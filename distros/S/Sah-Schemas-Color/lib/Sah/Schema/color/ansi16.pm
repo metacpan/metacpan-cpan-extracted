@@ -1,20 +1,20 @@
 package Sah::Schema::color::ansi16;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-02'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Color'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our $schema = [str => {
     summary => 'ANSI-16 color, either a number from 0-15 or color names like "black", "bold red", etc',
     match => qr/\A(?:0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|
                     (?:(bold|bright) \s )?(black|red|green|yellow|blue|magenta|cyan|white))\z/ix,
     examples => [
-        {data=> 0, valid=>1},
-        {data=>15, valid=>1},
-        {data=>16, valid=>0},
-        {data=>'black'  , valid=>1, res=>'black'},
-        {data=>'foo'    , valid=>0},
+        {value=> 0, valid=>1},
+        {value=>15, valid=>1},
+        {value=>16, valid=>0},
+        {value=>'black'  , valid=>1, validated_value=>'black'},
+        {value=>'foo'    , valid=>0},
     ],
 }, {}];
 
@@ -33,9 +33,39 @@ Sah::Schema::color::ansi16 - ANSI-16 color, either a number from 0-15 or color n
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::Schema::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+This document describes version 0.012 of Sah::Schema::color::ansi16 (from Perl distribution Sah-Schemas-Color), released on 2020-03-08.
 
 =head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("color::ansi16*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['color::ansi16*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
 
 Sample data:
 

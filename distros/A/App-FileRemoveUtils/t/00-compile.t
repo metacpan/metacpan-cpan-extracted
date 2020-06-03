@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FileDeleteUtils.pm',
@@ -15,7 +15,9 @@ my @module_files = (
 
 my @scripts = (
     'script/delete-all-empty-dirs',
-    'script/delete-all-empty-files'
+    'script/delete-all-empty-files',
+    'script/list-all-empty-dirs',
+    'script/list-all-empty-files'
 );
 
 # no fake home requested

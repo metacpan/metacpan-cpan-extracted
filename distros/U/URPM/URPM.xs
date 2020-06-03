@@ -981,6 +981,29 @@ update_provides_files(const URPM__Package pkg, HV *provides) {
   }
 }
 
+static FD_t open_compressed_file(char *filename) {
+  char *t;
+  rpmCompressedMagic compressed = COMPRESSED_OTHER;
+  int rc = rpmFileIsCompressed(filename, &compressed);
+  switch (compressed) {
+  case COMPRESSED_BZIP2: t = "r.bzip2"; break;
+  case COMPRESSED_LZMA:
+  case COMPRESSED_XZ:
+    t = "r.xz"; break;
+#ifdef RPM4_14_0
+  case COMPRESSED_ZSTD:
+    t = "r.zstd"; break;
+#endif
+  case COMPRESSED_OTHER:
+  default:
+    t = "r.gzip"; break;
+  }
+  if (rc)
+    return NULL;
+  FD_t f = Fopen(filename, "r.fdio");
+  return Fdopen(f, t);
+}
+
 static FD_t
 open_archive(char *filename, int *empty_archive) {
   int fd;
@@ -2911,13 +2934,12 @@ Urpm_parse_synthesis__XS(urpm, filename, ...)
 
     if (depslist != NULL) {
       char buff[65536*2];
-      char *p, *eol, *t;
+      char *p, *eol;
       int buff_len;
       struct s_Package pkg;
       FD_t f = NULL;
       int start_id = 1 + av_len(depslist);
       SV *callback = NULL;
-      rpmCompressedMagic compressed = COMPRESSED_OTHER;
 
       if (items > 2) {
 	int i;
@@ -2931,24 +2953,9 @@ Urpm_parse_synthesis__XS(urpm, filename, ...)
       }
 
       PUTBACK;
-      int rc = rpmFileIsCompressed(filename, &compressed);
+      f = open_compressed_file(filename);
 
-      switch (compressed) {
-      case COMPRESSED_BZIP2: t = "r.bzip2"; break;
-      case COMPRESSED_LZMA:
-      case COMPRESSED_XZ:
-        t = "r.xz"; break;
-#ifdef RPM4_14_0
-      case COMPRESSED_ZSTD:
-        t = "r.zstd"; break;
-#endif
-      case COMPRESSED_OTHER:
-      default:
-        t = "r.gzip"; break;
-      }
-      f = Fopen(filename, "r.fdio");
-
-      if (!rc && (f = Fdopen(f, t)) != NULL && !Ferror(f)) {
+      if (f != NULL && !Ferror(f)) {
 	// initialize first package
 	memset(&pkg, 0, sizeof(struct s_Package));
 	buff[sizeof(buff)-1] = 0;

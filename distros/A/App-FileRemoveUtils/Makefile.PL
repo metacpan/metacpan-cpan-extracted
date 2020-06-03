@@ -15,12 +15,15 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-FileRemoveUtils",
   "EXE_FILES" => [
     "script/delete-all-empty-dirs",
-    "script/delete-all-empty-files"
+    "script/delete-all-empty-files",
+    "script/list-all-empty-dirs",
+    "script/list-all-empty-files"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::FileRemoveUtils",
   "PREREQ_PM" => {
+    "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Exporter" => "5.57",
     "File::Find" => 0,
     "File::MoreUtil" => "0.624",
@@ -33,13 +36,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Slurper" => 0,
     "File::Spec" => 0,
-    "File::Temp" => 0,
+    "File::Temp" => "0.2307",
     "File::chdir" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,12 +50,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Exporter" => "5.57",
   "File::Find" => 0,
   "File::MoreUtil" => "0.624",
   "File::Slurper" => 0,
   "File::Spec" => 0,
-  "File::Temp" => 0,
+  "File::Temp" => "0.2307",
   "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

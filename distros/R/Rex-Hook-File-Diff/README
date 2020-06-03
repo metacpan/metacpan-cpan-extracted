@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v0.1.0
+    version v0.2.0
 
 SYNOPSIS
 
@@ -34,6 +34,8 @@ DESCRIPTION
 
     sed <https://metacpan.org/pod/Rex::Commands::File#sed>
 
+      It uses the diff utility if available.
+
 DIAGNOSTICS
 
     This module does not do any error checking (yet).
@@ -47,6 +49,8 @@ DEPENDENCIES
 
     See the included cpanfile.
 
+    Requires the diff utility to show the diff for remote file operations.
+
 INCOMPATIBILITIES
 
     There are no known incompatibilities with other modules.
@@ -54,8 +58,6 @@ INCOMPATIBILITIES
 BUGS AND LIMITATIONS
 
     There are no known bugs. Make sure they are reported.
-
-    Currently the module supports local file operations only.
 
     Upload hook support is not implemented (yet), so diff is not shown upon
     file uploads when using the source option with the file

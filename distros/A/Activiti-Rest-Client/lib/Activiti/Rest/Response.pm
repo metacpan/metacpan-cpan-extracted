@@ -104,8 +104,8 @@ sub from_http_response {
 
     if($content_type =~ /json/o){
       $new_args{parsed_content} = JSON::decode_json($res->content);
-    }elsif($content_type =~ /xml/o){
-      $new_args{parsed_content} = Encode::decode('UTF-8',$res->content);
+    }elsif($content_type =~ /(xml|html)/o){
+      $new_args{parsed_content} = $res->decoded_content();
     }
 
   }

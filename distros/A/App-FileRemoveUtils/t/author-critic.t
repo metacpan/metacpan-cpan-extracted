@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/FileDeleteUtils.pm','lib/App/FileRemoveUtils.pm','script/delete-all-empty-dirs','script/delete-all-empty-files'];
+my $filenames = ['lib/App/FileDeleteUtils.pm','lib/App/FileRemoveUtils.pm','script/delete-all-empty-dirs','script/delete-all-empty-files','script/list-all-empty-dirs','script/list-all-empty-files'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -1,4 +1,4 @@
-# this file was auto-generated at 2020-05-28 14:42:53
+# this file was auto-generated at 2020-06-03 12:45:43
 aaa.aaa
 aarp.aarp
 abarth.abarth
@@ -49,6 +49,7 @@ ally.ally
 alsace.alsace
 alstom.alstom
 am.am
+amazon.amazon
 americanexpress.americanexpress
 americanfamily.americanfamily
 amex.amex
@@ -1436,6 +1437,7 @@ xin.xin
 орг.орг
 नेट.नेट
 ストア.ストア
+アマゾン.アマゾン
 삼성.삼성
 சிங்கப்பூர்.சிங்கப்பூர்
 商标.商标
@@ -1476,6 +1478,7 @@ xin.xin
 ком.ком
 укр.укр
 香港.香港
+亚马逊.亚马逊
 诺基亚.诺基亚
 食品.食品
 δοκιμή.δοκιμή

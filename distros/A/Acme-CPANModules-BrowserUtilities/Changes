@@ -1,0 +1,9 @@
+0.002   2020-06-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add per-browser lists: ChromeUtilities, FirefoxUtilities,
+	  OperaUtilities, VivaldiUtilities.
+
+
+0.001   2020-06-03  Released-By: PERLANCAR
+
+        - First release.

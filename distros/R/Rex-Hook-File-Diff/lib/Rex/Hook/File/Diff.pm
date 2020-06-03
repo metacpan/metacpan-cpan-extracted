@@ -6,9 +6,10 @@ use 5.012;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.0';
 
 use Rex 0.044 -base;
+use Rex::Helper::Run;
 use Rex::Hook;
 use Text::Diff 1.44;
 
@@ -17,14 +18,28 @@ register_function_hooks { before_change => { file => \&show_diff, }, };
 sub show_diff {
     my ( $original_file, @opts ) = @_;
 
-    if ( !Rex::is_local() ) {
-        Rex::Logger::debug('Skipping File::Diff hook due to remote connection');
+    my $diff;
+    my $diff_command = can_run('diff');
+
+    if ($diff_command) {
+        my $command = join q( ), $diff_command, '-u', involved_files($original_file);
+
+        if ( $diff = i_run $command, fail_ok => TRUE ) {
+            $diff .= "\n";
+        }
+    }
+    elsif ( Rex::is_local() ) {
+        $diff = diff( involved_files($original_file) );
+    }
+    else {
+        Rex::Logger::debug(
+            'Skipping File::Diff hook due to remote operation without the diff utility');
         return;
     }
 
-    my $diff = diff( involved_files($original_file) );
-
-    if ( length $diff > 0 ) { print "Diff for: $original_file\n$diff" }
+    if ( length $diff > 0 ) {
+        Rex::Commands::say("Diff for: $original_file\n$diff");
+    }
 
     return;
 }
@@ -76,7 +91,7 @@ Rex::Hook::File::Diff - show diff of changes for files managed by Rex
 
 =head1 VERSION
 
-version v0.1.0
+version v0.2.0
 
 =head1 SYNOPSIS
 
@@ -100,6 +115,8 @@ This module allows L<Rex> to show a diff of changes for the files managed via it
 
 =item L<sed|https://metacpan.org/pod/Rex::Commands::File#sed>
 
+It uses the C<diff> utility if available.
+
 =back
 
 =head1 DIAGNOSTICS
@@ -114,6 +131,8 @@ This module does not require any configuration, nor does it use any environment 
 
 See the included C<cpanfile>.
 
+Requires the C<diff> utility to show the diff for remote file operations.
+
 =head1 INCOMPATIBILITIES
 
 There are no known incompatibilities with other modules.
@@ -121,8 +140,6 @@ There are no known incompatibilities with other modules.
 =head1 BUGS AND LIMITATIONS
 
 There are no known bugs. Make sure they are reported.
-
-Currently the module supports local file operations only.
 
 Upload hook support is not implemented (yet), so diff is not shown upon file uploads when using the C<source> option with the L<file|https://metacpan.org/pod/Rex::Commands::File#file> command (or the L<upload|https://metacpan.org/pod/Rex::Commands::Upload#upload> command directly).
 

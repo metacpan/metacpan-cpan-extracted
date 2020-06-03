@@ -28,6 +28,7 @@ $rpmheaderlocation or die "Can't find rpmheader location";
 
 # Just to get rpm version. Deps checking has been done by ../Makefile.PL:
 my %cfg = ExtUtils::PkgConfig->find("rpm");
+$cfg{modversion} =~ s/(?:-(?:beta|rc).*)?$//i;
 $rpmv ||= $cfg{modversion};
 
 # Generate version-features flags depending on installed rpm version:

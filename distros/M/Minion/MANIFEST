@@ -65,6 +65,12 @@ MANIFEST.SKIP
 README.md
 t/backend.t
 t/commands.t
+t/lib/MinionTest/AddTestTask.pm
+t/lib/MinionTest/BadTestTask.pm
+t/lib/MinionTest/EmptyTestTask.pm
+t/lib/MinionTest/FailTestTask.pm
+t/lib/MinionTest/NoResultTestTask.pm
+t/lib/MinionTest/SyntaxErrorTestTask.pm
 t/pg.t
 t/pg_admin.t
 t/pg_lite_app.t

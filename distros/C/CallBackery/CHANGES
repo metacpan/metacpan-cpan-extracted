@@ -1,3 +1,7 @@
+0.33.3 2020-06-03 09:22:00 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix tra to properly handle multiple arguments
+
 0.33.2 2020-05-28 14:45:36 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - allow for dates before 1970 (negative epoch)

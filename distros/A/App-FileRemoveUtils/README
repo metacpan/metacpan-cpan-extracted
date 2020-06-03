@@ -2,8 +2,8 @@ NAME
     App::FileRemoveUtils - Utilities related to removing/deleting files
 
 VERSION
-    This document describes version 0.002 of App::FileRemoveUtils (from Perl
-    distribution App-FileRemoveUtils), released on 2020-05-30.
+    This document describes version 0.005 of App::FileRemoveUtils (from Perl
+    distribution App-FileRemoveUtils), released on 2020-06-03.
 
 DESCRIPTION
     This distribution provides the following command-line utilities:
@@ -11,6 +11,10 @@ DESCRIPTION
     *   delete-all-empty-dirs
 
     *   delete-all-empty-files
+
+    *   list-all-empty-dirs
+
+    *   list-all-empty-files
 
 FUNCTIONS
   delete_all_empty_dirs
@@ -70,6 +74,38 @@ FUNCTIONS
     element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
+
+    Return value: (any)
+
+  list_all_empty_dirs
+    Usage:
+
+     list_all_empty_dirs($include_would_be_empty) -> any
+
+    List all sempty (zero-entry) subdirectories in the current directory
+    tree.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $include_would_be_empty => *bool* (default: 1)
+
+        Include directories that would be empty if their empty
+        subdirectories are removed.
+
+    Return value: (any)
+
+  list_all_empty_files
+    Usage:
+
+     list_all_empty_files() -> any
+
+    List all empty (zero-sized) files in the current directory tree.
+
+    This function is not exported.
+
+    No arguments.
 
     Return value: (any)
 

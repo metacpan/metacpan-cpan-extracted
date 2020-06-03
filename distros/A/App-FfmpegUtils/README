@@ -1,0 +1,109 @@
+NAME
+    App::FfmpegUtils - Utilities related to ffmpeg
+
+VERSION
+    This document describes version 0.002 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2020-06-03.
+
+FUNCTIONS
+  reencode_video
+    Usage:
+
+     reencode_video(%args) -> [status, msg, payload, meta]
+
+    Re-encode video (using ffmpeg and H.264 codec).
+
+    This utility runs ffmpeg to re-encode your video files. It is a wrapper
+    to simplify invocation of ffmpeg. It selects the appropriate ffmpeg
+    options for you, allows you to specify multiple files, and picks
+    appropriate output filenames. It also sports a "--dry-run" option to let
+    you see ffmpeg options to be used without actually running ffmpeg.
+
+    This utility is usually used to reduce the file size (and optionally
+    video width/height) of videos so they are smaller, while minimizing
+    quality loss. The default setting is roughly similar to how Google
+    Photos encodes videos (max 1080p).
+
+    The default settings are:
+
+     -v:c libx264
+     -preset veryslow (to get the best compression rate, but with the slowest encoding time)
+     -crf 28 (0-51, subjectively sane is 18-28, 18 ~ visually lossless, 28 ~ visually acceptable)
+
+    when a downsizing is requested (using the "--downsize-to" option), this
+    utility first checks each input video if it is indeed larger than the
+    requested final size. If it is, then the "-vf scale" option is added.
+    This utility also calculates a valid size for ffmpeg, since using "-vf
+    scale=-1:720" sometimes results in failure due to odd number.
+
+    Audio streams are copied, not re-encoded.
+
+    Output filenames are:
+
+     ORIGINAL_NAME.crf28.mp4
+
+    or (if downsizing is done):
+
+     ORIGINAL_NAME.480p-crf28.mp4
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   crf => *int*
+
+    *   downsize_to => *str* (default: "1080p")
+
+        Downsizing will only be done if the input video is indeed larger
+        then the target downsize.
+
+        To disable downsizing, set "--downsize-to" to '' (empty string), or
+        specify on "--dont-downsize" on the CLI.
+
+    *   ffmpeg_path => *filename*
+
+    *   files* => *array[filename]*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-FfmpegUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-FfmpegUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-FfmpegUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

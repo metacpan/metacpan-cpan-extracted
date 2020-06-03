@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Sah::Compiler::perl::TH::bool" : "0",
             "Exporter" : "5.57",
             "File::Find" : "0",
             "File::MoreUtil" : "0.624",
@@ -48,7 +49,7 @@
          "requires" : {
             "File::Slurper" : "0",
             "File::Spec" : "0",
-            "File::Temp" : "0",
+            "File::Temp" : "0.2307",
             "File::chdir" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -68,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-App-FileRemoveUtils"
       }
    },
-   "version" : "0.002",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -82,6 +83,16 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript delete-all-empty-files",
+            "version" : "0.422"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript list-all-empty-dirs",
+            "version" : "0.422"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript list-all-empty-files",
             "version" : "0.422"
          },
          {

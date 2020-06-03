@@ -33,6 +33,7 @@ nytprof.out
 *.bs
 /_eumm/
 /config.*
+/conftools
 *~
 /.vscode/perl-lang/
 frontend/node_modules/

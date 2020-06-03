@@ -1,5 +1,8 @@
 Revision history for Perl extension EAV::XS.
 
+0.4.8  Wed Jun  3 09:51:22 UTC 2020
+	- update IANA database
+
 0.4.7  Thu May 28 12:16:07 UTC 2020
 	- update IANA database
 

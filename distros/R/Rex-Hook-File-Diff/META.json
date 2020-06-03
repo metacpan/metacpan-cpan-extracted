@@ -4,7 +4,7 @@
       "Ferenc Erki <erkiferenc@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,6 +36,7 @@
       "runtime" : {
          "requires" : {
             "Rex" : "0.044",
+            "Rex::Helper::Run" : "0",
             "Rex::Hook" : "0",
             "Text::Diff" : "1.44",
             "perl" : "5.014",
@@ -60,7 +61,7 @@
    "provides" : {
       "Rex::Hook::File::Diff" : {
          "file" : "lib/Rex/Hook/File/Diff.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -75,7 +76,7 @@
          "web" : "https://github.com/ferki/Rex-Hook-File-Diff"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.0",
    "x_generated_by_perl" : "v5.30.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -1,0 +1,70 @@
+{
+   "abstract" : "Implement RFC 8188 HTTP Encrypted Content Encoding",
+   "author" : [
+      "Ed J <etj@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Crypt-RFC8188",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.10"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "0",
+            "Test::Pod" : "1.22"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CryptX" : "0.068",
+            "Exporter" : "5.57",
+            "MIME::Base64" : "3.11",
+            "Math::BigInt" : "1.999804",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mohawk2/Crypt-RFC8188/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mohawk2/Crypt-RFC8188"
+      },
+      "x_IRC" : "irc://irc.perl.org/#graphql-perl"
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.00"
+}

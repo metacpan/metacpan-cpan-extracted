@@ -1,9 +1,9 @@
 package Sah::SchemaR::color::ansi256;
 
-our $DATE = '2020-03-02'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.012'; # VERSION
 
-our $rschema = ["int",[{examples=>[{data=>0,valid=>1},{data=>255,valid=>1},{data=>256,valid=>0},{data=>"black",valid=>0},{data=>"foo",valid=>0}],max=>255,min=>0,summary=>"ANSI-256 color, an integer number from 0-255"}],["int"]];
+our $rschema = ["int",[{examples=>[{valid=>1,value=>0},{valid=>1,value=>255},{valid=>0,value=>256},{valid=>0,value=>"black"},{valid=>0,value=>"foo"}],max=>255,min=>0,summary=>"ANSI-256 color, an integer number from 0-255"}],["int"]];
 
 1;
 # ABSTRACT: ANSI-256 color, an integer number from 0-255
@@ -20,7 +20,7 @@ Sah::SchemaR::color::ansi256 - ANSI-256 color, an integer number from 0-255
 
 =head1 VERSION
 
-This document describes version 0.009 of Sah::SchemaR::color::ansi256 (from Perl distribution Sah-Schemas-Color), released on 2020-03-02.
+This document describes version 0.012 of Sah::SchemaR::color::ansi256 (from Perl distribution Sah-Schemas-Color), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

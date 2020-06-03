@@ -54,6 +54,6 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "10.05",
+   "version" : "10.06",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -3,14 +3,18 @@ NAME
     Multi-Account Containers add-on
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.006 of
     App::FirefoxMultiAccountContainersUtils (from Perl distribution
-    App-FirefoxMultiAccountContainersUtils), released on 2020-05-26.
+    App-FirefoxMultiAccountContainersUtils), released on 2020-06-03.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities related to Firefox
     multi-account containers addon:
+
+    *   firefox-mua-list-containers
+
+    *   firefox-mua-modify-containers
 
     *   firefox-mua-sort-containers
 
@@ -19,6 +23,95 @@ DESCRIPTION
     />.
 
 FUNCTIONS
+  firefox_mua_list_containers
+    Usage:
+
+     firefox_mua_list_containers(%args) -> [status, msg, payload, meta]
+
+    Sort Firefox Multi-Account Containers add-on's containers.
+
+    At the time of this writing, the UI does not provide a way to sort the
+    containers. Thus this utility.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   profile* => *firefox::profile_name*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  firefox_mua_modify_containers
+    Usage:
+
+     firefox_mua_modify_containers(%args) -> [status, msg, payload, meta]
+
+    Modify (and delete) Firefox Multi-Account Containers add-on's containers
+    with Perl code.
+
+    Examples:
+
+    *   Delete all containers matching some conditions (remove -n to
+        actually delete it):
+
+         firefox_mua_modify_containers(
+             profile => "myprofile",
+           code => "return 0 if \$_->{icon} eq \"cart\" || \$_->{name} =~ /temp/i; \$_"
+         );
+
+    *   Delete all containers (remove -n to actually delete it):
+
+         firefox_mua_modify_containers( profile => "myprofile", code => 0);
+
+    *   Change all icons to "dollar" and all colors to "red":
+
+         firefox_mua_modify_containers(
+             profile => "myprofile",
+           code => "\$_->{icon} = \"dollar\"; \$_->{color} = \"red\"; \$_"
+         );
+
+    This utility lets you modify the identity records in "containers.json"
+    file using Perl code. The Perl code is called for every container
+    (record). It is given the record hash in $_ and is supposed to modify
+    and return the modified the record. It can also choose to return false
+    to instruct deleting the record.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code* => *code|str*
+
+    *   profile* => *firefox::profile_name*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   firefox_mua_sort_containers
     Usage:
 

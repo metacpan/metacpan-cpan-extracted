@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.16.2';
+$App::gimpgitbuild::Command::build::VERSION = '0.18.0';
 use strict;
 use warnings;
 use 5.014;
@@ -24,7 +24,7 @@ sub abstract
 
 sub opt_spec
 {
-    return ();
+    return ( [ "mode=s", "Mode (e.g: \"clean\")" ], );
 
 
 }
@@ -105,9 +105,11 @@ qq#NOCONFIGURE=1 ./autogen.sh && ./configure @{$extra_configure_args} --prefix="
             cmd => [
 qq#cd "$git_co" && git checkout "$args->{branch}" && ( $args->{tag} || $sync_cmd ) && #
                     . (
-                      $args->{use_meson}
-                    ? $meson_build_shell_cmd
-                    : $autoconf_build_shell_cmd
+                    ( $self->{mode} eq 'clean' ) ? "git clean -dxf ."
+                    : (
+                          $args->{use_meson} ? $meson_build_shell_cmd
+                        : $autoconf_build_shell_cmd
+                    )
                     )
             ]
         }
@@ -130,8 +132,11 @@ sub execute
 {
     my ( $self, $opt, $args ) = @_;
 
-    my $output_fn = $opt->{output};
-    my $exe       = $opt->{exec} // [];
+    my $mode = ( $opt->{mode} || 'build' );
+    if ( not( ( $mode eq 'clean' ) or ( $mode eq 'build' ) ) )
+    {
+        die "Unsupported mode '$mode'!";
+    }
 
     my $fh  = \*STDIN;
     my $obj = App::gimpgitbuild::API::GitBuild->new;
@@ -142,6 +147,7 @@ sub execute
     $ENV{PKG_CONFIG_PATH} = $env->{PKG_CONFIG_PATH};
     $ENV{XDG_DATA_DIRS}   = $env->{XDG_DATA_DIRS};
     _which_xvfb_run();
+    $self->{mode} = $mode;
     my $base_src_dir = $obj->base_git_clones_dir;
 
     my $GNOME_GIT = 'https://gitlab.gnome.org/GNOME';
@@ -170,7 +176,7 @@ sub execute
             url       => "https://github.com/mypaint/libmypaint.git",
             prefix    => $obj->mypaint_p,
             use_meson => 0,
-            branch    => "v1.5.1",
+            branch    => "v1.6.1",
             tag       => "true",
         }
     );
@@ -216,7 +222,7 @@ __END__
 
 =head1 VERSION
 
-version 0.16.2
+version 0.18.0
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

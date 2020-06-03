@@ -31,5 +31,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: git://git.mageia.org/software/rpm/perl-URPM/
-version: v5.28
+version: v5.122
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

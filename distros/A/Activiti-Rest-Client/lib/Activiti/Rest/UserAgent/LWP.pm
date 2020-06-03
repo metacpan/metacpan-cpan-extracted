@@ -99,9 +99,11 @@ sub _construct_params_as_array {
   return \@array;
 }
 sub _get {
-  my($self,$url,$data)=@_;
+  my($self,$url,$data,$headers)=@_;
   my $query = _construct_query($data) || "";
-  $self->ua->get($url."?$query");
+  my @headers;
+  @headers = @{ _construct_params_as_array($headers) } if is_hash_ref($headers);
+  $self->ua->get($url."?$query",@headers);
 }
 sub _delete {
   my($self,$url,$params,$headers)=@_;

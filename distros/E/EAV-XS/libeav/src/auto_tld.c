@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2020-05-28 14:42:52 */
+/* this file was auto-generated at 2020-06-03 12:45:43 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -54,6 +54,7 @@ const tld_t tld_list[] = {
     { "alsace", 7, TLD_TYPE_GENERIC },
     { "alstom", 7, TLD_TYPE_GENERIC },
     { "am", 3, TLD_TYPE_COUNTRY_CODE },
+    { "amazon", 7, TLD_TYPE_GENERIC },
     { "americanexpress", 16, TLD_TYPE_GENERIC },
     { "americanfamily", 15, TLD_TYPE_GENERIC },
     { "amex", 5, TLD_TYPE_GENERIC },
@@ -1120,7 +1121,7 @@ const tld_t tld_list[] = {
     { "schwarz", 8, TLD_TYPE_GENERIC },
     { "science", 8, TLD_TYPE_GENERIC },
     { "scjohnson", 10, TLD_TYPE_GENERIC },
-    { "scor", 5, TLD_TYPE_GENERIC },
+    { "scor", 5, TLD_TYPE_NOT_ASSIGNED },
     { "scot", 5, TLD_TYPE_GENERIC },
     { "sd", 3, TLD_TYPE_COUNTRY_CODE },
     { "se", 3, TLD_TYPE_COUNTRY_CODE },
@@ -1441,6 +1442,7 @@ const tld_t tld_list[] = {
     { "xn--c1avg", 10, TLD_TYPE_GENERIC },
     { "xn--c2br7g", 11, TLD_TYPE_GENERIC },
     { "xn--cck2b3b", 12, TLD_TYPE_GENERIC },
+    { "xn--cckwcxetd", 14, TLD_TYPE_GENERIC },
     { "xn--cg4bki", 11, TLD_TYPE_GENERIC },
     { "xn--clchc0ea0b2g2a9gcd", 23, TLD_TYPE_COUNTRY_CODE },
     { "xn--czr694b", 12, TLD_TYPE_GENERIC },
@@ -1481,6 +1483,7 @@ const tld_t tld_list[] = {
     { "xn--j1aef", 10, TLD_TYPE_GENERIC },
     { "xn--j1amh", 10, TLD_TYPE_COUNTRY_CODE },
     { "xn--j6w193g", 12, TLD_TYPE_COUNTRY_CODE },
+    { "xn--jlq480n2rg", 15, TLD_TYPE_GENERIC },
     { "xn--jlq61u9w7b", 15, TLD_TYPE_GENERIC },
     { "xn--jvr189m", 12, TLD_TYPE_GENERIC },
     { "xn--jxalpdlp", 13, TLD_TYPE_TEST },

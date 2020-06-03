@@ -1,11 +1,17 @@
-0.22    2017-07-11 (PERLANCAR)
+0.230   2020-06-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Prefix function name in do/undo actions with package
+	  name, so they're usable from other package.
+
+
+0.22    2017-07-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.21    2016-12-28 (PERLANCAR)
+0.21    2016-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -13,7 +19,7 @@
 	  x_spec.
 
 
-0.20    2016-12-27 (PERLANCAR)
+0.20    2016-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -26,7 +32,7 @@
         - [build] Rebuild to remove extraneous dependencies.
 
 
-0.19    2016-06-12 (PERLANCAR)
+0.19    2016-06-12  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -35,7 +41,7 @@
 	- [dist] Bump prereq version Test::Perinci::Tx::Manager -> 0.56.
 
 
-0.18    2015-09-03 (PERLANCAR)
+0.18    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -44,27 +50,27 @@
 	  requirement.
 
 
-0.17    2015-08-17 (PERLANCAR)
+0.17    2015-08-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.16    2015-02-06 (PERLANCAR)
+0.16    2015-02-06  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Adjust to Perinci::CmdLine -> Perinci::CmdLine::Classic.
 
 
-0.15    2014-12-19 (PERLANCAR)
+0.15    2014-12-19  Released-By: PERLANCAR
 
         - [Bugfix] Update old code (which didn't adjust to pericmd 1.17+, where
           all pericmd's run methods return envres directly).
 
 
-0.14    2014-12-05 (PERLANCAR)
+0.14    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -72,40 +78,40 @@
 	  File::MoreUtil.
 
 
-0.13    2014-10-14 (PERLANCAR)
+0.13    2014-10-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add screenshot.
 
 
-0.12    2014-08-24 (SHARYANTO)
+0.12    2014-08-24  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Adjust to Perinci::CmdLine 1.20.
 
 
-0.11    2014-05-17 (SHARYANTO)
+0.11    2014-05-17  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Replace File::Slurp with File::Slurp::Tiny.
 
 
-0.10    2013-05-10 (SHARYANTO)
+0.10    2013-05-10  Released-By: SHARYANTO
 
         - No functional changes. Adjust to Perinci::CmdLine 0.76.
 
 
-0.09    2012-09-06 (SHARYANTO)
+0.09    2012-09-06  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - trash() returns path of file in trash.
 
 
-0.08    2012-09-04 (SHARYANTO)
+0.08    2012-09-04  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -119,7 +125,7 @@
         - A couple of other fixes.
 
 
-0.07    2012-08-28 (SHARYANTO)
+0.07    2012-08-28  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -127,7 +133,7 @@
           using suffix.
 
 
-0.06    2012-08-24 (SHARYANTO)
+0.06    2012-08-24  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
@@ -135,7 +141,7 @@
           avoid problem with trashing symlinks.
 
 
-0.05    2012-08-24 (SHARYANTO)
+0.05    2012-08-24  Released-By: SHARYANTO
 
         [REMOVED FEATURES]
 
@@ -151,14 +157,14 @@
           Perinci::Sub::Gen::Undoable.
 
 
-0.04    2012-08-16 (SHARYANTO)
+0.04    2012-08-16  Released-By: SHARYANTO
 
         - Update to using Perinci::Sub::Gen::Undoable 0.25 (v=2).
 
         - Allow empty_trash() to work without Perinci::CmdLine.
 
 
-0.03    2012-07-27 (SHARYANTO)
+0.03    2012-07-27  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -170,7 +176,7 @@
           entered by user.
 
 
-0.02    2012-07-27 (SHARYANTO)
+0.02    2012-07-27  Released-By: SHARYANTO
 
         [BUG FIXES]
 
@@ -181,6 +187,6 @@
           found, permission denied).
 
 
-0.01    2012-07-26 (SHARYANTO)
+0.01    2012-07-26  Released-By: SHARYANTO
 
         - First version.

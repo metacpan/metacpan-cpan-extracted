@@ -3,3 +3,7 @@ Revision history for Perl module Neo4j::Client
     - Initial version
 0.11 2020-06-02
     - Pull CFLAGS from configure run and append
+0.12 2020-06-02
+    - Abort Makefile.PL on MSWin
+0.15 2020-06-03
+    - Install config.h, libneo4j-client src/lib/*.h, and add DEV_CCFLAGS

@@ -145,9 +145,8 @@ my %tests = (
 		'construct' => sub {
 			return $class->new($csvfile, %default_options,
 				'include_fields' => [
-					'ID',
 					'postcode',
-					'Subscription list',
+					'Address Code 2',
 				],
 			);
 		},
@@ -157,12 +156,19 @@ my %tests = (
 			is_deeply(
 				[$o->fieldNames()],
 				[
-					'ID',
 					'postcode',				# Aliased 'Postal Code',
-					'Subscription list',
+					'Address Code 2',
 				],
 				"$name: fieldNames() returns expected names"
 			);
+		},
+		'extra row tests' => sub {
+			my $name = shift;
+			my $o = shift;
+			my $row = shift;
+			if (defined($row->{'Address Code 2'})) {
+				is($row->{'postcode'}, '1234AB', 'include_fields does not mess up internal field indexing');
+			}
 		},
 	},
 );
@@ -190,8 +196,7 @@ foreach my $name (keys %tests) {
 		while (my $row = $o->nextRow()) {
 			ok(!$o->eof(), "$name: eof() not reached while reading");
 			$verbose && diag("$name " . Data::Dumper::Dumper($row));
-			ok(defined($row->{'ID'}) && ($row->{'ID'} =~ /^\d+$/), "$name: \$row->{'ID'} returns the expected value");
-			ok(defined($row->{'postcode'}), "$name: \$row->{'postcode'} returns a value");
+			ok(defined($row->{'postcode'}) && ($row->{'postcode'} =~ /^\d{4}[A-Z]{2}$/), "$name: \$row->{'postcode'} returns the expected value");
 			if (my $sub = $test->{'extra row tests'}) {
 				&{$test->{'extra row tests'}}($name, $o, $row);
 			}

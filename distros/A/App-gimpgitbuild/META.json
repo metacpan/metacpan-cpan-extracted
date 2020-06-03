@@ -62,23 +62,23 @@
    "provides" : {
       "App::gimpgitbuild" : {
          "file" : "lib/App/gimpgitbuild.pm",
-         "version" : "v0.16.2"
+         "version" : "v0.18.0"
       },
       "App::gimpgitbuild::API::GitBuild" : {
          "file" : "lib/App/gimpgitbuild/API/GitBuild.pm",
-         "version" : "v0.16.2"
+         "version" : "v0.18.0"
       },
       "App::gimpgitbuild::Command::build" : {
          "file" : "lib/App/gimpgitbuild/Command/build.pm",
-         "version" : "v0.16.2"
+         "version" : "v0.18.0"
       },
       "App::gimpgitbuild::Command::env" : {
          "file" : "lib/App/gimpgitbuild/Command/env.pm",
-         "version" : "v0.16.2"
+         "version" : "v0.18.0"
       },
       "App::gimpgitbuild::Command::runenv" : {
          "file" : "lib/App/gimpgitbuild/Command/runenv.pm",
-         "version" : "v0.16.2"
+         "version" : "v0.18.0"
       }
    },
    "release_status" : "stable",
@@ -93,10 +93,10 @@
          "web" : "https://github.com/shlomif/App-gimpgitbuild"
       }
    },
-   "version" : "0.16.2",
+   "version" : "0.18.0",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030002"
+         "version" : "5.030003"
       },
       "plugins" : [
          {
@@ -556,7 +556,7 @@
          "version" : "6.014"
       }
    },
-   "x_generated_by_perl" : "v5.30.2",
+   "x_generated_by_perl" : "v5.30.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Apache-2.0"
 }

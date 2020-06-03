@@ -1,3 +1,7 @@
+0.6.1 2020-06-03 10:03:20 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - keep translation files sorted to reduce diff size
+
 0.6.0 2020-05-10 13:44:32 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - add rebuild test to github action

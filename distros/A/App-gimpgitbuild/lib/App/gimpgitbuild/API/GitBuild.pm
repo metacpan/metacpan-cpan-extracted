@@ -1,5 +1,5 @@
 package App::gimpgitbuild::API::GitBuild;
-$App::gimpgitbuild::API::GitBuild::VERSION = '0.16.2';
+$App::gimpgitbuild::API::GitBuild::VERSION = '0.18.0';
 use strict;
 use warnings;
 use 5.014;
@@ -109,7 +109,7 @@ App::gimpgitbuild::API::GitBuild - common API
 
 =head1 VERSION
 
-version 0.16.2
+version 0.18.0
 
 =head1 METHODS
 

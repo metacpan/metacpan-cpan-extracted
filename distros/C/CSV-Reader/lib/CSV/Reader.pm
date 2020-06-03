@@ -3,7 +3,7 @@ use strict;
 use Carp qw(carp croak);
 use Text::CSV ();
 use Tie::IxHash ();
-our $VERSION = 1.09;
+our $VERSION = 1.10;
 
 =head1 NAME
 
@@ -304,8 +304,9 @@ sub _read {
 			warn(__PACKAGE__ . '::_read ' . Data::Dumper::Dumper($csv_row));
 		}
 		tie(my %row, 'Tie::IxHash');
-		my $i=0;
+		my $field_cols = $self->{'field_cols'};	# name to index map
 		foreach my $k ($self->fieldNames()) {
+			my $i = $field_cols->{$k};
 			my $v = $csv_row->[$i];
 			if (defined($v)) {
 				$v =~ s/^\s+|\s+$//g;
@@ -314,7 +315,6 @@ sub _read {
 				}
 			}
 			$row{$k} = $v;
-			$i++;
 		}
 		$self->{'row'} = \%row;
 		$self->{'linenum'}++;

@@ -1,3 +1,6 @@
+0.1255  2020-06-03 11:28:58 CEST
+   - add support for deadletter jobs from flowable
+
 0.1254  2018-04-25 11:16:46 CEST
    - add option timeout for client
 

@@ -14,6 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-FirefoxMultiAccountContainersUtils",
   "EXE_FILES" => [
+    "script/firefox-mua-list-containers",
+    "script/firefox-mua-modify-containers",
     "script/firefox-mua-sort-containers"
   ],
   "LICENSE" => "perl",
@@ -21,7 +23,9 @@ my %WriteMakefileArgs = (
   "NAME" => "App::FirefoxMultiAccountContainersUtils",
   "PREREQ_PM" => {
     "App::FirefoxUtils" => "0.012",
+    "Data::Sah::Compiler::perl::TH::any" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
+    "Data::Sah::Compiler::perl::TH::code" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Str::replace_dashes_with_underscores" => 0,
     "File::Copy" => 0,
@@ -43,7 +47,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +56,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::FirefoxUtils" => "0.012",
+  "Data::Sah::Compiler::perl::TH::any" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
+  "Data::Sah::Compiler::perl::TH::code" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "Data::Sah::Filter::perl::Str::replace_dashes_with_underscores" => 0,
   "File::Copy" => 0,

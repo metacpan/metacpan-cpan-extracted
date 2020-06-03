@@ -34,7 +34,9 @@
       "runtime" : {
          "requires" : {
             "App::FirefoxUtils" : "0.012",
+            "Data::Sah::Compiler::perl::TH::any" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
+            "Data::Sah::Compiler::perl::TH::code" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "Data::Sah::Filter::perl::Str::replace_dashes_with_underscores" : "0",
             "File::Copy" : "0",
@@ -73,12 +75,22 @@
          "web" : "https://github.com/perlancar/perl-App-FirefoxMultiAccountContainersUtils"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript firefox-mua-list-containers",
+            "version" : "0.422"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript firefox-mua-modify-containers",
+            "version" : "0.422"
+         },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript firefox-mua-sort-containers",

@@ -1,7 +1,7 @@
 package File::Trash::Undoable;
 
-our $DATE = '2017-07-11'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2020-06-03'; # DATE
+our $VERSION = '0.230'; # VERSION
 
 use 5.010001;
 use strict;
@@ -63,7 +63,7 @@ sub trash {
     if (defined $suffix) {
         if ($tx_action eq 'check_state') {
             if ($exists) {
-                unshift @undo, [untrash => {path=>$path, suffix=>$suffix}];
+                unshift @undo, [__PACKAGE__."::untrash" => {path=>$path, suffix=>$suffix}];
             }
             if (@undo) {
                 log_info("(DRY) Trashing $path ...") if $dry_run;
@@ -84,8 +84,8 @@ sub trash {
             or return [412, "Please specify -tx_action_id"];
         $suffix = substr($taid, 0, 8);
         if ($exists) {
-            push    @do  , [trash   => {path=>$path, suffix=>$suffix}];
-            unshift @undo, [untrash => {path=>$path, suffix=>$suffix}];
+            push    @do  , [__PACKAGE__."::trash"   => {path=>$path, suffix=>$suffix}];
+            unshift @undo, [__PACKAGE__."::untrash" => {path=>$path, suffix=>$suffix}];
         }
         if (@undo) {
             log_info("(DRY) Trashing $path (suffix $suffix) ...") if $dry_run;
@@ -143,7 +143,7 @@ sub untrash {
         my @res = $trash->list_contents({
             search_path=>$apath, suffix=>$suffix});
         return [412, "File/dir $path0 does not exist in trash"] unless @res;
-        unshift @undo, [trash => {path => $apath, suffix=>$suffix}];
+        unshift @undo, [__PACKAGE__."::trash" => {path => $apath, suffix=>$suffix}];
         log_info("(DRY) Untrashing $path0 ...") if $dry_run;
         return [200, "File/dir $path0 should be untrashed",
                 undef, {undo_actions=>\@undo}];
@@ -196,8 +196,8 @@ sub trash_files {
         $_ = l_abs_path($_);
         $_ or return [400, "Can't convert to absolute path: $orig"];
         log_info("(DRY) Trashing %s ...", $orig) if $dry_run;
-        push    @do  , [trash   => {path=>$_}];
-        unshift @undo, [untrash => {path=>$_, mtime=>$st[9]}];
+        push    @do  , [__PACKAGE__."::trash"   => {path=>$_}];
+        unshift @undo, [__PACKAGE__."::untrash" => {path=>$_, mtime=>$st[9]}];
     }
 
     return [200, "", undef, {do_actions=>\@do, undo_actions=>\@undo}];
@@ -243,7 +243,7 @@ File::Trash::Undoable - Trash files, with undo/redo capability
 
 =head1 VERSION
 
-This document describes version 0.22 of File::Trash::Undoable (from Perl distribution File-Trash-Undoable), released on 2017-07-11.
+This document describes version 0.230 of File::Trash::Undoable (from Perl distribution File-Trash-Undoable), released on 2020-06-03.
 
 =head1 SYNOPSIS
 
@@ -263,7 +263,7 @@ Screenshots:
 
 Usage:
 
- empty_trash() -> [status, msg, result, meta]
+ empty_trash() -> [status, msg, payload, meta]
 
 Empty trash.
 
@@ -276,18 +276,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_trash_contents
 
 Usage:
 
- list_trash_contents() -> [status, msg, result, meta]
+ list_trash_contents() -> [status, msg, payload, meta]
 
 List contents of trash directory.
 
@@ -300,18 +301,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 trash
 
 Usage:
 
- trash(%args) -> [status, msg, result, meta]
+ trash(%args) -> [status, msg, payload, meta]
 
 Trash a file.
 
@@ -332,6 +334,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<suffix> => I<str>
 
+
 =back
 
 Special arguments:
@@ -340,23 +343,23 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
@@ -365,18 +368,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 trash_files
 
 Usage:
 
- trash_files(%args) -> [status, msg, result, meta]
+ trash_files(%args) -> [status, msg, payload, meta]
 
 Trash files (with undo support).
 
@@ -391,9 +395,10 @@ Arguments ('*' denotes required arguments):
 
 =item * B<files>* => I<array[str]>
 
-Files/dirs to delete.
+FilesE<sol>dirs to delete.
 
 Files must exist.
+
 
 =back
 
@@ -403,23 +408,23 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
@@ -428,18 +433,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 untrash
 
 Usage:
 
- untrash(%args) -> [status, msg, result, meta]
+ untrash(%args) -> [status, msg, payload, meta]
 
 Untrash a file.
 
@@ -461,6 +467,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<suffix> => I<str>
 
+
 =back
 
 Special arguments:
@@ -469,23 +476,23 @@ Special arguments:
 
 =item * B<-tx_action> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_action_id> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_recovery> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_rollback> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =item * B<-tx_v> => I<str>
 
-For more information on transaction, see L<Rinci::Transaction>.
+For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 =back
 
@@ -494,7 +501,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -544,7 +551,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

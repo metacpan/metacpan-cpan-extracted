@@ -1,3 +1,21 @@
+0.005   2020-06-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add list_all_empty_dirs().
+
+        - Add CLIs: list-all-empty-dirs, list-all-empty-files.
+
+
+0.004   2020-06-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add list_all_empty_files().
+
+
+0.003   2020-06-03  Released-By: PERLANCAR; Urgency: medium
+
+	- delete_all_empty_files(): Return the filenames in result
+	  metadata.
+
+
 0.002   2020-05-30  Released-By: PERLANCAR; Urgency: medium
 
 	- [removed] Remove scripts that got accidentally copied from

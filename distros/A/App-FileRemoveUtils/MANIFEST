@@ -11,6 +11,8 @@ lib/App/FileDeleteUtils.pm
 lib/App/FileRemoveUtils.pm
 script/delete-all-empty-dirs
 script/delete-all-empty-files
+script/list-all-empty-dirs
+script/list-all-empty-files
 t/00-compile.t
 t/01-basic.t
 t/author-critic.t

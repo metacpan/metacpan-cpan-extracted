@@ -1,5 +1,5 @@
 package System::Command::Reaper;
-$System::Command::Reaper::VERSION = '1.119';
+$System::Command::Reaper::VERSION = '1.120';
 use strict;
 use warnings;
 use 5.006;
@@ -112,6 +112,8 @@ sub close {
 
 sub DESTROY {
     my ($self) = @_;
+    local $?;
+    local $!;
     $self->close if !exists $self->{exit};
 }
 
@@ -127,7 +129,7 @@ System::Command::Reaper - Reap processes started by System::Command
 
 =head1 VERSION
 
-version 1.119
+version 1.120
 
 =head1 SYNOPSIS
 

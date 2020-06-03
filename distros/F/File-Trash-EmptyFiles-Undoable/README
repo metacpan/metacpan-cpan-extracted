@@ -1,0 +1,98 @@
+NAME
+    File::Trash::EmptyFiles::Undoable - Trash all empty files in the current
+    directory tree, with undo/redo capability
+
+VERSION
+    This document describes version 0.001 of
+    File::Trash::EmptyFiles::Undoable (from Perl distribution
+    File-Trash-EmptyFiles-Undoable), released on 2020-06-03.
+
+SYNOPSIS
+     # use the trash-all-empty-files-u script
+
+DESCRIPTION
+    This module provides routines to trash all empty files in the current
+    directory tree, with undo/redo support. Actual trashing/untrashing is
+    provided by File::Trash::Undoable.
+
+    This is the undoable version of App::FileRemoveUtils
+    "delete_all_empty_files". The CLI is trash-all-empty-files-u.
+
+FUNCTIONS
+  trash_all_empty_files
+    Usage:
+
+     trash_all_empty_files() -> [status, msg, payload, meta]
+
+    Trash all empty (zero-sized) files in the current directory tree, with
+    undo support.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    No arguments.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see L<Rinci::Transaction>.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Trash-EmptyFiles-Undoable>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Trash-EmptyFiles-Undoable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-EmptyFiles
+    -Undoable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    File::Trash::Undoable and trash-u.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

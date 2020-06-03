@@ -1,9 +1,9 @@
 package App::FileRemoveUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-30'; # DATE
+our $DATE = '2020-06-03'; # DATE
 our $DIST = 'App-FileRemoveUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,6 +14,78 @@ use Exporter 'import';
 our @EXPORT_OK = qw(delete_all_empty_files delete_all_empty_dirs);
 
 our %SPEC;
+
+$SPEC{list_all_empty_files} = {
+    v => 1.1,
+    summary => 'List all empty (zero-sized) files in the current directory tree',
+    args => {},
+    result_naked => 1,
+};
+sub list_all_empty_files {
+    require File::Find;
+
+    my @files;
+    File::Find::find(
+        sub {
+            -l $_; # perform lstat instead of stat
+            return unless -f _;
+            return if -s _;
+            push @files, "$File::Find::dir/$_";
+        },
+        '.'
+    );
+
+    \@files;
+}
+
+$SPEC{list_all_empty_dirs} = {
+    v => 1.1,
+    summary => 'List all sempty (zero-entry) subdirectories in the current directory tree',
+    args_as => 'array',
+    args => {
+        include_would_be_empty => {
+            summary => 'Include directories that would be empty if '.
+                'their empty subdirectories are removed',
+            schema => 'bool*',
+            pos => 0,
+            default => 1,
+        },
+    },
+    result_naked => 1,
+};
+sub list_all_empty_dirs {
+    require File::Find;
+    require File::MoreUtil;
+
+    my $include_would_be_empty = $_[0] // 1;
+
+    my %dirs; # key = path, value = {subdir => 1}
+    File::Find::find(
+        sub {
+            return if $_ eq '.' || $_ eq '..';
+            return if -l $_;
+            return unless -d _;
+            return if File::MoreUtil::dir_has_non_subdirs($_);
+            my $path = "$File::Find::dir/$_";
+            $dirs{$path} = { map {$_=>1} File::MoreUtil::get_dir_entries($_) };
+        },
+        '.'
+    );
+
+    my @dirs;
+    for my $dir (sort { length($b) <=> length($a) || $a cmp $b } keys %dirs) {
+        if (!(keys %{ $dirs{$dir} })) {
+            push @dirs, $dir;
+            if ($include_would_be_empty) {
+                $dir =~ m!(.+)/(.+)! or next;
+                my ($parent, $base) = ($1, $2);
+                delete $dirs{$parent}{$base};
+            }
+        }
+    }
+
+    \@dirs;
+}
 
 $SPEC{delete_all_empty_files} = {
     v => 1.1,
@@ -41,21 +113,10 @@ $SPEC{delete_all_empty_files} = {
     ],
 };
 sub delete_all_empty_files {
-    require File::Find;
     my %args = @_;
 
-    my @files;
-    File::Find::find(
-        sub {
-            -l $_; # perform lstat instead of stat
-            return unless -f _;
-            return if -s _;
-            push @files, "$File::Find::dir/$_";
-        },
-        '.'
-    );
-
-    for my $f (@files) {
+    my $files = list_all_empty_files();
+    for my $f (@$files) {
         if ($args{-dry_run}) {
             log_info "[DRY-RUN] Deleting %s ...", $f;
         } else {
@@ -66,7 +127,9 @@ sub delete_all_empty_files {
         }
     }
 
-    [200];
+    [200, "OK", undef, {
+        'func.files' => $files,
+    }];
 }
 
 $SPEC{delete_all_empty_dirs} = {
@@ -95,31 +158,12 @@ $SPEC{delete_all_empty_dirs} = {
     ],
 };
 sub delete_all_empty_dirs {
-    require File::Find;
-    require File::MoreUtil;
     my %args = @_;
 
-    my %dirs; # key = path, value = {subdir => 1}
-    File::Find::find(
-        sub {
-            return if $_ eq '.' || $_ eq '..';
-            return if -l $_;
-            return unless -d _;
-            return if File::MoreUtil::dir_has_non_subdirs($_);
-            my $path = ($File::Find::dir eq '.' ? '' : "$File::Find::dir/"). $_;
-            $dirs{$path} = { map {$_=>1} File::MoreUtil::get_dir_entries($_) };
-        },
-        '.'
-    );
-
-    for my $dir (sort { length($b) <=> length($a) } keys %dirs) {
+    my $dirs = list_all_empty_dirs();
+    for my $dir (@$dirs) {
         if ($args{-dry_run}) {
-            if (!(keys %{ $dirs{$dir} })) {
-                log_info "[DRY-RUN] Deleting %s ...", $dir;
-                $dir =~ m!(.+)/(.+)! or next;
-                my ($parent, $base) = ($1, $2);
-                delete $dirs{$parent}{$base};
-            }
+            log_info "[DRY-RUN] Deleting %s ...", $dir;
         } else {
             if (File::MoreUtil::dir_empty($dir)) {
                 log_info "Deleting %s ...", $dir;
@@ -148,7 +192,7 @@ App::FileRemoveUtils - Utilities related to removing/deleting files
 
 =head1 VERSION
 
-This document describes version 0.002 of App::FileRemoveUtils (from Perl distribution App-FileRemoveUtils), released on 2020-05-30.
+This document describes version 0.005 of App::FileRemoveUtils (from Perl distribution App-FileRemoveUtils), released on 2020-06-03.
 
 =head1 DESCRIPTION
 
@@ -159,6 +203,10 @@ This distribution provides the following command-line utilities:
 =item * L<delete-all-empty-dirs>
 
 =item * L<delete-all-empty-files>
+
+=item * L<list-all-empty-dirs>
+
+=item * L<list-all-empty-files>
 
 =back
 
@@ -236,6 +284,47 @@ First element (status) is an integer containing HTTP status code
 200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 list_all_empty_dirs
+
+Usage:
+
+ list_all_empty_dirs($include_would_be_empty) -> any
+
+List all sempty (zero-entry) subdirectories in the current directory tree.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<$include_would_be_empty> => I<bool> (default: 1)
+
+Include directories that would be empty if their empty subdirectories are removed.
+
+
+=back
+
+Return value:  (any)
+
+
+
+=head2 list_all_empty_files
+
+Usage:
+
+ list_all_empty_files() -> any
+
+List all empty (zero-sized) files in the current directory tree.
+
+This function is not exported.
+
+No arguments.
 
 Return value:  (any)
 

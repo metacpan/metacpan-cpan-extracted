@@ -1,3 +1,14 @@
+0.006   2020-06-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utilities: firefox-mua-list-containers,
+	  firefox-mua-modify-containers.
+
+
+0.005   2020-05-27  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] When --dry-run, do not bail when firefox is running.
+
+
 0.004   2020-05-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereq version of App::FirefoxUtils (0.010+ needed for

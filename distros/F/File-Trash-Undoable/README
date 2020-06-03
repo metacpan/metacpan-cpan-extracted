@@ -2,8 +2,8 @@ NAME
     File::Trash::Undoable - Trash files, with undo/redo capability
 
 VERSION
-    This document describes version 0.22 of File::Trash::Undoable (from Perl
-    distribution File-Trash-Undoable), released on 2017-07-11.
+    This document describes version 0.230 of File::Trash::Undoable (from
+    Perl distribution File-Trash-Undoable), released on 2020-06-03.
 
 SYNOPSIS
      # use the trash-u script
@@ -18,7 +18,7 @@ FUNCTIONS
   empty_trash
     Usage:
 
-     empty_trash() -> [status, msg, result, meta]
+     empty_trash() -> [status, msg, payload, meta]
 
     Empty trash.
 
@@ -31,7 +31,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -40,7 +40,7 @@ FUNCTIONS
   list_trash_contents
     Usage:
 
-     list_trash_contents() -> [status, msg, result, meta]
+     list_trash_contents() -> [status, msg, payload, meta]
 
     List contents of trash directory.
 
@@ -53,7 +53,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -62,7 +62,7 @@ FUNCTIONS
   trash
     Usage:
 
-     trash(%args) -> [status, msg, result, meta]
+     trash(%args) -> [status, msg, payload, meta]
 
     Trash a file.
 
@@ -86,30 +86,30 @@ FUNCTIONS
 
     *   -tx_action => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_action_id => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_recovery => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_rollback => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_v => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -118,7 +118,7 @@ FUNCTIONS
   trash_files
     Usage:
 
-     trash_files(%args) -> [status, msg, result, meta]
+     trash_files(%args) -> [status, msg, payload, meta]
 
     Trash files (with undo support).
 
@@ -140,30 +140,30 @@ FUNCTIONS
 
     *   -tx_action => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_action_id => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_recovery => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_rollback => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_v => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -172,7 +172,7 @@ FUNCTIONS
   untrash
     Usage:
 
-     untrash(%args) -> [status, msg, result, meta]
+     untrash(%args) -> [status, msg, payload, meta]
 
     Untrash a file.
 
@@ -197,30 +197,30 @@ FUNCTIONS
 
     *   -tx_action => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_action_id => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_recovery => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_rollback => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     *   -tx_v => *str*
 
-        For more information on transaction, see Rinci::Transaction.
+        For more information on transaction, see L<Rinci::Transaction>.
 
     Returns an enveloped result (an array).
 
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -261,8 +261,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
-    perlancar@cpan.org.
+    This software is copyright (c) 2020, 2017, 2016, 2015, 2014, 2013, 2012
+    by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

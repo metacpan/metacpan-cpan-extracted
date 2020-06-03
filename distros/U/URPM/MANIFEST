@@ -9,6 +9,7 @@ URPM/Resolve.pm
 URPM/Signature.pm
 t/00prepare.t
 t/01setter-getter.t
+t/03kwality.t
 t/buggy_synthesis.cz
 t/empty_synthesis.cz
 t/fatal.t
@@ -19,6 +20,6 @@ t/sort_graph.t
 t/synthesis.t
 t/test-rpm.spec
 ChangeLog
+Changes
 META.json                                Module meta-data (added by MakeMaker)
 META.yml                                 Module meta-data (added by MakeMaker)
-NEWS

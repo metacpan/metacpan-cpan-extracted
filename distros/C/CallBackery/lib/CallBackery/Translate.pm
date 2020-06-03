@@ -91,6 +91,7 @@ sub tra {
     my $id = 1;
     for my $a (@args){
         $str =~ s/%$id/$a/g;
+        $id++;
     }
     return $str;
 }

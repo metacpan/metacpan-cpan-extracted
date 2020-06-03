@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/FirefoxMultiAccountContainersUtils.pm','script/firefox-mua-sort-containers'];
+my $filenames = ['lib/App/FirefoxMultiAccountContainersUtils.pm','script/firefox-mua-list-containers','script/firefox-mua-modify-containers','script/firefox-mua-sort-containers'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

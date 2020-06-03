@@ -4,7 +4,11 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "system",
+      "command"
+   ],
    "license" : [
       "perl_5"
    ],
@@ -14,6 +18,14 @@
    },
    "name" : "System-Command",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
@@ -54,11 +66,22 @@
          },
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "File::Find" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
-            "Test::More" : "0"
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88"
          }
+      }
+   },
+   "provides" : {
+      "System::Command" : {
+         "file" : "lib/System/Command.pm",
+         "version" : "1.120"
+      },
+      "System::Command::Reaper" : {
+         "file" : "lib/System/Command/Reaper.pm",
+         "version" : "1.120"
       }
    },
    "release_status" : "stable",
@@ -73,7 +96,7 @@
          "web" : "http://github.com/book/System-Command"
       }
    },
-   "version" : "1.119",
+   "version" : "1.120",
    "x_contributors" : [
       "Ed J <etj@cpan.org>",
       "viviparous <viviparous@github.com>",
@@ -88,6 +111,7 @@
       "mokko <mauricemengel@gmail.com>",
       "Alessandro Ghedini <al3xbio@gmail.com>"
    ],
+   "x_generated_by_perl" : "v5.28.1",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

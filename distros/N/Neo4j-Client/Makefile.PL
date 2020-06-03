@@ -13,10 +13,16 @@ use Carp qw/carp croak/;
 use strict;
 
 
+# Windoze alert
+if ($^O =~ /MSWin/) {
+  say "This package will not install in Windows natively.";
+  say "Try installing under Cygwin or MSys.";
+  exit 0;
+}
+
 my $libdir = File::Spec->catdir(qw/build src lib/);
 my @try_incdirs = ("", qw{/usr/include /usr/local/opt/openssl/include});
 my @try_libdirs = ("", qw{/usr/lib /usr/local/opt/openssl/lib});
-
 opendir my $src, $libdir;
 my @files = grep /\.[ch]$/, readdir $src;
 if (!(find_openssl(\@try_incdirs,\@try_libdirs)->[2])) { # remove openssl files
@@ -38,7 +44,7 @@ my $LDDLFLAGS = $Config{lddlflags};
 WriteMakefile(
   NAME => 'Neo4j::Client',
   MIN_PERL_VERSION => '5.010',
-  META_ADD => {
+  META_MERGE => {
     resources => {
       repository => {
 	url => 'https://github.com/majensen/neoclient',
@@ -84,16 +90,6 @@ WriteMakefile(
   realclean => { FILES => ['a.out','config.h', 'build/config.h',@files,'lib/Neo4j/ClientTLS.pm'] },
  );
 
-# heads-up : real <TAB>s in FRAG below
-# sub MY::postambler {
-#   return <<'FRAG';
-# so_to_blib : pm_to_blib
-# 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV},'\''$(INST_LIB)/auto'\'')' -- \
-# 	  blib/arch/auto/Neo4j/Client/Client.$(DLEXT) \
-# 	  $(INST_ARCHLIB)/auto/Neo4j/Client/libClient.$(DLEXT)
-# 	$(NOECHO) $(TOUCH) so_to_blib
-# FRAG
-# }
 
 sub _configure {
   my ($in,$out,$err);
@@ -125,7 +121,7 @@ sub _configure {
     close($f);
   }
 
-  # Review config.log for threading info
+  # Review config.log for threading info and cflags
   open my $lf, "config.log" or croak "Where's the config.log?";
   my @log = <$lf>;
   my %pthread = map { chomp;my @a = split /=/; $a[1]=~s/'//g; @a } grep /PTHREAD_(?:CFLAGS|LIBS)/,@log;
@@ -286,3 +282,20 @@ sub ExtUtils::CChecker::pop_include_dirs {
   pop @{$self->{include_dirs}};
 }
 
+package MY;
+# heads-up : real <TAB>s in FRAG below
+sub postamble {
+  return <<'FRAG';
+h_to_blib : pm_to_blib config.h
+	$(MKPATH) blib/arch/auto/Neo4j/Client/include/
+	$(CP) build/src/lib/*.h blib/arch/auto/Neo4j/Client/include/
+	$(CP) config.h blib/arch/auto/Neo4j/Client/include/
+	$(NOECHO) $(TOUCH) h_to_blib
+FRAG
+}
+
+sub top_targets {
+  my $orig = shift->SUPER::top_targets(@_);
+  $orig =~ s/linkext/linkext h_to_blib/;
+  return $orig;
+}

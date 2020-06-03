@@ -1,0 +1,13 @@
+0.002   2020-06-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible] Downsize to 1080p by default, like Google Photos.
+
+        - [ux] Add shortcut aliases --dont-downsize/--no-downsize to disable
+          downsizing (in addition to --downsize-to '').
+
+	- [doc] Add more description, examples.
+
+
+0.001   2020-06-03  Released-By: PERLANCAR
+
+	- First release.

@@ -1,7 +1,7 @@
 package App::FileDeleteUtils;
 
-our $DATE = '2020-05-30'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2020-06-03'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Utilities related to removing/deleting files
@@ -18,7 +18,7 @@ App::FileDeleteUtils - Utilities related to removing/deleting files
 
 =head1 VERSION
 
-This document describes version 0.002 of App::FileDeleteUtils (from Perl distribution App-FileRemoveUtils), released on 2020-05-30.
+This document describes version 0.005 of App::FileDeleteUtils (from Perl distribution App-FileRemoveUtils), released on 2020-06-03.
 
 =head1 DESCRIPTION
 
