@@ -32,6 +32,7 @@ $post_diag = sub {
   eval {
     require NewFangle;
     diag 'newrelic_version = ', NewFangle::newrelic_version();
+    diag 'lib              = ', $_ for NewFangle::FFI::_lib();
   };
  };
 

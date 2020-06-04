@@ -1,6 +1,25 @@
 ==================================================
-Changes from 2015-05-27 00:00:00 +0000 to present.
+Changes from 2015-06-06 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 2.00 at 2020-06-04 10:20:07 +0000
+-----------------------------------------
+
+  Change: 0ab4bf0d8b02af79e1afed7fac9e91b75f1c1fda
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-06-04 11:20:07 +0000
+
+    Resolve patching issues with v5.22.x and v5.24.x
+
+    https://github.com/bingos/devel-patchperl/issues/44
+
+    Configure changes had been backported to the v5.22 and v5.24 maint
+    releases, so what worked for .0 releases didn't work for later maint
+    releases.
+
+    I have adjusted and tested the patch application criteria for all
+    v5.22.x and v5.24.x releases. 
 
 -----------------------------------------
 version 1.98 at 2020-05-25 18:17:30 +0000
@@ -584,5 +603,5 @@ version 1.36 at 2015-07-03 11:48:26 +0000
     Added Errno GCC5 patches as far back as v5.6.0 
 
 =================================================
-Plus 67 releases after 2015-05-27 00:00:00 +0000.
+Plus 67 releases after 2015-06-06 00:00:00 +0000.
 =================================================

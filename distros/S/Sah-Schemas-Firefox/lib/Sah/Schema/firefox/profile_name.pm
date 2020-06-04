@@ -1,9 +1,9 @@
 package Sah::Schema::firefox::profile_name;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-18'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'Sah-Schemas-Firefox'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $schema = [str => {
     min_len => 1,
@@ -36,22 +36,36 @@ Sah::Schema::firefox::profile_name - Firefox profile name
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schema::firefox::profile_name (from Perl distribution Sah-Schemas-Firefox), released on 2020-04-18.
+This document describes version 0.002 of Sah::Schema::firefox::profile_name (from Perl distribution Sah-Schemas-Firefox), released on 2020-06-04.
 
 =head1 SYNOPSIS
 
-Using with L<Data::Sah>:
+To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
- my $vdr = gen_validator("firefox::profile_name*");
- say $vdr->($data) ? "valid" : "INVALID!";
+ my $validator = gen_validator("firefox::profile_name*");
+ say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+To validate function parameters against this schema (requires L<Params::Sah>):
 
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("firefox::profile_name*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
  package MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
@@ -69,12 +83,27 @@ Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 Sample data:
 
- undef  # INVALID
+ ""  # INVALID
 
- undef  # valid
+ "standard"  # valid
 
 =head1 HOMEPAGE
 

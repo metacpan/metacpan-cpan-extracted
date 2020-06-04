@@ -1,0 +1,53 @@
+Revision history for Perl extension Games::Literati.
+
+0.042  Thu Jun  4 15:30:00 2020
+    - Add get_solutions() to get structured solutions hash
+    - improve test coverage
+
+0.041   Private (pryrt)
+    - Documentation fixes
+
+0.040  Sat Apr  2 16:00:00 2016
+    - Add superscrabble() 21x21 board (https://rt.cpan.org/Ticket/Display.html?id=112455)
+    - Update installation test suite
+
+0.032  Mon Mar  7 18:52:00 2016
+    - added install tests to verify different games score appropriately, and to verify
+      the #29539 BugFix from 0.030
+    - BugFix (https://rt.cpan.org/Ticket/Display.html?id=112715): while adding install tests,
+      discovered that scores weren't coming out right when I ran multiple games in the same
+      script (for example, switching from literati to scrabble to compare the scores for
+      the same board); reset bonus array when initializing a new game.
+
+0.031  Sat Feb 27 15:15:00 2016
+    - Fix scoring bug -- wilds weren't getting rotated when the rest of the board was, so
+      for Y-axis words, it was scoring too much if there was a wild already on the board as
+      part of the new word.  (Found while playing Words With Friends: real game scored 2
+      points less than Games::Literati::wordswithfriends() because a two-point letter was
+      really a wild, but G::L::wwf didn't notice.)  FIX = Swap row/col during wilds
+      comparison.
+
+0.03  Thu Feb 25 17:00:00 2016
+    - Replace hardcoded "Scrabble/Literati" printed title with our $GameName-dependent text
+    - Sprinkle comments throughout the code, to help me understand and debug it better
+    - Update/expand POD documentation
+    - BUGFIX: change the "cross-word" scoring (if you lay down a horizontal set of tiles,
+      the "cross-words" are any vertical words that are created) to check the wilds under
+      new tiles in the cross-word don't get scored, but that new tiles that are part of the
+      cross-word are scored (and include bonuses) = fixed the array indexing in the unless
+      (wild), and fixed the logic so if it's not wild, it does score.
+        <https://rt.cpan.org/Ticket/Display.html?id=29539>
+
+0.021 Private (pryrt)
+    - Add wordswithfriends()
+        <https://rt.cpan.org/Ticket/Display.html?id=112381>
+
+0.02  Private (pryrt)
+    - Add $WordFile to customize path to dictionary
+        <https://rt.cpan.org/Ticket/Display.html?id=112378>
+    - separate input() out from search() to keep the functions distinct
+        <https://rt.cpan.org/Ticket/Display.html?id=112379>
+
+0.01  Thu Jan  9 23:35:59 2003
+    - original version; created by h2xs 1.21 with options
+        -AXcfn Games::Literati

@@ -3,25 +3,31 @@ abstract: 'No-fuss generation of Atom syndication feeds'
 author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires:
-  Test::More: 0.88
-  utf8: 0
-configure_requires:
-  ExtUtils::MakeMaker: 0
+  Test::More: '0'
+  utf8: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: XML-Atom-SimpleFeed
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Carp: 0
-  Encode: 0
-  POSIX: 0
-  perl: 5.008001
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  Encode: '0'
+  POSIX: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/ap/XML-Atom-SimpleFeed/issues
   repository: git://github.com/ap/XML-Atom-SimpleFeed.git
-version: 0.902
+version: '0.904'
+x_copyright:
+  holder: 'Aristotle Pagaltzis'
+  year: 2020
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

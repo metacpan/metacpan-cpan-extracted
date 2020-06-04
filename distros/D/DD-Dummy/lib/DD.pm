@@ -1,11 +1,12 @@
 ## no critic: Modules::ProhibitAutomaticExportation
 
-package DD;
+package # hide from PAUSE
+    DD;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-08-12'; # DATE
+our $DATE = '2020-06-05'; # DATE
 our $DIST = 'DD-Dummy'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use Exporter qw(import);
 our @EXPORT = qw(dd dd_warn dd_die dmp);
@@ -33,6 +34,18 @@ sub _doit {
         elsif ($_action eq 'dd_warn') { warn   Data::Dump::Color::dump(@_). "\n"; return @_ }
         elsif ($_action eq 'dd_die' ) { die    Data::Dump::Color::dump(@_). "\n"            }
         elsif ($_action eq 'dmp'    ) { return Data::Dump::Color::dump(@_)                  }
+    } elsif ($BACKEND eq 'Data::Dump::ObjectAsString') {
+        require Data::Dump::ObjectAsString;
+        if    ($_action eq 'dd'     ) { print  Data::Dump::ObjectAsString::dump(@_). "\n"; return @_ }
+        elsif ($_action eq 'dd_warn') { warn   Data::Dump::ObjectAsString::dump(@_). "\n"; return @_ }
+        elsif ($_action eq 'dd_die' ) { die    Data::Dump::ObjectAsString::dump(@_). "\n"            }
+        elsif ($_action eq 'dmp'    ) { return Data::Dump::ObjectAsString::dump(@_)                  }
+    } elsif ($BACKEND eq 'Data::Dump::Options') {
+        require Data::Dump::Options;
+        if    ($_action eq 'dd'     ) { print  Data::Dump::Options::dump(@_). "\n"; return @_ }
+        elsif ($_action eq 'dd_warn') { warn   Data::Dump::Options::dump(@_). "\n"; return @_ }
+        elsif ($_action eq 'dd_die' ) { die    Data::Dump::Options::dump(@_). "\n"            }
+        elsif ($_action eq 'dmp'    ) { return Data::Dump::Options::dump(@_)                  }
     } elsif ($BACKEND eq 'Data::Dump::PHP') {
         require Data::Dump::PHP;
         if    ($_action eq 'dd'     ) { print  Data::Dump::PHP::dump(@_). "\n"; return @_ }
@@ -142,7 +155,7 @@ DD - Dump data structure for debugging
 
 =head1 VERSION
 
-This document describes version 0.007 of DD (from Perl distribution DD-Dummy), released on 2019-08-12.
+This document describes version 0.009 of DD (from Perl distribution DD-Dummy), released on 2020-06-05.
 
 =head1 SYNOPSIS
 
@@ -185,6 +198,14 @@ Optional dependency. Compact output.
 =item * L<Data::Dump::Color>
 
 Optional dependency. Colored output.
+
+=item * L<Data::Dump::ObjectAsString>
+
+Optional dependency.
+
+=item * L<Data::Dump::Options>
+
+Optional dependency.
 
 =item * L<Data::Dump::PHP>
 
@@ -325,7 +346,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

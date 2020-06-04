@@ -5,11 +5,11 @@ use warnings;
 use Class::InsideOut qw( private register id );
 use Carp qw(croak);
 use English qw(-no_match_vars);
-use 5.010;    #5.10.0
+use 5.012;    #5.12.0
 
 use Business::DK::CPR qw(validate1968 validate2007);
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 private number    => my %number;       # read-only accessor: number()
 private gender    => my %gender;       # read-only accessor: gender()
@@ -102,7 +102,7 @@ Class::Business::DK::CPR - Danish CPR number class
 
 =head1 VERSION
 
-The documentation describes version 0.16 of Class::Business::DK::CPR
+The documentation describes version 0.17 of Class::Business::DK::CPR
 
 =head1 SYNOPSIS
 
@@ -219,15 +219,27 @@ Coverage of the test suite is at 98.3%
 
 Please report issue via GitHub
 
-    L<https://github.com/jonasbn/perl-business-dk-cpr/issues>
+=over
+
+=item * L<GitHub Issues|https://github.com/jonasbn/perl-business-dk-cpr/issues>
+
+=back
 
 Alternatively report issues via CPAN RT:
 
-    L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CPR>
+=over
+
+=item * L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-DK-CPR>
+
+=back
 
 or by sending mail to
 
-    bug-Business-DK-CPR@rt.cpan.org
+=over
+
+=item * C<bug-Business-DK-CPR@rt.cpan.org>
+
+=back
 
 =head1 AUTHOR
 

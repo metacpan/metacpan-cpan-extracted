@@ -39,6 +39,9 @@ A L<Date::Holidays> style package updated with the British bank holiday dates no
 published at L<https://www.gov.uk/bank-holidays>. Holidays may apply to all
 regions, or some combination - see the C<regions> parameter for more details.
 
+N.B. - Dates of future holidays may occasionally be updated after they've been
+published.
+
 Module is named with correct ISO-3166-1 code for the United Kingdom: "GB"
 (Great Britain)
 
@@ -49,7 +52,8 @@ L<Date::Holidays::GB::SCT>.
 =head1 EXPORTS
 
 Exports C<holidays>, C<is_holiday>, C<next_holiday> on demand.
-Also can export the aliases C<gb_holidays> and C<is_gb_holiday>.
+Also can export the aliases C<gb_holidays>, C<is_gb_holiday>
+and C<next_gb_holiday>.
 
 =head1 METHODS
 

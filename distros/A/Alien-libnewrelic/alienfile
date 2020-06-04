@@ -19,6 +19,7 @@ share {
 
   my @patch = (
     '%{patch} -p1 < %{.install.patch}/notice-error-with-stacktrace.diff',
+    '%{patch} -p1 < %{.install.patch}/hostname.diff',
   );
   push @patch, '%{patch} -p1 < %{.install.patch}/macos.diff' if $^O eq 'darwin';
 

@@ -35,6 +35,9 @@ A [Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays) style package up
 published at [https://www.gov.uk/bank-holidays](https://www.gov.uk/bank-holidays). Holidays may apply to all
 regions, or some combination - see the `regions` parameter for more details.
 
+N.B. - Dates of future holidays may occasionally be updated after they've been
+published.
+
 Module is named with correct ISO-3166-1 code for the United Kingdom: "GB"
 (Great Britain)
 
@@ -45,7 +48,8 @@ To just work with holiday days for a single region, use one of the subclasses:
 # EXPORTS
 
 Exports `holidays`, `is_holiday`, `next_holiday` on demand.
-Also can export the aliases `gb_holidays` and `is_gb_holiday`.
+Also can export the aliases `gb_holidays`, `is_gb_holiday`
+and `next_gb_holiday`.
 
 # METHODS
 

@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Dmp" => "0.240",
     "Exporter" => "5.57",
-    "File::Temp" => 0,
+    "File::Temp" => "0.2307",
     "IPC::System::Options" => "0.335",
     "JSON" => 0,
     "Log::ger" => "0.037",
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %FallbackPrereqs = (
   "Data::Dmp" => "0.240",
   "Exporter" => "5.57",
   "File::Spec" => 0,
-  "File::Temp" => 0,
+  "File::Temp" => "0.2307",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "IPC::System::Options" => "0.335",

@@ -16,7 +16,7 @@
 #   * when asked for tiles, give then in upper case (case conversion)
 ########################################################################
 
-use 5.006;
+use 5.008;
 
 use warnings;
 use strict;

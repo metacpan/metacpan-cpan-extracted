@@ -6,6 +6,6 @@ use warnings;
 use Devel::CheckBin;
 check_bin('git');
 
-use 5.010;
+use 5.013002;
 use Module::Build::Tiny 0.034;
 Build_PL();

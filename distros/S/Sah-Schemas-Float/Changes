@@ -1,9 +1,30 @@
+0.011   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: int_or_inf, uint_or_posinf, posint_or_posinf.
+
+
+0.010   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: inf, posinf, neginf, nan.
+
+
+0.009   2020-05-27  Released-By: PERLANCAR; Urgency: medium
+
+        [schema percent]
+
+        - Add recommendation (or should I say, discouragement).
+
+        [schema share]
+
+        - [bugfix] Add missing clause min=>0 & max=>1.
+
+
 0.008   2020-03-04  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.
 
-	- [build] Rebuild with updated dzil plugin [Sah::Schemas] to correctly
-          show examples.
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
 
 
 0.007   2020-03-04  Released-By: PERLANCAR; Urgency: medium

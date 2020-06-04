@@ -124,5 +124,6 @@ sub smtpd_data_fh {
   my $uid = $msg_id->user();
   $heap->{smtpd}->send_to_client( $id, "250 $uid Message accepted for delivery" );
   $heap->{smtpd}->shutdown();
+  unlink 'message';
   return;
 }

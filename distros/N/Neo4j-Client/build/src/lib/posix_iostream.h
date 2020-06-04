@@ -19,6 +19,7 @@
 
 #include "neo4j-client.h"
 #include "iostream.h"
+#include <sys/socket.h>
 
 /**
  * Create an iostream for a POSIX file descriptor.

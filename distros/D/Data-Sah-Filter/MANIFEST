@@ -19,6 +19,11 @@ lib/Data/Sah/Filter/js/Str/uc.pm
 lib/Data/Sah/Filter/js/Str/ucfirst.pm
 lib/Data/Sah/Filter/js/Str/upcase.pm
 lib/Data/Sah/Filter/js/Str/uppercase.pm
+lib/Data/Sah/Filter/perl/Float/ceil.pm
+lib/Data/Sah/Filter/perl/Float/check_has_fraction.pm
+lib/Data/Sah/Filter/perl/Float/check_int.pm
+lib/Data/Sah/Filter/perl/Float/floor.pm
+lib/Data/Sah/Filter/perl/Float/round.pm
 lib/Data/Sah/Filter/perl/Str/check.pm
 lib/Data/Sah/Filter/perl/Str/downcase.pm
 lib/Data/Sah/Filter/perl/Str/lc.pm
@@ -50,6 +55,11 @@ t/js-Str-uc.t
 t/js-Str-ucfirst.t
 t/js-Str-upcase.t
 t/js-Str-uppercase.t
+t/perl-Float-ceil.t
+t/perl-Float-check_has_fraction.t
+t/perl-Float-check_int.t
+t/perl-Float-floor.t
+t/perl-Float-round.t
 t/perl-Str-check.t
 t/perl-Str-downcase.t
 t/perl-Str-lc.t

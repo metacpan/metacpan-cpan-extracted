@@ -5,7 +5,7 @@ do { my $x = {
                                         'ExtUtils::MakeMaker' => '0',
                                         'File::ShareDir::Install' => '0.06',
                                         'Module::Build::Tiny' => '0.034',
-                                        'perl' => '5.010'
+                                        'perl' => '5.013002'
                                       }
                       },
        'develop' => {
@@ -179,7 +179,7 @@ do { my $x = {
                                       'URI::Escape' => '0',
                                       'if' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => '5.010',
+                                      'perl' => '5.013002',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -212,7 +212,7 @@ do { my $x = {
                                    'lib' => '0',
                                    'namespace::clean' => '0',
                                    'parent' => '0',
-                                   'perl' => '5.010'
+                                   'perl' => '5.013002'
                                  }
                  },
        'x_Dist_Zilla' => {

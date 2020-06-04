@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA256 e73bbabe5f837c81a3a999f8ada9167b7a660d2d8e852bed470555e473b6de36 CHANGES
+SHA256 d9626fdec7a668f1fe6b877f62fe4bc60514d4d07b54e569b94e72f9b1b338fc LICENSE
+SHA256 0432165c5b267b40198948e695ac31e843b42b310dc06d7413c9a48ab98140c8 MANIFEST
+SHA256 d48c1308d0f026453dbd6bdca8784dc34065b094d3386c0882b55e051e1f4992 META.json
+SHA256 3920d836c6252f4e6c19b2c92c3ceb23e1c8a4056386e77cfd9af187df46fbcb META.yml
+SHA256 92165bef719c5dba0b2702756666afb92bc6b88074d9bd42c3527bb2cad410d2 Makefile.PL
+SHA256 a5c56ca38a24e5ef9ec3473ea66eb78c1287cf62e6e8dd5753ed587de9a8b28e README.md
+SHA256 afb941439526878eeaddf64809e71b80cb1a984c096af257e44dd24ebb434be0 RELEASE.md
+SHA256 0de30b5a0d61c999c9ec7300350213bedc1885c993f1bf0df010e1a9a033d7ae lib/Games/Literati.pm
+SHA256 a11c0a09059b1cd47a4fe6eba77a8ecc0fa753c075b0641fd725d704cf2560f8 t/01_import_wordlist.t
+SHA256 21b7a8c45969a2475b961ce141a67f5b440baa04f1989bab579c4fc5a70230ef t/02_board_init.t
+SHA256 06f111cab68760f4c81c6c4aa7f5bbc28e6407374a45e07b3f22590a824e5298 t/03_input_processing.t
+SHA256 bce6cb5333768fa6aff7338a11036ce661b3efe927db2003787717fe38372492 t/04_score_games.t
+SHA256 9e3fd36d3db516475d0c3a7eae8fc4099b2ff10550fc78d4e700f690e2a1c26a t/05_misc.t
+SHA256 d260e6e2c8bd1b6ddde22ce06bbc6ef9fd5b1464501379a8b3308d2d63fac077 t/game1
+SHA256 fbfb887107c5de11eafae4e2774975f0008c830dc73ae68c21ac117d9cd8b9c2 t/game1ss
+SHA256 2110ec38a5dcb1f656520faad1bed95b470b09c247b4ab52a9d6aed852af1c16 t/game2
+SHA256 758e491b958847abae2442fcee6f55e1c2a1a0922b491665f3df0051e1462f02 t/game3
+SHA256 bc8a15e13c33f006ed971663faba12aeaed5d52eb6c5494619d38a45126f8f2a t/game4
+SHA256 d7659bdf3f66901960e7ded73a1af4eea1575515cf2d11c1d316baa4d23a4f4c t/game5
+SHA256 1e4ce9030c5675315fa3e5f114468ff8ecc4da3487775e3915802801cc50e0b6 t/game5ss
+SHA256 810311d85c676309f40484dfc52b8ffa6a00c22b3929d514809eaae483b238d6 t/game_b
+SHA256 d9141dca431662212202d1ac0ea3a193830cdd520b5b581bd7205b5af31505e9 t/game_i
+SHA256 06bb9fa9c49dbb59801f4d38fae1c024328fc77dde242a4bffd7e00a5e6a490a t/game_w
+SHA256 7242ed546761821d8c2f5cf8ba04cab2c58c1f50e087ac27bf016b6420bae60c t/legacy.t
+SHA256 ffb2dbfcfd4e08cc99096bfad577f1fa3e6371f9168d36719e6098b17a511358 t/wordlist
+SHA256 c3f9c8c283a2b1f2f1896f27a01cbe3cddc0c9d93f752e4639035a0f5b36f6e8 t/wordlist.2
+SHA256 6dab355cae0b174bf4fe83904d15491b97e6c461a04e972b894473016e1f8c3a xt/00-sign.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE6ADa9A+awTiidH7W+iz85Wilrc8FAl7ZdyQACgkQ+iz85Wil
+rc8YnhAAkvuEr6mI0Q4MeGE/mVmUDQAzIfSXaeS66Ae4mZHDBpCiIRBpSusy7N/q
+93nHMx7oNUgU0TWRvPU94gDCWYUUD4glQYHLrPL5gKTsnmrW+jDJnF7Tfd2MofUr
+J/gQsc6vM43FEkgKpGmDbCgXYj00es17HdU93nUNlx799o9JYoEMySGM5W2ziQZc
+ziZgAW5EwLKT8MQ3f7N4Ur8EcPIgVf1cLTXjviCJCyNiEPXwtv319ERZFvUFYeVA
+JGHR/gL+T0UWUIO6S3htSGYNuGbGmiK4h3nj6qmTVuIEUjNf9eDz+xRi1pIA+Iuw
+Z4HDIq8U1pcAn/hhGA/v32CHh7US/fk4/TVuh/r3ChPgJqngQSdyGQQDPwA45uJy
+1pPraic7gob86/N8chkSHq7rFPg8ApZFXWm3yfg2tWX/vTCtl8d4roOiKeq3k5Aw
+TKpAK2nJxeWOlYUQh4x6Nv/UnNZLNHBhwbZxlFSRP0gi45QuZ7MbcQn14PaSnMR+
+0Kx7ll15VPSr+Vjk9thyZY8QeVZM5Buf3K2GfmyQEa91OWkr3eD8kt9Pb5qwDhMg
+p9NGf+PwrkrjEMrlwItQROQCcTl6GmlGyv7lnFpkuTirmw8Maw1DRkbCLL/cXhv8
+Apclk1KQ/cuUdFIY1yeVqQwnLT45Jn7IoYAifRfsuloO/ETnVEQ=
+=i9jl
+-----END PGP SIGNATURE-----

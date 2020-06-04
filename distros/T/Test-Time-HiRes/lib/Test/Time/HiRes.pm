@@ -7,7 +7,7 @@ use Test::More;
 use Test::Time;
 use Time::HiRes ();
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 our $time    = 0;    # epoch in microseconds
 our $seconds = 0;    # i.e. standard epoch
@@ -48,12 +48,18 @@ sub _microseconds {
     return $time % 1_000_000;
 }
 
+sub _float {
+    return 0 unless $time;
+    my $t = $time / 1_000_000;
+    return sprintf( "%.6f", $t ) + 0;
+}
+
 sub import {
     my ( $class, %opts ) = @_;
 
     $in_effect = 1;
-    Test::Time->import; # make sure Test::Time is enabled, in case
-                        # there was a call to ->unimport earlier
+    Test::Time->import;    # make sure Test::Time is enabled, in case
+                           # there was a call to ->unimport earlier
 
     return if $imported;
 
@@ -78,8 +84,7 @@ sub import {
         if (in_effect) {
             _synchronise_times();
 
-            my $t = $time / 1_000_000;
-            return sprintf( "%.6f", $t );
+            return _float();
         }
         else {
             return $sub_time->();
@@ -114,9 +119,11 @@ sub import {
     };
 
     *Time::HiRes::gettimeofday = sub() {
+
         if (in_effect) {
             _synchronise_times();
-            return ( $seconds, _microseconds() );
+
+            return wantarray ? ( $seconds, _microseconds() ) : _float();
         }
         else {
             return $sub_gettimeofday->();
@@ -202,6 +209,7 @@ Michael Jemmeson E<lt>mjemmeson@cpan.orgE<gt>
 =head1 CONTRIBUTORS
 
 Gianni Ceccarelli E<lt>dakkar@thenautilus.netE<gt>
+Theo van Hoesel E<lt>Th.J.v.Hoesel+CPAN@gmail.com<gt>
 
 =head1 COPYRIGHT
 

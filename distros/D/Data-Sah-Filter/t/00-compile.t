@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 32 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter.pm',
@@ -21,6 +21,11 @@ my @module_files = (
     'Data/Sah/Filter/js/Str/ucfirst.pm',
     'Data/Sah/Filter/js/Str/upcase.pm',
     'Data/Sah/Filter/js/Str/uppercase.pm',
+    'Data/Sah/Filter/perl/Float/ceil.pm',
+    'Data/Sah/Filter/perl/Float/check_has_fraction.pm',
+    'Data/Sah/Filter/perl/Float/check_int.pm',
+    'Data/Sah/Filter/perl/Float/floor.pm',
+    'Data/Sah/Filter/perl/Float/round.pm',
     'Data/Sah/Filter/perl/Str/check.pm',
     'Data/Sah/Filter/perl/Str/downcase.pm',
     'Data/Sah/Filter/perl/Str/lc.pm',

@@ -135,6 +135,30 @@ is_deeply $obj->dura, $expected, 'processed durations';
 is_deeply [ sort @{ $obj->_dura_list->{0} } ], ['hn','qn'], '_dura_list';
 
 $expected = {
+    0 => {
+        'hn*G4,hn*E3 qn*F4,hn*D3' => 2,
+        'qn*A4 hn*G4,hn*E3'       => 2,
+        'qn*A4,hn*F3 qn*A4'       => 2,
+        'qn*C4 qn*G4,hn*E3'       => 2,
+        'qn*C4,hn*C3 qn*C4'       => 2,
+        'qn*D4,qn*F3 qn*D4,qn*G3' => 2,
+        'qn*E4 hn*D4,hn*G3'       => 2,
+        'qn*E4 qn*D4,qn*F3'       => 2,
+        'qn*E4,hn*C3 qn*E4'       => 2,
+        'qn*E4,hn*G3 qn*E4'       => 2,
+        'qn*F4 qn*E4,hn*C3'       => 2,
+        'qn*F4 qn*E4,hn*G3'       => 2,
+        'qn*F4,hn*D3 qn*F4'       => 2,
+        'qn*F4,hn*F3 qn*F4'       => 2,
+        'qn*G4 qn*A4,hn*F3'       => 2,
+        'qn*G4 qn*F4,hn*F3'       => 2,
+        'qn*G4,hn*E3 qn*G4'       => 4,
+    }
+};
+
+is_deeply $obj->dura_notes, $expected, 'processed dura_notes';
+
+$expected = {
     'hn,hn qn,hn-qn qn,hn' => 2,
     'qn hn,hn-qn,hn qn'    => 2,
     'qn qn,hn-qn hn,hn'    => 2,
@@ -149,6 +173,8 @@ $expected = {};
 
 is_deeply $obj->note_net->{0}, $expected, 'note_net';
 
+is_deeply $obj->dura_note_net->{0}, $expected, 'dura_note_net';
+
 $obj->populate;
 
 isa_ok $obj->score, 'MIDI::Simple';
@@ -157,5 +183,7 @@ is $obj->dura_convert('1920'), 'hn', 'dura_convert';
 is $obj->dura_convert('960,1920'), 'qn,hn', 'dura_convert';
 is $obj->note_convert('60 61'), 'C4 Cs4', 'note_convert';
 is $obj->note_convert('60 61,62'), 'C4 Cs4,D4', 'note_convert';
+is $obj->dura_note_convert('1920*60'), 'hn*C4', 'dura_note_convert';
+is $obj->dura_note_convert('960,1920*61,62'), 'qn,hn*Cs4,D4', 'dura_note_convert';
 
 done_testing();

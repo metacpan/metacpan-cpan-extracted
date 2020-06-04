@@ -36,7 +36,7 @@
          "requires" : {
             "Data::Dmp" : "0.240",
             "Exporter" : "5.57",
-            "File::Temp" : "0",
+            "File::Temp" : "0.2307",
             "IPC::System::Options" : "0.335",
             "JSON" : "0",
             "Log::ger" : "0.037",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah-Filter"
       }
    },
-   "version" : "0.006",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

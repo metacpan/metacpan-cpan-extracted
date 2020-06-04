@@ -1,5 +1,10 @@
 Change log for Business::DK::CPR
 
+0.17 2020-06-04 Maintenance release, update not required
+
+- Added missing specification of test requirement to cpanfile
+  Thanks to Mohammad S Anwar (MANWAR) for the PR
+
 0.16 2020-06-02 Maintenance release, update not required
 
 - Removed the directive from the Dist::Zilla config as indicated in release 0.15

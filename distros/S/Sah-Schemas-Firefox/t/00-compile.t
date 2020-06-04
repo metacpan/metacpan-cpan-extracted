@@ -6,11 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Data/Sah/Filter/perl/Firefox/check_profile_name_exists.pm',
     'Perinci/Sub/XCompletion/firefox_profile_name.pm',
+    'Sah/Schema/firefox/local_profile_name.pm',
     'Sah/Schema/firefox/profile_name.pm',
+    'Sah/SchemaR/firefox/local_profile_name.pm',
     'Sah/SchemaR/firefox/profile_name.pm',
     'Sah/Schemas/Firefox.pm'
 );

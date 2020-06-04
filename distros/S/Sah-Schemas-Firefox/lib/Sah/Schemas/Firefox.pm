@@ -1,9 +1,9 @@
 package Sah::Schemas::Firefox;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-18'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'Sah-Schemas-Firefox'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas related to Firefox
@@ -20,7 +20,7 @@ Sah::Schemas::Firefox - Various Sah schemas related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::Schemas::Firefox (from Perl distribution Sah-Schemas-Firefox), released on 2020-04-18.
+This document describes version 0.002 of Sah::Schemas::Firefox (from Perl distribution Sah-Schemas-Firefox), released on 2020-06-04.
 
 =head1 HOMEPAGE
 

@@ -1,4 +1,4 @@
-package NewFangle::Transaction 0.02 {
+package NewFangle::Transaction 0.03 {
 
   use strict;
   use warnings;
@@ -123,7 +123,7 @@ NewFangle::Transaction - NewRelic application class
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ C-SDK yourself and need this method then you will need to apply this patch.
 
  my $bool = $txn->ignore;
 
-csdk: newrelic_ignore_transaction)
+(csdk: newrelic_ignore_transaction)
 
 =head2 end
 
@@ -222,7 +222,9 @@ Ends the transaction.
 
 =head2 record_custom_event
 
- $txn->record_custom_event;
+ $txn->record_custom_event($event);
+
+C<$event> should be an instance of L<NewFangle::CustomEvent>.
 
 (csdk: newrelic_record_custom_event)
 

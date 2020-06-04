@@ -1,7 +1,7 @@
 package Sah::SchemaR::firefox::profile_name;
 
-our $DATE = '2020-04-18'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-06-04'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"standard"}],min_len=>1,summary=>"Firefox profile name","x.completion"=>"firefox_profile_name"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::firefox::profile_name - Firefox profile name
 
 =head1 VERSION
 
-This document describes version 0.001 of Sah::SchemaR::firefox::profile_name (from Perl distribution Sah-Schemas-Firefox), released on 2020-04-18.
+This document describes version 0.002 of Sah::SchemaR::firefox::profile_name (from Perl distribution Sah-Schemas-Firefox), released on 2020-06-04.
 
 =head1 DESCRIPTION
 

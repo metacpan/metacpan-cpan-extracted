@@ -1,3 +1,14 @@
+0.008   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add filters: Float::check_int, Float::check_has_fraction (currently
+          perl only).
+
+
+0.007   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add filters: Float::{ceil,floor,round} (currently perl only).
+
+
 0.006   2020-05-31  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- [incompatible] Rename filter 'Str::lowcase' to 'Str::lowercase'.

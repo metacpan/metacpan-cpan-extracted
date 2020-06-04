@@ -36,6 +36,20 @@ my $reader = new CSV::Reader('/path/to/file.csv',
 	'field_aliases'	=> {
 		'postal_code' => 'postcode', # applied after normalization
 	},
+	'mutators' => {
+		'postcode' => sub {	# if postalcode is Dutch, then make sure it has no spaces and is in uppercase.
+			my $val_ref = shift;
+			my $row_ref = shift;
+			if (defined($$val_ref) && defined($row_ref->{'country'}) && ($row_ref->{'country'} eq 'NL')) {
+				$$val_ref =~ s/\s+//;
+				$$val_ref = uc($$val_ref);
+			}
+		},
+		'has_fiber_internet' => sub {	# set a default for an empty (undef) value
+			my $val_ref = shift;
+			$$val_ref //= 0;	# defined-or assignment operator (in case you didn't know)
+		},
+	},
 );
 
 # Show the field names found in the header row:
@@ -64,13 +78,16 @@ The following ```%options``` are supported:
 
 - ```debug```: boolean, if true, then debug messages are emitted using warn().
 - ```field_aliases```: hashref of case insensitive alias (in file) => real name (as expected in code) pairs.
-- ```field_normalizer```: optional callback that receives a field name by reference to normalize (e.g. make lowercase).
-- ```include_fields```: optional arrayref of field names to include. If given, then all other field names are excluded.
+- ```field_normalizer```: callback that receives a field name by reference to normalize (e.g. make lowercase).
+- ```include_fields```: arrayref of field names to include. If given, then all other field names are excluded.
 - ```delimiter```: string, default ','
 - ```enclosure```: string, default '"'
 - ```escape```: string, default backslash
+- ```mutators```: hashref of field name => callback($value_ref, $row_ref) pairs.
 
 Note: the option ```field_aliases``` is processed after the option ```field_normalizer``` if given.
+
+Note: the callbacks given with the ```mutators``` option are called in their key order (which is an unpredictable order unless they're tied with Tie::IxHash).
 
 Public object methods
 ---------------------

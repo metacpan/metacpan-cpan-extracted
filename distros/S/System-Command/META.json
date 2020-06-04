@@ -77,11 +77,11 @@
    "provides" : {
       "System::Command" : {
          "file" : "lib/System/Command.pm",
-         "version" : "1.120"
+         "version" : "1.121"
       },
       "System::Command::Reaper" : {
          "file" : "lib/System/Command/Reaper.pm",
-         "version" : "1.120"
+         "version" : "1.121"
       }
    },
    "release_status" : "stable",
@@ -96,8 +96,9 @@
          "web" : "http://github.com/book/System-Command"
       }
    },
-   "version" : "1.120",
+   "version" : "1.121",
    "x_contributors" : [
+      "Michael McClimon <mmcclimon@cpan.org>",
       "Ed J <etj@cpan.org>",
       "viviparous <viviparous@github.com>",
       "Rob Kinyon <rkinyon@cpan.org>",

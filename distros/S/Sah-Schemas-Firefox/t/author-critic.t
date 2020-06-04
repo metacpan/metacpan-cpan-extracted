@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Perinci/Sub/XCompletion/firefox_profile_name.pm','lib/Sah/Schema/firefox/profile_name.pm','lib/Sah/SchemaR/firefox/profile_name.pm','lib/Sah/Schemas/Firefox.pm'];
+my $filenames = ['lib/Data/Sah/Filter/perl/Firefox/check_profile_name_exists.pm','lib/Perinci/Sub/XCompletion/firefox_profile_name.pm','lib/Sah/Schema/firefox/local_profile_name.pm','lib/Sah/Schema/firefox/profile_name.pm','lib/Sah/SchemaR/firefox/local_profile_name.pm','lib/Sah/SchemaR/firefox/profile_name.pm','lib/Sah/Schemas/Firefox.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

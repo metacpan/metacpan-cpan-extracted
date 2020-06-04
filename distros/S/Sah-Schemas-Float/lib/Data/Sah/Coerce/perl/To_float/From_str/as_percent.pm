@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_float::From_str::as_percent;
 
 # AUTHOR
-our $DATE = '2020-03-08'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 use 5.010001;
 use strict;
@@ -51,7 +51,7 @@ Data::Sah::Coerce::perl::To_float::From_str::as_percent
 
 =head1 VERSION
 
-This document describes version 0.008 of Data::Sah::Coerce::perl::To_float::From_str::as_percent (from Perl distribution Sah-Schemas-Float), released on 2020-03-08.
+This document describes version 0.011 of Data::Sah::Coerce::perl::To_float::From_str::as_percent (from Perl distribution Sah-Schemas-Float), released on 2020-06-04.
 
 =for Pod::Coverage ^(meta|coerce)$
 

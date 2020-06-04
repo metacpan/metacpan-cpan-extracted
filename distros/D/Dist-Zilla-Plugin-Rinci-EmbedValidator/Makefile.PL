@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Dist::Zilla::Plugin::Rinci::EmbedValidator",
   "PREREQ_PM" => {
-    "Data::Dmp" => "0.21",
-    "Data::Sah" => "0.895",
+    "Data::Dmp" => "0.240",
+    "Data::Sah" => "0.907",
     "Dist::Zilla::Role::FileFinderUser" => 0,
     "Dist::Zilla::Role::FileMunger" => 0,
     "Moose" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.250",
+  "VERSION" => "0.251",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,8 +43,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Dmp" => "0.21",
-  "Data::Sah" => "0.895",
+  "Data::Dmp" => "0.240",
+  "Data::Sah" => "0.907",
   "Dist::Zilla::Role::FileFinderUser" => 0,
   "Dist::Zilla::Role::FileMunger" => 0,
   "File::Spec" => 0,

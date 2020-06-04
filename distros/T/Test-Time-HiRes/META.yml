@@ -12,7 +12,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ no_index:
 provides:
   Test::Time::HiRes:
     file: lib/Test/Time/HiRes.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Test::More: '0.96'
   Test::Time: '0.07'
@@ -41,7 +41,9 @@ resources:
   bugtracker: https://github.com/mjemmeson/Test-Time-HiRes/issues
   homepage: https://github.com/mjemmeson/Test-Time-HiRes
   repository: https://github.com/mjemmeson/Test-Time-HiRes.git
-version: '0.04'
+version: '0.05'
 x_contributors:
   - 'Gianni Ceccarelli <gianni.ceccarelli@broadbean.com>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.26.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

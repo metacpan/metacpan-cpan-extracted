@@ -31,6 +31,10 @@ is_deeply [$record->value('234X')], [], '->value (empty)';
 is_deeply $record->fields('010@'), 
     [ [ '010@', '', 'a' => 'chi'] ], '->field';
 
+is_deeply $record->fields('003@','010@'),
+    [ [ '003@', '', '0' => '12345' ],
+      [ '010@', '', 'a' => 'chi'] ], '->field(...)';
+
 is_deeply $record->fields('?!*~'), [ ], 'invalid PICA path';
 is scalar @{pica_fields($record,'1...')}, 5, 'pica_fields';
 

@@ -1,7 +1,7 @@
 package Sah::Schemas::Float;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-06-04'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas for various floating types
@@ -18,15 +18,31 @@ Sah::Schemas::Float - Sah schemas for various floating types
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schemas::Float (from Perl distribution Sah-Schemas-Float), released on 2020-03-08.
+This document describes version 0.011 of Sah::Schemas::Float (from Perl distribution Sah-Schemas-Float), released on 2020-06-04.
 
 =head1 SAH SCHEMAS
 
 =over
 
+=item * L<inf|Sah::Schema::inf>
+
+Inf or -Inf.
+
+=item * L<int_or_inf|Sah::Schema::int_or_inf>
+
+Integer, or InfE<sol>-Inf.
+
+=item * L<nan|Sah::Schema::nan>
+
+NaN.
+
 =item * L<negfloat|Sah::Schema::negfloat>
 
 Negative float.
+
+=item * L<neginf|Sah::Schema::neginf>
+
+-Inf.
 
 =item * L<percent|Sah::Schema::percent>
 
@@ -36,12 +52,29 @@ This type is basically C<float>, with C<str_as_percent> coerce rule. So the
 percent sign is optional, but the number is always interpreted as percent, e.g.
 "1" is interpreted as 1% (0.01).
 
+In general, instead of using this schema, I recommend just using the C<float>
+type (which by default includes coercion rule to convert from percent notation
+e.g. '1%' -> 0.01). Use this schema if your argument really needs to be
+expressed in percents.
+
 
 =item * L<posfloat|Sah::Schema::posfloat>
 
 Positive float.
 
 See also C<ufloat> for floats that are equal or larger than 0.
+
+
+=item * L<posinf|Sah::Schema::posinf>
+
+Inf but not -Inf.
+
+=item * L<posint_or_posinf|Sah::Schema::posint_or_posinf>
+
+Positive integer, or Inf.
+
+Can be used to check value for number of items in a (possibly infinite)
+sequence.
 
 
 =item * L<share|Sah::Schema::share>
@@ -64,6 +97,14 @@ L<Sah::Schema::percent> instead.
 Non-negative float.
 
 See also C<posfloat> for floats that are larger than 0.
+
+
+=item * L<uint_or_posinf|Sah::Schema::uint_or_posinf>
+
+Unsigned integer, or Inf.
+
+Can be used to check value for number of items in a (possibly infinite)
+sequence.
 
 
 =back

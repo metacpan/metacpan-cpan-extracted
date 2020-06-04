@@ -2,14 +2,11 @@ use strict;
 use warnings;
 use utf8;
 use PICA::Data qw(pica_parser pica_writer pica_value);
-use PICA::Parser::Plain;
-use PICA::Parser::Plus;
-use PICA::Parser::XML;
 use Test::Exception;
 use Test::More;
 use Test::Warn;
 
-foreach my $type (qw(Plain Plus XML Binary)) {
+foreach my $type (qw(Plain Plus XML Binary JSON)) {
     my $module = "PICA::Parser::$type";
     my $file   = 't/files/pica.' . lc($type);
 

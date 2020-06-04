@@ -9,12 +9,8 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Danish CPR (SSN) number generator/validator",
   "AUTHOR" => "Jonas B. <jonasbn\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "Module::Build" => "0.30"
-  },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "Module::Build" => "0.30"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Business-DK-CPR",
   "EXE_FILES" => [
@@ -39,15 +35,18 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Perl::Critic::Bangs" => 0,
     "Pod::Coverage::TrustPod" => 0,
+    "Test::Exception" => 0,
     "Test::Fatal" => 0,
     "Test::Kwalitee" => "1.21",
     "Test::More" => 0,
+    "Test::NoPlan" => 0,
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08",
     "Test::Tester" => "1.302111"
   },
-  "VERSION" => "0.16",
+  "VERSION" => "0.17",
   "test" => {
     "TESTS" => "t/*.t t/Business/DK/CPR/*.t t/Class/Business/DK/CPR/*.t"
   }
@@ -64,13 +63,15 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Module::Build" => "0.30",
   "Params::Validate" => 0,
+  "Perl::Critic::Bangs" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Readonly" => 0,
+  "Test::Exception" => 0,
   "Test::Fatal" => 0,
   "Test::Kwalitee" => "1.21",
   "Test::More" => 0,
+  "Test::NoPlan" => 0,
   "Test::Pod" => "1.41",
   "Test::Pod::Coverage" => "1.08",
   "Test::Tester" => "1.302111",

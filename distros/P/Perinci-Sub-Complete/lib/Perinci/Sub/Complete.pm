@@ -1,7 +1,9 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.942'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-04'; # DATE
+our $DIST = 'Perinci-Sub-Complete'; # DIST
+our $VERSION = '0.943'; # VERSION
 
 use 5.010001;
 use strict;
@@ -194,7 +196,7 @@ sub complete_arg_val {
                         my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                         require $mod_pm;
                         my $fref = \&{"$mod\::gen_completion"};
-                        log_trace("[comp][periscomp] invoking gen_completion() from %s ...", $mod);
+                        log_trace("[comp][periscomp] invoking %s\::gen_completion(%s) ...", $mod, $xcargs);
                         $comp = $fref->(%$xcargs);
                     } else {
                         log_trace("[comp][periscomp] module %s is not installed, skipped", $mod);
@@ -228,10 +230,12 @@ sub complete_arg_val {
 
         if ($comp) {
             if (ref($comp) eq 'CODE') {
-                log_trace("[comp][periscomp] invoking arg completion routine");
-                $fres = $comp->(
+                my %cargs = (
                     %$extras,
-                    word=>$word, arg=>$arg, args=>$args{args});
+                    word=>$word, arg=>$arg, args=>$args{args},
+                );
+                log_trace("[comp][periscomp] invoking arg completion routine with args (%s)", \%cargs);
+                $fres = $comp->(%cargs);
                 return; # from eval
             } elsif (ref($comp) eq 'ARRAY') {
                 # this is deprecated but will be supported for some time
@@ -402,7 +406,7 @@ sub complete_arg_elem {
                         my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                         require $mod_pm;
                         my $fref = \&{"$mod\::gen_completion"};
-                        log_trace("[comp][periscomp] invoking gen_completion() from %s ...", $mod);
+                        log_trace("[comp][periscomp] invoking %s\::gen_completion(%s) ...", $mod, $xcargs);
                         $elcomp = $fref->(%$xcargs);
                     } else {
                         log_trace("[comp][periscomp] module %s is not installed, skipped", $mod);
@@ -437,11 +441,13 @@ sub complete_arg_elem {
         $ourextras->{index} = $index;
         if ($elcomp) {
             if (ref($elcomp) eq 'CODE') {
-                log_trace("[comp][periscomp] invoking arg element completion routine");
-                $fres = $elcomp->(
+                my %cargs = (
                     %$extras,
                     %$ourextras,
-                    word=>$word);
+                    word=>$word,
+                );
+                log_trace("[comp][periscomp] invoking arg element completion routine with args (%s)", \%cargs);
+                $fres = $elcomp->(%cargs);
                 return; # from eval
             } elsif (ref($elcomp) eq 'ARRAY') {
                 log_trace("[comp][periscomp] using array specified in arg element completion routine: %s", $elcomp);
@@ -622,11 +628,13 @@ sub complete_arg_index {
 
         if ($idxcomp) {
             if (ref($idxcomp) eq 'CODE') {
-                log_trace("[comp][periscomp] invoking arg element index completion routine");
-                $fres = $idxcomp->(
+                my %cargs = (
                     %$extras,
                     %$ourextras,
-                    word=>$word);
+                    word=>$word,
+                );
+                log_trace("[comp][periscomp] invoking arg element index completion routine with args (%s)", \%cargs);
+                $fres = $idxcomp->(%cargs);
                 return; # from eval
             } elsif (ref($idxcomp) eq 'ARRAY') {
                 log_trace("[comp][periscomp] using array specified in arg element index completion routine: %s", $idxcomp);
@@ -886,7 +894,7 @@ sub complete_cli_arg {
                 $cargs{arg} = $sm->{arg};
                 my $arg_spec = $args_prop->{$sm->{arg}} or goto RETURN_RES;
                 if ($comp) {
-                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument with args (%s)", \%cargs);
                     my $compres;
                     eval { $compres = $comp->(%cargs) };
                     log_debug("[comp][periscomp] completion died: $@") if $@;
@@ -936,7 +944,7 @@ sub complete_cli_arg {
                 $cargs{arg}  = undef;
                 my $codata = $copts_by_ospec->{$ospec};
                 if ($comp) {
-                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument with args (%s)", \%cargs);
                     my $res;
                     eval { $res = $comp->(%cargs) };
                     log_debug("[comp][periscomp] completion died: $@") if $@;
@@ -947,7 +955,7 @@ sub complete_cli_arg {
                 }
                 if ($codata->{completion}) {
                     $cargs{arg}  = undef;
-                    log_trace("[comp][periscomp] completing with common option's 'completion' property");
+                    log_trace("[comp][periscomp] completing with common option's 'completion' property with args (%s)", \%cargs);
                     my $res;
                     eval { $res = $codata->{completion}->(%cargs) };
                     log_debug("[comp][periscomp] completion died: $@") if $@;
@@ -984,7 +992,7 @@ sub complete_cli_arg {
                 log_trace("[comp][periscomp] this argument position is for non-slurpy function argument <%s>", $an);
                 $cargs{arg} = $an;
                 if ($comp) {
-                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument with args (%s)", \%cargs);
                     my $res;
                     eval { $res = $comp->(%cargs) };
                     log_debug("[comp][periscomp] completion died: $@") if $@;
@@ -1012,7 +1020,7 @@ sub complete_cli_arg {
                 $cargs{index} = $index;
                 log_trace("[comp][periscomp] this position is for slurpy function argument <%s>'s element[%d]", $an, $index);
                 if ($comp) {
-                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument with args (%s)", \%cargs);
                     my $res;
                     eval { $res = $comp->(%cargs) };
                     log_debug("[comp][periscomp] completion died: $@") if $@;
@@ -1029,7 +1037,7 @@ sub complete_cli_arg {
 
             log_trace("[comp][periscomp] there is no matching function argument at this position");
             if ($comp) {
-                log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument with args (%s)", \%cargs);
                 my $res;
                 eval { $res = $comp->(%cargs) };
                 log_debug("[comp][periscomp] completion died: $@") if $@;
@@ -1078,7 +1086,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.942 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2020-03-04.
+This document describes version 0.943 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2020-06-04.
 
 =head1 SYNOPSIS
 

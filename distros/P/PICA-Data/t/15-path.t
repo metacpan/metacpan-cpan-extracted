@@ -42,4 +42,18 @@ while( my ($path, $values) = each %matches ) {
     is_deeply [ PICA::Path->new($path)->match_subfields($field) ], $values
 };
 
+# Accessors
+my $path = PICA::Path->new('123A[0.]/1-3');
+is $path->fields, '123A';
+is $path->occurrences, '0.';
+is $path->subfields, undef;
+is $path->positions, '1-3';
+
+$path = PICA::Path->new('00..$0');
+is $path->fields, '00..';
+is $path->occurrences, undef;
+is $path->subfields, '0';
+is $path->positions, undef;
+
+
 done_testing;

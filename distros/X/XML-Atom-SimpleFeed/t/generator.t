@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use XML::Atom::SimpleFeed;
-use Test::More 0.88; # for done_testing
+use Test::More tests => 3;
 
 my $g = XML::Atom::SimpleFeed::DEFAULT_GENERATOR;
 
@@ -14,5 +14,3 @@ like $_, qr!<generator>z</generator>!, 'specified generator'
 
 unlike $_, qr!<generator!, 'suppressed generator'
 	for XML::Atom::SimpleFeed->new( qw( title x id y generator ), undef )->as_string;
-
-done_testing;

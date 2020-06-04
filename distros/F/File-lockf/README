@@ -1,0 +1,59 @@
+
+Introduction
+------------
+
+File-Lockf is a wrapper around the lockf system call. Perl supports the
+flock system call natively, but that does not acquire network locks. Perl
+also supports the fcntl system call, but that is somewhat ugly to
+use. There are other locking modules available for Perl, but none of them
+provided what I wanted -- a simple, clean interface to the lockf system
+call, without any bells or whistles getting in the way.
+
+
+Installation
+------------
+
+To compile and install File-Lockf, simply run the following commands:
+
+     perl Makefile.PL
+     make
+     make install
+
+
+File-Lockf has been tested under Solaris 2.5-10 and Linux. It is possible that
+it will not compile as-is under other operating systems. If you can't get
+File-Lockf to compile, please contact me and I'll try to help you figure out
+what changes are needed for your platform, and potentially merge them into the
+distribution.
+
+The File-Lockf module contains usage instructions, which can be viewed
+after installation by typing either "man File::lockf" or "perldoc
+File::lockf".
+
+
+Changes
+-------
+
+0.26 - Add metadata to Makefile.PL and bump version for release
+       containing META.json/META.yml.
+
+0.25 - Added new method to return file handle associated with lock
+       object.
+
+0.20 - Added simple OO wrapper class around locking functionality,
+       including a new method to iteratively attempt to acquire a
+       lock.
+
+0.15 - First publicly released version.
+
+
+Feedback/Availability
+---------------------
+
+Please report any bugs or feature requests to <henson@acm.org>.
+
+
+The latest version of File-Lockf is currently available on CPAN, or
+via github:
+
+	https://github.com/pbhenson/File-Lockf

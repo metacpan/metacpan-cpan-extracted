@@ -43,8 +43,6 @@ stop_words_file = t/wordlist.txt
 
 #TODO
 
-[-Documentation::RequirePodLinksIncludeText]
-
 [-RegularExpressions::RequireLineBoundaryMatching]
 
 [-RegularExpressions::RequireExtendedFormatting]

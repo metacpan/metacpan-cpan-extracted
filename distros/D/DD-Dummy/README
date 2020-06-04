@@ -2,8 +2,8 @@ NAME
     DD::Dummy - A dummy module to pull DD
 
 VERSION
-    This document describes version 0.007 of DD::Dummy (from Perl
-    distribution DD-Dummy), released on 2019-08-12.
+    This document describes version 0.009 of DD::Dummy (from Perl
+    distribution DD-Dummy), released on 2020-06-05.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -26,7 +26,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

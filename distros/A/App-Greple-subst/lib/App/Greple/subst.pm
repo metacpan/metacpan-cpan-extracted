@@ -6,7 +6,7 @@ subst - Greple module for text search and substitution
 
 =head1 VERSION
 
-Version 2.1401
+Version 2.1402
 
 =head1 SYNOPSIS
 
@@ -256,7 +256,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::subst;
 
-our $VERSION = '2.1401';
+our $VERSION = '2.1402';
 
 use v5.14;
 use strict;
@@ -280,6 +280,7 @@ use Carp;
 use Data::Dumper;
 use Text::ParseWords qw(shellwords);
 use Encode;
+use Getopt::EX::Colormap qw(colorize);
 use App::Greple::Common;
 use App::Greple::Pattern;
 use App::Greple::subst::Dict;
@@ -463,9 +464,10 @@ sub subst_show_stat {
 			  grep { $_ ne $to } @keys),
 			 (grep { $_ eq $to } @keys)) {
 		my $index = $key eq $to ? $i * 2 + 1 : $i * 2;
-		printf(" %s(%d)",
+		printf(" %s(%s)",
 		       main::index_color($index, $key),
-		       $hash->{$key});
+		       colorize($key eq $to ? 'B' : 'RD', $hash->{$key})
+		    );
 	    }
 	}
 	print "\n";
@@ -715,7 +717,7 @@ option default \
 	-Mtermcolor::bg(default=100,light=--subst-color-light,dark=--subst-color-dark) \
 	--prologue subst_initialize \
 	--begin subst_begin \
-	--le &subst_search --no-regioncolor
+	--le +&subst_search --no-regioncolor
 
 expand ++dump    --all --need 0 -h --nocolor
 option --diff    --subst ++dump --of &subst_diff

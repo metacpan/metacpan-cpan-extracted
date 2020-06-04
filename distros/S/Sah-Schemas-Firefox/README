@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Firefox - Various Sah schemas related to Firefox
 
 VERSION
-    This document describes version 0.001 of Sah::Schemas::Firefox (from
-    Perl distribution Sah-Schemas-Firefox), released on 2020-04-18.
+    This document describes version 0.002 of Sah::Schemas::Firefox (from
+    Perl distribution Sah-Schemas-Firefox), released on 2020-06-04.
 
 HOMEPAGE
     Please visit the project's homepage at

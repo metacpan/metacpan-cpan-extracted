@@ -8,9 +8,11 @@ use English qw(-no_match_vars);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
+use 5.006;    #5.6.0
+
 use Class::Business::DK::CPR;
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 my $verbose = 0;
 my $result = GetOptions( 'verbose' => \$verbose );
@@ -21,14 +23,12 @@ if ( not $ARGV[0] ) {
 
 my $unvalidated_cpr = $ARGV[0];
 
-my $rv = 0;
 my $cpr;
 
 eval { $cpr = Class::Business::DK::CPR->new($unvalidated_cpr); };
 
 if ($EVAL_ERROR) {
-    print "$unvalidated_cpr is not valid\n";
-
+    die "$unvalidated_cpr is not valid\n";
 }
 else {
     if ($verbose) {

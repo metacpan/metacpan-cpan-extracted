@@ -25,7 +25,7 @@ my @try_incdirs = ("", qw{/usr/include /usr/local/opt/openssl/include});
 my @try_libdirs = ("", qw{/usr/lib /usr/local/opt/openssl/lib});
 opendir my $src, $libdir;
 my @files = grep /\.[ch]$/, readdir $src;
-if (!(find_openssl(\@try_incdirs,\@try_libdirs)->[2])) { # remove openssl files
+if (! defined find_openssl(\@try_incdirs,\@try_libdirs)->[1]) { # remove openssl files
   @files = grep !/openssl/, @files;
 }
 # stage the libneo4client source+headers
@@ -97,14 +97,22 @@ sub _configure {
   # Find openssl or exclude TLS support
   my $ssl_flags = find_openssl(\@try_incdirs, \@try_libdirs);
   say STDERR "Building without TLS - openssl not found" unless $ssl_flags;
-  my ($tls_cc, $tls_ld, $tls_libd);
-  (($tls_cc, $tls_ld, $tls_libd) = @$ssl_flags) if $ssl_flags;
-  my  $TLS = ($tls_libd ? '--with-tls' : '--without-tls');
-  my  $WITH_LIBS = ($tls_libd ? "--with-libs=$tls_libd" : '');
+  my ($tls_cc, $tls_ld, $tls_libd, $have_pc) = @$ssl_flags;
+  my  $TLS = (defined $tls_ld ? '--with-tls' : '--without-tls');
+  my  $WITH_LIBS = (defined $tls_libd ? "--with-libs=$tls_libd" : '');
   my @configure_opts = ($TLS,$WITH_LIBS || ());
   say "Running configure";
   chdir 'build';
-  my $rc = run ['./configure',@configure_opts], \$in,\$out,\$err;
+  my @env;
+  if (!$have_pc) {
+    # libneo4j-client configure kludge - if no pkg-config,
+    # must set both OPENSSL_LIBS and OPENSSL_CFLAGS to non-empty strings
+    # for the ssl check to succeed
+    my $ll = join(' ', ($tls_libd ? "-L$tls_libd":()), "$tls_ld ");
+    @env = ('env',"OPENSSL_CFLAGS='$tls_cc '",
+	    "OPENSSL_LIBS='$ll'");
+  }
+  my $rc = run [@env,'./configure',@configure_opts], \$in,\$out,\$err;
   if (!$rc) {
     croak "configure failed with this output:\n$err";
   }
@@ -179,7 +187,7 @@ sub find_openssl {
   return $ssl_flags if ($ssl_flags);
   say "Finding openssl";
   my ($in,$out,$err);
-
+  my $pkg_config = 1;
   try {
     if (run([qw/pkg-config --variable=libdir openssl/],\$in,\$out,\$err)) {
       print $out;
@@ -192,6 +200,7 @@ sub find_openssl {
       push @{$try_incdirs}, $out;
     }
   } catch {
+    $pkg_config = undef;
     say STDERR "(note: no pkg-config)\n";
   };
     
@@ -220,11 +229,11 @@ TRY
 
   unless ($inc_found) {
     open(STDERR, ">&OLDERR");
-    return $ssl_flags = [undef,undef,undef];
+    return $ssl_flags = [undef,undef,undef, $pkg_config];
   }
   
   for my $libdir (@$try_libdirs) {
-    $libdir = realpath $libdir;
+    $libdir = realpath $libdir if $libdir;
     $cc->unshift_extra_linker_flags( "-L".$libdir ) if $libdir;
     if ($cc->try_compile_run( source => $tryc )) {
       $lib_found=1;
@@ -238,10 +247,10 @@ TRY
     open(STDERR, ">&OLDERR");
     return $ssl_flags = [join( ' ', @{$cc->extra_compiler_flags}),
 	    join( ' ', @{$cc->extra_linker_flags}),
-	   $libd];
+	   $libd, $pkg_config];
   }
   open(STDERR, ">&OLDERR");  
-  return $ssl_flags = [undef,undef,undef];
+  return $ssl_flags = [undef,undef,undef,$pkg_config];
 }
 
 # monkey patches for ExtUtils::CChecker

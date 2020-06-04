@@ -1,5 +1,10 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+1.3  Thu Jun  4 21:39:30 CEST 2020
+
+- Maintenance release addressing the broken inc/ configuration pointed out in: RT:77784 by HMBRAND
+  REF: https://rt.cpan.org/Ticket/Display.html?id=77784
+
 1.2  Sat Oct 27 09:37:04 CEST 2018
 
 - Maintenance release addressing the missing exclusion of the MYMETA files

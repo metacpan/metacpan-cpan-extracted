@@ -1,8 +1,5 @@
 package POE::Component::Server::SimpleSMTP;
-BEGIN {
-  $POE::Component::Server::SimpleSMTP::VERSION = '1.50';
-}
-
+$POE::Component::Server::SimpleSMTP::VERSION = '1.52';
 #ABSTRACT: A simple to use POE SMTP Server.
 
 use strict;
@@ -241,8 +238,8 @@ sub _start_listener {
 
 sub _accept_client {
   my ($kernel,$self,$socket,$peeraddr,$peerport) = @_[KERNEL,OBJECT,ARG0..ARG2];
-  my $sockaddr = eval "inet_ntoa( ( unpack_sockaddr_in ( CORE::getsockname $socket ) )[1] )";
-  my $sockport = eval "( unpack_sockaddr_in ( CORE::getsockname $socket ) )[0]";
+  my $sockaddr = eval { inet_ntoa( ( sockaddr_in ( CORE::getsockname($socket)) )[1] ) };
+  my $sockport = eval { ( sockaddr_in ( CORE::getsockname($socket)) )[0] };
   $peeraddr = inet_ntoa( $peeraddr );
 
   my $wheel = POE::Wheel::ReadWrite->new(
@@ -686,7 +683,11 @@ sub _dnsbl {
 
 sub _sender_verify {
   my ($kernel,$self,$data) = @_[KERNEL,OBJECT,ARG0];
-  return if $data->{error} and $data->{error} eq 'NOERROR';
+  if ( $data->{error} and $data->{error} eq 'NOERROR' ) {
+    my @answers = $data->{response}->answer();
+    return if scalar @answers;
+    $data->{error} = 'NXDOMAIN';
+  }
   my $id = delete $data->{context};
   $self->{clients}->{ $id }->{fverify} = $data->{error};
   return;
@@ -721,18 +722,22 @@ sub SMTPD_cmd_mail {
      $response = '503 Sender already specified';
   }
   elsif ( my ($from) = $args =~ /^from:\s*<(.+)>/i ) {
-     $response = "250 <$from>... Sender OK";
-     $self->{clients}->{ $id }->{mail} = $from;
-     if ( $self->{sender_verify} ) {
-        my $host = Email::Address->new(undef,$from,undef)->host();
-        my $response = $self->{resolver}->resolve(
-	        event   => '_sender_verify',
-	        type    => 'MX',
-	        host    => $host,
-	        context => $id,
-        );
-        $poe_kernel->post( $self->{session_id}, '_sender_verify', $response ) if $response;
-     }
+    if ( my $host = Email::Address->new(undef,$from,undef)->host() ) {
+      $response = "250 <$from>... Sender OK";
+      $self->{clients}->{ $id }->{mail} = $from;
+      if ( $self->{sender_verify} ) {
+          my $response = $self->{resolver}->resolve(
+	          event   => '_sender_verify',
+	          type    => 'MX',
+	          host    => $host,
+	          context => $id,
+          );
+          $poe_kernel->post( $self->{session_id}, '_sender_verify', $response ) if $response;
+      }
+    }
+    else {
+      $response = "501 Sender address must contain a domain";
+    }
   }
   else {
      $args = '' unless $args;
@@ -863,6 +868,22 @@ sub SMTPD_message {
   my ($self,$smtpd) = splice @_, 0, 2;
   return PLUGIN_EAT_NONE unless $self->{simple};
   my $id = ${ $_[0] };
+  if ( $self->{sender_verify} and defined $self->{clients}->{ $id }->{fverify} ) {
+     my $response;
+     my $fverify = uc $self->{clients}->{ $id }->{fverify};
+     if ( $fverify eq 'NXDOMAIN' ) {
+       $response = '550 Sender verify failed';
+     }
+     else {
+       $response = '451 Temporary local problem - please try later';
+     }
+     delete $self->{clients}->{ $id }->{mail};
+     delete $self->{clients}->{ $id }->{rcpt};
+     delete $self->{clients}->{ $id }->{buffer};
+     delete $self->{clients}->{ $id }->{fverify};
+     $self->_send_event( 'smtpd_fverify', $id, $response, $fverify );
+     return PLUGIN_EAT_ALL;
+  }
   my $from = ${ $_[1] };
   my $rcpt = ${ $_[2] };
   my $buf = ${ $_[3] };
@@ -909,9 +930,11 @@ sub enqueue {
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -919,7 +942,7 @@ POE::Component::Server::SimpleSMTP - A simple to use POE SMTP Server.
 
 =head1 VERSION
 
-version 1.50
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -1502,10 +1525,9 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

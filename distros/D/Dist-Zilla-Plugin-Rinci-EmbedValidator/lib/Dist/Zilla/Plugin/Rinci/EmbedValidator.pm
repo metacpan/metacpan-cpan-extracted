@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Rinci::EmbedValidator;
 
-our $DATE = '2019-07-04'; # DATE
-our $VERSION = '0.250'; # VERSION
+our $DATE = '2020-06-05'; # DATE
+our $VERSION = '0.251'; # VERSION
 
 use 5.010001;
 use strict;
@@ -279,8 +279,9 @@ sub munge_file {
         if (/^\s*sub \s+ (\w+)/x) {
             $self->log_debug("Found sub declaration $1");
             unless ($pkg_name) {
-                $self->log_fatal(
-                    "$fname:$i: module does not have package definition");
+                $self->log(
+                    "$fname:$i: module does not have package definition, skipping this file");
+                return;
             }
             $check_prev_sub->();
             $sub_name      = $1;
@@ -388,7 +389,7 @@ Dist::Zilla::Plugin::Rinci::EmbedValidator - Embed schema validator code in buil
 
 =head1 VERSION
 
-This document describes version 0.250 of Dist::Zilla::Plugin::Rinci::EmbedValidator (from Perl distribution Dist-Zilla-Plugin-Rinci-EmbedValidator), released on 2019-07-04.
+This document describes version 0.251 of Dist::Zilla::Plugin::Rinci::EmbedValidator (from Perl distribution Dist-Zilla-Plugin-Rinci-EmbedValidator), released on 2020-06-05.
 
 =head1 SYNOPSIS
 
@@ -559,7 +560,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

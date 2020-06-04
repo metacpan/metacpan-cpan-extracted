@@ -4,7 +4,7 @@ use warnings;
 use XML::Atom::SimpleFeed;
 
 package XML::Atom::SimpleFeed;
-use Test::More 0.88; # for done_testing
+use Test::More tests => 9;
 BEGIN { eval { require Test::LongString; Test::LongString->import; 1 } or *is_string = \&is; }
 
 sub _ok {
@@ -42,5 +42,3 @@ is xml_tag( 'br' ), '<br/>', 'simple tags are self-closed';
 is xml_tag( 'b', 'foo', '<br/>' ), '<b>foo<br/></b>', 'tags with content are properly formed';
 is xml_tag( [ 'br', clear => 'left' ] ), '<br clear="left"/>', 'simple tags can have attributes';
 is xml_tag( [ 'b', style => 'color: red' ], 'foo', '<br/>' ), '<b style="color: red">foo<br/></b>', 'simple tags can have attributes';
-
-done_testing;

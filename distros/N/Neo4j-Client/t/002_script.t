@@ -19,5 +19,5 @@ ok(run([ $^X, '-Mblib', $script, '--cc' ],\$in,\$out,\$err),"--cc");
 like $out, qr{-I/},"got some ccflags";
 ok(run([ $^X, '-Mblib', $script, '--cc', '--dev' ],\$in,\$out,\$err),"--cc --dev");
 like $out, qr{-I/},"got some ccflags";
-like $out, qr{include}, "got dev ccflags";
+like $out, qr{Client/include}, "got dev ccflags";
 done_testing;

@@ -13,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
 keywords:
   - Scrabble
   - Literati
@@ -30,11 +30,15 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Games::Literati:
+    file: lib/Games/Literati.pm
+    version: '0.042'
 requires:
   Exporter: '0'
-  perl: '5.006000'
+  perl: '5.008000'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Games-Literati
-  repository: https://github.com/pryrt/Games-Literati
-version: 0.04
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+  bugtracker: https://github.com/pryrt/Games-Literati/issues
+  repository: https://github.com/pryrt/Games-Literati.git
+version: '0.042'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

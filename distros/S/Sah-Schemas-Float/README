@@ -2,13 +2,29 @@ NAME
     Sah::Schemas::Float - Sah schemas for various floating types
 
 VERSION
-    This document describes version 0.008 of Sah::Schemas::Float (from Perl
-    distribution Sah-Schemas-Float), released on 2020-03-08.
+    This document describes version 0.011 of Sah::Schemas::Float (from Perl
+    distribution Sah-Schemas-Float), released on 2020-06-04.
 
 SAH SCHEMAS
+    *   inf
+
+        Inf or -Inf.
+
+    *   int_or_inf
+
+        Integer, or Inf/-Inf.
+
+    *   nan
+
+        NaN.
+
     *   negfloat
 
         Negative float.
+
+    *   neginf
+
+        -Inf.
 
     *   percent
 
@@ -18,11 +34,27 @@ SAH SCHEMAS
         So the percent sign is optional, but the number is always
         interpreted as percent, e.g. "1" is interpreted as 1% (0.01).
 
+        In general, instead of using this schema, I recommend just using the
+        "float" type (which by default includes coercion rule to convert
+        from percent notation e.g. '1%' -> 0.01). Use this schema if your
+        argument really needs to be expressed in percents.
+
     *   posfloat
 
         Positive float.
 
         See also "ufloat" for floats that are equal or larger than 0.
+
+    *   posinf
+
+        Inf but not -Inf.
+
+    *   posint_or_posinf
+
+        Positive integer, or Inf.
+
+        Can be used to check value for number of items in a (possibly
+        infinite) sequence.
 
     *   share
 
@@ -43,6 +75,13 @@ SAH SCHEMAS
         Non-negative float.
 
         See also "posfloat" for floats that are larger than 0.
+
+    *   uint_or_posinf
+
+        Unsigned integer, or Inf.
+
+        Can be used to check value for number of items in a (possibly
+        infinite) sequence.
 
 HOMEPAGE
     Please visit the project's homepage at

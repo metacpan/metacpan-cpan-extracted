@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,15 +41,15 @@ requires:
   XML::Writer: '0'
   perl: v5.10.0
 resources:
-  bugtracker: https://github.com/gbv/PICA-Data/issues
-  homepage: https://github.com/gbv/PICA-Data
-  repository: https://github.com/gbv/PICA-Data.git
-version: '1.06'
+  bugtracker: https://github.com/GBV/PICA-Data/issues
+  homepage: https://github.com/GBV/PICA-Data
+  repository: https://github.com/GBV/PICA-Data.git
+version: '1.07'
 x_contributors:
   - 'Carsten Klee <klee@cpan.org>'
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Johann Rolschewski <johann@rolschewski.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
-x_generated_by_perl: v5.28.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.18.1
+x_serialization_backend: 'YAML::Tiny version 1.63'
 x_static_install: 1

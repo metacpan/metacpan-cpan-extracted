@@ -1,5 +1,11 @@
 Revision history for PICA::Data
 
+1.07  2020-06-04 13:55:07 CEST
+    - rename pica-validate to picadata
+    - support filtering by multiple path expressions (pica_fields)
+    - Add PICA JSON Writer and serializer
+    - Add PICA::Path accessors
+
 1.06  2020-04-20 11:20:40 CEST
     - fix return of empty values
 

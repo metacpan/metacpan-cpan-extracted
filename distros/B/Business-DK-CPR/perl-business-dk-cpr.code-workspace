@@ -4,9 +4,12 @@
 			"path": "."
 		}
 	],
-	"settings": {},
-	"perlcritic.additionalArguments": [
-        "--profile",
-        "t/perlcriticrc"
-    ]
+    "settings": {
+        "perlcritic.additionalArguments": [
+            "--profile",
+            "t/perlcriticrc"
+        ],
+        "perlSyntax.includePaths": ["lib"],
+    },
+
 }

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.156-4-g6e0619a
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.157-2-g8b96f45
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.157';
+our $VERSION = '0.158';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Moose;
@@ -198,7 +198,8 @@ sub _pause_download_url {
   my $self = shift;
   my ($username, $password) = @{$self->_pause_config}{qw(user password)};
   return if not $username or not $password;
-  'http://'.$username.':'.uri_escape($password).'@pause.perl.org/pub/PAUSE/authors/id/'.substr($username, 0, 1).'/'.substr($username,0,2).'/'.$username.'/%a';
+  $password = uri_escape($password) =~ s/%/%%/gr;
+  'http://'.$username.':'.$password.'@pause.perl.org/pub/PAUSE/authors/id/'.substr($username, 0, 1).'/'.substr($username,0,2).'/'.$username.'/%a';
 }
 
 # configs are applied when plugins match ->isa($key) or ->does($key)
@@ -661,7 +662,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.157
+version 0.158
 
 =head1 SYNOPSIS
 

@@ -3,9 +3,9 @@ NAME
     in built code
 
 VERSION
-    This document describes version 0.250 of
+    This document describes version 0.251 of
     Dist::Zilla::Plugin::Rinci::EmbedValidator (from Perl distribution
-    Dist-Zilla-Plugin-Rinci-EmbedValidator), released on 2019-07-04.
+    Dist-Zilla-Plugin-Rinci-EmbedValidator), released on 2020-06-05.
 
 SYNOPSIS
     In dist.ini:
@@ -170,8 +170,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012
-    by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013,
+    2012 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

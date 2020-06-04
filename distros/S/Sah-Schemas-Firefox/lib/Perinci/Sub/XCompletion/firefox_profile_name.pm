@@ -1,9 +1,9 @@
 package Perinci::Sub::XCompletion::firefox_profile_name;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-18'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'Sah-Schemas-Firefox'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ Perinci::Sub::XCompletion::firefox_profile_name - Generate completion for Firefo
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::Sub::XCompletion::firefox_profile_name (from Perl distribution Sah-Schemas-Firefox), released on 2020-04-18.
+This document describes version 0.002 of Perinci::Sub::XCompletion::firefox_profile_name (from Perl distribution Sah-Schemas-Firefox), released on 2020-06-04.
 
 =head1 SYNOPSIS
 

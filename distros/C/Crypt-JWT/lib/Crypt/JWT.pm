@@ -3,7 +3,7 @@ package Crypt::JWT;
 use strict;
 use warnings;
 
-our $VERSION = '0.026';
+our $VERSION = '0.027';
 
 use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(decode_jwt encode_jwt)] );
@@ -442,6 +442,8 @@ sub _encode_jwe {
   my $alg     = $args{alg};
   my $enc     = $args{enc};
   my $header  = $args{extra_headers} ? \%{$args{extra_headers}} : {};
+  croak "JWE: missing 'enc'" if !defined $enc;
+  croak "JWE: missing 'payload'" if !defined $payload;
   # add claims to payload
   _add_claims($payload, %args) if ref $payload eq 'HASH';
   # serialize payload
@@ -544,9 +546,10 @@ sub _sign_jws {
     my $pk = _prepare_rsa_key($key);
     $sig  = $pk->sign_message($data, $hash, 'pss', $hashlen);
   }
-  elsif ($alg =~ /^ES(256|384|512)/) { # ECDSA signatures
+  elsif ($alg =~ /^ES(256|256K|384|512)$/) { # ECDSA signatures
+    my $hash = {ES256 => 'SHA256', ES256K => 'SHA256', ES384 => 'SHA384', ES512 => 'SHA512'}->{$alg};
     my $pk = _prepare_ecc_key($key);
-    $sig  = $pk->sign_message_rfc7518($data, "SHA$1");
+    $sig  = $pk->sign_message_rfc7518($data, $hash);
   }
   elsif ($alg eq 'EdDSA') { # Ed25519 signatures
     my $pk = _prepare_ed25519_key($key);
@@ -579,8 +582,8 @@ sub _verify_jws {
     my $pk = _prepare_rsa_key($key);
     return 1 if $pk->verify_message($sig, $data, $hash, 'pss', $hashlen);
   }
-  elsif ($alg =~ /^ES(256|384|512)/) { # ECDSA signatures
-    my $hash = "SHA$1";
+  elsif ($alg =~ /^ES(256|256K|384|512)$/) { # ECDSA signatures
+    my $hash = {ES256 => 'SHA256', ES256K => 'SHA256', ES384 => 'SHA384', ES512 => 'SHA512'}->{$alg};
     my $pk = _prepare_ecc_key($key);
     return 1 if $pk->verify_message_rfc7518($sig, $data, $hash);
   }
@@ -596,6 +599,7 @@ sub _encode_jws {
   my $payload = $args{payload};
   my $alg     = $args{alg};
   my $header  = $args{extra_headers} ? \%{$args{extra_headers}} : {};
+  croak "JWS: missing 'payload'" if !defined $payload;
   croak "JWS: alg 'none' not allowed" if $alg eq 'none' && !$args{allow_none};
   # add claims to payload
   _add_claims($payload, %args) if ref $payload eq 'HASH';
@@ -683,6 +687,7 @@ sub _decode_jws {
 sub encode_jwt {
   my %args = @_;
 
+  croak "JWT: missing 'alg'" unless $args{alg};
   my $ser = $args{serialization} || 'compact';
   if ($args{alg} =~ /^(none|EdDSA|((HS|RS|PS|ES)(512|384|256)))$/) {
     ###JWS
@@ -862,6 +867,7 @@ The value depends on the C<alg> token header value.
  ES256               public ECC key, perl HASH ref with JWK key structure,
                      a reference to SCALAR string with PEM or DER or JSON/JWK data,
                      an instance of Crypt::PK::ECC
+ ES256K              public ECC key, see ES256
  ES384               public ECC key, see ES256
  ES512               public ECC key, see ES256
  EdDSA               public Ed25519 key
@@ -1226,6 +1232,7 @@ Supported JWS algorithms:
  PS384  ...  RSA+PSS + SHA384 signature
  PS512  ...  RSA+PSS + SHA512 signature
  ES256  ...  ECDSA + SHA256 signature
+ ES256K ...  ECDSA + SHA256 signature
  ES384  ...  ECDSA + SHA384 signature
  ES512  ...  ECDSA + SHA512 signature
  EdDSA  ...  Ed25519 signature
@@ -1264,6 +1271,7 @@ A key used for token encryption (JWE) or token signing (JWS). The value depends 
  ES256               private ECC key, perl HASH ref with JWK key structure,
                      a reference to SCALAR string with PEM or DER or JSON/JWK data,
                      an instance of Crypt::PK::ECC
+ ES256K              private ECC key, see ES256
  ES384               private ECC key, see ES256
  ES512               private ECC key, see ES256
  EdDSA               private Ed25519 key

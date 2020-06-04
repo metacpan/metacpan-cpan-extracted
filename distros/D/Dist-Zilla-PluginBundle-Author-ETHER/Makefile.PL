@@ -10,7 +10,7 @@ use warnings;
 use Devel::CheckBin;
 check_bin('git');
 
-use 5.010;
+use 5.013002;
 use ExtUtils::MakeMaker;
 
 BEGIN {
@@ -92,7 +92,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-Author-ETHER",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.013002",
   "NAME" => "Dist::Zilla::PluginBundle::Author::ETHER",
   "PL_FILES" => {},
   "PREREQ_PM" => {
@@ -242,7 +242,7 @@ my %WriteMakefileArgs = (
     "namespace::clean" => 0,
     "parent" => 0
   },
-  "VERSION" => "0.157",
+  "VERSION" => "0.158",
   "test" => {
     "TESTS" => "t/*.t"
   }

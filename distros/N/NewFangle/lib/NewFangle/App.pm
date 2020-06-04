@@ -1,4 +1,4 @@
-package NewFangle::App 0.02 {
+package NewFangle::App 0.03 {
 
   use strict;
   use warnings;
@@ -12,6 +12,13 @@ package NewFangle::App 0.02 {
 
   $ffi->attach( [ create_app => 'new' ] => ['newrelic_app_config_t', 'unsigned short'] => 'newrelic_app_t' => sub {
     my($xsub, undef, $config, $timeout) = @_;
+
+    if(defined $ENV{NEWRELIC_APP_HOSTNAME}) {
+      NewFangle::newrelic_set_hostname(
+        $ENV{NEWRELIC_APP_HOSTNAME}
+      );
+    }
+
     $config //= {};
     $config = NewFangle::Config->new(%$config) if ref $config eq 'HASH';
     $timeout //= $ENV{PERL_NEWFANGLE_TIMEOUT} // 0;
@@ -67,7 +74,7 @@ NewFangle::App - NewRelic application class
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -6,21 +6,35 @@ use warnings;
 
 use Test::More;
 
-plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 27 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/To_float/From_str/as_percent.pm',
     'Data/Sah/Coerce/perl/To_float/From_str/share.pm',
+    'Sah/Schema/inf.pm',
+    'Sah/Schema/int_or_inf.pm',
+    'Sah/Schema/nan.pm',
     'Sah/Schema/negfloat.pm',
+    'Sah/Schema/neginf.pm',
     'Sah/Schema/percent.pm',
     'Sah/Schema/posfloat.pm',
+    'Sah/Schema/posinf.pm',
+    'Sah/Schema/posint_or_posinf.pm',
     'Sah/Schema/share.pm',
     'Sah/Schema/ufloat.pm',
+    'Sah/Schema/uint_or_posinf.pm',
+    'Sah/SchemaR/inf.pm',
+    'Sah/SchemaR/int_or_inf.pm',
+    'Sah/SchemaR/nan.pm',
     'Sah/SchemaR/negfloat.pm',
+    'Sah/SchemaR/neginf.pm',
     'Sah/SchemaR/percent.pm',
     'Sah/SchemaR/posfloat.pm',
+    'Sah/SchemaR/posinf.pm',
+    'Sah/SchemaR/posint_or_posinf.pm',
     'Sah/SchemaR/share.pm',
     'Sah/SchemaR/ufloat.pm',
+    'Sah/SchemaR/uint_or_posinf.pm',
     'Sah/Schemas/Float.pm'
 );
 

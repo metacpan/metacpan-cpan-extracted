@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.057';
+our $VERSION = '1.058';
 # ABSTRACT: The Best Web Framework Deserves the Best CMS
 
 #pod =head1 SYNOPSIS
@@ -227,7 +227,7 @@ Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.057
+version 1.058
 
 =head1 SYNOPSIS
 

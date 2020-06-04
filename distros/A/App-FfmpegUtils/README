@@ -2,8 +2,8 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.002 of App::FfmpegUtils (from Perl
-    distribution App-FfmpegUtils), released on 2020-06-03.
+    This document describes version 0.003 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2020-06-04.
 
 FUNCTIONS
   reencode_video

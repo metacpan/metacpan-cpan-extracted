@@ -6,12 +6,13 @@ MANIFEST
 META.json
 META.yml
 README
-bin/pica-validate
+bin/picadata
 cpanfile
 dist.ini
 lib/PICA/Data.pm
 lib/PICA/Parser/Base.pm
 lib/PICA/Parser/Binary.pm
+lib/PICA/Parser/JSON.pm
 lib/PICA/Parser/PPXML.pm
 lib/PICA/Parser/Plain.pm
 lib/PICA/Parser/Plus.pm
@@ -23,6 +24,7 @@ lib/PICA/Schema/Error.pm
 lib/PICA/Writer/Base.pm
 lib/PICA/Writer/Binary.pm
 lib/PICA/Writer/Generic.pm
+lib/PICA/Writer/JSON.pm
 lib/PICA/Writer/PPXML.pm
 lib/PICA/Writer/Plain.pm
 lib/PICA/Writer/Plus.pm
@@ -41,6 +43,7 @@ t/author-pod-syntax.t
 t/files/bgb.example
 t/files/dump.dat
 t/files/pica.binary
+t/files/pica.json
 t/files/pica.plain
 t/files/pica.plus
 t/files/pica.xml

@@ -1,0 +1,49 @@
+NAME
+    Data::Dump::ObjectAsString - Like Data::Dump but objects are stringified
+    instead of dumped
+
+VERSION
+    This document describes version 0.001 of Data::Dump::ObjectAsString
+    (from Perl distribution Data-Dump-ObjectAsString), released on
+    2020-06-04.
+
+SYNOPSIS
+    Use like you would use Data::Dump:
+
+     use Data::Dump::ObjectAsString;
+     dd [1,2,3,4];
+
+DESCRIPTION
+    This is actually a thin wrapper of Data::Dump::Options. When dumping,
+    $Data::Dump::Options::OBJECT_AS is locally set to "string".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Dump-ObjectAsString>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Dump-ObjectAsString>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-ObjectAsStr
+    ing>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Data::Dump::Options
+
+    Data::Dump
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -16,7 +16,7 @@ GetOptions(
 !($libs || $ccflags || $dev) && pod2usage(0);
 
 print join(' ', ($ccflags ?
-		   ($dev ? $Neo4j::Client::CCFLAGS :$Neo4j::Client::CCFLAGS) : ()),
+		   ($dev ? $Neo4j::Client::DEV_CCFLAGS : $Neo4j::Client::CCFLAGS) : ()),
 	   ($libs ? $Neo4j::Client::LIBS : ()));
 1;
 

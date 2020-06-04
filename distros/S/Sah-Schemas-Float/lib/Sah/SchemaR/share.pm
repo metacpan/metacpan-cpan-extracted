@@ -1,9 +1,9 @@
 package Sah::SchemaR::share;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-06-04'; # DATE
+our $VERSION = '0.011'; # VERSION
 
-our $rschema = ["float",[{description=>"\nAccepted in one of these forms:\n\n    0.5      # a normal float between 0 and 1\n    10       # a float between 1 (exclusive) and 100, interpreted as percent\n    10%      # a percentage string, between 0% and 100%\n\nDue to different interpretations, particularly \"1\" (some people might expect it\nto mean \"0.01\" or \"1%\") use of this type is discouraged. Use\n<pm:Sah::Schema::percent> instead.\n\n",examples=>[{valid=>1,validated_value=>0,value=>0},{valid=>1,validated_value=>0.5,value=>0.5},{valid=>1,validated_value=>1,value=>1},{valid=>1,validated_value=>0.012,value=>1.2},{valid=>1,validated_value=>0.012,value=>"1.2%"},{valid=>0,value=>"102%"}],summary=>"A float between 0 and 1","x.perl.coerce_rules"=>["From_str::share"]}],["float"]];
+our $rschema = ["float",[{description=>"\nAccepted in one of these forms:\n\n    0.5      # a normal float between 0 and 1\n    10       # a float between 1 (exclusive) and 100, interpreted as percent\n    10%      # a percentage string, between 0% and 100%\n\nDue to different interpretations, particularly \"1\" (some people might expect it\nto mean \"0.01\" or \"1%\") use of this type is discouraged. Use\n<pm:Sah::Schema::percent> instead.\n\n",examples=>[{valid=>1,validated_value=>0,value=>0},{valid=>1,validated_value=>0.5,value=>0.5},{valid=>1,validated_value=>1,value=>1},{valid=>1,validated_value=>0.012,value=>1.2},{valid=>1,validated_value=>0.012,value=>"1.2%"},{valid=>0,value=>"102%"}],max=>1,min=>0,summary=>"A float between 0 and 1","x.perl.coerce_rules"=>["From_str::share"]}],["float"]];
 
 1;
 # ABSTRACT: A float between 0 and 1
@@ -20,7 +20,7 @@ Sah::SchemaR::share - A float between 0 and 1
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::share (from Perl distribution Sah-Schemas-Float), released on 2020-03-08.
+This document describes version 0.011 of Sah::SchemaR::share (from Perl distribution Sah-Schemas-Float), released on 2020-06-04.
 
 =head1 DESCRIPTION
 

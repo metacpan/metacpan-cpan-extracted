@@ -1,4 +1,4 @@
-package NewFangle::CustomEvent 0.02 {
+package NewFangle::CustomEvent 0.03 {
 
   use strict;
   use warnings;
@@ -42,12 +42,15 @@ NewFangle::CustomEvent - NewRelic custom event class
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
  use NewFangle;
+ my $app   = NewFangle::App->new;
+ my $txn   = $app->start_web_transaction("my-txn");
  my $event = NewFangle::CustomEvent->new("my event");
+ $txn->record_custom_event($event);
 
 =head1 DESCRIPTION
 

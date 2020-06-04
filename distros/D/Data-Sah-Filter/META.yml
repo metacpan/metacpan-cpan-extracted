@@ -21,7 +21,7 @@ name: Data-Sah-Filter
 requires:
   Data::Dmp: '0.240'
   Exporter: '5.57'
-  File::Temp: '0'
+  File::Temp: '0.2307'
   IPC::System::Options: '0.335'
   JSON: '0'
   Log::ger: '0.037'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Filter
   homepage: https://metacpan.org/release/Data-Sah-Filter
   repository: git://github.com/perlancar/perl-Data-Sah-Filter.git
-version: '0.006'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

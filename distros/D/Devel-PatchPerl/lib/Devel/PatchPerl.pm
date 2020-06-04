@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '1.98';
+$Devel::PatchPerl::VERSION = '2.00';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -10168,7 +10168,7 @@ Y3BwZmxhZ3M9IiRjcHBmbGFncyAtRF9fR05VQ19fIgorMS4qKSBjcHBmbGFncz0iJGNwcGZsYWdz
 IC1EX19HTlVDX18iCiBlc2FjCiBjYXNlICIkbWlwc190eXBlIiBpbgogJycpOzsK
 CONFGCC10520
   }
-  if ( $num < 5.023005 ) {
+  if ( $num < 5.023005 and ! ( $num >= 5.022002 and $num < 5.023000 ) ) {
     return _patch_b64(<<'CONFGCC10522');
 LS0tIENvbmZpZ3VyZQorKysgQ29uZmlndXJlCkBAIC00NjU3LDcgKzQ2NTcsNyBAQCBlbHNlCiBm
 aQogJHJtIC1mIHRyeSB0cnkuKgogY2FzZSAiJGdjY3ZlcnNpb24iIGluCi0xKikgY3BwPWAuL2xv
@@ -10204,7 +10204,9 @@ IHNlZW0gdG8gaGF2ZSAtRF9GT1JUSUZZX1NPVVJDRSBhbHJlYWR5LCBub3QgYWRkaW5nIGl0LiIg
 PiY0Cg==
 CONFGCC10522
   }
-  if ( $num <= 5.026000 or ( $num >= 5.027000 and $num < 5.027003 ) ) {
+  if ( ( $num <= 5.026000 or ( $num >= 5.027000 and $num < 5.027003 ) )
+       and ! ( $num >= 5.024003 and $num < 5.025000  )
+  ) {
     return _patch_b64(<<'CONFGCC10526');
 LS0tIENvbmZpZ3VyZQorKysgQ29uZmlndXJlCkBAIC00NzAzLDcgKzQ3MDMsNyBAQCBlbHNlCiBm
 aQogJHJtIC1mIHRyeSB0cnkuKgogY2FzZSAiJGdjY3ZlcnNpb24iIGluCi0xKikgY3BwPWAuL2xv
@@ -10323,7 +10325,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 1.98
+version 2.00
 
 =head1 SYNOPSIS
 

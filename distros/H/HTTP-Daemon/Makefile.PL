@@ -104,7 +104,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => 0,
     "URI" => 0
   },
-  "VERSION" => "6.10",
+  "VERSION" => "6.12",
   "test" => {
     "TESTS" => "t/*.t t/local/*.t t/robot/*.t"
   }

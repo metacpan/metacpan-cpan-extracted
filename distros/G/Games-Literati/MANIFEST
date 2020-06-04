@@ -1,13 +1,15 @@
-Changes
-Literati.pm
-Makefile.PL
-MANIFEST
-README
+CHANGES
+lib/Games/Literati.pm
 LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+RELEASE.md
 t/01_import_wordlist.t
 t/02_board_init.t
 t/03_input_processing.t
 t/04_score_games.t
+t/05_misc.t
 t/game1
 t/game1ss
 t/game2
@@ -15,8 +17,13 @@ t/game3
 t/game4
 t/game5
 t/game5ss
+t/game_b
 t/game_i
+t/game_w
+t/legacy.t
 t/wordlist
 t/wordlist.2
+xt/00-sign.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

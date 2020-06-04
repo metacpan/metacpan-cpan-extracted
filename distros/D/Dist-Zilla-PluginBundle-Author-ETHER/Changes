@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-PluginBundle-Author-ETHER
 
+0.158     2020-06-03 17:27:26Z
+          - properly escape the escaped PAUSE download URL (sorry again Olaf!)
+
 0.157     2020-05-27 20:46:58Z
           - properly uri-escape the PAUSE download URL (sorry Olaf!)
 

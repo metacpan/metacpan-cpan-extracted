@@ -11,6 +11,7 @@ pod_spelling_system:
     - NewFangle
     - csdk
     - datastore
+    - UI
 
 pod_coverage:
   skip: 0

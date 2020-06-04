@@ -1,5 +1,9 @@
 Revision history for NewFangle},
 
+0.03      2020-06-03 14:19:13 -0600
+  - Add NewFangle::newrelic_set_host_display_name (gh#14)
+  - Add NEWRELIC_APP_HOSTNAME environment variable (gh#14)
+
 0.02      2020-05-19 16:23:14 -0600
   - Bump Alien::libnewrelic prereq to 0.04
   - NewFangle::Transaction#record_custom_event now returns a true value

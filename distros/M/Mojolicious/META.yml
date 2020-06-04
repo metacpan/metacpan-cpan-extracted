@@ -27,10 +27,12 @@ requires:
   Sub::Util: '1.41'
   perl: '5.016'
 resources:
-  IRC: irc://irc.freenode.net/#mojo
+  IRC:
+    url: irc://irc.freenode.net/#mojo
+    web: https://webchat.freenode.net/#mojo
   bugtracker: https://github.com/mojolicious/mojo/issues
   homepage: https://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/mojolicious/mojo.git
-version: '8.51'
+version: '8.52'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

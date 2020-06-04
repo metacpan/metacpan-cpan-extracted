@@ -281,7 +281,7 @@ subtest "a -remove'd plugin should not be loaded" => sub {
 cmp_deeply(
   (first { $_->plugin_name eq '@Author::ETHER/install release' } @{$tzil->plugins}),
   methods(
-    run => [ 'cpanm http://URMOM:my%20sekrit%20password@pause.perl.org/pub/PAUSE/authors/id/U/UR/URMOM/%a' ],
+    run => [ 'cpanm http://URMOM:my%%20sekrit%%20password@pause.perl.org/pub/PAUSE/authors/id/U/UR/URMOM/%a' ],
   ),
   'correctly generated the URL for installing the newly-uploaded distribution',
 );

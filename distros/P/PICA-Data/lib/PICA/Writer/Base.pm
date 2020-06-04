@@ -2,7 +2,7 @@ package PICA::Writer::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Scalar::Util qw(blessed openhandle reftype);
 use Carp qw(croak);
@@ -94,6 +94,8 @@ Use one of the following subclasses instead:
 =item L<PICA::Writer::XML>
 
 =item L<PICA::Writer::PPXML>
+
+=item L<PICA::Writer::JSON>
 
 =back
 

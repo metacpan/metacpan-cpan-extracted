@@ -1,5 +1,10 @@
 Revision history for Test-Time-HiRes
 
+0.05  2020-06-04 21:25:08 BST
+
+ - time() returns a number, not a formatted string - thanks: vanhoesel
+ - gettimeofday() can be called in scalar context - thanks: vanhoesel
+
 0.04  2018-09-28 09:23:08 BST
 
  - making import() work after unimport() - thanks: dakkar

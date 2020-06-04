@@ -5,7 +5,7 @@
 #
 # Examples:
 # perl ngram-play --files ~/Music/moonlight.mid --size 3 --max 16 --shuf --pause en
-# perl ngram-play --files ~/Music/twinkle-twinkle.mid --size 2 --out '' --image --thresh 2
+# perl ngram-play --files ~/Music/twinkle-twinkle.mid --size 2 --max 0 --out '' --image --thresh 2
 # perl ngram-play --dir ~/Music/MIDI --size 3 --max 16 --shuf --pause en
 
 use strict;
@@ -113,7 +113,9 @@ else {
     print 'Durations: ', ddc($mng->dura), "\n",
         'Duration network: ', ddc($mng->dura_net), "\n",
         'Notes: ', ddc($mng->notes), "\n",
-        'Note network: ', ddc($mng->note_net);
+        'Note network: ', ddc($mng->note_net), "\n",
+        'Durations*Notes: ', ddc($mng->dura_notes), "\n",
+        'Duration*Note network: ', ddc($mng->dura_note_net);
 }
 
 exit unless $opts{image};
@@ -159,3 +161,24 @@ for my $edge ( keys %{ $mng->dura_net->{$opts{chan}} } ) {
 }
 
 $g->run( format => 'png', output_file => $0 . '-durations.png' );
+
+# Now duration*note
+$g = GraphViz2->new(
+    global => { directed => 1 },
+    node   => { shape => 'oval' },
+    edge   => { color => 'grey' },
+);
+
+%edges = ();
+
+for my $edge ( keys %{ $mng->dura_note_net->{$opts{chan}} } ) {
+    next unless $mng->dura_note_net->{$opts{chan}}{$edge} >= $opts{thresh};
+
+    # Split the edge in two
+    my ($i, $j) = split '-', $edge;
+
+    $g->add_edge(from => $i, to => $j, label => $mng->dura_note_net->{$opts{chan}}{$edge})
+        unless $edges{$edge}++;
+}
+
+$g->run( format => 'png', output_file => $0 . '-duration_note.png' );

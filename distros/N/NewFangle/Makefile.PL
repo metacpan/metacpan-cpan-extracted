@@ -73,7 +73,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"                   => "0.000060",
     "YAML"                        => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -95,7 +95,7 @@ my %FallbackPrereqs = (
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
 if ( do { use FFI::CheckLib 0.27; !find_lib lib => 'newrelic' } ) {
-  requires( 'Alien::libnewrelic', '0.04' );
+  requires( 'Alien::libnewrelic', '0.05' );
 }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

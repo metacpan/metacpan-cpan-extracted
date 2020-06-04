@@ -8,6 +8,8 @@ my %tests = (
     '<record xlmns="info:srw/schema/5/picaXML-v1.0">' => 'XML',
     "028A \x{1F}a\x{1E}\x{0A}" => 'Plus',
     "028A \x{1F}a\x{1E}\x{1D}" => 'Binary',
+    '[]' => 'JSON',
+    '{record=>[]}' => 'JSON'
 );
 
 while (my ($pica, $format) = each %tests) {

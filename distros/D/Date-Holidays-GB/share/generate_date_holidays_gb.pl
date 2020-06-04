@@ -39,7 +39,6 @@ sub download_json {
 }
 
 sub get_dates {
-
     my $data = shift;
 
     my %holiday;
@@ -58,8 +57,7 @@ sub get_dates {
 }
 
 sub read_file {
-
-    my $file = file();
+    my ($file) = @_;
 
     open my $READ, '<:encoding(utf-8)', $file
         or die "Unable to open $file for reading: $!";
@@ -72,7 +70,29 @@ sub read_file {
 
     return ( $pm, $data );
 }
-/usr/local/bin/bash: perltidy: command not found
+
+sub write_file {
+    my ($holiday_data) = @_;
+
+    my $file = file();
+
+    my ( $pm, $data ) = read_file($file);
+
+    open my $WRITE, '>:encoding(utf-8)', $file
+        or die "Unable to open $file for writing: $!";
+
+    my $now = DateTime->now->ymd;
+
+    $pm =~ s/sub date_generated \{[^}]+\}/sub date_generated { '$now' }/;
+
+    print $WRITE $pm;
+    print $WRITE "__DATA__\n";
+    print $WRITE holiday_data( parse_existing($data), $holiday_data );
+
+    close $WRITE;
+
+    return 1;
+}
 
 sub parse_existing {
     my ($data) = @_;

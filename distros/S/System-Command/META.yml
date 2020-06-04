@@ -28,10 +28,10 @@ name: System-Command
 provides:
   System::Command:
     file: lib/System/Command.pm
-    version: '1.120'
+    version: '1.121'
   System::Command::Reaper:
     file: lib/System/Command/Reaper.pm
-    version: '1.120'
+    version: '1.121'
 requires:
   Carp: '0'
   Cwd: '0'
@@ -51,8 +51,9 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=System-Command
   repository: http://github.com/book/System-Command.git
-version: '1.120'
+version: '1.121'
 x_contributors:
+  - 'Michael McClimon <mmcclimon@cpan.org>'
   - 'Ed J <etj@cpan.org>'
   - 'viviparous <viviparous@github.com>'
   - 'Rob Kinyon <rkinyon@cpan.org>'

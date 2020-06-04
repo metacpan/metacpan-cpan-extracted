@@ -1,7 +1,7 @@
 package Sah::SchemaR::ufloat;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2020-06-04'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 our $rschema = ["float",[{description=>"\nSee also `posfloat` for floats that are larger than 0.\n\n",examples=>[{valid=>1,value=>0},{valid=>1,value=>0.1},{valid=>1,value=>1},{valid=>0,value=>-0.1}],min=>0,summary=>"Non-negative float"}],["float"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::ufloat - Non-negative float
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::SchemaR::ufloat (from Perl distribution Sah-Schemas-Float), released on 2020-03-08.
+This document describes version 0.011 of Sah::SchemaR::ufloat (from Perl distribution Sah-Schemas-Float), released on 2020-06-04.
 
 =head1 DESCRIPTION
 

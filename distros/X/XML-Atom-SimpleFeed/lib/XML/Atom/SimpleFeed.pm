@@ -3,8 +3,8 @@ use strict;
 use warnings;
 
 package XML::Atom::SimpleFeed;
-$XML::Atom::SimpleFeed::VERSION = '0.902';
-# ABSTRACT: No-fuss generation of Atom syndication feeds
+
+our $VERSION = '0.904';
 
 use Carp;
 use Encode ();
@@ -398,10 +398,6 @@ __END__
 =head1 NAME
 
 XML::Atom::SimpleFeed - No-fuss generation of Atom syndication feeds
-
-=head1 VERSION
-
-version 0.902
 
 =head1 SYNOPSIS
 
@@ -814,7 +810,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Aristotle Pagaltzis.
+This software is copyright (c) 2020 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

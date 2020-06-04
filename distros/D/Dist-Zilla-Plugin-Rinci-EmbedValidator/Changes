@@ -1,3 +1,9 @@
+0.251   2020-06-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Don't throw fatal error when file does not package declaration,
+	  skip it instead.
+
+
 0.250   2019-07-04  Released-By: PERLANCAR; Urgency: high
 
 	- Rename module

@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::GetSentry;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '1.1.8';
+our $VERSION = '1.1.9';
 
 use Data::Dump 'dump';
 use Devel::StackTrace::Extract;
@@ -14,6 +14,12 @@ has [qw(
 
 has 'log_levels' => sub { ['error', 'fatal'] };
 has 'processors' => sub { [] };
+has 'release' => sub {
+    my $release = eval { `git log --pretty="%h" -n1 HEAD` };
+    chomp($release);
+
+    return $release;
+};
 
 has 'raven' => sub {
     my $self = shift;
@@ -28,6 +34,7 @@ has 'raven' => sub {
         sentry_dsn  => $self->sentry_dsn,
         timeout     => $self->timeout,
         processors  => $self->processors,
+        release     => $self->release,
     );
 };
 
@@ -49,6 +56,7 @@ has 'handlers' => sub {
 
 has 'custom_handlers' => sub { {} };
 has 'pending' => sub { {} };
+has 'skip' => sub { [] };
 
 =head2 register
 
@@ -67,7 +75,7 @@ sub register {
     $self->custom_handlers($handlers);
 
     $config ||= {};
-    $self->{ $_ } = $config->{ $_ } for keys %$config;
+    $self->$_($config->{ $_ }) for keys %$config;
     
     $self->hook_after_dispatch($app);
     $self->hook_on_message($app);

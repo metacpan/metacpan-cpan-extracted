@@ -1,9 +1,9 @@
 package Data::Sah::FilterJS;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-31'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -109,7 +109,7 @@ Data::Sah::FilterJS - Generate filter code
 
 =head1 VERSION
 
-This document describes version 0.006 of Data::Sah::FilterJS (from Perl distribution Data-Sah-Filter), released on 2020-05-31.
+This document describes version 0.008 of Data::Sah::FilterJS (from Perl distribution Data-Sah-Filter), released on 2020-06-04.
 
 =head1 SYNOPSIS
 

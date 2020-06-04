@@ -1,5 +1,9 @@
 Revision history for Alien-libnewrelic
 
+0.05      2020-06-03 14:15:21 -0600
+  - Add patch to override hostname (gh#6)
+    (based on https://github.com/plicease/newrelic-c-sdk/tree/graham/perl-patches)
+
 0.04      2020-05-19 15:19:03 -0600
   - Pin to libnewrelic 1.3.0 for patches (gh#5)
   - Add patch to add newrelic_notice_error_with_stacktrace

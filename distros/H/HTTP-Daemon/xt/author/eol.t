@@ -11,6 +11,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/chunked.t',
+    't/encoding.t',
     't/local/http.t',
     't/misc/httpd',
     't/misc/httpd_term.pl',

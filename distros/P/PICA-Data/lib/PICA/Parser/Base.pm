@@ -2,7 +2,7 @@ package PICA::Parser::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Carp qw(croak);
 
@@ -97,6 +97,8 @@ Use one of the following subclasses instead:
 =item L<PICA::Parser::XML>
 
 =item L<PICA::Parser::PPXML>
+
+=item L<PICA::Parser::JSON>
 
 =back
 

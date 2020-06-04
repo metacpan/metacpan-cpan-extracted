@@ -11,12 +11,14 @@ use PICA::Writer::Plus;
 use PICA::Writer::XML;
 use PICA::Writer::PPXML;
 use PICA::Parser::PPXML;
+use PICA::Writer::JSON;
 use PICA::Writer::Generic;
 
 use File::Temp qw(tempfile);
 use IO::File;
 use Encode qw(encode);
 use Scalar::Util qw(reftype);
+use JSON::PP;
 
 my @pica_records = (
     [
@@ -197,6 +199,25 @@ PLUS
     is $out, '003@ 01041318383021A aHello $¥!028C/01 dEmmaaGoldman', 'Generic Writer (default)';
 }
 
+note 'PICA::Writer::JSON';
+{
+    my $out = "";
+    my $writer = PICA::Writer::JSON->new( fh => \$out );
+    my $record = $pica_records[0];
+    $writer->write($record);
+    is $out, encode_json([@$record]) . "\n", 'JSON (array)';
+
+    $out = "";
+    $record = $pica_records[1];
+    $writer->write($record);
+    is $out, encode_json($record->{record}) . "\n", 'JSON (hash)';
+
+    $out = "";
+    $writer = PICA::Writer::JSON->new( fh => \$out, pretty => 1 );
+    $writer->write($record);
+    like $out, qr/^\[\n\s+\[/m, 'JSON (pretty)';
+}
+
 note 'PICA::Data';
 
 {
@@ -211,6 +232,7 @@ note 'PICA::Data';
       $record = $record->{record} if reftype $record eq 'HASH';
       is_deeply $r->{record}, $record, 'record->string';
   }
+
     my $PLAIN = <<'PLAIN';
 003@ $01041318383
 021A $aHello $$¥!
@@ -220,6 +242,10 @@ note 'PICA::Data';
 PLAIN
 
   is $append, $PLAIN, 'record->write';
+
+  my $record = bless $pica_records[1], 'PICA::Data';
+  my $json = JSON::PP->new->utf8->convert_blessed->encode($record);
+  is "$json\n", $record->string('JSON'), 'encode as JSON via TO_JSON';
 }
 
 note 'Exeptions';

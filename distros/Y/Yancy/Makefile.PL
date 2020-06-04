@@ -44,11 +44,12 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "File::Temp" => "0.2307",
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "1.057",
+  "VERSION" => "1.058",
   "test" => {
     "TESTS" => "t/*.t t/backend/*.t t/command/backend/*.t t/controller/*.t t/examples/*.t t/plugin/*.t t/plugin/auth/*.t t/plugin/form/*.t t/selenium/*.t"
   }
@@ -62,6 +63,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "File::Spec::Functions" => 0,
+  "File::Temp" => "0.2307",
   "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

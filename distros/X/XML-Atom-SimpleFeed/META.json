@@ -4,21 +4,24 @@
       "Aristotle Pagaltzis <pagaltzis@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "XML-Atom-SimpleFeed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
+      "build" : {},
+      "configure" : {},
       "runtime" : {
          "requires" : {
             "Carp" : "0",
@@ -31,7 +34,7 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88",
+            "Test::More" : "0",
             "utf8" : "0"
          }
       }
@@ -47,6 +50,10 @@
          "web" : "https://github.com/ap/XML-Atom-SimpleFeed"
       }
    },
-   "version" : "0.902"
+   "version" : "0.904",
+   "x_copyright" : {
+      "holder" : "Aristotle Pagaltzis",
+      "year" : 2020
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }
-

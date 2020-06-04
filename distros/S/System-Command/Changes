@@ -1,6 +1,12 @@
 Revision history for System-Command
 
+1.121 2020-06-03 BOOK
+    - No functional change: update Changes and contributors
+
 1.120 2020-06-03 BOOK
+    [ENHANCEMENTS]
+    - System::Command does not clobber $? and $! any more
+      when DESTOYed (GH #27 by MMCCLIMON)
 
 1.119 Mon Apr 2 2018
     [TESTS]

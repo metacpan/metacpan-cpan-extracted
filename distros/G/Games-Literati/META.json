@@ -4,7 +4,7 @@
       "Peter C. jones <petercj AT cpan.org>, Chicheng Zhang"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Scrabble",
       "Literati",
@@ -18,7 +18,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Games-Literati",
    "no_index" : {
@@ -30,13 +30,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Cwd" : "0",
-            "ExtUtils::MakeMaker" : "0",
-            "File::Basename" : "0",
-            "IO::String" : "0",
-            "Test::More" : "0",
-            "strict" : "0",
-            "warnings" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -47,19 +41,37 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "0",
-            "perl" : "5.006000"
+            "perl" : "5.008000"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "IO::String" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Games::Literati" : {
+         "file" : "lib/Games/Literati.pm",
+         "version" : "0.042"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Games-Literati"
+         "web" : "https://github.com/pryrt/Games-Literati/issues"
       },
       "repository" : {
-         "url" : "https://github.com/pryrt/Games-Literati"
+         "type" : "git",
+         "url" : "https://github.com/pryrt/Games-Literati.git",
+         "web" : "https://github.com/pryrt/Games-Literati"
       }
    },
-   "version" : 0.04,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.042",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

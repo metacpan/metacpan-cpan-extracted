@@ -3,7 +3,7 @@ use strict;
 use Carp qw(carp croak);
 use Text::CSV ();
 use Tie::IxHash ();
-our $VERSION = 1.10;
+our $VERSION = 1.11;
 
 =head1 NAME
 
@@ -46,6 +46,20 @@ This was designed with the idea of using an iterator interface, but Perl does no
 		'field_aliases'	=> {
 			'postal_code' => 'postcode', # applied after normalization
 		},
+		'mutators' => {
+			'postcode' => sub {	# if postalcode is Dutch, then make sure it has no spaces and is in uppercase.
+				my $val_ref = shift;
+				my $row_ref = shift;
+				if (defined($$val_ref) && defined($row_ref->{'country'}) && ($row_ref->{'country'} eq 'NL')) {
+					$$val_ref =~ s/\s+//;
+					$$val_ref = uc($$val_ref);
+				}
+			},
+			'has_fiber_internet' => sub {	# set a default for an empty (undef) value
+				my $val_ref = shift;
+				$$val_ref //= 0;
+			},
+		},
 	);
 
 	# Show the field names found in the header row:
@@ -72,13 +86,16 @@ The following %options are supported:
 
 	- debug: boolean, if true, then debug messages are emitted using warn().
 	- field_aliases: hashref of case insensitive alias (in file) => real name (as expected in code) pairs.
-	- field_normalizer: optional callback that receives a field name by reference to normalize (e.g. make lowercase).
-	- include_fields: optional arrayref of field names to include. If given, then all other field names are excluded.
+	- field_normalizer: callback that receives a field name by reference to normalize (e.g. make lowercase).
+	- include_fields: arrayref of field names to include. If given, then all other field names are excluded.
 	- delimiter: string, default ','
 	- enclosure: string, default '"'
 	- escape: string, default backslash
+	- mutators: hashref of field name => callback($value_ref, $row_ref) pairs.
 
 Note: the option field_aliases is processed after the option field_normalizer if given.
+
+Note: the callbacks given with the mutators option are called in their key order (which is an unpredictable order unless they're tied with Tie::IxHash).
 
 =cut
 
@@ -99,6 +116,7 @@ sub new {
 		'delimiter'		=> ',',
 		'enclosure'		=> '"',
 		'escape'		=> '\\',
+		'mutators'		=> undef,
 		'skip_empty_lines'	=> 0, # TODO: implement this
 	};
 	tie(%{$self->{'field_cols'}}, 'Tie::IxHash');
@@ -165,6 +183,20 @@ sub new {
 					croak("The '$key' option must be a code ref");
 				}
 				$opt_field_normalizer = $value;
+			}
+			elsif ($key eq 'mutators') {
+				if (ref($value) ne 'HASH') {
+					croak("The '$key' option must be a hashref of field name => code ref pairs");
+				}
+				foreach my $name (keys %$value) {
+					my $mutator = $options{$key}->{$name};
+					if (defined($mutator)) {
+						unless (ref($mutator) eq 'CODE') {
+							croak('The mutator for "' . $name . '" must be a CODE ref');
+						}
+					}
+				}
+				$self->{$key} = $value;
 			}
 			else {
 				croak("Unknown option '$key'");
@@ -262,6 +294,9 @@ sub new {
 			croak('The following column headers are missing: ' . join(', ', @missing));
 		}
 	}
+
+
+
 	bless($self, ref($proto) || $proto);
 	return $self;
 }
@@ -316,6 +351,18 @@ sub _read {
 			}
 			$row{$k} = $v;
 		}
+
+		# Call mutators if defined
+		if (my $mutators = $self->{'mutators'}) {	# name to coderef map
+			foreach my $k (keys %$mutators) {
+				if (exists($row{$k})) {
+					if (my $mutator = $mutators->{$k}) {
+						&$mutator(\$row{$k}, \%row);
+					}
+				}
+			}
+		}
+
 		$self->{'row'} = \%row;
 		$self->{'linenum'}++;
 	}

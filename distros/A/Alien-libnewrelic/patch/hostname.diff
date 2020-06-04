@@ -1,0 +1,84 @@
+commit f4a3c158aa76255aeecce1e5ed89228017ec5841
+Author: Graham Ollis <plicease@cpan.org>
+Date:   Wed Jun 3 13:57:41 2020 -0600
+
+    add interface to override hostname
+
+diff --git a/include/libnewrelic.h b/include/libnewrelic.h
+index 8089746..b5e0e72 100644
+--- a/include/libnewrelic.h
++++ b/include/libnewrelic.h
+@@ -1248,6 +1248,8 @@ bool newrelic_accept_distributed_trace_payload_httpsafe(
+ bool newrelic_set_transaction_name(newrelic_txn_t* transaction,
+                                    const char* transaction_name);
+ 
++bool newrelic_set_hostname(const char *hostname);
++
+ /**
+  * A list of examples for Doxygen to cross-reference. If a function in
+  * libnewrelic.h appears in one of these examples, the example source
+diff --git a/src/global.c b/src/global.c
+index 1b0177a..791296f 100644
+--- a/src/global.c
++++ b/src/global.c
+@@ -6,6 +6,7 @@
+ #include "util_memory.h"
+ #include "util_sleep.h"
+ #include "util_strings.h"
++#include "util_system.h"
+ 
+ #include <stdlib.h>
+ 
+@@ -129,3 +130,8 @@ void newrelic_add_api_supportability_metric(nrtxn_t* txn, const char* name) {
+ 
+   nr_free(metric);
+ }
++
++bool newrelic_set_hostname(const char *hostname) {
++  nrl_info(NRL_API, "override hostname to %s", hostname);
++  return nr_system_set_hostname(hostname);
++}
+diff --git a/vendor/newrelic/axiom/util_system.c b/vendor/newrelic/axiom/util_system.c
+index 372dc6b..f87a432 100644
+--- a/vendor/newrelic/axiom/util_system.c
++++ b/vendor/newrelic/axiom/util_system.c
+@@ -23,9 +23,21 @@ char* nr_system_get_service_port(const char* service, const char* port_type) {
+   return port;
+ }
+ 
++static char *override_hostname;
++
++int nr_system_set_hostname(const char *hostname) {
++  nr_free(override_hostname);
++  override_hostname = nr_strdup(hostname);
++  return 1;
++}
++
+ char* nr_system_get_hostname(void) {
+   char hn[512];
+ 
++  if (override_hostname != NULL) {
++    return nr_strdup(override_hostname);
++  }
++
+   nr_memset(&hn, 0, sizeof(hn));
+ 
+   gethostname(hn, sizeof(hn));
+diff --git a/vendor/newrelic/axiom/util_system.h b/vendor/newrelic/axiom/util_system.h
+index 6bcf75b..2ae9579 100644
+--- a/vendor/newrelic/axiom/util_system.h
++++ b/vendor/newrelic/axiom/util_system.h
+@@ -44,6 +44,13 @@ extern char* nr_system_get_service_port(const char* service,
+  */
+ extern char* nr_system_get_hostname(void);
+ 
++/*
++ * Purpose : Set the host name.
++ *
++ * Returns : 1 on success
++ */
++extern int nr_system_set_hostname(const char*);
++
+ /*
+  * Purpose : Returns the number of logical processors available.
+  *

@@ -1,6 +1,6 @@
 package Date::Holidays::GB;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 # ABSTRACT: Determine British holidays - Current UK public and bank holiday dates up to 2021
 
@@ -18,6 +18,7 @@ our @EXPORT_OK = qw(
   is_holiday
   is_gb_holiday
   next_holiday
+  next_gb_holiday
 );
 
 # See
@@ -136,6 +137,8 @@ sub is_holiday {
     return _holiday( $holiday, \@region_codes );
 }
 
+sub next_gb_holiday { return next_holiday(@_) }
+
 sub next_holiday {
     my @regions = @_;
 
@@ -193,7 +196,7 @@ sub _holiday {
     return join( ', ', @strings );
 }
 
-sub date_generated { '2020-02-11' }
+sub date_generated { '2020-06-04' }
 
 1;
 

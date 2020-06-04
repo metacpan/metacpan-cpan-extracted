@@ -2,7 +2,7 @@ package PICA::Path;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
@@ -10,7 +10,7 @@ use Scalar::Util qw(reftype);
 use overload '""' => \&stringify;
 
 sub new {
-    my ($class, $path) = @_;
+    my ( $class, $path ) = @_;
 
     confess "invalid pica path" if $path !~ /
         ([012.][0-9.][0-9.][A-Z@.]) # tag
@@ -24,36 +24,38 @@ sub new {
     my $subfield   = defined $5 ? "[$5]" : "[_A-Za-z0-9]";
 
     my @position;
-    if (defined $6) { # from, to
-        my ($from, $dash, $to, $length) = ($7, $8, $9, 0);
+    if ( defined $6 ) {    # from, to
+        my ( $from, $dash, $to, $length ) = ( $7, $8, $9, 0 );
 
         if ($dash) {
-            confess "invalid pica path" unless defined($from // $to); # /-
+            confess "invalid pica path" unless defined( $from // $to );    # /-
         }
 
-        if (defined $to) {
-            if (!$from and $dash) { # /-X
+        if ( defined $to ) {
+            if ( !$from and $dash ) {                                      # /-X
                 $from = 0;
             }
             $length = $to - $from + 1;
-        } else {
+        }
+        else {
             if ($8) {
                 $length = undef;
-            } else {
+            }
+            else {
                 $length = 1;
             }
         }
 
-        if (!defined $length or $length >= 1) {
-            unless (!$from and !defined $length) { # /0-
-                @position = ($from, $length);
+        if ( !defined $length or $length >= 1 ) {
+            unless ( !$from and !defined $length ) {    # /0-
+                @position = ( $from, $length );
             }
         }
     }
 
     $field = qr{$field};
-    
-    if (defined $occurrence) {
+
+    if ( defined $occurrence ) {
         $occurrence = qr{$occurrence};
     }
 
@@ -63,8 +65,8 @@ sub new {
 }
 
 sub match_record {
-    my ($self, $record, %args) = @_;
-    
+    my ( $self, $record, %args ) = @_;
+
     # my $subfield_regex = $self->[2];
 
     my %default_args = (
@@ -80,27 +82,31 @@ sub match_record {
         $args{split} = 1;
     }
 
-    # check if path exists    
-    if ($args{value}) {
+    # check if path exists
+    if ( $args{value} ) {
         my $value = $self->record_subfields($record);
-        return $value ?  $args{value} : undef;
+        return $value ? $args{value} : undef;
     }
 
     # gather values from matched subfields
     my @matches;
-    for my $field (@{$self->record_fields($record)}) {
+    for my $field ( @{ $self->record_fields($record) } ) {
         next unless defined $field;
-        my @matched_subfields = $args{pluck} ? $self->match_subfields( $field, pluck => 1 ) : $self->match_subfields($field);      
+        my @matched_subfields =
+            $args{pluck}
+          ? $self->match_subfields( $field, pluck => 1 )
+          : $self->match_subfields($field);
         next unless defined $matched_subfields[0];
-        if ($args{split}) {
-            if ($args{nested_arrays}) {
-                push @matches,\@matched_subfields;
+        if ( $args{split} ) {
+            if ( $args{nested_arrays} ) {
+                push @matches, \@matched_subfields;
             }
             else {
-                push @matches,@matched_subfields;
+                push @matches, @matched_subfields;
             }
-        } else {
-            push @matches, join($args{join}, @matched_subfields);
+        }
+        else {
+            push @matches, join( $args{join}, @matched_subfields );
         }
 
     }
@@ -114,8 +120,8 @@ sub match_record {
         # ... or string
         else {
             return $args{force_array}
-                ? \@matches
-                : join( $args{join}, @matches );
+              ? \@matches
+              : join( $args{join}, @matches );
         }
     }
     return;
@@ -123,14 +129,18 @@ sub match_record {
 }
 
 sub match_field {
-    my ($self, $field) = @_;
+    my ( $self, $field ) = @_;
 
-    if ( $field->[0] =~ $self->[0] && 
-        (!$self->[1] || (defined $field->[1] && $field->[1] =~ $self->[1])) ) {
+    if (
+        $field->[0] =~ $self->[0]
+        && ( !$self->[1]
+            || ( defined $field->[1] && $field->[1] =~ $self->[1] ) )
+      )
+    {
         return $field;
     }
 
-    return
+    return;
 }
 
 sub match_subfields {
@@ -146,7 +156,7 @@ sub match_subfields {
 
         # Treat the subfields as a hash index
         my $subfield_href = {};
-        for ( my $i = 2; $i < @{$field}; $i += 2 ) {
+        for ( my $i = 2 ; $i < @{$field} ; $i += 2 ) {
             push @{ $subfield_href->{ $field->[$i] } }, $field->[ $i + 1 ];
         }
 
@@ -157,8 +167,8 @@ sub match_subfields {
             if ( defined $from ) {
                 push @values, map {
                     $length
-                        ? substr( $_, $from, $length )
-                        : substr( $_, $from )
+                      ? substr( $_, $from, $length )
+                      : substr( $_, $from )
                 } @{$value};
             }
             else {
@@ -168,14 +178,14 @@ sub match_subfields {
         }
     }
     else {
-        for ( my $i = 2; $i < @$field; $i += 2 ) {
+        for ( my $i = 2 ; $i < @$field ; $i += 2 ) {
             if ( $field->[$i] =~ $subfield_regex ) {
                 my $value = $field->[ $i + 1 ];
                 if ( defined $from ) {
-                    $value
-                        = $length
-                        ? substr( $value, $from, $length )
-                        : substr( $value, $from );
+                    $value =
+                      $length
+                      ? substr( $value, $from, $length )
+                      : substr( $value, $from );
                     next if '' eq ( $value // '' );
                 }
                 push @values, $value;
@@ -187,68 +197,93 @@ sub match_subfields {
 }
 
 sub record_fields {
-    my ($self, $record) = @_;
+    my ( $self, $record ) = @_;
 
     $record = $record->{record} if reftype $record eq 'HASH';
     return [ grep { $self->match_field($_) } @$record ];
 }
 
 sub record_subfields {
-    my ($self, $record) = @_;
+    my ( $self, $record ) = @_;
 
     $record = $record->{record} if reftype $record eq 'HASH';
 
     my @values;
 
-    foreach my $field (grep { $self->match_field($_) } @$record) {
+    foreach my $field ( grep { $self->match_field($_) } @$record ) {
         push @values, $self->match_subfields($field);
     }
 
     return @values;
 }
 
+sub unescape {
+    my $exp = shift;
+    $exp =~ s/^\(\?[^:]*:(.*)\)$/$1/ if defined $exp;
+    return $exp;
+}
+
 sub stringify {
-    my ($self, $short) = @_;
+    my ( $self, $short ) = @_;
 
-    my ($field, $occurrence, $subfields) = map {
-        defined $_ ? do {
-            s/^\(\?[^:]*:(.*)\)$/$1/;
-             $_ } : undef
-        } ($self->[0], $self->[1], $self->[2]); 
+    my $str = $self->fields;
 
-    my $str = $field;
+    my $occurrence = $self->occurrences;
+    $str .= "[$occurrence]" if defined $occurrence;
 
-    if (defined $occurrence) {
-        $str .= "[$occurrence]";
-    }
-
-    if (defined $subfields and $subfields ne '[_A-Za-z0-9]') {
-        $subfields =~ s/\[|\]//g;
-        unless( $short and $subfields !~  /^\$/ ) {
+    my $subfields = $self->subfields;
+    if ( defined $subfields ) {
+        unless ( $short and $subfields !~ /^\$/ ) {
             $str .= '$';
         }
         $str .= $subfields;
     }
 
-    my ($from, $length, $pos) = ($self->[3], $self->[4]);
-    if (defined $from) {
+    my $pos = $self->positions;
+    $str .= "/$pos" if defined $pos;
+
+    $str;
+}
+
+sub fields {
+    return unescape( $_[0]->[0] );
+}
+
+sub occurrences {
+    return unescape( $_[0]->[1] );
+}
+
+sub subfields {
+    my $subfields = unescape( $_[0]->[2] );
+    if ( defined $subfields and $subfields ne '[_A-Za-z0-9]' ) {
+        $subfields =~ s/\[|\]//g;
+        return $subfields;
+    }
+    return;
+}
+
+sub positions {
+    my ($self) = @_;
+
+    my ( $from, $length, $pos ) = ( $self->[3], $self->[4] );
+    if ( defined $from ) {
         if ($from) {
             $pos = $from;
-        }         
-        if (!defined $length) {
+        }
+        if ( !defined $length ) {
             if ($from) {
                 $pos = "$from-";
             }
-        } elsif ($length > 1) {
-            $pos .= '-' . ($from + $length - 1);
-        } elsif ($length == 1 && !$from) {
+        }
+        elsif ( $length > 1 ) {
+            $pos .= '-' . ( $from + $length - 1 );
+        }
+        elsif ( $length == 1 && !$from ) {
             $pos = 0;
         }
     }
 
-    $str .= "/$pos" if defined $pos;
-
-    $str;
+    return $pos;
 }
 
 1;
@@ -631,6 +666,22 @@ without inspection field and occurrence values.
 
 Stringifies the PICA path to normalized form. Subfields are separated with
 C<$>, unless called as C<stringify(1)> or the first subfield is C<$>.
+
+=head2 fields
+
+Return the stringified field expression or undefined.
+
+=head2 subfields
+
+Return the stringified subfields expression or undefined.
+
+=head2 occurrences
+
+Return the stringified occurrences expression or undefined.
+
+=head2 positions
+
+Return the stringified position or undefined.
 
 =head1 SEE ALSO
 

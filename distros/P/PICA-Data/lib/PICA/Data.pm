@@ -2,7 +2,7 @@ package PICA::Data;
 use strict;
 use warnings;
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
@@ -15,7 +15,7 @@ our $EPN_PATH = PICA::Path->new('203@/..0');
 
 use Carp qw(croak);
 use Scalar::Util qw(reftype blessed);
-use List::Util qw(first);
+use List::Util qw(first any);
 use IO::Handle;
 use PICA::Path;
 
@@ -38,12 +38,19 @@ sub pica_values {
 }
 
 sub pica_fields {
-    my ( $record, $path ) = @_;
+    my $record = shift;
+    $record = $record->{record} if reftype $record eq 'HASH';
 
-    $path = eval { PICA::Path->new($path) } unless ref $path;
-    return [] unless defined $path;
+    my @pathes = map {
+        ref $_ ? $_ : eval { PICA::Path->new($_) }
+    } @_;
 
-    return $path->record_fields($record);
+    return [
+        grep {
+            my $cur = $_;
+            any { $_->match_field($cur) } @pathes
+        } @$record
+    ];
 }
 
 sub pica_value {
@@ -152,11 +159,13 @@ use PICA::Parser::XML;
 use PICA::Parser::Plus;
 use PICA::Parser::Plain;
 use PICA::Parser::Binary;
+use PICA::Parser::JSON;
 use PICA::Writer::XML;
 use PICA::Writer::Plus;
 use PICA::Writer::Plain;
 use PICA::Writer::Binary;
 use PICA::Writer::PPXML;
+use PICA::Writer::JSON;
 
 sub pica_parser {
     _pica_module( 'PICA::Parser', @_ );
@@ -180,6 +189,7 @@ sub pica_guess {
         'Plus'   => ( $pica =~ tr/\x{0A}// ),
         'Binary' => ( $pica =~ tr/\x{1D}// ),
         'XML'    => ( $pica =~ tr/<// ),
+        'JSON'   => ( $pica =~ tr/[{[]// ),
     );
     $count{$_} > $count{$format} and $format = $_ for grep { $_ } keys %count;
 
@@ -207,6 +217,9 @@ sub _pica_module {
     elsif ( $type =~ /^(pica)?ppxml$/ ) {
         "${base}::PPXML"->new(@_);
     }
+    elsif ( $type =~ /^(nd)?json$/ ) {
+        "${base}::JSON"->new(@_);
+    }
     else {
         croak "unknown PICA parser type: $type";
     }
@@ -229,6 +242,12 @@ sub string {
     $options{start} //= 0;
     pica_writer( $type => %options )->write($pica);
     return $string;
+}
+
+sub TO_JSON {
+    my $record = shift;
+    $record = $record->{record} if reftype $record eq 'HASH';
+    return [@$record];
 }
 
 sub pica_xml_struct {
@@ -458,10 +477,9 @@ expression. The following are virtually equivalent:
     $path->record_subfields($record);
     $record->values($path); # if $record is blessed
 
-=head2 pica_fields( $record, $path )
+=head2 pica_fields( $record, $path[, $path...] )
 
-Returns a PICA record (or empty array reference) limited to fields specified in
-a PICA path expression. The following are virtually equivalent:
+Returns a PICA record (or empty array reference) limited to fields specified inione ore more PICA path expression. The following are virtually equivalent:
 
     pica_fields($record, $path);
     $path->record_fields($record);
@@ -496,7 +514,7 @@ expression.
 
 Same as C<values> but only returns the first value.
 
-=head2 fields( $path )
+=head2 fields( $path[, $path...] )
 
 Returns a PICA record limited to fields specified in a L<PICA::Path>
 expression.  Always returns an array reference.
@@ -547,7 +565,7 @@ the same terms as Perl itself.
 
 =item
 
-L<pica-validate> command line script to parse, serialize, count, and validate
+L<picadata> command line script to parse, serialize, count, and validate
 PICA+ data.
 
 =item 

@@ -8,7 +8,7 @@
 #       * import short $WordFile="wordlist2" with 2 valid words
 ########################################################################
 
-use 5.006;
+use 5.008;
 
 use warnings;
 use strict;

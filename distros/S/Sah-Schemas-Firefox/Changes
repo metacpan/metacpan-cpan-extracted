@@ -1,3 +1,8 @@
+0.002   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schema: firefox::local_profile_name.
+
+
 0.001   2020-04-18  Released-By: PERLANCAR
 
         - First release.

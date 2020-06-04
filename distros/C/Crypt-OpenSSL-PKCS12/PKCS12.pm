@@ -3,7 +3,7 @@ package Crypt::OpenSSL::PKCS12;
 use strict;
 use Exporter;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);

@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Ngram
   repository: https://github.com/ology/MIDI-Ngram.git
-version: '0.1700'
+version: '0.1800'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

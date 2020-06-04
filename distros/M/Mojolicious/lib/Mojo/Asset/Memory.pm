@@ -14,8 +14,8 @@ sub add_chunk {
   # Upgrade if necessary
   $self->{content} .= $chunk;
   return $self if !$self->auto_upgrade || $self->size <= $self->max_memory_size;
-  $self->emit(upgrade => my $file = $self->to_file);
-  return $file;
+  $self->emit(upgrade => my $file = Mojo::Asset::File->new);
+  return $file->add_chunk($self->slurp);
 }
 
 sub contains {
@@ -34,9 +34,7 @@ sub get_chunk {
   $max //= 131072;
 
   $offset += $self->start_range;
-  if (my $end = $self->end_range) {
-    $max = $end + 1 - $offset if ($offset + $max) > $end;
-  }
+  if (my $end = $self->end_range) { $max = $end + 1 - $offset if ($offset + $max) > $end }
 
   return substr shift->{content} // '', $offset, $max;
 }

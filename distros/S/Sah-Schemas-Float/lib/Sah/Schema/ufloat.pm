@@ -1,9 +1,9 @@
 package Sah::Schema::ufloat;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-08'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'Sah-Schemas-Float'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our $schema = [float => {
     summary   => 'Non-negative float',
@@ -37,22 +37,36 @@ Sah::Schema::ufloat - Non-negative float
 
 =head1 VERSION
 
-This document describes version 0.008 of Sah::Schema::ufloat (from Perl distribution Sah-Schemas-Float), released on 2020-03-08.
+This document describes version 0.011 of Sah::Schema::ufloat (from Perl distribution Sah-Schemas-Float), released on 2020-06-04.
 
 =head1 SYNOPSIS
 
-Using with L<Data::Sah>:
+To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
- my $vdr = gen_validator("ufloat*");
- say $vdr->($data) ? "valid" : "INVALID!";
+ my $validator = gen_validator("ufloat*");
+ say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
 
-Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+To validate function parameters against this schema (requires L<Params::Sah>):
 
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("ufloat*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
  package MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
@@ -70,6 +84,21 @@ Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 Sample data:
 

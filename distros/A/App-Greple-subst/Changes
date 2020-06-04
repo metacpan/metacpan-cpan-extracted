@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-subst
 
+2.1402 2020-06-04T07:16:39Z
+
+    - Update to use required function pattern of Getopt::EX.
+    - Improve combination algorithm and add sort capability.
+
 2.1401 2020-05-07T09:50:32Z
 
     - Supress uninitialized warning in stat summary.

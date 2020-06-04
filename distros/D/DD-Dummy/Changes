@@ -1,3 +1,16 @@
+0.009   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+        - [dist] Try not giving DD 'package DD::Dummy' to see its effect on
+          MetaCPAN.
+
+
+0.008   2020-06-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Hide DD package from PAUSE indexer.
+
+        - Add backends: Data::Dump::ObjectAsString, Data::Dump::Options.
+
+
 0.007   2019-08-12  Released-By: PERLANCAR; Urgency: medium
 
         - (Temporarily) rename dist from DD to DD-Dummy.
