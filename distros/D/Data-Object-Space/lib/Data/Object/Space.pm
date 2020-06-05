@@ -8,11 +8,22 @@ use routines;
 
 use parent 'Data::Object::Name';
 
-our $VERSION = '2.07'; # VERSION
+our $VERSION = '2.08'; # VERSION
 
 # METHODS
 
 my %has;
+
+method all($name, @args) {
+  my $result = [];
+
+  my $class = $self->class;
+  for my $package ($self->package, @{$self->inherits}) {
+    push @$result, [$package, $class->new($package)->$name(@args)];
+  }
+
+  return $result;
+}
 
 method append(@args) {
   my $class = $self->class;
@@ -80,7 +91,9 @@ method call($func, @args) {
   my $next = $class->can($func);
 
   unless ($next) {
-    $next = sub { $class->$func(@args) } if $class->can('AUTOLOAD');
+    if ($class->can('AUTOLOAD')) {
+      $next = sub { no strict 'refs'; &{"${class}::${func}"}(@args) };
+    }
   }
 
   unless ($next) {
@@ -510,6 +523,11 @@ method siblings() {
   ];
 }
 
+method tryload() {
+
+  return do { local $@; eval { $self->load }; int!$@ };
+}
+
 method use($target, @params) {
   my $version;
 
@@ -610,6 +628,34 @@ L<Types::Standard>
 =head1 METHODS
 
 This package implements the following methods:
+
+=cut
+
+=head2 all
+
+  all(Str $name, Any @args) : ArrayRef[Tuple[Str, Any]]
+
+The all method executes any available method on the instance and all instances
+representing packages inherited by the package represented by the invocant.
+
+=over 4
+
+=item all example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/object/space');
+
+  $space->all('id');
+
+  # [
+  #   ['Data::Object::Space', 'Data_Object_Space'],
+  #   ['Data::Object::Name', 'Data_Object_Name'],
+  # ]
+
+=back
 
 =cut
 
@@ -1894,6 +1940,48 @@ deep).
   #   'Encode/Config'
   #   ...
   # ]
+
+=back
+
+=cut
+
+=head2 tryload
+
+  tryload() : Bool
+
+The tryload method attempt to C<load> the represented package using the
+L</load> method and returns truthy/falsy based on whether the package was
+loaded.
+
+=over 4
+
+=item tryload example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('c_p_a_n');
+
+  $space->tryload
+
+  # 1
+
+=back
+
+=over 4
+
+=item tryload example #2
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('brianne_spinka');
+
+  $space->tryload
+
+  # 0
 
 =back
 

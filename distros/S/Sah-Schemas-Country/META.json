@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Country"
       }
    },
-   "version" : "0.005",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -399,7 +399,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Sah::Schemas",
                         "name" : "-Sah::Schemas",
-                        "version" : "0.060"
+                        "version" : "0.061"
                      }
                   ]
                }

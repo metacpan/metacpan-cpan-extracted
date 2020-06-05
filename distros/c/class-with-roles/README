@@ -1,0 +1,55 @@
+NAME
+    class::with::roles - Shortcut for using a class and applying it some
+    Role::Tiny roles, from the command line
+
+VERSION
+    This document describes version 0.004 of class::with::roles (from Perl
+    distribution class-with-roles), released on 2020-06-05.
+
+SYNOPSIS
+    To be used mainly from the command line:
+
+     % perl -Mclass::with::roles=MyClass,+My::Role1,+My::Role2 -E'...'
+     % perl -Mclass::with::roles=MyClass,import1,import2,+My::Role1,+My::Role2 -E'...'
+     % perl -Mclass::with::roles=MyClass,'!',+My::Role1,+My::Role2 -E'...'
+
+    which is shortcut for:
+
+     % perl -E'use MyClass;                      use Role::Tiny; Role::Tiny->apply_roles_to_package("MyClass", "My::Role1", "My::Role2"); ...'
+     % perl -E'use MyClass "import1", "import2"; use Role::Tiny; Role::Tiny->apply_roles_to_package("MyClass", "My::Role1", "My::Role2"); ...'
+     % perl -E'use MyClass ();                   use Role::Tiny; Role::Tiny->apply_roles_to_package("MyClass", "My::Role1", "My::Role2"); ...'
+
+    but you can also use it from regular Perl code:
+
+     use class::with::roles MyClass => '+My::Role1', '+My::Role2';
+     use class::with::roles MyClass => 'import1', 'import2', '+My::Role1', '+My::Role2';
+     use class::with::roles MyClass => '!', '+My::Role1', '+My::Role2';
+
+DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/class-with-roles>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-class-with-roles>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=class-with-roles>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Role::Tiny
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

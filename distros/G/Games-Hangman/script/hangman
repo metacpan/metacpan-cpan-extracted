@@ -1,10 +1,12 @@
 #!perl
 
-our $DATE = '2017-03-05'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-02'; # DATE
+our $DIST = 'Games-Hangman'; # DIST
+our $VERSION = '0.063'; # VERSION
 
 use Games::Hangman;
-use Getopt::Long qw(:config bundling auto_version auto_help);
+use Getopt::Long::More;
 
 my %opts = (
     list => undef,
@@ -12,12 +14,22 @@ my %opts = (
     max_len => undef,
 );
 GetOptions(
-    'list|l=s' => \$opts{list},
+    'wordlist|list|l|w=s' => optspec(
+        destination => \$opts{list},
+        completion => sub {
+            require Complete::Module;
+            my %cargs = @_;
+            Complete::Module::complete_module(
+                word => $cargs{word},
+                ns_prefix => 'WordList',
+            );
+        },
+    ),
     'min-len=i' => \$opts{min_len},
     'max-len=i' => \$opts{max_len},
 );
 
-binmode(STDOUT, ":utf8");
+binmode(STDOUT, ":encoding(utf8)");
 my $game = Games::Hangman->new(%opts);
 $game->run;
 
@@ -36,7 +48,7 @@ hangman - A text-based hangman
 
 =head1 VERSION
 
-This document describes version 0.06 of hangman (from Perl distribution Games-Hangman), released on 2017-03-05.
+This document describes version 0.063 of hangman (from Perl distribution Games-Hangman), released on 2020-06-02.
 
 =head1 SYNOPSIS
 
@@ -72,12 +84,9 @@ What's different about this particular variant:
 
 =over
 
-=item * Wordlist is searched from C<Games::Word::Wordlist::*> modules
+=item * Longer phrases are allowed
 
-=item * Phraselist
-
-Aside from words, phrases are also allowed. Non-letters will be revealed first.
-Phraselists are searched in C<Games::Word::Phraselist::*> modules.
+=item * Wordlists (or phrase list) are searched from C<WordList::*> modules
 
 =back
 
@@ -85,8 +94,12 @@ Phraselists are searched in C<Games::Word::Phraselist::*> modules.
 
 =head2 C<--list=s, -l>
 
-Select word-/phraselist, will be searched in C<Games::Word::Wordlist::> or
-C<Games::Word::Phraselist::>.
+Select word-/phraselist, will be searched in C<Wordlist::*> or
+C<WordList::Phrase::>.
+
+=head2 C<--wordlist=s, -w>
+
+Alias for C<--wordlist>.
 
 =head2 C<--min-len=i>
 
@@ -95,6 +108,40 @@ Minimum word/phrase length. The default is 5 for word, 0 for phrase.
 =head2 C<--max-len=i>
 
 Maximum word/phrase length. The default is unlimited.
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C hangman hangman
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete hangman 'p/*/`hangman`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
 
 =head1 HOMEPAGE
 
@@ -118,9 +165,7 @@ hangman from C<bsdgames> Debian package
 
 hangman from C<ppt> (Perl Power Tools) on CPAN
 
-L<Games::Word::Wordlist>
-
-L<Games::Word::Phraselist>
+C<WordList::*>
 
 =head1 AUTHOR
 
@@ -128,7 +173,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

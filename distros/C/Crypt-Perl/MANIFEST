@@ -606,6 +606,7 @@ t/assets/prime256v1.key.public
 t/assets/prime256v1.prkey
 t/assets/prime256v1_explicit.key
 t/assets/prime256v1_explicit.key.public
+t/ecdsa_verify_small_r_and_s.t
 t/lib/ECDSAKeyTest.pm
 t/lib/NeedsOpenSSL.pm
 t/lib/OpenSSL_Control.pm

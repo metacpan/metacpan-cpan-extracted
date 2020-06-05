@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Find the top repeated note phrases of MIDI files
 
-our $VERSION = '0.1800';
+our $VERSION = '0.1801';
 
 use Moo;
 use strictures 2;
@@ -662,7 +662,7 @@ MIDI::Ngram - Find the top repeated note phrases of MIDI files
 
 =head1 VERSION
 
-version 0.1800
+version 0.1801
 
 =head1 SYNOPSIS
 
@@ -846,9 +846,12 @@ Create a new C<MIDI::Ngram> object.
 
 =head2 process
 
-  $analysis = $mng->process;
+  $mng->process;
 
-Find all ngram phrases and return the note analysis.
+Find all ngram phrases of durations, notes and both combined.
+
+This method creates the B<dura_notes>, B<dura>, and B<notes>
+repetition lists.
 
 =head2 populate
 

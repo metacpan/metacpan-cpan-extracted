@@ -31,7 +31,7 @@
          "requires" : {
             "Complete::Module" : "0",
             "Role::Tiny::With" : "0",
-            "WordList" : "v0.6.0",
+            "WordList" : "v0.7.4",
             "WordListRole::FirstNextResetFromEach" : "0",
             "parent" : "0",
             "warnings" : "0"
@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-WordList-MetaSyntactic-Any"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

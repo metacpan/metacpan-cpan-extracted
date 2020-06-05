@@ -2,8 +2,8 @@ NAME
     Data::Dump::Options - Like Data::Dump but with some more options
 
 VERSION
-    This document describes version 0.001 of Data::Dump::Options (from Perl
-    distribution Data-Dump-Options), released on 2020-06-04.
+    This document describes version 0.002 of Data::Dump::Options (from Perl
+    distribution Data-Dump-Options), released on 2020-06-05.
 
 SYNOPSIS
     Use like you would use Data::Dump:
@@ -12,7 +12,7 @@ SYNOPSIS
      dd [1,2,3,4];
 
 DESCRIPTION
-    A fork of Data::Dump 1.23 to give some dumping options.>
+    A fork of Data::Dump 1.23 to give some more dumping options.
 
 CONFIGURATION
     In addition to Data::Dump's options, there are a few package variables
@@ -36,9 +36,12 @@ CONFIGURATION
 
          Foo::Bar=ARRAY(0x5653ec564740)
 
-        format even, disregarding object's overloading of stringification.
+        disregarding object's overloading of stringification.
 
-        Useful if you don't care about objects.
+        Useful if you don't want to see the innards of objects (e.g. during
+        debugging), or, as TOBYINK <https://metacpan.org/author/TOBYINK>
+        suggested, "Useful if you are passionate about objects being
+        opaque."
 
         The default value is "dump".
 
@@ -58,7 +61,18 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Data::Dump and other "Data::Dump::*" modules.
+    Data::Dump actually has a "filtering" mechanism to customize dumping. It
+    lets you specify a callback function that gets called for every item
+    during dumping process and has a chance to produce a custom dump for
+    that item. "Data::Dump::Options" could be implemented using this
+    filtering instead, but filtered dumping is slower.
+
+    Other "Data::Dump::*" modules.
+
+    Data::Bahe also offers some dumping options. This is a project I've
+    mulled over from time to time since about 2015 and is currently in early
+    stage of implementation. Data::Dump::Options is written as a stop-gap
+    measure to quickly give the kind of dumps I want.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

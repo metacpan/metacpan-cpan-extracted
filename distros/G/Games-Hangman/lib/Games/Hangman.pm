@@ -1,13 +1,14 @@
 package Games::Hangman;
 
-our $DATE = '2017-03-05'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-02'; # DATE
+our $DIST = 'Games-Hangman'; # DIST
+our $VERSION = '0.063'; # VERSION
 
 #use Color::ANSI::Util qw(ansibg ansifg);
 use Module::List qw(list_modules);
 use Module::Load;
 use Term::ReadKey;
-use Text::Unaccent;
 use Text::WideChar::Util qw(wrap);
 use Time::HiRes qw(sleep);
 
@@ -159,7 +160,7 @@ sub draw {
     my ($termwidth, $wordwidth);
     {
         if (eval "require Term::Size") {
-            ($termwidth, undef) = Term::Size::chars();
+            ($termwidth, undef) = Term::Size::chars(*STDOUT{IO});
         } else {
             $termwidth = 80;
         }
@@ -212,6 +213,8 @@ sub read_key {
 }
 
 sub new_word {
+    require Text::Unaccent;
+
     my $self = shift;
 
     my $word;
@@ -226,7 +229,7 @@ sub new_word {
 
             # for now we deal with ascii only
             if ($word =~ /[^\x20-\x7f]/) {
-                $word = unac_string("utf8", $word);
+                $word = Text::Unaccent::unac_string("utf8", $word);
                 next if $word =~ /[^\x20-\x7f]/;
             }
 
@@ -263,6 +266,7 @@ sub BUILD {
         my ($list, $type) = @_;
         if ($self->list) {
             $list = $self->list;
+            $list =~ s!/!::!g; # normalize Foo/Bar into Foo::Bar
             if ($list =~ s/^WordList::Phrase:://) {
                 $type = 'p';
             } elsif ($list =~ /^WordList::/) {
@@ -423,6 +427,7 @@ sub run {
     $self->cleanup;
 }
 
+1;
 # ABSTRACT: A text-based hangman
 
 __END__
@@ -437,7 +442,7 @@ Games::Hangman - A text-based hangman
 
 =head1 VERSION
 
-This document describes version 0.06 of Games::Hangman (from Perl distribution Games-Hangman), released on 2017-03-05.
+This document describes version 0.063 of Games::Hangman (from Perl distribution Games-Hangman), released on 2020-06-02.
 
 =head1 SYNOPSIS
 
@@ -471,7 +476,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 =encoding utf-8
 
@@ -141,7 +141,14 @@ Show locale information.
 
 Show option list.
 
-=item B<prefix>
+=item B<listopt>=I<option>
+
+Set the option to display option list and exit.  You can introduce a
+new option B<-l> to show available option list:
+
+    -Mi18n::setopt(listopt=-l)
+
+=item B<prefix>=I<string>
 
 Specify prefix string.  Default is C<-->.
 
@@ -190,10 +197,15 @@ my %opt = (
     verbose => 0,
     list    => 0,
     prefix  => '--',
-);
+    listopt => undef,
+    );
+
+my $module;
 
 sub initialize {
+    return if state $called++;
     my($obj, $argv) = @_;
+    $module = $obj;
     setup();
 }
 
@@ -230,12 +242,38 @@ sub finalize {
     }
 
     $obj->mode(function => 1);
+    if (my $listopt = $opt{listopt}) {
+	$obj->setopt($listopt, "&options(show,exit)");
+    }
+    &options(set => 1, show => $opt{list});
+    return;
+}
+
+sub localeinfo {
+    $_[0]=~ /^(?<lang>[a-z][a-z])_(?<cc>[A-Z][A-Z])$/;
+    ( $+{lang} && $iso639{$+{lang}} || 'UNKNOWN' ,
+      $+{cc}   && $iso3361{$+{cc}}  || 'UNKNOWN' );
+}
+
+sub options {
+    my %arg = (
+	set  => 0, # set option
+	show => 0, # print option
+	exit => 0, # exit at the end
+	@_);
+    my $optwidth = length($opt{prefix}) + 5;
     for my $opt (sort { lc $a cmp lc $b } keys %opthash) {
 	my $option = $opt{prefix} . $opt;
 	my $call = "&setenv(LANG=$opthash{$opt})";
-	$obj->setopt($option, $call);
-	say "option $option $call" if $opt{list};
+	$module->setopt($option, $call) if $arg{set};
+	if ($arg{show}) {
+	    my($lang, $cc) = localeinfo($opthash{$opt});
+	    printf "option %-*s %s # %s / %s\n",
+		$optwidth, $option, $call, $lang, $cc;
+	}
     }
+    exit if $arg{exit};
+    return ();
 }
 
 sub setup {
@@ -244,7 +282,7 @@ sub setup {
     for (`locale -a`) {
 	/^((\w\w)_(\w\w))$/ or next;
 	my($name, $lang, $cc) = ($1, $2, lc $3);
-	push @locale, $name;
+	push @locale,           $name;
 	push @{ $lang{$lang} }, $name;
 	push @{ $cc{$cc}     }, $name;
     }
@@ -255,17 +293,6 @@ sub locales {
     grep { /^\w\w_\w\w$/ } @locale;
 }
 
-sub options {
-    my $obj = shift;
-    grep { -x "$_/locale" } split /:/, $ENV{PATH} or return;
-    for (locales()) {
-	/^(\w\w_(\w\w))$/ or next;
-	my($opt, $value) = ("--".lc($2), "-Mutil::setenv(LANG=$1)");
-	say "option $opt $value";
-    }
-    exit;
-}
-
 sub setopt {
     %opt = (%opt, @_);
 }
@@ -274,11 +301,7 @@ sub setenv {
     while (@_ >= 2) {
 	my($key, $value) = splice @_, 0, 2;
 	if ($opt{verbose}) {
-	    my($lang, $cc) = do {
-		$value =~ /^(?<lang>[a-z][a-z])_(?<cc>[A-Z][A-Z])$/;
-		( $+{lang} && $iso639{$+{lang}} || 'UNKNOWN' ,
-		  $+{cc}   && $iso3361{$+{cc}}  || 'UNKNOWN' );
-	    };
+	    my($lang, $cc) = localeinfo $value;
 	    warn "$key=$value ($lang / $cc)\n";
 	}
 	$ENV{$key} = $value;

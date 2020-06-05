@@ -1,9 +1,9 @@
 package WordList::MetaSyntactic::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-04'; # DATE
+our $DATE = '2020-06-05'; # DATE
 our $DIST = 'WordList-MetaSyntactic-Any'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use parent qw(WordList);
 
@@ -32,7 +32,7 @@ our %PARAMS = (
 sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
-    my $mod = "Acme::MetaSyntactic::$self->[2]{theme}";
+    my $mod = "Acme::MetaSyntactic::$self->{params}{theme}";
     (my $mod_pm = "$mod.pm") =~ s!::!/!g;
     require $mod_pm;
 
@@ -41,14 +41,14 @@ sub new {
         @names = map { @{ ${"$mod\::MultiList"}{$_} } }
             sort keys %{"$mod\::MultiList"};
     }
-    $self->[1] = \@names;
+    $self->{_names} = \@names;
     $self;
 }
 
 sub each_word {
     my ($self, $code) = @_;
 
-    for (@{ $self->[1] }) {
+    for (@{ $self->{_names} }) {
         no warnings 'numeric';
         my $ret = $code->($_);
         return if defined $ret && $ret == -2;
@@ -70,7 +70,7 @@ WordList::MetaSyntactic::Any - Wordlist from any Acme::MetaSyntactic::* module
 
 =head1 VERSION
 
-This document describes version 0.001 of WordList::MetaSyntactic::Any (from Perl distribution WordList-MetaSyntactic-Any), released on 2020-05-04.
+This document describes version 0.002 of WordList::MetaSyntactic::Any (from Perl distribution WordList-MetaSyntactic-Any), released on 2020-06-05.
 
 =head1 SYNOPSIS
 

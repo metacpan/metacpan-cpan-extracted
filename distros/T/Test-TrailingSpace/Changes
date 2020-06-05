@@ -1,3 +1,6 @@
+0.0500  2020-06-05
+    - Convert the file processing to use a code generated callback (a speed optimization).
+
 0.0400  2020-05-20
     - Add the 'find_cr' and 'find_tabs' options.
 

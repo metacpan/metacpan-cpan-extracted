@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt::Perl
 
+0.32 Thu Jun 4 2020
+- Fix issue #14: Fix ECDSA verify when r and s are small.
+  (reported by Antonio de la Piedra)
+
 0.31 Tue Feb 11 2020
 - Fix ed25519 support detection.
 - Recommend Math::BigInt::GMP.

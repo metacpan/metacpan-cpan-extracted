@@ -1,0 +1,22 @@
+0.004   2020-06-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fourth time's the charm: import on behalf of caller.
+
+	- Introduce "!" as the syntax to skip class import().
+
+	- Check class name syntax to be safe.
+
+
+0.003   2020-06-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Derp, used the wrong invocant.
+
+
+0.002   2020-06-05  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Oops, pass the wrong import arguments to class.
+
+
+0.001   2020-06-05  Released-By: PERLANCAR
+
+        - First release.

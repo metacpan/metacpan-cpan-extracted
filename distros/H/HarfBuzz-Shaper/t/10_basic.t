@@ -16,7 +16,6 @@ $hb->set_size(36);
 $hb->set_text("Hell€!");
 my $info = $hb->shaper;
 # use DDumper; DDumper($info);
-# It's a pity this font does not have glyph names.
 my $result = [
   {
     ax => '25.992',
@@ -24,7 +23,7 @@ my $result = [
     dx => 0,
     dy => 0,
     g => 41,
-    name => '',
+    name => 'H',
   },
   {
     ax => '15.192',
@@ -32,7 +31,7 @@ my $result = [
     dx => 0,
     dy => 0,
     g => 70,
-    name => '',
+    name => 'e',
   },
   {
     ax => '10.008',
@@ -40,7 +39,7 @@ my $result = [
     dx => 0,
     dy => 0,
     g => 77,
-    name => '',
+    name => 'l',
   },
   {
     ax => '10.008',
@@ -48,7 +47,7 @@ my $result = [
     dx => 0,
     dy => 0,
     g => 77,
-    name => '',
+    name => 'l',
   },
   {
     ax => 18,
@@ -56,7 +55,7 @@ my $result = [
     dx => 0,
     dy => 0,
     g => 347,
-    name => '',
+    name => 'Euro',
   },
   {
     ax => '11.988',
@@ -64,7 +63,7 @@ my $result = [
     dx => 0,
     dy => 0,
     g => 2,
-    name => '',
+    name => 'exclam',
   },
 ];
 
@@ -84,7 +83,9 @@ sub compare {
 	    diag( "CId $i->{g} must be $j->{g}" );
 	    return;
 	}
-	unless ( $i->{name} eq $j->{name} ) {
+	# It's a pity this font does not have glyph names.
+	# But harbuzz 2.6.6 started to return them.
+	unless ( $i->{name} eq $j->{name} or '' eq $j->{name}) {
 	    diag( "Name $i->{name} must be $j->{name}" );
 	    return;
 	}

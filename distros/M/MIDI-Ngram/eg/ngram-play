@@ -12,7 +12,6 @@ use strict;
 use warnings;
 
 use Data::Dumper::Compact 'ddc';
-
 use File::Find::Rule;
 use Getopt::Long;
 use GraphViz2;
@@ -110,12 +109,13 @@ if ( $opts{out} ) {
     $mng->write;
 }
 else {
-    print 'Durations: ', ddc($mng->dura), "\n",
-        'Duration network: ', ddc($mng->dura_net), "\n",
-        'Notes: ', ddc($mng->notes), "\n",
-        'Note network: ', ddc($mng->note_net), "\n",
-        'Durations*Notes: ', ddc($mng->dura_notes), "\n",
-        'Duration*Note network: ', ddc($mng->dura_note_net);
+    print join "\n",
+        'Durations: '             . ddc($mng->dura),
+        'Duration network: '      . ddc($mng->dura_net),
+        'Notes: '                 . ddc($mng->notes),
+        'Note network: '          . ddc($mng->note_net),
+        'Durations*Notes: '       . ddc($mng->dura_notes),
+        'Duration*Note network: ' . ddc($mng->dura_note_net);
 }
 
 exit unless $opts{image};

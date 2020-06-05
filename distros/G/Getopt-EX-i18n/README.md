@@ -124,7 +124,14 @@ module declaration.
 
     Show option list.
 
-- **prefix**
+- **listopt**=_option_
+
+    Set the option to display option list and exit.  You can introduce a
+    new option **-l** to show available option list:
+
+        -Mi18n::setopt(listopt=-l)
+
+- **prefix**=_string_
 
     Specify prefix string.  Default is `--`.
 

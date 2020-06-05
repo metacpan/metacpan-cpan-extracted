@@ -1,0 +1,47 @@
+NAME
+    Role::TinyCommons::TermAttr::Software - Find out information about
+    terminal (emulator) software we run on
+
+VERSION
+    This document describes version 0.001 of
+    Role::TinyCommons::TermAttr::Software (from Perl distribution
+    Role-TinyCommons-TermAttr-Software), released on 2020-06-05.
+
+DESCRIPTION
+PROVIDED METHODS
+  termattr_software_info
+    Try to find out information about terminal (emulator) software we run
+    on. Uses Term::Detect::Software. Return a hash.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Role-TinyCommons-TermAttr-Software>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Role-TinyCommons-TermAttr-Software>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-Term
+    Attr-Software>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Role::TinyCommons
+
+    Term::Detect::Software
+
+    Term::App::Role::Attrs, an earlier project, uses Moo::Role.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

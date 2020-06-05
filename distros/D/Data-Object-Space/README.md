@@ -34,6 +34,28 @@ This package uses type constraints from:
 
 This package implements the following methods:
 
+## all
+
+    all(Str $name, Any @args) : ArrayRef[Tuple[Str, Any]]
+
+The all method executes any available method on the instance and all instances
+representing packages inherited by the package represented by the invocant.
+
+- all example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('data/object/space');
+
+        $space->all('id');
+
+        # [
+        #   ['Data::Object::Space', 'Data_Object_Space'],
+        #   ['Data::Object::Name', 'Data_Object_Name'],
+        # ]
+
 ## append
 
     append(Str @args) : Object
@@ -1019,6 +1041,38 @@ deep).
         #   'Encode/Config'
         #   ...
         # ]
+
+## tryload
+
+    tryload() : Bool
+
+The tryload method attempt to `load` the represented package using the
+["load"](#load) method and returns truthy/falsy based on whether the package was
+loaded.
+
+- tryload example #1
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('c_p_a_n');
+
+        $space->tryload
+
+        # 1
+
+- tryload example #2
+
+        package main;
+
+        use Data::Object::Space;
+
+        my $space = Data::Object::Space->new('brianne_spinka');
+
+        $space->tryload
+
+        # 0
 
 ## use
 

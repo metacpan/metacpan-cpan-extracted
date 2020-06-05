@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Test-TrailingSpace",
-  "dist_version" => "0.0400",
+  "dist_version" => "0.0500",
   "license" => "mit",
   "module_name" => "Test::TrailingSpace",
   "recursive_test_files" => 1,

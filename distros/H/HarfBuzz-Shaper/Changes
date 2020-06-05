@@ -1,6 +1,10 @@
 Revision history for HarfBuzz::Shaper.
 
-0.021
+0.022 2020-06-05
+
+    - Update tests for harfbuzz 2.6.6. Thanks to ppisar for fixing this.
+
+0.021 2020-02-08
 
     - Add set/get_language.
     - Simplify XS by using typemaps.

@@ -1,5 +1,9 @@
 Revision history for MIDI-Ngram
 
+0.1801 2020-06-04 16:05:42
+    - Improve documentation.
+    - Improve eg/ngram-play.
+
 0.1800 2020-06-04 00:43:17
     - Improve documentation.
     - Add computation of simultaneous duration*note event lists.

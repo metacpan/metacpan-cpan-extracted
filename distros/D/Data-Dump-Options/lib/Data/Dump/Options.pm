@@ -3,9 +3,9 @@
 package Data::Dump::Options;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-04'; # DATE
+our $DATE = '2020-06-05'; # DATE
 our $DIST = 'Data-Dump-Options'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use vars qw(@EXPORT @EXPORT_OK $DEBUG);
@@ -628,7 +628,7 @@ Data::Dump::Options - Like Data::Dump but with some more options
 
 =head1 VERSION
 
-This document describes version 0.001 of Data::Dump::Options (from Perl distribution Data-Dump-Options), released on 2020-06-04.
+This document describes version 0.002 of Data::Dump::Options (from Perl distribution Data-Dump-Options), released on 2020-06-05.
 
 =head1 SYNOPSIS
 
@@ -639,7 +639,7 @@ Use like you would use L<Data::Dump>:
 
 =head1 DESCRIPTION
 
-A fork of L<Data::Dump> 1.23 to give some dumping options.>
+A fork of L<Data::Dump> 1.23 to give some more dumping options.
 
 =for Pod::Coverage ^(.+)$
 
@@ -667,9 +667,11 @@ If set to "default_string", then object will be dumped as the standard:
 
  Foo::Bar=ARRAY(0x5653ec564740)
 
-format even, disregarding object's overloading of stringification.
+disregarding object's overloading of stringification.
 
-Useful if you don't care about objects.
+Useful if you don't want to see the innards of objects (e.g. during debugging),
+or, as L<TOBYINK|https://metacpan.org/author/TOBYINK> suggested, "Useful if you
+are passionate about objects being opaque."
 
 The default value is "dump".
 
@@ -693,7 +695,18 @@ feature.
 
 =head1 SEE ALSO
 
-L<Data::Dump> and other C<Data::Dump::*> modules.
+L<Data::Dump> actually has a "filtering" mechanism to customize dumping. It lets
+you specify a callback function that gets called for every item during dumping
+process and has a chance to produce a custom dump for that item.
+C<Data::Dump::Options> could be implemented using this filtering instead, but
+filtered dumping is slower.
+
+Other C<Data::Dump::*> modules.
+
+L<Data::Bahe> also offers some dumping options. This is a project I've mulled
+over from time to time since about 2015 and is currently in early stage of
+implementation. Data::Dump::Options is written as a stop-gap measure to quickly
+give the kind of dumps I want.
 
 =head1 AUTHOR
 

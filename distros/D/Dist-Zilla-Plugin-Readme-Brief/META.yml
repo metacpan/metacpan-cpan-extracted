@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ name: Dist-Zilla-Plugin-Readme-Brief
 provides:
   Dist::Zilla::Plugin::Readme::Brief:
     file: lib/Dist/Zilla/Plugin/Readme/Brief.pm
-    version: '0.003002'
+    version: '0.003003'
 recommends:
   Moose: '2.000'
 requires:
@@ -48,4 +48,4 @@ resources:
   bugtracker: https://github.com/KENTNL/Dist-Zilla-Plugin-Readme-Brief/issues
   homepage: https://github.com/KENTNL/Dist-Zilla-Plugin-Readme-Brief
   repository: https://github.com/KENTNL/Dist-Zilla-Plugin-Readme-Brief.git
-version: '0.003002'
+version: '0.003003'

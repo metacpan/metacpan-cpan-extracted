@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 # ABSTRACT: Basic Test
 
@@ -38,3 +38,13 @@ ok( ( first { $_ eq 'Foo' } @lines ),                   'Document name found and
 ok( ( first { $_ eq 'This is a description' } @lines ), 'Description injected' );
 ok( ( first { $_ eq 'INSTALLATION' } @lines ),          'Installation section injected' );
 ok( ( first { $_ eq 'COPYRIGHT AND LICENSE' } @lines ), 'Copyright section injected' );
+
+ok( my $brief = ( first { $_->isa('Dist::Zilla::Plugin::Readme::Brief') } @{ $test->plugins } ), "Found own plugin" );
+my $cfg;
+my $err;
+{
+  local $@;
+  eval { $cfg = $brief->dump_config; 1 } or $err = $@;
+}
+ok( !$err, "Dump config returns value without error" );
+diag explain $err if $err;

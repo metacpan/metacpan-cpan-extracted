@@ -27,6 +27,7 @@ Namespace Class for Perl 5
 
 =includes
 
+method: all
 method: append
 method: array
 method: arrays
@@ -67,6 +68,7 @@ method: scalar
 method: scalars
 method: sibling
 method: siblings
+method: tryload
 method: use
 method: used
 method: variables
@@ -99,6 +101,32 @@ Types::Standard
 =description
 
 This package provides methods for parsing and manipulating package namespaces.
+
+=cut
+
+=method all
+
+The all method executes any available method on the instance and all instances
+representing packages inherited by the package represented by the invocant.
+
+=signature all
+
+all(Str $name, Any @args) : ArrayRef[Tuple[Str, Any]]
+
+=example-1 all
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('data/object/space');
+
+  $space->all('id');
+
+  # [
+  #   ['Data::Object::Space', 'Data_Object_Space'],
+  #   ['Data::Object::Name', 'Data_Object_Name'],
+  # ]
 
 =cut
 
@@ -1248,6 +1276,42 @@ siblings() : ArrayRef[Object]
 
 =cut
 
+=method tryload
+
+The tryload method attempt to C<load> the represented package using the
+L</load> method and returns truthy/falsy based on whether the package was
+loaded.
+
+=signature tryload
+
+tryload() : Bool
+
+=example-1 tryload
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('c_p_a_n');
+
+  $space->tryload
+
+  # 1
+
+=example-2 tryload
+
+  package main;
+
+  use Data::Object::Space;
+
+  my $space = Data::Object::Space->new('brianne_spinka');
+
+  $space->tryload
+
+  # 0
+
+=cut
+
 =method use
 
 The use method executes a C<use> statement within the package namespace
@@ -1432,6 +1496,16 @@ my $subs = $test->standard;
 
 $subs->synopsis(fun($tryable) {
   ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'all', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, [
+    ['Data::Object::Space', 'Data_Object_Space'],
+    ['Data::Object::Name', 'Data_Object_Name'],
+  ];
 
   $result
 });
@@ -1833,6 +1907,18 @@ $subs->example(-1, 'siblings', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   ok @$result > 1;
   ok $_->isa('Data::Object::Space') for @$result;
+
+  $result
+});
+
+$subs->example(-1, 'tryload', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-2, 'tryload', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
 
   $result
 });

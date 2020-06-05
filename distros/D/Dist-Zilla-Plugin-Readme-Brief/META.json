@@ -4,7 +4,7 @@
       "Kent Fredric <kentnl@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -79,7 +79,6 @@
             "Dist::Zilla::Plugin::Twitter" : "0",
             "Dist::Zilla::Plugin::UploadToCPAN" : "0",
             "Dist::Zilla::Plugin::lib" : "0",
-            "English" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::Perl_5" : "0",
             "Test::CPAN::Changes" : "0.19",
@@ -88,6 +87,7 @@
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
             "Test::More" : "0.96",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          },
@@ -141,7 +141,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Readme::Brief" : {
          "file" : "lib/Dist/Zilla/Plugin/Readme/Brief.pm",
-         "version" : "0.003002"
+         "version" : "0.003003"
       }
    },
    "release_status" : "stable",
@@ -156,13 +156,13 @@
          "web" : "https://github.com/KENTNL/Dist-Zilla-Plugin-Readme-Brief"
       }
    },
-   "version" : "0.003002",
+   "version" : "0.003003",
    "x_BuiltWith" : {
       "external_file" : "misc/built_with.json"
    },
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.025010"
+         "version" : "5.027009"
       },
       "plugins" : [
          {
@@ -175,12 +175,12 @@
                }
             },
             "name" : "lib",
-            "version" : "0.001001"
+            "version" : "0.001002"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::KENTNL/MetaConfig",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -195,7 +195,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Author::KENTNL/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.009"
+                        "version" : "6.015"
                      }
                   ],
                   "include_underscores" : 0
@@ -243,7 +243,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git --version" : "2.12.0",
+                  "git_version" : "2.27.0",
                   "include_authors" : 0,
                   "include_releaser" : 0,
                   "order_by" : "name",
@@ -251,7 +251,7 @@
                }
             },
             "name" : "@Author::KENTNL/Git::Contributors",
-            "version" : "0.029"
+            "version" : "0.032"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -277,17 +277,17 @@
                }
             },
             "name" : "@Author::KENTNL/Git::GatherDir",
-            "version" : "2.041"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Author::KENTNL/License",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::KENTNL/MetaJSON",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML::Minimal",
@@ -303,7 +303,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::KENTNL/Manifest",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Author::KENTNL::TravisCI",
@@ -340,32 +340,32 @@
                }
             },
             "name" : "@Author::KENTNL/Author::KENTNL::CONTRIBUTING",
-            "version" : "0.001005"
+            "version" : "0.001006"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
             "name" : "@Author::KENTNL/CopyXBuild",
-            "version" : "0.163040"
+            "version" : "0.170880"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaTests",
             "name" : "@Author::KENTNL/MetaTests",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
             "name" : "@Author::KENTNL/PodCoverageTests",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::KENTNL/PodSyntaxTests",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@Author::KENTNL/Test::ReportPrereqs",
-            "version" : "0.025"
+            "version" : "0.027"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
@@ -402,7 +402,7 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::KENTNL/Test::Compile::PerFile/AUTOVIV/:InstallModulesPM",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile::PerFile",
@@ -424,12 +424,12 @@
          {
             "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
             "name" : "@Author::KENTNL/Test::Perl::Critic",
-            "version" : "3.000"
+            "version" : "3.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::KENTNL/ManifestSkip",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion::Sanitized",
@@ -565,7 +565,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@Author::KENTNL/AutoPrereqs",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -576,7 +576,7 @@
                }
             },
             "name" : "@Author::KENTNL/BundleDevelSuggests",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::AuthorDeps",
@@ -601,7 +601,7 @@
                }
             },
             "name" : "@Author::KENTNL/MakeMaker",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes",
@@ -611,7 +611,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Readme::Brief",
             "name" : "@Author::KENTNL/ShippedReadme",
-            "version" : "0.003002"
+            "version" : "0.003003"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -646,12 +646,12 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Author::KENTNL/TestRelease",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Author::KENTNL/ConfirmRelease",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -668,12 +668,12 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.0",
+                  "git_version" : "2.27.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::KENTNL/Git::Check",
-            "version" : "2.041"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -691,7 +691,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.0",
+                  "git_version" : "2.27.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -699,7 +699,7 @@
                }
             },
             "name" : "@Author::KENTNL/commit_dirty_files",
-            "version" : "2.041"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -708,12 +708,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003002-source",
+                  "tag" : "0.003003-source",
                   "tag_format" : "%v-source",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.0",
+                  "git_version" : "2.27.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -721,7 +721,7 @@
                }
             },
             "name" : "@Author::KENTNL/tag_master",
-            "version" : "2.041"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::NextRelease",
@@ -731,7 +731,7 @@
                }
             },
             "name" : "@Author::KENTNL/Git::NextRelease",
-            "version" : "0.004000"
+            "version" : "0.004001"
          },
          {
             "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease",
@@ -746,7 +746,7 @@
                }
             },
             "name" : "@Author::KENTNL/BumpVersionAfterRelease",
-            "version" : "0.015"
+            "version" : "0.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -766,7 +766,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.0",
+                  "git_version" : "2.27.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -774,7 +774,7 @@
                }
             },
             "name" : "@Author::KENTNL/commit_release_changes",
-            "version" : "2.041"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CommitBuild",
@@ -788,12 +788,12 @@
                   "release_message" : "Build results of %h (on %b)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.0",
+                  "git_version" : "2.27.0",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::KENTNL/Git::CommitBuild",
-            "version" : "2.041"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Tag",
@@ -802,12 +802,12 @@
                   "branch" : "releases",
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003002",
+                  "tag" : "0.003003",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git --version" : "2.12.0",
+                  "git_version" : "2.27.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -815,12 +815,12 @@
                }
             },
             "name" : "@Author::KENTNL/tag_release",
-            "version" : "2.041"
+            "version" : "2.043"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Author::KENTNL/UploadToCPAN",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Twitter",
@@ -866,7 +866,7 @@
                }
             },
             "name" : "@Author::KENTNL/always_latest_develop_bundle",
-            "version" : "0.003002"
+            "version" : "0.003003"
          },
          {
             "class" : "Dist::Zilla::Plugin::RemovePrereqs::Provided",
@@ -882,7 +882,7 @@
                }
             },
             "name" : "@Author::KENTNL/::Role::BundleDeps",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -893,62 +893,62 @@
                }
             },
             "name" : "Prereqs",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.009"
+            "version" : "6.015"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::KENTNL/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.009"
+            "version" : "6.015"
          }
       ],
       "zilla" : {
@@ -956,7 +956,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.009"
+         "version" : "6.015"
       }
    },
    "x_authority" : "cpan:KENTNL",
@@ -965,6 +965,8 @@
       "David E. Wheeler <david@justatheory.com>",
       "Karen Etheridge <ether@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "x_generated_by_perl" : "v5.27.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

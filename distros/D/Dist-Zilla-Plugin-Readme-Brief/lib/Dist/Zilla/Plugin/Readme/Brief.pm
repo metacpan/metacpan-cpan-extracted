@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::Readme::Brief;
 
-our $VERSION = '0.003002';
+our $VERSION = '0.003003';
 
 # ABSTRACT: Provide a short simple README with just the essentials
 
@@ -134,7 +134,7 @@ around dump_config => sub {
 
   for my $attrname (qw(  installer source_file _source_file_override description_label )) {
     if ( $self->meta->find_attribute_by_name($attrname)->has_value($self)) {
-      $localconf->{ $attrname } = $self->can($attrname)->();
+      $localconf->{ $attrname } = $self->can($attrname)->($self);
     }
   }
 
@@ -372,7 +372,7 @@ Dist::Zilla::Plugin::Readme::Brief - Provide a short simple README with just the
 
 =head1 VERSION
 
-version 0.003002
+version 0.003003
 
 =head1 SYNOPSIS
 
@@ -518,7 +518,7 @@ Kent Fredric <kentnl@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Kent Fredric <kentfredric@gmail.com>.
+This software is copyright (c) 2020 by Kent Fredric <kentfredric@gmail.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -24,7 +24,7 @@ name: Test-TrailingSpace
 provides:
   Test::TrailingSpace:
     file: lib/Test/TrailingSpace.pm
-    version: '0.0400'
+    version: '0.0500'
 requires:
   File::Find::Object::Rule: '0.0301'
   Test::More: '0.88'
@@ -36,10 +36,10 @@ resources:
   bugtracker: https://github.com/shlomif/perl-test-trailingspace/issues
   homepage: http://metacpan.org/release/Test-TrailingSpace
   repository: git://github.com/shlomif/perl-test-trailingspace.git
-version: '0.0400'
+version: '0.0500'
 x_Dist_Zilla:
   perl:
-    version: '5.030002'
+    version: '5.030003'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -144,7 +144,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@SHLOMIF/MetaProvides::Package'
       version: '2.004003'
@@ -402,6 +402,6 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.014'
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.30.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

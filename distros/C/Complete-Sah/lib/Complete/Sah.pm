@@ -1,9 +1,9 @@
 package Complete::Sah;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'Complete-Sah'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -83,12 +83,13 @@ sub complete_from_schema {
         my $rsch = ${"$pkg\::rschema"};
         $type = $rsch->[0];
         # let's just merge everything, for quick checking of clause
-        $cs = {};
-        for my $cs0 (@{ $rsch->[1] // [] }) {
+        my $merged_cs = {};
+        for my $cs0 (@{ $rsch->[1] // [] }, $cs) {
             for (keys %$cs0) {
-                $cs->{$_} = $cs0->{$_};
+                $merged_cs->{$_} = $cs0->{$_};
             }
         }
+        $cs = $merged_cs;
         log_trace("[compsah] retrieving schema from module %s, base type=%s", $pkg, $type);
     }
 
@@ -116,17 +117,19 @@ sub complete_from_schema {
                     my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                     require $mod_pm;
                     my $fref = \&{"$mod\::gen_completion"};
-                    log_trace("[compsah] invoking %s's gen_completion(%s) ...", $mod, $xcargs);
+                    log_trace("[compsah] invoking %s\::gen_completion(%s) ...", $mod, $xcargs);
                     $comp = $fref->(%$xcargs);
                 } else {
                     log_trace("[compsah] module %s is not installed, skipped", $mod);
                 }
             }
             if ($comp) {
-                log_trace("[compsah] using arg completion routine from schema's 'x.completion' attribute");
-                $fres = $comp->(
+                my %cargs = (
                     %{$args{extras} // {}},
-                    word=>$word, arg=>$args{arg}, args=>$args{args});
+                    word=>$word, arg=>$args{arg}, args=>$args{args},
+                );
+                log_trace("[compsah] using arg completion routine from schema's 'x.completion' attribute with args (%s)", \%cargs);
+                $fres = $comp->(%cargs);
                 return; # from eval
                 }
             }
@@ -359,7 +362,7 @@ Complete::Sah - Sah-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.006 of Complete::Sah (from Perl distribution Complete-Sah), released on 2020-03-04.
+This document describes version 0.007 of Complete::Sah (from Perl distribution Complete-Sah), released on 2020-06-04.
 
 =head1 SYNOPSIS
 

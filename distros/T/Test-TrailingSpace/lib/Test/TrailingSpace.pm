@@ -1,5 +1,5 @@
 package Test::TrailingSpace;
-$Test::TrailingSpace::VERSION = '0.0400';
+$Test::TrailingSpace::VERSION = '0.0500';
 use 5.014;
 use strict;
 use warnings;
@@ -18,30 +18,6 @@ sub new
     $self->_init(@_);
 
     return $self;
-}
-
-sub _find_cr
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        $self->{_find_cr} = shift;
-    }
-
-    return $self->{_find_cr};
-}
-
-sub _find_tabs
-{
-    my $self = shift;
-
-    if (@_)
-    {
-        $self->{_find_tabs} = shift;
-    }
-
-    return $self->{_find_tabs};
 }
 
 sub _filename_regex
@@ -80,6 +56,18 @@ sub _abs_path_prune_re
     return $self->{_abs_path_prune_re};
 }
 
+sub _path_cb
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{_path_cb} = shift;
+    }
+
+    return $self->{_path_cb};
+}
+
 sub _init
 {
     my ( $self, $args ) = @_;
@@ -87,9 +75,29 @@ sub _init
     $self->_root_path( exists( $args->{root} ) ? $args->{root} : '.' );
     $self->_filename_regex( $args->{filename_regex} );
     $self->_abs_path_prune_re( $args->{abs_path_prune_re} );
-    $self->_find_cr( $args->{find_cr} );
-    $self->_find_tabs( $args->{find_tabs} );
+    my $find_cr = $args->{find_cr};
 
+    my $OPEN_MODE = $find_cr ? '<:raw' : '<';
+    my $cb =
+"sub { my (\$p) = \@_;open( my \$fh, '$OPEN_MODE', \$p );while ( my \$l = <\$fh> ){chomp(\$l);";
+    $cb .=
+q#if ( $l =~ /[ \\t]+\\r?\\z/ ){diag("Found trailing space in file '$p'");return 1;}#;
+    if ( $args->{find_tabs} )
+    {
+        $cb .=
+q#if ( $l =~ /\\t/ ) { diag("Found hard tabs in file '$p'"); return 1; }#;
+    }
+
+    if ($find_cr)
+    {
+        $cb .=
+q# if ( $l =~ /\\r\\z/ ) { diag("Found Carriage Returns line endings in file '$p'"); return 1; }#;
+    }
+    $cb .= "} return 0;}";
+
+    ## no critic
+    $self->_path_cb( eval($cb) );
+    ## use critic
     return;
 }
 
@@ -104,8 +112,6 @@ sub no_trailing_space
     my $subrule = File::Find::Object::Rule->new;
 
     my $abs_path_prune_re = $self->_abs_path_prune_re();
-    my $find_cr           = $self->_find_cr();
-    my $find_tabs         = $self->_find_tabs();
 
     my $rule = $subrule->or(
         $subrule->new->exec(
@@ -126,35 +132,11 @@ sub no_trailing_space
           # ->exec(sub { print STDERR join(",", "Foo==", @_), "\n"; return 1; })
             ->name( $self->_filename_regex() ),
     )->start( $self->_root_path() );
+    my $cb = $self->_path_cb();
 
-    my $OPEN_MODE = $find_cr ? '<:raw' : '<';
     while ( my $path = $rule->match() )
     {
-        open( my $fh, $OPEN_MODE, $path );
-    LINES:
-        while ( my $line = <$fh> )
-        {
-            chomp($line);
-            if ( $line =~ /[ \t]+\r?\z/ )
-            {
-                ++$num_found;
-                diag("Found trailing space in file '$path'");
-                last LINES;
-            }
-            if ( $find_tabs and ( $line =~ /\t/ ) )
-            {
-                ++$num_found;
-                diag("Found hard tabs in file '$path'");
-                last LINES;
-            }
-            if ( $find_cr and ( $line =~ /\r\z/ ) )
-            {
-                ++$num_found;
-                diag("Found Carriage Returns line endings in file '$path'");
-                last LINES;
-            }
-        }
-        close($fh);
+        $num_found += $cb->($path);
     }
 
     return is( $num_found, 0, $blurb );
@@ -174,7 +156,7 @@ Test::TrailingSpace - test for trailing space in source files.
 
 =head1 VERSION
 
-version 0.0400
+version 0.0500
 
 =head1 SYNOPSIS
 

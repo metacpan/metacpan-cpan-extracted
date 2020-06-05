@@ -64,7 +64,7 @@
    "provides" : {
       "Test::TrailingSpace" : {
          "file" : "lib/Test/TrailingSpace.pm",
-         "version" : "0.0400"
+         "version" : "0.0500"
       }
    },
    "release_status" : "stable",
@@ -79,10 +79,10 @@
          "web" : "https://github.com/shlomif/perl-test-trailingspace"
       }
    },
-   "version" : "0.0400",
+   "version" : "0.0500",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030002"
+         "version" : "5.030003"
       },
       "plugins" : [
          {
@@ -217,7 +217,7 @@
                   "meta_noindex" : 1
                },
                "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000036",
+                  "Module::Metadata" : "1.000037",
                   "version" : "0.006"
                }
             },
@@ -553,7 +553,7 @@
          "version" : "6.014"
       }
    },
-   "x_generated_by_perl" : "v5.30.2",
+   "x_generated_by_perl" : "v5.30.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "MIT"
 }

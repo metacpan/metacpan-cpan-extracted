@@ -216,6 +216,8 @@ sub _get_jwk_curve_name {
 sub _verify {
     my ($self, $msg, $r, $s) = @_;
 
+    $_ = Crypt::Perl::BigInt->new($_) for ($r, $s);
+
     if ($r->is_positive() && $s->is_positive()) {
         my ($x, $y) = Crypt::Perl::ECDSA::Utils::split_G_or_public( $self->_decompress_public_point() );
         $_ = Crypt::Perl::BigInt->from_bytes($_) for ($x, $y);

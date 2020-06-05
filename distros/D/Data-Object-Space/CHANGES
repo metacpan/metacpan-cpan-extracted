@@ -1,6 +1,13 @@
 Changelog for Data-Object-Space
 
-2.07 2020-05-20T18:52:30
+2.08 2020-06-05T02:39:39
+ - Add release updates
+ - Add "tryload" method (#62)
+ - Add "all" method to exec on all parents (#63)
+ - Fix bad invocant on "AUTOLOAD" call (#64)
+
+2.07 2020-05-20T18:52:31
+ - Built release version 2.07
  - Add release updates
  - Fix typo in .gitattributes
  - Add support for using "use" in a package space (#57)

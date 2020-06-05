@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Complete::Module" => 0,
     "Role::Tiny::With" => 0,
-    "WordList" => "0.6.0",
+    "WordList" => "0.7.4",
     "WordListRole::FirstNextResetFromEach" => 0,
     "parent" => 0,
     "warnings" => 0
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,7 +43,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Role::Tiny::With" => 0,
   "Test::More" => 0,
-  "WordList" => "0.6.0",
+  "WordList" => "0.7.4",
   "WordListRole::FirstNextResetFromEach" => 0,
   "parent" => 0,
   "warnings" => 0

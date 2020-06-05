@@ -1,5 +1,9 @@
 Revision history for Getopt::EX -Mi18n module
 
+0.03 2020-06-05T07:17:08Z
+
+    - Add 'listopt' parameter.
+
 0.02 2020-06-04T14:59:23Z
 
     - Fix bug of exporting variable from iso* submodules.
