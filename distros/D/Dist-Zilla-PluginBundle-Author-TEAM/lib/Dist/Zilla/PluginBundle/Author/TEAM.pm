@@ -4,8 +4,9 @@ package Dist::Zilla::PluginBundle::Author::TEAM;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
- 
+our $VERSION = '0.004';
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
+
 =head1 NAME
 
 Dist::Zilla::PluginBundle::Author::TEAM - yet another plugin bundle for Dist::Zilla
@@ -29,7 +30,7 @@ has max_target_perl => (
         $self->payload->{'Test::MinimumVersion.max_target_perl'} // $self->payload->{max_target_perl} // '5.14.0';
     },
 );
- 
+
 has authority => (
     is      => 'ro',
     isa     => 'Str',
@@ -39,17 +40,17 @@ has authority => (
         $self->payload->{'Authority.authority'} // $self->payload->{authority} // 'cpan:TEAM';
     },
 );
- 
+
 has installer => (
     is      => 'ro',
     isa     => 'Str',
     lazy    => 1,
     default => sub { shift->payload->{installer} // 'MakeMaker' },
 );
- 
+
 sub configure {
     my $self = shift;
- 
+
     my @copy_from_build     = qw(LICENSE Makefile.PL);
     my @gather_exclude      = (@copy_from_build, qw(README.md));
     my @no_index            = qw(eg share shares t xt);
@@ -57,7 +58,7 @@ sub configure {
     my @git_remotes         = qw(github origin);
     my @check_files         = qw(:InstallModules :ExecFiles :TestFiles :ExtraTestFiles);
     my $perl_version_target = $self->max_target_perl;
- 
+
     my @plugins = (
         ['Git::GatherDir' => {
             exclude_filename => [ @gather_exclude ]
@@ -81,13 +82,12 @@ sub configure {
         ['SpellingCommonMistakesTests'],
         ['MetaTests'],
         ['Test::CPAN::Changes'],
-        ['Test::Pod::No404s'],
         ['Test::MinimumVersion' => {max_target_perl => $perl_version_target}],
         ['Test::EOL' => {finder => [@check_files]}],
         ['Test::NoTabs' => {finder => [@check_files]}],
         ['Test::Portability'],
         ['Test::ReportPrereqs'],
-        ['Authority' => {authority => $self->authority, do_munging => 0}],
+        ['Authority' => {authority => $self->authority, do_munging => 1, locate_comment => 1}],
         ['MetaJSON'],
         ['MetaYAML'],
         ['MetaNoIndex' => {directory => [@no_index]}],
@@ -104,12 +104,11 @@ sub configure {
         ['ReadmeAnyFromPod' => 'DistReadme' => {filename => 'README', location => 'build', type => 'text'}],
         ['Manifest'],
         ['ManifestSkip'],
- 
+
         $self->installer,     # e.g. MakeMaker
         ['NextRelease'],
         ['CheckChangesHasContent'],
         ['Git::Check' => {allow_dirty => [@allow_dirty], untracked_files => 'ignore'}],
-        ['RunExtraTests'],
         ['TestRelease'],
         ['UploadToCPAN'],
         ['ConfirmRelease'],
@@ -119,14 +118,14 @@ sub configure {
         ['ArchiveRelease' => { directory => '/home/tom/dev/CPAN-Archive' } ],
         ['Git::Push' => {push_to => 'github master +master:refs/heads/release +dist', remotes_must_exist => 0}],
     );
- 
+
     $self->add_plugins(@plugins);
 }
- 
+
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 with 'Dist::Zilla::Role::PluginBundle::PluginRemover';
 with 'Dist::Zilla::Role::PluginBundle::Config::Slicer';
- 
+
 __PACKAGE__->meta->make_immutable;
 
 1;

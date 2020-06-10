@@ -1,8 +1,9 @@
 package IO::Pager;
-our $VERSION = "1.01"; #Untouched since 1.00
+our $VERSION = "1.02"; #Untouched since 1.02
 
 use 5.008; #At least, for decent perlio, and other modernisms
 use strict;
+use warnings;
 use base qw( Tie::Handle );
 use Env qw( PAGER );
 use File::Spec;
@@ -20,7 +21,8 @@ sub find_pager {
 
   #Permit explicit use of pure perl pager
   local $_ = 'IO::Pager::less';
-  return $_ if $_[0] eq $_ or $PAGER eq $_;
+  return $_ if (defined($_[0]) && ($_[0] eq $_)) or
+      (defined($PAGER) && ($PAGER eq $_));
 
   # Use File::Which if available (strongly recommended)
   my $which = eval { require File::Which };
@@ -75,7 +77,7 @@ sub _check_pagers {
   return $io_pager;
 }
 
-#Should have this as first block for clarity, but not with its use of a sub :-/
+#Should have this as first block for clarity, but not with its use of a sub
 BEGIN { # Set the $ENV{PAGER} to something reasonable
   $PAGER = find_pager();
   
@@ -161,7 +163,8 @@ sub TIEHANDLE {
 #  if( $tied_fh =~ /\*(?:\w+::)?STD(?:OUT|ERR)$/ ){
 #      open($dupe_fh, '>&', $tied_fh) or warn "Unable to dupe $tied_fh";
 #  }
-  if ( $child = CORE::open($real_fh, '|-', $PAGER) ){
+  do{ no warnings; $child = CORE::open($real_fh, '|-', $PAGER) };
+  if ( $child ){
     my @oLayers = PerlIO::get_layers($tied_fh, details=>1, output=>1);
     my $layers = '';
     for(my $i=0;$i<$#oLayers;$i+=3){
@@ -256,7 +259,7 @@ sub CLOSE {
 #  *{$self->{tied_fh}} = *{$self->{dupe_fh}};
 }
 
-*DESTROY = \&CLOSE;
+{ no warnings 'once'; *DESTROY = \&CLOSE; }
 
 
 #Non-IO methods
@@ -280,7 +283,7 @@ __END__
 
 =head1 NAME
 
-IO::Pager - Select a pager and pipe text to it if destination is a TTY
+IO::Pager - Select a pager (possibly perl-based) & pipe it text if a TTY
 
 =head1 SYNOPSIS
 
@@ -543,12 +546,6 @@ C<less>, C<most>, C<w3m>, C<lv>, C<pg> and L<more>.
 
 =item 4. Term::Pager via IO::Pager::Perl
 
-=cut
-
-If instantiating an IO::Pager object and Term::Pager version 1.5 or greater is
-available, L<IO::Pager::Perl> will be used.
-
-=pod
 You may also set $ENV{PAGER} to
 Term::Pager to select this extensible, pure perl pager for display.
 
@@ -590,7 +587,7 @@ This module was inspired by Monte Mitzelfelt's IO::Page 0.02
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2019 Jerrad Pierce
+Copyright (C) 2003-2020 Jerrad Pierce
 
 =over
 

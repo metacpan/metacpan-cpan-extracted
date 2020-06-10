@@ -1,5 +1,19 @@
 Revision history for MIDI-Drummer
 
+0.0902 2020-06-09 10:19:42
+    - Improve documentation.
+    - Add an eighth-note flag to ->metronome44.
+
+0.0901 2020-06-08 16:47:53
+    - Clean up code slightly.
+    - Improve documentation slightly.
+
+0.0900 2020-06-08 16:37:01
+    - Improve and add to the eg/ programs.
+    - Add the ->metronome44 alias to the ->metronome method.
+    - Add the ->metronome34 method.
+    - Improve documentation.
+
 0.0803 2020-03-21 19:05:07
     - Do not document the ->BUILD method.
 

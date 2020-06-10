@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+
 
 use ExtUtils::MakeMaker;
 
@@ -14,10 +14,10 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Sah-Schemas-CryptoCurrency",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::CryptoCurrency",
   "PREREQ_PM" => {
     "Data::Sah::Coerce::perl::To_str::From_str::to_cryptocurrency_code" => 0,
+    "Data::Sah::Coerce::perl::To_str::From_str::to_cryptocurrency_safename" => 0,
     "Data::Sah::Coerce::perl::To_str::From_str::to_cryptoexchange_currency_pair" => 0,
     "Data::Sah::Coerce::perl::To_str::From_str::to_cryptoexchange_safename" => 0,
     "Data::Sah::Coerce::perl::To_str::From_str::to_fiat_or_cryptocurrency_code" => 0,
@@ -35,15 +35,12 @@ my %WriteMakefileArgs = (
     "Sah::Schema::currency::code" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah" => "0.903",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.98",
-    "strict" => 0,
-    "warnings" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.013",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,8 +48,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Sah" => "0.903",
   "Data::Sah::Coerce::perl::To_str::From_str::to_cryptocurrency_code" => 0,
+  "Data::Sah::Coerce::perl::To_str::From_str::to_cryptocurrency_safename" => 0,
   "Data::Sah::Coerce::perl::To_str::From_str::to_cryptoexchange_currency_pair" => 0,
   "Data::Sah::Coerce::perl::To_str::From_str::to_cryptoexchange_safename" => 0,
   "Data::Sah::Coerce::perl::To_str::From_str::to_fiat_or_cryptocurrency_code" => 0,
@@ -71,9 +68,7 @@ my %FallbackPrereqs = (
   "Perinci::Sub::XCompletion::cryptoexchange_safename" => 0,
   "Perinci::Sub::XCompletion::fiat_or_cryptocurrency" => 0,
   "Sah::Schema::currency::code" => 0,
-  "Test::More" => "0.98",
-  "strict" => 0,
-  "warnings" => 0
+  "Test::More" => 0
 );
 
 

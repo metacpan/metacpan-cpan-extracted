@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Role::Tiny" : "0"
+            "Role::Tiny" : "0",
+            "Term::App::Util::Interactive" : "0.002"
          }
       },
       "test" : {
@@ -56,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Role-TinyCommons-TermAttr-Interactive"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

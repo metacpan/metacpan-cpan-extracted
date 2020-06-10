@@ -54,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-PSchemas-Perl"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -164,7 +164,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.060"
+            "version" : "0.061"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",

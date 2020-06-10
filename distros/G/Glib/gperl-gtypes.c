@@ -132,6 +132,7 @@ GType
 gperl_param_flags_get_type (void)
 {
   static GType etype = 0;
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   if (etype == 0) {
     static const GFlagsValue values[] = {
       {G_PARAM_READABLE,       "G_PARAM_READABLE",       "readable"},
@@ -140,10 +141,22 @@ gperl_param_flags_get_type (void)
       {G_PARAM_CONSTRUCT_ONLY, "G_PARAM_CONSTRUCT_ONLY", "construct-only"},
       {G_PARAM_LAX_VALIDATION, "G_PARAM_LAX_VALIDATION", "lax-validation"},
       {G_PARAM_PRIVATE,        "G_PARAM_PRIVATE",        "private"},
+#if GLIB_CHECK_VERSION (2, 8, 0)
+      {G_PARAM_STATIC_NAME,    "G_PARAM_STATIC_NAME",    "static-name"},
+      {G_PARAM_STATIC_NICK,    "G_PARAM_STATIC_NICK",    "static-nick"},
+      {G_PARAM_STATIC_BLURB,   "G_PARAM_STATIC_BLURB",   "static-blurb"},
+#endif
+#if GLIB_CHECK_VERSION (2, 42, 0)
+      {G_PARAM_EXPLICIT_NOTIFY, "G_PARAM_EXPLICIT_NOTIFY", "explicit-notify"},
+#endif
+#if GLIB_CHECK_VERSION (2, 26, 0)
+      {G_PARAM_DEPRECATED,     "G_PARAM_DEPRECATED",     "deprecated"},
+#endif
       {0, NULL, NULL}
     };
     etype = g_flags_register_static ("GPerlParamFlags", values);
   }
+  G_GNUC_END_IGNORE_DEPRECATIONS
   return etype;
 }
 
@@ -452,12 +465,16 @@ GType gperl_shell_error_get_type (void);
 
 /* -------------------------------------------------------------------------- */
 
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 static const GEnumValue _gperl_spawn_error_values[] = {
   { G_SPAWN_ERROR_FORK, "G_SPAWN_ERROR_FORK", "fork" },
   { G_SPAWN_ERROR_READ, "G_SPAWN_ERROR_READ", "read" },
   { G_SPAWN_ERROR_CHDIR, "G_SPAWN_ERROR_CHDIR", "chdir" },
   { G_SPAWN_ERROR_ACCES, "G_SPAWN_ERROR_ACCES", "acces" },
   { G_SPAWN_ERROR_PERM, "G_SPAWN_ERROR_PERM", "perm" },
+#if GLIB_CHECK_VERSION (2, 32, 0)
+  { G_SPAWN_ERROR_TOO_BIG, "G_SPAWN_ERROR_TOO_BIG", "too-big" },
+#endif
   { G_SPAWN_ERROR_2BIG, "G_SPAWN_ERROR_2BIG", "2big" },
   { G_SPAWN_ERROR_NOEXEC, "G_SPAWN_ERROR_NOEXEC", "noexec" },
   { G_SPAWN_ERROR_NAMETOOLONG, "G_SPAWN_ERROR_NAMETOOLONG", "nametoolong" },
@@ -475,6 +492,7 @@ static const GEnumValue _gperl_spawn_error_values[] = {
   { G_SPAWN_ERROR_FAILED, "G_SPAWN_ERROR_FAILED", "failed" },
   { 0, NULL, NULL }
 };
+G_GNUC_END_IGNORE_DEPRECATIONS
 
 GType
 gperl_spawn_error_get_type (void)

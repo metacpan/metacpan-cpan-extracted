@@ -14,13 +14,17 @@ lib/JSON/Validator/Error.pm
 lib/JSON/Validator/Formats.pm
 lib/JSON/Validator/Joi.pm
 lib/JSON/Validator/Ref.pm
+lib/JSON/Validator/Schema.pm
+lib/JSON/Validator/Schema/Draft4.pm
+lib/JSON/Validator/Schema/Draft6.pm
+lib/JSON/Validator/Schema/Draft7.pm
 lib/JSON/Validator/Util.pm
 Makefile.PL
 MANIFEST			This list of files
 README.md
 t/00-basic.t
 t/acceptance.t
-t/booleans.t
+t/backcompat.t
 t/bundle.t
 t/coerce-default.t
 t/coerce.t
@@ -60,6 +64,9 @@ t/draft4-tests/refRemote.json
 t/draft4-tests/required.json
 t/draft4-tests/type.json
 t/draft4-tests/uniqueItems.json
+t/draft4.t
+t/draft6.t
+t/draft7.t
 t/formats.t
 t/get.t
 t/Helper.pm
@@ -115,12 +122,14 @@ t/spec/with-deep-mixed-ref.json
 t/spec/with-relative-ref.json
 t/stack/Some.pm
 t/stack/Some/Module.pm
+t/test/array.pm
+t/test/number.pm
+t/test/object.pm
 t/to-json.t
 t/util-checksum-yaml-xs.t
 t/util.t
 t/validate-draft07.t
 t/validate-id.t
-t/validate-json.t
 t/validate-recursive.t
 t/validate-schema.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

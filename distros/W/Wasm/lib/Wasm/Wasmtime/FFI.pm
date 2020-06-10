@@ -2,6 +2,7 @@ package Wasm::Wasmtime::FFI;
 
 use strict;
 use warnings;
+use 5.008004;
 use FFI::C 0.05;
 use FFI::Platypus 1.26;
 use FFI::Platypus::Buffer ();
@@ -11,7 +12,7 @@ use Devel::GlobalDestruction ();
 use base qw( Exporter );
 
 # ABSTRACT: Private class for Wasm::Wasmtime
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy );
@@ -260,7 +261,7 @@ Wasm::Wasmtime::FFI - Private class for Wasm::Wasmtime
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

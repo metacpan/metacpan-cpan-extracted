@@ -18,14 +18,12 @@ meta-spec:
 name: Role-TinyCommons-TermAttr-Color
 requires:
   Role::Tiny: '0'
-  Role::Tiny::With: '0'
-  Role::TinyCommons::TermAttr::Interactive: '0'
-  Role::TinyCommons::TermAttr::Software: '0'
+  Term::App::Util::Color: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-TermAttr-Color
   homepage: https://metacpan.org/release/Role-TinyCommons-TermAttr-Color
   repository: git://github.com/perlancar/perl-Role-TinyCommons-TermAttr-Color.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

@@ -17,15 +17,16 @@ $t->get_ok('/relative-to-the-root.json')->status_is(200);
 
 $base_url = $t->tx->req->url->to_abs->path('/');
 like $base_url, qr{^http}, 'got base_url to web server';
-is $jv->version, 4,    'default version';
 is $jv->_id_key, 'id', 'default id_key';
 
 delete $jv->{version};
 eval { $jv->load_and_validate_schema("${base_url}relative-to-the-root.json") };
 ok !$@, "${base_url}relative-to-the-root.json" or diag $@;
-is $jv->{version}, 4, 'detected version from draft-04';
 
 my $schema = $jv->schema;
+is $schema->moniker, 'draft04', 'moniker';
+is $schema->specification, 'http://json-schema.org/draft-04/schema#',
+  'specification';
 is $schema->get('/id'), 'http://example.com/relative-to-the-root.json',
   'get /id';
 is $schema->get('/definitions/B/id'), 'b.json', 'id /definitions/B/id';

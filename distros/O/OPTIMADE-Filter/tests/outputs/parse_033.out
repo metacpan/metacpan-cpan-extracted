@@ -57,4 +57,4 @@ $VAR1 = bless( {
 == Filter ==
 ((list LENGTH < "5") AND ((list LENGTH = "four") AND (list LENGTH >= max_length_of_the_list)))
 == SQL ==
-(<no SQL representation> AND (<no SQL representation> AND <no SQL representation>))
+<no SQL representation> AND (<no SQL representation> AND <no SQL representation>)

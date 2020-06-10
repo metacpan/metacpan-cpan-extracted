@@ -12,4 +12,4 @@ $VAR1 = bless( {
 == Filter ==
 ("5" < _exmpl_a)
 == SQL ==
-("5" < '_exmpl_a')
+"5" < '_exmpl_a'

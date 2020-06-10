@@ -16,7 +16,7 @@ use parent qw( HiPi::Interface::Common::HD44780 );
 use Carp;
 use HiPi qw( :lcd );
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 sub new {
     my ($class, %userparams) = @_;

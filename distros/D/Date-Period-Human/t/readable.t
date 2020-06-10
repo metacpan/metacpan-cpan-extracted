@@ -18,6 +18,7 @@ my @tests =(
     [ '2010-03-04 10:15:00', 'gisteren om 10:15',              'yesterday at 10:15',     '10:15 yesterday', 'Gestern um 10:15' ],
     [ '2010-03-01 10:00:00', '4 dagen geleden',                '4 days ago',             '4d ago',          'vor 4 Tagen' ],
     [ '2010-02-01 10:00:00', 'een maand geleden',              'a month ago',            '1m ago',          'vor einem Monat' ],
+    [ '2010-02-26 10:00:00', 'een week geleden',               'a week ago',             '1w ago',          'vor einer Woche' ],
 );
 
 my $d = Date::Period::Human->new({lang => 'nl', today_and_now => [2010,3,5,10,15,0]});

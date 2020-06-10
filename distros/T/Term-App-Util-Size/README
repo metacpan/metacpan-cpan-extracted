@@ -1,0 +1,116 @@
+NAME
+    Term::App::Util::Size - Determine the sane terminal size (width, height)
+
+VERSION
+    This document describes version 0.002 of Term::App::Util::Size (from
+    Perl distribution Term-App-Util-Size), released on 2020-06-10.
+
+DESCRIPTION
+FUNCTIONS
+  term_height
+    Usage:
+
+     term_height() -> [status, msg, payload, meta]
+
+    Try to determine the sane terminal height.
+
+    First will observe the LINES environment variable, and use it if
+    defined. Note that in a Unix shell like bash, COLUMNS and LINES are
+    shell variables and not environment variables, so they are not inherited
+    by child processes. You usually set the LINES environment variable when
+    you want to override the terminal height.
+
+    Then, if LINES is not defined, will try to use the Perl module
+    Term::Size to determine the terminal size and use the result if succeed.
+
+    Third, if the Perl module is not available, will run "tput lines" and
+    use the output returned by tput if succeed.
+
+    Otherwise will use the default value of 25.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  term_width
+    Usage:
+
+     term_width() -> [status, msg, payload, meta]
+
+    Try to determine the sane terminal width.
+
+    First will observe the COLUMNS environment variable, and use it if
+    defined. Note that in a Unix shell like bash, COLUMNS and LINES are
+    shell variables and not environment variables, so they are not inherited
+    by child processes. You usually set the COLUMNS environment variable
+    when you want to override the terminal width.
+
+    Then, if COLUMNS is not defined, will try to use Perl module Term::Size
+    to determine the terminal size and use the result if succeed.
+
+    Third, if the Perl module is not available, will run "tput cols" and use
+    the output returned by tput if succeed.
+
+    Otherwise will use the default value of 80 (79 on Windows; the default
+    command prompt window is 80x25 but printing one character on rightmost
+    column will cause the cursor to move to the next line, so we choose
+    80-1).
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+  COLUMNS
+  LINES
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Term-App-Util-Size>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Term-App-Util-Size>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Term-App-Util-Size>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other "Term::App::Util::*" modules.
+
+    Term::Size
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

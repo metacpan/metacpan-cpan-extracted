@@ -30,6 +30,7 @@ $modules{$_} = $_ for qw(
   Test2::V0
   Test::Alien::Diag
   YAML
+  autodie
 );
 
 $post_diag = sub {

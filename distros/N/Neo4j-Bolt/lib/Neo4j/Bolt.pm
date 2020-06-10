@@ -1,17 +1,20 @@
 package Neo4j::Bolt;
+use Neo4j::Client;
+use Cwd qw/realpath getcwd/;
+
 
 BEGIN {
-  our $VERSION = "0.12";
-  eval 'require Neo4j::Bolt::Config; 1';
+  our $VERSION = "0.20";
 }
+use Inline 'global';
 use Inline 
-  C => Config =>
-  LIBS => $Neo4j::Bolt::Config::extl,
-  INC => $Neo4j::Bolt::Config::extc,  
+  P => Config =>
+  LIBS => $Neo4j::Client::LIBS,
+  INC => join(' ',$Neo4j::Client::CCFLAGS,'-I'.realpath('include')),
   version => $VERSION,
   name => __PACKAGE__;
 
-use Inline C => <<'END_BOLT_C';
+use Inline P => <<'END_BOLT_C';
 #include <neo4j_config_struct.h>
 #include <neo4j-client.h>
 #define CXNCLASS "Neo4j::Bolt::Cxn"
@@ -134,7 +137,7 @@ Neo4j::Bolt - query Neo4j using Bolt protocol
    "MATCH (a) RETURN head(labels(a)) as lbl, count(a) as ct",
    {} # parameter hash required
  );
- @names = $stream->fieldnames;
+ @names = $stream->field_names;
  while ( my @row = $stream->fetch_next ) {
    print "For label '$row[0]' there are $row[1] nodes.\n";
  }
@@ -216,7 +219,7 @@ To connect by SSL/TLS, use connect_tls, with a hashref with keys as follows
 
 Example:
 
-  $cxn = Neo4j::Bolt->connect_tls('bolt://boogaloo-dudes.us:7687', { ca_cert => '/etc/ssl/cert.pem' });
+  $cxn = Neo4j::Bolt->connect_tls('bolt://all-the-young-dudes.us:7687', { ca_cert => '/etc/ssl/cert.pem' });
 
 When neither C<ca_dir> nor C<ca_file> are specified, an attempt will
 be made to use the default trust store instead.

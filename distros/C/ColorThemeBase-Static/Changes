@@ -1,0 +1,38 @@
+0.006   2020-06-09  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+        - Adjust to ColorTheme 2.1.0 (add get_args(), get_struct(), rename
+          get_color to get_item_color).
+
+        - New base class: ColorThemeBase::Base.
+
+
+0.005   2020-06-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename ColorThemeBase::Static{,::FromStructColors}. But the old name
+          is aliased.
+
+        - Add ColorThemeBase::Static::FromObjectColors.
+
+
+0.004   2020-06-08  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible] Adjust to ColorTheme 2.0.1 (rename
+	  get_color_list() to list_items()).
+
+
+0.003   2020-06-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [color theme Test::Static] test a color only returning background
+	  color and not foreground color.
+
+
+0.002   2020-06-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [test] Add tests.
+
+	- Split new() to ColorThemeBase::Constructor.
+
+
+0.001    2020-06-07  Released-By: PERLANCAR
+
+        - First release.

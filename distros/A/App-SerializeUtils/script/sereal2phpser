@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-10'; # DATE
-our $VERSION = '0.162'; # VERSION
+our $DATE = '2020-06-06'; # DATE
+our $VERSION = '0.163'; # VERSION
 
 use 5.010001;
 use strict;
@@ -93,9 +93,15 @@ OUTPUT: {
         } elsif ($Opts{dumper} eq 'Data::Dump') {
             require Data::Dump;
             $code_to = "Data::Dump::dump($code_from)";
+        } elsif ($Opts{dumper} eq 'Data::Bahe') {
+            require Data::Bahe;
+            $code_to = "Data::Bahe::dump($code_from)";
         } elsif ($Opts{dumper} eq 'Data::Dmp') {
             require Data::Dmp;
             $code_to = "Data::Dmp::dmp($code_from)";
+        } elsif ($Opts{dumper} eq 'Data::Dumper::Compact') {
+            require Data::Dumper::Compact;
+            $code_to = "Data::Dumper::Compact->dump($code_from)";
         } elsif ($Opts{dumper} eq 'Data::Dumper') {
             require Data::Dumper;
             $code_to = "Data::Dumper->new([$code_from], ['data'])->".
@@ -155,7 +161,7 @@ sereal2phpser - Convert between serialization formats
 
 =head1 VERSION
 
-This document describes version 0.162 of sereal2phpser (from Perl distribution App-SerializeUtils), released on 2020-04-10.
+This document describes version 0.163 of sereal2phpser (from Perl distribution App-SerializeUtils), released on 2020-06-06.
 
 =head1 SYNOPSIS
 

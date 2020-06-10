@@ -3,14 +3,16 @@ package Test2::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '1.302073';
+our $VERSION = '1.302175';
 
 
 use Test2::API::Instance;
 use Test2::Util qw/get_tid/;
 use Test2::API qw{
+    test2_in_preload
     test2_init_done
     test2_ipc
+    test2_has_ipc
     test2_ipc_enable_polling
     test2_pid
     test2_stack
@@ -18,14 +20,27 @@ use Test2::API qw{
     context
 };
 
+# Make sure stuff is finalized before anyone tried to fork or start a new thread.
+{
+    # Avoid warnings if things are loaded at run-time
+    no warnings 'void';
+    INIT {
+        use warnings 'void';
+        context()->release() unless test2_in_preload();
+    }
+}
+
 use Carp qw/confess/;
 
 our @EXPORT_OK = qw/cull/;
 BEGIN { require Exporter; our @ISA = qw(Exporter) }
 
-sub import {
-    goto &Exporter::import unless test2_init_done();
+sub unimport { Test2::API::test2_ipc_disable() }
 
+sub import {
+    goto &Exporter::import if test2_has_ipc || !test2_init_done();
+
+    confess "IPC is disabled" if Test2::API::test2_ipc_disabled();
     confess "Cannot add IPC in a child process (" . test2_pid() . " vs $$)" if test2_pid() != $$;
     confess "Cannot add IPC in a child thread (" . test2_tid() . " vs " . get_tid() . ")"  if test2_tid() != get_tid();
 
@@ -82,4 +97,4 @@ sub cull {
 
 __END__
 
-#line 140
+#line 160

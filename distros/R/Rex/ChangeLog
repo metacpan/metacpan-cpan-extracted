@@ -1,5 +1,28 @@
 Revision history for Rex
 
+1.11.0 2020-06-05 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Make group resource idempotent
+ - Fix sysctl detection for Gentoo
+ - Fix setting false values as sysctl parameters
+ - Fix passing external_master as Net::OpenSSH constructor parameter
+
+ [DOCUMENTATION]
+ - Clarify auth documentation
+ - Clarify setting per-host authentication details within a group
+ - Clarify documentation of configuring OpenSSH options
+ - Clarify Rex::Transaction documentation
+ - Fix typos
+ - Document limitations of nesting shared variables
+ - Add initial documentation for Rex::Hook
+ - Clarify hooks documentation
+ - Clarify synopsis and code example for Rex::Commands::MD5
+
+ [ENHANCEMENTS]
+ - Check availability of sysctl command
+ - Checksum file only when content is managed
+ - Support dotted semantic versioning for trial releases
+
 1.10.0 2020-05-05 Ferenc Erki <erkiferenc@gmail.com>
  [BUG FIXES]
  - Fix warning about redundant arguments when using sync with key

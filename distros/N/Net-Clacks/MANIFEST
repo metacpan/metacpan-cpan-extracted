@@ -16,7 +16,7 @@ example/exampleserver.key
 example/rawclient.pl
 example/README.txt
 example/server.pl
-lib/Net/Clacks.pod
+lib/Net/Clacks.pm
 lib/Net/Clacks/ClacksCache.pm
 lib/Net/Clacks/Client.pm
 lib/Net/Clacks/Server.pm

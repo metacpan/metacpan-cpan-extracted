@@ -1,18 +1,18 @@
 package Sah::Schema::hexbuf;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-02'; # DATE
+our $DATE = '2020-03-04'; # DATE
 our $DIST = 'Sah-Schemas-Binary'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $schema = [str => {
     summary => 'Binary data encoded in hexdigits',
     match => qr/\A([0-9A-fa-f][0-9A-fa-f])*\z/,
     examples => [
-        {data=>'', valid=>1},
-        {data=>'f', valid=>0, summary=>'Odd number of digits'},
-        {data=>'fafafa', valid=>1},
-        {data=>'fafafg', valid=>0},
+        {value=>'', valid=>1},
+        {value=>'f', valid=>0, summary=>'Odd number of digits'},
+        {value=>'fafafa', valid=>1},
+        {value=>'fafafg', valid=>0},
     ],
 }, {}];
 
@@ -32,19 +32,49 @@ Sah::Schema::hexbuf - Binary data encoded in hexdigits
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2020-03-02.
+This document describes version 0.004 of Sah::Schema::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2020-03-04.
 
 =head1 SYNOPSIS
 
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("hexbuf*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['hexbuf*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+
 Sample data:
 
- ""  # valid
+ undef  # valid
 
- "f"  # INVALID (Odd number of digits)
+ undef  # INVALID (Odd number of digits)
 
- "fafafa"  # valid
+ undef  # valid
 
- "fafafg"  # INVALID
+ undef  # INVALID
 
 =head1 HOMEPAGE
 

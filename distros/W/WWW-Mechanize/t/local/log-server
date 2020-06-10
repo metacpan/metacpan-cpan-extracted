@@ -1,9 +1,8 @@
 # Thanks to merlyn for nudging me and giving me this snippet!
 use strict;
-use HTTP::Daemon 6.05;
+use HTTP::Daemon ();
 use CGI 4.08;
 use Getopt::Long;
-use Socket ();
 
 $|++;
 
@@ -13,15 +12,7 @@ GetOptions(
 
 my $d = HTTP::Daemon->new or die;
 
-my $url = URI->new($d->url);
-if ($d->sockdomain == Socket::AF_INET) {
-    $url->host( '127.0.0.1' );
-} elsif ($d->sockdomain == Socket::AF_INET6) {
-    $url->host( '[::1]' );
-} else {
-    die "unexpected sockdomain: " . $d->sockdomain;
-}
-print "$url\n";
+print $d->url, "\n";
 
 my ($filename,$logfile) = @ARGV[0,1];
 if ($filename) {

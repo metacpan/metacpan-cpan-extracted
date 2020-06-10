@@ -42,39 +42,39 @@
    "provides" : {
       "Pg::Explain" : {
          "file" : "lib/Pg/Explain.pm",
-         "version" : "0.99"
+         "version" : "1.00"
       },
       "Pg::Explain::Analyzer" : {
          "file" : "lib/Pg/Explain/Analyzer.pm",
-         "version" : "0.99"
+         "version" : "1.00"
       },
       "Pg::Explain::From" : {
          "file" : "lib/Pg/Explain/From.pm",
-         "version" : "0.99"
+         "version" : "1.00"
       },
       "Pg::Explain::FromJSON" : {
          "file" : "lib/Pg/Explain/FromJSON.pm",
-         "version" : "0.99"
+         "version" : "1.00"
       },
       "Pg::Explain::FromText" : {
          "file" : "lib/Pg/Explain/FromText.pm",
-         "version" : "0.99"
+         "version" : "1.00"
       },
       "Pg::Explain::FromXML" : {
          "file" : "lib/Pg/Explain/FromXML.pm",
-         "version" : "0.99"
+         "version" : "1.00"
       },
       "Pg::Explain::FromYAML" : {
          "file" : "lib/Pg/Explain/FromYAML.pm",
-         "version" : "0.99"
+         "version" : "1.00"
       },
       "Pg::Explain::Node" : {
          "file" : "lib/Pg/Explain/Node.pm",
-         "version" : "0.99"
+         "version" : "1.00"
       },
       "Pg::Explain::StringAnonymizer" : {
          "file" : "lib/Pg/Explain/StringAnonymizer.pm",
-         "version" : "0.99"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -88,6 +88,6 @@
          "web" : "https://gitlab.com/depesz/Pg--Explain"
       }
    },
-   "version" : "0.99",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

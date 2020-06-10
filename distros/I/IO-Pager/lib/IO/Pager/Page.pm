@@ -1,6 +1,8 @@
 package IO::Pager::Page;
+use strict;
+use warnings;
 
-our $VERSION = 0.32;
+our $VERSION = 1.02;
 
 
 # The meat
@@ -19,7 +21,7 @@ sub import {
   $SIG{PIPE} = 'IGNORE' if $opt{hush};
 }
 
-"Badee badee badee that's all folks!";
+local $_= "Badee badee badee that's all folks!";
 
 __END__
 

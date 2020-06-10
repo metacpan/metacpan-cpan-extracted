@@ -1,21 +1,36 @@
 Revision history for JIP-LockFile
 
-0.051   2018-01-07
-        Updated Makefile.PL for version 2 of the CPAN distribution metadata specification.
+0.062  2020-06-09
+  - Improved portability of some tests.
 
-0.05    2015-06-01
-        Fixed Windows (mswin32) bugs in tests.
+0.061  2020-06-09
+  - Added error method.
+  - More tests.
+  - More documentation.
+  - Small minor improvements.
 
-0.04    2015-05-28
-        Small changes in distro.
+0.06  2020-05-11
+  - Removed dependency from JIP::ClassField.
+  - Added Perl 5.30 into ".travis.yml".
+  - Added get_lock_data method.
+  - Small changes in distro.
 
-0.03    2015-05-17
-        get_lock_file() is now lock_file().
-        JIP::ClassField for getters/setters.
+0.051  2018-01-07
+  - Updated Makefile.PL for version 2 of the CPAN distribution metadata specification.
 
-0.02    2015-04-29
-        Bugfixes.
+0.05  2015-06-01
+  - Fixed Windows (mswin32) bugs in tests.
 
-0.01    2015-04-19
-        First version, released on an unsuspecting world.
+0.04  2015-05-28
+  - Small changes in distro.
+
+0.03  2015-05-17
+  - get_lock_file() is now lock_file().
+  - JIP::ClassField for getters/setters.
+
+0.02  2015-04-29
+  - Bugfixes.
+
+0.01  2015-04-19
+  - First version, released on an unsuspecting world.
 

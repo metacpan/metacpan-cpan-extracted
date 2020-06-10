@@ -95,7 +95,8 @@ gperl_log_handler (const gchar   *log_domain,
                    const gchar   *message,
                    gpointer       user_data)
 {
-	char * desc;
+        char *desc;
+        char *env;
 
 	gboolean in_recursion = (log_level & G_LOG_FLAG_RECURSION) != 0;
 	gboolean is_fatal = (log_level & G_LOG_FLAG_FATAL) != 0;
@@ -107,12 +108,29 @@ gperl_log_handler (const gchar   *log_domain,
 		message = "(NULL) message";
 
 	switch (log_level) {
-		case G_LOG_LEVEL_CRITICAL: desc = "CRITICAL"; break;
-		case G_LOG_LEVEL_ERROR:    desc = "ERROR";    break;
-		case G_LOG_LEVEL_WARNING:  desc = "WARNING";  break;
-		case G_LOG_LEVEL_MESSAGE:  desc = "Message";  break;
-		default: desc = "LOG";
+                case G_LOG_LEVEL_ERROR:    desc = "ERROR";    break;
+                case G_LOG_LEVEL_CRITICAL: desc = "CRITICAL"; break;
+                case G_LOG_LEVEL_WARNING:  desc = "WARNING";  break;
+                case G_LOG_LEVEL_MESSAGE:  desc = "Message";  break;
+                case G_LOG_LEVEL_INFO:     desc = "INFO";     break;
+                case G_LOG_LEVEL_DEBUG:    desc = "DEBUG";    break;
+                default: desc = "LOG";
 	}
+
+        /* GLib will automatically skip debug messages unless the
+         * G_MESSAGES_DEBUG environment variable is set to either
+         * "all" or a colon-separated list of log domains that include
+         * the domain used for the message.
+         */
+        if (log_level & (G_LOG_LEVEL_INFO | G_LOG_LEVEL_DEBUG)) {
+                const char *env = g_getenv ("G_MESSAGES_DEBUG");
+                if (env == NULL)
+                        return;
+                if (strcmp (env, "all") != 0 &&
+                    (log_domain == NULL || strstr (env, log_domain) == NULL)) {
+                        return;
+                }
+        }
 
 	GPERL_SET_CONTEXT;
 	warn ("%s%s%s %s**: %s",
@@ -362,21 +380,27 @@ MODULE = Glib::Log	PACKAGE = Glib
 ##define g_message(...)  g_log (G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, __VA_ARGS__)
 ##define g_critical(...) g_log (G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, __VA_ARGS__)
 ##define g_warning(...)  g_log (G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, __VA_ARGS__)
+##define g_info(...)     g_log (G_LOG_DOMAIN, G_LOG_LEVEL_INFO, __VA_ARGS__)
+##define g_debug(...)    g_log (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG, __VA_ARGS__)
 void
 error (class, gchar_ornull * domain, const gchar * message)
     ALIAS:
-	error = 0
-	message = 1
-	critical = 2
-	warning = 3
+        error = 0
+        critical = 1
+        warning = 2
+        message = 3
+        info = 4
+        debug = 5
     PREINIT:
 	GLogLevelFlags flags = G_LOG_LEVEL_MESSAGE;
     CODE:
 	switch (ix) {
-		case 0: flags = G_LOG_LEVEL_ERROR; break;
-		case 1: flags = G_LOG_LEVEL_MESSAGE; break;
-		case 2: flags = G_LOG_LEVEL_CRITICAL; break;
-		case 3: flags = G_LOG_LEVEL_WARNING; break;
+                case 0: flags = G_LOG_LEVEL_ERROR; break;
+                case 1: flags = G_LOG_LEVEL_CRITICAL; break;
+                case 2: flags = G_LOG_LEVEL_WARNING; break;
+                case 3: flags = G_LOG_LEVEL_MESSAGE; break;
+                case 4: flags = G_LOG_LEVEL_INFO; break;
+                case 5: flags = G_LOG_LEVEL_DEBUG; break;
 	}
 	g_log (domain, flags, "%s", message);
 

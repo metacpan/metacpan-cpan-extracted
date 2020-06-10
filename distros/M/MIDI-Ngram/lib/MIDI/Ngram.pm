@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Find the top repeated note phrases of MIDI files
 
-our $VERSION = '0.1801';
+our $VERSION = '0.1806';
 
 use Moo;
 use strictures 2;
@@ -662,7 +662,7 @@ MIDI::Ngram - Find the top repeated note phrases of MIDI files
 
 =head1 VERSION
 
-version 0.1801
+version 0.1806
 
 =head1 SYNOPSIS
 
@@ -681,9 +681,11 @@ version 0.1801
   $mng->process;
 
   # Analyze
+  print Dumper $mng->dura_notes;
   print Dumper $mng->duras;
   print Dumper $mng->notes;
 
+  print Dumper $mng->dura_note_net;
   print Dumper $mng->dura_net;
   print Dumper $mng->note_net;
 
@@ -693,14 +695,17 @@ version 0.1801
   $mng->write;
 
   # Convert a MIDI number string to a duration or note name.
-  my $named = $mng->dura_convert('96');
-  $named = $mng->note_convert('60 61,62');
+  my $named = $mng->dura_convert('96'); # qn
+  $named = $mng->note_convert('60 61,62'); # C4 Cs4,D4
 
 =head1 DESCRIPTION
 
 C<MIDI::Ngram> parses a given list of MIDI files, finds the top
-repeated note phrases, builds the analysis, transition network, and
-renders to a MIDI file if desired.
+repeated note phrases, builds the transition networks, and renders to
+a MIDI file if desired.
+
+Note: This module currently assumes that all given B<in_file>s have
+the same MIDI ppqn (given by the first C<$opus-E<gt>ticks> seen).
 
 =head1 ATTRIBUTES
 
@@ -813,28 +818,52 @@ the B<populate> method.
 The hash-reference bucket of C<duration*note> ngrams.  Constructed by
 the B<process> method.
 
+The combination of duration with a note is indicated with the C<*>
+character.  For example: C<ten*Cs4>
+
 =head2 notes
 
 The hash-reference bucket of pitch ngrams.  Constructed by the
 B<process> method.
+
+Notes are represented in MIDI format with octave number like, C<Cs4>.
+A cluster of repeated notes is separated by spaces.  Simultaneous
+notes are separated with a comma (C<,>).  For example: C<A4,Cs5>.
 
 =head2 dura
 
 The hash-reference bucket of duration ngrams.  Constructed by the
 B<process> method.
 
+Durations are represented in MIDI::Simple style format.  For example,
+C<hn> for a known length and C<d123> for a tick duration.
+A cluster of repeated durations is separated by spaces.  Simultaneous
+durations are separated with a comma (C<,>).  For example: C<hn,d85>.
+
 =head2 dura_net
 
 A hash-reference ngram transition network of the durations.
+
+A dash or hyphen (C<->) divides nodes.  For example:
+C<qn,hn qn-qn,hn qn> where the nodes are both C<qn,hn qn> and
+C<qn,hn qn>.
 
 =head2 note_net
 
 A hash-reference ngram transition network of the notes.
 
+A dash or hyphen (C<->) divides nodes.  For example:
+C<A4 G4,E3-F4,D3 F4> where the nodes are C<A4 G4,E3> and
+C<F4,D3 F4>.
+
 =head2 dura_note_net
 
 A hash-reference ngram transition network of the durations and notes
 considered as a unit.
+
+A dash or hyphen (C<->) divides nodes.  For example:
+C<qn*C3 qn*G4,hn*E3-qn*G4 qn*F4,hn*F3> where the nodes are
+C<qn*C3 qn*G4,hn*E3> and C<qn*G4 qn*F4,hn*F3>.
 
 =head1 METHODS
 

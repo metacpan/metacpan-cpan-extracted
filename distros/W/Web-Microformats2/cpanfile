@@ -3,6 +3,7 @@ requires "HTML::Entities";
 requires "HTML::TreeBuilder::XPath";
 requires "JSON";
 requires "List::Util";
+requires "URI";
 requires "Moo";
 requires "MooX::HandlesVia";
 requires "Readonly";

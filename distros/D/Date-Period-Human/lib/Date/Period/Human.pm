@@ -6,7 +6,7 @@ use Carp;
 
 use Date::Calc qw/Delta_DHMS Today_and_Now N_Delta_YMDHMS/;
 
-our $VERSION='0.4.7';
+our $VERSION='0.4.8';
 
 use utf8; # umlauts in translations
 
@@ -299,8 +299,9 @@ sub human_readable {
 
 sub _translate {
     my ($self, $key, @values) = @_;
-
-    return sprintf($translation{$self->{lang}}{$key}, @values);
+    my $phrase = $translation{$self->{lang}}{$key};
+    return sprintf $phrase, @values if $phrase =~ /%/;
+    return $phrase;
 }
 
 1;

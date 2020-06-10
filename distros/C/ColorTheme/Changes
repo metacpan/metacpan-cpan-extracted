@@ -1,0 +1,56 @@
+2.1.0   2020-06-09  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
+
+	- [incompatible] Rename get_color() to get_item_color() to be more
+	  specific.
+
+	- Add get_args(), get_struct().
+
+	- [incompatible] Color theme structure: rename property 'colors' to
+	  'items' to avoid confusion with "item colors hash".
+
+        - Define "item colors hash" which is the value of each item in the
+	  'items' property.
+
+	- Add note about status of the 2.x specification.
+
+
+2.0.1   2020-06-08  Released-By: PERLANCAR; Backward-Compatible: no
+
+        - Revise.
+
+        - Specify 'args' property in the color theme structure.
+
+        - [incompatible change] Rename method get_color_list() to list_items().
+
+
+2.0.0   2020-06-07  Released-By: PERLANCAR; Backward-Compatible: no
+
+        - Renamed from Color-Theme to ColorTheme.
+
+        - Bump specification version from 0.10 to 2.
+
+        - Color theme module must now only contain a single theme. The color
+          theme structure must be put in %THEME (instead of the old
+          %color_themes).
+
+        - Color theme module must now be a class that is instantiated. It can
+          accept arguments ("parameterized color theme").
+
+        - Support dynamic theme (where the list of items cannot be fully
+          retrieved from C<colors> property of %THEME, but from
+          get_color_list().
+
+
+0.10.1  2018-02-25  Released-By: PERLANCAR
+
+        - No spec changes.
+
+        - Split Color::Theme::Util and Color::Theme::Role::* to their own dists.
+
+
+0.01    2014-12-11  Released-By: PERLANCAR
+
+        - First release, split from SHARYANTO-Roles and renamed module from
+          SHARYANTO::Role::ColorTheme to Color::Theme::Role. Some other changes:
+          split into two roles (Role and Role::ANSI for ANSI-specific stuffs),
+          rename some methods.

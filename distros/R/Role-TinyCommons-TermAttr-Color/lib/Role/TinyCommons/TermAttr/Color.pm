@@ -1,67 +1,34 @@
 package Role::TinyCommons::TermAttr::Color;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-05'; # DATE
+our $DATE = '2020-06-06'; # DATE
 our $DIST = 'Role-TinyCommons-TermAttr-Color'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Role::Tiny;
-use Role::Tiny::With;
-
-with 'Role::TinyCommons::TermAttr::Software';
-with 'Role::TinyCommons::TermAttr::Interactive';
-
-# return undef if fail to parse
-sub __parse_color_depth {
-    my $val = shift;
-    if ($val =~ /\A\d+\z/) {
-        return $val;
-    } elsif ($val =~ /\A(\d+)[ _-]?(?:bit|b)\z/) {
-        return 2**$val;
-    } else {
-        # IDEA: parse 'high color', 'true color'?
-        return undef;
-    }
-}
 
 sub termattr_use_color {
+    require Term::App::Util::Color;
+
     my $self = shift;
-    if (exists $ENV{NO_COLOR}) {
-        $self->{_termattr_debug_info}{use_color_from} = 'NO_COLOR env';
-        return 0;
-    } elsif (defined $ENV{COLOR}) {
-        $self->{_termattr_debug_info}{use_color_from} = 'COLOR env';
-        return $ENV{COLOR};
-    } elsif (defined $ENV{COLOR_DEPTH}) {
-        $self->{_termattr_debug_info}{use_color_from} = 'COLOR_DEPTH env';
-        my $val = __parse_color_depth($ENV{COLOR_DEPTH}) //
-            $ENV{COLOR_DEPTH};
-        return $val ? 1:0;
-    } else {
-        $self->{_termattr_debug_info}{use_color_from} =
-            'interactive + color_deth';
-        return $self->termattr_interactive && $self->termattr_color_depth > 0;
-    }
+
+    my $res = Term::App::Util::Color::term_app_should_use_color();
+    $self->{_termattr_debug_info} //= {};
+    $self->{_termattr_debug_info}{$_} = $res->[3]{'func.debug_info'}{$_}
+        for keys %{ $res->[3]{'func.debug_info'} };
+    $res->[2];
 }
 
 sub termattr_color_depth {
+    require Term::App::Util::Color;
+
     my $self = shift;
-    my $pval;
-    if (defined($ENV{COLOR_DEPTH}) &&
-            defined($pval = __parse_color_depth($ENV{COLOR_DEPTH}))) {
-        $self->{_termattr_debug_info}{color_depth_from} = 'COLOR_DEPTH env';
-        return $pval;
-    } elsif (defined($ENV{COLOR}) && $ENV{COLOR} !~ /^(|0|1)$/ &&
-                 defined($pval = __parse_color_depth($ENV{COLOR}))) {
-        $self->{_termattr_debug_info}{color_depth_from} = 'COLOR env';
-        return $pval;
-    } elsif (defined(my $cd = $self->termattr_software_info->{color_depth})) {
-        $self->{_termattr_debug_info}{color_depth_from} = 'detect_terminal';
-        return $cd;
-    } else {
-        $self->{_termattr_debug_info}{color_depth_from} = 'default';
-        return 16;
-    }
+
+    my $res = Term::App::Util::Color::term_app_color_depth();
+    $self->{_termattr_debug_info} //= {};
+    $self->{_termattr_debug_info}{$_} = $res->[3]{'func.debug_info'}{$_}
+        for keys %{ $res->[3]{'func.debug_info'} };
+    $res->[2];
 }
 
 1;
@@ -79,32 +46,17 @@ Role::TinyCommons::TermAttr::Color - Determine color depth and whether to use co
 
 =head1 VERSION
 
-This document describes version 0.001 of Role::TinyCommons::TermAttr::Color (from Perl distribution Role-TinyCommons-TermAttr-Color), released on 2020-06-05.
+This document describes version 0.002 of Role::TinyCommons::TermAttr::Color (from Perl distribution Role-TinyCommons-TermAttr-Color), released on 2020-06-06.
 
 =head1 DESCRIPTION
+
+These use L<Term::App::Util::Color> as backend.
 
 =head1 PROVIDED METHODS
 
 =head2 termattr_use_color
 
-Try to determine whether colors should be used. First will check NO_COLOR
-environment variable: if it exists then we should not use colors. Then check the
-COLOR environment variable: if it's false then color should not be used, if it's
-true then color should be used. Then check the COLOR_DEPTH environment variable:
-if it's true (not 0) then color should be used. Lastly check if running
-interactively.
-
 =head2 termattr_color_depth
-
-Try to determine the terminal's color depth.
-
-=head1 ENVIRONMENT
-
-=head2 COLOR
-
-=head2 COLOR_DEPTH
-
-=head2 NO_COLOR
 
 =head1 HOMEPAGE
 
@@ -124,10 +76,11 @@ feature.
 
 =head1 SEE ALSO
 
+L<Term::App::Util::Color>
+
 L<Role::TinyCommons>
 
-L<Term::App::Role::Attrs>, an earlier project, L<Moo::Role>, and currently more
-complete version.
+L<Term::App::Role::Attrs>, an earlier project, L<Moo::Role>.
 
 =head1 AUTHOR
 

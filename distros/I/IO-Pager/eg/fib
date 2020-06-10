@@ -1,0 +1,47 @@
+#!/usr/local/bin/perl
+use strict;
+use IO::Pager::Perl;
+use Term::ReadKey;
+
+my($m, $n)=(1,1);
+my $t = IO::Pager::Perl->new(pause=>"\cL", wrap=>1, pause=>"\cL",
+			     text=> ["1\n",
+				     sub{ ($m,$n)=($n,$m+$n); return "$m\n" } ]
+			     );
+my($PIPE, @F);
+#if( -t STDIN ){
+#  @F = <ARGV> }
+#else{
+#  #Separate piped input from keyboard input
+#  open($PIPE, '<&=STDIN' ) or die $!;
+#  close(STDIN);
+#  open(STDIN, '<', '/dev/tty') or die $!;
+#}
+
+eval{
+  while( $t->more(RT=>.05) ){
+#    my $X;
+#    defined($PIPE) ?
+#	do{ $t->add_text($X) if sysread($PIPE, $X, 1024) } :
+#	$t->add_text( splice(@F, 0, $t->rows()) );
+  }
+};
+
+__END__
+=pod
+
+=head1 NAME
+
+fib - display Fibanocci sequence via callback with a pure perl pager
+
+=head1 SEE ALSO
+
+L<IO::Pager::Perl>, L<less(1)>
+
+=head1 AUTHORS
+
+    Jerrad Pierce jpierce@cpan.org
+
+=head1 LICENSE
+ 
+=cut

@@ -1,0 +1,46 @@
+NAME
+    WordList::Color::Any - Wordlist from any Graphics::ColorNames::* module
+
+VERSION
+    This document describes version 0.001 of WordList::Color::Any (from Perl
+    distribution WordList-Color-Any), released on 2020-06-07.
+
+SYNOPSIS
+     use WordList::Color::Any;
+
+     my $wl = WordList::Color::Any->new(scheme => 'WWW');
+     $wl->each_word(sub { ... });
+
+DESCRIPTION
+    This is a dynamic, parameterized wordlist to get list of words from a
+    Graphics::ColorNames::* module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/WordList-Color-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-WordList-Color-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=WordList-Color-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    WordList
+
+    Graphics::ColorNames
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

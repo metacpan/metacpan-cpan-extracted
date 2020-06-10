@@ -1,7 +1,7 @@
 package Neo4j::Bolt::Relationship;
 # ABSTRACT: Representation of Neo4j Relationship
 
-$Neo4j::Bolt::Relationship::VERSION = '0.12';
+$Neo4j::Bolt::Relationship::VERSION = '0.20';
 
 use strict;
 use warnings;

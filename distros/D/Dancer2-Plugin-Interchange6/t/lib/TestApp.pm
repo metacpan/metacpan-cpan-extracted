@@ -6,6 +6,7 @@ use warnings;
 BEGIN {
     $ENV{DANCER_CONFDIR} = 't';
     $ENV{DANCER_ENVDIR}  = 't/environment';
+    $ENV{DANCER_VIEWS}   = 't/views';
     die "DANCER_ENVIRONMENT not set" unless $ENV{DANCER_ENVIRONMENT};
 }
 

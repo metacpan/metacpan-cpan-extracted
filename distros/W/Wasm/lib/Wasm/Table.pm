@@ -2,9 +2,10 @@ package Wasm::Table;
 
 use strict;
 use warnings;
+use 5.008004;
 
-# ABSTRACT: Interface to Web Assembly Tables
-our $VERSION = '0.10'; # VERSION
+# ABSTRACT: Interface to WebAssembly Tables
+our $VERSION = '0.14'; # VERSION
 
 
 1;
@@ -17,11 +18,11 @@ __END__
 
 =head1 NAME
 
-Wasm::Table - Interface to Web Assembly Tables
+Wasm::Table - Interface to WebAssembly Tables
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 DESCRIPTION
 

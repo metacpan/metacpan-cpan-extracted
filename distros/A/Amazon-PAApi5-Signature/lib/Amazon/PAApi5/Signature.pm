@@ -26,7 +26,7 @@ use Class::Accessor::Lite (
     /],
 );
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 sub new {
     my $class      = shift;
@@ -35,12 +35,15 @@ sub new {
     my $payload    = shift or croak 'payload is required';
     my $opt        = shift || {};
 
+    my $operation     = $opt->{operation} || 'SearchItems';
+    my $resource_path = $opt->{resource_path} ? $opt->{resource_path} : '/paapi5/' . lc($operation);
+
     return bless {
         access_key     => $access_key,
         secret_key     => $secret_key,
         payload        => $payload,
-        resource_path  => $opt->{resource_path}  || '/paapi5/searchitems',
-        operation      => $opt->{operation}      || 'SearchItems',
+        resource_path  => $resource_path,
+        operation      => $operation,
         host           => $opt->{host}           || 'webservices.amazon.com',
         region         => $opt->{region}         || 'us-east-1',
         service        => $opt->{service}        || 'ProductAdvertisingAPI',
@@ -191,9 +194,11 @@ Amazon::PAApi5::Signature - Amazon Product Advertising API(PA-API) 5.0 Helper
 
 =head1 SYNOPSIS
 
+This code is an example of US region.
+
     use Amazon::PAApi5::Payload;
     use Amazon::PAApi5::Signature;
-    use HTTP::Headers;
+    use HTTP::Request::Common;
     use LWP::UserAgent;
     use Data::Dumper;
 
@@ -214,22 +219,25 @@ Amazon::PAApi5::Signature - Amazon Product Advertising API(PA-API) 5.0 Helper
         }),
     );
 
-    my $ua = LWP::UserAgent->new(
-        default_headers => HTTP::Headers->new($sig->headers),
-    );
+    my $ua = LWP::UserAgent->new;
 
-    my $res = $ua->post($sig->req_url, Content => $sig->payload);
+    my $req = POST $sig->req_url, $sig->headers, Content => $sig->payload;
+    my $res = $ua->request($req);
 
     warn Dumper($res->status_line, $res->content);
 
-See B<example/> directory of this module.
+NOTE that Product Advertising API 5.0 has usage limit. Please confirm L<https://webservices.amazon.com/paapi5/documentation/troubleshooting/api-rates.html> or a page for your region.
+
+See B<example/> directory of this module for more examples.
+
+L<https://github.com/bayashi/Amazon-PAApi5-Signature/tree/master/example>
 
 
 =head1 DESCRIPTION
 
 Amazon::PAApi5::Signature generates a request headers and request body for Amazon Product Advertising API(PA-API) 5.0
 
-<https://webservices.amazon.com/paapi5/documentation/quick-start.html>
+L<https://webservices.amazon.com/paapi5/documentation/quick-start.html>
 
 
 =head1 METHODS
@@ -259,7 +267,7 @@ Get a hash for HTTP request
 
 =begin html
 
-<a href="https://github.com/bayashi/Amazon-PAApi5-Signature/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/Amazon-PAApi5-Signature"><img src="https://secure.travis-ci.org/bayashi/Amazon-PAApi5-Signature.png"/></a> <a href="https://coveralls.io/r/bayashi/Amazon-PAApi5-Signature"><img src="https://coveralls.io/repos/bayashi/Amazon-PAApi5-Signature/badge.png?branch=master"/></a>
+<a href="https://github.com/bayashi/Amazon-PAApi5-Signature/blob/master/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="http://travis-ci.org/bayashi/Amazon-PAApi5-Signature"><img src="https://secure.travis-ci.org/bayashi/Amazon-PAApi5-Signature.png?_t=1591465089"/></a> <a href="https://coveralls.io/r/bayashi/Amazon-PAApi5-Signature"><img src="https://coveralls.io/repos/bayashi/Amazon-PAApi5-Signature/badge.png?_t=1591465089&branch=master"/></a>
 
 =end html
 

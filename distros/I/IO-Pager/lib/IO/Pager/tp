@@ -1,13 +1,71 @@
 #!/usr/local/bin/perl
 use strict;
+use warnings;
 use IO::Pager::Perl;
 use Term::ReadKey;
+use Getopt::Long;
 
-my $t = IO::Pager::Perl->new(pause=>"\cL", wrap=>1, pause=>"\cL");
+my %Opts = (fold=>1);
+(my $LESS = $ENV{LESS}) =~ s/P.+(?:\$|$)//;
+$Opts{eof} = 1       if $LESS =~ /e/;
+$Opts{statusCol} = 1 if $LESS =~ /J/;
+$Opts{lineNo} = 1    if $LESS =~ /N/;
+$Opts{raw} = 1       if $LESS =~ /r/;
+$Opts{squeeze} = 1   if $LESS =~ /s/;
+$Opts{fold} = 0      if $LESS =~ /S/;
+$Opts{pause} = "\cL" if $ENV{MORE} =~ /l/;
+
+my %Long;
+#Custom argument processing
+{
+  no warnings 'uninitialized';
+  $Long{shift}  = -(grep { /^-\d+$/ }  @ARGV)[-1];
+  ($Long{jump}   =  (grep { /^\+\d+$/ } @ARGV)[-1]) =~ s/^\+//;
+  ($Long{search} =  (grep { /^\+\// }   @ARGV)[-1]) =~ s%\+/=%%;
+}
+@ARGV          =   grep { $_ !~ /^[-+]\d+$|^\+\// } @ARGV;
+Getopt::Long::Configure("no_ignore_case");
+GetOptions(\%Long,
+	   (map { "$_!"  } split//, 'JSenrs'),  # bare
+	   (map { "$_=s" } qw'j p cols'),       # args ##rows
+	   'l:s',
+	  );
+$Long{l} = "\cL" if defined($Long{l}) && $Long{l} eq '';
+
+$Opts{eof}       = $Long{e} if defined($Long{e});
+$Opts{statusCol} = $Long{J} if defined($Long{J});
+$Opts{pause}     = $Long{l} if defined($Long{l});
+$Opts{lineNo}    = $Long{n} if defined($Long{n});
+$Opts{raw}       = $Long{r} if defined($Long{r});
+$Opts{squeeze}   = $Long{s} if defined($Long{s});
+$Opts{shift}     = $Long{shift} if defined($Long{shift});
+#$Opts{rows}      = $Long{rows} if defined($Long{rows});
+$Opts{cols}      = $Long{cols} if defined($Long{cols});
+$Opts{fold}      = not $Long{S} if defined($Long{S});
+$Opts{jump}      = ($Long{j}||$Long{jump})
+  if defined($Long{j})||defined($Long{jump});
+$Opts{search}    = $Long{p}||$Long{search}
+  if defined($Long{p})||defined($Long{search});
+
+#use Data::Dumper; print Dumper \%Opts; exit 0;
+
+my $t = IO::Pager::Perl->new(%Opts);
 
 my($PIPE, @F);
 if( -t STDIN ){
-  @F = <ARGV> }
+#  @F = <ARGV> }
+  if( scalar(@ARGV) == 1){
+    @F = <ARGV> }
+  else{
+    foreach my $file ( @ARGV ){
+      my $err;
+      open(FILE, '<', $file) or $err = $!;
+      push @F, '='x8 ." $file ".'='x8 ." $err\n", <FILE>;
+      $F[-1] .= $/ unless $F[-1] =~ /\n$/;
+      close(FILE);
+    }
+  }
+}
 else{
   #Separate piped input from keyboard input
   open($PIPE, '<&=STDIN' ) or die $!;
@@ -27,11 +85,144 @@ eval{
 __END__
 =pod
 
-=head1 SEE ALSO
-
 =head1 NAME
 
 tp - a pure perl pager
+
+=head1 SYNOPSIS
+
+    tp -[JSenrs] [-cols] [-l[STR]] [-j|+ #] [-p|+/ STR]
+
+=head1 OPTIONS
+
+=over 4
+
+=item -e
+
+Exit at end of file.
+
+=item -f[STR]
+
+If defined, the pager will pause when the character sequence specified
+by STR is encountered in the input text. The default value when enabled
+is formfeed i.e; ^L; in order to mimic traditional behavior of L<more/1>.
+
+You might also supply a regular expression as STR e.g;
+
+    tp -f '[ie]t'
+
+=item -J
+
+Add a column with markers indicating which row match a search expression.
+
+=item -n
+
+Display line numbering.
+Toggleable at run time with I<#>.
+
+=item -r
+
+Send raw control characters from input unadulterated to the terminal.
+By default, chracters other than tab and newline will be converted to
+caret notation e.g; ^@ for null or ^L for form feed.
+
+=item -s
+
+Squeeze multiple blank lines into one.
+
+=item -S
+
+Do not fold long lines.
+
+=cut
+
+=# item -rows
+
+Set the number of rows for the pager.
+
+If absent, the terminal is queried directly with L<Term::ReadKey> if
+loaded or C<stty> or C<tput>, and if these fail it defaults to 25.
+
+=pod
+
+=item -cols
+
+Set the number of columns for the pager.
+
+If absent, the terminal is queried directly with L<Term::ReadKey> if
+loaded or C<stty> or C<tput>, and if these fail it defaults to 80.
+
+=back
+
+=head1 User Interface
+
+=over
+
+=item h - help
+
+=item q - close
+
+=item r or C-l - refresh
+
+=item ENTER or down arrow - scroll down one line
+
+=item d - scroll down one half page
+
+=item SPACE or C-v - scroll down one page
+
+=item b or M-v - scroll up one page 
+
+=item u - scroll up one half page
+
+=item y or up arrow - scroll up one line
+
+=item g or < - scroll to top
+
+=item G or > - scroll to bottom
+
+=item \d+ - jump to line number
+
+=item left arrow - scroll left
+
+=item right arrow - scroll right
+
+=item / - search forward
+
+=item ? - search backward
+
+=item n or P - next match
+
+=item p or N - previous match
+
+=item # - toggle line-numbering
+
+=item S - toggle folding
+
+=item C - toggle raw/cooked output
+
+=item m - save mark
+
+=item ' - goto mark
+
+Special marks
+
+=over 4
+
+=item ^ Beginning of file
+
+=item $ End of file
+
+=item ' Previous location
+
+=item " List user-created marks
+
+=back
+
+=back
+
+=head1 ENVIRONMENT
+
+tp checks the I<LESS>, I<MORE>, I<TERM> and I<TERMCAP> variables.
 
 =head1 SEE ALSO
 

@@ -2,6 +2,8 @@ package Wasm::Wasmtime;
 
 use strict;
 use warnings;
+use 5.008004;
+use Wasm::Wasmtime::Caller;
 use Wasm::Wasmtime::Config;
 use Wasm::Wasmtime::Engine;
 use Wasm::Wasmtime::ExportType;
@@ -23,7 +25,7 @@ use Wasm::Wasmtime::WasiConfig;
 use Wasm::Wasmtime::WasiInstance;
 
 # ABSTRACT: Perl interface to Wasmtime
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 1;
@@ -40,7 +42,7 @@ Wasm::Wasmtime - Perl interface to Wasmtime
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

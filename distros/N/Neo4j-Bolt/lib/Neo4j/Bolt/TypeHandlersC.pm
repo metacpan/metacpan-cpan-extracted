@@ -1,24 +1,22 @@
 package Neo4j::Bolt::TypeHandlersC;
 BEGIN {
-  our $VERSION = "0.12";
-  eval 'require Neo4j::Bolt::Config; 1';
+  our $VERSION = "0.20";
 }
 use JSON::PP; # operator overloading for boolean values
 use Neo4j::Bolt::Node;
 use Neo4j::Bolt::Relationship;
 use Neo4j::Bolt::Path;
+use Neo4j::Client;
 
 use Inline 'global';
-use Inline C => Config =>
-  LIBS => $Neo4j::Bolt::Config::extl,
-  INC => $Neo4j::Bolt::Config::extc,
-  optimize => '-g',
-  myextlib => $Neo4j::Bolt::Config::liba,
+use Inline P => Config =>
+  LIBS => $Neo4j::Client::LIBS,
+  INC => $Neo4j::Client::CCFLAGS,
   ccflagsex => '-Wno-comment',
   version => $VERSION,
   name => __PACKAGE__;
 
-use Inline C => <<'END_TYPE_HANDLERS_C';
+use Inline P => <<'END_TYPE_HANDLERS_C';
 
 #include <neo4j-client.h>
 
@@ -72,7 +70,7 @@ neo4j_value_t AV_to_neo4j_list(AV *av);
 neo4j_value_t HV_to_neo4j_map(HV *hv);
 neo4j_value_t HV_to_neo4j_node(HV *hv);
 neo4j_value_t HV_to_neo4j_relationship(HV *hv);
-neo4j_value_t AV_to_neo4j_path(HV *hv);
+neo4j_value_t AV_to_neo4j_path(AV *av);
 neo4j_value_t SV_to_neo4j_value(SV *sv);
 
 SV* neo4j_bool_to_SViv( neo4j_value_t value );
@@ -133,7 +131,7 @@ neo4j_value_t SV_to_neo4j_value(SV *sv) {
     thing = SvRV(sv);
     t = SvTYPE(thing);
     if ( t < SVt_PVAV) { // scalar ref
-      if (sv_isobject(sv) && sv_isa(sv, "JSON::PP::Boolean") || SvIOK(thing) && SvIV(thing) >> 1 == 0) {
+      if ((sv_isobject(sv) && sv_isa(sv, "JSON::PP::Boolean")) || (SvIOK(thing) && SvIV(thing) >> 1 == 0)) {
         // boolean (accepts JSON::PP, Types::Serialiser, literal \1 and \0)
         return SViv_to_neo4j_bool(thing);
       }
@@ -309,7 +307,7 @@ neo4j_value_t HV_to_neo4j_relationship(HV *hv) {
   return neo4j_relationship(fields);
 }
 
-neo4j_value_t AV_to_neo4j_path(HV *hv) {
+neo4j_value_t AV_to_neo4j_path(AV *av) {
   fprintf(stderr, "Not yet implemented");
   return neo4j_null;
 }

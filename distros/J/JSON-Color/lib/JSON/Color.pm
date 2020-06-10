@@ -1,40 +1,21 @@
 package JSON::Color;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-09'; # DATE
+our $DIST = 'JSON-Color'; # DIST
+our $VERSION = '0.130'; # VERSION
+
 use 5.010001;
 use strict;
 use warnings;
 
 our $sul_available = eval { require Scalar::Util::LooksLikeNumber; 1 } ? 1:0;
-use Term::ANSIColor qw(:constants);
-
-# PUSHCOLOR and LOCALCOLOR cannot be used, they are functions, not escape codes
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(encode_json);
 
-our $VERSION = '0.12'; # VERSION
-
-our %theme = (
-    start_quote         => BOLD . BRIGHT_GREEN,
-    end_quote           => RESET,
-    start_string        => GREEN,
-    end_string          => RESET,
-    start_string_escape => BOLD,
-    end_string_escape   => RESET . GREEN, # back to string
-    start_number        => BOLD . BRIGHT_MAGENTA,
-    end_number          => RESET,
-    start_bool          => CYAN,
-    end_bool            => RESET,
-    start_null          => CYAN,
-    end_null            => RESET,
-    start_object_key    => MAGENTA,
-    end_object_key      => RESET,
-    start_object_key_escape => BOLD,
-    end_object_key_escape   => RESET . MAGENTA, # back to object key
-    start_linum         => REVERSE . WHITE,
-    end_linum           => RESET,
-);
+use Color::ANSI::Util qw(ansi_reset);
 
 my %esc = (
     "\n" => '\n',
@@ -49,69 +30,75 @@ my %esc = (
 sub _string {
     my ($value, $opts) = @_;
 
-    my ($sq, $eq, $ss, $es, $sse, $ese);
+    my $ct = $opts->{_color_theme_obj};
+    my $c_reset = ansi_reset(1);
+    my ($c_q, $c_s, $c_e);
     if ($opts->{obj_key}) {
-        $sq  = $theme{start_object_key};
-        $eq  = $theme{end_object_key};
-        $ss  = $theme{start_object_key};
-        $es  = $theme{end_object_key};
-        $sse = $theme{start_object_key_escape};
-        $ese = $theme{end_object_key_escape};
+        $c_s  = $ct->get_item_color_as_ansi('object_key');
+        $c_q  = $ct->get_item_color_as_ansi('object_key_quote');
+        $c_e  = $ct->get_item_color_as_ansi('object_key_escape');
     } else {
-        $sq  = $theme{start_quote};
-        $eq  = $theme{end_quote};
-        $ss  = $theme{start_string};
-        $es  = $theme{end_string};
-        $sse = $theme{start_string_escape};
-        $ese = $theme{end_string_escape};
+        $c_s  = $ct->get_item_color_as_ansi('string');
+        $c_q  = $ct->get_item_color_as_ansi('string_quote');
+        $c_e  = $ct->get_item_color_as_ansi('string_escape');
     }
 
     $value =~ s/([\x22\x5c\n\r\t\f\b])|([\x00-\x08\x0b\x0e-\x1f])/
         join("",
-             $sse,
+             $c_e,
              $1 ? $esc{$1} : '\\u00' . unpack('H2', $2),
-             $ese,
+             $c_reset, $c_s,
          )
             /eg;
 
     return join(
         "",
-        $sq, '"', $eq,
-        $ss, $value, $es,
-        $sq, '"', $eq,
+        $c_q, '"', $c_reset,
+        $c_s, $value, $c_reset,
+        $c_q, '"', $c_reset,
     );
 }
 
 sub _number {
     my ($value, $opts) = @_;
 
+    my $ct = $opts->{_color_theme_obj};
     return join(
         "",
-        $theme{start_number}, $value, $theme{end_number},
+        $ct->get_item_color_as_ansi('number'),
+        $value,
+        ansi_reset(1),
     );
 }
 
 sub _null {
     my ($value, $opts) = @_;
 
+    my $ct = $opts->{_color_theme_obj};
     return join(
         "",
-        $theme{start_null}, "null", $theme{end_null},
+        $ct->get_item_color_as_ansi('null'),
+        "null",
+        ansi_reset(1),
     );
 }
 
 sub _bool {
     my ($value, $opts) = @_;
 
+    my $ct = $opts->{_color_theme_obj};
     return join(
         "",
-        $theme{start_bool}, "$value", $theme{end_bool},
+        $ct->get_item_color_as_ansi($value ? 'true' : 'false'),
+        "$value",
+        ansi_reset(1),
     );
 }
 
 sub _array {
     my ($value, $opts) = @_;
 
+    #my $ct = $opts->{_color_theme_obj};
     return "[]" unless @$value;
     my $indent  = $opts->{pretty} ? "   " x  $opts->{_indent}    : "";
     my $indent2 = $opts->{pretty} ? "   " x ($opts->{_indent}+1) : "";
@@ -120,10 +107,10 @@ sub _array {
     return join(
         "",
         "[$nl",
-        (map {
+        (map {(
             $indent2,
             _encode($value->[$_], $opts),
-            $_ == @$value-1 ? $nl : ",$nl",
+            $_ == @$value-1 ? $nl : ",$nl",)
         } 0..@$value-1),
         $indent, "]",
     );
@@ -132,6 +119,7 @@ sub _array {
 sub _hash {
     my ($value, $opts) = @_;
 
+    #my $ct = $opts->{_color_theme_obj};
     return "{}" unless keys %$value;
     my $indent  = $opts->{pretty} ? "   " x  $opts->{_indent}    : "";
     my $indent2 = $opts->{pretty} ? "   " x ($opts->{_indent}+1) : "";
@@ -151,7 +139,7 @@ sub _hash {
         my $k = $k[$_];
         push @res, (
             $indent2,
-            _string($k, {obj_key=>1}),
+            _string($k, {%$opts, obj_key=>1}),
             $colon,
             _encode($value->{$k}, $opts),
             $_ == @k-1 ? $nl : ",$nl",
@@ -191,6 +179,17 @@ sub encode_json {
     my ($value, $opts) = @_;
     $opts //= {};
     $opts->{_indent} //= 0;
+    $opts->{color_theme} //=
+        $ENV{JSON_COLOR_COLOR_THEME} //
+        $ENV{COLOR_THEME} //
+        "JSON::Color::ColorTheme::default_ansi";
+
+    require Module::Load::Util;
+    my $ct = Module::Load::Util::instantiate_class_with_optional_args($opts->{color_theme});
+    require Role::Tiny;
+    Role::Tiny->apply_roles_to_object($ct, 'ColorThemeRole::ANSI');
+    $opts->{_color_theme_obj} = $ct;
+
     my $res = _encode($value , $opts);
 
     if ($opts->{linum}) {
@@ -199,7 +198,7 @@ sub encode_json {
         my $fmt = "%".length($lines)."d";
         my $i = 0;
         $res =~ s/^/
-            $theme{start_linum} . sprintf($fmt, ++$i) . $theme{end_linum}
+            $ct->get_item_color('linum') . sprintf($fmt, ++$i) . ansi_reset(1)
                 /meg;
     }
     $res;
@@ -220,7 +219,7 @@ JSON::Color - Encode to colored JSON
 
 =head1 VERSION
 
-This document describes version 0.12 of JSON::Color (from Perl distribution JSON-Color), released on 2016-08-23.
+This document describes version 0.130 of JSON::Color (from Perl distribution JSON-Color), released on 2020-06-09.
 
 =head1 SYNOPSIS
 
@@ -244,6 +243,11 @@ like Regexp or file handle).
 Known options:
 
 =over
+
+=item * color_theme => STR
+
+Pick a color theme, which is a L<ColorTheme>-confirming color theme module. The
+default is L<JSON::Color::ColorTheme::default>. For example: L<ColorTheme::Lens::Lighten>
 
 =item * pretty => BOOL (default: 0)
 
@@ -294,6 +298,16 @@ prerequisite is installed:
  % perl -MJSON::Color=encode_json -E'say encode_json([1, "1"])'
  [1,"1"]
 
+=head1 ENVIRONMENT
+
+=head2 JSON_COLOR_COLOR_THEME
+
+Set default color theme. Has precedence over L</COLOR_THEME>.
+
+=head2 COLOR_THEME
+
+Set default color theme.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/JSON-Color>.
@@ -323,7 +337,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

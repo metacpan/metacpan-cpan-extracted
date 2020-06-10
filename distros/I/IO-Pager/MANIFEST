@@ -8,6 +8,7 @@ lib/IO/Pager/Unbuffered.pm
 lib/IO/Pager/less.pm
 lib/IO/Pager/Perl.pm
 lib/IO/Pager/tp
+eg/fib
 README
 TODO
 .proverc

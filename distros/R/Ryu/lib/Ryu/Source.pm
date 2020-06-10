@@ -5,7 +5,8 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '1.012'; # VERSION
+our $VERSION = '2.001'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
 
@@ -24,11 +25,78 @@ This is probably the module you'd want to start with, if you were going to be
 using any of this. There's a disclaimer in L<Ryu> that may be relevant at this
 point.
 
+=head2 Quick start
+
+You'd normally want to start by creating a L<Ryu::Source> instance:
+
+ my $src = Ryu::Source->new;
+
+If you're dealing with L<IO::Async> code, use L<Ryu::Async> to ensure that you
+get properly awaitable L<Future> instances:
+
+ $loop->add(my $ryu = Ryu::Async->new);
+ my $src = $ryu->source;
+
+Once you have a source, you'll need two things:
+
+=over 4
+
+=item * items to put into one end
+
+=item * processing to attach to the other end
+
+=back
+
+For the first, call L</emit>:
+
+ # 1s drifting periodic timer
+ while(1) {
+  await $loop->delay_future(after => 1);
+  $src->emit('');
+ }
+
+For the second, this would be L</each>:
+
+ $src->each(sub { print "Had timer tick\n" });
+
+So far, not so useful - the power of this type of reactive programming is in the
+ability to chain and combine disparate event sources.
+
+At this point, L<https://rxmarbles.com> is worth a visit - this provides a clear
+visual demonstration of how to combine multiple event streams using the chaining
+methods. Most of the API here is modelled after similar principles.
+
+First, the L</map> method: this provides a way to transform each item into
+something else:
+
+ $src->map(do { my $count = 0; sub { ++$count } })
+     ->each(sub { print "Count is now $_\n" })
+
+Next, L</filter> provides an equivalent to Perl's L<grep> functionality:
+
+ $src->map(do { my $count = 0; sub { ++$count } })
+     ->filter(sub { $_ % 2 })
+     ->each(sub { print "Count is now at an odd number: $_\n" })
+
+You can stack these:
+
+ $src->map(do { my $count = 0; sub { ++$count } })
+     ->filter(sub { $_ % 2 })
+     ->filter(sub { $_ % 5 })
+     ->each(sub { print "Count is now at an odd number which is not divisible by 5: $_\n" })
+
+or:
+
+ $src->map(do { my $count = 0; sub { ++$count } })
+     ->map(sub { $_ % 3 ? 'fizz' : $_ })
+     ->map(sub { $_ % 5 ? 'buzz' : $_ })
+     ->each(sub { print "An imperfect attempt at the fizz-buzz game: $_\n" })
+
 =cut
 
 no indirect;
-
 use sort qw(stable);
+
 use Scalar::Util ();
 use Ref::Util ();
 use List::Util ();
@@ -36,7 +104,10 @@ use List::UtilsBy;
 use Encode ();
 use Syntax::Keyword::Try;
 use Future;
+use Future::Queue;
 use curry::weak;
+
+use Ryu::Buffer;
 
 use Log::Any qw($log);
 
@@ -819,6 +890,50 @@ sub as_string {
         $data .= $_;
     });
     $self->completed->transform(done => sub { $data })
+}
+
+=head2 as_queue
+
+Returns a L<Future::Queue> instance which will
+L<Future::Queue/push> items whenever the source
+emits them.
+
+Unfortunately there is currently no way to tell
+when the queue will end, so you'd need to track
+that separately.
+
+=cut
+
+sub as_queue {
+    my ($self) = @_;
+    my $queue = Future::Queue->new;
+    $self->each(sub {
+        $queue->push($_)
+    });
+    return $queue;
+}
+
+=head2 as_buffer
+
+Returns a L<Ryu::Buffer> instance, which will
+L<Ryu::Buffer/write> any emitted items from this
+source to the buffer as they arrive.
+
+Intended for stream protocol handling - individual
+sized packets are perhaps better suited to the
+L<Ryu::Source> per-item behaviour.
+
+=cut
+
+sub as_buffer {
+    my ($self) = @_;
+    my $buffer = Ryu::Buffer->new(
+        new_future => $self->{new_future}
+    );
+    $self->each(sub {
+        $buffer->write($_)
+    });
+    return $buffer;
 }
 
 =head2 combine_latest

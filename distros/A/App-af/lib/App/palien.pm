@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.014;
 
-package App::palien 0.15 {
+package App::palien 0.16 {
 
 use Getopt::Long qw( GetOptions );
 use Pod::Usage qw( pod2usage );
@@ -213,7 +213,7 @@ App::palien - Command line interface to Alien::Base
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 DESCRIPTION
 

@@ -10,7 +10,7 @@ configure_requires:
   Module::Build::Pluggable: '0'
   Module::Build::Pluggable::CPANfile: '0.05'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ provides:
     file: lib/Amazon/PAApi5/Payload.pm
   Amazon::PAApi5::Signature:
     file: lib/Amazon/PAApi5/Signature.pm
-    version: '0.02'
+    version: '0.04'
 requires:
   Carp: '0'
   Class::Accessor::Lite: '0'
@@ -36,5 +36,5 @@ resources:
   bugtracker: http://github.com/bayashi/Amazon-PAApi5-Signature/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: http://github.com/bayashi/Amazon-PAApi5-Signature
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

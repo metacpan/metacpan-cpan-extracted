@@ -1,9 +1,9 @@
 package Sah::Schema::currency::code;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-02'; # DATE
+our $DATE = '2020-03-04'; # DATE
 our $DIST = 'Sah-Schemas-Currency'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use Locale::Codes::Currency_Codes ();
 
@@ -22,9 +22,9 @@ _
     in => $codes,
     'x.perl.coerce_rules' => ['From_str::to_upper'],
     examples => [
-        {data=>'', valid=>0},
-        {data=>'idr', valid=>1, res=>'IDR'},
-        {data=>'foo', valid=>0},
+        {value=>'', valid=>0},
+        {value=>'idr', valid=>1, res=>'IDR'},
+        {value=>'foo', valid=>0},
     ],
 }, {}];
 
@@ -43,17 +43,47 @@ Sah::Schema::currency::code - Currency code
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schema::currency::code (from Perl distribution Sah-Schemas-Currency), released on 2020-03-02.
+This document describes version 0.006 of Sah::Schema::currency::code (from Perl distribution Sah-Schemas-Currency), released on 2020-03-04.
 
 =head1 SYNOPSIS
 
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("currency::code*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['currency::code*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+
 Sample data:
 
- ""  # INVALID
+ undef  # INVALID
 
- "idr"  # valid, becomes "IDR"
+ undef  # valid, becomes "IDR"
 
- "foo"  # INVALID
+ undef  # INVALID
 
 =head1 DESCRIPTION
 

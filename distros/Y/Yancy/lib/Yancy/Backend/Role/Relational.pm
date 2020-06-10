@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::Relational;
-our $VERSION = '1.058';
+our $VERSION = '1.060';
 # ABSTRACT: A role to give a relational backend relational capabilities
 
 #pod =head1 SYNOPSIS
@@ -407,7 +407,7 @@ sub read_schema {
     for my $table ( @table_names ) {
         my @foreign_keys;
         for my $foreign_table ( @table_names ) {
-            my $sth = $db->dbh->foreign_key_info( undef, undef, $foreign_table, undef, undef, $table );
+            my $sth = $db->dbh->foreign_key_info( $dbcatalog, $dbschema, $foreign_table, $dbcatalog, $dbschema, $table );
             next unless $sth; # Pg returns null if no foreign keys
             push @foreign_keys, @{ $sth->fetchall_arrayref( {} ) };
         }
@@ -451,7 +451,7 @@ Yancy::Backend::Role::Relational - A role to give a relational backend relationa
 
 =head1 VERSION
 
-version 1.058
+version 1.060
 
 =head1 SYNOPSIS
 

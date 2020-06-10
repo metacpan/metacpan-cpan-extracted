@@ -12,6 +12,7 @@ use Music::Scales;
 my $max    = shift || 16;
 my $note   = shift || 'C';
 my $type   = shift || 'major';
+my $scale  = shift || 'pentatonic';
 my $octave = shift || 4;
 my $bpm    = shift || 100;
 my $leads  = shift || '1 2 4 7';
@@ -19,7 +20,7 @@ my $leads  = shift || '1 2 4 7';
 my $quarter = 'qn';
 my $half    = 'hn';
 
-my @scale = get_scale_MIDI( $note, $octave, $type );
+my @scale = get_scale_MIDI( $note, $octave, $scale );
 
 my @leaders = split /\s+/, $leads;
 
@@ -43,6 +44,7 @@ for my $i ( 1 .. $max ) {
             type    => 'half',
             leading => $leaders[ int rand @leaders ],
         );
+        $chords = clip( $mc, $chords ); # Remove a random note from the chord
         $score->n( $half, @$_ ) for @$chords;
     }
 }
@@ -57,3 +59,13 @@ $chords = $mc->cadence( type => 'plagal' );
 $score->n( $half, @$_ ) for @$chords;
 
 $score->write_score("$0.mid");
+
+sub clip {
+    my ( $mc, $chords ) = @_;
+    my @chords;
+    for my $chord ( @$chords ) {
+        $chord = $mc->remove_notes( [int rand @$chord], $chord );
+        push @chords, $chord;
+    }
+    return \@chords;
+}

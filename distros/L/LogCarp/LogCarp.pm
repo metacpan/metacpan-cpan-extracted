@@ -1,13 +1,15 @@
 package CGI::LogCarp;
 
-# SCCS INFO: @(#) CGI::LogCarp.pm 1.12 98/08/14
-#  RCS INFO: $Id: CGI::LogCarp.pm,v 1.12 1998/08/14 mak Exp $
+# SCCS INFO: @(#) CGI::LogCarp.pm 4.48 20/06/06
+#  RCS INFO: $Id: CGI::LogCarp.pm,v 4.48 2020/06/06 mak Exp $
 #
-# Copyright (C) 1997,1998 Michael King (mike808@mo.net)
+# Copyright (C) 1997,2020 Michael King (mikeking@cpan.org)
 # Saint Louis, MO USA.
 #
 # This module is free software; you can redistribute it and/or
-# modify it under the same terms as Perl itself.
+# modify it under the terms of the Artistic License 2.0.
+
+# SPDX-License-Identifier: Artistic-2.0-Perl
 
 =head1 NAME
 
@@ -21,8 +23,8 @@ Methods are defined for directing messages to STDERR, STDBUG, and STDLOG.
 Each stream can be directed to its own location independent of the others.
 
 It can be used as a version-compatible drop-in replacement for the
-CGI::Carp module.  This means that version 1.10 of CGI::LogCarp provides
-the same functionality, usage, and features as at least version 1.10
+CGI::Carp module.  This means that version 4.48 of CGI::LogCarp provides
+the same functionality, usage, and features as at least version 4.48
 of CGI::Carp.
 
 =head1 SYNOPSIS
@@ -594,39 +596,43 @@ Thanks to Michael G Schwern ( schwern@starmedia.net ) for the constructive input
 
 =head1 AUTHORZ<>(S)
 
-mak - Michael King ( mike808@mo.net )
+mak - Michael King ( mikeking@cpan.org )
 
 =head1 HISTORY
 
  CGI::LogCarp.pm
  v1.01 09/15/97 mak
  v1.12 08/14/98 mak
+ v4.48 06/06/20 mak
 
 =head1 CHANGE LOG
 
  1.05 first posting to CPAN
  1.12 major revision, tracking CGI::Carp
+ 4.48 major revision to track current version of CGI::Carp.
 
 =head1 MODIFICATIONS
 
 =head1 COPYRIGHT
 
- Copyright (C) 1997,1998 Michael King ( mike808@mo.net )
+ Copyright (C) 1997,2020 Michael King ( mikeking@cpan.org )
  Saint Louis, MO USA.
 
 This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+modify it under the terms of the Artistic License 2.0.
 
-This module is copyright (c) 1997,1998 by Michael King ( mike808@mo.net ) and is
-made available to the Perl public under terms of the Artistic License used to
-cover Perl itself. See the file Artistic in the distribution  of Perl 5.002 or
-later for details of copy and distribution terms.
+This module is copyright (c) 1997,2020 by Michael King (mikeking@cpan.org)
+and is made available to the Perl public under terms of the
+Artistic License 2.0. See the file LICENSE for details
+of copy and distribution terms.
+
+The authoritative text of the Artistic License 2.0 can be found here:
+https://www.perlfoundation.org/artistic-license-20.html
 
 =head1 AVAILABILITY
 
-The latest version of this module is likely to be available from:
+The latest version of this module is likely to be available from: CPAN.org
 
- http://walden.mo.net/~mike808/LogCarp
 
 The best place to discuss this code is via email with the author.
 
@@ -721,7 +727,7 @@ use Symbol; # 1.0201; # Make sure we are using the new one
 use SelectSaver;   # This must be *after* use Symbol 1.0201
 
 # Package Version
-$CGI::LogCarp::VERSION = "1.12";
+$CGI::LogCarp::VERSION = "4.48";
 sub VERSION () { $CGI::LogCarp::VERSION; };
 
 # Constants
@@ -978,12 +984,12 @@ sub die (@)
 sub _longmess {
     my $message = Carp::longmess();
     my $mod_perl = (
-        $ENV{'GATEWAY_INTERFACE'} 
+        $ENV{'GATEWAY_INTERFACE'}
         and
         $ENV{'GATEWAY_INTERFACE'} =~ /^CGI-Perl\//
     );
     $message =~ s,eval[^\n]+(Apache|Netscape)/Registry\.pm.*,,s if $mod_perl;
-    return( $message );    
+    return( $message );
 }
 
 # --- END OF PAGE ---^L#- - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1033,7 +1039,7 @@ The message is sent to the STDERR, STDLOG, and STDBUG streams.
 =cut
 
 sub confess
-{ 
+{
     CGI::LogCarp::die( Carp::longmess(join("",@_)) );
 }
 
@@ -1655,7 +1661,7 @@ This method is not exportable.
 sub unlock (*)
 {
     my ($fh) = shift;
-    $fh = to_filehandle($fh) or realdie "Invalid filehandle $fh\n"; 
+    $fh = to_filehandle($fh) or realdie "Invalid filehandle $fh\n";
     my $no = fileno($fh) or return;
     return unless ( -f $fh and -w _ );
     flock $fh, LOCK_UN;

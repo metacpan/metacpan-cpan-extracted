@@ -1328,11 +1328,14 @@ g_object_new (class, ...)
 	const char *class
     PREINIT:
 	int n_params = 0;
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	GParameter * params = NULL;
+        G_GNUC_END_IGNORE_DEPRECATIONS
 	GType object_type;
 	GObject * object;
 	GObjectClass *oclass = NULL;
     CODE:
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 #define FIRST_ARG	1
 	object_type = gperl_object_type_from_package (class);
 	if (!object_type)
@@ -1381,6 +1384,7 @@ g_object_new (class, ...)
 #undef FIRST_ARG
 
 	object = g_object_newv (object_type, n_params, params);
+        G_GNUC_END_IGNORE_DEPRECATIONS
 
 	/* this wrapper *must* own this object!
 	 * because we've been through initialization, the perl object

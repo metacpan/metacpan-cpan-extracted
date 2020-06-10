@@ -1,5 +1,10 @@
 Revision history for App-PDF-Link
 
+0.25	2020-06-06
+
+	Optimize icon loading to prevent unneeded icons to be included
+	in the PDF.
+
 0.24	2019-07-26
 
 	Use musix XML icon for mxl and musicxml; use generic XML icon for xml.

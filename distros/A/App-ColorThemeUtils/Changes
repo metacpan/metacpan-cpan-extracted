@@ -1,8 +1,39 @@
-0.002   2019-02-02 (PERLANCAR)
+0.007   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [incompatible] [cli show-color-theme-swatch] Accept theme module
+	  name with optional args instead of separate -m and -A.
+
+
+0.006   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to ColorTheme 2.1.0.
+
+
+0.005   2020-06-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to ColorTheme 2.0.1 (get_color_list renamed to
+	  list_items).
+
+
+0.004   2020-06-07  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux][cli show-color-theme-swatch] Add shortcut aliases -A and -m.
+
+
+0.003   2020-06-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to ColorTheme v2 specification.
+
+        - Remove CLI list-color-themes.
+
+        - Add CLI show-color-theme-swatch.
+
+
+0.002   2019-02-02  Released-By: PERLANCAR
 
 	- [bugfix] Forgot to require module before use.
 
 
-0.001   2018-02-25 (PERLANCAR)
+0.001   2018-02-25  Released-By: PERLANCAR
 
         - First release.

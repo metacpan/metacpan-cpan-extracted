@@ -2,11 +2,12 @@ package Wasm::Wasmtime::Trap;
 
 use strict;
 use warnings;
+use 5.008004;
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
 
 # ABSTRACT: Wasmtime trap class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_trap_';
@@ -58,7 +59,7 @@ Wasm::Wasmtime::Trap - Wasmtime trap class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

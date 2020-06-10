@@ -197,7 +197,7 @@ const gchar* g_get_user_special_dir (GUserDirectory directory);
 
 =for apidoc __function__
 =cut
-gchar_own * g_get_prgname ();
+const gchar* g_get_prgname ();
 
 =for apidoc __function__
 =cut

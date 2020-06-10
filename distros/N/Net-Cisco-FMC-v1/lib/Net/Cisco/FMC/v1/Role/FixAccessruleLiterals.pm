@@ -1,11 +1,11 @@
 package Net::Cisco::FMC::v1::Role::FixAccessruleLiterals;
-$Net::Cisco::FMC::v1::Role::FixAccessruleLiterals::VERSION = '0.004001';
+$Net::Cisco::FMC::v1::Role::FixAccessruleLiterals::VERSION = '0.004002';
 # ABSTRACT: Role for Cisco Firepower Management Center (FMC) API version 1 method generation
 
 use 5.024;
 use feature 'signatures';
 use NetAddr::IP::Lite ':nofqdn';
-use Role::Tiny;
+use Moo::Role;
 
 no warnings "experimental::signatures";
 
@@ -68,14 +68,14 @@ Net::Cisco::FMC::v1::Role::FixAccessruleLiterals - Role for Cisco Firepower Mana
 
 =head1 VERSION
 
-version 0.004001
+version 0.004002
 
 =head1 SYNOPSIS
 
     use strict;
     use warnings;
     use Net::Cisco::FMC::v1;
-    use Role::Tiny ();
+    use Moo::Role ();
 
     my $fmc = Net::Cisco::FMC::v1->new(
         server      => 'https://fmcrestapisandbox.cisco.com',
@@ -84,7 +84,7 @@ version 0.004001
         clientattrs => { timeout => 30 },
     );
 
-    Role::Tiny->apply_roles_to_object($fmc,
+    Moo::Role->apply_roles_to_object($fmc,
         'Net::Cisco::FMC::v1::Role::FixAccessruleLiterals');
 
 =head1 DESCRIPTION
@@ -242,7 +242,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 - 2019 by Alexander Hartmaier.
+This software is copyright (c) 2018 - 2020 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

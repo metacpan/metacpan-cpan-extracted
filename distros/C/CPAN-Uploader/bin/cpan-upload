@@ -23,6 +23,8 @@ use Getopt::Long::Descriptive 0.084;
 #pod     --ignore-errors    instead of aborting, continue to next file on error
 #pod     -c --config        config file to use; defaults to ~/.pause
 #pod     --md5              compute MD5 checksums of the files
+#pod     --retries          number of retries to perform on upload failure
+#pod     --retry-delay      number of seconds to wait between retries
 #pod
 #pod =head1 CONFIGURATION
 #pod
@@ -75,6 +77,8 @@ my ($opt, $usage) = describe_options(
   [ "ignore-errors" => "instead of aborting, continue to next file on error" ],
   [ "config|c=s"    => "config file to use; defaults to ~/.pause" ],
   [ "md5"           => "compute MD5 checksums of the files" ],
+  [ "retries=i"     => "number of retries to perform on upload failure" ],
+  [ "retry-delay=i" => "number of seconds to wait between retries" ],
 );
 
 if ($opt->help) {
@@ -105,7 +109,7 @@ if (
 $arg{debug}  = 1 if $opt->verbose;
 $arg{subdir} = $opt->directory if defined $opt->directory;
 
-$arg{ $_ } = $opt->$_ for grep { defined $opt->$_ } qw(dry_run http_proxy);
+$arg{ $_ } = $opt->$_ for grep { defined $opt->$_ } qw(dry_run http_proxy retries retry_delay);
 
 if (! $arg{password}) {
   require Term::ReadKey;
@@ -172,7 +176,7 @@ cpan-upload - upload a distribution to the CPAN
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 USAGE
 
@@ -188,6 +192,8 @@ version 0.103013
     --ignore-errors    instead of aborting, continue to next file on error
     -c --config        config file to use; defaults to ~/.pause
     --md5              compute MD5 checksums of the files
+    --retries          number of retries to perform on upload failure
+    --retry-delay      number of seconds to wait between retries
 
 =head1 CONFIGURATION
 
@@ -223,7 +229,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

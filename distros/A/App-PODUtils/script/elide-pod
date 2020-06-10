@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-14'; # DATE
-our $VERSION = '0.048'; # VERSION
+our $DATE = '2020-06-06'; # DATE
+our $VERSION = '0.049'; # VERSION
 
 use 5.010001;
 use strict;
@@ -81,13 +81,16 @@ elide-pod - Elide POD
 
 =head1 VERSION
 
-This document describes version 0.048 of elide-pod (from Perl distribution App-PODUtils), released on 2020-04-14.
+This document describes version 0.049 of elide-pod (from Perl distribution App-PODUtils), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % elide-pod [options] [pod_file]
+ % elide-pod [--config-path=path | -c] [--config-profile=profile | -P]
+     [--format=name] [--json] [--lines=s] [--(no)naked-res] [--no-config |
+     -C] [--no-env] [--page-result[=program]] [--retain-level=s]
+     [--view-result[=program]] [pod_file]
 
 =head1 DESCRIPTION
 
@@ -191,6 +194,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 

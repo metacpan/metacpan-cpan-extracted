@@ -35,5 +35,9 @@ is($new->{thing}->{a}, 'b');
 is($new->{thing}->{c}, 'd');
 is_deeply($new->{thing}->{array}, [{ a => 'c', d => 'f' }, 2, 'hey']);
 
+$new = $blessed->merge($one, { thing => { a => 12 } });
+is($new->{thing}->{a}, 12);
+
+
 done_testing;
 

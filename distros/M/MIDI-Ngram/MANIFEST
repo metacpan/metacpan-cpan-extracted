@@ -8,7 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
-eg/ngram-play
+eg/ngram-analyze
 eg/twinkle_twinkle.mid
 lib/MIDI/Ngram.pm
 t/00-compile.t

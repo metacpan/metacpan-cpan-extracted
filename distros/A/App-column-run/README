@@ -1,0 +1,100 @@
+NAME
+    App::column::run - Run several commands and show their output in
+    multiple columns
+
+VERSION
+    This document describes version 0.002 of App::column::run (from Perl
+    distribution App-column-run), released on 2020-06-06.
+
+FUNCTIONS
+  column_run
+    Usage:
+
+     column_run(%args) -> [status, msg, payload, meta]
+
+    Run several commands and show their output in multiple columns.
+
+    This utility is similar to using the Unix utility pr to columnate
+    output, something like (in bash):
+
+     % pr -t -m -w $COLUMNS -l 99999 <(command1 args...) <(command2 args...)
+
+    except with the following features:
+
+    *   ANSI color and wide character handling
+
+    *   passing adjusted COLUMNS environment to commands so they can adjust
+        output
+
+    *   Passing common arguments to all commands
+
+    *   Multiplexing STDIN to all commands
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   args => *array[str]*
+
+        Common arguments to pass to each program.
+
+    *   commands* => *array[str]*
+
+    *   linum_width => *posint*
+
+        Line number width.
+
+    *   on_long_line => *str* (default: "clip")
+
+        What to do to long lines.
+
+    *   separator => *str* (default: "|")
+
+        Separator character between columns.
+
+    *   show_linum => *bool*
+
+        Show line number.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-column-run>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-column-run>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-column-run>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    pr. Perinci::To::POD=HASH(0x55c267e37168).
+
+    column. Perinci::To::POD=HASH(0x55c267e37168).
+
+    diff. Perinci::To::POD=HASH(0x55c267e37168).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

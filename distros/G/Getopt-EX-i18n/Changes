@@ -1,5 +1,17 @@
 Revision history for Getopt::EX -Mi18n module
 
+0.06 2020-06-08T01:52:19Z
+
+    - Introduce parameter 'long_lc' and 'country_lc'.
+
+0.05 2020-06-06T16:30:04Z
+
+    - Update Moo implementation.
+
+0.04 2020-06-06T02:09:48Z
+
+    - Sort option list by country code.
+
 0.03 2020-06-05T07:17:08Z
 
     - Add 'listopt' parameter.

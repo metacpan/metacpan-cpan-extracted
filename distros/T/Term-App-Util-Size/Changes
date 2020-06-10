@@ -1,0 +1,8 @@
+0.002   2020-06-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Use tput cols & tput lines after Term::Size fails.
+
+
+0.001   2020-06-06  Released-By: PERLANCAR
+
+        - First release.

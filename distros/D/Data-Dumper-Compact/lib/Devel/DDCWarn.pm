@@ -4,7 +4,7 @@ use strictures 2;
 use Data::Dumper::Compact;
 use base qw(Exporter);
 
-our $VERSION = '0.005001';
+our $VERSION = '0.005002';
 $VERSION =~ tr/_//d;
 
 our @EXPORT = map +($_, $_.'T'), qw(Df Dto Dwarn Derr);
@@ -58,11 +58,21 @@ my $W = sub { warn $_[0] };
 
 sub Dwarn { Dto($W, @_) }
 sub DwarnT { DtoT($W, @_) }
+sub Dwarn1 {
+  return () unless @_;
+  my $one = shift;
+  wantarray ? (Dwarn($one), @_) : Dwarn($one)
+}
 
 my $E = sub { print STDERR $_[0] };
 
 sub Derr { Dto($E, @_) }
 sub DerrT { DtoT($E, @_) }
+sub Derr1 {
+  return () unless @_;
+  my $one = shift;
+  wantarray ? (Derr($one), @_) : Derr($one)
+}
 
 1;
 

@@ -1,9 +1,9 @@
 package App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-26'; # DATE
+our $DATE = '2020-06-10'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.058'; # VERSION
+our $VERSION = '1.059'; # VERSION
 
 use 5.010001;
 use strict;
@@ -583,7 +583,7 @@ sub _set_since {
 sub _add_since_where_clause {
     my ($args, $where, $table) = @_;
     if (defined $args->{added_since}  )          { push @$where, "$table.rec_ctime >= ". (0+$args->{added_since}) }
-    if (defined $args->{updated_since})          { push @$where, "$table.rec_mtime >= ". (0+$args->{updated_since}) }
+    if (defined $args->{updated_since})          { push @$where, "($table.rec_mtime >= ". (0+$args->{updated_since}). " AND $table.rec_ctime < ".(0+$args->{updated_since}). ")" }
     if (defined $args->{added_or_updated_since}) { push @$where, "($table.rec_ctime >= ". (0+$args->{added_or_updated_since}). " OR $table.rec_mtime >= ". (0+$args->{added_or_updated_since}). ")" }
 }
 
@@ -1683,6 +1683,7 @@ sub _list_archive_members {
         eval {
             $tar = Archive::Tar->new;
             $tar->read($path); # can still die untrapped when out of mem
+            die $tar->error if $tar->error;
             #log_trace("  listing tar members ...");
             @members = $tar->list_files(["full_path","mode","mtime","size"]);
             #log_trace("  members: %s", \@members);
@@ -4459,6 +4460,7 @@ sub deps {
         $_->{module} = ("  " x ($_->{level}-1)) . $_->{module}
             unless $args{flatten};
         delete $_->{dist} unless @$file_ids > 1 || $_->{level} > 1;
+        delete $_->{module_file_id};
         delete $_->{level};
     }
 
@@ -4704,7 +4706,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.058 of App::lcpan (from Perl distribution App-lcpan), released on 2020-05-26.
+This document describes version 1.059 of App::lcpan (from Perl distribution App-lcpan), released on 2020-06-10.
 
 =head1 SYNOPSIS
 

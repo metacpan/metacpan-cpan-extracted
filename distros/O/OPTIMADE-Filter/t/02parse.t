@@ -54,14 +54,19 @@ for my $case (@inputs) {
     }
 
     if( $tree ) {
+        my $sql_options = {};
+        if( exists $options->{flatten} ) {
+            $sql_options->{flatten} = $options->{flatten};
+        }
         eval {
             if( $options->{use_placeholders} ) {
-                my( $sql, $values ) = $tree->to_SQL( { placeholder => '?' } );
+                $sql_options->{placeholder} = '?';
+                my( $sql, $values ) = $tree->to_SQL( $sql_options );
                 $output .= "$sql\n" .
                            "=== Values ===\n" .
                            Dumper $values;
             } else {
-                $output .= $tree->to_SQL . "\n";
+                $output .= $tree->to_SQL( $sql_options ) . "\n";
             }
         };
         $output = $@ . $output if $@;

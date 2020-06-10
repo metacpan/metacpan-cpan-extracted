@@ -1,9 +1,9 @@
 package IPC::System::Options;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-23'; # DATE
+our $DATE = '2020-06-06'; # DATE
 our $DIST = 'IPC-System-Options'; # DIST
-our $VERSION = '0.336'; # VERSION
+our $VERSION = '0.337'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -355,14 +355,22 @@ sub _system_or_readpipe_or_run_or_start {
             defined($opts->{stdin}) ? \$opts->{stdin} : \*STDIN,
             sub {
                 if ($opts->{capture_stdout}) {
-                    ${$opts->{capture_stdout}} .= $_[0];
+                    if (ref $opts->{capture_stdout} eq 'CODE') {
+                        $opts->{capture_stdout}->($_[0]);
+                    } else {
+                        ${$opts->{capture_stdout}} .= $_[0];
+                    }
                 } else {
                     print $_[0];
                 }
             }, # out
             sub {
                 if ($opts->{capture_stderr}) {
-                    ${$opts->{capture_stderr}} .= $_[0];
+                    if (ref $opts->{capture_sderr} eq 'CODE') {
+                        $opts->{capture_sderr}->($_[0]);
+                    } else {
+                        ${$opts->{capture_stderr}} .= $_[0];
+                    }
                 } else {
                     print STDERR $_[0];
                 }
@@ -469,7 +477,7 @@ IPC::System::Options - Perl's system() and readpipe/qx replacement, with options
 
 =head1 VERSION
 
-This document describes version 0.336 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2020-04-23.
+This document describes version 0.337 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
@@ -763,27 +771,11 @@ See option documentation in C<system()>.
 
 See option documentation in C<system()>.
 
-=item * capture_stdout => scalarref
+=item * capture_stdout => scalarref|coderef
 
 See option documentation in C<system()>.
 
-=item * capture_stderr => scalarref
-
-See option documentation in C<system()>.
-
-=item * capture_merged => scalarref
-
-See option documentation in C<system()>.
-
-=item * tee_stdout => scalarref
-
-See option documentation in C<system()>.
-
-=item * tee_stderr => scalarref
-
-See option documentation in C<system()>.
-
-=item * tee_merged => scalarref
+=item * capture_stderr => scalarref|coderef
 
 See option documentation in C<system()>.
 

@@ -1,5 +1,5 @@
 package smokebrew;
-$smokebrew::VERSION = '0.56';
+$smokebrew::VERSION = '1.00';
 #ABSTRACT: Automated Perl building and installation for CPAN Testers
 
 use strict;
@@ -19,7 +19,7 @@ smokebrew - Automated Perl building and installation for CPAN Testers
 
 =head1 VERSION
 
-version 0.56
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -140,6 +140,11 @@ smokebrew skip the build process, but enable reconfiguration.
 =item C<--make MAKE>
 
 This is an optional argument. Specify the C<make> executable that should be used. The default is C<make>.
+
+=item C<--jobs int>
+
+This is an optional argument. Specify an C<integer> that should be used with C<make -j> to enable parallel builds.
+This will be ignored for when building any perl below v5.19.4.
 
 =back
 

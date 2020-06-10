@@ -4,7 +4,7 @@
       "Johan Vromans <jvromans@squirrel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,11 +46,11 @@
    "provides" : {
       "App::PDF::Link" : {
          "file" : "lib/App/PDF/Link.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "pdflink" : {
          "file" : "script/pdflink",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/sciurius/pdflink"
       }
    },
-   "version" : "0.24",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.25",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

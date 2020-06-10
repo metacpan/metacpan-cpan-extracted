@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200511123711;
+our $VERSION = 1.20200606131956;
 
 my $formatters = [
                 {
@@ -24175,7 +24175,7 @@ $areanames{en}->{55994102} = "Imperatriz\ \-\ MA";
       $number =~ s/(^\+55|\D)//g;
       my $self = bless({ number => $number, formatters => $formatters, validators => $validators, areanames => \%areanames}, $class);
       return $self if ($self->is_valid());
-      my $prefix = qr/^(?:0(?:(1[245]|2[1-35]|31|4[13]|[56]5|99)(\d{10,11}))?)/;
+      my $prefix = qr/^(?:(?:0|90)(?:(1[245]|2[1-35]|31|4[13]|[56]5|99)(\d{10,11}))?)/;
       my @matches = $number =~ /$prefix/;
       if (defined $matches[-1]) {
         no warnings 'uninitialized';

@@ -24,7 +24,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Currency
   homepage: https://metacpan.org/release/Sah-Schemas-Currency
   repository: git://github.com/perlancar/perl-Sah-Schemas-Currency.git
-version: '0.005'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -295,7 +295,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.05'
+              version: '0.061'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

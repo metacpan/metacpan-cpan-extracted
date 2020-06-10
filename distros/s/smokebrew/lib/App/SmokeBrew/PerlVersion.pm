@@ -1,5 +1,5 @@
 package App::SmokeBrew::PerlVersion;
-$App::SmokeBrew::PerlVersion::VERSION = '0.56';
+$App::SmokeBrew::PerlVersion::VERSION = '1.00';
 #ABSTRACT: Moose role for perl versions
 
 use strict;
@@ -37,6 +37,12 @@ sub can_quadmath {
   return 1;
 }
 
+sub can_jobs {
+  my $self = shift;
+  return 0 unless $self->version->numify >= 5.019004;
+  return 1;
+}
+
 no Moose::Role;
 
 qq[Smokin'];
@@ -53,7 +59,7 @@ App::SmokeBrew::PerlVersion - Moose role for perl versions
 
 =head1 VERSION
 
-version 0.56
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -99,6 +105,10 @@ Returns true if the perl version is a C<development> perl release, false otherwi
 =item C<can_quadmath>
 
 Returns true if the perl version is capable of being built with C<quadmath>.
+
+=item C<can_jobs>
+
+Returns true if the perl version is safely capable of being built with C<make -j>.
 
 =back
 

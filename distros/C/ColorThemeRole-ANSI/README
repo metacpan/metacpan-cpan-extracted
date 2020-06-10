@@ -1,0 +1,44 @@
+NAME
+    ColorThemeRole::ANSI - Roles for using ColorTheme::* with ANSI codes
+
+VERSION
+    This document describes version 0.001 of ColorThemeRole::ANSI (from Perl
+    distribution ColorThemeRole-ANSI), released on 2020-06-09.
+
+DESCRIPTION
+    Can be mixed in with a "ColorTheme::*" class. Handy when using color
+    theme in terminal.
+
+PROVIDED METHODS
+  get_item_color_as_ansi
+    Like get_item_color(), but returns color already converted to ANSI code.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ColorThemeRole-ANSI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ColorThemeRole-ANSI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ColorThemeRole-ANSI>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    ColorThemeUtil::ANSI
+
+    ColorTheme
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

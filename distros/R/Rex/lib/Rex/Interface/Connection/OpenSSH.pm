@@ -9,7 +9,7 @@ package Rex::Interface::Connection::OpenSSH;
 use strict;
 use warnings;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 
 BEGIN {
   use Rex::Require;
@@ -94,9 +94,16 @@ sub connect {
 
   my @connection_props = ( "" . $server ); # stringify server object, so that a dumper don't print out passwords.
   push @connection_props, ( user => $user, port => $port );
-  push @connection_props, master_opts      => \@ssh_opts_line if @ssh_opts_line;
-  push @connection_props, default_ssh_opts => \@ssh_opts_line if @ssh_opts_line;
-  push @connection_props, proxy_command    => $proxy_command  if $proxy_command;
+
+  if (@ssh_opts_line) {
+    if ( !$net_openssh_constructor_options{external_master} ) {
+      push @connection_props, master_opts => \@ssh_opts_line;
+    }
+
+    push @connection_props, default_ssh_opts => \@ssh_opts_line;
+  }
+
+  push @connection_props, proxy_command => $proxy_command if $proxy_command;
 
   my @auth_types_to_try;
   if ( $auth_type && $auth_type eq "pass" ) {

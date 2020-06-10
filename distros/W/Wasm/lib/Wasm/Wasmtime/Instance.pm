@@ -2,6 +2,7 @@ package Wasm::Wasmtime::Instance;
 
 use strict;
 use warnings;
+use 5.008004;
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Module;
 use Wasm::Wasmtime::Extern;
@@ -12,7 +13,7 @@ use Ref::Util qw( is_ref is_blessed_ref is_plain_coderef is_plain_scalarref );
 use Carp ();
 
 # ABSTRACT: Wasmtime instance class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_instance_';
@@ -148,7 +149,7 @@ Wasm::Wasmtime::Instance - Wasmtime instance class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

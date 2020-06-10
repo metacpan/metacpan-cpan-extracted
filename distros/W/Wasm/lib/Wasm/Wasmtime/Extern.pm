@@ -2,6 +2,7 @@ package Wasm::Wasmtime::Extern;
 
 use strict;
 use warnings;
+use 5.008004;
 use Wasm::Wasmtime::FFI;
 
 require Wasm::Wasmtime::Func;
@@ -10,7 +11,7 @@ require Wasm::Wasmtime::Table;
 require Wasm::Wasmtime::Memory;
 
 # ABSTRACT: Wasmtime extern class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_extern_';
@@ -67,7 +68,7 @@ Wasm::Wasmtime::Extern - Wasmtime extern class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

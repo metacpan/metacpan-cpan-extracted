@@ -33,7 +33,7 @@ open(ERR,'>'.$carpout) or die;
 carpout \*ERR or die;
 
 warn "a WARN before in main";
-my $match = '06croak.t ERR: a CROAK at t/06croak.t line 37';
+my $match = '06croak.t ERR: a CROAK at t/myCroak.pm line 8.';
 my $croaked = eval { myCroak::check(); };
 $croaked = $@ =~ m/$match$/;
 warn "a WARN after in main";

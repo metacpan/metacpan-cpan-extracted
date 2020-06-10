@@ -2,8 +2,8 @@ NAME
     Color::RGB::Util - Utilities related to RGB colors
 
 VERSION
-    This document describes version 0.599 of Color::RGB::Util (from Perl
-    distribution Color-RGB-Util), released on 2019-08-20.
+    This document describes version 0.601 of Color::RGB::Util (from Perl
+    distribution Color-RGB-Util), released on 2020-06-08.
 
 SYNOPSIS
      use Color::RGB::Util qw(
@@ -96,6 +96,44 @@ FUNCTIONS
     Like "assign_rgb_color" except that it will make sure the assigned color
     is light.
 
+  hsl2hsv
+    Usage:
+
+     my $hsl = hsl2hsv("0 1 0.5"); # => "0 1 1"
+
+    Convert HSL to HSV.
+
+  hsl2rgb
+    Usage:
+
+     my $rgb = hsl2rgb("0 1 0.5"); # => ff0000
+
+    Convert HSL to RGB. HSL should be given in a whitespace-separated H,S,L
+    values e.g. "0 1 0.5". H (hue degree) has a range from 0-360 where 0 is
+    red, 120 is green, 240 is blue and 360 is back to red. S (saturation)
+    has a range from 0-1 where 0 is gray and 1 is fully saturated hue. L
+    (lumination) has a range from 0-1 where 0 is fully black, 0.5 fully
+    saturated, and 1 is fully white. See also "rgb2hsl".
+
+  hsv2hsl
+    Usage:
+
+     my $hsl = hsv2hsl("0 1 1"); # => "0 1 0.5"
+
+    Convert HSV to HSL.
+
+  hsv2rgb
+    Usage:
+
+     my $rgb = hsv2rgb("0 1 1"); # => ff0000
+
+    Convert HSV to RGB. HSV should be given in a whitespace-separated H,S,V
+    values e.g. "0 1 1". H (hue degree) has a range from 0-360 where 0 is
+    red, 120 is green, 240 is blue and 360 is back to red. S (saturation)
+    has a range from 0-1 where 0 is gray and 1 is fully saturated hue. V
+    (value) has a range from 0-1 where 0 is black and 1 is white. See also
+    "rgb2hsv".
+
   int2rgb
     Usage:
 
@@ -187,7 +225,7 @@ FUNCTIONS
      my $hsv = rgb2hsv($rgb); # example: "0 1 255"
 
     Convert RGB (0-255) to HSV. The result is a space-separated H, S, V
-    values.
+    values. See
 
   rgb2int
     Usage:
@@ -247,7 +285,7 @@ FUNCTIONS
         This algorithm tends to choose the hued colors instead of favoring
         to fallback on white/gray, which is more preferred.
 
-    For more details about color difference, refer to
+    For more about color difference, try reading
     <https://en.wikipedia.org/wiki/Color_difference>.
 
   rgb_distance
@@ -306,7 +344,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-Color-RGB-Util>.
+    <https://github.com/perlancar/perl-SHARYANTO-Color-Util>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -322,7 +360,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2015, 2014, 2013 by
+    This software is copyright (c) 2020, 2019, 2018, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

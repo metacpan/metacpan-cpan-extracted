@@ -1,17 +1,18 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.003-13-g3d882cb
+package JSON::Schema::Draft201909; # git description: v0.004-25-g734b719
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Syntax::Keyword::Try 0.11;
 use Carp qw(croak carp);
 use List::Util 1.33 qw(any pairs);
+use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
 use Mojo::JSON::Pointer;
 use Mojo::URL;
 use Safe::Isa;
@@ -82,14 +83,15 @@ sub evaluate {
       $document->_resource_pairs
   );
 
+  my $base_uri = Mojo::URL->new;  # TODO: will be set by a global attribute
+
   my $state = {
-    base_uri => Mojo::URL->new,                   # TODO: will be set by a global attribute
     short_circuit => $self->short_circuit,
     depth => 0,
     data_path => '',
-    traversed_schema_path => '',  # the accumulated path up to the last $ref traversal
-    canonical_schema_uri => undef,# the canonical path of the last traversed $ref (Mojo::URL)
-    schema_path => '',            # the rest of the path, since the last traversed $ref
+    traversed_schema_path => '',        # the accumulated path up to the last $ref traversal
+    canonical_schema_uri => $base_uri,  # the canonical path of the last traversed $ref
+    schema_path => '',                  # the rest of the path, since the last traversed $ref
     errors => [],
   };
 
@@ -177,14 +179,13 @@ sub _eval_keyword_id {
 
   assert_keyword_type($state, $schema, 'string');
 
-  my $uri = Mojo::URL->new($schema->{'$id'})->base($state->{base_uri})->to_abs;
+  my $uri = Mojo::URL->new($schema->{'$id'})->base($state->{canonical_schema_uri})->to_abs;
   abort($state, '$id value "%s" cannot have a non-empty fragment', $schema->{'$id'})
     if length $uri->fragment;
 
   $uri->fragment(undef);
-  $state->{base_uri} = $uri;
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
-  $state->{canonical_schema_uri} = $uri->clone;
+  $state->{canonical_schema_uri} = $uri;
   $state->{schema_path} = '';
 
   return 1;
@@ -196,7 +197,6 @@ sub _eval_keyword_anchor {
   assert_keyword_type($state, $schema, 'string');
 
   if ($schema->{'$anchor'} !~ /^[A-Za-z][A-Za-z0-9_:.-]+$/) {
-    $self->_remove_resource($state->{base_uri}->clone->fragment($schema->{'$anchor'}));
     abort($state, '$anchor value "%s" does not match required syntax', $schema->{'$anchor'});
   }
 
@@ -214,7 +214,7 @@ sub _eval_keyword_recursiveAnchor {
   # record the canonical location of the current position, to be used against future resolution
   # of a $recursiveRef uri -- as if it was the current location when we encounter a $ref.
   my $uri = $state->{canonical_schema_uri} ? $state->{canonical_schema_uri}->clone : Mojo::URL->new;
-  $uri->fragment(($uri->fragment//'').$state->{schema_path});
+  abort($state, '"$recursiveAnchor" keyword used without "$id"') if $uri->fragment;
 
   $state->{recursive_anchor_uri} = $uri;
   return 1;
@@ -254,7 +254,7 @@ sub _eval_keyword_ref {
 
   assert_keyword_type($state, $schema, 'string');
 
-  my $uri = Mojo::URL->new($schema->{'$ref'})->base($state->{base_uri})->to_abs;
+  my $uri = Mojo::URL->new($schema->{'$ref'})->base($state->{canonical_schema_uri})->to_abs;
   return $self->_fetch_and_eval_ref_uri($data, $schema, $state, $uri);
 }
 
@@ -263,12 +263,11 @@ sub _eval_keyword_recursiveRef {
 
   assert_keyword_type($state, $schema, 'string');
 
-  my $uri = Mojo::URL->new($schema->{'$recursiveRef'})
-    ->base($state->{recursive_anchor_uri})->to_abs;
+  my $base = $state->{recursive_anchor_uri} // Mojo::URL->new;
+  my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->base($base)->to_abs;
 
-  abort($state, 'cannot resolve a $recursiveRef with a non-empty fragment against a'
-      .' $recursiveAnchor location with a canonical URI containing a fragment')
-    if $schema->{'$recursiveRef'} ne '#' and $state->{recursive_anchor_uri}->fragment;
+  abort($state, 'cannot resolve a $recursiveRef with a non-empty fragment against a $recursiveAnchor location with a canonical URI containing a fragment')
+    if $schema->{'$recursiveRef'} ne '#' and $base->fragment;
 
   return $self->_fetch_and_eval_ref_uri($data, $schema, $state, $uri);
 }
@@ -296,8 +295,7 @@ sub _eval_keyword_defs {
   my ($self, $data, $schema, $state) = @_;
 
   my $type = $self->_get_type($schema->{'$defs'});
-  abort($state, '$defs value is not an object or boolean')
-    if $type ne 'object' and $type ne 'boolean';
+  assert_keyword_type($state, $schema, 'object');
 
   # we do nothing directly with this keyword, including not collecting its value for annotations.
   return 1;
@@ -306,14 +304,14 @@ sub _eval_keyword_defs {
 sub _eval_keyword_type {
   my ($self, $data, $schema, $state) = @_;
 
-  foreach my $type (ref $schema->{type} eq 'ARRAY' ? @{$schema->{type}} : $schema->{type}) {
+  foreach my $type (is_plain_arrayref($schema->{type}) ? @{$schema->{type}} : $schema->{type}) {
     abort($state, 'unrecognized type "%s"', $type)
       if not any { $type eq $_ } qw(null boolean object array string number integer);
     return 1 if $self->_is_type($type, $data);
   }
 
   return E($state, 'wrong type (expected %s)',
-    ref $schema->{type} eq 'ARRAY' ? ('one of '.join(', ', @{$schema->{type}})) : $schema->{type});
+    is_plain_arrayref($schema->{type}) ? ('one of '.join(', ', @{$schema->{type}})) : $schema->{type});
 }
 
 sub _eval_keyword_enum {
@@ -415,8 +413,13 @@ sub _eval_keyword_pattern {
   return 1 if not $self->_is_type('string', $data);
   assert_keyword_type($state, $schema, 'string');
 
-  return 1 if $data =~ qr/$schema->{pattern}/;
-  return E($state, 'pattern does not match');
+  try {
+    return 1 if $data =~ m/$schema->{pattern}/;
+    return E($state, 'pattern does not match');
+  }
+  catch {
+    abort($state, $@);
+  };
 }
 
 sub _eval_keyword_maxItems {
@@ -614,7 +617,7 @@ sub _eval_keyword_dependentSchemas {
   foreach my $property (sort keys %{$schema->{dependentSchemas}}) {
     next if not exists $data->{$property}
       or $self->_eval($data, $schema->{dependentSchemas}{$property},
-        +{ %$state, schema_path => $state->{schema_path}.'/dependentSchemas/'.$property });
+        +{ %$state, schema_path => jsonp($state->{schema_path}, 'dependentSchemas', $property) });
 
     $valid = 0;
     last if $state->{short_circuit};
@@ -629,7 +632,7 @@ sub _eval_keyword_items {
 
   return 1 if not $self->_is_type('array', $data);
 
-  if (ref $schema->{items} ne 'ARRAY') {
+  if (not is_plain_arrayref($schema->{items})) {
     my $valid = 1;
     foreach my $idx (0 .. $#{$data}) {
       next if $self->_eval($data->[$idx], $schema->{items},
@@ -756,8 +759,8 @@ sub _eval_keyword_properties {
     next if not exists $data->{$property};
     $valid = 0 if not $self->_eval($data->{$property}, $schema->{properties}{$property},
         +{ %$state,
-          data_path => $state->{data_path}.'/'.$property,
-          schema_path => $state->{schema_path}.'/properties/'.$property,
+          data_path => jsonp($state->{data_path}, $property),
+          schema_path => jsonp($state->{schema_path}, 'properties', $property),
         });
     last if not $valid and $state->{short_circuit};
   }
@@ -774,12 +777,21 @@ sub _eval_keyword_patternProperties {
 
   my $valid = 1;
   foreach my $property_pattern (sort keys %{$schema->{patternProperties}}) {
-    foreach my $property (sort grep /$property_pattern/, keys %$data) {
+    my @matched_properties;
+    try {
+      @matched_properties = grep m/$property_pattern/, keys %$data;
+    }
+    catch {
+      abort({ %$state,
+        schema_path_rest => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) },
+      $@);
+    };
+    foreach my $property (sort @matched_properties) {
       $valid = 0
         if not $self->_eval($data->{$property}, $schema->{patternProperties}{$property_pattern},
           +{ %$state,
-            data_path => $state->{data_path}.'/'.$property,
-            schema_path => $state->{schema_path}.'/patternProperties/'.$property_pattern,
+            data_path => jsonp($state->{data_path}, $property),
+            schema_path => jsonp($state->{schema_path}, 'patternProperties', $property_pattern),
           });
       last if not $valid and $state->{short_circuit};
     }
@@ -801,13 +813,13 @@ sub _eval_keyword_additionalProperties {
       and any { $property =~ /$_/ } keys %{$schema->{patternProperties}};
 
     if ($self->_is_type('boolean', $schema->{additionalProperties})) {
-      $valid = E({ %$state, data_path => $state->{data_path}.'/'.$property },
+      $valid = E({ %$state, data_path => jsonp($state->{data_path}, $property) },
         'additional property not permitted') if not $schema->{additionalProperties};
     }
     else {
       $valid = 0 if not $self->_eval($data->{$property}, $schema->{additionalProperties},
         +{ %$state,
-          data_path => $state->{data_path}.'/'.$property,
+          data_path => jsonp($state->{data_path}, $property),
           schema_path => $state->{schema_path}.'/additionalProperties',
         });
     }
@@ -833,7 +845,7 @@ sub _eval_keyword_propertyNames {
   foreach my $property (sort keys %$data) {
     $valid = 0 if not $self->_eval($property, $schema->{propertyNames},
       +{ %$state,
-        data_path => $state->{data_path}.'/'.$property,
+        data_path => jsonp($state->{data_path}, $property),
         schema_path => $state->{schema_path}.'/propertyNames',
       });
     last if not $valid and $state->{short_circuit};
@@ -863,14 +875,14 @@ sub _is_type {
     return is_bool($value);
   }
   if ($type eq 'object') {
-    return ref $value eq 'HASH';
+    return is_plain_hashref($value);
   }
   if ($type eq 'array') {
-    return ref $value eq 'ARRAY';
+    return is_plain_arrayref($value);
   }
 
   if ($type eq 'string' or $type eq 'number' or $type eq 'integer') {
-    return 0 if not defined $value or ref $value;
+    return 0 if not defined $value or is_ref($value);
     my $flags = B::svref_2object(\$value)->FLAGS;
 
     if ($type eq 'string') {
@@ -896,11 +908,11 @@ sub _get_type {
   my ($self, $value) = @_;
 
   return 'null' if not defined $value;
-  return 'object' if ref $value eq 'HASH';
-  return 'array' if ref $value eq 'ARRAY';
+  return 'object' if is_plain_hashref($value);
+  return 'array' if is_plain_arrayref($value);
   return 'boolean' if is_bool($value);
 
-  if (not ref $value) {
+  if (not is_ref($value)) {
     my $flags = B::svref_2object(\$value)->FLAGS;
     return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
     return 'number' if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
@@ -926,7 +938,7 @@ sub _is_equal {
     return 0 if keys %$x != keys %$y;
     return 0 if not $self->_is_equal([ sort keys %$x ], [ sort keys %$y ]);
     foreach my $property (keys %$x) {
-      $state->{path} = $path.'/'.$property;
+      $state->{path} = jsonp($path, $property);
       return 0 if not $self->_is_equal($x->{$property}, $y->{$property}, $state);
     }
     return 1;
@@ -1057,19 +1069,27 @@ has _json_decoder => (
   default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1) },
 );
 
+# shorthand for creating and appending json pointers
+use namespace::clean 'jsonp';
+sub jsonp {
+  return join('/', shift, map s/~/~0/gr =~ s!/!~1!gr, @_);
+}
+
 # shorthand for creating error objects
 use namespace::clean 'E';
 sub E {
   my ($state, $error_string, @args) = @_;
 
-  my $suffix = $state->{keyword} ? '/'.$state->{keyword} : '';
+  # sometimes the keyword shouldn't be at the very end of the schema path
+  my $schema_path_rest = $state->{schema_path_rest}
+    // $state->{schema_path}.($state->{keyword} ? '/'.$state->{keyword} : '');
+
   push @{$state->{errors}}, JSON::Schema::Draft201909::Error->new(
     instance_location => $state->{data_path},
-    keyword_location => $state->{traversed_schema_path}.$state->{schema_path}.$suffix,
-    !$state->{canonical_schema_uri} ? () : ( absolute_keyword_location => do {
+    keyword_location => $state->{traversed_schema_path}.$schema_path_rest,
+    !"$state->{canonical_schema_uri}" ? () : ( absolute_keyword_location => do {
       my $uri = $state->{canonical_schema_uri}->clone;
-      $uri->fragment(($uri->fragment//'').$state->{schema_path}.$suffix)
-        if $state->{schema_path} or $suffix;
+      $uri->fragment(($uri->fragment//'').$schema_path_rest) if $schema_path_rest;
       $uri;
     } ),
     error => @args ? sprintf($error_string, @args) : $error_string,
@@ -1110,13 +1130,16 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
   use JSON::Schema::Draft201909;
 
-  $js = JSON::Schema::Draft2019->new;
+  $js = JSON::Schema::Draft2019->new(
+    output_format => 'flag',
+    ... # other options
+  );
   $result = $js->evaluate($instance_data, $schema_data);
 
 =head1 DESCRIPTION
@@ -1227,10 +1250,6 @@ To date, missing components include most of these. More specifically, features t
 
 =item *
 
-recognition of C<$id>
-
-=item *
-
 loading multiple schema documents, and registration of a schema against a canonical base URI
 
 =item *
@@ -1252,14 +1271,6 @@ loading schema documents from the network
 =item *
 
 loading schema documents from a local web application (e.g. L<Mojolicious>)
-
-=item *
-
-use of C<$recursiveRef> and C<$recursiveAnchor>
-
-=item *
-
-use of plain-name fragments with C<$anchor>
 
 =back
 

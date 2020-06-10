@@ -3,13 +3,11 @@ use Test2::Tools::Compare qw( array hash D );
 use Net::Cisco::FMC::v1;
 use JSON qw();
 
-SKIP: {
-    skip "environment variables not set"
-        unless exists $ENV{NET_CISCO_FMC_V1_HOSTNAME}
-            && exists $ENV{NET_CISCO_FMC_V1_USERNAME}
-            && exists $ENV{NET_CISCO_FMC_V1_PASSWORD}
-            && exists $ENV{NET_CISCO_FMC_V1_POLICY};
-};
+skip_all "environment variables not set"
+    unless exists $ENV{NET_CISCO_FMC_V1_HOSTNAME}
+        && exists $ENV{NET_CISCO_FMC_V1_USERNAME}
+        && exists $ENV{NET_CISCO_FMC_V1_PASSWORD}
+        && exists $ENV{NET_CISCO_FMC_V1_POLICY};
 
 my $fmc = Net::Cisco::FMC::v1->new(
     server      => 'https://' . $ENV{NET_CISCO_FMC_V1_HOSTNAME},
@@ -29,7 +27,10 @@ ok(my $policy = $fmc->create_accesspolicy({
     },
 }), 'access policy created');
 
-END { $fmc->delete_accesspolicy($policy->{id}); }
+END {
+    $fmc->delete_accesspolicy($policy->{id})
+        if defined $policy;
+}
 
 ok(my $accessrules = $fmc->list_accessrules($policy->{id}),
     'list accessrules successful');

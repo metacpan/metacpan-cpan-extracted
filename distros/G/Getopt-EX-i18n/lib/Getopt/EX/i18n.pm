@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = "0.03";
+our $VERSION = "0.06";
 
 =encoding utf-8
 
@@ -83,10 +83,10 @@ default, and set C<LANG> environment as C<ja_JP>.
     LOCALE:   --ja_JP  (raw)
               --ja-JP  (dash)
               --jaJP   (long)
-              --jajp   (lclong)
+              --jajp   (long_lc)
     LANGUAGE: --ja     (lang)
     COUNTRY:  --JP     (country)
-              --jp     (country)
+              --jp     (country_lc)
 
 Short language option (C<--ja>) is defined in the alphabetical order
 of the country code, so the option C<--en> is assigned to C<en_AU>.
@@ -116,18 +116,20 @@ module declaration.
 
 =item B<long>
 
-=item B<lclong>
+=item B<long_lc>
 
 =item B<lang>
 
 =item B<country>
 
+=item B<country_lc>
+
 These parameter tells which option is defined.  All options are
 enabled by default.  You can disable country option like this:
 
-    command -Mi18n::setopt(country=0)
+    command -Mi18n::setopt(country=0,country_lc=0)
 
-    command -Mi18n::setopt=country=0
+    command -Mi18n::setopt=country=0,country_lc=0
 
 =item B<verbose>
 
@@ -184,20 +186,18 @@ Kazumasa Utashiro E<lt>kaz@utashiro.comE<gt>
 
 =cut
 
-use Getopt::EX::i18n::iso3361 qw(%iso3361);
-use Getopt::EX::i18n::iso639 qw(%iso639);
-
 my %opt = (
-    raw     => 1,
-    dash    => 1,
-    long    => 1,
-    lclong  => 1,
-    lang    => 1,
-    country => 1,
-    verbose => 0,
-    list    => 0,
-    prefix  => '--',
-    listopt => undef,
+    raw        => 1,
+    dash       => 1,
+    long       => 1,
+    long_lc    => 1,
+    lang       => 1,
+    country    => 1,
+    country_lc => 1,
+    verbose    => 0,
+    list       => 0,
+    prefix     => '--',
+    listopt    => undef,
     );
 
 my $module;
@@ -214,6 +214,20 @@ my %lang;
 my %cc;
 my %opthash;
 
+package LocaleObj {
+    use Moo;
+    has [ qw(name lang cc) ] => (is => 'ro', required => 1);
+    sub create {
+	my $class = shift;
+	$_[0] =~ /^(([a-z][a-z])_([A-Z][A-Z]))$/ or die;
+	$class->new(name => $1, lang => $2, cc => $3);
+    }
+    use Getopt::EX::i18n::iso639 qw(%iso639);
+    use Getopt::EX::i18n::iso3361 qw(%iso3361);
+    sub lang_name { $iso639 {+shift->lang} || 'UNKNOWN' }
+    sub cc_name   { $iso3361{+shift->cc}   || 'UNKNOWN' }
+}
+
 sub finalize {
     my($obj, $argv) = @_;
     for my $locale (sort @locale) {
@@ -224,20 +238,18 @@ sub finalize {
 	push @list, "$lang-$cc" if $opt{dash};
 	push @list, "$lang$cc"  if $opt{long};
 	$cc = lc $cc;
-	push @list, "$lang$cc"  if $opt{lclong};
+	push @list, "$lang$cc"  if $opt{long_lc};
 	if ($opt{lang}) {
 	    if (!$opthash{$lang} or $lang eq $cc) {
 		push @list, $lang;
 	    }
 	}
-	if ($opt{country}) {
-	    if ($lang eq $cc or @{$cc{$cc}} == 1) {
-		push @list, uc $cc;
-		push @list, $cc if not $lang{$cc};
-	    }
+	if ($lang eq $cc or @{$cc{$cc}} == 1) {
+	    push @list, uc $cc if $opt{country};
+	    push @list,    $cc if $opt{country_lc} and !$lang{$cc};
 	}
 	for (@list) {
-	    $opthash{$_} = $locale;
+	    $opthash{$_} = LocaleObj->create($locale);
 	}
     }
 
@@ -249,27 +261,29 @@ sub finalize {
     return;
 }
 
-sub localeinfo {
-    $_[0]=~ /^(?<lang>[a-z][a-z])_(?<cc>[A-Z][A-Z])$/;
-    ( $+{lang} && $iso639{$+{lang}} || 'UNKNOWN' ,
-      $+{cc}   && $iso3361{$+{cc}}  || 'UNKNOWN' );
-}
-
 sub options {
     my %arg = (
 	set  => 0, # set option
 	show => 0, # print option
 	exit => 0, # exit at the end
 	@_);
-    my $optwidth = length($opt{prefix}) + 5;
-    for my $opt (sort { lc $a cmp lc $b } keys %opthash) {
+    my @keys = do {
+	map  { $_->[0] }
+	sort { $a->[1] cmp $b->[1] || $a->[0] cmp $b->[0] }
+	map  { [ $_, $opthash{$_}->cc ] }
+	keys %opthash;
+    };
+    for my $opt (@keys) {
+	my $locale = $opthash{$opt};
 	my $option = $opt{prefix} . $opt;
-	my $call = "&setenv(LANG=$opthash{$opt})";
+	my $name = $locale->name;
+	my $call = "&setenv(LANG=$name)";
 	$module->setopt($option, $call) if $arg{set};
 	if ($arg{show}) {
-	    my($lang, $cc) = localeinfo($opthash{$opt});
 	    printf "option %-*s %s # %s / %s\n",
-		$optwidth, $option, $call, $lang, $cc;
+		(state $optwidth = length($opt{prefix}) + length($name)),
+		$option, $call,
+		$locale->cc_name, $locale->lang_name;
 	}
     }
     exit if $arg{exit};
@@ -301,8 +315,9 @@ sub setenv {
     while (@_ >= 2) {
 	my($key, $value) = splice @_, 0, 2;
 	if ($opt{verbose}) {
-	    my($lang, $cc) = localeinfo $value;
-	    warn "$key=$value ($lang / $cc)\n";
+	    my $l = LocaleObj->create($value);
+	    warn sprintf("%s=%s (%s / %s)\n",
+			 $key, $value, $l->lang_name, $l->cc_name);
 	}
 	$ENV{$key} = $value;
     }

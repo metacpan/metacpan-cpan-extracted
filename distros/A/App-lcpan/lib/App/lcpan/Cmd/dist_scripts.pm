@@ -1,9 +1,9 @@
 package App::lcpan::Cmd::dist_scripts;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-26'; # DATE
+our $DATE = '2020-06-10'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.058'; # VERSION
+our $VERSION = '1.059'; # VERSION
 
 use 5.010;
 use strict;
@@ -67,7 +67,7 @@ App::lcpan::Cmd::dist_scripts - List scripts in a distribution
 
 =head1 VERSION
 
-This document describes version 1.058 of App::lcpan::Cmd::dist_scripts (from Perl distribution App-lcpan), released on 2020-05-26.
+This document describes version 1.059 of App::lcpan::Cmd::dist_scripts (from Perl distribution App-lcpan), released on 2020-06-10.
 
 =head1 FUNCTIONS
 

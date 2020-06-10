@@ -132,7 +132,11 @@ qx.Class.define('callbackery.ui.plugin.Table', {
                         currentRow = index;
                         if (rowData._actionSet) {
                             for (var key in rowData._actionSet) {
-                                buttonMap[key].set(rowData._actionSet[key]);
+                                var as = rowData._actionSet[key]
+                                if (as.label) {
+                                    as.label = this.xtr(as.label) 
+                                }
+                                buttonMap[key].set(as);
                             }
                         }
                     }

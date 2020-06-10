@@ -27,11 +27,11 @@ Pg::Explain::Node - Class representing single node from query plan
 
 =head1 VERSION
 
-Version 0.99
+Version 1.00
 
 =cut
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 =head1 SYNOPSIS
 
@@ -672,7 +672,7 @@ sub as_text {
             $heading_line .= " " . $S->{ 'table_alias' } if $S->{ 'table_alias' };
         }
     }
-    $heading_line .= sprintf '  (cost=%.3f..%.3f rows=%s width=%d)', $self->estimated_startup_cost, $self->estimated_total_cost, $self->estimated_rows, $self->estimated_row_width;
+    $heading_line .= sprintf '  (cost=%.2f..%.2f rows=%s width=%d)', $self->estimated_startup_cost, $self->estimated_total_cost, $self->estimated_rows, $self->estimated_row_width;
     if ( $self->is_analyzed ) {
         my $inner;
         if ( $self->never_executed ) {

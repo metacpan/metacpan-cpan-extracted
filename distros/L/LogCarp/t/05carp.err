@@ -1,0 +1,5 @@
+[Sat Jun  6 14:57:21 2020]   6712 05carp.t ERR: a WARN before in main at t/05carp.t line 35.
+[Sat Jun  6 14:57:21 2020]   6712 05carp.t ERR: a WARN in check at t/myCarp.pm line 7.
+[Sat Jun  6 14:57:21 2020]   6712 05carp.t ERR: a CARP at t/myCarp.pm line 8.
+[Sat Jun  6 14:57:21 2020]   6712 05carp.t ERR: a WARN after in check at t/myCarp.pm line 9.
+[Sat Jun  6 14:57:21 2020]   6712 05carp.t ERR: a WARN after in main at t/05carp.t line 37.

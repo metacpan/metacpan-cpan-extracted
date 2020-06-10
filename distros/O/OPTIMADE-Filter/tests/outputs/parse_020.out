@@ -12,4 +12,4 @@ $VAR1 = bless( {
 == Filter ==
 (_exmpl_some_string_property = "42")
 == SQL ==
-('_exmpl_some_string_property' = "42")
+'_exmpl_some_string_property' = "42"

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Github;
-our $VERSION = '1.058';
+our $VERSION = '1.060';
 # ABSTRACT: Authenticate using Github's OAuth2 provider
 
 #pod =head1 SYNOPSIS
@@ -199,10 +199,10 @@ sub handle_token_p {
         $c->session->{yancy}{ $self->moniker }{ github_login } = $login;
         if ( !$self->_get_user( $c, $login ) ) {
             if ( !$self->allow_register ) {
-                $c->stash(
-                    status => 403,
-                );
-                die 'Registration of new users is not allowed',
+                $c->app->log->error( 'Registration not allowed (set allow_register)' );
+                $c->stash( status => 403 );
+                die 'Registration of new users is not allowed';
+                return;
             }
             my $schema = $c->yancy->schema( $self->schema );
             $c->yancy->create(
@@ -229,7 +229,7 @@ Yancy::Plugin::Auth::Github - Authenticate using Github's OAuth2 provider
 
 =head1 VERSION
 
-version 1.058
+version 1.060
 
 =head1 SYNOPSIS
 

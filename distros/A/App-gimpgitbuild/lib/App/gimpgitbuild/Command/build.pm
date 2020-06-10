@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.18.0';
+$App::gimpgitbuild::Command::build::VERSION = '0.18.1';
 use strict;
 use warnings;
 use 5.014;
@@ -128,6 +128,21 @@ sub _which_xvfb_run
     return;
 }
 
+sub _ascertain_lack_of_gtk_warnings
+{
+    my $path = which('gvim');
+    if ( defined($path) )
+    {
+        my $stderr = `"$path" -u NONE -U NONE -f /dev/null +q 2>&1`;
+        if ( $stderr =~ /\S/ )
+        {
+            die
+"There may be gtk warnings (e.g: in KDE Plasma 5 on Fedora 32 ). Please fix them.";
+        }
+    }
+    return;
+}
+
 sub execute
 {
     my ( $self, $opt, $args ) = @_;
@@ -147,6 +162,7 @@ sub execute
     $ENV{PKG_CONFIG_PATH} = $env->{PKG_CONFIG_PATH};
     $ENV{XDG_DATA_DIRS}   = $env->{XDG_DATA_DIRS};
     _which_xvfb_run();
+    _ascertain_lack_of_gtk_warnings();
     $self->{mode} = $mode;
     my $base_src_dir = $obj->base_git_clones_dir;
 
@@ -222,7 +238,7 @@ __END__
 
 =head1 VERSION
 
-version 0.18.0
+version 0.18.1
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

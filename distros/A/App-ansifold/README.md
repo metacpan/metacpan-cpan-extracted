@@ -4,7 +4,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # SYNOPSIS
 
@@ -82,9 +82,10 @@ and produces output like this:
 
 # LINE BREAKING
 
-Option **--boundary=word** prohibit to break line within alphanumeric
-word.  This version supports line break adjustment, mainly to perform
-Japanese \`\`KINSOKU'' processing.  Use **--linebreak=all** to enable it.
+Option **--boundary=word** prohibit to break line in the middle of
+alphanumeric word.  This version also supports line break adjustment,
+mainly to perform Japanese \`\`KINSOKU'' processing.  Use
+**--linebreak=all** to enable it.
 
 When **--linebreak** option is enabled, if the cut-off text start with
 space or prohibited characters (e.g. closing parenthesis), they are
@@ -106,9 +107,9 @@ formatting capability.
 
 # SEE ALSO
 
-[github](https://github.com/kaz-utashiro/ansifold)
+[ansifold](https://github.com/kaz-utashiro/ansifold)
 
-[github](https://github.com/kaz-utashiro/Text-ANSI-Fold)
+[Text::ANSI::Fold](https://github.com/kaz-utashiro/Text-ANSI-Fold)
 
 [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers)
 

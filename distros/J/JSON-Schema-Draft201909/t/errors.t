@@ -964,4 +964,117 @@ subtest 'sorted property names' => sub {
   );
 };
 
+subtest 'bad regex in schema' => sub {
+  my $schema = {
+    type => 'object',
+    properties => {
+      my_pattern => {
+        type => 'string',
+        pattern => '(',
+      },
+      my_patternProperties => {
+        type => 'object',
+        patternProperties => { '(' => true },
+        additionalProperties => false,
+      },
+    },
+  };
+
+  cmp_deeply(
+    $js->evaluate(
+      { my_pattern => 'foo' },
+      $schema,
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '/my_pattern',
+          keywordLocation => '/properties/my_pattern/pattern',
+          error => re(qr/EXCEPTION: Unmatched \( in regex/),
+        },
+      ],
+    },
+    'bad "pattern" regex is properly noted in error',
+  );
+
+  cmp_deeply(
+    $js->evaluate(
+      { my_patternProperties => { foo => 1 } },
+      $schema,
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '/my_patternProperties',
+          keywordLocation => '/properties/my_patternProperties/patternProperties/(',
+          error => re(qr/EXCEPTION: Unmatched \( in regex/),
+        },
+      ],
+    },
+    'bad "patternProperties" regex is properly noted in error',
+  );
+};
+
+subtest 'JSON pointer escaping' => sub {
+  cmp_deeply(
+    $js->evaluate(
+      { '{}' => { 'my~tilde/slash-property' => 1 } },
+      {
+        '$defs' => {
+          mydef => {
+            properties => {
+              '{}' => {
+                patternProperties => {
+                  '~' => { minimum => 5 },
+                  '/' => { minimum => 6 },
+                  '[~/]' => { minimum => 7 },
+                },
+              },
+            },
+          },
+        },
+        '$ref' => '#/$defs/mydef',
+      },
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '/{}/my~0tilde~1slash-property',
+          keywordLocation => '/$ref/properties/{}/patternProperties/~1/minimum',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/~1/minimum',
+          error => 'value is smaller than 6',
+        },
+        {
+          instanceLocation => '/{}/my~0tilde~1slash-property',
+          keywordLocation => '/$ref/properties/{}/patternProperties/[~0~1]/minimum',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/%5B~0~1%5D/minimum',
+          error => 'value is smaller than 7',
+        },
+        {
+          instanceLocation => '/{}/my~0tilde~1slash-property',
+          keywordLocation => '/$ref/properties/{}/patternProperties/~0/minimum',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/~0/minimum',
+          error => 'value is smaller than 5',
+        },
+        {
+          instanceLocation => '/{}',
+          keywordLocation => '/$ref/properties/{}/patternProperties',
+          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties',
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/$ref/properties',
+          absoluteKeywordLocation => '#/$defs/mydef/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+    'JSON pointers are properly escaped; URIs doubly so',
+  );
+};
+
 done_testing;

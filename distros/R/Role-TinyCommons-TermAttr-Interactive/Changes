@@ -1,3 +1,8 @@
+0.003   2020-06-06  Released-By: PERLANCAR; Urgency: medium
+
+	- [refactor] Move core logic to Term::App::Util::Interactive.
+
+
 0.002   2020-06-05  Released-By: PERLANCAR; Urgency: high
 
 	- [bugfix] Oops, forgot to put the implementation.

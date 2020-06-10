@@ -635,7 +635,7 @@ SKIP: foreach my $db_type (qw(pg)) #pg_with_schema
         save_col   => [ 1, 5, 123 ],
         nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -688,7 +688,7 @@ SKIP: foreach my $db_type (qw(pg)) #pg_with_schema
         save_col   => [ 1, 5, 123 ],
         nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -734,7 +734,7 @@ SKIP: foreach my $db_type (qw(pg)) #pg_with_schema
         save_col   => [ 1, 5, 123 ],
         nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -795,7 +795,7 @@ SKIP: foreach my $db_type (qw(pg)) #pg_with_schema
         save_col   => [ 1, 5, 123 ],
         nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -1342,7 +1342,7 @@ SKIP: foreach my $db_type (qw(pg)) #pg_with_schema
         save_col   => [ 1, 5 ],
         nums       => [ 1, 2, 3 ],
         fk1        => 2,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '3/30/2004 12:34:56 pm'
       ],
       clauses => [ "LOWER(status) LIKE 'ac%'" ],
@@ -3780,7 +3780,7 @@ SKIP: foreach my $db_type ('mysql')
         save_col   => [ 1, 5, 123 ],
         nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -3841,7 +3841,7 @@ SKIP: foreach my $db_type ('mysql')
         save_col   => [ 1, 5, 123 ],
         nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       hints   => { ignore_index => 'rose_db_object_test_idx' },
@@ -4371,7 +4371,7 @@ SKIP: foreach my $db_type ('mysql')
         save_col   => [ 1, 5 ],
         nums       => [ 1, 2, 3 ],
         fk1        => 2,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '3/30/2004 12:34:56 pm'
       ],
       clauses => [ "LOWER(status) LIKE 'ac%'" ],
@@ -6583,7 +6583,7 @@ SKIP: foreach my $db_type (qw(informix))
         save_col   => [ 1, 5, 123 ],
         nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -6638,7 +6638,7 @@ SKIP: foreach my $db_type (qw(informix))
         save_col   => [ 1, 5, 123 ],
         nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -7192,12 +7192,12 @@ SKIP: foreach my $db_type (qw(informix))
         fk1        => { lt => 100 },
         or         => [ nums => { in_set => [ 2, 22, 222 ] }, 
                         fk1 => { lt => 777 },
-                        last_modified => '6/6/2020' ],
+                        last_modified => '6/6/2099' ], # XXX: Breaks in 2099!
         nums       => { any_in_set => [ 1, 99, 100 ] },
         nums       => { in_set => [ 2, 22, 222 ] },
         nums       => { in_set => 2 },
         nums       => { all_in_set => [ 1, 2, 3 ] },
-        last_modified => { le => '6/6/2020' }, # XXX: test breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: test breaks in 2099!
         date_created  => '3/30/2004 12:34:56 pm'
       ],
       clauses => [ "LOWER(status) LIKE 'ac%'" ],
@@ -9517,7 +9517,7 @@ SKIP: foreach my $db_type (qw(sqlite))
         save_col   => [ 1, 5, 123 ],
         #nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -9579,7 +9579,7 @@ SKIP: foreach my $db_type (qw(sqlite))
         save_col   => [ 1, 5, 123 ],
         nums       => [ 4, 5, 6 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -10102,7 +10102,7 @@ SKIP: foreach my $db_type (qw(sqlite))
         save_col   => [ 1, 5 ],
         nums       => [ 1, 2, 3 ],
         fk1        => 2,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '3/30/2004 12:34:56 pm'
       ],
       clauses => [ "LOWER(status) LIKE 'ac%'" ],
@@ -12295,7 +12295,7 @@ SKIP: foreach my $db_type (qw(oracle))
         and        => [],
         save_col   => [ 1, 5, 123 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -12346,7 +12346,7 @@ SKIP: foreach my $db_type (qw(oracle))
         and        => [],
         save_col   => [ 1, 5, 123 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -12397,7 +12397,7 @@ SKIP: foreach my $db_type (qw(oracle))
         and        => [],
         save_col   => [ 1, 5, 123 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -12453,7 +12453,7 @@ SKIP: foreach my $db_type (qw(oracle))
 
         save_col   => [ 1, 5, 123 ],
         fk1        => 1,
-        last_modified => { le => '6/6/2020' }, # XXX: breaks in 2020!
+        last_modified => { le => '6/6/2099' }, # XXX: breaks in 2099!
         date_created  => '5/10/2002 10:34:56 am'
       ],
       clauses => [ "LOWER(status) LIKE 'w%'" ],
@@ -12999,8 +12999,8 @@ SKIP: foreach my $db_type (qw(oracle))
         fk1        => { lt => 99 },
         fk1        => { lt => 100 },
         or         => [ fk1 => { lt => 777 },
-                        last_modified => '6/6/2020' ],
-        last_modified => { le => '6/6/2020' }, # XXX: test breaks in 2020!
+                        last_modified => '6/6/2099' ], # XXX: Breaks in 2099!
+        last_modified => { le => '6/6/2099' }, # XXX: test breaks in 2099!
         date_created  => '3/30/2004 12:34:56 pm'
       ],
       clauses => [ "LOWER(status) LIKE 'ac%'" ],

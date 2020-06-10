@@ -9,7 +9,7 @@ package Rex::User::SunOS;
 use strict;
 use warnings;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 
 use Rex::Logger;
 use Rex::Commands::Run;

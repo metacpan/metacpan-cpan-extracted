@@ -12,4 +12,4 @@ $VAR1 = bless( {
 == Filter ==
 (author = " someone ")
 == SQL ==
-('author' = " someone ")
+'author' = " someone "

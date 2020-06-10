@@ -9,7 +9,23 @@ package Rex::Hook;
 use strict;
 use warnings;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
+
+=head1 NAME
+
+Rex::Hook - manage Rex hooks
+
+=head1 DESCRIPTION
+
+This module manages hooks of various Rex functions.
+
+=head1 SYNOPSIS
+
+ use Rex::Hook;
+ 
+ register_function_hooks { $state => { $function => $coderef, }, };
+
+=cut
 
 require Exporter;
 use base qw(Exporter);
@@ -18,6 +34,20 @@ use vars qw(@EXPORT);
 @EXPORT = qw(register_function_hooks);
 
 my $__hooks = {};
+
+=head1 EXPORTED FUNCTIONS
+
+=head2 register_function_hooks { $state => { $function => $coderef } };
+
+Registers a C<$coderef> to be called when C<$function> reaches C<$state> during its execution.
+
+For example:
+
+ register_function_hooks { before_change => { file => \&backup } };
+
+C<$coderef> may get parameters passed to it depending on the hook in question. See the given hook's documentation about details.
+
+=cut
 
 sub register_function_hooks {
   my ($hooks) = @_;

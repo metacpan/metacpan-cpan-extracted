@@ -1,5 +1,50 @@
-@  changeset:   112:69a8c1cc562f
+@  changeset:   121:98710de3fcfa
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@rosetta>
+|  date:        Tue Jun 09 14:58:34 2020 +0200
+|  summary:     MANIFEST, BF Makefile.PL
+|
+o  changeset:   120:704f93edb66b
+|  user:        Rene Schickbauer <cavac@rosetta>
+|  date:        Tue Jun 09 14:57:11 2020 +0200
+|  summary:     Update Changes file
+|
+o  changeset:   119:656d70082f07
+|  user:        Rene Schickbauer <cavac@rosetta>
+|  date:        Tue Jun 09 14:56:32 2020 +0200
+|  summary:     Bump version to 12
+|
+o  changeset:   118:d906766d694e
+|  user:        Rene Schickbauer <cavac@rosetta>
+|  date:        Tue Jun 09 14:55:50 2020 +0200
+|  summary:     Update docs
+|
+o  changeset:   117:a07d4edeb64b
+|  user:        Rene Schickbauer <cavac@rosetta>
+|  date:        Tue Jun 09 14:55:32 2020 +0200
+|  summary:     Change Clacks.pod back to Clacks.pm to allow "cpan install Net::Clacks"
+|
+o  changeset:   116:f293c3e90f68
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Jun 09 14:47:37 2020 +0200
+|  summary:     Allow cleaner disconnect for ClacksCache
+|
+o  changeset:   115:d96448310e1d
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Thu Mar 12 10:49:48 2020 +0100
+|  summary:     Add access to raw socket for IO::Select stuff and similar
+|
+o  changeset:   114:83f5c977322d
+|  user:        Rene Schickbauer <cavac@venera>
+|  date:        Wed Mar 11 20:12:38 2020 +0100
+|  summary:     Change docs to show that doNetwork takes an optional read timeout argument
+|
+o  changeset:   113:95845bbcea84
+|  user:        Rene Schickbauer <cavac@cables.cavac.at>
+|  date:        Tue Mar 10 14:37:06 2020 +0100
+|  summary:     Update Changes again
+|
+o  changeset:   112:69a8c1cc562f
 |  user:        Rene Schickbauer <cavac@cables.cavac.at>
 |  date:        Tue Mar 10 14:36:34 2020 +0100
 |  summary:     Split documentation and UpgradeGuide, because the upgrade guide gets longer and longer and longer and longer and longer....

@@ -3,14 +3,14 @@ package Test2::API::Context;
 use strict;
 use warnings;
 
-our $VERSION = '1.302073';
+our $VERSION = '1.302175';
 
 
-use Carp qw/confess croak longmess/;
+use Carp qw/confess croak/;
 use Scalar::Util qw/weaken blessed/;
 use Test2::Util qw/get_tid try pkg_to_file get_tid/;
 
-use Test2::Util::Trace();
+use Test2::EventFacet::Trace();
 use Test2::API();
 
 # Preload some key event types
@@ -20,7 +20,7 @@ my %LOADED = (
         my $file = "Test2/Event/$_.pm";
         require $file unless $INC{$file};
         ( $pkg => $pkg, $_ => $pkg )
-    } qw/Ok Diag Note Info Plan Bail Exception Waiting Skip Subtest/
+    } qw/Ok Diag Note Plan Bail Exception Waiting Skip Subtest Pass Fail V2/
 );
 
 use Test2::Util::ExternalMeta qw/meta get_meta set_meta delete_meta/;
@@ -72,6 +72,8 @@ sub DESTROY {
         # show the warning about using eq.
         no warnings 'uninitialized';
         if($self->{+EVAL_ERROR} eq $@ && $hub->is_local) {
+            require Carp;
+            my $mess = Carp::longmess("Context destroyed");
             my $frame = $self->{+_IS_SPAWN} || $self->{+TRACE}->frame;
             warn <<"            EOT";
 A context appears to have been destroyed without first calling release().
@@ -87,6 +89,10 @@ release():
   File: $frame->[1]
   Line: $frame->[2]
   Tool: $frame->[3]
+
+Here is a trace to the code that caused the context to be destroyed, this could
+be an exit(), a goto, or simply the end of a scope:
+$mess
 
 Cleaning up the CONTEXT stack...
             EOT
@@ -156,9 +162,7 @@ sub do_in_context {
     # We need to update the pid/tid and error vars.
     my $clone = $self->snapshot;
     @$clone{+ERRNO, +EVAL_ERROR, +CHILD_ERROR} = ($!, $@, $?);
-    $clone->{+TRACE} = $clone->{+TRACE}->snapshot;
-    $clone->{+TRACE}->set_pid($$);
-    $clone->{+TRACE}->set_tid(get_tid());
+    $clone->{+TRACE} = $clone->{+TRACE}->snapshot(pid => $$, tid => get_tid());
 
     my $hub = $clone->{+HUB};
     my $hid = $hub->hid;
@@ -203,6 +207,49 @@ sub alert {
     $self->trace->alert($msg);
 }
 
+sub send_ev2_and_release {
+    my $self = shift;
+    my $out  = $self->send_ev2(@_);
+    $self->release;
+    return $out;
+}
+
+sub send_ev2 {
+    my $self = shift;
+
+    my $e;
+    {
+        local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+        $e = Test2::Event::V2->new(
+            trace => $self->{+TRACE}->snapshot,
+            @_,
+        );
+    }
+
+    if ($self->{+_ABORTED}) {
+        my $f = $e->facet_data;
+        ${$self->{+_ABORTED}}++ if $f->{control}->{halt} || defined($f->{control}->{terminate}) || defined($e->terminate);
+    }
+    $self->{+HUB}->send($e);
+}
+
+sub build_ev2 {
+    my $self = shift;
+
+    local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+    Test2::Event::V2->new(
+        trace => $self->{+TRACE}->snapshot,
+        @_,
+    );
+}
+
+sub send_event_and_release {
+    my $self = shift;
+    my $out = $self->send_event(@_);
+    $self->release;
+    return $out;
+}
+
 sub send_event {
     my $self  = shift;
     my $event = shift;
@@ -210,12 +257,19 @@ sub send_event {
 
     my $pkg = $LOADED{$event} || $self->_parse_event($event);
 
-    my $e = $pkg->new(
-        trace => $self->{+TRACE}->snapshot,
-        %args,
-    );
+    my $e;
+    {
+        local $Carp::CarpLevel = $Carp::CarpLevel + 1;
+        $e = $pkg->new(
+            trace => $self->{+TRACE}->snapshot,
+            %args,
+        );
+    }
 
-    ${$self->{+_ABORTED}}++ if $self->{+_ABORTED} && defined $e->terminate;
+    if ($self->{+_ABORTED}) {
+        my $f = $e->facet_data;
+        ${$self->{+_ABORTED}}++ if $f->{control}->{halt} || defined($f->{control}->{terminate}) || defined($e->terminate);
+    }
     $self->{+HUB}->send($e);
 }
 
@@ -226,10 +280,95 @@ sub build_event {
 
     my $pkg = $LOADED{$event} || $self->_parse_event($event);
 
+    local $Carp::CarpLevel = $Carp::CarpLevel + 1;
     $pkg->new(
         trace => $self->{+TRACE}->snapshot,
         %args,
     );
+}
+
+sub pass {
+    my $self = shift;
+    my ($name) = @_;
+
+    my $e = bless(
+        {
+            trace => bless({%{$self->{+TRACE}}}, 'Test2::EventFacet::Trace'),
+            name  => $name,
+        },
+        "Test2::Event::Pass"
+    );
+
+    $self->{+HUB}->send($e);
+    return $e;
+}
+
+sub pass_and_release {
+    my $self = shift;
+    my ($name) = @_;
+
+    my $e = bless(
+        {
+            trace => bless({%{$self->{+TRACE}}}, 'Test2::EventFacet::Trace'),
+            name  => $name,
+        },
+        "Test2::Event::Pass"
+    );
+
+    $self->{+HUB}->send($e);
+    $self->release;
+    return 1;
+}
+
+sub fail {
+    my $self = shift;
+    my ($name, @diag) = @_;
+
+    my $e = bless(
+        {
+            trace => bless({%{$self->{+TRACE}}}, 'Test2::EventFacet::Trace'),
+            name  => $name,
+        },
+        "Test2::Event::Fail"
+    );
+
+    for my $msg (@diag) {
+        if (ref($msg) eq 'Test2::EventFacet::Info::Table') {
+            $e->add_info({tag => 'DIAG', debug => 1, $msg->info_args});
+        }
+        else {
+            $e->add_info({tag => 'DIAG', debug => 1, details => $msg});
+        }
+    }
+
+    $self->{+HUB}->send($e);
+    return $e;
+}
+
+sub fail_and_release {
+    my $self = shift;
+    my ($name, @diag) = @_;
+
+    my $e = bless(
+        {
+            trace => bless({%{$self->{+TRACE}}}, 'Test2::EventFacet::Trace'),
+            name  => $name,
+        },
+        "Test2::Event::Fail"
+    );
+
+    for my $msg (@diag) {
+        if (ref($msg) eq 'Test2::EventFacet::Info::Table') {
+            $e->add_info({tag => 'DIAG', debug => 1, $msg->info_args});
+        }
+        else {
+            $e->add_info({tag => 'DIAG', debug => 1, details => $msg});
+        }
+    }
+
+    $self->{+HUB}->send($e);
+    $self->release;
+    return 0;
 }
 
 sub ok {
@@ -239,7 +378,7 @@ sub ok {
     my $hub = $self->{+HUB};
 
     my $e = bless {
-        trace => bless( {%{$self->{+TRACE}}}, 'Test2::Util::Trace'),
+        trace => bless( {%{$self->{+TRACE}}}, 'Test2::EventFacet::Trace'),
         pass  => $pass,
         name  => $name,
     }, 'Test2::Event::Ok';
@@ -251,14 +390,7 @@ sub ok {
     $self->failure_diag($e);
 
     if ($on_fail && @$on_fail) {
-        for my $of (@$on_fail) {
-            if (ref($of) eq 'CODE' || (blessed($of) && $of->can('render'))) {
-                $self->info($of, diagnostics => 1);
-            }
-            else {
-                $self->diag($of);
-            }
-        }
+        $self->diag($_) for @$on_fail;
     }
 
     return $e;
@@ -267,13 +399,6 @@ sub ok {
 sub failure_diag {
     my $self = shift;
     my ($e) = @_;
-
-    # This behavior is inherited from Test::Builder which injected a newline at
-    # the start of the first diagnostics when the harness is active, but not
-    # verbose. This is important to keep the diagnostics from showing up
-    # appended to the existing line, which is hard to read. In a verbose
-    # harness there is no need for this.
-    my $prefix = $ENV{HARNESS_ACTIVE} && !$ENV{HARNESS_IS_VERBOSE} ? "\n" : "";
 
     # Figure out the debug info, this is typically the file name and line
     # number, but can also be a custom message. If no trace object is provided
@@ -285,8 +410,8 @@ sub failure_diag {
     # Create the initial diagnostics. If the test has a name we put the debug
     # info on a second line, this behavior is inherited from Test::Builder.
     my $msg = defined($name)
-        ? qq[${prefix}Failed test '$name'\n$debug.\n]
-        : qq[${prefix}Failed test $debug.\n];
+        ? qq[Failed test '$name'\n$debug.\n]
+        : qq[Failed test $debug.\n];
 
     $self->diag($msg);
 }
@@ -301,12 +426,6 @@ sub skip {
         pass => 1,
         @extra,
     );
-}
-
-sub info {
-    my $self = shift;
-    my ($renderer, %params) = @_;
-    $self->send_event('Info', renderer => $renderer, %params);
 }
 
 sub note {
@@ -368,4 +487,4 @@ sub _parse_event {
 
 __END__
 
-#line 739
+#line 1019

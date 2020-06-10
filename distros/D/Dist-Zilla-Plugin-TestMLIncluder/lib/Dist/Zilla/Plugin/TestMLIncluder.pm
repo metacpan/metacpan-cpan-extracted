@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::TestMLIncluder;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -29,18 +29,18 @@ https://github.com/testml-lang/testml/wiki/publishing-cpan-modules-with-testml-t
       or die "Invalid TESTML_ROOT '$testml_root'";
 
     # Load the local TestML::Compiler:
-    unshift @INC, "$testml_root/src/testml-compiler-perl5/lib";
+    unshift @INC, "$testml_root/src/testml-compiler-perl/lib";
     require TestML::Compiler;
   }
 }
 
-# Pull the local Perl5 TestML modules into inc/lib/:
+# Pull the local Perl TestML modules into inc/lib/:
 sub gather_files {
   my ($self) = @_;
 
-  for my $file (io("$testml_root/src/perl5/lib")->All_Files) {
+  for my $file (io("$testml_root/src/perl/lib")->All_Files) {
     my $path = $file->pathname;
-    $path =~ s{\Q$testml_root\E/src/perl5/}{};
+    $path =~ s{\Q$testml_root\E/src/perl/}{};
     $self->add("inc/$path", $file->all);
   }
 

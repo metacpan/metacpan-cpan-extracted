@@ -1,7 +1,9 @@
 package App::ANSIColorUtils;
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-09'; # DATE
+our $DIST = 'App-ANSIColorUtils'; # DIST
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,6 +41,56 @@ sub show_ansi_color_table {
                 $_ < 8   ? sprintf("\e[%dm%s\e[0m", 30+$_, "This is ANSI color #$_") :
                 $_ < 16  ? sprintf("\e[1;%dm%s\e[0m", 30+$_-8, "This is ANSI color #$_") :
                            sprintf("\e[38;5;%dm%s\e[0m", $_, "This is ANSI color #$_"),
+        };
+    }
+    [200, "OK", \@rows];
+}
+
+$SPEC{show_colors} = {
+    v => 1.1,
+    summary => 'Show colors specified in argument as text with ANSI colors',
+    args => {
+        colors => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'color',
+            schema => ['array*', of=>'str*'],
+            req => 1,
+            pos => 0,
+            slurpy => 1,
+        },
+    },
+};
+sub show_colors {
+    require Color::ANSI::Util;
+    require Graphics::ColorNamesLite::All;
+    #require String::Escape; # ugly: \x1b...
+    require Data::Dmp;
+
+    my $codes = $Graphics::ColorNamesLite::All::NAMES_RGB_TABLE;
+
+    my %args = @_;
+
+    my @rows;
+    my $j = -1;
+    for my $name (@{ $args{colors} }) {
+        $j++;
+        my $code;
+        if ($name =~ /\A[0-9A-fa-f]{6}\z/) {
+            $code = $name;
+        } else {
+            $code = $codes->{$name}; defined $code or die "Unknown color name '$name'";
+        }
+        my $ansifg = Color::ANSI::Util::ansifg($code);
+        my $ansibg = Color::ANSI::Util::ansibg($code);
+        push @rows, {
+            name => $name,
+            rgb_code => $code,
+            ansi_fg_code => Data::Dmp::dmp($ansifg),
+            ansi_bg_code => Data::Dmp::dmp($ansibg),
+            fg =>
+                $ansifg . "This is text with foreground color $name (#$code)" . Color::ANSI::Util::ansi_reset(1) . "\n" .
+                $ansifg . "\e[1m" . "This is text with foreground color $name (#$code) + BOLD" . Color::ANSI::Util::ansi_reset(1) . "\n",
+            bg => $ansibg . Color::ANSI::Util::ansifg(Color::RGB::Util::rgb_is_light($code) ? "000000":"ffffff") . "This is text with background color $name (#$code)" . Color::ANSI::Util::ansi_reset(1),
         };
     }
     [200, "OK", \@rows];
@@ -172,7 +224,7 @@ App::ANSIColorUtils - Utilities related to ANSI color
 
 =head1 VERSION
 
-This document describes version 0.006 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2019-08-20.
+This document describes version 0.007 of App::ANSIColorUtils (from Perl distribution App-ANSIColorUtils), released on 2020-06-09.
 
 =head1 DESCRIPTION
 
@@ -208,6 +260,8 @@ This distributions provides the following command-line utilities:
 
 =item * L<show-assigned-rgb-colors>
 
+=item * L<show-colors>
+
 =item * L<show-text-using-color-gradation>
 
 =back
@@ -230,6 +284,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<width> => I<str> (default: 8)
+
 
 =back
 
@@ -266,6 +321,39 @@ Arguments ('*' denotes required arguments):
 =item * B<strings>* => I<array[str]>
 
 =item * B<tone> => I<str>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 show_colors
+
+Usage:
+
+ show_colors(%args) -> [status, msg, payload, meta]
+
+Show colors specified in argument as text with ANSI colors.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<colors>* => I<array[str]>
+
 
 =back
 
@@ -316,6 +404,7 @@ Arguments ('*' denotes required arguments):
 
 If unspecified, will show a bar of '=' across the terminal.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -353,7 +442,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-package Linux::Systemd 1.191790;
+package Linux::Systemd 1.201600;
 
 use v5.16;
 
@@ -12,8 +12,8 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Ioan Rogers cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee
-diff irc mailto metadata placeholders metacpan
+=for :stopwords Ioan Rogers cpan testmatrix url bugtracker rt cpants kwalitee diff irc
+mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -21,7 +21,7 @@ Linux::Systemd - Bindings for C<systemd> APIs
 
 =head1 VERSION
 
-version 1.191790
+version 1.201600
 
 =head1 DESCRIPTION
 
@@ -64,16 +64,16 @@ L<https://metacpan.org/release/Linux-Systemd>
 
 =head2 Bugs / Feature Requests
 
-Please report any bugs or feature requests through the web interface at L<https://github.com/ioanrogers/Linux-Systemd/issues>.
+Please report any bugs or feature requests through the web interface at L<https://gitlab.com/ioanrogers/Linux-Systemd/issues>.
 You will be automatically notified of any progress on the request by the system.
 
 =head2 Source Code
 
 The source code is available for from the following locations:
 
-L<https://github.com/ioanrogers/Linux-Systemd>
+L<https://gitlab.com/ioanrogers/Linux-Systemd>
 
-  git clone git://github.com/ioanrogers/Linux-Systemd.git
+  git clone https://gitlab.com:ioanrogers/Linux-Systemd.git
 
 =head1 AUTHOR
 
@@ -81,7 +81,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Ioan Rogers.
+This software is Copyright (c) 2020 by Ioan Rogers.
 
 This is free software, licensed under:
 

@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Determine the sane terminal size",
+  "ABSTRACT" => "Determine the sane terminal size (width, height)",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Role::TinyCommons::TermAttr::Size",
   "PREREQ_PM" => {
     "Role::Tiny" => 0,
-    "Term::Size" => 0
+    "Term::App::Util::Size" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,7 +37,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Role::Tiny" => 0,
-  "Term::Size" => 0,
+  "Term::App::Util::Size" => 0,
   "Test::More" => 0
 );
 

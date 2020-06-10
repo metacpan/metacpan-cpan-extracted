@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.058';
+our $VERSION = '1.060';
 # ABSTRACT: The Best Web Framework Deserves the Best CMS
 
 #pod =head1 SYNOPSIS
@@ -141,6 +141,11 @@ our $VERSION = '1.058';
 #pod L<OpenAPI|http://openapis.org> API specification. The API spec document
 #pod is located at C</yancy/api>.
 #pod
+#pod =head2 Internationalization
+#pod
+#pod Yancy is working on support for translating all internal text. See L<Yancy::I18N>
+#pod for more information. Translations and other help will be greatly appreciated!
+#pod
 #pod =head1 GUIDES
 #pod
 #pod =over
@@ -227,7 +232,7 @@ Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.058
+version 1.060
 
 =head1 SYNOPSIS
 
@@ -364,6 +369,11 @@ This application creates a REST API using the standard
 L<OpenAPI|http://openapis.org> API specification. The API spec document
 is located at C</yancy/api>.
 
+=head2 Internationalization
+
+Yancy is working on support for translating all internal text. See L<Yancy::I18N>
+for more information. Translations and other help will be greatly appreciated!
+
 =head1 GUIDES
 
 =over
@@ -413,13 +423,17 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ed J Mohammad S Anwar Pavel Serikov Rajesh Mallah William Lindley Wojtek Bażant
+=for stopwords Ed J Erik Johansen Mohammad S Anwar Pavel Serikov Rajesh Mallah William Lindley Wojtek Bażant
 
 =over 4
 
 =item *
 
 Ed J <mohawk2@users.noreply.github.com>
+
+=item *
+
+Erik Johansen <uniejo@users.noreply.github.com>
 
 =item *
 

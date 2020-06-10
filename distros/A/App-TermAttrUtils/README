@@ -3,8 +3,8 @@ NAME
     attributes
 
 VERSION
-    This document describes version 0.005 of App::TermAttrUtils (from Perl
-    distribution App-TermAttrUtils), released on 2019-11-26.
+    This document describes version 0.006 of App::TermAttrUtils (from Perl
+    distribution App-TermAttrUtils), released on 2020-06-10.
 
 DESCRIPTION
     This distributions provides the following command-line utilities related
@@ -43,7 +43,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

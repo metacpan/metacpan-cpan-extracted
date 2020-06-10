@@ -3,6 +3,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use Mojo::Rx::Subscription;
+use Mojo::Rx::Subscriber;
 
 use Scalar::Util 'reftype';
 
@@ -23,7 +24,7 @@ use Scalar::Util 'reftype';
 #   (body)      This method calls the $function that Mojo::Rx::Observable->new received as argument (and that initiates the subscription)
 #   (return)    This method returns a new Mojo::Rx::Subscription object, that contains the "cleanup subref" returned by $function
 
-our $VERSION = "v0.12.1";
+our $VERSION = "v0.13.0";
 
 sub new {
     my ($class, $function) = @_;
@@ -37,6 +38,8 @@ sub subscribe {
     my ($self, @args) = @_;
 
     my $subscriber = {};
+    bless $subscriber, 'Mojo::Rx::Subscriber';
+
     if ((reftype($args[0]) // '') eq 'HASH') {
         $args[0]{_subscription} = delete $args[0]{new_subscription} if $args[0]{new_subscription};
         @$subscriber{qw/ next error complete _subscription /} = @{ $args[0] }{qw/ next error complete _subscription /};

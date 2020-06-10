@@ -8,8 +8,11 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/disco
 eg/five
-eg/metronome
+eg/metronome34
+eg/metronome44
+eg/reggae
 eg/swing
 lib/MIDI/Drummer/Tiny.pm
 t/00-compile.t

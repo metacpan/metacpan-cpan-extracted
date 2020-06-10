@@ -20,8 +20,8 @@ requires:
   App::podsel: '0.004'
   Complete::Module: '0'
   Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_to_path: '0'
+  Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
-  Data::Sah::Compiler::perl::TH::hash: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Data::Sah::Filter::perl::Str::replace_dashes_with_underscores: '0'
   File::Slurper::Dash: '0'
@@ -35,9 +35,10 @@ requires:
   Pod::Elemental::Transformer::Pod5: '0'
   Pod::Elide: '0.003'
   Pod::Simple::Methody: '0'
+  Pod::Strip: '0'
   Sah::Schema::perl::pod_filename: '0'
   Sah::Schema::sortsub::spec: '0'
-  Sort::Sub: '0.118'
+  Sort::Sub: '0.120'
   Sort::SubList: '0'
   parent: '0'
   perl: '5.010001'
@@ -47,7 +48,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PODUtils
   homepage: https://metacpan.org/release/App-PODUtils
   repository: git://github.com/perlancar/perl-App-PODUtils.git
-version: '0.048'
+version: '0.049'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

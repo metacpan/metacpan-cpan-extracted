@@ -15,6 +15,7 @@ my $loop = IO::Async::Loop->new();
 testing_loop( $loop );
 
 my ( $my_rd, $term_wr ) = IO::Async::OS->pipepair or die "Cannot pipepair - $!";
+$term_wr->blocking(0);
 
 my $tickit = Tickit::Async->new(
    term_out => $term_wr,

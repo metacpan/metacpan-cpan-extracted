@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Music::Cadence",
   "PREREQ_PM" => {
+    "List::Util" => "1.44",
     "Moo" => 2,
     "Music::Chord::Note" => 0,
     "Music::Chord::Positions" => 0,
@@ -35,7 +36,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.1404",
+  "VERSION" => "0.1502",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "List::Util" => "1.44",
   "Moo" => 2,
   "Music::Chord::Note" => 0,
   "Music::Chord::Positions" => 0,

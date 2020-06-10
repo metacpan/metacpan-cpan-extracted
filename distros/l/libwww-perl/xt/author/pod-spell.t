@@ -51,6 +51,7 @@ ConnCache
 Coppit
 Couzins
 DAVIDRW
+Dahan
 Daignault
 Daina
 Dalgleish
@@ -119,6 +120,7 @@ Joao
 Joe
 Joerg
 John
+Jonathan
 Jr
 Julien
 KONISHI
@@ -341,6 +343,7 @@ jefflee
 jfesler
 jmates
 john9art
+jonathan
 jraspass
 jwilk
 jwittkoski

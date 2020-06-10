@@ -32,7 +32,7 @@
          "requires" : {
             "Carp" : "0",
             "English" : "0",
-            "Exporter" : "0",
+            "Exporter" : "5.57",
             "perl" : "5.010001"
          }
       },
@@ -57,6 +57,6 @@
          "web" : "https://github.com/outtaspace/jip_datapath"
       }
    },
-   "version" : "0.041",
+   "version" : "0.042",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

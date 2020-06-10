@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-PluginBundle-Author-TEAM
 
+0.004     2020-06-08 14:39:00+08:00 Asia/Kuala_Lumpur
+    Avoid running xt/ tests twice
+
+0.003     2020-06-08 14:02:42+08:00 Asia/Kuala_Lumpur
+    Disables the No404s test, since some distributions can have
+    thousands of links and the test is rarely useful.
+
+    Also includes the $AUTHORITY info by default now.
+
 0.002     2019-01-02 01:35:03+08:00 Asia/Kuala_Lumpur
     GatherPrune not fruitful - turns out that explicitly excluding
     dist.ini means that the resulting distribution does not include

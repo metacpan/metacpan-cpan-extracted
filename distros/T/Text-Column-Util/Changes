@@ -1,0 +1,15 @@
+0.003   2020-06-07  Released-By: PERLANCAR; Urgency: medium
+
+	- No functional changes.
+
+	- Clean Changes entries [copy-paste mistake].
+
+
+0.002   2020-06-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Pass column_width to gen_texts coderef.
+
+
+0.001   2017-12-03  Released-By: PERLANCAR
+
+        - First release.

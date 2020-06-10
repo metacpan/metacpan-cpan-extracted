@@ -20,7 +20,7 @@ package Rex::Commands::Mkfs;
 use warnings;
 use strict;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);

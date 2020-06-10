@@ -40,8 +40,8 @@ SKIP: {
 
     # Try a few remote servers
     my %webs = (
-      # Hopefully this is never a routeable host
-      '172.29.249.249'       => 0,
+      # Documentation address, non-routable
+      '203.0.113.90'       => 0,
 
       # Hopefully all these web ports are open
       'facebook.com.'  => 1,

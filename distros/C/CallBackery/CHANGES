@@ -1,3 +1,11 @@
+0.33.5 2020-06-07 11:25:16 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - translate labels transported via buttonSet
+
+0.33.4 2020-06-07 11:12:16 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - translate labels transported via _actionSet property
+
 0.33.3 2020-06-03 09:22:00 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - fix tra to properly handle multiple arguments

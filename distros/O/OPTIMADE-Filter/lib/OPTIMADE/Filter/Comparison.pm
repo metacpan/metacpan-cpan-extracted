@@ -102,26 +102,30 @@ sub to_SQL
     my @values;
     my @operands_now;
     for my $arg (@operands) {
+        my $sql = $arg;
         if( blessed $arg && $arg->can( 'to_SQL' ) ) {
-            ( $arg, my $values ) = $arg->to_SQL( $options );
+            ( $sql, my $values ) = $arg->to_SQL( $options );
+            if( $arg->isa( OPTIMADE::Filter::Comparison:: ) ) {
+                $sql = "($sql)";
+            }
             push @values, @$values;
         } else {
             push @values, $arg;
             if( $placeholder ) {
-                $arg = $placeholder;
+                $sql = $placeholder;
             } else {
-                $arg =~ s/"/""/g;
-                $arg = "\"$arg\"";
+                $sql =~ s/"/""/g;
+                $sql = "\"$sql\"";
             }
         }
-        push @operands_now, $arg;
+        push @operands_now, $sql;
     }
     @operands = @operands_now;
 
     if( wantarray ) {
-        return ( "($operands[0] $operator $operands[1])", \@values );
+        return ( "$operands[0] $operator $operands[1]", \@values );
     } else {
-        return "($operands[0] $operator $operands[1])";
+        return "$operands[0] $operator $operands[1]";
     }
 }
 

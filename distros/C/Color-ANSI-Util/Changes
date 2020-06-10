@@ -1,3 +1,9 @@
+0.164   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option for ansi_reset() to conditionally return reset
+	  sequence when color is enabled.
+
+
 0.163   2019-08-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Use rgb_diff() with hsv_hue1 algorithm to convert RGB 24bit to

@@ -6,7 +6,8 @@ use warnings;
 # Older versions cannot complete the test suite successfully
 use 5.018;
 
-our $VERSION = '1.012';
+our $VERSION = '2.001';
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
 
@@ -40,7 +41,7 @@ Eventually some documentation pages might appear, but at the moment they're unli
 =over 4
 
 =item * Network protocol implementations - if you're bored of stringing together C<substr>, C<pack>, C<unpack>
-and C<vec>, try L<Ryu::Manual::Protocol>
+and C<vec>, try L<Ryu::Manual::Protocol> or L<Ryu::Buffer>.
 
 =item * Extract, Transform, Load workflows (ETL) - need to pull data from somewhere, mangle it into shape, push it to
 a database? that'd be L<Ryu::Manual::ETL>
@@ -52,11 +53,22 @@ a database? that'd be L<Ryu::Manual::ETL>
 As an expert software developer with a keen eye for useful code, you may already be bored of this documentation
 and on the verge of reaching for alternatives. The L</SEE ALSO> section may speed you on your way.
 
+=head2 Compatibility
+
+Since L<Mojo::Rx> follows the ReactiveX conventions quite closely, we'd expect to have
+the ability to connect L<Mojo::Rx> observable to a L<Ryu::Source>, and provide an
+adapter from a L<Ryu::Source> to act as a L<Mojo::Rx>-style observable. This is not yet
+implemented, but planned for a future version.
+
+Most of the other modules in L<SEE ALSO> are either not used widely enough or not a good
+semantic fit for a compatibility layer - but if you're interested in this, L<please ask|https://github.com/team-at-cpan/Ryu/issues>.
+
 =head2 Components
 
 =head3 Sources
 
-A source emits items. See L<Ryu::Source>.
+A source emits items. See L<Ryu::Source>. If in doubt, this is likely to be the class
+that you wanted.
 
 Items can be any scalar value - some examples:
 
@@ -83,11 +95,12 @@ A sink receives items. It's the counterpart to a source. See L<Ryu::Sink>.
 =head3 Streams
 
 A stream is a thing with a source. See L<Ryu::Stream>, which is likely to be something that does not yet
-exist.
+have much documentation - in practice, the L<Ryu::Source> implementation covers most use-cases.
 
-=head2 What does this module do?
+=head2 So what does this module do?
 
 Nothing. It's just a top-level loader for pulling in all the other components.
+You wanted L<Ryu::Source> instead, or possibly L<Ryu::Buffer>.
 
 =head2 Some notes that might not relate to anything
 
@@ -131,6 +144,10 @@ our $ryu = __PACKAGE__->new;
 
 our @EXPORT_OK = qw($ryu);
 
+our $FUTURE_FACTORY = sub {
+    Future->new->set_label($_[1])
+};
+
 =head1 METHODS
 
 Note that you're more likely to find useful methods in the following classes:
@@ -144,6 +161,12 @@ Note that you're more likely to find useful methods in the following classes:
 =item * L<Ryu::Observable>
 
 =back
+
+=cut
+
+=head2 new
+
+Instantiates a L<Ryu> object, allowing L</from>, L</just> and other methods.
 
 =cut
 
@@ -187,6 +210,8 @@ Some perl modules of relevance:
 
 =item * L<Future> - fundamental building block for one-shot tasks
 
+=item * L<Future::Queue> - a FIFO queue for L<Future> tasks
+
 =item * L<POE::Filter> - venerable and battle-tested, but slightly short on features due to the focus on protocols
 
 =item * L<Data::Transform> - standalone version of L<POE::Filter>
@@ -215,6 +240,8 @@ syntax is "backwards" (same as grep/map chains in Perl)
 =item * L<Async::Stream> - early release, but seems to be very similar in concept to L<Ryu::Source>
 
 =item * L<Data::Monad>
+
+=item * L<Mojo::Rx> - Mojolicious-specific support for ReactiveX, follows the rxjs API quite closely
 
 =back
 

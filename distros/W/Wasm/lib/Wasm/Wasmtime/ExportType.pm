@@ -2,12 +2,13 @@ package Wasm::Wasmtime::ExportType;
 
 use strict;
 use warnings;
+use 5.008004;
 use Ref::Util qw( is_blessed_ref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime export type class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_exporttype_';
@@ -79,7 +80,7 @@ Wasm::Wasmtime::ExportType - Wasmtime export type class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

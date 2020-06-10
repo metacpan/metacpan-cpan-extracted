@@ -64,7 +64,7 @@
    "provides" : {
       "Test::TrailingSpace" : {
          "file" : "lib/Test/TrailingSpace.pm",
-         "version" : "0.0500"
+         "version" : "0.0600"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/shlomif/perl-test-trailingspace"
       }
    },
-   "version" : "0.0500",
+   "version" : "0.0600",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030003"

@@ -264,16 +264,14 @@ sub overview { # this method is invoked from the admin prompt
     
     my $overview_txt = join "\n", @overviews;
     
-    my $backlog = $Threads->get_queue_count();
-    
-    if ($fh) {
-        $fh->write($overview_txt);
-    }
-    
     if ($for_api) {
         return $overview;
     }
     
+    if ($fh && !$for_api) {    	
+    	$Log->log({msg=>"i think I have a fh and its not the api in overview",level=>3});
+        $fh->write($overview_txt);
+    }
     
 }
 
@@ -286,6 +284,7 @@ sub api_overview {
     my $json_string = eval{$json->encode( $data )};
     $Log->log({'msg'=>"$@",'level'=>2}) if $@;
     if ($fh) {
+    	$Log->log({msg=>"i think I have a fh in api_overview",level=>3});
         $fh->write($json_string);
     } else {
         return $json_string;

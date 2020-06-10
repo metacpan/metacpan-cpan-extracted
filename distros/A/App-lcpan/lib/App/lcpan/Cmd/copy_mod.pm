@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::copy_mod;
 
-our $DATE = '2020-05-26'; # DATE
-our $VERSION = '1.058'; # VERSION
+our $DATE = '2020-06-10'; # DATE
+our $VERSION = '1.059'; # VERSION
 
 use 5.010;
 use strict;
@@ -76,7 +76,7 @@ App::lcpan::Cmd::copy_mod - Copy a module's latest release file to current direc
 
 =head1 VERSION
 
-This document describes version 1.058 of App::lcpan::Cmd::copy_mod (from Perl distribution App-lcpan), released on 2020-05-26.
+This document describes version 1.059 of App::lcpan::Cmd::copy_mod (from Perl distribution App-lcpan), released on 2020-06-10.
 
 =head1 FUNCTIONS
 

@@ -1,11 +1,8 @@
 package MIDI::Simple::Drummer::Rudiments;
+$MIDI::Simple::Drummer::Rudiments::VERSION = '0.0805';
 our $AUTHORITY = 'cpan:GENE';
-
-our $VERSION = '0.04';
-
 use strict;
 use warnings;
-
 use parent 'MIDI::Simple::Drummer';
 
 use constant PAN_LEFT   => 0;
@@ -965,7 +962,7 @@ MIDI::Simple::Drummer::Rudiments
 
 =head1 VERSION
 
-version 0.0803
+version 0.0805
 
 =head1 SYNOPSIS
 
@@ -979,27 +976,23 @@ version 0.0803
 
 This package contains rudiment patterns.
 
-=head1 NAME
-
-MIDI::Simple::Drummer::Rudiments - Drum rudiments
-
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
 Sets pan_width to 1/4 distance from center.
 Sets the reverb effect to 1 and chorus to 0.
 
 =head1 I. Roll Rudiments
 
-=head2 single_stroke_roll()
+=head2 single_stroke_roll
 
  tap tap tap tap tap tap tap tap
  r   l   r   l   r   l   r   l
 
 1. Single Stroke Roll
 
-=head2 single_stroke_four()
+=head2 single_stroke_four
 
 2. Single Stroke Four
 
@@ -1007,7 +1000,7 @@ Sets the reverb effect to 1 and chorus to 0.
  tap tap tap tap tap tap tap tap
  r   l   r   l   r   l   r   l
 
-=head2 single_stroke_seven()
+=head2 single_stroke_seven
 
 3. Single Stroke Seven
 
@@ -1017,11 +1010,11 @@ Sets the reverb effect to 1 and chorus to 0.
 
 =head1 B. Multiple Bounce Rudiments
 
-=head2 multiple_bounce_roll()
+=head2 multiple_bounce_roll
 
 Not yet implemented...
 
-=head2 triple_stroke_roll()
+=head2 triple_stroke_roll
 
 5. Triple Stroke Roll
 
@@ -1029,7 +1022,7 @@ Not yet implemented...
  tap tap tap tap tap tap
  r   r   r   l   l   l
 
-=head2 double_stroke_open_roll()
+=head2 double_stroke_open_roll
 
 6. Double Stroke Open Roll (Long Roll)
 
@@ -1038,7 +1031,7 @@ Alternating diddles
  diddle diddle diddle diddle
  r  r   l  l   r  r   l  l
 
-=head2 five_stroke_roll()
+=head2 five_stroke_roll
 
 7. Five Stroke Roll
 
@@ -1048,7 +1041,7 @@ Two diddles, accent
  diddle diddle Tap
  r  r   l  l    R
 
-=head2 six_stroke_roll()
+=head2 six_stroke_roll
 
 8. Six Stroke Roll
 
@@ -1058,7 +1051,7 @@ Accent, 2 diddles, accent
  Tap diddle diddle Tap
  R   l  l   r  r   L
 
-=head2 seven_stroke_roll()
+=head2 seven_stroke_roll
 
 9. Seven Stroke Roll
 
@@ -1068,7 +1061,7 @@ Accent, 2 diddles, accent
  diddle diddle diddle Tap
  r  r   l  l   r  r   L
 
-=head2 nine_stroke_roll()
+=head2 nine_stroke_roll
 
 10. Nine Stroke Roll
 
@@ -1078,7 +1071,7 @@ Accent, 2 diddles, accent
  diddle diddle diddle diddle Tap
  r  r   l  l   r  r   l  l   R
 
-=head2 ten_stroke_roll()
+=head2 ten_stroke_roll
 
 11. Ten Stroke Roll
 
@@ -1088,7 +1081,7 @@ Accent, 2 diddles, accent
  diddle diddle diddle diddle Tap Tap
  r  r   l  l   r  r   l  l   R   L
 
-=head2 eleven_stroke_roll()
+=head2 eleven_stroke_roll
 
 12. Eleven Stroke Roll
 
@@ -1098,7 +1091,7 @@ Accent, 2 diddles, accent
  diddle diddle diddle diddle diddle Tap
  r  r   l  l   r  r   l  l   r  r   L
 
-=head2 thirteen_stroke_roll()
+=head2 thirteen_stroke_roll
 
 13. Thirteen Stroke Roll
 
@@ -1108,7 +1101,7 @@ Accent, 2 diddles, accent
  diddle diddle diddle diddle diddle diddle Tap
  r  r   l  l   r  r   l  l   r  r   l  l   R
 
-=head2 fifteen_stroke_roll()
+=head2 fifteen_stroke_roll
 
 14. Fifteen Stroke Roll
 
@@ -1118,7 +1111,7 @@ Accent, 2 diddles, accent
  diddle diddle diddle diddle diddle diddle diddle Tap
  r  r   l  l   r  r   l  l   r  r   l  l   r  r   L
 
-=head2 seventeen_stroke_roll()
+=head2 seventeen_stroke_roll
 
 15. Seventeen Stroke Roll
 
@@ -1130,7 +1123,7 @@ Accent, 2 diddles, accent
 
 =head1 II. Diddle Rudiments
 
-=head2 single_paradiddle()
+=head2 single_paradiddle
 
 16. Single Paradiddle
 
@@ -1139,7 +1132,7 @@ Accent, single stroke, diddle
  Tap tap diddle
  R   l   r  r
 
-=head2 double_paradiddle()
+=head2 double_paradiddle
 
 17. Double Paradiddle
 
@@ -1148,7 +1141,7 @@ Accent, 3 single strokes, diddle
  Tap tap tap tap diddle
  R   l   r   l   r  r
 
-=head2 triple_paradiddle()
+=head2 triple_paradiddle
 
 18. Triple Paradiddle
 
@@ -1157,7 +1150,7 @@ Accent, 3 single strokes, diddle
  Tap tap tap tap tap tap diddle
  R   l   r   l   r   l   r  r
 
-=head2 paradiddle_diddle()
+=head2 paradiddle_diddle
 
 19. Paradiddle-Diddle
 
@@ -1168,21 +1161,21 @@ Accent, 3 single strokes, diddle
 
 =head1 III. Flam Rudiments
 
-=head2 flam()
+=head2 flam
 
 20. Flam
 
  grace tap = flam
  r     l     r l
 
-=head2 flam_accent()
+=head2 flam_accent
 
 21. Flam Accent
 
  Flam tap tap
  l R  l   r
 
-=head2 flam_tap()
+=head2 flam_tap
 
 22. Flam Tap
 
@@ -1191,97 +1184,97 @@ Accented "flam-diddles"
  grace Diddle grace Diddle
      l R  r       r L  l
 
-=head2 flamacue()
+=head2 flamacue
 
 23. Flamacue
 
 Flam, accent, 2 taps, flam
 
-=head2 flam_paradiddle()
+=head2 flam_paradiddle
 
 24. Flam Paradiddle
 
 Accented flam, tap, diddle
 
-=head2 flammed_mill()
+=head2 flammed_mill
 
 25. Single flammed Mill
 
 Accented flam-diddle, 2 taps
 
-=head2 flam_paradiddle_diddle()
+=head2 flam_paradiddle_diddle
 
 26. Flam Paradiddle-Diddle
 
-=head2 pataflafla()
+=head2 pataflafla
 
 27. Pataflafla
 
-=head2 swiss_army_triplet()
+=head2 swiss_army_triplet
 
 28. Swiss Army Triplet
 
-=head2 inverted_flam_tap()
+=head2 inverted_flam_tap
 
 29. Inverted Flam Tap
 
-=head2 flam_drag()
+=head2 flam_drag
 
 30. Flam Drag
 
 =head1 IV. Drag Rudiments
 
-=head2 drag()
+=head2 drag
 
 31. Drag (Half drag or ruff)
 
-=head2 single_drag_tap()
+=head2 single_drag_tap
 
 32. Single Drag Tap
 
-=head2 double_drag_tap()
+=head2 double_drag_tap
 
 33. Double Drag Tap
 
-=head2 lesson_25_two_and_three()
+=head2 lesson_25_two_and_three
 
 34. Lesson 25 (Two and Three)
 
-=head2 single_dragadiddle()
+=head2 single_dragadiddle
 
 35. Single Dragadiddle
 
-=head2 drag_paradiddle_1()
+=head2 drag_paradiddle_1
 
 36. Drag Paradiddle #1
 
-=head2 drag_paradiddle_2()
+=head2 drag_paradiddle_2
 
 37. Drag Paradiddle #2
 
-=head2 single_ratamacue()
+=head2 single_ratamacue
 
 38. Single Ratamacue
 
-=head2 double_ratamacue()
+=head2 double_ratamacue
 
 39. Double Ratamacue
 
-=head2 triple_ratamacue()
+=head2 triple_ratamacue
 
 40. Triple Ratamacue
 
-=head2 pan_left(), pan_center(), pan_right()
+=head2 pan_left, pan_center, pan_right
 
  $d->pan_left($width);
- $d->pan_center();
+ $d->pan_center;
  $d->pan_right($width);
 
 Convenience methods to pan in different directions.
 
-=head2 alternate_pan()
+=head2 alternate_pan
 
- $d->alternate_pan();
+ $d->alternate_pan;
  $d->alternate_pan($direction);
  $d->alternate_pan($direction, $width);
 
@@ -1292,7 +1285,7 @@ The pan B<direction> is B<0> for left (the default) and B<1> for right.
 The B<width> can be any integer between B<1> and B<64> (the default).
 A B<width> of B<64> means "stereo pan 100% left/right."
 
-=head2 alternate_note()
+=head2 alternate_note
 
 Abstract method for alternating a note strike based on the beat and note value,
 given the following parameters.
@@ -1304,7 +1297,7 @@ Arguments & defaults:
   groups_of     : Number of beats after which we pan
   note          : A 1/16th note
 
-=head2 single_stroke_n()
+=head2 single_stroke_n
 
 Abstract method for multiple types of single stroke rolls of B<n> maximum beats.
 
@@ -1343,7 +1336,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 # VERSION
 
-version 1.201410
+version 1.201592
 
 # OPTIONS
 
@@ -77,7 +77,7 @@ The source code is available for from the following locations:
 [https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR](https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR)
 
 ```
-git clone https://gitlab.com:ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git
+git clone https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git
 ```
 
 # AUTHOR

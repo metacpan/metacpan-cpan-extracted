@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.058';
+our $VERSION = '1.060';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -591,6 +591,7 @@ sub _get_register {
     my ( $self, $c ) = @_;
     if ( !$self->allow_register ) {
         $c->app->log->error( 'Registration not allowed (set allow_register)' );
+        $c->reply->not_found;
         return;
     }
     return $c->render( 'yancy/auth/password/register',
@@ -602,6 +603,7 @@ sub _post_register {
     my ( $self, $c ) = @_;
     if ( !$self->allow_register ) {
         $c->app->log->error( 'Registration not allowed (set allow_register)' );
+        $c->reply->not_found;
         return;
     }
 
@@ -758,7 +760,7 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.058
+version 1.060
 
 =head1 SYNOPSIS
 

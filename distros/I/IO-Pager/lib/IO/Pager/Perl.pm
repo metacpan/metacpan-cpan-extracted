@@ -1,5 +1,5 @@
 package IO::Pager::Perl;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use Term::Cap;
 
 #Signal handling, only needs to be set once, and does not have access to object
 my($SP, $RT) = $|;
-local $SIG{INT} = local $SIG{QUIT} = \&done; 
+local $SIG{INT} = local $SIG{QUIT} = \&close; 
 
 #Stubs for ReadKey functions that we fill in with code refs if it's not loaded
 sub ReadMode;
@@ -44,17 +44,34 @@ sub new {
 		    NOR   => $t->Tputs('me'), # Normal
 		   );
 
+  my $text;
+  if( defined( $param{text} ) ){
+    my $ref = ref( $param{text} );
+    if( $ref eq 'ARRAY' ){
+      die "Invalid text, must be string, code ref, or [string, code ref]"
+	unless (scalar( @{$param{text}} ) ==2) and
+	  ref( $param{text}->[0] ) eq '' and
+	  ref( $param{text}->[1] ) eq 'CODE';
 
-  my $text = delete($param{text}) if defined($param{text});
+      $text = $param{text}->[0];
+      $param{text} = $param{text}->[1]      
+    }
+    elsif( $ref eq '' ){
+      $text = delete( $param{text} );
+    }
+  }
+
+  $param{visualBell} = delete($param{visualBeep}) if
+      defined($param{visualBeep}) and not defined($param{visualBell});
 
   my $me = bless {
 		  # default values
 		  _cursor => 0,		_end => 0,	   _left => 0,
 		  _term  => $t,		_dumb => $dumb,    _txtN => 0,
 		  _search => '',	_statCols => 0,    _lineNo=>[0],
-		  lineNo => 0,		pause => 0,	   #pause=>"\cL" #more
+		  lineNo => 0,		pause => '',	   #pause=>"\cL" #more
 		  raw => 0,		statusCol => 0,	   squeeze=>0,
-		  visualBeep=>0,	wrap=>0,
+		  visualBell=>0,	fold=>0,
 		  %dims,
 
 		  # if the termcap entries don't exist, nothing bad will happen
@@ -77,7 +94,7 @@ sub new {
 		bottom=>	'Bottom',
 		prompt=>	"<h>=help \000<space>=down <b>=back <q>=quit",
 		continue=>	'press any key to continue',
-		help=>		<<'EOH'
+		help=>		<<EOH
  q         quit             \000 h       help
  r C-l     refresh          \000                         
  /         search           \000 ?       search backwards
@@ -87,29 +104,43 @@ sub new {
  d         half page down   \000 u       half page up
  g <       goto top         \000 G >     goto bottom
    <-      scroll left      \000  ->     scroll right
- #         Line numbering   \000 \d+\n   jump to line \d+
+ m         mark position    \000 '       return to mark
+ #         line numbering   \000 \\d+\\n   jump to line \\d+
+ C         toogle raw       \000 S       toggle folding
 EOH
 	       };
-  $me->{_fnc} = {
-		 'q' => \&done,		'h' => \&help,
-		 '/' => \&search,	'?' => \&hcraes,
-		 'n' => \&next_match,	'P' => \&prev_match,
-		 'p' => \&prev_match,	'N' => \&prev_match,
-		 'r' => \&refresh,	"\cL" => \&refresh,
-		 ' ' => \&downpage,	"\cC" => \&downpage,
-		 "\n"=> \&downline,	"\e[B" => \&downline,
-		 'd' => \&downhalf,	'u' => \&uphalf,
-		 'b' => \&uppage,	"\ev" => \&uppage,
-		 'y' => \&upline,	"\e[A" => \&upline,
-		 '<' => \&to_top,
-		 '>' => \&to_bott,	'$' => \&to_bott,
-		 "\e[D" => \&move_left,	"\e[C" => \&move_right,	
-		 '#' => \&toggle_numbering,
-		 '/(\d+)/'=>1 #jump to line
-		};
 
-    $me->{_end} = $me->{rows} - 1;
+#  $me->{_fnc} = {
+  $me->add_func(
+		'q' => \&close,	       'h' => \&help,
+		'/' => \&search,       '?' => \&hcraes,
+		'n' => \&next_match,   'P' => \&prev_match,
+		'p' => \&prev_match,   'N' => \&prev_match,
+		'r' => \&refresh,      "\cL" => \&refresh,
+		' ' => \&downpage,     "\cv" => \&downpage,  #"\e\[5~"=>\&downpage, #M-down
+		"\n"=> \&downline,     "\e[B" => \&downline,
+		'd' => \&downhalf,     'u' => \&uphalf,
+		'b' => \&uppage,       "\eV" => \&uppage,    #"\e\[6~"=>\&uppage, #M-up
+		'y' => \&upline,       "\e[A" => \&upline,
+		'<' => \&to_top,       "\e[H" => \&to_top,   'g' => \&to_top,
+#"\e\[1;3C"=>\&to_top, #PGUP?
+#"\e\[1;3D"=>\&to_bott,#PGDN?
+		'>' => \&to_bott,      '$' => \&to_bott,     'G' => \&to_bott,
+		"\e0E" => \&to_bott,   "\e0W" => \&to_bott,
+		"\e[D" => \&move_left, "\e[C" => \&move_right,
+		'm' => \&save_mark,    "'" => \&goto_mark,
+		'#' => \&toggle_numbering,
+		'C' => \&toggle_raw,
+		'S' => \&toggle_fold,
+		'/(\d+)/'=>1 #jump to line
+		); #};
   
+  #Mise-en-place; prepare to cook some characters
+  #\000-\010\013-\037/@A-HK-Z[\\]^_/
+  $me->{_raw}->{chr($_)} = chr(64+$_) foreach (0..8, 11..31);
+
+  $me->{_end} = $me->{rows} - 1;
+
   $SIG{WINCH} = sub{ $me->resize() };
 
   $me;
@@ -123,7 +154,7 @@ sub resize {
 
   $me->{_end} = $me->{rows} - 1;
 
-  $me->refresh();
+  $me->{fold} ? $me->reflow() : $me->refresh();
   $me->prompt();
 
   $me->{WINCH}->() if ref($me->{WINCH}) eq 'CODE';
@@ -178,7 +209,7 @@ sub add_text {
   #Split on new lines, preserving internal blanks
   my @F = split(/\n/, $_, -1);
 
-  if( $me->{wrap} ){
+  if( $me->{fold} ){
     #Two expressions to avoid lame single-use warning
     local $Text::Wrap::columns;
     $Text::Wrap::columns = $me->{cols} -
@@ -218,19 +249,38 @@ sub add_text {
   push @{$me->{_text}}, @F;
   $me->{_txtN} = @{ $me->{_text} }; #-1;
 
-  $me->refresh() if $shown <= $me->{rows};
+#XXX fix this expression?! shoud not be rows, but instead cursor
+#warn $shown;
+  $me->refresh(); # if $shown <= $me->{rows}; # + $me->{_cursor};
 }
+
+sub reflow {
+  my $me = shift;
+  my($prevLine, @text) = 0;
+  while( scalar @{$me->{_text}} ){
+    my $curLine = shift @{$me->{_lineNo}};
+    if( $curLine == $prevLine ){
+      $text[-1] .= ' ' . (shift @{$me->{_text}}||''); }
+    else{
+      push @text, shift @{$me->{_text}}; }
+    $prevLine = $curLine;
+  }
+  $me->{_lineNo}=[];
+  $me->{_txtN}=0;
+  $me->add_text( join($/, @text) );
+}
+
 
 sub more {
   my $me = shift;
   my %param = @_;
   $RT = $me->{RT} = $param{RT};
 
-  if( $me->{wrap} ){
+  if( $me->{fold} ){
     eval "use Text::Wrap";
     $me->dialog("Text::Wrap unavailable, disabling wrap mode\n\n$@") if $@;
   }
-  if( $@ or not $me->{wrap} ){
+  if( $@ or not $me->{fold} ){
     sub wrap {@_}
   }
   
@@ -243,44 +293,71 @@ sub more {
   else{
     print $me->{NOR};
 
+
+    #INPUT LOOP, revised with inspiration from Term::Screen::getch()
+    my $input='';
     while( 1 ){
       $me->prompt();					# status line
+      my $exit = undef;
 
-      my $exit;
-      my $q = ReadKey($param{RT});
-      # Catch arrow keys. NOTE: Escape would enter this too
-      #...requiring an extra input if no ReadKey
-      if( defined($q) and ord($q) == 27 ){
-	$q.=ReadKey(0);
-	$q.=ReadKey(0) if $q eq "\e[";
-      }
-      if( defined($q) and $q =~ /\d/ and $me->{_fnc}->{'/(\d+)/'} ){
-	$me->{_I18N}{status} = $q;
-	$me->prompt();
-	while( defined($_ = ReadKey(0)) ){
-	  last unless /\d/;
-	  $q .= $_;
-	  $me->{_I18N}{status} = $q;
-	  $me->prompt();
-	}
-	#Commit on enter, anything else aborts
-	if( $_ eq "\n" ){
-	  $q<$me->{_txtN} ? $me->jump($q) : $me->to_bott();
-	}
-	$me->{_I18N}{status} = '';
+      my $char = ReadKey($param{RT});
+      #Fall back to parent loop, obviating need for callbacks to implement
+      #tail functionality and for cleaner startup (no preload on piped input)
+      #next unless defined($char);
+      return 1 unless defined($char);
+      $input .= $char;
+      unless( ($input=~ /^\e/ and index($me->{_fncRE}, $input)>0 )
+	      || $input =~ /^\d+/
+	      || defined($me->{_fnc}->{$input}) ){
+	#&beep();
+	$me->beep($input);
+	$input ='';
 	next;
       }
 
-      if( defined $q ){
-	my $f = $me->{_fnc}->{$q} || \&beep;
-	# $me->{_I18N}{status} = $q;			#input debugging
-	$exit = ref($f->($me));
+      if( $me->{_fnc}->{$input} ){
+	$input =~ s/\e/^\[/;
+	use B 'svref_2object';
+	my $n = $me->{_fnc}->{$input};
+	$n = svref_2object($n)->GV->NAME;
+#DEBUG	$me->dialog(quotemeta($input)." $n",1);
+	$exit = $me->{_fnc}->{$input}->($me);
+	$input='';
+      }
+      #Line-number input
+      elsif( $me->{_fnc}->{'/(\d+)/'} and $input =~ /^\d+/ ){
+	if( $char eq "\cH" or ord($char)==127 ){
+	  chop($input); chop($input);
+	}
+	elsif( $char eq "\cG" ){
+	  $me->{_I18N}{status} = $input = '';
+	  $me->prompt();
+	  return 1;
+	}
+	if( $input =~ /^\d+\n$/ ){
+	  chomp($input);
+	  $exit = $input < $me->{_txtN} ? $me->jump($input) : $me->to_bott();
+	  $me->{_I18N}{status} = $input = '';
+	  $me->prompt();
+	  next;
+	}
+	else{
+	  $me->{_I18N}{status} = $input;
+	  $me->prompt();
+	}
       }
 
-      return 1 if $param{RT} or $exit;
+
+##	if( defined $q ){
+##	my $f = $me->{_fnc}->{$q} || \&beep;
+##	# $me->{_I18N}{status} = $q;			#input debugging
+##	$exit = ref($f->($me));
+##      }
+      #XXX DOH! need to expand this condition to only trip if full key has been read
+      return 1 if $param{RT} && defined($exit);
     }
-    }
-  $me->done();
+  }
+  $me->close();
 }
 *less = \&more; *page = \&more;
 #Avid lame single-use warning
@@ -297,7 +374,7 @@ sub I18N {
 BEGIN{
   #Install generic accessors
   no strict 'refs';
-  foreach my $method ( qw(eof lineNo pause raw statusCol visualBeep) ){
+  foreach my $method ( qw(eof lineNo pause raw statusCol visualBell) ){
     *{$method} = sub{ $_[0]->{$method}=$_[1] if defined($_[1]);
 		      $_[0]->{$method} }
   }
@@ -313,11 +390,18 @@ sub add_func {
   while( my($k, $v) = each %param ){
     $me->{_fnc}{$k} = $v;
   }
+  #RegExp::Trie, RegExp::Optimize, List::RegExp
+  $me->{_fncRE} = join '|', #map { quotemeta($_) }
+    sort keys %{ $me->{_fnc} };
+  #$me->{_fncRE} = qr/^($me->{_fncRE})/;
 }
 
 sub beep {
   print "\a";
-  print $_[0]->{_term}->Tputs('vb') if $_[0]->{visualBeep};
+  my $scan = $_[1];
+  $scan =~ s/([^[:print:]])/sprintf("\\%03o", ord($1))/ge;
+  $_[0]->dialog("Unrecognized command: $scan", 1);
+  print $_[0]->{_term}->Tputs('vb') if $_[0]->{visualBell};
 }
 
 # display a prompt, etc
@@ -337,7 +421,8 @@ sub prompt {
   print $me->{_term}->Tgoto('cm', 0, $me->{rows});	# bottom left
   print $me->{_term}->Tputs('ce');			# clear line
   my $prompt = $me->{_I18N}{prompt};
-  my $pN = $me->{cols} - 2 - length($p) - length($me->{_I18N}{prompt});
+  (my $pSansCodes = $p) =~ s/\e\[[\d;]*[a-zA-Z]//g;
+  my $pN = $me->{cols} - 2 - length($pSansCodes) - length($me->{_I18N}{prompt});
   $p .= ' ' x ($pN > 1 ? $pN : 1);
   $prompt = $pN>2 ? $prompt : do {$prompt =~ s/\000.+//; $prompt };
   print $me->{REV};					# reverse video
@@ -345,13 +430,19 @@ sub prompt {
   print $me->{NOR};					# normal video
 }
 
-sub done {
+sub close {
   ReadMode 0;
   print "\n";
   $| = $SP || 0;
   #Did we exit via signal or prompt?
   $RT ? die : return \"foo";
 }
+
+{
+  no warnings 'once';
+  *done = \&close;
+}
+
 
 # provide help to user
 sub help {
@@ -419,16 +510,14 @@ sub disp_menu {
 sub remove_menu {
   my $me = shift;
 
-#XXX now fails if at bottom of text
-
   my $s = $me->{rows} - $me->{_menuRows};
 
   #Allow wipe of incomplete/paused output.
   #XXX "Bug" in that we get an extra chunk of output after menu closing
   my $pause = $me->{pause};
-  $me->{pause} = '';
+  $me->{pause} = undef;
 
-  $me->I18N('status', $s."..".$me->rows()); $me->prompt();
+  #$me->I18N('status', $s."..".$me->rows()); $me->prompt();
 
   # Fractional restoration instead of full refresh
   foreach my $n ($s .. $me->{rows}){
@@ -458,17 +547,24 @@ sub line {
   my $me = shift;
   my $n  = shift;
   local $_ = $me->{_text}[$n]||'';
+#  my $prev = $me->{_text}[$n-1]||'';
 
   #!! ORDER OF OPERATIONS ON OUTPUT PROCESSING AND DECORATION MATTERS
 
+#  #Squeeze... this identifies lines, but just gives a blank line, still
+#              code elsewhere iterates over rows and advances down screen...
+#              we need to intervene in each of those instances and:
+#              not progress another line of display then add another iteration
+#  return if $me->{squeeze} && $_ eq '' && $prev eq '';
+
   #Breaks?
-  my $pause =1 if length($me->{pause}) && defined && /$me->{pause}/;
+  my $pausey = 1 if length($me->{pause}) && defined && /$me->{pause}/;
 
   #Crop if no folding
   my $len = length();
-  unless( $me->{wrap} ){
-    $_ = ($len-$me->{_statCols}) < $me->{_left} ? '' : substr($_,
-	       $me->{_statCols}  + $me->{_left},$me->{cols}-$me->{_statCols});
+  unless( $me->{fold} ){
+    $_ = ($len-$me->{_statCols}) < $me->{_left} ? '' :
+      substr($_, $me->{_left}, $me->{cols}-$me->{_statCols});
     if( $len - $me->{_left} > $me->{cols} ){
       substr($_, -1, 1, "\$");
     }
@@ -476,9 +572,9 @@ sub line {
 
   #Cook control characters
   unless( $me->{raw} ){
-    #XXX Specially protect escape sequences, so we can wrap controls in REV?
-    s/(?=[\000-\010\013-\037])/^/g;
-    tr/\000-\010\013-\037/@A-HK-Z[\\]^_/;
+#    s/(?=[\000-\010\013-\037])/^/g;
+#    tr/\000-\010\013-\037/@A-HK-Z[\\]^_/;
+    s/([\000-\010\013-\037])/$me->{REV}^$me->{_raw}->{$1}$me->{NOR}/g;
   }
 
   #Search
@@ -489,7 +585,7 @@ sub line {
   my $info = $me->{statusCol} && !$me->{lineNo} ?
     ($matched ? '*' : ' ') :''; 
   $info = sprintf("% 8s", 
-		  $me->{wrap} ? ($me->{_lineNo}->[$n]||-1) : 
+		  $me->{fold} ? ($me->{_lineNo}->[$n]||-1) : 
 				(defined($me->{_text}[$n]) ? $n+1 : '')
 		 ) if $me->{lineNo};
   $_ = ($me->{statusCol} && $matched ? $me->{REV} : '').
@@ -500,7 +596,7 @@ sub line {
 
   print;
 
-  if( $pause ){
+  if( $pausey ){
     $me->{_end} = $n;					#Advance past pause
     no warnings 'exiting'; last;
   }
@@ -513,11 +609,18 @@ sub down_lines {
 
   for (1 .. $n){
     if( $me->{_end} >= $me->{_txtN}-1 ){
-      exit if $me->{eof};
-      &beep; last; }
-    else{
+      exit if $me->{eof} && ref($me->{text}) ne 'CODE';
+      if( ref($me->{text}) eq 'CODE' ){
+	$me->add_text( $me->{text}->() );
+      }
+      else{
+	&beep; last;
+      }
+    }
+#    else{ #Switch to two statements to allow callback
+    if( $me->{_end} < $me->{_txtN}-1 ){
       if( length($me->{pause}) && $me->{_end} < $me->{rows}-1 ){
-	print $t->Tgoto('cm', 0, $me->{_end}+1 ); }	# move
+	print $t->Tgoto('cm',  0, $me->{_end}+1 ); }	# move
       else{
 	# why? because some terminals have bugs...
 	print $t->Tgoto('cm', 0, $me->{rows} );		# move
@@ -532,7 +635,12 @@ sub down_lines {
   }
 }
 sub downhalf {  $_[0]->down_lines( $_[0]->{rows} / 2 ); }
-sub downpage {  $_[0]->down_lines( $_[0]->{rows} ); }
+sub downpage {  $_[0]->down_lines( $_[0]->{rows} );
+		#WTF?! add_text in tp's while-loop cannot be reached if there's
+		#no delay here until something other than downpage is called?!
+		select(undef, undef, undef, .1); #XXX WTF?!
+#		warn "\n\n", map{$_[0]->{$_}."\n"} qw/rows _cursor _end/;
+}
 sub downline {  $_[0]->down_lines( 1 ); }
 
 sub up_lines {
@@ -561,6 +669,42 @@ sub to_top {  $_[0]->jump(0); }
 sub to_bott {
   my $me = shift;
   $me->jump( $me->{rows}>$me->{_txtN} ? 0 : $me->{_txtN}-$me->{rows} );
+}
+
+sub save_mark{
+  my $me = shift;
+
+  $me->I18N('status', $me->{BLD}.'*Mark name?*'.$me->{NOR}.$me->{REV});
+  $me->prompt();
+  $me->{_term}->Tgoto('cm',
+		      length('[tp] 100% Bottom Mark name?')+1,
+		      $me->{rows});
+  my $mark = ReadKey();
+  next if $mark eq "'";
+  $me->{_mark}->{$mark} = $me->{_cursor};
+  $me->I18N('status', '');
+  $me->prompt();
+}
+
+sub goto_mark{
+  my $me = shift;
+
+  my $mark = ReadKey();
+  my $jump = $me->{_mark}->{$mark};
+  if( $mark eq '^' ){
+    $jump = 0;
+  }
+  elsif( $mark eq '$' ){
+    $jump = $me->{_txtN} - $me->{rows};
+  }
+  elsif( $mark eq '"' ){
+    my $marks = join("\n", map {"$_ = $me->{_mark}->{$_}"}
+		     sort keys %{ $me->{_mark} } );
+    $me->dialog($marks);
+    return;
+  }
+  $me->{_mark}->{"'"} = $me->{_cursor};
+  $me->jump( $jump );
 }
 
 sub jump {
@@ -676,7 +820,21 @@ sub next_match{
 sub toggle_numbering{
   my $me = shift;
   $me->{lineNo} = not $me->{lineNo};
+#  $me->reflow();
   $me->refresh();
+}
+
+sub toggle_raw{
+  my $me = shift;
+  $me->{raw} = not $me->{raw};
+  $me->reflow();
+}
+
+sub toggle_fold{
+  my $me = shift;
+  $me->{fold} = not $me->{fold};
+  $me->{_lineNo} = [1 .. $me->{_txtN}] if $me->{fold};
+  $me->reflow();
 }
 
 sub dumb_mode {
@@ -736,13 +894,13 @@ The following options are recognized, and shown with the default value:
 =item I<rows> =E<gt>25?
 
 The number of rows on your terminal.  The terminal is queried directly
-with Term::ReadKey if loaded or C<stty> or C<tput>, and if these fail
+with L<Term::ReadKey> if loaded or C<stty> or C<tput>, and if these fail
 it defaults to 25.
 
 =item I<cols> =E<gt>80?
 
 The number of columns on your terminal. The terminal is queried directly
-with Term::ReadKey if loaded or C<stty> or C<tput>, and if these fail it
+with L<Term::ReadKey> if loaded or C<stty> or C<tput>, and if these fail it
 defaults to 80.
 
 =item I<speed> =E<gt>38400?
@@ -783,7 +941,7 @@ Collapse multiple blank lines into one.
 
 Add a column with markers indicating which row match a search expression.
 
-=item I<visualBeep> =E<gt>0
+=item I<visualBell> =E<gt>0
 
 Flash the screen when beeping.
 
@@ -794,8 +952,8 @@ Flash the screen when beeping.
 There are accessors for all of the above properties, however those for
 rows, cols, speed, fold and squeeze are read only.
 
-  #Is visualBeep set?
-  $t->visualBeep();
+  #Is visualBell set?
+  $t->visualBell();
 
   #Enable line numbering
   $t->lineNo(1);
@@ -832,6 +990,21 @@ to request non-blocking polls, but likely will not behave as you would hope.
 NOTE: If Term::ReadKey is not loaded but RT is true, screen updates will only
 occur on keypress.
 
+=head3 Callback
+
+You can also pass a code reference to the I<text> attribute of the constructor
+which will be called when reaching the "end of file"; consequently, it is not
+possible to set the I<eof> flag to exit at end of fie if doing so.
+
+    $t->new( text=>sub{ } ); #eof=>0 is implied
+
+Alternatively, you may supply a reference to a two element array. The first is
+an initial chunk of text to load, and the second the callback.
+
+    #Fibonacci
+    my($m, $n)=(1,1);
+    $t->new( text=> ["1\n", sub{ ($m,$n)=($n,$m+$n); return "$n\n"} ] );
+
 =head2 Adding Functionality and Internationalization (I18N)
 
 It is possible to extend the features of IO::Pager::Perl by supplying the
@@ -840,7 +1013,7 @@ invoked upon matching keypress; where \c? represents Control-? and \e?
 represents Alt-? The existing pairings are:
 
 	'h' => \&help,
-	'q' => \&done,
+	'q' => \&close,
 	'r' => \&refresh,       #also "\cL"
 	"\n"=> \&downline,      #also "\e[B"
 	' ' => \&downpage,      #also "\cv"
@@ -856,6 +1029,8 @@ represents Alt-? The existing pairings are:
 	'p' => \&prev_match,    #also 'N'
 	"\e[D" => \&move_left,
 	"\e[C" => \&move_right,
+        'm' => \&save_mark,
+        "'" => \&goto_mark,
 	'#' => \&toggle_numbering,
 
 And a special sequence of a number followed by enter analogous to:
@@ -909,11 +1084,29 @@ text is wider than the display, and shown in two sequential dialogs.
 Similarly, the status text will be cropped at a null character for narrow
 displays.
 
+=head2 User Interface
+
+=head3 Marks
+
+There are multiple special marks
+
+=over 4
+
+=item ^ Beginning of file
+
+=item $ End of file
+
+=item ' Previous location
+
+=item " List user-created marks
+
+=back
+
 =head1 CAVEATS
 
 =head2 UN*X
 
-This modules currently only works in UN*X-like environment.
+This modules currently only works in a UN*X-like environment.
 
 =head2 Performance
 

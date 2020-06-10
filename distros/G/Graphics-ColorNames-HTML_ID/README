@@ -1,0 +1,46 @@
+NAME
+    Graphics::ColorNames::HTML_ID - HTML color names and equivalent RGB
+    values (Indonesian translation)
+
+VERSION
+    This document describes version 3.3.1.001 of
+    Graphics::ColorNames::HTML_ID (from Perl distribution
+    Graphics-ColorNames-HTML_ID), released on 2020-06-07.
+
+SYNOPSIS
+      require Graphics::ColorNames::HTML_ID;
+
+      $NameTable = Graphics::ColorNames::HTML->NamesRgbTable();
+      $RgbBlack  = $NameTable->{hitam};
+
+DESCRIPTION
+    This is an Indonesian translation for Graphics::ColorNames::HTML.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Graphics-ColorNames-HTML_ID>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Graphics-ColorNames-HTML_ID>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNames-H
+    TML_ID>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Graphics::ColorNames::HTML
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

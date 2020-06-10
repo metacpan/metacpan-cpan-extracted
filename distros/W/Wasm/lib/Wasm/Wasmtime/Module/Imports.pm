@@ -2,6 +2,7 @@ package Wasm::Wasmtime::Module::Imports;
 
 use strict;
 use warnings;
+use 5.008004;
 use Carp ();
 use Hash::Util ();
 use overload
@@ -22,7 +23,7 @@ use overload
   fallback => 1;
 
 # ABSTRACT: Wasmtime module imports class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 sub new
@@ -85,7 +86,7 @@ Wasm::Wasmtime::Module::Imports - Wasmtime module imports class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

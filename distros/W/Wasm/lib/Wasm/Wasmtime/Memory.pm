@@ -2,6 +2,7 @@ package Wasm::Wasmtime::Memory;
 
 use strict;
 use warnings;
+use 5.008004;
 use base qw( Wasm::Wasmtime::Extern );
 use Ref::Util qw( is_ref is_plain_arrayref );
 use Wasm::Wasmtime::FFI;
@@ -11,7 +12,7 @@ use constant is_memory => 1;
 use constant kind => 'memory';
 
 # ABSTRACT: Wasmtime memory class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_memory_';
@@ -87,7 +88,7 @@ Wasm::Wasmtime::Memory - Wasmtime memory class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

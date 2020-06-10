@@ -2,6 +2,7 @@ package Test2::Tools::Wasm;
 
 use strict;
 use warnings;
+use 5.008004;
 use Ref::Util qw( is_plain_arrayref );
 use Test2::API qw( context );
 use base qw( Exporter );

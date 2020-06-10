@@ -2,7 +2,12 @@ package Builder;
 use File::Spec;
 use File::Find;
 use Try::Tiny;
+use Config;
+use v5.10;
+use Cwd;
 use base 'Module::Build';
+use strict;
+use warnings;
 __PACKAGE__->add_property( 'inline_modules' );
 
 my $have_p2m = eval "require Pod::Markdown; 1";
@@ -16,45 +21,37 @@ my $have_p2m = eval "require Pod::Markdown; 1";
 sub ACTION_build {
   my $self = shift;
   my $mod_ver = $self->dist_version;
-  my $arch = `uname -m`;
-  chomp $arch;
-  my @libdirs = (
-    "/usr/local/lib",
-    "/usr/lib/$arch-linux-gnu",
-  );
-  my $liba;
-  open my $cf, ">", File::Spec->catfile($self->base_dir,qw/lib Neo4j Bolt Config.pm/) or die $!;
-  my $lib = "libneo4j-client.a";
-  for my $L (@{$self->extra_linker_flags}) {
-    if ($L =~ /^-L([^[:space:]]*)(?:\s+|$)/) {
-      my $l = $1;
-      $liba = File::Spec->catfile($l, $lib);
-      last if -e $liba;
-    }
-  }
-  for my $libdir (@libdirs) {
-    last if $liba && -e $liba && $liba =~ m|/|;
-    print "Looking for $lib in $libdir\n";
-    $liba = File::Spec->catfile($libdir, $lib);
-  }
-  die "$lib not found, cannot build Neo4j-Bolt\n" unless -e $liba;
-  my $extl = join(" ", @{$self->extra_linker_flags});
-  my $extc = join(" ", @{$self->extra_compiler_flags});
-  print $cf "package Neo4j::Bolt::Config;\n\$extl = '$extl';\n\$extc = '$extc';\n\$liba='$liba';\n1;\n";
-  close $cf;
   $self->SUPER::ACTION_build;
   for my $m (@{$self->inline_modules}) {
     # this is an undocumented function (_INSTALL_) of Inline
     # that will likely not change, since it is integral to
     # Inline::MakeMaker
-    $self->do_system( $^X, '-Mblib', '-MInline=NOISY,_INSTALL_',
-		      "-MInline=Config,name,$m,version,$mod_ver",
-		      "-M$m", "-e", "1", $mod_ver, 'blib/arch');
+    my @cmpts = split(/::/,$m);
+    my $fn = "$cmpts[-1].$Config{dlext}";
+    print STDERR "Checking for ". File::Spec->catfile($self->blib,qw/arch auto/,@cmpts,$fn)."\n";
+    if ( ! -e File::Spec->catfile($self->blib,qw/arch auto/,@cmpts,$fn) ) {
+      $self->do_system( $^X, '-Mblib', '-MInline=NOISY,_INSTALL_',
+			"-MInline=Config,name,$m,version,$mod_ver",
+			"-M$m", "-e", "1", $mod_ver, 'blib/arch');
+    }
+    else {
+      print STDERR "Found ". File::Spec->catfile($self->blib,qw/arch auto/,@cmpts,$fn)."\n";      
+    }
   }
-
-
 }
 
+sub ACTION_install {
+  my $self = shift;
+  $self->depends_on('build');
+  # clear out build utilites - Inline C patch
+  print STDERR "Removing cargo cult Inline\n";
+  unlink 'blib/lib/Inline/P.pm';
+  unlink 'blib/lib/Inline/denter.pm';
+  unlink 'blib/lib/Inline/MakeMaker.pm';  
+  unlink 'blib/lib/Inline';
+  unlink 'blib/lib/Inline.pm';
+  $self->SUPER::ACTION_install;
+}
  sub ACTION_test {
    my $self = shift;
    unless (-d File::Spec->catdir(qw/blib arch auto Neo4j Bolt/)) {

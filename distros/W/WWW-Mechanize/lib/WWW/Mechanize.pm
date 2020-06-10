@@ -6,11 +6,11 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = '1.97';
+our $VERSION = '2.00';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
-use LWP::UserAgent 5.827;
+use LWP::UserAgent 6.45;
 use HTML::Form 1.00;
 use HTML::TokeParser;
 use Scalar::Util qw(tainted);
@@ -1759,7 +1759,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 1.97
+version 2.00
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/PODUtils.pm'
@@ -18,6 +18,7 @@ my @scripts = (
     'script/extract-links-in-pod',
     'script/poddump',
     'script/podless',
+    'script/podstrip',
     'script/podxlinks',
     'script/reverse-pod-headings',
     'script/sort-pod-headings'

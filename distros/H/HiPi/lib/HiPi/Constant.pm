@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -67,6 +67,9 @@ my $const = {
     },
     
     rpi => {
+        
+        
+        
         RPI_PIN_3  =>  ( $legacyboard ) ? 0 : 2,
         RPI_PIN_5  =>  ( $legacyboard ) ? 1 : 3,
         RPI_PIN_7  =>  4,
@@ -107,6 +110,9 @@ my $const = {
         RPI_MODE_ALT3   => 7,
         RPI_MODE_ALT4   => 3,
         RPI_MODE_ALT5   => 2,
+        
+        RPI_ALT_FUNCTION_VERSION_2708 => 1,
+        RPI_ALT_FUNCTION_VERSION_2711 => 2,
         
         RPI_INT_NONE           => 0x00,
         RPI_INT_FALL           => 0x01,
@@ -879,18 +885,22 @@ my $const = {
         PCA_9685_SERVO_DIRECTION_AC => 2,
     },
     
-    oled => {
-        SSD1306_128_X_64_I2C  => 0x01 + 0x04 + 0x08 + 0x20,
-        SSD1306_128_X_32_I2C  => 0x01 + 0x04 + 0x10 + 0x20,
+    oled => {                 #  ic     cols   rows   intf
+        SSD1306_128_X_64_I2C  => 0x001 + 0x04 + 0x08 + 0x20,
+        SSD1306_128_X_32_I2C  => 0x001 + 0x04 + 0x10 + 0x20,
         
-        SH1106_128_X_64_I2C   => 0x02 + 0x04 + 0x08 + 0x20,
-        SH1106_128_X_32_I2C   => 0x02 + 0x04 + 0x10 + 0x20,
+        SH1106_128_X_64_I2C   => 0x002 + 0x04 + 0x08 + 0x20,
+        SH1106_128_X_32_I2C   => 0x002 + 0x04 + 0x10 + 0x20,
         
-        SSD1306_128_X_64_SPI  => 0x01 + 0x04 + 0x08 + 0x40,
-        SSD1306_128_X_32_SPI  => 0x01 + 0x04 + 0x10 + 0x40,
+        SSD1306_128_X_64_SPI  => 0x001 + 0x04 + 0x08 + 0x40,
+        SSD1306_128_X_32_SPI  => 0x001 + 0x04 + 0x10 + 0x40,
         
-        SH1106_128_X_64_SPI   => 0x02 + 0x04 + 0x08 + 0x40,
-        SH1106_128_X_32_SPI   => 0x02 + 0x04 + 0x10 + 0x40,
+        SH1106_128_X_64_SPI   => 0x002 + 0x04 + 0x08 + 0x40,
+        SH1106_128_X_32_SPI   => 0x002 + 0x04 + 0x10 + 0x40,
+        
+        SSD1322_128_X_64_SPI  => 0x100 + 0x04 + 0x08 + 0x40,
+        SSD1322_256_X_64_SPI  => 0x100 + 0x80 + 0x08 + 0x40,
+        
     },
     
     ms5611 => {

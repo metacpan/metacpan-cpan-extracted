@@ -4,13 +4,13 @@
       "Jonathan Leto <jonathan@leto.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "gpl_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-GSL",
    "prereqs" : {
@@ -43,7 +43,7 @@
    "provides" : {
       "Math::GSL" : {
          "file" : "lib/Math/GSL.pm",
-         "version" : "0.40"
+         "version" : "0.41"
       },
       "Math::GSL::BLAS" : {
          "file" : "lib/Math/GSL/BLAS.pm",
@@ -825,6 +825,18 @@
          "file" : "lib/Math/GSL/Multiroots.pm",
          "version" : 0
       },
+      "Math::GSL::Multiset" : {
+         "file" : "lib/Math/GSL/Multiset.pm",
+         "version" : 0
+      },
+      "Math::GSL::Multiset::gsl_multiset_struct" : {
+         "file" : "lib/Math/GSL/Multiset.pm",
+         "version" : 0
+      },
+      "Math::GSL::Multisetc" : {
+         "file" : "lib/Math/GSL/Multiset.pm",
+         "version" : 0
+      },
       "Math::GSL::NTuple" : {
          "file" : "lib/Math/GSL/NTuple.pm",
          "version" : 0
@@ -1081,7 +1093,99 @@
          "file" : "lib/Math/GSL/SparseMatrix.pm",
          "version" : 0
       },
-      "Math::GSL::SparseMatrix::gsl_spmatrix_tree" : {
+      "Math::GSL::SparseMatrix::gsl_spmatrix_char" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_char_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_complex" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_complex_float" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_complex_float_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_complex_long_double" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_complex_long_double_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_complex_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_float" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_float_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_int" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_int_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_long_double" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_long_double_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_pool_node" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_short" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_short_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_uchar" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_uchar_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_uint" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_uint_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_ushort" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_ushort_work" : {
+         "file" : "lib/Math/GSL/SparseMatrix.pm",
+         "version" : 0
+      },
+      "Math::GSL::SparseMatrix::gsl_spmatrix_work" : {
          "file" : "lib/Math/GSL/SparseMatrix.pm",
          "version" : 0
       },
@@ -1229,12 +1333,12 @@
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/gpl-license.php"
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
       ],
       "repository" : {
          "url" : "http://github.com/leto/math--gsl/tree/master"
       }
    },
-   "version" : "0.40",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.41",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

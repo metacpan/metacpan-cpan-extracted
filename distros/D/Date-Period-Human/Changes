@@ -1,5 +1,9 @@
 Changes for Date-Period-Human
 
+0.4.8  2020-06-05 21:26:07 CEST
+		- Fix sprintf warnings (Thanks isync)
+		  https://github.com/pstuifzand/date-period-human/issues/6
+
 0.4.7  2020-03-18 19:40:38 CET
 		- Move translation to package variable, so it's easier to make small
 		changes to the languages

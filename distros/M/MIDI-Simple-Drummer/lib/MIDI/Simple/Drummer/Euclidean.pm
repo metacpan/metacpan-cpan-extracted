@@ -1,9 +1,9 @@
 package MIDI::Simple::Drummer::Euclidean;
+$MIDI::Simple::Drummer::Euclidean::VERSION = '0.0805';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 use parent 'MIDI::Simple::Drummer';
-our $VERSION = '0.01';
 
 sub new {
     my $self = shift;
@@ -29,7 +29,8 @@ sub _default_patterns {
     for my $i ( @$rhythm ) {
         if ( $i eq 'x' ) {
             my $pad = $self->{-pad};
-            $self->note($self->EIGHTH, $self->$pad );
+            my $note = $self->$pad || $self->snare;
+            $self->note($self->EIGHTH, $note );
         }
         else {
             $self->rest($self->EIGHTH);
@@ -96,23 +97,19 @@ MIDI::Simple::Drummer::Euclidean
 
 =head1 VERSION
 
-version 0.0803
+version 0.0805
 
 =head1 DESCRIPTION
 
 Generate Euclidean rhythms and "world beat" grooves.
 
-=head1 NAME
-
-MIDI::Simple::Drummer::Euclidean - Euclidean Rhythms
-
 =head1 METHODS
 
-=head2 euclid()
+=head2 euclid
 
 Return a list of B<x> onsets or B<.> rests given the C<onsets> and C<beats>.
 
-=head2 rotate()
+=head2 rotate
 
 Rotate the given list of onsets and rests to the next (to the right) onset.
 
@@ -132,7 +129,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

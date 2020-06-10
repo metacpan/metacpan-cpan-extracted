@@ -5,7 +5,7 @@ WriteMakefile(
     'AUTHOR'        => [
         'Theo van Hoesel (VANHOESEL) <tvanhoesel@perceptyx.com'
     ],
-    'VERSION'       => '0.19',
+    'VERSION'       => '0.20',
     'ABSTRACT_FROM' => 'lib/OpenTracing/Interface.pod',
     'LICENSE'       => 'artistic2',
     'MAN3PODS'      => {
@@ -29,21 +29,21 @@ WriteMakefile(
     'META_MERGE'    => {
         provides        => {
             'OpenTracing::Interface'
-                => { version => '0.19', file => 'lib/OpenTracing/Interface.pm' },
+                => { version => '0.20', file => 'lib/OpenTracing/Interface.pm' },
             'OpenTracing::Interface::ContextReference'
-                => { version => '0.19', file => 'lib/OpenTracing/Interface/ContextReference.pm' },
+                => { version => '0.20', file => 'lib/OpenTracing/Interface/ContextReference.pm' },
             'OpenTracing::Interface::Scope'
-                => { version => '0.19', file => 'lib/OpenTracing/Interface/Scope.pm' },
+                => { version => '0.20', file => 'lib/OpenTracing/Interface/Scope.pm' },
             'OpenTracing::Interface::ScopeManager'
-                => { version => '0.19', file => 'lib/OpenTracing/Interface/ScopeManager.pm' },
+                => { version => '0.20', file => 'lib/OpenTracing/Interface/ScopeManager.pm' },
             'OpenTracing::Interface::Span'
-                => { version => '0.19', file => 'lib/OpenTracing/Interface/Span.pm' },
+                => { version => '0.20', file => 'lib/OpenTracing/Interface/Span.pm' },
             'OpenTracing::Interface::SpanContext'
-                => { version => '0.19', file => 'lib/OpenTracing/Interface/SpanContext.pm' },
+                => { version => '0.20', file => 'lib/OpenTracing/Interface/SpanContext.pm' },
             'OpenTracing::Interface::Tracer'
-                => { version => '0.19', file => 'lib/OpenTracing/Interface/Tracer.pm' },
+                => { version => '0.20', file => 'lib/OpenTracing/Interface/Tracer.pm' },
             'OpenTracing::Types'
-                => { version => '0.19', file => 'lib/OpenTracing/Types.pm' },
+                => { version => '0.20', file => 'lib/OpenTracing/Types.pm' },
         },
         description => '`OpenTracing::Interface` describes the OpenTracing API'
               . '  ' . 'for the Perl5 programming language.'

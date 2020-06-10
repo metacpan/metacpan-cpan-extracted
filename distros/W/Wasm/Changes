@@ -1,5 +1,17 @@
 Revision history for Wasm},
 
+0.14      2020-06-07 21:03:13 -0600
+  - Require minimum Perl 5.8.4.  This was already the case in practice
+    since 0.11 when Wasm::Hook was merged, as it uses autodie (gh#69)
+  - Fix a couple of tests that needed Test2::Plugin::Wasm (gh#68)
+
+0.12      2020-06-05 22:04:20 -0600
+  - Added wasm_caller_memory function to Wasm::Memory (gh#67)
+
+0.11      2020-06-05 16:43:31 -0600
+  - Added Wasm::Wasmtime::Caller (gh#63)
+  - Merged Wasm::Hook into this dist (gh#64)
+
 0.10      2020-05-15 14:08:03 -0600
   - Bump required Alien::wasmtime 0.09 and wasmtime to 0.16.0 (gh#57)
   - Added interruptable and max_wasm_stack to Wasm::Wasmtime::Config (gh#57)

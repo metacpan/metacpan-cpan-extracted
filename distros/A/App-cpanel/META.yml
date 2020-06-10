@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: 6.63_03
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-cpanel
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojolicious: '8.50'
+  perl: '5.016'
+resources:
+  IRC: irc://irc.perl.org/#graphql-perl
+  bugtracker: https://github.com/mohawk2/App-cpanel/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mohawk2/App-cpanel
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

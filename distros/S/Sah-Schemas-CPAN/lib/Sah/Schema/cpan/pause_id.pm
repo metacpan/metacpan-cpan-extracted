@@ -1,9 +1,9 @@
 package Sah::Schema::cpan::pause_id;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-02'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-CPAN'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use strict;
 use Regexp::Pattern::CPAN;
@@ -14,9 +14,9 @@ our $schema = ["str", {
     'x.perl.coerce_rules'=>['From_str::to_upper'],
     'x.completion'=>['lcpan_authorid'],
     examples => [
-        {data=>'', valid=>0},
-        {data=>'perlancar', valid=>1, res=>'PERLANCAR'},
-        {data=>'perlancar2', valid=>0, summary=>'Too long'},
+        {value=>'', valid=>0},
+        {value=>'perlancar', valid=>1, validated_value=>'PERLANCAR'},
+        {value=>'perlancar2', valid=>0, summary=>'Too long'},
     ],
 }, {}];
 
@@ -36,9 +36,39 @@ Sah::Schema::cpan::pause_id - PAUSE author ID
 
 =head1 VERSION
 
-This document describes version 0.007 of Sah::Schema::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2020-03-02.
+This document describes version 0.010 of Sah::Schema::cpan::pause_id (from Perl distribution Sah-Schemas-CPAN), released on 2020-03-08.
 
 =head1 SYNOPSIS
+
+Using with L<Data::Sah>:
+
+ use Data::Sah qw(gen_validator);
+ my $vdr = gen_validator("cpan::pause_id*");
+ say $vdr->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create a validator to return error message, coerced value,
+ # even validators in other languages like JavaScript, from the same schema.
+ # See its documentation for more details.
+
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['cpan::pause_id*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
 
 Sample data:
 

@@ -5,23 +5,58 @@ use warnings;
 use MIDI::Drummer::Tiny;
 
 my $d = MIDI::Drummer::Tiny->new(
-    file      => $0 . '.mid',
-    bpm       => 90,
-    signature => '4/4',
-    bars      => 8,
+    file => $0 . '.mid',
+    bpm  => 90,
+    bars => 9,
 );
 
 $d->count_in(1);
 
-for ( 1 .. $d->bars ) {
+my $i = 0;
+
+for my $n ( 1 .. $d->bars ) {
     $d->note( $d->quarter,          $d->ride1, $d->kick );
     $d->note( $d->triplet_eighth,   $d->ride1 );
     $d->rest( $d->triplet_eighth );
     $d->note( $d->triplet_eighth,   $d->ride1, $d->kick );
-    $d->note( $d->quarter,          $d->ride1, $d->kick );
+    $d->note( $d->quarter,          $d->ride1, $d->snare );
     $d->note( $d->triplet_eighth,   $d->ride1, $d->kick );
     $d->rest( $d->triplet_eighth );
     $d->note( $d->triplet_eighth,   $d->ride1 );
+
+    if ( $n % 3 == 0 ) {
+        if ( $i % 2 == 0 ) {
+            $d->note( $d->triplet_eighth, $d->snare );
+            $d->note( $d->triplet_eighth, $d->snare );
+            $d->note( $d->triplet_eighth, $d->snare );
+            $d->note( $d->triplet_eighth, $d->hi_tom );
+            $d->note( $d->triplet_eighth, $d->hi_tom );
+            $d->note( $d->triplet_eighth, $d->hi_tom );
+            $d->note( $d->triplet_eighth, $d->hi_mid_tom );
+            $d->note( $d->triplet_eighth, $d->hi_mid_tom );
+            $d->note( $d->triplet_eighth, $d->hi_mid_tom );
+            $d->note( $d->triplet_eighth, $d->low_tom );
+            $d->note( $d->triplet_eighth, $d->low_tom );
+            $d->note( $d->triplet_eighth, $d->low_tom );
+        }
+        else {
+            $d->note( $d->triplet_eighth, $d->snare );
+            $d->note( $d->triplet_eighth, $d->snare );
+            $d->note( $d->triplet_eighth, $d->hi_tom );
+            $d->note( $d->triplet_eighth, $d->snare );
+            $d->rest( $d->triplet_eighth );
+            $d->note( $d->triplet_eighth, $d->hi_mid_tom );
+            $d->note( $d->triplet_eighth, $d->snare );
+            $d->rest( $d->triplet_eighth );
+            $d->note( $d->triplet_eighth, $d->low_tom );
+            $d->note( $d->triplet_eighth, $d->snare );
+            $d->rest( $d->triplet_eighth );
+            $d->note( $d->triplet_eighth, $d->hi_floor_tom );
+        }
+        $i++;
+    }
 }
+
+$d->note( $d->quarter, $d->ride1, $d->kick );
 
 $d->write;

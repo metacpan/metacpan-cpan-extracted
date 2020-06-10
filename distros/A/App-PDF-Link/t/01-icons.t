@@ -14,7 +14,7 @@ ok( $pdf, "Created PDF" );
 
 App::PDF::Link::Icons::_load_icon_images( {}, $pdf );
 
-my $icons = App::PDF::Link::Icons::__icons();
+my $icons = App::PDF::Link::Icons::__icons($pdf);
 
 ok( defined $icons->{mscz}, "Got MuseScore icon" );
 ok( defined $icons->{html}, "Got iRealPro icon"  );
@@ -26,7 +26,7 @@ ok( defined $icons->{abc},  "Got ABC icon"       );
 
 App::PDF::Link::Icons::_load_icon_images( { all => 1 }, $pdf );
 
-$icons = App::PDF::Link::Icons::__icons();
+$icons = App::PDF::Link::Icons::__icons($pdf);
 
 my $xp = 11 + 24;
 ok( keys(%$icons) == $xp, "Got all @{[scalar(keys(%$icons))]} icons" );

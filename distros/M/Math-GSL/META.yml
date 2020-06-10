@@ -13,7 +13,7 @@ configure_requires:
   Module::Build: '0.38'
   PkgConfig: '0.07720'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ name: Math-GSL
 provides:
   Math::GSL:
     file: lib/Math/GSL.pm
-    version: '0.40'
+    version: '0.41'
   Math::GSL::BLAS:
     file: lib/Math/GSL/BLAS.pm
     version: '0'
@@ -608,6 +608,15 @@ provides:
   Math::GSL::Multirootsc:
     file: lib/Math/GSL/Multiroots.pm
     version: '0'
+  Math::GSL::Multiset:
+    file: lib/Math/GSL/Multiset.pm
+    version: '0'
+  Math::GSL::Multiset::gsl_multiset_struct:
+    file: lib/Math/GSL/Multiset.pm
+    version: '0'
+  Math::GSL::Multisetc:
+    file: lib/Math/GSL/Multiset.pm
+    version: '0'
   Math::GSL::NTuple:
     file: lib/Math/GSL/NTuple.pm
     version: '0'
@@ -800,7 +809,76 @@ provides:
   Math::GSL::SparseMatrix::gsl_spmatrix:
     file: lib/Math/GSL/SparseMatrix.pm
     version: '0'
-  Math::GSL::SparseMatrix::gsl_spmatrix_tree:
+  Math::GSL::SparseMatrix::gsl_spmatrix_char:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_char_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_complex:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_complex_float:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_complex_float_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_complex_long_double:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_complex_long_double_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_complex_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_float:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_float_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_int:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_int_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_long_double:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_long_double_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_pool_node:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_short:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_short_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_uchar:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_uchar_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_uint:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_uint_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_ushort:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_ushort_work:
+    file: lib/Math/GSL/SparseMatrix.pm
+    version: '0'
+  Math::GSL::SparseMatrix::gsl_spmatrix_work:
     file: lib/Math/GSL/SparseMatrix.pm
     version: '0'
   Math::GSL::SparseMatrixc:
@@ -915,7 +993,7 @@ requires:
   perl: v5.8.1
   version: '0.77'
 resources:
-  license: http://opensource.org/licenses/gpl-license.php
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
   repository: http://github.com/leto/math--gsl/tree/master
-version: '0.40'
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

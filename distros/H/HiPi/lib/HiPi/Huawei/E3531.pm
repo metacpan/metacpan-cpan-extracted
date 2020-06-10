@@ -15,7 +15,7 @@ my @_package_accessors = qw( );
 
 __PACKAGE__->create_accessors( @_package_accessors );
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 sub new {
     my($class, %params) = @_;

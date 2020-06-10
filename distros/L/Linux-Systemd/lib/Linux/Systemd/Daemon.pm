@@ -1,4 +1,4 @@
-package Linux::Systemd::Daemon 1.191790;
+package Linux::Systemd::Daemon 1.201600;
 
 # ABSTRACT: Systemd daemon API
 
@@ -70,7 +70,7 @@ Linux::Systemd::Daemon - Systemd daemon API
 
 =head1 VERSION
 
-version 1.191790
+version 1.201600
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Ioan Rogers.
+This software is Copyright (c) 2020 by Ioan Rogers.
 
 This is free software, licensed under:
 

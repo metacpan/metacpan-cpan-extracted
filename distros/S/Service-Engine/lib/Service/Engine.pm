@@ -31,10 +31,11 @@ Service::Engine - a framework for getting things done!
 
 =head1 VERSION
 
-Version 0.46
+Version 0.47
 
 0.45 -- Adding Elasticsearch
 0.46 -- Updating Mysql to use utf8mb4
+0.47 -- Removing unused code
 
 =cut
 
@@ -46,7 +47,7 @@ our $Data;
 our $EngineName;
 our $EngineInstance;
 our $EngineConfig;
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 our $Modules = {};
 our $ModuleMethods = {};
 our $Alert;

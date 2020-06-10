@@ -2,9 +2,10 @@ package Wasm::Func;
 
 use strict;
 use warnings;
+use 5.008004;
 
-# ABSTRACT: Interface to Web Assembly Memory
-our $VERSION = '0.10'; # VERSION
+# ABSTRACT: Interface to WebAssembly Memory
+our $VERSION = '0.14'; # VERSION
 
 
 1;
@@ -17,11 +18,11 @@ __END__
 
 =head1 NAME
 
-Wasm::Func - Interface to Web Assembly Memory
+Wasm::Func - Interface to WebAssembly Memory
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

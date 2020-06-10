@@ -1,7 +1,7 @@
 package Sah::SchemaR::cryptoexchange::currency_pair;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.015'; # VERSION
 
 our $rschema = ["str",[{description=>"\nCurrency pair is string in the form of *currency1*/*currency2*, where\n*currency1* is called the base currency and must be a known cryptocurrency code\n(e.g. LTC) while *currency2* is the quote (or price) currency and must be a\nknown fiat currency or a known cryptocurrency code (e.g. USD, or BTC).\n\nCryptocurrency code is checked against catalog in <pm:CryptoCurrency::Catalog>,\nwhile fiat currency code is checked against <pm:Locale::Codes::Currency_Codes>.\n\nWill be normalized to uppercase.\n\n",match=>qr(\A\S+/\S+\z),summary=>"Currency pair, e.g. LTC/USD","x.perl.coerce_rules"=>["From_str::to_cryptoexchange_currency_pair"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptoexchange::currency_pair - Currency pair, e.g. LTC/USD
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::cryptoexchange::currency_pair (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
+This document describes version 0.015 of Sah::SchemaR::cryptoexchange::currency_pair (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

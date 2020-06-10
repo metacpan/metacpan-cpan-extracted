@@ -107,22 +107,13 @@ L<Net::Clacks>
 Upgrading to version 11 on a client-by-client basis should work fine since there have been no incompatible changes,
 but this has only seen limited testing. As always, it is recommended to upgrade everything in one go.
 
+=head2 VERSION 12
 
-=head1 MODULES
+This is mostly an internal bugfix release. It now again allows in install Net::Clacks directly, instead of requiring
+the user to name the full sub-module name ("Net::Clacks::Client").
 
-The server is implemented in L<Net::Clacks::Server>.
-
-The client library in L<Net::Clacks::Client>.
-
-A more Cache::Memcached compatible client library (caching only, no real time communication) is implemented
-in the L<Net::Clacks::ClacksCache> module.
-
-Please also take a look at the examples, this implements a simple chat client.
-
-=head1 IMPORTANT NOTE
-
-Please refer to the included protocol.txt file for information
-about the CLACKS protocol.
+In this release, a new disconnect() method was added to L<Net::Clacks::ClacksCache>. This will allow to disconnect
+cleanly from the server.
 
 =head1 AUTHOR
 

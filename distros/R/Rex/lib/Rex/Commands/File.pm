@@ -62,7 +62,7 @@ use strict;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -363,25 +363,31 @@ you use Perl packages.
 All the possible variables ('{environment}', '{hostname}', ...) are documented
 in the CMDB YAML documentation.
 
-This function supports the following hooks:
+This function supports the following L<hooks|Rex::Hook>:
 
-=over 8
+=over 4
 
 =item before
 
-This gets executed before everything is done. The return value of this hook overwrite the original parameters of the function-call.
+This gets executed before anything is done. All original parameters are passed to it.
+
+The return value of this hook overwrites the original parameters of the function-call.
 
 =item before_change
 
-This gets executed right before the new file is written. Only with I<content> parameter. For the I<source> parameter the hook of the upload function is used.
+This gets executed right before the new file is written. All original parameters are passed to it.
+
+Only called when the C<content> parameter is used. For the C<source> parameter, the L<upload|Rex::Commands::Upload#upload> hooks are used.
 
 =item after_change
 
-This gets executed right after the file was written. Only with I<content> parameter. For the I<source> parameter the hook of the upload function is used.
+This gets executed right after the file is written. All original parameters, and any returned results are passed to it.
+
+Only called when the C<content> parameter is used. For the C<source> parameter, the L<upload|Rex::Commands::Upload#upload> hooks are used.
 
 =item after
 
-This gets executed right before the file() function returns.
+This gets executed right before the C<file()> function returns. All original parameters, and any returned results are passed to it.
 
 =back
 
@@ -448,9 +454,11 @@ sub file {
   my $__ret = { changed => 0 };
 
   my ( $new_md5, $old_md5 );
-  eval { $old_md5 = md5($file); };
 
-  if ( exists $option->{no_overwrite} && $option->{no_overwrite} && $old_md5 ) {
+  if ( exists $option->{no_overwrite}
+    && $option->{no_overwrite}
+    && $fs->is_file($file) )
+  {
     Rex::Logger::debug(
       "File already exists and no_overwrite option given. Doing nothing.");
     $__ret = { changed => 0 };
@@ -483,6 +491,7 @@ sub file {
     $fh->close;
 
     # now get md5 sums
+    eval { $old_md5 = md5($file); };
     $new_md5 = md5($tmp_file_name);
 
     if ( $new_md5 && $old_md5 && $new_md5 eq $old_md5 ) {
@@ -756,7 +765,7 @@ On failure it will die.
  
  # catch an error
  if($@) {
-   print "An error occured. $@.\n";
+   print "An error occurred. $@.\n";
  }
  
  # work with the filehandle
@@ -813,7 +822,7 @@ On failure it will die.
  
  # catch an error
  if($@) {
-   print "An error occured. $@.\n";
+   print "An error occurred. $@.\n";
  }
  
  # work with the filehandle

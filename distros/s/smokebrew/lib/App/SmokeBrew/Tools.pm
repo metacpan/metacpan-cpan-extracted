@@ -1,5 +1,5 @@
 package App::SmokeBrew::Tools;
-$App::SmokeBrew::Tools::VERSION = '0.56';
+$App::SmokeBrew::Tools::VERSION = '1.00';
 #ABSTRACT: Various utility functions for smokebrew
 
 use strict;
@@ -204,7 +204,7 @@ App::SmokeBrew::Tools - Various utility functions for smokebrew
 
 =head1 VERSION
 
-version 0.56
+version 1.00
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package CPAN::Uploader;
 # ABSTRACT: upload things to the CPAN
-$CPAN::Uploader::VERSION = '0.103013';
+$CPAN::Uploader::VERSION = '0.103014';
 #pod =head1 ORIGIN
 #pod
 #pod This code is mostly derived from C<cpan-upload-http> by Brad Fitzpatrick, which
@@ -21,7 +21,7 @@ use LWP::UserAgent;
 use File::HomeDir;
 
 my $UPLOAD_URI = $ENV{CPAN_UPLOADER_UPLOAD_URI}
-              || 'https://pause.perl.org/pause/authenquery';
+              || 'https://pause.perl.org/pause/authenquery?ACTION=add_uri';
 
 #pod =method upload_file
 #pod
@@ -31,12 +31,14 @@ my $UPLOAD_URI = $ENV{CPAN_UPLOADER_UPLOAD_URI}
 #pod
 #pod Valid arguments are:
 #pod
-#pod   user       - (required) your CPAN / PAUSE id
-#pod   password   - (required) your CPAN / PAUSE password
-#pod   subdir     - the directory (under your home directory) to upload to
-#pod   http_proxy - uri of the http proxy to use
-#pod   upload_uri - uri of the upload handler; usually the default (PAUSE) is right
-#pod   debug      - if set to true, spew lots more debugging output
+#pod   user        - (required) your CPAN / PAUSE id
+#pod   password    - (required) your CPAN / PAUSE password
+#pod   subdir      - the directory (under your home directory) to upload to
+#pod   http_proxy  - uri of the http proxy to use
+#pod   upload_uri  - uri of the upload handler; usually the default (PAUSE) is right
+#pod   debug       - if set to true, spew lots more debugging output
+#pod   retries     - number of retries to perform on upload failure (5xx response)
+#pod   retry_delay - number of seconds to wait between retries
 #pod
 #pod This method attempts to actually upload the named file to the CPAN.  It will
 #pod raise an exception on error.
@@ -66,7 +68,16 @@ sub upload_file {
       . '$file: ' . Data::Dumper::Dumper($file)
     );
   } else {
-    $self->_upload($file);
+    my $tries = ($self->{retries} > 0) ? $self->{retries} + 1 : 1;
+
+    TRY: for my $try (1 .. $tries) {
+      last TRY if eval { $self->_upload($file); 1 };
+      die $@ unless $@ !~ /request failed with error code 5/;
+      if ($try <= $tries) {
+        $self->log("Upload failed ($@), will make attempt #$try ...");
+        sleep $self->{retry_delay} if $self->{retry_delay};
+      }
+    }
   }
 }
 
@@ -287,7 +298,7 @@ CPAN::Uploader - upload things to the CPAN
 
 =head1 VERSION
 
-version 0.103013
+version 0.103014
 
 =head1 METHODS
 
@@ -299,12 +310,14 @@ version 0.103013
 
 Valid arguments are:
 
-  user       - (required) your CPAN / PAUSE id
-  password   - (required) your CPAN / PAUSE password
-  subdir     - the directory (under your home directory) to upload to
-  http_proxy - uri of the http proxy to use
-  upload_uri - uri of the upload handler; usually the default (PAUSE) is right
-  debug      - if set to true, spew lots more debugging output
+  user        - (required) your CPAN / PAUSE id
+  password    - (required) your CPAN / PAUSE password
+  subdir      - the directory (under your home directory) to upload to
+  http_proxy  - uri of the http proxy to use
+  upload_uri  - uri of the upload handler; usually the default (PAUSE) is right
+  debug       - if set to true, spew lots more debugging output
+  retries     - number of retries to perform on upload failure (5xx response)
+  retry_delay - number of seconds to wait between retries
 
 This method attempts to actually upload the named file to the CPAN.  It will
 raise an exception on error.
@@ -356,7 +369,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Barbie Christian Walde David Caldwell Golden fREW Schmidt Gabor Szabo Graham Knop Kent Fredric Mark Fowler Mike Doherty Steven Haryanto (on Asus Zenbook) sungo Torsten Raudssus Vincent Pit
+=for stopwords Barbie Christian Walde David Caldwell Golden fREW Schmidt Gabor Szabo Graham Knop Kent Fredric Mark Fowler Mike Doherty perlancar (@netbook-zenbook-ux305) Ricardo Signes Steven Haryanto (on Asus Zenbook) sungo Torsten Raudssus Vincent Pit
 
 =over 4
 
@@ -402,6 +415,14 @@ Mike Doherty <doherty@cs.dal.ca>
 
 =item *
 
+perlancar (@netbook-zenbook-ux305) <perlancar@gmail.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Steven Haryanto (on Asus Zenbook) <stevenharyanto@gmail.com>
 
 =item *
@@ -420,7 +441,7 @@ Vincent Pit <perl@profvince.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo SIGNES.
+This software is copyright (c) 2020 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,22 +13,35 @@
       "version" : 2
    },
    "name" : "Dist-Zilla-PluginBundle-Author-TEAM",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.014000"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::TEAM" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
             "Test::Version" : "1"
          }
       },
@@ -93,8 +106,12 @@
             "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0",
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "Dist::Zilla::Role::PluginBundle::PluginRemover" : "0",
+            "Dist::Zilla::Util" : "0",
+            "Moose" : "0",
             "Perl::Version" : "0",
-            "Test::CPAN::Meta" : "0"
+            "Test::CPAN::Meta" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -107,8 +124,15 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CheckDeps" : "0.010",
-            "Test::More" : "0.94"
+            "Test::More" : "0.94",
+            "perl" : "5.006"
          }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::Author::TEAM" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/TEAM.pm",
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -116,14 +140,17 @@
       "bugtracker" : {
          "web" : "https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM/issues"
       },
+      "homepage" : "https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM.git",
+         "url" : "https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM.git",
          "web" : "https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM"
       }
    },
-   "version" : "0.002",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "0.004",
+   "x_authority" : "cpan:TEAM",
+   "x_generated_by_perl" : "v5.30.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

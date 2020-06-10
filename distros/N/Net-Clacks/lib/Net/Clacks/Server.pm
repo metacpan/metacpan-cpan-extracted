@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 11;
+our $VERSION = 12;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -774,6 +774,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         $clients{$cid}->{mirror} = 0;
                         $sendinterclacks = 0;
                     } elsif($clients{$cid}->{buffer} =~ /^QUIT/) {
+                        print STDERR "Client disconnected cleanly!\n";
                         push @toremove, $cid;
                         $sendinterclacks = 0;
                     } elsif($clients{$cid}->{buffer} =~ /^TIMEOUT/ && $clients{$cid}->{interclacks}) {

@@ -24,7 +24,7 @@ name: Test-TrailingSpace
 provides:
   Test::TrailingSpace:
     file: lib/Test/TrailingSpace.pm
-    version: '0.0500'
+    version: '0.0600'
 requires:
   File::Find::Object::Rule: '0.0301'
   Test::More: '0.88'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/shlomif/perl-test-trailingspace/issues
   homepage: http://metacpan.org/release/Test-TrailingSpace
   repository: git://github.com/shlomif/perl-test-trailingspace.git
-version: '0.0500'
+version: '0.0600'
 x_Dist_Zilla:
   perl:
     version: '5.030003'

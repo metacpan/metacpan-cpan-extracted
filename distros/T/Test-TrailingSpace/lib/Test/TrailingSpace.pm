@@ -1,5 +1,5 @@
 package Test::TrailingSpace;
-$Test::TrailingSpace::VERSION = '0.0500';
+$Test::TrailingSpace::VERSION = '0.0600';
 use 5.014;
 use strict;
 use warnings;
@@ -79,21 +79,21 @@ sub _init
 
     my $OPEN_MODE = $find_cr ? '<:raw' : '<';
     my $cb =
-"sub { my (\$p) = \@_;open( my \$fh, '$OPEN_MODE', \$p );while ( my \$l = <\$fh> ){chomp(\$l);";
+"sub { my (\$r) = \@_; my \$nf = 0; while (my \$p = \$r->match()) { open( my \$fh, '$OPEN_MODE', \$p ); L: while ( my \$l = <\$fh> ){chomp(\$l);";
     $cb .=
-q#if ( $l =~ /[ \\t]+\\r?\\z/ ){diag("Found trailing space in file '$p'");return 1;}#;
+q#if ( $l =~ /[ \\t]+\\r?\\z/ ){diag("Found trailing space in file '$p'");++$nf; last L;}#;
     if ( $args->{find_tabs} )
     {
         $cb .=
-q#if ( $l =~ /\\t/ ) { diag("Found hard tabs in file '$p'"); return 1; }#;
+q#if ( $l =~ /\\t/ ) { diag("Found hard tabs in file '$p'"); ++$nf; last L;}#;
     }
 
     if ($find_cr)
     {
         $cb .=
-q# if ( $l =~ /\\r\\z/ ) { diag("Found Carriage Returns line endings in file '$p'"); return 1; }#;
+q# if ( $l =~ /\\r\\z/ ) { diag("Found Carriage Returns line endings in file '$p'");  ++$nf; last L; }#;
     }
-    $cb .= "} return 0;}";
+    $cb .= "} } return \$nf;}";
 
     ## no critic
     $self->_path_cb( eval($cb) );
@@ -106,8 +106,6 @@ sub no_trailing_space
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my ( $self, $blurb ) = @_;
-
-    my $num_found = 0;
 
     my $subrule = File::Find::Object::Rule->new;
 
@@ -132,12 +130,7 @@ sub no_trailing_space
           # ->exec(sub { print STDERR join(",", "Foo==", @_), "\n"; return 1; })
             ->name( $self->_filename_regex() ),
     )->start( $self->_root_path() );
-    my $cb = $self->_path_cb();
-
-    while ( my $path = $rule->match() )
-    {
-        $num_found += $cb->($path);
-    }
+    my $num_found = $self->_path_cb()->($rule);
 
     return is( $num_found, 0, $blurb );
 }
@@ -156,7 +149,7 @@ Test::TrailingSpace - test for trailing space in source files.
 
 =head1 VERSION
 
-version 0.0500
+version 0.0600
 
 =head1 SYNOPSIS
 

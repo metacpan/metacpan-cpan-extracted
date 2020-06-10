@@ -12,6 +12,7 @@ use JSON;
 use CGI;
 
 sub process_http_request {
+
     my $self = shift;
     
     my $json = JSON->new->allow_nonref;
@@ -35,13 +36,24 @@ sub process_http_request {
     } else {
         my $allowed_resources = $self->{'Config'}->get_config('api')->{'allowed_resources'};
         my $path = $ENV{'REQUEST_URI'};
+        
+        # strip off query 
+        if ($path =~ /\?/) {
+        	$path =~ s/(.*)\?.*/$1/;
+        }
+        
         my (undef,$module,$method,$params) = split /\//, $path;
-    
+    	warn("trying $module: $method : $params"); 
+    	 
         $content = eval{$json->encode( {'error'=>"unknown resource $path"} )};
     
-        if ($allowed_resources->{$module}) {
+        if ($module && $method && $allowed_resources->{$module}) {
             if ($allowed_resources->{$module}->{$method}) {
-               $content = $self->{$module}->$method();
+               warn("trying $module: $method"); 
+               my $eval_content = eval{$self->{$module}->$method()};
+               if ($eval_content) {
+               		$content = $eval_content;
+               }
             }
         }
     }

@@ -1,5 +1,5 @@
 package App::SmokeBrew::BuildPerl;
-$App::SmokeBrew::BuildPerl::VERSION = '0.56';
+$App::SmokeBrew::BuildPerl::VERSION = '1.00';
 #ABSTRACT: build and install a particular version of Perl
 
 use strict;
@@ -81,6 +81,11 @@ has 'make' => (
   default => sub { my $make = $Config::Config{make} || 'make'; can_run( $make ) },
 );
 
+has 'jobs' => (
+  is => 'ro',
+  isa => 'Int',
+);
+
 has 'mirrors' => (
   is => 'ro',
   isa => 'ArrayRefUri',
@@ -120,13 +125,14 @@ sub build_perl {
     unshift @conf_opts, '-Dprefix=' . $prefix;
     local $ENV{MAKE} = $self->make;
     my $cmd = [ './Configure', '-des', @conf_opts ];
+    my $jobs = ( $self->jobs && $self->can_jobs ? "-j" . $self->jobs : '' );
     return unless scalar run( command => $cmd,
                          verbose => 1, );
-    return unless scalar run( command => [ $self->make ], verbose => $self->verbose );
+    return unless scalar run( command => [ $self->make, $jobs ], verbose => $self->verbose );
     unless ( $self->skiptest ) {
-      return unless scalar run( command => [ $self->make, 'test' ], verbose => $self->verbose );
+      return unless scalar run( command => [ $self->make, $jobs, 'test' ], verbose => $self->verbose );
     }
-    return unless scalar run( command => [ $self->make, 'install' ], verbose => $self->verbose );
+    return unless scalar run( command => [ $self->make, $jobs, 'install' ], verbose => $self->verbose );
     rmtree ( File::Spec->catdir( $prefix, 'man' ) ) # remove the manpages
       unless $self->nozapman;
   }
@@ -174,7 +180,7 @@ App::SmokeBrew::BuildPerl - build and install a particular version of Perl
 
 =head1 VERSION
 
-version 0.56
+version 1.00
 
 =head1 SYNOPSIS
 

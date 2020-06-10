@@ -32,6 +32,7 @@ pod_coverage:
     - Wasm::Wasmtime::ExternType#new
     - Wasm::Wasmtime::Extern#new
     - Wasm::Wasmtime::Table#new
+    - Wasm::Wasmtime::Caller#new
     - Wasm::Wasmtime::Instance::Exports#new
     - Wasm::Wasmtime::Instance::Exports#can
     - Wasm::Wasmtime::Module::Exports#new

@@ -38,7 +38,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 NEWS
-perl-Glib.doap
+perl-glib.doap
 perl-Glib.spec.in
 README
 t/1.t

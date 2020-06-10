@@ -1,17 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 package Tickit::Async;
 
 use strict;
 use warnings;
 use base qw( Tickit IO::Async::Notifier );
-Tickit->VERSION( '0.69' ); # Tickit::_Tickit->_new_with_evloop
+Tickit->VERSION( '0.71' ); # Full `watch_io` callback
 IO::Async::Notifier->VERSION( '0.43' ); # Need support for being a nonprinciple mixin
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use IO::Async::Loop 0.47; # ->run and ->stop methods
 use IO::Async::Stream;
@@ -102,13 +102,31 @@ sub _make_tickit
       sub { # destroy
          warn "TODO: destroy\n";
       },
+
       sub { $loop->run },
       sub { $loop->stop },
-      sub { $loop->watch_io  ( handle => $_[0], on_read_ready => $_[1] ) },
+
+      sub {
+         my ( $fh, $cond, $iowatch ) = @_;
+         $loop->watch_io(
+            handle => $fh,
+            ( $cond & Tickit::IO_IN  ) ? ( on_read_ready  => sub { $iowatch->( Tickit::IO_IN  ) } ) : (),
+            ( $cond & Tickit::IO_OUT ) ? ( on_write_ready => sub { $iowatch->( Tickit::IO_OUT ) } ) : (),
+            ( $cond & Tickit::IO_HUP ) ? ( on_hangup      => sub { $iowatch->( Tickit::IO_HUP ) } ) : (),
+         );
+      },
       sub { $loop->unwatch_io( handle => $_[0], on_read_ready => 1     ) },
-      sub { return $loop->watch_time( at => $_[0], code => $_[1] ) },
+
+      sub {
+         my ( $time, $watch ) = @_;
+         return $loop->watch_time( at => $time, code => $watch );
+      },
       sub { $loop->unwatch_time( $_[0] ) },
-      sub { $loop->watch_idle( when => "later", code => $_[0] ) },
+
+      sub {
+         my ( $watch ) = @_;
+         $loop->watch_idle( when => "later", code => $watch );
+      },
       sub { warn "TODO: cancel idle" },
    );
 }

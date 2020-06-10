@@ -1,14 +1,13 @@
 package JIP::DataPath;
 
-use parent 'Exporter';
-
 use strict;
 use warnings;
 
 use Carp qw(croak);
+use Exporter qw(import);
 use English qw(-no_match_vars);
 
-our $VERSION = '0.041';
+our $VERSION = '0.042';
 
 our @EXPORT_OK = qw(path);
 
@@ -49,16 +48,16 @@ sub get {
 
     my ($contains, $context) = $self->_accessor($path_parts);
 
-    if ($contains) {
-        my $last_part = $path_parts->[-1] // q{};
-        my $type      = ref $context      // q{};
+    return $default_value if !$contains;
 
-        if ($type eq 'HASH' && length $last_part) {
-            return $context->{$last_part};
-        }
-        elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
-            return $context->[$last_part];
-        }
+    my $last_part = $path_parts->[-1] // q{};
+    my $type      = ref $context      // q{};
+
+    if ($type eq 'HASH' && length $last_part) {
+        return $context->{$last_part};
+    }
+    elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
+        return $context->[$last_part];
     }
 
     return $default_value;
@@ -73,16 +72,16 @@ sub get_new {
 
     my ($contains, $context) = $self->_accessor($path_parts);
 
-    if ($contains) {
-        my $last_part = $path_parts->[-1] // q{};
-        my $type      = ref $context      // q{};
+    return $default_value if !$contains;
 
-        if ($type eq 'HASH' && length $last_part) {
-            return __PACKAGE__->new(document => $context->{$last_part});
-        }
-        elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
-            return __PACKAGE__->new(document => $context->[$last_part]);
-        }
+    my $last_part = $path_parts->[-1] // q{};
+    my $type      = ref $context      // q{};
+
+    if ($type eq 'HASH' && length $last_part) {
+        return __PACKAGE__->new(document => $context->{$last_part});
+    }
+    elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
+        return __PACKAGE__->new(document => $context->[$last_part]);
     }
 
     return $default_value;
@@ -106,18 +105,18 @@ sub set {
 
     my ($contains, $context) = $self->_accessor($path_parts);
 
-    if ($contains) {
-        my $last_part = $path_parts->[-1] // q{};
-        my $type      = ref $context      // q{};
+    return 0 if !$contains;
 
-        if ($type eq 'HASH' && length $last_part) {
-            $context->{$last_part} = $value;
-            return 1;
-        }
-        elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
-            $context->[$last_part] = $value;
-            return 1;
-        }
+    my $last_part = $path_parts->[-1] // q{};
+    my $type      = ref $context      // q{};
+
+    if ($type eq 'HASH' && length $last_part) {
+        $context->{$last_part} = $value;
+        return 1;
+    }
+    elsif ($type eq 'ARRAY' && $last_part =~ m{^\d+$}x) {
+        $context->[$last_part] = $value;
+        return 1;
     }
 
     return 0;
@@ -176,7 +175,7 @@ JIP::DataPath - provides a way to access data elements in a deep, complex and ne
 
 =head1 VERSION
 
-This document describes L<JIP::DataPath> version C<0.041>.
+This document describes L<JIP::DataPath> version C<0.042>.
 
 =head1 SYNOPSIS
 
@@ -236,7 +235,7 @@ Extract value from L</"document"> identified by the given path.
 
 =head2 get_new
 
-    my $o = JIP::DataPath->new(
+    my $data_path = JIP::DataPath->new(
         document => {
             foo => {
                 bar => {
@@ -247,13 +246,13 @@ Extract value from L</"document"> identified by the given path.
     );
 
     # undef
-    $o->get_new(['not exists']);
+    $data_path->get_new(['not exists']);
 
     # {wtf => 42}
-    $o->get_new(['foo bar'])->document;
+    $data_path->get_new(['foo bar'])->document;
 
     # 'default value'
-    $o->get_new(['not exists'], 'default value');
+    $data_path->get_new(['not exists'], 'default value');
 
 Extract value from L</"document">, identified by the given path, and create an instance of the L<JIP::DataPath> with this value.
 
@@ -326,13 +325,17 @@ Alias of C<< JIP::DataPath->new(document => {}) >>. It creates a L<JIP::DataPath
 
 None.
 
+=head1 DEPENDENCIES
+
+Perl 5.10.1 or later.
+
 =head1 CONFIGURATION AND ENVIRONMENT
 
 L<JIP::DataPath> requires no configuration files or environment variables.
 
 =head1 SEE ALSO
 
-L<Data::Focus>, L<Data::PathSimple>, L<Data::SimplePath>
+L<Data::Focus>, L<Data::PathSimple>, L<Data::SimplePath>, L<JSON::Pointer>
 
 =head1 AUTHOR
 

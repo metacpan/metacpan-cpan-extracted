@@ -96,6 +96,8 @@ lib/Yancy/Help/Config.pod
 lib/Yancy/Help/Cookbook.pod
 lib/Yancy/Help/Standalone.pod
 lib/Yancy/Help/Upgrading.pod
+lib/Yancy/I18N.pm
+lib/Yancy/I18N/en.pm
 lib/Yancy/Plugin/Auth.pm
 lib/Yancy/Plugin/Auth/Basic.pm
 lib/Yancy/Plugin/Auth/Github.pm
@@ -151,6 +153,12 @@ t/fixtures/foreign-key-field/mysql.sql
 t/fixtures/foreign-key-field/pg.sql
 t/fixtures/foreign-key-field/schema.json
 t/fixtures/foreign-key-field/sqlite.sql
+t/fixtures/markdown/README.md
+t/fixtures/markdown/dbic.pl
+t/fixtures/markdown/mysql.sql
+t/fixtures/markdown/pg.sql
+t/fixtures/markdown/schema.json
+t/fixtures/markdown/sqlite.sql
 t/helpers.t
 t/i18n.t
 t/lib/Digest/Broken.pm

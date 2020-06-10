@@ -1,75 +1,111 @@
-SYNOPSIS
+NAME
+    JSON::Color - Encode to colored JSON
 
+VERSION
+    This document describes version 0.130 of JSON::Color (from Perl
+    distribution JSON-Color), released on 2020-06-09.
+
+SYNOPSIS
      use JSON::Color qw(encode_json);
      say encode_json([1, "two", {three => 4}]);
 
 DESCRIPTION
-
     This module generates JSON, colorized with ANSI escape sequences.
 
     To change the color, see the %theme in the source code. In theory you
     can also modify it to colorize using HTML.
 
 FUNCTIONS
-
- encode_json($data, \%opts) => STR
-
-    Encode to JSON. Will die on error (e.g. when encountering
-    non-encodeable data like Regexp or file handle).
+  encode_json($data, \%opts) => STR
+    Encode to JSON. Will die on error (e.g. when encountering non-encodeable
+    data like Regexp or file handle).
 
     Known options:
 
-      * pretty => BOOL (default: 0)
+    *   color_theme => STR
 
-      Pretty-print.
+        Pick a color theme, which is a ColorTheme-confirming color theme
+        module. The default is JSON::Color::ColorTheme::default. For
+        example: ColorTheme::Lens::Lighten
 
-      * linum => BOOL (default: 0)
+    *   pretty => BOOL (default: 0)
 
-      Show line number.
+        Pretty-print.
 
-      * sort_by => CODE
+    *   linum => BOOL (default: 0)
 
-      If specified, then sorting of hash keys will be done using this sort
-      subroutine. This is similar to the sort_by option in the JSON module.
-      Note that code is executed in JSON::Color namespace, example:
+        Show line number.
 
-       # reverse sort
-       encode_json(..., {sort_by => sub { $JSON::Color::b cmp $JSON::Color::a }});
+    *   sort_by => CODE
 
-      Another example, using Sort::ByExample:
+        If specified, then sorting of hash keys will be done using this sort
+        subroutine. This is similar to the "sort_by" option in the JSON
+        module. Note that code is executed in "JSON::Color" namespace,
+        example:
 
-       use Sort::ByExample cmp => {-as => 'by_eg', example => [qw/foo bar baz/]};
-       encode_json(..., {sort_by => sub { by_eg($JSON::Color::a, $JSON::Color::b) }});
+         # reverse sort
+         encode_json(..., {sort_by => sub { $JSON::Color::b cmp $JSON::Color::a }});
+
+        Another example, using Sort::ByExample:
+
+         use Sort::ByExample cmp => {-as => 'by_eg', example => [qw/foo bar baz/]};
+         encode_json(..., {sort_by => sub { by_eg($JSON::Color::a, $JSON::Color::b) }});
 
 FAQ
-
- What about loading?
-
+  What about loading?
     Use JSON.
 
- How to handle non-encodeable data?
-
+  How to handle non-encodeable data?
     Use Data::Clean::JSON.
 
- Why do numbers become strings?
-
+  Why do numbers become strings?
     Example:
 
      % perl -MJSON::Color=encode_json -E'say encode_json([1, "1"])'
      ["1","1"]
 
     To detect whether a scalar is a number (e.g. differentiate between "1"
-    and 1), the XS module Scalar::Util::LooksLikeNumber is used. This is
-    set as an optional prerequisite, so you'll need to install it
-    separately. After the prerequisite is installed:
+    and 1), the XS module Scalar::Util::LooksLikeNumber is used. This is set
+    as an optional prerequisite, so you'll need to install it separately.
+    After the prerequisite is installed:
 
      % perl -MJSON::Color=encode_json -E'say encode_json([1, "1"])'
      [1,"1"]
 
-SEE ALSO
+ENVIRONMENT
+  JSON_COLOR_COLOR_THEME
+    Set default color theme. Has precedence over "COLOR_THEME".
 
+  COLOR_THEME
+    Set default color theme.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/JSON-Color>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-JSON-Color>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-Color>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     To colorize with HTML, you can try Syntax::Highlight::JSON.
 
     Syntax::SourceHighlight can also colorize JSON/JavaScript to HTML or
     ANSI escape. It requires the GNU Source-highlight library.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2016, 2015, 2014, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

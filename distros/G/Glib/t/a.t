@@ -18,7 +18,7 @@ if ($Config{archname} =~ m/^(x86_64|mipsel|mips|alpha)/
 	# and in 2.4.0 (actually 2.3.2).
 	plan skip_all => "g_log doubles messages by accident on 64-bit platforms";
 } else {
-	plan tests => 30;
+	plan tests => 32;
 }
 
 package Foo;
@@ -34,6 +34,20 @@ $SIG{__WARN__} = sub { chomp (my $msg = $_[0]); ok(1, "in __WARN__: $msg"); };
 Glib->message (undef, 'whee message');
 Glib->critical (undef, 'whee critical');
 Glib->warning (undef, 'whee warning');
+
+{
+	local %ENV = %ENV;
+
+	# These should not call the __WARN__ handler above.
+	$ENV{G_MESSAGES_DEBUG} = '';
+	Glib->info (undef, 'whee info');
+	Glib->debug (undef, 'whee debug');
+
+	# Now they sould.
+	$ENV{G_MESSAGES_DEBUG} = 'all';
+	Glib->info (undef, 'whee info');
+	Glib->debug (undef, 'whee debug');
+}
 
 my $id =
 Glib::Log->set_handler (__PACKAGE__,

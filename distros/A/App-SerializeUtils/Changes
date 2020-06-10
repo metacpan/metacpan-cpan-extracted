@@ -1,3 +1,8 @@
+0.163   2020-06-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Support Perl dumpers Data::Bahe, Data::Dumper::Compact.
+
+
 0.162   2020-04-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utilities: dd2sexp, json2sexp, phpser2sexp, sereal2sexp,

@@ -95,83 +95,80 @@ is_deeply $obj->notes, {}, 'notes';
 $obj->process;
 
 my $expected = {
-    0 => {
-        'A4 G4,E3' => 2,
-        'A4,F3 A4' => 2,
-        'C4 G4,E3' => 2,
-        'C4,C3 C4' => 2,
-        'D4,F3 D4,G3' => 2,
-        'D4,G3 C4,C3' => 2,
-        'E4 D4,F3' => 2,
-        'E4 D4,G3' => 2,
-        'E4,C3 E4' => 2,
-        'E4,G3 E4' => 2,
-        'F4 E4,C3' => 2,
-        'F4 E4,G3' => 2,
-        'F4,D3 F4' => 2,
-        'F4,F3 F4' => 2,
-        'G4 A4,F3' => 2,
-        'G4 F4,F3' => 2,
-        'G4,E3 F4,D3' => 2,
-        'G4,E3 G4' => 4,
-    }
+    'A4 A4' => 2,
+    'A4 G4' => 2,
+    'C4 C4' => 2,
+    'C4 G4' => 3,
+    'D4 C4' => 3,
+    'D4 D4' => 2,
+    'E4 D4' => 4,
+    'E4 E4' => 4,
+    'F4 E4' => 4,
+    'F4 F4' => 4,
+    'G4 A4' => 2,
+    'G4 F4' => 4,
+    'G4 G4' => 4,
 };
 
-is_deeply $obj->notes, $expected, 'processed notes';
+is_deeply $obj->notes->{0}, $expected, 'processed notes';
 
 $expected = {
-    0 => {
-        'hn,hn qn,hn' => 4,
-        'qn hn,hn'    => 4,
-        'qn qn,hn'    => 11,
-        'qn qn,qn'    => 2,
-        'qn,hn qn'    => 16,
-        'qn,qn qn,qn' => 2,
-    }
+    'hn qn' => 5,
+    'qn hn' => 6,
+    'qn qn' => 30,
 };
 
-is_deeply $obj->dura, $expected, 'processed durations';
+is_deeply $obj->dura->{0}, $expected, 'processed durations';
 
 is_deeply [ sort @{ $obj->_dura_list->{0} } ], ['hn','qn'], '_dura_list';
 
 $expected = {
-    0 => {
-        'hn*G4,hn*E3 qn*F4,hn*D3' => 2,
-        'qn*A4 hn*G4,hn*E3'       => 2,
-        'qn*A4,hn*F3 qn*A4'       => 2,
-        'qn*C4 qn*G4,hn*E3'       => 2,
-        'qn*C4,hn*C3 qn*C4'       => 2,
-        'qn*D4,qn*F3 qn*D4,qn*G3' => 2,
-        'qn*E4 hn*D4,hn*G3'       => 2,
-        'qn*E4 qn*D4,qn*F3'       => 2,
-        'qn*E4,hn*C3 qn*E4'       => 2,
-        'qn*E4,hn*G3 qn*E4'       => 2,
-        'qn*F4 qn*E4,hn*C3'       => 2,
-        'qn*F4 qn*E4,hn*G3'       => 2,
-        'qn*F4,hn*D3 qn*F4'       => 2,
-        'qn*F4,hn*F3 qn*F4'       => 2,
-        'qn*G4 qn*A4,hn*F3'       => 2,
-        'qn*G4 qn*F4,hn*F3'       => 2,
-        'qn*G4,hn*E3 qn*G4'       => 4,
-    }
+  'hn*G4 qn*F4' => 2,
+  'qn*A4 hn*G4' => 2,
+  'qn*A4 qn*A4' => 2,
+  'qn*C4 qn*C4' => 2,
+  'qn*C4 qn*G4' => 2,
+  'qn*D4 hn*C4' => 2,
+  'qn*D4 qn*D4' => 2,
+  'qn*E4 hn*D4' => 2,
+  'qn*E4 qn*D4' => 2,
+  'qn*E4 qn*E4' => 4,
+  'qn*F4 qn*E4' => 4,
+  'qn*F4 qn*F4' => 4,
+  'qn*G4 qn*A4' => 2,
+  'qn*G4 qn*F4' => 2,
+  'qn*G4 qn*G4' => 4,
 };
 
-is_deeply $obj->dura_notes, $expected, 'processed dura_notes';
+is_deeply $obj->dura_notes->{0}, $expected, 'processed dura_notes';
 
 $expected = {
-    'hn,hn qn,hn-qn qn,hn' => 2,
-    'qn hn,hn-qn,hn qn'    => 2,
-    'qn qn,hn-qn hn,hn'    => 2,
-    'qn qn,hn-qn qn,hn'    => 3,
-    'qn,hn qn-hn,hn qn,hn' => 2,
-    'qn,hn qn-qn,hn qn'    => 5,
+  'hn qn-qn qn' => 3,
+  'qn hn-qn qn' => 2,
+  'qn qn-hn qn' => 3,
+  'qn qn-qn hn' => 2,
+  'qn qn-qn qn' => 9,
 };
 
 is_deeply $obj->dura_net->{0}, $expected, 'dura_net';
 
-$expected = {};
+$expected = {
+  'A4 A4-G4 F4' => 2,
+  'C4 C4-G4 G4' => 2,
+  'F4 E4-E4 D4' => 3,
+  'G4 F4-F4 E4' => 3,
+  'G4 G4-A4 A4' => 2,
+};
 
 is_deeply $obj->note_net->{0}, $expected, 'note_net';
+
+$expected = {
+  'hn*G4 qn*F4-qn*F4 qn*E4' => 2,
+  'qn*A4 qn*A4-hn*G4 qn*F4' => 2,
+  'qn*C4 qn*C4-qn*G4 qn*G4' => 2,
+  'qn*F4 qn*E4-qn*E4 qn*D4' => 2,
+  'qn*G4 qn*G4-qn*A4 qn*A4' => 2,
+};
 
 is_deeply $obj->dura_note_net->{0}, $expected, 'dura_note_net';
 
@@ -179,11 +176,13 @@ $obj->populate;
 
 isa_ok $obj->score, 'MIDI::Simple';
 
-is $obj->dura_convert('1920'), 'hn', 'dura_convert';
-is $obj->dura_convert('960,1920'), 'qn,hn', 'dura_convert';
+is $obj->_opus_ticks, 480, '_opus_ticks';
+
+is $obj->dura_convert('1920'), 'wn', 'dura_convert';
+is $obj->dura_convert('960,1920'), 'hn,wn', 'dura_convert';
 is $obj->note_convert('60 61'), 'C4 Cs4', 'note_convert';
 is $obj->note_convert('60 61,62'), 'C4 Cs4,D4', 'note_convert';
-is $obj->dura_note_convert('1920*60'), 'hn*C4', 'dura_note_convert';
-is $obj->dura_note_convert('960,1920*61,62'), 'qn,hn*Cs4,D4', 'dura_note_convert';
+is $obj->dura_note_convert('1920*60'), 'wn*C4', 'dura_note_convert';
+is $obj->dura_note_convert('960,1920*61,62'), 'hn,wn*Cs4,D4', 'dura_note_convert';
 
 done_testing();

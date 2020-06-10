@@ -6,15 +6,13 @@ use warnings;
 
 use lib 't/lib';
 use MockUtils qw/build_mock_object/;
-use RoleUtils qw/get_required_methods/;
+use Role::Inspector qw/get_role_info/;
 
 use OpenTracing::Interface::ScopeManager;
 
 my $class = ref build_mock_object(
    class_name    => 'ScopeManager',
-   class_methods => [
-       get_required_methods('OpenTracing::Interface::ScopeManager')
-   ],
+   class_methods => get_role_info('OpenTracing::Interface::ScopeManager')->{requires},
 );
 can_all_ok($class);
 

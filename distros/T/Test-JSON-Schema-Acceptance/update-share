@@ -1,6 +1,11 @@
 #!/usr/bin/env perl
 
-# update Changes file with new 'share' commit and commit.
+chomp(my $dirty = `git status --untracked --porcelain share`);
+!length($dirty) and die 'Cannot proceed: share/ is not dirty. Run "git submodule update --remote"';
+
+chomp($dirty = `git status --untracked --porcelain Changes`);
+length($dirty) and die 'Cannot proceed: Changes is already dirty';
+
 use Path::Tiny;
 chomp(my $str = `git submodule status`);
 my ($sha) = split(' ', $str, 2);

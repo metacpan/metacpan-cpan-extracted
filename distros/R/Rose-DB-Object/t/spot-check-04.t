@@ -143,7 +143,7 @@ EOF
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (1, 'id1', 'album1', 'artist1', 1999)));
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (2, 'id2', 'album2', 'artist1', 2000)));
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (3, 'id3', 'album3', 'artist2', 1934)));
-    $dbh->do(qq(INSERT INTO rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2020)));
+    $dbh->do(qq(INSERT INTO rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2099)));
 
     $dbh->do(qq(INSERT INTO rdbo_album_artwork VALUES ('album1.jpg', 'id1')));
     $dbh->do(qq(INSERT INTO rdbo_album_artwork VALUES ('album2.jpg', 'id2')));
@@ -170,7 +170,7 @@ EOF
     $dbh->do(qq(INSERT INTO Rose_db_object_private.rdbo_albums VALUES (1, 'id1', 'album1', 'artist1', 1999)));
     $dbh->do(qq(INSERT INTO Rose_db_object_private.rdbo_albums VALUES (2, 'id2', 'album2', 'artist1', 2000)));
     $dbh->do(qq(INSERT INTO Rose_db_object_private.rdbo_albums VALUES (3, 'id3', 'album3', 'artist2', 1934)));
-    $dbh->do(qq(INSERT INTO Rose_db_object_private.rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2020)));
+    $dbh->do(qq(INSERT INTO Rose_db_object_private.rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2099)));
 
     $dbh->do(qq(INSERT INTO Rose_db_object_private.rdbo_album_artwork VALUES ('album1.jpg', 'id1')));
     $dbh->do(qq(INSERT INTO Rose_db_object_private.rdbo_album_artwork VALUES ('album2.jpg', 'id2')));
@@ -244,7 +244,7 @@ EOF
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (1, 'id1', 'album1', 'artist1', 1999)));
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (2, 'id2', 'album2', 'artist1', 2000)));
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (3, 'id3', 'album3', 'artist2', 1934)));
-    $dbh->do(qq(INSERT INTO rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2020)));
+    $dbh->do(qq(INSERT INTO rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2099)));
 
     $dbh->do(qq(INSERT INTO rdbo_album_artwork VALUES ('album1.jpg', 'id1')));
     $dbh->do(qq(INSERT INTO rdbo_album_artwork VALUES ('album2.jpg', 'id2')));
@@ -296,7 +296,7 @@ EOF
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (1, 'id1', 'album1', 'artist1', 1999)));
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (2, 'id2', 'album2', 'artist1', 2000)));
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (3, 'id3', 'album3', 'artist2', 1934)));
-    $dbh->do(qq(INSERT INTO rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2020)));
+    $dbh->do(qq(INSERT INTO rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2099)));
 
     $dbh->do(qq(INSERT INTO rdbo_album_artwork VALUES ('album1.jpg', 'id1')));
     $dbh->do(qq(INSERT INTO rdbo_album_artwork VALUES ('album2.jpg', 'id2')));
@@ -348,7 +348,7 @@ EOF
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (1, 'id1', 'album1', 'artist1', 1999)));
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (2, 'id2', 'album2', 'artist1', 2000)));
     $dbh->do(qq(INSERT INTO rdbo_albums VALUES (3, 'id3', 'album3', 'artist2', 1934)));
-    $dbh->do(qq(INSERT INTO rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2020)));
+    $dbh->do(qq(INSERT INTO rdbo_albums VALUES (4, 'id4', 'album4', 'artist2', 2099)));
 
     $dbh->do(qq(INSERT INTO rdbo_album_artwork VALUES ('album1.jpg', 'id1')));
     $dbh->do(qq(INSERT INTO rdbo_album_artwork VALUES ('album2.jpg', 'id2')));

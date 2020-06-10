@@ -1,5 +1,11 @@
 Revision history for Perl extension Mojo-Rx
 
+v0.13.0 2020-06-09T16:41:20Z
+
+    - added first few tests (Felipe Gasper)
+    - added optional next, error, complete methods to Subscriber objects (Felipe Gasper)
+    - fixed bug where Mojo::Rx wouldn't work with the -Ilib command-line option
+
 v0.12.1 2020-05-08T05:45:26Z
 
     - fixed bug in rx_timer, where a timer's $id could get M::IOLoop->remove'd after its timer's expiry

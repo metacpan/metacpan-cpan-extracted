@@ -1,9 +1,9 @@
 package MIDI::Simple::Drummer::Rock;
+$MIDI::Simple::Drummer::Rock::VERSION = '0.0805';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 use parent 'MIDI::Simple::Drummer';
-our $VERSION = '0.03';
 
 use constant CLOSED => 'Closed Hi-Hat';
 use constant CRASH  => 'Crash Cymbal 1';
@@ -291,7 +291,7 @@ MIDI::Simple::Drummer::Rock
 
 =head1 VERSION
 
-version 0.0803
+version 0.0805
 
 =head1 DESCRIPTION
 
@@ -301,10 +301,6 @@ L<MIDI::Simple::Drummer>.
 The constructor can be provided with a specific patch number (default 1
 "Standard Kit") or the arguments C<-power =E<gt> 1> or C<-room =E<gt> 1> to use
 the alternate rock kits.
-
-=head1 NAME
-
-MIDI::Simple::Drummer::Rock - Rock drum grooves
 
 =head1 TO DO
 
@@ -323,7 +319,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

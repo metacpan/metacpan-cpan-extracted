@@ -1,7 +1,9 @@
 package Color::ANSI::Util;
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.163'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-09'; # DATE
+our $DIST = 'Color-ANSI-Util'; # DIST
+our $VERSION = '0.164'; # VERSION
 
 use 5.010001;
 use strict;
@@ -525,7 +527,14 @@ sub rgb_to_ansi_bg_code {
 
 sub ansibg { goto &rgb_to_ansi_bg_code }
 
-sub ansi_reset { "\e[0m" }
+sub ansi_reset {
+    my $conditional = shift;
+    if ($conditional) {
+        my $cd = _color_depth();
+        return "" if $cd < 16;
+    }
+    "\e[0m";
+}
 
 1;
 # ABSTRACT: Routines for dealing with ANSI colors
@@ -542,7 +551,7 @@ Color::ANSI::Util - Routines for dealing with ANSI colors
 
 =head1 VERSION
 
-This document describes version 0.163 of Color::ANSI::Util (from Perl distribution Color-ANSI-Util), released on 2019-08-20.
+This document describes version 0.164 of Color::ANSI::Util (from Perl distribution Color-ANSI-Util), released on 2020-06-09.
 
 =head1 SYNOPSIS
 
@@ -600,6 +609,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::ansi16>
 
+
 =back
 
 Return value:  (color::rgb24)
@@ -621,6 +631,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::ansi256>
+
 
 =back
 
@@ -644,6 +655,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+
 =back
 
 Return value:  (color::ansi16)
@@ -665,6 +677,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
 
 =back
 
@@ -688,6 +701,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+
 =back
 
 Return value:  (str)
@@ -709,6 +723,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
 
 =back
 
@@ -732,6 +747,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+
 =back
 
 Return value:  (str)
@@ -753,6 +769,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
 
 =back
 
@@ -776,6 +793,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+
 =back
 
 Return value:  (str)
@@ -797,6 +815,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
 
 =back
 
@@ -827,6 +846,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<$color>* => I<color::rgb24>
 
+
 =back
 
 Return value:  (str)
@@ -855,6 +875,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$color>* => I<color::rgb24>
+
 
 =back
 
@@ -895,10 +916,13 @@ Alias for rgb_to_ansi_fg_code().
 
 Alias for rgb_to_ansi_bg_code().
 
-=head2 ansi_reset
+=head2 ansi_reset( [ $conditional ])
 
 Returns "\e[0m", which is the ANSI escape sequence to reset color. Normally you
 print this sequence after you print colored text.
+
+If C<$conditional> is set to true, then ansi_reset() will return "" if color is
+disabled.
 
 =head1 ENVIRONMENT
 
@@ -950,7 +974,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

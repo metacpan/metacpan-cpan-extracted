@@ -1,0 +1,183 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Ryu::Buffer
+at lib/Ryu/Buffer.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Ryu::Buffer - accumulate data
+
+=head1 DESCRIPTION
+
+Provides a simple way to push bytes or characters into a buffer,
+and get them back out again.
+
+Typically of use for delimiter-based or fixed-size protocols.
+
+=head1 METHODS
+
+=head2 new
+
+Instantiates a new, empty L<Ryu::Buffer>.
+
+=head1 METHODS - Reading data
+
+These methods provide ways of accessing the buffer either
+destructively (C<read*>) or non-destructively (C<peek*>).
+
+=head2 read_exactly
+
+Reads exactly the given number of bytes or characters.
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$size> - number of characters or bytes to return
+
+=back
+
+Returns a L<Future> which will resolve to a scalar containing the requested data.
+
+=head2 read_atmost
+
+Reads up to the given number of bytes or characters - if
+we have at least one byte or character in the buffer, we'll
+return that even if it's shorter than the requested C<$size>.
+This method is guaranteed not to return B<more> than the
+C<$size>.
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$size> - maximum number of characters or bytes to return
+
+=back
+
+Returns a L<Future> which will resolve to a scalar containing the requested data.
+
+=head2 read_atleast
+
+Reads at least the given number of bytes or characters - if
+we have a buffer that's the given size or larger, we'll
+return everything available, even if it's larger than the
+requested C<$size>.
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$size> - minimum number of characters or bytes to return
+
+=back
+
+Returns a L<Future> which will resolve to a scalar containing the requested data.
+
+=head2 read_until
+
+Reads up to the given string or regex match.
+
+Pass a C<qr//> instance if you want to use a regular expression to match,
+or a plain string if you want exact-string matching behaviour.
+
+The data returned will B<include> the match.
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$match> - the string or regex to match against
+
+=back
+
+Returns a L<Future> which will resolve to the requested bytes or characters.
+
+=head2 read_packed
+
+Uses L<pack> template notation to define a pattern to extract.
+Will attempt to accumulate enough bytes to fulfill the request,
+then unpack and extract from the buffer.
+
+This method only supports a B<very limited> subset of the
+full L<pack> functionality - currently, this includes
+sequences such as C<A4> or C<N1n1>, but does B<not> handle
+multi-stage templates such as C<N/a*>.
+
+These would need to parse the initial C<N1> bytes to
+determine the full extent of the data to be processed, and
+the logic for handling this is not yet implemented.
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$format> - a L<pack>-style format string
+
+=back
+
+Returns a L<Future> which will resolve to the requested items,
+of which there can be more than one depending on the format string.
+
+=head2 write
+
+Add more data to the buffer.
+
+Call this with a single scalar, and the results will be appended
+to the internal buffer, triggering any callbacks for read activity
+as required.
+
+=head2 size
+
+Returns the current buffer size.
+
+=head2 is_empty
+
+Returns true if the buffer is currently empty (size = 0), false otherwise.
+
+=head1 METHODS - Internal
+
+These are documented for convenience, but generally not recommended
+to call any of these directly.
+
+=head2 data
+
+Accessor for the internal buffer. Not recommended to use this,
+but if you break it you get to keep all the pieces.
+
+=head2 process_pending
+
+Used internally to trigger callbacks once L</write> has been called.
+
+=head2 new_future
+
+Instantiates a new L<Future>, used to ensure we get something awaitable.
+
+Can be overridden using C<$Ryu::FUTURE_FACTORY>.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Ryu::Node>
+
+L<flow_control|Ryu::Node/flow_control>, L<is_paused|Ryu::Node/is_paused>, L<label|Ryu::Node/label>, L<parent|Ryu::Node/parent>, L<pause|Ryu::Node/pause>, L<resume|Ryu::Node/resume>, L<unblocked|Ryu::Node/unblocked>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
+

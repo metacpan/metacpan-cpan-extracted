@@ -61,7 +61,7 @@ my %WriteMakefileArgs = (
     "File::HomeDir" => 0,
     "File::ShareDir" => 0,
     "File::Slurper" => 0,
-    "File::Temp" => 0,
+    "File::Temp" => "0.2307",
     "File::Util::Tempdir" => "0.032",
     "File::Which" => 0,
     "Function::Fallback::CoreOrPP" => "0.07",
@@ -121,7 +121,7 @@ my %WriteMakefileArgs = (
     "Test::SQL::Schema::Versioned" => "0.15",
     "Test::WithDB::SQLite" => "0.08"
   },
-  "VERSION" => "1.058",
+  "VERSION" => "1.059",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -169,7 +169,7 @@ my %FallbackPrereqs = (
   "File::ShareDir" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
-  "File::Temp" => 0,
+  "File::Temp" => "0.2307",
   "File::Util::Tempdir" => "0.032",
   "File::Which" => 0,
   "FindBin" => 0,

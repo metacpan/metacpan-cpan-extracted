@@ -3,7 +3,7 @@ package Test2::API::Stack;
 use strict;
 use warnings;
 
-our $VERSION = '1.302073';
+our $VERSION = '1.302175';
 
 
 use Test2::Hub();
@@ -28,7 +28,7 @@ sub new_hub {
     }
     else {
         require Test2::API;
-        $hub->format(Test2::API::test2_formatter()->new)
+        $hub->format(Test2::API::test2_formatter()->new_root)
             unless $hub->format || exists($params{formatter});
 
         my $ipc = Test2::API::test2_ipc();
@@ -62,6 +62,12 @@ sub cull {
 sub all {
     my $self = shift;
     return @$self;
+}
+
+sub root {
+    my $self = shift;
+    return unless @$self;
+    return $self->[0];
 }
 
 sub clear {
@@ -99,4 +105,4 @@ sub clear {
 
 __END__
 
-#line 220
+#line 226

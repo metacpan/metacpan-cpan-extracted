@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v0.996-3-g3d97dc3
+package Test::JSON::Schema::Acceptance; # git description: v0.998-2-g13ca4ca
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '0.997';
+our $VERSION = '0.999';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Test::More ();
@@ -119,18 +119,6 @@ sub _run_tests {
             (ref $options->{tests}{test_description} eq 'ARRAY'
               ? @{$options->{tests}{test_description}} : $options->{tests}{test_description});
 
-        local $::TODO = 'Test marked TODO via "todo_tests"'
-          if $options->{todo_tests} and
-            any {
-              my $o = $_;
-              (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
-                and
-              (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
-                and
-              (not $o->{test_description} or grep $_ eq $test->{description}, (ref $o->{test_description} eq 'ARRAY' ? @{$o->{test_description}} : $o->{test_description}))
-            }
-            @{$options->{todo_tests}};
-
         my $result = $self->_run_test($one_file, $test_group, $test, $options);
         ++$results{ $result ? 'pass' : 'fail' };
       }
@@ -144,15 +132,16 @@ sub _run_tests {
   my $diag = sub { Test::More->builder->${\ ($self->verbose ? 'diag' : 'note') }(@_) };
 
   $diag->("\n\n".'Results using '.ref($self).' '.$self->VERSION);
-  my $submodule_status = path($self->test_dir)->parent->parent->child('submodule_status');
-  if ($submodule_status->exists) {
+
+  my $submodule_status = path(dist_dir('Test-JSON-Schema-Acceptance'), 'submodule_status');
+  if ($submodule_status->exists and $submodule_status->parent->subsumes($self->test_dir)) {
     chomp(my ($commit, $url) = $submodule_status->lines);
     $diag->('with commit '.$commit);
     $diag->('from '.$url.':');
   }
 
   $diag->('');
-  my $length = max(map length $_->{file}, @$tests);
+  my $length = max(10, map length $_->{file}, @$tests);
   $diag->(sprintf('%-'.$length.'s  pass  fail', 'filename'));
   $diag->('-'x($length + 12));
   $diag->(sprintf('%-'.$length.'s   %3d   %3d', @{$_}{qw(file pass fail)}))
@@ -165,8 +154,21 @@ sub _run_test {
 
   TODO: {
     local $::TODO = 'Test marked TODO via deprecated "skip_tests"'
-      if ref $options->{skip_tests} eq 'ARRAY' and
-        grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/), @{$options->{skip_tests}};
+      if ref $options->{skip_tests} eq 'ARRAY'
+        and grep +(($test_group->{description}.' - '.$test->{description}) =~ /$_/),
+          @{$options->{skip_tests}};
+
+    local $::TODO = 'Test marked TODO via "todo_tests"'
+      if $options->{todo_tests}
+        and any {
+          my $o = $_;
+          (not $o->{file} or grep $_ eq $one_file->{file}, (ref $o->{file} eq 'ARRAY' ? @{$o->{file}} : $o->{file}))
+            and
+          (not $o->{group_description} or grep $_ eq $test_group->{description}, (ref $o->{group_description} eq 'ARRAY' ? @{$o->{group_description}} : $o->{group_description}))
+            and
+          (not $o->{test_description} or grep $_ eq $test->{description}, (ref $o->{test_description} eq 'ARRAY' ? @{$o->{test_description}} : $o->{test_description}))
+        }
+        @{$options->{todo_tests}};
 
     my $test_name = $one_file->{file}.': "'.$test_group->{description}.'" - "'.$test->{description}.'"';
 
@@ -202,12 +204,15 @@ has _test_data => (
   isa => ArrayRef[Dict[
            file => InstanceOf['Path::Tiny'],
            json => ArrayRef[Dict[
+             # id => Optional[Str],
              description => Str,
              comment => Optional[Str],
              schema => $json_bool|HashRef,
              tests => ArrayRef[Dict[
+               # id => Optional[Str],
                data => Any,
                description => Str,
+               comment => Optional[Str],
                valid => $json_bool,
              ]],
            ]],
@@ -260,7 +265,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 0.997
+version 0.999
 
 =head1 SYNOPSIS
 

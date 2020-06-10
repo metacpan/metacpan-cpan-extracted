@@ -1,0 +1,86 @@
+=head1 NAME
+
+OpenSMTPD::Password - Perl extension for creating password hashes
+
+=head1 INSTALLATION
+
+To install this module type the following:
+  
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+=head1 DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  BSD::arc4random
+
+Tests require:
+
+  OpenSMTPD's `smtpctl encrypt` command
+
+=head1 SYNOPSIS
+
+  use OpenSMTPD::Password qw/newhash checkhash/;
+
+  my $hash = newhash($password);
+
+  if (checkhash($password, $hash)) {
+	do_cool_stuff();
+  }
+
+=head1 DESCRIPTION
+
+Simple module for creating and verifying password hashes for OpenSMTPD.
+
+=head2 Subroutines
+
+=over 12
+
+=item C<newhash>
+
+Returns a hash of the password suitable for use with smtpd(8)
+
+=item C<checkhash>
+
+Returns a true value if the plaintext password matches the provided hash.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl version of the encrypt program included with OpenSMTPD portable by Sunil Nimmagadda and Gilles Chehade.
+
+=head2 EXPORT
+
+None by default.
+
+=head1 SEE ALSO
+
+smtpd(8)
+
+=head1 AUTHOR
+
+Edgar Pettijohn, E<lt>edgar@pettijohn-web.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020 by Edgar Pettijohn
+
+Permission to use, copy, modify, and distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+=cut
+

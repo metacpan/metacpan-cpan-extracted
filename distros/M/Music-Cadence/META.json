@@ -34,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "List::Util" : "1.44",
             "Moo" : "2",
             "Music::Chord::Note" : "0",
             "Music::Chord::Positions" : "0",
@@ -67,7 +68,7 @@
          "web" : "https://github.com/ology/Music-Cadence"
       }
    },
-   "version" : "0.1404",
+   "version" : "0.1502",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

@@ -1,9 +1,23 @@
 ==================================================
-Changes from 2018-03-28 00:00:00 +0000 to present.
+Changes from 2018-06-09 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 7.6 at 2020-03-27 22:47:21 +0000
+version 7.7 at 2020-06-08 15:37:15 +0000
+----------------------------------------
+
+  Change: 5cbe34afdc85b490d2938aa9e37a39f9b34ae6d6
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2020-06-08 08:34:40 +0000
+
+    Bugfix release
+
+    * Sending "0" value query parameters did not work previously * Only add the
+    ~/.es-utils.* to the config search path if HOME is set * Fix typo in the
+    documentation 
+
+----------------------------------------
+version 7.6 at 2020-03-27 22:43:58 +0000
 ----------------------------------------
 
   Change: 6cb7406e8cf4b112efe4fffd0a0138089d841597
@@ -918,45 +932,6 @@ version 5.7 at 2018-07-06 05:34:05 +0000
 
     Made es_request() errors fatal and sped up index lookup 
 
-----------------------------------------
-version 5.6 at 2018-04-13 18:20:03 +0000
-----------------------------------------
-
-  Change: fcb981c7ea59b5e3ac5f9c5b2ae3cf34e1fad5a3
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-04-13 20:20:03 +0000
-
-    Documentation fixup with the latest pod tooling 
-
-  Change: 2d9fce9813a585ff3115bfdce4b6b46a09192bf7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-04-13 10:57:03 +0000
-
-    Don't track the local TODO file 
-
-  Change: 7727fd81af17556c54e9c911d507efcd20266765
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-04-13 10:54:44 +0000
-
-    Ready for 5.6 Release
-
-    * Remove overzealous debugging messages * Tweak es-storage-data.pl to
-    provide full details via --all * Change the way
-    es-daily-index-maintenance.pl complains when --master--only is set. *
-    Documentation updated 
-
-  Change: 1b06f8ce6a574e34acea51938193d7590c6c24f9
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-03-17 00:49:08 +0000
-
-    Docs updated added --view base to es-storage-data.pl 
-
-  Change: 0cf82d70c23104b590f29b4551612578541cbb6a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-03-17 00:39:18 +0000
-
-    Get es-storage-data.pl working on modern ElasticSearch 
-
 =================================================
-Plus 62 releases after 2018-03-28 00:00:00 +0000.
+Plus 63 releases after 2018-06-09 00:00:00 +0000.
 =================================================

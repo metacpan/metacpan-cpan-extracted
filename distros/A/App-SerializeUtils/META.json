@@ -30,11 +30,13 @@
       "runtime" : {
          "requires" : {
             "Cpanel::JSON::XS" : "0",
+            "Data::Bahe" : "0",
             "Data::Dmp" : "0.240",
             "Data::Dump" : "0",
             "Data::Dump::Color" : "0",
             "Data::Dump::SExpression" : "0",
             "Data::Dumper" : "0",
+            "Data::Dumper::Compact" : "0",
             "Data::Undump" : "0",
             "Getopt::Long" : "2.50",
             "Getopt::Long::Complete" : "0",
@@ -76,7 +78,7 @@
          "web" : "https://github.com/perlancar/perl-App-SerializeUtils"
       }
    },
-   "version" : "0.162",
+   "version" : "0.163",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+1.06 2020-06-09T06:30:59Z
+
+    - Fix ANSI reset handling bug.
+
 1.05 2020-04-28T08:34:30Z
 
     - Conform to ECMA-48 OPERATING SYSTEM COMMAND string terminator.

@@ -8,13 +8,15 @@ use Test::Builder;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '1.302073';
+our $VERSION = '1.302175';
 
 
 #line 73
 
 sub import {
     my($class) = shift;
+
+    Test2::API::test2_load() unless Test2::API::test2_in_preload();
 
     # Don't run all this when loading ourself.
     return 1 if $class eq 'Test::Builder::Module';
@@ -60,14 +62,16 @@ sub _strip_imports {
     return @imports;
 }
 
-#line 137
+#line 139
 
 sub import_extra { }
 
-#line 167
+#line 169
 
 sub builder {
     return Test::Builder->new;
 }
+
+#line 180
 
 1;

@@ -1,5 +1,5 @@
 ---
-abstract: 'Determine the sane terminal size'
+abstract: 'Determine the sane terminal size (width, height)'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -18,12 +18,12 @@ meta-spec:
 name: Role-TinyCommons-TermAttr-Size
 requires:
   Role::Tiny: '0'
-  Term::Size: '0'
+  Term::App::Util::Size: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Role-TinyCommons-TermAttr-Size
   homepage: https://metacpan.org/release/Role-TinyCommons-TermAttr-Size
   repository: git://github.com/perlancar/perl-Role-TinyCommons-TermAttr-Size.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

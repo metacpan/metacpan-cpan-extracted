@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8 * 3 + 4;
+use Test::More;
 use Test::Ping;
 
 use English '-no_match_vars';
@@ -42,8 +42,8 @@ SKIP: {
 
     # Try a few remote servers
     my %webs = (
-        # Hopefully this is never a routeable host
-        '172.29.249.249'       => 0,
+        # Documentation address; non-routable
+        '203.0.113.90'       => 0,
 
         # Hopefully all these web ports are open
         'www.geocities.com.'   => 1,
@@ -52,7 +52,6 @@ SKIP: {
         'www.yahoo.com.'       => 1,
         'www.about.com.'       => 1,
         'www.microsoft.com.'   => 1,
-        '127.0.0.1'            => 1,
     );
 
     time_atmost(
@@ -111,3 +110,4 @@ SKIP: {
     );
 }
 
+done_testing();

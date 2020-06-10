@@ -2,6 +2,7 @@ package Wasm::Wasmtime::Module;
 
 use strict;
 use warnings;
+use 5.008004;
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::Module::Exports;
@@ -11,7 +12,7 @@ use Wasm::Wasmtime::ExportType;
 use Carp ();
 
 # ABSTRACT: Wasmtime module class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_module_';
@@ -143,7 +144,7 @@ Wasm::Wasmtime::Module - Wasmtime module class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

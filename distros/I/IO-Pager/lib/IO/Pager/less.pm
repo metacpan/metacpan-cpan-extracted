@@ -1,7 +1,8 @@
 package IO::Pager::less;
-our $VERSION = 1.01;
+our $VERSION = 1.02;
 
 use strict;
+use warnings;
 use base qw( IO::Pager::Unbuffered );
 
 BEGIN{
@@ -47,8 +48,8 @@ sub new(;$) {  # [FH], procedural
   $!=$@, return 0 if $@ =~ 'pipe';
 
   my $self = tie *$tied_fh, $class, $tied_fh or return 0;
-  use Data::Dumper; print Dumper 'TIED: ', $$, $self;
-  CORE::print {$self->{real_fh}} "BOO!";
+#XXX  use Data::Dumper; print Dumper 'TIED: ', $$, $self;
+#XXX  CORE::print {$self->{real_fh}} "BOO!";
   { # Truly unbuffered
     my $saver = SelectSaver->new($self->{real_fh});
     $|=1;
@@ -66,6 +67,10 @@ sub PRINT {
   CORE::print {$self->{LOG}} @args if exists($self->{LOG});
   CORE::syswrite({$self->{real_fh}},
 		 join('', @args) ) or die "Could not print to PAGER: $!\n";
+}
+
+sub flush {
+  $_[0]->refresh();
 }
 
 sub _pipe_to_fork ($) {

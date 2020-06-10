@@ -9,6 +9,7 @@ use Test::NoTabs;
 my @files = (
     'lib/Ryu.pm',
     'lib/Ryu/Buffer.pm',
+    'lib/Ryu/Buffer.pod',
     'lib/Ryu/Exception.pm',
     'lib/Ryu/Manual/ETL.pod',
     'lib/Ryu/Manual/Protocol.pod',
@@ -25,6 +26,7 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/buffer.t',
     't/observable.t',
     't/ryu.t',
     't/source/batch.t',
@@ -63,7 +65,6 @@ my @files = (
     'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
-    'xt/author/pod-no404s.t',
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
     'xt/author/test-version.t',

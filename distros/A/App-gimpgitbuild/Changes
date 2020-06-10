@@ -1,5 +1,9 @@
 Revision history for App-gimpgitbuild
 
+0.18.1   2020-06-09
+    - Make sure an optional gvim invocation does not emit gtk warnings.
+        - They break gimp's "make check".
+
 0.18.0   2020-06-03
     - Add "build --mode=clean"
     - Build libmypaint tag version 1.6.1.

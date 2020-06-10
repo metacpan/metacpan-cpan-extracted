@@ -1,27 +1,32 @@
-0.060   2018-09-22 (PERLANCAR)
+0.061   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add ColorTheme.
+
+
+0.060   2018-09-22  Released-By: PERLANCAR
 
 	- [Bugfix] Fix checking of negative condition.
 
 
-0.05    2017-07-07 (PERLANCAR)
+0.05    2017-07-07  Released-By: PERLANCAR
 
 	- Switch from (ab)using InstallTool phase to using AfterBuild phase
 	  to do our stuffs, to be compatible with DZP:StaticInstall.
 
 
-0.04    2016-12-28 (PERLANCAR)
+0.04    2016-12-28  Released-By: PERLANCAR
 
 	- Update check: spec relationship is now expressed using
 	  rel=x_spec.
 
 
-0.03    2016-12-27 (PERLANCAR)
+0.03    2016-12-27  Released-By: PERLANCAR
 
 	- Update check: spec relationship is now expressed in
 	  DevelopSuggests using _SPEC:: prefix.
 
 
-0.02    2015-12-17 (PERLANCAR)
+0.02    2015-12-17  Released-By: PERLANCAR
 
 	- Allow building of dists like Perinci-Access-Lite or
 	  Perinci-Access-Perl which wants to express spec prereq to Rinci
@@ -29,6 +34,6 @@
 	  .tag-implements-Rinci file.
 
 
-0.01    2015-09-11 (PERLANCAR)
+0.01    2015-09-11  Released-By: PERLANCAR
 
         - First release.

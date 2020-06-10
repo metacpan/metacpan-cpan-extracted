@@ -1,3 +1,10 @@
+0.003   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add parameterized schema: perl::modname_with_optional_args.
+
+	- [bugfix] Didn't return normalized schema.
+
+
 0.002   2020-06-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Use meta() as usual in other projects rather than get_args().

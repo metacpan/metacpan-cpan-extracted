@@ -14,6 +14,14 @@
 #ifndef _GPERL_PRIVATE_H_
 #define _GPERL_PRIVATE_H_
 
+/* If we're building against a very old version of GLib, provide a fallback
+ * macro that doesn't do anything
+ */
+#ifndef G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+#define G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+#define G_GNUC_END_IGNORE_DEPRECATIONS
+#endif
+
 /*
  * Thread-safety macros and helpers
  */

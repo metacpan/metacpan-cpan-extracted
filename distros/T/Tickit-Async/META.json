@@ -21,8 +21,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.4004",
-            "Module::Build::Using::PkgConfig" : "0"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
@@ -31,7 +30,7 @@
             "IO::Async::Notifier" : "0.43",
             "IO::Async::Stream" : "0.34",
             "IO::Async::Test" : "0",
-            "Tickit" : "0.69"
+            "Tickit" : "0.71"
          }
       },
       "test" : {
@@ -45,7 +44,7 @@
    "provides" : {
       "Tickit::Async" : {
          "file" : "lib/Tickit/Async.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -54,6 +53,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

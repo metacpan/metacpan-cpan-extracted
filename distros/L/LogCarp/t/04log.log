@@ -1,0 +1,5 @@
+[Sat Jun  6 14:57:20 2020]   6711 04log.t LOG: Some LOG schtuff 1 - LOGLEVEL=1 at t/04log.t line 47.
+[Sat Jun  6 14:57:20 2020]   6711 04log.t LOG: Some LOG schtuff 1 - LOGLEVEL=2 at t/04log.t line 49.
+[Sat Jun  6 14:57:20 2020]   6711 04log.t ERR: WARNING: This goes to LOG too - LOGLEVEL=2 at t/04log.t line 50.
+[Sat Jun  6 14:57:20 2020]   6711 04log.t LOG: Some LOG schtuff 2 - LOGLEVEL=1 at t/04log.t line 55.
+[Sat Jun  6 14:57:20 2020]   6711 04log.t ERR: WARNING: This goes to LOG too - LOGLEVEL=1 at t/04log.t line 56.

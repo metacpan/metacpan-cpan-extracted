@@ -17,7 +17,7 @@ use Carp;
 use HiPi qw( :rpi :lcd );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 __PACKAGE__->create_accessors( qw( devicetype address devicename backend ) );
 

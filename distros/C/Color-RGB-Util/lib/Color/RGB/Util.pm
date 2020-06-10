@@ -1,7 +1,9 @@
 package Color::RGB::Util;
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.599'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-08'; # DATE
+our $DIST = 'Color-RGB-Util'; # DIST
+our $VERSION = '0.601'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,6 +17,10 @@ our @EXPORT_OK = qw(
                        assign_rgb_color
                        assign_rgb_dark_color
                        assign_rgb_light_color
+                       hsl2hsv
+                       hsl2rgb
+                       hsv2hsl
+                       hsv2rgb
                        int2rgb
                        mix_2_rgb_colors
                        mix_rgb_colors
@@ -38,6 +44,12 @@ my $re_rgb = qr/\A#?([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})\z/;
 
 sub _min {
     $_[0] < $_[1] ? $_[0] : $_[1];
+}
+
+sub _wrap_h {
+    my $h = shift;
+    $h %= 360 if abs($h) > 360;
+    $h >= 0 ? $h : 360+$h;
 }
 
 sub assign_rgb_color {
@@ -81,9 +93,9 @@ sub mix_2_rgb_colors {
     $pct //= 0.5;
 
     my ($r1, $g1, $b1) =
-        $rgb1 =~ $re_rgb or die "Invalid rgb1 color, must be in 'ffffff' form";
+        $rgb1 =~ $re_rgb or die "Invalid rgb1 color '$rgb1', must be in 'ffffff' form";
     my ($r2, $g2, $b2) =
-        $rgb2 =~ $re_rgb or die "Invalid rgb2 color, must be in 'ffffff' form";
+        $rgb2 =~ $re_rgb or die "Invalid rgb2 color '$rgb2', must be in 'ffffff' form";
     for ($r1, $g1, $b1, $r2, $g2, $b2) { $_ = hex $_ }
 
     return sprintf("%02x%02x%02x",
@@ -124,10 +136,10 @@ sub rand_rgb_color {
 
     $rgb1 //= '000000';
     my ($r1, $g1, $b1) =
-        $rgb1 =~ $re_rgb or die "Invalid rgb1 color, must be in 'ffffff' form";
+        $rgb1 =~ $re_rgb or die "Invalid rgb1 color '$rgb1', must be in 'ffffff' form";
     $rgb2 //= 'ffffff';
     my ($r2, $g2, $b2) =
-        $rgb2 =~ $re_rgb or die "Invalid rgb2 color, must be in 'ffffff' form";
+        $rgb2 =~ $re_rgb or die "Invalid rgb2 color '$rgb2', must be in 'ffffff' form";
     for ($r1, $g1, $b1, $r2, $g2, $b2) { $_ = hex $_ }
 
     return sprintf("%02x%02x%02x",
@@ -176,7 +188,7 @@ sub reverse_rgb_color {
     my ($rgb) = @_;
 
     my ($r, $g, $b) =
-        $rgb =~ $re_rgb or die "Invalid rgb color, must be in 'ffffff' form";
+        $rgb =~ $re_rgb or die "Invalid rgb color '$rgb', must be in 'ffffff' form";
     for ($r, $g, $b) { $_ = hex $_ }
 
     return sprintf("%02x%02x%02x", 255-$r, 255-$g, 255-$b);
@@ -186,7 +198,7 @@ sub rgb2grayscale {
     my ($rgb) = @_;
 
     my ($r, $g, $b) =
-        $rgb =~ $re_rgb or die "Invalid rgb color, must be in 'ffffff' form";
+        $rgb =~ $re_rgb or die "Invalid rgb color '$rgb', must be in 'ffffff' form";
     for ($r, $g, $b) { $_ = hex $_ }
 
     # basically we just average the R, G, B
@@ -198,7 +210,7 @@ sub rgb2int {
     my $rgb = shift;
 
     # just to check
-    $rgb =~ $re_rgb or die "Invalid rgb color, must be in 'ffffff' form";
+    $rgb =~ $re_rgb or die "Invalid rgb color '$rgb', must be in 'ffffff' form";
 
     hex($rgb);
 }
@@ -207,7 +219,7 @@ sub rgb2sepia {
     my ($rgb) = @_;
 
     my ($r, $g, $b) =
-        $rgb =~ $re_rgb or die "Invalid rgb color, must be in 'ffffff' form";
+        $rgb =~ $re_rgb or die "Invalid rgb color '$rgb', must be in 'ffffff' form";
     for ($r, $g, $b) { $_ = hex $_ }
 
     # reference: http://www.techrepublic.com/blog/howdoi/how-do-i-convert-images-to-grayscale-and-sepia-tone-using-c/120
@@ -224,9 +236,9 @@ sub rgb_diff {
     $algo //= 'euclidean';
 
     my ($r1, $g1, $b1) =
-        $rgb1 =~ $re_rgb or die "Invalid rgb1 color, must be in 'ffffff' form";
+        $rgb1 =~ $re_rgb or die "Invalid rgb1 color '$rgb1', must be in 'ffffff' form";
     my ($r2, $g2, $b2) =
-        $rgb2 =~ $re_rgb or die "Invalid rgb2 color, must be in 'ffffff' form";
+        $rgb2 =~ $re_rgb or die "Invalid rgb2 color '$rgb2', must be in 'ffffff' form";
     for ($r1, $g1, $b1, $r2, $g2, $b2) { $_ = hex $_ }
 
     my $dr2 = ($r1-$r2)**2;
@@ -268,9 +280,9 @@ sub rgb_distance {
     my ($rgb1, $rgb2) = @_;
 
     my ($r1, $g1, $b1) =
-        $rgb1 =~ $re_rgb or die "Invalid rgb1 color, must be in 'ffffff' form";
+        $rgb1 =~ $re_rgb or die "Invalid rgb1 color '$rgb1', must be in 'ffffff' form";
     my ($r2, $g2, $b2) =
-        $rgb2 =~ $re_rgb or die "Invalid rgb2 color, must be in 'ffffff' form";
+        $rgb2 =~ $re_rgb or die "Invalid rgb2 color '$rgb2', must be in 'ffffff' form";
     for ($r1, $g1, $b1, $r2, $g2, $b2) { $_ = hex $_ }
 
     (($r1-$r2)**2 + ($g1-$g2)**2 + ($b1-$b2)**2)**0.5;
@@ -295,7 +307,7 @@ sub rgb_luminance {
     my ($rgb) = @_;
 
     my ($r, $g, $b) =
-        $rgb =~ $re_rgb or die "Invalid rgb color, must be in 'ffffff' form";
+        $rgb =~ $re_rgb or die "Invalid rgb color '$rgb', must be in 'ffffff' form";
     for ($r, $g, $b) { $_ = hex $_ }
 
     return _rgb_luminance($r, $g, $b);
@@ -307,9 +319,9 @@ sub tint_rgb_color {
     $pct //= 0.5;
 
     my ($r1, $g1, $b1) =
-        $rgb1 =~ $re_rgb or die "Invalid rgb1 color, must be in 'ffffff' form";
+        $rgb1 =~ $re_rgb or die "Invalid rgb1 color '$rgb1', must be in 'ffffff' form";
     my ($r2, $g2, $b2) =
-        $rgb2 =~ $re_rgb or die "Invalid rgb2 color, must be in 'ffffff' form";
+        $rgb2 =~ $re_rgb or die "Invalid rgb2 color '$rgb2', must be in 'ffffff' form";
     for ($r1, $g1, $b1, $r2, $g2, $b2) { $_ = hex $_ }
 
     my $lum = _rgb_luminance($r1, $g1, $b1);
@@ -325,7 +337,7 @@ sub rgb2hsl {
     my ($rgb) = @_;
 
     my ($r, $g, $b) =
-        $rgb =~ $re_rgb or die "Invalid rgb color, must be in 'ffffff' form";
+        $rgb =~ $re_rgb or die "Invalid rgb color '$rgb', must be in 'ffffff' form";
     for ($r, $g, $b) { $_ = hex($_)/255 }
 
     my $max = $r;
@@ -376,7 +388,7 @@ sub rgb2hsv {
     my ($rgb) = @_;
 
     my ($r, $g, $b) =
-        $rgb =~ $re_rgb or die "Invalid rgb color, must be in 'ffffff' form";
+        $rgb =~ $re_rgb or die "Invalid rgb color '$rgb', must be in 'ffffff' form";
     for ($r, $g, $b) { $_ = hex($_)/255 }
 
     my $max = $r;
@@ -421,6 +433,72 @@ sub rgb2hsv {
     return sprintf("%.3g %.3g %.3g", $h, $s, $v);
 }
 
+sub hsl2hsv {
+    my $hsl = shift;
+
+    my ($h, $s, $l) = split / /, $hsl;
+    $h>=0 && $h<=360 or $h = _wrap_h($h); $s>=0 && $s<=1 or die "Invalid S in HSL '$hsl', must be in 0-1"; $l>=0 && $l<=1 or die "Invalid L in HSL '$hsl', must be in 0-1";
+    my $_h = $h;
+    my $_s;
+    my $_v;
+
+    $l *= 2;
+    $s *= ($l <= 1) ? $l : 2-$l;
+    $_v = ($l+$s) / 2;
+    $_s = (2*$s) / ($l+$s);
+
+    "$_h $_s $_v";
+}
+
+sub hsv2hsl {
+    my $hsv = shift;
+
+    my ($h, $s, $v) = split / /, $hsv;
+    $h>=0 && $h<=360 or $h = _wrap_h($h); $s>=0 && $s<=1 or die "Invalid S in HSV '$hsv', must be in 0-1"; $v>=0 && $v<=1 or die "Invalid V in HSV '$hsv', must be in 0-1";
+    my $_h = $h;
+    my $_s = $s * $v;
+    my $_l = (2-$s) * $v;
+
+    $_s /= $_l <= 1 ? ($_l==0 ? 1 : $_l) : (2-$_l);
+    $_l /= 2;
+
+    "$_h $_s $_l";
+}
+
+sub hsl2rgb {
+    hsv2rgb(hsl2hsv(shift));
+}
+
+sub hsv2rgb {
+    my $hsv = shift;
+
+    my ($h, $s, $v) = split / /, $hsv;
+    $h>=0 && $h<=360 or $h = _wrap_h($h); $s>=0 && $s<=1 or die "Invalid S in HSV '$hsv', must be in 0-1"; $v>=0 && $v<=1 or die "Invalid V in HSV '$hsv', must be in 0-1";
+
+    my $i = int($h/60);
+    my $f = $h/60 - $i;
+    my $p = $v * (1-$s);
+    my $q = $v * (1-$f*$s);
+    my $t = $v * (1-(1-$f)*$s);
+
+    my ($r, $g, $b);
+    if ($i==0) {
+        $r = $v; $g = $t; $b = $p;
+    } elsif ($i==1) {
+        $r = $q; $g = $v; $b = $p;
+    } elsif ($i==2) {
+        $r = $p; $g = $v; $b = $t;
+    } elsif ($i==3) {
+        $r = $p; $g = $q; $b = $v;
+    } elsif ($i==4) {
+        $r = $t; $g = $p; $b = $v;
+    } else {
+        $r = $v; $g = $p; $b = $q;
+    }
+
+    return sprintf("%02x%02x%02x", $r*255, $g*255, $b*255);
+}
+
 1;
 # ABSTRACT: Utilities related to RGB colors
 
@@ -436,7 +514,7 @@ Color::RGB::Util - Utilities related to RGB colors
 
 =head1 VERSION
 
-This document describes version 0.599 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2019-08-20.
+This document describes version 0.601 of Color::RGB::Util (from Perl distribution Color-RGB-Util), released on 2020-06-08.
 
 =head1 SYNOPSIS
 
@@ -534,6 +612,47 @@ dark.
 
 Like L</assign_rgb_color> except that it will make sure the assigned color is
 light.
+
+=head2 hsl2hsv
+
+Usage:
+
+ my $hsl = hsl2hsv("0 1 0.5"); # => "0 1 1"
+
+Convert HSL to HSV.
+
+=head2 hsl2rgb
+
+Usage:
+
+ my $rgb = hsl2rgb("0 1 0.5"); # => ff0000
+
+Convert HSL to RGB. HSL should be given in a whitespace-separated H,S,L values
+e.g. "0 1 0.5". H (hue degree) has a range from 0-360 where 0 is red, 120 is
+green, 240 is blue and 360 is back to red. S (saturation) has a range from 0-1
+where 0 is gray and 1 is fully saturated hue. L (lumination) has a range from
+0-1 where 0 is fully black, 0.5 fully saturated, and 1 is fully white. See also
+L</rgb2hsl>.
+
+=head2 hsv2hsl
+
+Usage:
+
+ my $hsl = hsv2hsl("0 1 1"); # => "0 1 0.5"
+
+Convert HSV to HSL.
+
+=head2 hsv2rgb
+
+Usage:
+
+ my $rgb = hsv2rgb("0 1 1"); # => ff0000
+
+Convert HSV to RGB. HSV should be given in a whitespace-separated H,S,V values
+e.g. "0 1 1". H (hue degree) has a range from 0-360 where 0 is red, 120 is
+green, 240 is blue and 360 is back to red. S (saturation) has a range from 0-1
+where 0 is gray and 1 is fully saturated hue. V (value) has a range from 0-1
+where 0 is black and 1 is white. See also L</rgb2hsv>.
 
 =head2 int2rgb
 
@@ -636,7 +755,7 @@ Usage:
 
  my $hsv = rgb2hsv($rgb); # example: "0 1 255"
 
-Convert RGB (0-255) to HSV. The result is a space-separated H, S, V values.
+Convert RGB (0-255) to HSV. The result is a space-separated H, S, V values. See
 
 =head2 rgb2int
 
@@ -702,7 +821,7 @@ preferred.
 
 =back
 
-For more details about color difference, refer to
+For more about color difference, try reading
 L<https://en.wikipedia.org/wiki/Color_difference>.
 
 =head2 rgb_distance
@@ -764,7 +883,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Color-RGB-
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Color-RGB-Util>.
+Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-Color-Util>.
 
 =head1 BUGS
 
@@ -784,7 +903,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -29,7 +29,8 @@ DESCRIPTION
     they're unlikely to exist.
 
       * Network protocol implementations - if you're bored of stringing
-      together substr, pack, unpack and vec, try Ryu::Manual::Protocol
+      together substr, pack, unpack and vec, try Ryu::Manual::Protocol or
+      Ryu::Buffer.
 
       * Extract, Transform, Load workflows (ETL) - need to pull data from
       somewhere, mangle it into shape, push it to a database? that'd be
@@ -41,11 +42,25 @@ DESCRIPTION
     may already be bored of this documentation and on the verge of reaching
     for alternatives. The "SEE ALSO" section may speed you on your way.
 
+ Compatibility
+
+    Since Mojo::Rx follows the ReactiveX conventions quite closely, we'd
+    expect to have the ability to connect Mojo::Rx observable to a
+    Ryu::Source, and provide an adapter from a Ryu::Source to act as a
+    Mojo::Rx-style observable. This is not yet implemented, but planned for
+    a future version.
+
+    Most of the other modules in "SEE ALSO" are either not used widely
+    enough or not a good semantic fit for a compatibility layer - but if
+    you're interested in this, please ask
+    <https://github.com/team-at-cpan/Ryu/issues>.
+
  Components
 
   Sources
 
-    A source emits items. See Ryu::Source.
+    A source emits items. See Ryu::Source. If in doubt, this is likely to
+    be the class that you wanted.
 
     Items can be any scalar value - some examples:
 
@@ -68,12 +83,13 @@ DESCRIPTION
   Streams
 
     A stream is a thing with a source. See Ryu::Stream, which is likely to
-    be something that does not yet exist.
+    be something that does not yet have much documentation - in practice,
+    the Ryu::Source implementation covers most use-cases.
 
- What does this module do?
+ So what does this module do?
 
     Nothing. It's just a top-level loader for pulling in all the other
-    components.
+    components. You wanted Ryu::Source instead, or possibly Ryu::Buffer.
 
  Some notes that might not relate to anything
 
@@ -114,6 +130,10 @@ METHODS
 
       * Ryu::Observable
 
+ new
+
+    Instantiates a Ryu object, allowing "from", "just" and other methods.
+
  from
 
     Helper method which returns a Ryu::Source from a list of items.
@@ -129,6 +149,8 @@ SEE ALSO
     Some perl modules of relevance:
 
       * Future - fundamental building block for one-shot tasks
+
+      * Future::Queue - a FIFO queue for Future tasks
 
       * POE::Filter - venerable and battle-tested, but slightly short on
       features due to the focus on protocols
@@ -165,6 +187,9 @@ SEE ALSO
       concept to Ryu::Source
 
       * Data::Monad
+
+      * Mojo::Rx - Mojolicious-specific support for ReactiveX, follows the
+      rxjs API quite closely
 
  Other references
 

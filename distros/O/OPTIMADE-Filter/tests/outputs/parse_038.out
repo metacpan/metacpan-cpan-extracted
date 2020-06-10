@@ -16,4 +16,4 @@ $VAR1 = bless( {
 == Filter ==
 (property STARTS WITH another_property)
 == SQL ==
-('property' LIKE 'another_property')
+'property' LIKE 'another_property'

@@ -9,16 +9,27 @@ build_requires:
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
   Test::More: '0.94'
-  perl: '5.014000'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-PluginBundle-Author-TEAM
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Dist::Zilla::PluginBundle::Author::TEAM:
+    file: lib/Dist/Zilla/PluginBundle/Author/TEAM.pm
+    version: '0.004'
 requires:
   Dist::Zilla::Plugin::ArchiveRelease: '0'
   Dist::Zilla::Plugin::Authority: '0'
@@ -79,11 +90,18 @@ requires:
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
+  Dist::Zilla::Util: '0'
+  Moose: '0'
   Perl::Version: '0'
   Test::CPAN::Meta: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM/issues
-  repository: git://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM.git
-version: '0.002'
-x_generated_by_perl: v5.28.1
+  homepage: https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM
+  repository: https://github.com/team-at-cpan/Dist-Zilla-PluginBundle-Author-TEAM.git
+version: '0.004'
+x_authority: cpan:TEAM
+x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

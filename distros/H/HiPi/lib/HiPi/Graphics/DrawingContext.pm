@@ -16,7 +16,7 @@ use HiPi::Graphics::BitmapFont;
 
 use parent qw( HiPi::Class );
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 __PACKAGE__->create_accessors( qw( contextarray pen_inverted ) );
 

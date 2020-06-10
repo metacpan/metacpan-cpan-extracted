@@ -6,7 +6,7 @@ use warnings;
 
 use Getopt::Long;
 
-our $VERSION = '0.162'; # VERSION
+our $VERSION = '0.163'; # VERSION
 
 my $yaml_mod = 'XS';
 GetOptions(
@@ -47,7 +47,7 @@ check-yaml - Check YAML syntax
 
 =head1 VERSION
 
-This document describes version 0.162 of check-yaml (from Perl distribution App-SerializeUtils), released on 2020-04-10.
+This document describes version 0.163 of check-yaml (from Perl distribution App-SerializeUtils), released on 2020-06-06.
 
 =head1 DESCRIPTION
 

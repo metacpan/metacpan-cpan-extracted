@@ -27,11 +27,11 @@ Pg::Explain::FromXML - Parser for explains in XML format
 
 =head1 VERSION
 
-Version 0.99
+Version 1.00
 
 =cut
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,12 @@ sub parse_source {
 
     my $top_node = $self->make_node_from( $struct->{ 'Plan' } );
 
-    $self->explain->planning_time( $struct->{ 'Planning-Time' } )   if $struct->{ 'Planning-Time' };
+    if ( $struct->{ 'Planning' } ) {
+        $self->explain->planning_time( $struct->{ 'Planning' }->{ 'Planning-Time' } );
+    }
+    elsif ( $struct->{ 'Planning-Time' } ) {
+        $self->explain->planning_time( $struct->{ 'Planning-Time' } );
+    }
     $self->explain->execution_time( $struct->{ 'Execution-Time' } ) if $struct->{ 'Execution-Time' };
     $self->explain->total_runtime( $struct->{ 'Total-Runtime' } )   if $struct->{ 'Total-Runtime' };
     if ( $struct->{ 'Triggers' } ) {

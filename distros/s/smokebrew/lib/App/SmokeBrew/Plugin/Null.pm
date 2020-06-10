@@ -1,5 +1,5 @@
 package App::SmokeBrew::Plugin::Null;
-$App::SmokeBrew::Plugin::Null::VERSION = '0.56';
+$App::SmokeBrew::Plugin::Null::VERSION = '1.00';
 #ABSTRACT: A smokebrew plugin for does nothing.
 
 use strict;
@@ -31,7 +31,7 @@ App::SmokeBrew::Plugin::Null - A smokebrew plugin for does nothing.
 
 =head1 VERSION
 
-version 0.56
+version 1.00
 
 =head1 SYNOPSIS
 

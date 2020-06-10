@@ -9,7 +9,7 @@ package Rex::Interface::File::SSH;
 use strict;
 use warnings;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 
 use Fcntl;
 use Rex::Interface::Fs;

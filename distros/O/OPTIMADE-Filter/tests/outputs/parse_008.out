@@ -16,4 +16,4 @@ $VAR1 = bless( {
 == Filter ==
 (key = value)
 == SQL ==
-('key' = 'value')
+'key' = 'value'

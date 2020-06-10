@@ -2,6 +2,7 @@ package Wasm::Wasmtime::Table;
 
 use strict;
 use warnings;
+use 5.008004;
 use base qw( Wasm::Wasmtime::Extern );
 use Ref::Util qw( is_ref );
 use Wasm::Wasmtime::FFI;
@@ -11,7 +12,7 @@ use constant is_table => 1;
 use constant kind => 'table';
 
 # ABSTRACT: Wasmtime table class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_table_';
@@ -58,7 +59,7 @@ Wasm::Wasmtime::Table - Wasmtime table class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

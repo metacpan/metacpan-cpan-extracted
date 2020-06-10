@@ -80,6 +80,8 @@ Amazon::PAApi5::Payload handles request body
 
 See B<example/> directory of this module.
 
+L<https://github.com/bayashi/Amazon-PAApi5-Signature/tree/master/example>
+
 L<https://webservices.amazon.com/paapi5/documentation/api-reference.html>
 
 

@@ -47,7 +47,8 @@
          "suggests" : {
             "Data::Dumper::Compact" : "0",
             "File::Find::Rule" : "0",
-            "GraphViz2" : "0"
+            "GraphViz2" : "0",
+            "Pod::Usage" : "0"
          }
       },
       "test" : {
@@ -72,7 +73,7 @@
          "web" : "https://github.com/ology/MIDI-Ngram"
       }
    },
-   "version" : "0.1801",
+   "version" : "0.1806",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -291,6 +292,7 @@
                      "durations",
                      "ngram",
                      "ngrams",
+                     "ppqn",
                      "qn",
                      "randpatch",
                      "tqn"
@@ -330,7 +332,7 @@
                   "exclude_filename" : [],
                   "exclude_match" : [
                      "\\.png",
-                     "ngram-play\\.mid"
+                     "ngram-analyze\\.mid"
                   ],
                   "follow_symlinks" : 0,
                   "include_dotfiles" : 0,

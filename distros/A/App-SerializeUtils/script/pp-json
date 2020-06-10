@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-10'; # DATE
-our $VERSION = '0.162'; # VERSION
+our $DATE = '2020-06-06'; # DATE
+our $VERSION = '0.163'; # VERSION
 
 use 5.010001;
 use strict;
@@ -64,7 +64,7 @@ pp-json - Pretty-print (and colorize) JSON
 
 =head1 VERSION
 
-This document describes version 0.162 of pp-json (from Perl distribution App-SerializeUtils), released on 2020-04-10.
+This document describes version 0.163 of pp-json (from Perl distribution App-SerializeUtils), released on 2020-06-06.
 
 =head1 DESCRIPTION
 

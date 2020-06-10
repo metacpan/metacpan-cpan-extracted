@@ -2,6 +2,7 @@ package Wasm::Wasmtime::Linker;
 
 use strict;
 use warnings;
+use 5.008004;
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::Extern;
@@ -12,7 +13,7 @@ use Ref::Util qw( is_blessed_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime linker class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasmtime_linker_';
@@ -118,7 +119,7 @@ Wasm::Wasmtime::Linker - Wasmtime linker class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

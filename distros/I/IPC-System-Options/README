@@ -3,8 +3,8 @@ NAME
     options
 
 VERSION
-    This document describes version 0.336 of IPC::System::Options (from Perl
-    distribution IPC-System-Options), released on 2020-04-23.
+    This document describes version 0.337 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2020-06-06.
 
 SYNOPSIS
      use IPC::System::Options qw(system readpipe run start);
@@ -288,27 +288,11 @@ FUNCTIONS
 
         See option documentation in "system()".
 
-    *   capture_stdout => scalarref
+    *   capture_stdout => scalarref|coderef
 
         See option documentation in "system()".
 
-    *   capture_stderr => scalarref
-
-        See option documentation in "system()".
-
-    *   capture_merged => scalarref
-
-        See option documentation in "system()".
-
-    *   tee_stdout => scalarref
-
-        See option documentation in "system()".
-
-    *   tee_stderr => scalarref
-
-        See option documentation in "system()".
-
-    *   tee_merged => scalarref
+    *   capture_stderr => scalarref|coderef
 
         See option documentation in "system()".
 

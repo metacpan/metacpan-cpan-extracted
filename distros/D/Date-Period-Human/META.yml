@@ -29,7 +29,7 @@ resources:
   bugtracker: https://github.com/pstuifzand/date-period-human/issues
   homepage: https://github.com/pstuifzand/date-period-human
   repository: https://github.com/pstuifzand/date-period-human.git
-version: 0.4.7
+version: 0.4.8
 x_contributors:
   - 'David Precious <davidp@preshweb.co.uk>'
   - 'isync <O.Zucker@web.de>'

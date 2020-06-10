@@ -19,7 +19,7 @@ use Carp;
 
 # Chip based on a PIC 18F14K22
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 __PACKAGE__->create_accessors( qw( devicename address res fil1 fil0 backend ) );
 
@@ -36,7 +36,7 @@ sub new {
         res         => 1,
         fil1        => 0,
         fil0        => 0,
-        backend     => 'smbus',
+        backend     => 'i2c',
     );
     
     # get user params
@@ -103,8 +103,8 @@ sub read_channels {
 sub read_register {
     my($self) = @_;
     my $numbytes = ( $self->res ) ? 10 : 20;
-    my $address  = ( $self->res ) ? 0x01 : 0x00;
-    my @rvals = $self->device->bus_read( $address, $numbytes );
+    #my $address  = ( $self->res ) ? 0x01 : 0x01;
+    my @rvals = $self->device->bus_read( undef, $numbytes );
     if( $numbytes == 10 ) {
         for( my $i = 0; $i < 10; $i++ ) {
             $rvals[$i] *= 4;

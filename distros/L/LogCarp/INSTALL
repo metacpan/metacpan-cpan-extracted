@@ -1,22 +1,24 @@
 ----------------------------------------------------------------------
     This is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
- 
+    under the terms of the Artistic License 2.0.
+
     This software is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    Artistic License 2.0 for more details.
 
-	Please send any reports of problems or bugs to mike808@mo.net.
-	I wouldn't mind a short note to know that you're using this.
-	Suggestions and knowing how many others are using this will help
-	promote its upkeep.
+    Please send any reports of problems or bugs to mikeking@cpan.org.
+    I wouldn't mind a short note to know that you're using this.
+    Suggestions and knowing how many others are using this will help
+    promote its upkeep.
 
-	This package is copyright (c) 1997 by Michael King (mike808@mo.net)
-	and is made available to the Perl public under terms of the
-	Artistic License used to cover Perl itself.
-	See the file Artistic in the distribution  of Perl 5.002 or
-	later for details of copy and distribution terms.
+    This package is copyright (c) 1997,2020 by Michael King (mikeking@cpan.org)
+    and is made available to the Perl public under terms of the
+    Artistic License 2.0. See the file LICENSE for details
+    of copy and distribution terms.
+
+    The authoritative text of the Artistic License 2.0 can be found here:
+    https://www.perlfoundation.org/artistic-license-20.html
 
 ----------------------------------------------------------------------
 
@@ -47,5 +49,4 @@ there will be the output of redirected error, log, and debug streams.
 You can check what you get against my versions in the ./t/check directory.
 
 Michael King
-<mike808@mo.net>
-http://walden.mo.net/~mike808
+<mikeking@cpan.org>

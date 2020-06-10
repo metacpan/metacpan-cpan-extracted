@@ -5,12 +5,23 @@ use warnings;
 use MIDI::Simple::Drummer::Rudiments;
 
 my $d = MIDI::Simple::Drummer::Rudiments->new(
-    -volume => 50,
-    -bpm    => 30,
+    -volume => 100,
+    -bpm    => 100,
 );
-#$d->count_in;
+
+$d->count_in;
+
 $d->snare('Electric Snare');
-for my $n (keys %{ $d->_default_patterns }) {
-    $d->beat(-name => $n);
-}
+
+# 2 paradiddle_diddles, 2 single_paradiddles
+$d->beat( -name => 19 );
+$d->beat( -name => 19 );
+$d->beat( -name => 16 );
+$d->beat( -name => 16 );
+
+# All patterns
+#for my $n (keys %{ $d->_default_patterns }) {
+#    $d->beat(-name => $n);
+#}
+
 $d->write("$0.mid");

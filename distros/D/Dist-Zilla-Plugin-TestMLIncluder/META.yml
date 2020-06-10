@@ -27,6 +27,6 @@ resources:
   bugtracker: https://github.com/ingydotnet/dist-zilla-plugin-testmlincluder-pm/issues
   homepage: https://github.com/ingydotnet/dist-zilla-plugin-testmlincluder-pm
   repository: https://github.com/ingydotnet/dist-zilla-plugin-testmlincluder-pm.git
-version: '0.18'
+version: '0.19'
 x_generated_by_perl: v5.28.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

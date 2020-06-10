@@ -1,3 +1,15 @@
+0.276   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to replace another instance of WordListUtil::CLI
+	  usage.
+
+
+0.275   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace WordListUtil::CLI with the more general
+	  Module::List::Util.
+
+
 0.274   2020-05-24  Released-By: PERLANCAR; Urgency: medium
 
 	- Support loading parameterized wordlist with syntax -w

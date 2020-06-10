@@ -33,6 +33,19 @@ subtest 'local JSON pointer' => sub {
   );
 };
 
+subtest 'fragment with URI-escaped and JSON Pointer-escaped characters' => sub {
+  ok(
+    $js->evaluate(
+      1,
+      {
+        '$defs' => { 'foo-bar-tilde~-slash/-braces{}-def' => true },
+        '$ref' => '#/$defs/foo-bar-tilde~0-slash~1-braces%7B%7D-def',
+      },
+    ),
+    'can follow $ref with escaped components',
+  );
+};
+
 subtest 'local anchor' => sub {
   ok(
     $js->evaluate(
@@ -121,7 +134,7 @@ subtest '$id with an empty fragment' => sub {
   );
 };
 
-subtest '$recursiveRef with no use of $recursiveAnchor' => sub {
+subtest '$recursiveRef without nesting' => sub {
   cmp_deeply(
     $js->evaluate(
       { foo => { bar => 'hello', baz => 1 } },
@@ -211,6 +224,85 @@ subtest '$recursiveRef with no use of $recursiveAnchor' => sub {
   );
 };
 
+subtest '$recursiveRef without $recursiveAnchor' => sub {
+  cmp_deeply(
+    $js->evaluate(
+      { foo => { bar => 1 } },
+      {
+        properties => { foo => { '$recursiveRef' => '#' } },
+        additionalProperties => false,
+      },
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '/foo/bar',
+          keywordLocation => '/properties/foo/$recursiveRef/additionalProperties',
+          absoluteKeywordLocation => '#/additionalProperties',
+          error => 'additional property not permitted',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/properties/foo/$recursiveRef/additionalProperties',
+          absoluteKeywordLocation => '#/additionalProperties',
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/properties',
+          error => 'not all properties are valid',
+        },
+      ],
+    },
+  );
+};
+
+subtest '$recursiveAnchor is not at a schema resource root' => sub {
+  my $schema = {
+    '$defs' => {
+      myobject => {
+        '$recursiveAnchor' => true,
+        anyOf => [
+          { type => 'integer' },
+          {
+            type => 'object',
+            additionalProperties => { '$recursiveRef' => '#' },
+          },
+        ],
+      },
+    },
+    anyOf => [
+      { type => 'integer' },
+      { '$ref' => '#/$defs/myobject' },
+    ],
+  };
+
+  cmp_deeply(
+    $js->evaluate({ foo => 1 }, $schema)->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf/1/$ref/$recursiveAnchor',
+          absoluteKeywordLocation => '#/$defs/myobject/$recursiveAnchor',
+          error => 'EXCEPTION: "$recursiveAnchor" keyword used without "$id"',
+        },
+      ],
+    },
+  );
+
+  $schema->{'$defs'}{myobject}{'$id'} = 'myobject.json';
+
+  cmp_deeply(
+    $js->evaluate({ foo => 1 }, $schema)->TO_JSON,
+    {
+      valid => bool(1),
+    },
+  );
+};
+
 subtest '$recursiveAnchor and $recursiveRef - standard usecases' => sub {
   my $schema = {
     '$defs' => {
@@ -244,6 +336,7 @@ subtest '$recursiveAnchor and $recursiveRef - standard usecases' => sub {
     {
       valid => bool(1),
     },
+    '$recursiveRef with a single $recursiveAnchor in scope',
   );
 
   cmp_deeply(
@@ -299,6 +392,7 @@ subtest '$recursiveAnchor and $recursiveRef - standard usecases' => sub {
         },
       ],
     },
+    'validation requires the override that is not in scope',
   );
 
   cmp_deeply(
@@ -309,6 +403,7 @@ subtest '$recursiveAnchor and $recursiveRef - standard usecases' => sub {
     {
       valid => bool(1),
     },
+    '$recursiveRef with both $recursiveAnchors in scope',
   );
 
   cmp_deeply(
@@ -321,11 +416,8 @@ subtest '$recursiveAnchor and $recursiveRef - standard usecases' => sub {
     {
       valid => bool(1),
     },
+    'validation makes use of the override that is now in scope',
   );
 };
-
-# TODO: $recursiveRef with a fragment - resolve against $recursiveAnchor uri
-# TODO: $recursiveRef with a path portion - resolve against $recursiveAnchor uri
-# TODO: error case where $recursiveRef is not '#' and $recursiveAnchor uri has a fragment
 
 done_testing;

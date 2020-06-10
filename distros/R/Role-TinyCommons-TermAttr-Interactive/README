@@ -3,19 +3,15 @@ NAME
     application is running interactively
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Role::TinyCommons::TermAttr::Interactive (from Perl distribution
-    Role-TinyCommons-TermAttr-Interactive), released on 2020-06-05.
+    Role-TinyCommons-TermAttr-Interactive), released on 2020-06-06.
 
 DESCRIPTION
+    Uses Term::App::Util::Interactive as backend.
+
 PROVIDED METHODS
   termattr_interactive
-    Try to determine whether terminal application is running interactively.
-    Will first check the INTERACTIVE environment variable, then check using
-    "-t STDOUT".
-
-ENVIRONMENT
-  INTERACTIVE
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Role-TinyCommons-TermAttr-Interactive>.
@@ -34,6 +30,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Term::App::Util::Interactive
+
     Role::TinyCommons
 
     Term::App::Role::Attrs, an earlier project, uses Moo::Role.

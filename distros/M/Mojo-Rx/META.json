@@ -48,34 +48,43 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test2::Suite" : "0"
          }
       }
    },
    "provides" : {
       "Mojo::Rx" : {
          "file" : "lib/Mojo/Rx.pm",
-         "version" : "v0.12.1"
+         "version" : "v0.13.0"
       },
       "Mojo::Rx::ConnectableObservable" : {
          "file" : "lib/Mojo/Rx/ConnectableObservable.pm",
-         "version" : "v0.12.1"
+         "version" : "v0.13.0"
       },
       "Mojo::Rx::Observable" : {
          "file" : "lib/Mojo/Rx/Observable.pm",
-         "version" : "v0.12.1"
+         "version" : "v0.13.0"
+      },
+      "Mojo::Rx::Operators::Creation" : {
+         "file" : "lib/Mojo/Rx/Operators/Creation.pm"
+      },
+      "Mojo::Rx::Operators::Pipeable" : {
+         "file" : "lib/Mojo/Rx/Operators/Pipeable.pm"
       },
       "Mojo::Rx::Subject" : {
          "file" : "lib/Mojo/Rx/Subject.pm",
-         "version" : "v0.12.1"
+         "version" : "v0.13.0"
+      },
+      "Mojo::Rx::Subscriber" : {
+         "file" : "lib/Mojo/Rx/Subscriber.pm"
       },
       "Mojo::Rx::Subscription" : {
          "file" : "lib/Mojo/Rx/Subscription.pm",
-         "version" : "v0.12.1"
+         "version" : "v0.13.0"
       },
       "Mojo::Rx::Utils" : {
          "file" : "lib/Mojo/Rx/Utils.pm",
-         "version" : "v0.12.1"
+         "version" : "v0.13.0"
       }
    },
    "release_status" : "stable",
@@ -89,8 +98,11 @@
          "web" : "https://gitlab.com/karjala/p5-mojo-rx"
       }
    },
-   "version" : "v0.12.1",
+   "version" : "v0.13.0",
    "x_authority" : "cpan:KARJALA",
+   "x_contributors" : [
+      "Felipe Gasper <felipe@felipegasper.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

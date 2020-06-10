@@ -86,8 +86,9 @@ sub to_SQL
     $self->validate;
 
     $options = {} unless $options;
-    my( $delim, $placeholder ) = (
+    my( $delim, $flatten, $placeholder ) = (
         $options->{delim},
+        $options->{flatten},
         $options->{placeholder},
     );
     $delim = "'" unless $delim;
@@ -104,6 +105,10 @@ sub to_SQL
                 chomp $@;
                 $arg = "<$@>";
             }
+            if( $self->{operands}[$i]->isa( OPTIMADE::Filter::AndOr:: ) &&
+                (!$flatten || $self->operator ne $self->{operands}[$i]->operator) ) {
+                $arg = "($arg)";
+            }
             push @values, @$values;
         } else {
             push @values, $arg;
@@ -118,9 +123,9 @@ sub to_SQL
     }
 
     if( wantarray ) {
-        return ( "($operands[0] $operator $operands[1])", \@values );
+        return ( "$operands[0] $operator $operands[1]", \@values );
     } else {
-        return "($operands[0] $operator $operands[1])";
+        return "$operands[0] $operator $operands[1]";
     }
 }
 

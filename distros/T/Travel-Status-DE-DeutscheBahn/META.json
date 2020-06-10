@@ -47,19 +47,19 @@
    "provides" : {
       "Travel::Status::DE::DeutscheBahn" : {
          "file" : "lib/Travel/Status/DE/DeutscheBahn.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Travel::Status::DE::HAFAS" : {
          "file" : "lib/Travel/Status/DE/HAFAS.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Travel::Status::DE::HAFAS::Result" : {
          "file" : "lib/Travel/Status/DE/HAFAS/Result.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Travel::Status::DE::HAFAS::StopFinder" : {
          "file" : "lib/Travel/Status/DE/HAFAS/StopFinder.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-DeutscheBahn"
       }
    },
-   "version" : "3.00",
+   "version" : "3.01",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -2,7 +2,7 @@ package Blessed::Merge;
 
 use 5.006;
 
-our $VERSION = '0.11';
+our $VERSION = '1.00';
 use strict;
 use warnings;
 use Scalar::Util qw/reftype/;
@@ -34,7 +34,10 @@ sub merge {
 	} @_;
 	for my $f (keys %isa) {
 		my $check = $isa{$f} or next;
-		$_ eq $f and next or $check->isa($_) and delete $isa{$_} for keys %isa;	
+		for (keys %isa) {
+			$_ eq $f and next;
+			delete $isa{$_} if $check->isa($_); 
+		}
 	}
 	return $self->{blessed} ? scalar keys %isa == 1 ? bless $new, $base_bless : do { 
 		my $class = sprintf "Blessed::Merge::__ANON__::%s", $self->{itterator}++;
@@ -104,7 +107,7 @@ Blessed::Merge - Merge Blessed Refs.
 
 =head1 VERSION
 
-Version 0.11
+Version 1.00
 
 =cut
 
@@ -204,13 +207,16 @@ Disable to prevent the same ref check.
 
 	my $new = $blessed->merge($foo, $bar);
 
+	$new->method_from_foo();
+	$new->method_from_bar();
+
 =head2 merge
 
 	$blessed->merge($foo x n(100000));
 
 =head1 AUTHOR
 
-Robert Acock, C<< <thisusedtobeanemail at gmail.com> >>
+Robert Acock, C<< <email at lnation.org> >>
 
 =head1 BUGS
 
@@ -223,7 +229,6 @@ automatically be notified of progress on your bug as I make changes.
 You can find documentation for this module with the perldoc command.
 
 	perldoc Blessed::Merge
-
 
 You can also look for information at:
 
@@ -251,7 +256,7 @@ L<http://search.cpan.org/dist/Blessed-Merge/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Robert Acock.
+Copyright 2017->2020 Robert Acock.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

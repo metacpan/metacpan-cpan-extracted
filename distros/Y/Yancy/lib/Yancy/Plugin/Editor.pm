@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.058';
+our $VERSION = '1.060';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -79,6 +79,10 @@ our $VERSION = '1.058';
 #pod =head2 return_to
 #pod
 #pod The URL to use for the "Back to Application" link. Defaults to C</>.
+#pod
+#pod =head2 title
+#pod
+#pod The title of the page, shown in the title bar and the page header. Defaults to C<Yancy>.
 #pod
 #pod =head1 HELPERS
 #pod
@@ -186,6 +190,8 @@ sub _helper_name {
 sub register {
     my ( $self, $app, $config ) = @_;
 
+    $config->{title} //= $app->l( 'Yancy' );
+    $config->{return_label} //= $app->l( 'Back to Application' );
     $self->backend( $config->{backend} );
     $self->schema( my $schema = $config->{schema} );
 
@@ -280,6 +286,8 @@ sub register {
             controller => $config->{default_controller},
             action => 'index',
             api_url => $openapi->route->render,
+            title => $config->{title},
+            return_label => $config->{return_label},
         );
     $route->post( '/upload' )->name( 'yancy.editor.upload' )
         ->to( cb => sub {
@@ -614,7 +622,7 @@ sub _openapi_spec_from_schema {
     }
 
     return {
-        info => $config->{info} || { title => 'Yancy', version => 1 },
+        info => $config->{info} || { title => $config->{title}, version => 1 },
         swagger => '2.0',
         host => $config->{host} // hostname(),
         basePath => '/api',
@@ -664,7 +672,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.058
+version 1.060
 
 =head1 SYNOPSIS
 
@@ -743,6 +751,10 @@ This can be a string or a L<Mojolicious::Routes::Route> object.
 =head2 return_to
 
 The URL to use for the "Back to Application" link. Defaults to C</>.
+
+=head2 title
+
+The title of the page, shown in the title bar and the page header. Defaults to C<Yancy>.
 
 =head1 HELPERS
 

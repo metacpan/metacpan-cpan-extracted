@@ -1,0 +1,52 @@
+NAME
+    Color::HSL::Util - Utilities related to HSL color space
+
+VERSION
+    This document describes version 0.001 of Color::HSL::Util (from Perl
+    distribution Color-HSL-Util), released on 2020-06-07.
+
+SYNOPSIS
+     use Color::HSV::Util qw(
+                           hsl2hsv
+                           hsl2rgb
+                           hsv2hsl
+                           rgb2hsl
+     );
+
+DESCRIPTION
+FUNCTIONS
+  hsl2hsv
+  hsl2rgb
+  hsv2hsl
+  rgb2hsl
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Color-HSL-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Color-HSL-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Color-HSL-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Color::RGB::Util
+
+    Color::HSV::Util
+
+    Color::ANSI::Util
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

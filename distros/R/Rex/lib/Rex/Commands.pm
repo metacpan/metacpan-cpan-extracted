@@ -111,7 +111,7 @@ package Rex::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 
 require Rex::Exporter;
 use Rex::TaskList;
@@ -379,7 +379,9 @@ Or with the expression syntax:
 
  group "servergroup", "www[1..3]", "memcache[01..03]";
 
-You can also specify server options after a server name with a hash reference:
+If the C<use_server_auth> feature flag is enabled, you can also specify server options after a server name with a hash reference:
+
+ use Rex -feature => ['use_server_auth'];
 
  group "servergroup", "www1" => { user => "other" }, "www2";
 
@@ -496,16 +498,16 @@ sub password {
 
 =head2 auth(for => $entity, %data)
 
-With this function you can modify/set special authentication parameters for tasks and groups.
-If you want to modify a group's authentication you first have to create it.
-(Place the auth command after the group.)
+With this command you can set or modify authentication parameters for tasks and groups. (Please note this is different than setting authentication details for the members of a host group. If you are looking for that, please check out the L<group|https://metacpan.org/pod/Rex::Commands#group> command.)
 
-If you want to set special login information for a group you have to activate that feature first.
+If you want to set special login information for a group you have to enable at least the C<0.31> feature flag, and ensure the C<group> is declared before the C<auth> command.
 
- use Rex -feature => 0.31; # activate setting auth for a group
+Command line options to set locality or authentication details are still taking precedence, and may override these settings.
 
  # auth for groups
  
+ use Rex -feature => ['0.31']; # activate setting auth for a group
+
  group frontends => "web[01..10]";
  group backends => "be[01..05]";
  
@@ -1431,7 +1433,7 @@ sub before_task_start {
 
 Run code after the task is finished (and after the ssh connection is terminated). This gets executed only once for a task.
 
-The task name is a regular expression to find all tasks with a matching name. The special task name C<'ALL'> can be used to run code before all tasks.
+The task name is a regular expression to find all tasks with a matching name. The special task name C<'ALL'> can be used to run code after all tasks.
 
 If called repeatedly, each sub will be appended to a list of 'after_task_finished' functions.
 

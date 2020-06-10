@@ -1,4 +1,7 @@
-Revision history for Net-Cisco-FMC-v1: 0.004001
+Revision history for Net-Cisco-FMC-v1: 0.004002
+
+0.004002  2020-06-09 10:43:10+02:00 Europe/Vienna
+    - fix skipping of api.t when environment variables aren't set
 
 0.004001  2019-07-09 09:32:45+02:00 Europe/Vienna
     - add tests which require the FMC, policy name, username and password set

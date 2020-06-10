@@ -4,7 +4,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 # VERSION
 
-version v0.4.0
+version v0.4.1
 
 # SYNOPSIS
 
@@ -250,6 +250,8 @@ It is false by default, for backwards compatability. But it is
 recommended that you set this to true.
 
 See [https://www.filamentgroup.com/lab/load-css-simpler/](https://www.filamentgroup.com/lab/load-css-simpler/).
+
+This attribute was added in v0.4.0.
 
 # METHODS
 

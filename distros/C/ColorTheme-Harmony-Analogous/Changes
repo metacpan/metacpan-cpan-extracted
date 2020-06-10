@@ -1,0 +1,23 @@
+0.004   2020-06-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Adjust to ColorTheme 2.1.0.
+
+
+0.003   2020-06-08  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Use dzil plugin DZP:ColorTheme and weaver plugin
+	  PWP:ColorTheme.
+
+
+0.002   2020-06-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Adjust to ColorTheme 2.0.1.
+
+	- Use ColorThemeBase::Static::FromObjectColors.
+
+
+0.001   2020-06-07  Released-By: PERLANCAR
+
+        - First release.

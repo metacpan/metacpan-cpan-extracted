@@ -1,6 +1,6 @@
 package MIDI::Simple::Drummer::Jazz;
+$MIDI::Simple::Drummer::Jazz::VERSION = '0.0805';
 our $AUTHORITY = 'cpan:GENE';
-our $VERSION = '0.02';
 use strict;
 use warnings;
 use parent 'MIDI::Simple::Drummer';
@@ -143,7 +143,7 @@ MIDI::Simple::Drummer::Jazz
 
 =head1 VERSION
 
-version 0.0803
+version 0.0805
 
 =head1 DESCRIPTION
 
@@ -155,18 +155,14 @@ Kit") or the argument C<-brushes =E<gt> 1> to use the "Brushes kit."
 
 Additionally, the methods below are available.
 
-=head1 NAME
-
-MIDI::Simple::Drummer::Jazz - Jazz drum grooves
-
 =head1 METHODS
 
-=head2 ride1(), ride2(), bell()
+=head2 ride1, ride2, bell
 
 Strike (or set) the rides, individually.  By default, these are the
 kit rides.  Imagine that!
 
-=head2 pedal()
+=head2 pedal
 
 "Depress" the pedal hi-hat.
 
@@ -180,7 +176,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

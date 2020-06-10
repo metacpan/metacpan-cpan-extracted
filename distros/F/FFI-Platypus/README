@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.28
+    version 1.29
 
 SYNOPSIS
 
@@ -1830,7 +1830,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2015,2016,2017,2018,2019 by Graham
+    This software is copyright (c) 2015,2016,2017,2018,2019,2020 by Graham
     Ollis.
 
     This is free software; you can redistribute it and/or modify it under

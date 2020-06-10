@@ -1,7 +1,7 @@
-requires 'perl', '5.010';
+requires 'perl', '5.010'; # TODO: find the right version
 
 on 'test' => sub {
-    requires 'Test::More', '0.98';
+    requires 'Test2::Suite';
 };
 
-requires 'Mojolicious'; # figure out what version
+requires 'Mojolicious'; # TODO: find the right version

@@ -111,11 +111,11 @@
       "homepage" : "https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-IOANR",
       "repository" : {
          "type" : "git",
-         "url" : "https://gitlab.com:ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git",
+         "url" : "https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git",
          "web" : "https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR"
       }
    },
-   "version" : "1.201410",
+   "version" : "1.201592",
    "x_BuiltWith" : {
       "failures" : {
          "Dist::Zilla::PluginBundle::Author::IOANR" : "Module::MetaData could not parse a version from lib/Dist/Zilla/PluginBundle/Author/IOANR.pm"

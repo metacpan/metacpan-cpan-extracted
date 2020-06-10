@@ -46,4 +46,4 @@ $VAR1 = bless( {
 == Filter ==
 ((_exmpl_element_counts HAS < "3") AND (_exmpl_element_counts HAS ANY > "3", = "6", = "4", != "8"))
 == SQL ==
-(<no SQL representation> AND <no SQL representation>)
+<no SQL representation> AND <no SQL representation>

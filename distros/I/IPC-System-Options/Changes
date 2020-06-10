@@ -1,3 +1,9 @@
+0.337   2020-06-06  Released-By: PERLANCAR; Urgency: medium
+
+	- run(): Allow capture_stdout & capture_stderr to be coderef in
+	  addition to scalarref.
+
+
 0.336   2020-04-23  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

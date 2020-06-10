@@ -74,7 +74,7 @@
             "File::HomeDir" : "0",
             "File::ShareDir" : "0",
             "File::Slurper" : "0",
-            "File::Temp" : "0",
+            "File::Temp" : "0.2307",
             "File::Util::Tempdir" : "0.032",
             "File::Which" : "0",
             "Function::Fallback::CoreOrPP" : "0.07",
@@ -151,7 +151,7 @@
          "web" : "https://github.com/perlancar/perl-App-lcpan"
       }
    },
-   "version" : "1.058",
+   "version" : "1.059",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -261,7 +261,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.060"
+            "version" : "0.061"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",

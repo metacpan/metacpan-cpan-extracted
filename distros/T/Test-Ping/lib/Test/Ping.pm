@@ -1,8 +1,8 @@
 package Test::Ping;
-$Test::Ping::VERSION = '0.204';
+# ABSTRACT: Testing pings using Net::Ping
+$Test::Ping::VERSION = '0.210';
 use strict;
 use warnings;
-# ABSTRACT: Testing pings using Net::Ping
 
 use Test::Ping::Ties::BIND;
 use Test::Ping::Ties::PORT;
@@ -123,7 +123,7 @@ Test::Ping - Testing pings using Net::Ping
 
 =head1 VERSION
 
-version 0.204
+version 0.210
 
 =head1 SYNOPSIS
 
@@ -297,7 +297,7 @@ Sawyer X
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Sawyer X.
+This software is Copyright (c) 2020 by Sawyer X.
 
 This is free software, licensed under:
 

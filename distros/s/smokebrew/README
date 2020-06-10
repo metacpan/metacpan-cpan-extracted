@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.56
+    version 1.00
 
 SYNOPSIS
 
@@ -146,6 +146,12 @@ COMMAND LINE SWITCHES
 
       This is an optional argument. Specify the make executable that should
       be used. The default is make.
+
+    --jobs int
+
+      This is an optional argument. Specify an integer that should be used
+      with make -j to enable parallel builds. This will be ignored for when
+      building any perl below v5.19.4.
 
     There are a number of options that allow you to specify what particular
     perl versions are installed.

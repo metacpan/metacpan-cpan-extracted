@@ -25,7 +25,7 @@ my $dbh = connect_database();
 if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 589;
+plan tests => 594;
 
 isnt ($dbh, undef, 'Connect to database for database handle method testing');
 
@@ -34,7 +34,7 @@ $dbh->do('set client_min_messages=warning');
 
 my ($pglibversion,$pgversion) = ($dbh->{pg_lib_version},$dbh->{pg_server_version});
 my ($schema,$schema2,$schema3) = ('dbd_pg_testschema', 'dbd_pg_testschema2', 'dbd_pg_testschema3');
-my ($table1,$table2,$table3) = ('dbd_pg_test1','dbd_pg_test2','dbd_pg_test3');
+my ($table1,$table2,$table3,$table4) = ('dbd_pg_test1','dbd_pg_test2','dbd_pg_test3','dbd_pg_test4');
 my ($sequence2,$sequence3,$sequence4) = ('dbd_pg_testsequence2','dbd_pg_testsequence3','dbd_pg_testsequence4');
 
 my ($SQL, $sth, $result, @results, $expected, $warning, $rows, $t, $info);
@@ -452,6 +452,32 @@ is_deeply ($result, $expected, $t);
     $warning=q{};
     $dbh->rollback();
     ok (length $warning, $t);
+
+    ## Use deferred constraint so a commit will fail
+    $dbh->{AutoCommit} = 0;
+    $dbh->do("CREATE TABLE $schema.$table4 (id INTEGER PRIMARY KEY, val INTEGER)");
+    $dbh->do("ALTER TABLE $schema.$table4 ADD CONSTRAINT ref FOREIGN KEY (val) REFERENCES $table4(id) DEFERRABLE INITIALLY DEFERRED");
+
+    $t = 'Insert succeeds with broken foreign key because it is deferred';
+    eval {
+        $dbh->do("INSERT INTO $schema.$table4 VALUES (1,2)");
+    };
+    is ($@, '', $t);
+
+    $t = 'Before a failed commit, AutoCommit is false';
+    is ($dbh->{AutoCommit}, '', $t);
+
+    $t = 'Commit fails because of a deferred foreign key';
+    eval {
+        $dbh->commit();
+    };
+    like ($@, qr/ERROR/, $t);
+
+    $t = 'After a failed commit, AutoCommit is still false';
+    is ($dbh->{AutoCommit}, '', $t);
+
+    $dbh->rollback();
+
 }
 
 #
@@ -1736,14 +1762,27 @@ while ($dbh->pg_lo_read($handle, $data, 513)) {
 }
 is (length($buf), length($buf2), $t);
 
+$t='DB handle method "pg_lo_close" works after read';
+$result = $dbh->pg_lo_close($handle);
+ok ($result, $t);
+$dbh->commit;
+
 SKIP: {
 
-    #$pgversion < 80300 and skip ('Server version 8.3 or greater needed for pg_lo_truncate tests', 2);
-    skip ('pg_lo_truncate is not working yet', 2);
-    $t='DB handle method "pg_lo_truncate" works';
+    $pgversion < 80300 and skip ('Server version 8.3 or greater needed for pg_lo_truncate tests', 2);
+
+    $t='DB handle method "pg_lo_truncate" fails if opened in read mode only';
+    $handle = $dbh->pg_lo_open($object, $R);
+    $result = $dbh->pg_lo_truncate($handle, 4);
+    is ($result, undef, $t);
+    $dbh->rollback();
+
+    $t='DB handle method "pg_lo_truncate" works if opened in read/write mode';
+    $handle = $dbh->pg_lo_open($object, $W);
     $result = $dbh->pg_lo_truncate($handle, 4);
     is ($result, 0, $t);
 
+    $t='DB handle method "pg_lo_truncate" truncates to expected size';
     $dbh->pg_lo_lseek($handle, 0, 0);
     ($buf2,$data) = ('','');
     while ($dbh->pg_lo_read($handle, $data, 100)) {
@@ -1751,10 +1790,6 @@ SKIP: {
     }
     is (length($buf2), 4, $t);
 }
-
-$t='DB handle method "pg_lo_close" works after read';
-$result = $dbh->pg_lo_close($handle);
-ok ($result, $t);
 
 $t='DB handle method "pg_lo_unlink" works';
 $result = $dbh->pg_lo_unlink($object);

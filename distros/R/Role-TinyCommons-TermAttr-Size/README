@@ -1,23 +1,18 @@
 NAME
     Role::TinyCommons::TermAttr::Size - Determine the sane terminal size
+    (width, height)
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.003 of
     Role::TinyCommons::TermAttr::Size (from Perl distribution
-    Role-TinyCommons-TermAttr-Size), released on 2020-06-05.
+    Role-TinyCommons-TermAttr-Size), released on 2020-06-06.
 
 DESCRIPTION
+    Uses Term::App::Util::Size as backend.
+
 PROVIDED METHODS
   termattr_height
-    Try to determine the sane terminal height. First observe the "LINES"
-    environment variable, if unset then try using Term::Size to determine
-    the terminal size, if fail then use default of 25.
-
   termattr_width
-    Try to determine the sane terminal width. First observe the "COLUMNS"
-    environment variable, if unset then try using Term::Size to determine
-    the terminal size, if fail then use default of 80 (79 on Windows).
-
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Role-TinyCommons-TermAttr-Size>.
@@ -35,12 +30,11 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Term::App::Util::Size
+
     Role::TinyCommons
 
-    Term::Size
-
-    Term::App::Role::Attrs, an earlier project, Moo::Role, and currently
-    more complete version.
+    Term::App::Role::Attrs, an earlier project, uses Moo::Role.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::Query;
 use strict;
 use warnings;
 
-our $VERSION = '7.6'; # VERSION
+our $VERSION = '7.7'; # VERSION
 
 use App::ElasticSearch::Utilities qw(es_request);
 use CLI::Helpers qw(:output);
@@ -191,7 +191,7 @@ sub request_body {
         } or do {
             debug({color=>'red'}, "request_body() - Failed to retrieve '$section'");
         };
-        next unless $val;
+        next unless defined $val;
         my $data = { $section => $val };
         my $param = $map{$section} || $section;
         $body{$param} = $val;
@@ -347,7 +347,7 @@ App::ElasticSearch::Utilities::Query - Object representing ES Queries
 
 =head1 VERSION
 
-version 7.6
+version 7.7
 
 =head1 ATTRIBUTES
 
@@ -516,7 +516,7 @@ Aliased as B<add_aggs>.
 
 Use this to wrap an aggregation in another aggregation.  For example:
 
-    $q->add_aggregation(ip => { terms => { field => src_ip } });
+    $q->add_aggregations(ip => { terms => { field => src_ip } });
 
 Creates:
 

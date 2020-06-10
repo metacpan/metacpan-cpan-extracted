@@ -21,6 +21,7 @@ do { my $x = {
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
                                       'Test::NoTabs' => '0',
+                                      'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'Test::Signature' => '0',
                                       'Test::Synopsis' => '0',

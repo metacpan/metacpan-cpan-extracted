@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: FFI support for structured records data
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 
 {
@@ -82,7 +82,7 @@ FFI::Platypus::Record::Meta - FFI support for structured records data
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 DESCRIPTION
 
@@ -127,7 +127,7 @@ Diab Jerius (DJERIUS)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016,2017,2018,2019 by Graham Ollis.
+This software is copyright (c) 2015,2016,2017,2018,2019,2020 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

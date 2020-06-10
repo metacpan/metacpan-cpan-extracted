@@ -1,9 +1,9 @@
 package App::PODUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-14'; # DATE
+our $DATE = '2020-06-06'; # DATE
 our $DIST = 'App-PODUtils'; # DIST
-our $VERSION = '0.048'; # VERSION
+our $VERSION = '0.049'; # VERSION
 
 use 5.010001;
 use strict;
@@ -347,7 +347,7 @@ App::PODUtils - Command-line utilities related to POD
 
 =head1 VERSION
 
-This document describes version 0.048 of App::PODUtils (from Perl distribution App-PODUtils), released on 2020-04-14.
+This document describes version 0.049 of App::PODUtils (from Perl distribution App-PODUtils), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
@@ -365,6 +365,8 @@ POD:
 =item * L<poddump>
 
 =item * L<podless>
+
+=item * L<podstrip>
 
 =item * L<podxlinks>
 
@@ -537,7 +539,7 @@ Path to a .POD file, or a POD name (e.g. Foo::Bar) which will be searched in @IN
 
 "-" means standard input.
 
-=item * B<sort_args> => I<hash>
+=item * B<sort_args> => I<array[str]>
 
 Arguments to pass to the Sort::Sub::* routine.
 
@@ -569,7 +571,7 @@ feature.
 =head1 SEE ALSO
 
 
-L<pomdump>. Perinci::To::POD=HASH(0x55e8f5737ec0).
+L<pomdump>. Perinci::To::POD=HASH(0x55628ea7d630).
 
 L<podsel>.
 

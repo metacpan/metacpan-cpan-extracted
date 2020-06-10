@@ -2,6 +2,7 @@ package Wasm::Wasmtime::FuncType;
 
 use strict;
 use warnings;
+use 5.008004;
 use base qw( Wasm::Wasmtime::ExternType );
 use Ref::Util qw( is_arrayref );
 use Wasm::Wasmtime::FFI;
@@ -10,7 +11,7 @@ use constant is_functype => 1;
 use constant kind => 'functype';
 
 # ABSTRACT: Wasmtime function type class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_functype_';
@@ -81,7 +82,7 @@ Wasm::Wasmtime::FuncType - Wasmtime function type class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

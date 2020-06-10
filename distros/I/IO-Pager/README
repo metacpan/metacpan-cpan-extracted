@@ -48,17 +48,16 @@ into quirks, it tends to be happiest under perl built with perlio not stdio.
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2019 Jerrad Pierce
+IO::Pager::Perl - Jerrad Pierce & Jeff Weisberg, Perl Artistic License
+
+All Else - Copyright (C) 2003-2019 Jerrad Pierce:
 
  * Thou shalt not claim ownership of unmodified materials.
-
  * Thou shalt not claim whole ownership of modified materials.
-
  * Thou shalt grant the indemnity of the provider of materials.
-
  * Thou shalt use and dispense freely without other restrictions.
 
-Or, if you prefer:
+  Or, if you prefer:
 
   This library is free software; you can redistribute it and/or modify it
   under the same terms as Perl itself, either Perl version 5.0 or, at your

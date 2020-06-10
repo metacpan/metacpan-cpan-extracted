@@ -2,8 +2,8 @@ NAME
     Sah::PSchemas::Perl - Parameterized schemas related to Perl
 
 VERSION
-    This document describes version 0.002 of Sah::PSchemas::Perl (from Perl
-    distribution Sah-PSchemas-Perl), released on 2020-06-04.
+    This document describes version 0.003 of Sah::PSchemas::Perl (from Perl
+    distribution Sah-PSchemas-Perl), released on 2020-06-09.
 
 DESCRIPTION
     EXPERIMENTAL.

@@ -1,3 +1,15 @@
+0.601   2020-06-08  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Wrap H in input HSL/HSV.
+
+	- [ux] Make sure we show invalid rgb value in error messages.
+
+
+0.600   2020-06-07  Released-By: PERLANCAR; Urgency: medium
+
+	- Add functions: hsl2{hsv,rgb}, hsv2{hsl,rgb}.
+
+
 0.599   2019-08-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add functions: rgb2hsl, rgb2hsv (stolen from Graphics-Color,

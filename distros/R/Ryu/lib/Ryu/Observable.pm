@@ -5,7 +5,8 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '1.012'; # VERSION
+our $VERSION = '2.001'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
 

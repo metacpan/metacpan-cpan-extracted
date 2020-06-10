@@ -4,13 +4,13 @@ package App::PDF::Link;
 
 # pdflink -- insert file links in PDF documents
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 # Author          : Johan Vromans
 # Created On      : Thu Sep 15 11:43:40 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Fri Jul 26 22:42:31 2019
-# Update Count    : 394
+# Last Modified On: Sat Jun  6 21:23:42 2020
+# Update Count    : 396
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -698,7 +698,7 @@ Johan Vromans E<lt>jvromans@squirrel.nlE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2016,2019 Johan Vromans. All rights reserved.
+Copyright 2016,2020 Johan Vromans. All rights reserved.
 
 This module is free software. You can redistribute it and/or
 modify it under the terms of the Artistic License 2.0.

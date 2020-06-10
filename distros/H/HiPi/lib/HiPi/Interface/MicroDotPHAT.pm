@@ -49,7 +49,7 @@ use HiPi::Interface::MicroDotPHAT::Font qw( :font );
 use Try::Tiny;
 use Carp;
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 __PACKAGE__->create_ro_accessors( qw( _hat_width _hat_height ) );
 
@@ -99,8 +99,11 @@ sub new {
     # initialise
     my @controllers = ();
     
+    my $devicename = $params{devicename};
+    
     for my $address ( 0x63, 0x62, 0x61 ) {
-        my $control = HiPi::Interface::IS31FL3730->new( address => $address );
+        my %is31params = ( $devicename ) ? ( address => $address, devicename => $devicename ) : ( address => $address );
+        my $control = HiPi::Interface::IS31FL3730->new( %is31params );
         $control->reset;
         $control->configure( FL3730_SSD_NORMAL | FL3730_DM_MATRIX_BOTH | FL3730_AEN_OFF | FL3730_ADM_8X8 );
         $control->lighting_effect( FL3730_AGS_0_DB | FL3730_CS_35_MA );

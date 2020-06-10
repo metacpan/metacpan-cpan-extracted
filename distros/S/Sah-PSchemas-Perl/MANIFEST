@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/Sah/PSchema/perl/modname.pm
+lib/Sah/PSchema/perl/modname_with_optional_args.pm
 lib/Sah/PSchemas/Perl.pm
 t/00-compile.t
 t/author-critic.t

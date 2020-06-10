@@ -4,7 +4,7 @@ package Types::ElasticSearch;
 use strict;
 use warnings;
 
-our $VERSION = '7.6'; # VERSION
+our $VERSION = '7.7'; # VERSION
 
 use Type::Library -base;
 use Type::Tiny;
@@ -30,7 +30,7 @@ Types::ElasticSearch - Types for working with ElasticSearch
 
 =head1 VERSION
 
-version 7.6
+version 7.7
 
 =head1 AUTHOR
 

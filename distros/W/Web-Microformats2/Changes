@@ -1,5 +1,9 @@
 Revision history for Web::Microformats2
 
+0.511 2020-06-08T23:19:37Z
+
+    - Adding a dependency whose lack causes some tests to fail.
+
 0.510 2020-04-28T23:07:03Z
 
     - For the sake of faster load time, swapped out all use of Moose

@@ -4,10 +4,13 @@ author:
   - 'Mark A. Jensen'
 build_requires:
   Inline: '0'
+  Test::Exception: '0'
+  Test::More: '0'
   Try::Tiny: '0'
 configure_requires:
   ExtUtils::CChecker: '0'
   Module::Build: 0.36_14
+  Neo4j::Client: '0.17'
   Try::Tiny: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
@@ -26,10 +29,14 @@ recommends:
 requires:
   Inline::C: '0'
   JSON::PP: '0'
+  Neo4j::Client: '0.17'
   URI: '0'
 resources:
   bugtracker: https://github.com/majensen/perlbolt/issues
   license: http://www.apache.org/licenses/LICENSE-2.0.txt
   repository: https://github.com/majensen/perlbolt.git
-version: '0.12'
+version: '0.20'
+x_contributors:
+  - 'Mark A. Jensen <majensen@cpan.org>'
+  - 'Arne Johannessen <ajnn@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

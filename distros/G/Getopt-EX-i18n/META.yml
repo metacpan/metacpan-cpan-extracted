@@ -26,20 +26,23 @@ no_index:
 provides:
   Getopt::EX::i18n:
     file: lib/Getopt/EX/i18n.pm
-    version: '0.03'
+    version: '0.06'
   Getopt::EX::i18n::iso3361:
     file: lib/Getopt/EX/i18n/iso3361.pm
   Getopt::EX::i18n::iso639:
     file: lib/Getopt/EX/i18n/iso639.pm
+  LocaleObj:
+    file: lib/Getopt/EX/i18n.pm
 requires:
   Getopt::EX: v1.18.0
   List::Util: '1.45'
+  Moo: '0'
   perl: '5.014'
 resources:
   bugtracker: https://github.com/kaz-utashiro/Getopt-EX-i18n/issues
   homepage: https://github.com/kaz-utashiro/Getopt-EX-i18n
   repository: git://github.com/kaz-utashiro/Getopt-EX-i18n.git
-version: '0.03'
+version: '0.06'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

@@ -2,10 +2,27 @@ package Wasm::Memory;
 
 use strict;
 use warnings;
+use 5.008004;
+use Wasm::Wasmtime::Caller ();
+use base qw( Exporter );
 
-# ABSTRACT: Interface to Web Assembly Memory
-our $VERSION = '0.10'; # VERSION
+our @EXPORT_OK = qw( wasm_caller_memory );
 
+# ABSTRACT: Interface to WebAssembly Memory
+our $VERSION = '0.14'; # VERSION
+
+
+sub wasm_caller_memory
+{
+  my $caller = Wasm::Wasmtime::Caller::wasmtime_caller();
+  defined $caller
+    ? do {
+      my $wm = $caller->export_get('memory');
+      defined $wm && $wm->is_memory
+        ? __PACKAGE__->new($wm)
+        : undef;
+    } : undef;
+}
 
 sub new
 {
@@ -43,13 +60,15 @@ __END__
 
 =head1 NAME
 
-Wasm::Memory - Interface to Web Assembly Memory
+Wasm::Memory - Interface to WebAssembly Memory
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
+
+Use WebAssembly memory from plain Perl:
 
  use PeekPoke::FFI qw( peek poke );
  use Wasm
@@ -79,11 +98,58 @@ version 0.10
  printf "min     = %d\n", $min;                  # 3
  printf "max     = %d\n", $max;                  # 9
 
+Use WebAssembly memory from Perl in callback from WebAssembly:
+
+ use Wasm::Memory qw( wasm_caller_memory );
+ 
+ {
+   # this just uses Platypus to create a utility function
+   # to convert a pointer to a C string into a Perl string.
+   use FFI::Platypus 1.00;
+   my $ffi = FFI::Platypus->new( api => 1 );
+   $ffi->attach_cast( 'cstring' => 'opaque' => 'string' );
+ }
+ 
+ sub print_wasm_string
+ {
+   my $ptr = shift;
+   my $memory = wasm_caller_memory;
+   print cstring($ptr + $memory->address);
+ }
+ 
+ use Wasm
+   -api => 0,
+   -wat => q{
+     (module
+       (import "main" "print_wasm_string" (func $print_wasm_string (param i32)))
+       (func (export "run")
+         i32.const 0
+         call $print_wasm_string
+       )
+       (memory (export "memory") 1)
+       (data (i32.const 0) "Hello, world!\n\00")
+     )
+   },
+ ;
+ 
+ run();
+
 =head1 DESCRIPTION
 
 This class represents a region of memory exported from a WebAssembly
 module.  A L<Wasm::Memory> instance is automatically imported into
 Perl space for each WebAssembly memory region with the same name.
+
+=head1 FUNCTIONS
+
+=head2 wasm_caller_memory
+
+ my $memory = wasm_caller_memory;
+
+Returns the memory region of the WebAssembly caller, if Perl has been
+called by Wasm, otherwise it returns C<undef>.
+
+This function can be exported by request via L<Exporter>.
 
 =head1 METHODS
 

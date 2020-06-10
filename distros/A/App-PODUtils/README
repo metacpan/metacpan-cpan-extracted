@@ -2,8 +2,8 @@ NAME
     App::PODUtils - Command-line utilities related to POD
 
 VERSION
-    This document describes version 0.048 of App::PODUtils (from Perl
-    distribution App-PODUtils), released on 2020-04-14.
+    This document describes version 0.049 of App::PODUtils (from Perl
+    distribution App-PODUtils), released on 2020-06-06.
 
 SYNOPSIS
     This distribution provides the following command-line utilities related
@@ -18,6 +18,8 @@ SYNOPSIS
     *   poddump
 
     *   podless
+
+    *   podstrip
 
     *   podxlinks
 
@@ -163,7 +165,7 @@ FUNCTIONS
 
         "-" means standard input.
 
-    *   sort_args => *hash*
+    *   sort_args => *array[str]*
 
         Arguments to pass to the Sort::Sub::* routine.
 
@@ -189,7 +191,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    pomdump. Perinci::To::POD=HASH(0x55e8f5737ec0).
+    pomdump. Perinci::To::POD=HASH(0x55628ea7d630).
 
     podsel.
 

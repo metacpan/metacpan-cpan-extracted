@@ -1,9 +1,9 @@
 use strict;
-use Test::More 0.98;
+use warnings;
+use Test2::V0;
 
-use_ok $_ for qw(
-    Mojo::Rx
-);
+use Mojo::Rx 'rx_of';
+
+pass 'use';
 
 done_testing;
-

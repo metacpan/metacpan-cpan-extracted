@@ -36,4 +36,4 @@ $VAR1 = bless( {
 == Filter ==
 ((NOT (a > b)) AND (NOT (x > "0")))
 == SQL ==
-((NOT ('a' > 'b')) AND (NOT ('x' > "0")))
+NOT ('a' > 'b') AND NOT ('x' > "0")

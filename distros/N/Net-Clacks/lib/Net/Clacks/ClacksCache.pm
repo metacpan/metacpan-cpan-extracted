@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 11;
+our $VERSION = 12;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -102,8 +102,24 @@ sub extraDestroys {
     return;
 }
 
+sub disconnect {
+    my ($self) = @_;
+
+    eval {
+        $self->{clacks}->disconnect();
+    };
+
+    return;
+}
+
 DESTROY {
     my ($self) = @_;
+
+    print STDERR "ClacksCache DESTROY $PID\n";
+
+    eval {
+        $self->{clacks}->disconnect();
+    };
 
     $self->extraDestroys();
     return;
@@ -321,6 +337,10 @@ Internal function
 =head2 reconnect
 
 Reconnect to the clacks server. This is mostly used internally, but you can call it if you suspect your connection is wonky or broken.
+
+=head2 disconnect
+
+Disconnect from the Server
 
 =head2 sanitize_key
 

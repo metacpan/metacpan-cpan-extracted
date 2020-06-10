@@ -51,7 +51,7 @@ package Rex;
 use strict;
 use warnings;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 
 # development version if this variable is not set
 if ( !$Rex::VERSION ) {
@@ -647,7 +647,7 @@ sub import {
       if ( $add =~ m/^(\d+\.\d+)$/ ) {
         my $vers = $1;
         my ( $major, $minor, $patch, $dev_release ) =
-          $Rex::VERSION =~ m/^(\d+)\.(\d+)\.(\d+)_?(\d+)?$/;
+          $Rex::VERSION =~ m/^(\d+)\.(\d+)\.(\d+)[_.]?(\d+)?$/;
 
         my ( $c_major, $c_minor ) = split( /\./, $vers );
 

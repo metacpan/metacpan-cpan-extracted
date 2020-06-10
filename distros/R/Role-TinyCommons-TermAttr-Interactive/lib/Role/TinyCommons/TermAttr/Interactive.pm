@@ -1,21 +1,22 @@
 package Role::TinyCommons::TermAttr::Interactive;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-05'; # DATE
+our $DATE = '2020-06-06'; # DATE
 our $DIST = 'Role-TinyCommons-TermAttr-Interactive'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Role::Tiny;
 
 sub termattr_interactive {
+    require Term::App::Util::Interactive;
+
     my $self = shift;
-    if (defined $ENV{INTERACTIVE}) {
-        $self->{_termattr_debug_info}{interactive_from} = 'INTERACTIVE env';
-        return $ENV{INTERACTIVE};
-    } else {
-        $self->{_termattr_debug_info}{interactive_from} = '-t STDOUT';
-        return (-t STDOUT);
-    }
+
+    my $res = Term::App::Util::Interactive::term_app_is_interactive();
+    $self->{_termattr_debug_info} //= {};
+    $self->{_termattr_debug_info}{$_} = $res->[3]{'func.debug_info'}{$_}
+        for keys %{ $res->[3]{'func.debug_info'} };
+    $res->[2];
 }
 
 1;
@@ -33,20 +34,15 @@ Role::TinyCommons::TermAttr::Interactive - Determine whether terminal applicatio
 
 =head1 VERSION
 
-This document describes version 0.002 of Role::TinyCommons::TermAttr::Interactive (from Perl distribution Role-TinyCommons-TermAttr-Interactive), released on 2020-06-05.
+This document describes version 0.003 of Role::TinyCommons::TermAttr::Interactive (from Perl distribution Role-TinyCommons-TermAttr-Interactive), released on 2020-06-06.
 
 =head1 DESCRIPTION
+
+Uses L<Term::App::Util::Interactive> as backend.
 
 =head1 PROVIDED METHODS
 
 =head2 termattr_interactive
-
-Try to determine whether terminal application is running interactively. Will
-first check the INTERACTIVE environment variable, then check using C<-t STDOUT>.
-
-=head1 ENVIRONMENT
-
-=head2 INTERACTIVE
 
 =head1 HOMEPAGE
 
@@ -65,6 +61,8 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+L<Term::App::Util::Interactive>
 
 L<Role::TinyCommons>
 

@@ -1,0 +1,40 @@
+NAME
+    Graphics::ColorNamesLite::All - Lots of color names and equivalent RGB
+    values (lite version)
+
+VERSION
+    This document describes version 0.001 of Graphics::ColorNamesLite::All
+    (from Perl distribution Graphics-ColorNamesLite-All), released on
+    2020-06-09.
+
+DESCRIPTION
+    This is a merge of various Graphics::ColorNames::* modules.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Graphics-ColorNamesLite-All>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Graphics-ColorNamesLite-All>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Graphics-ColorNamesLi
+    te-All>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    "Graphics::ColorNames::*"
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

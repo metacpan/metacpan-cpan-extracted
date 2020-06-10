@@ -14,12 +14,12 @@ my $d = MIDI::Simple::Drummer::Euclidean->new(
 
 $d->sync_tracks(
     sub {
-        $d->{-pad} = 'n36';
+        $d->{-pad} = '40';
         $d->{-rhythm} = [qw( x . x x x . )];
         $d->beat(-name => 1);
     },
     sub {
-        $d->{-pad} = 'n42';
+        $d->{-pad} = '36';
         $d->{-rhythm} = [qw( . x . x x . )];
         $d->beat(-name => 1);
     },

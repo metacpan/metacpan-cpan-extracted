@@ -25,5 +25,5 @@ requires:
   Scalar::Util: '0'
   Tie::IxHash: '1.23'
   perl: '5.006'
-version: '0.11'
+version: '1.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

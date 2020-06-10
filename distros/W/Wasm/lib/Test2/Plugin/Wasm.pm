@@ -2,13 +2,14 @@ package Test2::Plugin::Wasm;
 
 use strict;
 use warnings;
+use 5.008004;
 use Test2::API qw( context );
 use Test2::Mock;
 use Data::Dumper ();
 use FFI::C::Util qw( c_to_perl );
 
-# ABSTRACT: Test2 plugin for Wasm extensions
-our $VERSION = '0.10'; # VERSION
+# ABSTRACT: Test2 plugin for WebAssembly extensions
+our $VERSION = '0.14'; # VERSION
 
 
 sub get_virtual_memory_limit
@@ -92,11 +93,11 @@ __END__
 
 =head1 NAME
 
-Test2::Plugin::Wasm - Test2 plugin for Wasm extensions
+Test2::Plugin::Wasm - Test2 plugin for WebAssembly extensions
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -114,7 +115,7 @@ make sense for all L<Wasm> extensions running in a testing context in the future
 
 =item L<Wasm>
 
-Write Perl extensions using Web Assembly.
+Write Perl extensions using WebAssembly.
 
 =back
 

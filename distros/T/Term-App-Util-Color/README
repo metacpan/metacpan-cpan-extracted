@@ -1,0 +1,99 @@
+NAME
+    Term::App::Util::Color - Determine color depth and whether to use color
+    or not
+
+VERSION
+    This document describes version 0.001 of Term::App::Util::Color (from
+    Perl distribution Term-App-Util-Color), released on 2020-06-06.
+
+DESCRIPTION
+FUNCTIONS
+  term_app_color_depth
+    Usage:
+
+     term_app_color_depth() -> [status, msg, payload, meta]
+
+    Try to determine the suitable color depth to use. Will first check
+    COLOR_DEPTH environment variable and use that if defined. Otherwise will
+    check COLOR environment variable and use that as color depth if defined
+    and the value looks like color depth (e.g. 256 or "24bit"). Otherwise
+    will try to detect terminal emulation software and use the highest
+    supported color depth of that terminal software. Otherwise will default
+    to 16.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  term_app_should_use_color
+    Usage:
+
+     term_app_should_use_color() -> [status, msg, payload, meta]
+
+    Try to determine whether colors should be used. First will check
+    NO_COLOR environment variable and return false if it exists. Otherwise
+    will check the COLOR environment variable and use it if it's defined.
+    Otherwise will check the COLOR_DEPTH environment variable and if defined
+    will use color when color depth is > 0. Otherwise will check if script
+    is running interactively and when it is then will use color. Otherwise
+    will not use color.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+  COLOR
+  COLOR_DEPTH
+  NO_COLOR
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Term-App-Util-Color>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Term-App-Util-Color>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Term-App-Util-Color>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other "Term::App::Util::*" modules.
+
+    Term::Detect::Software
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

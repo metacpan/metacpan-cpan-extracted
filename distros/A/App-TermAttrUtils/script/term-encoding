@@ -1,8 +1,8 @@
 #!perl
 
-our $DATE = '2019-11-26'; # DATE
+our $DATE = '2020-06-10'; # DATE
 our $DIST = 'App-TermAttrUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,7 +25,7 @@ term-encoding - Print terminal encoding according to Term::Encoding
 
 =head1 VERSION
 
-This document describes version 0.005 of term-encoding (from Perl distribution App-TermAttrUtils), released on 2019-11-26.
+This document describes version 0.006 of term-encoding (from Perl distribution App-TermAttrUtils), released on 2020-06-10.
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

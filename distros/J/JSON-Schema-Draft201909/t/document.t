@@ -241,7 +241,34 @@ subtest '$id with a non-empty fragment' => sub {
         '$defs' => {
           foo => {
             '$id' => 'http://localhost:4242/my_foo#hello',
-            type => 'string',
+            properties => {
+              bar => {
+                '$id' => 'my_bar',
+                '$anchor' => 'my_anchor',
+              },
+            },
+          },
+        },
+      },
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        '' => { path => '', canonical_uri => str('') },
+        'my_bar' => { path => '/$defs/foo/properties/bar', canonical_uri => str('my_bar') },
+        'my_bar#my_anchor' => { path => '/$defs/foo/properties/bar', canonical_uri => str('my_bar') },
+      ),
+    ),
+    'did not index the $id with a non-empty fragment, nor use it as the base for other identifiers',
+  );
+};
+
+subtest '$anchor not conforming to syntax' => sub {
+  cmp_deeply(
+    JSON::Schema::Draft201909::Document->new(
+      schema => {
+        '$defs' => {
+          foo => {
+            '$anchor' => 'my_#bad_anchor',
           },
         },
       },
@@ -251,7 +278,116 @@ subtest '$id with a non-empty fragment' => sub {
         '' => { path => '', canonical_uri => str('') },
       ],
     ),
-    'did not index the $id with a non-empty fragment -- either it is not in a subschema or the schema is buggy',
+    'did not index an $anchor with invalid characters',
+  );
+};
+
+subtest '$anchor and $id below an $id that is not at the document root' => sub {
+  cmp_deeply(
+    JSON::Schema::Draft201909::Document->new(
+      canonical_uri => Mojo::URL->new('https://foo.com'),
+      schema => {
+        allOf => [
+          {
+            '$id' => 'https://bar.com',
+            '$anchor' => 'my_anchor',
+            not => {
+              '$anchor' => 'my_not',
+              not => { '$id' => 'inner_id' },
+            },
+          },
+        ],
+      },
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        'https://foo.com' => {
+          path => '', canonical_uri => str('https://foo.com'),
+        },
+        'https://bar.com' => {
+          path => '/allOf/0', canonical_uri => str('https://bar.com'),
+        },
+        'https://bar.com#my_anchor' => {
+          path => '/allOf/0', canonical_uri => str('https://bar.com'),
+        },
+        'https://bar.com#my_not' => {
+          path => '/allOf/0/not', canonical_uri => str('https://bar.com#/not'),
+        },
+        'https://bar.com/inner_id' => {
+          path => '/allOf/0/not/not', canonical_uri => str('https://bar.com/inner_id'),
+        },
+      ),
+    ),
+    'canonical_uri uses the path from the innermost $id, not document root $id',
+  );
+};
+
+subtest 'JSON pointer and URI escaping' => sub {
+  cmp_deeply(
+    JSON::Schema::Draft201909::Document->new(
+      schema => {
+        '$defs' => {
+          foo => {
+            patternProperties => {
+              '~' => {
+                '$id' => 'http://localhost:4242/~username',
+                properties => {
+                  '~/' => {
+                    '$anchor' => 'tilde',
+                  },
+                },
+              },
+              '/' => {
+                '$id' => 'http://localhost:4242/my_slash',
+                properties => {
+                  '~/' => {
+                    '$anchor' => 'slash',
+                  },
+                },
+              },
+              '[~/]' => {
+                '$id' => 'http://localhost:4242/~username/my_slash',
+                properties => {
+                  '~/' => {
+                    '$anchor' => 'tildeslash',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    ),
+    listmethods(
+      resource_index => unordered_pairs(
+        '' => { path => '', canonical_uri => str('') },
+        'http://localhost:4242/~username' => {
+          path => '/$defs/foo/patternProperties/~0',
+          canonical_uri => str('http://localhost:4242/~username'),
+        },
+        'http://localhost:4242/my_slash' => {
+          path => '/$defs/foo/patternProperties/~1',
+          canonical_uri => str('http://localhost:4242/my_slash'),
+        },
+        'http://localhost:4242/~username/my_slash' => {
+          path => '/$defs/foo/patternProperties/[~0~1]',
+          canonical_uri => str('http://localhost:4242/~username/my_slash'),
+        },
+        'http://localhost:4242/~username#tilde' => {
+          path => '/$defs/foo/patternProperties/~0/properties/~0~1',
+          canonical_uri => str('http://localhost:4242/~username#/properties/~0~1'),
+        },
+        'http://localhost:4242/my_slash#slash' => {
+          path => '/$defs/foo/patternProperties/~1/properties/~0~1',
+          canonical_uri => str('http://localhost:4242/my_slash#/properties/~0~1'),
+        },
+        'http://localhost:4242/~username/my_slash#tildeslash' => {
+          path => '/$defs/foo/patternProperties/[~0~1]/properties/~0~1',
+          canonical_uri => str('http://localhost:4242/~username/my_slash#/properties/~0~1'),
+        },
+      ),
+    ),
+    'properly escaped special characters in JSON pointers and URIs',
   );
 };
 

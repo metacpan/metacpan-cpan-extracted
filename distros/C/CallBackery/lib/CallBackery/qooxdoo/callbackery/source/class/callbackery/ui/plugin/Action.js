@@ -73,9 +73,13 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                             this._buttonMap[btCfg.key]=button;
                         }
                         if (btCfg.buttonSet) {
-                            button.set(btCfg.buttonSet);
+                            var bs = btCfg.buttonSet;
+                            if (bs.label) {
+                                bs.label = this.xtr(bs.label);
+                            }
+                            button.set(bs);
                             if (btCfg.key){
-                                this._buttonSetMap[btCfg.key]=btCfg.buttonSet;
+                                this._buttonSetMap[btCfg.key]=bs;
                             }
                         }
                         
@@ -256,9 +260,13 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                 this._buttonMap[btCfg.key]=button;
             }
             if (btCfg.buttonSet) {
-                button.set(btCfg.buttonSet);
+                var bs = btCfg.buttonSet;
+                if (bs.label) {
+                    bs.label = this.xtr(bs.label);
+                }
+                button.set(bs);
                 if (btCfg.key){
-                    this._buttonSetMap[btCfg.key]=btCfg.buttonSet;
+                    this._buttonSetMap[btCfg.key]=bs;
                 }
             }
             var serverCall = callbackery.data.Server.getInstance();

@@ -4,13 +4,13 @@
       "Dominic Hargreaves <dom@earth.li>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Oxford-Calendar",
    "no_index" : {
@@ -54,5 +54,6 @@
          "web" : "https://github.com/jmdh/Oxford-Calendar"
       }
    },
-   "version" : "2.11"
+   "version" : "2.12",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

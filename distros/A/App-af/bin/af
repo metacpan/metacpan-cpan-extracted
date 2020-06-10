@@ -12,7 +12,7 @@ use File::chdir;
 # VERSION
 
 
-package App::af::download 0.15 {
+package App::af::download 0.16 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
@@ -83,7 +83,7 @@ package App::af::download 0.15 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::probe 0.15 {
+package App::af::probe 0.16 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
@@ -134,7 +134,7 @@ package App::af::probe 0.15 {
   }
 }
 
-package App::af::install 0.15 {
+package App::af::install 0.16 {
   use Moose;
   use namespace::autoclean;
   use File::Temp qw( tempdir );
@@ -349,7 +349,7 @@ package App::af::install 0.15 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::requires 0.15 {
+package App::af::requires 0.16 {
   use Moose;
   use namespace::autoclean;
   use YAML qw( Dump );
@@ -384,7 +384,7 @@ package App::af::requires 0.15 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::missing 0.15 {
+package App::af::missing 0.16 {
   use Moose;
   use namespace::autoclean;
   use Capture::Tiny qw( capture );
@@ -498,7 +498,7 @@ package App::af::missing 0.15 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::prop 0.15 {
+package App::af::prop 0.16 {
   use Moose;
   use namespace::autoclean;
 
@@ -600,7 +600,7 @@ package App::af::prop 0.15 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::list 0.15 {
+package App::af::list 0.16 {
   use Moose;
   use namespace::autoclean;
   use Path::Tiny qw( path );
@@ -621,7 +621,7 @@ package App::af::list 0.15 {
     my($self) = @_;
     
     my $table;
-    $table = Text::Table->new('name', 'alien version', 'package version')
+    $table = Text::Table->new('name', 'install type', 'alien version', 'package version')
       if $self->long;
     
     foreach my $inc (map { path($_)->absolute } @INC)
@@ -653,9 +653,10 @@ package App::af::list 0.15 {
         }
         else
         {
+          my $install_type = eval { $class->install_type } // '---';
           my $perl_version = eval { $class->VERSION } // '---';
           my $pkg_version   = eval { $class->version } // '---';
-          $table->add($class, $perl_version, $pkg_version);
+          $table->add($class, $install_type, $perl_version, $pkg_version);
         }
       }
 
@@ -694,7 +695,7 @@ af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 

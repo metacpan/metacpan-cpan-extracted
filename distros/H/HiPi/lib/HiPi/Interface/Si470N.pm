@@ -21,7 +21,7 @@ use HiPi qw( :i2c :si470n :rpi );
 use HiPi::GPIO;
 use HiPi::Device::I2C;
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 __PACKAGE__->create_accessors( qw(
     devicename address

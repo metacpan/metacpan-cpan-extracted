@@ -46,7 +46,7 @@ use Carp;
 BEGIN {
 	use Exporter;
 	our ($VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
-	$VERSION = "0.34";
+	$VERSION = "0.35";
 }
 
 

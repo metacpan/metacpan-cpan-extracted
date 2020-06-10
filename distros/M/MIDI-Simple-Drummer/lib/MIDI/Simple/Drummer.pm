@@ -1,8 +1,9 @@
 package MIDI::Simple::Drummer;
 our $AUTHORITY = 'cpan:GENE';
+
 # ABSTRACT: An algorithmic MIDI drummer
 
-our $VERSION = '0.0803';
+our $VERSION = '0.0805';
 
 use strict;
 use warnings;
@@ -20,19 +21,20 @@ BEGIN {
         s => { number => 16, ordinal => '16th', name => 'sixteenth' },
         y => { number => 32, ordinal => '32nd', name => 'thirtysecond' },
         x => { number => 64, ordinal => '64th', name => 'sixtyfourth' },
+        o => { number => 128, ordinal => '128th', name => 'onetwentyeighth' },
     };
 
     # Add constants for each known duration.
     for my $n (keys %MIDI::Simple::Length) {
         # Get the duration part of the note name.
-        my $name = $n =~ /([whqesyx])n$/o ? $1 : '';
+        my $name = $n =~ /([whqesyxo])n$/ ? $1 : '';
 
         if ($name) {
             # Create a meaningful prefix for the named constant.
             my $prefix = '';
-            $prefix .= 'triplet'       if $n =~ /t\w/o;
-            $prefix .= 'double_dotted' if $n =~ /^dd/o;
-            $prefix .= 'dotted'        if $n =~ /^d[^d]/o;
+            $prefix .= 'triplet'       if $n =~ /t\w/;
+            $prefix .= 'double_dotted' if $n =~ /^dd/;
+            $prefix .= 'dotted'        if $n =~ /^d[^d]/;
             $prefix .= '_' if $prefix;
 
             # Add name-based duration.
@@ -85,7 +87,7 @@ sub new { # Is there a drummer in the house?
     bless $self, $class;
 
     # Perform any pre-flight default setting.
-    $self->_setup();
+    $self->_setup;
 
     return $self;
 }
@@ -99,8 +101,8 @@ sub _setup { # Where's my roadies, Man?
     $self->{-score}->set_tempo(int(60_000_000 / $self->{-bpm}));
 
     # Give unto us a drum, so that we might bang upon it all day, instead of working.
-    $self->{-kit} ||= $self->_default_kit();
-    $self->{-patterns} ||= $self->_default_patterns();
+    $self->{-kit} ||= $self->_default_kit;
+    $self->{-patterns} ||= $self->_default_patterns;
 
     # Set the groove dimensions if a time signature is given.
     if ($self->{-signature}) {
@@ -582,12 +584,13 @@ MIDI::Simple::Drummer - An algorithmic MIDI drummer
 
 =head1 VERSION
 
-version 0.0803
+version 0.0805
 
 =head1 SYNOPSIS
 
-  # A glorified metronome:
   use MIDI::Simple::Drummer;
+
+  # A glorified metronome:
   my $d = MIDI::Simple::Drummer->new(-bpm => 100);
   $d->count_in;
   for(1 .. $d->phrases * $d->bars) {
@@ -596,8 +599,7 @@ version 0.0803
   }
 
   # Shuffle:
-  use MIDI::Simple::Drummer;
-  my $d = MIDI::Simple::Drummer->new(-bpm => 100);
+  $d = MIDI::Simple::Drummer->new(-bpm => 100);
   $d->count_in;
   for(1 .. $d->phrases * $d->bars) {
     $d->note($d->TRIPLET_EIGHTH, $d->backbeat_rhythm(-beat => $_));
@@ -607,7 +609,7 @@ version 0.0803
 
   # A rock drummer:
   use MIDI::Simple::Drummer::Rock;
-  my $d = MIDI::Simple::Drummer::Rock->new(
+  $d = MIDI::Simple::Drummer::Rock->new(
     -bpm     => 100,
     -volume  => 100,
     -phrases => 8,
@@ -637,15 +639,14 @@ version 0.0803
   }
 
   # Multi-tracking:
-  use MIDI::Simple::Drummer;
-  my $d = MIDI::Simple::Drummer->new(-file => "$0.mid");
+  $d = MIDI::Simple::Drummer->new(-file => "$0.mid");
   $d->patterns(b1 => \&hihat);
   $d->patterns(b2 => \&backbeat);
   $d->sync_tracks(
     sub { $d->beat(-name => 'b1') },
     sub { $d->beat(-name => 'b2') },
   );
-  $d->write();
+  $d->write;
   sub hihat { # tick
     my $self = shift;
     $self->note($self->EIGHTH, $self->tick) for 1 .. 2 * $self->beats;
@@ -661,28 +662,27 @@ This is a "robotic" drummer that provides algorithmic methods to make beats,
 rhythms, noise, what have you.  It is also a glorified metronome.
 
 This is not a traditional "drum machine" that is controlled in a mechanical
-or "arithmetic" sense.  It is a "sufficiently intelligent" drummer, with which
-you can practice, improvise, compose, record and experiment.
+or "arithmetic" sense.  It is a drummer, with which you can practice, improvise,
+compose, record and experiment.
 
 The "beats" are entirely constructed with Perl, and as such, any algorithmic
-procedure can be used to generate the phrases - Bayesian stochastic,
-evolutionary game simulation, L-system, recursive descent grammar, Markov chain,
-Quantum::Whatever...
+procedure can be used to generate the phrases - Bayesian, stochastic,
+evolutionary, game simulation, L-system, recursive descent grammar, Markov
+chain...
 
 Note that B<you>, the programmer (and de facto drummer), should know what the
 kit elements are named and what the patterns do.  For these things, "Use The
 Source, Luke."  Also, check out the included style sub-classes, the F<eg/*>
 files (and the F<*.mid> files they produce).
 
-The default drum kit is the B<exciting>, General MIDI Kit.  Fortunately, you can
-import the F<.mid> file into your DAW with auto-separated tracks of "virtual
-instruments."  But using the C<-patch> parameter, you can change drum kits (to
-brushes or TR-808 for instance) and also have various extended MIDI voices
-available.
+The default drum kit is the B<exciting> General MIDI Kit.  Fortunately, you can
+import the F<.mid> file into your DAW and reassign better patches.  Using the
+C<-patch> parameter, you can change drum kits (to brushes or TR-808 for
+instance) and also have various extended MIDI voices available.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
   my $d = MIDI::Simple::Drummer->new(%arguments);
 
@@ -713,10 +713,9 @@ Return a new C<MIDI::Simple::Drummer> instance with these default arguments:
   -patterns  => {}  # To be filled at run-time
   -score     => MIDI::Simple->new_score
 
-These arguments can all be overridden in the constuctor or accessors of the same
-name.
+These arguments can all be overridden in the constuctor with accessors.
 
-=head2 volume(), pan(), pan_width(), bpm()
+=head2 volume, pan, pan_width, bpm
 
   $x = $d->method;
   $d->method($x);
@@ -726,7 +725,7 @@ Return and set the volume, pan, pan_width and beats-per-minute methods.
 MIDI pan (C<CC#10>) goes from F<1> left to F<127> right.  That puts the middle
 at F<63>.
 
-=head2 phrases(), bars(), beats(), divisions()
+=head2 phrases, bars, beats, divisions
 
 B<phrases> is the number of bars (or measures) you want to play.
 
@@ -743,42 +742,41 @@ signature; the part of the measure that "gets the beat" or simply, "the pulse."
 These are all variables that you can use as rhythm metrics to control the groove.
 They are just numbers, not objects or lists.
 
-=head2 signature()
+=head2 signature
 
-Get or set the string ratio of B<-beats> over B<-divisions>.  By default this is
-not defined, allowing unbridled free-form expression.
+Get or set the string ratio of B<-beats> over B<-divisions>.
 
-=head2 div_name()
+=head2 div_name
 
 The name of the denominator of the time signature.
 
-=head2 patch()
+=head2 patch
 
 The drum kit.
 
 1: Standard. 33: Jazz. 41: Brushes. Etc.
 
-=head2 channel()
+=head2 channel
 
 Get or set the MIDI channel.
 
-=head2 chorus(), reverb()
+=head2 chorus, reverb
 
 Effects 0 (off) to 127 (full)
 
-=head2 file()
+=head2 file
 
 Get or set the name for the F<.mid> file to write.
 
-=head2 sync_tracks()
+=head2 sync_tracks
 
 Combine beats in parallel with an argument list of anonymous subroutines.
 
-=head2 patterns()
+=head2 patterns
 
 Return or set known style patterns.
 
-=head2 score()
+=head2 score
 
   $x = $d->score;
   $x = $d->score($score);
@@ -788,24 +786,24 @@ Return or set known style patterns.
 Return or set the L<MIDI::Simple/score> if provided as the first argument.  If
 there are any other arguments, they are treated as MIDI score settings.
 
-=head2 accent_note()
+=head2 accent_note
 
   $x = $d->accent_note($d->EIGHTH);
 
 Accent a single note.
 
-=head2 accent()
+=head2 accent
 
-  $x = $d->accent();
+  $x = $d->accent;
 
 Either return the current volume plus the accent increment or set the accent
 increment.  This has an upper limit of MIDI fff.
 
-=head2 duck()
+=head2 duck
 
 This is the mirror opposite of the C<accent> method.
 
-=head2 strike()
+=head2 strike
 
   $x = $d->strike;
   $x = $d->strike('Cowbell');
@@ -816,7 +814,7 @@ Return note values for percussion names from the standard MIDI percussion set
 (with L<MIDI/notenum2percussion>) in either scalar or list context. (Default
 predefined snare patch)
 
-=head2 option_strike()
+=head2 option_strike
 
   $x = $d->option_strike;
   $x = $d->option_strike('Short Guiro','Short Whistle','Vibraslap');
@@ -824,28 +822,28 @@ predefined snare patch)
 Return a note value from a list of patches (default predefined crash cymbals).
 If another set of patches is given, one of those is chosen at random.
 
-=head2 note()
+=head2 note
 
   $d->note($d->SIXTEENTH, $d->snare);
-  $d->note('sn', 'n38');
+  $d->note('sn', 'n38'); # Same
 
 Add a note to the score.  This is a pass-through to L<MIDI::Simple/n>.
 
-=head2 rest()
+=head2 rest
 
   $d->rest($d->SIXTEENTH);
-  $d->rest('sn');
+  $d->rest('sn'); # Same
 
 Add a rest to the score.  This is a pass-through to L<MIDI::Simple/r>.
 
-=head2 metronome()
+=head2 metronome
 
   $d->metronome;
   $d->metronome('Mute Triangle');
 
 Add (beats * phrases) of the C<Pedal Hi-Hat>, unless another patch is provided.
 
-=head2 count_in()
+=head2 count_in
 
   $d->count_in;
   $d->count_in(2);
@@ -855,7 +853,7 @@ And a-one and a-two!E<lt>E<sol>Lawrence WelkE<gt> ..11E<lt>E<sol>FZE<gt>
 
 If No arguments are provided, the C<Closed Hi-Hat> patch is used.
 
-=head2 rotate()
+=head2 rotate
 
   $x = $d->rotate;
   $x = $d->rotate(3);
@@ -864,7 +862,7 @@ If No arguments are provided, the C<Closed Hi-Hat> patch is used.
 Rotate through a list of patches according to the given beat number.  (Default
 backbeat patches)
 
-=head2 backbeat_rhythm()
+=head2 backbeat_rhythm
 
   $x = $d->backbeat_rhythm;
   $x = $d->backbeat_rhythm(-beat => $y);
@@ -878,12 +876,16 @@ Add a rotating backbeat to the score.
 Arguments:
 
 B<beat> is the beat we are on.
+
 B<backbeat> is the list of patches to use instead of the stock bass and snare.
+
 B<patches> is a list of possible patches to use instead of the crash cymbals.
+
 B<tick> is the patch to use instead of the closed hi-hat.
+
 B<fill> is the fill pattern we last played.
 
-=head2 beat()
+=head2 beat
 
   $x = $d->beat;
   $x = $d->beat(-name => $n);
@@ -906,11 +908,11 @@ C<-last>, or if there is no given pattern to play, another is chosen.
 
 For C<-type =E<gt> 'fill'>, we append a named fill to the MIDI score.
 
-=head2 fill()
+=head2 fill
 
 This is an alias to C<beat(-type =E<gt> 'fill')>.
 
-=head2 patterns()
+=head2 patterns
 
   $x = $d->patterns;
   $x = $d->patterns('rock_1');
@@ -922,7 +924,7 @@ This is an alias to C<beat(-type =E<gt> 'fill')>.
 Return or set the code references to the named patterns.  If no argument is
 given, all the known patterns are returned.
 
-=head2 write()
+=head2 write
 
   $x = $d->write;
   $x = $d->write('Buddy-Rich.mid');
@@ -933,7 +935,7 @@ successful.  If no filename is given, we use the preset C<-file> attribute.
 
 =head1 KIT ACCESS
 
-=head2 kit()
+=head2 kit
 
   $x = $d->kit;
   $x = $d->kit('snare');
@@ -943,14 +945,14 @@ successful.  If no filename is given, we use the preset C<-file> attribute.
 
 Return or set part or all of the percussion set.
 
-=head2 name_of()
+=head2 name_of
 
   $x = $d->name_of('kick'); # "Acoustic Bass Drum"
   @x = $d->name_of('crash'); # ('Chinese Cymbal', 'Crash Cymbal 1...)
 
 Return the instrument names behind the kit nick-name lists.
 
-=head2 hhat()
+=head2 hhat
 
     $x = $d->hhat;
     $x = $d->hhat('Cabasa','Maracas','Claves');
@@ -958,7 +960,7 @@ Return the instrument names behind the kit nick-name lists.
 Strike or set the "hhat" patches.  By default, these are the C<Closed Hi-Hat>,
 C<Open Hi-Hat> and the C<Pedal Hi-Hat.>
 
-=head2 crash()
+=head2 crash
 
     $x = $d->crash;
     $x = $d->crash(@crashes);
@@ -966,7 +968,7 @@ C<Open Hi-Hat> and the C<Pedal Hi-Hat.>
 Strike or set the "crash" patches.  By default, these are the C<Chinese Cymbal>,
 C<Crash Cymbal 1>, C<Crash Cymbal 2> and the C<Splash Cymbal.>
 
-=head2 ride()
+=head2 ride
 
     $x = $d->ride;
     $x = $d->ride(@rides);
@@ -974,7 +976,7 @@ C<Crash Cymbal 1>, C<Crash Cymbal 2> and the C<Splash Cymbal.>
 Strike or set the "ride" patches.  By default, these are the C<Ride Bell>,
 C<Ride Cymbal 1> and the C<Ride Cymbal 2.>
 
-=head2 tom()
+=head2 tom
 
     $x = $d->tom;
     $x = $d->tom('Low Conga','Mute Hi Conga','Open Hi Conga');
@@ -982,28 +984,28 @@ C<Ride Cymbal 1> and the C<Ride Cymbal 2.>
 Strike or set the "tom" patches.  By default, these are the C<High Tom>,
 C<Hi-Mid Tom>, etc.
 
-=head2 kick()
+=head2 kick
 
     $x = $d->kick;
     $x = $d->kick('Bass Drum 1');
 
 Strike or set the "kick" patch.  By default, this is the C<Acoustic Bass Drum>.
 
-=head2 tick()
+=head2 tick
 
     $x = $d->tick;
     $x = $d->tick('Mute Triangle');
 
 Strike or set the "tick" patch.  By default, this is the C<Closed Hi-Hat>.
 
-=head2 snare()
+=head2 snare
 
     $x = $d->snare;
     $x = $d->snare('Electric Snare');
 
 Strike or set the "snare" patches.  By default, this is the C<Acoustic Snare.>
 
-=head2 backbeat()
+=head2 backbeat
 
     $x = $d->backbeat;
     $x = $d->backbeat('Bass Drum 1','Side Stick');
@@ -1048,20 +1050,20 @@ Return C<'yn'>.
 
 Return C<'xn'>.
 
-=head2 _p2n()
+=head2 _p2n
 
 Return C<%MIDI::percussion2notenum> a la L<MIDI/GOODIES>.
 
-=head2 _n2p()
+=head2 _n2p
 
 Return the inverse: C<%MIDI::notenum2percussion>.
 
-=head2 _default_patterns()
+=head2 _default_patterns
 
 Patterns provided by default. This is C<{}>, that is, nothing.  This is defined
 in a I<MIDI::Simple::Drummer::*> style package.
 
-=head2 _default_kit()
+=head2 _default_kit
 
 Kit provided by default. This is a subset of the B<exciting> general MIDI kit.
 This can also be defined in a I<MIDI::Simple::Drummer::*> style package, to use
@@ -1069,38 +1071,35 @@ better patches.
 
 =head1 SEE ALSO
 
-The F<eg/*> and F<t/*> files, that come with this distribution show
-how to use it.
+The F<eg/*> and F<t/*> files, that come with this distribution
 
-The I<MIDI::Simple::Drummer::*> styles, which you can make (and upload).
+The I<MIDI::Simple::Drummer::*> styles
 
-L<MIDI::Simple> itself, of course.
+L<MIDI::Simple> itself
+
+L<Music::Duration>
+
+L<MIDI::Drummer::Tiny> - A Moo-based simplified drum module
 
 L<https://en.wikipedia.org/wiki/General_MIDI#Percussion>
 
-L<http://maps.google.com/maps?q=mike+avery+joplin> - my drum teacher.
-
-This distribution at
-L<https://github.com/ology/Music/tree/master/MIDI-Simple-Drummer>,
-where interim changes are made, long before any CPAN release.
-
 =head1 TO DO
 
-* Be smart about swing timing (e.g. $d->TRIPLET_XXXX).
+Be smart about swing timing (e.g. $d->TRIPLET_XXXX).
 
-* Handle double and half time (via DIVISION hashref).
+Handle double and half time (via DIVISION hashref).
 
-* Use "relative rhythm metrics" if given a time signature.
+Use "relative rhythm metrics" if given a time signature.
 
-* Use L<MIDI::Score/quantize>?
+Use L<MIDI::Score/quantize>?
 
-* Keep a running clock/total to know where we are in time, at all times.
+Keep a running clock/total to know where we are in time, at all times.
 
-* Intelligently modulate dynamics to add nuance and "humanize."
+Intelligently modulate dynamics to add nuance and "humanize."
 
-* Make a C<MIDI::Simple::Drummer::AC\x{26A1}DC> (Phil Rudd) style.
+Make a C<MIDI::Simple::Drummer::AC\x{26A1}DC> (Phil Rudd) style.
 
-* Leverage L<MIDI::Tab/from_drum_tab> or L<MIDI::Simple/read_score>?
+Leverage L<MIDI::Tab/from_drum_tab> or L<MIDI::Simple/read_score>?
 
 =head1 CREDITS
 
@@ -1118,7 +1117,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -47,12 +47,13 @@
             "Term::ReadKey" : "0",
             "Text::Wrap" : "0",
             "Tie::Handle" : "0",
-            "base" : "0"
+            "base" : "0",
+            "perl" : "5.008000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.01",
+   "version" : "1.02",
    "x_runtime" : {
       "recommends" : {}
    },

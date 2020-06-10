@@ -2,13 +2,14 @@ package Wasm::Wasmtime::ImportType;
 
 use strict;
 use warnings;
+use 5.008004;
 use Carp ();
 use Ref::Util qw( is_blessed_ref );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ExternType;
 
 # ABSTRACT: Wasmtime import type class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_importtype_';
@@ -95,7 +96,7 @@ Wasm::Wasmtime::ImportType - Wasmtime import type class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

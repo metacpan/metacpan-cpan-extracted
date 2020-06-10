@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.4.4
+## Version v0.4.5
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2017/07/19
-## Modified 2020/05/22
+## Modified 2020/06/08
 ## 
 ##----------------------------------------------------------------------------
 package DB::Object::Query;
@@ -16,7 +16,7 @@ BEGIN
     use Scalar::Util ();
     use Devel::Confess;
     our( $VERSION, $DEBUG, $VERBOSE );
-    $VERSION = 'v0.4.4';
+    $VERSION = 'v0.4.5';
     $DEBUG = 0;
     $VERBOSE = 0;
 };
@@ -1744,12 +1744,14 @@ sub _where_having
                     ## This is an already formulated clause
                     elsif( $self->_is_object( $arg[0] ) && $arg[0]->isa( 'DB::Object::Query::Clause' ) )
                     {
+                        ## $self->message( 3, "First element is an DB::Object::Query::Clause object." );
                         push( @list, shift( @arg ) );
                         next;
                     }
                     ## Case where there is a litteral query component, e.g. "LENGTH(lang) = 2" and the number of arguments is odd which means there is no second argument such as: ->where( "LENGTH(lang) = 2", $tbl->fo->user_id => "something );
-                    elsif( @_ % 2 && !ref( $arg[0] ) )
+                    elsif( ( scalar( @arg ) % 2 ) && !ref( $arg[0] ) )
                     {
+                        ## $self->message( 3, "Number of element is odd and first one is not a reference." );
                         push( @list, $self->new_clause({ value => shift( @arg ), type => 'where' }) );
                         next;
                     }
@@ -2121,7 +2123,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-This is version v0.4.4
+This is version v0.4.5
 
 =head1 DESCRIPTION
 
@@ -2147,4 +2149,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

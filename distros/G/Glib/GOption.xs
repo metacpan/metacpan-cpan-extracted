@@ -48,8 +48,10 @@ no_copy_for_you (gpointer boxed)
 static void
 gperl_option_group_free (GOptionGroup *group)
 {
+        G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 	if (!g_hash_table_lookup (transferred_groups, group))
 		g_option_group_free (group);
+        G_GNUC_END_IGNORE_DEPRECATIONS
 }
 
 GType

@@ -73,10 +73,10 @@ default, and set `LANG` environment as `ja_JP`.
     LOCALE:   --ja_JP  (raw)
               --ja-JP  (dash)
               --jaJP   (long)
-              --jajp   (lclong)
+              --jajp   (long_lc)
     LANGUAGE: --ja     (lang)
     COUNTRY:  --JP     (country)
-              --jp     (country)
+              --jp     (country_lc)
 
 Short language option (`--ja`) is defined in the alphabetical order
 of the country code, so the option `--en` is assigned to `en_AU`.
@@ -101,16 +101,17 @@ module declaration.
 - **raw**
 - **dash**
 - **long**
-- **lclong**
+- **long\_lc**
 - **lang**
 - **country**
+- **country\_lc**
 
     These parameter tells which option is defined.  All options are
     enabled by default.  You can disable country option like this:
 
-        command -Mi18n::setopt(country=0)
+        command -Mi18n::setopt(country=0,country_lc=0)
 
-        command -Mi18n::setopt=country=0
+        command -Mi18n::setopt=country=0,country_lc=0
 
 - **verbose**
 

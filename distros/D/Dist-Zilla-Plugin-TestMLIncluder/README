@@ -5,7 +5,7 @@ NAME
 VERSION
 
     This document describes Dist::Zilla::Plugin::TestMLIncluder version
-    0.18.
+    0.19.
 
 SYNOPSIS
 
@@ -41,7 +41,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright 2018. Ingy döt Net.
+    Copyright 2014-2020. Ingy döt Net.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

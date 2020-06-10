@@ -43,19 +43,19 @@ else {
   if (my $r = $data->{requires}) {
     while (my ($key, $value) = (each %$r)) {
       push @{$data->{RequiredModules}},
-        $key . ($value eq '0' ? '' : "~$value");
+        $key . ($key ne 'perl' and $value eq '0' ? '' : "~$value");
     }
   }
   if (my $r = $data->{test}{requires}) {
     while (my ($key, $value) = (each %$r)) {
       push @{$data->{RequiredModules}},
-        $key . ($value eq '0' ? '' : "~$value");
+        $key . ($key ne 'perl' and $value eq '0' ? '' : "~$value");
     }
   }
   if (my $r = $data->{recommends}) {
     while (my ($key, $value) = (each %$r)) {
       push @{$data->{RequiredModules}},
-        $key . ($value eq '0' ? '' : "~$value");
+        $key . ($key ne 'perl' and $value eq '0' ? '' : "~$value");
     }
   }
   ($data->{namepath} = $data->{libname} || $data->{name})

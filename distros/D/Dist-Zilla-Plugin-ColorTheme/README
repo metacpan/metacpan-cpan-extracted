@@ -1,0 +1,59 @@
+NAME
+    Dist::Zilla::Plugin::ColorTheme - Plugin to use when building
+    distribution that has ColorTheme modules
+
+VERSION
+    This document describes version 0.001 of Dist::Zilla::Plugin::ColorTheme
+    (from Perl distribution Dist-Zilla-Plugin-ColorTheme), released on
+    2020-06-08.
+
+SYNOPSIS
+    In dist.ini:
+
+     [ColorTheme]
+
+DESCRIPTION
+    This plugin is to be used when building distribution that has ColorTheme
+    modules.
+
+    It does the following to every "ColorThemes/*" .pm file:
+
+    *
+
+    It does the following to every "ColorTheme/*" .pm file:
+
+    *   Set module abstract from the color theme structure (%THEME)'s
+        summary
+
+CONFIGURATION
+  exclude_module
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-ColorTheme>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-ColorTheme>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Col
+    orTheme>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Pod::Weaver::Plugin::ColorTheme
+
+    ColorTheme
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

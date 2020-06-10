@@ -1,0 +1,74 @@
+NAME
+    Module::Load::Util - Some utility routines related to module loading
+
+VERSION
+    This document describes version 0.001 of Module::Load::Util (from Perl
+    distribution Module-Load-Util), released on 2020-06-09.
+
+SYNOPSIS
+DESCRIPTION
+FUNCTIONS
+  load_module_with_optional_args
+    Usage:
+
+     load_module_with_optional_args( [ \%opts , ] $module_with_optional_args );
+
+    Examples:
+
+     load_module_with_optional_args("Color::RGB::Util");                # default imports, equivalent to runtime version of 'use Color::RGB::Util'
+     load_module_with_optional_args({import=>0}, "Color::RGB::Util");   # do not import,   equivalent to runtime version of 'use Color::RGB::Util ()'
+     load_module_with_optional_args("Color::RGB::Util=rgb2hsv");        # imports rgb2hsv. equivalent to runtime version of 'use Color::RGB::Util qw(rgb2hsv)'
+     load_module_with_optional_args({ns_prefix=>"Color"}, "RGB::Util"); # equivalent to loading Color::RGB::Util
+
+    Known options:
+
+    *   import
+
+        Bool. Defaults to true.
+
+        = item * ns_prefix
+
+  instantiate_class_with_optional_args
+    Usage:
+
+     instantiate_class_with_optional_args( [ \%opts , ] $class_with_optional_args );
+
+    Examples:
+
+     my $obj = instantiate_class_with_optional_args("WordList::Color::Any");                           # equivalent to: require WordList::Color::Any; WordList::Color::Any->new;
+     my $obj = instantiate_class_with_optional_args("WordList::Color::Any=theme,Foo");                 # equivalent to: require WordList::Color::Any; WordList::Color::Any->new(theme=>"Foo");
+     my $obj = instantiate_class_with_optional_args({ns_prefix=>"WordList"}, "Color::Any=theme,Foo");  # equivalent to: require WordList::Color::Any; WordList::Color::Any->new(theme=>"Foo");
+
+    This is like "load_module_with_optional_args" but the arguments
+    specified after "=" will be passed to the class constructor instead of
+    used as import arguments.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Load-Util>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Load-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Load-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::Load
+
+    Class::Load
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

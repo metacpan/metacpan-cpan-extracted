@@ -3,13 +3,13 @@ use strict;
 use warnings;
 use Amazon::PAApi5::Payload;
 use Amazon::PAApi5::Signature;
-use HTTP::Headers;
+use HTTP::Request::Common;
 use LWP::UserAgent;
 use Data::Dumper;
 
-my $PARTNER_TAG = 'YOUR_ASSOCIATE_PARTNER_TAG-22';
-my $ACCESS_KEY = 'YOUR_ACCESS_KEY';
-my $SECRET_KEY = 'YOUR_SECRET_KEY';
+my $PARTNER_TAG = $ENV{AMAZON_PARTNER_TAG};
+my $ACCESS_KEY = $ENV{AMAZON_ACCESS_KEY};
+my $SECRET_KEY = $ENV{AMAZON_SECRET_KEY};
 
 {
     my $payload = Amazon::PAApi5::Payload->new(
@@ -24,16 +24,14 @@ my $SECRET_KEY = 'YOUR_SECRET_KEY';
         $SECRET_KEY,
         $payload,
         {
-            resource_path => '/paapi5/getbrowsenodes',,
-            operation     => 'GetBrowseNodes',
+            operation => 'GetBrowseNodes',
         },
     );
 
-    my $ua = LWP::UserAgent->new(
-        default_headers => HTTP::Headers->new($sig->headers),
-    );
+    my $ua = LWP::UserAgent->new;
 
-    my $res = $ua->post($sig->req_url, Content => $sig->payload);
+    my $req = POST $sig->req_url, $sig->headers, Content => $sig->payload;
+    my $res = $ua->request($req);
 
     warn Dumper($res->status_line, $res->content);
 }

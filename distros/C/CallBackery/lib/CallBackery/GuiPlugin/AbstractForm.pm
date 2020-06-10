@@ -158,7 +158,7 @@ sub processData {
         }
         $handler = $self->actionCfgMap->{$args->{key}}{handler};
         if (ref $handler eq 'CODE'){
-            $self->log->warn("Using handler properties in actionCfg is deprecated. User actionHandler instead.");
+            $self->log->warn("Using handler properties in actionCfg is deprecated. Use actionHandler instead.");
             return $handler->($formData);
         }
         $self->log->error('Plugin instance '.$self->name." action $args->{key} has a broken handler");

@@ -5,9 +5,7 @@ use Test::More;
 
 BEGIN { use_ok('MIDI::Simple::Drummer::Jazz') }
 
-my $d = eval { MIDI::Simple::Drummer::Jazz->new };
-isa_ok $d, 'MIDI::Simple::Drummer::Jazz';
-ok !$@, 'created with no arguments';
+my $d = new_ok 'MIDI::Simple::Drummer::Jazz';
 
 my $x = $d->patterns(0);
 is $x, undef, 'get unknown pattern is undef';

@@ -2,6 +2,7 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
+    'MIN_PERL_VERSION'  => 5.8.0,
     'NAME'              => 'IO::Pager',
     'VERSION_FROM'      => 'lib/IO/Pager.pm', # finds $VERSION
     'BUILD_REQUIRES'    => {

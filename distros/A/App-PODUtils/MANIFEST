@@ -13,6 +13,7 @@ script/elide-pod
 script/extract-links-in-pod
 script/poddump
 script/podless
+script/podstrip
 script/podxlinks
 script/reverse-pod-headings
 script/sort-pod-headings

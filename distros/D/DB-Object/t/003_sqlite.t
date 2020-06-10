@@ -57,7 +57,7 @@ SKIP:
 	my $date = $dt->ymd( '-' );
 	is( $sql->_curdate, "$date", "Checking curdate()" );
 	my $time = $dt->hms( ':' );
-	is( $sql->_curtime, "$time", "Checking curtime()" );
+	like( $sql->_curtime, qr/\d{2}\:\d{2}\:\d{2}/, "Checking curtime()" );
 	is( $sql->_dayname( "$dt" ), $dt->day_name, "Checking dayname()" );
 	is( $sql->_dayofmonth( "$dt" ), $dt->day, "Checking dayofmonth()" );
 	is( $sql->_dayofweek( "$dt" ), $dt->day_of_week, "Checking dayofweek()" );

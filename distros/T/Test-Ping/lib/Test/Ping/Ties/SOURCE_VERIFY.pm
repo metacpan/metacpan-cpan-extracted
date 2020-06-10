@@ -1,8 +1,8 @@
 package Test::Ping::Ties::SOURCE_VERIFY;
-$Test::Ping::Ties::SOURCE_VERIFY::VERSION = '0.204';
+# ABSTRACT: Source Verify Tie variable to Test::Ping
+$Test::Ping::Ties::SOURCE_VERIFY::VERSION = '0.210';
 use strict;
 use warnings;
-# ABSTRACT: Source Verify Tie variable to Test::Ping
 
 use Net::Ping;
 use Tie::Scalar;
@@ -25,7 +25,7 @@ Test::Ping::Ties::SOURCE_VERIFY - Source Verify Tie variable to Test::Ping
 
 =head1 VERSION
 
-version 0.204
+version 0.210
 
 =head1 DESCRIPTION
 
@@ -47,7 +47,7 @@ Sawyer X
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Sawyer X.
+This software is Copyright (c) 2020 by Sawyer X.
 
 This is free software, licensed under:
 

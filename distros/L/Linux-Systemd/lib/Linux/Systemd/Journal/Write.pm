@@ -1,4 +1,4 @@
-package Linux::Systemd::Journal::Write 1.191790;
+package Linux::Systemd::Journal::Write 1.201600;
 
 # ABSTRACT: XS wrapper around sd-journal
 
@@ -135,7 +135,7 @@ Linux::Systemd::Journal::Write - XS wrapper around sd-journal
 
 =head1 VERSION
 
-version 1.191790
+version 1.201600
 
 =head1 SYNOPSIS
 
@@ -248,7 +248,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Ioan Rogers.
+This software is Copyright (c) 2020 by Ioan Rogers.
 
 This is free software, licensed under:
 

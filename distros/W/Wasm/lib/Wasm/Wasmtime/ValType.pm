@@ -2,10 +2,11 @@ package Wasm::Wasmtime::ValType;
 
 use strict;
 use warnings;
+use 5.008004;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Wasmtime value type class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_valtype_';
@@ -80,7 +81,7 @@ Wasm::Wasmtime::ValType - Wasmtime value type class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

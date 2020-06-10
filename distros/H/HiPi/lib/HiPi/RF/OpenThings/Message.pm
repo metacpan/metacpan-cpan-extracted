@@ -18,7 +18,7 @@ use HiPi::RF::OpenThings;
 use Try::Tiny;
 use JSON;
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 __PACKAGE__->create_accessors( qw(
     cryptseed

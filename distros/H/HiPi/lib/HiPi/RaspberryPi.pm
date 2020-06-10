@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
@@ -150,6 +150,7 @@ my @_alt_func_names_2711 =
 );
 
 my $_alt_function_names;
+my $_alt_function_names_version;
 
 my %_revstash = (
     'beta'      => { release => 'Q1 2012', model_name => 'Raspberry Pi Model B Revision beta', revision => 'beta', board_type => $btype1, memory => 256, manufacturer => 'Generic' },
@@ -185,6 +186,7 @@ my %_revinfostash = (
         '2' => 1024,
         '3' => 2048,
         '4' => 4096,
+        '5' => 8192,
     },
     manufacturer => {
         '0' => 'Sony UK',
@@ -261,7 +263,14 @@ my %_revinfostash = (
         '15' => 'unknown',
         '16' => 'Q1 2019',
         '17' => 'Q2 2019',
-        
+    },
+    extended_release => {
+        'a03111' => 'Q2 2019', #	4B	1.1	1GB	Sony UK
+        'b03111' => 'Q2 2019', #	4B	1.1	2GB	Sony UK
+        'b03112' => 'Q1 2020', #	4B	1.2	2GB	Sony UK
+        'c03111' => 'Q2 2019', # 	4B	1.1	4GB	Sony UK
+        'c03112' => 'Q1 2020', #	4B	1.2	4GB	Sony UK
+        'd03114' => 'Q2 2020', #	4B	1.4	8GB	Sony UK
     },
 );
 
@@ -310,6 +319,8 @@ sub memory { return $_config->{memory}; }
 sub serial_number { return $_config->{serial}; }
 
 sub get_alt_function_names { return $_alt_function_names; }
+
+sub alt_func_version { return $_alt_function_names_version; }
 
 sub board_description {
     my $description = 'Unknown board type';
@@ -389,7 +400,7 @@ sub _configure {
             # base type
             my $binfo = $_revstash{$defaultkey};
                         
-            $binfo->{release}  = $_revinfostash{release}->{$schemetype} || 'Q1 2015';
+            $binfo->{release}  = $_revinfostash{extended_release}->{$rev} || $_revinfostash{release}->{$schemetype} || 'Q1 2015';
             $binfo->{model_name} = $_revinfostash{type}->{$schemetype} || qq(Unknown Raspberry Pi Type : $schemetype);
             $binfo->{model_name} = $device_tree_boardname if $device_tree_boardname;
             $binfo->{memory}   = $_revinfostash{memsize}->{$schemesize} || 256;
@@ -426,10 +437,18 @@ sub _configure {
     $_config->{hardware} = $hardware;
     $_config->{serial}  = $serial;
     
-    $_alt_function_names = (  $_config->{processor} eq 'BCM2711' ) ? \@_alt_func_names_2711 : \@_alt_func_names_2708;
+    if($_config->{processor} eq 'BCM2711' ) {
+        $_alt_function_names = \@_alt_func_names_2711;
+        $_alt_function_names_version = 2;
+    } else {
+        $_alt_function_names = \@_alt_func_names_2708;
+        $_alt_function_names_version = 1;
+    }
     
     return;
 }
+
+
 
 sub new {
     my $class = shift;

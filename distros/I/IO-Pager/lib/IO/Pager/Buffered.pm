@@ -1,5 +1,5 @@
 package IO::Pager::Buffered;
-our $VERSION = 0.42;
+our $VERSION = 1.02;
 
 use strict;
 use base qw( IO::Pager );
@@ -46,7 +46,7 @@ sub CLOSE {
   $self->SUPER::CLOSE();
 }
 
-*DESTROY = \&CLOSE;
+{ no warnings 'once'; *DESTROY = \&CLOSE; }
 
 sub TELL {
   # Return the size of the buffer
@@ -107,14 +107,14 @@ IO::Pager subclasses are designed to programmatically decide whether
 or not to pipe a filehandle's output to a program specified in I<PAGER>;
 determined and set by IO::Pager at runtime if not yet defined.
 
-This subclass buffers all output for display until execution returns to the
-parent scope or a manual L</flush> occurs.L<*|/close> If this is not what
-you want look at another subclass such as L<IO::Pager::Unbuffered>. While
-probably not common, this may be useful in some cases, such as buffering all
-output to STDOUT while the process occurs so that warnings on STDERR are more
+This subclass buffers all output for display until execution returns to
+the parent scope or a manual flush occurs. If this is not what you want
+look at another subclass such as L<IO::Pager::Unbuffered>. While probably
+not common, this may be useful in some cases, such as buffering all output
+to STDOUT while the process occurs so that warnings on STDERR are more
 visible, then displaying the less urgent output from STDOUT after. Or,
-alternately, letting output to STDOUT slide by and defer warnings for later
-perusal.
+alternately, letting output to STDOUT slide by and defer warnings for
+later perusal.
 
 =head1 METHODS
 
@@ -124,7 +124,7 @@ Class-specific method specifics below, others are inherited from IO::Pager.
 
 Instantiate a new IO::Pager to paginate FILEHANDLE if necessary.
 I<Assign the return value to a scoped variable>. Output does not
-occur until the filehandle is L</flush>ed or L</close>d.
+occur until the filehandle is flushed or closed.
 
 =head2 new( [FILEHANDLE] )
 
@@ -135,7 +135,7 @@ back if there's no TTY to allow for IO::Pager agnostic programming.
 
 Flushes the buffer to the pager and closes the filehandle for writing.
 Normally, when using a lexically or locally scoped variable to hold the
-token supplied by L</open>, explicit calls to close are unnecessary.
+token supplied by open, explicit calls to close are unnecessary.
 However, if you are using IO::Pager::Buffered with an unlocalized STDOUT
 or STDERR you close the filehandle to display the buffered content or
 wait for global garbage cleaning upon program termination.

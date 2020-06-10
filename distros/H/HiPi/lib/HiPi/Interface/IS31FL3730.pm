@@ -18,7 +18,7 @@ use HiPi::RaspberryPi;
 use Carp;
 use Try::Tiny;
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 __PACKAGE__->create_accessors( qw( ) );
 

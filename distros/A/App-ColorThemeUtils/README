@@ -2,15 +2,15 @@ NAME
     App::ColorThemeUtils - CLI utilities related to color themes
 
 VERSION
-    This document describes version 0.002 of App::ColorThemeUtils (from Perl
-    distribution App-ColorThemeUtils), released on 2019-02-02.
+    This document describes version 0.007 of App::ColorThemeUtils (from Perl
+    distribution App-ColorThemeUtils), released on 2020-06-09.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
 
     *   list-color-theme-modules
 
-    *   list-color-themes
+    *   show-color-theme-swatch
 
 FUNCTIONS
   list_color_theme_modules
@@ -18,7 +18,7 @@ FUNCTIONS
 
      list_color_theme_modules(%args) -> [status, msg, payload, meta]
 
-    List color theme modules.
+    List ColorTheme modules.
 
     This function is not exported.
 
@@ -37,18 +37,18 @@ FUNCTIONS
 
     Return value: (any)
 
-  list_color_themes
+  show_color_theme_swatch
     Usage:
 
-     list_color_themes(%args) -> [status, msg, payload, meta]
+     show_color_theme_swatch(%args) -> [status, msg, payload, meta]
 
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
 
-    *   detail => *bool*
+    *   theme* => *perl::modname_with_optional_args*
 
-    *   module => *perl::modname*
+    *   width => *posint* (default: 80)
 
     Returns an enveloped result (an array).
 
@@ -83,7 +83,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

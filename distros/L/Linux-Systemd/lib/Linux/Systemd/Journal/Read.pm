@@ -1,4 +1,4 @@
-package Linux::Systemd::Journal::Read 1.191790;
+package Linux::Systemd::Journal::Read 1.201600;
 
 # ABSTRACT: Read from systemd journals
 
@@ -102,7 +102,7 @@ Linux::Systemd::Journal::Read - Read from systemd journals
 
 =head1 VERSION
 
-version 1.191790
+version 1.201600
 
 =head1 METHODS
 
@@ -156,7 +156,7 @@ Ioan Rogers <ioanr@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Ioan Rogers.
+This software is Copyright (c) 2020 by Ioan Rogers.
 
 This is free software, licensed under:
 

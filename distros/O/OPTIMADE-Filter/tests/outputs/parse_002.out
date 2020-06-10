@@ -12,4 +12,4 @@ $VAR1 = bless( {
 == Filter ==
 (spacegroup = "P2")
 == SQL ==
-('spacegroup' = "P2")
+'spacegroup' = "P2"

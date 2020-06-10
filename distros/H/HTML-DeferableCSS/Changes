@@ -1,5 +1,9 @@
 Revision history for HTML-DeferableCSS:
 
+v0.4.1    2020-06-08 12:48:51+01:00 Europe/London
+  [Documentation]
+  - Added note when simple attribute was added.
+
 v0.4.0    2020-05-29 23:34:41+01:00 Europe/London
   [Improvements]
   - Added simple mode option to use a simpler method without the

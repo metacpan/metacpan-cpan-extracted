@@ -1,5 +1,14 @@
 Revision history for MIDI-Simple-Drummer
 
+0.0805 2020-06-09 16:29:49
+    - Fix child module POD.
+
+0.0804 2020-06-09 16:09:55
+    - Update dist.ini directives.
+    - Improve documentation.
+    - Add the 128th duration.
+    - Cleaned-up test code.
+
 0.0803    2015-10-04 17:53:32-05:00 America/Chicago
     - Replaced the broken rock SYNOPSIS example with a working example.
 

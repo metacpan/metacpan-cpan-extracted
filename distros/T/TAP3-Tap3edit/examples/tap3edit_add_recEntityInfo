@@ -1,0 +1,39 @@
+#!/usr/bin/perl 
+#
+# Copyright (c) 2004 Javier Gutierrez <https://github.com/tap3edit/TAP3-Tap3edit>. 
+# All rights reserved. This program is free software; you can redistribute 
+# it and/or modify it under the same terms as Perl itself.
+#
+#  Adds the recEntityInfo
+#
+
+
+use TAP3::Tap3edit;
+
+
+$filename=shift;
+
+if ( ! $filename ) {
+	die "Usage: $0 tapname\n";
+}
+
+
+$tap3 = TAP3::Tap3edit->new();
+$tap3->decode($filename)  or  die $tap3->error;
+
+$new_recEntityInfo={
+          "recEntityType" => 1,
+          "recEntityId" => {
+            "mscId" => "99991111999"
+          },
+          "recEntityCode" => 11
+};
+
+
+$struct=$tap3->structure;
+
+my $element;
+
+push ( @{$struct->{'transferBatch'}->{'networkInfo'}->{'recEntityInfo'} }, $new_recEntityInfo );
+
+$tap3->encode("$filename.new");

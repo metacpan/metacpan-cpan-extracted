@@ -1,5 +1,23 @@
 Revision history for Ryu
 
+2.001     2020-06-09 01:35:39+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - basic ->read_packed support in Ryu::Buffer
+
+2.000     2020-06-09 00:37:33+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - Ryu::Buffer was previously an empty class, should now be doing something useful
+    - ->as_queue to get a Future::Queue instance from a Ryu::Source
+    - ->as_buffer to get a Ryu::Buffer instance from a Ryu::Source
+
+    Deprecations:
+
+    - Ryu::Exception ->future is no longer supported, should be ->as_future instead
+
+    Since there's a deprecated feature, this is a major version release.
+
 1.012     2020-03-22 13:35:42+08:00 Asia/Kuala_Lumpur
     New features:
 

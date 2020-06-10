@@ -4,13 +4,14 @@ package JSON::Schema::Draft201909::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use feature 'current_sub';
 use Mojo::URL;
 use Carp 'croak';
 use JSON::MaybeXS 1.004001 'is_bool';
+use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
 use List::Util 1.29 'pairs';
 use Moo;
 use MooX::TypeTiny;
@@ -36,7 +37,7 @@ has resource_index => (
   is => 'bare',
   isa => HashRef[Dict[
       canonical_uri => InstanceOf['Mojo::URL'], # always fragmentless
-      path => Str,  # always a json pointer
+      path => Str,  # always a json pointer, relative to the document root
     ]],
   handles_via => 'Hash',
   handles => {
@@ -77,9 +78,9 @@ sub BUILD {
 
   my $original_uri = $self->canonical_uri->clone;
   my $schema = $self->data;
-  my %identifiers = _traverse_for_identifiers($schema, $original_uri);
+  my %identifiers = _traverse_for_identifiers($schema, '', $original_uri->clone);
 
-  if (ref $self->schema eq 'HASH' and my $id = $self->get('/$id')) {
+  if (is_plain_hashref($self->schema) and my $id = $self->get('/$id')) {
     $self->_set_canonical_uri(Mojo::URL->new($id)) if $id ne $self->canonical_uri;
   }
 
@@ -92,74 +93,44 @@ sub BUILD {
 }
 
 sub _traverse_for_identifiers {
-  my ($data, $canonical_uri) = @_;
-  my $uri_fragment = $canonical_uri->fragment // '';
+  my ($data, $path, $canonical_uri) = @_;
   my %identifiers;
-  if (ref $data eq 'ARRAY') {
+  if (is_plain_arrayref($data)) {
     return map
-      __SUB__->($data->[$_], $canonical_uri->clone->fragment($uri_fragment.'/'.$_)),
+      __SUB__->($data->[$_], jsonp($path, $_),
+        $canonical_uri->clone->fragment($canonical_uri->fragment.'/'.$_)),
       0 .. $#{$data};
   }
-  elsif (ref $data eq 'HASH') {
-    if (exists $data->{'$id'} and _is_type(undef, 'string', $data->{'$id'})) {
-      $canonical_uri = Mojo::URL->new($data->{'$id'})->base($canonical_uri)->to_abs;
-      # this might not be a real $id... wait for it to be encountered at runtime before dying
-      if (not length $canonical_uri->fragment) {
+  elsif (is_plain_hashref($data)) {
+    if (exists $data->{'$id'} and not is_ref($data->{'$id'})) {
+      my $uri = Mojo::URL->new($data->{'$id'});
+      if (not length $uri->fragment) {
+        $canonical_uri = $uri->base($canonical_uri)->to_abs;
         $canonical_uri->fragment(undef);
-        $identifiers{$canonical_uri} = { path => $uri_fragment, canonical_uri => $canonical_uri };
-      };
+        $identifiers{$canonical_uri} = { path => $path, canonical_uri => $canonical_uri->clone };
+      }
     }
-    if (exists $data->{'$anchor'} and _is_type(undef, 'string', $data->{'$anchor'})) {
-      # we cannot change the canonical uri, or we won't be able to properly identify
-      # paths within this resource
+    if (exists $data->{'$anchor'} and not is_ref($data->{'$anchor'})
+        and $data->{'$anchor'} =~ /^[A-Za-z][A-Za-z0-9_:.-]+$/) {
       my $uri = Mojo::URL->new->base($canonical_uri)->to_abs->fragment($data->{'$anchor'});
-      $identifiers{$uri} = { path => $uri_fragment, canonical_uri => $canonical_uri };
+      $identifiers{$uri} = { path => $path, canonical_uri => $canonical_uri->clone };
     }
 
     return
       %identifiers,
-      map __SUB__->($data->{$_}, $canonical_uri->clone->fragment($uri_fragment.'/'.$_)), keys %$data;
+      map
+        __SUB__->($data->{$_}, jsonp($path, $_),
+          $canonical_uri->clone->fragment(jsonp($canonical_uri->fragment, $_))),
+        keys %$data;
   }
 
   return ();
 }
 
-# copied from JSON::Schema::Draft201909 (ugh)
-sub _is_type {
-  my (undef, $type, $value) = @_;
-
-  if ($type eq 'null') {
-    return !(defined $value);
-  }
-  if ($type eq 'boolean') {
-    return is_bool($value);
-  }
-  if ($type eq 'object') {
-    return ref $value eq 'HASH';
-  }
-  if ($type eq 'array') {
-    return ref $value eq 'ARRAY';
-  }
-
-  if ($type eq 'string' or $type eq 'number' or $type eq 'integer') {
-    return 0 if not defined $value or ref $value;
-    my $flags = B::svref_2object(\$value)->FLAGS;
-
-    if ($type eq 'string') {
-      return $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
-    }
-
-    if ($type eq 'number') {
-      return !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
-    }
-
-    if ($type eq 'integer') {
-      return !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK))
-        && int($value) == $value;
-    }
-  }
-
-  croak sprintf('unknown type "%s"', $type);
+# shorthand for creating and appending json pointers
+use namespace::clean 'jsonp';
+sub jsonp {
+  return join('/', (shift // ''), map s/~/~0/gr =~ s!/!~1!gr, @_);
 }
 
 1;
@@ -178,7 +149,7 @@ JSON::Schema::Draft201909::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

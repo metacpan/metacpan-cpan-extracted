@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/PODUtils.pm','script/dump-pod-structure','script/elide-pod','script/extract-links-in-pod','script/poddump','script/podless','script/podxlinks','script/reverse-pod-headings','script/sort-pod-headings'];
+my $filenames = ['lib/App/PODUtils.pm','script/dump-pod-structure','script/elide-pod','script/extract-links-in-pod','script/poddump','script/podless','script/podstrip','script/podxlinks','script/reverse-pod-headings','script/sort-pod-headings'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

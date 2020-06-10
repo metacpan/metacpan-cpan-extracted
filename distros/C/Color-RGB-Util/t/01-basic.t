@@ -11,6 +11,10 @@ use Color::RGB::Util qw(
                            assign_rgb_color
                            assign_rgb_dark_color
                            assign_rgb_light_color
+                           hsl2hsv
+                           hsl2rgb
+                           hsv2hsl
+                           hsv2rgb
                            int2rgb
                            mix_2_rgb_colors
                            mix_rgb_colors
@@ -30,6 +34,17 @@ use Color::RGB::Util qw(
                            tint_rgb_color
                    );
 
+subtest _wrap_h => sub {
+    is(Color::RGB::Util::_wrap_h(0), 0);
+    is(Color::RGB::Util::_wrap_h(1), 1);
+    is(Color::RGB::Util::_wrap_h(-10), 350);
+    is(Color::RGB::Util::_wrap_h(360), 360);
+    is(Color::RGB::Util::_wrap_h(370), 10);
+    is(Color::RGB::Util::_wrap_h(730), 10);
+    is(Color::RGB::Util::_wrap_h(-360), 0);
+    is(Color::RGB::Util::_wrap_h(-370), 350);
+};
+
 subtest assign_rgb_color => sub {
     is(assign_rgb_color(""),    "da5509");
     is(assign_rgb_color("foo"), "0b5d33");
@@ -46,6 +61,44 @@ subtest assign_rgb_light_color => sub {
     is(assign_rgb_light_color(""),    "ecaa84");
     is(assign_rgb_light_color("foo"), "85ae99");
     is(assign_rgb_light_color("baz"), "bb40a2");
+};
+
+subtest hsl2hsv => sub {
+    is(hsl2hsv("0 1 0.5"), "0 1 1"); # red ff0000
+    is(hsl2hsv("120 1 0.5"), "120 1 1"); # green 00ff00
+    is(hsl2hsv("120 1 0.751"), "120 0.498 1"); # light green 80ff80
+    is(hsl2hsv("240 1 0.251"), "240 1 0.502"); # dark blue 000080
+
+    # test wrapping of h
+    is(hsl2hsv("720 1 0.5"), "0 1 1"); # red ff0000
+};
+
+subtest hsv2hsl => sub {
+    is(hsv2hsl("0 1 1"), "0 1 0.5"); # red ff0000
+    is(hsv2hsl("120 1 1"), "120 1 0.5"); # green 00ff00
+    is(hsv2hsl("120 0.498 1"), "120 1 0.751"); # light green 80ff80
+    is(hsv2hsl("240 1 0.502"), "240 1 0.251"); # dark blue 000080
+
+    # test wrapping of h
+    is(hsv2hsl("720 1 1"), "0 1 0.5"); # red ff0000
+};
+
+subtest hsv2rgb => sub {
+    is(hsv2rgb("0 1 1"), "ff0000");
+    is(hsv2rgb("120 0.498 1"), "80ff80");
+    is(hsv2rgb("240 1 0.502"), "000080");
+
+    # test wrapping of h
+    is(hsv2rgb("720 1 1"), "ff0000");
+};
+
+subtest hsl2rgb => sub {
+    is(hsl2rgb("0 1 0.5"), "ff0000");
+    is(hsl2rgb("120 1 0.751"), "80ff80");
+    is(hsl2rgb("240 1 0.251"), "000080");
+
+    # test wrapping of h
+    is(hsl2rgb("720 1 0.5"), "ff0000");
 };
 
 subtest int2rgb => sub {

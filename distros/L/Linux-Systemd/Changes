@@ -1,5 +1,9 @@
 Changelog for Linux-Systemd
 
+1.201600 2020-06-08T05:59:06Z
+ - [Closes #4] Fix test failure from mixing `no_plan` and `done_testing`
+ - Repo migrated to Gitlab
+
 1.191790 2019-06-28T16:27:06Z
  - [really closes #3] don't use Try::Tiny
 

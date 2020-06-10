@@ -37,6 +37,7 @@ use Amazon::PAApi5::Signature;
     isa_ok $sig, 'Amazon::PAApi5::Signature';
 
     is $sig->req_url, 'https://webservices.amazon.com/paapi5/searchitems';
+    is $sig->resource_path, '/paapi5/searchitems';
 
     my $auth = $sig->headers_as_hashref->{Authorization};
     like $auth, qr/^AWS4-HMAC-SHA256 Credential=ACCESSKEY\//;
@@ -47,6 +48,23 @@ use Amazon::PAApi5::Signature;
     is $to_req->{uri}, $sig->req_url;
     like $to_req->{headers}{Authorization}, qr/^AWS4-HMAC-SHA256 Credential=ACCESSKEY\//;
     like $to_req->{content}, qr/^\{.+\}$/;
+}
+
+{
+    my $sig = Amazon::PAApi5::Signature->new(
+        'ACCESSKEY',
+        'SECRETKEY',
+        Amazon::PAApi5::Payload->new(
+            'test-example-22',
+        )->to_json({
+            Keywords => 'Perl',
+        }),
+        {
+            resource_path => '/paapi5/specific',
+        }
+    );
+
+    is $sig->resource_path, '/paapi5/specific';
 }
 
 done_testing;

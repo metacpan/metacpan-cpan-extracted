@@ -1,0 +1,45 @@
+#!/usr/bin/perl 
+#
+# Copyright (c) 2004 Javier Gutierrez <https://github.com/tap3edit/TAP3-Tap3edit>. 
+# All rights reserved. This program is free software; you can redistribute 
+# it and/or modify it under the same terms as Perl itself.
+#  
+# Show the first service code of every call.
+#
+#
+#  Usage: tap3edit_show_service_code tapfile
+#
+#  E.g: tap3edit_show_service_code CDOPER1OPER200001
+#
+
+
+use TAP3::Tap3edit;
+
+$filename=shift;
+
+if ( ! $filename ) {
+	die "Usage: $0 tapname\n";
+}
+
+
+$tap3 = TAP3::Tap3edit->new();
+$tap3->decode($filename)  or  die $tap3->error;
+
+$struct=$tap3->structure;
+
+my $key;
+
+# Will scan all the calls for Camel attachments.
+foreach $key ( @{$struct->{'transferBatch'}->{'callEventDetails'} } ) {
+
+	foreach ( keys %{$key} ) {
+
+		# Since the content of basicServiceUsedList is stored as an Array we show
+		# the first elemet with "[0]". In the case we want to show all of them we
+		# can use "foreach".
+
+		$service_code=$key->{$_}{basicServiceUsedList}[0]{basicService}{serviceCode}{teleServiceCode};
+		print "Service Code: $service_code\n";
+
+	}
+}

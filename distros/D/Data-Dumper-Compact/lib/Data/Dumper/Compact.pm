@@ -5,7 +5,7 @@ use Scalar::Util qw(blessed reftype);
 use Data::Dumper ();
 use Mu::Tiny;
 
-our $VERSION = '0.005001';
+our $VERSION = '0.005002';
 $VERSION =~ tr/_//d;
 
 sub import {

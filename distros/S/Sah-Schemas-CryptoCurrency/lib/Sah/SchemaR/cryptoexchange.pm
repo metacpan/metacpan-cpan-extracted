@@ -1,9 +1,9 @@
 package Sah::SchemaR::cryptoexchange;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.015'; # VERSION
 
-our $rschema = ["str",[{description=>"\nCryptoexchange code or name or safename that is listed in\n<pm:CryptoExchange::Catalog>, e.g. GDAX, \"BX Thailand\", bx-thailand.\n\nCode/name/safename must be listed.\n\nWill be normalized to safename in lowercase.\n\n",summary=>"Cryptoexchange code, name, or safename","x.completion"=>"cryptoexchange","x.perl.coerce_rules"=>["From_str::to_cryptoexchange_safename"]}],["str"]];
+our $rschema = ["str",[{description=>"\nCryptoexchange code or name or safename that is listed in\n<pm:CryptoExchange::Catalog>, e.g. GDAX, \"BX Thailand\", bx-thailand.\n\nCode/name/safename must be listed.\n\nWill be normalized to safename in lowercase.\n\n",examples=>[{valid=>0,value=>""},{valid=>0,value=>"foo"},{valid=>1,validated_value=>"bx-thailand",value=>"BX Thailand"},{valid=>1,validated_value=>"bx-thailand",value=>"BX-thailand"},{valid=>1,validated_value=>"bx-thailand",value=>"bx"}],summary=>"Cryptoexchange code, name, or safename","x.completion"=>"cryptoexchange","x.perl.coerce_rules"=>["From_str::to_cryptoexchange_safename"]}],["str"]];
 
 1;
 # ABSTRACT: Cryptoexchange code, name, or safename
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptoexchange - Cryptoexchange code, name, or safename
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::cryptoexchange (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
+This document describes version 0.015 of Sah::SchemaR::cryptoexchange (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

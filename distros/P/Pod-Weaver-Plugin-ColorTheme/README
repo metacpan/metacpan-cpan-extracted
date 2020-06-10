@@ -1,0 +1,59 @@
+NAME
+    Pod::Weaver::Plugin::ColorTheme - Plugin to use when building
+    distribution which has ColorTheme::* modules
+
+VERSION
+    This document describes version 0.001 of Pod::Weaver::Plugin::ColorTheme
+    (from Perl distribution Pod-Weaver-Plugin-ColorTheme), released on
+    2020-06-08.
+
+SYNOPSIS
+    In your weaver.ini:
+
+     [-ColorTheme]
+
+DESCRIPTION
+    This plugin is used when building a distribution which has ColorTheme::*
+    modules. It does the following to each ColorTheme::* Perl source code:
+
+    *   Create "COLOR THEMES" POD section from list of ColorTheme::* modules
+        in the distribution
+
+    *   Mention some modules in See Also section
+
+        e.g. ColorTheme, App::ColorThemeUtils.
+
+    It does the following to each ColorTheme::* Perl source code:
+
+    *   Add "DESCRIPTION" POD section from theme structure's description
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-ColorTheme>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-ColorTheme>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Col
+    orTheme>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    ColorTheme
+
+    Dist::Zilla::Plugin::ColorTheme
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

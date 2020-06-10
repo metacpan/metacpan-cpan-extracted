@@ -28,4 +28,4 @@ $VAR1 = bless( {
 == Filter ==
 ((prototype_formula STARTS "B2") AND (prototype_formula ENDS WITH "D2"))
 == SQL ==
-(('prototype_formula' LIKE "B2%") AND ('prototype_formula' LIKE "%D2"))
+'prototype_formula' LIKE "B2%" AND 'prototype_formula' LIKE "%D2"

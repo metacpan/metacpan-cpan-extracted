@@ -5,9 +5,7 @@ use Test::More;
 
 BEGIN { use_ok('MIDI::Simple::Drummer') }
 
-my $d = eval { MIDI::Simple::Drummer->new };
-isa_ok $d, 'MIDI::Simple::Drummer';
-ok !$@, 'created with no arguments';
+my $d = new_ok 'MIDI::Simple::Drummer';
 
 my $f1 = 'Drummer.mid';
 my $f2 = 'Buddy-Rich.mid';

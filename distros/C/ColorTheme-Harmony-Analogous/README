@@ -1,0 +1,50 @@
+NAME
+    ColorTheme::Harmony::Analogous - Create theme with colors equidistant in
+    hue
+
+VERSION
+    This document describes version 0.004 of ColorTheme::Harmony::Analogous
+    (from Perl distribution ColorTheme-Harmony-Analogous), released on
+    2020-06-09.
+
+DESCRIPTION
+    This color theme has a central color (e.g. for 5 colors, "color3") with
+    the hue of *central_h*. Half of the other colors are on the left in the
+    color wheel, with equal distance of *h_distance*, while the other half
+    are on the right. The colors will have the same saturation and
+    brightness.
+
+    Example, for 5 colors, *central_h* of 120 (green) and *h_distance* of 35
+    then "color3" will have hue 120, "color2" 90, "color1" 60, "color4" 150,
+    "color5" 180. You can see this on the terminal with:
+
+     % show-color-theme-swatch Harmony::Analogous -A central_h=120 -A h_distance=35 -A s=0.8
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ColorTheme-Harmony-Analogous>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ColorTheme-Harmony-Analogous>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ColorTheme-Harmony-An
+    alogous>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Other "ColorTheme::Harmony::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

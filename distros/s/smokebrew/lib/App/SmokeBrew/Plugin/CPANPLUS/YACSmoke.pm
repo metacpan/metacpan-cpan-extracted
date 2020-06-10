@@ -1,5 +1,5 @@
 package App::SmokeBrew::Plugin::CPANPLUS::YACSmoke;
-$App::SmokeBrew::Plugin::CPANPLUS::YACSmoke::VERSION = '0.56';
+$App::SmokeBrew::Plugin::CPANPLUS::YACSmoke::VERSION = '1.00';
 #ABSTRACT: A smokebrew plugin for CPANPLUS::YACSmoke based smokers
 
 use strict;
@@ -318,7 +318,7 @@ App::SmokeBrew::Plugin::CPANPLUS::YACSmoke - A smokebrew plugin for CPANPLUS::YA
 
 =head1 VERSION
 
-version 0.56
+version 1.00
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -93,9 +93,10 @@ and produces output like this:
 
 =head1 LINE BREAKING
 
-Option B<--boundary=word> prohibit to break line within alphanumeric
-word.  This version supports line break adjustment, mainly to perform
-Japanese ``KINSOKU'' processing.  Use B<--linebreak=all> to enable it.
+Option B<--boundary=word> prohibit to break line in the middle of
+alphanumeric word.  This version also supports line break adjustment,
+mainly to perform Japanese ``KINSOKU'' processing.  Use
+B<--linebreak=all> to enable it.
 
 When B<--linebreak> option is enabled, if the cut-off text start with
 space or prohibited characters (e.g. closing parenthesis), they are
@@ -117,9 +118,9 @@ formatting capability.
 
 =head1 SEE ALSO
 
-L<github|https://github.com/kaz-utashiro/ansifold>
+L<ansifold|https://github.com/kaz-utashiro/ansifold>
 
-L<github|https://github.com/kaz-utashiro/Text-ANSI-Fold>
+L<Text::ANSI::Fold|https://github.com/kaz-utashiro/Text-ANSI-Fold>
 
 L<Getopt::EX::Numbers>
 

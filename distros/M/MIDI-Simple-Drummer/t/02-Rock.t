@@ -6,8 +6,7 @@ use Test::More;
 
 use_ok('MIDI::Simple::Drummer::Rock');
 
-my $d = MIDI::Simple::Drummer::Rock->new;
-isa_ok $d, 'MIDI::Simple::Drummer::Rock';
+my $d = new_ok 'MIDI::Simple::Drummer::Rock';
 
 my $x = $d->patterns(0);
 is $x, undef, 'get unknown pattern is undef';

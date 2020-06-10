@@ -33,9 +33,7 @@
       "runtime" : {
          "requires" : {
             "Role::Tiny" : "0",
-            "Role::Tiny::With" : "0",
-            "Role::TinyCommons::TermAttr::Interactive" : "0",
-            "Role::TinyCommons::TermAttr::Software" : "0"
+            "Term::App::Util::Color" : "0"
          }
       },
       "test" : {
@@ -59,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Role-TinyCommons-TermAttr-Color"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

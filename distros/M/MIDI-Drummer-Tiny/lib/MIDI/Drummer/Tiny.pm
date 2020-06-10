@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.0803';
+our $VERSION = '0.0902';
 
 use Moo;
 use MIDI::Simple;
@@ -92,9 +92,12 @@ sub count_in {
 }
 
 
+sub metronome44 { shift->metronome(@_) }
+
 sub metronome {
     my $self = shift;
     my $bars = shift || $self->bars;
+    my $flag = shift || 0;
 
     my $i = 0;
 
@@ -104,18 +107,37 @@ sub metronome {
             $self->note( $self->quarter, $self->open_hh, $self->snare );
         }
         else {
-            if ( $i % 2 == 0 )
+            if ( $flag == 0 )
             {
                 $self->note( $self->quarter, $self->open_hh, $self->kick );
             }
             else
             {
-                $self->note( $self->eighth, $self->open_hh, $self->kick );
-                $self->note( $self->eighth, $self->kick );
+                if ( $i % 2 == 0 )
+                {
+                    $self->note( $self->quarter, $self->open_hh, $self->kick );
+                }
+                else
+                {
+                    $self->note( $self->eighth, $self->open_hh, $self->kick );
+                    $self->note( $self->eighth, $self->kick );
+                }
             }
 
             $i++;
         }
+    }
+}
+
+
+sub metronome34 {
+    my $self = shift;
+    my $bars = shift || $self->bars;
+
+    for ( 1 .. $bars ) {
+        $self->note( $self->quarter, $self->ride1, $self->kick );
+        $self->note( $self->quarter, $self->ride1 );
+        $self->note( $self->quarter, $self->ride1, $self->snare );
     }
 }
 
@@ -139,7 +161,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.0803
+version 0.0902
 
 =head1 SYNOPSIS
 
@@ -156,12 +178,14 @@ version 0.0803
 
  $d->count_in(1);  # Closed hi-hat for 1 bar
 
+ $d->metronome34;  # 3/4 time for the number of bars
+
+ $d->rest( $d->whole );
+
  $d->note( $d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare )
-    for 1 .. $d->beats * $d->bars;  # Alternate kick and snare
+    for 1 .. $d->beats * $d->bars;  # Alternate kick and snare in 4/4 time
 
- $d->metronome();
-
- $d->write();
+ $d->write;
 
 =head1 DESCRIPTION
 
@@ -172,39 +196,39 @@ a MIDI score.
 
 =head2 file
 
-Default: MIDI-Drummer.mid
+Default: C<MIDI-Drummer.mid>
 
 =head2 score
 
-Default: MIDI::Simple->new_score
+Default: C<MIDI::Simple-E<gt>new_score>
 
 =head2 channel
 
-Default: 9
+Default: C<9>
 
 =head2 volume
 
-Default: 100
+Default: C<100>
 
 =head2 bpm
 
-Default: 120
+Default: C<120>
 
 =head2 reverb
 
-Default: 0
+Default: C<0>
 
 =head2 chorus
 
-Default: 0
+Default: C<0>
 
 =head2 pan
 
-Default: 0
+Default: C<0>
 
 =head2 bars
 
-Default: 4
+Default: C<4>
 
 =head2 beats
 
@@ -216,9 +240,9 @@ Computed given the B<signature>.
 
 =head2 signature
 
-Default: 4/4
+Default: C<4/4>
 
-B<beats>/B<divisions>
+B<beats> / B<divisions>
 
 =head1 KIT
 
@@ -280,7 +304,7 @@ B<beats>/B<divisions>
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
   $d = MIDI::Drummer::Tiny->new(%arguments);
 
@@ -288,7 +312,7 @@ Return a new C<MIDI::Drummer::Tiny> object.
 
 =for Pod::Coverage BUILD
 
-=head2 note()
+=head2 note
 
  $d->note( $d->quarter, $d->closed_hh, $d->kick );
  $d->note( 'qn', 'n42', 'n35' ); # Same thing
@@ -297,7 +321,7 @@ Add a note to the score.
 
 This method takes the same arguments as with L<MIDI::Simple/"Parameters for n/r/noop">.
 
-=head2 rest()
+=head2 rest
 
  $d->rest( $d->quarter );
 
@@ -305,7 +329,7 @@ Add a rest to the score.
 
 This method takes the same arguments as with L<MIDI::Simple/"Parameters for n/r/noop">.
 
-=head2 count_in()
+=head2 count_in
 
  $d->count_in;
  $d->count_in($bars);
@@ -313,18 +337,34 @@ This method takes the same arguments as with L<MIDI::Simple/"Parameters for n/r/
 Play the closed hihat for the number of beats times the given bars.
 If no bars are given, the default times the number of beats is used.
 
-=head2 metronome()
+=head2 metronome, metronome44
 
-  $d->metronome;
-  $d->metronome($bars);
+  $d->metronome44;
+  $d->metronome44($bars);
+  $d->metronome44($bars, $flag);
+  $d->metronome44(16, 1);
+  $d->metronome44(0, 1); # Use the ->bars attribute
 
-Add a steady beat to the score.
+Add a steady 4/4 beat to the score.
 
-=head2 write()
+If a B<flag> is provided the beat is modified to include alternating
+eighth-note kicks.
 
-Output the score to the F<*.mid> file given in the constuctor.
+=head2 metronome34
+
+  $d->metronome34;
+  $d->metronome34($bars);
+
+Add a steady 3/4 beat to the score.
+
+=head2 write
+
+Output the score to the default F<*.mid> file or one given to the
+constuctor.
 
 =head1 SEE ALSO
+
+The F<t/*> and F<eg/*> programs in this distribution
 
 L<Moo>
 
@@ -338,7 +378,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

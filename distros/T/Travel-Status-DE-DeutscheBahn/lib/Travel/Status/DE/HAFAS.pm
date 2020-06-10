@@ -16,7 +16,7 @@ use Travel::Status::DE::HAFAS::Result;
 use Travel::Status::DE::HAFAS::StopFinder;
 use XML::LibXML;
 
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 
 my %hafas_instance = (
 
@@ -328,7 +328,11 @@ sub results {
 			push( @messages, $n->getAttribute('header') );
 		}
 
-		substr( $date, 6, 0, '20' );
+		# Some backends report dd.mm.yy, some report dd.mm.yyyy
+		# -> map all dates to dd.mm.yyyy
+		if ( length($date) == 8 ) {
+			substr( $date, 6, 0, '20' );
+		}
 
 		# TODO the first charactor of delayReason is special:
 		# " " -> no additional data, rest (if any) is delay reason
@@ -430,7 +434,7 @@ monitors
 
 =head1 VERSION
 
-version 3.00
+version 3.01
 
 =head1 DESCRIPTION
 

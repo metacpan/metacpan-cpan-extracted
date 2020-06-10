@@ -17,7 +17,7 @@ use Carp;
 use Fcntl;
 use HiPi qw( :rpi );
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 __PACKAGE__->create_accessors();
 

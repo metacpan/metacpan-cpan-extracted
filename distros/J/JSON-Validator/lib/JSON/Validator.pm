@@ -4,15 +4,14 @@ use Mojo::Base -base;
 use B;
 use Carp 'confess';
 use Exporter 'import';
-use JSON::Validator::Error;
 use JSON::Validator::Formats;
 use JSON::Validator::Joi;
 use JSON::Validator::Ref;
+use JSON::Validator::Schema;
 use JSON::Validator::Util
   qw(E data_checksum data_section data_type is_type json_pointer prefix_errors schema_type);
 use List::Util 'uniq';
 use Mojo::File 'path';
-use Mojo::JSON::Pointer;
 use Mojo::JSON qw(false true);
 use Mojo::URL;
 use Mojo::Util qw(url_unescape sha1_sum);
@@ -24,8 +23,14 @@ use constant RECURSION_LIMIT   => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 use constant YAML_SUPPORT      => eval 'use YAML::XS 0.67;1';
 
-our $VERSION = '3.25';
+our $VERSION = '4.00';
 our @EXPORT_OK = qw(joi validate_json);
+
+our %SCHEMAS = (
+  'http://json-schema.org/draft-04/schema#' => '+Draft4',
+  'http://json-schema.org/draft-06/schema#' => '+Draft6',
+  'http://json-schema.org/draft-07/schema#' => '+Draft7',
+);
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
 my $HTTP_SCHEME_RE    = qr{^https?:};
@@ -37,13 +42,13 @@ has cache_paths => sub {
 
 has formats => sub { shift->_build_formats };
 
-has generate_definitions_path => sub {
+sub version {
   my $self = shift;
-  Scalar::Util::weaken($self);
-  return sub { [$self->{definitions_key} || 'definitions'] };
-};
-
-has version => 4;
+  Mojo::Util::deprecated('version() will be removed in future version.');
+  return $self->{version} || 4 unless @_;
+  $self->{version} = shift;
+  $self;
+}
 
 has ua => sub {
   require Mojo::UserAgent;
@@ -55,18 +60,19 @@ has ua => sub {
 
 sub bundle {
   my ($self, $args) = @_;
-  my ($cloner);
+  my $cloner;
 
-  my $schema
-    = $args->{schema} ? $self->_resolve($args->{schema}) : $self->schema->data;
-  my @topics = ([$schema, my $bundle = {}, '']);    # ([$from, $to], ...);
+  my $schema    = $self->_new_schema($args->{schema} || $self->schema);
+  my $schema_id = $schema->id || $self->{root_schema_url} || '';
+  my @topics = ([$schema->data, my $bundle = {}, '']);    # ([$from, $to], ...);
 
   if ($args->{replace}) {
     $cloner = sub {
       my $from      = shift;
       my $from_type = ref $from;
-      my $tied;
-      $from = $tied->schema if $from_type eq 'HASH' and $tied = tied %$from;
+      my $tied      = $from_type eq 'HASH' && tied %$from;
+
+      $from = $tied->schema if $tied;
       my $to = $from_type eq 'ARRAY' ? [] : $from_type eq 'HASH' ? {} : $from;
       push @topics, [$from, $to] if $from_type;
       return $to;
@@ -76,22 +82,21 @@ sub bundle {
     $cloner = sub {
       my $from      = shift;
       my $from_type = ref $from;
+      my $tied      = $from_type eq 'HASH' && tied %$from;
 
-      my $tied = $from_type eq 'HASH' && tied %$from;
       unless ($tied) {
         my $to = $from_type eq 'ARRAY' ? [] : $from_type eq 'HASH' ? {} : $from;
         push @topics, [$from, $to] if $from_type;
         return $to;
       }
 
-      return $from
-        if !$args->{schema}
-        and $tied->fqn =~ m!^\Q$self->{root_schema_url}\E\#!;
+      return $from if !$args->{schema} and $tied->fqn =~ m!^\Q$schema_id\E\#!;
 
       my $path = $self->_definitions_path($bundle, $tied);
       unless ($self->{bundled_refs}{$tied->fqn}++) {
         push @topics,
-          [_node($schema, $path, 1, 0) || {}, _node($bundle, $path, 1, 1)];
+          [_node($schema->data, $path, 1, 0) || {},
+          _node($bundle, $path, 1, 1)];
         push @topics, [$tied->schema, _node($bundle, $path, 0, 1)];
       }
 
@@ -101,10 +106,7 @@ sub bundle {
     };
   }
 
-  Mojo::Util::deprecated('bundle({ref_key => "..."}) will be removed.')
-    if $args->{ref_key};
-  local $self->{definitions_key} = $args->{ref_key};
-  local $self->{bundled_refs}    = {};
+  local $self->{bundled_refs} = {};
 
   while (@topics) {
     my ($from, $to) = @{shift @topics};
@@ -145,21 +147,24 @@ sub coerce {
 sub get { JSON::Validator::Util::schema_extract(shift->schema->data, shift) }
 
 sub joi {
+  Mojo::Util::deprecated('joi() will be removed in future version.');
   return JSON::Validator::Joi->new unless @_;
   my ($data, $joi) = @_;
   return $joi->validate($data, $joi);
 }
 
 sub load_and_validate_schema {
-  my ($self, $spec, $args) = @_;
-  my $schema = $args->{schema} || SPECIFICATION_URL;
-  $self->version($1) if !$self->{version} and $schema =~ /draft-0+(\w+)/;
-  $spec = $self->_resolve($spec);
-  my @errors = $self->new(%$self)->schema($schema)->validate($spec);
-  confess join "\n", "Invalid JSON specification $spec:", map {"- $_"} @errors
-    if @errors;
-  $self->{schema} = Mojo::JSON::Pointer->new($spec);
-  $self;
+  my ($self, $schema, $args) = @_;
+  my $specification = $args->{schema} || SPECIFICATION_URL;
+  $self->{version} = $1
+    if !$self->{version} and $specification =~ /draft-0+(\w+)/;
+
+  my $obj = $self->_new_schema($schema, specification => $specification);
+  confess join "\n", "Invalid JSON specification $schema",
+    map {"- $_"} @{$obj->errors}
+    if @{$obj->errors};
+  $self->{schema} = $obj;
+  return $self;
 }
 
 sub new {
@@ -171,18 +176,21 @@ sub new {
 sub schema {
   my $self = shift;
   return $self->{schema} unless @_;
-  $self->{schema} = Mojo::JSON::Pointer->new($self->_resolve(shift));
+  $self->{schema} = $self->_new_schema(shift);
   return $self;
 }
 
-sub singleton { state $jv = shift->new }
+sub singleton {
+  Mojo::Util::deprecated('singleton() will be removed in future version.');
+  state $jv = shift->new;
+}
 
 sub validate {
   my ($self, $data, $schema) = @_;
-  $schema ||= $self->schema->data;
+  $schema //= $self->schema->data;
   return E '/', 'No validation rules defined.' unless defined $schema;
 
-  local $self->{schema} = Mojo::JSON::Pointer->new($schema);
+  local $self->{schema} = $self->_new_schema($schema);
   local $self->{seen}   = {};
   local $self->{temp_schema} = [];    # make sure random-errors.t does not fail
   my @errors = $self->_validate($_[1], '', $schema);
@@ -190,17 +198,24 @@ sub validate {
 }
 
 sub validate_json {
+  Mojo::Util::deprecated('validate_json() will be removed in future version.');
   __PACKAGE__->singleton->schema($_[1])->validate($_[0]);
 }
 
 sub _build_formats {
   return {
+    'byte'          => JSON::Validator::Formats->can('check_byte'),
     'date'          => JSON::Validator::Formats->can('check_date'),
     'date-time'     => JSON::Validator::Formats->can('check_date_time'),
+    'duration'      => JSON::Validator::Formats->can('check_duration'),
+    'double'        => JSON::Validator::Formats->can('check_double'),
     'email'         => JSON::Validator::Formats->can('check_email'),
+    'float'         => JSON::Validator::Formats->can('check_float'),
     'hostname'      => JSON::Validator::Formats->can('check_hostname'),
     'idn-email'     => JSON::Validator::Formats->can('check_idn_email'),
     'idn-hostname'  => JSON::Validator::Formats->can('check_idn_hostname'),
+    'int32'         => JSON::Validator::Formats->can('check_int32'),
+    'int64'         => JSON::Validator::Formats->can('check_int64'),
     'ipv4'          => JSON::Validator::Formats->can('check_ipv4'),
     'ipv6'          => JSON::Validator::Formats->can('check_ipv6'),
     'iri'           => JSON::Validator::Formats->can('check_iri'),
@@ -214,12 +229,13 @@ sub _build_formats {
     'uri-reference' => JSON::Validator::Formats->can('check_uri_reference'),
     'uri-reference' => JSON::Validator::Formats->can('check_uri_reference'),
     'uri-template'  => JSON::Validator::Formats->can('check_uri_template'),
+    'uuid'          => JSON::Validator::Formats->can('check_uuid'),
   };
 }
 
 sub _definitions_path {
   my ($self, $bundle, $ref) = @_;
-  my $path = $self->generate_definitions_path->($ref);
+  my $path = $self->_definitions_path_for_ref($ref);
 
   # No need to rewrite, if it already has a nice name
   my $node   = _node($bundle, $path, 2, 0);
@@ -249,10 +265,12 @@ sub _definitions_path {
   return [@$path, $key];
 }
 
+sub _definitions_path_for_ref { ['definitions'] }
+
 # Try not to break JSON::Validator::OpenAPI::Mojolicious
 sub _get { shift; JSON::Validator::Util::_schema_extract(@_) }
 
-sub _id_key { $_[0]->version < 7 ? 'id' : '$id' }
+sub _id_key { ($_[0]->{version} || 4) < 7 ? 'id' : '$id' }
 
 sub _load_schema {
   my ($self, $url) = @_;
@@ -339,6 +357,26 @@ sub _load_schema_from_url {
   return $self->_load_schema_from_text(\$tx->res->body);
 }
 
+sub _new_schema {
+  my ($self, $spec, @attrs) = @_;
+  return $spec if blessed $spec and $spec->can('specification');
+
+  if (!$spec and is_type $spec, 'HASH') {
+    $spec = $spec->{'$spec'} || $spec->{schema};
+  }
+  if (!$spec and $self->{version}) {
+    $spec = sprintf 'http://json-schema.org/draft-%02s/schema#',
+      $self->{version};
+  }
+
+  push @attrs, formats => $self->{formats} if $self->{formats};
+  push @attrs, version => $self->{version} if $self->{version};
+  unshift @attrs, $spec, map { ($_ => $self->$_) } qw(cache_paths formats ua);
+  my $schema = $self->_schema_class($spec)->new(@attrs);
+  $schema->specification($spec) if $spec and !$schema->specification;
+  return $schema;
+}
+
 sub _node {
   my ($node, $path, $offset, $create) = @_;
 
@@ -381,7 +419,7 @@ sub _resolve {
   my ($id, $resolved);
 
   local $self->{level} = $self->{level} || 0;
-  delete $_[0]->{schemas}{''} unless $self->{level};
+  delete $self->{schemas}{''} unless $self->{level};
 
   if (ref $schema eq 'HASH') {
     $id = $schema->{$id_key} // '';
@@ -410,6 +448,7 @@ sub _resolve {
         or $rid =~ m!^/!;
     }
     warn sprintf "[JSON::Validator] Using root_schema_url of '$rid'\n" if DEBUG;
+    $self->id($rid) if $self->can('id') and !$self->id;
     $self->{root_schema_url} = $rid;
   }
 
@@ -471,8 +510,7 @@ sub _resolve_ref {
 
   while (1) {
     last if is_type $other, 'BOOL';
-    $ref = $other->{'$ref'};
-    push @guard, $other->{'$ref'};
+    push @guard, ($ref = $other->{'$ref'});
     confess "Seems like you have a circular reference: @guard"
       if @guard > RECURSION_LIMIT;
     last if !$ref or ref $ref;
@@ -493,6 +531,33 @@ sub _resolve_ref {
   }
 
   tie %$topic, 'JSON::Validator::Ref', $other, $topic->{'$ref'}, $fqn;
+}
+
+# back compat
+sub _schema_class {
+  my ($self, $spec) = @_;
+
+  my $schema_class = $spec && $SCHEMAS{$spec} || 'JSON::Validator::Schema';
+  $schema_class =~ s!^\+(.+)$!JSON::Validator::Schema::$1!;
+  confess "Could not load $schema_class: $@"
+    unless $schema_class->can('new')
+    or eval "require $schema_class;1";
+
+  return $schema_class if ref $_[0] eq __PACKAGE__;
+
+  my $jv_class = ref($self) || $self;
+  my $short_schema_class
+    = $schema_class =~ m!JSON::Validator::Schema::(.+)! ? $1 : $schema_class;
+  my $package = sprintf 'JSON::Validator::Schema::Backcompat::%s',
+    $jv_class =~ m!^JSON::Validator::(.+)! ? $1 : $jv_class;
+  return $package if $package->can('new');
+
+  die "package $package: $@"
+    unless eval "package $package; use Mojo::Base '$jv_class'; 1";
+  Mojo::Util::monkey_patch($package, $_ => $schema_class->can($_))
+    for
+    qw(bundle contains data errors get id new resolve specification validate);
+  return $package;
 }
 
 sub _validate {
@@ -818,20 +883,14 @@ sub _validate_type_array {
 
 sub _validate_type_boolean {
   my ($self, $value, $path, $schema) = @_;
-  return if is_type $value, 'BOOL';
 
   # String that looks like a boolean
-  if (
-        defined $value
-    and $self->{coerce}{booleans}
-    and (B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK)
-      or $value =~ /^(true|false)$/)
-    )
-  {
-    $_[1] = $value ? true : false;
-    return;
+  if (defined $value and $self->{coerce}{booleans}) {
+    $_[1] = false if $value =~ m!^(0|false|)$!;
+    $_[1] = true  if $value =~ m!^(1|true)$!;
   }
 
+  return if is_type $_[1], 'BOOL';
   return E $path, [boolean => type => data_type $value];
 }
 
@@ -848,7 +907,7 @@ sub _validate_type_null {
   my ($self, $value, $path, $schema) = @_;
 
   return unless defined $value;
-  return E $path, ['null', 'null'];
+  return E $path, [null => type => data_type $value];
 }
 
 sub _validate_type_number {
@@ -882,9 +941,8 @@ sub _validate_type_number {
 sub _validate_type_object {
   my ($self, $data, $path, $schema) = @_;
 
-  if (ref $data ne 'HASH') {
-    return E $path, [object => type => data_type $data];
-  }
+  return E $path, [object => type => data_type $data]
+    unless ref $data eq 'HASH';
 
   my @errors;
   my @dkeys = sort keys %$data;
@@ -1168,22 +1226,11 @@ L<JSON::Validator::Error> objects when the input data violates the L</schema>.
 
 =head2 joi
 
-  use JSON::Validator "joi";
-  my $joi    = joi;
-  my @errors = joi($data, $joi); # same as $joi->validate($data);
-
-Used to construct a new L<JSON::Validator::Joi> object or perform validation.
+DEPRECATED.
 
 =head2 validate_json
 
-  use JSON::Validator "validate_json";
-  my @errors = validate_json $data, $schema;
-
-This can be useful in web applications:
-
-  my @errors = validate_json $c->req->json, "data://main/spec.json";
-
-See also L</validate> and L</ERROR OBJECT> for more details.
+DEPRECATED.
 
 =head1 ATTRIBUTES
 
@@ -1213,18 +1260,6 @@ block should return C<undef> on success and an error string on error:
 
 See L<JSON::Validator::Formats> for a list of supported formats.
 
-=head2 generate_definitions_path
-
-  my $cb = $jv->generate_definitions_path;
-  my $jv = $jv->generate_definitions_path(sub { my $ref = shift; return ["definitions"] });
-
-Holds a callback that is used by L</bundle> to figure out where to place
-references. The default location is under "definitions", but this can be
-changed to whatever you want. The input C<$ref> variable passed on is a
-L<JSON::Validator::Ref> object.
-
-This attribute is EXPERIMENTAL and might change without warning.
-
 =head2 ua
 
   my $ua = $jv->ua;
@@ -1238,11 +1273,7 @@ L<Mojo::UserAgent/max_redirects> set to 3.
 
 =head2 version
 
-  my $int = $jv->version;
-  my $jv  = $jv->version(7);
-
-Used to set the JSON Schema version to use. Will be set automatically when
-using L</load_and_validate_schema>, unless already set.
+DEPRECATED.
 
 =head1 METHODS
 
@@ -1351,7 +1382,7 @@ structured that can be used to validate C<$schema>.
 
 Used to set a schema from either a data structure or a URL.
 
-C<$schema> will be a L<Mojo::JSON::Pointer> object when loaded,
+C<$schema> will be a L<JSON::Validator::Schema> object when loaded,
 and C<undef> by default.
 
 The C<$url> can take many forms, but needs to point to a text file in the
@@ -1391,9 +1422,7 @@ the will be loaded from the app defined in L</ua>. Something like this:
 
 =head2 singleton
 
-  my $jv = JSON::Validator->singleton;
-
-Returns the L<JSON::Validator> object used by L</validate_json>.
+DEPRECATED.
 
 =head2 validate
 

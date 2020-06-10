@@ -1,5 +1,14 @@
 Revision history for WWW::Mechanize
 
+2.00      2020-06-09 19:09:53Z
+    - Require LWP::UserAgent 6.45 (GH#302) (Shoichi Kaji)
+
+1.99      2020-06-08 15:35:04Z
+    - Bump HTTP::Daemon test dependency to 6.12 (GH#300) (Olaf Alders)
+
+1.98      2020-05-25 17:06:47Z (TRIAL RELEASE)
+    - Don't make assumptions about port 80 in test (GH#299) (Olaf Alders)
+
 1.97      2020-05-14 00:46:53Z
     - Respect CDATA[[ sections when parsing HTML (GH#298) (Max Maischein)
     - extract image links also from css (GH#12) (Jozef Kutej) and (GH#297)

@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MIDI::Drummer::Tiny;
+
+my $d = MIDI::Drummer::Tiny->new(
+    file => $0 . '.mid',
+    bpm  => 120,
+    bars => 8,
+);
+
+$d->count_in(1);
+
+my $i = 0;
+
+for my $n ( 0 .. $d->bars - 1 ) {
+    if ( $n % 2 == 0 ) {
+        for ( 1 .. 3 ) {
+            $d->note( $d->eighth, $d->closed_hh, $d->kick );
+            $d->note( $d->eighth, $d->closed_hh );
+            $d->note( $d->eighth, $d->open_hh,   $d->kick, $d->snare );
+            $d->note( $d->eighth, $d->closed_hh );
+        }
+    }
+    else {
+        $d->note( $d->sixteenth, $d->closed_hh, $d->kick );
+        $d->note( $d->sixteenth, $d->closed_hh );
+        $d->note( $d->sixteenth, $d->closed_hh );
+        $d->note( $d->sixteenth, $d->open_hh );
+        $d->note( $d->sixteenth, $d->closed_hh, $d->kick, $d->snare );
+        $d->note( $d->sixteenth, $d->closed_hh );
+        $d->note( $d->sixteenth, $d->closed_hh );
+        $d->note( $d->sixteenth, $d->closed_hh );
+    }
+}
+
+$d->note( $d->quarter, $d->crash1, $d->kick );
+
+$d->write;

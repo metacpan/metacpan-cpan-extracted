@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.058';
+our $VERSION = '1.060';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -682,6 +682,7 @@ sub register {
     push @{ $app->renderer->paths }, $share->child( 'templates' )->to_string;
     push @{$app->routes->namespaces}, 'Yancy::Controller';
     push @{ $app->commands->namespaces }, 'Yancy::Command';
+    $app->plugin( 'I18N', { namespace => 'Yancy::I18N' } );
 
     # Helpers
     $app->helper( 'yancy.config' => sub { return $config } );
@@ -1045,7 +1046,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.058
+version 1.060
 
 =head1 SYNOPSIS
 

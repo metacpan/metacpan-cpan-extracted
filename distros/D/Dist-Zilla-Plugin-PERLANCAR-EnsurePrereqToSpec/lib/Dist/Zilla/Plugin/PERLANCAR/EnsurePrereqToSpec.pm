@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec;
 
-our $DATE = '2018-09-22'; # DATE
-our $VERSION = '0.060'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-09'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec'; # DIST
+our $VERSION = '0.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,6 +15,9 @@ use namespace::autoclean;
 with (
     'Dist::Zilla::Role::AfterBuild',
     'Dist::Zilla::Role::Rinci::CheckDefinesMeta',
+    'Dist::Zilla::Role::FileFinderUser' => {
+        default_finders => [':InstallModules'],
+    },
 );
 
 sub _prereq_check {
@@ -73,6 +78,13 @@ sub after_build {
         $self->log_fatal(["Dist does not define Rinci metadata, but there is a phase=develop rel=xpec prereq to Rinci"])
             if $self->_has_prereq($prereqs_hash, "Rinci", "develop", "x_spec");
     }
+
+    # ColorTheme
+    if (grep { $_->name =~ m!(?:\A|/)ColorTheme/.+\.pm! } @{ $self->found_files }) {
+        $self->log_fatal(["Dist has ColorThemes/* .pm file but there is no prereq phase=develop, rel=x_spec to ColorTheme"])
+            unless $self->_prereq_only_in($prereqs_hash, "ColorTheme", "develop", "x_spec");
+    }
+
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -91,7 +103,7 @@ Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec - Ensure prereq to spec modul
 
 =head1 VERSION
 
-This document describes version 0.060 of Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec), released on 2018-09-22.
+This document describes version 0.061 of Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec), released on 2020-06-09.
 
 =head1 SYNOPSIS
 
@@ -102,10 +114,22 @@ In C<dist.ini>:
 =head1 DESCRIPTION
 
 I like to specify prerequisite to spec modules such as L<Rinci>, L<Riap>,
-L<Sah>, L<Setup>, etc as DevelopRecommends, to express that a distribution
-conforms to such specification(s).
+L<Sah>, L<Setup>, etc as (phase=develop, rel=x_spec) dependency, to express that
+a distribution conforms to such specification(s).
 
-Currently only L<Rinci> is checked.
+Currently only these spec is checked:
+
+=over
+
+=item * L<Rinci>
+
+When a package contains Rinci metadata (C<%SPEC>).
+
+=item * L<ColorTheme>
+
+When there is a ColorTheme/* source files.
+
+=back
 
 =for Pod::Coverage .+
 
@@ -131,7 +155,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

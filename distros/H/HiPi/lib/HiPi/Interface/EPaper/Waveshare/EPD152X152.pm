@@ -17,7 +17,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( ) );
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 
 sub _create {

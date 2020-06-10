@@ -29,6 +29,8 @@ use Color::ANSI::Util qw(
                            ansifg
                            rgb_to_ansi_bg_code
                            ansibg
+
+                           ansi_reset
                     );
 
 subtest "16 colors" => sub {
@@ -76,6 +78,8 @@ subtest "color detection (ENV)" => sub {
     $Color::ANSI::Util::_color_depth = undef;
     $ENV{COLOR_DEPTH} = 0;
     is(ansifg("7e0102"), "");
+    is(ansi_reset(1), "");
+    is(ansi_reset(), "\e[0m");
 
     $Color::ANSI::Util::_color_depth = undef;
     $ENV{COLOR_DEPTH} = 16;

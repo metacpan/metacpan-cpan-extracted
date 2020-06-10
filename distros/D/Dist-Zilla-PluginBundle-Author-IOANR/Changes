@@ -1,5 +1,15 @@
 Changelog for Dist-Zilla-PluginBundle-Author-IOANR
 
+1.201592 2020-06-07T23:33:20Z
+ - Fix repository URL
+
+1.201591 2020-06-07T22:48:47Z
+ - Fix regex for http git remotes
+
+1.201590 2020-06-07T22:26:02Z
+ - Drop travis
+ - Bail out if can't find git host
+
 1.201410 2020-05-20T05:29:24Z
  - Don't bundle Devel::CheckOS in build tarballs
  - Fix always using Devel::AssertOS in Build.PL 

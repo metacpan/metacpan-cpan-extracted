@@ -108,4 +108,4 @@ $VAR1 = bless( {
 == Filter ==
 ((elements HAS = "H") AND ((elements HAS ALL = "H", = "He", = "Ga", = "Ta") AND ((elements HAS ONLY = "H", = "He", = "Ga", = "Ta") AND (elements HAS ANY = "H", = "He", = "Ga", = "Ta"))))
 == SQL ==
-(<no SQL representation> AND (<no SQL representation> AND (<no SQL representation> AND <no SQL representation>)))
+<no SQL representation> AND (<no SQL representation> AND (<no SQL representation> AND <no SQL representation>))

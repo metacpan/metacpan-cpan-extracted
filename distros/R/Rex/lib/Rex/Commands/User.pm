@@ -39,7 +39,7 @@ package Rex::Commands::User;
 use strict;
 use warnings;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.11.0'; # VERSION
 
 require Rex::Exporter;
 use Rex::Commands::Fs;
@@ -125,6 +125,20 @@ sub account {
 =head2 create_user($user => {})
 
 Create or update a user.
+
+This function supports the following L<hooks|Rex::Hook>:
+
+=over 4
+
+=item before
+
+This gets executed before the user is created. All original parameters are passed to it.
+
+=item after
+
+This gets executed after the user is created. All original parameters, and the user's C<UID> are passed to it.
+
+=back
 
 =cut
 
@@ -311,11 +325,17 @@ sub group_resource {
     Rex::get_current_connection()->{reporter}
       ->report_resource_start( type => "group", name => $group_name );
 
+    my $gid = get_gid($group_name);
+
     if ( $option{ensure} eq "present" ) {
-      Rex::Commands::User::create_group( $group_name, %option );
+      if ( !defined $gid ) {
+        Rex::Commands::User::create_group( $group_name, %option );
+      }
     }
     elsif ( $option{ensure} eq "absent" ) {
-      Rex::Commands::User::delete_group($group_name);
+      if ( defined $gid ) {
+        Rex::Commands::User::delete_group($group_name);
+      }
     }
     else {
       die "Unknown 'ensure' value. Valid values are 'present' and 'absent'.";

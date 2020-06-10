@@ -34,7 +34,8 @@ requires:
   Text::Wrap: '0'
   Tie::Handle: '0'
   base: '0'
-version: '1.01'
+  perl: '5.008000'
+version: '1.02'
 x_runtime:
   recommends: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

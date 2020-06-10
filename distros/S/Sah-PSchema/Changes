@@ -1,0 +1,12 @@
+0.002   2020-06-06  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+	- [doc] Mention Sah::Schemas, Sah::Schema::*, Sah::PSchema::*.
+
+        - [doc] Add more documentation.
+
+
+0.001   2020-06-05  Released-By: PERLANCAR
+
+        - First release.

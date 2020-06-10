@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::IOANR 1.201410;
+package Dist::Zilla::PluginBundle::Author::IOANR 1.201592;
 
 # ABSTRACT: Build dists the way IOANR likes
 
@@ -81,7 +81,14 @@ sub _build__resources {
     # this will totally fall apart
     my @remote = $self->_git->remote(qw/get-url/, $self->git_remote);
     my $git_url = shift @remote;
-    my ($git_host, $git_org, $git_repo) = $git_url =~ m{^.+@(github|gitlab).com[:/](\w+)/(.+).git$};
+    if (!$git_url) {
+      die "Failed to find git remote url\n";
+    }
+
+    my ($git_host, $git_org, $git_repo) = $git_url =~ m{^.+@?(github|gitlab).com[:/](\w+)/(.+).git$};
+    if (!$git_host) {
+      die "Unable to find supported git host from $git_url\n";
+    }
 
     # sometimes dist name and repo/project name are the same, sometimes the repo
     # has a p5- prefix
@@ -90,7 +97,7 @@ sub _build__resources {
       'bugtracker.web' => sprintf('https://%s.com/%s/%s/issues', $git_host, $git_org, $git_repo),
       'homepage' => sprintf('https://metacpan.org/release/%s', $dist_name),
       'repository.type' => 'git',
-      'repository.url' => sprintf('https://%s.com:%s/%s.git', $git_host, $git_org, $git_repo),
+      'repository.url' => sprintf('https://%s.com/%s/%s.git', $git_host, $git_org, $git_repo),
       'repository.web' => sprintf('https://%s.com/%s/%s', $git_host, $git_org, $git_repo),
     };
 
@@ -265,7 +272,7 @@ Dist::Zilla::PluginBundle::Author::IOANR - Build dists the way IOANR likes
 
 =head1 VERSION
 
-version 1.201410
+version 1.201592
 
 =head1 OPTIONS
 
@@ -335,7 +342,7 @@ The source code is available for from the following locations:
 
 L<https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR>
 
-  git clone https://gitlab.com:ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git
+  git clone https://gitlab.com/ioanrogers/Dist-Zilla-PluginBundle-Author-IOANR.git
 
 =head1 AUTHOR
 

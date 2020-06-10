@@ -46,7 +46,7 @@ SKIP: {
 
     ping_ok( 'localhost', 'Test localhost on the web port' );
 
-    ping_not_ok( '172.29.249.249', 'Hopefully this is never a routeable host' );
+    ping_not_ok( '203.0.113.90', 'Documentation address; non-routable' );
 
     # Test a few remote servers
     # Hopefully they are up when the tests are run.

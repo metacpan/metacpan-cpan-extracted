@@ -4,7 +4,7 @@ author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
   File::Spec: '0'
-  File::Temp: '0'
+  File::Temp: '0.2307'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::Exception: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-System-Options
   homepage: https://metacpan.org/release/IPC-System-Options
   repository: git://github.com/perlancar/perl-IPC-System-Options.git
-version: '0.336'
+version: '0.337'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

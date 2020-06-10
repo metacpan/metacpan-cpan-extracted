@@ -1,6 +1,18 @@
 ==================================================
-Changes from 2015-04-29 00:00:00 +0000 to present.
+Changes from 2015-06-10 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.00 at 2020-06-08 10:20:36 +0000
+-----------------------------------------
+
+  Change: aa10f8ed83413f0b684009ba7ec2f32d0a33ae61
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-06-08 11:20:36 +0000
+
+    Added --jobs option to enable parallel builds
+
+    This option will be ignored for perl versions less than v5.19.4 
 
 -----------------------------------------
 version 0.56 at 2020-04-27 19:38:31 +0000
@@ -55,5 +67,5 @@ version 0.50 at 2017-05-31 10:13:27 +0000
     Update CPANPLUS::YACSmoke plugin for changes in CPANPLUS 
 
 =================================================
-Plus 24 releases after 2015-04-29 00:00:00 +0000.
+Plus 24 releases after 2015-06-10 00:00:00 +0000.
 =================================================

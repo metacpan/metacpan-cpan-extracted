@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 
 use Role::MethodReturns;
@@ -16,6 +16,7 @@ use Types::Common::Numeric qw/PositiveOrZeroNum/;
 
 use Carp;
 
+use namespace::clean;
 
 around get_scope_manager => instance_method ( ) {
     

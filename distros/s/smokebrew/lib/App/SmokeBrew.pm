@@ -1,5 +1,5 @@
 package App::SmokeBrew;
-$App::SmokeBrew::VERSION = '0.56';
+$App::SmokeBrew::VERSION = '1.00';
 #ABSTRACT: The guts of smokebrew
 
 use strict;
@@ -156,6 +156,11 @@ has 'make' => (
   isa => 'Str',
 );
 
+has 'jobs' => (
+  is => 'ro',
+  isa => 'Int',
+);
+
 # What perl versions to install
 
 has 'stable' => (
@@ -226,7 +231,7 @@ sub run {
         version   => $perl,
         map { ( $_ => $self->$_ ) }
           grep { defined $self->$_ }
-            qw(builddir prefix verbose noclean nozapman skiptest perlargs mirrors make),
+            qw(builddir prefix verbose noclean nozapman skiptest perlargs mirrors make jobs),
       );
       unless ( $build ) {
         error( "Could not create a build object for ($perl)", $self->verbose );
@@ -307,7 +312,7 @@ App::SmokeBrew - The guts of smokebrew
 
 =head1 VERSION
 
-version 0.56
+version 1.00
 
 =head1 SYNOPSIS
 

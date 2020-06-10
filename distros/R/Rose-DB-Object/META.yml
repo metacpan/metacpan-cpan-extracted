@@ -41,5 +41,5 @@ resources:
   homepage: http://rosecode.org
   license: http://dev.perl.org/licenses/
   repository: https://github.com/siracusa/rose/tree/master/modules/Rose-DB-Object
-version: '0.817'
+version: '0.818'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

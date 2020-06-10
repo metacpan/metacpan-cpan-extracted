@@ -1,3 +1,11 @@
+0.0600  2020-06-07
+    - Avoid excessive callback calls by having the _path_cb take the $rule
+    object (optimization).
+
+0.0501  2020-06-06
+    - Try to fix t/dogfood.t tests failures on MS Windows.
+        - E.g: http://www.cpantesters.org/cpan/report/11330c63-6d80-1014-a13f-106dfb661191
+
 0.0500  2020-06-05
     - Convert the file processing to use a code generated callback (a speed optimization).
 

@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 11;
+our $VERSION = 12;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -179,6 +179,16 @@ sub activate_memcached_compat {
 
     $self->{memcached_compatibility} = 1;
     return;
+}
+
+sub getRawSocket {
+    my ($self) = @_;
+
+    if($self->{needreconnect}) {
+        $self->reconnect();
+    }
+
+    return $self->{socket};
 }
 
 sub doNetwork {
@@ -1103,9 +1113,17 @@ Internal function
 
 Reconnect to the CLACKS server when something went wrong.
 
+=head2 getRawSocket
+
+Returns the raw socket. You MUST NOT send or read data from because this will mess up the connection. Access to the raw
+socket is only useful in speciality cases, like you want to wait on multiple Clacks sockets for incoming data using
+IO::Select. In most cases, you wont need this.
+
 =head2 doNetwork
 
 Process incoming and outpoing messages. L<doNetwork> tries to send as much as possible. But due to network congestion it might not be able to send everything in one go and it will try not to hold up the caller for too long. Thats why it's important to call doNetwork from the cyclic loop of your programm at least every few seconds or so (depending on what you are trying to do).
+
+doNetwork takes one optional argument, the timeout time to wait for incoming traffic. The default is not to wait at all.
 
 =head2 flush
 

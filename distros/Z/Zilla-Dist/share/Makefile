@@ -34,7 +34,7 @@ DIST := $(DISTDIR).tar.gz
 NAMEPATH := $(subst -,/,$(NAMEPATH))
 SUCCESS := "$(DIST) Released!!!"
 
-export TESTML_RUN := perl5
+export TESTML_RUN := perl
 
 default: help
 

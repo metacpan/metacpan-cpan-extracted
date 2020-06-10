@@ -7,28 +7,40 @@ use warnings FATAL => 'all';
 use Test::More;
 use English qw(-no_match_vars);
 
-plan tests => 10;
+## no critic (TestingAndDebugging::RequireTestLabels)
+## no critic (RegularExpressions::RequireDotMatchAnything)
+## no critic (RegularExpressions::RequireLineBoundaryMatching)
+
+BEGIN {
+    plan tests => 11;
+
+    use_ok 'JIP::DataPath', '0.042';
+};
 
 subtest 'Require some module' => sub {
-    plan tests => 2;
+    plan tests => 1;
 
-    use_ok 'JIP::DataPath', '0.041';
     require_ok 'JIP::DataPath';
 
     diag(
-        sprintf 'Testing JIP::DataPath %s, Perl %s, %s',
+        sprintf(
+            'Testing JIP::DataPath %s, Perl %s, %s',
             $JIP::DataPath::VERSION,
             $PERL_VERSION,
             $EXECUTABLE_NAME,
+        ),
     );
 };
 
 subtest 'new(). exceptions' => sub {
-    plan tests => 1;
+    plan tests => 2;
 
-    eval { JIP::DataPath->new; } or do {
+    my $done = eval { return JIP::DataPath->new; };
+    if ($EVAL_ERROR) {
         like $EVAL_ERROR, qr{^Mandatory \s argument \s "document" \s is \s missing}x;
-    };
+    }
+
+    ok !$done;
 };
 
 subtest 'new()' => sub {
@@ -335,7 +347,7 @@ subtest 'perform()' => sub {
     subtest 'perform set()' => sub {
         plan tests => 1;
 
-        my $result = $o->perform('set', [qw(foo bar 0 wtf)], 100500);
+        my $result = $o->perform('set', [qw(foo bar 0 wtf)], 100_500);
         is $result, 1;
     };
 
@@ -349,7 +361,7 @@ subtest 'perform()' => sub {
     is_deeply $o->document, {
         foo => {
             bar => [
-                {wtf => 100500},
+                {wtf => 100_500},
             ],
         },
     };
@@ -436,7 +448,10 @@ subtest '_accessor()' => sub {
         is(
             $contains,
             $test->{'contains'},
-            sprintf('contains "%s"', join(q{/}, @{ $test->{'path'} })),
+            sprintf(
+                'contains "%s"',
+                join(q{/}, @{ $test->{'path'} }),
+            ),
         );
         is_deeply $context,  $test->{'context'};
     }

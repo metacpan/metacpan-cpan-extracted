@@ -1,5 +1,9 @@
 Revision history for Pg-Explain
 
+1.00    2020/06/06
+        - Make generated text explains more like Pg
+        - Parse planning time from explains from PostgreSQL 13
+
 0.99    2020/04/23
         - Fix requirements for tests
 

@@ -22,6 +22,7 @@ meta-spec:
   version: '1.4'
 name: Music-Cadence
 requires:
+  List::Util: '1.44'
   Moo: '2'
   Music::Chord::Note: '0'
   Music::Chord::Positions: '0'
@@ -34,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Cadence
   repository: https://github.com/ology/Music-Cadence.git
-version: '0.1404'
+version: '0.1502'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

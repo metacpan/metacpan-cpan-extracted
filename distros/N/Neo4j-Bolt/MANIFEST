@@ -4,7 +4,7 @@ MANIFEST
 Changes
 LICENSE
 README
-lib/Neo4j/neo4j_config_struct.h
+include/neo4j_config_struct.h
 lib/Neo4j/Bolt.pm
 lib/Neo4j/Bolt/NeoValue.pm
 lib/Neo4j/Bolt/Cxn.pm
@@ -13,10 +13,14 @@ lib/Neo4j/Bolt/TypeHandlersC.pm
 lib/Neo4j/Bolt/Node.pm
 lib/Neo4j/Bolt/Relationship.pm
 lib/Neo4j/Bolt/Path.pm
+lib/Inline/P.pm
+lib/Inline.pm
+lib/Inline/denter.pm
+lib/Inline/MakeMaker.pm
 lib/URI/bolt.pm
 t/001_useok.t
 t/002_types.t
-t/003_stream.t
+xt/003_stream.t
 t/004_query.t
 t/006_as_simple.t
 t/098_pod.t

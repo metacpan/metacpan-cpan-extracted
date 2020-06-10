@@ -2,12 +2,12 @@ package Wasm;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use Ref::Util qw( is_plain_arrayref );
 use Carp ();
 
 # ABSTRACT: Write Perl extensions using Wasm
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 our %WASM;
@@ -342,7 +342,7 @@ Wasm - Write Perl extensions using Wasm
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -481,8 +481,8 @@ was loaded. It is roughly analogous to the C<@INC> array in Perl.
 =head1 CAVEATS
 
 As mentioned before as of this writing this dist is a work in progress.
-I won't intentionally break stuff if I don't have to, but practicality
-may demand it in some situations.
+I won't intentionally break stuff without a compelling reason, but
+practicality may demand it in some situations.
 
 This interface is implemented using the bundled L<Wasm::Wasmtime> family
 of modules, which depends on the Wasmtime project.

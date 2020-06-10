@@ -20,7 +20,6 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 use Carp;
 use Clone qw( clone );
 use autodie;
-use Data::Dumper;
 use Pg::Explain::StringAnonymizer;
 use Pg::Explain::FromText;
 use Pg::Explain::FromYAML;
@@ -33,11 +32,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 0.99
+Version 1.00
 
 =cut
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 =head1 SYNOPSIS
 

@@ -44,6 +44,7 @@
          "requires" : {
             "Getopt::EX" : "v1.18.0",
             "List::Util" : "1.45",
+            "Moo" : "0",
             "perl" : "5.014"
          }
       },
@@ -56,13 +57,16 @@
    "provides" : {
       "Getopt::EX::i18n" : {
          "file" : "lib/Getopt/EX/i18n.pm",
-         "version" : "0.03"
+         "version" : "0.06"
       },
       "Getopt::EX::i18n::iso3361" : {
          "file" : "lib/Getopt/EX/i18n/iso3361.pm"
       },
       "Getopt::EX::i18n::iso639" : {
          "file" : "lib/Getopt/EX/i18n/iso639.pm"
+      },
+      "LocaleObj" : {
+         "file" : "lib/Getopt/EX/i18n.pm"
       }
    },
    "release_status" : "stable",
@@ -76,7 +80,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-i18n"
       }
    },
-   "version" : "0.03",
+   "version" : "0.06",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

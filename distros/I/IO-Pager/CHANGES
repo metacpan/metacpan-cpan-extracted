@@ -1,9 +1,36 @@
 Revision history for Perl extension IO::Pager.
 
-1.01	Tue Oct 08 2019
-	Add less.pm to MANIFEST
+1.02	Sun Jun 07 2020
+	Fix warning for undefined PAGER RT#132658
 
-	Fix interactive test 16
+	Fix flipped operands for cmp_ok in test 11.
+
+	Fix synthetic warning in test 9.
+
+	Win32 path fixes (git pull #6)
+
+	Remove deprecated POD content that some parsers carped about RT#131437
+
+	::Perl Add --tail mode to tp
+
+	::Perl Implement reflow for toggleable line numbering and folding.
+
+	::Perl Add support for bookmarks.
+
+	::Perl Add and document environment variable + switch processing to tp.
+
+	::Perl Rename visualBeep to visuaBell, but keep visualBeep as an alias.
+
+	::Perl Rename done() to close(), but keep done() as an alias.
+
+	::Perl Remove some debugging status updates.
+
+	::Perl More fixes for interactive test 16.
+
+1.01	Tue Oct 08 2019
+	Add less.pm to MANIFEST.
+
+	Fix interactive test 16.
 
 1.00	Mon Oct 07 2019
 	Fork Term::Pager to IO::Pager::Perl, with many new features.
@@ -31,7 +58,7 @@ Revision history for Perl extension IO::Pager.
 
 	Stringify version. RT#127342
 
-	Add bignum dependency RT#130319
+	Add bignum dependency. RT#130319
 
 	Add support for eventual Term::Pager v1.5
 
@@ -97,7 +124,7 @@ Revision history for Perl extension IO::Pager.
 
 	Undef $ENV{LESS} in interactive tests in case -E is set.
 
-	Robustify t/11 for Win32 RT#79950
+	Robustify t/11 for Win32. RT#79950
 
 0.31    Sat Apr 06 2013
 
@@ -114,7 +141,7 @@ Revision history for Perl extension IO::Pager.
 	Fixed tests under Win32 & cygwin RT#75181
 
 	Swap IO::Pager:new and ::open, alter subclass::open to
-	remove unnecessary level of subroutine calls
+	remove unnecessary level of subroutine calls.
 
 	Return IO::Handle objects when not connected to a TTY for
 	transparent use of IO::Pager when programming OO.
@@ -129,32 +156,32 @@ Revision history for Perl extension IO::Pager.
 
 0.20	Sat Feb 11 2012
 
-	Fixed RT#74691, add File::Which as dependency / skip test if missing
+	Fixed RT#74691, add File::Which as dependency / skip test if missing.
 
-	Fixed non-TTY/redirection behavior and added corresponding test
+	Fixed non-TTY/redirection behavior and added corresponding test.
 
-	Improve buffering sistuation in both ::Buffered and ::Unbuffered
+	Improve buffering sistuation in both ::Buffered and ::Unbuffered.
 
-	Auto-gensym scalar filehandles like perl's open
+	Auto-gensym scalar filehandles like perl's open.
 
-	Add OO interface
+	Add OO interface.
 
 	Add alternate pagers 'lv', 'pg',
-	and system default '/etc/alternatives/pager' RT#74519
+	and system default '/etc/alternatives/pager'. RT#74519
 
 	Add tests for initialization failure conditions (9-open.t)
 
 0.16	Fri Feb 3 2012
 
-	Require 5.8.0 or better
+	Require 5.8.0 or better.
 
 	Removed Perl warning 'Use of tie on a handle without * is deprecated'.
 
-	No interactive questions during 'make test' RT#66718
+	No interactive questions during 'make test'. RT#66718
 
 	Better handling of missing PAGER.
 
-	Look for more pagers: 'most' and 'w3m' RT#74519
+	Look for more pagers: 'most' and 'w3m'. RT#74519
 
 	Documentation clean-up, light refactoring, more error checks.
 
@@ -162,7 +189,7 @@ Revision history for Perl extension IO::Pager.
 
 0.10	Unreleased
 
-	Added support for encodings via binmode() RT#67930
+	Added support for encodings via binmode(). RT#67930
 
 	Test: encoding, handle (glob, scalar, OO), interactive...
 
@@ -173,7 +200,7 @@ Revision history for Perl extension IO::Pager.
 
 	Fixed several mis-coded segments that did not affect operation.
 
-	Added C<tell> in IO::Pager::Unbuffered to check size of buffered output.
+	Added C<tell> in IO::Pager::Buffered to check size of buffered output.
 
 	Pager open error now sets $! instead of issuing a warning, to more
 	closely emulate the C<open> experience. Check return value as before.
@@ -185,7 +212,7 @@ Revision history for Perl extension IO::Pager.
 0.06	Wed Sep 21 2005
 
 	Fixed a stupid leftover using =~ for assignment that some perls ignored
-	RT14692.
+	RT#14692.
 
 	Fixed other nits in t.pl and documentation.
 

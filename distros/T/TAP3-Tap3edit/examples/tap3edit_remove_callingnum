@@ -1,0 +1,62 @@
+#!/usr/bin/perl 
+#
+# Copyright (c) 2004 Javier Gutierrez <https://github.com/tap3edit/TAP3-Tap3edit>.
+# All rights reserved. This program is free software; you can redistribute
+# it and/or modify it under the same terms as Perl itself.
+#  
+#  Remove the calling number from the MTC's when has non-numerical characters
+#  
+#  
+#  Usage: tap3edit_remove_callingnum tapfile
+#  
+#  E.g: tap3edit_remove_callingnum CDOPER1OPER200001
+#  
+#  Note: The hexadecimal values may be displayed with unreadable charachters.
+#        To change those charachters you will need to handle them as Hexa/ASCII values.
+
+
+use TAP3::Tap3edit;
+
+$filename=shift;
+
+if ( ! $filename ) {
+	die "Usage: $0 filename\n";
+}
+
+
+$tap3 = TAP3::Tap3edit->new();
+$tap3->decode($filename) || die $tap3->error;
+
+
+$struct=$tap3->structure;
+
+my $key;
+
+# Will scan all the calls for MTC's.
+foreach $key ( @{$struct->{'transferBatch'}->{'callEventDetails'} } ) {
+
+	foreach ( keys %{$key} ) {
+
+		if ( $_ eq "mobileTerminatedCall" )
+		{
+			if ( defined $key->{$_}->{'basicCallInformation'} )
+			{
+				if ( defined $key->{$_}->{'basicCallInformation'}->{'callOriginator'} )
+				{
+					if ( defined $key->{$_}->{'basicCallInformation'}->{'callOriginator'}->{'callingNumber'} )
+					{
+						if ($key->{$_}->{'basicCallInformation'}->{'callOriginator'}->{'callingNumber'} =~ /^[0-9]/)
+						{
+							$key->{$_}->{'basicCallInformation'}->{'callOriginator'}->{'callingNumber'}=();
+						}
+					}
+				}
+			}
+		}
+
+	}
+}
+
+# if ( defined $key->{$_}->{'camelServiceUsed'} ) {
+# 		$key->{$_}->{'camelServiceUsed'} = ();
+$tap3->encode($filename.".new")  or  die $tap3->error;

@@ -2,6 +2,7 @@ package Wasm::Wasmtime::TableType;
 
 use strict;
 use warnings;
+use 5.008004;
 use base qw( Wasm::Wasmtime::ExternType );
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::ValType;
@@ -10,7 +11,7 @@ use constant is_tabletype => 1;
 use constant kind => 'tabletype';
 
 # ABSTRACT: Wasmtime table type class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 $ffi_prefix = 'wasm_tabletype_';
@@ -89,7 +90,7 @@ Wasm::Wasmtime::TableType - Wasmtime table type class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

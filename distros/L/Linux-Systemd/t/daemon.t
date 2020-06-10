@@ -1,4 +1,4 @@
-use Test::More 'no_plan';
+use Test::More;
 use Test::Fatal;
 
 use_ok 'Linux::Systemd::Daemon', qw/sd_notify sd_ready/;

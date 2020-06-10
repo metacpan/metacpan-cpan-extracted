@@ -1,0 +1,49 @@
+NAME
+    ColorThemeUtil::ANSI - Utility routines related to color themes and ANSI
+    code
+
+VERSION
+    This document describes version 0.001 of ColorThemeUtil::ANSI (from Perl
+    distribution ColorThemeUtil-ANSI), released on 2020-06-09.
+
+FUNCTIONS
+  item_color_to_ansi
+    Usage:
+
+     my $ansi_code = item_color_to_ansi($color [ , $is_bg ]);
+
+    This routine expects an item color (string or hash, see ColorTheme)
+    returned by "get_item_color()" and converts it to ANSI code. This
+    routine cannot handle coderef item color directly; so use
+    "get_item_color()" first.
+
+    If the item color has "ansi_fg" or "ansi_bg" property, this routine will
+    use that directly. Otherwise, it will convert RGB to ANSI.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ColorThemeUtil-ANSI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-ColorThemeUtil-ANSI>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ColorThemeUtil-ANSI>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    ColorTheme
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

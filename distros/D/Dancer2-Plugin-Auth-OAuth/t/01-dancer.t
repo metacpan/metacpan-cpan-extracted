@@ -113,7 +113,9 @@ test_psgi
             ### callback
             $res = $cb->(GET "/auth_test/$provider/callback?oauth_token=foo&oauth_verifier=bar&code=foobar"); # mixing oauth versions
             ok($res->code == 302, "[$provider][cb] Response code (302)");
-            is($res->header('Location'), 'http://localhost/users', "[$provider] success_url setting");
+
+            # Dancer2 v0.300001 moved to RFC 7231 behavior for redirects
+            is($res->header('Location'), $Dancer2::VERSION gt '0.300000' ? '/users' : 'http://localhost/users', "[$provider] success_url setting");
 
             my $cookie = $res->header('Set-Cookie');
                $cookie =~ s/;.*$//;

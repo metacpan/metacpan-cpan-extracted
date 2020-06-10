@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2019-11-26'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-10'; # DATE
+our $DIST = 'App-TermAttrUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -23,7 +25,7 @@ sub run {
         color_depth   => $self->color_depth,
         term_width    => $self->term_width,
         term_height   => $self->term_height,
-        _term_attrs_debug_info => $self->_term_attrs_debug_info,
+        _termattr_debug_info => $self->{_termattr_debug_info},
     };
 }
 
@@ -46,7 +48,7 @@ term-attrs - Show terminal attributes (from Term::App::Role::Attrs)
 
 =head1 VERSION
 
-This document describes version 0.005 of MyApp (from Perl distribution App-TermAttrUtils), released on 2019-11-26.
+This document describes version 0.006 of MyApp (from Perl distribution App-TermAttrUtils), released on 2020-06-10.
 
 =head1 SYNOPSIS
 
@@ -55,7 +57,7 @@ This document describes version 0.005 of MyApp (from Perl distribution App-TermA
 Sample result:
 
  {
-   _term_attrs_debug_info => {
+   _termattr_debug_info => {
                                color_depth_from   => "detect_terminal",
                                interactive_from   => "-t STDOUT",
                                term_height_from   => "term_size",
@@ -63,14 +65,14 @@ Sample result:
                                use_box_chars_from => "detect_terminal",
                                use_color_from     => "interactive + color_deth",
                                use_utf8_from      => "detect_terminal + LANG/LANGUAGE env must include \"utf8\"",
-                             },
-   color_depth            => 16777216,
-   interactive            => 1,
-   term_height            => 45,
-   term_width             => 192,
-   use_box_chars          => 1,
-   use_color              => 1,
-   use_utf8               => 1,
+                           },
+   color_depth          => 16777216,
+   interactive          => 1,
+   term_height          => 45,
+   term_width           => 192,
+   use_box_chars        => 1,
+   use_color            => 1,
+   use_utf8             => 1,
  }
 
 =head1 DESCRIPTION
@@ -104,7 +106,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

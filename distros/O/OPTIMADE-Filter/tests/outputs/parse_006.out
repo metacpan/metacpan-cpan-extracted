@@ -124,4 +124,4 @@ $VAR1 = bless( {
 == Filter ==
 ((number = "0.") AND ((number = ".0") AND ((number = "0.0") AND ((number = "+0") AND ((n_u_m_b_e_r = "-0") AND ((number = "0e1") AND ((number = "0e-1") AND (number = "0e+1"))))))))
 == SQL ==
-(('number' = "0.") AND (('number' = ".0") AND (('number' = "0.0") AND (('number' = "+0") AND (('n_u_m_b_e_r' = "-0") AND (('number' = "0e1") AND (('number' = "0e-1") AND ('number' = "0e+1"))))))))
+'number' = "0." AND ('number' = ".0" AND ('number' = "0.0" AND ('number' = "+0" AND ('n_u_m_b_e_r' = "-0" AND ('number' = "0e1" AND ('number' = "0e-1" AND 'number' = "0e+1"))))))

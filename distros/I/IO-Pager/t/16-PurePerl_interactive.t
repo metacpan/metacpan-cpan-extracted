@@ -18,28 +18,19 @@ SKIP: {
     my $BOB = new IO::Pager local *STDOUT, 'less' or die "Failed to create PAGER FH $!";
 
     isa_ok $BOB, 'IO::Pager::less';
-    
-    $BOB->print("OO factory filehandle\n") foreach 1..25;
+
+    #XXX No longer needed with return of control to host loop instead of
+    #XXX repeating input loop, but cannot hurt to preserve the instructions
+    warn "\n\nCurrent IO::Pager::Less is suboptimal \e[7;5m*** Press Ctrl-L to refresh ***\e[0m\n\n\n";
+
+    $BOB->print("This pager is implemented in perl\n") foreach 1..25;
     $BOB->print("\nEnd of text, try pressing 'Q' to exit.\n");
   }
 
   select STDERR;
-  my $A1 = prompt("\nDid you see 'OO factory filehandle' in your pager? [Yn]");
+  my $A1 = prompt("\nDid you see 'This pager is implemented in perl' in a pager? [Yn]");
   ok is_yes($A1), 'OO, factory instantiation';
 
-  {
-    my $BOB = new IO::Pager::less or die "Failed to create PAGER FH $!";
-
-    isa_ok $BOB, 'IO::Pager::less';
-
-    $BOB->say("OO subclass filehandle") foreach 1..25;
-    $BOB->say("\nEnd of text, try pressing 'Q' to exit.");
-    #XXX Close required because pager is not terminated on DESTROY
-    $BOB->close();
-  }
-
-  my $A2 = prompt("\nDid you see 'OO subclass filehandle' in your pager? [Yn]");
-  ok is_yes($A2), 'OO, subclass instantiation';
 }
 
 done_testing;

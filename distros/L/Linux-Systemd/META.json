@@ -4,7 +4,7 @@
       "Ioan Rogers <ioanr@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -41,6 +41,7 @@
             "Test::Mojibake" : "0",
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
+            "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
             "Test::Signature" : "0",
             "Test::Synopsis" : "0",
@@ -81,43 +82,43 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ioanrogers/Linux-Systemd/issues"
+         "web" : "https://gitlab.com/ioanrogers/Linux-Systemd/issues"
       },
+      "homepage" : "https://metacpan.org/release/Linux-Systemd",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/ioanrogers/Linux-Systemd.git",
-         "web" : "https://github.com/ioanrogers/Linux-Systemd"
+         "url" : "https://gitlab.com:ioanrogers/Linux-Systemd.git",
+         "web" : "https://gitlab.com/ioanrogers/Linux-Systemd"
       }
    },
-   "version" : "1.191790",
+   "version" : "1.201600",
    "x_BuiltWith" : {
-      "failures" : {
-         "Test::Signature" : "module was not found in INC"
-      },
       "modules" : {
          "CPAN::Meta" : "2.150010",
          "Carp" : "1.50",
-         "Dist::Zilla" : "6.012",
-         "Dist::Zilla::Plugin::Prereqs" : "6.012",
-         "Dist::Zilla::PluginBundle::Author::IOANR" : "1.173520",
-         "Exporter" : "5.73",
-         "ExtUtils::MakeMaker" : "7.34",
+         "Dist::Zilla" : "6.014",
+         "Dist::Zilla::Plugin::Prereqs" : "6.014",
+         "Dist::Zilla::PluginBundle::Author::IOANR" : "1.201400",
+         "Exporter" : "5.74",
+         "ExtUtils::MakeMaker" : "7.44",
          "ExtUtils::PkgConfig" : "1.16",
          "File::Basename" : "2.85",
          "File::Spec" : "3.78",
-         "IO::Handle" : "1.40",
+         "IO::Handle" : "1.42",
          "IPC::Open3" : "1.20",
-         "Module::Build" : "0.4229",
-         "Moo" : "2.003004",
+         "Module::Build" : "0.4231",
+         "Moo" : "2.004000",
          "Software::License::LGPL_2_1" : "0.103014",
          "Test::CheckDeps" : "0.010",
          "Test::EOL" : "2.00",
          "Test::Fatal" : "0.014",
          "Test::Kwalitee" : "1.28",
          "Test::Mojibake" : "1.3",
-         "Test::More" : "1.302162",
+         "Test::More" : "1.302175",
          "Test::NoTabs" : "2.02",
+         "Test::Pod::No404s" : "0.02",
          "Test::Portability::Files" : "0.10",
+         "Test::Signature" : "1.11",
          "Test::Synopsis" : "0.16",
          "Test::Vars" : "0.014",
          "Test::Version" : "2.09",
@@ -127,25 +128,22 @@
          "warnings" : "1.44"
       },
       "perl" : {
-         "original" : "v5.30.0",
+         "original" : "v5.30.1",
          "qv" : 1,
          "version" : [
             5,
             30,
-            0
+            1
          ]
       },
       "perl-config" : {
-         "gccversion" : "8.3.0",
+         "gccversion" : "Clang 9.0.1 (Fedora 9.0.1-2.fc31)",
          "myarchname" : "x86_64-linux",
          "osname" : "linux"
       },
       "platform" : "linux"
    },
-   "x_contributors" : [
-      "Ioan Rogers <ioan.rogers@sophos.com>",
-      "Ioan Rogers <irogers@maxmind.com>"
-   ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
+   "x_generated_by_perl" : "v5.30.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "LGPL-2.1"
 }

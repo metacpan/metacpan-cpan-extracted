@@ -11,7 +11,7 @@ my $finder = Test::TrailingSpace->new(
         find_tabs         => 1,
         root              => '.',
         filename_regex    => qr/(?:\.(?:t|pm|pl|PL|yml|json))|README|Changes\z/,
-        abs_path_prune_re => qr/sample-data/,
+        abs_path_prune_re => qr/(?i:(?:(?:MYMETA\.(json|yml)\z)|sample-data))/,
     },
 );
 

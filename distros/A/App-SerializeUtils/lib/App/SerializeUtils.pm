@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.162'; # VERSION
+our $VERSION = '0.163'; # VERSION
 
 1;
 # ABSTRACT: Utilities for serialization tasks
@@ -21,7 +21,7 @@ App::SerializeUtils - Utilities for serialization tasks
 
 =head1 VERSION
 
-This document describes version 0.162 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2020-04-10.
+This document describes version 0.163 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2020-06-06.
 
 =head1 SYNOPSIS
 

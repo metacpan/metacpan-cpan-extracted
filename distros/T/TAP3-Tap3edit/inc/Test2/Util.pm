@@ -3,10 +3,16 @@ package Test2::Util;
 use strict;
 use warnings;
 
-our $VERSION = '1.302073';
+our $VERSION = '1.302175';
 
-
+use POSIX();
 use Config qw/%Config/;
+use Carp qw/croak/;
+
+BEGIN {
+    local ($@, $!, $SIG{__DIE__});
+    *HAVE_PERLIO = eval { require PerlIO; PerlIO->VERSION(1.02); } ? sub() { 1 } : sub() { 0 };
+}
 
 our @EXPORT_OK = qw{
     try
@@ -18,9 +24,19 @@ our @EXPORT_OK = qw{
     CAN_REALLY_FORK
     CAN_FORK
 
+    CAN_SIGSYS
+
     IS_WIN32
 
     ipc_separator
+
+    gen_uid
+
+    do_rename do_unlink
+
+    try_sig_mask
+
+    clone_io
 };
 BEGIN { require Exporter; our @ISA = qw(Exporter) }
 
@@ -144,8 +160,122 @@ sub pkg_to_file {
 
 sub ipc_separator() { "~" }
 
+my $UID = 1;
+sub gen_uid() { join ipc_separator() => ($$, get_tid(), time, $UID++) }
+
+sub _check_for_sig_sys {
+    my $sig_list = shift;
+    return $sig_list =~ m/\bSYS\b/;
+}
+
+BEGIN {
+    if (_check_for_sig_sys($Config{sig_name})) {
+        *CAN_SIGSYS = sub() { 1 };
+    }
+    else {
+        *CAN_SIGSYS = sub() { 0 };
+    }
+}
+
+my %PERLIO_SKIP = (
+    unix => 1,
+    via  => 1,
+);
+
+sub clone_io {
+    my ($fh) = @_;
+    my $fileno = eval { fileno($fh) };
+
+    return $fh if !defined($fileno) || !length($fileno) || $fileno < 0;
+
+    open(my $out, '>&' . $fileno) or die "Can't dup fileno $fileno: $!";
+
+    my %seen;
+    my @layers = HAVE_PERLIO ? grep { !$PERLIO_SKIP{$_} and !$seen{$_}++ } PerlIO::get_layers($fh) : ();
+    binmode($out, join(":", "", "raw", @layers));
+
+    my $old = select $fh;
+    my $af  = $|;
+    select $out;
+    $| = $af;
+    select $old;
+
+    return $out;
+}
+
+BEGIN {
+    if (IS_WIN32) {
+        my $max_tries = 5;
+
+        *do_rename = sub {
+            my ($from, $to) = @_;
+
+            my $err;
+            for (1 .. $max_tries) {
+                return (1) if rename($from, $to);
+                $err = "$!";
+                last if $_ == $max_tries;
+                sleep 1;
+            }
+
+            return (0, $err);
+        };
+        *do_unlink = sub {
+            my ($file) = @_;
+
+            my $err;
+            for (1 .. $max_tries) {
+                return (1) if unlink($file);
+                $err = "$!";
+                last if $_ == $max_tries;
+                sleep 1;
+            }
+
+            return (0, "$!");
+        };
+    }
+    else {
+        *do_rename = sub {
+            my ($from, $to) = @_;
+            return (1) if rename($from, $to);
+            return (0, "$!");
+        };
+        *do_unlink = sub {
+            my ($file) = @_;
+            return (1) if unlink($file);
+            return (0, "$!");
+        };
+    }
+}
+
+sub try_sig_mask(&) {
+    my $code = shift;
+
+    my ($old, $blocked);
+    unless(IS_WIN32) {
+        my $to_block = POSIX::SigSet->new(
+            POSIX::SIGINT(),
+            POSIX::SIGALRM(),
+            POSIX::SIGHUP(),
+            POSIX::SIGTERM(),
+            POSIX::SIGUSR1(),
+            POSIX::SIGUSR2(),
+        );
+        $old = POSIX::SigSet->new;
+        $blocked = POSIX::sigprocmask(POSIX::SIG_BLOCK(), $to_block, $old);
+        # Silently go on if we failed to log signals, not much we can do.
+    }
+
+    my ($ok, $err) = &try($code);
+
+    # If our block was successful we want to restore the old mask.
+    POSIX::sigprocmask(POSIX::SIG_SETMASK(), $old, POSIX::SigSet->new()) if defined $blocked;
+
+    return ($ok, $err);
+}
+
 1;
 
 __END__
 
-#line 258
+#line 448

@@ -12,4 +12,4 @@ $VAR1 = bless( {
 == Filter ==
 (list CONTAINS "string\"with\"quotes")
 == SQL ==
-('list' LIKE "%string""with""quotes%")
+'list' LIKE "%string""with""quotes%"

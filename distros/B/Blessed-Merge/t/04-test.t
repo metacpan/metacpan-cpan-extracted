@@ -16,11 +16,23 @@ use Bang;
 	1;
 }
 
+{
+	package Zoom;
+
+	sub new { bless {}, $_[0] }
+
+	sub again {
+		return 'thing';
+	}
+
+	1;
+}
+
 use Blessed::Merge;
 my $merge = Blessed::Merge->new( same => 0 );
 
 my $self = $merge->merge(Foo->new, Bar->new, Bang->new);
-my $sself = $merge->merge(Foo->new, Bar->new, Bang->new, Boom->new);
+my $sself = $merge->merge(Boom->new, Foo->new, Bar->new, Bang->new, Zoom->new);
 
 is ($self->test, 'okay');
 is ($self->another, 'next');

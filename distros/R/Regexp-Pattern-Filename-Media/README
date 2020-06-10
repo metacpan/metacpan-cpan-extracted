@@ -1,0 +1,76 @@
+NAME
+    Regexp::Pattern::Filename::Media - Media (image/audio/video) filename
+
+VERSION
+    This document describes version 0.001 of
+    Regexp::Pattern::Filename::Media (from Perl distribution
+    Regexp-Pattern-Filename-Media), released on 2020-04-01.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Filename::Media::filename_media");
+
+DESCRIPTION
+    This is a Regexp::Pattern wrapper for Filename::Media.
+
+PATTERNS
+    *   filename_media
+
+        Media (image/audio/video) filename.
+
+        Examples:
+
+        No extension.
+
+         "foo" =~ re("Filename::Media::filename_media");  # doesn't match
+
+        Not an extension.
+
+         "mp4" =~ re("Filename::Media::filename_media");  # doesn't match
+
+         "foo.jpg" =~ re("Filename::Media::filename_media");  # matches
+
+         "foo.mp3" =~ re("Filename::Media::filename_media");  # matches
+
+         "foo.mp4" =~ re("Filename::Media::filename_media");  # matches
+
+        Case insensitive.
+
+         "foo bar.MKV" =~ re("Filename::Media::filename_media");  # matches
+
+        Regex is anchored.
+
+         "foo.MKV is the file" =~ re("Filename::Media::filename_media");  # doesn't match
+
+         "foo.txt" =~ re("Filename::Media::filename_media");  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Filename-Media>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Filename-Media>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Filena
+    me-Media>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern
+
+    Filename::Media
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

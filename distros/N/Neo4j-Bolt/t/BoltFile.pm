@@ -1,13 +1,12 @@
 package t::BoltFile;
+use Neo4j::Client;
 use File::Spec;
 BEGIN {
   use lib 'lib';
-  eval 'require Neo4j::Bolt::Config; 1' or die "Can't find config";
 }
 use Inline C => Config =>
-  LIBS  => $Neo4j::Bolt::Config::extl,
-  INC => $Neo4j::Bolt::Config::extc,
-  myextlib => $Neo4j::Bolt::Config::liba;
+  LIBS  => $Neo4j::Client::LIBS,
+  INC => $Neo4j::Client::DEV_CCFLAGS;
 
 use Inline C => <<'END_BOLTFILE_C';
 

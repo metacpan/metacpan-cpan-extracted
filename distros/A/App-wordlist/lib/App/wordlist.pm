@@ -1,9 +1,9 @@
 package App::wordlist;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
+our $DATE = '2020-06-09'; # DATE
 our $DIST = 'App-wordlist'; # DIST
-our $VERSION = '0.274'; # VERSION
+our $VERSION = '0.276'; # VERSION
 
 use 5.010001;
 use strict;
@@ -252,7 +252,7 @@ _
 };
 sub wordlist {
     require Encode;
-    require WordListUtil::CLI;
+    require Module::Load::Util;
 
     my %args = @_;
 
@@ -316,7 +316,8 @@ sub wordlist {
 
         # optimize random picking when there's only one wordlist to pick from
         if ($random && @$wordlists == 1 && $num > 0 && $num <= 100) {
-            my $wl_obj = WordListUtil::CLI::instantiate_wordlist($wordlists->[0]);
+            my $wl_obj = Module::Load::Util::instantiate_class_with_optional_args(
+                {ns_prefix=>"WordList"}, $wordlists->[0]);
             return [200, "OK", [$wl_obj->pick($num)]];
         }
 
@@ -348,7 +349,11 @@ sub wordlist {
             my $wl = $wordlists->[$i_wordlist];
             unless ($wl_obj) {
                 log_trace "Instantiating wordlist $wl ...";
-                $wl_obj = WordListUtil::CLI::instantiate_wordlist($wl, 'ignore');
+                eval {
+                    $wl_obj = Module::Load::Util::instantiate_class_with_optional_args(
+                        {ns_prefix=>"WordList"}, $wl);
+                };
+                warn if $@;
                 unless ($wl_obj) {
                     $i_wordlist++;
                     goto REDO;
@@ -494,7 +499,7 @@ App::wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.274 of App::wordlist (from Perl distribution App-wordlist), released on 2020-05-24.
+This document describes version 0.276 of App::wordlist (from Perl distribution App-wordlist), released on 2020-06-09.
 
 =head1 SYNOPSIS
 

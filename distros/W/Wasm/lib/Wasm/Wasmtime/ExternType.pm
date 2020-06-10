@@ -2,6 +2,7 @@ package Wasm::Wasmtime::ExternType;
 
 use strict;
 use warnings;
+use 5.008004;
 use Wasm::Wasmtime::FFI;
 
 require Wasm::Wasmtime::FuncType;
@@ -10,7 +11,7 @@ require Wasm::Wasmtime::TableType;
 require Wasm::Wasmtime::MemoryType;
 
 # ABSTRACT: Wasmtime extern type class
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 sub kind { die "internal error" };
@@ -63,7 +64,7 @@ Wasm::Wasmtime::ExternType - Wasmtime extern type class
 
 =head1 VERSION
 
-version 0.10
+version 0.14
 
 =head1 SYNOPSIS
 

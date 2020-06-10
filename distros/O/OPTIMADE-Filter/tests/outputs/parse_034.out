@@ -13,4 +13,4 @@ $VAR1 = bless( {
 == Filter ==
 (species.chemical_symbols = "Ti")
 == SQL ==
-('species'.'chemical_symbols' = "Ti")
+'species'.'chemical_symbols' = "Ti"

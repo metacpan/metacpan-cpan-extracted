@@ -8,7 +8,7 @@ use Mojo::Rx::Subscription;
 
 use Scalar::Util 'weaken';
 
-our $VERSION = "v0.12.1";
+our $VERSION = "v0.13.0";
 
 sub new {
     my ($class, $source, $subject_factory) = @_;

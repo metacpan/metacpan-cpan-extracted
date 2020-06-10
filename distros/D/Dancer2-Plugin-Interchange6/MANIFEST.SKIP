@@ -1,4 +1,4 @@
-^\.git\/
+.git
 ^.*\.tar.gz$
 ^.*.bak
 ^.*.old

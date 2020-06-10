@@ -42,6 +42,8 @@ sub new {
         }
     }
     
+    my $self = bless $attributes, $class;
+    
     # pull in some Service::Engine globals
     $Config = $Service::Engine::Config;
     $Log = $Service::Engine::Log;
@@ -49,8 +51,6 @@ sub new {
     $Threads = $Service::Engine::Threads;
     $Health = $Service::Engine::Health;
     $Engine = $Service::Engine::Engine;
-    
-    my $self = bless $attributes, $class;
         
     # create our admin methods
     # these will be autoloaded from Service::Engine like this my $method = $Admin->methodname();
@@ -85,8 +85,8 @@ sub new {
             
             # set up commands
             $self->add_command({'module'=>$Threads, 'method'=>'add_thread', 'label'=>'AddThread'});
-            $self->add_command({'module'=>$self, 'method'=>'stop_engine', 'label'=>'StopEngine'});
-            $self->add_command({'module'=>$Engine, 'method'=>'start_selector', 'label'=>'StartEngine'});
+            $self->add_command({'module'=>$self, 'method'=>'stop_engine', 'label'=>'Stop Engine'});
+            $self->add_command({'module'=>$Engine, 'method'=>'start_selector', 'label'=>'Start Engine'});
 
         }
         
@@ -111,7 +111,7 @@ sub start_api_server {
         $Server = Service::Engine::API::Server->new(
                                                         'host' => $host_ip, 
                                                         'port' => $host_port, 
-                                                        'server_type' => ['Net::Server::Multiplex'],
+                                                        'server_type' => ['PreFork'],
                                                         'SSL_key_file'  => $key_file,
                                                         'SSL_cert_file' => $cert_file,
                                                     );

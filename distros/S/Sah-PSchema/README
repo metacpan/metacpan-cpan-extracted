@@ -1,0 +1,83 @@
+NAME
+    Sah::PSchema - Retrieve and resolve parameterized Sah schema
+
+VERSION
+    This document describes version 0.002 of Sah::PSchema (from Perl
+    distribution Sah-PSchema), released on 2020-06-06.
+
+SYNOPSIS
+    In YourModule.pm:
+
+     package YourModule;
+     use Sah::PSchema 'get_schema';
+
+     our %SPEC;
+     $SPEC{pick_word_from_wordlist} = {
+         v => 1.1,
+         args => {
+             wordlist => {
+                 schema => get_schema('perl::modname', {ns_prefix=>'WordList'}, {req=>1}),
+                 req => 1,
+                 pos => 0,
+             },
+         }
+     };
+     sub pick_word_from_wordlist {
+         ...
+     }
+
+     1;
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+    This module implements parameterized Sah schema in a simple way.
+
+FUNCTIONS
+  get_schema
+    Usage:
+
+     my $sch = get_schema($psch, \%args [ , \%clause_set ]);
+
+    Example:
+
+     my $sch = get_schema("perl::modname", {ns_prefix=>"WordList"}, {req=>1});
+     # => ["perl::modname", {req=>1, 'x.completion'=>[perl_modname => {ns_prefix=>"WordList"}]}]
+
+    The function simply loads "Sah::PSchema::$psch" module then calls its
+    "get_schema" method with the arguments \%args and \%clause_set. In the
+    above example, the module Sah::PSchema::perl::modname module is loaded.
+    This parameterized schema basically just return the regular
+    "perl::modname" (from Sah::Schema::perl::modname) but with the
+    "ns_prefix" argument put into argument for "x.completion".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sah-PSchema>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Sah-PSchema>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-PSchema>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sah::Schemas and "Sah::Schema::*"
+
+    Sah::PSchemas and "Sah::PSchema::*"
+
+    Sah and Data::Sah
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,3 +1,16 @@
+Overview of changes in Glib 1.3293 (stable)
+============================================
+
+* Rename DOAP file in the manifest
+* Fix Glib::get_prgname()
+* Add fallback macros for deprecated sections
+* Ignore deprecation warnings around g_object_newv()
+* Add missing GParamSpecFlags enumeration values
+* Add missing GSpawnError enumeration value
+* Ignore warnings for g_option_group_free()
+* Match GLib's log message handling
+* Add tests for Glib->info and Glib->debug
+
 Overview of changes in Glib 1.3292 (stable)
 ============================================
 

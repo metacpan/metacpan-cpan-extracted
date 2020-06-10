@@ -14,7 +14,7 @@ my @module_files = (
 
 my @scripts = (
     'script/list-color-theme-modules',
-    'script/list-color-themes'
+    'script/show-color-theme-swatch'
 );
 
 # no fake home requested

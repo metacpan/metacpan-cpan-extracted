@@ -41,3 +41,9 @@ the way I am doing it now.
 1.12 Thu Aug 13 23:38:02 CDT 1998
   - some minor fixes
 
+4.48 Sat Jun  6 11:40:21 CDT 2020
+  - Synchronized to Carp.pm from Perl 5.22.1
+  - Synchronized to CGI::Carp-4.48 from perl 5.22.1
+  - tests updated
+  - packaging refreshed to current PAUSE/CPAN guidelines
+

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Future/Buffer.pm
+MANIFEST			This list of files
+t/00use.t
+t/01read.t
+t/02read_exactly.t
+t/03read_until.t
+t/10write.t
+t/11fill.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

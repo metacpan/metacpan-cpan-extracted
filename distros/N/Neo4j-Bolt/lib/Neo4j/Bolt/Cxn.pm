@@ -1,16 +1,17 @@
 package Neo4j::Bolt::Cxn;
+use Neo4j::Client;
+
 BEGIN {
-  our $VERSION = "0.12";
+  our $VERSION = "0.20";
   require Neo4j::Bolt::TypeHandlersC;
-  eval 'require Neo4j::Bolt::Config; 1';
 }
 # use Inline 'global';
-use Inline C => Config => LIBS => $Neo4j::Bolt::Config::extl,
-  INC => $Neo4j::Bolt::Config::extc,
+use Inline P => Config => LIBS => $Neo4j::Client::LIBS,
+  INC => $Neo4j::Client::CCFLAGS,
   version => $VERSION,
   name => __PACKAGE__;
   
-use Inline C => <<'END_BOLT_CXN_C';
+use Inline P => <<'END_BOLT_CXN_C';
 #include <neo4j-client.h>
 #include <errno.h>
 #define RSCLASS  "Neo4j::Bolt::ResultStream"

@@ -28,4 +28,4 @@ $VAR1 = bless( {
 == Filter ==
 ((_mp_bandgap > "5.0") AND (_cod_molecular_weight < "350"))
 == SQL ==
-(('_mp_bandgap' > "5.0") AND ('_cod_molecular_weight' < "350"))
+'_mp_bandgap' > "5.0" AND '_cod_molecular_weight' < "350"

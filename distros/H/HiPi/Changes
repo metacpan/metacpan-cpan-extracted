@@ -1,3 +1,7 @@
+Version 0.81  - 07 June 2020
+                Updated for Raspberry Pi 4 8GB model
+                Bug fix in HiPi::RaspberryPi dump_board_info()
+
 Version 0.80  - 22 July 2019
                 Updated for Raspberry Pi 4 alternate function settings.
                 MFRC522 interface updated for default speed compatible

@@ -1,0 +1,4 @@
+[Sat Jun  6 14:57:21 2020]   6713 06croak.t ERR: a WARN before in main at t/06croak.t line 35.
+[Sat Jun  6 14:57:21 2020]   6713 06croak.t ERR: a WARN in check at t/myCroak.pm line 7.
+[Sat Jun  6 14:57:21 2020]   6713 06croak.t ERR: a CROAK at t/myCroak.pm line 8.
+[Sat Jun  6 14:57:21 2020]   6713 06croak.t ERR: a WARN after in main at t/06croak.t line 39.

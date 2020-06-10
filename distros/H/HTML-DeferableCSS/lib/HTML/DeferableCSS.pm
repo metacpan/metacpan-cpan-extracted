@@ -20,7 +20,7 @@ use Types::Standard qw/ Bool CodeRef HashRef Maybe Tuple /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 
 
@@ -344,7 +344,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -593,6 +593,8 @@ It is false by default, for backwards compatability. But it is
 recommended that you set this to true.
 
 See L<https://www.filamentgroup.com/lab/load-css-simpler/>.
+
+This attribute was added in v0.4.0.
 
 =head1 METHODS
 

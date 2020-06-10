@@ -1,0 +1,89 @@
+package ColorTheme::Test::Random;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-09'; # DATE
+our $DIST = 'ColorThemes-Test'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+use strict;
+use warnings;
+use parent 'ColorThemeBase::Base';
+
+use Color::RGB::Util qw(rand_rgb_color);
+
+our %THEME = (
+    v => 2,
+    summary => 'A color theme which gives random colors',
+    dynamic => 1,
+    args => {
+        cache => {
+            schema => 'bool*',
+            default => 1,
+        },
+        # TODO: whether to set random foreground color or not (default 1)
+        # TODO: whether to set random background color or not (default 0)
+    },
+);
+
+sub list_items {
+    my $self = shift;
+
+    my @list = [];
+    wantarray ? @list : \@list;
+}
+
+sub get_item_color {
+    my ($self, $name, $args) = @_;
+    if ($self->{args}{cache}) {
+        return $self->{_cache}{$name} if defined $self->{_cache}{$name};
+        $self->{_cache}{$name} = rand_rgb_color();
+    } else {
+        rand_rgb_color();
+    }
+}
+
+1;
+# ABSTRACT: A color theme which gives random colors
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ColorTheme::Test::Random - A color theme which gives random colors
+
+=head1 VERSION
+
+This document describes version 0.002 of ColorTheme::Test::Random (from Perl distribution ColorThemes-Test), released on 2020-06-09.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/ColorThemes-Test>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-ColorThemes-Test>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=ColorThemes-Test>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

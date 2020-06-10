@@ -3,27 +3,16 @@ NAME
     to use color or not
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Role::TinyCommons::TermAttr::Color (from Perl distribution
-    Role-TinyCommons-TermAttr-Color), released on 2020-06-05.
+    Role-TinyCommons-TermAttr-Color), released on 2020-06-06.
 
 DESCRIPTION
+    These use Term::App::Util::Color as backend.
+
 PROVIDED METHODS
   termattr_use_color
-    Try to determine whether colors should be used. First will check
-    NO_COLOR environment variable: if it exists then we should not use
-    colors. Then check the COLOR environment variable: if it's false then
-    color should not be used, if it's true then color should be used. Then
-    check the COLOR_DEPTH environment variable: if it's true (not 0) then
-    color should be used. Lastly check if running interactively.
-
   termattr_color_depth
-    Try to determine the terminal's color depth.
-
-ENVIRONMENT
-  COLOR
-  COLOR_DEPTH
-  NO_COLOR
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Role-TinyCommons-TermAttr-Color>.
@@ -41,10 +30,11 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Term::App::Util::Color
+
     Role::TinyCommons
 
-    Term::App::Role::Attrs, an earlier project, Moo::Role, and currently
-    more complete version.
+    Term::App::Role::Attrs, an earlier project, Moo::Role.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

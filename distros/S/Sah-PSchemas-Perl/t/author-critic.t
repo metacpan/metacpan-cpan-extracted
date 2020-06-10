@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Sah/PSchema/perl/modname.pm','lib/Sah/PSchemas/Perl.pm'];
+my $filenames = ['lib/Sah/PSchema/perl/modname.pm','lib/Sah/PSchema/perl/modname_with_optional_args.pm','lib/Sah/PSchemas/Perl.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

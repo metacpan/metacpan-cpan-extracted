@@ -14,20 +14,19 @@ my $d = MIDI::Drummer::Tiny->new(
 );
 
 $d->score->synch(
-    \&hihat,
+    \&cymbals,
     \&beat,
 );
 
 $d->write();
 
-sub hihat {
-    for my $beat ( 0 .. $max - 1 ) {
-        # Crash every 3rd time around
+sub cymbals {
+    for my $beat ( 1 .. $max ) {
         if ( $beat % 3 == 0 ) {
             $d->note( $d->eighth, $d->crash2 );
         }
         else {
-            $d->note( $d->eighth, $d->closed_hh );
+            $d->note( $d->eighth, $d->open_hh );
         }
 
         $d->note( $d->eighth, $d->closed_hh ) for 1 .. 9;

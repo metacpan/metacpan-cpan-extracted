@@ -1,9 +1,9 @@
 package Sah::SchemaR::cryptocurrency::safename;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.015'; # VERSION
 
-our $rschema = ["str",[{description=>"\nCryptocurrency safename that is listed in <pm:CryptoCurrency::Catalog>, e.g.\nbitcoin, Ethereum-Classic, BITCOIN-PRIVATE.\n\nName will be converted to lowercase.\n\n",summary=>"Cryptocurrency safename","x.completion"=>"cryptocurrency_safename","x.perl.coerce_rules"=>["From_str::to_lower"]}],["str"]];
+our $rschema = ["str",[{description=>"\nCryptocurrency safename that is listed in <pm:CryptoCurrency::Catalog>, e.g.\nbitcoin, Ethereum-Classic, BITCOIN-PRIVATE.\n\nName will be converted to lowercase.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"bitcoin",value=>"btc"},{valid=>1,validated_value=>"bitcoin",value=>"bitcoin"},{valid=>1,validated_value=>"bitcoin-cash",value=>"bitCOIN caSh"},{valid=>0,value=>"notbtc"}],summary=>"Cryptocurrency safename","x.completion"=>"cryptocurrency_safename","x.perl.coerce_rules"=>["From_str::to_cryptocurrency_safename"]}],["str"]];
 
 1;
 # ABSTRACT: Cryptocurrency safename
@@ -20,7 +20,7 @@ Sah::SchemaR::cryptocurrency::safename - Cryptocurrency safename
 
 =head1 VERSION
 
-This document describes version 0.013 of Sah::SchemaR::cryptocurrency::safename (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2019-11-29.
+This document describes version 0.015 of Sah::SchemaR::cryptocurrency::safename (from Perl distribution Sah-Schemas-CryptoCurrency), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

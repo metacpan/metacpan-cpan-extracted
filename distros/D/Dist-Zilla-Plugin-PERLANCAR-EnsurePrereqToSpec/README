@@ -3,10 +3,10 @@ NAME
     spec modules
 
 VERSION
-    This document describes version 0.060 of
+    This document describes version 0.061 of
     Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec (from Perl
     distribution Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec), released
-    on 2018-09-22.
+    on 2020-06-09.
 
 SYNOPSIS
     In "dist.ini":
@@ -15,10 +15,18 @@ SYNOPSIS
 
 DESCRIPTION
     I like to specify prerequisite to spec modules such as Rinci, Riap, Sah,
-    Setup, etc as DevelopRecommends, to express that a distribution conforms
-    to such specification(s).
+    Setup, etc as (phase=develop, rel=x_spec) dependency, to express that a
+    distribution conforms to such specification(s).
 
-    Currently only Rinci is checked.
+    Currently only these spec is checked:
+
+    *   Rinci
+
+        When a package contains Rinci metadata (%SPEC).
+
+    *   ColorTheme
+
+        When there is a ColorTheme/* source files.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -42,7 +50,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

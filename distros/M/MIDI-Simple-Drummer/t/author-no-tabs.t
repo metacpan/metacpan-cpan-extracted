@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -26,13 +26,7 @@ my @files = (
     't/02-Rock.t',
     't/03-Jazz.t',
     't/04-Rudiments.t',
-    't/05-Euclidean.t',
-    't/author-eol.t',
-    't/author-no-tabs.t',
-    't/author-pod-spell.t',
-    't/release-pod-coverage.t',
-    't/release-pod-syntax.t',
-    't/release-synopsis.t'
+    't/05-Euclidean.t'
 );
 
 notabs_ok($_) foreach @files;

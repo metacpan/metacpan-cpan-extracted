@@ -4,10 +4,9 @@ use warnings FATAL => 'all';
 
 use base 'Mojo::Rx::Observable';
 
-use Mojo::Rx 'rx_observable';
 use Mojo::Rx::Utils 'get_subscription_from_subscriber';
 
-our $VERSION = "v0.12.1";
+our $VERSION = "v0.13.0";
 
 sub new {
     my ($class) = @_;

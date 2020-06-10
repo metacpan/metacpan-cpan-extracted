@@ -1,7 +1,8 @@
 package IO::Pager::Unbuffered;
-our $VERSION = 0.42;
+our $VERSION = 10.02;
 
 use strict;
+use warnings;
 use base qw( IO::Pager );
 use SelectSaver;
 

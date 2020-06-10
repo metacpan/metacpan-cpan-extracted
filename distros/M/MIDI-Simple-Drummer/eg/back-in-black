@@ -24,6 +24,7 @@ $d->patterns('3.1'    => \&beat_three_one);
 $d->patterns('3.2'    => \&beat_three_two);
 $d->patterns('3.3'    => \&beat_three_three);
 $d->patterns('3.4'    => \&beat_three_four);
+$d->patterns('3.5'    => \&beat_three_five);
 
 # Intro
 $d->count_in(2, 'Pedal Hi-Hat');
@@ -34,8 +35,8 @@ $d->beat(-name => 2.1, %args);
 $d->beat(-name => 2.1) for 0 .. 1;
 $d->fill(-name => 2);
 
-# Verse
 for (0 .. 1) {
+    # Verse
     $d->beat(-name => 2.1, %args);
     $d->beat(-name => 2.1) for 0 .. 1;
     $d->fill(-name => 1);
@@ -44,7 +45,8 @@ for (0 .. 1) {
     $d->fill(-name => 3);
 
     # Chorus
-    $d->beat(-name => 2.1, %args) for 0 .. 5;
+    $d->beat(-name => 3.5);
+    $d->beat(-name => 2.1, %args) for 0 .. 4;
     $d->beat(-name => 2.2, %args);
     $d->fill(-name => 4);
 }
@@ -62,9 +64,18 @@ $d->beat(-name => 3.3);
 $d->beat(-name => 3.4);
 
 # Chorus
+$d->beat(-name => 3.5);
+$d->beat(-name => 2.1, %args) for 0 .. 4;
+$d->beat(-name => 2.2, %args);
+$d->fill(-name => 4);
+$d->beat(-name => 3.5);
+$d->beat(-name => 2.1, %args) for 0 .. 4;
+$d->beat(-name => 2.2, %args); # TODO New beat needed here
+$d->fill(-name => 4);
+
 # Bridge
 # Chorus
-# Solo 2
+# Outro
 
 $d->write;
 
@@ -188,4 +199,19 @@ sub beat_three_four {
     $d->note($d->DOTTED_EIGHTH, $d->kick, $d->strike('Crash Cymbal 1'));
     $d->note($d->DOTTED_EIGHTH, $d->kick, $d->strike('Crash Cymbal 1'));
     $d->note($d->EIGHTH, $d->kick, $d->strike('Crash Cymbal 1'));
+}
+
+sub beat_three_five {
+    my $d = shift;
+
+    $d->note($d->SIXTEENTH, $d->snare, $d->tick);
+    $d->note($d->SIXTEENTH, $d->snare, $d->tick);
+    $d->note($d->EIGHTH, $d->snare, $d->tick);
+    $d->note($d->DOTTED_EIGHTH, $d->kick, $d->strike('Crash Cymbal 1'));
+    $d->note($d->DOTTED_EIGHTH, $d->kick, $d->strike('Crash Cymbal 2'));
+
+    $d->note($d->EIGHTH, $d->kick, $d->strike('Crash Cymbal 1'));
+    $d->note($d->EIGHTH, $d->tick);
+    $d->note($d->EIGHTH, $d->snare, $d->tick);
+    $d->note($d->EIGHTH, $d->kick, $d->tick);
 }

@@ -1,3 +1,14 @@
+1.059   2020-06-10  Released-By: PERLANCAR; Urgency: medium
+
+	- The --updated-since X option now does not include records created at
+	  X, to avoid duplication when viewing new records as well as updated
+	  records in the same time (e.g. in whatsnew).
+
+	[subcommand deps]
+
+        - [ux] Delete module_file_id from results.
+
+
 1.058   2020-05-26  Released-By: PERLANCAR; Urgency: medium
 
 	- [incompatible change] Add/replace/rename/remove ctime/mtime

@@ -27,7 +27,7 @@ __PACKAGE__->create_ro_accessors( qw(
 
 __PACKAGE__->create_accessors( qw( context gpio ) );
 
-our $VERSION ='0.80';
+our $VERSION ='0.81';
 
 use constant {
     CONTROL_CONTINUE        => 0x80,
@@ -41,6 +41,8 @@ use constant {
     TYPE_ROWS_32            => 0x10,
     TYPE_BUS_I2C            => 0x20,
     TYPE_BUS_SPI            => 0x40,
+    TYPE_COLUMNS_256        => 0x80,
+    TYPE_CONTROL_SSD1322    => 0x100,
     
     OLED_SETCONTRAST => 0x81,
     OLED_DISPLAYALLON_RESUME  => 0xA4,

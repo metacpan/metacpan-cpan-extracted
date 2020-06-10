@@ -1,0 +1,21 @@
+Sort  (cost=32.93..33.01 rows=32 width=224) (actual time=0.623..0.624 rows=1 loops=1)
+  Sort Key: n.nspname, c.relname
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=14
+  ->  Hash Join  (cost=1.09..32.13 rows=32 width=224) (actual time=0.086..0.613 rows=1 loops=1)
+        Hash Cond: (c.relnamespace = n.oid)
+        Buffers: shared hit=14
+        ->  Seq Scan on pg_class c  (cost=0.00..29.89 rows=65 width=73) (actual time=0.022..0.499 rows=130 loops=1)
+              Filter: ((relkind = ANY ('{r,p,v,m,S,f,""}'::"char"[])) AND pg_table_is_visible(oid))
+              Rows Removed by Filter: 257
+              Buffers: shared hit=13
+        ->  Hash  (cost=1.07..1.07 rows=2 width=68) (actual time=0.037..0.038 rows=1 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=1
+              ->  Seq Scan on pg_namespace n  (cost=0.00..1.07 rows=2 width=68) (actual time=0.029..0.032 rows=1 loops=1)
+                    Filter: ((nspname <> 'pg_catalog'::name) AND (nspname <> 'information_schema'::name) AND (nspname !~ '^pg_toast'::text))
+                    Rows Removed by Filter: 3
+                    Buffers: shared hit=1
+Planning Time: 0.634 ms
+  Buffers: shared hit=6
+Execution Time: 0.721 ms

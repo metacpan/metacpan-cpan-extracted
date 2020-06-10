@@ -18,7 +18,6 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 # UTF8 boilerplace, per http://stackoverflow.com/questions/6162484/why-does-modern-perl-avoid-utf-8-by-default/
 
 use Carp;
-use Data::Dumper;
 use Pg::Explain::Node;
 
 =head1 NAME
@@ -27,11 +26,11 @@ Pg::Explain::FromText - Parser for text based explains
 
 =head1 VERSION
 
-Version 0.99
+Version 1.00
 
 =cut
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 =head1 SYNOPSIS
 

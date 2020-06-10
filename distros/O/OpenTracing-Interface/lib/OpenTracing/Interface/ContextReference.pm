@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 
 use Role::MethodReturns;
@@ -13,7 +13,7 @@ use Role::MethodReturns;
 use OpenTracing::Types qw/ContextReference SpanContext/;
 use Types::Standard qw/Bool/;
 
-
+use namespace::clean;
 
 around new_child_of => class_method ( SpanContext $span_context ) {
     

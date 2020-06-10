@@ -1,0 +1,226 @@
+NAME
+    ColorTheme - Color themes
+
+SPECIFICATION VERSION
+    2
+
+VERSION
+    This document describes version 2.1.0 of ColorTheme (from Perl
+    distribution ColorTheme), released on 2020-06-09.
+
+DESCRIPTION
+    This document specifies a way to create and use color themes.
+
+SPECIFICATION STATUS
+    The series 2.x version is still unstable. API might still change between
+    releases.
+
+GLOSSARY
+  color theme
+    Essentially, a mapping of item names and color codes. For example, a
+    color theme for syntax-coloring JSON might be something like:
+
+     {
+       string  => "ffff00",
+       number  => "00ffff",
+       comma   => "",
+       brace   => "",
+       bracket => "",
+       null    => "ff0000",
+       true    => "00ff00",
+       false   => "008000",
+     }
+
+    An application (in this case, a JSON pretty-printer) will consult the
+    color theme to get the color codes for various items. By using a
+    different color theme which contains the same item names, a user can
+    change the appearance of an application or its output (in terms of
+    color) simply by using another compatible color theme, i.e. color theme
+    which provides color codes for the same items.
+
+  color theme structure
+    A DefHash which contains the "color theme" and additional data.
+
+    A simple (static) theme has all its information accessible from the
+    color theme structure.
+
+  color theme class
+    A Perl module in the "ColorTheme::*" or "SOME::APP::ColorTheme::*"
+    namespace following this specification. A color theme class contains
+    "color theme structure" in its %THEME package variable, as well as some
+    required methods to access the information in the structure.
+
+    A simple (static) theme has all its information accessible from the
+    color theme structure, so client can actually bypass the methods and
+    access the color theme structure directly. Although it is recommended to
+    always use the methods to access information in the color theme.
+
+  static color theme
+    A color theme where all the items are specified in the color theme
+    structure. A client can by-pass the method and access %THEME directly.
+
+    See also: "dynamic color theme".
+
+  dynamic color theme
+    A color theme where one must call "/list_items" to get all the items,
+    because not all (or any) of the items are specified in the color theme
+    structure.
+
+    A dynamic color theme can produce items on-demand or transform other
+    color themes, e.g. provide a tint or duotone color effect on an existing
+    theme.
+
+    When a color theme is dynamic, it must set the property "dynamic" in the
+    color theme structure to true.
+
+    See also: "static color theme".
+
+SPECIFICATION
+  Color theme class
+    A color theme class must be put in "ColorTheme::" namespace, or for
+    application-specific themes, in "SOME::APP::ColorTheme::*", where
+    "SOME::APP" is an application namespace.
+
+    The color theme class must declare a package hash variable named %THEME
+    containing the color theme structure. It also must provide these
+    methods:
+
+    *   new
+
+        Usage:
+
+         my $theme_class = ColorTheme::NAME->new([ %args ]);
+
+        Constructor. Known arguments will depend on the particular theme
+        class and must be specified in the color theme structure under the
+        "args" key.
+
+    *   get_struct
+
+        Usage:
+
+         my $theme_struct = $theme_class->get_struct;
+
+        Provide a method way of getting the "color theme structure". A
+        client can also access the %THEME package variable directly.
+
+    *   get_args
+
+        Usage:
+
+         my $theme_class_args = $theme_class->get_args;
+
+        Provide a method way of getting the arguments to the constructor.
+        The official implementation ColorThemeBase::Constructor stores this
+        in the 'args' key of the hash object, but the proper way to access
+        the arguments should be via this method.
+
+    *   list_items
+
+        Usage:
+
+         my @item_names = $theme_class->list_items;
+         my $item_names = $theme_class->list_items;
+
+        Must return list of item names provided by theq theme. Each item has
+        a color associated with it and the color can be retrieved using
+        "get_color".
+
+    *   get_item_color
+
+        Usage:
+
+         my $color = $theme_class->get_item_color($item_name [ , \%args ]);
+
+        Get color for an item. See "Item color".
+
+  Color theme structure
+    Color theme structure is a DefHash containing these keys:
+
+    *   v
+
+        Required. Float. From DefHash. Must be set to 2 (this specification
+        version).
+
+    *   summary
+
+        String. Optional. From DefHash.
+
+    *   description
+
+        String. Optional. From DefHash.
+
+    *   args
+
+        Hash of argument names as keys, and argument specification DefHash
+        as values. The argument specification resembles that specified in
+        Rinci::function. Some of the important or relevant properties:
+        "req", "schema", "default".
+
+    *   dynamic
+
+        Boolean, optional. Must be set to true if the theme class is
+        dynamic, i.e. the "items" property does not contain all (or even
+        any) of the items of the theme. Client must call "list_items" to
+        list all the items in the theme.
+
+    *   items
+
+        Required. Hash of item names as keys and item colors as values. See
+        "Item color".
+
+  Item color
+    The color of an item can be one of three things.
+
+    First, the simplest, a single RGB value in the form of 6-hexdigit
+    string, e.g. "ffcc00".
+
+    Second, a DefHash called "item colors hash" containing one or more of
+    these properties: "fg" (foreground RGB color), "bg" (background RGB
+    color), "ansi_fg" (foreground ANSI escape sequence string), "ansi_bg"
+    (background ANSI escape sequence string). It can also contain additional
+    information like "summary" (a summary describing the item),
+    "description", "tags", and so on. Properties like "ansi_fg" and
+    "ansi_bg" are used to support specifying things that are not
+    representable by RGB, e.g. reverse or bold.
+
+    Third, a coderef which if called is expected to return one of the two
+    formerly mentioned value (RGB string or the "item colors hash"). A
+    coderef cannot return another coderef. Coderef will be called with
+    arguments "($self, $name, \%args)" where $self is the color theme class
+    (from which you can access the color theme structure as well as
+    arguments to the constructor), $name is the item name requested, and
+    "\%args" is hashref to additional, per-item arguments.
+
+    Allowing coderef as color allows for flexibility, e.g. for doing
+    gradation border color, random color, context-sensitive color, etc.
+
+HISTORY
+    Color::Theme is an older specification, superseded by this document.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/ColorTheme>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-ColorTheme>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=ColorTheme>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DefHash
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2018, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+#
+# Copyright (c) 2004 Javier Gutierrez <https://github.com/tap3edit/TAP3-Tap3edit>.
+# All rights reserved. This program is free software; you can redistribute
+# it and/or modify it under the same terms as Perl itself.
+#  
+#  Creates a TAP3R2 notification file.
+#  
+#  
+#  This script will create a tap3 release 2 notification file
+#  
+#  Usage: tap3edit_create_notification_file tapfile
+#  
+#  E.g: tap3edit_create_notification_file CDOPER1OPER200001
+#  
+#  Note: Please note that the file will be created with all 
+#        the dates as 20040101 and UTC as +0000. You can 
+#        change the release of the file by changing 
+#        $tap3->release(2) where 2 is the desired release.
+#  
+#  
+
+use TAP3::Tap3edit;
+
+$filename=shift;
+
+if ( ! $filename ) {
+	die "Usage: perl $0 CDOPER1OPER200001\n";
+}
+
+$vshortname=substr($filename,2,5); #Shortname from the VPLMN
+$hshortname=substr($filename,7,5); #shortname from the HPLMN
+$seq_number=substr($filename,12,5); #sequence number
+
+$notific_struct = {
+    "notification" => {
+      "releaseVersionNumber" => 2,
+      "transferCutOffTimeStamp" => {
+        "localTimeStamp" => "20040101000000",
+        "utcTimeOffset" => "+0000"
+      },
+      "recipient" => "$hshortname",
+      "specificationVersionNumber" => 3,
+      "fileCreationTimeStamp" => {
+        "localTimeStamp" => "20040101000000",
+        "utcTimeOffset" => "+0000"
+      },
+      "sender" => "$vshortname",
+      "fileSequenceNumber" => "$seq_number",
+      "fileAvailableTimeStamp" => {
+        "localTimeStamp" => "20040101000000",
+        "utcTimeOffset" => "+0000"
+      }
+    },
+};
+
+
+$tap3 = TAP3::Tap3edit->new();
+
+$tap3->file_type("TAP");
+$tap3->version(3);
+$tap3->release(2);
+
+$tap3->structure($notific_struct);
+$tap3->encode($filename) || die $tap3->error();

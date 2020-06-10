@@ -35,7 +35,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Ngram
   repository: https://github.com/ology/MIDI-Ngram.git
-version: '0.1801'
+version: '0.1806'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -209,6 +209,7 @@ x_Dist_Zilla:
             - durations
             - ngram
             - ngrams
+            - ppqn
             - qn
             - randpatch
             - tqn
@@ -238,7 +239,7 @@ x_Dist_Zilla:
           exclude_filename: []
           exclude_match:
             - \.png
-            - ngram-play\.mid
+            - ngram-analyze\.mid
           follow_symlinks: 0
           include_dotfiles: 0
           prefix: ''

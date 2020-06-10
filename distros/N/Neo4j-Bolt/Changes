@@ -1,4 +1,7 @@
 Revision history for Perl module Neo4j::Bolt
+0.20 2020-06-05
+    - Eschew local libneo4j-client; use Neo4j::Client
+    - Add Inline baggage for build only
 0.12 2020-02-29
     - Stab at finding libneo4j-client on *nix
 

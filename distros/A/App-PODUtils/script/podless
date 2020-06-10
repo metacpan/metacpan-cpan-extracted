@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-04-14'; # DATE
-our $VERSION = '0.048'; # VERSION
+our $DATE = '2020-06-06'; # DATE
+our $VERSION = '0.049'; # VERSION
 
 use 5.010;
 use strict;
@@ -55,7 +55,7 @@ podless - Show Perl POD source code with `less`
 
 =head1 VERSION
 
-This document describes version 0.048 of podless (from Perl distribution App-PODUtils), released on 2020-04-14.
+This document describes version 0.049 of podless (from Perl distribution App-PODUtils), released on 2020-06-06.
 
 =head1 SYNOPSIS
 
@@ -143,6 +143,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 

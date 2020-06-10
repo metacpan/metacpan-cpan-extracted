@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -141,7 +141,9 @@ sub configure {
 my @color_stack;
 my $reset;
 sub set_reset { $reset = shift };
-sub get_reset { ("$reset", $reset = '', @color_stack = ())[0] };
+sub get_reset {
+    ("$reset", $reset && do { $reset = ''; @color_stack = () })[0];
+}
 
 sub fold {
     my $obj = ref $_[0] ? $_[0] : do {
