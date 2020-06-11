@@ -15,20 +15,27 @@ ok( db_version() eq '2.0', "db version" );
 ok( are_equal( elem_mass('Fe'             ), 55.935, 3), "elem_mass(none)" );
 ok( are_equal( elem_mass('Fe', 'mono'     ), 55.935, 3), "elem_mass(mono)" );
 ok( are_equal( elem_mass('Fe', 'mono_mass'), 55.935, 3), "elem_mass(mono_mass)" );
-ok( are_equal( elem_mass('Fe', 'average'  ), 55.845, 3), "elem_mass(average)"  );
-ok( are_equal( elem_mass('Fe', 'avge_mass'), 55.845, 3), "elem_mass(avge_mass)"  );
+ok( are_equal( elem_mass('Fe', 'average'  ), 55.845, 2), "elem_mass(average)"  );
+ok( are_equal( elem_mass('Fe', 'avge_mass'), 55.845, 2), "elem_mass(avge_mass)"  );
 like( exception {elem_mass('Fe', 'foobar')}, qr/Unexpected mass type/,
     "elem_mass() bad mass type" );
 
+# test elem_mass() for elements from PubChem
+ok( are_equal( elem_mass('Si'             ), 27.976927, 3), "PubChem elem_mass(none)" );
+ok( are_equal( elem_mass('Si', 'mono'     ), 27.976927, 3), "PubChem elem_mass(mono)" );
+ok( are_equal( elem_mass('Si', 'mono_mass'), 27.976927, 3), "PubChem elem_mass(mono_mass)" );
+ok( are_equal( elem_mass('Si', 'average'  ), 28.086, 2), "PubChem elem_mass(average)"  );
+ok( are_equal( elem_mass('Si', 'avge_mass'), 28.086, 2), "PubChem elem_mass(avge_mass)"  );
+
 # test aa_mass()
 ok( are_equal( aa_mass('G'           ), 57.021, 3), "elem_mass(mono)" );
-ok( are_equal( aa_mass('G', 'average'), 57.051, 3), "elem_mass(avg)"  );
+ok( are_equal( aa_mass('G', 'average'), 57.051, 2), "elem_mass(avg)"  );
 
 # test mod_mass()
 my $name = mod_id_to_name(21);
 ok ($name eq 'Phospho', "mod_id_to_name");
 ok( are_equal( mod_mass($name),             79.9663 , 3), "mod_mass(mono)" );
-ok( are_equal( mod_mass($name, 'average'),  79.9799 , 3), "mod_mass(avg)"  );
+ok( are_equal( mod_mass($name, 'average'),  79.9799 , 2), "mod_mass(avg)"  );
 
 # test brick_mass() 
 ok( are_equal( brick_mass('Water'), 18.010565, 3), "brick_mass()" );
@@ -62,6 +69,6 @@ done_testing();
 sub are_equal {
 
     my ($v1, $v2, $dp) = @_;
-    return sprintf("%.${dp}f", $v1) eq sprintf("%.${dp}f", $v2);
+    return abs($v2 - $v1) < 10**-$dp;
 
 }

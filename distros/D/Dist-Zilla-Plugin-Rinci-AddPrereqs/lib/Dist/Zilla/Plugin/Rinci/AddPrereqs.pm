@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::Rinci::AddPrereqs;
 
-our $DATE = '2019-12-28'; # DATE
-our $VERSION = '0.144'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-10'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-Rinci-AddPrereqs'; # DIST
+our $VERSION = '0.145'; # VERSION
 
 use 5.010001;
 use strict;
@@ -82,16 +84,18 @@ sub _add_prereqs_from_func_meta {
             }
             $e = $arg_spec->{'x.completion'};
             if ($e && $cli_info) {
-                my $xcomp_name;
-                if (ref $e eq 'CODE') {
-                    # can't do anything about it for now
-                } elsif (ref $e eq 'ARRAY') {
-                    $xcomp_name = $e->[0];
-                } else {
-                    $xcomp_name = $e;
+                {
+                    my $xcomp_name;
+                    if (ref $e eq 'ARRAY') {
+                        $xcomp_name = $e->[0];
+                    } elsif (!ref $e) {
+                        $xcomp_name = $e;
+                    } else {
+                        $self->log_fatal("Can't handle x.completion value $e");
+                    }
+                    my $pkg = "Perinci::Sub::XCompletion::$xcomp_name";
+                    $self->_add_prereq($pkg => version_from_pmversions($pkg) // 0);
                 }
-                my $pkg = "Perinci::Sub::XCompletion::$xcomp_name";
-                $self->_add_prereq($pkg => version_from_pmversions($pkg) // 0);
             }
             $e = $arg_spec->{'x.element_completion'};
             if ($e && $cli_info) {
@@ -234,7 +238,7 @@ Dist::Zilla::Plugin::Rinci::AddPrereqs - Add prerequisites from Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.144 of Dist::Zilla::Plugin::Rinci::AddPrereqs (from Perl distribution Dist-Zilla-Plugin-Rinci-AddPrereqs), released on 2019-12-28.
+This document describes version 0.145 of Dist::Zilla::Plugin::Rinci::AddPrereqs (from Perl distribution Dist-Zilla-Plugin-Rinci-AddPrereqs), released on 2020-06-10.
 
 =head1 SYNOPSIS
 
@@ -366,7 +370,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

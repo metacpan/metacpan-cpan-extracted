@@ -1,5 +1,22 @@
 Revision history for MS
 
+0.206003 2020-06-11
+        Fix bug in test suite floating point equality testing causing failed tests on Perls compiled with -Duselongdouble
+
+0.206002 2020-06-10
+        Add additional atomic mass data from PubChem (Unimod only includes a subset of elements)
+
+0.206001 2020-06-03
+        Fix edge case bug triggered by very short Numpress linear arrays
+        Change imported uniq() to List::MoreUtils to pacify older perls
+
+0.206 2020-06-02
+        Fix bugs in param() method of MS::Reader::XML::CV and add testing
+        Add params() method to MS::Reader::XML::CV
+
+0.205 2020-06-01
+        Add deduplicate() to MS::Search::DB
+
 0.204003 2020-02-18
         Fix too-early binary mode setting with add_from_url()
         Add tests for MS::Search::DB

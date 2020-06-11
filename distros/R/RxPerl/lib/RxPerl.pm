@@ -1,11 +1,19 @@
 package RxPerl;
 use 5.008001;
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 
-our $VERSION = "v0.0.1";
+use RxPerl::Operators::Creation ':all';
+use RxPerl::Operators::Pipeable ':all';
 
+use Exporter 'import';
+our @EXPORT_OK = (
+    @RxPerl::Operators::Creation::EXPORT_OK,
+    @RxPerl::Operators::Pipeable::EXPORT_OK,
+);
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
+our $VERSION = "v0.14.0";
 
 1;
 __END__

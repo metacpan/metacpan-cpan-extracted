@@ -1,5 +1,10 @@
 Revision history for Device-Chip
 
+0.13    2020-06-10
+        [CHANGES]
+         * Beginnings of a UART protocol type, sufficient for transmit-only or
+           PC-first request/response communications
+
 0.12    2020-04-26
         [CHANGES]
          * Don't get confused by Device::Chip::Adapter implementations that

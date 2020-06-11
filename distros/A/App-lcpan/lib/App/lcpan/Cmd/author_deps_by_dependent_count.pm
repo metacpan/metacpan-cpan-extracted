@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::author_deps_by_dependent_count;
 
-our $DATE = '2020-06-10'; # DATE
-our $VERSION = '1.059'; # VERSION
+our $DATE = '2020-06-11'; # DATE
+our $VERSION = '1.061'; # VERSION
 
 use 5.010;
 use strict;
@@ -73,7 +73,7 @@ App::lcpan::Cmd::author_deps_by_dependent_count - List all dependencies of dists
 
 =head1 VERSION
 
-This document describes version 1.059 of App::lcpan::Cmd::author_deps_by_dependent_count (from Perl distribution App-lcpan), released on 2020-06-10.
+This document describes version 1.061 of App::lcpan::Cmd::author_deps_by_dependent_count (from Perl distribution App-lcpan), released on 2020-06-11.
 
 =head1 FUNCTIONS
 

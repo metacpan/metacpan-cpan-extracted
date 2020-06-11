@@ -1,9 +1,9 @@
 package App::GraphicsColorNamesUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-04'; # DATE
+our $DATE = '2020-06-10'; # DATE
 our $DIST = 'App-GraphicsColorNamesUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -134,7 +134,7 @@ $SPEC{list_color_names} = {
     summary => 'List all color names from a Graphics::ColorNames scheme',
     args => {
         scheme => {
-            schema => 'perl::modname*',
+            schema => 'perl::colorscheme::modname*',
             req => 1,
             pos => 0,
         },
@@ -171,41 +171,73 @@ $SPEC{show_color_swatch} = {
     summary => 'List all color names from a Graphics::ColorNames scheme as a color swatch',
     args => {
         scheme => {
-            schema => 'perl::modname*',
+            schema => 'perl::colorscheme::modname*',
             req => 1,
             pos => 0,
         },
-        width => {
+        table_width => {
             schema => 'posint*',
             default => 80,
             cmdline_aliases => {w=>{}},
         },
+        columns => {
+            schema => 'posint*',
+            default => 1,
+            cmdline_aliases => {c=>{}},
+        },
+        row_height => {
+            schema => 'posint*',
+            default => 3,
+        },
+        #cell_padding => {
+        #    schema => 'uint*',
+        #    default => 0,
+        #},
     },
 };
 sub show_color_swatch {
-    require Color::ANSI::Util;
     require Color::RGB::Util;
-    require String::Pad;
+    require Text::ANSITable;
 
     my %args = @_;
-    my $width = $args{width} // 80;
+    my $table_width = $args{table_width} // 80;
+    my $columns = $args{columns} // 1;
+
+    my $column_width = int($table_width / $columns); $column_width = 1 if $column_width < 1;
 
     my $res = list_color_names(scheme => $args{scheme}, detail=>1);
     return $res unless $res->[0] == 200;
 
-    my $reset = Color::ANSI::Util::ansi_reset();
-    for my $row (@{ $res->[2] }) {
-        my $empty_bar = " " x $width;
-        my $text_bar  = String::Pad::pad("$row->{name} ($row->{rgb})", $width, "center", " ", 1);
-        my $bar = join(
-            "",
-            Color::ANSI::Util::ansibg($row->{rgb}), $empty_bar, $reset, "\n",
-            Color::ANSI::Util::ansibg($row->{rgb}), Color::ANSI::Util::ansifg(Color::RGB::Util::rgb_is_dark($row->{rgb}) ? "ffffff" : "000000"), $text_bar, $reset, "\n",
-            Color::ANSI::Util::ansibg($row->{rgb}), $empty_bar, $reset, "\n",
-            $empty_bar, "\n",
-        );
-        print $bar;
+    my $t = Text::ANSITable->new;
+    $t->border_style('Default::none_ascii');
+    $t->columns([map {"col$_"} 1..$columns]);
+    $t->cell_height($args{row_height} // 1);
+    $t->cell_valign('middle');
+    $t->cell_width($column_width);
+    #$t->cell_pad($args{cell_padding} // 0);
+    #$t->cell_vpad($args{cell_padding} // 0);
+
+    my $rowidx = 0;
+    my $colidx = 0;
+    my @row;
+    for my $i (0 .. $#{ $res->[2] }) {
+        my $name = $res->[2][$i]{name};
+        my $code = $res->[2][$i]{rgb};
+        $t->set_cell_style($rowidx, $colidx, bgcolor => $code);
+        $t->set_cell_style($rowidx, $colidx, fgcolor => Color::RGB::Util::rgb_is_dark($code) ? "ffffff" : "000000");
+        push @row, "#".($i+1).". $name ($code)";
+        if (@row >= $columns || $i == $#{ $res->[2] }) {
+            $t->add_row([@row]);
+            @row = ();
+        }
+        $colidx++;
+        if ($colidx >= $columns) {
+            $colidx = 0;
+            $rowidx++;
+        }
     }
+    print $t->draw;
+    #use DD; dd $t;
     [200];
 }
 
@@ -224,7 +256,7 @@ App::GraphicsColorNamesUtils - Utilities related to Graphics::ColorNames
 
 =head1 VERSION
 
-This document describes version 0.004 of App::GraphicsColorNamesUtils (from Perl distribution App-GraphicsColorNamesUtils), released on 2020-02-04.
+This document describes version 0.005 of App::GraphicsColorNamesUtils (from Perl distribution App-GraphicsColorNamesUtils), released on 2020-06-10.
 
 =head1 DESCRIPTION
 
@@ -331,7 +363,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<true>
 
-=item * B<scheme>* => I<perl::modname>
+=item * B<scheme>* => I<perl::colorscheme::modname>
 
 
 =back
@@ -388,9 +420,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<scheme>* => I<perl::modname>
+=item * B<columns> => I<posint> (default: 1)
 
-=item * B<width> => I<posint> (default: 80)
+=item * B<row_height> => I<posint> (default: 3)
+
+=item * B<scheme>* => I<perl::colorscheme::modname>
+
+=item * B<table_width> => I<posint> (default: 80)
 
 
 =back

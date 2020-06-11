@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use FindBin;
 use MS::Reader::MzML;
-use MS::CV qw/:MS/;
+use MS::CV qw/:MS is_a cv_name/;
 
 chdir $FindBin::Bin;
 
@@ -134,11 +134,29 @@ ok( $s = $p->next_spectrum, "read first record"  );
 ok( $s = $p->next_spectrum, "read second record" );
 ok( are_equal( $s->rt,  5063.2261, 3), "rt()" );
 
+# test param fetching and listing
+my $model;
+CONFIG:
+for my $config (values %{ $p->{instrumentConfigurationList}->{instrumentConfiguration} }) {
+    my @params = $p->params(ref => $config);
+    for (@params) {
+        if (is_a($_, MS_INSTRUMENT_MODEL)) {
+            $model = cv_name($_);
+            last CONFIG;
+        }
+    }
+}
+ok( $model eq 'LTQ Orbitrap Elite', "find instrument model param" );
+ok( defined $p->param(
+    MS_MS1_SPECTRUM,
+    ref => $p->{fileDescription}->{fileContent}
+), "fetch specific CV param");
+
 done_testing();
 
 sub are_equal {
 
     my ($v1, $v2, $dp) = @_;
-    return sprintf("%.${dp}f", $v1) eq sprintf("%.${dp}f", $v2);
+    return abs($v2 - $v1) < 10**-$dp;
 
 }

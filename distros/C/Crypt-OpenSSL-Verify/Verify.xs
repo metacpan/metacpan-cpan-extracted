@@ -1,6 +1,10 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#define NEED_mg_findext
+#define NEED_newRV_noinc
+#define NEED_sv_2pv_flags
+#include "ppport.h"
 
 #include <openssl/asn1.h>
 #include <openssl/objects.h>
@@ -11,8 +15,8 @@
 #include <openssl/pem.h>
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
+#include <openssl/x509_vfy.h>
 
-typedef X509_STORE *Crypt__OpenSSL__Verify;
 typedef X509 *Crypt__OpenSSL__X509;
 
 struct OPTIONS {
@@ -20,7 +24,9 @@ struct OPTIONS {
    bool  trust_no_local;
    bool  trust_onelogin;
 };
+
 =pod
+
 =head1 NAME
 
 Verify.xs - C interface to OpenSSL to verify certificates
@@ -83,6 +89,7 @@ int verify_cb(struct OPTIONS * options, int ok, X509_STORE_CTX * ctx)
     return ok;
 }
 #endif
+
 =head2 int cb1(ok, ctx)
 
 The link to the Perl verify_callback() sub.  This called by OpenSSL
@@ -91,7 +98,9 @@ to the Perl verify_callback() sub.  It gets a return code from Perl
 and returns it to OpenSSL
 
 =head3 Parameters
+
 =over
+
 =item ok
     * ok - the result of the certificate verification in OpenSSL
             ok = 1, !ok = 0
@@ -100,8 +109,8 @@ and returns it to OpenSSL
     * ctx - Pointer to the X509_Store_CTX that OpenSSL includes the
             error codes in
 =back
-=cut
 
+=cut
 
 static SV *callback = (SV *) NULL;
 
@@ -113,8 +122,8 @@ static int cb1(ok, ctx)
     int count;
     int i;
 
-    /* printf("Callback pointer: %p\n", ctx); */
-    /* printf("Callback UL of pointer %lu\n", PTR2UV(ctx)); */
+    //printf("Callback pointer: %p\n", ctx);
+    //printf("Callback UL of pointer %lu\n", PTR2UV(ctx));
     ENTER;
     SAVETMPS;
 
@@ -138,6 +147,7 @@ static int cb1(ok, ctx)
 
     return i;
 }
+
 =head2 ssl_error(void)
 
 Returns the string description of the ssl error
@@ -160,6 +170,27 @@ static const char *ctx_error(X509_STORE_CTX * ctx)
     return X509_verify_cert_error_string(X509_STORE_CTX_get_error(ctx));
 }
 
+// Taken from p5-Git-Raw
+STATIC HV *ensure_hv(SV *sv, const char *identifier) {
+    if (!SvROK(sv) || SvTYPE(SvRV(sv)) != SVt_PVHV)
+    croak("Invalid type for '%s', expected a hash", identifier);
+
+    return (HV *) SvRV(sv);
+}
+
+static int ssl_store_destroy(pTHX_ SV* var, MAGIC* magic) {
+    X509_STORE * store;
+
+    store = (X509_STORE *) magic->mg_ptr;
+    if (!store)
+        return 0;
+
+    X509_STORE_free(store);
+    return 1;
+}
+
+static const MGVTBL store_magic = { NULL, NULL, NULL, NULL, ssl_store_destroy };
+
 MODULE = Crypt::OpenSSL::Verify    PACKAGE = Crypt::OpenSSL::Verify
 
 PROTOTYPES: DISABLE
@@ -181,6 +212,7 @@ Called by the Perl code to register which Perl sub is
 the OpenSSL Verify Callback
 
 =cut
+
 void register_verify_cb(fn)
     SV *fn
 
@@ -192,38 +224,59 @@ void register_verify_cb(fn)
         else
             SvSetSV(callback, fn);
 
-=head _new
+=head new
 
-The main function to setup the OpenSSL Store to hold the CAfile and to
-configure the options for the verification.  In particular it sets the
-CAfile, and CApat, noCAfile and noCApath if provided.
+Constructs the object ready to verify the certificates.
+It also sets the callback function.
 
-It also sets the callback function and returns a an integer value containing
-the pointer to X509_Store.
+    Crypt::OpenSSL::Verify->new(CAfile, options);
 
-Crypt::OpenSSL::Verify _new(class, options)
+For users coming from L<Crypt::OpenSSL::VerifyX509>, you should
+instantiate the object using:
+
+    Crypt::OpenSSL::Verify->new(CAfile, { strict_certs => 0 } );
+
+User who do not want a CAfile but want to use the defaults please use:
+
+    Crypt::OpenSSL::Verify->new(undef);
+
+The object created is similar to running the following command with the
+C<openssl verify> command line tool: C<< openssl verify [ -CApath
+/path/to/certs ] [ -noCApath ] [ -noCAfile ] [ -CAfile /path/to/file ]
+cert.pem >>
+
 =cut
-UV _new(class, options)
-    SV *class
-    HV *options
+
+SV * new(class, ...)
+    const char * class
 
     PREINIT:
 
-        X509_LOOKUP * lookup = NULL;
-        X509_STORE * store = NULL;
+        SV * CAfile = NULL;
+
+        HV * options = newHV();
+
+        X509_LOOKUP * cafile_lookup = NULL;
+        X509_LOOKUP * cadir_lookup = NULL;
+        X509_STORE * x509_store = NULL;
         SV **svp;
-        SV *CAfile = NULL;
         SV *CApath = NULL;
-        int noCApath = 0, noCAfile = 0;
-        int strict_certs = 1; /* Default is strict openSSL verify */
+        int noCApath = 0;
+        int noCAfile = 0;
+        int strict_certs = 1; // Default is strict openSSL verify
+        SV * store = newSV(0);
 
     CODE:
 
-        (void)SvPV_nolen(class);
 
-        if (hv_exists(options, "CAfile", strlen("CAfile"))) {
-            svp = hv_fetch(options, "CAfile", strlen("CAfile"), 0);
-            CAfile = *svp;
+        if (items > 1) {
+            if (ST(1) != NULL)
+                // TODO: ensure_string_sv
+                CAfile = ST(1);
+
+            if (items > 2)
+                options = ensure_hv(ST(2), "options");
+
         }
 
         if (hv_exists(options, "noCAfile", strlen("noCAfile"))) {
@@ -252,76 +305,86 @@ UV _new(class, options)
             }
         }
 
-    /* BEGIN Source apps.c setup_verify() */
-    store = X509_STORE_new();
-    if (store == NULL) {
-        X509_STORE_free(store);
-        croak("failure to allocate x509 store: %s", ssl_error());
-    }
+        x509_store = X509_STORE_new();
 
-    /* In strict mode do not allow any errors to be ignore */
-    if ( ! strict_certs ) {
-        X509_STORE_set_verify_cb_func(store, cb1);
-    }
+        if (x509_store == NULL) {
+            X509_STORE_free(x509_store);
+            croak("failure to allocate x509 store: %s", ssl_error());
+        }
 
-    /* Load the CAfile to the store as a certificate to lookup against */
-    if (CAfile != NULL || !noCAfile) {
-        /* Add a lookup structure to the store to load a file */
-        lookup = X509_STORE_add_lookup(store, X509_LOOKUP_file());
-        if (lookup == NULL) {
-            X509_STORE_free(store);
+        if (!strict_certs)
+            X509_STORE_set_verify_cb_func(x509_store, cb1);
+
+        if (noCAfile) {
+            X509_LOOKUP_init(cafile_lookup);
+        }
+        else {
+            cafile_lookup = X509_STORE_add_lookup(x509_store, X509_LOOKUP_file());
+        }
+
+        if (cafile_lookup == NULL) {
+            X509_STORE_free(x509_store);
             croak("failure to add lookup to store: %s", ssl_error());
         }
+
         if (CAfile != NULL) {
-            if (!X509_LOOKUP_load_file
-                (lookup, SvPV_nolen(CAfile), X509_FILETYPE_PEM)) {
-                X509_STORE_free(store);
+            if (!X509_STORE_load_locations(x509_store, SvPV_nolen(CAfile), NULL)) {
+                X509_STORE_free(x509_store);
                 croak("Error loading file %s: %s\n", SvPV_nolen(CAfile),
                     ssl_error());
             }
-        } else {
-            X509_LOOKUP_load_file(lookup, NULL, X509_FILETYPE_DEFAULT);
         }
-    }
 
-    /* Load the CApath to the store as a hash dir lookup against */
-    if (CApath != NULL || !noCApath) {
-        /* Add a lookup structure to the store to load hash dir */
-        lookup = X509_STORE_add_lookup(store, X509_LOOKUP_hash_dir());
-        if (lookup == NULL) {
-            X509_STORE_free(store);
-            croak("failure to add hash_dir lookup to store: %s", ssl_error());
+        if (noCApath) {
+            X509_LOOKUP_init(cadir_lookup);
         }
+        else {
+            cadir_lookup = X509_STORE_add_lookup(x509_store, X509_LOOKUP_hash_dir());
+        }
+
+        if (cadir_lookup == NULL) {
+            X509_STORE_free(x509_store);
+            croak("failure to add lookup to store: %s", ssl_error());
+        }
+
         if (CApath != NULL) {
-            if (!X509_LOOKUP_add_dir(lookup, SvPV_nolen(CApath),
-                    X509_FILETYPE_PEM)) {
+            if (!X509_LOOKUP_add_dir(cadir_lookup, SvPV_nolen(CApath), X509_FILETYPE_PEM)) {
+                X509_STORE_free(x509_store);
                 croak("Error loading directory %s\n", SvPV_nolen(CApath));
             }
-        } else {
-            X509_LOOKUP_add_dir(lookup, NULL, X509_FILETYPE_DEFAULT);
         }
-    }
 
-    /* Pass the pointer as an integer so it can return
-     * unscathed in the call to ctx_error_code() from Perl */
-    RETVAL = PTR2UV(store);
 
-    //printf("X509_STORE - Pointer to RETVAL: %p\n", store);
-    //printf("X509_STORE - RETVAL: %lu\n", RETVAL);
-    ERR_clear_error();
-    /* END Source apps.c setup_verify() */
+        HV * attributes = newHV();
+
+        SV *const self = newRV_noinc( (SV *)attributes );
+
+        sv_magicext(store, NULL, PERL_MAGIC_ext,
+            &store_magic, (const char *)x509_store, 0);
+
+        if((hv_store(attributes, "STORE", 5, store, 0)) == NULL)
+            croak("unable to init store");
+
+        RETVAL = sv_bless( self, gv_stashpv( class, 0 ) );
+
+        // Empty the currect thread error queue
+        // https://www.openssl.org/docs/man1.1.1/man3/ERR_clear_error.html
+        ERR_clear_error();
 
     OUTPUT:
 
         RETVAL
 
 =head2 ctx_error_code(ctx)
+
 Called by the Perl code's verify_callback() to get the error code
 from SSL from the ctx
 
 Receives the pointer to the ctx as an integer that is converted back
 to the point address to be used
+
 =cut
+
 int ctx_error_code(ctx)
     UV ctx;
 
@@ -338,6 +401,7 @@ int ctx_error_code(ctx)
         RETVAL
 
 =head2 verify(self, x509)
+
 The actual verify function that calls OpenSSL to verify the x509 Cert that
 has been passed in as a parameter against the store that was setup in _new()
 
@@ -352,6 +416,7 @@ Contains details about Crypt::OpenSSL::Verify including  the STORE
 Certificate to verify
 
 =back
+
 =cut
 
 int verify(self, x509)
@@ -364,36 +429,31 @@ int verify(self, x509)
 
     CODE:
         SV **svp;
-        X509_STORE * store;
-        store = 0;
+        MAGIC* mg;
+        X509_STORE * store = NULL;
         //bool strict_certs = 1;
         //struct OPTIONS trust_options;
         //trust_options.trust_expired = 0;
         //trust_options.trust_no_local = 0;
-        //trust_options.trust_onelogin = 0;
+        //trust_options.trust_onelogin = 0r
+        //
 
         if (x509 == NULL)
-        {
             croak("no cert to verify");
-        }
 
         csc = X509_STORE_CTX_new();
-        if (csc == NULL) {
+        if (csc == NULL)
             croak("X.509 store context allocation failed: %s", ssl_error());
-        }
 
-        if (hv_exists(self, "STORE", strlen("STORE"))) {
-            svp = hv_fetch(self, "STORE", strlen("STORE"), 0);
-            if (SvIOKp(*svp)) {
-                store = (X509_STORE *) INT2PTR(UV, SvIV(*svp));
-            } else {
-                croak("STORE: Integer not found in self!\n");
-            }
-        } else {
+        if (!hv_exists(self, "STORE", strlen("STORE")))
             croak("STORE not found in self!\n");
-        }
-        //printf("X509_STORE - Pointer to store: %p\n", &svp);
-        //printf("X509_STORE - Pointer to store: %p\n",(void *)  INT2PTR(UV, SvIV(*svp)));
+
+        svp = hv_fetch(self, "STORE", strlen("STORE"), 0);
+
+        if (!SvMAGICAL(*svp) || (mg = mg_findext(*svp, PERL_MAGIC_ext, &store_magic)) == NULL)
+            croak("STORE is invalid");
+
+        store = (X509_STORE *) mg->mg_ptr;
 
         X509_STORE_set_flags(store, 0);
 
@@ -445,16 +505,6 @@ int verify(self, x509)
     OUTPUT:
 
         RETVAL
-
-void DESTROY(store)
-    Crypt::OpenSSL::Verify store;
-
-    PPCODE:
-
-        if (store)
-            X509_STORE_free(store);
-        store = 0;
-
 
 #if OPENSSL_API_COMPAT >= 0x10100000L
 void __X509_cleanup(void)

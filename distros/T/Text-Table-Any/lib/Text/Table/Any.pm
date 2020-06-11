@@ -1,7 +1,9 @@
 package Text::Table::Any;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.096'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-11'; # DATE
+our $DIST = 'Text-Table-Any'; # DIST
+our $VERSION = '0.097'; # VERSION
 
 #IFUNBUILT
 # # use 5.010001;
@@ -11,6 +13,7 @@ our $VERSION = '0.096'; # VERSION
 
 our @BACKENDS = qw(
                       Text::Table::Tiny
+                      Text::Table::TinyBorderStyle
                       Text::Table::TinyColor
                       Text::Table::TinyColorWide
                       Text::Table::TinyWide
@@ -52,6 +55,10 @@ sub table {
     if ($backend eq 'Text::Table::Tiny') {
         require Text::Table::Tiny;
         return Text::Table::Tiny::table(
+            rows => $rows, header_row => $header_row) . "\n";
+    } elsif ($backend eq 'Text::Table::TinyBorderStyle') {
+        require Text::Table::TinyBorderStyle;
+        return Text::Table::TinyBorderStyle::table(
             rows => $rows, header_row => $header_row) . "\n";
     } elsif ($backend eq 'Text::Table::TinyColor') {
         require Text::Table::TinyColor;
@@ -189,7 +196,7 @@ Text::Table::Any - Generate text table using one of several backends
 
 =head1 VERSION
 
-This document describes version 0.096 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2019-11-29.
+This document describes version 0.097 of Text::Table::Any (from Perl distribution Text-Table-Any), released on 2020-06-11.
 
 =head1 SYNOPSIS
 
@@ -210,7 +217,7 @@ This document describes version 0.096 of Text::Table::Any (from Perl distributio
 
 This module provides a single function, C<table>, which formats a
 two-dimensional array of data as text table, using one of several available
-backends. The interface is modelled after L<Text::Table::Tiny> (0.3);
+backends. The interface is modelled after L<Text::Table::Tiny> (0.03);
 Text::Table::Tiny also happens to be the default backend.
 
 The example shown in the SYNOPSIS generates the following table:
@@ -321,6 +328,8 @@ Optional. Pick a backend module. Supported backends:
 
 =item * Text::Table::Tiny
 
+=item * Text::Table::TinyBorderStyle
+
 =item * Text::Table::TinyColor
 
 =item * Text::Table::TinyColorWide
@@ -400,7 +409,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

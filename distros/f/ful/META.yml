@@ -1,0 +1,29 @@
+---
+abstract: 'A foolish "find upper lib" pragma'
+author:
+  - 'Ryan Willis <code@ryanwillis.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0.30'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ful
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: '3.26'
+  File::Spec: '3.32'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/ryan-willis/p5-ful.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

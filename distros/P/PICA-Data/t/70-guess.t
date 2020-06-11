@@ -4,12 +4,12 @@ use Test::More;
 use PICA::Data ':all';
 
 my %tests = (
-    '028A $ax' => 'Plain',
+    '028A $ax'                                        => 'Plain',
     '<record xlmns="info:srw/schema/5/picaXML-v1.0">' => 'XML',
-    "028A \x{1F}a\x{1E}\x{0A}" => 'Plus',
-    "028A \x{1F}a\x{1E}\x{1D}" => 'Binary',
-    '[]' => 'JSON',
-    '{record=>[]}' => 'JSON'
+    "028A \x{1F}a\x{1E}\x{0A}"                        => 'Plus',
+    "028A \x{1F}a\x{1E}\x{1D}"                        => 'Binary',
+    '[]'                                              => 'JSON',
+    '{record=>[]}'                                    => 'JSON'
 );
 
 while (my ($pica, $format) = each %tests) {

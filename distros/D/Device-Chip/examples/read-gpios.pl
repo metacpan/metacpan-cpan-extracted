@@ -20,7 +20,7 @@ my @gpios = $proto->list_gpios;
 while(1) {
     my $gpios = $proto->read_gpios( [@gpios] )->get;
     print "Read " .
-        join( " ", map { "$_=$gpios->{$_}" } sort keys %$gpios ) .
+        join( " ", map { "$_=" . ( $gpios->{$_} // "0" ) } sort keys %$gpios ) .
         "\n";
 
     sleep 0.5;

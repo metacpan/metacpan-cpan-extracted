@@ -1,6 +1,8 @@
-requires 'perl', '5.008001';
+requires 'perl', '5.010'; # TODO: find the right version
 
 on 'test' => sub {
-    requires 'Test::More', '0.98';
+    requires 'Test2::Suite';
+    requires 'Mojolicious'; # TODO: find the right version
+    requires 'IO::Async'; # TODO: find the right version
+    requires 'AnyEvent'; # TODO: find the right version
 };
-

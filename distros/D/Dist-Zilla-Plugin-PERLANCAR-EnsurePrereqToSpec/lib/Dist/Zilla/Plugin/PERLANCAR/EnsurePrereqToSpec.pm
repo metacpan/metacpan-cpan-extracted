@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-11'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec'; # DIST
-our $VERSION = '0.061'; # VERSION
+our $VERSION = '0.062'; # VERSION
 
 use 5.010001;
 use strict;
@@ -81,8 +81,20 @@ sub after_build {
 
     # ColorTheme
     if (grep { $_->name =~ m!(?:\A|/)ColorTheme/.+\.pm! } @{ $self->found_files }) {
-        $self->log_fatal(["Dist has ColorThemes/* .pm file but there is no prereq phase=develop, rel=x_spec to ColorTheme"])
+        $self->log_fatal(["Dist has ColorTheme/* .pm file but there is no prereq phase=develop, rel=x_spec to ColorTheme"])
             unless $self->_prereq_only_in($prereqs_hash, "ColorTheme", "develop", "x_spec");
+    } else {
+        $self->log_fatal(["Dist does not have ColorTheme/* .pm file, but there is a phase=develop rel=xpec prereq to ColorTheme"])
+            if $self->_has_prereq($prereqs_hash, "ColorTheme", "develop", "x_spec");
+    }
+
+    # BorderStyle
+    if (grep { $_->name =~ m!(?:\A|/)BorderStyle/.+\.pm! } @{ $self->found_files }) {
+        $self->log_fatal(["Dist has BorderStyle/* .pm file but there is no prereq phase=develop, rel=x_spec to BorderStyle"])
+            unless $self->_prereq_only_in($prereqs_hash, "BorderStyle", "develop", "x_spec");
+    } else {
+        $self->log_fatal(["Dist does not have BorderStyle/* .pm file, but there is a phase=develop rel=xpec prereq to BorderStyle"])
+            if $self->_has_prereq($prereqs_hash, "BorderStyle", "develop", "x_spec");
     }
 
 }
@@ -103,7 +115,7 @@ Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec - Ensure prereq to spec modul
 
 =head1 VERSION
 
-This document describes version 0.061 of Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec), released on 2020-06-09.
+This document describes version 0.062 of Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec), released on 2020-06-11.
 
 =head1 SYNOPSIS
 
@@ -128,6 +140,10 @@ When a package contains Rinci metadata (C<%SPEC>).
 =item * L<ColorTheme>
 
 When there is a ColorTheme/* source files.
+
+=item * L<BorderStyle>
+
+When there is a BorderStyle/* source files.
 
 =back
 

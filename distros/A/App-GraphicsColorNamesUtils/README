@@ -2,9 +2,9 @@ NAME
     App::GraphicsColorNamesUtils - Utilities related to Graphics::ColorNames
 
 VERSION
-    This document describes version 0.004 of App::GraphicsColorNamesUtils
+    This document describes version 0.005 of App::GraphicsColorNamesUtils
     (from Perl distribution App-GraphicsColorNamesUtils), released on
-    2020-02-04.
+    2020-06-10.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -86,7 +86,7 @@ FUNCTIONS
 
     *   detail => *true*
 
-    *   scheme* => *perl::modname*
+    *   scheme* => *perl::colorscheme::modname*
 
     Returns an enveloped result (an array).
 
@@ -133,9 +133,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   scheme* => *perl::modname*
+    *   columns => *posint* (default: 1)
 
-    *   width => *posint* (default: 80)
+    *   row_height => *posint* (default: 3)
+
+    *   scheme* => *perl::colorscheme::modname*
+
+    *   table_width => *posint* (default: 80)
 
     Returns an enveloped result (an array).
 

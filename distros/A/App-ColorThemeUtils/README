@@ -2,8 +2,8 @@ NAME
     App::ColorThemeUtils - CLI utilities related to color themes
 
 VERSION
-    This document describes version 0.007 of App::ColorThemeUtils (from Perl
-    distribution App-ColorThemeUtils), released on 2020-06-09.
+    This document describes version 0.008 of App::ColorThemeUtils (from Perl
+    distribution App-ColorThemeUtils), released on 2020-06-11.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -77,7 +77,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Color::Theme
+    ColorTheme
 
 AUTHOR
     perlancar <perlancar@cpan.org>

@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::extract_script;
 
-our $DATE = '2020-06-10'; # DATE
-our $VERSION = '1.059'; # VERSION
+our $DATE = '2020-06-11'; # DATE
+our $VERSION = '1.061'; # VERSION
 
 use 5.010;
 use strict;
@@ -99,7 +99,7 @@ App::lcpan::Cmd::extract_script - Extract a script's latest release file to curr
 
 =head1 VERSION
 
-This document describes version 1.059 of App::lcpan::Cmd::extract_script (from Perl distribution App-lcpan), released on 2020-06-10.
+This document describes version 1.061 of App::lcpan::Cmd::extract_script (from Perl distribution App-lcpan), released on 2020-06-11.
 
 =head1 FUNCTIONS
 

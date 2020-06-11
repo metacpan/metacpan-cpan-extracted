@@ -22,7 +22,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-DBI
   homepage: https://metacpan.org/release/Sah-Schemas-DBI
   repository: git://github.com/perlancar/perl-Sah-Schemas-DBI.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -293,7 +293,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.060'
+              version: '0.061'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -

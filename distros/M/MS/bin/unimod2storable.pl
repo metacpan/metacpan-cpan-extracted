@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+use Getopt::Long;
+use HTTP::Tiny;
+use JSON qw/decode_json/;
 use XML::Twig;
 use Storable qw/nstore/;
 
@@ -19,10 +22,24 @@ my $twig = XML::Twig->new(
 
 );
 
-my ($fn_in, $fn_out, $dump) = @ARGV;
+my $fi_unimod;
+my $fi_elements;
+my $fo_storable;
+my $dump = 0;
+
+GetOptions(
+    'unimod=s'   => \$fi_unimod,
+    'elements=s' => \$fi_elements,
+    'out=s'      => \$fo_storable,
+    'dump'       => \$dump,
+);
+
+my ($fn_in, $fn_out) = @ARGV;
 
 my $unimod = {};
-$twig->parsefile($fn_in);
+$twig->parsefile($fi_unimod);
+
+fetch_missing_elements($unimod);
 
 if ($dump) {
     use Data::Dumper;
@@ -30,10 +47,9 @@ if ($dump) {
     local $Data::Dumper::Terse    = 1;
     local $Data::Dumper::Sortkeys = 1;
     print Dumper $unimod;
-    exit;
 }
 
-nstore $unimod => $fn_out or die "Error writing Storable to disk: $@\n";
+nstore $unimod => $fo_storable or die "Error writing Storable to disk: $@\n";
 
 exit;
 
@@ -109,14 +125,21 @@ sub parse_mod {
     for (qw/title full_name record_id/) {
         die "Missing meta $_ for elt $tag\n" if (! defined $attrs->{$_});
     }
-    my $id = $attrs->{record_id};
+    my $title = $attrs->{title};
 
     my $delta = $elt->first_child('umod:delta')
         or die "failed to find delta elt";
     my $mono  = $delta->att('mono_mass');
     my $avg   = $delta->att('avge_mass');
-    die "Error parsing delta masses for mod $id\n"
+    die "Error parsing delta masses for mod $title\n"
         if (! defined $mono || !  defined $avg);
+    $unimod->{$tag}->{$title}->{mono_mass} = $mono;
+    $unimod->{$tag}->{$title}->{avge_mass} = $avg;
+    $unimod->{$tag}->{$title}->{full_name} = $attrs->{full_name};
+    $unimod->{$tag}->{$title}->{record_id} = $attrs->{record_id};
+
+    # store mappings of record_id to title
+    $unimod->{mod_index}->{$attrs->{record_id}} = $title;
 
     # parse element composition
     for my $atom ($delta->children('umod:element')) {
@@ -124,19 +147,12 @@ sub parse_mod {
         for (qw/symbol number/) {
             die "Missing meta $_ for elt\n" if (! defined $attrs->{$_});
         }
-        $unimod->{$tag}->{$id}->{atoms}->{ $attrs->{symbol} }
+        print STDERR "$attrs->{symbol} to $attrs->{number}\n";
+        $unimod->{$tag}->{$title}->{atoms}->{ $attrs->{symbol} }
             = $attrs->{number};
     }
 
-    $unimod->{$tag}->{$id}->{mono_mass} = $mono;
-    $unimod->{$tag}->{$id}->{avge_mass} = $avg;
-    $unimod->{$tag}->{$id}->{full_name} = $attrs->{full_name};
-    $unimod->{$tag}->{$id}->{title}     = $attrs->{title};
-
-    # store mappings of record_id to title
-    $unimod->{mod_index}->{$attrs->{title}} = $id;
-
-    $unimod->{$tag}->{$id}->{hashref} = $elt->simplify(
+    $unimod->{$tag}->{$title}->{hashref} = $elt->simplify(
         forcearray => [qw/
             umod:element
             umod:specificity
@@ -152,3 +168,74 @@ sub parse_mod {
     return;
 
 }
+
+sub fetch_missing_elements {
+
+    my ($unimod) = @_;
+
+    my %elements;
+
+    open my $in, '<', $fi_elements;
+    while (my $line = <$in>) {
+
+        next if ($line =~ /^\s*#/);
+        chomp $line;
+        my ($num, $sym, $name) = split ',', $line;
+        $elements{$name} = $sym;
+
+    }
+    close $in;
+
+    my $ua = HTTP::Tiny->new();
+
+    ELEM:
+    for my $el (keys %elements) {
+
+        say STDERR "Fetching $el";
+
+        my $url = sprintf
+            "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/fastformula/%s/JSON?MaxRecords=1",
+            $elements{$el},
+        ;
+
+        my $res = $ua->get($url);
+
+        if (! $res->{success}) {
+            warn "Failed to fetch data for $el: $res->{reason}\n";
+            next ELEM;
+        }
+
+        my $data = decode_json( $res->{content} );
+        my @mono = grep {$_->{urn}->{label} eq 'Weight' && $_->{urn}->{name} eq 'MonoIsotopic'} @{ $data->{PC_Compounds}->[0]->{props} };
+        die "Missing or too many mono masses for $el\n"
+            if (scalar @mono != 1);
+        my @avg = grep {$_->{urn}->{label} eq 'Molecular Weight' } @{ $data->{PC_Compounds}->[0]->{props} };
+        die "Missing or too many avg masses for $elements{$el}\n"
+            if (scalar @avg != 1);
+
+        my $mass_avg = $avg[0]->{value}->{fval}
+            // die "Missing avg mass for $el";
+        my $mass_mono = $mono[0]->{value}->{fval}
+            // die "Missing mono mass for $el";
+        
+        my $existing = $unimod->{elem}->{ $elements{$el} };
+        if (defined $existing) {
+            my $prev = $existing->{mono_mass};
+            my $delta = abs($prev - $mass_mono);
+            if ($delta > 0.01) {
+                die "Disageement in mono mass: prev $prev, curr $mass_mono\n";
+            }
+        }
+        else {
+            $unimod->{elem}->{ $elements{$el} } = {
+                full_name => $el,
+                avge_mass => $mass_avg,
+                mono_mass => $mass_mono,
+            };
+            say STDERR "\tAdded $el";
+        }
+
+    }
+
+}
+

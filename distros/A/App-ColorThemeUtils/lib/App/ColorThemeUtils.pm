@@ -1,9 +1,9 @@
 package App::ColorThemeUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-11'; # DATE
 our $DIST = 'App-ColorThemeUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -112,7 +112,7 @@ App::ColorThemeUtils - CLI utilities related to color themes
 
 =head1 VERSION
 
-This document describes version 0.007 of App::ColorThemeUtils (from Perl distribution App-ColorThemeUtils), released on 2020-06-09.
+This document describes version 0.008 of App::ColorThemeUtils (from Perl distribution App-ColorThemeUtils), released on 2020-06-11.
 
 =head1 DESCRIPTION
 
@@ -209,7 +209,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<Color::Theme>
+L<ColorTheme>
 
 =head1 AUTHOR
 

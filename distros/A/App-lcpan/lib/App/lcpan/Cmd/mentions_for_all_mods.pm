@@ -1,7 +1,7 @@
 package App::lcpan::Cmd::mentions_for_all_mods;
 
-our $DATE = '2020-06-10'; # DATE
-our $VERSION = '1.059'; # VERSION
+our $DATE = '2020-06-11'; # DATE
+our $VERSION = '1.061'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ App::lcpan::Cmd::mentions_for_all_mods - List PODs which mention all specified m
 
 =head1 VERSION
 
-This document describes version 1.059 of App::lcpan::Cmd::mentions_for_all_mods (from Perl distribution App-lcpan), released on 2020-06-10.
+This document describes version 1.061 of App::lcpan::Cmd::mentions_for_all_mods (from Perl distribution App-lcpan), released on 2020-06-11.
 
 =head1 FUNCTIONS
 
@@ -83,6 +83,30 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<added_or_updated_since> => I<date>
+
+Include only records that are addedE<sol>updated since a certain date.
+
+=item * B<added_or_updated_since_last_index_update> => I<true>
+
+Include only records that are addedE<sol>updated since the last index update.
+
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
+
+Include only records that are addedE<sol>updated since the last N index updates.
+
+=item * B<added_since> => I<date>
+
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<cpan> => I<dirname>
 
@@ -118,6 +142,18 @@ Filter by module(s) that do the mentioning.
 Filter by script(s) that do the mentioning.
 
 =item * B<modules>* => I<array[perl::modname]>
+
+=item * B<updated_since> => I<date>
+
+Include only records that are updated since certain date.
+
+=item * B<updated_since_last_index_update> => I<true>
+
+Include only records that are updated since the last index update.
+
+=item * B<updated_since_last_n_index_updates> => I<posint>
+
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

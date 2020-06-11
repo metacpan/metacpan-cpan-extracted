@@ -1,22 +1,21 @@
 package PICA::Schema::Builder;
-use strict;
-use warnings;
+use v5.14.1;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use PICA::Schema qw(field_identifier);
 use Scalar::Util qw(reftype);
 
 sub new {
     my $class = shift;
-    bless { fields => { }, counter => 0 }, $class;
+    bless {fields => {}, counter => 0}, $class;
 }
 
 sub add {
     my ($self, $record) = @_;
 
     $record = $record->{record} if reftype $record eq 'HASH';
-	my $fields = $self->{fields};
+    my $fields = $self->{fields};
 
     my %field_identifiers;
     foreach (@$record) {
@@ -26,68 +25,69 @@ sub add {
 
         # check whether field is repeated within thin record
         if ($field_identifiers{$id}) {
-			$fields->{$id}{repeatable} = 1;
-        } else {
-        	$field_identifiers{$id} = 1;
+            $fields->{$id}{repeatable} = 1;
+        }
+        else {
+            $field_identifiers{$id} = 1;
         }
 
         # field has not been inspected yet
         if (!$fields->{$id}) {
-            $fields->{$id} = {
-                counter => 0,
-                tag => $tag,
-                subfields => {},
-            };
+            $fields->{$id} = {counter => 0, tag => $tag, subfields => {},};
             $fields->{$id}{occurrence} = $occ if length $id gt 4;
-			$fields->{$id}{required} = 1 unless $self->{counter};
-        } else {
+            $fields->{$id}{required}   = 1 unless $self->{counter};
+        }
+        else {
             $fields->{$id}{counter}++;
         }
 
-
-		my $subfields = $fields->{$id}{subfields};
-		my %subfield_codes;
+        my $subfields = $fields->{$id}{subfields};
+        my %subfield_codes;
         while (@content) {
             my ($code, $value) = splice(@content, 0, 2);
 
             # check whether subfield is repeated within this field
-			if ($subfield_codes{$code}) {
-				$subfields->{$code}{repeatable} = 1;
-			} else {
-				$subfield_codes{$code} = 1;
+            if ($subfield_codes{$code}) {
+                $subfields->{$code}{repeatable} = 1;
+            }
+            else {
+                $subfield_codes{$code} = 1;
             }
 
             if (!$subfields->{$code}) {
-				$subfields->{$code} = { code => $code };
-			    $subfields->{$code}{required} = 1 unless $fields->{$id}{counter};
-			}
+                $subfields->{$code} = {code => $code};
+                $subfields->{$code}{required} = 1
+                    unless $fields->{$id}{counter};
+            }
         }
 
-		# subfields not given in this field are not required
-		for (grep { !$subfield_codes{$_} } keys %$subfields) {
-			delete $subfields->{$_}{required};
-		}
+        # subfields not given in this field are not required
+        for (grep {!$subfield_codes{$_}} keys %$subfields) {
+            delete $subfields->{$_}{required};
+        }
     }
 
-	# fields not given in this record are not required
-    for (grep { !$field_identifiers{$_} } keys %$fields) {
+    # fields not given in this record are not required
+    for (grep {!$field_identifiers{$_}} keys %$fields) {
         delete $fields->{$_}{required};
     }
 
-	$self->{counter}++;
+    $self->{counter}++;
 }
 
 sub schema {
     my ($self) = @_;
-    PICA::Schema->new({
-        fields => {
-            map {
-                my %field = %{$self->{fields}{$_}};
-                delete $field{counter};
-                $_ => \%field;
-            } keys %{$self->{fields}}
+    PICA::Schema->new(
+        {
+            fields => {
+                map {
+                    my %field = %{$self->{fields}{$_}};
+                    delete $field{counter};
+                    $_ => \%field;
+                } keys %{$self->{fields}}
+            }
         }
-    })
+    );
 }
 
 1;

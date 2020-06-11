@@ -1,0 +1,11 @@
+Revision history for App::PP::Autolink
+
+2.02 20200611 18:00 AEST
+  - Check Aliens only if they inherit from Alien::Base
+  - Update POD
+
+2.01 20200611 16:10 AEST
+  - Second CPAN release because I forgot the CHANGES file in 2.00
+
+2.00 20200611
+  - First CPAN release

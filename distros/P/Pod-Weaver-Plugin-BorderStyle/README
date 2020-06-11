@@ -1,0 +1,61 @@
+NAME
+    Pod::Weaver::Plugin::BorderStyle - Plugin to use when building
+    distribution which has BorderStyle::* modules
+
+VERSION
+    This document describes version 0.001 of
+    Pod::Weaver::Plugin::BorderStyle (from Perl distribution
+    Pod-Weaver-Plugin-BorderStyle), released on 2020-06-11.
+
+SYNOPSIS
+    In your weaver.ini:
+
+     [-BorderStyle]
+
+DESCRIPTION
+    This plugin is used when building a distribution which has
+    BorderStyle::* modules. It does the following to each BorderStyles::*
+    Perl source code:
+
+    *   Create "BORDER STYLES" POD section from list of BorderStyle::*
+        modules in the distribution
+
+    *   Mention some modules in See Also section
+
+        e.g. BorderStyle, App::BorderStyleUtils.
+
+    It does the following to each BorderStyle::* Perl source code:
+
+    *   Add "DESCRIPTION" POD section from border style structure's
+        description
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Plugin-BorderStyle>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Plugin-BorderStyle>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Bor
+    derStyle>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    BorderStyle
+
+    Dist::Zilla::Plugin::BorderStyle
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -20,6 +20,8 @@ is_deeply( hashref_subset({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}) , {b=>2, c=
 is_deeply({hash_subset   ({a=>1, b=>2, c=>3}, sub {$_[0] =~ /[bcd]/})}, {b=>2, c=>3});
 is_deeply( hashref_subset({a=>1, b=>2, c=>3}, sub {$_[0] =~ /[bcd]/}) , {b=>2, c=>3});
 
+# multiple args
+is_deeply({hash_subset   ({a=>1, b=>2, c=>3, d=>4}, {c=>1}, [qw/b/], sub {$_[0] =~ /[bcd]/})},      {b=>2, c=>3, d=>4});
 
 is_deeply({hash_subset_without   ({a=>1, b=>2, c=>3}, [qw/b c/])},             {a=>1});
 is_deeply( hashref_subset_without({a=>1, b=>2, c=>3}, [qw/b c/]) ,             {a=>1});
@@ -29,5 +31,8 @@ is_deeply( hashref_subset_without({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}) , {
 
 is_deeply({hash_subset_without   ({a=>1, b=>2, c=>3}, sub {$_[0] =~ /[bcd]/})}, {a=>1});
 is_deeply( hashref_subset_without({a=>1, b=>2, c=>3}, sub {$_[0] =~ /[bcd]/}) , {a=>1});
+
+# multiple args
+is_deeply({hash_subset_without   ({a=>1, b=>2, c=>3, d=>4}, {c=>1}, [qw/b/], sub {$_[0] =~ /[bcd]/})},      {a=>1});
 
 done_testing;

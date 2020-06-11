@@ -55,6 +55,6 @@ done_testing();
 sub are_equal {
 
     my ($v1, $v2, $dp) = @_;
-    return sprintf("%.${dp}f", $v1) eq sprintf("%.${dp}f", $v2);
+    return abs($v2 - $v1) < 10**-$dp;
 
 }

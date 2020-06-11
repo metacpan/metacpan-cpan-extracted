@@ -8,7 +8,7 @@ package Device::Chip::ProtocolBase::SPI;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 NAME
 

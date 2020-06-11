@@ -510,7 +510,7 @@ $tx = $ua->get("http://127.0.0.1:$port");
 ok $tx->keep_alive, 'keep connection alive';
 is $tx->res->code, 200,      'right status';
 is $tx->res->body, 'works!', 'right content';
-sleep 1;
+$ua->ioloop->delay->timer(1)->wait;
 $tx = $ua->get("http://127.0.0.1:$port");
 ok !$tx->kept_alive, 'kept connection not alive';
 ok $tx->keep_alive, 'keep connection alive';

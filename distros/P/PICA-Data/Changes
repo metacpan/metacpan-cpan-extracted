@@ -1,6 +1,12 @@
 Revision history for PICA::Data
 
-1.07  2020-06-04 13:55:07 CEST
+1.08 2020-06-10T13:27:29Z
+    - Require Perl >= 5.14.1
+    - Fix installation of picadata script
+    - Make picadata detect missing files
+    - Use perltidy and tidyall for coding style
+
+1.07
     - rename pica-validate to picadata
     - support filtering by multiple path expressions (pica_fields)
     - Add PICA JSON Writer and serializer
@@ -56,11 +62,13 @@ Revision history for PICA::Data
 0.33  2017-07-10 13:19:46 CEST
     - new writer PPXML
     - list denpencies in cpanfile
+
 0.32  2017-06-28 14:21:36 CEST
     - sort record before printing
     - updated travis.yml with use of --skip-installed
     - skip faulty fields by default, add strict option in parsers
     - fix IO layer for XML parser in test file
+
 0.31  2016-02-19 10:13:44 CET
     - refactor parser
     - add PICA::Path::record_field and ::record_subfields

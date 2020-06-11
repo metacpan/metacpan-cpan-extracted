@@ -1,7 +1,9 @@
 package App::lcpan::Cmd::mentions;
 
-our $DATE = '2020-06-10'; # DATE
-our $VERSION = '1.059'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-11'; # DATE
+our $DIST = 'App-lcpan'; # DIST
+our $VERSION = '1.061'; # VERSION
 
 use 5.010;
 use strict;
@@ -85,6 +87,9 @@ _
             element_completion => \&App::lcpan::_complete_cpanid,
         },
         #%App::lcpan::fauthor_args,
+        %App::lcpan::fctime_args,
+        %App::lcpan::fmtime_args,
+        %App::lcpan::fctime_or_mtime_args,
     },
 };
 sub handle_cmd {
@@ -108,6 +113,9 @@ sub handle_cmd {
     my @bind;
     my @where;
     #my @having;
+
+    App::lcpan::_set_since(\%args, $dbh);
+    App::lcpan::_add_since_where_clause(\%args, \@where, "mention");
 
     if ($type eq 'script') {
         push @where, "mention.script_name IS NOT NULL";
@@ -223,7 +231,7 @@ App::lcpan::Cmd::mentions - List mentions
 
 =head1 VERSION
 
-This document describes version 1.059 of App::lcpan::Cmd::mentions (from Perl distribution App-lcpan), released on 2020-06-10.
+This document describes version 1.061 of App::lcpan::Cmd::mentions (from Perl distribution App-lcpan), released on 2020-06-11.
 
 =head1 FUNCTIONS
 
@@ -248,6 +256,30 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<added_or_updated_since> => I<date>
+
+Include only records that are addedE<sol>updated since a certain date.
+
+=item * B<added_or_updated_since_last_index_update> => I<true>
+
+Include only records that are addedE<sol>updated since the last index update.
+
+=item * B<added_or_updated_since_last_n_index_updates> => I<posint>
+
+Include only records that are addedE<sol>updated since the last N index updates.
+
+=item * B<added_since> => I<date>
+
+Include only records that are added since a certain date.
+
+=item * B<added_since_last_index_update> => I<true>
+
+Include only records that are added since the last index update.
+
+=item * B<added_since_last_n_index_updates> => I<posint>
+
+Include only records that are added since the last N index updates.
 
 =item * B<cpan> => I<dirname>
 
@@ -293,6 +325,18 @@ Filter by script(s) that do the mentioning.
 =item * B<type> => I<str> (default: "any")
 
 Filter by type of things being mentioned.
+
+=item * B<updated_since> => I<date>
+
+Include only records that are updated since certain date.
+
+=item * B<updated_since_last_index_update> => I<true>
+
+Include only records that are updated since the last index update.
+
+=item * B<updated_since_last_n_index_updates> => I<posint>
+
+Include only records that are updated since the last N index updates.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

@@ -50,6 +50,14 @@ if ( network_available() ) {
 
 }
 
+# test deduplication
+$db = MS::Search::DB->new();
+$db->add_from_file( $test_file );
+$db->add_from_file( $test_file );
+my $n_orig = get_db_size( $db );
+ok( $db->deduplicate(), "run deduplicate" );
+ok( get_db_size($db) == $n_orig/2, "verify deduplicate" );
+
 done_testing();
 
 sub get_db_size {

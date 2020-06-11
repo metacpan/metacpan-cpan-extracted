@@ -1,6 +1,5 @@
 package PICA::Schema::Error;
-use strict;
-use warnings;
+use v5.14.1;
 
 use overload fallback => 1, '""' => \&message;
 
@@ -10,16 +9,15 @@ sub new {
 
     my $error = {
         tag => $field->[0],
-        (($field->[1] // '' ne '') ? (occurrence => $field->[1]) : ()),
-        @_
+        (($field->[1] // '' ne '') ? (occurrence => $field->[1]) : ()), @_
     };
 
     # add error messages
-    my $id = join '/', grep { ($_ // '') ne '' } @$field[0 .. 1];
+    my $id = join '/', grep {($_ // '') ne ''} @$field[0 .. 1];
     $error->{message} = _field_error_message($error, $id);
 
-    while (my ($code, $sf) = each %{ $error->{subfields} // {} }) {
-        $sf->{code} = $code;
+    while (my ($code, $sf) = each %{$error->{subfields} // {}}) {
+        $sf->{code}    = $code;
         $sf->{message} = _subfield_error_message($sf, $id);
     }
 
@@ -32,22 +30,28 @@ sub message {
 
 sub _subfield_error_message {
     my $error = shift;
-    my $id = (shift // '') . '$' . $error->{code};
+    my $id    = (shift // '') . '$' . $error->{code};
 
     if ($error->{required}) {
-        "missing subfield $id"
-    } elsif ($error->{repeated}) {
-        "subfield $id is not repeatable"
-    } elsif ($error->{deprecated}) {
-        "deprecated subfield $id"
-    } elsif ($error->{position}) {
-        "invalid value at position $error->{position} of subfield $id"
-    } elsif ($error->{pattern}) {
-        "value of subfield $id does not match pattern $error->{pattern}"
-    } elsif (defined $error->{order}) {
-        "wrong subfield order of $id"
-    } else {
-        "unknown subfield $id"
+        "missing subfield $id";
+    }
+    elsif ($error->{repeated}) {
+        "subfield $id is not repeatable";
+    }
+    elsif ($error->{deprecated}) {
+        "deprecated subfield $id";
+    }
+    elsif ($error->{position}) {
+        "invalid value at position $error->{position} of subfield $id";
+    }
+    elsif ($error->{pattern}) {
+        "value of subfield $id does not match pattern $error->{pattern}";
+    }
+    elsif (defined $error->{order}) {
+        "wrong subfield order of $id";
+    }
+    else {
+        "unknown subfield $id";
     }
 }
 
@@ -55,16 +59,20 @@ sub _field_error_message {
     my ($error, $id) = @_;
 
     if ($error->{required}) {
-        "missing field $id"
-    } elsif ($error->{repeated}) {
-        "field $id is not repeatable"
-    } elsif ($error->{subfields}) {
+        "missing field $id";
+    }
+    elsif ($error->{repeated}) {
+        "field $id is not repeatable";
+    }
+    elsif ($error->{subfields}) {
         my $sf = join '', keys %{$error->{subfields}};
         "invalid subfield" . (length $sf > 1 ? "s $id\$$sf" : " $id\$$sf");
-    } elsif ($error->{deprecated}) {
-        "deprecated field $id"
-    } else {
-        "unknown field $id"
+    }
+    elsif ($error->{deprecated}) {
+        "deprecated field $id";
+    }
+    else {
+        "unknown field $id";
     }
 }
 

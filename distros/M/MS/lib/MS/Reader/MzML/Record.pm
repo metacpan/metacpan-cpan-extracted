@@ -163,8 +163,10 @@ sub _decode_np_linear {
 
     my $fp = unpack 'd>', substr($data,0,8,'');
     my @v  = unpack 'VV', substr($data,0,8,'');
-    push @v, 2*$v[-1] - $v[-2] + $_
-        for ( @{ _decode_trunc_ints($data) } );
+    if (length $data) {
+        push @v, 2*$v[-1] - $v[-2] + $_
+            for ( @{ _decode_trunc_ints($data) } );
+    }
     @v = map {$_/$fp} @v;
 
     return \@v;

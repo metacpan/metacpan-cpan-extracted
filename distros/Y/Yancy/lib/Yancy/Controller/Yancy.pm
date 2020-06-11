@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.060';
+our $VERSION = '1.061';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -439,7 +439,7 @@ sub list {
 
 #pod =method get
 #pod
-#pod     $routes->get( '/:id' )->to(
+#pod     $routes->get( '/:id_field' )->to(
 #pod         'yancy#get',
 #pod         schema => $schema_name,
 #pod         template => $template_name,
@@ -457,10 +457,13 @@ sub list {
 #pod
 #pod The schema to use. Required.
 #pod
-#pod =item id
+#pod =item "id_field"
 #pod
-#pod The ID of the item from the schema. Required. Usually part of
-#pod the route path as a placeholder.
+#pod The ID field(s) for the item should be defined as stash items, usually via
+#pod route placeholders named after the field.
+#pod
+#pod     # Schema ID field is "page_id"
+#pod     $routes->get( '/pages/:page_id' )
 #pod
 #pod =item template
 #pod
@@ -523,12 +526,14 @@ sub get {
 
 #pod =method set
 #pod
-#pod     $routes->any( [ 'GET', 'POST' ] => '/:id/edit' )->to(
+#pod     # Update an existing item
+#pod     $routes->any( [ 'GET', 'POST' ] => '/:id_field/edit' )->to(
 #pod         'yancy#set',
 #pod         schema => $schema_name,
 #pod         template => $template_name,
 #pod     );
 #pod
+#pod     # Create a new item
 #pod     $routes->any( [ 'GET', 'POST' ] => '/create' )->to(
 #pod         'yancy#set',
 #pod         schema => $schema_name,
@@ -548,12 +553,12 @@ sub get {
 #pod Displaying a form could be done as a separate route using the C<yancy#get>
 #pod method, but with more code:
 #pod
-#pod     $routes->get( '/:id/edit' )->to(
+#pod     $routes->get( '/:id_field/edit' )->to(
 #pod         'yancy#get',
 #pod         schema => $schema_name,
 #pod         template => $template_name,
 #pod     );
-#pod     $routes->post( '/:id/edit' )->to(
+#pod     $routes->post( '/:id_field/edit' )->to(
 #pod         'yancy#set',
 #pod         schema => $schema_name,
 #pod         template => $template_name,
@@ -569,10 +574,14 @@ sub get {
 #pod
 #pod The schema to use. Required.
 #pod
-#pod =item id
+#pod =item "id_field"
 #pod
-#pod The ID of the item from the schema. Optional: If not specified, a new
-#pod item will be created. Usually part of the route path as a placeholder.
+#pod The ID field(s) for the item should be defined as stash items, usually via
+#pod route placeholders named after the field. Optional: If not specified, a new
+#pod item will be created.
+#pod
+#pod     # Schema ID field is "page_id"
+#pod     $routes->post( '/pages/:page_id' )
 #pod
 #pod =item template
 #pod
@@ -590,7 +599,7 @@ sub get {
 #pod The name of a route to forward the user to on success. Optional. Any
 #pod route placeholders that match item field names will be filled in.
 #pod
-#pod     $routes->get( '/:id/:slug' )->name( 'blog.view' );
+#pod     $routes->get( '/:blog_id/:slug' )->name( 'blog.view' );
 #pod     $routes->post( '/create' )->to(
 #pod         'yancy#set',
 #pod         schema => 'blog',
@@ -819,7 +828,7 @@ sub set {
 
 #pod =method delete
 #pod
-#pod     $routes->any( [ 'GET', 'POST' ], '/delete/:id' )->to(
+#pod     $routes->any( [ 'GET', 'POST' ], '/delete/:id_field' )->to(
 #pod         'yancy#delete',
 #pod         schema => $schema_name,
 #pod         template => $template_name,
@@ -843,10 +852,13 @@ sub set {
 #pod
 #pod The schema to use. Required.
 #pod
-#pod =item id
+#pod =item "id_field"
 #pod
-#pod The ID of the item from the schema. Required. Usually part of the
-#pod route path as a placeholder.
+#pod The ID field(s) for the item should be defined as stash items, usually via
+#pod route placeholders named after the field.
+#pod
+#pod     # Schema ID field is "page_id"
+#pod     $routes->get( '/pages/:page_id' )
 #pod
 #pod =item template
 #pod
@@ -991,7 +1003,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.060
+version 1.061
 
 =head1 SYNOPSIS
 
@@ -1169,7 +1181,7 @@ number and setting the C<$offset> query parameter.
 
 =head2 get
 
-    $routes->get( '/:id' )->to(
+    $routes->get( '/:id_field' )->to(
         'yancy#get',
         schema => $schema_name,
         template => $template_name,
@@ -1187,10 +1199,13 @@ This method uses the following stash values for configuration:
 
 The schema to use. Required.
 
-=item id
+=item "id_field"
 
-The ID of the item from the schema. Required. Usually part of
-the route path as a placeholder.
+The ID field(s) for the item should be defined as stash items, usually via
+route placeholders named after the field.
+
+    # Schema ID field is "page_id"
+    $routes->get( '/pages/:page_id' )
 
 =item template
 
@@ -1223,12 +1238,14 @@ the URL ends in C<.json>, the item will be returned as a JSON object.
 
 =head2 set
 
-    $routes->any( [ 'GET', 'POST' ] => '/:id/edit' )->to(
+    # Update an existing item
+    $routes->any( [ 'GET', 'POST' ] => '/:id_field/edit' )->to(
         'yancy#set',
         schema => $schema_name,
         template => $template_name,
     );
 
+    # Create a new item
     $routes->any( [ 'GET', 'POST' ] => '/create' )->to(
         'yancy#set',
         schema => $schema_name,
@@ -1248,12 +1265,12 @@ forwarded to another place.
 Displaying a form could be done as a separate route using the C<yancy#get>
 method, but with more code:
 
-    $routes->get( '/:id/edit' )->to(
+    $routes->get( '/:id_field/edit' )->to(
         'yancy#get',
         schema => $schema_name,
         template => $template_name,
     );
-    $routes->post( '/:id/edit' )->to(
+    $routes->post( '/:id_field/edit' )->to(
         'yancy#set',
         schema => $schema_name,
         template => $template_name,
@@ -1269,10 +1286,14 @@ This method uses the following stash values for configuration:
 
 The schema to use. Required.
 
-=item id
+=item "id_field"
 
-The ID of the item from the schema. Optional: If not specified, a new
-item will be created. Usually part of the route path as a placeholder.
+The ID field(s) for the item should be defined as stash items, usually via
+route placeholders named after the field. Optional: If not specified, a new
+item will be created.
+
+    # Schema ID field is "page_id"
+    $routes->post( '/pages/:page_id' )
 
 =item template
 
@@ -1290,7 +1311,7 @@ L</ACTION HOOKS> for usage.
 The name of a route to forward the user to on success. Optional. Any
 route placeholders that match item field names will be filled in.
 
-    $routes->get( '/:id/:slug' )->name( 'blog.view' );
+    $routes->get( '/:blog_id/:slug' )->name( 'blog.view' );
     $routes->post( '/create' )->to(
         'yancy#set',
         schema => 'blog',
@@ -1367,7 +1388,7 @@ case, the form query parameters are not used.
 
 =head2 delete
 
-    $routes->any( [ 'GET', 'POST' ], '/delete/:id' )->to(
+    $routes->any( [ 'GET', 'POST' ], '/delete/:id_field' )->to(
         'yancy#delete',
         schema => $schema_name,
         template => $template_name,
@@ -1391,10 +1412,13 @@ This method uses the following stash values for configuration:
 
 The schema to use. Required.
 
-=item id
+=item "id_field"
 
-The ID of the item from the schema. Required. Usually part of the
-route path as a placeholder.
+The ID field(s) for the item should be defined as stash items, usually via
+route placeholders named after the field.
+
+    # Schema ID field is "page_id"
+    $routes->get( '/pages/:page_id' )
 
 =item template
 

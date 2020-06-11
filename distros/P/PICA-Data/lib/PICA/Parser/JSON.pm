@@ -1,8 +1,7 @@
 package PICA::Parser::JSON;
-use strict;
-use warnings;
+use v5.14.1;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use JSON::PP;
 our $JSON = JSON::PP->new;
@@ -12,7 +11,7 @@ use parent 'PICA::Parser::Base';
 sub _next_record {
     my ($self) = @_;
 
-    if ( my $line = $self->{reader}->getline ) {
+    if (my $line = $self->{reader}->getline) {
         return $JSON->decode($line);
     }
 }

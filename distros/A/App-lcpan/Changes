@@ -1,3 +1,29 @@
+1.061   2020-06-11  Released-By: PERLANCAR; Urgency: medium
+
+	[subcommand mentions]
+
+        - Add --{added,updated,added-or-updated-}-* options.
+
+	[subcommand whatsnew]
+
+        - Show new mentions for you.
+
+
+1.060   2020-06-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Fix author-deps & author-rdeps which didn't apply the
+	  {added,updated,added_or_updated}_since filter to the correct
+	  entity (to module/dist instead of dep).
+
+	- [bugfix] Fix typo that caused --added-since-last-n-index-updates
+	  to not work.
+
+	[subcommand whatsnew]
+
+        - Add --my-author option to show additional added/updated items related
+	  to you.
+
+
 1.059   2020-06-10  Released-By: PERLANCAR; Urgency: medium
 
 	- The --updated-since X option now does not include records created at

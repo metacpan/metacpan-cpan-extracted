@@ -4,7 +4,7 @@
       "Jeremy Volkening <jdv@base2bio.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "gpl_3"
    ],
@@ -46,7 +46,7 @@
    "provides" : {
       "MS" : {
          "file" : "lib/MS.pm",
-         "version" : "0.204003"
+         "version" : "0.206003"
       },
       "MS::CV" : {
          "file" : "lib/MS/CV.pm"
@@ -169,6 +169,6 @@
          "url" : "https://github.com/jvolkening/p5-MS"
       }
    },
-   "version" : "0.204003",
+   "version" : "0.206003",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

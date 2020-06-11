@@ -24,4 +24,5 @@ t/20protocolbase-spi.t
 t/50test-gpio.t
 t/51test-spi.t
 t/52test-i2c.t
+t/53test-uart.t
 t/99pod.t

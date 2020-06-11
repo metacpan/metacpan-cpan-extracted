@@ -1,9 +1,11 @@
+## no critic: ControlStructures::ProhibitUnreachableCode
+
 package App::lcpan::Cmd::whatsnew;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-10'; # DATE
+our $DATE = '2020-06-11'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.059'; # VERSION
+our $VERSION = '1.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,6 +13,7 @@ use warnings;
 use Log::ger;
 
 require App::lcpan;
+use Hash::Subset 'hash_subset';
 
 our %SPEC;
 
@@ -20,6 +23,19 @@ $SPEC{'handle_cmd'} = {
     args => {
         %App::lcpan::common_args,
         %App::lcpan::fctime_or_mtime_args,
+        my_author => {
+            summary => 'My author ID',
+            description => <<'_',
+
+If specified, will show additional added/updated items for this author ID
+("you"), e.g. what distributions recently added dependency to one of your
+modules.
+
+_
+            schema => 'str*',
+            cmdline_aliases => {a=>{}},
+            completion => \&_complete_cpanid,
+        },
     },
 };
 sub handle_cmd {
@@ -27,6 +43,7 @@ sub handle_cmd {
     require Text::Table::Org; # just to let scan-prereqs know
 
     my %args = @_;
+    my $my_author = $args{my_author};
 
     my $state = App::lcpan::_init(\%args, 'ro');
     my $dbh = $state->{dbh};
@@ -37,7 +54,6 @@ sub handle_cmd {
     my $time = delete($args{added_or_updated_since});
     my $ftime = scalar(gmtime $time) . " UTC";
 
-    my ($res, $fres);
     my $org = '';
 
     local $ENV{FORMAT_PRETTY_TABLE_BACKEND} = 'Text::Table::Org';
@@ -46,6 +62,7 @@ sub handle_cmd {
     $org .= "WHAT'S NEW SINCE $ftime\n\n";
 
   NEW_MODULES: {
+        my ($res, $fres);
         $res = App::lcpan::modules(added_since=>$time, detail=>1);
         unless ($res->[0] == 200) {
             $org .= "Can't list new modules: $res->[0] - $res->[1]\n\n";
@@ -60,6 +77,7 @@ sub handle_cmd {
     }
 
   UPDATED_MODULES: {
+        my ($res, $fres);
         $res = App::lcpan::modules(updated_since=>$time, detail=>1);
         unless ($res->[0] == 200) {
             $org .= "Can't list updated modules: $res->[0] - $res->[1]\n\n";
@@ -74,6 +92,7 @@ sub handle_cmd {
     }
 
   NEW_AUTHORS: {
+        my ($res, $fres);
         $res = App::lcpan::authors(added_since=>$time, detail=>1);
         unless ($res->[0] == 200) {
             $org .= "Can't list new authors: $res->[0] - $res->[1]\n\n";
@@ -88,6 +107,7 @@ sub handle_cmd {
     }
 
   UPDATED_AUTHORS: {
+        my ($res, $fres);
         $res = App::lcpan::authors(updated_since=>$time, detail=>1);
         unless ($res->[0] == 200) {
             $org .= "Can't list updated authors: $res->[0] - $res->[1]\n\n";
@@ -95,6 +115,72 @@ sub handle_cmd {
         }
         my $num = @{ $res->[2] };
         $org .= "* Updated authors ($num)\n";
+        $fres = Perinci::Result::Format::Lite::format(
+            $res, 'text-pretty', 0, 0);
+        $org .= $fres;
+        $org .= "\n";
+    }
+
+  NEW_REVERSE_DEPENDENCIES: {
+        last unless defined $my_author;
+        my ($res, $fres);
+        require App::lcpan::Cmd::author_rdeps;
+        $res = App::lcpan::Cmd::author_rdeps::handle_cmd(
+            author=>$my_author, user_authors_arent=>[$my_author],
+            added_since=>$time,
+            phase => 'ALL',
+            rel => 'ALL',
+        );
+        unless ($res->[0] == 200) {
+            $org .= "Can't list new reverse dependencies for modules of $my_author: $res->[0] - $res->[1]\n\n";
+            last;
+        }
+        my $num = @{ $res->[2] };
+        $org .= "* Distributions of other authors recently depending on one of $my_author\'s modules ($num)\n";
+        $fres = Perinci::Result::Format::Lite::format(
+            $res, 'text-pretty', 0, 0);
+        $org .= $fres;
+        $org .= "\n";
+    }
+
+  UPDATED_REVERSE_DEPENDENCIES: {
+        # skip for now, usually empty. because dep records are usually not
+        # updated but recreated.
+        last;
+
+        last unless defined $my_author;
+        my ($res, $fres);
+        require App::lcpan::Cmd::author_rdeps;
+        $res = App::lcpan::Cmd::author_rdeps::handle_cmd(
+            author=>$my_author, user_authors_arent=>[$my_author], updated_since=>$time,
+            phase => 'ALL',
+            rel => 'ALL',
+        );
+        unless ($res->[0] == 200) {
+            $org .= "Can't list updated reverse dependencies for modules of $my_author: $res->[0] - $res->[1]\n\n";
+            last;
+        }
+        my $num = @{ $res->[2] };
+        $org .= "* Distributions of other authors which updated dependencies to one of $my_author\'s modules ($num)\n";
+        $fres = Perinci::Result::Format::Lite::format(
+            $res, 'text-pretty', 0, 0);
+        $org .= $fres;
+        $org .= "\n";
+    }
+
+  NEW_MENTIONS: {
+        last unless defined $my_author;
+        my ($res, $fres);
+        require App::lcpan::Cmd::mentions;
+        $res = App::lcpan::Cmd::mentions::handle_cmd(
+            mentioned_authors=>[$my_author], mentioner_authors_arent=>[$my_author], added_since=>$time,
+        );
+        unless ($res->[0] == 200) {
+            $org .= "Can't list updated reverse dependencies for modules of $my_author: $res->[0] - $res->[1]\n\n";
+            last;
+        }
+        my $num = @{ $res->[2] };
+        $org .= "* New mentions to one of $my_author\'s modules ($num)\n";
         $fres = Perinci::Result::Format::Lite::format(
             $res, 'text-pretty', 0, 0);
         $org .= $fres;
@@ -119,7 +205,7 @@ App::lcpan::Cmd::whatsnew - Show what's added/updated recently
 
 =head1 VERSION
 
-This document describes version 1.059 of App::lcpan::Cmd::whatsnew (from Perl distribution App-lcpan), released on 2020-06-10.
+This document describes version 1.061 of App::lcpan::Cmd::whatsnew (from Perl distribution App-lcpan), released on 2020-06-11.
 
 =head1 FUNCTIONS
 
@@ -164,6 +250,14 @@ If C<index_name> is a filename without any path, e.g. C<index.db> then index wil
 be located in the top-level of C<cpan>. If C<index_name> contains a path, e.g.
 C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
+
+=item * B<my_author> => I<str>
+
+My author ID.
+
+If specified, will show additional added/updated items for this author ID
+("you"), e.g. what distributions recently added dependency to one of your
+modules.
 
 =item * B<use_bootstrap> => I<bool> (default: 1)
 

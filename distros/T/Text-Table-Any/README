@@ -2,8 +2,8 @@ NAME
     Text::Table::Any - Generate text table using one of several backends
 
 VERSION
-    This document describes version 0.096 of Text::Table::Any (from Perl
-    distribution Text-Table-Any), released on 2019-11-29.
+    This document describes version 0.097 of Text::Table::Any (from Perl
+    distribution Text-Table-Any), released on 2020-06-11.
 
 SYNOPSIS
      use Text::Table::Any;
@@ -23,7 +23,7 @@ DESCRIPTION
     This module provides a single function, "table", which formats a
     two-dimensional array of data as text table, using one of several
     available backends. The interface is modelled after Text::Table::Tiny
-    (0.3); Text::Table::Tiny also happens to be the default backend.
+    (0.03); Text::Table::Tiny also happens to be the default backend.
 
     The example shown in the SYNOPSIS generates the following table:
 
@@ -125,6 +125,8 @@ FUNCTIONS
 
         *   Text::Table::Tiny
 
+        *   Text::Table::TinyBorderStyle
+
         *   Text::Table::TinyColor
 
         *   Text::Table::TinyColorWide
@@ -196,7 +198,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

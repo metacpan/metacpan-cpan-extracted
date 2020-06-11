@@ -1,3 +1,8 @@
+0.006   2020-06-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow multiple keys sources to include/exclude.
+
+
 0.005   2019-11-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Add functions: hash{,ref}_subset_without.

@@ -1,19 +1,20 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GraphicsColorNamesUtils/show_color_swatch
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2020-02-04'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-10'; # DATE
 our $DIST = 'App-GraphicsColorNamesUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Perinci::CmdLine::Any;
+use Perinci::CmdLine::Classic;
 
-my $cmdline = Perinci::CmdLine::Any->new(
+my $cmdline = Perinci::CmdLine::Classic->new(
     url => "/App/GraphicsColorNamesUtils/show_color_swatch",
     program_name => "show-color-swatch",
     read_config => 0,
@@ -37,13 +38,15 @@ show-color-swatch - List all color names from a Graphics::ColorNames scheme as a
 
 =head1 VERSION
 
-This document describes version 0.004 of show-color-swatch (from Perl distribution App-GraphicsColorNamesUtils), released on 2020-02-04.
+This document describes version 0.005 of show-color-swatch (from Perl distribution App-GraphicsColorNamesUtils), released on 2020-06-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % show-color-swatch [options] <scheme>
+ % show-color-swatch [-c=s] [--columns=s] [--format-options=s]
+     [--format=name] [--json] [--(no)naked-res] [--row-height=s]
+     [--table-width=s] [-w=s] <scheme>
 
 =head1 OPTIONS
 
@@ -53,9 +56,21 @@ C<*> marks required options.
 
 =over
 
+=item B<--columns>=I<s>, B<-c>
+
+Default value:
+
+ 1
+
+=item B<--row-height>=I<s>
+
+Default value:
+
+ 3
+
 =item B<--scheme>=I<s>*
 
-=item B<--width>=I<s>, B<-w>
+=item B<--table-width>=I<s>, B<-w>
 
 Default value:
 
@@ -67,6 +82,10 @@ Default value:
 
 =over
 
+=item B<--format-options>=I<s>
+
+Pass options to formatter.
+
 =item B<--format>=I<s>
 
 Choose output format, e.g. json, text.
@@ -77,7 +96,7 @@ Default value:
 
 =item B<--json>
 
-Set output format to json.
+Equivalent to --format=json-pretty.
 
 =item B<--naked-res>
 
@@ -99,10 +118,6 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
-
-=item B<--page-result>
-
-Filter output through a pager.
 
 =back
 

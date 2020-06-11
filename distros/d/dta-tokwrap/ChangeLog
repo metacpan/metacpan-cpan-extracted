@@ -1,5 +1,9 @@
 ##-*- Mode: ChangeLog; coding: utf-8; -*-
 
+v0.95 Thu, 11 Jun 2020 09:07:46 +0200 moocow
+	* added scripts/dtatw-trim-(encode|decode).perl for aggressive input sanitization
+	* see mm https://dmm.bbaw.de/dstar-teambbaw/pl/8n5iz57js7b6xb979buc65mrdr
+
 v0.94 Tue, 05 May 2020 13:52:35 +0200 moocow
 	* fix for XML::Parser v2.46 (kira / ubuntu 20.04 LTS): parsefile("-") doesn't read from stdin anymore
 

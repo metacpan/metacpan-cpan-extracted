@@ -1,5 +1,10 @@
 Revision history for Perl extension Geo::IP2Proxy
 
+3.00  Mon June 11 16:00:00 2020
+      Third major release under the Geo::IP2Proxy
+      Added new function "getThreat"
+      Support "RES" in residential proxy detection in PX10+
+
 2.20  Fri October 18 16:00:00 2019
       Reduced file I/O to improve query performance
 

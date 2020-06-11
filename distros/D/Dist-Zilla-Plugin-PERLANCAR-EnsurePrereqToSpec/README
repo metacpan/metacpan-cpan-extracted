@@ -3,10 +3,10 @@ NAME
     spec modules
 
 VERSION
-    This document describes version 0.061 of
+    This document describes version 0.062 of
     Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec (from Perl
     distribution Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec), released
-    on 2020-06-09.
+    on 2020-06-11.
 
 SYNOPSIS
     In "dist.ini":
@@ -27,6 +27,10 @@ DESCRIPTION
     *   ColorTheme
 
         When there is a ColorTheme/* source files.
+
+    *   BorderStyle
+
+        When there is a BorderStyle/* source files.
 
 HOMEPAGE
     Please visit the project's homepage at

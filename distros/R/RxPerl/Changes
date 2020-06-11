@@ -1,5 +1,9 @@
 Revision history for Perl extension RxPerl
 
+v0.14.0 2020-06-10T18:33:29Z
+
+    - Support for Mojo::IOLoop, AnyEvent, and IO::Async
+
 v0.0.1 2020-05-08T22:42:52Z
 
     - initial version

@@ -1,16 +1,15 @@
 package PICA::Writer::Plain;
-use strict;
-use warnings;
+use v5.14.1;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use charnames qw(:full);
 
 use parent 'PICA::Writer::Base';
 
-sub SUBFIELD_INDICATOR {'$' }
-sub END_OF_FIELD       { "\n" }
-sub END_OF_RECORD      { "\n" }
+sub SUBFIELD_INDICATOR {'$'}
+sub END_OF_FIELD       {"\n"}
+sub END_OF_RECORD      {"\n"}
 
 sub write_subfield {
     my ($self, $code, $value) = @_;

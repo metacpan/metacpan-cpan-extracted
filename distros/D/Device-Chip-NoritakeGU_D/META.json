@@ -1,0 +1,50 @@
+{
+   "abstract" : "chip driver for F<Noritake> F<GU-D> display modules",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Device-Chip-NoritakeGU_D",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::Chip" : "0",
+            "Future::AsyncAwait" : "0.19",
+            "List::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Device::Chip::Adapter" : "0.13",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Device::Chip::NoritakeGU_D" : {
+         "file" : "lib/Device/Chip/NoritakeGU_D.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

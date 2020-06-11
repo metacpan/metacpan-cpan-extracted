@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Extend Alien::Base with roles!
-our $VERSION = '2.23'; # VERSION
+our $VERSION = '2.25'; # VERSION
 
 
 1;
@@ -21,7 +21,7 @@ Alien::Role - Extend Alien::Base with roles!
 
 =head1 VERSION
 
-version 2.23
+version 2.25
 
 =head1 SYNOPSIS
 

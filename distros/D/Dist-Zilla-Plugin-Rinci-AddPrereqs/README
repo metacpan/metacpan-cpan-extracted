@@ -3,9 +3,9 @@ NAME
     metadata
 
 VERSION
-    This document describes version 0.144 of
+    This document describes version 0.145 of
     Dist::Zilla::Plugin::Rinci::AddPrereqs (from Perl distribution
-    Dist-Zilla-Plugin-Rinci-AddPrereqs), released on 2019-12-28.
+    Dist-Zilla-Plugin-Rinci-AddPrereqs), released on 2020-06-10.
 
 SYNOPSIS
     In "dist.ini":
@@ -123,7 +123,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2018, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-06-10'; # DATE
-our $VERSION = '1.059'; # VERSION
+our $DATE = '2020-06-11'; # DATE
+our $VERSION = '1.061'; # VERSION
 
 use 5.010;
 use strict;
@@ -65,7 +65,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.059 of lcpan (from Perl distribution App-lcpan), released on 2020-06-10.
+This document describes version 1.061 of lcpan (from Perl distribution App-lcpan), released on 2020-06-11.
 
 =head1 SYNOPSIS
 
@@ -1245,11 +1245,11 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
+=item B<--author-arg>=I<s>*
+
 =item B<--author-isnt>=I<s@>
 
 Can be specified multiple times.
-
-=item B<--author>=I<s>*
 
 =item B<--author>=I<s@>
 
@@ -2284,6 +2284,30 @@ See C<--file>.
 
 =over
 
+=item B<--added-or-updated-since-last-index-update>, B<--since-last-index-update>
+
+Include only records that are added/updated since the last index update.
+
+=item B<--added-or-updated-since-last-n-index-updates>=I<s>, B<--since-last-n-index-updates>
+
+Include only records that are added/updated since the last N index updates.
+
+=item B<--added-or-updated-since>=I<s>, B<--since>
+
+Include only records that are added/updated since a certain date.
+
+=item B<--added-since-last-index-update>
+
+Include only records that are added since the last index update.
+
+=item B<--added-since-last-n-index-updates>=I<s>
+
+Include only records that are added since the last N index updates.
+
+=item B<--added-since>=I<s>
+
+Include only records that are added since a certain date.
+
 =item B<--mentioned-author>=I<s@>
 
 Filter by author(s) of module/script being mentioned.
@@ -2375,6 +2399,18 @@ Default value:
 Valid values:
 
  ["any","script","module","unknown-module","known-module"]
+
+=item B<--updated-since-last-index-update>
+
+Include only records that are updated since the last index update.
+
+=item B<--updated-since-last-n-index-updates>=I<s>
+
+Include only records that are updated since the last N index updates.
+
+=item B<--updated-since>=I<s>
+
+Include only records that are updated since certain date.
 
 =back
 
@@ -2382,6 +2418,30 @@ Valid values:
 
 =over
 
+=item B<--added-or-updated-since-last-index-update>, B<--since-last-index-update>
+
+Include only records that are added/updated since the last index update.
+
+=item B<--added-or-updated-since-last-n-index-updates>=I<s>, B<--since-last-n-index-updates>
+
+Include only records that are added/updated since the last N index updates.
+
+=item B<--added-or-updated-since>=I<s>, B<--since>
+
+Include only records that are added/updated since a certain date.
+
+=item B<--added-since-last-index-update>
+
+Include only records that are added since the last index update.
+
+=item B<--added-since-last-n-index-updates>=I<s>
+
+Include only records that are added since the last N index updates.
+
+=item B<--added-since>=I<s>
+
+Include only records that are added since a certain date.
+
 =item B<--mentioned-author>=I<s@>
 
 Filter by author(s) of module/script being mentioned.
@@ -2438,11 +2498,47 @@ Valid values:
 
  ["any","script","module","unknown-module","known-module"]
 
+=item B<--updated-since-last-index-update>
+
+Include only records that are updated since the last index update.
+
+=item B<--updated-since-last-n-index-updates>=I<s>
+
+Include only records that are updated since the last N index updates.
+
+=item B<--updated-since>=I<s>
+
+Include only records that are updated since certain date.
+
 =back
 
 =head2 Options for subcommand mentions-by-script
 
 =over
+
+=item B<--added-or-updated-since-last-index-update>, B<--since-last-index-update>
+
+Include only records that are added/updated since the last index update.
+
+=item B<--added-or-updated-since-last-n-index-updates>=I<s>, B<--since-last-n-index-updates>
+
+Include only records that are added/updated since the last N index updates.
+
+=item B<--added-or-updated-since>=I<s>, B<--since>
+
+Include only records that are added/updated since a certain date.
+
+=item B<--added-since-last-index-update>
+
+Include only records that are added since the last index update.
+
+=item B<--added-since-last-n-index-updates>=I<s>
+
+Include only records that are added since the last N index updates.
+
+=item B<--added-since>=I<s>
+
+Include only records that are added since a certain date.
 
 =item B<--mentioned-author>=I<s@>
 
@@ -2488,11 +2584,47 @@ Can be specified multiple times.
 
 See C<--script>.
 
+=item B<--updated-since-last-index-update>
+
+Include only records that are updated since the last index update.
+
+=item B<--updated-since-last-n-index-updates>=I<s>
+
+Include only records that are updated since the last N index updates.
+
+=item B<--updated-since>=I<s>
+
+Include only records that are updated since certain date.
+
 =back
 
 =head2 Options for subcommand mentions-for-all-mods
 
 =over
+
+=item B<--added-or-updated-since-last-index-update>, B<--since-last-index-update>
+
+Include only records that are added/updated since the last index update.
+
+=item B<--added-or-updated-since-last-n-index-updates>=I<s>, B<--since-last-n-index-updates>
+
+Include only records that are added/updated since the last N index updates.
+
+=item B<--added-or-updated-since>=I<s>, B<--since>
+
+Include only records that are added/updated since a certain date.
+
+=item B<--added-since-last-index-update>
+
+Include only records that are added since the last index update.
+
+=item B<--added-since-last-n-index-updates>=I<s>
+
+Include only records that are added since the last N index updates.
+
+=item B<--added-since>=I<s>
+
+Include only records that are added since a certain date.
 
 =item B<--mentioned-author>=I<s@>
 
@@ -2557,6 +2689,18 @@ Can be specified multiple times.
 =item B<--modules-json>=I<s>
 
 See C<--module>.
+
+=item B<--updated-since-last-index-update>
+
+Include only records that are updated since the last index update.
+
+=item B<--updated-since-last-n-index-updates>=I<s>
+
+Include only records that are updated since the last N index updates.
+
+=item B<--updated-since>=I<s>
+
+Include only records that are updated since certain date.
 
 =back
 
@@ -2564,6 +2708,30 @@ See C<--module>.
 
 =over
 
+=item B<--added-or-updated-since-last-index-update>, B<--since-last-index-update>
+
+Include only records that are added/updated since the last index update.
+
+=item B<--added-or-updated-since-last-n-index-updates>=I<s>, B<--since-last-n-index-updates>
+
+Include only records that are added/updated since the last N index updates.
+
+=item B<--added-or-updated-since>=I<s>, B<--since>
+
+Include only records that are added/updated since a certain date.
+
+=item B<--added-since-last-index-update>
+
+Include only records that are added since the last index update.
+
+=item B<--added-since-last-n-index-updates>=I<s>
+
+Include only records that are added since the last N index updates.
+
+=item B<--added-since>=I<s>
+
+Include only records that are added since a certain date.
+
 =item B<--mentioned-author>=I<s@>
 
 Filter by author(s) of module/script being mentioned.
@@ -2628,11 +2796,47 @@ Can be specified multiple times.
 
 See C<--module>.
 
+=item B<--updated-since-last-index-update>
+
+Include only records that are updated since the last index update.
+
+=item B<--updated-since-last-n-index-updates>=I<s>
+
+Include only records that are updated since the last N index updates.
+
+=item B<--updated-since>=I<s>
+
+Include only records that are updated since certain date.
+
 =back
 
 =head2 Options for subcommand mentions-for-script
 
 =over
+
+=item B<--added-or-updated-since-last-index-update>, B<--since-last-index-update>
+
+Include only records that are added/updated since the last index update.
+
+=item B<--added-or-updated-since-last-n-index-updates>=I<s>, B<--since-last-n-index-updates>
+
+Include only records that are added/updated since the last N index updates.
+
+=item B<--added-or-updated-since>=I<s>, B<--since>
+
+Include only records that are added/updated since a certain date.
+
+=item B<--added-since-last-index-update>
+
+Include only records that are added since the last index update.
+
+=item B<--added-since-last-n-index-updates>=I<s>
+
+Include only records that are added since the last N index updates.
+
+=item B<--added-since>=I<s>
+
+Include only records that are added since a certain date.
 
 =item B<--mentioned-author>=I<s@>
 
@@ -2697,6 +2901,18 @@ Can be specified multiple times.
 =item B<--scripts-json>=I<s>
 
 See C<--script>.
+
+=item B<--updated-since-last-index-update>
+
+Include only records that are updated since the last index update.
+
+=item B<--updated-since-last-n-index-updates>=I<s>
+
+Include only records that are updated since the last N index updates.
+
+=item B<--updated-since>=I<s>
+
+Include only records that are updated since certain date.
 
 =back
 
@@ -4169,6 +4385,15 @@ Include only records that are added/updated since the last N index updates.
 
 Include only records that are added/updated since a certain date.
 
+=item B<--my-author>=I<s>, B<-a>
+
+My author ID.
+
+If specified, will show additional added/updated items for this author ID
+("you"), e.g. what distributions recently added dependency to one of your
+modules.
+
+
 =back
 
 =head2 Options for subcommand x-mentions-for-mod
@@ -4342,7 +4567,7 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand author-deps-by-dependent-count
 
- author (see --author)
+ author (see --author-arg)
  authors (see --author)
  authors_arent (see --author-isnt)
  include_core (see --exclude-core)
@@ -4613,6 +4838,12 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand mentions
 
+ added_or_updated_since (see --added-or-updated-since)
+ added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
+ added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ added_since (see --added-since)
+ added_since_last_index_update (see --added-since-last-index-update)
+ added_since_last_n_index_updates (see --added-since-last-n-index-updates)
  mentioned_authors (see --mentioned-author)
  mentioned_modules (see --mentioned-module)
  mentioned_scripts (see --mentioned-script)
@@ -4621,48 +4852,96 @@ List of available configuration parameters:
  mentioner_modules (see --mentioner-module)
  mentioner_scripts (see --mentioner-script)
  type (see --type)
+ updated_since (see --updated-since)
+ updated_since_last_index_update (see --updated-since-last-index-update)
+ updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
 
 =head2 Configuration for subcommand mentions-by-mod
 
+ added_or_updated_since (see --added-or-updated-since)
+ added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
+ added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ added_since (see --added-since)
+ added_since_last_index_update (see --added-since-last-index-update)
+ added_since_last_n_index_updates (see --added-since-last-n-index-updates)
  mentioned_authors (see --mentioned-author)
  mentioned_modules (see --mentioned-module)
  mentioned_scripts (see --mentioned-script)
  modules (see --module)
  type (see --type)
+ updated_since (see --updated-since)
+ updated_since_last_index_update (see --updated-since-last-index-update)
+ updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
 
 =head2 Configuration for subcommand mentions-by-script
 
+ added_or_updated_since (see --added-or-updated-since)
+ added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
+ added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ added_since (see --added-since)
+ added_since_last_index_update (see --added-since-last-index-update)
+ added_since_last_n_index_updates (see --added-since-last-n-index-updates)
  mentioned_authors (see --mentioned-author)
  mentioned_modules (see --mentioned-module)
  mentioned_scripts (see --mentioned-script)
  scripts (see --script)
+ updated_since (see --updated-since)
+ updated_since_last_index_update (see --updated-since-last-index-update)
+ updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
 
 =head2 Configuration for subcommand mentions-for-all-mods
 
+ added_or_updated_since (see --added-or-updated-since)
+ added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
+ added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ added_since (see --added-since)
+ added_since_last_index_update (see --added-since-last-index-update)
+ added_since_last_n_index_updates (see --added-since-last-n-index-updates)
  mentioned_authors (see --mentioned-author)
  mentioner_authors (see --mentioner-author)
  mentioner_authors_arent (see --mentioner-author-isnt)
  mentioner_modules (see --mentioner-module)
  mentioner_scripts (see --mentioner-script)
  modules (see --module)
+ updated_since (see --updated-since)
+ updated_since_last_index_update (see --updated-since-last-index-update)
+ updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
 
 =head2 Configuration for subcommand mentions-for-mod
 
+ added_or_updated_since (see --added-or-updated-since)
+ added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
+ added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ added_since (see --added-since)
+ added_since_last_index_update (see --added-since-last-index-update)
+ added_since_last_n_index_updates (see --added-since-last-n-index-updates)
  mentioned_authors (see --mentioned-author)
  mentioner_authors (see --mentioner-author)
  mentioner_authors_arent (see --mentioner-author-isnt)
  mentioner_modules (see --mentioner-module)
  mentioner_scripts (see --mentioner-script)
  modules (see --module)
+ updated_since (see --updated-since)
+ updated_since_last_index_update (see --updated-since-last-index-update)
+ updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
 
 =head2 Configuration for subcommand mentions-for-script
 
+ added_or_updated_since (see --added-or-updated-since)
+ added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
+ added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ added_since (see --added-since)
+ added_since_last_index_update (see --added-since-last-index-update)
+ added_since_last_n_index_updates (see --added-since-last-n-index-updates)
  mentioned_authors (see --mentioned-author)
  mentioner_authors (see --mentioner-author)
  mentioner_authors_arent (see --mentioner-author-isnt)
  mentioner_modules (see --mentioner-module)
  mentioner_scripts (see --mentioner-script)
  scripts (see --script)
+ updated_since (see --updated-since)
+ updated_since_last_index_update (see --updated-since-last-index-update)
+ updated_since_last_n_index_updates (see --updated-since-last-n-index-updates)
 
 =head2 Configuration for subcommand mod
 
@@ -4989,6 +5268,7 @@ List of available configuration parameters:
  added_or_updated_since (see --added-or-updated-since)
  added_or_updated_since_last_index_update (see --added-or-updated-since-last-index-update)
  added_or_updated_since_last_n_index_updates (see --added-or-updated-since-last-n-index-updates)
+ my_author (see --my-author)
 
 =head2 Configuration for subcommand x-mentions-for-mod
 

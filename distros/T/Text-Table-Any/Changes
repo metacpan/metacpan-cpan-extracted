@@ -1,3 +1,8 @@
+0.097   2020-06-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add backend: Text::Table::TinyBorderStyle.
+
+
 0.096   2019-11-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Text::Table::CSV (0.022) now (re-)observes header_row=0.

@@ -26,7 +26,7 @@ sub search_lib {
             return $lib;
         } elsif (-f $path . '/' . $libbase_so) {
             print "$path/$libbase_so\n";
-            print "Found `$_/$libbase_so'.\n";
+            print "Found `$path/$libbase_so'.\n";
             return $lib;
         }
     }
@@ -58,7 +58,7 @@ if (-d "/usr/include/openssl") {
 cc_lib_links('crypto');
 cc_optimize_flags('-O3 -Wall -Werror -DOPENSSL_API_COMPAT=0x10100000L');
 
-requires 'Crypt::OpenSSL::X509';
+requires 'Crypt::OpenSSL::X509' => '1.807';
 
 author_requires 'Test::NoTabs';
 author_requires 'Test::Pod' => '1.14';
@@ -66,6 +66,7 @@ author_requires 'Test::Pod::Coverage' => '1.04';
 
 test_requires 'Test::More' => '0.88';
 test_requires 'File::Slurp';
+test_requires 'Test::Exception';
 
 resources
      license     => "http://dev.perl.org/licenses",

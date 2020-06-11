@@ -1,0 +1,14 @@
+0.003   2020-06-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe TEXT_TABLE_TINY_BORDER_STYLE & BORDER_STYLE.
+
+
+0.002   2020-06-11  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to add leading space in the first column, and
+	  trailing space in the last column.
+
+
+0.001   2020-06-11  Released-By: PERLANCAR
+
+        - First release.

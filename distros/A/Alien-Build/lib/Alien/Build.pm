@@ -13,7 +13,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.23'; # VERSION
+our $VERSION = '2.25'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1165,7 +1165,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.23
+version 2.25
 
 =head1 SYNOPSIS
 
@@ -2005,7 +2005,7 @@ be used by some Fetch plugins, if they support it.
 =head1 SUPPORT
 
 The intent of the C<Alien-Build> team is to support as best as possible
-all Perls from 5.8.1 to the latest production version.  So long as they
+all Perls from 5.8.4 to the latest production version.  So long as they
 are also supported by the Perl toolchain.
 
 Please feel encouraged to report issues that you encounter to the

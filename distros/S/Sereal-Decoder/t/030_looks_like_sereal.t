@@ -65,7 +65,7 @@ my @tests= (
     [ "=Srl" . chr(1) . chr(0) . chr(SRL_HDR_UNDEF), "", "wrong magic string is not Sereal" ],
 );
 
-plan tests => 2 + @tests * 5;
+plan tests => 3 + @tests * 5;
 
 is( prototype( \&looks_like_sereal ),        undef );
 is( prototype( \&scalar_looks_like_sereal ), "\$" );
@@ -78,4 +78,10 @@ foreach my $t (@tests) {
     is( looks_like_sereal($input),                  $outcome, "$name (old function)" );
     is( $decoder->looks_like_sereal($input),        $outcome, "$name (object method)" );
     is( Sereal::Decoder->looks_like_sereal($input), $outcome, "$name (class method)" );
+}
+
+SKIP:{
+    skip "Build test only needs to run on linux", 1 if $^O ne "linux";
+    require Test::MemoryGrowth;
+    Test::MemoryGrowth::no_growth(sub{ looks_like_sereal(doc(1,3,1)) },'looks_like_sereal should not leak');
 }

@@ -1,0 +1,3 @@
+[FileGatherer]
+include_dotfiles = true
+exclude_match = ['^\.(?!(perltidy|tidyallrc))']

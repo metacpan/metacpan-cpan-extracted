@@ -1,0 +1,22 @@
+Build.PL
+Changes
+examples/font-demo.pl
+examples/gpio.pl
+examples/hello-world.pl
+examples/sinewave.pl
+examples/touchswitches.pl
+lib/Device/Chip/NoritakeGU_D.pm
+MANIFEST			This list of files
+t/00use.t
+t/01uart.t
+t/02spi.t
+t/03i2c.t
+t/10commands.t
+t/11bit-image.t
+t/20gpio.t
+t/21touchswitches.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

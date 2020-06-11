@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Carp;
 
@@ -78,6 +78,13 @@ sub make_protocol_SPI
    return Future->done( $self );
 }
 
+sub make_protocol_UART
+{
+   my $self = shift;
+   $self->{protocol} = "UART";
+   return Future->done( $self );
+}
+
 sub configure
 {
    Future->done;
@@ -133,17 +140,17 @@ invocation should return or throw.
 
 my %METHODS = (
    sleep           => [ undef,
-                        [qw( GPIO SPI I2C )] ],
+                        [qw( GPIO SPI I2C UART )] ],
    write_gpios     => [ sub { my ( $v ) = @_; join ",", map { $v->{$_} ? $_ : "!$_" } sort keys %$v },
-                        [qw( GPIO SPI I2C )] ],
+                        [qw( GPIO SPI I2C UART )] ],
    read_gpios      => [ sub { my ( $v ) = @_; join ",", @$v },
-                        [qw( GPIO SPI I2C )] ],
+                        [qw( GPIO SPI I2C UART )] ],
    tris_gpios      => [ sub { my ( $v ) = @_; join ",", @$v },
-                        [qw( GPIO SPI I2C )] ],
+                        [qw( GPIO SPI I2C UART )] ],
    write           => [ undef,
-                        [qw( SPI I2C )] ],
+                        [qw( SPI I2C UART )] ],
    read            => [ undef,
-                        [qw( I2C )] ],
+                        [qw( I2C UART )] ],
    write_then_read => [ undef,
                         [qw( SPI I2C )] ],
    readwrite       => [ undef,

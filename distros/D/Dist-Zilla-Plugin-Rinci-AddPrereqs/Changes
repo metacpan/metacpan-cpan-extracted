@@ -1,3 +1,9 @@
+0.145   2020-06-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Don't add prereq to Perinci::Sub::XCompletion::* if we
+	  can't grok x.completion value (e.g. coderef).
+
+
 0.144   2019-12-28  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

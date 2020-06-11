@@ -1,0 +1,167 @@
+NAME
+    BorderStyles::Standard - A standard collection of border styles
+
+VERSION
+    This document describes version 0.002 of BorderStyles::Standard (from
+    Perl distribution BorderStyles-Standard), released on 2020-06-11.
+
+BORDER STYLES
+    *   BorderStyle::ASCII::None
+
+        No borders, but data row separator is still drawn using dashes.
+
+    *   BorderStyle::ASCII::SingleLine
+
+        Single line border with ASCII characters.
+
+    *   BorderStyle::ASCII::SingleLineHorizontalOnly
+
+        Single line border with ASCII characters, horizontal only.
+
+    *   BorderStyle::ASCII::SingleLineInnerOnly
+
+        Single line border with ASCII characters, between columns only.
+
+    *   BorderStyle::ASCII::SingleLineOuterOnly
+
+        Single line border with ASCII characters, outer borders only.
+
+    *   BorderStyle::ASCII::SingleLineVerticalOnly
+
+        Single line border with ASCII characters, vertical only.
+
+    *   BorderStyle::ASCII::Space
+
+        Space as borders, but data row separator is still drawn using
+        dashes.
+
+    *   BorderStyle::ASCII::SpaceInnerOnly
+
+        No borders, but columns are still separated using spaces and data
+        row separator is still drawn using dashes.
+
+    *   BorderStyle::BoxChar::None
+
+        No borders, but data row separator is still drawn using horizontal
+        line.
+
+    *   BorderStyle::BoxChar::SingleLine
+
+        Single line border with box-drawing characters.
+
+    *   BorderStyle::BoxChar::SingleLineHorizontalOnly
+
+        Single line border with box-drawing characters, horizontal only.
+
+    *   BorderStyle::BoxChar::SingleLineInnerOnly
+
+        Single line border with box-drawing characters, between columns
+        only.
+
+    *   BorderStyle::BoxChar::SingleLineOuterOnly
+
+        Single line border with box-drawing characters, outer borders only.
+
+    *   BorderStyle::BoxChar::SingleLineVerticalOnly
+
+        Single line border with box-drawing characters, vertical only.
+
+    *   BorderStyle::BoxChar::Space
+
+        Space as borders, but data row separator is still drawn using
+        horizontal line.
+
+    *   BorderStyle::BoxChar::SpaceInnerOnly
+
+        No borders, but columns are still separated using spaces and data
+        row separator is still drawn using horizontal line.
+
+    *   BorderStyle::UTF8::Brick
+
+        Single-line, bold on bottom right to give illusion of depth.
+
+    *   BorderStyle::UTF8::BrickOuterOnly
+
+        Single-line (outer only), bold on bottom right to give illusion of
+        depth.
+
+    *   BorderStyle::UTF8::DoubleLine
+
+        Double-line border with UTF8 characters.
+
+    *   BorderStyle::UTF8::None
+
+        No borders, but data row separator is still drawn using horizontal
+        line.
+
+    *   BorderStyle::UTF8::SingleLine
+
+        Single-line border with UTF8 characters.
+
+    *   BorderStyle::UTF8::SingleLineBold
+
+        Bold single-line border with UTF8 characters.
+
+    *   BorderStyle::UTF8::SingleLineCurved
+
+        Single-line border with UTF8 characters, curved edges.
+
+    *   BorderStyle::UTF8::SingleLineHorizontalOnly
+
+        Single line border with box-drawing characters, horizontal only.
+
+    *   BorderStyle::UTF8::SingleLineInnerOnly
+
+        Single line border with UTF8 characters, between columns only.
+
+    *   BorderStyle::UTF8::SingleLineOuterOnly
+
+        Single line border with UTF8 characters, outer borders only.
+
+    *   BorderStyle::UTF8::SingleLineVerticalOnly
+
+        Single line border with UTF8 characters, vertical only.
+
+    *   BorderStyle::UTF8::Space
+
+        Space as borders, but data row separator is still drawn using
+        horizontal line.
+
+    *   BorderStyle::UTF8::SpaceInnerOnly
+
+        No borders, but columns are still separated using spaces and data
+        row separator is still drawn using horizontal line.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/BorderStyles-Standard>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-BorderStyles-Standard>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyles-Standard
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    BorderStyle - specification
+
+    App::BorderStyleUtils - CLIs
+
+    Text::Table::TinyBorderStyle, Text::ANSITable - some table renderers
+    that can use border styles
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

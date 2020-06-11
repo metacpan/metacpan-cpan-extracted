@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.060';
+our $VERSION = '1.061';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -622,7 +622,7 @@ sub _openapi_spec_from_schema {
     }
 
     return {
-        info => $config->{info} || { title => $config->{title}, version => 1 },
+        info => $config->{info} || { title => $config->{title}, version => "1" },
         swagger => '2.0',
         host => $config->{host} // hostname(),
         basePath => '/api',
@@ -672,7 +672,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.060
+version 1.061
 
 =head1 SYNOPSIS
 

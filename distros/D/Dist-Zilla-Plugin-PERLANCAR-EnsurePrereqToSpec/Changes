@@ -1,3 +1,10 @@
+0.062   2020-06-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Add BorderStyle.
+
+	- [bugfix] Forgot to bail on superfluous dependency to ColorTheme.
+
+
 0.061   2020-06-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Add ColorTheme.

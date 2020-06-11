@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Role::RequireUser;
-our $VERSION = '1.060';
+our $VERSION = '1.061';
 # ABSTRACT: Add authorization based on user attributes
 
 #pod =head1 SYNOPSIS
@@ -98,7 +98,7 @@ Yancy::Plugin::Auth::Role::RequireUser - Add authorization based on user attribu
 
 =head1 VERSION
 
-version 1.060
+version 1.061
 
 =head1 SYNOPSIS
 

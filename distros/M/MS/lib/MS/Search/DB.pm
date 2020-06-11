@@ -172,6 +172,23 @@ sub add_crap {
 
 }
 
+sub deduplicate {
+
+    my ($self) = @_;
+
+    my @dedup;
+    my %seen;
+
+    for my $seq (@{ $self->{seqs} }) {
+        next if ($seen{uc $seq});
+        push @dedup, $seq;
+        $seen{uc $seq} = 1;
+    }
+
+    $self->{seqs} = \@dedup;
+
+}
+
 1;
 
 __END__
@@ -202,6 +219,9 @@ MS::Search::DB - A class to facilitate construction of MS/MS protein search data
 
     # add contaminant sequences from cRAP
     $db->add_crap();
+
+    # remove exact duplicates
+    $db->deduplicate();
 
     # generate decoy sequences
     $db->add_decoys(
@@ -280,6 +300,15 @@ default, downloads the "common Repository of Adventitious Proteins", aka
 "cRAP", from GPM. An optional URL can be provided to fetch from another
 source.
 
+=head2 deduplicate
+
+    $db->deduplicate();
+
+Removes exact duplicate entries (by sequence, not ID), which can sometimes cause issues with
+downstream software. Sequences are processed in the order in which they were
+added, so the first occurrence of each duplicated sequence is retained and all
+subsequent occurrences are discarded.
+
 =head2 add_decoys
 
     $db->add_decoys(
@@ -341,7 +370,7 @@ Jeremy Volkening <jdv@base2bio.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015-2016 Jeremy Volkening
+Copyright 2015-2020 Jeremy Volkening
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

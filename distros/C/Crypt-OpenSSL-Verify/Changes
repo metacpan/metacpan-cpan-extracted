@@ -1,13 +1,76 @@
 Version History
 
-0.13
+0.16-TRIAL
+    Bug fix and Pachaging improvements
+
+        015cc45 Fix EOL in Verify.pm
+        015cc45 (Fix error in Makefile.PL
+        bd39e72 Update Changes
+        e9e6b95 Increment version
+        2d40a41 Fix MANIFEST.SKIP and MANIFEST
+        66b307f hv_store returns NULL on failure and this fixes a compile
+            error on some versions of gcc with a value declared but not used
+        b45e9cd Add MANIFEST
+        c3b41a6 (tag: 0.15-TRIAL) Add documentation
+        06db323 Increment version and final changes update
+
+0.15-TRIAL
+    Special thanks to Wesley Schwengle (WATERKIP) who cleaned up
+    a lot of the code, made it readable and fixed a particularly
+    hard to track down bug and most of all fixed a lot I had done
+    the opposite of correctly.
+
+    Where to start:
+
+    So for a few minutes we were incompatable with less that 5.014
+    but Wesley came through with a fix.
+
+    This was a large cleanup refactor by Wesley with me watching and
+    learning from the sidelines.  Not a lot of functional changes but
+    it does a lot of things differently (correct?) and the documentation
+    is much improved.
+
+        1c57034 Update changes
+        4103463 And just like that works with perl 5.010
+        b5ace5a Merge pull request #11 from waterkip/readable
+        ca526b3 Be backward compatible and use Devel::PPort
+        c33c18f noStore is a duplicate and no longer supported
+        1d8b065 Perl 5.14 is now the minimum supported version
+        fe68fea Magic mg_findext requires perl >=5.014
+        cdf5d01 Merge pull request #10 from waterkip/readable
+        9528321 Add Test::Exception as test dep
+        9337100 Remove duplicate code
+        4e31ee0 Remove typedef for X509_STORE
+        01c5bbc Use sv_magicext and mg_findext
+        2599ec1 Fix null operation bug
+        1f8fc02 Add some more whitespaces in docs
+        c41131d Update documenation of new()
+        d9cad77 Clear the OpenSSL thread error queue
+        a0473ff rename bug test
+        42796e7 Move new to XS code
+        090cdbc Make version dep visible via Makefile.PL so it will actually update when needed
+        a61f2c1 Simplify constructor logic
+        873908c Add test for null pointer issue
+        d6c3189 Make code a bit more readable
+        cb496c5 Update Changes
+        48c0555 Merge pull request #9 from timlegge/trial-14
+
+0.14-TRIAL
+    Bugfixes
+        62a7aed Increment Version
+        0862601 Require at least 1.807 Crypt::OpenSSL::X509
+        e4b3506 remove x bit from Makefile.PL
+        40d6c2e Fix pod documentation issue
+        cdb334d (tag: 0.13) Update Changes
+
+0.13    Sat, 16 May 2020 13:36:10 GMT
     Bugfixes
         e2cdf3a Increment Version 0.13
         457a2c7 Add pod info for strict_certs
         1c623db Indent pod to fix formatting
         cf42091 Increment Version, Update changes and add =pod to Verify.xs
 
-0.12-TRIAL
+0.12-TRIAL      Fri, 15 May 2020 22:01:20 GMT
     Bugfixes
         9156a97 Merge pull request #7 from timlegge/new-as-object
         92ffc20 Fixes #8 openssh returns different error on freebsd

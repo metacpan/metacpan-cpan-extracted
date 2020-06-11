@@ -1,16 +1,15 @@
 package PICA::Parser::Binary;
-use strict;
-use warnings;
+use v5.14.1;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use charnames qw(:full);
 
 use parent 'PICA::Parser::Plus';
 
-sub SUBFIELD_INDICATOR { "\N{INFORMATION SEPARATOR ONE}" }
-sub END_OF_FIELD       { "\N{INFORMATION SEPARATOR TWO}" }
-sub END_OF_RECORD      { "\N{INFORMATION SEPARATOR THREE}" }
+sub SUBFIELD_INDICATOR {"\N{INFORMATION SEPARATOR ONE}"}
+sub END_OF_FIELD       {"\N{INFORMATION SEPARATOR TWO}"}
+sub END_OF_RECORD      {"\N{INFORMATION SEPARATOR THREE}"}
 
 1;
 __END__

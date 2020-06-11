@@ -1,9 +1,9 @@
 Geo::IP2Proxy
 =============
 
-This Perl module provides fast reverse lookup of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots and data center ranges using IP2Proxy BIN database. Other information available includes proxy type, country, state, city,  ISP, domain name, usage type, AS number, AS name and last seen date.
+This Perl module provides fast reverse lookup of IP address to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges and residential proxies using IP2Proxy BIN databases. Other information available includes proxy type, country, state, city,  ISP, domain name, usage type, AS number, AS name, last seen date and threats.
 
-This pure Perl module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/database/ip2proxy upon subscription. It supports both IPv4 and IPv6 addressing.
+This pure Perl module uses a file based IP2Proxy .BIN database available at https://www.ip2location.com/database/ip2proxy upon subscription. IP2Proxy supports both IPv4 and IPv6 addressing.
 
 The complete IPv4 and IPv6 proxy database are available at https://www.ip2location.com/database/ip2proxy
 
@@ -24,11 +24,11 @@ To install this module type the following:
 
 DEPENDENCIES
 
-The complete IP2Proxy databases (PX1, PX2, PX3, PX4, PX5, PX6, PX7 and PX8) are available at https://www.ip2location.com/database/ip2proxy under subscription package.
+The complete IP2Proxy databases (PX1, PX2, PX3, PX4, PX5, PX6, PX7, PX8, PX9 and PX10) are available at https://www.ip2location.com/database/ip2proxy under subscription package.
 
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2019 by IP2Location.com, support@ip2location.com
+Copyright (C) 2020 by IP2Location.com, support@ip2location.com
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.8.6 or, at your option, any later version of Perl 5 you may have available.

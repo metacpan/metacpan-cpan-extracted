@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::ColorThemeUtils",
   "PREREQ_PM" => {
-    "Color::ANSI::Util" => "0.161",
+    "Color::ANSI::Util" => "0.164",
     "Color::RGB::Util" => "0.600",
     "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Color::ANSI::Util" => "0.161",
+  "Color::ANSI::Util" => "0.164",
   "Color::RGB::Util" => "0.600",
   "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modname" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,

@@ -1,0 +1,32 @@
+NAME
+    BorderStyleBase - A suitable base class for most BorderStyle::* modules
+
+VERSION
+    This document describes version 0.002 of BorderStyleBase (from Perl
+    distribution BorderStyleBase), released on 2020-06-11.
+
+DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/BorderStyleBase>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-BorderStyleBase>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyleBase>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

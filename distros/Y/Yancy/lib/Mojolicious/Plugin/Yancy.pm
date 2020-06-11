@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Yancy;
-our $VERSION = '1.060';
+our $VERSION = '1.061';
 # ABSTRACT: Embed a simple admin CMS into your Mojolicious application
 
 #pod =head1 SYNOPSIS
@@ -778,7 +778,7 @@ sub _build_validator {
         # This fixes HTML forms submitting the string "20" not being
         # detected as a number, or the number 1 not being detected as
         # a boolean
-        coerce => { booleans => 1, numbers => 1 },
+        coerce => { booleans => 1, numbers => 1, strings => 1 },
     );
     my $formats = $v->formats;
     $formats->{ password } = sub { undef };
@@ -1046,7 +1046,7 @@ Mojolicious::Plugin::Yancy - Embed a simple admin CMS into your Mojolicious appl
 
 =head1 VERSION
 
-version 1.060
+version 1.061
 
 =head1 SYNOPSIS
 

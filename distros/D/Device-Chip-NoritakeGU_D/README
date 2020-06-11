@@ -1,0 +1,186 @@
+NAME
+
+    Device::Chip::NoritakeGU_D - chip driver for Noritake GU-D display
+    modules
+
+SYNOPSIS
+
+       use Device::Chip::NoritakeGU_D;
+    
+       my $chip = Device::Chip::NoritakeGU_D->new( interface => "UART" );
+       $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+       $chip->text( "Hello, world!" )->get;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides communication to a display module
+    in the GU-D family by Noritake.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+CONSTRUCTOR
+
+ new
+
+       $chip = Device::Chip::NoritakeGU_D->new(
+          interface => $iface,
+          ...
+       )
+
+    Constructs a new driver instance for the given interface type. The type
+    must be one of UART, I2C or SPI.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ text
+
+       $chip->text( $str )->get
+
+    Draw text at the cursor position.
+
+ cursor_left
+
+ cursor_right
+
+ cursor_home
+
+       $chip->cursor_left->get
+       $chip->cursor_right->get
+    
+       $chip->cursor_linehome->get
+    
+       $chip->cursor_home->get
+
+    Move the cursor left or right one character position, to the beginning
+    of the line, or to the home position (top left corner).
+
+ cursor_goto
+
+       $chip->cursor_goto( $x, $y )->get
+
+    Moves the cursor to the $x'th column of the $y'th line (zero-indexed).
+
+ linefeed
+
+       $chip->linefeed->get
+
+    Move the cursor down to the next line.
+
+ clear
+
+       $chip->clear
+
+    Clear the display.
+
+ select_window
+
+       $chip->select_window( $win )->get
+
+    Select the main window (when $win is 0), or one of the four numbered
+    sub-windows.
+
+ initialise
+
+       $chip->initialise
+
+    Reset all settings to their default values.
+
+ set_cursor_visible
+
+       $chip->set_cursor_visible( $bool )->get
+
+    Set whether the cursor is visible.
+
+ set_brightness
+
+       $chip->set_brightness( $val )->get
+
+    Set the display brightness, from 1 to 8.
+
+ set_reverse
+
+       $chip->set_reverse( $bool )->get
+
+    Sets whether subsequent text will be rendered in "reverse video" (clear
+    pixels on a set background) effect.
+
+ set_write_mixture_display_mode
+
+       $chip->set_write_mixture_display_mode( $mode )->get
+
+    Set the combining mode for newly-added display content. $mode must be
+    one of
+
+       set or and xor
+
+ set_font_size
+
+       $chip->set_font_size( $size )->get
+
+    Set the font size. $size must be one of
+
+       5x7 8x16
+
+ set_font_width
+
+       $chip->set_font_width( $width )->get
+
+    Set the font width. $width must be one of
+
+       fixed fixed2 prop prop2
+
+ set_font_magnification
+
+       $chip->set_font_magnification( $xscale, $yscale )->get
+
+    Set the font scaling factor. $xscale must be between 1 to 4, and
+    $yscale must be 1 or 2.
+
+ realtime_image_display_columns
+
+       $chip->realtime_image_display_columns( @columns )->get
+
+    Sends a bitmapped image to the display, at the cursor position. The
+    cursor is not moved.
+
+    @columns should be a list of strings of equal length, containing bytes
+    of pixel data to represent each vertical column of the image content.
+
+ set_gpio_direction
+
+       $chip->set_gpio_direction( $dir )->get
+
+    Configure the GPIO pins for input or output. $dir is bitmask of four
+    bits. Low bits correspond to input, high bits to output.
+
+ set_gpio_output
+
+       $chip->set_gpio_output( $value )->get
+
+    Write the value to the GPIO pins.
+
+ read_gpio
+
+       $value = $chip->read_gpio->get
+
+    Returns the current state of the GPIO pins.
+
+ read_touchswitches
+
+       $switches = $chip->read_touchswitches->get
+
+    Reads the status of the panel touch switches. Returns a hash reference
+    whose keys are the names of the touch areas (SW1, SW2, ...) and values
+    are booleans indicating whether that area currently detects a touch.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

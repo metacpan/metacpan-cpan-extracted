@@ -10,7 +10,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Carp;
 
@@ -495,6 +495,57 @@ operations must be performed within a single I²C transaction using a repeated
 start condition.
 
 =cut
+
+=head1 UART PROTOCOL
+
+The UART protocol is still subject to ongoing design. In particular, a
+suitable interface for general-purpose spurious read notifications ha yet to
+be designed. The current API is suitable for transmit-only, or
+request/response interfaces where the PC side is in control of communications
+and knows exactly when, and how many bytes long, data will be received.
+
+=head2 Configuration Options
+
+=over 4
+
+=item baudrate => INT
+
+The communication bitrate, in bits per second. Most adapters ought to be able
+to accept the common ones such as 9600, 19200 or 38400.
+
+=item bits => INT
+
+The number of bits per character. Usually 8, though some adapters may be able
+to offer smaller values.
+
+=item parity => "n" | "o" | "e"
+
+Disables parity generation/checking (when C<n>), or enables it for odd
+(when C<o>) or even (when C<e>).
+
+=item stop => 1 | 2
+
+The size of the stop state, in bits. Either 1 or 2.
+
+=back
+
+=head2 write
+
+   $uart->write( $bytes )->get
+
+Transmits the given bytes over the UART TX line.
+
+=head2 read
+
+   $bytes = $uart->read( $len )->get
+
+Receives the given number of bytes from the UART RX line. The returned future
+will not complete until the requested number of bytes are available.
+
+This API is suitable for PC-first request/response style interfaces, but will
+not be sufficient for chip-first notifications or other use-cases. A suitable
+API shape for more generic scenarios is still a matter of ongoing design
+investigation.
 
 =head1 AUTHOR
 

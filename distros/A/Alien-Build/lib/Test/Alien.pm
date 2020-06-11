@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '2.23'; # VERSION
+our $VERSION = '2.25'; # VERSION
 
 
 our @aliens;
@@ -267,7 +267,7 @@ sub xs_ok
       config => do {
         my %config = %{ $xs->{cbuilder_config} };
         my $lddlflags = join(' ', grep !/^-l/, shellwords map { _flags $_, 'libs' } @aliens) . " $Config{lddlflags}";
-        $config{lddlflags} = defined $config{lddlflags} ? "$config{lddlflags} $lddlflags" : $lddlflags;
+        $config{lddlflags} = defined $config{lddlflags} ? "$lddlflags $config{lddlflags}" : $lddlflags;
         \%config;
       },
     );
@@ -654,7 +654,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 2.23
+version 2.25
 
 =head1 SYNOPSIS
 

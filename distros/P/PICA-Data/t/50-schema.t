@@ -9,16 +9,15 @@ use Test::Deep;
 
 is field_identifier(['003@']), '003@', 'field_identifer (003@)';
 is field_identifier(['012A', '01']), '012A/01', 'field_identifer (012A/01)';
-is field_identifier(['209A', '01']), '209A', 'field_identifer (209A/XX)';
+is field_identifier(['209A', '01']), '209A',    'field_identifer (209A/XX)';
 
 my $tests = YAML::Tiny->read('t/files/schema-tests.yaml')->[0];
 
-my %records = map {
-        ($_ => pica_parser('plain', fh => \($tests->{records}{$_}) )->next())
-    } keys %{$tests->{records}};
-my %schemas = map {
-        $_ => PICA::Schema->new($tests->{schemas}{$_})
-    } keys %{$tests->{schemas}};
+my %records
+    = map {($_ => pica_parser('plain', fh => \($tests->{records}{$_}))->next())}
+    keys %{$tests->{records}};
+my %schemas = map {$_ => PICA::Schema->new($tests->{schemas}{$_})}
+    keys %{$tests->{schemas}};
 
 foreach (@{$tests->{tests}}) {
     my $schema = $schemas{$_->{schema}};
@@ -27,7 +26,7 @@ foreach (@{$tests->{tests}}) {
     my @errors = $schema->check($record, %{$_->{options} || {}});
     my @expect = @{$_->{errors} || []};
     bless $_, 'PICA::Schema::Error' for @expect;
-    if ( !cmp_deeply \@errors, \@expect, $_->{check} ) {
+    if (!cmp_deeply \@errors, \@expect, $_->{check}) {
         note explain $_ for @errors;
     }
 }

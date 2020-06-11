@@ -5,7 +5,7 @@ use warnings;
 
 require 5.010;
 
-our $VERSION = '0.13';
+our $VERSION = '0.17';
 
 use Crypt::OpenSSL::X509;
 
@@ -17,58 +17,6 @@ BOOT_XS: {
 
     do { __PACKAGE__->can('bootstrap') || \&DynaLoader::bootstrap }
       ->( __PACKAGE__, $VERSION );
-}
-
-sub new {
-    if ( scalar(@_) == 2 ) {
-        # Backward compatability Crypt::OpenSSL::Verify
-        # only one parameter is the CAfile name
-        push @_, undef;
-    }
-    my ( $class, %args ) = @_;
-    my $self    = {};
-    my $options = \%args;
-    if ( exists $options->{CAfile} ) {
-        $self = {
-            CAfile         => $options->{CAfile},
-            CApath         => $options->{CApath},
-            noCAfile       => $options->{noCAfile},
-            noStore        => $options->{noStore},
-            trust_expired  => $options->{trust_expired},
-            trust_no_local => $options->{trust_no_local},
-            trust_onelogin => $options->{trust_onelogin},
-            strict_certs   => $options->{strict_certs},
-            STORE          => 0
-        };
-    }
-    else {
-        # Support Crypt::OpenSSL::VerifyX509 calling format
-        if ( keys %args == 1 ) {
-            for ( keys %args ) {
-                my %arg = ( CAfile => $_ );
-                %args = %arg;
-                $self = {
-                    CAfile         => $_,
-                    strict_certs   => 0, # Maintain original functionality
-                    STORE          => 0
-                }
-
-            }
-        }
-    }
-    my $opt = $self;
-    my $store = _new( $class, $opt ) ;
-    if ($store) {
-        $self->{STORE} = $store;
-    }
-    else {
-        $self = 0;
-    }
-    bless $self, $class;
-
-    return $self;
-
-
 }
 
 # Register the sub pcb1
@@ -199,7 +147,7 @@ Arguments:
        CApath => '/etc/ssl/certs',     # Optional
        noCAfile => 1,                  # Optional
        noCApath => 0,                  # Optional
-       strict_certs = 1                # Default (Optional) 
+       strict_certs => 1               # Default (Optional)
    );
 
 =head2  new('t/cacert.pem');
@@ -264,6 +212,7 @@ Arguements:
 =head1 AUTHOR
 
 Timothy Legge <timlegge@gmail.com>
+Wesley Schwengle <waterkip>
 
 =head1 COPYRIGHT
 
@@ -272,6 +221,7 @@ this distribution, including binary files, unless explicitly noted
 otherwise.
 
 Copyright 2020 Timothy Legge
+Copyright 2020 Wesley Schwengle
 
 Based on the Original Crypt::OpenSSL::VerifyX509 by
 

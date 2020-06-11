@@ -1,0 +1,11 @@
+0.002    2020-06-11  Released-By: PERLANCAR; Urgency: low
+
+         - No functional changes.
+
+         - [build] Rebuild with updated Pod::Weaver::Plugin::BorderStyle to show
+           sample in Synopsis.
+
+
+0.001    2020-06-11  Released-By: PERLANCAR
+
+        - First release.

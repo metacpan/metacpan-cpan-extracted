@@ -1,3 +1,9 @@
+0.005   2020-06-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli show-color-swatch] Add option --columns (-c) to show in
+	  multicolumn.
+
+
 0.004   2020-02-04  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild to update Sah coerce rule module names.

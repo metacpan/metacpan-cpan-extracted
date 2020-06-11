@@ -1,5 +1,5 @@
 package Net::Whois::IANA;
-$Net::Whois::IANA::VERSION = '0.44';
+$Net::Whois::IANA::VERSION = '0.45';
 use 5.006;
 
 use strict;
@@ -45,7 +45,7 @@ BEGIN {
     # accessors
     # do not use AUTOLOAD - only accept lowercase function name
     # define accessors at compile time
-    my @accessors = qw{country netname desc status source server inetnum inet6num cidr};
+    my @accessors = qw{country netname descr status source server inetnum inet6num cidr};
 
     foreach my $accessor (@accessors) {
         no strict 'refs';
@@ -56,6 +56,8 @@ BEGIN {
             return $self->{QUERY}->{$accessor};
         };
     }
+
+    *desc = \&descr; # backward compatibility
 }
 
 our @EXPORT = qw( @IANA %IANA );
@@ -588,7 +590,8 @@ sub is_mine ($$;@) {
         s|(/.*)|$pad$1|;
         $_;
       }
-      map { split(/\s+/) } @cidr;
+      map  { split(/\s+/) }
+      grep { defined $_ } @cidr;
 
     return Net::CIDR::cidrlookup( $ip, @cidr );
 }
@@ -607,7 +610,7 @@ Net::Whois::IANA - Net::Whois::IANA - A universal WHOIS data extractor.
 
 =head1 VERSION
 
-version 0.44
+version 0.45
 
 =head1 SYNOPSIS
 

@@ -71,6 +71,8 @@ bin_SCRIPTS = \
 	dtatw-lb-encode.perl \
 	dtatw-percent-encode.perl \
 	dtatw-percent-decode.perl \
+	dtatw-trim-encode.perl \
+	dtatw-trim-decode.perl \
 	file-substr.perl
 
 #	dtatw-txml2cspan.perl

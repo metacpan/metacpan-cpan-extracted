@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '2.23'; # VERSION
+our $VERSION = '2.25'; # VERSION
 
 
 sub new
@@ -254,7 +254,11 @@ sub mm_install
     $mm->SUPER::install(@rest);
   };
 
-  "install :: alien_clean_install\n\n$section";
+  return
+      ".NOTPARALLEL : \n\n"
+    . ".NO_PARALLEL : \n\n"
+    . "install :: alien_clean_install\n\n"
+    . $section;
 }
 
 sub import
@@ -409,7 +413,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 2.23
+version 2.25
 
 =head1 SYNOPSIS
 

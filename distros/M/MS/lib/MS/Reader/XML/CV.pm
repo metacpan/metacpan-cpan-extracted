@@ -6,6 +6,7 @@ use warnings;
 use parent qw/MS::Reader::XML/;
 
 use Carp;
+use List::MoreUtils qw/uniq/;
 use Scalar::Util qw/weaken/;
 
 sub fetch_record {
@@ -32,22 +33,55 @@ sub param {
     my $idx = $args{index} // 0;
     my $ref = $args{ref}   // $self;
 
-    my $val   = $ref->{cvParam}->{$cv}->[$idx]->{value};
-    my $units = $ref->{cvParam}->{$cv}->[$idx]->{unitAccession};
+    my $val;
+    my $units;
+    if (exists $ref->{cvParam}) {
+        $val = $ref->{cvParam}->{$cv}->[$idx]->{value};
+        if (exists $ref->{cvParam}->{$cv}->[$idx]->{unitAccession}) {
+            $units = $ref->{cvParam}->{$cv}->[$idx]->{unitAccession};
+        }
+    }
 
     # try groups if not found initially
-    if (! defined $val) {
+    if (! defined $val && exists $ref->{referenceableParamGroupRef}) {
         for (@{ $ref->{referenceableParamGroupRef} }) {
-            my $r = $self->{__param_groups}->{ $_->{ref} };
+            my $r = $self->{referenceableParamGroupList}
+                ->{referenceableParamGroup}->{ $_->{ref} };
             next if (! exists $r->{cvParam}->{$cv});
             $val = $r->{cvParam}->{$cv}->[$idx]->{value};
             next if (! defined $val);
-            $units = $ref->{cvParam}->{$cv}->[$idx]->{unitAccession};
+            if (exists $r->{cvParam}->{$cv}->[$idx]->{unitAccession}) {
+                $units = $r->{cvParam}->{$cv}->[$idx]->{unitAccession};
+            }
             last;
         }
     }
         
     return wantarray ? ($val, $units) : $val;
+
+}
+
+sub params {
+
+    my ($self, %args) = @_;
+
+    my $ref = $args{ref} // $self;
+
+    my @params = ();
+   
+    if (exists $ref->{cvParam}) {
+        push @params, keys %{ $ref->{cvParam} };
+    }
+
+    if (exists $ref->{referenceableParamGroupRef}) {
+        for (@{ $ref->{referenceableParamGroupRef} }) {
+            my $r = $self->{referenceableParamGroupList}
+                ->{referenceableParamGroup}->{ $_->{ref} };
+            push @params, keys %{ $r->{cvParam} };
+        }
+    }
+    
+    return uniq @params;
 
 }
 
@@ -127,11 +161,32 @@ The method can also take two optional named arguments:
 =item * C<index> — the index of the parameter to retrieve. Some CV parameters
 can be repeated, and this option can be used to access each one. Default: 0.
 
-=item * C<ref> — a hash reference pointing to an internal data structure.
-This is used when the CV param to be looked up is not directly attached to the
+=item * C<ref> — a hash reference pointing to an internal data structure. This
+is used when the CV param to be looked up is not directly attached to the
 object making the call, but possibly to a part of it's internal structure.
-Generally, ths is used in implementing class methods internally, as its use
-requires a knowledge of the underlying data structure.
+Generally, this is only used in implementing class methods internally, as its
+use requires a knowledge of the underlying data structure.
+
+=back
+
+=head2 params
+
+    use MS::CV qw/:MS/;
+    my @cv_ids = $obj->params;
+    @cv_ids = $obj->params(ref => $some_ref);
+
+With no arguments, returns an array of CV IDs directly attached to the object
+(if any). 
+
+The method can also take one optional named argument:
+
+=over
+
+=item * C<ref> — a hash reference pointing to an internal data structure. This
+is used when the CV params to be listed are not directly attached to the
+object making the call, but possibly to a part of it's internal structure.
+Generally, this is only used in implementing class methods internally, as its
+use requires a knowledge of the underlying data structure.
 
 =back
 

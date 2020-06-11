@@ -1,8 +1,7 @@
 package PICA::Writer::Base;
-use strict;
-use warnings;
+use v5.14.1;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Scalar::Util qw(blessed openhandle reftype);
 use Carp qw(croak);
@@ -15,17 +14,20 @@ sub new {
 
     my $fh = $self->{fh} // \*STDOUT;
     if (!ref $fh) {
-        if ( open(my $handle, '>:encoding(UTF-8)', $fh) ) {
-            $fh = $handle; 
-        } else {
+        if (open(my $handle, '>:encoding(UTF-8)', $fh)) {
+            $fh = $handle;
+        }
+        else {
             croak "cannot open file for writing: $fh\n";
         }
-    } elsif (reftype $fh eq 'SCALAR' and !blessed $fh) {
+    }
+    elsif (reftype $fh eq 'SCALAR' and !blessed $fh) {
         open(my $handle, '>>', $fh);
-        $fh = $handle; 
-    } elsif (!openhandle($fh) and !(blessed $fh && $fh->can('print'))) {
-        croak 'expect filehandle or object with method print!'
-    }    
+        $fh = $handle;
+    }
+    elsif (!openhandle($fh) and !(blessed $fh && $fh->can('print'))) {
+        croak 'expect filehandle or object with method print!';
+    }
     $self->{fh} = $fh;
 
     $self;
@@ -45,11 +47,11 @@ sub write_record {
     foreach my $field (@$record) {
         $fh->print($field->[0]);
         if (defined $field->[1] and $field->[1] ne '') {
-            $fh->print(sprintf("/%02d",$field->[1]));
+            $fh->print(sprintf("/%02d", $field->[1]));
         }
         $fh->print(' ');
-        for (my $i=2; $i<scalar @$field; $i+=2) {
-            $self->write_subfield($field->[$i], $field->[$i+1]);
+        for (my $i = 2; $i < scalar @$field; $i += 2) {
+            $self->write_subfield($field->[$i], $field->[$i + 1]);
         }
         $fh->print($self->END_OF_FIELD);
     }

@@ -1,0 +1,28 @@
+---
+abstract: 'chip driver for F<Noritake> F<GU-D> display modules'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Device::Chip::Adapter: '0.13'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Chip-NoritakeGU_D
+provides:
+  Device::Chip::NoritakeGU_D:
+    file: lib/Device/Chip/NoritakeGU_D.pm
+    version: '0.01'
+requires:
+  Device::Chip: '0'
+  Future::AsyncAwait: '0.19'
+  List::Util: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

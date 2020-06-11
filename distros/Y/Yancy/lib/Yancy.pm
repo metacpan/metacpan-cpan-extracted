@@ -1,7 +1,9 @@
 package Yancy;
-our $VERSION = '1.060';
+our $VERSION = '1.061';
 # ABSTRACT: The Best Web Framework Deserves the Best CMS
 
+#pod =encoding utf8
+#pod
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
@@ -232,7 +234,7 @@ Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.060
+version 1.061
 
 =head1 SYNOPSIS
 
@@ -244,6 +246,8 @@ version 1.060
     };
 
 =head1 DESCRIPTION
+
+=encoding utf8
 
 =for html <div style="display: flex">
 <div style="margin: 3px; flex: 1 1 50%">
@@ -423,9 +427,13 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ed J Erik Johansen Mohammad S Anwar Pavel Serikov Rajesh Mallah William Lindley Wojtek Bażant
+=for stopwords Boris Däppen Ed J Erik Johansen Mohammad S Anwar Pavel Serikov Rajesh Mallah William Lindley Wojtek Bażant
 
 =over 4
+
+=item *
+
+Boris Däppen <bdaeppen.perl@gmail.com>
 
 =item *
 

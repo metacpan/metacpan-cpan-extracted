@@ -58,7 +58,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.52';
+our $VERSION  = '8.53';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -77,9 +77,7 @@ sub build_controller {
 
   # Embedded application
   my $stash = {};
-  if ($tx && (my $sub = $tx->can('stash'))) {
-    ($stash, $tx) = ($tx->$sub, $tx->tx);
-  }
+  if ($tx && (my $sub = $tx->can('stash'))) { ($stash, $tx) = ($tx->$sub, $tx->tx) }
 
   # Build default controller
   my $defaults = $self->defaults;

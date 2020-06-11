@@ -1,0 +1,62 @@
+{
+   "abstract" : "Pack PAR executables, finding dynamic libs automatically",
+   "author" : [
+      "Shawn Laffan <shawnlaffan@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-PP-Autolink",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0.48",
+            "Env" : "0",
+            "File::Find::Rule" : "0",
+            "File::Which" : "0",
+            "Getopt::ArgvFile" : "0",
+            "List::Util" : "0",
+            "Module::ScanDeps" : "1.27",
+            "PAR::Packer" : "1.049",
+            "Path::Tiny" : "0.108",
+            "rlib" : "0.02"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shawnlaffan/perl-pp-autolink/issues/"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shawnlaffan/perl-pp-autolink"
+      }
+   },
+   "version" : "2.02",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

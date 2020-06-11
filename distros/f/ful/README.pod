@@ -1,0 +1,65 @@
+=encoding utf-8
+
+=head1 NAME
+
+ful - a useI<B<ful>> pragma that will ascend dirs to automatically
+"B<f>ind B<u>pper B<l>ib" directories and add them to C<@INC>.
+
+
+=head1 NOTICE
+
+If you felt your blood boil when you first discovered this module, don't worry,
+you're not alone.
+
+This module name not only effectively breaks all of the "rules," but is also
+non-descript, duplicates existing functionality, and is purely a vanity project.
+
+(Maybe you should C<use common::sense;>)
+
+=head1 SYNOPSIS
+
+One line to rule them all.
+
+    use ful;
+
+Within C<a-script.pl> when your project looks like this:
+
+    project-root/
+    ├── bin/
+    │   └── utils/
+    │       └── a-script.pl
+    ├── lib/
+    ├── vendor/
+    │   └── SomeOrg/
+    │       └── Some/
+    │           └── Module.pm
+
+If you need more than just the C<project-root/lib> directory, you can do this:
+
+    use ful qw/vendor lib/;
+
+Instead of:
+
+    use lib::relative '../../lib';
+    use lib::relative '../../vendor';
+    # or
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    use lib "$FindBin::Bin/../vendor";
+    # or even
+    BEGIN {
+        use Path::Tiny;
+        my $base = path(__FILE__)->parent;
+        $base = $base->parent until -d "$base/lib" or $base->is_rootdir;
+        unshift @INC, "$base/lib", "$base/vendor";
+    }
+
+
+=head1 VERSION
+
+0.03
+
+=head1 SUPPORT
+
+Support is by the author. Please file bug reports or ask questions at
+L<https://github.com/ryan-willis/p5-ful/issues>.

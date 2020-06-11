@@ -1,9 +1,9 @@
 package App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-10'; # DATE
+our $DATE = '2020-06-11'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.059'; # VERSION
+our $VERSION = '1.061'; # VERSION
 
 use 5.010001;
 use strict;
@@ -559,11 +559,11 @@ sub _set_since {
     if (defined $args->{added_since_last_index_update} || defined $args->{updated_since_last_index_update} || defined $args->{added_or_updated_since_last_index_update}) {
         my ($time) = $dbh->selectrow_array("SELECT date FROM log WHERE category='update_index' AND summary LIKE 'Begin%' ORDER BY date DESC");
         die "Index has not been updated at all, cannot use {added_,updated_,added_or_updated_}since_last_index_update option" unless $time;
-        if (delete $args->{added_since_last_index_update})            { $args->{added_since}            //= $time; $num_sinces++ }
-        if (delete $args->{updated_since_last_index_update})          { $args->{updated_since}          //= $time; $num_sinces++ }
-        if (delete $args->{added_or_updated_since_last_index_update}) { $args->{added_or_updated_since} //= $time; $num_sinces++ }
+        if (delete $args->{added_since_last_index_update})            { $args->{added_since}            //= $time; log_trace "Setting added_since=%s", $time; $num_sinces++ }
+        if (delete $args->{updated_since_last_index_update})          { $args->{updated_since}          //= $time; log_trace "Setting updated_since=%s", $time; $num_sinces++ }
+        if (delete $args->{added_or_updated_since_last_index_update}) { $args->{added_or_updated_since} //= $time; log_trace "Setting added_or_updated_since=%s", $time; $num_sinces++ }
     }
-    if (defined $args->{added_since_n_last_index_updates} || defined $args->{updated_since_last_n_index_updates} || defined $args->{added_or_updated_since_last_n_index_updates}) {
+    if (defined $args->{added_since_last_n_index_updates} || defined $args->{updated_since_last_n_index_updates} || defined $args->{added_or_updated_since_last_n_index_updates}) {
         my $n = int($args->{added_since_last_n_index_updates} // $args->{updated_since_last_n_index_updates} // $args->{added_or_updated_since_last_n_index_updates});
         $n = 1 if $n < 1;
         my $sth = $dbh->prepare("SELECT date FROM log WHERE category='update_index' AND summary LIKE 'Begin%' ORDER BY date DESC");
@@ -572,9 +572,9 @@ sub _set_since {
         my $time;
         1 while ++$i <= $n && (($time) = $sth->fetchrow_array);
         die "Index has not been updated that many times, please set a lower number for {,added_,updated_}since_last_n_index_updates option" if $i < $n;
-        if (delete $args->{added_since_last_n_index_updates})            { $args->{added_since}            //= $time; $num_sinces++ }
-        if (delete $args->{updated_since_last_n_index_updates})          { $args->{updated_since}          //= $time; $num_sinces++ }
-        if (delete $args->{added_or_updated_since_last_n_index_updates}) { $args->{added_or_updated_since} //= $time; $num_sinces++ }
+        if (delete $args->{added_since_last_n_index_updates})            { $args->{added_since}            //= $time; log_trace "Setting added_since=%s", $time; $num_sinces++ }
+        if (delete $args->{updated_since_last_n_index_updates})          { $args->{updated_since}          //= $time; log_trace "Setting updated_since=%s", $time; $num_sinces++ }
+        if (delete $args->{added_or_updated_since_last_n_index_updates}) { $args->{added_or_updated_since} //= $time; log_trace "Setting added_or_updated_since=%s", $time; $num_sinces++ }
     }
 
     die "Multiple {added_,updated_,added_or_updated_}since options set, please set only one to avoid confusion" if $num_sinces > 1;
@@ -4706,7 +4706,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.059 of App::lcpan (from Perl distribution App-lcpan), released on 2020-06-10.
+This document describes version 1.061 of App::lcpan (from Perl distribution App-lcpan), released on 2020-06-11.
 
 =head1 SYNOPSIS
 

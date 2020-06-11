@@ -2,8 +2,8 @@ NAME
     Hash::Subset - Produce subset of a hash
 
 VERSION
-    This document describes version 0.005 of Hash::Subset (from Perl
-    distribution Hash-Subset), released on 2019-11-19.
+    This document describes version 0.006 of Hash::Subset (from Perl
+    distribution Hash-Subset), released on 2020-06-11.
 
 SYNOPSIS
      use Hash::Subset qw(
@@ -21,17 +21,17 @@ SYNOPSIS
      my %subset = hash_subset   ({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => (b=>2, c=>3)
      my $subset = hashref_subset({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => {b=>2, c=>3}
 
-     # excluding keys specified in an array
-     my %subset = hash_subset_without   ({a=>1, b=>2, c=>3}, ['b','c','d']); # => (a=>1)
-     my $subset = hashref_subset_without({a=>1, b=>2, c=>3}, ['b','c','d']); # => {a=>1}
-
-     # excluding keys specified in another hash
-     my %subset = hash_subset_without   ({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => (a=>1)
-     my $subset = hashref_subset_without({a=>1, b=>2, c=>3}, {b=>20, c=>30, d=>40}); # => {a=>1}
-
      # filtering keys using a coderef
      my %subset = hash_subset   ({a=>1, b=>2, c=>3}, sub {$_[0] =~ /[bc]/}); # => (b=>2, c=>3)
      my $subset = hashref_subset({a=>1, b=>2, c=>3}, sub {$_[0] =~ /[bc]/}); # => {b=>2, c=>3}
+
+     # multiple filters: array, hash, coderef
+     my %subset = hash_subset   ({a=>1, b=>2, c=>3, d=>4}, {c=>1}, [qw/b/], sub {$_[0] =~ /[bcd]/}); # => (b=>2, c=>3, d=>4)
+     my $subset = hashref_subset({a=>1, b=>2, c=>3, d=>4}, {c=>1}, [qw/b/], sub {$_[0] =~ /[bcd]/}); # => {b=>2, c=>3, d=>4}
+
+     # excluding keys
+     my %subset = hash_subset_without   ({a=>1, b=>2, c=>3}, ['b','c','d']); # => (a=>1)
+     my $subset = hashref_subset_without({a=>1, b=>2, c=>3}, ['b','c','d']); # => {a=>1}
 
     A use case is when you use hash arguments:
 
@@ -98,15 +98,12 @@ FUNCTIONS
   hash_subset
     Usage:
 
-     my %subset  = hash_subset   (\%hash, \@keys);
-     my $subset  = hashref_subset(\%hash, \@keys);
+     my %subset  = hash_subset   (\%hash, @keys_srcs);
+     my $subset  = hashref_subset(\%hash, @keys_srcs);
 
-     my %subset  = hash_subset   (\%hash, \%another_hash);
-     my $subset  = hashref_subset(\%hash, \%another_hash);
-
-     # filter_sub is called with args ($key, $value) and return true when key should be included
-     my %subset  = hash_subset   (\%hash, \&filter_sub);
-     my $subset  = hashref_subset(\%hash, \&filter_sub);
+    Where @keys_src elements can be arrayref, hashref, or coderef. Coderef
+    will be called with args($key, $value) and return true when key should
+    be included.
 
     Produce subset of %hash, returning the subset hash (or hashref, in the
     case of "hashref_subset" function).
@@ -127,26 +124,16 @@ FUNCTIONS
 
      my %subset = %hash{grep {exists $hash{$_}} "b","c","d"}; # => (b=>2, c=>3)
 
-    and available for perl earlier than 5.20.
+    and available for perl earlier than 5.20. In addition to that,
+    hash_subset() accepts arrayref as well as hashref/coderef, and several
+    of them.
 
   hashref_subset
     See "hash_subset".
 
   hash_subset_without
-    Usage:
-
-     my %subset  = hash_subset_without   (\%hash, \@keys);
-     my $subset  = hashref_subset_without(\%hash, \@keys);
-
-     my %subset  = hash_subset_without   (\%hash, \%another_hash);
-     my $subset  = hashref_subset_without(\%hash, \%another_hash);
-
-     # filter_sub is called with args ($key, $value) and return true when key should be excluded
-     my %subset  = hash_subset_without   (\%hash, \&filter_sub);
-     my $subset  = hashref_subset_without(\%hash, \&filter_sub);
-
-    Like "hash_subset", but reverses the logic. Will create subset that only
-    includes keys not in the specified array/hash.
+    Like "hash_subset", but reverses the logic: will create subset that only
+    includes keys not in the specified arrays/hashes/coderefs.
 
   hashref_subset_without
     See "hash_subset_without".
@@ -186,7 +173,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

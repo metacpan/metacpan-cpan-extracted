@@ -1,0 +1,79 @@
+NAME
+    Text::Table::TinyBorderStyle - Text::Table::Tiny + support for colored
+    text
+
+VERSION
+    This document describes version 0.003 of Text::Table::TinyBorderStyle
+    (from Perl distribution Text-Table-TinyBorderStyle), released on
+    2020-06-11.
+
+SYNOPSIS
+     use Text::Table::TinyBorderStyle qw/ generate_table /;
+
+     my $rows = [
+         # header row
+         ['Name','Rank','Serial'],
+         # rows
+         ['alice', 'pvt', '123456'],
+         ['bob',   'cpl', '98765321'],
+         ['carol', 'brig gen', '8745'],
+     ];
+     print generate_table(rows => $rows, header_row => 1, border_style => 'BorderStyle::ASCII::SingleLine');
+
+DESCRIPTION
+    This module is like Text::Table::Tiny (0.04) with added support for
+    using border styles. For more details about border styles, see
+    BorderStyle specification. The styles are in "BorderStyle::*" modules.
+    Try installing and using the border style modules to see what they look
+    like.
+
+    Interface, options, and format variables are the same as in
+    Text::Table::Tiny.
+
+ENVIRONMENT
+  BORDER_STYLE
+    Set default for "border_style" argument. See also
+    "TEXT_TABLE_TINY_BORDER_STYLE".
+
+  BORDER_STYLE
+    Set default for "border_style" argument. Takes precedence over
+    "BORDER_STYLE".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-Table-TinyBorderStyle>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-Table-TinyBorderStyle>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-TinyBorder
+    Style>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Text::Table::Tiny and other variants like Text::Table::TinyColor,
+    Text::Table::TinyWide, Text::Table::TinyColorWide.
+
+    BorderStyle and "BorderStyle::*" modules, e.g.
+    BorderStyle::ASCII::SingleLine or BorderStyle::UTF8::DoubleLine.
+
+    Text::Table::Any
+
+    Text::ANSITable which also supports border styles as well as color
+    themes, aligning wide/colored text, and other features, but with larger
+    footprint and slower rendering speed.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
