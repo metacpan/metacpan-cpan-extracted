@@ -56,6 +56,6 @@
       "x_IRC" : "irc://chat.freenode.net/#amusewiki",
       "x_WebIRC" : "https://webchat.freenode.net/?channels=#amusewiki"
    },
-   "version" : "1.42",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.43",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

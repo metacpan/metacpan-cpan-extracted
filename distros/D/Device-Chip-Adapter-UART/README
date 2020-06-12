@@ -10,10 +10,10 @@ DESCRIPTION
     of a Device::Chip driver to communicate with actual chip hardware using
     this adapter.
 
-    At present, this adapter only provides the GPIO protocol as a wrapper
-    around the modem control and handshaking lines. A future version will
-    also provide access to the actual transmit and receive data, once a
-    suitable interface is designed.
+    This adapter provides both the GPIO and UART protocols. The GPIO
+    protocol wraps the modem control and handshaking lines. The UART
+    protocol adds access to the transmit and receive lines by adding the
+    "write" and "read" methods.
 
 CONSTRUCTOR
 

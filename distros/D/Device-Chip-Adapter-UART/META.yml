@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,12 +16,14 @@ name: Device-Chip-Adapter-UART
 provides:
   Device::Chip::Adapter::UART:
     file: lib/Device/Chip/Adapter/UART.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Device::Chip::Adapter: '0'
   Future: '0'
+  Future::Buffer: '0'
+  Future::IO: '0.04'
   IO::Termios: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

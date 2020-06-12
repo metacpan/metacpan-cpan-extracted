@@ -8,6 +8,8 @@ my $build = Module::Build->new(
    requires => {
       'Device::Chip::Adapter' => 0,
       'Future' => 0,
+      'Future::Buffer' => 0,
+      'Future::IO' => 0.04,
       'IO::Termios' => 0,
    },
    test_requires => {

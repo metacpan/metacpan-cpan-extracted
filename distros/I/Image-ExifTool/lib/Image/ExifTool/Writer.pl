@@ -359,7 +359,7 @@ sub SetNewValue($;$$%)
     my $convType = $options{Type} || ($$self{OPTIONS}{PrintConv} ? 'PrintConv' : 'ValueConv');
 
     # filter value if necessary
-    Filter($$self{OPTIONS}{FilterW}, \$value) if $convType eq 'PrintConv';
+    $self->Filter($$self{OPTIONS}{FilterW}, \$value) or return 0 if $convType eq 'PrintConv';
 
     my (@wantGroup, $family2);
     my $wantGroup = $options{Group};
@@ -745,7 +745,7 @@ TAG: foreach $tagInfo (@matchingTags) {
         }
         $writeGroup{$tagInfo} = $writeGroup;
     }
-    # sort tag info list in reverse order of priority (higest number last)
+    # sort tag info list in reverse order of priority (highest number last)
     # so we get the highest priority error message in the end
     @tagInfoList = sort { $tagPriority{$a} <=> $tagPriority{$b} } @tagInfoList;
     # must write any tags which also write other tags first
@@ -857,7 +857,7 @@ TAG: foreach $tagInfo (@matchingTags) {
             # check to make sure this is a List or Shift tag if adding
             if ($addValue and not ($shift or $$tagInfo{List})) {
                 if ($addValue eq '2') {
-                    undef $addValue;    # quitely reset this option
+                    undef $addValue;    # quietly reset this option
                 } else {
                     $err = "Can't add $wgrp1:$tag (not a List type)";
                     $verbose > 2 and print $out "$err\n";
@@ -1338,13 +1338,13 @@ sub SetNewValuesFromFile($$;@)
         foreach $tag (@tags) {
             # don't try to set errors or warnings
             next if $tag =~ /^(Error|Warning)\b/;
-            # get approprite value type if necessary
+            # get appropriate value type if necessary
             if ($opts{SrcType} and $opts{SrcType} ne $srcType) {
                 $$info{$tag} = $srcExifTool->GetValue($tag, $opts{SrcType});
             }
             # set value for this tag
             my ($n, $e) = $self->SetNewValue($tag, $$info{$tag}, %opts);
-            # delete this tag if we could't set it
+            # delete this tag if we couldn't set it
             $n or delete $$info{$tag};
         }
         return $info;
@@ -2305,6 +2305,10 @@ sub WriteInfo($$;$$)
                     $fileType = $tiffType;
                     undef $rtnVal;
                 } else {
+                    if ($tiffType eq 'FFF') {
+                        # (see https://exiftool.org/forum/index.php?topic=10848.0)
+                        $self->Error('Phocus may not properly update previews of edited FFF images', 1);
+                    }
                     $dirInfo{Parent} = $tiffType;
                     $rtnVal = $self->ProcessTIFF(\%dirInfo);
                 }
@@ -2963,9 +2967,13 @@ sub InsertTagValues($$$;$$$)
         my (@tags, $val, $tg, @val, $type, $expr, $didExpr, $level, $asList);
         # "$$" represents a "$" symbol, and "$/" is a newline
         if ($var eq '$' or $var eq '/') {
-            $var = "\n" if $var eq '/';
-            $rtnStr .= "$pre$var";
             $line =~ s/^\s*\}// if $bra;
+            if ($var eq '/') {
+                $var = "\n";
+            } elsif ($line =~ /^self\b/ and not $rtnStr =~ /\$$/) {
+                $var = '$$';    # ("$$self{var}" in string)
+            }
+            $rtnStr .= "$pre$var";
             next;
         }
         # allow multiple group names
@@ -3070,6 +3078,8 @@ sub InsertTagValues($$$;$$$)
                             last unless $tag =~ / /;    # all done if we got our best match
                         }
                     }
+                } elsif ($tag eq 'self') {
+                    $val = $self; # ("$self{var}" or "$self->{var}" in string)
                 } else {
                     # get the tag value
                     $val = $self->GetValue($tag, $type);
@@ -4070,7 +4080,7 @@ sub WriteDirectory($$$;$)
                 $self->Warn("Can't write EXIF as a block to $$self{FILE_TYPE} file");
                 last;
             }
-            # this can happen if we call WriteDirectory for an EXIF directory without  going
+            # this can happen if we call WriteDirectory for an EXIF directory without going
             # through WriteTIFF as the WriteProc (which happens if conditionally replacing
             # the EXIF block and the condition fails), but we never want to do a block write
             # in this case because the EXIF block would end up with two TIFF headers
@@ -4794,19 +4804,20 @@ TryLib: for ($lib=$strptimeLib; ; $lib='') {
 
 #------------------------------------------------------------------------------
 # Set byte order according to our current preferences
-# Inputs: 0) ExifTool object ref
+# Inputs: 0) ExifTool object ref, 1) default byte order
 # Returns: new byte order ('II' or 'MM') and sets current byte order
 # Notes: takes the first of the following that is valid:
 #  1) ByteOrder option
 #  2) new value for ExifByteOrder
-#  3) makenote byte order from last file read
-#  4) big endian
-sub SetPreferredByteOrder($)
+#  3) default byte order passed to this routine
+#  4) makenote byte order from last file read
+#  5) big endian
+sub SetPreferredByteOrder($;$)
 {
-    my $self = shift;
+    my ($self, $default) = @_;
     my $byteOrder = $self->Options('ByteOrder') ||
                     $self->GetNewValue('ExifByteOrder') ||
-                    $$self{MAKER_NOTE_BYTE_ORDER} || 'MM';
+                    $default || $$self{MAKER_NOTE_BYTE_ORDER} || 'MM';
     unless (SetByteOrder($byteOrder)) {
         warn "Invalid byte order '${byteOrder}'\n" if $self->Options('Verbose');
         $byteOrder = $$self{MAKER_NOTE_BYTE_ORDER} || 'MM';
@@ -5514,7 +5525,11 @@ sub WriteJPEG($$)
                 my $buff = $self->WriteDirectory(\%dirInfo, $tagTablePtr, \&WriteTIFF);
                 if (defined $buff and length $buff) {
                     if (length($buff) + length($exifAPP1hdr) > $maxSegmentLen) {
-                        $self->Warn('Creating multi-segment EXIF',1);
+                        if ($self->Options('NoMultiExif')) {
+                            $self->Error('EXIF is too large for JPEG segment');
+                        } else {
+                            $self->Warn('Creating multi-segment EXIF',1);
+                        }
                     }
                     # switch to buffered output if required
                     if (($$self{PREVIEW_INFO} or $$self{LeicaTrailer}) and not $oldOutfile) {
@@ -5668,7 +5683,8 @@ sub WriteJPEG($$)
             my ($buff, $endPos, $trailInfo);
             my $delPreview = $$self{DEL_PREVIEW};
             $trailInfo = IdentifyTrailer($raf) unless $$delGroup{Trailer};
-            unless ($oldOutfile or $delPreview or $trailInfo or $$delGroup{Trailer}) {
+            my $nvTrail = $self->GetNewValueHash($Image::ExifTool::Extra{Trailer});
+            unless ($oldOutfile or $delPreview or $trailInfo or $$delGroup{Trailer} or $nvTrail) {
                 # blindly copy the rest of the file
                 while ($raf->Read($buff, 65536)) {
                     Write($outfile, $buff) or $err = 1, last;
@@ -5699,7 +5715,20 @@ sub WriteJPEG($$)
             }
             # remember position of last data copied
             $endPos = $raf->Tell() - length($buff);
-            # rewrite trailers if they exist
+            # write new trailer if specified
+            if ($nvTrail) {
+                # access new value directly to avoid copying a potentially very large data block
+                if ($$nvTrail{Value} and $$nvTrail{Value}[0]) { # (note: "0" will also delete the trailer)
+                    $self->VPrint(0, '  Writing new trailer');
+                    Write($outfile, $$nvTrail{Value}[0]) or $err = 1;
+                    ++$$self{CHANGED};
+                } elsif ($raf->Seek(0, 2) and $raf->Tell() != $endPos) {
+                    $self->VPrint(0, '  Deleting trailer (', $raf->Tell() - $endPos, ' bytes)');
+                    ++$$self{CHANGED};  # changed if there was previously a trailer
+                }
+                last;   # all done
+            }
+            # rewrite existing trailers
             if ($trailInfo) {
                 my $tbuf = '';
                 $raf->Seek(-length($buff), 1);  # seek back to just after EOI
@@ -5863,7 +5892,7 @@ sub WriteJPEG($$)
                 HexDump($segDataPt, undef, %dumpParms);
             }
         }
-        # group delete of APP segements
+        # group delete of APP segments
         if ($$delGroup{$dirName}) {
             $verbose and print $out "  Deleting $dirName segment\n";
             ++$$self{CHANGED};
@@ -5972,7 +6001,11 @@ sub WriteJPEG($$)
                     # delete segment if IFD contains no entries
                     length $$segDataPt or $del = 1, last;
                     if (length($$segDataPt) + length($exifAPP1hdr) > $maxSegmentLen) {
-                        $self->Warn('Writing multi-segment EXIF',1);
+                        if ($self->Options('NoMultiExif')) {
+                            $self->Error('EXIF is too large for JPEG segment');
+                        } else {
+                            $self->Warn('Writing multi-segment EXIF',1);
+                        }
                     }
                     # switch to buffered output if required
                     if (($$self{PREVIEW_INFO} or $$self{LeicaTrailer}) and not $oldOutfile) {

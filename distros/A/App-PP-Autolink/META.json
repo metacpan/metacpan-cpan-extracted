@@ -33,7 +33,7 @@
             "File::Find::Rule" : "0",
             "File::Which" : "0",
             "Getopt::ArgvFile" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.45",
             "Module::ScanDeps" : "1.27",
             "PAR::Packer" : "1.049",
             "Path::Tiny" : "0.108",
@@ -57,6 +57,6 @@
          "url" : "https://github.com/shawnlaffan/perl-pp-autolink"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

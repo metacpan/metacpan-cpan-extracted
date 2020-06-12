@@ -10,7 +10,7 @@ use HTML::Parser;
 use HTML::Form;
 use Digest::MD5();
 
-our $VERSION = '9.02';
+our $VERSION = '9.03';
 
 # $Id: $
 # $Log: LaPoste.pm,v $
@@ -252,6 +252,7 @@ sub _list_accounts {
         my $html = _GET_content($self, _rel_url($response, '/voscomptes/canalXHTML/comptesCommun/synthese_ep/afficheSyntheseEP-synthese_ep.ea'));
         push @l, _list_accounts_one_page($self, $html, 'savings');
     }
+    @l or _output("/tmp/t.html", $html);
     @l;
 }
 
@@ -261,9 +262,9 @@ sub _list_accounts_one_page {
 
     my $flag = '';
     my ($url, $name, $owner, $account_no, $balance_cb);
-
+    
     foreach (split("\n", $html)) {
-        if ($flag eq 'url' && m!<a href="(.*?)"! || m!redirigerVersCU16\('(.*?)'\)!) {
+        if ($flag eq 'url' && m!<a href="(.*?)"! || m!redirigerVersCU16\(event, '(.*?)'\)!) {
             $url = $1;
         } elsif (m!<h3>(.*?)\s*</h3>(?:<span>(.*)</span>)?!) {
             $name = $1;

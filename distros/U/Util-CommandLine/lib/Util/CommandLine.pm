@@ -10,7 +10,7 @@ use Pod::Usage 'pod2usage';
 use Proc::PID::File;
 use Term::ReadKey 'ReadMode';
 
-our $VERSION = '1.04'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
 use constant EXPORT_OK => [ qw( options pod2usage singleton readmode ) ];
 
@@ -63,7 +63,32 @@ sub options {
     shift if ( index( ( $_[0] || '' ), '::' ) != -1 );
 
     my $settings = {};
-    GetOptions( $settings, @_, qw( help man ) ) || pod2usage(0);
+    GetOptions(
+        map {
+            if (/\{/) {
+                $settings->{ ( split(/[|=]/) )[0] } = [];
+                $_ => $settings->{ ( split(/[|=]/) )[0] };
+            }
+            else {
+                $_ => \$settings->{ ( split(/[|=]/) )[0] };
+            }
+        } map { split(/\s+/) } @_, qw( help man )
+    ) || pod2usage(0);
+
+    for ( keys %$settings ) {
+        delete $settings->{$_} if (
+            not defined $settings->{$_} or
+            (
+                ref $settings->{$_} eq 'ARRAY' and (
+                    not @{ $settings->{$_} } or
+                    (
+                        @{ $settings->{$_} } == 1 and
+                        $settings->{$_}[0] eq ''
+                    )
+                )
+            )
+        );
+    }
 
     pod2usage( '-exitstatus' => 1, '-verbose' => 1 ) if ( $settings->{'help'} );
     pod2usage( '-exitstatus' => 0, '-verbose' => 2 ) if ( $settings->{'man'}  );
@@ -89,7 +114,7 @@ Util::CommandLine - Command-line interface helper utility
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Util-CommandLine.svg)](https://travis-ci.org/gryphonshafer/Util-CommandLine)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Util-CommandLine/badge.png)](https://coveralls.io/r/gryphonshafer/Util-CommandLine)
@@ -109,6 +134,9 @@ version 1.04
 
     # example 2
     use Util::CommandLine qw( podhelp singleton );
+
+    # example 3
+    my $opt = options('set|s=s{0,3} extra|e=s');
 
 =head1 DESCRIPTION
 
@@ -175,15 +203,7 @@ L<GitHub|https://github.com/gryphonshafer/Util-CommandLine>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Util-CommandLine>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Util::CommandLine>
-
-=item *
-
-L<AnnoCPAN|http://annocpan.org/dist/Util-CommandLine>
 
 =item *
 
@@ -209,7 +229,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gryphon Shafer.
+This software is copyright (c) 2020 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

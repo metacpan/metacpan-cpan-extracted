@@ -1,9 +1,9 @@
 package Sah::Schemas::DataSizeSpeed;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-DataSizeSpeed'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to data sizes & speeds (filesize, transfer speed, etc)
@@ -20,7 +20,7 @@ Sah::Schemas::DataSizeSpeed - Sah schemas related to data sizes & speeds (filesi
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schemas::DataSizeSpeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
+This document describes version 0.009 of Sah::Schemas::DataSizeSpeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-08.
 
 =head1 SAH SCHEMAS
 

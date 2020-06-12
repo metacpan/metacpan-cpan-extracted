@@ -57,7 +57,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-DataSizeSpeed"
       }
    },
-   "version" : "0.006",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -408,7 +408,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Sah::Schemas",
                         "name" : "-Sah::Schemas",
-                        "version" : "0.060"
+                        "version" : "0.061"
                      }
                   ]
                }

@@ -76,7 +76,8 @@ METHODS
        $len = $buffer->length
 
     Returns the length of the currently-stored data; that is, data that has
-    been provided by write calls but not yet consumed by read.
+    been provided by write calls or the fill callback but not yet consumed
+    by a read future.
 
  is_empty
 
@@ -97,9 +98,9 @@ METHODS
     it is safe for the caller to ignore the return value, but it may become
     not so.
 
- read
+ read_atmost
 
-       $f = $buffer->read( $len )
+       $f = $buffer->read_atmost( $len )
     
           $data = $f->get
 

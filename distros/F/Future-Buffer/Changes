@@ -1,4 +1,9 @@
 Revision history for Future-Buffer
 
+0.02    2020-06-12
+        [CHANGES]
+         * Rename ->read to ->read_atmost to match the IO::Async::Stream
+           method name, and remind users it isn't an exact length
+
 0.01    2020-06-09
         First version, released on an unsuspecting world.

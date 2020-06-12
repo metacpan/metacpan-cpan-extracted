@@ -8,7 +8,7 @@ package XS::Parse::Sublike;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -29,10 +29,8 @@ these. Unless you are writing a keyword plugin using XS, this module is not
 for you.
 
 This module is also currently experimental, and the design is still evolving
-and subject to change. Later versions will likely break ABI compatibility,
-requiring changes to any module that depends on it.
-
-It is hoped eventually this will be useful for other modules too.
+and subject to change. Later versions may break ABI compatibility, requiring
+changes or at least a rebuild of any module that depends on it.
 
 =head1 XS FUNCTIONS
 
@@ -99,10 +97,9 @@ combined. The hooks given by the I<hooks> argument are considered to be on the
 "outside" from those of the registered keyword "inside". The outside ones run
 first for all stages, except C<pre_blockend> which runs them inside-out.
 
-=head1 PARSE HOOKS AND CONTEXT
+=head1 PARSE CONTEXT
 
-The C<XSParseSublikeHooks> structure provides the following hook stages, in
-the given order. They share state about the ongoing parse process using
+The various hook stages all share state about the ongoing parse process using
 various fields of the C<XSParseSublikeContext> structure.
 
    struct XSParseSublikeContext {
@@ -111,6 +108,55 @@ various fields of the C<XSParseSublikeContext> structure.
       OP *body;
       CV *cv;
    }
+
+=head1 PARSE HOOKS
+
+The C<XSParseSublikeHooks> structure provides the following hook stages, which
+are invoked in the given order.
+
+In addition there are two C<U8> fields named I<require_parts> and
+I<skip_parts> which control the behaviour of various parts of the syntax which
+are usually optional. Any parts with bits set in I<require_parts> become
+non-optional, and an error if they are missing. Any parts with bits set in
+I<skip_parts> will skip the relevant part of the parsing process.
+
+When two sets of hooks are combined by the C<xs_parse_sublike_any> function,
+these bitmasks are accumulated together with inclusive or. Any part required
+by either set of hooks will still be required; any step skipped by either will
+be skipped entirely.
+
+If the same bit is set in both fields then the relevant parsing step will not
+be performed but it will still be an error for that section to be missing.
+This is likely not useful.
+
+Note that for skipped parts, only the actual parsing steps are skipped. A hook
+function can still set the relevant fields in the context structure anyway to
+force a particular value for those parts.
+
+=over 4
+
+=item XS_PARSE_SUBLIKE_PART_NAME
+
+The name of the function.
+
+=item XS_PARSE_SUBLIKE_PART_ATTRS
+
+The attributes of the function.
+
+This part can be skipped, but the bit is ignored when in I<require_parts>. It
+is always permitted to not provide any additional attributes to a function
+definition.
+
+=item XS_PARSE_SUBLIKE_PART_SIGNATURE
+
+The attributes of the function.
+
+This part can be skipped, but the bit is ignored when in I<require_parts>. It
+is always permitted not to provide a signature for a function definition,
+because such syntax only applies when C<use feature 'signatures'> is in
+effect, and only on supporting perl versions.
+
+=back
 
 =head2 The C<permit> Stage
 

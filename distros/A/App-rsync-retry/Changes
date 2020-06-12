@@ -1,25 +1,31 @@
-0.005   2019-05-21 (PERLANCAR)
+0.006   2020-06-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Do not give --retry-on-all a shortcut option -a, because that's
+	  used by rsync [GH#1].
+
+
+0.005   2019-05-21  Released-By: PERLANCAR
 
 	- Add script: rsync-retry-on-all.
 
 
-0.004   2019-04-17 (PERLANCAR)
+0.004   2019-04-17  Released-By: PERLANCAR
 
 	- Observe RSYNC_RETRY_ON, RSYNC_RETRY_ON_ALL.
 
 
-0.003   2019-04-10 (PERLANCAR)
+0.003   2019-04-10  Released-By: PERLANCAR
 
 	- Add options: --retry-on, --retry-on-all.
 
 
-0.002   2019-03-27 (PERLANCAR)
+0.002   2019-03-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix/tweak doc.
 
 
-0.001   2019-03-27 (PERLANCAR)
+0.001   2019-03-27  Released-By: PERLANCAR
 
         - First release.

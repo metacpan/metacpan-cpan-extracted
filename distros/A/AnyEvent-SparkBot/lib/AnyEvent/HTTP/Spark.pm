@@ -148,7 +148,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Me Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-me-get.html>
 
 =cut
 
@@ -180,7 +179,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List People Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-get.html>
 
 =back
 
@@ -205,7 +203,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Person Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-personId-get.html>
 
 =back
 
@@ -230,7 +227,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Create Person Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-post.html>
 
 =back
 
@@ -255,7 +251,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Delete Person Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-personId-delete.html>
 
 =back
 
@@ -280,7 +275,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Update Person Vendor Documentation: L<https://developer.ciscospark.com/endpoint-people-personId-put.html>
 
 =back
 
@@ -307,7 +301,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Rooms Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-get.html>
 
 =back
 
@@ -332,7 +325,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Room Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-roomId-get.html>
 
 =back
 
@@ -357,7 +349,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Create Room Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-post.html>
 
 =back
 
@@ -382,7 +373,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Delete Room Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-roomId-delete.html>
 
 =back
 
@@ -407,7 +397,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Update Room Vendor Documentation: L<https://developer.ciscospark.com/endpoint-rooms-roomId-put.html>
 
 =back
 
@@ -434,7 +423,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Memberships Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-get.html>
 
 =back
 
@@ -459,7 +447,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-membershipId-get.html>
 
 =back
 
@@ -484,7 +471,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Create Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-post.html>
 
 =back
 
@@ -509,7 +495,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Delete Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-membershipId-delete.html>
 
 =back
 
@@ -534,7 +519,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Update Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-memberships-membershipId-put.html>
 
 =back
 
@@ -568,7 +552,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Messages Vendor Documentation: L<https://developer.ciscospark.com/endpoint-messages-get.html>
 
 =back
 
@@ -593,7 +576,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Message Vendor Documentation: L<https://developer.ciscospark.com/endpoint-messages-messageId-get.html>
 
 =back
 
@@ -618,7 +600,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Create Message Vendor Documentation: L<https://developer.ciscospark.com/endpoint-messages-post.html>
 
 =back
 
@@ -643,7 +624,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Delete Message Vendor Documentation: L<https://developer.ciscospark.com/endpoint-messages-messageId-delete.html>
 
 =back
 
@@ -670,7 +650,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Teams Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-get.html>
 
 =back
 
@@ -695,7 +674,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Team Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-teamId-get.html>
 
 =back
 
@@ -720,7 +698,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Create Team Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-post.html>
 
 =back
 
@@ -745,7 +722,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Delete Team Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-teamId-delete.html>
 
 =back
 
@@ -770,7 +746,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Update Team Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teams-teamId-put.html>
 
 =back
 
@@ -797,7 +772,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Team Memberships Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-get.html>
 
 =back
 
@@ -822,7 +796,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Team Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-membershipId-get.html>
 
 =back
 
@@ -847,7 +820,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Create Team Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-post.html>
 
 =back
 
@@ -872,7 +844,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Delete Team Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-membershipId-delete.html>
 
 =back
 
@@ -897,7 +868,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Update Team Membership Vendor Documentation: L<https://developer.ciscospark.com/endpoint-teammemberships-membershipId-put.html>
 
 =back
 
@@ -924,7 +894,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Webhooks Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-get.html>
 
 =back
 
@@ -949,7 +918,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Webhook Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-webhookId-get.html>
 
 =back
 
@@ -974,7 +942,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Create Webhook Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-post.html>
 
 =back
 
@@ -999,7 +966,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Delete Webhook Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-webhookId-delete.html>
 
 =back
 
@@ -1024,7 +990,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Update Webhook Vendor Documentation: L<https://developer.ciscospark.com/endpoint-webhooks-webhookId-put.html>
 
 =back
 
@@ -1051,7 +1016,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Organizations Vendor Documentation: L<https://developer.ciscospark.com/endpoint-organizations-get.html>
 
 =back
 
@@ -1076,7 +1040,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Organization Vendor Documentation: L<https://developer.ciscospark.com/endpoint-organizations-orgId-get.html>
 
 =back
 
@@ -1103,7 +1066,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Licenses Vendor Documentation: L<https://developer.ciscospark.com/endpoint-licenses-get.html>
 
 =back
 
@@ -1128,7 +1090,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get License Vendor Documentation: L<https://developer.ciscospark.com/endpoint-licenses-licenseId-get.html>
 
 =back
 
@@ -1155,7 +1116,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Roles Vendor Documentation: L<https://developer.ciscospark.com/endpoint-roles-get.html>
 
 =back
 
@@ -1180,7 +1140,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Role Vendor Documentation: L<https://developer.ciscospark.com/endpoint-roles-roleId-get.html>
 
 =back
 
@@ -1207,7 +1166,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * List Events Vendor Documentation: L<https://developer.ciscospark.com/endpoint-events-get.html>
 
 =back
 
@@ -1232,7 +1190,6 @@ Example Callback
       # 4: HTTP::Result Object
     };
 
-=item * Get Event Vendor Documentation: L<https://developer.ciscospark.com/endpoint-events-eventId-get.html>
 
 =back
 
@@ -1240,6 +1197,7 @@ Example Callback
 
 __PACKAGE__->_build_common("people",qw(list get create delete update));
 __PACKAGE__->_build_common("rooms",qw(list get create delete update));
+__PACKAGE__->_build_common("meetings",qw(list get create delete update));
 __PACKAGE__->_build_common("memberships",qw(list get create delete update));
 __PACKAGE__->_build_common("messages",qw(list get create delete));
 __PACKAGE__->_build_common("teams",qw(list get create delete update));
@@ -1304,6 +1262,128 @@ sub _build_common {
     *{$label}=$code;
   }
 }
+
+=head1 Meetingss
+
+=head2 List Meetingss
+
+=over 4
+
+=item * Blocking my $result=$self->listMeetingss($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_listMeetingss($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+
+=back
+
+=head2 Get Meetings
+
+=over 4
+
+=item * Blocking my $result=$self->getMeetings($roomId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_getMeetings($cb,$roomId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$roomId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+
+=back
+
+=head2 Create Meetings
+
+=over 4
+
+=item * Blocking my $result=$self->createMeetings($hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_createMeetings($cb,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+
+=back
+
+=head2 Delete Meetings
+
+=over 4
+
+=item * Blocking my $result=$self->deleteMeetings($roomId)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_deleteMeetings($cb,$roomId)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$roomId)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+
+=back
+
+=head2 Update Meetings
+
+=over 4
+
+=item * Blocking my $result=$self->updateMeetings($roomId,$hashRef)
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $id=$self->que_updateMeetings($cb,$roomId,$hashRef)
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$roomId,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+
+=back
 
 =head1 Low Level Request functions
 

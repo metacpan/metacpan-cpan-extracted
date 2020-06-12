@@ -712,7 +712,7 @@ sub _compile_pdf {
         if ($i > 2 and @run_xindy) {
             foreach my $exec (@run_xindy) {
                 $self->log_info("Executing " . join(" ", @$exec) . "\n");
-                system(@$exec) == 0 or $self->log_error("Errors running " . join(" ", @$exec) ."\n");
+                system(@$exec) == 0 or $self->log_fatal("Errors running " . join(" ", @$exec) ."\n");
             }
         }
         my $pipe = IO::Pipe->new;

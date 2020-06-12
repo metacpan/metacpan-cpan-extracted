@@ -21,7 +21,7 @@ use vars qw($VERSION $AUTOLOAD $lastFetched);
 use Image::ExifTool qw(:DataAccess :Utils);
 require Exporter;
 
-$VERSION = '1.49';
+$VERSION = '1.50';
 
 sub FetchObject($$$$);
 sub ExtractObject($$;$$);
@@ -95,7 +95,7 @@ my %supportedFilter = (
     WRITABLE => 'string',
     # set PRIORITY to 0 so most recent Info dictionary takes precedence
     # (Acrobat Pro bug? doesn't use same object/generation number for
-    #  new Info dictionary when doing incrmental update)
+    #  new Info dictionary when doing incremental update)
     PRIORITY => 0,
     NOTES => q{
         As well as the tags listed below, the PDF specification allows for
@@ -703,9 +703,11 @@ sub CheckObject($$$$)
     my $raf = $$et{RAF};
     $raf->Seek($offset+$$et{PDFBase}, 0) or $et->Warn("Bad $tag offset"), return undef;
     # verify that we are reading the expected object
-    $raf->ReadLine($data) or $et->Warn("Error reading $tag data"), return undef;
     ($obj = $ref) =~ s/R/obj/;
-    unless ($data =~ s/^$obj//) {
+    for (;;) {
+        $raf->ReadLine($data) or $et->Warn("Error reading $tag data"), return undef;
+        last if $data =~ s/^$obj//;
+        next if $data =~ /^\s+$/;   # keep reading if this was a blank line
         # handle cases where other whitespace characters are used in the object ID string
         while ($data =~ /^\d+(\s+\d+)?\s*$/) {
             $raf->ReadLine($dat);
@@ -717,6 +719,7 @@ sub CheckObject($$$$)
             $et->Warn("$tag object ($obj) not found at offset $offset");
             return undef;
         }
+        last;
     }
     # read the first line of data from the object (ignoring blank lines and comments)
     for (;;) {
@@ -779,7 +782,7 @@ sub FetchObject($$$$)
             return undef;
         }
         # extract the object at the specified index in the stream
-        # (offsets in table are in sequential order, so we can subract from
+        # (offsets in table are in sequential order, so we can subtract from
         #  the next offset to get the object length)
         $offset = $$table[$i + 1];
         my $len = ($$table[$i + 3] || length($$obj{_stream})) - $offset;

@@ -1,9 +1,9 @@
 package Sah::Schema::datasize;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-DataSizeSpeed'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = ['float' => {
     summary => 'Data size',
@@ -21,13 +21,14 @@ Can be coerced from string that contains units, e.g.:
 _
     min => 0,
     'x.perl.coerce_rules' => ['From_str::suffix_datasize'],
+
     examples => [
-        {data=>'2KB', valid=>1, res=>2*1024},
-        {data=>'2 kb', valid=>1, res=>2*1024},
-        {data=>'2mb', valid=>1, res=>2*1024*1024},
-        {data=>'1.5K', valid=>1, res=>1536},
-        {data=>'1.6ki', valid=>1, res=>1600},
-        {data=>'1zzz', valid=>0},
+        {value=>'2KB', valid=>1, validated_value=>2*1024},
+        {value=>'2 kb', valid=>1, validated_value=>2*1024},
+        {value=>'2mb', valid=>1, validated_value=>2*1024*1024},
+        {value=>'1.5K', valid=>1, validated_value=>1536},
+        {value=>'1.6ki', valid=>1, validated_value=>1600},
+        {value=>'1zzz', valid=>0},
     ],
 }, {}];
 
@@ -47,7 +48,7 @@ Sah::Schema::datasize - Data size
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::datasize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
+This document describes version 0.009 of Sah::Schema::datasize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -61,7 +62,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;

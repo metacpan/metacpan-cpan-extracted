@@ -103,6 +103,9 @@ like($@, qr/Invalid package name/, ' ... croaks if package is undefined');
 	$mcgi->unmock('Vars');
 	like($warn, qr/ was not mocked/, "... warns if a subroutine isn't mocked");
 
+	$mcgi->unmock();
+	like($warn, qr/Nothing to unmock/, '... warns if no arguments passed to unmock');
+
 	$mcgi->unmock('param');
 	is(\&{"ExampleModule::param"}, $orig_param, '... restores the original subroutine');
 

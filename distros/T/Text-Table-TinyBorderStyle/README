@@ -1,11 +1,11 @@
 NAME
-    Text::Table::TinyBorderStyle - Text::Table::Tiny + support for colored
-    text
+    Text::Table::TinyBorderStyle - Text::Table::Tiny + support for border
+    styles
 
 VERSION
-    This document describes version 0.003 of Text::Table::TinyBorderStyle
+    This document describes version 0.004 of Text::Table::TinyBorderStyle
     (from Perl distribution Text-Table-TinyBorderStyle), released on
-    2020-06-11.
+    2020-06-12.
 
 SYNOPSIS
      use Text::Table::TinyBorderStyle qw/ generate_table /;
@@ -65,8 +65,8 @@ SEE ALSO
     Text::Table::Any
 
     Text::ANSITable which also supports border styles as well as color
-    themes, aligning wide/colored text, and other features, but with larger
-    footprint and slower rendering speed.
+    themes (including coloring the borders), aligning wide/colored text, and
+    other features, but with larger footprint and slower rendering speed.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

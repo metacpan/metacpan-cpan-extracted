@@ -1,0 +1,13 @@
+pm_to_blib
+Makefile.old
+Makefile
+nytprof
+nytprof.out
+blib
+bin/
+ful-*.tar.gz
+.vscode
+cover_db
+MANIFEST.bak
+MYMETA*
+Acme-ful-*

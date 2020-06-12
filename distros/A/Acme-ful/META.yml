@@ -1,0 +1,37 @@
+---
+abstract: 'A nifty "find upper lib" pragma'
+author:
+  - 'Ryan Willis <code@ryanwillis.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0.30'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-ful
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Acme::ful:
+    file: lib/Acme/ful.pm
+    version: '0.07'
+  ful:
+    file: lib/ful.pm
+    version: '0.07'
+requires:
+  Cwd: '3.26'
+  File::Spec: '3.32'
+  perl: '5.026001'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/ryan-willis/p5-Acme-ful.git
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -42,7 +42,7 @@ class Money
     #   bank.get_rate 'USD', 'CAD'
     class VariableExchange < Base
 
-      attr_reader :mutex, :store
+      attr_reader :mutex
 
       # Available formats for importing/exporting rates.
       RATE_FORMATS = [:json, :ruby, :yaml].freeze
@@ -59,6 +59,10 @@ class Money
       def initialize(st = Money::RatesStore::Memory.new, &block)
         @store = st
         super(&block)
+      end
+
+      def store
+        @store.is_a?(String) ? Object.const_get(@store) : @store
       end
 
       def marshal_dump
@@ -110,7 +114,7 @@ class Money
           if rate = get_rate(from.currency, to_currency)
             fractional = calculate_fractional(from, to_currency)
             from.class.new(
-              exchange(fractional, rate, &block), to_currency
+              exchange(fractional, rate, &block), to_currency, self
             )
           else
             raise UnknownRate, "No conversion rate known for '#{from.currency.iso_code}' -> '#{to_currency}'"
@@ -213,8 +217,7 @@ class Money
       #   s = bank.export_rates(:json)
       #   s #=> "{\"USD_TO_CAD\":1.24515,\"CAD_TO_USD\":0.803115}"
       def export_rates(format, file = nil, opts = {})
-        raise Money::Bank::UnknownRateFormat unless
-          RATE_FORMATS.include? format
+        raise Money::Bank::UnknownRateFormat unless RATE_FORMATS.include?(format)
 
         store.transaction do
           s = FORMAT_SERIALIZERS[format].dump(rates)
@@ -254,8 +257,13 @@ class Money
       #   bank.get_rate("USD", "CAD") #=> 1.24515
       #   bank.get_rate("CAD", "USD") #=> 0.803115
       def import_rates(format, s, opts = {})
-        raise Money::Bank::UnknownRateFormat unless
-          RATE_FORMATS.include? format
+        raise Money::Bank::UnknownRateFormat unless RATE_FORMATS.include?(format)
+
+        if format == :ruby
+          warn '[WARNING] Using :ruby format when importing rates is potentially unsafe and ' \
+            'might lead to remote code execution via Marshal.load deserializer. Consider using ' \
+            'safe alternatives such as :json and :yaml.'
+        end
 
         store.transaction do
           data = FORMAT_SERIALIZERS[format].load(s)

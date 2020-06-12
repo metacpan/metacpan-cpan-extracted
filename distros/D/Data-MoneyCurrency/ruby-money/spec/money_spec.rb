@@ -641,6 +641,14 @@ YAML
       expect(money.exchange_to("EUR")).to eq Money.new(200_00, "EUR")
     end
 
+    it "allows double conversion using same bank" do
+      bank = Money::Bank::VariableExchange.new
+      bank.add_rate('EUR', 'USD', 2)
+      bank.add_rate('USD', 'EUR', 0.5)
+      money = Money.new(100_00, "USD", bank)
+      expect(money.exchange_to("EUR").exchange_to("USD")).to eq money
+    end
+
     it 'uses the block given as rounding method' do
       money = Money.new(100_00, 'USD')
       expect(money.bank).to receive(:exchange_with).and_yield(300_00)
@@ -884,6 +892,7 @@ YAML
   end
 
   describe ".default_currency" do
+    before { Money.setup_defaults }
     after { Money.setup_defaults }
 
     it "accepts a lambda" do
@@ -899,8 +908,8 @@ YAML
     it 'warns about changing default_currency value' do
       expect(Money)
         .to receive(:warn)
-        .with('[WARNING] The default currency will change to `nil` in the next major release. Make ' \
-              'sure to set it explicitly using `Money.default_currency=` to avoid potential issues')
+        .with('[WARNING] The default currency will change from `USD` to `nil` in the next major release. ' \
+              'Make sure to set it explicitly using `Money.default_currency=` to avoid potential issues')
 
       Money.default_currency
     end
@@ -914,13 +923,14 @@ YAML
   end
 
   describe ".rounding_mode" do
+    before { Money.setup_defaults }
     after { Money.setup_defaults }
 
     it 'warns about changing default rounding_mode value' do
       expect(Money)
         .to receive(:warn)
-        .with('[WARNING] The default rounding mode will change to `ROUND_HALF_UP` in the next major ' \
-              'release. Set it explicitly using `Money.rounding_mode=` to avoid potential problems.')
+        .with('[WARNING] The default rounding mode will change from `ROUND_HALF_EVEN` to `ROUND_HALF_UP` in ' \
+              'the next major release. Set it explicitly using `Money.rounding_mode=` to avoid potential problems.')
 
       Money.rounding_mode
     end

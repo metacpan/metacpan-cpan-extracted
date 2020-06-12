@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
 package Device::Chip::Adapter::UART;
 
@@ -9,11 +9,13 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 
 use Future;
+use Future::Buffer;
+use Future::IO 0.04; # ->syswrite_exactly
 use IO::Termios;
 
 =head1 NAME
@@ -28,10 +30,10 @@ serial port, such as a USB UART adapter, allowing an instance of a
 L<Device::Chip> driver to communicate with actual chip hardware using this
 adapter.
 
-At present, this adapter only provides the C<GPIO> protocol as a wrapper
-around the modem control and handshaking lines. A future version will also
-provide access to the actual transmit and receive data, once a suitable
-interface is designed.
+This adapter provides both the C<GPIO> and C<UART> protocols. The C<GPIO>
+protocol wraps the modem control and handshaking lines. The C<UART> protocol
+adds access to the transmit and receive lines by adding the L</write> and
+L</read> methods.
 
 =cut
 
@@ -65,6 +67,15 @@ sub new
 
    my $termios = IO::Termios->open( $args{dev} ) or
       die "Cannot open $args{dev} - $!";
+
+   $termios->blocking( 0 );
+
+   for( $termios->getattr ) {
+      $_->cfmakeraw;
+      $_->setflag_clocal( 1 );
+
+      $termios->setattr( $_ );
+   }
 
    return bless {
       termios => $termios,
@@ -114,14 +125,14 @@ sub configure
    my $self = shift;
    my %args = @_;
 
-   defined $args{$_} and $self->{$_} = delete $args{$_}
-      for qw( baud bits parity stop );
+   exists $args{$_} and $self->{$_} = delete $args{$_}
+      for qw( baudrate bits parity stop );
 
    keys %args and
       croak "Unrecognised configure options: " . join( ", ", keys %args );
 
    $self->{termios}->set_mode( join ",",
-      @{$self}{qw( baud bits parity stop )}
+      @{$self}{qw( baudrate bits parity stop )}
    );
 
    return Future->done;
@@ -177,6 +188,35 @@ sub tris_gpios
 {
    # ignore
    Future->done;
+}
+
+sub write
+{
+   my $self = shift;
+   my ( $bytes ) = @_;
+
+   return Future::IO->syswrite_exactly( $self->{termios}, $bytes );
+}
+
+sub readbuffer
+{
+   my $self = shift;
+   return $self->{readbuf} //= do {
+      my $fh  = $self->{termios};
+
+      Future::Buffer->new(
+         fill => sub { Future::IO->sysread( $fh, 256 ) },
+      );
+   };
+}
+
+sub read
+{
+   my $self = shift;
+   my ( $len ) = @_;
+
+   # This is a 'read_exactly'
+   return $self->readbuffer->read_exactly( $len );
 }
 
 =head1 AUTHOR

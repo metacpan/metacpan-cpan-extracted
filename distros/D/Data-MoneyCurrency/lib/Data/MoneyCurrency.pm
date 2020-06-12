@@ -19,7 +19,7 @@ $Data::Dumper::Sortkeys = 1;
 my $rh_currency_for_country = {};
 
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 
 my $rh_currency_iso; # contains character strings
@@ -273,8 +273,8 @@ my $rh_currencies_for_country = {
 
 
 sub get_currencies_for_country {
-    croak "get_currency received no arguments" if @_ == 0;
-    croak "get_currency received more than one argument" if @_ > 1;
+    croak "get_currencies_for_country received no arguments" if @_ == 0;
+    croak "get_currencies_for_country received more than one argument" if @_ > 1;
     my $country = lc($_[0]);
 
     # Return shallow copy to avoid mutating $rh_currencies_for_country
@@ -300,7 +300,7 @@ Data::MoneyCurrency - Get information for different currencies
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -323,7 +323,7 @@ dependency on it, the relevant data files are already included.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 EXPORT
 
@@ -357,7 +357,7 @@ reference to an array of strings that are currency codes.
 =head1 BUGS
 
 Please report any bugs or feature requests through the web interface at
-L<https://github.com/Flimm/perl5-Data-MoneyCurrency/issues>.
+L<https://github.com/OpenCageData/perl5-Data-MoneyCurrency>.
 
 =head1 SUPPORT
 
@@ -379,18 +379,13 @@ L<https://metacpan.org/pod/Data::MoneyCurrency>
 
 Original version by David D Lowe (FLIMM)
 
-=head1 LICENSE AND COPYRIGHT
-
-This is licensed under the MIT license, and includes code from the
-RubyMoney/Money module, which is also licensed under the MIT license.
-
 =head1 AUTHOR
 
 edf <edf@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Opencage Data Limited.
+This software is copyright (c) 2020 by OpenCage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

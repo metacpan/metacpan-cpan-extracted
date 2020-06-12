@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
         'PAR::Packer'      => '1.049',
         'Path::Tiny'       => '0.108',
         'rlib'             => '0.02',
-        'List::Util'       => 0,
+        'List::Util'       => '1.45',
         'Env'              => 0,
     },
     EXE_FILES		=> [

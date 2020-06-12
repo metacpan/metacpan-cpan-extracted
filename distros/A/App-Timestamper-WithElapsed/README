@@ -1,5 +1,5 @@
 This archive contains the distribution App-Timestamper-WithElapsed,
-version 0.0.1:
+version 0.2.0:
 
   display the timestamp STDIN lines were received and the elapsed seconds since the last received line.
 

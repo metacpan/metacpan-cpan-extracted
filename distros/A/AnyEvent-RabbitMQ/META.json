@@ -45,7 +45,7 @@
          "requires" : {
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "version" : "0"
+            "version" : "0.77"
          }
       }
    },
@@ -57,7 +57,7 @@
          "web" : "https://github.com/bobtfish/AnyEvent-RabbitMQ"
       }
    },
-   "version" : "1.21",
+   "version" : "1.22",
    "x_contributors" : [
       "Tom Doran <bobtfish@cpan.org>",
       "Nicolas R <atoomic@cpan.org>",
@@ -66,7 +66,10 @@
       "Masahito Ikuta <cooldaemon@gmail.com>",
       "Rod Taylor <rod.taylor@gmail.com>",
       "Carl H\u00f6rberg <carl@cloudamqp.com>",
-      "Julio Polo <julio@hawaii.edu>"
+      "Julio Polo <julio@hawaii.edu>",
+      "A.J. Ragusa <aragusa@globalnoc.iu.edu>",
+      "Jos\u00e9 Mic\u00f3",
+      "Scott O'Neil <scott@cpanel.net>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }

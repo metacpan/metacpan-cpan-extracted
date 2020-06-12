@@ -1,4 +1,9 @@
 Revision history for Device-Chip-Adapter-UART
 
+0.02    2020-06-12
+        [CHANGES]
+         * Initial implementation of the 'UART' protocol, with ->write and
+           ->read methods
+
 0.01    2019-07-02 13:39:37
         First version, released on an unsuspecting world.

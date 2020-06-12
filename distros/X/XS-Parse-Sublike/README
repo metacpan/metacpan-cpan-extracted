@@ -12,10 +12,9 @@ DESCRIPTION
     module is not for you.
 
     This module is also currently experimental, and the design is still
-    evolving and subject to change. Later versions will likely break ABI
-    compatibility, requiring changes to any module that depends on it.
-
-    It is hoped eventually this will be useful for other modules too.
+    evolving and subject to change. Later versions may break ABI
+    compatibility, requiring changes or at least a rebuild of any module
+    that depends on it.
 
 XS FUNCTIONS
 
@@ -85,10 +84,9 @@ XS FUNCTIONS
     "inside". The outside ones run first for all stages, except
     pre_blockend which runs them inside-out.
 
-PARSE HOOKS AND CONTEXT
+PARSE CONTEXT
 
-    The XSParseSublikeHooks structure provides the following hook stages,
-    in the given order. They share state about the ongoing parse process
+    The various hook stages all share state about the ongoing parse process
     using various fields of the XSParseSublikeContext structure.
 
        struct XSParseSublikeContext {
@@ -97,6 +95,52 @@ PARSE HOOKS AND CONTEXT
           OP *body;
           CV *cv;
        }
+
+PARSE HOOKS
+
+    The XSParseSublikeHooks structure provides the following hook stages,
+    which are invoked in the given order.
+
+    In addition there are two U8 fields named require_parts and skip_parts
+    which control the behaviour of various parts of the syntax which are
+    usually optional. Any parts with bits set in require_parts become
+    non-optional, and an error if they are missing. Any parts with bits set
+    in skip_parts will skip the relevant part of the parsing process.
+
+    When two sets of hooks are combined by the xs_parse_sublike_any
+    function, these bitmasks are accumulated together with inclusive or.
+    Any part required by either set of hooks will still be required; any
+    step skipped by either will be skipped entirely.
+
+    If the same bit is set in both fields then the relevant parsing step
+    will not be performed but it will still be an error for that section to
+    be missing. This is likely not useful.
+
+    Note that for skipped parts, only the actual parsing steps are skipped.
+    A hook function can still set the relevant fields in the context
+    structure anyway to force a particular value for those parts.
+
+    XS_PARSE_SUBLIKE_PART_NAME
+
+      The name of the function.
+
+    XS_PARSE_SUBLIKE_PART_ATTRS
+
+      The attributes of the function.
+
+      This part can be skipped, but the bit is ignored when in
+      require_parts. It is always permitted to not provide any additional
+      attributes to a function definition.
+
+    XS_PARSE_SUBLIKE_PART_SIGNATURE
+
+      The attributes of the function.
+
+      This part can be skipped, but the bit is ignored when in
+      require_parts. It is always permitted not to provide a signature for
+      a function definition, because such syntax only applies when use
+      feature 'signatures' is in effect, and only on supporting perl
+      versions.
 
  The permit Stage
 

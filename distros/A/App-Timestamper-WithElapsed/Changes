@@ -1,4 +1,8 @@
 Revision history for App-Timestamper-WithElapsed
 
+0.2.0       2020-06-12
+    - [Bug Fix] Stop running the loop and process on EOF.
+    - [New Feature] Add the --from-start flag.
+
 0.0.1       2020-06-09
     - First version, released on an unsuspecting world

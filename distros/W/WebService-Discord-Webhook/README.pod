@@ -6,7 +6,7 @@ WebService::Discord::Webhook - A module for posting messages to Discord chat ser
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -37,13 +37,13 @@ in a game.
 
 An example Discord Webhook URL looks like this:
 
-    https://discordapp.com/api/webhooks/2237...5344/3d89...cf11
+    https://discord.com/api/webhooks/2237...5344/3d89...cf11
 
 where the first magic number ("2237...5344") is the C<id> and the second
 ("3d89...cf11") is the C<token>.
 
 For more information on Discord Webhooks, see the Discord API documentation
-located at L<https://discordapp.com/developers/docs/resources/webhook>.
+located at L<https://discord.com/developers/docs/resources/webhook>.
 
 =head1 METHODS
 
@@ -128,8 +128,7 @@ also cached as above.
 
 =head2 destroy
 
-Deletes the Webhook from the Discord service.  Returns True if successful,
-undef otherwise.
+Deletes the Webhook from the Discord service.  There is no return value.
 
 B<Warning!>  Once a Webhook is deleted, the existing token and ID are no
 longer valid.  A server administrator will need to re-create the endpoint
@@ -183,7 +182,7 @@ messages with image attachments, colorful borders or backgrounds, etc.
 The value should be an embed object (hashref) to post.  These values are
 not checked by WebService::Discord::Webhook.  For information on the expected
 data structure, refer to Discord's documentation on Channel Embed Objects:
-L<https://discordapp.com/developers/docs/resources/channel#embed-object>
+L<https://discord.com/developers/docs/resources/channel#embed-object>
 
 C<embed> cannot be combined with C<file>.
 
@@ -211,6 +210,19 @@ avatar at avatar_url).  To upload a new avatar to Discord, see C<modify>.
 If set, posts as a TTS message.  TTS messages appear as normal, but will also
 be read aloud to users in the channel (if permissions allow).
 
+=item * allowed_mentions:
+Customize behavior of pings ("at mentions") in a message.  By default, Discord
+will parse the message content looking for users, roles, and groups to notify.
+Sometimes this is undesired - for example, when reposting content into the
+channel, it would be impolite to let a news summary that includes "@everyone"
+to ping the entire channel.  This parameter instructs Discord on how to
+correctly parse (or suppress) mentions from the posted message.
+
+The value should be an allowed_mentions object (hashref) to post.  These values
+are not checked by WebService::Discord::Webhook.  For details about the data
+structure, refer to Discord's documentation on Allowed Mentions Objects:
+L<https://discord.com/developers/docs/resources/channel#allowed-mentions-object>
+
 =back
 
 As a special case, if a scalar is passed to this function, it is assumed to
@@ -219,8 +231,8 @@ be a regular text message to post via the "content" method.
 The return value for this function depends on the setting of C<wait> during
 webhook construction.  If C<wait> is False (default), the function returns
 immediately: parameters are checked for validity, but no attempt is made to
-verify that the message actually posted to the channel.  The function will
-return True.
+verify that the message actually posted to the channel.  There is no return
+value in this case.
 
 If C<wait> is True, function return is delayed until the message successfully
 posts.  The return value in this case is a hashref containing details about
@@ -237,9 +249,9 @@ structure (will be encoded to JSON using C<JSON::PP>).
 More information about the format of a Slack webhook is available on the
 Slack API reference at L<https://api.slack.com/incoming-webhooks>.
 
-This function returns True on success, and is also affected by the value
-of C<wait>.  Typically a Slack webhook returns the string C<"ok"> on
-success.
+This function's return behavior is similar to C<execute()>, in that it is also
+affected by the value of C<wait>.  Typically a Slack webhook returns the string
+C<"ok"> on success.
 
 =head2 execute_github
 
@@ -253,14 +265,41 @@ C<X-GitHub-Event> header.
 More information about the format of a Github webhook is available on the
 Github API reference at L<https://developer.github.com/webhooks>.
 
+This function's return behavior is similar to C<execute()>, in that it is also
+affected by the value of C<wait>.
+
 B<Note:>  Posting a message using the C<execute_github> function is currently
 a specially-cased feature of Discord.  The webhook always appears as a user
 named "GitHub" with a custom avatar, ignoring any existing styling.  Thus, it
 should NOT be used as a general-purpose posting function.  However, it may be
 useful to proxy messages from GitHub and repost them on Discord.
 
-This function returns True on success, and is also affected by the value
-of C<wait>.
+=head1 ERRORS
+
+All errors in WebService::Discord::Webhook are handled by throwing exceptions
+using C<croak()>.  This includes both local errors (e.g. invalid parameters)
+as well as remote service errors (e.g. upload too large, name invalid).
+
+Errors are returned as a single string.  Some attempt is made to standardize
+the wording, so that they can be parsed by regex if the caller wants to inspect
+the error and retry or continue.
+
+If you wish to trap errors, the traditional Perl way to catch the exceptions is
+to wrap them in an C<eval> block, as in:
+
+    my $result = eval {
+        $webhook->execute(...);
+    };
+
+    if ($@) {
+        # do something with the error here
+        warn "Execute failed with error: $@";
+    }
+
+    # execution continues...
+
+Also consider using L<Try::Tiny>, which provides the familiar C<try> / C<catch>
+constructs to help with exception handling.
 
 =head1 LICENSE
 

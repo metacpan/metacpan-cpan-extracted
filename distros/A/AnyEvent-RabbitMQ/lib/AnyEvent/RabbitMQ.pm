@@ -32,7 +32,7 @@ use AnyEvent::RabbitMQ::LocalQueue;
 
 use namespace::clean;
 
-our $VERSION = '1.21';
+our $VERSION = '1.22'; # VERSION
 
 use constant {
     _ST_CLOSED => 0,
@@ -170,8 +170,10 @@ sub connect {
                     $self->{drain_condvar}->send
                         if exists $self->{drain_condvar};
                 },
+                peername => $args{host},
                 $args{tls} ? (tls => 'connect') : (),
                 $args{tls_ctx} ? ( tls_ctx => $args{tls_ctx} ) : (),
+                $args{nodelay} ? ( nodelay => $args{nodelay} ) : (),
             );
             $self->_read_loop($args{on_close}, $args{on_read_failure});
             $self->_start(%args,);
@@ -689,6 +691,7 @@ AnyEvent::RabbitMQ - An asynchronous and multi channel Perl AMQP client.
       tls        => 0, # Or 1 if you'd like SSL
       tls_ctx    => $anyevent_tls # or a hash of AnyEvent::TLS options.
       tune       => { heartbeat => 30, channel_max => $whatever, frame_max = $whatever },
+      nodelay    => 1, # Reduces latency by disabling Nagle's algorithm
       on_success => sub {
           my $ar = shift;
           $ar->open_channel(

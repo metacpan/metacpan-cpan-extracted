@@ -16,25 +16,25 @@ my $buf = Future::Buffer->new(
 );
 
 # A quiescent buffer does not yet invoke fill
-ok( !@next_fill_f, 'fill not yet invoked before any ->read' );
+ok( !@next_fill_f, 'fill not yet invoked before any ->read_atmost' );
 
-# A ->read call invokes fill to provide data
+# A ->read_atmost call invokes fill to provide data
 {
-   my $read_f = $buf->read( 128 );
+   my $read_f = $buf->read_atmost( 128 );
 
-   ok( @next_fill_f, 'fill invoked after ->read' );
-   ok( !$read_f->is_ready, '->read not yet ready' );
+   ok( @next_fill_f, 'fill invoked after ->read_atmost' );
+   ok( !$read_f->is_ready, '->read_atmost not yet ready' );
 
    ( shift @next_fill_f )->done( "abcd" );
 
-   is( $read_f->get, "abcd", '->read yields data after fill' );
+   is( $read_f->get, "abcd", '->read_atmost yields data after fill' );
    ok( !@next_fill_f, 'fill not yet invoked again' );
 }
 
 # Two queued ->reads can see one round of fill
 {
-   my $read1 = $buf->read( 2 );
-   my $read2 = $buf->read( 2 );
+   my $read1 = $buf->read_atmost( 2 );
+   my $read2 = $buf->read_atmost( 2 );
 
    ok( @next_fill_f, 'fill invoked after two reads' );
 
@@ -52,7 +52,7 @@ ok( !@next_fill_f, 'fill not yet invoked before any ->read' );
    ( shift @next_fill_f )->done( "j" );
    ( shift @next_fill_f )->done( "kl" );
 
-   is( $read_f->get, "ijkl", '->read yields combined results of multiple fills' );
+   is( $read_f->get, "ijkl", '->read_atmost yields combined results of multiple fills' );
 }
 
 # fill future is used as prototype for read futures
@@ -61,7 +61,7 @@ ok( !@next_fill_f, 'fill not yet invoked before any ->read' );
       fill => sub { return Some::Future::Subclass->new },
    );
 
-   my $f = $buf->read( 1 );
+   my $f = $buf->read_atmost( 1 );
    isa_ok( $f, "Some::Future::Subclass", '$f' );
 }
 

@@ -39,10 +39,24 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
 {
   struct XSParseSublikeContext ctx = { 0 };
 
-  ctx.name = lex_scan_ident();
-  lex_read_space(0);
+  U8 require_parts = 0, skip_parts = 0;
+  if(hooksA) {
+    require_parts |= hooksA->require_parts;
+    skip_parts    |= hooksA->skip_parts;
+  }
+  if(hooksB) {
+    require_parts |= hooksB->require_parts;
+    skip_parts    |= hooksB->skip_parts;
+  }
 
-  ENTER_with_name("parse_block");
+  if(!(skip_parts & XS_PARSE_SUBLIKE_PART_NAME)) {
+    ctx.name = lex_scan_ident();
+    lex_read_space(0);
+  }
+  if((require_parts & XS_PARSE_SUBLIKE_PART_NAME) && !ctx.name)
+    croak("Expected name for sub-like construction");
+
+  ENTER_with_name("parse_sublike");
   /* From here onwards any `return` must be prefixed by LEAVE_with_name() */
 
   if(hooksA && hooksA->pre_subparse)
@@ -53,7 +67,7 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
   I32 floor_ix = start_subparse(FALSE, ctx.name ? 0 : CVf_ANON);
   SAVEFREESV(PL_compcv);
 
-  if(lex_peek_unichar(0) == ':') {
+  if(!(skip_parts & XS_PARSE_SUBLIKE_PART_ATTRS) && (lex_peek_unichar(0) == ':')) {
     lex_read_unichar(0);
 
     ctx.attrs = lex_scan_attrs(PL_compcv);
@@ -69,7 +83,7 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
 
 #ifdef HAVE_PARSE_SUBSIGNATURE
   OP *sigop = NULL;
-  if(lex_peek_unichar(0) == '(') {
+  if(!(skip_parts & XS_PARSE_SUBLIKE_PART_SIGNATURE) && (lex_peek_unichar(0) == '(')) {
     lex_read_unichar(0);
     lex_read_space(0);
 
@@ -88,6 +102,21 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
 
       sigop = op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
         newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux));
+
+      /* a nextstate at the end handles context correctly for an empty
+       * sub body */
+      sigop = op_append_elem(OP_LINESEQ, sigop, newSTATEOP(0, NULL, NULL));
+
+#if HAVE_PERL_VERSION(5,31,5)
+      /* wrap the list of arg ops in a NULL aux op.  This serves two
+       * purposes. First, it makes the arg list a separate subtree
+       * from the body of the sub, and secondly the null op may in
+       * future be upgraded to an OP_SIGNATURE when implemented. For
+       * now leave it as ex-argcheck
+       */
+      sigop = newUNOP_AUX(OP_ARGCHECK, 0, sigop, NULL);
+      op_null(sigop);
+#endif
     }
     else
 #endif
@@ -95,7 +124,7 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
       sigop = parse_subsignature(0);
 
       if(PL_parser->error_count) {
-        LEAVE_with_name("parse_block");
+        LEAVE_with_name("parse_sublike");
         return 0;
       }
     }
@@ -111,8 +140,16 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
   SvREFCNT_inc(PL_compcv);
 
 #ifdef HAVE_PARSE_SUBSIGNATURE
-  if(sigop)
+  if(sigop) {
+    /* parse_block() returns an empy block as a stub op.
+     * no need to keep that if we we have a signature.
+     */
+    if (ctx.body->op_type == OP_STUB) {
+      op_free(ctx.body);
+      ctx.body = NULL;
+    }
     ctx.body = op_append_list(OP_LINESEQ, sigop, ctx.body);
+  }
 #endif
 
   if(PL_parser->error_count) {
@@ -127,11 +164,11 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
     *op_ptr = newOP(OP_NULL, 0);
     if(ctx.name) {
       SvREFCNT_dec(ctx.name);
-      LEAVE_with_name("parse_block");
+      LEAVE_with_name("parse_sublike");
       return KEYWORD_PLUGIN_STMT;
     }
     else {
-      LEAVE_with_name("parse_block");
+      LEAVE_with_name("parse_sublike");
       return KEYWORD_PLUGIN_EXPR;
     }
   }
@@ -154,7 +191,7 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
   if(hooksB && hooksB->post_newcv)
     (*hooksB->post_newcv)(aTHX_ &ctx);
 
-  LEAVE_with_name("parse_block");
+  LEAVE_with_name("parse_sublike");
 
   if(ctx.name) {
     *op_ptr = newOP(OP_NULL, 0);

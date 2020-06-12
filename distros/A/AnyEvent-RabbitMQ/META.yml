@@ -5,7 +5,7 @@ author:
 build_requires:
   Test::Exception: '0'
   Test::More: '0'
-  version: '0'
+  version: '0.77'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
@@ -27,7 +27,7 @@ requires:
   perl: '5.010'
 resources:
   repository: git://github.com/bobtfish/AnyEvent-RabbitMQ.git
-version: '1.21'
+version: '1.22'
 x_contributors:
   - 'Tom Doran <bobtfish@cpan.org>'
   - 'Nicolas R <atoomic@cpan.org>'
@@ -37,4 +37,7 @@ x_contributors:
   - 'Rod Taylor <rod.taylor@gmail.com>'
   - 'Carl Hörberg <carl@cloudamqp.com>'
   - 'Julio Polo <julio@hawaii.edu>'
+  - 'A.J. Ragusa <aragusa@globalnoc.iu.edu>'
+  - 'José Micó'
+  - "Scott O'Neil <scott@cpanel.net>"
 x_serialization_backend: 'YAML::Tiny version 1.70'

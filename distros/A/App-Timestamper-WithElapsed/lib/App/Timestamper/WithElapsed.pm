@@ -1,5 +1,5 @@
 package App::Timestamper::WithElapsed;
-$App::Timestamper::WithElapsed::VERSION = '0.0.1';
+$App::Timestamper::WithElapsed::VERSION = '0.2.0';
 use strict;
 use warnings;
 use 5.014;
@@ -13,6 +13,7 @@ use autodie;
 # by PEVANS (Paul Evans) and relicensed as MIT License with his
 # permission. Thanks!
 
+use Getopt::Long 2.37 qw/ GetOptionsFromArray /;
 use Time::HiRes qw/ time /;
 
 use IO::Async::Stream          ();
@@ -30,18 +31,37 @@ sub new
     return $self;
 }
 
+sub _from_start
+{
+    my $self = shift;
+
+    if (@_)
+    {
+        $self->{_from_start} = shift;
+    }
+
+    return $self->{_from_start};
+}
+
 sub _init
 {
     my ( $self, $args ) = @_;
+    my $argv = ( $args->{argv} // [] );
 
+    my $from_start;
+    GetOptionsFromArray( $argv, 'from-start!' => \$from_start, )
+        or die $!;
+    $self->_from_start($from_start);
     return;
 }
 
 sub run
 {
+    my $self = shift;
     my $loop = IO::Async::Loop->new;
 
     my $last_line_time = time();
+    my $init_time      = $self->_from_start ? ( $last_line_time + 0 ) : 0;
     STDOUT->autoflush(1);
     my $timer = IO::Async::Timer::Periodic->new(
         interval => 0.1,
@@ -53,6 +73,14 @@ sub run
             return;
         },
     );
+    my $out = sub {
+        my $t = shift;
+        my $l = shift;
+        chomp $l;
+        my $s = sprintf( "%.8f    %s", $t - $init_time, $l );
+        printf "\r%-70s\n", $s;
+        return;
+    };
 
     my $stream = IO::Async::Stream->new(
         read_handle => \*STDIN,
@@ -63,13 +91,14 @@ sub run
             {
                 my $l = $1;
                 my $t = time();
-                printf "\r%.8f\t%s", $t, $l;
+                $out->( $t, $l );
                 $last_line_time = $t;
             }
 
             if ($eof)
             {
-                printf "%.8f\t%s\n", time(), $$buffref;
+                $out->( time(), $$buffref );
+                $loop->stop();
             }
 
             return 0;
@@ -99,7 +128,7 @@ seconds since the last received line.
 
 =head1 VERSION
 
-version 0.0.1
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -113,7 +142,7 @@ Constructor
 
 =head2 run
 
-Run the application.
+Run the application .
 
 =head1 CREDITS
 

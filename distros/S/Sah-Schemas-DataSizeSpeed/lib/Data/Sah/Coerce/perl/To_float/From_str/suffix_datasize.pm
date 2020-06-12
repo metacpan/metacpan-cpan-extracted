@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_float::From_str::suffix_datasize;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-DataSizeSpeed'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,7 +55,7 @@ Data::Sah::Coerce::perl::To_float::From_str::suffix_datasize - Parse number from
 
 =head1 VERSION
 
-This document describes version 0.006 of Data::Sah::Coerce::perl::To_float::From_str::suffix_datasize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
+This document describes version 0.009 of Data::Sah::Coerce::perl::To_float::From_str::suffix_datasize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-08.
 
 =head1 SYNOPSIS
 

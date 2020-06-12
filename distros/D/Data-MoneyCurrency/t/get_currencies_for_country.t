@@ -16,4 +16,8 @@ is_deeply(get_currencies_for_country('us'), ['usd'], 'Test USA');
 is_deeply(get_currencies_for_country('cu'), ['cuc', 'cup'], 'Test Cuba');
 is_deeply(get_currencies_for_country('lt'), ['eur'], 'Test Lithuania');
 
+throws_ok {
+    get_currencies_for_country();
+} qr/no arguments/, "get_currencies_for_country() throws exception";
+
 done_testing();

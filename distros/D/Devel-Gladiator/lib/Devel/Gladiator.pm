@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Devel::Gladiator;
-# git description: v0.06-9-g25ce2f6
-$Devel::Gladiator::VERSION = '0.07';
+package Devel::Gladiator; # git description: v0.07-22-g8e8e311
 # ABSTRACT: Walk Perl's arena
 # KEYWORDS: development debugging memory allocation usage leaks cycles arena
+
+our $VERSION = '0.08';
 
 use base 'Exporter';
 
@@ -40,9 +40,7 @@ sub arena_table {
 use XSLoader;
 XSLoader::load(
     __PACKAGE__,
-    exists $Devel::Gladiator::{VERSION}
-        ? ${ $Devel::Gladiator::{VERSION} }
-        : (),
+    $VERSION,
 );
 
 1;
@@ -59,7 +57,7 @@ Devel::Gladiator - Walk Perl's arena
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -74,9 +72,10 @@ version 0.07
   warn arena_table(); # prints counts keyed by class
 
   # how to spot new entries in the arena after running some code
-  my %dump1 = map { ("$_" => $_) } walk_arena();
+  use Devel::Gladiator qw(walk_arena);
+  my %dump1 = map { ("$_" => $_) } @{walk_arena()};
   # do something
-  my %dump2 = map { $dump1{$_} ? () : ("$_" => $_) } walk_arena();
+  my %dump2 = map { $dump1{$_} ? () : ("$_" => $_) } @{walk_arena()};
   use Devel::Peek; Dump \%dump2;
 
 =head1 DESCRIPTION
@@ -117,29 +116,44 @@ This code may not work on perls 5.6.x and 5.8.x if L<PadWalker> is installed.
 
 =over 4
 
+=item *
+
 L<Become a hero plumber|http://blog.woobling.org/2009/05/become-hero-plumber.html>
+
+=item *
+
 L<Test::Memory::Cycle>
+
+=item *
+
 L<Devel::Cycle>
+
+=item *
+
 L<Devel::Refcount>
+
+=item *
+
 L<Devel::Leak>
+
+=item *
+
 L<Data::Structure::Util>
 
 =back
+
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Gladiator>
+(or L<bug-Devel-Gladiator@rt.cpan.org|mailto:bug-Devel-Gladiator@rt.cpan.org>).
 
 =head1 AUTHOR
 
 Artur Bergman <sky@apple.com>
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2006 by Artur Bergman.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge יובל קוג'מן (Yuval Kogman) Jesse Luehrs Brad Fitzpatrick Ed J Curtis Brandt
+=for stopwords Karen Etheridge יובל קוג'מן (Yuval Kogman) Jesse Luehrs Brad Fitzpatrick mohawk Curtis Brandt
 
 =over 4
 
@@ -161,12 +175,19 @@ Brad Fitzpatrick <brad@danga.com>
 
 =item *
 
-Ed J <mohawk2@users.noreply.github.com>
+mohawk <mohawk2@users.noreply.github.com>
 
 =item *
 
 Curtis Brandt <curtisjbrandt@gmail.com>
 
 =back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2006 by Artur Bergman.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

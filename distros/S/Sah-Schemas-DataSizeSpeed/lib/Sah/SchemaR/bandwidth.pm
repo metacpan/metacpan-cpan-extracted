@@ -1,9 +1,9 @@
 package Sah::SchemaR::bandwidth;
 
-our $DATE = '2020-03-03'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.009'; # VERSION
 
-our $rschema = ["float",[{description=>"\nFloat, in bytes/second.\n\nCan be coerced from string that contains units, e.g.:\n\n    1000kbps -> 128000 (kilobits per second, 1024-based)\n    2.5 mbit -> 327680 (megabit per second, 1024-based)\n    128KB/s  -> 131072 (kilobyte per second, 1024-based)\n\n",examples=>[{data=>"1000kbps",res=>128000,valid=>1},{data=>"2.5 mbit",res=>327680,valid=>1},{data=>"128KB/s",res=>131072,valid=>1},{data=>"128K/s",res=>131072,valid=>1},{data=>"128K",res=>131072,valid=>1},{data=>"1zzz",valid=>0}],min=>0,summary=>"Data transfer speed","x.perl.coerce_rules"=>["From_str::suffix_dataspeed"]},{summary=>"Data transfer speed"}],["dataspeed","float"]];
+our $rschema = ["float",[{description=>"\nFloat, in bytes/second.\n\nCan be coerced from string that contains units, e.g.:\n\n    1000kbps -> 128000 (kilobits per second, 1024-based)\n    2.5 mbit -> 327680 (megabit per second, 1024-based)\n    128KB/s  -> 131072 (kilobyte per second, 1024-based)\n\n",examples=>[{valid=>1,validated_value=>128000,value=>"1000kbps"},{valid=>1,validated_value=>327680,value=>"2.5 mbit"},{valid=>1,validated_value=>131072,value=>"128KB/s"},{valid=>1,validated_value=>131072,value=>"128K/s"},{valid=>1,validated_value=>131072,value=>"128K"},{valid=>0,value=>"1zzz"}],min=>0,summary=>"Data transfer speed","x.perl.coerce_rules"=>["From_str::suffix_dataspeed"]},{examples=>[{valid=>1,validated_value=>128000,value=>"1000kbps"},{valid=>1,validated_value=>327680,value=>"2.5 mbit"},{valid=>1,validated_value=>131072,value=>"128KB/s"},{valid=>1,validated_value=>131072,value=>"128K/s"},{valid=>1,validated_value=>131072,value=>"128K"},{valid=>0,value=>"1zzz"}],summary=>"Data transfer speed"}],["dataspeed","float"]];
 
 1;
 # ABSTRACT: Data transfer speed
@@ -20,7 +20,7 @@ Sah::SchemaR::bandwidth - Data transfer speed
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::bandwidth (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
+This document describes version 0.009 of Sah::SchemaR::bandwidth (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

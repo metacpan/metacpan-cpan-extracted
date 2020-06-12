@@ -522,6 +522,9 @@ sub WriteExif($$$)
     my $name = $$dirInfo{Name};
     $name = $dirName unless $name and $dirName eq 'MakerNotes' and $name !~ /^MakerNote/;
 
+    # save byte order of existing EXIF
+    $$et{SaveExifByteOrder} = GetByteOrder() if $dirName eq 'IFD0' or $dirName eq 'ExifIFD';
+
     # set encoding for strings
     $strEnc = $et->Options('CharsetEXIF') if $$tagTablePtr{GROUPS}{0} eq 'EXIF';
 
@@ -2294,8 +2297,8 @@ NoOverwrite:            next if $isNew > 0;
                     } elsif ($ifd < 0) {
                         # pad if necessary (but don't pad contiguous image blocks)
                         my $pad = 0;
-                        ++$pad if $size & 0x01 and ($n+1 >= $count or not $oldEnd or
-                                  $oldEnd != $$oldOffset[$n+1]);
+                        ++$pad if ($blockSize + $size) & 0x01 and ($n+1 >= $count or
+                                  not $oldEnd or $oldEnd != $$oldOffset[$n+1]);
                         # preserve original image padding if specified
                         if ($$origDirInfo{PreserveImagePadding} and $n+1 < $count and
                             $oldEnd and $$oldOffset[$n+1] > $oldEnd)

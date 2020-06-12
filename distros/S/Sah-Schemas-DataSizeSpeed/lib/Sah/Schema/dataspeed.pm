@@ -1,9 +1,9 @@
 package Sah::Schema::dataspeed;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-DataSizeSpeed'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $schema = ['float' => {
     summary => 'Data transfer speed',
@@ -20,13 +20,14 @@ Can be coerced from string that contains units, e.g.:
 _
     min => 0,
     'x.perl.coerce_rules' => ['From_str::suffix_dataspeed'],
+
     examples => [
-        {data=>'1000kbps', valid=>1, res=>128000},
-        {data=>'2.5 mbit', valid=>1, res=>327680},
-        {data=>'128KB/s' , valid=>1, res=>131072},
-        {data=>'128K/s'  , valid=>1, res=>131072},
-        {data=>'128K'    , valid=>1, res=>131072},
-        {data=>'1zzz'    , valid=>0},
+        {value=>'1000kbps', valid=>1, validated_value=>128000},
+        {value=>'2.5 mbit', valid=>1, validated_value=>327680},
+        {value=>'128KB/s' , valid=>1, validated_value=>131072},
+        {value=>'128K/s'  , valid=>1, validated_value=>131072},
+        {value=>'128K'    , valid=>1, validated_value=>131072},
+        {value=>'1zzz'    , valid=>0},
     ],
 }, {}];
 
@@ -46,7 +47,7 @@ Sah::Schema::dataspeed - Data transfer speed
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::dataspeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
+This document describes version 0.009 of Sah::Schema::dataspeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -60,7 +61,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;

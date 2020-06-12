@@ -3,7 +3,7 @@ Changes
 lib/Future/Buffer.pm
 MANIFEST			This list of files
 t/00use.t
-t/01read.t
+t/01read_atmost.t
 t/02read_exactly.t
 t/03read_until.t
 t/10write.t

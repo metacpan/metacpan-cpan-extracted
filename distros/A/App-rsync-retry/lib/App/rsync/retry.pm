@@ -1,7 +1,7 @@
 package App::rsync::retry;
 
-our $DATE = '2019-05-21'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2020-06-12'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Rsync wrapper to retry on transfer errrors
@@ -18,7 +18,7 @@ App::rsync::retry - Rsync wrapper to retry on transfer errrors
 
 =head1 VERSION
 
-This document describes version 0.005 of App::rsync::retry (from Perl distribution App-rsync-retry), released on 2019-05-21.
+This document describes version 0.006 of App::rsync::retry (from Perl distribution App-rsync-retry), released on 2020-06-12.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/OpenCageData/perl5-Data-MoneyCurrency.svg?branch=master)](https://travis-ci.org/OpenCageData/perl5-Data-MoneyCurrency)
 [![CPAN](https://img.shields.io/cpan/v/Data-MoneyCurrency.svg?style=flat-square)](https://metacpan.org/pod/Data::MoneyCurrency)
-[![Coverage Status](https://coveralls.io/repos/github/OpenCageData/perl5-Data-MoneyCurrency/badge.svg?branch=master)](https://coveralls.io/github/OpenCageData/perl5-Data-MoneyCurrency?branch=master)
 
 Data-MoneyCurrency
 
@@ -22,7 +21,7 @@ perldoc command.
 You can also look for information at:
 
     GitHub issues (report bugs here)
-        https://github.com/Flimm/perl5-Data-MoneyCurrency/issues
+        https://github.com/OpenCageData/perl5-Data-MoneyCurrency
 
     Meta CPAN
         https://metacpan.org/pod/Data::MoneyCurrency

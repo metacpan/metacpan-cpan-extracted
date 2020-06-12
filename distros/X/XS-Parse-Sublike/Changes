@@ -1,5 +1,10 @@
 Revision history for XS-Parse-Sublike
 
+0.08    2020-06-12
+        [CHANGES]
+         * Define API to either require or skip parsing the name of a sub, or
+           skip parsing attributes or signatures           
+
 0.07    2020-04-02
         [BUGFIXES]
          * Ensure that empty-signature functions are still parsed correctly

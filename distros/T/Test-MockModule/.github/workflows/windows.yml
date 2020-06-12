@@ -31,6 +31,11 @@ jobs:
           echo "##[add-path]C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin"
       - name: perl -V
         run: perl -V
+      - name: install deps using cpanm
+        uses: perl-actions/install-with-cpanm@v1.1
+        with:
+          install: |
+            SUPER
       - name: Build.PL
         run: perl Build.PL
       - name: ./Build test

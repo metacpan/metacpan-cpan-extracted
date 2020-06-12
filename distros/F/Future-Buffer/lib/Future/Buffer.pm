@@ -9,7 +9,7 @@ use 5.010; # //
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Future;
 
@@ -162,7 +162,8 @@ sub _invoke_pending
    $len = $buffer->length
 
 Returns the length of the currently-stored data; that is, data that has been
-provided by C<write> calls but not yet consumed by C<read>.
+provided by C<write> calls or the C<fill> callback but not yet consumed by a
+C<read> future.
 
 =cut
 
@@ -202,9 +203,9 @@ sub write
    return Future->done;
 }
 
-=head2 read
+=head2 read_atmost
 
-   $f = $buffer->read( $len )
+   $f = $buffer->read_atmost( $len )
 
       $data = $f->get
 
@@ -215,7 +216,7 @@ yield a shorter length if less is currently available.
 
 =cut
 
-sub read
+sub read_atmost
 {
    my $self = shift;
    my ( $maxlen ) = @_;

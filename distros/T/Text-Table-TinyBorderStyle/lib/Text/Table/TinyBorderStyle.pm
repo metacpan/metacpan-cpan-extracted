@@ -1,9 +1,9 @@
 package Text::Table::TinyBorderStyle;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-06-12'; # DATE
 our $DIST = 'Text-Table-TinyBorderStyle'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.006;
 use strict;
@@ -163,7 +163,7 @@ sub _get_bottom_border {
 }
 
 1;
-# ABSTRACT: Text::Table::Tiny + support for colored text
+# ABSTRACT: Text::Table::Tiny + support for border styles
 
 __END__
 
@@ -173,11 +173,11 @@ __END__
 
 =head1 NAME
 
-Text::Table::TinyBorderStyle - Text::Table::Tiny + support for colored text
+Text::Table::TinyBorderStyle - Text::Table::Tiny + support for border styles
 
 =head1 VERSION
 
-This document describes version 0.003 of Text::Table::TinyBorderStyle (from Perl distribution Text-Table-TinyBorderStyle), released on 2020-06-11.
+This document describes version 0.004 of Text::Table::TinyBorderStyle (from Perl distribution Text-Table-TinyBorderStyle), released on 2020-06-12.
 
 =head1 SYNOPSIS
 
@@ -242,9 +242,9 @@ L<BorderStyle::ASCII::SingleLine> or L<BorderStyle::UTF8::DoubleLine>.
 
 L<Text::Table::Any>
 
-L<Text::ANSITable> which also supports border styles as well as color themes,
-aligning wide/colored text, and other features, but with larger footprint and
-slower rendering speed.
+L<Text::ANSITable> which also supports border styles as well as color themes
+(including coloring the borders), aligning wide/colored text, and other
+features, but with larger footprint and slower rendering speed.
 
 =head1 AUTHOR
 

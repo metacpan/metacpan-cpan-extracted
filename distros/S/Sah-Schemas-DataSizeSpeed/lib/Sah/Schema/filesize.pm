@@ -1,12 +1,16 @@
 package Sah::Schema::filesize;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-DataSizeSpeed'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
+
+use Sah::Schema::datasize;
 
 our $schema = ['datasize' => {
     summary => 'File size',
+
+    examples => $Sah::Schema::datasize::schema->[1]{examples},
 }, {}];
 
 1;
@@ -25,7 +29,7 @@ Sah::Schema::filesize - File size
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
+This document describes version 0.009 of Sah::Schema::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -39,7 +43,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;
@@ -58,6 +62,20 @@ Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+
+Sample data:
+
+ "2KB"  # valid, becomes 2048
+
+ "2 kb"  # valid, becomes 2048
+
+ "2mb"  # valid, becomes 2097152
+
+ "1.5K"  # valid, becomes 1536
+
+ "1.6ki"  # valid, becomes 1600
+
+ "1zzz"  # INVALID
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,79 @@
+=encoding utf-8
+
+=head1 NAME
+
+ful - a useI<ful> "B<f>ind B<u>pper B<l>ib" pragma that ascends dirs to include
+module directories in C<@INC>.
+
+=head1 SYNOPSIS
+
+One line to rule them all.
+
+    use ful;
+
+Within C<a-script.pl> when your project looks like this:
+
+    project-root/
+    ├── bin/
+    │   └── utils/
+    │       └── a-script.pl
+    ├── lib/
+    ├── vendor/
+    │   └── SomeOrg/
+    │       └── Some/
+    │           └── Module.pm
+
+And that's it.
+
+And if you need more than just the C<project-root/lib> dir, you can do this:
+
+    use ful qw/vendor lib/;
+
+Instead of:
+
+    use lib::relative '../../lib';
+    use lib::relative '../../vendor';
+    # or
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    use lib "$FindBin::Bin/../vendor";
+    # or even
+    BEGIN {
+        use Path::Tiny;
+        my $base = path(__FILE__)->parent;
+        $base = $base->parent until -d "$base/lib" or $base->is_rootdir;
+        unshift @INC, "$base/lib", "$base/vendor";
+    }
+
+=head1 LICENSE
+
+MIT License
+
+Copyright (c) 2020 Ryan Willis <code@ryanwillis.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=head1 VERSION
+
+0.07
+
+=head1 SUPPORT
+
+Support is by the author. Please file bug reports or ask questions at
+L<https://github.com/ryan-willis/p5-Acme-ful/issues>

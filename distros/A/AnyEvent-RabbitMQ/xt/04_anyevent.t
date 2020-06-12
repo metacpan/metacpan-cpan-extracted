@@ -1,6 +1,7 @@
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
+use version 0.77;
 
 use FindBin;
 
@@ -41,6 +42,35 @@ my $ar = AnyEvent::RabbitMQ->new(verbose => $conf{verbose});
 lives_ok sub {
     $ar->load_xml_spec()
 }, 'load xml spec';
+
+my @nagle = ([], [nodelay => 0], [nodelay => 1]);
+
+for my $opt (@nagle) {
+    my $done = AnyEvent->condvar;
+    my $z = AnyEvent::RabbitMQ->new(verbose => $conf{verbose});
+    $z->connect(
+        (map {$_ => $conf{$_}} qw(host port user pass vhost)),
+        timeout    => 1,
+        on_success => sub {
+            my $ar = shift;
+            isa_ok($ar, 'AnyEvent::RabbitMQ');
+            $done->send;
+        },
+        on_failure => failure_cb($done),
+        on_return  => sub {
+            my $method_frame = shift->method_frame;
+            die "return: ", $method_frame->reply_code, $method_frame->reply_text
+              if $method_frame->reply_code;
+        },
+        on_close   => sub {
+            my $method_frame = shift->method_frame;
+            Carp::confess "close: ", $method_frame->reply_code, $method_frame->reply_text
+              if $method_frame->reply_code;
+        },
+        @{ $opt },
+    );
+    $done->recv;
+}
 
 my $done = AnyEvent->condvar;
 $ar->connect(

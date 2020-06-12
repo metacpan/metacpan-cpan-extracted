@@ -49,7 +49,7 @@ use Image::ExifTool::Exif;
 use Image::ExifTool::GPS;
 require Exporter;
 
-$VERSION = '3.30';
+$VERSION = '3.33';
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(EscapeXML UnescapeXML);
 
@@ -183,6 +183,7 @@ my %xmpNS = (
     dwc       => 'http://rs.tdwg.org/dwc/index.htm',
     GettyImagesGIFT => 'http://xmp.gettyimages.com/gift/1.0/',
     LImage    => 'http://ns.leiainc.com/photos/1.0/image/',
+    Profile   => 'http://ns.google.com/photos/dd/1.0/profile/',
 );
 
 # build reverse namespace lookup
@@ -777,6 +778,10 @@ my %sRetouchArea = (
     LImage => {
         Name => 'LImage',
         SubDirectory => { TagTable => 'Image::ExifTool::XMP::LImage' },
+    },
+    Device => {
+        Name => 'Device',
+        SubDirectory => { TagTable => 'Image::ExifTool::XMP::Device' },
     },
 );
 
@@ -1480,6 +1485,29 @@ my %sPantryItem = (
             Name   => { },
         }
     },
+    # more again (ref forum11258)
+    GrainSeed => { },
+    ClipboardOrientation => { Writable => 'integer' },
+    ClipboardAspectRatio => { Writable => 'integer' },
+    PresetType  => { },
+    Cluster     => { },
+    UUID        => { Avoid => 1 },
+    SupportsAmount          => { Writable => 'boolean' },
+    SupportsColor           => { Writable => 'boolean' },
+    SupportsMonochrome      => { Writable => 'boolean' },
+    SupportsHighDynamicRange=> { Writable => 'boolean' },
+    SupportsNormalDynamicRange=> { Writable => 'boolean' },
+    SupportsSceneReferred   => { Writable => 'boolean' },
+    SupportsOutputReferred  => { Writable => 'boolean' },
+    CameraModelRestriction  => { },
+    Copyright   => { Avoid => 1 },
+    ContactInfo => { },
+    GrainSeed   => { Writable => 'integer' },
+    Name        => { Writable => 'lang-alt', Avoid => 1 },
+    ShortName   => { Writable => 'lang-alt' },
+    SortName    => { Writable => 'lang-alt' },
+    Group       => { Writable => 'lang-alt', Avoid => 1 },
+    Description => { Writable => 'lang-alt', Avoid => 1 },
 );
 
 # Tiff namespace properties (tiff)
@@ -2113,6 +2141,35 @@ my %sPantryItem = (
     WaterDepth          => { Writable => 'rational' },
     Acceleration        => { Writable => 'rational' },
     CameraElevationAngle=> { Writable => 'rational' },
+    # new in Exif 2.32 (according to the spec, these should use a different namespace
+    # URI, but the same namespace prefix... Exactly how is that supposed to work?!!
+    # -- I'll just stick with the same URI)
+    CompositeImage => { Writable => 'integer',
+        PrintConv => {
+            0 => 'Unknown',
+            1 => 'Not a Composite Image',
+            2 => 'General Composite Image',
+            3 => 'Composite Image Captured While Shooting',
+        },
+    },
+    CompositeImageCount => { List => 'Seq', Writable => 'integer' },
+    CompositeImageExposureTimes => {
+        FlatName => 'CompImage',
+        Struct => {
+            STRUCT_NAME => 'CompImageExp',
+            NAMESPACE => 'exifEX',
+            TotalExposurePeriod     => { Writable => 'rational' },
+            SumOfExposureTimesOfAll => { Writable => 'rational', FlatName => 'SumExposureAll' },
+            SumOfExposureTimesOfUsed=> { Writable => 'rational', FlatName => 'SumExposureUsed' },
+            MaxExposureTimesOfAll   => { Writable => 'rational', FlatName => 'MaxExposureAll' },
+            MaxExposureTimesOfUsed  => { Writable => 'rational', FlatName => 'MaxExposureUsed' },
+            MinExposureTimesOfAll   => { Writable => 'rational', FlatName => 'MinExposureAll'  },
+            MinExposureTimesOfUsed  => { Writable => 'rational', FlatName => 'MinExposureUsed' },
+            NumberOfSequences       => { Writable => 'integer',  FlatName => 'NumSequences' },
+            NumberOfImagesInSequences=>{ Writable => 'integer',  FlatName => 'ImagesPerSequence' },
+            Values =>   { List => 'Seq', Writable => 'rational' },
+        },
+    },
 );
 
 # Auxiliary namespace properties (aux) - not fully documented (ref PH)
@@ -2244,7 +2301,7 @@ my %sPantryItem = (
 
 # Composite XMP tags
 %Image::ExifTool::XMP::Composite = (
-    # get latitude/logitude reference from XMP lat/long tags
+    # get latitude/longitude reference from XMP lat/long tags
     # (used to set EXIF GPS position from XMP tags)
     GPSLatitudeRef => {
         Require => 'XMP-exif:GPSLatitude',
@@ -2901,13 +2958,15 @@ sub PrintLensID(@)
             # for Pentax, CS4 stores an int16u, but we use 2 x int8u
             $id = join(' ', unpack('C*', pack('n', $id)));
         }
-        my $str = $$printConv{$id} || "Unknown ($id)";
         # Nikon is a special case because Adobe doesn't store the full LensID
+        # (Apple Photos does, but we have to convert back to hex)
         if ($mk eq 'Nikon') {
-            my $hex = sprintf("%.2X", $id);
+            $id = sprintf('%X', $id);
+            $id = "0$id" if length($id) & 0x01;     # pad with leading 0 if necessary
+            $id =~ s/(..)/$1 /g and $id =~ s/ $//;  # put spaces between bytes
             my (%newConv, %used);
             my $i = 0;
-            foreach (grep /^$hex /, keys %$printConv) {
+            foreach (grep /^$id/, keys %$printConv) {
                 my $lens = $$printConv{$_};
                 next if $used{$lens}; # avoid duplicates
                 $used{$lens} = 1;
@@ -2916,6 +2975,7 @@ sub PrintLensID(@)
             }
             $printConv = \%newConv;
         }
+        my $str = $$printConv{$id} || "Unknown ($id)";
         return Image::ExifTool::Exif::PrintLensID($et, $str, $printConv,
                     undef, $id, $focalLength, $sa, $maxAv, $sf, $lf, $lensModel);
     }
@@ -3013,8 +3073,20 @@ sub FoundXMP($$$$;$)
         if ($$tagTablePtr{NAMESPACE}) {
             $tagID = $tag;
         } else {
+            $xns = $xmpNS{$ns};
+            unless (defined $xns) {
+                $xns = $ns;
+                # validate namespace prefix
+                unless ($ns =~ /^[A-Z_a-z\x80-\xff][-.0-9A-Z_a-z\x80-\xff]*$/ or $ns eq '') {
+                    $et->Warn("Invalid XMP namespace prefix '${ns}'");
+                    # clean up prefix for use as an ExifTool group name
+                    $ns =~ tr/-.0-9A-Z_a-z\x80-\xff//dc;
+                    $ns =~ /^[A-Z_a-z\x80-\xff]/ or $ns = "ns_$ns";
+                    $stdXlatNS{$xns} = $ns;
+                    $xmpNS{$ns} = $xns;
+                }
+            }
             # add XMP namespace prefix to avoid collisions in variable-namespace tables
-            $xns = $xmpNS{$ns} || $ns;
             $tagID = "$xns:$tag";
             # add namespace to top-level structure property
             $structProps[0][0] = "$xns:" . $structProps[0][0] if @structProps;

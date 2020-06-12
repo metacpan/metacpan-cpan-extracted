@@ -33,3 +33,6 @@
   -- Changed min version of Data::Dumper to 2.161
 1.010
   -- Changed min version of Carp to 1.38
+1.011 
+  -- Removed old vendor doc links
+  -- Added missing meetings api and pod

@@ -205,10 +205,16 @@ endofelems:
 
   OP *checkop = newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux);
 
+  checkop = op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
+      op_prepend_elem(OP_LINESEQ, checkop, elems));
+
+  /* a nextstate at the end handles context correctly for an empty
+   * sub body */
+  checkop = op_append_elem(OP_LINESEQ, checkop, newSTATEOP(0, NULL, NULL));
+
   LEAVE;
 
-  return op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
-      op_prepend_elem(OP_LINESEQ, checkop, elems));
+  return checkop;
 }
 
 #endif

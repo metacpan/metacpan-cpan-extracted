@@ -13,6 +13,174 @@
 <p><b>Note:</b> This page gives the history of older exiftool versions.  See
 <a href="history.html">history.html</a> for the recent history.</p>
 
+<a name='v11.84'><b>Jan. 10, 2020 - Version 11.84</b></a>
+<ul>
+<li>Decode accelerometer data from timed metadata of more dashcam videos
+<li>Decode Canon G9 white balance tags (thanks LibRaw)
+<li>Recognize INSP files
+</ul>
+
+<a name='v11.83'><b>Jan. 9, 2020 - Version 11.83</b></a>
+<ul>
+<li>Added a couple of new XMP-crs tags (thanks Herb)
+<li>Fixed bug introduced in 11.82 with the -php -D output
+<li>Fixed problem where some flattened XMP tags could be written when they
+    should be avoided
+</ul>
+
+<a name='v11.82'><b>Jan. 8, 2020 - Version 11.82</b></a>
+<ul>
+<li>Added a new Canon LensType
+<li>Added a new CanonModelID (thanks LibRaw)
+<li>Added ability to process SubDirectories in QuickTime Keys tags
+<li>Removed minor error when writing PDF 2.0 files (github issue #30)
+<li>Fixed problem where trailing null bytes were removed from binary values in
+    the -php output when the -b option was used
+</ul>
+
+<a name='v11.81'><b>Jan. 2, 2020 - Version 11.81</b></a>
+<ul>
+<li>Added a new Nikon LensID
+<li>Added two new CanonModelID's (thanks LibRaw)
+<li>Decode AVIF AV1 configuration record
+<li>Changed names of QuickTime MovieData tags to "MediaData"
+<li>Patched to use 4-digit years in Time::Local calls
+<li>Patched Composite sub-second date/time tags to do additional validation of
+    source EXIF date/time tags before adding sub seconds
+<li>Fixed problem where -json output could produce invalid JSON when -struct was
+    used and the structure field names contained special characters (github
+    issue #32)
+<li>Fixed spelling in a Panasonic SceneMode value (thanks Hubert)
+</ul>
+
+<a name='v11.80'><b>Dec. 17, 2019 - Version 11.80</b></a>
+<ul>
+<li>Added a new Canon LensType
+<li>Added a new Nikon Z LensID (thanks LibRaw)
+<li>Added a few new Sony LensType values (thanks Jos Roost)
+<li>Attempt to improve reliability of Samsung DepthMapWidth/Height decoding
+<li>Updated a number of Canon-mount Tamron lens names to include the Tamron
+    model number
+<li>Patched MOV/MP4 writer to allow a small amount of garbage at the end of a
+    file to be deleted when writing with the -m option
+<li>Fixed bug where some Composite tags may not have taken priority over other
+    tags as they should have
+</ul>
+
+<a name='v11.79'><b>Dec. 12, 2019 - Version 11.79</b></a>
+<ul>
+<li>Added support for AVIF files
+<li>Added new Canon, Sigma and Sony LensType values (thanks LibRaw)
+<li>Made PDF 2.0 writable at your own risk with the -m option (github issue #30)
+<li>Enhanced -validate feature to warn about duplicate languages in an XMP
+    lang-alt list
+<li>Fixed inconsistency between documentation and ExifTool capabilities for
+    "Writable" status of some tags
+</ul>
+
+<a name='v11.78'><b>Dec. 5, 2019 - Version 11.78</b></a>
+<ul>
+<li>Added a new Nikon LensID (thanks Chris)
+<li>Added two new FujiFilm SceneRecognition values
+<li>Patched to avoid crash in Windows when writing a negative epoch time using
+    the "-d %s" option
+<li>Fixed problem editing MIE tags when using the "-wm w" option
+</ul>
+
+<a name='v11.77'><b>Nov. 27, 2019 - Version 11.77</b></a>
+<ul>
+<li>Added a new Nikon LensID (thanks Joe Sch&ouml;nberg)
+<li>Added a number of new Olympus LensType values (thanks LibRaw)
+<li>Added a new Canon LensType
+<li>Decode timed GPS from Ambarella A12 dash cam MP4 videos
+<li>Decode a number of new Sigma tags (thanks LibRaw)
+<li>Decode a couple of new PanasonicRaw tags (thanks LibRaw)
+<li>Enhanced -fileOrder option to add -fast feature
+</ul>
+
+<a name='v11.76'><b>Nov. 12, 2019 - Version 11.76</b></a>
+<ul>
+<li>Added support for the Sony ILCE-9M2 (thanks Jos Roost)
+<li>Added a couple of new XMP-GCamera tags
+<li>Added MIMEType values for some formats that previously reported
+    "application/unknown"
+<li>Enhanced -geotag feature to write pitch to CameraElevationAngle if available
+<li>Improved determination of MIMEEncoding for TXT files
+</ul>
+
+<a name='v11.75'><b>Nov. 4, 2019 - Version 11.75</b></a>
+<ul>
+<li>Added ability to read some basic characteristics of TXT files
+<li>Added kml_track.fmt to the fmt_files of the full distribution
+<li>Added built-in support for decoding GPS from the four video subtitle text
+    formats that were previously handled by separate config files, and removed
+    these config files from the distribution
+<li>Derive GPSDateTime from CreateDate and SampleTime if not already available
+    when extracting timed GPS metadata from QuickTime-format videos
+<li>Changed family 2 groups of some Extra tags
+</ul>
+
+<a name='v11.74'><b>Oct. 29, 2019 - Version 11.74</b></a>
+<ul>
+<li>Added support for new XMP IPTC Extension version 1.5 tags
+<li>Added a new Nikon LensID (thanks LibRaw)
+<li>Decode GPS track from Auto-Vox dashcam MOV videos
+<li>Improved Russian translations (thanks Andrei Korzhyts and Alexander)
+<li>Enhanced convert_regions.config to support new IPTC Extension 1.5 ImageRegion
+<li>Changed the way the FlatName element works when used in a structure element
+    (the structure name is now added as a prefix to the flattened tag name)
+<li>Patched gpx.fmt and gpx_wpt.fmt to support sub-seconds in GPSDateTime value
+</ul>
+
+<a name='v11.73'><b>Oct. 23, 2019 - Version 11.73</b></a>
+<ul>
+<li>Decode timed metadata from Parrot drone videos
+<li>Patched dji.config file to properly handle time zones
+<li>Fixed bug which caused runtime error when reading timed metadata from Cobra
+    Dash Cam AVI videos
+</ul>
+
+<a name='v11.72'><b>Oct. 22, 2019 - Version 11.72</b></a>
+<ul>
+<li>Added warning messages for corrupted Photoshop document data
+<li>Added a new Olympus CameraType
+<li>Added a new Canon LensType
+<li>Decode more Sigma tags
+<li>Improved Russian translations (thanks Alexander)
+<li>Updated decoding of some CanonCustom settings for recent models
+<li>Documented DNG OpcodeList values
+</ul>
+
+<a name='v11.71'><b>Oct. 16, 2019 - Version 11.71</b></a>
+<ul>
+<li>Added a new Sony LensType (thanks Jos Roost)
+<li>Added a few new Nikon Z LensID's
+<li>Added a simple print conversion for DNG OpcodeList tags (note that due to
+    this, these tags must now be copied using the -n option)
+<li>Fixed problems determining some video parameters for DV files
+<li>Changed behaviour of -sep option when writing empty list items
+<li>API Changes:
+    <ul>
+    <li>Changed <a href="ExifTool.html#ListSplit">ListSplit option</a> to preserve empty list items
+    </ul>
+</ul>
+
+<a name='v11.70'><b>Oct. 10, 2019 - Version 11.70</b></a> <span class=grn>(production release)</span>
+<ul>
+<li>Added a new CanonModelID (thanks Laurent Cl&eacute;vy)
+<li>Improved identification of Office Open XML files (github issue #27)
+<li>Removed RAF version check when writing FujiFilm RAF files
+<li>Limited the number of accelerometer records that ExifTool will read by
+    default with the -ee option from INSV files to avoid excessive processing
+    times and memory usage
+<li>Patched Windows version to allow reading of shared files with Unicode names
+    (thanks Eriksson)
+<li>Patched to avoid converting some bad GPS coordinates (thanks Csaba Toth)
+<li>Fixed verbose output to include YCbCrSubSampling for JPEG files
+<li>Fixed conversion and group names for the new FujiFilm tag added in 11.68
+<li>Fixed format of GeoTiffDirectory and GeoTiffDoubleParams when writing
+</ul>
+
 <a name='v11.69'><b>Oct. 2, 2019 - Version 11.69</b></a>
 <ul>
 <li>Fixed bug introduced in version 11.66 where the sign was lost when writing
@@ -332,7 +500,7 @@
 <li>Added ability to write CanonVRD tags in CR3 images
 <li>Decode a couple more tags from Canon CR3 images
 <li>Enhanced Validate option to check for duplicate QuickTime atoms
-<li>Relaxed contraints when writing IPTC date tags to allow use of separators
+<li>Relaxed constraints when writing IPTC date tags to allow use of separators
     other than a colon
 <li>Fixed CR3 writing to update CTBO table with any changed offsets or sizes
     (although this table doesn't seem to be used by any RAW viewer, it may be
@@ -1525,7 +1693,7 @@
 <li>Decode a new Panasonic tag
 <li>Fixed problem decoding Sony VariableLowPassFilter values (thanks Jos Roost)
 <li>Fixed problem setting XMP:About when creating new XMP in a file
-<li>Fixed an incorect Pentax DriveMode value (thanks Andras Salamon)
+<li>Fixed an incorrect Pentax DriveMode value (thanks Andras Salamon)
 <li>API Changes
     <ul>
     <li>Allow access to the advanced formatting expression via a new ExifTool
@@ -2100,7 +2268,7 @@
 <ul>
 <li>Added ability to extract OS X system metadata ("MDItem" tags)
 <li>Added a value conversion for GoogleTrackDuration
-<li>Enchanced the -i option to allow full path names to be specified
+<li>Enhanced the -i option to allow full path names to be specified
 <li>Fixed a potential runtime error when writing corrupted JPEG images
 <li>API Changes:
     <ul>
@@ -3554,7 +3722,7 @@
 <li>Decode new Canon 6D CustomFunctions
 <li>Improved calculation of ScaleFactor35efl for Canon cameras
 <li>Changed priority of PDF Info tags so tags from most recent Info dictionary
-    take precedence (to partially accomodate the questionable Acrobat Pro
+    take precedence (to partially accommodate the questionable Acrobat Pro
     incremental update technique)
 <li>Changed some verbose warnings when attempting to write "unsafe" tags
 <li>Changed behaviour so that "unsafe" tags are not copied for any tag specified
@@ -3940,7 +4108,7 @@
 <li>Decode some new CanonVRD DLO tags
 <li>Changed decoding of CanonVRD VRDVersion tag
 <li>Changed formatting of a Pentax LensType for consistency with other lenses
-<li>Patched decoding of Reconyx:DateTimeOriginal to accomodate values written
+<li>Patched decoding of Reconyx:DateTimeOriginal to accommodate values written
     with an incorrect byte order by some models
 </ul>
 
@@ -4570,7 +4738,7 @@
 
 <a name='v8.46'><b>Jan. 22, 2011 - Version 8.46</b></a>
 <ul>
-<li>Simpified definition of user-defined XMP structures: flattened tags are now
+<li>Simplified definition of user-defined XMP structures: flattened tags are now
     automatically generated, and UserDefined::xmpStruct is no longer needed (but
     backward compatibility is maintained with the old-style definitions)
 <li>Added ability to handle multi-dimensional arrays in structured output
@@ -5694,7 +5862,7 @@
 <li>Decode large preview in APP2 of images from newer Samsung models
 <li>Extract FujiFilm PreviewImage from improperly written FPXR segment
 <li>Improved decoding of Nikon WB levels for some models
-<li>Reduced memory useage when writing DNG and some other RAW image files
+<li>Reduced memory usage when writing DNG and some other RAW image files
 <li>Changed format of Canon D30 SerialNumber to remove the hyphen and add
     leading 0's if less than 9 characters (now same format as printed on camera)
 <li>Changed writing of GPSTimeStamp and GPSDateStamp to adjust date/time to UTC
@@ -6435,7 +6603,7 @@
 <li>Renamed Pentax ModelRevision tag to ProductionCode and improved print
     conversion to indicate if camera has been serviced
 <li>Added check to prevent EXIF tags from being written to JPEG images if they
-    would obviously exceed the maximimum JPEG segment size limit
+    would obviously exceed the maximum JPEG segment size limit
 <li>Relaxed error checks when writing JPEG images to allow MakerNotes to be
     rebuilt if the MakerNote IFD is not contained within the MakerNotes data
 <li>Fixed decoding of Pentax ExternalFlashGuideNumber when AF360 is used with
@@ -7679,7 +7847,7 @@
 <a name='v6.41'><b>Sept. 18, 2006 - Version 6.41</b></a>
 <ul>
 <li>Fixed calculation of Canon ISO in some images and renamed ShotISO to BaseISO
-<li>Minor improvment to order of operations when deleting multiple groups and
+<li>Minor improvement to order of operations when deleting multiple groups and
     adding back information in batch mode
 </ul>
 
@@ -7822,7 +7990,7 @@
 <li>Added read/write support for WDP (Windows Media Photo) images
 <li>Improved algorithm to recognize maker notes offsets which need fixing
 <li>Properly handle maker notes which have value offsets relative to the
-    individial IFD entries (Kyocera, Rollei and some Konica and Toshiba models)
+    individual IFD entries (Kyocera, Rollei and some Konica and Toshiba models)
 <li>Decode a couple of new Sigma lens values in Canon LensType
 <li>Decreased block size for buffered files to improve performance over slow
     pipes
@@ -8122,7 +8290,7 @@
 <li>Added Canon maker note footer when rewriting Canon maker notes
 <li>Attempt to fix problem where ScaleFactor35efl was calculated incorrectly for
     some Canon images
-<li>Reduce memory useage and speed up writing of large TIFF images
+<li>Reduce memory usage and speed up writing of large TIFF images
 <li>Fixed problem with binary data offsets in verbose dump
 <li>Fixed problem writing Comment if 'File' group specified
 <li>Fixed bug which could cause formatting error in htmlDump output
@@ -8383,7 +8551,7 @@
 
 <a name='v5.70'><b>Oct. 23, 2005 - Version 5.70</b></a>
 <ul>
-<li>Significant internal changes to improve speed and reduce memory useage
+<li>Significant internal changes to improve speed and reduce memory usage
 <li>Fixed a bug introduced in version 5.63 which caused incorrect XMP GPS
     coordinates to be returned
 <li>Changed handling of Kodak date records
@@ -8446,7 +8614,7 @@
 <li>Decode a few more Photoshop tags
 <li>Issue an error if there is extra data after the normal end of file when
     rewriting TIFF images (avoids possible data loss if attempting to write an
-    unsuported RAW image with a TIFF-like data structure)
+    unsupported RAW image with a TIFF-like data structure)
 <li>Added ability to replace existing tags with user defined tags
 <li>Denote minor errors/warnings by adding '[minor]' to the message (these are
     the errors which can be ignored with the -m option)
@@ -9257,7 +9425,7 @@
     specific IPTC tag values with 'TAG-=VALUE'
 <li>Made EXIF SceneType writable
 <li>Renamed Nikon ISOUsed tag to ISO
-<li>Added documention of Canon RAW (CRW) file format
+<li>Added documentation of Canon RAW (CRW) file format
 </ul>
 
 <a name='v4.41'><b>Jan. 27, 2005 - Version 4.41</b></a>
@@ -9777,7 +9945,7 @@
 <a name='v3.36'><b>Apr. 6, 2004 - Version 3.36</b></a>
 <ul>
 <li>Added support for Sanyo and Minolta maker notes
-<li>Added skeleton for interpeting Sony maker notes
+<li>Added skeleton for interpreting Sony maker notes
 <li>Interpret Pentax PrintIM
 </ul>
 
@@ -9831,7 +9999,7 @@
 <li>Optimized a few routines to speed things up a bit
 <li>API Changes:
     <ul>
-    <li>Changed GetDescription() documention to indicate it is called with an
+    <li>Changed GetDescription() documentation to indicate it is called with an
         ExifTool object (this is still optional, but will be mandatory with the
         next version)
     </ul>

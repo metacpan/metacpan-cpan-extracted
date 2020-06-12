@@ -8,7 +8,7 @@ package XS::Parse::Sublike::Builder;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -135,8 +135,16 @@ struct XSParseSublikeContext {
   /* STAGE post_newcv */
 };
 
+enum {
+  XS_PARSE_SUBLIKE_PART_NAME      = 1<<0,
+  XS_PARSE_SUBLIKE_PART_ATTRS     = 1<<1,
+  XS_PARSE_SUBLIKE_PART_SIGNATURE = 1<<2,
+};
+
 struct XSParseSublikeHooks {
-  U32  flags;   /* undocumented but reserved for ABI back-compat later */
+  U16  flags;   /* undocumented but reserved for ABI back-compat later */
+  U8   require_parts;
+  U8   skip_parts;
   bool (*permit)         (pTHX);
   void (*pre_subparse)   (pTHX_ struct XSParseSublikeContext *ctx);
   void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx);

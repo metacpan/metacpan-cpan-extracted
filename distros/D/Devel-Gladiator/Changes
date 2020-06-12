@@ -1,5 +1,9 @@
 Revision history for Devel-Gladiator
 
+0.08    2020-06-11 17:42:46Z
+        - fix sample code snippet for spotting new arena entries (mohawk,
+          PR#2)
+
 0.07    2014-10-19 18:26:32Z
         - skip failing PadWalker tests on < 5.009 (RT#99581)
 

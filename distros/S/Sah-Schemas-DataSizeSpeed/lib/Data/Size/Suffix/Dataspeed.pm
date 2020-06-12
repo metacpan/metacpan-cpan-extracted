@@ -1,9 +1,9 @@
 package Data::Size::Suffix::Dataspeed;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-DataSizeSpeed'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 # case-sensitive
 our %suffixes = (
@@ -87,7 +87,7 @@ Data::Size::Suffix::Dataspeed - Digital data transfer speed suffixes
 
 =head1 VERSION
 
-This document describes version 0.006 of Data::Size::Suffix::Dataspeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
+This document describes version 0.009 of Data::Size::Suffix::Dataspeed (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-08.
 
 =head1 HOMEPAGE
 

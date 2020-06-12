@@ -21,7 +21,7 @@ A Ruby Library for dealing with money and currency conversion.
 
 ### Features
 
-- Provides a `Money` class which encapsulates all information about an certain
+- Provides a `Money` class which encapsulates all information about a certain
   amount of money, such as its value and its currency.
 - Provides a `Money::Currency` class which encapsulates all information about
   a monetary unit.
@@ -334,6 +334,8 @@ end
 Now you can use it with the default bank.
 
 ```ruby
+# For Rails 6 pass model name as a string to make it compatible with zeitwerk
+# Money.default_bank = Money::Bank::VariableExchange.new("ExchangeRate")
 Money.default_bank = Money::Bank::VariableExchange.new(ExchangeRate)
 
 # Add to the underlying store
@@ -421,6 +423,13 @@ Money.new(2.34567).round.format #=> "$0.02"
 Money.new(2.34567).round(BigDecimal::ROUND_HALF_UP, 2).format #=> "$0.0235"
 ```
 
+You can set the default rounding mode by passing one of the `BigDecimal` mode enumerables like so:
+```ruby
+Money.rounding_mode = BigDecimal::ROUND_HALF_EVEN
+```
+See [BigDecimal::ROUND_MODE](https://ruby-doc.org/stdlib-2.5.1/libdoc/bigdecimal/rdoc/BigDecimal.html#ROUND_MODE) for more information
+
+
 ## Ruby on Rails
 
 To integrate money in a Rails application use [money-rails](https://github.com/RubyMoney/money-rails).
@@ -482,6 +491,16 @@ Money.new(10_000_00, 'EUR').format # => €10,000.00
 I18n.locale = :es
 Money.new(10_000_00, 'USD').format # => $10.000,00
 Money.new(10_000_00, 'EUR').format # => €10.000,00
+```
+
+If you need to localize the position of the currency symbol, you
+have to pass it manually. *Note: this will become the default formatting
+behavior in the next version.*
+
+```ruby
+I18n.locale = :fr
+format = I18n.t :format, scope: 'number.currency.format'
+Money.new(10_00, 'EUR').format(format: format) # => 10,00 €
 ```
 
 For the legacy behaviour of "per currency" localization (formatting depends only on currency):

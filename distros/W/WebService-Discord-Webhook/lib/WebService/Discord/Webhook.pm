@@ -16,13 +16,13 @@ use MIME::Base64 qw(encode_base64);
 use File::Spec;
 
 # better error messages
-use Carp qw(croak carp);
+use Carp qw(croak);
 
 # PACKAGE VARS
-our $VERSION = '1.00';
+our $VERSION = '1.10';
 
 # Base URL for all API requests
-our $BASE_URL = 'https://discordapp.com/api';
+our $BASE_URL = 'https://discord.com/api';
 
 ##################################################
 
@@ -40,7 +40,7 @@ sub new {
   my $class = shift;
 
   my %params;
-  if ( scalar @_ > 1 ) {
+  if ( @_ > 1 ) {
     %params = @_;
   } else {
     $params{url} = shift;
@@ -49,28 +49,27 @@ sub new {
   # check parameters
   my ( $id, $token );
   if ( $params{url} ) {
-    if ( $params{url} =~ m{discordapp\.com/api/webhooks/(\d+)/([^/?]+)}i ) {
+    if ( $params{url} =~ m{discord(?:app)?\.com/api/webhooks/(\d+)/([^/?]+)}i ) {
       $id    = $1;
       $token = $2;
     } else {
-      croak "Failed to parse ID and Token from URL";
+      croak "PARAMETER ERROR: Failed to parse ID and Token from URL";
     }
   } elsif ( $params{id} && $params{token} ) {
     if ( $params{id} =~ m/^\d+$/ && $params{token} =~ m{^[^/?]+$} ) {
       $id    = $params{id};
       $token = $params{token};
     } else {
-      croak "Failed to validate ID and Token";
+      croak "PARAMETER ERROR: Failed to validate ID and Token";
     }
   } else {
-    croak "Must provide either URL, or ID and Token";
+    croak "PARAMETER ERROR: Must provide either URL, or ID and Token";
   }
 
   # Create an LWP UserAgent for REST requests
-  my %attributes =
-    ( agent =>
-"p5-WebService-Discord-Webhook (https://github.com/greg-kennedy/p5-WebService-Discord-Webhook, $VERSION)"
-    );
+  my %attributes = (
+    agent => "p5-WebService-Discord-Webhook (https://github.com/greg-kennedy/p5-WebService-Discord-Webhook, $VERSION)"
+  );
   if ( $params{timeout} )    { $attributes{timeout}    = $params{timeout} }
   if ( $params{verify_SSL} ) { $attributes{verify_SSL} = $params{verify_SSL} }
 
@@ -95,13 +94,13 @@ sub _parse_response {
 
   # sanity
   if ( $self->{id} ne $response->{id} ) {
-    carp "Warning: get() returned ID='"
+    croak "SERVICE ERROR: get() returned ID='"
       . $response->{id}
       . "', expected ID='"
       . $self->{id} . "'";
   }
   if ( $self->{token} ne $response->{token} ) {
-    carp "Warning: get() returned Token='"
+    croak "SERVICE ERROR: get() returned Token='"
       . $response->{token}
       . "', expected Token='"
       . $self->{token} . "'";
@@ -132,18 +131,14 @@ sub get {
   if ( !$response->{success} ) {
 
     # non-200 code returned
-    carp "Warning: HTTP::Tiny->get($url) returned error ("
-      . $response->{status} . " "
-      . $response->{reason} . "): '"
-      . $response->{content} . "'";
-    return;
+    croak "HTTP ERROR: HTTP::Tiny->get($url) returned error\n"
+      . "\tcode: " . $response->{status} . " " . $response->{reason} . "\n"
+      . "\tcontent: " . $response->{content};
   } elsif ( !$response->{content} ) {
 
     # empty result
-    carp "Warning: HTTP::Tiny->get($url) returned empty response ("
-      . $response->{status} . " "
-      . $response->{reason} . ")";
-    return;
+    croak "HTTP ERROR: HTTP::Tiny->get($url) returned empty response\n"
+      . "\tcode: " . $response->{status} . " " . $response->{reason};
   }
 
   # update internal structs and return
@@ -156,7 +151,7 @@ sub modify {
   my $self = shift;
 
   my %params;
-  if ( scalar @_ > 1 ) {
+  if ( @_ > 1 ) {
     %params = @_;
   } else {
     $params{name} = shift;
@@ -164,7 +159,7 @@ sub modify {
 
   # check params
   if ( !( $params{name} || exists $params{avatar} ) ) {
-    croak "Modify request with no valid parameters";
+    croak "PARAMETER ERROR: Modify request with no valid parameters";
   }
 
   my %request;
@@ -189,7 +184,7 @@ sub modify {
         $type = 'image/gif';
       } else {
         croak
-"Could not determine image type from data (not a valid png, jpeg or gif image)";
+          "PARAMETER ERROR: Could not determine image type from data (not a valid png, jpeg or gif image)";
       }
 
       $request{avatar} =
@@ -213,18 +208,14 @@ sub modify {
   if ( !$response->{success} ) {
 
     # non-200 code returned
-    carp "Warning: HTTP::Tiny->patch($url) returned error ("
-      . $response->{status} . " "
-      . $response->{reason} . "): '"
-      . $response->{content} . "'";
-    return;
+    croak "HTTP ERROR: HTTP::Tiny->patch($url) returned error\n"
+      . "\tcode: " . $response->{status} . " " . $response->{reason} . "\n"
+      . "\tcontent: " . $response->{content};
   } elsif ( !$response->{content} ) {
 
     # empty result
-    carp "Warning: HTTP::Tiny->patch($url) returned empty response ("
-      . $response->{status} . " "
-      . $response->{reason} . ")";
-    return;
+    croak "HTTP ERROR: HTTP::Tiny->patch($url) returned empty response\n"
+      . "\tcode: " . $response->{status} . " " . $response->{reason};
   }
 
   # update internal structs and return
@@ -239,15 +230,12 @@ sub destroy {
 
   my $response = $self->{http}->delete($url);
   if ( !$response->{success} ) {
-    carp "Warning: HTTP::Tiny->delete($url) returned error ("
-      . $response->{status} . " "
-      . $response->{reason} . "): '"
-      . $response->{content} . "'";
-    return;
+    croak "HTTP ERROR: HTTP::Tiny->delete($url) returned error\n"
+      . "\tcode: " . $response->{status} . " " . $response->{reason} . "\n"
+      . "\tcontent: " . $response->{content};
   }
 
-  # DELETE response is 204 NO CONTENT, simply return true if successful.
-  return 1;
+  # DELETE response is 204 NO CONTENT, so there is no return code.
 }
 
 # EXECUTE - posts the message.
@@ -259,12 +247,13 @@ sub destroy {
 #  username
 #  avatar_url
 #  tts
+#  allowed_mentions
 sub execute {
   my $self = shift;
 
   # extract params
   my %params;
-  if ( scalar @_ > 1 ) {
+  if ( @_ > 1 ) {
     %params = @_;
   } else {
     $params{content} = shift;
@@ -277,9 +266,10 @@ sub execute {
   # test required fields
   if ( !( $params{content} || $params{files} || $params{embeds} ) ) {
     croak
-"Execute request missing required parameters (must have at least content, embed, or file)";
+      "PARAMETER ERROR: Execute request missing required parameters (must have at least content, embed, or file)";
   } elsif ( $params{embeds} && $params{files} ) {
-    croak "Execute request: cannot combine file and embed request in one call.";
+    croak
+      "PARAMETER ERROR: Execute request cannot combine file and embed request in one call.";
   }
 
   # construct JSON request
@@ -291,6 +281,7 @@ sub execute {
   if ( $params{username} )   { $request{username}   = $params{username} }
   if ( $params{avatar_url} ) { $request{avatar_url} = $params{avatar_url} }
   if ( $params{tts} )        { $request{tts}        = JSON::PP::true }
+  if ( $params{allowed_mentions} ) { $request{allowed_mentions} = $params{allowed_mentions} }
 
   # compose URL
   my $url = $BASE_URL . '/webhooks/' . $self->{id} . '/' . $self->{token};
@@ -316,14 +307,14 @@ sub execute {
     #  32 random chars to make a boundary
     my @chars    = ( 'A' .. 'Z', 'a' .. 'z', '0' .. '9' );
     my $boundary = '';
-    for ( my $i = 0; $i < 32; $i++ ) {
+    for ( 0 .. 31 ) {
       $boundary .= $chars[ rand @chars ];
     }
 
     # Build request body
     my $content = '';
 
-    for ( my $i = 0; $i < scalar @{ $params{files} }; $i++ ) {
+    for my $i ( 0 .. $#{ $params{files} } ) {
       my $file = $params{files}[$i];
       $content .= "\r\n--$boundary\r\n";
       $content .=
@@ -357,23 +348,20 @@ sub execute {
   }
 
   if ( !$response->{success} ) {
-    carp "Warning: HTTP::Tiny->post($url) returned: "
-      . $response->{status} . " "
-      . $response->{reason} . ": '"
-      . $response->{content} . "'";
-    return;
+    croak "HTTP ERROR: HTTP::Tiny->post($url) returned error\n"
+      . "\tcode: " . $response->{status} . " " . $response->{reason} . "\n"
+      . "\tcontent: " . $response->{content};
   }
 
   # return details, or just true if content is empty (wait=0)
   if ( $response->{content} ) { return decode_json( $response->{content} ) }
-  return 1;
 }
 
 sub execute_slack {
   my $self = shift;
 
   my $json;
-  if ( scalar @_ > 1 ) {
+  if ( @_ > 1 ) {
     my %params = @_;
     $json = encode_json( \%params );
   } else {
@@ -388,16 +376,14 @@ sub execute_slack {
   my $response = $self->{http}->post( $url,
     { headers => { 'Content-Type' => 'application/json' }, content => $json } );
   if ( !$response->{success} ) {
-    carp "Warning: HTTP::Tiny->post($url) returned: "
-      . $response->{status} . " "
-      . $response->{reason} . ": '"
-      . $response->{content} . "'";
-    return;
+    croak "HTTP ERROR: HTTP::Tiny->post($url) returned error\n"
+      . "\tcode: " . $response->{status} . " " . $response->{reason} . "\n"
+      . "\tcontent: " . $response->{content};
   }
 
-  # return details, or just true if content is empty (wait=0)
+  # return details, or just undef if content is empty (wait=0)
   #  Slack request usually returns the string "ok"
-  return $response->{content} || 1;
+  if ( $response->{content} ) { return $response->{content} }
 }
 
 sub execute_github {
@@ -407,7 +393,8 @@ sub execute_github {
 
   # check params
   if ( !( $params{event} && $params{json} ) ) {
-    croak "execute_github missing required event and json parameters";
+    croak
+      "PARAMETER ERROR: execute_github missing required event and json parameters";
   }
 
   # create a github-format post url
@@ -426,16 +413,14 @@ sub execute_github {
     }
   );
   if ( !$response->{success} ) {
-    carp "Warning: HTTP::Tiny->post($url) returned: "
-      . $response->{status} . " "
-      . $response->{reason} . ": '"
-      . $response->{content} . "'";
-    return;
+    croak "HTTP ERROR: HTTP::Tiny->post($url) returned error\n"
+      . "\tcode: " . $response->{status} . " " . $response->{reason} . "\n"
+      . "\tcontent: " . $response->{content};
   }
 
-  # return details, or just true if content is empty (wait=0)
+  # return details, or just undef if content is empty (wait=0)
   #  github request usually has no response
-  return $response->{content} || 1;
+  if ( $response->{content} ) { return $response->{content} }
 }
 
 1;
@@ -450,7 +435,7 @@ WebService::Discord::Webhook - A module for posting messages to Discord chat ser
 
 =head1 VERSION
 
-version 1.00
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -481,13 +466,13 @@ in a game.
 
 An example Discord Webhook URL looks like this:
 
-    https://discordapp.com/api/webhooks/2237...5344/3d89...cf11
+    https://discord.com/api/webhooks/2237...5344/3d89...cf11
 
 where the first magic number ("2237...5344") is the C<id> and the second
 ("3d89...cf11") is the C<token>.
 
 For more information on Discord Webhooks, see the Discord API documentation
-located at L<https://discordapp.com/developers/docs/resources/webhook>.
+located at L<https://discord.com/developers/docs/resources/webhook>.
 
 =head1 METHODS
 
@@ -572,8 +557,7 @@ also cached as above.
 
 =head2 destroy
 
-Deletes the Webhook from the Discord service.  Returns True if successful,
-undef otherwise.
+Deletes the Webhook from the Discord service.  There is no return value.
 
 B<Warning!>  Once a Webhook is deleted, the existing token and ID are no
 longer valid.  A server administrator will need to re-create the endpoint
@@ -627,7 +611,7 @@ messages with image attachments, colorful borders or backgrounds, etc.
 The value should be an embed object (hashref) to post.  These values are
 not checked by WebService::Discord::Webhook.  For information on the expected
 data structure, refer to Discord's documentation on Channel Embed Objects:
-L<https://discordapp.com/developers/docs/resources/channel#embed-object>
+L<https://discord.com/developers/docs/resources/channel#embed-object>
 
 C<embed> cannot be combined with C<file>.
 
@@ -655,6 +639,19 @@ avatar at avatar_url).  To upload a new avatar to Discord, see C<modify>.
 If set, posts as a TTS message.  TTS messages appear as normal, but will also
 be read aloud to users in the channel (if permissions allow).
 
+=item * allowed_mentions:
+Customize behavior of pings ("at mentions") in a message.  By default, Discord
+will parse the message content looking for users, roles, and groups to notify.
+Sometimes this is undesired - for example, when reposting content into the
+channel, it would be impolite to let a news summary that includes "@everyone"
+to ping the entire channel.  This parameter instructs Discord on how to
+correctly parse (or suppress) mentions from the posted message.
+
+The value should be an allowed_mentions object (hashref) to post.  These values
+are not checked by WebService::Discord::Webhook.  For details about the data
+structure, refer to Discord's documentation on Allowed Mentions Objects:
+L<https://discord.com/developers/docs/resources/channel#allowed-mentions-object>
+
 =back
 
 As a special case, if a scalar is passed to this function, it is assumed to
@@ -663,8 +660,8 @@ be a regular text message to post via the "content" method.
 The return value for this function depends on the setting of C<wait> during
 webhook construction.  If C<wait> is False (default), the function returns
 immediately: parameters are checked for validity, but no attempt is made to
-verify that the message actually posted to the channel.  The function will
-return True.
+verify that the message actually posted to the channel.  There is no return
+value in this case.
 
 If C<wait> is True, function return is delayed until the message successfully
 posts.  The return value in this case is a hashref containing details about
@@ -681,9 +678,9 @@ structure (will be encoded to JSON using C<JSON::PP>).
 More information about the format of a Slack webhook is available on the
 Slack API reference at L<https://api.slack.com/incoming-webhooks>.
 
-This function returns True on success, and is also affected by the value
-of C<wait>.  Typically a Slack webhook returns the string C<"ok"> on
-success.
+This function's return behavior is similar to C<execute()>, in that it is also
+affected by the value of C<wait>.  Typically a Slack webhook returns the string
+C<"ok"> on success.
 
 =head2 execute_github
 
@@ -697,14 +694,41 @@ C<X-GitHub-Event> header.
 More information about the format of a Github webhook is available on the
 Github API reference at L<https://developer.github.com/webhooks>.
 
+This function's return behavior is similar to C<execute()>, in that it is also
+affected by the value of C<wait>.
+
 B<Note:>  Posting a message using the C<execute_github> function is currently
 a specially-cased feature of Discord.  The webhook always appears as a user
 named "GitHub" with a custom avatar, ignoring any existing styling.  Thus, it
 should NOT be used as a general-purpose posting function.  However, it may be
 useful to proxy messages from GitHub and repost them on Discord.
 
-This function returns True on success, and is also affected by the value
-of C<wait>.
+=head1 ERRORS
+
+All errors in WebService::Discord::Webhook are handled by throwing exceptions
+using C<croak()>.  This includes both local errors (e.g. invalid parameters)
+as well as remote service errors (e.g. upload too large, name invalid).
+
+Errors are returned as a single string.  Some attempt is made to standardize
+the wording, so that they can be parsed by regex if the caller wants to inspect
+the error and retry or continue.
+
+If you wish to trap errors, the traditional Perl way to catch the exceptions is
+to wrap them in an C<eval> block, as in:
+
+    my $result = eval {
+        $webhook->execute(...);
+    };
+
+    if ($@) {
+        # do something with the error here
+        warn "Execute failed with error: $@";
+    }
+
+    # execution continues...
+
+Also consider using L<Try::Tiny>, which provides the familiar C<try> / C<catch>
+constructs to help with exception handling.
 
 =head1 LICENSE
 

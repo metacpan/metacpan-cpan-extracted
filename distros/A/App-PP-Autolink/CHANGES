@@ -1,5 +1,8 @@
 Revision history for App::PP::Autolink
 
+2.02 20200612
+  - Set minimum List::Util version to 1.45 for util sub.
+
 2.02 20200611 18:00 AEST
   - Check Aliens only if they inherit from Alien::Base
   - Update POD

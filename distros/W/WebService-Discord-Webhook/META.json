@@ -51,6 +51,6 @@
          "url" : "https://github.com/greg-kennedy/p5-WebService-Discord-Webhook"
       }
    },
-   "version" : "1.00",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

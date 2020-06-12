@@ -1,9 +1,9 @@
 package Sah::SchemaR::filesize;
 
-our $DATE = '2020-03-03'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.009'; # VERSION
 
-our $rschema = ["float",[{description=>"\nFloat, in bytes.\n\nCan be coerced from string that contains units, e.g.:\n\n    2KB   -> 2048      (kilobyte, 1024-based)\n    2mb   -> 2097152   (megabyte, 1024-based)\n    1.5K  -> 1536      (kilobyte, 1024-based)\n    1.6ki -> 1600      (kibibyte, 1000-based)\n\n",examples=>[{data=>"2KB",res=>2048,valid=>1},{data=>"2 kb",res=>2048,valid=>1},{data=>"2mb",res=>2097152,valid=>1},{data=>"1.5K",res=>1536,valid=>1},{data=>"1.6ki",res=>1600,valid=>1},{data=>"1zzz",valid=>0}],min=>0,summary=>"Data size","x.perl.coerce_rules"=>["From_str::suffix_datasize"]},{summary=>"File size"}],["datasize","float"]];
+our $rschema = do{my$a=["float",[{description=>"\nFloat, in bytes.\n\nCan be coerced from string that contains units, e.g.:\n\n    2KB   -> 2048      (kilobyte, 1024-based)\n    2mb   -> 2097152   (megabyte, 1024-based)\n    1.5K  -> 1536      (kilobyte, 1024-based)\n    1.6ki -> 1600      (kibibyte, 1000-based)\n\n",examples=>[{valid=>1,validated_value=>2048,value=>"2KB"},{valid=>1,validated_value=>2048,value=>"2 kb"},{valid=>1,validated_value=>2097152,value=>"2mb"},{valid=>1,validated_value=>1536,value=>"1.5K"},{valid=>1,validated_value=>1600,value=>"1.6ki"},{valid=>0,value=>"1zzz"}],min=>0,summary=>"Data size","x.perl.coerce_rules"=>["From_str::suffix_datasize"]},{examples=>'fix',summary=>"File size"}],["datasize","float"]];$a->[1][1]{examples}=$a->[1][0]{examples};$a};
 
 1;
 # ABSTRACT: File size
@@ -20,7 +20,7 @@ Sah::SchemaR::filesize - File size
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
+This document describes version 0.009 of Sah::SchemaR::filesize (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

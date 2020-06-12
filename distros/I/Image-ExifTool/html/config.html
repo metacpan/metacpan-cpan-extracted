@@ -23,12 +23,12 @@
 #
 #               To activate this file, rename it to ".ExifTool_config" and
 #               place it in your home directory or the exiftool application
-#               directory.  (On Windows and Mac systems this must be done via
-#               the command line since the GUI's don't allow filenames to begin
-#               with a dot.  Use the "rename" command in Windows or "mv" on the
-#               Mac.)  This causes ExifTool to automatically load the file when
-#               run.  Your home directory is determined by the first defined of
-#               the following environment variables:
+#               directory.  (On Mac and some Windows systems this must be done
+#               via the command line since the GUI's may not allow filenames to
+#               begin with a dot.  Use the "rename" command in Windows or "mv"
+#               on the Mac.)  This causes ExifTool to automatically load the
+#               file when run.  Your home directory is determined by the first
+#               defined of the following environment variables:
 #
 #                   1.  EXIFTOOL_HOME
 #                   2.  HOME
@@ -223,6 +223,8 @@
                 2 =&gt; 'OtherImage',
                 <span class=com># (DNG and A100 ARW may be have 2 PreviewImage's)</span>
                 3 =&gt; 'PreviewImage (1)',
+                <span class=com># (if the MPF has 2 previews, MPImage3 could be the larger one)</span>
+                4 =&gt; 'MPImage3',
             },
             <span class=com># ValueConv may also be a code reference
             # Inputs: 0) reference to list of values, 1) ExifTool object</span>

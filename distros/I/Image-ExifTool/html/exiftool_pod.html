@@ -4,7 +4,7 @@
 <head>
 <title>exiftool Application Documentation</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link rev="made" href="mailto:root@osx217.apple.com" />
+<link rev="made" href="mailto:root@osx316.apple.com" />
 </head>
 
 <body style="background-color: white">
@@ -29,7 +29,7 @@
   <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
   <li><a href="#OPTIONS">OPTIONS</a>
     <ul>
-      <li><a href="#Option-Summary">Option Summary</a></li>
+      <li><a href="#Option-Overview">Option Overview</a></li>
       <li><a href="#Option-Details">Option Details</a>
         <ul>
           <li><a href="#Tag-operations">Tag operations</a></li>
@@ -99,34 +99,35 @@
 
 <pre><code>  File Types
   ------------+-------------+-------------+-------------+------------
-  3FR   r     | DSS   r     | J2C   r     | ODS   r     | RSRC  r
-  3G2   r/w   | DV    r     | JNG   r/w   | ODT   r     | RTF   r
-  3GP   r/w   | DVB   r/w   | JP2   r/w   | OFR   r     | RW2   r/w
-  A     r     | DVR-MS r    | JPEG  r/w   | OGG   r     | RWL   r/w
-  AA    r     | DYLIB r     | JSON  r     | OGV   r     | RWZ   r
-  AAE   r     | EIP   r     | K25   r     | OPUS  r     | RM    r
-  AAX   r/w   | EPS   r/w   | KDC   r     | ORF   r/w   | SEQ   r
-  ACR   r     | EPUB  r     | KEY   r     | OTF   r     | SKETCH r
-  AFM   r     | ERF   r/w   | LA    r     | PAC   r     | SO    r
-  AI    r/w   | EXE   r     | LFP   r     | PAGES r     | SR2   r/w
-  AIFF  r     | EXIF  r/w/c | LNK   r     | PBM   r/w   | SRF   r
-  APE   r     | EXR   r     | LRV   r/w   | PCD   r     | SRW   r/w
-  ARQ   r/w   | EXV   r/w/c | M2TS  r     | PCX   r     | SVG   r
-  ARW   r/w   | F4A/V r/w   | M4A/V r/w   | PDB   r     | SWF   r
-  ASF   r     | FFF   r/w   | MAX   r     | PDF   r/w   | THM   r/w
-  AVI   r     | FITS  r     | MEF   r/w   | PEF   r/w   | TIFF  r/w
-  AVIF  r/w   | FLA   r     | MIE   r/w/c | PFA   r     | TORRENT r
-  AZW   r     | FLAC  r     | MIFF  r     | PFB   r     | TTC   r
-  BMP   r     | FLIF  r/w   | MKA   r     | PFM   r     | TTF   r
-  BPG   r     | FLV   r     | MKS   r     | PGF   r     | TXT   r
-  BTF   r     | FPF   r     | MKV   r     | PGM   r/w   | VCF   r
-  CHM   r     | FPX   r     | MNG   r/w   | PLIST r     | VRD   r/w/c
-  COS   r     | GIF   r/w   | MOBI  r     | PICT  r     | VSD   r
-  CR2   r/w   | GPR   r/w   | MODD  r     | PMP   r     | WAV   r
-  CR3   r/w   | GZ    r     | MOI   r     | PNG   r/w   | WDP   r/w
-  CRM   r/w   | HDP   r/w   | MOS   r/w   | PPM   r/w   | WEBP  r
-  CRW   r/w   | HDR   r     | MOV   r/w   | PPT   r     | WEBM  r
-  CS1   r/w   | HEIC  r/w   | MP3   r     | PPTX  r     | WMA   r
+  3FR   r     | DR4   r/w/c | ITC   r     | ODP   r     | RIFF  r
+  3G2   r/w   | DSS   r     | J2C   r     | ODS   r     | RSRC  r
+  3GP   r/w   | DV    r     | JNG   r/w   | ODT   r     | RTF   r
+  A     r     | DVB   r/w   | JP2   r/w   | OFR   r     | RW2   r/w
+  AA    r     | DVR-MS r    | JPEG  r/w   | OGG   r     | RWL   r/w
+  AAE   r     | DYLIB r     | JSON  r     | OGV   r     | RWZ   r
+  AAX   r/w   | EIP   r     | K25   r     | OPUS  r     | RM    r
+  ACR   r     | EPS   r/w   | KDC   r     | ORF   r/w   | SEQ   r
+  AFM   r     | EPUB  r     | KEY   r     | OTF   r     | SKETCH r
+  AI    r/w   | ERF   r/w   | LA    r     | PAC   r     | SO    r
+  AIFF  r     | EXE   r     | LFP   r     | PAGES r     | SR2   r/w
+  APE   r     | EXIF  r/w/c | LNK   r     | PBM   r/w   | SRF   r
+  ARQ   r/w   | EXR   r     | LRV   r/w   | PCD   r     | SRW   r/w
+  ARW   r/w   | EXV   r/w/c | M2TS  r     | PCX   r     | SVG   r
+  ASF   r     | F4A/V r/w   | M4A/V r/w   | PDB   r     | SWF   r
+  AVI   r     | FFF   r/w   | MAX   r     | PDF   r/w   | THM   r/w
+  AVIF  r/w   | FITS  r     | MEF   r/w   | PEF   r/w   | TIFF  r/w
+  AZW   r     | FLA   r     | MIE   r/w/c | PFA   r     | TORRENT r
+  BMP   r     | FLAC  r     | MIFF  r     | PFB   r     | TTC   r
+  BPG   r     | FLIF  r/w   | MKA   r     | PFM   r     | TTF   r
+  BTF   r     | FLV   r     | MKS   r     | PGF   r     | TXT   r
+  CHM   r     | FPF   r     | MKV   r     | PGM   r/w   | VCF   r
+  COS   r     | FPX   r     | MNG   r/w   | PLIST r     | VRD   r/w/c
+  CR2   r/w   | GIF   r/w   | MOBI  r     | PICT  r     | VSD   r
+  CR3   r/w   | GPR   r/w   | MODD  r     | PMP   r     | WAV   r
+  CRM   r/w   | GZ    r     | MOI   r     | PNG   r/w   | WDP   r/w
+  CRW   r/w   | HDP   r/w   | MOS   r/w   | PPM   r/w   | WEBP  r
+  CS1   r/w   | HDR   r     | MOV   r/w   | PPT   r     | WEBM  r
+  CSV   r     | HEIC  r/w   | MP3   r     | PPTX  r     | WMA   r
   DCM   r     | HEIF  r/w   | MP4   r/w   | PS    r/w   | WMV   r
   DCP   r/w   | HTML  r     | MPC   r     | PSB   r/w   | WTV   r
   DCR   r     | ICC   r/w/c | MPG   r     | PSD   r/w   | WV    r
@@ -138,7 +139,6 @@
   DOC   r     | INSV  r     | NRW   r/w   | RAM   r     | ZIP   r
   DOCX  r     | INX   r     | NUMBERS r   | RAR   r     |
   DPX   r     | ISO   r     | O     r     | RAW   r/w   |
-  DR4   r/w/c | ITC   r     | ODP   r     | RIFF  r     |
 
   Meta Information
   ----------------------+----------------------+---------------------
@@ -162,7 +162,7 @@
 
 <p>Case is not significant for any command-line option (including tag and group names), except for single-character options when the corresponding upper-case option exists. Many single-character options have equivalent long-name versions (shown in brackets), and some options have inverses which are invoked with a leading double-dash. Unrecognized options are interpreted as tag names (for this reason, multiple single-character options may NOT be combined into one argument). Contrary to standard practice, options may appear after source file names on the exiftool command line.</p>
 
-<h2 id="Option-Summary">Option Summary</h2>
+<h2 id="Option-Overview">Option Overview</h2>
 
 <p><a href="#Tag-operations">Tag operations</a></p>
 
@@ -183,11 +183,11 @@
   -csv[[+]=CSVFILE]                Export/import tags in CSV format
   -d FMT      (-dateFormat)        Set format for date/time values
   -D          (-decimal)           Show tag ID numbers in decimal
-  -E, -ex     (-escape(HTML|XML))  Escape values for HTML (-E) or XML (-ex)
+  -E,-ex,-ec  (-escape(HTML|XML|C))Escape tag values for HTML, XML or C
   -f          (-forcePrint)        Force printing of all specified tags
   -g[NUM...]  (-groupHeadings)     Organize output by tag group
   -G[NUM...]  (-groupNames)        Print group name for each tag
-  -h          (-htmlFormat)        Use HMTL formatting for output
+  -h          (-htmlFormat)        Use HTML formatting for output
   -H          (-hex)               Show tag ID numbers in hexadecimal
   -htmlDump[OFFSET]                Generate HTML-format binary dump
   -j[[+]=JSONFILE] (-json)         Export/import tags in JSON format
@@ -214,7 +214,7 @@
 <p><a href="#Processing-control">Processing control</a></p>
 
 <pre><code>  -a          (-duplicates)        Allow duplicate tags to be extracted
-  -e          (--composite)        Do not calculate composite tags
+  -e          (--composite)        Do not generate composite tags
   -ee         (-extractEmbedded)   Extract information from embedded files
   -ext[+] EXT (-extension)         Process files with specified extension
   -F[OFFSET]  (-fixBase)           Fix the base for maker notes offsets
@@ -242,7 +242,8 @@
 <pre><code>  -@ ARGFILE                       Read command-line arguments from file
   -k          (-pause)             Pause before terminating
   -list[w|f|wf|g[NUM]|d|x]         List various exiftool capabilities
-  -ver                             Print exiftool version number</code></pre>
+  -ver                             Print exiftool version number
+  --                               End of options</code></pre>
 
 <p><a href="#Special-features">Special features</a></p>
 
@@ -261,6 +262,7 @@
   -common_args                     Define common arguments
   -config CFGFILE                  Specify configuration file name
   -echo[NUM] TEXT                  Echo text to stdout or stderr
+  -efile[NUM][!] ERRFILE           Save names of files with errors
   -execute[NUM]                    Execute multiple commands on one line
   -srcfile FMT                     Process a different source file
   -stay_open FLAG                  Keep reading -@ argfile even after EOF
@@ -456,6 +458,7 @@
     Thai        cp874            Windows Thai
     DOSLatinUS  cp437            DOS Latin US
     DOSLatin1   cp850            DOS Latin1
+    DOSCyrillic cp866            DOS Cyrillic
     MacRoman    cp10000, Roman   Macintosh Roman
     MacLatin2   cp10029          Macintosh Latin2 (Central Europe)
     MacCyrillic cp10007          Macintosh Cyrillic
@@ -520,10 +523,10 @@
 <p>Show tag ID number in decimal when extracting information.</p>
 
 </dd>
-<dt id="E--ex--escapeHTML--escapeXML"><b>-E</b>, <b>-ex</b> (<b>-escapeHTML</b>, <b>-escapeXML</b>)</dt>
+<dt id="E--ex--ec--escapeHTML--escapeXML--escapeC"><b>-E</b>, <b>-ex</b>, <b>-ec</b> (<b>-escapeHTML</b>, <b>-escapeXML</b>, <b>-escapeC</b>)</dt>
 <dd>
 
-<p>Escape characters in output values for HTML (<b>-E</b>) or XML (<b>-ex</b>). For HTML, all characters with Unicode code points above U+007F are escaped as well as the following 5 characters: &amp; (&amp;amp;) &#39; (&amp;#39;) &quot; (&amp;quot;) &gt; (&amp;gt;) and &lt; (&amp;lt;). For XML, only these 5 characters are escaped. The <b>-E</b> option is implied with <b>-h</b>, and <b>-ex</b> is implied with <b>-X</b>. The inverse conversion is applied when writing tags.</p>
+<p>Escape characters in output tag values for HTML (<b>-E</b>), XML (<b>-ex</b>) or C (<b>-ec</b>). For HTML, all characters with Unicode code points above U+007F are escaped as well as the following 5 characters: &amp; (&amp;amp;) &#39; (&amp;#39;) &quot; (&amp;quot;) &gt; (&amp;gt;) and &lt; (&amp;lt;). For XML, only these 5 characters are escaped. The <b>-E</b> option is implied with <b>-h</b>, and <b>-ex</b> is implied with <b>-X</b>. For C, all control characters and the backslash are escaped. The inverse conversion is applied when writing tags.</p>
 
 </dd>
 <dt id="f--forcePrint"><b>-f</b> (<b>-forcePrint</b>)</dt>
@@ -652,7 +655,7 @@
 <dt id="p-FMTFILE-or-STR--printFormat"><b>-p</b> <i>FMTFILE</i> or <i>STR</i> (<b>-printFormat</b>)</dt>
 <dd>
 
-<p>Print output in the format specified by the given file or string. The argument is interpreted as a string unless a file of that name exists, in which case the string is loaded from the contents of the file. Tag names in the format file or string begin with a <code>$</code> symbol and may contain a leading group names and/or a trailing <code>#</code>. Case is not significant. Braces <code>{}</code> may be used around the tag name to separate it from subsequent text. Use <code>$$</code> to represent a <code>$</code> symbol, and <code>$/</code> for a newline.</p>
+<p>Print output in the format specified by the given file or string. The argument is interpreted as a string unless a file of that name exists, in which case the string is loaded from the contents of the file. Tag names in the format file or string begin with a <code>$</code> symbol and may contain leading group names and/or a trailing <code>#</code> (to disable print conversion). Case is not significant. Braces <code>{}</code> may be used around the tag name to separate it from subsequent text. Use <code>$$</code> to represent a <code>$</code> symbol, and <code>$/</code> for a newline.</p>
 
 <p>Multiple <b>-p</b> options may be used, each contributing a line (or more) of text to the output. Lines beginning with <code>#[HEAD]</code> and <code>#[TAIL]</code> are output before the first processed file and after the last processed file respectively. Lines beginning with <code>#[SECT]</code> and <code>#[ENDS]</code> are output before and after each section of files. A section is defined as a group of consecutive files with the same section header (eg. files are grouped by directory if <code>#[SECT]</code> contains <code>$directory</code>). Lines beginning with <code>#[BODY]</code> and lines not beginning with <code>#</code> are output for each processed file. Lines beginning with <code>#[IF]</code> are not output, but all BODY lines are skipped if any tag on an IF line doesn&#39;t exist. Other lines beginning with <code>#</code> are ignored. For example, this format file:</p>
 
@@ -668,7 +671,7 @@
 
 <p>produces output like this:</p>
 
-<pre><code>    -- Generated by ExifTool 11.85 --
+<pre><code>    -- Generated by ExifTool 12.00 --
     File: a.jpg - 2003:10:31 15:44:19
     (f/5.6, 1/60s, ISO 100)
     File: b.jpg - 2006:05:23 11:57:38
@@ -886,7 +889,7 @@
 <dt id="e---composite"><b>-e</b> (<b>--composite</b>)</dt>
 <dd>
 
-<p>Extract existing tags only -- don&#39;t calculate composite tags.</p>
+<p>Extract existing tags only -- don&#39;t generate composite tags.</p>
 
 </dd>
 <dt id="ee--extractEmbedded"><b>-ee</b> (<b>-extractEmbedded</b>)</dt>
@@ -965,6 +968,11 @@
 
 <p>Adding <i>NUM</i> to the <b>-if</b> option causes a separate processing pass to be executed for evaluating <i>EXPR</i> at a <b>-fast</b> level given by <i>NUM</i> (see the <b>-fast</b> option documentation for details). Without <i>NUM</i>, only one processing pass is done at the level specified by the <b>-fast</b> option. For example, using <b>-if4</b> is possible if <i>EXPR</i> uses only pseudo System tags, and may significantly speed processing if enough files fail the condition.</p>
 
+<p>The expression has access to the current ExifTool object through <code>$self</code>, and the following special functions are available to allow short-circuiting of the file processing. Both functions have a return value of 1. Case is significant for function names.</p>
+
+<pre><code>    End()    - end processing after this file
+    EndDir() - end processing of files in this directory</code></pre>
+
 <p>Notes:</p>
 
 <p>1) The <b>-n</b> and <b>-b</b> options also apply to tags used in <i>EXPR</i>.</p>
@@ -1016,11 +1024,13 @@
 
 <p>Similar to <b>-overwrite_original</b> except that an extra step is added to allow the original file attributes to be preserved. For example, on a Mac this causes the original file creation date, type, creator, label color, icon, Finder tags, other extended attributes and hard links to the file to be preserved (but note that the Mac OS resource fork is always preserved unless specifically deleted with <code>-rsrc:all=</code>). This is implemented by opening the original file in update mode and replacing its data with a copy of a temporary file before deleting the temporary. The extra step results in slower performance, so the <b>-overwrite_original</b> option should be used instead unless necessary.</p>
 
+<p>Note that this option reverts to the behaviour of the <b>-overwrite_original</b> option when also writing the FileName and/or Directory tags.</p>
+
 </dd>
 <dt id="P--preserve"><b>-P</b> (<b>-preserve</b>)</dt>
 <dd>
 
-<p>Preserve the filesystem modification date/time (<code>FileModifyDate</code>) of the original file when writing. Note that some filesystems store a creation date (Windows <code>FileCreateDate</code> or Mac <code>MDItemFSCreationDate</code>) which is not affected by this option. The creation date is preserved on Windows systems where Win32API::File and Win32::API are available regardless of this setting. For other systems, the <b>-overwrite_original_in_place</b> option may be used if necessary to preserve the creation date. This option is superseded by any value written to the FileModifyDate tag.</p>
+<p>Preserve the filesystem modification date/time (<code>FileModifyDate</code>) of the original file when writing. Note that some filesystems store a creation date (ie. <code>FileCreateDate</code> on Windows and Mac systems) which is not affected by this option. This creation date is preserved on Windows systems where Win32API::File and Win32::API are available regardless of this setting. For other systems, the <b>-overwrite_original_in_place</b> option may be used if necessary to preserve the creation date. The <b>-P</b> option is superseded by any value written to the FileModifyDate tag.</p>
 
 </dd>
 <dt id="password-PASSWD"><b>-password</b> <i>PASSWD</i></dt>
@@ -1141,6 +1151,12 @@
 <p>Print exiftool version number. The <b>-v</b> option may be added to print addition system information (see the README file of the full distribution for more details about optional libraries), or <b>-v2</b> to also list the Perl include directories.</p>
 
 </dd>
+<dt id="pod"><b>--</b></dt>
+<dd>
+
+<p>Indicates the end of options. Any remaining arguments are treated as file names, even if they begin with a dash (<code>-</code>).</p>
+
+</dd>
 </dl>
 
 <h3 id="Special-features">Special features</h3>
@@ -1246,6 +1262,12 @@
 <p>Echo <i>TEXT</i> to stdout (<b>-echo</b> or <b>-echo1</b>) or stderr (<b>-echo2</b>). Text is output as the command line is parsed, before the processing of any input files. <i>NUM</i> may also be 3 or 4 to output text (to stdout or stderr respectively) after processing is complete.</p>
 
 </dd>
+<dt id="efile-NUM-ERRFILE"><b>-efile</b>[<i>NUM</i>][!] <i>ERRFILE</i></dt>
+<dd>
+
+<p>Save the names of files giving errors (<i>NUM</i> missing or 1), files that were unchanged (<i>NUM</i> is 2), files that fail the <b>-if</b> condition (<i>NUM</i> is 4), or any combination thereof (by summing <i>NUM</i>, eg. <b>-efile3</b> is the same has having both <b>-efile</b> and <b>-efile2</b> options with the same <i>ERRFILE</i>). By default, file names are appended to any existing <i>ERRFILE</i>, but <i>ERRFILE</i> is overwritten if an exclamation point is added to the option (eg. <b>-efile!</b>). Saves the name of the file specified by the <b>-srcfile</b> option if applicable.</p>
+
+</dd>
 <dt id="execute-NUM"><b>-execute</b>[<i>NUM</i>]</dt>
 <dd>
 
@@ -1264,6 +1286,8 @@
 <p>If more than one <b>-srcfile</b> option is specified, the files are tested in order and the first existing source file is processed. If none of the source files already exist, then exiftool uses the first <b>-srcfile</b> specified.</p>
 
 <p>A <i>FMT</i> of <code>@</code> may be used to represent the original <i>FILE</i>, which may be useful when specifying multiple <b>-srcfile</b> options (eg. to fall back to processing the original <i>FILE</i> if no sidecar exists).</p>
+
+<p>When this option is used, two special UserParam tags (OriginalFileName and OriginalDirectory) are generated to allow access to the original <i>FILE</i> name and directory.</p>
 
 </dd>
 <dt id="stay_open-FLAG"><b>-stay_open</b> <i>FLAG</i></dt>
@@ -1296,7 +1320,7 @@
 <dt id="userParam-PARAM-VAL"><b>-userParam</b> <i>PARAM[[^]=[VAL]]</i></dt>
 <dd>
 
-<p>Set user parameter. <i>PARAM</i> is an arbitrary user parameter name. This is an interface to the API UserParam option (see the <a>Image::ExifTool Options</a> documentation), and provides a method to access user-defined parameters from inside tag name expressions (as if it were any other tag, see example below), and from PrintConv/ValueConv logic (via the ExifTool Options function). Similar to the <b>-api</b> option, the parameter value is set to 1 if <i>=VAL</i> is omitted, undef if just <i>VAL</i> is omitted with <code>=</code>, or an empty string if <i>VAL</i> is omitted with <code>^=</code>.</p>
+<p>Set user parameter. <i>PARAM</i> is an arbitrary user parameter name. This is an interface to the API UserParam option (see the <a>Image::ExifTool Options</a> documentation), and provides a method to access user-defined parameters in arguments to the <b>-if</b> and <b>-p</b> options as if they were any other tag. Appending a hash tag (<code>#</code>) to <i>PARAM</i> also causes the parameter to be extracted as a normal tag (in the UserParam group). Similar to the <b>-api</b> option, the parameter value is set to 1 if <i>=VAL</i> is omitted, undef if just <i>VAL</i> is omitted with <code>=</code>, or an empty string if <i>VAL</i> is omitted with <code>^=</code>.</p>
 
 <pre><code>    exiftool -p &#39;$test from $filename&#39; -userparam test=Hello FILE</code></pre>
 
@@ -1374,6 +1398,10 @@
 <p>2) When writing only pseudo System tags (eg. FileModifyDate).</p>
 
 <p>3) On Windows if the file has Unicode characters in its name, and a) the <b>-overwrite_original</b> option is used, or b) the <code>_original</code> backup already exists.</p>
+
+<p>Hidden files in Windows behave as read-only files when attempting to write any real tags to the file -- an error is generated when using the <b>-overwrite_original_in_place</b>, otherwise writing should be successful and the hidden attribute will be removed. But the <b>-if</b> option may be used to avoid processing hidden files (provided Win32API::File is available):</p>
+
+<pre><code>    exiftool -if &quot;$fileattributes !~ /Hidden/&quot; ...</code></pre>
 
 <h1 id="READING-EXAMPLES">READING EXAMPLES</h1>
 

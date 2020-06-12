@@ -1,5 +1,19 @@
 # Changelog
 
+## 6.13.7
+- Improve deprecation warnings for the upcoming major release
+
+## 6.13.6
+- Fix a regression introduced in 6.13.5 that broken RatesStore::Memory subclasses
+
+## 6.13.5
+- Raise warning on using Money.default_currency
+- Raise warning on using default Money.rounding_mode
+- Add Second Ouguiya MRU 929 to currency iso file
+- Add symbol for UZS
+- Use monitor for recursive mutual exclusion in RatesStore::Memory
+- Allow passing store as a string to Money::Bank::VariableExchange (to support Rails 6)
+
 ## 6.13.4
 - Update currency config for Zambian Kwacha (ZMW)
 - Do not modify options passed to FormattingRules
@@ -46,7 +60,7 @@
 - Wrap all amount parts when `:html_wrap` option is used
 - Deprecate `#currency_as_string` and `#currency_as_string=` (in favour of `#with_currency`)
 - Add `#with_currency` for swapping the currency
-- Rewrite allocate/split (fixing some penny loosing issues)
+- Rewrite allocate/split (fixing some penny losing issues)
 
 ## 6.11.3
 - Fix regression: if enabled use i18n locales in Money#to_s
@@ -65,7 +79,7 @@
 - Added new symbol for bitcoin denomination
 - Specify custom rounding precision when using `infinite_precision`
 - Allow splits with sums greater than 1
-- Prevent arithmetic methods from loosing reference to the bank
+- Prevent arithmetic methods from losing reference to the bank
 - Fix coerced zero numeric subtraction
 - Fix south asian formatting to support whole numbers
 - Refactor formatting logic

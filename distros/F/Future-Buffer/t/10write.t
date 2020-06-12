@@ -14,8 +14,8 @@ my $buf = Future::Buffer->new;
    $buf->write( "abcd" );
    $buf->write( "efgh" );
 
-   is( $buf->read( 8192 )->get, "abcdefgh",
-      '->read after two ->writes' );
+   is( $buf->read_atmost( 8192 )->get, "abcdefgh",
+      '->read_atmost after two ->writes' );
 }
 
 done_testing;

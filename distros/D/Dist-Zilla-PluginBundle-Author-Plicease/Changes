@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.48      2020-06-12 07:53:34 -0600
+  - Bump default minimum perl to 5.8.4
+  - Fixed bug where My package could be unintentionally claimed
+
 2.47      2020-04-29 09:58:39 -0600
   - Silence redefine warning.
   - Fix travis-ci status button in README.md

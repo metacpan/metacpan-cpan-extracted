@@ -28,7 +28,7 @@ use strict;
 use vars qw($VERSION $AUTOLOAD $iptcDigestInfo);
 use Image::ExifTool qw(:DataAccess :Utils);
 
-$VERSION = '1.64';
+$VERSION = '1.65';
 
 sub ProcessPhotoshop($$$);
 sub WritePhotoshop($$$);
@@ -545,7 +545,7 @@ my %unicodeString = (
         PrintConv => 'sprintf("%d%%",$val)',
     },
     # tags extracted from additional layer information (tag ID's are real)
-    # - must be able to accomodate a blank entry to preserve the list ordering
+    # - must be able to accommodate a blank entry to preserve the list ordering
     luni => {
         Name => 'LayerUnicodeNames',
         List => 1,
@@ -982,6 +982,7 @@ sub ProcessPhotoshop($$$)
             DataPos => $$dirInfo{DataPos},
             Size    => $size,
             Start   => $pos,
+            Base    => $$dirInfo{Base},
             Parent  => $$dirInfo{DirName},
         );
         $size += 1 if $size & 0x01; # size is padded to an even # bytes

@@ -11,7 +11,7 @@
 #               4) Jaroslav Stepanek via rt.cpan.org
 #               5) Nick Livchits private communication
 #               6) Sreerag Raghavan private communication (SM-C200)
-#               IB) Iliah Borg private communcation (LibRaw)
+#               IB) Iliah Borg private communication (LibRaw)
 #               NJ) Niels Kristian Bech Jensen private communication
 #------------------------------------------------------------------------------
 
@@ -960,6 +960,8 @@ my %formatMinMax = (
    # 0x08e0-name - seen 'Panorama_Shot_Info'
    # 0x08e0 - string, seen 'PanoramaShot'
    # 0x08e1-name - seen 'Motion_Panorama_Info'
+   # 0x0910-name - seen 'Front_Cam_Selfie_Info'
+   # 0x0910 - string, seen 'Front_Cam_Selfie_Info'
    # 0x09e0-name - seen 'Burst_Shot_Info'
    # 0x09e0 - string, seen '489489125'
    # 0x0a01-name - seen 'Image_UTC_Data'
@@ -974,7 +976,7 @@ my %formatMinMax = (
     '0x0a30-name' => 'EmbeddedVideoType', # ("MotionPhoto_Data")
     '0x0a30' => { Name => 'EmbeddedVideoFile', Groups => { 2 => 'Video' }, Binary => 1 }, #forum7161
    # 0x0aa1-name - seen 'MCC_Data'
-   # 0x0aa1 - seen '234','222'
+   # 0x0aa1 - seen '234','222','429'
    # 0x0ab0-name - seen 'DualShot_Meta_Info'
     '0x0ab1-name' => 'DepthMapName', # seen 'DualShot_DepthMap_1' (SM-N950U)
     '0x0ab1' => { Name => 'DepthMapData', Binary => 1 },

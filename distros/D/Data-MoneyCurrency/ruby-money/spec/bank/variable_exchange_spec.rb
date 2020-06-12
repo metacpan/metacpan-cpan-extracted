@@ -20,10 +20,14 @@ describe Money::Bank::VariableExchange do
       describe 'custom store' do
         let(:custom_store) { Object.new }
 
-        let(:bank) { described_class.new(custom_store) }
-
         it 'sets #store to be custom store' do
+          bank = described_class.new(custom_store)
           expect(bank.store).to eql(custom_store)
+        end
+
+        it 'allows passing custom store as a string' do
+          bank = described_class.new('Object')
+          expect(bank.store).to eql(Object)
         end
       end
 
@@ -74,7 +78,7 @@ describe Money::Bank::VariableExchange do
           expect(bank.exchange_with(special_money_class.new(100, 'USD'), 'EUR')).to be_a special_money_class
         end
 
-        it "doesn't loose precision when handling larger amounts" do
+        it "doesn't lose precision when handling larger amounts" do
           expect(bank.exchange_with(Money.new(100_000_000_000_000_01, 'USD'), 'EUR')).to eq Money.new(133_000_000_000_000_01, 'EUR')
         end
       end
@@ -149,7 +153,7 @@ describe Money::Bank::VariableExchange do
 
     it "delegates options to store, options are a no-op" do
       expect(subject.store).to receive(:get_rate).with('USD', 'EUR')
-      subject.get_rate('USD', 'EUR', without_mutex: true)
+      subject.get_rate('USD', 'EUR')
     end
   end
 
@@ -215,11 +219,23 @@ describe Money::Bank::VariableExchange do
     end
 
     context "with format == :ruby" do
+      let(:dump) { Marshal.dump({ "USD_TO_EUR" => 1.25, "USD_TO_JPY" => 2.55 }) }
+
       it "loads the rates provided" do
-        s = Marshal.dump({"USD_TO_EUR"=>1.25,"USD_TO_JPY"=>2.55})
-        subject.import_rates(:ruby, s)
+        subject.import_rates(:ruby, dump)
+
         expect(subject.get_rate('USD', 'EUR')).to eq 1.25
         expect(subject.get_rate('USD', 'JPY')).to eq 2.55
+      end
+
+      it "prints a warning" do
+        allow(subject).to receive(:warn)
+
+        subject.import_rates(:ruby, dump)
+
+        expect(subject)
+          .to have_received(:warn)
+          .with(include('[WARNING] Using :ruby format when importing rates is potentially unsafe'))
       end
     end
 

@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.43 2020-06-12
+
+ - Fix bug in handling xindy failure
+
 1.42 2020-06-01
 
  - Remove special case for macedonian (expecting recent texlive for

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Text::Table::Tiny + support for colored text",
+   "abstract" : "Text::Table::Tiny + support for border styles",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Text-Table-TinyBorderStyle"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

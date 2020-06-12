@@ -7,10 +7,10 @@ use warnings;
 use Test::More;
 use Devel::Peek;
 
-if ($] < '5.009') {
+if ("$]" < '5.009') {
     plan skip_all => "Tests with PadWalker do not pass on 5.8.x - patches welcome";
 }
-if (!eval "require PadWalker; 1") {
+if (!eval { require PadWalker; 1 }) {
     plan skip_all => "No PadWalker installed";
 }
 

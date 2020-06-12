@@ -38,7 +38,7 @@
    "provides" : {
       "Test::MockModule" : {
          "file" : "lib/Test/MockModule.pm",
-         "version" : "v0.172.0"
+         "version" : "v0.173.0"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "git://github.com/geofffranks/test-mockmodule.git"
       }
    },
-   "version" : "v0.172.0",
+   "version" : "v0.173.0",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

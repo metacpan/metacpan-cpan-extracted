@@ -1,5 +1,5 @@
 ---
-abstract: 'Text::Table::Tiny + support for colored text'
+abstract: 'Text::Table::Tiny + support for border styles'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Table-TinyBorderStyle
   homepage: https://metacpan.org/release/Text-Table-TinyBorderStyle
   repository: git://github.com/perlancar/perl-Text-Table-TinyBorderStyle.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

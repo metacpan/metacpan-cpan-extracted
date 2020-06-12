@@ -1,12 +1,16 @@
 package Sah::Schema::dataquota;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-DataSizeSpeed'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.009'; # VERSION
+
+use Sah::Schema::dataspeed;
 
 our $schema = ['dataspeed' => {
     summary => 'Data transfer quota',
+
+    examples => $Sah::Schema::dataspeed::schema->[1]{examples},
 }, {}];
 
 1;
@@ -25,7 +29,7 @@ Sah::Schema::dataquota - Data transfer quota
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::dataquota (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-03.
+This document describes version 0.009 of Sah::Schema::dataquota (from Perl distribution Sah-Schemas-DataSizeSpeed), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -39,7 +43,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;
@@ -58,6 +62,20 @@ Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+
+Sample data:
+
+ "1000kbps"  # valid, becomes 128000
+
+ "2.5 mbit"  # valid, becomes 327680
+
+ "128KB/s"  # valid, becomes 131072
+
+ "128K/s"  # valid, becomes 131072
+
+ "128K"  # valid, becomes 131072
+
+ "1zzz"  # INVALID
 
 =head1 DESCRIPTION
 
