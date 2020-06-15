@@ -21,10 +21,10 @@ SKIP: {
     local $STDOUT = new IO::Pager *BOB, ':utf8', 'IO::Pager::Buffered';
 
 
-    printf BOB "Unicode Z-inverted carat: \x{17D}\n"; #Ž
-    printf BOB "Unicode Copyright < Copyleft: \x{A9} < \x{2184}\x{20DD}\n"; #© < ↄ⃝
-    printf BOB "Unicode camel: \x{1f42a}\n", $_; #	🐪 
-    printf BOB "\nEnd of text, try pressing 'Q' to exit.\n";
+    print BOB "Unicode Z-inverted carat: \x{17D}\n"; #Ž
+    print BOB "Unicode Copyright < Copyleft: \x{A9} < \x{2184}\x{20DD}\n"; #© < ↄ⃝
+    print BOB "Unicode camel: \x{1f42a}\n"; #	🐪 
+    print BOB "\nEnd of text, try pressing 'Q' to exit.\n";
     close BOB;
   };
 

@@ -15,9 +15,13 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-OperaUtils",
   "EXE_FILES" => [
     "script/kill-opera",
+    "script/opera-has-processes",
     "script/opera-is-paused",
+    "script/opera-is-running",
     "script/pause-opera",
     "script/ps-opera",
+    "script/restart-opera",
+    "script/start-opera",
     "script/terminate-opera",
     "script/unpause-opera"
   ],
@@ -25,10 +29,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::OperaUtils",
   "PREREQ_PM" => {
-    "App::BrowserUtils" => "0.002",
+    "App::BrowserUtils" => "0.008",
+    "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+    "Data::Sah::Compiler::perl::TH::any" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
+    "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Unix::check_uid_exists" => 0,
     "Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid" => 0,
     "Log::ger" => "0.037",
@@ -45,7 +52,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,10 +60,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::BrowserUtils" => "0.002",
+  "App::BrowserUtils" => "0.008",
+  "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+  "Data::Sah::Compiler::perl::TH::any" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
+  "Data::Sah::Compiler::perl::TH::str" => 0,
   "Data::Sah::Filter::perl::Unix::check_uid_exists" => 0,
   "Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid" => 0,
   "File::Spec" => 0,

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/OperaUtils.pm'
@@ -14,9 +14,13 @@ my @module_files = (
 
 my @scripts = (
     'script/kill-opera',
+    'script/opera-has-processes',
     'script/opera-is-paused',
+    'script/opera-is-running',
     'script/pause-opera',
     'script/ps-opera',
+    'script/restart-opera',
+    'script/start-opera',
     'script/terminate-opera',
     'script/unpause-opera'
 );

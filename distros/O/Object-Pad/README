@@ -10,7 +10,7 @@ SYNOPSIS
           has $x = 0;
           has $y = 0;
     
-          method BUILD {
+          BUILD {
             ($x, $y) = @_;
           }
     
@@ -39,21 +39,18 @@ DESCRIPTION
     Classes are automatically provided with a constructor method, called
     new, which helps create the object instances.
 
-    By default, this constructor will invoke the BUILD method of every
-    component class, passing the list of arguments the constructor was
-    invoked with. Each class should perform its required setup behaviour in
-    a method called BUILD, but does not need to chain to the SUPER class
-    first; this is handled automatically.
-
-       $self->BUILD( @_ )  # for each component class
+    As part of the construction process, the BUILD block of every component
+    class will be invoked, passing in the list of arguments the constructor
+    was invoked with. Each class should perform its required setup
+    behaviour, but does not need to chain to the SUPER class first; this is
+    handled automatically.
 
     If the class provides a BUILDARGS class method, that is used to mangle
-    the list of arguments before the BUILD methods are called. Note this
+    the list of arguments before the BUILD blocks are called. Note this
     must be a class method not an instance method (and so implemented using
     sub). It should perform any SUPER chaining as may be required.
 
        @args = $class->BUILDARGS( @_ )
-       $self->BUILD( @args )  # for each component class
 
 KEYWORDS
 
@@ -87,7 +84,7 @@ KEYWORDS
           ...
        }
     
-       class Name extends BASECLASS VERSION {
+       class Name extends BASECLASS BASEVER {
           ...
        }
 
@@ -99,9 +96,9 @@ KEYWORDS
     and thus it must either already exist, or be locatable via the usual
     @INC mechanisms.
 
-    The superclass must either be implemented by Object::Pad, or be some
-    class whose instances are blessed hash references. For more detail on
-    this latter case see "SUBCLASSING CLASSIC PERL CLASSES".
+    The superclass may or may not itself be implemented by Object::Pad, but
+    if it is not then see "SUBCLASSING CLASSIC PERL CLASSES" for further
+    detail on the semantics of how this operates.
 
     An optional version check can also be supplied; it performs the
     equivalent of
@@ -173,6 +170,8 @@ KEYWORDS
        has $var = CONST;
        has @var;
        has %var;
+    
+       has $var :ATTR ATTR...;
 
     Declares that the instances of the class have a member field of the
     given name. This member field (called a "slot") will be accessible as a
@@ -187,10 +186,48 @@ KEYWORDS
 
     A scalar slot may provide a expression that gives an initialisation
     value, which will be assigned into the slot of every instance during
-    the constructor before the BUILD methods are invoked. For
+    the constructor before the BUILD blocks are invoked. For
     ease-of-implementation reasons this expression must currently be a
     compiletime constant, but it is hoped that a future version will relax
     this restriction and allow runtime-computed values.
+
+    The following slot attributes are supported:
+
+  :reader, :reader(NAME)
+
+    Generates a reader method to return the current value of the slot.
+    Currently these are only permitted for scalar slots. If no name is
+    given, the name of the slot is used. A single prefix character _ will
+    be removed if present.
+
+       has $slot :reader;
+    
+       # equivalent to
+       has $slot;  method slot { return $slot }
+
+  :writer, :writer(NAME)
+
+    Generates a writer method to set a new value of the slot from its first
+    argument. Currently these are only permitted for scalar slots. If no
+    name is given, the name of the slot is used prefixed by set_. A single
+    prefix character _ will be removed if present.
+
+       has $slot :writer;
+    
+       # equivalent to
+       has $slot;  method set_slot { $slot = shift }
+
+  :mutator, :mutator(NAME)
+
+    Generates an lvalue mutator method to return or set the value of the
+    slot. These are only permitted for scalar slots. If no name is given,
+    the name of the slot is used. A single prefix character _ will be
+    removed if present.
+
+       has $slot :mutator;
+    
+       # equivalent to
+       has $slot;  method slot :lvalue { $slot }
 
  method
 
@@ -225,7 +262,7 @@ KEYWORDS
 
     A list of attributes may be supplied as for sub. The most useful of
     these is :lvalue, allowing easy creation of read-write accessors for
-    slots.
+    slots (but see also the :reader, :writer and :mutator slot attributes).
 
        class Counter {
           has $count;
@@ -239,6 +276,24 @@ KEYWORDS
     Every method automatically gets the :method attribute applied, which
     suppresses warnings about ambiguous calls resolved to core functions if
     the name of a method matches a core function.
+
+ BUILD
+
+       BUILD {
+          ...
+       }
+    
+       BUILD (SIGNATURE) {
+          ...
+       }
+
+    Declares the builder block for this component class. A builder block
+    may use subroutine signature syntax, as for methods, to assist in
+    unpacking its arguments.
+
+    Currently this is just a synonym for method BUILD ..., though in a
+    later version this may no longer be the case. A build block is not
+    permitted to use subroutine attributes.
 
 IMPLIED PRAGMATA
 
@@ -281,7 +336,7 @@ SUBCLASSING CLASSIC PERL CLASSES
     not see the object in a fully consistent state. (This fact is not
     specific to using Object::Pad and would happen in classic Perl OO as
     well). The slot initialisers will have been invoked but the BUILD
-    methods will not.
+    blocks will not.
 
     For example; in the following
 
@@ -296,7 +351,7 @@ SUBCLASSING CLASSIC PERL CLASSES
     
        class DerivedClass extends ClassicPerlBaseClass {
           has $_value = "B";
-          method BUILD {
+          BUILD {
              $_value = "C";
           }
           method get_value { return $_value }
@@ -306,9 +361,9 @@ SUBCLASSING CLASSIC PERL CLASSES
        say "Value seen by user is ", $obj->get_value;
 
     Until the ClassicPerlBaseClass::new superconstructor has returned the
-    BUILD method will not have been invoked. The $_value slot will still
+    BUILD block will not have been invoked. The $_value slot will still
     exist, but its value will be B during the superconstructor. After the
-    superconstructor, the BUILD methods are invoked before the completed
+    superconstructor, the BUILD blocks are invoked before the completed
     object is returned to the user. The result will therefore be:
 
        Value seen by superconstructor is B
@@ -320,19 +375,41 @@ STYLE SUGGESTIONS
     should be noted in order to establish a set of best practices, and
     encourage consistency of code which uses this module.
 
+ $VERSION declaration
+
+    While it would be nice for CPAN and other toolchain modules to parse
+    the embedded version declarations in class statements, the current
+    state at time of writing (June 2020) is that none of them actually do.
+    As such, it will still be necessary to make a once-per-file $VERSION
+    declaration in syntax those modules can parse.
+
+    Further note that these modules will also not parse the class
+    declaration, so you will have to duplicate this with a package
+    declaration as well as a class keyword. This does involve repeating the
+    package name, so is slightly undesirable.
+
+    It is hoped that eventually upstream toolchain modules will be adapted
+    to accept the class syntax as being sufficient to declare a package and
+    set its version.
+
+    See also
+
+      * https://github.com/Perl-Toolchain-Gang/Module-Metadata/issues/33
+
  File Layout
 
     Begin the file with a use Object::Pad line; ideally including a
-    minimum-required version. This should be followed by the toplevel class
-    declaration for the file. As it is at toplevel there is no need to use
-    the block notation; it can be a unit class.
+    minimum-required version. This should be followed by the toplevel
+    package and class declarations for the file. As it is at toplevel there
+    is no need to use the block notation; it can be a unit class.
 
     There is no need to use strict or apply other usual pragmata; these
     will be implied by the class keyword.
 
        use Object::Pad 0.16;
     
-       class My::Classname 1.23;
+       package My::Classname 1.23;
+       class My::Classname;
     
        # other use statements
     
@@ -345,8 +422,8 @@ STYLE SUGGESTIONS
     examples such as "dumb record" structures this may be sufficient.
 
        class Tag {
-          has $name;  method name  :lvalue { $name }
-          has $value; method value :lvalue { $value }
+          has $name  :mutator;
+          has $value :mutator;
        }
 
     In larger examples with lots of non-trivial method bodies, it can get
@@ -440,8 +517,6 @@ IMPLEMENTATION TODOs
       Non-constant default expressions
 
          has $var = EXPR;
-
-      A way to request generated accessors - ro or rw.
 
       * Work out why no indirect doesn't appear to work properly before
       perl 5.20.

@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.28';
 
 use Carp;
 
@@ -36,7 +36,7 @@ C<Object::Pad> - a simple syntax for lexical slot-based objects
       has $x = 0;
       has $y = 0;
 
-      method BUILD {
+      BUILD {
         ($x, $y) = @_;
       }
 
@@ -65,21 +65,17 @@ private variables that look like lexicals as object member fields.
 Classes are automatically provided with a constructor method, called C<new>,
 which helps create the object instances.
 
-By default, this constructor will invoke the C<BUILD> method of every
-component class, passing the list of arguments the constructor was invoked
-with. Each class should perform its required setup behaviour in a method
-called C<BUILD>, but does not need to chain to the C<SUPER> class first;
-this is handled automatically.
-
-   $self->BUILD( @_ )  # for each component class
+As part of the construction process, the C<BUILD> block of every component
+class will be invoked, passing in the list of arguments the constructor was
+invoked with. Each class should perform its required setup behaviour, but does
+not need to chain to the C<SUPER> class first; this is handled automatically.
 
 If the class provides a C<BUILDARGS> class method, that is used to mangle the
-list of arguments before the C<BUILD> methods are called. Note this must be a
+list of arguments before the C<BUILD> blocks are called. Note this must be a
 class method not an instance method (and so implemented using C<sub>). It
 should perform any C<SUPER> chaining as may be required.
 
    @args = $class->BUILDARGS( @_ )
-   $self->BUILD( @args )  # for each component class
 
 =head1 KEYWORDS
 
@@ -113,7 +109,7 @@ A single superclass is supported by the keyword C<extends>
       ...
    }
 
-   class Name extends BASECLASS VERSION {
+   class Name extends BASECLASS BASEVER {
       ...
    }
 
@@ -125,9 +121,9 @@ load it by code equivalent to
 and thus it must either already exist, or be locatable via the usual C<@INC>
 mechanisms.
 
-The superclass must either be implemented by C<Object::Pad>, or be some class
-whose instances are blessed hash references. For more detail on this latter
-case see L<SUBCLASSING CLASSIC PERL CLASSES>.
+The superclass may or may not itself be implemented by C<Object::Pad>, but if
+it is not then see L<SUBCLASSING CLASSIC PERL CLASSES> for further detail on
+the semantics of how this operates.
 
 An optional version check can also be supplied; it performs the equivalent of
 
@@ -196,6 +192,8 @@ default representation type, and does not have to be specifically requested.
    has @var;
    has %var;
 
+   has $var :ATTR ATTR...;
+
 Declares that the instances of the class have a member field of the given
 name. This member field (called a "slot") will be accessible as a lexical
 variable within any C<method> declarations in the class.
@@ -209,10 +207,46 @@ to use L</method> to create an accessor.
 
 A scalar slot may provide a expression that gives an initialisation value,
 which will be assigned into the slot of every instance during the constructor
-before the C<BUILD> methods are invoked. For ease-of-implementation reasons
+before the C<BUILD> blocks are invoked. For ease-of-implementation reasons
 this expression must currently be a compiletime constant, but it is hoped that
 a future version will relax this restriction and allow runtime-computed
 values.
+
+The following slot attributes are supported:
+
+=head3 :reader, :reader(NAME)
+
+Generates a reader method to return the current value of the slot. Currently
+these are only permitted for scalar slots. If no name is given, the name of
+the slot is used. A single prefix character C<_> will be removed if present.
+
+   has $slot :reader;
+
+   # equivalent to
+   has $slot;  method slot { return $slot }
+
+=head3 :writer, :writer(NAME)
+
+Generates a writer method to set a new value of the slot from its first
+argument. Currently these are only permitted for scalar slots. If no name is
+given, the name of the slot is used prefixed by C<set_>. A single prefix
+character C<_> will be removed if present.
+
+   has $slot :writer;
+
+   # equivalent to
+   has $slot;  method set_slot { $slot = shift }
+
+=head3 :mutator, :mutator(NAME)
+
+Generates an lvalue mutator method to return or set the value of the slot.
+These are only permitted for scalar slots. If no name is given, the name of
+the slot is used. A single prefix character C<_> will be removed if present.
+
+   has $slot :mutator;
+
+   # equivalent to
+   has $slot;  method slot :lvalue { $slot }
 
 =head2 method
 
@@ -246,7 +280,8 @@ that is handled directly.
    $obj->m(1, 2);
 
 A list of attributes may be supplied as for C<sub>. The most useful of these
-is C<:lvalue>, allowing easy creation of read-write accessors for slots.
+is C<:lvalue>, allowing easy creation of read-write accessors for slots (but
+see also the C<:reader>, C<:writer> and C<:mutator> slot attributes).
 
    class Counter {
       has $count;
@@ -260,6 +295,24 @@ is C<:lvalue>, allowing easy creation of read-write accessors for slots.
 Every method automatically gets the C<:method> attribute applied, which
 suppresses warnings about ambiguous calls resolved to core functions if the
 name of a method matches a core function.
+
+=head2 BUILD
+
+   BUILD {
+      ...
+   }
+
+   BUILD (SIGNATURE) {
+      ...
+   }
+
+Declares the builder block for this component class. A builder block may use
+subroutine signature syntax, as for methods, to assist in unpacking its
+arguments.
+
+Currently this is just a synonym for C<method BUILD ...>, though in a later
+version this may no longer be the case. A build block is not permitted to use
+subroutine attributes.
 
 =head1 IMPLIED PRAGMATA
 
@@ -299,7 +352,7 @@ the constructor. This is supported here since C<Object::Pad> version 0.19.
 Note however that any methods invoked by the superclass constructor may not
 see the object in a fully consistent state. (This fact is not specific to
 using C<Object::Pad> and would happen in classic Perl OO as well). The slot
-initialisers will have been invoked but the C<BUILD> methods will not.
+initialisers will have been invoked but the C<BUILD> blocks will not.
 
 For example; in the following
 
@@ -314,7 +367,7 @@ For example; in the following
 
    class DerivedClass extends ClassicPerlBaseClass {
       has $_value = "B";
-      method BUILD {
+      BUILD {
          $_value = "C";
       }
       method get_value { return $_value }
@@ -324,9 +377,9 @@ For example; in the following
    say "Value seen by user is ", $obj->get_value;
 
 Until the C<ClassicPerlBaseClass::new> superconstructor has returned the
-C<BUILD> method will not have been invoked. The C<$_value> slot will still
+C<BUILD> block will not have been invoked. The C<$_value> slot will still
 exist, but its value will be C<B> during the superconstructor. After the
-superconstructor, the C<BUILD> methods are invoked before the completed object
+superconstructor, the C<BUILD> blocks are invoked before the completed object
 is returned to the user. The result will therefore be:
 
    Value seen by superconstructor is B
@@ -338,19 +391,47 @@ While in no way required, the following suggestions of code style should be
 noted in order to establish a set of best practices, and encourage consistency
 of code which uses this module.
 
+=head2 $VERSION declaration
+
+While it would be nice for CPAN and other toolchain modules to parse the
+embedded version declarations in C<class> statements, the current state at
+time of writing (June 2020) is that none of them actually do. As such, it will
+still be necessary to make a once-per-file C<$VERSION> declaration in syntax
+those modules can parse.
+
+Further note that these modules will also not parse the C<class> declaration,
+so you will have to duplicate this with a C<package> declaration as well as a
+C<class> keyword. This does involve repeating the package name, so is slightly
+undesirable.
+
+It is hoped that eventually upstream toolchain modules will be adapted to
+accept the C<class> syntax as being sufficient to declare a package and set
+its version.
+
+See also
+
+=over 2
+
+=item *
+
+L<https://github.com/Perl-Toolchain-Gang/Module-Metadata/issues/33>
+
+=back
+
 =head2 File Layout
 
 Begin the file with a C<use Object::Pad> line; ideally including a
-minimum-required version. This should be followed by the toplevel C<class>
-declaration for the file. As it is at toplevel there is no need to use the
-block notation; it can be a unit class.
+minimum-required version. This should be followed by the toplevel C<package>
+and C<class> declarations for the file. As it is at toplevel there is no need
+to use the block notation; it can be a unit class.
 
 There is no need to C<use strict> or apply other usual pragmata; these will
 be implied by the C<class> keyword.
 
    use Object::Pad 0.16;
 
-   class My::Classname 1.23;
+   package My::Classname 1.23;
+   class My::Classname;
 
    # other use statements
 
@@ -363,8 +444,8 @@ lowercase, name components separated by underscores. For tiny examples such as
 "dumb record" structures this may be sufficient.
 
    class Tag {
-      has $name;  method name  :lvalue { $name }
-      has $value; method value :lvalue { $value }
+      has $name  :mutator;
+      has $value :mutator;
    }
 
 In larger examples with lots of non-trivial method bodies, it can get
@@ -422,10 +503,21 @@ sub Object::Pad::MOP::Class::add_BUILD
    my ( $code ) = @_;
    # For now a builder is just a method named BUILD. But keep this API in case
    # one day it isn't
-   $self->add_method( BUILD => $code );
+   $self->_add_method( BUILD => $code );
 }
 
 sub Object::Pad::MOP::Class::add_method
+{
+   my $self = shift;
+   my ( $name, $code ) = @_;
+
+   $name eq "BUILD" and
+      carp "Adding a named method called BUILD is not recommended; use ->add_BUILD directly";
+
+   $self->_add_method( $name, $code );
+}
+
+sub Object::Pad::MOP::Class::_add_method
 {
    my $self = shift;
    my ( $name, $code ) = @_;
@@ -549,8 +641,6 @@ Some extensions of the C<has> syntax:
 Non-constant default expressions
 
    has $var = EXPR;
-
-A way to request generated accessors - ro or rw.
 
 =item *
 

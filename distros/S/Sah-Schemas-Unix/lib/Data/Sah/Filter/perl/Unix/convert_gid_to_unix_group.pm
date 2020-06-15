@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::Unix::convert_gid_to_unix_group;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,7 +26,7 @@ sub filter {
 
     $res->{expr_filter} = join(
         "",
-        "do { my \$tmp = $dt; if (\$tmp =~ /\\A[0-9]+\\z/) { my \@gr = getgrgid(\$tmp); return [\"GID \$tmp has no associated group name\", \$tmp] unless \@gr; return [undef, \$gr[0]] } [undef, \$tmp] }",
+        "do { my \$tmp = $dt; if (\$tmp =~ /\\A[0-9]+\\z/) { my \@gr = getgrgid(\$tmp); \@gr ? [undef, \$gr[0]] : [\"GID \$tmp has no associated group name\", \$tmp] } else { [undef, \$tmp] } }",
     );
 
     $res;
@@ -47,7 +47,7 @@ Data::Sah::Filter::perl::Unix::convert_gid_to_unix_group
 
 =head1 VERSION
 
-This document describes version 0.010 of Data::Sah::Filter::perl::Unix::convert_gid_to_unix_group (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Data::Sah::Filter::perl::Unix::convert_gid_to_unix_group (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
 
 =for Pod::Coverage ^(meta|filter)$
 

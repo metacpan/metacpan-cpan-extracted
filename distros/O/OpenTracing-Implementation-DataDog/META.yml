@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Most: '0'
+  Test::OpenTracing::Interface: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
@@ -36,10 +37,11 @@ requires:
   Syntax::Feature::Maybe: '0'
   Time::HiRes: '0'
   Try::Tiny: '0'
+  Type::Tiny::XS: '0'
   Types::Common::String: '0'
   Types::Interface: '0'
   Types::Standard: '0'
   aliased: '0'
   syntax: '0'
-version: '0.03'
+version: v0.30.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

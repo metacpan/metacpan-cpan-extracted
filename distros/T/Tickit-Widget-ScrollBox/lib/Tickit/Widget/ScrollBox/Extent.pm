@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 use 5.026; # signatures
-use Object::Pad 0.17;
+use Object::Pad 0.27;
 
-class Tickit::Widget::ScrollBox::Extent 0.08;
+package Tickit::Widget::ScrollBox::Extent 0.09;
+class Tickit::Widget::ScrollBox::Extent;
 
 use Scalar::Util qw( weaken );
 
@@ -28,7 +29,7 @@ has $_total;
 has $_scrollbox;
 has $_id;
 
-method BUILD ( $scrollbox, $id )
+BUILD ( $scrollbox, $id )
 {
    weaken( $_scrollbox = $scrollbox );
    $_id = $id;

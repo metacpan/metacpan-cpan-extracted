@@ -1,13 +1,20 @@
 package Sah::Schema::unix::pid;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-06-13'; # DATE
+our $VERSION = '0.012'; # VERSION
 
-our $schema = [uint => {
+our $schema = [posint => {
     summary => 'Process identifier (PID)',
     description => <<'_',
 
 _
+
+    examples => [
+        {value=>-1, valid=>0},
+        {value=>0, valid=>0},
+        {value=>1, valid=>1},
+    ],
+
 }, {}];
 
 1;
@@ -25,7 +32,76 @@ Sah::Schema::unix::pid - Process identifier (PID)
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::unix::pid (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Sah::Schema::unix::pid (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("unix::pid*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("unix::pid*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['unix::pid*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ -1  # INVALID
+
+ 0  # INVALID
+
+ 1  # valid
 
 =head1 DESCRIPTION
 

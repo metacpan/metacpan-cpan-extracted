@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Geneable;
 # ABSTRACT: Geneable Moose role for Gene and GenePlus objects
-$Bio::Palantir::Roles::Geneable::VERSION = '0.200700';
+$Bio::Palantir::Roles::Geneable::VERSION = '0.201670';
 use Moose::Role;
 
 use autodie;
@@ -27,7 +27,7 @@ Bio::Palantir::Roles::Geneable - Geneable Moose role for Gene and GenePlus objec
 
 =head1 VERSION
 
-version 0.200700
+version 0.201670
 
 =head1 SYNOPSIS
 

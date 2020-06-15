@@ -5,33 +5,40 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.20';
+our $VERSION = 'v0.202.2';
 
 
-use Role::MethodReturns;
+use Role::Declare;
 
 use OpenTracing::Types qw/SpanContext/;
-use Types::Standard qw/Str Value/;
+use Types::Standard qw/Any HashRef Str Value/;
 
 use namespace::clean;
 
-around get_baggage_item => instance_method ( Str $key ) {
-    
-    returns_maybe( Value,
-        $original->( $instance => ( $key ) )
-    )
-    
-};
+
+instance_method get_baggage_item(
+    Str $key
+) :ReturnMaybe(Value) {}
 
 
 
-around with_baggage_item => instance_method ( Str $key, Str $value ) {
-    
-    returns( SpanContext ,
-        $original->( $instance => ( $key, $value ) )
-    )
-    
-};
+instance_method get_baggage_items(
+) :ReturnList (Any) {}
+
+
+
+instance_method with_baggage_item(
+    Str $key,
+    Str $value
+) :Return(SpanContext) {}
+
+
+
+instance_method with_baggage_items(
+    %key_values,
+) :Return(SpanContext) {
+    ( HashRef[Str] )->assert_valid( {%key_values} )
+}
 
 
 

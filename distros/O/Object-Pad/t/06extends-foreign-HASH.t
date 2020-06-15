@@ -29,7 +29,7 @@ my @BUILDS_INVOKED;
 class Derived::Class extends Base::Class {
    has $derived_field = 456;
 
-   method BUILD {
+   BUILD {
       my @args = @_;
       Test::More::is_deeply( \@args, [ "ok" ], '@_ to Derived::Class::BUILD' );
       push @BUILDS_INVOKED, __PACKAGE__;
@@ -45,7 +45,7 @@ class Derived::Class extends Base::Class {
    is( $obj->fields, "base_field=123,derived_field=456",
       '$obj->fields' );
    is_deeply( \@BUILDS_INVOKED, [qw( Derived::Class )],
-      'BUILD method invoked correctly' );
+      'BUILD invoked correctly' );
 
    # We don't mind what the output here is but it should be well-behaved
    # and not crash the dumper
@@ -61,7 +61,7 @@ class Derived::Class extends Base::Class {
 # Ensure that double-derived classes still chain down to foreign new
 {
    class DoubleDerived extends Derived::Class {
-      method BUILD {
+      BUILD {
          push @BUILDS_INVOKED, __PACKAGE__;
       }
       method fields {
@@ -73,7 +73,7 @@ class Derived::Class extends Base::Class {
       "base_field=123,derived_field=456,doubled=yes",
       'Double-derived from foreign still invokes base constructor' );
    is_deeply( \@BUILDS_INVOKED, [qw( Derived::Class DoubleDerived )],
-      'BUILD methods invoked correctly for double-derived class' );
+      'BUILD invoked correctly for double-derived class' );
 }
 
 # Various RT132263 test cases

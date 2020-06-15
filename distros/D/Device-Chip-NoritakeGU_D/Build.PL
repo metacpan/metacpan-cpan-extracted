@@ -6,9 +6,12 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::NoritakeGU_D',
    requires => {
+      'perl' => '5.026', # signatures in Object::Pad
+
       'Device::Chip' => 0,
       'Future::AsyncAwait' => '0.19',
       'List::Util' => 0,
+      'Object::Pad' => '0.27',
    },
    test_requires => {
       'Test::Device::Chip::Adapter' => '0.13', # for UART protocol

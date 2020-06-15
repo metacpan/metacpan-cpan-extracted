@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::HopeRF69
 # Description  : Control Hope RF69 Transceivers
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2020 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -17,9 +17,10 @@ use Carp;
 use HiPi qw( :rpi :spi :hrf69 );
 
 __PACKAGE__->create_accessors( qw( devicename reset_gpio update_default_on_reset
-                                   fsk_config ook_config ook_repeat) );
+                                   fsk_config ook_config ook_repeat
+                                   high_power_module max_power_on ) );
 
-our $VERSION ='0.81';
+our $VERSION ='0.82';
 
 # Hope recommended updated reset defaults
 my $reset_defaults = [
@@ -53,8 +54,8 @@ sub new {
             [ RF69_REG_FRMID, 		  0x93 ],   # carrier freq -> 434.3MHz 0x6C9333
             [ RF69_REG_FRLSB, 		  0x33 ],   # carrier freq -> 434.3MHz 0x6C9333
             [ RF69_REG_AFCCTRL,       0x00 ],   # standard AFC routine
-            #[ RF69_REG_PREAMBLEMSB,   0x00 ],   # 3 byte preamble
-            #[ RF69_REG_PREAMBLELSB,   0x03 ],   # 3 byte preamble
+            [ RF69_REG_PREAMBLEMSB,   0x00 ],   # 3 byte preamble
+            [ RF69_REG_PREAMBLELSB,   0x03 ],   # 3 byte preamble
             [ RF69_REG_LNA, 		  0x08 ],	# 200ohms, gain by AGC loop -> 50ohms
             [ RF69_REG_RXBW, 		  0x43 ],	# channel filter bandwidth 10kHz -> 60kHz  page:26
             [ RF69_REG_BITRATEMSB, 	  0x1A ],	# 4800b/s
@@ -63,7 +64,7 @@ sub new {
             [ RF69_REG_SYNCVALUE1, 	  0x2D ],	# 1st byte of Sync word
             [ RF69_REG_SYNCVALUE2, 	  0xD4 ],	# 2nd byte of Sync word
             [ RF69_REG_PACKETCONFIG1, 0xA0 ],   # Variable length, Manchester coding
-            [ RF69_REG_PAYLOADLEN, 	  66   ],	# max Length in RX, not used in Tx
+            [ RF69_REG_PAYLOADLEN, 	  0x42 ],	# max Length in RX, not used in Tx
             [ RF69_REG_NODEADDRESS,   0x06 ],	# Node address used in address filtering ( not used in this config )
             [ RF69_REG_FIFOTHRESH, 	  0x81 ],	# Condition to start packet transmission: at least one byte in FIFO
             [ RF69_REG_OPMODE, 		  RF69_MASK_OPMODE_RX ], # Operating mode to Receive    
@@ -123,6 +124,12 @@ sub configure {
     for my $msgref ( @$config ) {
         $self->write_register(@$msgref);
     }
+    
+    if( $self->high_power_module ) {
+        $self->write_register( RF69_REG_OCP, RF69_VAL_OCP_OFF );
+        $self->write_register( RF69_REG_PALEVEL, ( $self->read_register(RF69_REG_PALEVEL) & 0x1F) | RF69_PALEVEL_PA1_ON | RF69_PALEVEL_PA2_ON );
+    }
+    
     $self->wait_for(RF69_REG_IRQFLAGS1, RF69_MASK_MODEREADY, RF69_TRUE);
 }
 
@@ -130,6 +137,15 @@ sub change_mode {
     my($self, $mode, $waitmask) = @_;
     $waitmask //= RF69_MASK_MODEREADY;
     $self->write_register(RF69_REG_OPMODE, $mode);
+    if( $self->high_power_module && $self->max_power_on ) {
+        if( $mode == RF69_MASK_OPMODE_RX ) {
+            $self->write_register( RF69_REG_TESTPA1, 0x55 );
+            $self->write_register( RF69_REG_TESTPA2, 0x70 );
+        } elsif( $mode == RF69_MASK_OPMODE_TX ) {
+            $self->write_register( RF69_REG_TESTPA1, 0x5D );
+            $self->write_register( RF69_REG_TESTPA2, 0x7C );
+        }
+    }
     $self->wait_for(RF69_REG_IRQFLAGS1, $waitmask, RF69_TRUE);
 }
 
@@ -257,6 +273,7 @@ sub send_ook_message {
         
     # switch to OOK mode
     $self->configure($self->ook_config);
+    $self->set_mode_transmitter();
     
     # wait for mode ready for transmit after config
 	$self->wait_for(RF69_REG_IRQFLAGS1, RF69_MASK_MODEREADY | RF69_MASK_TXREADY, RF69_TRUE);
@@ -279,6 +296,7 @@ sub send_ook_message {
     
     # return to default mode
     $self->configure($self->fsk_config);
+    $self->set_mode_receiver();
     
     return;
 }

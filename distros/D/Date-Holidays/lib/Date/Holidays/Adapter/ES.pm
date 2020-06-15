@@ -8,7 +8,7 @@ use Module::Load; # load
 
 use vars qw($VERSION);
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 sub holidays {
     my ($self, %params) = @_;
@@ -49,7 +49,15 @@ sub is_holiday {
     my $dh = $self->{_adaptee}->new();
 
     if ($dh) {
+        my $holiday = $dh->is_holiday(year => $params{year}, month => $params{month}, day => $params{day});
+
         if ($params{region} and $params{region} eq 'ca') {
+
+            eval { load 'Date::Holidays::CA_ES'; }; # From Module::Load
+            if ($@) {
+                warn "Unable to load: Date::Holidays::CA_ES - $@\n";
+                return $holiday;
+            }
 
             my $dh_ca_es = Date::Holidays::CA_ES->new();
 
@@ -57,7 +65,7 @@ sub is_holiday {
 
             my $holiday_date = sprintf('%02s%02s', $params{month}, $params{day});
 
-            my $holiday = $holidays->{$holiday_date};
+            $holiday = $holidays->{$holiday_date};
 
             if ($holiday) {
                 return $holiday;
@@ -66,7 +74,7 @@ sub is_holiday {
             }
         }
 
-        return $dh->is_holiday(year => $params{year}, month => $params{month}, day => $params{day});
+        return $holiday
     } else {
         return '';
     }
@@ -84,7 +92,7 @@ Date::Holidays::Adapter::ES - adapter class for Date::Holidays::ES and Date::Hol
 
 =head1 VERSION
 
-This POD describes version 1.21 of Date::Holidays::Adapter::ES
+This POD describes version 1.22 of Date::Holidays::Adapter::ES
 
 =head1 DESCRIPTION
 

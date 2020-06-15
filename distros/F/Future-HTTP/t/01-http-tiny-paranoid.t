@@ -16,7 +16,7 @@ my $err = $@;
 if( !$ok) {
     plan skip_all => "Couldn't load Future::HTTP::Tiny::Paranoid: $err";
 };
-plan tests => 10;
+plan tests => 11;
 
 delete @ENV{ qw[
     HTTP_PROXY
@@ -46,6 +46,7 @@ my $h = $url->host;
 HTTP::Tiny::Paranoid->whitelisted_hosts([ $h, '127.0.0.1' ]);
 
 my $ua = Future::HTTP::Tiny::Paranoid->new();
+ok !$ua->is_async, 'is_async is false';
 
 my ($body,$headers) = $ua->http_get($url)->get;
 like $headers->{Status}, qr/2../, "Retrieve URL using HTTP::Tiny::Paranoid backend";

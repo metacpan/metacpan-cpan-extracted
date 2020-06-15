@@ -1,15 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::MCP4725;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
-
-our $VERSION = '0.08';
+package Device::Chip::MCP4725 0.09;
+class Device::Chip::MCP4725
+   extends Device::Chip;
 
 use Carp;
 use Future::AsyncAwait;
@@ -53,11 +51,8 @@ leading C<0> or C<0x> prefixes.
 
 =cut
 
-sub I2C_options
+sub I2C_options ( $, %params )
 {
-   my $self = shift;
-   my %params = @_;
-
    my $addr = delete $params{addr} // 0x60;
    $addr = oct $addr if $addr =~ m/^0/;
 
@@ -94,10 +89,8 @@ Returns a C<HASH> reference containing the chip's current configuration
 
 =cut
 
-async sub read_config
+async method read_config ()
 {
-   my $self = shift;
-
    my $bytes = await $self->protocol->read( 5 );
    my ( $status, $dac, $eeprom ) = unpack( "C S> S>", $bytes );
 
@@ -127,18 +120,15 @@ C<$powerdown> is optional and will default to 0 if not provided.
 
 =cut
 
-sub write_dac
+async method write_dac ( $dac, $powerdown = undef )
 {
-   my $self = shift;
-   my ( $dac, $powerdown ) = @_;
-
    $dac &= 0x0FFF;
 
    my $pd = 0;
    $pd = $NAME_TO_POWERDOWN{$powerdown} // croak "Unrecognised powerdown state '$powerdown'"
       if defined $powerdown;
 
-   $self->protocol->write( pack "S>", $pd << 12 | $dac );
+   await $self->protocol->write( pack "S>", $pd << 12 | $dac );
 }
 
 =head2 write_dac_ratio
@@ -150,12 +140,9 @@ ratio between 0 and 1.
 
 =cut
 
-sub write_dac_ratio
+async method write_dac_ratio ( $ratio )
 {
-   my $self = shift;
-   my ( $ratio ) = @_;
-
-   $self->write_dac_ratio( $ratio * 2**12 );
+   await $self->write_dac_ratio( $ratio * 2**12 );
 }
 
 =head2 write_dac_and_eeprom
@@ -166,18 +153,15 @@ As L</write_dac> but also updates the EEPROM with the same values.
 
 =cut
 
-sub write_dac_and_eeprom
+async method write_dac_and_eeprom ( $dac, $powerdown = undef )
 {
-   my $self = shift;
-   my ( $dac, $powerdown ) = @_;
-
    $dac &= 0x0FFF;
 
    my $pd = 0;
    $pd = $NAME_TO_POWERDOWN{$powerdown} // croak "Unrecognised powerdown state '$powerdown'"
       if defined $powerdown;
 
-   $self->protocol->write( pack "C S>", 0x60 | $pd << 1, $dac << 4 );
+   await $self->protocol->write( pack "C S>", 0x60 | $pd << 1, $dac << 4 );
 }
 
 =head1 AUTHOR

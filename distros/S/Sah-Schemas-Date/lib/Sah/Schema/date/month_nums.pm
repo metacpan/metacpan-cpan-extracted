@@ -1,9 +1,9 @@
 package Sah::Schema::date::month_nums;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = ['array' => {
     summary => 'Array of month numbers',
@@ -11,14 +11,14 @@ our $schema = ['array' => {
     'x.perl.coerce_rules' => ['From_str::comma_sep'],
     'x.completion' => ['date_month_num'],
     examples => [
-        {data=>'', valid=>1},
-        {data=>0, valid=>0},
-        {data=>1, valid=>1},
-        {data=>[1], valid=>1},
-        {data=>[1,12], valid=>1},
-        {data=>'1,12', valid=>1},
-        {data=>[1,12,13], valid=>0},
-        {data=>'1,12,13', valid=>0},
+        {value=>'', valid=>1, validated_value=>[]},
+        {value=>0, valid=>0},
+        {value=>1, valid=>1, validated_value=>[1]},
+        {value=>[1], valid=>1},
+        {value=>[1,12], valid=>1},
+        {value=>'1,12', valid=>1, validated_value=>[1,12]},
+        {value=>[1,12,13], valid=>0},
+        {value=>'1,12,13', valid=>0},
     ],
 }, {}];
 
@@ -38,7 +38,7 @@ Sah::Schema::date::month_nums - Array of month numbers
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::date::month_nums (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::Schema::date::month_nums (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;
@@ -74,17 +74,17 @@ Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
 
 Sample data:
 
- ""  # valid
+ ""  # valid, becomes []
 
  0  # INVALID
 
- 1  # valid
+ 1  # valid, becomes [1]
 
  [1]  # valid
 
  [1,12]  # valid
 
- "1,12"  # valid
+ "1,12"  # valid, becomes [1,12]
 
  [1,12,13]  # INVALID
 

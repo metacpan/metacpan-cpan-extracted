@@ -1,3 +1,10 @@
+Version 0.82  - 14 June 2020
+                Updated Energenie and HopeRF69 interfaces allowing use of other
+                RF69HW and RF69W module breakouts.
+                HiPi::Interface::MAX7219LEDStrip correction to auto resizing and
+                scrolling.
+                Added interface for BMP280 /BME280 sensors
+
 Version 0.81  - 07 June 2020
                 Updated for Raspberry Pi 4 8GB model
                 Bug fix in HiPi::RaspberryPi dump_board_info()

@@ -79,15 +79,15 @@ subtest "pass on arguments for 'finish'" => sub {
 
 
 
-subtest "pass on arguments for 'set_tag'" => sub {
+subtest "pass on arguments for 'add_tag'" => sub {
     
     undef @test_params;
     
     my $test_object = bless {}, 'MyTest::Span';
     
     lives_ok {
-        $test_object->set_tag( tag_key => 0 )
-    } "Can call method 'set_tag'";
+        $test_object->add_tag( tag_key => 0 )
+    } "Can call method 'add_tag'";
     
     cmp_deeply(
         \@test_params => [
@@ -121,15 +121,15 @@ subtest "pass on arguments for 'log_data'" => sub {
 
 
 
-subtest "pass on arguments for 'set_baggage_item'" => sub {
+subtest "pass on arguments for 'add_baggage_item'" => sub {
     
     undef @test_params;
     
     my $test_object = bless {}, 'MyTest::Span';
     
     lives_ok {
-        $test_object->set_baggage_item( item => 'value' )
-    } "Can call method 'set_baggage_item'";
+        $test_object->add_baggage_item( item => 'value' )
+    } "Can call method 'add_baggage_item'";
     
     cmp_deeply(
         \@test_params => [
@@ -172,7 +172,7 @@ package MyTest::Span;
 sub get_context {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::SpanContext'
+    return bless {}, 'MySyub::SpanContext'
     
 };
 
@@ -190,7 +190,14 @@ sub finish {
     
 };
 
-sub set_tag {
+sub add_tag {
+    push @main::test_params, [ @_ ];
+    
+    return shift
+    
+};
+
+sub add_tags {
     push @main::test_params, [ @_ ];
     
     return shift
@@ -204,7 +211,14 @@ sub log_data {
     
 };
 
-sub set_baggage_item {
+sub add_baggage_item {
+    push @main::test_params, [ @_ ];
+    
+    return shift
+    
+};
+
+sub add_baggage_items {
     push @main::test_params, [ @_ ];
     
     return shift
@@ -214,7 +228,14 @@ sub set_baggage_item {
 sub get_baggage_item {
     push @main::test_params, [ @_ ];
     
-    return 'this is a baggae item value - what ever'
+    return 'this is a baggage item value - what ever'
+    
+};
+
+sub get_baggage_items {
+    push @main::test_params, [ @_ ];
+    
+    return 'this is a baggage item value - what ever'
     
 };
 
@@ -225,7 +246,7 @@ BEGIN {
 
 
 
-package MyDuck::SpanContext;
+package MySyub::SpanContext;
 
 sub get_baggage_item;
 sub with_baggage_item;

@@ -4,7 +4,7 @@ README
 Makefile.PL
 App/pl.pm
 pl
-pl.bat
+pl.cmd
 t/a.txt
 t/b.txt
 t/c.txt

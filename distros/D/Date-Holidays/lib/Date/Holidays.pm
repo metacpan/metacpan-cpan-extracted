@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -332,7 +332,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-The documentation describes version 1.21 of Date::Holidays
+The documentation describes version 1.22 of Date::Holidays
 
 =head1 FEATURES
 
@@ -764,7 +764,7 @@ to be used by L<Date::Holidays::Adapter::Local|https://metacpan.org/pod/Date::Ho
 
 =item * L<Scalar::Util|https://metacpan.org/pod/Scalar::Util>
 
-=item * L<JSON|https://metacpan.org/pod/JSON|>
+=item * L<JSON|https://metacpan.org/pod/JSON>
 
 =item * L<File::Slurp|https://metacpan.org/pod/File::Slurp>
 
@@ -954,6 +954,8 @@ Please see L<Task::Date::Holidays|https://metacpan.org/pod/Task::Date::Holidays>
 
 =over
 
+=item * Miquel Ruiz, PR fixing a bug with regions for ES, supporting Data::Holidays::CA_ES resulting in 1.22
+
 =item * Denis Boyun, PR introducing Date::Holidays::UA resulting in 1.19
 
 =item * Mario Minati, for telling me about the states in Date::Holidays::DE resulting in 1.17
@@ -992,11 +994,11 @@ Please see L<Task::Date::Holidays|https://metacpan.org/pod/Task::Date::Holidays>
 
 =head1 AUTHOR
 
-Jonas B. Nielsen, (jonasbn) - C<< <jonasbn@cpan.org> >>
+Jonas B., (jonasbn) - C<< <jonasbn@cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Date-Holidays and related modules are (C) by Jonas B. Nielsen, (jonasbn)
+Date-Holidays and related modules are (C) by Jonas B., (jonasbn)
 2004-2020
 
 Date-Holidays and related modules are released under the Artistic License 2.0

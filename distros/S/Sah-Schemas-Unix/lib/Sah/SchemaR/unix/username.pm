@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::username;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-06-13'; # DATE
+our $VERSION = '0.012'; # VERSION
 
-our $rschema = ["str",[{description=>"\nThe checking follows POSIX rules: does not begin with a hyphen and only contains\n[A-Za-z0-9._-].\n\nThe above rule allows integers like 1234, which can be confused with UID, so\nthis schema disallows pure integers.\n\nThe maximum length is 32 following libc6's limit.\n\n",match=>qr((?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])),max_len=>32,min_len=>1,summary=>"Unix account name"}],["str"]];
+our $rschema = ["str",[{description=>"\nThe checking follows POSIX rules: does not begin with a hyphen and only contains\n[A-Za-z0-9._-].\n\nThe above rule allows integers like 1234, which can be confused with UID, so\nthis schema disallows pure integers.\n\nThe maximum length is 32 following libc6's limit.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>0,value=>"-andy"},{valid=>0,value=>1234},{valid=>1,value=>"andy2"},{valid=>0,value=>"an dy"},{valid=>1,value=>"an.dy"},{summary=>"Too long",value=>0}],match=>qr((?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])),max_len=>32,min_len=>1,summary=>"Unix account name"}],["str"]];
 
 1;
 # ABSTRACT: Unix account name
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::username - Unix account name
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Sah::SchemaR::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
 
 =head1 DESCRIPTION
 

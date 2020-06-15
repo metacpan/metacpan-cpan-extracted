@@ -1,0 +1,20 @@
+/**
+   A simple Java file.
+*/
+// Uncomment version:
+//<?   $Version = 'Test';    !>
+//<? # $Version = 'Release'; !>
+
+public class simple {
+
+  public static int main(String[] args) {
+
+    //<? $O = "    ".($Version eq 'Test' ?
+    // 'System.out.println("Test version");' :
+    // 'System.out.println("Release version");' );
+    //!>//+
+    System.out.println("Test version");//-
+
+    return 0;
+  }
+}

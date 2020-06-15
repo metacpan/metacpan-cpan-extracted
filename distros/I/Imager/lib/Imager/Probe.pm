@@ -1,10 +1,11 @@
 package Imager::Probe;
+use 5.006;
 use strict;
 use File::Spec;
 use Config;
 use Cwd ();
 
-our $VERSION = "1.006";
+our $VERSION = "1.007";
 
 my @alt_transfer = qw/altname incsuffix libbase/;
 
@@ -88,6 +89,9 @@ sub is_exe {
   my @exe_suffix = $Config{_exe};
   if ($^O eq 'MSWin32') {
     push @exe_suffix, qw/.bat .cmd/;
+  }
+  elsif ($^O eq 'cygwin') {
+    push @exe_suffix, "";
   }
 
   for my $dir (File::Spec->path) {

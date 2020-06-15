@@ -1,5 +1,9 @@
 Revision history for DateTime::Format::Genealogy
 
+0.03	Fri Jun 12 20:25:09 EDT 2020
+	Added the quiet flag
+	Added the strict flag and allow long month names if not given
+
 0.02	Wed Mar  4 10:48:52 EST 2020
 	Added check for invalid parameter (thanks to MANWAR)
 		See https://github.com/nigelhorne/DateTime-Format-Genealogy/pull/1

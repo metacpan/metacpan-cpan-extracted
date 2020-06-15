@@ -534,7 +534,7 @@ data blocks encoding procedures
 	Xmodem::Constants::CHECKSUM ...... type of block checksum
 	Xmodem::Constants::CRC16 ......... type of block crc16
 	Xmodem::Constants::CRC32 ......... type of block crc32
-	
+
 =head1 Xmodem::Receiver
 
 Control class to initiate and complete a C<X-modem> file transfer in receive mode
@@ -564,7 +564,7 @@ Returns the underlying L<Device::Modem> object.
 
 =item receive_message()
 
-Retreives message from modem and if a block is detected it breaks it into appropriate
+Retrieves message from modem and if a block is detected it breaks it into appropriate
 parts.
 
 =item run()

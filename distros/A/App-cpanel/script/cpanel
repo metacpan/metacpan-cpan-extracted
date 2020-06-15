@@ -1,5 +1,5 @@
 #!perl
 
-use App::cpanel qw(dispatch_cmd);
+use App::cpanel qw(dispatch_cmd_print);
 
-print dispatch_cmd(@ARGV);
+dispatch_cmd_print(@ARGV);

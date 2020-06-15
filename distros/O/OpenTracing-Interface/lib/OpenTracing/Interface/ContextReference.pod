@@ -51,52 +51,69 @@ See L<OpenTracing References|http://opentracing.io/spec/#causal-span-references>
 
 
 
-=head2 new_child_of( $span_context )
+=head2 C<new_child_of>
 
 Creates a C<SpanContext> C<ContextReference> for which L<type_is_child_of> is
 'true'.
 
     ContextReference->new_child_of( $span_context );
 
-=head3 Required Positional Parameter
+=over
+
+=item Required Positional Parameter(s)
 
 =over
 
-=item $span_context
+=item span_context, a B<required> C<SpanContext>
 
-The C<SpanContext> the returned C<ContextReference> should should refer to.
-
-Must be a C<SpanContext> form L<OpenTracing::Types>.
+The sapn context that the returned context reference should should refer to.
 
 =back
 
-=head3 Returns
+=item Returns
 
-A newly instantiated C<ContextReference>
+=over
+
+=item C<ContextReference>
+
+The newly instantiated reference.
+
+=back
+
+=back
 
 
-=head2 new_follows_from( $span_context )
+
+=head2 C<new_follows_from>
 
 Creates a C<SpanContext> C<ContextReference> for which L<type_is_follows_from>
 is 'true'.
 
     ContextReference->new_follows_from( $span_context );
 
-=head3 Required Positional Parameter
+=over
+
+=item Required Positional Parameter
 
 =over
 
-=item $span_context
+=item span_context, a B<required> C<SpanContext>
 
-The C<SpanContext> the returned C<ContextReference> should should refer to.
-
-Must be a C<SpanContext> form L<OpenTracing::Types>.
+The context the returned context reference should should refer to.
 
 =back
 
-=head3 Returns
+=item Returns
 
-A newly instantiated C<ContextReference>
+=over
+
+=item C<ContextReference>
+
+A newly instantiated context reference
+
+=back
+
+=back
 
 
 
@@ -104,23 +121,37 @@ A newly instantiated C<ContextReference>
 
 
 
-=head2 get_referenced_context
+=head2 C<get_referenced_context>
 
 Returns the original referenced C<SpanContext>.
 
     $span_context = $reference->get_referenced_context;
 
-=head3 Parameters
+=over
 
-none
+=item Parameter(s)
 
-=head3 Returns
+=over
 
-C<SpanContext> being referenced.
+I<none>
+
+=back
+
+=item Returns
+
+=over
+
+=item C<SpanContext>
+
+The span context being referenced.
+
+=back
+
+=back
 
 
 
-=head2 type_is_child_of
+=head2 C<type_is_child_of>
 
 Returns 'true' iff the C<ContextReference> is a C<CHILD_OF> type is, most
 likely, instantiated with the C<new_child_of> constructor.
@@ -128,17 +159,29 @@ likely, instantiated with the C<new_child_of> constructor.
     say "I'm a CHILD_OF context reference"
         if $context_reference->type_is_child_of;
 
-=head3 Parameters
+=over
 
-none
+=item Parameter(s)
 
-=head3 Returns
+=over
 
-C<Bool>
+I<none>
+
+=back
+
+=item Returns
+
+=over
+
+=item C<Bool>
+
+=back
+
+=back
 
 
 
-=head2 type_is_follows_from
+=head2 Ctype_is_follows_from>
 
 Returns 'true' iff the C<ContextReference> is a C<FOLLOWS_FROM> type is, most
 likely, instantiated with the C<new_follows_from> constructor.
@@ -146,17 +189,25 @@ likely, instantiated with the C<new_follows_from> constructor.
     say "I'm a FOLLOWS_FROM context reference"
         if $context_reference->type_is_child_of;
 
-=head3 Parameters
+=over
 
-none
+=item Parameter(s)
 
-=head3 Returns
+=over
 
-C<Bool>
+I<none>
 
+=back
 
+=item Returns
 
-=cut
+=over
+
+=item C<Bool>
+
+=back
+
+=back
 
 
 
@@ -176,21 +227,31 @@ all common elements that conform L<OpenTracing::Interface>
 
 =back
 
-=cut
-
 
 
 =head1 CAVEATS
-
-This description is using C<around> method modifiers that basically wraps them
-around the real implementation. These method modifiers provide a 'readable' and
-reusable interface, describing the inputs and outputs, using type constraints.
-
-Consumers of this role, or implementors of the interface are MUST implement each
-method mentioned below. Not doing so will result in compilation errors.
 
 Since this role does nothing else than checking input and output, it is useful
 during development. Most likely it can be switched off safely in production
 environments.
 
-=cut
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+

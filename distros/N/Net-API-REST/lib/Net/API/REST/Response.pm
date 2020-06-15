@@ -535,7 +535,7 @@ sub _try
     my $pack = shift( @_ ) || return( $self->error( "No Apache package name was provided to call method" ) );
     my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
     my $r = Apache2::RequestUtil->request;
-    $r->log_error( "Net::API::REST::Response::_try to call method \"$meth\" in package \"$pack\"." );
+    # $r->log_error( "Net::API::REST::Response::_try to call method \"$meth\" in package \"$pack\"." );
     try
     {
         return( $self->$pack->$meth ) if( !scalar( @_ ) );

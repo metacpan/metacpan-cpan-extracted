@@ -17,7 +17,7 @@ if( !$ok) {
     exit;
 };
 
-plan tests => 11;
+plan tests => 12;
 
 delete @ENV{ qw[
     HTTP_PROXY
@@ -38,6 +38,7 @@ my $server = Test::HTTP::LocalServer->spawn(
 );
 
 my $ua = Future::HTTP::Mojo->new();
+ok $ua->is_async, 'is_async is true';
 my $url = "" . $server->url; # Mojolicious wants a string or a Mojo::URL, not a URI::URL :-/
 
 my ($body,$headers) = $ua->http_get($url)->get;

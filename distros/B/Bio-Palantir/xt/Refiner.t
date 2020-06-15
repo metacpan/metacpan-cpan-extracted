@@ -313,7 +313,7 @@ my $class = 'Bio::Palantir::Refiner::ClusterPlus';
     my $ClusterPlus = $class->new( _cluster => $root->all_clusters ); 
 
     my @expected_exploratory_domain_symbols = [
-        'CAL_domain', 'ACP', 'KS', 'PCP', 'AT', 'DHt',
+        'CAL', 'ACP', 'KS', 'PCP', 'AT', 'DHt',
         'TE', 'DHt', 'TE', 'KR', 'ACP', 'AT', 'TE', 'PCP',
     ];
 

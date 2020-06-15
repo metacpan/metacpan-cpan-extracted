@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletion::date_dow_num_en_or_id;
 
-our $DATE = '2019-11-28'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,7 +48,7 @@ Perinci::Sub::XCompletion::date_dow_num_en_or_id - Generate completion for date:
 
 =head1 VERSION
 
-This document describes version 0.003 of Perinci::Sub::XCompletion::date_dow_num_en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
+This document describes version 0.005 of Perinci::Sub::XCompletion::date_dow_num_en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
 
 =head1 CONFIGURATION
 
@@ -102,7 +102,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

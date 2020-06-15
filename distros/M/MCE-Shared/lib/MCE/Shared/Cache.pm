@@ -16,7 +16,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.871';
+our $VERSION = '1.872';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -580,15 +580,13 @@ sub keys {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find( { getkeys => 1 }, @_ );
    }
+   elsif ( wantarray ) {
+      my $data = $self->[_DATA];
+      @_ ? map { exists $data->{ $_ } ? $_ : undef } @_
+         : $self->_keys;
+   }
    else {
-      if ( wantarray ) {
-         my $data = $self->[_DATA];
-         @_ ? map { exists $data->{ $_ } ? $_ : undef } @_
-            : $self->_keys;
-      }
-      else {
-         scalar CORE::keys %{ $self->[_DATA] };
-      }
+      scalar CORE::keys %{ $self->[_DATA] };
    }
 }
 
@@ -613,15 +611,12 @@ sub pairs {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find( @_ );
    }
+   elsif ( wantarray ) {
+      my $data = $self->[_DATA];
+      map { $_ => $data->{ $_ } } ( @_ ? @_ : $self->_keys );
+   }
    else {
-      if ( wantarray ) {
-         my $data = $self->[_DATA];
-         @_ ? map { $_ => $data->{ $_ } } @_
-            : map { $_ => $data->{ $_ } } $self->_keys;
-      }
-      else {
-         scalar CORE::keys %{ $self->[_DATA] };
-      }
+      scalar CORE::keys %{ $self->[_DATA] };
    }
 }
 
@@ -636,14 +631,11 @@ sub values {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find( { getvals => 1 }, @_ );
    }
+   elsif ( wantarray ) {
+      @{ $self->[_DATA] }{ ( @_ ? @_ : $self->_keys ) };
+   }
    else {
-      if ( wantarray ) {
-         @_ ? @{ $self->[_DATA] }{ @_ }
-            : @{ $self->[_DATA] }{ $self->_keys };
-      }
-      else {
-         scalar CORE::keys %{ $self->[_DATA] };
-      }
+      scalar CORE::keys %{ $self->[_DATA] };
    }
 }
 
@@ -850,6 +842,17 @@ sub getset {
    $old;
 }
 
+# setnx ( key, value [, expires_in ] )
+
+sub setnx {
+   return 0 if ( exists $_[0]->[_DATA]{ $_[1] } );
+
+   $_[0]->_inskey( $_[1], defined $_[3] ? $_[3] : () );
+   $_[0]->[_DATA]{ $_[1] } = $_[2];
+
+   1;
+}
+
 # len ( key )
 # len ( )
 
@@ -899,7 +902,7 @@ MCE::Shared::Cache - A hybrid LRU-plain cache helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Cache version 1.871
+This document describes MCE::Shared::Cache version 1.872
 
 =head1 DESCRIPTION
 
@@ -981,6 +984,7 @@ fetches only.
  }
 
  $val   = $ca->set( $key, $val );
+ $ret   = $ca->setnx( $key, $val );         # set only if the key exists
  $val   = $ca->get( $key );
  $val   = $ca->delete( $key );              # del is an alias for delete
  $bool  = $ca->exists( $key );
@@ -1493,6 +1497,18 @@ before the key is expired.
  $val = $ca->set( "key", "value", "2 hours"   );  # or "2h"
  $val = $ca->set( "key", "value", "2 days"    );  # or "2d"
  $val = $ca->set( "key", "value", "2 weeks"   );  # or "2w"
+
+Reorder: Yes
+
+=head2 setnx ( key, value [, expires_in ] )
+
+Sets the value of a hash key, only if the key does not exist. Returns a 1
+for new key or 0 if the key already exists and no operation was performed.
+Optionally, give the number of seconds before the key is expired.
+
+ $ret = $ca->setnx( "key", "value" );
+
+Current API available since 1.872.
 
 Reorder: Yes
 

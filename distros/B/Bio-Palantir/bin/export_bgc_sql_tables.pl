@@ -490,7 +490,7 @@ sub fill_bgc_tables {
     CLUSTER:
     for my $cluster (@$ref_clusters) {
 
-        if ($cluster->type =~ m/other/  && ! $ARGV_keep_other_type) {    # contain mostly redundant genes and domains
+        if ($cluster->type =~ m/other/  && $ARGV_discard_other_type) {    # contain mostly redundant genes and domains
             next CLUSTER;
         }
 
@@ -530,8 +530,13 @@ sub fill_bgc_tables {
             Module:
             for my $module (sort { $a->rank <=> $b->rank } @modules) {
 
+                my $module_uui = $annotation eq 'palantir'
+                    ? $module->uui
+                    : $ug->create_str
+                ; # for modules appearing in several clusters (regions) in antiSMASH v5.1
+
                 my @module_elmts = (
-                    $module->uui, $module->rank, 
+                    $module_uui, $module->rank, 
                     (join '-',  @{ $module->get_domain_functions }), 
                     $module->size, 
                     (join '-', @{ $module->genomic_prot_coordinates }),
@@ -542,28 +547,23 @@ sub fill_bgc_tables {
                 @module_elmts = map { $_ // 'na' } @module_elmts;
 
                 $module_uui_for{$_->uui} 
-                    = $module->uui for @{ $module->domains };
+                    = $module_uui for @{ $module->domains };
 
                 push @{ $table_ref->{'Modules' . $suffix} }, 
                     join "\t", @module_elmts;
 
                 push @{ $table_ref->{'Sequences'} }, join "\t", 
-                    ($module->uui, $module->protein_sequence, $module->size);
+                    ($module_uui, $module->protein_sequence, $module->size);
             }
         }
-
-        # filter duplicated genes (taken in several clusters) TODO improve this... not clean
-        my @done_uuis;
 
         GENE:
         for my $gene ( sort { $a->rank <=> $b->rank } $cluster->all_genes) {
 
-            # TODO need to generate uuid here because some genes are included in different clusters sometimes
-            next GENE if grep { $_ eq $gene->uui } @done_uuis;
-            
             my $gene_uui = $annotation eq 'palantir'
                 ? $gene->uui
-                : $ug->create_str; # For duplicated genes (t3pks in t1pks,...) TODO what to do ? duplicated ids because of overlapping clusters otherwise
+                : $ug->create_str
+            ; # for genes appearing in several clusters (t3pks in t1pks,...) since antiSMASH v3
 
             my @gene_elmts;
             if ($annotation eq 'antismash') {
@@ -593,9 +593,10 @@ sub fill_bgc_tables {
             DOMAIN:
             for my $domain (sort { $a->rank <=> $b->rank } $gene->all_domains) {
                 
-                my $domain_uui = 'palantir'
+                my $domain_uui = $annotation eq 'palantir'
                     ? $domain->uui
-                    : $ug->create_str;
+                    : $ug->create_str
+                ;
 
                 my $function = $domain->function;
                
@@ -669,8 +670,6 @@ sub fill_bgc_tables {
                     ;
                 }
             }
-
-            push @done_uuis, $gene_uui; 
         }
     }
 
@@ -753,7 +752,7 @@ export_bgc_sql_tables.pl - Exports SQL tables of BGC data (Palantir and antiSMAS
 
 =head1 VERSION
 
-version 0.200700
+version 0.201670
 
 =head1 NAME
 
@@ -848,12 +847,12 @@ Method for delineating the modules. Modules can either be cut on condensation
 =for Euclid: str.type: /condensation|substrate\-selection/
     str.default: 'substrate-selection'
 
-=item --keep-other-type
+=item --discard-other-type
 
-Allow clusters characterized as "other" by antiSMASH.
-WARNING: these clusters often include redundant genes and domains with
-other clusters of the genome, and thus might create non-unique id issues when
-creating an SQL database. 
+Discard clusters characterized as "other" by antiSMASH.
+It might be interesting to use this option as these clusters often include
+Redundant genes and domains with other clusters of the genome, and thus might
+create non-unique id issues when creating an SQL database. 
 
 =item --gap-filling [=] <bool>
 

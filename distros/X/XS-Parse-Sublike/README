@@ -101,6 +101,13 @@ PARSE HOOKS
     The XSParseSublikeHooks structure provides the following hook stages,
     which are invoked in the given order.
 
+    The structure has a flags field, which controls various optional parts
+    of operation. The following flags are defined.
+
+    XS_PARSE_SUBLIKE_FLAG_FILTERATTRS
+
+      If set, the optional filter_attr stage will be invoked.
+
     In addition there are two U8 fields named require_parts and skip_parts
     which control the behaviour of various parts of the syntax which are
     usually optional. Any parts with bits set in require_parts become
@@ -167,6 +174,24 @@ PARSE HOOKS
 
     At this point the optional sub attributes are parsed and filled into
     the attrs field of the context, then block_start() is called.
+
+ The optional filter_attr Stage
+
+       bool (*filter_attr)(pTHX_ struct XSParseSublikeContext *ctx,
+          SV *attr, SV *val);
+
+    If the flags field includes XS_PARSE_SUBLIKE_FLAG_FILTERATTRS then each
+    individual attribute is passed through this optional filter function
+    immediately as each is parsed. attr will be a string SV containing the
+    name of the attribute, and val will either be NULL, or a string SV
+    containing the contents of the parens after its name (without the
+    parens themselves).
+
+    If the filter returns true, it indicates that it has in some way
+    handled the attribute and it should not be added to the list given to
+    newATTRSUB(). If the filter returns false it will be handled in the
+    usual way; equivalent to the case where the filter function did not
+    exist.
 
  The post_blockstart Stage
 

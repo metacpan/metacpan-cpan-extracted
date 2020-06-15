@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Tickit::Widget::Choice',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.17',
+      'Object::Pad' => '0.27',
 
       'Tickit::RenderBuffer' => 0,
       'Tickit::Style' => 0,
@@ -19,7 +19,6 @@ my $build = Module::Build->new(
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',
-   create_makefile_pl => 'traditional',
    create_license => 1,
    create_readme  => 1,
    meta_merge => {

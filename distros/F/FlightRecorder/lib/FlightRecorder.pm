@@ -14,7 +14,7 @@ use Data::Object::ClassHas;
 with 'Data::Object::Role::Pluggable';
 with 'Data::Object::Role::Throwable';
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 # ATTRIBUTES
 
@@ -101,6 +101,10 @@ method branch(Str $name) {
   $self->output($self->auto) if $self->auto;
 
   return $self;
+}
+
+method count(Maybe[Str] $level) {
+  return int scalar grep {$level ? $$_{level} eq "$level" : 1} @{$self->{logs}};
 }
 
 method context(Str $name) {
@@ -339,6 +343,15 @@ method report(Str $name, Str $level = $self->level) {
   return $self->plugin("report_$name" => (%args));
 }
 
+method reset() {
+  delete $self->{head};
+  delete $self->{item};
+  delete $self->{refs};
+  delete $self->{logs};
+
+  return $self;
+}
+
 method serialize() {
   my $data = {};
 
@@ -349,6 +362,11 @@ method serialize() {
   $data->{zeros} = $self->zeros;
 
   return $data;
+}
+
+method simple(Str $level = $self->level) {
+
+  return $self->report('simple', $level);
 }
 
 method succinct(Str $level = $self->level) {
@@ -393,7 +411,7 @@ method warn(Str @messages) {
 
 =head1 NAME
 
-FlightRecorder
+FlightRecorder - Structured Logging
 
 =cut
 
@@ -414,7 +432,7 @@ Logging for Distributed Systems
   );
 
   # $f->begin('try');
-  # $f->debug('something happend');
+  # $f->debug('something happened');
   # $f->end;
 
 =cut
@@ -471,7 +489,7 @@ This attribute is read-write, accepts C<(Str)> values, and is optional.
 
   head(Str)
 
-This attribute is read-write, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 
@@ -546,6 +564,48 @@ when called.
   # given: synopsis
 
   $f->begin('test')->branch('next')
+
+=back
+
+=cut
+
+=head2 count
+
+  count(Maybe[Str] $level) : Int
+
+The count method returns the total number of log entries, or the number of log
+entries matching the log level specified.
+
+=over 4
+
+=item count example #1
+
+  # given: synopsis
+
+  $f->begin('try')->debug('something happened')->end;
+  $f->count;
+
+=back
+
+=over 4
+
+=item count example #2
+
+  # given: synopsis
+
+  $f->info('something happened');
+  $f->count('info');
+
+=back
+
+=over 4
+
+=item count example #3
+
+  # given: synopsis
+
+  $f->fatal('something happened');
+  $f->count('fatal');
 
 =back
 
@@ -733,6 +793,37 @@ The report method loads and returns the specified report plugin.
 
 =cut
 
+=head2 reset
+
+  reset() : Object
+
+The reset method returns an object to its initial state.
+
+=over 4
+
+=item reset example #1
+
+  # given: synopsis
+
+  $f->begin('try')->debug('something happened')->end;
+  $f->reset;
+
+=back
+
+=over 4
+
+=item reset example #2
+
+  # given: synopsis
+
+  $f->begin('try')->debug('something happened')->end;
+  $f->branch('main')->switch('try')->fatal('something happened')->end;
+  $f->reset;
+
+=back
+
+=cut
+
 =head2 serialize
 
   serialize() : HashRef
@@ -747,6 +838,25 @@ a C<hashref>.
   # given: synopsis
 
   $f->begin('main')->serialize
+
+=back
+
+=cut
+
+=head2 simple
+
+  simple() : Object
+
+The simple method loads and returns the
+L<FlightRecorder::Plugin::ReportSimple> report plugin.
+
+=over 4
+
+=item simple example #1
+
+  # given: synopsis
+
+  $f->simple
 
 =back
 

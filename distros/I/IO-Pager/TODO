@@ -1,33 +1,29 @@
 Important things here and in code flagged with XXX
 
-OLD key debug
-OLD	why do some functions die?
-OLD	why does initial load hang?
-OLD		return 1 if not defined $char?
-OLD
-OLD	Revert to previous fnc invocation scheme? Should not matter
-OLD !	Check ref() eq 'CODE' before running
-OLD
-OLD	Test bed with:
-OLD		outer loop
-OLD		Term::ReadKey
-OLD
-OLD		ioctl() for cbreak?
+1.03
 
+IPP	Consolidate special inputs? (multichar,abort &search, &write_buffer);
+	(delete &search, \d)
+
+Lesskey     #command
+!!          &         filter          #super-nifty! built-in grep
+!!          -         toggle-option   #switch toggle_* to this?!
+!           _         display-option
+            :e        examine         #open new file
+            E         examine         
+            \eu       undo-hilite     #toggle higlight of current search term
+            F         forw-forever    #tail
+
+IPP	Switch from Term::Cap to Term::TermInfo and get keycodes too?
+IPP	$TT=Term::Terminfo->new(); $TT->str_capnames; $TT->getstr
+IPP	bel,blink,bold,rev,smul[underline],sgr0[reset]
+IPP	kcub1[left],kcuf1[right],kcuu1[up],kcud1[down],kLFT[S-left],kRIT[S-right]
+IPP	kprv,knxt,khome,kend,kbs[backspace],kf1(help?),kich1(insert as mark?)
+
+IPP	fix infinite scroll if invalid jump (bogus user entry or unmapped key)
 
 1.02
-IPP	Fix M-v? Is it TERM specific failure? e.g; hterm on ChromeOS
-
 IPP	rename tp to ppp ("pure" perl pager)? (except stty/tput, and ReadKey)
-
-IPP	M-{left,right} file jump
-IPP	tp: $me->mark(_txN, #) if eof
-IPP	M-right: push ($n=shift);  jump $n
-IPP	M-left:  unshift ($n=pop); jump $n
-
-IPP	scroll left/right half-width?
-
-IPP 	"Minimal jump editing: ^G abort, delete"?
 
 IPP	return if $Squeeze and $me->{_text}-[cur] eq '' and
 IPP			$me->{_text}->[prev] eq ''
@@ -41,9 +37,6 @@ IPP		getch: reimplement (versus #use#, misalignments with forking)
 IPP		sysread vs. Term::ReadKey, as $^O alt for getc() in ReadMode()?
 IPP
 IPP		get_fn_keys aliases
-IPP	PgUp (^[[5~ M-Up), PgDwn (^[[6 M-Down~),
-IPP	Home (^[[H C-M-Up),  End (^[[F C-M-Down)
-
 
 IPP	WINCH reflow
 IPP		keep cursor at same content?
@@ -56,22 +49,20 @@ IPP	Display filename in status line?
 
 IPP	Clear buffer for multiple files? OTOH, while different,
 IPP		all-in-one is kind of a unique and nifty feature.
-IPP	Discontinuous numbering?
+IPP	But can we offer discontinuous numbering?
 
 IPP	Rearchitect around String::Tagged::Terminal?
 
 1.01
+IPP	Check ref() eq 'CODE' before running
+
+IPP	ioctl() for cbreak to replace stty? May not be so cross-platform
+
 IPP	Add Windows support? via Win32::Console or Win32::Console::ANSI or
 IPP	Term::ANSIScreen or Win10 1511+ ENABLE_VIRTUAL_TERMINAL_PROCESSING &
 IPP	TERM=vt100; also Term::Size::Win32 or Win32::Readch
 
 1.00
-IPP	If fold, remap left & right scroll to beep?
-
-IPP	Squeeze
-IPP		Proper logical line numbering?
-IPP		Togglable? ...with reflow
-
 IPP			#Consolidate _cursor+{rows} and _end??
 IPP	resize	126  $me->{_end} = $me->{rows} - 1; #NOOP
 IPP	new	113    $me->{_end} = $me->{rows} - 1; #NOOP, just setting up

@@ -82,11 +82,12 @@ sub diag_messages {
 }
 
 
-# Since there are is a 'ClassName' type-constraint, it needs to have an ISA
+# Since there are is a 'ClassName' type-constraint,
+# it needs to have a non-empty ISA
 #
 package MyTest::Empty;
 
-our @ISA;
+our @ISA = ('MyTest');
 
 
 

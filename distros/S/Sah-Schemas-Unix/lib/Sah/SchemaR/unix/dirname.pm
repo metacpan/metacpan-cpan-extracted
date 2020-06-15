@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::dirname;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-06-13'; # DATE
+our $VERSION = '0.012'; # VERSION
 
-our $rschema = ["str",[{match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem directory name on a Unix system","x.completion"=>["dirname"]},{description=>"\nThis is just a convenient alias for dirname::unix.\n\n",summary=>"Directory name (with optional path) on a Unix system"}],["dirname::unix","str"]];
+our $rschema = ["str",[{match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem directory name on a Unix system","x.completion"=>["dirname"]},{description=>"\nThis is just a convenient alias for dirname::unix.\n\n",examples=>[],summary=>"Directory name (with optional path) on a Unix system"}],["dirname::unix","str"]];
 
 1;
 # ABSTRACT: Directory name (with optional path) on a Unix system
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::dirname - Directory name (with optional path) on a Unix syst
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::unix::dirname (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Sah::SchemaR::unix::dirname (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
 
 =head1 DESCRIPTION
 

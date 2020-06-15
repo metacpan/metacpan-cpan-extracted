@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-08'; # DATE
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.020'; # VERSION
 
 use 5.010001;
 use strict;
@@ -24,7 +24,11 @@ with (
     #'Dist::Zilla::Role::RequireFromBuild',
 );
 
+has exclude_module => (is => 'rw');
+
 use namespace::autoclean;
+
+sub mvp_multivalue_args { qw(exclude_module) }
 
 sub _load_schema_modules {
     my $self = shift;
@@ -39,6 +43,12 @@ sub _load_schema_modules {
 
         my $pkg_pm = $1;
         (my $pkg = $pkg_pm) =~ s/\.pm$//; $pkg =~ s!/!::!g;
+
+        if ($self->exclude_module && grep { $pkg eq $_ } @{ $self->exclude_module }) {
+            $self->log_debug(["Sah schema module %s excluded", $pkg]);
+            next;
+        }
+
         $self->log_debug(["Loading schema module %s ...", $pkg_pm]);
         delete $INC{$pkg_pm};
         require $pkg_pm;
@@ -221,7 +231,7 @@ sub gather_files {
 
 use Test::More;
 
-eval "use Test::Sah::Schema 0.001";
+eval "use Test::Sah::Schema 0.009";
 plan skip_all => "Test::Sah::Schema 0.001 required for testing Sah::Schema::* modules"
   if $@;
 
@@ -307,7 +317,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.018 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2020-05-08.
+This document describes version 0.020 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2020-06-13.
 
 =head1 SYNOPSIS
 
@@ -354,6 +364,10 @@ to reduce startup overhead when doing tab completion.
 =back
 
 =for Pod::Coverage .+
+
+=head1 CONFIGURATION
+
+=head2 exclude_module
 
 =head1 HOMEPAGE
 

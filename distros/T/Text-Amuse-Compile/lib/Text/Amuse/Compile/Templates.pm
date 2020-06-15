@@ -880,6 +880,9 @@ sub latex {
 [% END %]
 
 [% IF enable_secondary_footnotes %]
+\usepackage[fragile]{bigfoot}
+\usepackage{perpage}
+\DeclareNewFootnote{default}
 [% IF safe_options.secondary_footnotes_alpha %]
 \DeclareNewFootnote{B}[alph]
 \MakeSortedPerPage[1]{footnoteB}
@@ -1181,6 +1184,19 @@ sub slides {
     my $slides =<<'LATEX';
 \documentclass[ignorenonframetext]{beamer}
 [% tex_setup_langs %]
+[% IF enable_secondary_footnotes %]
+\usepackage[fragile]{bigfoot}
+\usepackage{perpage}
+\DeclareNewFootnote{default}
+[% IF safe_options.secondary_footnotes_alpha %]
+\DeclareNewFootnote{B}[alph]
+\MakeSortedPerPage[1]{footnoteB}
+[% ELSE %]
+\DeclareNewFootnote{B}
+\MakeSorted{footnoteB}
+\renewcommand*\thefootnoteB{(\arabic{footnoteB})}
+[% END %]
+[% END %]
 \usetheme{[% safe_options.beamertheme %]}
 \usecolortheme{[% safe_options.beamercolortheme %]}
 

@@ -1,9 +1,9 @@
 package Sah::Schema::date::tz_offset_lax;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = ['date::tz_offset' => {
     summary => 'Timezone offset in seconds from UTC',
@@ -27,18 +27,18 @@ A coercion from timezone name is also provided.
 
 _
     examples => [
-        {data=>'', valid=>0},
-        {data=>'UTC', valid=>1, res=>0},
-        {data=>'3600', valid=>1, res=>3600},
-        {data=>'-43200', valid=>1, res=>-43200},
-        {data=>'-12', valid=>1, res=>-12*3600},
-        {data=>'-1200', valid=>1, res=>-12*3600},
-        {data=>'-12:00', valid=>1, res=>-12*3600},
-        {data=>'UTC-12', valid=>1, res=>-12*3600},
-        {data=>'UTC-1200', valid=>1, res=>-12*3600},
-        {data=>'UTC+12:45', valid=>1, res=>+12.75*3600},
-        {data=>'UTC-13', valid=>0},
-        {data=>'UTC+12:01', valid=>1, res=>+(12*3600+60)},
+        {value=>'', valid=>0},
+        {value=>'UTC', valid=>1, validated_value=>0},
+        {value=>'3600', valid=>1, validated_value=>3600},
+        {value=>'-43200', valid=>1, validated_value=>-43200},
+        {value=>'-12', valid=>1, validated_value=>-12*3600},
+        {value=>'-1200', valid=>1, validated_value=>-12*3600},
+        {value=>'-12:00', valid=>1, validated_value=>-12*3600},
+        {value=>'UTC-12', valid=>1, validated_value=>-12*3600},
+        {value=>'UTC-1200', valid=>1, validated_value=>-12*3600},
+        {value=>'UTC+12:45', valid=>1, validated_value=>+12.75*3600},
+        {value=>'UTC-13', valid=>0},
+        {value=>'UTC+12:01', valid=>1, validated_value=>+(12*3600+60)},
     ],
 }, {}];
 
@@ -58,7 +58,7 @@ Sah::Schema::date::tz_offset_lax - Timezone offset in seconds from UTC
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::date::tz_offset_lax (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::Schema::date::tz_offset_lax (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -72,7 +72,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;

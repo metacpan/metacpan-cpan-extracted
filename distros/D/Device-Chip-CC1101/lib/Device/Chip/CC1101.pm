@@ -3,11 +3,10 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.16;
 use 5.026; # postfix-deref, signatures
+use Object::Pad 0.27;
 
-package Device::Chip::CC1101 0.03 { } 
-
+package Device::Chip::CC1101 0.04;
 class Device::Chip::CC1101
    extends Device::Chip;
 
@@ -68,7 +67,7 @@ Interval in seconds to poll the chip status after transmitting. A default of
 has $_fosc;
 has $_poll_interval;
 
-method BUILD ( %opts )
+BUILD ( %opts )
 {
    $_fosc          = $opts{fosc} // 26E6; # presets presume 26MHz XTAL
    $_poll_interval = $opts{poll_interval} // 0.05;
@@ -82,7 +81,7 @@ method SPI_options
    );
 }
 
-method power { $self->protocol->power( @_ ) }
+method power ( $on ) { $self->protocol->power( $on ) }
 
 =head1 METHODS
 
@@ -314,17 +313,17 @@ values as a convenience.
 
 =cut
 
-sub _tohex   { return sprintf "%v02X", $_[0] }
-sub _fromhex { return pack "H*", $_[0] =~ s/\.//gr }
+sub _tohex   ( $v ) { return sprintf "%v02X", $v }
+sub _fromhex ( $v ) { return pack "H*", $v =~ s/\.//gr }
 
-async method _read_CONFIG
+async method _read_CONFIG ()
 {
    return await $self->protocol->write_then_read(
       pack( "C", REG_READ | REG_BURST | 0 ), 41
    );
 }
 
-async method _read_PATABLE
+async method _read_PATABLE ()
 {
    return await $self->protocol->write_then_read(
       pack( "C", REG_READ | REG_BURST | REG_PATABLE ), 8
@@ -335,7 +334,7 @@ has $_config;
 has $_patable;
 has %_cached_config;
 
-async method read_config
+async method read_config ()
 {
    my %config = (
       unpack_CONFIG( $_config //= await $self->_read_CONFIG ),
@@ -477,7 +476,7 @@ my @MARCSTATE = qw(
    TXRX_SWITCH RXFIFO_OVERFLOW FSTXON TX TXEND RXTX_SWITCH TXFIFO_UNDERFLOW
 );
 
-async method read_marcstate
+async method read_marcstate ()
 {
    my $marcstate = await $self->read_register( REG_MARCSTATE );
    return $MARCSTATE[$marcstate] // $marcstate;
@@ -499,8 +498,8 @@ following:
 
 =cut
 
-method read_chipstatus_rx { $self->_read_chipstatus( REG_READ ) }
-method read_chipstatus_tx { $self->_read_chipstatus( REG_WRITE ) }
+method read_chipstatus_rx () { $self->_read_chipstatus( REG_READ ) }
+method read_chipstatus_tx () { $self->_read_chipstatus( REG_WRITE ) }
 
 my @STATES = qw( IDLE RX TX FSTXON CALIBRATE SETTLINE RXFIFO_OVERFLOW TXFIFO_UNDERFLOW );
 
@@ -527,7 +526,7 @@ boolean fields of the following names:
 
 =cut
 
-async method read_pktstatus
+async method read_pktstatus ()
 {
    my $pktstatus = unpack "C", await $self->protocol->write_then_read(
       pack( "C", REG_READ|REG_BURST | REG_PKTSTATUS ), 1
@@ -560,7 +559,7 @@ Command the chip to perform a software reset.
 
 =cut
 
-async method reset
+async method reset ()
 {
    await $self->command( CMD_SRES );
 }
@@ -573,7 +572,7 @@ Command the chip to flush the RX and TX FIFOs.
 
 =cut
 
-async method flush_fifos
+async method flush_fifos ()
 {
    await $self->command( CMD_SFRX );
    await $self->command( CMD_SFTX );
@@ -587,7 +586,7 @@ Command the chip to enter RX mode.
 
 =cut
 
-async method start_rx
+async method start_rx ()
 {
    await $self->command( CMD_SIDLE );
    1 until ( await $self->read_marcstate ) eq "IDLE";
@@ -604,7 +603,7 @@ Command the chip to enter TX mode.
 
 =cut
 
-async method start_tx
+async method start_tx ()
 {
    await $self->command( CMD_SIDLE );
    1 until ( await $self->read_marcstate ) eq "IDLE";
@@ -621,7 +620,7 @@ Command the chip to enter IDLE mode.
 
 =cut
 
-async method idle
+async method idle ()
 {
    await $self->command( CMD_SIDLE );
 }
@@ -686,7 +685,7 @@ them available.
 
 =cut
 
-async method receive
+async method receive ()
 {
    # TODO: Check for RX UNDERFLOW somehow?
 

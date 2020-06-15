@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.871';
+our $VERSION = '1.872';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -923,6 +923,7 @@ sub del {
 
 sub set {
    my ( $key, $data, $keys, $indx ) = ( $_[1], @{ $_[0] } );
+
    $data->{ $key } = $_[2], $indx->{ $key } = @{ $keys };
    push @{ $keys }, "$key";
 
@@ -953,7 +954,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.871
+This document describes MCE::Hobo version 1.872
 
 =head1 SYNOPSIS
 

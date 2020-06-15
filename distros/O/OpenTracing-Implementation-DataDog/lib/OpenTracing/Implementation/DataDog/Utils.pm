@@ -6,6 +6,8 @@ OpenTracing::Implementation::DataDog::Utils - DataDog Utilities
 
 =cut
 
+our $VERSION = 'v0.30.1';
+
 use Exporter qw/import/;
 
 our @EXPORT_OK = qw/random_64bit_int nano_seconds epoch_floatingpoint/;

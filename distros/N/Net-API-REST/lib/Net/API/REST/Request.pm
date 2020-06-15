@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Request.pm
-## Version v0.8.4
+## Version v0.8.6
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/05/16
+## Modified 2020/06/13
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::REST::Request;
@@ -31,7 +31,7 @@ BEGIN
     use APR::Request::Apache2;
     use Net::API::REST::Cookies;
     use URI;
-    use URI::Query;
+    use Net::API::REST::Query;
     use URI::Escape;
     use HTTP::AcceptLanguage;
     use Net::API::REST::DateTime;
@@ -40,7 +40,7 @@ BEGIN
     use JSON;
     use Nice::Try;
     use version;
-    our $VERSION = 'v0.8.4';
+    our $VERSION = 'v0.8.6';
     our @DoW = qw( Sun Mon Tue Wed Thu Fri Sat );
     our @MoY = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
     our $MoY = {};
@@ -139,6 +139,8 @@ sub accept_language { return( shift->headers->{ 'Accept-Language' } ); }
 
 ## The allowed methods, GET, POST, PUT, OPTIONS, HEAD, etc
 sub allowed { return( shift->_try( 'request', 'allowed', @_ ) ); }
+
+sub args { return( shift->_try( 'request', 'args', @_ ) ); }
 
 sub as_string { return( shift->_try( 'request', 'as_string' ) ); }
 
@@ -686,7 +688,7 @@ sub query
 {
     my $self = shift( @_ );
     my $qs = $self->query_string;
-    my $qq = URI::Query->new( $qs );
+    my $qq = Net::API::REST::Query->new( $qs );
     my %hash = $qq->hash;
     return( \%hash );
 }
@@ -1052,7 +1054,7 @@ sub _try
     my $pack = shift( @_ ) || return( $self->error( "No Apache package name was provided to call method" ) );
     my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
     my $r = Apache2::RequestUtil->request;
-    $r->log_error( "Net::API::REST::Request::_try to call method \"$meth\" in package \"$pack\"." );
+    # $r->log_error( "Net::API::REST::Request::_try to call method \"$meth\" in package \"$pack\"." );
     try
     {
         return( $self->$pack->$meth ) if( !scalar( @_ ) );
@@ -1084,7 +1086,7 @@ Net::API::REST::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.8.4
+    v0.8.6
 
 =head1 DESCRIPTION
 
@@ -1731,7 +1733,7 @@ See L<Apache::RequestUtil> for more information.
 
 =head2 query()
 
-Check the query string sent in the http request, which obviously should be a GET, but not necessarily, and parse it with L<URI::Query> and return a hash reference.
+Check the query string sent in the http request, which obviously should be a GET, but not necessarily, and parse it with L<Net::API::REST::Query> and return a hash reference.
 
 =head2 query_string( query string )
 

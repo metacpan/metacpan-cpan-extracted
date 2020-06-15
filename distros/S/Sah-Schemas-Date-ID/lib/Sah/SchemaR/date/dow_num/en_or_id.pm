@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::dow_num::en_or_id;
 
-our $DATE = '2019-11-28'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["int",[{max=>7,min=>1,summary=>"Day-of-week number (1-7, 1=Monday)","x.completion"=>["date_dow_num_en_or_id"],"x.perl.coerce_rules"=>["From_str::convert_en_or_id_dow_name_to_num"]}],["int"]];
+our $rschema = ["int",[{examples=>[{valid=>0,value=>""},{valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,value=>7},{valid=>0,value=>8}],max=>7,min=>1,summary=>"Day-of-week number (1-7, 1=Monday)","x.completion"=>["date_dow_num_en_or_id"],"x.perl.coerce_rules"=>["From_str::convert_en_or_id_dow_name_to_num"]}],["int"]];
 
 1;
 # ABSTRACT: Day-of-week number (1-7, 1=Monday)
@@ -20,7 +20,7 @@ Sah::SchemaR::date::dow_num::en_or_id - Day-of-week number (1-7, 1=Monday)
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::date::dow_num::en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
+This document describes version 0.005 of Sah::SchemaR::date::dow_num::en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 ---
-abstract: 'Select a pager and pipe text to it if destination is a TTY'
+abstract: 'Select a pager (possibly perl-based) & pipe it text if a TTY'
 author:
   - 'Jerrad Pierce <jpierce@cpan.org>, Florent Angly <florent.angly@gmail.com>'
 build_requires:
@@ -35,7 +35,7 @@ requires:
   Tie::Handle: '0'
   base: '0'
   perl: '5.008000'
-version: '1.02'
+version: '1.03'
 x_runtime:
   recommends: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

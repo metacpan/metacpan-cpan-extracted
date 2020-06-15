@@ -1,5 +1,5 @@
 package IO::Pager;
-our $VERSION = "1.02"; #Untouched since 1.02
+our $VERSION = "1.03"; #Untouched since 1.03
 
 use 5.008; #At least, for decent perlio, and other modernisms
 use strict;
@@ -13,7 +13,7 @@ use Symbol;
 use overload '+' => "PID", bool=> "PID";
 
 our $SIGPIPE;
-my $oldPAGER = $PAGER;
+#use Carp; $SIG{__WARN__} = sub{ print STDERR @_, Carp::longmess(),"\n\n"; };
 
 sub find_pager {
   # Return the name (or path) of a pager that IO::Pager can use
@@ -79,6 +79,7 @@ sub _check_pagers {
 
 #Should have this as first block for clarity, but not with its use of a sub
 BEGIN { # Set the $ENV{PAGER} to something reasonable
+  our $oldPAGER = $PAGER || '';
   $PAGER = find_pager();
   
   if( ($PAGER =~ 'more' and $oldPAGER ne 'more') or
@@ -229,6 +230,7 @@ sub PRINTF {
   my ($self, $format, @args) = @_;
   $self->PRINT(sprintf($format, @args));
 }
+
 
 sub say {
   my ($self, @args) = @_;

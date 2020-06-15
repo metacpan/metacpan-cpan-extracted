@@ -5,15 +5,12 @@ use warnings;
 
 use parent qw(Exporter);
 
-our $VERSION = '0.033';
+our $VERSION = '0.034';
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
 
 Tickit::DSL - domain-specific language for Tickit terminal apps
-
-=head1 VERSION
-
-version 0.032
 
 =head1 SYNOPSIS
 
@@ -36,7 +33,6 @@ mainly intended for prototyping:
  use strict;
  use warnings;
  use Tickit::DSL;
- 
  vbox {
   # Single line menu at the top of the screen
   menubar {
@@ -704,7 +700,7 @@ already installed.
 =cut
 
 sub console(&@) {
-    require Tickit::Console;
+    require "Tickit" . "/Console.pm";
     my %args = (on_line => @_);
     my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
     my $w = Tickit::Console->new(
@@ -1492,3 +1488,4 @@ Tom Molesworth <TEAM@cpan.org>
 =head1 LICENSE
 
 Copyright Tom Molesworth 2012-2015. Licensed under the same terms as Perl itself.
+

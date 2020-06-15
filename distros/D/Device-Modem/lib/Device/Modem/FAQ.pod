@@ -10,7 +10,7 @@ connected to your computer via a B<serial port>.
 
 =head2 Who is the author of this work?
 
-Cosimo Streppone (L<cosimo@cpan.org>), an italian guy who works and
+Cosimo Streppone (L<cosimo@cpan.org>), an Italian guy, who works and
 enjoys writing perl programs and objects. If you want to know more,
 go to http://www.streppone.it/cosimo/work/perl/
 
@@ -211,4 +211,3 @@ Uh.
 
 Please contact me, so I can improve my software design, ideas and coding,
 but only if you explain the reasons of your criticism. Thank you.
-

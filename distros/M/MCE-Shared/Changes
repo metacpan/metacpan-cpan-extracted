@@ -1,6 +1,19 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.872 Sun Jun 14 22:30:00 EST 2020
+
+  * Added open to required dependencies.
+  * Set default encodings on standard filehandles in tests using UTF-8.
+
+  * Added setnx method to MCE::Shared::{ Cache, Hash and Ordhash }.
+  * Added hsetnx method to MCE::Shared::Minidb.
+
+  * Updated keys, pairs, and values in
+    MCE::Shared::{ Array, Cache, Hash and Ordhash }.
+
+  * The MCE::Shared project is completed.
+
 1.871 Wed May 13 05:30:00 EST 2020
 
   * Reverted prior change. Skip unicode testing for MCE::Shared::Cache

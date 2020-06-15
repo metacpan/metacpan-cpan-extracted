@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 use 5.026;
-use Object::Pad 0.22;
+use Object::Pad 0.27;
 
-class Tickit::Widget::Tabbed::Ribbon 0.022
+package Tickit::Widget::Tabbed::Ribbon 0.023;
+class Tickit::Widget::Tabbed::Ribbon
         extends Tickit::Widget;
 
 Tickit::Window->VERSION( '0.57' );  # ->bind_event
@@ -118,7 +119,7 @@ has $_active_tab_index;
 
 has @_tabs;
 
-method BUILD ( %args ) {
+BUILD ( %args ) {
         my ( $prev_more, $next_more ) = $args{tabbed}->get_style_values(qw( more_left more_right ));
         $_prev_more = MoreMarker( $prev_more, textwidth( $prev_more ), undef );
         $_next_more = MoreMarker( $next_more, textwidth( $next_more ), undef );
@@ -302,7 +303,7 @@ use List::Util qw( sum0 );
 has $_active_marker;
 has $_scroll_offset = 0;
 
-method BUILD ( %args ) {
+BUILD ( %args ) {
         $_active_marker = $args{active_marker} || [ "[", "]" ];
 }
 
@@ -520,7 +521,7 @@ use List::Util qw( max );
 has $_tab_position;
 has $_scroll_offset = 0;
 
-method BUILD ( %args ) {
+BUILD ( %args ) {
         $_tab_position = $args{tab_position};
 }
 

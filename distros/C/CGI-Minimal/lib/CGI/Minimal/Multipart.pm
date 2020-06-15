@@ -2,7 +2,7 @@ package CGI::Minimal;
 
 # This program is licensed under the same terms as Perl.
 # See http://dev.perl.org/licenses/
-# Copyright 1999-2004 Benjamin Franz. All Rights Reserved.
+# Copyright Jerilyn Franz. All Rights Reserved.
 
 # I don't 'use warnings;' here because it pulls in ~ 20Kbytes of code
 # and is incompatible with perl's older than 5.6

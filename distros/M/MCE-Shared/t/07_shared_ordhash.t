@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use utf8;
+use open qw(:std :utf8);
 
 use Test::More;
 
@@ -12,9 +13,9 @@ BEGIN {
    use_ok 'MCE::Shared::Ordhash';
 }
 
-MCE::Flow::init {
+MCE::Flow->init(
    max_workers => 1
-};
+);
 
 tie my %h1, 'MCE::Shared', { module => 'MCE::Shared::Ordhash' }, (
    k1 => 10, k2 => '', k3 => ''
@@ -53,7 +54,7 @@ MCE::Flow::run( sub {
    $h5->{n}    = 20;
 });
 
-MCE::Flow::finish;
+MCE::Flow->finish;
 
 is( $h1{k1}, 15, 'shared ordhash, check fetch, store' );
 is( $h1{k2}, '', 'shared ordhash, check blank value' );
@@ -69,13 +70,18 @@ MCE::Flow::run( sub {
    $h1{ret} = [ 'wind', 'air' ];
 });
 
-MCE::Flow::finish;
+MCE::Flow->finish;
 
 is( $e1,  1, 'shared ordhash, check exists before delete' );
 is( $d1, '', 'shared ordhash, check delete' );
 is( $e2,  0, 'shared ordhash, check exists after delete' );
 is( $s1,  0, 'shared ordhash, check clear' );
 is( $h1{ret}->[1], 'air', 'shared ordhash, check auto freeze/thaw' );
+
+is( $h5->setnx(n => 10), 0, 'shared ordhash, check setnx old key' );
+is( $h5->get('n'), '20', 'shared ordhash, check setnx old value' );
+is( $h5->setnx(m => 10), 1, 'shared ordhash, check setnx new key' );
+is( $h5->get('m'), '10', 'shared ordhash, check setnx value' );
 
 {
    $h5->clear();
@@ -111,6 +117,24 @@ is( $h1{ret}->[1], 'air', 'shared ordhash, check auto freeze/thaw' );
       [ @vals ], [ qw/ c_c b_b a_a / ],
       'shared ordhash, check pipeline_ex list'
    );
+}
+
+{
+   $h5->clear();
+
+   my ( $k, $v );
+
+   ( $k, $v ) = $h5->pop;
+   cmp_array( [ $k, $v ], [ undef, undef ], 'shared ordhash, pop empty in list context' );
+
+   ( $k, $v ) = $h5->shift;
+   cmp_array( [ $k, $v ], [ undef, undef ], 'shared ordhash, shift empty in list context' );
+
+   $v = $h5->pop;
+   is( $v, undef, 'shared ordhash, pop empty in scalar context' );
+
+   $v = $h5->shift;
+   is( $v, undef, 'shared ordhash, shift empty in scalar context' );
 }
 
 ## --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
@@ -516,7 +540,8 @@ $h5->sort("by key alpha desc"), cmp_array(
 
 ## MCE::Shared->ordhash is ordered. Therefore, sorting is not required.
 
-$h5->clear(); $h5->mset( 0, 'over', 1, 'the', 2, 'rainbow', 3, 77 );
+$h5->assign( 0, '', 1, '', 2, 'rainbow' );
+$h5->mset( 1, 'the', 0, 'over', 3, 77 );
 
 cmp_array(
    [ $h5->pairs() ], [ qw/ 0 over 1 the 2 rainbow 3 77 / ],

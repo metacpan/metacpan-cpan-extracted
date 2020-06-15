@@ -28,7 +28,7 @@ chomp $baud;
 
 $baud ||= 19200;
 
-my $modem = new Device::Modem ( port => $port );
+my $modem = Device::Modem->new( port => $port );
 my $stop;
 
 die "Could not connect to $port!\n" unless $modem->connect( baudrate => $baud );
@@ -55,4 +55,3 @@ while( not $stop ) {
 }
 
 print "Done.\n";
-

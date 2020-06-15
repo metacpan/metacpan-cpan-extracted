@@ -1,3 +1,9 @@
+0.734   2020-06-12  Released-By: PERLANCAR; Urgency: medium
+
+	- pmgrep: Allow wildcards in module names by using Sah schema
+	  'perl::modnames'.
+
+
 0.733   2020-05-10  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli pmcost] Fix schema for module argument to allow args, e.g.

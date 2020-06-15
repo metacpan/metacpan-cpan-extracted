@@ -1,18 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::AD5691R;
+use 5.026;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
+package Device::Chip::AD5691R 0.09;
+class Device::Chip::AD5691R
+   extends Device::Chip;
 
 use Carp;
 use Future::AsyncAwait;
-
-our $VERSION = '0.08';
 
 use Data::Bitfield qw( bitfield boolfield enumfield );
 
@@ -62,11 +61,8 @@ leading C<0> or C<0x> prefixes.
 
 =cut
 
-sub I2C_options
+sub I2C_options ( $, %params )
 {
-   my $self = shift;
-   my %params = @_;
-
    my $addr = delete $params{addr} // 0x4C;
    $addr = oct $addr if $addr =~ m/^0/;
 
@@ -104,15 +100,15 @@ initialised to power-on defaults, and tracked by the C<change_config> method.
 
 =cut
 
-async sub read_config
-{
-   my $self = shift;
+has $_config;
 
+async method read_config ()
+{
    # The chip doesn't allow us to read its config. These are the power-on
    # defaults. We'll track updates.
-   my $config = $self->{config} //= 0;
+   $_config //= 0;
 
-   return { unpack_CONFIG( $config ) };
+   return { unpack_CONFIG( $_config ) };
 }
 
 =head2 change_config
@@ -124,17 +120,14 @@ their existing values.
 
 =cut
 
-async sub change_config
+async method change_config ( %changes )
 {
-   my $self = shift;
-   my %changes = @_;
-
    my $config = await $self->read_config;
 
-   $self->{config} = pack_CONFIG( %$config, %changes );
+   $_config = pack_CONFIG( %$config, %changes );
 
    await $self->protocol->write( pack "C S>",
-      CMD_WRITE_CTRL, $self->{config} << 11 );
+      CMD_WRITE_CTRL, $_config << 11 );
 }
 
 =head1 METHODS
@@ -154,11 +147,8 @@ the output voltage.
 
 =cut
 
-async sub write_dac
+async method write_dac ( $value, $update = 0 )
 {
-   my $self = shift;
-   my ( $value, $update ) = @_;
-
    await $self->protocol->write( pack "C S>",
       ( $update ? CMD_WRITE_AND_UPDATE : CMD_WRITE_INPUT ), $value << 4 );
 }
@@ -173,11 +163,8 @@ C<GAIN> config bit.
 
 =cut
 
-async sub write_dac_voltage
+async method write_dac_voltage ( $voltage )
 {
-   my $self = shift;
-   my ( $voltage ) = @_;
-
    my $config = await $self->read_config;
 
    my $value = $voltage * ( 1 << 12 ) / 2.5;

@@ -26,7 +26,7 @@ use Carp qw(confess);
 use Crypt::JWT qw(encode_jwt);
 use Data::UUID;
 
-our $VERSION = '3.0000';
+our $VERSION = '3.0001';
 
 has configuration => (
     is       => 'ro',
@@ -43,7 +43,7 @@ has configuration => (
 
 =cut
 
-sub createCheckoutCode {
+sub getPurchaseId {
     my ($self, $offer) = @_;
 
     my $rest_client = plenigo::RestClient->new(configuration => $self->configuration);

@@ -35,6 +35,7 @@ my $server = Test::HTTP::LocalServer->spawn(
 );
 
 my $ua = Future::HTTP::AnyEvent->new();
+ok $ua->is_async, 'is_async is true';
 my $url = $server->url;
 
 my ($body,$headers) = $ua->http_get($url)->get;

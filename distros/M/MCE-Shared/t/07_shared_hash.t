@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use utf8;
+use open qw(:std :utf8);
 
 use Test::More;
 
@@ -12,9 +13,9 @@ BEGIN {
    use_ok 'MCE::Shared::Hash';
 }
 
-MCE::Flow::init {
+MCE::Flow->init(
    max_workers => 1
-};
+);
 
 tie my %h1, 'MCE::Shared', ( k1 => 10, k2 => '', k3 => '' );
 
@@ -51,7 +52,7 @@ MCE::Flow::run( sub {
    $h5->{n}  = 20;
 });
 
-MCE::Flow::finish;
+MCE::Flow->finish;
 
 is( $h1{k1}, 15, 'shared hash, check fetch, store' );
 is( $h1{k2}, '', 'shared hash, check blank value' );
@@ -67,13 +68,18 @@ MCE::Flow::run( sub {
    $h1{ret} = [ 'wind', 'air' ];
 });
 
-MCE::Flow::finish;
+MCE::Flow->finish;
 
 is( $e1,  1, 'shared hash, check exists before delete' );
 is( $d1, '', 'shared hash, check delete' );
 is( $e2,  0, 'shared hash, check exists after delete' );
 is( $s1,  0, 'shared hash, check clear' );
 is( $h1{ret}->[1], 'air', 'shared hash, check auto freeze/thaw' );
+
+is( $h5->setnx(n => 10), 0, 'shared hash, check setnx old key' );
+is( $h5->get('n'), '20', 'shared hash, check setnx old value' );
+is( $h5->setnx(m => 10), 1, 'shared hash, check setnx new key' );
+is( $h5->get('m'), '10', 'shared hash, check setnx new value' );
 
 {
    $h5->clear();

@@ -1,3 +1,17 @@
+0.012   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Do not use 'return' in coerce/prefilter generated code
+	  because it causes early exit in Perinci::Sub::Wrapper-generated
+	  code.
+
+
+0.011   2020-05-27  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Make PID a posint not uint (0 is not allowed).
+
+	- Add examples (tests) in the schema and remove the tests in t/.
+
+
 0.010   2020-02-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Reimplement coercion rules as filter rules because filters are

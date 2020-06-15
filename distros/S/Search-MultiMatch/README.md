@@ -54,7 +54,7 @@ This example illustrates how to add some key/value pairs to the table and how to
     }
 
     my $pattern = make_key('i love');        # make the search-pattern
-    my @matches = $smm->search($pattern);    # search for the pattern
+    my @matches = $smm->search($pattern);    # search by the pattern
 
     pp \@matches;                            # dump the results
 ```

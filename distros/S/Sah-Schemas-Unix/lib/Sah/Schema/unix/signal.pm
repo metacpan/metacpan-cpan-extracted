@@ -1,10 +1,13 @@
 package Sah::Schema::unix::signal;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-13'; # DATE
+our $DIST = 'Sah-Schemas-Unix'; # DIST
+our $VERSION = '0.012'; # VERSION
 
 our $schema = ['str' => {
     'summary' => 'Unix signal name (e.g. TERM or KILL) or number (9 or 15)',
+    match => '\A(?:[A-Z]+[0-9]*|[1-9][0-9]*)\z',
     'x.examples' => [qw/HUP INT QUIT ILL ABRT FPE KILL SEGV PIPE ALRM TERM USR1 USR2 CHLD CONT STOP TSTP TTIN TTOU/, 1..15],
 _
 }, {}];
@@ -24,7 +27,68 @@ Sah::Schema::unix::signal - Unix signal name (e.g. TERM or KILL) or number (9 or
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("unix::signal*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("unix::signal*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['unix::signal*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 =head1 HOMEPAGE
 

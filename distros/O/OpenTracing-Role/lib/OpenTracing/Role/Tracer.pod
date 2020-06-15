@@ -1,0 +1,259 @@
+
+=head1 NAME
+
+OpenTracing::Role::Tracer - Role for OpenTracin implementations.
+
+=head1 SYNOPSIS
+
+    package OpenTracing::Implementation::MyBackendService::Tracer;
+    
+    use Moo;
+    
+    sub build_span {
+        my $self = shift;
+        my %opts = @_;
+        
+        Span->new( %opts,
+            on_finish => sub {
+                my $span = shift;
+                $self->do_something_with_span( $span )
+            },
+        )
+    }
+    
+    sub build_context { ... }
+        my $self = shift;
+        my %opts = @_;
+        
+        SpanContext->new( %opts )
+    }
+    
+    sub extract_context { ... }
+    
+    sub inject_context { ... }
+    
+    ...
+    
+    with 'OpenTracing::Role::Tracer';
+    
+    1;
+
+
+=head1 DESCRIPTION
+
+This C<Moo::Role> provides the consuming class with most, if not all, of the
+methods being described in L<OpenTracing::Interface::Tracer>.
+
+
+
+=head1 IMPLEMENTED OPENTRACING METHODS
+
+The following methods from
+L<OpenTracing::Interface|OpenTracing::Interface::Span>
+have been implemented. See their documentation for more details.
+
+
+
+=head2 C<get_scope_manager>
+
+Returns the current C<ScopeManager>, which may be a NoOp but may not be
+C<undef>.
+
+See L<OpenTracing::Interface::Tracer/"get_scope_manager">.
+
+
+
+=head2 C<get_active_span>
+
+This will return the 'active' span.
+
+See L<OpenTracing::Interface::Tracer/"get_active_span">.
+
+
+
+=head2 C<start_active_span>
+
+Starts AND activates a C<Span> and returns its C<Scope>.
+
+See L<OpenTracing::Interface::Tracer/"start_active_span">.
+
+
+
+=head2 C<start_span>
+
+Starts, but does not activate a C<Span>
+
+See L<OpenTracing::Interface::Tracer/"start_span">.
+
+
+
+=head1 WARNING
+
+B<Never use any of attributes or methods below in any integration!>
+
+Only methods mentioned in the Public OpenTracing::Interface are safe to be used
+in any integration or when instrumenting applications.
+
+
+
+=head1 ATTRIBUTES
+
+The attributes below become part of the consuming class, but because of its
+in-mutable design, those can not be set after instantiation, one will need to
+use the provided methods to clone with the data.
+
+
+
+=head2 C<scope_manager>
+
+A required read-only L<ScopeManager|OpenTracing::Types::ScopeManager> that
+can L<< C<get_active_scope> |
+OpenTracing::Interface::ScopeManager/"get_active_scope" >>
+and  L<< C<activate_span> |
+OpenTracing::Interface::ScopeManager/"activate_span" >>
+
+See L<ScopeManager|OpenTracing::Interface::ScopeManager>.
+
+
+
+=head2 C<default_span_context_args>
+
+An optional C<HashRef> that defaults to an empty hash reference.
+
+These key/value pairs are being used to build a new C<SpanContext> object (using
+C<build_context> for a I<rootspan> if no active <SpanContext> is provided or
+available during C<start_span>. These key/value pairs are typically
+implementation dependent.
+
+See L<< C<build_context> >>.
+
+
+
+
+=head1 REQUIRED METHODS
+
+The following method(s) are required to be implemented by a consuming class.
+
+
+
+=head2 C<build_span>
+
+An implementation specific build method that allows the implementation to do its
+own settings and requirements, where needed. One typical responsabillity of the
+builder is to set the L<< C<on_finish>|OpenTracing::Role::Span/"on_finish" >>.
+
+The first argument of the method call, is as usual, the C<Tracer> invocant self.
+
+=over
+
+=item Expected Named Parameters
+
+=over
+
+=item C<operation_name>
+
+A required <Str> representing the name of this span
+
+=item C<child_of>
+
+A required C<span> or C<SpanContext> that this decends from
+
+=item C<context>
+
+The required current C<SpanContext> the new <Span> belongs to at the time of
+creation.
+
+=item C<start_time>
+
+An optional C<PositiveOrZeroNum>, the (fractional) number of seconds since epoch
+
+=item C<tags>
+
+An optional <HashRef> of <Str>.
+
+=back
+
+=item Returns
+
+=over
+
+=item MUST return a L<< C<Span>|OpenTracing::Types::Span >>
+
+=back
+
+=back
+
+
+
+=head2 C<build_context>
+
+An implementation specific build method that allows the implementation to do its
+own settings and requirements, where needed. 
+
+The first argument of the method call, is as usual, the C<Tracer> invocant self.
+
+It will get followed by the (dereferenced) list of C<default_span_context_args>.
+
+=over
+
+=item Returns
+
+=over
+
+=item MUST return a L<< C<Span>|OpenTracing::Types::SpanContext >>
+
+=back
+
+=back
+
+
+
+=head2 C<extract_context>
+
+See L<< C<extract_context>|OpenTracing::Interface::Tracer/"extract_context" >>
+for a description.
+
+
+
+=head2 C<inject_context>
+
+See L<< C<extract_context>|OpenTracing::Interface::Tracer/"inject_context" >>
+for a description.
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Types>
+
+Type constraints for checking Interfaces
+
+=item L<OpenTracing::Interface::Tracer>
+
+A role that defines the Tracer interface
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+=cut

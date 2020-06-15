@@ -1,5 +1,10 @@
 package Sah::Schemas::Date::ID;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-08'; # DATE
+our $DIST = 'Sah-Schemas-Date-ID'; # DIST
+our $VERSION = '0.005'; # VERSION
+
 1;
 # ABSTRACT: Sah schemas related to date (Indonesian)
 
@@ -15,7 +20,7 @@ Sah::Schemas::Date::ID - Sah schemas related to date (Indonesian)
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schemas::Date::ID (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
+This document describes version 0.005 of Sah::Schemas::Date::ID (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -51,7 +56,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@
 #
 # This script tries to dial a number taken from STDIN
 # or as first argument.
-# 
+#
 # Example:
 #   perl dial.pl 012,3456789
 #
@@ -29,7 +29,7 @@ if( $config{'tty'} ) {
 
 } else {
 
-	$config{'tty'} = $Device::Modem::DEFAULT_PORT; 
+	$config{'tty'} = $Device::Modem::DEFAULT_PORT;
 
 	print "What is your serial port? [$config{'tty'}] ";
 	chomp( $port = <STDIN> );
@@ -42,7 +42,7 @@ if( $config{'tty'} ) {
 
 }
 
-my $modem = new Device::Modem( port => $port );
+my $modem = Device::Modem->new( port => $port );
 
 if( $modem->connect( baudrate => $config{'baud'} || 19200 ) ) {
 	print "ok connected.\n";

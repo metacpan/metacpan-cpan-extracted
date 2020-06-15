@@ -1,3 +1,18 @@
+0.013   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Some convenience added: --from as alias for --from-time,
+	  --to as alias for --to-time.
+
+        - [ux] More sensible default for --to-time: now set to 'now' instead of
+	  end of the day of '--from-time'.
+
+
+0.012   2020-06-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Add coerce rule 'From_str::natural' for date arguments to
+	  allow CLI saying e.g. 'list-new-cpan-dists --from-time yesterday.
+
+
 0.011   2020-02-06  Released-By: PERLANCAR; Urgency: medium
 
 	- Add stats.

@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::uid;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-06-13'; # DATE
+our $VERSION = '0.012'; # VERSION
 
-our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",summary=>"User identifier (UID)"}],["uint","int"]];
+our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",examples=>[{data=>0,valid=>1},{data=>1,valid=>1},{data=>-1,valid=>0}],min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",examples=>[{valid=>0,value=>-1},{valid=>1,value=>0},{valid=>1,value=>1}],summary=>"User identifier (UID)"}],["uint","int"]];
 
 1;
 # ABSTRACT: User identifier (UID)
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::uid - User identifier (UID)
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::unix::uid (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Sah::SchemaR::unix::uid (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
 
 =head1 DESCRIPTION
 

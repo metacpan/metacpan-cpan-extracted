@@ -53,23 +53,42 @@ implementation.
 
 
 
-=head2 get_scope_manager
+=head2 C<get_scope_manager>
 
-Returns the current C<ScopeManager>, which may be a NoOp but may not be null.
+Returns the current C<ScopeManager>, which may be a 'NoOp' implementation but
+may not be C<undef>.
 
     my $scope_manager = $tracer->get_scope_manager;
 
-=head3 Parameters
+=over
 
-None
+=item Positional Parameter(s)
 
-=head3 Returns
+=over
 
-An object of type C<ScopeManager> from L<OpenTracing::Types>.
+I<none>
+
+=back
+
+=item Returns
+
+=over
+
+=item C<ScopeManager>
+
+The scope manager dealing with scope for the integration.
+
+This will return a instance of aL<< C<NoOp> Implementation|
+OpenTracing::Implementation::NoOp::ScopeManager >> if no scope manager has been
+given during instantiation!
+
+=back
+
+=back
 
 
 
-=head2 get_active_span
+=head2 C<get_active_span>
 
 This will return the 'active' span.
 
@@ -77,18 +96,31 @@ This will return the 'active' span.
 
 A shorthand for C<< $tracer->get_scope_manager->get_active_scope->get_span >>.
 
-=head3 Parameters
+=over
 
-None
+=item Positional Parameter(s)
 
-=head3 Returns
+=over
 
-An object of type C<Span> from L<OpenTracing::Types> OR C<undef> if there is no
-active C<Scope>.
+I<none>
+
+=back
+
+=item Returns
+
+=over
+
+=item Maybe C<Span>
+
+An span object or C<undef> if there is no active scope.
+
+=back
+
+=back
 
 
 
-=head2 start_active_span( $operation_name, %options )
+=head2 C<start_active_span>
 
 Starts AND activates a C<Span> and returns its C<Scope>.
 
@@ -100,24 +132,26 @@ Starts AND activates a C<Span> and returns its C<Scope>.
         tags                    => {
             tag_key_1               => 'tag_value_1',
         },
-        start_time              => now(),           # default
+        start_time              => time,            # default
         ignore_active_span      => 0,               # default
         finish_span_on_close    => 1,               # default
     );
 
-=head3 Required Positional Parameters
+=over
+
+=item Required Positional Parameter(s)
 
 =over
 
-=item operation_name, as C<Str>
+=item operation_name, a B<required> C<Str>
 
 =back
 
-=head3 Named Options
+=item Named Options
 
 =over
 
-=item child_of
+=item C<child_of>, a C<Span> or C<SpanContext>
 
 either
 
@@ -127,43 +161,47 @@ or
 
 An object of type C<SpanContext> from L<OpenTracing::Types>.
 
-=item references
+=item C<references>, as B<array reference> of C<ContextReference>s
 
-an C<ArrayRef> of C<ContextReference> type objects.
+=item C<tags>, a B<hash reference> of C<Str>
 
-=item tags
+a hash reference of tags, the values must be a strings.
 
-a C<HashRef> of tags, the values must be a C<Str>
+=item C<start_time>, a C<PositiveOrZeroNum>
 
-=item start_time
+The (fractional) number off  seconds since epoch, and can have decimals, for
+example, up to nano-seconds accuracy.
 
-A C<PositiveOrZeroNum>, that is the number off seconds since epoch, and can have
-decimals, for example, up to nano-seconds accuracy.
+=item C<ignore_active_span>, a C<Bool>
 
-=item ignore_active_span
-
-A C<Bool> when set to 'true', will not use the current active span when creating
-an implicit parent span for a missing L<child_of>, otherwise, that would be
+When set to 'true', will not use the current active span when creating an
+implicit parent span for a missing C<child_of>, otherwise, that would be
 used.
 
-=item finish_span_on_close
+=item C<finish_span_on_close>, a C<Bool>
 
-A C<Bool> when set to false, it will not be automatically closed when it goes
-out of scope. This is 'true' by default.
+When set to false, it will not be automatically closed when it goes out of
+scope. This is 'true' by default.
 
 =back
 
-=head3 Returns
+=item Returns
 
-An object of type C<Scope> from L<OpenTracing::Types>.
+=over
 
-=head3 Note
+=item C<Scope>
+
+=back
+
+=item Note
 
 C<child_of> and C<references> are mutual exclusive.
 
+=back
 
 
-=head2 start_span( $operation_name, %options )
+
+=head2 C<start_span>
 
 Starts, but does not activate a C<Span>
 
@@ -175,23 +213,25 @@ Starts, but does not activate a C<Span>
         tags                    => {
             tag_key_1               => 'tag_value_1',
         },
-        start_time              => now(),           # default
+        start_time              => time,            # default
         ignore_active_span      => 0,               # default
     );
 
-=head3 Required Positional Parameters
+=over
+
+=item Required Positional Parameter(s)
 
 =over
 
-=item operation_name, as C<Str>
+=item operation_name, a B<required> C<Str>
 
 =back
 
-=head3 Named Options
+=item Named Options
 
 =over
 
-=item child_of
+=item C<child_of>, a C<Span> or C<SpanContext>
 
 either
 
@@ -199,43 +239,47 @@ An object of type C<Span> from L<OpenTracing::Types>.
 
 or
 
-An object of type C<SpanContex> from L<OpenTracing::Types>.
+An object of type C<SpanContext> from L<OpenTracing::Types>.
 
-=item references
+=item C<references>, as B<array reference> of C<ContextReference>s
 
-an C<ArrayRef> of C<ContextReference> type objects.
+=item C<tags>, a B<hash reference> of C<Str>
 
-=item tags
+a hash reference of tags, the values must be a strings.
 
-a C<HashRef> of tags, the values must be a C<Str>
+=item C<start_time>, a C<PositiveOrZeroNum>
 
-=item start_time
+The (fractional) number off  seconds since epoch, and can have decimals, for
+example, up to nano-seconds accuracy.
 
-A C<PositiveOrZeroNum>, that is the number off seconds since epoch, and can have
-decimals, for example, up to nano-seconds accuracy.
+=item C<ignore_active_span>, a C<Bool>
 
-=item ignore_active_span
-
-A C<Bool> when set to 'true', will not use the current active span when creating
-an implicit parent span for a missing L<child_of>, otherwise, that would be
+When set to 'true', will not use the current active span when creating an
+implicit parent span for a missing C<child_of>, otherwise, that would be
 used.
 
 =back
 
-=head3 Returns
+=item Returns
 
-An object of type C<Span> from L<OpenTracing::Types>.
+=over
 
-=head3 Note
+=item C<Span>
+
+=back
+
+=item Note
 
 C<child_of> and C<references> are mutual exclusive.
 
+=back
 
 
-=head2 inject_context( OPENTRACING_CARRIER_FORMAT => $carrier, $span_context )
+
+=head2 C<inject_context>
 
 Takes a C<SpanContext> and takes the bits that are of interest, and injects them
-into a B<cloned> C<$carrier>.
+into a B<cloned> carrier.
 
     my $span_context = $tracer->get_active_span->get_context;
     
@@ -244,7 +288,7 @@ into a B<cloned> C<$carrier>.
     
     my $cntx_headers =
         $tracer->inject_context(
-            OPENTRACING_FORMAT_HTTP_HEADERS => $http_headers,
+            OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS => $http_headers,
             $opentracing_spancontext
     );
     
@@ -257,36 +301,46 @@ The C<$carier> will be a best effort clone, because immutable object should be
 the right thing to have.
 
 Depending on the implementation items that will be injected are things like
-C<trace_id>, C<span_id> and possibly all the C<BaggageItems>.
-
-=head3 Required Positional Parameters
+C<trace_id>, C<span_id> and possibly all the C<baggage_items>.
 
 =over
 
-=item OPENTRACING_FORMAT
+=item Required Positional Parameter(s)
 
-A way to specify the format of the carrier.
+=over
 
-=item $carrier
+=item OPENTRACING_CARRIER_FORMAT, an Enum
 
-Most likely, a 'object' but the specs describe plain text map too. and binary
+A way to specify the format of the carrier. See
+L<OpenTracing::Constants::CarrierFormat> for an overview.
+
+=item carrier
+
+Most likely, a 'object' but the specs describe plain text map too, and binary
 data.
 
-=item $span_context
-
-The C<SpanContext> containing the the information that needs to be added to the
-C<$carrier>.
+=item span_context, A B<required> C<SpanContext>
+The span context containing the the information that needs to be added to the
+carrier.
 
 =back
 
-=head3 Returns
+=item Returns
 
-A B<cloned> version of the C<$carrier> with the - for the implementation
-relevent - injected context items.
+=over
+
+=item C<Object> or otherwise <Defined>
+
+A B<cloned> version of the carrier with the - for the implementation relevent -
+injected context items.
+
+=back
+
+=back
 
 
 
-=head2 extract_context( OPENTRACING_CARRIER_FORMAT => $carrier )
+=head2 C<extract_context>
 
 Extract the tracer relevant information from a C<$carrier> and return it as a
 C<SpanContext>.
@@ -302,29 +356,38 @@ C<SpanContext>.
         
     }
 
-This may return C<undef> iff the C<$carrier> can be understood, based on the
-given C<OPENTRACING_CARRIER_FORMAT>, but no relevant information could be
+This may return C<undef> iff the carrier can be understood, based on the
+given C<OPENTRACING_CARRIER_FORMAT>, and no relevant information could be
 detected. This usually happens at incomming request that are not part of a
 ditributed service.
 
-=head3 Required Positional Parameters
+=over
+
+=item Required Positional Parameter(s)
 
 =over
 
-=item OPENTRACING_CARRIER_FORMAT
+=item OPENTRACING_CARRIER_FORMAT, an Enum
 
-A way to specify the format of the carrier.
+A way to specify the format of the carrier. See
+L<OpenTracing::Constants::CarrierFormat> for an overview.
 
-=item $carrier
+=item carrier
 
-Most likely, a 'object' but the specs describe plain text map too. and binary
+Most likely, a 'object' but the specs describe plain text map too, and binary
 data.
 
 =back
 
-=head3 Returns
+=item Returns
 
-An object of type C<SpanContext> from L<OpenTracing::Types>.
+=over
+
+=item Maybe C<SpanContext>
+
+=back
+
+=back
 
 
 
@@ -344,8 +407,6 @@ all common elements that conform L<OpenTracing::Interface>
 
 =back
 
-=cut
-
 
 
 =head1 CAVEATS
@@ -361,4 +422,22 @@ Since this role does nothing else than checking input and output, it is useful
 during development. Most likely it can be switched off safely in production
 environments.
 
-=cut
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.

@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-FirefoxUtils",
   "EXE_FILES" => [
+    "script/firefox-has-processes",
     "script/firefox-is-paused",
     "script/firefox-is-running",
     "script/get-firefox-profile-dir",
@@ -21,6 +22,8 @@ my %WriteMakefileArgs = (
     "script/list-firefox-profiles",
     "script/pause-firefox",
     "script/ps-firefox",
+    "script/restart-firefox",
+    "script/start-firefox",
     "script/terminate-firefox",
     "script/unpause-firefox"
   ],
@@ -28,8 +31,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::FirefoxUtils",
   "PREREQ_PM" => {
-    "App::BrowserUtils" => "0.005",
+    "App::BrowserUtils" => "0.008",
     "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+    "Data::Sah::Compiler::perl::TH::any" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
@@ -52,7 +56,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,8 +64,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::BrowserUtils" => "0.005",
+  "App::BrowserUtils" => "0.008",
   "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+  "Data::Sah::Compiler::perl::TH::any" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,

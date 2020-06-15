@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -23,7 +23,9 @@
          "requires" : {
             "Device::Chip" : "0",
             "Future::AsyncAwait" : "0.19",
-            "List::Util" : "0"
+            "List::Util" : "0",
+            "Object::Pad" : "0.27",
+            "perl" : "5.026"
          }
       },
       "test" : {
@@ -36,7 +38,7 @@
    "provides" : {
       "Device::Chip::NoritakeGU_D" : {
          "file" : "lib/Device/Chip/NoritakeGU_D.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -45,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -154,14 +154,7 @@ MUSE
     foreach my $ext ('.tex', '.sl.tex') {
         my $texbody = read_file($source . $ext);
         unlike $texbody, qr{\\MakeSorted};
-        diag $texbody;
-        if ($ext eq '.tex') {
-            unlike $texbody, qr{\\usepackage\[fragile\]\{bigfoot\}};
-        }
-        else {
-            # for sl.tex is irrelevant, but template is missing the conditional:
-            like $texbody, qr{\\usepackage\[fragile\]\{bigfoot\}};
-        }
+        unlike $texbody, qr{\\usepackage\[fragile\]\{bigfoot\}};
     }
     foreach my $ext ('.pdf', '.sl.pdf') {
         my $output = $source . $ext;

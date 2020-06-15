@@ -37,7 +37,7 @@ via L<activate_Span> and access to an active C<Scope> via L<get_active_scope>.
 
 
 
-=head2 activate_span( $span, %options )
+=head2 C<activate_span>
 
 Set the specified C<Span> as the active instance for the current context
 (usually a thread).
@@ -46,9 +46,9 @@ Set the specified C<Span> as the active instance for the current context
         ignore_active_span => 1
     );
     
-    my $manager = $tracer->get_scope_manager;
+    my $scope_manager = $tracer->get_scope_manager;
     
-    my $scope = $manager->activate_span( $span,
+    my $scope = $scope_manager->activate_span( $span,
         finish_span_on_close => 0
     );
 
@@ -57,34 +57,44 @@ period is due, C<< $scope->close() >> ought to be called.
 Observe the span will be automatically finished when C<< $scope->close() >> is
 called.
 
-=head3 Required Positional Parameters
+=over
+
+=item Required Positional Parameter(s)
 
 =over
 
-=item Span
+=item span, a B<required> C<Span> object.
 
-An object that does the C<Span> interface.
+The span to be activated.
 
 =back
 
-=head3 Named Options
+=item Named Options
 
 =over
 
-=item finish_span_on_close
+=item C<finish_span_on_close>, as a C<Bool>
 
-A C<Bool> when set to false, the C<Span> will not be automatically finished when
-the C<Scope> has been closed. This is 'true' by default.
+When set to false, the span will not be automatically finished when the scope
+is being closed. This is 'true' by default.
 
 =back
 
-=head3 Returns
+=item Returns
 
-An object that implements the C<Scope> interface.
+=over
+
+=item C<Scope>
+
+The scope object for the given span.
+
+=back
+
+=back
 
 
 
-=head2 get_active_scope
+=head2 Cget_active_scope>
 
 Return the currently active C<Scope> which can be used to access the
 currently active C<Span>, using C<< $scope->get_span >>.
@@ -93,15 +103,27 @@ currently active C<Span>, using C<< $scope->get_span >>.
     
     my $scope = $manager->get_activate_scope;
 
-=head3 Parameters
+=over
 
-none
+=item Positional Parameter(s)
 
-=head3 Returns
+=over
 
-The C<Scope> that is currently active or undef if none is yet active.
+I<none>
 
-=cut
+=back
+
+=item Returns
+
+=over
+
+=item Maybe C<Scope>
+
+The currently active scope or C<undef> if none.
+
+=back
+
+=back
 
 
 
@@ -127,15 +149,26 @@ all common elements that conform L<OpenTracing::Interface>
 
 =head1 CAVEATS
 
-This description is using C<around> method modifiers that basically wraps them
-around the real implementation. These method modifiers provide a 'readable' and
-reusable interface, describing the inputs and outputs, using type constraints.
-
-Consumers of this role, or implementors of the interface are MUST implement each
-method mentioned below. Not doing so will result in compilation errors.
-
 Since this role does nothing else than checking input and output, it is useful
 during development. Most likely it can be switched off safely in production
 environments.
 
-=cut
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.

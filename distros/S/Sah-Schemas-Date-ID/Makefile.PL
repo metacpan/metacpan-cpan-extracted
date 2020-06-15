@@ -17,20 +17,18 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::Date::ID",
   "PREREQ_PM" => {
-    "Complete::Util" => "0.603",
+    "Complete::Util" => "0.608",
     "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Sah::Coerce" => "0.038",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.98",
-    "Test::Needs" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,14 +36,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Complete::Util" => "0.603",
-  "Data::Sah::Coerce" => "0.038",
+  "Complete::Util" => "0.608",
   "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Test::More" => "0.98",
-  "Test::Needs" => 0,
+  "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0
 );

@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Tickit::DSL;
-
 vbox {
 	floatbox {
 		vbox {

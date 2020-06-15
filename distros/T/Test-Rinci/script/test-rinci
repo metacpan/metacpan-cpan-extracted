@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.153'; # VERSION
+our $DATE = '2020-06-13'; # DATE
+our $VERSION = '0.154'; # VERSION
 
 use 5.010;
 use strict;
@@ -11,12 +11,17 @@ use Getopt::Long qw(:config bundling no_ignore_case auto_help auto_version);
 use Test::Rinci;
 
 my %opts = (
+    include_packages => [],
+    include_functions => [],
     exclude_packages => [],
     exclude_functions => [],
     wrap_function => 1,
     test_function_examples => 1,
 );
 GetOptions(
+    '<>' => sub {
+        push @{ $opts{include_packages} }, $_[0];
+    },
     'exclude-package=s' => $opts{exclude_packages},
     'exclude-function=s' => $opts{exclude_functions},
     'W' => sub { $opts{wrap_function} = 0 },
@@ -43,13 +48,19 @@ test-rinci - Test Rinci metadata in all dist's modules
 
 =head1 VERSION
 
-This document describes version 0.153 of test-rinci (from Perl distribution Test-Rinci), released on 2019-08-20.
+This document describes version 0.154 of test-rinci (from Perl distribution Test-Rinci), released on 2020-06-13.
 
 =head1 SYNOPSIS
 
 In your dist directory:
 
- % test-rinci [options]
+ % test-rinci [options] [module]...
+
+To test certain modules only:
+
+ % test-rinci Module1 Module2::Sub
+
+For more options, see documentation.
 
 =head1 DESCRIPTION
 
@@ -104,7 +115,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

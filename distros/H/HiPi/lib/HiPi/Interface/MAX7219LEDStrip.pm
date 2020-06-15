@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::MAX7219LEDStrip
 # Description  : Interface to strip of MAX7219 driven LEDs
-# Copyright    : (c) 2018-2019 Mark Dootson
+# Copyright    : (c) 2018-2020 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -60,9 +60,10 @@ sub new {
     $params{pixel_height} = 8;
     
     $params{buffer} = HiPi::Utils::BitBuffer->new(
-        width       => $params{pixel_width},
-        height      => $params{pixel_height},
-        autoresize  => 1,
+        width         => $params{pixel_width},
+        height        => $params{pixel_height},
+        autoresize    => 1,
+        autoincrement => $params{segments} * 8,
     );
     
     unless(defined($params{device})) {
@@ -97,9 +98,10 @@ sub clear {
     
     $self->buffer (
         HiPi::Utils::BitBuffer->new(
-            width       => $self->pixel_width,
-            height      => $self->pixel_height,
-            autoresize  => 1,
+            width         => $self->pixel_width,
+            height        => $self->pixel_height,
+            autoresize    => 1,
+            autoincrement => $self->pixel_width * 8,
         )
     );
     

@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::year;
 
-our $DATE = '2020-03-03'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = ["int",[{examples=>[{data=>"",valid=>0},{data=>1,valid=>1},{data=>2020,valid=>1},{data=>1.1,valid=>0}],summary=>"Year number"}],["int"]];
+our $rschema = ["int",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>2020},{valid=>0,value=>1.1}],summary=>"Year number"}],["int"]];
 
 1;
 # ABSTRACT: Year number
@@ -20,7 +20,7 @@ Sah::SchemaR::date::year - Year number
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::date::year (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::SchemaR::date::year (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

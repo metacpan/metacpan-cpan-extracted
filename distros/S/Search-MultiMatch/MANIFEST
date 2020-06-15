@@ -10,5 +10,7 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/search_movies.t
+t/search_movies_2.t
+t/search_movies_3.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

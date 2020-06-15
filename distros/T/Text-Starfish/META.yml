@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl-based Framework for Text-Embedded Programming and Preprocessing'
 author:
-  - 'Vlado Keselj http://www.cs.dal.ca/~vlado'
+  - 'Vlado Keselj http://web.cs.dal.ca/~vlado and contributing authors'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -18,4 +18,4 @@ no_index:
     - t
     - inc
 requires: {}
-version: '1.30'
+version: '1.31'

@@ -16,7 +16,7 @@ if( !$ok) {
     plan skip_all => "Couldn't load Net::Async::HTTP: $err";
     exit;
 };
-plan tests => 10;
+plan tests => 11;
 
 
 delete @ENV{ qw[
@@ -38,6 +38,7 @@ my $server = Test::HTTP::LocalServer->spawn(
 );
 
 my $ua = Future::HTTP::NetAsync->new();
+ok $ua->is_async, 'is_async is true';
 my $url = $server->url;
 
 my ($body,$headers) = $ua->http_get($url)->get;

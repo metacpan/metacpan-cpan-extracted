@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::pathname;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-06-13'; # DATE
+our $VERSION = '0.012'; # VERSION
 
-our $rschema = ["str",[{match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem path name on a Unix system","x.completion"=>["filename"]},{description=>"\nThis is just a convenient alias for pathname::unix.\n\n",summary=>"Path name (filename or dirname) on a Unix system"}],["pathname::unix","str"]];
+our $rschema = ["str",[{match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem path name on a Unix system","x.completion"=>["filename"]},{description=>"\nThis is just a convenient alias for pathname::unix.\n\n",examples=>[],summary=>"Path name (filename or dirname) on a Unix system"}],["pathname::unix","str"]];
 
 1;
 # ABSTRACT: Path name (filename or dirname) on a Unix system
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::pathname - Path name (filename or dirname) on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::unix::pathname (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Sah::SchemaR::unix::pathname (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
 
 =head1 DESCRIPTION
 

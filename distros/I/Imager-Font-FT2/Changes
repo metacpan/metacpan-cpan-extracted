@@ -1,3 +1,9 @@
+Imager-Font-FT2 0.98
+====================
+
+ - use pkg-config to find freetype2 if available.
+ - Imager has moved to github
+
 Imager-Font-FT2 0.97
 ====================
 

@@ -4,19 +4,19 @@ use 5.010;
 use strict;
 use warnings;
 
-=head1 NAME
-
 =encoding utf8
+
+=head1 NAME
 
 Search::MultiMatch - An efficient, tree-based, 2D multimatcher.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 SYNOPSIS
 
@@ -82,13 +82,14 @@ Example:
 sub add {
     my ($self, $key, $value) = @_;
 
+    my $vref  = \$value;
     my $table = $self->{table};
 
     foreach my $group (@$key) {
         my $ref = $table;
         foreach my $item (@$group) {
             $ref = $ref->{$item} //= {};
-            push @{$ref->{values}}, \$value;
+            push @{$ref->{$ref}}, $vref;
         }
     }
 
@@ -163,7 +164,7 @@ sub search {
     my ($self, $pattern, %opt) = @_;
 
     my $table = $self->{table};
-    my $keep = $opt{keep} // '';
+    my $keep  = $opt{keep} // '';
 
     my (@matches, %seen);
 
@@ -180,8 +181,8 @@ sub search {
             }
         }
 
-        if (defined($ref) and exists($ref->{values})) {
-            foreach my $match (@{$ref->{values}}) {
+        if (defined($ref) and exists($ref->{$ref})) {
+            foreach my $match (@{$ref->{$ref}}) {
                 if (not exists $seen{$match}) {
                     $seen{$match} = 1;
                     push @matches, $match;
@@ -245,7 +246,7 @@ and how to search the table with a given pattern at a later time:
     }
 
     my $pattern = make_key('i love');        # make the search-pattern
-    my @matches = $smm->search($pattern);    # search for the pattern
+    my @matches = $smm->search($pattern);    # search by the pattern
 
     pp \@matches;                            # dump the results
 
@@ -259,43 +260,13 @@ The results are:
      {match => "From Paris with Love (2010)", score => 1},
     ]
 
-=head1 AUTHOR
-
-Daniel Șuteu, C<< <trizenx at gmail.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/trizen/Search-MultiMatch>.
-I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Search::MultiMatch
-
-
-You can also look for information at:
-
-=over 4
-
-=item * Github
+=head1 REPOSITORY
 
 L<https://github.com/trizen/Search-MultiMatch>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=head1 AUTHOR
 
-L<http://annocpan.org/dist/Search-MultiMatch>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Search-MultiMatch>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Search-MultiMatch/>
-
-=back
+Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 

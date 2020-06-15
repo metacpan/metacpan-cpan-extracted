@@ -2,8 +2,8 @@ NAME
     App::OperaUtils - Utilities related to the Opera browser
 
 VERSION
-    This document describes version 0.003 of App::OperaUtils (from Perl
-    distribution App-OperaUtils), released on 2020-04-11.
+    This document describes version 0.005 of App::OperaUtils (from Perl
+    distribution App-OperaUtils), released on 2020-06-13.
 
 SYNOPSIS
 DESCRIPTION
@@ -12,17 +12,53 @@ DESCRIPTION
 
     *   kill-opera
 
+    *   opera-has-processes
+
     *   opera-is-paused
+
+    *   opera-is-running
 
     *   pause-opera
 
     *   ps-opera
+
+    *   restart-opera
+
+    *   start-opera
 
     *   terminate-opera
 
     *   unpause-opera
 
 FUNCTIONS
+  opera_has_processes
+    Usage:
+
+     opera_has_processes(%args) -> [status, msg, payload, meta]
+
+    Check whether Opera has processes.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quiet => *true*
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   opera_is_paused
     Usage:
 
@@ -32,6 +68,39 @@ FUNCTIONS
 
     Opera is defined as paused if *all* of its processes are in 'stop'
     state.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quiet => *true*
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  opera_is_running
+    Usage:
+
+     opera_is_running(%args) -> [status, msg, payload, meta]
+
+    Check whether Opera is running.
+
+    Opera is defined as running if there are some Opera processes that are
+    *not* in 'stop' state. In other words, if Opera has been started but is
+    currently paused, we do not say that it's running. If you want to check
+    if Opera process exists, you can use "ps_opera".
 
     This function is not exported.
 
@@ -66,7 +135,7 @@ FUNCTIONS
     often still eat considerable CPU cycles even though they only run in the
     background. Stopping (kill -STOP) the browser processes is a simple and
     effective way to stop CPU eating on Unix. It can be performed whenever
-    you are not using your browsers for a little while, e.g. when you are
+    you are not using your browser for a little while, e.g. when you are
     typing on an editor or watching a movie. When you want to use your
     browser again, simply unpause it.
 
@@ -103,6 +172,74 @@ FUNCTIONS
     *   users => *array[unix::local_uid]*
 
         Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  restart_opera
+    Usage:
+
+     restart_opera(%args) -> [status, msg, payload, meta]
+
+    Restart opera.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   opera_cmd => *array[str]|str* (default: "opera")
+
+    *   quiet => *true*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  start_opera
+    Usage:
+
+     start_opera(%args) -> [status, msg, payload, meta]
+
+    Start opera if not already started.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   opera_cmd => *array[str]|str* (default: "opera")
+
+    *   quiet => *true*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
 
     Returns an enveloped result (an array).
 

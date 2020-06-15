@@ -9,7 +9,7 @@ use Test::HTTP::LocalServer;
 use Future::HTTP::Tiny;
 use HTTP::Tiny;
 
-plan tests => 10;
+plan tests => 11;
 my $server = Test::HTTP::LocalServer->spawn(
     #debug => 1
 );
@@ -28,6 +28,7 @@ delete @ENV{ qw[
 
 diag( "Version of HTTP::Tiny: " . HTTP::Tiny->VERSION );
 my $ua = Future::HTTP::Tiny->new();
+ok !$ua->is_async, 'is_async is false';
 my $url = $server->url;
 
 my ($body,$headers) = $ua->http_get($url)->get;

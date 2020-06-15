@@ -8,13 +8,16 @@ use Test::OpenTracing::Tester::CanAll;
 my $Test = Test::OpenTracing::Tester::CanAll->new(
     interface_name => 'Span',
     interface_methods => [
+        'add_baggage_item',
+        'add_baggage_items',
+        'add_tag',
+        'add_tags',
         'finish',
         'get_baggage_item',
+        'get_baggage_items',
         'get_context',
         'log_data',
         'overwrite_operation_name',
-        'set_baggage_item',
-        'set_tag',
     ],
 );
 
@@ -26,12 +29,15 @@ done_testing();
 
 package MyTest::Span;
 
-sub get_context;
-sub overwrite_operation_name;
+sub add_baggage_item;
+sub add_baggage_items;
+sub add_tag;
+sub add_tags;
 sub finish;
-sub set_tag;
-sub log_data;
-sub set_baggage_item;
 sub get_baggage_item;
+sub get_baggage_items;
+sub get_context;
+sub log_data;
+sub overwrite_operation_name;
 
 1;

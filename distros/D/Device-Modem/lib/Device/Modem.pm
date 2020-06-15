@@ -1,5 +1,5 @@
 # Device::Modem - a Perl class to interface generic modems (AT-compliant)
-# Copyright (C) 2002-2014 Cosimo Streppone, cosimo@cpan.org
+# Copyright (C) 2002-2020 Cosimo Streppone, cosimo@cpan.org
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
@@ -10,14 +10,15 @@
 # Perl licensing terms for details.
 
 package Device::Modem;
-$VERSION = '1.57';
+our $VERSION = '1.59';
+$VERSION = eval $VERSION;
 
 BEGIN {
 
     if( index($^O, 'Win') >= 0 ) {   # MSWin32 (and not darwin, cygwin, ...)
 
         require Win32::SerialPort;
-        import  Win32::SerialPort;
+        Win32::SerialPort->import;
 
         # Import line status constants from Win32::SerialPort module
         *Device::Modem::MS_CTS_ON  = *Win32::SerialPort::MS_CTS_ON;
@@ -28,7 +29,7 @@ BEGIN {
     } else {
 
         require Device::SerialPort;
-        import  Device::SerialPort;
+        Device::SerialPort->import;
 
         # Import line status constants from Device::SerialPort module
         *Device::Modem::MS_CTS_ON = *Device::SerialPort::MS_CTS_ON;
@@ -144,7 +145,7 @@ sub dial {
     elsif ($mode =~ m{VOICE}i || $number =~ m{;}) {
         $mode = 'VOICE';
     }
-    # Invalid input, or explicit 'DATA' call 
+    # Invalid input, or explicit 'DATA' call
     else {
         $mode = 'DATA';
     }
@@ -178,7 +179,7 @@ sub dial {
     # Dial number and wait for response
     if( length $number == 1 ) {
         $self->log->write('info', 'dialing address book number ['.$number.']' );
-        
+
         $self->atsend( 'ATDS' . $number . $suffix . CR );
     } else {
         $self->log->write('info', 'dialing number ['.$number.']' );
@@ -492,9 +493,9 @@ sub connect {
 
     # Connect on serial (use different mod for win32)
     if( $me->ostype eq 'windoze' ) {
-        $me->port( new Win32::SerialPort($me->{'port'}) );
+        $me->port( Win32::SerialPort->new($me->{'port'}) );
     } else {
-        $me->port( new Device::SerialPort($me->{'port'}) );
+        $me->port( Device::SerialPort->new($me->{'port'}) );
     }
 
     # Check connection
@@ -794,9 +795,9 @@ sub parse_answer {
             wantarray
             ? ($code, @buff)
             : $buff;
-            
+
     } else {
-    
+
         return '';
 
     }
@@ -818,7 +819,7 @@ and without B<ANY> warranty! Have fun.
 
   use Device::Modem;
 
-  my $modem = new Device::Modem( port => '/dev/ttyS1' );
+  my $modem = Device::Modem->new( port => '/dev/ttyS1' );
 
   if( $modem->connect( baudrate => 9600 ) ) {
       print "connected!\n";
@@ -1351,7 +1352,7 @@ As of 1.52, C<port()> will automatically try to reconnect if it detects
 a bogus underlying port object. It will reconnect with the same options used
 when C<connect()>ing the first time.
 
-If no connection has taken place yet, then B<no automatic reconnection>
+If no connection has taken place yet, then B<no attempt to automatically reconnect>
 will be attempted.
 
 =head2 repeat()
@@ -1418,7 +1419,7 @@ Sends the initialization string to the connected modem. Usage:
 
 If you specified an C<init_string> as an option to C<new()> object constructor,
 that is taken by default to initialize the modem.
-Else you can specify C<$init_string> parameter to use your own custom intialization
+Else you can specify C<$init_string> parameter to use your own custom initialization
 string. Be careful!
 
 =head2 status()
@@ -1514,7 +1515,7 @@ when `autoscan' is invoked, creating a `profile' of the
 current device, with list of supported commands, and database
 of brand/model-specific commands
 
-=item Serial speed autodetect
+=item Serial speed auto-detect
 
 Now if you connect to a different baud rate than that of your modem,
 probably you will get no response at all. It would be nice if C<Device::Modem>

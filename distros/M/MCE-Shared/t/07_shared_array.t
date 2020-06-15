@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use utf8;
+use open qw(:std :utf8);
 
 use Test::More;
 
@@ -12,9 +13,9 @@ BEGIN {
    use_ok 'MCE::Shared::Array';
 }
 
-MCE::Flow::init {
+MCE::Flow->init(
    max_workers => 1
-};
+);
 
 tie my @a1, 'MCE::Shared', ( 10, '', '' );
 
@@ -54,7 +55,7 @@ MCE::Flow::run( sub {
    $a5->[0] = 20;
 });
 
-MCE::Flow::finish;
+MCE::Flow->finish;
 
 is( $a1[0], 15, 'shared array, check fetch, store' );
 is( $a1[1], '', 'shared array, check blank value' );
@@ -71,7 +72,7 @@ MCE::Flow::run( sub {
    $a1[2] = [ 'wind', 'air' ];
 });
 
-MCE::Flow::finish;
+MCE::Flow->finish;
 
 is( $e1,  1, 'shared array, check exists before delete' );
 is( $d1, '', 'shared array, check delete' );
@@ -87,7 +88,7 @@ MCE::Flow::run( sub {
    $s1 = shift(@a1); $s2 = pop(@a1);
 });
 
-MCE::Flow::finish;
+MCE::Flow->finish;
 
 is( $s3, 24, 'shared array, check splice' );
 is( join(' ', @a1), 'air sun', 'shared array, check push, unshift' );

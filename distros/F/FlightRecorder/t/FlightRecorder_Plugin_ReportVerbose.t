@@ -22,6 +22,7 @@ Verbose FlightRecorder Report Generator
 =includes
 
 method: generate
+method: output
 
 =cut
 
@@ -32,7 +33,7 @@ method: generate
   use FlightRecorder;
   use FlightRecorder::Plugin::ReportVerbose;
 
-  my $f = FlightRecorder->new;
+  my $f = FlightRecorder->new(auto => undef);
   my $r = FlightRecorder::Plugin::ReportVerbose->new(flight_recorder => $f);
 
   $f->begin('main');
@@ -83,6 +84,23 @@ generate() : Str
   # given: synopsis
 
   $r->generate
+
+=cut
+
+=method output
+
+The output method generates a verbose report of activity captured by
+L<FlightRecorder> and prints it to STDOUT.
+
+=signature output
+
+output() : Str
+
+=example-1 output
+
+  # given: synopsis
+
+  $r->output
 
 =cut
 
@@ -141,7 +159,7 @@ $subs->example(-1, 'generate', 'method', fun($tryable) {
   like $result, qr/package: 'main'/;
   like $result, qr/process: $quote\d+$quote/;
   like $result, qr/subroutine: '\(eval\)'/;
-  like $result, qr/timestamp: \d+/;
+  like $result, qr/timestamp: $quote\d+$quote/;
   like $result, qr/version: 'no-version'/;
 
   $result

@@ -15,20 +15,28 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-VivaldiUtils",
   "EXE_FILES" => [
     "script/kill-vivaldi",
+    "script/list-vivaldi-profiles",
     "script/pause-vivaldi",
     "script/ps-vivaldi",
+    "script/restart-vivaldi",
+    "script/start-vivaldi",
     "script/terminate-vivaldi",
     "script/unpause-vivaldi",
-    "script/vivaldi-is-paused"
+    "script/vivaldi-has-processes",
+    "script/vivaldi-is-paused",
+    "script/vivaldi-is-running"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::VivaldiUtils",
   "PREREQ_PM" => {
-    "App::BrowserUtils" => "0.002",
+    "App::BrowserUtils" => "0.008",
+    "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+    "Data::Sah::Compiler::perl::TH::any" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
+    "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Unix::check_uid_exists" => 0,
     "Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid" => 0,
     "Log::ger" => "0.037",
@@ -36,6 +44,7 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine::Lite" => "1.827",
     "Sah::Schema::true" => 0,
     "Sah::Schema::unix::local_uid" => 0,
+    "Vivaldi::Util::Profile" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -45,7 +54,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,10 +62,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::BrowserUtils" => "0.002",
+  "App::BrowserUtils" => "0.008",
+  "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+  "Data::Sah::Compiler::perl::TH::any" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
+  "Data::Sah::Compiler::perl::TH::str" => 0,
   "Data::Sah::Filter::perl::Unix::check_uid_exists" => 0,
   "Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid" => 0,
   "File::Spec" => 0,
@@ -68,6 +80,7 @@ my %FallbackPrereqs = (
   "Sah::Schema::true" => 0,
   "Sah::Schema::unix::local_uid" => 0,
   "Test::More" => 0,
+  "Vivaldi::Util::Profile" => 0,
   "strict" => 0,
   "warnings" => 0
 );

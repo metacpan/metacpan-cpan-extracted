@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/OperaUtils.pm','script/kill-opera','script/opera-is-paused','script/pause-opera','script/ps-opera','script/terminate-opera','script/unpause-opera'];
+my $filenames = ['lib/App/OperaUtils.pm','script/kill-opera','script/opera-has-processes','script/opera-is-paused','script/opera-is-running','script/pause-opera','script/ps-opera','script/restart-opera','script/start-opera','script/terminate-opera','script/unpause-opera'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

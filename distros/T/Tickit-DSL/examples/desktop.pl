@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Tickit::DSL;
-
 desktop {
 	my $txt = static 'a static widget', 'parent:label' => 'static';
 	entry {
@@ -11,4 +10,3 @@ desktop {
 	placeholder;
 };
 tickit->run;
-

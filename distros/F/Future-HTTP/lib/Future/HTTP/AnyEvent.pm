@@ -12,7 +12,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 with 'Future::HTTP::Handler';
 
@@ -25,6 +25,8 @@ Future::HTTP::AnyEvent - asynchronous HTTP client with a Future interface
 sub BUILDARGS( $class, %options ) {
     return {}
 }
+
+sub is_async { !0 }
 
 sub future_from_result {
     my( $self, $body, $headers ) = @_;
@@ -74,6 +76,10 @@ using L<AnyEvent::HTTP>.
     my $ua = Future::HTTP::AnyEvent->new();
 
 Creates a new instance of the HTTP client.
+
+=head2 C<< $ua->is_async() >>
+
+Returns true, because this backend is asynchronous.
 
 =head2 C<< $ua->http_get($url, %options) >>
 
@@ -161,7 +167,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

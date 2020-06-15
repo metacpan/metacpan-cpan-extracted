@@ -1,10 +1,9 @@
 package Imager::Color::Float;
-
+use 5.006;
 use Imager;
 use strict;
-use vars qw($VERSION);
 
-$VERSION = "1.005";
+our $VERSION = "1.006";
 
 # It's just a front end to the XS creation functions.
 
@@ -110,6 +109,17 @@ object contains.
 =item info
 
 Calling info merely dumps the relevant color to the log.
+
+=item red
+
+=item green
+
+=item blue
+
+=item alpha
+
+Returns the respective component as a floating point value typically
+from 0 to 1.0.
 
 =back
 

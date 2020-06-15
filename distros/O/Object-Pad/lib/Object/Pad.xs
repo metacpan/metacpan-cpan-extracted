@@ -349,7 +349,7 @@ static OP *pp_slotpad(pTHX)
   AV *slotsav = (AV *)PAD_SV(PADIX_SLOTS);
 
   if(slotix > av_top_index(slotsav))
-    croak("ARGH: instance does not have a slot at index %d", slotix);
+    croak("ARGH: instance does not have a slot at index %ld", (long int)slotix);
 
   SV **slots = AvARRAY(slotsav);
 
@@ -362,11 +362,11 @@ static OP *pp_slotpad(pTHX)
       break;
     case OPpSLOTPAD_AV:
       if(!SvROK(slot) || SvTYPE(val = SvRV(slot)) != SVt_PVAV)
-        croak("ARGH: expected to find an ARRAY reference at slot index %d", slotix);
+        croak("ARGH: expected to find an ARRAY reference at slot index %ld", (long int)slotix);
       break;
     case OPpSLOTPAD_HV:
       if(!SvROK(slot) || SvTYPE(val = SvRV(slot)) != SVt_PVHV)
-        croak("ARGH: expected to find a HASH reference at slot index %d", slotix);
+        croak("ARGH: expected to find a HASH reference at slot index %ld", (long int)slotix);
       break;
     default:
       croak("ARGH: unsure what to do with this slot type");
@@ -945,6 +945,104 @@ static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
   return slotmeta;
 }
 
+enum {
+  ACCESSOR,
+  ACCESSOR_READER,
+  ACCESSOR_WRITER,
+  ACCESSOR_LVALUE_MUTATOR,
+};
+static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname, void *_data)
+{
+  int type = PTR2IV(_data);
+
+  if(SvPVX(slotmeta->name)[0] != '$')
+    /* TODO: A reader for an array or hash slot should also be fine */
+    croak("Can only generate accessors for scalar slots");
+
+  ENTER;
+
+  if(!mname) {
+    if(SvPVX(slotmeta->name)[1] == '_')
+      mname = SvPVX(slotmeta->name) + 2;
+    else
+      mname = SvPVX(slotmeta->name) + 1;
+
+    if(type == ACCESSOR_WRITER) {
+      SV *namesv = newSVpvf("set_%s", mname);
+      SAVEFREESV(namesv);
+      mname = SvPVX(namesv);
+    }
+  }
+
+  ClassMeta *classmeta = slotmeta->class;
+
+  U8 repr = classmeta->repr;
+  if(repr == REPR_AUTOSELECT && !classmeta->foreign_new)
+    repr = REPR_NATIVE;
+
+  I32 floor_ix = start_subparse(FALSE, 0);
+  SAVEFREESV(PL_compcv);
+
+  I32 save_ix = block_start(TRUE);
+
+  /* TODO: On perl versions 5.26+ we should generate the signature checking
+   * op as well so as to check the size of @_ on invocation
+   */
+
+  OP *ops = op_append_list(OP_LINESEQ, NULL,
+    newSTATEOP(0, NULL, NULL));
+  ops = op_append_list(OP_LINESEQ, ops,
+    newMETHSTARTOP(0, repr));
+
+  PADOFFSET padix = pad_add_name_sv(slotmeta->name, 0, NULL, NULL);
+  intro_my();
+
+  ops = op_append_list(OP_LINESEQ, ops,
+    newSLOTPADOP(0, OPpSLOTPAD_SV, padix, slotmeta->slotix));
+
+  switch(type) {
+    case ACCESSOR_LVALUE_MUTATOR:
+      CvLVALUE_on(PL_compcv);
+      /* fallthrough */
+    case ACCESSOR_READER:
+      ops = op_append_list(OP_LINESEQ, ops,
+        newPADxVOP(OP_PADSV, padix, 0, 0));
+      break;
+
+    case ACCESSOR_WRITER:
+      ops = op_append_list(OP_LINESEQ, ops,
+        newBINOP(OP_SASSIGN, 0,
+          newOP(OP_SHIFT, 0),
+          newPADxVOP(OP_PADSV, padix, 0, 0)));
+      break;
+
+    default:
+      croak("TODO generate accessor type %d", type);
+  }
+
+  SvREFCNT_inc(PL_compcv);
+  ops = block_end(save_ix, ops);
+
+  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, newSVpvf("%" SVf "::%s", classmeta->name, mname)),
+    NULL, NULL, ops);
+  CvMETHOD_on(cv);
+
+  LEAVE;
+}
+
+struct SlotAttribute {
+  char *attrname;
+  /* TODO: int flags */
+  void (*apply)(pTHX_ SlotMeta *slotmeta, const char *value, void *data);
+  void *applydata;
+};
+static struct SlotAttribute slot_attributes[] = {
+  "reader",  &S_generate_slot_accessor, (void *)ACCESSOR_READER,
+  "writer",  &S_generate_slot_accessor, (void *)ACCESSOR_WRITER,
+  "mutator", &S_generate_slot_accessor, (void *)ACCESSOR_LVALUE_MUTATOR,
+  { 0 }
+};
+
 /*******************
  * Custom Keywords *
  *******************/
@@ -1102,6 +1200,54 @@ static int keyword_has(pTHX_ OP **op_ptr)
   SvREFCNT_dec(name);
 
   lex_read_space(0);
+
+  if(lex_peek_unichar(0) == ':') {
+    lex_read_unichar(0);
+    lex_read_space(0);
+
+    SV *slotmetasv = newSV(0);
+    sv_setref_uv(slotmetasv, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
+    SAVEFREESV(slotmetasv);
+
+    SV *attr;
+    while(attr = lex_scan_attr()) {
+      lex_read_space(0);
+
+      char *attrname = SvPV_nolen(attr);
+      char *val = strchr(attrname, '(');
+
+      if(val) {
+        attrname = save_strndup(attrname, val - attrname);
+        val  = save_strndup(val + 1, strlen(val) - 2);
+      }
+
+      ENTER;
+      SAVETMPS;
+
+      SAVEFREESV(attr);
+
+      for(struct SlotAttribute *def = slot_attributes; def->attrname; def++) {
+        if(!strEQ(attrname, def->attrname))
+          continue;
+
+        (*def->apply)(aTHX_ slotmeta, val, def->applydata);
+
+        goto done;
+      }
+
+      croak("Unrecognised slot attribute :%s", attrname);
+
+done:
+      FREETMPS;
+      LEAVE;
+
+      /* Accept additional colons to prefix additional attrs */
+      if(lex_peek_unichar(0) == ':') {
+        lex_read_unichar(0);
+        lex_read_space(0);
+      }
+    }
+  }
 
   if(lex_peek_unichar(0) == '=') {
     lex_read_unichar(0);
@@ -1350,6 +1496,34 @@ static struct XSParseSublikeHooks parse_method_hooks = {
   .post_newcv      = parse_post_newcv,
 };
 
+static void parse_BUILD_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
+{
+  ctx->name = newSVpvs("BUILD");
+
+  return parse_pre_subparse(aTHX_ ctx);
+}
+
+static struct XSParseSublikeHooks parse_BUILD_hooks = {
+  .skip_parts = XS_PARSE_SUBLIKE_PART_NAME|XS_PARSE_SUBLIKE_PART_ATTRS,
+  /* no permit */
+  .pre_subparse    = parse_BUILD_pre_subparse,
+  .post_blockstart = parse_post_blockstart,
+  .pre_blockend    = parse_pre_blockend,
+  .post_newcv      = parse_post_newcv,
+};
+
+static int keyword_BUILD(pTHX_ OP **op_ptr)
+{
+  /* For now, `BUILD { ... }` just means the same as `method BUILD { ... }`
+   */
+  if(!have_compclassmeta)
+    croak("Cannot 'BUILD' outside of 'class'");
+
+  lex_read_space(0);
+
+  return xs_parse_sublike(&parse_BUILD_hooks, op_ptr);
+}
+
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
 static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
@@ -1367,6 +1541,10 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
   if(kwlen == 3 && strEQ(kw, "has") &&
       hv_fetchs(hints, "Object::Pad/has", 0))
     return keyword_has(aTHX_ op_ptr);
+
+  if(kwlen == 5 && strEQ(kw, "BUILD") &&
+      hv_fetchs(hints, "Object::Pad/method", 0))
+    return keyword_BUILD(aTHX_ op_ptr);
 
   return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
 }
@@ -1538,6 +1716,6 @@ BOOT:
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
 
-  boot_xs_parse_sublike(0.06);
+  boot_xs_parse_sublike(0.08); /* hooks.omit_parts */
 
   register_xs_parse_sublike("method", &parse_method_hooks);

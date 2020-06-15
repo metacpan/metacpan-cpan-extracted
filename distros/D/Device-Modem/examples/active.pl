@@ -48,7 +48,7 @@ if( $config{'tty'} ) {
 # BEGIN OF TESTS
 # -----------------------------------------------------
 
-my $modem = new Device::Modem( port => $port );
+my $modem = Device::Modem->new( port => $port );
 
 if( $modem->connect( baudrate => $config{'baud'} || 19200 ) ) {
 	print "ok 2\n";

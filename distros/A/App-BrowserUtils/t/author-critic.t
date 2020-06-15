@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/BrowserUtils.pm','script/browsers-are-paused','script/kill-browsers','script/pause-browsers','script/ps-browsers','script/terminate-browsers','script/unpause-browsers'];
+my $filenames = ['lib/App/BrowserUtils.pm','script/browsers-are-paused','script/kill-browsers','script/pause-browsers','script/ps-browsers','script/restart-browsers','script/start-browsers','script/terminate-browsers','script/unpause-browsers'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

@@ -2,8 +2,8 @@ NAME
     Test::Rinci - Test Rinci metadata
 
 VERSION
-    This document describes version 0.153 of Test::Rinci (from Perl
-    distribution Test-Rinci), released on 2019-08-20.
+    This document describes version 0.154 of Test::Rinci (from Perl
+    distribution Test-Rinci), released on 2020-06-13.
 
 SYNOPSIS
     To check all metadata in a module:
@@ -121,8 +121,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2016, 2015, 2014, 2013, 2012
-    by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2018, 2016, 2015, 2014, 2013,
+    2012 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -55,7 +55,7 @@ but has not materialized yet.
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 our @loops;
 push @loops, (
@@ -77,6 +77,7 @@ push @loops, (
     ['Future/HTTP.pm' => 'Future::HTTP::Tiny'],
 );
 our $implementation;
+our $default = 'Future::HTTP::Tiny';
 
 =head1 METHODS
 
@@ -111,13 +112,31 @@ sub best_implementation( $class, @candidates ) {
         $INC{$_->[0]}
     } @candidates;
 
+    if( ! @applicable_implementations ) {
+        @applicable_implementations = map {$_->[1]} @candidates;
+    }
+
     # Check which one we can load:
     for my $impl (@applicable_implementations) {
         if( eval "require $impl; 1" ) {
             return $impl;
         };
     };
+
+    # This will crash and burn, but that's how it is
+    return $default;
 };
+
+=head2 C<< $ua->is_async() >>
+
+Returns true if the selected backend is asynchronous, false if it is
+synchronous.
+
+=cut
+
+sub is_async {
+    die "method is_async must be overloaded by subclass\n";
+}
 
 # We support the L<AnyEvent::HTTP> API first
 
@@ -207,7 +226,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

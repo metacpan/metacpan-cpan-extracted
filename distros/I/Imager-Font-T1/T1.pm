@@ -1,12 +1,12 @@
 package Imager::Font::T1;
+use 5.006;
 use strict;
 use Imager::Color;
-use vars qw(@ISA $VERSION);
-@ISA = qw(Imager::Font);
+our @ISA = qw(Imager::Font);
 use Scalar::Util ();
 
 BEGIN {
-  $VERSION = "1.026";
+  our $VERSION = "1.027";
 
   require XSLoader;
   XSLoader::load('Imager::Font::T1', $VERSION);
@@ -233,7 +233,15 @@ __END__
 
 =head1 DESCRIPTION
 
-Imager::Font creates a Imager::Font::Type1 object when asked to create
+=for stopwords Freetype
+
+Imager::Font::T1 is deprecated.
+
+F<T1Lib> is unmaintained and has serious bugs when built on 64-bit
+systems.  Freetype 2 has Type 1 font support and is supported by
+Imager via L<Imager::Font::FT2>.
+
+L<Imager::Font> creates a C<Imager::Font::Type1 object> when asked to create
 a font object based on a C<.pfb> file.
 
 See Imager::Font to see how to use this type.

@@ -1,5 +1,8 @@
 Revision history for Net-SSL-ExpireDate
 
+1.21 2020-06-15
+  * "record type is SSL3_AL_FATAL" occurred (added suppoted groups) #9
+
 1.20 2017-02-07
   * Update expire date in test cases
     ref: #6

@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FirefoxUtils.pm'
 );
 
 my @scripts = (
+    'script/firefox-has-processes',
     'script/firefox-is-paused',
     'script/firefox-is-running',
     'script/get-firefox-profile-dir',
@@ -20,6 +21,8 @@ my @scripts = (
     'script/list-firefox-profiles',
     'script/pause-firefox',
     'script/ps-firefox',
+    'script/restart-firefox',
+    'script/start-firefox',
     'script/terminate-firefox',
     'script/unpause-firefox'
 );

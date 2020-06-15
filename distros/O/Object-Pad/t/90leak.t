@@ -20,7 +20,7 @@ use Object::Pad;
        # Needs at least one field member to trigger failures
        has $thing;
        # ... and we need to refer to it in a method as well
-       method BUILD { $thing }
+       BUILD { $thing }
    }
 
    no_growth { Example->new };
@@ -31,7 +31,7 @@ use Object::Pad;
       has @array;
       has %hash;
 
-      method BUILD {
+      BUILD {
          @array = ();
          %hash  = ();
       }

@@ -41,6 +41,11 @@ but has not materialized yet.
 
 Creates a new instance of the HTTP client.
 
+## `$ua->is_async()`
+
+Returns true if the selected backend is asynchronous, false if it is
+synchronous.
+
 ## `$ua->http_get($url, %options)`
 
     my $res = $ua->http_get('http://example.com/',
@@ -127,7 +132,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2016-2019 by Max Maischein `corion@cpan.org`.
+Copyright 2016-2020 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 

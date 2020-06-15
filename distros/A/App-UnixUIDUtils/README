@@ -1,0 +1,132 @@
+NAME
+    App::UnixUIDUtils - Utilities related to Unix UID/GID
+
+VERSION
+    This document describes version 0.001 of App::UnixUIDUtils (from Perl
+    distribution App-UnixUIDUtils), released on 2020-06-13.
+
+DESCRIPTION
+    This distributions provides the following command-line utilities:
+
+    *   gid-to-groupname
+
+    *   groupname-to-gid
+
+    *   uid-to-username
+
+    *   username-to-uid
+
+FUNCTIONS
+  gid_to_groupname
+    Usage:
+
+     gid_to_groupname(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   group* => *unix::local_groupname*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  groupname_to_gid
+    Usage:
+
+     groupname_to_gid(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   group* => *unix::local_gid*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  uid_to_username
+    Usage:
+
+     uid_to_username(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   user* => *unix::local_username*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  username_to_uid
+    Usage:
+
+     username_to_uid(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   user* => *unix::local_uid*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-UnixUIDUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-UnixUIDUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-UnixUIDUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

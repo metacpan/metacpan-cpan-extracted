@@ -1,5 +1,5 @@
 {
-   "abstract" : "Select a pager and pipe text to it if destination is a TTY",
+   "abstract" : "Select a pager (possibly perl-based) & pipe it text if a TTY",
    "author" : [
       "Jerrad Pierce <jpierce@cpan.org>, Florent Angly <florent.angly@gmail.com>"
    ],
@@ -53,7 +53,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.02",
+   "version" : "1.03",
    "x_runtime" : {
       "recommends" : {}
    },

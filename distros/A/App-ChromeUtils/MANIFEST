@@ -8,10 +8,15 @@ Makefile.PL
 README
 dist.ini
 lib/App/ChromeUtils.pm
+script/chrome-has-processes
 script/chrome-is-paused
+script/chrome-is-running
 script/kill-chrome
+script/list-chrome-profiles
 script/pause-chrome
 script/ps-chrome
+script/restart-chrome
+script/start-chrome
 script/terminate-chrome
 script/unpause-chrome
 t/00-compile.t

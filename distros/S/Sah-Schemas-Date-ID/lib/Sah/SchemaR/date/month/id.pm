@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::month::id;
 
-our $DATE = '2019-11-28'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["cistr",[{in=>[1,2,3,4,5,6,7,8,9,10,11,12,"jan","feb","mar","apr","mei","jun","jul","agu","sep","okt","nov","des","januari","februari","maret","april","juni","juli","agustus","september","oktober","november","desember"],summary=>"Month number/name (abbreviated or full, in Indonesian)"}],["cistr"]];
+our $rschema = ["cistr",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"jan"},{valid=>1,value=>"FEBRUARI"},{summary=>"English",valid=>0,value=>"march"},{valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,value=>12},{valid=>0,value=>13}],in=>[1,2,3,4,5,6,7,8,9,10,11,12,"jan","feb","mar","apr","mei","jun","jul","agu","sep","okt","nov","des","januari","februari","maret","april","juni","juli","agustus","september","oktober","november","desember"],summary=>"Month number/name (abbreviated or full, in Indonesian)"}],["cistr"]];
 
 1;
 # ABSTRACT: Month number/name (abbreviated or full, in Indonesian)
@@ -20,7 +20,7 @@ Sah::SchemaR::date::month::id - Month number/name (abbreviated or full, in Indon
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::date::month::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
+This document describes version 0.005 of Sah::SchemaR::date::month::id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

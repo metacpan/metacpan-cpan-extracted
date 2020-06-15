@@ -1,5 +1,15 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.45 2020-06-15
+
+ - Secondary footnote: move back the loading of the bigfoot package to
+   the template. If you use custom templates and secondary footnotes, you
+   need to update it loading the bigfoot or manyfoot
+
+1.44 2020-06-14
+
+ - Extend the range of permitted commands in the magic comments
+
 1.43 2020-06-12
 
  - Fix bug in handling xindy failure

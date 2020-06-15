@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Energenie::ENER314_RT
 # Description :  Control Energenie ENER314-RT board
-# Copyright    : Copyright (c) 2016-2017 Mark Dootson
+# Copyright    : Copyright (c) 2016-2020 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -22,9 +22,9 @@ use HiPi::RF::OpenThings::Message;
 
 __PACKAGE__->create_accessors( qw( device devicename led_green led_red 
                               led_on _green_pin _red_pin ook_repeat
-                              backend default_config ook_config gpiodev) );
+                              backend default_config ook_config gpiodev rf_high_power ) );
 
-our $VERSION ='0.81';
+our $VERSION ='0.82';
 
 sub new {
     my( $class, %userparams ) = @_;
@@ -50,8 +50,8 @@ sub new {
             [ RF69_REG_FRMID, 		  0x93 ],   # carrier freq -> 434.3MHz 0x6C9333
             [ RF69_REG_FRLSB, 		  0x33 ],   # carrier freq -> 434.3MHz 0x6C9333
             [ RF69_REG_AFCCTRL,       0x00 ],   # standard AFC routine
-            #[ RF69_REG_PREAMBLEMSB,   0x00 ],   # 3 byte preamble
-            #[ RF69_REG_PREAMBLELSB,   0x03 ],   # 3 byte preamble
+            [ RF69_REG_PREAMBLEMSB,   0x00 ],   # 3 byte preamble
+            [ RF69_REG_PREAMBLELSB,   0x03 ],   # 3 byte preamble
             [ RF69_REG_LNA, 		  0x08 ],	# 200ohms, gain by AGC loop -> 50ohms
             [ RF69_REG_RXBW, 		  0x43 ],	# channel filter bandwidth 10kHz -> 60kHz  page:26
             [ RF69_REG_BITRATEMSB, 	  0x1A ],	# 4800b/s
@@ -60,7 +60,7 @@ sub new {
             [ RF69_REG_SYNCVALUE1, 	  0x2D ],	# 1st byte of Sync word
             [ RF69_REG_SYNCVALUE2, 	  0xD4 ],	# 2nd byte of Sync word
             [ RF69_REG_PACKETCONFIG1, 0xA0 ],   # Variable length, Manchester coding
-            [ RF69_REG_PAYLOADLEN, 	  66   ],	# max Length in RX, not used in Tx
+            [ RF69_REG_PAYLOADLEN, 	  0x42 ],	# max Length in RX, not used in Tx
             [ RF69_REG_NODEADDRESS,   0x06 ],	# Node address used in address filtering ( not used in this config )
             [ RF69_REG_FIFOTHRESH, 	  0x81 ],	# Condition to start packet transmission: at least one byte in FIFO
             [ RF69_REG_OPMODE, 		  RF69_MASK_OPMODE_RX ], # Operating mode to Receive    
@@ -88,6 +88,8 @@ sub new {
             [ RF69_REG_FIFOTHRESH, 	 0x1E ],   # Condition to start packet transmission: wait for 30 bytes in FIFO
             [ RF69_REG_OPMODE, 		 RF69_MASK_OPMODE_TX ],	# Transmitter mode
         ],
+        
+        rf_high_power => 0,
     );
     
     foreach my $key (sort keys(%userparams)) {
@@ -105,6 +107,8 @@ sub new {
             backend      => $params{backend},
             fsk_config   => $params{default_config},
             ook_config   => $params{ook_config},
+            high_power_module  => $params{rf_high_power},
+            max_power_on => ( $params{rf_high_power} ) ? 1 : 0,
         );
     }
     

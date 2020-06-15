@@ -1,9 +1,9 @@
 package Sah::Schema::unix::groupname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our $schema = [str => {
     summary => 'Unix group name',
@@ -21,6 +21,18 @@ _
     min_len => 1,
     max_len => 32,
     match => qr/(?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])/,
+
+    examples => [
+        {value=>'', valid=>0},
+        {value=>'foo', valid=>1},
+        {value=>'-andy', valid=>0},
+        {value=>'1234', valid=>0},
+        {value=>'andy2', valid=>1},
+        {value=>'an dy', valid=>0},
+        {value=>'an.dy', valid=>1},
+        {value=>'a' x 33, value=>0, summary=>'Too long'},
+    ],
+
 }, {}];
 
 1;
@@ -38,7 +50,86 @@ Sah::Schema::unix::groupname - Unix group name
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::unix::groupname (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Sah::Schema::unix::groupname (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+
+=head1 SYNOPSIS
+
+To check data against this schema (requires L<Data::Sah>):
+
+ use Data::Sah qw(gen_validator);
+ my $validator = gen_validator("unix::groupname*");
+ say $validator->($data) ? "valid" : "INVALID!";
+
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
+
+To validate function parameters against this schema (requires L<Params::Sah>):
+
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("unix::groupname*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
+ package MyApp;
+ our %SPEC;
+ $SPEC{myfunc} = {
+     v => 1.1,
+     summary => 'Routine to do blah ...',
+     args => {
+         arg1 => {
+             summary => 'The blah blah argument',
+             schema => ['unix::groupname*'],
+         },
+         ...
+     },
+ };
+ sub myfunc {
+     my %args = @_;
+     ...
+ }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ ""  # INVALID
+
+ "foo"  # valid
+
+ "-andy"  # INVALID
+
+ 1234  # INVALID
+
+ "andy2"  # valid
+
+ "an dy"  # INVALID
+
+ "an.dy"  # valid
+
+ 0  # INVALID (Too long)
 
 =head1 DESCRIPTION
 

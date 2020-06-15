@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/ChromeUtils.pm','script/chrome-is-paused','script/kill-chrome','script/pause-chrome','script/ps-chrome','script/terminate-chrome','script/unpause-chrome'];
+my $filenames = ['lib/App/ChromeUtils.pm','script/chrome-has-processes','script/chrome-is-paused','script/chrome-is-running','script/kill-chrome','script/list-chrome-profiles','script/pause-chrome','script/ps-chrome','script/restart-chrome','script/start-chrome','script/terminate-chrome','script/unpause-chrome'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

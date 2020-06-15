@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Energenie::Command
 # Description  : Energenie Command Wrapper
-# Copyright    : Copyright (c) 2017 Mark Dootson
+# Copyright    : Copyright (c) 2017-2020 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -22,9 +22,10 @@ use JSON;
 use Try::Tiny;
 use HiPi::RF::OpenThings::Message;
 
-our $VERSION ='0.81';
+our $VERSION ='0.82';
 
-__PACKAGE__->create_accessors( qw( config result mode display options pretty user console_display_message) );
+__PACKAGE__->create_accessors( qw( config result mode display options pretty user
+                                   console_display_message ) );
 
 use constant {
     ERROR_SUCCESS     => 'ERROR_SUCCESS',
@@ -108,16 +109,16 @@ my $commandopts = {
         defaults => { help => 0, list => 0, } ,
     },
     join    => {
-        template => [ 'help|h!', 'list|l!', 'name|n:s', 'delete|d:s', 'rename|r:s' ],
-        defaults => { help => 0, list => 0, name => '', delete  => '', rename => '' },
+        template => [ 'help|h!', 'list|l!', 'name|n:s', 'delete|d:s', 'rename|r:s', 'timeout|t:i' ],
+        defaults => { help => 0, list => 0, name => '', delete  => '', rename => '', timeout => 60 },
     },
     adapter => {
-        template => [ 'help|h!', 'list|l!', 'name|n:s', 'query|q!', 'on|1!', 'off|0!', ],
-        defaults => { name => undef, query => 0, on => 0, off => 0, list => 0, help => 0, },
+        template => [ 'help|h!', 'list|l!', 'name|n:s', 'query|q!', 'on|1!', 'off|0!', 'timeout|t:i' ],
+        defaults => { name => undef, query => 0, on => 0, off => 0, list => 0, help => 0, timeout => 60 },
     },
     monitor => {
-        template => [ 'help|h!', 'list|l!', 'name|n:s', ],
-        defaults => { name => undef, list => 0, help => 0, } ,
+        template => [ 'help|h!', 'list|l!', 'name|n:s', 'timeout|t:i' ],
+        defaults => { name => undef, list => 0, help => 0,  timeout => 60 } ,
     },
 };
 
@@ -459,7 +460,7 @@ sub command_config {
         }
     
         if( $self->options->{board} ) {
-            if( my ($board) = ( $self->options->{board} =~ /^(ENER314|ENER314_RT)$/i ) ) {
+            if( my ($board) = ( $self->options->{board} =~ /^(ENER314|ENER314_RT|RF69HW)$/i ) ) {
                 $newboard = uc($board);
             } else {
                 $self->set_result_error(
@@ -680,7 +681,7 @@ sub command_pair {
         unless($groupname) {
             $self->set_result_options_error(
                 ERROR_PAIR_INVALID_OPTIONS,
-                'You must provide a --groupname to pair a socket or switch when using tx/rx board ENER314_RT',
+                'You must provide a --groupname to pair a socket or switch when using tx/rx board ENER314_RT or RF69HW',
                 'pair'
             );
             return;
@@ -722,7 +723,7 @@ sub command_pair {
     
     my $error =  try {
         my $handler = HiPi::Energenie->new(
-            board => $self->conf->{board},
+            backend    => $self->conf->{board},
             devicename => $self->conf->{spi_device},
             reset_gpio => $self->conf->{reset_gpio},
         );
@@ -847,7 +848,7 @@ sub command_switch {
     
     my $error =  try {
         my $handler = HiPi::Energenie->new(
-            board => $self->conf->{board},
+            backend    => $self->conf->{board},
             devicename => $self->conf->{spi_device},
             reset_gpio => $self->conf->{reset_gpio},
         );
@@ -919,7 +920,7 @@ sub command_alias {
         unless($groupname) {
             $self->set_result_options_error(
                 ERROR_ALIAS_INVALID_OPTIONS,
-                'You must provide --groupname, --switch and --name to alias a switch when using the txrx ENER314_RT board',
+                'You must provide --groupname, --switch and --name to alias a switch when using the txrx ENER314_RT or RF69HW boards',
                 'alias'
             );
             return;
@@ -978,7 +979,7 @@ sub command_join {
     unless( $self->receiver ) {
         $self->set_result_error(
             ERROR_USUPPORTED_RX_COMMAND,
-            q(You must be using board ENER314_RT to use join command),
+            q(You must be using board ENER314_RT or RF69HW to use join command),
             'join'
         );
         return;
@@ -1063,17 +1064,27 @@ sub command_join {
     
     # only show on console
     print STDERR qq(\nListening for join messages from adapters and monitors. Set your device mode to join ....\n\n);
-        
+    
+    my $timeout = $self->options->{timeout};
+    unless( $timeout =~ /^[1-9][0-9]*$/) {
+        $self->set_result_options_error(
+            ERROR_JOIN_INVALID_OPTIONS,
+            qq(Invalid value for timeout $timeout),
+        );
+        return;
+    }
+    
     my $result =  try {
         my $handler = HiPi::Energenie->new(
-            board => $self->conf->{board},
+            backend    => $self->conf->{board},
             devicename => $self->conf->{spi_device},
             reset_gpio => $self->conf->{reset_gpio},
         );
         
         return $handler->process_request(
             command  => 'join',
-        );        
+            timeout  => $timeout,
+        );
     } catch {
         return { success => 0, error => $_ , catch_errorcode => ERROR_SYSTEM };
     };
@@ -1132,7 +1143,7 @@ sub command_adapter {
     unless( $self->receiver ) {
         $self->set_result_error(
             ERROR_USUPPORTED_RX_COMMAND,
-            q(You must be using board ENER314_RT to use the adapter command),
+            q(You must be using board ENER314_RT or RF69HW to use the adapter command),
             'switch'
         );
         return;
@@ -1167,8 +1178,18 @@ sub command_adapter {
         return;
     }
     
+    my $timeout = $self->options->{timeout};
+
     if( $self->options->{query} ) {
-        $self->do_monitor_query( $nameconfig, 'adapter', $name );
+        unless( $timeout =~ /^[1-9][0-9]*$/) {
+            $self->set_result_options_error(
+                ERROR_ADAPTER_INVALID_OPTIONS,
+                qq(Invalid value for timeout $timeout),
+                'query',
+            );
+            return;
+        }
+        $self->do_monitor_query( $nameconfig, 'adapter', $name, $timeout );
         return;
     }
     
@@ -1192,13 +1213,22 @@ sub command_adapter {
         return;
     }
     
+    unless( $timeout =~ /^[1-9][0-9]*$/) {
+        $self->set_result_options_error(
+            ERROR_ADAPTER_INVALID_OPTIONS,
+            qq(Invalid value for timeout $timeout),
+            'switch',
+        );
+        return;
+    }
+    
     my $state = ( $self->options->{on} ) ? 1 : 0;
     
     # do switch
     
     my $result = try {
         my $handler = HiPi::Energenie->new(
-            board => $self->conf->{board},
+            backend    => $self->conf->{board},
             devicename => $self->conf->{spi_device},
             reset_gpio => $self->conf->{reset_gpio},
         );
@@ -1207,6 +1237,7 @@ sub command_adapter {
             command         => 'switch',
             sensor_key      => $nameconfig->{sensor_key},
             switch_state    => $state,
+            timeout         => $timeout,
         );
         
         return $val;
@@ -1244,7 +1275,7 @@ sub command_monitor {
     unless( $self->receiver ) {
         $self->set_result_error(
             ERROR_USUPPORTED_RX_COMMAND,
-            q(You must be using board ENER314_RT to use the monitor command),
+            q(You must be using board ENER314_RT or RF69HW to use the monitor command),
             'switch'
         );
         return;
@@ -1260,6 +1291,7 @@ sub command_monitor {
         );
         return;
     }
+    
     
     my $nameconfig;
     
@@ -1279,15 +1311,24 @@ sub command_monitor {
         return;
     }
     
-    $self->do_monitor_query( $nameconfig, 'monitor', $name );
+    my $timeout = $self->options->{timeout};
+    unless( $timeout =~ /^[1-9][0-9]*$/) {
+        $self->set_result_options_error(
+            ERROR_MONITOR_INVALID_OPTIONS,
+            qq(Invalid value for timeout $timeout),
+        );
+        return;
+    }
+    
+    $self->do_monitor_query( $nameconfig, 'monitor', $name, $timeout );
 }
 
 sub do_monitor_query {
-    my ( $self, $nameconfig, $type, $configname ) = @_;
-
+    my ( $self, $nameconfig, $type, $configname, $timeout ) = @_;
+    
     my $result = try {
         my $handler = HiPi::Energenie->new(
-            board => $self->conf->{board},
+            backend    => $self->conf->{board},
             devicename => $self->conf->{spi_device},
             reset_gpio => $self->conf->{reset_gpio},
         );
@@ -1295,6 +1336,7 @@ sub do_monitor_query {
         my $val = $handler->process_request(
             command         => 'query',
             sensor_key      => $nameconfig->{sensor_key},
+            timeout         => $timeout,
         );
         
         return $val;
@@ -1416,7 +1458,7 @@ sub format_group {
 
 sub receiver {
     my $self = shift;
-    return ( $self->conf->{board} eq 'ENER314_RT' ) ? 1 : 0;
+    return ( $self->conf->{board} =~ /^ENER314_RT|RF69HW$/ ) ? 1 : 0;
 }
 
 sub get_command_usage {
@@ -1432,7 +1474,7 @@ sub get_command_usage {
   command :
     help        Print this message
     version     Print the version
-    config      Configure the board type ( ENER314_RT or ENER314 )
+    config      Configure the board type ( ENER314_RT, ENER314 or RF69HW )
     group       Manage groups for use with sockets
     pair        Pair a socket or switch
     alias       Rename or name a socket or switch
@@ -1456,15 +1498,15 @@ sub get_command_usage {
 
     --list        -l  List the current config
 
-    --board       -b  < ENER314 | ENER314_RT > Set the board type that
+    --board       -b  < ENER314 | ENER314_RT | RF69HW > Set the board type that
                       you have connected to the Raspberry Pi.
                       Default is 'ENER314_RT'
 
     --device      -d  < devicename > Set the SPI device used by the
-                      ENER314_RT board. Default is '/dev/spidev0.1'
+                      ENER314_RT or RF69HW board. Default is '/dev/spidev0.1'
     
     --reset       -r  < gpio > Specify the GPIO pin connected to
-                      the reset pin on the ENER314_RT board.
+                      the reset pin on the ENER314_RT or RF69HW board.
                       Default is 25 ( RPI_PIN_22 )
     
     --json            The command results will be output as a JSON
@@ -1480,8 +1522,8 @@ sub get_command_usage {
         group => q(
   usage : hipi-energenie group <options>
 
-  description: Set up groups for use with ENER314_RT board to control
-               multiple sets of simple switches or sockets.
+  description: Set up groups for use with ENER314_RT or RF69HW board to
+               control multiple sets of simple switches or sockets.
 
   options :
 
@@ -1648,6 +1690,9 @@ sub get_command_usage {
                       new name.
                       
     --delete      -d  <name> Remove the named monitor or adapter from configuration
+    
+    --timeout     -t <timeout> Timeout in seconds to wait for a join request.
+                      The default is 60.
 
     --json            The command results will be output as a JSON
                       string. This can be used when you want to parse
@@ -1678,6 +1723,9 @@ sub get_command_usage {
     --on          -1  Switch the adapter on
     
     --off         -0  Switch the adapter off
+    
+    --timeout     -t <timeout> Timeout in seconds to wait for a confirmation.
+                      The default is 60.
 
     --json            The command results will be output as a JSON
                       string. This can be used when you want to parse
@@ -1702,6 +1750,9 @@ sub get_command_usage {
 
     --name        -n  <name> The name registered for the montitor. This
                       is required.
+                      
+    --timeout     -t <timeout> Timeout in seconds to wait for a response.
+                      The default is 60.
 
     --json            The command results will be output as a JSON
                       string. This can be used when you want to parse

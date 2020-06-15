@@ -1,0 +1,17 @@
+0.003   2020-04-05  Released-By: PERLANCAR; Urgency: medium
+
+	- Mark deprecated, superseded by youtube-dl-if.
+
+
+0.002   2020-04-05  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix bug in detecting video ID.
+
+	- Add more logging.
+
+        - Add completer hint (use _youtube-dl) for shcompgen
+
+
+0.001   2020-04-01  Released-By: PERLANCAR
+
+        - First release.

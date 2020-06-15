@@ -27,10 +27,13 @@ use constant {
         get_context
         overwrite_operation_name
         finish
-        set_tag
+        add_tag
+        add_tags
         log_data
-        set_baggage_item
+        add_baggage_item
+        add_baggage_items
         get_baggage_item
+        get_baggage_items
     ) ],
 };
 

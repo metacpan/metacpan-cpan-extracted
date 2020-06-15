@@ -1,6 +1,7 @@
 requires 'Mojolicious', '8.0';
 
 on 'test' => sub {
+    requires 'List::Util', '1.39';
     requires 'Test::More', '0.99';
 };
 

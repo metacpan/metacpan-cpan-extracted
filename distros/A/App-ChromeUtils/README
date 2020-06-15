@@ -2,27 +2,65 @@ NAME
     App::ChromeUtils - Utilities related to Google Chrome browser
 
 VERSION
-    This document describes version 0.004 of App::ChromeUtils (from Perl
-    distribution App-ChromeUtils), released on 2020-04-11.
+    This document describes version 0.007 of App::ChromeUtils (from Perl
+    distribution App-ChromeUtils), released on 2020-06-13.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities related to Google Chrome
     browser:
 
+    *   chrome-has-processes
+
     *   chrome-is-paused
 
+    *   chrome-is-running
+
     *   kill-chrome
+
+    *   list-chrome-profiles
 
     *   pause-chrome
 
     *   ps-chrome
+
+    *   restart-chrome
+
+    *   start-chrome
 
     *   terminate-chrome
 
     *   unpause-chrome
 
 FUNCTIONS
+  chrome_has_processes
+    Usage:
+
+     chrome_has_processes(%args) -> [status, msg, payload, meta]
+
+    Check whether Chrome has processes.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quiet => *true*
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   chrome_is_paused
     Usage:
 
@@ -32,6 +70,39 @@ FUNCTIONS
 
     Chrome is defined as paused if *all* of its processes are in 'stop'
     state.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   quiet => *true*
+
+    *   users => *array[unix::local_uid]*
+
+        Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  chrome_is_running
+    Usage:
+
+     chrome_is_running(%args) -> [status, msg, payload, meta]
+
+    Check whether Chrome is running.
+
+    Chrome is defined as running if there are some Chrome processes that are
+    *not* in 'stop' state. In other words, if Chrome has been started but is
+    currently paused, we do not say that it's running. If you want to check
+    if Chrome process exists, you can use "ps_chrome".
 
     This function is not exported.
 
@@ -66,7 +137,7 @@ FUNCTIONS
     often still eat considerable CPU cycles even though they only run in the
     background. Stopping (kill -STOP) the browser processes is a simple and
     effective way to stop CPU eating on Unix. It can be performed whenever
-    you are not using your browsers for a little while, e.g. when you are
+    you are not using your browser for a little while, e.g. when you are
     typing on an editor or watching a movie. When you want to use your
     browser again, simply unpause it.
 
@@ -103,6 +174,74 @@ FUNCTIONS
     *   users => *array[unix::local_uid]*
 
         Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  restart_chrome
+    Usage:
+
+     restart_chrome(%args) -> [status, msg, payload, meta]
+
+    Restart chrome.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   chrome_cmd => *array[str]|str* (default: "google-chrome")
+
+    *   quiet => *true*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  start_chrome
+    Usage:
+
+     start_chrome(%args) -> [status, msg, payload, meta]
+
+    Start chrome if not already started.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   chrome_cmd => *array[str]|str* (default: "google-chrome")
+
+    *   quiet => *true*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
 
     Returns an enveloped result (an array).
 

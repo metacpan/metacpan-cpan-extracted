@@ -15,6 +15,9 @@ WriteMakefile(
   "PREREQ_PM" => {
     "Mojolicious" => '8.50',
   },
+  "TEST_REQUIRES" => {
+    "Test::More" => "0.92",
+  },
   EXE_FILES => [ 'script/cpanel' ],
   META_MERGE => {
     "meta-spec" => { version => 2 },

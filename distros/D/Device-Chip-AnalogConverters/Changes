@@ -1,5 +1,11 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.09    2020-06-13
+        [CHANGES]
+         * Update to Object::Pad 0.27
+            + BUILD block syntax
+            + package+class declaration to keep metadata parsers happy
+
 0.08    2019-09-07 22:15:15
         [CHANGES]
          * Avoid Data::Bitfield's "bytes-BE" format as it is due to be changed

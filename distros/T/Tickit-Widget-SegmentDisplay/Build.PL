@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Tickit::Widget::SegmentDisplay',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.19',
+      'Object::Pad' => '0.27',
 
       'Tickit::Test' => '0.12',
       'Tickit::Widget' => '0.36',

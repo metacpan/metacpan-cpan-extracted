@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Bot-BasicBot-Pluggable-Module-DateTimeCalc);
+use Bot::BasicBot::Pluggable::Module::DateTimeCalc;
+
+my $bot = Bot::BasicBot::Pluggable::Module::DateTimeCalc->new(
+    server      => 'irc.perl.org',
+    port        => '6667',
+    channels    => ['#bottest'],
+    nick        => 'TimeBot',
+    name        => 'Time Bot',
+    ignore_list => [],
+);
+
+$bot->run;

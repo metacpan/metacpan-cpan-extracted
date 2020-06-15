@@ -18,7 +18,6 @@ use JSON qw( encode_json decode_json );
 use File::Slurp;
 use Try::Tiny;
 use Cwd;
-use Data::Dumper;
 
 __PACKAGE__->create_accessors( qw(
     json_file

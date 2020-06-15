@@ -69,8 +69,45 @@ static int parse2(pTHX_ const struct XSParseSublikeHooks *hooksA, const struct X
 
   if(!(skip_parts & XS_PARSE_SUBLIKE_PART_ATTRS) && (lex_peek_unichar(0) == ':')) {
     lex_read_unichar(0);
+    lex_read_space(0);
 
-    ctx.attrs = lex_scan_attrs(PL_compcv);
+    ctx.attrs = newLISTOP(OP_LIST, 0, NULL, NULL);
+
+    while(1) {
+      SV *attr = newSV(0);
+      SV *val  = newSV(0);
+      if(!lex_scan_attrval_into(attr, val))
+        break;
+      lex_read_space(0);
+      if(lex_peek_unichar(0) == ':') {
+        lex_read_unichar(0);
+        lex_read_space(0);
+      }
+
+      bool handled = false;
+
+      if(hooksA && (hooksA->flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS) && (hooksA->filter_attr))
+        handled |= (*hooksA->filter_attr)(aTHX_ &ctx, attr, val);
+      if(hooksB && (hooksB->flags & XS_PARSE_SUBLIKE_FLAG_FILTERATTRS) && (hooksB->filter_attr))
+        handled |= (*hooksB->filter_attr)(aTHX_ &ctx, attr, val);
+
+      if(handled) {
+        SvREFCNT_dec(attr);
+        SvREFCNT_dec(val);
+        continue;
+      }
+
+      if(strEQ(SvPVX(attr), "lvalue")) {
+        CvLVALUE_on(PL_compcv);
+        continue;
+      }
+
+      if(SvPOK(val))
+        sv_catpvf(attr, "(%" SVf ")", val);
+      SvREFCNT_dec(val);
+
+      ctx.attrs = op_append_elem(OP_LIST, ctx.attrs, newSVOP(OP_CONST, 0, attr));
+    }
   }
 
   PL_hints |= HINT_LOCALIZE_HH;

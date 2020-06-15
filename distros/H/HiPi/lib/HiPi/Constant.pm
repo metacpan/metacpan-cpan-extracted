@@ -2,7 +2,7 @@
 # Distribution : HiPi Modules for Raspberry Pi
 # File         : lib/HiPi/Constant.pm
 # Description  : Constants for HiPi
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2020 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.81';
+our $VERSION ='0.82';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -632,6 +632,15 @@ my $const = {
         RF69_VAL_RSSITHRESH220	=> 0xDC,  # RSSI threshold => 0xE4 -> => 0xDC (220)
         RF69_VAL_PREAMBLELSB3	=> 0x03,  # preamble size LSB 3
         RF69_VAL_PREAMBLELSB5	=> 0x05,  # preamble size LSB 5
+        
+        RF69_VAL_OCP_OFF        => 0x0F,
+        RF69_VAL_OCP_ON         => 0x1A,  # default
+        RF69_PALEVEL_PA0_ON     => 0x80,  # Default
+        RF69_PALEVEL_PA0_OFF    => 0x00,
+        RF69_PALEVEL_PA1_ON     => 0x40,
+        RF69_PALEVEL_PA1_OFF    => 0x00,  # Default
+        RF69_PALEVEL_PA2_ON     => 0x20,
+        RF69_PALEVEL_PA2_OFF    => 0x00,  # Default
     },
     
     mcp3adc => {
@@ -1193,12 +1202,95 @@ my $const = {
 		MFCR522_RXGAIN_MAX				=> 0x07 << 4	# // 111b - 48 dB, maximum, convenience for MFCR522_RXGAIN_48dB
         
     },
+    
+    bmx280 => {
+        BM280_REG_CALIB1            => 0x88,
+    
+        BM280_REG_ID                => 0xD0,
+        BM280_REG_RESET             => 0xE0,
+        
+        BM280_REG_CALIB2            => 0xE1,  # BME280 only
+        
+        BM280_REG_CTRL_HUM          => 0xF2,  # BME280 only
+        BM280_REG_STATUS            => 0xF3,
+        BM280_REG_CTRL_MEAS         => 0xF4,
+        BM280_REG_CONFIG            => 0xF5,
+        
+        BM280_REG_PRESS_MSB         => 0xF7,
+        BM280_REG_PRESS_LSB         => 0xF8,
+        BM280_REG_PRESS_XLSB        => 0xF9,
+        BM280_REG_TEMP_MSB          => 0xFA,
+        BM280_REG_TEMP_LSB          => 0xFB,
+        BM280_REG_TEMP_XLSB         => 0xFC,
+        BM280_REG_HUM_MSB           => 0xFD,  # BME280 only
+        BM280_REG_HUM_LSB           => 0xFE,  # BME280 only
+        
+        BM280_VAL_RESET             => 0xB6,
+        
+        BM280_VAL_BMP_CALIB1LEN      => 0x18, # 24
+        BM280_VAL_BME_CALIB1LEN      => 0x19, # 25
+        BM280_VAL_BME_CALIB2LEN      => 0x07, #  7
+        
+        BM280_TYPE_BME280           => 0x60,
+        BM280_TYPE_BMP280           => 0x58,
+        
+        BM280_COMP_DIG_T1 => 0,
+        BM280_COMP_DIG_T2 => 1,
+        BM280_COMP_DIG_T3 => 2,
+        
+        BM280_COMP_DIG_P1 => 3,
+        BM280_COMP_DIG_P2 => 4,
+        BM280_COMP_DIG_P3 => 5,
+        BM280_COMP_DIG_P4 => 6,
+        BM280_COMP_DIG_P5 => 7,
+        BM280_COMP_DIG_P6 => 8,
+        BM280_COMP_DIG_P7 => 9,
+        BM280_COMP_DIG_P8 => 10,
+        BM280_COMP_DIG_P9 => 11,
+        
+        BM280_COMP_DIG_H1 => 12,
+        BM280_COMP_DIG_H2 => 13,
+        BM280_COMP_DIG_H3 => 14,
+        BM280_COMP_DIG_H4 => 15,
+        BM280_COMP_DIG_H5 => 16,
+        BM280_COMP_DIG_H6 => 17,
+        
+        BM280_MODE_SLEEP  => 0b00,
+        BM280_MODE_NORMAL => 0b11,
+        BM280_MODE_FORCED => 0b01,
+        
+        BM280_OSRS_SKIP => 0b000,
+        BM280_OSRS_X1   => 0b001,
+        BM280_OSRS_X2   => 0b010,
+        BM280_OSRS_X4   => 0b011,
+        BM280_OSRS_X8   => 0b100,
+        BM280_OSRS_X16  => 0b101,
+        
+        BM280_FILTER_OFF => 0b000,
+        BM280_FILTER_2   => 0b001,
+        BM280_FILTER_4   => 0b010,
+        BM280_FILTER_8   => 0b011,
+        BM280_FILTER_16  => 0b100,
+        
+        BM280_STANDBY_0     => 0b000,
+        BM280_BME_STANDBY_10 => 0b110,
+        BM280_BME_STANDBY_20 => 0b111,
+        BM280_STANDBY_62    => 0b001,
+        BM280_STANDBY_125   => 0b010,
+        BM280_STANDBY_250   => 0b011,
+        BM280_STANDBY_500   => 0b100,
+        BM280_STANDBY_1000  => 0b101,
+        BM280_BMP_STANDBY_1000 => 0b110,
+        BM280_BMP_STANDBY_2000 => 0b111,
+        
+    },
 };
 
 my $tagaliases = {
     mcp23x17 => [ qw( mcp23017 mcp23S17 ) ],
     rpi      => [ qw( raspberry ) ],
-    fl3730   => [ qw( is31fl3730 )]
+    fl3730   => [ qw( is31fl3730 )],
+    bmx280   => [ qw( bmp280 bme280 ) ],
 };
 
 sub hipi_export_ok {

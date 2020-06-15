@@ -1137,6 +1137,16 @@ typedef int SysRet;
 /* avoid some xsubpp strangeness */
 #define NEWLINE '\n'
 
+#define ICL_red(c) ((c)->rgba.r)
+#define ICL_green(c) ((c)->rgba.g)
+#define ICL_blue(c) ((c)->rgba.b)
+#define ICL_alpha(c) ((c)->rgba.a)
+
+#define ICLF_red(c) ((c)->rgba.r)
+#define ICLF_green(c) ((c)->rgba.g)
+#define ICLF_blue(c) ((c)->rgba.b)
+#define ICLF_alpha(c) ((c)->rgba.a)
+
 MODULE = Imager		PACKAGE = Imager::Color	PREFIX = ICL_
 
 Imager::Color
@@ -1201,7 +1211,21 @@ i_rgb_to_hsv(c)
       OUTPUT:
         RETVAL
         
+int
+ICL_red(c)
+	  Imager::Color c
 
+int
+ICL_green(c)
+	  Imager::Color c
+
+int
+ICL_blue(c)
+	  Imager::Color c
+
+int
+ICL_alpha(c)
+	  Imager::Color c
 
 MODULE = Imager        PACKAGE = Imager::Color::Float  PREFIX=ICLF_
 
@@ -1262,6 +1286,22 @@ i_rgb_to_hsv(c)
         i_rgb_to_hsvf(RETVAL);
       OUTPUT:
         RETVAL
+
+double
+ICLF_red(c)
+	  Imager::Color::Float c
+
+double
+ICLF_green(c)
+	  Imager::Color::Float c
+
+double
+ICLF_blue(c)
+	  Imager::Color::Float c
+
+double
+ICLF_alpha(c)
+	  Imager::Color::Float c
 
 MODULE = Imager		PACKAGE = Imager::ImgRaw	PREFIX = IIM_
 
@@ -2251,9 +2291,15 @@ i_matrix_transform(im, xsize, ysize, matrix_av, ...)
     RETVAL
 
 undef_int
-i_gaussian(im,stdev)
+i_gaussian(im,stddev)
     Imager::ImgRaw     im
-	    im_double     stdev
+	    im_double     stddev
+
+undef_int
+i_gaussian2(im,stddevX,stddevY)
+    Imager::ImgRaw     im
+	    im_double     stddevX
+	    im_double     stddevY
 
 void
 i_unsharp_mask(im,stdev,scale)

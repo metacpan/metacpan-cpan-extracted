@@ -5,105 +5,72 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.20';
+our $VERSION = 'v0.202.2';
 
 
-use Role::MethodReturns;
+use Role::Declare -lax; # so missing named parameters default to undef
 
 use OpenTracing::Types qw/ContextReference Scope ScopeManager Span SpanContext/;
-use Types::Standard qw/Any ArrayRef Bool Dict HashRef Optional Str/;
+use Types::Standard qw/ArrayRef Bool Dict HashRef Maybe Object Str/;
 use Types::Common::Numeric qw/PositiveOrZeroNum/;
 
 use Carp;
 
 use namespace::clean;
 
-around get_scope_manager => instance_method ( ) {
-    
-    returns( ScopeManager,
-        $original->( $instance => ( ) )
-    )
-    
-};
+
+
+instance_method get_scope_manager(
+) :Return(ScopeManager) {}
 
 
 
-around get_active_span => instance_method ( ) {
-    
-    returns_maybe( Span,
-        $original->( $instance => ( ) )
-    )
-    
-};
+instance_method get_active_span(
+) :ReturnMaybe(Span) {}
 
 
 
-around start_active_span => instance_method ( Str  $operation_name, @options ) {
-    
+instance_method start_active_span(
+    Str $operation_name,
+    Maybe[ Span | SpanContext ]         :$child_of,
+    Maybe[ ArrayRef[ContextReference] ] :$references,
+    Maybe[ HashRef[Str] ]               :$tags,
+    Maybe[ PositiveOrZeroNum ]          :$start_time,
+    Maybe[ Bool ]                       :$ignore_active_span,
+    Maybe[ Bool ]                       :$finish_span_on_close,
+) :Return(Scope) {
     croak "'child_of' and 'references' are mutual exclusive options"
-        if exists { @options }->{child_of} && exists { @options }->{references};
-    
-    ( Dict[
-        
-        child_of                => Optional[ Span | SpanContext ],
-        references              => Optional[ ArrayRef[ ContextReference ]],
-        tags                    => Optional[ HashRef[ Str ] ],
-        start_time              => Optional[ PositiveOrZeroNum ],
-        ignore_active_span      => Optional[ Bool ],
-        finish_span_on_close    => Optional[ Bool ],
-        
-    ] )->assert_valid( { @options } );
-    
-    returns( Scope,
-        $original->( $instance => ( $operation_name, @options ) )
-    )
-    
-};
+        if defined $child_of && defined $references;
+}
 
 
 
-around start_span => instance_method ( Str $operation_name, @options ) {
-    
+instance_method start_span(
+    Str $operation_name,
+    Maybe[ Span | SpanContext ]         :$child_of,
+    Maybe[ ArrayRef[ContextReference] ] :$references,
+    Maybe[ HashRef[Str] ]               :$tags,
+    Maybe[ PositiveOrZeroNum ]          :$start_time,
+    Maybe[ Bool ]                       :$ignore_active_span,
+) :Return(Span) {
     croak "'child_of' and 'references' are mutual exclusive options"
-        if exists { @options }->{child_of} && exists { @options }->{references};
-    
-    ( Dict[
-        
-        child_of                => Optional[ Span | SpanContext ],
-        references              => Optional[ ArrayRef[ ContextReference ]],
-        tags                    => Optional[ HashRef[ Str ] ],
-        start_time              => Optional[ PositiveOrZeroNum ],
-        ignore_active_span      => Optional[ Bool ],
-        
-    ] )->assert_valid( { @options } );
-    
-    returns( Span,
-    
-        $original->( $instance => ( $operation_name, @options ) )
-    )
-};
+      if defined $child_of && defined $references;
+}
 
 
 
-around inject_context => instance_method ( $carrier_format, $carrier,
+instance_method inject_context(
+    Str    $carrier_format,
+    Object $carrier,
     SpanContext $span_context
-) {
-    
-    returns( Any,
-        $original->( $instance => ( $carrier_format, $carrier, $span_context ) )
-    )
-    
-};
+) :Return(Object) {}
 
 
 
-around extract_context => instance_method ( $carrier_format, $carrier ) {
-    
-    returns_maybe( SpanContext,
-        $original->( $instance => ( $carrier_format, $carrier ) )
-    )
-    
-};
+instance_method extract_context(
+    Str    $carrier_format,
+    Object $carrier
+) :ReturnMaybe(SpanContext) {}
 
 
 

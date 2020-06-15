@@ -1,0 +1,157 @@
+
+=head1 NAME
+
+OpenTracing::Role::ScopeManager - Role for OpenTracing implementations.
+
+
+
+=head1 SYNOPSIS
+
+    package OpenTracing::Implementation::MyBackendService::ScopeManager;
+    
+    use Moo;
+    
+    with 'OpenTracing::Role::ScopeManager'
+    
+    sub build_scope{
+        my $self = shift;
+        my $options = { @_ };
+        
+        my $current_scope = $self->get_active_scope;
+        
+        my $scope = OpenTracing::Implementation::DataDog::Scope->new(
+            span                 => $options->{ span },
+            finish_span_on_close => $options->{ finish_span_on_close },
+            on_close             => sub {
+                $self->set_active_scope( $current_scope );
+            }
+        );
+        
+        return $scope
+    }
+    
+    1;
+
+
+
+=head1 DESCRIPTION
+
+This C<Moo::Role> provides the consuming class with most, if not all, of the
+methods being described in L<OpenTracing::Interface::ScopeManager>.
+
+
+
+=head1 IMPLEMENTED OPENTRACING METHODS
+
+The following methods from
+L<OpenTracing::Interface|OpenTracing::Interface::ScopeManager>
+have been implemented. See their documentation for more details.
+
+
+
+=head2 C<activate_span>
+
+Set the specified Span as the active instance for the current context (usually a
+thread).
+
+See L<OpenTracing::Interface::ScopeManager/"activate_span">.
+
+
+
+=head2 C<get_active_scope>
+
+Return the currently active C<Scope> which can be used to access the currently
+active C<Span>, using C<< $scope->get_span >>.
+
+See L<OpenTracing::Interface::ScopeManager/"get_active_scope">.
+
+
+
+=head1 WARNING
+
+B<Never use any of attributes or methods below in any integration!>
+
+Only methods mentioned in the Public OpenTracing::Interface are safe to be used
+in any integration or when instrumenting applications.
+
+
+
+=head1 ATTRIBUTES
+
+
+
+=head2 C<active_scope>
+
+A L<Span|OpenTracing::Types/"Scope"> type.
+
+
+
+=head1 REQUIRED METHODS
+
+The following method(s) are required to be implemented by a consuming class.
+
+
+
+=head2 C<build_scope>
+
+This method should return a C<Scope>
+
+=over
+
+=item Expected Named Parameters
+
+=over
+
+=item C<span>
+
+A OpenTracing compliant C<Span> object.
+
+=item C<finish_span_on_close>
+
+A C<Bool> type.
+
+=back
+
+=back
+
+=head3 Note
+
+Unlike the OpenTracing API interface specification, C<build_scope> does not let
+it up for discusion, C<span> and C<finish_span_on_close> are expected named
+parameters.
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Types>
+
+Type constraints for checking Interfaces
+
+=item L<OpenTracing::Interface::ScopeManager>
+
+A role that defines the ScopeManager interface
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+=cut

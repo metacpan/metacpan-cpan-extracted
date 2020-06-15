@@ -19,6 +19,12 @@ ADCs
 
  SUGGESTED ADC METHODS
 
+  trigger
+
+       $chip->trigger( %args )->get
+
+    Optional. This method asks the chip to begin taking a reading.
+
   read_adc
 
        $value = $chip->read_adc->get

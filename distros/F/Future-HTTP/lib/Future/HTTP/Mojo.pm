@@ -7,7 +7,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 with 'Future::HTTP::Handler';
 
@@ -42,6 +42,8 @@ sub BUILDARGS {
         @ua_args
     }
 }
+
+sub is_async { !0 }
 
 sub _ae_from_mojolicious( $self, $tx ) {
     # Convert the result back to a future
@@ -122,6 +124,10 @@ sub http_post($self,$url,$body,%options) {
     my $ua = Future::HTTP::Mojo->new();
 
 Creates a new instance of the HTTP client.
+
+=head2 C<< $ua->is_async() >>
+
+Returns true, because this backend is asynchronous.
 
 =head2 C<< $ua->http_get($url, %options) >>
 
@@ -214,7 +220,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

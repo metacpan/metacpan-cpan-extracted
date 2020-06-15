@@ -1,9 +1,9 @@
 package Sah::Schema::date::tz_name;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [str => {
     summary => 'Timezone name',
@@ -15,7 +15,7 @@ our $schema = [str => {
         Complete::TZ::complete_tz(word => $args{word});
     },
     examples => [
-        {data=>'Asia/Jakarta', valid=>1},
+        {value=>'Asia/Jakarta', valid=>1},
     ],
 }, {}];
 
@@ -35,7 +35,7 @@ Sah::Schema::date::tz_name - Timezone name
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::Schema::date::tz_name (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;

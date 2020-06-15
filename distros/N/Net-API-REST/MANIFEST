@@ -3,6 +3,7 @@ lib/Net/API/REST.pm
 lib/Net/API/REST/Cookies.pm
 lib/Net/API/REST/DateTime.pm
 lib/Net/API/REST/JWT.pm
+lib/Net/API/REST/Query.pm
 lib/Net/API/REST/Request.pm
 lib/Net/API/REST/Response.pm
 lib/Net/API/REST/Status.pm
@@ -12,5 +13,7 @@ MANIFEST
 README
 t/00.load.t
 t/01.routes.t
+t/02.pod.t
+t/03.uri_query.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

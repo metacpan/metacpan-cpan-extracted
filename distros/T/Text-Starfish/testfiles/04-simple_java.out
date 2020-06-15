@@ -1,0 +1,16 @@
+/**
+   A simple Java file.
+*/
+// Uncomment version:
+
+
+
+public class simple {
+
+  public static int main(String[] args) {
+
+        System.out.println("Test version");
+
+    return 0;
+  }
+}

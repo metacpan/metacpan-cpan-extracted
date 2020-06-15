@@ -1385,6 +1385,47 @@ Example Callback
 
 =back
 
+=head1 Attaching files to messages
+
+Posting files to channel steps outside of the traditional json data format. 
+
+=over 4 
+
+=item * Blocking my $result=$self->uploadFile('/path/to/file',%args);
+
+Returns a L<Data::Result> Object, when true it contains the data, when false it contains why it failed.
+
+=item * Non-Blocking my $result=$self->que_uploadFile($cb,'/path/to/file',%args);
+
+Example Callback
+
+  $cb=sub {
+    my ($self,$id,$result,$request,$response,$roomId,$hashRef)=@_;
+      # 0: $self The current AnyEvent::HTTP::Slack object
+      # 1: $id the id of the http request
+      # 2: Data::Result Object
+      # 3: HTTP::Request Object
+      # 4: HTTP::Result Object
+    };
+
+=back
+
+=cut
+
+sub que_uploadFile {
+  my ($self,$cb,$file,%args)=@_;
+
+  my $post=[
+    %args,
+    files=>[$file],
+  ];
+
+  my $url=$self->api_url.'messages';
+  my $request=POST($url,Content_type=>'form-data',Content=>$post);
+  $request->header(Authorization=>"Bearer ".$self->token);
+  return $self->queue_request($request,$cb);
+}
+
 =head1 Low Level Request functions
 
 This section documents low level request functions.

@@ -1,16 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Console;
+use 5.026; # signatures
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use 5.010; # //
-use base qw( Tickit::Widget::VBox );
-
-our $VERSION = '0.07';
+package Tickit::Console 0.08;
+class Tickit::Console
+   extends Tickit::Widget::VBox;
 
 use Tickit::Widget::Entry;
 use Tickit::Widget::Scroller 0.04;
@@ -26,9 +24,9 @@ C<Tickit::Console> - build full-screen console-style applications
 
 =head1 SYNOPSIS
 
- my $console = Tickit::Console->new;
+   my $console = Tickit::Console->new;
 
- Tickit->new( root => $console )->run;
+   Tickit->new( root => $console )->run;
 
 =head1 DESCRIPTION
 
@@ -46,7 +44,9 @@ widget for a L<Tickit> instance.
 
 =cut
 
-=head2 $console = Tickit::Console->new( %args )
+=head2 new
+
+   $console = Tickit::Console->new( %args )
 
 Returns a new instance of a C<Tickit::Console>. Takes the following named
 arguments:
@@ -57,7 +57,7 @@ arguments:
 
 Callback to invoke when a line of text is entered in the entry widget.
 
- $on_line->( $active_tab, $text )
+   $on_line->( $active_tab, $text )
 
 =item tab_class => STRING
 
@@ -74,23 +74,19 @@ tab constructor in the C<add_tab> method.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my %args = @_;
+has %_default_tab_opts;
+has $_tabbed;
+has $_entry;
 
+BUILD ( %args )
+{
    my $on_line = delete $args{on_line};
 
-   my %default_tab_opts;
-   $default_tab_opts{$_} = delete $args{$_} for
+   $_default_tab_opts{$_} = delete $args{$_} for
       qw( timestamp_format datestamp_format );
 
-   my $self = $class->SUPER::new( %args );
-
-   $self->{default_tab_opts} = \%default_tab_opts;
-
    $self->add(
-      $self->{tabbed} = Tickit::Widget::Tabbed->new(
+      $_tabbed = Tickit::Widget::Tabbed->new(
          tab_position => "bottom",
          tab_class    => $args{tab_class} // "Tickit::Console::Tab",
       ),
@@ -98,23 +94,18 @@ sub new
    );
 
    $self->add(
-      $self->{entry} = Tickit::Widget::Entry->new
+      $_entry = Tickit::Widget::Entry->new
    );
 
    weaken( my $weakself = $self );
-   $self->{entry}->set_on_enter( sub {
+   $_entry->set_on_enter( sub ( $entry, @ ) {
       return unless $weakself;
-      my ( $entry ) = @_;
       my $line = $entry->text;
       $entry->set_text( "" );
 
       my $tab = $weakself->active_tab;
-      if( $tab->{on_line} ) {
-         $tab->{on_line}->( $tab, $line );
-      }
-      else {
+      $tab->_on_line( $line ) or
          $on_line->( $tab, $line );
-      }
    } );
 
    return $self;
@@ -124,7 +115,9 @@ sub new
 
 =cut
 
-=head2 $tab = $console->add_tab( %args )
+=head2 add_tab
+
+   $tab = $console->add_tab( %args )
 
 Adds a new tab to the console, and returns a L<Tickit::Console::Tab> object
 representing it.
@@ -151,7 +144,7 @@ sort of widget tree with that inside it, and return it. This can be used to
 apply a decorative frame, place the scroller in a split box or other layout
 along with other widgets, or various other effects.
 
- $tab_widget = $make_widget->( $scroller )
+   $tab_widget = $make_widget->( $scroller )
 
 =back
 
@@ -159,47 +152,53 @@ Any other named arguments are passed to the tab's constructor.
 
 =cut
 
-sub add_tab
+method add_tab ( %args )
 {
-   my $self = shift;
-   my %args = @_;
-
    my $make_widget = delete $args{make_widget};
-   my $on_line     = delete $args{on_line};
 
    my $scroller = Tickit::Widget::Scroller->new( gravity => "bottom" );
 
    my $widget = $make_widget ? $make_widget->( $scroller ) : $scroller;
 
-   my $tab = $self->{tabbed}->add_tab(
+   my $tab = $_tabbed->add_tab(
       $widget,
       label => delete $args{name},
-      %{ $self->{default_tab_opts} },
+      console => $self,
+      scroller => $scroller,
+      %_default_tab_opts,
       %args,
    );
-
-   $tab->{on_line} = $on_line;
-
-   # Cheating
-   $tab->{scroller} = $scroller;
-   weaken( $tab->{console} = $self );
 
    return $tab;
 }
 
-=head2 $index = $console->active_tab_index
+=head2 active_tab_index
 
-=head2 $tab = $console->active_tab
+   $index = $console->active_tab_index
 
-=head2 $console->remove_tab( $tab_or_index )
+=head2 active_tab
 
-=head2 $console->move_tab( $tab_or_index, $delta )
+   $tab = $console->active_tab
 
-=head2 $console->activate_tab( $tab_or_index )
+=head2 remove_tab
 
-=head2 $console->next_tab
+   $console->remove_tab( $tab_or_index )
 
-=head2 $console->prev_tab
+=head2 move_tab
+
+   $console->move_tab( $tab_or_index, $delta )
+
+=head2 active_tab
+
+   $console->activate_tab( $tab_or_index )
+
+=head2 next_tab
+
+   $console->next_tab
+
+=head2 prev_tab
+
+   $console->prev_tab
 
 These methods are all passed through to the underlying
 L<Tickit::Widget::Tabbed> object.
@@ -209,62 +208,66 @@ L<Tickit::Widget::Tabbed> object.
 foreach my $method (qw( active_tab_index active_tab
       remove_tab move_tab activate_tab next_tab prev_tab )) {
    no strict 'refs';
-   *$method = sub {
-      my $self = shift;
-      $self->{tabbed}->$method( @_ );
+   *$method = method {
+      $_tabbed->$method( @_ );
    };
 }
 
-=head2 $console->bind_key( $key, $code )
+=head2 bind_key
+
+   $console->bind_key( $key, $code )
 
 Installs a callback to invoke if the given key is pressed, overwriting any
 previous callback for the same key. The code block is invoked as
 
- $code->( $console, $key )
+   $code->( $console, $key )
 
 If C<$code> is missing or C<undef>, any existing callback is removed.
 
 =cut
 
-sub bind_key
-{
-   my $self = shift;
-   my ( $key, $code ) = @_;
+has %_keybindings;
 
-   $self->{keybindings}{$key}[0] = $code;
+method bind_key ( $key, $code )
+{
+   $_keybindings{$key}[0] = $code;
 
    $self->_update_key_binding( $key );
 }
 
-sub _update_key_binding
+method _update_key_binding ( $key )
 {
-   my $self = shift;
-   my ( $key ) = @_;
-
-   my $bindings = $self->{keybindings}{$key};
+   my $bindings = $_keybindings{$key};
 
    if( $bindings->[0] or $bindings->[1] ) {
-      $self->{entry}->bind_keys( $key => sub {
-         my ( $entry, $key ) = @_;
+      $_entry->bind_keys( $key => sub ( $entry, $key ) {
          $entry->parent->_on_key( $key );
       });
    }
    else {
-      $self->{entry}->bind_key( $key => undef );
+      $_entry->bind_key( $key => undef );
    }
 }
 
-sub _on_key
+method _inc_key_binding ( $key )
 {
-   my $self = shift;
-   my ( $key ) = @_;
+   $_keybindings{$key}[1]++;
+   $self->_update_key_binding( $key );
+}
 
+method _dec_key_binding ( $key )
+{
+   $_keybindings{$key}[1]--;
+   $self->_update_key_binding( $key );
+}
+
+method _on_key ( $key )
+{
    if( my $tab = $self->active_tab ) {
-      return 1 if $tab->{keybindings}{$key} and
-         $tab->{keybindings}{$key}->( $tab, $key );
+      return 1 if $tab->_on_key( $key );
    }
 
-   my $code = $self->{keybindings}{$key}[0] or return 0;
+   my $code = $_keybindings{$key}[0] or return 0;
    return $code->( $self, $key );
 }
 

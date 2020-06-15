@@ -5,7 +5,7 @@ use utf8;
 use warnings FATAL => 'all';
 use Test::More;
 
-plan tests => 30;
+plan tests => 6;
 
 use_ok('Search::MultiMatch') || print "Bail out!\n";
 
@@ -16,6 +16,7 @@ sub make_key {
 }
 
 my @movies = (
+              'some values here',
               'My First Lover',
               'A Lot Like Love',
               'Funny Games (2007)',
@@ -54,11 +55,7 @@ sub search {
                   {match => 'From Paris with Love (2010)', score => 1},
                  );
 
-    is($#matches, $#expect);
-    foreach my $i (0 .. $#matches) {
-        is($matches[$i]{match}, $expect[$i]{match});
-        is($matches[$i]{score}, $expect[$i]{score});
-    }
+    is_deeply(\@matches, \@expect);
 }
 
 #
@@ -66,12 +63,9 @@ sub search {
 #
 {
     my @matches = search('i love', keep => 'best');
-    my @expect = ({match => 'P.S. I Love You (2007)', score => 2});
-    is($#matches, $#expect);
-    foreach my $i (0 .. $#expect) {
-        is($matches[$i]{match}, $expect[$i]{match});
-        is($matches[$i]{score}, $expect[$i]{score});
-    }
+    my @expect  = ({match => 'P.S. I Love You (2007)', score => 2});
+
+    is_deeply(\@matches, \@expect);
 }
 
 #
@@ -79,12 +73,9 @@ sub search {
 #
 {
     my @matches = search('(2003) actually lo', keep => 'best');
-    my @expect = ({match => 'Love Actually (2003)', score => 3});
-    is($#matches, $#expect);
-    foreach my $i (0 .. $#expect) {
-        is($matches[$i]{match}, $expect[$i]{match});
-        is($matches[$i]{score}, $expect[$i]{score});
-    }
+    my @expect  = ({match => 'Love Actually (2003)', score => 3});
+
+    is_deeply(\@matches, \@expect);
 }
 
 #
@@ -99,11 +90,8 @@ sub search {
                   {match => "From Paris with Love (2010)", score => 1},
                   {match => "P.S. I Love You (2007)",      score => 1},
                  );
-    is($#matches, $#expect);
-    foreach my $i (0 .. $#expect) {
-        is($matches[$i]{match}, $expect[$i]{match});
-        is($matches[$i]{score}, $expect[$i]{score});
-    }
+
+    is_deeply(\@matches, \@expect);
 }
 
 #

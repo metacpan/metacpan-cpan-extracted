@@ -12,7 +12,7 @@ use Time::HiRes qw( sleep );
 GetOptions(
    'p|print-config' => \my $PRINT_CONFIG,
 
-   'adapter|A=s' => \( my $ADAPTER = "FTDI" ),
+   'adapter|A=s' => \( my $ADAPTER ),
    'mount|M=s'   => \( my $MOUNTPARAMS ),
 ) or exit 1;
 

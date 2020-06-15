@@ -1,3 +1,17 @@
+0.006 2020-06-14
+- handle empty dirs
+
+0.005 2020-06-13
+- localfs.ls must list dotfiles
+
+0.004 2020-06-13
+- reject on non-200 response code
+- reject on failure
+- fixes for mirror so upload works
+
+0.003 2020-06-13
+- enable mirroring to and from a cPanel site
+
 0.002 2020-06-07
 - make accessible to MetaCPAN
 

@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Tickit::DSL;
-
 vbox {
  # Single line menu at the top of the screen
  menubar {
@@ -42,4 +41,3 @@ vbox {
  # although it's not on CPAN yet so we don't
 };
 tickit->run;
-

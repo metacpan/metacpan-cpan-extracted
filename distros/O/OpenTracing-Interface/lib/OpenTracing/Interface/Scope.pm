@@ -5,37 +5,23 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.20';
+our $VERSION = 'v0.202.2';
 
 
-use Role::MethodReturns;
+use Role::Declare;
 
 use OpenTracing::Types qw/Span/;
 
 use namespace::clean;
 
 
-around close => instance_method ( ) {
-    
-    returns_self( $instance,
-        
-        $original->( $instance => ( ) )
-        
-    );
-    
-};
+instance_method close(
+) :ReturnSelf {}
 
 
 
-around get_span => instance_method ( ) {
-    
-    returns( Span ,
-        
-        $original->( $instance => ( ) )
-        
-    )
-};
-
+instance_method get_span(
+) :Return(Span) {}
 
 
 1;

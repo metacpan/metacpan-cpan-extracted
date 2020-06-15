@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-24'; # DATE
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,13 +40,15 @@ get-firefox-profile-dir - Given a Firefox profile name, return its directory
 
 =head1 VERSION
 
-This document describes version 0.012 of get-firefox-profile-dir (from Perl distribution App-FirefoxUtils), released on 2020-05-24.
+This document describes version 0.013 of get-firefox-profile-dir (from Perl distribution App-FirefoxUtils), released on 2020-06-13.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % get-firefox-profile-dir [--debug] [--format=name] [--json] [--log-level=level] [--(no)naked-res] [--page-result[=program]] [--quiet] [--trace] [--verbose] <profile>
+ % get-firefox-profile-dir [--debug] [--format=name] [--json]
+     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
+     [--quiet] [--trace] [--verbose] [--view-result[=program]] <profile>
 
 =head1 DESCRIPTION
 
@@ -130,6 +132,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 

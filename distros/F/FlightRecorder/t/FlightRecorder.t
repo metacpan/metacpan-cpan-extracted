@@ -14,6 +14,12 @@ FlightRecorder
 
 =cut
 
+=tagline
+
+Structured Logging
+
+=cut
+
 =abstract
 
 Logging for Distributed Systems
@@ -24,6 +30,7 @@ Logging for Distributed Systems
 
 method: begin
 method: branch
+method: count
 method: data
 method: debug
 method: end
@@ -32,7 +39,9 @@ method: fatal
 method: info
 method: output
 method: report
+method: reset
 method: serialize
+method: simple
 method: succinct
 method: switch
 method: verbose
@@ -51,7 +60,7 @@ method: warn
   );
 
   # $f->begin('try');
-  # $f->debug('something happend');
+  # $f->debug('something happened');
   # $f->end;
 
 =cut
@@ -65,7 +74,7 @@ Types::Standard
 =attributes
 
 auto: ro, opt, Maybe[FileHandle]
-head: rw, opt, Str
+head: ro, opt, Str
 item: ro, opt, HashRef
 refs: ro, opt, HashRef
 level: ro, opt, Enum[qw(debug info warn error fatal)]
@@ -120,6 +129,38 @@ branch(Str $label) : Object
   # given: synopsis
 
   $f->begin('test')->branch('next')
+
+=cut
+
+=method count
+
+The count method returns the total number of log entries, or the number of log
+entries matching the log level specified.
+
+=signature count
+
+count(Maybe[Str] $level) : Int
+
+=example-1 count
+
+  # given: synopsis
+
+  $f->begin('try')->debug('something happened')->end;
+  $f->count;
+
+=example-2 count
+
+  # given: synopsis
+
+  $f->info('something happened');
+  $f->count('info');
+
+=example-3 count
+
+  # given: synopsis
+
+  $f->fatal('something happened');
+  $f->count('fatal');
 
 =cut
 
@@ -281,6 +322,31 @@ report(Str $name, Str $level) : Object
 
 =cut
 
+=method reset
+
+The reset method returns an object to its initial state.
+
+=signature reset
+
+reset() : Object
+
+=example-1 reset
+
+  # given: synopsis
+
+  $f->begin('try')->debug('something happened')->end;
+  $f->reset;
+
+=example-2 reset
+
+  # given: synopsis
+
+  $f->begin('try')->debug('something happened')->end;
+  $f->branch('main')->switch('try')->fatal('something happened')->end;
+  $f->reset;
+
+=cut
+
 =method serialize
 
 The serialize method normalizes and serializes the event log and returns it as
@@ -295,6 +361,23 @@ serialize() : HashRef
   # given: synopsis
 
   $f->begin('main')->serialize
+
+=cut
+
+=method simple
+
+The simple method loads and returns the
+L<FlightRecorder::Plugin::ReportSimple> report plugin.
+
+=signature simple
+
+simple() : Object
+
+=example-1 simple
+
+  # given: synopsis
+
+  $f->simple
 
 =cut
 
@@ -396,6 +479,27 @@ $subs->example(-1, 'branch', 'method', fun($tryable) {
   is $result->refs->{'0002'}, 'next';
   is $result->logs->[0]{message}, 'test began';
   is $result->logs->[1]{message}, 'next began';
+
+  $result
+});
+
+$subs->example(-1, 'count', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 3;
+
+  $result
+});
+
+$subs->example(-2, 'count', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+$subs->example(-3, 'count', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 1;
 
   $result
 });
@@ -514,6 +618,26 @@ $subs->example(-2, 'report', 'method', fun($tryable) {
   $result
 });
 
+$subs->example(-1, 'reset', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok !exists $result->{head};
+  ok !exists $result->{item};
+  ok !exists $result->{refs};
+  ok !exists $result->{logs};
+
+  $result
+});
+
+$subs->example(-2, 'reset', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok !exists $result->{head};
+  ok !exists $result->{item};
+  ok !exists $result->{refs};
+  ok !exists $result->{logs};
+
+  $result
+});
+
 $subs->example(-1, 'serialize', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   ok $result->{head};
@@ -523,6 +647,16 @@ $subs->example(-1, 'serialize', 'method', fun($tryable) {
   ok $result->{zeros};
 
   ok !$result->{item};
+
+  $result
+});
+
+$subs->example(-1, 'simple', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('FlightRecorder::Plugin::ReportSimple');
+  ok $result->isa('FlightRecorder::Plugin::Report');
+  ok $result->flight_recorder;
+  is $result->level, 'debug';
 
   $result
 });

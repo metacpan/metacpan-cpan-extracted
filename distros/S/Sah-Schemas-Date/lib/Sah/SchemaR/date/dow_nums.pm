@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::dow_nums;
 
-our $DATE = '2020-03-03'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = ["array",[{examples=>[{data=>"",valid=>1},{data=>1,valid=>1},{data=>[1],valid=>1},{data=>[1,7],valid=>1},{data=>"1,7",valid=>1},{data=>[1,7,8],valid=>0},{data=>"1,7,8",valid=>0}],of=>["date::dow_num",{},{}],summary=>"Array of day-of-week numbers (1-7, 1=Monday)","x.completion"=>["date_dow_nums"],"x.perl.coerce_rules"=>["From_str::comma_sep"]}],["array"]];
+our $rschema = ["array",[{examples=>[{valid=>1,validated_value=>[],value=>""},{valid=>1,validated_value=>[1],value=>1},{valid=>1,value=>[1]},{valid=>1,value=>[1,7]},{valid=>1,validated_value=>[1,7],value=>"1,7"},{valid=>0,value=>[1,7,8]},{valid=>0,value=>"1,7,8"}],of=>["date::dow_num",{},{}],summary=>"Array of day-of-week numbers (1-7, 1=Monday)","x.completion"=>["date_dow_nums"],"x.perl.coerce_rules"=>["From_str::comma_sep"]}],["array"]];
 
 1;
 # ABSTRACT: Array of day-of-week numbers (1-7, 1=Monday)
@@ -20,7 +20,7 @@ Sah::SchemaR::date::dow_nums - Array of day-of-week numbers (1-7, 1=Monday)
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::date::dow_nums (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::SchemaR::date::dow_nums (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

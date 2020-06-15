@@ -125,9 +125,10 @@ lib/HiPi/Huawei/Errors.pm
 lib/HiPi/Huawei/HiLink.pm
 lib/HiPi/Huawei/Modem.pm
 lib/HiPi/Interface.pm
+lib/HiPi/Interface/BME280.pm
 lib/HiPi/Interface/Common/HD44780.pm
 lib/HiPi/Interface/Common/MCP23X17.pm
-lib/HiPi/Interface/Common/MIHomeAdapter.pm
+lib/HiPi/Interface/Common/Weather.pm
 lib/HiPi/Interface/DS18X20.pm
 lib/HiPi/Interface/ENER002.pm
 lib/HiPi/Interface/EnergenieSwitch.pm

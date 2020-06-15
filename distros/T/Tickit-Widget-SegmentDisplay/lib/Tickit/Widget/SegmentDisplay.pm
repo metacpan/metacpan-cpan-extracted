@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2013-2020 -- leonerd@leonerd.org.uk
 
 use 5.026;  # signatures
-use Object::Pad 0.19;
+use Object::Pad 0.27;
 
-class Tickit::Widget::SegmentDisplay 0.06
+package Tickit::Widget::SegmentDisplay 0.07;
+class Tickit::Widget::SegmentDisplay
    extends Tickit::Widget;
 
 use Tickit::Style;
@@ -165,7 +166,7 @@ has $_margin;
 
 has $_value;
 
-method BUILD ( %args )
+BUILD ( %args )
 {
    my $type = $args{type} // "seven";
    my $method;
@@ -196,8 +197,7 @@ method BUILD ( %args )
          $use_unicode  ? "flush_unicode"  :
                          "flush" );
 
-      $_render_to_rb = sub {
-         my $self = shift;
+      $_render_to_rb = method {
          my ( $rb, $rect ) = @_;
          my @buff;
 

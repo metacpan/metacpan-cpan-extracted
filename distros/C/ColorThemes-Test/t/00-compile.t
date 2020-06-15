@@ -6,10 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ColorTheme/Test/Random.pm',
+    'ColorTheme/Test/RandomANSI16.pm',
+    'ColorTheme/Test/RandomANSI256.pm',
     'ColorThemes/Test.pm'
 );
 

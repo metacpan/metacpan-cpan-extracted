@@ -20,7 +20,7 @@
             "Device::Chip" : "0",
             "Future::AsyncAwait" : "0.38",
             "Future::IO" : "0",
-            "Object::Pad" : "0.16",
+            "Object::Pad" : "0.27",
             "XS::Parse::Sublike" : "0.05",
             "perl" : "5.026"
          }
@@ -34,7 +34,7 @@
    "provides" : {
       "Device::Chip::CC1101" : {
          "file" : "lib/Device/Chip/CC1101.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

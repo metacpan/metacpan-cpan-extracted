@@ -1,18 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::ADS1115;
+use 5.026;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip::Base::RegisteredI2C );
+package Device::Chip::ADS1115 0.09;
+class Device::Chip::ADS1115
+   extends Device::Chip::Base::RegisteredI2C;
+
 Device::Chip::Base::RegisteredI2C->VERSION( '0.10' );
 
 use Future::AsyncAwait 0.13; # list-context bugfix
-
-our $VERSION = '0.08';
 
 use Data::Bitfield 0.02 qw( bitfield boolfield enumfield );
 
@@ -99,13 +99,14 @@ bitfield { format => "integer" }, CONFIG =>
    COMP_LAT  => boolfield(2),
    COMP_QUE  => enumfield(0, qw( 1 2 4 DIS ));
 
-async sub read_config
-{
-   my $self = shift;
+has $_config;
+has $_fullscale_f;
 
+async method read_config ()
+{
    my $bytes = await $self->cached_read_reg( REG_CONFIG, 1 );
 
-   return $self->{config} = { unpack_CONFIG( unpack "S>", $bytes ) };
+   return $_config = { unpack_CONFIG( unpack "S>", $bytes ) };
 }
 
 =head2 change_config
@@ -117,16 +118,13 @@ their existing values.
 
 =cut
 
-async sub change_config
+async method change_config ( %changes )
 {
-   my $self = shift;
-   my %changes = @_;
-
-   my $config = $self->{config} // await $self->read_config;
+   my $config = $_config // await $self->read_config;
 
    %$config = ( %$config, %changes );
 
-   delete $self->{fullscale_f} if exists $changes{PGA};
+   undef $_fullscale_f if exists $changes{PGA};
 
    await $self->cached_write_reg( REG_CONFIG, pack "S>", pack_CONFIG( %$config ) );
 }
@@ -140,10 +138,8 @@ reading of the currently-selected input channel when in single-shot mode.
 
 =cut
 
-async sub trigger
+async method trigger ()
 {
-   my $self = shift;
-
    my $config = await $self->read_config;
 
    # Not "cached" as OS is a volatile bit
@@ -163,20 +159,16 @@ integer. To convert this into voltage use the L</read_adc_voltage> method.
 
 =cut
 
-async sub read_adc
+async method read_adc ()
 {
-   my $self = shift;
-
    my $bytes = await $self->read_reg( REG_RESULT, 1 );
 
    return unpack "S>", $bytes;
 }
 
-async sub _fullscale
+async method _fullscale ()
 {
-   my $self = shift;
-
-   return $self->{fullscale} //= do {
+   return $_fullscale_f //= do {
       my $config = await $self->read_config;
       ( $config->{PGA} =~ m/(\d\.\d+)V/ )[0];
    };
@@ -192,10 +184,8 @@ configuration option to scale it.
 
 =cut
 
-async sub read_adc_voltage
+async method read_adc_voltage ()
 {
-   my $self = shift;
-
    my $f = Future->needs_all( $self->_fullscale, $self->read_adc );
    my ( $fullscale, $reading ) = await $f;
 

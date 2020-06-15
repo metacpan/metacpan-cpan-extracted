@@ -24,6 +24,7 @@ t/10method-attrs.t
 t/11method-signatures.t
 t/20slots-private.t
 t/21slots-capture.t
+t/22slots-accesssors.t
 t/30unit-class.t
 t/31pad-outside.t
 t/50croak-method.t
@@ -38,4 +39,5 @@ t/80async-method.t
 t/80dynamically+Object-Pad.t
 t/81async-method+dynamically.t
 t/90leak.t
+t/91legacy-method-BUILD.t
 t/99pod.t

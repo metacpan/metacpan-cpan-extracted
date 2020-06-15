@@ -6,7 +6,7 @@ use 5.010;
 
 our( $VERSION, $A, @A );
 BEGIN {
-    $VERSION = '0.52.1';
+    $VERSION = '0.53';
     *A = *ARGV;
     my $execed = shift if @A && $A[0] eq '+'; # don't recursively call perl again for -p
     return unless @A and $A[0] =~ /^-/s;
@@ -66,16 +66,15 @@ BEGIN {
     push @pl::opts, join '', '-', @pl1 if @pl1;
 #warn join '|', $perl // $^X, @perl, '--', $0, '+', @pl::opts, '--', @A, "\n";
     if( ! $execed and $perl || @perl ) { # let perl do perl-opts
-	unshift @A, $perl // $^X, @perl, '--', $0, '+', @pl::opts, '--';
-	if( $^O !~ /^MSWin/ ) {
-	    exec @A;
-	    warn $perl // $^X, ": $!\n";
-	} else {
+	unshift @A, $perl //= $^X, @perl, '--', $0, '+', @pl::opts, '--';
+	if( $^O =~ /^MSWin/ ) {
 	    require Win32::ShellQuote;
-	    system {$A[0]} Win32::ShellQuote::quote_system_list( @A );
-	    warn $perl // $^X, ": $!\n" if $!;
-	    exit;
+	    my $ret = system {$A[0]} Win32::ShellQuote::quote_system_list( @A );
+	    warn $perl, ": $!\n" if $!;
+	    exit $ret >> 8;
 	}
+	exec @A;
+	warn $perl, ": $!\n";
 	exit 1;
     }
 }
@@ -145,7 +144,7 @@ sub b(&@) {
 # Do it 100x for very fast test code (to increase weight compared to Benchmark overhead).
 sub B(&@) {
     my( $code, @rest ) = @_;
-    b { for my $i (0..99) { $code->() }} @rest;
+    b { for my $i (0..99) { &$code() }} @rest;
 }
 
 # Config
@@ -165,29 +164,50 @@ sub c(@) {
 }
 
 # scalar date time
-# todo ISO;  5.10 has Time::HiRes
-sub D(;$$) {
-    my( $s, $us ) = $_[0];
-    if( ! defined $s || $s < 0 ) {
-	my $o = $s // 0;
-	( $s, $us ) = eval { require Time::HiRes; Time::HiRes::gettimeofday() };
-	$s //= time;
-	$s += $o;
-    } elsif( ref $s ) {
-	( $s, $us ) = @$s;
-    } elsif( $s > 1e14 ) {	# so big it must be us?
-	$us = $s % 1000000;
-	$s = $s / 1000000;
-    } elsif( $s > 1e11 ) {	# so big it must be ms?
-	$us = ($s % 1000) * 1000;
-	$s = $s / 1000;
-    } elsif( $s - int $s ) {	# fractional?
-	$us = ($s - int $s) * 1000000;
+sub D(@) {
+    my( $s, $us, $z, $zo );
+    require Time::HiRes;
+    for( @_ ) {
+	if( ref ) {
+	    ($s, $us) = @$_;
+	} elsif( /^([-+]?)(1[0-3]|0?[0-9])(?:\.([0-9])([0-9])?|:([0-5])?([0-9]))?$/i ) {
+	    $z = $2 * 3600  +  ($3 ? ($3.($4//0)) * 36  :  $6 ? (($5//0).$6) * 60  :  0);
+	    $zo = sprintf ' %s%02d:%02d', $1 || '+', $z / 3600, $z % 3600 / 60;
+	    $z = -$z if $1 eq '-';
+	} elsif( /^([-+]?)(?=.)([0-9]*)(?:\.([0-9]*))?$/i ) {
+	    my $nus = substr +($3 // '') . '0'x6, 0, 6;
+	    if( $1 ) {
+		($s, $us) = &Time::HiRes::gettimeofday unless defined $s;
+		if( $1 eq '+' ) {
+		    $s += $2 // 0;
+		    $us += $nus;
+		    ++$s, $us -= 1e6 if $us >= 1e6;
+		} else {
+		    $s -= $2 // 0;
+		    $us -= $nus;
+		    --$s, $us += 1e6 if $us < 0;
+		}
+	    } else {
+		$s = $2 // 0;
+		$us = $nus;
+	    }
+	}
     }
-    $s = $_[1] ? gmtime $s : localtime $s;
-    substr $s, 19, 0, sprintf '.%06d', $us
-	if defined $us;
+    ($s, $us) = &Time::HiRes::gettimeofday unless defined $s;
+    if( $pl::isodate ) {
+	my @time = reverse +(defined( $z ) ? gmtime $s + $z : localtime $s)[0..5];
+	$s = sprintf '%04d-%02d-%02dT%02d:%02d:%02d.%06d%s', 1900 + shift( @time ), 1 + shift( @time ), @time, $us, $zo // '';
+    } else {
+	$s = defined( $z ) ? gmtime $s + $z : localtime $s;
+	substr $s, 19, 0, $zo if $zo;
+	substr $s, 19, 0, sprintf '.%06d', $us // 0;
+    }
     defined wantarray ? $s : e $s;
+}
+
+sub I(@) {
+    local $pl::isodate = 1;
+    &D;
 }
 
 # turns list of ipv4/6 addresses & hostnames or $_ into /etc/hosts format
@@ -225,7 +245,7 @@ sub h(@) {
 		my $v4 = $_->{family} == AF_INET();
 		my $addr = $unpack[$v4]->( $_->{addr} );
 		my @get = gethostbyaddr( $addr, $_->{family} );
-		$res->( $v4, @get ? @get : ($name, (undef)x3, $addr) );
+		&$res( $v4, @get ? @get : ($name, (undef)x3, $addr) );
 	    }
 	} else {		# older perl
 	    %name = ();
@@ -234,7 +254,7 @@ sub h(@) {
 	    my @get = $v6 ? gethostbyaddr( $addr = inet_pton( AF_INET6(), $name ), AF_INET6()) :
 	      $name =~ /[a-z]/i ? gethostbyname( $name ) :
 	      gethostbyaddr $addr = inet_aton( $name ), AF_INET();
-	    $res->( ! $v6, @get ? @get : ($name, (undef)x3, $addr) );
+	    &$res( ! $v6, @get ? @get : ($name, (undef)x3, $addr) );
 	}
     }
     for( sort keys %res ) {
@@ -274,7 +294,7 @@ sub n(;$) {
 sub p(&$@) {
     my $code = shift;
     open my $fd, "-|", @_ or die "$_[0]: $!\n";
-    $code->() while <$fd>;
+    &$code() while <$fd>;
 }
 
 
@@ -300,11 +320,12 @@ Predefined functions:
   b { } NAME, ARG... benchmark slow CODE for 10s, display NAME, looping over ARGs.
   B { } NAME, ARG... same, but run CODE 100 times in benchmark, to reduce overhead.
   c RE...           %Config, e.g. c->{sitelib}, optionally only part matching regexps
-  D [ARG][, UTC]    Date (from ARG [s, us], us, ms, s or -s), UTC if true
+  D [ARG...][, TZ]  Date (from ARG [s, us], s{.us} or [+-]s{.us}, TZ ([+-]0-13{:mm|.ff})
   e ARG...          echo prettified ARGs or $_ with spaces and newline
   E ARG...          same, but no newline
   f FMT, ARG...     format prettified ARGs with newline
   F FMT, ARG...     same, but without newline
+  I [ARG...][, TZ]  Isodate (from ARG [s, us], s{.us} or [+-]s{.us}, TZ ([+-]0-13{:mm|.ff})
   k [KEY, VALUE]    store VALUE or chomped $_ in $k{KEY or $1}[$I] for keydiff
   K [NUMBER, VALUE] same, but KEY is $F[NUMBER] or $F[0]
   n [N]             trim %n values less than N (default 2) e.g.; -en or -e 'n 5'
@@ -513,6 +534,7 @@ BEGIN {
     *Echof = \&F;
     *FIELD = \@F;
     *hosts = \&h;
+    *Isodate = \&I;
     *keydiff = *k;
     *Keydiff = *K;
     *number = *n;
@@ -564,7 +586,7 @@ GNU General Public License, which may be found in the Perl 5 source kit.";
 	    } else {
 		if( /z/ ) {
 		    $pl::bit[7] = "\n;INIT { \$pl::Z = sub{$bit} }";
-		    $pl::z = '$pl::Z->(); ';
+		    $pl::z = '&$pl::Z(); ';
 		} else {
 		    $pl::bit[8] = "\n;END { $bit }";
 		}
@@ -597,7 +619,7 @@ GNU General Public License, which may be found in the Perl 5 source kit.";
     #no warnings 'experimental';	# overridden by -W
     no strict;
 #e join '', map $_ // '', @pl::bit;
-    eval join '', map $_ // '', @pl::bit;
+    eval join '', map $_ // '', splice @pl::bit;
     if( $@ ) {
 	warn $@;
 	exit 255;
@@ -638,7 +660,7 @@ sub n_loop(&@) {
     for my $arg ( @_ ) {
 	open my $fd, '<', \$arg;
 	$::A = "file$::I";
-	$code->() for <$fd>;
+	&$code() for <$fd>;
 	++$::I;
     }
 }
@@ -681,13 +703,6 @@ warn "Starting tests\n";
 
 # assert n_loop => "file0 a\n\nfile0 b\nfile1 c\n\nfile2 d\n\nfile2 e\n\nfile2 f\n",
 #     stdout { n_loop { ::e $::A, $_ } "a\nb", "c\n", "d\ne\nf" };
-
-assert D_sec => "Fri Feb 13 23:31:30 2009",			::D 1234567890, 1;
-assert D_ms => "Fri Feb 13 23:31:30.123000 2009",		::D 1234567890123, 1;
-assert D_us => "Fri Feb 13 23:31:30.123456 2009",		::D 1234567890123456, 1;
-assert D_float => "Fri Feb 13 23:31:30.123456 2009",		::D 1234567890.123456, 1;
-assert D_array => "Fri Feb 13 23:31:30.123456 2009",		::D[1234567890, 123456], 1;
-assert D_print => "Fri Feb 13 23:31:30.123000 2009\n", stdout { ::D 1234567890123, 1 };
 
 my @l = qw(0 a b c aa bb cc 0b1 0b2 07 08 babe bad be);
 ( $H, $T ) = 0;
@@ -772,6 +787,15 @@ one-liners, C<@F>, is single-lettered.  Because not everyone may like that, Pl
 has it both ways.  Everything is aliased both as a word and as a single
 letter, including Perl's own C<@F> & C<*ARGV>.
 
+Perl one-liners, and hence pl, are by nature bilingual.  You must run the
+command with its options & arguments, typically from Shell.  By design, Perl
+quotes mimic Shell quotes, so here they collide.  As Perl also uses Shell
+meta-characters like C<$>, the best solution is to protect Perl-code from the
+Shell with single quotes.  That means they can't be used inside.  (An ugly way
+around that is C<'\''>, which ends a string, blackslashes a quote and starts
+another.  For literal quotes use C<$q(uote)>.)  Double quotes or C<q{}> are
+the way to go.
+
 B<-b> doesn't do a C<BEGIN> block.  Rather it is in the same scope as your
 main PERLCODE.  So you can use it to initialise C<my> variables.  Whereas, if
 you define a my variable in the main program of a B<-n>, B<-p>, B<-P>, B<-o>
@@ -779,8 +803,8 @@ or B<-O> loop, it's a new variable each time.  This echoes "a c" because B<-e>
 gives an C<END> block, as a closure of the 1st C<$inner> variable.  Perl
 warns "Variable "$inner" will not stay shared":
 
-    pl -Ob 'my $outer'  -e 'echo $inner, $outer'  'my $inner = $outer = $ARGV' a b c
-    pl -Ob 'my $outer'  -e 'e $inner, $outer'  'my $inner = $outer = $A' a b c
+    pl -Ob 'my $outer' -e 'echo $inner, $outer' 'my $inner = $outer = $ARGV' a b c
+    pl -Ob 'my $outer' -e 'e $inner, $outer' 'my $inner = $outer = $A' a b c
 
 =head1 EXAMPLES
 
@@ -835,7 +859,7 @@ flip-flop operator, starting with your regexp and going till each end-of-file:
     pl -P '99..eof' file*
     pl -P '/first/..eof' file*
 
-You can even get head and tail (which in programming logic translates to: or),
+You can even get head and tail (which in programming logic translates to C<or>),
 if last line of head comes before 1st line of tail (or actually any number of
 such disjoint ranges):
 
@@ -875,6 +899,13 @@ If you want this per file, you must empty the hash in the end-of-file B<-z>
 code:
 
     pl -Pz '%a = ()' '!$a{$_}++' file*
+
+=item Remove Empty Lines
+
+Technically this does the opposite, printing back to the same files (B<-Pi>)
+all lines containing non-whitespace C<\S>:
+
+    pl -Pi '/\S/' file*
 
 =item Move a line further down in each file
 
@@ -976,9 +1007,9 @@ escape one backslash from the Shell.  No matter how many dots the filename
 contains, 1st element is the size and last is the suffix.  Sum it in C<%n(umber)>,
 which gets sorted numerically at the end:
 
-    find -name '*.*' -type f -printf "%s.%f\0" |
+    find -name "*.*" -type f -printf "%s.%f\0" |
         pl -0lF\\. '$number{".$FIELD[-1]"} += $FIELD[0]'
-    find -name '*.*' -type f -printf "%s.%f\0" |
+    find -name "*.*" -type f -printf "%s.%f\0" |
         pl -0lF\\. '$n{".$F[-1]"} += $F[0]'
 
 This is similar, but also deals with suffixless files:
@@ -994,9 +1025,9 @@ Incredibly, find has no ready-made ISO date, so specify the 3 parts.  If you
 don't want days, just leave out C<-%Td>.  Sum up encountered dates in
 sort-value-numerically-at-end hash C<%n(umber)>:
 
-    find -printf '%TY-%Tm-%Td\n' |
+    find -printf "%TY-%Tm-%Td\n" |
         pl -ln '++$number{$_}'
-    find -printf '%TY-%Tm-%Td\n' |
+    find -printf "%TY-%Tm-%Td\n" |
         pl -ln '++$n{$_}'
 
 =item Count files per date with rollup
@@ -1010,9 +1041,9 @@ once also the year with "____".  This sorts after numbers and gives a sum for
 all with the same leading numbers.  Use the sort-by-key-at-end hash
 C<%s(tring)>:
 
-    find -printf '%TY-%Tm-%Td\n' |
+    find -printf "%TY-%Tm-%Td\n" |
         pl -ln '++$string{$_}; ++$string{$_} while s/[0-9]+(?=[-_]*$)/"_" x length $&/e'
-    find -printf '%TY-%Tm-%Td\n' |
+    find -printf "%TY-%Tm-%Td\n" |
         pl -ln '++$s{$_}; ++$s{$_} while s/[0-9]+(?=[-_]*$)/"_" x length $&/e'
 
 =back
@@ -1219,7 +1250,7 @@ before echoing, start with double size:
     pl '($w, $h) = (1189, 1682); f "%3s  %4dmm x %4dmm", "A$_", ($w, $h) = ($h / 2, $w) for 0..10'
 
 The table could easily be widened to cover B- & C-formats, by extending each
-list of 2, to an appropriate list of 6, e.g. C<($Aw, $Ah, $Bw, ...)>.  But a
+list of 2, to a corresponding list of 6, e.g. C<($Aw, $Ah, $Bw, ...)>.  But a
 more algorithmic approach seems better.  This fills C<@A(RGV)> in B<-b>, as
 though it had been given on the command line and prepares a nested list of the
 3 initials specs.  The format is tripled (with cheat spaces at the beginning).
@@ -1375,6 +1406,19 @@ If your input comes from a file, collect it in a list and perform at end (B<-e>)
     pl -lne 'hosts @list' 'push @list, $_' file
     pl -lne 'h @list' 'push @list, $_' file
 
+=item Quine
+
+I<I feel more like I do now than I did a while ago. (-:>
+
+A quine is a program that prints itself.  This uses inside knowledge of how
+your program compiles to a function.  The internal pretty-printer decompiles
+it.  Surrounding boilerplate is replaced by C<pl ''>.  Both the long and short
+form are quines.  This requires at least Perl 5.14, which introduced and
+automatically adds C</u>:
+
+    pl 'echo grep({tr/\n / /s; s/.*: \{ /pl $quote/u; s/; \}.*/$quote/u;} pl::pretty(\&pl::prog))'
+    pl 'e grep({tr/\n / /s; s/.*: \{ /pl $q/u; s/; \}.*/$q/u;} pl::pretty(\&pl::prog))'
+
 =back
 
 =head1 COMPATIBILITY
@@ -1414,9 +1458,10 @@ shenanigans with unbalanced braces won't work
 
 I<B<W>ork B<I>s B<N>ever B<D>one B<O>n B<W>indows B<S>ystems ;-)>
 
-Do yourself a favour and get a real Shell, e.g. from Cygwin or MSYS!  If you
-can't avoid F<command.com> or F<cmd.exe>, you will have to first convert all
-inner quotes to C<qq>.  Then convert the outer single quotes to double quotes:
+Do yourself a favour and get a real Shell, e.g. from WSL, Cygwin, MSYS or
+MinGW!  If you can't avoid F<command.com> or F<cmd.exe>, you will have to
+first convert all inner quotes to C<qq>.  Then convert the outer single quotes
+to double quotes:
 
     pl "echo qq{${quote}Perl$quote}, qq{$Quote@ARGV$Quote}" one liner
     pl "e qq{${q}Perl$q}, qq{$Q@A$Q}" one liner
@@ -1427,9 +1472,7 @@ While the old Windows 10 terminal understands Ansi escape sequences, it makes
 it horribly hard to activate them.  So they are off by default, requiring
 B<--color> to override that choice.
 
-=for html <footer>
+=for html <hr>
 
 Pl is maintained on L<SourceForge|https://perl1liner.sourceforge.io/> and also
 available on L<meta::cpan|https://metacpan.org/pod/distribution/App-pl/pl>.
-
-=for html </footer>

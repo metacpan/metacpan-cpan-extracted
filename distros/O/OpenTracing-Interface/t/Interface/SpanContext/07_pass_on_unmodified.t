@@ -54,6 +54,28 @@ subtest "pass on arguments for 'with_baggage_item'" => sub {
 
 
 
+subtest "pass on arguments for 'with_baggage_items'" => sub {
+    
+    undef @test_params;
+    
+    my $test_object = bless {}, 'MyTest::SpanContext';
+    
+    lives_ok {
+        $test_object->with_baggage_items( item => 'value', that => 'other' )
+    } "Can call method 'with_baggage_item'";
+    
+    cmp_deeply(
+        \@test_params => [
+            [ $test_object, 'item', 'value', 'that', 'other' ],
+        ],
+        "... and the original subroutine gets the expected arguments"
+    );
+    
+};
+
+
+
+
 
 
 done_testing();
@@ -66,14 +88,24 @@ sub get_baggage_item {
     push @main::test_params, [ @_ ];
     
     return 'this is a baggage item value - what ever'
+};
+
+sub get_baggage_items {
+    push @main::test_params, [ @_ ];
     
+    return this => 1, that => 2
 };
 
 sub with_baggage_item {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::SpanContext'
+    return bless {}, 'MySyub::SpanContext'
+};
+
+sub with_baggage_items {
+    push @main::test_params, [ @_ ];
     
+    return bless {}, 'MySyub::SpanContext'
 };
 
 BEGIN {
@@ -83,9 +115,10 @@ BEGIN {
 
 
 
-package MyDuck::SpanContext;
+package MySyub::SpanContext;
 
 sub get_baggage_item;
+sub get_baggage_items;
 sub with_baggage_item;
 
 

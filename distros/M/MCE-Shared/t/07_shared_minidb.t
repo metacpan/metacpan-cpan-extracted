@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use utf8;
+use open qw(:std :utf8);
 
 use Test::More;
 
@@ -248,6 +249,25 @@ is(
 is(
    $db->hset('k3'), undef,  # no-op without field/value
    'shared minidb hash, check hset key, no-op'
+);
+
+## hsetnx
+
+is(
+   $db->hsetnx('k2', 'f17', 'foobar'), '0',
+   'shared minidb hash, check hsetnx old field'
+);
+is(
+   $db->hget('k2', 'f17'), 'baz',
+   'shared minidb hash, check hsetnx old value'
+);
+is(
+   $db->hsetnx('k2', 'hello', 'world'), '1',
+   'shared minidb hash, check hsetnx new field'
+);
+is(
+   $db->hget('k2', 'hello'), 'world',
+   'shared minidb hash, check hsetnx new value'
 );
 
 ## hassign

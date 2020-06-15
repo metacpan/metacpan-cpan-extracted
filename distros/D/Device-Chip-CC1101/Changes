@@ -1,5 +1,11 @@
 Revision history for Device-Chip-CC1101
 
+0.04    2020-06-13
+        [CHANGES]
+         * Update to Object::Pad 0.27
+            + BUILD block syntax
+            + package+class declaration to keep metadata parsers happy
+
 0.03    2020-03-27
         [CHANGES]
          * Use Object::Pad for class implementation

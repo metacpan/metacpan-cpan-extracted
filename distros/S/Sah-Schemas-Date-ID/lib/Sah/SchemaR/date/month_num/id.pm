@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::month_num::id;
 
-our $DATE = '2019-11-28'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["int",[{max=>12,min=>1,summary=>"Month number","x.perl.coerce_rules"=>["From_str::convert_id_month_name_to_num"]}],["int"]];
+our $rschema = ["int",[{examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>1,value=>"jan"},{valid=>1,validated_value=>8,value=>"AGU"},{valid=>0,value=>"aug"},{valid=>0,value=>0},{valid=>1,value=>1},{valid=>1,value=>12},{valid=>0,value=>13}],max=>12,min=>1,summary=>"Month number","x.perl.coerce_rules"=>["From_str::convert_id_month_name_to_num"]}],["int"]];
 
 1;
 # ABSTRACT: Month number
@@ -20,7 +20,7 @@ Sah::SchemaR::date::month_num::id - Month number
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::date::month_num::id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
+This document describes version 0.005 of Sah::SchemaR::date::month_num::id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

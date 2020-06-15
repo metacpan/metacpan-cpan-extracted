@@ -1,0 +1,263 @@
+
+=head1 NAME
+
+OpenTracing::Role::SpanContext - Role for OpenTracing implementations.
+
+=head1 SYNOPSIS
+
+    package OpenTracing::Implementation::MyBackendService::SpanContext
+    
+    use Moo;
+    
+    ...
+    
+    with 'OpenTracing::Role::SpanContext'
+    
+    1;
+
+=cut
+
+=head1 DESCRIPTION
+
+This is a role for OpenTracing implenetations that are compliant with the
+L<OpenTracing::Interface>.
+
+It has been suggested that an object that implements the OpenTracing SpanContext
+interface SHOULD be immutable, to avoid lifetime issues. Therefore, the
+attributes are read/write-protected. Any changes tried to make, will trigger a
+L<Sub::Trigger::Lock> exception.
+
+The only way to 'mutate' the bagage items, is by using L<with_baggage_item> or
+L<with_baggage_items>.
+
+Most likely, the L<new> constructor would only be called during the extraction
+phase. Depending on the framework the OpenTracing implementation is being used
+for, it will be initialised with request depenent information. From there on,
+additional bagage-items can be added.
+
+Implementors should be aware of the immutable desired behavbior and should use
+methods like C<with_...> to clone this object with new values, rather than just
+updating any values of the the attributes.
+
+
+
+=head1 IMPLEMENTED OPENTRACING METHODS
+
+The following methods from
+L<OpenTracing::Interface|OpenTracing::Interface::SpanContext>
+have been implemented. See their documentation for more details.
+
+
+
+=head2 C<get_baggage_item>
+
+This will return the value of a baggage item, based on its key.
+
+See L<OpenTracing::Interface::SpanContext/"get_baggage_item">.
+
+
+
+=head2 C<get_baggage_items>
+
+This will return a Hash of key/value pairs.
+
+See L<OpenTracing::Interface::SpanContext/"get_baggage_item">.
+
+
+
+=head2 C<with_baggage_item>
+
+Creates a cloned C<SpanContext> object with the new key => value pair.
+
+See L<OpenTracing::Interface::SpanContext/"with_baggage_item">.
+
+
+
+=head2 C<with_baggage_items>
+
+Creates a cloned C<SpanContext> object with the multiple key => value pairs.
+
+See L<OpenTracing::Interface::SpanContext/"with_baggage_items">.
+
+
+
+=head1 WARNING
+
+B<Never use any of attributes or methods below in any integration!>
+
+Only methods mentioned in the Public OpenTracing::Interface are safe to be used
+in any integration or when instrumenting applications.
+
+
+
+=head1 ATTRIBUTES
+
+The attributes below become part of the consuming class, but because of its
+in-mutable design, those can not be set after instantiation, one will need to
+use the provided methods to clone with the data.
+
+
+
+=head2 C<trace_id>
+
+A L<GUID|Data::GUIID> for a trace that gets assigned at instantiation and should
+remain the same for all related Spans.
+
+See L<< C<with_trace_id> >> for setting the C<trace_id>.
+
+
+
+=head2 C<span_id>
+
+A L<GUID|Data::GUIID> for a span that gets assigned at instantiation and should
+remain the unique for all related Spans.
+
+See L<< C<with_span_id> >> for setting the C<span_id>.
+
+
+
+=head2 C<baggage_items>
+
+Relevant information that needs to be propagated from one Span to the other or
+across the edges of the service or application.
+
+See L<SpanContext|OpenTracing::Interface::SpanContext>.
+
+
+
+=head1 CLONE METHODS
+
+Since C<SpanContext> is supposed to be an in-mutable object, and there are some
+occasions that settings need to changed (i.e. a root span), there are a few
+cloning methods provided:
+
+
+
+=head2 C<new_clone>
+
+Creates a new object with all the same attributes, other than C<trace_id> and
+C<span_id>.
+
+    my $new_context = $current_context->new_clone
+        ->with_trace_id( $current_context->trace_id );
+    # since most likely, you do want to keep that
+
+=head3 Returns
+
+A 'cloned' C<SpanContext>
+
+
+
+=head2 C<with_trace_id>
+
+Creates a cloned object, with a new value for C<trace_id>, possibly during a
+C<< $TRACER->ectract_context >> method
+
+    $span_context = SpanContext->new( ... )->with_trace_id( $trace_id );
+
+=head3 Required Positional Parameter(s)
+
+=over
+
+=item C<trace_id>
+
+This could be any C<Value>, for example a C<Uuid> type.
+
+=back
+
+=head3 Returns
+
+A cloned C<SpanContext>
+
+
+
+=head2 C<with_span_id>
+
+Creates a cloned object, with a new value for C<span_id>, possibly during a
+C<< $TRACER->ectract_context >> method
+
+    $span_context = SpanContext->new( ... )->with_span_id( $span_id );
+
+=head3 Required Positional Parameter(s)
+
+=over
+
+=item C<span_id>
+
+This could be any C<Value>, for example a C<Uuid> type.
+
+=back
+
+=head3 Returns
+
+A cloned C<SpanContext>
+
+
+
+=head1 ATTRIBUTES
+
+
+
+=head2 baggage_items
+
+
+
+=head1 INSTANCE METHODS
+
+
+
+=head2 get_baggage_item
+
+Returns a single value for a given key.
+
+=head2 get_baggage_items
+
+Returns a hash that contains all key/value pairs for the current baggage items.
+By returning a hash and not a reference, it purposefully makes it hard to mutate
+any of the key/value pairs in the baggage_items.
+
+=head2 with_baggage_item
+
+Creates a clone of the current object, with new kew/value pair added.
+
+=head2 with_baggage_items
+
+Creates a clone of the current object, with list of kew/value pairs added.
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Types>
+
+Type constraints for checking Interfaces
+
+=item L<OpenTracing::Interface::SpanContext>
+
+A role that defines the SpanContext interface
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+=cut

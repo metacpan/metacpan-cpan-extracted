@@ -1,5 +1,5 @@
 package IO::Pager::Buffered;
-our $VERSION = 1.02;
+our $VERSION = 1.03; #Untouched since 1.03
 
 use strict;
 use base qw( IO::Pager );
@@ -42,7 +42,9 @@ sub PRINT {
 sub CLOSE {
   my ($self) = @_;
   # Print buffer and close using IO::Pager's methods
-  $self->SUPER::PRINT($self->{buffer}) if exists $self->{buffer};
+  $self->SUPER::PRINT($self->{buffer}) if
+      exists($self->{buffer}) && length($self->{buffer});
+  $self->{buffer}='';
   $self->SUPER::CLOSE();
 }
 

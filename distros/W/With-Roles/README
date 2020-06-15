@@ -19,7 +19,7 @@ SYNOPSIS
       my $another_class = My::Class->with::roles('+My::Role');
 
 DESCRIPTION
-    This module provides a easy to use global function that can be used on
+    This module provides an easy to use global function that can be used on
     any package to create a new package with a set of roles applied.
 
     When used on classes, generates a subclass with the given roles applied.
@@ -28,13 +28,13 @@ DESCRIPTION
     applied.
 
     When used on objects, applies the roles to the object and returns the
-    object.
+    object. Unlike with roles and classes, this modifies the invocant.
 
     Compatible with Moose, Moo, Mouse, and Role::Tiny roles and classes.
 
     The generated packages will have names based on the original classes and
-    roles. The exact form of the generated names should not be relied on,
-    but should aid with debugging.
+    roles to aid with debugging. The exact form of the generated names
+    should not be relied on.
 
     A shorthand of "+RoleName" can be used for roles named like
     "MyClass::Role::RoleName". Additional roles applied will continue to

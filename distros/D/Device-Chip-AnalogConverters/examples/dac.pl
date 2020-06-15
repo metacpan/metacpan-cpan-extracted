@@ -9,7 +9,7 @@ use Getopt::Long;
 
 GetOptions(
    'chip|C=s'    => \( my $CHIP ),
-   'adapter|A=s' => \( my $ADAPTER = "FTDI" ),
+   'adapter|A=s' => \( my $ADAPTER ),
    'mount|M=s'   => \( my $MOUNTPARAMS ),
 
    'p|print-config' => \my $PRINT_CONFIG,

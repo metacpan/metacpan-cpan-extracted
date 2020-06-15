@@ -21,12 +21,12 @@ requires:
   Compress::Raw::Zlib: '0'
   CryptX: '0.067'
   Exporter: '5.57'
-  JSON::MaybeXS: '1.003005'
+  JSON: '0'
   Scalar::Util: '0'
   Test::More: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/DCIT/perl-Crypt-JWT/issues
   repository: https://github.com/DCIT/perl-Crypt-JWT
-version: '0.027'
+version: '0.028'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

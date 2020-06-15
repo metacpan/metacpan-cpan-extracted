@@ -43,7 +43,7 @@ when a given C<Span> B<is> scheduled and on the path.
 
 
 
-=head2 close
+=head2 C<close>
 
 Mark the end of the active period for the current thread and L<Scope>,
 updating the C<ScopeManager::active()> in the process.
@@ -53,32 +53,58 @@ updating the C<ScopeManager::active()> in the process.
 NOTE: Calling C<close> more than once on a single C<Scope> instance leads
 to undefined behavior.
 
-=head3 Parameters
+=over
 
-none
+=item Parameter(s)
 
-=head3 Returns
+=over
+
+I<none>
+
+=back
+
+=item Returns
+
+=over
+
+=item C<Invocant>
 
 The C<Scope> instance <$self>, for ease of chaining (although the usefulness is
 doubtfull).
 
+=back
+
+=back
 
 
-=head2 get_span
+
+=head2 C<get_span>
 
 Returns the C<Span> that's been scoped by this C<Scope>
 
     my $span = $scope->get_span
 
-=head3 Parameters
+=over
 
-none
+=item Parameter(s)
 
-=head3 Returns
+=over
 
-The C<Span> that's been scoped by this C<Scope>.
+I<none>
 
-=cut
+=back
+
+=item Returns
+
+=over
+
+=item C<Span>
+
+The span that's been scoped by this scope.
+
+=back
+
+=back
 
 
 
@@ -98,21 +124,30 @@ all common elements that conform L<OpenTracing::Interface>
 
 =back
 
-=cut
-
 
 
 =head1 CAVEATS
-
-This description is using C<around> method modifiers that basically wraps them
-around the real implementation. These method modifiers provide a 'readable' and
-reusable interface, describing the inputs and outputs, using type constraints.
-
-Consumers of this role, or implementors of the interface are MUST implement each
-method mentioned below. Not doing so will result in compilation errors.
 
 Since this role does nothing else than checking input and output, it is useful
 during development. Most likely it can be switched off safely in production
 environments.
 
-=cut
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.

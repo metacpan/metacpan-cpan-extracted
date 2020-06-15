@@ -5,7 +5,7 @@ OpenTracing::Interface - API definition for OpenTransport implementations
 
 =head1 VERSION
 
-0.20
+v0.202.1
 
 =head1 DESCRIPTION
 
@@ -81,6 +81,10 @@ Extract a SpanContext from an incoming request
     }
 
 
+=head1 WARNING
+
+THIS IS A BREAKING CHANGE COMPARED TO THE PREVIOUS VERSION (v0.201.x) AND
+EARLIER VERSIONS.
 
 =head1 DESCRIPTION
 
@@ -154,6 +158,8 @@ common elements that conform this L<OpenTracing::Interface>
 =head1 AUTHOR
 
 Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
 
 =head1 COPYRIGHT AND LICENSE
 

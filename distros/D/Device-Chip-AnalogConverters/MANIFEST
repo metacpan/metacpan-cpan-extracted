@@ -4,7 +4,6 @@ examples/adc.pl
 examples/ads1115.pl
 examples/dac.pl
 examples/ltc2400.pl
-examples/max11200.pl
 examples/mcp4725.pl
 lib/Device/Chip/AD5691R.pm
 lib/Device/Chip/ADS1115.pm

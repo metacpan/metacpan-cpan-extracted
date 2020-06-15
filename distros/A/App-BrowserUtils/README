@@ -3,8 +3,8 @@ NAME
     GUI ones
 
 VERSION
-    This document describes version 0.006 of App::BrowserUtils (from Perl
-    distribution App-BrowserUtils), released on 2020-05-07.
+    This document describes version 0.007 of App::BrowserUtils (from Perl
+    distribution App-BrowserUtils), released on 2020-06-13.
 
 SYNOPSIS
 DESCRIPTION
@@ -17,6 +17,10 @@ DESCRIPTION
     *   pause-browsers
 
     *   ps-browsers
+
+    *   restart-browsers
+
+    *   start-browsers
 
     *   terminate-browsers
 
@@ -106,6 +110,139 @@ FUNCTIONS
     *   users => *array[unix::local_uid]*
 
         Kill browser processes that belong to certain user(s) only.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  restart_browsers
+    Usage:
+
+     restart_browsers(%args) -> [status, msg, payload, meta]
+
+    Restart browsers.
+
+    For each of the requested browser, first check whether browser processes
+    (that run the current user) exist. If they do then terminate the browser
+    first. After that, start the browser again.
+
+    Example on the CLI:
+
+     % restart-browsers --restart-firefox
+
+    To customize command:
+
+     % restart-browsers --start-firefox --firefox-cmd 'firefox -P myprofile'
+
+    when starting each browser, console output will be captured and returned
+    in function metadata. Will wait for 2/5/10 seconds and check if the
+    browsers have been started. If all browsers can't be started, will
+    return 500; otherwise will return 200 but report the browsers that
+    failed to start to the STDERR.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   chrome_cmd => *array[str]|str* (default: "google-chrome")
+
+    *   firefox_cmd => *array[str]|str* (default: "firefox")
+
+    *   opera_cmd => *array[str]|str* (default: "opera")
+
+    *   quiet => *true*
+
+    *   restart_chrome => *bool*
+
+    *   restart_firefox => *bool*
+
+    *   restart_opera => *bool*
+
+    *   restart_vivaldi => *bool*
+
+    *   vivaldi_cmd => *array[str]|str* (default: "vivaldi")
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  start_browsers
+    Usage:
+
+     start_browsers(%args) -> [status, msg, payload, meta]
+
+    Start browsers.
+
+    For each of the requested browser, check whether browser processes (that
+    run as the current user) exist and if not then start the browser. If
+    browser processes exist, even if all are paused, then no new instance of
+    the browser will be started.
+
+    when starting each browser, console output will be captured and returned
+    in function metadata. Will wait for 2/5/10 seconds and check if the
+    browsers have been started. If all browsers can't be started, will
+    return 500; otherwise will return 200 but report the browsers that
+    failed to start to the STDERR.
+
+    Example on the CLI:
+
+     % start-browsers --start-firefox
+
+    To customize command to use to start:
+
+     % start-browsers --start-firefox --firefox-cmd 'firefox -P myprofile'
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   chrome_cmd => *array[str]|str* (default: "google-chrome")
+
+    *   firefox_cmd => *array[str]|str* (default: "firefox")
+
+    *   opera_cmd => *array[str]|str* (default: "opera")
+
+    *   quiet => *true*
+
+    *   start_chrome => *bool*
+
+    *   start_firefox => *bool*
+
+    *   start_opera => *bool*
+
+    *   start_vivaldi => *bool*
+
+    *   vivaldi_cmd => *array[str]|str* (default: "vivaldi")
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
 
     Returns an enveloped result (an array).
 

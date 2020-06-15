@@ -1,9 +1,9 @@
 package Sah::Schema::date::dow_num;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [int => {
     summary => 'Day-of-week number (1-7, 1=Monday)',
@@ -12,11 +12,11 @@ our $schema = [int => {
     'x.perl.coerce_rules' => ['From_str::convert_en_dow_name_to_num'],
     'x.completion' => ['date_dow_num'],
     examples => [
-        {data=>'', valid=>0},
-        {data=>0, valid=>0},
-        {data=>1, valid=>1},
-        {data=>7, valid=>1},
-        {data=>8, valid=>0},
+        {value=>'', valid=>0},
+        {value=>0, valid=>0},
+        {value=>1, valid=>1},
+        {value=>7, valid=>1},
+        {value=>8, valid=>0},
     ],
 }, {}];
 
@@ -36,7 +36,7 @@ Sah::Schema::date::dow_num - Day-of-week number (1-7, 1=Monday)
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::date::dow_num (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::Schema::date::dow_num (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -50,7 +50,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;

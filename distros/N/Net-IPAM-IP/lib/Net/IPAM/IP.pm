@@ -1,6 +1,6 @@
 package Net::IPAM::IP;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 use 5.10.0;
 use strict;

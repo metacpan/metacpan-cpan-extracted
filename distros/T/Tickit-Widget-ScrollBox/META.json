@@ -23,7 +23,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.17",
+            "Object::Pad" : "0.27",
             "Tickit::SingleChildWidget" : "0.53",
             "Tickit::Style" : "0.35",
             "Tickit::Window" : "0.39",
@@ -34,11 +34,11 @@
    "provides" : {
       "Tickit::Widget::ScrollBox" : {
          "file" : "lib/Tickit/Widget/ScrollBox.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Tickit::Widget::ScrollBox::Extent" : {
          "file" : "lib/Tickit/Widget/ScrollBox/Extent.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
       ],
       "x_IRC" : "irc://irc.freenode.net/#tickit"
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

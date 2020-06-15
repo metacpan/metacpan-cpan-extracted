@@ -2,8 +2,8 @@
 
 package Test::Rinci;
 
-our $DATE = '2019-08-20'; # DATE
-our $VERSION = '0.153'; # VERSION
+our $DATE = '2020-06-13'; # DATE
+our $VERSION = '0.154'; # VERSION
 
 use 5.010001;
 use strict;
@@ -137,6 +137,22 @@ sub _test_variable_metadata {
     $Test->ok(1, "currently no test for variable metadata");
 }
 
+sub _set_option_defaults {
+    my $opts = shift;
+
+    $opts->{load}                    //= 1;
+    $opts->{test_package_metadata}   //= 1;
+    $opts->{include_packages}        //= [];
+    $opts->{exclude_packages}        //= [];
+    $opts->{test_function_metadata}  //= 1;
+    $opts->{wrap_function}           //= 1;
+    $opts->{test_function_examples}  //= 1;
+    $opts->{include_functions}       //= [];
+    $opts->{exclude_functions}       //= [];
+    $opts->{test_variable_metadata}  //= 1;
+    $opts->{exclude_variables}       //= [];
+}
+
 sub metadata_in_module_ok {
     my $module = shift;
     my %opts   = (@_ && (ref $_[0] eq "HASH")) ? %{(shift)} : ();
@@ -144,15 +160,7 @@ sub metadata_in_module_ok {
     my $res;
     my $ok = 1;
 
-    $opts{load}                    //= 1;
-    $opts{test_package_metadata}   //= 1;
-    $opts{exclude_packages}        //= [];
-    $opts{test_function_metadata}  //= 1;
-    $opts{wrap_function}           //= 1;
-    $opts{test_function_examples}  //= 1;
-    $opts{exclude_functions}       //= [];
-    $opts{test_variable_metadata}  //= 1;
-    $opts{exclude_variables}       //= [];
+    _set_option_defaults(\%opts);
 
     my $has_tests;
 
@@ -295,10 +303,29 @@ sub metadata_in_all_modules_ok {
     my $msg  = shift;
     my $ok = 1;
 
+    _set_option_defaults($opts);
+
     my @starters = _starting_points();
     local @INC = (@starters, @INC);
 
     $Test->plan(tests => 1);
+
+    my @include_packages;
+    {
+        my $val = delete $opts->{include_packages};
+        last unless $val;
+        for my $mod (@$val) {
+            push @include_packages, $mod;
+        }
+    }
+    my @exclude_packages;
+    {
+        my $val = delete $opts->{exclude_packages};
+        last unless $val;
+        for my $mod (@$val) {
+            push @exclude_packages, $mod;
+        }
+    }
 
     my @modules = all_modules(@starters);
     if (@modules) {
@@ -306,6 +333,12 @@ sub metadata_in_all_modules_ok {
             "Rinci metadata on all dist's modules",
             sub {
                 for my $module (@modules) {
+                    if (@include_packages) {
+                        next unless grep { $module eq $_ } @include_packages;
+                    }
+                    if (@exclude_packages) {
+                        next if grep { $module eq $_ } @exclude_packages;
+                    }
                     #$log->infof("Processing module %s ...", $module);
                     my $thismsg = defined $msg ? $msg :
                         "Rinci metadata on $module";
@@ -336,7 +369,7 @@ Test::Rinci - Test Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.153 of Test::Rinci (from Perl distribution Test-Rinci), released on 2019-08-20.
+This document describes version 0.154 of Test::Rinci (from Perl distribution Test-Rinci), released on 2020-06-13.
 
 =head1 SYNOPSIS
 
@@ -468,7 +501,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

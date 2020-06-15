@@ -1,0 +1,740 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Tickit::DSL
+at lib/Tickit/DSL.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Tickit::DSL - domain-specific language for Tickit terminal apps
+
+=head1 SYNOPSIS
+
+ use Tickit::DSL;
+ vbox {
+  hbox { static 'left' } expand => 1;
+  hbox { static 'right' } expand => 1;
+ }
+
+=head1 DESCRIPTION
+
+WARNING: This is an early version, has an experimental API, and is
+subject to change in future. Please get in contact and/or wait for
+1.0 if you want something stable.
+
+Provides a simplified interface for writing Tickit applications. This is
+mainly intended for prototyping:
+
+ #!/usr/bin/env perl
+ use strict;
+ use warnings;
+ use Tickit::DSL;
+ vbox {
+  # Single line menu at the top of the screen
+  menubar {
+   submenu File => sub {
+    menuitem Open  => sub { warn 'open' };
+    menuspacer;
+    menuitem Exit  => sub { tickit->stop };
+   };
+   submenu Edit => sub {
+    menuitem Copy  => sub { warn 'copy' };
+    menuitem Cut   => sub { warn 'cut' };
+    menuitem Paste => sub { warn 'paste' };
+   };
+   menuspacer;
+   submenu Help => sub {
+    menuitem About => sub { warn 'about' };
+   };
+  };
+  # A 2-panel layout covers most of the rest of the display
+  widget {
+   # Left and right panes:
+   vsplit {
+    # A tree on the left, 1/4 total width
+    widget {
+     placeholder;
+    } expand => 1;
+    # and a tab widget on the right, 3/4 total width
+    widget {
+     tabbed {
+      widget { placeholder } label => 'First thing';
+ 	};
+    } expand => 3;
+   } expand => 1;
+  } expand => 1;
+  # At the bottom of the screen we show the status bar
+  # statusbar { } show => [qw(clock cpu memory debug)];
+  # although it's not on CPAN yet so we don't
+ };
+ tickit->run;
+
+=head1 METHODS
+
+=head2 import
+
+By default we'll import all the known widget shortcuts. To override this, pass a list
+(possibly empty) on import:
+
+ use Tickit::DSL qw();
+
+By default, the synchronous L<Tickit> class will be used. You can make L</tickit> refer
+to a L<Tickit::Async> object instead by passing the C< :async > tag:
+
+ use Tickit::DSL qw(:async);
+
+the default is C< :sync >, but you can make this explicit:
+
+ use Tickit::DSL qw(:sync);
+
+There is currently no support for mixing the two styles in a single application - if
+C< :async > or C< :sync > have already been passed to a previous import, attempting
+to apply the opposite one will cause an exception.
+
+This is fine:
+
+ use Tickit::DSL qw(:sync);
+ use Tickit::DSL qw();
+ use Tickit::DSL;
+
+This is not:
+
+ use Tickit::DSL qw(:sync);
+ use Tickit::DSL qw(:async); # will raise an exception
+
+=head1 FUNCTIONS - Utility
+
+All functions are exported, unless otherwise noted.
+
+=head2 loop
+
+Returns the L<IO::Async::Loop> instance if we're in C< :async > mode, throws an
+exception if we're not. See L</import> for details.
+
+=head2 tickit
+
+Returns (constructing if necessary) the L<Tickit> (or L<Tickit::Async>) instance.
+
+=head2 later
+
+Defers a block of code.
+
+ later {
+  print "this happened later\n";
+ };
+
+Will run the code after the next round of I/O events.
+
+=head2 timer
+
+Sets up a timer to run a block of code later.
+
+ timer {
+  print "about a second has passed\n";
+ } after => 1;
+
+ timer {
+  print "about a minute has passed\n";
+ } at => time + 60;
+
+Takes a codeblock and either C<at> or C<after> definitions. Passing
+anything other than a single definition will cause an exception.
+
+=head2 add_widgets
+
+Adds some widgets under an existing widget.
+
+ my $some_widget = vbox { };
+ add_widgets {
+  vbox { ... };
+  hbox { ... };
+ } under => $some_widget;
+
+Returns the widget we added the new widgets under (i.e. the C< under > parameter).
+
+=head1 FUNCTIONS - Layout
+
+The following functions create/manage widgets which are useful for layout purposes.
+
+=head2 vbox
+
+Creates a L<Tickit::Widget::VBox>. This is a container, so the first
+parameter is a coderef which will switch the current parent to the new
+vbox.
+
+Any additional parameters will be passed to the new L<Tickit::Widget::VBox>
+instance:
+
+ vbox {
+   ...
+ } class => 'some_vbox';
+ vbox {
+   ...
+ } classes => [qw(other vbox)], style => { fg => 'green' };
+
+=head2 vsplit
+
+Creates a L<Tickit::Widget::VSplit>. This is a container, so the first
+parameter is a coderef which will switch the current parent to the new
+widget. Note that this widget expects 2 child widgets only.
+
+Any additional parameters will be passed to the new L<Tickit::Widget::VSplit>
+instance:
+
+ vsplit {
+   ...
+ } class => 'some_vsplit';
+ vsplit {
+   ...
+ } classes => [qw(other vsplit)], style => { fg => 'green' };
+
+=head2 frame
+
+Uses L<Tickit::Widget::Frame> to draw a frame around a single widget. This is a container, so the first
+parameter is a coderef which will switch the current parent to the new frame.
+
+Any additional parameters will be passed to the new L<Tickit::Widget::Frame>
+instance:
+
+ frame {
+   ...
+ } title => 'some frame', title_align => 0.5;
+
+=head2 gridbox
+
+Creates a L<Tickit::Widget::GridBox>. This is a container, so the first
+parameter is a coderef which will switch the current parent to the new
+widget.
+
+Although any widget is allowed here, you'll probably want all the immediate
+children to be L</gridrow>s.
+
+Any additional parameters will be passed to the new L<Tickit::Widget::GridBox>
+instance:
+
+ gridbox {
+   gridrow { static 'left'; static 'right' };
+   gridrow { static 'BL'; static 'BR' };
+ } style => { col_spacing => 1, row_spacing => 1 };
+
+=head2 gridrow
+
+Marks a separate row in an existing L<Tickit::Widget::GridBox>. This behaves
+something like a container, see L</gridbox> for details.
+
+=head2 hbox
+
+Creates a L<Tickit::Widget::HBox>. This is a container, so the first
+parameter is a coderef which will switch the current parent to the new
+hbox.
+
+Any additional parameters will be passed to the new L<Tickit::Widget::HBox>
+instance:
+
+ hbox {
+   ...
+ } class => 'some_hbox';
+ hbox {
+   ...
+ } classes => [qw(other hbox)], style => { fg => 'green' };
+
+=head2 hsplit
+
+Creates a L<Tickit::Widget::HSplit>. This is a container, so the first
+parameter is a coderef which will switch the current parent to the new
+widget. Note that this widget expects 2 child widgets only.
+
+Any additional parameters will be passed to the new L<Tickit::Widget::HSplit>
+instance:
+
+ hsplit {
+   ...
+ } class => 'some_hsplit';
+ hsplit {
+   ...
+ } classes => [qw(other hsplit)], style => { fg => 'green' };
+
+=head2 desktop
+
+Desktop layout. Pretty much like any other container,
+but with the ability to specify window positions and
+then move them around interactively.
+
+ desktop {
+  my $txt = static 'a static widget', 'parent:label' => 'static';
+  entry {
+   $txt->set_text($_[1])
+  } 'parent:label' => 'entry widget',
+    'parent:left' => 1,
+    'parent:top' => 1;
+ };
+
+=head2 relative
+
+See L</pane> for the details.
+
+=head2 pane
+
+A pane in a L</relative> layout.
+
+=head1 FUNCTIONS - Scrolling
+
+The following functions create/manage widgets which deal with data that wouldn't
+normally fit in the available terminal space.
+
+=head2 scrollbox
+
+Creates a L<Tickit::Widget::ScrollBox>. This is a container, so the first
+parameter is a coderef which will switch the current parent to the new
+widget. Note that this widget expects a single child widget only.
+
+Any additional parameters will be passed to the new L<Tickit::Widget::ScrollBox>
+instance:
+
+ scrollbox {
+   ...
+ } class => 'some_hsplit';
+
+=head2 scroller
+
+Adds a L<Tickit::Widget::Scroller>. Contents are probably going to be L</scroller_text>
+for now.
+
+ scroller {
+   scroller_text 'line ' . $_ for 1..500;
+ };
+
+Passes any additional args to the constructor:
+
+ scroller {
+   scroller_text 'line ' . $_ for 1..100;
+ } gravity => 'bottom';
+
+=head2 scroller_text
+
+A text item, expects to be added to a L</scroller>.
+
+=head2 scroller_richtext
+
+A text item, expects to be added to a L</scroller>. The item itself should be
+a L<String::Tagged> instance, like this:
+
+ my $str = String::Tagged->new( "An important message" );
+ $str->apply_tag( 3, 9, b => 1 );
+ scroller_richtext $str;
+
+=head2 console
+
+Console widget. Current just supports creating the
+console and setting an on_line callback:
+
+ my $con = console {
+  warn "Had a line: @_";
+ };
+ $con->add_tab(
+  name => 'test',
+  on_line => sub { warn "test line: @_" }
+ );
+
+although a future version may provide C< console_tab >
+as a helper function for adding tabs to an existing
+console.
+
+Note that this will attempt to load L<Tickit::Console>
+at runtime, so it may throw an exception if it is not
+already installed.
+
+=head2 term
+
+Terminal widget.
+
+ term command => '/bin/bash';
+
+=head2 logpanel
+
+Displays any log messages raised by L<Log::Any> or, optionally, through STDERR.
+
+ logpanel stderr => 1;
+
+=head1 FUNCTIONS - Miscellaneous container
+
+These act as containers.
+
+=head2 tabbed
+
+Creates a L<Tickit::Widget::Tabbed> instance. Use the L</widget> wrapper
+to set the label when adding new tabs, or provide the
+label as a parent: attribute:
+
+ tabbed {
+   widget { static 'some text' } label => 'first tab';
+   static 'other text' 'parent:label' => 'second tab';
+ };
+
+If you want a different ribbon, pass it like so:
+
+ tabbed {
+   static 'some text' 'parent:label' => 'first tab';
+   static 'other text' 'parent:label' => 'second tab';
+ } ribbon_class => 'Some::Ribbon::Class', tab_position => 'top';
+
+The C<ribbon_class> parameter may be undocumented.
+
+=head2 floatbox
+
+A container which normally has no visible effect, but provides the ability to contain L</float>s.
+These are floating windows which can be located anywhere within the container, usually for the purpose
+of providing dynamic windows such as popups and dropdowns.
+
+ floatbox {
+  vbox {
+   button {
+    float {
+     static 'this is a float'
+    } lines => 3, top => -1, left => '-50%';
+   } 'Show';
+  }
+ }
+
+=head2 float
+
+A L</float> provides a floating window within a L</floatbox> container - note that the L</floatbox>
+does not need to be an immediate parent.
+
+ floatbox {
+  vbox {
+   button {
+    float {
+     static 'this is a float'
+    } lines => 3, top => -1, left => '-50%';
+   } 'Show';
+  }
+ }
+
+=head2 statusbar
+
+A L<Tickit::Widget::Statusbar>. Not very exciting.
+
+=head1 FUNCTIONS - General widgets
+
+=head2 static
+
+Static text. Very simple:
+
+ static 'some text';
+
+You can be more specific if you want:
+
+ static 'some text', align => 'center';
+
+=head2 figlet
+
+Fancier text, generated by L<Text::FIGlet>. Same as static:
+
+ figlet 'some text';
+
+but you can specify a font as well:
+
+ figlet 'some text', font => 'slant';
+
+=head2 entry
+
+A L<Tickit::Widget::Entry> input field. Takes a coderef as the first parameter
+since the C<on_enter> handler seems like an important feature.
+
+ my $rslt = static 'result here';
+ entry { shift; $rslt->set_text(eval shift) } text => '1 + 3';
+
+=head2 checkbox
+
+Checkbox (or checkbutton).
+
+=head2 radiobutton
+
+ radiogroup {
+  radiobutton { } 'one';
+  radiobutton { } 'two';
+  radiobutton { } 'three';
+ };
+
+=head2 radiogroup
+
+See L</radiobutton>.
+
+=head2 button
+
+A button. First parameter is the code to run when activated,
+second parameter is the label:
+
+ button { warn "Activated" } 'OK';
+
+=head2 tree
+
+A L<Tickit::Widget::Tree>. It only partially works, but you're welcome to try it.
+
+ tree {
+    warn "activated: @_\n";
+ } data => [
+    node1 => [
+        qw(some nodes here)
+    ],
+    node2 => [
+        qw(more nodes in this one),
+        and => [
+            qw(this has a few child nodes too)
+        ]
+    ],
+ ];
+
+=head2 table
+
+Tabular rendering.
+
+ table {
+  warn "activated one or more items";
+ } data => [
+  [ 1, 'first line' ],
+  [ 2, 'second line' ],
+ ], columns => [
+  { label => 'ID', width => 9, align => 'right' },
+  { label => 'Description' },
+ ];
+
+=head2 breadcrumb
+
+Provides a "breadcrumb trail".
+
+ my $bc = breadcrumb {
+  warn "crumb selected: @_";
+ };
+ $bc->adapter->push([qw(some path here)]);
+
+=head2 placeholder
+
+Use this if you're not sure which widget you want yet. It's a L<Tickit::Widget::Placegrid>,
+so there aren't many options.
+
+ placeholder;
+ vbox {
+   widget { placeholder } expand => 3;
+   placeholder 'parent:expand' => 5;
+ };
+
+This is also available under the alias C<placegrid>.
+
+=head2 placegrid
+
+An alias for L</placeholder>.
+
+=head2 decoration
+
+Purely decorative. A L<Tickit::Widget::Decoration>, controlled entirely through styles.
+
+ decoration;
+ vbox {
+   widget { decoration } expand => 3;
+   decoration class => 'deco1', 'parent:expand' => 5;
+ };
+
+=head2 fileviewer
+
+File viewer. Takes a code block and a file name. The code block is currently unused,
+but eventually will be called when the current line is activated in the widget.
+
+ fileviewer { } 'somefile.txt';
+
+=head2 FUNCTIONS - Menu-related
+
+Things for menus
+
+=head2 menubar
+
+Menubar courtesy of L<Tickit::Widget::MenuBar>. Every self-respecting app wants
+one of these.
+
+ menubar {
+  submenu File => sub {
+   menuitem Exit  => sub { tickit->stop };
+  };
+  menuspacer;
+  submenu Help => sub {
+   menuitem About => sub { warn 'about' };
+  };
+ };
+
+You'll probably want to show popup menus at some
+point. Try this:
+
+ floatbox {
+  vbox {
+   menubar {
+    submenu Help => sub {
+     menuitem About => sub {
+      float {
+       static 'this is a popup message'
+      }
+    };
+   };
+   static 'plain text under the menubar';
+  }
+ };
+
+=head2 submenu
+
+A menu entry in a L</menubar>. First parameter is used as the label,
+second is the coderef to populate the widgets (will be called immediately).
+
+See L</menubar>.
+
+=head2 menuspacer
+
+Adds a spacer if you're in a menu. No idea what it'd do if you're not in a menu.
+
+=head2 menuitem
+
+A menu is not much use without something in it. See L</menubar>.
+
+=head2 FUNCTIONS - Generic or internal use
+
+Things that don't really fit into the other categories.
+
+=head2 customwidget
+
+A generic function for adding 'custom' widgets - i.e. anything that's not already
+supported by this module.
+
+This will call the coderef, expecting to get back a L<Tickit::Widget>, then it'll
+apply that widget to whatever the current parent is. Any options will be passed
+as widget arguments, see L</widget> for details.
+
+ customwidget {
+  my $tbl = Tickit::Widget::Table::Paged->new;
+  $tbl->add_column(...);
+  $tbl;
+ } expand => 1;
+
+=head2 widget
+
+Many container widgets provide support for additional options when adding child widgets.
+For example, a L<Tickit::Widget::VBox> can take an C<expand> parameter which determines
+how space should be allocated between children.
+
+This function provides a way to pass those options - use it as a wrapper around another
+widget-generating function, like so:
+
+ widget { static 'this is text' } expand => 1;
+
+in context, this would be:
+
+ vbox {
+   widget { static => '33%' } expand => 1;
+   widget { static => '66%' } expand => 2;
+ };
+
+Note that this functionality can also be applied
+by passing attributes with the C<parent:> prefix
+o the widgets themselves - the above example would
+thus be:
+
+ vbox {
+   static => '33%' 'parent:expand' => 1;
+   static => '66%' 'parent:expand' => 2;
+ };
+
+=head2 apply_widget
+
+Internal function used for applying the given widget.
+
+Not exported.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Tickit::Widget::Border>
+
+=item * L<Tickit::Widget::Box>
+
+=item * L<Tickit::Widget::Button>
+
+=item * L<Tickit::Widget::CheckButton>
+
+=item * L<Tickit::Widget::Console>
+
+=item * L<Tickit::Widget::Decoration>
+
+=item * L<Tickit::Widget::Entry>
+
+=item * L<Tickit::Widget::FloatBox>
+
+=item * L<Tickit::Widget::Frame>
+
+=item * L<Tickit::Widget::GridBox>
+
+=item * L<Tickit::Widget::HBox>
+
+=item * L<Tickit::Widget::HSplit>
+
+=item * L<Tickit::Widget::Layout::Desktop>
+
+=item * L<Tickit::Widget::Layout::Relative>
+
+=item * L<Tickit::Widget::Menu>
+
+=item * L<Tickit::Widget::Placegrid>
+
+=item * L<Tickit::Widget::Progressbar>
+
+=item * L<Tickit::Widget::RadioButton>
+
+=item * L<Tickit::Widget::Scroller>
+
+=item * L<Tickit::Widget::Scroller::Item::Text>
+
+=item * L<Tickit::Widget::ScrollBox>
+
+=item * L<Tickit::Widget::SegmentDisplay>
+
+=item * L<Tickit::Widget::SparkLine>
+
+=item * L<Tickit::Widget::Static>
+
+=item * L<Tickit::Widget::Statusbar>
+
+=item * L<Tickit::Widget::Tabbed>
+
+=item * L<Tickit::Widget::Table>
+
+=item * L<Tickit::Widget::Tree>
+
+=item * L<Tickit::Widget::VBox>
+
+=item * L<Tickit::Widget::VSplit>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Exporter>
+
+L<as_heavy|Exporter/as_heavy>, L<export|Exporter/export>, L<export_fail|Exporter/export_fail>, L<export_ok_tags|Exporter/export_ok_tags>, L<export_tags|Exporter/export_tags>, L<export_to_level|Exporter/export_to_level>, L<require_version|Exporter/require_version>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2015. Licensed under the same terms as Perl itself.
+

@@ -7,7 +7,7 @@ use Carp;
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 sub holidays {
     my ($self, %params) = @_;
@@ -45,7 +45,7 @@ Date::Holidays::Adapter::UA - an adapter class for Date::Holidays::UA
 
 =head1 VERSION
 
-This POD describes version 1.21 of Date::Holidays::Adapter::UA
+This POD describes version 1.22 of Date::Holidays::Adapter::UA
 
 =head1 DESCRIPTION
 

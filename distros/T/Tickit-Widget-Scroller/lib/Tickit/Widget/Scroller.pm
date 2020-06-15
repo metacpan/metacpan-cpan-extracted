@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 use 5.026; # signatures
-use Object::Pad 0.17;
+use Object::Pad 0.27;
 
-class Tickit::Widget::Scroller 0.24
+package Tickit::Widget::Scroller 0.25;
+class Tickit::Widget::Scroller
    extends Tickit::Widget;
 
 use Tickit::Style;
@@ -161,7 +162,7 @@ has $_gravity_bottom;
 
 has $_pending_scroll_to_bottom;
 
-method BUILD ( %args )
+BUILD ( %args )
 {
    my $gravity = delete $args{gravity} || "top";
 

@@ -4,42 +4,48 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4206",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tickit-Console",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::Identity" : "0",
-            "Test::More" : "0.88"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
+            "Object::Pad" : "0.27",
             "String::Tagged" : "0.10",
             "Tickit" : "0",
             "Tickit::Widget::Entry" : "0",
             "Tickit::Widget::Scroller" : "0.04",
             "Tickit::Widget::Tabbed" : "0.015",
             "Tickit::Window" : "0.45",
-            "perl" : "5.010"
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Identity" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Tickit::Console" : {
          "file" : "lib/Tickit/Console.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Tickit::Console::Tab" : {
          "file" : "lib/Tickit/Console/Tab.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -48,5 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

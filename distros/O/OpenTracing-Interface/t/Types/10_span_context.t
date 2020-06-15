@@ -25,7 +25,9 @@ use constant {
     CLASS_NAME       => 'SpanContext',
     REQUIRED_METHODS => [ qw(
         get_baggage_item
+        get_baggage_items
         with_baggage_item
+        with_baggage_items
     ) ],
 };
 

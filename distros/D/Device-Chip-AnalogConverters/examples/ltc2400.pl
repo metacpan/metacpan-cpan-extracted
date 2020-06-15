@@ -9,7 +9,7 @@ use Device::Chip::Adapter;
 use Getopt::Long;
 
 GetOptions(
-   'adapter|A=s' => \( my $ADAPTER = "FTDI" ),
+   'adapter|A=s' => \( my $ADAPTER ),
    'mount|M=s'   => \( my $MOUNTPARAMS ),
 ) or exit 1;
 

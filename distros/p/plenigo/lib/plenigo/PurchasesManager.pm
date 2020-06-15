@@ -23,7 +23,7 @@ package plenigo::PurchasesManager;
 
 =head1 DESCRIPTION
 
- plenigo::CustomerManPurchasesManagerager provides functionality to offer purchase information.
+ plenigo::CustomerPurchasesManager provides functionality to offer purchase information.
 
 =cut
 
@@ -32,7 +32,7 @@ use Carp qw(confess);
 use plenigo::Ex;
 use plenigo::RestClient;
 
-our $VERSION = '3.0000';
+our $VERSION = '3.0001';
 
 has configuration => (
     is       => 'ro',

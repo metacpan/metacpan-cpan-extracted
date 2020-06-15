@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Utils::BitBuffer
 # Description  : Bit Buffers
-# Copyright    : Copyright (c) 2018 Mark Dootson
+# Copyright    : Copyright (c) 2018-2020 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -15,9 +15,9 @@ use warnings;
 use Bit::Vector;
 use parent qw( HiPi::Class );
 
-our $VERSION ='0.81';
+our $VERSION ='0.82';
 
-__PACKAGE__->create_accessors ( qw( buffer y_buffer width height autoresize ) );
+__PACKAGE__->create_accessors ( qw( buffer y_buffer width height autoresize autoincrement ) );
 
 sub new {
     my ( $class, %userparams ) = @_;
@@ -26,6 +26,7 @@ sub new {
         width       => 8,
         height      => 8,
         autoresize  => 0,
+        autoincrement => 1
     );
     
      # get user params
@@ -61,7 +62,7 @@ sub set_bit {
     if(  $self->autoresize ) {
         my ($neww, $newh) = (0,0);
         if( $x >= $self->width ) {
-            $neww = $x + 1;
+            $neww = $x + $self->autoincrement;
         }
         if( $y >= $self->height ) {
             $newh = $y + 1;
@@ -132,6 +133,7 @@ sub clone_buffer {
         width => $self->width,
         height => $self->height,
         autoresize => $self->autoresize,
+        autoincrement => $self->autoincrement,
     );
     
     my @newbuffer = ();

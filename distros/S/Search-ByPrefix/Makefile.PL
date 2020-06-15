@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
               NAME               => 'Search::ByPrefix',
-              AUTHOR             => q{Daniel Șuteu <trizenx@gmail.com>},
+              AUTHOR             => q<Daniel Șuteu <trizen@cpan.org>>,,
               VERSION_FROM       => 'lib/Search/ByPrefix.pm',
               ABSTRACT_FROM      => 'lib/Search/ByPrefix.pm',
               LICENSE            => 'artistic_2',

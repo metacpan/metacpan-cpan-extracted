@@ -1,0 +1,253 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-12'; # DATE
+our $DIST = 'App-YoutubeDlIf'; # DIST
+our $VERSION = '0.002'; # VERSION
+# FRAGMENT id=shcompgen-hint command=_youtube-dl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => '/App/YoutubeDlIf/youtube_dl_if',
+    log => 1,
+    log_level => 'info',
+    read_config => 0,
+    read_env => 0,
+    allow_unknown_opts => 1,
+)->run;
+
+# PODNAME: youtube-dl-if
+# ABSTRACT: Download videos using youtube-dl with extra selection/filtering
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+youtube-dl-if - Download videos using youtube-dl with extra selection/filtering
+
+=head1 VERSION
+
+This document describes version 0.002 of youtube-dl-if (from Perl distribution App-YoutubeDlIf), released on 2020-04-12.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % youtube-dl-if [options] <url_or_id> ...
+
+=head1 DESCRIPTION
+
+This is a wrapper for B<youtube-dl>.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--log-file>=I<s>
+
+File that contains list of download filenames.
+
+Default value:
+
+ "/home/s1/notes/download-logs.org"
+
+=item B<--url-or-id>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--urls-or-ids-json>=I<s>
+
+See C<--url-or-id>.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--if-duration-not-longer-than>=I<s>
+
+=item B<--if-duration-not-shorter-than>=I<s>
+
+=item B<--if-not-yet>
+
+If set, only download videos that are not yet downloaded.
+
+When set to true, youtube-dl-if will first extract downloaded video ID's from
+filenames or URL's or video ID's listed in a text file (specified via
+`--log-file`), e.g.:
+
+    35682594        Table Tennis Shots- If Were Not Filmed, Nobody Would Believe [HD]-dUjxqFbWzQo.mp4       date:[2019-12-29 ]
+
+or:
+
+    https://www.youtube.com/embed/U9v2S49sHeQ?rel=0
+
+or:
+
+    U9v2S49sHeQ
+
+When a video ID is found then it is assumed to be already downloaded in the past
+and will not be downloaded again.
+
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C youtube-dl-if youtube-dl-if
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete youtube-dl-if 'p/*/`youtube-dl-if`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-YoutubeDlIf>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-YoutubeDlIf>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-YoutubeDlIf>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

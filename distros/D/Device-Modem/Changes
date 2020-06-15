@@ -1,5 +1,21 @@
 Revision history for Perl extension Device::Modem.
 
+1.59  Mon Jun 15 08:17:54 CEST 2020
+    - Merged pull request #6 from ghciv6/fix_multi_instance_log
+    fixed log handling with multi instances and typo in close().
+    Thanks to @ghciv6 !
+
+1.58
+    - Updated test suite a bit.
+    - Added the tests to the manifest.
+    - Got rid of indirect object syntax.
+    - Moved test.pl to the actual test suite.
+    - Updated $VERSION declarations according to:
+      http://www.dagolden.com/index.php/369/version-numbers-should-be-boring/
+    - Added some extra tests (xt/author, xt/release).
+    - Fixed some spelling.
+
+
 1.57  Sun Jan 26 11:36:11 CET 2014
     - Added a "handshake" option to the connect() method.
       Allowed values are "xoff", "rts" or "none" (default).
@@ -126,7 +142,7 @@ Revision history for Perl extension Device::Modem.
 
 1.23  Wed Dec  4 00:34:52 CET 2002
         - little documentation adjustments in main Modem.pm class;
-        - removed use of `warnings.pm' 
+        - removed use of `warnings.pm'
         - now File log class opens the log file once and writes
           on already opened file handle, until final close().
         - Thanks to Joerg Neuberger for spotting out a problem with
@@ -191,4 +207,3 @@ Revision history for Perl extension Device::Modem.
 0.01  Tue Feb 26 22:15:22 CET 2002
 	- original version; created by h2xs 1.20 with options
 		-A -X -n Device::Modem -v 0.01
-

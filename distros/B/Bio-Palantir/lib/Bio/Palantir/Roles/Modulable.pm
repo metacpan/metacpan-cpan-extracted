@@ -1,6 +1,6 @@
 package Bio::Palantir::Roles::Modulable;
 # ABSTRACT: Modulable Moose role for Module object construction
-$Bio::Palantir::Roles::Modulable::VERSION = '0.200700';
+$Bio::Palantir::Roles::Modulable::VERSION = '0.201670';
 use Moose::Role;
 
 use autodie;
@@ -369,7 +369,7 @@ Bio::Palantir::Roles::Modulable - Modulable Moose role for Module object constru
 
 =head1 VERSION
 
-version 0.200700
+version 0.201670
 
 =head1 SYNOPSIS
 

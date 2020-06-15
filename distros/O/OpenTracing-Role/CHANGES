@@ -1,6 +1,38 @@
 CHANGE LOG
 ==========
 
+2020-06-15 - v0.81.0
+--------------------
+
+### Changed
+    - Rename method to `get_parent_span_id`
+
+### Added
+    - `get_span_id`, through its `context` attribute
+
+
+2020-06-15 - v0.80.0
+--------------------
+
+### Changed
+    - Add and Rename methods from the OpenTracing::Interface
+
+### Added
+    - All methods from the API definition are now covered.
+    - Tests, test, and more tests.
+
+
+2020-06-14 - v0.70.1
+--------------------
+
+Pin and fix dependencies
+
+
+2020-06-14 - v0.70.0
+--------------------
+
+Change versioning numbers to dotted decimals
+
 
 2020-04-20 - v0.07
 ------------------

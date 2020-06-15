@@ -10,7 +10,7 @@ use Time::HiRes qw( sleep );
 
 GetOptions(
    'chip|C=s'    => \( my $CHIP ),
-   'adapter|A=s' => \( my $ADAPTER = "FTDI" ),
+   'adapter|A=s' => \( my $ADAPTER ),
    'mount|M=s'   => \( my $MOUNTPARAMS ),
 
    'p|print-config' => \my $PRINT_CONFIG,
@@ -33,6 +33,7 @@ $chip->mount_from_paramstr(
 )->get;
 
 $chip->protocol->power(1)->get;
+END { $chip->protocol->power(0)->get if $chip }
 
 $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
@@ -47,6 +48,10 @@ my $HAVE_READ_ADC_RATIO   = $chip->can( 'read_adc_ratio' );
 if( @ARGV ) {
    my %changes = map { ( $_ =~ m/^(.*?)=(.*)/ ) } @ARGV;
    $chip->change_config( %changes )->get;
+}
+
+if( $chip->can( "init" ) ) {
+   $chip->init->get;
 }
 
 if( $PRINT_CONFIG ) {

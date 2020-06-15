@@ -46,9 +46,6 @@ t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
-t/coerce-perl-str_convert_en_or_id_dow_name_to_num.t
-t/coerce-perl-str_convert_en_or_id_month_name_to_num.t
-t/coerce-perl-str_convert_id_dow_name_to_num.t
-t/coerce-perl-str_convert_id_month_name_to_num.t
 t/release-rinci.t
+t/release-sah-schema.t
 weaver.ini

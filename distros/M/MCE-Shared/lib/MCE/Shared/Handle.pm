@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.871';
+our $VERSION = '1.872';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (InputOutput::ProhibitTwoArgOpen)
@@ -22,7 +22,6 @@ our $VERSION = '1.871';
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
 use MCE::Shared::Base ();
-use Errno ();
 
 my $LF = "\012"; Internals::SvREADONLY($LF, 1);
 my $_tid = $INC{'threads.pm'} ? threads->tid() : 0;
@@ -241,8 +240,8 @@ sub WRITE {
               ? syswrite($_[0], $_[1], $_[2] - $wrote, $wrote)
               : syswrite($_[0], $_[1], $_[2] - $wrote, $_[3] + $wrote)
       ) or do {
-         if ( $! ) {
-            redo WRITE if $! == Errno::EINTR();
+         unless ( defined $wrote ) {
+            redo WRITE if $!{EINTR} || $!{EAGAIN} || $!{EWOULDBLOCK};
             return undef;
          }
       };
@@ -459,8 +458,8 @@ sub WRITE {
             $_wrote += ( syswrite (
                $_obj->{ $_id }, $_buf, length($_buf) - $_wrote, $_wrote
             )) or do {
-               if ( $! ) {
-                  redo WRITE if $! == Errno::EINTR();
+               unless ( defined $_wrote ) {
+                  redo WRITE if $!{EINTR} || $!{EAGAIN} || $!{EWOULDBLOCK};
                   print {$_DAU_R_SOCK} ''.$LF;
 
                   return;
@@ -753,7 +752,7 @@ MCE::Shared::Handle - Handle helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Handle version 1.871
+This document describes MCE::Shared::Handle version 1.872
 
 =head1 DESCRIPTION
 

@@ -1271,6 +1271,55 @@ EOF
   is $dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F', 'right text';
 };
 
+subtest 'Scoped selectors' => sub {
+  my $dom = Mojo::DOM->new(<<EOF);
+<p>Zero</p>
+<div>
+  <p>One</p>
+  <p>Two</p>
+  <p><a href="#">Link</a></p>
+</div>
+<div>
+  <p>Three</p>
+  <p>Four</p>
+  <i>Six</i>
+</div>
+<p>Five</p>
+EOF
+  is $dom->at('div p')->at(':scope')->text,   'One',  'right text';
+  is $dom->at('div')->at(':scope p')->text,   'One',  'right text';
+  is $dom->at('div')->at(':scope > p')->text, 'One',  'right text';
+  is $dom->at('div')->at('> p')->text,        'One',  'right text';
+  is $dom->at('div p')->at('+ p')->text,      'Two',  'right text';
+  is $dom->at('div p')->at('~ p')->text,      'Two',  'right text';
+  is $dom->at('div p')->at('~ p a')->text,    'Link', 'right text';
+  is $dom->at('div')->at(':scope a')->text,   'Link', 'right text';
+  is $dom->at('div')->at(':scope > a'), undef, 'no result';
+  is $dom->at('div')->at(':scope > p > a')->text, 'Link', 'right text';
+  is $dom->find('div')->last->at(':scope p')->text,   'Three', 'right text';
+  is $dom->find('div')->last->at(':scope > p')->text, 'Three', 'right text';
+  is $dom->find('div')->last->at('> p')->text,        'Three', 'right text';
+  is $dom->at('div p')->at(':scope + p')->text,                 'Two',  'right text';
+  is $dom->at('div')->at(':scope > p:nth-child(2), p a')->text, 'Two',  'right text';
+  is $dom->at('div')->at('p, :scope > p:nth-child(2)')->text,   'One',  'right text';
+  is $dom->at('div')->at('p:not(:scope > *)')->text,            'Zero', 'right text';
+  is $dom->at('div p:nth-child(2)')->at('*:is(:scope)')->text,  'Two',  'right text';
+  is $dom->at('div')->at('div p, ~ p')->text,                   'Five', 'right text';
+  is $dom->at('> p')->text, 'Zero', 'right text';
+  is $dom->at(':scope'), undef, 'no result';
+  is $dom->at(':scope p')->text,     'Zero', 'right text';
+  is $dom->at(':scope div p')->text, 'One',  'right text';
+  is $dom->at(':scope p a')->text,   'Link', 'right text';
+  is $dom->at('> p')->at('p ~ :scope'), undef, 'no result';
+  is $dom->at('> p:last-child')->at('p ~ :scope')->text, 'Five', 'righ text';
+  is $dom->at('p:has(+ i)')->text,        'Four',  'right text';
+  is $dom->at('p:has(:scope ~ i)')->text, 'Three', 'right text';
+  is $dom->at('div:has(i) p')->text,      'Three', 'right text';
+  is $dom->at('div:has(> i) p')->text,    'Three', 'right text';
+  is $dom->find('div:not(:has(i)) > p')->last->all_text, 'Link', 'right text';
+  is $dom->find('div:has(:not(p)) > p')->last->all_text, 'Four', 'right text';
+};
+
 subtest 'Adding nodes' => sub {
   my $dom = Mojo::DOM->new(<<EOF);
 <ul>
@@ -1443,7 +1492,7 @@ EOF
   is $dom->find('ruby > rp')->[1]->text, 'C',     'right text';
   is $dom->find('ruby > rt')->[1]->text, "D\n  ", 'right text';
   is $dom->find('ruby > rp')->[2]->text, "E\n  ", 'right text';
-  is $dom->find('ruby > rt')->[2]->text, "F\n\n", 'right text';
+  is $dom->find('ruby > rt')->[2]->text, "F\n",   'right text';
 };
 
 subtest 'Optional "optgroup" and "option" tags' => sub {
@@ -2640,6 +2689,87 @@ EOF
   is $dom->at('barns|bar [hreflang|=en-US]', %ns)->text, 'YADA', 'right text';
   ok !$dom->at('barns|bar [hreflang|=en-US-yada]', %ns), 'no result';
   ok !$dom->at('barns|bar [hreflang|=e]',          %ns), 'no result';
+};
+
+subtest 'No more content' => sub {
+  my $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <select>
+      <option>A
+      <option>B
+    </select>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->find('body > select > option')->[0]->text, "A\n      ", 'right text';
+  is $dom->find('body > select > option')->[1]->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text, 'C', 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <select>
+      <optgroup>
+        <option>A
+        <option>B
+    </select>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->find('body > select > optgroup > option')->[0]->text, "A\n        ", 'right text';
+  is $dom->find('body > select > optgroup > option')->[1]->text, "B\n    ",     'right text';
+  is $dom->at('body > textarea')->text, 'C', 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <ul>
+      <li>A
+      <li>B
+    </ul>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->find('body > ul > li')->[0]->text, "A\n      ", 'right text';
+  is $dom->find('body > ul > li')->[1]->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text, 'C', 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <dl>
+      <dd>A
+      <dd>B
+    </dl>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->find('body > dl > dd')->[0]->text, "A\n      ", 'right text';
+  is $dom->find('body > dl > dd')->[1]->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text, 'C', 'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <ruby>
+      <rp>A
+      <rt>B
+    </ruby>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->at('body > ruby > rp')->text, "A\n      ", 'right text';
+  is $dom->at('body > ruby > rt')->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text,  'C',         'right text';
+
+  $dom = Mojo::DOM->new(<<EOF);
+  <body>
+    <ruby>
+      <rt>A
+      <rp>B
+    </ruby>
+    <textarea>C</textarea>
+  </body>
+EOF
+  is $dom->at('body > ruby > rt')->text, "A\n      ", 'right text';
+  is $dom->at('body > ruby > rp')->text, "B\n    ",   'right text';
+  is $dom->at('body > textarea')->text,  'C',         'right text';
 };
 
 subtest 'Reusing fragments' => sub {

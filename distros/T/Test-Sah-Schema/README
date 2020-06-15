@@ -2,8 +2,8 @@ NAME
     Test::Sah::Schema - Test Sah::Schema::* modules in distribution
 
 VERSION
-    This document describes version 0.008 of Test::Sah::Schema (from Perl
-    distribution Test-Sah-Schema), released on 2020-03-04.
+    This document describes version 0.009 of Test::Sah::Schema (from Perl
+    distribution Test-Sah-Schema), released on 2020-06-13.
 
 SYNOPSIS
     To check a single Sah::Schema::* module:

@@ -1,6 +1,50 @@
 CHANGE LOG
 ==========
 
+2020-06-15 v0.202.2
+
+Fix POD troubles
+
+
+2020-06-14 v0.202.1
+-------------------
+
+Fix version number in main PM file
+
+
+2020-06-14 v0.202.0 BREAKING CHANGE
+-----------------------------------
+
+Rename and add methods
+- The names for `set_tag` and `set_baggage_item` have been changed to `add_...`
+- Added plural versions for method related to `tags` and `baggage_items`
+
+
+2020-06-14 v0.201.2
+-------------------
+
+Fix minor issues from `OT::Constants`
+
+
+2020-06-13 v0.201.1
+-------------------
+
+Make `Test::OT::Interface` pinned
+
+
+2020-06-13 v0.201.0
+-------------------
+
+Fix return type for `get_active_scope`
+Add OPENTRACING_CARRIER_FORMAT_* constants
+
+
+2020-06-13 v0.200.0
+-------------------
+
+Change to proper versioning
+
+
 2020-06-08 v0.20
 ----------------
 

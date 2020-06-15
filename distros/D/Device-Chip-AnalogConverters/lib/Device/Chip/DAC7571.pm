@@ -1,15 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::DAC7571;
+use 5.026;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
-
-our $VERSION = '0.08';
+package Device::Chip::DAC7571 0.09;
+class Device::Chip::DAC7571
+   extends Device::Chip;
 
 use Carp;
 use Future::AsyncAwait;
@@ -53,11 +52,8 @@ leading C<0> or C<0x> prefixes.
 
 =cut
 
-sub I2C_options
+sub I2C_options ( $, %params )
 {
-   my $self = shift;
-   my %params = @_;
-
    my $addr = delete $params{addr} // 0x4C;
    $addr = oct $addr if $addr =~ m/^0/;
 
@@ -82,8 +78,8 @@ my %NAME_TO_POWERDOWN = (
 );
 
 # Chip has no config registers
-async sub read_config { return {} }
-async sub change_config { }
+async method read_config () { return {} }
+async method change_config (%) { }
 
 =head2 write_dac
 
@@ -98,26 +94,20 @@ be one of the following four values
 
 =cut
 
-sub write_dac
+async method write_dac ( $dac, $powerdown = undef )
 {
-   my $self = shift;
-   my ( $dac, $powerdown ) = @_;
-
    $dac &= 0x0FFF;
 
    my $pd = 0;
    $pd = $NAME_TO_POWERDOWN{$powerdown} // croak "Unrecognised powerdown state '$powerdown'"
       if defined $powerdown;
 
-   $self->protocol->write( pack "S>", $pd << 12 | $dac );
+   await $self->protocol->write( pack "S>", $pd << 12 | $dac );
 }
 
-sub write_dac_ratio
+async method write_dac_ratio ( $ratio )
 {
-   my $self = shift;
-   my ( $ratio ) = @_;
-
-   $self->write_dac( $ratio * 2**12 );
+   await $self->write_dac( $ratio * 2**12 );
 }
 
 =head1 AUTHOR

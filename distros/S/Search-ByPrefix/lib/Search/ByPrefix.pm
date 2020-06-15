@@ -12,11 +12,11 @@ Search::ByPrefix - An efficient, tree-based, multi-match prefix searcher.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -87,7 +87,7 @@ sub add {
 
     foreach my $item (@$key) {
         $ref = $ref->{$item} //= {};
-        push @{$ref->{values}}, $vref;
+        push @{$ref->{$ref}}, $vref;
     }
 
     $self;
@@ -126,7 +126,7 @@ sub search {
         }
     }
 
-    map { $$_ } @{$ref->{values}};
+    map { $$_ } @{$ref->{$ref}};
 }
 
 =head1 EXAMPLE
@@ -163,43 +163,13 @@ The results are:
     "/home/user1/tmp/covert/operator"
     "/home/user1/tmp/coven/members"
 
-=head1 AUTHOR
-
-Daniel Șuteu, C<< <trizenx at gmail.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to L<https://github.com/trizen/Search-ByPrefix>.
-I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Search::ByPrefix
-
-
-You can also look for information at:
-
-=over 4
-
-=item * Github
+=head1 REPOSITORY
 
 L<https://github.com/trizen/Search-ByPrefix>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=head1 AUTHOR
 
-L<http://annocpan.org/dist/Search-ByPrefix>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Search-ByPrefix>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Search-ByPrefix/>
-
-=back
+Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 

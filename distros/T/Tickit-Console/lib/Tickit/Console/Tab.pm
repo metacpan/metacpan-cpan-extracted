@@ -1,16 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-package Tickit::Console::Tab;
+use 5.026; # signatures
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use 5.010; # //
-use base qw( Tickit::Widget::Tabbed::Tab );
+use Tickit::Widget::Tabbed;
 
-our $VERSION = '0.07';
+package Tickit::Console::Tab 0.08;
+class Tickit::Console::Tab
+   extends Tickit::Widget::Tabbed::Tab;
 
 use Tickit::Widget::Scroller::Item::Text;
 use Tickit::Widget::Scroller::Item::RichText;
@@ -18,7 +18,7 @@ use Tickit::Widget::Scroller::Item::RichText;
 use String::Tagged 0.10;
 
 use POSIX ();
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed weaken );
 
 =head1 NAME
 
@@ -55,45 +55,53 @@ this message is added as well to the scroller.
 
 =cut
 
-sub new
+has $_scroller;
+has $_console;
+has $_on_line;
+
+has $_timestamp_format;
+has $_datestamp_format;
+
+BUILD ( $tabbed, %args )
 {
-   my $class = shift;
-   my ( $tabbed, %args ) = @_;
+   $_scroller = $args{scroller};
+   weaken( $_console = $args{console} );
 
-   my $self = $class->SUPER::new( @_ );
+   $_on_line = $args{on_line};
 
-   $self->{timestamp_format} = $args{timestamp_format};
-   $self->{datestamp_format} = $args{datestamp_format};
-
-   return $self;
+   $_timestamp_format = $args{timestamp_format};
+   $_datestamp_format = $args{datestamp_format};
 }
 
 =head1 METHODS
 
 =cut
 
-=head2 $name = $tab->name
+=head2 name
 
-=head2 $tab->set_name( $name )
+=head2 set_name
+
+   $name = $tab->name
+
+   $tab->set_name( $name )
 
 Returns or sets the tab name text
 
 =cut
 
-sub name
+method name ()
 {
-   my $self = shift;
    return $self->label;
 }
 
-sub set_name
+method set_name ( $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
    $self->set_label( $name );
 }
 
-=head2 $tab->append_line( $string, %opts )
+=head2 append_line
+
+   $tab->append_line( $string, %opts )
 
 Appends a line of text to the tab. C<$string> may either be a plain perl
 string, or an instance of L<String::Tagged> containing formatting tags, as
@@ -120,10 +128,8 @@ Overrides the stored format for generating a datestamp string.
 
 =cut
 
-sub strftime
+sub strftime ( $format, @t )
 {
-   my ( $format, @t ) = @_;
-
    if( blessed $format and $format->isa( "String::Tagged" ) ) {
       my $fplain = $format->str;
       my $ret = String::Tagged->new;
@@ -149,10 +155,8 @@ sub strftime
    }
 }
 
-sub _make_item
+sub _make_item ( $string, %opts )
 {
-   my ( $string, %opts ) = @_;
-
    if( blessed $string and $string->isa( "String::Tagged" ) ) {
       return Tickit::Widget::Scroller::Item::RichText->new( $string, %opts );
    }
@@ -161,12 +165,12 @@ sub _make_item
    }
 }
 
-sub _make_item_with_timestamp
-{
-   my $self = shift;
-   my ( $string, %opts ) = @_;
+has $_dusk_datestamp;
+has $_dawn_datestamp;
 
-   if( my $timestamp_format = delete $opts{timestamp_format} // $self->{timestamp_format} ) {
+method _make_item_with_timestamp ( $string, %opts )
+{
+   if( my $timestamp_format = delete $opts{timestamp_format} // $_timestamp_format ) {
       my $time = delete $opts{time} // time();
       my $timestamp = strftime( $timestamp_format, localtime $time );
 
@@ -176,69 +180,63 @@ sub _make_item_with_timestamp
    return _make_item( $string, %opts );
 }
 
-sub append_line
+method append_line ( $string, %opts )
 {
-   my $self = shift;
-   my ( $string, %opts ) = @_;
-
-   my $scroller = $self->{scroller};
-
-   if( my $datestamp_format = delete $opts{datestamp_format} // $self->{datestamp_format} ) {
+   if( my $datestamp_format = delete $opts{datestamp_format} // $_datestamp_format ) {
       my $time = $opts{time} //= time();
       my $plain = POSIX::strftime( $datestamp_format, my @t = localtime $time );
 
-      if( ( $self->{dusk_datestamp} // "" ) ne $plain ) {
+      if( ( $_dusk_datestamp // "" ) ne $plain ) {
          my $datestamp = strftime( $datestamp_format, @t );
-         $scroller->push( _make_item( $datestamp ) );
+         $_scroller->push( _make_item( $datestamp ) );
 
-         $self->{dusk_datestamp} = $plain;
-         $self->{dawn_datestamp} //= $plain;
+         $_dusk_datestamp = $plain;
+         $_dawn_datestamp //= $plain;
       }
    }
 
-   $scroller->push( $self->_make_item_with_timestamp( $string, %opts ) );
+   $_scroller->push( $self->_make_item_with_timestamp( $string, %opts ) );
 }
 
 *add_line = \&append_line;
 
-=head2 $tab->prepend_line( $string, %opts )
+=head2 prepend_line
+
+   $tab->prepend_line( $string, %opts )
 
 As C<append_line>, but prepends it at the beginning of the scroller.
 
 =cut
 
-sub prepend_line
+method prepend_line ( $string, %opts )
 {
-   my $self = shift;
-   my ( $string, %opts ) = @_;
-
-   my $scroller = $self->{scroller};
-
    my $datestamp_item;
-   if( my $datestamp_format = delete $opts{datestamp_format} // $self->{datestamp_format} ) {
+   if( my $datestamp_format = delete $opts{datestamp_format} // $_datestamp_format ) {
       my $time = $opts{time} //= time();
       my $plain = POSIX::strftime( $datestamp_format, my @t = localtime $time );
 
-      $scroller->shift if ( $self->{dawn_datestamp} // "" ) eq $plain;
+      $_scroller->shift if ( $_dawn_datestamp // "" ) eq $plain;
 
       my $datestamp = strftime( $datestamp_format, @t );
       $datestamp_item = _make_item( $datestamp );
 
-      $self->{dawn_datestamp} = $plain;
-      $self->{dusk_datestamp} //= $plain;
+      $_dawn_datestamp = $plain;
+      $_dusk_datestamp //= $plain;
    }
 
-   $scroller->unshift( $self->_make_item_with_timestamp( $string, %opts ) );
-   $scroller->unshift( $datestamp_item ) if $datestamp_item;
+   $_scroller->unshift( $self->_make_item_with_timestamp( $string, %opts ) );
+   $_scroller->unshift( $datestamp_item ) if $datestamp_item;
 }
 
-=head2 $tab->bind_key( $key, $code )
+=head2 bind_key
+
+   $tab->bind_key( $key, $code )
 
 Installs a callback to invoke if the given key is pressed while this tab has
 focus, overwriting any previous callback for the same key. The code block is
 invoked as
 
- $result = $code->( $tab, $key )
+   $result = $code->( $tab, $key )
 
 If C<$code> is missing or C<undef>, any existing callback is removed.
 
@@ -248,23 +246,34 @@ invoked instead.
 
 =cut
 
-sub bind_key
+has %_keybindings;
+
+method bind_key ( $key, $code )
 {
-   my $self = shift;
-   my ( $key, $code ) = @_;
-
-   my $console = $self->{console};
-
-   if( not $self->{keybindings}{$key} and $code ) {
-      $console->{keybindings}{$key}[1]++;
-      $console->_update_key_binding( $key );
+   if( not $_keybindings{$key} and $code ) {
+      $_console->_inc_key_binding( $key );
    }
-   elsif( $self->{keybindings}{$key} and not $code ) {
-      $console->{keybindings}{$key}[1]--;
-      $console->_update_key_binding( $key );
+   elsif( $_keybindings{$key} and not $code ) {
+      $_console->_dec_key_binding( $key );
    }
 
-   $self->{keybindings}{$key} = $code;
+   $_keybindings{$key} = $code;
+}
+
+method _on_line ( $line )
+{
+   $_on_line or return 0;
+
+   $_on_line->( $self, $line );
+
+   return 1;
+}
+
+method _on_key ( $key )
+{
+   return 1 if $_keybindings{$key} and
+      $_keybindings{$key}->( $self, $key );
+   return 0;
 }
 
 =head1 AUTHOR

@@ -1,5 +1,21 @@
 Revision history for Object-Pad
 
+0.28    2020-06-14
+        [BUGFIXES]
+         * Declare correct version of XS::Parse::Sublike in configure_requires
+           as we need it at Build.PL time
+         * Fix printf formats for SLOTOFFSET arguments
+         * Fix github URL in docs
+
+0.27    2020-06-13
+        [CHANGES]
+         * Support :reader :writer :mutator attributes on slot variables, to
+           automatically generate accessor methods for them
+         * Accept `BUILD { ... }` without the `method` keyword. Suggest this
+           as usual style. Discourage the `method` form.
+         * Updated advice to module authors on how to declare package/VERSION
+           sufficient to keep toolchain modules happy
+
 0.26    2020-04-27
         [CHANGES]
          * Sanity-checking of ->add_slot names

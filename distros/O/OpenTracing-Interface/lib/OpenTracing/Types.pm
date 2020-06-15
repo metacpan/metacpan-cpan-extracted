@@ -10,7 +10,7 @@ OpenTracing::Types - Type constraints for checking Interfaces
 
 
 
-our $VERSION = '0.20';
+our $VERSION = 'v0.202.2';
 
 
 
@@ -76,14 +76,19 @@ use constant {
         get_context
         overwrite_operation_name
         finish
-        set_tag
+        add_tag
+        add_tags
         log_data
-        set_baggage_item
+        add_baggage_item
+        add_baggage_items
         get_baggage_item
+        get_baggage_items
     ) ],
     REQUIRED_METHODS_FOR_SPAN_CONTEXT => [ qw(
         get_baggage_item
+        get_baggage_items
         with_baggage_item
+        with_baggage_items
     ) ],
     REQUIRED_METHODS_FOR_TRACER => [ qw(
         get_scope_manager
@@ -176,7 +181,7 @@ See also L<OpenTracing::Interface::ScopeManager/"INSTANCE METHODS">.
 
 =item C<< log_data >>
 
-=item C<< set_baggage_item >>
+=item C<< add_baggage_item >>
 
 =item C<< get_baggage_item >>
 

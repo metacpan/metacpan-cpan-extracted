@@ -1,14 +1,16 @@
 package Imager;
+use 5.006;
 
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS %formats $DEBUG %filters %DSOs $ERRSTR %OPCODES $I2P $FORMATGUESS $warn_obsolete);
 use IO::File;
 use Scalar::Util;
 use Imager::Color;
 use Imager::Font;
 use Config;
 
-@EXPORT_OK = qw(
+our $ERRSTR;
+
+our @EXPORT_OK = qw(
 		init
 		init_log
 		DSO_open
@@ -89,10 +91,10 @@ use Config;
                 NCF
 );
 
-@EXPORT=qw(
+our @EXPORT=qw(
 	  );
 
-%EXPORT_TAGS=
+our %EXPORT_TAGS=
   (handy => [qw(
 		newfont
 		newcolor
@@ -138,13 +140,15 @@ $combine_types{sat}  = $combine_types{saturation};
 # this will be used to store global defaults at some point
 my %defaults;
 
+our $VERSION;
+
 BEGIN {
   require Exporter;
   my $ex_version = eval $Exporter::VERSION;
   if ($ex_version < 5.57) {
-    @ISA = qw(Exporter);
+    our @ISA = qw(Exporter);
   }
-  $VERSION = '1.011';
+  $VERSION = '1.012';
   require XSLoader;
   XSLoader::load(Imager => $VERSION);
 }
@@ -161,7 +165,16 @@ my %format_classes =
    t1 => "Imager::Font::T1",
   );
 
+our %formats;
+
 tie %formats, "Imager::FORMATS", \%formats_low, \%format_classes;
+
+our %filters;
+
+our $DEBUG;
+our %OPCODES;
+our $FORMATGUESS;
+our $warn_obsolete;
 
 BEGIN {
   for(i_list_formats()) { $formats_low{$_}++; }
@@ -278,6 +291,11 @@ BEGIN {
                         callseq => [ 'image', 'stddev' ],
                         defaults => { },
                         callsub => sub { my %hsh = @_; i_gaussian($hsh{image}, $hsh{stddev}); },
+                       };
+  $filters{gaussian2} = {
+                        callseq => [ 'image', 'stddevX', 'stddevY' ],
+                        defaults => { },
+                        callsub => sub { my %hsh = @_; i_gaussian2($hsh{image}, $hsh{stddevX}, $hsh{stddevY}); },
                        };
   $filters{mosaic} =
     {
@@ -521,7 +539,9 @@ END {
   }
 }
 
-# Load a filter plugin 
+# Load a filter plugin
+
+our %DSOs;
 
 sub load_plugin {
   my ($filename)=@_;
@@ -2419,6 +2439,8 @@ sub scaleY {
 # this moves pixels to a new location in the returned image.
 # NOTE - should make a utility function to check transforms for
 # stack overruns
+
+our $I2P;
 
 sub transform {
   my $self=shift;
@@ -5028,7 +5050,7 @@ L<Imager::ImageTypes/"Common Tags">.
 blend - alpha blending one image onto another
 L<Imager::Transformations/rubthrough()>
 
-blur - L<Imager::Filters/gaussian>, L<Imager::Filters/conv>
+blur - L<< Imager::Filters/C<gaussian> >>, L<< Imager::Filters/C<conv> >>
 
 boxes, drawing - L<Imager::Draw/box()>
 
@@ -5044,9 +5066,9 @@ combine modes - L<Imager::Draw/"Combine Types">
 
 compare images - L<Imager::Filters/"Image Difference">
 
-contrast - L<Imager::Filters/contrast>, L<Imager::Filters/autolevels>
+contrast - L<< Imager::Filters/C<contrast> >>, L<< Imager::Filters/C<autolevels> >>
 
-convolution - L<Imager::Filters/conv>
+convolution - L<< Imager::Filters/C<conv> >>
 
 cropping - L<Imager::Transformations/crop()>
 
@@ -5087,27 +5109,27 @@ fonts, metrics - L<Imager::Font/bounding_box()>, L<Imager::Font::BBox>
 fonts, multiple master - L<Imager::Font/"MULTIPLE MASTER FONTS">
 
 fountain fill - L<Imager::Fill/"Fountain fills">,
-L<Imager::Filters/fountain>, L<Imager::Fountain>,
-L<Imager::Filters/gradgen>
+L<< Imager::Filters/C<fountain> >>, L<Imager::Fountain>,
+L<< Imager::Filters/C<gradgen> >>
 
 GIF files - L<Imager::Files/"GIF">
 
 GIF files, animated - L<Imager::Files/"Writing an animated GIF">
 
 gradient fill - L<Imager::Fill/"Fountain fills">,
-L<Imager::Filters/fountain>, L<Imager::Fountain>,
-L<Imager::Filters/gradgen>
+L<< Imager::Filters/C<fountain> >>, L<Imager::Fountain>,
+L<< Imager::Filters/C<gradgen> >>
 
 gray scale, convert image to - L<Imager::Transformations/convert()>
 
-gaussian blur - L<Imager::Filters/gaussian>
+gaussian blur - L<< Imager::Filters/C<gaussian> >>, L<< Imager::Filters/C<gaussian2> >>
 
 hatch fills - L<Imager::Fill/"Hatched fills">
 
 ICO files - L<Imager::Files/"ICO (Microsoft Windows Icon) and CUR (Microsoft Windows Cursor)">
 
-invert image - L<Imager::Filters/hardinvert>,
-L<Imager::Filters/hardinvertall>
+invert image - L<< Imager::Filters/C<hardinvert> >>,
+L<< Imager::Filters/C<hardinvertall> >>
 
 JPEG - L<Imager::Files/"JPEG">
 
@@ -5121,12 +5143,12 @@ L<Imager::Font/transform()>
 
 metadata, image - L<Imager::ImageTypes/"Tags">, L<Image::ExifTool>
 
-mosaic - L<Imager::Filters/mosaic>
+mosaic - L<< Imager::Filters/C<mosaic> >>
 
-noise, filter - L<Imager::Filters/noise>
+noise, filter - L<< Imager::Filters/C<noise> >>
 
-noise, rendered - L<Imager::Filters/turbnoise>,
-L<Imager::Filters/radnoise>
+noise, rendered - L<< Imager::Filters/C<turbnoise> >>,
+L<< Imager::Filters/C<radnoise> >>
 
 paste - L<Imager::Transformations/paste()>,
 L<Imager::Transformations/rubthrough()>
@@ -5136,7 +5158,7 @@ L<Imager::ImageTypes/new()>
 
 =for stopwords posterize
 
-posterize - L<Imager::Filters/postlevels>
+posterize - L<< Imager::Filters/C<postlevels> >>
 
 PNG files - L<Imager::Files>, L<Imager::Files/"PNG">
 
@@ -5157,7 +5179,7 @@ security - L<Imager::Security>
 
 SGI files - L<Imager::Files/"SGI (RGB, BW)">
 
-sharpen - L<Imager::Filters/unsharpmask>, L<Imager::Filters/conv>
+sharpen - L<< Imager::Filters/C<unsharpmask> >>, L<< Imager::Filters/C<conv> >>
 
 size, image - L<Imager::ImageTypes/getwidth()>,
 L<Imager::ImageTypes/getheight()>
@@ -5175,16 +5197,16 @@ text, measuring - L<Imager::Font/bounding_box()>, L<Imager::Font::BBox>
 
 threads - L<Imager::Threads>
 
-tiles, color - L<Imager::Filters/mosaic>
+tiles, color - L<< Imager::Filters/C<mosaic> >>
 
 transparent images - L<Imager::ImageTypes>,
 L<Imager::Cookbook/"Transparent PNG">
 
 =for stopwords unsharp
 
-unsharp mask - L<Imager::Filters/unsharpmask>
+unsharp mask - L<< Imager::Filters/C<unsharpmask> >>
 
-watermark - L<Imager::Filters/watermark>
+watermark - L<< Imager::Filters/C<watermark> >>
 
 writing an image to a file - L<Imager::Files>
 
@@ -5206,7 +5228,15 @@ L<http://www.molar.is/en/lists/imager-devel/>
 
 where you can also find the mailing list archive.
 
-You can report bugs by pointing your browser at:
+You can report bugs either via github at:
+
+=over
+
+L<https://github.com/tonycoz/imager/issues>
+
+=back
+
+or at:
 
 =over
 
@@ -5226,29 +5256,13 @@ Please remember to include the versions of Imager, perl, supporting
 libraries, and any relevant code.  If you have specific images that
 cause the problems, please include those too.
 
-If you don't want to publish your email address on a mailing list you
-can use CPAN::Forum:
-
-  http://www.cpanforum.com/dist/Imager
-
-You will need to register to post.
-
 =head1 CONTRIBUTING TO IMAGER
 
 =head2 Feedback
 
 I like feedback.
 
-If you like or dislike Imager, you can add a public review of Imager
-at CPAN Ratings:
-
-  http://cpanratings.perl.org/dist/Imager
-
-=for stopwords Bitcard
-
-This requires a Bitcard account (http://www.bitcard.org).
-
-You can also send email to the maintainer below.
+You can send email to the maintainer below.
 
 If you send me a bug report via email, it will be copied to Request
 Tracker.
@@ -5264,13 +5278,16 @@ it will be delayed until I get a chance to write them.
 
 To browse Imager's git repository:
 
-  http://git.imager.perl.org/imager.git
+  https://github.com/tonycoz/imager.git
 
 To clone:
 
-  git clone git://git.imager.perl.org/imager.git
+  git clone git://github.com/tonycoz/imager.git
 
-My preference is that patches are provided in the format produced by
+Or you can create a fork as usual on github and submit a github pull
+request.
+
+Patches can either be submitted as a github pull request or by using
 C<git format-patch>, for example, if you made your changes in a branch
 from master you might do:
 

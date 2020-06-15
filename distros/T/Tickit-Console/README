@@ -1,88 +1,128 @@
 NAME
-    `Tickit::Console' - build full-screen console-style applications
+
+    Tickit::Console - build full-screen console-style applications
 
 SYNOPSIS
-     my $console = Tickit::Console->new;
 
-     Tickit->new( root => $console )->run;
+       my $console = Tickit::Console->new;
+    
+       Tickit->new( root => $console )->run;
 
 DESCRIPTION
-    A `Tickit::Console' instance is a subclass of Tickit::Widget::VBox
+
+    A Tickit::Console instance is a subclass of Tickit::Widget::VBox
     intended to help building a full-screen console-style application which
     presents the user with one or more scrollable text areas, selectable as
-    tabs on a ribbon, with a text entry area at the bottom of the screen for
-    entering commands or other data. As a Tickit::Widget subclass it can be
-    added anywhere within a widget tree, though normally it would be used as
-    the root widget for a Tickit instance.
+    tabs on a ribbon, with a text entry area at the bottom of the screen
+    for entering commands or other data. As a Tickit::Widget subclass it
+    can be added anywhere within a widget tree, though normally it would be
+    used as the root widget for a Tickit instance.
 
 CONSTRUCTOR
-  $console = Tickit::Console->new( %args )
-    Returns a new instance of a `Tickit::Console'. Takes the following named
+
+ new
+
+       $console = Tickit::Console->new( %args )
+
+    Returns a new instance of a Tickit::Console. Takes the following named
     arguments:
 
     on_line => CODE
-            Callback to invoke when a line of text is entered in the entry
-            widget.
 
-             $on_line->( $active_tab, $text )
+      Callback to invoke when a line of text is entered in the entry
+      widget.
+
+         $on_line->( $active_tab, $text )
 
     tab_class => STRING
-            Optional. If set, gives a class name (which should be a subclass
-            of Tickit::Console::Tab) to construct newly-added tabs with.
-            This setting allows an application to provide new methods in
-            tabs to change behaviours.
+
+      Optional. If set, gives a class name (which should be a subclass of
+      Tickit::Console::Tab) to construct newly-added tabs with. This
+      setting allows an application to provide new methods in tabs to
+      change behaviours.
 
     timestamp_format, datestamp_format
-            Optional. If supplied, these will be stored as default values to
-            pass to the tab constructor in the `add_tab' method.
+
+      Optional. If supplied, these will be stored as default values to pass
+      to the tab constructor in the add_tab method.
 
 METHODS
-  $tab = $console->add_tab( %args )
-    Adds a new tab to the console, and returns a Tickit::Console::Tab object
-    representing it.
+
+ add_tab
+
+       $tab = $console->add_tab( %args )
+
+    Adds a new tab to the console, and returns a Tickit::Console::Tab
+    object representing it.
 
     Takes the following named arguments:
 
     name => STRING
-            Name for the tab.
+
+      Name for the tab.
 
     on_line => CODE
-            Optional. Provides a different callback to invoke when a line of
-            text is entered while this tab is active. Invoked the same way
-            as above.
+
+      Optional. Provides a different callback to invoke when a line of text
+      is entered while this tab is active. Invoked the same way as above.
 
     make_widget => CODE
-            Optional. Gives a piece of code used to construct the actual
-            Tickit::Widget used as this tab's child in the ribbon. A
-            `Tickit::Widget::Scroller' to hold the tab's content will be
-            passed in to this code, which should construct some sort of
-            widget tree with that inside it, and return it. This can be used
-            to apply a decorative frame, place the scroller in a split box
-            or other layout along with other widgets, or various other
-            effects.
 
-             $tab_widget = $make_widget->( $scroller )
+      Optional. Gives a piece of code used to construct the actual
+      Tickit::Widget used as this tab's child in the ribbon. A
+      Tickit::Widget::Scroller to hold the tab's content will be passed in
+      to this code, which should construct some sort of widget tree with
+      that inside it, and return it. This can be used to apply a decorative
+      frame, place the scroller in a split box or other layout along with
+      other widgets, or various other effects.
+
+         $tab_widget = $make_widget->( $scroller )
 
     Any other named arguments are passed to the tab's constructor.
 
-  $index = $console->active_tab_index
-  $tab = $console->active_tab
-  $console->remove_tab( $tab_or_index )
-  $console->move_tab( $tab_or_index, $delta )
-  $console->activate_tab( $tab_or_index )
-  $console->next_tab
-  $console->prev_tab
+ active_tab_index
+
+       $index = $console->active_tab_index
+
+ active_tab
+
+       $tab = $console->active_tab
+
+ remove_tab
+
+       $console->remove_tab( $tab_or_index )
+
+ move_tab
+
+       $console->move_tab( $tab_or_index, $delta )
+
+ active_tab
+
+       $console->activate_tab( $tab_or_index )
+
+ next_tab
+
+       $console->next_tab
+
+ prev_tab
+
+       $console->prev_tab
+
     These methods are all passed through to the underlying
     Tickit::Widget::Tabbed object.
 
-  $console->bind_key( $key, $code )
+ bind_key
+
+       $console->bind_key( $key, $code )
+
     Installs a callback to invoke if the given key is pressed, overwriting
     any previous callback for the same key. The code block is invoked as
 
-     $code->( $console, $key )
+       $code->( $console, $key )
 
-    If `$code' is missing or `undef', any existing callback is removed.
+    If $code is missing or undef, any existing callback is removed.
 
 AUTHOR
+
     Paul Evans <leonerd@leonerd.org.uk>
 

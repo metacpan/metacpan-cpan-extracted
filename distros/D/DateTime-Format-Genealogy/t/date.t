@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 18;
+use Test::Most tests => 19;
 use Test::NoWarnings;
 use Test::Deep;
 
@@ -36,4 +36,6 @@ DATA: {
 
 	cmp_deeply(DateTime::Format::Genealogy::parse_datetime('5 Jan 2019'), methods('dmy' => '05-01-2019'));
 	cmp_deeply(DateTime::Format::Genealogy->parse_datetime('5 Jan 2019'), methods('dmy' => '05-01-2019'));
+
+	cmp_deeply(DateTime::Format::Genealogy::parse_datetime('12 June 2020'), methods('dmy' => '12-06-2020'));
 }

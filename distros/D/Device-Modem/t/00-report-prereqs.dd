@@ -1,0 +1,58 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Changes' => '0.4',
+                                      'Test::CheckManifest' => '1.29',
+                                      'Test::Kwalitee' => '1.22',
+                                      'Test::More' => '0.88',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::Spelling::CommonMistakes' => '1.000',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Version' => '1',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Exporter' => '0',
+                                      'File::Basename' => '0',
+                                      'File::Path' => '0',
+                                      'IO::Handle' => '0',
+                                      'Sys::Syslog' => '0',
+                                      'base' => '0',
+                                      'constant' => '0',
+                                      'perl' => '5.006',
+                                      'overload' => '0',
+                                      'strict' => '0',
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0',
+                                 }
+                 }
+     };
+    if ($^O eq 'MSWin32') {
+        $x->{runtime}->{requires}->{'Win32::SerialPort'} = 0;
+    }
+    else {
+        $x->{runtime}->{requires}->{'Device::SerialPort'} = 0;
+    }
+  $x;
+}

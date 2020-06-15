@@ -49,6 +49,7 @@
             "Syntax::Feature::Maybe" : "0",
             "Time::HiRes" : "0",
             "Try::Tiny" : "0",
+            "Type::Tiny::XS" : "0",
             "Types::Common::String" : "0",
             "Types::Interface" : "0",
             "Types::Standard" : "0",
@@ -58,11 +59,12 @@
       },
       "test" : {
          "requires" : {
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "Test::OpenTracing::Interface" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "v0.30.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

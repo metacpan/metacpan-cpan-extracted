@@ -26,13 +26,13 @@ no_index:
 provides:
   Tickit::Widget::Tabbed:
     file: lib/Tickit/Widget/Tabbed.pm
-    version: '0.022'
+    version: '0.023'
   Tickit::Widget::Tabbed::Ribbon:
     file: lib/Tickit/Widget/Tabbed/Ribbon.pm
-    version: '0.022'
+    version: '0.023'
 requires:
   List::Util: '1.26'
-  Object::Pad: '0.22'
+  Object::Pad: '0.27'
   Scalar::Util: '0'
   Struct::Dumb: '0'
   Tickit::ContainerWidget: '0.44'
@@ -40,5 +40,5 @@ requires:
   Tickit::Window: '0.28'
   parent: '0'
   perl: '5.026'
-version: '0.022'
+version: '0.023'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

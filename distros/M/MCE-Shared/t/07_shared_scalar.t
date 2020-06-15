@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use utf8;
+use open qw(:std :utf8);
 
 use Test::More;
 
@@ -12,9 +13,9 @@ BEGIN {
    use_ok 'MCE::Shared::Scalar';
 }
 
-MCE::Flow::init {
+MCE::Flow->init(
    max_workers => 1
-};
+);
 
 tie my $s1, 'MCE::Shared', 10;
 tie my $s2, 'MCE::Shared', '';
@@ -31,7 +32,7 @@ MCE::Flow::run( sub {
    $s5->set(20);
 });
 
-MCE::Flow::finish;
+MCE::Flow->finish;
 
 is( $s1, 15, 'shared scalar, check fetch, store' );
 is( $s2, '', 'shared scalar, check blank value' );

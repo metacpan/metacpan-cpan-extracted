@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::month::en;
 
-our $DATE = '2020-03-03'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = ["cistr",[{examples=>[{data=>"",valid=>0},{data=>1,valid=>1},{data=>"jan",valid=>1},{data=>"FeB",valid=>1},{data=>"March",valid=>1},{data=>"foo",valid=>0},{data=>13,valid=>0}],in=>[1,2,3,4,5,6,7,8,9,10,11,12,"jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","june","july","august","september","october","november","december"],summary=>"Month number/name (abbreviated or full, in English)"}],["cistr"]];
+our $rschema = ["cistr",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>1},{valid=>1,value=>"jan"},{valid=>1,value=>"FeB"},{valid=>1,value=>"March"},{valid=>0,value=>"foo"},{valid=>0,value=>13}],in=>[1,2,3,4,5,6,7,8,9,10,11,12,"jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec","january","february","march","april","june","july","august","september","october","november","december"],summary=>"Month number/name (abbreviated or full, in English)"}],["cistr"]];
 
 1;
 # ABSTRACT: Month number/name (abbreviated or full, in English)
@@ -20,7 +20,7 @@ Sah::SchemaR::date::month::en - Month number/name (abbreviated or full, in Engli
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::SchemaR::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

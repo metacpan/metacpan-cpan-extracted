@@ -1,9 +1,9 @@
 package App::ListNewCPANDists;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-06'; # DATE
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,7 +12,7 @@ use Log::ger;
 
 our %SPEC;
 
-my $sch_date = ['date*', 'x.perl.coerce_to' => 'DateTime'];
+my $sch_date = ['date*', 'x.perl.coerce_to' => 'DateTime', 'x.perl.coerce_rules'=>['From_str::natural']];
 my $URL_PREFIX = 'https://fastapi.metacpan.org/v1';
 
 our $db_schema_spec = {
@@ -214,10 +214,12 @@ _
             schema => $sch_date,
             req => 1,
             pos => 0,
+            cmdline_aliases => {from=>{}},
         },
         to_time   => {
             schema => $sch_date,
             pos => 1,
+            cmdline_aliases => {to=>{}},
         },
     },
     examples => [
@@ -230,19 +232,21 @@ _
     ],
 };
 sub list_new_cpan_dists {
+    require DateTime;
+
     my %args = @_;
 
     my $state = _init(\%args);
     my $dbh = $state->{dbh};
 
     my $from_time = $args{from_time};
-    my $to_time   = $args{to_time};
-    if (!$to_time) {
-        $to_time = $from_time->clone;
-        $to_time->set_hour(23);
-        $to_time->set_minute(59);
-        $to_time->set_second(59);
-    }
+    my $to_time   = $args{to_time} // DateTime->now;
+    #if (!$to_time) {
+    #    $to_time = $from_time->clone;
+    #    $to_time->set_hour(23);
+    #    $to_time->set_minute(59);
+    #    $to_time->set_second(59);
+    #}
     if ($args{-orig_to_time} && $args{-orig_to_time} !~ /T\d\d:\d\d:\d\d/) {
         $to_time->set_hour(23);
         $to_time->set_minute(59);
@@ -502,7 +506,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.011 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2020-02-06.
+This document describes version 0.013 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2020-06-13.
 
 =head1 FUNCTIONS
 

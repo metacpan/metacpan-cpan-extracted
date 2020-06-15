@@ -1,3 +1,9 @@
+0.013   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] We must not use 'return' inside do {} in coercion
+	  expression.
+
+
 0.012   2020-03-08  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

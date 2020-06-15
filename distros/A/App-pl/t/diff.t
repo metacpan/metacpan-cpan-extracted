@@ -2,32 +2,29 @@ use Test::Simple tests => 7;
 
 # chdir to t/
 $_ = $0;
-s~[^/]+$~~;
+s~[^/\\]+$~~;
 chdir $_ if length;
 
-sub pl($@) {
-    my $expect = shift;
-    die "Will fail on Win, coz of \": @_\n", if grep /"/, @_;
-    my $win = require Win32::ShellQuote if $^O =~ /^MSWin/;
-    open my $fh, '-|', $^X, '-W', $win ? '..\pl' : '../pl',
-      $win ? map '"'.join('""', split /"/).'"', @_ : @_;
+# run pl, expect $_
+sub pl(@) {
+    my $fh;
+    if( $^O =~ /^MSWin/ ) {
+	require Win32::ShellQuote;
+	open $fh, Win32::ShellQuote::quote_native( $^X, '-W', '..\pl', @_ ) . '|';
+    } else {
+	open $fh, '-|', $^X, '-W', '../pl', @_;
+    }
     local $/;
     my $ret = <$fh>;
-    ok $ret eq $expect, join ' ', 'pl', map /[\s*?()[\]{}\$\\'";|&]|^$/ ? "'$_'" : $_, @_;
-    print "got: '$ret', expected: '$expect'\n" if $ret ne $expect;
-}
-
-sub alter(&@) {
-    local $_ = $_;
-    shift->();
-    pl $_, @_;
+    ok $ret eq $_, join ' ', 'pl', map /[\s*?()[\]{}\$\\'";|&]|^$/ ? "'$_'" : $_, @_
+      or print "got: '$ret', expected: '$_'\n";
 }
 
 my @abc = <[abc].txt>;
 my( $B, $I, $G, $R, $E, $e ) = map "\e[${_}m", 1, 3, 32, 31, '', '';
 $G = $R = $E = '' unless eval { require Algorithm::Diff };
 
-my $diff = <<EOF;
+$_ = <<EOF;
 ${B}b${e}
 	${G}b,2:B B${E}
 	${G}b,2:B${R}B${G} B${E}
@@ -46,13 +43,13 @@ ${B}e${e}
 	${G}e,5:E EE${E}
 EOF
 
-pl $diff, '-F,', '--color', 'K', @abc;
-pl $diff, '--color', '-F,', 'k $F[0]', @abc;
-pl $diff, '-lF,', '--color=always', 'k $F[0], $_', @abc;
-pl $diff, '--color=always', '-F,', '/(.*?),/; k', @abc;
-pl $diff, '--color', '-F,', '/(.*?),/; k, $1', @abc;
-pl $diff, '--color', '-lF,', '/(.*?),/; k, $1, $_', @abc;
+pl '-F,', '--color', 'K', @abc;
+pl '--color', '-F,', 'k $F[0]', @abc;
+pl '-lF,', '--color=always', 'k $F[0], $_', @abc;
+pl '--color=always', '-F,', '/(.*?),/; k', @abc;
+pl '--color', '-F,', '/(.*?),/; k, $1', @abc;
+pl '--color', '-lF,', '/(.*?),/; k, $1, $_', @abc;
 
-$diff =~ s/\e\[\d*m//g;
+s/\e\[\d*m//g;
 
-pl $diff, '-F,', '--color=never', 'K', @abc;
+pl '-F,', '--color=never', 'K', @abc;

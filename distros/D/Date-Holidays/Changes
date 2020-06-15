@@ -1,5 +1,11 @@
 Changes file for Date-Holidays
 
+1.22 2020-06-13 Bug fix release, update recommended
+
+- Addressed broken support for regions in ES (Spain), improving support for Date::Holidays::CA_ES
+  Thanks to Miquel Ruiz
+
+
 1.21 2020-04-22 Bug fix release, update not required
 
 - Addressed a minor bug in the test suite addressed with release 1.19, Date::Holidays::UA supports a holidays method

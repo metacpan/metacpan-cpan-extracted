@@ -10,7 +10,7 @@ my $build = Module::Build->new(
       'Device::Chip' => 0,
       'Future::AsyncAwait' => '0.38', # async method
       'Future::IO' => 0,
-      'Object::Pad' => '0.16', # async method
+      'Object::Pad' => '0.27',
       'XS::Parse::Sublike' => '0.05', # parse_subsignature whitespace bugfix
 
       'perl' => '5.026', # postfix-deref, signatures

@@ -9,6 +9,8 @@ lib/IO/Pager/less.pm
 lib/IO/Pager/Perl.pm
 lib/IO/Pager/tp
 eg/fib
+eg/foldable.txt
+eg/pauses.txt
 README
 TODO
 .proverc

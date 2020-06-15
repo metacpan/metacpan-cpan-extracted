@@ -1,7 +1,9 @@
 package App::YouTubeUtils;
 
-our $DATE = '2018-08-07'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-01'; # DATE
+our $DIST = 'App-YouTubeUtils'; # DIST
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Command-line utilities related to YouTube
@@ -18,7 +20,7 @@ App::YouTubeUtils - Command-line utilities related to YouTube
 
 =head1 VERSION
 
-This document describes version 0.002 of App::YouTubeUtils (from Perl distribution App-YouTubeUtils), released on 2018-08-07.
+This document describes version 0.004 of App::YouTubeUtils (from Perl distribution App-YouTubeUtils), released on 2020-04-01.
 
 =head1 DESCRIPTION
 
@@ -47,13 +49,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<youtube-dl-if-not-yet> from L<App::YoutubeDlIfNotYet>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

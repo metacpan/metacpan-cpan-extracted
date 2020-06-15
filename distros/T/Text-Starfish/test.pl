@@ -3,39 +3,37 @@
 #########################
 
 use Test;
-BEGIN { plan tests => 5 };
+BEGIN { plan tests => 39 };
 use Text::Starfish;
 use File::Copy;
 use Carp;
 use Cwd;
-ok(1);				# made this far
+my $comment_width = 14;
+sub cmt_print { my $c=shift; while (length($c)<$comment_width) {
+  $c.='.'; } print "$c: "; }
+
+&cmt_print("use test(1)"); ok(1);
 
 # Slash hack was added because the Windows terminal evaluates does not
 # evaluate $vars (the use a %varname% form instead) and therefore would
 # not require the extra escape character at the beginning of the variable.
 my $slash_hack;
-if ($^O =~ m/MSWin/) {
-	$slash_hack = '';
-}
-else {
-	$slash_hack = '\\';
-}
-mkdir 'tmp', 0700 unless -d 'tmp';
-mkdir 'tmp/Text', 0700 unless -d 'tmp/Text';
+if ($^O =~ m/MSWin/) { $slash_hack = ''; }
+else                 {$slash_hack = '\\'; }
+&my_mkdir('tmp', 'tmp/Text');
 copy('Starfish.pm','tmp/Text/Starfish.pm');
-
 {
     my $f = getfile('starfish');
     $f =~ s<^#!/usr/bin/perl>{#!/usr/bin/perl -I../blib/lib} or die;
     putfile('tmp/starfish', $f);
 }
-
 chdir 'tmp' or die;
 
-if (&is_module_available('CGI')) {
-  &testcase('01', 'replace'); # "ok 2" requires CGI module
-} else {
-  ok(1); print "\tskipped (ok 2) - CGI module not available\n"; }
+&testcase('02-simple_java'); # a simple Java example
+&testcase('03-simple_java'); # a simple Java example, related to previous
+&testcase('04-simple_java', 'replace'); # a simple Java example, replace mode
+&testcase('05-simple_java', 'replace'); # a simple Java example, replace mode
+&testcase('06-addHook', 'replace'); # 01->06-addHook
 
 if (&is_module_available('CGI')) {
   &testcase('02', 'replace'); # "ok 3" requires CGI module
@@ -183,32 +181,28 @@ sub okfiles {
     }
 }
 
-sub getfile($) {
-    my $f = shift;
-    local *F;
-    open(F, "<$f") or croak "getfile:cannot open $f:$!";
-    my @r = <F>;
-    close(F);
-    return wantarray ? @r : join ('', @r);
-}
-
+# $testnum  - test id, starting with number, but could have a suffix; e.g. 01-a
+# $infile   - name of the original input test file (in testdir)
+# $procfile - name of the input file when starfish is run on it
+# $outfile  - name of the expected outfile in the testdir
 sub testcase {
-    my $testnum = shift;
-    my ($infile, $procfile, $replace, $out, $outfile);
-    my $testdir = "test-$testnum";
-    if (-d $testdir) { `rm -rfv $testdir/*` }
-    else { mkdir $testdir, 0700 or die "can't mkdir $testdir: $!"; }
-    chdir $testdir or die;
-    my $testfilesdir = '../../testfiles';
+  my $testnum = shift; &cmt_print($testnum);
+  my ($infile, $procfile, $replace, $out, $outfile);
+  my $testdir = "test-$testnum";
+  if (-d $testdir) { &rm_dir_recursively($testdir) }
+  &my_mkdir($testdir);
+  chdir $testdir or die;
+  my $testfilesdir = '../../testfiles';
 
     # example: &testcase(34, 'in:33_tex.in->34.tex -replace -o=34-slides.tex');
     if ($#_==0 && $_[0] =~ /^in:(\S*)->(\S*) -replace -o=(\S*)$/) {
       $infile = $1; $procfile = $2; $outfile = $replace = $3;
     }
     elsif ( -e "$testfilesdir/$testnum.in" and $#_==-1) {
-	$infile   = "$testnum.in";
-	$procfile = "$testnum.in";
-	$outfile  = "$testnum.out";
+      $infile   = "$testnum.in";
+      $procfile = "$testnum.in";
+      $outfile  = "$testnum.out";
+      if ($testnum =~ /_java$/) { $procfile = "$`.java" }
     }
     elsif ( -e "$testfilesdir/$testnum.in" and
 	    $#_==0 and $_[0] eq 'out' ) {
@@ -219,10 +213,14 @@ sub testcase {
     }
     elsif ( -e "$testfilesdir/$testnum.in" and
 	    $#_==0 and $_[0] eq 'replace' ) {
-	$infile   = "$testnum.in";
-	$procfile = "$testnum.in";
-	$outfile  = "$testnum.out";
-	$replace  = "$testnum.out";
+      $infile   = "$testnum.in";
+      $procfile = "$testnum.in";
+      $outfile  = "$testnum.out";
+      $replace  = "$testnum.out";
+      if ($testnum =~ /_java$/) {
+	$procfile = "$`.java";
+	$replace = "$`_out.java";
+      }
     }
     elsif ( -e "$testfilesdir/${testnum}_html.in" ) {
 	$infile = "${testnum}_html.in";
@@ -247,10 +245,10 @@ sub testcase {
 	{  $replace = "${testnum}_out.tex" }
     }
     elsif ( -e "$testfilesdir/${testnum}.html.sfish" ) {
-	$infile = "${testnum}.html.sfish";
-	$procfile = "$testnum.html.sfish";
-	$replace = "$testnum.html";
-	$outfile = "${testnum}_html.out";
+      $infile = "${testnum}.html.sfish";
+      $procfile = "$testnum.html.sfish";
+      $replace = "$testnum.html";
+      $outfile = "${testnum}_html.out";
     }
     elsif ( -e "$testfilesdir/${testnum}_java.in" and
 	    $#_==0 and $_[0] eq 'out' ) {
@@ -267,7 +265,8 @@ sub testcase {
     }
     else { die }
 
-    mycopy("$testfilesdir/$infile",  $procfile);
+    mycopy("$testfilesdir/$infile", $infile);
+    mycopy("$testfilesdir/$infile", $procfile) if $infile ne $procfile;
     my $outExpected = "$outfile-expected";
     my $outfile_masked = $outfile;
     $outfile_masked =~ s/\.tex$/_tex.out/;
@@ -327,6 +326,12 @@ sub is_module_available {
   my $module = shift; eval qq{require $module};
   return '' if $@; return 1;
 }
+
+sub rm_dir_recursively { my $d=shift; system('rm', '-rf', $d); }
+
+sub my_mkdir {
+  for my $d (@_) { next if -d $d;
+    mkdir $d, 0700 or die "can't mkdir $d: $!" } }
 
 sub mycopy {
   my $f1 = shift; my $f2 = shift;

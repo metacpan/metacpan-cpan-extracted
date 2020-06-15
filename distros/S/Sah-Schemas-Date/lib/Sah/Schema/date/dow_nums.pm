@@ -1,9 +1,9 @@
 package Sah::Schema::date::dow_nums;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = ['array' => {
     summary => 'Array of day-of-week numbers (1-7, 1=Monday)',
@@ -11,13 +11,13 @@ our $schema = ['array' => {
     'x.perl.coerce_rules' => ['From_str::comma_sep'],
     'x.completion' => ['date_dow_nums'],
     examples => [
-        {data=>'', valid=>1},
-        {data=>1, valid=>1},
-        {data=>[1], valid=>1},
-        {data=>[1,7], valid=>1},
-        {data=>'1,7', valid=>1},
-        {data=>[1,7,8], valid=>0},
-        {data=>'1,7,8', valid=>0},
+        {value=>'', valid=>1, validated_value=>[]},
+        {value=>1, valid=>1, validated_value=>[1]},
+        {value=>[1], valid=>1},
+        {value=>[1,7], valid=>1},
+        {value=>'1,7', valid=>1, validated_value=>[1,7]},
+        {value=>[1,7,8], valid=>0},
+        {value=>'1,7,8', valid=>0},
     ],
 }, {}];
 
@@ -37,7 +37,7 @@ Sah::Schema::date::dow_nums - Array of day-of-week numbers (1-7, 1=Monday)
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::date::dow_nums (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::Schema::date::dow_nums (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;
@@ -73,15 +73,15 @@ Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
 
 Sample data:
 
- ""  # valid
+ ""  # valid, becomes []
 
- 1  # valid
+ 1  # valid, becomes [1]
 
  [1]  # valid
 
  [1,7]  # valid
 
- "1,7"  # valid
+ "1,7"  # valid, becomes [1,7]
 
  [1,7,8]  # INVALID
 

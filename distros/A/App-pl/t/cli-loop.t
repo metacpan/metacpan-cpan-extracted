@@ -2,25 +2,33 @@ use Test::Simple tests => 27;
 
 # chdir to t/
 $_ = $0;
-s~[^/]+$~~;
+s~[^/\\]+$~~;
 chdir $_ if length;
 
-sub pl($@) {
-    my $expect = shift;
-    die "Will fail on Win, coz of \": @_\n", if grep /"/, @_;
-    my $win = require Win32::ShellQuote if $^O =~ /^MSWin/;
-    open my $fh, '-|', $^X, '-W', $win ? '..\pl' : '../pl',
-      $win ? map '"'.join('""', split /"/).'"', @_ : @_;
+# run pl, expect $_
+sub pl(@) {
+    my $fh;
+    if( $^O =~ /^MSWin/ ) {
+	require Win32::ShellQuote;
+	open $fh, Win32::ShellQuote::quote_native( $^X, '-W', '..\pl', @_ ) . '|';
+    } else {
+	open $fh, '-|', $^X, '-W', '../pl', @_;
+    }
     local $/;
     my $ret = <$fh>;
-    ok $ret eq $expect, join ' ', 'pl', map /[\s*?()[\]{}\$\\'";|&]|^$/ ? "'$_'" : $_, @_;
-    print "got: '$ret', expected: '$expect'\n" if $ret ne $expect;
+    ok $ret eq $_, join ' ', 'pl', map /[\s*?()[\]{}\$\\'";|&]|^$/ ? "'$_'" : $_, @_
+      or print "got: '$ret', expected: '$_'\n";
 }
-
-sub alter(&@) {
+# run pl, expect shift
+sub pl_e($@) {
+    local $_ = shift;
+    &pl;
+}
+# run pl, expect $_ altered by shift->()
+sub pl_a(&@) {
     local $_ = $_;
     shift->();
-    pl $_, @_;
+    &pl;
 }
 
 
@@ -28,15 +36,15 @@ my @abc = <[abc].txt>;
 my $abc = join '', @abc;
 my $abcn = join "\n", @abc, '';
 
-pl '', '-o', '', @abc;
-pl $abc, '-o', 'E', @abc;
-pl $abc, '-op', '', @abc;
-pl $abc[0], '-op1', '', @abc;
-pl $abc[1], '-oP', '/b/', @abc;
-pl $abc[1], '-oP1', '/b|c/', @abc;
-pl $abcn, '-opl12', '', @abc;
-pl $abc, '-Op', '$_ = $A', @abc;
-pl $abcn, '-O', 'e $A', @abc;
+pl_e '', '-o', '', @abc;
+pl_e $abc, '-o', 'E', @abc;
+pl_e $abc, '-op', '', @abc;
+pl_e $abc[0], '-op1', '', @abc;
+pl_e $abc[1], '-oP', '/b/', @abc;
+pl_e $abc[1], '-oP1', '/b|c/', @abc;
+pl_e $abcn, '-opl12', '', @abc;
+pl_e $abc, '-Op', '$_ = $A', @abc;
+pl_e $abcn, '-O', 'e $A', @abc;
 
 
 my $copy = $_ = <<EOF;
@@ -59,47 +67,48 @@ EOF
 
 my @bze = ('-rbecho q{begin}', '-ze q{eof}', '-e', 'e q{end}');
 sub unbze { s/(?:begin|eof|end)\n//g }
-pl $_, @bze, 'Echo qq{$ARGIND;$ARGV;$.;$_}', @abc;
-pl $_, @bze, 'E qq{$I;$A;$.;$_}', @abc;
-alter \&unbze,
-  '-r', 'Echo qq{$ARGIND;$ARGV;$.;$_}', @abc;
+pl @bze, 'Echo "$ARGIND;$ARGV;$.;$_"', @abc;
+pl @bze, 'E "$I;$A;$.;$_"', @abc;
+pl_a \&unbze,
+  '-r', 'Echo "$ARGIND;$ARGV;$.;$_"', @abc;
 
 sub cut_from_34 { s/([0-9]).+,[34].+\n(?:\1.+\n)*//gm }
-alter \&cut_from_34,
-  @bze, 'last if /[34]/; E qq{$I;$A;$.;$_}', @abc;
-alter { cut_from_34; s/(?:begin|eof|end)\n//g }
-  '-r', 'last if /[34]/; E qq{$I;$A;$.;$_}', @abc;
+pl_a \&cut_from_34,
+  @bze, 'last if /[34]/; E "$I;$A;$.;$_"', @abc;
+pl_a { cut_from_34; s/(?:begin|eof|end)\n//g }
+  '-r', 'last if /[34]/; E "$I;$A;$.;$_"', @abc;
 
 substr $bze[0], 1, 1, '';	# done testing -r
 
 sub renumber { my $i = 0; s/;\K([1-9])(?=;)/++$i/eg } # convert $. to count across all files
 renumber;
-pl $_, @bze, 'E qq{$I;$A;$.;$_}', @abc;
+pl @bze, 'E "$I;$A;$.;$_"', @abc;
 
 sub cut_after_23 { s/([0-9]).+,[23].+\n\K(?:\1.+\n)*//gm }
-alter { cut_after_23; renumber }
-  @bze, 'E qq{$I;$A;$.;$_}; last if /[23]/', @abc;
+pl_a { cut_after_23; renumber }
+  @bze, 'E "$I;$A;$.;$_"; last if /[23]/', @abc;
 
-pl '', '-n', '', @abc;
+pl_e '', '-n', '', @abc;
 
 unbze;
 s/.*;//mg; # reduce to only file contents
-pl $_, '-n', 'E', @abc;
-pl $_, '-ln', 'e', @abc;
-pl $_, '-p', '', @abc;
-pl $_, '-lp', '', @abc;
+pl '-n', 'E', @abc;
+pl '-ln', 'e', @abc;
+pl '-p', '', @abc;
+pl '-lp', '', @abc;
 
 my @cdlines = grep /[cd]/, split /^/;
-pl join( '', $cdlines[0], "eof\n", $cdlines[1], "eof\n" x 2 ), '-P2z', 'e q{eof}', '/[cde]/', @abc;
-pl join( '', @cdlines ), '-rP2', '/[cde]/', @abc;
+pl_e join( '', $cdlines[0], "eof\n", $cdlines[1], "eof\n" x 2 ), '-P2z', 'e q{eof}', '/[cde]/', @abc;
+pl_e join( '', @cdlines ), '-rP2', '/[cde]/', @abc;
 
-sub pl10($$) {
-    my $sep = $_[1];
-    alter { s/^(.+)$sep(.+)$/$2 $1/gm } $_[0], 'e @F[1, 0]', @abc;
+# run pl, expect @F[1, 0] separated by $_[0]
+sub pl_F10($$) {
+    my $sep = $_[0];
+    pl_a { s/^(.+)$sep(.+)$/$2 $1/gm } $_[1], 'e @F[1, 0]', @abc;
 }
-pl10 '-al', ' ';
-pl10 '-lF,', ',';
-pl10 '-lF:', ':';
+pl_F10 ' ', '-al';
+pl_F10 ',', '-lF,';
+pl_F10 ':', '-lF:';
 
 # reproduce the splits that -054 (comma) will do
 $_ = $copy;
@@ -109,4 +118,4 @@ chop; # extra [ on last line
 s/[0-9].*;//mg; # reduce to only file contents
 s/,/,][/g;
 substr $_, 0, 0, '[';
-pl $_, '-054n', 'E qq{[$_]}', @abc; # 054 is comma, also splits at file ends
+pl '-054n', 'E "[$_]"', @abc; # 054 is comma, also splits at file ends

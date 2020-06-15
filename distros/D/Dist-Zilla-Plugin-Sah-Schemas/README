@@ -3,9 +3,9 @@ NAME
     Sah-Schemas-* distribution
 
 VERSION
-    This document describes version 0.018 of
+    This document describes version 0.020 of
     Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution
-    Dist-Zilla-Plugin-Sah-Schemas), released on 2020-05-08.
+    Dist-Zilla-Plugin-Sah-Schemas), released on 2020-06-13.
 
 SYNOPSIS
     In dist.ini:
@@ -39,6 +39,8 @@ DESCRIPTION
         Perinci::Sub::Complete uses this to reduce startup overhead when
         doing tab completion.
 
+CONFIGURATION
+  exclude_module
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Dist-Zilla-Plugin-Sah-Schemas>.

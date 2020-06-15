@@ -41,6 +41,21 @@ sub check {
     };
 }
 
+my %skip = (
+    'lib/Future/HTTP/AnyEvent.pm' => 1,
+    'lib/Future/HTTP/Mojo.pm' => 1,
+    'lib/Future/HTTP/NetAsync.pm' => 1,
+    'lib/Future/HTTP/Tiny/Paranoid.pm' => 1,
+    'blib/lib/Future/HTTP/AnyEvent.pm' => 1,
+    'blib/lib/Future/HTTP/Mojo.pm' => 1,
+    'blib/lib/Future/HTTP/NetAsync.pm' => 1,
+    'blib/lib/Future/HTTP/Tiny/Paranoid.pm' => 1,
+);
+
+if(( $ENV{USER} || '') eq 'corion' and (`hostname`||'') eq 'outerlimits') {
+    %skip = ();
+}
+
 my @files;
 find({wanted => \&wanted, no_chdir => 1},
     grep { -d $_ }
@@ -51,7 +66,7 @@ if( my $exe = $module{EXE_FILES}) {
     push @files, @$exe;
 };
 
-for (@files) {
+for (grep {!$skip{$_}} @files) {
     check($_)
 }
 

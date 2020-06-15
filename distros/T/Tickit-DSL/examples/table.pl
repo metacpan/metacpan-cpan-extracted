@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Tickit::DSL;
-
 my $tbl = table {
  warn "activated one or more items";
 } data => [

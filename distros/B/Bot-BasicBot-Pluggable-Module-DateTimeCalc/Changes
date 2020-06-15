@@ -1,5 +1,8 @@
 Revision history for Bot-BasicBot-Pluggable-Module-DateTimeCalc
 
+0.0400 2020-06-12 18:53:48
+    - Use DateTime::Format::Natural not Date::Manip.
+
 0.0304 2019-01-20 20:40:42
     - Add to documentation.
     - Fix the dist.ini file.

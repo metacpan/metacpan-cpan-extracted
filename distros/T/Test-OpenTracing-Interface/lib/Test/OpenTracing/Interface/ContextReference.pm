@@ -27,7 +27,7 @@ Test::OpenTracing::Interface::ContextReference - compliance testing
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = 'v0.21.0';
 
 
 use Test::OpenTracing::Interface;

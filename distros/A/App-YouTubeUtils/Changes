@@ -1,10 +1,23 @@
-0.002   2018-08-07 (PERLANCAR)
+0.004   2020-04-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [refactor] Move extract-youtube-video-ids core logic to
+	  YouTube::Util.
+
+
+0.003   2020-04-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention youtube-dl-if-not-yet.
+
+
+0.002   2018-08-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix Rinci metadata of example.
 
 
-0.001   2018-08-07 (PERLANCAR)
+0.001   2018-08-07  Released-By: PERLANCAR
 
         - First release.

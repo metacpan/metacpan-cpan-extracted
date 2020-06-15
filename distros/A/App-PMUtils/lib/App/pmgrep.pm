@@ -2,8 +2,8 @@
 
 package App::pmgrep;
 
-our $DATE = '2020-05-10'; # DATE
-our $VERSION = '0.733'; # VERSION
+our $DATE = '2020-06-12'; # DATE
+our $VERSION = '0.734'; # VERSION
 
 use 5.010001;
 use strict;
@@ -25,12 +25,20 @@ This is a like the Unix command **grep** but instead of specifying filenames,
 you specify module names or prefixes. The utility will search module source
 files from Perl's `@INC`.
 
+Examples:
+
+    # Find pre-increment in all Perl module files
+    % pmgrep '\+\+\$'
+
+    # Find some pattern in all Data::Sah::Coerce::* modules (note ** wildcard for recursing)
+    % pmgrep 'return ' Data::Sah::Coerce::**
+
 _
     add_args    => {
         modules => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'module',
-            schema => ['array*', of=>'perl::modname_or_prefix*'],
+            schema => 'perl::modnames*',
             pos => 1,
             greedy => 1,
             description => <<'_',
@@ -136,7 +144,7 @@ App::pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.733 of App::pmgrep (from Perl distribution App-PMUtils), released on 2020-05-10.
+This document describes version 0.734 of App::pmgrep (from Perl distribution App-PMUtils), released on 2020-06-12.
 
 =head1 FUNCTIONS
 
@@ -152,6 +160,14 @@ Print lines from installed Perl module sources matching a pattern.
 This is a like the Unix command B<grep> but instead of specifying filenames,
 you specify module names or prefixes. The utility will search module source
 files from Perl's C<@INC>.
+
+Examples:
+
+ # Find pre-increment in all Perl module files
+ % pmgrep '\+\+\$'
+ 
+ # Find some pattern in all Data::Sah::Coerce::* modules (note ** wildcard for recursing)
+ % pmgrep 'return ' Data::Sah::Coerce::**
 
 This function is not exported.
 
@@ -177,7 +193,7 @@ Invert the sense of matching.
 
 =item * B<line_number> => I<true>
 
-=item * B<modules> => I<array[perl::modname_or_prefix]>
+=item * B<modules> => I<perl::modnames>
 
 If not specified, all installed Perl modules will be searched.
 

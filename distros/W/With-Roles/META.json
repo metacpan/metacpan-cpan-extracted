@@ -4,7 +4,7 @@
       "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -61,7 +61,7 @@
          "web" : "https://github.com/haarg/With-Roles"
       }
    },
-   "version" : "0.001000",
+   "version" : "0.001001",
    "x_authority" : "cpan:HAARG",
    "x_breaks" : {},
    "x_serialization_backend" : "JSON::PP version 4.04"

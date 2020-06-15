@@ -1,9 +1,9 @@
 package Sah::Schema::date::month::en;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [cistr => {
     summary => 'Month number/name (abbreviated or full, in English)',
@@ -13,13 +13,13 @@ our $schema = [cistr => {
         qw/january february march april june july august september october november december/,
     ],
     examples => [
-        {data=>'', valid=>0},
-        {data=>1, valid=>1},
-        {data=>'jan', valid=>1},
-        {data=>'FeB', valid=>1},
-        {data=>'March', valid=>1},
-        {data=>'foo', valid=>0},
-        {data=>13, valid=>0},
+        {value=>'', valid=>0},
+        {value=>1, valid=>1},
+        {value=>'jan', valid=>1},
+        {value=>'FeB', valid=>1},
+        {value=>'March', valid=>1},
+        {value=>'foo', valid=>0},
+        {value=>13, valid=>0},
     ],
 }, {}];
 
@@ -39,7 +39,7 @@ Sah::Schema::date::month::en - Month number/name (abbreviated or full, in Englis
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::Schema::date::month::en (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;

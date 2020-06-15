@@ -13,7 +13,15 @@ OpenTracing::Interface::SpanContext - A role that defines the SpanContext interf
         ...
     }
     
+    sub get_baggage_items {
+        ...
+    }
+    
     sub with_baggage_item {
+        ...
+    }
+    
+    sub with_baggage_items {
         ...
     }
     
@@ -43,13 +51,11 @@ C<span_id>, C<sampled>).
 
 
 
-=head1 METHODS
-
-=cut
+=head1 INSTANCE METHODS
 
 
 
-=head2 get_baggage_item
+=head2 C<get_baggage_item>
 
 This will return the value of a baggage item, based on its key.
 
@@ -57,19 +63,64 @@ This will return the value of a baggage item, based on its key.
 
 It will return C<undef> if there is no value for the given key.
 
-=head3 Parameters
+=over
 
-none
+=item Required Positional Parameter(s)
 
-=head3 Returns
+=over
 
-A value, as C<Str>.
+=item baggage_key, a B<required> C<Str>
 
-C<undef> if no matching key value is found.
+=back
+
+=item Returns
+
+=over
+
+=item Maybe a C<Value>
+
+The value of the requested baggage item, or C<undef> when such a value was
+missing.
+
+=back
+
+=back
 
 
 
-=head2 with_baggage_item( $key => $value )
+=head2 C<get_baggage_items>
+
+This will return a Hash of key/value pairs.
+
+    my %items = $span_context->get_baggage_items;
+
+It will return an empty list if there is no key/value pairs set.
+
+=over
+
+=item Positional Parameter(s)
+
+=over
+
+I<none>
+
+=back
+
+=item Returns
+
+=over
+
+=item C<Hash>
+
+A list of key/value pairs, not a hash reference!
+
+=back
+
+=back
+
+
+
+=head2 C<with_baggage_item>
 
 Creates a cloned C<SpanContext> object with the new key => value pair.
 
@@ -77,25 +128,42 @@ Creates a cloned C<SpanContext> object with the new key => value pair.
         baggage_key => $value,
     );
 
-=head3 Required Positional Parameters
+=over
+
+=item Required Positional Parameter(s)
 
 =over
 
-=item key
+=item baggage_key, as B<required> C<Str>
 
-must be a string
-
-=item value
-
-must be a string
+=item baggage_value, as C<Value>
 
 =back
 
-=head3 Returns
+=item Returns
 
-A cloned object that MUST implement this interface.
+=over
 
-=cut
+=item C<SpanContext>
+
+A b<cloned> version of the invocing span context for chaining purposes.
+
+=back 
+
+=back
+
+
+
+=head2 C<with_baggage_items>
+
+Creates a cloned C<SpanContext> object with the multiple key => value pairs.
+
+    my $new_span_context = $old_span_context->with_baggage_items(
+        baggage_key => $value,
+        another_key => $other,
+    );
+
+See L<< C<with_baggage_item> >> above.
 
 
 
@@ -115,8 +183,6 @@ all common elements that conform L<OpenTracing::Interface>
 
 =back
 
-=cut
-
 
 
 =head1 CAVEATS
@@ -132,4 +198,22 @@ Since this role does nothing else than checking input and output, it is useful
 during development. Most likely it can be switched off safely in production
 environments.
 
-=cut
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.

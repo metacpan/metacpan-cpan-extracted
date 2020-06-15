@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.17;
 use 5.026; # signatures
+use Object::Pad 0.27;
 
-class Tickit::Widget::Choice 0.03
+package Tickit::Widget::Choice 0.04;
+class Tickit::Widget::Choice
    extends Tickit::Widget;
 
 use Carp;
@@ -80,21 +81,21 @@ has $_on_changed;
 
 has $_chosen;
 
-method BUILD( %params )
+BUILD ( %params )
 {
    $self->push_choice( @$_ ) for @{ $params{choices} || [] };
 
    $self->set_on_changed( $params{on_changed} ) if $params{on_changed};
 }
 
-method lines { 1 }
+method lines () { 1 }
 
-method cols
+method cols ()
 {
    return 4 + max( 1, map { textwidth $_->[1] } @_choices );
 }
 
-method window_gained( $window )
+method window_gained ( $window )
 {
    $self->SUPER::window_gained( $window );
 
@@ -111,7 +112,7 @@ method window_gained( $window )
 
 =cut
 
-method on_changed { $_on_changed }
+method on_changed () { $_on_changed }
 
 =head2 set_on_changed
 
@@ -124,7 +125,7 @@ changed.
 
 =cut
 
-method set_on_changed( $new ) { $_on_changed = $new }
+method set_on_changed ( $new ) { $_on_changed = $new }
 
 =head1 METHODS
 
@@ -139,7 +140,7 @@ display caption.
 
 =cut
 
-method push_choice( $value, $caption )
+method push_choice ( $value, $caption )
 {
    push @_choices, [ $value, $caption ];
    $_chosen = 0 if !defined $_chosen;
@@ -158,7 +159,7 @@ Returns the value of the currently-chosen choice.
 
 =cut
 
-method chosen_value
+method chosen_value ()
 {
    return $_choices[ $_chosen ]->[0];
 }
@@ -172,7 +173,7 @@ previously-chosen one, invokes the C<on_changed> event.
 
 =cut
 
-method choose_by_idx( $idx )
+method choose_by_idx ( $idx )
 {
    return if $_chosen == $idx;
 
@@ -192,7 +193,7 @@ event.
 
 =cut
 
-method choose_by_value( $value )
+method choose_by_value ( $value )
 {
    $_choices[$_][0] eq $value and return $self->choose_by_idx( $_ )
       for 0 .. $#_choices;
@@ -210,7 +211,7 @@ Display the popup menu in a modal float until a choice is made.
 
 has $_menu;
 
-method popup_menu
+method popup_menu ()
 {
    my $menu = $_menu = Tickit::Widget::Menu->new(
       items => [ map {
@@ -233,7 +234,7 @@ method popup_menu
    $menu->highlight_item( $_chosen );
 }
 
-method render_to_rb( $rb, $rect )
+method render_to_rb ( $rb, $rect )
 {
    my $border_pen = $self->get_style_pen( 'border' );
    my $linestyle  = $self->get_style_values( 'border_linestyle' );
@@ -253,15 +254,15 @@ method render_to_rb( $rb, $rect )
    $rb->vline_at( 0, 0, $right+2, $linestyle, $border_pen, CAP_START|CAP_END );
 }
 
-method key_first_choice { $self->choose_by_idx( 0 ); 1 }
-method key_last_choice  { $self->choose_by_idx( $#_choices ); 1 }
+method key_first_choice ($) { $self->choose_by_idx( 0 ); 1 }
+method key_last_choice  ($) { $self->choose_by_idx( $#_choices ); 1 }
 
-method key_next_choice  { $self->choose_by_idx( $_chosen+1 ) if $_chosen < $#_choices; 1 }
-method key_prev_choice  { $self->choose_by_idx( $_chosen-1 ) if $_chosen > 0; 1 }
+method key_next_choice  ($) { $self->choose_by_idx( $_chosen+1 ) if $_chosen < $#_choices; 1 }
+method key_prev_choice  ($) { $self->choose_by_idx( $_chosen-1 ) if $_chosen > 0; 1 }
 
-method key_popup { $self->popup_menu; 1 }
+method key_popup ($) { $self->popup_menu; 1 }
 
-method on_mouse( $ev )
+method on_mouse ( $ev )
 {
    return unless $ev->type eq "press" and $ev->button == 1;
 

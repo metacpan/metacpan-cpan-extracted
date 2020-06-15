@@ -11,7 +11,9 @@ use strict;
 use warnings;
 
 
-$ENV{OPENTRACING_INTERFACE} = 1 unless exists $ENV{OPENTRACING_INTERFACE};
+BEGIN {
+    $ENV{OPENTRACING_INTERFACE} = 1 unless exists $ENV{OPENTRACING_INTERFACE};
+}
 #
 # This breaks if it would be set to 0 externally, so, don't do that!!!
 

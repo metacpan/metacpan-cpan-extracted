@@ -54,12 +54,28 @@ static void stage_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
   }
 }
 
+static bool stage_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *value)
+{
+  if(!hv_fetchs(GvHV(PL_hintgv), "t::stages/filter_attr-capture", 0))
+    return false;
+
+  AV *av = newAV();
+  av_push(av, SvREFCNT_inc(attr));
+  av_push(av, SvREFCNT_inc(value));
+
+  sv_setrv(get_sv("t::stages::captured", GV_ADD), (SV *)av);
+  return true;
+}
+
 static const struct XSParseSublikeHooks parse_stages_hooks = {
+  .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS,
   .permit          = stage_permit,
   .pre_subparse    = stage_pre_subparse,
   .post_blockstart = stage_post_blockstart,
   .pre_blockend    = stage_pre_blockend,
   .post_newcv      = stage_post_newcv,
+
+  .filter_attr     = stage_filter_attr,
 };
 
 MODULE = t::stages  PACKAGE = t::stages

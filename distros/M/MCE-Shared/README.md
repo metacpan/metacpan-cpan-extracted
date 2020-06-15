@@ -1,6 +1,6 @@
 ## MCE::Shared for Perl
 
-This document describes MCE::Shared version 1.871.
+This document describes MCE::Shared version 1.872.
 
 ### Description
 
@@ -72,7 +72,7 @@ The next demonstration does the same thing using a MCE Model.
 
  # Compute bounds only, workers receive [ begin, end ] values
 
- MCE::Flow::init(
+ MCE::Flow->init(
     chunk_size  => 200_000,
     max_workers => 8,
     bounds_only => 1

@@ -8,6 +8,8 @@ Makefile.PL
 README
 dist.ini
 lib/ColorTheme/Test/Random.pm
+lib/ColorTheme/Test/RandomANSI16.pm
+lib/ColorTheme/Test/RandomANSI256.pm
 lib/ColorThemes/Test.pm
 t/00-compile.t
 t/author-critic.t

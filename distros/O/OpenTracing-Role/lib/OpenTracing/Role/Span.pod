@@ -1,0 +1,351 @@
+
+=head1 NAME
+
+OpenTracing::Role::Span - Role for OpenTracing implementations.
+
+
+
+=head1 SYNOPSIS
+
+    package OpenTracing::Implementation::MyBackendService::Span;
+    
+    use Moo;
+    
+    ...
+    
+    with 'OpenTracing::Role::Span'
+    
+    1;
+
+
+
+=head1 DESCRIPTION
+
+This is a Role for OpenTracing implenetations that are compliant with the
+L<OpenTracing::Interface>.
+
+With the exception of calls to C<get_context()> (which are always allowed),
+C<finish()> must be the last call made to any span instance, and to do otherwise
+leads to undefined behavior (but not returning an exception).
+
+
+
+=head1 IMPLEMENTED OPENTRACING METHODS
+
+The following methods from
+L<OpenTracing::Interface|OpenTracing::Interface::Span>
+have been implemented. See their documentation for more details.
+
+
+
+=head2 C<get_context>
+
+Yields the C<SpanContext> for this C<Span>. Note that the return value of 
+C<get_context()> is still valid after a call to L<finish()>, as is a call to
+L<get_context()> after a call to L<finish()>.
+
+See L<OpenTracing::Interface::Span/"get_context">.
+
+
+
+=head2 C<overwrite_operation_name>
+
+Changes the operation name.
+
+See L<OpenTracing::Interface::Span/"overwrite_operation_name">.
+
+
+
+=head2 C<finish>
+
+Sets the end timestamp and finalizes Span state.
+
+See L<OpenTracing::Interface::Span/"finish">.
+
+
+
+=head2 C<add_tag>
+
+Adds a tag to the span.
+
+See L<OpenTracing::Interface::Span/"add_tag">.
+
+
+
+=head2 C<add_tags>
+
+Adds multiple tags to the span at the same time
+
+See L<OpenTracing::Interface::Span/"add_tags">.
+
+
+
+=head2 C<log_data>
+
+Adds a log record to the span.
+
+See L<OpenTracing::Interface::Span/"log_data">.
+
+
+
+=head2 C<add_baggage_item>
+
+Sets a key:value pair on this Span and its SpanContext that also propagates to
+descendants of this Span.
+
+See L<OpenTracing::Interface::Span/"add_baggage_item">.
+
+
+
+=head2 C<add_baggage_items>
+
+Sets multiple C<baggage_items> at once.
+
+See L<OpenTracing::Interface::Span/"add_baggage_items">.
+
+
+
+=head2 C<get_baggage_item>
+
+Returns either the corresponding baggage value, or C<undef> when such a value
+was missing.
+
+See L<OpenTracing::Interface::Span/"get_baggage_item">.
+
+
+
+=head2 C<get_baggage_items>
+
+This will return a Hash of key/value pairs.
+
+See L<OpenTracing::Interface::Span/"get_baggage_items">.
+
+
+
+=head1 WARNING
+
+B<Never use any of attributes or methods below in any integration!>
+
+Only methods mentioned in the Public OpenTracing::Interface are safe to be used
+in any integration or when instrumenting applications.
+
+
+
+=head1 ATTRIBUTES
+
+
+
+=head2 C<operation_name>
+
+A required C<Str> Type value, for the operation name.
+
+See L<< C<get_operation_name> >> and L<< C<overwrite_operation_name> >>.
+
+
+
+=head2 C<start_time>
+
+A read-only C<PositiveOrZeroNum> floatingpoint that defaults to the number of
+seconds since epoch.
+
+
+
+=head2 C<finish_time>
+
+A C<PositiveOrZeroNum> floatingpoint that can only be set by calling C<finish>.
+
+See L<< C<finish> >> and L<< C<has_finished> >>.
+
+
+
+=head2 C<tags>
+
+An optional C<HashRef> of C<Value>s that defaults to an empty hash reference.
+
+See L<< C<add_tag> >>, L<< C<add_tags> >>, L<< C<get_tag> >>, and
+L<< C<get_tags> >>.
+
+
+
+=head2 C<context>
+
+A required read-only L<SpanContext|OpenTracing::Types/"SpanContext"> type.
+
+Although a read-only, it will get swapped for a L<< C<clone_with>|
+OpenTracing::Roles::SpanContext/"clone_with" >> result when trying to add any
+C<baggage_item>, since C<SpanContext> is inmutable.
+
+See L<< C<get_context> >>, L<< C<add_baggage_item> >>, and
+L<< C<add_baggage_items> >>.
+
+
+
+=head2 C<child_of>
+
+A B<optional> C<Span> or C<SpanContext>.
+
+Note: this may not be the correct design and this attribute may disapear.
+
+See L<< C<parent_span_id> >>.
+
+
+
+=head2 C<on_finish>
+
+Maybe a L<CodeRef|Types::Standard/"CodeRef"> that will gets executed when
+C<finish> gets called. Its only parameter, is the C<Span> invocant itself.
+
+Its usefulnes currently is for dealing with c<span> inside C<Tracer>.
+
+See L<< C<finish> >>.
+
+
+=head1 INSTANCE METHODS
+
+
+
+=head2 C<get_operation_name>
+
+The accessor for the L<< C<operatation_name> >>
+
+=over
+
+=item Returns
+
+=over
+
+=item C<Str>
+
+=back
+
+=back
+
+
+
+=head2 C<has_finished>
+
+The state wether or not L<< C<finish> >> has been called or
+not.
+
+=over
+
+=item Returns
+
+=over
+
+=item C<Bool>
+
+=back
+
+=back
+
+
+
+=head2 C<get_span_id>
+
+The identifier of the C<Span> itself, through its span context.
+
+=over
+
+=item Returns
+
+=over
+
+=item C<Uuid>
+
+=back
+
+=back
+
+
+
+=head2 C<get_parent_span_id>
+
+The identifier of the parent C<Span>
+
+=over
+
+=item Returns
+
+=over
+
+=item C<Uuid>
+
+=back
+
+=back
+
+
+
+=head2 C<duration>
+
+The time (in seconds) between start and finish. This will C<croak> when either
+L<< C<start_time> >> or L<< C<finish_time> >> has not been set yet.
+
+=over
+
+=item Returns
+
+=over
+
+=item C<Num> number of seconds
+
+=back
+
+=back
+
+
+
+=head2 C<epoch_floatingpoint>
+
+A helper method to make it explicit that the time is in floating point, and not
+the usual integer number of seconds since epoch.
+
+=over
+
+=item Returns
+
+=over
+
+=item C<Num> number of seconds since epoch
+
+=back
+
+=back
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Types>
+
+Type constraints for checking Interfaces
+
+=item L<OpenTracing::Interface::Span>
+
+A role that defines the Span interface
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+=cut
+

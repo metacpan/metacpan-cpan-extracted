@@ -5,6 +5,12 @@ Roles for quickly building OpenTracing compliant Implementations
 Feel free to use them, or just ignore these. Just make sure that the
 Implementation is compliant with `Perl - OpenTracing API`
 
+## INSTALLING
+
+You need to install pre-requisits yourself:
+
+    - cpanm VANHOESEL/Test-OpenTracing-Interface-v0.20.1.tar.gz
+    - cpanm VANHOESEL/OpenTracing-Interface-v0.201.2.tar.gz
 
 ## LICENSE INFORMATION
 

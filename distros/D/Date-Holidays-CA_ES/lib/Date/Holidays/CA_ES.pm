@@ -1,8 +1,5 @@
 package Date::Holidays::CA_ES;
-{
-  $Date::Holidays::CA_ES::VERSION = '0.03';
-}
-
+$Date::Holidays::CA_ES::VERSION = '0.04';
 use strict;
 use warnings;
 
@@ -38,6 +35,7 @@ sub holidays {
 }
 
 1;
+
 __END__
 
 =head1 NAME
@@ -48,16 +46,14 @@ Date::Holidays::CA_ES - Catalan holidays
 
   use Date::Holidays;
 
-  my $dh = Date::Holidays->new( countrycode => 'ca_es', nocheck => 1 );
+  my $dh = Date::Holidays->new( countrycode => 'es' );
+  $dh->is_holiday(year => 2007, month => 4, day => 9 , region => 'ca')
 
 =head1 DESCRIPTION
 
 This module provide the official holidays for Catalonia, an Autonomous
 Community of Spain. It makes use of Date::Holidays::ES as parent class, since
 the catalan holidays are the spanish ones plus some more.
-
-Notice that "ca_es" is not a valid ISO 3166 code, so the "nocheck" option set
-to true in the constructor is mandatory to use this module.
 
 The following Catalan holidays have fixed dates (remember to take a look to the
 spanish ones as well!)
@@ -74,8 +70,7 @@ The following Catalan holiday hasn't a fixed date:
 =head1 METHODS
 
 The methods are identical to Date::Holidays::ES ones, except those with the
-"es" country code in them. Since "ca_es", is not a valid ISO country code,
-those methods are not provided.
+"es" country code in them.
 
 =head2 holidays
 
@@ -92,7 +87,7 @@ Miquel Ruiz, E<lt>mruiz@cpan.orgE<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2011 Miquel Ruiz.
+Copyright 2020 Miquel Ruiz.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

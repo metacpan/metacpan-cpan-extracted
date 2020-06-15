@@ -14,33 +14,32 @@
 # Here is his copyright and license statements:
 #
 #    TkUsr v0.80
-#    
+#
 #    Copyright (C) 1998-2003 Ludovic Drolez (ldrolez@free.fr)
-#   
+#
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation; either version 2 of the License, or
 #    (at your option) any later version.
-#    
+#
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
-#    
+#
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.       
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 #
 # $Id$
 
 package Device::Modem::UsRobotics;
-$VERSION = sprintf '%d.%02d', q$Revision: 1.5 $ =~ /(\d)\.(\d+)/;
+our $VERSION = '1.58';
+$VERSION = eval $VERSION;
 
 use strict;
-use Device::Modem;
-
-@Device::Modem::UsRobotics::ISA = 'Device::Modem';
+use base 'Device::Modem';
 
 use constant DLE => chr(0x10);
 use constant SUB => chr(0x1A);
@@ -88,12 +87,12 @@ sub get_mem_page($)
     # Download a page
     #set device(binary) 1
     #fconfigure $device(dev) -translation binary
-    
+
     # Get the page
     $self->atsend( sprintf('AT+MTP=%d'.Device::Modem::CR, 0 + $page) );
     $self->wait(100);
 
-    # Wait for data 
+    # Wait for data
     my $data = $self->answer();
 
     #set device(buffer) ""
@@ -241,7 +240,7 @@ sub fax_id_string
     {
         $self->atsend( sprintf('AT+MFI="%s"',$_[0]) . Device::Modem::CR );
         $self->wait(100);
-        my($ok, $ans) = $self->parse_answer(); 
+        my($ok, $ans) = $self->parse_answer();
         $self->log->write('info', 'New Fax ID string set to ['.$_[0].']');
         $result = $ok;
     }
@@ -317,7 +316,7 @@ sub message_scan_page($\$)
         #my $chksum  = substr($page, $pos, 2);
         #$pos += 2;
         my $chksum = 0;
-        
+
         my $block   = substr($page, $pos, $block_len);
         $pos += $block_len;
 
@@ -413,7 +412,7 @@ sub extract_voice_message($)
     return undef unless %msg;
     return undef if $msg{type} != 2;
 
-    # set startpage $stat($number.page) 
+    # set startpage $stat($number.page)
     $startpage = $msg{page};
 
     # Download the 1st page
@@ -475,7 +474,7 @@ sub extract_voice_message($)
         		#set end end
                 #$end = $end;
     	    }
-            
+
 	        # append data [string range $d 2 $end]
             if( $end )
             {
@@ -514,7 +513,7 @@ sub _byte_stuff($)
 #   DLE DLE <= DLE
 #   DLE SUB(0x1A) <= DLE DLE
 #   DLE ETX(0x03) = end of page
-# 
+#
 # I: data: data to decode
 # R: escaped data
 #
@@ -527,16 +526,16 @@ sub _byte_stuff($)
         my $id = index($data, chr(0x10));
 	    # if {$id == -1} break
         last if $id == -1;
-    
+
     	#append out [string range $data 0 [expr $id - 1]]
         $out .= substr($data, 0, $id - 1);
-        
+
     	#set nextchar [string index $data [expr $id+1]]
         my $nextchar = substr($data, $id + 1, 1);
 
     	#set data [string range $data [expr $id+2] end]
         $data = substr($data, $id + 2);
-        
+
     	#switch $nextchar {
 	    #    "\x10" { append out \x10\x1A }
     	#    default { append out \x10\x10$nextchar }
@@ -550,7 +549,7 @@ sub _byte_stuff($)
             $out .= chr(0x10) . chr(0x10) . $nextchar;
         }
     }
-    
+
     # add end of data
     #append out $data\x10\x03
     $out .= $data . chr(0x10) . chr(0x03);
@@ -567,10 +566,10 @@ sub _byte_unstuff(@)
     #   DLE DLE => DLE
     #   DLE SUB(0x1A) => DLE DLE
     #   DLE ETX(0x03) = end of page, the data is put in another hash
-    # 
+    #
     # I: data: data to decode
     # O: array: contains one or more pages of data (array(1), array(2)...)
-    # R: number of pages 
+    # R: number of pages
     #
 
     my($self, $data, $r_pages) = @_;
@@ -600,8 +599,8 @@ sub _byte_unstuff(@)
 	    #"\x03" { set adata($numpage) $out
 		#    set out ""
 		#    incr numpage
-		#    # end of page 
-	    #}	    
+		#    # end of page
+	    #}
 	    #default { append out \x10$nextchar }
 	    #}
         if( $nextchar eq DLE )
@@ -641,7 +640,7 @@ Device::Modem::UsRobotics - USR modems extensions to control self-mode
 
   use Device::Modem::UsRobotics;
 
-  my $modem = new Device::Modem::UsRobotics( port => '/dev/ttyS1' );
+  my $modem = Device::Modem::UsRobotics->new( port => '/dev/ttyS1' );
   $modem->connect( baudrate => 9600 );
   my %info = $modem->messages_info();
   print "There are $info{unreleased_voice_msg} unread voice messages on $info{stored_voice_msg} total\n";

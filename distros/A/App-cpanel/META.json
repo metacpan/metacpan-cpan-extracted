@@ -42,6 +42,11 @@
             "Mojolicious" : "8.50",
             "perl" : "5.016"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.92"
+         }
       }
    },
    "release_status" : "stable",
@@ -58,6 +63,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.002",
+   "version" : "0.006",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -1,5 +1,5 @@
 package IO::Pager::Perl;
-our $VERSION = '1.02';
+our $VERSION = '1.03'; #Untouched since 1.03
 
 use strict;
 use warnings;
@@ -16,7 +16,8 @@ sub ReadKey;
 sub new {
   my $class = shift;
   my %param = @_;
-  local $ENV{TERM} = $ENV{TERM};
+  local $ENV{TERM} = $ENV{TERM} || '';
+  local $ENV{TERMCAP} = $ENV{TERM} || '';
 
   my %dims = get_size(cols =>$param{cols} ||80,
 		      rows =>$param{rows} ||25,
@@ -94,52 +95,87 @@ sub new {
 		bottom=>	'Bottom',
 		prompt=>	"<h>=help \000<space>=down <b>=back <q>=quit",
 		continue=>	'press any key to continue',
+		searchwrap=>    'No more matches, next search will wrap',
+		nowrap=>        'Text::Wrap unavailable, disabling folding',
 		help=>		<<EOH
- q         quit             \000 h       help
- r C-l     refresh          \000                         
- /         search           \000 ?       search backwards
- n P       next match       \000 p N     previous match
- space C-v page down        \000 b M-v   page up
- enter     line down        \000 y       line up
- d         half page down   \000 u       half page up
- g <       goto top         \000 G >     goto bottom
-   <-      scroll left      \000  ->     scroll right
- m         mark position    \000 '       return to mark
- #         line numbering   \000 \\d+\\n   jump to line \\d+
- C         toogle raw       \000 S       toggle folding
+ q           quit             \000 h       help
+ r C-l       refresh          \000 R       flush buffers
+ /           search           \000 ?       search backwards
+ n P         next match       \000 p N     previous match
+ space C-v   page down        \000 b M-v   page up
+ enter down  line down        \000 y up    line up
+ d           half page down   \000 u       half page up
+ g <         goto top         \000 G >     goto bottom
+   left      scroll left 1 tab\000   right scroll right 1 tab
+ S-left      scroll left 1/2  \000 S-right scroll right 1/2
+ m           mark position    \000 '       return to mark
+ #           line numbering   \000 \\d+\\n   jump to line \\d+
+:n           next file        \000 :p      previous file
+ C           toogle raw       \000 S       toggle folding
 EOH
 	       };
 
-#  $me->{_fnc} = {
-  $me->add_func(
-		'q' => \&close,	       'h' => \&help,
-		'/' => \&search,       '?' => \&hcraes,
-		'n' => \&next_match,   'P' => \&prev_match,
-		'p' => \&prev_match,   'N' => \&prev_match,
-		'r' => \&refresh,      "\cL" => \&refresh,
-		' ' => \&downpage,     "\cv" => \&downpage,  #"\e\[5~"=>\&downpage, #M-down
-		"\n"=> \&downline,     "\e[B" => \&downline,
-		'd' => \&downhalf,     'u' => \&uphalf,
-		'b' => \&uppage,       "\eV" => \&uppage,    #"\e\[6~"=>\&uppage, #M-up
-		'y' => \&upline,       "\e[A" => \&upline,
-		'<' => \&to_top,       "\e[H" => \&to_top,   'g' => \&to_top,
-#"\e\[1;3C"=>\&to_top, #PGUP?
-#"\e\[1;3D"=>\&to_bott,#PGDN?
-		'>' => \&to_bott,      '$' => \&to_bott,     'G' => \&to_bott,
-		"\e0E" => \&to_bott,   "\e0W" => \&to_bott,
-		"\e[D" => \&move_left, "\e[C" => \&move_right,
-		'm' => \&save_mark,    "'" => \&goto_mark,
-		'#' => \&toggle_numbering,
-		'C' => \&toggle_raw,
-		'S' => \&toggle_fold,
-		'/(\d+)/'=>1 #jump to line
-		); #};
+  our %config;
+  add_keys(\&help,      'h', 'H');
+  add_keys(\&close,     'q', 'Q', ':q', ':Q');
+  add_keys(\&refresh,   'r', "\cL", "\cR");
+  add_keys(\&next_match,'n', 'P');
+  add_keys(\&prev_match,'p', 'N');
+  add_keys(\&to_bott,   '>', 'G', '$', "\e>", "\e[F", "\e0E", "\e0W", "\e[4~");
+                                     #M->      ?     End     End     End
+  add_keys(\&downpage,  ' ', 'z', "\cV", , 'f', "\cF", "\e ", "\e[6~"); #M-  PgDn
+  add_keys(\&downhalf,  'd', "\cD");
+  add_keys(\&downline,  'e', 'j', 'J', "\cE", "\cN", "\e[B"); #down
+  add_keys(\&downline_raw, "\n");
+  add_keys(\&upline,    'y', 'k', "\cY", "\cK", 'K', 'Y', "\cP", "\e[A"); #up
+  add_keys(\&uphalf,    'u', "\cU");
+  add_keys(\&uppage,    'w', 'b', "\cB", "\ev", "\e[5~"); #M-v PgUp
+  add_keys(\&to_top,    '<', 'g',      "\e<", "\e[H", "\e0",          "\e[1~");
+                                        #M-<    Home    Home            Home
+  add_keys(\&next_file, ':n', "\e[1;4C");
+  add_keys(\&prev_file, ':p', "\e[1;4D");
+  add_keys(\&save_mark, 'm', "\e[2~"); #Ins
+  add_keys(\&shift_left, "\e\[1;2D", "\e("); #S-left  S-M-9
+  #Cannot have M-[ for left, \e[ conflicts with other codes
+  add_keys(\&shift_right,"\e\[1;2C", "\e)"); #S-right S-M-0
+
+  #          Home  PgUp  PgDn  End   Ins
+  # terminfo khome kpp   knp   kend  kich1
+  # eterm          \E0y  \E0q  \E0s
+  # rxvt     \E[7~ \E[5~ \E[6~ \E[8~ \e[2~ #
+  # xterm    \EOH  \E[5~ \E6~  \EOF  \e[2~ #
+  #nxterm    \e[\C-@           \e[e
+  #"\e\[1;3C"=> #M-left
+  #"\e\[1;3D"=> #M-right
+
+  $me->add_func(%config,
+		'/(\d+)/' => 1,         #jump to line
+		"\e[D" => \&tab_left,   #left
+		"\e[C" => \&tab_right,  #right, 
+		'&' => \&grep,
+		'/' => \&search,
+		'?' => \&hcraes,
+		"'" => \&goto_mark,
+		'#' => \&toggle_num,    #XXX Change toggle* to '-' initiated
+		'C' => \&toggle_raw,    #multi-key input mode like \d+ to
+		'S' => \&toggle_fold,   #mimic less?
+		'R' => \&flush_buffer,
+		':w'=> \&write_buffer,
+	       );
   
   #Mise-en-place; prepare to cook some characters
   #\000-\010\013-\037/@A-HK-Z[\\]^_/
   $me->{_raw}->{chr($_)} = chr(64+$_) foreach (0..8, 11..31);
 
   $me->{_end} = $me->{rows} - 1;
+
+  if( $me->{fold} ){
+    eval "use Text::Wrap";
+    $me->dialog($me->{_I18N}{nowrap} . "\n\n$@") if $@;
+  }
+  if( $@ or not $me->{fold} ){
+    sub wrap {@_}
+  }
 
   $SIG{WINCH} = sub{ $me->resize() };
 
@@ -219,18 +255,22 @@ sub add_text {
     my $extraSum=0;
     for( my $i=0; $i<$lines; $i++ ){
       $me->{_lineNo}->[$i+$me->{_txtN}] = $me->{_txtN}+$i+1-$extraSum;
+
+      #Automark multi-file
+      $me->{_mark}->{$1} = $i+$me->{_txtN} if
+	defined($F[$i]) && $F[$i] =~ m%\cF\c]\cL\cE \[(\d+)/%;
+
       if( defined($F[$i]) && length($F[$i]) > $me->{cols} ){
 	my @G = split/\n/, wrap('', '', $F[$i]);
 	my $extras = scalar(@G);
 	splice(@F, $i, 1, @G);
-
 	#Repeat real line number for logical folded lines
 	$me->{_lineNo}->[$i+$me->{_txtN}+$_] =
 	  $me->{_txtN}+$i+1-$extraSum foreach 1..$extras-1;
 
 	$i += $extras-1;
 	$lines += $extras;
-	$extraSum+=$extras-1;
+	$extraSum += $extras-1;
       }
     }
   }
@@ -249,9 +289,7 @@ sub add_text {
   push @{$me->{_text}}, @F;
   $me->{_txtN} = @{ $me->{_text} }; #-1;
 
-#XXX fix this expression?! shoud not be rows, but instead cursor
-#warn $shown;
-  $me->refresh(); # if $shown <= $me->{rows}; # + $me->{_cursor};
+  $me->refresh(); #XXX if $shown <= $me->{rows}; # + $me->{_cursor};
 }
 
 sub reflow {
@@ -270,19 +308,26 @@ sub reflow {
   $me->add_text( join($/, @text) );
 }
 
+#Capture errant method calls
+sub AUTOLOAD{
+  eval "use Carp";
+  my $me = shift;
+  our $AUTOLOAD =~ s/.*:://;
+  return if $AUTOLOAD eq 'DESTROY';
 
+  local $Text::Wrap::columns=int(.75*$me->{cols});
+  my $msg = wrap('', '', "$AUTOLOAD\n\n". Carp::longmess());
+  $me->beep();
+  $me->dialog("Unknown method $msg", 1);
+}
+
+#$input is pulled outside the subroutine to allow for Esc+x entry of M-x
+#after the deferring to host loop instead of using a TIGHT input loop
+my $input;
 sub more {
   my $me = shift;
   my %param = @_;
   $RT = $me->{RT} = $param{RT};
-
-  if( $me->{fold} ){
-    eval "use Text::Wrap";
-    $me->dialog("Text::Wrap unavailable, disabling wrap mode\n\n$@") if $@;
-  }
-  if( $@ or not $me->{fold} ){
-    sub wrap {@_}
-  }
   
   ReadMode 3; #cbreak
   $| = 1;
@@ -295,72 +340,69 @@ sub more {
 
 
     #INPUT LOOP, revised with inspiration from Term::Screen::getch()
-    my $input='';
+    #my $input=''; #TIGHT
     while( 1 ){
       $me->prompt();					# status line
       my $exit = undef;
 
       my $char = ReadKey($param{RT});
-      #Fall back to parent loop, obviating need for callbacks to implement
-      #tail functionality and for cleaner startup (no preload on piped input)
-      #next unless defined($char);
+      #Defer to host loop, obviating need for callbacks to implement tail
+      #functionality and for cleaner startup (no preload on piped input)
+      #next unless defined($char); #TIGHT
       return 1 unless defined($char);
-      $input .= $char;
+      $me->{_I18N}{status} = $input .= $char;
+      $me->prompt();
+
       unless( ($input=~ /^\e/ and index($me->{_fncRE}, $input)>0 )
 	      || $input =~ /^\d+/
+	      || $input =~ /:+/
 	      || defined($me->{_fnc}->{$input}) ){
-	#&beep();
 	$me->beep($input);
 	$input ='';
 	next;
       }
 
       if( $me->{_fnc}->{$input} ){
-	$input =~ s/\e/^\[/;
 	use B 'svref_2object';
 	my $n = $me->{_fnc}->{$input};
 	$n = svref_2object($n)->GV->NAME;
-#DEBUG	$me->dialog(quotemeta($input)." $n",1);
 	$exit = $me->{_fnc}->{$input}->($me);
-	$input='';
+	$me->{_I18N}{status} = $input = '';
+      }
+      #vi-style input
+      elsif( $input =~ /^:/ ){
+	if( ($char eq "\cG") or ($input eq '::') ){
+	  $me->{_I18N}{status} = $input = '';
+	  $me->prompt();
+	  return 1; }
       }
       #Line-number input
       elsif( $me->{_fnc}->{'/(\d+)/'} and $input =~ /^\d+/ ){
 	if( $char eq "\cH" or ord($char)==127 ){
-	  chop($input); chop($input);
-	}
+	  chop($input); chop($input); }
 	elsif( $char eq "\cG" ){
 	  $me->{_I18N}{status} = $input = '';
 	  $me->prompt();
-	  return 1;
-	}
+	  return 1; }
 	if( $input =~ /^\d+\n$/ ){
 	  chomp($input);
 	  $exit = $input < $me->{_txtN} ? $me->jump($input) : $me->to_bott();
 	  $me->{_I18N}{status} = $input = '';
 	  $me->prompt();
-	  next;
-	}
+	  next; }
+	#XXX need to do something here to handle no-decimal/bogus entry
 	else{
 	  $me->{_I18N}{status} = $input;
-	  $me->prompt();
-	}
+	  $me->prompt(); }
       }
 
-
-##	if( defined $q ){
-##	my $f = $me->{_fnc}->{$q} || \&beep;
-##	# $me->{_I18N}{status} = $q;			#input debugging
-##	$exit = ref($f->($me));
-##      }
-      #XXX DOH! need to expand this condition to only trip if full key has been read
       return 1 if $param{RT} && defined($exit);
     }
   }
   $me->close();
 }
 *less = \&more; *page = \&more;
-#Avid lame single-use warning
+#Avoid lame single-use warning
 my $foo = \&less; $foo = \&page;
 
 
@@ -384,28 +426,36 @@ BEGIN{
 }
 
 #HELPERS
-sub add_func {
+sub add_keys{
+  our %config;
+  my $sub = shift;
+ $config{$_} = $sub foreach @_;
+}
+
+sub add_func{
   my $me = shift;
   my %param = @_;
   while( my($k, $v) = each %param ){
     $me->{_fnc}{$k} = $v;
   }
-  #RegExp::Trie, RegExp::Optimize, List::RegExp
-  $me->{_fncRE} = join '|', #map { quotemeta($_) }
-    sort keys %{ $me->{_fnc} };
+  #XXX RegExp::Trie, List::RegExp? #quotemeta?
+  $me->{_fncRE} = join '|', sort keys %{ $me->{_fnc} };
   #$me->{_fncRE} = qr/^($me->{_fncRE})/;
 }
 
-sub beep {
+sub beep{
   print "\a";
-  my $scan = $_[1];
-  $scan =~ s/([^[:print:]])/sprintf("\\%03o", ord($1))/ge;
-  $_[0]->dialog("Unrecognized command: $scan", 1);
   print $_[0]->{_term}->Tputs('vb') if $_[0]->{visualBell};
+
+  if( defined($_[1]) ){
+    $_[1] =~ s/\e/^[/;
+    $_[1] =~ s/([^[:print:]])/sprintf("\\%03o", ord($1))/ge; #Cook
+    $_[0]->dialog("Unrecognized command: $_[1]", 1);
+  }
 }
 
 # display a prompt, etc
-sub prompt {
+sub prompt{
   my $me = shift;
   $me->{_txtN} ||= 0;
 
@@ -430,7 +480,7 @@ sub prompt {
   print $me->{NOR};					# normal video
 }
 
-sub close {
+sub close{
   ReadMode 0;
   print "\n";
   $| = $SP || 0;
@@ -445,7 +495,7 @@ sub close {
 
 
 # provide help to user
-sub help {
+sub help{
   my $me = shift;
   my $help = $me->{_I18N}{help};
   my $cont = $me->{_I18N}{continue};
@@ -465,7 +515,7 @@ sub help {
   $me->dialog( $help . "\n" . (' 'x$padding) . $cont );
 }
 
-sub dialog {
+sub dialog{
   my($me, $msg, $timeout) = @_;
   $msg = defined($msg) ? $msg : '';
   $timeout = defined($timeout) ? $timeout : 0;
@@ -474,7 +524,7 @@ sub dialog {
   $me->remove_menu();
 }
 
-sub max_width {
+sub max_width{
   my $me = shift;
   my $width = 0;
   foreach (@_){ $width = length($_) if length($_) > $width };
@@ -482,7 +532,7 @@ sub max_width {
 }
 
 # put a box around some text
-sub box_text {
+sub box_text{
   my $me  = shift;
   my @txt = split(/\n/, $_[0]);
   my $width = $me->max_width(@txt);
@@ -493,12 +543,12 @@ sub box_text {
 }
 
 # display a popup menu (or other text)
-sub disp_menu {
+sub disp_menu{
   my $me = shift;
   my $menu = shift;
 
   $me->{_menuRows} = @{[split /\n/, $menu]};
-  print $me->{_term}->Tgoto('cm',0,$me->{rows} - $me->{_menuRows});	# move
+  print $me->{_term}->Tgoto('cm',0, 2);	# move
   print $me->{MENU};					# set color
   my $x = $me->{_term}->Tgoto('RI',0,4);		# 4 transparent spaces
   $menu =~ s/^\s*/$x/gm;
@@ -507,20 +557,17 @@ sub disp_menu {
 }
 
 # remove popup and repaint
-sub remove_menu {
+sub remove_menu{
   my $me = shift;
 
-  my $s = $me->{rows} - $me->{_menuRows};
+  my $s = $me->{_menuRows} +2;
 
   #Allow wipe of incomplete/paused output.
-  #XXX "Bug" in that we get an extra chunk of output after menu closing
   my $pause = $me->{pause};
   $me->{pause} = undef;
 
-  #$me->I18N('status', $s."..".$me->rows()); $me->prompt();
-
   # Fractional restoration instead of full refresh
-  foreach my $n ($s .. $me->{rows}){
+  foreach my $n (2 .. $s){
     print $me->{_term}->Tgoto('cm', 0, $n);		# move
     print $me->{_term}->Tputs('ce');			# clear line
     $me->line($n);
@@ -530,20 +577,38 @@ sub remove_menu {
   $me->{pause} = $pause;
 }
 
+sub flush_buffer{
+  my $me = shift;
+  $me->{_text} = [];
+  $me->{_txtN} = 0;
+  $me->{_lineNo}=[];
+  $me->refresh();
+}
+
 # refresh screen
-sub refresh {
+sub refresh{
   my $me = shift;
 
   print $me->{_term}->Tputs('cl');			# home, clear
   for my $n (0 .. $me->{rows} -1){
     print $me->{_term}->Tgoto('cm', 0, $n);		# move
     print $me->{_term}->Tputs('ce');			# clear line
-    $me->line($n+$me->{_cursor});			# XXX w/o cursor messy
- 							# after menu & refresh
+
+    #Skip cursor ahead to matching line if in grep mode
+    if( $me->{_grep} && defined($me->{_text}->[$me->{_cursor}+$n]) ){
+      until( $me->{_text}->[$me->{_cursor}+$n] =~
+	     m%$me->{_search}|\cF\c]\cL\cE \[\d+/% ){
+        $me->{_cursor}++;
+        last if $me->{_cursor}+$me->{rows}+$n >= $me->{_txtN};
+      }
+    }
+
+    $me->line($n+$me->{_cursor}) if			# XXX w/o cursor messy
+      $me->{_cursor}+$me->{rows}+$n <= $me->{_txtN}     # after menu & refresh
   }
 }
 
-sub line {
+sub line{
   my $me = shift;
   my $n  = shift;
   local $_ = $me->{_text}[$n]||'';
@@ -556,6 +621,8 @@ sub line {
 #              we need to intervene in each of those instances and:
 #              not progress another line of display then add another iteration
 #  return if $me->{squeeze} && $_ eq '' && $prev eq '';
+
+  $me->{_curFile} = $1 if m%\cF\c]\cL\cE \[(\d+)/%;
 
   #Breaks?
   my $pausey = 1 if length($me->{pause}) && defined && /$me->{pause}/;
@@ -572,8 +639,6 @@ sub line {
 
   #Cook control characters
   unless( $me->{raw} ){
-#    s/(?=[\000-\010\013-\037])/^/g;
-#    tr/\000-\010\013-\037/@A-HK-Z[\\]^_/;
     s/([\000-\010\013-\037])/$me->{REV}^$me->{_raw}->{$1}$me->{NOR}/g;
   }
 
@@ -602,22 +667,21 @@ sub line {
   }
 }
 
-sub down_lines {
+sub down_lines{
   my $me = shift;
   my $n  = shift;
   my $t  = $me->{_term};
 
-  for (1 .. $n){
+#  for(my $i=1; $i<=$n; $i++){
+  LINE: for(1..$n){
     if( $me->{_end} >= $me->{_txtN}-1 ){
       exit if $me->{eof} && ref($me->{text}) ne 'CODE';
       if( ref($me->{text}) eq 'CODE' ){
-	$me->add_text( $me->{text}->() );
-      }
+	$me->add_text( $me->{text}->() ); }
       else{
-	&beep; last;
-      }
+	&beep; last; }
     }
-#    else{ #Switch to two statements to allow callback
+    #Two blocks instead of an else to allow input callback
     if( $me->{_end} < $me->{_txtN}-1 ){
       if( length($me->{pause}) && $me->{_end} < $me->{rows}-1 ){
 	print $t->Tgoto('cm',  0, $me->{_end}+1 ); }	# move
@@ -629,7 +693,20 @@ sub down_lines {
       }
 
       print $t->Tputs('ce');				# clear line
-      $me->line( ++$me->{_end} );
+
+      #Skip cursor ahead to matching line if in grep mode
+      if( $me->{_grep} && $me->{_end} < $me->{_txtN} ){
+	until( $me->{_text}->[$me->{_end}] =~
+	       m%$me->{_search}|\cF\c]\cL\cE \[\d+/% ){
+	  $me->{_end}++;
+	  $me->{_cursor}++;
+	  if( $me->{_end} >= $me->{_txtN} ){
+	    $me->{cursor} = $me->{_end} = $me->{_txtN};
+	    last;
+	  }
+	}
+      }
+      $me->line( ++$me->{_end} ) if $me->{_end} <= $me->{_txtN};
       $me->{_cursor}++;
     }
   }
@@ -642,8 +719,10 @@ sub downpage {  $_[0]->down_lines( $_[0]->{rows} );
 #		warn "\n\n", map{$_[0]->{$_}."\n"} qw/rows _cursor _end/;
 }
 sub downline {  $_[0]->down_lines( 1 ); }
+#Term::ReadKey doesn't offer sufficiently fine control; we want CS8 but -OCRNL
+sub downline_raw { $_[0]->down_lines( 1 ); $_[0]->refresh(); }
 
-sub up_lines {
+sub up_lines{
   my $me = shift;
   my $n  = shift;
 
@@ -653,6 +732,13 @@ sub up_lines {
     }else{
       print $me->{_term}->Tgoto('cm',0,0);	# move
       print $me->{_term}->Tputs('sr');		# scroll back
+
+      #XXX Skip cursor back to matching line if in grep mode
+      #XXX this is tough because we want {rows} matching lines
+      #XXX Requires cache of currently grepped lines, then unshift
+      #XXX as we scroll back until we get {rows} new lines or hit top.
+      #XXX finally, displaying the to {rows} of the cache
+
       $me->line( --$me->{_cursor} );
       $me->{_end}--;
     }
@@ -666,7 +752,7 @@ sub uphalf {  $_[0]->up_lines( $_[0]->{rows} / 2 ); }
 
 sub to_top {  $_[0]->jump(0); }
 
-sub to_bott {
+sub to_bott{
   my $me = shift;
   $me->jump( $me->{rows}>$me->{_txtN} ? 0 : $me->{_txtN}-$me->{rows} );
 }
@@ -680,6 +766,7 @@ sub save_mark{
 		      length('[tp] 100% Bottom Mark name?')+1,
 		      $me->{rows});
   my $mark = ReadKey();
+  return if $mark eq "\cG";
   next if $mark eq "'";
   $me->{_mark}->{$mark} = $me->{_cursor};
   $me->I18N('status', '');
@@ -690,6 +777,8 @@ sub goto_mark{
   my $me = shift;
 
   my $mark = ReadKey();
+  return if $mark eq "\cG";
+
   my $jump = $me->{_mark}->{$mark};
   if( $mark eq '^' ){
     $jump = 0;
@@ -707,7 +796,20 @@ sub goto_mark{
   $me->jump( $jump );
 }
 
-sub jump {
+sub prev_file{ $_[0]->next_file('anti') }
+sub next_file{
+  my $me = shift;
+  my $mode = shift || '';
+  my $mark = $me->{_curFile} + ( $mode eq 'anti' ? -1 : 1 );
+  if( exists($me->{_mark}->{$mark}) ){
+    $me->{_mark}->{"'"} = $me->{_cursor};
+    $me->jump( $me->{_mark}->{$mark} ); }
+  else{
+    $me->beep()
+  }
+}
+
+sub jump{
   my $me = shift;
 
   $me->{_cursor} = shift;
@@ -715,14 +817,14 @@ sub jump {
   $me->refresh();
 }
 
-sub move_right {
+sub tab_right{
   my $me = shift;
 
   $me->{_left} += 8;
   $me->refresh();
 }
 
-sub move_left {
+sub tab_left{
   my $me = shift;
 
   $me->{_left} -= 8;
@@ -730,10 +832,30 @@ sub move_left {
   $me->refresh();
 }
 
-sub hcraes{  $_[0]->search(1); }
-sub search {
+sub shift_right{
   my $me = shift;
-  $me->{_hcraes} = shift || 0;
+
+  $me->{_left} += int($me->{cols}/2);
+  $me->refresh();
+}
+
+sub shift_left{
+  my $me = shift;
+
+  $me->{_left} -= int($me->{cols}/2);
+  $me->{_left} = 0 if $me->{_left} < 0;
+  $me->refresh();
+}
+
+
+sub grep{  $_[0]->search(-1); }
+sub hcraes{  $_[0]->search(1); }
+sub search{
+  my $me = shift;
+  my $mode = shift || 0;
+  $me->{_hcraes} = $mode == 1;
+  $me->{_grep} =   $mode == -1;
+  $me->{_searchWrap} = 0 unless $me->{_grep};
 
   # get pattern
   (my($prev), $me->{_search}) = ($me->{_search}, '');
@@ -741,7 +863,7 @@ sub search {
   print $me->{_term}->Tgoto('cm', 0, $me->{rows});	# move bottom
   print $me->{_term}->Tputs('ce');			# clear line
   print $me->{HILT};					# set color
-  print $me->{_hcraes} ? '?' : '/';
+  print $mode ? ( $mode > 0 ? '?' : '&' ) : '/';
 
   while(1){
     my $l = ReadKey();
@@ -761,7 +883,10 @@ sub search {
   print $me->{NOR};					# normal color
   print $me->{_term}->Tgoto('cm', 0, $me->{rows});	# move bottom
   print $me->{_term}->Tputs('ce');			# clear line
-  return if $me->{_search} eq '';
+  if( $me->{_search} eq '' ){
+    $me->refresh();
+    return;
+  }
 
   $me->{_search} = '(?i)'.$me->{_search} unless
     $me->{_search} ne lc($me->{_search});
@@ -786,10 +911,10 @@ sub search {
     $me->refresh();
     return;
   }
+
   # not found
   &beep;
   $me->dialog($me->{_I18N}{404}, 1);
-
   return;
 }
 
@@ -800,11 +925,16 @@ sub next_match{
 
   my $mode=shift;
   if( defined($mode) and $mode ='anti' ){
-    $mode = not $me->{_hcraes};
-  }
+    $mode = not $me->{_hcraes}; }
   else{
     $mode = $me->{_hcraes};
   }
+
+  if( $me->{_searchWrap} ){
+    $me->{_searchWrap} = 0;
+    $me->jump( $mode ? $me->{_txtN} : 0 );
+  }
+
 
   my $i = $mode ? ($me->{_cursor}||0)-1 : ($me->{_cursor})+1;
   my $matched=0;
@@ -814,10 +944,15 @@ sub next_match{
     $matched = $me->{_text}[$i] =~ /$me->{_search}/;
     last if $matched;
   }
+  if( ($i == ($mode ? 0 : $me->{_txtN} )) && ($me->{_searchWrap} == 0) ){
+    $me->dialog($me->I18N('searchwrap'), 1);
+    $me->{_searchWrap} = 1;
+    return;
+  }
   $matched ? $me->jump($i) : &beep;
 }
 
-sub toggle_numbering{
+sub toggle_num{
   my $me = shift;
   $me->{lineNo} = not $me->{lineNo};
 #  $me->reflow();
@@ -837,7 +972,42 @@ sub toggle_fold{
   $me->reflow();
 }
 
-sub dumb_mode {
+
+sub write_buffer{
+  my $me = shift;
+  my $out;
+
+  print $me->{_term}->Tgoto('cm', 0, $me->{rows});	# move bottom
+  print $me->{_term}->Tputs('ce');			# clear line
+  print "Save to: ";
+
+  while(1){
+    my $l = ReadKey();
+    return if $l eq "\cG";
+    last if $l eq "\n" || $l eq "\r";
+
+    if( !defined($l)| $l eq "\e" || $l eq "\cG" ){
+      return;
+    }
+    if( $l eq "\b" || $l eq "\177" ){
+      print "\b \b" if $out ne '';
+      substr($out, -1, 1, '');
+      next;
+    }
+    print $l;
+    $out .= $l;
+  }
+  if( ! -e $out && open(OUT, '>', $out) ){
+    print OUT join($/, @{$me->{_text}});
+    CORE::close(OUT);
+  }
+  else{
+    $me->dialog("ERROR: " . -e $out ? "File exists" : $!)
+  }
+}
+
+
+sub dumb_mode{
   my $me = shift;
   my $end = 0;
 
@@ -876,7 +1046,7 @@ IO::Pager::Perl - Page text a screenful at a time, like more or less
 =head1 DESCRIPTION
 
 This is a module for paging through text one screenful at a time.
-It supports the features you expectcusing the shortcuts you expect.
+It supports the features you expect using the shortcuts you expect.
 
 IO::Pager::Perl is an enhanced fork of L<Term::Pager>.
 
@@ -915,7 +1085,7 @@ Exit at end of file.
 
 =item I<fold> =E<gt>1
 
-Wrap long lines.
+Fold long lines with L<Text::Wrap>.
 
 =item I<lineNo> =E<gt>0
 
@@ -994,7 +1164,7 @@ occur on keypress.
 
 You can also pass a code reference to the I<text> attribute of the constructor
 which will be called when reaching the "end of file"; consequently, it is not
-possible to set the I<eof> flag to exit at end of fie if doing so.
+possible to set the I<eof> flag to exit at end of file if doing so.
 
     $t->new( text=>sub{ } ); #eof=>0 is implied
 
@@ -1005,39 +1175,136 @@ an initial chunk of text to load, and the second the callback.
     my($m, $n)=(1,1);
     $t->new( text=> ["1\n", sub{ ($m,$n)=($n,$m+$n); return "$n\n"} ] );
 
-=head2 Adding Functionality and Internationalization (I18N)
+=head2 User Interface
+
+There are multiple special bookmarks (marks) that can be used in navigation.
+
+=over 4
+
+=item ^ Beginning of file
+
+=item $ End of file
+
+=item ' Previous location
+
+=item " List user-created marks
+
+=back
+
+C<add_text> will automatically create special numeric marks when it encounters
+a special character sequence, allowing the user to jump to predetermined
+points in the buffer. Sequence that match the following regular expression
+
+     /\cF\c]\cL\cE \[(\d+)\// #e.g; ^F^]^L^E [3/4]
+
+will have marks matching $1 created that point at the line of the buffer the
+sequence occurs on.
+
+=head1 CUSTOMIZATION
+
+=head2 add_func
 
 It is possible to extend the features of IO::Pager::Perl by supplying the
 C<add_func> method with a hash of character keys and callback values to be
 invoked upon matching keypress; where \c? represents Control-? and \e?
-represents Alt-? The existing pairings are:
+represents Alt-? The existing mappings are listed below, and lengthier
+descriptions are available in L<tp>.
 
-	'h' => \&help,
-	'q' => \&close,
-	'r' => \&refresh,       #also "\cL"
-	"\n"=> \&downline,      #also "\e[B"
-	' ' => \&downpage,      #also "\cv"
-	'd' => \&downhalf,
-	'b' => \&uppage,        #also "\ev"
-	'y' => \&upline,        #also "\e[A"
-	'u' => \&uphalf,
-	'g' => \&to_top,        #also '<'
-	'G' => \&to_bott,       #also '>'
-	'/' => \&search,
-	'?' => \&hcraes,        #reverse search
-	'n' => \&next_match,    #also 'P'
-	'p' => \&prev_match,    #also 'N'
-	"\e[D" => \&move_left,
-	"\e[C" => \&move_right,
-        'm' => \&save_mark,
-        "'" => \&goto_mark,
-	'#' => \&toggle_numbering,
+=head3 General
+
+=over
+
+=item &help - C<h> or C<H>
+
+=item &close - C<q> or C<Q> or C<:q> or C<:Q>
+
+=item &refresh - C<r> or C<C-l> or C<C-R>
+
+=item &flush_buffer - C<R>
+
+=item &write_buffer - C<:w>
+
+=back
+
+=head3 Navigation
+
+=over
+
+=item &downline - C<ENTER> or C<e> or C<j> or C<J> or C<C-e> or C<C-n> or C<down arrow>
+
+=item &downhalf - C<d> or C<C-d>
+
+=item &downpage - C<SPACE> C<f> or C<z> or C<C-f> or C<C-v> or C<M-space> or C<PgDn>
+
+=item &uppage - C<b> or C<w> or C<C-b> or C<M-v> or C<PgUp>
+
+=item &uphalf - C<u> or C<C-u>
+
+=item &upline - C<k> or C<y> or C<K> or C<Y> or C<C-K> or C<C-P> or C<C-Y> or C<up arrow>
+
+=item &to_bott - C<G> or C<$> or C<E<gt>> or C<M-E<gt>> or C<End>
+
+=item &to_top - C<g> or C<E<lt>> or C<M-E<lt>>
+
+=item &tab_left - C<left arrow>
+
+=item &shift_left - C<S-left arrow>
+
+=item &tab_right - C<right arrow>
+
+=item &shift_right - C<S-right arrow>
+
+=item &next_file - C<:n> or C<S-M-right arrow>
+
+=item &prev_file - C<:p> or C<S-M-left arrow>
+
+=back
 
 And a special sequence of a number followed by enter analogous to:
 
 	'/(\d+)/'   => \&jump(\1)        
 
 if the value for that key is true.
+
+=head3 Bookmarks
+
+=over
+
+=item &save_mark - C<m> or C<Ins>
+
+=item &goto_mark - C<'>
+
+=back
+
+=head3 Search
+
+=over
+
+=item &search - /
+
+=item &hcraes - ? 
+
+=item &next_match - n or P
+
+=item &prev_match - p or N 
+
+=item &grep - &
+
+=back
+
+=head3 Options
+
+=over
+
+=item &toggle_num - #
+
+=item &toggle_fold - S
+
+=item &toggle_raw - C
+
+=back
+
+=head2 I18N
 
 The C<dialog> method may be particularly useful when enhancing the pager.
 It accepts a string to display, and an optional timeout to sleep for
@@ -1063,13 +1330,16 @@ C<I18N> method to replace the default text or save text for your own interface.
 
 Current text elements available for customization are:
 
-    404      - search text not found dialog
-    bottom   - prompt line end of file indicator
-    continue - text to display at the bottom of the help dialog
-    help     - help dialog text, a list of keys and their functions
-    prompt   - displayed at the bottom of the screen
-    status   - brief message to include in the status line
-    top      - prompt line start of file indicator
+    404        - search text not found dialog
+    bottom     - prompt line end of file indicator
+    continue   - text to display at the bottom of the help dialog
+    help       - help dialog text, a list of keys and their functions
+    prompt     - displayed at the bottom of the screen
+    status     - brief message to include in the status line
+    top        - prompt line start of file indicator
+    bottom     - prompt line end of file indicator
+    searchwrap - message that pager is about to loop for more matches
+    nowrap     - notice that missing Text::Wrap prevents folding toggle
 
 I<status> is intended for sharing short messages not worthy of a dialog
 e.g; when debugging. You will need to call the C<prompt> method after
@@ -1078,29 +1348,11 @@ and call C<prompt> again to clear the message.
 
 =head3 Scalability
 
-The help text will be split in two horizontally on a null character if the
-text is wider than the display, and shown in two sequential dialogs.
+The help text will be split in two horizontally on a null character if
+the text is wider than the display, and shown in two sequential dialogs.
 
 Similarly, the status text will be cropped at a null character for narrow
 displays.
-
-=head2 User Interface
-
-=head3 Marks
-
-There are multiple special marks
-
-=over 4
-
-=item ^ Beginning of file
-
-=item $ End of file
-
-=item ' Previous location
-
-=item " List user-created marks
-
-=back
 
 =head1 CAVEATS
 

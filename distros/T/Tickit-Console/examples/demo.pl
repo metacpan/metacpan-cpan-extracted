@@ -5,7 +5,8 @@ use warnings;
 
 use Tickit::Async;
 use Tickit::Console;
-use Tickit::Widgets qw( Frame );
+use Tickit::Widgets 0.30
+   qw( Frame=0.32 );
 
 use IO::Async::Loop;
 use IO::Async::Timer::Periodic;
@@ -89,10 +90,9 @@ my $framedtab = $console->add_tab(
       my ( $scroller ) = @_;
 
       return Tickit::Widget::Frame->new(
-         child => $scroller,
          style => { linetype => "single" },
          title => "The scroller",
-      )
+      )->set_child( $scroller );
    },
 );
 

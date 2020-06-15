@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 OpenTracing::Role - common attributes and methods for OpenTracing
@@ -11,6 +12,43 @@ required by a OpenTracing compliant implementation. If these are missing, then
 it may cause issues being compatible with other modules and or frameworks that
 need the deeper voodoo magic inside Opentracing.
 
+
+=head2 Provided roles
+
+This distribution provides the following roles:
+
+=over 4
+
+=item L<OpenTracing::Role::ContextReference>
+
+References are used by C<Tracer> methods C<start_span> and C<start_active_span>
+to create "casual span references"
+
+=item L<OpenTracing::Role::Scope>
+
+A C<Scope> formalizes the activation and deactivation of a C<Span>, usually from
+a CPU standpoint.
+
+=item L<OpenTracing::Role::ScopeManager>
+
+The C<ScopeManager> interface abstracts both the activation of C<Span> instances
+via C<activate_span> and access to an active C<Scope> via C<get_active_scope>.
+
+=item L<OpenTracing::Role::Span>
+
+A C<Span> represents a unit of work executed on behalf of a C<Trace>.
+
+=item L<OpenTracing::Role::SpanContext>
+
+A C<SpanContext> represents C<Span> state that must be propagated to descendant
+C<Span>'s and across process boundaries.
+
+=item L<OpenTracing::Role::Tracer>
+
+The C<Tracer> is the entry point API between instrumentation code and the
+tracing implementation.
+
+=back
 
 
 =head1 AUTHOR
@@ -30,7 +68,3 @@ This library is distributed in the hope that it will be useful, but it is
 provided "as is" and without any express or implied warranties.
 
 For details, see the full text of the license in the file LICENSE.
-
-
-
-=cut

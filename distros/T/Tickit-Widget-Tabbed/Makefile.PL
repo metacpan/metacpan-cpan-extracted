@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.026",
   "NAME" => "Tickit::Widget::Tabbed",
   "PREREQ_PM" => {
-    "Object::Pad" => "0.22",
+    "Object::Pad" => "0.27",
 
     "List::Util" => "1.26",
     "Scalar::Util" => 0,

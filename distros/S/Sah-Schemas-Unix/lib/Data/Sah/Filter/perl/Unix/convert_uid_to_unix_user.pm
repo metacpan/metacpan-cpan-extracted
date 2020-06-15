@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::Unix::convert_uid_to_unix_user;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-11'; # DATE
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use 5.010001;
 use strict;
@@ -26,7 +26,7 @@ sub filter {
 
     $res->{expr_filter} = join(
         "",
-        "do { my \$tmp = $dt; if (\$tmp =~ /\\A[0-9]+\\z/) { my \@pw = getpwuid(\$tmp); return [\"UID \$tmp has no associated username\", \$tmp] unless \@pw; return [undef, \$pw[0]] } [undef, \$tmp] }",
+        "do { my \$tmp = $dt; if (\$tmp =~ /\\A[0-9]+\\z/) { my \@pw = getpwuid(\$tmp); \@pw ? [undef, \$pw[0]] : [\"UID \$tmp has no associated username\", \$tmp] } else { [undef, \$tmp] } }",
     );
 
     $res;
@@ -47,7 +47,7 @@ Data::Sah::Filter::perl::Unix::convert_uid_to_unix_user
 
 =head1 VERSION
 
-This document describes version 0.010 of Data::Sah::Filter::perl::Unix::convert_uid_to_unix_user (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Data::Sah::Filter::perl::Unix::convert_uid_to_unix_user (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
 
 =for Pod::Coverage ^(meta|filter)$
 

@@ -25,7 +25,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.871';
+our $VERSION = '1.872';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -82,8 +82,8 @@ sub TIEHASH {
 # STORE ( key, value )
 
 sub STORE {
-   my ( $key, $data, $keys ) = ( $_[1], @{ $_[0] } );
-   push @{ $keys }, "$key" unless ( exists $data->{ $key } );
+   my ( $key, $data ) = ( $_[1], @{ $_[0] } );
+   push @{ $_[0]->[_KEYS] }, "$key" unless ( exists $data->{ $key } );
 
    $data->{ $key } = $_[2];
 }
@@ -145,7 +145,7 @@ sub DELETE {
       %{ $indx } ? $_[0]->_fill_index : do {
          $_[0]->purge if ${ $gcnt };
          my $i; $i = ${ $begi } = 0;
-         $indx->{ $_ } = $i++ for @{ $keys };
+         $indx->{ $keys->[$_] } = $i++ for 0..$#{ $keys };
       };
 
       delete $indx->{ $key };
@@ -214,7 +214,6 @@ sub _fill_index {
    # from end of list
    if ( !exists $indx->{ $keys->[-1] } ) {
       my $i = ${ $begi } + @{ $keys } - 1;
-
       for my $k ( reverse @{ $keys } ) {
          $i--, next unless ( defined $k );
          last if ( exists $indx->{ $k } );
@@ -225,7 +224,6 @@ sub _fill_index {
    # from start of list
    else {
       my $i = ${ $begi };
-
       for my $k ( @{ $keys } ) {
          $i++, next unless ( defined $k );
          last if ( exists $indx->{ $k } );
@@ -396,7 +394,10 @@ sub clone {
       }
    }
    else {
-      @keys = $self->_keys;
+      @keys = ${ $self->[_GCNT] }
+         ? grep defined($_), @{ $self->[_KEYS] }
+         : @{ $self->[_KEYS] };
+
       %data = %{ $self->[_DATA] };
    }
 
@@ -444,26 +445,18 @@ sub keys {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find({ getkeys => 1 }, @_);
    }
-   else {
-      if ( wantarray ) {
+   elsif ( wantarray ) {
+      if ( @_ ) {
          my $data = $self->[_DATA];
-         @_ ? map { exists $data->{ $_ } ? $_ : undef } @_
-            : $self->_keys;
+         return map { exists $data->{ $_ } ? $_ : undef } @_;
       }
-      else {
-         scalar CORE::keys %{ $self->[_DATA] };
-      }
+      ${ $self->[_GCNT] }
+         ? grep defined($_), @{ $self->[_KEYS] }
+         : @{ $self->[_KEYS] };
    }
-}
-
-# _keys ( )
-
-sub _keys {
-   my ( $self ) = @_;
-
-   ${ $self->[_GCNT] }
-      ? grep defined($_), @{ $self->[_KEYS] }
-      : @{ $self->[_KEYS] };
+   else {
+      scalar CORE::keys %{ $self->[_DATA] };
+   }
 }
 
 # pairs ( key [, key, ... ] )
@@ -476,15 +469,17 @@ sub pairs {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find(@_);
    }
+   elsif ( wantarray ) {
+      my $data = $self->[_DATA];
+      if ( @_ ) {
+         return map { $_ => $data->{ $_ } } @_;
+      }
+      ${ $self->[_GCNT] }
+         ? map { $_ => $data->{ $_ } } grep defined($_), @{ $self->[_KEYS] }
+         : map { $_ => $data->{ $_ } } @{ $self->[_KEYS] };
+   }
    else {
-      if ( wantarray ) {
-         my $data = $self->[_DATA];
-         @_ ? map { $_ => $data->{ $_ } } @_
-            : map { $_ => $data->{ $_ } } $self->_keys;
-      }
-      else {
-         scalar CORE::keys %{ $self->[_DATA] };
-      }
+      scalar CORE::keys %{ $self->[_DATA] };
    }
 }
 
@@ -498,14 +493,16 @@ sub values {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find({ getvals => 1 }, @_);
    }
+   elsif ( wantarray ) {
+      if ( @_ ) {
+         return @{ $self->[_DATA] }{ @_ };
+      }
+      ${ $self->[_GCNT] }
+         ? @{ $self->[_DATA] }{ grep defined($_), @{ $self->[_KEYS] } }
+         : @{ $self->[_DATA] }{ @{ $self->[_KEYS] } };
+   }
    else {
-      if ( wantarray ) {
-         @_ ? @{ $self->[_DATA] }{ @_ }
-            : @{ $self->[_DATA] }{ $self->_keys };
-      }
-      else {
-         scalar CORE::keys %{ $self->[_DATA] };
-      }
+      scalar CORE::keys %{ $self->[_DATA] };
    }
 }
 
@@ -608,26 +605,30 @@ sub sort {
 
    # Return sorted keys, leaving the data intact.
 
+   my $keys = ${ $self->[_GCNT] }
+      ? [ grep defined($_), @{ $self->[_KEYS] } ]
+      : $self->[_KEYS];
+
    if ( defined wantarray ) {
       if ( $by_key ) {                                # by key
          if ( $alpha ) { ( $desc )
-          ? CORE::sort { $b cmp $a } $self->_keys
-          : CORE::sort { $a cmp $b } $self->_keys;
+          ? CORE::sort { $b cmp $a } @{ $keys }
+          : CORE::sort { $a cmp $b } @{ $keys };
          }
          else { ( $desc )
-          ? CORE::sort { $b <=> $a } $self->_keys
-          : CORE::sort { $a <=> $b } $self->_keys;
+          ? CORE::sort { $b <=> $a } @{ $keys }
+          : CORE::sort { $a <=> $b } @{ $keys };
          }
       }
       else {                                          # by value
          my $d = $self->[_DATA];
          if ( $alpha ) { ( $desc )
-          ? CORE::sort { $d->{$b} cmp $d->{$a} } $self->_keys
-          : CORE::sort { $d->{$a} cmp $d->{$b} } $self->_keys;
+          ? CORE::sort { $d->{$b} cmp $d->{$a} } @{ $keys }
+          : CORE::sort { $d->{$a} cmp $d->{$b} } @{ $keys };
          }
          else { ( $desc )
-          ? CORE::sort { $d->{$b} <=> $d->{$a} } $self->_keys
-          : CORE::sort { $d->{$a} <=> $d->{$b} } $self->_keys;
+          ? CORE::sort { $d->{$b} <=> $d->{$a} } @{ $keys }
+          : CORE::sort { $d->{$a} <=> $d->{$b} } @{ $keys };
          }
       }
    }
@@ -636,23 +637,23 @@ sub sort {
 
    elsif ( $by_key ) {                                # by key
       if ( $alpha ) { ( $desc )
-       ? $self->_reorder( CORE::sort { $b cmp $a } $self->_keys )
-       : $self->_reorder( CORE::sort { $a cmp $b } $self->_keys );
+       ? $self->_reorder( CORE::sort { $b cmp $a } @{ $keys } )
+       : $self->_reorder( CORE::sort { $a cmp $b } @{ $keys } );
       }
       else { ( $desc )
-       ? $self->_reorder( CORE::sort { $b <=> $a } $self->_keys )
-       : $self->_reorder( CORE::sort { $a <=> $b } $self->_keys );
+       ? $self->_reorder( CORE::sort { $b <=> $a } @{ $keys } )
+       : $self->_reorder( CORE::sort { $a <=> $b } @{ $keys } );
       }
    }
    else {                                             # by value
       my $d = $self->[_DATA];
       if ( $alpha ) { ( $desc )
-       ? $self->_reorder( CORE::sort { $d->{$b} cmp $d->{$a} } $self->_keys )
-       : $self->_reorder( CORE::sort { $d->{$a} cmp $d->{$b} } $self->_keys );
+       ? $self->_reorder( CORE::sort { $d->{$b} cmp $d->{$a} } @{ $keys } )
+       : $self->_reorder( CORE::sort { $d->{$a} cmp $d->{$b} } @{ $keys } );
       }
       else { ( $desc )
-       ? $self->_reorder( CORE::sort { $d->{$b} <=> $d->{$a} } $self->_keys )
-       : $self->_reorder( CORE::sort { $d->{$a} <=> $d->{$b} } $self->_keys );
+       ? $self->_reorder( CORE::sort { $d->{$b} <=> $d->{$a} } @{ $keys } )
+       : $self->_reorder( CORE::sort { $d->{$a} <=> $d->{$b} } @{ $keys } );
       }
    }
 }
@@ -748,6 +749,17 @@ sub getset {
    $old;
 }
 
+# setnx ( key, value )
+
+sub setnx {
+   my ( $key, $data ) = ( $_[1], @{ $_[0] } );
+   return 0 if ( exists $data->{ $key } );
+
+   $data->{ $key } = $_[2];
+
+   1;
+}
+
 # len ( key )
 # len ( )
 
@@ -799,7 +811,7 @@ MCE::Shared::Ordhash - An ordered hash class featuring tombstone deletion
 
 =head1 VERSION
 
-This document describes MCE::Shared::Ordhash version 1.871
+This document describes MCE::Shared::Ordhash version 1.872
 
 =head1 DESCRIPTION
 
@@ -846,6 +858,7 @@ new level of performance, for a pure-Perl ordered hash implementation.
  }
 
  $val   = $oh->set( $key, $val );
+ $ret   = $oh->setnx( $key, $val );         # set only if the key exists
  $val   = $oh->get( $key );
  $val   = $oh->delete( $key );              # del is an alias for delete
  $bool  = $oh->exists( $key );
@@ -1268,6 +1281,15 @@ Sets the value of the given hash key and returns its new value.
  $val = $oh->set( "key", "value" );
  $val = $oh->{ "key" } = "value";
 
+=head2 setnx ( key, value )
+
+Sets the value of a hash key, only if the key does not exist. Returns a 1
+for new key or 0 if the key already exists and no operation was performed.
+
+ $ret = $oh->setnx( "key", "value" );
+
+Current API available since 1.872.
+
 =head2 shift
 
 Removes and returns the first key-value pair or value in scalar context of the
@@ -1423,7 +1445,7 @@ L<Hash::Ordered> by David Golden.
 MCE::Shared has only one shared-manager process which is by design. Therefore,
 re-factored tombstone deletion with extras for lesser impact to the rest of the
 library. This module differs in personality from Hash::Ordered mainly for
-compatibility with other classes included with MCE::Shared.
+compatibility with the other classes included with MCE::Shared.
 
 The following simulates a usage pattern inside L<MCE::Hobo> involving random
 key deletion. For example, an application joining a list of Hobos provided by

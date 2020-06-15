@@ -145,22 +145,7 @@ HYPERREF
     if ($args{bidi}) {
         push @out, '\\usepackage{bidi}';
     }
-
-    # if disabled, use
-    # \newcommand{\footnoteB}[1]{\{\{#1\}\}}
-
-    if ($args{enable_secondary_footnotes}) {
-    # bigfoot after bidi
-        push @out, <<'BIGFOOT';
-% footnote handling
-\usepackage[fragile]{bigfoot}
-\usepackage{perpage}
-\DeclareNewFootnote{default}
-BIGFOOT
-    }
-
-    push @out, <<'MUSE';
-MUSE
+    push @out, '';
     return join("\n", @out);
 }
 

@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'Test-Sah-Schema'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ test-sah-schema-modules - Test all Schema modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.008 of test-sah-schema-modules (from Perl distribution Test-Sah-Schema), released on 2020-03-04.
+This document describes version 0.009 of test-sah-schema-modules (from Perl distribution Test-Sah-Schema), released on 2020-06-13.
 
 =head1 SYNOPSIS
 

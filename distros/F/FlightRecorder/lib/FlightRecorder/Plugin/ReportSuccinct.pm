@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'FlightRecorder::Plugin::Report';
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 # METHODS
 
@@ -71,7 +71,7 @@ Succinct FlightRecorder Report Generator
   use FlightRecorder;
   use FlightRecorder::Plugin::ReportSuccinct;
 
-  my $f = FlightRecorder->new;
+  my $f = FlightRecorder->new(auto => undef);
   my $r = FlightRecorder::Plugin::ReportSuccinct->new(flight_recorder => $f);
 
   $f->begin('main');
@@ -147,6 +147,25 @@ L<FlightRecorder>.
   # given: synopsis
 
   $r->generate
+
+=back
+
+=cut
+
+=head2 output
+
+  output() : Str
+
+The output method generates a verbose report of activity captured by
+L<FlightRecorder> and prints it to STDOUT.
+
+=over 4
+
+=item output example #1
+
+  # given: synopsis
+
+  $r->output
 
 =back
 

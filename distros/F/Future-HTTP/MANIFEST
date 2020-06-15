@@ -18,6 +18,7 @@ README
 README.mkdn
 t/00-load.t
 t/01-anyevent-http.t
+t/01-backend-selection.t
 t/01-backends-anyevent.t
 t/01-backends-default.t
 t/01-backends-mojolicious.t

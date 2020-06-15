@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/VivaldiUtils.pm','script/kill-vivaldi','script/pause-vivaldi','script/ps-vivaldi','script/terminate-vivaldi','script/unpause-vivaldi','script/vivaldi-is-paused'];
+my $filenames = ['lib/App/VivaldiUtils.pm','script/kill-vivaldi','script/list-vivaldi-profiles','script/pause-vivaldi','script/ps-vivaldi','script/restart-vivaldi','script/start-vivaldi','script/terminate-vivaldi','script/unpause-vivaldi','script/vivaldi-has-processes','script/vivaldi-is-paused','script/vivaldi-is-running'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

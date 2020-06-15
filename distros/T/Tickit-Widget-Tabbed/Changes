@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-Tabbed
 
+0.023     2020-06-13
+          [CHANGES]
+           * Update to Object::Pad 0.27
+              + BUILD block syntax
+              + package+class declaration to keep metadata parsers happy
+
 0.022     2020-04-17
           [CHANGES]
            * Use Object::Pad

@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.871';
+our $VERSION = '1.872';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -124,14 +124,12 @@ sub keys {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find({ getkeys => 1 }, @_);
    }
+   elsif ( wantarray ) {
+      @_ ? map { exists $self->{ $_ } ? $_ : undef } @_
+         : CORE::keys %{ $self };
+   }
    else {
-      if ( wantarray ) {
-         @_ ? map { exists $self->{ $_ } ? $_ : undef } @_
-            : CORE::keys %{ $self };
-      }
-      else {
-         scalar CORE::keys %{ $self };
-      }
+      scalar CORE::keys %{ $self };
    }
 }
 
@@ -145,14 +143,12 @@ sub pairs {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find(@_);
    }
+   elsif ( wantarray ) {
+      @_ ? map { $_ => $self->{ $_ } } @_
+         : %{ $self };
+   }
    else {
-      if ( wantarray ) {
-         @_ ? map { $_ => $self->{ $_ } } @_
-            : %{ $self };
-      }
-      else {
-         scalar CORE::keys %{ $self };
-      }
+      scalar CORE::keys %{ $self };
    }
 }
 
@@ -166,14 +162,12 @@ sub values {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find({ getvals => 1 }, @_);
    }
+   elsif ( wantarray ) {
+      @_ ? @{ $self }{ @_ }
+         : CORE::values %{ $self };
+   }
    else {
-      if ( wantarray ) {
-         @_ ? @{ $self }{ @_ }
-            : CORE::values %{ $self };
-      }
-      else {
-         scalar CORE::keys %{ $self };
-      }
+      scalar CORE::keys %{ $self };
    }
 }
 
@@ -272,6 +266,15 @@ sub getset {
    $old;
 }
 
+# setnx ( key, value )
+
+sub setnx {
+   return 0 if ( exists $_[0]->{ $_[1] } );
+   $_[0]->{ $_[1] } = $_[2];
+
+   1;
+}
+
 # len ( key )
 # len ( )
 
@@ -311,7 +314,7 @@ MCE::Shared::Hash - Hash helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Hash version 1.871
+This document describes MCE::Shared::Hash version 1.872
 
 =head1 DESCRIPTION
 
@@ -345,6 +348,7 @@ A hash helper class for use as a standalone or managed by L<MCE::Shared>.
  }
 
  $val   = $ha->set( $key, $val );
+ $ret   = $ha->setnx( $key, $val );         # set only if the key exists
  $val   = $ha->get( $key );
  $val   = $ha->delete( $key );              # del is an alias for delete
  $bool  = $ha->exists( $key );
@@ -721,6 +725,15 @@ Sets the value of the given hash key and returns its new value.
 
  $val = $ha->set( "key", "value" );
  $val = $ha->{ "key" } = "value";
+
+=head2 setnx ( key, value )
+
+Sets the value of a hash key, only if the key does not exist. Returns a 1
+for new key or 0 if the key already exists and no operation was performed.
+
+ $ret = $ha->setnx( "key", "value" );
+
+Current API available since 1.872.
 
 =head2 values ( key [, key, ... ] )
 

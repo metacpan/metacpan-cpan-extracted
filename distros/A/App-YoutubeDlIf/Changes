@@ -1,0 +1,10 @@
+0.002   2020-04-12  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Remove dependency of --log-file to --if-not-yet for now
+	  because the --log-file's default will cause an error everytime
+	  unless --if-not-yet is always specified.
+
+
+0.001   2020-04-05  Released-By: PERLANCAR
+
+        - First release, superseding youtube-dl-if-not-yet.

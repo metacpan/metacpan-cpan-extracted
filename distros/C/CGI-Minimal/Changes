@@ -1,3 +1,7 @@
+1.30 13 Jun 2020 - Maintainer update. Relicensed under the MIT License.
+                   Minor tweaks to build process. Added meta_merge
+                   information for GitHub. No functional changes.
+
 1.29 21 Aug 2007 - Documentation fix to performance hints section.
                    No functional changes.
  

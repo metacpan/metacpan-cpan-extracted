@@ -1,5 +1,22 @@
 Imager release history.  Older releases can be found in Changes.old
 
+Imager 1.012 - 14 Jun 2020
+============
+
+ - Imager has moved to github.
+
+ - T1lib support is deprecated
+
+ - added guassian2 filter which allows separate filter radii for vertical
+   and horizontal.  Thanks to Leolo.
+   https://rt.cpan.org/Ticket/Display.html?id=129769
+
+ - freetype2 support can now use pkg-config to configure itself.
+
+ - added red, green, blue, alpha methods to color objects.
+
+ - eliminate use vars.
+
 Imager 1.011 - 7 Mar 2019
 ============
 

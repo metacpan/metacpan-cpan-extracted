@@ -12,4 +12,5 @@ t/t90std.t			Standard font tests for W32
 W32.pm
 W32.xs
 win32.c
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -5,9 +5,10 @@
 #      Paul Evans, 2011-2015 -- leonerd@leonerd.org.uk
 
 use 5.026;
-use Object::Pad 0.22;
+use Object::Pad 0.27;
 
-class Tickit::Widget::Tabbed 0.022
+package Tickit::Widget::Tabbed 0.023;
+class Tickit::Widget::Tabbed
         extends Tickit::ContainerWidget;
 
 Tickit::Widget->VERSION("0.12");
@@ -121,7 +122,7 @@ method ribbon { $_ribbon }
 
 has @_child_window_geometry;
 
-method BUILD ( %args ) {
+BUILD ( %args ) {
         $_tab_class    = delete($args{tab_class});
         $_ribbon_class = delete($args{ribbon_class});
 
@@ -430,7 +431,7 @@ has $_active = 0;
 has $_on_activated;
 has $_on_deactivated;
 
-method BUILD ( $tabbed, %args ) {
+BUILD ( $tabbed, %args ) {
         weaken( $_tabbed = $tabbed );
 
         $_widget = $args{widget};
@@ -563,21 +564,16 @@ Rather than use the default built-in object class for tab objects, a
 C<Tickit::Widget::Tabbed> or subclass thereof can return objects in another
 class instead. This is most useful for subclasses of the tabbed widget itself.
 
-To perform this, create a subclass of C<Tickit::Widget::Tabbed::Tab> with a
-constructor having the following behaviour:
+To perform this, create a subclass of C<Tickit::Widget::Tabbed::Tab>. Since
+version 0.022 this module is implemented using L<Object::Pad>, so you can rely
+on having that available for implementing a subclass:
 
- sub new
- {
-         my $class = shift;
-         my ( $tabbed, %args ) = @_;
+ use Object::Pad;
 
-         ...
+ class MyCustomTabClass extends Tickit::Widget::Tabbed::Tab;
 
-         my $self = $class->SUPER::new( $tabbed, %args );
-
-         ...
-
-         return $self;
+ BUILD {
+        ...
  }
 
 Arrange for this class to be used by the tabbed widget either by passing its
@@ -585,12 +581,12 @@ name as a constructor argument called C<tab_class>, or by overriding a method
 called C<TAB_CLASS>.
 
  my $tabbed = Tickit::Widget::Tabbed->new(
-         tab_class => "Tab::Class::Name"
+         tab_class => "MyCustomTabClass"
  );
 
 or
 
- use constant TAB_CLASS => "Tab::Class::Name";
+ use constant TAB_CLASS => "MyCustomTabClass";
 
 =head1 CUSTOM RIBBON CLASS
 

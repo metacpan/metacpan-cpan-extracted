@@ -28,7 +28,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Date
   homepage: https://metacpan.org/release/Sah-Schemas-Date
   repository: git://github.com/perlancar/perl-Sah-Schemas-Date.git
-version: '0.010'
+version: '0.013'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

@@ -15,7 +15,7 @@ subtest "pass on arguments for 'new_child_of'" => sub {
     
     undef @test_params;
     
-    my $duck_spancontext = bless {}, 'MyDuck::SpanContext';
+    my $duck_spancontext = bless {}, 'MyStub::SpanContext';
     
     lives_ok {
         MyTest::ContextReference->new_child_of( $duck_spancontext )
@@ -36,7 +36,7 @@ subtest "pass on arguments for 'new_follows_from'" => sub {
     
     undef @test_params;
     
-    my $duck_spancontext = bless {}, 'MyDuck::SpanContext';
+    my $duck_spancontext = bless {}, 'MyStub::SpanContext';
     
     lives_ok {
         MyTest::ContextReference->new_follows_from( $duck_spancontext )
@@ -139,7 +139,7 @@ sub new_follows_from {
 sub get_referenced_context {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::SpanContext'
+    return bless {}, 'MyStub::SpanContext'
     
 };
 
@@ -164,10 +164,12 @@ BEGIN {
 
 
 
-package MyDuck::SpanContext;
+package MyStub::SpanContext;
 
-sub get_baggage_item;
-sub with_baggage_item;
+sub get_baggage_item   { ... };
+sub get_baggage_items  { ... };
+sub with_baggage_item  { ... };
+sub with_baggage_items { ... };
 
 
 

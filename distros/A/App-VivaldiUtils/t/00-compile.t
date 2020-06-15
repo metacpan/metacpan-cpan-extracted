@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 12 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/VivaldiUtils.pm'
@@ -14,11 +14,16 @@ my @module_files = (
 
 my @scripts = (
     'script/kill-vivaldi',
+    'script/list-vivaldi-profiles',
     'script/pause-vivaldi',
     'script/ps-vivaldi',
+    'script/restart-vivaldi',
+    'script/start-vivaldi',
     'script/terminate-vivaldi',
     'script/unpause-vivaldi',
-    'script/vivaldi-is-paused'
+    'script/vivaldi-has-processes',
+    'script/vivaldi-is-paused',
+    'script/vivaldi-is-running'
 );
 
 # no fake home requested

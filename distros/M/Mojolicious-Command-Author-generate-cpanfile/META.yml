@@ -3,6 +3,7 @@ abstract: 'cpanfile generator command'
 author:
   - 'Bernhard Graf <augensalat@gmail.com>'
 build_requires:
+  List::Util: '1.39'
   Test::More: '0.99'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -26,13 +27,13 @@ no_index:
 provides:
   Mojolicious::Command::Author::generate::cpanfile:
     file: lib/Mojolicious/Command/Author/generate/cpanfile.pm
-    version: '0.01'
+    version: '0.10'
 requires:
   Mojolicious: '8.0'
 resources:
   bugtracker: https://gitlab.com/augensalat/perl-mojolicious-command-author-generate-cpanfile/issues
   homepage: https://gitlab.com/augensalat/perl-mojolicious-command-author-generate-cpanfile
   repository: git://gitlab.com/augensalat/perl-mojolicious-command-author-generate-cpanfile.git
-version: '0.01'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

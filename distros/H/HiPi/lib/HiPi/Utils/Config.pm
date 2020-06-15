@@ -41,8 +41,6 @@ sub new {
     $params{'_configkey'} = '';
     
     $params{default}->{'hipi-config-version'} = $VERSION;
-    
-    use Data::Dumper;
         
     my $fileroot = ( $> ) ? qq($ENV{HOME}/.hipi-perl) : '/etc/hipi-perl';
     my $filename = ( $> ) ? 'user.conf' : 'global.conf';

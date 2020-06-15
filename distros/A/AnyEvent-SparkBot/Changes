@@ -36,3 +36,5 @@
 1.011 
   -- Removed old vendor doc links
   -- Added missing meetings api and pod
+1.012
+  -- Added uploadFile interface

@@ -87,6 +87,20 @@ $chip->mount(
    $adapter->check_and_clear( '$chip->trigger and ->read_adc' );
 }
 
+# ->default_trigger_rate
+{
+   $adapter->expect_write( "\x85" ); # trigger at 30s/sec
+   $adapter->expect_readwrite( "\xC9\x00\x00\x00" )
+      ->returns( "\x00\x12\x34\x60" );
+
+   $chip->default_trigger_rate = 30;
+   $chip->trigger->get;  # defaults to 120s/sec
+   is( $chip->read_adc->get, 0x123460,
+      '$chip->read_adc returns result' );
+
+   $adapter->check_and_clear( '$chip->trigger after ->default_trigger_rate' );
+}
+
 # ->read_adc_ratio
 {
    $adapter->expect_readwrite( "\xC9\x00\x00\x00" )
@@ -126,6 +140,37 @@ $chip->mount(
    $chip->write_selfcal_gain( 0xabcdef )->get;
 
    $adapter->check_and_clear( '$chip->selfcal' );
+}
+
+# GPIO adapter
+{
+   my $gpioproto = $chip->as_gpio_adapter->make_protocol( "GPIO" )->get;
+
+   is_deeply( [ $gpioproto->list_gpios ], [qw( GPIO1 GPIO2 GPIO3 GPIO4 )],
+      '$gpioproto->list_gpios' );
+
+   $adapter->expect_write( "\xC4\x11" );
+
+   $gpioproto->write_gpios( { GPIO1 => 1 } )->get;
+
+   $adapter->check_and_clear( '$gpioproto->write_gpios' );
+
+
+   $adapter->expect_write( "\xC4\x33" );
+
+   $gpioproto->write_gpios( { GPIO2 => 1 } )->get;
+
+   $adapter->check_and_clear( '$gpioproto->write_gpios preserves existing' );
+
+
+   $adapter->expect_readwrite( "\xC5\x00" )
+      ->returns( "\x00\x33" );
+
+   is_deeply( $gpioproto->read_gpios( [ 'GPIO3' ] )->get,
+      { GPIO3 => 0 },
+      'result of $gpioproto->read_gpios' );
+
+   $adapter->check_and_clear( '$gpioproto->read_gpios' );
 }
 
 done_testing;

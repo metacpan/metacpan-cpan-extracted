@@ -53,7 +53,7 @@
    "provides" : {
       "HiPi" : {
          "file" : "lib/HiPi.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       },
       "HiPi::Class" : {
          "file" : "lib/HiPi/Class.pm",
@@ -61,7 +61,7 @@
       },
       "HiPi::Constant" : {
          "file" : "lib/HiPi/Constant.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       },
       "HiPi::Device" : {
          "file" : "lib/HiPi/Device.pm",
@@ -93,11 +93,11 @@
       },
       "HiPi::Energenie" : {
          "file" : "lib/HiPi/Energenie.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       },
       "HiPi::Energenie::Command" : {
          "file" : "lib/HiPi/Energenie/Command.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       },
       "HiPi::Energenie::ENER314" : {
          "file" : "lib/HiPi/Energenie/ENER314.pm",
@@ -105,7 +105,7 @@
       },
       "HiPi::Energenie::ENER314_RT" : {
          "file" : "lib/HiPi/Energenie/ENER314_RT.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       },
       "HiPi::GPIO" : {
          "file" : "lib/HiPi/GPIO.pm",
@@ -447,6 +447,10 @@
          "file" : "lib/HiPi/Interface.pm",
          "version" : "0.81"
       },
+      "HiPi::Interface::BME280" : {
+         "file" : "lib/HiPi/Interface/BME280.pm",
+         "version" : "0.82"
+      },
       "HiPi::Interface::Common::HD44780" : {
          "file" : "lib/HiPi/Interface/Common/HD44780.pm",
          "version" : "0.81"
@@ -455,9 +459,9 @@
          "file" : "lib/HiPi/Interface/Common/MCP23X17.pm",
          "version" : "0.81"
       },
-      "HiPi::Interface::Common::MIHomeAdapter" : {
-         "file" : "lib/HiPi/Interface/Common/MIHomeAdapter.pm",
-         "version" : "0.81"
+      "HiPi::Interface::Common::Weather" : {
+         "file" : "lib/HiPi/Interface/Common/Weather.pm",
+         "version" : "0.82"
       },
       "HiPi::Interface::DS18X20" : {
          "file" : "lib/HiPi/Interface/DS18X20.pm",
@@ -520,7 +524,7 @@
       },
       "HiPi::Interface::EnergenieSwitch" : {
          "file" : "lib/HiPi/Interface/EnergenieSwitch.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       },
       "HiPi::Interface::HTADCI2C" : {
          "file" : "lib/HiPi/Interface/HTADCI2C.pm",
@@ -540,7 +544,7 @@
       },
       "HiPi::Interface::HopeRF69" : {
          "file" : "lib/HiPi/Interface/HopeRF69.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       },
       "HiPi::Interface::IS31FL3730" : {
          "file" : "lib/HiPi/Interface/IS31FL3730.pm",
@@ -596,7 +600,7 @@
       },
       "HiPi::Interface::MS5611" : {
          "file" : "lib/HiPi/Interface/MS5611.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       },
       "HiPi::Interface::MicroDotPHAT" : {
          "file" : "lib/HiPi/Interface/MicroDotPHAT.pm",
@@ -667,7 +671,7 @@
       },
       "HiPi::Utils::BitBuffer" : {
          "file" : "lib/HiPi/Utils/BitBuffer.pm",
-         "version" : "0.81"
+         "version" : "0.82"
       },
       "HiPi::Utils::Config" : {
          "file" : "lib/HiPi/Utils/Config.pm",
@@ -689,6 +693,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.81",
+   "version" : "0.82",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

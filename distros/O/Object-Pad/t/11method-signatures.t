@@ -14,8 +14,8 @@ use Object::Pad;
 class List {
    has @values;
 
-   method push(@more) { push @values, @more }
-   method nshift($n)  { splice @values, 0, $n }
+   method push ( @more ) { push @values, @more }
+   method nshift ( $n )  { splice @values, 0, $n }
 }
 
 {
@@ -29,11 +29,11 @@ class List {
 class Greeter {
    has $_who;
 
-   method BUILD(%args) {
+   BUILD ( %args ) {
       $_who = $args{who};
    }
 
-   method greet($message = "Hello, $_who") {
+   method greet ( $message = "Hello, $_who" ) {
       return $message;
    }
 }

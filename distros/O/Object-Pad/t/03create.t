@@ -13,7 +13,7 @@ class Point {
    has $x = 0;
    has $y = 0;
 
-   method BUILD {
+   BUILD {
       ( $x, $y ) = @_;
    }
 
@@ -34,7 +34,7 @@ class WithBuildargs {
       return ( 4, 5, 6 );
    }
 
-   method BUILD {
+   BUILD {
       @buildall = @_;
    }
 }
@@ -82,7 +82,7 @@ class WithBuildargs {
 {
    my $BUILD_invoked;
    class One {
-      method BUILD { $BUILD_invoked++ }
+      BUILD { $BUILD_invoked++ }
    }
    class Two extends One {}
 

@@ -19,7 +19,7 @@ use constant hipi_export_constants();
 use Scalar::Util qw( weaken isweak refaddr );
 use Carp;
 
-our $VERSION ='0.81';
+our $VERSION ='0.82';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();
@@ -31,12 +31,15 @@ our $interrupt_verbose = 0;
 # who knows what we can catch
 $SIG{INT}  = \&_call_registered_and_exit;
 $SIG{TERM} = \&_call_registered_and_exit;
-$SIG{PIPE} = \&_call_registered_and_exit;
 $SIG{HUP}  = \&_call_registered_and_exit;
 
 sub is_raspberry_pi { return HiPi::RaspberryPi::is_raspberry() ; }
 
 sub alt_func_version { return HiPi::RaspberryPi::alt_func_version() ; }
+
+sub catch_sigpipe {
+    $SIG{PIPE} = \&_call_registered_and_exit;
+}
 
 sub twos_compliment {
     my( $class, $value, $numbytes) = @_;

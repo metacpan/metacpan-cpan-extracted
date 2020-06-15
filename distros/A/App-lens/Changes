@@ -1,5 +1,13 @@
-Revision history for App-lens
+0.021   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
-0.01    2015-07-25 (PERLANCAR)
+	- [bugfix] Didn't handle ANSI color/SGR codes 90-97 & 100-107.
+
+
+0.020   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add a transform 'ct' (use ColorTransform::* module).
+
+
+0.01    2015-07-25  Released-By: PERLANCAR
 
         - First release.

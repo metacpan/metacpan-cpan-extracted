@@ -17,20 +17,17 @@ $ENV{OPENTRACING_INTERFACE} = 1 unless exists $ENV{OPENTRACING_INTERFACE};
 
 
 
-package MyTestClass;
-
+package MyStub;
 use Moo;
+
+sub build_scope { ... };
 
 with 'OpenTracing::Role::ScopeManager';
 
-# add required subs
-#
-sub activate_span { ... }
-sub get_active_scope { ... }
 
 
 package main;
 
-interface_ok('MyTestClass', 'OpenTracing::Interface::ScopeManager');
+interface_ok('MyStub', 'OpenTracing::Interface::ScopeManager');
 
 done_testing();

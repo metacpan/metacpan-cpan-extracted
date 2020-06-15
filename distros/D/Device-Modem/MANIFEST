@@ -14,4 +14,21 @@ Makefile.PL
 MANIFEST
 META.yml			Module meta-data (added by MakeMaker)
 README
-test.pl
+t/00-report-prereqs.dd
+t/00-report-prereqs.t
+t/01-load.t
+t/02-coms.t
+xt/author/00-compile.t
+xt/author/addressbook.t
+xt/author/echo.t
+xt/author/offhook.t
+xt/author/pod-coverage.t
+xt/author/pod-spell.t
+xt/author/pod-syntax.t
+xt/author/registers.t
+xt/author/status.t
+xt/author/test-version.t
+xt/author/usrobotics.t
+xt/release/changes_has_content.t
+xt/release/kwalitee.t
+META.json                                Module JSON meta-data (added by MakeMaker)

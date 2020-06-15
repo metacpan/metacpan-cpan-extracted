@@ -1,9 +1,9 @@
 package ColorThemes::Test;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'ColorThemes-Test'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: A collection of color themes, mainly for testing
@@ -20,7 +20,7 @@ ColorThemes::Test - A collection of color themes, mainly for testing
 
 =head1 VERSION
 
-This document describes version 0.002 of ColorThemes::Test (from Perl distribution ColorThemes-Test), released on 2020-06-09.
+This document describes version 0.003 of ColorThemes::Test (from Perl distribution ColorThemes-Test), released on 2020-06-13.
 
 =head1 HOMEPAGE
 

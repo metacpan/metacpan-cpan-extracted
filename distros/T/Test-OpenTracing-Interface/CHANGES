@@ -1,6 +1,25 @@
 CHANGE LOG
 ==========
 
+2020-06-14   v0.21.0
+--------------------
+
+Add and rename methods for new version of OpenTracing::Interface 'v0.202.x'
+
+
+2020-06-13   v0.20.1
+--------------------
+
+Add WARNING about the OT::Interface v0.201.x being covered
+
+
+2020-06-13   v0.20.0
+--------------------
+
+Version number issues only
+
+
+
 2020-05-13   v0.02
 ------------------
 

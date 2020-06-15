@@ -10,7 +10,7 @@ use Device::Modem;
 # Init modem
 my $port = '/dev/ttyS0';
 my $baud = 9600;
-my $modem = new Device::Modem ( port => $port );
+my $modem = Device::Modem->new( port => $port );
 
 die "Can't connect to port $port!\n" unless $modem->connect( baudrate => $baud );
 print "Connected to $port.\n\n";
@@ -53,4 +53,3 @@ while( ! $received_call ) {
 }
 
 $modem->disconnect();
-

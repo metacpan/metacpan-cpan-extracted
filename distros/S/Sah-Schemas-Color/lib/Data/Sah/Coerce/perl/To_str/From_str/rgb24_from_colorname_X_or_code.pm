@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code;
 
-# AUTHOR
-our $DATE = '2020-03-08'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'Sah-Schemas-Color'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,10 +33,13 @@ sub coerce {
         "",
         "do { ", (
             "my \$tmp = lc $dt;",
-            "if (\$tmp =~ /\\A\#?([0-9a-f]{6})\\z/) { return [undef, \$1] } ",
-            "unless (\%__Sah::colorcodes_X) { tie \%__Sah::colorcodes_X, 'Graphics::ColorNames', 'X' } ",
-            "if (exists \$__Sah::colorcodes_X{\$tmp}) { return [undef, \$__Sah::colorcodes_X{\$tmp}] } ",
-            "[\"Unknown color name \\'\$tmp\\'\"]", ),
+            "if (\$tmp =~ /\\A\#?([0-9a-f]{6})\\z/) { [undef, \$1] } ",
+            "else { ",
+            "  unless (\%__Sah::colorcodes_X) { tie \%__Sah::colorcodes_X, 'Graphics::ColorNames', 'X' } ",
+            "  if (exists \$__Sah::colorcodes_X{\$tmp}) { [undef, \$__Sah::colorcodes_X{\$tmp}] } ",
+            "  else { [\"Unknown color name \\'\$tmp\\'\"] } ",
+            "} ",
+        ),
         "}",
     );
     $res;
@@ -57,7 +60,7 @@ Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code - Coer
 
 =head1 VERSION
 
-This document describes version 0.012 of Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code (from Perl distribution Sah-Schemas-Color), released on 2020-03-08.
+This document describes version 0.013 of Data::Sah::Coerce::perl::To_str::From_str::rgb24_from_colorname_X_or_code (from Perl distribution Sah-Schemas-Color), released on 2020-06-13.
 
 =head1 SYNOPSIS
 

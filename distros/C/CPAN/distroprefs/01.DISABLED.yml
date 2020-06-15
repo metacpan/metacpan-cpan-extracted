@@ -16,6 +16,7 @@ match:
     ^(?x:
     .^   # never matches, only purpose is to let things align nicely
     |.+/Moose-1.99                           # rt.cpan.org 66211
+    |.+/Panda-XS-2\.1\.                      # deprecated https://rt.cpan.org/Ticket/Display.html?id=130234
     |.+/Perl6/                               # perl5 only
     |.+/Test-Simple-2.00_                    # rt.cpan.org 66317
     |.+/Win32(API)?-[A-RT-Za-z]              # Win32-ShellQuote
@@ -79,12 +80,14 @@ match:
     |BOOK/Net-Proxy-0.13                     # hangs always
     |BOWMANBS/Audio-Ecasound-\d              # hangs very early: RT 32101
     |BRONDSEM/Mail-SpamAssassin-Plugin-OpenPGP-1.0.4.tar.gz
+    |BRYCE/SVG-Metadata-0.28.tar.gz          # looks like abandoned since 2005
     |BSCHMAL/parrot-0.6.0.tar.gz             # hangs during configure with 5.10
     |BSUGARS/IPC-Shareable-0.60.tar.gz       # hangs
     |BSUGARS/nsapi_perl-0.24.tar.gz          # seems abandoned since 1998
     |BTROTT/Catalyst-Plugin-AtomServer-0.04  # seems abandoned since 2006
     |BTROTT/WWW-Blog-Metadata-0.02           # ExtUtils::AutoInstall 0.56 http://rt.cpan.org/Ticket/Display.html?id=40601
     |BWILLIAM/AltaVista-SDKLinguistics-3.02.tar.gz # looks like abandoned since 2001
+    |CAFFIEND/font_ft2_0.1.0.tgz             # only fails on cpantesters
     |CAIDAPERL/Chart-Graph-\d                # hangs Makefile.PL: RT 33541
     |CAPOEIRAB/WWW-Salesforce-               # demands username and passwd
     |CEBJYRE/Task-BeLike-Cebjyre-\d          # hangs somewhere
@@ -142,6 +145,7 @@ match:
     |EWILHELM/HTTP-Server-Simple-Er-v0.0.3.tar.gz # hangs on some perls
     |FIBO/PNI-Node-Tk-                       # hangs after t/PNI-Node-Tk.t
     |FCO/treadsemulate/threads-emulate-0     # hangs in 00-load.t on 32642
+    |FDULAU/Graph-Chart-0.65                 # looks like abandonded since 2012
     |FROGGS/Alien-SDL-1.418                  # questions
     |FreeHAL                                 # David Cantrell warns that it is a 137 MB thingy
     |GAFFER/Relations-Abstract-0.94.tar.gz   # seems abandoned sincce 2001
@@ -151,6 +155,7 @@ match:
     |GEOTIGER/Oracle-Trigger-\d              # may call both CPANPLUS::install and CPAN::install
     |GGARAND/PerlQt-3.008.tar.gz             # disk scans taking forever
     |GKNAUSS/WebService-Upcoming             # for members only
+    |GOLOGO/Podcast-ESLPodcast-Splitter-v0.0.1 # only fails on cpantesters
     |GONERI/Ocsinventory-Agent-0.0.8.tar.gz  # hangs
     |GONERI/Ocsinventory-Agent-\d            # hanger
     |GRICHTER/Apache-SessionX-2.01.tar.gz    # user input required
@@ -178,6 +183,7 @@ match:
     |HOPCROFTS/Nagios-WebTransact-\d         # asks for a server and port
     |HOPCROFTS/Nagios-WebTransact-Timed-\d   # asks for a server and port
     |HORROCKS/CGI-SpeedyCGI-2.22.tar.gz      # looks like abendoned since 2003
+    |IDERRICK/WWW-VieDeMerde-0.21.tar.gz     # fails since 2010
     |IKRUGLOV/Sereal-Encoder-4\.\d+_\d+.tar.gz
     |.*/DbFramework-\d                       # asks questions but I have not time
     |ILYAM/HTTP-WebTest-2.04.tar.gz          # looks like abandoned since 2003
@@ -186,6 +192,7 @@ match:
     |INGY/Module-Install-TestML-0.02.tar.gz  # unsuited for testing: https://github.com/testml-lang/testml/wiki/TestML-and-CPAN
     |ISHIGAKI/PPM-Make-\d                    # asks questions
     |IVAN/Business-OnlinePayment-eSelectPlus-\d # hangs with 5.14.0-357
+    |IVAN/Net-APP-0.2.tar.gz                 # looks like abandoned since 2001
     |IX/Apache-Wombat-0.5.1.tar.gz           # asks questions
     |JANL/Net-Server-0.99.6.1                # hangs
     |JANPAZ/Font-TFM-\d                      # asks for path to tfm files
@@ -240,11 +247,13 @@ match:
     |LBAXTER/Openview-Message-0.03.tar.gz
     |LBROCARD/Devel-ebug-HTTP-0.32           # http://rt.cpan.org/Ticket/Display.html?id=40599
     |LDS/Bio-SamTools-\d                     # requires non-CPAN prereq
+    |LEIFHED/perldap-1.4.tar.gz              # looks like abandoned since 1999
     |LEOCHARRE/WWW-Autosite-                 # asks question, does not use prompt RT 35081
     |LGODDARD/Tk-Wizard-2.158.tar.gz
     |LTP/Audio-Play-MPlayer-\d               # hangs
     |LDS/Bio-BigFile-1.07.tar.gz             # https://rt.cpan.org/Ticket/Display.html?id=56916
     |LUISMUNOZ/IO-File-Log-1.01.tar.gz       # seems like abandoned since 2002
+    |LUISMUNOZ/Mail-Abuse-1.026.tar.gz       # seems like abandoned since 2007
     |LUPE/Filesys-SamFS-\d                   # have no SamFS
     |LUSHE/Egg-Release-DBI                   # brings laptop to its knees RT #39239
     |LUSOL/tkjuke-2.2.1.tar.gz               # asks questions
@@ -285,7 +294,6 @@ match:
     |MSERGEANT/XML-miniXQL-0.04.tar.gz       # rest in peace: missing dependency decl on XML::Parser but so old (1999) that I do not want to RT it
     |MSHILTONJ/CGI-Test-\d                   # asks if it should strip Carp::Datum calls
     |MSROTH/Db-Documentum-\d                 # press return to continue...
-    |MTHURN/Net-Address-Ethernet-\d          # interactive questions that we cannot answer as a bot
     |MTHURN/WWW-Search-Yahoo-\d              # hangs in t/china.t
     |MTROWBRI/HTTP-ProxySelector-Persistent-0.02.tar.gz # looks like abandoned since 2007
     |MWS/ResourcePool-Resource-SOAP-Lite-\d  # asks questions
@@ -306,6 +314,7 @@ match:
     |PEVANS/IPC-PerlSSH-\d                   # asks for a password during testing
     |PEVANS/IO-Async-Loop-Glib-0.20          # hangs after t/12share-timer.t (in t/15share-child.t)
     |PFARR/Net-SMS-Clickatell-SOAP-
+    |PHONYBONE/Data-Babel-Client-0.02.tar.gz # looks like abandoned since circa 2011
     |PHILIPS/DBIx-MyParse-\d                 # too complicated to set up (mysql source etc.)
     |PHISH/XML-LibXML-Common-0.13.tar.gz     # could cause a downgrade (yes it did)
     |PIERS/Jabber-mod_perl-0.15.tar.gz       # user interaction required
@@ -359,6 +368,7 @@ match:
     |STEVAN/FCGI-Engine-\d                   # 0.04 hangs on t/002_basic_with_listen
     |STEVENC/WWW-Myspace-\d                  # tests take too long
     |STIGMATA/RAS-AS5200-1.04.tar.gz         # looks like abandoned since 2000
+    |STIGMATA/RAS-HiPerARC-1.03.tar.gz       # looks like abandoned since 2000
     |STODGHIL/SOAP-Clean-0.02.tar.gz         # looks like abandoned since 2003
     |STRYTOAST/Data-Pageset-Variable-0.03    # seems to be abandoned
     |STRYTOAST/PluceneSimple-1.04.tar.gz     # seems to be abandoned
@@ -405,6 +415,7 @@ match:
     |XANTUS/MojoX-AIO-0.02.tar.gz            # hangs
     |XAOINC/XAO-FS-1.0                       # avoid older version
     |XERN/Bio-MedChunker-0.02.tar.gz
+    |XERN/Bio-Medpost-0.04.tar.gz            # looks like abandoned since 2005
     |XERN/CGI-QuickApp-\d                    # hangs immediately
     |XERN/Lingua-EN-GeniaTagger-0.01.tar.gz  # looks like abandonded since 2006
     |XERXES/Microsoft-AdCenter-[1-7]\.\d+\.tar.gz # avoid non-latest version (8.11)

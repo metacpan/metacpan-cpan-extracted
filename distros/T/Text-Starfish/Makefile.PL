@@ -1,7 +1,5 @@
 use ExtUtils::MakeMaker;
 
-# $Id: $
-
 WriteMakefile(
     'NAME'		=> 'Text::Starfish',
     'ABSTRACT'          => 'Perl-based Framework for '.
@@ -11,7 +9,10 @@ WriteMakefile(
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
        (
       #ABSTRACT_FROM => 'Starfish.pm', # retrieve abstract from module
-       AUTHOR     => 'Vlado Keselj http://www.cs.dal.ca/~vlado') : ()),
+	AUTHOR     => 'Vlado Keselj http://web.cs.dal.ca/~vlado and '.
+	              'contributing authors',
+	LICENSE          => 'perlartistic',
+       ) : ()),
     'dist'  => {'COMPRESS'=>'gzip', 'SUFFIX' => 'gz'},
     'clean' => {FILES => "tmp* Text *~"},
     EXE_FILES => [ 'starfish' ],

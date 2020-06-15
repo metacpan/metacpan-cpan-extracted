@@ -63,15 +63,31 @@ static void stage_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
   }
 }
 
+static bool stage_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *value)
+{
+  if(!hv_fetchs(GvHV(PL_hintgv), "t::stages/filter_attr-capture", 0))
+    return false;
+
+  AV *av = newAV();
+  av_push(av, SvREFCNT_inc(attr));
+  av_push(av, SvREFCNT_inc(value));
+
+  sv_setrv(get_sv("t::stages::captured", GV_ADD), (SV *)av);
+  return true;
+}
+
 static const struct XSParseSublikeHooks parse_stages_hooks = {
+  .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS,
   .permit          = stage_permit,
   .pre_subparse    = stage_pre_subparse,
   .post_blockstart = stage_post_blockstart,
   .pre_blockend    = stage_pre_blockend,
   .post_newcv      = stage_post_newcv,
+
+  .filter_attr     = stage_filter_attr,
 };
 
-#line 75 "t/stages.c"
+#line 91 "t/stages.c"
 #ifndef PERL_UNUSED_VAR
 #  define PERL_UNUSED_VAR(var) if (0) var = var
 #endif
@@ -215,7 +231,7 @@ S_croak_xs_usage(const CV *const cv, const char *const params)
 #  define newXS_deffile(a,b) Perl_newXS_deffile(aTHX_ a,b)
 #endif
 
-#line 219 "t/stages.c"
+#line 235 "t/stages.c"
 #ifdef __cplusplus
 extern "C"
 #endif
@@ -240,12 +256,12 @@ XS_EXTERNAL(boot_t__stages)
 
     /* Initialisation Section */
 
-#line 68 "t/stages.xs"
+#line 84 "t/stages.xs"
   boot_xs_parse_sublike(0);
 
   register_xs_parse_sublike("stages", &parse_stages_hooks);
 
-#line 249 "t/stages.c"
+#line 265 "t/stages.c"
 
     /* End of Initialisation Section */
 

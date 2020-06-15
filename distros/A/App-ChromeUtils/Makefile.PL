@@ -14,10 +14,15 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-ChromeUtils",
   "EXE_FILES" => [
+    "script/chrome-has-processes",
     "script/chrome-is-paused",
+    "script/chrome-is-running",
     "script/kill-chrome",
+    "script/list-chrome-profiles",
     "script/pause-chrome",
     "script/ps-chrome",
+    "script/restart-chrome",
+    "script/start-chrome",
     "script/terminate-chrome",
     "script/unpause-chrome"
   ],
@@ -25,10 +30,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::ChromeUtils",
   "PREREQ_PM" => {
-    "App::BrowserUtils" => "0.002",
+    "App::BrowserUtils" => "0.008",
+    "Chrome::Util::Profile" => "0.004",
+    "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+    "Data::Sah::Compiler::perl::TH::any" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
     "Data::Sah::Compiler::perl::TH::bool" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
+    "Data::Sah::Compiler::perl::TH::str" => 0,
     "Data::Sah::Filter::perl::Unix::check_uid_exists" => 0,
     "Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid" => 0,
     "Log::ger" => "0.037",
@@ -45,7 +54,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,10 +62,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::BrowserUtils" => "0.002",
+  "App::BrowserUtils" => "0.008",
+  "Chrome::Util::Profile" => "0.004",
+  "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
+  "Data::Sah::Compiler::perl::TH::any" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
   "Data::Sah::Compiler::perl::TH::bool" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
+  "Data::Sah::Compiler::perl::TH::str" => 0,
   "Data::Sah::Filter::perl::Unix::check_uid_exists" => 0,
   "Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid" => 0,
   "File::Spec" => 0,

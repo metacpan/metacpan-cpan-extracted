@@ -25,6 +25,8 @@
 
 # TODO: perhaps use a layered approach to the database schema
 
+# TODO: Use https://github.com/mapbox/geocoder-abbreviations/blob/master/tokens/en.json for the abbreviations
+
 use 5.010;
 use strict;
 use warnings;
@@ -196,6 +198,35 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20852,
 		}, {
+			'LAT' => 39.2244603797302,
+			'LON' => -77.449615439877,
+			'STREET' => 'MOUTH OF MONOCACY RD',
+			'CITY' => 'DICKERSON',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20842,
+		}, {
+			'NAME' => 'PATAPSCO VALLEY STATE PARK',
+			'LAT' => 39.29491,
+			'LON' => -76.78051,
+			'NUMBER' => 8020,
+			'STREET' => 'BALTIMORE NATIONAL PIKE',
+			'CITY' => 'ELLICOTT CITY',
+			'COUNTY' => 'HOWARD',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 21043,
+		}, {
+			'NAME' => 'UTICA DISTRICT PARK',
+			'LAT' => 39.5167883333333,
+			'LON' => -77.4015166666667,
+			'CITY' => 'FREDERICK',
+			'COUNTY' => 'FREDERICK',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 21701,
+		}, {
 			'NAME' => 'ALBERT EINSTEIN HIGH SCHOOL',
 			'LAT' => 39.03869019,
 			'LON' => -77.0682871,
@@ -260,11 +291,31 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
 		}, {
+			'LAT' => 39.017633,
+			'LON' => -77.049551,
+			'NUMBER' => 9904,
+			'STREET' => 'GARDINER AVE',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20902,
+		}, {
 			'NAME' => 'FOREST GLEN MEDICAL CENTER',
 			'LAT' => 39.016042,
 			'LON' => -77.042148,
 			'NUMBER' => 9801,
 			'STREET' => 'GEORGIA AVE',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20902,
+		}, {
+			'LAT' => 39.019385,
+			'LON' => -77.049779,
+			'NUMBER' => 2322,
+			'STREET' => 'HILDAROSE DR',
 			'CITY' => 'SILVER SPRING',
 			'COUNTY' => 'MONTGOMERY',
 			'STATE' => 'MD',

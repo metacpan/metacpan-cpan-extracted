@@ -39,14 +39,18 @@ my %urls = (
 	# 'https://geocode.nigelhorne.com/lib/Geo/Coder/Free/MaxMind/databases/cities.sql' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.sql',
 	# 'http://download.maxmind.com/download/worldcities/worldcitiespop.txt.gz' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
 	# This data are 7 years out of date, and are unconsistent with the Geonames database
-	'https://github.com/apache/commons-csv/blob/master/src/test/resources/perf/worldcitiespop.txt.gz?raw=true' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
+	'https://github.com/apache/commons-csv/blob/master/src/test/resources/org/apache/commons/csv/perf/worldcitiespop.txt.gz?raw=true' => 'lib/Geo/Coder/Free/MaxMind/databases/cities.csv.gz',
 	'http://download.geonames.org/export/dump/allCountries.zip' => 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.zip',
 );
 
 # unlink('lib/Geo/Coder/Free/MaxMind/databases/cities.sql');
 
 foreach my $url(keys %urls) {
-	next if(-r $urls{$url});
+	my $file = $urls{$url};
+	if(-r $file) {
+		# Don't bother downloading if the file is less than a week old
+		next if(-M $file < 7);
+	}
 	if(eval { require HTTP::Cache::Transparent; }) {
 		HTTP::Cache::Transparent->import();
 		my $cachedir;
@@ -65,7 +69,6 @@ foreach my $url(keys %urls) {
 	}
 
 	my $download = 0;
-	my $file = $urls{$url};
 	if(-r $file) {
 		if((-M $file) > 1) {
 			$download = 1;
@@ -80,7 +83,7 @@ foreach my $url(keys %urls) {
 			print "Moving $path to $file\n";
 			rename $path, $file or die "$file: $!";
 		} elsif(my $err = $ff->error(1)) {
-			die $err;
+			die "$url: $err";
 		} else {
 			die "There was a problem downloading $url";
 		}

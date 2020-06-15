@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_int::From_str::convert_id_dow_name_to_num;
 
-# AUTHOR
-our $DATE = '2019-11-28'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Date-ID'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -63,7 +63,7 @@ Data::Sah::Coerce::perl::To_int::From_str::convert_id_dow_name_to_num - Convert 
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Coerce::perl::To_int::From_str::convert_id_dow_name_to_num (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
+This document describes version 0.005 of Data::Sah::Coerce::perl::To_int::From_str::convert_id_dow_name_to_num (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::tz_offset_lax;
 
-our $DATE = '2020-03-03'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = ["int",[{description=>"\nThis schema allows timezone offsets that are not known to exist, e.g. 1 second\n(+00:00:01). If you only want ot allow timezone offsets that are known to exist,\nsee the `date::tz_offset` schema.\n\nA coercion from these form of string is provided:\n\n    UTC\n\n    UTC-14 or UTC+12 or UTC+12:45 or UTC-00:25:21\n    -14 or +12, -1400 or +12:00\n\nA coercion from timezone name is also provided.\n\n",examples=>[{data=>"",valid=>0},{data=>"UTC",res=>0,valid=>1},{data=>3600,res=>3600,valid=>1},{data=>-43200,res=>-43200,valid=>1},{data=>-12,res=>-43200,valid=>1},{data=>-1200,res=>-43200,valid=>1},{data=>"-12:00",res=>-43200,valid=>1},{data=>"UTC-12",res=>-43200,valid=>1},{data=>"UTC-1200",res=>-43200,valid=>1},{data=>"UTC+12:45",res=>45900,valid=>1},{data=>"UTC-13",valid=>0},{data=>"UTC+12:01",res=>43260,summary=>"Unknown offset",valid=>1}],max=>50400,min=>-43200,summary=>"Timezone offset in seconds from UTC","x.completion"=>sub{package Sah::Schema::date::tz_offset;require Complete::TZ;require Complete::Util;my(%args) = @_;Complete::Util::combine_answers(Complete::TZ::complete_tz_offset('word', $args{'word'}), Complete::TZ::complete_tz_name('word', $args{'word'}))},"x.perl.coerce_rules"=>["From_str::tz_offset_strings"]}],["date::tz_offset","int"]];
+our $rschema = ["int",[{description=>"\nThis schema allows timezone offsets that are not known to exist, e.g. 1 second\n(+00:00:01). If you only want ot allow timezone offsets that are known to exist,\nsee the `date::tz_offset` schema.\n\nA coercion from these form of string is provided:\n\n    UTC\n\n    UTC-14 or UTC+12 or UTC+12:45 or UTC-00:25:21\n    -14 or +12, -1400 or +12:00\n\nA coercion from timezone name is also provided.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>0,value=>"UTC"},{valid=>1,validated_value=>3600,value=>3600},{valid=>1,validated_value=>-43200,value=>-43200},{valid=>1,validated_value=>-43200,value=>-12},{valid=>1,validated_value=>-43200,value=>-1200},{valid=>1,validated_value=>-43200,value=>"-12:00"},{valid=>1,validated_value=>-43200,value=>"UTC-12"},{valid=>1,validated_value=>-43200,value=>"UTC-1200"},{valid=>1,validated_value=>45900,value=>"UTC+12:45"},{valid=>0,value=>"UTC-13"},{summary=>"Unknown offset",valid=>1,validated_value=>43260,value=>"UTC+12:01"}],max=>50400,min=>-43200,summary=>"Timezone offset in seconds from UTC","x.completion"=>sub{package Sah::Schema::date::tz_offset;require Complete::TZ;require Complete::Util;my(%args) = @_;Complete::Util::combine_answers(Complete::TZ::complete_tz_offset('word', $args{'word'}), Complete::TZ::complete_tz_name('word', $args{'word'}))},"x.perl.coerce_rules"=>["From_str::tz_offset_strings"]}],["date::tz_offset","int"]];
 
 1;
 # ABSTRACT: Timezone offset in seconds from UTC
@@ -20,7 +20,7 @@ Sah::SchemaR::date::tz_offset_lax - Timezone offset in seconds from UTC
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::date::tz_offset_lax (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::SchemaR::date::tz_offset_lax (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

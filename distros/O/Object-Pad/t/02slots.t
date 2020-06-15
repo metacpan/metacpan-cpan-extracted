@@ -31,7 +31,7 @@ class AllTheTypes {
    has @array;
    has %hash;
 
-   method BUILD {
+   BUILD {
       push @array, 456;
       $hash{789} = 10;
    }

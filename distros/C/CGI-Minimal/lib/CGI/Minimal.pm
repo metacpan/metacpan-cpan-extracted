@@ -16,7 +16,7 @@ $CGI::Minimal::_allow_hybrid_post_get   = 0;
 $CGI::Minimal::_mod_perl                = 0;
 $CGI::Minimal::_no_subprocess_env       = 0;
 
-$CGI::Minimal::VERSION = "1.29";
+$CGI::Minimal::VERSION = "1.30";
 
 if (exists ($ENV{'MOD_PERL'}) && (0 == $CGI::Minimal::_mod_perl)) {
 	$| = 1;

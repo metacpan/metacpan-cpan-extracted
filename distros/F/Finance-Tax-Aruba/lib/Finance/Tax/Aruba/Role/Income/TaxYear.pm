@@ -1,0 +1,422 @@
+package Finance::Tax::Aruba::Role::Income::TaxYear;
+our $VERSION = '0.001';
+use Moose::Role;
+
+# ABSTRACT: A role that implements income tax logic
+
+requires qw(
+    _build_tax_bracket
+    is_year
+);
+
+
+has income => (
+    is       => 'ro',
+    isa      => 'Num',
+    required => 1,
+);
+
+has yearly_income => (
+    is => 'ro',
+    isa => 'Num',
+    lazy => 1,
+    builder => '_build_yearly_income',
+    predicate => 'has_yearly_income',
+);
+
+has yearly_income_gross => (
+    is => 'ro',
+    isa => 'Num',
+    lazy => 1,
+    builder => '_build_yearly_income_gross',
+    predicate => 'has_yearly_income_gross',
+);
+
+has months => (
+    is       => 'ro',
+    isa      => 'Int',
+    default  => 12,
+);
+
+has wervingskosten_max => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 1500,
+);
+
+has wervingskosten_percentage => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 3,
+);
+
+has wervingskosten => (
+    is       => 'ro',
+    isa      => 'Num',
+    lazy     => 1,
+    builder  => '_build_wervingskosten',
+);
+
+has aov_max => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 85_000,
+);
+
+has azv_max => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 85_000,
+);
+
+has taxfree_max => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 28_861,
+);
+
+has taxfree_amount => (
+    is       => 'ro',
+    isa      => 'Num',
+    builder  => '_build_taxfree_amount',
+    lazy     => 1,
+);
+
+has aov_percentage_employer => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 10.5,
+);
+
+has aov_percentage_employee => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 5,
+);
+
+has aov_yearly_income => (
+    is       => 'ro',
+    isa      => 'Num',
+    lazy     => 1,
+    builder  => '_get_aov_yearly_income',
+);
+
+has azv_max => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 85_000,
+);
+
+has azv_percentage_employee => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 1.6,
+);
+
+has azv_percentage_employer => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 8.9,
+);
+
+has azv_yearly_income => (
+    is       => 'ro',
+    isa      => 'Num',
+    lazy     => 1,
+    builder  => '_get_aov_yearly_income',
+);
+
+has tax_brackets => (
+    is      => 'ro',
+    isa     => 'ArrayRef',
+    lazy    => 1,
+    builder => '_build_tax_bracket',
+);
+
+has tax_bracket => (
+    is => 'ro',
+    isa => 'HashRef',
+    lazy => 1,
+    builder => '_get_tax_bracket',
+);
+
+has tax_rate => (
+    is => 'ro',
+    isa => 'Num',
+    lazy => 1,
+    builder => '_get_tax_rate',
+);
+
+has tax_fixed => (
+    is => 'ro',
+    isa => 'Num',
+    lazy => 1,
+    builder => '_get_tax_fixed',
+);
+
+has tax_minimum => (
+    is => 'ro',
+    isa => 'Num',
+    lazy => 1,
+    builder => '_get_tax_minimum',
+);
+
+has tax_maximum => (
+    is => 'ro',
+    isa => 'Defined',
+    lazy => 1,
+    builder => '_get_tax_maximum',
+);
+
+has tax_variable => (
+    is => 'ro',
+    isa => 'Num',
+    lazy => 1,
+    builder => '_get_tax_variable',
+);
+
+has taxable_amount => (
+    is => 'ro',
+    isa => 'Num',
+    lazy => 1,
+    builder => '_get_taxable_amount',
+);
+
+sub _build_yearly_income_gross {
+    my $self = shift;
+    return $self->income * $self->months;
+}
+
+sub _build_yearly_income {
+    my $self = shift;
+    return $self->yearly_income_gross - $self->wervingskosten;
+}
+
+sub _get_tax_bracket {
+    my $self = shift;
+
+    foreach (@{$self->tax_brackets}) {
+        return $_ if $self->taxable_wage < $_->{max};
+    }
+}
+
+sub _get_tax_rate {
+    my $self = shift;
+    return $self->tax_bracket->{rate};
+}
+
+sub _get_tax_fixed {
+    my $self = shift;
+    return $self->tax_bracket->{fixed};
+}
+
+sub _get_tax_minimum {
+    my $self = shift;
+    return $self->tax_bracket->{min};
+}
+
+sub _get_tax_maximum {
+    my $self = shift;
+    return $self->tax_bracket->{max} * 1;
+}
+
+sub _get_taxable_amount {
+    my $self = shift;
+    return $self->taxable_wage - $self->tax_minimum;
+}
+
+sub _get_tax_variable {
+    my $self = shift;
+    return $self->get_cost($self->taxable_amount, $self->tax_rate);
+}
+
+sub income_tax {
+    my $self = shift;
+    return $self->tax_variable + $self->tax_fixed;
+}
+
+sub _build_wervingskosten {
+    my $self = shift;
+    my $wervingskosten = $self->get_cost(
+        $self->yearly_income_gross,
+        $self->wervingskosten_percentage
+    );
+    return $self->wervingskosten_max
+        if $wervingskosten > $self->wervingskosten_max;
+    return $wervingskosten;
+}
+
+sub get_cost {
+    my ($self, $costs, $perc) = @_;
+    return $costs * ($perc / 100);
+}
+
+sub _build_taxfree_amount {
+    my $self = shift;
+
+    if ($self->zuiver_jaarloon < $self->taxfree_max) {
+        return $self->zuiver_jaarloon * ($self->months/12);
+    }
+    return $self->taxfree_max * ($self->months/12);
+}
+
+sub _get_aov_yearly_income {
+    my $self = shift;
+    my $max  = $self->aov_max * ($self->months / 12);
+    my $jaarloon = $self->yearly_income;
+    return $jaarloon > $max ? $max : $jaarloon;
+}
+
+sub aov_employee {
+    my $self = shift;
+    return $self->get_cost(
+        $self->aov_yearly_income,
+        $self->aov_percentage_employee
+    );
+}
+
+sub aov_employer {
+    my $self = shift;
+    return $self->get_cost(
+        $self->aov_yearly_income,
+        $self->aov_percentage_employer
+    );
+}
+
+sub aov_premium {
+    my $self = shift;
+    return $self->get_cost(
+        $self->aov_yearly_income,
+        $self->aov_percentage_employee + $self->aov_percentage_employer
+    );
+}
+
+sub azv_premium {
+    my $self = shift;
+    return $self->get_cost(
+        $self->azv_yearly_income,
+        $self->azv_percentage_employee + $self->azv_percentage_employer
+    );
+}
+
+sub _get_azv_yearly_income {
+    my $self = shift;
+    my $max  = $self->azv_max * ($self->months / 12);
+    my $jaarloon = $self->yearly_income;
+    $jaarloon = $max if $jaarloon > $max;
+    return $jaarloon;
+}
+
+sub azv_employee {
+    my $self = shift;
+    return $self->get_cost(
+        $self->azv_yearly_income,
+        $self->azv_percentage_employee
+    );
+}
+
+sub azv_employer {
+    my $self = shift;
+    return $self->get_cost(
+        $self->azv_yearly_income,
+        $self->azv_percentage_employer
+    );
+}
+
+sub zuiver_jaarloon {
+    my $self = shift;
+
+    return $self->yearly_income
+         - $self->aov_employee
+         - $self->azv_employee
+}
+
+sub taxable_wage {
+    my $self = shift;
+    my $taxable_wage = $self->zuiver_jaarloon - $self->taxfree_amount;
+    return $taxable_wage < 0 ? 0 : $taxable_wage;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax logic
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    package Aruba::Tax::Income::XXXX;
+    use Moose;
+
+    with qw(Finance::Tax::Aruba::Role::Income::TaxYear);
+
+    sub _build_tax_bracket {
+        return [],
+    }
+
+    sub is_year {
+        ...;
+    }
+
+=head1 DESCRIPTION
+
+Consumers of this role must implements the following methods:
+
+=head2 _build_tax_bracket
+
+This should be an array reference containing the information about each
+bracket.
+
+    [
+        { min => 0, max => 34930, fixed => 0, rate => 14 },
+        {
+            min   => 34930,
+            max   => 65904,
+            fixed => 4890.2,
+            rate  => 25
+        },
+        {
+            min   => 65904,
+            max   => 147454,
+            fixed => 12633.7,
+            rate  => 42
+        },
+        {
+            min   => 147454,
+            max   => 'inf' * 1,
+            fixed => 46884.7,
+            rate  => 52
+        },
+    ];
+
+=head2 is_year
+
+This function should return true if the year is supported by the plugin
+
+=head1 ATTRIBUTES
+
+TODO: Add more documentation
+
+=head1 AUTHOR
+
+Wesley Schwengle <waterkip@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Wesley Schwengle.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut

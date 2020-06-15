@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-FloatBox
 
+0.08    2020-06-13
+        [CHANGES]
+         * Update to Object::Pad 0.27
+            + BUILD block syntax
+            + package+class declaration to keep metadata parsers happy
+
 0.07    2020-04-30
         [BUGFIXES]
          * Removed stray `my $self` line that got left behind (RT132458)

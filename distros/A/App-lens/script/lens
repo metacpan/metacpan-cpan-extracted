@@ -1,0 +1,293 @@
+#!perl
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-13'; # DATE
+our $DIST = 'App-lens'; # DIST
+our $VERSION = '0.021'; # VERSION
+
+use 5.010001;
+use strict 'subs', 'vars';
+use warnings;
+
+sub transform_bold {
+    if ($_[0] == 1) {
+        return @_;
+    } else {
+        return (1, @_);
+    }
+}
+
+sub transform_inverse {
+    if ($_[0] == 7) {
+        return ();
+    } else {
+        return (7, @_);
+    }
+}
+
+sub transform_mono {
+    if ($_[0] >= 30 && $_[0] <= 38) {
+        # ansi fg
+        return (37);
+    } elsif ($_[0] >= 40 && $_[0] <= 48) {
+        # ansi bg
+        return (47);
+    } elsif ($_[0] >= 90 && $_[0] <= 97) {
+        # bright ansi fg
+        return (1,37);
+    } elsif ($_[0] >= 100 && $_[0] <= 107) {
+        # bright ansi bg
+        return (1,47);
+    } else {
+        return @_;
+    }
+}
+
+sub transform_nobold {
+    if ($_[0] == 1) {
+        return ();
+    } else {
+        return @_;
+    }
+}
+
+sub transform_noop { @_ }
+
+sub transform_pastel {
+    state $pastel_ansifgs = [
+        [38, 5,   0], # 0 black
+        [38, 5, 203], # 1 red
+        [38, 5, 113], # 2 green
+        [38, 5, 192], # 3 yellow
+        [38, 5,  69], # 4 blue
+        [38, 5, 104], # 5 magenta
+        [38, 5,  74], # 6 cyan
+        [38, 5, 246], # 7 white (gray)
+    ];
+    state $pastel_ansibgs = [map { [48, 5, $_->[2]] } @$pastel_ansifgs];
+
+    if ($_[0] >= 30 && $_[0] <= 37) {
+        return @{ $pastel_ansifgs->[$_[0]-30] };
+    } elsif ($_[0] >= 90 && $_[0] <= 97) {
+        # XXX bright
+        return @{ $pastel_ansifgs->[$_[0]-90] };
+    } elsif ($_[0] >= 40 && $_[0] <= 47) {
+        return  @{ $pastel_ansibgs->[$_[0]-40] };
+    } elsif ($_[0] >= 100 && $_[0] <= 107) {
+        return  @{ $pastel_ansibgs->[$_[0]-100] };
+    } else {
+        return @_;
+    }
+}
+
+sub transform_ct {
+    state $ct_sub = do {
+        require Color::ANSI::Util;
+        require Color::RGB::Util;
+
+        my $mod = shift @ARGV;
+        $mod = "ColorTransform::$mod" unless $mod =~ /\AColorTransform::/;
+        (my $modpm = "$mod.pm") =~ s!::!/!g;
+        require $modpm;
+
+        \&{"$mod\::transform"};
+    };
+
+    my ($rgb, $is_bg, $is_bright);
+    if ($_[0] >= 30 && $_[0] <= 37) {
+        # ansi fg, 16 color
+        $rgb = Color::ANSI::Util::ansi16_to_rgb($_[0] - 30);
+    } elsif ($_[0] >= 90 && $_[0] <= 97) {
+        # bright ansi fg, 16 color
+        $is_bright++;
+        $rgb = Color::ANSI::Util::ansi16_to_rgb($_[0] - 90);
+    } elsif ($_[0] == 38 && $_[1] == 5) {
+        # ansi fg, 256 color
+        $rgb = Color::ANSI::Util::ansi256_to_rgb($_[2]);
+    } elsif ($_[0] == 38 && $_[1] == 2) {
+        # ansi fg, 24bit
+        $rgb = sprintf("%02x%02x%02x", $_[2], $_[3], $_[4]);
+    } elsif ($_[0] >= 40 && $_[0] <= 47) {
+        # ansi bg, 16 color
+        $is_bg++;
+        $rgb = Color::ANSI::Util::ansi16_to_rgb($_[0] - 40);
+    } elsif ($_[0] >= 100 && $_[0] <= 107) {
+        # ansi bright bg, 16 color
+        $is_bright++;
+        $is_bg++;
+        $rgb = Color::ANSI::Util::ansi16_to_rgb($_[0] - 100);
+    } elsif ($_[0] == 48 && $_[1] == 5) {
+        # ansi bg, 256 color
+        $is_bg++;
+        $rgb = Color::ANSI::Util::ansi256_to_rgb($_[2]);
+    } elsif ($_[0] == 48 && $_[1] == 2) {
+        # ansi bg, 24bit
+        $is_bg++;
+        $rgb = sprintf("%02x%02x%02x", $_[2], $_[3], $_[4]);
+    } else {
+        return @_;
+    }
+
+    # transform color
+    my $trgb = $ct_sub->(color=>$rgb, @ARGV);
+    my $code = $is_bg ? Color::ANSI::Util::ansibg($trgb) : Color::ANSI::Util::ansifg($trgb);
+    $code =~ s/\A\e\[//;
+    $code =~ s/m\z//;
+    split /;/, $code;
+}
+
+if (!@ARGV || (grep {$_ eq '--help'} @ARGV)) {
+    print <<'EOF';
+lens - Transform colors in terminal output
+
+Usage:
+  % command-that-produces-colored-output | lens <transform-name> [transform-option]...
+
+List of available transforms:
+  bold    - Set bold to all colors
+  mono    - replace all colors with gray
+  nobold  - remove bold
+  noop    - do no transform
+  pastel  - pastelize colors
+  ct      - Use a ColorTransform::* module
+
+Some examples:
+
+ # Make ls output mono
+ % ls -l --color | lens mono
+
+ # Make the WWW color swatch into monotone (green)
+ % COLOR=1 show-color-swatch | lens ct Monotone hue 120
+
+EOF
+    exit 0;
+} else {
+    my $tname = shift @ARGV;
+    defined &{"transform_$tname"} or die "Unknown transform '$tname'\n";
+    my $tsub = \&{"transform_$tname"};
+    my $transform = sub {
+        my @codes = split ';', shift;
+        my @res;
+        while (@codes) {
+            my @args;
+            if (($codes[0] == 38 || $codes[0] == 48) && @codes > 1) {
+                if ($codes[1] == 2) {
+                    @args = splice @codes, 0, 5;
+                } elsif ($codes[1] == 5) {
+                    @args = splice @codes, 0, 3;
+                } else {
+                    @args = (shift @codes);
+                }
+            } else {
+                @args = (shift @codes);
+            }
+            push @res, $tsub->(@args);
+        }
+        join ';', @res;
+    };
+    while (<STDIN>) {
+        s/\e\[(.+?)m/"\e[" . $transform->($1) . "m"/eg;
+        print;
+    }
+}
+
+1;
+# ABSTRACT: Transform colors in terminal output
+# PODNAME: lens
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+lens - Transform colors in terminal output
+
+=head1 VERSION
+
+This document describes version 0.021 of lens (from Perl distribution App-lens), released on 2020-06-13.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % command-that-produces-colored-output | lens <transform-name>
+
+Available transforms:
+
+=over
+
+=item * bold
+
+Give bold to all colors.
+
+=item * inverse
+
+Inverse all colors.
+
+=item * mono
+
+Replace all colors with gray.
+
+=item * nobold
+
+Remove bold.
+
+=item * noop
+
+Do no transform.
+
+=item * pastel
+
+Pastelize colors.
+
+=item * ct
+
+Transform using one of ColorTransform::* modules.
+
+=back
+
+Some examples:
+
+ # Make ls output mono
+ % ls -l --color | lens mono
+
+ # Make the WWW color swatch into monotone (green)
+ % COLOR=1 show-color-swatch | lens ct Monotone hue 120
+
+=head1 DESCRIPTION
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-lens>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-lens>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-lens>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+C<ColorTransform::*> modules
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

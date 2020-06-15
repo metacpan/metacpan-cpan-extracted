@@ -9,11 +9,16 @@ README
 dist.ini
 lib/App/VivaldiUtils.pm
 script/kill-vivaldi
+script/list-vivaldi-profiles
 script/pause-vivaldi
 script/ps-vivaldi
+script/restart-vivaldi
+script/start-vivaldi
 script/terminate-vivaldi
 script/unpause-vivaldi
+script/vivaldi-has-processes
 script/vivaldi-is-paused
+script/vivaldi-is-running
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

@@ -9,7 +9,7 @@ use Test::Refcount;
 use Object::Pad;
 
 class Point {
-   method BUILD { @$self = @_; }
+   BUILD { @$self = @_; }
 
    method where { sprintf "(%d,%d)", @$self }
 }
@@ -25,7 +25,7 @@ class Point {
 # anon methods
 {
    class Point3 {
-      method BUILD { @$self = @_; }
+      BUILD { @$self = @_; }
 
       our $clearer = method {
          @$self = ( 0 ) x 3;
@@ -45,7 +45,7 @@ SKIP: {
    class RT132321 {
       has $_genvalue;
 
-      method BUILD {
+      BUILD {
          $_genvalue = method { 123 };
       }
 

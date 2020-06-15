@@ -1,5 +1,5 @@
 package IO::Pager::Unbuffered;
-our $VERSION = 10.02;
+our $VERSION = 1.02; #Untouched since 1.02
 
 use strict;
 use warnings;

@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
               NAME               => 'Search::MultiMatch',
-              AUTHOR             => q{Daniel Șuteu <trizenx@gmail.com>},
+              AUTHOR             => q<Daniel Șuteu <trizen@cpan.org>>,,
               VERSION_FROM       => 'lib/Search/MultiMatch.pm',
               ABSTRACT_FROM      => 'lib/Search/MultiMatch.pm',
               LICENSE            => 'artistic_2',

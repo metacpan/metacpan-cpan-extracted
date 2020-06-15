@@ -45,36 +45,32 @@ where n is a multiple of 32: uint_32, uint_64, uint_96, uint_128, ...
 =cut
 
 sub incr_n {
-  my $n = shift;
-  Carp::croak("missing argument") unless defined $n;
+  my $n = shift // Carp::croak("missing argument");
 
-  my $l = length($n);
+  # split in individual 32 bit unsigned ints in network byte order
+  my @N = unpack( 'N*', $n );
 
-  # work in chunks of 32 bits = 4 bytes
-  my $p = $l / 4 - 1;
-
-  # only uint_32, uint_64, uint_96, uint_128, ... allowed
-  Carp::croak("wrong bitlen") if $l % 4 != 0 or $p < 0;
-
-  # start at least significant chunk position
-  my $chunk = vec( $n, $p, 32 );
+  # start at least significant N
+  my $i = $#N;
 
   # carry?
-  while ( $chunk == 0xffff_ffff ) {
+  while ( $N[$i] == 0xffff_ffff ) {
 
-    # OVERFLOW, this chunk is already the most significant chunk!
-    return if $p == 0;
+    # OVERFLOW, it's already the most significant N
+    return if $i == 0;
 
-    # set this chunk to zero: 0xffff_ffff + 1 = 0x0000_0000 + carry
-    vec( $n, $p, 32 ) = 0;
+    # set this N to zero: 0xffff_ffff + 1 = 0x0000_0000 + carry
+    $N[$i] = 0;
 
-    # carry on to next more significant chunk position
-    $chunk = vec( $n, --$p, 32 );
+    # carry on to next more significant N
+    $i--;
   }
 
-  # incr this chunk
-  vec( $n, $p, 32 ) = ++$chunk;
-  return $n;
+  # incr this N
+  $N[$i]++;
+
+  # pack again the individual 32 bit integers in network byte order to one byte string
+  return pack( 'N*', @N );
 }
 
 =head2 $string = inet_ntop_pp( $family, $address )

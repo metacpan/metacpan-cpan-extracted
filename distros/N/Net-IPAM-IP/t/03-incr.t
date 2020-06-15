@@ -25,12 +25,6 @@ ok( !incr_n( pack( 'n8', (0xffff) x 8 ) ),       'overflow 128bit' );
 eval { incr_n() };
 like( $@, qr/missing/, 'missing argument' );
 
-eval { incr_n( pack( 'C5', 255, 255, 255, 255, 255 ) ) };
-like( $@, qr/wrong/, 'wrong bitlen' );
-
-eval { incr_n('') };
-like( $@, qr/wrong/, 'wrong bitlen' );
-
 #############################
 
 my $good = [

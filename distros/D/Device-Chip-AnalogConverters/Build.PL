@@ -7,9 +7,13 @@ my $build = Module::Build->new(
    module_name => "Device::Chip::AnalogConverters",
 
    requires => {
+      'perl' => '5.026', # signatures in Object::Pad
+      'Object::Pad' => '0.27',
+
       'Data::Bitfield' => '0.02',
       'Device::Chip' => '0.10',
       'Future::AsyncAwait' => '0.13',
+      'Future::IO' => 0,
    },
    test_requires => {
       'Test::Device::Chip::Adapter' => 0,

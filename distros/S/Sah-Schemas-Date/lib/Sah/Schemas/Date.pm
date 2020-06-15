@@ -1,9 +1,9 @@
 package Sah::Schemas::Date;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to date
@@ -20,7 +20,7 @@ Sah::Schemas::Date - Sah schemas related to date
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schemas::Date (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::Schemas::Date (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 SYNOPSIS
 

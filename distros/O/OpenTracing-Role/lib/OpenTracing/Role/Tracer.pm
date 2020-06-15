@@ -1,99 +1,44 @@
 package OpenTracing::Role::Tracer;
 
-=head1 NAME
-
-OpenTracing::Role::Tracer - Role for OpenTracin implementations.
-
-=head1 SYNOPSIS
-
-    package OpenTracing::Implementation::MyBackendService::Tracer;
-    
-    use Moo;
-    
-    sub start_active_span { ... };
-    
-    sub start_span { ... };
-    
-    ...
-    
-    with 'OpenTracing::Role::Tracer';
-    
-    1;
-
-=cut
-
-
-
-our $VERSION = '0.07';
-
-
+our $VERSION = 'v0.81.0';
 
 use Moo::Role;
 
 use Carp;
+use OpenTracing::Types qw/ScopeManager Span SpanContext is_Span is_SpanContext/;
+use Ref::Util qw/is_plain_hashref/;
+use Role::Declare;
 use Try::Tiny;
-use Types::Standard qw/Object/;
-
-
-
-=head1 DESCRIPTION
-
-This is a base-class for OpenTracing implenetations that are compliant with the
-L<OpenTracing::Interface>.
-
-=cut
-
-
+use Types::Common::Numeric qw/PositiveOrZeroNum/;
+use Types::Standard qw/HashRef Object Str/;
 
 has scope_manager => (
-    is              => 'lazy',
-    isa             => Object,
+    is              => 'ro',
+    isa             => ScopeManager,
     reader          => 'get_scope_manager',
+    default => sub {
+        require 'OpenTracing::Implementation::NoOp::ScopeManager';
+        return OpenTracing::Implementation::NoOp::ScopeManager->new
+    },
 );
 
-
-
-requires '_build_scope_manager';
-
-requires 'build_span';
-
-requires 'extract_context';
-
-requires 'inject_context';
-
-
+has default_span_context_args => (
+    is              => 'ro',
+    isa             => HashRef[Str],
+    default         => sub{ {} },
+);
 
 sub get_active_span {
     my $self = shift;
     
-    my $span = try {
-        $self->get_scope_manager->get_active_scope->get_span
-    } catch {
-        return undef
-    };
+    my $scope_manager = $self->get_scope_manager
+        or croak "Can't get a 'ScopeManager'";
     
-    return $span
+    my $scope = $scope_manager->get_active_scope
+        or return;
+    
+    return $scope->get_span;
 }
-#
-# this is not really a good design but so convenient.
-
-
-
-# this is not an OpenTracing API requirement
-#
-sub get_active_span_context {
-    my $self = shift;
-    
-    my $span_context = try {
-        $self->get_active_span->get_context
-    } catch {
-        return undef
-    };
-    
-    return $span_context
-}
-
-
 
 sub start_active_span {
     my $self = shift;
@@ -101,7 +46,6 @@ sub start_active_span {
         or croak "Missing required operation_name";
     my $opts = { @_ };
     
-    # remove the `finish_span_on_close` option, which is for this method only! 
     my $finish_span_on_close = 
         exists( $opts->{ finish_span_on_close } ) ?
             !! delete $opts->{ finish_span_on_close }
@@ -111,7 +55,6 @@ sub start_active_span {
     my $span = $self->start_span( $operation_name => %$opts );
     
     my $scope_manager = $self->get_scope_manager();
-    
     my $scope = $scope_manager->activate_span( $span,
         finish_span_on_close => $finish_span_on_close
     );
@@ -119,10 +62,9 @@ sub start_active_span {
     return $scope
 }
 
-
-
 sub start_span {
     my $self = shift;
+    
     my $operation_name = shift
         or croak "Missing required operation_name";
     my $opts = { @_ };
@@ -135,14 +77,19 @@ sub start_span {
     $child_of //= $self->get_active_span()
         unless $ignore_active_span;
     
-#   $child_of->does(') ?
+    my $context;
+
+    $context = $child_of
+        if is_SpanContext($child_of);
     
-    my $context =
-        defined $child_of
-        && 
-        $child_of->does('OpenTracing::Interface::SpanContext')
-        ?
-        $child_of : $self->get_active_span_context();
+    $context = $child_of->get_context
+        if is_Span($child_of);
+    
+    $context = $context->new_clone->with_trace_id( $context->trace_id )
+        if is_SpanContext($context);
+    
+    $context = $self->build_context( %{$self->default_span_context_args} )
+        unless defined $context;
     
     my $span = $self->build_span(
         operation_name => $operation_name,
@@ -151,32 +98,39 @@ sub start_span {
         tags           => $tags,
         context        => $context,
     );
+    #
+    # we should get rid of passing 'child_of' or the not exisitng 'follows_from'
+    # these are merely helpers to define 'references'.
     
     return $span
 }
 
+instance_method extract_context(
+    Str    $carrier_format,
+    Object $carrier
+) :ReturnMaybe(SpanContext) {}
 
 
-=head1 REQUIRES
+instance_method inject_context(
+    Str    $carrier_format,
+    Object $carrier,
+    SpanContext $span_context
+) :Return(Object) {}
 
-The followin must be implemented by consuming class
 
-=cut
+instance_method build_span (
+    Str                :$operation_name,
+    SpanContext | Span :$child_of,
+    SpanContext        :$context,
+    PositiveOrZeroNum  :$start_time      = undef,
+    HashRef[Str]       :$tags            = {},
+) :Return (Span) { };
 
-
-
-=head2 build_span
-
-=cut
-
-##### requires 'build_span';
-#
-# $self->build_span(
-#     operartion_name => $operation_name,
-#     start_time      => $start_time,
-#     tags            => \@tags,
-#     context         => $context,
-# );
+instance_method build_context (
+    %default_span_context_args,
+) :Return (SpanContext) {
+    ( HashRef[Str] )->assert_valid( { %default_span_context_args } );
+};
 
 
 

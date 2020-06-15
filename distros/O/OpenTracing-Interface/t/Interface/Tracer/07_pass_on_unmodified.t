@@ -51,9 +51,9 @@ subtest "pass on arguments for 'start_active_span'" => sub {
     
     undef @test_params;
     
-    my $span_context         = bless {}, 'MyDuck::SpanContext';
-    my $context_reference_1  = bless {}, 'MyDuck::ContextReference';
-    my $context_reference_2  = bless {}, 'MyDuck::ContextReference';
+    my $span_context         = bless {}, 'MySyub::SpanContext';
+    my $context_reference_1  = bless {}, 'MySyub::ContextReference';
+    my $context_reference_2  = bless {}, 'MySyub::ContextReference';
     
     # the options 'child_of' and 'references' are mutual exclusive
     # so we test those separatly
@@ -146,9 +146,9 @@ subtest "pass on arguments for 'start_span'" => sub {
     
     undef @test_params;
     
-    my $span_context         = bless {}, 'MyDuck::SpanContext';
-    my $context_reference_1  = bless {}, 'MyDuck::ContextReference';
-    my $context_reference_2  = bless {}, 'MyDuck::ContextReference';
+    my $span_context         = bless {}, 'MySyub::SpanContext';
+    my $context_reference_1  = bless {}, 'MySyub::ContextReference';
+    my $context_reference_2  = bless {}, 'MySyub::ContextReference';
     
     # the options 'child_of' and 'references' are mutual exclusive
     # so we test those separatly
@@ -225,8 +225,8 @@ subtest "pass on arguments for 'inject_context'" => sub {
     
     my $test_object = bless {}, 'MyTest::Tracer';
     
-    my $span_context = bless {}, 'MyDuck::SpanContext';
-    my $carrier      = bless {}, 'MyDuck::Carrier'; # nope, does not exists
+    my $span_context = bless {}, 'MySyub::SpanContext';
+    my $carrier      = bless {}, 'MySyub::Carrier'; # nope, does not exists
     
     lives_ok {
         $test_object->inject_context(
@@ -257,7 +257,7 @@ subtest "pass on arguments for 'extract_context'" => sub {
     
     my $test_object = bless {}, 'MyTest::Tracer';
     
-    my $carrier      = bless {}, 'MyDuck::Carrier'; # nope, does not exists
+    my $carrier      = bless {}, 'MySyub::Carrier'; # nope, does not exists
     
     lives_ok {
         $test_object->extract_context(
@@ -448,7 +448,7 @@ package MyTest::Tracer;
 sub get_scope_manager {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::ScopeManager'
+    return bless {}, 'MySyub::ScopeManager'
     
 };
 
@@ -456,7 +456,7 @@ sub get_active_span {
 
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::Span'
+    return bless {}, 'MySyub::Span'
     
 };
 
@@ -464,7 +464,7 @@ sub start_active_span {
 
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::Scope'
+    return bless {}, 'MySyub::Scope'
     
 };
 
@@ -472,7 +472,7 @@ sub start_span {
 
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::Span'
+    return bless {}, 'MySyub::Span'
     
 };
 
@@ -480,7 +480,7 @@ sub inject_context {
 
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::Carrier' # don't care
+    return bless {}, 'MySyub::Carrier' # don't care
     
 };
 
@@ -488,7 +488,7 @@ sub extract_context {
 
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::SpanContext'
+    return bless {}, 'MySyub::SpanContext'
     
 };
 
@@ -502,7 +502,7 @@ BEGIN {
 
 
 
-package MyDuck::ContextReference;
+package MySyub::ContextReference;
 
 sub new_child_of;
 sub new_follows_from;
@@ -512,33 +512,38 @@ sub type_is_follows_from;
 
 
 
-package MyDuck::Span;
+package MySyub::Span;
 
 sub get_context;
 sub overwrite_operation_name;
 sub finish;
-sub set_tag;
+sub add_tag;
+sub add_tags;
 sub log_data;
-sub set_baggage_item;
+sub add_baggage_item;
+sub add_baggage_items;
 sub get_baggage_item;
+sub get_baggage_items;
 
 
 
-package MyDuck::SpanContext;
+package MySyub::SpanContext;
 
 sub get_baggage_item;
+sub get_baggage_items;
 sub with_baggage_item;
+sub with_baggage_items;
 
 
 
-package MyDuck::Scope;
+package MySyub::Scope;
 
 sub close;
 sub get_span;
 
 
 
-package MyDuck::ScopeManager;
+package MySyub::ScopeManager;
 
 sub activate_span;
 sub get_active_scope;

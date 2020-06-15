@@ -12,7 +12,6 @@ package DateTime::Format::Genealogy;
 
 use strict;
 use warnings;
-use autodie qw(:all);
 # use diagnostics;
 # use warnings::unused;
 use 5.006_001;
@@ -22,17 +21,32 @@ use Carp;
 use DateTime::Format::Natural;
 use Genealogy::Gedcom::Date 2.01;
 
+our %months = (
+	'January' => 'Jan',
+	'February' => 'Feb',
+	'March' => 'Mar',
+	'April' => 'Apr',
+	# 'May' => 'May',
+	'June' => 'Jun',
+	'July' => 'Jul',
+	'August' => 'Aug',
+	'September' => 'Sep',
+	'October' => 'Oct',
+	'November' => 'Nov',
+	'December' => 'Dec'
+);
+
 =head1 NAME
 
 DateTime::Format::Genealogy - Create a DateTime object from a Genealogy Date
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -62,6 +76,10 @@ If a date range is given, return a two element array in array context, or undef 
 Returns undef if the date can't be parsed, is just a year or if it is an appoximate date starting with "c", "ca" or "abt".
 Can be called as a class or object method.
 
+date: the date to be parsed
+quiet: set to fail silently if there is an error with the date
+strict: more strictly enforce the Gedcom standard, for example don't allow long month names
+
 =cut
 
 sub parse_datetime {
@@ -84,11 +102,14 @@ sub parse_datetime {
 	} else {
 		$params{'date'} = shift;
 	}
+	my $quiet = $params{'quiet'};
+	my $strict = $params{'strict'};
 
 	if(my $date = $params{'date'}) {
 		# TODO: Needs much more sanity checking
 		if(($date =~ /^bef\s/i) || ($date =~ /^aft\s/i)) {
-			Carp::carp("$date is invalid, need an exact date to create a DateTime");
+			Carp::carp("$date is invalid, need an exact date to create a DateTime")
+				unless($quiet);
 			return;
 		}
 		if($date =~ /^31 Nov/) {
@@ -110,11 +131,19 @@ sub parse_datetime {
 			return;
 		}
 		if($date !~ /^\d{3,4}$/) {
+			if($date =~ /^(\d{1,2})\s+([A-Z]{4,}+)\s+(\d{3,4})$/i) {
+				if((!$strict) && (my $abbrev = $months{$2})) {
+					$date = "$1 $abbrev $3";
+				} else {
+					Carp::croak("Unparseable date $date - often because the month name isn't 3 letters") unless($quiet);
+				}
+			}
 			if(($date =~ /^\d/) && (my $d = $self->_date_parser_cached($date))) {
 				return $dfn->parse_datetime($d->{'canonical'});
 			}
 			if(($date !~ /^(Abt|ca?)/i) && ($date =~ /^[\w\s]+$/)) {
 				# ACOM exports full month names and non-standard format dates e.g. U.S. format MMM, DD YYYY
+				# TODO: allow that when mot in strict mode
 				if(my $rc = $dfn->parse_datetime($date)) {
 					return $rc;
 				}
@@ -205,7 +234,7 @@ L<http://cpanratings.perl.org/d/DateTime-Format-Gedcom>
 
 Copyright 2018-2020 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 

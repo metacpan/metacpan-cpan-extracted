@@ -1,0 +1,89 @@
+NAME
+    App::YoutubeDlIfNotYet - (DEPRECATED) Download videos using youtube-dl
+    only if videos have not been donwnloaded yet
+
+VERSION
+    This document describes version 0.003 of App::YoutubeDlIfNotYet (from
+    Perl distribution App-YoutubeDlIfNotYet), released on 2020-04-05.
+
+DEPRECATION NOTICE
+    Superseded by youtube-dl-if (from App::YoutubeDlIf).
+
+DESCRIPTION
+FUNCTIONS
+  youtube_dl_if_not_yet
+    Usage:
+
+     youtube_dl_if_not_yet(%args) -> [status, msg, payload, meta]
+
+    (DEPRECATED) Download videos using youtube-dl only if videos have not
+    been donwnloaded yet.
+
+    This is a wrapper for youtube-dl; it tries to extract downloaded video
+    ID's from filenames or URL's or video ID's listed in a text file, e.g.:
+
+     35682594        Table Tennis Shots- If Were Not Filmed, Nobody Would Believe [HD]-dUjxqFbWzQo.mp4       date:[2019-12-29 ]
+
+    or:
+
+     https://www.youtube.com/embed/U9v2S49sHeQ?rel=0
+
+    or:
+
+     U9v2S49sHeQ
+
+    When a video ID is found then it is assumed to be already downloaded in
+    the past and will not be downloaded again.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   log_file => *str* (default: "/home/s1/notes/download-logs.org")
+
+        File that contains list of download filenames.
+
+    *   urls_or_ids* => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HISTORY
+    First written in Apr 2016. Packaged as CPAN distribution in Apr 2020.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-YoutubeDlIfNotYet>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-YoutubeDlIfNotYet>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-YoutubeDlIfNotYet
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::YouTubeUtils for other YouTube-related CLIs.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

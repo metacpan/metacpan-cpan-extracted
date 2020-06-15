@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v0.5.6
+## Version v0.5.9
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/05/21
+## Modified 2020/06/13
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::REST;
@@ -47,7 +47,7 @@ BEGIN
     use Net::API::REST::Response;
     use Net::API::REST::Status;
     our( $VERSION, $DEBUG, $VERBOSE, $API_VERSION );
-    $VERSION = 'v0.5.6';
+    $VERSION = 'v0.5.9';
 };
 
 {
@@ -158,7 +158,7 @@ sub bailout
         }
         catch( $e )
         {
-            $self->message( 3, "An error occurred while printing out data." );
+            $self->message( 3, "An error occurred while printing out data: $e" );
             return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
         }
     }
@@ -1613,7 +1613,7 @@ sub _try
     my $pack = shift( @_ ) || return( $self->error( "No Apache package name was provided to call method" ) );
     my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
     my $r = Apache2::RequestUtil->request;
-    $r->log_error( "Net::API::REST::_try to call method \"$meth\" in package \"$pack\"." );
+    # $r->log_error( "Net::API::REST::_try to call method \"$meth\" in package \"$pack\"." );
     try
     {
         return( $self->$pack->$meth ) if( !scalar( @_ ) );
@@ -1783,7 +1783,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v0.5.6
+    v0.5.9
 
 =head1 DESCRIPTION
 

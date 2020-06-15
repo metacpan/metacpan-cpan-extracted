@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.871';
+our $VERSION = '1.872';
 
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
 
@@ -135,14 +135,12 @@ sub keys {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find({ getkeys => 1 }, @_);
    }
+   elsif ( wantarray ) {
+      @_ ? map { exists $self->[ $_ ] ? $_ : undef } @_
+         : ( 0 .. $#{ $self } );
+   }
    else {
-      if ( wantarray ) {
-         @_ ? map { exists $self->[ $_ ] ? $_ : undef } @_
-            : ( 0 .. $#{ $self } );
-      }
-      else {
-         scalar @{ $self };
-      }
+      scalar @{ $self };
    }
 }
 
@@ -156,14 +154,12 @@ sub pairs {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find(@_);
    }
+   elsif ( wantarray ) {
+      @_ ? map { $_ => $self->[ $_ ] } @_
+         : map { $_ => $self->[ $_ ] } 0 .. $#{ $self };
+   }
    else {
-      if ( wantarray ) {
-         @_ ? map { $_ => $self->[ $_ ] } @_
-            : map { $_ => $self->[ $_ ] } 0 .. $#{ $self };
-      }
-      else {
-         scalar @{ $self };
-      }
+      scalar @{ $self };
    }
 }
 
@@ -177,14 +173,12 @@ sub values {
    if ( @_ == 1 && $_[0] =~ /^(?:key|val)[ ]+\S\S?[ ]+\S/ ) {
       $self->_find({ getvals => 1 }, @_);
    }
+   elsif ( wantarray ) {
+      @_ ? @{ $self }[ @_ ]
+         : @{ $self }
+   }
    else {
-      if ( wantarray ) {
-         @_ ? @{ $self }[ @_ ]
-            : @{ $self }
-      }
-      else {
-         scalar @{ $self };
-      }
+      scalar @{ $self };
    }
 }
 
@@ -389,7 +383,7 @@ MCE::Shared::Array - Array helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Array version 1.871
+This document describes MCE::Shared::Array version 1.872
 
 =head1 DESCRIPTION
 

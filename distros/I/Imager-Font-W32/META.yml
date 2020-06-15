@@ -1,30 +1,31 @@
---- #YAML:1.0
-name:               Imager-Font-W32
-version:            0.89
-abstract:           Win32 font file support for Imager
+---
+abstract: 'Win32 font driver for Imager'
 author:
-    - Tony Cook <tonyc@cpan.org>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
-    Imager:               0.95
+  - 'Tony Cook <tonyc@cpan.org>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-    Imager:               0.95
-    Test::More:           0.47
-requires:
-    Imager:    0.95
-    XSLoader:  0
-resources:
-    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager
-    homepage:    http://imager.perl.org/
-    repository:  git://git.imager.perl.org/imager.git
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+  Imager: '0.95'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Imager: '0.95'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Imager-Font-W32
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Imager: '0.95'
+  XSLoader: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager
+  homepage: http://imager.perl.org/
+  repository: git://github.com/tonycoz/imager.git
+version: '0.91'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

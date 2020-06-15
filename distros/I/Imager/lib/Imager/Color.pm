@@ -1,10 +1,9 @@
 package Imager::Color;
-
+use 5.006;
 use Imager;
 use strict;
-use vars qw($VERSION);
 
-$VERSION = "1.012";
+our $VERSION = "1.013";
 
 # It's just a front end to the XS creation functions.
 
@@ -683,6 +682,16 @@ set() method.
     my($h, $s, $v, $alpha) = $color->hsv();
 
 Returns the color as a Hue/Saturation/Value/Alpha tuple.
+
+=item red
+
+=item green
+
+=item blue
+
+=item alpha
+
+Returns the respective component as an integer from 0 to 255.
 
 =back
 

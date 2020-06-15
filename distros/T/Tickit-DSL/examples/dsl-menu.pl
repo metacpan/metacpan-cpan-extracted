@@ -12,8 +12,6 @@ package AppManager;
 use parent -norequire => 'Manager::Base';
 package main;
 use Tickit::DSL;
-use Try::Tiny;
-
 my $fm = FileManager->new;
 my $cm = ClipboardManager->new;
 my $sys = AppManager->new;

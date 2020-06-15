@@ -1,3 +1,10 @@
+0.007   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add utility: start-browsers, restart-browsers.
+
+        - _do_browser(): add action 'has_processes'.
+
+
 0.006   2020-05-02  Released-By: PERLANCAR; Urgency: high
 
         - Merge two releases 0.005 and 0.005.1.

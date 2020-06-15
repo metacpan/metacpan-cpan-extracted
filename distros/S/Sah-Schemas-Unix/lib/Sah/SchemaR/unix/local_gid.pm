@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::local_gid;
 
-our $DATE = '2020-02-11'; # DATE
-our $VERSION = '0.010'; # VERSION
+our $DATE = '2020-06-13'; # DATE
+our $VERSION = '0.012'; # VERSION
 
-our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",summary=>"Group identifier (GID)"},{description=>"\nExisting means having a group name associated with this GID, i.e. `getgrgid`\nreturns a record.\n\nSupport coercion from an existing group name.\n\n",prefilters=>["Unix::convert_unix_group_to_gid","Unix::check_gid_exists"],summary=>"Group identifier (GID) that has to exist on the system"}],["unix::gid","uint","int"]];
+our $rschema = ["int",[{description=>"\nSee also `posint` for integers that start from 1.\n\n",examples=>[{data=>0,valid=>1},{data=>1,valid=>1},{data=>-1,valid=>0}],min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},{description=>"\n",examples=>[{valid=>0,value=>-1},{valid=>1,value=>0},{valid=>1,value=>1}],summary=>"Group identifier (GID)"},{description=>"\nExisting means having a group name associated with this GID, i.e. `getgrgid`\nreturns a record.\n\nSupport coercion from an existing group name.\n\n",prefilters=>["Unix::convert_unix_group_to_gid","Unix::check_gid_exists"],summary=>"Group identifier (GID) that has to exist on the system"}],["unix::gid","uint","int"]];
 
 1;
 # ABSTRACT: Group identifier (GID) that has to exist on the system
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::local_gid - Group identifier (GID) that has to exist on the 
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::SchemaR::unix::local_gid (from Perl distribution Sah-Schemas-Unix), released on 2020-02-11.
+This document describes version 0.012 of Sah::SchemaR::unix::local_gid (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
 
 =head1 DESCRIPTION
 

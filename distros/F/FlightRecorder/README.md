@@ -1,6 +1,6 @@
 # NAME
 
-FlightRecorder
+FlightRecorder - Structured Logging
 
 # ABSTRACT
 
@@ -17,7 +17,7 @@ Logging for Distributed Systems
     );
 
     # $f->begin('try');
-    # $f->debug('something happend');
+    # $f->debug('something happened');
     # $f->end;
 
 # DESCRIPTION
@@ -60,7 +60,7 @@ This attribute is read-write, accepts `(Str)` values, and is optional.
 
     head(Str)
 
-This attribute is read-write, accepts `(Str)` values, and is optional.
+This attribute is read-only, accepts `(Str)` values, and is optional.
 
 ## item
 
@@ -115,6 +115,34 @@ when called.
         # given: synopsis
 
         $f->begin('test')->branch('next')
+
+## count
+
+    count(Maybe[Str] $level) : Int
+
+The count method returns the total number of log entries, or the number of log
+entries matching the log level specified.
+
+- count example #1
+
+        # given: synopsis
+
+        $f->begin('try')->debug('something happened')->end;
+        $f->count;
+
+- count example #2
+
+        # given: synopsis
+
+        $f->info('something happened');
+        $f->count('info');
+
+- count example #3
+
+        # given: synopsis
+
+        $f->fatal('something happened');
+        $f->count('fatal');
 
 ## data
 
@@ -242,6 +270,27 @@ The report method loads and returns the specified report plugin.
 
         $f->report('succinct', 'fatal')
 
+## reset
+
+    reset() : Object
+
+The reset method returns an object to its initial state.
+
+- reset example #1
+
+        # given: synopsis
+
+        $f->begin('try')->debug('something happened')->end;
+        $f->reset;
+
+- reset example #2
+
+        # given: synopsis
+
+        $f->begin('try')->debug('something happened')->end;
+        $f->branch('main')->switch('try')->fatal('something happened')->end;
+        $f->reset;
+
 ## serialize
 
     serialize() : HashRef
@@ -254,6 +303,19 @@ a `hashref`.
         # given: synopsis
 
         $f->begin('main')->serialize
+
+## simple
+
+    simple() : Object
+
+The simple method loads and returns the
+[FlightRecorder::Plugin::ReportSimple](https://metacpan.org/pod/FlightRecorder::Plugin::ReportSimple) report plugin.
+
+- simple example #1
+
+        # given: synopsis
+
+        $f->simple
 
 ## succinct
 

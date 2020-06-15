@@ -2,7 +2,7 @@ package With::Roles;
 use strict;
 use warnings;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001001';
 $VERSION =~ tr/_//d;
 
 use Carp qw(croak);
@@ -79,6 +79,14 @@ sub _extends {
   no strict 'refs';
   my $caller = caller;
   @{"${caller}::ISA"} = (@_);
+  _copy_mro($_[0], $caller);
+}
+
+sub _copy_mro {
+  my $source = shift;
+  my $target = shift || caller;
+  mro::set_mro($target, mro::get_mro($source))
+    if defined &mro::set_mro;
 }
 
 sub _detect_type {
@@ -131,6 +139,7 @@ sub _detect_type {
     return 'Role::Tiny';
   }
   else {
+    local $@;
     eval { _require($_) }
       for grep !($INC{'Role/Tiny.pm'} && Role::Tiny->is_role($_)), @roles;
     if (
@@ -167,14 +176,22 @@ sub with::roles {
     my $type = _detect_type($base, @roles)
       or croak "Can't determine class or role type of $base or @roles!";
 
-    my $set_base
-      = $type eq 'Role::Tiny::With' ? __PACKAGE__.'::_extends'
-      : $type =~ /Role/             ? 'with'
-                                    : 'extends';
-    _gen($new, $type,
-      $set_base => [ $base ],
-      with      => [ @roles ],
-    );
+    my @ops;
+
+    if ($type eq 'Role::Tiny::With') {
+      push @ops, __PACKAGE__.'::_extends', [ $base ];
+    }
+    elsif ($type =~ /Role/) {
+      push @ops, with => [ $base ];
+    }
+    else {
+      push @ops, extends => [ $base ];
+      push @ops, __PACKAGE__.'::_copy_mro' => [ $base ];
+    }
+
+    push @ops, with => [ @roles ];
+
+    _gen($new, $type, @ops);
   }
 
   $BASE{$new} = [$orig_base, @all_roles];
@@ -215,7 +232,7 @@ With::Roles - Create role/class/object with composed roles
 
 =head1 DESCRIPTION
 
-This module provides a easy to use global function that can be used on any
+This module provides an easy to use global function that can be used on any
 package to create a new package with a set of roles applied.
 
 When used on classes, generates a subclass with the given roles applied.
@@ -223,12 +240,13 @@ When used on classes, generates a subclass with the given roles applied.
 When used on roles, generates a new role with the base and given roles applied.
 
 When used on objects, applies the roles to the object and returns the object.
+Unlike with roles and classes, this modifies the invocant.
 
 Compatible with L<Moose>, L<Moo>, L<Mouse>, and L<Role::Tiny> roles and classes.
 
-The generated packages will have names based on the original classes and roles.
-The exact form of the generated names should not be relied on, but should aid
-with debugging.
+The generated packages will have names based on the original classes and roles
+to aid with debugging. The exact form of the generated names should not be
+relied on.
 
 A shorthand of C<+RoleName> can be used for roles named like
 C<MyClass::Role::RoleName>.  Additional roles applied will continue to base

@@ -4,7 +4,7 @@
 #  (C) Paul Evans, 2018-2019 -- leonerd@leonerd.org.uk
 
 package Device::Chip::AnalogConverters;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -40,6 +40,12 @@ L<Device::Chip::MAX11200>
 =back
 
 =head2 SUGGESTED ADC METHODS
+
+=head3 trigger
+
+   $chip->trigger( %args )->get
+
+Optional. This method asks the chip to begin taking a reading.
 
 =head3 read_adc
 

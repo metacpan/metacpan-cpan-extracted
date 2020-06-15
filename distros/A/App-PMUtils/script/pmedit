@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-05-10'; # DATE
-our $VERSION = '0.733'; # VERSION
+our $DATE = '2020-06-12'; # DATE
+our $VERSION = '0.734'; # VERSION
 
 use 5.010;
 use strict;
@@ -61,7 +61,7 @@ pmedit - Launch editor for Perl module source code
 
 =head1 VERSION
 
-This document describes version 0.733 of pmedit (from Perl distribution App-PMUtils), released on 2020-05-10.
+This document describes version 0.734 of pmedit (from Perl distribution App-PMUtils), released on 2020-06-12.
 
 =head1 SYNOPSIS
 
@@ -123,6 +123,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 

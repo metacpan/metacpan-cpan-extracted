@@ -1,0 +1,73 @@
+{
+   "abstract" : "Perl extension to talk to modem devices connected via serial port",
+   "author" : [
+      "Cosimo Streppone <cosimo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Modem",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Device::SerialPort" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "IO::Handle" : "0",
+            "Sys::Syslog" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "overload" : "0",
+            "perl" : "5.006",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-device-modem@rt.cpan.org"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cosimo/perl5-device-modem.git"
+      }
+   },
+   "version" : "1.59",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

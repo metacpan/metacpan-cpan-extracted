@@ -1,7 +1,7 @@
 package Sah::SchemaR::color::rgb24;
 
-our $DATE = '2020-03-08'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2020-06-13'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>1,validated_value=>"000000",value=>"000000"},{valid=>1,validated_value=>"000000",value=>"black"},{valid=>1,validated_value=>"ffffcc",value=>"FFffcc"},{valid=>1,validated_value=>"ffffcc",value=>"#FFffcc"},{valid=>0,value=>"foo"}],match=>qr(\A[0-9A-Fa-f]{6}\z),summary=>"RGB 24-digit color, a hexdigit e.g. ffcc00","x.completion"=>["colorname"],"x.perl.coerce_rules"=>["From_str::rgb24_from_colorname_X_or_code"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::color::rgb24 - RGB 24-digit color, a hexdigit e.g. ffcc00
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::color::rgb24 (from Perl distribution Sah-Schemas-Color), released on 2020-03-08.
+This document describes version 0.013 of Sah::SchemaR::color::rgb24 (from Perl distribution Sah-Schemas-Color), released on 2020-06-13.
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 ---
 abstract: 'shortcuts for writing Tickit apps'
 author:
-  - 'Tom Molesworth <cpan@perlsite.co.uk>'
+  - 'Tom Molesworth <TEAM@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -9,53 +9,88 @@ build_requires:
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
   Test::More: '0.98'
-  perl: '5.010001'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Tickit-DSL
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
 provides:
   Tickit::DSL:
     file: lib/Tickit/DSL.pm
-    version: '0.033'
+    version: '0.034'
 recommends:
   Tickit::Async: '0'
 requires:
   Exporter: '0'
+  IO::Async::Loop: '0'
   List::UtilsBy: '0'
   Tickit: '0.63'
-  Tickit::Widget::Breadcrumb: '0.003'
-  Tickit::Widget::Calendars: '0.001'
-  Tickit::Widget::Choice: '0.02'
-  Tickit::Widget::Decoration: '0.004'
-  Tickit::Widget::Figlet: '0.003'
-  Tickit::Widget::FileViewer: '0.004'
-  Tickit::Widget::FloatBox: '0.02'
-  Tickit::Widget::Layout::Desktop: '0.011'
-  Tickit::Widget::Layout::Relative: '0.005'
-  Tickit::Widget::LogAny: '0.005'
-  Tickit::Widget::Menu: '0.08'
-  Tickit::Widget::Progressbar: '0.101'
-  Tickit::Widget::ScrollBox: '0.07'
-  Tickit::Widget::Scroller: '0.22'
-  Tickit::Widget::SegmentDisplay: '0.02'
-  Tickit::Widget::SparkLine: '0.104'
-  Tickit::Widget::Statusbar: '0.004'
-  Tickit::Widget::Tabbed: '0.018'
-  Tickit::Widget::Table: '0.216'
-  Tickit::Widget::Term: '0.003'
-  Tickit::Widget::Tree: '0.114'
-  Tickit::Widget::VHBox: '0.001'
+  Tickit::Async: '0'
+  Tickit::Widget::Border: '0'
+  Tickit::Widget::Box: '0'
+  Tickit::Widget::Breadcrumb: '0'
+  Tickit::Widget::Button: '0'
+  Tickit::Widget::Calendars: '0'
+  Tickit::Widget::CheckButton: '0'
+  Tickit::Widget::Choice: '0'
+  Tickit::Widget::Decoration: '0'
+  Tickit::Widget::Entry: '0'
+  Tickit::Widget::Figlet: '0'
+  Tickit::Widget::FileViewer: '0'
+  Tickit::Widget::FloatBox: '0'
+  Tickit::Widget::Frame: '0'
+  Tickit::Widget::GridBox: '0'
+  Tickit::Widget::HBox: '0'
+  Tickit::Widget::HSplit: '0'
+  Tickit::Widget::Layout::Desktop: '0'
+  Tickit::Widget::Layout::Relative: '0'
+  Tickit::Widget::LogAny: '0'
+  Tickit::Widget::Menu: '0'
+  Tickit::Widget::Menu::Item: '0'
+  Tickit::Widget::MenuBar: '0'
+  Tickit::Widget::Placegrid: '0'
+  Tickit::Widget::Progressbar: '0'
+  Tickit::Widget::RadioButton: '0'
+  Tickit::Widget::ScrollBox: '0'
+  Tickit::Widget::Scroller: '0'
+  Tickit::Widget::Scroller::Item::RichText: '0'
+  Tickit::Widget::Scroller::Item::Text: '0'
+  Tickit::Widget::SegmentDisplay: '0'
+  Tickit::Widget::SparkLine: '0'
+  Tickit::Widget::Spinner: '0'
+  Tickit::Widget::Static: '0'
+  Tickit::Widget::Statusbar: '0'
+  Tickit::Widget::Tabbed: '0'
+  Tickit::Widget::Table: '0'
+  Tickit::Widget::Term: '0'
+  Tickit::Widget::Tree: '0'
+  Tickit::Widget::VBox: '0.46'
+  Tickit::Widget::VHBox: '0'
+  Tickit::Widget::VSplit: '0'
   Tickit::Widgets: '0.19'
   parent: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Tickit-DSL/issues
-  homepage: http://search.cpan.org/perldoc?Tickit-DSL
-  repository: git://github.com/team-at-cpan/Tickit-DSL.git
-version: '0.033'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+  homepage: https://github.com/team-at-cpan/Tickit-DSL
+  repository: https://github.com/team-at-cpan/Tickit-DSL.git
+version: '0.034'
+x_authority: cpan:TEAM
+x_contributors:
+  - 'Tom Molesworth <tom@perlsite.co.uk>'
+x_generated_by_perl: v5.30.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

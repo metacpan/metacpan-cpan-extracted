@@ -1,6 +1,6 @@
 package AnyEvent::SparkBot;
 
-our $VERSION='1.011';
+our $VERSION='1.012';
 use Modern::Perl;
 use Moo;
 use MooX::Types::MooseLike::Base qw(:all);

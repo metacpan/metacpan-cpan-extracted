@@ -3,8 +3,10 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.17;
-class Tickit::Widget::Scroller::Item::Text 0.24;
+use Object::Pad 0.27;
+
+package Tickit::Widget::Scroller::Item::Text 0.25;
+class Tickit::Widget::Scroller::Item::Text;
 
 use Tickit::Utils qw( textwidth cols2chars );
 
@@ -61,7 +63,7 @@ has @_chunks;
 has $_width; # width for which the @_lineruns are valid
 has @_lineruns;
 
-method BUILD ( $text, %opts )
+BUILD ( $text, %opts )
 {
    $_indent = $opts{indent} if defined $opts{indent};
 

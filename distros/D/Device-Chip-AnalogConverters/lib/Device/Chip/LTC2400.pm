@@ -1,17 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::LTC2400;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
+package Device::Chip::LTC2400 0.09;
+class Device::Chip::LTC2400
+   extends Device::Chip;
 
 use Future::AsyncAwait;
-
-our $VERSION = '0.08';
 
 use constant PROTOCOL => "SPI";
 
@@ -65,10 +63,8 @@ other fields will be provided.
 
 =cut
 
-async sub read_adc
+async method read_adc ()
 {
-   my $self = shift;
-
    my $bytes = await $self->protocol->readwrite( "\x00" x 4 );
 
    my $value = unpack "L>", $bytes;

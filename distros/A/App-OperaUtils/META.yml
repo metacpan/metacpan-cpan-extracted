@@ -17,10 +17,13 @@ meta-spec:
   version: '1.4'
 name: App-OperaUtils
 requires:
-  App::BrowserUtils: '0.002'
+  App::BrowserUtils: '0.008'
+  Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
+  Data::Sah::Compiler::perl::TH::any: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
+  Data::Sah::Compiler::perl::TH::str: '0'
   Data::Sah::Filter::perl::Unix::check_uid_exists: '0'
   Data::Sah::Filter::perl::Unix::convert_unix_user_to_uid: '0'
   Log::ger: '0.037'
@@ -35,14 +38,22 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-OperaUtils
   homepage: https://metacpan.org/release/App-OperaUtils
   repository: git://github.com/perlancar/perl-App-OperaUtils.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
   plugins:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript opera-has-processes'
+      version: '0.422'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript opera-is-paused'
+      version: '0.422'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript opera-is-running'
       version: '0.422'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -55,6 +66,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript ps-opera'
+      version: '0.422'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript restart-opera'
+      version: '0.422'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript start-opera'
       version: '0.422'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
@@ -151,7 +170,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.060'
+      version: '0.062'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -332,7 +351,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.144'
+      version: '0.145'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'

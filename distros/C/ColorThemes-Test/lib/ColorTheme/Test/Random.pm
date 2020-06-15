@@ -1,9 +1,9 @@
 package ColorTheme::Test::Random;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-13'; # DATE
 our $DIST = 'ColorThemes-Test'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ ColorTheme::Test::Random - A color theme which gives random colors
 
 =head1 VERSION
 
-This document describes version 0.002 of ColorTheme::Test::Random (from Perl distribution ColorThemes-Test), released on 2020-06-09.
+This document describes version 0.003 of ColorTheme::Test::Random (from Perl distribution ColorThemes-Test), released on 2020-06-13.
 
 =head1 HOMEPAGE
 

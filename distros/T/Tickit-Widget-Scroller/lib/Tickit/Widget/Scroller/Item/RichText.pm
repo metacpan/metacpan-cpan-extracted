@@ -4,7 +4,9 @@
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
 use Object::Pad 0.17;
-class Tickit::Widget::Scroller::Item::RichText 0.24
+
+package Tickit::Widget::Scroller::Item::RichText 0.25;
+class Tickit::Widget::Scroller::Item::RichText
    extends Tickit::Widget::Scroller::Item::Text;
 
 use Tickit::Utils qw( textwidth );

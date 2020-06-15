@@ -1,18 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::MAX11200;
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
-
-our $VERSION = '0.08';
+package Device::Chip::MAX11200 0.09;
+class Device::Chip::MAX11200
+   extends Device::Chip;
 
 use Carp;
 use Future::AsyncAwait;
+use Future::IO;
 use Data::Bitfield 0.02 qw( bitfield boolfield enumfield );
 use List::Util qw( first );
 
@@ -59,6 +58,27 @@ L<Future> instances.
 
 =cut
 
+=head2 init
+
+   $chip->init->get
+
+Performs startup self-calibration by setting C<NOSCG> and C<NOSCO> to zero
+then requesting a calibration cycle.
+
+=cut
+
+async method init ()
+{
+   await $self->change_config(
+      NOSCG => 0,
+      NOSCO => 0,
+   );
+
+   await $self->selfcal;
+
+   await Future::IO->sleep( 0.2 ); # selfcal takes 200msec
+}
+
 use constant {
    REG_STAT  => 0,
    REG_CTRL1 => 1,
@@ -71,13 +91,8 @@ use constant {
    REG_SCGC  => 8,
 };
 
-async sub read_register
+async method read_register ( $reg, $len = 1 )
 {
-   my $self = shift;
-   my ( $reg, $len ) = @_;
-
-   $len //= 1;
-
    my $bytes = await $self->protocol->readwrite(
       pack "C a*", 0xC1 | ( $reg << 1 ), "\0" x $len
    );
@@ -85,11 +100,8 @@ async sub read_register
    return substr $bytes, 1;
 }
 
-async sub write_register
+async method write_register ( $reg, $val )
 {
-   my $self = shift;
-   my ( $reg, $val ) = @_;
-
    await $self->protocol->write(
       pack "C a*", 0xC0 | ( $reg << 1 ), $val
    );
@@ -105,11 +117,8 @@ use constant {
    CMD_CONV      => 0,
 };
 
-async sub command
+async method command ( $cmd )
 {
-   my $self = shift;
-   my ( $cmd ) = @_;
-
    await $self->protocol->write( pack "C", 0x80 | $cmd );
 }
 
@@ -136,10 +145,8 @@ bitfield { format => "bytes-LE" }, STAT =>
    RATE  => enumfield(4, @RATES),
    SYSOR => boolfield(7);
 
-async sub read_status
+async method read_status ()
 {
-   my $self = shift;
-
    my $bytes = await $self->read_register( REG_STAT );
 
    return unpack_STAT( $bytes );
@@ -183,10 +190,8 @@ bitfield { format => "bytes-LE" }, CONFIG =>
    NOSYSG => boolfield(8+4),
    DGAIN  => enumfield(8+5, qw( 1 2 4 8 16 ));
 
-async sub read_config
+async method read_config ()
 {
-   my $self = shift;
-
    my ( $ctrl1, $ctrl3 ) = await Future->needs_all(
       $self->read_register( REG_CTRL1 ), $self->read_register( REG_CTRL3 )
    );
@@ -203,11 +208,8 @@ their existing values.
 
 =cut
 
-async sub change_config
+async method change_config ( %changes )
 {
-   my $self = shift;
-   my %changes = @_;
-
    my $config = $self->{config} // await $self->read_config;
 
    $self->{config} = { %$config, %changes };
@@ -227,10 +229,8 @@ Requests the chip perform a self-calibration.
 
 =cut
 
-async sub selfcal
+async method selfcal ()
 {
-   my $self = shift;
-
    await $self->command( CMD_SELFCAL );
 }
 
@@ -242,10 +242,8 @@ Requests the chip perform the offset part of system calibration.
 
 =cut
 
-async sub syscal_offset
+async method syscal_offset ()
 {
-   my $self = shift;
-
    await $self->command( CMD_SYSOCAL );
 }
 
@@ -257,10 +255,8 @@ Requests the chip perform the gain part of system calibration.
 
 =cut
 
-async sub syscal_gain
+async method syscal_gain ()
 {
-   my $self = shift;
-
    await $self->command( CMD_SYSGCAL );
 }
 
@@ -270,18 +266,24 @@ async sub syscal_gain
 
 Requests the chip perform a conversion of the input level, at the given
 rate (which must be one of the values specified for the C<RATE> configuration
-option); defaulting to C<120> if not defined. Once the conversion is complete
-it can be read using the C<read_adc> method.
+option); defaulting to the value of L</default_trigger_rate> if not defined.
+Once the conversion is complete it can be read using the C<read_adc> method.
+
+=head2 default_trigger_rate
+
+   $rate = $chip->default_trigger_rate
+   $chip->default_trigger_rate = $new_rate
+
+Lvalue accessor for the default trigger rate if L</trigger> is invoked without
+one. Initialised to 120.
 
 =cut
 
-async sub trigger
+has $_default_trigger_rate = 120;
+method default_trigger_rate :lvalue { $_default_trigger_rate }
+
+async method trigger ( $rate = $_default_trigger_rate )
 {
-   my $self = shift;
-   my ( $rate ) = @_;
-
-   $rate //= 120;
-
    defined( my $rateidx = first { $RATES[$_] == $rate } 0 .. $#RATES )
       or croak "Unrecognised conversion rate $rate";
 
@@ -301,10 +303,8 @@ either signed or unsigned as per the C<FORMAT> configuration.
 
 =cut
 
-async sub read_adc
+async method read_adc ()
 {
-   my $self = shift;
-
    my $bytes = await $self->read_register( REG_DATA, 3 );
 
    return unpack "L>", "\0$bytes";
@@ -319,10 +319,8 @@ taking into account the current mode setting of the chip.
 
 =cut
 
-async sub read_adc_ratio
+async method read_adc_ratio ()
 {
-   my $self = shift;
-
    my ( $value, $config ) = await Future->needs_all(
       $self->read_adc,
       ( $self->{config} ? Future->done( $self->{config} ) : $self->read_config )
@@ -357,20 +355,17 @@ Sets or reads the values of the GPIO pins as a 4-bit integer. Bits in the
 C<$direction> should be high to put the corresponding pin into output mode, or
 low to put it into input mode.
 
+As an alternative to these methods, see instead L</gpio_adapter>.
+
 =cut
 
-async sub write_gpios
+async method write_gpios ( $values, $dir )
 {
-   my $self = shift;
-   my ( $values, $dir ) = @_;
-
    await $self->write_register( REG_CTRL2, pack "C", ( $dir << 4 ) | $values );
 }
 
-async sub read_gpios
+async method read_gpios ()
 {
-   my $self = shift;
-
    my $bytes = await $self->read_register( REG_CTRL2 );
 
    return 0x0F & unpack "C", $bytes;
@@ -403,16 +398,101 @@ foreach (
 
    no strict 'refs';
 
-   *{"read_$name"} = async sub {
-      my $bytes = await $_[0]->read_register( $reg, 3 );
+   *{"read_$name"} = async method () {
+      my $bytes = await $self->read_register( $reg, 3 );
       return unpack "I>", "\0" . $bytes;
    };
 
-   *{"write_$name"} = async sub {
-      await $_[0]->write_register( $reg,
-         substr( pack( "I>", $_[1] ), 1 )
+   *{"write_$name"} = async method ( $value ) {
+      await $self->write_register( $reg,
+         substr( pack( "I>", $value ), 1 )
       );
    };
+}
+
+=head2 as_gpio_adapter
+
+   $adapter = $chip->as_gpio_adapter
+
+Returns an instance implementing the L<Device::Chip::Adapter> interface,
+allowing access to the four GPIO pins via the standard adapter API.
+
+=cut
+
+method as_gpio_adapter
+{
+   return Device::Chip::MAX11200::_GPIOAdapter->new( $self );
+}
+
+class Device::Chip::MAX11200::_GPIOAdapter {
+   use Carp;
+
+   has $_chip;
+   BUILD { ( $_chip ) = @_; }
+
+   async method make_protocol ( $pname )
+   {
+      $pname eq "GPIO" or
+         croak "Unrecognised protocol name $pname";
+
+      return $self;
+   }
+
+   method list_gpios { qw( GPIO1 GPIO2 GPIO3 GPIO4 ) }
+
+   method meta_gpios
+   {
+      return map {
+         Device::Chip::Adapter::GPIODefinition( $_, "rw", 0 )
+      } $self->list_gpios;
+   }
+
+   has $_dir = "";
+   has $_val = "";
+
+   async method write_gpios ( $values )
+   {
+      foreach my $n ( 1 .. 4 ) {
+         defined( my $v = $values->{"GPIO$n"} ) or next;
+
+         vec( $_dir, $n-1, 1 ) = 1;
+         vec( $_val, $n-1, 1 ) = $v;
+      }
+
+      await $_chip->write_gpios( ord $_val, ord $_dir );
+   }
+
+   async method tris_gpios ( $pins )
+   {
+      my $newdir = $_dir;
+      foreach my $pin ( @$pins ) {
+         $pin =~ m/^GPIO(\d)/ and $1 >= 1 and $1 <= 4 or
+            croak "Unrecognised GPIO pin name $pin";
+         my $n = $1;
+
+         vec( $newdir, $n-1, 1 ) = 0;
+      }
+
+      if( $newdir ne $_dir ) {
+         $_dir = $newdir;
+         await $_chip->write_gpios( ord $_val, ord $_dir );
+      }
+   }
+
+   async method read_gpios ( $pins )
+   {
+      await $self->tris_gpios( $pins );
+
+      my $read = chr await $_chip->read_gpios;
+
+      my %ret;
+      foreach my $pin ( @$pins ) {
+         $pin =~ m/^GPIO(\d)/ and my $n = $1;
+         $ret{$pin} = vec( $read, $n-1, 1 );
+      }
+
+      return \%ret;
+   }
 }
 
 =head1 AUTHOR

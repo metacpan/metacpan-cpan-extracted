@@ -1,15 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::MCP3221;
+use 5.026;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
-
-our $VERSION = '0.08';
+package Device::Chip::MCP3221 0.09;
+class Device::Chip::MCP3221
+   extends Device::Chip;
 
 use Future::AsyncAwait;
 
@@ -50,11 +49,8 @@ leading C<0> or C<0x> prefixes.
 
 =cut
 
-sub I2C_options
+sub I2C_options ( $, %params )
 {
-   my $self = shift;
-   my %params = @_;
-
    my $addr = delete $params{addr} // 0x4D;
    $addr = oct $addr if $addr =~ m/^0/;
 
@@ -72,8 +68,8 @@ L<Future> instances.
 =cut
 
 # Chip has no config registers
-async sub read_config { return {} }
-async sub change_config { }
+async method read_config () { return {} }
+async method change_config (%) { }
 
 =head2 read_adc
 
@@ -84,10 +80,8 @@ integer.
 
 =cut
 
-async sub read_adc
+async method read_adc ()
 {
-   my $self = shift;
-
    my $buf = await $self->protocol->read( 2 );
 
    return unpack "S>", $buf;
@@ -102,10 +96,8 @@ between 0 and 1.
 
 =cut
 
-async sub read_adc_ratio
+async method read_adc_ratio ()
 {
-   my $self = shift;
-
    # MCP3221 is 12-bit
    return ( await $self->read_adc ) / 2**12;
 }

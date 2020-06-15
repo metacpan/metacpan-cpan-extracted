@@ -1,0 +1,136 @@
+
+=head1 NAME
+
+OpenTracing::Role::ContextReference - Role for OpenTracing implementations.
+
+
+
+=head1 SYNOPSIS
+
+    package OpenTracing::Implementation::MyBackendService::ContextReference;
+    
+    use Moo;
+    
+    with 'OpenTracing::Role::ContextReference'
+    
+    1;
+
+=cut
+
+
+
+=head1 DESCRIPTION
+
+This C<Moo::Role> provides the consuming class with most, if not all, of the
+methods being described in L<OpenTracing::Interface::ContextReference>.
+
+
+
+=head1 IMPLEMENTED OPENTRACING METHODS
+
+The following methods from
+L<OpenTracing::Interface|OpenTracing::Interface::ContextReference>
+have been implemented. See their documentation for more details.
+
+
+
+
+=head2 C<new_child_of>
+
+Creates a C<SpanContext> C<ContextReference> for which L<type_is_child_of> is
+'true'.
+
+See L<OpenTracing::Interface::ContextReference/"new_child_of">.
+
+
+
+=head2 C<type_is_child_of>
+
+See L<OpenTracing::Interface::ContextReference/"type_is_child_of">.
+
+
+
+=head2 C<new_follows_from>
+
+Creates a C<SpanContext> C<ContextReference> for which L<type_is_follows_from>
+is 'true'.
+
+See L<OpenTracing::Interface::ContextReference/"new_follows_from">.
+
+
+
+=head2 C<type_is_follows_from>
+
+See L<OpenTracing::Interface::ContextReference/"type_is_follows_from">.
+
+
+
+=head2 C<get_referenced_context>
+
+Returns the original referenced C<SpanContext>.
+
+See L<OpenTracing::Interface::ContextReference/"get_referenced_context">.
+
+
+
+=head1 WARNING
+
+B<Never use any of attributes or methods below in any integration!>
+
+Only methods mentioned in the Public OpenTracing::Interface are safe to be used
+in any integration or when instrumenting applications.
+
+
+
+==head1 ATTRIBUTES
+
+
+
+=head2 C<reference_type>
+
+An L<< C<Enum>|Types::Standard/"Enum >> type
+of either the constant C<CHILD_OF> or C<FOLLOWS_FROM>.
+This is just an I<implementation detail> as other methods are provided to deal
+with C<reference_type>. See L<above|/"IMPLEMENTED OPENTRACING METHODS">
+
+
+
+=head2 C<reference_context>
+
+A required L<SpanContext|OpenTracing::Types/"SpanContext"> type.
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Types>
+
+Type constraints for checking Interfaces
+
+=item L<OpenTracing::Interface::ContextReference>
+
+Defines the ContextReference
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing API for Perl' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This library is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+=cut

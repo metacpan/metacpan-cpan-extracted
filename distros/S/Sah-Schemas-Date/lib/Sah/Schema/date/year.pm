@@ -1,17 +1,17 @@
 package Sah::Schema::date::year;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-03'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Date'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [int => {
     summary => 'Year number',
     examples => [
-        {data=>'', valid=>0},
-        {data=>1, valid=>1},
-        {data=>2020, valid=>1},
-        {data=>1.1, valid=>0},
+        {value=>'', valid=>0},
+        {value=>1, valid=>1},
+        {value=>2020, valid=>1},
+        {value=>1.1, valid=>0},
     ],
 }, {}];
 
@@ -31,7 +31,7 @@ Sah::Schema::date::year - Year number
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schema::date::year (from Perl distribution Sah-Schemas-Date), released on 2020-03-03.
+This document describes version 0.013 of Sah::Schema::date::year (from Perl distribution Sah-Schemas-Date), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;

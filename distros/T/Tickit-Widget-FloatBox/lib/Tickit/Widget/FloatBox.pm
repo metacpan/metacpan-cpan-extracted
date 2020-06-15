@@ -4,9 +4,10 @@
 #  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
 use 5.026; # signatures
-use Object::Pad 0.17;
+use Object::Pad 0.27;
 
-class Tickit::Widget::FloatBox 0.07
+package Tickit::Widget::FloatBox 0.08;
+class Tickit::Widget::FloatBox
    extends Tickit::ContainerWidget;
 
 use Carp;
@@ -64,7 +65,7 @@ mutator.
 has $_base_child;
 has @_floats;
 
-method BUILD ( %args )
+BUILD ( %args )
 {
    if( $args{base_child} ) {
       Carp::carp( "The 'base_child' constructor argument to ${\ref $self} is discouraged; use ->set_base_child instead" );
@@ -246,7 +247,7 @@ has $_child;
 has $_hidden;
 has %_geom;
 
-method BUILD ( $fb, $child, %args )
+BUILD ( $fb, $child, %args )
 {
    $_fb = $fb;
    $_child = $child;

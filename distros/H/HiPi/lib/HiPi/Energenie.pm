@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Energenie
 # Description:   Control Energenie devices
-# Copyright    : Copyright (c) 2016-2017 Mark Dootson
+# Copyright    : Copyright (c) 2016-2020 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -21,7 +21,7 @@ use Carp;
 
 __PACKAGE__->create_accessors( qw( backend ook_repeat can_rx ) );
 
-our $VERSION ='0.81';
+our $VERSION ='0.82';
 
 use constant {
     STATE_LISTEN                => 2,
@@ -72,6 +72,17 @@ sub new {
             );
             $params{device} = $dev;
             
+        } elsif( $params{backend} eq 'RF69HW' ) {
+            # Two way high powered module
+            require HiPi::Energenie::ENER314_RT;
+            my $dev = HiPi::Energenie::ENER314_RT->new(
+                led_on      => 0,
+                devicename  => $params{devicename},
+                reset_gpio  => $params{reset_gpio},
+                rf_high_power => 1,
+            );
+            $params{device} = $dev;
+            
         } elsif( $params{backend} eq 'ENER314' ) { 
             # simple 1 way single group board
             require HiPi::Energenie::ENER314;
@@ -106,7 +117,7 @@ sub switch_socket {
 # test what we actually send 
 sub dump_message {
     my($self, $socket, $offon) = @_;
-    croak(q(Method requires backend 'ENER314_RT')) if $self->backend ne 'ENER314_RT';
+    croak(q(Method requires backend 'ENER314_RT' or 'RF69HW' )) if $self->backend !~ /^ENER314_RT|RF69HW$/;
     croak(qq(Invalid socket $socket)) unless $socket =~ /^0|1|2|3|4$/;
     $offon = ( $offon ) ? 1 : 0;
     my $data = $_ook_switchdata->[$socket]->[$offon];

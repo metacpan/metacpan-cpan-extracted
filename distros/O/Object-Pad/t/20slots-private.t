@@ -11,7 +11,7 @@ class Base::Class {
    has $data;
    method data { $data }
 
-   method BUILD {
+   BUILD {
       $data = "base data"
    }
 }
@@ -20,7 +20,7 @@ class Derived::Class extends Base::Class {
    has $data;
    method data { $data }
 
-   method BUILD {
+   BUILD {
       $data = "derived data";
    }
 }

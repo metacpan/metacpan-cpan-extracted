@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.871';
+our $VERSION = '1.872';
 
 use MCE::Shared::Base ();
 use base 'MCE::Shared::Base::Common';
@@ -753,6 +753,15 @@ sub hgetset {
    $self->[0][0]{ $key }->getset(@_);
 }
 
+# hsetnx ( key, field, value )
+
+sub hsetnx {
+   my ( $self, $key ) = ( shift, shift );
+   return unless length($key);
+   $self->[0]->set($key, _new_hash()) unless exists($self->[0][0]{ $key });
+   $self->[0][0]{ $key }->setnx(@_);
+}
+
 # hlen ( key, field )
 # hlen ( key )
 # hlen ( )
@@ -1114,7 +1123,7 @@ MCE::Shared::Minidb - A pure-Perl in-memory data store
 
 =head1 VERSION
 
-This document describes MCE::Shared::Minidb version 1.871
+This document describes MCE::Shared::Minidb version 1.872
 
 =head1 DESCRIPTION
 
@@ -1596,6 +1605,15 @@ returned.
  $val = $db->hset( "some_key", "field", "value" );
  $len = $db->hset( "some_key", "f1" => "val1", "f2" => "val2" );
 
+=head2 hsetnx ( key, field, value )
+
+Sets the value of a hash field, only if the field does not exist. Returns a 1
+for new field or 0 if the field already exists and no operation was performed.
+
+ $ret = $db->hsetnx( "some_key", "field", "value" );
+
+Current API available since 1.872.
+
 =head2 hshift
 
 Removes and returns the first key-value pair or value in scalar context from
@@ -2067,7 +2085,7 @@ Increments the value of key-index by one and returns its old value.
 
 =head2 lgetset ( key, index, value )
 
-Sets the value of key-index and return its old value.
+Sets the value of key-index and returns its old value.
 
  $old = $db->lgetset( $key, 0, "baz" );
 

@@ -19,7 +19,7 @@ subtest "pass on arguments for 'close'" => sub {
     my $test_object = bless {}, 'MyTest::Scope';
     
     lives_ok {
-        $test_object->close( )
+        my $test_object = $test_object->close( )
     } "Can call method 'close'";
     
     cmp_deeply(
@@ -40,7 +40,7 @@ subtest "pass on arguments for 'get_span'" => sub {
     my $test_object = bless {}, 'MyTest::Scope';
     
     lives_ok {
-        $test_object->get_span()
+        my $span = $test_object->get_span()
     } "Can call method 'get_span'";
     
     cmp_deeply(
@@ -60,6 +60,8 @@ done_testing();
 
 package MyTest::Scope;
 
+use Moo;
+
 sub close {
     push @main::test_params, [ @_ ];
     
@@ -70,26 +72,30 @@ sub close {
 sub get_span {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MyDuck::Span'
+    
+    return bless {}, 'MyStub::Span'
     
 };
 
 BEGIN {
-    use Role::Tiny::With;
+#   use Role::Tiny::With;
     with 'OpenTracing::Interface::Scope'
 }
 
 
 
-package MyDuck::Span;
+package MyStub::Span;
 
-sub get_context;
-sub overwrite_operation_name;
-sub finish;
-sub set_tag;
-sub log_data;
-sub set_baggage_item;
-sub get_baggage_item;
+sub get_context              { ... };
+sub overwrite_operation_name { ... };
+sub finish                   { ... };
+sub add_tag                  { ... };
+sub add_tags                 { ... };
+sub log_data                 { ... };
+sub add_baggage_item         { ... };
+sub add_baggage_items        { ... };
+sub get_baggage_item         { ... };
+sub get_baggage_items        { ... };
 
 
 

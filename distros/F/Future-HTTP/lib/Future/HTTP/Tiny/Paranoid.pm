@@ -7,7 +7,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 extends 'Future::HTTP::Tiny';
 
@@ -18,7 +18,7 @@ has '+ua' => (
 
 =head1 NAME
 
-Future::HTTP::Tiny - synchronous HTTP client with a Future interface
+Future::HTTP::Tiny::Paranoid - synchronous HTTP client with a Future interface
 
 =head1 DESCRIPTION
 
@@ -40,11 +40,15 @@ You can set up the whitelist and blacklist through the global accessors:
 
 =head1 METHODS
 
-=head2 C<< Future::HTTP::Tiny->new() >>
+=head2 C<< Future::HTTP::Tiny::Paranoid->new() >>
 
-    my $ua = Future::HTTP::Tiny->new();
+    my $ua = Future::HTTP::Tiny::Paranoid->new();
 
 Creates a new instance of the HTTP client.
+
+=head2 C<< $ua->is_async() >>
+
+Returns false, because this backend is synchronous.
 
 =head2 C<< $ua->http_get($url, %options) >>
 
@@ -151,7 +155,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

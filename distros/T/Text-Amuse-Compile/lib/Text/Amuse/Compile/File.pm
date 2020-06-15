@@ -1418,6 +1418,10 @@ sub _interpolate_magic_comments {
                     strut |
                     flushbottom |
                     raggedbottom |
+                    vfill |
+                    amusewiki[a-zA-Z]+ |
+                    clearpage |
+                    cleardoublepage |
                     vskip \x{20}+ $size
                 )
                 \x{20}*

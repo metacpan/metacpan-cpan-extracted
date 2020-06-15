@@ -11,7 +11,7 @@ class Animal 1.23 {
    has $legs;
    method legs { $legs };
 
-   method BUILD {
+   BUILD {
       ( $legs ) = @_;
    }
 }

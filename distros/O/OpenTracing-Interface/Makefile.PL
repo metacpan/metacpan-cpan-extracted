@@ -5,7 +5,7 @@ WriteMakefile(
     'AUTHOR'        => [
         'Theo van Hoesel (VANHOESEL) <tvanhoesel@perceptyx.com'
     ],
-    'VERSION'       => '0.20',
+    'VERSION'       => 'v0.202.2',
     'ABSTRACT_FROM' => 'lib/OpenTracing/Interface.pod',
     'LICENSE'       => 'artistic2',
     'MAN3PODS'      => {
@@ -18,7 +18,7 @@ WriteMakefile(
         'lib/OpenTracing/Interface/Scope.pod'
             => 'blib/man3/OpenTracing::Interface::Scope.3',
         'lib/OpenTracing/Interface/ScopeManager.pod'
-            => 'blib/man3/OpenTracing::Interface::Scopemanager.3',
+            => 'blib/man3/OpenTracing::Interface::ScopeManager.3',
         'lib/OpenTracing/Interface/Span.pod'
             => 'blib/man3/OpenTracing::Interface::Span.3',
         'lib/OpenTracing/Interface/SpanContext.pod'
@@ -29,21 +29,21 @@ WriteMakefile(
     'META_MERGE'    => {
         provides        => {
             'OpenTracing::Interface'
-                => { version => '0.20', file => 'lib/OpenTracing/Interface.pm' },
+                => { version => 'v0.202.2', file => 'lib/OpenTracing/Interface.pm' },
             'OpenTracing::Interface::ContextReference'
-                => { version => '0.20', file => 'lib/OpenTracing/Interface/ContextReference.pm' },
+                => { version => 'v0.202.2', file => 'lib/OpenTracing/Interface/ContextReference.pm' },
             'OpenTracing::Interface::Scope'
-                => { version => '0.20', file => 'lib/OpenTracing/Interface/Scope.pm' },
+                => { version => 'v0.202.2', file => 'lib/OpenTracing/Interface/Scope.pm' },
             'OpenTracing::Interface::ScopeManager'
-                => { version => '0.20', file => 'lib/OpenTracing/Interface/ScopeManager.pm' },
+                => { version => 'v0.202.2', file => 'lib/OpenTracing/Interface/ScopeManager.pm' },
             'OpenTracing::Interface::Span'
-                => { version => '0.20', file => 'lib/OpenTracing/Interface/Span.pm' },
+                => { version => 'v0.202.2', file => 'lib/OpenTracing/Interface/Span.pm' },
             'OpenTracing::Interface::SpanContext'
-                => { version => '0.20', file => 'lib/OpenTracing/Interface/SpanContext.pm' },
+                => { version => 'v0.202.2', file => 'lib/OpenTracing/Interface/SpanContext.pm' },
             'OpenTracing::Interface::Tracer'
-                => { version => '0.20', file => 'lib/OpenTracing/Interface/Tracer.pm' },
+                => { version => 'v0.202.2', file => 'lib/OpenTracing/Interface/Tracer.pm' },
             'OpenTracing::Types'
-                => { version => '0.20', file => 'lib/OpenTracing/Types.pm' },
+                => { version => 'v0.202.2', file => 'lib/OpenTracing/Types.pm' },
         },
         description => '`OpenTracing::Interface` describes the OpenTracing API'
               . '  ' . 'for the Perl5 programming language.'

@@ -5,7 +5,6 @@ use Tickit::DSL;
 use Eval::WithLexicals;
 use Try::Tiny;
 use Data::Dumper;
-
 my $eval = Eval::WithLexicals->with_plugins(
 	"HintPersistence"
 )->new(
@@ -39,20 +38,3 @@ vbox {
 	};
 };
 tickit->run;
-
-=pod
-
-
-  menubar {
-    menuitem {
-      menuitem { tickit->stop } label => 'Exit';
-	} label => 'File';
-    menuitem {
-      menuitem { tickit->stop } label => 'Exit';
-	} label => 'Widgets';
-  } linetype => 'single';
-  desktop { };
-  statusbar { };
-
-=cut
-

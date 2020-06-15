@@ -5,63 +5,40 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.20';
+our $VERSION = 'v0.202.2';
 
 
-use Role::MethodReturns;
+use Role::Declare;
 
 use OpenTracing::Types qw/ContextReference SpanContext/;
 use Types::Standard qw/Bool/;
 
 use namespace::clean;
 
-around new_child_of => class_method ( SpanContext $span_context ) {
-    
-    returns( ContextReference ,
-        $original->( $class => ( $span_context ) )
-    );
-    
-};
+class_method new_child_of(
+    SpanContext $span_context
+) :Return(ContextReference) {}
 
 
 
-around new_follows_from => class_method ( SpanContext $span_context ) {
-    
-    returns( ContextReference ,
-        $original->( $class => ( $span_context ) )
-    )
-    
-};
+class_method new_follows_from(
+    SpanContext $span_context
+) :Return(ContextReference) {}
 
 
 
-around get_referenced_context => instance_method ( ) {
-    
-    returns( SpanContext ,
-        $original->( $instance => ( ) )
-    )
-    
-};
+instance_method get_referenced_context(
+) :Return(SpanContext) {}
 
 
 
-around type_is_child_of => instance_method ( ) {
-    
-    returns( Bool ,
-        $original->( $instance => ( ) )
-    )
-    
-};
+instance_method type_is_child_of(
+) :Return(Bool) {}
 
 
 
-around type_is_follows_from => instance_method ( ) {
-    
-    returns( Bool ,
-        $original->( $instance => ( ) )
-    )
-    
-};
+instance_method type_is_follows_from(
+) :Return(Bool) {}
 
 
 

@@ -9,7 +9,7 @@ use feature 'signatures';
 use HTTP::Request;
 use IO::Async::Future;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 with 'Future::HTTP::Handler';
 
@@ -49,6 +49,8 @@ sub BUILDARGS {
         @ua_args
     }
 }
+
+sub is_async { !0 }
 
 sub _ae_from_netasync( $self, $res ) {
     # Convert the result back to the AnyEvent format
@@ -123,11 +125,15 @@ sub http_post($self,$url,$body,%options) {
 
 =head1 METHODS
 
-=head2 C<< Future::HTTP::Mojo->new() >>
+=head2 C<< Future::HTTP::NetAsync->new() >>
 
-    my $ua = Future::HTTP::Mojo->new();
+    my $ua = Future::HTTP::NetAsync->new();
 
 Creates a new instance of the HTTP client.
+
+=head2 C<< $ua->is_async() >>
+
+Returns true, because this backend is asynchronous.
 
 =head2 C<< $ua->http_get($url, %options) >>
 
@@ -196,7 +202,7 @@ L<Future>
 
 L<AnyEvent::HTTP> for the details of the API
 
-L<Mojo::UserAgent> for the backend
+L<Net::Async::HTTP> for the backend
 
 =head1 REPOSITORY
 
@@ -220,7 +226,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2016-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2016-2020 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

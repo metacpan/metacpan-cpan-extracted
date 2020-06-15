@@ -2,6 +2,23 @@ CHANGE LOG
 ==========
 
 
+2020-06-15 - v0.30.1
+--------------------
+
+### Added
+    - More tests, from Test::OpenTracing::Interface
+ 
+### Fixed
+    - Test failures due to differences in Type::Tiny and Type::Tiny::XS
+
+
+2020-06-15 - v0.30.0
+--------------------
+
+### Fixed
+    - version numbering
+
+
 2020-02-13 - v0.03
 ------------------
 

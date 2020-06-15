@@ -1,3 +1,10 @@
+0.201670  2020-06-15 15:59:52+02:00 Europe/Brussels
+
+0.201670  2020-06-15 15:04:33+02:00 Europe/Brussels
+	- Fixes
+		- bin::export_bgc_sql_tables: fixed the redundancy of IDs for modules extracted from antiSMASH v5.1 reports and shared between several gene clusters
+		- Parser: fixed the absence of value for the size of modules extracted from antiSMASH v5.1 reports
+
 0.200700  2020-03-10 20:49:48+01:00 Europe/Brussels
 	- Changes
 		- Roles::Modulable: improved the module delineation algorithm

@@ -12,7 +12,7 @@ package HiPi::Interface::MPL3115A2;
 
 use strict;
 use warnings;
-use parent qw( HiPi::Interface );
+use parent qw( HiPi::Interface::Common::Weather );
 use HiPi qw( :i2c :mpl3115a2 :rpi );
 use HiPi::RaspberryPi;
 use Carp;
@@ -348,19 +348,6 @@ sub os_all_data {
     my( $pressure, $tempert ) = $self->os_both_data( MPL_FUNC_PRESSURE );
     
     return ( $altitude, $pressure, $tempert );    
-}
-
-sub sea_level_pressure {
-    my( $class, $pressure, $altitude, $temperature, $gravity) = @_;
-    $gravity ||= 9.81;   # acceleration due to gravity
-    my $dgc    = 287.0; # dry gas constant
-    
-    # Po = ((P * 1000) * Math.exp((g*Zg)/(Rd *  (Tv_avg + 273.15))))/1000;
-    
-    my $result = (($pressure * 1000) * exp(($gravity * $altitude)/($dgc *  ($temperature + 273.15))))/1000;
-    
-    $result = sprintf("%.2f", $result);
-    return $result;
 }
 
 

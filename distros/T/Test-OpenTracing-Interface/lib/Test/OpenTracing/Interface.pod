@@ -14,6 +14,16 @@ Test::OpenTracing::Interface - Test OpenTracing::Interface compliance
 
 
 
+=head1 WARNING
+
+These and others are still beta release, method can be added or removed or their
+names be changed. This may cause breakage.
+
+This version works cover L<OpenTracing::Interface> VERSION 'v0.202.x'
+
+Use version 'v0.20.1' or VERSION 0.02 of this library for support of previous
+OpenTracing::Interface releases.
+
 =head1 DESCRIPTION
 
 This package contains mutiple tests that can be used for proving compliance with

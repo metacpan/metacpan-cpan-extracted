@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-IP
 
+1.23    Sun, 14 Jun 2020 22:50:21 +0200
+        * better KISS increment algorithm, even speeds up incr_n in most cases
+
 1.22    Mon, 11 May 2020 08:30:30 +0200
         * more tests for buggy Socket::inet_pton
 

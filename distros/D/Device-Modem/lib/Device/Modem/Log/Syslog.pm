@@ -12,7 +12,8 @@
 # $Id$
 
 package Device::Modem::Log::Syslog;
-$VERSION = sprintf '%d.%02d', q$Revision: 2.1 $ =~ /(\d+)\.(\d+)/;
+our $VERSION = '2.11';
+$VERSION = eval $VERSION;
 
 use strict;
 use Sys::Syslog ();
@@ -80,7 +81,7 @@ Device::Modem::Log::Syslog - Syslog logging plugin for Device::Modem class
 
   use Device::Modem;
 
-  my $box = new Device::Modem( log => 'syslog', ... );
+  my $box = Device::Modem->( log => 'syslog', ... );
   ...
 
 =head1 DESCRIPTION

@@ -1,3 +1,8 @@
+0.003   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Add themes: Test::RandomANSI16, Test::RandomANSI256.
+
+
 0.002   2020-06-09  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] [theme Test::Random] 'cache' arg was not observed.

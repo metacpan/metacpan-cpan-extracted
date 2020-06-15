@@ -1,9 +1,9 @@
 package Sah::SchemaR::date::month_nums::en_or_id;
 
-our $DATE = '2019-11-28'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["array",[{of=>["date::month_num::en_or_id",{},{}],summary=>"Array of month numbers","x.perl.coerce_rules"=>["From_str::comma_sep"]}],["array"]];
+our $rschema = ["array",[{examples=>[{valid=>1,validated_value=>[],value=>""},{valid=>1,validated_value=>[1],value=>"jan"},{valid=>1,validated_value=>[8],value=>"AGU"},{valid=>1,validated_value=>[8],value=>"aug"},{valid=>0,value=>0},{valid=>1,validated_value=>[1,8],value=>"1,agu"},{valid=>1,validated_value=>[1,8],value=>[1,"agu"]},{valid=>1,validated_value=>[1,12],value=>"1,12"},{valid=>0,value=>"1,12,13"},{valid=>0,value=>[1,12,13]}],of=>["date::month_num::en_or_id",{},{}],summary=>"Array of month numbers","x.perl.coerce_rules"=>["From_str::comma_sep"]}],["array"]];
 
 1;
 # ABSTRACT: Array of month numbers
@@ -20,7 +20,7 @@ Sah::SchemaR::date::month_nums::en_or_id - Array of month numbers
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::date::month_nums::en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2019-11-28.
+This document describes version 0.005 of Sah::SchemaR::date::month_nums::en_or_id (from Perl distribution Sah-Schemas-Date-ID), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

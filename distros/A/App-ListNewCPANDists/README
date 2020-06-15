@@ -3,8 +3,8 @@ NAME
     period
 
 VERSION
-    This document describes version 0.011 of App::ListNewCPANDists (from
-    Perl distribution App-ListNewCPANDists), released on 2020-02-06.
+    This document describes version 0.013 of App::ListNewCPANDists (from
+    Perl distribution App-ListNewCPANDists), released on 2020-06-13.
 
 FUNCTIONS
   create_new_cpan_dists_stats

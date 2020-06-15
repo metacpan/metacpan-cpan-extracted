@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 use base qw(Class::Accessor);
 use Crypt::OpenSSL::X509 qw(FORMAT_ASN1);
@@ -190,10 +190,11 @@ sub _peer_certificate {
         if ($record->{type} != $SSL3_RT_HANDSHAKE) {
             if ($record->{type} == $SSL3_RT_ALERT) {
                 my $d1 = unpack 'C', substr $record->{data}, 0, 1;
+                my $d2 = unpack 'C', substr $record->{data}, 1, 1;
                 if ($d1 eq $SSL3_AL_WARNING) {
                     ; # go ahead
                 } else {
-                    croak "record type is SSL3_AL_FATAL";
+                    croak "record type is SSL3_AL_FATAL. [desctioption: $d2]";
                 }
             } else {
                 croak "record type is not HANDSHAKE";
@@ -365,6 +366,24 @@ sub _send_client_hello {
         for my $c (split //, $servername) {
             push @ext, ord($c);
         }
+    }
+
+    # Extension: supported_groups
+    push @ext, 0x00, 0x0a; # supported_groups
+    my @supportedGroups = (
+	0x000a, # sect163r1
+	0x0017, # secp256r1
+	0x0018, # secp384r1
+	0x0019, # secp521r1
+	0x001d, # x25519
+	0x001e, # x448
+    );
+    $len = scalar(@supportedGroups) * 2;
+    push @ext, (($len >> 8) & 0xFF);
+    push @ext, (($len     ) & 0xFF);
+    foreach my $i (@supportedGroups) {
+        push @ext, (($i >> 8) & 0xFF);
+        push @ext, (($i     ) & 0xFF);
     }
 
     # Extension: signature_algorithms (>= TLSv1.2)

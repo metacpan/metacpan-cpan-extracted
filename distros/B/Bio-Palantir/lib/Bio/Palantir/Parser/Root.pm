@@ -1,6 +1,6 @@
 package Bio::Palantir::Parser::Root;
 # ABSTRACT: BiosynML DTD-derived internal class
-$Bio::Palantir::Parser::Root::VERSION = '0.200700';
+$Bio::Palantir::Parser::Root::VERSION = '0.201670';
 use Moose;
 use namespace::autoclean;
 
@@ -334,7 +334,7 @@ sub _extract_antismash_modules {
         ;
 
         my $gene_ids = [map { $_->uui } @mgenes];  # ArrayRef Module attribute
-        
+
         my $mdomains;
         for my $gene (@mgenes) { 
 
@@ -356,6 +356,10 @@ sub _extract_antismash_modules {
 #                 $mgene->protein_sequence
 #             );
 #
+        
+        my $size
+            = $module->{prot_end}{value} - $module->{prot_start}{value} + 1;
+
         push @report_modules, Module->new(
             rank => $module->{id}{value},
             genomic_prot_begin => $module->{prot_start}{value},
@@ -367,6 +371,7 @@ sub _extract_antismash_modules {
             protein_sequence => $module_sequence,
             gene_uuis => $gene_ids,
             domains => $mdomains,
+            size => $size,
         );
     }
 
@@ -387,7 +392,7 @@ Bio::Palantir::Parser::Root - BiosynML DTD-derived internal class
 
 =head1 VERSION
 
-version 0.200700
+version 0.201670
 
 =head1 SYNOPSIS
 

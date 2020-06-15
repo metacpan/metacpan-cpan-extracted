@@ -1,5 +1,13 @@
 Revision history for Tickit-Console
 
+0.08    2020-06-15
+        [CHANGES]
+         * Use Object::Pad 0.27 and signatures from perl 5.26
+
+        [BUGFIXES]
+         * Remember to actually 'use Tickit::Widget::Tabbed' to get the ::Tab
+           util class out of it
+
 0.07    2014/09/08 19:30:44
         [CHANGES]
          * Added ->prepend_line, allowing pre-history text to be inserted at

@@ -1,6 +1,6 @@
 =======================================================================
 Device::Modem - a Perl class to interface generic modems (AT-compliant)
-Copyright (C) 2002-2014 Cosimo Streppone, cosimo@cpan.org
+Copyright (C) 2002-2020 Cosimo Streppone, cosimo@cpan.org
 =======================================================================
 
 This is a perl extension to talk to AT compliant devices via serial port.
@@ -19,7 +19,7 @@ Have fun!
 Prerequisites
 -------------
 
-+ working perl installation >= 5.005_03
++ working perl installation >= 5.006
 + Device::SerialPort >= 0.19 (Win32::SerialPort in on Windows platform)
 + a modem or AT-compliant device if you want to use
   it for some real work

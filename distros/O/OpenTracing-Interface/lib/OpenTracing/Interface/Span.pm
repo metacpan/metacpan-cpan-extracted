@@ -4,92 +4,82 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.20';
+our $VERSION = 'v0.202.2';
 
 
-use Role::MethodReturns;
+use Role::Declare -lax;
 
 use OpenTracing::Types qw/SpanContext/;
-use Types::Standard qw/ Str Value HashRef ArrayRef/;
-use Types::Common::Numeric qw/PositiveNum/;
+use Time::HiRes qw/time/;
+use Types::Standard qw/Any Str Value HashRef ArrayRef Maybe Str Value/;
+use Types::Common::Numeric qw/PositiveNum PositiveOrZeroNum/;
 
 use namespace::clean;
 
 
-around get_context => instance_method ( ) {
-    
-    returns( SpanContext,
-        $original->( $instance => ( ) )
-    )
-    
-};
+instance_method get_context(
+) :Return(SpanContext) {}
 
 
 
-around overwrite_operation_name => instance_method ( Str $operation_name ) {
-    
-    returns_self( $instance,
-        $original->( $instance => ( $operation_name ) )
-    )
-    
-};
+instance_method overwrite_operation_name(
+    Str $operation_name
+) :ReturnSelf {}
 
 
 
-around finish => instance_method ( @time_stamps ) {
-    
-    ( ArrayRef[PositiveNum, 0, 1 ] )->assert_valid( \@time_stamps );
-    #
-    # a bit narly construct, but otherwise we might have accidently introduced
-    # `undef` as an argument, where there used to be none!
-    
-    returns_self( $instance,
-        $original->( $instance => ( @time_stamps ) )
-    )
-    
-};
+instance_method finish(
+    PositiveOrZeroNum $time_stamp = time(),
+) :ReturnSelf {}
 
 
 
-around set_tag => instance_method ( Str $key, Value $value ) {
-    
-    returns_self( $instance,
-        $original->( $instance => ( $key, $value ) )
-    )
-    
-};
+instance_method add_tag(
+    Str $key,
+    Value $value
+) :ReturnSelf {}
 
 
 
-around log_data => instance_method ( @log_data ) {
-    
-    ( HashRef[ Value ] )->assert_valid( { @log_data } );
-    
-    returns_self( $instance,
-        $original->( $instance => ( @log_data ) )
-    )
-    
-};
+instance_method add_tags(
+    %key_values,
+) :ReturnSelf {
+    ( HashRef[Value] )->assert_valid( {%key_values} )
+}
 
 
 
-around set_baggage_item => instance_method ( Str $key, Value $value, ) {
-    
-    returns_self( $instance,
-        $original->( $instance => ( $key, $value ) )
-    )
-    
-};
+instance_method log_data(
+    %key_values
+) :ReturnSelf {
+    ( HashRef[ Value ] )->assert_valid( { %key_values } );
+}
 
 
 
-around get_baggage_item => instance_method ( Str $key ) {
-    
-    returns_maybe ( Value,
-        $original->( $instance => ( $key ) )
-    )
-    
-};
+instance_method add_baggage_item(
+    Str $key,
+    Value $value
+) :ReturnSelf {}
+
+
+
+instance_method add_baggage_items(
+    %key_values,
+) :ReturnSelf {
+    ( HashRef[Value] )->assert_valid( {%key_values} )
+}
+
+
+
+instance_method get_baggage_item(
+    Str $key
+) :ReturnMaybe(Value) {}
+
+
+
+instance_method get_baggage_items(
+) :ReturnList(Any) {}
 
 
 

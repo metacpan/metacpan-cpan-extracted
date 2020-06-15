@@ -1,3 +1,22 @@
+0.013   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
+0.012   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update property names in examples (data -> value, res ->
+	  validated_value).
+
+
+0.011   2020-03-04  Released-By: PERLANCAR; Urgency: medium
+
+	- Update examples, use 'value' instead of 'data'.
+
+
 0.010   2020-03-03  Released-By: PERLANCAR; Urgency: medium
 
 	- [date::tz_offset] Tweak coerce rule: allow [+-]HH or [+-]HHMM.

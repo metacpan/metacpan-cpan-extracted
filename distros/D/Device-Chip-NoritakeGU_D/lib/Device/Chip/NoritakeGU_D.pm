@@ -3,13 +3,12 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::NoritakeGU_D;
+use 5.026; # signatures
+use Object::Pad 0.27;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
-
-our $VERSION = '0.01';
+package Device::Chip::NoritakeGU_D 0.02;
+class Device::Chip::NoritakeGU_D
+   extends Device::Chip;
 
 use Carp;
 
@@ -62,49 +61,44 @@ my %INTERFACES = (
    UART => 1, I2C => 1, SPI => 1,
 );
 
-sub new
-{
-   my $class = shift;
-   my %params = @_;
+has $_protocol;
+has $_interface;
 
+BUILD ( %params )
+{
    my $interface = delete $params{interface} or
       croak "Require an interface parameter";
    $INTERFACES{$interface} or
       croak "Unrecognised interface type '$interface'";
 
-   my $self = $class->SUPER::new( %params );
+   $_protocol = $interface;
 
-   $self->{protocol} = $interface;
-
-   $self->{interface} = bless {}, __PACKAGE__."::_Iface::$interface";
-
-   return $self;
+   my $iface_class = __PACKAGE__."::_Iface::$interface";
+   $_interface = $iface_class->new;
 }
 
-sub PROTOCOL { shift->{protocol} }
+method PROTOCOL { $_protocol }
+
+*UART_options = *I2C_options = *SPI_options = method { $_interface->options };
 
 # passthrough
-sub power
+method power
 {
-   my $self = shift;
    return $self->protocol->power( @_ ) if $self->protocol->can( "power" );
    return Future->done;
 }
 
-sub mount
+method mount ( $adapter, %params )
 {
-   my $self = shift;
-   my ( $adapter, %params ) = @_;
-
-   $self->{interface}->mountopts( \%params );
+   $_interface->mountopts( \%params );
 
    return $self->SUPER::mount( $adapter, %params );
 }
 
-sub write { $_[0]->{interface}->write( @_ ) }
-sub read  { $_[0]->{interface}->read ( @_ ) }
+method write { $_interface->write( $self, @_ ) }
+method read  { $_interface->read ( $self, @_ ) }
 
-sub write_us { shift->write( pack "C*", 0x1F, @_ ) }
+method write_us { $self->write( pack "C*", 0x1F, @_ ) }
 
 =head1 METHODS
 
@@ -121,11 +115,8 @@ Draw text at the cursor position.
 
 =cut
 
-async sub text
+async method text ( $text )
 {
-   my $self = shift;
-   my ( $text ) = @_;
-
    # Don't allow C0 controls
    $text =~ m/[\x00-\x1F]/ and
       croak "Invalid characters for ->text";
@@ -133,33 +124,24 @@ async sub text
    await $self->write( $text );
 }
 
-sub BOOL_COMMAND
+sub BOOL_COMMAND ( $name, @bytes )
 {
-   my ( $name, @bytes ) = @_;
-
    my $lastbyte = pop @bytes;
 
    no strict 'refs';
-   *$name = sub {
-      my $self = shift;
-      my ( $on ) = @_;
-
+   *$name = method ( $on ) {
       $self->write_us( @bytes, $lastbyte + !!$on );
    };
 }
 
-sub INT_COMMAND
+sub INT_COMMAND ( $name, $min, $max, @bytes )
 {
-   my ( $name, $min, $max, @bytes ) = @_;
    my $shortname = ( split m/_/, $name )[-1];
 
    my $lastbyte = pop @bytes;
 
    no strict 'refs';
-   *$name = sub {
-      my $self = shift;
-      my ( $value ) = @_;
-
+   *$name = method ( $value ) {
       $value >= $min and $value <= $max or
          croak "Invalid $shortname for ->$name";
 
@@ -167,9 +149,8 @@ sub INT_COMMAND
    };
 }
 
-sub ENUM_COMMAND
+sub ENUM_COMMAND ( $name, $values, @bytes )
 {
-   my ( $name, $values, @bytes ) = @_;
    my @values = @$values;
 
    my $shortname = ( split m/_/, $name )[-1];
@@ -177,10 +158,7 @@ sub ENUM_COMMAND
    my $lastbyte = pop @bytes;
 
    no strict 'refs';
-   *$name = sub {
-      my $self = shift;
-      my ( $value ) = @_;
-
+   *$name = method ( $value ) {
       defined( my $index = first { $values[$_] eq $value } 0 .. $#values ) or
          croak "Invalid $shortname for ->$name";
 
@@ -206,10 +184,10 @@ line, or to the home position (top left corner).
 
 =cut
 
-sub cursor_left     { $_[0]->write( "\x08" ) }
-sub cursor_right    { $_[0]->write( "\x09" ) }
-sub cursor_linehome { $_[0]->write( "\x0D" ) }
-sub cursor_home     { $_[0]->write( "\x0B" ) }
+method cursor_left     { $self->write( "\x08" ) }
+method cursor_right    { $self->write( "\x09" ) }
+method cursor_linehome { $self->write( "\x0D" ) }
+method cursor_home     { $self->write( "\x0B" ) }
 
 =head2 cursor_goto
 
@@ -219,11 +197,8 @@ Moves the cursor to the C<$x>'th column of the C<$y>'th line (zero-indexed).
 
 =cut
 
-sub cursor_goto
+method cursor_goto ( $x, $y )
 {
-   my $self = shift;
-   my ( $x, $y ) = @_;
-
    # TODO: Bounds-check $x, $y
 
    $self->write( pack "C C S< S<", 0x1F, 0x24, $x, $y );
@@ -237,7 +212,7 @@ Move the cursor down to the next line.
 
 =cut
 
-sub linefeed { $_[0]->write( "\x0A" ) }
+method linefeed { $self->write( "\x0A" ) }
 
 =head2 clear
 
@@ -247,7 +222,7 @@ Clear the display.
 
 =cut
 
-sub clear { $_[0]->write( "\x0C" ) }
+method clear { $self->write( "\x0C" ) }
 
 =head2 select_window
 
@@ -269,7 +244,7 @@ Reset all settings to their default values.
 
 =cut
 
-sub initialise   { $_[0]->write( "\x1B\x40" ) }
+method initialise { $self->write( "\x1B\x40" ) }
 
 =head2 set_cursor_visible
 
@@ -354,22 +329,16 @@ C<$yscale> must be 1 or 2.
 
 =cut
 
-sub set_font_magnification
+method set_font_magnification ( $x, $y )
 {
-   my $self = shift;
-   my ( $x, $y ) = @_;
-
    $x >= 1 and $x <= 4 or croak "Invalid x scale";
    $y >= 1 and $y <= 2 or croak "Invalid y scale";
 
    $self->write_us( 0x28, 0x67, 0x40, $x, $y );
 }
 
-sub _realtime_image_display
+method _realtime_image_display ( $width, $height, $bytes )
 {
-   my $self = shift;
-   my ( $width, $height, $bytes ) = @_;
-
    $self->write( "\x1F\x28\x66\x11" . pack "S< S< C a*",
       $width, $height, 1, $bytes,
    );
@@ -387,11 +356,8 @@ pixel data to represent each vertical column of the image content.
 
 =cut
 
-sub realtime_image_display_columns
+method realtime_image_display_columns ( @columns )
 {
-   my $self = shift;
-   my @columns = @_;
-
    @columns or croak "Expected at least 1 column";
    my $height = length $columns[0];
    $height == length $_ or croak "Expected all columns of equal length" for @columns[1..$#columns];
@@ -401,11 +367,8 @@ sub realtime_image_display_columns
    $self->_realtime_image_display( scalar @columns, $height, $bytes );
 }
 
-sub realtime_image_display_lines
+method realtime_image_display_lines ( @lines )
 {
-   my $self = shift;
-   my @lines = @_;
-
    @lines or croak "Expected at least 1 line";
    my $width = length $lines[0];
    $width == length $_ or croak "Expected all lines of equal length" for @lines[1..$#lines];
@@ -428,11 +391,8 @@ Low bits correspond to input, high bits to output.
 
 =cut
 
-async sub set_gpio_direction
+async method set_gpio_direction ( $dir )
 {
-   my $self = shift;
-   my ( $dir ) = @_;
-
    await $self->write_us( 0x28, 0x70, 0x01, 0x00, $dir & 0x0F );
 }
 
@@ -444,11 +404,8 @@ Write the value to the GPIO pins.
 
 =cut
 
-async sub write_gpio
+async method write_gpio ( $value )
 {
-   my $self = shift;
-   my ( $value ) = @_;
-
    await $self->write_us( 0x28, 0x70, 0x10, 0x00, $value & 0x0F );
 }
 
@@ -460,10 +417,8 @@ Returns the current state of the GPIO pins.
 
 =cut
 
-async sub read_gpio
+async method read_gpio
 {
-   my $self = shift;
-
    await $self->write_us( 0x28, 0x70, 0x20, 0x00 );
    my ( $header, $id1, $id2, $value ) = unpack "C4", await $self->read( 4 );
 
@@ -483,10 +438,8 @@ booleans indicating whether that area currently detects a touch.
 
 =cut
 
-async sub read_touchswitches
+async method read_touchswitches
 {
-   my $self = shift;
-
    await $self->write( "\x1F\x4B\x10" );
 
    my ( $header, $len, $switches ) = unpack "C C S>", await $self->read( 4 );
@@ -500,126 +453,97 @@ async sub read_touchswitches
 
 # Interface helpers
 
-package
-   Device::Chip::NoritakeGU_D::_Iface::UART;
+class Device::Chip::NoritakeGU_D::_Iface::UART {
+   use constant DEFAULT_BAUDRATE => 38400;
 
-use constant DEFAULT_BAUDRATE => 38400;
+   has $_baudrate;
 
-sub mountopts
-{
-   shift;
-   my ( $chip, $params ) = @_;
+   method mountopts ( $params )
+   {
+      $_baudrate = delete $params->{baudrate} // DEFAULT_BAUDRATE;
+   }
 
-   $chip->{baudrate} = delete $params->{baudrate} // DEFAULT_BAUDRATE;
+   method options
+   {
+      return (
+         baudrate => $_baudrate,
+      );
+   }
+
+   async method write ( $chip, $bytes )
+   {
+      await $chip->protocol->write( $bytes );
+   }
+
+   async method read ( $chip, $len )
+   {
+      return await $chip->protocol->read( $len );
+   }
 }
 
-sub Device::Chip::NoritakeGU_D::UART_options
-{
-   my $self = shift;
+class Device::Chip::NoritakeGU_D::_Iface::I2C {
+   use constant DEFAULT_ADDR => 0x50;
 
-   return (
-      baudrate => $self->{baudrate},
-   );
+   has $_addr;
+
+   method mountopts ( $params )
+   {
+      $_addr = delete $params->{addr} // DEFAULT_ADDR;
+   }
+
+   method options
+   {
+      return (
+         addr => $_addr,
+      );
+   }
+
+   async method write ( $chip, $bytes )
+   {
+      await $chip->protocol->write( $bytes );
+   }
+
+   async method read ( $chip, $len )
+   {
+      return await $chip->protocol->read( $len );
+   }
 }
 
-async sub write
-{
-   shift;
-   my ( $chip, $bytes ) = @_;
+class Device::Chip::NoritakeGU_D::_Iface::SPI {
+   method mountopts ( $ ) {}
 
-   await $chip->protocol->write( $bytes );
-}
+   method options
+   {
+      return (
+         mode => 0,
+         # max_bitrate => 2E6, # min clock period 500ns
+         # Need to slow the bitrate down in order to generate inter-word gaps
+         max_bitrate => 500E3,
+      );
+   }
 
-async sub read
-{
-   shift;
-   my ( $chip, $len ) = @_;
+   async method write ( $chip, $bytes )
+   {
+      await $chip->protocol->write( "\x44" . $bytes );
+   }
 
-   return await $chip->protocol->read( $len );
-}
+   async method read ( $chip, $len )
+   {
+      # TODO:
+      #   The datasheet says that after you write a 0x58 byte, the very next byte
+      #   you get back will be the status. Experimental testing shows you get an
+      #   echo of the 0x58 first, then status.
 
-package
-   Device::Chip::NoritakeGU_D::_Iface::I2C;
+      my $status = unpack "x C", await $chip->protocol->write_then_read( "\x58", 2 );
 
-use constant DEFAULT_ADDR => 0x50;
+      #   The datasheet says that after you write a 0x54 byte, you'll immediately
+      #   get 0x00 then the data. Experimental testing suggests that you get an
+      #   echo of the 0x54 byte first, then 0x00, then the data.
 
-sub mountopts
-{
-   shift;
-   my ( $chip, $params ) = @_;
+      my $bytes = await $chip->protocol->write_then_read( "\x54", ( $status & 0x1F ) + 2 );
 
-   $chip->{addr} = delete $params->{addr} // DEFAULT_ADDR;
-}
-
-sub Device::Chip::NoritakeGU_D::I2C_options
-{
-   my $self = shift;
-
-   return (
-      addr => $self->{addr},
-   );
-}
-
-async sub write
-{
-   shift;
-   my ( $chip, $bytes ) = @_;
-
-   await $chip->protocol->write( $bytes );
-}
-
-async sub read
-{
-   shift;
-   my ( $chip, $len ) = @_;
-
-   return await $chip->protocol->read( $len );
-}
-
-package
-   Device::Chip::NoritakeGU_D::_Iface::SPI;
-
-sub mountopts {}
-
-sub Device::Chip::NoritakeGU_D::SPI_options
-{
-   my $self = shift;
-
-   return (
-      mode => 0,
-      # max_bitrate => 2E6, # min clock period 500ns
-      # Need to slow the bitrate down in order to generate inter-word gaps
-      max_bitrate => 500E3,
-   );
-}
-
-async sub write
-{
-   shift;
-   my ( $chip, $bytes ) = @_;
-
-   await $chip->protocol->write( "\x44" . $bytes );
-}
-
-async sub read
-{
-   shift;
-   my ( $chip, $len ) = @_;
-
-   # TODO:
-   #   The datasheet says that after you write a 0x58 byte, the very next byte
-   #   you get back will be the status. Experimental testing shows you get an
-   #   echo of the 0x58 first, then status.
-
-   my $status = unpack "x C", await $chip->protocol->write_then_read( "\x58", 2 );
-
-   #   The datasheet says that after you write a 0x54 byte, you'll immediately
-   #   get 0x00 then the data. Experimental testing suggests that you get an
-   #   echo of the 0x54 byte first, then 0x00, then the data.
-
-   my $bytes = await $chip->protocol->write_then_read( "\x54", ( $status & 0x1F ) + 2 );
-
-   return substr $bytes, 2;
+      return substr $bytes, 2;
+   }
 }
 
 =head1 AUTHOR
