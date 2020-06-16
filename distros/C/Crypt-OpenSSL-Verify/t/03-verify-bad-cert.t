@@ -3,7 +3,7 @@ use Crypt::OpenSSL::Verify;
 use Crypt::OpenSSL::X509;
 
 my $v = Crypt::OpenSSL::Verify->new('t/cacert.pem');
-ok($v);
+isa_ok($v, 'Crypt::OpenSSL::Verify');
 
 my $text =<<CERT;
 -----BEGIN CERTIFICATE-----
@@ -33,7 +33,7 @@ hvcNAQEFBQADgYEACgl1sxEPVgsK8sTYCF+OhTIrZ5fhhmCf5kunCWvLeMcTJtNP
 CERT
 
 my $cert = Crypt::OpenSSL::X509->new_from_string($text);
-ok($cert);
+isa_ok($cert, 'Crypt::OpenSSL::X509');
 
 my $ret;
 eval {
@@ -49,7 +49,7 @@ $v = Crypt::OpenSSL::Verify->new(
     noCAfile => 0,
 }
     );
-ok($v);
+isa_ok($v, 'Crypt::OpenSSL::Verify');
 
 $ret = undef;
 eval {

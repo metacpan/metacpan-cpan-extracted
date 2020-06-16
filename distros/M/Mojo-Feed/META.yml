@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Mojo::Feed:
     file: lib/Mojo/Feed.pm
-    version: '0.18'
+    version: '0.19'
   Mojo::Feed::Item:
     file: lib/Mojo/Feed/Item.pm
   Mojo::Feed::Item::Enclosure:
@@ -35,7 +35,7 @@ provides:
     file: lib/Mojo/Feed/Reader.pm
   Mojolicious::Plugin::FeedReader:
     file: lib/Mojolicious/Plugin/FeedReader.pm
-    version: '0.18'
+    version: '0.19'
 requires:
   HTTP::Date: '6.02'
   Mojolicious: '8.03'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/dotandimet/Mojo-Feed/issues
   homepage: https://github.com/dotandimet/Mojo-Feed
   repository: git://github.com/dotandimet/Mojo-Feed.git
-version: '0.18'
+version: '0.19'
 x_authority: cpan:DOTAN
 x_contributors:
   - 'Mario Domgoergen <mdom@taz.de>'

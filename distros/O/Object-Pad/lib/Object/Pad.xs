@@ -10,6 +10,10 @@
 
 #include "XSParseSublike.h"
 
+#ifdef HAVE_DMD_HELPER
+#  include "DMD_helper.h"
+#endif
+
 #ifndef wrap_keyword_plugin
 #  include "wrap_keyword_plugin.c.inc"
 #endif
@@ -179,6 +183,15 @@ static COP *S_find_cop_for_lvintro(pTHX_ PADOFFSET padix, OP *o, COP **copp)
   return NULL;
 }
 
+typedef void AttributeHandler(pTHX_ void *target, const char *value, void *data);
+
+struct AttributeDefinition {
+  char *attrname;
+  /* TODO: int flags */
+  AttributeHandler *apply;
+  void *applydata;
+};
+
 /*********************************
  * Class and Slot Implementation *
  *********************************/
@@ -191,7 +204,7 @@ typedef struct ClassMeta ClassMeta;
 typedef struct {
   SV *name;
   ClassMeta *class;
-  OP *defaultop;
+  SV *defaultsv;
   SLOTOFFSET slotix;
 } SlotMeta;
 
@@ -379,6 +392,22 @@ static OP *pp_slotpad(pTHX)
   return PL_op->op_next;
 }
 
+/* Just like OP_CONST except it doesn't set SvREADONLY on the target SV */
+static OP *pp_sv(pTHX)
+{
+  dSP;
+  PUSHs(cSVOP->op_sv);
+  PUTBACK;
+  return PL_op->op_next;
+}
+
+static OP *newSVOP_SV(SV *sv, I32 flags)
+{
+  OP *op = newSVOP(OP_CUSTOM, flags, sv);
+  op->op_ppaddr = &pp_sv;
+  return op;
+}
+
 static OP *newSLOTPADOP(I32 flags, U8 private, PADOFFSET padix, SLOTOFFSET slotix)
 {
 #ifdef HAVE_UNOP_AUX
@@ -485,11 +514,8 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
       switch(sigil) {
         case '$':
-          /* push ..., undef */
-          if(slotmeta->defaultop)
-            op = slotmeta->defaultop;
-          else
-            op = newOP(OP_UNDEF, 0);
+          /* push ..., $defaultsv */
+          op = newSVOP_SV(slotmeta->defaultsv, 0);
           break;
         case '@':
           /* push ..., [] */
@@ -567,6 +593,8 @@ static int on_free_compclassmeta(pTHX_ SV *sv, MAGIC *mg)
   ClassMeta *meta = (ClassMeta *)mg->mg_ptr;
 
   mop_class_seal(meta);
+
+  return 0;
 }
 
 static MGVTBL vtbl_compclassmeta = {
@@ -864,42 +892,33 @@ static ClassMeta *S_mop_create_class(pTHX_ SV *name, SV *superclassname)
   return meta;
 }
 
-#define apply_class_attribute(meta, attr)  S_apply_class_attribute(aTHX_ meta, attr)
-static void S_apply_class_attribute(pTHX_ ClassMeta *meta, SV *attr)
+static void S_set_class_repr(pTHX_ ClassMeta *meta, const char *val, void *_)
 {
-  char *name = SvPV_nolen(attr);
-  char *val = strchr(name, '(');
+  if(!val)
+    croak(":repr attribute requires a representation type specification");
 
-  if(val) {
-    name = save_strndup(name, val - name);
-    val  = save_strndup(val + 1, strlen(val) - 2);
+  if(strEQ(val, "native")) {
+    if(meta->foreign_new)
+      croak("Cannot switch a subclass of a foreign superclass type to :repr(native)");
+    meta->repr = REPR_NATIVE;
   }
-
-  /* TODO: Think about how to make this more easily extensible */
-  if(strEQ(name, "repr")) {
-    if(!val)
-      croak(":repr attribute requires a representation type specification");
-
-    if(strEQ(val, "native")) {
-      if(meta->foreign_new)
-        croak("Cannot switch a subclass of a foreign superclass type to :repr(native)");
-      meta->repr = REPR_NATIVE;
-    }
-    else if(strEQ(val, "HASH"))
-      meta->repr = REPR_HASH;
-    else if(strEQ(val, "magic")) {
-      if(!meta->foreign_new)
-        croak("Cannot switch to :repr(magic) without a foreign superclass");
-      meta->repr = REPR_MAGIC;
-    }
-    else if(strEQ(val, "default") || strEQ(val, "autoselect"))
-      meta->repr = REPR_AUTOSELECT;
-    else
-      croak("Unrecognised class representation type %s", val);
+  else if(strEQ(val, "HASH"))
+    meta->repr = REPR_HASH;
+  else if(strEQ(val, "magic")) {
+    if(!meta->foreign_new)
+      croak("Cannot switch to :repr(magic) without a foreign superclass");
+    meta->repr = REPR_MAGIC;
   }
+  else if(strEQ(val, "default") || strEQ(val, "autoselect"))
+    meta->repr = REPR_AUTOSELECT;
   else
-    croak("Unrecognised class attribute %" SVf, name);
+    croak("Unrecognised class representation type %s", val);
 }
+
+static struct AttributeDefinition class_attributes[] = {
+  { "repr", (AttributeHandler *)&S_set_class_repr, NULL },
+  { 0 },
+};
 
 #define mop_class_add_slot(class, slotname)  S_mop_class_add_slot(aTHX_ class, slotname)
 static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
@@ -938,7 +957,7 @@ static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
   slotmeta->name = SvREFCNT_inc(slotname);
   slotmeta->class = meta;
   slotmeta->slotix = meta->offset + av_count(slots);
-  slotmeta->defaultop = NULL;
+  slotmeta->defaultsv = newSV(0);
 
   av_push(slots, (SV *)slotmeta);
 
@@ -1030,16 +1049,27 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
   LEAVE;
 }
 
-struct SlotAttribute {
-  char *attrname;
-  /* TODO: int flags */
-  void (*apply)(pTHX_ SlotMeta *slotmeta, const char *value, void *data);
-  void *applydata;
+static struct AttributeDefinition slot_attributes[] = {
+  { "reader",  (AttributeHandler *)&S_generate_slot_accessor, (void *)ACCESSOR_READER },
+  { "writer",  (AttributeHandler *)&S_generate_slot_accessor, (void *)ACCESSOR_WRITER },
+  { "mutator", (AttributeHandler *)&S_generate_slot_accessor, (void *)ACCESSOR_LVALUE_MUTATOR },
+  { 0 }
 };
-static struct SlotAttribute slot_attributes[] = {
-  "reader",  &S_generate_slot_accessor, (void *)ACCESSOR_READER,
-  "writer",  &S_generate_slot_accessor, (void *)ACCESSOR_WRITER,
-  "mutator", &S_generate_slot_accessor, (void *)ACCESSOR_LVALUE_MUTATOR,
+
+static void S_check_method_override(pTHX_ struct XSParseSublikeContext *ctx, const char *val, void *_data)
+{
+  if(!ctx->name)
+    croak("Cannot apply :override to anonymous methods");
+
+  GV *gv = gv_fetchmeth_sv(compclassmeta->stash, ctx->name, 0, 0);
+  if(gv && GvCV(gv))
+    return;
+
+  croak("Superclass does not have a method named '%" SVf "'", SVfARG(ctx->name));
+}
+
+static struct AttributeDefinition method_attributes[] = {
+  { "override", (AttributeHandler *)&S_check_method_override, NULL },
   { 0 }
 };
 
@@ -1092,9 +1122,37 @@ static int keyword_class(pTHX_ OP **op_ptr)
       break;
   }
 
-  OP *attrs = NULL;
+  ClassMeta *meta = mop_create_class(packagename, superclassname);
+
+  if(superclassname)
+    SvREFCNT_dec(superclassname);
+
   if(lex_consume(":")) {
-    attrs = lex_scan_attrs(NULL);
+    SV *attr = newSV(0), *val = newSV(0);
+    SAVEFREESV(attr); SAVEFREESV(val);
+
+    while(lex_scan_attrval_into(attr, val)) {
+      lex_read_space(0);
+
+      struct AttributeDefinition *def;
+      for(def = class_attributes; def->attrname; def++) {
+        if(!strEQ(SvPVX(attr), def->attrname))
+          continue;
+
+        (*def->apply)(aTHX_ meta, SvPOK(val) ? SvPVX(val) : NULL, def->applydata);
+
+        goto done;
+      }
+
+      croak("Unrecognised class attribute :%" SVf, SVfARG(attr));
+
+done:
+      /* Accept additional colons to prefix additional attrs */
+      if(lex_peek_unichar(0) == ':') {
+        lex_read_unichar(0);
+        lex_read_space(0);
+      }
+    }
   }
 
   bool is_block;
@@ -1119,11 +1177,6 @@ static int keyword_class(pTHX_ OP **op_ptr)
   import_pragma("experimental", "signatures");
 #endif
 
-  ClassMeta *meta = mop_create_class(packagename, superclassname);
-
-  if(superclassname)
-    SvREFCNT_dec(superclassname);
-
   /* CARGOCULT from perl/op.c:Perl_package() */
   {
     SAVEGENERICSV(PL_curstash);
@@ -1144,18 +1197,6 @@ static int keyword_class(pTHX_ OP **op_ptr)
     sv_setsv(GvSV(gv_fetchpvs("VERSION", GV_ADDMULTI, SVt_PV)), packagever);
 
     PL_hints = savehints;
-  }
-
-  if(attrs) {
-    /* attrs should be a list of OP_CONST ops whose first child is the
-     *   pushmark, which we skip */
-    OP *op;
-    for(op = OpSIBLING(cLISTOPx(attrs)->op_first); op; op = OpSIBLING(op)) {
-      assert(op->op_type == OP_CONST);
-      SV *attr = cSVOPx(op)->op_sv;
-
-      apply_class_attribute(meta, attr);
-    }
   }
 
   if(is_block) {
@@ -1209,38 +1250,25 @@ static int keyword_has(pTHX_ OP **op_ptr)
     sv_setref_uv(slotmetasv, "Object::Pad::MOP::Slot", PTR2UV(slotmeta));
     SAVEFREESV(slotmetasv);
 
-    SV *attr;
-    while(attr = lex_scan_attr()) {
+    SV *attrname = newSV(0), *attrval = newSV(0);
+    SAVEFREESV(attrname); SAVEFREESV(attrval);
+
+    while(lex_scan_attrval_into(attrname, attrval)) {
       lex_read_space(0);
 
-      char *attrname = SvPV_nolen(attr);
-      char *val = strchr(attrname, '(');
-
-      if(val) {
-        attrname = save_strndup(attrname, val - attrname);
-        val  = save_strndup(val + 1, strlen(val) - 2);
-      }
-
-      ENTER;
-      SAVETMPS;
-
-      SAVEFREESV(attr);
-
-      for(struct SlotAttribute *def = slot_attributes; def->attrname; def++) {
-        if(!strEQ(attrname, def->attrname))
+      struct AttributeDefinition *def;
+      for(def = slot_attributes; def->attrname; def++) {
+        if(!strEQ(SvPVX(attrname), def->attrname))
           continue;
 
-        (*def->apply)(aTHX_ slotmeta, val, def->applydata);
+        (*def->apply)(aTHX_ slotmeta, SvPOK(attrval) ? SvPVX(attrval) : NULL, def->applydata);
 
         goto done;
       }
 
-      croak("Unrecognised slot attribute :%s", attrname);
+      croak("Unrecognised slot attribute :%" SVf, SVfARG(attrname));
 
 done:
-      FREETMPS;
-      LEAVE;
-
       /* Accept additional colons to prefix additional attrs */
       if(lex_peek_unichar(0) == ':') {
         lex_read_unichar(0);
@@ -1249,6 +1277,13 @@ done:
     }
   }
 
+  *op_ptr = NULL;
+
+  /* It would be nice to just yield some OP to represent the has slot here
+   * and let normal parsing of normal scalar assignment accept it. But we can't
+   * because scalar assignment tries to peephole far too deply into us and
+   * everything breaks... :/
+   */
   if(lex_peek_unichar(0) == '=') {
     lex_read_unichar(0);
     lex_read_space(0);
@@ -1263,24 +1298,17 @@ done:
       return 0;
     }
 
-    /* TODO: This is currently very restrictive. However, if we allow any
-     * expression then the pad indexes within it will be all wrong. We'll have
-     * to tread carefully.
-     * It should be possible to allow somewhat more in future but for now this
-     * is at least safe
-     */
-    if(op->op_type != OP_CONST || op->op_flags & OPf_KIDS)
-      croak("Default expression for 'has %" SVf "' must be compiletime constant",
-        SVfARG(name));
-
-    slotmeta->defaultop = op;
+    *op_ptr = newBINOP(OP_SASSIGN, 0,
+      op,
+      newSVOP_SV(SvREFCNT_inc(slotmeta->defaultsv), 0));
   }
 
   if(lex_read_unichar(0) != ';') {
     croak("Expected default expression or end of statement");
   }
 
-  *op_ptr = newOP(OP_NULL, 0);
+  if(!*op_ptr)
+    *op_ptr = newOP(OP_NULL, 0);
 
   LEAVE;
 
@@ -1341,6 +1369,24 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
   intro_my();
 
   LEAVE;
+}
+
+static bool parse_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val)
+{
+  struct AttributeDefinition *def;
+  for(def = method_attributes; def->attrname; def++) {
+    if(!strEQ(SvPVX(attr), def->attrname))
+      continue;
+
+    /* TODO: We might want to wrap the CV in some sort of MethodMeta struct
+     * but for now we'll just pass the XSParseSublikeContext context */
+    (*def->apply)(aTHX_ ctx, SvPOK(val) ? SvPVX(val) : NULL, def->applydata);
+
+    return true;
+  }
+
+  /* No error, just let it fall back to usual attribute handling */
+  return false;
 }
 
 static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
@@ -1489,8 +1535,10 @@ static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
 }
 
 static struct XSParseSublikeHooks parse_method_hooks = {
+  .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS,
   .permit          = parse_permit,
   .pre_subparse    = parse_pre_subparse,
+  .filter_attr     = parse_filter_attr,
   .post_blockstart = parse_post_blockstart,
   .pre_blockend    = parse_pre_blockend,
   .post_newcv      = parse_post_newcv,
@@ -1548,6 +1596,42 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 
   return (*next_keyword_plugin)(aTHX_ kw, kwlen, op_ptr);
 }
+
+#ifdef HAVE_DMD_HELPER
+static int dump_slotmeta(pTHX_ const SV *sv, SlotMeta *slotmeta)
+{
+  int ret = 0;
+
+  /* Some trickery to generate dynamic labels */
+  const char *name = SvPVX(slotmeta->name);
+  SV *label = newSV(0);
+
+  sv_setpvf(label, "the Object::Pad slot %s name", name);
+  ret += DMD_ANNOTATE_SV(sv, slotmeta->name, SvPVX(label));
+
+  sv_setpvf(label, "the Object::Pad slot %s default value", name);
+  ret += DMD_ANNOTATE_SV(sv, slotmeta->defaultsv, SvPVX(label));
+
+  SvREFCNT_dec(label);
+
+  return ret;
+}
+
+static int dumppackage_class(pTHX_ const SV *sv)
+{
+  int ret = 0;
+  ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV((SV *)sv));
+
+  ret += DMD_ANNOTATE_SV(sv, meta->name, "the Object::Pad class name");
+  ret += DMD_ANNOTATE_SV(sv, (SV *)meta->methodscope, "the Object::Pad temporary method scope");
+
+  I32 i;
+  for(i = 0; i < av_count(meta->slots); i++)
+    ret += dump_slotmeta(aTHX_ sv, (SlotMeta *)AvARRAY(meta->slots)[i]);
+
+  return ret;
+}
+#endif
 
 MODULE = Object::Pad    PACKAGE = Object::Pad
 
@@ -1680,7 +1764,7 @@ value(self, obj)
     AV *slotsav = (AV *)get_obj_slotsav(obj, repr, true);
 
     if(meta->slotix > av_top_index(slotsav))
-      croak("ARGH: instance does not have a slot at index %d", meta->slotix);
+      croak("ARGH: instance does not have a slot at index %ld", (long int)meta->slotix);
 
     SV *value = AvARRAY(slotsav)[meta->slotix];
 
@@ -1715,7 +1799,10 @@ BOOT:
   CvLVALUE_on(get_cv("Object::Pad::MOP::Slot::value", 0));
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);
+#ifdef HAVE_DMD_HELPER
+  DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
+#endif
 
-  boot_xs_parse_sublike(0.08); /* hooks.omit_parts */
+  boot_xs_parse_sublike(0.09); /* hooks.filter_attr */
 
   register_xs_parse_sublike("method", &parse_method_hooks);

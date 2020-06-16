@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Feed::Reader;
 
-our $VERSION = "0.18";
+our $VERSION = "0.19";
 
 use Scalar::Util qw(blessed);
 
@@ -305,18 +305,13 @@ Some tests adapted from L<Feed::Find> and L<XML:Feed>, Feed autodiscovery adapte
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014, Dotan Dimet.
+This software is Copyright (c) 2014-2019 by Dotan Dimet E<lt>dotan@corky.netE<gt>.
 
 This program is free software, you can redistribute it and/or modify it
 under the terms of the Artistic License version 2.0.
 
-Test data (web pages, feeds and excerpts) included in this package is intended for testing purposes only, and is not meant in any way
-to infringe on the rights of the respective authors.
-
-=head1 SEE ALSO
-
-L<Mojolicious>, L<Mojolicious::Guides>, L<http://mojolicio.us>
-
-L<XML::Feed>, L<Feed::Find>, L<HTTP::Date>
+Test data (web pages, feeds and excerpts) included in this package is intended
+for testing purposes only, and is not meant in any way to infringe on the
+rights of the respective authors.
 
 =cut

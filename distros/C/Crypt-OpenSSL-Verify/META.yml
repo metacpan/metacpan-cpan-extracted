@@ -1,0 +1,33 @@
+---
+abstract: 'OpenSSL Verify certificate verification in XS.'
+author:
+  - Timothy Legge <timlegge@cpan.org>
+  - Wesley Schwengle <waterkip@cpan.org>
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  File::Slurp: '0'
+  Test::Exception: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-OpenSSL-Verify
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::OpenSSL::X509: '1.807'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-Verify/issues
+  license: http://dev.perl.org/licenses
+  repository: https://github.com/perl-net-saml2/perl-Crypt-OpenSSL-Verify
+version: '0.19'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+

@@ -1,3 +1,23 @@
+0.003   2020-06-16  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Use regexp from Regexp::Pattern::Perl::Module.
+
+
+0.002   2020-06-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Support 2-element array form for module/class name in addition
+	  to string.
+
+        - Rename option 'caller' to 'target_package'. The old option is still
+	  supported but no longer documented.
+
+        - [test] Add tests.
+
+        - [doc] Expand documentation.
+
+
 0.001    2020-06-09  Released-By: PERLANCAR
 
          - First release.

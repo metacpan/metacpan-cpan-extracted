@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modname_with_optional_args;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-21'; # DATE
+our $DATE = '2020-06-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name (e.g. Foo::Bar) with optional arguments (e.g. Foo::Bar=arg1,arg2)',
@@ -19,7 +19,7 @@ just like the `-MMODULE=ARGS` shortcut that `perl` provides. Examples:
 See also: `perl::modname`.
 
 _
-    match => '\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*(?:=.*)?\z',
+    match => $Regexp::Pattern::Perl::Module::RE{perl_modname_with_optional_args}{pat},
 
     'x.perl.coerce_rules' => [
         'From_str::normalize_perl_modname',
@@ -52,7 +52,7 @@ Sah::Schema::perl::modname_with_optional_args - Perl module name (e.g. Foo::Bar)
 
 =head1 VERSION
 
-This document describes version 0.032 of Sah::Schema::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
+This document describes version 0.033 of Sah::Schema::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
 
 =head1 SYNOPSIS
 

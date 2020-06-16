@@ -20,7 +20,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '10.06';
+our $VERSION = '10.07';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -58,7 +58,7 @@ sub foreground {
 
   # Reset event loop
   Mojo::IOLoop->reset;
-  local @{$SIG}{qw(CHLD INT TERM QUIT)} = ('default') x 4;
+  local $SIG{CHLD} = local $SIG{INT} = local $SIG{TERM} = local $SIG{QUIT} = 'DEFAULT';
 
   my $worker = $self->worker->register;
   $job = $worker->dequeue(0 => {id => $id, queues => ['minion_foreground']});
@@ -324,6 +324,28 @@ Which are loaded like any other plugin from your application.
   # Mojolicious::Lite
   plugin 'MyApp::Task::PokeMojo';
 
+=head1 TASK CLASSES
+
+For even more flexibility you can also move tasks into dedicated classes. Allowing the use of Perl features such as
+inheritance and roles. But be aware that support for task classes is still B<EXPERIMENTAL> and might change without
+warning!
+
+  package MyApp::Task::PokeMojo;
+  use Mojo::Base 'Minion::Job';
+
+  sub run {
+    my $self = shift;
+    $self->app->ua->get('mojolicious.org');
+    $self->app->log->debug('We have poked mojolicious.org for a visitor');
+  }
+
+  1;
+
+Task classes are registered just like any other task with L</"add_task"> and you can even register the same class with
+multiple names.
+
+  $minion->add_task(poke_mojo => 'MyApp::Task::PokeMojo');
+
 =head1 EXAMPLES
 
 This distribution also contains a great example application you can use for inspiration. The L<link
@@ -585,8 +607,7 @@ Get L<Minion::Job> object without making any changes to the actual job or return
   my $jobs = $minion->jobs;
   my $jobs = $minion->jobs({states => ['inactive']});
 
-Return L<Minion::Iterator> object to safely iterate through job information. Note that this method is B<EXPERIMENTAL>
-and might change without warning!
+Return L<Minion::Iterator> object to safely iterate through job information.
 
   # Iterate through jobs for two tasks
   my $jobs = $minion->jobs({tasks => ['foo', 'bar']});
@@ -945,8 +966,7 @@ dependencies.
 
   enqueued_jobs => 100000
 
-Rough estimate of how many jobs have ever been enqueued. Note that this field is B<EXPERIMENTAL> and might change
-without warning!
+Rough estimate of how many jobs have ever been enqueued.
 
 =item failed_jobs
 
@@ -1031,8 +1051,7 @@ Build L<Minion::Worker> object. Note that this method should only be used to imp
   my $workers = $minion->workers;
   my $workers = $minion->workers({ids => [2, 3]});
 
-Return L<Minion::Iterator> object to safely iterate through worker information. Note that this method is B<EXPERIMENTAL>
-and might change without warning!
+Return L<Minion::Iterator> object to safely iterate through worker information.
 
   # Iterate through workers
   my $workers = $minion->workers;

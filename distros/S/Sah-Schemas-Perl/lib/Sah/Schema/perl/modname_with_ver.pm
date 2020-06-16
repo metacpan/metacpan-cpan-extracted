@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modname_with_ver;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-21'; # DATE
+our $DATE = '2020-06-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl module name with version number suffix, e.g. Foo::Bar@0.001',
@@ -43,7 +43,7 @@ Sah::Schema::perl::modname_with_ver - Perl module name with version number suffi
 
 =head1 VERSION
 
-This document describes version 0.032 of Sah::Schema::perl::modname_with_ver (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
+This document describes version 0.033 of Sah::Schema::perl::modname_with_ver (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
 
 =head1 SYNOPSIS
 

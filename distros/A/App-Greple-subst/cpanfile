@@ -1,6 +1,6 @@
 requires 'perl', '5.014';
 
-requires 'App::Greple', '8.4001';
+requires 'App::Greple', '8.4002';
 requires 'Getopt::EX', 'v1.18.0';
 requires 'Getopt::EX::termcolor', '1.06';
 requires 'File::Share';

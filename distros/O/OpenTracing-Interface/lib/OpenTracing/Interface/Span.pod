@@ -9,10 +9,6 @@ OpenTracing::Interface::Span - A role that defines the Span interface
 
     pacakge OpenTracing::Implementation::MyBackendService::Span;
     
-    sub get_context {
-        ...
-    }
-    
     sub overwrite_operation_name {
         ...
     }
@@ -38,14 +34,6 @@ OpenTracing::Interface::Span - A role that defines the Span interface
     }
     
     sub add_baggage_items {
-        ...
-    }
-    
-    sub get_baggage_item {
-        ...
-    }
-    
-    sub get_baggage_items {
         ...
     }
     
@@ -331,70 +319,6 @@ Sets multiple C<baggage_items> at once.
     );
 
 See L<< C<add_baggage_item> >> above.
-
-
-
-=head2 C<get_baggage_item>
-
-Returns either the corresponding baggage value, or C<undef> when such a value
-was missing.
-
-    my $baggage_value = $span->get_baggage_item( $baggage_key );
-
-=over
-
-=item Required Positional Parameters
-
-=over
-
-=item baggage_key, a B<required> C<Str>
-
-=back
-
-=item Returns
-
-=over
-
-=item Maybe a C<Value>
-
-The value of the requested baggage item, or C<undef> when such a value was
-missing.
-
-=back
-
-=back
-
-
-
-=head2 C<get_baggage_items>
-
-This will return a Hash of key/value pairs.
-
-    my %baggage_items = $span->get_baggage_items;
-
-It will return an empty list if there is no key/value pairs set.
-
-=over
-
-=item Positional Parameter(s)
-
-=over
-
-I<none>
-
-=back
-
-=item Returns
-
-=over
-
-=item C<Hash>
-
-A list of key/value pairs, not a hash reference!
-
-=back
-
-=back
 
 
 

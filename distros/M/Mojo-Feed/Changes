@@ -1,5 +1,11 @@
 Revision history for Perl extension Mojo-Feed
 
+0.19 2020-06-16T12:03:17Z
+
+    - Made is_valid and feed_type attributes of Mojo::Feed
+    - Exposed Mojo::Feed utility methods find_feed_links() and 
+      is_feed_content_type()
+
 0.18 2019-07-07T13:56:36Z
 
     - Bump required Mojolicious version to 8.03 just to use a weak attribute.

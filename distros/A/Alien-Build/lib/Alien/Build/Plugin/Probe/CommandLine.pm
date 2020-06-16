@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use File::Which ();
 
 # ABSTRACT: Probe for tools or commands already available
-our $VERSION = '2.25'; # VERSION
+our $VERSION = '2.26'; # VERSION
 
 
 has '+command' => sub { Carp::croak "@{[ __PACKAGE__ ]} requires command property" };
@@ -106,7 +106,7 @@ Alien::Build::Plugin::Probe::CommandLine - Probe for tools or commands already a
 
 =head1 VERSION
 
-version 2.25
+version 2.26
 
 =head1 SYNOPSIS
 

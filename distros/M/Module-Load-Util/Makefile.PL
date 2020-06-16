@@ -17,15 +17,20 @@ my %WriteMakefileArgs = (
   "NAME" => "Module::Load::Util",
   "PREREQ_PM" => {
     "Exporter" => "5.57",
+    "Regexp::Pattern::Perl::Module" => 0,
     "strict" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "FindBin" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0
+    "Test::Exception" => 0,
+    "Test::More" => "0.98",
+    "lib" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,10 +40,15 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "File::Spec" => 0,
+  "FindBin" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Test::More" => 0,
-  "strict" => 0
+  "Regexp::Pattern::Perl::Module" => 0,
+  "Test::Exception" => 0,
+  "Test::More" => "0.98",
+  "lib" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

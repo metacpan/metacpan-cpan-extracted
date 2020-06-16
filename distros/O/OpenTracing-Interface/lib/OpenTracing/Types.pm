@@ -10,7 +10,7 @@ OpenTracing::Types - Type constraints for checking Interfaces
 
 
 
-our $VERSION = 'v0.202.2';
+our $VERSION = 'v0.203.0';
 
 
 

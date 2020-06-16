@@ -1,9 +1,12 @@
 Revision history for Perl module Module::Generic
 
-0.12.14 2020-05-28T05:46:04
-    - Tweaked Module::Generic::Number::_set_get_prop in my last deprate attempt to correct this tedious bug. Should fix RT #132714
+0.12.15 2020-06-16T12:22:19+0900
+    - Fixed some test units
 
-0.12.13 2020-05-27T13:58:32
+0.12.14 2020-05-28T05:46:04+0900
+    - Tweaked Module::Generic::Number::_set_get_prop in my last desperate attempt to correct this tedious bug. Should fix RT #132714
+
+0.12.13 2020-05-27T13:58:324+0900
     - Corrected (hopefully) an issue whereby some undefined hash keys would not be undefined affecting test unit
 
 0.12.12 2020-05-25T13:55:00+09:00
@@ -11,28 +14,28 @@ Revision history for Perl module Module::Generic
     - Implemented a workaround to Number::Format on Windows whereby some of the POSIX::localconv values are -1. When there is no value, such as when the locale is C or when it is on Windows (value being -1), then numeric values default to 0
     - Improved test units for when running on Windows Strawberry
 
-0.12.11 2020-05-25T14:56:15
+0.12.11 2020-05-25T14:56:154+0900
 
-0.12.10 2020-05-24T13:00:03
+0.12.10 2020-05-24T13:00:034+0900
     - Corrected bug in test unit for Module::Generic::Number. Fix bug RT #132671
     - Updated Module::Generic::Scalar to return undef when creating an object with an undefined value. Fix bug RT #132681 (https://rt.cpan.org/Ticket/Display.html?id=132681)
 
-0.12.9 2020-05-23T15:00:57
+0.12.9 2020-05-23T15:00:574+0900
     - Corrected bug in test unit for Module::Generic::Number
 
-0.12.8 2020-05-22T16:15:00
+0.12.8 2020-05-22T16:15:004+0900
     - Change POSIX requirement to version 1.53_01 and perl minimum version to v5.26.1
 
-0.12.7 2020-05-22T16:15:00
+0.12.7 2020-05-22T16:15:004+0900
     - Corrected RT bug #132664 https://rt.cpan.org/Public/Bug/Display.html?id=132664 in Module::Number::init
 
-0.12.6 2020-05-21T14:52:00
+0.12.6 2020-05-21T14:52:004+0900
     - Corrected a small bug in creating a Number::Format object.
 
-0.12.5 2020-05-20T23:22:00
+0.12.5 2020-05-20T23:22:004+0900
     - Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
 
-0.12.4 2020-05-16T17:22:00
+0.12.4 2020-05-16T17:22:004+0900
     - Specified more clearly version 0.006019 for Devel::Declare, because upper version break TryCatch
 
 0.12.3 2020-05-16

@@ -162,12 +162,11 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 if (s.set.filter){
                     s.set.filter = RegExp(s.filter);
                 }
-                if (s.set.placeholder){
-                    s.set.placeholder = this.xtr(s.set.placeholder);
-                }
-                if (s.set.label){
-                    s.set.label = this.xtr(s.set.label);
-                }
+                ['placeholder','tooltip','label'].forEach(function(key){
+                    if (key in s.set){
+                       s.set[key] = this.xtr(s.set[key]);
+                    }
+                }, this);
                 control.set(s.set);
             }
 

@@ -178,6 +178,7 @@ my $tx            = $t->get_ok('/plasmastrum.xml')->tx;
 my $feed_from_tx  = Mojo::Feed::Reader->new->ua( $t->app->ua )->parse( $tx->res->body );
 my $feed_from_url = Mojo::Feed::Reader->new->ua( $t->app->ua )
   ->parse( Mojo::URL->new('/plasmastrum.xml') );
+# feed served as HTML:
 my $feed_from_url2 =
   Mojo::Feed::Reader->new->ua( $t->app->ua )->parse( Mojo::URL->new('/plasm') );
 

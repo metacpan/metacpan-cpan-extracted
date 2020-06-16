@@ -1,4 +1,9 @@
 
+1.06      2020-06-16 20:11:58+02:00 Europe/Berlin
+	- Remove accidently added directory
+	- Re-Upload to CPAN, since the last version vanished somehow
+	  (Thanks, LEEJO)
+
 1.05      2020-03-01 20:46:46+01:00 Europe/Berlin
 	- Make IO::Socket::SSL an explicit dependency to hopefully
 	  fix the problem reported by CPAN testers

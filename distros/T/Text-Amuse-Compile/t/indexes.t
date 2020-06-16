@@ -26,6 +26,9 @@ my $workingdir = Path::Tiny->tempdir(CLEANUP => !$ENV{NOCLEANUP});
 my $c = Text::Amuse::Compile->new(
                                   tex => 1,
                                   pdf => $ENV{TEST_WITH_LATEX},
+                                  logger => sub {
+                                      diag @_;
+                                  },
                                  );
 
 {
@@ -43,6 +46,7 @@ my $c = Text::Amuse::Compile->new(
     my $doc = $cfile->document;
     diag Dumper($cfile->document_indexes);
     my $indexer = Text::Amuse::Compile::Indexer->new(latex_body => $doc->as_latex,
+                                                     logger => sub { diag @_ },
                                                      index_specs => [ $cfile->document_indexes ]);
     diag Dumper($indexer->specifications);
     foreach my $spec (@{ $indexer->specifications }) {

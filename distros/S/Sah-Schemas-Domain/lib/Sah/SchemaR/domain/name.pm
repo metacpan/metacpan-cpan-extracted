@@ -1,9 +1,9 @@
 package Sah::SchemaR::domain::name;
 
-our $DATE = '2019-11-29'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["str",[{description=>"\nThis schema is currently very simple, it just checks for strings with this\npattern:\n\n    /^[0-9a-z]([0-9a-z-]*[0-9a-z])?\n      (\\.[0-9a-z]([0-9a-z-]*[0-9a-z]?))+\$/x\n\nand coerced to lowercase. Does not allow internationalized domain name (but you\ncan use its Punycode (xn--) representation. Does not check for valid public\nsuffixes.\n\n",match=>"\\A[0-9a-z]([0-9a-z-]*[0-9a-z])?(\\.[0-9a-z]([0-9a-z-]*[0-9a-z]?))+\\z",summary=>"Domain name","x.perl.coerce_rules"=>["From_str::to_lower"]}],["str"]];
+our $rschema = ["str",[{description=>"\nThis schema is currently very simple, it just checks for strings with this\npattern:\n\n    /^[0-9a-z]([0-9a-z-]*[0-9a-z])?\n      (\\.[0-9a-z]([0-9a-z-]*[0-9a-z]?))+\$/x\n\nand coerced to lowercase. Does not allow internationalized domain name (but you\ncan use its Punycode (xn--) representation. Does not check for valid public\nsuffixes.\n\n",examples=>[{valid=>1,validated_value=>"foo-bar.com",value=>"FOO-BAR.COM"},{summary=>"At least two parts are needed",valid=>0,value=>"foobar"},{valid=>0,validated_value=>"dash at the end of part is not allowed",value=>"foo-.com"},{valid=>0,validated_value=>"dash at the beginning of part is not allowed",value=>"-foo.com"},{valid=>0,validated_value=>"invalid character !",value=>"foo!.com"},{valid=>0,validated_value=>"invalid character _",value=>"foo_bar.com"}],match=>"\\A[0-9a-z]([0-9a-z-]*[0-9a-z])?(\\.[0-9a-z]([0-9a-z-]*[0-9a-z]?))+\\z",summary=>"Domain name","x.perl.coerce_rules"=>["From_str::to_lower"]}],["str"]];
 
 1;
 # ABSTRACT: Domain name
@@ -20,7 +20,7 @@ Sah::SchemaR::domain::name - Domain name
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::domain::name (from Perl distribution Sah-Schemas-Domain), released on 2019-11-29.
+This document describes version 0.005 of Sah::SchemaR::domain::name (from Perl distribution Sah-Schemas-Domain), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

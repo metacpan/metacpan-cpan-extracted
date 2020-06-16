@@ -2,13 +2,15 @@ package Mojo::Feed::Item;
 use Mojo::Base '-base';
 use Mojo::Util qw( trim );
 
+use HTTP::Date 'str2time';
+
+use Mojo::Feed::Item::Enclosure;
+
 use overload
   bool     => sub {1},
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-use Mojo::Feed::Item::Enclosure;
-use HTTP::Date 'str2time';
 
 has [qw(title link content id description guid published author)];
 
@@ -206,17 +208,21 @@ Dotan Dimet
 
 Mario Domgoergen
 
-=head1 LICENSE
+Some tests adapted from L<Feed::Find> and L<XML:Feed>, Feed auto-discovery adapted from L<Feed::Find>.
 
-Copyright (C) Dotan Dimet.
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018-2019 by Dotan Dimet E<lt>dotan@corky.netE<gt>.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License version 2.0.
+
+Test data (web pages, feeds and excerpts) included in this package is intended
+for testing purposes only, and is not meant in any way to infringe on the
+rights of the respective authors.
 
 =head1 AUTHOR
 
 Dotan Dimet E<lt>dotan@corky.netE<gt>
-
-Mario Domgoergen
 
 =cut

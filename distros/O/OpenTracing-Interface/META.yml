@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Most: '0'
-  Test::OpenTracing::Interface: v0.21.0
+  Test::OpenTracing::Interface: v0.22.0
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
@@ -34,28 +34,28 @@ no_index:
 provides:
   OpenTracing::Interface:
     file: lib/OpenTracing/Interface.pm
-    version: v0.202.2
+    version: v0.203.0
   OpenTracing::Interface::ContextReference:
     file: lib/OpenTracing/Interface/ContextReference.pm
-    version: v0.202.2
+    version: v0.203.0
   OpenTracing::Interface::Scope:
     file: lib/OpenTracing/Interface/Scope.pm
-    version: v0.202.2
+    version: v0.203.0
   OpenTracing::Interface::ScopeManager:
     file: lib/OpenTracing/Interface/ScopeManager.pm
-    version: v0.202.2
+    version: v0.203.0
   OpenTracing::Interface::Span:
     file: lib/OpenTracing/Interface/Span.pm
-    version: v0.202.2
+    version: v0.203.0
   OpenTracing::Interface::SpanContext:
     file: lib/OpenTracing/Interface/SpanContext.pm
-    version: v0.202.2
+    version: v0.203.0
   OpenTracing::Interface::Tracer:
     file: lib/OpenTracing/Interface/Tracer.pm
-    version: v0.202.2
+    version: v0.203.0
   OpenTracing::Types:
     file: lib/OpenTracing/Types.pm
-    version: v0.202.2
+    version: v0.203.0
 requires:
   Carp: '0'
   Package::Constants: '0'
@@ -67,5 +67,5 @@ requires:
   Types::Common::Numeric: '0'
   Types::Standard: '0'
   namespace::clean: '0'
-version: v0.202.2
+version: v0.203.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

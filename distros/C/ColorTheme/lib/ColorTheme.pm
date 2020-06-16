@@ -1,9 +1,9 @@
 package ColorTheme;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-14'; # DATE
 our $DIST = 'ColorTheme'; # DIST
-our $VERSION = '2.1.0'; # VERSION
+our $VERSION = '2.1.1'; # VERSION
 
 1;
 # ABSTRACT: Color themes
@@ -24,7 +24,7 @@ ColorTheme - Color themes
 
 =head1 VERSION
 
-This document describes version 2.1.0 of ColorTheme (from Perl distribution ColorTheme), released on 2020-06-09.
+This document describes version 2.1.1 of ColorTheme (from Perl distribution ColorTheme), released on 2020-06-14.
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,7 @@ releases.
 
 =head2 color theme
 
-Essentially, a mapping of item names and color codes. For example, a color theme
+Essentially, a mapping of item names and item colors. For example, a color theme
 for syntax-coloring JSON might be something like:
 
  {
@@ -68,10 +68,10 @@ accessible from the color theme structure.
 
 =head2 color theme class
 
-A Perl module in the C<ColorTheme::*> or C<SOME::APP::ColorTheme::*> namespace
-following this specification. A color theme class contains L</color theme
-structure> in its C<%THEME> package variable, as well as some required methods
-to access the information in the structure.
+A Perl module in the C<ColorTheme::*> namespace following this specification. A
+color theme class contains L</color theme structure> in its C<%THEME> package
+variable, as well as some required methods to access the information in the
+structure.
 
 A simple (L<static|/static color theme>) theme has all its information
 accessible from the color theme structure, so client can actually bypass the
@@ -102,9 +102,9 @@ See also: L</static color theme>.
 
 =head2 Color theme class
 
-A color theme class must be put in C<ColorTheme::> namespace, or for
-application-specific themes, in C<SOME::APP::ColorTheme::*>, where C<SOME::APP>
-is an application namespace.
+A color theme class must be put in C<ColorTheme::> namespace.
+Application-specific color themes should be put under
+C<ColorTheme::MODULE::NAME::*> or C<ColorTheme::APP::NAME::*>.
 
 The color theme class must declare a package hash variable named C<%THEME>
 containing the L<color theme structure|/Color theme structure>. It also must
@@ -116,7 +116,7 @@ provide these methods:
 
 Usage:
 
- my $theme_class = ColorTheme::NAME->new([ %args ]);
+ my $ctheme_obj = ColorTheme::NAME->new([ %args ]);
 
 Constructor. Known arguments will depend on the particular theme class and must
 be specified in the color theme structure under the C<args> key.
@@ -125,7 +125,8 @@ be specified in the color theme structure under the C<args> key.
 
 Usage:
 
- my $theme_struct = $theme_class->get_struct;
+ my $ctheme_struct = ColorTheme::NAME->get_struct;
+ my $ctheme_struct = $ctheme_obj->get_struct;
 
 Provide a method way of getting the L</color theme structure>. A client can also
 access the C<%THEME> package variable directly.
@@ -134,7 +135,7 @@ access the C<%THEME> package variable directly.
 
 Usage:
 
- my $theme_class_args = $theme_class->get_args;
+ my $args = $ctheme_obj->get_args;
 
 Provide a method way of getting the arguments to the constructor. The official
 implementation L<ColorThemeBase::Constructor> stores this in the 'args' key of

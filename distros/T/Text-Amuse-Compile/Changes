@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse::Compile
 
+1.46 2020-06-16
+
+ - Improve performance of LaTeX indexing. This is still experimental
+   but stabilizing (testing against a real-life book)
+
 1.45 2020-06-15
 
  - Secondary footnote: move back the loading of the bigfoot package to

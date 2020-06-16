@@ -48,7 +48,7 @@
          "web" : "https://github.com/perlancar/perl-BorderStyle"
       }
    },
-   "version" : "2.0.1",
+   "version" : "2.0.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -158,7 +158,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.061"
+            "version" : "0.062"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",

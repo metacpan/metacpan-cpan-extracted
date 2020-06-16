@@ -24,6 +24,11 @@ class Counter {
 
    is( $counter->describe, "Count is now 3",
       '$counter->describe after $counter->inc x 3' );
+
+   # BEGIN-time initialised slots get private storage
+   my $counter2 = Counter->new;
+   is( $counter2->describe, "Count is now 0",
+      '$counter2 has its own $count' );
 }
 
 class AllTheTypes {
@@ -78,5 +83,35 @@ class Holder {
    undef $holder;
    is_oneref( $datum, '$datum finally' );
 }
+
+# Sequencing order of expressions
+{
+   my @order;
+   sub seq
+   {
+      push @order, $_[0];
+      return $_[0];
+   }
+
+   seq("start");
+
+   class Sequencing {
+      has $at_BEGIN = "BEGIN";
+      has $at_class = ::seq("class");
+
+      method test {
+         ::is( $at_BEGIN, "BEGIN", '$at_BEGIN set correctly' );
+         ::is( $at_class, "class", '$at_class set correctly' );
+      }
+   }
+
+   seq("new");
+   Sequencing->new->test;
+
+   is_deeply( \@order, [qw( start class new )],
+      'seq() calls happened in the correct order' );
+}
+
+Sequencing->new->test;
 
 done_testing;

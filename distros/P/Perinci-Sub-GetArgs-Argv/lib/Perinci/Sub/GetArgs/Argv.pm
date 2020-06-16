@@ -1,7 +1,7 @@
 package Perinci::Sub::GetArgs::Argv;
 
-our $DATE = '2019-06-26'; # DATE
-our $VERSION = '0.843'; # VERSION
+our $DATE = '2020-06-16'; # DATE
+our $VERSION = '0.844'; # VERSION
 
 use 5.010001;
 use strict;
@@ -802,7 +802,7 @@ Normally you would want to use strict mode, for more error checking. Setting off
 strict is used by, for example, Perinci::Sub::Complete during completion where
 the command-line might still be incomplete.
 
-Should probably be named `ignore_errors`. :-)
+Should probably be named `ignore_errors` or `allow_unknown_options`. :-)
 
 _
         },
@@ -1136,7 +1136,7 @@ Perinci::Sub::GetArgs::Argv - Get subroutine arguments from command line argumen
 
 =head1 VERSION
 
-This document describes version 0.843 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2019-06-26.
+This document describes version 0.844 of Perinci::Sub::GetArgs::Argv (from Perl distribution Perinci-Sub-GetArgs-Argv), released on 2020-06-16.
 
 =head1 SYNOPSIS
 
@@ -1269,6 +1269,7 @@ Whether to add --NAME-yaml for non-simple arguments.
 Will also interpret command-line arguments as YAML if assigned to function
 arguments, if arguments' schema is not simple scalar.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1312,7 +1313,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<allow_extra_elems> => I<bool> (default: 0)
 
-Allow extra/unassigned elements in argv.
+Allow extraE<sol>unassigned elements in argv.
 
 If set to 1, then if there are array elements unassigned to one of the
 arguments, instead of generating an error, this function will just ignore them.
@@ -1422,7 +1423,8 @@ Normally you would want to use strict mode, for more error checking. Setting off
 strict is used by, for example, Perinci::Sub::Complete during completion where
 the command-line might still be incomplete.
 
-Should probably be named C<ignore_errors>. :-)
+Should probably be named C<ignore_errors> or C<allow_unknown_options>. :-)
+
 
 =back
 
@@ -1480,7 +1482,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

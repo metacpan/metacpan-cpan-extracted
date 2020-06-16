@@ -1,5 +1,14 @@
 Revision history for Object-Pad
 
+0.29    2020-06-16
+        [CHANGES]
+         * Accept :override attribute on methods
+         * Accept runtime expressions as `has $slot = DEFAULT`
+         * Added Devel::MAT::Dumper::Helper support
+
+        [BUGFIXES]
+         * Fix various compiler warnings
+
 0.28    2020-06-14
         [BUGFIXES]
          * Declare correct version of XS::Parse::Sublike in configure_requires

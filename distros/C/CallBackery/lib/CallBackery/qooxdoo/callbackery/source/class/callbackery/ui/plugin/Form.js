@@ -203,6 +203,11 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     if ('value' in s.set){
                         delete s.set.value; // do NOT change the value of anything.
                     }
+                    ['placeholder','tooltip','label'].forEach(function(key){
+                         if (key in s.set){
+                            s.set[key] = this.xtr(s.set[key]);
+                        }
+                    }, this);
                     var ctrl = this._form.getControl(s.key);
                     ctrl.set(s.set);
                 }

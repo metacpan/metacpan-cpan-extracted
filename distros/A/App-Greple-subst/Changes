@@ -1,5 +1,10 @@
 Revision history for Perl extension App-Greple-subst
 
+2.1403 2020-06-16T16:09:00Z
+
+    - Use App::Greple 8.4002, otherwise --need 0 --all produces
+      empty data when no match was found to required pattern.
+
 2.1402 2020-06-04T07:16:39Z
 
     - Update to use required function pattern of Getopt::EX.

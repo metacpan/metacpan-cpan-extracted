@@ -1,6 +1,6 @@
 package OpenTracing::Role::Span;
 
-our $VERSION = 'v0.81.0';
+our $VERSION = 'v0.81.1';
 
 
 
@@ -197,14 +197,14 @@ protected_has child_of => (
 # this is just non of your business, and will get depricated as soon as there is
 # references
 
-sub get_child_of { $_[0]->child_of }
+sub _get_child_of { $_[0]->child_of }
 #
 # so this can be swapped for something more clever once using references
 
 sub get_parent_span_id {
     my $self = shift;
     
-    my $child_of = $self->get_child_of;
+    my $child_of = $self->_get_child_of;
     
     return unless defined $child_of;
     

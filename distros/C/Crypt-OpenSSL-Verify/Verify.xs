@@ -101,13 +101,16 @@ and returns it to OpenSSL
 
 =over
 
-=item ok
-    * ok - the result of the certificate verification in OpenSSL
-            ok = 1, !ok = 0
+=item * ok
 
-=item ctx
-    * ctx - Pointer to the X509_Store_CTX that OpenSSL includes the
-            error codes in
+    The result of the certificate verification in OpenSSL ok = 1, !ok =
+    0
+
+=item * ctx
+
+    Pointer to the X509_Store_CTX that OpenSSL includes the error codes
+    in
+
 =back
 
 =cut
@@ -116,22 +119,22 @@ static SV *callback = (SV *) NULL;
 
 static int cb1(ok, ctx)
     int ok;
-    UV *ctx;
+    IV *ctx;
 {
     dSP;
     int count;
     int i;
 
     //printf("Callback pointer: %p\n", ctx);
-    //printf("Callback UL of pointer %lu\n", PTR2UV(ctx));
+    //printf("Callback INT of pointer %lu\n", (unsigned long) PTR2IV(ctx));
     ENTER;
     SAVETMPS;
 
     PUSHMARK(SP);
     EXTEND(SP, 2);
 
-    PUSHs(newSVuv(ok));                 // Pass ok as integer on the stack
-    PUSHs(newSVuv(PTR2UV(ctx)));        // Pass pointer address as integer
+    PUSHs(newSViv(ok));                 // Pass ok as integer on the stack
+    PUSHs(newSViv(PTR2IV(ctx)));        // Pass pointer address as integer
     PUTBACK;
 
     count = call_sv(callback, G_SCALAR);  // Call the verify_callback()
@@ -224,7 +227,7 @@ void register_verify_cb(fn)
         else
             SvSetSV(callback, fn);
 
-=head new
+=head1 new
 
 Constructs the object ready to verify the certificates.
 It also sets the callback function.
@@ -386,15 +389,15 @@ to the point address to be used
 =cut
 
 int ctx_error_code(ctx)
-    UV ctx;
+    IV ctx;
 
     PREINIT:
 
     CODE:
-        /* printf("ctx_error_code - UL holding pointer: %lu\n", ctx); */
-        /* printf("ctx_error_code - Pointer to ctx: %p\n", (void *) INT2PTR(UV , ctx)); */
+        /* printf("ctx_error_code - int holding pointer: %lu\n", (unsigned long) ctx); */
+        /* printf("ctx_error_code - Pointer to ctx: %p\n", (void *) INT2PTR(SV * , ctx)); */
 
-        RETVAL = X509_STORE_CTX_get_error((X509_STORE_CTX *) INT2PTR(UV, ctx));
+        RETVAL = X509_STORE_CTX_get_error((X509_STORE_CTX *) INT2PTR(SV *, ctx));
 
     OUTPUT:
 
@@ -405,7 +408,9 @@ int ctx_error_code(ctx)
 The actual verify function that calls OpenSSL to verify the x509 Cert that
 has been passed in as a parameter against the store that was setup in _new()
 
-=over Parameters
+=head3 Parameters
+
+=over
 
 =item self - self object
 
@@ -497,10 +502,11 @@ int verify(self, x509)
         //    int cb = verify_cb(&trust_options, RETVAL, csc);
         //    RETVAL = cb;
         //}
-        X509_STORE_CTX_free(csc);
 
         if (!RETVAL)
             croak("verify: %s", ctx_error(csc));
+
+        X509_STORE_CTX_free(csc);
 
     OUTPUT:
 

@@ -16,7 +16,9 @@ t/00_compile.t
 t/01-parse.t
 t/02-no-reader.t
 t/03-feed-find.t
+t/035-feed-find-noreader.t
 t/04-opml.t
+t/05-misc.t
 t/06-atom10.t
 t/09-enclosures.t
 t/10-feed_types.t
@@ -30,7 +32,9 @@ t/samples/itunes_author_order.xml
 t/samples/itunes_summary.xml
 t/samples/link1.html
 t/samples/link2_multi.html
+t/samples/link2_multi_rel.html
 t/samples/link3_anchor.html
+t/samples/link3_anchor_no_base.html
 t/samples/no_link.html
 t/samples/perlmonks.html
 t/samples/plasmastrum.xml

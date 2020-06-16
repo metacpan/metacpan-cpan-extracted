@@ -1323,6 +1323,7 @@ sub _prepare_tex_tokens {
     if (my @raw_indexes = $self->document_indexes) {
         my $indexer = Text::Amuse::Compile::Indexer->new(latex_body => $latex_body,
                                                          language_code => $doc->language_code,
+                                                         logger => $self->logger || sub { print @_ },
                                                          index_specs => \@raw_indexes);
         $latex_body = $indexer->indexed_tex_body;
         my %xindy_langs = (

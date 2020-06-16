@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = 'v0.202.2';
+our $VERSION = 'v0.203.0';
 
 
 use Role::Declare;
@@ -14,16 +14,6 @@ use OpenTracing::Types qw/SpanContext/;
 use Types::Standard qw/Any HashRef Str Value/;
 
 use namespace::clean;
-
-
-instance_method get_baggage_item(
-    Str $key
-) :ReturnMaybe(Value) {}
-
-
-
-instance_method get_baggage_items(
-) :ReturnList (Any) {}
 
 
 

@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.12.14
+## Version v0.12.15
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/08/24
-## Modified 2020/05/28
+## Modified 2020/06/16
 ## 
 ##----------------------------------------------------------------------------
 package Module::Generic;
@@ -41,7 +41,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.12.14';
+    $VERSION     = 'v0.12.15';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -6500,7 +6500,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.12.14
+    v0.12.15
 
 =head1 DESCRIPTION
 

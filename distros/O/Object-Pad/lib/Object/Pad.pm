@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 use Carp;
 
@@ -188,7 +188,7 @@ default representation type, and does not have to be specifically requested.
 =head2 has
 
    has $var;
-   has $var = CONST;
+   has $var = EXPR;
    has @var;
    has %var;
 
@@ -207,10 +207,9 @@ to use L</method> to create an accessor.
 
 A scalar slot may provide a expression that gives an initialisation value,
 which will be assigned into the slot of every instance during the constructor
-before the C<BUILD> blocks are invoked. For ease-of-implementation reasons
-this expression must currently be a compiletime constant, but it is hoped that
-a future version will relax this restriction and allow runtime-computed
-values.
+before the C<BUILD> blocks are invoked. Note that this expression is evaluated
+exactly once, at runtime, after the class definition has been parsed. It is
+not evaluated individually for every object instance of that class.
 
 The following slot attributes are supported:
 
@@ -295,6 +294,14 @@ see also the C<:reader>, C<:writer> and C<:mutator> slot attributes).
 Every method automatically gets the C<:method> attribute applied, which
 suppresses warnings about ambiguous calls resolved to core functions if the
 name of a method matches a core function.
+
+The following additional attributes are recognised by C<Object::Pad> directly:
+
+=head3 :override
+
+Marks that this method expects to override another of the same name from a
+superclass. It is an error at compiletime if the superclass does not provide
+such a method.
 
 =head2 BUILD
 
@@ -633,14 +640,6 @@ private slots.
 
 Consider multiple inheritence of subclassing, if that is still considered
 useful after adding roles.
-
-=item *
-
-Some extensions of the C<has> syntax:
-
-Non-constant default expressions
-
-   has $var = EXPR;
 
 =item *
 

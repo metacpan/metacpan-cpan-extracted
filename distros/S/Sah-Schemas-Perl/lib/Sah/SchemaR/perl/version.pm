@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::version;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.032'; # VERSION
+our $DATE = '2020-06-16'; # DATE
+our $VERSION = '0.033'; # VERSION
 
 our $rschema = ["obj",[{description=>"\nUse this schema if you want to accept a version object (see <pm:version>).\nCoercion from string is provided.\n\n",isa=>"version",summary=>"Perl version object","x.perl.coerce_rules"=>["From_str::perl_version"]}],["obj"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::version - Perl version object
 
 =head1 VERSION
 
-This document describes version 0.032 of Sah::SchemaR::perl::version (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
+This document describes version 0.033 of Sah::SchemaR::perl::version (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
 
 =head1 DESCRIPTION
 

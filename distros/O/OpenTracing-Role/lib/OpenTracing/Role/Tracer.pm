@@ -1,16 +1,17 @@
 package OpenTracing::Role::Tracer;
 
-our $VERSION = 'v0.81.0';
+our $VERSION = 'v0.81.1';
 
 use Moo::Role;
+use syntax qw/maybe/;
 
 use Carp;
 use OpenTracing::Types qw/ScopeManager Span SpanContext is_Span is_SpanContext/;
 use Ref::Util qw/is_plain_hashref/;
-use Role::Declare;
+use Role::Declare -lax;
 use Try::Tiny;
 use Types::Common::Numeric qw/PositiveOrZeroNum/;
-use Types::Standard qw/HashRef Object Str/;
+use Types::Standard qw/Maybe HashRef Object Str/;
 
 has scope_manager => (
     is              => 'ro',
@@ -93,10 +94,16 @@ sub start_span {
     
     my $span = $self->build_span(
         operation_name => $operation_name,
-        child_of       => $child_of,
-        start_time     => $start_time,
-        tags           => $tags,
         context        => $context,
+
+        maybe
+        child_of       => $child_of,
+
+        maybe
+        start_time     => $start_time,
+
+        maybe
+        tags           => $tags,
     );
     #
     # we should get rid of passing 'child_of' or the not exisitng 'follows_from'
@@ -119,11 +126,11 @@ instance_method inject_context(
 
 
 instance_method build_span (
-    Str                :$operation_name,
-    SpanContext | Span :$child_of,
-    SpanContext        :$context,
-    PositiveOrZeroNum  :$start_time      = undef,
-    HashRef[Str]       :$tags            = {},
+    Str                         :$operation_name,
+    SpanContext                 :$context,
+    Maybe[ SpanContext | Span ] :$child_of,
+    Maybe[ PositiveOrZeroNum ]  :$start_time,
+    Maybe[ HashRef[Str] ]       :$tags,
 ) :Return (Span) { };
 
 instance_method build_context (

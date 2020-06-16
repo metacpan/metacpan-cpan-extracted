@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     2
 
 VERSION
-    This document describes version 2.0.1 of BorderStyle (from Perl
-    distribution BorderStyle), released on 2020-06-11.
+    This document describes version 2.0.2 of BorderStyle (from Perl
+    distribution BorderStyle), released on 2020-06-14.
 
 DESCRIPTION
     This document specifies a way to create and use border styles
@@ -16,9 +16,9 @@ GLOSSARY
   border style structure
 SPECIFICATION
   Border style class
-    Border style class must be put under "BorderStyle::*" or, in the case of
-    application-specific border styles, "APP::NAME::BorderStyle::*" where
-    "APP::NAME" is an application's namespace.
+    Border style class must be put under "BorderStyle::*".
+    Application-specific border styles should be put under
+    "BorderStyle::MODULE::NAME::*" or "BorderStyle::APP::NAME::*".
 
     Border style structure must be put in the %BORDER package variable.
 

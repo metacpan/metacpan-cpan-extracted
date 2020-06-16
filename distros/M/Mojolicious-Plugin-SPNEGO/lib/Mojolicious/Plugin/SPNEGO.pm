@@ -3,7 +3,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 use IO::Socket::Timeout;
 use Mojo::Util qw(b64_decode);
-our $VERSION = '0.4.1';
+our $VERSION = '0.5.0';
 
 my %cCache;
 
@@ -41,12 +41,21 @@ sub register {
                             $c->log->error("LDAP ERROR: " . $msg->error);
                             return $msg
                         },
-                        timeout=>$timeout
-                    );
+                        timeout=>$timeout,
+                        verify => $cfg->{verify} // 'none'
+                    ) or return 0;
                     if ($cfg->{start_tls}){
                         my $msg = $ldap->start_tls($cfg->{start_tls});
                         if ($msg->is_error()){
                             $c->log->error($msg->error);
+                            return 0;
+                        }
+                    }
+                    elsif ($ldap->uri !~ m{^ldaps://} and $cfg->{verify}){
+                        my $msg = $ldap->start_tls(verify => $cfg->{verify});
+                        if ($msg->is_error()){
+                            $c->log->error($msg->error);
+                            return 0;
                         }
                     }
                     # Read/Write timeouts via setsockopt
@@ -114,9 +123,7 @@ Mojolicious::Plugin::SPNEGO - Provide NTLM authentication by forwarding requests
     if (not $c->session('user')){
         $c->ntlm_auth({
             ad_server => "ldap://my.server",
-            start_tls => {
-                verify => 'none',
-            },
+            verify => 'require', # if any verify value is set then start_tls is issued
             auth_success_cb => sub {
                 my $c = shift;
                 my $user = shift;

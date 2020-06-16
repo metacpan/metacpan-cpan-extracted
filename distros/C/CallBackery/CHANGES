@@ -1,3 +1,7 @@
+0.33.6 2020-06-16 10:48:34 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - properly translate placeholder and tooltip even in reConf case
+
 0.33.5 2020-06-07 11:25:16 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - translate labels transported via buttonSet

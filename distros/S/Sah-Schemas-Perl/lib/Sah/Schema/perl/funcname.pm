@@ -1,9 +1,9 @@
 package Sah::Schema::perl::funcname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-21'; # DATE
+our $DATE = '2020-06-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl function name, either qualified with package name (e.g. Foo::subname) or unqualified (e.g. subname)',
@@ -41,7 +41,7 @@ Sah::Schema::perl::funcname - Perl function name, either qualified with package 
 
 =head1 VERSION
 
-This document describes version 0.032 of Sah::Schema::perl::funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
+This document describes version 0.033 of Sah::Schema::perl::funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
 
 =head1 SYNOPSIS
 

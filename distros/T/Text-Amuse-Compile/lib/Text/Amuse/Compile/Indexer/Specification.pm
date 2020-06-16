@@ -16,12 +16,6 @@ Text::Amuse::Compile::Indexer::Specification - Class for LaTeX indexes
 
 Everything here is pretty much private and used by L<Text::Amuse::Compile::Indexer>
 
-=head1 FUNCTIONS
-
-=head2 explode_line
-
-Tokenize a line, splitting in whitespace, word and non-word componentes.
-
 =head1 ACCESSORS AND METHODS
 
 =over 4
@@ -42,7 +36,7 @@ strings.
 =item matches
 
 Lazily built, a sorted arrayref with hashrefs with the matching
-specification. The pattern is tokenized.
+specification.
 
 =item total_found
 
@@ -84,16 +78,10 @@ sub _build_matches {
         $label ||= $match;
         push @pairs, {
                       match => $match,
-                      tokens => [ explode_line($match) ],
                       label => $label,
                      };
     }
-    return [ sort { @{$b->{tokens}} <=> @{$a->{tokens}} or $a->{match} cmp $b->{match} } @pairs ];
-}
-
-sub explode_line {
-    my $l = shift;
-    return grep { length($_) } map { split(/(\s+)/, $_) } split(/\b/, $l);
+    return \@pairs;
 }
 
 1;

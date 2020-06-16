@@ -13,9 +13,6 @@ my $Test = Test::OpenTracing::Tester::CanAll->new(
         'add_tag',
         'add_tags',
         'finish',
-        'get_baggage_item',
-        'get_baggage_items',
-        'get_context',
         'log_data',
         'overwrite_operation_name',
     ],
@@ -34,9 +31,6 @@ sub add_baggage_items;
 sub add_tag;
 sub add_tags;
 sub finish;
-sub get_baggage_item;
-sub get_baggage_items;
-sub get_context;
 sub log_data;
 sub overwrite_operation_name;
 

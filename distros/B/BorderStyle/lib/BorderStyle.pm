@@ -1,9 +1,9 @@
 package BorderStyle;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-06-14'; # DATE
 our $DIST = 'BorderStyle'; # DIST
-our $VERSION = '2.0.1'; # VERSION
+our $VERSION = '2.0.2'; # VERSION
 
 1;
 # ABSTRACT: Border styles
@@ -24,7 +24,7 @@ BorderStyle - Border styles
 
 =head1 VERSION
 
-This document describes version 2.0.1 of BorderStyle (from Perl distribution BorderStyle), released on 2020-06-11.
+This document describes version 2.0.2 of BorderStyle (from Perl distribution BorderStyle), released on 2020-06-14.
 
 =head1 DESCRIPTION
 
@@ -40,9 +40,9 @@ This document specifies a way to create and use border styles
 
 =head2 Border style class
 
-Border style class must be put under C<BorderStyle::*> or, in the case of
-application-specific border styles, C<APP::NAME::BorderStyle::*> where
-C<APP::NAME> is an application's namespace.
+Border style class must be put under C<BorderStyle::*>. Application-specific
+border styles should be put under C<BorderStyle::MODULE::NAME::*> or
+C<BorderStyle::APP::NAME::*>.
 
 Border style structure must be put in the C<%BORDER> package variable.
 

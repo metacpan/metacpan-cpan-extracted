@@ -8,14 +8,6 @@ use Mojo::Util 'decode', 'trim';
 use Carp qw(carp croak);
 use Scalar::Util qw(blessed);
 
-# feed mime-types:
-our @feed_types = (
-    'application/x.atom+xml', 'application/atom+xml',
-    'application/xml',        'text/xml',
-    'application/rss+xml',    'application/rdf+xml'
-);
-our %is_feed = map { $_ => 1 } @feed_types;
-
 has charset => 'UTF-8';
 
 has ua            => sub { Mojo::UserAgent->new };
@@ -80,64 +72,17 @@ sub discover {
         sub {
             my ($tx) = @_;
             if ( $tx->res->is_success && $tx->res->code == 200 ) {
-                return $self->_find_feed_links( $tx->req->url, $tx->res );
+                my $feed = Mojo::Feed->new(url => $tx->req->url);
+                return $feed->url if ($feed->is_feed_content_type($tx->res->headers->content_type));
+                my @feeds = $feed->find_feed_links($tx->res);
+                return @feeds if (@feeds);
+                $feed->body($tx->res->body);
+                $feed->charset($tx->res->content->charset) if ($tx->res->content->charset);
+                return $feed->url if ($feed->is_valid);
             }
             return;
         }
       );
-}
-
-sub _find_feed_links {
-    my ( $self, $url, $res ) = @_;
-
-    state $feed_exp = qr/((\.(?:rss|xml|rdf)$)|(\/feed\/)|(feeds*\.))/;
-    my @feeds;
-
-    # use split to remove charset attribute from content_type
-    my ($content_type) = split( /[; ]+/, $res->headers->content_type );
-    if ( $is_feed{$content_type} ) {
-        push @feeds, Mojo::URL->new($url)->to_abs;
-    }
-    else {
-        # we are in a web page. PHEAR.
-        my $base = Mojo::URL->new(
-                 $res->dom->find('head base')->map( 'attr', 'href' )->join('')
-              || $url )->to_abs($url);
-        my $title =
-          $res->dom->find('head > title')->map('text')->join('') || $url;
-        $res->dom->find('head link')->each(
-            sub {
-                my $attrs = $_->attr();
-                return unless ( $attrs->{'rel'} );
-                my %rel = map { $_ => 1 } split /\s+/, lc( $attrs->{'rel'} );
-                my $type = ( $attrs->{'type'} ) ? lc trim $attrs->{'type'} : '';
-                if ( $is_feed{$type}
-                    && ( $rel{'alternate'} || $rel{'service.feed'} ) )
-                {
-                    push @feeds,
-                      Mojo::URL->new( $attrs->{'href'} )->to_abs($base);
-                }
-            }
-        );
-        $res->dom->find('a')->grep(
-            sub {
-                $_->attr('href')
-                  && $_->attr('href') =~ /$feed_exp/io;
-            }
-        )->each(
-            sub {
-                push @feeds, Mojo::URL->new( $_->attr('href') )->to_abs($base);
-            }
-        );
-
-        # call me crazy, but maybe this is just a feed served as HTML?
-        unless (@feeds) {
-            if ( $self->parse( $res->body, $res->content->charset ) ) {
-                push @feeds, Mojo::URL->new($url)->to_abs;
-            }
-        }
-    }
-    return @feeds;
 }
 
 sub parse_opml {
@@ -286,20 +231,20 @@ Mario Domgoergen
 
 Some tests adapted from L<Feed::Find> and L<XML:Feed>, Feed auto-discovery adapted from L<Feed::Find>.
 
+=head1 COPYRIGHT AND LICENSE
 
-
-=head1 LICENSE
-
-Copyright (C) Dotan Dimet.
+This software is Copyright (c) 2018-2019 by Dotan Dimet E<lt>dotan@corky.netE<gt>.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the terms of the Artistic License version 2.0.
+
+Test data (web pages, feeds and excerpts) included in this package is intended
+for testing purposes only, and is not meant in any way to infringe on the
+rights of the respective authors.
 
 =head1 AUTHOR
 
 Dotan Dimet E<lt>dotan@corky.netE<gt>
-
-Mario Domgoergen
 
 =cut
 

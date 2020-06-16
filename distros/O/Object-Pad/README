@@ -167,7 +167,7 @@ KEYWORDS
  has
 
        has $var;
-       has $var = CONST;
+       has $var = EXPR;
        has @var;
        has %var;
     
@@ -186,10 +186,10 @@ KEYWORDS
 
     A scalar slot may provide a expression that gives an initialisation
     value, which will be assigned into the slot of every instance during
-    the constructor before the BUILD blocks are invoked. For
-    ease-of-implementation reasons this expression must currently be a
-    compiletime constant, but it is hoped that a future version will relax
-    this restriction and allow runtime-computed values.
+    the constructor before the BUILD blocks are invoked. Note that this
+    expression is evaluated exactly once, at runtime, after the class
+    definition has been parsed. It is not evaluated individually for every
+    object instance of that class.
 
     The following slot attributes are supported:
 
@@ -276,6 +276,15 @@ KEYWORDS
     Every method automatically gets the :method attribute applied, which
     suppresses warnings about ambiguous calls resolved to core functions if
     the name of a method matches a core function.
+
+    The following additional attributes are recognised by Object::Pad
+    directly:
+
+  :override
+
+    Marks that this method expects to override another of the same name
+    from a superclass. It is an error at compiletime if the superclass does
+    not provide such a method.
 
  BUILD
 
@@ -511,12 +520,6 @@ IMPLEMENTATION TODOs
 
       * Consider multiple inheritence of subclassing, if that is still
       considered useful after adding roles.
-
-      * Some extensions of the has syntax:
-
-      Non-constant default expressions
-
-         has $var = EXPR;
 
       * Work out why no indirect doesn't appear to work properly before
       perl 5.20.

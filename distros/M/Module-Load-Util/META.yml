@@ -4,9 +4,13 @@ author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
   File::Spec: '0'
+  FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::More: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  lib: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -18,12 +22,13 @@ meta-spec:
 name: Module-Load-Util
 requires:
   Exporter: '5.57'
+  Regexp::Pattern::Perl::Module: '0'
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Load-Util
   homepage: https://metacpan.org/release/Module-Load-Util
   repository: git://github.com/perlancar/perl-Module-Load-Util.git
-version: '0.001'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -111,7 +116,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.061'
+      version: '0.062'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -292,7 +297,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.144'
+      version: '0.145'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
@@ -372,6 +377,14 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
       version: '6.014'
     -
       class: Dist::Zilla::Plugin::FinderCode

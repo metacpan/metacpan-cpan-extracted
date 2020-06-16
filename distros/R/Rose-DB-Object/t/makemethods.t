@@ -343,16 +343,25 @@ SKIP:
 
 $p->{'password_encrypted'} = ':8R1Kf2nOS0bRE';
 
-ok($p->password_is('xyzzy'), 'chkpass() 1');
-is($p->password, 'xyzzy', 'chkpass() 2');
+my $salt = substr($p->{'password_encrypted'}, 1, 2);
 
-eval { $p->set_password() };
-ok($@, 'chkpass() 3');
+if(defined(crypt('xyzzy', $salt)))
+{
+   ok($p->password_is('xyzzy'), 'chkpass() 1');
+   is($p->password, 'xyzzy', 'chkpass() 2');
 
-$p->set_password('foobar');
+   eval { $p->set_password() };
+   ok($@, 'chkpass() 3');
 
-ok($p->password_is('foobar'), 'chkpass() 4');
-is($p->get_password, 'foobar', 'chkpass() 5');
+   $p->set_password('foobar');
+
+   ok($p->password_is('foobar'), 'chkpass() 4');
+   is($p->get_password, 'foobar', 'chkpass() 5');
+}
+else
+{
+  SKIP: { skip('chkpass tests due to undef return from crypt()', 5) }
+}
 
 BEGIN
 {

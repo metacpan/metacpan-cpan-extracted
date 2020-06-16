@@ -1,9 +1,17 @@
+2.0.2   2020-06-14  Released-By: PERLANCAR; Urgency: medium
+
+	- No longer encourage putting border style modules under app
+	  namespace (SOME::APP::BorderStyle::*) due to slow search.
+
+	- Add note in Changes: 2.0.0 was never released.
+
+
 2.0.1   2020-06-11  Released-By: PERLANCAR; Urgency: medium
 
 	- Forgot to specify box_chars property.
 
 
-2.0.0   2020-06-11  Released-By: PERLANCAR
+2.0.0   2020-06-11  Released-By: PERLANCAR; Released: no
 
         - Rename from Border-Style to BorderStyle.
 

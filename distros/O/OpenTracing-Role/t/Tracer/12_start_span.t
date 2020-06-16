@@ -204,7 +204,6 @@ subtest "Use 'default_context' when no 'child_of' and no 'active_span'" => sub {
         { @{$call_args} },
         {
             operation_name     => 'some operation name',
-            child_of           => undef,
             start_time         => 1.25,
             tags               => { foo => 1, bar => 6 },
             context            => $some_span_context,

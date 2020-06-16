@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     2
 
 VERSION
-    This document describes version 2.1.0 of ColorTheme (from Perl
-    distribution ColorTheme), released on 2020-06-09.
+    This document describes version 2.1.1 of ColorTheme (from Perl
+    distribution ColorTheme), released on 2020-06-14.
 
 DESCRIPTION
     This document specifies a way to create and use color themes.
@@ -17,7 +17,7 @@ SPECIFICATION STATUS
 
 GLOSSARY
   color theme
-    Essentially, a mapping of item names and color codes. For example, a
+    Essentially, a mapping of item names and item colors. For example, a
     color theme for syntax-coloring JSON might be something like:
 
      {
@@ -45,10 +45,10 @@ GLOSSARY
     color theme structure.
 
   color theme class
-    A Perl module in the "ColorTheme::*" or "SOME::APP::ColorTheme::*"
-    namespace following this specification. A color theme class contains
-    "color theme structure" in its %THEME package variable, as well as some
-    required methods to access the information in the structure.
+    A Perl module in the "ColorTheme::*" namespace following this
+    specification. A color theme class contains "color theme structure" in
+    its %THEME package variable, as well as some required methods to access
+    the information in the structure.
 
     A simple (static) theme has all its information accessible from the
     color theme structure, so client can actually bypass the methods and
@@ -77,9 +77,9 @@ GLOSSARY
 
 SPECIFICATION
   Color theme class
-    A color theme class must be put in "ColorTheme::" namespace, or for
-    application-specific themes, in "SOME::APP::ColorTheme::*", where
-    "SOME::APP" is an application namespace.
+    A color theme class must be put in "ColorTheme::" namespace.
+    Application-specific color themes should be put under
+    "ColorTheme::MODULE::NAME::*" or "ColorTheme::APP::NAME::*".
 
     The color theme class must declare a package hash variable named %THEME
     containing the color theme structure. It also must provide these
@@ -89,7 +89,7 @@ SPECIFICATION
 
         Usage:
 
-         my $theme_class = ColorTheme::NAME->new([ %args ]);
+         my $ctheme_obj = ColorTheme::NAME->new([ %args ]);
 
         Constructor. Known arguments will depend on the particular theme
         class and must be specified in the color theme structure under the
@@ -99,7 +99,8 @@ SPECIFICATION
 
         Usage:
 
-         my $theme_struct = $theme_class->get_struct;
+         my $ctheme_struct = ColorTheme::NAME->get_struct;
+         my $ctheme_struct = $ctheme_obj->get_struct;
 
         Provide a method way of getting the "color theme structure". A
         client can also access the %THEME package variable directly.
@@ -108,7 +109,7 @@ SPECIFICATION
 
         Usage:
 
-         my $theme_class_args = $theme_class->get_args;
+         my $args = $ctheme_obj->get_args;
 
         Provide a method way of getting the arguments to the constructor.
         The official implementation ColorThemeBase::Constructor stores this

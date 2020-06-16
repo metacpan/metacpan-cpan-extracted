@@ -22,9 +22,9 @@ $v = Crypt::OpenSSL::Verify->new(
         noCAfile => 0,
     }
 );
-ok($v);
+isa_ok($v, 'Crypt::OpenSSL::Verify');
 
 $ret = $v->verify($cert);
-ok($ret);
+ok($ret, "t/cert.pem verified");
 
 done_testing;

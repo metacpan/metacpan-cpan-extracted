@@ -1,9 +1,9 @@
 package Sah::Schema::perl::modnames;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-21'; # DATE
+our $DATE = '2020-06-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.032'; # VERSION
+our $VERSION = '0.033'; # VERSION
 
 our $schema = [array => {
     summary => 'Array of Perl module names, e.g. ["Foo::Bar", "Baz"]',
@@ -50,7 +50,7 @@ Sah::Schema::perl::modnames - Array of Perl module names, e.g. ["Foo::Bar", "Baz
 
 =head1 VERSION
 
-This document describes version 0.032 of Sah::Schema::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
+This document describes version 0.033 of Sah::Schema::perl::modnames (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
 
 =head1 SYNOPSIS
 

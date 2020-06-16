@@ -24,25 +24,21 @@
             "Pod::Coverage::TrustPod" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Sah::Schema" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Data::Sah::Coerce::perl::To_str::From_str::to_lower" : "0",
-            "perl" : "5.010001"
+            "Data::Sah::Coerce::perl::To_str::From_str::to_lower" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Data::Sah" : "0.903",
-            "Data::Sah::Coerce" : "0.038",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.98",
-            "strict" : "0",
-            "warnings" : "0"
+            "Test::More" : "0"
          }
       }
    },
@@ -58,7 +54,7 @@
          "web" : "https://github.com/perlancar/perl-Sah-Schemas-Domain"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -73,7 +69,7 @@
                }
             },
             "name" : "Sah::Schemas",
-            "version" : "0.016"
+            "version" : "0.017"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -220,12 +216,12 @@
          {
             "class" : "Dist::Zilla::Plugin::CopyrightYearFromGit",
             "name" : "@Author::PERLANCAR/CopyrightYearFromGit",
-            "version" : "0.003"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::IfBuilt",
             "name" : "@Author::PERLANCAR/IfBuilt",
-            "version" : "0.02"
+            "version" : "0.03"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
@@ -394,12 +390,12 @@
                      {
                         "class" : "Pod::Weaver::Plugin::PERLANCAR::SortSections",
                         "name" : "@Author::PERLANCAR/PERLANCAR::SortSections",
-                        "version" : "0.06"
+                        "version" : "0.081"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Sah::Schemas",
                         "name" : "-Sah::Schemas",
-                        "version" : "0.04"
+                        "version" : "0.061"
                      }
                   ]
                }
@@ -420,7 +416,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddPrereqs",
             "name" : "@Author::PERLANCAR/Rinci::AddPrereqs",
-            "version" : "0.142"
+            "version" : "0.144"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AddToDb",

@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::modprefixes;
 
-our $DATE = '2020-05-21'; # DATE
-our $VERSION = '0.032'; # VERSION
+our $DATE = '2020-06-16'; # DATE
+our $VERSION = '0.033'; # VERSION
 
 our $rschema = ["array",[{description=>"\nArray of Perl module prefixes, where each element is of `perl::modprefix`\nschema, e.g. `Foo::`, `Foo::Bar::`.\n\nContains coercion rule that expands wildcard, so you can specify:\n\n    Module::C*\n\nand it will be expanded to e.g.:\n\n    [\"Module::CPANTS::\", \"Module::CPANfile::\", \"Module::CheckVersion::\", \"Module::CoreList::\"]\n\nThe wildcard syntax supports jokers (`?`, '*`) and brackets (`[abc]`). See the\n`unix` type of wildcard in <pm:Regexp::Wildcards>, which this coercion rule\nuses.\n\n",of=>["perl::modprefix",{req=>1},{}],summary=>"Perl module prefixes, e.g. [\"\", \"Foo::\", \"Foo::Bar::\"]","x.element_completion"=>"perl_modprefix","x.perl.coerce_rules"=>["From_str_or_array::expand_perl_modprefix_wildcard"]}],["array"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::modprefixes - Perl module prefixes, e.g. ["", "Foo::", "Foo:
 
 =head1 VERSION
 
-This document describes version 0.032 of Sah::SchemaR::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2020-05-21.
+This document describes version 0.033 of Sah::SchemaR::perl::modprefixes (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
 
 =head1 DESCRIPTION
 

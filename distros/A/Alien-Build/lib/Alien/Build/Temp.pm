@@ -8,7 +8,7 @@ use File::Temp ();
 use File::Spec ();
 
 # ABSTRACT: Temp Dir support for Alien::Build
-our $VERSION = '2.25'; # VERSION
+our $VERSION = '2.26'; # VERSION
 
 
 # problem with vanilla File::Temp is that is often uses
@@ -82,7 +82,7 @@ Alien::Build::Temp - Temp Dir support for Alien::Build
 
 =head1 VERSION
 
-version 2.25
+version 2.26
 
 =head1 DESCRIPTION
 

@@ -5,7 +5,7 @@ use warnings;
 
 require 5.010;
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 use Crypt::OpenSSL::X509;
 
@@ -103,21 +103,29 @@ Crypt::OpenSSL::Verify - OpenSSL Verify certificate verification in XS.
   use Crypt::OpenSSL::X509;
 
   my $ca = Crypt::OpenSSL::Verify->new(
-                CAfile => 't/cacert.pem',
-                CApath => '/etc/ssl/certs',     # Optional
-                noCAfile => 1,                  # Optional
-                noCApath => 0                   # Optional
-                );
-
-  OR
+      't/cacert.pem', # or undef
+      {
+          CApath   => '/etc/ssl/certs',    # Optional
+          noCAfile => 1,                   # Optional
+          noCApath => 0                    # Optional
+      }
+  );
 
   # Backward compatible with Crypt::OpenSSL:VerifyX509
   my $ca = Crypt::OpenSSL::Verify->new('t/cacert.pem');
 
-  AND
+  # Using the defaults of your OS:
+  my $ca = Crypt::OpenSSL::Verify->new();
+
+  # and later on..
 
   my $cert = Crypt::OpenSSL::X509->new(...);
   $ca->verify($cert);
+
+
+The object created is similar to running the following command with the
+C<openssl verify> command line tool: C<< openssl verify [ -CApath /path/to/certs ]
+[ -noCApath ] [ -noCAfile ] [ -CAfile /path/to/file ] cert.pem >>
 
 =head1 DESCRIPTION
 
@@ -134,30 +142,28 @@ need to verify that the signing certificate is valid.
 
 Constructor. Returns an OpenSSL Verify instance, set up with the given CA.
 
-Arguments:
+    my $ca = Crypt::OpenSSL::Verify->new(
+        't/cacert.pem',   # or undef
+        {
+            # Path to a directory containg hashed CA Certificates
+            CApath => $ca_path,
 
- * CAfile => $cafile_path       - path to a file containing the CA certificate
- * CApath => $ca_path           - path to a directory containg hashed CA Certificates
- * noCAfile => 0 or 1           - Default CAfile should not be loaded if TRUE
- * noCApath => 0 or 1           - Default CApath should not be loaded if TRUE
- * strict_certs => 0 or 1       - Do not override any OpenSSL verify errors
+            # Default CAfile should not be loaded if TRUE, defaults to FALSE
+            noCAfile => 0,
 
-   (
-       CAfile => $cafile_path
-       CApath => '/etc/ssl/certs',     # Optional
-       noCAfile => 1,                  # Optional
-       noCApath => 0,                  # Optional
-       strict_certs => 1               # Default (Optional)
-   );
+            # Default CApath should not be loaded if TRUE, defaults to FALSE
+            noCApath => 0,
 
-=head2  new('t/cacert.pem');
+            # Do not override any OpenSSL verify errors if FALSE, defaults to TRUE
+            strict_certs => 1,
+        }
+    );
 
-Constructor. Returns an OpenSSL Verify instance, set up with the given CA.
-             Backward compatible with Crypt::OpenSSL:VerifyX509
+    # Backward compatible with Crypt::OpenSSL:VerifyX509
+    my $ca = Crypt::OpenSSL::Verify->new('t/cacert.pem', {strict_certs => 0 });
 
-Arguments:
-
- * $cafile_path                 - path to a file containing the CA certificate
+    # Using the defaults of your OS:
+    my $ca = Crypt::OpenSSL::Verify->new();
 
 =head2 new_from_x509($catext)
 
@@ -211,8 +217,13 @@ Arguements:
 
 =head1 AUTHOR
 
-Timothy Legge <timlegge@gmail.com>
-Wesley Schwengle <waterkip>
+=over
+
+=item Timothy Legge <timlegge@gmail.com>
+
+=item Wesley Schwengle <waterkip@cpan.org>
+
+=back
 
 =head1 COPYRIGHT
 
@@ -220,15 +231,21 @@ The following copyright notice applies to all the files provided in
 this distribution, including binary files, unless explicitly noted
 otherwise.
 
-Copyright 2020 Timothy Legge
-Copyright 2020 Wesley Schwengle
+=over
+
+=item Copyright 2020 Timothy Legge
+
+=item Copyright 2020 Wesley Schwengle
+
+=back
 
 Based on the Original Crypt::OpenSSL::VerifyX509 by
 
-Copyright 2010 Chris Andrews <chrisandrews@venda.com>
+=over
 
-Most of the current module is based on the OpenSSL verify.c app and is
-therefore under Copyright 1999-2020, OpenSSL Software Foundation.
+=item Copyright 2010 Chris Andrews <chrisandrews@venda.com>
+
+=back
 
 =head1 LICENCE
 

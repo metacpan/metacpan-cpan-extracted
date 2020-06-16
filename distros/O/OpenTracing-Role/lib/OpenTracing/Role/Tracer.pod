@@ -152,24 +152,25 @@ The first argument of the method call, is as usual, the C<Tracer> invocant self.
 
 =item C<operation_name>
 
-A required <Str> representing the name of this span
-
-=item C<child_of>
-
-A required C<span> or C<SpanContext> that this decends from
+A B<required> <Str> representing the name of this span
 
 =item C<context>
 
-The required current C<SpanContext> the new <Span> belongs to at the time of
+The B<required> current C<SpanContext> the new <Span> belongs to at the time of
 creation.
+
+=item C<child_of>
+
+An B<optional> C<span> or C<SpanContext> that this decends from
 
 =item C<start_time>
 
-An optional C<PositiveOrZeroNum>, the (fractional) number of seconds since epoch
+An B<optional> C<PositiveOrZeroNum>, the (fractional) number of seconds since
+epoch
 
 =item C<tags>
 
-An optional <HashRef> of <Str>.
+An B<optional> <HashRef> of <Str>.
 
 =back
 

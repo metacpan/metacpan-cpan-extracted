@@ -1,3 +1,13 @@
+2.1.1   2020-06-14  Released-By: PERLANCAR; Urgency: medium
+
+	- No longer encourage putting color themes under app namespace
+	  (SOME::APP::ColorTheme::*) due to slow search.
+
+	- Allow get_struct() to be called as a static method.
+
+        - Minor Fixes/tweaks.
+
+
 2.1.0   2020-06-09  Released-By: PERLANCAR; Urgency: medium; Backward-Compatible: no
 
 	- [incompatible] Rename get_color() to get_item_color() to be more

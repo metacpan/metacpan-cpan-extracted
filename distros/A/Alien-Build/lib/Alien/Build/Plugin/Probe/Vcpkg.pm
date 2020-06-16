@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Probe for system libraries using Vcpkg
-our $VERSION = '2.25'; # VERSION
+our $VERSION = '2.26'; # VERSION
 
 
 has '+name';
@@ -106,7 +106,7 @@ Alien::Build::Plugin::Probe::Vcpkg - Probe for system libraries using Vcpkg
 
 =head1 VERSION
 
-version 2.25
+version 2.26
 
 =head1 SYNOPSIS
 

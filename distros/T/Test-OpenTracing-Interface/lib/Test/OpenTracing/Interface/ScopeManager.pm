@@ -24,7 +24,7 @@ Test::OpenTracing::Interface::ScopeManager - compliance testing
 use strict;
 use warnings;
 
-our $VERSION = 'v0.21.0';
+our $VERSION = 'v0.22.0';
 
 
 use Test::OpenTracing::Interface;

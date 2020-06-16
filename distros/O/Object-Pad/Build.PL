@@ -13,7 +13,7 @@ my $build = Module::Build->new(
          ( 'indirect' => 0 ) ),
 
       'perl' => '5.016', # pad_add_name_pvn, pad_add_name_pvs, gv_init_pvn
-      'XS::Parse::Sublike' => '0.08',
+      'XS::Parse::Sublike' => '0.09',
    },
    test_requires => {
       'Data::Dump' => 0,
@@ -23,7 +23,7 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
-      'XS::Parse::Sublike::Builder' => '0.08',
+      'XS::Parse::Sublike::Builder' => '0.09',
    },
    license => 'perl',
    create_license => 1,
@@ -33,5 +33,9 @@ my $build = Module::Build->new(
 );
 
 XS::Parse::Sublike::Builder->extend_module_build( $build );
+
+if( eval { require Devel::MAT::Dumper::Helper } ) {
+   Devel::MAT::Dumper::Helper->extend_module_build( $build );
+}
 
 $build->create_build_script;

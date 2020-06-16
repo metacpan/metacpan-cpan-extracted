@@ -134,7 +134,7 @@ SKIP:
     {
         skip( 'Unsupported language', 4 );
     }
-    my $n_loc = Module::Generic::Number->new( 100, { lang => 'fr_FR', precede => 1, debug => 0 });
+    my $n_loc = Module::Generic::Number->new( 100, { lang => 'fr_FR', precede => 1, precision => 2, thousand => ' ', decimal => ',', debug => 0 });
     isa_ok( $n_loc, 'Module::Generic::Number', 'Object with locale language string' );
     is( $n_loc->precision, 2, 'French precision => 2' );
     ## RT #132667

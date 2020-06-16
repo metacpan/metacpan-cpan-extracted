@@ -71,18 +71,30 @@ static SV *MY_lex_scan_ident(pTHX_ int flags)
   return ret;
 }
 
-#define lex_scan_attr()  MY_lex_scan_attr(aTHX)
-static SV *MY_lex_scan_attr(pTHX)
+#define lex_scan_attrval_into(name, val)  MY_lex_scan_attrval_into(aTHX_ name, val)
+static bool MY_lex_scan_attrval_into(pTHX_ SV *name, SV *val)
 {
-  SV *ret = lex_scan_ident();
-  if(!ret)
-    return ret;
+  /* TODO: really want  lex_scan_ident_into() */
+  SV *n = lex_scan_ident();
+  if(!n)
+    return false;
 
-  lex_read_space(0);
+  sv_setsv(name, n);
+  SvREFCNT_dec(n);
+
+  if(name != val)
+    SvPOK_off(val);
+
+  /* Do not read space here as space is not allowed between NAME(ARGS) */
 
   if(lex_peek_unichar(0) != '(')
-    return ret;
-  sv_cat_c(ret, lex_read_unichar(0));
+    return true;
+
+  lex_read_unichar(0);
+  if(name == val)
+    sv_cat_c(val, '(');
+  else
+    sv_setpvs(val, "");
 
   int count = 1;
   I32 c = lex_peek_unichar(0);
@@ -95,21 +107,38 @@ static SV *MY_lex_scan_attr(pTHX)
       /* The next char does not bump count even if it is ( or );
        * the \\ is still captured
        */
-      sv_cat_c(ret, lex_read_unichar(0));
+      sv_cat_c(val, lex_read_unichar(0));
       c = lex_peek_unichar(0);
       if(c == -1)
         goto unterminated;
     }
 
-    sv_cat_c(ret, lex_read_unichar(0));
+    /* Don't append final closing ')' on split name/val */
+    if(count || (name == val))
+      sv_cat_c(val, c);
+    lex_read_unichar(0);
+
     c = lex_peek_unichar(0);
   }
 
-  if(c != -1)
-    return ret;
+  if(c == -1)
+    return false;
+
+  return true;
 
 unterminated:
   croak("Unterminated attribute parameter in attribute list");
+}
+
+#define lex_scan_attr()  MY_lex_scan_attr(aTHX)
+static SV *MY_lex_scan_attr(pTHX)
+{
+  SV *ret = newSV(0);
+  if(MY_lex_scan_attrval_into(aTHX_ ret, ret))
+    return ret;
+
+  SvREFCNT_dec(ret);
+  return NULL;
 }
 
 #define lex_scan_attrs(compcv)  MY_lex_scan_attrs(aTHX_ compcv)
@@ -135,6 +164,12 @@ static OP *MY_lex_scan_attrs(pTHX_ CV *compcv)
       attrs = newLISTOP(OP_LIST, 0, NULL, NULL);
 
     attrs = op_append_elem(OP_LIST, attrs, newSVOP(OP_CONST, 0, attr));
+
+    /* Accept additional colons to prefix additional attrs */
+    if(lex_peek_unichar(0) == ':') {
+      lex_read_unichar(0);
+      lex_read_space(0);
+    }
   }
 
   return attrs;

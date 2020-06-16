@@ -1,8 +1,40 @@
 Version History
 
-0.16-TRIAL
-    Bug fix and Pachaging improvements
+0.19    16-Jun-2020
 
+    Issue latest based on 0.18-TRIAL
+    No other changes
+
+        Increment Version 0.19 and update Changes file
+
+0.18-TRIAL
+
+    Potential fix for issues on OpenBSD and Windows and move
+    issues and repo to organization site
+
+        9f4359a Increment Version 0.18-TRIAL
+        53eabb4 (tag: 0.18-TRIAL) Update Changes for version 0.18-TRIAL
+        8d04ccc Merge pull request #4 from perl-net-saml2/issues
+        8d04ccc Merge pull request #4 from perl-net-saml2/issues
+        a6838f6 Merge pull request #5 from perl-net-saml2/misc-updates
+        fcf5feb Update repo and issues location
+        583af44 More test standardization
+        1c625f9 Fixes #3 - 32 bit pointer conversion
+        0a1f804 Merge pull request #2 from perl-net-saml2/issues
+        6a032eb Fixes #2 - Use after free bug
+        bfe1d0e Update POD
+
+0.17    10-Jun-2020 04:33
+
+    Increment version
+
+        16c240e (tag: 0.17) Increment Version 0.17
+
+0.16-TRIAL    09-Jun-2020 18:56	
+
+    Bug fix and Packaging improvements
+
+        40d313d (tag: 0.16-TRIAL) Update Changes for 0.16-TRIAL
         015cc45 Fix EOL in Verify.pm
         015cc45 (Fix error in Makefile.PL
         bd39e72 Update Changes
@@ -14,7 +46,7 @@ Version History
         c3b41a6 (tag: 0.15-TRIAL) Add documentation
         06db323 Increment version and final changes update
 
-0.15-TRIAL
+0.15-TRIAL    08-Jun-2020 21:02
     Special thanks to Wesley Schwengle (WATERKIP) who cleaned up
     a lot of the code, made it readable and fixed a particularly
     hard to track down bug and most of all fixed a lot I had done
@@ -55,7 +87,7 @@ Version History
         cb496c5 Update Changes
         48c0555 Merge pull request #9 from timlegge/trial-14
 
-0.14-TRIAL
+0.14-TRIAL    20 May 2020 17:23
     Bugfixes
         62a7aed Increment Version
         0862601 Require at least 1.807 Crypt::OpenSSL::X509

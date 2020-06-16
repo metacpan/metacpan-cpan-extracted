@@ -1,0 +1,10 @@
+0.002   2020-06-16  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [dist] Forgot to use weaver plugin [-Regexp::Pattern].
+
+
+0.001   2020-06-16  Released-By: PERLANCAR
+
+        - First, early release.

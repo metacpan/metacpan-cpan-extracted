@@ -1,4 +1,3 @@
-.eachperlrc
 Build.PL
 Changes
 hax/lexer-additions.c.inc
@@ -30,6 +29,7 @@ t/31pad-outside.t
 t/50croak-method.t
 t/51pragmata.t
 t/52croak-scope.t
+t/53croak-override.t
 t/70mop-class.t
 t/71mop-create-class.t
 t/72mop-slot.t

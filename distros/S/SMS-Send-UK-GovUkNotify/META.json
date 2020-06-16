@@ -1,0 +1,47 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Andrew Isherwood <andrew.isherwood@ptfs-europe.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SMS-Send-UK-GovUkNotify",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::JWT" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "SMS::Send::Driver" : "0",
+            "Test::More" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

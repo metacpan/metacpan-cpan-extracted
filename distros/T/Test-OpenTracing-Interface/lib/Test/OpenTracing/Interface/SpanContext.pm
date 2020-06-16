@@ -22,7 +22,7 @@ Test::OpenTracing::Interface::SpanContext - compliance testing
 use strict;
 use warnings;
 
-our $VERSION = 'v0.21.0';
+our $VERSION = 'v0.22.0';
 
 
 use Test::OpenTracing::Interface;
@@ -64,11 +64,14 @@ sub can_all_ok {
         test_this           => $thing,
         interface_name      => 'SpanContext',
         interface_methods   => [
-            'get_baggage_item',
-            'get_baggage_items',
+#           'get_baggage_item',
+#           'get_baggage_items',
             'with_baggage_item',
             'with_baggage_items',
         ],
+        #
+        # XXX Getter are not part of the Opaque API
+        #
         maybe
         message             => $message,
     );

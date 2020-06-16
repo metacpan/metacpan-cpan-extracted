@@ -5,7 +5,7 @@ use File::Slurp qw(read_file);
 use Test::Exception;
 
 my $v = Crypt::OpenSSL::Verify->new('t/cacert.pem', { strict_certs => 0 });
-ok($v);
+isa_ok($v, 'Crypt::OpenSSL::Verify');
 
 my $text = read_file('t/cert-expired.pem');
 like($text, qr/BhMCQ0ExFjAUBgNVBAgMDU5ldyBC/);
@@ -27,7 +27,7 @@ $v = Crypt::OpenSSL::Verify->new(
         strict_certs => 0,
     }
 );
-ok($v);
+isa_ok($v, 'Crypt::OpenSSL::Verify');
 
 lives_ok(
     sub {
@@ -43,6 +43,7 @@ $v = Crypt::OpenSSL::Verify->new(
         strict_certs => 1
     }
 );
+isa_ok($v, 'Crypt::OpenSSL::Verify');
 
 throws_ok(
     sub {

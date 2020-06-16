@@ -3,9 +3,9 @@ NAME
     arguments (@ARGV)
 
 VERSION
-    This document describes version 0.843 of Perinci::Sub::GetArgs::Argv
+    This document describes version 0.844 of Perinci::Sub::GetArgs::Argv
     (from Perl distribution Perinci-Sub-GetArgs-Argv), released on
-    2019-06-26.
+    2020-06-16.
 
 SYNOPSIS
      use Perinci::Sub::GetArgs::Argv;
@@ -289,7 +289,8 @@ FUNCTIONS
         Setting off strict is used by, for example, Perinci::Sub::Complete
         during completion where the command-line might still be incomplete.
 
-        Should probably be named "ignore_errors". :-)
+        Should probably be named "ignore_errors" or "allow_unknown_options".
+        :-)
 
     Returns an enveloped result (an array).
 
@@ -338,8 +339,8 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012,
-    2011 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013,
+    2012, 2011 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Greple" : "8.4001",
+            "App::Greple" : "8.4002",
             "Data::Section" : "0.200007",
             "File::Share" : "0",
             "Getopt::EX" : "v1.18.0",
@@ -62,7 +62,7 @@
    "provides" : {
       "App::Greple::subst" : {
          "file" : "lib/App/Greple/subst.pm",
-         "version" : "2.1402"
+         "version" : "2.1403"
       },
       "App::Greple::subst::Dict" : {
          "file" : "lib/App/Greple/subst/Dict.pm"
@@ -88,7 +88,7 @@
          "web" : "https://github.com/kaz-utashiro/greple-subst"
       }
    },
-   "version" : "2.1402",
+   "version" : "2.1403",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

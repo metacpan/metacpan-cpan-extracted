@@ -70,8 +70,8 @@ test_requires 'Test::Exception';
 
 resources
      license     => "http://dev.perl.org/licenses",
-     bugtracker  => "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Crypt-OpenSSL-Verify",
-     repository  => "http://github.com/timlegge/perl-Crypt-OpenSSL-Verify";
+     bugtracker  => "https://github.com/perl-Net-SAML2/perl-Crypt-OpenSSL-Verify/issues",
+     repository  => "https://github.com/perl-Net-SAML2/perl-Crypt-OpenSSL-Verify";
 
 author_tests 't/author';
 

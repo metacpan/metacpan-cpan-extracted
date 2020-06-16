@@ -7,6 +7,8 @@ use Test::More;
 
 use Object::Pad;
 
+use attributes ();
+
 class Counter {
    has $count = 0;
    method count :lvalue { $count }
@@ -29,6 +31,10 @@ class Counter {
    $counter->inc;
 
    is( $counter->count, 5, 'count is 5' );
+}
+
+class TwiceCounter extends Counter {
+   method inc :override { $self->SUPER::inc; $self->SUPER::inc; }
 }
 
 done_testing;

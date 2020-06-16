@@ -9,7 +9,10 @@ README
 dist.ini
 lib/Module/Load/Util.pm
 t/00-compile.t
+t/01-basic.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/lib/Module/Load/Util/Test/Class.pm
+t/lib/Module/Load/Util/Test/Module.pm
 weaver.ini
