@@ -181,12 +181,11 @@ sub embed ($%) {
         $obj->can('embeddable_methods') ||
             throw $self "embed - object (".ref($obj).") does not have embeddable_methods() method";
 
-        ##
         # Setting base for the object we embed, it might need it
         #
-        $obj->set_base_config($self) if $obj->can('set_base_config');
+        my $set_base_config=$obj->can('set_base_config');
+        $set_base_config->($obj,$self) if $set_base_config;
 
-        ##
         # Building perl code for proxy methods definitions
         #
         my @list=$obj->embeddable_methods();

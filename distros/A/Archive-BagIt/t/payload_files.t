@@ -1,6 +1,7 @@
 
 BEGIN { chdir 't' if -d 't' }
 
+use warnings;
 use Test::More 'no_plan';
 use strict;
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::DummySource;
-$Lab::Moose::Instrument::DummySource::VERSION = '3.701';
+$Lab::Moose::Instrument::DummySource::VERSION = '3.703';
 #ABSTRACT: Dummy YokogawaGS200 source for use with 'Debug' connection
 
 use 5.010;
@@ -10,6 +10,7 @@ use Lab::Moose::Instrument
     qw/validated_getter validated_setter setter_params/;
 use Carp;
 use Lab::Moose::Instrument::Cache;
+use Time::HiRes qw/time sleep/;
 
 use namespace::autoclean;
 
@@ -34,6 +35,36 @@ has verbose => (
     is      => 'ro',
     isa     => 'Bool',
     default => 1
+);
+
+#
+# Internal variables for continous sweep
+#
+
+has _sweep_start_time => (
+    is  => 'rw',
+    isa => 'Lab::Moose::PosNum',
+);
+
+has _active => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0
+);
+
+has _sweep_target_level => (
+    is  => 'rw',
+    isa => 'Num',
+);
+
+has _sweep_start_level => (
+    is  => 'rw',
+    isa => 'Num',
+);
+
+has _sweep_rate => (
+    is  => 'rw',
+    isa => 'Num',
 );
 
 with qw(
@@ -68,32 +99,105 @@ sub set_level {
     );
 }
 
-#
-# Aliases for Lab::XPRESS::Sweep API
-#
-
 sub cached_level {
     my $self = shift;
     return $self->get_level(@_);
 }
 
+# return negative if sweep is done
+sub _remaining_sweep_time {
+    my $self = shift;
+    if ( not $self->_active ) {
+        croak "no sweep";
+    }
+    my $start_time   = $self->_sweep_start_time();
+    my $rate         = $self->_sweep_rate;
+    my $target_level = $self->_sweep_target_level;
+    my $start_level  = $self->_sweep_start_level;
+
+    my $sgn = $target_level >= $start_level ? 1 : -1;
+    my $duration = abs( ( $target_level - $start_level ) / $rate );
+    return $duration - ( time() - $start_time );
+}
+
 sub get_level {
+    my ( $self, %args ) = validated_getter( \@_ );
+
+    if ( $self->_active() ) {
+
+        # in sweep
+
+        my $remaining_time = $self->_remaining_sweep_time();
+
+        my $start_time   = $self->_sweep_start_time();
+        my $rate         = $self->_sweep_rate;
+        my $target_level = $self->_sweep_target_level;
+        my $start_level  = $self->_sweep_start_level;
+
+        my $sgn = $target_level >= $start_level ? 1 : -1;
+        my $duration = abs( ( $target_level - $start_level ) / $rate );
+        if ( $remaining_time < 0 ) {
+            $self->_active(0);
+            $self->source_level( value => $target_level );
+            return $target_level;
+        }
+        else {
+            return $start_level + $sgn * $rate * ( time - $start_time );
+        }
+    }
+    else {
+        return $self->cached_source_level();
+    }
+}
+
+sub config_sweep {
     my $self = shift;
-
-    # Dummy Source: do not query!
-    return $self->cached_source_level();
+    my %args = @_;
+    if ( $self->_active ) {
+        croak("config_sweep called while instrument is active");
+    }
+    my $target = $args{point};
+    my $rate   = abs( $args{rate} );
+    $self->_sweep_start_level( $self->cached_level );
+    $self->_sweep_target_level($target);
+    $self->_sweep_rate($rate);
 }
 
-sub set_voltage {
-    my $self  = shift;
-    my $value = shift;
-    return $self->set_level( value => $value );
-}
-
-sub sweep_to_level {
+sub trg {
     my $self = shift;
-    return $self->set_voltage(@_);
+    $self->_active(1);
+    $self->_sweep_start_time( time() );
 }
+
+sub wait {
+    my $self         = shift;
+    my $start_time   = $self->_sweep_start_time();
+    my $rate         = $self->_sweep_rate;
+    my $target_level = $self->_sweep_target_level;
+    my $start_level  = $self->_sweep_start_level;
+    my $duration     = abs( ( $target_level - $start_level ) / $rate );
+
+    if ( $start_time + $duration > time() ) {
+        sleep( $start_time + $duration - time() );
+    }
+
+    # Sweep done
+    $self->_active(0);
+    $self->source_level( value => $target_level );
+}
+
+sub active {
+    my $self = shift;
+    if ( not $self->_active ) {
+        return 0;
+    }
+    if ( $self->_remaining_sweep_time > 0 ) {
+        return 1;
+    }
+    return 0;
+}
+
+__PACKAGE__->meta()->make_immutable();
 
 1;
 
@@ -109,7 +213,7 @@ Lab::Moose::Instrument::DummySource - Dummy YokogawaGS200 source for use with 'D
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 
@@ -139,6 +243,7 @@ version 3.701
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
+            2020       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

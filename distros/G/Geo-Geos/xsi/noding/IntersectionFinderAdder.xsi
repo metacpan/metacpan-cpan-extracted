@@ -19,6 +19,7 @@ Sv new(SV*,SV* liObj, Array coords) {
 }
 
 xs::Array IntersectionFinderAdder::getInteriorIntersections() {
+    (void)THIS;
     Object me{ST(0)};
     auto payload = me.payload(&payload_marker_IntersectionFinderAdder);
     auto* real_payload = static_cast<IntersectionFinderAdder_payload*>(payload.ptr);

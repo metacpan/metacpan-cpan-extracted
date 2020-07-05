@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Zing::Zang::Simple;
+
+=pod explain
+
+- when creating zing processes ...
+- typically you will want to subclass a Zing/Process derived class ...
+- however, there are times when you don't need/want to dedicate a class
+
+- the zang-simple is a ready-to-use callback-based zing simple process ...
+- see ./examples/00-zing-simple
+
+=cut
+
+my $z = Zing::Zang::Simple->new(
+  on_perform => sub {
+    my ($self) = @_;
+
+    warn time;
+
+    return;
+  },
+);
+
+$z->execute;

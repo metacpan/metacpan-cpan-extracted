@@ -1,7 +1,9 @@
 package Bencher::Scenario::URIEscaping;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-18'; # DATE
+our $DIST = 'Bencher-Scenario-URIEscaping'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -16,6 +18,7 @@ our $scenario = {
     summary => 'Benchmark URI escaping using various modules',
 
     precision => 0.001,
+    module_startup_precision => 0.05,
 
     participants => [
         {fcall_template => 'URI::Escape::uri_escape(<str>)', tags=>['escape']},
@@ -95,7 +98,7 @@ Bencher::Scenario::URIEscaping - Benchmark URI escaping using various modules
 
 =head1 VERSION
 
-This document describes version 0.004 of Bencher::Scenario::URIEscaping (from Perl distribution Bencher-Scenario-URIEscaping), released on 2017-01-25.
+This document describes version 0.006 of Bencher::Scenario::URIEscaping (from Perl distribution Bencher-Scenario-URIEscaping), released on 2020-06-18.
 
 =head1 SYNOPSIS
 
@@ -119,13 +122,13 @@ Version numbers shown below are the versions used when running the sample benchm
 
 L<URI::Escape> 3.31
 
-L<URI::XSEscape> 0.000008
+L<URI::XSEscape> 0.001000
 
 L<URI::Escape::XS> 0.14
 
 L<URI::Encode> 1.1.1
 
-L<URI::Encode::XS> 0.09
+L<URI::Encode::XS> 0.11
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -249,66 +252,73 @@ Function call template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.30.2 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 4.15.0-91-generic >>.
 
 Benchmark with default options (C<< bencher -m URIEscaping >>):
 
  #table1#
- +--------------------------------+-----------+------------+------------+------------+---------+---------+
- | participant                    | dataset   | rate (/s)  | time (μs)  | vs_slowest |  errors | samples |
- +--------------------------------+-----------+------------+------------+------------+---------+---------+
- | URI::Encode::uri_encode        | empty     |     2510   | 398        |     1      |   4e-07 |      23 |
- | URI::Encode::uri_decode        | u_ascii53 |     2640   | 379        |     1.05   | 1.9e-07 |      25 |
- | URI::Encode::uri_encode        | ascii53   |     2640   | 378        |     1.05   | 2.6e-07 |      21 |
- | URI::Encode::uri_decode        | u_ascii66 |     2700   | 370        |     1.08   | 2.1e-07 |      20 |
- | URI::Encode::uri_encode        | ascii66   |     2720   | 368        |     1.08   | 2.1e-07 |      20 |
- | URI::Escape::uri_escape_utf8   | ascii53   |    84850.3 |  11.7855   |    33.7805 |   0     |      20 |
- | URI::Escape::uri_escape        | ascii53   |    97657.3 |  10.2399   |    38.8793 |   0     |      32 |
- | URI::Escape::uri_escape_utf8   | utf36     |   102000   |   9.8      |    40.6    | 3.1e-09 |      23 |
- | URI::Escape::uri_unescape      | u_ascii53 |   118000   |   8.46     |    47.1    | 8.4e-09 |      28 |
- | URI::Escape::uri_escape_utf8   | ascii66   |   142000   |   7.05     |    56.5    | 3.1e-09 |      23 |
- | URI::Escape::uri_escape        | ascii66   |   150000   |   6.7      |    59      | 6.8e-09 |      77 |
- | URI::Escape::uri_unescape      | u_ascii66 |   199000   |   5.02     |    79.3    | 1.7e-09 |      20 |
- | URI::Escape::uri_escape_utf8   | empty     |  1200000   |   0.85     |   470      | 8.9e-10 |      70 |
- | URI::Escape::XS::uri_escape    | ascii53   |  1542000   |   0.6484   |   614      | 1.1e-11 |      28 |
- | URI::Escape::XS::uri_escape    | ascii66   |  1700000   |   0.58     |   680      | 6.2e-10 |      36 |
- | URI::XSEscape::uri_escape_utf8 | ascii66   |  1710000   |   0.583    |   683      | 1.9e-10 |      23 |
- | URI::XSEscape::uri_escape_utf8 | ascii53   |  1800000   |   0.54     |   730      | 5.8e-10 |      41 |
- | URI::Escape::uri_escape        | empty     |  1920000   |   0.521    |   764      | 1.8e-10 |      26 |
- | URI::XSEscape::uri_escape_utf8 | utf36     |  1990000   |   0.502    |   793      | 2.1e-10 |      20 |
- | URI::Escape::XS::uri_escape    | empty     |  2136070   |   0.468149 |   850.412  |   0     |      27 |
- | URI::Escape::XS::uri_unescape  | u_ascii53 |  2140000   |   0.467    |   853      | 2.1e-10 |      20 |
- | URI::Escape::XS::uri_unescape  | u_ascii66 |  2210000   |   0.453    |   878      | 3.8e-10 |      95 |
- | URI::XSEscape::uri_escape_utf8 | empty     |  2400000   |   0.41     |   960      | 4.7e-10 |      64 |
- | URI::XSEscape::uri_escape      | ascii66   |  2851000   |   0.3508   |  1135      | 1.1e-11 |      20 |
- | URI::XSEscape::uri_unescape    | u_ascii53 |  3200000   |   0.31     |  1300      | 3.1e-10 |      20 |
- | URI::XSEscape::uri_unescape    | u_ascii66 |  3300000   |   0.31     |  1300      | 3.1e-10 |      20 |
- | URI::XSEscape::uri_escape      | ascii53   |  3403000   |   0.2939   |  1355      | 9.5e-12 |      20 |
- | URI::Encode::XS::uri_decode    | u_ascii66 |  5900000   |   0.17     |  2300      | 2.3e-10 |      65 |
- | URI::XSEscape::uri_escape      | empty     |  7099810   |   0.140849 |  2826.57   |   0     |      20 |
- | URI::Encode::XS::uri_decode    | u_ascii53 |  7190760   |   0.139067 |  2862.78   |   0     |      24 |
- | URI::Encode::XS::uri_encode    | ascii66   |  8700000   |   0.11     |  3500      | 1.8e-10 |      29 |
- | URI::Encode::XS::uri_encode    | ascii53   |  9100000   |   0.11     |  3600      | 1.3e-10 |      50 |
- | URI::Encode::XS::uri_encode    | empty     | 24900000   |   0.0402   |  9900      |   1e-11 |      21 |
- +--------------------------------+-----------+------------+------------+------------+---------+---------+
+ +--------------------------------+-----------+--------------+--------------+-----------+------------+-----------------------+-----------------------+---------+---------+
+ | participant                    | dataset   | ds_tags      | p_tags       | rate (/s) | time (μs)  | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+ +--------------------------------+-----------+--------------+--------------+-----------+------------+-----------------------+-----------------------+---------+---------+
+ | URI::Encode::uri_encode        | ascii53   | escape       | escape       |      3410 | 293        |                 0.00% |            982933.13% | 2.8e-07 |     104 |
+ | URI::Encode::uri_decode        | u_ascii53 | unescape     | unescape     |      3480 | 288        |                 1.99% |            963720.81% | 2.1e-07 |      20 |
+ | URI::Encode::uri_encode        | ascii66   | escape       | escape       |      3550 | 282        |                 4.00% |            945139.90% | 2.1e-07 |      20 |
+ | URI::Encode::uri_decode        | u_ascii66 | unescape     | unescape     |      3550 | 282        |                 4.06% |            944547.08% | 2.4e-07 |      24 |
+ | URI::Encode::uri_encode        | empty     | escape       | escape       |      3680 | 272        |                 7.92% |            910775.23% | 2.1e-07 |      20 |
+ | URI::Escape::uri_escape        | ascii53   | escape       | escape       |    132879 |   7.52563  |              3796.93% |             25125.81% | 5.5e-12 |      20 |
+ | URI::Escape::uri_escape_utf8   | ascii53   | escape       | escape, utf8 |    138000 |   7.27     |              3933.67% |             24270.69% |   3e-09 |      24 |
+ | URI::Escape::uri_escape_utf8   | utf36     | escape, utf8 | escape, utf8 |    160000 |   6.1      |              4728.44% |             20259.23% | 6.1e-09 |      24 |
+ | URI::Escape::uri_unescape      | u_ascii53 | unescape     | unescape     |    165285 |   6.05014  |              4747.31% |             20179.99% | 4.8e-12 |      22 |
+ | URI::Escape::uri_escape_utf8   | ascii66   | escape       | escape, utf8 |    214000 |   4.67     |              6179.44% |             15554.80% | 4.6e-09 |      42 |
+ | URI::Escape::uri_escape        | ascii66   | escape       | escape       |    226080 |   4.4232   |              6530.22% |             14726.55% | 5.7e-12 |      20 |
+ | URI::Escape::uri_unescape      | u_ascii66 | unescape     | unescape     |    274380 |   3.64458  |              7946.72% |             12116.57% |   0     |      20 |
+ | URI::Escape::uri_escape_utf8   | empty     | escape       | escape, utf8 |   1730000 |   0.576    |             50780.41% |              1832.05% | 5.7e-10 |      24 |
+ | URI::Escape::uri_escape        | empty     | escape       | escape       |   2400610 |   0.41656  |             70302.45% |              1296.31% |   0     |      20 |
+ | URI::Escape::XS::uri_escape    | ascii53   | escape       | escape       |   2440000 |   0.41     |             71373.22% |              1275.39% | 2.1e-10 |      20 |
+ | URI::Escape::XS::uri_escape    | ascii66   | escape       | escape       |   2438740 |   0.410048 |             71420.59% |              1274.48% |   0     |      20 |
+ | URI::XSEscape::uri_escape_utf8 | ascii66   | escape       | escape, utf8 |   2663000 |   0.3755   |             78006.67% |              1158.58% | 5.7e-12 |      25 |
+ | URI::XSEscape::uri_escape_utf8 | ascii53   | escape       | escape, utf8 |   2726030 |   0.366834 |             79845.81% |              1129.62% |   0     |      20 |
+ | URI::Escape::XS::uri_unescape  | u_ascii53 | unescape     | unescape     |   2900000 |   0.35     |             84295.89% |              1064.79% | 3.9e-10 |      23 |
+ | URI::XSEscape::uri_escape_utf8 | utf36     | escape, utf8 | escape, utf8 |   2890000 |   0.346    |             84571.59% |              1061.00% |   3e-10 |      21 |
+ | URI::Escape::XS::uri_escape    | empty     | escape       | escape       |   3000000 |   0.334    |             87784.28% |              1018.55% |   1e-10 |      20 |
+ | URI::Escape::XS::uri_unescape  | u_ascii66 | unescape     | unescape     |   3187000 |   0.3138   |             93354.20% |               951.89% | 4.8e-12 |      20 |
+ | URI::XSEscape::uri_escape_utf8 | empty     | escape       | escape, utf8 |   3800000 |   0.27     |            110522.39% |               788.64% | 3.1e-10 |      37 |
+ | URI::XSEscape::uri_unescape    | u_ascii53 | unescape     | unescape     |   4852000 |   0.2061   |            142183.42% |               590.90% | 1.7e-11 |      20 |
+ | URI::XSEscape::uri_unescape    | u_ascii66 | unescape     | unescape     |   4986000 |   0.2006   |            146111.46% |               572.34% | 5.8e-12 |      20 |
+ | URI::XSEscape::uri_escape      | ascii66   | escape       | escape       |   5293000 |   0.1889   |            155112.72% |               533.35% | 5.5e-12 |      20 |
+ | URI::XSEscape::uri_escape      | ascii53   | escape       | escape       |   5670000 |   0.176    |            166067.23% |               491.59% |   1e-10 |      21 |
+ | URI::XSEscape::uri_escape      | empty     | escape       | escape       |   9980000 |   0.1      |            292476.83% |               235.99% | 5.2e-11 |      20 |
+ | URI::Encode::XS::uri_decode    | u_ascii66 | unescape     | unescape     |  12000000 |   0.082    |            356094.65% |               175.98% | 1.2e-10 |      56 |
+ | URI::Encode::XS::uri_encode    | ascii66   | escape       | escape       |  12550000 |   0.07966  |            368038.76% |               167.03% | 5.8e-12 |      20 |
+ | URI::Encode::XS::uri_encode    | ascii53   | escape       | escape       |  13000000 |   0.075    |            389431.92% |               152.36% | 1.1e-10 |      45 |
+ | URI::Encode::XS::uri_decode    | u_ascii53 | unescape     | unescape     |  13500000 |   0.07407  |            395844.46% |               148.28% | 5.7e-12 |      26 |
+ | URI::Encode::XS::uri_encode    | empty     | escape       | escape       |  33500000 |   0.0298   |            982933.13% |                 0.00% | 4.9e-12 |      20 |
+ +--------------------------------+-----------+--------------+--------------+-----------+------------+-----------------------+-----------------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m URIEscaping --module-startup >>):
 
  #table2#
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | URI::Encode         | 1.07                         | 4.43               | 18.1           |     18.2  |                  12.82 |       1    | 1.8e-05 |     418 |
- | URI::Escape::XS     | 1.07                         | 4.41               | 18.1           |     11.6  |                   6.22 |       1.57 | 1.1e-05 |     494 |
- | URI::Escape         | 1.29                         | 4.56               | 16.4           |     11.4  |                   6.02 |       1.6  | 1.1e-05 |     664 |
- | URI::XSEscape       | 1.29                         | 4.62               | 16.4           |      9.82 |                   4.44 |       1.85 | 9.6e-06 |     406 |
- | URI::Encode::XS     | 1.07                         | 4.54               | 18.1           |      8.71 |                   3.33 |       2.09 | 8.5e-06 |      26 |
- | perl -e1 (baseline) | 1.29                         | 4.57               | 16.4           |      5.38 |                   0    |       3.38 | 5.4e-06 |     326 |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | URI::Encode         |        17 |                12 |                 0.00% |               235.22% | 9.2e-05   |      20 |
+ | URI::Escape::XS     |        10 |                 5 |                75.36% |                91.16% |   0.00033 |      20 |
+ | URI::Escape         |         9 |                 4 |                85.44% |                80.77% |   0.00015 |      20 |
+ | URI::XSEscape       |         8 |                 3 |               117.22% |                54.32% |   0.00018 |      22 |
+ | URI::Encode::XS     |         7 |                 2 |               144.39% |                37.17% |   0.00014 |      20 |
+ | perl -e1 (baseline) |         5 |                 0 |               235.22% |                 0.00% |   0.00016 |      20 |
+ +---------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
+
+=head1 BENCHMARK NOTES
+
+L<URI::Encode::XS> is the fastest, but it does not support custom list of safe
+characters. If you don't want to encode C</> as C<%2F>, for example, you're out
+of luck. For URI escaping with custom character list support, the fastest is
+L<URI::XSEscape> followed by L<URI::Escape::XS>.
 
 =head1 HOMEPAGE
 
@@ -332,7 +342,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

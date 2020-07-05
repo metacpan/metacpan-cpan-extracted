@@ -8,7 +8,7 @@ use constant {CURRENT_INTERFACE => 'rdma.current', MAX_INTERFACE => 'rdma.max',
 has cgroup => sub { Mojo::IOLoop::ReadWriteProcess::CGroup::v2->new };
 
 sub current { shift->cgroup->_list(CURRENT_INTERFACE) }
-sub max { shift->cgroup->_setget(MAX_INTERFACE, @_) }
+sub max     { shift->cgroup->_setget(MAX_INTERFACE, @_) }
 
 1;
 

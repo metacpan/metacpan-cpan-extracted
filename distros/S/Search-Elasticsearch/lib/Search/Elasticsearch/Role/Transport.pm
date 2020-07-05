@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Transport;
-$Search::Elasticsearch::Role::Transport::VERSION = '6.80';
+$Search::Elasticsearch::Role::Transport::VERSION = '6.81';
 use Moo::Role;
 
 requires qw(perform_request);
@@ -72,7 +72,7 @@ Search::Elasticsearch::Role::Transport - Transport role providing interface betw
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 AUTHOR
 

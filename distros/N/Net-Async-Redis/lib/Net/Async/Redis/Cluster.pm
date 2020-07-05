@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '2.004'; # VERSION
+our $VERSION = '2.005'; # VERSION
 
 =encoding utf8
 

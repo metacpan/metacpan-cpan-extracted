@@ -8,7 +8,7 @@ use Mojo::Util 'steady_time';
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = '4.005';
+our $VERSION = 'v5.0.1';
 
 has dequeue_interval => 0.5;
 has 'sqlite';
@@ -103,6 +103,10 @@ sub list_jobs {
   my ($self, $offset, $limit, $options) = @_;
 
   my (@where, @where_params);
+  if (defined(my $before = $options->{before})) {
+    push @where, 'id < ?';
+    push @where_params, $before;
+  }
   if (defined(my $ids = $options->{ids})) {
     my $ids_in = join ',', ('?')x@$ids;
     push @where, @$ids ? "id in ($ids_in)" : 'id is null';
@@ -180,6 +184,10 @@ sub list_workers {
   my ($self, $offset, $limit, $options) = @_;
 
   my (@where, @where_params);
+  if (defined(my $before = $options->{before})) {
+    push @where, 'w.id < ?';
+    push @where_params, $before;
+  }
   if (defined(my $ids = $options->{ids})) {
     my $ids_in = join ',', ('?')x@$ids;
     push @where, @$ids ? "w.id in ($ids_in)" : 'w.id is null';
@@ -305,14 +313,19 @@ sub repair {
 }
 
 sub reset {
-  my $db = shift->sqlite->db;
-  my $tx = $db->begin;
-  $db->query('delete from minion_jobs');
-  $db->query('delete from minion_locks');
-  $db->query('delete from minion_workers');
-  $db->query(q{delete from sqlite_sequence
-    where name in ('minion_jobs','minion_locks','minion_workers')});
-  $tx->commit;
+  my ($self, $options) = (shift, shift // {});
+  my $db = $self->sqlite->db;
+  if ($options->{all}) {
+    my $tx = $db->begin;
+    $db->query('delete from minion_jobs');
+    $db->query('delete from minion_locks');
+    $db->query('delete from minion_workers');
+    $db->query(q{delete from sqlite_sequence
+      where name in ('minion_jobs','minion_locks','minion_workers')});
+    $tx->commit;
+  } elsif ($options->{locks}) {
+    $db->query('delete from minion_locks');
+  }
 }
 
 sub retry_job {
@@ -635,8 +648,7 @@ Transition from C<active> to C<finished> state with or without a result.
 
   my $history = $backend->history;
 
-Get history information for job queue. Note that this method is EXPERIMENTAL and
-might change without warning!
+Get history information for job queue.
 
 These fields are currently available:
 
@@ -671,6 +683,12 @@ Returns the information about jobs in batches.
 These options are currently available:
 
 =over 2
+
+=item before
+
+  before => 23
+
+List only jobs before this id.
 
 =item ids
 
@@ -880,6 +898,12 @@ These options are currently available:
 
 =over 2
 
+=item before
+
+  before => 23
+
+List only workers before this id.
+
 =item ids
 
   ids => ['23', '24']
@@ -962,9 +986,9 @@ defaults to C<1>.
 
   my $bool = $backend->note($job_id, {mojo => 'rocks', minion => 'too'});
 
-Change one or more metadata fields for a job. It is currently an error to
-attempt to set a metadata field with a name containing the characters C<.>,
-C<[>, or C<]>.
+Change one or more metadata fields for a job. Setting a value to C<undef> will
+remove the field. It is currently an error to attempt to set a metadata field
+with a name containing the characters C<.>, C<[>, or C<]>.
 
 =head2 receive
 
@@ -1007,9 +1031,27 @@ Repair worker registry and job queue if necessary.
 
 =head2 reset
 
-  $backend->reset;
+  $backend->reset({all => 1});
 
 Reset job queue.
+
+These options are currently available:
+
+=over 2
+
+=item all
+
+  all => 1
+
+Reset everything.
+
+=item locks
+
+  locks => 1
+
+Reset only locks.
+
+=back
 
 =head2 retry_job
 
@@ -1088,15 +1130,13 @@ Number of workers that are currently processing a job.
   delayed_jobs => 100
 
 Number of jobs in C<inactive> state that are scheduled to run at specific time
-in the future. Note that this field is EXPERIMENTAL and might change without
-warning!
+in the future.
 
 =item enqueued_jobs
 
   enqueued_jobs => 100000
 
-Rough estimate of how many jobs have ever been enqueued. Note that this field is
-EXPERIMENTAL and might change without warning!
+Rough estimate of how many jobs have ever been enqueued.
 
 =item failed_jobs
 

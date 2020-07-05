@@ -4,13 +4,13 @@
       "Sarah Richardson <SMRichardson@lbl.gov>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Bio-GeneDesign",
    "prereqs" : {
@@ -27,7 +27,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Bio::Root::Root" : "1.006924",
+            "Bio::Root::Version" : "1.0069",
             "List::Util" : "1.22",
             "Math::Combinatorics" : "0.09",
             "Text::Wrap" : "2009.0305",
@@ -38,54 +38,59 @@
    "provides" : {
       "Bio::GeneDesign" : {
          "file" : "lib/Bio/GeneDesign.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       },
       "Bio::GeneDesign::Basic" : {
          "file" : "lib/Bio/GeneDesign/Basic.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       },
       "Bio::GeneDesign::CodonJuggle" : {
          "file" : "lib/Bio/GeneDesign/CodonJuggle.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       },
       "Bio::GeneDesign::Codons" : {
          "file" : "lib/Bio/GeneDesign/Codons.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       },
       "Bio::GeneDesign::Graph" : {
          "file" : "lib/Bio/GeneDesign/Graph.pm",
-         "version" : "5.54"
+         "version" : "5.56"
+      },
+      "Bio::GeneDesign::IO" : {
+         "file" : "lib/Bio/GeneDesign/IO.pm",
+         "version" : "5.56"
       },
       "Bio::GeneDesign::Oligo" : {
          "file" : "lib/Bio/GeneDesign/Oligo.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       },
       "Bio::GeneDesign::PrefixTree" : {
          "file" : "lib/Bio/GeneDesign/PrefixTree.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       },
       "Bio::GeneDesign::Random" : {
          "file" : "lib/Bio/GeneDesign/Random.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       },
       "Bio::GeneDesign::RestrictionEnzyme" : {
          "file" : "lib/Bio/GeneDesign/RestrictionEnzyme.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       },
       "Bio::GeneDesign::RestrictionEnzymes" : {
          "file" : "lib/Bio/GeneDesign/RestrictionEnzymes.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       },
       "Bio::GeneDesign::ReverseTranslate" : {
          "file" : "lib/Bio/GeneDesign/ReverseTranslate.pm",
-         "version" : "5.54"
+         "version" : "5.56"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://opensource.org/licenses/bsd-license.php"
+         "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "5.54"
+   "version" : "5.56",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

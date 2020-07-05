@@ -193,12 +193,12 @@ public:
     }
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
-    size_t rfind (const _CharT* const& s, size_t pos = 0) const {
+    size_t rfind (const _CharT* const& s, size_t pos = npos) const {
         return rfind(s, pos, traits_type::length(s));
     }
 
     template <size_t SIZE>
-    size_t rfind (const CharT (&s)[SIZE], size_t pos = 0) const {
+    size_t rfind (const CharT (&s)[SIZE], size_t pos = npos) const {
         return rfind(s, pos, SIZE-1);
     }
 
@@ -229,11 +229,11 @@ public:
     }
 
 
-    size_t find_last_of (basic_string_view v, size_t pos = 0) const {
+    size_t find_last_of (basic_string_view v, size_t pos = npos) const {
         return find_last_of(v._str, pos, v._length);
     }
 
-    size_t find_last_of (CharT ch, size_t pos = 0) const {
+    size_t find_last_of (CharT ch, size_t pos = npos) const {
         return rfind(ch, pos);
     }
 
@@ -245,12 +245,12 @@ public:
     }
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
-    size_t find_last_of (const _CharT* const& s, size_t pos = 0) const {
+    size_t find_last_of (const _CharT* const& s, size_t pos = npos) const {
         return find_last_of(s, pos, traits_type::length(s));
     }
 
     template <size_t SIZE>
-    size_t find_last_of (const CharT (&s)[SIZE], size_t pos = 0) const {
+    size_t find_last_of (const CharT (&s)[SIZE], size_t pos = npos) const {
         return find_last_of(s, pos, SIZE-1);
     }
 
@@ -283,11 +283,11 @@ public:
     }
 
 
-    size_t find_last_not_of (basic_string_view v, size_t pos = 0) const {
+    size_t find_last_not_of (basic_string_view v, size_t pos = npos) const {
         return find_last_not_of(v._str, pos, v._length);
     }
 
-    size_t find_last_not_of (CharT ch, size_t pos = 0) const {
+    size_t find_last_not_of (CharT ch, size_t pos = npos) const {
         for (const CharT* ptr = _str + (pos >= _length ? (_length - 1) : pos); ptr >= _str; --ptr)
             if (!traits_type::eq(*ptr, ch)) return ptr - _str;
         return npos;
@@ -301,12 +301,12 @@ public:
     }
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
-    size_t find_last_not_of (const _CharT* const& s, size_t pos = 0) const {
+    size_t find_last_not_of (const _CharT* const& s, size_t pos = npos) const {
         return find_last_not_of(s, pos, traits_type::length(s));
     }
 
     template <size_t SIZE>
-    size_t find_last_not_of (const CharT (&s)[SIZE], size_t pos = 0) const {
+    size_t find_last_not_of (const CharT (&s)[SIZE], size_t pos = npos) const {
         return find_last_not_of(s, pos, SIZE-1);
     }
 

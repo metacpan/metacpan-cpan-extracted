@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.061';
+our $VERSION = '1.064';
 # ABSTRACT: The Best Web Framework Deserves the Best CMS
 
 #pod =encoding utf8
@@ -7,7 +7,7 @@ our $VERSION = '1.061';
 #pod =head1 SYNOPSIS
 #pod
 #pod     use Mojolicious::Lite;
-#pod     use Mojo::Pg; # Supported backends: Pg, MySQL, SQLite, DBIx::Class
+#pod     use Mojo::Pg; # Supported backends: Mojo::Pg, Mojo::mysql, Mojo::SQLite, DBIx::Class
 #pod     plugin Yancy => {
 #pod         backend => { Pg => Mojo::Pg->new( 'postgres:///myapp' ) },
 #pod         read_schema => 1,
@@ -234,12 +234,12 @@ Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.061
+version 1.064
 
 =head1 SYNOPSIS
 
     use Mojolicious::Lite;
-    use Mojo::Pg; # Supported backends: Pg, MySQL, SQLite, DBIx::Class
+    use Mojo::Pg; # Supported backends: Mojo::Pg, Mojo::mysql, Mojo::SQLite, DBIx::Class
     plugin Yancy => {
         backend => { Pg => Mojo::Pg->new( 'postgres:///myapp' ) },
         read_schema => 1,

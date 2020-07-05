@@ -46,6 +46,9 @@ my $server = IO::Socket::INET->new(
 ok($server, "server") or diag "server new and listen failed: $!";
 my $port = $server->sockport();
 
+SKIP: {
+    skip "No UA_Client_disconnect_async in open62541", 5
+	unless OPCUA::Open62541::Client->can('connect_async');
 ($sok, $cok, $dok, my $aok) = (0, 0, 0, 0);
 no_leaks_ok {
     my $client = OPCUA::Open62541::Client->new();
@@ -67,3 +70,4 @@ ok($sok, "client async new");
 ok($cok, "config async get");
 ok($dok, "default async set");
 ok($aok, "client async connect");
+}  # SKIP

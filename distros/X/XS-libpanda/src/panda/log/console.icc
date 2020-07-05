@@ -1,0 +1,10 @@
+#include "console.h"
+#include <iostream>
+
+namespace panda { namespace log {
+
+void ConsoleLogger::log (const string& msg, const Info&) {
+    std::cout << msg << std::endl;
+};
+
+}}

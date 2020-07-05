@@ -1,6 +1,6 @@
 package Text::ANSI::Fold::Japanese::Wikipedia;
 
-use strict;
+use v5.14;
 use warnings;
 use utf8;
 

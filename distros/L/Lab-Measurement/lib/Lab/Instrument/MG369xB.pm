@@ -1,6 +1,6 @@
 package Lab::Instrument::MG369xB;
 #ABSTRACT: Anritsu MG369xB series signal generator
-$Lab::Instrument::MG369xB::VERSION = '3.701';
+$Lab::Instrument::MG369xB::VERSION = '3.703';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);
@@ -182,7 +182,7 @@ Lab::Instrument::MG369xB - Anritsu MG369xB series signal generator
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 CAVEATS/BUGS
 

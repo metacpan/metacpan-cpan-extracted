@@ -27,9 +27,14 @@ use File::Spec::Functions 'splitdir';
 has controller => '';
 
 sub _cgroup {
-  path($_[0]->parent
-    ?
-      path($_[0]->_vfs, $_[0]->controller // '', $_[0]->name // '', $_[0]->parent)
+  path(
+    $_[0]->parent
+    ? path(
+      $_[0]->_vfs,
+      $_[0]->controller // '',
+      $_[0]->name       // '',
+      $_[0]->parent
+      )
     : path($_[0]->_vfs, $_[0]->controller // '', $_[0]->name // ''));
 }
 
@@ -44,7 +49,7 @@ sub from {
   my ($self, $string) = @_;
   my $g = $self->_vfs;
   $string =~ s/$g//;
-  my @p = splitdir($string);
+  my @p   = splitdir($string);
   my $pre = substr $string, 0, 1;
   shift @p if $pre eq '/';
   my $controller = shift @p;

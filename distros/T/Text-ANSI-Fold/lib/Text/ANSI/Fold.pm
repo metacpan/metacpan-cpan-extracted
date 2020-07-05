@@ -1,10 +1,10 @@
 package Text::ANSI::Fold;
-use 5.014;
-use strict;
+
+use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -126,7 +126,7 @@ my %prohibition_re = do {
 
 sub configure {
     my $obj = ref $_[0] ? $_[0] : do {
-	state $private = new __PACKAGE__;
+	state $private = __PACKAGE__->new;
     };
     shift;
     croak "invalid parameter" if @_ % 2;
@@ -139,10 +139,10 @@ sub configure {
 }
 
 my @color_stack;
-my $reset;
-sub set_reset { $reset = shift };
-sub get_reset {
-    ("$reset", $reset && do { $reset = ''; @color_stack = () })[0];
+my @reset;
+sub put_reset { @reset = shift };
+sub pop_reset {
+    @reset ? do { @color_stack = (); pop @reset } : '';
 }
 
 sub fold {
@@ -178,8 +178,7 @@ sub fold {
     my $folded = '';
     my $eol = '';
     my $room = $width;
-    @color_stack = ();
-    $reset = '';
+    @color_stack = @reset = ();
 
     while (length) {
 
@@ -198,15 +197,15 @@ sub fold {
 	    next;
 	}
 	if (s/\A($reset_re)//) {
-	    set_reset($1);
+	    put_reset($1);
 	    next;
 	}
 
 	last if $room < 1;
 	last if $room != $width and &_startWideSpacing and $room < 2;
 
-	if ($reset) {
-	    $folded .= get_reset();
+	if (@reset) {
+	    $folded .= pop_reset();
 	}
 
 	if (s/\A($color_re)//) {
@@ -249,7 +248,7 @@ sub fold {
 	my($s, $e) = ($-[3], $+[3]);
 	my $l = $e - $s;
 	if ($room + $l < $width and $l + length($tail) <= $width) {
-	    $_ = substr($folded, $s, $l, '') . get_reset() . $_;
+	    $_ = substr($folded, $s, $l, '') . pop_reset() . $_;
 	    $room += $l;
 	}
     }
@@ -264,19 +263,12 @@ sub fold {
 	and ${^PREMATCH} ne ''
 	and (my $w = vwidth $+{runout}) <= $runout) {
 	$folded = ${^PREMATCH};
-	if ($reset) {
-	    $_ = ${^MATCH} . $reset . $_;
-	    @color_stack = () if $+{color};
-	    $reset = '';
-	} else {
-	    $_ = ${^MATCH} . $_;
-	}
+	$_ = join '', ${^MATCH}, @reset, $_;
+	pop_reset() if $+{color};
 	$room += $w;
     }
 
-    if ($reset) {
-	$folded .= get_reset();
-    }
+    $folded .= pop_reset() if @reset;
 
     $room += $margin;
 
@@ -402,7 +394,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
     ($folded, $remain) = ansi_fold($text, $width, [ option ]);
 
     use Text::ANSI::Fold;
-    my $f = new Text::ANSI::Fold width => 80, boundary => 'word';
+    my $f = Text::ANSI::Fold->new(width => 80, boundary => 'word');
     $f->configure(ambiguous => 'wide');
     ($folded, $remain) = $f->fold($text);
 
@@ -413,13 +405,13 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
     }
 
     use Text::ANSI::Fold qw(:constants);
-    my $fold = new Text::ANSI::Fold
+    my $fold = Text::ANSI::Fold->new(
         width     => 70,
         boundary  => 'word',
         linebreak => LINEBREAK_ALL,
         runin     => 4,
         runout    => 4,
-        ;
+        );
 
 =head1 DESCRIPTION
 
@@ -469,9 +461,10 @@ using default width with additional parameter:
 You can create an object to hold parameters, which is effective during
 object life time.  For example, 
 
-    my $f = new Text::ANSI::Fold
+    my $f = Text::ANSI::Fold->new(
         width => 80,
-        boundary => 'word';
+        boundary => 'word',
+        );
 
 makes an object folding on word boundaries with 80 columns width.
 Then you can use this without parameters.
@@ -518,7 +511,7 @@ B<text> option.  Next program just works.
 When using B<chops> method, B<width> parameter can take array
 reference, and chops text into given width list.
 
-    my $fold = new Text::ANSI::Fold;
+    my $fold = Text::ANSI::Fold->new;
     my @list = $fold->text("1223334444")->chops(width => [ 1, 2, 3 ]);
     # return ("1", "22", "333") and keep "4444"
 
@@ -531,7 +524,7 @@ function as well as B<new> and B<configure> method.
 
     Text::ANSI::Fold->configure(boundary => 'word');
 
-    my $f = new Text::ANSI::Fold boundary => 'word';
+    my $f = Text::ANSI::Fold->new(boundary => 'word');
 
     $f->configure(boundary => 'word');
 
@@ -614,13 +607,13 @@ characters with prohibited character handling.
     use open IO => 'utf8', ':std';
     
     use Text::ANSI::Fold qw(:constants);
-    my $fold = new Text::ANSI::Fold
+    my $fold = Text::ANSI::Fold->new(
         width     => 70,
         boundary  => 'word',
         linebreak => LINEBREAK_ALL,
         runin     => 4,
         runout    => 4,
-        ;
+        );
     
     $, = "\n";
     while (<>) {

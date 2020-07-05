@@ -1,0 +1,105 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use List::Util qw(max);
+use Log::ger::Output 'Screen';
+use Progress::Any '$progress';
+use Progress::Any::Output;
+use Time::HiRes qw(sleep);
+
+my $progress_x = Progress::Any->get_indicator(task => "x");
+my $progress_y = Progress::Any->get_indicator(task => "y");
+my $progress_z = Progress::Any->get_indicator(task => "z");
+
+Progress::Any::Output->add({task=>"x"}, "TermProgressBarColor", width=>60, rownum=>0, freq=>0.1);
+Progress::Any::Output->add({task=>"y"}, "TermProgressBarColor", width=>70, rownum=>1, freq=>0.2, show_delay=>2);
+Progress::Any::Output->add({task=>"z"}, "TermProgressBarColor", width=>80, rownum=>2, freq=>0.3);
+
+#use DD; dd \%Progress::Any::outputs;
+
+my ($target_x, $target_y, $target_z) = @ARGV;
+$progress_x->target($target_x) if $target_x;
+$progress_y->target($target_y) if $target_y;
+$progress_z->target($target_z) if $target_z;
+
+my $end_x = $target_x // int(15*rand)+7;
+my $end_y = $target_y // int(15*rand)+7;
+my $end_z = $target_z // int(15*rand)+7;
+for (1..max($end_x, $end_y, $end_z)) {
+    if ($_ <= $end_x) {
+        $progress_x->update(message => "Doing task x $_/".($target_x // "?"));
+        $progress_x->finish if $_ == $end_x;
+    }
+    if ($_ <= $end_y) {
+        $progress_y->update(message => "Doing task y $_/".($target_y // "?"));
+        $progress_y->finish if $_ == $end_y;
+    }
+    if ($_ <= $end_z) {
+        $progress_z->update(message => "Doing task z $_/".($target_z // "?"));
+        $progress_z->finish if $_ == $end_z;
+    }
+    sleep 0.2;
+}
+
+# ABSTRACT: Multiple progress bars
+# PODNAME: progress-any-eg-progressbar-05-multiple-progressbars
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+progress-any-eg-progressbar-05-multiple-progressbars - Multiple progress bars
+
+=head1 VERSION
+
+This document describes version 0.001 of progress-any-eg-progressbar-05-multiple-progressbars (from Perl distribution Progress-Any-Examples), released on 2020-06-20.
+
+=head1 SYNOPSIS
+
+ % progress-any-eg-progressbar-05-multiple-progressbars [target_x] [target_y] [target_z]
+
+=head1 DESCRIPTION
+
+This examples demos L<Progress::Any::Output::TermProgressBarColor>'s ability to
+show progress bar at a certain row number, so we can add several progress bar
+outputs at different row number.
+
+Note that the second progress bar is created with argument C<show_delay> set to
+2, so it will begin updating after two seconds.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Progress-Any-Examples>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Progress-Any-Examples>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any-Examples>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

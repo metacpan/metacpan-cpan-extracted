@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_MFLI;
-$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.701';
+$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.703';
 #ABSTRACT: Zurich Instruments MFLI Lock-in Amplifier
 
 use 5.010;
@@ -525,7 +525,7 @@ Lab::Moose::Instrument::ZI_MFLI - Zurich Instruments MFLI Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 

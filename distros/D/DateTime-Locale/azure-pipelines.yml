@@ -1,0 +1,41 @@
+resources:
+  repositories:
+    - repository: ci-perl-helpers
+      type: github
+      name: houseabsolute/ci-perl-helpers
+      endpoint: houseabsolute
+
+stages:
+  - template: templates/helpers/build.yml@ci-perl-helpers
+    parameters:
+      debug: true
+
+  - template: templates/helpers/linux.yml@ci-perl-helpers
+    parameters:
+      coverage: codecov
+      debug: true
+      test_xt: true
+      use_default_perls: true
+      apt:
+        - locales
+      pre_test_steps:
+        # This is needed for the spelling test to pass. If run with LANG=C
+        # (the default absent an explicit setting), the test seems to read the
+        # <DATA> handle or the pod files incorrectly.
+        - bash: |
+            sudo locale-gen en_US.UTF-8
+            echo "##vso[task.setvariable variable=LANG]en_US.UTF-8"
+            echo "##vso[task.setvariable variable=LANGUAGE]en"
+            echo "##vso[task.setvariable variable=LC_ALL]en"_US.UTF-8
+          displayName: Set locale env vars
+
+  - template: templates/helpers/macos.yml@ci-perl-helpers
+    parameters:
+      debug: true
+      use_default_perls: true
+
+  - template: templates/helpers/windows.yml@ci-perl-helpers
+    parameters:
+      debug: true
+      use_default_perls: true
+

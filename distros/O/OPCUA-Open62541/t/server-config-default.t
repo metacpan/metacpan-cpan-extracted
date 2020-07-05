@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use OPCUA::Open62541;
 
-use Test::More tests => 14;
+use Test::More tests => 24;
 use Test::Deep;
 use Test::Exception;
 use Test::LeakTrace;
@@ -40,4 +40,23 @@ my %info = (
     BuildInfo_productUri => 'http://open62541.org',
     BuildInfo_softwareVersion => re(qr/^1\./)  # '1.0.1'
 );
-cmp_deeply($buildinfo, \%info, "buildinfo hash")
+cmp_deeply($buildinfo, \%info, "buildinfo hash");
+
+lives_ok { $config->setMaxSessions(42) }
+    "custom max sessions";
+no_leaks_ok { $config->setMaxSessions(42) }
+    "custom max sessions leak";
+
+ok(my $maxsessions = $config->getMaxSessions(), "max sessions get");
+no_leaks_ok { $config->getMaxSessions() } "max sessions leak";
+is($maxsessions, 42, "max sessions");
+
+lives_ok { $config->setMaxSessionTimeout(30000) }
+    "custom max session timeout";
+no_leaks_ok { $config->setMaxSessionTimeout(30000) }
+    "custom max session timeout leak";
+
+ok(my $maxsessiontimeout = $config->getMaxSessionTimeout(),
+    "max session timeout get");
+no_leaks_ok { $config->getMaxSessionTimeout() } "max session timeout leak";
+is($maxsessiontimeout, 30000, "max session timeout");

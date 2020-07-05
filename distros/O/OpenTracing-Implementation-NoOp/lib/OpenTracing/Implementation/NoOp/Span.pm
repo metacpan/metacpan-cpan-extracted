@@ -9,11 +9,13 @@ OpenTracing::Implementation::NoOp::Span - NoOp, so code won't break!
 Objects of this class implement the required methods of the
 L<OpenTracing::Interface::Span>,
 to be compliant during testing and allow applications to continue working
-without having to catch acceptions all the time.
+without having to catch exceptions all the time.
 
-None of the methods will do anything usefull.
+None of the methods will do anything useful.
 
 =cut
+
+our $VERSION = 'v0.71.1';
 
 
 
@@ -33,14 +35,18 @@ sub overwrite_operation_name { shift }
 
 sub finish { shift }
 
-sub set_tag { shift }
+sub add_tag  { shift }
+sub add_tags { shift }
+
+sub get_tags { return ( ) }
 
 sub log_data { shift }
 
-sub set_baggage_item { shift }
+sub add_baggage_item  { shift }
+sub add_baggage_items { shift }
 
-sub get_baggage_item { undef }
-
+sub get_baggage_item  { undef }
+sub get_baggage_items { return ( ) }
 
 
 BEGIN {

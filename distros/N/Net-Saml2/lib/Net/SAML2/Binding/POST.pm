@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Moose;
-use MooseX::Types::Moose qw/ Str /;
 use Net::SAML2::XML::Util qw/ no_comments /;
 
 
@@ -13,8 +12,8 @@ use MIME::Base64 qw/ decode_base64 /;
 use Crypt::OpenSSL::VerifyX509;
 
 
-has 'cert_text' => (isa => Str, is => 'ro', required => 0);
-has 'cacert' => (isa => 'Maybe[Str]', is => 'ro', required => 0);
+has 'cert_text' => (isa => 'Str', is => 'ro');
+has 'cacert' => (isa => 'Maybe[Str]', is => 'ro');
 
 
 sub handle_response {
@@ -24,6 +23,7 @@ sub handle_response {
     my $xml = no_comments(decode_base64($response));
     my $xml_opts = { x509 => 1 };
     $xml_opts->{ cert_text } = $self->cert_text if ($self->cert_text);
+    $xml_opts->{ exclusive } = 1;
     my $x = Net::SAML2::XML::Sig->new($xml_opts);
     my $ret = $x->verify($xml);
     die "signature check failed" unless $ret;
@@ -57,7 +57,7 @@ Net::SAML2::Binding::POST
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,8 @@ This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
             2015       Mike Wisener
             2016       Jeff Fearn
             2017       Alessandro Ranellucci
-            2019-2020  Timothy Legge
+            2019       Timothy Legge
+            2020       Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

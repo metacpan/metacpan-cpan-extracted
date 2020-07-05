@@ -1,0 +1,79 @@
+NAME
+
+    Metrics::Any::Adapter::Routable - configurable routing of reported
+    metrics
+
+SYNOPSIS
+
+       use Metrics::Any::Adapter 'Routable',
+          targets => [
+             [ "important", "Statsd" ],
+             [ "default",   "Prometheus" ],
+             [ ["default", "debug"], "File", path => "metrics.log" ],
+          ],
+          packages => {
+             "My::Application" => "important",
+             "Net::Async::HTTP" => "debug",
+             "IO::Async::*" => "debug", # wildcard matches
+             # anything else will be assigned "default"
+          };
+
+DESCRIPTION
+
+    This Metrics::Any adapter type acts as a proxy for a set of multiple
+    other adapters, allowing an application to configure which adapter (or
+    adapters) to send particular metrics into.
+
+    Routing of metrics is done by a "category" name. Each reported metric
+    is assigned into a category, which is a string. Each configured adapter
+    declares an interest in one or more category names. Reported metrics
+    are then routed only to those adapters which declared an interest in
+    the category.
+
+    Primarily the category names are set by the packages configuration
+    argument. Additionally, this can be overridden by any individual metric
+    when it is constructed by providing a category parameter to the make_*
+    method which created it.
+
+ARGUMENTS
+
+    The following additional arguments are recognised
+
+ targets
+
+       targets => [
+          [ $category, $type, ],
+          [ $category, $type, @args ],
+          [ [ @categories ], $type, @args ],
+          ...
+       ],
+
+    A reference to an array containing a list of targets. Each target
+    consists of a category name (or reference array containing a list of
+    categories), a type name, and an optional set of constructor arguments,
+    all stored in its own array reference.
+
+    These targets will all be constructed and stored by the adapter.
+
+ packages
+
+       packages => {
+          $package => $category,
+          ...
+       }
+
+    A reference to a hash associating a category name with a reporting
+    package. Any metrics registered by the given package will be associated
+    with the given category name.
+
+    A pattern can also be specified with a trailing ::* wildcard; this will
+    match any package name within the given namespace. Longer matches will
+    take precedence over shorter ones.
+
+    Any reported metric that does not otherwise have a category configured
+    will be assigned the category default.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -237,8 +237,7 @@ sub _build_data_hash ($self) {
         ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
         $data{ 'era_' . $length }
             = [
-            $cal_root->{eras}{ 'era' . $era_length{$length} }->@{ 0, 1 }
-            ];
+            $cal_root->{eras}{ 'era' . $era_length{$length} }->@{ 0, 1 } ];
     }
 
     return \%data;
@@ -299,18 +298,10 @@ sub _build_version ($self) {
 }
 
 sub _build_json_file ($self) {
-    my $code_file = $self->_source_data_root->child(
-        qw( cldr-dates-full main ),
-        $self->code, 'ca-gregorian.json'
-    );
+    my $code_file = $self->_gregorian_file_for_code( $self->code );
     return $code_file if -f $code_file;
 
-    my $parent_file = $self->_source_data_root->child(
-        qw( cldr-dates-full main ),
-        $self->_parent_code,
-        'ca-gregorian.json'
-    );
-
+    my $parent_file = $self->_gregorian_file_for_code( $self->_parent_code );
     unless ( -f $parent_file ) {
         die "Could not find $code_file or $parent_file for locale ",
             $self->code, "\n";
@@ -320,15 +311,35 @@ sub _build_json_file ($self) {
 }
 
 sub _build_parent_code ($self) {
+    my $code = $self->code;
+    while ( $code = $self->_parent_of_code($code) ) {
+        my $parent_file = $self->_gregorian_file_for_code($code);
+        return $code if -f $parent_file;
+    }
+
+    # This is impossible because we should always be able to find root as a
+    # parent.
+    die 'Impossible! Could not find a parent!';
+}
+
+sub _parent_of_code ( $self, $code ) {
     my $explicit_parents = $self->_explicit_parents;
 
-    return $explicit_parents->{ $self->code }
-        if $explicit_parents->{ $self->code };
+    return $explicit_parents->{$code}
+        if $explicit_parents->{$code};
 
     return
-          $self->code =~ /-/    ? $self->code =~ s/-[^-]+$//r
-        : $self->code ne 'root' ? 'root'
-        :   die 'There is no parent for the root locale!';
+          $code =~ /-/    ? $code =~ s/-[^-]+$//r
+        : $code ne 'root' ? 'root'
+        :                   die 'There is no parent for the root locale!';
+}
+
+sub _gregorian_file_for_code ( $self, $code ) {
+    return $self->_source_data_root->child(
+        qw( cldr-dates-full main ),
+        $code,
+        'ca-gregorian.json'
+    );
 }
 
 sub _has_parent_code ($self) {

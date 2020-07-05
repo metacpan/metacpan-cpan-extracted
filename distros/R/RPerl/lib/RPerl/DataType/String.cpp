@@ -1,7 +1,7 @@
 using std::cout;  using std::cerr;  using std::endl;
 
 #ifndef __CPP__INCLUDED__RPerl__DataType__String_cpp
-#define __CPP__INCLUDED__RPerl__DataType__String_cpp 0.013_000
+#define __CPP__INCLUDED__RPerl__DataType__String_cpp 0.013_100
 
 // [[[ INCLUDES ]]]
 #include <RPerl/DataType/String.h>		// -> NULL (relies on native C type)
@@ -257,7 +257,7 @@ SV* string_to_string(SV* input_sv)
 
 	input_sv_string = SvPV_nolen(input_sv);
 
-//fprintf(stderr, "in CPPOPS_PERLTYPES string_to_string(), received input_sv_string =\n%s\n\n", input_sv_string.c_str());
+fprintf(stderr, "in CPPOPS_PERLTYPES string_to_string(), received input_sv_string =\n%s\n\n", input_sv_string.c_str());
 //fprintf(stderr, "in CPPOPS_PERLTYPES string_to_string()...\n");
 
 	// escape all back-slash \ and single-quote ' characters with a back-slash \ character
@@ -284,9 +284,14 @@ SV* string_to_string(SV* input_sv)
 
 # elif defined __CPP__TYPES
 
+string to_string(string input_string) {
+    fprintf(stderr, "in CPPOPS_CPPTYPES to_string(), about to call string_to_string & return value...\n");
+    return(string_to_string(input_string));
+}
+
 string string_to_string(string input_string)
 {
-//fprintf(stderr, "in CPPOPS_CPPTYPES string_to_string(), top of subroutine, received input_string =\n%s\n\n", input_string.c_str());
+fprintf(stderr, "in CPPOPS_CPPTYPES string_to_string(), top of subroutine, received input_string =\n%s\n\n", input_string.c_str());
 //fprintf(stderr, "in CPPOPS_CPPTYPES string_to_string()...\n");
 
     size_t input_string_pos;

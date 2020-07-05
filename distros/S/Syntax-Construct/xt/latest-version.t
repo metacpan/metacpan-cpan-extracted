@@ -28,7 +28,7 @@ $ff->fetch(to => \ my $perl_org)
 
 my $version_re = qr/5\.[0-9]+\.[0-9]+/;
 my $travis_version = (sort_by_version(map /($version_re)/,
-                                      grep /$version_re/ && $_ ne 'blead',
+                                      grep /$version_re/,
                                       @{ $travis->{perl} }))[-1];
 
 plan(tests => 1);

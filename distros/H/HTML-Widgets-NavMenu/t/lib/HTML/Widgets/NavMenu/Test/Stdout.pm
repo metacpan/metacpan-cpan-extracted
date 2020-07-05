@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use IO::Scalar;
+use IO::Scalar ();
 
-open SAVEOUT, ">&STDOUT";
-print SAVEOUT "";
+open my $SAVEOUT, ">&STDOUT";
+print {$SAVEOUT} "";
 
 my $buffer = "";
 

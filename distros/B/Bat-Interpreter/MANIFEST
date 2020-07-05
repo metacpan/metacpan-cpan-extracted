@@ -50,8 +50,10 @@ t/13-comparison_with_spaces.cmd
 t/13-comparison_with_spaces.t
 t/13-error_on_unsupported_condition.cmd
 t/13-error_on_unsupported_condition.t
-t/14-if_exists.cmd
-t/14-if_exists.t
+t/14-if_exists_with_variable_substitution.cmd
+t/14-if_exists_with_variable_substitution.t
+t/14-if_exists_without_variable_substitution.cmd
+t/14-if_exists_without_variable_substitution.t
 t/15-NEQ_mixedcase_operator.cmd
 t/15-NEQ_mixedcase_operator.t
 t/16-LEQ_mixedcase_operator.cmd

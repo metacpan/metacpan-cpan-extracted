@@ -53,7 +53,7 @@
    "provides" : {
       "Math::Prime::Util::GMP" : {
          "file" : "lib/Math/Prime/Util/GMP.pm",
-         "version" : "0.51"
+         "version" : "0.52"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "url" : "https://github.com/danaj/Math-Prime-Util-GMP"
       }
    },
-   "version" : "0.51",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.52",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

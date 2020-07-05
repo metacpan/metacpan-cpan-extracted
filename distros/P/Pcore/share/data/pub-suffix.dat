@@ -11,6 +11,8 @@
 *.alces.network;*.alces.network
 *.awdev.ca;*.awdev.ca
 *.azurecontainer.io;*.azurecontainer.io
+*.backyards.banzaicloud.io;*.backyards.banzaicloud.io
+*.banzai.cloud;*.banzai.cloud
 *.bd;*.bd
 *.bzz.dapps.earth;*.bzz.dapps.earth
 *.ck;*.ck
@@ -41,10 +43,12 @@
 *.kunden.ortsinfo.at;*.kunden.ortsinfo.at
 *.landing.myjino.ru;*.landing.myjino.ru
 *.lcl.dev;*.lcl.dev
+*.linodeobjects.com;*.linodeobjects.com
 *.magentosite.cloud;*.magentosite.cloud
 *.mm;*.mm
 *.moonscale.io;*.moonscale.io
 *.nagoya.jp;*.nagoya.jp
+*.nodebalancer.linode.com;*.nodebalancer.linode.com
 *.nom.br;*.nom.br
 *.np;*.np
 *.oci.customer-oci.com;*.oci.customer-oci.com
@@ -54,6 +58,7 @@
 *.on-rancher.cloud;*.on-rancher.cloud
 *.on-rio.io;*.on-rio.io
 *.otap.co;*.otap.co
+*.owo.codes;*.owo.codes
 *.pg;*.pg
 *.platform.sh;*.platform.sh
 *.platformsh.site;*.platformsh.site
@@ -106,6 +111,7 @@
 4u.com;4u.com
 5.bg;5.bg
 6.bg;6.bg
+611.to;611.to
 64-b.it;64-b.it
 7.bg;7.bg
 8.bg;8.bg
@@ -427,6 +433,7 @@ api.stdlib.com;api.stdlib.com
 apigee.io;apigee.io
 app;app
 app.banzaicloud.io;app.banzaicloud.io
+app.gp;app.gp
 app.lmpm.com;app.lmpm.com
 app.os.fedoraproject.org;app.os.fedoraproject.org
 app.os.stg.fedoraproject.org;app.os.stg.fedoraproject.org
@@ -557,6 +564,8 @@ at;at
 at-band-camp.net;at-band-camp.net
 at.eu.org;at.eu.org
 at.it;at.it
+at.md;at.md
+at.vg;at.vg
 atami.shizuoka.jp;atami.shizuoka.jp
 ath.cx;ath.cx
 athleta;athleta
@@ -634,6 +643,7 @@ ba.leg.br;ba.leg.br
 babia-gora.pl;babia-gora.pl
 baby;baby
 backplaneapp.io;backplaneapp.io
+backyards.banzaicloud.io;backyards.banzaicloud.io
 badaddja.no;badaddja.no
 badajoz.museum;badajoz.museum
 baghdad.museum;baghdad.museum
@@ -663,6 +673,7 @@ band;band
 bandai.fukushima.jp;bandai.fukushima.jp
 bando.ibaraki.jp;bando.ibaraki.jp
 bank;bank
+banzai.cloud;banzai.cloud
 banzaicloud.io;banzaicloud.io
 bar;bar
 bar.pro;bar.pro
@@ -732,7 +743,9 @@ bcn;bcn
 bd;bd
 bd.se;bd.se
 be;be
+be.ax;be.ax
 be.eu.org;be.eu.org
+be.gy;be.gy
 bearalvahki.no;bearalvahki.no
 bearalváhki.no;xn--bearalvhki-y4a.no
 beardu.no;beardu.no
@@ -806,7 +819,7 @@ biratori.hokkaido.jp;biratori.hokkaido.jp
 birdart.museum;birdart.museum
 birkenes.no;birkenes.no
 birthplace.museum;birthplace.museum
-bitballoon.com;bitballoon.com
+bitbridge.net;bitbridge.net
 biz;biz
 biz.at;biz.at
 biz.az;biz.az
@@ -848,6 +861,9 @@ blockbuster;blockbuster
 blog;blog
 blog.bo;blog.bo
 blog.br;blog.br
+blog.gt;blog.gt
+blog.kg;blog.kg
+blog.vu;blog.vu
 blogdns.com;blogdns.com
 blogdns.net;blogdns.net
 blogdns.org;blogdns.org
@@ -1152,6 +1168,7 @@ casino.hu;casino.hu
 castle.museum;castle.museum
 castres.museum;castres.museum
 cat;cat
+cat.ax;cat.ax
 catania.it;catania.it
 catanzaro.it;catanzaro.it
 catering;catering
@@ -1180,6 +1197,7 @@ cc.fl.us;cc.fl.us
 cc.ga.us;cc.ga.us
 cc.gu.us;cc.gu.us
 cc.hi.us;cc.hi.us
+cc.hn;cc.hn
 cc.ia.us;cc.ia.us
 cc.id.us;cc.id.us
 cc.il.us;cc.il.us
@@ -1253,6 +1271,7 @@ cg;cg
 ch;ch
 ch.eu.org;ch.eu.org
 ch.it;ch.it
+ch.tc;ch.tc
 chambagri.fr;chambagri.fr
 championship.aero;championship.aero
 chanel;chanel
@@ -1827,6 +1846,9 @@ de;de
 de.com;de.com
 de.cool;de.cool
 de.eu.org;de.eu.org
+de.gt;de.gt
+de.ls;de.ls
+de.md;de.md
 de.us;de.us
 deal;deal
 dealer;dealer
@@ -1848,6 +1870,7 @@ dellogliastra.it;dellogliastra.it
 delmenhorst.museum;delmenhorst.museum
 deloitte;deloitte
 delta;delta
+demo.jelastic.com;demo.jelastic.com
 democracia.bo;democracia.bo
 democrat;democrat
 demon.nl;demon.nl
@@ -1868,6 +1891,7 @@ dev-myqnapcloud.com;dev-myqnapcloud.com
 dev.adobeaemcloud.com;dev.adobeaemcloud.com
 dev.static.land;dev.static.land
 dev.thingdust.io;dev.thingdust.io
+dev.vu;dev.vu
 development.run;development.run
 devices.resinstaging.io;devices.resinstaging.io
 df.gov.br;df.gov.br
@@ -1931,7 +1955,6 @@ doesntexist.org;doesntexist.org
 dog;dog
 dolls.museum;dolls.museum
 domains;domains
-dominic.ua;dominic.ua
 donetsk.ua;donetsk.ua
 donna.no;donna.no
 donostia.museum;donostia.museum
@@ -2067,6 +2090,7 @@ ed.cr;ed.cr
 ed.jp;ed.jp
 ed.pw;ed.pw
 edeka;edeka
+edgeapp.net;edgeapp.net
 edgestack.me;edgestack.me
 edogawa.tokyo.jp;edogawa.tokyo.jp
 edu;edu
@@ -2217,6 +2241,7 @@ eiheiji.fukui.jp;eiheiji.fukui.jp
 eisenbahn.museum;eisenbahn.museum
 ekloges.cy;ekloges.cy
 elasticbeanstalk.com;elasticbeanstalk.com
+elastx.net;elastx.net
 elb.amazonaws.com;elb.amazonaws.com
 elb.amazonaws.com.cn;elb.amazonaws.com.cn
 elblag.pl;elblag.pl
@@ -2274,6 +2299,7 @@ erni;erni
 erotica.hu;erotica.hu
 erotika.hu;erotika.hu
 es;es
+es.ax;es.ax
 es.eu.org;es.eu.org
 es.gov.br;es.gov.br
 es.kr;es.kr
@@ -2290,7 +2316,6 @@ est-mon-blogueur.com;est-mon-blogueur.com
 est.pr;est.pr
 estate;estate
 estate.museum;estate.museum
-esurance;esurance
 et;et
 etajima.hiroshima.jp;etajima.hiroshima.jp
 etc.br;etc.br
@@ -2312,6 +2337,7 @@ eu-west-2.amazonaws.com;eu-west-2.amazonaws.com
 eu-west-2.elasticbeanstalk.com;eu-west-2.elasticbeanstalk.com
 eu-west-3.amazonaws.com;eu-west-3.amazonaws.com
 eu-west-3.elasticbeanstalk.com;eu-west-3.elasticbeanstalk.com
+eu.ax;eu.ax
 eu.com;eu.com
 eu.int;eu.int
 eu.meteorapp.com;eu.meteorapp.com
@@ -2366,7 +2392,6 @@ fast;fast
 fastly-terrarium.com;fastly-terrarium.com
 fastly.net;fastly.net
 fastlylb.net;fastlylb.net
-fastpanel.direct;fastpanel.direct
 fastvps-server.com;fastvps-server.com
 fastvps.host;fastvps.host
 fastvps.site;fastvps.site
@@ -2478,6 +2503,7 @@ florø.no;xn--flor-jra.no
 flowers;flowers
 flt.cloud.muni.cz;flt.cloud.muni.cz
 fly;fly
+fly.dev;fly.dev
 flynnhosting.net;flynnhosting.net
 flå.no;xn--fl-zia.no
 fm;fm
@@ -2676,6 +2702,7 @@ funagata.yamagata.jp;funagata.yamagata.jp
 funahashi.toyama.jp;funahashi.toyama.jp
 fund;fund
 fundacio.museum;fundacio.museum
+funkfeuer.at;funkfeuer.at
 fuoisku.no;fuoisku.no
 fuossko.no;fuossko.no
 furano.hokkaido.jp;furano.hokkaido.jp
@@ -2701,6 +2728,7 @@ fyresdal.no;fyresdal.no
 førde.no;xn--frde-gra.no
 g.bg;g.bg
 g.se;g.se
+g.vbrplsbx.io;g.vbrplsbx.io
 g12.br;g12.br
 ga;ga
 ga.us;ga.us
@@ -2760,6 +2788,7 @@ genova.it;genova.it
 gent;gent
 gentapps.com;gentapps.com
 genting;genting
+gentlentapis.com;gentlentapis.com
 geology.museum;geology.museum
 geometre-expert.fr;geometre-expert.fr
 george;george
@@ -2769,6 +2798,7 @@ getmyip.com;getmyip.com
 gets-it.net;gets-it.net
 gf;gf
 gg;gg
+gg.ax;gg.ax
 ggee;ggee
 ggf.br;ggf.br
 gh;gh
@@ -2791,6 +2821,7 @@ git-repos.de;git-repos.de
 github.io;github.io
 githubusercontent.com;githubusercontent.com
 gitlab.io;gitlab.io
+gitpage.si;gitpage.si
 gives;gives
 giving;giving
 gjemnes.no;gjemnes.no
@@ -3250,6 +3281,7 @@ hidaka.hokkaido.jp;hidaka.hokkaido.jp
 hidaka.kochi.jp;hidaka.kochi.jp
 hidaka.saitama.jp;hidaka.saitama.jp
 hidaka.wakayama.jp;hidaka.wakayama.jp
+hidora.com;hidora.com
 higashi.fukuoka.jp;higashi.fukuoka.jp
 higashi.fukushima.jp;higashi.fukushima.jp
 higashi.okinawa.jp;higashi.okinawa.jp
@@ -3401,6 +3433,7 @@ host;host
 hosting;hosting
 hosting-cluster.nl;hosting-cluster.nl
 hosting.myjino.ru;hosting.myjino.ru
+hostyhosting.io;hostyhosting.io
 hot;hot
 hotel.hu;hotel.hu
 hotel.lk;hotel.lk
@@ -3579,6 +3612,7 @@ indian.museum;indian.museum
 indiana.museum;indiana.museum
 indianapolis.museum;indianapolis.museum
 indianmarket.museum;indianmarket.museum
+indie.porn;indie.porn
 indigena.bo;indigena.bo
 industria.bo;industria.bo
 industries;industries
@@ -3663,6 +3697,7 @@ inuyama.aichi.jp;inuyama.aichi.jp
 investments;investments
 inzai.chiba.jp;inzai.chiba.jp
 io;io
+io.kg;io.kg
 iobb.net;iobb.net
 ip6.arpa;ip6.arpa
 ipifony.net;ipifony.net
@@ -3830,6 +3865,8 @@ izumo.shimane.jp;izumo.shimane.jp
 izumozaki.niigata.jp;izumozaki.niigata.jp
 izunokuni.shizuoka.jp;izunokuni.shizuoka.jp
 j.bg;j.bg
+j.layershift.co.uk;j.layershift.co.uk
+j.scaleforce.com.cy;j.scaleforce.com.cy
 jab.br;jab.br
 jaguar;jaguar
 jambyl.su;jambyl.su
@@ -3846,6 +3883,7 @@ je;je
 jeep;jeep
 jefferson.museum;jefferson.museum
 jeju.kr;jeju.kr
+jelastic.com;jelastic.com
 jelenia-gora.pl;jelenia-gora.pl
 jeonbuk.kr;jeonbuk.kr
 jeonnam.kr;jeonnam.kr
@@ -3863,6 +3901,7 @@ jinsekikogen.hiroshima.jp;jinsekikogen.hiroshima.jp
 jio;jio
 jl.cn;jl.cn
 jll;jll
+jls-sto1.elastx.net;jls-sto1.elastx.net
 jm;jm
 jmp;jmp
 jnj;jnj
@@ -3889,6 +3928,8 @@ joyent.com;joyent.com
 joyo.kyoto.jp;joyo.kyoto.jp
 jp;jp
 jp.eu.org;jp.eu.org
+jp.kg;jp.kg
+jp.md;jp.md
 jp.net;jp.net
 jpmorgan;jpmorgan
 jpn.com;jpn.com
@@ -4070,6 +4111,7 @@ kashima.saga.jp;kashima.saga.jp
 kashiwa.chiba.jp;kashiwa.chiba.jp
 kashiwara.osaka.jp;kashiwara.osaka.jp
 kashiwazaki.niigata.jp;kashiwazaki.niigata.jp
+kasserver.com;kasserver.com
 kasuga.fukuoka.jp;kasuga.fukuoka.jp
 kasuga.hyogo.jp;kasuga.hyogo.jp
 kasugai.aichi.jp;kasugai.aichi.jp
@@ -4438,6 +4480,7 @@ law;law
 law.pro;law.pro
 law.za;law.za
 lawyer;lawyer
+layershift.co.uk;layershift.co.uk
 laz.it;laz.it
 lazio.it;lazio.it
 lb;lb
@@ -4574,6 +4617,7 @@ linkitools.space;linkitools.space
 linkyard-cloud.ch;linkyard-cloud.ch
 linkyard.cloud;linkyard.cloud
 linode.com;linode.com
+linodeobjects.com;linodeobjects.com
 linz.museum;linz.museum
 lipsy;lipsy
 live;live
@@ -4794,6 +4838,7 @@ mb.ca;mb.ca
 mb.it;mb.it
 mba;mba
 mc;mc
+mc.ax;mc.ax
 mc.eu.org;mc.eu.org
 mc.it;mc.it
 mckinsey;mckinsey
@@ -4805,9 +4850,11 @@ me.eu.org;me.eu.org
 me.it;me.it
 me.ke;me.ke
 me.so;me.so
+me.tc;me.tc
 me.tz;me.tz
 me.uk;me.uk
 me.us;me.us
+me.vu;me.vu
 med;med
 med.br;med.br
 med.ec;med.ec
@@ -5003,6 +5050,7 @@ minokamo.gifu.jp;minokamo.gifu.jp
 minowa.nagano.jp;minowa.nagano.jp
 mint;mint
 mintere.site;mintere.site
+mircloud.host;mircloud.host
 misaki.okayama.jp;misaki.okayama.jp
 misaki.osaka.jp;misaki.osaka.jp
 misasa.tottori.jp;misasa.tottori.jp
@@ -5429,6 +5477,7 @@ neat-url.com;neat-url.com
 nebraska.museum;nebraska.museum
 nec;nec
 nedre-eiker.no;nedre-eiker.no
+neko.am;neko.am
 nemuro.hokkaido.jp;nemuro.hokkaido.jp
 nerdpol.ovh;nerdpol.ovh
 nerima.tokyo.jp;nerima.tokyo.jp
@@ -5577,7 +5626,6 @@ net.zm;net.zm
 netbank;netbank
 netflix;netflix
 netlify.app;netlify.app
-netlify.com;netlify.com
 network;network
 neues.museum;neues.museum
 neustar;neustar
@@ -5674,6 +5722,7 @@ niyodogawa.kochi.jp;niyodogawa.kochi.jp
 nj.us;nj.us
 nl;nl
 nl.ca;nl.ca
+nl.ci;nl.ci
 nl.eu.org;nl.eu.org
 nl.no;nl.no
 nm.cn;nm.cn
@@ -5817,6 +5866,8 @@ nuoro.it;nuoro.it
 nv.us;nv.us
 nx.cn;nx.cn
 ny.us;ny.us
+nyaa.am;nyaa.am
+nyan.to;nyan.to
 nyc;nyc
 nyc.mn;nyc.mn
 nyc.museum;nyc.museum
@@ -6269,6 +6320,7 @@ owariasahi.aichi.jp;owariasahi.aichi.jp
 own.pm;own.pm
 ownip.net;ownip.net
 ownprovider.com;ownprovider.com
+owo.codes;owo.codes
 ox.rs;ox.rs
 oxford.museum;oxford.museum
 oy.lc;oy.lc
@@ -6299,6 +6351,7 @@ padua.it;padua.it
 page;page
 pagefrontapp.com;pagefrontapp.com
 pagespeedmobilizer.com;pagespeedmobilizer.com
+pagexl.com;pagexl.com
 palace.museum;palace.museum
 paleo.museum;paleo.museum
 palermo.it;palermo.it
@@ -6337,6 +6390,7 @@ pc.pl;pc.pl
 pccw;pccw
 pcloud.host;pcloud.host
 pd.it;pd.it
+pdns.page;pdns.page
 pe;pe
 pe.ca;pe.ca
 pe.gov.br;pe.gov.br
@@ -6426,6 +6480,8 @@ plaza.museum;plaza.museum
 plc.co.im;plc.co.im
 plc.ly;plc.ly
 plc.uk;plc.uk
+plesk.page;plesk.page
+pleskns.com;pleskns.com
 plo.ps;plo.ps
 plumbing;plumbing
 plurinacional.bo;plurinacional.bo
@@ -7018,6 +7074,7 @@ sc.tz;sc.tz
 sc.ug;sc.ug
 sc.us;sc.us
 sca;sca
+scaleforce.com.cy;scaleforce.com.cy
 scapp.io;scapp.io
 scb;scb
 sch.ae;sch.ae
@@ -7062,7 +7119,6 @@ sciences.museum;sciences.museum
 sciencesnaturelles.museum;sciencesnaturelles.museum
 scientist.aero;scientist.aero
 scjohnson;scjohnson
-scor;scor
 scot;scot
 scotland.museum;scotland.museum
 scrapper-site.net;scrapper-site.net
@@ -7086,6 +7142,7 @@ secure;secure
 security;security
 securitytactics.com;securitytactics.com
 seek;seek
+seidat.net;seidat.net
 seihi.nagasaki.jp;seihi.nagasaki.jp
 seika.kyoto.jp;seika.kyoto.jp
 seiro.niigata.jp;seiro.niigata.jp
@@ -7281,6 +7338,7 @@ showa.yamanashi.jp;showa.yamanashi.jp
 showtime;showtime
 shriram;shriram
 shunan.yamaguchi.jp;shunan.yamaguchi.jp
+shw.io;shw.io
 si;si
 si.eu.org;si.eu.org
 si.it;si.it
@@ -7826,8 +7884,10 @@ tn.it;tn.it
 tn.us;tn.us
 to;to
 to.gov.br;to.gov.br
+to.gt;to.gt
 to.it;to.it
 to.leg.br;to.leg.br
+to.md;to.md
 to.work;to.work
 toba.mie.jp;toba.mie.jp
 tobe.ehime.jp;tobe.ehime.jp
@@ -8078,6 +8138,7 @@ tv.bo;tv.bo
 tv.br;tv.br
 tv.im;tv.im
 tv.it;tv.it
+tv.kg;tv.kg
 tv.na;tv.na
 tv.sd;tv.sd
 tv.tr;tv.tr
@@ -8135,6 +8196,7 @@ ujitawara.kyoto.jp;ujitawara.kyoto.jp
 uk;uk
 uk.com;uk.com
 uk.eu.org;uk.eu.org
+uk.kg;uk.kg
 uk.net;uk.net
 uk0.bigv.io;uk0.bigv.io
 ukco.me;ukco.me
@@ -8198,9 +8260,11 @@ us-east-2.elasticbeanstalk.com;us-east-2.elasticbeanstalk.com
 us-gov-west-1.elasticbeanstalk.com;us-gov-west-1.elasticbeanstalk.com
 us-west-1.elasticbeanstalk.com;us-west-1.elasticbeanstalk.com
 us-west-2.elasticbeanstalk.com;us-west-2.elasticbeanstalk.com
+us.ax;us.ax
 us.com;us.com
 us.eu.org;us.eu.org
 us.gov.pl;us.gov.pl
+us.kg;us.kg
 us.na;us.na
 us.org;us.org
 usa.museum;usa.museum
@@ -8236,6 +8300,7 @@ uvic.museum;uvic.museum
 uw.gov.pl;uw.gov.pl
 uwajima.ehime.jp;uwajima.ehime.jp
 uwu.ai;uwu.ai
+uwu.nu;uwu.nu
 uy;uy
 uy.com;uy.com
 uz;uz
@@ -8293,6 +8358,7 @@ varese.it;varese.it
 varggat.no;varggat.no
 varoy.no;varoy.no
 vb.it;vb.it
+vbrplsbx.io;vbrplsbx.io
 vc;vc
 vc.it;vc.it
 vda.it;vda.it
@@ -8310,6 +8376,8 @@ venice.it;venice.it
 vennesla.no;vennesla.no
 ventures;ventures
 verbania.it;verbania.it
+vercel.app;vercel.app
+vercel.dev;vercel.dev
 vercelli.it;vercelli.it
 verdal.no;verdal.no
 verisign;verisign
@@ -8408,6 +8476,7 @@ vt.us;vt.us
 vu;vu
 vuelos;vuelos
 vv.it;vv.it
+vxl.sh;vxl.sh
 várggát.no;xn--vrggt-xqad.no
 vågan.no;xn--vgan-qoa.no
 vågsøy.no;xn--vgsy-qoa0j.no
@@ -8457,6 +8526,7 @@ watches;watches
 waw.pl;waw.pl
 wazuka.kyoto.jp;wazuka.kyoto.jp
 we.bs;we.bs
+we.tc;we.tc
 weather;weather
 weatherchannel;weatherchannel
 web.app;web.app
@@ -8504,6 +8574,7 @@ whoswho;whoswho
 wi.us;wi.us
 wielun.pl;wielun.pl
 wien;wien
+wien.funkfeuer.at;wien.funkfeuer.at
 wif.gov.pl;wif.gov.pl
 wiih.gov.pl;wiih.gov.pl
 wiki;wiki
@@ -8571,7 +8642,9 @@ xin;xin
 xj.cn;xj.cn
 xnbay.com;xnbay.com
 xs4all.space;xs4all.space
+xx.gl;xx.gl
 xxx;xxx
+xy.ax;xy.ax
 xyz;xyz
 xz.cn;xz.cn
 y.bg;y.bg

@@ -94,6 +94,7 @@ my $res = $t->tx->res->json;
 cmp_deeply(
   $res,
   {
+    scopes        => ignore(),
     access_token  => re( '^.+$' ),
     token_type    => 'Bearer',
     expires_in    => '3600',

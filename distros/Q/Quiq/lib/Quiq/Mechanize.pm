@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.183';
+our $VERSION = '1.184';
 
 # -----------------------------------------------------------------------------
 
@@ -68,6 +68,7 @@ sub new {
     return $class->SUPER::new(
         autocheck => 1,
         stack_depth => 0,
+        strict_forms => 1,
         onerror => sub {
             my $msg = join '',@_;                
             $class->throw(
@@ -83,7 +84,7 @@ sub new {
 
 =head1 VERSION
 
-1.183
+1.184
 
 =head1 AUTHOR
 

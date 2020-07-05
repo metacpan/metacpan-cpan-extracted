@@ -1,5 +1,10 @@
 Revision history for Perl module Net::Curl::Promiser
 
+0.11 Sat 4 Jul 2020
+- Make fail_handle() and cancel_handle() detect non-pending requests.
+- Make cancel_handle() act immediately rather than on the next
+  event loop run. This fixes a bug that caused the event loop to hang.
+
 0.10 Sat 9 May 2020
 - Make event loop tests use distributed (pure-Perl) event loops.
 - Tweak internal debug code

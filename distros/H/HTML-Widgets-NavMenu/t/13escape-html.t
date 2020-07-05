@@ -1,13 +1,11 @@
-#!/usr/bin/perl -w
-
-use Test::More tests => 9;
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-BEGIN
-{
-    use_ok('HTML::Widgets::NavMenu::EscapeHtml');    # TEST
-}
+use Test::More tests => 8;
+
+use HTML::Widgets::NavMenu::EscapeHtml qw/ escape_html /;
 
 {
     # TEST

@@ -3,16 +3,18 @@ use warnings;
 use Test::More;
 use FFI::ExtractSymbols;
 use FFI::CheckLib qw( find_lib );
-use FFI::ExtractSymbols::ConfigData;
+use File::ShareDir::Dist::Install qw( install_config_get );
+
+my $config = install_config_get 'FFI-ExtractSymbols';
 
 plan skip_all => 'requires posix_nm mode with no underscore prefix'
-  unless FFI::ExtractSymbols::ConfigData->config('posix_nm')
-  &&     FFI::ExtractSymbols::ConfigData->config('function_prefix') eq ''
-  &&     FFI::ExtractSymbols::ConfigData->config('data_prefix') eq '';
+  unless $config->{'posix_nm'}
+  &&     $config->{'function_prefix'} eq ''
+  &&     $config->{'data_prefix'} eq '';
 
 plan tests => 3;
 
-my $lib = find_lib lib => 'test', symbol => 'my_function', libpath => 'libtest';
+my $lib = find_lib lib => 'test', symbol => 'my_function', libpath => 't/ffi';
 
 note "lib=$lib";
 

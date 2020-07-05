@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::6_0::Role::API;
-$Search::Elasticsearch::Client::6_0::Role::API::VERSION = '6.80';
+$Search::Elasticsearch::Client::6_0::Role::API::VERSION = '6.81';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::API';
 
@@ -24,25 +24,27 @@ sub api {
 
     'bulk.metadata' => {
         params => {
-            '_index'        => '_index',
-            'index'         => '_index',
-            '_type'         => '_type',
-            'type'          => '_type',
-            '_id'           => '_id',
-            'id'            => '_id',
-            'pipeline'      => 'pipeline',
-            'routing'       => 'routing',
-            '_routing'      => 'routing',
-            'parent'        => 'parent',
-            '_parent'       => 'parent',
-            'timestamp'     => 'timestamp',
-            '_timestamp'    => 'timestamp',
-            'ttl'           => 'ttl',
-            '_ttl'          => 'ttl',
-            'version'       => 'version',
-            '_version'      => 'version',
-            'version_type'  => 'version_type',
-            '_version_type' => 'version_type'
+            '_index'          => '_index',
+            'index'           => '_index',
+            '_type'           => '_type',
+            'type'            => '_type',
+            '_id'             => '_id',
+            'id'              => '_id',
+            'pipeline'        => 'pipeline',
+            'routing'         => 'routing',
+            '_routing'        => 'routing',
+            'parent'          => 'parent',
+            '_parent'         => 'parent',
+            'timestamp'       => 'timestamp',
+            '_timestamp'      => 'timestamp',
+            'ttl'             => 'ttl',
+            '_ttl'            => 'ttl',
+            'version'         => 'version',
+            '_version'        => 'version',
+            'version_type'    => 'version_type',
+            '_version_type'   => 'version_type',
+            'if_seq_no'       => 'if_seq_no',
+            'if_primary_term' => 'if_primary_term'
         }
     },
     'bulk.update' => {
@@ -1932,6 +1934,7 @@ sub api {
             ignore_unavailable => "boolean",
             include_defaults   => "boolean",
             local              => "boolean",
+            include_type_name  => "boolean",
         },
     },
 
@@ -4760,7 +4763,7 @@ Search::Elasticsearch::Client::6_0::Role::API - This class contains the spec for
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

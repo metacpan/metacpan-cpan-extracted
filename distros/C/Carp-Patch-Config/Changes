@@ -1,3 +1,8 @@
+0.006   2020-06-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add another value for -Dump: 3/Data::Dump::ObjectAsString.
+
+
 0.005   2019-12-09  Released-By: PERLANCAR; Urgency: medium
 
 	- -Dump: allow choosing Data::Dump instead of Data::Dmp.

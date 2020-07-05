@@ -1,6 +1,6 @@
 package Search::Elasticsearch::Client::5_0;
 
-our $VERSION='6.80';
+our $VERSION='6.81';
 use Search::Elasticsearch 6.00 ();
 
 1;
@@ -15,7 +15,7 @@ Search::Elasticsearch::Client::5_0 - Thin client with full support for Elasticse
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

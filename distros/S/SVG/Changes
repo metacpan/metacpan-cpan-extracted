@@ -1,5 +1,9 @@
 Revision history for Perl extension SVG.
 
+2.85  2020.07.02 MANWAR
+      - Minor documentation fix, thanks @polettix.
+      - Fixed broken author test (xt/author).
+
 2.84  2018.02.19 MANWAR
       - Removed '+x' bits from the script "xt/author/pod-syntax.t".
 

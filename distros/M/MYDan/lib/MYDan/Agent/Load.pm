@@ -88,7 +88,7 @@ sub run
 
     unless( $query = $run{query} )
     {
-        my %query = ( code => 'load', user => $run{user}, sudo => $run{sudo}, argv => [ $sp, $position ] );
+        my %query = ( code => $ENV{MYDan_Agent_Load_Code} || 'load', user => $run{user}, sudo => $run{sudo}, argv => [ $sp, $position ] );
 
         my $isc = $run{role} && $run{role} eq 'client' ? 1 : 0;
 

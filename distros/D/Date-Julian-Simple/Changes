@@ -1,5 +1,8 @@
 Revision history for Date::Julian::Simple
 
+0.12  Thu Jun 25 01:15:00 2020
+      - Check feb month days only when leap year.
+
 0.11  Fri Oct 18 12:40:00 2019
       - Updated dependency on Date::Utils v0.28.
 

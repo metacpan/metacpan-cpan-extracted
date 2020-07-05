@@ -2,8 +2,8 @@ NAME
     ColorTheme::Lens::Tint - Tint other theme
 
 VERSION
-    This document describes version 0.001 of ColorTheme::Lens::Tint (from
-    Perl distribution ColorTheme-Lens-Tint), released on 2020-06-09.
+    This document describes version 0.002 of ColorTheme::Lens::Tint (from
+    Perl distribution ColorTheme-Lens-Tint), released on 2020-06-19.
 
 DESCRIPTION
     This color theme tints RGB colors from other color scheme with another

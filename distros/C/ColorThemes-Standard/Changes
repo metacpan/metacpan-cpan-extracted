@@ -1,0 +1,8 @@
+0.002   2020-06-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add special property _no_color in ColorTheme::NoColor.
+
+
+0.001    2020-06-18  Released-By: PERLANCAR
+
+        - First, early release.

@@ -5,7 +5,7 @@
       "PortaOne <perl-radius at portaone.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -36,11 +36,12 @@
             "AnyEvent" : "0",
             "AnyEvent::Handle::UDP" : "0",
             "Class::Accessor::Fast" : "0",
-            "Data::Radius" : "v1.2.1",
+            "Data::Radius" : "v1.2.3",
             "perl" : "v5.10.0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.1"
+   "version" : "v1.1.2",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

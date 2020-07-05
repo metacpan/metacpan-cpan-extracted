@@ -10,7 +10,7 @@ OpenTracing::Types - Type constraints for checking Interfaces
 
 
 
-our $VERSION = 'v0.203.0';
+our $VERSION = 'v0.204.0';
 
 
 
@@ -78,6 +78,7 @@ use constant {
         finish
         add_tag
         add_tags
+        get_tags
         log_data
         add_baggage_item
         add_baggage_items

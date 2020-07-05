@@ -4,7 +4,7 @@ Ufal-MorphoDiTa package is a Perl bindings for MorphoDiTa library
 http://ufal.mff.cuni.cz/morphodita.
 
 In order to compile the package, compiler supporting C++11 is required,
-either g++ 4.7 or newer, or clang++ 3.2 or newer.
+either g++ 4.9 or newer, or clang++ 3.2 or newer.
 
 INSTALLATION
 

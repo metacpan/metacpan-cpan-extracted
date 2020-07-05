@@ -7,6 +7,8 @@ use Encode ();
 
 use Exporter qw/import/;
 
+use Sub::Util ();
+
 sub globref {
   my $pack = shift;
   unless (defined $pack) {
@@ -258,16 +260,24 @@ sub function_names {
   my $packname = delete $opts{from}     // caller;
   my $pattern  = delete $opts{matching} || qr{^[A-Za-z]\w+$};
   my $except   = delete $opts{except}   // qr{^import$};
+  my $grep     = delete $opts{grep};
   if (keys %opts) {
     croak "Unknown arguments: ".join(", ", keys %opts);
   }
   my $symtab = *{globref($packname, '')}{HASH};
   my @result;
-  foreach my $name (sort keys %$symtab) {
-    next unless *{$symtab->{$name}}{CODE};
-    next unless $name =~ $pattern;
-    next if $except and $name =~ $except;
-    push @result, $name;
+  foreach (sort keys %$symtab) {
+    my $item = $symtab->{$_};
+    defined (my $code = ref $item eq 'CODE' ? $item :
+             ref \$item eq 'GLOB' ? *{$item}{CODE} : undef)
+      or next;
+    my $realName = Sub::Util::subname($code);
+    my ($stash) = $realName =~ m/^(.+)::(.*?)$/;
+    next unless $stash eq $packname;
+    next unless $_ =~ $pattern;
+    next if $except and $_ =~ $except;
+    next if $grep and not $grep->($realName, $code);
+    push @result, $_;
   }
   @result;
 }

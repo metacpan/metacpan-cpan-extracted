@@ -1,5 +1,8 @@
 Revision history for perl distribution OpenAPI-Client
 
+0.25 2020-06-30T18:45:37+0900
+ - Fix setting correct request method on client errors
+
 0.24 2019-05-05T14:36:11+0700
  - Fix t/command-local-with-ref.t
 

@@ -1,5 +1,9 @@
 Change history for libwww-perl
 
+6.46      2020-06-23 21:19:26Z
+    - Fix a looping regression in 6.45 for redirect responses without
+      a Location header (GH PR#342, Niko Tyni)
+
 6.45      2020-06-08 14:51:28Z
     - Fix Client-Warning: Internal response sometimes reset (GH#341) (Jonathan
       Dahan and Julien Fiegehenn)

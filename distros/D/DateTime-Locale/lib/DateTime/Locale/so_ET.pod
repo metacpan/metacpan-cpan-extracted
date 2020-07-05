@@ -241,8 +241,8 @@ Somali Ethiopia locale.
 
 =head3 Narrow (format)
 
-  CH
-  CD
+  B
+  A
 
 =head2 Date Formats
 

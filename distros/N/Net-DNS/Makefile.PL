@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1781 2020-05-13 08:58:25Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1791 2020-06-26 14:34:36Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -222,7 +222,7 @@ sub dist {
 	return join '', shift->SUPER::dist(), <<'END';
 
 # $(PERM_RWX) raises security issues downstream
-PREOP =	$(NOECHO) $(CHMOD) $(PERM_RW) contrib$(DFSEP)* demo$(DFSEP)*
+PREOP = $(CHMOD) $(PERM_RW) $(DISTVNAME)$(DFSEP)contrib$(DFSEP)* $(DISTVNAME)$(DFSEP)demo$(DFSEP)*
 END
 }
 

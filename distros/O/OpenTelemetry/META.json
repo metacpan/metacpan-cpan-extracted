@@ -1,0 +1,100 @@
+{
+   "abstract" : "supporting for application process monitoring, as defined by opentelemetry.io",
+   "author" : [
+      "Tom Molesworth <TEAM@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "OpenTelemetry",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::TEAM" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "OpenTracing" : "0",
+            "indirect" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.94",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "OpenTelemetry" : {
+         "file" : "lib/OpenTelemetry.pm",
+         "version" : "0.001"
+      },
+      "OpenTelemetry::Any" : {
+         "file" : "lib/OpenTelemetry/Any.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/team-at-cpan/OpenTelemetry/issues"
+      },
+      "homepage" : "https://github.com/team-at-cpan/OpenTelemetry",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/team-at-cpan/OpenTelemetry.git",
+         "web" : "https://github.com/team-at-cpan/OpenTelemetry"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:TEAM",
+   "x_generated_by_perl" : "v5.30.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

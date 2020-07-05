@@ -71,7 +71,7 @@ See submodule documentation for details.
 
 The code in this module is a pure-perl implementation of the original DDC C++ and XS code,
 based on
-L<DDC::XS|DDC::XS> v0.19 and L<DDC|http://sourceforge.net/projects/ddc-concordance/files/ddc-concordance/> v2.1.15.
+L<DDC::XS|DDC::XS> v0.25 and L<DDC|http://sourceforge.net/projects/ddc-concordance/files/ddc-concordance/> v2.2.4.
 
 Newer features of the C++ query parser and its XS interface may not be supported.
 If you need to be 100% sure you're parsing queries exactly as the C++ DDC server does, use
@@ -140,7 +140,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2016-2018, Bryan Jurish.  All rights reserved.
+Copyright (c) 2016-2020, Bryan Jurish.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

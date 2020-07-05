@@ -1,6 +1,28 @@
 #include "Gzip.h"
 #include <iostream>
 #include "../error.h"
+#include <system_error>
+
+/* we need inflateReset2, which was added in 1.2.3.4, according to
+ * https://www.zlib.net/ChangeLog.txt
+ */
+
+#if ZLIB_VER_MAJOR != 1
+#if ZLIB_VER_MINOR != 2
+#if ZLIB_VER_REVISION < 3
+
+#error "minimum zlib version is 1.2.3.4"
+
+#elif ZLIB_VER_REVISION 3
+
+#if ZLIB_VER_SUBREVISION < 4
+#error "minimum zlib version is 1.2.3.4"
+#endif
+
+#endif
+#endif
+#endif
+
 
 namespace panda { namespace protocol { namespace http { namespace compression {
 
@@ -67,8 +89,9 @@ void Gzip::prepare_compress(Compression::Level level) noexcept {
 
 
 std::error_code Gzip::uncompress(const string& piece, Body& body) noexcept {
+    using Error = panda::protocol::http::errc;
     assert(mode == Mode::uncompress);
-    if (rx_done) { return errc::uncompression_failure; }
+    if (rx_done) { return Error::uncompression_failure; }
     string acc;
     acc.reserve(piece.size() * RX_BUFF_SCALE);
 
@@ -81,7 +104,7 @@ std::error_code Gzip::uncompress(const string& piece, Body& body) noexcept {
     std::error_code errc;
     auto consume_buff = [&](bool final){
         if (stream.total_out >= *max_body_size) {
-            errc = errc::body_too_large;
+            errc = Error::body_too_large;
             return false;
         }
 
@@ -103,7 +126,7 @@ std::error_code Gzip::uncompress(const string& piece, Body& body) noexcept {
         switch (r) {
         case Z_STREAM_END:
             if (!consume_buff(true)) { break; }
-            if (consumed_bytes != piece.size()) { errc = errc::uncompression_failure; }
+            if (consumed_bytes != piece.size()) { errc = Error::uncompression_failure; }
             else                                { rx_done = true; }
             enough = true;
             break;
@@ -120,7 +143,7 @@ std::error_code Gzip::uncompress(const string& piece, Body& body) noexcept {
                 break;
             }
         default:
-            errc = errc::uncompression_failure;
+            errc = Error::uncompression_failure;
             break;
         }
     } while (!errc && !enough);

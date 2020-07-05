@@ -4,7 +4,7 @@ WWW::Shorten::SCK - Perl interface to sck.pm
 
 # VERSION
 
-version 0.7
+version 0.8
 
 # SYNOPSIS
 
@@ -37,11 +37,11 @@ If anything goes wrong, then either function will return nothing.
 
 # SUPPORT, LICENSE, THANKS and SUCH
 
-See the main [WWW::Shorten](https://metacpan.org/pod/WWW::Shorten) docs.
+See the main [WWW::Shorten](https://metacpan.org/pod/WWW%3A%3AShorten) docs.
 
 # SEE ALSO
 
-[WWW::Shorten](https://metacpan.org/pod/WWW::Shorten), [perl](https://metacpan.org/pod/perl), [https://www.sck.pm/](https://www.sck.pm/)
+[WWW::Shorten](https://metacpan.org/pod/WWW%3A%3AShorten), [perl](https://metacpan.org/pod/perl), [https://www.sck.pm/](https://www.sck.pm/)
 
 # BUGS
 

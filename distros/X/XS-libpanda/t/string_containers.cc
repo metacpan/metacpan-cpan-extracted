@@ -4,9 +4,7 @@
 #include <panda/unordered_string_map.h>
 #include <panda/unordered_string_set.h>
 
-using namespace panda;
-using namespace test;
-using test::Allocator;
+#define TEST(name) TEST_CASE("string_containers: " name, "[string_containers]")
 
 using String = panda::basic_string<char, std::char_traits<char>, Allocator<char>>;
 
@@ -19,7 +17,7 @@ static const string_view nokey = "nokeynokeynokeynokeynokeynokeynokeynokeynokeyn
 static const string skey1 = string(key1);
 static const string skey2 = string(key2);
 
-TEST_CASE("string_map", "[string_containers]") {
+TEST("string_map") {
     string_map<String, string> c;
     c.emplace(skey1, val1);
     c.emplace(skey2, val2);
@@ -81,7 +79,7 @@ TEST_CASE("string_map", "[string_containers]") {
     }
 }
 
-TEST_CASE("string_multimap", "[string_containers]") {
+TEST("string_multimap") {
     string_multimap<String, string> c;
     c.emplace(skey1, val1);
     c.emplace(skey2, val2);
@@ -139,7 +137,7 @@ TEST_CASE("string_multimap", "[string_containers]") {
     }
 }
 
-TEST_CASE("unordered_string_map", "[string_containers]") {
+TEST("unordered_string_map") {
     unordered_string_map<String, string> c;
     c.emplace(skey1, val1);
     c.emplace(skey2, val2);
@@ -189,7 +187,7 @@ TEST_CASE("unordered_string_map", "[string_containers]") {
     }
 }
 
-TEST_CASE("unordered_string_multimap", "[string_containers]") {
+TEST("unordered_string_multimap") {
     unordered_string_multimap<String, string> c;
     c.emplace(skey1, val1);
     c.emplace(skey2, val2);
@@ -239,7 +237,7 @@ TEST_CASE("unordered_string_multimap", "[string_containers]") {
     }
 }
 
-TEST_CASE("string_set", "[string_containers]") {
+TEST("string_set") {
     string_set<String> c;
     c.emplace(skey1);
     c.emplace(skey2);
@@ -295,7 +293,7 @@ TEST_CASE("string_set", "[string_containers]") {
     }
 }
 
-TEST_CASE("string_multiset", "[string_containers]") {
+TEST("string_multiset") {
     string_multiset<String> c;
     c.emplace(skey1);
     c.emplace(skey2);
@@ -353,7 +351,7 @@ TEST_CASE("string_multiset", "[string_containers]") {
     }
 }
 
-TEST_CASE("unordered_string_set", "[string_containers]") {
+TEST("unordered_string_set") {
     unordered_string_set<String> c;
     c.emplace(skey1);
     c.emplace(skey2);
@@ -397,7 +395,7 @@ TEST_CASE("unordered_string_set", "[string_containers]") {
     }
 }
 
-TEST_CASE("unordered_string_multiset", "[string_containers]") {
+TEST("unordered_string_multiset") {
     unordered_string_multiset<String> c;
     c.emplace(skey1);
     c.emplace(skey2);

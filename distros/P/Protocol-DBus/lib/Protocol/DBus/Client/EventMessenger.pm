@@ -42,11 +42,49 @@ sub send_error { _wrap_send( 'send_error', @_ ) }
 
 sub send_signal { _wrap_send( 'send_signal', @_ ) }
 
+=pod
+
+The following control whether to accept incoming messages from D-Bus:
+
+=over
+
+=item * C<pause()>
+
+=item * C<resume()>
+
+=back
+
+=cut
+
+sub pause { $_[0][2]->(); return $_[0] }
+sub resume { $_[0][3]->(); return $_[0] }
+
+=pod
+
+Additional methods:
+
+=over
+
+=item * C<get_unique_bus_name()> - A passthrough to
+the L<Protocol::DBus::Client> method of the same name.
+
+=cut
+
+sub get_unique_bus_name {
+    return $_[0]->_dbus()->get_unique_bus_name();
+}
+
+=back
+
+=cut
+
+#----------------------------------------------------------------------
+
 # Undocumented
 sub new {
-    my ($class, $dbus, $post_send_cr) = @_;
+    my ($class, $dbus, $post_send_cr, $pause_cr, $resume_cr) = @_;
 
-    return bless [$dbus, $post_send_cr], $class;
+    return bless [$dbus, $post_send_cr, $pause_cr, $resume_cr], $class;
 }
 
 # for testing

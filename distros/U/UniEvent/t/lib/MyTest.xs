@@ -1,5 +1,5 @@
-#include <xs/unievent.h>
 #include "test.h"
+#include <xs/unievent.h>
 
 MODULE = MyTest                PACKAGE = MyTest
 PROTOTYPES: DISABLE

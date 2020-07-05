@@ -22,6 +22,7 @@ use warnings;
 
 use DBI;
 use Mojo::Template;
+use Mojo::UserAgent;
 use SReview::Config::Common;
 
 =head1 NAME
@@ -115,14 +116,15 @@ redirect output to.
 my $state_actions = $config->get('state_actions');
 
 my $mt = Mojo::Template->new;
+my $ua = Mojo::UserAgent->new;
 
 $mt->vars(1);
 
 while(1) {
 	$dbh->begin_work;
 	print "==> Checking for new work...\n";
-	my $next = $dbh->prepare("UPDATE talks SET state = state_next(state), progress='waiting' WHERE id = ?");
 	my $start = $dbh->prepare("UPDATE talks SET progress = 'scheduled' WHERE id = ?");
+	my $publishing = $dbh->prepare("SELECT talks.id FROM talks JOIN events ON events.id = talks.event WHERE state='publishing' AND events.name = ?");
 
 	my $st;
 	my $statelist = "'" . join("','", keys(%{$state_actions})) . "'";
@@ -143,6 +145,7 @@ same database if wanted.
 
 =cut
 
+	$dbh->prepare("UPDATE talks SET state=state_next(state), progress='waiting' WHERE progress='done' AND event = (SELECT id FROM events WHERE name = ?)")->execute($config->get('event'));
 	if($config->get('query_limit') > 0) {
 		$st = $dbh->prepare("SELECT talks.id, state, progress, title, rooms.name AS room, extract(epoch from (endtime - starttime)) AS length FROM talks JOIN rooms ON rooms.id = talks.room JOIN events ON events.id = talks.event WHERE (state IN ($statelist) AND progress = 'waiting' AND events.name = ?) OR progress = 'done' LIMIT ?");
 		$st->execute($config->get('event'), $config->get('query_limit'));
@@ -151,11 +154,6 @@ same database if wanted.
 		$st->execute($config->get('event'));
 	}
 	while(my $row = $st->fetchrow_hashref) {
-		if($row->{progress} eq "done") {
-			print "Job for event " . $row->{title} . " in state " . $row->{state} . " finished, migrating it to the next state\n";
-			$next->execute($row->{id});
-			next;
-		}
 		if(exists(${$state_actions}{$row->{state}})) {
 			print "Starting job for event " . $row->{title} . " in state " . $row->{state} . "...\n";
 			$start->execute($row->{id});
@@ -172,6 +170,38 @@ stderr and a file for stdout for each script run.
 =cut
 
 			system $mt->render($statetrans, {talkid => $row->{id}, room => $row->{room}, length => $row->{length}, output_dir => $config->get('script_output')});
+		}
+	}
+	$publishing->execute($config->get('event'));
+	if(!defined($config->get('published_headers')) || !defined($config->get('eventurl_format'))) {
+		$dbh->prepare("UPDATE talks SET progress='done' WHERE state='publishing' AND event = (SELECT id FROM events WHERE name = ?)")->execute($config->get('event'));
+	} else {
+		while(my $row = $publishing->fetchrow_hashref) {
+                        my $url = SReview::Talk->new(talkid => $row->{id})->eventurl;
+			my $res = $ua->head($url)->result;
+			my $is_ok = 1;
+			my $headers = $config->get('published_headers');
+			foreach my $header(keys %{$headers}) {
+				if($header eq '_code') {
+					if($res->code ne $headers->{_code}) {
+						$is_ok = 0;
+						last;
+					}
+				} else {
+					my $val;
+					eval "\$val = \$res->$header;";
+					if($@) {
+						die $!
+					}
+					if($headers->{$header} ne $val) {
+						$is_ok = 0;
+						last;
+					}
+				}
+			}
+			if($is_ok) {
+				$dbh->prepare("UPDATE talks SET progress='done' WHERE id = ?")->execute();
+                        }
 		}
 	}
 	print "finished, waiting 10 seconds...\n";

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::0_90::Role::Bulk;
-$Search::Elasticsearch::Client::0_90::Role::Bulk::VERSION = '6.80';
+$Search::Elasticsearch::Client::0_90::Role::Bulk::VERSION = '6.81';
 use Moo::Role;
 requires 'add_action', 'flush';
 
@@ -286,7 +286,7 @@ Search::Elasticsearch::Client::0_90::Role::Bulk - Provides common functionality 
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 AUTHOR
 

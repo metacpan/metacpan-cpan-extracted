@@ -7,16 +7,13 @@ package Vote::Count::Borda;
 
 use Moose::Role;
 
-# use Storable 3.15 qw(dclone);
-# use Try::Tiny;
-
-our $VERSION='1.01';
+our $VERSION='1.03';
 
 =head1 NAME
 
 Vote::Count::Borda
 
-=head1 VERSION 1.01
+=head1 VERSION 1.03
 
 =cut
 
@@ -25,9 +22,8 @@ Vote::Count::Borda
 no warnings 'experimental';
 use List::Util qw( min max );
 use Vote::Count::RankCount;
-# use Try::Tiny;
-# use boolean;
-# use Data::Printer;
+use Try::Tiny;
+use Data::Dumper;
 
 has 'bordaweight' => (
   is      => 'rw',
@@ -37,6 +33,17 @@ has 'bordaweight' => (
 );
 
 has 'bordadepth' => (
+  is      => 'rw',
+  isa     => 'Int',
+  default => 0,
+);
+
+# Many real world Borda implmentations use 1
+# for unranked default. The way unranked choices are valued
+# relies on NonApproval (from Approval), which does not 
+# support overriding the Active Set. Because this is a low 
+# priority function the limitation is acceptable. 
+has 'unrankdefault' => (
   is      => 'rw',
   isa     => 'Int',
   default => 0,
@@ -54,23 +61,31 @@ has 'bordadepth' => (
 
 =head1 Borda Count
 
-Scores Choices based on their position on the Ballot. The first choice candidate gets a score equal to the number of choices, each lower choice recieves 1 less.
+Scores Choices based on their position on the Ballot. The first choice candidate gets a score equal to the number of choices, each lower choice receives 1 less.
 
-Variations mostly relate to altering the Borda Weight for scoring. The original method scored unranked choices at 1, optionally they may be scored as 0 (which is the current module behaviour).
+The Borda Count is trying to Cardinally value Preferential choices, for this reason where the Borda Count is an appropriate method it is a better to use a Range Ballot instead of Preferential so that the voters may assign the Cardinal values.
 
-=head2 Borda Wieght and Depth
+=head1 Variations on the Borda Count
 
-Numerous alternate weightings have been used.
+One major criticism of the count is that when there are many choices the difference between a first and second choice becomes negligible. A large number of alternative weightings have been used to address this. 
 
-One alternative is to score for the number of choices after the current one -- in a five choice race first is worth 4 and last is worth 0.
+=head2 Borda Depth (bordadepth parameter)
 
-One major criticism of the count is that when there are many choices the difference between a first and second choice becomes negligable. Many of the alternate weights address this by either limiting the maximum depth, fixing the depth or using a different scaling such as 1/x where x is the position of the choice (1 is worth 1, 3 is 1/3).
+One of the simpler variations is to fix the depth, when the depth is set to a certain number the weighting is as if the ballot had that many choices, and choices ranked lower than the depth are scored 0. If there are eight choices and a depth of 3, a first choice is worth 3, a 3rd 1, and later choices are ignored 
 
-Range Voting Methods such as STAR typically use a fixed depth count where voters may rank choices equally.
+=head2 Borda Weight (bordaweight parameter)
 
-When Creating a VoteCount object the Borda weight may be set by passing a coderef. The coderef takes two arguments. The first argument is the
-position of the choice in question. The second argument is the depth of the ballot. The optional bordadepth attribute will set an arbitrary
-depth. Some popular options such inversion (where choice $c becomes $c/1 then inverted to 1/$c) don't  need to know the depth. In such cases the coderef should just ignore the second argument.
+Some of the popular alternate weighting systems include:
+
+=over
+
+=item * different scaling such as 1/x where x is the position of the choice (1 is worth 1, 3 is 1/3). 
+
+=item * Another popular alternative is to score for one less than the number of choices -- in a five choice race first is worth 4 and last is worth 0.
+
+=back
+
+When Creating a VoteCount object a custom Borda weight may be set by passing a coderef for bordaweight. The coderef takes two arguments. The first argument is the position of the choice in question. The second argument is optional for passing the depth of the ballot to the coderef. Some popular options such inversion (where choice $c becomes $c/1 then inverted to 1/$c) don't need to know the depth. In such cases the coderef should just ignore the second argument.
 
   my $testweight = sub {
     my $x = int shift @_;
@@ -82,17 +97,18 @@ depth. Some popular options such inversion (where choice $c becomes $c/1 then in
     bordaweight => $testweight,
   );
 
+=head2 unrankdefault
+
+Jean-Charles de Borda expected voters to rank all available choices. When they fail to do this the unranked choices need to be handled. The default in Vote::Count is to score unranked choices as 0. However, it is also common to score them as 1. Vote::Count permits using any Integer for this valuation.  
+
+  my $VC2 = Vote::Count->new(
+    BallotSet   => read_ballots('t/data/data2.txt'),
+    unrankdefault => 1,
+  );
+
 =head1 Method Borda
 
-Returns a RankCount Object with the scores per the weighting rule, for Ranked Choice Ballots.
-
-=head1 Method Score
-
-Returns a RankCount Object with the choices scored using the scores set by the voters, for Range Ballots.
-
-=head1 To Do
-
-Since there are so many variations of Borda, it would be nice to offer a large array of presets. Currently options are only handled by passing a coderef at object creation. Borda for RCV is not a priority for the developer.
+Returns a RankCount Object with the scores per the weighting rule, for Ranked Choice Ballots. Optional Parameter is a hashref defining an active set.
 
 =cut
 
@@ -103,15 +119,11 @@ sub _buildbordaweight {
     }
 }
 
-=pod
+# Private Method _bordashrinkballot( $BallotSet, $active )
 
-=head3 Private Method _bordashrinkballot( $BallotSet, $active )
-
-Takes a BallotSet and active list and returns a
-BallotSet reduced to only the active choices. When
-choices are removed later choices are promoted.
-
-=cut
+# Takes a BallotSet and active list and returns a
+# BallotSet reduced to only the active choices. When
+# choices are removed later choices are promoted.
 
 sub _bordashrinkballot ( $BallotSet, $active ) {
   my $newballots = {};
@@ -119,9 +131,8 @@ sub _bordashrinkballot ( $BallotSet, $active ) {
   for my $b ( keys %ballots ) {
     my @newballot = ();
     for my $item ( $ballots{$b}{'votes'}->@* ) {
-      if ( defined $active->{$item} ) {
-        push @newballot, $item;
-      }
+      try { if (  $active->{$item} ) { push @newballot, $item } }
+      catch {};
     }
     if ( scalar(@newballot) ) {
       $newballots->{$b}{'votes'} = \@newballot;
@@ -133,7 +144,7 @@ sub _bordashrinkballot ( $BallotSet, $active ) {
 }
 
 sub _dobordacount ( $self, $BordaTable, $active ) {
-  my $BordaCount = {};
+    my $BordaCount = {};
   my $weight     = $self->bordaweight;
   my $depth =
       $self->bordadepth
@@ -152,11 +163,18 @@ sub _dobordacount ( $self, $BordaTable, $active ) {
 sub Borda ( $self, $active = undef ) {
   my %BallotSet = $self->BallotSet()->%*;
   my %ballots   = ();
+  if ( defined $active ) {
+    die q/unrankdefault other than 0 is not compatible with overriding the 
+        Active Set. To fix this use the SetActive method to update the active
+        set, then call this (Borda) method without passing an active set./
+    if $self->unrankdefault();
+  }
   $active = $self->Active() unless defined $active;
   %ballots = %{ _bordashrinkballot( \%BallotSet, $active ) };
-  my %BordaTable = ( map { $_ => {} } keys( $active->%* ) );
-  for my $b ( keys %ballots ) {
-    my @votes  = $ballots{$b}->{'votes'}->@*;
+  my %BordaTable = ( map { $_ => {} } keys( $active->%* ) );  
+BORDALOOPACTIVE:    
+  for my $b ( keys %ballots ) { 
+    my @votes  = $ballots{$b}->{'votes'}->@* ;
     my $bcount = $ballots{$b}->{'count'};
     for ( my $i = 0 ; $i < scalar(@votes) ; $i++ ) {
       my $c = $votes[$i];
@@ -164,6 +182,12 @@ sub Borda ( $self, $active = undef ) {
     }
   }
   my $BordaCounted = _dobordacount( $self, \%BordaTable, $active );
+  if ( $self->unrankdefault() ) {
+    my $unranked = $self->NonApproval()->RawCount();
+    for my $u ( keys $unranked->%* ) {
+      $BordaCounted->{$u} += $unranked->{$u} * $self->unrankdefault() 
+    }
+  }
   return Vote::Count::RankCount->Rank($BordaCounted);
 }
 
@@ -183,7 +207,7 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2020,2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 LICENSE
 

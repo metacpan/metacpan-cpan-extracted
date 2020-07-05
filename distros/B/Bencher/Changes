@@ -1,3 +1,11 @@
+1.050   2020-06-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Resynchronize version number with Bencher-Backend.
+
+	- Introduce module_startup_precision property, deprecate
+	  default_precision.
+
+
 1.043   2019-11-20  Released-By: PERLANCAR; Urgency: medium
 
         - [build] Rebuild with updated Sah coerce rule module names.

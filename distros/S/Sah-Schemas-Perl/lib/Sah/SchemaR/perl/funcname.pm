@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::funcname;
 
-our $DATE = '2020-06-16'; # DATE
-our $VERSION = '0.033'; # VERSION
+our $DATE = '2020-06-19'; # DATE
+our $VERSION = '0.034'; # VERSION
 
 our $rschema = ["str",[{description=>"\nCurrently function name is restricted to this regex:\n\n    \\A[A-Za-z_][A-Za-z_0-9]*\\z\n\nFunction name can be qualified (prefixed) by a package name, which is restricted\nto this regex:\n\n    [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\n\n",match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)?[A-Za-z_]([A-Za-z_0-9]+)*\\z",summary=>"Perl function name, either qualified with package name (e.g. Foo::subname) or unqualified (e.g. subname)"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::funcname - Perl function name, either qualified with package
 
 =head1 VERSION
 
-This document describes version 0.033 of Sah::SchemaR::perl::funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
+This document describes version 0.034 of Sah::SchemaR::perl::funcname (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

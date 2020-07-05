@@ -12,18 +12,33 @@ use version;
 use Carp;
 use English qw/ -no_match_vars /;
 use YAML::Syck;
+use Path::Tiny;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.12');
+our $VERSION = version->new('0.1.13');
 our $NAME    = 'who';
 our $OPTIONS = [
+    'set|s=s',
     'verbose|v+',
 ];
 sub details_sub { return ( $NAME, $OPTIONS )};
 
 sub run {
     my ($self) = @_;
+
+    if ($self->defaults->{set}) {
+        my $file = path($self->defaults->{set})->absolute;
+        my $dir = $file->parent;
+        my $config = LoadFile($file);
+        print <<"EXPORTS";
+export VTIDE_NAME="$config->{name}"
+export VTIDE_CONFIG="$file"
+export VTIDE_DIR="$dir"
+export VTIDE_TERM=99
+EXPORTS
+        return;
+    }
 
     if ( ! $ENV{VTIDE_NAME} ) {
         print "Not in a VTide session\n";
@@ -54,13 +69,15 @@ App::VTide::Command::Who - Tells you about the terminal you are in
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Who version 0.1.12
+This documentation refers to App::VTide::Command::Who version 0.1.13
 
 =head1 SYNOPSIS
 
-    vtide who [-f|--force]
+    vtide who [[-s|--set] path/to/.vtide.yml]
 
     OPTIONS
+     -s --set[=]file
+                    Set the current terminal to use the supplied config file
      -v --verbose   Show more detailed output
         --help      Show this help
         --man       Show the full man page

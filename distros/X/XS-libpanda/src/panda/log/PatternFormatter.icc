@@ -1,0 +1,168 @@
+#include "PatternFormatter.h"
+#include "../exception.h"
+
+#ifdef _WIN32
+    #include <process.h>
+    #define _PANDA_GETPID _getpid()
+    #define _PANDA_LOCALTIME(epoch_ptr, tm_ptr) (localtime_s(tm_ptr, epoch_ptr) == 0)
+#else
+    #include <unistd.h>
+    #define _PANDA_GETPID getpid()
+    #define _PANDA_LOCALTIME(epoch_ptr, tm_ptr) (localtime_r(epoch_ptr, tm_ptr) != nullptr)
+#endif
+
+#ifdef _GNU_SOURCE
+    extern char* program_invocation_name;
+    static inline const char* get$0 () { return program_invocation_name; }
+#else
+    static inline const char* get$0 () { return "<unknown>"; }
+#endif
+
+namespace panda { namespace log {
+
+string_view default_format = "%1t %c[%L/%1M]%C %f:%l,%F(): %m";
+
+void set_format (string_view pattern) {
+    set_formatter(new PatternFormatter(pattern));
+}
+
+#ifdef _WIN32
+    static const char* colors[] = {nullptr};
+#else
+    static const char* colors[] = {nullptr, nullptr, nullptr, nullptr, "\e[33m", "\e[31m", "\e[41m", "\e[41m", "\e[41m"};
+#endif
+    
+static const char  clear_color[] = "\e[0m";
+static const char* dates[] = {"%Y-%m-%d %H:%M:%S", "%y-%m-%d %H:%M:%S", "%H:%M:%S"};
+
+static void add_mks (string& dest, long nsec, unsigned prec) {
+    dest += '.';
+    if (nsec < 100000000) dest += '0';
+    if (nsec < 10000000)  dest += '0';
+    if (nsec < 1000000)   dest += '0';
+    if (nsec < 100000)    dest += '0';
+    if (nsec < 10000)     dest += '0';
+    if (nsec < 1000)      dest += '0';
+    if (nsec < 100)       dest += '0';
+    if (nsec < 10)        dest += '0';
+    dest += panda::to_string(nsec);
+    dest.length(dest.length() - 9 + prec);
+}
+
+static inline void ymdhms (string& dest, time_t epoch, unsigned type) {
+    struct tm dt;
+    if (!_PANDA_LOCALTIME(&epoch, &dt)) return;
+
+    auto cap = 23;
+    string tmp(cap);
+
+    assert(type < 3);
+    auto len = strftime(tmp.buf(), cap, dates[type], &dt);
+    tmp.length(len);
+
+    dest += tmp;
+}
+
+string PatternFormatter::format (std::string& msg, const Info& info) const {
+    auto len = _fmt.length();
+    auto s   = _fmt.data();
+    auto se  = s + len;
+    string ret((len > 25 ? len*2 : 50) + msg.length());
+
+    while (s < se) {
+        char c = *s++;
+        if (c != '%' || s == se) {
+            ret += c;
+            continue;
+        }
+
+        unsigned x = 0, y = 0;
+        bool dot = false;
+
+        SWITCH:
+        switch (*s++) {
+            case 'F': {
+                if (info.func.length()) ret += info.func;
+                else                    ret += "<top>";
+                break;
+            }
+            case 'f': {
+                if (x) ret += info.file;
+                else {
+                    auto file = info.file;
+                    auto pos = file.rfind('/');
+                    if (pos < file.length()) file = file.substr(pos+1);
+                  #ifdef _WIN32
+                    pos = file.rfind('\\');
+                    if (pos < file.length()) file = file.substr(pos+1);
+                  #endif
+                    ret += file;
+                }
+                break;
+            }
+            case 'l': ret += panda::to_string(info.line);           break;
+            case 'm': ret += string_view(msg.data(), msg.length()); break;
+            case 'M': {
+                if (info.module->name.length()) ret += info.module->name;
+                else {
+                    if (x && ret.length() >= x) ret.length(ret.length() - x);
+                    s += y;
+                }
+                break;
+            }
+            case 'L': {
+                switch (info.level) {
+                    case VERBOSE_DEBUG : ret += "DEBUG";     break;
+                    case DEBUG         : ret += "debug";     break;
+                    case INFO          : ret += "info";      break;
+                    case NOTICE        : ret += "notice";    break;
+                    case WARNING       : ret += "warning";   break;
+                    case ERROR         : ret += "error";     break;
+                    case CRITICAL      : ret += "critical";  break;
+                    case ALERT         : ret += "alert";     break;
+                    case EMERGENCY     : ret += "emergency"; break;
+                    default: break;
+                }
+                break;
+            }
+            case 't': {
+                if (x < 3) ymdhms(ret, info.time.tv_sec, x);
+                else       ret += panda::to_string(info.time.tv_sec);
+                if (y) add_mks(ret, info.time.tv_nsec, y);
+                break;
+            }
+            case 'T': {
+                std::stringstream ss;
+                ss << std::this_thread::get_id();
+                auto str = ss.str();
+                ret.append(str.data(), str.length());
+                break;
+            }
+            case 'p': {
+                ret += panda::to_string(_PANDA_GETPID);
+                break;
+            }
+            case 'P': {
+                ret += get$0();
+                break;
+            }
+            case 'c': if (colors[info.level]) ret += colors[info.level]; break;
+            case 'C': if (colors[info.level]) ret += clear_color; break;
+            case '.': {
+                if (s == se) throw exception("bad formatter pattern");
+                dot = true;
+                goto SWITCH;
+            }
+            default: {
+                char c = *(s-1);
+                if (s == se || c < '0' || c > '9') throw exception("bad formatter pattern");
+                (dot ? y : x) = c - '0';
+                goto SWITCH;
+            }
+        }
+    }
+
+    return ret;
+}
+
+}}

@@ -1,8 +1,12 @@
-package Raisin::Routes::Endpoint;
+#!perl
+#PODNAME: Raisin::Routes::Endpoint
+#ABSTRACT: Endpoint class for Raisin::Routes.
 
 use strict;
 use warnings;
 
+package Raisin::Routes::Endpoint;
+$Raisin::Routes::Endpoint::VERSION = '0.90';
 use Plack::Util::Accessor qw(
     check
     code
@@ -111,9 +115,17 @@ sub match {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Raisin::Routes::Endpoint - Endpoint class for Raisin::Routes.
+
+=head1 VERSION
+
+version 0.90
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -121,11 +133,13 @@ This module was inspired by L<Kelp::Routes::Pattern>.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh E<lt>atE<gt> cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

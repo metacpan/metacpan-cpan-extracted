@@ -1,6 +1,10 @@
 Changelog for Log-Any-Adapter-Sentry-Raven
 
-v0.0.4 2020-05-07T22:07:45
+v0.0.5 2020-07-02T15:09:41
+ - run `make update` for v0.0.5 (Mark Flickinger)
+ - Avoid buggy Sentry::Raven version (jrubinator)
+
+v0.0.4 2020-05-04T20:19:44
  - run `make update` for v0.0.4 (Jonathan Rubin)
  - Properly set default test behavior (Jonathan Rubin)
  - Move custom test package to the top (Jonathan Rubin)

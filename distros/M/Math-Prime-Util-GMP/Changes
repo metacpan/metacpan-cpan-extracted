@@ -1,6 +1,49 @@
 Revision history for Perl module Math::Prime::Util::GMP
 
-0.51 2018-02-27
+0.52 2020-06-22
+
+    [ADDED]
+
+    - powint(a,b)             integer a^b
+    - mulint(a,b)             integer a*b
+    - addint(a,b)             integer a+b
+    - subint(a,b)             integer a-b
+    - divint(a,b)             integer a/b quotient  (floor)
+    - modint(a,b)             integer a/b modulo    (floor)
+    - divrem(a,b)             integer a/b quo + rem (Euclidian)
+    - tdivrem(a,b)            integer a/b quo + rem (truncated)
+    - absint(n)               integer absolute value
+    - negint(n)               integer negate: returns -n
+    - is_gaussian_prime(a,b)  is a+bi a Gaussian prime
+    - random_safe_prime(b)    random b-bit safe prob prime
+    - next_twin_prime(n)      returns start of twin prime > n
+
+    [FIXES]
+
+    - Remove a mod in the AKS test that was in code since 2012.
+
+    - squfof126 was not portable. GMP 6.2.0 changed to lazy allocation
+      causing the code to fail.  Rewrote function to be more portable.
+
+    - is_totient for powers of 2 was returning 0.  Thanks Trizen.
+
+    - LambertW could fault if given inputs very near the branch point.
+
+    [PERFORMANCE]
+
+    - Trizen suggested binary splitting LCM.  Much faster for big lists.
+
+    - Trizen improved speed of lucas sequence for large n and even modulus.
+
+    - todigits uses a subquadratic algorithm.  Thanks to Trizen for request.
+
+    - sieving depth for large sizes wasn't optimal on 32-bit machines.
+      Thanks to Seth Troisi.
+
+    - LambertW is about 2x faster due to a better and faster initial estimate.
+
+
+0.51 2018-08-27
 
     [ADDED]
 

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::5_0::Async::Scroll;
-$Search::Elasticsearch::Client::5_0::Async::Scroll::VERSION = '6.80';
+$Search::Elasticsearch::Client::5_0::Async::Scroll::VERSION = '6.81';
 use Moo;
 use Search::Elasticsearch::Util qw(parse_params throw);
 use Search::Elasticsearch::Async::Util qw(thenable);
@@ -219,7 +219,7 @@ Search::Elasticsearch::Client::5_0::Async::Scroll - A helper module for scrolled
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,34 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Dist::Zilla::PluginBundle::Author::DERIV
+at lib/Dist/Zilla/PluginBundle/Author/DERIV.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Dist::Zilla::PluginBundle::Author::DERIV - yet another plugin bundle for Dist::Zilla
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moose::Object>
+
+L<BUILDALL|Moose::Object/BUILDALL>, L<BUILDARGS|Moose::Object/BUILDARGS>, L<DEMOLISHALL|Moose::Object/DEMOLISHALL>, L<DOES|Moose::Object/DOES>, L<does|Moose::Object/does>, L<dump|Moose::Object/dump>
+
+=back
+
+=head1 DESCRIPTION
+
+See L<https://metacpan.org/author/DERIV> for modules which may possibly use this.
+
+=head1 AUTHOR
+
+Deriv Services Ltd C<< <DERIV@cpan.org> >>, but initially started as an exact copy of L<Dist::Zilla::PluginBundle::Author::TEAM>
+
+Copyright Deriv Services Ltd 2020. Licensed under the same terms as Perl itself.
+

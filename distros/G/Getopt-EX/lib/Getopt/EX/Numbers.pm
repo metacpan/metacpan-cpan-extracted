@@ -15,6 +15,8 @@ $obj->parse("start:end:step:length")->sequence;
 
 Getopt::EX::Numbers->new->parse("1:10:2")->sequence;
 
+Getopt::EX::Numbers->new(start=>1,end=>10,step=>2)->sequence;
+
 =head1 FORMAT
 
 Number format is composed by four elements: C<start>, C<end>, C<step>
@@ -49,9 +51,13 @@ means C<3,3,3,3,3>.  C<2:6:2{3}> means C<2,4,6,2,4,6,2,4,6>.
 
 =over 4
 
-=item B<new> ( [ B<min> => n ] , [ B<max> => m ] )
+=item B<new> ( [ B<min> => n ] , [ B<max> => m ] ... )
 
 Create object with optional parameter B<min> and B<max>.
+
+Other parameters (B<start>, B<end>, B<step>, B<length>) also can be
+specified with B<new> method.  This is equivalent to use B<parse>
+method.
 
 =item B<parse>(I<spec>)
 
@@ -76,7 +82,7 @@ Return number sequence:
 
 package Getopt::EX::Numbers;
 
-use strict;
+use v5.14;
 use warnings;
 
 use Carp;
@@ -91,7 +97,11 @@ use Moo;
 
 has [ qw(min max start end step length _spec) ] => ( is => 'rw' ) ;
 
+has [ qw(+start +end +step +length) ] => ( default => '' ) ;
+
 has '+min' => ( default => 0 ) ;
+
+no Moo;
 
 sub parse {
     my $obj = shift;

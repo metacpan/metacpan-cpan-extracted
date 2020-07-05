@@ -4,7 +4,7 @@ use warnings;
 
 require 5.008_001;
 
-our $VERSION = '0.25';
+our $VERSION = '0.28';
 $VERSION = eval {$VERSION};
 
 
@@ -39,7 +39,7 @@ Net::SAML2
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 

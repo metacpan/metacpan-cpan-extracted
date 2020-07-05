@@ -1,9 +1,9 @@
 package Sah::Schema::perl::podname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-16'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 our $schema = ['str' => {
     summary => 'Perl POD name, e.g. Moose::Cookbook',
@@ -40,7 +40,7 @@ Sah::Schema::perl::podname - Perl POD name, e.g. Moose::Cookbook
 
 =head1 VERSION
 
-This document describes version 0.033 of Sah::Schema::perl::podname (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
+This document describes version 0.034 of Sah::Schema::perl::podname (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
 
 =head1 SYNOPSIS
 

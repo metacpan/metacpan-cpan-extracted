@@ -8,12 +8,12 @@ What is it?
 
 Where can (did) I get it?
 -------------------------
-   http://hea-www.harvard.edu/~rpete/cfitsio
-   http://www.perl.com/CPAN/authors/id/P/PR/PRATZLAFF
+   https://hea-www.harvard.edu/~rpete/cfitsio
+   https://www.perl.com/CPAN/authors/id/P/PR/PRATZLAFF
 
 What version of cfitsio does this module require?
 ----------------------------------------------
-  Astro::FITS::CFITSIO version 1.12 requires at least cfitsio version 3.44
+  Astro::FITS::CFITSIO version 1.14 requires at least cfitsio version 3.48
 
 Installation
 ------------
@@ -21,14 +21,14 @@ Installation
    distribution directory. Essentially, it just tells you to set the
    CFITSIO environment variable, and then do
 
-     $ perl Makefile.PL OPTIMIZE=-O0
+     $ perl Makefile.PL
      $ make
      $ make test
      $ make install
 
 Copyright and License
 ---------------------
-   Copyright (C) 2002,2004,2006,2011,2012,2013,2016,2018 by the
+   Copyright (C) 2002,2004,2006,2011,2012,2013,2016,2018,2020 by the
    Smithsonian Astrophysical Observatory.
 
    This software is released under the same terms as Perl. A copy of

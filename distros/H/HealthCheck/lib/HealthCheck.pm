@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: A health check for your code
 use version;
-our $VERSION = 'v1.5.4'; # VERSION: 0.01
+our $VERSION = 'v1.5.5'; # VERSION: 0.01
 
 use 5.010;
 use strict;
@@ -55,11 +55,11 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod     );
 #pod
 #pod     # It's possible to add ids, labels, and tags to your checks
-#pod     # and they will be copied to the Result
+#pod     # and they will be copied to the Result.
 #pod     $other_checker->register( My::Checker->new(
-#pod         id    => 'my_checker',
-#pod         label => 'My Checker',
-#pod         tags  => [qw( cheap copied_to_the_result )]
+#pod         id      => 'my_checker',
+#pod         label   => 'My Checker',
+#pod         tags    => [qw( cheap copied_to_the_result )],
 #pod     ) );
 #pod
 #pod     # You can add HealthCheck instances as checks
@@ -145,12 +145,35 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod                     tags   => [ "cheap", "easy" ],
 #pod                     status => "WARNING",
 #pod                 },
-#pod                 {   id     => "object_method",
+#pod                 {   id     => "object_method_1",
 #pod                     label  => "My Checker",
 #pod                     tags   => [ "cheap", "copied_to_the_result" ],
 #pod                     status => "WARNING",
 #pod                 }
 #pod             ],
+#pod         }
+#pod     ],
+#pod
+#pod There is also runtime support,
+#pod which can be enabled by adding a truthy C<runtime> param to the C<check>.
+#pod
+#pod     $checker->check( tags => [ 'easy', '!fast' ], runtime => 1 );
+#pod
+#pod     id      => "my_health_check",
+#pod     label   => "My Health Check",
+#pod     runtime => "0.000",
+#pod     tags    => [ "cheap", "easy" ],
+#pod     status  => "WARNING",
+#pod     results => [
+#pod         {   id      => "class_method",
+#pod             runtime => "0.000",
+#pod             tags    => [ "cheap", "easy" ],
+#pod             status  => "WARNING",
+#pod         },
+#pod         {   id      => "object_method",
+#pod             runtime => "0.000",
+#pod             tags    => [ "cheap", "easy" ],
+#pod             status  => "WARNING",
 #pod         }
 #pod     ],
 #pod
@@ -167,6 +190,8 @@ Hash::Util::FieldHash::fieldhash my %registered_checks;
 #pod
 #pod A fast HTTP endpoint that can be used to verify that a web app can
 #pod serve traffic.
+#pod To this end, it may be useful to use the runtime support option,
+#pod available in L<HealthChecks::Diagnostic>.
 #pod
 #pod =item *
 #pod A more complete check that verifies all the things work after a deployment.
@@ -552,7 +577,7 @@ HealthCheck - A health check for your code
 
 =head1 VERSION
 
-version v1.5.4
+version v1.5.5
 
 =head1 SYNOPSIS
 
@@ -590,11 +615,11 @@ version v1.5.4
     );
 
     # It's possible to add ids, labels, and tags to your checks
-    # and they will be copied to the Result
+    # and they will be copied to the Result.
     $other_checker->register( My::Checker->new(
-        id    => 'my_checker',
-        label => 'My Checker',
-        tags  => [qw( cheap copied_to_the_result )]
+        id      => 'my_checker',
+        label   => 'My Checker',
+        tags    => [qw( cheap copied_to_the_result )],
     ) );
 
     # You can add HealthCheck instances as checks
@@ -680,12 +705,35 @@ C<%result> will be from the subset of checks run due to the tags.
                     tags   => [ "cheap", "easy" ],
                     status => "WARNING",
                 },
-                {   id     => "object_method",
+                {   id     => "object_method_1",
                     label  => "My Checker",
                     tags   => [ "cheap", "copied_to_the_result" ],
                     status => "WARNING",
                 }
             ],
+        }
+    ],
+
+There is also runtime support,
+which can be enabled by adding a truthy C<runtime> param to the C<check>.
+
+    $checker->check( tags => [ 'easy', '!fast' ], runtime => 1 );
+
+    id      => "my_health_check",
+    label   => "My Health Check",
+    runtime => "0.000",
+    tags    => [ "cheap", "easy" ],
+    status  => "WARNING",
+    results => [
+        {   id      => "class_method",
+            runtime => "0.000",
+            tags    => [ "cheap", "easy" ],
+            status  => "WARNING",
+        },
+        {   id      => "object_method",
+            runtime => "0.000",
+            tags    => [ "cheap", "easy" ],
+            status  => "WARNING",
         }
     ],
 
@@ -702,6 +750,8 @@ There are several things this is trying to enable:
 
 A fast HTTP endpoint that can be used to verify that a web app can
 serve traffic.
+To this end, it may be useful to use the runtime support option,
+available in L<HealthChecks::Diagnostic>.
 
 =item *
 A more complete check that verifies all the things work after a deployment.

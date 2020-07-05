@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use AppPtpTest;
-use Test::More tests => 16;
+use Test::More tests => 17;
 
 {
   my $data = ptp([qw(--grep oo)], 'default_data.txt');
@@ -21,6 +21,9 @@ use Test::More tests => 16;
 }{
   my $data = ptp([qw(-I -g b)], 'default_data.txt');
   is($data, "foobar=\nab/cd\nBe\nfoobaz\n", 'case insensitive');
+}{
+  my $data = ptp([qw(-V -g b)], \"ab\ncd\nabc\nef\n");
+  is($data, "cd\nef\n", 'inverted');
 }{
   my $data = ptp([qw(-I -S -g b)], 'default_data.txt');
   is($data, "foobar=\nab/cd\nfoobaz\n", 'case sensitive');

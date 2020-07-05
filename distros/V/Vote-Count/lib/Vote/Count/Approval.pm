@@ -11,13 +11,13 @@ no warnings 'experimental';
 use Data::Printer;
 use Carp;
 
-our $VERSION='1.01';
+our $VERSION='1.03';
 
 =head1 NAME
 
 Vote::Count::Approval
 
-=head1 VERSION 1.01
+=head1 VERSION 1.03
 
 =cut
 
@@ -39,6 +39,10 @@ Returns a RankCount object for the current Active Set taking an optional argumen
 
   # to specify a cutoff on Range Ballots
   my $Approval = $Election->Approval( $activeset, $cutoff );
+
+=head1 Method NonApproval  
+
+The opposite of Approval. Returns a RankCount object for the current Active Set of the non-exhausted ballots not supporting a choice. It does not have the option to provide an Active Set. Only available for Ranked Ballots. 
 
 =head2 Cut Off (Range Ballots Only)
 
@@ -63,7 +67,7 @@ sub _approval_rcv_do ( $active, $ballots ) {
   return Vote::Count::RankCount->Rank( \%approval );
 }
 
-sub _approval_range_do ( $active, $ballots, $depth, $cutoff ) {
+sub _approval_range_do ( $active, $ballots, $cutoff ) {
   my %approval = ( map { $_ => 0 } keys( $active->%* ) );
   for my $b ( @{$ballots} ) {
   APPROVALKEYSC: for my $c ( keys $b->{'votes'}->%* ) {
@@ -79,11 +83,34 @@ sub Approval ( $self, $active = undef, $cutoff = 0 ) {
   my %BallotSet = $self->BallotSet()->%*;
   $active = $self->Active() unless defined $active;
   if ( $BallotSet{'options'}{'range'} ) {
-    _approval_range_do( $active, $BallotSet{'ballots'},
-      $BallotSet{'depth'}, $cutoff );
+    return _approval_range_do( $active, $BallotSet{'ballots'},
+      $cutoff );
   }
   else {
-    return _approval_rcv_do( $active, $BallotSet{'ballots'} );
+    _approval_rcv_do( $active, $BallotSet{'ballots'} );
+  }
+}
+
+sub _non_approval_rcv_do ( $I, $ballots ) {
+  my $active = $I->Active();
+  my %nonapproval = ( map { $_ => 0 } keys( $active->%* ) );
+  my %approval = %{_approval_rcv_do ( $active, $ballots )->RawCount()};
+  my $activevotes = $I->VotesActive();
+  for my $A ( keys %nonapproval) {
+    $nonapproval{ $A } = $activevotes - $approval{ $A };
+  }
+  return Vote::Count::RankCount->Rank( \%nonapproval );
+}
+
+# For each choice in the active set counts ballots 
+sub NonApproval ( $I, $cutoff = 0 ) {
+  my %BallotSet = $I->BallotSet()->%*;
+  my $ballots = $BallotSet{'ballots'};
+  if ( $BallotSet{'options'}{'rcv'} ) {
+    return _non_approval_rcv_do( $I, $ballots );
+  }
+  else {
+    die "NonApproval currently implemented for RCV ballots."
   }
 }
 

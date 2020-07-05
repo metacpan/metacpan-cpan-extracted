@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -8,6 +8,8 @@ use Test::More;
 use_ok( "Metrics::Any" );
 use_ok( "Metrics::Any::Adapter" );
 use_ok( "Metrics::Any::Collector" );
+
+use_ok( "Metrics::Any::AdapterBase::Stored" );
 
 use_ok( "Metrics::Any::Adapter::File" );
 use_ok( "Metrics::Any::Adapter::Null" );

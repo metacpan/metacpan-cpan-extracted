@@ -15,7 +15,7 @@ do { my $x = {
                                       'Devel::StackTrace::Extract' => '0',
                                       'Log::Any::Adapter::Base' => '1.708',
                                       'Log::Any::Adapter::Util' => '0',
-                                      'Sentry::Raven' => '0'
+                                      'Sentry::Raven' => '!= 1.13'
                                     }
                     },
        'test' => {

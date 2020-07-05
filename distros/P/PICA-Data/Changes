@@ -1,5 +1,19 @@
 Revision history for PICA::Data
 
+1.11 2020-07-01T10:57:27Z
+    - picadata: --count does not echo records by default
+    - picadata: detect ndjson file extension
+    - Fix PICA::Schema::Builder to properly encode true on JSON
+
+1.10 2020-06-25T21:00:31Z
+    - picadata: support selecting subfield values
+
+1.09 2020-06-24T08:42:49Z
+    - Support syntax highlighting
+    - picadata: guess serialization from filename
+    - picadata: support multiple path expressions
+    - picadata: make -p and -f optional
+
 1.08 2020-06-10T13:27:29Z
     - Require Perl >= 5.14.1
     - Fix installation of picadata script

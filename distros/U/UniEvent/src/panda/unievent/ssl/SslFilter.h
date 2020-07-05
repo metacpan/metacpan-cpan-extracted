@@ -11,7 +11,7 @@ struct SslFilter : StreamFilter, AllocatedObject<SslFilter> {
     static constexpr double PRIORITY = 1;
     static const     void*  TYPE;
 
-    SslFilter (Stream* h, SSL_CTX* context) : SslFilter(h, context, nullptr) {}
+    SslFilter (Stream* h, const SslContext& context) : SslFilter(h, context, nullptr) {}
     SslFilter (Stream* h, const SSL_METHOD* method = nullptr);
 
     virtual ~SslFilter ();
@@ -32,7 +32,7 @@ private:
     enum class State   { initial = 0, negotiating = 1, error = 2, terminal = 3 };
     enum class Profile { UNKNOWN = 0, SERVER = 1, CLIENT = 2 };
 
-    SslFilter (Stream* h, SSL_CTX* context, const SslFilterSP& server_filter);
+    SslFilter (Stream* h, const SslContext& context, const SslFilterSP& server_filter);
 
     SSL*              ssl;
     BIO*              read_bio;
@@ -42,7 +42,7 @@ private:
     Profile           profile;
     weak<SslFilterSP> server_filter;
 
-    void init                 (SSL_CTX*);
+    void init                 (const SslContext& context);
     void start_ssl_connection (Profile);
     int  negotiate            ();
     void negotiation_finished (const ErrorCode& = {});

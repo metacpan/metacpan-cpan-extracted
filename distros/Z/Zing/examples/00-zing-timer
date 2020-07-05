@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Data::Dumper;
+use Zing::Timer;
+
+=pod explain
+
+- zing-timer is a process, see ./examples/00-zing-process ...
+- but more specifically executes pre-defined scheduled tasks
+- scheduled tasks are always pre-defined messages bound for 1+ queue(s)
+- i.e. a zing-timer puts messages in a queue at specific times
+
+=cut
+
+(my $t = Zing::Timer->new)->name;
+
+warn Dumper $t;

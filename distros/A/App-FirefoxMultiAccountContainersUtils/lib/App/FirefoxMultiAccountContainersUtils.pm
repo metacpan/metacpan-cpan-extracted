@@ -1,9 +1,9 @@
 package App::FirefoxMultiAccountContainersUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-03'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -29,7 +29,7 @@ _
 
 our %arg0_profile = (
     profile => {
-        schema => 'firefox::profile_name*',
+        schema => 'firefox::local_profile_name*',
         req => 1,
         pos => 0,
     },
@@ -125,11 +125,7 @@ the record. It can also choose to return false to instruct deleting the record.
 
 _
     args => {
-        profile => {
-            schema => 'firefox::profile_name*',
-            req => 1,
-            pos => 0,
-        },
+        %arg0_profile,
         code => {
             schema => ['any*', of=>['code*', 'str*']],
             req => 1,
@@ -215,11 +211,7 @@ containers. Thus this utility.
 
 _
     args => {
-        profile => {
-            schema => 'firefox::profile_name*',
-            req => 1,
-            pos => 0,
-        },
+        %arg0_profile,
         %Sort::Sub::argsopt_sortsub,
     },
     features => {
@@ -278,7 +270,7 @@ App::FirefoxMultiAccountContainersUtils - Utilities related to Firefox Multi-Acc
 
 =head1 VERSION
 
-This document describes version 0.006 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-06-03.
+This document describes version 0.007 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-06-04.
 
 =head1 SYNOPSIS
 
@@ -320,7 +312,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<profile>* => I<firefox::profile_name>
+=item * B<profile>* => I<firefox::local_profile_name>
 
 
 =back
@@ -386,7 +378,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<code>* => I<code|str>
 
-=item * B<profile>* => I<firefox::profile_name>
+=item * B<profile>* => I<firefox::local_profile_name>
 
 
 =back
@@ -434,7 +426,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<profile>* => I<firefox::profile_name>
+=item * B<profile>* => I<firefox::local_profile_name>
 
 =item * B<sort_args> => I<array[str]>
 

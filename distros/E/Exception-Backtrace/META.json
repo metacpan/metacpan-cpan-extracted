@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -25,21 +25,21 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Framework" : "v1.2.9",
-            "XS::Install" : "v1.2.16",
-            "XS::libdwarf" : "20200114.6",
-            "XS::libpanda" : "v1.3.14",
+            "XS::Framework" : "v1.3.2",
+            "XS::Install" : "v1.2.18",
+            "XS::libdwarf" : "20200114.8",
+            "XS::libpanda" : "v1.4.6",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Framework" : "v1.2.9",
-            "XS::Install" : "v1.2.16",
-            "XS::libdwarf" : "20200114.6",
-            "XS::libpanda" : "v1.3.14",
+            "XS::Framework" : "v1.3.2",
+            "XS::Install" : "v1.2.18",
+            "XS::libdwarf" : "20200114.8",
+            "XS::libpanda" : "v1.4.6",
             "next::XS" : "v1.0.7",
-            "perl" : "5.022000"
+            "perl" : "5.020000"
          }
       },
       "test" : {
@@ -48,14 +48,14 @@
             "Test::More" : "0",
             "Test::Simple" : "0.96",
             "Test::Warnings" : "0",
-            "XS::Framework" : "v1.2.9",
-            "XS::libdwarf" : "20200114.6",
-            "XS::libpanda" : "v1.3.14",
+            "XS::Framework" : "v1.3.2",
+            "XS::libdwarf" : "20200114.8",
+            "XS::libpanda" : "v1.4.6",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.2",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v1.0.8",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

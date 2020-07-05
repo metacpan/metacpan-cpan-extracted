@@ -1,27 +1,10 @@
-JSONP
-==================
-
-This module is intended to help you to build web applications based on lightweight JSON/JSONP perl web services on the server side and javascript on the client side. jQuery is higly advised.
+See https://metacpan.org/pod/JSONP for details.
 
 INSTALLATION
 
-To install this module type the following:
+install this module as customary for Perl:
 
    perl Makefile.PL
    make
    make test
    make install
-
-DEPENDENCIES
-
-This module requires these other modules and libraries:
-
-  the only non-core module required is JSON, JSON::XS is advised
-
-COPYRIGHT AND LICENCE
-
-Copyright © 2014 - 2017 by Anselmo Canfora
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10 or,
-at your option, any later version of Perl 5 you may have available.

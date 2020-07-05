@@ -30,6 +30,62 @@ The program takes in argument a list of files (that can appear anywhere on the
 line) and a list of commands that describe a pipeline to apply on each input
 file.
 
+=head2 OPTIONS SUMMARY
+
+Here is a short summary of some of the main options available. Many more options
+are described (and in more details) below, in the L</OPTIONS> section.
+
+=over 4
+
+=item B<-g> I<pattern>, B<-s> I<pattern> I<subst>
+
+Filter all the lines using the given pattern (inverted with B<-V> before the
+B<-g> option), or replace all the match of the pattern by the given substitution
+string.
+
+=item B<-p> I<perl code>
+
+Execute the given code for each lines of input (the line is in B<$_> that can be
+modified).
+
+=item B<-n> I<perl code>
+
+Replace each line by the return value of the given code (the input line is in
+B<$_>).
+
+=item B<--sort>, B<--uniq>, B<--head> I<n>, B<--tail> I<n>, B<--reverse>, B<--shuffle>, ...
+
+Sort the file, remove duplicate lines, keep the first or last lines, reverse the
+file, randomly shuffle the file, etc.
+
+=item B<--pivot>, B<--anti-pivot>, B<--transpose>
+
+Join all the lines into a single lines (B<--pivot>), or split the fields of each
+lines into multiple lines (B<--anti-pivot>). Invert lines and column (fields on
+a line) with B<--transpose>.
+
+=item B<--cut> I<f1,f2,...>
+
+Keep only the given fields of each line (by default fields can be separated by
+tabs or comma, they will be separated by tabs in the output, this can be
+overridden with B<-F> and B<-P>).
+
+=item B<--paste> I<filename>
+
+Join each line of the current file with the matching line of the given filename.
+
+=item B<--tee> I<filename>, B<--shell> I<command>
+
+Write the content of the file to the give filename or send it to the given shell
+command.
+
+=item B<-o> I<filename>, B<-a> I<filename>, B<-i>
+
+Write the output to the given file (instead of the standard output), or append
+to the file, or write it in-place in the input files.
+
+=back
+
 =head1 DESCRIPTION
 
 B<PTP> is a versatile and expressive text processor program. The core features
@@ -482,6 +538,8 @@ content.
 =item B<-m>, B<--merge>
 
 Merge the content of all the input files before the execution of the pipeline.
+The pipeline is then applied only once on the entire content of all the files,
+as if this was from a single big file.
 
 =item B<-i>, B<--in-place>
 
@@ -508,8 +566,8 @@ on the command line. It does not apply on files that are explicitely listed. In
 particular, this option does not apply on files that are expended by a shell
 glob. It derives that this option is useless unless B<-R> is specified too.
 
-All the functions from the Perl L<File::Spec::Functions> are available to the
-code being executed (e.g. the B<splitpath> function).
+All the functions from the Perl L<File::Spec::Functions> module are available to
+the code being executed (e.g. the B<splitpath> function).
 
 =item B<--input-encoding> I<encoding> (alias B<--in-encoding>)
 
@@ -623,7 +681,7 @@ cancelled by another option.
 
 Make the regular expressions used for the B<--grep> and B<--substitute> commands
 be case-insensitive by default (this can still be overidden in a given regular
-expression with the B<(?i)> flag).
+expression with the B<(?-i)> flag).
 
 This does not apply to regular expressions evaluated through the B<--perl>
 command.
@@ -631,10 +689,10 @@ command.
 =item B<-S>, B<--case-sensitive>
 
 Make the regular expressions used for the B<--grep> and B<--substitute> commands
-be case-insensitive by default (this can still be overidden in a given regular
+be case-sensitive by default (this can still be overidden in a given regular
 expression with the B<(?i)> flag).
 
-This is the default mode when B<--case-insensitive> is not specified.
+This is the default mode unless B<--case-insensitive> is specified.
 
 =item B<-Q>, B<--quote-regexp>
 
@@ -643,8 +701,8 @@ commands so that all (possibly) special characters are treated like normal
 characters. In practice this means that the matching done by these commands
 will be a simple text matching. Also disable variable interpolation for the
 substitution string passed to B<--substitute> and for the arguments to the
-B<--insert-before>, B<--insert-after>, B<--insert-at-offset> and B<--tee>
-commands.
+B<--insert-before>, B<--insert-after>, B<--insert-at-offset>, B<--tee>, and
+B<--shell> commands.
 
 This does not apply to regular expressions evaluated through the B<--perl>
 command.
@@ -689,8 +747,9 @@ B<-I> flags (as well as their opposed B<-E> and B<-S>).
 
 =item B<-P> I<string>, B<--output-field-spec>
 
-Specify the separator used to paste fields together with the B<--cut> command.
-The default is a tabulation character.
+Specify the separator used to paste fields together with the B<--cut> command
+and to join lines with the B<--paste> command. The default is a tabulation
+character.
 
 =item Default values for B<-F> and B<-P>
 

@@ -1,11 +1,16 @@
 ---
 abstract: 'A REST API microframework for Perl.'
 author:
-  - 'Artur Khabibullin - rtkh@cpan.org'
+  - 'Artur Khabibullin <rtkh@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   List::Util: '1.29'
   Module::Build: '0.28'
   Test::Exception: '0'
+  Test::More: '0'
   Test::Pod: '0'
   Test::Simple: '1.001014'
 configure_requires:
@@ -37,7 +42,7 @@ resources:
   bugtracker: https://github.com/khrt/Raisin/issues
   homepage: https://github.com/khrt/Raisin
   repository: https://github.com/khrt/Raisin.git
-version: '0.89'
+version: '0.90'
 x_contributors:
   - 'Vladimir Lettiev <thecrux@gmail.com>'
   - 'Dan Burke <dburke@addictmud.org>'

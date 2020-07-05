@@ -228,8 +228,9 @@ sub do_grep {
   my ($content, $markers, $modes, $options, $re) = @_;
   my ($use_stmt, $quoted_re) = prepare_re2($re, $modes);
   print "\$re = ${quoted_re}\n" if $options->{debug_mode};
+  my $conjuction = $modes->{inverse_match} ? 'if' : 'unless';
   my $wrapped = get_code_in_safe_env(
-      "{; ${use_stmt} undef \$_ unless m ${quoted_re} }", $options, '--grep');
+      "{; ${use_stmt} undef \$_ ${conjuction} m ${quoted_re} }", $options, '--grep');
   $. = 0;
   map { $m_setter->set(\$markers->[$.]);
         $n_setter->set($.++);

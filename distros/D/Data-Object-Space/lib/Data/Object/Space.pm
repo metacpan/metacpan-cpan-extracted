@@ -8,7 +8,7 @@ use routines;
 
 use parent 'Data::Object::Name';
 
-our $VERSION = '2.08'; # VERSION
+our $VERSION = '2.10'; # VERSION
 
 # METHODS
 
@@ -105,6 +105,18 @@ method call($func, @args) {
   }
 
   @_ = @args; goto $next;
+}
+
+method chain(@steps) {
+  my $result = $self;
+
+  for my $step (@steps) {
+    my ($name, @args) = (ref($step) eq 'ARRAY') ? @$step : ($step);
+
+    $result = $result->$name(@args);
+  }
+
+  return $result;
 }
 
 method child(@args) {
@@ -318,6 +330,10 @@ method load() {
 
   return $class if $has{$class};
 
+  if ($class eq "main") {
+    return do { $has{$class} = 1; $class };
+  }
+
   my $failed = !$class || $class !~ /^\w(?:[\w:']*\w)?$/;
   my $loaded;
 
@@ -434,6 +450,22 @@ method rebase(@args) {
   my $path = join '/', map $class->new($_)->path, @args;
 
   return $class->new($self->base)->prepend($path);
+}
+
+method reload() {
+  my $class = $self->package;
+
+  delete $has{$class};
+
+  my $path = $self->format('path', '%s.pm');
+
+  delete $INC{$path};
+
+  no strict 'refs';
+
+  @{"${class}::ISA"} = ();
+
+  return $self->load;
 }
 
 method require($target) {
@@ -972,6 +1004,82 @@ and if successful returns the resulting value.
   $space->call('start')
 
   # bless({}, 'Zoo')
+
+=back
+
+=cut
+
+=head2 chain
+
+  chain(Str | Tuple[Str, Any] @steps) : Any
+
+The chain method chains one or more method calls and returns the result.
+
+=over 4
+
+=item chain example #1
+
+  package Chu::Chu0;
+
+  sub import;
+
+  package main;
+
+  my $space = Data::Object::Space->new('Chu::Chu0');
+
+  $space->chain('bless');
+
+=back
+
+=over 4
+
+=item chain example #2
+
+  package Chu::Chu1;
+
+  sub import;
+
+  sub new {
+    bless pop;
+  }
+
+  sub frame {
+    [@_]
+  }
+
+  package main;
+
+  my $space = Data::Object::Space->new('Chu::Chu1');
+
+  $space->chain(['bless', {1..4}], 'frame');
+
+  # [ bless( { '1' => 2, '3' => 4 }, 'Chu::Chu1' ) ]
+
+=back
+
+=over 4
+
+=item chain example #3
+
+  package Chu::Chu2;
+
+  sub import;
+
+  sub new {
+    bless pop;
+  }
+
+  sub frame {
+    [@_]
+  }
+
+  package main;
+
+  my $space = Data::Object::Space->new('Chu::Chu2');
+
+  $space->chain('bless', ['frame', {1..4}]);
+
+  # [ bless( {}, 'Chu::Chu2' ), { '1' => 2, '3' => 4 } ]
 
 =back
 
@@ -1726,6 +1834,54 @@ specified to the base of the current object's namespace.
 
 =cut
 
+=head2 reload
+
+  reload() : Str
+
+The reload method attempts to delete and reload the package namespace using the
+L</load> method. B<Note:> Reloading is additive and will overwrite existing
+symbols but does not remove symbols.
+
+=over 4
+
+=item reload example #1
+
+  package main;
+
+  use Data::Object::Space;
+
+  # Foo::Gen is generate with $VERSION as 0.01
+
+  my $space = Data::Object::Space->new('foo/gen');
+
+  $space->reload;
+
+  # Foo::Gen
+  # Foo::Gen->VERSION is 0.01
+
+=back
+
+=over 4
+
+=item reload example #2
+
+  package main;
+
+  use Data::Object::Space;
+
+  # Foo::Gen is regenerated with $VERSION as 0.02
+
+  my $space = Data::Object::Space->new('foo/gen');
+
+  $space->reload;
+
+  # Foo::Gen
+  # Foo::Gen->VERSION is 0.02
+
+=back
+
+=cut
+
 =head2 require
 
   require(Str $target) : Any
@@ -1761,7 +1917,7 @@ objects were derived.
 
   # given: synopsis
 
-  $space->root
+  $space->root;
 
   # Foo
 

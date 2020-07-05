@@ -1,5 +1,10 @@
 Revision history for App-CSV2Chart
 
+0.12.0      2020-07-04
+    - Add --width and --height flags.
+        - https://github.com/shlomif/CSV2Chart/issues
+    - Add more flags to the "svg" sub-command.
+
 0.10.0      2020-02-18
     - Add the --chart-type CLI option.
 

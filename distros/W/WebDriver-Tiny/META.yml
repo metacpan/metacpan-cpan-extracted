@@ -2,11 +2,15 @@
 abstract: 'Selenium 2.0 bindings for Perl'
 author:
   - 'James Raspass <j.raspass@cv-library.co.uk>'
-build_requires: {}
+build_requires:
+  Test::More: '0'
+  lib: '0'
+  strict: '0'
+  utf8: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,15 +19,23 @@ name: WebDriver-Tiny
 provides:
   WebDriver::Tiny:
     file: lib/WebDriver/Tiny.pm
-    version: '0.102'
+    version: '0.103'
   WebDriver::Tiny::Elements:
     file: lib/WebDriver/Tiny/Elements.pm
-    version: '0.102'
+    version: '0.103'
 requires:
+  Carp: '1.25'
+  HTTP::Tiny: '0'
+  JSON::PP: '0'
+  MIME::Base64: '0'
+  charnames: '0'
+  feature: '0'
   perl: '5.020'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/cv-library/WebDriver-Tiny/issues
   repository: git://github.com/cv-library/WebDriver-Tiny.git
-version: '0.102'
-x_generated_by_perl: v5.28.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '0.103'
+x_generated_by_perl: v5.26.0
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

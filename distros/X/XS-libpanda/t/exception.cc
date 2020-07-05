@@ -1,9 +1,8 @@
 #include "test.h"
-
 #include <panda/exception.h>
 #include <iostream>
 
-using namespace panda;
+#define TEST(name) TEST_CASE("exception: " name, "[exception]")
 
 // prevent inlining
 extern "C" {
@@ -63,21 +62,21 @@ void fn48() { fn47(); ++v; }
 
 }
 
-TEST_CASE("exception with trace, catch exact exception", "[exception]") {
+TEST("exception with trace, catch exact exception") {
     bool was_catch = false;
     try {
         fn48();
     } catch( const bt<std::invalid_argument>& e) {
         auto trace = e.get_backtrace_info();
-        REQUIRE(e.get_trace().size() == 50);
+        REQUIRE(e.get_trace().size() >= 49);
         REQUIRE((bool)trace);
         REQUIRE(e.what() == std::string("Oops!"));
 
         auto frames = trace->get_frames();
         REQUIRE(frames.size() >= 47);
         
-        StackframePtr fn01_frame = nullptr;
-        StackframePtr fn45_frame = nullptr;
+        StackframeSP fn01_frame = nullptr;
+        StackframeSP fn45_frame = nullptr;
 
         for(auto& f : frames)  {
             std::cout << f->name << "\n";
@@ -99,7 +98,7 @@ TEST_CASE("exception with trace, catch exact exception", "[exception]") {
     REQUIRE(was_catch);
 }
 
-TEST_CASE("exception with trace, catch non-final class", "[exception]") {
+TEST("exception with trace, catch non-final class") {
     bool was_catch = false;
     try {
         fn48();
@@ -107,13 +106,13 @@ TEST_CASE("exception with trace, catch non-final class", "[exception]") {
         REQUIRE(e.what() == std::string("Oops!"));
         auto bt = dyn_cast<const panda::Backtrace*>(&e);
         REQUIRE(bt);
-        REQUIRE(bt->get_trace().size() == 50);
+        REQUIRE(bt->get_trace().size() >= 49);
         auto trace = bt->get_backtrace_info();
         REQUIRE((bool)trace);
         auto frames = trace->get_frames();
         REQUIRE(frames.size() >= 47);
-        StackframePtr fn01_frame = nullptr;
-        StackframePtr fn45_frame = nullptr;
+        StackframeSP fn01_frame = nullptr;
+        StackframeSP fn45_frame = nullptr;
 
         for(auto& f : frames)  {
             if (f->name.find("fn01") != string::npos) { fn01_frame = f; }
@@ -126,7 +125,7 @@ TEST_CASE("exception with trace, catch non-final class", "[exception]") {
     REQUIRE(was_catch);
 }
 
-TEST_CASE("panda::exception with string", "[exception]") {
+TEST("panda::exception with string") {
     bool was_catch = false;
     try {
         throw panda::exception("my-description");
@@ -135,4 +134,9 @@ TEST_CASE("panda::exception with string", "[exception]") {
         was_catch = true;
     }
     REQUIRE(was_catch);
+}
+
+TEST("Backtrace::dump_trace()") {
+    auto trace = Backtrace::dump_trace();
+    CHECK_THAT( trace, Catch::Matchers::Contains( "Backtrace" ) );
 }

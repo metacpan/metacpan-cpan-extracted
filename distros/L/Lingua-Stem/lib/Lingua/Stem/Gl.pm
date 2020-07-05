@@ -1,7 +1,5 @@
 package Lingua::Stem::Gl;
 
-# $RCSfile: De.pm,v $ $Revision: 1.4 $ $Date: 1999/06/24 23:33:37 $ $Author: snowhare $
-
 =head1 NAME
 
 Lingua::Stem::Gl - Stemming algorithm for Galacian
@@ -24,6 +22,8 @@ a standardized interface and caching.
 
 =head1 CHANGES
 
+2.30 2020.06.20 - Version renumber for module consistency
+
 1.02 2004.04.26 - Documenation fix
 
 1.01 2003.09.28 - Documentation fix
@@ -37,6 +37,7 @@ a standardized interface and caching.
 #######################################################################
 
 use strict;
+use warnings;
 
 use Lingua::GL::Stemmer;
 
@@ -49,7 +50,7 @@ BEGIN {
     @EXPORT_OK   = qw (stem clear_stem_cache stem_caching);
     %EXPORT_TAGS = ();
 }
-$VERSION = "1.02";
+$VERSION = "2.30";
 
 my $Stem_Caching  = 0;
 my $Stem_Cache    = {};
@@ -194,12 +195,12 @@ xern <xern@cpan.org>
 =head1 AUTHOR
 
   Integration in Lingua::Stem by 
-  Benjamin Franz, FreeRun Technologies,
-  snowhare@nihongo.org or http://www.nihongo.org/snowhare/
+  Jerilyn Franz, FreeRun Technologies,
+  <cpan@jerilyn.info> 
 
 =head1 COPYRIGHT
 
-Benjamin Franz, FreeRun Technologies
+Jerilyn Franz, FreeRun Technologies
 
 This code is freely available under the same terms as Perl.
 

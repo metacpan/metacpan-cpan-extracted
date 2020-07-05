@@ -9,11 +9,13 @@ OpenTracing::Implementation::NoOp::ScopeManager - NoOp, so code won't break!
 Objects of this class implement the required methods of the
 L<OpenTracing::Interface::ScopeManager>,
 to be compliant during testing and allow applications to continue working
-without having to catch acceptions all the time.
+without having to catch exceptions all the time.
 
-None of the methods will do anything usefull.
+None of the methods will do anything useful.
 
 =cut
+
+our $VERSION = 'v0.71.1';
 
 
 

@@ -42,6 +42,8 @@ template <typename T> struct IntrusiveChainIterator {
 
     IntrusiveChainIterator (const T& tail, const T& current = T()) : tail(tail), current(current) {}
     
+    IntrusiveChainIterator (const IntrusiveChainIterator& o) : tail(o.tail), current(o.current) {}
+
     template <typename S>
     IntrusiveChainIterator (const IntrusiveChainIterator<S>& o) : tail(o.tail), current(o.current) {}
 

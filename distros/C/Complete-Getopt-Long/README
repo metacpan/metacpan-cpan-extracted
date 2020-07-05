@@ -3,7 +3,7 @@ NAME
     Getopt::Long specification
 
 VERSION
-    This document describes version 0.478 of Complete::Getopt::Long (from
+    This document describes version 0.479 of Complete::Getopt::Long (from
     Perl distribution Complete-Getopt-Long), released on 2020-04-16.
 
 SYNOPSIS

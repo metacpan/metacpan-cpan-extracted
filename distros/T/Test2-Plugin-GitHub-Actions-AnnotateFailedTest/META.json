@@ -46,7 +46,7 @@
             "Test2" : "1.302133",
             "Test2::API" : "0",
             "URI::Escape" : "0",
-            "perl" : "5.008001",
+            "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -62,7 +62,7 @@
    "provides" : {
       "Test2::Plugin::GitHub::Actions::AnnotateFailedTest" : {
          "file" : "lib/Test2/Plugin/GitHub/Actions/AnnotateFailedTest.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,10 @@
          "web" : "https://github.com/utgwkk/Test2-Plugin-GitHub-Actions-AnnotateFailedTest"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
+   "x_contributors" : [
+      "hitode909 <hitode909@gmail.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1
 }

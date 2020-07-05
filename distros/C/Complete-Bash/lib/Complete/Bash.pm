@@ -1,9 +1,9 @@
 package Complete::Bash;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-01-28'; # DATE
+our $DATE = '2020-04-16'; # DATE
 our $DIST = 'Complete-Bash'; # DIST
-our $VERSION = '0.334'; # VERSION
+our $VERSION = '0.335'; # VERSION
 
 use 5.010001;
 use strict;
@@ -267,7 +267,7 @@ sub parse_cmdline {
     die "$0: COMP_LINE not set, make sure this script is run under ".
         "bash completion (e.g. through complete -C)\n" unless defined $line;
 
-    log_trace "[compbash] line=<$line> point=<$point>"
+    log_trace "[compbash] parse_cmdline(): input: line=<$line> point=<$point>"
         if $ENV{COMPLETE_BASH_TRACE};
 
     my @words;
@@ -343,7 +343,7 @@ sub parse_cmdline {
     $cword //= @words;
     $words[$cword] //= '';
 
-    log_trace "[compbash] words=%s, cword=%s", \@words, $cword
+    log_trace "[compbash] parse_cmdline(): result: words=%s, cword=%s", \@words, $cword
         if $ENV{COMPLETE_BASH_TRACE};
 
     [\@words, $cword];
@@ -361,16 +361,16 @@ word-breaking characters:
 
 So if command-line is:
 
-    command -MData::Dump bob@example.org
+    command --module=Data::Dump bob@example.org
 
 then they will be parsed as:
 
-    ["command", "-MData", "::", "Dump", "bob", '@', "example.org"]
+    ["command", "--module", "=", "Data", "::", "Dump", "bob", '@', "example.org"]
 
 Normally in Perl applications, we want `:`, `@` to be part of word. So this
 routine will convert the above into:
 
-    ["command", "-MData::Dump", 'bob@example.org']
+    ["command", "--module=Data::Dump", 'bob@example.org']
 
 _
 };
@@ -396,6 +396,8 @@ sub join_wordbreak_words {
             push @$new_words, $w;
         }
     }
+    log_trace "[compbash] join_wordbreak_words(): result: words=%s, cword=%d", $new_words, $cword
+        if $ENV{COMPLETE_BASH_TRACE};
     [$new_words, $cword];
 }
 
@@ -757,7 +759,7 @@ Complete::Bash - Completion routines for bash shell
 
 =head1 VERSION
 
-This document describes version 0.334 of Complete::Bash (from Perl distribution Complete-Bash), released on 2020-01-28.
+This document describes version 0.335 of Complete::Bash (from Perl distribution Complete-Bash), released on 2020-04-16.
 
 =head1 DESCRIPTION
 
@@ -906,6 +908,7 @@ Boolean. Default is true. See source code for more details.
 
 =back
 
+
 =back
 
 Return value: Formatted string (or array, if `as` is set to `array`) (str|array)
@@ -927,16 +930,16 @@ word-breaking characters:
 
 So if command-line is:
 
- command -MData::Dump bob@example.org
+ command --module=Data::Dump bob@example.org
 
 then they will be parsed as:
 
- ["command", "-MData", "::", "Dump", "bob", '@', "example.org"]
+ ["command", "--module", "=", "Data", "::", "Dump", "bob", '@', "example.org"]
 
 Normally in Perl applications, we want C<:>, C<@> to be part of word. So this
 routine will convert the above into:
 
- ["command", "-MData::Dump", 'bob@example.org']
+ ["command", "--module=Data::Dump", 'bob@example.org']
 
 This function is not exported by default, but exportable.
 
@@ -1076,7 +1079,8 @@ doing tab completion.
 
 =item * B<$point> => I<int>
 
-Point/position to complete in command-line, defaults to COMP_POINT.
+PointE<sol>position to complete in command-line, defaults to COMP_POINT.
+
 
 =back
 
@@ -1125,6 +1129,7 @@ Command-line which contains a marker character.
 =item * B<$marker> => I<str> (default: "^")
 
 Marker character.
+
 
 =back
 

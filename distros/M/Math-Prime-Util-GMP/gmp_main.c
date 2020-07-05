@@ -94,8 +94,10 @@ static int is_tiny_prime(uint32_t n) {
   f = 59;
   limit = (uint32_t) (sqrt((double)n));
   while (f <= limit) {
-    if ( !(n%f) || !(n%(f+2)) || !(n%(f+8)) || !(n%(f+12)) ) return 0;  f += 14;
-    if ( !(n%f) || !(n%(f+4)) || !(n%(f+6)) || !(n%(f+10)) ) return 0;  f += 16;
+    if ( !(n%f) || !(n%(f+2)) || !(n%(f+8)) || !(n%(f+12)) ) return 0;
+    f += 14;
+    if ( !(n%f) || !(n%(f+4)) || !(n%(f+6)) || !(n%(f+10)) ) return 0;
+    f += 16;
   }
   return 2;
 }
@@ -179,11 +181,14 @@ int primality_pretest(mpz_t n)
 /* Controls how many numbers to sieve.  Little time impact. */
 #define NPS_MERIT  30.0
 /* Controls how many primes to use.  Big time impact. */
-#define NPS_DEPTH(log2n, log2log2n) \
-  (log2n < 100) ? 1000 : \
-  (BITS_PER_WORD == 32 && log2n > 9000U) ? UVCONST(2500000000) : \
-  (BITS_PER_WORD == 64 && log2n > 4294967294U) ? UVCONST(9300000000000000000) :\
-  ((log2n * (log2n >> 5) * (UV)((log2log2n)*1.5)) >> 1)
+static UV _nps_depth(UV log2n, UV log2log2n) {
+  double d;
+  if (log2n < 100) return 1000;
+  d = 0.75 * (double)log2n * (double)(log2n >> 5) * (double)log2log2n;
+  /* Make sure we don't try to sieve too far. */
+  if (d >= (double)(UV_MAX>>1)) return (UV_MAX>>1);
+  return (UV) d;
+}
 
 static void next_prime_with_sieve(mpz_t n) {
   UV i, log2n, log2log2n, width, depth;
@@ -192,7 +197,7 @@ static void next_prime_with_sieve(mpz_t n) {
   log2n = mpz_sizeinbase(n, 2);
   for (log2log2n = 1, i = log2n; i >>= 1; ) log2log2n++;
   width = (UV) (NPS_MERIT/1.4427 * (double)log2n + 0.5);
-  depth = NPS_DEPTH(log2n, log2log2n);
+  depth = _nps_depth(log2n, log2log2n);
 
   if (width & 1) width++;                     /* Make width even */
   mpz_add_ui(n, n, mpz_even_p(n) ? 1 : 2);    /* Set n to next odd */
@@ -223,7 +228,7 @@ static void prev_prime_with_sieve(mpz_t n) {
   log2n = mpz_sizeinbase(n, 2);
   for (log2log2n = 1, i = log2n; i >>= 1; ) log2log2n++;
   width = (UV) (NPS_MERIT/1.4427 * (double)log2n + 0.5);
-  depth = NPS_DEPTH(log2n, log2log2n);
+  depth = _nps_depth(log2n, log2log2n);
 
   mpz_sub_ui(n, n, mpz_even_p(n) ? 1 : 2);       /* Set n to prev odd */
   width = 64 * ((width+63)/64);                /* Round up to next 64 */
@@ -341,14 +346,14 @@ void surround_primes(mpz_t n, UV* prev, UV* next, UV skip_width) {
   for (found = 0, search_merits = 20; !found; search_merits *= 2) {
     double logn = mpz_logn(n);
 
-    if (BITS_PER_WORD == 32 && log2n >   7000)
-      depth = UVCONST(2500000000);
-    else if (BITS_PER_WORD == 64 && log2n > 200000)
+    if (BITS_PER_WORD == 32 && log2n >  16600)
+      depth = UVCONST(   2500000000);
+    else if (BITS_PER_WORD == 64 && log2n > 203600)
       depth = UVCONST(6000000000000);
     else if (log2n > 900)
       depth = (UV) ((-.05L+(log2n/8000.0L)) * logn * logn * log(logn));
     else
-      depth = NPS_DEPTH(log2n, log2log2n);
+      depth = _nps_depth(log2n, log2log2n);
 
     width = (UV) (search_merits * logn + 0.5);
     width = 64 * ((width+63)/64);    /* Round up to next 64 */
@@ -915,6 +920,7 @@ int _totpred(mpz_t n, mpz_t maxd)
 
     if (mpz_odd_p(n)) return 0;
     if (mpz_cmp_ui(n,2) == 0) return 1;
+    if (mpz_popcount(n) == 1) return 1;   /* n > 0 is a power of 2 */
 
     mpz_init(N);  mpz_init(p);
     mpz_tdiv_q_2exp(N, n, 1);
@@ -1040,6 +1046,15 @@ uint32_t* partial_sieve(mpz_t start, UV length, UV maxprime)
   MPUassert(length > 0, "partial sieve given zero length");
   mpz_sub_ui(start, start, 1);
   if (length & 1) length++;
+
+  if (mpz_cmp_ui(start, maxprime) <= 0) {
+    mpz_t t;
+    mpz_init(t);
+    mpz_add_ui(t, start, length+1);
+    mpz_sqrt(t, t);
+    maxprime = mpz_get_ui(t);
+    mpz_clear(t);
+  }
 
   /* Allocate odds-only array in uint32_t units */
   wlen = (length+63)/64;
@@ -1530,6 +1545,63 @@ UV* sieve_primes(mpz_t inlow, mpz_t high, UV k, UV *rn) {
   return retlist.list;
 }
 
+void next_twin_prime(mpz_t res, mpz_t n) {
+  mpz_t low, t;
+
+  mpz_init(t);
+  if (mpz_cmp_ui(n, 1000000) < 0) {
+    UV p, ulow = mpz_get_ui(n), last = 0;
+    PRIME_ITERATOR(iter);
+    prime_iterator_setprime(&iter, ulow);
+    while (1) {
+      p = prime_iterator_next(&iter);
+      if (p-last == 2 && last > 0) {
+        mpz_set_ui(res, last);
+        break;
+      }
+      last = p;
+    }
+    prime_iterator_destroy(&iter);
+  } else {
+    UV i, starti, l2, length, depth, found = 0;
+    uint32_t* comp;
+
+    mpz_init(low);
+    mpz_add_ui(low, n, 1);
+    if (mpz_even_p(low))  mpz_add_ui(low, low, 1);
+
+    l2 = mpz_sizeinbase(low,2);
+    if (l2 <= 6000) {
+      depth = (l2/160.0) * l2 * l2;
+      length = 3 * 0.634 * l2 * l2;  /* we will resieve sometimes */
+      if (length % 2) length++;  /* low is odd, length must be even */
+    } else {
+      depth  = UVCONST(1350000000);
+      length = UVCONST(  91296000);
+    }
+
+    while (!found) {
+      starti = (6 - mpz_fdiv_ui(low,6)) % 6;
+      comp = partial_sieve(low, length + 2, depth);
+      for (i = starti; i <= length && !found; i += 6) {
+        if (!TSTAVAL(comp, i) && !TSTAVAL(comp, i+2)) {
+          if ( (mpz_add_ui(t,low,i),  miller_rabin_ui(t,2)) &&
+               (mpz_add_ui(t,t,2),    miller_rabin_ui(t,2)) &&
+               (mpz_add_ui(t,low,i),  _GMP_is_lucas_pseudoprime(t,2)) &&
+               (mpz_add_ui(t,t,2),    _GMP_is_lucas_pseudoprime(t,2)) ) {
+            mpz_add_ui(res, low, i);
+            found = 1;
+          }
+        }
+      }
+      Safefree(comp);
+      mpz_add_ui(low, low, length+1);
+    }
+    mpz_clear(low);
+  }
+  mpz_clear(t);
+}
+
 UV* sieve_twin_primes(mpz_t low, mpz_t high, UV twin, UV *rn) {
   mpz_t t;
   UV i, length, k, starti = 1, skipi = 2;
@@ -1855,4 +1927,75 @@ UV* sieve_cluster(mpz_t low, mpz_t high, uint32_t* cl, UV nc, UV *rn) {
   mpz_clear(t);
   *rn = retlist.nsize;
   return retlist.list;
+}
+
+static uint32_t* _todigits32(uint32_t *ndigits, uint32_t n, uint32_t base) {
+  uint32_t bits[32];
+  uint32_t *digits, i, d;
+
+  for (d = 0; n; n /= base)
+    bits[d++] = n % base;
+
+  New(0, digits, d, uint32_t);
+  for (i = 0; i < d; i++)
+    digits[i] = bits[d-i-1];
+  *ndigits = d;
+  return digits;
+}
+static uint32_t* _todigits_base2(uint32_t *ndigits, mpz_t n) {
+  uint32_t *digits, d, bits = mpz_sizeinbase(n, 2);
+  New(0, digits, bits, uint32_t);
+  for (d = 0; d < bits; d++)
+    digits[d] = mpz_tstbit(n,bits-d-1);
+  *ndigits = d;
+  return digits;
+}
+/* Algorithm 1.26 FastIntegerOutput from MCA v0.5.9 */
+uint32_t* todigits(uint32_t *ndigits, mpz_t n, uint32_t base) {
+  uint32_t* digits, *rdigits, *qdigits;
+  uint32_t  k, nlen, rlen, qlen, zlen, i, j;
+  mpz_t Q, R;
+
+  if (base == 2)
+    return _todigits_base2(ndigits, n);
+
+  if (mpz_cmp_ui(n, 0xFFFFFFFFUL) <= 0)
+    return _todigits32(ndigits, mpz_get_ui(n), base);
+
+  mpz_init(Q); mpz_init(R);
+  nlen = logint(n, base) + 1;
+
+  /* Find k s.t.  B^(2k-2) <= n <= B^(2k) */
+  k = ((nlen-1) >> 1) + 1;
+
+  /* Compute Q,R = DivRem(n, base^k) */
+  mpz_ui_pow_ui(Q, base, k);
+  mpz_tdiv_qr(Q, R, n, Q);
+
+  /* In theory we could do this all in place, avoiding the allocations
+   * and copying. */
+
+  qdigits = todigits(&qlen, Q, base);
+  rdigits = todigits(&rlen, R, base);
+
+  zlen = k - rlen;
+  if (qlen + rlen + zlen != nlen) croak("todigits: internal sizes wrong!");
+  mpz_clear(Q);  mpz_clear(R);
+
+  /* Allocate exactly as much space as needed. */
+  New(0, digits, nlen, uint32_t);
+  j = 0;
+
+  for (i = 0; i < qlen; i++)
+    digits[j++] = qdigits[i];
+  for (i = 0; i < zlen; i++)
+    digits[j++] = 0;
+  for (i = 0; i < rlen; i++)
+    digits[j++] = rdigits[i];
+
+  Safefree(rdigits);
+  Safefree(qdigits);
+
+  *ndigits = nlen;
+  return digits;
 }

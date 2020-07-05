@@ -4,7 +4,7 @@ App::VTide::Configuration - Description of the vtide configuration files
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Configuration version 0.1.12
+This documentation refers to App::VTide::Configuration version 0.1.13
 
 =head1 SYNOPSIS
 

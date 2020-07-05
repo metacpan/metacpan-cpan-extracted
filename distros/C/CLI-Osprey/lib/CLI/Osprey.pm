@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: MooX::Options + MooX::Cmd + Sanity
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Carp 'croak';
@@ -100,8 +100,9 @@ sub import {
         method => $subobject,
         @args,
       );
-    } else {
-      use_module($subobject);
+    }
+    else {
+        use_module($subobject) unless $osprey_config->{on_demand};
     }
 
     $subcommands->{$name} = $subobject;
@@ -162,7 +163,7 @@ CLI::Osprey - MooX::Options + MooX::Cmd + Sanity
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -358,7 +359,7 @@ Default: true.
 If true, command-line options override key/value pairs passed to
 C<new_with_options>. If false, the reverse is true.
 
-=head2 protect_argv
+=head2 preserve_argv
 
 Default: false.
 
@@ -375,6 +376,16 @@ Default: C<"USAGE: $program_name %o">
 Provides the header of the usage message printed in response to the C<-h>
 option or an error in option processing. The format of the string is described
 in L<Getopt::Long::Descriptive/"$usage_desc">.
+
+=head2 on_demand
+
+Default: false
+
+If set to a true value, the commands' modules won't be loaded
+at compile time, but if the command is invoked. This is useful for
+minimizing compile time if the application has a lot of commands or
+the commands are on the heavy side. Note that enabling the feature
+may interfere with the ability to fatpack the application.
 
 =head1 OPTION PARAMETERS
 

@@ -29,6 +29,7 @@ use constant {
         finish
         add_tag
         add_tags
+        get_tags
         log_data
         add_baggage_item
         add_baggage_items

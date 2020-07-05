@@ -1,0 +1,37 @@
+Revision history for Code-ART
+
+0.000001  Fri Jun  8 12:52:06 2018
+       Initial release.
+
+
+
+0.000002  Thu Jun 25 09:02:40 2020
+          No changes logged
+
+
+0.000003  Fri Jun 26 00:25:50 2020
+
+    - Corrected Makefile.pl to reflect actual minimal Perl version (v5.16)
+
+    - Corrected RT address (thanks, Juerd!)
+
+
+0.000004  Fri Jun 26 01:10:36 2020
+
+    - Added warning regarding the default <CTRL-S> mapping.
+      (thanks, Juerd)
+
+    - Fixed handling of $$derefs
+      (thanks, Juerd)
+
+
+0.000005  Fri Jun 26 10:57:58 2020
+
+    - Changed default <CTRL-S> mapping to <CTRL-R>...just to be safe
+      (thanks again, Juerd) 
+
+    - Removed unintended dependency on experimentals.pm
+      (thanks, Andreas)
+
+    - Fixed POD bugs
+      (thanks, Dave)

@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=ColorTheme
   homepage: https://metacpan.org/release/ColorTheme
   repository: git://github.com/perlancar/perl-ColorTheme.git
-version: 2.1.1
+version: 2.1.2
 x_Dist_Zilla:
   perl:
     version: '5.030002'

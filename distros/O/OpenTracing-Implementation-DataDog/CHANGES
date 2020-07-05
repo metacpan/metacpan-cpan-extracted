@@ -2,21 +2,90 @@ CHANGE LOG
 ==========
 
 
-2020-06-15 - v0.30.1
+
+2020-07-01 - v0.41.2
+--------------------
+
+### Changed
+  - Stringify meta data
+
+
+2020-06-24 - v0.41.1
 --------------------
 
 ### Added
+    - DataDog specific HTTP-headers, like `X-Datadog-Trace-Count`
+
+
+2020-06-23 - v0.41.0
+--------------------
+
+### Changed
+    - use `default_` values inside Tracer for SpanContext
+
+
+2020-06-19 - v0.40.3
+--------------------
+
+### Fixed
+    - Set dependency on `MooX::Attributes::ENV` to minmal 0.02
+
+
+2020-06-18 - v0.40.2
+--------------------
+
+### Fixed
+    - MANIFEST
+
+
+2020-06-18 - v0.40.1
+--------------------
+
+### Changed
+    - Depndency on OT::Roles v0.81.3
+
+### Added
+    - More tests on `build_*` methods
+
+
+2020-06-17 - v0.40.0
+--------------------
+
+### Changed
+    - Depndency on OT::Roles v0.81.2
+    - Rename to `get_parent_span_id`
+
+
+2020-06-15 - v0.40.0.7-TRIAL
+---------------------------
+
+### Fixed
+    - `get_parent_span_id`
+
+
+2020-06-15 - v0.40.0.6-TRIAL
+---------------------------
+
+### Changed
+    - More generic code moving etc.
+
+
+2020-06-02 - v0.04_003
+----------------------
+
+### Added
     - More tests, from Test::OpenTracing::Interface
- 
+
 ### Fixed
     - Test failures due to differences in Type::Tiny and Type::Tiny::XS
 
 
-2020-06-15 - v0.30.0
---------------------
 
-### Fixed
-    - version numbering
+2020-05-29 - v0.04_001
+----------------------
+
+### Changed
+    - Generic code has gone to OpenTracing::Roles
 
 
 2020-02-13 - v0.03

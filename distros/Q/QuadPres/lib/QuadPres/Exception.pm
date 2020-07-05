@@ -1,5 +1,5 @@
 package QuadPres::Exception;
-$QuadPres::Exception::VERSION = '0.28.2';
+$QuadPres::Exception::VERSION = '0.28.3';
 use 5.016;
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ sub text
 }
 
 package QuadPres::Exception::RenderFile;
-$QuadPres::Exception::RenderFile::VERSION = '0.28.2';
+$QuadPres::Exception::RenderFile::VERSION = '0.28.3';
 use vars qw(@ISA);
 
 @ISA = qw(QuadPres::Exception);
@@ -43,9 +43,27 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+QuadPres::Exception - exception class
+
 =head1 VERSION
 
-version 0.28.2
+version 0.28.3
+
+=head1 SYNOPSIS
+
+    use QuadPres::Exception ();
+
+    QuadPres::Exception->throw({text=>"error"});
+
+=head1 METHODS
+
+=head2 throw
+
+=head2 text
+
+Returns the text.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

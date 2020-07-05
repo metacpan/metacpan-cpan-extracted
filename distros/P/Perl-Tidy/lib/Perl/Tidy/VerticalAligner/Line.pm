@@ -8,7 +8,7 @@
 package Perl::Tidy::VerticalAligner::Line;
 use strict;
 use warnings;
-our $VERSION = '20200110';
+our $VERSION = '20200619';
 
 {
 
@@ -19,6 +19,7 @@ our $VERSION = '20200110';
         jmax_original_line        => undef,
         rtokens                   => undef,
         rfields                   => undef,
+        rfield_lengths            => undef,
         rpatterns                 => undef,
         indentation               => undef,
         leading_space_count       => undef,
@@ -31,6 +32,8 @@ our $VERSION = '20200110';
         is_terminal_ternary       => undef,
         is_terminal_else          => undef,
         j_terminal_match          => undef,
+        is_forced_break           => undef,
+        end_group                 => undef,
     );
     {
 
@@ -76,10 +79,11 @@ our $VERSION = '20200110';
         my $self = shift;
         return $self->{_jmax_original_line};
     }
-    sub get_rtokens     { my $self = shift; return $self->{_rtokens} }
-    sub get_rfields     { my $self = shift; return $self->{_rfields} }
-    sub get_rpatterns   { my $self = shift; return $self->{_rpatterns} }
-    sub get_indentation { my $self = shift; return $self->{_indentation} }
+    sub get_rtokens        { my $self = shift; return $self->{_rtokens} }
+    sub get_rfields        { my $self = shift; return $self->{_rfields} }
+    sub get_rfield_lengths { my $self = shift; return $self->{_rfield_lengths} }
+    sub get_rpatterns      { my $self = shift; return $self->{_rpatterns} }
+    sub get_indentation    { my $self = shift; return $self->{_indentation} }
 
     sub get_j_terminal_match {
         my $self = shift;
@@ -94,6 +98,11 @@ our $VERSION = '20200110';
     sub get_is_terminal_ternary {
         my $self = shift;
         return $self->{_is_terminal_ternary};
+    }
+
+    sub get_is_forced_break {
+        my $self = shift;
+        return $self->{_is_forced_break};
     }
 
     sub get_leading_space_count {
@@ -213,6 +222,12 @@ our $VERSION = '20200110';
         return;
     }
 
+    sub set_rfield_lengths {
+        my ( $self, $val ) = @_;
+        $self->{_rfield_lengths} = $val;
+        return;
+    }
+
     sub set_rpatterns {
         my ( $self, $val ) = @_;
         $self->{_rpatterns} = $val;
@@ -252,6 +267,14 @@ our $VERSION = '20200110';
     sub set_alignment {
         my ( $self, $j, $val ) = @_;
         $self->{_ralignments}->[$j] = $val;
+        return;
+    }
+
+    sub get_end_group { my $self = shift; return $self->{_end_group} }
+
+    sub set_end_group {
+        my ( $self, $j, $val ) = @_;
+        $self->{_end_group}->[$j] = $val;
         return;
     }
 

@@ -1,5 +1,14 @@
 Revision history for HTML-Latemp-NavLinks-GenHtml
 
+0.2.9   2020-07-03
+    - Remove POD docs that are generated using weaver.ini.
+
+0.2.8   2020-06-24
+    - Convert dist.ini to [RewriteVersion]:
+        - http://www.nntp.perl.org/group/perl.module-authors/2016/11/msg10865.html
+        - Thanks to Karen Etheridge
+    - dist.ini, weaver.ini, t/*.t, perltidy, etc. cleanups
+
 0.2.6   2015-12-28
     - Add MANIFEST.SKIP and remove temporary files.
 

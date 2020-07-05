@@ -10,7 +10,7 @@
 #
 
 package Text::Template;
-$Text::Template::VERSION = '1.58';
+$Text::Template::VERSION = '1.59';
 # ABSTRACT: Expand template text with embedded Perl
 
 use strict;
@@ -611,7 +611,7 @@ Text::Template - Expand template text with embedded Perl
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 SYNOPSIS
 
@@ -663,7 +663,7 @@ version 1.58
  $text = $template->fill_in(PREPEND => q{use strict 'vars';}, ...);
 
  use Text::Template 'fill_in_string';
- $text = fill_in_string( <<EOM, PACKAGE => 'T', ...);
+ $text = fill_in_string( <<'EOM', PACKAGE => 'T', ...);
  Dear {$recipient},
  Pay me at once.
         Love, 

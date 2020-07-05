@@ -53,7 +53,7 @@ sub enable {
         while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
           $singleton->collect($pid => $? => $!);
         }
-        }
+      }
     });
 }
 
@@ -91,8 +91,8 @@ sub unregister { delete($singleton->process_table()->{+pop()}) }
 sub _resolve {
   my ($el, $w) = (pop, pop);
   return
-    exists $singleton->{$w}->{$el} ?
-    $w eq 'orphans'
+      exists $singleton->{$w}->{$el}
+    ? $w eq 'orphans'
       ? $singleton->{$w}->{$el}
       : ${$singleton->{$w}->{$el}}
     : undef;
@@ -149,18 +149,18 @@ sub _get_prctl_syscall {
     = $machine
     =~ /^i[3456]86|^blackfin|cris|frv|h8300|m32r|m68k|microblaze|mn10300|sh|s390|parisc$/
     ? 172
-    : $machine eq "x86_64"  ? 157
-    : $machine eq "sparc64" ? 147
-    : $machine eq "aarch64" ? 167
+    : $machine eq "x86_64"                         ? 157
+    : $machine eq "sparc64"                        ? 147
+    : $machine eq "aarch64"                        ? 167
     : ($machine eq "ppc" || $machine eq "ppc64le") ? 171
-    : $machine eq "ia64"   ? 1170
-    : $machine eq "alpha"  ? 348
-    : $machine eq "arm"    ? 0x900000 + 172
-    : $machine eq "avr32"  ? 148
-    : $machine eq "mips"   ? 4000 + 192
-    : $machine eq "mips64" ? 5000 + 153
-    : $machine eq "xtensa" ? 130
-    :                        undef;
+    : $machine eq "ia64"                           ? 1170
+    : $machine eq "alpha"                          ? 348
+    : $machine eq "arm"                            ? 0x900000 + 172
+    : $machine eq "avr32"                          ? 148
+    : $machine eq "mips"                           ? 4000 + 192
+    : $machine eq "mips64"                         ? 5000 + 153
+    : $machine eq "xtensa"                         ? 130
+    :                                                undef;
 
   unless (defined $prctl_call) {
     delete @INC{
@@ -188,7 +188,7 @@ sub _prctl {
     ($arg5 or 0));
 
   warn "prctl($option) is unavailable on this platform." if $!{EINVAL};
-  warn "Error! $!" if $!;
+  warn "Error! $!"                                       if $!;
   return $ret;
 }
 

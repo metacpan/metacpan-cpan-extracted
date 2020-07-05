@@ -14,13 +14,13 @@ extends 'Vote::Count';
 # use Moose;
 # extends 'Vote::Count';
 
-our $VERSION='1.01';
+our $VERSION='1.03';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetIRV
 
-=head1 VERSION 1.01
+=head1 VERSION 1.03
 
 =cut
 
@@ -61,9 +61,9 @@ SmithSet IRV is easy to understand but requires a full matrix and thus is harder
 
 When there is no Condorcet Winner this method is Later Harm Sufficient. There might be edge cases where IRV's sensitivity to dropping order creates a Later Harm effect, but they should be pretty rare. When there is a Condorcet Winner the effect is the normal one for a Condorcet Method.
 
-The easiest way to imagine a case where a choice not in the Smith Set changed the outcome is by cloning the winner, such that there is a choice defeating them in early Top Count but not defeating them. The negative impact of the clone is an established weakness of IRV. It would appear that any possible Later Harm issue in addition to be very much at the edge is more than offset by consistency improvement.
+The easiest way to imagine a case where a choice not in the Smith Set changed the outcome is by cloning the winner, such that there is a choice defeating them in early Top Count but not defeating them. The negative impact of the clone is an established weakness of IRV. It would appear that any possible Later Harm issue in addition to being very much at the edge is more than offset by consistency improvement.
 
-Smith Set IRV still has a significant Later Harm failure, but it has demonstrably less Later Harm effect than other Condorcet methods.
+Smith Set IRV still has a significant Later Harm failure, but it has less Later Harm effect than other Condorcet methods.
 
 =head3 Condorcet Criteria
 

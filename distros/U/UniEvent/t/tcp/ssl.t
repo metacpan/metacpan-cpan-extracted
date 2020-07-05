@@ -119,7 +119,6 @@ subtest 'unknown shit' => sub {
     $srv->loop->run;
     done_testing(8);
 };
-
 done_testing();
 
 sub sslerr () {

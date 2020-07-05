@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Test2/Plugin/GitHub/Actions/AnnotateWarnings.pm
+minil.toml
+t/00_compile.t
+t/annotate.t
+t/ignore.t
+t/unimport.t
+META.yml
+MANIFEST

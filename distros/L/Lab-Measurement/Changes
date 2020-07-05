@@ -4,6 +4,16 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.703 2020-06-21
+  * Bug fix in Moose::Sweep::Continuous so it can be called more
+    than once
+  * Dummysource: Add continous sweep functionality and test
+  * Improve continuous sweep tests
+
+3.702 2020-06-18
+  * Documentation fixes
+  * Fix for Sweep-Continuous.t test on slow machines
+
 3.701 2020-05-10
   * HPE4400B driver requires PDL::Graphics::Gnuplot installed
 

@@ -203,10 +203,10 @@ METHODS - Internal
 
 AUTHOR
 
-    Tom Molesworth <TEAM@cpan.org>
+    Tom Molesworth <TEAM@cpan.org>, with contributions from @chylli-binary.
 
 LICENSE
 
-    Copyright Tom Molesworth 2014-2019. Licensed under the same terms as
+    Copyright Tom Molesworth 2014-2020. Licensed under the same terms as
     Perl itself.
 

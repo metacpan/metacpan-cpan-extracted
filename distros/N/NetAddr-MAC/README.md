@@ -30,3 +30,4 @@ https://github.com/djzort/NetAddr-MAC
 
 [![Build Status](https://travis-ci.org/djzort/NetAddr-MAC.svg?branch=master)](https://travis-ci.org/djzort/NetAddr-MAC)
 [![CPAN version](https://badge.fury.io/pl/NetAddr-MAC.svg)](https://metacpan.org/pod/NetAddr::MAC)
+[![Kritika Analysis Status](https://kritika.io/users/djzort/repos/7834712978866242/heads/master/status.svg)](https://kritika.io/users/djzort/repos/7834712978866242/heads/master/)

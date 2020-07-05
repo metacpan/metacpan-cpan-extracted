@@ -1,11 +1,14 @@
 use strict;
 use Test::More;
 use Test::More::UTF8;
+use Test::Exception;
 use POSIX qw( strftime );
 use YAML::Syck qw(Dump);
 use DBD::SQLite 1.62;
 use FindBin::libs;
 use DBIx::NamedParams;
+use HashCondition;
+use ArrayCondition;
 use open ':std' => ( $^O eq 'MSWin32' ? ':locale' : ':utf8' );
 
 note("Perl version:\t$]");
@@ -201,6 +204,66 @@ subtest 'KeepBindingIfNoKey' => sub {
     foreach my $expected (@expecteds) {
         is_deeply( $sth->fetchrow_hashref, $expected, toTestName($expected) );
     }
+    $sth->finish;
+};
+
+subtest 'prepare_ex need hash' => sub {
+    my $sql = 'SELECT `ID`, `Name`, `Status` FROM `Users` WHERE `Status` in (:State+-INTEGER)';
+    my $sth;
+    throws_ok {
+        $sth = $dbh->prepare_ex( $sql, undef );
+        $sth->finish;
+    }
+    qr/need a hash reference/, 'undef';
+    throws_ok {
+        $sth = $dbh->prepare_ex( $sql, 1 );
+        $sth->finish;
+    }
+    qr/need a hash reference/, 'number';
+    throws_ok {
+        $sth = $dbh->prepare_ex( $sql, 'string' );
+        $sth->finish;
+    }
+    qr/need a hash reference/, 'string';
+    throws_ok {
+        $sth = $dbh->prepare_ex( $sql, [ 1, 2, 5 ] );
+        $sth->finish;
+    }
+    qr/need a hash reference/, 'array';
+    lives_ok {
+        $sth = $dbh->prepare_ex( $sql, { State => [ 1, 2, 5 ], } );
+        $sth->finish;
+    }
+    'hash';
+    lives_ok {
+        $sth = $dbh->prepare_ex( $sql, HashCondition->new( undef, undef, [ 1, 2, 5 ] ) );
+        $sth->finish;
+    }
+    'HashCondition';
+    throws_ok {
+        $sth = $dbh->prepare_ex( $sql, ArrayCondition->new( undef, undef, [ 1, 2, 5 ] ) );
+        $sth->finish;
+    }
+    qr/need a hash reference/, 'ArrayCondition';
+};
+
+subtest 'bind_param_ex need hash' => sub {
+    my $sth = $dbh->prepare_ex( 'INSERT INTO `Users` ( `ID`, `Name`, `Status` ) '
+            . 'VALUES ( :ID-INTEGER, :Name-VARCHAR, :State-INTEGER )' );
+    throws_ok { $sth->bind_param_ex(undef); }
+    qr/need a hash reference/, 'undef';
+    throws_ok { $sth->bind_param_ex(1); }
+    qr/need a hash reference/, 'number';
+    throws_ok { $sth->bind_param_ex('string'); }
+    qr/need a hash reference/, 'string';
+    throws_ok { $sth->bind_param_ex( [ 1, 2, 5 ] ); }
+    qr/need a hash reference/, 'array';
+    lives_ok { $sth->bind_param_ex( { State => [ 1, 2, 5 ], } ); }
+    'hash';
+    lives_ok { $sth->bind_param_ex( HashCondition->new( undef, undef, [ 1, 2, 5 ] ) ); }
+    'HashCondition';
+    throws_ok { $sth->bind_param_ex( ArrayCondition->new( undef, undef, [ 1, 2, 5 ] ) ); }
+    qr/need a hash reference/, 'ArrayCondition';
     $sth->finish;
 };
 

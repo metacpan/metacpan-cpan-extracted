@@ -163,6 +163,30 @@ my $path22 = 'M21.3 10.5v.5c0 4.7-3.5 10.1-9.9 10.1-2 0-3.8-.6-5.3-1.6.3 0 .6.1.
 my @info2 = extract_path_info ($path22);#, {verbose => 1});
 ok (@info2);
 
+# Test no_smooth on smooth cubic beziers with and without previous cubic.
+
+my $nscb = 'M5,4s1,1,2,2s2,1,3,1';
+my @nscb = extract_path_info ($nscb, {absolute => 1, no_smooth => 1});
+
+is_deeply ($nscb[1]{control1}, [5,4], "reuse start point");
+is_deeply ($nscb[1]{control2}, [6,5]);
+is_deeply ($nscb[1]{end},      [7,6]);
+is_deeply ($nscb[2]{control1}, [8,7], "reflect previous control point");
+is_deeply ($nscb[2]{control2}, [9,7]);
+is_deeply ($nscb[2]{end},      [10,7]);
+
+# Test no_smooth on smooth quadratic beziers with and without previous
+# quadratic.
+
+my $nsqb = 'M5,1t1,1M3,5q1,1,2,2t2,2';
+my @nsqb = extract_path_info ($nsqb, {absolute => 1, no_smooth => 1});
+
+is_deeply ($nsqb[1]{control}, [5,1], "reuse start point");
+is_deeply ($nsqb[1]{end},     [6,2]);
+is_deeply ($nsqb[3]{control}, [4,6]);
+is_deeply ($nsqb[3]{end},     [5,7]);
+is_deeply ($nsqb[4]{control}, [6,8], "reflect previous control point");
+is_deeply ($nsqb[4]{end},     [7,9]);
 
 done_testing ();
 exit;

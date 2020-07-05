@@ -57,8 +57,7 @@ sub AUTOLOAD {
   return (
     eval { $self->pool->Mojo::IOLoop::ReadWriteProcess::Pool::_cmd(@_, $fn) },
     (grep(/once|on|emit/, $fn))
-    ?
-      eval { $self->queue->Mojo::IOLoop::ReadWriteProcess::Pool::_cmd(@_, $fn) }
+    ? eval { $self->queue->Mojo::IOLoop::ReadWriteProcess::Pool::_cmd(@_, $fn) }
     : ());
 }
 

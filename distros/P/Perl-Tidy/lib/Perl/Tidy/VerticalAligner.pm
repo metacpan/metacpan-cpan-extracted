@@ -1,7 +1,7 @@
 package Perl::Tidy::VerticalAligner;
 use strict;
 use warnings;
-our $VERSION = '20200110';
+our $VERSION = '20200619';
 
 use Perl::Tidy::VerticalAligner::Alignment;
 use Perl::Tidy::VerticalAligner::Line;
@@ -76,6 +76,7 @@ use vars qw(
   $consecutive_block_comments
 
   $cached_line_text
+  $cached_line_text_length
   $cached_line_type
   $cached_line_flag
   $cached_seqno
@@ -106,10 +107,22 @@ use vars qw(
 
 sub initialize {
 
-    (
-        my $class, $rOpts, $file_writer_object, $logger_object,
-        $diagnostics_object
-    ) = @_;
+    my ( $class, @args ) = @_;
+
+    my %defaults = (
+        rOpts              => undef,
+        file_writer_object => undef,
+        logger_object      => undef,
+        diagnostics_object => undef,
+        length_function    => sub { return length( $_[0] ) },
+    );
+    my %args = ( %defaults, @args );
+
+    $rOpts              = $args{rOpts};
+    $file_writer_object = $args{file_writer_object};
+    $logger_object      = $args{logger_object};
+    $diagnostics_object = $args{diagnostics_object};
+    my $length_function = $args{length_function};
 
     # variables describing the entire space group:
     $ralignment_list            = [];
@@ -139,6 +152,7 @@ sub initialize {
 
     # valign_output_step_B cache:
     $cached_line_text                = "";
+    $cached_line_text_length         = 0;
     $cached_line_type                = 0;
     $cached_line_flag                = 0;
     $cached_seqno                    = 0;
@@ -167,7 +181,7 @@ sub initialize {
 
     initialize_for_new_group();
 
-    $vertical_aligner_self = {};
+    $vertical_aligner_self = { length_function => $length_function, };
     bless $vertical_aligner_self, $class;
     return $vertical_aligner_self;
 }
@@ -372,7 +386,8 @@ sub valign_input {
     # side comments.  Tabs in these fields can mess up the column counting.
     # The log file warns the user if there are any such tabs.
 
-    my ( $rline_hash, $rfields, $rtokens, $rpatterns ) = @_;
+    my ($rline_hash) = @_;
+
     my $level                     = $rline_hash->{level};
     my $level_end                 = $rline_hash->{level_end};
     my $indentation               = $rline_hash->{indentation};
@@ -383,6 +398,10 @@ sub valign_input {
     my $do_not_pad                = $rline_hash->{do_not_pad};
     my $rvertical_tightness_flags = $rline_hash->{rvertical_tightness_flags};
     my $level_jump                = $rline_hash->{level_jump};
+    my $rfields                   = $rline_hash->{rfields};
+    my $rtokens                   = $rline_hash->{rtokens};
+    my $rpatterns                 = $rline_hash->{rpatterns};
+    my $rfield_lengths            = $rline_hash->{rfield_lengths};
 
     # number of fields is $jmax
     # number of tokens between fields is $jmax-1
@@ -488,7 +507,7 @@ sub valign_input {
             || $is_blank_line
           )
         {
-            push_group_line( $rfields->[0] );
+            push_group_line( [ $rfields->[0], $rfield_lengths->[0] ] );
             return;
         }
         else {
@@ -502,9 +521,10 @@ sub valign_input {
     my $j_terminal_match;
 
     if ( $is_terminal_ternary && @group_lines ) {
-        $j_terminal_match =
-          fix_terminal_ternary( $group_lines[-1], $rfields, $rtokens,
-            $rpatterns );
+        $j_terminal_match = fix_terminal_ternary(
+            $group_lines[-1], $rfields, $rtokens,
+            $rpatterns,       $rfield_lengths
+        );
         $jmax = @{$rfields} - 1;
     }
 
@@ -517,8 +537,10 @@ sub valign_input {
         && $level_jump == 0 )
     {
 
-        $j_terminal_match =
-          fix_terminal_else( $group_lines[-1], $rfields, $rtokens, $rpatterns );
+        $j_terminal_match = fix_terminal_else(
+            $group_lines[-1], $rfields, $rtokens,
+            $rpatterns,       $rfield_lengths
+        );
         $jmax = @{$rfields} - 1;
     }
 
@@ -542,7 +564,7 @@ sub valign_input {
                 ( $zero_count > 3 )
 
                 # ..or if this new line doesn't fit to the left of the comments
-                || ( ( $leading_space_count + length( $rfields->[0] ) ) >
+                || ( ( $leading_space_count + $rfield_lengths->[0] ) >
                     $group_lines[0]->get_column(0) )
               )
             {
@@ -557,15 +579,24 @@ sub valign_input {
         {
             $group_type                  = 'COMMENT';
             $comment_leading_space_count = $leading_space_count;
-            push_group_line( $rfields->[0] );
+            push_group_line( [ $rfields->[0], $rfield_lengths->[0] ] );
             return;
         }
 
         # just write this line directly if no current group, no side comment,
         # and no space recovery is needed.
         if ( !@group_lines && !get_recoverable_spaces($indentation) ) {
-            valign_output_step_B( $leading_space_count, $rfields->[0], 0,
-                $outdent_long_lines, $rvertical_tightness_flags, $level );
+
+            valign_output_step_B(
+                leading_space_count       => $leading_space_count,
+                line                      => $rfields->[0],
+                line_length               => $rfield_lengths->[0],
+                side_comment_length       => 0,
+                outdent_long_lines        => $outdent_long_lines,
+                rvertical_tightness_flags => $rvertical_tightness_flags,
+                level                     => $level
+            );
+
             return;
         }
     }
@@ -594,6 +625,7 @@ sub valign_input {
         rtokens                   => $rtokens,
         rfields                   => $rfields,
         rpatterns                 => $rpatterns,
+        rfield_lengths            => $rfield_lengths,
         indentation               => $indentation,
         leading_space_count       => $leading_space_count,
         outdent_long_lines        => $outdent_long_lines,
@@ -603,6 +635,7 @@ sub valign_input {
         rvertical_tightness_flags => $rvertical_tightness_flags,
         is_terminal_ternary       => $is_terminal_ternary,
         j_terminal_match          => $j_terminal_match,
+        is_forced_break           => $is_forced_break,
     );
 
     # --------------------------------------------------------------------
@@ -669,16 +702,19 @@ sub join_hanging_comment {
     my $maximum_field_index = $old_line->get_jmax();
     return 0
       unless $maximum_field_index > $jmax;    # the current line has more fields
-    my $rpatterns = $line->get_rpatterns();
+    my $rpatterns      = $line->get_rpatterns();
+    my $rfield_lengths = $line->get_rfield_lengths();
 
     $line->set_is_hanging_side_comment(1);
     $jmax = $maximum_field_index;
     $line->set_jmax($jmax);
     $rfields->[$jmax]         = $rfields->[1];
+    $rfield_lengths->[$jmax]  = $rfield_lengths->[1];
     $rtokens->[ $jmax - 1 ]   = $rtokens->[0];
     $rpatterns->[ $jmax - 1 ] = $rpatterns->[0];
     foreach my $j ( 1 .. $jmax - 1 ) {
         $rfields->[$j]         = " "; # NOTE: caused glitch unless 1 blank, why?
+        $rfield_lengths->[$j]  = 1;
         $rtokens->[ $j - 1 ]   = "";
         $rpatterns->[ $j - 1 ] = "";
     }
@@ -728,36 +764,43 @@ sub eliminate_old_fields {
     return unless ( $case != 1 || $maximum_field_index - 2 <= $jmax );
 
     # case 1 must have side comment
-    my $old_rfields = $old_line->get_rfields();
+    my $old_rfields        = $old_line->get_rfields();
+    my $old_rfield_lengths = $old_line->get_rfield_lengths();
     return
       if ( $case == 1
         && length( $old_rfields->[$maximum_field_index] ) == 0 );
 
-    my $rfields = $new_line->get_rfields();
+    my $rfields        = $new_line->get_rfields();
+    my $rfield_lengths = $new_line->get_rfield_lengths();
 
     my $hid_equals = 0;
 
     my @new_alignments        = ();
     my @new_fields            = ();
+    my @new_field_lengths     = ();
     my @new_matching_patterns = ();
     my @new_matching_tokens   = ();
 
-    my $j               = 0;
-    my $current_field   = '';
-    my $current_pattern = '';
+    my $j                    = 0;
+    my $current_field        = '';
+    my $current_field_length = 0;
+    my $current_pattern      = '';
 
     # loop over all old tokens
     my $in_match = 0;
     foreach my $k ( 0 .. $maximum_field_index - 1 ) {
-        $current_field   .= $old_rfields->[$k];
+        $current_field .= $old_rfields->[$k];
+        $current_field_length += $old_rfield_lengths->[$k];
         $current_pattern .= $old_rpatterns->[$k];
         last if ( $j > $jmax - 1 );
 
         if ( $old_rtokens->[$k] eq $rtokens->[$j] ) {
             $in_match                  = 1;
             $new_fields[$j]            = $current_field;
+            $new_field_lengths[$j]     = $current_field_length;
             $new_matching_patterns[$j] = $current_pattern;
             $current_field             = '';
+            $current_field_length      = 0;
             $current_pattern           = '';
             $new_matching_tokens[$j]   = $old_rtokens->[$k];
             $new_alignments[$j]        = $old_line->get_alignment($k);
@@ -798,7 +841,9 @@ sub eliminate_old_fields {
         my $k = $maximum_field_index;
         $current_field   .= $old_rfields->[$k];
         $current_pattern .= $old_rpatterns->[$k];
+        $current_field_length += $old_rfield_lengths->[$k];
         $new_fields[$j]            = $current_field;
+        $new_field_lengths[$j]     = $current_field_length;
         $new_matching_patterns[$j] = $current_pattern;
 
         $new_alignments[$j] = $old_line->get_alignment($k);
@@ -808,6 +853,7 @@ sub eliminate_old_fields {
         $old_line->set_jmax($jmax);
         $old_line->set_rtokens( \@new_matching_tokens );
         $old_line->set_rfields( \@new_fields );
+        $old_line->set_rfield_lengths( \@new_field_lengths );
         $old_line->set_rpatterns( \@{$rpatterns} );
     }
 
@@ -861,15 +907,26 @@ sub eliminate_old_fields {
           @{$old_rfields}[ 1 .. $maximum_field_index - 1 ];
         my $mid_patterns = join "",
           @{$old_rpatterns}[ 1 .. $maximum_field_index - 1 ];
+        my $mid_field_length = 0;
+        foreach ( @{$old_rfield_lengths}[ 1 .. $maximum_field_index - 1 ] ) {
+            $mid_field_length += $_;
+        }
         my @new_alignments = (
             $old_line->get_alignment(0),
             $old_line->get_alignment( $maximum_field_index - 1 )
         );
         my @new_tokens =
           ( $old_rtokens->[0], $old_rtokens->[ $maximum_field_index - 1 ] );
+
         my @new_fields = (
             $old_rfields->[0], $mid_field, $old_rfields->[$maximum_field_index]
         );
+
+        my @new_field_lengths = (
+            $old_rfield_lengths->[0],
+            $mid_field_length, $old_rfield_lengths->[$maximum_field_index]
+        );
+
         my @new_patterns = (
             $old_rpatterns->[0], $mid_patterns,
             $old_rpatterns->[$maximum_field_index]
@@ -879,6 +936,7 @@ sub eliminate_old_fields {
         $old_line->set_jmax($maximum_field_index);
         $old_line->set_rtokens( \@new_tokens );
         $old_line->set_rfields( \@new_fields );
+        $old_line->set_rfield_lengths( \@new_field_lengths );
         $old_line->set_rpatterns( \@new_patterns );
 
         initialize_for_new_group();
@@ -895,11 +953,14 @@ sub make_side_comment {
 
     # if line does not have a side comment...
     if ( ( $jmax == 0 ) || ( $rtokens->[ $jmax - 1 ] ne '#' ) ) {
-        my $rfields   = $new_line->get_rfields();
-        my $rpatterns = $new_line->get_rpatterns();
-        $rtokens->[$jmax]     = '#';
-        $rfields->[ ++$jmax ] = '';
-        $rpatterns->[$jmax]   = '#';
+        my $rfields        = $new_line->get_rfields();
+        my $rfield_lengths = $new_line->get_rfield_lengths();
+        my $rpatterns      = $new_line->get_rpatterns();
+        $jmax += 1;
+        $rtokens->[ $jmax - 1 ]  = '#';
+        $rfields->[$jmax]        = '';
+        $rfield_lengths->[$jmax] = 0;
+        $rpatterns->[$jmax]      = '#';
         $new_line->set_jmax($jmax);
         $new_line->set_jmax_original_line($jmax);
     }
@@ -944,7 +1005,7 @@ sub decide_if_list {
         my $jmax      = $line->get_jmax();
 
         foreach ( 1 .. $jmax - 2 ) {
-            if ( $rtokens->[$_] !~ /^(\,|=>|\{)/ ) {
+            if ( $rtokens->[$_] !~ /^(\,|=>)/ ) {
                 $list_type = "";
                 last;
             }
@@ -983,9 +1044,10 @@ sub eliminate_new_fields {
           && ( $new_line->get_list_type() !~ /^,/ );
     }
 
-    my $rfields       = $new_line->get_rfields();
-    my $rpatterns     = $new_line->get_rpatterns();
-    my $old_rpatterns = $old_line->get_rpatterns();
+    my $rfields        = $new_line->get_rfields();
+    my $rfield_lengths = $new_line->get_rfield_lengths();
+    my $rpatterns      = $new_line->get_rpatterns();
+    my $old_rpatterns  = $old_line->get_rpatterns();
 
     # loop over all OLD tokens except comment and check match
     my $match = 1;
@@ -1004,14 +1066,18 @@ sub eliminate_new_fields {
 
             $rfields->[ $maximum_field_index - 1 ] .= $rfields->[$k];
             $rfields->[$k] = "";
+            $rfield_lengths->[ $maximum_field_index - 1 ] +=
+              $rfield_lengths->[$k];
+            $rfield_lengths->[$k] = 0;
             $rpatterns->[ $maximum_field_index - 1 ] .= $rpatterns->[$k];
             $rpatterns->[$k] = "";
         }
 
-        $rtokens->[ $maximum_field_index - 1 ] = '#';
-        $rfields->[$maximum_field_index]       = $rfields->[$jmax];
-        $rpatterns->[$maximum_field_index]     = $rpatterns->[$jmax];
-        $jmax                                  = $maximum_field_index;
+        $rtokens->[ $maximum_field_index - 1 ]  = '#';
+        $rfields->[$maximum_field_index]        = $rfields->[$jmax];
+        $rfield_lengths->[$maximum_field_index] = $rfield_lengths->[$jmax];
+        $rpatterns->[$maximum_field_index]      = $rpatterns->[$jmax];
+        $jmax                                   = $maximum_field_index;
     }
     $new_line->set_jmax($jmax);
     return;
@@ -1030,7 +1096,7 @@ sub fix_terminal_ternary {
     #
     # returns 1 if the terminal item should be indented
 
-    my ( $old_line, $rfields, $rtokens, $rpatterns ) = @_;
+    my ( $old_line, $rfields, $rtokens, $rpatterns, $rfield_lengths ) = @_;
     return unless ($old_line);
 
 ## FUTURE CODING
@@ -1051,7 +1117,8 @@ sub fix_terminal_ternary {
     # look for the question mark after the :
     my ($jquestion);
     my $depth_question;
-    my $pad = "";
+    my $pad        = "";
+    my $pad_length = 0;
     foreach my $j ( 0 .. $maximum_field_index - 1 ) {
         my $tok = $rtokens_old->[$j];
         if ( $tok =~ /^\?(\d+)$/ ) {
@@ -1062,7 +1129,8 @@ sub fix_terminal_ternary {
 
             $jquestion = $j;
             if ( $rfields_old->[ $j + 1 ] =~ /^(\?\s*)/ ) {
-                $pad = " " x length($1);
+                $pad_length = length($1);
+                $pad        = " " x $pad_length;
             }
             else {
                 return;    # shouldn't happen
@@ -1079,9 +1147,10 @@ sub fix_terminal_ternary {
 
     # Work on copies of the actual arrays in case we have
     # to return due to an error
-    my @fields   = @{$rfields};
-    my @patterns = @{$rpatterns};
-    my @tokens   = @{$rtokens};
+    my @fields        = @{$rfields};
+    my @patterns      = @{$rpatterns};
+    my @tokens        = @{$rtokens};
+    my @field_lengths = @{$rfield_lengths};
 
     VALIGN_DEBUG_FLAG_TERNARY && do {
         local $" = '><';
@@ -1109,8 +1178,12 @@ sub fix_terminal_ternary {
             # Note that this padding will remain even if the terminal value goes
             # out on a separate line.  This does not seem to look to bad, so no
             # mechanism has been included to undo it.
-            my $field1 = shift @fields;
+            my $field1        = shift @fields;
+            my $field_length1 = shift @field_lengths;
+            my $len_colon     = length($colon);
             unshift @fields, ( $colon, $pad . $therest );
+            unshift @field_lengths,
+              ( $len_colon, $pad_length + $field_length1 - $len_colon );
 
             # change the leading pattern from : to ?
             return unless ( $patterns[0] =~ s/^\:/?/ );
@@ -1120,7 +1193,8 @@ sub fix_terminal_ternary {
             unshift( @patterns, @{$rpatterns_old}[ 0 .. $jquestion ] );
 
             # insert appropriate number of empty fields
-            splice( @fields, 1, 0, ('') x $jadd ) if $jadd;
+            splice( @fields,        1, 0, ('') x $jadd ) if $jadd;
+            splice( @field_lengths, 1, 0, (0) x $jadd )  if $jadd;
         }
 
         # handle sub-case of first field just equal to leading colon.
@@ -1136,13 +1210,15 @@ sub fix_terminal_ternary {
             $patterns[1] = "?b" . $patterns[1];
 
             # pad the second field
-            $fields[1] = $pad . $fields[1];
+            $fields[1]        = $pad . $fields[1];
+            $field_lengths[1] = $pad_length + $field_lengths[1];
 
             # install leading tokens and patterns of existing line, replacing
             # leading token and inserting appropriate number of empty fields
             splice( @tokens,   0, 1, @{$rtokens_old}[ 0 .. $jquestion ] );
             splice( @patterns, 1, 0, @{$rpatterns_old}[ 1 .. $jquestion ] );
-            splice( @fields, 1, 0, ('') x $jadd ) if $jadd;
+            splice( @fields,        1, 0, ('') x $jadd ) if $jadd;
+            splice( @field_lengths, 1, 0, (0) x $jadd )  if $jadd;
         }
     }
 
@@ -1158,9 +1234,11 @@ sub fix_terminal_ternary {
         unshift( @patterns, @{$rpatterns_old}[ 0 .. $jquestion ] );
 
         # insert appropriate number of empty fields
-        $jadd = $jquestion + 1;
-        $fields[0] = $pad . $fields[0];
-        splice( @fields, 0, 0, ('') x $jadd ) if $jadd;
+        $jadd             = $jquestion + 1;
+        $fields[0]        = $pad . $fields[0];
+        $field_lengths[0] = $pad_length + $field_lengths[0];
+        splice( @fields,        0, 0, ('') x $jadd ) if $jadd;
+        splice( @field_lengths, 0, 0, (0) x $jadd )  if $jadd;
     }
 
     VALIGN_DEBUG_FLAG_TERNARY && do {
@@ -1171,9 +1249,10 @@ sub fix_terminal_ternary {
     };
 
     # all ok .. update the arrays
-    @{$rfields}   = @fields;
-    @{$rtokens}   = @tokens;
-    @{$rpatterns} = @patterns;
+    @{$rfields}        = @fields;
+    @{$rtokens}        = @tokens;
+    @{$rpatterns}      = @patterns;
+    @{$rfield_lengths} = @field_lengths;
 ## FUTURE CODING
 ##     $end_line->set_rfields( \@fields );
 ##     $end_line->set_rtokens( \@tokens );
@@ -1194,7 +1273,7 @@ sub fix_terminal_else {
     #
     # returns a positive value if the else block should be indented
     #
-    my ( $old_line, $rfields, $rtokens, $rpatterns ) = @_;
+    my ( $old_line, $rfields, $rtokens, $rpatterns, $rfield_lengths ) = @_;
     return unless ($old_line);
     my $jmax = @{$rfields} - 1;
     return unless ( $jmax > 0 );
@@ -1240,7 +1319,8 @@ sub fix_terminal_else {
     my $jadd = $jbrace - $jparen;
     splice( @{$rtokens},   0, 0, @{$rtokens_old}[ $jparen .. $jbrace - 1 ] );
     splice( @{$rpatterns}, 1, 0, @{$rpatterns_old}[ $jparen + 1 .. $jbrace ] );
-    splice( @{$rfields}, 1, 0, ('') x $jadd );
+    splice( @{$rfields},        1, 0, ('') x $jadd );
+    splice( @{$rfield_lengths}, 1, 0, (0) x $jadd );
 
     # force a flush after this line if it does not follow a case
     if   ( $rfields_old->[0] =~ /^case\s*$/ ) { return }
@@ -1296,6 +1376,7 @@ sub fix_terminal_else {
         my $is_hanging_side_comment = $new_line->get_is_hanging_side_comment();
         my $rtokens                 = $new_line->get_rtokens();
         my $rfields                 = $new_line->get_rfields();
+        my $rfield_lengths          = $new_line->get_rfield_lengths();
         my $rpatterns               = $new_line->get_rpatterns();
         my $list_type               = $new_line->get_list_type();
 
@@ -1304,10 +1385,6 @@ sub fix_terminal_else {
         my $old_rtokens     = $old_line->get_rtokens();
 
         my $jlimit = $jmax - 1;
-        if ( $maximum_field_index > $jmax ) {
-            $jlimit = $jmax_original_line;
-            --$jlimit unless ( length( $new_line->get_rfields()->[$jmax] ) );
-        }
 
         # handle comma-separated lists ..
         if ( $group_list_type && ( $list_type eq $group_list_type ) ) {
@@ -1411,7 +1488,7 @@ sub fix_terminal_else {
                 # $pad is the number of spaces by which we must increase
                 # the current field to squeeze in this field.
                 my $pad =
-                  length( $rfields->[$j] ) - $old_line->current_field_width($j);
+                  $rfield_lengths->[$j] - $old_line->current_field_width($j);
                 if ( $j == 0 ) { $pad += $leading_space_count; }
 
                 # remember max pads to limit marginal cases
@@ -1542,11 +1619,12 @@ sub fix_terminal_else {
             $GoToLoc = 9;
             goto NO_MATCH if ($comment);
 
-            # Corrected loop
-            for my $jj ( $jlimit .. $maximum_field_index ) {
-                $rtokens->[$jj]         = $old_rtokens->[$jj];
-                $rfields->[ $jj + 1 ]   = '';
-                $rpatterns->[ $jj + 1 ] = $old_rpatterns->[ $jj + 1 ];
+            # Corrected loop; a test case is file 'fig13_20.pl'
+            for my $jj ( $jmax .. $maximum_field_index ) {
+                $rtokens->[ $jj - 1 ]  = $old_rtokens->[ $jj - 1 ];
+                $rpatterns->[$jj]      = $old_rpatterns->[$jj];
+                $rfields->[$jj]        = '';
+                $rfield_lengths->[$jj] = 0;
             }
 
 ##          THESE DO NOT GIVE CORRECT RESULTS
@@ -1554,6 +1632,7 @@ sub fix_terminal_else {
 ##          $new_line->set_jmax($jmax);
 
         }
+
         return;
 
       NO_MATCH:
@@ -1642,21 +1721,29 @@ sub salvage_equality_matches {
         my $jmax     = $line_obj->get_jmax();
         my $jmax_new = 2;
         return unless $jmax > $jmax_new;
-        my $rfields     = $line_obj->get_rfields();
-        my $rpatterns   = $line_obj->get_rpatterns();
-        my $rtokens     = $line_obj->get_rtokens();
-        my $rfields_new = [
+        my $rfields        = $line_obj->get_rfields();
+        my $rfield_lengths = $line_obj->get_rfield_lengths();
+        my $rpatterns      = $line_obj->get_rpatterns();
+        my $rtokens        = $line_obj->get_rtokens();
+        my $rfields_new    = [
             $rfields->[0], join( '', @{$rfields}[ 1 .. $jmax - 1 ] ),
             $rfields->[$jmax]
         ];
+
+        my $mid_length = 0;
+        foreach ( @{$rfield_lengths}[ 1 .. $jmax - 1 ] ) { $mid_length += $_ }
+        my $rfield_lengths_new =
+          [ $rfield_lengths->[0], $mid_length, $rfield_lengths->[$jmax] ];
+
         my $rpatterns_new = [
             $rpatterns->[0], join( '', @{$rpatterns}[ 1 .. $jmax - 1 ] ),
             $rpatterns->[$jmax]
         ];
         my $rtokens_new = [ $rtokens->[0], $rtokens->[ $jmax - 1 ] ];
-        $line_obj->{_rfields}   = $rfields_new;
-        $line_obj->{_rpatterns} = $rpatterns_new;
-        $line_obj->{_rtokens}   = $rtokens_new;
+        $line_obj->{_rfields}        = $rfields_new;
+        $line_obj->{_rfield_lengths} = $rfield_lengths_new;
+        $line_obj->{_rpatterns}      = $rpatterns_new;
+        $line_obj->{_rtokens}        = $rtokens_new;
         $line_obj->set_jmax($jmax_new);
     };
 
@@ -1681,6 +1768,7 @@ sub check_fit {
     my $is_hanging_side_comment = $new_line->get_is_hanging_side_comment();
     my $rtokens                 = $new_line->get_rtokens();
     my $rfields                 = $new_line->get_rfields();
+    my $rfield_lengths          = $new_line->get_rfield_lengths();
     my $rpatterns               = $new_line->get_rpatterns();
 
     my $group_list_type = $group_lines[0]->get_list_type();
@@ -1694,7 +1782,8 @@ sub check_fit {
     my $maximum_field_index = $old_line->get_jmax();
     for my $j ( 0 .. $jmax ) {
 
-        my $pad = length( $rfields->[$j] ) - $old_line->current_field_width($j);
+        ##my $pad = length( $rfields->[$j] ) - $old_line->current_field_width($j);
+        my $pad = $rfield_lengths->[$j] - $old_line->current_field_width($j);
 
         if ( $j == 0 ) {
             $pad += $leading_space_count;
@@ -1747,11 +1836,11 @@ sub check_fit {
 
         if (
                $pad > $padding_available
-            && $jmax == 2                        # matching one thing (plus #)
-            && $j == $jmax - 1                   # at last field
-            && @group_lines > 1                  # more than 1 line in group now
-            && $jmax < $maximum_field_index      # other lines have more fields
-            && length( $rfields->[$jmax] ) == 0  # no side comment
+            && $jmax == 2                       # matching one thing (plus #)
+            && $j == $jmax - 1                  # at last field
+            && @group_lines > 1                 # more than 1 line in group now
+            && $jmax < $maximum_field_index     # other lines have more fields
+            && $rfield_lengths->[$jmax] == 0    # no side comment
 
             # Uncomment to match only equals (but this does not seem necessary)
             # && $rtokens->[0] =~ /^=\d/           # matching an equals
@@ -1814,13 +1903,14 @@ sub add_to_group {
     # initialize field lengths if starting new group
     if ( @group_lines == 1 ) {
 
-        my $jmax    = $new_line->get_jmax();
-        my $rfields = $new_line->get_rfields();
-        my $rtokens = $new_line->get_rtokens();
-        my $col     = $new_line->get_leading_space_count();
+        my $jmax           = $new_line->get_jmax();
+        my $rfields        = $new_line->get_rfields();
+        my $rfield_lengths = $new_line->get_rfield_lengths();
+        my $rtokens        = $new_line->get_rtokens();
+        my $col            = $new_line->get_leading_space_count();
 
         for my $j ( 0 .. $jmax ) {
-            $col += length( $rfields->[$j] );
+            $col += $rfield_lengths->[$j];
 
             # create initial alignments for the new group
             my $token = "";
@@ -1871,9 +1961,10 @@ sub flush {
             valign_output_step_C( $cached_line_text,
                 $cached_line_leading_space_count,
                 $last_level_written );
-            $cached_line_type    = 0;
-            $cached_line_text    = "";
-            $cached_seqno_string = "";
+            $cached_line_type        = 0;
+            $cached_line_text        = "";
+            $cached_line_text_length = 0;
+            $cached_seqno_string     = "";
         }
     }
     return;
@@ -1937,9 +2028,10 @@ sub my_flush_comment {
 
     # look for excessively long lines
     my $max_excess = 0;
-    foreach my $str (@group_lines) {
+    foreach my $item (@group_lines) {
+        my ( $str, $str_len ) = @{$item};
         my $excess =
-          length($str) +
+          $str_len +
           $leading_space_count -
           maximum_line_length_for_level($group_level);
         if ( $excess > $max_excess ) {
@@ -1961,9 +2053,18 @@ sub my_flush_comment {
 
     # write the lines
     my $outdent_long_lines = 0;
-    foreach my $line (@group_lines) {
-        valign_output_step_B( $leading_space_count, $line, 0,
-            $outdent_long_lines, "", $group_level );
+
+    foreach my $item (@group_lines) {
+        my ( $line, $line_len ) = @{$item};
+        valign_output_step_B(
+            leading_space_count       => $leading_space_count,
+            line                      => $line,
+            line_length               => $line_len,
+            side_comment_length       => 0,
+            outdent_long_lines        => $outdent_long_lines,
+            rvertical_tightness_flags => "",
+            level                     => $group_level,
+        );
     }
 
     initialize_for_new_group();
@@ -2007,8 +2108,13 @@ sub my_flush_code {
 
     # output the lines
     foreach my $line (@group_lines) {
-        valign_output_step_A( $line, $min_ci_gap, $do_not_align,
-            $group_leader_length, $extra_leading_spaces );
+        valign_output_step_A(
+            line                 => $line,
+            min_ci_gap           => $min_ci_gap,
+            do_not_align         => $do_not_align,
+            group_leader_length  => $group_leader_length,
+            extra_leading_spaces => $extra_leading_spaces
+        );
     }
 
     initialize_for_new_group();
@@ -2061,7 +2167,9 @@ sub my_flush {
             # Start a new group if necessary
             if ( !@group_lines ) {
                 add_to_group($new_line);
-
+                if ( $new_line->{_end_group} ) {
+                    my_flush_code();
+                }
                 next;
             }
 
@@ -2173,8 +2281,7 @@ sub my_flush {
                 $is_matching_terminal_line = 0;
             }
 
-            # Optional optimization; end the group if we know we cannot match
-            # next line.
+            # end the group if we know we cannot match next line.
             elsif ( $new_line->{_end_group} ) {
                 my_flush_code();
             }
@@ -2193,50 +2300,65 @@ sub my_flush {
 
 sub delete_selected_tokens {
 
-    my ( $line_obj, $ridel ) = @_;
+    my ( $line_obj, $ridel, $new_list_ok ) = @_;
+
+    # $line_obj    is the line to be modified
+    # $ridel       is a ref to list of indexes to be deleted
+    # $new_list_ok is flag giving permission to convert non-list to list
 
     # remove an unused alignment token(s) to improve alignment chances
+
     return unless ( defined($line_obj) && defined($ridel) && @{$ridel} );
 
-    my $jmax_old      = $line_obj->get_jmax();
-    my $rfields_old   = $line_obj->get_rfields();
-    my $rpatterns_old = $line_obj->get_rpatterns();
-    my $rtokens_old   = $line_obj->get_rtokens();
+    my $jmax_old           = $line_obj->get_jmax();
+    my $rfields_old        = $line_obj->get_rfields();
+    my $rfield_lengths_old = $line_obj->get_rfield_lengths();
+    my $rpatterns_old      = $line_obj->get_rpatterns();
+    my $rtokens_old        = $line_obj->get_rtokens();
+
+    my $EXPLAIN = 0;
 
     local $" = '> <';
-    0 && print <<EOM;
+    $EXPLAIN && print <<EOM;
 delete indexes: <@{$ridel}>
 old jmax: $jmax_old
 old tokens: <@{$rtokens_old}>
 old patterns: <@{$rpatterns_old}>
 old fields: <@{$rfields_old}>
+old field_lengths: <@{$rfield_lengths_old}>
 EOM
 
-    my $rfields_new   = [];
-    my $rpatterns_new = [];
-    my $rtokens_new   = [];
+    my $rfields_new        = [];
+    my $rpatterns_new      = [];
+    my $rtokens_new        = [];
+    my $rfield_lengths_new = [];
 
     my $kmax      = @{$ridel} - 1;
     my $k         = 0;
     my $jdel_next = $ridel->[$k];
 
-    # FIXME:
-    if ( $jdel_next < 0 ) { print STDERR "bad jdel_next=$jdel_next\n"; return }
-    my $pattern = $rpatterns_old->[0];
-    my $field   = $rfields_old->[0];
-    push @{$rfields_new},   $field;
-    push @{$rpatterns_new}, $pattern;
+    if ( $jdel_next < 0 ) { return }    # shouldnt happen
+    my $pattern      = $rpatterns_old->[0];
+    my $field        = $rfields_old->[0];
+    my $field_length = $rfield_lengths_old->[0];
+    push @{$rfields_new},        $field;
+    push @{$rfield_lengths_new}, $field_length;
+    push @{$rpatterns_new},      $pattern;
+
     for ( my $j = 0 ; $j < $jmax_old ; $j++ ) {
-        my $token   = $rtokens_old->[$j];
-        my $field   = $rfields_old->[ $j + 1 ];
-        my $pattern = $rpatterns_old->[ $j + 1 ];
+        my $token        = $rtokens_old->[$j];
+        my $field        = $rfields_old->[ $j + 1 ];
+        my $field_length = $rfield_lengths_old->[ $j + 1 ];
+        my $pattern      = $rpatterns_old->[ $j + 1 ];
         if ( $k > $kmax || $j < $jdel_next ) {
-            push @{$rtokens_new},   $token;
-            push @{$rfields_new},   $field;
-            push @{$rpatterns_new}, $pattern;
+            push @{$rtokens_new},        $token;
+            push @{$rfields_new},        $field;
+            push @{$rpatterns_new},      $pattern;
+            push @{$rfield_lengths_new}, $field_length;
         }
         elsif ( $j == $jdel_next ) {
-            $rfields_new->[-1]   .= $field;
+            $rfields_new->[-1] .= $field;
+            $rfield_lengths_new->[-1] += $field_length;
             $rpatterns_new->[-1] .= $pattern;
             if ( ++$k <= $kmax ) {
                 my $jdel_last = $jdel_next;
@@ -2259,9 +2381,164 @@ EOM
     $line_obj->set_rtokens($rtokens_new);
     $line_obj->set_rpatterns($rpatterns_new);
     $line_obj->set_rfields($rfields_new);
+    $line_obj->set_rfield_lengths($rfield_lengths_new);
     $line_obj->set_jmax($jmax_new);
 
-    0 && print <<EOM;
+    # update list type based on new leading token
+    my $old_list_type = $line_obj->get_list_type();
+    my $new_list_type = "";
+    if ( $rtokens_new->[0] =~ /^(=>|,)/ ) {
+        $new_list_type = $rtokens_new->[0];
+    }
+
+    # An existing list will still be a list but with possibly different leading
+    # token
+    if ($old_list_type) {
+        if ( $old_list_type ne $new_list_type ) {
+            $line_obj->set_list_type($new_list_type);
+        }
+    }
+
+    # A non-list line could become a list if all non-list tokens have been
+    # deleted. But only do this if the "new_list_ok" flag is set.  The following
+    # two-line snippet shows an example of unwanted => alignement which can
+    # occur if we promote lines to be lists without permission:
+    #  $w1->bin( $xc, $yc,   { Panel => 3 } );
+    #  $w1->env( 0, 1, 0, 1, { Axis  => 'Box' } );
+    elsif ( $new_list_type && $new_list_ok ) {
+        my ( $raw_tok, $lev, $tag, $tok_count ) =
+          decode_alignment_token($new_list_type);
+
+        # But for lines with leading commas, we will require that they be
+        # tagged before converting a line from non-list to a list.
+        if ($tag) {
+            for ( my $i = 1 ; $i < @{$rtokens_new} - 1 ; $i++ ) {
+                if ( $rtokens_new->[$i] !~ /^(,|=>)/ ) {
+                    $new_list_type = "";
+                    last;
+                }
+            }
+            $line_obj->set_list_type($new_list_type) if ($new_list_type);
+        }
+    }
+
+    $EXPLAIN && print <<EOM;
+
+new jmax: $jmax_new
+new tokens: <@{$rtokens_new}>
+new patterns: <@{$rpatterns_new}>
+new fields: <@{$rfields_new}>
+EOM
+    return;
+}
+
+sub add_dummy_alignment_fields {
+
+    # NOTE: This routine is not currently called but it works and is included
+    # because it may be used in the future.
+    my ( $line_obj, $line_hw, $debug ) = @_;
+
+    # Add dummy alignment variables to line $line_obj
+    # by copying them from $line_hw.
+    #  $line_obj is the line being modified
+    #  $line_hw is the line used as an example
+    #  $debug is a flag for dumping values during testing
+
+    return unless ( defined($line_obj) && defined($line_hw) );
+
+    my $jmax_old           = $line_obj->get_jmax();
+    my $rfields_old        = $line_obj->get_rfields();
+    my $rfield_lengths_old = $line_obj->get_rfield_lengths();
+    my $rpatterns_old      = $line_obj->get_rpatterns();
+    my $rtokens_old        = $line_obj->get_rtokens();
+
+    my $jmax_hw           = $line_hw->get_jmax();
+    my $rfields_hw        = $line_hw->get_rfields();
+    my $rfield_lengths_hw = $line_hw->get_rfield_lengths();
+    my $rpatterns_hw      = $line_hw->get_rpatterns();
+    my $rtokens_hw        = $line_hw->get_rtokens();
+
+    my $num_old = @{$rtokens_old};
+    my $num_hw  = @{$rtokens_hw};
+
+    print STDERR "num_old=$num_old; num_hw=$num_hw\n";
+    print STDERR "Adding; jmax_hw=$jmax_hw, jmax_old=$jmax_old\n";
+    $debug = 0;
+
+    if ( $jmax_hw < $jmax_old ) {
+        print STDERR "unexpected values jmax_old=$jmax_old > jmax_hw=$jmax_hw";
+        return;
+    }
+
+    local $" = ')(';
+    $debug && print STDERR <<EOM;
+old jmax: $jmax_old
+old tokens: <@{$rtokens_old}>
+old patterns: <@{$rpatterns_old}>
+old fields: <@{$rfields_old}>
+old field_lengths: <@{$rfield_lengths_old}>
+EOM
+
+    my $rfields_new        = [];
+    my $rpatterns_new      = [];
+    my $rtokens_new        = [];
+    my $rfield_lengths_new = [];
+
+    my $pattern      = $rpatterns_old->[0];
+    my $field        = $rfields_old->[0];
+    my $field_length = $rfield_lengths_old->[0];
+    push @{$rfields_new},        $field;
+    push @{$rfield_lengths_new}, $field_length;
+    push @{$rpatterns_new},      $pattern;
+
+    for ( my $j = 0 ; $j < $jmax_hw ; $j++ ) {
+        my ( $token, $field, $field_length, $pattern );
+
+        # copy old fields before the side comment
+        if ( $j < $jmax_old - 1 ) {
+            $token        = $rtokens_old->[$j];
+            $field        = $rfields_old->[ $j + 1 ];
+            $field_length = $rfield_lengths_old->[ $j + 1 ];
+            $pattern      = $rpatterns_old->[ $j + 1 ];
+        }
+
+        # copy additional empty felds with same pattern as the model
+        elsif ( $j < $jmax_hw - 1 ) {
+            $token        = $rtokens_hw->[$j];
+            $field        = "";
+            $field_length = 0;
+            $pattern      = $rpatterns_hw->[ $j + 1 ];
+        }
+
+        # keep original side comment
+        else {
+            $token        = $rtokens_old->[ $jmax_old - 1 ];
+            $field        = $rfields_old->[$jmax_old];
+            $field_length = $rfield_lengths_old->[$jmax_old];
+            $pattern      = $rpatterns_old->[$jmax_old];
+        }
+
+        push @{$rtokens_new},        $token;
+        push @{$rfields_new},        $field;
+        push @{$rpatterns_new},      $pattern;
+        push @{$rfield_lengths_new}, $field_length;
+
+    }
+
+    # ----- x ------ x ------ x ------
+    #t      0        1        2        <- token indexing
+    #f   0      1        2        3    <- field and pattern
+
+    my $jmax_new = @{$rfields_new} - 1;
+    $line_obj->set_rtokens($rtokens_new);
+    $line_obj->set_rpatterns($rpatterns_new);
+    $line_obj->set_rfields($rfields_new);
+    $line_obj->set_rfield_lengths($rfield_lengths_new);
+    $line_obj->set_jmax($jmax_new);
+
+    local $" = ')(';
+
+    $debug && print <<EOM;
 
 new jmax: $jmax_new
 new tokens: <@{$rtokens_new}>
@@ -2356,7 +2633,8 @@ sub delete_unmatched_tokens {
     # many obviously un-needed alignment tokens as possible.  This will prevent
     # them from interfering with the final alignment.
 
-    return unless @{$rlines};
+    return unless @{$rlines} > 1;
+
     my $has_terminal_match = $rlines->[-1]->get_j_terminal_match();
 
     # ignore hanging side comments in these operations
@@ -2366,15 +2644,18 @@ sub delete_unmatched_tokens {
     my @min_levels;
 
     my $jmax = @{$rnew_lines} - 1;
+    return unless $jmax >= 0;
 
     my %is_good_tok;
 
     # create a hash of tokens for each line
     my $rline_hashes = [];
+    my $saw_list_type;
     foreach my $line ( @{$rnew_lines} ) {
         my $rhash   = {};
         my $rtokens = $line->get_rtokens();
-        my $i       = 0;
+        if ( !$saw_list_type && $line->get_list_type() ) { $saw_list_type = 1 }
+        my $i = 0;
         my $i_eq;
         my $lev_min;
         foreach my $tok ( @{$rtokens} ) {
@@ -2474,7 +2755,6 @@ sub delete_unmatched_tokens {
             my $line    = $rnew_lines->[$jj];
             my $rtokens = $line->get_rtokens();
             my $rhash   = $rline_hashes->[$jj];
-            my $i       = 0;
             my $i_eq    = $i_equals[$jj];
             my @idel;
             my $imax = @{$rtokens} - 2;
@@ -2541,14 +2821,327 @@ sub delete_unmatched_tokens {
                 }
             }
 
-            if (@idel) { delete_selected_tokens( $line, \@idel ) }
+            if (@idel) {
+                delete_selected_tokens( $line, \@idel, $saw_list_type );
+            }
         }
+
     }    # End loop over subgroups
+
+    fix_ragged_matches($rlines) if ($saw_list_type);
 
     return;
 }
 
-{        # decide_if_aligned_pair
+{        # fix_ragged_matches
+
+    my %is_comma_or_comment;
+    my $BLOCK_MERGE_RATIO;
+    my $EXPLAIN;
+
+    BEGIN {
+        my @q;
+
+        @q = ( ',', '=>', '#' );
+        @is_comma_or_comment{@q} = (1) x scalar(@q);
+
+        # This fraction controls merges. Only merge a long block into a shorter
+        # block if the ratio of the number of lines is less than this ratio.
+        # The idea is to avoid merging away a significant block that would
+        # otherwise be aligned.  This is not a critical parameter.  Some
+        # testing showed that it is best between about 0.3 and 0.5.  The
+        # original test snippet, git25, worked best with a value >=0.35.
+        $BLOCK_MERGE_RATIO = 0.5;
+
+        # Debug flag
+        $EXPLAIN = 0;
+    }
+
+    sub fix_ragged_matches {
+        my ($rlines) = @_;
+
+        return unless @{$rlines} > 2;
+
+        # Look at a group of lines and see if there are ragged matches
+        # which can be improved by adjusting alignments.
+
+        # TODO: This version only treats lists.  It might be generalized
+        # to handle more types of matches.
+
+        #########################################################
+        # Step 1. Start by scanning the lines and collecting info
+        #########################################################
+        # For each line, save:  [is_list, imax_match]
+        #   is_list=a flag showing if it is a pure list,
+        #   imax_match = the index of the highest matching alignment token
+        my $ri_list_info = [];
+        my $rtokens;
+        my $imax;
+        my $in_match = 0;
+        my $jj       = -1;
+
+        foreach my $line ( @{$rlines} ) {
+
+            # _m = previous line
+            my $rtokens_m = $rtokens;
+            my $imax_m    = $imax;
+            my $jj_m      = $jj;
+
+            $jj++;
+            $rtokens = $line->get_rtokens();
+            $imax    = @{$rtokens} - 2;        # max i before comment
+            my $list_type = $line->get_list_type();
+
+            # No matches if there is a group ending flag set between these lines
+            my $end_group = ( $jj_m >= 0 && $rlines->[$jj_m]->{_end_group} );
+
+            # Also skip past a non-list line; we are working on pure lists here
+            if ( $end_group || !$list_type ) {
+                push @{$ri_list_info}, [ 0, -1 ];
+                next;
+            }
+
+            # Loop to examine tokens of each line
+            my $i_nomatch;
+            my $is_list    = $imax >= 0;
+            my $i          = -1;
+            my $imax_match = -1;
+
+            foreach my $tok ( @{$rtokens} ) {
+                $i++;
+                last if ( $i > $imax );
+                my ( $raw_tok, $lev, $tag, $tok_count ) =
+                  decode_alignment_token($tok);
+
+                # Look for lines which are lists
+                if ( $is_list && !$is_comma_or_comment{$raw_tok} ) {
+                    $is_list = 0;
+                    last;
+                }
+
+                # Look for index of first token which does not match the
+                # previous line
+                if ( defined($rtokens_m) ) {
+                    if ( $i > $imax_m ) { last; }
+                    my $tokm = $rtokens_m->[$i];
+                    last if ( $tok ne $tokm );
+                }
+                $imax_match = $i;
+            }
+
+            # Save the last index of leading matches to the previous line
+            push @{$ri_list_info}, [ $is_list, $imax_match ];
+        }
+
+        ##########################################################
+        # Step 2. Combine runs of equal length matches into blocks
+        ##########################################################
+        my @match_blocks;
+
+        # Each block in @match_blocks contains [jbeg, jend, imax_match], where
+        # jbeg = line index of first line of block
+        # jend = line index of last line of block
+        # imax_match = index of maximum alignment token for lines in this batch.
+        #    This value applies to matches between all lines j=jbeg to jend and
+        #    j=jbeg-1 to jend-1.  In other words, the value for a pair of lines
+        #    is stored with the line with the higher index.
+        my $imatch      = -10;
+        my $j_last_line = @{$rlines} - 1;
+        my %counts;
+        my $total_match_count = 0;
+        my $all_list_lines    = 1;
+        for ( my $jr = 1 ; $jr <= $j_last_line ; $jr++ ) {
+            my $jl = $jr - 1;
+            my ( $is_list, $imax_match ) = @{ $ri_list_info->[$jr] };
+            if ( !$is_list ) { $all_list_lines = 0 }
+            $counts{$imax_match}++;
+            $total_match_count += $imax_match + 2;
+
+            # look at total variation of fields
+            my $nl = $rlines->[$jl]->get_jmax();
+            my $nr = $rlines->[$jr]->get_jmax();
+
+            $imax_match = -1 unless ($is_list);
+            if ( $imax_match != $imatch ) {
+                if (@match_blocks) {
+                    $match_blocks[-1]->[1] = $jr - 1;
+                }
+
+                push @match_blocks, [ $jl, $j_last_line, $imax_match, 0 ];
+                $imatch = $imax_match;
+            }
+        }
+
+        if ($EXPLAIN) {
+            print "Blocks Before Merging:\n";
+            local $" = ')(';
+            foreach (@match_blocks) {
+                print "Block: (@{$_})\n";
+            }
+        }
+
+        ############################################################
+        # Step 3. Try to improve overall alignment by merging blocks
+        ############################################################
+
+        # Loop over iterations; it usually just takes one pass but it may
+        # occasionally take 2 iterations.
+        for ( my $it = 0 ; $it < 3 ; $it++ ) {
+
+            # quit if no more matches possible
+            last unless ( @match_blocks > 1 );
+
+            # loop over blocks
+            my @new_match_blocks = ();
+            my $merge_count      = 0;
+            for ( my $ib = 0 ; $ib < @match_blocks ; $ib++ ) {
+                my $block = $match_blocks[$ib];
+                my ( $jmin, $jmax, $imatch ) = @{$block};
+                my $num = $jmax - $jmin;
+
+                # Skip no-match blocks
+                next if ( $imatch < 0 );
+
+                # pull out values for previous block
+                my ( $block_m, $jmin_m, $jmax_m, $imatch_m, $num_m );
+                if (@new_match_blocks) {
+                    $block_m = $new_match_blocks[-1];
+                    ( $jmin_m, $jmax_m, $imatch_m ) = @{$block_m};
+                    $num_m = $jmax_m - $jmin_m;
+                }
+
+                # See if we can merge this block into a previous block which
+                # has an equal or fewer number of aligned fields.  The combined
+                # block will have the lesser number of alignments.  We will
+                # only do this if it will help overall alignment.
+                if ( defined($block_m) && $imatch >= $imatch_m ) {
+
+                    # Always ok to merge blocks with an equal number of
+                    # alignments.  This can occur if we previously removed an
+                    # intermediate larger block.
+                    my $merge_ok = ( $imatch == $imatch_m );
+
+                    # And it is ok to merge if the fraction of lines of the
+                    # block being modified is acceptably small.
+                    $merge_ok ||= $num < $BLOCK_MERGE_RATIO * $num_m;
+
+                    # If necessary, look for a sandwich situation at next block
+                    # and recompute assuming all three merge.
+                    if ( !$merge_ok && $ib < @match_blocks - 1 ) {
+                        my $block_p = $match_blocks[ $ib + 1 ];
+                        my ( $jmin_p, $jmax_p, $imatch_p ) = @{$block_p};
+                        if ( $imatch_p == $imatch_m ) {
+                            my $num_p = $jmax_p - $jmin_p;
+                            $merge_ok ||=
+                              $num < $BLOCK_MERGE_RATIO * ( $num_m + $num_p );
+                        }
+                    }
+
+                    if ($merge_ok) {
+
+                        # We are only merging with the previous block. In a
+                        # sandwich merge, the next block will merge in the next
+                        # pass through the loop.
+                        $block_m = [ $jmin_m, $jmax, $imatch_m ];
+                        $new_match_blocks[-1] = $block_m;
+                        $merge_count++;
+                        $EXPLAIN > 2
+                          && print
+"Merged block # $ib into previous block; #lines $num into $num_m, #matches $imatch into $imatch_m, it=$it\n";
+                        next;
+                    }
+                }
+                push @new_match_blocks, $block;
+            }
+            @match_blocks = @new_match_blocks;
+            $EXPLAIN > 2 && print "it=$it, merged block count = $merge_count\n";
+            last if ( $merge_count == 0 );
+        }
+
+        if ($EXPLAIN) {
+            print "Blocks After Merging:\n";
+            local $" = ')(';
+            foreach (@match_blocks) {
+                print "Block: (@{$_})\n";
+            }
+        }
+
+        #######################################################################
+        # Step 4. Trim away alignments which extend beyond the block alignments
+        #######################################################################
+        my ( $jbeg, $jend, $imax_match );
+        for ( my $ib = 0 ; $ib < @match_blocks ; $ib++ ) {
+            my $block = $match_blocks[$ib];
+            my ( $jbeg_m, $jend_m, $imax_match_m ) =
+              ( $jbeg, $jend, $imax_match );
+            ( $jbeg, $jend, $imax_match ) = @{$block};
+
+            next unless ( $imax_match >= 0 );
+
+            # We will ignore a group of two lines. These are already well
+            # covered by existing logic, and we can only make things worse.
+            next unless ( $jend - $jbeg > 1 );
+
+            if (   $jbeg > 0
+                && defined($imax_match_m)
+                && $imax_match > $imax_match_m
+                && $imax_match_m >= 0 )
+            {
+                $rlines->[ $jbeg - 1 ]->{_end_group} = 1;
+                $EXPLAIN > 2 && print "Marked group end before line $jbeg\n";
+            }
+
+            # remove unused alignment tokens
+            for ( my $jj = $jbeg ; $jj <= $jend ; $jj++ ) {
+                my $line    = $rlines->[$jj];
+                my $rtokens = $line->get_rtokens();
+                my $imax    = @{$rtokens} - 2;
+                my $tok     = $rtokens->[0];
+
+                # The first line of a block is handled by previous block except
+                # for the first line.  There are no gaps between blocks, so all
+                # lines will be handled.
+                next if ( $jj == $jbeg && $jj > 0 );
+
+                # A boundary line is trimmed to the larger of its surrounding
+                # match lengths:
+                my $imax_match_j = $imax_match;
+
+                # First line checks previous block
+                if (   $jj == $jbeg
+                    && defined($imax_match_m)
+                    && $imax_match_m > $imax_match_j )
+                {
+                    $imax_match_j = $imax_match_m;
+                }
+
+                # Last line checks next block
+                if ( $jj == $jend && $ib < @match_blocks - 1 ) {
+                    my $block_p = $match_blocks[ $ib + 1 ];
+                    my ( $jmin_p, $jmax_p, $imax_match_p ) = @{$block_p};
+                    if ( $imax_match_p > $imax_match_j ) {
+                        $imax_match_j = $imax_match_p;
+                    }
+                }
+
+                # Now delete the unused alignment tokens
+
+             # NOTE: We are currently only working on lists, so we can allow
+             # lines to be promoted as lists.  But if this coding is generalized
+             # this flag may have to be adjusted to handle or non-lists.
+                my $new_list_ok = 1;
+
+                if ( $imax_match_j < $imax ) {
+                    my @idel = ( $imax_match_j + 1 .. $imax );
+                    delete_selected_tokens( $line, \@idel, $new_list_ok );
+                }
+            }
+        }
+        return;
+    }
+}
+
+{    # decide_if_aligned_pair
 
     my %is_if_or;
     my %is_assignment;
@@ -2556,7 +3149,7 @@ sub delete_unmatched_tokens {
     BEGIN {
 
         my @q = qw(
-          if or ||
+          if unless or ||
         );
         @is_if_or{@q} = (1) x scalar(@q);
 
@@ -2725,9 +3318,10 @@ sub delete_unmatched_tokens {
         # But try to convert them into a simple comment group if the first line
         # a has side comment
         my $rfields             = $group_lines[0]->get_rfields();
+        my $rfield_lengths      = $group_lines[0]->get_rfield_lengths();
         my $maximum_field_index = $group_lines[0]->get_jmax();
-        if ( $do_not_align
-            && ( length( $rfields->[$maximum_field_index] ) > 0 ) )
+        if (   $do_not_align
+            && $rfield_lengths->[$maximum_field_index] > 0 )
         {
             combine_fields();
             $do_not_align = 0;
@@ -2747,7 +3341,7 @@ sub adjust_side_comment {
     my $maximum_field_index     = $group_lines[0]->get_jmax();
     my $i                       = 0;
     foreach my $line (@group_lines) {
-        if ( length( $line->get_rfields()->[$maximum_field_index] ) ) {
+        if ( $line->get_rfield_lengths()->[$maximum_field_index] ) {
             $have_side_comment       = 1;
             $first_side_comment_line = $i;
             last;
@@ -2843,10 +3437,16 @@ sub valign_output_step_A {
     # been found. Then it is shipped to the next step.
     ###############################################################
 
-    my ( $line, $min_ci_gap, $do_not_align, $group_leader_length,
-        $extra_leading_spaces )
-      = @_;
+    my %input_hash = @_;
+
+    my $line                 = $input_hash{line};
+    my $min_ci_gap           = $input_hash{min_ci_gap};
+    my $do_not_align         = $input_hash{do_not_align};
+    my $group_leader_length  = $input_hash{group_leader_length};
+    my $extra_leading_spaces = $input_hash{extra_leading_spaces};
+
     my $rfields                   = $line->get_rfields();
+    my $rfield_lengths            = $line->get_rfield_lengths();
     my $leading_space_count       = $line->get_leading_space_count();
     my $outdent_long_lines        = $line->get_outdent_long_lines();
     my $maximum_field_index       = $line->get_jmax();
@@ -2857,7 +3457,8 @@ sub valign_output_step_A {
         $leading_space_count += $min_ci_gap;
     }
 
-    my $str = $rfields->[0];
+    my $str     = $rfields->[0];
+    my $str_len = $rfield_lengths->[0];
 
     # loop to concatenate all fields of this line and needed padding
     my $total_pad_count = 0;
@@ -2868,12 +3469,12 @@ sub valign_output_step_A {
           if (
             ( $j == $maximum_field_index )
             && ( !defined( $rfields->[$j] )
-                || ( length( $rfields->[$j] ) == 0 ) )
+                || ( $rfield_lengths->[$j] == 0 ) )
           );
 
         # compute spaces of padding before this field
         my $col = $line->get_column( $j - 1 );
-        my $pad = $col - ( length($str) + $leading_space_count );
+        my $pad = $col - ( $str_len + $leading_space_count );
 
         if ($do_not_align) {
             $pad =
@@ -2901,10 +3502,12 @@ sub valign_output_step_A {
 
         # only add padding when we have a finite field;
         # this avoids extra terminal spaces if we have empty fields
-        if ( length( $rfields->[$j] ) > 0 ) {
+        if ( $rfield_lengths->[$j] > 0 ) {
             $str .= ' ' x $total_pad_count;
+            $str_len += $total_pad_count;
             $total_pad_count = 0;
             $str .= $rfields->[$j];
+            $str_len += $rfield_lengths->[$j];
         }
         else {
             $total_pad_count = 0;
@@ -2918,12 +3521,18 @@ sub valign_output_step_A {
         }
     }
 
-    my $side_comment_length = ( length( $rfields->[$maximum_field_index] ) );
+    my $side_comment_length = $rfield_lengths->[$maximum_field_index];
 
     # ship this line off
-    valign_output_step_B( $leading_space_count + $extra_leading_spaces,
-        $str, $side_comment_length, $outdent_long_lines,
-        $rvertical_tightness_flags, $group_level );
+    valign_output_step_B(
+        leading_space_count => $leading_space_count + $extra_leading_spaces,
+        line                => $str,
+        line_length         => $str_len,
+        side_comment_length => $side_comment_length,
+        outdent_long_lines  => $outdent_long_lines,
+        rvertical_tightness_flags => $rvertical_tightness_flags,
+        level                     => $group_level,
+    );
     return;
 }
 
@@ -2981,11 +3590,14 @@ sub combine_fields {
     #  @group_lines
     my $maximum_field_index = $group_lines[0]->get_jmax();
     foreach my $line (@group_lines) {
-        my $rfields = $line->get_rfields();
+        my $rfields        = $line->get_rfields();
+        my $rfield_lengths = $line->get_rfield_lengths();
         foreach ( 1 .. $maximum_field_index - 1 ) {
             $rfields->[0] .= $rfields->[$_];
+            $rfield_lengths->[0] += $rfield_lengths->[$_];
         }
-        $rfields->[1] = $rfields->[$maximum_field_index];
+        $rfields->[1]        = $rfields->[$maximum_field_index];
+        $rfield_lengths->[1] = $rfield_lengths->[$maximum_field_index];
 
         $line->set_jmax(1);
         $line->set_column( 0, 0 );
@@ -2995,9 +3607,10 @@ sub combine_fields {
     $maximum_field_index = 1;
 
     foreach my $line (@group_lines) {
-        my $rfields = $line->get_rfields();
+        my $rfields        = $line->get_rfields();
+        my $rfield_lengths = $line->get_rfield_lengths();
         for my $k ( 0 .. $maximum_field_index ) {
-            my $pad = length( $rfields->[$k] ) - $line->current_field_width($k);
+            my $pad = $rfield_lengths->[$k] - $line->current_field_width($k);
             if ( $k == 0 ) {
                 $pad += $line->get_leading_space_count();
             }
@@ -3027,14 +3640,23 @@ sub valign_output_step_B {
     # and closing tokens.
     ###############################################################
 
-    my ( $leading_space_count, $str, $side_comment_length, $outdent_long_lines,
-        $rvertical_tightness_flags, $level )
-      = @_;
+    my %input_hash = @_;
+
+    my $leading_space_count       = $input_hash{leading_space_count};
+    my $str                       = $input_hash{line};
+    my $str_length                = $input_hash{line_length};
+    my $side_comment_length       = $input_hash{side_comment_length};
+    my $outdent_long_lines        = $input_hash{outdent_long_lines};
+    my $rvertical_tightness_flags = $input_hash{rvertical_tightness_flags};
+    my $level                     = $input_hash{level};
+
+    # Useful -gcs test cases for wide characters are
+    # perl527/(method.t.2, reg_mesg.t, mime-header.t)
 
     # handle outdenting of long lines:
     if ($outdent_long_lines) {
         my $excess =
-          length($str) -
+          $str_length -
           $side_comment_length +
           $leading_space_count -
           maximum_line_length_for_level($level);
@@ -3055,6 +3677,7 @@ sub valign_output_step_B {
     # to the leading_space_count from here on.
     my $leading_string =
       $leading_space_count > 0 ? ( ' ' x $leading_space_count ) : "";
+    my $leading_string_length = length($leading_string);
 
     # Unpack any recombination data; it was packed by
     # sub send_lines_to_vertical_aligner. Contents:
@@ -3079,6 +3702,10 @@ sub valign_output_step_B {
 
     # handle any cached line ..
     # either append this line to it or write it out
+    # Note: the function length() is used in this next test out of caution.
+    # All testing has shown that the variable $cached_line_text_length is
+    # correct, but its calculation is complex and a loss of cached text would
+    # be a disaster.
     if ( length($cached_line_text) ) {
 
         # Dump an invalid cached line
@@ -3091,7 +3718,7 @@ sub valign_output_step_B {
         # Handle cached line ending in OPENING tokens
         elsif ( $cached_line_type == 1 || $cached_line_type == 3 ) {
 
-            my $gap = $leading_space_count - length($cached_line_text);
+            my $gap = $leading_space_count - $cached_line_text_length;
 
             # handle option of just one tight opening per line:
             if ( $cached_line_flag == 1 ) {
@@ -3101,10 +3728,11 @@ sub valign_output_step_B {
             }
 
             if ( $gap >= 0 && defined($seqno_beg) ) {
-                $leading_string      = $cached_line_text . ' ' x $gap;
-                $leading_space_count = $cached_line_leading_space_count;
-                $seqno_string        = $cached_seqno_string . ':' . $seqno_beg;
-                $level               = $last_level_written;
+                $leading_string        = $cached_line_text . ' ' x $gap;
+                $leading_string_length = $cached_line_text_length + $gap;
+                $leading_space_count   = $cached_line_leading_space_count;
+                $seqno_string = $cached_seqno_string . ':' . $seqno_beg;
+                $level        = $last_level_written;
             }
             else {
                 valign_output_step_C( $cached_line_text,
@@ -3116,6 +3744,8 @@ sub valign_output_step_B {
         # Handle cached line ending in CLOSING tokens
         else {
             my $test_line = $cached_line_text . ' ' x $cached_line_flag . $str;
+            my $test_line_length =
+              $cached_line_text_length + $cached_line_flag + $str_length;
             if (
 
                 # The new line must start with container
@@ -3136,8 +3766,7 @@ sub valign_output_step_B {
                 )
 
                 # The combined line must fit
-                && (
-                    length($test_line) <=
+                && ( $test_line_length <=
                     maximum_line_length_for_level($last_level_written) )
               )
             {
@@ -3229,10 +3858,12 @@ sub valign_output_step_B {
                     }
                 }
 
-                $str                 = $test_line;
-                $leading_string      = "";
-                $leading_space_count = $cached_line_leading_space_count;
-                $level               = $last_level_written;
+                $str                   = $test_line;
+                $str_length            = $test_line_length;
+                $leading_string        = "";
+                $leading_string_length = 0;
+                $leading_space_count   = $cached_line_leading_space_count;
+                $level                 = $last_level_written;
             }
             else {
                 valign_output_step_C( $cached_line_text,
@@ -3241,11 +3872,13 @@ sub valign_output_step_B {
             }
         }
     }
-    $cached_line_type = 0;
-    $cached_line_text = "";
+    $cached_line_type        = 0;
+    $cached_line_text        = "";
+    $cached_line_text_length = 0;
 
     # make the line to be written
-    my $line = $leading_string . $str;
+    my $line        = $leading_string . $str;
+    my $line_length = $leading_string_length + $str_length;
 
     # write or cache this line
     if ( !$open_or_close || $side_comment_length > 0 ) {
@@ -3253,6 +3886,7 @@ sub valign_output_step_B {
     }
     else {
         $cached_line_text                = $line;
+        $cached_line_text_length         = $line_length;
         $cached_line_type                = $open_or_close;
         $cached_line_flag                = $tightness_flag;
         $cached_seqno                    = $seqno;

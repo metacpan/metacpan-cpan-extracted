@@ -1,13 +1,12 @@
 package Lingua::Stem;
 
-# $RCSfile: Stem.pm,v $ $Revision: 1.2 $ $Date: 1999/06/16 17:45:28 $ $Author: snowhare $
-
 use strict;
+use warnings;
 require Exporter;
 use Lingua::Stem::AutoLoader;
 
 BEGIN {
-    $Lingua::Stem::VERSION     = '0.84';
+    $Lingua::Stem::VERSION     = '2.30';
     @Lingua::Stem::ISA         = qw (Exporter);
     @Lingua::Stem::EXPORT      = ();
     @Lingua::Stem::EXPORT_OK   = qw (stem stem_in_place clear_stem_cache stem_caching add_exceptions delete_exceptions get_exceptions set_locale get_locale);

@@ -19,7 +19,7 @@ BOOT {
     Stash("Net::SockAddr::Inet4", GV_ADD).inherit(me);
     Stash("Net::SockAddr::Inet6", GV_ADD).inherit(me);
     Stash("Net::SockAddr::Unix",  GV_ADD).inherit(me);
-    
+
     create_constants(me, {
         {"AF_UNSPEC", AF_UNSPEC},
         {"AF_INET",   AF_INET  },
@@ -27,7 +27,7 @@ BOOT {
         #ifndef _WIN32
         {"AF_UNIX",   AF_UNIX  },
         #endif
-        
+
         {"INADDR_ANY",       Simple(addr2sv(SockAddr::Inet4::addr_any))          },
         {"INADDR_LOOPBACK",  Simple(addr2sv(SockAddr::Inet4::addr_loopback))     },
         {"INADDR_BROADCAST", Simple(addr2sv(SockAddr::Inet4::addr_broadcast))    },
@@ -59,18 +59,8 @@ bool SockAddr::is_unix ()
 #endif
 
 string_view SockAddr::get () {
-    size_t len;
-    switch (THIS->family()) {
-        case AF_UNSPEC : XSRETURN_UNDEF;
-        case AF_INET   : len = sizeof(sockaddr_in); break;
-        case AF_INET6  : len = sizeof(sockaddr_in6); break;
-#ifndef _WIN32
-        default        : len = sizeof(sockaddr_un); break; // AF_UNIX
-#else
-        default        : XSRETURN_UNDEF;
-#endif
-    }
-    RETVAL = string_view((const char*)THIS->get(), len);
+    if (THIS->family() == AF_UNSPEC) XSRETURN_UNDEF;
+    RETVAL = string_view((const char*)THIS->get(), THIS->length());
 }
 
 std::string SockAddr::_to_string (...) {

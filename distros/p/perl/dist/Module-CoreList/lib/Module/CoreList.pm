@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20200601_30';
+our $VERSION = '5.20200620';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -363,7 +363,9 @@ sub changes_between {
     5.030002 => '2020-03-14',
     5.031010 => '2020-03-20',
     5.031011 => '2020-04-28',
+    5.028003 => '2020-06-01',
     5.030003 => '2020-06-01',
+    5.032000 => '2020-06-20',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -17461,6 +17463,17 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.028003 => {
+        delta_from => 5.028002,
+        changed => {
+            'B::Op_private'         => '5.028003',
+            'Config'                => '5.028003',
+            'Module::CoreList'      => '5.20200601_28',
+            'Module::CoreList::Utils'=> '5.20200601_28',
+        },
+        removed => {
+        }
+    },
     5.030003 => {
         delta_from => 5.030002,
         changed => {
@@ -17468,6 +17481,36 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'Config'                => '5.030003',
             'Module::CoreList'      => '5.20200601_30',
             'Module::CoreList::Utils'=> '5.20200601_30',
+        },
+        removed => {
+        }
+    },
+    5.032000 => {
+        delta_from => 5.031011,
+        changed => {
+            'B::Deparse'            => '1.54',
+            'B::Op_private'         => '5.032000',
+            'Benchmark'             => '1.23',
+            'Config'                => '5.032',
+            'Encode'                => '3.06',
+            'Encode::Guess'         => '2.08',
+            'File::Glob'            => '1.33',
+            'List::Util'            => '1.55',
+            'List::Util::XS'        => '1.55',
+            'Module::CoreList'      => '5.20200620',
+            'Module::CoreList::Utils'=> '5.20200620',
+            'POSIX'                 => '1.94',
+            'Scalar::Util'          => '1.55',
+            'Storable'              => '3.21',
+            'Sub::Util'             => '1.55',
+            'Thread::Queue'         => '3.14',
+            'Tie::Scalar'           => '1.05',
+            '_charnames'            => '1.48',
+            'charnames'             => '1.48',
+            'encoding'              => '3.00',
+            'perlfaq'               => '5.20200523',
+            're'                    => '0.40',
+            'threads'               => '2.25',
         },
         removed => {
         }
@@ -18572,8 +18615,22 @@ sub is_core
         removed => {
         }
     },
+    5.028003 => {
+        delta_from => 5.028002,
+        changed => {
+        },
+        removed => {
+        }
+    },
     5.030003 => {
         delta_from => 5.030002,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.032000 => {
+        delta_from => 5.031011,
         changed => {
         },
         removed => {
@@ -18802,12 +18859,8 @@ sub is_core
     'PerlIO::via::QuotedPrint'=> 'cpan',
     'Pod::Checker'          => 'cpan',
     'Pod::Escapes'          => 'cpan',
-    'Pod::Find'             => 'cpan',
-    'Pod::InputObjects'     => 'cpan',
     'Pod::Man'              => 'cpan',
     'Pod::ParseLink'        => 'cpan',
-    'Pod::ParseUtils'       => 'cpan',
-    'Pod::Parser'           => 'cpan',
     'Pod::Perldoc'          => 'cpan',
     'Pod::Perldoc::BaseTo'  => 'cpan',
     'Pod::Perldoc::GetOptsOO'=> 'cpan',
@@ -18821,8 +18874,6 @@ sub is_core
     'Pod::Perldoc::ToText'  => 'cpan',
     'Pod::Perldoc::ToTk'    => 'cpan',
     'Pod::Perldoc::ToXml'   => 'cpan',
-    'Pod::PlainText'        => 'cpan',
-    'Pod::Select'           => 'cpan',
     'Pod::Simple'           => 'cpan',
     'Pod::Simple::BlackBox' => 'cpan',
     'Pod::Simple::Checker'  => 'cpan',
@@ -18832,6 +18883,7 @@ sub is_core
     'Pod::Simple::HTML'     => 'cpan',
     'Pod::Simple::HTMLBatch'=> 'cpan',
     'Pod::Simple::HTMLLegacy'=> 'cpan',
+    'Pod::Simple::JustPod'  => 'cpan',
     'Pod::Simple::LinkSection'=> 'cpan',
     'Pod::Simple::Methody'  => 'cpan',
     'Pod::Simple::Progress' => 'cpan',
@@ -19229,12 +19281,8 @@ sub is_core
     'PerlIO::via::QuotedPrint'=> undef,
     'Pod::Checker'          => undef,
     'Pod::Escapes'          => undef,
-    'Pod::Find'             => undef,
-    'Pod::InputObjects'     => undef,
     'Pod::Man'              => 'https://rt.cpan.org/Dist/Display.html?Name=podlators',
     'Pod::ParseLink'        => 'https://rt.cpan.org/Dist/Display.html?Name=podlators',
-    'Pod::ParseUtils'       => undef,
-    'Pod::Parser'           => undef,
     'Pod::Perldoc'          => undef,
     'Pod::Perldoc::BaseTo'  => undef,
     'Pod::Perldoc::GetOptsOO'=> undef,
@@ -19248,8 +19296,6 @@ sub is_core
     'Pod::Perldoc::ToText'  => undef,
     'Pod::Perldoc::ToTk'    => undef,
     'Pod::Perldoc::ToXml'   => undef,
-    'Pod::PlainText'        => undef,
-    'Pod::Select'           => undef,
     'Pod::Simple'           => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::BlackBox' => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::Checker'  => 'https://github.com/perl-pod/pod-simple/issues',
@@ -19259,6 +19305,7 @@ sub is_core
     'Pod::Simple::HTML'     => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::HTMLBatch'=> 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::HTMLLegacy'=> 'https://github.com/perl-pod/pod-simple/issues',
+    'Pod::Simple::JustPod'  => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::LinkSection'=> 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::Methody'  => 'https://github.com/perl-pod/pod-simple/issues',
     'Pod::Simple::Progress' => 'https://github.com/perl-pod/pod-simple/issues',

@@ -17,29 +17,25 @@ Exception::Backtrace - Get C and Perl backtraces
     # Returns C and Perl backtraces string like:
     my $bt1 = Exception::Backtrace::get_backtrace_string($ex);
     # C backtrace:
-    # 0x7f4097db604e in panda::Backtrace::Backtrace at src/panda/exception.cc:27
-    # 0x7f4097ab7b77 in xs::safe_wrap_exception at src/xs/backtrace.cc:214
-    # 0x7f4097ac16bf in XS_Exception__Backtrace_safe_wrap_exception at Backtrace.xs.cc:262
-    # 0x55f8085ba453 in Perl_pp_entersub at pp_hot.c:5237
-    # 0x55f808576d62 in Perl_runops_debug at dump.c:2537
-    # 0x55f8084d5707 in Perl_call_sv at perl.c:3026
-    # 0x55f808580328 in S_invoke_exception_hook at util.c:1578
-    # 0x55f80858209a in Perl_croak_sv at util.c:1677
-    # 0x55f8085820de in Perl_die_sv at util.c:1602
-    # 0x55f80863f90e in Perl_pp_die at pp_sys.c:509
-    # 0x55f808576d62 in Perl_runops_debug at dump.c:2537
-    # 0x55f8084e028f in perl_run at perl.c:2711
-    # 0x55f8084a8282 in main at perlmain.c:72
-    # 0x7f40983c8deb in __libc_start_main at ../sysdeps/x86/libc-start.c:129
-    # 0x55f8084a82ca from /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/bin/perl
+    # 0x7f27b06e7cc8 in panda::Backtrace::Backtrace at XS-libpanda/src/panda/exception.cc:55
+    # 0x7f27b06e7dd4 in panda::exception::exception at XS-libpanda/src/panda/exception.cc:87
+    # 0x7f27b01068c5 in fn_1<short unsigned int> at Exception-Backtrace/t/MyTest.xs:9
+    # 0x7f27b0106482 in fn_2<std::__cxx11::basic_string<char> > at Exception-Backtrace/t/MyTest.xs:13
+    # 0x7f27b0105cad in <lambda()>::<lambda()>::operator() at Exception-Backtrace/t/MyTest.xs:225
+    # 0x7f27b0105d54 in <lambda()>::operator() at Exception-Backtrace/t/MyTest_xsgen.cc:235
+    # 0x7f27b01064b1 in xs::throw_guard<XS_MyTest_throw_backtrace(PerlInterpreter*, CV*)::<lambda()> > at ../../var/lib/x86_64-linux-thread-multi/XS/Framework.x/i/xs/catch.h:23    # 0x7f27b0105dbb in XS_MyTest_throw_backtrace at Exception-Backtrace/t/MyTest_xsgen.cc:229    # 0x55a24133efd4 in Perl_pp_entersub at /home/b/perl5/perlbrew/build/perl-5.32.0/perl-5.32.0/pp_hot.c:5277
+    # 0x55a2412f5a6a in Perl_runops_debug at /home/b/perl5/perlbrew/build/perl-5.32.0/perl-5.32.0/dump.c:2571
+    # 0x55a24124f303 in S_run_body at /home/b/perl5/perlbrew/build/perl-5.32.0/perl-5.32.0/perl.c:2761
+    # 0x55a24124f303 in perl_run at /home/b/perl5/perlbrew/build/perl-5.32.0/perl-5.32.0/perl.c:2761
+    # 0x55a24120f3ee in main at /home/b/perl5/perlbrew/build/perl-5.32.0/perl-5.32.0/perlmain.c:73
+    # 0x7f27b0a5edeb in __libc_start_main at /builddir/glibc-2.30/csu/../csu/libc-start.c:130
+    # 0x55a24120f42a from /home/b/perl5/perlbrew/perls/5.32.0m/bin/perl
     # Perl backtrace:
-    # main::__ANON__ at t/05-perl-exceptions.t:124
-    # main::(eval) at t/05-perl-exceptions.t:124
-    # Test::Builder::__ANON__ at /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/lib/site_perl/5.30.1/Test/Builder.pm:334
-    # Test::Builder::(eval) at /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/lib/site_perl/5.30.1/Test/Builder.pm:334
-    # Test::More::subtest at /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/lib/site_perl/5.30.1/Test/More.pm:809
-    # main::subtest at t/05-perl-exceptions.t:134
-
+    # main::(eval) at t/06-c-exceptions.t:16
+    # main::__ANON__ at /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/Test/Builder.pm:334
+    # Test::Builder::(eval) at /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/Test/Builder.pm:334
+    # Test::Builder::subtest at /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/Test/More.pm:809
+    # Test::More::subtest at t/06-c-exceptions.t:27
     # Returns just Perl backtrace
     my $bt2 = Exception::Backtrace::get_backtrace_string_pp($ex);
 
@@ -108,22 +104,24 @@ performed only on demand.
 
 =head1 LIMITATIONS
 
-Currently the package works only on *nix. Its work on Windows should be possible,
-but additional patches are need (namely, a patch for gathering Instruction Pointer
-addresses, and a patch to get list of loaded DLLs and their range of addresses).
+The module was tested on *nix, Darwin and Windows.
 
 To gather C/C++ backtrace the sources must be compiled with B<debug info>(aka
 C<-g> flag for C<cc>). It is possible to have a mixture of .so compiled with
-and without debug info; in the last case the symbol information will be not
-available, there will just address and .so name.
+and without debug info; in the last case the symbol information will be just partially
+available via L<XS::libpanda>, i.e. just symbol name and .so if available.
 
 It is recommended to have C<Perl> itself to be compiled with debug info, i.e.
 C<perl -V> / C<Compiler> / C<optimize> should contain C<-g>; this will allow
 to automatically add debug info for all XS-extensions.
 
-NB: debug info has B<zero runtime overhead>. The C<debug_*> sections in elf files
-are not loaded by Operating System at all. So, it takes only disk space, which
-is quite cheap nowadays.
+Strawberry Perl users: out of the box debug info is being stripped from the
+binaries via C<-s -O2> gcc flags. They should be changed to C<-O0 -g> to
+have DWARF debug info.
+
+NB: debug info has B<zero runtime overhead> on *nix. The C<debug_*> sections
+in elf files are not loaded by Operating System at all. So, it occupies only disk
+space, which is quite cheap nowadays.
 
 C++ symbolic information resolution (i.e. gathering source file, file line etc.),
 happens on demand, i.e. when C<Backtrace> object is created. During the resolution
@@ -142,6 +140,11 @@ It seems that underlying C<backtrace> call from L<XS::libpanda> does not always 
 correct/full backtrace. That means, that C/C++ backtrace does not works reliable.
 If you know workaround, please submit a patch.
 
+It is known, that systems with C<musl> (e.g. Alipne Linux) instead of C<glibc> do not
+export backtrace capabilities, so backtraces will not be available for that systems.
+There is a theoretical workaround to use C<libunwind>; that might be implemented
+in future.
+
 =head1 SEE ALSO
 
 L<XS::Framework>
@@ -151,6 +154,8 @@ L<XS::libpanda>
 L<Devel::StackTrace>
 
 L<http://dwarfstd.org/>
+
+L<libunwind | https://github.com/libunwind/libunwind>
 
 =head1 AUTHOR
 

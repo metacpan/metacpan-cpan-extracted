@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -13,6 +13,11 @@
       "version" : 2
    },
    "name" : "App-plasm",
+   "no_index" : {
+      "directory" : [
+         "examples"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -43,8 +48,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Path::Tiny" : "0",
             "Wasm" : "0.08",
+            "Wasm::Hook" : "0",
             "Wasm::Wasmtime" : "0.08",
+            "Wasm::Wasmtime::Wat2Wasm" : "0",
             "perl" : "5.008001"
          }
       },
@@ -69,10 +77,11 @@
          "type" : "git",
          "url" : "git://github.com/perlwasm/App-plasm.git",
          "web" : "https://github.com/perlwasm/App-plasm"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.01",
-   "x_generated_by_perl" : "v5.31.11",
+   "version" : "0.02",
+   "x_generated_by_perl" : "v5.20.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0

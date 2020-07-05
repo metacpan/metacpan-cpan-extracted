@@ -196,7 +196,6 @@ sub filter_prettier ( $self, %options ) {
     my $msg = {
         command => 'prettier',
         options => {
-            %options,
             "printWidth"              => 99999999,
             "tabWidth"                => 4,
             "semi"                    => \1,
@@ -208,6 +207,7 @@ sub filter_prettier ( $self, %options ) {
             "vueIndentScriptAndStyle" => \1,
             "endOfLine"               => "lf",
             filepath                  => "$self->{path}",
+            %options,
         },
         data => $self->{data},
     };
@@ -271,11 +271,11 @@ sub filter_terser ( $self, %options ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 200, 201, 202, 203,  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
-## |      | 204, 205, 206, 207,  |                                                                                                                |
-## |      | 208, 209             |                                                                                                                |
+## |    3 | 199, 200, 201, 202,  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
+## |      | 203, 204, 205, 206,  |                                                                                                                |
+## |      | 207, 208             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 65, 200              | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
+## |    2 | 65, 199              | ValuesAndExpressions::RequireNumberSeparators - Long number not separated with underscores                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    1 | 159                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+

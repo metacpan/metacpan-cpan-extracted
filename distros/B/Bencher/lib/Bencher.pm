@@ -1,7 +1,7 @@
 package Bencher;
 
-our $DATE = '2019-12-24'; # DATE
-our $VERSION = '1.043'; # VERSION
+our $DATE = '2020-06-18'; # DATE
+our $VERSION = '1.050'; # VERSION
 
 1;
 # ABSTRACT: A benchmark framework
@@ -18,7 +18,7 @@ Bencher - A benchmark framework
 
 =head1 VERSION
 
-This document describes version 1.043 of Bencher (from Perl distribution Bencher), released on 2019-12-24.
+This document describes version 1.050 of Bencher (from Perl distribution Bencher), released on 2020-06-18.
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ C<code_template> to be able to easily permute the code with datasets (see
 below). So you should only specify C<code> when you cannot specify
 C<fcall_template> or C<code_template> or the other way.
 
-You can specify C<fall_template>, and this is the recommended way whenever
+You can specify C<fcall_template>, and this is the recommended way whenever
 possible. It is a string containing a function call code, in the form of:
 
  MODULENAME::FUNCTIONAME(ARG, ...)
@@ -344,10 +344,23 @@ seconds, you might want to skip this test and set this to 0.
 
 =item * code_startup (bool)
 
-=item * default_precision (float, between=>[0,1])
+=item * precision (float)
+
+Precision to pass to Benchmark::Dumb. Default is 0. Can be overriden via
+C<--precision> (CLI). takes precedence over C<default_precision>.
+
+=item * default_precision (float)
+
+(DEPRECATED)
 
 Precision to pass to Benchmark::Dumb. Default is 0. Can be overriden via
 C<--precision> (CLI).
+
+=item * module_startup_precision (float)
+
+Precision to pass to Benchmark::Dumb, when running benchmark in module_startup
+mode. Default is from C<precision> or C<default_precision>. Can be overriden
+with C<--precision> (CLI).
 
 =item * result (any)
 
@@ -649,7 +662,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

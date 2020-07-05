@@ -9,6 +9,14 @@ OpenTracing::Interface::SpanContext - A role that defines the SpanContext interf
 
     package OpenTracing::Implementation::MyBackendService::SpanContext;
     
+    sub get_baggage_item {
+        ...
+    }
+    
+    sub get_baggage_items {
+        ...
+    }
+    
     sub with_baggage_item {
         ...
     }

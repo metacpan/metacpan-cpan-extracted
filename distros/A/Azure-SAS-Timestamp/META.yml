@@ -1,0 +1,47 @@
+---
+abstract: 'Creating timestamps for Azure Shared Access Signatures.'
+author:
+  - 'Ben Kaufman (WHOSGONNA) ben.whosgonna.com@gmail.com'
+build_requires:
+  DateTime: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Azure-SAS-Timestamp
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Azure::SAS::Timestamp:
+    file: lib/Azure/SAS/Timestamp.pm
+    version: v0.0.4
+requires:
+  Moo: '0'
+  Regexp::Common: '0'
+  Regexp::Common::time: '0'
+  Time::Piece: '1.3'
+  Types::Standard: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/whosgonna/Azure-SAS-Timestamp/issues
+  homepage: https://github.com/whosgonna/Azure-SAS-Timestamp
+  repository: git://github.com/whosgonna/Azure-SAS-Timestamp.git
+version: 0.0.4
+x_contributors:
+  - 'Ben Kaufman <ben.kaufman@altigen.com>'
+  - 'Ben Kaufman <ben.whosgonna.com@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

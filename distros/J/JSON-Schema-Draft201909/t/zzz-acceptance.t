@@ -26,8 +26,30 @@ my $accepter = Test::JSON::Schema::Acceptance->new(
   include_optional => 1,
   verbose => 1,
 );
-my $js = JSON::Schema::Draft201909->new;
-my $js_short_circuit = JSON::Schema::Draft201909->new(short_circuit => 1);
+
+my %options = (validate_formats => 1);
+my $js = JSON::Schema::Draft201909->new(%options);
+my $js_short_circuit = JSON::Schema::Draft201909->new(%options, short_circuit => 1);
+
+my $add_resource = sub {
+  my ($uri, $data) = @_;
+  $js->add_schema($uri => $data);
+  $js_short_circuit->add_schema($uri => $data);
+};
+
+# TODO: moving into TJSA 1.000
+my $base = Mojo::URL->new('http://localhost:1234');
+$accepter->additional_resources->visit(
+  sub {
+    my ($path) = @_;
+    return if not $path->is_file or $path !~ /\.json$/;
+    my $data = $accepter->_json_decoder->decode($path->slurp_raw);
+    my $file = $path->relative($accepter->additional_resources);
+    my $uri = Mojo::URL->new($file)->base($base)->to_abs;
+    $add_resource->($uri => $data);
+  },
+  { recurse => 1 },
+);
 
 my $encoder = JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0, convert_blessed => 1, canonical => 1, pretty => 1);
 $encoder->indent_length(2) if $encoder->can('indent_length');
@@ -55,38 +77,43 @@ $accepter->acceptance(
   @ARGV ? (tests => { file => \@ARGV }) : (),
   $ENV{NO_TODO} ? () : ( todo_tests => [
     { file => [
-        'refRemote.json',             # adding or loading external file
-        'unevaluatedItems.json',
-        'unevaluatedProperties.json',
-        'optional/bignum.json',
-        'optional/content.json',
-        'optional/ecmascript-regex.json', # possibly TODO, pending outcome of json-schema-org/JSON-Schema-Test-Suite#380
+        'unevaluatedItems.json',                    # TODO: see issue #19
+        'unevaluatedProperties.json',               # ""
+        'optional/bignum.json',                     # TODO: see issue #10
+        'optional/content.json',                    # per spec, should not be validated by default
+        'optional/ecmascript-regex.json',           # TODO: see issue #27
+        'optional/format/iri-reference.json',       # not yet implemented
+        'optional/format/uri-template.json',        # not yet implemented
+        $ENV{AUTOMATED_TESTING} ? (                 # these all depend on optional prereqs
         qw(
           optional/format/date-time.json
           optional/format/date.json
-          optional/format/duration.json
-          optional/format/ecmascript-regex.json
+          optional/format/time.json
           optional/format/email.json
           optional/format/hostname.json
-          optional/format/idn-email.json
           optional/format/idn-hostname.json
-          optional/format/ipv4.json
-          optional/format/ipv6.json
-          optional/format/iri-reference.json
-          optional/format/iri.json
-          optional/format/json-pointer.json
-          optional/format/regex.json
-          optional/format/relative-json-pointer.json
-          optional/format/time.json
-          optional/format/uri-reference.json
-          optional/format/uri-template.json
-          optional/format/uri.json
-        ),
+          optional/format/idn-email.json
+        ) ) : (),
       ] },
     { file => 'ref.json', group_description => [
-        'ref creates new scope when adjacent to keywords',  # unevaluatedProperties
+        'ref creates new scope when adjacent to keywords',  # unevaluatedProperties (issue #19)
       ] },
-
+    { file => 'refRemote.json', group_description => [      # TODO: waiting for test suite PR 360
+        'base URI change - change folder', 'base URI change - change folder in subschema',
+      ] },
+    # various edge cases that are difficult to accomodate
+    { file => 'optional/format/date-time.json', group_description => 'validation of date-time strings',
+      test_description => 'case-insensitive T and Z' },
+    { file => 'optional/format/date.json', group_description => 'validation of date strings',
+      test_description => 'only RFC3339 not all of ISO 8601 are valid' },
+    { file => 'optional/format/iri.json', group_description => 'validation of IRIs',  # see test suite issue 395
+      test_description => 'an invalid IRI based on IPv6' },
+    { file => 'optional/format/idn-hostname.json',
+      group_description => 'validation of internationalized host names',
+      test_description => [
+        'contains illegal char U+302E Hangul single dot tone mark', # IDN decoder likes this
+        'valid Chinese Punycode',                     # Data::Validate::Domain doesn't like this
+      ] },
     $Config{ivsize} < 8 || $Config{nvsize} < 8 ?            # see issue #10
       { file => 'const.json',
         group_description => 'float and integers are equal up to 64-bit representation limits',
@@ -123,6 +150,8 @@ $accepter->acceptance(
 # 2020-05-22  0.997  Looks like you failed 163 tests of 994.
 # 2020-06-01  0.997  Looks like you failed 159 tests of 994.
 # 2020-06-08  0.999  Looks like you failed 176 tests of 1055.
+# 2020-06-09  0.999  Looks like you failed 165 tests of 1055.
+# 2020-06-10  0.999  Looks like you failed 104 tests of 1055.
 
 
 END {

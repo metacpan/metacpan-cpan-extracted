@@ -233,3 +233,20 @@ Revision history for PPR
       line numbers are preserved through the operation.
       (thanks Albert)
 
+
+
+0.000027  Thu Jun 25 07:12:58 2020
+
+    * Tweaked handling of unary prefix operators to correctly 
+      identify '++' and '--' as atomic lexemes
+
+    * Added correct parsing of lexical subroutines
+
+
+0.000028  Sun Jun 28 02:58:01 2020
+
+    * Corrected edge-case behaviour in parsing __END__ and __DATA__
+      by adding the (?&PerlOWSOrEND) rule
+      (many thanks, Branislav!)
+
+    * Corrected edge-case behaviour in parsing of s/.../.../e constructs

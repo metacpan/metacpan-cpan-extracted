@@ -17,6 +17,7 @@ make_from_core.sh
 \bpm_to_blib$
 \.gz$
 \bblibdirs\.ts$         # 6.18 through 6.25 generated this
+\bMYMETA.*$
 
 # Avoid Module::Build generated and utility files.
 \bBuild$
@@ -32,3 +33,8 @@ make_from_core.sh
 
 # Avoid Devel::Cover files.
 \bcover_db\b
+
+# Avoid continuous integration configuration files
+\.travis.yml
+\.appveyor.yml
+\.github

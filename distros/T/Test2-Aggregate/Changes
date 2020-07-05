@@ -1,5 +1,14 @@
 Revision history for Test2-Aggregate
 
+0.14    2020-07-21
+        Fix for a CPAN tester.
+        POD update.
+
+0.13    2020-06-27
+        Fail on tests that are passing with errors - this is now default,
+        'allow_errors' option added to force old behavior if needed.
+        POD update.
+
 0.12    2020-02-21
         'dry_run' option.
         'pre_eval' option.

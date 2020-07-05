@@ -1,5 +1,8 @@
 Revision history for App-a2p
 
+1.013     2020-06-25 22:16:40+02:00 Europe/Amsterdam
+          No longer include handy.h
+
 1.012     2019-10-31 20:19:50+01:00 Europe/Amsterdam
           Fix compilation issues on perl 5.30 with debugging enabled
 

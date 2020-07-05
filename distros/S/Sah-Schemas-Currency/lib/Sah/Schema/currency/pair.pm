@@ -1,9 +1,9 @@
 package Sah::Schema::currency::pair;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Currency'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our $schema = [str => {
     summary => 'Fiat currency pair, e.g. USD/IDR',
@@ -24,7 +24,7 @@ _
     examples => [
         {value=>'', valid=>0},
         {value=>'idr', valid=>0},
-        {value=>'usd/idr', valid=>1, res=>'USD/IDR'},
+        {value=>'usd/idr', valid=>1, validated_value=>'USD/IDR'},
         {value=>'usd idr', valid=>0},
         {value=>'usd/foo', valid=>0},
     ],
@@ -45,7 +45,7 @@ Sah::Schema::currency::pair - Fiat currency pair, e.g. USD/IDR
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schema::currency::pair (from Perl distribution Sah-Schemas-Currency), released on 2020-03-04.
+This document describes version 0.008 of Sah::Schema::currency::pair (from Perl distribution Sah-Schemas-Currency), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -59,7 +59,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;
@@ -81,15 +81,15 @@ Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
 
 Sample data:
 
- undef  # INVALID
+ ""  # INVALID
 
- undef  # INVALID
+ "idr"  # INVALID
 
- undef  # valid, becomes "USD/IDR"
+ "usd/idr"  # valid, becomes "USD/IDR"
 
- undef  # INVALID
+ "usd idr"  # INVALID
 
- undef  # INVALID
+ "usd/foo"  # INVALID
 
 =head1 DESCRIPTION
 

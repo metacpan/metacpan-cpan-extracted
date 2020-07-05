@@ -415,18 +415,21 @@ sub t2ht ($) {
 
 Escapes text to look the same in JavaScript.
 
- ' ->> \'
+ ' ->> \u0027
  " ->> \"
  \ ->> \\
+
+Single quote is escaped into a hex code because that is acceptable in
+both Javascript and JSON strings, whereas \' is not valid in JSON.
 
 =cut
 
 sub t2hj ($) {
     my $text=shift;
     $text=~s/\\/\\\\/sg;
-    $text=~s/'/\\'/sg;
+    $text=~s/'/\\u0027/sg;
     $text=~s/"/\\"/sg;
-    $text=~s/([\x00-\x1f])/'\\'.sprintf('%03o',ord($1))/esg;
+    $text=~s/([\x00-\x1f])/'\\u'.sprintf('%04x',ord($1))/esg;
     return $text;
 }
 

@@ -1,6 +1,6 @@
 # DESCRIPTION
 
-A [Date::Holiday](https://metacpan.org/pod/Date%3A%3AHoliday) family member from Aruba
+A [Date::Holidays](https://metacpan.org/pod/Date%3A%3AHolidays) family member from Aruba
 
 # SYNOPSIS
 

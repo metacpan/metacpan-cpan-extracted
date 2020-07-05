@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "Search::Elasticsearch" => "6.00"
   },
-  "VERSION" => "6.80",
+  "VERSION" => "6.81",
   "test" => {
     "TESTS" => "t/*.t"
   }

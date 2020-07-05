@@ -14,7 +14,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,19 +27,19 @@ no_index:
 provides:
   SVG:
     file: lib/SVG.pm
-    version: '2.84'
+    version: '2.85'
   SVG::DOM:
     file: lib/SVG/DOM.pm
-    version: '2.84'
+    version: '2.85'
   SVG::Element:
     file: lib/SVG/Element.pm
-    version: '2.84'
+    version: '2.85'
   SVG::Extension:
     file: lib/SVG/Extension.pm
-    version: '2.84'
+    version: '2.85'
   SVG::XML:
     file: lib/SVG/XML.pm
-    version: '2.84'
+    version: '2.85'
 requires:
   Exporter: '0'
   Scalar::Util: '0'
@@ -51,7 +51,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/manwar/SVG.git
-version: '2.84'
+version: '2.85'
 x_contributors:
   - 'Peter Wainwright'
   - 'Ian Hickson'

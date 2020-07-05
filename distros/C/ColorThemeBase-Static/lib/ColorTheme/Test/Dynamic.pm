@@ -1,9 +1,9 @@
 package ColorTheme::Test::Dynamic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorThemeBase-Static'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use strict;
 use warnings;
@@ -11,13 +11,19 @@ use parent 'ColorThemeBase::Base';
 
 our %THEME = (
     v => 2,
-    summary => 'A simple color theme',
+    summary => 'A dynamic color theme',
     dynamic => 1,
     args => {
         tone => {schema=>['str*', in=>['red','green']], req=>1},
         opt1 => {schema=>'str*', default=>'foo'},
         opt2 => {schema=>'str*'},
     },
+    examples => [
+        {
+            summary => 'An red tone',
+            args => { tone => 'red' },
+        },
+    ],
 );
 
 sub list_items {
@@ -60,7 +66,7 @@ ColorTheme::Test::Dynamic - A dynamic color theme
 
 =head1 VERSION
 
-This document describes version 0.006 of ColorTheme::Test::Dynamic (from Perl distribution ColorThemeBase-Static), released on 2020-06-09.
+This document describes version 0.008 of ColorTheme::Test::Dynamic (from Perl distribution ColorThemeBase-Static), released on 2020-06-19.
 
 =head1 HOMEPAGE
 

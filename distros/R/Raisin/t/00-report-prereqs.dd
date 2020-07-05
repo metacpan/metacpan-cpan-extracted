@@ -1,0 +1,60 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.28'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.28'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Data::Printer' => '0.35',
+                                      'List::Util' => '1.29',
+                                      'Test::EOF' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Exception' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::NoBreakpoints' => '0.15',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Portability::Files' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'HTTP::Request::Common' => '0',
+                                      'HTTP::Status' => '0',
+                                      'Hash::Merge' => '0.300',
+                                      'JSON::MaybeXS' => '1.004000',
+                                      'Plack' => '1.0030',
+                                      'Plack::Middleware::CrossOrigin' => '0.009',
+                                      'Scalar::Util' => '1.38',
+                                      'Type::Tiny' => '0.044',
+                                      'YAML' => '0.90',
+                                      'parent' => '0',
+                                      'perl' => '5.010000'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'List::Util' => '1.29',
+                                   'Test::Exception' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Pod' => '0',
+                                   'Test::Simple' => '1.001014'
+                                 }
+                 }
+     };
+  $x;
+ }

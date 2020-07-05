@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::KeysightB2901A;
-$Lab::Moose::Instrument::KeysightB2901A::VERSION = '3.701';
+$Lab::Moose::Instrument::KeysightB2901A::VERSION = '3.703';
 #ABSTRACT: Agilent/Keysight B2901A voltage/current sourcemeter.
 
 use 5.010;
@@ -157,7 +157,7 @@ Lab::Moose::Instrument::KeysightB2901A - Agilent/Keysight B2901A voltage/current
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 

@@ -4,11 +4,15 @@
 Changes
 cpanfile
 lib/DBIx/TempDB.pm
+lib/DBIx/TempDB/Util.pm
 Makefile.PL
 MANIFEST			This list of files
+META_new.yml
 README
+README.md
 t/00-basic.t
 t/affiliate.mysql
+t/bin/on-process-end.pl
 t/blog.t
 t/blog/lib/Blog.pm
 t/blog/lib/Blog/Controller/Posts.pm
@@ -22,15 +26,17 @@ t/blog/templates/posts/create.html.ep
 t/blog/templates/posts/edit.html.ep
 t/blog/templates/posts/index.html.ep
 t/blog/templates/posts/show.html.ep
-t/create-database.t
 t/database-name.t
 t/drop-from-child-1.t
 t/drop-from-child-2.t
+t/drop.t
+t/dsn-for.t
 t/execute-file-mysql.t
 t/execute-file.t
 t/keep-database.t
 t/mysql-offline.t
 t/mysql-online.t
+t/on-process-end.t
 t/parse-mysql.t
 t/pg-offline.t
 t/pg-online.t

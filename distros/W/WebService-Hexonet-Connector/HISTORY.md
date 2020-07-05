@@ -1,3 +1,11 @@
+## [2.9.2](https://github.com/hexonet/perl-sdk/compare/v2.9.1...v2.9.2) (2020-06-22)
+
+
+### Bug Fixes
+
+* **tests:** deactivates role user login tests ([a277cf6](https://github.com/hexonet/perl-sdk/commit/a277cf6025ad621ebf2d4e5482056266d64c1644))
+* **tests:** fixes minor syntax format issue ([11aa014](https://github.com/hexonet/perl-sdk/commit/11aa014db44909c46d0526a0fc6a557dcc41c4ec))
+
 ## [2.9.1](https://github.com/hexonet/perl-sdk/compare/v2.9.0...v2.9.1) (2020-05-25)
 
 

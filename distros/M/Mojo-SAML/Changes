@@ -1,5 +1,8 @@
 Revision history for Perl distribution Mojo-SAML
 
+0.07 2020-06-22
+  - Fix compatibility with Mojolicious > 8.42 (giterlizzi++)
+
 0.06 2018-05-18
   - Bugfix in both saml.response_status and saml.response_success helpers
 

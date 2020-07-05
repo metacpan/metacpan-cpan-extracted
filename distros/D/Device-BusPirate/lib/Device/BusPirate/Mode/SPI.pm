@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 
@@ -28,25 +28,25 @@ C<Device::BusPirate::Mode::SPI> - use C<Device::BusPirate> in SPI mode
 
 Simple output (e.g. driving LEDs on a shift register)
 
- use Device::BusPirate;
+   use Device::BusPirate;
 
- my $pirate = Device::BusPirate->new;
- my $spi = $pirate->enter_mode( "SPI" )->get;
+   my $pirate = Device::BusPirate->new;
+   my $spi = $pirate->enter_mode( "SPI" )->get;
 
- $spi->configure( open_drain => 0 )->get;
+   $spi->configure( open_drain => 0 )->get;
 
- my $count = 0;
- while(1) {
-    $spi->writeread_cs( chr $count )->get;
-    $count++; $count %= 255;
- }
+   my $count = 0;
+   while(1) {
+      $spi->writeread_cs( chr $count )->get;
+      $count++; $count %= 255;
+   }
 
 Simple input (e.g. reading buttons on a shift register)
 
- while(1) {
-    my $in = ord $spi->writeread_cs( "\x00" )->get;
-    printf "Read %02x\n", $in;
- }
+   while(1) {
+      my $in = ord $spi->writeread_cs( "\x00" )->get;
+      printf "Read %02x\n", $in;
+   }
 
 =head1 DESCRIPTION
 
@@ -140,7 +140,7 @@ The following non-boolean options exist:
 
 A string giving the clock speed to use for SPI. Must be one of the values:
 
- 30k 125k 250k 1M 2M 2.6M 4M 8M
+   30k 125k 250k 1M 2M 2.6M 4M 8M
 
 By default the speed is C<30kHz>.
 

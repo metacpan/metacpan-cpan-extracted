@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Error;
-$Search::Elasticsearch::Error::VERSION = '6.80';
+$Search::Elasticsearch::Error::VERSION = '6.81';
 our $DEBUG = 0;
 
 @Search::Elasticsearch::Error::Internal::ISA     = __PACKAGE__;
@@ -179,7 +179,7 @@ Search::Elasticsearch::Error - Errors thrown by Search::Elasticsearch
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

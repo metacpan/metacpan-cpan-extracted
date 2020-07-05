@@ -6,7 +6,7 @@
 use 5.026; # signatures
 use Object::Pad 0.27;
 
-package Tickit::Console 0.08;
+package Tickit::Console 0.09;
 class Tickit::Console
    extends Tickit::Widget::VBox;
 
@@ -80,9 +80,9 @@ has $_entry;
 
 BUILD ( %args )
 {
-   my $on_line = delete $args{on_line};
+   my $on_line = $args{on_line};
 
-   $_default_tab_opts{$_} = delete $args{$_} for
+   $_default_tab_opts{$_} = $args{$_} for
       qw( timestamp_format datestamp_format );
 
    $self->add(
@@ -107,8 +107,6 @@ BUILD ( %args )
       $tab->_on_line( $line ) or
          $on_line->( $tab, $line );
    } );
-
-   return $self;
 }
 
 =head1 METHODS

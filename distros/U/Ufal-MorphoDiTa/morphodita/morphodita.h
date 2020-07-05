@@ -106,22 +106,6 @@ class derivator {
   virtual bool children(string_piece lemma, std::vector<derivated_lemma>& children) const = 0;
 };
 
-class derivation_formatter {
- public:
-  virtual ~derivation_formatter() {}
-
-  // Perform the required derivation and store it directly in the lemma.
-  virtual void format_derivation(std::string& lemma) const = 0;
-
-  // Static factory methods.
-  static derivation_formatter* new_none_derivation_formatter();
-  static derivation_formatter* new_root_derivation_formatter(const derivator* derinet);
-  static derivation_formatter* new_path_derivation_formatter(const derivator* derinet);
-  static derivation_formatter* new_tree_derivation_formatter(const derivator* derinet);
-  // String version of static factory method.
-  static derivation_formatter* new_derivation_formatter(string_piece name, const derivator* derinet);
-};
-
 class morpho {
  public:
   virtual ~morpho() {}
@@ -129,7 +113,7 @@ class morpho {
   static morpho* load(const char* fname);
   static morpho* load(std::istream& is);
 
-  enum guesser_mode { NO_GUESSER = 0, GUESSER = 1 };
+  enum guesser_mode { NO_GUESSER = 0, GUESSER = 1, GUESSER_UNSPECIFIED = -1 };
 
   // Perform morphologic analysis of a form. The form is given by a pointer and
   // length and therefore does not need to be '\0' terminated.  The guesser
@@ -193,7 +177,7 @@ class tagger {
   virtual const morpho* get_morpho() const = 0;
 
   // Perform morphologic analysis and subsequent disambiguation.
-  virtual void tag(const std::vector<string_piece>& forms, std::vector<tagged_lemma>& tags, morpho::guesser_mode guesser = morpho::guesser_mode(-1)) const = 0;
+  virtual void tag(const std::vector<string_piece>& forms, std::vector<tagged_lemma>& tags, morpho::guesser_mode guesser = morpho::GUESSER_UNSPECIFIED) const = 0;
 
   // Perform disambiguation only on given analyses.
   virtual void tag_analyzed(const std::vector<string_piece>& forms, const std::vector<std::vector<tagged_lemma> >& analyses, std::vector<int>& tags) const = 0;
@@ -223,6 +207,31 @@ class tagset_converter {
   static tagset_converter* new_pdt_to_conll2009_converter();
   static tagset_converter* new_strip_lemma_comment_converter(const morpho& dictionary);
   static tagset_converter* new_strip_lemma_id_converter(const morpho& dictionary);
+};
+
+class derivation_formatter {
+ public:
+  virtual ~derivation_formatter() {}
+
+  // Perform the required derivation and store it directly in the lemma.
+  virtual void format_derivation(std::string& lemma) const;
+
+  // Perform the required derivation and store it directly in the tagged_lemma.
+  // If a tagset_converter is given, it is also applied.
+  virtual void format_tagged_lemma(tagged_lemma& lemma, const tagset_converter* converter = nullptr) const = 0;
+
+  // Perform the required derivation on a list of tagged_lemmas.
+  // If a tagset_converter is given, it is also applied.
+  // Either way, only unique entries are returned.
+  virtual void format_tagged_lemmas(std::vector<tagged_lemma>& lemmas, const tagset_converter* converter = nullptr) const;
+
+  // Static factory methods.
+  static derivation_formatter* new_none_derivation_formatter();
+  static derivation_formatter* new_root_derivation_formatter(const derivator* derinet);
+  static derivation_formatter* new_path_derivation_formatter(const derivator* derinet);
+  static derivation_formatter* new_tree_derivation_formatter(const derivator* derinet);
+  // String version of static factory method.
+  static derivation_formatter* new_derivation_formatter(string_piece name, const derivator* derinet);
 };
 
 } // namespace morphodita

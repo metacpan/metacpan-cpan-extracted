@@ -1,8 +1,12 @@
-package Raisin;
+#!perl
+#PODNAME: Raisin
+#ABSTRACT: A REST API microframework for Perl.
 
 use strict;
 use warnings;
 
+package Raisin;
+$Raisin::VERSION = '0.90';
 use Carp qw(croak carp longmess);
 use HTTP::Status qw(:constants);
 use Plack::Response;
@@ -24,8 +28,6 @@ use Plack::Util::Accessor qw(
     decoder
     encoder
 );
-
-our $VERSION = '0.89';
 
 sub new {
     my ($class, %args) = @_;
@@ -228,7 +230,7 @@ sub before_finalize {
     my $self = shift;
 
     $self->res->status(HTTP_OK) unless $self->res->status;
-    $self->res->header('X-Framework' => "Raisin $VERSION");
+    $self->res->header('X-Framework' => 'Raisin ' . __PACKAGE__->VERSION);
 
     if ($self->api_version) {
         $self->res->header('X-API-Version' => $self->api_version);
@@ -303,11 +305,17 @@ sub session {
 
 __END__
 
-=encoding utf8
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Raisin - A REST API microframework for Perl.
+
+=head1 VERSION
+
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -374,9 +382,9 @@ Raisin - A REST API microframework for Perl.
 
             my $max_count = scalar(@users) - 1;
             my $start = $params->{start} > $max_count ? $max_count : $params->{start};
-            my $count = $params->{count} > $max_count ? $max_count : $params->{count};
+            my $end = $params->{count} > $max_count ? $max_count : $params->{count};
 
-            my @slice = @users[$start .. $count];
+            my @slice = @users[$start .. $end];
             { data => \@slice }
         };
 
@@ -434,8 +442,7 @@ Raisin is a REST API microframework for Perl.
 It's designed to run on Plack, providing a simple DSL to develop RESTful APIs easily.
 It was inspired by L<Grape|https://github.com/intridea/grape>.
 
-=for HTML
-<a href="https://cloud.drone.io/khrt/Raisin"><img src="https://cloud.drone.io/api/badges/khrt/Raisin/status.svg" /></a>
+=for HTML <a href="https://cloud.drone.io/khrt/Raisin"><img src="https://cloud.drone.io/api/badges/khrt/Raisin/status.svg" /></a>
 <a href="http://badge.fury.io/pl/Raisin"><img src="https://badge.fury.io/pl/Raisin.svg" alt="CPAN version" height="18"></a>
 
 =head1 FUNCTIONS
@@ -528,7 +535,6 @@ Describes response object which will be used to generate OpenAPI description.
         my $albums = $schema->resultset('Album');
         present data => $albums, with => 'MusicApp::Entity::Album';
     };
-
 
 =head3 params
 
@@ -1198,11 +1204,13 @@ which was inspired by L<Dancer>, which in its turn was inspired by Sinatra.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh@cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

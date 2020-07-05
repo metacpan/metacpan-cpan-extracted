@@ -23,7 +23,7 @@ use App::sdif;
 my $version = $App::sdif::VERSION;
 
 my $opt_d;
-my $opt_B;
+my $opt_unit;
 my $opt_diff;
 my $opt_date = 1;
 my $opt_refresh = 1;
@@ -39,7 +39,7 @@ my @opt_colormap;
 
 my @optargs = (
     "d" => \$opt_d,
-    "B|char" => \$opt_B,
+    "unit=s" => \$opt_unit,
     "diff=s" => \$opt_diff,
     "e|exec=s" => \@opt_exec,
     "r|refresh:1" => \$opt_refresh,
@@ -104,7 +104,7 @@ my @diffcmd = do {
 	( @default_diff,
 	  map  { $_->[1] }
 	  grep { $_->[0] }
-	  [   $opt_B    => '-B' ],
+	  [ $opt_unit   => "--unit=$opt_unit" ],
 	  [ ! $opt_mark => '--no-mark' ],
 	  [ ! $opt_old  => '--no-old' ],
 	);
@@ -197,8 +197,7 @@ Options:
 	--[no]newline       print newline result (default on)
 	--[no]clear         clear screen after output (default on)
 	--diff=command      diff command used to compare result
-
-	-B, --char          char-by-char comparison
+	--unit=unit         comparison unit (word/char/mecab)
 
 =head1 EXAMPLES
 
@@ -228,7 +227,7 @@ L<https://github.com/kaz-utashiro/sdif-tools>
 
 =head1 LICENSE
 
-Copyright 2014-2019 Kazumasa Utashiro
+Copyright 2014-2020 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

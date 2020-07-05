@@ -1,5 +1,5 @@
 package Test::Count::Parser;
-$Test::Count::Parser::VERSION = '0.1102';
+$Test::Count::Parser::VERSION = '0.1104';
 use warnings;
 use strict;
 
@@ -202,7 +202,7 @@ Test::Count::Parser - A Parser for Test::Count.
 
 =head1 VERSION
 
-version 0.1102
+version 0.1104
 
 =head1 SYNOPSIS
 
@@ -315,27 +315,11 @@ L<https://metacpan.org/release/Test-Count>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Test-Count>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Count>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Test-Count>
 
 =item *
 

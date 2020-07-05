@@ -60,6 +60,10 @@ Protocol::HTTP - very fast HTTP protocol incremental parser and serializer
     say $request->make_chunk('hello-world');    # outputs first chunk
     say $request->final_chunk();                # outputs final chunk
 
+    # cookies jar (for user-agents aka HTTP-clients)
+    my $jar = Protocol::HTTP::CookieJar->new;
+    $jar->populate($request);   # before request sent
+    $jar->collect($response);   # after response is received
 
 
 =head1 DESCRIPTION
@@ -93,6 +97,7 @@ L<Protocol::HTTP::Compression>
 
 L<Protocol::HTTP::Error>
 
+L<Protocol::HTTP::CookieJar>
 
 
 =head1 CONSTANTS
@@ -153,7 +158,7 @@ L<rfc7932 (brotli compression) |https://tools.ietf.org/html/rfc7932>
 
 L<rfc1952 (gzip compression) |https://tools.ietf.org/html/rfc1952>
 
-
+L<Same-Site Cookies draft |https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00>
 
 =head1 AUTHOR
 

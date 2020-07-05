@@ -1,5 +1,14 @@
 Revision history for Ryu
 
+2.002     2020-06-27 23:53:40+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Documentation updates:
+
+    - mention RxPerl and Future::Buffer
+    - clearer link to Ryu::Source, since it's not always obvious
+    where the real code can be found...
+
 2.001     2020-06-09 01:35:39+08:00 Asia/Kuala_Lumpur
     New features:
 

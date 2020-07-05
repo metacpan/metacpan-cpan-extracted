@@ -3,7 +3,7 @@ use 5.012;
 use lib 't/lib';
 use MyTest;
 use Test::Catch;
-use Panda::Lib::Logger;
+use XLog;
 
 $SIG{PIPE} = 'IGNORE';
 my @vars = @ARGV;
@@ -15,13 +15,9 @@ if ($vars[0] and $vars[0] =~ /^\d+$/) {
 alarm(0);
 
 if ($ENV{LOGGER}) {
-    Panda::Lib::Logger::set_native_logger(sub {
-        my ($level, $code, $msg) = @_;
-        say "$level $code $msg";
-    });
-    Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_DEBUG, "UniEvent");
-    Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_DEBUG, "UniEvent::Backend");
-    Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_INFO, "UniEvent::SSL");
+    XLog::set_logger(sub { say $_[1] });
+    XLog::set_level(XLog::DEBUG, "UniEvent");
+    XLog::set_level(XLog::INFO, "UniEvent::SSL");
 }
 
 if (@vars) {
@@ -31,5 +27,3 @@ if (@vars) {
 }
 
 done_testing();
-Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_CRITICAL); #turn logger off, it does not work in perl destroy phase
-

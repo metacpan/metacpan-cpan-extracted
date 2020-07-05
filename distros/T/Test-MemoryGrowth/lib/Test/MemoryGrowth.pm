@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2020 -- leonerd@leonerd.org.uk
 
 package Test::MemoryGrowth;
 
@@ -9,11 +9,13 @@ use strict;
 use warnings;
 use base qw( Test::Builder::Module );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our @EXPORT = qw(
    no_growth
 );
+
+use constant HAVE_DEVEL_GLADIATOR => defined eval { require Devel::Gladiator };
 
 use constant HAVE_DEVEL_MAT_DUMPER => defined eval { require Devel::MAT::Dumper };
 
@@ -87,7 +89,7 @@ would result in a growth rate smaller than one byte per call.
 A second failure case comes from the fact that memory usage is taken from the
 Operating System's measure of the process's Virtual Memory size, so as to be
 able to detect memory usage growth in C libraries or XS-level wrapping code,
-as well as Perl functions. Because Perl does not agressively return unused
+as well as Perl functions. Because Perl does not aggressively return unused
 memory to the Operating System, it is possible that a piece of code could use
 un-allocated but un-reclaimed memory to grow into; resulting in an increase in
 its requirements despite not requesting extra memory from the Operating
@@ -114,6 +116,27 @@ memory size, false positives can be minimised, by not attempting to assert
 that certain pieces of code do not grow in memory, when in fact it would be
 expected that they do.
 
+=head2 Devel::Gladiator Integration
+
+I<Since version 0.04.>
+
+If L<Devel::Gladiator> is installed, this test module will use it as a second
+potential source of detecting memory growth. A walk of the Perl memory heap is
+taken before running the code, in order to count the number of every kind of
+object present. This is then compared to a second count taken afterwards. Any
+object types that have increased by at least one per call are reported.
+
+For example, the output might contain the following extra lines of diagnostic
+output:
+
+   # Growths in arena object counts:
+   #   ARRAY 1735 -> 11735 (1.00 per call)
+   #   HASH 459 -> 10459 (1.00 per call)
+   #   REF 1387 -> 21387 (2.00 per call)
+   #   REF-ARRAY 163 -> 10163 (1.00 per call)
+   #   REF-HASH 66 -> 10066 (1.00 per call)
+   #   WithContainerSlots 10 -> 10010 (1.00 per call)
+
 =head2 Devel::MAT Integration
 
 If L<Devel::MAT> is installed, this test module will use it to dump the state
@@ -129,6 +152,15 @@ This pair of files may be useful for differential analysis.
 =head1 FUNCTIONS
 
 =cut
+
+sub get_heapcounts
+{
+   return {} unless HAVE_DEVEL_GLADIATOR;
+
+   my $counts = Devel::Gladiator::arena_ref_counts();
+
+   return $counts;
+}
 
 sub get_memusage
 {
@@ -177,43 +209,79 @@ sub no_growth(&@)
    my $i = 0;
    $code->() while $i++ < $burn_in;
 
+   # Fetch usage twice; first to allocate memory for it to run in so the
+   #   second can account for it.
    my $before_usage = get_memusage;
+   my $before_counts = get_heapcounts;
+
+   # Fetch a second copy before code, to preallocate memory for it now
+   my $after_counts = get_heapcounts;
+   $before_counts = $after_counts;
+
+   my $after_usage = get_memusage;
+   $before_usage = $after_usage;
 
    $i = 0;
    $code->() while $i++ < $calls;
 
-   my $after_usage = get_memusage;
+   undef $after_usage;
+   undef $after_counts;
 
-   my $increase = $after_usage - $before_usage;
-   # in bytes
-   $increase *= 1024;
+   $after_usage = get_memusage;
+   $after_counts = get_heapcounts;
 
+   # Collect up various test results
+   my $ok = 1;
+
+   my $increase = ( $after_usage - $before_usage ) * 1024; # in bytes
    # Even if we increased in memory usage, it's OK as long as we didn't gain
    # more than one byte per call
-   my $ok = $tb->ok( $increase < $calls, $name );
+   $ok = 0 if $increase >= $calls;
 
-   unless( $ok ) {
+   my $growth_counts;
+   foreach my $type ( keys %$after_counts ) {
+      my $growth = $after_counts->{$type} - $before_counts->{$type};
+      next unless $growth >= $calls;
+
+      $growth_counts->{$type} = sprintf "%d -> %d (%.2f per call)",
+         $before_counts->{$type}, $after_counts->{$type}, $growth / $calls;
+   }
+   $ok = 0 if $growth_counts;
+
+   $tb->ok( $ok, $name );
+   return $ok if $ok;
+
+   if( $increase >= $calls ) {
       $tb->diag( sprintf "Lost %d bytes of memory over %d calls, average of %.2f per call",
          $increase, $calls, $increase / $calls );
+   }
 
-      if( HAVE_DEVEL_MAT_DUMPER ) {
-         my $file = $0;
-         my $num = $tb->current_test;
+   if( $growth_counts ) {
+      $tb->diag( "Growths in arena object counts:\n" .
+         join( "\n", map { "  $_ $growth_counts->{$_}" } sort keys %$growth_counts ) );
+   }
 
-         # Trim the .t off first then append -$num.pmat, in case $0 wasn't a .t file
-         $file =~ s/\.(?:t|pm|pl)$//;
+   if( HAVE_DEVEL_MAT_DUMPER ) {
+      my $file = $0;
+      my $num = $tb->current_test;
 
-         my $beforefile = "$file-$num.pmat";
-         my $afterfile  = "$file-$num-after.pmat";
+      # Trim the .t off first then append -$num.pmat, in case $0 wasn't a .t file
+      $file =~ s/\.(?:t|pm|pl)$//;
 
-         $tb->diag( "Writing heap dump to $beforefile" );
-         Devel::MAT::Dumper::dump( $beforefile );
+      my $beforefile = "$file-$num.pmat";
+      my $afterfile  = "$file-$num-after.pmat";
 
-         $code->();
+      # Try to arrange the memory in as similar as state as possible by running
+      # one more iteration now before we take the "before" snapshot
+      $code->();
 
-         $tb->diag( "Writing heap dump after one more iteration to $afterfile" );
-         Devel::MAT::Dumper::dump( $afterfile );
-      }
+      $tb->diag( "Writing heap dump to $beforefile" );
+      Devel::MAT::Dumper::dump( $beforefile );
+
+      $code->();
+
+      $tb->diag( "Writing heap dump after one more iteration to $afterfile" );
+      Devel::MAT::Dumper::dump( $afterfile );
    }
 
    return $ok;

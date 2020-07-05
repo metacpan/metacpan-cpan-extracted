@@ -14,7 +14,7 @@ sub is_enum_type { $ENUM_TYPES{ $_[0] } ? 1 : 0 }
 
 my $md5;
 
-# encode Password attribute
+# encode User-Password attribute
 sub encrypt_pwd {
     my ($value, $secret, $authenticator) = @_;
 
@@ -37,7 +37,7 @@ sub encrypt_pwd {
     return join('', @list);
 }
 
-# decrypt value of Password attribute
+# decrypt value of User-Password attribute
 sub decrypt_pwd {
     my ($value, $secret, $authenticator) = @_;
 

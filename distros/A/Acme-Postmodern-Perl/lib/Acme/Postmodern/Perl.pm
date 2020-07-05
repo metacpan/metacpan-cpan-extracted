@@ -1,4 +1,4 @@
-package Acme::Postmodern::Perl 0.10;
+package Acme::Postmodern::Perl 0.11;
 
 use warnings;
 use strict;
@@ -9,7 +9,7 @@ Acme::Postmodern::Perl - Postmodern Perl solves all problems
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 
@@ -26,7 +26,7 @@ directly from your nearby CPAN mirror.
 
 =cut
 
-use 5.032;
+use 7;
 
 -1;
 __END__

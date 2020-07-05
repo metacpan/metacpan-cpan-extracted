@@ -20,31 +20,31 @@ name: QuadPres
 provides:
   QuadPres:
     file: lib/QuadPres.pm
-    version: v0.28.2
+    version: v0.28.3
   QuadPres::Base:
     file: lib/QuadPres/Base.pm
-    version: v0.28.2
+    version: v0.28.3
   QuadPres::Config:
     file: lib/QuadPres/Config.pm
-    version: v0.28.2
+    version: v0.28.3
   QuadPres::Exception:
     file: lib/QuadPres/Exception.pm
-    version: v0.28.2
+    version: v0.28.3
   QuadPres::Exception::RenderFile:
     file: lib/QuadPres/Exception.pm
-    version: v0.28.2
+    version: v0.28.3
   QuadPres::FS:
     file: lib/QuadPres/FS.pm
-    version: v0.28.2
+    version: v0.28.3
   QuadPres::Url:
     file: lib/QuadPres/Url.pm
-    version: v0.28.2
+    version: v0.28.3
   QuadPres::VimIface:
     file: lib/QuadPres/VimIface.pm
-    version: v0.28.2
+    version: v0.28.3
   QuadPres::WriteContents:
     file: lib/QuadPres/WriteContents.pm
-    version: v0.28.2
+    version: v0.28.3
 requires:
   Carp: '0'
   Class::XSAccessor: '0'
@@ -52,7 +52,7 @@ requires:
   Data::Dumper: '0'
   HTML::Widgets::NavMenu::EscapeHtml: '0'
   IO::All: '0'
-  List::MoreUtils: '0'
+  List::Util: '1.34'
   MooX: '0'
   MooX::late: '0.010'
   Path::Tiny: '0'
@@ -69,10 +69,10 @@ resources:
   bugtracker: https://github.com/shlomif/quad-pres/issues
   homepage: http://metacpan.org/release/QuadPres
   repository: https://github.com/shlomif/quad-pres.git
-version: 0.28.2
+version: 0.28.3
 x_Dist_Zilla:
   perl:
-    version: '5.030002'
+    version: '5.030003'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -188,6 +188,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Filter/PkgVersion'
+      version: '6.014'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Filter/PodCoverageTests'
       version: '6.014'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
@@ -424,6 +428,6 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.014'
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.30.3
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

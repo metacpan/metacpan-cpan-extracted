@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,7 +7,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Metrics::Any',
    requires => {
-      'perl' => '5.010', # // operator
+      'perl' => '5.014', # //, package NAME {BLOCK}
       'List::Util' => '1.29', # core since 5.20
    },
    test_requires => {

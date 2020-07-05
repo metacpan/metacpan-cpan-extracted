@@ -34,10 +34,6 @@ DEVELOPERS NOTE
 
   SOLE TESTS
 
-    Create exe file by spvmcc command
-      
-      yacc/bison.sh && perl Makefile.PL && make && perl -Mblib blib/script/spvmcc -B solo/spvm_build -I solo/lib -o solo/myexe TestCase && solo/myexe foo bar
-      
     SPVM solo test command
 
        # Normal run
@@ -109,10 +105,10 @@ DEVELOPERS NOTE
     
   PORTABILITY NOTE
   
-    Compiler type, version and working is various in different environments. 
+    SPVM is run on various environments.
     Main compiler targets is gcc and clang.
-    Main OS targets is Linux/Unix, Windows, macOS.
-    To keep maxmam portability, I have the following rule.
+    Main OS targets is Linux/Unix, Windows/MinGW, macOS.
+    To keep maxmam portability in SPVM core, I have the following rule.
   
     - don't use realloc.
     - don't use global variables
@@ -124,6 +120,13 @@ DEVELOPERS NOTE
     - NOTE: In Windows/MinGW/Strawbery Perl, newline is always \x0A if mode is text mode
     - Automatically loaded module must not be native or precompile
       Currently, SPVM::Byte, SPVM::Short, SPVM::Int, SPVM::Long, SPVM::Float, SPVM::Double, SPVM::Complex_2f, SPVM::Complex_2d
+    - Don't use temporary directory in SPVM module, for example, using File::Temp.
+      Security risk is increased and, Windows dll file can't be removed by cleanuping temporary directory
+    - Don't use feature_test_macros, for example,
+      #define _XOPEN_SOURCE
+      #define _POSIX_SOURCE
+      #define _POSIX_C_SOURCE
+    - Don't provide spvm command because resolving module path is too complex.
 
   CODING GUIDE LINE
     - use int8_t, int16_t, int32_t, int64_t instead of byte, short, int, long, _Bool.
@@ -136,7 +139,7 @@ DEVELOPERS NOTE
 
 =head1 COPYRIGHT & LICENSE
 
-	Copyright 2018-2019 Yuki Kimoto, all rights reserved.
+	Copyright 2018-2020 Yuki Kimoto, all rights reserved.
 
 	This program is free software; you can redistribute it and/or modify it
 	under the same terms as Perl itself.

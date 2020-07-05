@@ -1,0 +1,8 @@
+Revision history for Types-Algebraic
+
+0.02  2020-07-05 15:27:13 CEST
+        - Remove uses of postfix dereferencing, causing test failures when not enabled.
+        - Bump perl version required to v5.22 for simplicity.
+
+0.01  2020-07-04 11:17:40 CEST
+        - Initial release

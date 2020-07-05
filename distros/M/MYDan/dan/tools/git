@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 use FindBin qw( $RealBin $RealScript );
+die "err: endless loop.\n" if $ENV{MYDAN_GIT_TOOL};
+$ENV{MYDAN_GIT_TOOL} = 1;
 my $info = "Usage:
   git -i ssh-key-file git-command
   git -u foo git-command

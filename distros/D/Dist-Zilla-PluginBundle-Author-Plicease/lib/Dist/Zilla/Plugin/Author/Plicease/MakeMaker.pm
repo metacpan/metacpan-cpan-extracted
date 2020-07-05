@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.48 {
+package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.51 {
 
   use 5.014;
   use Moose;
@@ -164,7 +164,7 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.48 {
     if($config || $build || $test || $clean)
     {
       push @content, "{ package";
-      push @content, "    My;";
+      push @content, "    MY;";
       push @content, "  sub postamble {";
       push @content, "    my \$postamble = '';";
       push @content, '';
@@ -280,7 +280,7 @@ Dist::Zilla::Plugin::Author::Plicease::MakeMaker - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.48
+version 2.51
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,10 @@
+1.2.18   22.06.2020
+           - more safely use flock
+1.2.17   19.06.2020
+           - fix perl breaking <cmath> with "isnan" macro on windows
+           - auto add $Config{lddlflags} to LDDLFLAGS if supplied
+           - pass LDDLFLAGS to test Makefile if any
+           - fix source & c test source parallel build on GNU make
 1.2.16   13.02.2020
            - improve CLIB->FILE section. Now FILE can be an array ref
            - fix xsubpp param suffix

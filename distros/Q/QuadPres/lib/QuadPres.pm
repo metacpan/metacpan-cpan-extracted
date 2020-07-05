@@ -1,5 +1,5 @@
 package QuadPres;
-$QuadPres::VERSION = '0.28.2';
+$QuadPres::VERSION = '0.28.3';
 use 5.016;
 use strict;
 use warnings;
@@ -868,7 +868,145 @@ QuadPres - a presentation / slides manager.
 
 =head1 VERSION
 
-version 0.28.2
+version 0.28.3
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 contents
+
+TBD.
+
+=head2 coords
+
+TBD.
+
+=head2 doc_id
+
+TBD.
+
+=head2 doc_id_slash_terminated
+
+TBD.
+
+=head2 get_breadcrumbs_trail
+
+TBD.
+
+=head2 get_contents
+
+TBD.
+
+=head2 get_contents_helper
+
+TBD.
+
+=head2 get_contents_url
+
+TBD.
+
+=head2 get_control_text
+
+TBD.
+
+=head2 get_control_url
+
+TBD.
+
+=head2 get_document_base_text
+
+TBD.
+
+=head2 get_footer
+
+TBD.
+
+=head2 get_header
+
+TBD.
+
+=head2 get_last_url
+
+TBD.
+
+=head2 get_menupath_text
+
+TBD.
+
+=head2 get_most_advanced_leaf
+
+TBD.
+
+=head2 get_navigation_bar
+
+TBD.
+
+=head2 get_next_url
+
+TBD.
+
+=head2 get_prev_url
+
+TBD.
+
+=head2 get_relative_url__depcracated
+
+TBD.
+
+=head2 get_style_css_url
+
+TBD.
+
+=head2 get_subject
+
+TBD.
+
+=head2 get_subject_by_coords
+
+TBD.
+
+=head2 get_title
+
+TBD.
+
+=head2 get_up_url
+
+TBD.
+
+=head2 get_url_by_coords
+
+TBD.
+
+=head2 mode
+
+TBD.
+
+=head2 navigation_bar
+
+TBD.
+
+=head2 process_document_text
+
+TBD.
+
+=head2 render
+
+TBD.
+
+=head2 render_text
+
+TBD.
+
+=head2 stage_idx
+
+TBD.
+
+=head2 traverse_tree
+
+TBD.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -1,15 +1,13 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;  # package NAME {BLOCK}
 use warnings;
 
 use Test::More;
 
 my @method_call_args;
 
-{
-   package Metrics::Any::Adapter::Testing;
-
+package Metrics::Any::Adapter::Testing {
    sub new { bless {}, shift }
 
    sub make_counter   { shift; push @method_call_args, [ make_counter => @_ ] }
@@ -27,7 +25,7 @@ $metrics->inc_counter( handle => );
 
 is_deeply( \@method_call_args,
    [
-      [qw( make_counter main/handle name the_name )],
+      [qw( make_counter main/handle ), collector => $metrics, name => "the_name" ],
       [qw( inc_counter_by main/handle 1 )],
    ],
    'Adapter methods invoked'

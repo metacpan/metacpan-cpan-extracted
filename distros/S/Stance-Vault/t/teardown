@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+exec 1>&2
+echo
+
+export PORT=${PORT:-1024}
+docker-compose -p stance_vault_integration_tests -f t/docker-compose.yml down -v

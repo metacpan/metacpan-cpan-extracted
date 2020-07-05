@@ -1,10 +1,8 @@
 Changes
+INSTALL.SKIP
 lib/Syntax/Highlight/Engine/Simple.pm
 Makefile.PL
 MANIFEST
-MYMETA.json
-MYMETA.yml
-README
 README.pod
 t/00.load.t
 t/highlight.t

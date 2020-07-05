@@ -3,25 +3,28 @@ package FFI::ExtractSymbols::OpenBSD;
 use strict;
 use warnings;
 use File::Which qw( which );
+use File::ShareDir::Dist::Install;
 use constant _function_code => 'T';
 use constant _data_code     => 'B';
 
+my $config = File::ShareDir::Dist::dist_config('FFI-ExtractSymbols');
+
 # ABSTRACT: OpenBSD nm implementation for FFI::ExtractSymbols
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 return 1 if FFI::ExtractSymbols->can('extract_symbols') || $^O ne 'openbsd';
 
 my $nm = which('nm');
-$nm = FFI::ExtractSymbols::ConfigData->config('exe')->{nm}
+$nm = $config->{'exe'}->{nm}
   unless defined $nm;
 
 *FFI::ExtractSymbols::extract_symbols = sub
 {
   my($libpath, %callbacks) = @_;
-  
+
   $callbacks{$_} ||= sub {} for qw( export code data );
-  
+
   foreach my $line (`$nm -g $libpath`)
   {
     next if $line =~ /^\s/;
@@ -34,7 +37,7 @@ $nm = FFI::ExtractSymbols::ConfigData->config('exe')->{nm}
     elsif($type eq _data_code)
     {
       $callbacks{export}->($symbol, $symbol);
-      $callbacks{data}->  ($symbol, $symbol);      
+      $callbacks{data}->  ($symbol, $symbol);
     }
   }
   ();
@@ -54,7 +57,7 @@ FFI::ExtractSymbols::OpenBSD - OpenBSD nm implementation for FFI::ExtractSymbols
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 

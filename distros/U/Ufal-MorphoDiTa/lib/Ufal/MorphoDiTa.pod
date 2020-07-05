@@ -101,6 +101,18 @@ C++ API, see L\<http://ufal.mff.cuni.cz/morphodita/api-reference\>.
       static Tokenizer* newGenericTokenizer();
     };
   
+    class TagsetConverter {
+     public:
+      static TagsetConverter* newIdentityConverter();
+      static TagsetConverter* newPdtToConll2009Converter();
+      static TagsetConverter* newStripLemmaCommentConverter(const Morpho& morpho);
+      static TagsetConverter* newStripLemmaIdConverter(const Morpho& morpho);
+  
+      virtual void convert(TaggedLemma& lemma) const;
+      virtual void convertAnalyzed(TaggedLemmas& lemmas) const;
+      virtual void convertGenerated(TaggedLemmasForms& forms) const;
+    };
+  
     class Derivator {
      public:
       virtual bool parent(const char* lemma, DerivatedLemma& parent) const;
@@ -110,6 +122,8 @@ C++ API, see L\<http://ufal.mff.cuni.cz/morphodita/api-reference\>.
     class DerivationFormatter {
      public:
       virtual string formatDerivation(const char* lemma) const;
+      virtual void formatTaggedLemma(TaggedLemma& tagged_lemma, const TagsetConverter* converter = nullptr) const;
+      virtual void formatTaggedLemmas(TaggedLemmas& tagged_lemma, const TagsetConverter* converter = nullptr) const;
   
       static DerivationFormatter* newNoneDerivationFormatter();
       static DerivationFormatter* newRootDerivationFormatter(const Derivator* derivator);
@@ -122,7 +136,7 @@ C++ API, see L\<http://ufal.mff.cuni.cz/morphodita/api-reference\>.
      public:
       static Morpho* load(const char* fname);
   
-      enum { NO_GUESSER = 0, GUESSER = 1 };
+      enum { NO_GUESSER = 0, GUESSER = 1, GUESSER_UNSPECIFIED = -1 };
   
       virtual int analyze(const char* form, int guesser, TaggedLemmas& lemmas) const;
       virtual int generate(const char* lemma, const char* tag_wildcard, int guesser, TaggedLemmasForms& forms) const;
@@ -141,23 +155,11 @@ C++ API, see L\<http://ufal.mff.cuni.cz/morphodita/api-reference\>.
   
       virtual const Morpho* getMorpho() const;
   
-      virtual void tag(const Forms& forms, TaggedLemmas& tags, int guesser = -1) const;
+      virtual void tag(const Forms& forms, TaggedLemmas& tags, int guesser = Morpho::GUESSER_UNSPECIFIED) const;
   
       virtual void tagAnalyzed(const Forms& forms, const Analyses& analyses, Indices& tags) const;
   
       Tokenizer* newTokenizer() const;
-    };
-  
-    class TagsetConverter {
-     public:
-      static TagsetConverter* newIdentityConverter();
-      static TagsetConverter* newPdtToConll2009Converter();
-      static TagsetConverter* newStripLemmaCommentConverter(const Morpho& morpho);
-      static TagsetConverter* newStripLemmaIdConverter(const Morpho& morpho);
-  
-      virtual void convert(TaggedLemma& lemma) const;
-      virtual void convertAnalyzed(TaggedLemmas& lemmas) const;
-      virtual void convertGenerated(TaggedLemmasForms& forms) const;
     };
 
 =head1 Examples

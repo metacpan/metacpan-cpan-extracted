@@ -49,14 +49,17 @@ pl_e $abcn, '-O', 'e $A', @abc;
 
 my $copy = $_ = <<EOF;
 begin
+bof
 0;a.txt;1;a,1:A A
 0;a.txt;2;b,2:B B
 0;a.txt;3;c,3:C C
 eof
+bof
 1;b.txt;1;a,1:A A
 1;b.txt;2;b,2:BB B
 1;b.txt;3;d,4:D D
 eof
+bof
 2;c.txt;1;a,1:A A
 2;c.txt;2;c,3:C CC
 2;c.txt;3;d,:DD D
@@ -65,32 +68,34 @@ eof
 end
 EOF
 
-my @bze = ('-rbecho q{begin}', '-ze q{eof}', '-e', 'e q{end}');
-sub unbze { s/(?:begin|eof|end)\n//g }
-pl @bze, 'Echo "$ARGIND;$ARGV;$.;$_"', @abc;
-pl @bze, 'E "$I;$A;$.;$_"', @abc;
-pl_a \&unbze,
+my @BbeE = ('-rBecho "begin"', '-b', 'e "bof"', '-ee "eof"', '-E', 'e "end"');
+sub unBbeE { s/(?:begin|[be]of|end)\n//g }
+pl @BbeE, 'Echo "$ARGIND;$ARGV;$.;$_"', @abc;
+pl @BbeE, 'E "$I;$A;$.;$_"', @abc;
+pl_a \&unBbeE,
   '-r', 'Echo "$ARGIND;$ARGV;$.;$_"', @abc;
 
+	#use v5.10;say $_;
 sub cut_from_34 { s/([0-9]).+,[34].+\n(?:\1.+\n)*//gm }
+	#cut_from_34;say $_;
 pl_a \&cut_from_34,
-  @bze, 'last if /[34]/; E "$I;$A;$.;$_"', @abc;
-pl_a { cut_from_34; s/(?:begin|eof|end)\n//g }
+  @BbeE, 'last if /[34]/; E "$I;$A;$.;$_"', @abc;
+pl_a { &cut_from_34; &unBbeE }
   '-r', 'last if /[34]/; E "$I;$A;$.;$_"', @abc;
 
-substr $bze[0], 1, 1, '';	# done testing -r
+substr $BbeE[0], 1, 1, '';	# done testing -r
 
 sub renumber { my $i = 0; s/;\K([1-9])(?=;)/++$i/eg } # convert $. to count across all files
 renumber;
-pl @bze, 'E "$I;$A;$.;$_"', @abc;
+pl @BbeE, 'E "$I;$A;$.;$_"', @abc;
 
 sub cut_after_23 { s/([0-9]).+,[23].+\n\K(?:\1.+\n)*//gm }
 pl_a { cut_after_23; renumber }
-  @bze, 'E "$I;$A;$.;$_"; last if /[23]/', @abc;
+  @BbeE, 'E "$I;$A;$.;$_"; last if /[23]/', @abc;
 
 pl_e '', '-n', '', @abc;
 
-unbze;
+unBbeE;
 s/.*;//mg; # reduce to only file contents
 pl '-n', 'E', @abc;
 pl '-ln', 'e', @abc;
@@ -98,7 +103,7 @@ pl '-p', '', @abc;
 pl '-lp', '', @abc;
 
 my @cdlines = grep /[cd]/, split /^/;
-pl_e join( '', $cdlines[0], "eof\n", $cdlines[1], "eof\n" x 2 ), '-P2z', 'e q{eof}', '/[cde]/', @abc;
+pl_e join( '', $cdlines[0], "eof\n", $cdlines[1], "eof\n" x 2 ), '-P2e', 'e "eof"', '/[cde]/', @abc;
 pl_e join( '', @cdlines ), '-rP2', '/[cde]/', @abc;
 
 # run pl, expect @F[1, 0] separated by $_[0]
@@ -112,7 +117,7 @@ pl_F10 ':', '-lF:';
 
 # reproduce the splits that -054 (comma) will do
 $_ = $copy;
-unbze;
+unBbeE;
 s/^(.).*\K\n(?!\1)/\n][/mg; # different file numbers
 chop; # extra [ on last line
 s/[0-9].*;//mg; # reduce to only file contents

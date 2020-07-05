@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     2
 
 VERSION
-    This document describes version 2.1.1 of ColorTheme (from Perl
-    distribution ColorTheme), released on 2020-06-14.
+    This document describes version 2.1.2 of ColorTheme (from Perl
+    distribution ColorTheme), released on 2020-06-19.
 
 DESCRIPTION
     This document specifies a way to create and use color themes.
@@ -102,8 +102,9 @@ SPECIFICATION
          my $ctheme_struct = ColorTheme::NAME->get_struct;
          my $ctheme_struct = $ctheme_obj->get_struct;
 
-        Provide a method way of getting the "color theme structure". A
-        client can also access the %THEME package variable directly.
+        Provide a method way of getting the "color theme structure". Must
+        also work as a static method. A client can also access the %THEME
+        package variable directly.
 
     *   get_args
 

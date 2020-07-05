@@ -6,13 +6,13 @@ OpenTracing::Implementation::DataDog::Utils - DataDog Utilities
 
 =cut
 
-our $VERSION = 'v0.30.1';
+our $VERSION = 'v0.41.2';
+
+;
 
 use Exporter qw/import/;
 
-our @EXPORT_OK = qw/random_64bit_int nano_seconds epoch_floatingpoint/;
-
-use Time::HiRes qw( gettimeofday );
+our @EXPORT_OK = qw/random_64bit_int nano_seconds/;
 
 =head1 EXPORTS OK
 
@@ -42,21 +42,38 @@ sub nano_seconds { int( $_[0] * 1_000_000_000 ) }
 
 
 
-=head2 epoch_floatingpoint
+=head1 SEE ALSO
 
-Well, returns the time since 'epoch' with fractional seconds, as floating-point.
+=over
+
+=item L<OpenTracing::Implementation::DataDog>
+
+Sending traces to DataDog using Agent.
+
+=back
+
+
+
+=head1 AUTHOR
+
+Theo van Hoesel <tvanhoesel@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing::Implementation::DataDog'
+is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
 
 =cut
-
-sub epoch_floatingpoint {
-    return scalar gettimeofday()
-}
-#
-# well, this is a bit off a silly idea:
-# some implentations may want nano-second accuracy, but floating point
-# computations using 64bits (IEEE) are only having 16 digits in the mantissa.
-# The number of nano-seconds since epoch is 19 digits that barely fits in a
-# signed 64 bit integer.
-
 
 1;

@@ -3,9 +3,9 @@ NAME
     Multi-Account Containers add-on
 
 VERSION
-    This document describes version 0.006 of
+    This document describes version 0.007 of
     App::FirefoxMultiAccountContainersUtils (from Perl distribution
-    App-FirefoxMultiAccountContainersUtils), released on 2020-06-03.
+    App-FirefoxMultiAccountContainersUtils), released on 2020-06-04.
 
 SYNOPSIS
 DESCRIPTION
@@ -37,7 +37,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   profile* => *firefox::profile_name*
+    *   profile* => *firefox::local_profile_name*
 
     Returns an enveloped result (an array).
 
@@ -93,7 +93,7 @@ FUNCTIONS
 
     *   code* => *code|str*
 
-    *   profile* => *firefox::profile_name*
+    *   profile* => *firefox::local_profile_name*
 
     Special arguments:
 
@@ -128,7 +128,7 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
-    *   profile* => *firefox::profile_name*
+    *   profile* => *firefox::local_profile_name*
 
     *   sort_args => *array[str]*
 

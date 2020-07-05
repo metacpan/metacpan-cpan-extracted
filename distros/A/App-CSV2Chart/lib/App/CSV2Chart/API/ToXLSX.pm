@@ -1,11 +1,24 @@
 package App::CSV2Chart::API::ToXLSX;
-$App::CSV2Chart::API::ToXLSX::VERSION = '0.10.0';
+$App::CSV2Chart::API::ToXLSX::VERSION = '0.12.0';
 use strict;
 use warnings;
 use 5.014;
 
 use Excel::Writer::XLSX ();
 use Text::CSV           ();
+
+sub _to_xlsx_common_opt_spec
+{
+    return [
+        [ "chart-type=s", "Chart Type" ],
+        [ "height=i",     "Chart Height" ],
+        [ "output|o=s",   "Output path" ],
+        [ "title=s",      "Chart Title" ],
+        [ "width=i",      "Chart Width" ],
+        [ 'exec|e=s@',    "Execute command on the output" ]
+    ];
+
+}
 
 # Based on https://metacpan.org/source/JMCNAMARA/Excel-Writer-XLSX-0.99/examples/chart_scatter.pl by John McNamara - thanks!
 #
@@ -27,6 +40,8 @@ sub csv_to_xlsx
     my $fh         = $args->{input_fh};
     my $fn         = $args->{output_fn};
     my $title      = $args->{title};
+    my $height     = $args->{height};
+    my $width      = $args->{width};
     my $chart_type = ( $args->{chart_type} // 'scatter' );
 
     my $csv       = Text::CSV->new;
@@ -54,6 +69,11 @@ sub csv_to_xlsx
     # Create a new chart object. In this case an embedded chart.
     my $chart1 = $workbook->add_chart( type => $chart_type, embedded => 1 );
 
+    my @size = (
+        ( defined($height) ? ( height => $height ) : () ),
+        ( defined($width)  ? ( width  => $width )  : () ),
+    );
+
     foreach my $series_idx ( 0 .. $#$data - 1 )
     {
         # Configure second series. Note alternative use of array ref to define
@@ -72,6 +92,11 @@ sub csv_to_xlsx
 
     # Set an Excel chart style. Blue colors with white outline and shadow.
     $chart1->set_style(11);
+
+    if (@size)
+    {
+        $chart1->set_size(@size);
+    }
 
     # Insert the chart into the worksheet (with an offset).
     $worksheet->insert_chart( 'D2', $chart1, 25, 10 );
@@ -235,7 +260,7 @@ App::CSV2Chart::API::ToXLSX - convert CSV to xlsx internal API
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =head1 FUNCTIONS
 

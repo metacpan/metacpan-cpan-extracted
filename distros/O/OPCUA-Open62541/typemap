@@ -21,6 +21,8 @@ UA_LogLevel				T_PACKED
 UA_LogCategory				T_PACKED
 # data type is special as it points to constant data
 OPCUA_Open62541_DataType		T_PACKED
+# struct with Perl callbacks converted from hash
+OPCUA_Open62541_GlobalNodeLifecycle	T_PACKED
 # these are used only as return value
 UA_BrowseResponse			T_RETVAL_PACKED
 UA_BrowseResult				T_RETVAL_PACKED

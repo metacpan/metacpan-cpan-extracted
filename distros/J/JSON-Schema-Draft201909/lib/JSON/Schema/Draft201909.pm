@@ -1,18 +1,19 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.004-25-g734b719
+package JSON::Schema::Draft201909; # git description: v0.007-2-g70c74cd
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 
 no if "$]" >= 5.031009, feature => 'indirect';
+use feature 'fc';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Syntax::Keyword::Try 0.11;
 use Carp qw(croak carp);
 use List::Util 1.33 qw(any pairs);
-use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
+use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref is_plain_coderef);
 use Mojo::JSON::Pointer;
 use Mojo::URL;
 use Safe::Isa;
@@ -21,7 +22,7 @@ use File::ShareDir 'dist_dir';
 use Moo;
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
-use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict);
+use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef);
 use JSON::Schema::Draft201909::Error;
 use JSON::Schema::Draft201909::Result;
 use JSON::Schema::Draft201909::Document;
@@ -45,6 +46,65 @@ has max_traversal_depth => (
   isa => Int,
   default => 50,
 );
+
+has validate_formats => (
+  is => 'ro',
+  isa => Bool,
+  default => 0, # as specified by https://json-schema.org/draft/2019-09/schema#/$vocabulary
+);
+
+sub BUILD {
+  my ($self, $args) = @_;
+
+  if (exists $args->{format_validations}) {
+    croak 'format_validations must be a hashref'
+      if not is_plain_hashref($args->{format_validations});
+
+    foreach my $format (keys %{$args->{format_validations}}) {
+      if (my $existing = $self->_get_format_validation($format)) {
+        croak 'overrides to existing format_validations must be coderefs'
+          if not is_plain_coderef($args->{format_validations}{$format});
+        $self->_set_format_validation($format,
+          +{ type => $existing->{type}, sub => $args->{format_validations}{$format} });
+      }
+      else {
+        my $type = Dict[type => Enum[qw(null object array boolean string number integer)], sub => CodeRef];
+        croak $type->get_message($args->{format_validations}{$format})
+          if not $type->check($args->{format_validations}{$format});
+
+        $self->_set_format_validation($format => $args->{format_validations}{$format});
+      }
+    }
+  }
+}
+
+sub add_schema {
+  my $self = shift;
+
+  my $uri = $_[0]->$_isa('Mojo::URL') ? shift : !ref $_[0] ? Mojo::URL->new(shift) : Mojo::URL->new;
+  croak 'cannot add a schema with a uri with a fragment' if defined $uri->fragment;
+
+  if (not @_) {
+    my ($schema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
+    return if not defined $schema or not defined wantarray;
+    return $self->_get_resource($canonical_uri->clone->fragment(undef))->{document};
+  }
+
+  my $document = $_[0]->$_isa('JSON::Schema::Draft201909::Document') ? shift
+    : JSON::Schema::Draft201909::Document->new(schema => shift, $uri ? (canonical_uri => $uri) : ());
+
+  $self->_add_resources(
+    map +( $_->[0] => +{ %{$_->[1]}, document => $document } ),
+      $document->_resource_pairs
+  ) if not (grep $_->{document} == $document, $self->_resource_values);
+
+  if ("$uri" and not $self->_get_resource($uri)) {
+    $document->_add_resources($uri, { path => '', canonical_uri => $document->canonical_uri });
+    $self->_add_resources($uri => { path => '', canonical_uri => $document->canonical_uri, document => $document });
+  }
+
+  return $document;
+}
 
 sub evaluate_json_string {
   my ($self, $json_data, $schema) = @_;
@@ -70,18 +130,7 @@ sub evaluate_json_string {
 }
 
 sub evaluate {
-  my ($self, $data, $schema) = @_;
-
-  # TODO: move to $self->add_schema($schema)
-  my $document = JSON::Schema::Draft201909::Document->new(
-    # TODO canonical_uri => $self->base_uri,
-    schema => $schema,
-  );
-
-  $self->_add_resources(
-    map +( $_->[0] => +{ %{$_->[1]}, document => $document } ),
-      $document->_resource_pairs
-  );
+  my ($self, $data, $schema_reference) = @_;
 
   my $base_uri = Mojo::URL->new;  # TODO: will be set by a global attribute
 
@@ -97,6 +146,20 @@ sub evaluate {
 
   my $result;
   try {
+    my ($schema, $canonical_uri);
+
+    if (not ref $schema_reference or $schema_reference->$_isa('Mojo::URL')) {
+      ($schema, $canonical_uri) = $self->_fetch_schema_from_uri($schema_reference);
+    }
+    else {
+      my $document = $self->add_schema($schema_reference);
+      ($schema, $canonical_uri) = map $document->$_, qw(schema canonical_uri);
+    }
+
+    abort($state, 'unable to find resource %s', $schema_reference) if not defined $schema;
+
+    $state->{canonical_schema_uri} = $canonical_uri->clone->fragment($canonical_uri->fragment);
+
     $result = $self->_eval($data, $schema, $state);
   }
   catch {
@@ -131,13 +194,13 @@ sub _eval {
   my $schema_type = $self->_get_type($schema);
   return $schema || E($state, 'subschema is false') if $schema_type eq 'boolean';
 
-  abort($state, 'unrecognized schema type "%s"', $schema_type) if $schema_type ne 'object';
+  abort($state, 'invalid schema type: %s', $schema_type) if $schema_type ne 'object';
 
   my $result = 1;
 
   foreach my $keyword (
     # CORE KEYWORDS
-    qw($schema $id $anchor $recursiveAnchor $ref $recursiveRef $vocabulary $comment $defs),
+    qw($id $schema $anchor $recursiveAnchor $ref $recursiveRef $vocabulary $comment $defs),
     # VALIDATOR KEYWORDS
     qw(type enum const
       multipleOf maximum exclusiveMaximum minimum exclusiveMinimum
@@ -148,6 +211,8 @@ sub _eval {
     qw(allOf anyOf oneOf not if dependentSchemas
       items unevaluatedItems contains
       properties patternProperties additionalProperties unevaluatedProperties propertyNames),
+    # FORMAT VOCABULARY
+    qw(format),
     # DISCONTINUED KEYWORDS
     qw(definitions dependencies),
   ) {
@@ -164,16 +229,6 @@ sub _eval {
   return $result;
 }
 
-sub _eval_keyword_schema {
-  my ($self, $data, $schema, $state) = @_;
-
-  assert_keyword_type($state, $schema, 'string');
-  abort($state, 'custom $schema references are not yet supported')
-    if $schema->{'$schema'} ne 'https://json-schema.org/draft/2019-09/schema';
-
-  return 1;
-}
-
 sub _eval_keyword_id {
   my ($self, $data, $schema, $state) = @_;
 
@@ -187,6 +242,20 @@ sub _eval_keyword_id {
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path};
   $state->{canonical_schema_uri} = $uri;
   $state->{schema_path} = '';
+
+  return 1;
+}
+
+sub _eval_keyword_schema {
+  my ($self, $data, $schema, $state) = @_;
+
+  assert_keyword_type($state, $schema, 'string');
+
+  abort($state, '$schema can only appear at the schema resource root')
+    if length($state->{schema_path});
+
+  abort($state, 'custom $schema references are not yet supported')
+    if $schema->{'$schema'} ne 'https://json-schema.org/draft/2019-09/schema';
 
   return 1;
 }
@@ -214,7 +283,7 @@ sub _eval_keyword_recursiveAnchor {
   # record the canonical location of the current position, to be used against future resolution
   # of a $recursiveRef uri -- as if it was the current location when we encounter a $ref.
   my $uri = $state->{canonical_schema_uri} ? $state->{canonical_schema_uri}->clone : Mojo::URL->new;
-  abort($state, '"$recursiveAnchor" keyword used without "$id"') if $uri->fragment;
+  abort($state, '"$recursiveAnchor" keyword used without "$id"') if length $uri->fragment;
 
   $state->{recursive_anchor_uri} = $uri;
   return 1;
@@ -223,28 +292,13 @@ sub _eval_keyword_recursiveAnchor {
 sub _fetch_and_eval_ref_uri {
   my ($self, $data, $schema, $state, $uri) = @_;
 
-  my $fragment = $uri->fragment // '';
-  my ($subschema, $canonical_uri);
-  if (not length($fragment) or $fragment =~ m{^/}) {
-    my $base = $uri->clone->fragment(undef);
-    if (my $resource = $self->_get_or_load_resource($base)) {
-      $subschema = $resource->{document}->get($resource->{path}.$fragment);
-      $canonical_uri = $uri;
-    }
-  }
-  else {
-    if (my $resource = $self->_get_resource($uri)) {
-      $subschema = $resource->{document}->get($resource->{path});
-      $canonical_uri = $resource->{canonical_uri}->clone; # this is *not* the anchor-containing URI
-    }
-  }
-
+  my ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
   abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
 
   return $self->_eval($data, $subschema,
     +{ %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/'.$state->{keyword},
-      canonical_schema_uri => $canonical_uri, # note: not canonical yet until $id is processed
+      canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
       schema_path => '',
     });
 }
@@ -267,7 +321,7 @@ sub _eval_keyword_recursiveRef {
   my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->base($base)->to_abs;
 
   abort($state, 'cannot resolve a $recursiveRef with a non-empty fragment against a $recursiveAnchor location with a canonical URI containing a fragment')
-    if $schema->{'$recursiveRef'} ne '#' and $base->fragment;
+    if $schema->{'$recursiveRef'} ne '#' and length $base->fragment;
 
   return $self->_fetch_and_eval_ref_uri($data, $schema, $state, $uri);
 }
@@ -294,7 +348,6 @@ sub _eval_keyword_comment {
 sub _eval_keyword_defs {
   my ($self, $data, $schema, $state) = @_;
 
-  my $type = $self->_get_type($schema->{'$defs'});
   assert_keyword_type($state, $schema, 'object');
 
   # we do nothing directly with this keyword, including not collecting its value for annotations.
@@ -783,7 +836,7 @@ sub _eval_keyword_patternProperties {
     }
     catch {
       abort({ %$state,
-        schema_path_rest => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) },
+        _schema_path_rest => jsonp($state->{schema_path}, 'patternProperties', $property_pattern) },
       $@);
     };
     foreach my $property (sort @matched_properties) {
@@ -855,6 +908,110 @@ sub _eval_keyword_propertyNames {
   return E($state, 'not all property names are valid');
 }
 
+has _format_validations => (
+  is => 'bare',
+  isa => HashRef[Dict[
+      type => Enum[qw(null object array boolean string number integer)],
+      sub => CodeRef,
+    ]],
+  handles_via => 'Hash',
+  handles => {
+    _get_format_validation => 'get',
+    _set_format_validation => 'set',
+  },
+  lazy => 1,
+  default => sub {
+    my $is_datetime = sub {
+      eval { require Time::Moment; 1 } or return 1;
+      eval { Time::Moment->from_string($_[0]) } ? 1 : 0,
+    };
+    my $is_email = sub {
+      eval { require Email::Address::XS; Email::Address::XS->VERSION(1.01); 1 } or return 1;
+      Email::Address::XS->parse($_[0])->is_valid;
+    };
+    my $is_hostname = sub {
+      eval { require Data::Validate::Domain; 1 } or return 1;
+      Data::Validate::Domain::is_domain($_[0]);
+    };
+    my $idn_decode = sub {
+      eval { require Net::IDN::Encode; 1 } or return $_[0];
+      try { return Net::IDN::Encode::domain_to_ascii($_[0]) } catch { return $_[0]; }
+    };
+    my $is_ipv4 = sub {
+      my @o = split(/\./, $_[0], 5);
+      @o == 4 && (grep /^[0-9]{1,3}$/, @o) == 4 && (grep $_ < 256, @o) == 4;
+    };
+    # https://tools.ietf.org/html/rfc3339#appendix-A with some additions for the 2000 version
+    my $duration_re = do {
+      my $num = qr{[0-9]+(?:[.,][0-9]+)?};
+      my $second = qr{${num}S};
+      my $minute = qr{${num}M};
+      my $hour = qr{${num}H};
+      my $time = qr{T(?=[0-9])(?:$hour)?(?:$minute)?(?:$second)?};
+      my $day = qr{${num}D};
+      my $month = qr{${num}M};
+      my $year = qr{${num}Y};
+      my $week = qr{${num}W};
+      my $date = qr{(?=[0-9])(?:$year)?(?:$month)?(?:$day)?};
+      qr{^P(?:(?=.)(?:$date)?(?:$time)?|$week)$};
+    };
+
+    +{
+      'date-time' => { type => 'string', sub => $is_datetime },
+      date => { type => 'string', sub => sub { $is_datetime->($_[0].'T00:00:00Z') } },
+      time => { type => 'string', sub => sub { $is_datetime->('2000-01-01T'.$_[0]) } },
+      duration => { type => 'string', sub => sub {
+        $_[0] =~ $duration_re && $_[0] !~ m{[.,][0-9]+[A-Z].};
+      } },
+      email => { type => 'string', sub => sub { $is_email->($_[0]) && $_[0] !~ /[^[:ascii:]]/ } },
+      'idn-email' => { type => 'string', sub => $is_email },
+      hostname => { type => 'string', sub => $is_hostname },
+      'idn-hostname' => { type => 'string', sub => sub { $is_hostname->($idn_decode->($_[0])) } },
+      ipv4 => { type => 'string', sub => $is_ipv4 },
+      ipv6 => { type => 'string', sub => sub {
+        ($_[0] =~ /^(?:[[:xdigit:]]{0,4}:){0,7}[[:xdigit:]]{0,4}$/
+          || $_[0] =~ /^(?:[[:xdigit:]]{0,4}:){0,4}:?((?:[0-9]{1,3}\.){3}[0-9]{1,3})$/
+              && $is_ipv4->($1))
+          && (()= ($_[0] =~ /::/g)) < 2;
+      } },
+      uri => { type => 'string', sub => sub {
+        my $uri = Mojo::URL->new($_[0]);
+        fc($uri->to_unsafe_string) eq fc($_[0]) && $uri->is_abs && $_[0] !~ /[^[:ascii:]]/;
+      } },
+      'uri-reference' => { type => 'string', sub => sub {
+        fc(Mojo::URL->new($_[0])->to_unsafe_string) eq fc($_[0]) && $_[0] !~ /[^[:ascii:]]/;
+      } },
+      iri => { type => 'string', sub => sub { Mojo::URL->new($_[0])->is_abs } },
+      'iri-reference' => { type => 'string', sub => sub { 1 } },
+      uuid => { type => 'string', sub => sub {
+        $_[0] =~ /^[[:xdigit:]]{8}-(?:[[:xdigit:]]{4}-){3}[[:xdigit:]]{12}$/;
+      } },
+      'uri-template' => { type => 'string', sub => sub { 1 } },
+      'json-pointer' => { type => 'string', sub => sub {
+        (!length($_[0]) || $_[0] =~ m{^/}) && $_[0] !~ m{~(?![01])};
+      } },
+      'relative-json-pointer' => { type => 'string', sub => sub {
+        $_[0] =~ m{^[0-9]+(?:#$|$|/)} && $_[0] !~ m{~(?![01])};
+      } },
+      regex => { type => 'string', sub => sub { eval { qr/$_[0]/; 1 } ? 1 : 0 } },
+    }
+  },
+);
+
+sub _eval_keyword_format {
+  my ($self, $data, $schema, $state) = @_;
+
+  assert_keyword_type($state, $schema, 'string');
+
+  if ($self->validate_formats and my $spec = $self->_get_format_validation($schema->{format})) {
+    return E($state, 'not a %s', $schema->{format})
+      if $self->_is_type($spec->{type}, $data) and not $spec->{sub}->($data);
+  }
+
+  # TODO: create annotation
+  return 1;
+}
+
 sub _eval_keyword_definitions {
   carp 'no-longer-supported "definitions" keyword present: this should be rewritten as "$defs"';
   return 1;
@@ -912,11 +1069,11 @@ sub _get_type {
   return 'array' if is_plain_arrayref($value);
   return 'boolean' if is_bool($value);
 
-  if (not is_ref($value)) {
-    my $flags = B::svref_2object(\$value)->FLAGS;
-    return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
-    return 'number' if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
-  }
+  croak sprintf('unsupported reference type %s', ref $value) if is_ref($value);
+
+  my $flags = B::svref_2object(\$value)->FLAGS;
+  return 'string' if $flags & B::SVf_POK && !($flags & (B::SVf_IOK | B::SVf_NOK));
+  return 'number' if !($flags & B::SVf_POK) && ($flags & (B::SVf_IOK | B::SVf_NOK));
 
   croak sprintf('ambiguous type for %s', $self->_json_decoder->encode($value));
 }
@@ -986,6 +1143,7 @@ has _resource_index => (
     _resource_index => 'elements',
     _resource_keys => 'keys',
     _add_resources_unsafe => 'set',
+    _resource_values => 'values',
   },
   lazy => 1,
   default => sub { {} },
@@ -1062,6 +1220,32 @@ sub _get_or_load_resource {
   return;
 };
 
+# returns a schema (which may not be at a document root), and the canonical uri for that schema.
+# creates a Document and adds it to the resource index, if not already present.
+sub _fetch_schema_from_uri {
+  my ($self, $uri) = @_;
+
+  $uri = Mojo::URL->new($uri) if not ref $uri;
+  my $fragment = $uri->fragment // '';
+
+  my ($subschema, $canonical_uri);
+  if (not length($fragment) or $fragment =~ m{^/}) {
+    my $base = $uri->clone->fragment(undef);
+    if (my $resource = $self->_get_or_load_resource($base)) {
+      $subschema = $resource->{document}->get($resource->{path}.$fragment);
+      $canonical_uri = $resource->{canonical_uri}->clone->fragment($uri->fragment);
+    }
+  }
+  else {
+    if (my $resource = $self->_get_resource($uri)) {
+      $subschema = $resource->{document}->get($resource->{path});
+      $canonical_uri = $resource->{canonical_uri}->clone; # this is *not* the anchor-containing URI
+    }
+  }
+
+  return defined $subschema && $canonical_uri ? ($subschema, $canonical_uri) : ();
+}
+
 has _json_decoder => (
   is => 'ro',
   isa => HasMethods[qw(encode decode)],
@@ -1081,15 +1265,15 @@ sub E {
   my ($state, $error_string, @args) = @_;
 
   # sometimes the keyword shouldn't be at the very end of the schema path
-  my $schema_path_rest = $state->{schema_path_rest}
+  my $schema_path = delete $state->{_schema_path_rest}
     // $state->{schema_path}.($state->{keyword} ? '/'.$state->{keyword} : '');
 
   push @{$state->{errors}}, JSON::Schema::Draft201909::Error->new(
     instance_location => $state->{data_path},
-    keyword_location => $state->{traversed_schema_path}.$schema_path_rest,
+    keyword_location => $state->{traversed_schema_path}.$schema_path,
     !"$state->{canonical_schema_uri}" ? () : ( absolute_keyword_location => do {
       my $uri = $state->{canonical_schema_uri}->clone;
-      $uri->fragment(($uri->fragment//'').$schema_path_rest) if $schema_path_rest;
+      $uri->fragment(($uri->fragment//'').$schema_path) if $schema_path;
       $uri;
     } ),
     error => @args ? sprintf($error_string, @args) : $error_string,
@@ -1130,7 +1314,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -1169,7 +1353,23 @@ The maximum number of levels deep a schema traversal may go, before evaluation i
 protect against accidental infinite recursion, such as from two subschemas that each reference each
 other. Defaults to 50.
 
+=head2 validate_formats
+
+When true, the C<format> keyword will be treated as an assertion, not merely an annotation. Defaults
+to false.
+
+=head2 format_validations
+
+An optional hashref that allows overriding the validation method for formats, or adding new ones.
+Existing formats must be specified in the form of C<< { $format_name => $format_sub } >>, where
+the format sub is a coderef that takes one argument and returns a boolean result. New formats must
+be specified in the form of C<< { $format_name => { type => $type, sub => $format_sub } } >>,
+where the type indicates which of the core JSON Schema types (null, object, array, boolean, string,
+number, or integer) the instance value must be for the format validation to be considered.
+
 =head1 METHODS
+
+=for Pod::Coverage BUILD
 
 =head2 evaluate_json_string
 
@@ -1180,8 +1380,24 @@ Evaluates the provided instance data against the known schema document.
 The data is in the form of a JSON-encoded string (in accordance with
 L<RFC8259|https://tools.ietf.org/html/rfc8259>). B<The string is expected to be UTF-8 encoded.>
 
-The schema is in the form of a Perl data structure, representing a JSON Schema
-that respects the Draft 2019-09 meta-schema at L<https://json-schema.org/draft/2019-09/schema>.
+The schema must represent a JSON Schema that respects the Draft 2019-09 meta-schema at
+L<https://json-schema.org/draft/2019-09/schema>, in one of these forms:
+
+=over 4
+
+=item *
+
+a Perl data structure, such as what is returned from a JSON decode operation,
+
+=item *
+
+a L<JSON::Schema::Draft201909::Document> object,
+
+=item *
+
+or a URI string indicating the location where such a schema is located.
+
+=back
 
 The result is a L<JSON::Schema::Draft201909::Result> object, which can also be used as a boolean.
 
@@ -1194,10 +1410,40 @@ Evaluates the provided instance data against the known schema document.
 The data is in the form of an unblessed nested Perl data structure representing any type that JSON
 allows (null, boolean, string, number, object, array).
 
-The schema is in the form of a Perl data structure, representing a JSON Schema
-that respects the Draft 2019-09 meta-schema at L<https://json-schema.org/draft/2019-09/schema>.
+The schema must represent a JSON Schema that respects the Draft 2019-09 meta-schema at
+L<https://json-schema.org/draft/2019-09/schema>, in one of these forms:
+
+=over 4
+
+=item *
+
+a Perl data structure, such as what is returned from a JSON decode operation,
+
+=item *
+
+a L<JSON::Schema::Draft201909::Document> object,
+
+=item *
+
+or a URI string indicating the location where such a schema is located.
+
+=back
 
 The result is a L<JSON::Schema::Draft201909::Result> object, which can also be used as a boolean.
+
+=head2 add_schema
+
+  $js->add_schema($uri => $schema);
+  $js->add_schema($uri => $document);
+  $js->add_schema($schema);
+  $js->add_schema($document);
+
+Introduces the (unblessed, nested Perl data structure) or L<JSON::Schema::Draft201909::Document>
+object, representing a JSON Schema, to the implementation, registering it under the indicated URI if
+provided (and if not, C<''> will be used if no other identifier can be found within).
+
+You B<MUST> call C<add_schema> for any external resources that a schema may reference via C<$ref>
+before calling L</evaluate>, other than the standard metaschemas which are pre-loaded.
 
 =head1 LIMITATIONS
 
@@ -1214,51 +1460,114 @@ option.
 
 For more information, see L<Cpanel::JSON::XS/MAPPING>.
 
+=head2 FORMAT VALIDATION
+
+By default, formats are treated only as annotations, not assertions. When L</validate_format> is
+true, strings are also checked against the format as specified in the schema. At present the
+following formats are supported (use of any other formats than these will evaluate as true):
+
+=over 4
+
+=item *
+
+C<date-time>
+
+=item *
+
+C<date>
+
+=item *
+
+C<time>
+
+=item *
+
+C<duration>
+
+=item *
+
+C<email>
+
+=item *
+
+C<idn-email>
+
+=item *
+
+C<hostname>
+
+=item *
+
+C<idn-hostname>
+
+=item *
+
+C<ipv4>
+
+=item *
+
+C<ipv6>
+
+=item *
+
+C<uri>
+
+=item *
+
+C<uri-reference>
+
+=item *
+
+C<iri>
+
+=item *
+
+C<uuid>
+
+=item *
+
+C<json-pointer>
+
+=item *
+
+C<relative-json-pointer>
+
+=item *
+
+C<regex>
+
+=back
+
+A few optional prerequisites are needed for some of these (if the prerequisite is missing,
+validation will always succeed):
+
+=over 4
+
+=item *
+
+C<date-time>, C<date>, and C<time> require L<Time::Moment>
+
+=item *
+
+C<email> and C<idn-email> require L<Email::Address::XS>
+
+=item *
+
+C<hostname> and C<idn-hostname> require L<Data::Validate::Domain>
+
+=item *
+
+C<idn-hostname> requires L<Net::IDN::Encode>
+
+=back
+
 =head2 SPECIFICATION COMPLIANCE
 
 Until version 1.000 is released, this implementation is not fully specification-compliant.
 
-The minimum extensible JSON Schema implementation requirements involve:
+To date, missing components (some of which are optional, but still quite useful) include:
 
 =over 4
-
-=item *
-
-identifying, organizing, and linking schemas (with keywords such as C<$ref>, C<$id>, C<$schema>, C<$anchor>, C<$defs>)
-
-=item *
-
-providing an interface to evaluate assertions
-
-=item *
-
-providing an interface to collect annotations
-
-=item *
-
-applying subschemas to instances and combining assertion results and annotation data accordingly.
-
-=item *
-
-support for all vocabularies required by the Draft 2019-09 metaschema, L<https://json-schema.org/draft/2019-09/schema>
-
-=back
-
-To date, missing components include most of these. More specifically, features to be added include:
-
-=over 4
-
-=item *
-
-loading multiple schema documents, and registration of a schema against a canonical base URI
-
-=item *
-
-collection of annotations (L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.7.7>)
-
-=item *
-
-multiple output formats (L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>)
 
 =item *
 
@@ -1272,11 +1581,24 @@ loading schema documents from the network
 
 loading schema documents from a local web application (e.g. L<Mojolicious>)
 
+=item *
+
+multiple output formats (L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.10>)
+
+=item *
+
+annotation collection (including the "format", "meta-data" and "content" vocabularies)
+
+=item *
+
+examination of the C<$schema> keyword for deviation from the standard metaschema, including changes to vocabulary behaviour
+
 =back
 
 =head1 SECURITY CONSIDERATIONS
 
-The C<pattern> and C<patternProperties> keywords evaluate regular expressions from the schema.
+The C<pattern> and C<patternProperties> keywords, and the C<regex> format validator,
+evaluate regular expressions from the schema.
 No effort is taken (at this time) to sanitize the regular expressions for embedded code or
 potentially pathological constructs that may pose a security risk, either via denial of service
 or by allowing exposure to the internals of your application. B<DO NOT RUN SCHEMAS FROM UNTRUSTED
@@ -1297,10 +1619,6 @@ L<RFC8259|https://tools.ietf.org/html/rfc8259>
 =item *
 
 L<Test::JSON::Schema::Acceptance>
-
-=item *
-
-L<JSON::Validator>
 
 =back
 

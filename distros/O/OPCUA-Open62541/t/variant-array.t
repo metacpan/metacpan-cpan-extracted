@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use OPCUA::Open62541 ':TYPES';
 
-use Test::More tests => 52;
+use Test::More tests => 54;
 use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
@@ -88,21 +88,27 @@ no_leaks_ok { eval { $variant->hasArrayType(-1) } } "has type -1";
 
 $variant->setArray([OPCUA::Open62541::TRUE, 1, 2, '1', 'foo',
     OPCUA::Open62541::FALSE, undef, 0, '0', ''], TYPES_BOOLEAN);
-is_deeply($variant->getArray(), [(1) x 5, ('') x 5], "array TYPES_BOOLEAN");
-ok($variant->hasArrayType(TYPES_BOOLEAN), "variant TYPES_BOOLEAN");
-is($variant->getType(), TYPES_BOOLEAN, "type TYPES_BOOLEAN");
+is_deeply($variant->getArray(), [(1) x 5, ('') x 5], "TYPES_BOOLEAN array");
+ok($variant->hasArrayType(TYPES_BOOLEAN), "TYPES_BOOLEAN variant");
+is($variant->getType(), TYPES_BOOLEAN, "TYPES_BOOLEAN type");
 
-warnings_like { $variant->setArray([0, -128, 127, -129, 128], TYPES_SBYTE) }
-    ([(qr/Integer value /) x 2], "sbyte warn");
-is_deeply($variant->getArray(), [0, -128, 127, 127, -128], "array TYPES_SBYTE");
-ok($variant->hasArrayType(TYPES_SBYTE), "variant TYPES_SBYTE");
-is($variant->getType(), TYPES_SBYTE, "type TYPES_SBYTE");
+$variant->setArray([0, -128, 127], TYPES_SBYTE);
+throws_ok { $variant->setArray([-129, 128], TYPES_SBYTE) }
+    (qr/Integer value /, "TYPES_SBYTE croak");
+no_leaks_ok { eval { $variant->setArray([-129, 128], TYPES_SBYTE) } }
+    "TYPES_SBYTE leak";
+is_deeply($variant->getArray(), [0, -128, 127], "TYPES_SBYTE array");
+ok($variant->hasArrayType(TYPES_SBYTE), "TYPES_SBYTE variant");
+is($variant->getType(), TYPES_SBYTE, "TYPES_SBYTE type");
 
-warnings_like { $variant->setArray([0, 255, 256], TYPES_BYTE) }
-    ([qr/Unsigned value /], "byte warn" );
-is_deeply($variant->getArray(), [0, 255, 0], "array TYPES_BYTE");
-ok($variant->hasArrayType(TYPES_BYTE), "variant TYPES_BYTE");
-is($variant->getType(), TYPES_BYTE, "type TYPES_BYTE");
+$variant->setArray([0, 255], TYPES_BYTE);
+throws_ok { $variant->setArray([256], TYPES_BYTE) }
+    (qr/Unsigned value /, "TYPES_BYTE croak");
+no_leaks_ok { eval { $variant->setArray([256], TYPES_BYTE) } }
+    "TYPES_BYTE leak";
+is_deeply($variant->getArray(), [0, 255], "TYPES_BYTE array");
+ok($variant->hasArrayType(TYPES_BYTE), "TYPES_BYTE variant");
+is($variant->getType(), TYPES_BYTE, "TYPES_BYTE type");
 
 my @array = (0, 1, 2, 3, 4);
 delete $array[2];

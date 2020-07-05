@@ -53,7 +53,7 @@ Mojo::IOLoop::ReadWriteProcess is yet another process manager.
 
 # EVENTS
 
-[Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess) inherits all events from [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter) and can emit
+[Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess) inherits all events from [Mojo::EventEmitter](https://metacpan.org/pod/Mojo%3A%3AEventEmitter) and can emit
 the following new ones.
 
 ## start
@@ -134,7 +134,7 @@ Note: events attached to it are wiped when process has been stopped.
 
 # ATTRIBUTES
 
-[Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess) inherits all attributes from [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter) and implements
+[Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess) inherits all attributes from [Mojo::EventEmitter](https://metacpan.org/pod/Mojo%3A%3AEventEmitter) and implements
 the following new ones.
 
 ## execute
@@ -203,7 +203,7 @@ Set it to 0 if you want to disable internal channels.
     my $session = $process->session;
     $session->enable_subreaper;
 
-Returns the current [Mojo::IOLoop::ReadWriteProcess::Session](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Session) singleton.
+Returns the current [Mojo::IOLoop::ReadWriteProcess::Session](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess%3A%3ASession) singleton.
 
 ## subreaper
 
@@ -224,7 +224,7 @@ child.
     my $loop    = $process->ioloop;
     $subprocess = $process->ioloop(Mojo::IOLoop->new);
 
-Event loop object to control, defaults to the global [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop) singleton.
+Event loop object to control, defaults to the global [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop) singleton.
 
 ## max\_kill\_attempts
 
@@ -238,6 +238,20 @@ Defaults to `5`, is the number of attempts before bailing out.
 
 It can be used with blocking\_stop, so if the number of attempts are exhausted,
 a SIGKILL and waitpid will be tried at the end.
+
+## kill\_whole\_group
+
+    use Mojo::IOLoop::ReadWriteProcess;
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { setpgrp(0, 0); exec(...); }, kill_whole_group => 1 );
+    $process->start();
+    $process->send_signal(...); # Will skip the usual check whether $process->pid is running
+    $process->stop();           # Kills the entire process group and waits for all processes in the group to finish
+
+Defaults to `0`, whether to send signals (e.g. to stop) to the entire process group.
+
+This is useful when the sub process creates further sub processes and creates a new process
+group as shown in the example. In this case it might be useful to take care of the entire process
+group when stopping and wait for every process in the group to finish.
 
 ## collect\_status
 
@@ -278,12 +292,12 @@ Defaults to `1`, If enabled autoflush of handlers is enabled automatically.
 
 ## error
 
-Returns a [Mojo::Collection](https://metacpan.org/pod/Mojo::Collection) of errors.
+Returns a [Mojo::Collection](https://metacpan.org/pod/Mojo%3A%3ACollection) of errors.
 Note: errors that can be captured only at the end of the process
 
 # METHODS
 
-[Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess) inherits all methods from [Mojo::EventEmitter](https://metacpan.org/pod/Mojo::EventEmitter) and implements
+[Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess) inherits all methods from [Mojo::EventEmitter](https://metacpan.org/pod/Mojo%3A%3AEventEmitter) and implements
 the following new ones.
 
 ## start()
@@ -418,7 +432,7 @@ You can use it if you wish to display information on the process status.
 
     Mojo::IOLoop->singleton->start() unless Mojo::IOLoop->singleton->is_running;
 
-Returns a [Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo::IOLoop::Stream) object and demand the wait operation to [Mojo::IOLoop](https://metacpan.org/pod/Mojo::IOLoop).
+Returns a [Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AStream) object and demand the wait operation to [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop).
 It needs `set_pipes` enabled. Default IOLoop can be overridden in `ioloop()`.
 
 ## wait()
@@ -578,9 +592,9 @@ Send a signal to the process
     $pool->on( stop => sub { print "Process: ".(+shift()->pid)." finished"; } );
     $pool->stop();
 
-Returns a [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Pool) object that represent a group of processes.
+Returns a [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess%3A%3APool) object that represent a group of processes.
 
-It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess), and the last one represent the number of processes to generate.
+It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess), and the last one represent the number of processes to generate.
 
 ## batch()
 
@@ -589,8 +603,8 @@ It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacp
     $pool->add(sub { print "Hello\n" });
     $pool->on(stop => sub { shift->_diag("Done!") })->start->wait_stop;
 
-Returns a [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Pool) object generated from supplied arguments.
-It accepts as input the same parameter of [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Pool) constructor ( see parallel() ).
+Returns a [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess%3A%3APool) object generated from supplied arguments.
+It accepts as input the same parameter of [Mojo::IOLoop::ReadWriteProcess::Pool](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess%3A%3APool) constructor ( see parallel() ).
 
 ## process()
 
@@ -602,9 +616,9 @@ or even:
 
     process(sub { print "Hello\n" })->start->wait_stop;
 
-Returns a [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess) object that represent a process.
+Returns a [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess) object that represent a process.
 
-It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess).
+It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess).
 
 ## queue()
 
@@ -613,7 +627,7 @@ It accepts the same arguments as [Mojo::IOLoop::ReadWriteProcess](https://metacp
     $q->add(sub { return 42 } );
     $q->consume;
 
-Returns a [Mojo::IOLoop::ReadWriteProcess::Queue](https://metacpan.org/pod/Mojo::IOLoop::ReadWriteProcess::Queue) object that represent a queue.
+Returns a [Mojo::IOLoop::ReadWriteProcess::Queue](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AReadWriteProcess%3A%3AQueue) object that represent a queue.
 
 # DEBUGGING
 

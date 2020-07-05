@@ -2,8 +2,8 @@ NAME
     Progress::Any - Record progress to any output
 
 VERSION
-    This document describes version 0.214 of Progress::Any (from Perl
-    distribution Progress-Any), released on 2018-03-26.
+    This document describes version 0.215 of Progress::Any (from Perl
+    distribution Progress-Any), released on 2020-06-21.
 
 SYNOPSIS
     Example of using in a script with terminal progress bar as output
@@ -469,6 +469,8 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Progress::Any::Examples distribution contains example scripts.
+
     Other progress modules on CPAN: Term::ProgressBar,
     Term::ProgressBar::Simple, Time::Progress, among others.
 
@@ -482,7 +484,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2015, 2014, 2013, 2012 by
+    This software is copyright (c) 2020, 2018, 2015, 2014, 2013, 2012 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -21,6 +21,7 @@ lib/Lingua/Stem/Sv.pm
 LICENSE
 Makefile.PL
 MANIFEST
+META.json
 META.yml
 README
 t/01_import_all.t

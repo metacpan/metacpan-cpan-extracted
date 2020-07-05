@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::6_0::Direct::XPack::SQL;
-$Search::Elasticsearch::Client::6_0::Direct::XPack::SQL::VERSION = '6.80';
+$Search::Elasticsearch::Client::6_0::Direct::XPack::SQL::VERSION = '6.81';
 use Moo;
 with 'Search::Elasticsearch::Client::6_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -23,7 +23,7 @@ Search::Elasticsearch::Client::6_0::Direct::XPack::SQL - Plugin providing SQL fo
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 SYNOPSIS
 

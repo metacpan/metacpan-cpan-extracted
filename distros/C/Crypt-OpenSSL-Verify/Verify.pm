@@ -5,7 +5,7 @@ use warnings;
 
 require 5.010;
 
-our $VERSION = '0.19';
+our $VERSION = '0.22';
 
 use Crypt::OpenSSL::X509;
 
@@ -164,14 +164,6 @@ Constructor. Returns an OpenSSL Verify instance, set up with the given CA.
 
     # Using the defaults of your OS:
     my $ca = Crypt::OpenSSL::Verify->new();
-
-=head2 new_from_x509($catext)
-
-Constructor. Returns an OpenSSL Verify instance, set up with the given CA.
-
-Arguments:
-
- * $ca - Crypt::OpenSSL::X509->new_from_string(base64 certificate string)
 
 =head2 verify($cert)
 

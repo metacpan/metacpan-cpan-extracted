@@ -3,36 +3,12 @@
 using std::cout;
 using std::endl;
 
-TEST_CASE("sync connect error", "[tcp][v-ssl][v-buf]") {
-    AsyncTest test(2000, {"error"});
-    net::SockAddr::Inet4 sa("255.255.255.255", 0); // makes underlying backend connect end with error synchronously
-
-    TcpSP client = make_client(test.loop);
-    client->connect_event.add([&](auto&, auto& err, auto&) {
-        REQUIRE(err);
-
-        SECTION("disconnect") {
-            client->disconnect();
-        }
-        SECTION("just go") {}
-    });
-
-    client->connect(sa);
-
-    client->write("123");
-    client->disconnect();
-
-    auto res = test.await(client->write_event, "error");
-    auto err = std::get<1>(res);
-    REQUIRE(err == std::errc::operation_canceled);
-}
-
 TEST_CASE("write without connection", "[tcp][v-ssl]") {
     AsyncTest test(2000, 1);
     TcpSP client = make_client(test.loop);
     client->write("1");
     client->write_event.add([&](auto, auto& err, auto) {
-        REQUIRE(err == std::errc::not_connected);
+        REQUIRE(err & std::errc::not_connected);
         test.happens();
     });
     test.run();
@@ -53,7 +29,7 @@ TEST_CASE("write to closed socket", "[tcp][v-ssl][v-buf]") {
         client->write("2");
         client->write_event.add([&](auto, auto& err, auto) {
             WARN(err);
-            REQUIRE(err == std::errc::not_connected);
+            REQUIRE(err & std::errc::not_connected);
             test.happens("error");
             test.loop->stop();
         });
@@ -61,7 +37,7 @@ TEST_CASE("write to closed socket", "[tcp][v-ssl][v-buf]") {
     SECTION ("shutdown") {
         client->shutdown();
         client->shutdown_event.add([&](auto, auto& err, auto) {
-            REQUIRE(err == std::errc::not_connected);
+            REQUIRE(err & std::errc::not_connected);
             test.happens("error");
             test.loop->stop();
         });
@@ -136,7 +112,7 @@ TEST_CASE("immediate client reset", "[tcp][v-ssl]") {
     client->connect(sa);
 
     client->connect_event.add([&](auto, auto& err, auto) {
-        CHECK(err == std::errc::operation_canceled);
+        CHECK(err & std::errc::operation_canceled);
         test.happens("error");
     });
 
@@ -160,7 +136,7 @@ TEST_CASE("immediate client write reset", "[tcp][v-ssl][v-buf]") {
     client->write("123");
     client->write_event.add([&](auto, auto& err, auto) {
         test.happens("w");
-        CHECK(err == std::errc::operation_canceled);
+        CHECK(err & std::errc::operation_canceled);
     });
 
     test.loop->run();
@@ -484,33 +460,6 @@ TEST_CASE("no on_read after read_stop", "[.][tcp][v-ssl]") {
     variation.ssl = old_ssl;
 }
 
-TEST_CASE("connect with resolv request", "[tcp][v-ssl][v-buf]") {
-    AsyncTest test(3000, {"resolve", "connection"});
-    TcpSP server = make_server(test.loop);
-    net::SockAddr sa = server->sockaddr();
-
-    TcpSP client = make_client(test.loop);
-    Resolver::RequestSP res_req = new Resolver::Request(test.loop->resolver());
-    res_req->on_resolve([&](auto...){
-        test.happens("resolve");
-    });
-    TcpConnectRequestSP con_req = client->connect();
-    SECTION("host in") {
-        res_req->node(sa.ip())->port(sa.port());
-    }
-    SECTION("host overwirite") {
-        con_req->to(sa.ip(), sa.port());
-    }
-    SECTION("host conflict") {
-        auto blackhole = test.get_blackhole_addr();
-        res_req->node(blackhole.ip())->port(blackhole.port());
-        con_req->to(sa.ip(), sa.port());
-    }
-
-    con_req->to(res_req)->run();
-    test.await(server->connection_event, "connection");
-}
-
 TEST_CASE("Stream::write range", "[tcp]") {
     AsyncTest test(2000, {"connect"});
     TcpSP server = make_server(test.loop);
@@ -599,7 +548,7 @@ TEST_CASE("shutdown timeout", "[tcp]") {
     for (int i = 0; i < 1000; ++i) p.client->write(str);
     p.client->shutdown(1, [&](auto, auto& err, auto) {
         test.happens("shutdown");
-        CHECK(err == std::errc::timed_out);
+        CHECK(err & std::errc::timed_out);
     });
 
     p.client->run_in_order([&](auto) {
@@ -628,7 +577,7 @@ TEST_CASE("reset in write request while timeouted shutdown", "[tcp]") {
     });
     p.client->shutdown(1, [&](auto, auto& err, auto) {
         test.happens("shutdown");
-        CHECK(err == std::errc::timed_out);
+        CHECK(err & std::errc::timed_out);
         test.loop->stop();
     });
 
@@ -644,7 +593,7 @@ TEST_CASE("bind excepted error", "[tcp]") {
     server->listen(1);
 
     REQUIRE_FALSE(ret.has_value());
-    REQUIRE(ret.error() == errc::bind_error);
+    REQUIRE(ret.error() & errc::bind_error);
 }
 
 TEST_CASE("listen excepted error", "[tcp]") {
@@ -662,5 +611,44 @@ TEST_CASE("listen excepted error", "[tcp]") {
     auto ret = second_listener->listen(1);
 
     REQUIRE_FALSE(ret.has_value());
-    REQUIRE(ret.error() == errc::listen_error);
+    REQUIRE(ret.error() & errc::listen_error);
+}
+
+TEST_CASE("on_connection noclient", "[tcp]") {
+    AsyncTest test(2000, {"conn"});
+    TcpSP server = make_server(test.loop);
+    auto sa = server->sockaddr();
+
+    TcpSP client = make_client(test.loop);
+    client->connect(sa);
+
+    TcpSP server2 = make_server(test.loop);
+    auto sa2 = server2->sockaddr();
+
+    TcpSP client2 = make_client(test.loop);
+    client2->connect(sa2);
+
+    bool done = false;
+    auto on_connection = [&](const TcpSP& self, const TcpSP& oth, const StreamSP& client, const ErrorCode& err) {
+        if (done) {
+            self->reset();
+            REQUIRE(err);
+            REQUIRE(client == nullptr);
+            return;
+        }
+        auto sock = oth->socket().value();
+        accept(sock, nullptr, nullptr);
+        close(sock);
+        done = true;
+        test.loop->stop();
+        test.happens("conn");
+    };
+
+    server->connection_event.add([&](const StreamSP&, const StreamSP& client, const ErrorCode& err) {
+        on_connection(server, server2, client, err);
+    });
+    server2->connection_event.add([&](const StreamSP&, const StreamSP& client, const ErrorCode& err) {
+        on_connection(server2, server, client, err);
+    });
+    test.run();
 }

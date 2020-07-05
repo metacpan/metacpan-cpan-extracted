@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Data::Dumper;
+use Zing::Single;
+
+=pod explain
+
+- zing-single is a standard process, see ./examples/00-zing-process ...
+- which only executes its logic chain once and either returns or in the case ...
+- of a forked process, dies, and if watched is restarted
+
+=cut
+
+(my $p = Zing::Single->new)->name;
+
+warn Dumper $p;

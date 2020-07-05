@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1777 2020-05-07 08:24:01Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1787 2020-06-18 07:39:28Z willem $	-*-perl-*-
 #
 
 use strict;
@@ -90,7 +90,7 @@ sub dist {
 	return join '', shift->SUPER::dist(), <<'END';
 
 # $(PERM_RWX) raises security issues downstream
-PREOP =	$(NOECHO) $(CHMOD) $(PERM_RW) demo$(DFSEP)*
+PREOP = $(CHMOD) $(PERM_RW) $(DISTVNAME)$(DFSEP)demo$(DFSEP)*
 END
 }
 
@@ -163,15 +163,16 @@ test_cover :
 	cover -summary
 PlanB
 	my $ldflags = "-fprofile-arcs -ftest-coverage";
-	my $ccflags = "-O0 -DNO_ECCGOST $ldflags";
+	my $ccflags = "-O0 $ldflags";
 	return <<"PlanA";
 test_cover :
 	cover -delete
+	\$(NOECHO) \$(TOUCH) SEC.c	# recompile XS component
 	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) -W SEC.xs test CCFLAGS="$ccflags" OTHERLDFLAGS="$ldflags"
 	gcov SEC.xs
 	gcov2perl SEC.xs.gcov
 	cover -summary
-	\$(NOECHO) \$(TOUCH) SEC.c	# force partial rebuild before install
+	\$(NOECHO) \$(TOUCH) SEC.c	# force XS rebuild before install
 PlanA
 }
 

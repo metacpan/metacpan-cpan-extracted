@@ -5,7 +5,7 @@ Weasel::Driver::Selenium2 - Selenium::Remote::Driver wrapper for Weasel
 
 # VERSION
 
-0.10
+0.11
 
 # SYNOPSIS
 
@@ -54,7 +54,7 @@ Community support is available through
 # COPYRIGHT
 
 ```
-Copyright (c)  2016-2019  Erik Huelsmann
+Copyright (c)  2016-2020  Erik Huelsmann
 ```
 
 # LICENSE

@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use YAML::XS;
+use File::Spec;
+use MYDan::Util::OptConf;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'agent';
+$MYDan::Util::OptConf::ARGC = -1;
+
+=head1 SYNOPSIS
+
+ $0 cmd ..
+     [--env "A=123;B=abc" ]
+     [--secret "x=1;xx=2" ]
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( env=s secret=s ) )->dump();
+
+my $code = shift;
+my %query = ( code => $code, argv => argv( $code ) );
+
+map{ 
+    $query{"__$1"} = $2 if $_ =~ /^([^=]+)=(.+)$/  
+}split /;/, delete $o{secret} if $o{secret};
+
+if( $o{env} )
+{
+    my %env;
+    map{ my @env = split /=/, $_; $env{$env[0]} = $env[1] if 2 == @env }split /;/, $o{env};
+    $query{env} = \%env if %env;
+}
+
+my $tmpfile = "/tmp/tmp.lcall.$$";
+YAML::XS::DumpFile $tmpfile, \%query or die "dump fail: $!";
+open STDIN, '<', "$tmpfile" or die "Can't open '$tmpfile': $!";
+unlink $tmpfile;
+
+exec "$MYDan::PATH/dan/agent/code/$code";
+
+sub argv
+{
+    my $code = File::Spec->join( $o{argv}, shift );
+    return -f $code && ( $code = do $code ) && ref $code eq 'CODE'
+        ? &$code( @ARGV ) : \@ARGV;
+}

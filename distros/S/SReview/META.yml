@@ -23,8 +23,8 @@ requires:
   DateTime::Format::ISO8601: '0'
   Mojo::JSON: '0'
   Mojo::Pg: '0'
-  Mojolicious::Plugin::OAuth2::Server: '0'
+  Mojolicious::Plugin::OpenAPI: '0'
   Moose: '0'
   Net::Amazon::S3: '0'
-version: v0.5.1
+version: v0.6.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -2,18 +2,20 @@ package OpenTracing::Implementation::NoOp::Tracer;
 
 =head1 NAME
 
-OpenTracing::Implementation::NoOp::Span - NoOp, so code won't break!
+OpenTracing::Implementation::NoOp::Tracer - NoOp, so code won't break!
 
 =head1 DESCRIPTION
 
 Objects of this class implement the required methods of the
-L<OpenTracing::Interface::Scope>, to be compliant during testing and allow
-applications to continue working without having to catch acceptions all the
+L<OpenTracing::Interface::Tracer>, to be compliant during testing and allow
+applications to continue working without having to catch exceptions all the
 time.
 
-None of the methods will do anything usefull.
+None of the methods will do anything useful.
 
 =cut
+
+our $VERSION = 'v0.71.1';
 
 
 

@@ -1,3 +1,5 @@
+3.7.3.6   19.06.2020
+    - fix XS compilation warning
 3.7.3.5   08.02.2020
     - improve Makefile.PL on MacOS X
 3.7.3.4   31.01.2020

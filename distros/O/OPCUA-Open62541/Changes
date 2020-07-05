@@ -1,5 +1,50 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+0.019 2020-06-30
+    - Fix XS unpack for extension object, write data to C structure.
+
+0.018 2020-06-25
+    - Implement array dimensions for variant.
+    - Set value rank in test server complex objects.
+
+0.017 2020-06-23
+    - Implement createOptionalChild and generateChildNodeId global
+      node lifecycle callbacks.
+    - Make pack and unpack of ExtensionObject consistent.
+    - Fix lifecycle spelling.
+    - Code reference to client callback is stored as a copy.
+    - Implement global node lifecycle destructor.  Node context
+      can be changed in constructor and is accessible from destructor.
+    - Store config in server and client object from the beginning.
+
+0.016 2020-06-18
+    - Implement configuration of server session limits.  Server
+      config has methods getMaxSessions(), setMaxSessions(),
+      getMaxSessionTimeout(), setMaxSessionTimeout().
+    - Remove server newWithConfig() constructor.  The 1.1 API
+      would require a different implementation, but it is not used
+      anyway.
+    - open62541 has released version 1.1 of their library.  The
+      new API is slighlty different.  Update github CI to ubuntu-20.04
+      and implement enough XS so that all tests are passed or
+      skipped.  This makes p5-opcua-open62541 work with both 1.0
+      and 1.1 open62541.  Use Devel::CheckLib to find features of
+      the library and add #ifdef to compile a working variant.
+      Async connect works with 1.0 API only.
+    - Start adding global node lifecycle callbacks.  Only the
+      constructor callback has been implemented yet.  Using the
+      node context does not work.
+    - Pack and unpack Guid to formated Perl string as in Part 6,
+      5.1.3. of the OPC UA specification.
+    - During unpack of integer and float values, croak if an overflow
+      is detected.  This is better than a warning that nobody reads.
+    - Provide pack and unpack functions for full namespace 0 if
+      the open62541 library has been built with this option.
+    - Set admin session context to provide a context for the global
+      node lifecycle callbacks.  Implement server setAdminSessionContext()
+      method.
+    - Fix memory leak when server object is destroyed.
+
 0.015 2020-05-29
     - Implement client sendAsyncReadRequest() as it is missing
       in open62541 API.

@@ -1,7 +1,6 @@
 package Getopt::EX::Loader;
 
 use v5.14;
-use strict;
 use warnings;
 use utf8;
 use Carp;
@@ -86,7 +85,7 @@ sub append {
 sub load {
     my $obj = shift;
     my $bucket =
-	new Getopt::EX::Module @_, BASECLASS => $obj->baseclass;
+	Getopt::EX::Module->new(@_, BASECLASS => $obj->baseclass);
     $obj->append($bucket);
     $bucket;
 }
@@ -354,14 +353,15 @@ Getopt::EX::Loader - RC/Module loader
 
   use Getopt::EX::Loader;
 
-  my $loader = new Getopt::EX::Loader
-      BASECLASS => 'App::example';
+  my $loader = Getopt::EX::Loader->new(
+      BASECLASS => 'App::example',
+      );
 
   $loader->load_file("$ENV{HOME}/.examplerc");
 
   $loader->deal_with(\@ARGV);
 
-  my $parser = new Getopt::Long::Parser;
+  my $parser = Getopt::Long::Parser->new;
   $parser->getoptions( ... , $loader->builtins )
 
 =head1 DESCRIPTION

@@ -1,5 +1,10 @@
 #-*- Mode: ChangeLog -*-
 
+v0.25 Tue, 30 Jun 2020 09:41:54 +0200 moocow
+	* fixed some printf type-mismatch and ppport.h macro redefinition warnings
+	* added test for mantis #47973: double-escaped slash in CQTokRegex::toString()
+	* require ddc >= v2.2.4
+
 v0.24 Fri, 03 Apr 2020 11:21:40 +0200 moocow
 	* added support for DDC v2.2.3
 	  - attribute get/set bool QueryCompiler::KeepLexerComments

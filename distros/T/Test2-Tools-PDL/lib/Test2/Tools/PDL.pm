@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.0004'; # VERSION
+our $VERSION = '0.0005'; # VERSION
 
 use PDL::Lite ();
 use PDL::Primitive qw(which);
@@ -14,15 +14,15 @@ use PDL::Types;
 
 use Safe::Isa;
 use Scalar::Util qw(blessed);
-use Test2::API qw(context);
-use Test2::Compare qw(compare strict_convert);
+use Test2::API 1.302175 qw(context);
+use Test2::Compare 0.000130 qw(compare strict_convert);
 use Test2::Util::Table qw(table);
 use Test2::Util::Ref qw(render_ref);
 
 use parent qw/Exporter/;
 our @EXPORT = qw(pdl_ok pdl_is);
 
-our $TOLERANCE = $Test2::Compare::Float::DEFAULT_TOLERANCE;
+our $TOLERANCE     = $Test2::Compare::Float::DEFAULT_TOLERANCE;
 our $TOLERANCE_REL = 0;
 
 
@@ -32,7 +32,7 @@ sub pdl_ok {
 
     unless ( $thing->$_isa('PDL') ) {
         my $thingname = render_ref($thing);
-        $ctx->ok( 0, $name, ["'$thingname' is not a piddle."] );
+        $ctx->fail( $name, "'$thingname' is not a piddle." );
         $ctx->release;
         return 0;
     }
@@ -49,21 +49,21 @@ sub pdl_is {
 
     my $gotname = render_ref($got);
     unless ( $got->$_isa('PDL') ) {
-        $ctx->ok( 0, $name, ["First argument '$gotname' is not a piddle."] );
+        $ctx->fail( $name, "First argument '$gotname' is not a piddle." );
         $ctx->release;
         return 0;
     }
     unless ( $exp->$_isa('PDL') ) {
         my $expname = render_ref($exp);
-        $ctx->ok( 0, $name, ["Second argument '$expname' is not a piddle."] );
+        $ctx->fail( $name, "Second argument '$expname' is not a piddle." );
         $ctx->release;
         return 0;
     }
 
     my $exp_class = ref($exp);
     if ( ref($got) ne $exp_class ) {
-        $ctx->ok( 0, $name,
-            ["'$gotname' does not match the expected type '$exp_class'."] );
+        $ctx->fail( $name,
+            "'$gotname' does not match the expected type '$exp_class'." );
         $ctx->release;
         return 0;
     }
@@ -74,8 +74,8 @@ sub pdl_is {
     my $delta_dims = compare( \@got_dims, \@exp_dims, \&strict_convert );
 
     if ($delta_dims) {
-        $ctx->ok( 0, $name,
-            [ $delta_dims->table, 'Dimensions do not match', @diag ] );
+        $ctx->fail( $name, 'Dimensions do not match', $delta_dims->diag,
+            @diag );
         $ctx->release;
         return 0;
     }
@@ -87,13 +87,8 @@ sub pdl_is {
           compare( $got->isbad->unpdl, $exp->isbad->unpdl, \&strict_convert );
 
         if ($delta_isbad) {
-            $ctx->ok(
-                0, $name,
-                [
-                    $delta_isbad->table, 'Bad value patterns do not match',
-                    @diag
-                ]
-            );
+            $ctx->fail( $name, 'Bad value patterns do not match',
+                $delta_isbad->diag, @diag );
             $ctx->release;
             return 0;
         }
@@ -123,8 +118,8 @@ sub pdl_is {
     };
     if ($@) {
         my $gotname = render_ref($got);
-        $ctx->ok( 0, $name, [ "Error occurred during values comparison.", $@ ],
-            @diag );
+        $ctx->fail( $name, "Error occurred during values comparison.",
+            $@, @diag );
         $ctx->release;
         return 0;
     }
@@ -157,7 +152,8 @@ sub pdl_is {
                 } @{ $diff_which->unpdl }
             ]
         );
-        $ctx->ok( 0, $name, [ "Values do not match.", @table ], @diag );
+        $ctx->fail( $name, "Values do not match.", join( "\n", @table ),
+            @diag );
         $ctx->release;
         return 0;
     }
@@ -181,7 +177,7 @@ Test2::Tools::PDL - Test2 tools for verifying Perl Data Language piddles
 
 =head1 VERSION
 
-version 0.0004
+version 0.0005
 
 =head1 SYNOPSIS
 
@@ -201,7 +197,7 @@ version 0.0004
 
 Checks that the given C<$thing> is a L<PDL> object.
 
-=head2 pdl_is($got, $exp, $name);
+=head2 pdl_is($got, $exp, $name)
 
 Checks that piddle C<$got> is same as C<$exp>.
 
@@ -251,7 +247,7 @@ Mohammad S Anwar <manwar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Stephan Loyd.
+This software is copyright (c) 2018-2020 by Stephan Loyd.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

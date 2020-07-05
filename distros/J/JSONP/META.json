@@ -1,5 +1,5 @@
 {
-   "abstract" : "a module to quickly build JSON/JSONP web services",
+   "abstract" : "a module to quickly build JSON/JSONP web services, providing also some syntactic sugar acting a bit like a sort of DSL (domain specific language) for JSON.",
    "author" : [
       "Anselmo Canfora <acanfora@cpan.org>"
    ],
@@ -43,6 +43,13 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.93",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ANSI-C/JSONP.git",
+         "web" : "https://github.com/ANSI-C/JSONP"
+      }
+   },
+   "version" : "2.14",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

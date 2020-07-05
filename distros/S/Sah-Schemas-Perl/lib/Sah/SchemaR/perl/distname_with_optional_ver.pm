@@ -1,7 +1,7 @@
 package Sah::SchemaR::perl::distname_with_optional_ver;
 
-our $DATE = '2020-06-16'; # DATE
-our $VERSION = '0.033'; # VERSION
+our $DATE = '2020-06-19'; # DATE
+our $VERSION = '0.034'; # VERSION
 
 our $rschema = ["str",[{description=>"\nFor convenience (particularly in CLI with tab completion), you can input one of:\n\n    Foo::Bar\n    Foo/Bar\n    Foo/Bar.pm\n    Foo.Bar\n\nand it will be coerced into Foo-Bar form.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"Foo-Bar"},{valid=>1,value=>"Foo-Bar\@1"},{valid=>1,value=>"Foo-Bar\@1.0"},{valid=>1,validated_value=>"Foo-Bar\@1.0.0",value=>"Foo::Bar\@1.0.0"},{valid=>1,value=>"Foo-Bar\@0.5_001"},{valid=>1,validated_value=>"Foo-Bar\@0.5_001",value=>"Foo::Bar\@0.5_001"},{valid=>0,value=>"Foo-Bar\@a"}],match=>"\\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*(\@[0-9][0-9A-Za-z]*(\\.[0-9A-Za-z_]+)*)?\\z",summary=>"Perl distribution name (e.g. Foo-Bar) with optional version number suffix (e.g. Foo-Bar\@0.001)","x.completion"=>"perl_distname","x.perl.coerce_rules"=>["From_str::normalize_perl_distname"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::perl::distname_with_optional_ver - Perl distribution name (e.g. Fo
 
 =head1 VERSION
 
-This document describes version 0.033 of Sah::SchemaR::perl::distname_with_optional_ver (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
+This document describes version 0.034 of Sah::SchemaR::perl::distname_with_optional_ver (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

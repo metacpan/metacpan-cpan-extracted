@@ -10,12 +10,13 @@ use MOP4Import::Base::CLI -as_base
      , ['help' => doc => "show this help message", json_type => 'string']
      , ['quiet' => doc => 'to be (somewhat) quiet', json_type => 'int']
      , ['scalar' => doc => "evaluate methods in scalar context", json_type => 'bool']
-     , ['output' => default => 'json'
-        , doc => "choose output serializer (json/tsv/dump)"
+     , ['output' => default => 'ndjson'
+        , doc => "choose output serializer (ndjson/json/tsv/dump)"
         , json_type => 'string'
       ]
-     , ['flatten' => doc => "output each result separately (instead of single json array)"
-        , json_type => 'string']
+     , ['flatten'
+        , json_type => 'bool'
+      ]
      , ['undef-as' => default => 'null'
         , doc => "serialize undef as this value. used in tsv output"
         , json_type => 'string'
@@ -25,9 +26,6 @@ use MOP4Import::Base::CLI -as_base
         , json_type => 'bool'
       ]
      , ['binary' => default => 0, doc => "keep STDIN/OUT/ERR binary friendly"
-        , json_type => 'bool'
-      ]
-     , ['strip-json-comments' => default => 1
         , json_type => 'bool'
       ]
      , '_cli_json'
@@ -59,7 +57,7 @@ sub cli_precmd {
 #
 # Replace parse_opts to use parse_json_opts
 #
-sub parse_opts {
+sub cli_parse_opts {
   my ($pack, $list, $result, $opt_alias, $converter, %opts) = @_;
 
   MOP4Import::Util::parse_json_opts($pack, $list, $result, $opt_alias);
@@ -106,7 +104,7 @@ sub cli_invoke_sub {
 }
 
 #
-# Output abstraction (yield).
+# cli_output($list) -- Output abstraction (yield).
 #
 sub cli_output :method {
   (my MY $self, my ($list)) = @_;
@@ -120,15 +118,9 @@ sub cli_output :method {
   };
 
   if ($self->{scalar}) {
-    $emitter->(map {
-      $self->{flatten} ? lexpand($_) : $_;
-    } $_) for @$list;
+    $emitter->($_) for @$list;
   } else {
-    if ($self->{flatten}) {
-      $emitter->(@$list);
-    } else {
-      $emitter->($list);
-    }
+    $emitter->($list);
   }
 }
 
@@ -167,7 +159,12 @@ sub cli_exit_for_result {
 
 sub cli_array :method {
   (my MY $self, my @args) = @_;
-  wantarray ? @args : \@args;
+  \@args;
+}
+
+sub cli_list :method {
+  (my MY $self, my @args) = @_;
+  @args;
 }
 
 sub cli_object :method {
@@ -270,7 +267,6 @@ sub _cli_xargs {
   my ($subOrArray, @restPrefix) = @args;
   $self->cli_precheck_apply($subOrArray);
 
-  $self->{flatten} //= 1; # xargs should flatten outputs by default.
   local $/ = $opts->{null} ? "\0" : "\n";
   local *ARGV;
   if ($opts->{slurp} || $opts->{single}) {
@@ -364,6 +360,7 @@ sub cli_decoder_from__json {
 
 sub declare_output_format {
   (my $myPack, my Opts $opts, my ($formatName, $sub)) = m4i_args(@_);
+  my $encoderFuncName = "cli_encoder_to__$formatName";
   my $writeFuncName = "cli_write_fh_as_$formatName";
   my $outputFuncName = "cli_output_as_$formatName";
   if (ref $sub eq 'CODE') {
@@ -372,24 +369,56 @@ sub declare_output_format {
       shift->$writeFuncName(\*STDOUT, $_[0]);
     };
   } elsif (not defined $sub) {
-    unless ($opts->{destpkg}->can($writeFuncName)) {
+    if ($opts->{destpkg}->can($writeFuncName)) {
+      *{globref($opts->{destpkg}, $outputFuncName)} = sub {
+        shift->$writeFuncName(\*STDOUT, $_[0]);
+      };
+    }
+    elsif ($opts->{destpkg}->can($encoderFuncName)) {
+      *{globref($opts->{destpkg}, $outputFuncName)} = sub {
+        shift->$encoderFuncName(\*STDOUT)->($_[0]);
+      };
+
+      unless ($opts->{destpkg}->can($writeFuncName)) {
+        *{globref($opts->{destpkg}, $writeFuncName)} = sub {
+          shift->$encoderFuncName(shift)->(\@_);
+        };
+      }
+    }
+    else {
       Carp::croak "output_format $formatName doesn't have method '$writeFuncName'";
     }
-    *{globref($opts->{destpkg}, $outputFuncName)} = sub {
-      shift->$writeFuncName(\*STDOUT, $_[0]);
-    };
   } else {
     Carp::croak "Invalid argument for output_format: "
       . MOP4Import::Util::terse_dump($sub);
   }
 }
 
+# cli_write_fh($outFH, @output) -- Output format abstraction
+# In cli_run context, cli_write_fh is called from cli_output($list) and
+# used as cli_write_fh(\*STDOUT, $list).
+# But in general, cli_write_fh can process multiple arguments at once.
+#
+
 sub cli_write_fh {
   (my MY $self, my ($outFH, @args)) = @_;
-  my $output = $self->can("cli_write_fh_as_".$self->{'output'})
-    or Carp::croak("Unknown output format: $self->{'output'}");
 
-  $output->($self, $outFH, @args);
+  my ($outputFmt, @opts) = lexpand($self->{'output'});
+
+  if (my $sub = $self->can("cli_encoder_to__$outputFmt")) {
+    my $encoder = $sub->($self, $outFH, @opts);
+    $encoder->($_) for ($self->{flatten} ? (map {
+      (defined $_ && ref $_ eq 'ARRAY') ? @$_ : $_
+    } @args) : @args);
+  }
+  elsif ($sub = $self->can("cli_write_fh_as_".$outputFmt)) {
+    $sub->($self, $outFH, $self->{flatten} ? (map {
+      (defined $_ && ref $_ eq 'ARRAY') ? @$_ : $_
+    } @args) : @args);
+  }
+  else {
+    Carp::croak("Unknown output format: $self->{'output'}");
+  }
 }
 
 sub cli_json { JSON() }
@@ -409,7 +438,7 @@ sub cli_decode_json {
   $self->cli_decoder_from__json->($string);
 }
 
-sub cli_encode_json {
+sub cli_encode_json_as_bytes {
   (my MY $self, my ($obj, $json_type)) = @_;
   my $codec = $self->{_cli_json} //= $self->cli_json_encoder;
   my @opts;
@@ -435,6 +464,12 @@ sub cli_encode_json {
       }
     }
   };
+  $json;
+}
+
+sub cli_encode_json {
+  (my MY $self, my ($obj, $json_type)) = @_;
+  my $json = $self->cli_encode_json_as_bytes($obj, $json_type);
   Encode::_utf8_on($json) unless $self->{binary};
   $json;
 }
@@ -462,12 +497,44 @@ sub cli_json_decoder {
 
 #----------------------------------------
 
-sub cli_flatten_if_not_yet {
-  (my MY $self, my @args) = @_;
-  # When called via flatten, list is already unwrapped.
-  map {
-    $self->{flatten} ? $_ : @$_
-  } @args;
+sub cli_encode_as {
+  (my MY $self, my ($outputSpec, @items)) = @_;
+  my ($outputFmt, $layer, @opts) = lexpand($outputSpec);
+  $outputFmt //= '';
+  # Allow $layer to be a HASH
+  if (defined $layer and ref $layer eq 'HASH') {
+    my %opts = %$layer;
+    $layer = delete $opts{layer};
+    unshift @opts, %opts;
+  }
+  $layer //= '';
+  my $buffer = "";
+  {
+    open my $outFH, ">$layer", \$buffer;
+    if (my $sub = $self->can("cli_encoder_to__$outputFmt")) {
+      my $encoder = $sub->($self, $outFH, @opts);
+      foreach my $item (@items) {
+        $encoder->($item);
+      }
+    }
+    elsif ($sub = $self->can("cli_write_fh_as_$outputFmt")) {
+      $sub->($self, $outFH, \@items);
+    }
+    else {
+      Carp::croak "Unknown output format: '$outputFmt'";
+    }
+  }
+  $buffer;
+}
+
+MY->declare_output_format(MY, 'ndjson');
+sub cli_write_fh_as_ndjson {
+  (my MY $self, my ($outFH, @tables)) = @_;
+  foreach my $table (@tables) {
+    foreach my $item (ref $table eq 'ARRAY' ? @$table : $table) {
+      print $outFH ((ref $item ? $self->cli_encode_json($item) : $item // $self->{'undef-as'} // ''), "\n");
+    }
+  }
 }
 
 MY->declare_output_format(MY, 'json');
@@ -489,31 +556,47 @@ MY->declare_output_format(MY, 'dump');
 sub cli_write_fh_as_dump {
   (my MY $self, my ($outFH, @args)) = @_;
   foreach my $item (@args) {
-    print $outFH MOP4Import::Util::terse_dump($item), "\n";
+    my $dumper = Data::Dumper->new($item)
+      ->Terse(1)
+      ->Sortkeys(1)
+      ->Indent(1)
+      ->Deparse(1);
+    if (my $sub = $dumper->can("Trailingcomma")) {
+      $sub->($dumper, 1);
+    }
+
+    print $outFH $dumper->Dump;
   }
 }
 
 MY->declare_output_format(MY, 'raw');
 sub cli_write_fh_as_raw {
-  (my MY $self, my ($outFH, @args)) = @_;
-  foreach my $item ($self->cli_flatten_if_not_yet(@args)) {
-    print $outFH $item;
+  (my MY $self, my ($outFH, @tables)) = @_;
+  foreach my $table (@tables) {
+    foreach my $item (ref $table eq 'ARRAY' ? @$table : $table) {
+      print $outFH $item;
+    }
   }
 }
 
 MY->declare_output_format(MY, 'tsv');
 sub cli_write_fh_as_tsv {
-  (my MY $self, my ($outFH, @args)) = @_;
-  # Write given \@args as a single record if requested so.
-  print $outFH join("\t", map {
-    if (not defined $_) {
-      $self->{'undef-as'};
-    } elsif (ref $_) {
-      $self->cli_encode_json($_);
-    } else {
-      $_;
+  (my MY $self, my ($outFH, @tables)) = @_;
+  foreach my $table (@tables) {
+    foreach my $rec (@$table) {
+      print $outFH join("\t", map {
+        if (not defined $_) {
+          $self->{'undef-as'};
+        } elsif (ref $_) {
+          $self->cli_encode_json($_);
+        } else {
+          my $cp = $_;
+          $cp =~ s/[\t\n]+/ /g;
+          $cp
+        }
+      } ref $rec eq 'ARRAY' ? @$rec : $rec), "\n";
     }
-  } $self->cli_flatten_if_not_yet(@args)), "\n";
+  }
 }
 
 #========================================
@@ -539,14 +622,15 @@ sub cli_create_from_file :method {
 }
 
 sub cli_read_file :method {
-  my ($classOrObj, $fileName) = @_;
+  my ($classOrObj, $fileNameSpec, %moreOpts) = @_;
+  my ($fileName, %opts) = lexpand($fileNameSpec);
   my ($ftype) = $fileName =~ m{\.(\w+)$};
   $ftype //= "";
 
   my $sub = $classOrObj->can("cli_read_file__$ftype")
     or Carp::croak "Unsupported file type '$ftype': $fileName";
 
-  $sub->($classOrObj, $fileName);
+  $sub->($classOrObj, $fileName, %opts, %moreOpts);
 }
 
 # No filename extension => read entire content except last \n.
@@ -577,14 +661,15 @@ sub cli_read_file__yml {
 
 # .json
 sub cli_read_file__json {
-  my ($classOrObj, $fileName) = @_;
+  my ($classOrObj, $fileName, %opts) = @_;
+  my $allow_comments = delete $opts{allow_comments};
   open my $fh, '<', $fileName
     or Carp::croak "Can't open $fileName: $!";
   my $all = do {local $/; <$fh>};
   unless (defined $all) {
     Carp::croak "Can't read $fileName: $!";
   }
-  if ($classOrObj->allow_json_comments) {
+  if ($allow_comments) {
     require MOP4Import::Util::CommentedJson;
     local $@;
     eval {
@@ -605,11 +690,6 @@ sub cli_read_file__json {
   @result >= 2 ? \@result : $result[0];
 }
 
-sub allow_json_comments {
-  (my MY $self) = @_;
-  ref $self ? $self->{'strip-json-comments'} : 1;
-}
-
-MY->run(\@ARGV) unless caller;
+MY->cli_run(\@ARGV) unless caller;
 
 1;

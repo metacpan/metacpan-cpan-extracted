@@ -10,7 +10,7 @@ use constant {
 
 has cgroup => sub { Mojo::IOLoop::ReadWriteProcess::CGroup::v1->new };
 
-sub state { shift->cgroup->_setget(STATE_INTERFACE, @_) }
+sub state           { shift->cgroup->_setget(STATE_INTERFACE, @_) }
 sub self_freezing   { shift->cgroup->_list(SELF_FREEZING_INTERFACE) }
 sub parent_freezing { shift->cgroup->_list(PARENT_FREEZING_INTERFACE) }
 

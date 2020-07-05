@@ -13,4 +13,3 @@ t/10-pdlsv.t
 t/11-pdlfactor.t
 t/15-pdldt.t
 t/author-pod-syntax.t
-t/lib.pm

@@ -18,11 +18,12 @@ perl Build.PL
 
 Type 'perldoc Lingua::Stem' after installation for the documentation 
 
-Copyright 1999, Benjamin Franz <snowhare@nihongo.org> 
-(<URL:http://www.nihongo.org/snowhare/>),
+Copyright 1999, Jerilyn Franz <cpan@jerilyn.info> 
 Jim Richardson, <jimr@maths.usyd.edu.au>
 (<URL:http://www.maths.usyd.edu.au:8000/jimr.html>),
 and FreeRun Technologies (<URL:http://www.freeruntech.com/>). 
 
 All Rights Reserved.
 This software may be copied or redistributed under the same terms as Perl itelf.
+
+It means is is dual licenced under the GPL1 or later and the Perl Artistic Licence

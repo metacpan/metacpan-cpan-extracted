@@ -6,6 +6,7 @@
 #include <memory>
 #include <unordered_map>
 #include <list>
+#include <functional>
 #include <panda/exception.h>
 #include <panda/optional.h>
 
@@ -19,52 +20,63 @@ struct HighLow {
 };
 
 enum class Match { yes, no, unknown };
-
-struct FunctionDetails {
-    panda::string name;
-    std::uint64_t line_no = 0;
-};
-
-struct CUDetails {
-    panda::string name;
-};
+enum class Scan  { found, not_found, dead_end };
 
 struct DieHolder;
 struct LookupResult;
+struct DieRC;
+using DieSP = panda::iptr<DieRC>;
+struct CU;
+using CUSP = panda::iptr<CU>;
+using DieCollection = std::list<DieSP>;
+
+struct FunctionDetails {
+    panda::string name;
+    DieSP name_die = nullptr;
+    std::uint64_t line_no = 0;
+    panda::string source;
+};
 
 struct DieRC: panda::Refcnt {
     Dwarf_Die die;
     Dwarf_Debug debug;
-    panda::iptr<DieRC> parent;
+    DieSP parent;
+    DieCollection context;
 
-    DieRC(Dwarf_Die die_, Dwarf_Debug debug_, panda::iptr<DieRC> parent_);
+    struct FQN {
+        string full_name;
+        DieSP source_die;
+    };
+
+    DieRC(Dwarf_Die die_, Dwarf_Debug debug_, DieSP parent_);
     ~DieRC();
 
     Dwarf_Die resolve_ref(Dwarf_Die source, Dwarf_Half attribute) noexcept;
-    panda::iptr<DieRC> discover(Dwarf_Die target) noexcept;
-    panda::iptr<DieRC> discover(Dwarf_Off target_offset, DieHolder& node) noexcept;
-    string gather_fqn() noexcept;
+    DieSP discover(Dwarf_Die target) noexcept;
+    DieSP discover(Dwarf_Off target_offset, DieHolder& node) noexcept;
+    FQN gather_fqn() noexcept;
+    DieSP refine_location(std::uint64_t offset) noexcept;
     FunctionDetails refine_fn(LookupResult& lr) noexcept;
     void refine_fn_ao(Dwarf_Die abstract_origin, FunctionDetails& details) noexcept;
     void refine_fn_name(Dwarf_Die it, FunctionDetails& details) noexcept;
-    void refine_fn_line(LookupResult& lr, FunctionDetails& details) noexcept;
+    void refine_fn_line(Dwarf_Die die, std::uint64_t offset, FunctionDetails& details) noexcept;
     void refine_fn_line_fallback(Dwarf_Die it, FunctionDetails& details) noexcept;
+    void refine_fn_source(Dwarf_Die it, FunctionDetails& details, CU& cu) noexcept;
     void refine_fn_spec(Dwarf_Die specification, FunctionDetails& details) noexcept;
-    CUDetails refine_cu() noexcept;
 };
 
 struct DieHolder {
     Dwarf_Die die;
     Dwarf_Debug debug;
     DieHolder *parent;
-    panda::iptr<DieRC> owner;
+    DieSP owner;
 
-    DieHolder(panda::iptr<DieRC> owner);
+    DieHolder(DieSP owner);
     DieHolder(Dwarf_Die die_, Dwarf_Debug debug_, DieHolder* parent);
     DieHolder(const DieHolder&) = delete;
     DieHolder(DieHolder&&) = delete;
 
-    panda::iptr<DieRC> detach();
+    DieSP detach();
 
     panda::optional<HighLow> get_addr() noexcept;
     Match contains(std::uint64_t offset) noexcept;
@@ -72,19 +84,20 @@ struct DieHolder {
 };
 
 struct LookupResult {
-    LookupResult() {}
+    LookupResult(CU& root_) noexcept: root{CUSP{&root_}} {}
     LookupResult(const LookupResult&) = delete;
     LookupResult(LookupResult&&);
 
     bool is_complete() noexcept;
-    StackframePtr get_frame(std::uint64_t ip, const SharedObjectInfo& so) noexcept;
+    bool get_frames(std::uint64_t ip, const SharedObjectInfo& so, StackFrames& frames) noexcept;
 
-    panda::iptr<DieRC> cu;
-    panda::iptr<DieRC> subprogram;
+    CUSP root;
+    DieSP cu;
+    DieSP subprogram;
     std::uint64_t offset{0};
 };
 
-struct CU {
+struct CU: panda::Refcnt {
     Dwarf_Debug debug;
     int number;
 
@@ -97,30 +110,40 @@ struct CU {
     Dwarf_Unsigned typeoffset = 0;
     Dwarf_Half     header_type = DW_UT_compile;
     Dwarf_Sig8     signature;
-    panda::iptr<DieRC> cu_die;
+    Dwarf_Off      cu_offset = 0;
+    DieSP cu_die;
+
+    char **sources = nullptr;
+    Dwarf_Signed sources_count = 0;
+
     CU(Dwarf_Debug debug, int number_);
+    ~CU();
 
     LookupResult resolve(std::uint64_t offset) noexcept;
-    bool resolve(std::uint64_t offset, DieHolder& die, LookupResult& lr) noexcept;
-    bool examine(std::uint64_t offset, DieHolder& die, LookupResult& lr) noexcept;
+    Scan resolve(std::uint64_t offset, DieHolder& die, LookupResult& lr) noexcept;
+    Scan examine(std::uint64_t offset, DieHolder& die, LookupResult& lr) noexcept;
+
+    string get_source(size_t index) noexcept;
 };
-using CUPtr = std::unique_ptr<CU>;
 }
 
 
 struct DwarfInfo;
 
 struct DwarfInfo {
+    using file_guard_t = std::unique_ptr<FILE, std::function<void(FILE*)>>;
+
     SharedObjectInfo so_info;
     Dwarf_Ptr err_arg = nullptr;
     Dwarf_Debug debug = nullptr;
-    std::list<dwarf::CUPtr> CUs;
+    std::list<dwarf::CUSP> CUs;
+    file_guard_t guard;
 
     DwarfInfo(const SharedObjectInfo& info_):so_info{info_}{}
     ~DwarfInfo();
 
-    bool load() noexcept;
-    StackframePtr resolve(std::uint64_t ip) noexcept;
+    bool load(file_guard_t&& guard) noexcept;
+    bool resolve(std::uint64_t ip, StackFrames& frames) noexcept;
 };
 using DwarfInfoMap = std::map<panda::string, std::unique_ptr<DwarfInfo>>;
 

@@ -1,4 +1,5 @@
 #include <xs/basic.h>
+#include <thread>
 #include <vector>
 #include <xs/Sub.h>
 #include <xs/Simple.h>
@@ -15,6 +16,7 @@ PerlInterpreter* my_perl_auto_t::main_interp = PERL_GET_THX;
 my_perl_auto_t my_perl;
 
 static std::vector<panda::function<void()>> end_cbs;
+static const auto mt_id = std::this_thread::get_id();
 
 void at_perl_destroy (const panda::function<void()>& f) {
     end_cbs.push_back(f);
@@ -51,6 +53,15 @@ void __boot_module (const char* rawmod, void (*bootfunc)(pTHX_ CV*), const char*
 
     Sub sub = newXS(xsname.c_str(), bootfunc, file);
     sub.call<void>(Simple(module), Simple(version));
+}
+
+bool is_perl_thread () {
+    if (std::this_thread::get_id() == mt_id) return true;
+  #ifndef PERL_IMPLICIT_CONTEXT
+    return false;
+  #else
+    return (PerlInterpreter*)my_perl;
+  #endif
 }
 
 }

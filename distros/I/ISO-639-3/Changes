@@ -1,0 +1,8 @@
+Revision history for ISO-639-3
+
+0.01    Wed Jun 24 21:38:09 EEST 2020
+        First version, released on an unsuspecting world.
+
+0.02	Sun Jul  5 15:29:37 EEST 2020
+	avoid name clash with language code and full name
+	fallback to lower-case codes

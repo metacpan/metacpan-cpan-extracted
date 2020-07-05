@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
 package Device::Chip::Adapter::BusPirate;
 
@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip::Adapter );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 
@@ -130,6 +130,21 @@ async sub make_protocol_I2C
    my $mode = await $self->_enter_mode_I2C;
 
    return Device::Chip::Adapter::BusPirate::_I2C->new( $mode );
+}
+
+async sub make_protocol_UART
+{
+   my $self = shift;
+
+   $self->{mode} and
+      croak "Cannot enter UART protocol when " . _modename( $self->{mode} ) . " already active";
+
+   my $mode = await $self->{bp}->enter_mode( "UART" );
+   $self->{mode} = $mode;
+
+   await $mode->configure( open_drain => 0 );
+
+   return Device::Chip::Adapter::BusPirate::_UART->new( $mode );
 }
 
 sub shutdown
@@ -382,6 +397,35 @@ sub read
    my $self = shift;
    $self->{mode}->recv( $self->{addr}, @_ );
 }
+
+package
+   Device::Chip::Adapter::BusPirate::_UART;
+use base qw( Device::Chip::Adapter::BusPirate::_base );
+
+use Carp;
+
+sub configure
+{
+   my $self = shift;
+   my %args = @_;
+
+   return $self->{mode}->configure(
+      baud   => $args{baudrate},
+      bits   => $args{bits},
+      parity => $args{parity},
+      stop   => $args{stop},
+   );
+}
+
+sub write
+{
+   my $self = shift;
+   my ( $bytes ) = @_;
+
+   return $self->{mode}->write( $bytes );
+}
+
+sub read { croak "Device::BusPirate does not support read on UART" }
 
 =head1 AUTHOR
 

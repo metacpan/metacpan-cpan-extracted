@@ -10,7 +10,7 @@ use XS::Install::Deps;
 use XS::Install::Util;
 use XS::Install::Payload;
 
-our $VERSION = '1.2.16';
+our $VERSION = '1.2.18';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -546,6 +546,11 @@ sub process_LD {
         $params->{MODULE_INFO}{SHARED_LIBS_LINKING} = $str;
         $params->{LDFROM} .= ' '.$str if $str;
     }
+    
+    if (my $ldf = $params->{LDDLFLAGS}) {
+        my $cf = $Config{lddlflags};
+        $params->{LDDLFLAGS} = string_merge($cf, $ldf) if index($ldf, $cf) == -1;
+    }
 }
 
 sub process_test {
@@ -576,6 +581,7 @@ sub process_test {
         CC        => $tp->{CC} || $params->{CC},
         LD        => $tp->{LD} || $params->{LD},
         LDFROM    => $ldfrom,
+        LDDLFLAGS => string_merge($params->{LDDLFLAGS}, $tp->{LDDLFLAGS}),
         INC       => string_merge($params->{MODULE_INFO}{ORIG}{INC}, $tp->{INC}),
         CCFLAGS   => string_merge($params->{MODULE_INFO}{ORIG}{CCFLAGS}, $tp->{CCFLAGS}),
         DEFINE    => string_merge($params->{DEFINE}, $tp->{DEFINE}),
@@ -588,7 +594,6 @@ sub process_test {
         NO_MYMETA => 1,
         _XSTEST   => 1,
     );
-
     
     my $mm_args = makemaker_args(%args);
     return undef unless has_binary($mm_args);
@@ -671,7 +676,8 @@ sub binary_module_version {
 sub has_c      { return $_[0]->{C} && scalar(@{$_[0]->{C}}) ? 1 : 0 }
 sub has_object { return $_[0]->{OBJECT} && scalar(@{$_[0]->{OBJECT}}) ? 1 : 0 }
 sub has_xs     { return $_[0]->{XS} && scalar(keys %{$_[0]->{XS}}) ? 1 : 0 }
-sub has_binary { return has_c($_[0]) || has_object($_[0]) || has_xs($_[0]) }
+sub has_ext    { return $_[0]->{MODULE_INFO}{STATIC_LIBS} && scalar(@{$_[0]->{MODULE_INFO}{STATIC_LIBS}}) ? 1 : 0 }
+sub has_binary { return has_c($_[0]) || has_object($_[0]) || has_xs($_[0]) || has_ext($_[0]) }
 
 sub merge_optimize {
     my $to = shift;
@@ -801,7 +807,11 @@ sub _string_merge {
 sub string_merge {
     my $s = shift;
     $s //= '';
-    $s .= ($_ // '') for @_;
+    for my $val (@_) {
+        next unless defined($val) && length($val);
+        if (!$s) { $s = $val }
+        else { $s .= " $val"; }
+    }
     return $s;
 }
 
@@ -820,6 +830,13 @@ sub c2obj_file {
     
     sub init_methods {
         no warnings 'redefine';
+
+        # change "subdirs-test*" rule type from "::" to ":" as GNU make has a bug and can't do its deps in parallel
+        sub _fix_subdirs {
+            my $s = shift;
+            $s =~ s/^((subdirs-test(?:_dynamic|_static)?\s*)+)::/$1:/mg;
+            return $s;
+        }
         
         *postamble = sub {
             my $self = shift;
@@ -833,8 +850,10 @@ sub c2obj_file {
                 ++$i;
             }
             
-            return join("\n\n", @list);
+            return _fix_subdirs(join("\n\n", @list));
         };
+
+        *test = sub { return _fix_subdirs(shift->SUPER::test(@_)) };
         
         if ($fix_bsd_make_j) { # bsd's make has a bug: wrong value of $* when building in parallel, we use $< instead
             *c_o = sub {

@@ -1,5 +1,9 @@
 NetAddr::MAC - A MAC address object
 
+0.97    2020-06-28
+        - Set minimum perl version to 5.10
+        - No other changes
+
 0.96    2018-01-26
         - Fixed more POD mistakes
         - Use Test::Compile

@@ -1,5 +1,9 @@
 Revision history for QuadPres
 
+0.28.3       2020-06-17
+    - Enabled the POD coverage tests, but the documentation is still
+    incomplete.
+
 0.28.2       2020-04-28
     - Set minimal version of perl due to s///r .
 

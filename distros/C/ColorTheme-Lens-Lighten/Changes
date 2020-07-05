@@ -1,3 +1,10 @@
+0.002   2020-06-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add example.
+
+	- remove ColorTheme:: prefix from 'theme' argument.
+
+
 0.001   2020-06-09  Released-By: PERLANCAR
 
         - First release.

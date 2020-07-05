@@ -1,0 +1,61 @@
+{
+   "abstract" : "Plugin to check if a mx exists for the given mail address",
+   "author" : [
+      "Renee Baecker <reneeb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Validate-WithYAML-Plugin-EmailMX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Validate::WithYAML" : "0.08",
+            "Net::validMX" : "2",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Validate::WithYAML::Plugin::EmailMX" : {
+         "file" : "lib/Data/Validate/WithYAML/Plugin/EmailMX.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/reneeb/Data-Validate-WithYAML-Plugin-EmailMX/issues"
+      },
+      "homepage" : "http://github.com/reneeb/Data-Validate-WithYAML-Plugin-EmailMX",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/reneeb/Data-Validate-WithYAML-Plugin-EmailMX.git",
+         "web" : "http://github.com/reneeb/Data-Validate-WithYAML-Plugin-EmailMX"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "reneeb <info@perl-services.de>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+}
+

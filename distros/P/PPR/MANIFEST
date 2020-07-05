@@ -72,5 +72,6 @@ t/perl_pod.t
 t/decomment_heredoc_large.t
 t/heredoc_large.t
 t/PPR_ERROR_trailing.t
+t/sub_END.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

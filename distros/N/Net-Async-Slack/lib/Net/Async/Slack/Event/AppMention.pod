@@ -1,4 +1,7 @@
+=encoding utf8
+
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Slack::Event::AppMention
 at lib/Net/Async/Slack/Event/AppMention.pm
@@ -41,5 +44,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2020. Licensed under the same terms as Perl itself.
 

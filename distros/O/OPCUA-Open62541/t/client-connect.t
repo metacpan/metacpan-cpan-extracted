@@ -20,8 +20,9 @@ is($client->{client}->connect($client->url()), STATUSCODE_GOOD,
     "client connect");
 is($client->{client}->getState, CLIENTSTATE_SESSION,
     "client state connected");
-# check client did connect(2)
-ok($client->{log}->loggrep(qr/TCP connection established/, 5),
+# check client did connect(2) in 1.0 API or activated session in 1.1 API
+ok($client->{log}->loggrep(
+    qr/TCP connection established|SessionState: Activated/, 5),
     "client loggrep connected");
 
 is($client->{client}->disconnect(), STATUSCODE_GOOD, "client disconnect");

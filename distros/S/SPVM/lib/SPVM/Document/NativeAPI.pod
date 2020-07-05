@@ -1,9 +1,0 @@
-=head1 NAME
-
-SPVM::Document::NativeAPI - SPVM Native API
-
-=head1 What is Native API
-
-Native API is C level functions to manipulate data of SPVM in L<Extension|SPVM::Document::Extension>.
-
-If you need more performance or bind C/C++ functions, you can use L<Extension|SPVM::Document::Extension> and Native API.

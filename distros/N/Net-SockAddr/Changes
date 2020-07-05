@@ -1,3 +1,7 @@
+1.0.2    19.06.2020
+         - fix unitialized bits usage in SockAddr::Unix when converted to Perl
+         - more correct construction of SockAddr::Unix when zero-size path is provided
+         - fix valgrind complains on usage of unitialized memory
 1.0.1    17.02.2020
          - fix freebsd thread_local global destruction
          - fix older compilers

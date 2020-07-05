@@ -1,5 +1,5 @@
 package QuadPres::Base;
-$QuadPres::Base::VERSION = '0.28.2';
+$QuadPres::Base::VERSION = '0.28.3';
 use 5.016;
 use strict;
 use warnings;
@@ -49,9 +49,27 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+QuadPres::Base - base class
+
 =head1 VERSION
 
-version 0.28.2
+version 0.28.3
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 new()
+
+=head2 mk_accessors
+
+=head2 mk_acc_ref
+
+=head2
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -15,37 +15,26 @@ Inside your own CGI Application:
     
     use base qw/CGI::Application/;
     
-    use CGI::Application::Plugin::OpenTracing;
+    use CGI::Application::Plugin::OpenTracing ( YourImplementation => %options);
+
+Before Setup, initialize the Global Tracer with the following callback to add a
+list of implementation specific context parameters:
+
+    sub opentracing_bootstrap_options {
+        service_name    => __PACKAGE__,
+        service_type    => 'web',
+        resource_name   => 'test.cgi',
+    }
 
 After Setup, before Run, initialize the Global Tracer with the following
 callback:
 
-    sub opentracing_implementation {
-        my $webapp = shift;
-        my $run_mode = $webapp->get_current_runmode();
-        my $run_method = { $webapp->run_modes }->{ $run_mode };
-        
-        
-        return ( 'SomeImplementation' =>
-            default_context => {
-                
-                # implentation specific settings
-                #
-                service_name    => __PACKAGE__,
-                service_type    => 'web',
-                resource_name   => 'test.cgi',
-                
-                # any key/values that will be carried over to child spans
-                #
-                baggage_items   => {
-                    run_mode        => $run_mode,
-                    run_method      => $run_method,
-                }
-                
-            },
-        );
-        
-    }
+    # any key/values that will be carried over to child spans
+    #
+    sub opentracing_baggage_items {
+        client_id => '123XXX',
+        database  => 'secret_toys',
+   }
 
 
 

@@ -1,0 +1,77 @@
+---
+abstract: 'A webmention multitool'
+author:
+  - 'Jason McIntosh <jmac@jmac.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Whim
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Whim:
+    file: lib/Whim.pm
+    version: v1.2020.6.22.0
+  Whim::Command::listen:
+    file: lib/Whim/Command/listen.pm
+  Whim::Command::query:
+    file: lib/Whim/Command/query.pm
+  Whim::Command::send:
+    file: lib/Whim/Command/send.pm
+  Whim::Command::verify:
+    file: lib/Whim/Command/verify.pm
+  Whim::Controller::Display:
+    file: lib/Whim/Controller/Display.pm
+  Whim::Controller::Listen:
+    file: lib/Whim/Controller/Listen.pm
+  Whim::Core:
+    file: lib/Whim/Core.pm
+  Whim::Mention:
+    file: lib/Whim/Mention.pm
+requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  Daemon::Control: '0'
+  DateTime::Format::ISO8601: '0'
+  Digest::SHA: '0'
+  FindBin: '0'
+  LWP::UserAgent: '0'
+  Mojolicious: '0'
+  Moo: '0'
+  MooX::ClassAttribute: '0'
+  Path::Tiny: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Try::Tiny: '0'
+  Web::Mention: '0'
+  feature: '0'
+  lib: '0'
+  strict: '0'
+  utf8::all: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jmacdotorg/whim/issues
+  homepage: https://github.com/jmacdotorg/whim
+  repository: git://github.com/jmacdotorg/whim.git
+version: 1.2020.06.22.0
+x_authority: cpan:JMAC
+x_contributors:
+  - 'Brian Wisti <brianwisti@pobox.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -44,11 +44,10 @@ sub read_until (&$) {
 ##
 ## options
 ##
-my $opt_B;
 my @opt_d;
 my $opt_q;
 my $opt_n;
-my $opt_mecab;
+my $opt_unit = my $opt_unit_default = 'word';
 
 my $opt_env = 1;
 my $opt_stat;
@@ -117,7 +116,6 @@ if ($opt_env and my $env = $ENV{'CDIFOPTS'}) {
 
 my @optargs = (
     "d=s" => \@opt_d,
-    "B|char" => \$opt_B,
     "diff=s" => \$diff,
     "subdiff=s" => \$sub_diff,
     "color!" => \$opt_color,
@@ -132,7 +130,9 @@ my @optargs = (
     "man" => sub { pod2usage({-verbose => 2}) },
     "env!" => \$opt_env,
     "stat!" => \$opt_stat,
-    "mecab!" => \$opt_mecab,
+    "unit=s" => \$opt_unit,
+    "B|char!" => sub { $opt_unit = $_[1] ? 'char' : $opt_unit_default },
+    "mecab!" => sub { $opt_unit = $_[1] ? 'mecab' : $opt_unit_default },
     "old!" => \$opt_old,
     "new!" => \$opt_new,
     "command!" => \$opt_command,
@@ -271,7 +271,7 @@ my %func = do {
 };
 
 my $w_pattern = do {
-    if ($opt_B) {
+    if ($opt_unit =~ /^char/) {
 	qr/\X/s;
     } else {
 	qr{
@@ -717,7 +717,7 @@ sub context {
 
 sub wordlist {
     my $text = shift;
-    if (!$opt_B and $opt_mecab and $text =~ /\P{ASCII}/) {
+    if ($opt_unit eq 'mecab' and $text =~ /\P{ASCII}/) {
 	mecab_words($text);
     } else {
 	normal_words($text);
@@ -898,11 +898,11 @@ Options:
 	--rcs		use rcsdiff
 	-r<rev>, -q	rcs options
 
-	-B, --char          char-by-char comparison
 	--diff=command      specify diff command
 	--subdiff=command   specify backend diff command
 	--stat              show statistical information
 	--colormap=s        specify color map
+	--unit=s            word, char or mecab     (default word)
 	--[no]color         color or not            (default true)
 	--[no]256           ANSI 256 color mode     (default true)
 	--[no]commandcolor  color for command line  (default true)
@@ -948,9 +948,24 @@ Almost same as B<diff> command.
 Use rcsdiff instead of normal diff.  Option B<--rcs> is not required
 when B<-r>I<rev> is supplied.
 
+=item B<-->B<unit>=I<word>|I<char>|I<mecab>
+
+Specify the comparing unit.  Default is I<word> and compare each line
+word-by-word.  Specify I<char> if you want to compare them
+character-by-character.
+
+When I<mecab> is given as an unit, B<mecab> command is called as a
+tokenizer for non-ASCII text.  ASCII text is compared word-by-word.
+External B<mecab> command has to been installed.
+
 =item B<-B>, B<--char>
 
-Compare the data character-by-character context.
+Shortcut for B<--context=char>.  This option is being deprecated, and
+will be removed in a future.
+
+=item B<--mecab>
+
+Shortcut for B<--context=mecab>.
 
 =item B<--diff>=I<command>
 
@@ -1143,11 +1158,6 @@ Currently this option is effective only for modified lines.
 
 Set CARRIAGE-RETURN and ESCAPE visible attributes.  These options will
 be deprecated soon.  Use B<--visible> option instead.
-
-=item B<-->[B<no>]B<mecab>
-
-Use B<mecab> command as a tokenizer.  External command B<mecab> is
-required.
 
 =item B<--stat>
 

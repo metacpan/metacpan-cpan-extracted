@@ -1,5 +1,15 @@
 Revision history for Perl extension File::Rename.
 
+1.13	Robin Barker 2020-06-17
+        Fix 'examples' test script to do file globbing
+
+1.12	Robin Barker 2020-06-17
+	Added new test script to MANIFEST
+
+1.11	Robin Barker 2020-06-16
+	Added more examples in the script POD, suggested by 'xavier'
+	Added a test script to test that exampples in POD are valid
+
 1.10	Robin Barker 2018-09-25
 	Added option --filename [-d] to rename filename component only
 	Added option --fullpath [--path] to rename any part of path 

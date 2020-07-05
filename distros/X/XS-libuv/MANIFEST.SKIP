@@ -1,6 +1,6 @@
 libuv/build/
 
-#!start included /home/syber/perl5/perlbrew/perls/5.30.1g/lib/5.30.1/ExtUtils/MANIFEST.SKIP
+#!start included /home/b/perl5/perlbrew/perls/perl-debug-5.32.0/lib/5.32.0/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -73,5 +73,5 @@ libuv/build/
 
 # Avoid AppVeyor file
 ^\.?appveyor.yml
-#!end included /home/syber/perl5/perlbrew/perls/5.30.1g/lib/5.30.1/ExtUtils/MANIFEST.SKIP
+#!end included /home/b/perl5/perlbrew/perls/perl-debug-5.32.0/lib/5.32.0/ExtUtils/MANIFEST.SKIP
 

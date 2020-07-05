@@ -3,10 +3,10 @@ use warnings;
 
 package Archive::BagIt::DotBagIt;
 
-our $VERSION = '0.055'; # VERSION
+our $VERSION = '0.058'; # VERSION
 
 use Sub::Quote;
-use Moose;
+use Moo;
 
 extends "Archive::BagIt::Base";
 
@@ -19,7 +19,8 @@ has 'metadata_path' => (
 
 sub _build_metadata_path {
     my ($self) = @_;
-    return $self->bag_path."/.bagit";
+    my $bag_path = $self->bag_path();
+    return "$bag_path/.bagit";
 }
 
 has 'payload_path' => (
@@ -47,7 +48,15 @@ Archive::BagIt::DotBagIt
 
 =head1 VERSION
 
-version 0.055
+version 0.058
+
+=head1 NAME
+
+Archive::BagIt::DotBagIt
+
+=head1 VERSION
+
+version 0.058
 
 =head1 NAME
 
@@ -68,6 +77,17 @@ and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
+
+=head1 AUTHOR
+
+Rob Schmidt <rjeschmi@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

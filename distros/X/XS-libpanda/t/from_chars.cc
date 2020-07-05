@@ -2,7 +2,7 @@
 #include <panda/string.h>
 #include <panda/from_chars.h>
 
-using panda::string;
+#define TEST(name) TEST_CASE("from_chars: " name, "[from_chars]")
 
 struct Exc : std::exception {};
 
@@ -224,12 +224,11 @@ void from_chars_test() {
     test_sign_dependent<Int>::run();
 }
 
-TEST_CASE("from_chars int8_t",   "[from_chars]") { from_chars_test<int8_t>(); }
-TEST_CASE("from_chars int16_t",  "[from_chars]") { from_chars_test<int16_t>(); }
-TEST_CASE("from_chars int32_t",  "[from_chars]") { from_chars_test<int32_t>(); }
-TEST_CASE("from_chars int64_t",  "[from_chars]") { from_chars_test<int64_t>(); }
-TEST_CASE("from_chars uint8_t",  "[from_chars]") { from_chars_test<uint8_t>(); }
-TEST_CASE("from_chars uint16_t", "[from_chars]") { from_chars_test<uint16_t>(); }
-TEST_CASE("from_chars uint32_t", "[from_chars]") { from_chars_test<uint32_t>(); }
-TEST_CASE("from_chars uint64_t", "[from_chars]") { from_chars_test<uint64_t>(); }
-
+TEST("int8_t")   { from_chars_test<int8_t>(); }
+TEST("int16_t")  { from_chars_test<int16_t>(); }
+TEST("int32_t")  { from_chars_test<int32_t>(); }
+TEST("int64_t")  { from_chars_test<int64_t>(); }
+TEST("uint8_t")  { from_chars_test<uint8_t>(); }
+TEST("uint16_t") { from_chars_test<uint16_t>(); }
+TEST("uint32_t") { from_chars_test<uint32_t>(); }
+TEST("uint64_t") { from_chars_test<uint64_t>(); }

@@ -23,11 +23,11 @@ configs based on it.
 ###############################################################################
 package XAO::DO::Embeddable;
 use strict;
+use warnings;
 use XAO::Objects;
 use base XAO::Objects->load(objname => 'Atom');
 
-use vars qw($VERSION);
-$VERSION=(0+sprintf('%u.%03u',(q$Id: Embeddable.pm,v 2.1 2005/01/13 22:34:34 am Exp $ =~ /\s(\d+)\.(\d+)\s/))) || die "Bad VERSION";
+our $VERSION=2.1;
 
 ###############################################################################
 
@@ -38,9 +38,10 @@ object it is being embedded into.
 
 =cut
 
-sub set_base_config ($%) {
+sub set_base_config ($$) {
     my ($self,$base)=@_;
-    $self->{_embedding_base_config}=$base;
+    $self->{'_embedding_base_config'}=$base;
+    return $self;
 }
 
 ###############################################################################
@@ -54,9 +55,9 @@ from them through normal @ISA relations.
 
 =cut
 
-sub base_config ($%) {
+sub base_config ($) {
     my $self=shift;
-    return $self->{_embedding_base_config};
+    return $self->{'_embedding_base_config'};
 }
 
 ###############################################################################

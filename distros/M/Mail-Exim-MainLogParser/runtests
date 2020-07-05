@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+ 
+use lib 'lib';
+use Test::Harness qw(runtests);
+$Test::Harness::verbose = 1;
+ 
+my @testfiles;
+if (@ARGV >= 1) {
+    @testfiles = @ARGV;
+} else {
+    opendir (TD, 't');
+    while (my $testfile = readdir(TD)) {
+        next unless $testfile =~ /\.t$/;
+        push (@testfiles,('t/'.$testfile));
+    }
+    closedir(TD);
+}
+ 
+runtests(sort @testfiles);

@@ -15,7 +15,7 @@ sub attempt {
     sleep 1;
     $attempts++;
   }
-  $or->() if $or && !$condition->();
+  $or->()                     if $or && !$condition->();
   warn "Attempts terminated!" if DEBUG;
 }
 

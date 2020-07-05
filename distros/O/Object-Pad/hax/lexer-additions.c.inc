@@ -239,16 +239,28 @@ static SV *MY_lex_scan_parenthesized(pTHX)
 #define lex_scan_version(flags)  MY_lex_scan_version(aTHX_ flags)
 static SV *MY_lex_scan_version(pTHX_ int flags)
 {
-  const char *err = NULL;
-  const char *endp = prescan_version(PL_parser->bufptr, FALSE, &err, NULL, NULL, NULL, NULL);
+  I32 c;
+  SV *tmpsv = sv_2mortal(newSVpvs(""));
 
-  if(endp == PL_parser->bufptr && (flags & PARSE_OPTIONAL))
+  /* scan_version() expects a version to end in linefeed, semicolon or
+   * openbrace; gets confused if other keywords are fine. We'll have to
+   * extract it first.
+   *   https://rt.cpan.org/Ticket/Display.html?id=132903
+   */
+
+  while((c = lex_peek_unichar(0))) {
+    /* Allow a single leading v before accepting only digits, dot, underscore */
+    if((!SvCUR(tmpsv) && (c == 'v')) || strchr("0123456789._", c))
+      sv_cat_c(tmpsv, lex_read_unichar(0));
+    else
+      break;
+  }
+
+  if(!SvCUR(tmpsv) && (flags & PARSE_OPTIONAL))
     return NULL;
 
   SV *ret = newSV(0);
-  endp = scan_version(PL_parser->bufptr, ret, FALSE);
-
-  lex_read_to((char *)endp);
+  scan_version(SvPVX(tmpsv), ret, FALSE);
 
   return ret;
 }

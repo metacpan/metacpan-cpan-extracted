@@ -7,9 +7,16 @@ use Time::HiRes qw(sleep);
 
 use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
-use Test::More tests =>
-    OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() * 4 + 8;
+use Test::More;
+BEGIN {
+    if (OPCUA::Open62541::Client->can('connect_async')) {
+	plan tests =>
+	    OPCUA::Open62541::Test::Server::planning() +
+	    OPCUA::Open62541::Test::Client::planning() * 4 + 8;
+    } else {
+	plan skip_all => "No UA_Client_connect_async in open62541";
+    }
+}
 use Test::Exception;
 use Test::NoWarnings;
 use Test::LeakTrace;

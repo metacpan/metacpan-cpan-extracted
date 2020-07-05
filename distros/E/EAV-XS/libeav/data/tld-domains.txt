@@ -1,4 +1,4 @@
-# this file was auto-generated at 2020-06-03 12:45:43
+# this file was auto-generated at 2020-06-27 10:28:12
 aaa.aaa
 aarp.aarp
 abarth.abarth
@@ -1410,6 +1410,7 @@ xin.xin
 ভাৰত.ভাৰত
 ভারত.ভারত
 八卦.八卦
+ישראל.ישראל
 موقع.موقع
 বাংলা.বাংলা
 公益.公益

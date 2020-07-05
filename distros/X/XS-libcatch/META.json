@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -25,12 +25,12 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Install" : "v1.2.13"
+            "XS::Install" : "v1.2.17"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.13"
+            "XS::Install" : "v1.2.17"
          }
       },
       "test" : {
@@ -42,6 +42,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.1.0",
+   "version" : "v2.12.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -57,6 +57,6 @@
          "web" : "https://webchat.freenode.net/#mojo"
       }
    },
-   "version" : "10.07",
+   "version" : "10.08",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -6,7 +6,7 @@ package SPVM::Util {
   use SPVM::StringList;
   use SPVM::Unicode (uchar_to_utf8);
   use SPVM::Math (fabs, floor, log10, pow);
-
+  
   precompile sub copy_oarray : object[] ($objects : object[], $cloner : SPVM::Cloner) {
     my $length = @$objects;
     
@@ -455,48 +455,6 @@ package SPVM::Util {
     }
     
     return $new_string;
-  }
-
-  precompile sub complex_farray : SPVM::Complex_2f[] ($re_values : float[], $im_values : float[]) {
-    if (@$re_values != @$im_values) {
-      die "Real values length is different from imaginary values";
-    }
-    
-    my $z_array = new SPVM::Complex_2f[@$re_values];
-    for (my $i = 0; $i < @$re_values; $i++) {
-      $z_array->[$i]{re} = $re_values->[$i];
-      $z_array->[$i]{im} = $im_values->[$i];
-    }
-    
-    return $z_array;
-  }
-  
-  precompile sub complex_darray : SPVM::Complex_2d[] ($re_values : double[], $im_values : double[]) {
-    if (@$re_values != @$im_values) {
-      die "Real values length is different from imaginary values";
-    }
-    
-    my $z_array = new SPVM::Complex_2d[@$re_values];
-    for (my $i = 0; $i < @$re_values; $i++) {
-      $z_array->[$i]{re} = $re_values->[$i];
-      $z_array->[$i]{im} = $im_values->[$i];
-    }
-    
-    return $z_array;
-  }
-
-  precompile sub complexf : SPVM::Complex_2f ($re : float, $im : float) {
-    my $z : SPVM::Complex_2f;
-    $z->{re} = $re;
-    $z->{im} = $im;
-    return $z;
-  }
-  
-  precompile sub complexd : SPVM::Complex_2d ($re : double, $im : double) {
-    my $z : SPVM::Complex_2d;
-    $z->{re} = $re;
-    $z->{im} = $im;
-    return $z;
   }
 
   precompile sub copy_barray : byte[] ($nums : byte[]) {

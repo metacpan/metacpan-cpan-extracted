@@ -5,6 +5,7 @@ author:
 build_requires:
   Capture::Tiny: '0'
   Cpanel::JSON::XS: '4.05'
+  JSON::PP: '2.273'
   Module::Build::Pluggable::CPANfile: '0.05'
   Test::Exit: '0'
   Test::Kantan: '0'
@@ -13,11 +14,8 @@ build_requires:
   YAML::Syck: '0'
   rlib: '0'
 configure_requires:
-  Module::Build: '0'
-  Module::Build::Pluggable: '0'
+  Module::Build: '0.42'
   Module::Build::Pluggable::CPANfile: '0.05'
-  Module::CPANfile: '0'
-  rlib: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -36,7 +34,7 @@ provides:
     file: Base/Configure.pm
   MOP4Import::Declare:
     file: Declare.pm
-    version: '0.050'
+    version: '0.051'
   MOP4Import::Declare::Type:
     file: Declare/Type.pm
   MOP4Import::FieldSpec:
@@ -61,23 +59,29 @@ provides:
     file: Util/CommentedJson.pm
   MOP4Import::Util::FindMethods:
     file: Util/FindMethods.pm
+  MOP4Import::Util::Inspector:
+    file: Util/Inspector.pm
   MOP4Import::Util::JSON_TYPE:
     file: Util/JSON_TYPE.pm
+  MOP4Import::Util::ResolveSymlinks:
+    file: Util/ResolveSymlinks.pm
   MOP4Import::Util::compat_double_diamond:
     file: Util/compat_double_diamond.pm
   MOP4Import::Util::compat_double_diamond_5_20:
     file: Util/compat_double_diamond_5_20.pm
 recommends:
   Cpanel::JSON::XS: '4.05'
+  Data::Dumper: '2.160'
   File::AddInc: '0'
   Module::Runtime: '0'
   YAML::Syck: '0'
 requires:
   JSON::MaybeXS: '0'
+  Sub::Util: '1.40'
   perl: '5.010'
   rlib: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/hkoba/perl-mop4import-declare
-version: '0.050'
+version: '0.051'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

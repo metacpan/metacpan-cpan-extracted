@@ -1,6 +1,11 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.17 Jun 26, 2020
+
+	Recognise BIND private key accessed via symbolic link.
+
+
 **** 1.16 May 11, 2020
 
 	Improve testing of verify() functions.
@@ -638,4 +643,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1780 2020-05-11 09:19:56Z willem $
+$Id: Changes 1792 2020-06-26 14:43:25Z willem $

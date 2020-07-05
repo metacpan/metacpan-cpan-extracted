@@ -9,20 +9,22 @@ OpenTracing::Implementation::NoOp::SpanContext - NoOp, so code won't break!
 Objects of this class implement the required methods of the
 L<OpenTracing::Interface::SpanContext>,
 to be compliant during testing and allow applications to continue working
-without having to catch acceptions all the time.
+without having to catch exceptions all the time.
 
-None of the methods will do anything usefull.
+None of the methods will do anything useful.
 
 =cut
 
+our $VERSION = 'v0.71.1';
 
 
-sub get_baggage_item { undef }
 
 sub with_baggage_item { __PACKAGE__->new( ) }
 
 sub with_baggage_items { __PACKAGE__->new( ) }
 
+sub get_baggage_item  { undef }
+sub get_baggage_items { return ( ) }
 
 
 sub new { bless {} }

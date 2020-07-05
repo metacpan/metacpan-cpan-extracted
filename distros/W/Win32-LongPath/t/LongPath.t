@@ -692,14 +692,17 @@ sub ListDir
 
 {
 ###########
-# o open dir object for subdir
+# o open dir object
+# o attempt to open a file as a directory
 # o read contents
 # o examine contents
 ###########
 
-plan tests => 12;
+plan tests => 13;
 my $oDir = Win32::LongPath->new ();
 ok ($oDir, 'Win32::LongPath->new') or diag ("error=$^E");
+ok (!defined $oDir->opendirL ($hFiles {newfile}->{name}), 'opendirL (file)')
+  or diag ('Expected failure opening a file as a directory');
 ok ($oDir->opendirL ($sSubdir), 'opendirL (subdir)') or diag ("error=$^E");
 my @sFound = sort $oDir->readdirL ();
 my @sExpect = ('.', '..', $hFiles {newfile}->{name},

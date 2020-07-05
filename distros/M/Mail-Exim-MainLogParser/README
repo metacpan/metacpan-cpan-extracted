@@ -65,6 +65,8 @@ IMPORTED METHODS
 
     *   "EximMainLoglineParse"
 
+    *   "EximMainLoglineCompose"
+
 METHODS
   new
     Create a new object instances of this module. It is not necessary to
@@ -83,9 +85,9 @@ METHODS
   parse
     Parse a line from the Exim main log file and return a hash structure.
 
-        $logLineHashStructure = $exlog->parse($logline);
+        $exim_log_line_hash = $exlog->parse($exim_log_line_string);
 
-    *   exim_main_log_line
+    *   exim_log_line_string
 
         This is a single line from the Exim main log output. The below
         example log line is split over several lines in order to fit it on
@@ -97,7 +99,7 @@ METHODS
 
     This method returns a hash structure of the parsed log line.
 
-        print Dumper($logLineHashStructure);
+        print Dumper($exim_log_line_hash);
         $VAR1 = {
               'eximid' => '1dJ08B-0003oP-5i',
               'time' => '11:17:56',
@@ -120,15 +122,106 @@ METHODS
               'flag' => '<='
             };
 
+  EximMainLoglineCompose
+    See "compose()".
+
+  compose
+    Compose a log line from a parsed main log line hash and return as a
+    string.
+
+        $exim_log_line_composed = $exlog->compoe($exim_log_line_hash)
+
+    *   exim_log_line_hash
+
+        This is a single parsed line from the Exim main log output
+        represented as a HASH.
+
+            $exim_parsed_main_log_line = {
+                  'eximid' => '1dJ08B-0003oP-5i',
+                  'time' => '11:17:56',
+                  'date' => '2017-06-08',
+                  'args' => [
+                              {
+                                'H' => 'realmail.server.example.com (ehlo-name.example.com) [192.168.250.101]'
+                              },
+                              {
+                                'P' => 'esmtp'
+                              },
+                              {
+                                'S' => '1364'
+                              },
+                              {
+                                'id' => '266785270.3.2385849643852@peerhost.server.example.com'
+                              }
+                            ],
+                  'address' => 'do-not-reply@nowhere.com',
+                  'flag' => '<='
+                };
+
+    This method returns a string composition of the parsed log line HASH
+    structure. It is intended that the composed string matches the original
+    log line that was parsed, minus trailing white space.
+
+        print "$LoglineComposed";
+        2017-06-08 11:17:56 1dJ08B-0003oP-5i <= do-not-reply@nowhere.com
+            H=realmail.server.example.com (ehlo-name.example.com) [192.168.250.101]
+            P=esmtp S=1364 id=266785270.3.2385849643852@peerhost.server.example.com
+
+EXAMPLES
+  Show exim mail transactions for a particular email address
+        use Mail::Exim::MainLogParser;
+        $exilog = new Mail::Exim::MainLogParser();
+        my $emailaddress='me@example.com';
+        my $index = {};
+        my @mine_queued = ();
+        my $line_count = 0;
+        # open(EXIMLOG,"tail -f /var/log/exim/main.log |");  # Use `tail -f` to watch logs in real time
+        open(EXIMLOG,"cat /var/log/exim/main.log |");
+        while (my $line = <EXIMLOG>) {
+            $line_count++;
+            chomp($line);
+            my $parsed = $exilog->parse($line) || (warn "Warn: Could not parse line $line_count.\n" && next);
+            # Add each transaction to an eximid index
+            if (exists $parsed->{'eximid'}) {
+                push(@{$index->{$parsed->{'eximid'}}}, $parsed);
+            }
+            # Track the exim transactions that send or deliver via my email address
+            if ((exists $parsed->{'address'}) && ($parsed->{'address'} =~ /$emailaddress/i)) {
+                push(@mine_queued,$parsed->{'eximid'});
+            }
+            # Once a queued message is completed, print out transactions if mine, delete it
+            if ((exists $parsed->{'message'}) && ($parsed->{'message'} =~ /Completed/i)) {
+                my $eximid = $parsed->{'eximid'};
+                if (grep /$eximid/, @mine_queued) {
+                    foreach my $eximtransaction (@{$index->{$eximid}}) {
+                        print $exilog->compose($eximtransaction),"\n";
+                    }
+                    @mine_queued = grep ! /$eximid/, @mine_queued;
+                }
+                delete $index->{$eximid};
+            }
+        }
+        if (scalar @mine_queued >= 1) {
+            # Once we reach the end of the log, there may still be messages that have not completed yet
+            print "#"x10," My Uncompleted Messages ","#"x10,"\n";
+            foreach my $eximid (@mine_queued) {
+                foreach my $eximtransaction (@{$index->{$eximid}}) {
+                    print $exilog->compose($eximtransaction),"\n";
+                }
+            }
+        }
+        close(EXIMLOG);
+
 AUTHOR
     Russell Glaue, http://russ.glaue.org
 
 SEE ALSO
+    Exim4 log documentation:
     http://www.exim.org/exim-html-current/doc/html/spec_html/ch-log_files.ht
     ml
 
 COPYRIGHT
-    Copyright (c) 2017 Russell E Glaue, Center for the Application of
+    Copyright (c) 2017-2020 Russell E Glaue, Center for the Application of
     Information Technologies, Western Illinois University All rights
     reserved.
 

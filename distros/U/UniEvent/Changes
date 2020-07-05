@@ -1,3 +1,8 @@
+1.0.2     19.06.2020
+           - not specified because no docs yet
+           - fix valgrind complains
+           - treat SSL_ERROR_ZERO_RETURN as eof
+           - add RunMode::NOWAIT_FORCE for running loop even if there are only weak handles
 1.0.1     24.03.2020
            - fix UB with static logging module
            - fix Poll for windows

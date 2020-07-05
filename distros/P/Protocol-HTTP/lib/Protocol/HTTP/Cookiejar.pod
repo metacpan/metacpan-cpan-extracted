@@ -1,0 +1,179 @@
+=head1 NAME
+
+Protocol::HTTP::CookieJar - Cookie jar for HTTP user agents
+
+=head1 SYNOPSIS
+
+    use Protocol::HTTP::CookieJar;
+
+    my $jar = Protocol::HTTP::CookieJar->new;
+
+    # request will be populated with relevant cookies for the requested URI
+    my $request = Protocol::HTTP::Request->new({ uri => "http://crazypanda.ru/" });
+    $jar->populate($request);
+
+    my ($response, ...) =  $response_parser->parse($network_data);
+    # pull-in or update cookies in the jar
+    $jar->collect($response);
+
+    # cookies jar (de)serialization
+    my $binary_data = $jar->serialize();
+    my $jar = Protocol::HTTP::CookieJar->new($binary_data);
+
+    # inspect cookies
+    my $cookies = $jar->all_cookies;
+    while(my ($domain, cookies) = each %$cookies) {
+        say "Domain '$domain' has cookie named ', $_->{name}, "'" for (@$cookies);
+    }
+
+    my $cookies = $jar->find(URI::XS->new('http://crazypanda.ru/'));
+    say "A cookie named ', $_->{name}, "' will be sent" for (@$cookies);
+
+    # manual cookies injection
+    $jar->add("sid", { value => "1234", domain => 'ya.ru' }, URI::XS->new('http://ya.ru/'));
+
+    # cookies removal
+    $jar->remove("crazypanda.ru");       # remove cookies by domain
+    $jar->remove("", "session_id");      # remove cookies by cookie name
+    $jar->remove("", "/secure");         # remove cookies by path
+    $jar->remove("google.com", "session_id", "/secure");
+
+=head1 DESCRIPTION
+
+This is simple CookieJar, implemented in accordance with
+L<RFC 6265|http://tools.ietf.org/html/rfc6265>. and
+L<Same Site Cookies draft|https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00>.
+
+The user agents can use the L<Protocol::HTTP::CookieJar> to maintain state
+over stateless HTTP protocol.
+
+=head1 METHODS
+
+=head2 new($serialized = "")
+
+Constructs new cookie jar, optionally parsing the previously serialized state of
+cookies jar.
+
+
+=head2 to_string($include_session = false, $now = Date::now())
+
+Serializes cookies jar into a binary string.
+
+By default session cookies are not stored; this is similar behaviour when
+browser's tab is closed. C<$include_session> can be set to C<true> to
+preserve them.
+
+The non-session expired at the C<$now> moment cookies are not stored too.
+
+=head2 add($name, $cookie, $origin, $now = Date::now())
+
+    my $origin = URI::XS->new('http://crazypanda.ru/');
+    $jar->add("hello", { value => "world", domain => 'crazypanda.ru' }, $origin);
+
+Add new cookie hash C<$cookie> with name C<$name>, as it comes from
+L<Protocol::HTTP::Response> within the C<$origin> context (i.e.
+B<request> URI).
+
+If non-session cookie is expired at the C<$now> time moment, then it is ignored.
+
+=head2 remove($domain = "" , $name = "" , $path = "/")
+
+    my $removed_cookies = $cookie_jar->remove("yandex.ru", "session");
+
+Remove all cookies matching the specified criteria. The empty string mean
+"match all", so, the call
+
+    $cookie_jar->remove();
+
+will erase all cookies.
+
+The C<$path> will match all cookies by prefix, i.e. C<"/"> means "all paths".
+
+The C<$domain> will also match all subdomains. If subdomains should be
+excluded from removal, the domain should be dot-prefixed, e.g.
+
+    $cookie_jar->remove(".ya.ru");
+
+will remove all cookies for C<ya.ru> domain, but the cookies for
+C<my.ya.ru> will be kept.
+
+=head2 clear()
+
+Removes all cookies from the L<Protocol::HTTP::CookieJar>.
+
+=head2 find($request_uri, $context_uri = $request_uri, $now = Date::now(), $top_level = true)
+
+    my $cookies = $jar->find(URI::XS->new('http://crazypanda.ru/'));
+
+Returns all cookies, which will be sent to C<$request_uri> with in C<$context_uri>;
+The expired at the C<$now> moment cookies will be not included.
+
+For the meaning of the
+C<$top_level> please refer L<Same-Site Cookies|https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00>.
+
+=head2 collect($response, $request_uri, $now = Date::now())
+
+Cookie jar pulls in all cookies, set by server response in the L<Protocol::HTTP::Response> as the
+response to the C<$request_uri>.
+
+If non-session cookie is expired at the C<$now> time moment, then it is ignored.
+
+If user-provided cookie ignore-filrer is set, then each cookies will by quereied
+for addition, see L<set_ignore>.
+
+
+=head2 set_ignore(sub { ... });
+
+    $jar->set_ignore(sub {
+        my ($name, $coo) = @_;
+        return scalar($name =~ /^unsecure/);
+    });
+
+Sets cookies collection ignore predicate. If C<true> is returned, then cookie will I<not> be
+added into cookie jar.
+
+
+=head2 populate($request, $context_uri = $request->uri, $top_level = true, $now = $now = Date::now())
+
+Fills the L<Protocol::HTTP::Response> with the relevant cookies. The C<$context_uri> and
+C<$top_level> parameters are needed to inject cross-site request context to correclty check
+C<Same Site> cookies property, see
+L<Same-Site Cookies|https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00> for
+the details.
+
+The expired at the C<$now> moment cookies will be not be populated inot the C<$request>.
+
+=head2 all_cookies()
+
+Returns hashref of all cookies within the jar. The key is domain, and
+the values is the array of cookies.
+
+=head1 FUNCTIONS
+
+=head2 parse_cookies($data)
+
+    my ($err, $cookies) = Protocol::HTTP::CookieJar::parse_cookies($data)
+
+Parses previouly stored cookies jar.
+
+=head1 SEE ALSO
+
+L<Protocol::HTTP>
+
+L<Protocol::HTTP::Request>
+
+L<Protocol::HTTP::Response>
+
+L<URI::XS>
+
+L<Mojo::UserAgent::CookieJar>
+
+L<Date>
+
+=head1 REFERENCES
+
+L<https://tools.ietf.org/html/rfc6265>
+
+L<https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00>
+
+=cut

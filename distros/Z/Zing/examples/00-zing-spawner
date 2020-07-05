@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Data::Dumper;
+use Zing::Spawner;
+
+=pod explain
+
+- zing-spawner is a Worker process, see ./examples/00-zing-worker ...
+- and as such it listens to 1+ queue(s) and spawns (fork()s) apps
+- apps are "launched" in a fire-and-forget fashion but without the ...
+- possibility of creating zombie processes
+
+=cut
+
+(my $p = Zing::Spawner->new)->name;
+
+warn Dumper $p;

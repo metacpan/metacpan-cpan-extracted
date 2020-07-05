@@ -4,7 +4,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # SYNOPSIS
 
@@ -113,9 +113,9 @@ formatting capability.
 
 [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers)
 
-[https://www.w3.org/TR/2009/NOTE-jlreq-20090604/](https://www.w3.org/TR/2009/NOTE-jlreq-20090604/),
+[https://www.w3.org/TR/2012/NOTE-jlreq-20120403/](https://www.w3.org/TR/2012/NOTE-jlreq-20120403/),
 Requirements for Japanese Text Layout,
-W3C Working Group Note 4 June 2009
+W3C Working Group Note 3 April 2012
 
 # LICENSE
 

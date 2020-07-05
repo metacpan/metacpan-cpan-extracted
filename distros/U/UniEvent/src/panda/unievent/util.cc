@@ -189,8 +189,9 @@ std::vector<InterfaceAddress> interface_info () {
         row.name = uvrow.name;
         memcpy(row.phys_addr, uvrow.phys_addr, sizeof(uvrow.phys_addr));
         row.is_internal = uvrow.is_internal;
-        row.address = SockAddr((sockaddr*)&uvrow.address);
-        row.netmask = SockAddr((sockaddr*)&uvrow.netmask);
+        const constexpr size_t addr_size = sizeof(uvrow.address);
+        row.address = SockAddr((sockaddr*)&uvrow.address, addr_size);
+        row.netmask = SockAddr((sockaddr*)&uvrow.netmask, addr_size);
         ret.push_back(row);
     }
 

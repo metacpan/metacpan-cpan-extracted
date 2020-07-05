@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Frequency;
-$Lab::XPRESS::Sweep::Frequency::VERSION = '3.701';
+$Lab::XPRESS::Sweep::Frequency::VERSION = '3.703';
 #ABSTRACT: Frequency sweep
 
 use Lab::XPRESS::Sweep;
@@ -100,7 +100,7 @@ Lab::XPRESS::Sweep::Frequency - Frequency sweep
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 

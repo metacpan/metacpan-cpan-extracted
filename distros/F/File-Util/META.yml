@@ -18,7 +18,7 @@ build_requires:
   Test: '0'
   Test::More: '0'
   Test::NoWarnings: '0'
-  blib: '1.01'
+  lib: '0'
   perl: '5.008001'
   utf8: '0'
 configure_requires:
@@ -26,7 +26,7 @@ configure_requires:
   Module::Build: '0.28'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,25 +35,25 @@ name: File-Util
 provides:
   File::Util:
     file: lib/File/Util.pm
-    version: '4.161950'
+    version: '4.201720'
   File::Util::Definitions:
     file: lib/File/Util/Definitions.pm
-    version: '4.161950'
+    version: '4.201720'
   File::Util::Exception:
     file: lib/File/Util/Exception.pm
-    version: '4.161950'
+    version: '4.201720'
   File::Util::Exception::Diagnostic:
     file: lib/File/Util/Exception/Diagnostic.pm
-    version: '4.161950'
+    version: '4.201720'
   File::Util::Exception::Standard:
     file: lib/File/Util/Exception/Standard.pm
-    version: '4.161950'
+    version: '4.201720'
   File::Util::Interface::Classic:
     file: lib/File/Util/Interface/Classic.pm
-    version: '4.161950'
+    version: '4.201720'
   File::Util::Interface::Modern:
     file: lib/File/Util/Interface/Modern.pm
-    version: '4.161950'
+    version: '4.201720'
 recommends:
   Unicode::UTF8: '0.58'
 requires:
@@ -61,7 +61,6 @@ requires:
   Fcntl: '0'
   Scalar::Util: '0'
   constant: '0'
-  lib: '0'
   perl: '5.008001'
   strict: '0'
   subs: '0'
@@ -71,19 +70,19 @@ resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=File%3A%3AUtil
   homepage: https://github.com/tommybutler/file-util/wiki
   repository: git://github.com/tommybutler/file-util.git
-version: '4.161950'
+version: '4.201720'
 x_Dist_Zilla:
   perl:
-    version: '5.022001'
+    version: '5.030003'
   plugins:
     -
       class: Dist::Zilla::Plugin::Meta::Contributors
       name: Meta::Contributors
-      version: '0.002'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::Encoding
       name: Encoding
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -96,84 +95,84 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Filter/GatherDir'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/ManifestSkip'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/MetaYAML'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/License'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/Readme'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/ShareDir'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Filter/MakeMaker'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/Manifest'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/TestRelease'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/ConfirmRelease'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: RunExtraTests
-      version: '0.028'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::ModuleBuild
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: ModuleBuild
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::AutoVersion
       name: AutoVersion
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodVersion
       name: PodVersion
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -182,13 +181,18 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-              version: '5.042'
+              version: '6.015'
+          include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000036'
+          version: '0.006'
       name: MetaProvides::Package
-      version: '2.003001'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
@@ -196,35 +200,38 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: Test::ReportPrereqs
-      version: '0.021'
+      version: '0.027'
     -
-      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
-      name: '@TestingMania/Test::CPAN::Meta::JSON'
-      version: '0.004'
+      class: Dist::Zilla::Plugin::Test::LocalBrew
+      name: Test::LocalBrew
+      version: '0.08'
     -
-      class: Dist::Zilla::Plugin::PodSyntaxTests
-      name: '@TestingMania/PodSyntaxTests'
-      version: '5.042'
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@TestingMania/Test::Version'
+      version: '1.09'
     -
-      class: Dist::Zilla::Plugin::Test::Synopsis
-      name: '@TestingMania/Test::Synopsis'
-      version: '2.000006'
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      config:
+        Dist::Zilla::Plugin::Test::CPAN::Changes:
+          changelog: Changes
+      name: '@TestingMania/Test::CPAN::Changes'
+      version: '0.012'
     -
-      class: Dist::Zilla::Plugin::MojibakeTests
-      name: '@TestingMania/MojibakeTests'
-      version: '0.8'
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@TestingMania/Test::DistManifest'
+      version: '2.000005'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -234,21 +241,33 @@ x_Dist_Zilla:
       name: '@TestingMania/Test::Kwalitee'
       version: '2.12'
     -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@TestingMania/MojibakeTests'
+      version: '0.8'
+    -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: '@TestingMania/Test::Perl::Critic'
-      version: '3.000'
+      version: '3.001'
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@TestingMania/Test::CPAN::Meta::JSON'
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::MetaTests
       name: '@TestingMania/MetaTests'
-      version: '5.042'
+      version: '6.015'
     -
-      class: Dist::Zilla::Plugin::Test::CPAN::Changes
-      name: '@TestingMania/Test::CPAN::Changes'
-      version: '0.009'
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@TestingMania/PodCoverageTests'
+      version: '6.015'
     -
-      class: Dist::Zilla::Plugin::Test::DistManifest
-      name: '@TestingMania/Test::DistManifest'
-      version: '2.000005'
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@TestingMania/PodSyntaxTests'
+      version: '6.015'
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@TestingMania/Test::Synopsis'
+      version: '2.000007'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -260,10 +279,6 @@ x_Dist_Zilla:
             - ':TestFiles'
       name: '@TestingMania/Test::NoTabs'
       version: '0.15'
-    -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@TestingMania/PodCoverageTests'
-      version: '5.042'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -279,17 +294,16 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: '@TestingMania/Test::Compile'
-      version: '2.054'
-    -
-      class: Dist::Zilla::Plugin::Test::Version
-      name: '@TestingMania/Test::Version'
-      version: '1.05'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
       config:
         Dist::Zilla::Plugin::Test::PodSpelling:
-          directories: []
+          directories:
+            - bin
+            - lib
           spell_cmd: ''
           stopwords:
             - "AND'ed"
@@ -348,19 +362,19 @@ x_Dist_Zilla:
             - vtab
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
-      version: '2.007000'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: CheckChangesHasContent
-      version: '0.008'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Signature
       name: Signature
@@ -368,7 +382,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -376,7 +390,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -384,7 +398,7 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: Recommends
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -392,59 +406,62 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: DevelopRequires
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '5.042'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
-      version: '5.042'
+      version: '6.015'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '5.042'
+    version: '6.015'
 x_contributors:
   - 'John Fields <jfields.cpan.org@spammenot.com>'
   - 'Ricardo SIGNES <rjbs@cpan.org>'
   - 'Matt S Trout <perl-stuff@trout.me.uk>'
   - 'Nicholas Perez <nperez@cpan.org>'
   - 'David Golden <dagolden@cpan.org>'
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

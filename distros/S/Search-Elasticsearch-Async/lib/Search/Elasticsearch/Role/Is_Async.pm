@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Is_Async;
-$Search::Elasticsearch::Role::Is_Async::VERSION = '6.80';
+$Search::Elasticsearch::Role::Is_Async::VERSION = '6.81';
 use Moo::Role;
 use namespace::clean;
 
@@ -19,7 +19,7 @@ Search::Elasticsearch::Role::Is_Async - A role to mark classes which should be u
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Triton;
-$Lab::Moose::Instrument::OI_Triton::VERSION = '3.701';
+$Lab::Moose::Instrument::OI_Triton::VERSION = '3.703';
 #ABSTRACT: Oxford Instruments Triton gas handling system control
 
 use 5.010;
@@ -108,7 +108,6 @@ sub get_temp_pid {
         %args
     );
 }
-
 
 sub enable_temp_pid {
     my ( $self, %args ) = validated_getter( \@_ );
@@ -261,7 +260,7 @@ Lab::Moose::Instrument::OI_Triton - Oxford Instruments Triton gas handling syste
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 
@@ -283,20 +282,33 @@ version 3.701
 
  $temp = $oi_triton->get_temperature(channel => 1);
 
+Read out the current temperature of a resistance thermometer channel configured in the Triton software. 
+This does not trigger a measurement but merely returns the last measured value. 
+Measurements progress as configured in the Triton control panel and the resistance
+bridge.
+
 =head2 get_temperature_resistance
 
  $resistance = $oi_triton->get_temperature_resistance(channel => 1);
 
+Read out the current resistance of a resistance thermometer channel configured in the Triton software. 
+This does not trigger a measurement but merely returns the last measured value. 
+Measurements progress as configured in the Triton control panel and the resistance
+bridge.
+
 =head2 get_T
 
-equivalent to
-
  $oi_triton->get_temperature(channel => 5);
+
+This is a shortcut for reading out temperature channel 5, typically the mixing chamber temperature.
 
 =head2 set_user
 
  $oi_triton->set_user(value => 'NORM');
  $oi_triton->set_user(value => 'GUEST');
+
+Set the access level as configured in the Triton software. Typically, GUEST means read-only
+access and NORM means control access.
 
 =head2 enable_control/disable_control
 
@@ -313,7 +325,10 @@ respectively.
 =head2 set_temp_pid/get_temp_pid/enable_temp_pid/disable_temp_pid
 
  $oi_triton->set_temp_pid(value => 'ON');
- # or $oi_triton->enable_temp_pid();
+ # or equivalently $oi_triton->enable_temp_pid();
+
+ $oi_triton->set_temp_pid(value => 'OFF');
+ # or equivalently $oi_triton->disable_temp_pid();
 
 Set PID control of the mixing chamber temperature to 'ON' or 'OFF'.
 
@@ -324,10 +339,14 @@ Set PID control of the mixing chamber temperature to 'ON' or 'OFF'.
 
  my $status = $oi_triton->get_temp_ramp_status();
 
+Control and read out whether the temperature is being ramped.
+
 =head2 set_temp_ramp_rate/get_temp_ramp_rate
 
  $oi_triton->set_temp_ramp_rate(value => 1e-3); # 1mk/min
  my $ramp_rate = $oi_triton->get_temp_ramp_rate();
+
+Set and read out the temperature ramp rate in K/min.
 
 =head2 get_max_current
 
@@ -364,6 +383,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

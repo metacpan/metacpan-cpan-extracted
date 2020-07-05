@@ -26,12 +26,12 @@ static RawTraceProducer get_default_raw_producer() noexcept {
 #endif
 
 
-static StackframePtr as_frame (const char* symbol) {
+static StackframeSP as_frame (const char* symbol) {
     using guard_t = std::unique_ptr<char*, std::function<void(char**)>>;
-    auto r = StackframePtr(new Stackframe());
+    StackframeSP r;
     std::cmatch what;
 #if defined (__linux__)
-    static std::regex re("(.+)\\((.+)\\+(0x)?([0-9a-f]+)\\) \\[0x([0-9a-f]+)\\]");
+    static std::regex re("(.+)\\((.*)\\+(0x)?([0-9a-f]+)\\) \\[0x([0-9a-f]+)\\]");
     if (regex_match(symbol, what, re)) {
         panda::string dll           (what[1].first, what[1].length());
         panda::string mangled_name  (what[2].first, what[2].length());
@@ -55,6 +55,7 @@ static StackframePtr as_frame (const char* symbol) {
         panda::string symbol_offset (what[4].first, what[4].length());
         panda::string address       (what[2].first, what[2].length());
 #endif
+        r = new Stackframe();
         int status;
         string demangled_name = mangled_name;
         // https://en.wikipedia.org/wiki/Name_mangling, check it starts with '_Z'. The
@@ -67,10 +68,9 @@ static StackframePtr as_frame (const char* symbol) {
                 free(demangled);
             }
         }
-        //printf("symbol = %s, d = %s, o=%s\n", symbol, demangled_name.c_str(), mangled_name.c_str());
+        // printf("symbol = %s, d = %s, o=%s\n", symbol, demangled_name.c_str(), mangled_name.c_str());
         r->name = demangled_name;
         r->mangled_name = mangled_name;
-        r->file = "n/a";
         r->library = dll;
         r->line_no = 0;
 
@@ -90,32 +90,34 @@ static StackframePtr as_frame (const char* symbol) {
     return r;
 }
 
-struct glib_backtrace : BacktraceInfo {
+struct GlibcBacktrace : BacktraceBackend {
+    char** symbols = nullptr;
+    std::size_t size = 0;
+    const Backtrace& raw_traces;
+    bool gathered = false;
 
-    glib_backtrace(std::vector<StackframePtr>&& frames_) : frames(std::move(frames_)) {}
+    GlibcBacktrace(const Backtrace& raw_traces_) noexcept: raw_traces{raw_traces_} {}
+    ~GlibcBacktrace() { if (symbols) { free(symbols); } }
 
-    const std::vector<StackframePtr>& get_frames() const override { return frames; }
-    virtual string to_string() const override { throw "not implemented"; }
+    void gather() noexcept {
+        auto& buffer = raw_traces.buffer;
+        symbols = ::backtrace_symbols(buffer.data(), buffer.size());
+        if (symbols) { size = buffer.size(); }
+        gathered  = true;
+    }
 
-    std::vector<StackframePtr> frames;
+    bool produce_frame(StackFrames& frames, size_t i) override {
+        if (!gathered) gather();
+        if (i >= size) throw std::out_of_range("invalind frame index");
+        auto frame = as_frame(symbols[i]);
+        if (frame) frames.emplace_back(std::move(frame));
+        return (bool) frame;
+    }
 };
 
-static iptr<BacktraceInfo> glibc_producer(const RawTrace& buffer) {
-    using guard_t = std::unique_ptr<char**, std::function<void(char***)>>;
-    char** symbols = ::backtrace_symbols(buffer.data(), buffer.size());
-    if (!symbols) return {};
-
-    guard_t guard(&symbols, [](char*** ptr) { free(*ptr); });
-    std::vector<StackframePtr> frames;
-    frames.reserve(buffer.size());
-    for (int i = 0; i < static_cast<int>(buffer.size()); ++i) {
-        // printf("symbol = %s\n", symbols[i]);
-        auto frame = as_frame(symbols[i]);
-        frames.emplace_back(std::move(frame));
-    }
-    return new glib_backtrace(std::move(frames));
+BacktraceBackendSP glibc_producer(const Backtrace& raw_traces) noexcept {
+    return new GlibcBacktrace(raw_traces);
 }
-
 
 static BacktraceProducer get_default_bt_producer() noexcept {
     return glibc_producer;

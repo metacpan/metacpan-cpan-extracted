@@ -273,9 +273,13 @@ SV * new(class, ...)
 
 
         if (items > 1) {
-            if (ST(1) != NULL)
+            if (ST(1) != NULL) {
                 // TODO: ensure_string_sv
                 CAfile = ST(1);
+                if (strlen(SvPV_nolen(CAfile)) == 0) {
+                    CAfile = NULL;
+                }
+            }
 
             if (items > 2)
                 options = ensure_hv(ST(2), "options");
@@ -318,45 +322,38 @@ SV * new(class, ...)
         if (!strict_certs)
             X509_STORE_set_verify_cb_func(x509_store, cb1);
 
-        if (noCAfile) {
-            X509_LOOKUP_init(cafile_lookup);
-        }
-        else {
+        if (CAfile != NULL || !noCAfile) {
             cafile_lookup = X509_STORE_add_lookup(x509_store, X509_LOOKUP_file());
-        }
-
-        if (cafile_lookup == NULL) {
-            X509_STORE_free(x509_store);
-            croak("failure to add lookup to store: %s", ssl_error());
-        }
-
-        if (CAfile != NULL) {
-            if (!X509_STORE_load_locations(x509_store, SvPV_nolen(CAfile), NULL)) {
+            if (cafile_lookup == NULL) {
                 X509_STORE_free(x509_store);
-                croak("Error loading file %s: %s\n", SvPV_nolen(CAfile),
-                    ssl_error());
+                croak("failure to add lookup to store: %s", ssl_error());
+            }
+            if (CAfile != NULL) {
+                if (!X509_LOOKUP_load_file(cafile_lookup, SvPV_nolen(CAfile), X509_FILETYPE_PEM)) {
+                    X509_STORE_free(x509_store);
+                    croak("Error loading file %s: %s\n", SvPV_nolen(CAfile),
+                        ssl_error());
+                }
+            } else {
+                X509_LOOKUP_load_file(cafile_lookup, NULL, X509_FILETYPE_DEFAULT);
             }
         }
 
-        if (noCApath) {
-            X509_LOOKUP_init(cadir_lookup);
-        }
-        else {
+        if (CApath != NULL || !noCApath) {
             cadir_lookup = X509_STORE_add_lookup(x509_store, X509_LOOKUP_hash_dir());
-        }
-
-        if (cadir_lookup == NULL) {
-            X509_STORE_free(x509_store);
-            croak("failure to add lookup to store: %s", ssl_error());
-        }
-
-        if (CApath != NULL) {
-            if (!X509_LOOKUP_add_dir(cadir_lookup, SvPV_nolen(CApath), X509_FILETYPE_PEM)) {
+            if (cadir_lookup == NULL) {
                 X509_STORE_free(x509_store);
-                croak("Error loading directory %s\n", SvPV_nolen(CApath));
+                croak("failure to add lookup to store: %s", ssl_error());
+            }
+            if (CApath != NULL) {
+                if (!X509_LOOKUP_add_dir(cadir_lookup, SvPV_nolen(CApath), X509_FILETYPE_PEM)) {
+                    X509_STORE_free(x509_store);
+                    croak("Error loading directory %s\n", SvPV_nolen(CApath));
+                }
+            } else {
+                X509_LOOKUP_add_dir(cadir_lookup, NULL, X509_FILETYPE_DEFAULT);
             }
         }
-
 
         HV * attributes = newHV();
 

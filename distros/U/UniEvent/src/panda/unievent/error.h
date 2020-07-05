@@ -90,7 +90,7 @@ std::error_code make_ssl_error_code (int ssl_code);
 
 inline ErrorCode nest_error (const std::error_code& err, const ErrorCode& stack) {
     if (!stack) return stack;
-    return stack == std::errc::operation_canceled ? stack : ErrorCode(err, stack);
+    return stack & std::errc::operation_canceled ? stack : ErrorCode(err, stack);
 }
 
 

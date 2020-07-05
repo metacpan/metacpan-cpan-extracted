@@ -1,0 +1,25 @@
+<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"><soap-env:Body><samlp:LogoutResponse xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="sd8de04dca9ee5acc72d3f047b2b434e20a1b8a6b" InResponseTo="21B78E9C6C8ECF16F01E4A0F15AB2D46" IssueInstant="2010-10-07T07:36:27Z" Version="2.0">
+<saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">http://openam.nodnol.org:8080/opensso</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#sd8de04dca9ee5acc72d3f047b2b434e20a1b8a6b">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>fwaRmucO1+jis6PQGzKJ6exYo4M=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+TED3k3U9ho1+vCWk09WnkhcIPMRYlMwJE0InO5Vww9p/vz1LfkL8p5jNivPD/qSmoPczrMFehI/k
+31HxjDGbX3qpqypbovQAvT9j2GOm/4hR5qR4U2LNxXl0Umw2Zi1ntZpcONBtc3BFqxJ3xM6Cwv2U
+y0ubt2L6xc9KRu2BVo0=
+</ds:SignatureValue>
+</ds:Signature>
+<samlp:Status>
+<samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success">
+</samlp:StatusCode>
+</samlp:Status>
+</samlp:LogoutResponse></soap-env:Body></soap-env:Envelope>

@@ -1,5 +1,10 @@
 Revision history for WebService-Gyazo-B
 
+0.0406  2020-06-24
+    - Remove author tests from t/*.t
+        - https://rt.cpan.org/Public/Bug/Display.html?id=132871
+        - Thanks to Michael Kogan and Karen Etheridge ( ETHER ).
+
 0.0405  2015-11-26
     - ->error() was called on $image instead of $ua in a test.
         - http://www.cpantesters.org/cpan/report/112677a6-9231-11e5-8bc6-e0798fb2e322

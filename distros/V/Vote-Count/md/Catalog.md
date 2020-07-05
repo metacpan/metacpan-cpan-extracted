@@ -12,7 +12,7 @@ A catalog of common Vote Counting Systems and their implementation in Vote::Coun
 
 ## Borda Count
 
-The Borda Count implementation does not yet cover all common weighting rule variations.
+Methods which assign scores to choices by their ranking. 
 
 * Borda Count: core [Vote::Count::Borda](https://metacpan.org/pod/Vote::Count::Borda)
 * Nansen: *needs example*

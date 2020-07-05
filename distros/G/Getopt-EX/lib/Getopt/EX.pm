@@ -1,6 +1,6 @@
 package Getopt::EX;
 use 5.014;
-use version; our $VERSION = version->declare("v1.18.0");
+use version; our $VERSION = version->declare("v1.19.1");
 
 
 1;
@@ -12,7 +12,7 @@ Getopt::EX - Getopt Extender
 
 =head1 VERSION
 
-Version v1.18.0
+Version v1.19.1
 
 
 =head1 DESCRIPTION
@@ -91,8 +91,9 @@ This module provides more primitive access to the underlying modules.
 You should create loader object first:
 
   use Getopt::EX::Loader;
-  my $loader = new Getopt::EX::Loader
-      BASECLASS => 'App::example';
+  my $loader = Getopt::EX::Loader->new(
+      BASECLASS => 'App::example',
+      );
 
 Then load rc file:
 
@@ -105,16 +106,19 @@ And process command line options:
 Finally gives built-in function declared in dynamically loaded modules
 to option parser.
 
-  my $parser = new Getopt::Long::Parser;
+  my $parser = Getopt::Long::Parser->new;
   $parser->getoptions( ... , $loader->builtins )
 
 Actually, this is what L<Getopt::EX::Long> module is doing
 internally.
 
-To communicate with user-defined subroutines, use L<Getopt::EX::Func>
-module, which provide C<parse_func> interface.  If your script has
-B<--begin> option which tells the script to call specific function at
-the beginning of execution.  Write something like:
+=head2 L<Getopt::EX::Func>
+
+To make your script to communicate with user-defined subroutines, use
+L<Getopt::EX::Func> module, which provide C<parse_func> interface.  If
+your script has B<--begin> option which tells the script to call
+specific function at the beginning of execution.  Write something
+like:
 
     use Getopt::EX::Func qw(parse_func);
     GetOptions("begin:s" => $opt_begin);
@@ -126,7 +130,6 @@ Then the script can be invoked like this:
     % example -Mfoo --begin 'repeat(debug,msg=hello,count=2)'
 
 See L<Getopt::EX::Func> for more detail.
-
 
 =head2 L<Getopt::EX::Colormap>
 
@@ -149,9 +152,10 @@ You can use this with normal L<Getopt::Long>:
     my @colors;
     
     require Getopt::EX::Colormap;
-    my $handler = new Getopt::EX::Colormap
+    my $handler = Getopt::EX::Colormap->new(
         HASH => \%colormap,
-        LIST => \@colors;
+        LIST => \@colors,
+        );
     
     $handler->load_params(@opt_colormap);
 
@@ -176,7 +180,7 @@ ANSI color sequence.
 If you only use coloring function, it's more simple:
 
     require Getopt::EX::Colormap;
-    my $handler = new Getopt::EX::Colormap;
+    my $handler = Getopt::EX::Colormap->new;
 
     print $handler->color("R", "FILE in Red\n");
     print $handler->color("G", "LINE in Blue\n");

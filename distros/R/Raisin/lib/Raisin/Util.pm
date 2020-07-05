@@ -1,8 +1,12 @@
-package Raisin::Util;
+#!perl
+#PODNAME: Raisin::Util
+#ABSTRACT: Utility subroutine for Raisin.
 
 use strict;
 use warnings;
 
+package Raisin::Util;
+$Raisin::Util::VERSION = '0.90';
 use Plack::Util;
 
 sub make_tag_from_path {
@@ -26,9 +30,17 @@ sub iterate_params {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Raisin::Util - Utility subroutine for Raisin.
+
+=head1 VERSION
+
+version 0.90
 
 =head1 FUNCTIONS
 
@@ -42,11 +54,13 @@ Iterates over route parameters.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh E<lt>atE<gt> cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

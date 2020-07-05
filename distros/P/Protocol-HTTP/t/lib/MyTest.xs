@@ -1,5 +1,5 @@
 #include <xs/protocol/http.h>
-
+#include <cstdlib>
 using namespace panda;
 using namespace panda::protocol::http;
 
@@ -11,6 +11,10 @@ uint64_t bench_iequals (string_view a, string_view b) {
     for (auto i = 0; i < 1000; ++i) {
         RETVAL += iequals(a, b);
     }
+}
+
+void native_srand(int seed) {
+    std::srand(seed);
 }
 
 void bench () {

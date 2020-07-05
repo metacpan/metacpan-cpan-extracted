@@ -1,5 +1,4 @@
 #pragma once
-#include "../Debug.h"
 #include "LoopImpl.h"
 
 namespace panda { namespace unievent { namespace backend {
@@ -13,7 +12,7 @@ struct WorkImpl {
     LoopImpl*          loop;
     IWorkImplListener* listener;
 
-    WorkImpl (LoopImpl* loop, IWorkImplListener* lst) : loop(loop), listener(lst) { _ECTOR(); }
+    WorkImpl (LoopImpl* loop, IWorkImplListener* lst) : loop(loop), listener(lst) { panda_log_ctor(); }
 
     virtual void queue () = 0;
 
@@ -27,7 +26,7 @@ struct WorkImpl {
 
     virtual bool destroy () noexcept = 0;
 
-    virtual ~WorkImpl () { _EDTOR(); }
+    virtual ~WorkImpl () { panda_log_dtor(); }
 };
 
 }}}

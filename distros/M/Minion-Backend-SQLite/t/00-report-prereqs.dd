@@ -14,7 +14,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'List::Util' => '0',
-                                      'Minion' => '9.0',
+                                      'Minion' => '10.03',
                                       'Mojo::SQLite' => '3.000',
                                       'Mojolicious' => '7.29',
                                       'Sys::Hostname' => '0',
@@ -32,7 +32,7 @@ do { my $x = {
                    'requires' => {
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
-                                   'Test::More' => '0.88'
+                                   'Test::More' => '0.96'
                                  }
                  }
      };

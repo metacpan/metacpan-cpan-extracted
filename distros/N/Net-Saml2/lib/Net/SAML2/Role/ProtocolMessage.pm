@@ -1,33 +1,61 @@
 package Net::SAML2::Role::ProtocolMessage;
+
 use Moose::Role;
-use MooseX::Types::Moose qw/ Str /;
+
+# ABSTRACT: Common behaviour for Protocol messages
+
+use namespace::autoclean;
+
+use DateTime;
 use MooseX::Types::URI qw/ Uri /;
-use DateTime::Format::XSD;
-use Crypt::OpenSSL::Random;
-use XML::Generator;
+use Net::SAML2::Util qw(generate_id);
 
 
-has 'id'            => (isa => Str, is => 'ro', required => 1);
-has 'issue_instant' => (isa => Str, is => 'ro', required => 1);
-has 'issuer'        => (isa => Uri, is => 'rw', required => 1, coerce => 1);
-has 'issuer_namequalifier' => (isa => Str, is => 'rw', required => 0);
-has 'issuer_format' => (isa => Str, is => 'rw', required => 0);
-has 'destination'   => (isa => Uri, is => 'rw', required => 0, coerce => 1);
+has id => (
+    isa     => 'Str',
+    is      => 'ro',
+    builder => "_build_id"
+);
 
-around 'BUILDARGS' => sub {
-    my $orig = shift;
-    my $class = shift;
-    my %args = @_;
+has issue_instant => (
+    isa     => 'Str',
+    is      => 'ro',
+    builder => '_build_issue_instant',
+);
 
-    # random ID for this message
-    $args{id} ||= 'NETSAML2_' . unpack 'H*', Crypt::OpenSSL::Random::random_pseudo_bytes(16);
+has issuer => (
+    isa      => Uri,
+    is       => 'rw',
+    required => 1,
+    coerce   => 1,
+);
 
-    # IssueInstant in UTC
-    my $dt = DateTime->now( time_zone => 'UTC' );
-    $args{issue_instant} ||= $dt->strftime('%FT%TZ');
+has issuer_namequalifier => (
+    isa       => 'Str',
+    is        => 'rw',
+    predicate => 'has_issuer_namequalifier',
+);
 
-    return \%args;
-};
+has issuer_format => (
+    isa => 'Str',
+    is  => 'rw',
+    predicate => 'has_issuer_format',
+);
+
+has destination => (
+    isa       => Uri,
+    is        => 'rw',
+    coerce    => 1,
+    predicate => 'has_destination',
+);
+
+sub _build_issue_instant {
+    return DateTime->now(time_zone => 'UTC')->strftime('%FT%TZ');
+}
+
+sub _build_id {
+    return generate_id();
+}
 
 
 sub status_uri {
@@ -57,11 +85,11 @@ __END__
 
 =head1 NAME
 
-Net::SAML2::Role::ProtocolMessage
+Net::SAML2::Role::ProtocolMessage - Common behaviour for Protocol messages
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 DESCRIPTION
 
@@ -69,10 +97,6 @@ Provides default ID and timestamp arguments for Protocol classes.
 
 Provides a status-URI lookup method for the statuses used by this
 implementation.
-
-=head1 NAME
-
-Net::SAML2::Role::ProtocolMessage - common behaviour for Protocol messages
 
 =head1 CONSTRUCTOR ARGUMENTS
 
@@ -125,7 +149,8 @@ This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
   Copyright 2010-2011  Chris Andrews
             2012       Peter Marschall
             2017       Alessandro Ranellucci
-            2019-2020  Timothy Legge
+            2019       Timothy Legge
+            2020       Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

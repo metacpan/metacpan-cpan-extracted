@@ -15,12 +15,13 @@ use Data::Dumper;
 use Moose;
 extends 'Connector::Builtin';
 
+has '+LOCATION' => ( required => 0 );
+
 has prefix => (
     is  => 'rw',
     isa => 'Str',
     default => ''
 );
-
 
 sub get {
 

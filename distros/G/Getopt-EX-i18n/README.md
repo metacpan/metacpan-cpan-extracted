@@ -70,25 +70,25 @@ available on macOS 10.15 (Catalina).
 As for Japanese locale `ja_JP`, following options are defined by
 default, and set `LANG` environment as `ja_JP`.
 
-    LOCALE:   --ja_JP  (raw)
-              --ja-JP  (dash)
-              --jaJP   (long)
-              --jajp   (long_lc)
-    LANGUAGE: --ja     (lang)
-    COUNTRY:  --JP     (country)
-              --jp     (country_lc)
+    LOCALE:     --ja_JP  (raw)
+                --ja-JP  (dash)
+                --jaJP   (long)
+                --jajp   (long_lc)
+    LANGUAGE:   --ja     (language)
+    TERRITORY:  --JP     (territory)
+                --jp     (territory_lc)
 
 Short language option (`--ja`) is defined in the alphabetical order
-of the country code, so the option `--en` is assigned to `en_AU`.
-But if the same country name is found as language, it takes
+of the territory code, so the option `--en` is assigned to `en_AU`.
+But if the same territory name is found as language, it takes
 precedence; German is used in three locales (`de_AT`, `de_CH`,
 `de_DE`) but option `--de` is defined as `de_DE`.
 
-Country options (`--JP` and `--jp`) are defined only when the same
+Territory options (`--JP` and `--jp`) are defined only when the same
 language option is not defined by other entry, and only single entry
-can be found for the country.  Option for Switzerland is not defined
+can be found for the territory.  Option for Switzerland is not defined
 because there are three entries (`de_CH`, `fr_CH`, `it_CH`).
-Country option `--AM` is assigned to `hy_AM`, but language option
+Territory option `--AM` is assigned to `hy_AM`, but language option
 `--am` is assigned to `am_ET`.
 
 # OPTION
@@ -103,15 +103,15 @@ module declaration.
 - **long**
 - **long\_lc**
 - **lang**
-- **country**
-- **country\_lc**
+- **territory**
+- **territory\_lc**
 
     These parameter tells which option is defined.  All options are
-    enabled by default.  You can disable country option like this:
+    enabled by default.  You can disable territory option like this:
 
-        command -Mi18n::setopt(country=0,country_lc=0)
+        command -Mi18n::setopt(territory=0,territory_lc=0)
 
-        command -Mi18n::setopt=country=0,country_lc=0
+        command -Mi18n::setopt=territory=0,territory_lc=0
 
 - **verbose**
 
@@ -136,9 +136,17 @@ module declaration.
 
     Specify prefix string.  Default is `--`.
 
+# BUGS
+
+Support only UTF-8.
+
 # SEE ALSO
 
-- **optex**
+- [Getopt::EX](https://metacpan.org/pod/Getopt::EX)
+
+    [https://github.com/kaz-utashiro/Getopt-EX](https://github.com/kaz-utashiro/Getopt-EX)
+
+- [optex](https://metacpan.org/pod/App::optex)
 
     You can execute arbitrary command on the system getting the benefit of
     **Getopt::EX** using **optex**.

@@ -1,6 +1,6 @@
 package Getopt::EX::LabeledParam;
 
-use strict;
+use v5.14;
 use warnings;
 use Carp;
 
@@ -158,11 +158,11 @@ Getopt::EX::LabeledParam - Labeled parameter handling
   my @colors;
 
   require Getopt::EX::LabeledParam;
-  my $cmap = new Getopt::EX::LabeledParam
+  my $cmap = Getopt::EX::LabeledParam->new(
       NEWLABEL => 0,
       HASH => \%colormap,
       LIST => \@colors,
-      ;
+      );
   $cmap->append(@opt_colormap);
 
 

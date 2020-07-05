@@ -1,3 +1,6 @@
+0.08 2020-06-25
+-Fix bug in TOML table output generation (thanks ijackson)
+
 0.07 2020-05-08
 -Add support for floating time zones in TOML output (thanks ijackson)
 -Fix bug where datetimes were being outputed as ISO8601 instead of RFC3339

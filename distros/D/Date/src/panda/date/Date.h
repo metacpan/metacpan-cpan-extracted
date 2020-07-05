@@ -34,6 +34,11 @@ struct Date {
         static const int all     = ~0;
     };
 
+    struct WeekOfYear {
+        uint8_t week;
+        int32_t year;
+    };
+
     static inline Date now () { return Date(::time(NULL)); }
 
     static inline Date now_hires (clockid_t clock_id = CLOCK_REALTIME) {
@@ -217,6 +222,11 @@ struct Date {
     string_view wday_name   () const { dcheck(); return panda::time::wday_name(_date.wday); }
     string_view wday_sname  () const { dcheck(); return panda::time::wday_sname(_date.wday); }
 
+    uint8_t    week_of_month () const;
+    void       week_of_month (uint8_t val);
+    uint8_t    weeks_in_year () const { return weeks_in_year(year()); }
+    WeekOfYear week_of_year  () const;
+
     Date& truncate () {
         dcheck();
         _date.hour = _date.min = _date.sec = _mksec = 0;
@@ -244,6 +254,8 @@ struct Date {
 
     static bool range_check ()         { return _range_check; }
     static void range_check (bool val) { _range_check = val; }
+
+    static uint8_t weeks_in_year (int32_t year);
 
 private:
     friend void swap (Date&, Date&);

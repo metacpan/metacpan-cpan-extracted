@@ -6,7 +6,7 @@ use 5.010;
 
 our( $VERSION, $A, @A );
 BEGIN {
-    $VERSION = '0.53';
+    $VERSION = '0.54';
     *A = *ARGV;
     my $execed = shift if @A && $A[0] eq '+'; # don't recursively call perl again for -p
     return unless @A and $A[0] =~ /^-/s;
@@ -23,25 +23,25 @@ BEGIN {
 	    next;
 	}
 	unshift @A, "-$1" if s/^-$one*[0l][0-7]*$onepl+\K(0.*)//; # avoid -l012o0 -> -l0120
-	if( /^(-$one*(?:[0l][0-7]*$one*)*)(?:([CdDFiImM0beVz])(.*))?$/s ) { # Perl does 0 & l inline only with oct arg.
+	if( /^(-$one*(?:[0l][0-7]*$one*)*)(?:([CdDFiImM0bBeEV])(.*))?$/s ) { # Perl does 0 & l inline only with oct arg.
 	    my( $opts, $opt, $arg ) = ($1, $2, $3);
 	    $seen{$_} ||= $opts =~ $_ for qw(a n o O p P r);
 	    push @pl1, $1 while $opts =~ s/($onepl)//;
 	    if( defined $opt ) {
-		if( ! length $arg and $opt =~ /[IbeVz]/ ) { # These can have arg glued or separated
+		if( ! length $arg and $opt =~ /[IbBeEV]/ ) { # These can have arg glued or separated
 		    $arg = shift;
 		    unless( defined $arg ) {
 			warn "Missing argument to -$opt.\n";
 			exit 29;
 		    }
 		}
-		    $seen{z} ||= $opt eq 'z';
 		if( $opt eq 'V' ) {
 		    $perl = "perl$arg";
 		    undef $opt; # treat $opts below
 		} elsif( $opt eq 'I' ) {
 		    push @perl, $opts.'I', $arg; # let perl check for empty arg
-		} elsif( $opt =~ /[bez]/ ) {
+		} elsif( $opt =~ /[be]/i ) {
+		    $seen{$opt} ||= $opt =~ /[be]/;
 		    push @pl::opts, join( '', '-', @pl1, $opt ), $arg;
 		    @pl1 = ();
 		    undef $opt; # treat $opts below
@@ -62,7 +62,7 @@ BEGIN {
     $seen{a} ||= push @perl, '-a' if $seen{F};
     $seen{n} ||= push @perl, '-n'
       if ! grep $seen{$_}, qw(o O)
-      and grep $seen{$_}, qw(a p P r z);
+      and grep $seen{$_}, qw(a b e p P r);
     push @pl::opts, join '', '-', @pl1 if @pl1;
 #warn join '|', $perl // $^X, @perl, '--', $0, '+', @pl::opts, '--', @A, "\n";
     if( ! $execed and $perl || @perl ) { # let perl do perl-opts
@@ -123,7 +123,6 @@ sub f($@) {		  printf shift() . "\n", &pl::pretty }
 
 # Format without newline
 sub F($@) { local $| = 1; printf shift,		 &pl::pretty }
-
 
 
 # Benchmark code
@@ -301,35 +300,35 @@ sub p(&$@) {
 sub help(;$) {
     if( @_ && ! defined $_[0] ) {
 	print <<\EOF;
-usage: pl [-b PERLCODE] [-e PERLCODE] [-o] [-VVERSION] [-PERLOPT...] [--] [PERLCODE] [ARG ...]
-  -bprog & -eprog   wrap begin/end program around program in same scope, my-vars work.
-  -o                assume "for(@A) { ... }" loop around program
-  -O                assume "for $A (@A) { ... }" loop around program
+usage: pl {-{BbeE} program} [-o] [-Vversion] [-perlopt...] [--] [main program] [arg ...]
+  -bprog & -eprog   wrap begin/end program around each file in -n/-p...
+  -Bprog & -Eprog   wrap begin/end program around program in same scope, my-vars work.
+  -o                assume "for(@A) { ... }" loop around main program
+  -O                assume "for $A (@A) { ... }" loop around main program
   -p[number]        print on each loop (also -o/-O) iteration, at most number times
-  -P[number]        like -p, but print only if PERLCODE evaluates to true, like grep
+  -P[number]        like -p, but print only if main program evaluates to true, like grep
   -r                reset "$." and -p/-P counter for each file
-  -VVERSION         rerun with given VERSION, which is just appended to "perl".
-  -zeof-prog        add end-of-file program (for -n/-p...) in same scope, my-vars work.
-  --color[=WHEN]    colorize the output; WHEN can be 'never', 'always', or 'auto' (the default)
+  -VVERSION         rerun with given version, which is just appended to "perl".
+  --color[=when]    colorize the output; when can be 'never', 'always', or 'auto' (the default)
 These options are handled by perl:
 EOF
 	p { E if /^\s+-[0acCdDfFiImMntTuUvwWX]/ } $^X, '-h';
     }
     print <<\EOF;
 Predefined functions:
-  b { } NAME, ARG... benchmark slow CODE for 10s, display NAME, looping over ARGs.
-  B { } NAME, ARG... same, but run CODE 100 times in benchmark, to reduce overhead.
-  c RE...           %Config, e.g. c->{sitelib}, optionally only part matching regexps
-  D [ARG...][, TZ]  Date (from ARG [s, us], s{.us} or [+-]s{.us}, TZ ([+-]0-13{:mm|.ff})
-  e ARG...          echo prettified ARGs or $_ with spaces and newline
-  E ARG...          same, but no newline
-  f FMT, ARG...     format prettified ARGs with newline
-  F FMT, ARG...     same, but without newline
-  I [ARG...][, TZ]  Isodate (from ARG [s, us], s{.us} or [+-]s{.us}, TZ ([+-]0-13{:mm|.ff})
-  k [KEY, VALUE]    store VALUE or chomped $_ in $k{KEY or $1}[$I] for keydiff
-  K [NUMBER, VALUE] same, but KEY is $F[NUMBER] or $F[0]
-  n [N]             trim %n values less than N (default 2) e.g.; -en or -e 'n 5'
-  p { } CMD, ARG... open pipe from CMD and loop over it.
+  b { } name, arg... benchmark slow code for 10s, display name, looping over args.
+  B { } name, arg... same, but run code 100 times in benchmark, to reduce overhead.
+  c re...           %Config, e.g. c->{sitelib}, optionally only part matching regexps
+  D [arg...][, tz]  Date (from arg [s, us], s{.us} or [+-]s{.us}, tz ([+-]0-13{:mm|.ff})
+  e arg...          echo prettified args or $_ with spaces and newline
+  E arg...          same, but no newline
+  f fmt, arg...     format prettified args with newline
+  F fmt, arg...     same, but without newline
+  I [arg...][, tz]  isodate (from arg [s, us], s{.us} or [+-]s{.us}, tz ([+-]0-13{:mm|.ff})
+  k [key, value]    store value or chomped $_ in $k{key or $1}[$I] for keydiff
+  K [number, value] same, but key is $F[number] or $F[0]
+  n [n]             trim %n values less than n (default 2) e.g.; -en or -e 'n 5'
+  p { } cmd, arg... open pipe from cmd and loop over it.
 Predefined (magic) variables:
   *A	*ARGV	    $A & @A are aliases to $ARGV & @ARGV
   $I	0..n	    index of ARG currently being processed in -o, -n or -p
@@ -555,12 +554,13 @@ BEGIN {
     }
 
     # Assemble a program that works under perl -n, etc., while adding in pl's options.
-    @pl::bit[2, 4, 10, 12, 21] = # Don't pollute eval with my-var
+    @pl::bit[2, 4, 11, 13, 22] = # Don't pollute eval with my-var
       ('sub pl::prog { $pl::last = 1;',
        'LINE: {',		# dummy loop
        '} continue {',		# program didn't do last
        '$pl::last = 0 }',
        '}');
+
     while( @pl::opts ) {	# no for, need to shift
 	$_ = shift @pl::opts;
 	if( /^--color(?:()|=(a)lways|=(n)ever|=auto)$/s ) {
@@ -579,36 +579,36 @@ GNU General Public License, which may be found in the Perl 5 source kit.";
 	    exit;
 	}
 
-	if( /([bez])/ ) {
+	if( /([be])/i ) {
 	    my $bit = "\n#line 1 \"-$1 option\"\n" . shift( @pl::opts ) . "\n;";
-	    if( /b/ ) {
+	    if( /B/ ) {
 		$pl::bit[0] = $bit;
+	    } elsif( /b/ ) {
+		$pl::bit[5] = 'if( ($pl::exARGV //= "") ne $ARGV ) { ' . $bit . '; $pl::exARGV = $ARGV; }';
+	    } elsif( /e/ ) {
+		$pl::bit[8] = "\n;INIT { \$pl::Z = sub{$bit} }";
+		$pl::z = '&$pl::Z(); ';
 	    } else {
-		if( /z/ ) {
-		    $pl::bit[7] = "\n;INIT { \$pl::Z = sub{$bit} }";
-		    $pl::z = '&$pl::Z(); ';
-		} else {
-		    $pl::bit[8] = "\n;END { $bit }";
-		}
+		$pl::bit[9] = "\n;END { $bit }";
 	    }
 	}
-	@pl::bit[3, 13] =
+	@pl::bit[3, 14] =
 	  (/O/ ? 'for $A (@A) {' : 'for(@A) {',
 	   '} continue { ++$I; last if $pl::last }')
 	    if /o/i;
 	if( /p([1-9][0-9]*)?/i ) {
 	    my $p = $1;
 	    $pl::bit[1] = '$pl::p = 0;';
-	    @pl::bit[5, 9] =
+	    @pl::bit[6, 10] =
 	      ('$pl::P = do {',
 	       '}') if /P/;
-	    $pl::bit[11] = ' ++$pl::p, print or die "-p destination: $!\n"' . (/P/ ? ' if $pl::P;' : ';');
-	    $pl::bit[12] =~ s/0/\$pl::p >= $p/ if $p;
+	    $pl::bit[12] = ' ++$pl::p, print or die "-p destination: $!\n"' . (/P/ ? ' if $pl::P;' : ';');
+	    $pl::bit[13] =~ s/0/\$pl::p >= $p/ if $p;
 	}
 	$pl::r = 1 if /r/;
     }
-    $pl::bit[6] = @A ? "\n#line 1 \"perlcode\"\n" . shift() . ";\n" : ';';
-    $pl::bit[13] //= 		# ! -[oO]
+    $pl::bit[7] = @A ? "\n#line 1 \"perlcode\"\n" . shift() . ";\n" : ';';
+    $pl::bit[14] //= 		# ! -[oO]
       ' if( $pl::last || eof ) { ++$I; ' .
       ($pl::r ? 'close A; $pl::p = 0;' : 'if( $pl::last ) { my $d = $.; close A; $. = $d }') .
       ($pl::z // '') . ' }';
@@ -796,15 +796,15 @@ around that is C<'\''>, which ends a string, blackslashes a quote and starts
 another.  For literal quotes use C<$q(uote)>.)  Double quotes or C<q{}> are
 the way to go.
 
-B<-b> doesn't do a C<BEGIN> block.  Rather it is in the same scope as your
-main PERLCODE.  So you can use it to initialise C<my> variables.  Whereas, if
+B<-B> doesn't do a C<BEGIN> block.  Rather it is in the same scope as your
+main program.  So you can use it to initialise C<my> variables.  Whereas, if
 you define a my variable in the main program of a B<-n>, B<-p>, B<-P>, B<-o>
-or B<-O> loop, it's a new variable each time.  This echoes "a c" because B<-e>
+or B<-O> loop, it's a new variable each time.  This echoes "a c" because B<-E>
 gives an C<END> block, as a closure of the 1st C<$inner> variable.  Perl
 warns "Variable "$inner" will not stay shared":
 
-    pl -Ob 'my $outer' -e 'echo $inner, $outer' 'my $inner = $outer = $ARGV' a b c
-    pl -Ob 'my $outer' -e 'e $inner, $outer' 'my $inner = $outer = $A' a b c
+    pl -OB 'my $outer' -E 'echo $inner, $outer' 'my $inner = $outer = $ARGV' a b c
+    pl -OB 'my $outer' -E 'e $inner, $outer' 'my $inner = $outer = $A' a b c
 
 =head1 EXAMPLES
 
@@ -846,12 +846,12 @@ I<What has a head, a tail, but no legs?  A penny. :-)>
 
 If you want a bigger number of last lines, you need to stuff them in a list;
 not really worth it.  But if you want just 1 last line from each file, the
-end-of-file B<-z> code (no need to quote, as it has no special characters) can
+end-of-file B<-e> code (no need to quote, as it has no special characters) can
 C<E(cho)> it for you, capitalized so as to not add another newline (yes, Perl
 is case sensitive):
 
-    pl -z Echo '' file*
-    pl -z E '' file*
+    pl -e Echo '' file*
+    pl -e E '' file*
 
 If you want the tail from a line-number (e.g. 99) or a regexp, use the
 flip-flop operator, starting with your regexp and going till each end-of-file:
@@ -895,10 +895,10 @@ true (B<-P>), i.e. the count was 0:
 
     pl -P '!$a{$_}++' file*
 
-If you want this per file, you must empty the hash in the end-of-file B<-z>
+If you want this per file, you must empty the hash in the end-of-file B<-e>
 code:
 
-    pl -Pz '%a = ()' '!$a{$_}++' file*
+    pl -Pe '%a = ()' '!$a{$_}++' file*
 
 =item Remove Empty Lines
 
@@ -931,18 +931,18 @@ it first, replace C<unlink> with C<e(cho)>:
 
 If your resulting list is too long for the Shell, let Perl do it.  Beware that
 the Shell has a clever ordering of files, while Perl does it purely lexically!
-In the B<-b> begin code the result is assigned to C<@A(RGV)>, as though it had
+In the B<-B> BEGIN code the result is assigned to C<@A(RGV)>, as though it had
 come from the command line.  This list is then popped (shortened), instead of
 checking each time.  Since the program doesn't contain special characters, you
 don't even need to quote it:
 
-    pl -ob '@ARGV = <file*>; pop' unlink
-    pl -ob '@A = <file*>; pop' unlink
+    pl -oB '@ARGV = <file*>; pop' unlink
+    pl -oB '@A = <file*>; pop' unlink
 
 You can exclude files by any other criterion as well:
 
-    pl -ob '@ARGV = grep !/keep-me/, <file*>' unlink
-    pl -ob '@A = grep !/keep-me/, <file*>' unlink
+    pl -oB '@ARGV = grep !/keep-me/, <file*>' unlink
+    pl -oB '@A = grep !/keep-me/, <file*>' unlink
 
 =back
 
@@ -1251,15 +1251,15 @@ before echoing, start with double size:
 
 The table could easily be widened to cover B- & C-formats, by extending each
 list of 2, to a corresponding list of 6, e.g. C<($Aw, $Ah, $Bw, ...)>.  But a
-more algorithmic approach seems better.  This fills C<@A(RGV)> in B<-b>, as
+more algorithmic approach seems better.  This fills C<@A(RGV)> in B<-B>, as
 though it had been given on the command line and prepares a nested list of the
 3 initials specs.  The format is tripled (with cheat spaces at the beginning).
-The main PERLCODE loops over C<@A(RGV)>, thanks to B<-O>, doing the same as
+The main program loops over C<@A(RGV)>, thanks to B<-O>, doing the same as
 above, but on anonymous elements of C<@d>:
 
-    pl -Ob '@ARGV = 0..10; @d = (["A", 1189, 1682], ["B", 1414, 2000], ["C", 1297, 1834])' \
+    pl -OB '@ARGV = 0..10; @d = (["A", 1189, 1682], ["B", 1414, 2000], ["C", 1297, 1834])' \
         'echof "  %3s  %4dmm x %4dmm"x3, map +("$$_[0]$A", ($$_[1], $$_[2]) = ($$_[2] / 2, $$_[1])), @d'
-    pl -Ob '@A = 0..10; @d = (["A", 1189, 1682], ["B", 1414, 2000], ["C", 1297, 1834])' \
+    pl -OB '@A = 0..10; @d = (["A", 1189, 1682], ["B", 1414, 2000], ["C", 1297, 1834])' \
         'f "  %3s  %4dmm x %4dmm"x3, map +("$$_[0]$A", ($$_[1], $$_[2]) = ($$_[2] / 2, $$_[1])), @d'
 
 =item ANSI foreground;background color table
@@ -1272,15 +1272,15 @@ There are twice twice 8 different colors for dim & bright and for foreground &
 background.  Hence the multiplication of escape codes and of values to fill
 them.
 
-This fills C<@A(RGV)> in B<-b>, as though it had been given on the command
+This fills C<@A(RGV)> in B<-B>, as though it had been given on the command
 line.  It maps it to the 16fold number format to print the header.  Then the
-main PERLCODE loops over it with C<$A(RGV)>, thanks to B<-O>, to print the
+main program loops over it with C<$A(RGV)>, thanks to B<-O>, to print the
 body.  All numbers are duplicated with C<(N)x2>, once to go into the escape
 sequence, once to be displayed:
 
-    pl -Ob '@ARGV = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, @ARGV' \
+    pl -OB '@ARGV = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, @ARGV' \
         'echof "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $A, ($A + ($A > 8 ? 81 : 29))x2, map +(($_)x2, ($_+60)x2), 40..47'
-    pl -Ob '@A = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, @A' \
+    pl -OB '@A = map +($_, $_+8), 1..8; f "co:  fg;bg"."%5d"x16, @A' \
         'f "%2d:  \e[%dm%d;   ".("\e[%dm%4d "x16)."\e[m", $A, ($A + ($A > 8 ? 81 : 29))x2, map +(($_)x2, ($_+60)x2), 40..47'
 
 This does exactly the same, but explicitly loops over lists C<@co & @bg>:
@@ -1401,10 +1401,10 @@ If you don't want it to be sorted, call C<h(osts)> for individual addresses:
     pl -o hosts perl.org 127.0.0.1 perldoc.perl.org cpan.org
     pl -o h perl.org 127.0.0.1 perldoc.perl.org cpan.org
 
-If your input comes from a file, collect it in a list and perform at end (B<-e>):
+If your input comes from a file, collect it in a list and perform at end (B<-E>):
 
-    pl -lne 'hosts @list' 'push @list, $_' file
-    pl -lne 'h @list' 'push @list, $_' file
+    pl -lnE 'hosts @list' 'push @list, $_' file
+    pl -lnE 'h @list' 'push @list, $_' file
 
 =item Quine
 
@@ -1418,6 +1418,27 @@ automatically adds C</u>:
 
     pl 'echo grep({tr/\n / /s; s/.*: \{ /pl $quote/u; s/; \}.*/$quote/u;} pl::pretty(\&pl::prog))'
     pl 'e grep({tr/\n / /s; s/.*: \{ /pl $q/u; s/; \}.*/$q/u;} pl::pretty(\&pl::prog))'
+
+Even though decompilation rarely comes up as quine cheating, indirectly the
+above does read its source.  So it might be considered a cheating quine.  To
+placate those who think so, here's a constructive way of doing it, with a
+format string that gets fed to itself:
+
+    pl '$_ = q{$_ = q{%s}; echof "pl $quote$_$quote", $_}; echof "pl $quote$_$quote", $_'
+    pl '$_ = q{$_ = q{%s}; f "pl $q$_$q", $_}; f "pl $q$_$q", $_'
+
+The same approach, but without adding C<pl ''>, so this works only in the
+pl-Shell, which you start by calling it without arguments.  In the spirit of
+L<Code
+Golf|https://codegolf.stackexchange.com/questions/69/golf-you-a-quine-for-great-good#answer-4827>,
+made it very compact.  This is inspired by the shortest Perl quine, which we
+beat by 6 characters in the short form.  That uses C<x2> to duplicate the
+argument to the ancient C<printf>, which has no prototype.  But C<echof> (or
+C<f>) has a prototype.  So use the C<&>-syntax to avoid it giving the same
+C<qw()> string-in-a-list twice:
+
+    &echof(qw(&echof(qw(%s)x2))x2)
+    &f(qw(&f(qw(%s)x2))x2)
 
 =back
 
@@ -1445,7 +1466,7 @@ like C<exit>
 
 =item *
 
-using C<pop>, etc. to implicitly modify C<@A(RGV)> works in B<-b> begin code,
+using C<pop>, etc. to implicitly modify C<@A(RGV)> works in B<-B> BEGIN code,
 but not in your main program (which gets compiled to a function)
 
 =item *

@@ -1,3 +1,18 @@
+0.004   2020-06-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Make get_struct() work as static method as well (BorderStyle
+	  2.0.3).
+
+
+0.003   2020-06-19  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+	- Tweak summary of Test::Labeled.
+
+	- Give example for Test::CustomChar.
+
+
 0.002   2020-06-11  Released-By: PERLANCAR; Urgency: medium
 
 	- get_border_char(): Respect n=0 and return empty string.

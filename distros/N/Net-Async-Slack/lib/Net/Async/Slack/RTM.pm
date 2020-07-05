@@ -3,7 +3,7 @@ package Net::Async::Slack::RTM;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use parent qw(IO::Async::Notifier);
 
@@ -217,6 +217,7 @@ sub connect {
             on_frame => $self->curry::weak::on_frame,
         )
     );
+    $log->tracef('URL for websockets will be %s', "$uri");
     $self->{ws}->connect(
         url        => "$uri",
     )
@@ -330,5 +331,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2016-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2016-2020. Licensed under the same terms as Perl itself.
 

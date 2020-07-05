@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Amplitude;
-$Lab::XPRESS::Sweep::Amplitude::VERSION = '3.701';
+$Lab::XPRESS::Sweep::Amplitude::VERSION = '3.703';
 #ABSTRACT: Amplitude sweep of AC voltage/current
 
 use Lab::XPRESS::Sweep;
@@ -95,7 +95,7 @@ Lab::XPRESS::Sweep::Amplitude - Amplitude sweep of AC voltage/current
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 

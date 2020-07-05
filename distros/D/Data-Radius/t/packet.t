@@ -22,7 +22,7 @@ my($auth_req, $req_id, $auth) = $p->build(
     type => ACCESS_REQUEST,
     av_list => [
         { Name => 'User-Name', Value => 'JonSnow'},
-        { Name => 'Password', Value => 'Castle Black' },
+        { Name => 'User-Password', Value => 'Castle Black' },
     ],
     authenticator => $authenticator,
     request_id => 12,
@@ -51,7 +51,7 @@ is($id, $req_id, 'request id');
 is($auth_p, $auth, 'authenticator used');
 is_deeply($av, [
     { Name => 'User-Name', Value => 'JonSnow', Type => 'string', Vendor => undef, Tag => undef },
-    { Name => 'Password', Value => 'Castle Black', Type => 'string', Vendor => undef, Tag => undef },
+    { Name => 'User-Password', Value => 'Castle Black', Type => 'string', Vendor => undef, Tag => undef },
     # added by with_msg_auth => 1 in encoded, but real value is replaced to zeroes during validation
     { Name => 'Message-Authenticator', Value => "\x0" x 16, Type => 'string', Vendor => undef, Tag => undef },
 ], 'parsed packet');
@@ -62,7 +62,7 @@ my($auth_req2, $req_id2, $auth2) = $p->build(
     av_list => [
         { Name => 'Message-Authenticator', Value => undef },
         { Name => 'User-Name', Value => 'JonSnow'},
-        { Name => 'Password', Value => 'Castle Black' },
+        { Name => 'User-Password', Value => 'Castle Black' },
     ],
     authenticator => $authenticator,
     request_id => 12,

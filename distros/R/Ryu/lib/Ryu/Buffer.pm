@@ -3,7 +3,7 @@ package Ryu::Buffer;
 use strict;
 use warnings;
 
-our $VERSION = '2.001'; # VERSION
+our $VERSION = '2.002'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(Ryu::Node);
@@ -20,6 +20,10 @@ Provides a simple way to push bytes or characters into a buffer,
 and get them back out again.
 
 Typically of use for delimiter-based or fixed-size protocols.
+
+See also L<Future::Buffer>, if you're dealing exclusively with L<Future>
+instances and don't need the L<Ryu::Source> functionality then that's
+likely to be a better option.
 
 =cut
 

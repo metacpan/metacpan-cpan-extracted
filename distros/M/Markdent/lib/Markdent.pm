@@ -8,7 +8,7 @@ use warnings;
 # The first version that completely worked with newer versions of Specio.
 use Moose 2.1802 ();
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 1;
 
@@ -26,7 +26,7 @@ Markdent - An event-based Markdown parser toolkit
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 
@@ -174,7 +174,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andrew Speer Denis Ibaev Jason McIntosh Polina Shubina Shlomi Fish Stefan Hornburg (Racke) Tom Hukins
+=for stopwords Andrew Speer Denis Ibaev Jason McIntosh Jonas Smedegaard Polina Shubina Shlomi Fish Stefan Hornburg (Racke) Tom Hukins
 
 =over 4
 
@@ -189,6 +189,10 @@ Denis Ibaev <dionys@gmail.com>
 =item *
 
 Jason McIntosh <jmac@appleseed-sc.com>
+
+=item *
+
+Jonas Smedegaard <dr@jones.dk>
 
 =item *
 
@@ -210,7 +214,7 @@ Tom Hukins <tom@eborcom.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dave Rolsky.
+This software is copyright (c) 2020 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

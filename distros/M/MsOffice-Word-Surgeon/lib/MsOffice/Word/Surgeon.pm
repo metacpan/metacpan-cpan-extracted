@@ -11,7 +11,7 @@ use MsOffice::Word::Surgeon::Change;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 # constant integers to specify indentation modes -- see L<XML::LibXML>
 use constant XML_NO_INDENT     => 0;
@@ -19,7 +19,6 @@ use constant XML_SIMPLE_INDENT => 1;
 
 # name of the zip member that contains the main document body
 use constant MAIN_DOCUMENT => 'word/document.xml';
-
 
 has 'docx'      => (is => 'ro', isa => 'Str', required => 1);
 
@@ -40,7 +39,7 @@ has 'runs'      => (is => 'ro',   isa => 'ArrayRef', init_arg => undef,
 # GLOBAL VARIABLES
 #======================================================================
 
-# Various regexes for removing XML information without interest
+# Various regexes for removing uninteresting XML information
 my %noise_reduction_regexes = (
   proof_checking        => qr(<w:(?:proofErr[^>]+|noProof/)>),
   revision_ids          => qr(\sw:rsid\w+="[^"]+"),
@@ -239,7 +238,11 @@ sub unlink_fields {
 
   # just remove field nodes and "field instruction" nodes
   state $field_instruction_txt_rx = qr[<w:instrText.*?</w:instrText>];
-  state $field_boundary_rx        = qr[<w:fldChar.*?/>]; #  "begin" / "separate" / "end"
+  state $field_boundary_rx        = qr[<w:fldChar
+                                         (?:  [^>]*?/>                 # ignore all attributes until end of node ..
+                                            |                          # .. or
+                                              [^>]*?>.*?</w:fldChar>)  # .. ignore node content until closing tag
+                                      ]x;   # field boundaries are encoded as  "begin" / "separate" / "end"
   state $simple_field_rx          = qr[</?w:fldSimple[^>]*>];
 
   $self->reduce_noise($field_instruction_txt_rx, $field_boundary_rx, $simple_field_rx);
@@ -396,7 +399,7 @@ reassembling the whole document after having modified some text nodes.
 =head2 Status
 
 This is the first release; the software architecture is quite stable
-but the module is not battle-proofed. Minor changed to the public
+but the module is not battle-proofed. Minor changes to the public
 interface may occur in future versions.
 
 
@@ -661,7 +664,7 @@ Laurent Dami, E<lt>dami AT cpan DOT org<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2019 by Laurent Dami.
+Copyright 2019, 2020 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

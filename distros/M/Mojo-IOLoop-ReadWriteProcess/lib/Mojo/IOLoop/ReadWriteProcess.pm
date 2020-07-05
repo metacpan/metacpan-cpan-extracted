@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.25';
+our $VERSION = '0.27';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -22,6 +22,7 @@ use IO::Handle;
 use IO::Pipe;
 use IO::Select;
 use IPC::Open3;
+use Time::HiRes 'sleep';
 use Symbol 'gensym';
 use Storable;
 use POSIX qw( :sys_wait_h :signal_h );
@@ -37,7 +38,7 @@ has [
   qw(internal_pipes channels)
 ] => 1;
 
-has [qw(blocking_stop serialize quirkiness)] => 0;
+has [qw(blocking_stop serialize quirkiness total_sleeptime_during_kill)] => 0;
 
 has [
   qw(execute code process_id pidfile return_status),
@@ -46,6 +47,7 @@ has [
 ];
 
 has max_kill_attempts => 5;
+has kill_whole_group  => 0;
 
 has args  => sub { [] };
 has error => sub { Mojo::Collection->new };
@@ -135,8 +137,8 @@ sub _open {
 
   $self->read_stream(IO::Handle->new_from_fd($rdr, "r"));
   $self->write_stream(IO::Handle->new_from_fd($wtr, "w"));
-  $self->error_stream(($self->separate_err) ?
-      IO::Handle->new_from_fd($err, "r")
+  $self->error_stream(($self->separate_err)
+    ? IO::Handle->new_from_fd($err, "r")
     : $self->write_stream);
 
   return $self;
@@ -175,23 +177,23 @@ sub _fork_collect_status {
 
   if ($self->_internal_return) {
     $return_reader
-      = $self->_internal_return->isa("IO::Pipe::End") ?
-      $self->_internal_return
+      = $self->_internal_return->isa("IO::Pipe::End")
+      ? $self->_internal_return
       : $self->_internal_return->reader();
     $self->_new_err('Cannot read from return code pipe') && return
       unless IO::Select->new($return_reader)->can_read(10);
     $rt = $return_reader->getline();
     $self->_diag("Forked code Process Returns: " . ($rt ? $rt : 'nothing'))
       if DEBUG;
-    $self->return_status($self->serialize ?
-        eval { $self->_deserialize->(b64_decode($rt)) }
-      : $rt ? $rt
-      :       ());
+    $self->return_status(
+        $self->serialize ? eval { $self->_deserialize->(b64_decode($rt)) }
+      : $rt              ? $rt
+      :                    ());
   }
   if ($self->_internal_err) {
     $internal_err_reader
-      = $self->_internal_err->isa("IO::Pipe::End") ?
-      $self->_internal_err
+      = $self->_internal_err->isa("IO::Pipe::End")
+      ? $self->_internal_err
       : $self->_internal_err->reader();
     $self->_new_err('Cannot read from errors code pipe') && return
       unless IO::Select->new($internal_err_reader)->can_read(10);
@@ -263,8 +265,8 @@ sub _fork {
     if ($self->internal_pipes) {
       if ($self->_internal_err) {
         $internal_err
-          = $self->_internal_err->isa("IO::Pipe::End") ?
-          $self->_internal_err
+          = $self->_internal_err->isa("IO::Pipe::End")
+          ? $self->_internal_err
           : $self->_internal_err->writer();
         $internal_err->autoflush(1);
       }
@@ -272,8 +274,7 @@ sub _fork {
       if ($self->_internal_return) {
         $return
           = $self->_internal_return->isa("IO::Pipe::End")
-          ?
-          $self->_internal_return
+          ? $self->_internal_return
           : $self->_internal_return->writer();
         $return->autoflush(1);
       }
@@ -291,8 +292,8 @@ sub _fork {
       $stdout = $output_pipe->writer() if $output_pipe;
       $stderr
         = (!$self->separate_err) ? $stdout
-        : $output_err_pipe ? $output_err_pipe->writer()
-        :                    undef;
+        : $output_err_pipe       ? $output_err_pipe->writer()
+        :                          undef;
       $stdin = $input_pipe->reader() if $input_pipe;
       open STDERR, ">&", $stderr
         or !!$internal_err->write($!)
@@ -383,15 +384,15 @@ sub wait {
 }
 
 sub wait_stop { shift->wait->stop }
-sub errored { !!@{shift->error} ? 1 : 0 }
+sub errored   { !!@{shift->error} ? 1 : 0 }
 
 # PPC64: Treat msb on neg (different cpu/perl interpreter version)
 sub _st { my $st = shift >> 8; ($st & 0x80) ? (0x100 - ($st & 0xFF)) : $st }
 
 sub exit_status {
       defined $_[0]->_status && $_[0]->quirkiness ? _st(shift->_status)
-    : defined $_[0]->_status ? shift->_status >> 8
-    :                          undef;
+    : defined $_[0]->_status                      ? shift->_status >> 8
+    :                                               undef;
 }
 
 sub restart {
@@ -465,8 +466,8 @@ sub start {
   die "Nothing to do" unless !!$self->execute || !!$self->code;
 
   my @args
-    = $self->args ?
-    ref($self->args) eq "ARRAY"
+    = $self->args
+    ? ref($self->args) eq "ARRAY"
       ? @{$self->args}
       : $self->args
     : ();
@@ -490,58 +491,64 @@ sub start {
 sub send_signal {
   my $self   = shift;
   my $signal = shift // $self->_default_kill_signal;
-  return unless $self->is_running;
-  $self->_diag("Sending signal '$signal' to " . $self->process_id) if DEBUG;
-  kill $signal => $self->process_id;
+  my $pid    = shift // $self->process_id;
+  return unless $self->kill_whole_group || $self->is_running;
+  $self->_diag("Sending signal '$signal' to $pid") if DEBUG;
+  kill $signal => $pid;
   return $self;
 }
 
 sub stop {
   my $self = shift;
 
-  return $self unless defined $self->pid;
-
-  $self->_diag("Stopping " . $self->pid) if DEBUG;
-
+  my $pid = $self->pid;
+  return $self unless defined $pid;
   return $self->_shutdown(1) unless $self->is_running;
+  $self->_diag("Stopping $pid") if DEBUG;
 
   my $ret;
-  my $attempt = 1;
-  until ((defined $ret && $ret == $self->process_id)
-      || !$self->is_running
-      || $attempt > $self->max_kill_attempts)
+  my $attempt      = 1;
+  my $timeout      = $self->total_sleeptime_during_kill // 0;
+  my $sleep_time   = $self->sleeptime_during_kill;
+  my $max_attempts = $self->max_kill_attempts;
+  my $signal       = $self->_default_kill_signal;
+  $pid = -getpgrp($pid) if $self->kill_whole_group;
+  until ((defined $ret && ($ret == $pid || $ret == -1))
+      || ($attempt > $max_attempts && $timeout <= 0))
   {
-    $self->_diag("attempt ($attempt/"
-        . $self->max_kill_attempts
-        . ") to kill process: "
-        . $self->pid)
-      if DEBUG;
+    my $send_signal = $attempt == 1 || $timeout <= 0;
+    $self->_diag(
+      "attempt $attempt/$max_attempts to kill process: $pid, timeout: $timeout")
+      if DEBUG && $send_signal;
     $self->session->_protect(
       sub {
         local $?;
-        $self->send_signal();
-        $ret = waitpid($self->process_id, WNOHANG);
-        $self->_status($?) if $ret == $self->process_id;
+        if ($send_signal) {
+          $self->send_signal($signal, $pid);
+          ++$attempt;
+        }
+        $ret = waitpid($pid, WNOHANG);
+        $self->_status($?) if $ret == $pid || $ret == -1;
       });
-    $attempt++;
-    sleep $self->sleeptime_during_kill if $self->sleeptime_during_kill;
+    if ($sleep_time) {
+      sleep $sleep_time;
+      $timeout -= $sleep_time;
+    }
   }
 
   sleep $self->kill_sleeptime if $self->kill_sleeptime;
 
-  if ($self->blocking_stop && $self->is_running) {
-    $self->_diag(
-      "Could not kill process id: " . $self->process_id . ", blocking attempt")
-      if DEBUG;
+  if ($self->blocking_stop) {
+    $self->_diag("Could not kill process id: $pid, blocking attempt") if DEBUG;
     $self->emit('process_stuck');
 
     ### XXX: avoid to protect on blocking.
-    $self->send_signal($self->_default_blocking_signal);
-    $ret = waitpid($self->process_id, 0);
-    $self->_status($?) if $ret == $self->process_id;
+    $self->send_signal($self->_default_blocking_signal, $pid);
+    $ret = waitpid($pid, 0);
+    $self->_status($?) if $ret == $pid || $ret == -1;
   }
-  elsif ($self->is_running) {
-    $self->_diag("Could not kill process id: " . $self->process_id) if DEBUG;
+  else {
+    $self->_diag("Could not kill process id: $pid") if DEBUG;
     $self->_new_err('Could not kill process');
   }
 
@@ -855,6 +862,20 @@ Defaults to C<5>, is the number of attempts before bailing out.
 
 It can be used with blocking_stop, so if the number of attempts are exhausted,
 a SIGKILL and waitpid will be tried at the end.
+
+=head2 kill_whole_group
+
+    use Mojo::IOLoop::ReadWriteProcess;
+    my $process = Mojo::IOLoop::ReadWriteProcess->new(code => sub { setpgrp(0, 0); exec(...); }, kill_whole_group => 1 );
+    $process->start();
+    $process->send_signal(...); # Will skip the usual check whether $process->pid is running
+    $process->stop();           # Kills the entire process group and waits for all processes in the group to finish
+
+Defaults to C<0>, whether to send signals (e.g. to stop) to the entire process group.
+
+This is useful when the sub process creates further sub processes and creates a new process
+group as shown in the example. In this case it might be useful to take care of the entire process
+group when stopping and wait for every process in the group to finish.
 
 =head2 collect_status
 

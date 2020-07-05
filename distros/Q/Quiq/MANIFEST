@@ -1,4 +1,5 @@
 Changes
+data/image/A/img/000047-640x360.jpg
 lib/Quiq.pm
 lib/Quiq/AnsiColor.pm
 lib/Quiq/ApplicationPaths.pm
@@ -142,6 +143,7 @@ lib/Quiq/MediaWiki/Client.pm
 lib/Quiq/MediaWiki/Markup.pm
 lib/Quiq/ModelCache.pm
 lib/Quiq/Mojolicious/Plugin/Log/Parameters.pm
+lib/Quiq/Net.pm
 lib/Quiq/Object.pm
 lib/Quiq/Option.pm
 lib/Quiq/Parallel.pm
@@ -352,6 +354,7 @@ t/bin/Quiq/MediaWiki/Client.t
 t/bin/Quiq/MediaWiki/Markup.t
 t/bin/Quiq/ModelCache.t
 t/bin/Quiq/Mojolicious/Plugin/Log/Parameters.t
+t/bin/Quiq/Net.t
 t/bin/Quiq/Object.t
 t/bin/Quiq/Option.t
 t/bin/Quiq/Parallel.t

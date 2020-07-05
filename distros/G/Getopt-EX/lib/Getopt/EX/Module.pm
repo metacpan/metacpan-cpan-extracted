@@ -1,6 +1,6 @@
 package Getopt::EX::Module;
 
-use strict;
+use v5.14;
 use warnings;
 use Carp;
 
@@ -449,10 +449,10 @@ Getopt::EX::Module - RC/Module data container
 
   use Getopt::EX::Module;
 
-  my $bucket = new Getopt::EX::Module
+  my $bucket = Getopt::EX::Module->new(
 	BASECLASS => $baseclass,
 	FILE => $file_name  /  MODULE => $module_name,
-	;
+	);
 
 =head1 DESCRIPTION
 

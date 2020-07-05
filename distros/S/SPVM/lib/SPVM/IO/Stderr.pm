@@ -1,6 +1,4 @@
-package SPVM::IO::File;
-
-use SPVM 'SPVM::IO::Stderr';
+package SPVM::IO::Stderr;
 
 1;
 
@@ -12,31 +10,37 @@ SPVM::IO::Stderr - Standard out
   
   use SPVM::IO::Stderr;
   
-  # Print string to stdout
+  # Print string to stderr
   SPVM::IO::Stderr->print("Hello");
   
-  # Set stdout to binary mode
-  SPVM::IO::Stderr->set_binmode(1);
-
-  # Set stdout to text mode
-  SPVM::IO::Stderr->set_binmode(0);
-
 =head1 DESCRIPTION
 
 L<SPVM::IO::Stderr> manipulate standard output stream.
 
 =head1 CLASS METHODS
 
+=head2 AUTO_FLUSH
+
+  sub AUTO_FLUSH : byte ()
+
+Get auto flash flag. Default auto flush flag is 1.
+
+=head2 SET_AUTO_FLUSH
+
+  sub SET_AUTO_FLUSH : void ($bool : byte)
+
+Set auto flush flag.
+
 =head2 print
 
-  sub print($string : string)
+  sub print : void ($string : string)
 
-Print string to stdout.
+Print string to stderr.
 
-=head2 set_binmode
+If auto flush flag(AUTO_FLUSH) is true, flush buffered data to stderr after C<print> method call.
 
-  sub set_binmode : void ($binmode : int)
+=head2 flush
 
-Set binnary mode of stdout. If binmode is not 0, stdout become binary mode. If binmode is 0, stdout become text mode.
+  sub flush : void ()
 
-This method has only the meaning on Windows OS.
+Flush buffered data to stderr. If error, a exception occur.

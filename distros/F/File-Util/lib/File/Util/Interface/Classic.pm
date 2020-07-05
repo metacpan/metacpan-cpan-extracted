@@ -2,12 +2,10 @@ use strict;
 use warnings;
 
 package File::Util::Interface::Classic;
-$File::Util::Interface::Classic::VERSION = '4.161950';
+$File::Util::Interface::Classic::VERSION = '4.201720';
 # ABSTRACT: Legacy call interface to File::Util
 
 use Scalar::Util qw( blessed );
-
-use lib 'lib';
 
 use File::Util::Definitions qw( :all );
 
@@ -133,7 +131,7 @@ File::Util::Interface::Classic - Legacy call interface to File::Util
 
 =head1 VERSION
 
-version 4.161950
+version 4.201720
 
 =head1 DESCRIPTION
 

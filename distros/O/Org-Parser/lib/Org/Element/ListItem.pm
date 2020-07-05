@@ -1,7 +1,7 @@
 package Org::Element::ListItem;
 
-our $DATE = '2019-02-08'; # DATE
-our $VERSION = '0.550'; # VERSION
+our $DATE = '2020-04-01'; # DATE
+our $VERSION = '0.551'; # VERSION
 
 use 5.010;
 use locale;
@@ -42,7 +42,7 @@ Org::Element::ListItem - Represent Org list item
 
 =head1 VERSION
 
-This document describes version 0.550 of Org::Element::ListItem (from Perl distribution Org-Parser), released on 2019-02-08.
+This document describes version 0.551 of Org::Element::ListItem (from Perl distribution Org-Parser), released on 2020-04-01.
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,6 +8,7 @@ use lib qw/ t /;
 use MyMechanize;
 use Test::WWW::Mechanize::Driver qw/ Stacked FileContents ApplyTemplate /;
 use Test::More;
+$YAML::LoadBlessed = 1;
 
 my $tester = Test::WWW::Mechanize::Driver->new(
   mechanize => MyMechanize->new,

@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::KeyVal;
+
+=pod explain
+
+- zing-keyval is a generic key/val data store
+- it a subclass of Zing/Repo and uses Zing/Store operations
+
+=cut
+
+my $k = Zing::KeyVal->new(name => 'states');
+
+for my $i (1..1_000) {
+  warn "state-$i", " ", $k->send("state-$i", {created => time});
+}
+
+for my $i (1..1_000) {
+  warn "state-$i", " ", "created", " ", $k->recv("state-$i")->{created};
+}
+
+warn 'key/val data saved under', ' ', $k->term;
+
+$k->drop;

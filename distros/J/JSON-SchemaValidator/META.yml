@@ -1,0 +1,44 @@
+---
+abstract: 'JSON Schema Validator'
+author:
+  - 'Viacheslav Tykhanovskyi, C<vti@cpan.org>.'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-SchemaValidator
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JSON::SchemaValidator:
+    file: lib/JSON/SchemaValidator.pm
+    version: '1.01'
+  JSON::SchemaValidator::Pointer:
+    file: lib/JSON/SchemaValidator/Pointer.pm
+  JSON::SchemaValidator::Result:
+    file: lib/JSON/SchemaValidator/Result.pm
+requires:
+  JSON: '0'
+  URI::Escape: '0'
+resources:
+  bugtracker: https://github.com/vti/json-schemavalidator/issues
+  homepage: https://github.com/vti/json-schemavalidator
+  repository: git://github.com/vti/json-schemavalidator.git
+version: '1.01'
+x_contributors:
+  - 'vti <viacheslav.t@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

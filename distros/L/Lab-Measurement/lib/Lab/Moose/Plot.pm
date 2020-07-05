@@ -1,5 +1,5 @@
 package Lab::Moose::Plot;
-$Lab::Moose::Plot::VERSION = '3.701';
+$Lab::Moose::Plot::VERSION = '3.703';
 #ABSTRACT: Frontend to L<PDL::Graphics::Gnuplot>
 
 
@@ -134,7 +134,7 @@ Lab::Moose::Plot - Frontend to L<PDL::Graphics::Gnuplot>
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 

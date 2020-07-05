@@ -85,7 +85,7 @@ BEGIN {
 # method(one-arg__w) -> str        # use getLine(1)
 {
     # grab expected value from manual SCI_GETLINE
-    my $expect = editor()->{_hwobj}->SendMessage_getRawString( $scimsg{SCI_GETLINE}, 1, { trim => 'retval' } );
+    my $expect = editor()->{_hwobj}->SendMessage_getRawString( $SCIMSG{SCI_GETLINE}, 1, { trim => 'retval' } );
 
     # compare to auto-generated method result
     my $line = editor()->getLine(1);
@@ -208,23 +208,75 @@ BEGIN {
 # method(arg)->msg(arg)
 #   use styleSetFore(style,fore)/styleGetFore(style) pair
 {
-    my $f = editor()->styleGetFore($scimsg{STYLE_DEFAULT});
+    my $f = editor()->styleGetFore($SC_STYLE{STYLE_DEFAULT});
     ok defined($f), 'method(arg):message(arg): grab initial value';
-    note sprintf qq|\teditor->styleGetFore(%d): got:"%s"\n|, $scimsg{STYLE_DEFAULT}, $f//'<undef>';
+    note sprintf qq|\teditor->styleGetFore(%d): got:"%s"\n|, $SC_STYLE{STYLE_DEFAULT}, $f//'<undef>';
 
     # change the color
     my $reverse = (~$f) & 0xFFFFFF;     # invert the color
-    editor()->styleSetFore($scimsg{STYLE_DEFAULT}, $reverse);
+    editor()->styleSetFore($SC_STYLE{STYLE_DEFAULT}, $reverse);
 
-    my $r = editor()->styleGetFore($scimsg{STYLE_DEFAULT});
+    my $r = editor()->styleGetFore($SC_STYLE{STYLE_DEFAULT});
     ok defined($r), 'method(arg):message(arg): grab initial value';
-    note sprintf qq|\teditor->styleGetFore(%d): got:"%s"\n|, $scimsg{STYLE_DEFAULT}, $r//'<undef>';
+    note sprintf qq|\teditor->styleGetFore(%d): got:"%s"\n|, $SC_STYLE{STYLE_DEFAULT}, $r//'<undef>';
 
     is $r, $reverse, 'method(arg):message(arg): check for meaningful results';
     note sprintf qq|\teditor->styleGetFore(): "%s" vs "%s"\n|, $r//'<undef>', $reverse//'<undef>';
 
     # return to original foreground
-    editor()->styleSetFore($scimsg{STYLE_DEFAULT}, $f);
+    editor()->styleSetFore($SC_STYLE{STYLE_DEFAULT}, $f);
 }
+
+# method(arg)->msg(length,const char *)
+#   use editor->searchInTarget() and editor->replaceTargetRE() to verify
+#   other similar methods include addText() and related
+#       see also https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/issues/41 => replaceTargetRE
+#       see also https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/issues/42 => searchInTarget
+{
+    my $src =<<EOT;
+This is a not selected line !!!
+This is line one !!!
+Today is a beautiful day !!!
+This is line three !!!
+This is a not selected line !!!
+EOT
+    (my $exp = $src) =~ s/beautiful/great/;
+
+    editor->setText($src);
+    myTestHelpers::_mysleep_ms(50);
+
+    # set and verify the initial range
+    editor->setTargetRange(32,105);
+        # diag sprintf "range = (%s,%s)\n", editor->getTargetStart(), editor->getTargetEnd();
+        # diag sprintf "%s\n", do { (my $tmp = editor->getTargetText()) =~ s/^/\t/gm; $tmp };
+
+    # set the option
+    editor->setSearchFlags($SC_FIND{SCFIND_REGEXP});
+        # diag sprintf "SCFIND_REGEXP = '0x%08x'\n", $SC_FIND{SCFIND_REGEXP};
+        # diag sprintf "getSearchFlags() => '0x%08x' \n", editor->getSearchFlags();
+
+    # do the search and check retval
+    my $searchret = editor->searchInTarget('beautiful');
+        # diag sprintf "searchInTarget('beautiful')=%s\n", $searchret//'<undef>';
+    is $searchret, 64, "searchInTarget('beautiful') found the correct location";
+
+    # do the replacement
+    editor->replaceTargetRE('great');
+        # diag sprintf "range = (%s,%s)\n", editor->getTargetStart(), editor->getTargetEnd();
+        # diag sprintf "%s\n", do { (my $tmp = editor->getTargetText()) =~ s/^/\t/gm; $tmp };
+
+    # get the final whole text
+    my $got = editor->getText(); # the whole document
+        # diag sprintf "range = (%s,%s)\n", editor->getTargetStart(), editor->getTargetEnd();
+        # diag sprintf "%s\n", do { (my $tmp = editor->getTargetText()) =~ s/^/\t/gm; $tmp };
+    is $got, $exp, 'searchInTarget/replaceTargetRE() s/beautiful/great/ equivalent'
+        or diag sprintf "\t=> '%s'\n", dumper $got;
+
+    # cleanup
+    editor->setSavePoint();
+    notepad->closeAll();
+}
+
+
 
 done_testing;

@@ -110,11 +110,16 @@ EXPORTED SUBROUTINES
       This subroutine split text into tokens, where each token is the same
       writing script.
 
-AUTHORS
+    looks_like_simplified_chinese( $text ) #=> Bool
+
+      This subroutine does a naive test on the input $text and returns true
+      if $text looks like it is written in Simplified Chinese.
+
+AUTHOR
 
     Kang-min Liu <gugod@gugod.org>
 
-LICENCE
+LICENSE
 
     Unlicense https://unlicense.org/
 

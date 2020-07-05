@@ -1,13 +1,80 @@
 Revision history for Perl distribution Win32-Mechanize-NotepadPlusPlus
 
-v0.001002 2020-xx-xx
-    - Bugfix: notepad()->addText() will now properly add text, and has test coverage (fixed #8)
-    - Bugfix: notepad()->runMenuCommand() will now return undef (False) if the action is not found
-    - Test suite: improve the npp-gui runMenuCommand() (fixed #11) and runPluginCommand tests
-    - Test suite: 31-nppBeforeObject now doesn't try to use nonexistent environment variables (fixed #10)
+v0.004001 2020-Jun-20
+    - fix bug in notepad->prompt(), which only used two of the three
+      arguments, in wrong order (#47); test suite verifies default
+      values for title and default when they aren't used
+    - added new examples/pasteSpecial.pl to show how to paste a
+      clipboard entry other than CF_TEXT into Notepad++
+
+v0.004 2020-Jun-04
+    - fix bug in propertyNames() which deleted final char (#45)
+    - implemented helper methods: forEachLine, deleteLine, replaceWholeLine,
+        replaceLine, flash, getWord, getCurrentWord, getUserLineSelection,
+        getUserCharSelection (#15)
+    - make setTarget an alias of setTargetRange, and write an alias of
+        addText, for PythonScript compatibility (#15)
+    - implemented new auto-wrapper to get searchInTarget and similar calls
+        to work right (#42)
+    - fixed replaceTarget() and replaceTargetRE() replacing target with the
+        empty string (#41)
+    - fixed length bug in getTargetText() (#40)
+    - fixed bug in editor->setText('') which had empty strings
+        cause crash (#39)
+
+v0.003 2020-Apr-06
+    - fix mistakes and missing information in the POD (#35)
+    - add author tests for checking for autogen entries not in the
+        message list, and also note scintilla messages missing
+        from autogen that aren't manually implemented or deprecated
+        (#34)
+    - some NPP v7.8 messages were missing, so add them (#29)
+        and add a make target to make that easier to do in the future
+    - added version notes, to say which messages and enums require
+        NPP v7.8 (because these are the SCI v4.2.0 updates)
+    - runPluginsCommand() = fixed command cache feature and improved
+        test (#30)
+    - test suite: add delay in myTestHelpers to make sure there's
+        enough time after Notepad++ started before trying to save the
+        session (to avoid race condition with no files loaded yet)
+
+v0.002 2020-Mar-21
+    - Reorganize the hash variables for easier and clearer use going
+        forward (#13)
+    - editor->getLine() on an empty line will now correctly return an empty
+        string, not "\0" (fixed #14)
+    - update API for getNumberOpenFiles to correctly use the constants (#17)
+    - add notepad->getNppVar() for accessing the "user variables", like
+        FULL_CURRENT_PATH and CURRENT_WORD (#19)
+    - improve documentation internal links (#20)
+    - make the editor->hwnd() a public method (instead of using
+        editor()->{_hwnd})
+    - make the notepad->hwnd() a public method (instead of using
+        notepad()->{_hwnd})
+    - add helper editor->getEOLString(): convert EOL Mode integer to a string
+    - editor->getFileEndPosition(): gives the end position of the
+        whole document
+    - improve test coverage: add encoding names and getLanguageName coverage
+        to npp-buffer.t
+    - examples/ folder: adding more example usages
+    - improve Editor documentation on ->findText and some other methods, and
+        clean up set/get pairs, so they share the same information
+    - improve Notepad documentation, especially fixing the link for menuCmdID
+        source file
+
+v0.001002 2020-02-21
+    - Bugfix: notepad()->addText() will now properly add text, and has test
+        coverage (fixed #8)
+    - Bugfix: notepad()->runMenuCommand() will now return undef (False) if the
+        action is not found
+    - Test suite: improve the npp-gui runMenuCommand() (fixed #11) and
+        runPluginCommand tests
+    - Test suite: 31-nppBeforeObject now doesn't try to use nonexistent
+        environment variables (fixed #10)
 
 v0.001001 2020-02-15
-    - Fix some bugs in the test suite; improve diagnostics for more meaningful cpantesters reports
+    - Fix some bugs in the test suite; improve diagnostics for more meaningful
+        cpantesters reports
     - Propagate newest signing key to keyservers
 
 v0.001 2020-02-13

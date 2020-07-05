@@ -3,7 +3,7 @@ package Dist::Zilla::Plugin::Sah::Schemas;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-06-13'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 use 5.010001;
 use strict;
@@ -261,7 +261,7 @@ sub register_prereqs {
             type  => 'requires',
             phase => 'develop',
         },
-        'Test::Sah::Schema' => '0',
+        'Test::Sah::Schema' => '0.009',
     );
 
     # add prereqs to base schema modules
@@ -317,7 +317,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.020 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2020-06-13.
+This document describes version 0.021 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2020-06-13.
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.183';
+our $VERSION = '1.184';
 
 use Quiq::Parameters;
 use Net::SSH::Perl ();
@@ -28,7 +28,7 @@ L<Quiq::Hash>
 
 Ein Objekt der Klasse repräsentiert eine SSH-Verbindung zu einem Host.
 Über die Verbindung können Shell-Kommandos ausgeführt werden. Die
-Klasse ist ein Wrapper fr die Klasse Net::SSH::Perl, die das
+Klasse ist ein Wrapper für die Klasse Net::SSH::Perl, die das
 SSH Netzprotokoll direkt spricht.
 
 =head2 Installation
@@ -53,7 +53,7 @@ behoben werden. Siehe: L<https://github.com/ajgb/crypt-curve25519/issues/9#issue
 
 =head1 EXAMPLE
 
-Zeige Inhalt des Homeverzeichnisses auf Host dssp an:
+Zeige den Inhalt des Homeverzeichnisses auf Host dssp an:
 
   $ perl -MQuiq::Ssh -E 'print Quiq::Ssh->new("dssp")->exec("ls")'
 
@@ -246,7 +246,7 @@ sub exec {
 
 =head1 VERSION
 
-1.183
+1.184
 
 =head1 AUTHOR
 

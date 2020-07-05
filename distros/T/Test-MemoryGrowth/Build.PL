@@ -12,6 +12,7 @@ my $build = Module::Build->new(
       'Test::Builder' => 0,
    },
    recommends => {
+      'Devel::Gladiator' => 0,
       'Devel::MAT' => '0.04',
    },
    configure_requires => {

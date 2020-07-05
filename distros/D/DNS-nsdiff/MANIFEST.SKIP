@@ -1,0 +1,9 @@
+.git
+reversion.sh
+debian
+web
+Makefile
+MYMETA.*
+blib
+.*~
+.*\.tar\..*

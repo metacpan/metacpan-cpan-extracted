@@ -6,7 +6,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover';
 use namespace::clean;
 
-our $VERSION = 'v4.0.0';
+our $VERSION = 'v4.0.1';
 
 # Revisions can include entries with the standard plugin name, array ref of plugin/name/config,
 # or coderefs which are passed the pluginbundle object and return a list of plugins in one of these formats.
@@ -764,8 +764,10 @@ manually, use L<[MetaResources]|Dist::Zilla::Plugin::MetaResources>.
 
 To specify distribution prereqs in a L<cpanfile>, use
 L<[Prereqs::FromCPANfile]|Dist::Zilla::Plugin::Prereqs::FromCPANfile>. To
-specify prereqs in F<dist.ini>, use L<[Prereqs]|Dist::Zilla::Plugin::Prereqs>.
-To automatically guess the distribution's prereqs by parsing the code, use
+specify prereqs in a F<prereqs.json> or F<prereqs.yml>, use
+L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile>. To specify prereqs in
+F<dist.ini>, use L<[Prereqs]|Dist::Zilla::Plugin::Prereqs>. To automatically
+guess the distribution's prereqs by parsing the code, use
 L<[AutoPrereqs]|Dist::Zilla::Plugin::AutoPrereqs>.
 
 =head1 BUGS

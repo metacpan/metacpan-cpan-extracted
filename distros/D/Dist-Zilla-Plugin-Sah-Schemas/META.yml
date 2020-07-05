@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Sah-Schemas
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Sah-Schemas
   repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-Sah-Schemas.git
-version: '0.020'
+version: '0.021'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

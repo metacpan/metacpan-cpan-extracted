@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,9 +22,10 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/Image-SVG-Path/issues
   repository: https://github.com/benkasminbullock/Image-SVG-Path
-version: '0.32'
+version: '0.33'
 x_contributors:
   - 'Alessandro Ranellucci <aar@cpan.org>'
   - 'Colin Kuskie <colink@cpan.org>'
   - 'Alexander Gorlov'
+  - kekoa
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

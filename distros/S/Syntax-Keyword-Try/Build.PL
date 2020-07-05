@@ -22,6 +22,8 @@ my $build = Module::Build->new(
          x_IRC => "irc://irc.perl.org/#io-async",
       },
    },
+
+   extra_compiler_flags => [qw( -Ihax )],
 );
 
 $build->create_build_script;

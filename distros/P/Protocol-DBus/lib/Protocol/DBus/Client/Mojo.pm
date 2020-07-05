@@ -162,14 +162,15 @@ sub _set_watches_and_create_messenger {
             (undef, my $writable) = @_;
 
             if ($writable) {
-                my $r = Mojo::IOLoop->singleton->reactor();
-                _flush_send_queue($r, $reactor, $socket);
+                _flush_send_queue($dbus, $reactor, $socket);
             }
             else {
                 $read_cb->();
             }
         },
-    )->watch( $socket, 1, $dbus->pending_send() );
+    );
+
+    $self->_resume();
 
     $self->{'_stop_reading_cr'} = sub {
         Mojo::IOLoop->singleton->reactor()->remove($socket);
@@ -180,6 +181,22 @@ sub _set_watches_and_create_messenger {
             _flush_send_queue( $dbus, $reactor, $socket );
         }
     };
+}
+
+sub _pause {
+    Mojo::IOLoop->singleton->reactor()->watch(
+        $_[0]{'socket'},
+        0,
+        $_[0]{'db'}->pending_send(),
+    );
+}
+
+sub _resume {
+    Mojo::IOLoop->singleton->reactor()->watch(
+        $_[0]{'socket'},
+        1,
+        $_[0]{'db'}->pending_send(),
+    );
 }
 
 sub DESTROY {

@@ -1,8 +1,15 @@
 Revision history for Web::Mention
 
+0.712 2020-07-04T20:17:21Z
+
+    - Explicitly setting the internal user agent object's User-Agent
+    header to something other than 'libwww-perl/...', a red flag to
+    many web servers, and thus an obstacle to webmention verification
+    
 0.711 2020-05-08T23:30:36Z
 
-    - Fixing bug that would handle unprocessed webmentions poorly in certain circumstances.
+    - Fixing bug that would handle unprocessed webmentions poorly in
+    certain circumstances.
 
 0.710 2020-04-28T23:06:05Z
 

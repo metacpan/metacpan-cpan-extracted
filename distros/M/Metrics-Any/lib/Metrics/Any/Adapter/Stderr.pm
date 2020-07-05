@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Stderr;
+package Metrics::Any::Adapter::Stderr 0.06;
 
-use strict;
+use v5.14;
 use warnings;
 use base qw( Metrics::Any::Adapter::File );
 

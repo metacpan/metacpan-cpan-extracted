@@ -3,7 +3,7 @@ package Complete::Getopt::Long;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-04-16'; # DATE
 our $DIST = 'Complete-Getopt-Long'; # DIST
-our $VERSION = '0.478'; # VERSION
+our $VERSION = '0.479'; # VERSION
 
 use 5.010001;
 use strict;
@@ -109,23 +109,18 @@ sub _default_completion {
     $fres;
 }
 
-# return the key/element if $opt matches exactly a key/element in $opts (which
-# can be an array/hash) OR expands unambiguously to exactly one key/element in
-# $opts, otherwise return undef. e.g. _expand1('--fo', [qw/--foo --bar --baz
-# --fee --feet/]) and _expand('--fee', ...) will respectively return '--foo' and
-# '--fee' because it expands/is unambiguous in the list, but _expand1('--ba',
-# ...) or _expand1('--qux', ...) will both return undef because '--ba' expands
-# ambiguously (--bar/--baz) while '--qux' cannot be expanded.
-sub _expand1 {
+# return the possible options. if there is only one candidate (unambiguous
+# expansion) then scalar will be returned. otherwise, an array of candidates
+# will be returned.
+sub _matching_opts {
     my ($opt, $opts) = @_;
-    my @candidates;
-    my $is_hash = ref($opts) eq 'HASH';
-    for ($is_hash ? (sort {length($a)<=>length($b)} keys %$opts) : @$opts) {
+    my %candidates;
+    for (sort {length($a)<=>length($b)} keys %$opts) {
         next unless index($_, $opt) == 0;
-        push @candidates, $is_hash ? $opts->{$_} : $_;
+        $candidates{$_} = $opts->{$_};
         last if $opt eq $_;
     }
-    return @candidates == 1 ? $candidates[0] : undef;
+    \%candidates;
 }
 
 # mark an option (and all its aliases) as seen
@@ -559,9 +554,10 @@ sub complete_cli_arg {
             }
 
             my $opt = $word;
-            my $opthash = _expand1($opt, \%opts);
+            my $matching_opts = _matching_opts($opt, \%opts);
 
-            if ($opthash) {
+            if (keys(%$matching_opts) == 1) {
+                my $opthash = $matching_opts->{ (keys %$matching_opts)[0] };
                 $opt = $opthash->{name};
                 $expects[$i]{optname} = $opt;
                 my $nth = $seen_opts{$opt} // 0;
@@ -596,18 +592,21 @@ sub complete_cli_arg {
                     push @{ $parsed_opts{$opt} }, $words[$i+$_];
                 }
             } else {
-                # an unknown option, assume it doesn't require argument, unless
-                # it's --opt= or --opt=foo
+                # an unknown or still ambiguous option, assume it doesn't
+                # require argument, unless it's --opt= or --opt=foo
                 $opt = undef;
                 $expects[$i]{optname} = $opt;
+                my $possible_optnames = [sort keys %$matching_opts];
+                $expects[$i]{possible_optnames} = $possible_optnames;
 
                 # detect = after --opt
                 if ($i+1 < @words && $words[$i+1] eq '=') {
                     $i++;
-                    $expects[$i] = {separator=>1, optval=>undef, word=>''};
+                    $expects[$i] = {separator=>1, optval=>undef, possible_optnames=>$possible_optnames, word=>''};
                     if ($i+1 < @words) {
                         $i++;
                         $expects[$i]{optval} = $opt;
+                        $expects[$i]{possible_optnames} = $possible_optnames;
                     }
                 }
             }
@@ -706,7 +705,7 @@ sub complete_cli_arg {
         my %compargs = (
             %$extras,
             type=>'optval', words=>\@words, cword=>$args{cword},
-            word=>$word, opt=>$opt, ospec=>$opthash->{ospec},
+            word=>$word, opt=>($opt // $exp->{possible_optnames}), ospec=>$opthash->{ospec},
             argpos=>undef, nth=>$exp->{nth}, seen_opts=>\%seen_opts,
             parsed_opts=>\%parsed_opts,
         );
@@ -772,7 +771,7 @@ Complete::Getopt::Long - Complete command-line argument using Getopt::Long speci
 
 =head1 VERSION
 
-This document describes version 0.478 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-04-16.
+This document describes version 0.479 of Complete::Getopt::Long (from Perl distribution Complete-Getopt-Long), released on 2020-04-16.
 
 =head1 SYNOPSIS
 

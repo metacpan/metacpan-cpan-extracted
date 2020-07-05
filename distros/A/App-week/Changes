@@ -1,5 +1,18 @@
 Revision history for Perl extension App-week
 
+0.13 2020-06-29T02:23:37Z
+
+    - requires 'Getopt::EX', 'v1.19.0';
+
+0.12 2020-06-24T14:22:32Z
+
+    - Add default parameter to --theme option.
+
+0.11 2020-06-22T23:59:48Z
+
+    - Introduce --i18n option.
+    - Add -Molympic module and implement Day-of-Week color.
+
 0.10 2020-05-28T01:37:51Z
 
     - Update teams.pm.

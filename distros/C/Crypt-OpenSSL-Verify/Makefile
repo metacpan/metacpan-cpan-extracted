@@ -25,7 +25,7 @@
 #     OPTIMIZE => q[-O3 -Wall -Werror -DOPENSSL_API_COMPAT=0x10100000L]
 #     PREREQ_PM => { Crypt::OpenSSL::X509=>q[1.807], ExtUtils::MakeMaker=>q[6.59], File::Slurp=>q[0], Test::Exception=>q[0], Test::More=>q[0.88] }
 #     TEST_REQUIRES => {  }
-#     VERSION => q[0.19]
+#     VERSION => q[0.22]
 #     VERSION_FROM => q[Verify.pm]
 #     dist => {  }
 #     realclean => { FILES=>q[MYMETA.yml] }
@@ -67,11 +67,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Crypt::OpenSSL::Verify
 NAME_SYM = Crypt_OpenSSL_Verify
-VERSION = 0.19
+VERSION = 0.22
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_19
+VERSION_SYM = 0_22
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.19
+XS_VERSION = 0.22
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -277,7 +277,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Crypt-OpenSSL-Verify
-DISTVNAME = Crypt-OpenSSL-Verify-0.19
+DISTVNAME = Crypt-OpenSSL-Verify-0.22
 
 
 # --- MakeMaker macro section:
@@ -985,7 +985,7 @@ testdb_static :: static pure_all $(MAP_TARGET)
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Crypt-OpenSSL-Verify" VERSION="0.19">' > Crypt-OpenSSL-Verify.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Crypt-OpenSSL-Verify" VERSION="0.22">' > Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>OpenSSL Verify certificate verification in XS.</ABSTRACT>' >> Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>=over</AUTHOR>' >> Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Crypt-OpenSSL-Verify.ppd

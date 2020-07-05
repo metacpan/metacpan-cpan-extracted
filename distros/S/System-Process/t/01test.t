@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 use File::Temp qw/ tempfile /;
 use Data::Dumper;
@@ -116,7 +116,8 @@ close $fh;
 $pi = pidinfo file => $filename;
 
 isa_ok( $pi, CLASS_NAME );
-is( $pi->pid(), $pid, 'check pid' );
+is $pi->pid(), $pid, 'check pid';
+is $pi->pid(), $pi->{_procinfo}{pid}, 'check internal pid';
 
 
 #
@@ -126,7 +127,6 @@ $pi = pidinfo pid => $pid;
 
 isa_ok( $pi, CLASS_NAME );
 is( $pi->pid(), $pid, 'check pid' );
-
 
 #
 # Check the parsing
@@ -140,9 +140,9 @@ END
 
 $pi->parse_n_generate( split /\n/, $output );
 
-is $pi->cpu, 12345, 'check first cloumn';
-is $pi->user, 'testing', 'check second cloumn';
-is $pi->command, 'some command line', 'check last (command line) cloumn';
+is $pi->cpu, 12345, 'check first column';
+is $pi->user, 'testing', 'check second column';
+is $pi->command, 'some command line', 'check last (command line) column';
 
 
 #

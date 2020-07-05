@@ -2,10 +2,8 @@ use strict;
 use warnings;
 
 package File::Util::Interface::Modern;
-$File::Util::Interface::Modern::VERSION = '4.161950';
+$File::Util::Interface::Modern::VERSION = '4.201720';
 # ABSTRACT: Modern call interface to File::Util
-
-use lib 'lib';
 
 use File::Util::Interface::Classic qw( _myargs );
 use File::Util::Definitions qw( :all );
@@ -148,7 +146,7 @@ File::Util::Interface::Modern - Modern call interface to File::Util
 
 =head1 VERSION
 
-version 4.161950
+version 4.201720
 
 =head1 DESCRIPTION
 

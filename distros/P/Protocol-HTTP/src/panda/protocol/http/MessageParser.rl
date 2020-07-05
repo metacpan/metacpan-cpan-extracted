@@ -163,14 +163,14 @@
     chunk_trailer  := (header_field CRLF)* CRLF @done;
     
     ################################## REQUEST ########################################
-    method = "OPTIONS" %{request->method = Request::Method::OPTIONS; }
-           | "GET"     %{request->method = Request::Method::GET; }
-           | "HEAD"    %{request->method = Request::Method::HEAD; }
-           | "POST"    %{request->method = Request::Method::POST; }
-           | "PUT"     %{request->method = Request::Method::PUT; }
-           | "DELETE"  %{request->method = Request::Method::DELETE; }
-           | "TRACE"   %{request->method = Request::Method::TRACE; }
-           | "CONNECT" %{request->method = Request::Method::CONNECT; }
+    method = "OPTIONS" %{request->method_raw(Request::Method::OPTIONS); }
+           | "GET"     %{request->method_raw(Request::Method::GET);     }
+           | "HEAD"    %{request->method_raw(Request::Method::HEAD);    }
+           | "POST"    %{request->method_raw(Request::Method::POST);    }
+           | "PUT"     %{request->method_raw(Request::Method::PUT);     }
+           | "DELETE"  %{request->method_raw(Request::Method::DELETE);  }
+           | "TRACE"   %{request->method_raw(Request::Method::TRACE);   }
+           | "CONNECT" %{request->method_raw(Request::Method::CONNECT); }
            ;
     request_target  = VCHAR+ >mark %request_target %unmark;
     request_line    = method SP request_target SP http_version :> CRLF;

@@ -17,160 +17,183 @@ with 'CLI::Driver::CommonRole';
 ###############################
 
 has class => (
-    is => 'rw',
-    isa => 'Str',
+	is  => 'rw',
+	isa => 'Str',
 );
 
 has cli_arg => (
-    is  => 'rw',
-    isa => 'Str'
+	is  => 'rw',
+	isa => 'Str'
 );
 
 has method_arg => (
-    is  => 'rw',
-    isa => 'Str|Undef'
+	is  => 'rw',
+	isa => 'Str|Undef'
 );
 
 has required => (
-    is  => 'rw',
-    isa => 'Bool'
+	is  => 'rw',
+	isa => 'Bool'
 );
 
 has hard => (
-    is => 'rw',
-    isa => 'Bool',
+	is  => 'rw',
+	isa => 'Bool',
 );
 
 has flag => (
-    is => 'rw',
-    isa => 'Bool',
+	is  => 'rw',
+	isa => 'Bool',
 );
 
 has is_array => (
-    is => 'rw',
-    isa => 'Bool',
+	is  => 'rw',
+	isa => 'Bool',
 );
+
+has value => (
+    is => 'rw',
+    isa => 'Any',
+);
+
+has 'use_argv_map' => ( is => 'rw', isa => 'Bool' );
 
 ###############################################
 
 method get_signature {
 
-    my %sig;
-    my $val = $self->get_val;
+	my %sig;
+	
+	my $val = $self->_get_val;
+	$self->value($val);
+	if ( defined $val ) {
+		$sig{ $self->method_arg } = $val;
+	}
 
-    if ( defined $val ) {
-        $sig{ $self->method_arg } = $val;
-    }
-
-    return %sig;
+	return %sig;
 }
 
 method is_required {
-    
-    if ($self->required) {
-        return 1;    
-    }    
-    
-    return 0;
+
+	if ( $self->required ) {
+		return 1;
+	}
+
+	return 0;
 }
 
 method is_flag {
-    
-    if ($self->flag) {
-        return 1;    
-    }    
-    
-    return 0;
+
+	if ( $self->flag ) {
+		return 1;
+	}
+
+	return 0;
 }
 
 method is_optional {
-    
-    if (!$self->required) {
-       return 1; 
-    }    
-    
-    return 0;
+
+	if ( !$self->required ) {
+		return 1;
+	}
+
+	return 0;
 }
 
 method is_hard {
-    
-    if ($self->hard) {
-        return 1;    
-    }    
-    
-    return 0;
+
+	if ( $self->hard ) {
+		return 1;
+	}
+
+	return 0;
 }
 
 method is_soft {
-    
-    if (!$self->hard) {
-        return 1;    
-    }    
-    
-    return 0;
+
+	if ( !$self->hard ) {
+		return 1;
+	}
+
+	return 0;
 }
 
-method get_val {
+method _get_val {
 
-    my $arg  = $self->cli_arg;
-    my $val;
+	my $arg = $self->cli_arg;
+	my $val;
 
-    if ( $self->is_boolean ) {
-        #
-        # deprecated in favor of self->is_flag
-        #
-        my $success = GetOptionsFromArray( \@ARGV, "$arg" => \$val, );
+	if ( $self->is_boolean ) {
+		#
+		# deprecated in favor of self->is_flag
+		#
+		my $success = GetOptionsFromArray( \@ARGV, "$arg" => \$val, );
 
-        if ($success) {
-            my $val = $val ? 1 : 0;
-            return $val;
-        }
+		if ($success) {
+			my $val = $val ? 1 : 0;
+			return $val;
+		}
 
-        confess "something went sideways?";
-    }
-    elsif ($self->is_flag) {
-        # - just a cli switch
-        # - never required from cmdline
-        
-        my $success = GetOptionsFromArray( \@ARGV, "$arg" => \$val, );
+		confess "something went sideways?";
+	}
+	elsif ( $self->is_flag ) {
 
-        if ($success) {
-            my $val = $val ? 1 : 0;
-            return $val;
-        }
+		# - just a cli switch
+		# - never required from cmdline
 
-        confess "something went sideways?"; 
-    }
-    else {
+		if ( $self->use_argv_map ) {
+			 $val = $ARGV{$self->method_arg};
+			 delete $ARGV{$self->method_arg};
+			 return $val;
+		}
+		else {
+			my $success = GetOptionsFromArray( \@ARGV, "$arg" => \$val, );
+			if ($success) {
+				return $val ? 1 : 0;
+			}
+		}
 
-        # get "-arg <val>" from cmdline if exists
-        my $arg_type = "s";
-        
-        if( $self->is_array ){
-            $arg_type='s@';
-        }
+		confess "something went sideways?";
+	}
+	else {
 
-        my $success = GetOptionsFromArray( \@ARGV, "$arg=$arg_type" => \$val, );
-        if ($success) {
-            return $val;
-        }
+		if ( $self->use_argv_map ) {
+			if ( $ARGV{$self->method_arg} ) {
+				$val = $ARGV{$self->method_arg};
+				delete $ARGV{$self->method_arg};
+				return $val;
+			}
+		}
+		else {
+			# get "-arg <val>" from cmdline if exists
+			my $arg_type = "s";
+			$arg_type.= '@' if $self->is_array;
 
-        # we didn't find it in @ARGV
-        if ( $self->required ) {
-            $self->fatal("failed to get arg from argv: $arg");
-        }
-    }
+			my $success =
+			  GetOptionsFromArray( \@ARGV, "$arg=$arg_type" => \$val, );
+            if ($success) {
+                return $val; 	
+            }
+            		
+			confess "something went sideways?" if !$success;
+		}
 
-    return;
+		# we didn't find it in @ARGV
+		if ( $self->required ) {
+			confess "failed to get arg from argv: $arg";
+		}
+	}
+
+	return;
 }
 
 method is_boolean {
 
-    if (length $self->cli_arg > 1) {
-        return 1;    
-    }
-    
-    return 0;
+	if ( length $self->cli_arg > 1 ) {
+		return 1;
+	}
+
+	return 0;
 }
 
 1;

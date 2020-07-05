@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Data::Dumper;
+use Zing::Worker;
+
+=pod explain
+
+- zing-worker is a process, see ./examples/00-zing-process ...
+- but more specifically is a worker process that listens to 1+ queue(s) ...
+- and invokes the user-defined receive() method when new messages arrive
+- it's a class which is intended to be subclassed
+- because a Worker is also a Process, it runs its own event-loop
+- it invokes the perform() method at every event-loop tick
+- it invokes the receive() method when a new message is received
+- as with all other process types, a Worker process can multitask
+- the process is usually enacted by calling execute()
+- execute() starts the process event-loop
+
+=cut
+
+(my $p = Zing::Worker->new)->name;
+
+warn Dumper $p;

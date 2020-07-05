@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use English;
 
-use Test::More tests => 13;
+use Test::More tests => 18;
 
 use Log::Log4perl;
 Log::Log4perl->easy_init( { level   => 'ERROR' } );
@@ -14,10 +14,11 @@ Log::Log4perl->easy_init( { level   => 'ERROR' } );
 
 BEGIN {
     use_ok( 'Connector::Builtin::Memory' );
+    use_ok( 'Connector::Builtin::Static' );
 }
 
 require_ok( 'Connector::Builtin::Memory' );
-
+require_ok( 'Connector::Builtin::Static' );
 
 # diag "Connector::Proxy::Static tests\n";
 ###########################################################################
@@ -51,5 +52,13 @@ ok ($conn->exists('foo'), 'Node Exists');
 ok ($conn->exists( [ 'foo' ] ), 'Node Exists Array');
 ok (!$conn->exists('baz'), 'Not exists');
 
+$conn->set('bar', undef);
+ok (!$conn->exists('bar'), 'Not exists after delete');
 
+my $sub = Connector::Builtin::Static->new({
+    LOCATION => "foo"
+});
+is( $sub->get(''), 'foo' );
+$conn->set('bar', $sub);
 
+is($conn->get_meta('bar')->{TYPE}, 'connector');

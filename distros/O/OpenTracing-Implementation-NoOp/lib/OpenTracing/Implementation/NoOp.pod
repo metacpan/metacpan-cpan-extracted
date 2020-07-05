@@ -31,7 +31,7 @@ purposes).
 
 
 
-=head2 bootstrap
+=head2 bootstrap_tracer
 
     my $tracer = OpenTracing::Implementation::NoOp->bootstrap_tracer( @args );
 

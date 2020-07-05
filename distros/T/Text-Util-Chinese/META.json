@@ -24,11 +24,6 @@
             "App::ModuleBuildTiny" : "0.027"
          }
       },
-      "runtime" : {
-         "requires" : {
-            "List::Util" : "1.5"
-         }
-      },
       "test" : {
          "requires" : {
             "Test2::V0" : "0"
@@ -38,7 +33,7 @@
    "provides" : {
       "Text::Util::Chinese" : {
          "file" : "lib/Text/Util/Chinese.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -49,7 +44,7 @@
          "web" : "https://github.com/gugod/Text-Util-Chinese"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : null,
    "x_static_install" : "1"

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.183';
+our $VERSION = '1.184';
 
 use Quiq::Path;
 use Quiq::Option;
@@ -138,7 +138,10 @@ sub new {
     }
     else {                          # Datei öffnen
         $mode = shift;
-        $path = Quiq::Path->expandTilde(shift);
+        $path = shift;
+        if (!ref $path) {
+            $path = Quiq::Path->expandTilde($path);
+        }
     }
 
     # Optionen
@@ -943,7 +946,7 @@ sub slurpFromStdin {
 
 =head1 VERSION
 
-1.183
+1.184
 
 =head1 AUTHOR
 

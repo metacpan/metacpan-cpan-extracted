@@ -1,4 +1,4 @@
-#include "xs/geos.h"
+#include "xs/geos/geos.h"
 #include "panda/Geos/Helper.h"
 #include "panda/Geos/tesselate.h"
 #include "xsi/private_typemaps.h"

@@ -3,7 +3,7 @@ package MsOffice::Word::Surgeon::Utils;
 use Exporter  qw/import/;
 our @EXPORT = qw/maybe_preserve_spaces is_at_run_level/;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 sub maybe_preserve_spaces {
   my ($txt) = @_;

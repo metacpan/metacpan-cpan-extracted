@@ -5,6 +5,7 @@ author:
 build_requires:
   DBD::SQLite: '1.62'
   FindBin::libs: '0'
+  Test::Exception: '0'
   Test::More: '0.98'
   Test::More::UTF8: '0'
   YAML::Syck: '0'
@@ -30,12 +31,13 @@ no_index:
 provides:
   DBIx::NamedParams:
     file: lib/DBIx/NamedParams.pm
-    version: v0.0.9
+    version: v0.0.10
 requires:
   DBI: '0'
   DBI::Const::GetInfoType: '0'
   Encode: '0'
   Log::Dispatch: '0'
+  Scalar::Util: '0'
   Term::Encoding: '0'
   parent: '0'
   perl: '5.008001'
@@ -44,7 +46,7 @@ resources:
   bugtracker: https://github.com/TakeAsh/p-DBIx-NamedParams/issues
   homepage: https://github.com/TakeAsh/p-DBIx-NamedParams
   repository: git://github.com/TakeAsh/p-DBIx-NamedParams.git
-version: v0.0.9
+version: v0.0.10
 x_contributors:
   - 'TakeAsh <take@TakeAsh.net>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

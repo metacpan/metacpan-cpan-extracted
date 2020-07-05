@@ -21,7 +21,7 @@ requires:
   AnyEvent: '0'
   AnyEvent::AIO: '0'
   Class::Refresh: '0'
-  Compiler::Lexer: '0'
+  Compiler::Lexer: '0.23'
   Coro: '0'
   Data::Dump: '0'
   IO::AIO: '0'
@@ -30,5 +30,5 @@ requires:
   PadWalker: '0'
   Scalar::Util: '0'
   perl: '5.014'
-version: v2.0.2
+version: v2.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

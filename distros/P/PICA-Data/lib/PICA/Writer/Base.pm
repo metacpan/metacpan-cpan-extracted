@@ -1,9 +1,10 @@
 package PICA::Writer::Base;
 use v5.14.1;
 
-our $VERSION = '1.08';
+our $VERSION = '1.11';
 
 use Scalar::Util qw(blessed openhandle reftype);
+use Term::ANSIColor;
 use Carp qw(croak);
 
 sub new {
@@ -42,17 +43,26 @@ sub write_record {
     my ($self, $record) = @_;
     $record = $record->{record} if reftype $record eq 'HASH';
 
-    my $fh = $self->{fh};
+    my $fh  = $self->{fh};
+    my %col = %{$self->{color} // {}};
 
     foreach my $field (@$record) {
-        $fh->print($field->[0]);
+        $fh->print($col{tag} ? colored($field->[0], $col{tag}) : $field->[0]);
+
         if (defined $field->[1] and $field->[1] ne '') {
-            $fh->print(sprintf("/%02d", $field->[1]));
+            my $occ = sprintf("%02d", $field->[1]);
+            $fh->print(
+                ($col{syntax} ? colored('/', $col{syntax}) : '/')
+                . (
+                    $col{occurrence} ? colored($occ, $col{occurrence}) : $occ
+                )
+            );
         }
         $fh->print(' ');
         for (my $i = 2; $i < scalar @$field; $i += 2) {
             $self->write_subfield($field->[$i], $field->[$i + 1]);
         }
+
         $fh->print($self->END_OF_FIELD);
     }
     $fh->print($self->END_OF_RECORD);
@@ -103,7 +113,7 @@ Use one of the following subclasses instead:
 
 =head1 METHODS
 
-=head2 new( [ $fh | fh => $fh ] )
+=head2 new( [ $fh | fh => $fh ] [ %options ] )
 
 Create a new PICA writer, writing to STDOUT by default. The optional C<fh>
 argument can be a filename, a handle or any other blessed object with a
@@ -119,6 +129,21 @@ reference with a list of fields, as described in L<PICA::Data>.
 =head2 write_record ( $record ) 
 
 Writes one record.
+
+=head1 OPTIONS
+
+=head2 color
+
+Syntax highlighting can be enabled for L<PICA::Writer::Plain> and
+L<PICA::Writer::Plus> using color names from L<Term::ANSIColor>, e.g.
+
+    pica_writer('plain', color => {
+      tag => 'blue',
+      occurrence => 'magenta',
+      code => 'green',
+      value => 'white',
+      syntax => 'yellow',
+    })
 
 =head1 SEEALSO
 

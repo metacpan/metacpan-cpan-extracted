@@ -1,5 +1,10 @@
 Revision history for Test-MemoryGrowth
 
+0.04    2020-06-17
+        [CHANGES]
+         * Optional integration with Devel::Gladiator to provide a per-type
+           breakdown of growth of object types on the heap
+
 0.03    2018-01-16 01:22:54
         [CHANGES]
          * Emit two .pmat files on failed tests with one iteration advanced,

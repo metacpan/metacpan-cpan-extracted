@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "6.80",
+  "VERSION" => "6.81",
   "test" => {
     "TESTS" => "t/*.t t/Client_6_0_Async/*.t"
   }

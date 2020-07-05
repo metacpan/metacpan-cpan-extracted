@@ -1,0 +1,547 @@
+#!/usr/bin/perl
+# SPDX-License-Identifier: CC0-1.0
+
+use warnings;
+use strict;
+
+use Getopt::Std;
+use POSIX;
+
+sub wail { warn "nsdiff: @_\n"; }
+sub fail { wail @_; exit 2; }
+
+# for named-compilezone
+$ENV{PATH} .= ":/sbin:/usr/sbin:/usr/local/sbin";
+my $compilezone = 'named-compilezone -i local -k warn -n warn -o -';
+
+sub version {
+    while (<DATA>) {
+	print if m{^=head1 VERSION} ... m{^=head1 }
+	  and not m{^=head1 };
+    }
+    exit;
+}
+
+sub usage {
+    print STDERR <<EOF;
+usage: nsdiff [options] <zone> [old] [new]
+  Generate an `nsupdate` script that changes a zone from the
+  "old" version into the "new" version, ignoring DNSSEC records.
+  If the "old" file is omitted and there is no -s option, `nsdiff`
+  will AXFR the zone from the server in the zone's SOA MNAME field.
+options:
+  -h                  display full documentation
+  -V                  display version information
+  -0                  allow a domain's updates to span packets
+  -1                  abort if update doesn't fit in one packet
+  -c                  compare records case-insensitively
+  -C                  do not ignore CDS/CDNSKEY records
+  -d                  ignore DS records
+  -D                  do not ignore DNSKEY records
+  -i regex            ignore records matching the pattern
+  -m server[#port]    from where to AXFR new version of the zone
+  -s server[#port]    from where to AXFR old version of the zone
+  -S num|mode         SOA serial number or update mode
+  -q                  only output if zones differ
+  -u                  tell nsupdate to send to -s server
+  -v [q][r]           verbose query and/or reply
+  -b address          AXFR query source address
+  -k keyfile          AXFR query TSIG key
+  -y [hmac:]name:key  AXFR query TSIG key
+EOF
+    exit 2;
+}
+my %opt;
+usage unless getopts '-hV01cCdDi:m:s:S:quv:b:k:y:', \%opt;
+version if $opt{V};
+exec "perldoc -F $0" if $opt{h};
+usage if @ARGV < 1 || @ARGV > 3;
+
+my @digopts;
+for my $o (qw{ b k y }) {
+    push @digopts, "-$o $opt{$o}" if exists $opt{$o};
+}
+wail "ignoring dig options when loading zones from files"
+    if @digopts && @ARGV == 3;
+wail "ignoring -m option when loading new zone from file"
+    if $opt{m} && @ARGV > 1;
+fail "need -m option when there are no input files"
+    unless $opt{m} || @ARGV > 1;
+usage if $opt{u} && !$opt{s};
+
+usage if $opt{q} && $opt{v};
+usage if $opt{v} && $opt{v} !~ m{^[qr]*$};
+my $quiet = $opt{q} ? '2>/dev/null' : '';
+my $verbosity = exists $opt{v} ? $opt{v} : $quiet ? '' : 'r';
+
+$opt{$_} and $opt{$_} =~ s{#}{ } for qw{ s m }; # for nsupdate server command
+
+my $secRRtypes = qr{NSEC|NSEC3|NSEC3PARAM|RRSIG};
+$secRRtypes = qr{$secRRtypes|CDS|CDNSKEY} unless $opt{C};
+$secRRtypes = qr{$secRRtypes|DNSKEY} unless $opt{D};
+$secRRtypes = qr{$secRRtypes|DS} if $opt{d};
+
+my $soamode = $opt{S} || 'file';
+my $soafun = $soamode =~ m{^[0-9]+$} ?
+             sub { return $soamode } : {
+   serial => sub { return 0 },
+     file => sub { return $_[0] },
+   master => sub { return $_[0] }, # compat
+     unix => sub { return time },
+     date => sub { return strftime "%Y%m%d00", gmtime },
+}->{$soamode} or usage;
+
+my $zone = shift; $zone =~ s{[.]?$}{.};
+my $zonere = quotemeta $zone;
+my $hostname = qr{(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?[.])+};
+my $rname = qr{(?:[^;.\\\s]|\\.)+[.]$hostname|[.]};
+my $soare = qr{^$zonere\s+(\d+)\s+(IN\s+SOA\s+$hostname\s+$rname)
+	       \s+(\d+)\s+(\d+\s+\d+\s+\d+\s+\d+\n)$}x;
+my $dnssec = qr{^\S+\s+\d+\s+IN\s+($secRRtypes)\s+};
+my $exclude = $opt{i} ? qr{$dnssec|$opt{i}} : qr{$dnssec};
+
+# Check there is a SOA and remove DNSSEC records.
+# Store zone data in the keys of a hash.
+
+sub cleanzone {
+    my ($soa,%zone) = shift;
+    fail "missing SOA record" unless defined $soa and $soa =~ $soare;
+    $zone{$_} = 1 for grep { not m{^;|$exclude}o } @_;
+    return ($soa,\%zone);
+}
+
+sub axfrzone {
+    my $zone = shift;
+    my $primary = shift;
+    wail "loading zone $zone via AXFR from $primary" unless $quiet;
+    $primary =~ s{^(.*) (\d+)$}{-p $2 \@$1} or $primary = '@'.$primary;
+    return cleanzone qx{dig @digopts $primary +noadditional axfr $zone |
+                        $compilezone $zone /dev/stdin $quiet};
+}
+
+sub loadzone {
+    my ($zone,$file) = @_;
+    wail "loading zone $zone from file $file" unless $quiet;
+    return cleanzone qx{$compilezone -j $zone '$file' $quiet};
+}
+
+sub mname {
+    my $zone = shift;
+    my @soa = split ' ', qx{dig +short soa $zone};
+    my $primary = $soa[0];
+    fail "could not get SOA record for $zone"
+        unless defined $primary and $primary =~ m{^$hostname$};
+    return $primary;
+}
+
+my ($soa,$old) = (@ARGV < 2)
+                  ? axfrzone $zone, $opt{s} || mname $zone
+                  : loadzone $zone, shift;
+my ($newsoa,$new) = (@ARGV < 1)
+                  ? axfrzone $zone, $opt{m}
+                  : loadzone $zone, shift;
+
+# Does the SOA need to be updated?
+$soa =~ $soare;
+my $oldserial = $3;
+my $oldsoa = "$1 $2 $4";
+$newsoa =~ $soare;
+my $upsoa = $oldserial < $3 || $oldsoa ne "$1 $2 $4";
+# The serial number in the update might depend on the new SOA serial number.
+my $soamin = $soafun->($3);
+
+# Remove unchanged RRs, and save each name's deletions and additions.
+
+my (%del,%add,%uc);
+
+map { $uc{lc $_} = $_ } keys %$new if $opt{c};
+
+for my $rr (keys %$old) {
+    delete $old->{$rr};
+    next if $uc{lc $rr} and delete $new->{delete $uc{lc $rr}};
+    next if delete $new->{$rr};
+    my ($owner,$ttl,$data) = split ' ', $rr, 3;
+    push @{$del{$owner}}, $data;
+}
+for my $rr (keys %$new) {
+    delete $new->{$rr};
+    my ($owner,$data) = split ' ', $rr, 2;
+    push @{$add{$owner}}, $data;
+}
+
+# For each owner name prepare deletion commands followed by addition
+# commands. This ensures TTL adjustments and CNAME/other replacements
+# are handled correctly. Ensure each owner's changes are not split below.
+
+my (@batch,@script);
+
+sub emit {
+    if ($opt{0}) { push @script, splice @batch }
+    else { push @script, join '', splice @batch }
+}
+sub update {
+    my ($addel,$owner,$rrs) = @_;
+    push @batch, map "update $addel $owner $_", sort @$rrs;
+}
+for my $owner (keys %del) {
+    update 'delete', $owner, delete $del{$owner};
+    update 'add', $owner, delete $add{$owner} if exists $add{$owner};
+    emit;
+}
+for my $owner (keys %add) {
+    update 'add', $owner, delete $add{$owner};
+    emit;
+}
+
+my $status = ($upsoa or @script) ? 1 : 0;
+if ($quiet) {
+    wail "$zone has changes" if $status;
+    exit $status;
+}
+
+# Emit commands in batches that fit within the 64 KiB DNS packet limit
+# assuming textual representation is not smaller than binary encoding.
+# Use a prerequisite based on the SOA record to catch races.
+
+my $maxlen = 65536;
+while ($upsoa or @script) {
+    my ($length,$i) = (0,0);
+    $length += length $script[$i++] while $length < $maxlen and $i < @script;
+    my @batch = splice @script, 0, $length < $maxlen ? $i : $i - 1;
+    fail "update does not fit in packet"
+	if not $upsoa and @batch == 0
+	or $opt{1} and @script != 0;
+    print "server $opt{s}\n" if $opt{u};
+    $soa =~ $soare;
+    print "prereq yxrrset $zone $2 $3 $4";
+    my $serial = $3 >= $soamin ? $3 + 1 : $soamin;
+    $newsoa =~ $soare;
+    print "update add ", $soa = "$zone $1 $2 $serial $4";
+    print @batch;
+    print "show\n" if $verbosity =~ m{q};
+    print "send\n";
+    print "answer\n" if $verbosity =~ m{r};
+    undef $upsoa;
+}
+
+exit $status;
+
+__END__
+
+=head1 NAME
+
+nsdiff - create "nsupdate" script from DNS zone file differences
+
+=head1 SYNOPSIS
+
+nsdiff [B<-hV>] [B<-b> I<address>] [B<-k> I<keyfile>] [B<-y> [I<hmac>:]I<name>:I<key>]
+       [B<-0>|B<-1>] [B<-q>|B<-v> [q][r]] [B<-cCdD>] [B<-i> I<regex>] [B<-S> I<mode>|I<num>]
+       [B<-u>] [B<-s> I<server>] [B<-m> I<server>] <I<zone>> [I<old>] [I<new>]
+
+=head1 DESCRIPTION
+
+The B<nsdiff> program examines the F<old> and F<new> versions of a DNS
+zone, and outputs the differences as a script for use by BIND's
+B<nsupdate> program. It ignores DNSSEC-related differences, assuming
+that the name server has sole control over zone keys and signatures.
+
+The input files are typically in standard DNS zone file format. They
+are passed through BIND's B<named-compilezone> program to convert them
+to canonical form, so they may also be in BIND's "raw" format and may
+have F<.jnl> update journals.
+
+If the F<old> file is not specified, B<nsdiff> will use B<dig> to transfer
+the zone from the server given by the B<-s> option, or if the B<-s> option
+is missing it will get the server from the zone's SOA MNAME field. If both
+F<old> and F<new> files are not specified, B<nsdiff> will transfer the new
+version of the zone from the server given by the B<-m> option.
+
+The SOA serial number has special handling: any difference between the
+F<old> and F<new> serial numbers is ignored, because background DNSSEC
+signing activity can increment the serial number unpredictably. When
+the zones differ, B<nsdiff> sets the serial number according to the
+B<-S> option, and it uses the F<old> serial number to protect against
+conflicting updates.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-h>
+
+Display this documentation.
+
+=item B<-V>
+
+Display version information.
+
+=item B<-0>
+
+Allow very large updates affecting one domain name to be split across
+multiple requests.
+
+=item B<-1>
+
+Abort if update does not fit in one request packet.
+
+=item B<-C>
+
+Do not ignore CDS or CDNSKEY records. They are normally managed by
+B<dnssec-settime> with the C<-P sync> and C<-D sync> options, but you
+can use this option if you are managing them some other way. In that
+case, your un-signed zone file should include the complete CDS and/or
+CDNSKEY RRset(s); if not, B<nsdiff> will delete the records.
+
+=item B<-c>
+
+Compare records case-insensitively. Can be helpful if the B<nsupdate>
+target server does not preserve the case of domain names. However with
+this option, B<nsdiff> does not correctly handle records that only
+differ in case.
+
+=item B<-D>
+
+Do not ignore DNSKEY records. It is sometimes necessary to take manual
+control over a zone's DNSKEY RRset, for instance to include a foreign
+DNSKEY records during migration to or from another hosting provider.
+If you use this option your un-signed zone file should include the
+complete DNSKEY RRset; if not, nsdiff will try to delete the DNSKEY
+records. Normally B<named> will reject the update, unless the zone is
+configured with the I<dnssec-secure-to-insecure> option.
+
+=item B<-d>
+
+Ignore DS records. This option is useful if you are managing secure
+delegations on the signing server (via nsupdate) rather than in the
+source zone.
+
+=item B<-i> I<regex>
+
+Ignore more DNS records. By default, B<nsdiff> strips out DNSSEC RRs
+(except for DS) before comparing zones. You can exclude irrelevant
+changes from the diff by supplying a I<regex> that matches the
+unwanted RRs.
+
+=item B<-m> I<server>[#I<port>]
+
+Transfer the new version of the zone from the server given in this option,
+for example, a back-end hidden primary server. You can specify the server
+host name or IP address, optionally followed by a "#" and the port number.
+
+=item B<-s> I<server>[#I<port>]
+
+Transfer the old version of the zone from the server given in this option,
+using the same syntax as the B<-m> option.
+
+=item B<-S> B<date>|B<file>|B<serial>|B<unix>|I<num>
+
+Choose the SOA serial number update mode: the default I<file> takes
+the serial number from the I<new> input zone; I<date> uses a number of
+the form YYYYMMDDnn and allows for up to 100 updates per day;
+I<serial> just increments the serial number in the I<old> input zone;
+I<unix> uses the UNIX "seconds since the epoch" value. You can also
+specify an explicit serial number value. In all cases, if the I<old>
+input zone serial number is larger than the target value it is just
+incremented. Serial number wrap-around is not supported.
+
+=item B<-q>
+
+Quiet / quick check. Output is suppressed unless the zones differ, in
+which case a short note is printed instead of an B<nsupdate> script.
+
+=item B<-u>
+
+Tell B<nsupdate> to send the update message to the server specified in the
+B<-s> option.
+
+=item B<-v> [q][r]
+
+Control verbosity.
+The B<q> flag causes queries to be printed.
+The B<r> flag causes responses to be printed.
+To make B<nsdiff> quiet, use S<B<-v ''>>.
+
+=back
+
+The following options are passed to B<dig> to modify its SOA and AXFR
+queries:
+
+=over
+
+=item B<-b> I<address>
+
+Source address for B<dig> queries
+
+=item B<-k> I<keyfile>
+
+TSIG key file for B<dig> queries.
+
+=item B<-y> [I<hmac>:]I<name>:I<key>
+
+Literal TSIG key for B<dig> queries.
+
+=back
+
+=head1 EXIT STATUS
+
+The B<nsdiff> utility returns 0 if the zones are the same, 1 if they
+differ, and 2 if there was an error.
+
+=head1 DIAGNOSTICS
+
+=over
+
+=item C<usage: ...>
+
+=item C<not a domain name: I<E<lt>zoneE<gt>>>
+
+Errors in the command line.
+
+=item C<could not get SOA record for I<E<lt>zoneE<gt>>>
+
+Failed to retreive the zone's SOA using B<dig> when trying to obtain
+the server MNAME from which to AXFR the zone.
+
+=item C<missing SOA record>
+
+The output of B<named-compilezone> is incomplete,
+usually because the input file is erroneous.
+
+=item C<I<E<lt>zoneE<gt>> has changes>
+
+Printed instead of an B<nsupdate> script when the B<-q> option is
+used.
+
+=item C<update does not fit in packet>
+
+The changes for one domain name did not fit in 64 KiB, or the B<-1>
+option was specified and all the changes did not fit in 64 KiB.
+
+=item C<ignoring dig options when loading zones from files>
+
+Warning emitted when the command line includes options for B<dig>
+as well as zone source files.
+
+=item C<ignoring -m option when loading new zone from file>
+
+=item C<need -m option when there are no input files>
+
+The B<-m> I<server> option is required when there are no file arguments,
+and ignored otherwise.
+
+=item C<loading zone I<E<lt>zoneE<gt>> via AXFR from I<server>>
+
+=item C<loading zone I<E<lt>zoneE<gt>> from file I<file>>
+
+Normal progress messages emitted before B<nsdiff> invokes
+B<named-compilezone>, to explain the latter's diagnostics.
+
+=back
+
+=head1 EXAMPLE - DNSSEC
+
+It is easiest to deploy DNSSEC if you allow B<named> to manage zone keys
+and signatures automatically, and feed in changes to zones using DNS
+update requests. However this is very different from the traditional way
+of manually maintaining zones in standard DNS zone file format. The
+B<nsdiff> program bridges the gap between the two operational styles.
+
+To support this workflow you need BIND-9.7 or newer. You will continue
+maintaining your zone file C<$sourcefile> as before, but it is no
+longer the same as the C<$workingfile> used by B<named>. After you make
+a change, instead of using C<rndc reload $zone>, run C<nsdiff $zone
+$sourcefile | nsupdate -l>.
+
+Configure your zone as follows, to support DNSSEC and local dynamic updates:
+
+  zone $zone {
+    type primary;
+    file "$workingfile";
+    auto-dnssec maintain;
+    update-policy local;
+  };
+
+To create DNSSEC keys for your zone, change to named's working directory
+and run these commands:
+
+  dnssec-keygen -f KSK $zone
+  dnssec-keygen $zone
+
+=head1 EXAMPLE - bump-in-the-wire signing
+
+A common arrangement for DNSSEC is to have a primary server that is
+oblivious to DNSSEC, a signing server which transfers the zone from the
+primary and adds the DNSSEC records, and a number of secondary servers
+which transfer the zone from the signer and which are the public
+authoritative servers.
+
+You can implement this with B<nsdiff>, which handles the transfer of the
+zone from the primary to the signer. No modifications to the primary are
+necessary. You set up the signer as in the previous section. To transfer
+changes from the primary to the signer, run the following on the signer:
+
+  nsdiff -m $primary -s $signer $zone | nsupdate -l
+
+=head1 EXAMPLE - dynamic reverse DNS
+
+You have a reverse zone such as C<2.0.192.in-addr.arpa> which is
+mostly managed dynamically by a DHCP server, but which also has some
+static records (for network equipment, say). You can maintain the
+static part in a DNS zone file and feed any changes into the live
+dynamic zone by telling B<nsdiff> to ignore the dynamic entries. Say
+all the static equipment has IP addresses between 192.0.2.250 and
+192.0.2.255, then you can run the command pipeline:
+
+  nsdiff -i '^(?!25\d\.)' 2.0.192.in-addr.arpa 2.0.192.static |
+    nsupdate -l
+
+=head1 CAVEATS
+
+By default B<nsdiff> does not maintain the transactional semantics of
+native DNS update requests when the diff is big: it applies large changes
+in multiple update requests. To minimise the problems this may cause,
+B<nsdiff> ensures each domain name's changes are all in the same update
+request. There is still a small risk of clients not seeing a change applied
+atomically when that matters (e.g. altering an MX and creating the new
+target in the same transaction). You can avoid the risk by using the B<-1>
+option to prevent multi-packet updates, or by being careful about changes
+that depend on multiple domain names.
+
+The update requests emitted by B<nsdiff> include SOA serial number
+prerequisite checks to ensure that the zone has not changed while it is
+running. This can happen even in simple setups if B<named> happens to be
+re-signing the zone at the time you make an update. Unfortunately the DNS
+update protocol does not allow for good error reporting when a prerequisite
+check fails. You can use B<nspatch> to cope with this problem.
+
+=head1 BUGS
+
+When updating a name's DNS records, B<nsdiff> first deletes the old
+ones then adds the new ones. This ensures that CNAME replacements and
+TTL changes work correctly. However, this update strategy prevents you
+from replacing every record in a zone's apex NS RRset in one update,
+because it isn't possible to delete all a zone's name servers.
+
+=head1 VERSION
+
+  This is nsdiff-1.82 <https://dotat.at/prog/nsdiff/>
+
+  Written by Tony Finch <fanf2@cam.ac.uk> <dot@dotat.at>
+  at Cambridge University Information Services.
+  You may do anything with this. It has no warranty.
+  <https://creativecommons.org/publicdomain/zero/1.0/>
+
+=head1 ACKNOWLEDGMENTS
+
+Thanks to Mike Bristow, Piete Brooks (University of Cambridge Computer
+Laboratory), Terry Burton (University of Leicester), Owen Dunn
+(University of Cambridge Faculty of Mathematics), JP Mens, Mohamad
+Shidiq Purnama (PANDI), and Jordan Rieger (webnames.ca) for providing
+useful feedback.
+
+=head1 SEE ALSO
+
+nspatch(1), nsupdate(1), nsvi(1), dig(1),
+named(8), named-compilezone(8), perlre(1)
+
+=cut

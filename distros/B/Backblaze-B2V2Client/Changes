@@ -1,5 +1,11 @@
 Revision history for Perl extension Backblaze-B2V2Client
 
+1.2 2020-06-24T04:44:05Z
+
+    - Fix for respecting 'new_file_name' when using 'file_contents' in b2_upload_file()
+    - Doc note on B2's new S3-compatible API
+    - Doc note on using slurp_raw in Path::Tiny when using 'file_contents' in b2_upload_file()
+
 1.1 2019-05-09T04:06:37Z
 
     - Auto-create option for b2_list_buckets

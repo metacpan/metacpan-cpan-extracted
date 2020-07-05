@@ -1,8 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
-
-use HealthCheck;
+use Test2::V0 -target => 'HealthCheck',
+    qw< ok is note done_testing >;
 
 my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
@@ -49,42 +46,42 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
     my $expect = { status => 'OK' };
     my $check = sub {$expect};
 
-    is_deeply( HealthCheck->new( checks => [$check] )->check,
+    is( HealthCheck->new( checks => [$check] )->check,
         $expect, "->new(checks => [\$coderef])->check works" );
 
-    is_deeply( HealthCheck->new->register($check)->check,
+    is( HealthCheck->new->register($check)->check,
         $expect, "->new->register(\$coderef)->check works" );
 }
 
 { note "Find default method on object or class";
     my $expect = { status => 'OK' };
 
-    is_deeply( HealthCheck->new( checks => ['My::Check'] )->check,
+    is( HealthCheck->new( checks => ['My::Check'] )->check,
         $expect, "Check a class name with a check method" );
 
-    is_deeply( HealthCheck->new( checks => [ My::Check->new ] )->check,
+    is( HealthCheck->new( checks => [ My::Check->new ] )->check,
         $expect, "Check an object with a check method" );
 }
 
 { note "Find method on caller";
     my $expect = { status => 'OK', label => 'Other' };
 
-    is_deeply(
+    is(
         HealthCheck->new( checks => ['check'] )->check,
         { status => 'OK', label => 'Local' },
         "Found check method on main"
     );
 
-    is_deeply(
+    is(
         HealthCheck->new( checks => ['other_check'] )->check,
         { status => 'OK', label => 'Other Local' },
         "Found other_check method on main"
     );
 
-    is_deeply( My::Check->new->register_check->check,
+    is( My::Check->new->register_check->check,
         $expect, "Found other check method on caller object" );
 
-    is_deeply( My::Check->register_check->check,
+    is( My::Check->register_check->check,
         $expect, "Found other check method on caller class" );
 }
 
@@ -137,7 +134,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, @_ };
 
-    is_deeply(
+    is(
         HealthCheck->new( checks => [
             sub { +{ id => 'hashref', status => 'OK' } },
             { invocant => 'My::Check', check => sub { 'broken' } },
@@ -157,7 +154,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
     s/0x[[:xdigit:]]+/0xHEX/g for @warnings;
 
-    is_deeply \@warnings, [
+    is \@warnings, [
          "Invalid return from My::Check->CODE(0xHEX) (broken) $at$nl",
          "Invalid return from CODE(0xHEX) (ARRAY(0xHEX)) $at$nl",
     ], "Expected warnings";
@@ -174,7 +171,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
         delete @check{qw( invocant check )};
 
-        is_deeply(
+        is(
             \@args,
             [ %check ],
             "Without an invocant, called as a function"
@@ -190,7 +187,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         HealthCheck->new->register( \%check )->check;
 
         delete @check{qw( invocant check )};
-        is_deeply(
+        is(
             \@args,
             [ 'My::Check', %check ],
             "With an invocant, called as a method"
@@ -206,7 +203,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
         delete @check{qw( invocant check )};
 
-        is_deeply(
+        is(
             \@args,
             [ %check, custom => 'params' ],
             "Params passed to check merge with check definition"
@@ -222,7 +219,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
         delete @check{qw( invocant check )};
 
-        is_deeply(
+        is(
             \@args,
             [ %check, label => 'Check' ],
             "Params passed to check override check definition"
@@ -246,7 +243,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
                 sort keys %checks ];
     };
 
-    is_deeply $run->(), [
+    is $run->(), [
         'Cheap and Easy',
         'Default',
         'Fast and Cheap',
@@ -255,19 +252,19 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         'Invocant Can',
     ], "Without specifying any desired tags, should run all checks";
 
-    is_deeply $run->('default'), [ 'Default' ],
+    is $run->('default'), [ 'Default' ],
         'Default tag runs untagged checks';
 
-    is_deeply $run->('fast'), [ 'Fast and Cheap', 'Fast and Easy', ],
+    is $run->('fast'), [ 'Fast and Cheap', 'Fast and Easy', ],
         "Fast tag runs fast checks";
 
-    is_deeply $run->(qw( hard default )), ['Default', 'Hard'],
+    is $run->(qw( hard default )), ['Default', 'Hard'],
         "Specifying hard and default tags runs checks that match either";
 
-    is_deeply $run->(qw( invocant )), ['Invocant Can'],
+    is $run->(qw( invocant )), ['Invocant Can'],
         "Pick up tags if invocant can('tags')";
 
-    is_deeply $run->('!hard'), [
+    is $run->('!hard'), [
         'Cheap and Easy',
         'Default',
         'Fast and Cheap',
@@ -275,10 +272,10 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         'Invocant Can'
     ], "Not-hard tag runs not-hard checks";
 
-    is_deeply $run->(qw(fast !easy)), [ 'Fast and Cheap' ],
+    is $run->(qw(fast !easy)), [ 'Fast and Cheap' ],
         "Specyfying fast but not easy runs non-easy fast tests";
 
-    is_deeply $run->(qw( nonexistent )), [],
+    is $run->(qw( nonexistent )), [],
         "Specifying a tag that doesn't match means no checks are run";
 }
 
@@ -309,7 +306,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
             ),
         ] );
 
-    is_deeply $c->check, {
+    is $c->check, {
         'id'      => 'main',
         'status'  => 'CRITICAL',
         'tags'    => ['default'],
@@ -347,13 +344,13 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         ],
     }, "Default check runs all checks";
 
-    is_deeply $c->check( tags => ['default'] ), {
+    is $c->check( tags => ['default'] ), {
         'id'     => 'main',
         'tags'   => ['default'],
         'status' => 'OK',
     }, "Check with 'default' tags runs only untagged check";
 
-    is_deeply $c->check( tags => ['easy'] ), {
+    is $c->check( tags => ['easy'] ), {
         'id'      => 'main',
         'status'  => 'OK',
         'tags'    => ['default'],
@@ -374,7 +371,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         # Because the "subcheck" doesn't have a "hard" tag
         # it doesn't get run, so none of its checks get run
         # so there are no results.
-        is_deeply $c->check( tags => ['hard'] ),
+        is $c->check( tags => ['hard'] ),
             {
             'id'      => 'main',
             'tags'    => ['default'],
@@ -460,7 +457,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         ],
     );
 
-    is_deeply $c->check, {
+    is $c->check, {
         'id'      => 'main',
         'label'   => 'Main',
         'tags'    => ['main'],
@@ -511,7 +508,7 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 { note "Check that throws exception";
     my $check = sub { die "ded\n" };
     my $hc = HealthCheck->new( checks => [ $check, sub { status => 'OK' } ] );
-    is_deeply
+    is
         $hc->check,
         {
             results => [

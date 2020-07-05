@@ -37,7 +37,7 @@ sub on_destroy ( $scalar, $cb ) {
 }
 
 sub is_bool : prototype($) {
-    return ( is_ref $_[0] && UNIVERSAL::isa( $_[0], JSON::PP::Boolean:: ) ) || ( exists $INC{'Types/Serialiser.pm'} && Types::Serialiser::is_bool( $_[0] ) );
+    return ( is_ref $_[0] && ( UNIVERSAL::isa( $_[0], JSON::PP::Boolean:: ) || UNIVERSAL::isa( $_[0], "Data::MessagePack::Boolean" ) ) ) || ( exists $INC{'Types/Serialiser.pm'} && Types::Serialiser::is_bool( $_[0] ) );
 }
 
 sub is_path : prototype($) { return is_blessed_hashref $_[0] && $_[0]->isa('Pcore::Util::Path') }
@@ -56,6 +56,8 @@ sub is_res : prototype($) { return is_blessed_hashref $_[0] && $_[0]->can('IS_PC
 ## |    3 | 16                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 40                   | BuiltinFunctions::ProhibitUniversalIsa - UNIVERSAL::isa should not be used as a function                       |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 40                   | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

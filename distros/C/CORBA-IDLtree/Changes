@@ -1,5 +1,31 @@
 Revision history for CORBA-IDLtree
 
+2.04    2020/06/20
+        * In sub Parse_File_i case $file case $emucpp open $in
+          with encoding(UTF-8) to ensure that IDL files are parsed
+          as utf8.
+        * New sub discard_bom discards a possible Unicode or UTF-8
+          BOM (Byte Order Mark) at the start of the given line.
+          In sub get_items add optional argument $firstline.
+          If $firstline is given and true then discard_bom will be
+          called on the first line read from file.
+          In sub Parse_File_i outer while-loop add local
+          $firstline for call to sub get_items.
+        * New sub has_default_branch checks whether the given union
+          subordinates contain a DEFAULT branch.  This fixes a bug
+          related to checking that a union has an enum type as its
+          switch and does not have a default branch.
+          A false warning was generated in case the default branch
+          was preceded by a comment.
+        * Improvements to preprocessor emulation:
+          - Support "#if defined XYZ" without parentheses around
+            the symbol.  Fix evaluation of the symbol.
+          - Do not attempt evaluating preprocessor directives when
+            inside multi line comments.
+          - Fix handling of #endif in nested #if/#ifdef/#ifndef.
+        * In @annoDefs add java_mapping annotations defined by the
+          IDL4 to Java mapping proposal.
+
 2.03    2019/04/27
         * Fixed a bug related to Dump_Symbols whereby when using
           a string array ref as the optional argument, repeated

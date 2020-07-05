@@ -26,18 +26,16 @@ sub new
 {
     my ( $class, %self ) = @_;
 
-    map{ die "$_ undef" unless $self{$_} }qw( conf code name );
+    map{ die "$_ undef" unless $self{$_} }qw( conf code name run );
     $0 = "MYDan.monitorv2.collector.$self{name}";
+
+    $self{tmp} = "$self{run}/$self{name}";
     $self{config} = eval{ YAML::XS::LoadFile "$self{conf}/$self{name}" };
     die "load fail:$@" if $@;
 
     map{ die "$_ undef" unless $self{config}{$_} }qw( code interval target param );
     $self{code} = do "$self{code}/$self{config}{code}";
     die "load code fail" unless $self{code} && ref $self{code} eq 'CODE';
-
-    my $option = MYDan::Util::OptConf->load();
-    $self{range} = MYDan::Node->new( $option->dump( 'range' ) );
-    $self{cache} = MYDan::Node::DBI::Cache->new( $option->{range}{cache} );
 
     bless \%self, ref $class || $class;
 }
@@ -51,8 +49,18 @@ sub run
     while( 1 )
     {
         my $time = time;
-        my ( $config, $code, $range, $cache ) = @$this{qw( config code range cache )};
+        my ( $config, $code, $conf, $name, $tmp ) = @$this{qw( config code conf name tmp )};
 
+        print "check config: begin.\n";
+        my $newconfig = eval{ YAML::XS::LoadFile "$conf/$name" };
+        die "load config $conf/$name: $@\n" if $@;
+        die "config has been updated. exit.\n" 
+            unless ( YAML::XS::Dump $newconfig ) eq ( YAML::XS::Dump $config );
+        print "check config: done.\n";
+
+        my $option = MYDan::Util::OptConf->load();
+        my $range = MYDan::Node->new( $option->dump( 'range' ) );
+        my $cache = MYDan::Node::DBI::Cache->new( $option->{range}{cache} );
 
         print "batch: begin.\n";
 	    my @node = $range->load( $config->{target} )->list;
@@ -60,7 +68,9 @@ sub run
 
 
         print "collector: begin.\n";
-        my %err = &$code( %{$config->{param}}, node => \@node );
+        my %err = @node
+                   ? &$code( %{$config->{param}}, node => \@node )
+                   : ( 'mydan.monitorv2###sys###err' => 'NoNode' );
         print "collector: done.\n";
 
         print "analysis: begin.\n";
@@ -139,7 +149,11 @@ sub run
             }
         }
 
-        print "analysis: done.\n";
+        print "dump: begin.\n";
+        eval{ YAML::XS::DumpFile $tmp, \%err };
+        print "Dump Fail: $@\n" if $@;
+        print YAML::XS::Dump \%err;
+        print "dump: done.\n";
 
   	    my $due = $time + $config->{interval} - time;
 		sleep $due if $due > 0;

@@ -402,6 +402,7 @@ void alt_lucas_seq(mpz_t Uh, mpz_t Vl, mpz_t n, IV P, IV Q, mpz_t k,
 
   for (j = b; j > s; j--) {
     mpz_mul(Ql, Ql, Qh);
+    mpz_mod(Ql, Ql, n);
     if (mpz_tstbit(k, j)) {
       mpz_mul_si(Qh, Ql, Q);
       mpz_mul(Uh, Uh, Vh);
@@ -626,6 +627,7 @@ int proth(mpz_t N)
   mpz_t v, k, a;
   UV n;
   int i, res = -1;
+  /* TODO: Should have a flag to skip pretests */
   if (mpz_cmp_ui(N,100) <= 0) return (_GMP_is_prob_prime(N) ? 2 : 0);
   if (mpz_even_p(N) || mpz_divisible_ui_p(N, 3)) return 0;
   mpz_init(v); mpz_init(k);
@@ -649,6 +651,8 @@ int proth(mpz_t N)
     }
     mpz_clear(a);
   }
+  /* TODO: look into Rao (2018): k*2^n+1 for n>1, k prime */
+  /* if (n > 1 && res == -1 && _GMP_BPSW(k)) { ... } */
   mpz_clear(k); mpz_clear(v);
   if (res != -1 && get_verbose_level() > 1) printf("N shown %s with Proth\n", res ? "prime" : "composite");
   fflush(stdout);

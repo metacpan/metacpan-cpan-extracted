@@ -1,5 +1,5 @@
 package XML::Grammar::Vered;
-
+$XML::Grammar::Vered::VERSION = '0.0.12';
 use strict;
 use warnings;
 
@@ -11,8 +11,6 @@ use MooX qw/late/;
 
 use XML::GrammarBase::Role::RelaxNG v0.2.2;
 use XML::GrammarBase::Role::XSLT v0.2.2;
-
-our $VERSION = 'v0.0.9';
 
 with('XML::GrammarBase::Role::RelaxNG');
 with XSLT( output_format => 'docbook' );
@@ -40,7 +38,7 @@ XML::Grammar::Vered - a vered by any other name will translate as sweet.
 
 =head1 VERSION
 
-version 0.0.10
+version 0.0.12
 
 =head1 SYNOPSIS
 
@@ -73,10 +71,6 @@ Vered gets translated to DocBook 5/XML, and from there to other formats.
 “Vered” is the Hebrew word for “a rose”, and I came up with the name because
 I did not know what to call this format, and thought of “a rose by any other
 name will smell as sweet”.
-
-=head1 VERSION
-
-version 0.0.10
 
 =head1 EXAMPLE
 
@@ -193,36 +187,9 @@ version 0.0.10
         </body>
     </document>
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2013 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/XML-Grammar-Vered/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc XML::Grammar::Vered
 
 =head2 Websites
 
@@ -241,35 +208,11 @@ L<https://metacpan.org/release/XML-Grammar-Vered>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/XML-Grammar-Vered>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=XML-Grammar-Vered>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/XML-Grammar-Vered>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/XML-Grammar-Vered>
 
 =item *
 
@@ -320,5 +263,26 @@ from your repository :)
 L<https://github.com/shlomif/XML-Grammar-Vered>
 
   git clone git://github.com/shlomif/XML-Grammar-Vered.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/XML-Grammar-Vered/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

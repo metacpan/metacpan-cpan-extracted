@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth;
-our $VERSION = '1.061';
+our $VERSION = '1.064';
 # ABSTRACT: Add one or more authentication plugins to your site
 
 #pod =head1 SYNOPSIS
@@ -400,7 +400,7 @@ Yancy::Plugin::Auth - Add one or more authentication plugins to your site
 
 =head1 VERSION
 
-version 1.061
+version 1.064
 
 =head1 SYNOPSIS
 

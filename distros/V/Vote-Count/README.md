@@ -4,10 +4,6 @@
 
 Provides a Toolkit for implementing multiple voting systems, allowing a wide range of method options. This library allows the creation of election resolution methods matching a set of Election Rules that are written in an organization's governing rules, and not requiring the bylaws to specify the rules of the software that will be used for the election, especially important given that many of the other libraries available do not provide a bylaws compatible explanation of their process.
 
-This is also extremely useful to researchers who may want to study multiple methods and variations of methods.
-
-# Synopsis
-
   use 5.022; # Minimum Perl, or any later Perl.
   use feature qw /postderef signatures/;
 
@@ -35,6 +31,7 @@ This is also extremely useful to researchers who may want to study multiple meth
   my $Winner = $CondorcetElection->RunCondorcetDropping( $SmithSet )->{'winner'};
 
   # Create an object for IRV, use the same Floor as Condorcet
+
   my $IRVElection = Vote::Count->new(
     'BallotSet' => $ballotset,
     'Active' => $ChoicesAfterFloor );
@@ -54,16 +51,16 @@ This is also extremely useful to researchers who may want to study multiple meth
   # Now print the logs and winning information.
   say $CondorcetElection->logv();
   say $IRVElection->logv();
-  say '******************';
+  say '*'x60;
   say "Plurality Winner: $PluralityWinner->{'winner'}";
   say "IRV Winner: $IRVResult->{'winner'}";
-  say "Winner: $Winner";
+  say "Condorcet Winner: $Winner";
 
 # Overview
 
 ## Brief Review of Voting Methods
 
-Several alternatives have been proposed to the simple vote for a single choice method that has been used in most elections for a single member. In addition a number of different methods have been used for multiple members. For alternative single member voting, the three common alternatives are *Approval* (voters indicate all choices that they approve of), *Ranked Choice* (Voters rank the choices), and *Score* also known as *Range* (A Ranked Choice Ballot where the number of rankings is limited but voters may rank more than 1 choice at each rank).
+Several alternatives have been proposed to the simple vote for a single choice method that has been used in most elections for a single member. In addition a number of different methods have been used for multiple members. For alternative single member voting, the three common alternatives are *Approval* (voters indicate all choices that they approve of), *Ranked Choice* (Voters rank the choices), and *Score* also known as *Range* (voters give choices a score according to a scale).
 
 *Vote for One* ballots may be resolved by one of two methods: *Majority* and *Plurality*. Majority vote requires a majority of votes to win (but frequently produces no winner), and Plurality which selects the choice with the most votes.
 
@@ -152,15 +149,15 @@ The basic Condorcet Method will frequently fail to identify a winner. One possib
 
 ### Range (Score) Voting Systems
 
-Most Methods for Ranked Choice Ballots can be used for Range Ballots. Incentive for Strategic Voting
+Most Methods for Ranked Choice Ballots can be used for Range Ballots.
 
 Score Voting proposals typically implement *Borda Count*, with a fixed depth of choices. *STAR*, creates a virtual runoff between the top two *Borda Count* Choices.
 
-Advocates claim that this Ballot Style is a better expression of voter preference. Where it shows a clear advantage is in allowing Voters to directly mitigate Later Harm by ranking a strongly favored choice with the highest score and weaker choices with the lowest.
+Advocates claim that this Ballot Style is a better expression of voter preference. Where it shows a clear advantage is in allowing Voters to directly mitigate Later Harm by ranking a strongly favored choice with the highest score and weaker choices with the lowest. The downside to this strategy is that the voter is giving little help to later choices reaching the automatic runoff. Given a case with two roughly equal main factions, where one faction give strong support to all of its options, and the other faction's supporters give weak support to all later choices; the runoff will be between the two best choices of the first faction, even if the choices of the second faction all defeat any of the first's choices in pairwise comparison.
 
-The Range Ballot resolves the Borda weighting problem and allows the voter to manage the later harm effect, so it is clearly the better choice for Borda. Condorcet and IRV can resolve Range Ballots, but ignore the extra information and would prefer strict ordinality (not allowing equal ranking).
+The Range Ballot resolves the Borda weighting problem and allows the voter to manage the later harm effect, so it is clearly a better choice than Borda. Condorcet and IRV can resolve Range Ballots, but ignore the extra information and would prefer strict ordinality (not allowing equal ranking).
 
-Voters may find the Range Ballot to be more complex than the Ranked Choices Ballot.
+Voters may find the Range Ballot to be more complex than the Ranked Choice Ballot.
 
 # Objective and Motivation
 
@@ -211,7 +208,7 @@ When logging from your methods, use logt for events that produce a summary, use 
 
 ### Active Sets
 
-Active sets are typically represented as a Hash Reference where the keys represent the active choices, the values are ignored. The VoteCount Object contains an Active Set which can be Accessed or set via the ->Active() method. The ->GetActive and ->SetActive methods are preferred because they break the reference link between the object's copy and the external copy of the Active set.
+Active sets are typically represented as a Hash Reference where the keys represent the active choices and the value is true. The VoteCount Object contains an Active Set which can be Accessed or set via the ->Active() method. The ->GetActive and ->SetActive methods are preferred because they break the reference link between the object's copy and the external copy of the Active set.
 
 Most Components will take an argument for $activeset or default to the current Active set of the Vote::Count object, which will default to the Choices defined in the BallotSet.
 
@@ -221,6 +218,14 @@ Most Components will take an argument for $activeset or default to the current A
 
 * Active: Set or Get Active Set as HashRef
 
+* ResetActive: Sets the Active Set to the full choices list of the BallotSet.
+
+* SetActive: Sets the Active Set to provided HashRef. Using the Active method may preserve a reference between the Active Set and the HashRef, SetActive will not. The values to the hashref should evaluate as True.
+
+* SetActiveFromArrayRef: Same as SetActive except it takes an ArrayRef of the choices to be set as Active.
+
+
+
 * BallotSet: Get BallotSet
 
 * PairMatrix: Get a Matrix Object for the Active Set. Generated and cached on the first request.
@@ -228,6 +233,8 @@ Most Components will take an argument for $activeset or default to the current A
 * UpdatePairMatrix: Regenerate and cache Matrix with current Active Set.
 
 * VotesCast: Returns the number of votes cast.
+
+* VotesActive: Returns the number of non-exhausted ballots based on the current Active Set.
 
 ## Components
 

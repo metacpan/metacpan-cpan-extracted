@@ -1,3 +1,14 @@
+2.08 - 2020-06-23
+
+    * RT #129387: IPC::SysV memory operations limited to 31-bit offsets
+      I've made an attempt to fix this by simply replacing `int`
+      argument types with `UV`. This *should* work, but I've only
+      tested that it doesn't break any of the existing tests.
+    * Merged PR #7: Add strict and warnings to the test suite
+    * Merged PR #6: Add GitHub CI
+    * Merged PR #3: Switch IPC::SysV to XSLoader
+    * Merged PR #4: dont require ppport.h to build when inside perl core
+
 2.07 - 2016-05-09
 
     * CPAN #112827: incorrect skip count in t/ipcsysv.t

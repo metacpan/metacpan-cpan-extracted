@@ -11,6 +11,8 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 AO
+Adlam
+Adlm
 Aghem
 Ahad
 Ajé
@@ -46,6 +48,7 @@ Base
 Belarusian
 Bemba
 Bena
+Beng
 Bh
 Bhm
 Bhms
@@ -65,6 +68,7 @@ Ceuta
 Chakma
 Chiga
 Chiini
+Chiki
 Chiposi
 Chumapiri
 Chumatato
@@ -85,6 +89,7 @@ Data
 DateTime
 Dave
 Deseret
+Deva
 DiLuain
 Dilbata
 Dimingu
@@ -290,8 +295,10 @@ Maarten
 Macau
 Machame
 Magyarország
+Maithili
 Makhuwa
 Makonde
+Manipuri
 Mantaxtsees
 Marino
 Mayen
@@ -341,6 +348,8 @@ Nyankole
 Nynorsk
 Occitan
 Odia
+Ol
+Olck
 Oromo
 Orwokubanza
 Ossetic
@@ -386,6 +395,7 @@ Sanass
 Sanbata
 Sango
 Sangu
+Santali
 Sanyo
 Sayass
 Sena
@@ -790,6 +800,19 @@ fa_IR
 feira
 fera
 ff
+ff_Adlm
+ff_Adlm_BF
+ff_Adlm_CM
+ff_Adlm_GH
+ff_Adlm_GM
+ff_Adlm_GN
+ff_Adlm_GW
+ff_Adlm_LR
+ff_Adlm_MR
+ff_Adlm_NE
+ff_Adlm_NG
+ff_Adlm_SL
+ff_Adlm_SN
 ff_Latn
 ff_Latn_BF
 ff_Latn_CM
@@ -981,7 +1004,8 @@ ko_KR
 kok
 kok_IN
 ks
-ks_IN
+ks_Arab
+ks_Arab_IN
 ksb
 ksb_TZ
 ksf
@@ -1046,6 +1070,8 @@ lyatatu
 maanantai
 maanantaina
 maandag
+mai
+mai_IN
 mandag
 mas
 mas_KE
@@ -1074,6 +1100,9 @@ mm'min'ss
 mmss
 mn
 mn_MN
+mni
+mni_Beng
+mni_Beng_IN
 moandei
 mohammad
 mok
@@ -1081,6 +1110,7 @@ mr
 mr_IN
 ms
 ms_BN
+ms_ID
 ms_MY
 ms_SG
 mt
@@ -1154,6 +1184,8 @@ pa_Arab
 pa_Arab_PK
 pa_Guru
 pa_Guru_IN
+pcm
+pcm_NG
 pekan
 pirmadienis
 pirmdiena
@@ -1223,11 +1255,17 @@ saka
 samedi
 saq
 saq_KE
+sat
+sat_Olck
+sat_Olck_IN
 sav
 sbp
 sbp_TZ
 sd
-sd_PK
+sd_Arab
+sd_Arab_PK
+sd_Deva
+sd_Deva_IN
 se
 se_FI
 se_NO
@@ -1290,6 +1328,9 @@ sr_Latn_ME
 sr_Latn_RS
 sr_Latn_XK
 ss
+su
+su_Latn
+su_Latn_ID
 sublasses
 sunnudagur
 sv

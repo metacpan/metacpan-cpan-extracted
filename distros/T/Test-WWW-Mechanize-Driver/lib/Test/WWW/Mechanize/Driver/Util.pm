@@ -170,7 +170,7 @@ sub HAS {
 
  Dean Serenevy
  dean@serenevy.net
- http://dean.serenevy.net/
+ https://serenevy.net/
 
 =head1 COPYRIGHT
 

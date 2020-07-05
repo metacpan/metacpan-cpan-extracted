@@ -1,5 +1,4 @@
 #pragma once
-#include "../Debug.h"
 #include "../forward.h"
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
@@ -8,7 +7,7 @@
 
 namespace panda { namespace unievent { namespace ssl {
 
-extern log::Module ssllog; // definition is in SslFilter.cc
+extern log::Module panda_log_module;
 
 #ifdef LIBRESSL_VERSION_NUMBER
 #  define _PATCH_BIO 1
@@ -66,13 +65,13 @@ struct SslBio {
 
     static void set_buf (BIO* bio, const string& buf) {
         membuf_t* b = (membuf_t*) BIO_get_data(bio);
-        panda_mlog_debug(ssllog, bio << " len=" << buf.length() << ", was=" << b->buf.length());
+        panda_log_debug(bio << " len=" << buf.length() << ", was=" << b->buf.length());
         b->buf += buf;
     }
 
     static string steal_buf (BIO* bio) {
         membuf_t* b = (membuf_t*) BIO_get_data(bio);
-        panda_mlog_debug(ssllog, bio << " len=" << b->buf.length());
+        panda_log_debug(bio << " len=" << b->buf.length());
         string ret;
         ret.swap(b->buf);
         return ret;

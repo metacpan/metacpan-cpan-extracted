@@ -1,2 +1,0 @@
-[2397] error @0.317560> [hit #4]request to GET /login crashed: no metadata at ../lib/Net/SAML2/IdP.pm line 33. in /usr/share/perl5/vendor_perl/Dancer/Handler.pm l. 98
-[2397] error @0.003470> [hit #7]request to GET /login crashed: no metadata at ../lib/Net/SAML2/IdP.pm line 33. in /usr/share/perl5/vendor_perl/Dancer/Handler.pm l. 98

@@ -6,7 +6,6 @@ use lib qw(lib ../lib);
 
 use MyTracer;
 use OpenTracing::GlobalTracer qw/$T/;
-use Time::HiRes qw/sleep/;
 
 sub sleep_rand { sleep rand shift }
 

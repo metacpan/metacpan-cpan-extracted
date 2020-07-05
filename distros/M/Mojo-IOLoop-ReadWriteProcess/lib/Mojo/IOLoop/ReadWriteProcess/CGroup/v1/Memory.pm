@@ -99,10 +99,10 @@ sub swappiness     { shift->cgroup->_setget(SWAPPINESS_INTERFACE,     @_) }
 sub move_charge {
   shift->cgroup->_setget(MOVE_CHARGE_AT_IMMIGRATE_INTERFACE, @_);
 }
-sub oom_control { shift->cgroup->_setget(OOM_CONTROL_INTERFACE, @_) }
-sub numa_stat   { shift->cgroup->_list(NUMA_STAT_INTERFACE) }
-sub kmem_limit  { shift->cgroup->_setget(KMEM_LIMIT_INTERFACE,  @_) }
-sub kmem_usage  { shift->cgroup->_list(KMEM_USAGE_INTERFACE) }
+sub oom_control        { shift->cgroup->_setget(OOM_CONTROL_INTERFACE, @_) }
+sub numa_stat          { shift->cgroup->_list(NUMA_STAT_INTERFACE) }
+sub kmem_limit         { shift->cgroup->_setget(KMEM_LIMIT_INTERFACE, @_) }
+sub kmem_usage         { shift->cgroup->_list(KMEM_USAGE_INTERFACE) }
 sub kmem_failcnt       { shift->cgroup->_list(KMEM_FAILCNT_INTERFACE) }
 sub kmem_max_usage     { shift->cgroup->_list(KMEM_MAX_RECORDED_INTERFACE) }
 sub kmem_tcp_limit     { shift->cgroup->_setget(KMEM_TCP_LIMIT_INTERFACE, @_) }

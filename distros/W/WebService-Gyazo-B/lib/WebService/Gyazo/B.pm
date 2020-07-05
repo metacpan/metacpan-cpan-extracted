@@ -10,7 +10,7 @@ use LWP::Protocol::socks;
 use HTTP::Request::Common;
 use URI::Simple;
 
-our $VERSION = '0.0405';
+our $VERSION = '0.0406';
 
 my %PROXY_PROTOCOLS = (map { $_ => 1 } qw(http https socks socks4));
 
@@ -151,7 +151,7 @@ WebService::Gyazo::B - a Perl image upload library for gyazo.com
 
 =head1 VERSION
 
-version 0.0405
+version 0.0406
 
 =head1 SYNOPSIS
 
@@ -272,14 +272,15 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-Gyazo-B or by email to
-bug-webservice-gyazo-b@rt.cpan.org.
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-Gyazo-B> or by email
+to
+L<bug-webservice-gyazo-b@rt.cpan.org|mailto:bug-webservice-gyazo-b@rt.cpan.org>.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -302,15 +303,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/WebService-Gyazo-B>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/WebService-Gyazo-B>
+L<https://metacpan.org/release/WebService-Gyazo-B>
 
 =item *
 
@@ -319,30 +312,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=WebService-Gyazo-B>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/WebService-Gyazo-B>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/WebService-Gyazo-B>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/WebService-Gyazo-B>
 
 =item *
 
@@ -356,7 +325,7 @@ L<http://cpants.cpanauthors.org/dist/WebService-Gyazo-B>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/W/WebService-Gyazo-B>
 

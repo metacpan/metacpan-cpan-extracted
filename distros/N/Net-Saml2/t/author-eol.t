@@ -27,6 +27,7 @@ my @files = (
     'lib/Net/SAML2/Protocol/LogoutResponse.pm',
     'lib/Net/SAML2/Role/ProtocolMessage.pm',
     'lib/Net/SAML2/SP.pm',
+    'lib/Net/SAML2/Util.pm',
     'lib/Net/SAML2/XML/Sig.pm',
     'lib/Net/SAML2/XML/Util.pm',
     't/00-basic.t',
@@ -53,6 +54,8 @@ my @files = (
     't/cacert.pem',
     't/idp-metadata.xml',
     't/idp-metadata2.xml',
+    't/lib/Test/Net/SAML2.pm',
+    't/lib/Test/Net/SAML2/Util.pm',
     't/release-trailing-space.t',
     't/sign-nopw-cert.pem'
 );

@@ -2,7 +2,7 @@ NAME
     App::BloomUtils - Utilities related to bloom filters
 
 VERSION
-    This document describes version 0.004 of App::BloomUtils (from Perl
+    This document describes version 0.006 of App::BloomUtils (from Perl
     distribution App-BloomUtils), released on 2020-05-24.
 
 DESCRIPTION

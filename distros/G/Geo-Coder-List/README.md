@@ -1,25 +1,23 @@
-[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-List.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-List)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/naayd09612e10llw/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-list/branch/master)
-[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-List/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-List?branch=master)
-[![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-List/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-List)
-[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-List.svg)](http://search.cpan.org/~nhorne/Geo-Coder-List/)
-
+-[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-List.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-List)
+-[![Windows Build status](https://ci.appveyor.com/api/projects/status/naayd09612e10llw/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-list/branch/master)
+-[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-List/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-List?branch=master)
+-[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-List.svg)](https://metacpan.org/release/Geo-Coder-List)
 # NAME
 
 Geo::Coder::List - Call many Geo-Coders
 
 # VERSION
 
-Version 0.26
+Version 0.27
 
 # SYNOPSIS
 
-[Geo::Coder::All](https://metacpan.org/pod/Geo::Coder::All)
+[Geo::Coder::All](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AAll)
 and
-[Geo::Coder::Many](https://metacpan.org/pod/Geo::Coder::Many)
+[Geo::Coder::Many](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AMany)
 are great routines but neither quite does what I want.
 This module's primary use is to allow many backends to be used by
-[HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML::GoogleMaps::V3)
+[HTML::GoogleMaps::V3](https://metacpan.org/pod/HTML%3A%3AGoogleMaps%3A%3AV3)
 
 # SUBROUTINES/METHODS
 
@@ -29,6 +27,9 @@ Creates a Geo::Coder::List object.
 
 Takes an optional argument 'cache' which takes an cache object that supports
 get() and set() methods.
+Takes an optional argument 'debug',
+the higher the number,
+the more debugging.
 The licences of some geo coders,
 such as Google,
 specifically prohibit caching API calls,
@@ -71,7 +72,7 @@ and OpenStreetMap for other places:
 ## geocode
 
 Runs geocode on all of the loaded drivers.
-See [Geo::Coder::GooglePlaces::V3](https://metacpan.org/pod/Geo::Coder::GooglePlaces::V3) for an explanation
+See [Geo::Coder::GooglePlaces::V3](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces%3A%3AV3) for an explanation
 
 The name of the Geo-Coder that gave the result is put into the geocode element of the
 return value, if the value was retrieved from the cache the value will be undefined.
@@ -118,18 +119,18 @@ Nigel Horne, `<njh at bandsman.co.uk>`
 
 Please report any bugs or feature requests to `bug-geo-coder-list at rt.cpan.org`,
 or through the web interface at
-[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List).
+[https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List).
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 reverse\_geocode() doesn't update the logger.
-reverse\_geocode() should support [Geo::Location::Point](https://metacpan.org/pod/Geo::Location::Point) objects.
+reverse\_geocode() should support [Geo::Location::Point](https://metacpan.org/pod/Geo%3A%3ALocation%3A%3APoint) objects.
 
 # SEE ALSO
 
-[Geo::Coder::All](https://metacpan.org/pod/Geo::Coder::All)
-[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo::Coder::GooglePlaces)
-[Geo::Coder::Many](https://metacpan.org/pod/Geo::Coder::Many)
+[Geo::Coder::All](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AAll)
+[Geo::Coder::GooglePlaces](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGooglePlaces)
+[Geo::Coder::Many](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AMany)
 
 # SUPPORT
 
@@ -141,18 +142,18 @@ You can also look for information at:
 
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List)
 
 - CPAN Ratings
 
-    [http://cpanratings.perl.org/d/Geo-Coder-List](http://cpanratings.perl.org/d/Geo-Coder-List)
+    [https://cpanratings.perl.org/d/Geo-Coder-List](https://cpanratings.perl.org/d/Geo-Coder-List)
 
-- Search CPAN
+- MetaCPAN
 
-    [http://search.cpan.org/dist/Geo-Coder-List/](http://search.cpan.org/dist/Geo-Coder-List/)
+    [https://metacpan.org/release/Geo-Coder-List](https://metacpan.org/release/Geo-Coder-List)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016-2019 Nigel Horne.
+Copyright 2016-2020 Nigel Horne.
 
 This program is released under the following licence: GPL2

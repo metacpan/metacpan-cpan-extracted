@@ -1,5 +1,9 @@
 Revision history for Win32::LongPath
 
+2.1 June 29, 2020
+	- (vadim-160102) return error if opendirL fails
+	- added test for opendirL failure
+
 2.0 February 15, 2018
 	- changed retrieval of Perl file handle
 	- added sysopenL ()

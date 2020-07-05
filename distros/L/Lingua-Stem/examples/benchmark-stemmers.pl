@@ -1,4 +1,4 @@
-#!/opt/bin/perl
+#!/usr/bin/perl
 
 #########################
 # Usage: ./benchmark-stemmers.pl voc.txt
@@ -155,34 +155,34 @@ if ($snowball) {
     printf  "Lingua::Stem, one batch, cache level 2:                 %8s words/second\n", int($n/$elapsed);
 }
 
-# Word by word, Lingua::Stem, with caching
+# Word by word, Lingua::Stem::En, with caching
 {
     Lingua::Stem::En::stem_caching({ -level => 2});
     my $start_time = [gettimeofday];
     for (my $i = 0; $i < $loops; $i++) { 
         foreach my $w (@word_list) {
-            my ($result) = Lingua::Stem::En::stem($w);
+            my ($result) = Lingua::Stem::En::stem({ -words => [$w] });
         }
     }
     my $elapsed = tv_interval($start_time);
-    printf  "Lingua::Stem, one word at a time, cache level 2:        %8s words/second\n", int($n/$elapsed);
+    printf  "Lingua::Stem::En, one word at a time, cache level 2:        %8s words/second\n", int($n/$elapsed);
 }
 
-# Processed in batches with caching, Lingua::Stem
+# Processed in batches with caching, Lingua::Stem:En
 {
     Lingua::Stem::En::stem_caching({ -level => 2});
     my $start_time = [gettimeofday];
     for (my $i = 0; $i < $loops; $i++) { 
-        my ($result) = Lingua::Stem::En::stem(@word_list);
+        my ($result) = Lingua::Stem::En::stem({ -words => \@word_list });
     }
     my $elapsed = tv_interval($start_time);
-    printf  "Lingua::Stem, %6s word batches, cache level 2:       %8s words/second\n", $n_words, int($n/$elapsed);
+    printf  "Lingua::Stem::En, %6s word batches, cache level 2:       %8s words/second\n", $n_words, int($n/$elapsed);
 }
-# Processed in one batch with caching, Lingua::Stem
+# Processed in one batch with caching, Lingua::Stem::En
 {
     Lingua::Stem::En::stem_caching({ -level => 2});
     my $start_time = [gettimeofday];
-    my ($result) = Lingua::Stem::En::stem(@big_word_list);
+    my ($result) = Lingua::Stem::En::stem({ -words => \@big_word_list });
     my $elapsed = tv_interval($start_time);
-    printf  "Lingua::Stem, one batch, cache level 2:                 %8s words/second\n", int($n/$elapsed);
+    printf  "Lingua::Stem::En, one batch, cache level 2:                 %8s words/second\n", int($n/$elapsed);
 }

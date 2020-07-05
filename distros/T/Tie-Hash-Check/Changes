@@ -1,3 +1,11 @@
+0.09 2020-06-20T18:11:33+02:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.08 2016-08-27T10:51:31+02:00
  - Update minimum Perl version to right Module::Install way. Fix number?
 

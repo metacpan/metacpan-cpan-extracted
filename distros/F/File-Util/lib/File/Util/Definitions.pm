@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package File::Util::Definitions;
-$File::Util::Definitions::VERSION = '4.161950';
+$File::Util::Definitions::VERSION = '4.201720';
 # ABSTRACT: Global symbols and constants used in most File::Util classes
 
 use Fcntl qw( :flock );
@@ -183,7 +183,7 @@ File::Util::Definitions - Global symbols and constants used in most File::Util c
 
 =head1 VERSION
 
-version 4.161950
+version 4.201720
 
 =head1 DESCRIPTION
 

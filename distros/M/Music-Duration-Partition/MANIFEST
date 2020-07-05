@@ -8,6 +8,8 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/drum-fills
+eg/drum-fills-advanced
 eg/figured-bass
 eg/motif
 eg/shuffle

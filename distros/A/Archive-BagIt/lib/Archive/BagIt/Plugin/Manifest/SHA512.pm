@@ -4,14 +4,14 @@ use warnings;
 #ABSTRACT: The md5 plugin (default)
 package Archive::BagIt::Plugin::Manifest::SHA512;
 
-use Moose;
+use Moo;
 with 'Archive::BagIt::Role::Manifest';
 
 
 use Digest::SHA;
 use Sub::Quote;
 
-has 'plugin_name' => (
+has '+plugin_name' => (
     is => 'ro',
     default => 'Archive::BagIt::Plugin::Manifest::SHA512',
 );
@@ -24,7 +24,7 @@ has 'manifest_files' => (
     is => 'ro',
 );
 
-has 'algorithm' => (
+has '+algorithm' => (
     is => 'rw',
 );
 
@@ -60,7 +60,15 @@ Archive::BagIt::Plugin::Manifest::SHA512 - The md5 plugin (default)
 
 =head1 VERSION
 
-version 0.055
+version 0.058
+
+=head1 NAME
+
+Archive::BagIt::Plugin::Manifest::SHA512 - The md5 plugin (default)
+
+=head1 VERSION
+
+version 0.058
 
 =head1 AVAILABILITY
 
@@ -77,6 +85,17 @@ and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
+
+=head1 AUTHOR
+
+Rob Schmidt <rjeschmi@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

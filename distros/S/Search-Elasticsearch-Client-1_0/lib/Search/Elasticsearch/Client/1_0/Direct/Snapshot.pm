@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::1_0::Direct::Snapshot;
-$Search::Elasticsearch::Client::1_0::Direct::Snapshot::VERSION = '6.80';
+$Search::Elasticsearch::Client::1_0::Direct::Snapshot::VERSION = '6.81';
 use Moo;
 with 'Search::Elasticsearch::Client::1_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -17,7 +17,7 @@ Search::Elasticsearch::Client::1_0::Direct::Snapshot - A client for managing sna
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

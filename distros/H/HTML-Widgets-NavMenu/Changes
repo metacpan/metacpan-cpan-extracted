@@ -1,5 +1,17 @@
 Revision history for Perl extension HTML::Widgets::NavMenu.
 
+1.0801  2020-07-03
+    - Fix and re-enable the PerlCritic test on tidyall.
+
+1.0800  2020-07-03
+    - Speed up some hot spots / bottlenecks.
+        - "A Lisp programmer knows the value of everything and the cost
+        of nothing"
+        - https://www.shlomifish.org/humour/fortunes/show.cgi?id=linus-torvalds-about-indirections
+    - lib/HTML/Widgets/NavMenu/EscapeHtml.pm switched escape_html() to @EXPORT_OK
+        - Minor back compat break.
+    - Cleanups including explicit imports , and perlcritic.
+
 1.0704  2019-03-11
     - Convert to dzil.
     - Try to fix broken provides (e.g:

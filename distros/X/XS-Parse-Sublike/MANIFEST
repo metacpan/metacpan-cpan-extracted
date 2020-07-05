@@ -14,7 +14,11 @@ inc/Module/Build/with/XSTests.pm
 lib/XS/Parse/Sublike.pm
 lib/XS/Parse/Sublike.xs
 lib/XS/Parse/Sublike/Builder.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01func.t
 t/02func-signatures.t
@@ -24,6 +28,7 @@ t/11stages-pre_subparse.t
 t/12stages-post_blockstart.t
 t/13stages-pre_blockend.t
 t/14stages-post_newcv.t
+t/15stages-filter_attr.t
 t/20registrations.t
 t/30any.t
 t/40parts-name.t
@@ -42,7 +47,3 @@ t/stages.c
 t/stages.xs
 t/testcase.pm
 XSParseSublike.h
-README
-LICENSE
-META.yml
-META.json

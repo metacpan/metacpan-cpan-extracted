@@ -25,7 +25,7 @@ isa_ok $writer, 'Archive::Raw::DiskWriter';
 
 ok (!eval { $writer->write (bless {}, 'SomeObject') });
 
-my $output = 't/testextract/';
+my $output = 't/testextract_tar/';
 remove_tree ($output);
 
 while (my $entry = $reader->next())
@@ -50,18 +50,28 @@ while (my $entry = $reader->next())
 	}
 
 	ok (!-e $filename);
-	$writer->write ($entry);
 
-	if ($entry->filetype == Archive::Raw->AE_IFLNK)
+	if ($entry->filetype == Archive::Raw->AE_IFLNK && $^O eq 'MSWin32')
 	{
-		# what the link points to may not be available yet,
-		# so just make sure its a link
-		ok (-l $filename) if ($^O ne 'MSWin32');
+		# Not supported
 	}
 	else
 	{
-		ok (-e $filename);
+		$writer->write ($entry);
+
+		if ($entry->filetype == Archive::Raw->AE_IFLNK)
+		{
+			ok (-l $filename);
+		}
+		else
+		{
+			ok (-e $filename);
+		}
 	}
 }
 
+$reader->close();
+$writer->close();
+
 done_testing;
+

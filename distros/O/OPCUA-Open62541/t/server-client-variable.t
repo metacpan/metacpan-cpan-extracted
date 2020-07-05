@@ -55,6 +55,7 @@ my %attr = (
 	Variant_type                    => TYPES_INT32,
 	Variant_scalar                  => 42,
     },
+    VariableAttributes_valueRank        => VALUERANK_SCALAR,
     VariableAttributes_dataType         => TYPES_INT32,
     VariableAttributes_accessLevel      =>
 	ACCESSLEVELMASK_READ | ACCESSLEVELMASK_WRITE,

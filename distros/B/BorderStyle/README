@@ -5,8 +5,8 @@ SPECIFICATION VERSION
     2
 
 VERSION
-    This document describes version 2.0.2 of BorderStyle (from Perl
-    distribution BorderStyle), released on 2020-06-14.
+    This document describes version 2.0.3 of BorderStyle (from Perl
+    distribution BorderStyle), released on 2020-06-19.
 
 DESCRIPTION
     This document specifies a way to create and use border styles
@@ -39,8 +39,9 @@ SPECIFICATION
          my $bs_struct = BorderStyle::NAME->get_struct;
          my $bs_struct = $bs_obj->get_struct;
 
-        Provide a method way of getting the "border style structure". A
-        client can also access the %BORDER package variable directly.
+        Provide a method way of getting the "border style structure". Must
+        also work as a static method. A client can also access the %BORDER
+        package variable directly.
 
     *   get_args
 

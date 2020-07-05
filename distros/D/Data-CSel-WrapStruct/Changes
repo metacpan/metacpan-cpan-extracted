@@ -1,3 +1,10 @@
+0.008   2020-04-15  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add FAQ item about speed & using Data::Walk::More.
+
+
 0.007   2020-04-09  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] remove() on array element should update children's

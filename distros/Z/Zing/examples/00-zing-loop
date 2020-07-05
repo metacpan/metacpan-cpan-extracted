@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::Flow;
+use Zing::Loop;
+
+=pod explain
+
+- zing-loop is the Zing event-loop used by all processes
+- the loop takes a "flow" which represents an event-loop step/tick
+- the flow is implemented as a simplified linked-list
+- the term "flow" was used to denote logic flows given that the ...
+
+=cut
+
+my $f0 = Zing::Flow->new(name => 's0', code => sub {warn 'init'});
+my $f1 = $f0->next(Zing::Flow->new(name => 's1', code => sub {warn 'step 1'}));
+my $f2 = $f1->next(Zing::Flow->new(name => 's2', code => sub {warn 'step 2'}));
+my $f3 = $f2->next(Zing::Flow->new(name => 's3', code => sub {warn 'step 3'}));
+
+my $l = Zing::Loop->new(flow => $f0);
+
+$l->exercise; # run one cycle

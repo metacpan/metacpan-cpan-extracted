@@ -13,6 +13,7 @@ my @files = (
     'lib/HTML/Widgets/NavMenu/HeaderRole.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/Base.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/Html.pm',
+    'lib/HTML/Widgets/NavMenu/Iterator/Html/Item.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/JQTreeView.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/NavMenu.pm',
     'lib/HTML/Widgets/NavMenu/Iterator/NavMenu/HeaderRole.pm',
@@ -46,7 +47,6 @@ my @files = (
     't/16redirect.t',
     't/17nav-coords-unit.t',
     't/18url.t',
-    't/cpan-changes.t',
     't/lib/HTML/Widgets/NavMenu/Test/Data.pm',
     't/lib/HTML/Widgets/NavMenu/Test/Stdout.pm',
     't/lib/HTML/Widgets/NavMenu/Test/Util.pm'

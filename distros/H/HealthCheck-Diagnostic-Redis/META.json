@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -29,6 +29,7 @@
             "Carp" : "0",
             "HealthCheck::Diagnostic" : "0",
             "Redis::Fast" : "0",
+            "String::Random" : "0",
             "parent" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -44,6 +45,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::Differences" : "0",
             "Test::MockModule" : "0",
             "Test::More" : "0"
          }
@@ -52,23 +54,20 @@
    "provides" : {
       "HealthCheck::Diagnostic::Redis" : {
          "file" : "lib/HealthCheck/Diagnostic/Redis.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-Redis/issues"
-      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-Redis.git",
-         "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-Redis"
+         "url" : "git://github.com/Bmess1/HealthCheck-Diagnostic-Redis.git",
+         "web" : "https://github.com/Bmess1/HealthCheck-Diagnostic-Redis"
       }
    },
-   "version" : "v0.0.4",
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "JSON::XS version 4.02",
+   "version" : "v0.0.5",
+   "x_generated_by_perl" : "v5.18.2",
+   "x_serialization_backend" : "JSON::XS version 3.04",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1
 }

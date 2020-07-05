@@ -19,7 +19,7 @@ has destroy    => 0;
 has flags      => S_IRWXU() | S_IRWXG() | IPC_CREAT();
 has lock_flags => IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP
   | S_IROTH | S_IWOTH;
-has _size => 10 * 1024;
+has _size          => 10 * 1024;
 has _shared_memory => sub { $_[0]->_newmem() };
 has _shared_size =>
   sub { $_[0]->_newmem((2 * shift->key) - 1, $Config{intsize}) };
@@ -59,7 +59,7 @@ sub _writesize {
 
 sub _readsize {
   my $self = shift;
-  my $s = $self->_shared_size()->read(0, $Config{intsize});
+  my $s    = $self->_shared_size()->read(0, $Config{intsize});
   return unpack('I', $s);
 }
 
@@ -132,7 +132,7 @@ sub save {
   warn "[debug:$$] Error Saving data : $@" if $@ && DEBUG;
 
   $_[0]->_shared_memory->detach() if $_[0]->_shared_memory;
-  return if $@;
+  return                          if $@;
   return 1;
 }
 
@@ -159,7 +159,7 @@ sub load {
   };
 
   warn "[debug:$$] Error Loading data : $@" if $@ && DEBUG;
-  return if $@;
+  return                                    if $@;
   return 1;
 }
 
@@ -191,7 +191,7 @@ sub unlock {
   shift->_lock->unlock(@_);
 }
 
-sub lock { my $s = shift; my $r = $s->_lock->lock(@_); $s->load; $r }
+sub lock     { my $s = shift; my $r = $s->_lock->lock(@_); $s->load; $r }
 sub try_lock { $_[0]->_lock->try_lock() }
 
 sub lock_section {

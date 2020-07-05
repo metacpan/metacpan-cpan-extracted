@@ -1,237 +1,154 @@
-==================================================
-Changes from 2019-03-26 00:00:00 +0000 to present.
-==================================================
-
--------------------------------------------
-version v1.5.4 at 2020-03-25 19:14:57 +0000
--------------------------------------------
-
-  Change: ac76bd2f865a411dc31f0e2bc9933bc5536d8e19
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-03-25 15:14:40 +0000
-
-    Update README 
-
-  Change: d429df398e94ceea9418ba24789dbca488b131ab
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-03-03 19:52:43 +0000
-
-    Provide unique ids in summarize
-
-    If the "id" doesn't exist, we assume a default, but if we've seen the
-    the id in the current list of sub-results, we need to make it unique. 
-
-  Change: 765922c943243b17c6948082fc93334a00610946
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-24 11:20:51 +0000
-
-    Fix test to depend on Carp, not perl, version
-
-    Because the change in output comes from Carp and that can be updated
-    separately from perl. 
-
--------------------------------------------
-version v1.5.3 at 2020-02-21 18:26:04 +0000
--------------------------------------------
-
-  Change: df272cb38f80b7e9a27bd66fa61cbfe438718156
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-21 12:39:56 +0000
-
-    Adjust more links to the Health Check Standard 
-
-  Change: 38749641cbc68ca0a0f1bff3a2f37917e6bda629
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-13 14:54:51 +0000
-
-    Fix link to the HealthCheck Standard 
-
-  Change: 28118e975a7dbccbad823764792d17bece5a721e
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-24 16:17:06 +0000
-
-    Update meta files to public versions
-
-    Somehow I missed updating the Makefile and so the other files didn't
-    update correctly. 
-
-  Change: f3a708b93f831e717e93ac1b9b1d48fcdb2d038b
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-24 15:00:17 +0000
-
-    Remove internal Jenkinsfile 
-
-  Change: bbedb27828dcd3ca1a673af6c1a8cc057f07262b
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-17 12:02:18 +0000
-
-    Update files 
-
-  Change: 0f32c00a93a99a43e6f69f67f4d8009d82ba308a
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-17 12:02:18 +0000
-
-    Require appropriate version of our PluginBundle
-
-    To be sure contributors don't show up. 
-
-  Change: 54cd5345d7ef138c1ee5ce79aa9a97c3a40f51b7
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-17 12:02:18 +0000
-
-    Switch to Dist::Zilla::PluginBundle::Author::GSG
-
-    To make the module public 
-
-  Change: 253e040ae7fff0e047bc1cdae7005d50e305198b
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-01-08 18:47:21 +0000
-
-    Clean up cpanfile 
-
----------------------------------------------
-version v1.5.1.1 at 2019-10-18 18:33:59 +0000
----------------------------------------------
-
-  Change: 00ac5270b28a87e636310223126e199f903e74c2
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 14:33:59 +0000
-
-    Create distribution files 
-
-  Change: 8c890e4db955ee96a1df293fe3cbc56af763ea60
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 14:31:05 +0000
-
-    Convert to Bitbucket workflow 
-
-  Change: 401130694817da11fc8d452cff80059943fac82f
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 14:31:04 +0000
-
-    Remove gitc metadata 
-
----------------------------------------------
-version v1.5.1.0 at 2019-10-14 17:20:59 +0000
----------------------------------------------
-
-  Change: e241e8910e17d6610c6017ed00247f79d1caf5ce
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-14 12:58:43 +0000
-
-    Move WritingADiagnostic docs under lib
-
-    Because it's probably useful to actually install that, and our new
-    Dist::Zilla stuff doesn't like .pod files in the root. 
-
-  Change: 90841b04b5484987d11d6a62f5d93c37c7cf120f
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-14 12:34:47 +0000
-
-    Add GSGBundle to cpanfile
-
-    Not that we need it, but makes things easier. 
-
------------------------------------------------------------------------
-dist/version v0.0.0.1802_01/master/SM-1802 at 2019-06-05 18:10:05 +0000
------------------------------------------------------------------------
-
-  Change: 2a27d1666ec820b3bc76961b7d4ff7f9a371738b
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-04 18:33:07 +0000
-
-    Only copy tags from the checker
-
-    But we can copy id and label from the invocant as that is part of the
-    current check.
-
-    The tags however we can inherit so we can actually check those
-    things. I believe this matches the way things worked before. 
-
-  Change: da263de260e6cb0c7aa8695c812ce36cd9349093
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-06-04 15:32:28 +0000
-
-    Another test for not copying to sub-results
-
-    Because I didn't really like it. 
-
-  Change: 466e9b5d2768b5a88e591c20dfb8d1ca427d3864
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-06-04 12:51:41 +0000
-
-    SM-1802 Update docs 
-
-  Change: 43a8524ecb8231681a6a2497a6dcf4401a9bfc16
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-06-04 12:39:14 +0000
-
-    SM-1802 Standardize inheritance further
-
-    There were three places doing very similar things - running,
-    summarizing, and tag-checking of what *should* run. They now all use
-    the same code, and results always report the tags that should be
-    there. 
-
-  Change: 114ed91c437a5361e516e52d5aa56e5b18c055e2
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-05-31 17:51:47 +0000
-
-    Copy id, label, and tags from check to result
-
-    Unless the check has them. Also look at the Invocant to see if it has
-    them.
-
-    TODO is to look at the invocant and see if it `can(thing)` and if so
-    copy it. 
-
-  Change: 3fc08e9b17b7087e70b99d5d91a3e56ad944e0c3
-  Author: Andrew Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-05-31 17:50:54 +0000
-
-    Fix up some documentation
-
-    I actually ran this and figured out what the results were, which were
-    not what they claimed to be. 
-
-  Change: 845262f757036aa5f0d90f575af0b937e97a9019
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-05-31 11:16:24 +0000
-
-    SM-1802 Update the docs 
-
-  Change: c32678d4efd195edb34297b3af46625346e8d22e
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-05-31 11:16:24 +0000
-
-    SM-1802 Add implicit (parent-inherited) tags 
-
-  Change: 730214d4d6c6d55fc7d450400a623faf776c03bb
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-05-31 11:16:24 +0000
-
-    SM-1802 Add explicitly specified tags 
-
-  Change: 1b1e59430417385106c31a6be30962463850113d
-  Author: Jonathan Rubin <jon.rubin@grantstreet.com>
-  Date : 2019-05-31 11:16:18 +0000
-
-    SM-1802 Test healthchecks summarize their tags 
-
----------------------------------------------------------------------------
-dist/version v0.0.0.11289_01/master/PEX-11289a at 2019-05-06 14:07:39 +0000
----------------------------------------------------------------------------
-
-  Change: b65300127229f4cb74360c7129b0dc8a8648044a
-  Author: Brendan Byrd <brendan.byrd@grantstreet.com>
-  Date : 2019-04-30 16:32:07 +0000
-
-    PEX-11289a: Stringify errors from run calls
-
-    JSON encoding in the Plack Middleware usually doesn't have blessed
-    object encoding turned on, so stringify errors to prevent further
-    exceptions 
-
-=================================================
-Plus 50 releases after 2019-03-26 00:00:00 +0000.
-=================================================
+Changelog for HealthCheck
+
+v1.5.5 2020-07-02T19:23:35
+ - Update README (Maria Cioffi)
+ - Add more tests for runtime (Brandon Messineo)
+ - Revert back to b8f12974c15 (Andrew Hewus Fresh)
+ - Enhance tests for runtime enabling (Brandon Messineo)
+ - Simplify runtime argument handling (Mitch McCracken)
+ - Adding tests and more readable runtime logic (maria cioffi)
+ - Modifying runtime checks (maria cioffi)
+ - Adjust test to match value of runtime (Andrew Hewus Fresh)
+ - Convert from Test::More to Test2::V0 (Andrew Hewus Fresh)
+ - Add dependency on Time::HiRes to cpanfile (Andrew Hewus Fresh)
+ - Incoorporating some changes to documentation (maria cioffi)
+ - Improve "runtime" example in documentation (Andrew Hewus Fresh)
+ - Adding runtime support to diagnostic health check (maria cioffi)
+
+v1.5.4 2020-03-25T19:14:40
+ - Update README (Andrew Hewus Fresh)
+ - Provide unique ids in summarize (Andrew Hewus Fresh)
+ - Fix test to depend on Carp, not perl, version (Andrew Hewus Fresh)
+
+v1.5.3 2020-02-21T18:26:04
+ - Adjust more links to the Health Check Standard (Andrew Hewus Fresh)
+ - Fix link to the HealthCheck Standard (Andrew Hewus Fresh)
+ - Update meta files to public versions (Andrew Hewus Fresh)
+ - Remove internal Jenkinsfile (Andrew Hewus Fresh)
+ - Require appropriate version of our PluginBundle (Andrew Hewus Fresh)
+ - Update files (Andrew Hewus Fresh)
+ - Switch to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
+ - Clean up cpanfile (Andrew Hewus Fresh)
+
+v1.5.2 2019-11-05T21:42:22
+ - Merge remote-tracking branch 'origin/stage' into prod (Andrew Hewus
+   Fresh)
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Hewus
+   Fresh)
+ - Merge remote-tracking branch 'origin/master' into test (Andrew Hewus
+   Fresh)
+
+v1.5.1.1 2019-10-18T18:33:59
+ - Create distribution files (Andrew Hewus Fresh)
+ - Convert to Bitbucket workflow (Andrew Hewus Fresh)
+ - Remove gitc metadata (Andrew Hewus Fresh)
+
+v1.5.1.0 2019-10-14T17:20:59
+ - Add GSGBundle to cpanfile (Andrew Hewus Fresh)
+ - Move WritingADiagnostic docs under lib (Andrew Hewus Fresh)
+
+v1.5.0 2019-10-14T17:50:31
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Hewus
+   Fresh)
+
+v1.5.0.0 2019-08-01T20:08:47
+ - Merge remote-tracking branch 'origin/stage' into prod (Jonathan Rubin)
+ - Merge remote-tracking branch 'origin/test' into stage (Jonathan Rubin)
+ - Merge remote-tracking branch 'origin/master' into test (Jonathan Rubin)
+ - Only copy tags from the checker (Andrew Fresh)
+ - Another test for not copying to sub-results (Andrew Fresh)
+ - SM-1802 Update docs (Jonathan Rubin)
+ - SM-1802 Standardize inheritance further (Jonathan Rubin)
+ - Copy id, label, and tags from check to result (Andrew Fresh)
+ - Fix up some documentation (Andrew Fresh)
+ - SM-1802 Update the docs (Jonathan Rubin)
+ - SM-1802 Add implicit (parent-inherited) tags (Jonathan Rubin)
+ - SM-1802 Add explicitly specified tags (Jonathan Rubin)
+ - SM-1802 Test healthchecks summarize their tags (Jonathan Rubin)
+
+v1.4.0 2019-08-01T19:01:53
+ - Merge remote-tracking branch 'origin/test' into stage (Jonathan Rubin)
+
+v1.4.0.0 2019-05-17T19:25:37
+ - Merge remote-tracking branch 'origin/stage' into prod (Randy Sofia)
+ - Merge remote-tracking branch 'origin/test' into stage (Randy Sofia)
+ - Merge remote-tracking branch 'origin/master' into test (Randy Sofia)
+ - PEX-11289a: Stringify errors from run calls (Brendan Byrd)
+
+v1.3.1 2019-05-13T14:33:45
+ - Merge remote-tracking branch 'origin/test' into stage (Randy Sofia)
+
+v1.3.1.0 2019-02-15T20:56:26
+ - Merge remote-tracking branch 'origin/stage' into prod (Andrew Fresh)
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
+ - Merge remote-tracking branch 'origin/master' into test (Andrew Fresh)
+ - Minor wording adjustments remove duplicate info (Andrew Fresh)
+ - Add POD for a callback parameter (Brandon Messineo)
+ - Mention calling "summarize" explicitly (Brandon Messineo)
+ - Use UNKNOWN instead of croaking for validation errors (Brandon Messineo)
+ - Minor Tweaks to Diagnostic POD (Orenda Orr)
+ - Clean up the TempCheck diagnostic example (Brandon Messineo)
+ - Make the POD sound a little better (Brandon Messineo)
+ - Minor improvments (Andrew Fresh)
+ - use parent not base (Andrew Fresh)
+ - Clean up the introductory sections and remove example (Brandon Messineo)
+ - Add a section for instance vs class checks (Brandon Messineo)
+ - Add a section for the diagnostic methods that you can override (Brandon
+   Messineo)
+ - Remove confusing code portion (Brandon Messineo)
+
+v1.3.0 2019-02-15T20:56:10
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
+
+v1.3.0.0 2019-01-24T20:17:31
+ - Merge remote-tracking branch 'origin/stage' into prod (Jon Rubin)
+ - Merge remote-tracking branch 'origin/test' into stage (Jon Rubin)
+ - Merge remote-tracking branch 'origin/master' into test (Jon Rubin)
+ - SM-1685a Ensure working List::Util::any available (Jon Rubin)
+ - SM-1685 Tests for tag negation (Jon Rubin)
+ - SM-1685 Handling for negative tags (Jon Rubin)
+ - SM-1679: Add create a Test::Strict test (Benjamin Suntrup)
+
+v1.2.1 2019-01-24T20:17:12
+ - Merge remote-tracking branch 'origin/test' into stage (Jon Rubin)
+
+v1.2.1.0 2018-12-06T18:12:27
+ - Merge remote-tracking branch 'origin/stage' into prod (Andrew Fresh)
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
+ - Merge remote-tracking branch 'origin/master' into test (Andrew Fresh)
+ - Merge remote-tracking branch 'origin/test' (Jon Rubin)
+ - Merge tag 'cs/SM-1641/head' into test (Jon Rubin)
+ - SM-1641 Better error handling for bad checks (Jon Rubin)
+ - PEX-11055 fix a doc typo (Scott Lee)
+
+v1.2.0 2018-12-06T18:11:35
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
+
+v1.2.0.0 2018-10-30T20:21:22
+ - Merge remote-tracking branch 'origin/stage' into prod (Andrew Fresh)
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
+ - Merge remote-tracking branch 'origin/master' into test (Andrew Fresh)
+ - Update POD to mention UNKNOWN status overides for invalid results
+   (Orenda Orr)
+ - "Reverse" order of preference logic (Orenda Orr)
+ - Remove some unused tests (Andrew Fresh)
+ - Optimize status lookups with state variables (Andrew Fresh)
+ - Upgrade validation errors to UNKNOWN status (Andrew Fresh)
+ - Allow UNKNOWN status to override OK (Andrew Fresh)
+ - Allow summarizing UNDEFINED status from children (Andrew Fresh)
+ - Fix tests with old versions of Carp (Andrew Fresh)
+ - Minor refactor of status merging (Andrew Fresh)
+
+v1.1.0 2018-10-30T20:21:05
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
+
+v1.1.0.0 2018-10-16T19:33:02
+ - No changes found
+
+v1.0.0 2018-10-16T19:27:29
+ - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)
+
+v0.0.0 2019-10-14T17:20:59
+ - Add GSGBundle to cpanfile (Andrew Hewus Fresh)
+ - Move WritingADiagnostic docs under lib (Andrew Hewus Fresh)
+ - Merge remote-tracking branch 'origin/master' into test (Jonathan Rubin)

@@ -34,7 +34,7 @@ SockAddr AsyncTest::get_blackhole_addr () {
         addrinfo* res;
         int syserr = getaddrinfo("google.com", "81", NULL, &res);
         if (syserr) throw std::system_error(std::make_error_code(((std::errc)syserr)));
-        ret = res->ai_addr;
+        ret = SockAddr(res->ai_addr, sizeof(*res->ai_addr));
         freeaddrinfo(res);
     }
     return ret;
@@ -51,7 +51,11 @@ AsyncTest::AsyncTest (uint64_t timeout, unsigned count, const LoopSP& loop) : As
 }
 
 AsyncTest::~AsyncTest() noexcept(false) {
-    if (!happened_as_expected() && !std::uncaught_exception()) {
+    if (std::uncaught_exception()) {
+        return;
+    }
+    loop->run_nowait();
+    if (!happened_as_expected()) {
         throw Error("Test exits in bad state", *this);
     }
 }

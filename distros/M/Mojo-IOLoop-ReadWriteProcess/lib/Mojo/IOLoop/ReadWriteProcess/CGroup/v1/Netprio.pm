@@ -11,7 +11,7 @@ use constant {
 has cgroup => sub { Mojo::IOLoop::ReadWriteProcess::CGroup::v1->new };
 
 sub ifpriomap { shift->cgroup->_setget(IFPRIOMAP_INTERFACE, @_) }
-sub prioidx { shift->cgroup->_list(PRIOIDX_INTERFACE) }
+sub prioidx   { shift->cgroup->_list(PRIOIDX_INTERFACE) }
 
 1;
 

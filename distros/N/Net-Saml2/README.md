@@ -8,7 +8,7 @@ Net::SAML2
  
 # VERSION
  
-version 0.20
+version 0.26
  
 # SYNOPSIS
 
@@ -88,6 +88,7 @@ the last official version 0.17 by Chris Andrews
       Peter Marschall <peter@adpm.de>
       Timothy Legge <timlegge@gmail.com>
       xmikew <github@32ths.com>
+      Wesley Schwengle <wesley@opndev.io>
 
 # COPYRIGHT AND LICENSE
 

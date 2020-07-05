@@ -7,7 +7,7 @@ require Exporter;
 use parent 'Exporter';
 use OPCUA::Open62541::Constant;
 
-our $VERSION = '0.015';
+our $VERSION = '0.019';
 
 our @EXPORT_OK = @OPCUA::Open62541::Constant::EXPORT_OK;
 our %EXPORT_TAGS = %OPCUA::Open62541::Constant::EXPORT_TAGS;
@@ -76,8 +76,6 @@ and methods.
 
 =item $server = OPCUA::Open62541::Server->new()
 
-=item $server = OPCUA::Open62541::Server->newWithConfig($server_config)
-
 =item $server_config = $server->getConfig()
 
 =item $status_code = $server->run($server, $running)
@@ -97,6 +95,10 @@ magically.
 =item $status_code = $server->writeValue(\%nodeId, $value)
 
 =item \%browseResult = $server->browse($maxReferences, \%browseDescription)
+
+=item $server->setAdminSessionContext($context)
+
+This method is only available if open62541 library supports it.
 
 =item $status_code = $server->addVariableNode(\%requestedNewNodeId, \%parentNodeId, \%referenceTypeId, \%browseName, \%typeDefinition, \%attr, $nodeContext, \%outNewNodeId)
 
@@ -131,6 +133,23 @@ magically.
 =item $status_code = $server_config->setMinimal($port, $certificate)
 
 =item $server_config->setCustomHostname($custom_hostname)
+
+=item $server_config->setGlobalNodeLifecycle(\%lifecycle)
+
+=over 8
+
+=item $lifecycle{GlobalNodeLifecycle_constructor} = sub { my ($server, $sessionId, $sessionContext, $nodeId, \$nodeContext) = @_ }
+
+=item $lifecycle{GlobalNodeLifecycle_destructor} = sub { my ($server, $sessionId, $sessionContext, $nodeId, $nodeContext) = @_ }
+
+=item $lifecycle{GlobalNodeLifecycle_createOptionalChild} = sub { my ($server, $sessionId, $sessionContext, $sourceNodeId, $targetParentNodeId, $referenceTypeId) = @_ }
+
+=item $lifecycle{GlobalNodeLifecycle_generateChildNodeId} = sub { my ($server, $sessionId, $sessionContext, $sourceNodeId, $targetParentNodeId, $referenceTypeId, \%targetNodeId) = @_ }
+
+=back
+
+Call $server->setAdminSessionContext() to set $server and $sessionContext
+in the callback.
 
 =item $logger = $server_config->getLogger()
 

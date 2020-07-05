@@ -3,9 +3,9 @@
 #include <panda/function.h>
 #include <panda/intrusive_chain.h>
 
-using namespace panda;
 using std::shared_ptr;
-using test::Tracer;
+
+#define TEST(name) TEST_CASE("intrusive chain: " name, "[intrusive_chain]")
 
 struct MyPtr : IntrusiveChainNode<MyPtr*> {};
 
@@ -260,7 +260,7 @@ struct Test {
     }
 };
 
-TEST_CASE("pointer type", "[intrusive_chain]") {
+TEST("pointer type") {
     std::vector<MyPtr*> objs;
     Test<MyPtr*>::test([&]() -> MyPtr* {
         MyPtr* obj = new MyPtr();
@@ -272,19 +272,19 @@ TEST_CASE("pointer type", "[intrusive_chain]") {
     }
 }
 
-TEST_CASE("iptr type", "[intrusive_chain]") {
+TEST("iptr type") {
     Test<iptr<MyIPtr>>::test([&]() -> iptr<MyIPtr> {
         return new MyIPtr();
     });
 }
 
-TEST_CASE("shared_ptr type", "[intrusive_chain]") {
+TEST("shared_ptr type") {
     Test<shared_ptr<MySPtr>>::test([&]() -> shared_ptr<MySPtr> {
         return shared_ptr<MySPtr>(new MySPtr());
     });
 }
 
-TEST_CASE("custom type", "[intrusive_chain]") {
+TEST("custom type") {
     std::vector<MyCustom*> objs;
     Test<MyCustom*>::test([&]() -> MyCustom* {
         MyCustom* obj = new MyCustom();

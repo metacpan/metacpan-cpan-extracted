@@ -58,23 +58,23 @@ documentation and that feature set will likely be deprecated in the future.
 
 In other words, if you don't have a filename to pass, consider using the
 standard `do { local $/; <$fh> }`, or
-[Data::Section](https://metacpan.org/pod/Data::Section)/[Data::Section::Simple](https://metacpan.org/pod/Data::Section::Simple) for working with `__DATA__`.
+[Data::Section](https://metacpan.org/pod/Data%3A%3ASection)/[Data::Section::Simple](https://metacpan.org/pod/Data%3A%3ASection%3A%3ASimple) for working with `__DATA__`.
 
 # FUNCTIONS
 
-[File::Slurp](https://metacpan.org/pod/File::Slurp) implements the following functions.
+[File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp) implements the following functions.
 
 ## append\_file
 
 ```perl
-    use File::Spec qw(append_file write_file);
+    use File::Slurp qw(append_file write_file);
     my $res = append_file('/path/file', "Some text");
     # same as
     my $res = write_file('/path/file', {append => 1}, "Some text");
 ```
 
 The `append_file` function is simply a synonym for the
-["write\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#write_file) function, but ensures that the `append` option is
+["write\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#write_file) function, but ensures that the `append` option is
 set.
 
 ## edit\_file
@@ -102,9 +102,9 @@ The next argument is the filename.
 
 The next argument(s) is either a hash reference or a flattened hash,
 `key => value` pairs. The options are passed through to the
-["write\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#write_file) function. All options are described there.
+["write\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#write_file) function. All options are described there.
 Only the `binmode` and `err_mode` options are supported. The call to
-["write\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#write_file) has the `atomic` option set so you will always
+["write\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#write_file) has the `atomic` option set so you will always
 have a consistent file.
 
 ## edit\_file\_lines
@@ -131,9 +131,9 @@ The next argument is the filename.
 
 The next argument(s) is either a hash reference or a flattened hash,
 `key => value` pairs. The options are passed through to the
-["write\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#write_file) function. All options are described there.
+["write\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#write_file) function. All options are described there.
 Only the `binmode` and `err_mode` options are supported. The call to
-["write\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#write_file) has the `atomic` option set so you will always
+["write\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#write_file) has the `atomic` option set so you will always
 have a consistent file.
 
 ## ef
@@ -147,7 +147,7 @@ have a consistent file.
     ef \&replace_foo, '/path/file';
 ```
 
-The `ef` function is simply a synonym for the ["edit\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#edit_file)
+The `ef` function is simply a synonym for the ["edit\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#edit_file)
 function.
 
 ## efl
@@ -161,18 +161,18 @@ function.
     efl \&delete_foo, '/path/file';
 ```
 
-The `efl` function is simply a synonym for the ["edit\_file\_lines" in File::Slurp](https://metacpan.org/pod/File::Slurp#edit_file_lines)
+The `efl` function is simply a synonym for the ["edit\_file\_lines" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#edit_file_lines)
 function.
 
 ## overwrite\_file
 
 ```perl
-    use File::Spec qw(overwrite_file);
+    use File::Slurp qw(overwrite_file);
     my $res = overwrite_file('/path/file', "Some text");
 ```
 
 The `overwrite_file` function is simply a synonym for the
-["write\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#write_file) function.
+["write\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#write_file) function.
 
 ## prepend\_file
 
@@ -189,9 +189,9 @@ The `overwrite_file` function is simply a synonym for the
     write_file('/path/file', $new_content . $content);
 ```
 
-The `prepend_file` function is the opposite of ["append\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#append_file) as
+The `prepend_file` function is the opposite of ["append\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#append_file) as
 it writes new contents to the beginning of the file instead of the end. It is a
-combination of ["read\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#read_file) and ["write\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#write_file). It
+combination of ["read\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#read_file) and ["write\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#write_file). It
 works by first using `read_file` to slurp in the file and then calling
 `write_file` with the new data and the existing file data.
 
@@ -199,7 +199,7 @@ The first argument to `prepend_file` is the filename.
 
 The next argument(s) is either a hash reference or a flattened hash,
 `key => value` pairs. The options are passed through to the
-["write\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#write_file) function. All options are described there.
+["write\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#write_file) function. All options are described there.
 
 Only the `binmode` and `err_mode` options are supported. The
 `write_file` call has the `atomic` option set so you will always have
@@ -208,7 +208,7 @@ a consistent file.
 ## read\_dir
 
 ```perl
-    use File::Spec qw(read_dir);
+    use File::Slurp qw(read_dir);
     my @files = read_dir('/path/to/dir');
     # all files, even the dots
     my @files = read_dir('/path/to/dir', keep_dot_dot => 1);
@@ -232,8 +232,8 @@ The next argument(s) is either a hash reference or a flattened hash,
     The `err_mode` option has three possible values: `quiet`, `carp`, or the
     default, `croak`. In `quiet` mode, all errors will be silent. In `carp` mode,
     all errors will be emitted as warnings. And, in `croak` mode, all errors will
-    be emitted as exceptions. Take a look at [Try::Tiny](https://metacpan.org/pod/Try::Tiny) or
-    [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try) to see how to catch exceptions.
+    be emitted as exceptions. Take a look at [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny) or
+    [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3ATry) to see how to catch exceptions.
 
 - keep\_dot\_dot
 
@@ -246,7 +246,7 @@ The next argument(s) is either a hash reference or a flattened hash,
     The `prefix` option is a boolean option, defaulted to false (`0`).
     Setting this option to true (`1`) add the directory as a prefix to the file.
     The directory and the filename are joined using `File::Spec->catfile()` to
-    ensure the proper directory separator is used for your OS. See [File::Spec](https://metacpan.org/pod/File::Spec).
+    ensure the proper directory separator is used for your OS. See [File::Spec](https://metacpan.org/pod/File%3A%3ASpec).
 
 ## read\_file
 
@@ -319,8 +319,8 @@ The next argument(s) is either a hash reference or a flattened hash,
     The `err_mode` option has three possible values: `quiet`, `carp`, or the
     default, `croak`. In `quiet` mode, all errors will be silent. In `carp` mode,
     all errors will be emitted as warnings. And, in `croak` mode, all errors will
-    be emitted as exceptions. Take a look at [Try::Tiny](https://metacpan.org/pod/Try::Tiny) or
-    [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try) to see how to catch exceptions.
+    be emitted as exceptions. Take a look at [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny) or
+    [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3ATry) to see how to catch exceptions.
 
 - scalar\_ref
 
@@ -333,32 +333,32 @@ The next argument(s) is either a hash reference or a flattened hash,
 ## rf
 
 ```perl
-    use File::Spec qw(rf);
+    use File::Slurp qw(rf);
     my $text = rf('/path/file');
 ```
 
-The `rf` function is simply a synonym for the ["read\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#read_file)
+The `rf` function is simply a synonym for the ["read\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#read_file)
 function.
 
 ## slurp
 
 ```perl
-    use File::Spec qw(slurp);
+    use File::Slurp qw(slurp);
     my $text = slurp('/path/file');
 ```
 
-The `slurp` function is simply a synonym for the ["read\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#read_file)
+The `slurp` function is simply a synonym for the ["read\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#read_file)
 function.
 
 ## wf
 
 ```perl
-    use File::Spec qw(wf);
+    use File::Slurp qw(wf);
     my $res = wf('/path/file', "Some text");
 ```
 
 The `wf` function is simply a synonym for the
-["write\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#write_file) function.
+["write\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#write_file) function.
 
 ## write\_file
 
@@ -403,13 +403,13 @@ The next argument(s) is either a hash reference or a flattened hash,
     this option to true (`1`) will cause the data to be be written at the end of
     the current file. Internally this sets the `sysopen` mode flag `O_APPEND`.
 
-    The ["append\_file" in File::Slurp](https://metacpan.org/pod/File::Slurp#append_file) function sets this option by default.
+    The ["append\_file" in File::Slurp](https://metacpan.org/pod/File%3A%3ASlurp#append_file) function sets this option by default.
 
 - atomic
 
     The `atomic` option is a boolean option, defaulted to false (`0`). Setting
     this option to true (`1`) will cause the file to be be written to in an
-    atomic fashion. A temporary file name is created using ["tempfile" in File::Temp](https://metacpan.org/pod/File::Temp#tempfile).
+    atomic fashion. A temporary file name is created using ["tempfile" in File::Temp](https://metacpan.org/pod/File%3A%3ATemp#tempfile).
     After the file is closed it is renamed to the original file name
     (and `rename` is an atomic operation on most OSes). If the program using
     this were to crash in the middle of this, then the temporary file could
@@ -433,8 +433,8 @@ The next argument(s) is either a hash reference or a flattened hash,
     The `err_mode` option has three possible values: `quiet`, `carp`, or the
     default, `croak`. In `quiet` mode, all errors will be silent. In `carp` mode,
     all errors will be emitted as warnings. And, in `croak` mode, all errors will
-    be emitted as exceptions. Take a look at [Try::Tiny](https://metacpan.org/pod/Try::Tiny) or
-    [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax::Keyword::Try) to see how to catch exceptions.
+    be emitted as exceptions. Take a look at [Try::Tiny](https://metacpan.org/pod/Try%3A%3ATiny) or
+    [Syntax::Keyword::Try](https://metacpan.org/pod/Syntax%3A%3AKeyword%3A%3ATry) to see how to catch exceptions.
 
 - no\_clobber
 
@@ -471,6 +471,15 @@ You can get all subs in the module exported with
 ```perl
     use File::Slurp qw(:all);
 ```
+
+# SEE ALSO
+
+- [File::Slurper](https://metacpan.org/pod/File%3A%3ASlurper) - Provides a straightforward set of functions for the most
+common tasks of reading/writing text and binary files.
+- [Path::Tiny](https://metacpan.org/pod/Path%3A%3ATiny) - Lightweight and comprehensive file handling, including simple
+methods for reading, writing, and editing text and binary files.
+- [Mojo::File](https://metacpan.org/pod/Mojo%3A%3AFile) - Similar to Path::Tiny for the [Mojo](https://metacpan.org/pod/Mojo) toolkit, always works in
+bytes.
 
 # AUTHOR
 

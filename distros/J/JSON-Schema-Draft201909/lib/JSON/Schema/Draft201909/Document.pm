@@ -4,15 +4,16 @@ package JSON::Schema::Draft201909::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.005';
+our $VERSION = '0.008';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use feature 'current_sub';
 use Mojo::URL;
 use Carp 'croak';
 use JSON::MaybeXS 1.004001 'is_bool';
-use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
+use Ref::Util 0.100 qw(is_plain_arrayref is_plain_hashref);
 use List::Util 1.29 'pairs';
+use Safe::Isa;
 use Moo;
 use MooX::TypeTiny;
 use MooX::HandlesVia;
@@ -28,15 +29,16 @@ has schema => (
 
 has canonical_uri => (
   is => 'rwp',
-  isa => InstanceOf['Mojo::URL'],
+  isa => InstanceOf['Mojo::URL'], # always fragmentless
   lazy => 1,
   default => sub { Mojo::URL->new },
+  coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
 );
 
 has resource_index => (
   is => 'bare',
   isa => HashRef[Dict[
-      canonical_uri => InstanceOf['Mojo::URL'], # always fragmentless
+      canonical_uri => InstanceOf['Mojo::URL'],
       path => Str,  # always a json pointer, relative to the document root
     ]],
   handles_via => 'Hash',
@@ -102,7 +104,7 @@ sub _traverse_for_identifiers {
       0 .. $#{$data};
   }
   elsif (is_plain_hashref($data)) {
-    if (exists $data->{'$id'} and not is_ref($data->{'$id'})) {
+    if (exists $data->{'$id'} and JSON::Schema::Draft201909->_is_type('string', $data->{'$id'})) {
       my $uri = Mojo::URL->new($data->{'$id'});
       if (not length $uri->fragment) {
         $canonical_uri = $uri->base($canonical_uri)->to_abs;
@@ -110,7 +112,7 @@ sub _traverse_for_identifiers {
         $identifiers{$canonical_uri} = { path => $path, canonical_uri => $canonical_uri->clone };
       }
     }
-    if (exists $data->{'$anchor'} and not is_ref($data->{'$anchor'})
+    if (exists $data->{'$anchor'} and JSON::Schema::Draft201909->_is_type('string', $data->{'$anchor'})
         and $data->{'$anchor'} =~ /^[A-Za-z][A-Za-z0-9_:.-]+$/) {
       my $uri = Mojo::URL->new->base($canonical_uri)->to_abs->fragment($data->{'$anchor'});
       $identifiers{$uri} = { path => $path, canonical_uri => $canonical_uri->clone };
@@ -149,7 +151,7 @@ JSON::Schema::Draft201909::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.005
+version 0.008
 
 =head1 SYNOPSIS
 

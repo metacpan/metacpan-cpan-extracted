@@ -11,6 +11,7 @@ use lib qw(../lib/);
 
 use LCS::BV;
 use LCS;
+use LCS::Tiny;
 use Algorithm::Diff;
 use Algorithm::Diff::XS;
 use String::Similarity;
@@ -21,6 +22,7 @@ use Benchmark qw(:all) ;
 #use LCS::Tiny;
 #use LCS;
 use LCS::BV;
+use LCS::XS;
 
 #my $align = Align::Sequence->new;
 
@@ -50,84 +52,94 @@ my @data3 = ([qw/a b d/ x 50], [qw/b a d c/ x 50]);
 
 my @strings3 = map { join('',@$_) } @data3;
 
-print "\n",'LCS: Algorithm::Diff, Algorithm::Diff::XS, LCS, LCS::BV',"\n","\n";
-
-print 'LCS: [Chrerrplzon] [Choerephon]',"\n","\n";
+my $obj = LCS::BV->new();
 
 if (1) {
+
+  print "\n",'LCS: Algorithm::Diff, Algorithm::Diff::XS, LCS, LCS::BV',"\n","\n";
+
+  print 'LCS: [Chrerrplzon] [Choerephon]',"\n","\n";
+
+  if (1) {
     cmpthese( -1, {
-        'AD:LCSidx___' => sub {
+        'AD:LCSidx' => sub {
             Algorithm::Diff::LCSidx(@data)
         },
         'AD:XS:LCSidx' => sub {
             Algorithm::Diff::XS::LCSidx(@data)
         },
-        'LCS:BV:LCS__' => sub {
+        'LCS:BV:LCS' => sub {
             LCS::BV->LCS(@data)
         },
-        'LCS:LCS_____' => sub {
-            LCS::->LCS(@data)
+        'LCS:LCS' => sub {
+            LCS->LCS(@data)
+        },
+        'LCS:XS' => sub {
+            LCS::XS->LCS(@data)
+        },
+        'LCS:XSs' => sub {
+            LCS::XS->LCSs($strings[0],$strings[1])
         },
     });
-}
+  }
 
-print "\n",'LCS: [qw/a b d/ x 50], [qw/b a d c/ x 50]',"\n","\n";
+  print "\n",'LCS: [qw/a b d/ x 50], [qw/b a d c/ x 50]',"\n","\n";
 
-if (1) {
+  if (0) {
     cmpthese( -1, {
-        'AD:LCSidx___' => sub {
+        'AD:LCSidx' => sub {
             Algorithm::Diff::LCSidx(@data3)
         },
         'AD:XS:LCSidx' => sub {
             Algorithm::Diff::XS::LCSidx(@data3)
         },
-        'LCS:BV:LCS__' => sub {
+        'LCS:BV:LCS' => sub {
             LCS::BV->LCS(@data3)
         },
-        'LCS:LCS_____' => sub {
+        'LCS:LCS' => sub {
             LCS::->LCS(@data3)
         },
     });
-}
+  }
 
 print "\n",'LLCS: [Chrerrplzon] [Choerephon]',"\n","\n";
 
-if (1) {
+  if (0) {
     cmpthese( -1, {
-        'AD:LCS_length___' => sub {
+        'AD:LCS_length' => sub {
             Algorithm::Diff::LCS_length(@data)
         },
         'AD:XS:LCS_length' => sub {
             Algorithm::Diff::XS::LCS_length(@data)
         },
-        'LCS:BV:LLCS_____' => sub {
+        'LCS:BV:LLCS' => sub {
             LCS::BV->LLCS(@data)
         },
-        'LCS:LLCS________' => sub {
+        'LCS:LLCS' => sub {
             LCS->LLCS(@data)
         },
     });
-}
+  }
 
-print "\n",'LLCS: [qw/a b d/ x 50], [qw/b a d c/ x 50]',"\n","\n";
+  print "\n",'LLCS: [qw/a b d/ x 50], [qw/b a d c/ x 50]',"\n","\n";
 
-if (1) {
+  if (0) {
     cmpthese( -1, {
-        'AD:LCS_length___' => sub {
+        'AD:LCS_length' => sub {
             Algorithm::Diff::LCS_length(@data3)
         },
         'AD:XS:LCS_length' => sub {
             Algorithm::Diff::XS::LCS_length(@data3)
         },
-        'LCS:BV:LLCS_____' => sub {
+        'LCS:BV:LLCS' => sub {
             LCS::BV->LLCS(@data3)
         },
-        'LCS:LLCS________' => sub {
+        'LCS:LLCS' => sub {
             LCS->LLCS(@data3)
         },
     });
+  }
 }
-
 
 if (0) {
     cmpthese( -1, {
@@ -200,7 +212,68 @@ if (0) {
     });
 }
 
+if (1) {
+  print "\n",'LLCS: [Chrerrplzon] [Choerephon]',"\n","\n";
+
+  if (1) {
+    my $positions = $obj->prepare($data[0]);
+    cmpthese( -1, {
+        'LCS:BV:LLCS' => sub {
+            LCS::BV->LLCS(@data)
+        },
+        'LCS:LLCS' => sub {
+            LCS->LLCS(@data)
+        },
+        'LCStiny' => sub {
+            LCS::Tiny->LCS(@data)
+        },
+        'LCS::XS' => sub {
+            LCS::XS->LCS(@data)
+        },
+        'LCS:BV:LLS_prepared' => sub {
+            $obj->LLCS_prepared($positions,$data[1]),
+        },
+    });
+  }
+
+  print "\n",'LLCS: [qw/a b d/ x 50], [qw/b a d c/ x 50]',"\n","\n";
+
+  if (0) {
+    cmpthese( -1, {
+        'LCS:BV:LLCS' => sub {
+            LCS::BV->LLCS(@data3)
+        },
+        'LCS:LLCS' => sub {
+            LCS->LLCS(@data3)
+        },
+        'LCStiny' => sub {
+            LCS::Tiny->LCS(@data3)
+        },
+    });
+  }
+}
+
 =pod
+
+w3: Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+https://ark.intel.com/content/www/de/de/ark/products/75122/intel-core-i7-4770-processor-8m-cache-up-to-3-90-ghz.html
+
+    Intel Core i7-4770 Processor
+    Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2
+    4 Cores, 8 Threads
+    3.40 - 3.90 GHz
+    8 MB Cache
+    32 GB DDR3 RAM
+
+
+https://ark.intel.com/content/www/de/de/ark/products/83505/intel-core-i7-4770hq-processor-6m-cache-up-to-3-40-ghz.html
+
+    Intel Core i7-4770HQ Processor
+    Intel® SSE4.1, Intel® SSE4.2, Intel® AVX2
+    4 Cores, 8 Threads
+    2.20 - 3.40 GHz
+    6 MB Cache
+    16 GB DDR3 RAM
 
 LCS-BV/xt$ perl 50_diff_bench.t
 
@@ -208,35 +281,51 @@ LCS: Algorithm::Diff, Algorithm::Diff::XS, LCS, LCS::BV
 
 LCS: [Chrerrplzon] [Choerephon]
 
-                Rate LCS:LCS_____ AD:LCSidx___ AD:XS:LCSidx LCS:BV:LCS__
-LCS:LCS_____  9050/s           --         -72%         -87%         -87%
-AD:LCSidx___ 32000/s         254%           --         -53%         -55%
-AD:XS:LCSidx 68266/s         654%         113%           --          -5%
-LCS:BV:LCS__ 71739/s         693%         124%           5%           --
+                Rate      LCS:LCS    AD:LCSidx AD:XS:LCSidx   LCS:BV:LCS
+LCS:LCS       9225/s           --         -72%         -87%         -88%
+AD:LCSidx    33185/s         260%           --         -53%         -58%
+AD:XS:LCSidx 70447/s         664%         112%           --         -12%
+LCS:BV:LCS   79644/s         763%         140%          13%           --
 
 LCS: [qw/a b d/ x 50], [qw/b a d c/ x 50]
 
-               Rate LCS:LCS_____ AD:LCSidx___ LCS:BV:LCS__ AD:XS:LCSidx
-LCS:LCS_____ 46.7/s           --         -42%         -96%         -99%
-AD:LCSidx___ 79.8/s          71%           --         -93%         -98%
-LCS:BV:LCS__ 1163/s        2392%        1357%           --         -70%
-AD:XS:LCSidx 3930/s        8321%        4824%         238%           --
+               Rate      LCS:LCS    AD:LCSidx   LCS:BV:LCS AD:XS:LCSidx
+LCS:LCS      49.5/s           --         -37%         -96%         -99%
+AD:LCSidx    79.0/s          60%           --         -94%         -98%
+LCS:BV:LCS   1255/s        2434%        1488%           --         -69%
+AD:XS:LCSidx 4073/s        8124%        5052%         224%           --
 
 LLCS: [Chrerrplzon] [Choerephon]
 
-                     Rate LCS:LLCS________ AD:XS:LCS_length AD:LCS_length___ LCS:BV:LLCS_____
-LCS:LLCS________  10860/s               --             -70%             -70%             -92%
-AD:XS:LCS_length  36202/s             233%               --              -1%             -74%
-AD:LCS_length___  36540/s             236%               1%               --             -73%
-LCS:BV:LLCS_____ 137845/s            1169%             281%             277%               --
+                     Rate    LCS:LLCS AD:LCS_length AD:XS:LCS_length LCS:BV:LLCS
+LCS:LLCS          11270/s          --          -70%             -70%        -92%
+AD:LCS_length     37594/s        234%            --              -1%        -75%
+AD:XS:LCS_length  38059/s        238%            1%               --        -74%
+LCS:BV:LLCS      148945/s       1222%          296%             291%          --
 
 LLCS: [qw/a b d/ x 50], [qw/b a d c/ x 50]
 
-                   Rate LCS:LLCS________ AD:LCS_length___ AD:XS:LCS_length LCS:BV:LLCS_____
-LCS:LLCS________ 47.7/s               --             -40%             -40%             -98%
-AD:LCS_length___ 79.0/s              66%               --              -1%             -96%
-AD:XS:LCS_length 79.8/s              67%               1%               --             -96%
-LCS:BV:LLCS_____ 2054/s            4206%            2499%            2474%               --
+                   Rate     LCS:LLCS AD:LCS_length AD:XS:LCS_length  LCS:BV:LLCS
+LCS:LLCS         50.0/s           --          -37%             -37%         -98%
+AD:LCS_length    79.2/s          58%            --              -1%         -97%
+AD:XS:LCS_length 79.8/s          60%            1%               --         -97%
+LCS:BV:LLCS      2357/s        4614%         2874%            2853%           --
+
+
+
+LLCS: [Chrerrplzon] [Choerephon]
+
+                Rate    LCS:LLCS     LCStiny LCS:BV:LLCS
+LCS:LLCS     11377/s          --        -76%        -92%
+LCStiny      47733/s        320%          --        -64%
+LCS:BV:LLCS 133980/s       1078%        181%          --
+
+LLCS: [qw/a b d/ x 50], [qw/b a d c/ x 50]
+
+              Rate    LCS:LLCS     LCStiny LCS:BV:LLCS
+LCS:LLCS    50.5/s          --        -29%        -98%
+LCStiny     71.0/s         41%          --        -97%
+LCS:BV:LLCS 2337/s       4531%       3190%          --
 
 =cut
 

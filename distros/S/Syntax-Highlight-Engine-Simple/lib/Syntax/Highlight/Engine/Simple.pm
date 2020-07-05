@@ -2,7 +2,7 @@ package Syntax::Highlight::Engine::Simple;
 use warnings;
 use strict;
 use Carp;
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 
     ### ---
     ### constructor

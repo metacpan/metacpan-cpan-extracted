@@ -1,8 +1,12 @@
-package Raisin::Decoder;
+#!perl
+#PODNAME: Raisin::Decoder
+#ABSTRACT: A helper for L<Raisin::Middleware::Formatter> over decoder modules
 
 use strict;
 use warnings;
 
+package Raisin::Decoder;
+$Raisin::Decoder::VERSION = '0.90';
 use parent 'Raisin::Encoder';
 
 sub builtin {
@@ -16,9 +20,17 @@ sub builtin {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Raisin::Decoder - A helper for L<Raisin::Middleware::Formatter> over decoder modules.
+Raisin::Decoder - A helper for L<Raisin::Middleware::Formatter> over decoder modules
+
+=head1 VERSION
+
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -42,11 +54,13 @@ They are: L<Raisin::Encoder::JSON>, L<Raisin::Encoder::YAML>.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh E<lt>atE<gt> cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

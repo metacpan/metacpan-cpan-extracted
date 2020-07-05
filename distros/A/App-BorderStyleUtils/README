@@ -2,8 +2,8 @@ NAME
     App::BorderStyleUtils - CLI utilities related to border styles
 
 VERSION
-    This document describes version 0.001 of App::BorderStyleUtils (from
-    Perl distribution App-BorderStyleUtils), released on 2020-06-11.
+    This document describes version 0.002 of App::BorderStyleUtils (from
+    Perl distribution App-BorderStyleUtils), released on 2020-06-19.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:

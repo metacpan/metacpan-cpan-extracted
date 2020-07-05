@@ -8,7 +8,7 @@ package Object::Pad;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.31';
 
 use Carp;
 
@@ -207,13 +207,16 @@ to use L</method> to create an accessor.
 
 A scalar slot may provide a expression that gives an initialisation value,
 which will be assigned into the slot of every instance during the constructor
-before the C<BUILD> blocks are invoked. Note that this expression is evaluated
-exactly once, at runtime, after the class definition has been parsed. It is
-not evaluated individually for every object instance of that class.
+before the C<BUILD> blocks are invoked. I<Since version 0.29> this expression
+does not have to be a compiletime constant, though it is evaluated exactly
+once, at runtime, after the class definition has been parsed. It is not
+evaluated individually for every object instance of that class.
 
 The following slot attributes are supported:
 
 =head3 :reader, :reader(NAME)
+
+I<Since version 0.27.>
 
 Generates a reader method to return the current value of the slot. Currently
 these are only permitted for scalar slots. If no name is given, the name of
@@ -226,6 +229,8 @@ the slot is used. A single prefix character C<_> will be removed if present.
 
 =head3 :writer, :writer(NAME)
 
+I<Since version 0.27.>
+
 Generates a writer method to set a new value of the slot from its first
 argument. Currently these are only permitted for scalar slots. If no name is
 given, the name of the slot is used prefixed by C<set_>. A single prefix
@@ -234,9 +239,18 @@ character C<_> will be removed if present.
    has $slot :writer;
 
    # equivalent to
-   has $slot;  method set_slot { $slot = shift }
+   has $slot;  method set_slot { $slot = shift; return $self }
+
+I<Since version 0.28> a generated writer method will return the object
+invocant itself, allowing a chaining style.
+
+   $obj->set_x("x")
+      ->set_y("y")
+      ->set_z("z");
 
 =head3 :mutator, :mutator(NAME)
+
+I<Since version 0.27.>
 
 Generates an lvalue mutator method to return or set the value of the slot.
 These are only permitted for scalar slots. If no name is given, the name of
@@ -246,6 +260,11 @@ the slot is used. A single prefix character C<_> will be removed if present.
 
    # equivalent to
    has $slot;  method slot :lvalue { $slot }
+
+I<Since version 0.28> all of these generated accessor methods will include
+argument checking similar to that used by subroutine signatures, to ensure the
+correct number of arguments are passed - usually zero, but exactly one in the
+case of a C<:writer> method.
 
 =head2 method
 
@@ -299,6 +318,8 @@ The following additional attributes are recognised by C<Object::Pad> directly:
 
 =head3 :override
 
+I<Since version 0.29.>
+
 Marks that this method expects to override another of the same name from a
 superclass. It is an error at compiletime if the superclass does not provide
 such a method.
@@ -313,13 +334,17 @@ such a method.
       ...
    }
 
+I<Since version 0.27.>
+
 Declares the builder block for this component class. A builder block may use
 subroutine signature syntax, as for methods, to assist in unpacking its
-arguments.
+arguments. A build block is not a subroutine and thus is not permitted to use
+subroutine attributes (for example C<:lvalue>).
 
-Currently this is just a synonym for C<method BUILD ...>, though in a later
-version this may no longer be the case. A build block is not permitted to use
-subroutine attributes.
+Currently attempts to create a method named C<BUILD> (i.e. with syntax
+C<method BUILD {...}>) will create a builder block instead. As of version 0.31
+such attempts will print a warning at compiletime, and a later version may
+remove this altogether.
 
 =head1 IMPLIED PRAGMATA
 
@@ -504,57 +529,12 @@ sub begin_class
    Object::Pad::_begin_class( $name, $args{extends} );
 }
 
-sub Object::Pad::MOP::Class::add_BUILD
-{
-   my $self = shift;
-   my ( $code ) = @_;
-   # For now a builder is just a method named BUILD. But keep this API in case
-   # one day it isn't
-   $self->_add_method( BUILD => $code );
-}
-
-sub Object::Pad::MOP::Class::add_method
-{
-   my $self = shift;
-   my ( $name, $code ) = @_;
-
-   $name eq "BUILD" and
-      carp "Adding a named method called BUILD is not recommended; use ->add_BUILD directly";
-
-   $self->_add_method( $name, $code );
-}
-
-sub Object::Pad::MOP::Class::_add_method
-{
-   my $self = shift;
-   my ( $name, $code ) = @_;
-
-   my $pkg = $self->name;
-
-   no strict 'refs';
-   *{"${pkg}::${name}"} = $code;
-}
-
 # The universal base-class methods
 
 sub Object::Pad::UNIVERSAL::BUILDARGS
 {
    shift; # $class
    return @_;
-}
-
-# TODO: Inject this at class generation time by folding the mro list
-sub Object::Pad::UNIVERSAL::BUILDALL
-{
-   my $self = shift;
-
-   foreach my $pkg ( reverse @{ mro::get_linear_isa( ref $self ) } ) {
-      no strict 'refs';
-      defined &{"${pkg}::BUILD"} or next;
-
-      my $meth = \&{"${pkg}::BUILD"};
-      $self->$meth( @_ );
-   }
 }
 
 =head1 WITH OTHER MODULES

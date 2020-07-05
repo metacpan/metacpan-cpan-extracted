@@ -4,22 +4,25 @@
 
 namespace panda { namespace unievent {
 
+template<typename T>
+using opt = optional<T>;
+
 struct IFsPollListener {
-    virtual void on_fs_poll  (const FsPollSP&, const Fs::FStat& prev, const Fs::FStat& cur, const std::error_code&) = 0;
-    virtual void on_fs_start (const FsPollSP&, const Fs::FStat& stat, const std::error_code&) = 0;
+    virtual void on_fs_poll  (const FsPollSP&, const opt<Fs::FStat>& prev, const opt<Fs::FStat>& cur, const std::error_code&) = 0;
+    virtual void on_fs_start (const FsPollSP&, const opt<Fs::FStat>& stat, const std::error_code&) = 0;
 };
 
 struct IFsPollSelfListener : IFsPollListener {
-    virtual void on_fs_poll  (const Fs::FStat& prev, const Fs::FStat& cur, const std::error_code&) = 0;
-    virtual void on_fs_start (const Fs::FStat& stat, const std::error_code&) = 0;
-    void on_fs_poll  (const FsPollSP&, const Fs::FStat& prev, const Fs::FStat& cur, const std::error_code& err) override { on_fs_poll(prev, cur, err); }
-    void on_fs_start (const FsPollSP&, const Fs::FStat& stat, const std::error_code& err)                       override { on_fs_start(stat, err); }
+    virtual void on_fs_poll  (const opt<Fs::FStat>& prev, const opt<Fs::FStat>& cur, const std::error_code&) = 0;
+    virtual void on_fs_start (const opt<Fs::FStat>& stat, const std::error_code&) = 0;
+    void on_fs_poll  (const FsPollSP&, const opt<Fs::FStat>& prev, const opt<Fs::FStat>& cur, const std::error_code& err) override { on_fs_poll(prev, cur, err); }
+    void on_fs_start (const FsPollSP&, const opt<Fs::FStat>& stat, const std::error_code& err)                       override { on_fs_start(stat, err); }
 };
 
 struct FsPoll : virtual Handle {
-    using fs_poll_fptr  = void(const FsPollSP&, const Fs::FStat& prev, const Fs::FStat& cur, const std::error_code&);
+    using fs_poll_fptr  = void(const FsPollSP&, const opt<Fs::FStat>& prev, const opt<Fs::FStat>& cur, const std::error_code&);
     using fs_poll_fn    = function<fs_poll_fptr>;
-    using fs_start_fptr = void(const FsPollSP&, const Fs::FStat& stat, const std::error_code&);
+    using fs_start_fptr = void(const FsPollSP&, const opt<Fs::FStat>& stat, const std::error_code&);
     using fs_start_fn   = function<fs_start_fptr>;
 
     static const HandleType TYPE;
@@ -58,8 +61,8 @@ private:
     IFsPollListener*  _listener;
 
     void do_stat        ();
-    void notify         (const Fs::FStat&, const Fs::FStat&, const std::error_code&);
-    void initial_notify (const Fs::FStat&, const std::error_code&);
+    void notify         (const opt<Fs::FStat>&, const opt<Fs::FStat>&, const std::error_code&);
+    void initial_notify (const opt<Fs::FStat>&, const std::error_code&);
 };
 
 }}

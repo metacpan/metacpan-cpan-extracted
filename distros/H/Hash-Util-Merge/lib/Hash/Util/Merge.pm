@@ -6,8 +6,9 @@ use strict;
 use warnings;
 
 use Exporter ();
+use Sub::Util 1.40 qw( set_prototype );
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 # ABSTRACT: utility functions for merging hashes
 
@@ -29,7 +30,7 @@ sub import {
 }
 
 
-sub mergemap(&$$) { ## no critic (ProhibitSubroutinePrototypes)
+sub mergemap {
 
     my $pkg = caller;
     no strict 'refs'; ## no critic (ProhibitNoStrict)
@@ -50,6 +51,10 @@ sub mergemap(&$$) { ## no critic (ProhibitSubroutinePrototypes)
     return \%r;
 }
 
+BEGIN {
+    set_prototype '&$$' => \&mergemap;
+}
+
 
 1;
 
@@ -65,7 +70,7 @@ Hash::Util::Merge - utility functions for merging hashes
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 

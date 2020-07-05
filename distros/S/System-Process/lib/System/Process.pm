@@ -127,7 +127,7 @@ no warnings qw/once/;
 use Carp;
 use POSIX;
 
-our $VERSION = 0.19;
+our $VERSION = '0.20';
 our $ABSTRACT = "Simple OO wrapper over ps.";
 our $TEST = 0;
 
@@ -273,7 +273,18 @@ sub process_info {
 
     my $command = 'ps u ' . $self->pid();
     my @res = `$command`;
-    my $parse_result = parse_output(@res);
+
+    my $parse_result;
+    # BusyBox ps ouputs all processes only. Do postfiltering.
+    my $header = shift @res;
+    for my $r (@res) {
+        my $out = parse_output($header, $r);
+
+        if ( $out && $out->{pid} == $self->pid() ) {
+            $parse_result = $out;
+            last;
+        }
+    }
 
     # return $self->parse_output(@res);
 
@@ -366,12 +377,11 @@ sub parse_output {
 
     return 0 unless $out[1];
 
-    my @header = split /\s+/, $out[0];
-    my @values = split /\s+/, $out[1];
+    my @header = grep { length } split /\s+/, $out[0];
+    my @values = grep { length } split /\s+/, $out[1];
+
     my $res;
-
     my $last_key;
-
     for (0 .. $#values) {
         unless (@header) {
             unshift @values, $res->{$last_key};

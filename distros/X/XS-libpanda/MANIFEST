@@ -1,11 +1,11 @@
 .gitattributes
 Changes
 CMakeLists.txt
-lib.xs
 lib/XS/libpanda.pm
 lib/XS/libpanda.pod
 LICENSE
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 misc/mytest.pl
 misc/trun.plx
@@ -21,6 +21,8 @@ src/panda/exception.cc
 src/panda/exception.h
 src/panda/exception/unix.icc
 src/panda/exception/win.icc
+src/panda/exception/win_debug.cc
+src/panda/exception/win_debug.h
 src/panda/expected.h
 src/panda/from_chars.cc
 src/panda/from_chars.h
@@ -30,12 +32,20 @@ src/panda/hash.cc
 src/panda/hash.h
 src/panda/intrusive_chain.h
 src/panda/iterator.h
-src/panda/log.cc
 src/panda/log.h
+src/panda/log/console.h
+src/panda/log/console.icc
+src/panda/log/log.cc
+src/panda/log/log.h
+src/panda/log/multi.h
+src/panda/log/multi.icc
+src/panda/log/PatternFormatter.h
+src/panda/log/PatternFormatter.icc
 src/panda/memory.cc
 src/panda/memory.h
 src/panda/optional.h
 src/panda/owning_list.h
+src/panda/pp.h
 src/panda/refcnt.cc
 src/panda/refcnt.h
 src/panda/string.h
@@ -65,7 +75,19 @@ t/intrusive_chain.cc
 t/intrusive_chain.t
 t/iptr.cc
 t/iptr.t
+t/log/formatter.cc
+t/log/formatter.t
+t/log/log.cc
+t/log/log.t
+t/log/logger.cc
+t/log/logger.t
+t/log/logtest.h
+t/log/module.cc
+t/log/module.t
+t/log/multi.cc
+t/log/multi.t
 t/MyTest.pm
+t/MyTest.xs
 t/owning_list.cc
 t/owning_list.t
 t/string_char.cc
@@ -85,6 +107,8 @@ t/to_chars.cc
 t/to_chars.t
 t/traits.cc
 t/traits.t
+t/valgrind.cc
+t/valgrind.t
 t/varint.cc
 t/varint.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

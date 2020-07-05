@@ -13,7 +13,6 @@ Protocol::HTTP::Request - HTTP request class
         http_version => 10,
         headers      => {MyHeader => "my value"},
         cookies      => {Lorem => 'ipsum'},
-        body         => "my body",
     });
 
     $req->method();             # => METHOD_POST
@@ -37,6 +36,23 @@ Protocol::HTTP::Request - HTTP request class
     $req->compress(Protocol::HTTP::Compression::gzip, Protocol::HTTP::Compression::LEVEL_OPTIMAL);
     # now $req->to_string would return a little bit different result
 
+    # uploading as multipart/form-data
+    my $req = Protocol::HTTP::Request->new({
+        form => [field1 => 'value1', field2 => 'value2'],
+    });
+
+    my $req = Protocol::HTTP::Request->new({
+        form => {
+            enc_type => ENCODING_MULTIPART,
+            fields   => [field1 => 'value1', field2 => 'value2'],
+        },
+    });
+
+    # migrate from URI to form
+    my $req = Protocol::HTTP::Request->new({
+        uri  => '/path?login=user&pass=secret',
+        form => ENCODING_URL
+    });
 
 
 =head1 DESCRIPTION
@@ -59,14 +75,13 @@ byte octets.
 
 Constructs new request from hashref of properties, i.e. C<method>, C<uri>,
 C<allow_compression>, C<headers>, C<body>, C<http_version>, C<chunked>,
-C<compress>.
+C<compress>, C<form>.
 
 See corresponding methods documentation below and in L<Protocol::HTTP::Message> to find out what these parameters support.
 
 C<allow_compression> should be an array ref if multiple values are passed.
 
-
-=head2 method([$method])
+=head2 method_raw([$method])
 
 Get/set HTTP request method, e.g. C<GET>, C<POST> etc. in the first line of the request
 
@@ -90,8 +105,19 @@ Possible values:
 
 =item METHOD_CONNECT
 
+=item METHOD_UNSPECIFIED
+
+The special value to distinguish the case, when client developer did not specify
+the desired method
+
 =back
 
+=head2 method([$method])
+
+Deduces the used method, i.e. when it is unspecified it will be GET or POST
+(for multipart/form_data).
+
+The setter-variant works as method_raw setter
 
 =head2 uri([$uri])
 
@@ -145,6 +171,28 @@ was requested (see L<Protocol::HTTP::Message>), then it will be applied here.
 
 Returns stringified HTTP request method, e.g. C<"GET">, C<"POST"> etc.
 
+=head2 form()
+
+Allows to post data as C<multipart/form-data> (default) or as
+C<application/x-www-form-urlencoded>.
+
+When it is encoded as C<multipart/form-data>, the request will use
+the right method, e.g. if it is set to C<GET> it will be switched to C<POST>.
+
+When form is empty, and it is encoded as C<multipart/form-data>, it
+will B<move> the parameters from the query part of the request URI into
+tht form. And vise versa, if it is encoded as C<application/x-www-form-urlencoded>,
+it will B<add> the form fields into the request URI.
+
+Possible values for form C<encoding>:
+
+=over
+
+=item ENCODING_MULTIPART
+
+=item ENCODING_URL
+
+=back
 
 =head1 FUNCTIONS
 
@@ -161,6 +209,8 @@ L<Protocol::HTTP>
 L<Protocol::HTTP::Message>
 
 L<Protocol::HTTP::Compression>
+
+L<Protocol::HTTP::CookieJar>
 
 L<URI::XS>
 

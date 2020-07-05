@@ -2,6 +2,10 @@
 ##
 ## Change log for perl distribution DDC-Concordance
 
+v0.48 Tue, 30 Jun 2020 09:45:12 +0200 moocow
+	+ added DDC::PP fix for mantis #47973: double-escaped slashes from CQTokRegex::toString()
+	+ updated lexer support for negative dates a la ddc v2.2.4
+
 v0.47 Fri, 29 May 2020 10:48:10 +0200 moocow
 	+ added parseAddr() call in new() to help ensure consistent $client->{connect}
 

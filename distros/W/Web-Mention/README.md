@@ -383,6 +383,17 @@ properties.)
 
 The type of webmention this is. One of:
 
+- mention _(default)_
+- reply
+- like
+- repost
+- quotation
+- rsvp
+
+This list is based on the W3C Post Type Discovery document
+([https://www.w3.org/TR/post-type-discovery/#response-algorithm](https://www.w3.org/TR/post-type-discovery/#response-algorithm)), and
+adds a "quotation" type.
+
 ### verify
 
     my $is_verified = $wm->verify
@@ -395,17 +406,6 @@ after one try.
 Sets `is_tested` to 1 as a side-effect.
 
 See also ["is\_verified"](#is_verified).
-
-- mention _(default)_
-- reply
-- like
-- repost
-- quotation
-- rsvp
-
-This list is based on the W3C Post Type Discovery document
-([https://www.w3.org/TR/post-type-discovery/#response-algorithm](https://www.w3.org/TR/post-type-discovery/#response-algorithm)), and
-adds a "quotation" type.
 
 # SERIALIZATION
 

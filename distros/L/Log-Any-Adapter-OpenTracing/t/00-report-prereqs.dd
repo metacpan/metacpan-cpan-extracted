@@ -1,0 +1,57 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::PluginBundle::Author::TEAM' => '0',
+                                      'Software::License::Perl_5' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Log::Any::Adapter::Base' => '1.500',
+                                      'Log::Any::Adapter::Util' => '0',
+                                      'OpenTracing' => '1.001',
+                                      'OpenTracing::Any' => '0',
+                                      'indirect' => '0',
+                                      'parent' => '0',
+                                      'strict' => '0',
+                                      'utf8' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Log::Any' => '0',
+                                   'Log::Any::Adapter' => '0',
+                                   'OpenTracing::DSL' => '0',
+                                   'Test::CheckDeps' => '0.010',
+                                   'Test::More' => '0.94',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

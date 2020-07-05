@@ -25,40 +25,40 @@
       },
       "configure" : {
          "requires" : {
-            "Export::XS" : "v3.0.3",
+            "Export::XS" : "v3.0.5",
             "Test::Catch" : "v1.0.13",
-            "XS::Framework" : "v1.2.7",
-            "XS::Install" : "v1.2.15",
-            "XS::libcatch" : "v1.1.0",
-            "XS::libpanda" : "v1.3.10",
+            "XS::Framework" : "v1.3.2",
+            "XS::Install" : "v1.2.17",
+            "XS::libcatch" : "v2.12.1",
+            "XS::libpanda" : "v1.4.0",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Export::XS" : "v3.0.3",
-            "XS::Framework" : "v1.2.7",
-            "XS::Install" : "v1.2.15",
-            "XS::libpanda" : "v1.3.10",
+            "Export::XS" : "v3.0.5",
+            "XS::Framework" : "v1.3.2",
+            "XS::Install" : "v1.2.17",
+            "XS::libpanda" : "v1.4.0",
             "next::XS" : "v1.0.7"
          }
       },
       "test" : {
          "requires" : {
-            "Export::XS" : "v3.0.3",
+            "Export::XS" : "v3.0.5",
             "Test::Catch" : "v1.0.13",
             "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::Simple" : "0.96",
-            "XS::Framework" : "v1.2.7",
-            "XS::libcatch" : "v1.1.0",
-            "XS::libpanda" : "v1.3.10",
+            "XS::Framework" : "v1.3.2",
+            "XS::libcatch" : "v2.12.1",
+            "XS::libpanda" : "v1.4.0",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

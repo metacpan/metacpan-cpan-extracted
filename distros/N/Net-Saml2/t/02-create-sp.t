@@ -1,24 +1,27 @@
-use Test::More;
-use Net::SAML2;
+use Test::Lib;
+use Test::Net::SAML2;
 
-my $sp = Net::SAML2::SP->new(
-        id               => 'http://localhost:3000',
-        url              => 'http://localhost:3000',
-        cert             => 't/sign-nopw-cert.pem',
-        key              => 't/sign-nopw-cert.pem',
-        cacert           => 't/cacert.pem',
-        org_name         => 'Test',
-        org_display_name => 'Test',
-        org_contact      => 'test@example.com',
+my $sp = net_saml2_sp();
+
+my $xpath = get_xpath(
+    $sp->metadata,
+    md => 'urn:oasis:names:tc:SAML:2.0:metadata'
 );
-ok($sp);
-ok($sp->metadata);
 
-my $xml = $sp->metadata;
-my $xpath = XML::XPath->new( xml => $xml );
-$xpath->set_namespace('md', 'urn:oasis:names:tc:SAML:2.0:metadata');
+my @ssos = $xpath->findnodes(
+    '//md:EntityDescriptor/md:SPSSODescriptor/md:AssertionConsumerService');
 
-my @ssos = $xpath->findnodes('//md:EntityDescriptor/md:SPSSODescriptor/md:AssertionConsumerService');
-ok($ssos[0]->getAttribute('Binding') eq 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST');
+if (is(@ssos, 2, "Got two assertionConsumerService(s)")) {
+    is(
+        $ssos[0]->getAttribute('Binding'),
+        'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+        "Returns the correct binding: HTTP-POST"
+    );
+    is(
+        $ssos[1]->getAttribute('Binding'),
+        'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact',
+        "Returns the correct binding: HTTP-Artifact"
+    );
+}
 
 done_testing;

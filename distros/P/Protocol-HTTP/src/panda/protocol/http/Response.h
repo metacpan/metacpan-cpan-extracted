@@ -4,6 +4,7 @@
 #include <panda/memory.h>
 #include <panda/optional.h>
 
+
 namespace panda { namespace protocol { namespace http {
 
 struct Request;
@@ -29,6 +30,7 @@ struct Response : Message, AllocatedObject<Response> {
         optional<Date> expires     () const { if (!_expires) return {}; return Date(_expires); }
         bool           secure      () const { return _secure; }
         bool           http_only   () const { return _http_only; }
+        bool           session     () const { return !(_max_age || _expires);  }
         SameSite       same_site   () const { return _same_site; }
         int64_t        max_age_any () const;
         optional<Date> expires_any () const;
@@ -85,8 +87,8 @@ struct Response : Message, AllocatedObject<Response> {
 
     string full_message () const { return panda::to_string(code) + " " + (message ? message : message_for_code(code)); }
 
-    std::vector<string> to_vector (const Request* req = nullptr);
-    string              to_string (const Request* req = nullptr) { return Message::to_string(to_vector(req)); }
+    std::vector<string> to_vector (const Request* req = nullptr) const;
+    string              to_string (const Request* req = nullptr) const { return Message::to_string(to_vector(req)); }
 
     static string message_for_code (int code);
 
@@ -98,7 +100,7 @@ protected:
 private:
     friend struct ResponseParser;
 
-    string _http_header (const Request*, Compression::Type) const;
+    string _http_header (SerializationContext& ctx) const;
 };
 using ResponseSP = iptr<Response>;
 

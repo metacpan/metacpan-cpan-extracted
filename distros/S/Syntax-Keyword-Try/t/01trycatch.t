@@ -5,6 +5,8 @@ use warnings;
 
 use Test::More;
 
+use constant HAVE_WARN_EXPERIMENTAL => $] >= 5.018;
+
 use Syntax::Keyword::Try;
 
 # try success
@@ -92,6 +94,18 @@ use Syntax::Keyword::Try;
 
    like( $e, qr/^oopsie at /, 'exception is thrown' );
    like( $caught, qr/^oopsie at /, 'exception was seen by catch{}' );
+}
+
+# catch into new lexical
+{
+   no if HAVE_WARN_EXPERIMENTAL, warnings => 'experimental';
+
+   try {
+      die "caught\n";
+   }
+   catch my $e {
+      is( $e, "caught\n", 'exception is caught into new lexical' );
+   }
 }
 
 done_testing;

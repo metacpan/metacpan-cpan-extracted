@@ -4,7 +4,7 @@ use warnings;
 
 use Scalar::Util qw/weaken/;
 
-our $VERSION = '2.84';
+our $VERSION = '2.85';
 
 # this module extends SVG::Element
 package SVG::Element;
@@ -619,7 +619,7 @@ and so on.
 
 =head1 SYNOPSIS
 
-    my $svg=new SVG(id=>"svg_dom_synopsis", width=>"100", height=>"100");
+    my $svg=SVG->new(id=>"svg_dom_synopsis", width=>"100", height=>"100");
     my %attributes=$svg->getAttributes;
 
     my $group=$svg->group(id=>"group_1");
@@ -798,7 +798,6 @@ Martin Owens, doctormo@postmaster.co.uk
 
 perl(1), L<SVG>, L<SVG::XML>, L<SVG::Element>, L<SVG::Parser>
 
-L<http://www.roitsystems.com/> ROIT Systems: Commercial SVG perl solutions
 L<http://www.w3c.org/Graphics/SVG/> SVG at the W3C
 
 =cut

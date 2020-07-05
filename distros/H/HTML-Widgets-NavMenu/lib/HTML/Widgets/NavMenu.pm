@@ -1,18 +1,16 @@
+package HTML::Widgets::NavMenu;
+$HTML::Widgets::NavMenu::VERSION = '1.0801';
 use strict;
 use warnings;
 
 use 5.012;
 
-package HTML::Widgets::NavMenu;
-
-our $VERSION = '1.0703';
-
 package HTML::Widgets::NavMenu::Error;
-
-use base "HTML::Widgets::NavMenu::Object";
+$HTML::Widgets::NavMenu::Error::VERSION = '1.0801';
+use parent "HTML::Widgets::NavMenu::Object";
 
 package HTML::Widgets::NavMenu::Error::Redirect;
-
+$HTML::Widgets::NavMenu::Error::Redirect::VERSION = '1.0801';
 use strict;
 use vars qw(@ISA);
 @ISA = ("HTML::Widgets::NavMenu::Error");
@@ -28,10 +26,10 @@ sub CGIpm_perform_redirect
 }
 
 package HTML::Widgets::NavMenu::NodeDescription;
-
+$HTML::Widgets::NavMenu::NodeDescription::VERSION = '1.0801';
 use strict;
 
-use base qw(HTML::Widgets::NavMenu::Object);
+use parent qw(HTML::Widgets::NavMenu::Object);
 
 __PACKAGE__->mk_acc_ref( [qw(host host_url title label direct_url url_type)] );
 
@@ -50,14 +48,14 @@ sub _init
 1;
 
 package HTML::Widgets::NavMenu::LeadingPath::Component;
-
+$HTML::Widgets::NavMenu::LeadingPath::Component::VERSION = '1.0801';
 use vars qw(@ISA);
 
 @ISA = (qw(HTML::Widgets::NavMenu::NodeDescription));
 
 package HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive;
-
-use base 'HTML::Widgets::NavMenu::Iterator::Base';
+$HTML::Widgets::NavMenu::Iterator::GetCurrentlyActive::VERSION = '1.0801';
+use parent 'HTML::Widgets::NavMenu::Iterator::Base';
 
 __PACKAGE__->mk_acc_ref(
     [
@@ -166,9 +164,9 @@ sub _get_leading_path_coords
 
 package HTML::Widgets::NavMenu;
 
-use base 'HTML::Widgets::NavMenu::Object';
+use parent 'HTML::Widgets::NavMenu::Object';
 
-use HTML::Widgets::NavMenu::Url;
+use HTML::Widgets::NavMenu::Url ();
 
 require HTML::Widgets::NavMenu::Iterator::NavMenu;
 require HTML::Widgets::NavMenu::Iterator::SiteMap;
@@ -463,7 +461,7 @@ sub _get_next_coords
 
     my $i;
 
-    for ( $i = 0 ; $i < scalar(@coords) ; $i++ )
+    for ( $i = 0 ; $i < scalar(@coords) ; ++$i )
     {
         $branches[ $i + 1 ] = $branches[$i]->get_nth_sub( $coords[$i] );
     }
@@ -474,7 +472,7 @@ sub _get_next_coords
     }
     else
     {
-        for ( $i-- ; $i >= 0 ; $i-- )
+        for ( --$i ; $i >= 0 ; --$i )
         {
             if ( $branches[$i]->_num_subs() > ( $coords[$i] + 1 ) )
             {
@@ -810,13 +808,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 HTML::Widgets::NavMenu - A Perl Module for Generating HTML Navigation Menus
 
 =head1 VERSION
 
-version 1.0704
+version 1.0801
 
 =head1 SYNOPSIS
 
@@ -868,27 +868,6 @@ directory of the HTML-Widgets-NavMenu tarball, and complete working sites
 in the version control repositories at
 L<https://bitbucket.org/shlomif/shlomi-fish-homepage>
 and L<https://bitbucket.org/shlomif/perl-begin/>.
-
-=begin comment
-
-sub get_rel_url_from_coords
-{
-    my $self = shift;
-    my $coords = shift;
-
-    my ($ptr,$host);
-    my $iterator = $self->_get_nav_menu_traverser();
-    my $node_ret = $iterator->find_node_by_coords($coords);
-    my $item = $node_ret->{'item'};
-
-    return $self->_get_url_to_item($item);
-}
-
-=end comment
-
-=head1 VERSION
-
-version 1.0704
 
 =head1 USAGE
 
@@ -1099,6 +1078,23 @@ A flag that indicates if C<'host_url'> is already absolute.
 This is like get_cross_host_rel_url_ref() except that the arguments
 are clobbered into the arguments list. It is kept here for compatibility
 sake.
+
+=begin comment
+
+sub get_rel_url_from_coords
+{
+    my $self = shift;
+    my $coords = shift;
+
+    my ($ptr,$host);
+    my $iterator = $self->_get_nav_menu_traverser();
+    my $node_ret = $iterator->find_node_by_coords($coords);
+    my $item = $node_ret->{'item'};
+
+    return $self->_get_url_to_item($item);
+}
+
+=end comment
 
 =head1 The Input Tree of Contents
 
@@ -1404,8 +1400,8 @@ scripts.
 =item L<HTML::Menu::Hierarchical>
 
 A module by Don Owens for generating hierarchical HTML menus. I could not
-quite understand its tree traversal semantics, so I ended up not using it. Also
-seems to require that each of the tree node will have a unique ID.
+quite understand its tree traversal semantics, so I ended up not using it.
+It also seems to require that each of the tree nodes will have a unique ID.
 
 =item L<HTML::Widgets::Menu>
 
@@ -1433,36 +1429,9 @@ Copyright 2004, Shlomi Fish. All rights reserved.
 You can use, modify and distribute this module under the terms of the MIT Expat
 license. ( L<http://www.opensource.org/licenses/mit-license.php> ).
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2014 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/perl-HTML-Widgets-NavMenu/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc HTML::Widgets::NavMenu
 
 =head2 Websites
 
@@ -1481,35 +1450,11 @@ L<https://metacpan.org/release/HTML-Widgets-NavMenu>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/HTML-Widgets-NavMenu>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Widgets-NavMenu>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/HTML-Widgets-NavMenu>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/HTML-Widgets-NavMenu>
 
 =item *
 
@@ -1560,5 +1505,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-HTML-Widgets-NavMenu>
 
   git clone git://github.com/shlomif/perl-HTML-Widgets-NavMenu.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/perl-HTML-Widgets-NavMenu/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2005 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

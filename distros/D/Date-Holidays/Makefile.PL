@@ -9,12 +9,8 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Date::Holidays::* adapter and aggregator for all your holiday needs",
   "AUTHOR" => "Jonas B. <jonasbn\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "Module::Build" => "0.30"
-  },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
-    "Module::Build" => "0.30"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Date-Holidays",
   "LICENSE" => "artistic_2",
@@ -46,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "1.22",
+  "VERSION" => "1.23",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,7 +60,6 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "JSON" => 0,
   "Locale::Country" => 0,
-  "Module::Build" => "0.30",
   "Module::Load" => 0,
   "Pod::Coverage::TrustPod" => 0,
   "Scalar::Util" => 0,

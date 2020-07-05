@@ -61,6 +61,14 @@ sub initialize {
         return Protocol::DBus::Client::EventMessenger->new(
             $self->{'db'},
             $post_send_cr,
+            sub {
+                $self->_pause();
+                $self->{'_paused'} = 1;
+            },
+            sub {
+                $self->_resume();
+                $self->{'_paused'} = 0;
+            },
         );
     } );
 }
@@ -171,6 +179,12 @@ sub _create_get_message_callback {
                 if ($$on_signal_cr_r && $msg->type_is('SIGNAL')) {
                     $$on_signal_cr_r->($msg);
                 }
+
+                # In testing D-Bus was fast enough to send back
+                # a self-directed signal while this loop was happening,
+                # which caused receipt of messages even after pause()
+                # had been called.
+                last if $self->{'_paused'};
             }
 
             1;

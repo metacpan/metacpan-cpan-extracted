@@ -35,7 +35,7 @@
             "AnyEvent" : "0",
             "AnyEvent::AIO" : "0",
             "Class::Refresh" : "0",
-            "Compiler::Lexer" : "0",
+            "Compiler::Lexer" : "0.23",
             "Coro" : "0",
             "Data::Dump" : "0",
             "IO::AIO" : "0",
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.0.2",
+   "version" : "v2.1.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

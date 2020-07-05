@@ -37,7 +37,7 @@ bool SpatialIndex::remove(Envelope& env, SV *item) {
     SV* value = hv_delete_ent(real_payload->map, item, 0, 0);
     if (!value) throw "value is n/a in hash";
 
-    THIS->remove(&env, value);
+    RETVAL = THIS->remove(&env, value);
 }
 
 BOOT {

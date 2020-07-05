@@ -9,5 +9,7 @@ minil.toml
 t/00_compile.t
 t/01_DBI.t
 t/02_SQLite.t
+t/lib/ArrayCondition.pm
+t/lib/HashCondition.pm
 META.yml
 MANIFEST

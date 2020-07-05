@@ -3236,35 +3236,35 @@ case 133:
 	goto st0;
 tr178:
 #line 173 "src/panda/protocol/http/MessageParser.rl"
-	{request->method = Request::Method::CONNECT; }
+	{request->method_raw(Request::Method::CONNECT); }
 	goto st134;
 tr401:
 #line 171 "src/panda/protocol/http/MessageParser.rl"
-	{request->method = Request::Method::DELETE; }
+	{request->method_raw(Request::Method::DELETE);  }
 	goto st134;
 tr404:
 #line 167 "src/panda/protocol/http/MessageParser.rl"
-	{request->method = Request::Method::GET; }
+	{request->method_raw(Request::Method::GET);     }
 	goto st134;
 tr408:
 #line 168 "src/panda/protocol/http/MessageParser.rl"
-	{request->method = Request::Method::HEAD; }
+	{request->method_raw(Request::Method::HEAD);    }
 	goto st134;
 tr415:
 #line 166 "src/panda/protocol/http/MessageParser.rl"
-	{request->method = Request::Method::OPTIONS; }
+	{request->method_raw(Request::Method::OPTIONS); }
 	goto st134;
 tr420:
 #line 169 "src/panda/protocol/http/MessageParser.rl"
-	{request->method = Request::Method::POST; }
+	{request->method_raw(Request::Method::POST);    }
 	goto st134;
 tr422:
 #line 170 "src/panda/protocol/http/MessageParser.rl"
-	{request->method = Request::Method::PUT; }
+	{request->method_raw(Request::Method::PUT);     }
 	goto st134;
 tr427:
 #line 172 "src/panda/protocol/http/MessageParser.rl"
-	{request->method = Request::Method::TRACE; }
+	{request->method_raw(Request::Method::TRACE);   }
 	goto st134;
 st134:
 	if ( ++p == pe )

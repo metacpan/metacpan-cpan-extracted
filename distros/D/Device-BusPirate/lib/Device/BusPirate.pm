@@ -8,7 +8,7 @@ package Device::BusPirate;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 
@@ -53,22 +53,22 @@ device.
 To use it synchronously, call the C<get> method of any returned C<Future>
 instances to obtain the eventual result:
 
- my $spi = $pirate->enter_mode( "SPI" )->get;
+   my $spi = $pirate->enter_mode( "SPI" )->get;
 
- $spi->power( 1 )->get;
- my $input = $spi->writeread_cs( $output )->get;
+   $spi->power( 1 )->get;
+   my $input = $spi->writeread_cs( $output )->get;
 
 A truely-asynchronous program would use the futures more conventionally,
 perhaps by using C<< ->then >> chaining:
 
- my $input = $pirate->enter_mode( "SPI" )
-   ->then( sub {
-      my ( $spi ) = @_;
+   my $input = $pirate->enter_mode( "SPI" )
+     ->then( sub {
+        my ( $spi ) = @_;
 
-      $spi->power( 1 )->then( sub {
-         $spi->writeread_cs( $output );
-      });
-   });
+        $spi->power( 1 )->then( sub {
+           $spi->writeread_cs( $output );
+        });
+     });
 
 This module uses L<Future::IO> for its underlying IO operations, so using it
 in a program would require the event system to integrate with C<Future::IO>
@@ -262,6 +262,10 @@ The I2C mode. Returns an instance of L<Device::BusPirate::Mode::I2C>.
 
 The SPI mode. Returns an instance of L<Device::BusPirate::Mode::SPI>.
 
+=item C<UART>
+
+The UART mode. Returns an instance of L<Device::BusPirate::Mode::UART>.
+
 =back
 
 Once a mode object has been created, most of the interaction with the device
@@ -338,7 +342,7 @@ sub stop
 
 =item *
 
-More modes - UART, 1-wire, raw-wire
+More modes - 1-wire, raw-wire
 
 =item *
 

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::2_0::Role::API;
-$Search::Elasticsearch::Client::2_0::Role::API::VERSION = '6.80';
+$Search::Elasticsearch::Client::2_0::Role::API::VERSION = '6.81';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::API';
 
@@ -2167,7 +2167,7 @@ Search::Elasticsearch::Client::2_0::Role::API - This class contains the spec for
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

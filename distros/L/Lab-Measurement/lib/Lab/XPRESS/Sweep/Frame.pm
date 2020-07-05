@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Frame;
 #ABSTRACT: Frames for nested sweep structures
-$Lab::XPRESS::Sweep::Frame::VERSION = '3.701';
+$Lab::XPRESS::Sweep::Frame::VERSION = '3.703';
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
 use Lab::Exception;
@@ -84,7 +84,7 @@ Lab::XPRESS::Sweep::Frame - Frames for nested sweep structures
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 

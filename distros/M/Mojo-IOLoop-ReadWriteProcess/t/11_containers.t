@@ -136,7 +136,7 @@ subtest container_pid_isolation => sub {
 
   my @pids;
   my $fired;
-  $c->session->on(register => sub { push(@pids, shift) });
+  $c->session->on(register  => sub { push(@pids, shift) });
   $c->process->on(collected => sub { $fired++ });
   $c->once(stop => sub { $fired++ });
 

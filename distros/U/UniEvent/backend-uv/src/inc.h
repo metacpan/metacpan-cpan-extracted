@@ -1,7 +1,6 @@
 #pragma once
 #include <uv.h>
 #include <panda/unievent/util.h>
-#include <panda/unievent/Debug.h>
 #include <panda/unievent/error.h>
 #include <panda/unievent/backend/HandleImpl.h>
 
@@ -59,8 +58,11 @@ static inline string uvx_detach_buf (const uv_buf_t* uvbuf) {
 template <class Handle, class Func>
 static inline net::SockAddr uvx_sockaddr (Handle uvhp, Func&& f) {
     net::SockAddr ret;
-    int sz = sizeof(ret);
-    int err = f(uvhp, ret.get(), &sz);
+    int err;
+    ret.assign_foreign([&](auto ptr, auto size_ptr){
+        err = f(uvhp, ptr, (int*)size_ptr);
+        return !err;
+    });
     if (err) {
         if (err == UV_ENOTCONN || err == UV_EBADF || err == UV_EINVAL) return {};
         throw Error(uvx_error(err));

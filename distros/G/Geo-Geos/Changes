@@ -1,3 +1,8 @@
+1.0.6   22.06.2020
+    - fix tests on 32 bit systems
+1.0.5   19.06.2020
+    - fix compilation conflict with XS::Framework on Darwin/MacOSX
+    - silence minor warnings
 1.0.4   31.01.2020
     - use XS::libgeos
 1.0.3   25.01.2020

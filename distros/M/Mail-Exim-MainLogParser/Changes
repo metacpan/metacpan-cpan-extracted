@@ -1,5 +1,11 @@
 Revision history for Perl module Mail::Exim::MainLogParser
 
+0.02    2020-06-22 reg
+        - Fixed Parsing when Host messages (H=.*) were stored in 'message'.
+          They should instead be left in 'H' field value.
+        - Updated parsing to optionally recognize timezone and pid information 
+        - The compose() method is introduced to recompose a parsed log line
+
 0.01    2017-06-08 reg
         - original version; created by ExtUtils::ModuleMaker 0.56
 

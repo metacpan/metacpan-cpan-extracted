@@ -4,7 +4,7 @@ use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
 use Search::Elasticsearch 6.00;
-our $VERSION = "6.80";
+our $VERSION = "6.81";
 
 use HTTP::Parser::XS qw(HEADERS_AS_HASHREF parse_http_response);
 use Try::Tiny;
@@ -150,7 +150,7 @@ Search::Elasticsearch::Cxn::NetCurl - A Cxn implementation which uses libcurl vi
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

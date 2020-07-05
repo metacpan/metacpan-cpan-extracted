@@ -1,4 +1,12 @@
 #!/usr/bin/env perl
+
+# [[[ PREPROCESSOR ]]]
+# <<< EXECUTE_SUCCESS: '$s = buffalo' >>>
+# <<< EXECUTE_SUCCESS: '$s = alpha' >>>
+# <<< EXECUTE_SUCCESS: '$s = beta' >>>
+# <<< EXECUTE_SUCCESS: '$s = gamma' >>>
+# <<< EXECUTE_SUCCESS: '$s = howdy' >>>
+
 # [[[ HEADER ]]]
 use RPerl;
 use strict;

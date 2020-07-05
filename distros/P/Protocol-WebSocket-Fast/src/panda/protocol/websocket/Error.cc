@@ -4,7 +4,7 @@
 
 namespace panda { namespace protocol { namespace websocket {
 
-log::Module pwslog("Protocol""WebSocket", log::Warning);
+log::Module panda_log_module("Protocol::WebSocket", log::WARNING);
 
 const std::error_category& error_category = ErrorCategory();
 

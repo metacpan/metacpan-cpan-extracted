@@ -1,7 +1,9 @@
 package Progress::Any::Output::TermProgressBarColor;
 
-our $DATE = '2019-07-30'; # DATE
-our $VERSION = '0.246'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-20'; # DATE
+our $DIST = 'Progress-Any-Output-TermProgressBarColor'; # DIST
+our $VERSION = '0.247'; # VERSION
 
 use 5.010001;
 use strict;
@@ -134,9 +136,8 @@ sub new {
             $cols = $ENV{COLUMNS};
         } elsif (eval { require Term::Size; 1 }) {
             ($cols, $rows) = Term::Size::chars(*STDOUT{IO});
-        } else {
-            $cols = 80;
         }
+        $cols //= 80;
         # on windows if we print at rightmost column, cursor will move to the
         # next line, so we try to avoid that
         $args{width} = $^O =~ /Win/ ? $cols-1 : $cols;
@@ -150,6 +151,9 @@ sub new {
     $args{freq} = delete($args0{freq});
 
     $args{wide} = delete($args0{wide});
+
+    $args{rownum} = delete($args0{rownum});
+    $args{rownum} //= 0;
 
     $args{template} = delete($args0{template}) //
         '<color ffff00>%p%%</color> <color 808000>[</color>%B<color 808000>]</color><color ffff00>%R</color>';
@@ -270,7 +274,13 @@ sub update {
     );
 
     my $len = Text::ANSI::Util::ta_length($bar);
-    $self->{_bar}   = $bar . ("\b" x $len);
+    $self->{_bar} = join(
+        "",
+        "\n" x $self->{rownum},
+        $bar,
+        ("\b" x $len),
+        $self->{rownum} > 0 ? "\e[$self->{rownum}A" : "", # up N lines
+    );
     print { $self->{fh} } $self->{_bar};
     $self->{_lastlen} = $len;
 }
@@ -285,7 +295,14 @@ sub cleanup {
 
     my $ll = $self->{_lastlen};
     return unless $ll;
-    print { $self->{fh} } " " x $ll, "\b" x $ll;
+    my $clean_str = join(
+        "",
+        "\n" x $self->{rownum},
+        " " x $ll,
+        "\b" x $ll,
+        $self->{rownum} > 0 ? "\e[$self->{rownum}A" : "", # up N lines
+    );
+    print { $self->{fh} } $clean_str;
     undef $self->{_lastlen} unless $dont_reset_lastlen;
 }
 
@@ -315,7 +332,7 @@ Progress::Any::Output::TermProgressBarColor - Output progress to terminal as col
 
 =head1 VERSION
 
-This document describes version 0.246 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2019-07-30.
+This document describes version 0.247 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2020-06-20.
 
 =head1 SYNOPSIS
 
@@ -434,6 +451,11 @@ seconds. This can be used to create, e.g. a CLI application that is relatively
 not chatty but will display progress after several seconds of seeming inactivity
 to indicate users that the process is still going on.
 
+=item * rownum => uint
+
+Default 0. Can be set to put the progress bar at certain rownum. This can be
+used to display several progress bars together.
+
 =back
 
 =head2 keep_delay_showing()
@@ -512,7 +534,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

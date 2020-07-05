@@ -11,7 +11,6 @@ BEGIN {
 chdir 't';
 
 use Test::More;
-use diagnostics;
 
 # this is organized like this to avoid a "bug" in perls tainting.
 # using an elsif throws an insecure dependency error.

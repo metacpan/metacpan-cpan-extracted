@@ -4,7 +4,7 @@
       "/ BUGS"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.4",
+   "generated_by" : "Minilla/v3.1.9",
    "license" : [
       "mit"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -61,7 +61,7 @@
    "provides" : {
       "Backblaze::B2V2Client" : {
          "file" : "lib/Backblaze/B2V2Client.pm",
-         "version" : "1.1"
+         "version" : "1.2"
       }
    },
    "release_status" : "stable",
@@ -75,10 +75,12 @@
          "web" : "https://github.com/ericschernoff/Backblaze-B2V2Client"
       }
    },
-   "version" : "1.1",
+   "version" : "1.2",
    "x_contributors" : [
       "Eric Chernoff <eric@mail.weaverqueue.com>",
-      "Eric Chernoff <ericschernoff@gmail.com>"
+      "Eric Chernoff <eric@weaverstreet.net>",
+      "Eric Chernoff <ericschernoff@gmail.com>",
+      "estrabd <estrabd@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1

@@ -2,8 +2,8 @@ NAME
     Bencher - A benchmark framework
 
 VERSION
-    This document describes version 1.043 of Bencher (from Perl distribution
-    Bencher), released on 2019-12-24.
+    This document describes version 1.050 of Bencher (from Perl distribution
+    Bencher), released on 2020-06-18.
 
 SYNOPSIS
     See bencher CLI.
@@ -77,7 +77,7 @@ SCENARIO
     below). So you should only specify "code" when you cannot specify
     "fcall_template" or "code_template" or the other way.
 
-    You can specify "fall_template", and this is the recommended way
+    You can specify "fcall_template", and this is the recommended way
     whenever possible. It is a string containing a function call code, in
     the form of:
 
@@ -321,10 +321,23 @@ SCENARIO
 
     *   code_startup (bool)
 
-    *   default_precision (float, between=>[0,1])
+    *   precision (float)
+
+        Precision to pass to Benchmark::Dumb. Default is 0. Can be overriden
+        via "--precision" (CLI). takes precedence over "default_precision".
+
+    *   default_precision (float)
+
+        (DEPRECATED)
 
         Precision to pass to Benchmark::Dumb. Default is 0. Can be overriden
         via "--precision" (CLI).
+
+    *   module_startup_precision (float)
+
+        Precision to pass to Benchmark::Dumb, when running benchmark in
+        module_startup mode. Default is from "precision" or
+        "default_precision". Can be overriden with "--precision" (CLI).
 
     *   result (any)
 
@@ -629,7 +642,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

@@ -1,20 +1,29 @@
 CHANGES
-examples/moveFindResultsWindow.pl
+examples/add1.pl
+examples/forum14944-3.pl
+examples/forum15100-round-numbers.pl
+examples/forum19486-list-lexer-propertyNames.pl
+examples/genRandomText.pl
+examples/npp_selection_filenames_md5.pl
+examples/pasteSpecial.pl
 examples/readme.txt
 lib/Win32/Mechanize/NotepadPlusPlus.pm
 lib/Win32/Mechanize/NotepadPlusPlus/__hwnd.pm
-lib/Win32/Mechanize/NotepadPlusPlus/__npp_idm.pm
-lib/Win32/Mechanize/NotepadPlusPlus/__npp_msgs.pm
-lib/Win32/Mechanize/NotepadPlusPlus/__sci_msgs.pm
 lib/Win32/Mechanize/NotepadPlusPlus/Editor.pm
+lib/Win32/Mechanize/NotepadPlusPlus/Editor/Messages.pm
 lib/Win32/Mechanize/NotepadPlusPlus/Notepad.pm
+lib/Win32/Mechanize/NotepadPlusPlus/Notepad/Messages.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
 RELEASE.md
+src/__npp_idm.pm
+src/__npp_msgs.pm
+src/__sci_msgs.pm
 src/convertHeaders.pl
 src/menuCmdID.h
+src/mpod.pl
 src/Notepad_plus_msgs.h
 src/Scintilla.h
 t/00-load.t
@@ -31,12 +40,16 @@ t/myTestHelpers.pm
 t/npp-buffer.t
 t/npp-files.t
 t/npp-gui.t
+t/npp-menucmd.t
 t/npp-meta.t
 t/npp-sci.t
 t/sci-auto.t
+t/sci-hlprfns.t
 t/sci-manu.t
+t/sci-testcases.t
 t/sci-undo.t
 xt/00-sign.t
+xt/sci-autogen.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

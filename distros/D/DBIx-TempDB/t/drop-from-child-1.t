@@ -18,10 +18,10 @@ my ($database_name, @dsn);
 wait;    # drop database process
 ok !eval { DBI->connect(@dsn); 1 }, 'database cleaned up';
 
-for my $sig (qw( INT QUIT TERM )) {
+for my $sig (qw(INT QUIT TERM)) {
   my $tmpdb = DBIx::TempDB->new($ENV{TEST_PG_DSN}, drop_from_child => 1);
   usleep 10e3;
-  kill $sig, $tmpdb->{drop_pid} or do { diag "Could not kill $sig, $tmpdb->{drop_pid}"; next };
+  kill $sig, $tmpdb->{guard}[1] or do { diag "Could not kill $sig, $tmpdb->{drop_pid}"; next };
   wait;
   local $@;
   eval { DBI->connect($tmpdb->dsn) };

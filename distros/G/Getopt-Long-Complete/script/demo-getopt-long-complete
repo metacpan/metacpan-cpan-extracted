@@ -1,19 +1,22 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-10'; # DATE
+our $DATE = '2020-04-16'; # DATE
 our $DIST = 'Getopt-Long-Complete'; # DIST
-our $VERSION = '0.313'; # VERSION
+our $VERSION = '0.315'; # VERSION
 
 use strict;
 use warnings;
-use Complete::Util qw(complete_array_elem);
+use Log::ger;
+
+use Complete::Util qw(complete_array_elem combine_answers);
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
-my %opts = (cols => 1, bg=>0);
+my %opts;
 my $res = GetOptionsWithCompletion(
     sub {
         my %args = @_;
+        #use DD; dd \%args;
         my $word = $args{word};
         my $type = $args{type};
 
@@ -22,44 +25,67 @@ my $res = GetOptionsWithCompletion(
             return complete_array_elem(
                 array=>["arg$argpos-a", "arg$argpos-b"], word=>$word);
         } elsif ($type eq 'optval') {
-            my $opt = $args{opt};
-            if ($opt eq '--int-comp-array') {
-                return complete_array_elem(array=>[1..10], word=>$word);
-            } elsif ($opt eq '--str-comp-sub') {
-                return complete_array_elem(array=>[map {"$word$_"} "a".."z"],
-                                           word=>$word);
-            } elsif ($opt eq '--module' || $opt eq '-M') {
-                return {
+            my $opts = ref $args{opt} eq 'ARRAY' ? $args{opt} : [$args{opt}];
+            #log_trace "opts=%s", $opts;
+            my @comps;
+            if (grep { $_ eq '--int-comp-array' } @$opts) {
+                push @comps, complete_array_elem(array=>[1..10], word=>$word);
+            }
+            if (grep { $_ eq '--str-comp-sub' } @$opts) {
+                push @comps, complete_array_elem(array=>[map {"$word$_"} "a".."z"],
+                                                 word=>$word);
+            }
+            if (grep { /\A(--planet|-P|--opt-planet|-p)\z/ } @$opts) {
+                push @comps, {
                     words => complete_array_elem(
                         array=>[
-                            "Complete::Util",
-                            "Text::ANSITable",
-                            "Text::ANSI::",
-                            "Text::ANSI::Util",
+                            "mercury",
+                            "venus",
+                            "mars",
                         ],
                         word=>$word,
                     ),
                     path_sep => '::',
                 };
             }
+            if (grep { /\A(--fruit)\z/ } @$opts) {
+                push @comps, {
+                    words => complete_array_elem(
+                        array=>[
+                            "banana",
+                            "apple",
+                            "apricot",
+                            "durian",
+                        ],
+                        word=>$word,
+                    ),
+                    path_sep => '::',
+                };
+            }
+            return combine_answers(@comps);
         }
 
         undef;
     },
-    'flag1|1' => sub{},
-    'flag2|f' => sub{},
-    'bool|b!' => sub{},
-    'int=i' => sub{},
-    'module|M=s' => sub{},
-    'float|F=f' => sub{},
-    'str|text|S=s' => sub{},
-    'array=s@' => sub{},
-    'int-comp-array=i' => sub{},
-    'str-comp-sub=s' => sub{},
+    \%opts,
+    'flag1|1',
+    'flag2|f',
+    'bool|b!',
+    'int=i',
+    'float|F=f',
+    'str|text|S=s',
+    'array=s@',
+    'int-comp-array=i',
+    'str-comp-sub=s',
+
+    # to demonstrate completing optval
+    'planet|P=s',
+    'opt-planet|p:s',
+    'fruit=s',
 
     'version|v' => sub{
         no warnings;
-        print "test-getopt-long-complete version $main::VERSION\n";
+        print "demo-getopt-long-complete version $main::VERSION\n";
         exit 0;
     },
     'help|h|?' => sub {
@@ -69,21 +95,28 @@ Usage:
   $0 [opts]
 
 Options:
+  --array=s@
+  --(no)bool, -b
   --flag1, -1
   --flag2, -f
-  --(no)bool, -b
-  --int=i
   --float=f, -F
-  --str=s, --text, -S
-  --array=s@
+  --fruit=s
   --int-comp-array=i
+  --int=i
+  --opt-planet:s, -p
+  --planet=s, -P
   --str-comp-sub=s
+  --str=s, --text, -S
 _
         exit 0;
     },
 );
 
-#print $res ? "Getopt failed\n" : "Getopt succeeded\n";
+print $res ? "Getopt succeeded\n" : "Getopt failed\n";
+print "Result:\n";
+for (sort keys %opts) {
+    print "  $_: $opts{$_}\n";
+}
 
 # ABSTRACT: Script to demonstrate Getopt::Long::Complete
 # PODNAME: demo-getopt-long-complete
@@ -100,7 +133,7 @@ demo-getopt-long-complete - Script to demonstrate Getopt::Long::Complete
 
 =head1 VERSION
 
-This document describes version 0.313 of demo-getopt-long-complete (from Perl distribution Getopt-Long-Complete), released on 2020-04-10.
+This document describes version 0.315 of demo-getopt-long-complete (from Perl distribution Getopt-Long-Complete), released on 2020-04-16.
 
 =head1 SYNOPSIS
 

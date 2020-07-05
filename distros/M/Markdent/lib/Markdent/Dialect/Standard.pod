@@ -1,4 +1,4 @@
-package Mardent::Dialect::Standard;
+package Markdent::Dialect::Standard;
 
 =pod
 

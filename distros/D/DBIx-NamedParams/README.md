@@ -111,6 +111,8 @@ When the hash reference doesn't have the key that is same to the parameter name,
 
 [DBIx::NamedBinding](https://metacpan.org/pod/DBIx%3A%3ANamedBinding)
 
+[SQL::NamedPlaceholder](https://metacpan.org/pod/SQL%3A%3ANamedPlaceholder)
+
 ## DBD informations
 
 [SQLite Keywords](https://www.sqlite.org/lang_keywords.html) explains how to quote the identifier.

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
+use FindBin qw( $Bin );
+use lib "$Bin/../../../t/lib";
+
 use Test2::V0;
-
-use lib 't/lib';
-
 use Test::Markdent;
 
 test_all_html('fragment');

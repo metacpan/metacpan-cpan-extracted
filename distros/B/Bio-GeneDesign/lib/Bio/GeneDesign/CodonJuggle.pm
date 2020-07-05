@@ -4,7 +4,7 @@ Bio::GeneDesign::CodonJuggle
 
 =head1 VERSION
 
-Version 5.54
+Version 5.56
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = 5.54;
+our $VERSION = 5.56;
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(
@@ -237,7 +237,7 @@ __END__
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2015, GeneDesign developers
+Copyright (c) 2015, Sarah Richardson
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,

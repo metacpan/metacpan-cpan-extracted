@@ -11,7 +11,7 @@ use File::Spec;
 use FFI::Platypus::ShareConfig;
 
 # ABSTRACT: Platform specific configuration.
-our $VERSION = '1.30'; # VERSION
+our $VERSION = '1.31'; # VERSION
 
 
 sub new
@@ -147,7 +147,7 @@ sub cxx
   }
   elsif($self->osname eq 'MSWin32' && $self->{config}->{ccname} eq 'cl')
   {
-    # TODO: see https://github.com/Perl5-FFI/FFI-Platypus/issues/203
+    # TODO: see https://github.com/PerlFFI/FFI-Platypus/issues/203
     #return \@cc;
   }
 
@@ -421,7 +421,7 @@ FFI::Build::Platform - Platform specific configuration.
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 SYNOPSIS
 

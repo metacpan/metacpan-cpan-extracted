@@ -3,9 +3,9 @@ NAME
     hue
 
 VERSION
-    This document describes version 0.004 of ColorTheme::Harmony::Analogous
+    This document describes version 0.005 of ColorTheme::Harmony::Analogous
     (from Perl distribution ColorTheme-Harmony-Analogous), released on
-    2020-06-09.
+    2020-06-19.
 
 DESCRIPTION
     This color theme has a central color (e.g. for 5 colors, "color3") with
@@ -18,7 +18,7 @@ DESCRIPTION
     then "color3" will have hue 120, "color2" 90, "color1" 60, "color4" 150,
     "color5" 180. You can see this on the terminal with:
 
-     % show-color-theme-swatch Harmony::Analogous -A central_h=120 -A h_distance=35 -A s=0.8
+     % show-color-theme-swatch Harmony::Analogous=central_h,120,h_distance,35,s,0.8
 
 HOMEPAGE
     Please visit the project's homepage at

@@ -1,3 +1,8 @@
+0.294   2020-04-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Observe's common option's 'value_label' key.
+
+
 0.293   2020-04-27  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Fix logic bug that causes list of options to not be

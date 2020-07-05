@@ -195,7 +195,7 @@ XS_EXTERNAL(boot_t__func)
 #line 20 "t/func.xs"
   boot_xs_parse_sublike(0);
 
-  register_xs_parse_sublike("func", &parse_func_hooks);
+  register_xs_parse_sublike("func", &parse_func_hooks, NULL);
 
 #line 201 "t/func.c"
 

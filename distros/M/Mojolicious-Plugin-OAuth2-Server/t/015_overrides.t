@@ -15,6 +15,8 @@ my $verify_client_sub = sub {
   my ( $c,$client_id,$scopes_ref,$redirect_uri,$response_type )
     = @args{ qw/ mojo_controller client_id scopes redirect_uri response_type / };
 
+  ok( $c,'have a mojo_controller' );
+
   # in reality we would check a config file / the database to confirm the
   # client_id and client_secret match and that the scopes are valid
   return ( 0,'invalid_scope' ) if grep { $_ eq 'cry' } @{ $scopes_ref // [] };
@@ -32,6 +34,8 @@ my $store_auth_code_sub = sub {
   my ( $c,$auth_code,$client_id,$expires_in,$url,$scopes_ref )
     = @args{qw/ mojo_controller auth_code client_id expires_in redirect_uri scopes / };
 
+  ok( $c,'have a mojo_controller' );
+
   # in reality would store stuff in the database here (or perhaps a
   # correctly scoped hash, but the database is where it should be so
   # we have persistence across restarts and such)
@@ -46,6 +50,8 @@ my $verify_auth_code_sub = sub {
 
   my ( $c,$client_id,$client_secret,$auth_code,$url )
     = @args{qw/ mojo_controller client_id client_secret auth_code redirect_uri / };
+
+  ok( $c,'have a mojo_controller' );
 
   return ( 0,'invalid_grant' ) if $client_id ne '1';
   return ( 0,'invalid_grant' ) if $client_secret ne 'boo';
@@ -85,6 +91,8 @@ my $store_access_token_sub = sub {
     refresh_token expires_in scopes old_refresh_token
   / };
 
+  ok( $c,'have a mojo_controller' );
+
   $VALID_ACCESS_TOKEN  = $access_token;
   $VALID_REFRESH_TOKEN = $refresh_token;
 
@@ -97,6 +105,8 @@ my $verify_access_token_sub = sub {
 
   my ( $c,$access_token,$scopes_ref,$is_refresh_token )
   	= @args{qw/ mojo_controller access_token scopes is_refresh_token /};
+
+  ok( $c,'have a mojo_controller' );
 
   # and here we should check the access code is valid, not expired, and the
   # passed scopes are allowed for the access token

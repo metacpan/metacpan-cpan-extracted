@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use parent "Archive::BagIt";
 
-our $VERSION = '0.055'; # VERSION
+our $VERSION = '0.058'; # VERSION
 
 use IO::AIO;
 use Time::HiRes qw(time);
@@ -28,7 +28,7 @@ sub verify_bag {
     die("$payload_dir is not a directory") unless -d ($payload_dir);
     # Read the manifest file
     #print Dumper($self->{entries});
-    foreach my $entry (keys( @{$self->{entries}})) {
+    foreach my $entry (keys %{$self->{entries}}) {
       $manifest{$entry} = $self->{entries}->{$entry};
     }
     # Compile a list of payload files
@@ -100,7 +100,15 @@ Archive::BagIt::Fast
 
 =head1 VERSION
 
-version 0.055
+version 0.058
+
+=head1 NAME
+
+Archive::BagIt::Fast
+
+=head1 VERSION
+
+version 0.058
 
 =head1 NAME
 
@@ -121,6 +129,17 @@ and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
+
+=head1 AUTHOR
+
+Rob Schmidt <rjeschmi@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

@@ -1,9 +1,10 @@
 package PICA::Writer::Plain;
 use v5.14.1;
 
-our $VERSION = '1.08';
+our $VERSION = '1.11';
 
 use charnames qw(:full);
+use Term::ANSIColor;
 
 use parent 'PICA::Writer::Base';
 
@@ -14,7 +15,18 @@ sub END_OF_RECORD      {"\n"}
 sub write_subfield {
     my ($self, $code, $value) = @_;
     $value =~ s/\$/\$\$/g;
-    $self->{fh}->print($self->SUBFIELD_INDICATOR . $code . $value);
+
+    if (my $col = $self->{color}) {
+        $value
+            = ($col->{syntax} ? colored('$', $col->{syntax}) : '$')
+            . ($col->{code}  ? colored($code,  $col->{code})  : $code)
+            . ($col->{value} ? colored($value, $col->{value}) : $value);
+    }
+    else {
+        $value = $self->SUBFIELD_INDICATOR . $code . $value;
+    }
+
+    $self->{fh}->print($value);
 }
 
 1;

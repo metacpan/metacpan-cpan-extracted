@@ -4,7 +4,7 @@
       "Jos Boumans <kane[at]cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,6 +47,6 @@
          "url" : "https://github.com/jib/module-load-conditional"
       }
    },
-   "version" : "0.70",
+   "version" : "0.72",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

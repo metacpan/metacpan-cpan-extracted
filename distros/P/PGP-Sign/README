@@ -1,249 +1,163 @@
-                          PGP::Sign version 0.20
-           (Create and verify detached PGP signatures for data)
+                              PGP::Sign 1.00
+               (create and verify detached PGP signatures)
+                Maintained by Russ Allbery <rra@cpan.org>
 
-  Copyright 1997, 1998, 1999, 2000, 2002, 2004, 2007 Russ Allbery
-  <rra@stanford.edu>.  This program is free software; you may redistribute
-  it and/or modify it under the same terms as Perl itself.
+  Copyright 1997-2000, 2002, 2004, 2018, 2020 Russ Allbery <rra@cpan.org>.
+  This software is distributed under the same terms as Perl itself.
+  Please see the section LICENSE below for more information.
 
-INTRODUCTION
+BLURB
 
-  One important thing to clear up right away:  This is not a general PGP
-  module.
+  PGP::Sign is a Perl module for generating and verifying detached OpenPGP
+  signatures of textual data using GnuPG.  It was written to support
+  Netnews article signatures for signed control messages and PGPMoose.
 
-  For wonderful general PGP modules that will encrypt, decrypt, manage key
-  rings, slice, dice, fold, spindle, and mutilate your data, see the PGP
-  by-module directory at your local CPAN mirror; hopefully there will be
-  one there.  This module sprung out of a need to do one thing and one
-  thing only, do it securely, and do it well.  This module creates and
-  checks detached signatures for data.  That's it.  If you want to do
-  anything else that PGP lets you do, look elsewhere.
+DESCRIPTION
 
-  Currently this module only works with text data.  Support for binary
-  data is high on the list of features I want to add.
+  PGP::Sign is a Perl module that can generate and verify OpenPGP
+  signatures on some data.  Currently, only textual data (data that can be
+  processed using GnuPG's --textmode option) is supported.  It uses GnuPG
+  under the hood to do the work.
 
   The original purpose of this module was to factor out common code in a
-  News::Article class written by Andrew Gierth that did PGPMoose
-  signatures and signed control messages.  It should now be possible to
-  reimplement PGPMoose, signcontrol, and pgpverify using this module, and
-  the second and parts of the first have already been done.
+  News::Article class written by Andrew Gierth that handled PGPMoose and
+  control message signatures.  It is used to verify control message
+  signatures for the ftp.isc.org Netnews metadata archive, and to generate
+  signed control messages for the Big Eight Usenet hierarchies.
 
-  So much for the "one thing only" part.  For the "do it securely" part,
-  this module uses a pipe to pass the secret key password to PGP, rather
-  than a command line flag or an environment variable as seen in other
-  modules.  Both of those are subject to snooping by other users; this
-  approach isn't.
+  Data to be signed or verified can be passed into PGP::Sign in a wide
+  variety of formats: scalars, arrays, open files, even code references
+  that act as generators.  Keys with passphrases are supported and the
+  passphrase is passed to GnuPG securely (although getting the passphrase
+  to the PGP::Sign module is a problem for the calling application).
 
-  For the "do it well" part, the interface to this module takes every form
-  of data known to man.  Scalars and arrays are no problem, of course, but
-  if you give it a reference to an array, it'll walk the array to avoid
-  making a copy of a potentially large data structure.  You can also give
-  it an open file (in the form of a glob, a reference to a glob, a
-  FileHandle object, an IO::Handle object, or anything derived from
-  either) and it'll walk that too.  Or you can give it a reference to a
-  scalar if you really want to and it's cool with that.  Or, if you want
-  to get really exciting, you can give it a reference to a sub and it'll
-  call the sub repeatedly to get more data until the sub returns undef.
-  Perfect for walking some complex data structure you don't want to make
-  an internal copy of.  And if there's any other interesting data
-  structure you want to throw at it, tell me about it, and the next
-  version will probably support that too.
+  This module supports both GnuPG v2 and GnuPG v1 and, when used with
+  GnuPG v1, supports using OpenPGP keys and generating and verifying
+  signatures that are backward-compatible with PGP 2.6.2.
 
-  This module supports a wide variety of different versions of PGP, from
-  PGP 2.6.2 to PGP 5.0 to PGP 6.5 to the new (and very nice) GnuPG.
-  Different implementations of PGP are capable (and not capable) of
-  creating and checking various types of signatures; obviously, what this
-  module can do is limited by what versions of PGP you have installed.
-
-  See the documentation for all the gory details, which really aren't that
-  gory.  At least yet.
+  PGP::Sign provides both a (recommended) object-oriented API and a
+  (legacy) function-based API that uses global variables for configuration
+  and is backward-compatible with earlier versions of PGP::Sign.
 
 REQUIREMENTS
 
-  This module requires a version of PGP that supports PGPPASSFD or some
-  other mechanism for handing the passphrase over in a pipe.  2.6.2,
-  2.6.3i, 5.0, 6.5, and GnuPG all do.  I can't personally vouch for any
-  other version, but I believe ViaCrypt PGP 4.0 may also work (since it's
-  largely based on 2.6.2).  This module also requires an operating system
-  that's capable of coping with pipes, forking, and passing file
-  descriptors through an exec().  If your operating system can't, that's
-  considered by this module author to be a bug in your operating system
-  and not in this module.
+  Perl 5.20 or later and Module::Build are required to build this module,
+  and IPC::Run is required to use it.  Either GnuPG v2 or GnuPG v1
+  (selectable at runtime) is also required.  It has not been tested with
+  versions of GnuPG older than 1.4.23.
 
-  I've personally tested or received reports of clean tests of this module
-  with the following versions of PGP:
+  PGP::Sign uses IPC::Run features that are documented as not available on
+  Windows (primarily higher-numbered file descriptors) and has never been
+  tested with Gpg4win, so will probably not work on Windows (or, for that
+  matter, other non-UNIX systems).
 
-      PGP 2.6.2 (US version)
-      PGP 2.6.2i
-      PGP 5.0 (US Linux freeware version)
-      PGP 6.5.2 (US Solaris freeware version)
-      GnuPG 0.9.2 (Linux and Solaris)
-      GnuPG 1.0.1 (Solaris)
-      GnuPG 1.0.6 (Solaris)
-      GnuPG 1.2.1 (Linux)
-      GnuPG 1.2.2 (FreeBSD and OpenBSD)
-      GnuPG 1.2.4 (Linux)
-      GnuPG 1.4.6 (Linux)
+BUILDING AND INSTALLATION
 
-  If you successfully use this module with another significant version of
-  PGP not listed above, please let me know.
+  PGP::Sign uses Module::Build and can be installed using the same process
+  as any other Module::Build module:
 
-  This module requires no other modules besides IPC::Open3 and FileHandle,
-  both of which are part of Perl core and have been for some time.  It
-  should work with Perl 5.003 or later, although I personally have only
-  tested it with Perl 5.004_04, 5.005_03, 5.6.1, 5.8.0, 5.8.4, and 5.8.8.
+      perl Build.PL
+      ./Build
+      ./Build install
 
-INSTALLATION
-
-  Follow the standard installation procedure for Perl modules, which is to
-  type the following commands:
-
-      perl Makefile.PL
-      make
-      make test
-      make install
-
-  You'll probably need to do the last as root unless you're installing in
-  your own private modules directory.
-
-  In order for make test to succeed if you're using GnuPG and egd (the
-  entropy daemon), you may have to make a symlink from data/entropy to the
-  entropy socket in your ~/.gnupg directory.
-
-  When you run make, you will be prompted for the path to the program to
-  create signatures and the program to verify signatures.  PGP::Sign will
-  try to guess at what you may want to use, preferring GnuPG and then PGP
-  5.0.  For GnuPG, PGP 2.6, or PGP 6.5, both paths should point to the
-  same program; for PGP 5.0, pgps is the program that generates signatures
-  and pgpv is the program that verifies them.  Don't set the signing
-  program and the verifying program to mutually incompatible things, or
-  you'll get strange results.
-
-  You will also be prompted for what PGP style to default to, since each
-  PGP implementation works slightly differently.  This has to be one of
-  the following:  "PGP2" for PGP 2.6 workalikes, "PGP5" for PGP 5.0 and
-  workalikes, "PGP6" for PGP 6.5 and workalikes, or "GPG" for GnuPG.
-  Again, PGP::Sign will try to guess from the name of the binaries you
-  chose (and distinguish between PGP2 and PGP6 based on the output of the
-  program when run without any arguments).
-
-  If you have multiple versions of PGP installed on your system, you still
-  have to pick one to be the default.  You'll be able to switch between
-  PGP programs and PGP styles at runtime; see the PGP::Sign documentation
-  for details.
-
-  If you want to avoid the prompt for the path to PGP, you can, instead of
-  the first line, type:
-
-      perl Makefile.PL PGP=/path/to/pgp
-
-  and then /path/to/pgp will be used as the path to PGP (both signing and
-  verification) and you won't be prompted.  When invoked this way,
-  Makefile.PL will attempt to figure out what PGP style you're using from
-  the name of the binaries.  You can set it specifically with something
-  like:
-
-      perl Makefile.PL PGP=/usr/local/bin/gpg PGPSTYLE=GPG
-
-  if you need to.  If the signing program and verifying program are
-  different, set PGPS and PGPV instead of just PGP.  For example:
-
-      perl Makefile.PL PGPS=/usr/local/bin/pgps PGPV=/usr/local/bin/pgpv
-
-  If you want to install PGP::Sign in somewhere other than the default
-  installation location, you can set PREFIX or LIB on the Makefile.PL
-  command line.  See the ExtUtils::MakeMaker documentation for more
-  details.
+  You will have to run the last command as root unless you're installing
+  into a local Perl module tree in your home directory.
 
 TESTING
 
-  There is a small test suite that uses the files in data to make sure
-  that signing and checking of signatures work.  This test suite uses the
-  key rings and data in the data subdirectory of the distribution, and
-  should work correctly under any of the supported versions of PGP.
+  PGP::Sign comes with a test suite, which you can run after building
+  with:
 
-  To run the test suite, type:
+      ./Build test
 
-      make test
+  If a test fails, you can run a single test with verbose output via:
 
-  after running make.  Regardless of your PGP style, at least one test
-  will be skipped, since PGP::Sign knows how to test RSA signatures (PGP
-  2.6, PGP 5.0, and PGP 6.5), DSS version three signatures (PGP 5.0, PGP
-  6.5, and GnuPG), and DSS version four signatures (GnuPG only), and no
-  one PGP implementation can handle all three (unless your GnuPG
-  installation includes RSA support).
+      ./Build test --test_files <path-to-test>
 
-  For some reason, the test suite fails the first time it's run with PGP
-  6.5 (at least on Solaris), giving error messages about not having enough
-  random bits, and then succeeds the second time.  I consider this to be a
-  bug in PGP 6.5, as no other version of PGP has this problem.
+  The following additional Perl modules will be used by the test suite if
+  present:
 
-  Note that different PGP implementations return different things and
-  therefore the test suite looks for different things depending on what
-  your PGP style is set to.  See the PGP::Sign documentation for an
-  extended discussion of issues related to trailing whitespace, and see
-  the comments in test.pl for information on exactly what's being tested.
+  * Devel::Cover
+  * Test::MinimumVersion
+  * Test::Perl::Critic
+  * Test::Pod
+  * Test::Pod::Coverage
+  * Test::Spelling
+  * Test::Strict
+  * Test::Synopsis
 
-  More tests are welcome, particularly if you find a bug or if they test
-  some major functionality of this module not currently covered.
+  All are available on CPAN.  Those tests will be skipped if the modules
+  are not available.
 
-THANKS
+  To enable tests that don't detect functionality problems but are used to
+  sanity-check the release, set the environment variable RELEASE_TESTING
+  to a true value.  To enable tests that may be sensitive to the local
+  environment or that produce a lot of false positives without uncovering
+  many problems, set the environment variable AUTHOR_TESTING to a true
+  value.
 
-  To Andrew Gierth for the inspiration and motivation to write this and
-  the reminder that PGPPASSFD existed, for being one of the two people who
-  caught the mistake I made with $? and open3(), and for pointing out a
-  missing waitpid() in pgp_verify() that was causing zombies.
+SUPPORT
 
-  To Jon Ribbens for pointing out that $? isn't guaranteed to contain the
-  exit status of something called from open3() unless you do a waitpid()
-  for it first.
+  The PGP::Sign web page at:
 
-  To Andrew Ford for adding PGPPATH support and adding a test suite and
-  code in Makefile.PL to search for an installed version of PGP.
+      https://www.eyrie.org/~eagle/software/pgp-sign/
 
-  To Todd Underwood for the impetus to get this module working under GnuPG
-  and PGP 5.0, and to he and Monte Mitzelfelt for the initial GnuPG
-  implementation that I based mine on.
+  will always have the current version of this package, the current
+  documentation, and pointers to any additional resources.
 
-  To Lupe Christoph for pointing out that Perl 5.005_03 sets close-on-exec
-  on file handles created by pipe, requiring an fcntl() call in PGP::Sign
-  to unset that.
+  For bug tracking, use the CPAN bug tracker at:
 
-  To J. Porter Clark for information about the socket needed for GnuPG
-  with egd support.
+      https://rt.cpan.org/Dist/Display.html?Name=PGP-Sign
 
-  To Marco d'Itri for example code on how to use the GnuPG --status-fd
-  support, so that parsing of the human-readable output of GnuPG isn't
-  needed, and to Autrijus Tang for reminding me that I'd not yet pulled
-  that code over from pgpverify.
+  However, please be aware that I tend to be extremely busy and work
+  projects often take priority.  I'll save your report and get to it as
+  soon as I can, but it may take me a couple of months.
 
-  To David Lawrence and Greg Rose for signcontrol and PGPMoose
-  respectively, the motivating applications.
+SOURCE REPOSITORY
 
-  To Phil Zimmermann, because Phil should be listed in the thank you list
-  for anything related to PGP, given that he wrote it and went through
-  legal hell to make sure we still had it available.
+  PGP::Sign is maintained using Git.  You can access the current source on
+  GitHub at:
 
-  To Werner Koch for GnuPG, which is much nicer than any other PGP
-  implementation I've worked with and is free to boot, and for pointing me
-  at the right sections of RFC 2440 to explain the OpenPGP standard on
-  whitespace munging in text signatures.
+      https://github.com/rra/pgp-sign
 
-CONTACTING ME AND CONTRIBUTIONS
+  or by cloning the repository at:
 
-  Send any comments, bug reports, feature requests, flames, thank yous,
-  offers of vast quantities of money, lutefisk, and large green Martian
-  dogs named Ralf to rra@stanford.edu.  :)
+      https://git.eyrie.org/git/perl/pgp-sign.git
 
-  Please allow at least a month for me to respond to mail regarding this
-  module.  I get at *least* 1,000 mail messages a day, and I'm afraid this
-  module is something that I only get a chance to work on once every few
-  months.  I do intend to continue to maintain it, however, and I will get
-  back to you eventually.
+  or view the repository via the web at:
 
-  Contributions are welcome!  I will not have enough time to add
-  everything I want to add to this module, but I tend to be sparked into
-  bursts of creativity and programming energy when sent new ideas or
-  patches, even partial ones.  If you're interested in contributing,
-  please read TODO first.
+      https://git.eyrie.org/?p=perl/pgp-sign.git
 
-  Enjoy!
+  The eyrie.org repository is the canonical one, maintained by the author,
+  but using GitHub is probably more convenient for most purposes.  Pull
+  requests are gratefully reviewed and normally accepted.  It's probably
+  better to use the CPAN bug tracker than GitHub issues, though, to keep
+  all Perl module issues in the same place.
+
+LICENSE
+
+  The PGP::Sign package as a whole is covered by the following copyright
+  statement and license:
+
+    Copyright 1997-2000, 2002, 2004, 2018, 2020
+        Russ Allbery <rra@cpan.org>
+
+    This program is free software; you may redistribute it and/or modify
+    it under the same terms as Perl itself.  This means that you may
+    choose between the two licenses that Perl is released under: the GNU
+    GPL and the Artistic License.  Please see your Perl distribution for
+    the details and copies of the licenses.
+
+  Some files in this distribution are individually released under
+  different licenses, all of which are compatible with the above general
+  package license but which may require preservation of additional
+  notices.  All required notices, and detailed information about the
+  licensing of each file, are recorded in the LICENSE file.
+
+  Files covered by a license with an assigned SPDX License Identifier
+  include SPDX-License-Identifier tags to enable automated processing of
+  license information.  See https://spdx.org/licenses/ for more
+  information.
+
+  For any copyright range specified by files in this package as YYYY-ZZZZ,
+  the range specifies every single year in that closed interval.

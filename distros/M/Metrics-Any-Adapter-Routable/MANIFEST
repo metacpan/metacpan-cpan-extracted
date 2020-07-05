@@ -1,0 +1,13 @@
+.eachperlrc
+Build.PL
+Changes
+lib/Metrics/Any/Adapter/Routable.pm
+MANIFEST			This list of files
+t/00use.t
+t/01category-per-metric.t
+t/02category-per-package.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

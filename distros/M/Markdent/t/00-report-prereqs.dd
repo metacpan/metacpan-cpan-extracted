@@ -79,6 +79,7 @@ do { my $x = {
                                    'File::Find' => '0',
                                    'File::Spec' => '0',
                                    'File::Temp' => '0',
+                                   'FindBin' => '0',
                                    'IO::File' => '0',
                                    'Test2::V0' => '0.000081',
                                    'Test::More' => '1.302015',

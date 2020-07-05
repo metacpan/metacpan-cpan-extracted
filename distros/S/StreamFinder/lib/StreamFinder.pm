@@ -110,7 +110,7 @@ station / podcast / video.  The purpose is that one needs one of these URLs
 in order to have the option to stream the station / video in one's own choice 
 of media player software rather than using their web browser and accepting 
 flash, ads, javascript, cookies, trackers, web-bugs, and other 
-crapware associated with that method of playing.  The author uses his own 
+crapware associated with that method of play.  The author uses his own 
 custom all-purpose media player called "Fauxdacious" (his custom hacked 
 version of the open-source "Audacious" audio player).  "Fauxdacious" 
 (L<https://wildstar84.wordpress.com/fauxdacious/> incorporates this module to 
@@ -129,15 +129,18 @@ The currently-supported websites are:  banned.video
 iheartradio.com (L<StreamFinder::IHeartRadio>), podcasts.apple.com 
 (L<StreamFinder::Apple>), radio.net (L<StreamFinder::RadioNet>), 
 radionomy.com (L<StreamFinder::Radionomy>), reciva.com (L<StreamFinder::Reciva>), 
+spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>), 
-and (youtube.com, et. al and other sites that 
-youtube-dl supports) (L<StreamFinder::Youtube>).  
+and (youtube.com, et. al and other sites that youtube-dl supports) 
+(L<StreamFinder::Youtube>).  
 
 NOTE:  Facebook (Streamfinder::Facebook) has been removed because 
 logging into Facebook via the call to youtube-dl is now interpreted by 
 Facebook as a "rogue app. login" and will cause them to LOCK your account 
 and FORCE you to change your password the next time you log in 
 to Facebook!
+
+NOTE:  Radionomy appears to be defunct.
 
 NOTE:  For some sites, ie. Youtube, Vimeo, Brighteon, and BannedVideo, etc. 
 the "station" object actually refers to a specific video or podcast, but 
@@ -207,13 +210,16 @@ Returns an array of strings representing all stream URLs found.
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
 
-Current options are:  I<"random"> and I<"noplaylists">.  By default, the 
-first ("best"?) stream is returned.  If I<"random"> is specified, then 
-a random one is selected from the list of streams found.  
+Current options are:  I<"random">, I<"nopls">, and I<"noplaylists">.  
+By default, the first ("best"?) stream is returned.  If I<"random"> is 
+specified, then a random one is selected from the list of streams found.  
+If I<"nopls"> is specified, and the stream to be returned is a ".pls" playlist, 
+it is first fetched and the first entry (or a random entry if I<"random"> is 
+specified) is returned.  This is needed by Fauxdacious Mediaplayer.
 If I<"noplaylists"> is specified, and the stream to be returned is a 
-"playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
-in the playlist is returned.  This is needed by Fauxdacious Mediaplayer 
-since Fauxdacious intentionally does not allow recursive playlists.
+"playlist" (either .pls or .m3u? extension), it is first fetched and the first 
+entry (or a random entry if I<"random"> is specified) in the playlist 
+is returned.
 
 =item $station->B<count>()
 
@@ -310,7 +316,7 @@ L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 RECCOMENDS
 
-youtube-dl (for Brighteon, Tunein, Vimeo)
+youtube-dl (for Youtube, Brighteon, Tunein, Vimeo)
 
 wget
 
@@ -354,7 +360,7 @@ L<http://search.cpan.org/dist/StreamFinder/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2019 Jim Turner.
+Copyright 2017-2020 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -402,7 +408,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.28';
+our $VERSION = '1.30';
 our $DEBUG = 0;
 
 require Exporter;

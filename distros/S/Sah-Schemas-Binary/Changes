@@ -1,3 +1,11 @@
+0.005   2020-03-08  Released-By: PERLANCAR; Urgency: medium
+
+        - No functional changes.
+
+	- [build] Rebuild with updated Pod::Weaver plugin [-Sah::Schemas] to
+          correctly show examples.
+
+
 0.004   2020-03-04  Released-By: PERLANCAR; Urgency: medium
 
 	- Update examples, use 'value' instead of 'data'.

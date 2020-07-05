@@ -18,13 +18,159 @@ use lib "$FindBin::Bin/lib";
 {
   {
     my $build = SPVM::Builder->new;
-    $build->use('TestCase::CompileError::Literal::InvalidCharacterLiteral');
+    $build->use('TestCase::CompileError::Literal::Character::InvalidCharacterLiteralEmpty');
     my $success = $build->compile_spvm();
     ok($success == 0);
   }
   {
     my $build = SPVM::Builder->new;
-    $build->use('TestCase::CompileError::Literal::IntOutOfRange');
+    $build->use('TestCase::CompileError::Literal::Character::InvalidCharacterLiteral');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Literal::Interger::IntOutOfRange');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+# Lexcarl Variable
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::LexVar::Private');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::LexVar::LexVarNameStartDigit');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::LexVar::LexVarNameInvalidColon');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::LexVar::LexVarNameEndColon2');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::LexVar::LexVarNameContainsUnderScoreTwice');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::LexVar::LexVarNameColon2Twice');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+# Package Variable
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::PackageVar::Private');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::PackageVar::OurPackageVarNameStartDigit');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::PackageVar::OurPackageVarNameInvalidColon');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::PackageVar::OurPackageVarNameEndColon2');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::PackageVar::OurPackageVarNameContainsUnderScoreTwice');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::PackageVar::OurPackageVarNameColon2Twice');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+# Package
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('foo');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('4foo');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+# Sub
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Sub::Begin');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Sub::SubNameStartDigit');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Sub::SubNameContainsUnderScoreTwice');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+}
+
+# Field
+{
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Field::Private');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Field::HasFieldNameContainsUnderScoreTwice');
+    my $success = $build->compile_spvm();
+    ok($success == 0);
+  }
+  {
+    my $build = SPVM::Builder->new;
+    $build->use('TestCase::CompileError::Field::HasFieldNameStartDigit');
     my $success = $build->compile_spvm();
     ok($success == 0);
   }
@@ -158,16 +304,6 @@ use lib "$FindBin::Bin/lib";
   }
 }
 
-# Sub
-{
-  {
-    my $build = SPVM::Builder->new;
-    $build->use('TestCase::CompileError::Sub::Begin');
-    my $success = $build->compile_spvm();
-    ok($success == 0);
-  }
-}
-
 # String
 {
   {
@@ -257,20 +393,6 @@ use lib "$FindBin::Bin/lib";
 {
   my $build = SPVM::Builder->new;
   $build->use('TestCase::CompileError::TypeCantBeDetectedUndefDefault');
-  my $success = $build->compile_spvm();
-  ok($success == 0);
-}
-
-{
-  my $build = SPVM::Builder->new;
-  $build->use('TestCase::CompileError::PackageVar::Private');
-  my $success = $build->compile_spvm();
-  ok($success == 0);
-}
-
-{
-  my $build = SPVM::Builder->new;
-  $build->use('TestCase::CompileError::Field::Private');
   my $success = $build->compile_spvm();
   ok($success == 0);
 }

@@ -103,7 +103,7 @@ Kako locale.
   fɛ
   njapi
   nyukul
-  11
+  M11
   ɓulɓusɛ
 
 =head3 Abbreviated (format)
@@ -118,7 +118,7 @@ Kako locale.
   fɛ
   njapi
   nyukul
-  11
+  M11
   ɓulɓusɛ
 
 =head3 Narrow (format)
@@ -149,7 +149,7 @@ Kako locale.
   fɛ
   njapi
   nyukul
-  11
+  M11
   ɓulɓusɛ
 
 =head3 Abbreviated (stand-alone)
@@ -164,7 +164,7 @@ Kako locale.
   fɛ
   njapi
   nyukul
-  11
+  M11
   ɓulɓusɛ
 
 =head3 Narrow (stand-alone)

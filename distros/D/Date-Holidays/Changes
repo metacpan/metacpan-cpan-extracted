@@ -1,5 +1,14 @@
 Changes file for Date-Holidays
 
+1.23 2020-07-02 Maintenance release, update not required
+
+- Improvements to Dist::Zilla config, only ExtUtils::MakeMaker supported via Dist::Zilla now. Module::Build support having been removed
+ 
+- See the Article by Neil Bowers (NEILB) on the topic: https://neilb.org/2015/05/18/two-build-files-considered-harmful.html
+ 
+- Thanks to Karen Etheridge (ETHER) for information and link to the mentioned article
+
+
 1.22 2020-06-13 Bug fix release, update recommended
 
 - Addressed broken support for regions in ES (Spain), improving support for Date::Holidays::CA_ES

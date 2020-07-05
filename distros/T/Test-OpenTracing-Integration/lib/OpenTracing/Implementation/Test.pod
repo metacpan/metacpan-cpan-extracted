@@ -1,0 +1,130 @@
+
+=head1 NAME
+
+
+
+OpenTracing::Implementation::Test - In-Memory OpenTracing Test Implementation
+
+
+
+=head1 SYNOPSIS
+
+  use OpenTracing::Implementation::Test;
+  use Data::Dumper;
+
+  my $tracer = OpenTracing::Implementation::Test->bootstrap_tracer();
+  
+  my $scope = $tracer->start_active_span('foo');
+  
+  ...
+  
+  print Dumper $tracer->get_spans_as_struct();
+  print $tracer->span_tree();
+
+
+
+=head1 DESCRIPTION
+
+This is a simple in-memory implementation useful for checking your
+instrumentation. Instead of sending the data off to another service,
+the tracer itself keeps track of spans and allows for easy inspection.
+
+
+
+=head1 PROVIDED MODULES
+
+All of these consume the appropriate L<OpenTracing::Role>:
+
+=head2 L<OpenTracing::Implementation::Test::Tracer>
+
+=head2 L<OpenTracing::Implementation::Test::Span>
+
+=head2 L<OpenTracing::Implementation::Test::SpanContext>
+
+=head2 L<OpenTracing::Implementation::Test::Scope>
+
+=head2 L<OpenTracing::Implementation::Test::ScopeManager>
+
+
+
+=head1 EXTRA METHODS
+
+The modules below offer aditional functionallity specifacally for testing
+purposes.
+
+
+
+=head2 Tracer
+
+The test-tracer provides a few extra methods on top of the role, see
+L<OpenTracing::Implementation::Test::Tracer> for details.
+
+=over
+
+=item L<< C<get_spans_as_struct> |
+OpenTracing::Implementation::Test::Tracer/"get_spans_as_struct" >>
+
+Returns a list of hashes representing all spans, including information from
+SpanContexts.
+
+=item L<< C<span_tree> |
+OpenTracing::Implementation::Test::Tracer/"span_tree" >>
+
+Return a string representation of span relationships.
+
+=item L<< C<cmp_deeply> |
+OpenTracing::Implementation::Test::Tracer/"cmp_deeply" >>
+
+The test will compare current saved spans using C<cmp_deeply>.
+
+=item L<< C<cmp_easy> |
+OpenTracing::Implementation::Test::Tracer/"cmp_easy" >>
+
+Make testing more easy.
+
+=item L<< C<clear_spans> |
+OpenTracing::Implementation::Test::Tracer/"clear_spans" >>
+
+Removes all saved spans from the tracer.
+
+=back
+
+
+
+=head2 SpanContext
+
+=item L<< C<level> |
+OpenTracing::Implementation::Test::SpanContext/"level" >>
+
+Returns the depth of the span.
+
+=item L<< C<context_item> |
+OpenTracing::Implementation::Test::SpanContext/"context_item" >>
+
+Returns the value of a non-functional test attribute.
+
+=back
+
+
+
+=head1 AUTHOR
+
+Szymon Nieznanski <snieznanski@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'Test::OpenTracing::Integration'
+is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

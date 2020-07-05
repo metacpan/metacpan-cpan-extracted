@@ -1,5 +1,10 @@
 Revision history for Perl extension Test2-Plugin-GitHub-Actions-AnnotateFailedTest
 
+0.04 2020-06-22T07:28:11Z
+
+    - Fix requirement of Perl version (5.10.1 or more)
+    - Set default message for nameless assertion (thanks hitode909)
+
 0.03 2020-05-31T03:20:24Z
 
     - Fix tests

@@ -1,0 +1,9 @@
+Revision history for ISO-639-5
+
+0.01    Wed Jun 24 21:38:09 EEST 2020
+        First version, released on an unsuspecting world.
+
+0.02	Sun Jun 28 23:16:20 EEST 2020
+	- added function language_group_children (immediate children in language group hierarchy)
+	- redefined function language_group (returns all languages and not immediate children only)
+

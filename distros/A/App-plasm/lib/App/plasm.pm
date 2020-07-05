@@ -7,7 +7,7 @@ use Pod::Usage qw( pod2usage );
 use Getopt::Long qw( GetOptions );
 
 # ABSTRACT: Perl WebAssembly command line tool
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 sub main
@@ -15,6 +15,11 @@ sub main
   my $class = shift;  # unused
 
   Getopt::Long::Configure('permute');
+
+  if(defined $_[0] && $_[0] =~ /\.wasm$/)
+  {
+    unshift @_, 'run';
+  }
 
   if(defined $_[0] && $_[0] !~ /^-/)
   {
@@ -43,6 +48,7 @@ package App::plasm::run;
 use Pod::Usage qw( pod2usage );
 use Getopt::Long qw( GetOptions );
 use Wasm 0.08;
+use Wasm::Hook;
 
 my $sandbox;
 
@@ -123,6 +129,51 @@ sub main
   return 0;
 }
 
+package App::plasm::wat;
+
+use Pod::Usage qw( pod2usage );
+use Getopt::Long qw( GetOptions );
+use Wasm::Wasmtime::Wat2Wasm qw( wat2wasm );
+use Path::Tiny qw( path );
+
+sub main
+{
+  local @ARGV = @_;
+
+  my @pod = (-verbose => 99, -sections => "SUBCOMMANDS/wat");
+
+  GetOptions(
+    'help|h'    => sub { pod2usage({ -exitval => 0, @pod }) },
+  ) or pod2usage({ -exitval => 2, @pod });
+
+  my $filename = shift @ARGV;
+
+  pod2usage({ @pod,
+    -exitval  => 2,
+  }) unless defined $filename;
+
+  pod2usage({ @pod,
+    -message => "File not found: $filename",
+    -exitval  => 2,
+  }) unless -f $filename;
+
+  my $in  = path($filename);
+  my $out = $in->parent->child(do {
+    my $basename = $in->basename;
+    $basename =~ s/\.wat$//;
+    $basename . '.wasm';
+  });
+
+  pod2usage({ @pod,
+    -message => "Output file already exists: $out",
+    -exitval  => 2,
+  }) if -e $out;
+
+  $out->spew_raw(wat2wasm($in->slurp_utf8));
+
+  return 0;
+}
+
 1;
 
 __END__
@@ -137,7 +188,7 @@ App::plasm - Perl WebAssembly command line tool
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

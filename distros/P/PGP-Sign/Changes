@@ -1,0 +1,212 @@
+                      User-Visible PGP::Sign Changes
+
+PGP::Sign 1.00 (2020-06-27)
+
+    Drop support for all PGP implementations other than GnuPG.  I haven't
+    seen a working copy of the old commercial PGP implementations in years
+    and no longer have any way to test PGP::Sign with them.
+
+    Require a minimum Perl version of 5.20 and stop attempting to support
+    versions of Perl back to 5.003, which are now impossible to test with
+    and are missing many modern Perl features.
+
+    Add a new object-oriented API.  This avoids global variables and
+    global state, provides a simpler API that doesn't require or support
+    the now-obsolete version string, and calls croak on errors.  The
+    legacy API of pgp_sign, pgp_verify, and pgp_error is still supported
+    but is now implemented in terms of the object-oriented API.  The new
+    API should be used for all new code.
+
+    Add support for GnuPG v2.  GnuPG v2 is chosen by setting the style
+    constructor parameter or $PGP::Sign::PGPSTYLE to "GPG", which is now
+    the default.  Be aware that GnuPG v2 does not support creating
+    signatures that can be verified with PGP 2.6.2.  To support older keys
+    and signatures, set the style constructor parameter or
+    $PGP::Sign::PGPSTYLE to "GPG1", which uses GnuPG v1 configured to be
+    backward-compatible with PGP 2.6.2.
+
+    Status output from GnuPG is now kept separate from human-readable log
+    and error output for more reliable parsing.  This will change the
+    order of GnuPG output in reported error messages.  The human-readable
+    output will always be first, followed by the status messages.
+
+    Pass --allow-weak-digest-algos to GnuPG so it can use old keys and
+    verify signatures from old keys, such as those created with PGP 2.6.2.
+
+    pgp_sign, when called in array context, now always returns "GnuPG" as
+    the version string, and the version passed into pgp_verify is always
+    ignored.  Including the OpenPGP implementation version information in
+    signatures is obsolete; GnuPG no longer does it by default and it
+    serves no useful purpose.
+
+    When calling pgp_sign multiple times in the same process with
+    whitespace munging enabled, trailing whitespace without a newline
+    could have leaked into the next invocation of pgp_sign, resulting in
+    an invalid signature.  Clear any remembered whitespace between
+    pgp_sign invocations.
+
+    PGP::Sign now depends on IPC::Run and uses it to talk to GnuPG instead
+    of hand-rolling equivalent functionality with IPC::Open3.
+
+    Use File::Temp to create temporary files.  This should significantly
+    improve the safety of temporary file creation.  The default directory
+    for temporary file creation is now whatever directory File::Temp
+    chooses by default.  It can stll be overridden by setting the tmpdir
+    constructor parameter or $PGP::Sign::TMPDIR.
+
+    Rewrite the build system to use Module::Build.  This eliminates the
+    spurious VERSION.pm "module" at the top level, which was a hack for
+    setting the distribution version in old versions of
+    ExtUtils::MakeMaker and should improve the indexing of the module.
+    Move the module into a lib structure and the test suite data into
+    t/data.  Eliminate all of the prompting and command-line parameters to
+    set the PGP style and path to programs; instead, PGP::Sign will
+    default to using gpg1 from the user's PATH.
+
+    Rewrite ChangeLog into a more conventional Changes file.
+
+PGP::Sign 0.20 (2007-04-27)
+
+    Unbuffer output when building the module since there is an interactive
+    prompt.
+
+PGP::Sign 0.19 (2004-08-08)
+
+    Replace verification code for GnuPG with code that uses --status-fd,
+    so that it will work independent of locale.
+
+    Document limitations in the error reporting and recommended setting
+    TMPDIR.
+
+PGP::Sign 0.18 (2004-08-04)
+
+    Remove trustdb.gpg from the distribution and add it to the files
+    cleaned by make clean.
+
+PGP::Sign 0.17 (2002-06-28)
+
+    Skip the test for verification of data with trailing whitespace when
+    run under GnuPG, since the whitespace behavior changes fromr elease to
+    release.  GnuPG 1.0.2 is back to the previous behavior of releases
+    before GnuPG 1.0.1.
+
+    Update CAVEATS to be slightly less optimistic about the chances of a
+    major overhaul.  Add a URL for RFC 2440 and this module's web site.
+    Add a COPYRIGHT AND LICENSE section.  Update the markup in the
+    documentation.
+
+PGP::Sign 0.16 (2000-02-12)
+
+    Add support for PGP 6.5, including a new PGPSTYLE setting.
+
+    Add a waitpid call to pgp_verify() to avoid leaving zombies behind.
+
+    Document the change in trailing whitespace handling in GnuPG 1.0.1.
+
+PGP::Sign 0.15 (1999-06-13)
+
+    Clear the close-on-exec flag on the passphrase pipe in pgp_sign(),
+    required for Perl 5.005_03.
+
+    Document that PGP may want to write randseed.bin to its keyring
+    directory when run.
+
+PGP::Sign 0.14 (1999-02-10)
+
+    Add support for GnuPG and PGP 5.0.  This includes a new PGPSTYLE
+    global variable, support for separate programs for signing and
+    verification and lots of choosing between styles all over the code.
+    Document the incompatibilities between different versions with respect
+    to whitespace munging.
+
+    Add support for passing overrides for PGP paths and PGPSTYLE
+    configuration settings via a paths file in the top-level directory
+    instead of on the command line of makepm.PL.
+
+PGP::Sign 0.13 (1998-12-04)
+
+    Allow setting the path to PGP on the command line when running perl
+    Makefile.PL.
+
+PGP::Sign 0.12 (1998-12-02)
+
+    Ensure the path to PGP input by the user during the build process
+    overrides any other path to PGP found by the build system.
+
+PGP::Sign 0.11 (1998-11-27)
+
+    Prevent ExtUtils::MakeMaker from spuriously generating a
+    PGP::PGP::Sign man page.
+
+    Add ABSTRACT and AUTHOR to Makefile.PL for Perl versions 5.005 and
+    higher.
+
+PGP::Sign 0.10 (1998-11-26)
+
+    Fix a bug in finding the PGP version number of a signature.
+
+    Add support for the $PGP::Sign::PGPPATH configuration variable.
+
+    Clean up and reformat the documentation, add information about PGP
+    environment variables, and document the lack of support for PGP v5 and
+    GnuPG.
+
+    Add a test suite.
+
+PGP::Sign 0.9 (1998-07-05)
+
+    Fix the code for getting the exit status of PGP to call waitpid on a
+    specific PID, avoiding getting the status of some other child
+    process.
+
+    Explicitly set $/ in case the calling program had it set to something
+    odd.
+
+PGP::Sign 0.8 (1997-08-18)
+
+    Explicitly set a umask of 077 in pgp_verify() (and restore it on
+    completion) since we're creating temporary files.
+
+    Add a check to pgp_sign() to make sure we got a signature.
+
+PGP::Sign 0.7 (1997-08-15)
+
+    Use O_EXCL when opening files in /tmp to avoid symlink attacks.
+
+PGP::Sign 0.6 (1997-08-15)
+
+    Add support for $PGP::Sign::MUNGE, which says to remove trailing
+    whitespace from each line before passing it to PGP.
+
+PGP::Sign 0.5 (1997-07-28)
+
+    Fix some minor documentation nits.
+
+PGP::Sign 0.4 (1997-07-28)
+
+    Change signature verification code to verify detached signatures
+    instead of attached ones, and add a $PGP::Sign::TMPDIR variable to
+    specify where the temporary files should be created.
+
+    Remove support for $PGP::Sign::ORS, which was a hack that's no longer
+    necessary.  Adding newlines before the signature can be done by the
+    caller of the module.
+
+    Add a pgp_error() function to retrieve the error message from the last
+    command.
+
+PGP::Sign 0.3 (1997-07-27)
+
+    Add pgp_verify().
+
+PGP::Sign 0.2 (1997-07-27)
+
+    Use @PGP::Sign::ERROR correctly to store errors from pgp_sign().
+
+    Add documentation.
+
+    Fix some minor bugs.
+
+PGP::Sign 0.1 (1997-07-27)
+
+    Initial version, only supporting signature creation.

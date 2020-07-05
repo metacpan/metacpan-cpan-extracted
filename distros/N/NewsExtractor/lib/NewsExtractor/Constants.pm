@@ -82,6 +82,7 @@ use constant {
         'The News Lens 關鍵評論網',
         '立場新聞',
         '農傳媒',
+        '報導者 The Reporter',
     ],
 
     CATEGORY_NAMES => [

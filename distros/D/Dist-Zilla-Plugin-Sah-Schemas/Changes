@@ -1,3 +1,9 @@
+0.021   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Derp, didn't bump prereq version of Test::Sah::Schema
+	  correctly.
+
+
 0.020   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereq version of Test::Sah::Schema.

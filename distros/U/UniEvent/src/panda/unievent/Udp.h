@@ -34,7 +34,7 @@ struct Udp : virtual BackendHandle, AllocatedObject<Udp>, private backend::IUdpI
     CallbackDispatcher<send_fptr>    send_event;
 
     Udp (const LoopSP& loop = Loop::default_loop(), int domain = AF_UNSPEC) : domain(domain), _listener() {
-        _ECTOR();
+        panda_log_ctor();
         _init(loop, loop->impl()->new_udp(this, domain));
     }
 

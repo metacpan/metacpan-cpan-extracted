@@ -1,5 +1,22 @@
 Revision history for Future-AsyncAwait
 
+0.42    2020-06-29
+        [BUGFIXES]
+         * Fixes for assert failures on -DDEBUGGING perls:
+            + Workarounds for perl versions prior to 5.22 that get upset about
+              new*OP() being invoked with OP_CUSTOM
+            + Remember to set SVs_PADMY flag on newly-generated pad slot SVs
+              during suspend
+         * Don't leak SVs when cleaning up SAVEt_FREESV during cancellation
+
+0.41    2020-06-20
+        [CHANGES]
+         * Updates for XS::Parse::Sublike 0.10
+
+        [BUGFIXES]
+         * Fix Build.PL declaration on XS::Parse::Sublike that it needs to be
+           configure_requires
+
 0.40    2020-04-15
         [CHANGES]
          * Support a limited form of SAVEt_SPTR when the var is within the

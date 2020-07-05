@@ -1,7 +1,7 @@
 language: perl
 perl:
-  - 5.26
-  - 5.26-shrplib
+  - 5.30
+  - 5.30-shrplib
 
 before_install:
   - perl -V

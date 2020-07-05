@@ -22,7 +22,7 @@ our @SVG_REGEX = qw/
 our @FUNCTIONS = qw/extract_path_info reverse_path create_path_string/;
 our @EXPORT_OK = (@FUNCTIONS, @SVG_REGEX);
 our %EXPORT_TAGS = (all => \@FUNCTIONS, regex => \@SVG_REGEX);
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Carp;
 
@@ -660,18 +660,55 @@ sub extract_path_info
                     add_coords ($element->{end},      \@abs_pos);
                 }
                 if ($no_smooth) {
-                    if (!$previous) {
-                        die "No previous element";
-                    }
-                    if ($previous->{type} ne 'cubic-bezier') {
-                        die "Bad previous element type $previous->{type}";
-                    }
                     $element->{type} = 'cubic-bezier';
                     $element->{svg_key} = 'C';
-                    $element->{control1} = [
-                        2 * $abs_pos[0] - $previous->{control2}->[0],
-                        2 * $abs_pos[1] - $previous->{control2}->[1],
-                    ];
+                    if ($previous && $previous->{type} eq 'cubic-bezier') {
+                        $element->{control1} = [
+                            2 * $abs_pos[0] - $previous->{control2}->[0],
+                            2 * $abs_pos[1] - $previous->{control2}->[1],
+                        ];
+                    } else {
+                        $element->{control1} = [@abs_pos];
+                    }
+                }
+                if ($begin_drawing) {
+		    if ($verbose) {
+			printf "Beginning drawing at [%.4f, %.4f]\n", @abs_pos;
+		    }
+		    $begin_drawing = 0;
+		    @start_drawing = @abs_pos;
+                }
+                @abs_pos = @{$element->{end}};
+            }
+            elsif ($element->{type} eq 'quadratic-bezier') {
+                if ($element->{position} eq 'relative') {
+                    add_coords ($element->{control},  \@abs_pos);
+                    add_coords ($element->{end},      \@abs_pos);
+                }
+                if ($begin_drawing) {
+		    if ($verbose) {
+			printf "Beginning drawing at [%.4f, %.4f]\n", @abs_pos;
+		    }
+		    $begin_drawing = 0;
+		    @start_drawing = @abs_pos;
+                }
+                @abs_pos = @{$element->{end}};
+            }
+            elsif ($element->{type} eq 'smooth-quadratic-bezier') {
+                if ($element->{position} eq 'relative') {
+                    add_coords ($element->{end},      \@abs_pos);
+                }
+                if ($no_smooth) {
+                    $element->{type} = 'quadratic-bezier';
+                    $element->{svg_key} = 'Q';
+                    if ($previous && $previous->{type} eq 'quadratic-bezier') {
+                        $element->{control} = [
+                            2 * $abs_pos[0] - $previous->{control}->[0],
+                            2 * $abs_pos[1] - $previous->{control}->[1],
+                        ];
+                    } else {
+                        $element->{control} = [@abs_pos];
+                    }
                 }
                 if ($begin_drawing) {
 		    if ($verbose) {

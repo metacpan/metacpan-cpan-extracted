@@ -2,14 +2,6 @@ use 5.012;
 use UniEvent;
 use Time::HiRes qw/time/;
 use Panda::Lib;
-use Panda::Lib::Logger;
-
-set_log_level(LOG_VERBOSE_DEBUG);
-set_native_logger(sub {
-    my ($level, $cp, $msg) = @_;
-    say "$cp$msg";
-});
-set_log_level(LOG_EMERGENCY);
 
 my $loop = UE::Loop->default_loop;
 my $r = UE::Resolver->new($loop, {

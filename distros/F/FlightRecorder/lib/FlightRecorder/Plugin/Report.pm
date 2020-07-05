@@ -11,7 +11,7 @@ use routines;
 use Data::Object::Class;
 use Data::Object::ClassHas;
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 # ATTRIBUTES
 
@@ -53,20 +53,9 @@ method format() {
 }
 
 method generate() {
-  my $logs = $self->logs;
-  my $level = $self->level;
-  my $source = $self->flight_recorder;
-  my $levels = $source->levels;
+  my $lines = $self->lines;
 
-  my @lines;
-
-  for my $item (@$logs) {
-    if ($$levels{$item->{level}} >= $$levels{$level}) {
-      push @lines, $self->logline($item);
-    }
-  }
-
-  return join "\n", @lines;
+  return join "\n", @$lines;
 }
 
 method item_dump(HashRef $item) {
@@ -157,6 +146,23 @@ method item_message(HashRef $item) {
 method item_level(HashRef $item) {
 
   return $item->{level};
+}
+
+method lines() {
+  my $logs = $self->logs;
+  my $level = $self->level;
+  my $source = $self->flight_recorder;
+  my $levels = $source->levels;
+
+  my $lines;
+
+  for my $item (@$logs) {
+    if ($$levels{$item->{level}} >= $$levels{$level}) {
+      push @$lines, $self->logline($item);
+    }
+  }
+
+  return $lines;
 }
 
 method logline(HashRef $item) {

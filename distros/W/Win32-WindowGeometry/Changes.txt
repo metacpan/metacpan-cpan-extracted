@@ -1,0 +1,4 @@
+Release 1.01	2020-06-25
+	- Initial Release
+Release 1.02	2020-06-25
+	- Fixed POD docs

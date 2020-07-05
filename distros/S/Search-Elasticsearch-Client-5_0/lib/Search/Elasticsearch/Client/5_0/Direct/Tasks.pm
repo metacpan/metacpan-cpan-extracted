@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::5_0::Direct::Tasks;
-$Search::Elasticsearch::Client::5_0::Direct::Tasks::VERSION = '6.80';
+$Search::Elasticsearch::Client::5_0::Direct::Tasks::VERSION = '6.81';
 use Moo;
 with 'Search::Elasticsearch::Client::5_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -17,7 +17,7 @@ Search::Elasticsearch::Client::5_0::Direct::Tasks - A client for accessing the T
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

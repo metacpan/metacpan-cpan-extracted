@@ -9,6 +9,7 @@ Sv new(SV*,SV* liObj) {
 }
 
 Sv IntersectionAdder::getLineIntersector() {
+    (void)THIS;
     Object me{ST(0)};
     auto payload = me.payload(&payload_marker);
     Object li{payload.obj};

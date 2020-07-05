@@ -41,6 +41,15 @@ subtest 'subcommand' => sub {
 	is ( $stderr, '', "empty stderr" );
     };
 
+    subtest "inline" => sub {
+	local @ARGV = qw ( whisper );
+	my ( $stdout, $stderr, @result ) =
+	   capture { MyTest::Class::Basic->new_with_options->run };
+
+	is ( $stdout, "hello world!\n", "message sent to stdout" );
+	is ( $stderr, '', "empty stderr" );
+    };
+
 };
 
 done_testing;

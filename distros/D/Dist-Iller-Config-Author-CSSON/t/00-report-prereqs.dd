@@ -13,7 +13,7 @@ do { my $x = {
                                       'Badge::Depot::Plugin::Kwalitee' => '0',
                                       'Badge::Depot::Plugin::Perl' => '0',
                                       'Badge::Depot::Plugin::Travis' => '0',
-                                      'Dist::Zilla' => '6.012',
+                                      'Dist::Zilla' => '6.015',
                                       'Dist::Zilla::Plugin::Authority' => '1.009',
                                       'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.009',
                                       'Dist::Zilla::Plugin::ChangeStats::Dependencies::Git' => '0.0200',
@@ -46,7 +46,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::PodSyntaxTests' => '0',
                                       'Dist::Zilla::Plugin::PodWeaver' => '4.006',
                                       'Dist::Zilla::Plugin::Prereqs' => '0',
-                                      'Dist::Zilla::Plugin::PromptIfStale' => '0.055',
+                                      'Dist::Zilla::Plugin::PromptIfStale' => '0.057',
                                       'Dist::Zilla::Plugin::Readme' => '0',
                                       'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.163250',
                                       'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.007',
@@ -87,7 +87,7 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Dist::Iller' => '0.1408',
-                                      'Dist::Iller::Config::Author::CSSON' => '0.0324'
+                                      'Dist::Iller::Config::Author::CSSON' => '0.0325'
                                     }
                     },
        'runtime' => {

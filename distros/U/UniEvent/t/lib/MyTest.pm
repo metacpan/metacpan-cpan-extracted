@@ -21,14 +21,10 @@ init();
 
 sub init {
     if ($ENV{LOGGER}) {
-        require Panda::Lib::Logger;
-        Panda::Lib::Logger::set_native_logger(sub {
-            my ($level, $code, $msg) = @_;
-            say "$level $code $msg";
-        });
-        Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_VERBOSE_DEBUG());
-        Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_DEBUG(), "UniEvent::Backend");
-        Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_INFO(), "UniEvent::SSL");
+        require XLog;
+        XLog::set_logger(sub { say $_[1] });
+        XLog::set_level(XLog::VERBOSE_DEBUG());
+        XLog::set_level(XLog::INFO(), "UniEvent::SSL");
     }    
     
     # for file tests

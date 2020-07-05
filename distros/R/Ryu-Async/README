@@ -111,6 +111,11 @@ METHODS
 
  udp_server
 
+ tcp_server
+
+    Creates a listening TCP socket, and provides a Ryu::Async::Server
+    instance which will emit a new event every time a client connects.
+
  sink
 
     Returns a new Ryu::Sink.

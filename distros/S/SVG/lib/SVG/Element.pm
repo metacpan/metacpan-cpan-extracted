@@ -3,7 +3,7 @@ package SVG::Element;
 use strict;
 use warnings;
 
-our $VERSION = '2.84';
+our $VERSION = '2.85';
 
 =pod
 
@@ -53,7 +53,7 @@ our %autosubs = map { $_ => 1 } @autosubs;
 sub new {
     my ( $proto, $name, %attrs ) = @_;
     my $class = ref($proto) || $proto;
-    my $self = { -name => $name };
+    my $self  = { -name => $name };
     foreach my $key ( keys %attrs ) {
 
         #handle escapes for special elements such as anchor
@@ -631,7 +631,7 @@ sub fe {
         turbulence       => 'feTurbulence',
     );
 
-    my $key = lc( $attrs{'-type'} );
+    my $key     = lc( $attrs{'-type'} );
     my $fe_name = $allowed{ lc($key) } || 'error:illegal_filter_element';
     delete $attrs{'-type'};
 

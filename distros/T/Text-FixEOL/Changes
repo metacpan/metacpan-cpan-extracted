@@ -26,3 +26,9 @@ Revision history for Perl extension Text::FixEOL.
 1.06 2011.07.30 - Replaced inadvertent Unicode usage in POD with non-Unicode.
                   No functional changes.
 
+1.07 2020.06.19 - Maintainer update. Relicensed under the MIT License.
+                  Minor tweaks to build process. Added meta_merge info
+                  for GitHub. Set minimum Perl version to 5.006 and
+                  added warnings pragma.
+
+1.08 2020.06.19 - Fixed Module::Build perl requires. Removed unused 'DEBUG' method.

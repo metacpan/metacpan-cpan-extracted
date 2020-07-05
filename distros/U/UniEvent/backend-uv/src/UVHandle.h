@@ -11,7 +11,7 @@ protected:
 
     template <class...Args>
     UVHandle (Args&&...args) : Base(args...) {
-        _ECTOR();
+        panda_log_ctor();
         uvh.data = static_cast<HandleImpl*>(this);
     }
 
@@ -28,7 +28,7 @@ protected:
     }
 
     void destroy () noexcept override {
-        panda_mlog_verbose_debug(uelog, _type_name(uvhp()) << "::destroy " << this);
+        panda_log_verbose_debug(_type_name(uvhp()) << "::destroy " << this);
         this->listener = nullptr;
         uv_close(uvhp(), uvx_on_close);
     }
@@ -39,7 +39,7 @@ protected:
 private:
     static void uvx_on_close (uv_handle_t* p) {
         auto h = get_handle(p);
-        panda_mlog_verbose_debug(uelog, "uvx_on_close " << h << " " << _type_name(p));
+        panda_log_verbose_debug("uvx_on_close " << h << " " << _type_name(p));
         delete h;
     }
 

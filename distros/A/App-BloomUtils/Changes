@@ -1,3 +1,15 @@
+0.006   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Use user-selected m & k if specified, otherwise
+	  Algorithm::BloomFilter will choose yet another value.
+
+
+0.005   2020-05-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] We need to create the Algorithm::BloomFilter instance to
+	  know what the actual size will be.
+
+
 0.004   2020-05-24  Released-By: PERLANCAR; Urgency: medium
 
 	- [cil gen-bloom-filter] Show information on actual m/k/p/size.

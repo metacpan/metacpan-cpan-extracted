@@ -28,7 +28,7 @@ sub _get
 {
     my ( $self, $uri ) = @_;
 
-    $uri = URI::Escape::uri_escape( $uri );
+#    $uri = URI::Escape::uri_escape( $uri );
 
     my $url = "$self->{addr}$uri";
     return +{ stat => JSON::true, data => $url } if $self->{urlonly};
@@ -45,22 +45,20 @@ sub get
 {
     my ( $self, $uri ) = @_;
 
-    my $error = "openapi fail: $uri\n";
-
     if( $ENV{MYDan_OpenAPI_Retry} )
     {
         while( 1 )
         {
             my $res = $self->_get( $uri );
             return $res->{data} if $res->{stat};
-            warn "[WARN] $error";
+            warn "[WARN] openapi fail: $uri\n";
             sleep 3;
         }
     }
     else
     {
-        my $res = $self->_get( @_ );
-        $res->{stat} ? $res->{data} : die "[ERROR] $error";
+        my $res = $self->_get( $uri );
+        $res->{stat} ? $res->{data} : die "[ERROR] GET openapi fail: $uri $res->{info}\n";
     }
 }
 
@@ -68,7 +66,7 @@ sub _post
 {
     my ( $self, $uri, %form ) = @_;
 
-    $uri = URI::Escape::uri_escape( $uri );
+#    $uri = URI::Escape::uri_escape( $uri );
 
     my $url = "$self->{addr}$uri";
     return +{ stat => JSON::true, data => $url } if $self->{urlonly};
@@ -102,7 +100,7 @@ sub post
     else
     {
         my $res = $self->_post( @_ );
-        $res->{stat} ? $res->{data} : die "[ERROR] openapi fail: $uri\n";
+        $res->{stat} ? $res->{data} : die "[ERROR] POST openapi fail: $uri $res->{info}\n";
     }
 
 }

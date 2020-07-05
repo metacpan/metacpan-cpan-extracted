@@ -1,7 +1,7 @@
 package Devel::End::PrintINC;
 
-our $DATE = '2017-07-14'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-04-16'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 END {
     print "Contents of \@INC:\n";
@@ -28,7 +28,7 @@ Devel::End::PrintINC - Print @INC and %INC when program ends
 
 =head1 VERSION
 
-This document describes version 0.001 of Devel::End::PrintINC (from Perl distribution Devel-End-PrintINC), released on 2017-07-14.
+This document describes version 0.002 of Devel::End::PrintINC (from Perl distribution Devel-End-PrintINC), released on 2020-04-16.
 
 =head1 SYNOPSIS
 
@@ -58,13 +58,15 @@ L<Devel::DieHandler::PrintINCVersion>
 
 Other C<Devel::End::*> modules
 
+Other L<End>::* modules
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

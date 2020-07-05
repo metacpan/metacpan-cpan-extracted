@@ -36,7 +36,7 @@ my $promiser = Net::Curl::Promiser::Select->new();
         'no vecs are non-NUL',
     );
 
-    is_deeply( \@list, [], 'promise was never settled' ) or diag explain \@list;
+    is_deeply( \@list, [], 'promise remains pending' ) or diag explain \@list;
 }
 
 for my $fail_ar ( [], [undef], [0], ['haha'] ) {

@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Data::Dumper;
+use Zing::Simple;
+
+=pod explain
+
+- zing-simple is a process, see ./examples/00-zing-process ...
+- which only performs (e.g. perform()) and does not check it's mailbox ...
+- and thus is slightly faster and singularly focused
+
+=cut
+
+(my $p = Zing::Simple->new)->name;
+
+warn Dumper $p;

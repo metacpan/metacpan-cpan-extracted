@@ -4,8 +4,12 @@ author:
   - unknown
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Ref::Util: '0'
+  Test::JSON: '0'
+  Test::MockModule: '0'
   Test::Most: '0'
   Test::OpenTracing::Interface: '0'
+  Test::URI: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
@@ -23,19 +27,20 @@ requires:
   Carp: '0'
   Exporter: '0'
   HTTP::Request: '0'
+  HTTP::Response::Maker: '0'
   JSON::MaybeXS: '0'
   LWP::UserAgent: '0'
   Moo: '0'
   Moo::Role: '0'
-  MooX::Attribute::ENV: '0'
+  MooX::Attribute::ENV: '0.02'
+  MooX::Enumeration: '0'
   MooX::HandlesVia: '0'
   OpenTracing::Implementation: '0.03'
-  OpenTracing::Role: '0.06'
+  OpenTracing::Role: v0.82.0
   PerlX::Maybe: '0'
   Ref::Util: '0'
   Sub::Trigger::Lock: '0'
   Syntax::Feature::Maybe: '0'
-  Time::HiRes: '0'
   Try::Tiny: '0'
   Type::Tiny::XS: '0'
   Types::Common::String: '0'
@@ -43,5 +48,5 @@ requires:
   Types::Standard: '0'
   aliased: '0'
   syntax: '0'
-version: v0.30.1
+version: v0.41.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

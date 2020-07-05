@@ -21,6 +21,10 @@
 #define block_start(a)         Perl_block_start(aTHX_ a)
 #endif
 
+#ifndef intro_my
+#define intro_my()             Perl_intro_my(aTHX)
+#endif
+
 #ifndef OpSIBLING
 #define OpSIBLING(op)          (op->op_sibling)
 #endif
@@ -29,50 +33,38 @@
 #define OpMORESIB_set(op,sib)  ((op)->op_sibling = (sib))
 #endif
 
-/* borrowed from ZEFRAM/Scope-Escape-0.005/lib/Scope/Escape.xs */
-#define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
-#define PERL_DECIMAL_VERSION \
-        PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
-#define PERL_VERSION_GE(r,v,s) \
-        (PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+#define HAVE_PERL_VERSION(R, V, S) \
+    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
-#if PERL_VERSION_GE(5,26,0)
+#if HAVE_PERL_VERSION(5,26,0)
 #  define HAVE_OP_SIBPARENT
 #endif
 
-#if PERL_VERSION_GE(5,19,4)
+#if HAVE_PERL_VERSION(5,19,4)
 typedef SSize_t array_ix_t;
 #else /* <5.19.4 */
 typedef I32 array_ix_t;
 #endif /* <5.19.4 */
 
 #ifndef wrap_keyword_plugin
-#  ifndef OP_CHECK_MUTEX_LOCK /* < 5.15.8 */
-#    define OP_CHECK_MUTEX_LOCK ((void)0)
-#    define OP_CHECK_MUTEX_UNLOCK ((void)0)
-#  endif
+#  include "wrap_keyword_plugin.c.inc"
+#endif
 
-#  define wrap_keyword_plugin(func, var)  S_wrap_keyword_plugin(aTHX_ func, var)
-static void S_wrap_keyword_plugin(pTHX_ Perl_keyword_plugin_t func, Perl_keyword_plugin_t *var)
+/* On Perl 5.14 this had a different name */
+#ifndef pad_add_name_pvn
+#define pad_add_name_pvn(name, len, flags, typestash, ourstash)  MY_pad_add_name(aTHX_ name, len, flags, typestash, ourstash)
+PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, HV *typestash, HV *ourstash)
 {
-  /* BOOT can potentially race with other threads (RT123547) */
+  /* perl 5.14's Perl_pad_add_name requires a NUL-terminated name */
+  SV *namesv = sv_2mortal(newSVpvn(name, len));
 
-  /* Perl doesn't really provide us a nice mutex for doing this so this is the
-   * best we can find. See also
-   *   https://rt.perl.org/Public/Bug/Display.html?id=132413
-   */
-  if(*var)
-    return;
-
-  OP_CHECK_MUTEX_LOCK;
-  if(!*var) {
-    *var = PL_keyword_plugin;
-    PL_keyword_plugin = func;
-  }
-
-  OP_CHECK_MUTEX_UNLOCK;
+  return Perl_pad_add_name(aTHX_ SvPV_nolen(namesv), SvCUR(namesv), flags, typestash, ourstash);
 }
 #endif
+
+#include "lexer-additions.c.inc"
+
+#include "perl-additions.c.inc"
 
 static OP *pp_entertrycatch(pTHX);
 static OP *pp_catch(pTHX);
@@ -218,9 +210,9 @@ static OP *pp_pushfinally(pTHX)
 #define newPUSHFINALLYOP(finally)  MY_newPUSHFINALLYOP(aTHX_ finally)
 static OP *MY_newPUSHFINALLYOP(pTHX_ CV *finally)
 {
-  OP *op = newSVOP(OP_CUSTOM, 0, (SV *)finally);
+  OP *op = newSVOP_CUSTOM(0, (SV *)finally);
   op->op_ppaddr = &pp_pushfinally;
-  return op;
+  return (OP *)op;
 }
 
 #define newLOCALISEOP(gv)  MY_newLOCALISEOP(aTHX_ gv)
@@ -229,20 +221,6 @@ static OP *MY_newLOCALISEOP(pTHX_ GV *gv)
   OP *op = newGVOP(OP_GVSV, 0, gv);
   op->op_private |= OPpLVAL_INTRO;
   return op;
-}
-
-#define lex_consume(s)  MY_lex_consume(aTHX_ s)
-static int MY_lex_consume(pTHX_ char *s)
-{
-  /* I want strprefix() */
-  size_t i;
-  for(i = 0; s[i]; i++) {
-    if(s[i] != PL_parser->bufptr[i])
-      return 0;
-  }
-
-  lex_read_to(PL_parser->bufptr + i);
-  return i;
 }
 
 #define newSTATEOP_nowarnings()  MY_newSTATEOP_nowarnings(aTHX)
@@ -424,7 +402,7 @@ static OP *MY_newENTERTRYCATCHOP(pTHX_ OP *try, OP *catch)
    */
   ((UNOP *)enter)->op_first->op_ppaddr = &pp_entertrycatch;
 
-  ret = newLOGOP(OP_CUSTOM, 0,
+  ret = newLOGOP_CUSTOM(0,
     enter,
     newLISTOP(OP_SCOPE, 0, catch, NULL)
   );
@@ -463,16 +441,43 @@ static int try_keyword(pTHX_ OP **op)
   lex_read_space(0);
 
   if(lex_consume("catch")) {
+    PADOFFSET catchvar = 0;
+    I32 save_ix = block_start(TRUE);
     lex_read_space(0);
-    catch = parse_scoped_block(0);
+
+    if(lex_consume("my")) {
+#ifdef WARN_EXPERIMENTAL
+      Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+        "'catch my VAR' syntax is experimental and may be changed or removed without notice");
+#endif
+      lex_read_space(0);
+      catchvar = parse_lexvar();
+
+      lex_read_space(0);
+
+      intro_my();
+    }
+
+    catch = block_end(save_ix, parse_block(0));
     lex_read_space(0);
+
+    if(catchvar) {
+      OP *errsv_op = newGVOP(OP_GVSV, 0, PL_errgv);
+      OP *catchvar_op = newOP(OP_PADSV, 0);
+      catchvar_op->op_targ = catchvar;
+
+      catch = op_prepend_elem(OP_LINESEQ,
+        /* $var = $@ */
+        newBINOP(OP_SASSIGN, 0, errsv_op, catchvar_op),
+        catch);
+    }
   }
 
   if(lex_consume("finally")) {
     I32 floor_ix, save_ix;
     OP *body;
 
-#if !PERL_VERSION_GE(5,24,0)
+#if !HAVE_PERL_VERSION(5,24,0)
     if(is_value)
       croak("try do {} finally {} is not supported on this version of perl");
 #endif

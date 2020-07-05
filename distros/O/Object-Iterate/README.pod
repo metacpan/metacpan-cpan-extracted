@@ -10,7 +10,7 @@
 
 =for HTML <a href="https://github.com/briandfoy/object-iterate/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Object-Iterate.svg" /></a>
 
-=for HTML <a href="http://www.metacpan.org/module/Object::Iterate"><img src="https://img.shields.io/cpan/v/Object-Iterate.svg" /></A>
+=for HTML <a href="https://metacpan.org/pod/Object::Iterate"><img src="https://img.shields.io/cpan/v/Object-Iterate.svg" /></A>
 
 =head1 The Object::Iterate module
 
@@ -27,7 +27,7 @@ expect you to use. Steal the code and inline it.
 
 To read about L<Object::Iterate>, look at the embedded documentation
 in the module itself. Inside the distribution, you can format it
-with L<perldoc|http://perldoc.perl.org/perldoc.html>:
+with L<perldoc|https://perldoc.perl.orgperldoc.html>:
 
 	% perldoc lib/Object/Iterate.pm
 
@@ -36,17 +36,8 @@ name instead of the file location:
 
 	% perldoc Object::Iterate
 
-You can read the documentation and inspect the meta data on one of the
-CPAN web interfaces, such as L<CPAN Search|http://search.cpan.org/dist/Object-Iterate> or
-L<MetaCPAN|http://www.metacpan.org/module/Object::Iterate>:
-
-=over 4
-
-=item *	L<http://search.cpan.org/dist/Object-Iterate>
-
-=item *	L<http://www.metacpan.org/module/Object::Iterate>
-
-=back
+You can read the documentation and inspect the meta data at
+L<MetaCPAN|https://metacpan.org/pod/Object::Iterate>.
 
 The standard module documentation has example uses in the SYNOPSIS
 section, but you can also look in the I<examples/> directory (if it's

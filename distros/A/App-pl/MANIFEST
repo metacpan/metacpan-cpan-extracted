@@ -10,5 +10,6 @@ t/b.txt
 t/c.txt
 t/cli-loop.t
 t/diff.t
+t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

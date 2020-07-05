@@ -1,0 +1,58 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with OpenTracing::SpanProxy
+at lib/OpenTracing/SpanProxy.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+OpenTracing::SpanProxy - wrapper around an L<OpenTracing::Span>
+
+=head1 DESCRIPTION
+
+This is the wrapper class that user code would normally receive when working
+with spans. It allows the creation of nested subspans, and will automatically
+mark the span as complete when the proxy object is discarded.
+
+=head2 span
+
+Returns the L<OpenTracing::Span> instance that this wraps.
+
+=head2 log
+
+Writes a log entry to the L<OpenTracing::Span>.
+
+=head2 new_span
+
+Creates a new sub-span under this L<OpenTracing::Span> instance.
+
+=head2 DESTROY
+
+Called on destruction, will mark completion on the span by calling
+L<OpenTracing::Span/finish>.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<OpenTracing::Common>
+
+L<new|OpenTracing::Common/new>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
+

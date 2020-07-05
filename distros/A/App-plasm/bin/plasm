@@ -7,7 +7,7 @@ use App::plasm;
 
 # PODNAME: plasm
 # ABSTRACT: Perl WebAssembly command line tool
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 exit App::plasm->main(@ARGV);
@@ -24,7 +24,7 @@ plasm - Perl WebAssembly command line tool
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -57,6 +57,14 @@ C<program.wasm> are passed on to the WebAssembly program.
  % plasm dump --help
 
 Dumps the import and exports of the given WebAssembly module.
+
+=head2 wat
+
+ % plasm wat program.wat
+ % plasm wat --help
+
+Converts WebAssembly Text (.wat) to WebAssembly Binary (.wasm)
+using wasmtime's C<wat2wasm> function.
 
 =head1 SEE ALSO
 

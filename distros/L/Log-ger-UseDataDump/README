@@ -1,14 +1,43 @@
-SYNOPSIS
+NAME
+    Log::ger::UseDataDump - Use Data::Dump to dump data structures
 
+VERSION
+    This document describes version 0.002 of Log::ger::UseDataDump (from
+    Perl distribution Log-ger-UseDataDump), released on 2020-04-17.
+
+SYNOPSIS
      use Log::ger::UseDataDump;
 
 DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-UseDataDump>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-UseDataDump>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-UseDataDump>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Log::ger
 
     Data::Dump
 
-    Log::ger::UseDataDumpColor
+    Other modules to set data dumper for Log::ger: Log::ger::UseDataPrinter,
+    Log::ger::UseDataDumpColor, Log::ger::UseDataDumper.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

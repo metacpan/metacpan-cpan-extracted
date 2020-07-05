@@ -1,9 +1,9 @@
 package ColorTheme::Lens::Lighten;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorTheme-Lens-Lighten'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -24,6 +24,12 @@ our %THEME = (
             default => 50,
         },
     },
+    examples => [
+        {
+            summary => 'Lighten another color theme',
+            args => {theme => 'Test::Static'},
+        },
+    ],
 );
 
 sub new {
@@ -34,7 +40,7 @@ sub new {
 
     require Module::Load::Util;
     $self->{orig_theme_class} = Module::Load::Util::instantiate_class_with_optional_args(
-        $self->{args}{theme});
+        {ns_prefix=>'ColorTheme'}, $self->{args}{theme});
 
     $self;
 }
@@ -79,7 +85,7 @@ ColorTheme::Lens::Lighten - Lighten other theme
 
 =head1 VERSION
 
-This document describes version 0.001 of ColorTheme::Lens::Lighten (from Perl distribution ColorTheme-Lens-Lighten), released on 2020-06-09.
+This document describes version 0.002 of ColorTheme::Lens::Lighten (from Perl distribution ColorTheme-Lens-Lighten), released on 2020-06-19.
 
 =head1 HOMEPAGE
 

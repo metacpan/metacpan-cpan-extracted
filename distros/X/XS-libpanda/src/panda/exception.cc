@@ -2,6 +2,7 @@
 #include <cstring>
 #include <memory>
 #include <functional>
+
 #ifdef _WIN32
   #include "exception/win.icc"
 #else
@@ -10,13 +11,41 @@
 
 namespace panda {
 
-static RawTraceProducer  rawtrace_producer = get_default_raw_producer();
-static BacktraceProducer bt_producer       = get_default_bt_producer();
+using FrameProducers = std::vector<BacktraceProducer>;
+
+static RawTraceProducer rawtrace_producer = get_default_raw_producer();
+static FrameProducers   frame_producers { get_default_bt_producer() };
 
 BacktraceInfo::~BacktraceInfo() {};
 
+string BacktraceInfo::to_string() const noexcept {
+    string r;
+    for(auto& frame: frames) {
+        // mimic gdb-style
+        r += "0x";
+        r += string::from_number(frame->address, 16);
+        if (frame->name) {
+            r += " in ";
+            r += frame->name;
+        }
+        if (frame->file) {
+            r += " at ";
+            r += frame->file;
+            if (frame->line_no) {
+                r += ":";
+                r += string::from_number(frame->line_no, 10);
+            }
+        } else if(frame->library) {
+            r += " from ";
+            r += frame->library;
+        }
+        r += "\n";
+    }
+    return r;
+}
+
 void Backtrace::install_producer(BacktraceProducer& producer_) {
-    bt_producer = producer_;
+    frame_producers.push_back(producer_);
 }
 
 Backtrace::Backtrace (const Backtrace& other) noexcept : buffer(other.buffer) {}
@@ -24,8 +53,8 @@ Backtrace::Backtrace (const Backtrace& other) noexcept : buffer(other.buffer) {}
 Backtrace::Backtrace () noexcept {
     void* temp_buff[max_depth];
     auto depth = rawtrace_producer(temp_buff, max_depth);
-    if (depth) {
-        buffer.resize(max_depth);
+    if (depth > 0) {
+        buffer.resize(depth);
         std::memcpy(buffer.data(), temp_buff, sizeof(void*) * depth);
     }
 }
@@ -33,7 +62,24 @@ Backtrace::Backtrace () noexcept {
 Backtrace::~Backtrace() {}
 
 iptr<BacktraceInfo> Backtrace::get_backtrace_info() const noexcept {
-    return bt_producer(buffer);
+    StackFrames frames;
+    std::vector<BacktraceBackendSP> backends;
+    for(auto it = frame_producers.rbegin(); it != frame_producers.rend(); ++it) {
+        auto backend = (*it)(*this);
+        if (backend) backends.emplace_back(std::move(backend));
+    }
+
+    for (size_t i = 0; i < buffer.size(); ++i) {
+        bool done = false;
+        for (size_t j = 0; j < backends.size() && !done; ++j) {
+            done = backends[j]->produce_frame(frames, i);
+        }
+    }
+    return iptr<BacktraceInfo>(new BacktraceInfo(std::move(frames)));
+}
+
+string Backtrace::dump_trace() noexcept {
+    return Backtrace().get_backtrace_info()->to_string();
 }
 
 exception::exception () noexcept {}

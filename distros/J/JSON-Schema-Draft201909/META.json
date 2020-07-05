@@ -43,10 +43,13 @@
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
          },
          "requires" : {
+            "Data::Validate::Domain" : "0",
+            "Email::Address::XS" : "1.01",
             "Encode" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Net::IDN::Encode" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Wordlist" : "0",
             "Test::CPAN::Changes" : "0.19",
@@ -63,6 +66,7 @@
             "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
+            "Time::Moment" : "0",
             "perl" : "5.006"
          }
       },
@@ -75,6 +79,7 @@
             "List::Util" : "1.50",
             "Mojo::JSON::Pointer" : "0",
             "Mojo::URL" : "0",
+            "Mojolicious" : "7.23",
             "Moo" : "0",
             "MooX::HandlesVia" : "0",
             "MooX::TypeTiny" : "0.002002",
@@ -91,6 +96,14 @@
             "perl" : "v5.16.0",
             "strict" : "0",
             "warnings" : "0"
+         },
+         "suggests" : {
+            "Class::XSAccessor" : "0",
+            "Data::Validate::Domain" : "0",
+            "Email::Address::XS" : "1.01",
+            "Net::IDN::Encode" : "0",
+            "Time::Moment" : "0",
+            "Type::Tiny::XS" : "0"
          }
       },
       "test" : {
@@ -164,6 +177,7 @@
             "Dist::Zilla::Plugin::PodWeaver" : "4.008",
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0.006",
+            "Dist::Zilla::Plugin::Prereqs::Soften" : "0",
             "Dist::Zilla::Plugin::PromptIfStale" : "0",
             "Dist::Zilla::Plugin::Readme" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.142180",
@@ -197,19 +211,19 @@
    "provides" : {
       "JSON::Schema::Draft201909" : {
          "file" : "lib/JSON/Schema/Draft201909.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "JSON::Schema::Draft201909::Document" : {
          "file" : "lib/JSON/Schema/Draft201909/Document.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "JSON::Schema::Draft201909::Error" : {
          "file" : "lib/JSON/Schema/Draft201909/Error.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       },
       "JSON::Schema::Draft201909::Result" : {
          "file" : "lib/JSON/Schema/Draft201909/Result.pm",
-         "version" : "0.005"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -224,10 +238,10 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Draft201909"
       }
    },
-   "version" : "0.005",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.031011"
+         "version" : "5.032000"
       },
       "plugins" : [
          {
@@ -926,7 +940,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20200602"
+                  "Module::CoreList" : "5.20200620"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1047,7 +1061,7 @@
                }
             },
             "name" : "@Author::ETHER/copy generated files",
-            "version" : "0.007"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -1103,7 +1117,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/CopyFilesFromRelease",
-            "version" : "0.007"
+            "version" : "0.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -1143,7 +1157,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.005",
+                  "tag" : "v0.008",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1298,6 +1312,48 @@
             "version" : "6.015"
          },
          {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "RuntimeRequires",
+            "version" : "6.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "suggests"
+               }
+            },
+            "name" : "RuntimeSuggests",
+            "version" : "6.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs::Soften",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs::Soften" : {
+                  "copy_to" : [
+                     "develop.requires"
+                  ],
+                  "modules" : [
+                     "Time::Moment",
+                     "Data::Validate::Domain",
+                     "Email::Address::XS",
+                     "Net::IDN::Encode"
+                  ],
+                  "modules_from_features" : null,
+                  "to_relationship" : "suggests"
+               }
+            },
+            "name" : "Prereqs::Soften",
+            "version" : "0.006003"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
             "version" : "6.015"
@@ -1362,7 +1418,7 @@
       }
    },
    "x_authority" : "cpan:ETHER",
-   "x_generated_by_perl" : "v5.31.11",
+   "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,

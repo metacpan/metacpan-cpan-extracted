@@ -1,10 +1,10 @@
 use strict;
 use warnings;
+use diagnostics;
 
 package Archive::BagIt::Base;
 
-use Moose;
-use namespace::autoclean;
+use Moo;
 
 use utf8;
 use open ':std', ':encoding(utf8)';
@@ -15,13 +15,20 @@ use File::stat;
 use Digest::MD5;
 use Class::Load qw(load_class);
 use Carp;
-use List::Util qw( uniq);
+use List::Util qw(uniq);
 
-our $VERSION = '0.055'; # VERSION
+our $VERSION = '0.058'; # VERSION
 
 use Sub::Quote;
 
 my $DEBUG=0;
+
+
+has 'parallel' => ( # used for parallel verify, only usefull if bagits with many files expected!
+    is        => 'rw',
+    predicate => 'has_parallel',
+    default   => undef,
+);
 
 
 has 'bag_path' => (
@@ -196,18 +203,17 @@ has 'non_payload_files' => (
 
 has 'plugins' => (
     is=>'rw',
-    isa=>'HashRef',
+    #isa=>'HashRef',
 );
 
 has 'manifests' => (
     is=>'rw',
-    isa=>'HashRef',
+    #isa=>'HashRef',
 );
 
 has 'algos' => (
     is=>'rw',
-    isa=>'HashRef',
-
+    #isa=>'HashRef',
 );
 
 
@@ -216,8 +222,7 @@ around 'BUILDARGS' , sub {
     my $class = shift;
     if (@_ == 1 && !ref $_[0]) {
         return $class->$orig(bag_path=>$_[0]);
-    }
-    else {
+    } else {
         return $class->$orig(@_);
     }
 };
@@ -281,7 +286,6 @@ sub _build_manifest_files {
       push @manifest_files, $manifest_file;
     }
   }
-  #print Dumper(@manifest_files);
   return \@manifest_files;
 }
 
@@ -295,7 +299,6 @@ sub _build_tagmanifest_files {
     }
   }
   return \@tagmanifest_files;
-
 }
 
 sub __build_xxxmanifest_entries {
@@ -306,10 +309,14 @@ sub __build_xxxmanifest_entries {
   foreach my $xxmanifest_file (@xxmanifests) {
     die("Cannot open $xxmanifest_file: $!") unless (open(my $XXMANIFEST,"<:encoding(utf8)", $xxmanifest_file));
     my $algo = $xxmanifest_file;
+    $algo =~ s#//#/#g; # to fix problems with double path-separators
     $algo =~ s#^($bag_path/).bagit/#$1#; # FIXME: only for dotbagit-variant, if dotbagit will be outdated, this should be removed
     $algo =~ s#^$bag_path/##;
-    $algo =~ s#^tag##;
-    $algo =~ s#^manifest-([a-z0-9]+)\.txt$#$1#;
+    $algo =~ s#tag(manifest-[a-z0-9]+\.txt)#$1#;
+    $algo =~ s#.*manifest-([a-z0-9]+)\.txt$#$1#;
+    if ($algo =~ m#/#) {
+        die "wrong replacement of path $xxmanifest_file to determine algorithm '$algo' correctly, please contact author";
+    }
     while (my $line = <$XXMANIFEST>) {
       chomp($line);
       my($digest,$file) = split(/\s+/, $line, 2);
@@ -323,12 +330,16 @@ sub __build_xxxmanifest_entries {
 
 sub _build_tagmanifest_entries {
   my ($self) = @_;
-  return $self->__build_xxxmanifest_entries($self->tagmanifest_files);
+  my @tm_files = $self->tagmanifest_files();
+  my $entries = $self->__build_xxxmanifest_entries(@tm_files);
+  return $entries;
 }
 
 sub _build_manifest_entries {
   my ($self) = @_;
-  return $self->__build_xxxmanifest_entries($self->manifest_files);
+  my @m_files = $self->manifest_files();
+  my $entries = $self->__build_xxxmanifest_entries(@m_files);
+  return $entries;
 }
 
 sub _build_payload_files{
@@ -352,9 +363,6 @@ sub _build_payload_files{
     }
     #print "name: ".$File::Find::name."\n";
   }, $payload_dir);
-
-  #print p(@payload);
-
   return wantarray ? @payload : \@payload;
 
 }
@@ -508,65 +516,107 @@ sub load_plugins {
 sub _verify_XXX_manifests {
     my ($self, $xxprefix, $xxmanifest_entries, $files, $return_all_errors) =@_;
     # Read the manifest file
-    #use Data::Printer;
-    #p( $self);
-    #print Dumper($self->{entries});
-    my %manifest = %{$xxmanifest_entries};
     my @payload = @{ $files };
-    my %invalids;
+    my @invalid_messages;
     my $bagit = $self->bag_path;
     my $version = $self->bag_version();
+    my sub _invalid_report_or_die {
+        my $message = shift;
+        if ($return_all_errors) {
+            push @invalid_messages, $message;
+        } else {
+            die($message);
+        }
+        return;
+    }
+    foreach my $local_name (@payload) {
+        # local_name is relative to bagit base
+        unless (-r $bagit."/".$local_name) {
+            _invalid_report_or_die(
+                "cannot read $local_name (bag-path:$bagit)",
+            );
+        }
+    }
     # Evaluate each file against the manifest
     foreach my $alg (keys %{$xxmanifest_entries}) {
         my $manifest_alg = $self->manifests->{$alg};
-        if (! defined $manifest_alg) {
-            next;
-            # TODO: return Errormessage?
-        }
+        next unless (defined $manifest_alg); # FIXME_ errormessage?
         my $digestobj = $manifest_alg->algorithm();
-
-        my $xxfilename = "$bagit/$xxprefix-$alg.txt";
+        my $xxfilename = "${bagit}/${xxprefix}-${alg}.txt";
+        # first check if each file from payload exists in manifest_entries for given alg
         foreach my $local_name (@payload) {
             # local_name is relative to bagit base
-            my ($digest);
-            unless (exists $manifest{$alg}{"$local_name"}) {
-                #system ("tree $bagit");
-                #use File::Slurp;
-                #my $vontent = read_file($xxfilename);
-                #print "Content: '$vontent'\n";
-                #print "Alg=$alg\n";
-                #use Data::Printer;
-                #p( %manifest);
-                die("file found which is not in $xxfilename: [$local_name] (bag-path:$bagit)");
+            unless (exists $xxmanifest_entries->{$alg}->{$local_name}) { # localname as value should exist!
+                _invalid_report_or_die(
+                    "file in payload found, which is not in $xxfilename: [$local_name] (bag-path:$bagit)",
+                );
             }
-            if (!-r "$bagit/$local_name") {die("Cannot open $bagit/$local_name");}
-            $digest = $digestobj->verify_file("$bagit/$local_name");
-            print "digest " . $digestobj->name() . " of $bagit/$local_name: $digest\n" if $DEBUG;
-            unless ($digest eq $manifest{$alg}{$local_name}) {
-                if ($return_all_errors) {
-                    $invalids{$local_name} = $digest;
-                }
-                else {
-                    die("file: $bagit/$local_name invalid, digest ($alg) calculated=$digest, but expected=$manifest{$alg}{$local_name} in file '$xxfilename'");
-                }
-            }
-            delete($manifest{$alg}{$local_name});
         }
-    }
-    if($return_all_errors && keys(%invalids) ) {
-        foreach my $invalid (keys(%invalids)) {
-            print "invalid: $invalid hash: ".$invalids{$invalid}."\n";
+        # second check if each file from manifest_entries for given alg exists in payload
+        foreach my $local_name ( keys %{ $xxmanifest_entries->{alg} } ) {
+            unless (any { $_ eq $local_name } @payload) {
+                _invalid_report_or_die(
+                    "file expected via $xxfilename,  which is not found in payload: [$local_name] (bag-path:$bagit)"
+                );
+            }
+        }
+        # all preconditions full filled, now calc all digests
+        my sub __calc_digests ($) {
+            my $local_name = shift;
+            # local_name is relative to bagit base
+            my $full_name = $bagit . "/" . $local_name;
+            my $digest = $digestobj->verify_file($full_name);
+            print "digest " . $digestobj->name() . " of $full_name: $digest\n" if $DEBUG;
+            my $expected_digest = $xxmanifest_entries->{$alg}->{$local_name};
+            my $tmp;
+            $tmp->{calculated_digest} = $digest;
+            $tmp->{expected_digest} = $expected_digest;
+            $tmp->{local_name} = $local_name;
+            $tmp;
+        }
+
+        my @digest_hashes;
+        # check if we could use parallel
+        my $is_parallelizeable;
+        if (($self->has_parallel()) && (defined $self->parallel)) {
+            my $err;
+            ($is_parallelizeable, $err) = Class::Load::try_load_class("Parallel::Iterator");
+            if (!$is_parallelizeable) {
+                warn "Class 'Parallel::Iterator' could not be loaded…, $err\n";
+                $self->{parallel} = undef;
+            }
+        }
+        if ($is_parallelizeable) {
+            my $class = Class::Load::load_class("Parallel::Iterator");
+            $class->import( qw(iterate_as_array));
+            @digest_hashes = iterate_as_array (
+                sub {
+                    my ($idx, $local_name) = @_;
+                    return __calc_digests($local_name);
+                }, \@payload);
+        } else { # fallback to serial processing
+            @digest_hashes = map { __calc_digests( $_ ) } @payload;
+        }
+        # compare digests
+        foreach my $digest_entry (@digest_hashes) {
+            unless ($digest_entry->{calculated_digest} eq $digest_entry->{expected_digest}) {
+                _invalid_report_or_die(
+                    sprintf ("file: %s invalid, digest (%s) calculated=%s, but expected=%s in file '%s'",
+                        $digest_entry->{local_name},
+                        $alg,
+                        $digest_entry->{calculated_digest},
+                        $digest_entry->{expected_digest},
+                        $xxfilename
+                    )
+                );
+                }
+            }
+        }
+    if($return_all_errors && @invalid_messages ) {
+        foreach my $invalid (@invalid_messages) {
+            print "$invalid\n";
         }
         die ("bag verify for bagit $version failed with invalid files");
-    }
-    # Make sure there are no missing files
-    foreach my $alg (keys %manifest){
-        my @localfiles = keys(%{ $manifest{$alg} });
-        if (@localfiles) {
-            use Data::Printer;
-            p( $self);
-            die("Missing files in bag $bagit for algorithm=$alg", join( " file=", @localfiles));
-        }
     }
     return 1;
 }
@@ -588,7 +638,7 @@ sub _verify_tagmanifests {
     my @non_payload_files = grep { $_ !~ m/tagmanifest-[a-z0-9]+\.txt/} @{ $self->non_payload_files };
     $self->_verify_XXX_manifests(
         "tagmanifest",
-        $self->tagmanifest_entries,
+        $self->tagmanifest_entries(),
         \@non_payload_files,
         $return_all_errors
     );
@@ -611,7 +661,7 @@ sub verify_bag {
 
 
     die("$manifest_file is not a regular file for bagit $version") unless -f ($manifest_file);
-    die("$payload_dir is not a directory") unless -d ($payload_dir);
+    die("$payload_dir is not a directory or does not exist") unless -d ($payload_dir);
 
     unless ($version > .95) {
         die ("Bag Version $version is unsupported");
@@ -620,7 +670,6 @@ sub verify_bag {
     # check forced fixity
     $self->_verify_manifests($forced_fixity_alg, $return_all_errors);
     $self->_verify_tagmanifests($forced_fixity_alg, $return_all_errors);
-
 
     # TODO: check if additional algorithms are used
 
@@ -658,7 +707,8 @@ sub calc_bagsize {
 
 sub create_bagit {
     my($self) = @_;
-    open(my $BAGIT, ">", $self->metadata_path."/bagit.txt") or die("Can't open $self->metadata_path/bagit.txt for writing: $!");
+    my $metadata_path = $self->metadata_path();
+    open(my $BAGIT, ">", "$metadata_path/bagit.txt") or die("Can't open $metadata_path/bagit.txt for writing: $!");
     print($BAGIT "BagIt-Version: 1.0\nTag-File-Character-Encoding: UTF-8");
     close($BAGIT);
     return 1;
@@ -673,7 +723,8 @@ sub create_baginfo {
     $self->_add_or_replace_bag_info('Payload-Oxum', "$octets.$streams");
     $self->_add_or_replace_bag_info('Bag-Size', $self->calc_bagsize());
     # The RFC does not allow reordering:
-    open(my $BAGINFO, ">", $self->metadata_path."/bag-info.txt") or die("Can't open $self->metadata_path/bag-info.txt for writing: $!");
+    my $metadata_path = $self->metadata_path();
+    open(my $BAGINFO, ">", "$metadata_path/bag-info.txt") or die("Can't open $metadata_path/bag-info.txt for writing: $!");
     foreach my $entry (@{ $self->bag_info() }) {
         my %tmp = %{ $entry };
         my ($key, $value) = each %tmp;
@@ -694,16 +745,20 @@ sub store {
         $self->manifests->{$algorithm}->create_manifest();
     }
     foreach my $algorithm ( keys %{ $self->manifests }) {
-
         $self->manifests->{$algorithm}->create_tagmanifest();
     }
+    # retrigger builds
+    $self->{checksum_algos} = $self->_build_checksum_algos();
+    $self->{tagmanifest_files} = $self->_build_tagmanifest_files();
+    $self->{manifest_files} = $self->_build_manifest_files();
     return 1;
 }
 
 
 sub init_metadata {
     my ($class, $bag_path) = @_;
-    unless ( -d $bag_path) { die ( "source bag directory doesn't exist"); }
+    $bag_path =~ s#/$##; # replace trailing slash
+    unless ( -d $bag_path) { die ( "source bag directory '$bag_path' doesn't exist"); }
     my $self = $class->new(bag_path=>$bag_path);
     warn "no payload path\n" if ! -d $self->payload_path;
     unless ( -d $self->payload_path) {
@@ -717,12 +772,13 @@ sub init_metadata {
     }
 
     $self->store();
-
     # FIXME: deprecated?
     #foreach my $algorithm (keys %{$self->manifests}) {
         #$self->manifests->{$algorithm}->create_bagit();
         #$self->manifests->{$algorithm}->create_baginfo();
     #}
+
+
 
     return $self;
 }
@@ -756,7 +812,34 @@ Archive::BagIt::Base
 
 =head1 VERSION
 
-version 0.055
+version 0.058
+
+=head1 SYNOPSIS
+
+This modules will hopefully help with the basic commands needed to create
+and verify a bag. This part supports BagIt 1.0 according to RFC 8493 ([https://tools.ietf.org/html/rfc8493](https://tools.ietf.org/html/rfc8493)).
+
+    use Archive::BagIt::Base;
+
+    #read in an existing bag:
+    my $bag_dir = "/path/to/bag";
+    my $bag = Archive::BagIt::Base->new($bag_dir);
+
+
+    #construct bag in an existing directory
+    my $bag2 = Archive::BagIt::Base->make_bag($bag_dir);
+
+    # Validate a BagIt archive against its manifest
+    my $bag3 = Archive::BagIt::Base->new($bag_dir);
+    my $is_valid = $bag3->verify_bag();
+
+=head1 NAME
+
+Archive::BagIt::Base
+
+=head1 VERSION
+
+version 0.058
 
 =head1 NAME
 
@@ -780,18 +863,68 @@ Achive::BagIt::Base - The common base for both Bagit and dotBagIt
 
 =item Serhiy Bolkun
 
+=item Russell McOrmond
+
 =back
 
 =head1 SOURCE
 
-The original development version is on github at L<http://github.com/rjeschmi/Archive-BagIt>
-and may be cloned from L<git://github.com/rjeschmi/Archive-BagIt.git>
+The original development version was on github at L<http://github.com/rjeschmi/Archive-BagIt>
+and may be cloned from there.
 
 The actual development version is available at L<https://art1pirat.spdns.org/art1/Archive-BagIt>
 
-=head2 BUILDARGS
+=head1 TODO
 
-The constructor sub, will create a bag with a single argument
+=over
+
+=item Add support for non-Unix based filesystems
+
+=item enhanced testsuite
+
+=item improved plugin mechanism
+
+=item reduce complexity
+
+=item use modern perl code
+
+=item add code to easily update outdated Bags to v1.0
+
+=item add more ecamples in documentation
+
+=back
+
+=head2 Constructor
+
+The constructor sub, will create a bag with a single argument,
+
+    use Archive::BagIt::Base;
+
+    #read in an existing bag:
+    my $bag_dir = "/path/to/bag";
+    my $bag = Archive::BagIt::Base->new($bag_dir);
+
+or use hashreferences
+
+    use Archive::BagIt::Base;
+
+    #read in an existing bag:
+    my $bag_dir = "/path/to/bag";
+    my $bag = Archive::BagIt::Base->new(
+        bag_path => $bag_dir,
+        parallel => 1
+    );
+
+The arguments are:
+
+=over 1
+
+=item C<bag_path> - path to bag-directory
+
+=item C<parallel> - if set and Parallel::Iterator available, it verifies files in parallel.
+      Hint: use it only for very large bagits, because overhead for parallelization
+
+=back
 
 =head2 load_plugins
 
@@ -845,6 +978,17 @@ and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
+
+=head1 AUTHOR
+
+Rob Schmidt <rjeschmi@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

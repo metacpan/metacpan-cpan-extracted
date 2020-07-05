@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.12');
+our $VERSION = version->new('0.1.13');
 our $NAME    = 'edit';
 our $OPTIONS = [
     'test|T!',
@@ -31,7 +31,8 @@ sub run {
 
     my $params = $self->params( $cmd );
     $params->{edit} = $self->options->files;
-    my @cmd    = $self->command( $params );
+    $params->{title} = $cmd;
+    my @cmd = $self->command( $params );
 
     if ( $params->{env} && ref $params->{env} eq 'HASH' ) {
         for my $env ( keys %{ $params->{env} } ) {
@@ -90,7 +91,7 @@ App::VTide::Command::Edit - Run an edit command (like Run but without a terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Edit version 0.1.12
+This documentation refers to App::VTide::Command::Edit version 0.1.13
 
 =head1 SYNOPSIS
 

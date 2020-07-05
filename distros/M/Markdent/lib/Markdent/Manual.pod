@@ -1,4 +1,4 @@
-package Mardent::Manual;
+package Markdent::Manual;
 
 =pod
 

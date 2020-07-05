@@ -7,17 +7,17 @@ package Vote::Count::RankCount;
 use feature qw /postderef signatures/;
 no warnings 'experimental';
 use List::Util qw( min max sum);
-use TextTableTiny qw/generate_markdown_table/;
+use Vote::Count::TextTableTiny qw/generate_markdown_table/;
 use Sort::Hash;
 # use Data::Printer;
 
-our $VERSION='1.01';
+our $VERSION='1.03';
 
 =head1 NAME
 
 Vote::Count::RankCount
 
-=head1 VERSION 1.01
+=head1 VERSION 1.03
 
 =cut
 

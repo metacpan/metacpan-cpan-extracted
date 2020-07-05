@@ -34,6 +34,7 @@ t/08-test8.t
 t/09-test9.t
 t/10-test10.t
 t/11-test11.t
+t/11-use-argv-map.t
 t/12-test12.t
 t/13-test13.t
 t/14-test14.t

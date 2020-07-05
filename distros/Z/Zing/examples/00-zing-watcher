@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Data::Dumper;
+use Zing::Watcher;
+
+=pod explain
+
+- zing-watcher is a process, see ./examples/00-zing-process ...
+- but more specifically is a supervisor process
+- it's a class which is intended to be subclassed
+- a Watcher process launches (fork()) and monitors other processes
+- because a Watcher is also a Process, it runs its own event-loop ...
+- and invokes the perform() and receive() handlers respectively ...
+- meaning that Watcher processes can multitask too
+- the process is usually enacted by calling execute()
+- execute() starts the process event-loop
+
+=cut
+
+(my $p = Zing::Watcher->new)->name;
+
+warn Dumper $p;

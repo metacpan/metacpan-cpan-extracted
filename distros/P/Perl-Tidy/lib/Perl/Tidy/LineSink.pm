@@ -8,39 +8,36 @@
 package Perl::Tidy::LineSink;
 use strict;
 use warnings;
-our $VERSION = '20200110';
+our $VERSION = '20200619';
 
 sub new {
 
-    my ( $class, $output_file, $tee_file, $line_separator, $rOpts,
-        $rpending_logfile_message, $binmode )
-      = @_;
-    my $fh     = undef;
-    my $fh_tee = undef;
+    my ( $class, @args ) = @_;
+
+    my %defaults = (
+        output_file              => undef,
+        line_separator           => undef,
+        rOpts                    => undef,
+        rpending_logfile_message => undef,
+        is_encoded_data          => undef,
+    );
+    my %args = ( %defaults, @args );
+
+    my $output_file              = $args{output_file};
+    my $line_separator           = $args{line_separator};
+    my $rOpts                    = $args{rOpts};
+    my $rpending_logfile_message = $args{rpending_logfile_message};
+    my $is_encoded_data          = $args{is_encoded_data};
+
+    my $fh = undef;
 
     my $output_file_open = 0;
 
     if ( $rOpts->{'format'} eq 'tidy' ) {
-        ( $fh, $output_file ) = Perl::Tidy::streamhandle( $output_file, 'w' );
+        ( $fh, $output_file ) =
+          Perl::Tidy::streamhandle( $output_file, 'w', $is_encoded_data );
         unless ($fh) { Perl::Tidy::Die("Cannot write to output stream\n"); }
         $output_file_open = 1;
-        if ($binmode) {
-            if (   $rOpts->{'character-encoding'}
-                && $rOpts->{'character-encoding'} eq 'utf8' )
-            {
-                if ( ref($fh) eq 'IO::File' ) {
-                    $fh->binmode(":raw:encoding(UTF-8)");
-                }
-                elsif ( $output_file eq '-' ) {
-                    binmode STDOUT, ":raw:encoding(UTF-8)";
-                }
-            }
-
-            # Patch for RT 122030
-            elsif ( ref($fh) eq 'IO::File' ) { $fh->binmode(); }
-
-            elsif ( $output_file eq '-' ) { binmode STDOUT }
-        }
     }
 
     # in order to check output syntax when standard output is used,
@@ -61,14 +58,10 @@ EOM
 
     return bless {
         _fh               => $fh,
-        _fh_tee           => $fh_tee,
         _output_file      => $output_file,
         _output_file_open => $output_file_open,
-        _tee_flag         => 0,
-        _tee_file         => $tee_file,
-        _tee_file_opened  => 0,
         _line_separator   => $line_separator,
-        _binmode          => $binmode,
+        _is_encoded_data  => $is_encoded_data,
     }, $class;
 }
 
@@ -83,35 +76,6 @@ sub write_line {
 
     $fh->print($line) if ( $self->{_output_file_open} );
 
-    if ( $self->{_tee_flag} ) {
-        unless ( $self->{_tee_file_opened} ) { $self->really_open_tee_file() }
-        my $fh_tee = $self->{_fh_tee};
-        print $fh_tee $line;
-    }
-    return;
-}
-
-sub tee_on {
-    my $self = shift;
-    $self->{_tee_flag} = 1;
-    return;
-}
-
-sub tee_off {
-    my $self = shift;
-    $self->{_tee_flag} = 0;
-    return;
-}
-
-sub really_open_tee_file {
-    my $self     = shift;
-    my $tee_file = $self->{_tee_file};
-    my $fh_tee;
-    $fh_tee = IO::File->new(">$tee_file")
-      or Perl::Tidy::Die("couldn't open TEE file $tee_file: $!\n");
-    binmode $fh_tee if $self->{_binmode};
-    $self->{_tee_file_opened} = 1;
-    $self->{_fh_tee}          = $fh_tee;
     return;
 }
 
@@ -123,23 +87,7 @@ sub close_output_file {
     if ( $output_file ne '-' && !ref $output_file ) {
         eval { $self->{_fh}->close() } if $self->{_output_file_open};
     }
-    $self->close_tee_file();
-    return;
-}
-
-sub close_tee_file {
-    my $self = shift;
-
-    # Only close physical files, not STDOUT and other objects
-    if ( $self->{_tee_file_opened} ) {
-        my $tee_file = $self->{_tee_file};
-        if ( $tee_file ne '-' && !ref $tee_file ) {
-            eval { $self->{_fh_tee}->close() };
-            $self->{_tee_file_opened} = 0;
-        }
-    }
     return;
 }
 
 1;
-

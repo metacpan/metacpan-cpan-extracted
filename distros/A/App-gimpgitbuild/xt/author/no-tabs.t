@@ -10,7 +10,9 @@ my @files = (
     'bin/gimpgitbuild',
     'lib/App/gimpgitbuild.pm',
     'lib/App/gimpgitbuild/API/GitBuild.pm',
+    'lib/App/gimpgitbuild/API/Worker.pm',
     'lib/App/gimpgitbuild/Command/build.pm',
+    'lib/App/gimpgitbuild/Command/cleanbuild.pm',
     'lib/App/gimpgitbuild/Command/env.pm',
     'lib/App/gimpgitbuild/Command/runenv.pm',
     't/00-compile.t'

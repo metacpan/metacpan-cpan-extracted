@@ -1,3 +1,7 @@
+0.72    Thu 25 Jun 08:21:16 BST 2020
+
+* Avoid using indirect calls
+
 0.70    Sun Nov 10 14:28:41 GMT 2019
 
 * Protect ourselves from Module::Metadata parsing problems

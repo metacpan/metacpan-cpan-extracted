@@ -1,5 +1,5 @@
 package TOML::Tiny::Writer;
-$TOML::Tiny::Writer::VERSION = '0.07';
+$TOML::Tiny::Writer::VERSION = '0.08';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -16,7 +16,8 @@ my @KEYS;
 sub to_toml {
   my $data = shift;
   my %param = @_;
-  my @buff;
+  my @buff_assign;
+  my @buff_tables;
 
   for (ref $data) {
     when ('HASH') {
@@ -24,7 +25,7 @@ sub to_toml {
       for my $k (grep{ ref($data->{$_}) !~ /HASH|ARRAY/ } sort keys %$data) {
         my $key = to_toml_key($k);
         my $val = to_toml($data->{$k}, %param);
-        push @buff, "$key=$val";
+        push @buff_assign, "$key=$val";
       }
 
       # For values which are arrays, generate inline arrays for non-table
@@ -33,7 +34,7 @@ sub to_toml {
         # Empty table
         if (!@{$data->{$k}}) {
           my $key = to_toml_key($k);
-          push @buff, "$key=[]";
+          push @buff_assign, "$key=[]";
           next ARRAY;
         }
 
@@ -53,7 +54,7 @@ sub to_toml {
         if (@inline) {
           my $key = to_toml_key($k);
           my $val = to_toml(\@inline, %param);
-          push @buff, "$key=$val";
+          push @buff_assign, "$key=$val";
         }
 
         # Table values become an array-of-tables
@@ -61,8 +62,8 @@ sub to_toml {
           push @KEYS, $k;
 
           for (@table_array) {
-            push @buff, '', '[[' . join('.', map{ to_toml_key($_) } @KEYS) . ']]';
-            push @buff, to_toml($_);
+            push @buff_tables, '', '[[' . join('.', map{ to_toml_key($_) } @KEYS) . ']]';
+            push @buff_tables, to_toml($_);
           }
 
           pop @KEYS;
@@ -74,12 +75,12 @@ sub to_toml {
         if (!keys(%{$data->{$k}})) {
           # Empty table
           my $key = to_toml_key($k);
-          push @buff, "$key={}";
+          push @buff_assign, "$key={}";
         } else {
           # Generate [table]
           push @KEYS, $k;
-          push @buff, '', '[' . join('.', map{ to_toml_key($_) } @KEYS) . ']';
-          push @buff, to_toml($data->{$k}, %param);
+          push @buff_tables, '', '[' . join('.', map{ to_toml_key($_) } @KEYS) . ']';
+          push @buff_tables, to_toml($data->{$k}, %param);
           pop @KEYS;
         }
       }
@@ -91,7 +92,7 @@ sub to_toml {
         die "toml: found heterogenous array, but strict_arrays is set ($err)\n" unless $ok;
       }
 
-      push @buff, '[' . join(', ', map{ to_toml($_, %param) } @$data) . ']';
+      push @buff_tables, '[' . join(', ', map{ to_toml($_, %param) } @$data) . ']';
     }
 
     when ('SCALAR') {
@@ -100,7 +101,7 @@ sub to_toml {
       } elsif ($$_ eq '0') {
         return 'false';
       } else {
-        push @buff, to_toml($$_, %param);
+        push @buff_assign, to_toml($$_, %param);
       }
     }
 
@@ -152,7 +153,7 @@ sub to_toml {
     }
   }
 
-  join "\n", @buff;
+  join "\n", @buff_assign, @buff_tables;
 }
 
 sub to_toml_key {
@@ -202,7 +203,7 @@ TOML::Tiny::Writer
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 AUTHOR
 

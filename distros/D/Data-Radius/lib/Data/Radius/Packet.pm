@@ -476,7 +476,7 @@ Data::Radius::Packet - module to encode/decode RADIUS messages
         type => ACCESS_REQUEST,
         av_list => [
             { Name => 'User-Name', Value => 'JonSnow'},
-            { Name => 'Password', Value => 'Castle Black' },
+            { Name => 'User-Password', Value => 'Castle Black' },
             { Name => 'Message-Authenticator', Value => '' },
         ],
     );

@@ -1,5 +1,8 @@
 Build.PL
 Changes
+hax/lexer-additions.c.inc
+hax/perl-additions.c.inc
+hax/wrap_keyword_plugin.c.inc
 lib/Syntax/Keyword/Try.pm
 lib/Syntax/Keyword/Try.xs
 LICENSE

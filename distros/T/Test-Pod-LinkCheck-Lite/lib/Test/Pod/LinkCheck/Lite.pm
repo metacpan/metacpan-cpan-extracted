@@ -22,7 +22,7 @@ use Scalar::Util ();		# Core since 5.7.3
 use Storable ();		# Core since 5.7.3
 use Test::Builder ();		# Core since 5.6.2
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 our @ISA = qw{ Exporter };
 
@@ -1171,8 +1171,7 @@ for this information in the following places:
 
 =item File F<Metadata> in the directory used by the C<CPAN> client;
 
-=item Website L<https://cpanmetadb.plackperl.org/>, a.k.a. the CPAN Meta
-DB.
+=item Website L<https://cpanmetadb.plackperl.org/>, a.k.a. the CPAN Meta DB.
 
 =back
 
@@ -1537,8 +1536,8 @@ configurations, gave me an opportunity to make this module much more
 robust than it would otherwise have been. It is probably unfair to
 single out individual testers, but as the luck of the testing cycle
 would have it, results from Andreas J. König (C<ANDK>), Slaven Rezić
-(C<SREZIC>), and Chris Williams (C<BINGOS>) were particularly useful to
-me.
+(C<SREZIC>), Chris Williams (C<BINGOS>), and Alceu Rodrigues de Freitas
+Junior were particularly useful to me.
 
 =head1 SUPPORT
 
@@ -1551,7 +1550,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019 by Thomas R. Wyant, III
+Copyright (C) 2019-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

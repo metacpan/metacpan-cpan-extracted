@@ -96,7 +96,7 @@ sub cget :method {
   $self->{$key} // $default;
 }
 
-sub declare___field_with_weakref {
+sub declare___field_with_weakref :MetaOnly {
   (my $myPack, my Opts $opts, my FieldSpec $fs, my ($k, $v)) = m4i_args(@_);
 
   $fs->{$k} = $v;

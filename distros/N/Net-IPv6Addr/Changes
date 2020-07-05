@@ -1,5 +1,11 @@
 Revision history for Perl module Net::IPv6Addr
 
+1.01 2020-06-20
+        * Documentation revisions
+
+1.0  2020-06-18
+	* Stricter requirements for base 85 addresses
+
 0.96 2018-10-06
 	* Requirement on Math::BigInt changed to add version
 

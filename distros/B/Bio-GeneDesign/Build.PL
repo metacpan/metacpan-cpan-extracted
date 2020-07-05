@@ -17,7 +17,7 @@ my $GDB = Module::Build->new
   module_name         => 'Bio::GeneDesign',
   license             => 'bsd',
   dist_author         => q{Sarah Richardson <SMRichardson@lbl.gov>},
-  dist_version        => '5.54',
+  dist_version        => '5.55',
   dist_abstract       => 'Functions for the design of synthetic genes',
   add_to_cleanup      => [ 'Bio::GeneDesign-*' ],
   create_makefile_pl  => 'traditional',
@@ -32,7 +32,7 @@ my $GDB = Module::Build->new
     'List::Util'          => 1.22,
     'Math::Combinatorics' => 0.09,
     'Text::Wrap'          => 2009.0305,
-    'Bio::Root::Root'     => 1.006924,
+  	'Bio::Root::Version'  => 1.0069,
   },
   configure_requires  =>
   {

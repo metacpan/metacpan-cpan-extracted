@@ -27,13 +27,16 @@ no_index:
 provides:
   Mojolicious::Command::Author::generate::cpanfile:
     file: lib/Mojolicious/Command/Author/generate/cpanfile.pm
-    version: '0.10'
+    version: '0.20'
 requires:
   Mojolicious: '8.0'
+  Perl::Tokenizer: '0.10'
+  perl: '5.018'
+  version: '0.77'
 resources:
   bugtracker: https://gitlab.com/augensalat/perl-mojolicious-command-author-generate-cpanfile/issues
   homepage: https://gitlab.com/augensalat/perl-mojolicious-command-author-generate-cpanfile
   repository: git://gitlab.com/augensalat/perl-mojolicious-command-author-generate-cpanfile.git
-version: '0.10'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

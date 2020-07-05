@@ -1,3 +1,6 @@
+0.17 2020-06-30
+- update GraphQL to use react 16, needed by GraphiQL 0.18.0+ - thanks @JForst
+
 0.16 2020-05-18
 - more correct Apollo subscriptions protocol
 - implement websocket keepalive

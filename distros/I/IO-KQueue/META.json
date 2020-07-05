@@ -1,0 +1,52 @@
+{
+   "abstract" : "perl interface to the BSD kqueue system call",
+   "author" : [
+      "Matt Sergeant <matt@sergeant.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IO-KQueue",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/arc/p5-io-kqueue/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/arc/p5-io-kqueue.git",
+         "web" : "https://github.com/arc/p5-io-kqueue"
+      }
+   },
+   "version" : "0.37",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

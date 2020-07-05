@@ -1,6 +1,6 @@
 MODULE = Exception::Backtrace       PACKAGE = Exception::Backtrace::BacktraceInfo
 PROTOTYPES: DISABLE
 
-std::vector<StackframePtr> BacktraceInfo::get_frames() { RETVAL = THIS->get_frames(); }
+std::vector<StackframeSP> BacktraceInfo::get_frames() { RETVAL = THIS->get_frames(); }
 
 string BacktraceInfo::to_string()

@@ -1,9 +1,9 @@
 package App::BorderStyleUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'App-BorderStyleUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,9 +31,9 @@ sub list_border_style_modules {
     my %resmeta;
 
     my $mods = Module::List::Tiny::list_modules(
-        "", {list_modules => 1, recurse => 1});
+        "BorderStyle::", {list_modules => 1, recurse => 1});
     for my $mod (sort keys %$mods) {
-        next unless $mod =~ /(\A|::)BorderStyle::/;
+        $mod =~ s/\ABorderStyle:://;
         push @res, $mod;
     }
 
@@ -55,7 +55,7 @@ App::BorderStyleUtils - CLI utilities related to border styles
 
 =head1 VERSION
 
-This document describes version 0.001 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2020-06-11.
+This document describes version 0.002 of App::BorderStyleUtils (from Perl distribution App-BorderStyleUtils), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

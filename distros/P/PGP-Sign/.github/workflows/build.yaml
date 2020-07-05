@@ -1,0 +1,31 @@
+name: build
+
+on:
+  push:
+    branches:
+      - "master"
+    tags:
+      - "release/*"
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  perl:
+    env:
+      AUTHOR_TESTING: 1
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install prerequisites
+        run: sudo apt-get install cpanminus gnupg gnupg1
+      - name: perl -V
+        run: perl -V
+      - name: Install dependencies
+        run: sudo cpanm --installdeps .
+      - name: Build.PL
+        run: perl Build.PL
+      - name: make test
+        run: ./Build test

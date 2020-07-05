@@ -31,7 +31,7 @@ requires:
   MooX::Enumeration: '0'
   MooX::HandlesVia: '0'
   MooX::ProtectedAttributes: '0'
-  OpenTracing::Interface: v0.202.2
+  OpenTracing::Interface: v0.204.0
   OpenTracing::Types: '0'
   Role::Declare: '0'
   Sub::Trigger::Lock: '0'
@@ -39,5 +39,5 @@ requires:
   Try::Tiny: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '0'
-version: v0.81.1
+version: v0.82.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

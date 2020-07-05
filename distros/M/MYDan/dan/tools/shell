@@ -29,11 +29,13 @@ $| ++;
  $0 --host host --listen 9999 [--addr 10.10.10.1]\
       [--user user(default `id -un`)] [--sudo sudoer]
 
+    [--cmd top] [--ictrl 0|1]
+
 =cut
 
 $MYDan::Util::OptConf::THIS = 'agent';
 my $option = MYDan::Util::OptConf->load();
-my %o = $option->get( qw( host=s listen=i addr=s user=s sudo=s ) )->dump();
+my %o = $option->get( qw( host=s listen=i addr=s user=s sudo=s cmd=s ictrl=i ) )->dump();
 $option->assert( 'host' );
 
 my $cv = AE::cv;  
@@ -55,6 +57,7 @@ my $socket = IO::Socket::INET->new (
     Listen    => 1
 ) or die "listen $listen: $!\n";
 
+$o{ictrl} = $o{cmd} ? 1 : 0  unless defined $o{ictrl};
 $o{user} = `id -un` and chop $o{user}  unless $o{user};
 
 my $uuid = Data::UUID->new->create_str();
@@ -64,7 +67,7 @@ my ($cols, $rows) = Term::Size::chars *STDOUT{IO};
 my %query = (
     env => +{ TERM => 'linux' },
     code => 'shell',
-    argv => [ $o{addr}, $listen, $uuid, $rows, $cols ],
+    argv => [ $o{addr}, $listen, $uuid, $rows, $cols, undef, $o{cmd}, $o{ictrl} ],
     map{ $_ => $o{$_} }qw( user sudo )
 );
 
@@ -96,7 +99,7 @@ while ( $poll->handles && $soc ) {
         if ( $handle eq $soc )
         {
             if ( $byte = sysread( $soc, $data, 1024 ) ) { syswrite( STDOUT, $data, $byte ); }
-            else { $soc->shutdown(2); last; }
+            else { $soc->shutdown(2); goto EXIT; }
         }
 
         syswrite( $soc, $data, $byte ) 
@@ -106,8 +109,10 @@ while ( $poll->handles && $soc ) {
     if( $poll->handles( POLLHUP | POLLERR) )
     {
         $soc->shutdown( 2 );
-        last;
+        goto EXIT;
     }
 }
 
+EXIT:
 ReadMode(0);
+system 'echo -e "\033[?25h"';

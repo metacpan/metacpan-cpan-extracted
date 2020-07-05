@@ -1,5 +1,15 @@
 Revision history for Hash-Util-Merge:
 
+v0.1.2    2020-06-29 23:28:49+01:00 Europe/London
+  [Enhancements]
+  - Removed use of syntactic prototype.
+
+  [Tests]
+  - Removed clean namespace test.
+
+  [Other]
+  - Stop removing core modules from prereqs.
+
 v0.1.1    2020-02-14 08:24:57+00:00 Europe/London
   [Documentation]
   - Fix typo in SYNOPSIS, thanks @manwar

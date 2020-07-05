@@ -7,7 +7,7 @@ use lib './t/lib';
 
 use Test::More tests => 15;
 
-use HTML::Widgets::NavMenu;
+use HTML::Widgets::NavMenu ();
 
 use HTML::Widgets::NavMenu::Test::Data;
 

@@ -20,7 +20,7 @@ my $verify_client_sub = sub {
   return ( 0,'unauthorized_client' ) if $args{response_type} ne 'code';
 
   # all good
-  return ( 1,undef );
+  return ( 1,undef,$args{scopes} );
 };
 
 my $store_auth_code_sub = sub {
@@ -59,7 +59,7 @@ my $verify_auth_code_sub = sub {
 
   # and here we would check the database, check the auth code hasn't
   # expired, and so on
-  return ( $args{client_id},$error,$args{scopes} );
+  return ( $args{client_id},$error,$scope );
 };
 
 my $VALID_ACCESS_TOKEN;

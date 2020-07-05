@@ -103,11 +103,58 @@
 #  define PERL_EXPORT_C extern
 #endif
 
-#  include "handy.h"
-
-#ifndef isWORDCHAR
-#define isWORDCHAR(c) isALNUM(c)
+#ifdef TRUE
+#undef TRUE
 #endif
+#ifdef FALSE
+#undef FALSE
+#endif
+#define TRUE (1)
+#define FALSE (0)
+
+#if defined(I_STDBOOL) && !defined(PERL_BOOL_AS_CHAR)
+#  include <stdbool.h>
+#  ifndef HAS_BOOL
+#    define HAS_BOOL 1
+#  endif
+#endif
+
+/* bool is built-in for g++-2.6.3 and later, which might be used
+   for extensions.  <_G_config.h> defines _G_HAVE_BOOL, but we can't
+   be sure _G_config.h will be included before this file.  _G_config.h
+   also defines _G_HAVE_BOOL for both gcc and g++, but only g++
+   actually has bool.  Hence, _G_HAVE_BOOL is pretty useless for us.
+   g++ can be identified by __GNUG__.
+   Andy Dougherty       February 2000
+*/
+#ifdef __GNUG__         /* GNU g++ has bool built-in */
+# ifndef PERL_BOOL_AS_CHAR
+#  ifndef HAS_BOOL
+#    define HAS_BOOL 1
+#  endif
+# endif
+#endif
+
+#ifndef HAS_BOOL
+# ifdef bool
+#  undef bool
+# endif
+# define bool char
+# define HAS_BOOL 1
+#endif
+
+#define isALPHA isalpha
+#define isLOWER islower
+#define isALNUM isalnum
+#define isALPHANUMERIC isalnum
+#define isWORD isalnum
+#define isWORDCHAR isalnum
+#define isDIGIT isdigit
+#define isSPACE isspace
+#define toUPPER toupper
+#define strEQ(left, right) (strcmp(left, right) == 0)
+#define strnEQ(left, right, length) (strncmp(left, right, length) == 0)
+#define strNE(left, right) (strcmp(left, right) != 0)
 
 #define Nullop 0
 

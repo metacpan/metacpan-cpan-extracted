@@ -1,7 +1,7 @@
 package PICA::Parser::XML;
 use v5.14.1;
 
-our $VERSION = '1.08';
+our $VERSION = '1.11';
 
 use Carp qw(croak);
 use XML::LibXML::Reader;

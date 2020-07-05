@@ -1,5 +1,8 @@
 NEWS for File::Util
 
+Fri Jun 19 20:27:48 CDT 2020
+   Releasing to CPAN with bugfix, details in Changes file.
+
 Tue Jul 12 18:37:17 CDT 2016
    Releasing this bug fix to CPAN immediately.  Having changed only one line
    of code, and knowing the criticality of the bug, I'm releasing this as

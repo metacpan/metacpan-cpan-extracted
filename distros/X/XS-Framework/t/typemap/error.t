@@ -121,11 +121,11 @@ subtest 'ErrorCode eq' => sub {
 };
 
 subtest 'ErrorCode contains' => sub {
-    ok !(undef() & XS::STL::errc::operation_canceled()), 'undef &';
+    ok !(undef() == XS::STL::errc::operation_canceled()), 'undef &';
     my $err1 = MyTest::Error::operation_chain_canceled();
-    ok $err1 & XS::STL::errc::operation_canceled(), "ec & cancel";
-    ok $err1 & XS::STL::errc::connection_aborted(), "ec & abort";
-    ok !($err1 & XS::STL::errc::broken_pipe()), "ec !& epipe";
+    ok $err1 == XS::STL::errc::operation_canceled(), "ec & cancel";
+    ok $err1 == XS::STL::errc::connection_aborted(), "ec & abort";
+    ok !($err1 == XS::STL::errc::broken_pipe()), "ec !& epipe";
     ok $err1->contains(XS::STL::errc::operation_canceled()), "ec->contains";
 };
 

@@ -1,0 +1,91 @@
+{
+   "abstract" : "A parser toolkit for Standard Perl",
+   "author" : [
+      "Sawyer X",
+      "Vickenty Fesunov"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Guacamole",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Data::Visitor::Tiny" : "0",
+            "Exporter" : "5.57",
+            "List::Util" : "0",
+            "Marpa::R2" : "0",
+            "Path::Tiny" : "0",
+            "Ref::Util" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::Builder" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Guacamole" : {
+         "file" : "lib/Guacamole.pm",
+         "version" : "0.005"
+      },
+      "Guacamole::Deparse" : {
+         "file" : "lib/Guacamole/Deparse.pm",
+         "version" : "0.005"
+      },
+      "Guacamole::Dumper" : {
+         "file" : "lib/Guacamole/Dumper.pm",
+         "version" : "0.005"
+      },
+      "Guacamole::Test" : {
+         "file" : "lib/Guacamole/Test.pm",
+         "version" : "0.005"
+      },
+      "standard" : {
+         "file" : "lib/standard.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xsawyerx/guacamole.git",
+         "web" : "https://github.com/xsawyerx/guacamole"
+      }
+   },
+   "version" : "0.005",
+   "x_authority" : "cpan:XSAWYERX",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "MIT"
+}
+

@@ -1,5 +1,5 @@
 package Net::Whois::Raw::Common;
-$Net::Whois::Raw::Common::VERSION = '2.99028';
+$Net::Whois::Raw::Common::VERSION = '2.99029';
 # ABSTRACT: Helper for Net::Whois::Raw.
 
 use Encode;
@@ -165,7 +165,7 @@ sub _strip_trailer_lines {
 
 # get whois-server for domain / tld
 sub get_server {
-    my ($dom, $is_ns, $tld) = @_;
+    my ( $dom, $is_ns, $tld ) = @_;
 
     $tld ||= get_dom_tld( $dom );
     $tld = uc $tld;
@@ -174,18 +174,12 @@ sub get_server {
         return 'www_whois';
     }
 
-    my $srv = '';
     if ( $is_ns ) {
-        $srv = $Net::Whois::Raw::Data::servers{ $tld . '.NS' } ||
-               $Net::Whois::Raw::Data::servers{ 'NS' };
-    }
-    else {
-            #my $cname = "$tld.whois-servers.net";
-            my $cname = "whois.nic.$tld";
-        $srv = $Net::Whois::Raw::Data::servers{ $tld } || $cname;
+        return $Net::Whois::Raw::Data::servers{ $tld . '.NS' }
+            || $Net::Whois::Raw::Data::servers{ 'NS' };
     }
 
-    return $srv;
+    return lc( $Net::Whois::Raw::Data::servers{ $tld } || "whois.nic.$tld" );
 }
 
 sub get_real_whois_query{
@@ -240,8 +234,6 @@ sub get_http_query_url {
     my ($name, $tld) = split_domain($domain);
     my @http_query_data;
     # my ($url, %form);
-
-    my $server = get_server( undef, undef, $tld );
 
     if ($tld eq 'ru' || $tld eq 'su') {
         my $data = {
@@ -348,8 +340,6 @@ sub have_reserve_url {
 # %param: resp*, tld*
 sub parse_www_content {
     my ($resp, $tld, $url, $CHECK_EXCEED) = @_;
-
-    my $server = get_server( undef, undef, $tld );
 
     chomp $resp;
     $resp =~ s/\r//g;
@@ -616,7 +606,7 @@ Net::Whois::Raw::Common - Helper for Net::Whois::Raw.
 
 =head1 VERSION
 
-version 2.99028
+version 2.99029
 
 =head1 AUTHOR
 

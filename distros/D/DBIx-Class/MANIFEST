@@ -136,14 +136,13 @@ lib/DBIx/Class/SQLAHacks/Oracle.pm
 lib/DBIx/Class/SQLAHacks/OracleJoins.pm
 lib/DBIx/Class/SQLAHacks/SQLite.pm
 lib/DBIx/Class/SQLMaker.pm
-lib/DBIx/Class/SQLMaker.pod
 lib/DBIx/Class/SQLMaker/ACCESS.pm
+lib/DBIx/Class/SQLMaker/ClassicExtensions.pm
 lib/DBIx/Class/SQLMaker/LimitDialects.pm
 lib/DBIx/Class/SQLMaker/MSSQL.pm
 lib/DBIx/Class/SQLMaker/MySQL.pm
 lib/DBIx/Class/SQLMaker/Oracle.pm
 lib/DBIx/Class/SQLMaker/OracleJoins.pm
-lib/DBIx/Class/SQLMaker/OracleJoins.pod
 lib/DBIx/Class/SQLMaker/SQLite.pm
 lib/DBIx/Class/StartupCheck.pm
 lib/DBIx/Class/Storage.pm
@@ -198,6 +197,7 @@ lib/DBIx/Class/Storage/DBI/Sybase/Microsoft_SQL_Server/NoBindVars.pm
 lib/DBIx/Class/Storage/DBI/Sybase/MSSQL.pm
 lib/DBIx/Class/Storage/DBI/UniqueIdentifier.pm
 lib/DBIx/Class/Storage/DBIHacks.pm
+lib/DBIx/Class/Storage/Debug/PrettyTrace.pm
 lib/DBIx/Class/Storage/Statistics.pm
 lib/DBIx/Class/Storage/TxnScopeGuard.pm
 lib/DBIx/Class/UTF8Columns.pm
@@ -221,6 +221,8 @@ maint/Makefile.PL.inc/54_autogen_legalese_and_README.pl
 maint/Makefile.PL.inc/56_autogen_schema_files.pl
 maint/Makefile.PL.inc/61_inject_dbicadmin_pod.pl
 maint/Makefile.PL.inc/91_inc_sanity_check.pl
+maint/poisonsmoke.bash
+maint/travis_buildlog_downloader
 Makefile.PL
 MANIFEST			This list of files
 META.yml
@@ -269,7 +271,6 @@ t/63register_column.t
 t/63register_source.t
 t/64db.t
 t/65multipk.t
-t/67pager.t
 t/69update.t
 t/70auto.t
 t/71mysql.t
@@ -389,6 +390,11 @@ t/count/in_subquery.t
 t/count/joined.t
 t/count/prefetch.t
 t/count/search_related.t
+t/debug/bulk-insert.t
+t/debug/core.t
+t/debug/no-repeats.t
+t/debug/pretty.t
+t/debug/show-progress.t
 t/delete/cascade_missing.t
 t/delete/complex.t
 t/delete/m2m.t
@@ -507,6 +513,7 @@ t/lib/DBICTest/Schema/TypedObject.pm
 t/lib/DBICTest/Schema/VaryingMAX.pm
 t/lib/DBICTest/Schema/Year1999CDs.pm
 t/lib/DBICTest/Schema/Year2000CDs.pm
+t/lib/DBICTest/SQLMRebase.pm
 t/lib/DBICTest/SQLTracerObj.pm
 t/lib/DBICTest/SyntaxErrorComponent1.pm
 t/lib/DBICTest/SyntaxErrorComponent2.pm
@@ -562,6 +569,9 @@ t/multi_create/standard.t
 t/multi_create/torture.t
 t/ordered/cascade_delete.t
 t/ordered/unordered_movement.t
+t/pager/data_page_compat/constructor.t
+t/pager/data_page_compat/simple.t
+t/pager/dbic_core.t
 t/prefetch/attrs_untouched.t
 t/prefetch/correlated.t
 t/prefetch/count.t
@@ -660,14 +670,13 @@ t/sqlmaker/order_by_bindtransport.t
 t/sqlmaker/order_by_func.t
 t/sqlmaker/pg.t
 t/sqlmaker/quotes.t
+t/sqlmaker/rebase.t
 t/sqlmaker/sqlite.t
 t/storage/base.t
 t/storage/cursor.t
 t/storage/dbh_do.t
 t/storage/dbi_coderef.t
 t/storage/dbi_env.t
-t/storage/dbic_pretty.t
-t/storage/debug.t
 t/storage/deploy.t
 t/storage/deprecated_exception_source_bind_attrs.t
 t/storage/disable_sth_caching.t

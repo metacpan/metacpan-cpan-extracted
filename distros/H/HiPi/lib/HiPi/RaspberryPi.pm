@@ -2,7 +2,7 @@
 # Distribution : HiPi Modules for Raspberry Pi
 # File         : lib/HiPi/RaspberryPi.pm
 # Description  : Information about host Raspberry Pi
-# Copyright    : Copyright (c) 2013-2019 Mark Dootson
+# Copyright    : Copyright (c) 2013-2020 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.81';
+our $VERSION ='0.83';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
@@ -372,7 +372,7 @@ sub _configure {
     $rev =~ s/^\s+//;
     $rev =~ s/\s+$//;
         
-    $israspberry = $_cpuinfostash{Hardware} && $_cpuinfostash{Hardware} =~ /^BCM2708|BCM2709|BCM2710|BCM2835$/;
+    $israspberry = $_cpuinfostash{Hardware} && $_cpuinfostash{Hardware} =~ /^BCM(27|28)/;
         
     if ( $rev =~ /(beta|unknown|unknownex)$/) {
         my $infokey = exists($_revstash{$rev}) ? $rev : $defaultkey;

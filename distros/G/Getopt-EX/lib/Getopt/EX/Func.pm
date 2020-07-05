@@ -1,7 +1,6 @@
 package Getopt::EX::Func;
 
 use v5.14;
-use strict;
 use warnings;
 use Carp;
 

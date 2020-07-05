@@ -8,18 +8,23 @@
 package Perl::Tidy::IndentationItem;
 use strict;
 use warnings;
-our $VERSION = '20200110';
+our $VERSION = '20200619';
 
 sub new {
 
     # Create an 'indentation_item' which describes one level of leading
     # whitespace when the '-lp' indentation is used.
-    my (
-        $class,               $spaces,           $level,
-        $ci_level,            $available_spaces, $index,
-        $gnu_sequence_number, $align_paren,      $stack_depth,
-        $starting_index,
-    ) = @_;
+    my ( $class, %input_hash ) = @_;
+
+    my $spaces              = $input_hash{spaces};
+    my $level               = $input_hash{level};
+    my $ci_level            = $input_hash{ci_level};
+    my $available_spaces    = $input_hash{available_spaces};
+    my $index               = $input_hash{index};
+    my $gnu_sequence_number = $input_hash{gnu_sequence_number};
+    my $align_paren         = $input_hash{align_paren};
+    my $stack_depth         = $input_hash{stack_depth};
+    my $starting_index      = $input_hash{starting_index};
 
     my $closed            = -1;
     my $arrow_count       = 0;

@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous::Time;
-$Lab::Moose::Sweep::Continuous::Time::VERSION = '3.701';
+$Lab::Moose::Sweep::Continuous::Time::VERSION = '3.703';
 #ABSTRACT: Time sweep
 
 
@@ -80,6 +80,8 @@ sub BUILD {
 sub go_to_sweep_start {
     my $self = shift;
     $self->reset_index();
+    $self->reset_points_index();
+    $self->inc_points_index();
 }
 
 sub start_sweep {
@@ -88,19 +90,21 @@ sub start_sweep {
 }
 
 sub sweep_finished {
-    my $self     = shift;
-    my $duration = $self->get_duration(0);
-    if ( not defined $duration ) {
+    my $self = shift;
+
+    my $duration = $self->get_duration( $self->points_index - 1 );
+
+    if ( time() - $self->start_time < $duration ) {
+
+        # still in duration
         return 0;
     }
 
-    my $start_time = $self->start_time;
-    if ( time() - $start_time < $duration ) {
-        return 0;
-    }
-    if ( $self->num_durations > 1 ) {
-        $self->shift_intervals();
-        $self->shift_durations();
+    # duration is finished.
+    $self->inc_points_index();
+
+    # Are there more durations?
+    if ( $self->points_index < $self->num_durations() ) {
         $self->reset_index();
         $self->start_sweep();
         return 0;
@@ -130,7 +134,7 @@ Lab::Moose::Sweep::Continuous::Time - Time sweep
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 
@@ -155,6 +159,7 @@ version 3.701
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
+            2020       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

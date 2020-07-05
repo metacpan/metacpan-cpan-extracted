@@ -1,6 +1,6 @@
 package Date::Julian::Simple;
 
-$Date::Julian::Simple::VERSION   = '0.11';
+$Date::Julian::Simple::VERSION   = '0.12';
 $Date::Julian::Simple::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Date::Julian::Simple - Represents Julian date.
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
@@ -65,6 +65,8 @@ sub BUILD {
             my $day    = $self->day;
             my @caller = caller(0);
             @caller    = caller(2) if $caller[3] eq '(eval)';
+
+            return if ($self->month != 2);
 
             Date::Exception::InvalidDay->throw({
                 method      => __PACKAGE__."::validate_day",

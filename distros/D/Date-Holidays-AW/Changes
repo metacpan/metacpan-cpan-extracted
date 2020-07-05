@@ -1,5 +1,12 @@
 Revision history for Date-Holidays-AW
 
+0.003     2020-06-20 13:14:20Z
+
+    * Fix royal holidays as they have special rules and start/end year
+      logic
+    * Fix minor POD spelling error
+    * Remove unneeded test deps
+
 0.002     2020-06-14 05:50:45Z
 
     * Add correct translations for Papiamento

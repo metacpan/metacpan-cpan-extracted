@@ -1,3 +1,9 @@
+0.002   2020-06-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [cli list-border-style-modules] Now only show BorderStyle::*
+	  modules (no longer shows *::BorderStyle::* modules).
+
+
 0.001   2020-06-11  Released-By: PERLANCAR
 
         - First release.

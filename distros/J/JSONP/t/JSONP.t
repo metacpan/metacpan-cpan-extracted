@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-#use lib '/home/acanfora/Desktop/JSONP/lib';
+#use lib '/home/acanfora/JSONP/lib';
 use strict;
 use warnings;
 

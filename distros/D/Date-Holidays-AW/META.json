@@ -26,7 +26,6 @@
          },
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::PluginBundle::Author::WATERKIP" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Software::License::BSD" : "0",
@@ -62,10 +61,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Import::Into" : "1.002003",
-            "Sub::Override" : "0",
             "Test::More" : "0.96",
-            "Test::Most" : "0",
             "perl" : "5.010"
          }
       }
@@ -73,7 +69,7 @@
    "provides" : {
       "Date::Holidays::AW" : {
          "file" : "lib/Date/Holidays/AW.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -84,7 +80,7 @@
          "web" : "https://gitlab.com/waterkip/p5-date-holiday-aw"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_contributors" : [
       "Wesley Schwengle <wesley@opndev.io>"
    ],

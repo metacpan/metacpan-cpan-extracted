@@ -3,8 +3,8 @@ NAME
     suitable for use with Data::CSel
 
 VERSION
-    This document describes version 0.007 of Data::CSel::WrapStruct (from
-    Perl distribution Data-CSel-WrapStruct), released on 2020-04-09.
+    This document describes version 0.008 of Data::CSel::WrapStruct (from
+    Perl distribution Data-CSel-WrapStruct), released on 2020-04-15.
 
 SYNOPSIS
      use Data::CSel qw(csel);
@@ -180,6 +180,23 @@ FAQ
      ...
 
     will then print the expected "[0,'x','x']".
+
+  This module is slow!
+    If you intend to select a data structure with thousands of nodes or
+    more, you're probably better off using other approach, for example
+    Data::Walk::More. Data::Walk::More provides containers for the nodes
+    you're traversing. For example, the CSel expression
+    "Hash[has_keys("foo")] > Array > Scalar[value > 0]" can be written as:
+
+     walk sub {
+         my $ref = ref $_;
+         return if ref $_; # ... Scalar
+         return if $_ <= 0; # ... [value > 0]
+         return unless ref $Data::Walk::More::containers[-1] eq 'ARRAY'; # ... Array
+         return unless ref $Data::Walk::More::containers[-2] eq 'HASH'; # ... Hash
+         return unless exists $Data::Walk::More::containers[-2]{foo}; # ... [has_keys("foo")]
+         push @matches, $_;
+     }, $data;
 
 HOMEPAGE
     Please visit the project's homepage at

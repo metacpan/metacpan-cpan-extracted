@@ -4,13 +4,13 @@
       "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.022",
+   "generated_by" : "App::ModuleBuildTiny version 0.027",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojo-SAML",
    "prereqs" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Mojo::SAML" : {
          "file" : "lib/Mojo/SAML.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Mojo::SAML::Document" : {
          "file" : "lib/Mojo/SAML/Document.pm"
@@ -111,6 +111,7 @@
          "url" : "http://github.com/jberger/Mojo-SAML"
       }
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

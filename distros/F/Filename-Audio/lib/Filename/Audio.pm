@@ -1,7 +1,9 @@
 package Filename::Audio;
 
-our $DATE = '2017-08-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-01'; # DATE
+our $DIST = 'Filename-Audio'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +12,9 @@ use warnings;
 use Exporter qw(import);
 our @EXPORT_OK = qw(check_audio_filename);
 
-our $RE = qr(\.(?:mpega|aifc|aiff|flac|midi|mpga|opus|aif|amr|awb|axa|csd|gsm|kar|m3u|m4a|mid|mp2|mp3|oga|ogg|orc|pls|ram|sco|sd2|sid|snd|spx|wav|wax|wma|au|ra|rm)\z)i; # RE
+# sorted by length then asciibetical
+our $STR_RE = "mpega|aifc|aiff|flac|midi|mpga|opus|aif|amr|awb|axa|csd|gsm|kar|m3u|m4a|mid|mp2|mp3|oga|ogg|orc|pls|ram|sco|sd2|sid|snd|spx|wav|wax|wma|au|ra|rm"; # STR_RE
+our $RE = qr(\.(?:$STR_RE)\z)i;
 
 sub check_audio_filename {
     my %args = @_;
@@ -33,7 +37,7 @@ Filename::Audio - Check whether filename indicates being an audio file
 
 =head1 VERSION
 
-This document describes version 0.001 of Filename::Audio (from Perl distribution Filename-Audio), released on 2017-08-12.
+This document describes version 0.002 of Filename::Audio (from Perl distribution Filename-Audio), released on 2020-04-01.
 
 =head1 SYNOPSIS
 
@@ -81,7 +85,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

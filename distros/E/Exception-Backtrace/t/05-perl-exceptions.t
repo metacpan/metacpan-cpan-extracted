@@ -8,8 +8,12 @@ use lib 't';
 use MyTest;
 
 Exception::Backtrace::install();
+my $default_depth = MyTest::default_trace_depth();
 
 sub check_c_trace {
+    note("glibc/libunwind seems buggy on the system, skipping C trace"), return
+        unless $default_depth;
+
     my $bt = shift;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     like $bt, qr/(panda::Backtrace::Backtrace)|(from.*Backtrace\.)|(from.*libpanda)/;

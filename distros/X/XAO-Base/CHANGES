@@ -1,6 +1,55 @@
 https://github.com/amaltsev/XAO-Base
 ------------------------------------
 
+commit e9da86356bc2c2f330024f0ca4f67b89e21a06da
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Jun 29 23:24:01 2020 -0700
+
+    Manifest updated
+
+commit fd19ae3e21c6212679fab2cd5344d3c97bfe1a3f
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jun 26 08:18:54 2020 -0700
+
+    Version 1.26
+
+commit 10af316330397835d4e25d838117618d724da975
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Fri Jun 26 08:17:50 2020 -0700
+
+    Fixed /j filter to work for both JSON and JS
+    
+    JSON does not consider \' a valid escape sequence even though JS does.
+
+commit e363de91c31f085e57395056cfd3c3cc4b9ea90a
+Merge: 846b1e4 ee66007
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Jan 13 15:00:21 2020 -0800
+
+    Merge pull request #1 from manwar/add-repo-meta
+    
+    Added repo meta.
+
+commit 846b1e4856518721c2b2f2bd5c6ad715a8ee3ec7
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Mon Dec 23 17:49:10 2019 -0800
+
+    Minor adjustments while testing
+    
+    (no functional changes)
+
+commit ee66007124cf79909b16860e77358f6ee797fb87
+Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+Date:   Thu Nov 21 19:43:07 2019 +0000
+
+    Added repo meta.
+
+commit eece22cdaf4a67068bc383b310afa99eccb87ab6
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Thu Aug 29 13:58:56 2019 -0700
+
+    Added Cache::Uncached backend
+
 commit d2c86775604d0c0d1d679872ebffcac194c961d7
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Wed Feb 27 15:55:31 2019 -0800
@@ -25,59 +74,4 @@ Date:   Wed Oct 24 20:09:34 2018 -0700
     
     Allowing to refer to library projects from Config.pm and other
     situations when site configuration is not available yet.
-
-commit 3052f58da1e88bb792cf15fdb4d1ee1e66594608
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Wed Oct 24 17:54:52 2018 -0700
-
-    Added forgotten files to MANIFEST
-
-commit c435fbba5235d996d64c136e7c37ad3a47b6196f
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Oct 19 18:48:47 2018 -0700
-
-    Sub-level testing added
-    
-    Just testing, no functional changes and no version bump. There was a
-    scare that this did not work right, that turned out to be unfounded.
-
-commit d4e1e42c950d5ca9b2a0ebe8c85c57a45f52e00c
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Oct 19 11:31:03 2018 -0700
-
-    MANIFEST update
-
-commit cb0434f5db66227784a9f661a5124647b4ab146e
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Oct 19 11:14:15 2018 -0700
-
-    1.22 Added library projects support
-    
-    Put a site name list into configuration at /xao/objects/include to make
-    that site objects available for direct use or inheritance.
-
-commit 62b013744891ef82c22011dfac33534d690384d8
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Aug 25 07:46:41 2018 -0700
-
-    Forced ExtUtils::MakeMaker 6.64
-    
-    That's the version that understands TEST_REQUIRES, otherwise an
-    unsatisfied dependency on Test::Unit::Lite prevents the build on some
-    installations with modern perl, but really old MakeMaker.
-
-commit f8d10f78a8fd2b5a452641206d6d9142be227642
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Jul 7 09:12:11 2018 -0700
-
-    1.21 Fixed a stupid build bug
-    
-    The idea of making CHANGES from a git log back fired in CPAN
-    distribution. Fixed now hopefully.
-
-commit 58301c175d84be27c6f74a7650d61e3b117c47b8
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 19:01:41 2018 -0700
-
-    Made dist archive use 1.20 instead of 1.2
 

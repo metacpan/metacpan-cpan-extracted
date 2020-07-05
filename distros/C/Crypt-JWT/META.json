@@ -51,6 +51,6 @@
          "url" : "https://github.com/DCIT/perl-Crypt-JWT"
       }
    },
-   "version" : "0.028",
+   "version" : "0.029",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

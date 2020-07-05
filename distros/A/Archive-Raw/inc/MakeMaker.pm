@@ -35,7 +35,7 @@ our $opt = {};
 
 Getopt::Long::GetOptions(
 	"help" => \&usage,
-	'with-libarchive2-include=s' => \$opt->{'archive'}->{'incdir'},
+	'with-libarchive-include=s' => \$opt->{'archive'}->{'incdir'},
 	'with-libarchive-lib=s@'    => \$opt->{'archive'}->{'libs'},
 ) || die &usage();
 
@@ -151,6 +151,12 @@ foreach my $test (@library_tests) {
 		print uc($library), " support disabled", "\n";
 	}
 }
+
+if ($is_windows)
+{
+	$lib .= ' -lbcrypt';
+}
+
 
 my @deps;
 my @srcs;

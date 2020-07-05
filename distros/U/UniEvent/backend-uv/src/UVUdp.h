@@ -121,7 +121,7 @@ private:
         if (nread < 0) std::swap(err, nread);
         buf.length(nread); // set real buf len
 
-        h->handle_receive(buf, addr, flags, uvx_ce(err));
+        h->handle_receive(buf, net::SockAddr(addr, sizeof(*addr)), flags, uvx_ce(err));
     }
 };
 

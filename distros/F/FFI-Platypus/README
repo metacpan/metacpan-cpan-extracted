@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.30
+    version 1.31
 
 SYNOPSIS
 
@@ -1482,7 +1482,7 @@ FAQ
     5.10.0 seems to have a problem that is difficult to diagnose. Patches
     to fix are welcome, if you want to help out on this, please see:
 
-    https://github.com/Perl5-FFI/FFI-Platypus/issues/68
+    https://github.com/PerlFFI/FFI-Platypus/issues/68
 
     Since this is an older buggy version of Perl it is recommended that you
     instead upgrade to 5.10.1 or later.
@@ -1535,14 +1535,14 @@ SUPPORT
     a feature request, please open an issue on this project's GitHub Issue
     tracker:
 
-    https://github.com/perl5-FFI/FFI-Platypus/issues
+    https://github.com/perlFFI/FFI-Platypus/issues
 
 CONTRIBUTING
 
     If you have implemented a new feature or fixed a bug then you may make
     a pull request on this project's GitHub repository:
 
-    https://github.com/Perl5-FFI/FFI-Platypus/pulls
+    https://github.com/PerlFFI/FFI-Platypus/pulls
 
     This project is developed using Dist::Zilla. The project's git
     repository also comes with the Makefile.PL file necessary for building,
@@ -1649,7 +1649,7 @@ CONTRIBUTING
     making significant changes to the Platypus Core. For that I use
     `FFI-Performance`, which can be found in my GitHub repository here:
 
-    https://github.com/Perl5-FFI/FFI-Performance
+    https://github.com/PerlFFI/FFI-Performance
 
  System integrators
 

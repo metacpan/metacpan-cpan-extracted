@@ -208,7 +208,7 @@ void Stream::shutdown (Sv arg1 = {}, Sv arg2 = {}) {
 
 void Stream::disconnect ()
 
-void Stream::use_ssl (SSL_CTX* ctx = NULL) {
+void Stream::use_ssl (SslContext ctx = NULL) {
     if (ctx) THIS->use_ssl(ctx);
     else THIS->use_ssl();
 }

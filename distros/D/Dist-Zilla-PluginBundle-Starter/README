@@ -440,9 +440,10 @@ EXTENDING
 
   Prereqs
     To specify distribution prereqs in a cpanfile, use
-    [Prereqs::FromCPANfile]. To specify prereqs in dist.ini, use [Prereqs].
-    To automatically guess the distribution's prereqs by parsing the code,
-    use [AutoPrereqs].
+    [Prereqs::FromCPANfile]. To specify prereqs in a prereqs.json or
+    prereqs.yml, use [PrereqsFile]. To specify prereqs in dist.ini, use
+    [Prereqs]. To automatically guess the distribution's prereqs by parsing
+    the code, use [AutoPrereqs].
 
 BUGS
     Report any issues on the public bugtracker.

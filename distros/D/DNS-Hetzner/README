@@ -1,0 +1,59 @@
+NAME
+
+    DNS::Hetzner - Perl library to work with the API for the Hetzner DNS
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+        use DNS::Hetzner;
+    
+        my $cloud = DNS::Hetzner->new(
+            token => 'ABCDEFG1234567',    # your api token
+        );
+    
+        my $server_client = $cloud->server;
+        my $server_list   = $server_client->list;
+
+INFO
+
+    This is still pretty alpha. The API might change.
+
+ATTRIBUTES
+
+      * base_uri
+
+      (optional) Default: api/v1
+
+      * client
+
+      (optional) A Mojo::UserAgent compatible user agent. By default a new
+      object of Mojo::UserAgent is created.
+
+      * host
+
+      (optional) This is the URL to Hetzner's Cloud-API. Defaults to
+      https://dns.hetzner.com
+
+      * token
+
+      (required) Your API token.
+
+METHODS
+
+ request
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2020 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

@@ -1,0 +1,33 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::OpenTracing::Interface: v0.23.0
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-OpenTracing-Integration
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bytes::Random::Secure: '0'
+  Moo: '0'
+  OpenTracing::GlobalTracer: '0.04'
+  OpenTracing::Implementation::Interface::Bootstrap: '0'
+  OpenTracing::Implementation::NoOp: '0'
+  OpenTracing::Role: v0.82.0
+  Tree: '0'
+  Types::Standard: '0'
+  aliased: '0'
+  namespace::clean: '0'
+version: v0.101.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

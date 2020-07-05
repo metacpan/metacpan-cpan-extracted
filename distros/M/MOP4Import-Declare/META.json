@@ -16,28 +16,28 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "JSON::PP" : "2.273",
             "Module::Build::Pluggable::CPANfile" : "0.05",
             "rlib" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0",
-            "Module::Build::Pluggable" : "0",
-            "Module::Build::Pluggable::CPANfile" : "0.05",
-            "Module::CPANfile" : "0",
-            "rlib" : "0"
+            "Module::Build" : "0.42",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
          }
       },
       "runtime" : {
          "recommends" : {
             "Cpanel::JSON::XS" : "4.05",
+            "Data::Dumper" : "2.160",
             "File::AddInc" : "0",
             "Module::Runtime" : "0",
             "YAML::Syck" : "0"
          },
          "requires" : {
             "JSON::MaybeXS" : "0",
+            "Sub::Util" : "1.40",
             "perl" : "5.010",
             "rlib" : "0"
          }
@@ -69,7 +69,7 @@
       },
       "MOP4Import::Declare" : {
          "file" : "Declare.pm",
-         "version" : "0.050"
+         "version" : "0.051"
       },
       "MOP4Import::Declare::Type" : {
          "file" : "Declare/Type.pm"
@@ -107,8 +107,14 @@
       "MOP4Import::Util::FindMethods" : {
          "file" : "Util/FindMethods.pm"
       },
+      "MOP4Import::Util::Inspector" : {
+         "file" : "Util/Inspector.pm"
+      },
       "MOP4Import::Util::JSON_TYPE" : {
          "file" : "Util/JSON_TYPE.pm"
+      },
+      "MOP4Import::Util::ResolveSymlinks" : {
+         "file" : "Util/ResolveSymlinks.pm"
       },
       "MOP4Import::Util::compat_double_diamond" : {
          "file" : "Util/compat_double_diamond.pm"
@@ -126,6 +132,6 @@
          "url" : "https://github.com/hkoba/perl-mop4import-declare"
       }
    },
-   "version" : "0.050",
+   "version" : "0.051",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

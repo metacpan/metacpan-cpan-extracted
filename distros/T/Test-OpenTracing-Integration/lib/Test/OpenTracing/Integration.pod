@@ -1,0 +1,92 @@
+
+=head1 NAME
+
+Test::OpenTracing::Integration - Easy Testing of OpenTracing Integrations
+
+
+
+=head1 SYNOPSIS
+
+Your 'App'
+
+    package MyApp {
+        use OpenTracing::GlobalTracer qw/$TRACER/;
+        
+        sub something {
+            my $scope = $TRACER->start_active_span('some-work');
+            
+            $TRACER->start_span('more-work')->finish;
+            
+            $scope->close
+        }
+    }
+
+In the test:
+
+    use OpenTracing::Implementation qw/Test/;
+    use Test::OpenTracing::Integration;
+    
+    use MyApp;
+    
+    MyApp->something();
+    
+    global_tracer_cmp_easy(
+        [
+            { operation_name => 'more-work', level => 1 },
+        ],
+        'child span created'
+    );
+
+
+
+=head1 IMPORTED FUNCTIONS
+
+All of these functions require the current global tracer to be an instance
+of L<OpenTracing::Implementation::Test::Tracer>. All are exported by default.
+
+
+
+=head2 C<global_tracer_cmp_deeply>
+
+Runs a L<cmp_deeply> on the current global tracer.
+
+See: L<OpenTracing::Implementation::Test::Tracder/"cmp_deeply">
+
+
+
+=head2 C<global_tracer_cmp_easy>
+
+Runs a L<cmp_easy> on the current global tracer.
+
+See: L<OpenTracing::Implementation::Test::Tracder/"cmp_easy">
+
+
+
+=head2 C<reset_spans>
+
+Removes all saved spans from the current global tracer. Useful to start fresh
+before new test cases.
+
+
+
+=head1 AUTHOR
+
+Szymon Nieznanski <snieznanski@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'Test::OpenTracing::Integration'
+is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

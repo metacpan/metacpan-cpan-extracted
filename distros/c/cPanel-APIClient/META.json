@@ -1,0 +1,69 @@
+{
+   "abstract" : "L<cPanel|http://cpanel.com> APIs, à la TIMTOWTDI!",
+   "author" : [
+      "cPanel, L. L. C. (CPANEL)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "cPanel-APIClient",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Call::Context" : "0",
+            "JSON" : "0",
+            "URI::Escape" : "0",
+            "X::Tiny" : "0",
+            "parent" : "0",
+            "perl" : "5.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::Fatal" : "0",
+            "Test::MockModule" : "0.173",
+            "Test::More" : "0",
+            "autodie" : "0",
+            "mro" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cpanel/p5-cPanel-APIClient/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/cpanel/p5-cPanel-APIClient"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

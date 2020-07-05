@@ -19,22 +19,22 @@ DESCRIPTION
     To use it synchronously, call the get method of any returned Future
     instances to obtain the eventual result:
 
-     my $spi = $pirate->enter_mode( "SPI" )->get;
+       my $spi = $pirate->enter_mode( "SPI" )->get;
     
-     $spi->power( 1 )->get;
-     my $input = $spi->writeread_cs( $output )->get;
+       $spi->power( 1 )->get;
+       my $input = $spi->writeread_cs( $output )->get;
 
     A truely-asynchronous program would use the futures more
     conventionally, perhaps by using ->then chaining:
 
-     my $input = $pirate->enter_mode( "SPI" )
-       ->then( sub {
-          my ( $spi ) = @_;
+       my $input = $pirate->enter_mode( "SPI" )
+         ->then( sub {
+            my ( $spi ) = @_;
     
-          $spi->power( 1 )->then( sub {
-             $spi->writeread_cs( $output );
-          });
-       });
+            $spi->power( 1 )->then( sub {
+               $spi->writeread_cs( $output );
+            });
+         });
 
     This module uses Future::IO for its underlying IO operations, so using
     it in a program would require the event system to integrate with
@@ -105,6 +105,10 @@ METHODS
 
       The SPI mode. Returns an instance of Device::BusPirate::Mode::SPI.
 
+    UART
+
+      The UART mode. Returns an instance of Device::BusPirate::Mode::UART.
+
     Once a mode object has been created, most of the interaction with the
     device would be done using that mode object, as it will have methods
     relating to the specifics of that hardware mode. See the classes listed
@@ -130,7 +134,7 @@ METHODS
 
 TODO
 
-      * More modes - UART, 1-wire, raw-wire
+      * More modes - 1-wire, raw-wire
 
       * AUX frequency measurement and ADC support.
 

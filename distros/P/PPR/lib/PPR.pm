@@ -15,8 +15,9 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000026';
+our $VERSION = '0.000028';
 use utf8;
+use List::Util qw<min max>;
 
 # Class for $PPR::ERROR objects...
 { package PPR::ERROR;
@@ -62,682 +63,141 @@ use utf8;
 
 # Define the grammar...
 our $GRAMMAR = qr{
-(?(DEFINE)
+    (?(DEFINE)
 
-    (?<PerlEntireDocument>
-        \A
-        (?&PerlDocument)
-        (?:
-            \Z
-        |
-            (?(?{ !defined $PPR::ERROR })
-                (?>(?&PerlOWS))  (?{pos()})  ([^\n]++)
-                (?{ $PPR::ERROR = PPR::ERROR->new(source => "$^N", prefix => substr($_, 0, $^R) ) })
-                (?!)
-            )
-        )
-    ) # End of rule
-
-    (?<PerlDocument>
-        \x{FEFF}?+                      # Optional BOM marker
-        (?&PerlStatementSequence)
-    ) # End of rule
-
-    (?<PerlStatementSequence>
-        (?>(?&PerlPodSequence))
-        (?:
-            (?&PerlStatement)
-            (?&PerlPodSequence)
-        )*+
-    ) # End of rule
-
-    (?<PerlStatement>
-        (?>
-            (?>(?&PerlPodSequence))
-            (?: (?>(?&PerlLabel)) (?&PerlOWS) )?+
-            (?>(?&PerlPodSequence))
-            (?>
-                (?&PerlKeyword)
+        (?<PerlEntireDocument>
+            \A
+            (?&PerlDocument)
+            (?:
+                \Z
             |
-                # Inlined (?&PerlSubroutineDeclaration)
-                (?>
-                    sub \b                             (?>(?&PerlOWS))
-                    (?>(?&PerlOldQualifiedIdentifier))    (?&PerlOWS)
-                |
-                    AUTOLOAD                              (?&PerlOWS)
-                |
-                    DESTROY                               (?&PerlOWS)
+                (?(?{ !defined $PPR::ERROR })
+                    (?>(?&PerlOWSOrEND))  (?{pos()})  ([^\n]++)
+                    (?{ $PPR::ERROR = PPR::ERROR->new(source => "$^N", prefix => substr($_, 0, $^R) ) })
+                    (?!)
                 )
-                (?:
-                    # Perl pre 5.028
+            )
+        ) # End of rule (?<PerlEntireDocument>)
+
+        (?<PerlDocument>
+            \x{FEFF}?+                      # Optional BOM marker
+            (?&PerlStatementSequence)
+            (?&PerlOWSOrEND)
+        ) # End of rule (?<PerlDocument>)
+
+        (?<PerlStatementSequence>
+            (?>(?&PerlPodSequence))
+            (?:
+                (?&PerlStatement)
+                (?&PerlPodSequence)
+            )*+
+        ) # End of rule (?<PerlStatementSequence>)
+
+        (?<PerlStatement>
+            (?>
+                (?>(?&PerlPodSequence))
+                (?: (?>(?&PerlLabel)) (?&PerlOWSOrEND) )?+
+                (?>(?&PerlPodSequence))
+                (?>
+                    (?&PerlKeyword)
+                |
+                    # Inlined (?&PerlSubroutineDeclaration)
+                    (?>
+                        (?: (?> my | our | state ) \b      (?>(?&PerlOWS)) )?+
+                        sub \b                             (?>(?&PerlOWS))
+                        (?>(?&PerlOldQualifiedIdentifier))    (?&PerlOWS)
+                    |
+                        AUTOLOAD                              (?&PerlOWS)
+                    |
+                        DESTROY                               (?&PerlOWS)
+                    )
                     (?:
-                        (?>
-                            (?&PerlParenthesesList)    # Parameter list
-                        |
-                            \( [^)]*+ \)               # Prototype (
-                        )
-                        (?&PerlOWS)
-                    )?+
-                    (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+                        # Perl pre 5.028
+                        (?:
+                            (?>
+                                (?&PerlParenthesesList)    # Parameter list
+                            |
+                                \( [^)]*+ \)               # Prototype (
+                            )
+                            (?&PerlOWS)
+                        )?+
+                        (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+                    |
+                        # Perl post 5.028
+                        (?: (?>(?&PerlAttributes))       (?&PerlOWS) )?+
+                        (?: (?>(?&PerlParenthesesList))  (?&PerlOWS) )?+    # Parameter list
+                    )
+                    (?> ; | (?&PerlBlock) )
+                    # End of inlining
                 |
-                    # Perl post 5.028
-                    (?: (?>(?&PerlAttributes))       (?&PerlOWS) )?+
-                    (?: (?>(?&PerlParenthesesList))  (?&PerlOWS) )?+    # Parameter list
-                )
-                (?> ; | (?&PerlBlock) )
-                # End of inlining
-            |
-                # Inlined (?&PerlUseStatement)
-                (?: use | no ) (?>(?&PerlNWS))
-                (?>
-                    (?&PerlVersionNumber)
+                    # Inlined (?&PerlUseStatement)
+                    (?: use | no ) (?>(?&PerlNWS))
+                    (?>
+                        (?&PerlVersionNumber)
+                    |
+                        (?>(?&PerlQualifiedIdentifier))
+                        (?: (?>(?&PerlNWS)) (?&PerlVersionNumber)
+                            (?! (?>(?&PerlOWS)) (?> (?&PerlInfixBinaryOperator) | (?&PerlComma) | \? ) )
+                        )?+
+                        (?: (?>(?&PerlNWS)) (?&PerlPodSequence) )?+
+                        (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
+                    )
+                    (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
+                    # End of inlining
                 |
-                    (?>(?&PerlQualifiedIdentifier))
-                    (?: (?>(?&PerlNWS)) (?&PerlVersionNumber)
-                        (?! (?>(?&PerlOWS)) (?> (?&PerlInfixBinaryOperator) | (?&PerlComma) | \? ) )
-                    )?+
-                    (?: (?>(?&PerlNWS)) (?&PerlPodSequence) )?+
-                    (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
+                    # Inlined (?&PerlPackageDeclaration)
+                    package
+                        (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
+                    (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
+                        (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+                    # End of inlining
+                |
+                    (?&PerlControlBlock)
+                |
+                    (?&PerlFormat)
+                |
+                    (?>(?&PerlExpression))          (?>(?&PerlOWS))
+                    (?&PerlStatementModifier)?+     (?>(?&PerlOWSOrEND))
+                    (?> ; | (?= \} | \z ))
+                |
+                    (?&PerlBlock)
+                |
+                    ;
                 )
-                (?>(?&PerlOWS)) (?> ; | (?= \} | \z ))
-                # End of inlining
-            |
-                # Inlined (?&PerlPackageDeclaration)
-                package
-                    (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
-                (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
-                    (?>(?&PerlOWS)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
-                # End of inlining
-            |
-                (?&PerlControlBlock)
-            |
-                (?&PerlFormat)
-            |
-                (?>(?&PerlExpression))          (?>(?&PerlOWS))
-                (?&PerlStatementModifier)?+     (?>(?&PerlOWS))
+
+            | # A yada-yada...
+                \.\.\. (?>(?&PerlOWSOrEND))
                 (?> ; | (?= \} | \z ))
-            |
-                (?&PerlBlock)
-            |
-                ;
-            )
 
-        | # A yada-yada...
-            \.\.\. (?>(?&PerlOWS))
-            (?> ; | (?= \} | \z ))
+            | # Just a label...
+                (?>(?&PerlLabel)) (?>(?&PerlOWSOrEND))
+                (?> ; | (?= \} | \z ))
 
-        | # Just a label...
-            (?>(?&PerlLabel)) (?>(?&PerlOWS))
-            (?> ; | (?= \} | \z ))
+            | # Just an empty statement...
+                (?>(?&PerlOWS)) ;
 
-        | # Just an empty statement...
-            (?>(?&PerlOWS)) ;
-
-        | # An error (report it, if it's the first)...
-            (?(?{ !defined $PPR::ERROR })
-                (?> (?&PerlOWS) )
-                (?! (?: \} | \z ) )
-                (?{ pos() })
-                ( (?&PerlExpression) (?&PerlOWS) [^\n]++ | [^;\}]++ )
-                (?{ $PPR::ERROR //= PPR::ERROR->new(source => $^N, prefix => substr($_, 0, $^R) ) })
-                (?!)
-            )
-        )
-    ) # End of rule
-
-    (?<PerlSubroutineDeclaration>
-       (?>
-           sub \b                             (?>(?&PerlOWS))
-           (?>(?&PerlOldQualifiedIdentifier))    (?&PerlOWS)
-       |
-           AUTOLOAD                              (?&PerlOWS)
-       |
-           DESTROY                               (?&PerlOWS)
-       )
-       (?:
-           # Perl pre 5.028
-           (?:
-               (?>
-                   (?&PerlParenthesesList)    # Parameter list
-               |
-                   \( [^)]*+ \)               # Prototype (
-               )
-               (?&PerlOWS)
-           )?+
-           (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
-       |
-           # Perl post 5.028
-           (?: (?>(?&PerlAttributes))       (?&PerlOWS) )?+
-           (?: (?>(?&PerlParenthesesList))  (?&PerlOWS) )?+    # Parameter list
-       )
-       (?> ; | (?&PerlBlock) )
-    ) # End of rule
-
-    (?<PerlUseStatement>
-       (?: use | no ) (?>(?&PerlNWS))
-       (?>
-           (?&PerlVersionNumber)
-       |
-           (?>(?&PerlQualifiedIdentifier))
-           (?: (?>(?&PerlNWS)) (?&PerlVersionNumber)
-               (?! (?>(?&PerlOWS)) (?> (?&PerlInfixBinaryOperator) | (?&PerlComma) | \? ) )
-           )?+
-           (?: (?>(?&PerlNWS)) (?&PerlPodSequence) )?+
-           (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
-       )
-       (?>(?&PerlOWS)) (?> ; | (?= \} | \z ))
-    ) # End of rule
-
-    (?<PerlReturnExpression>
-       return \b (?>(?&PerlOWS)) (?&PerlExpression)
-    ) # End of rule
-
-    (?<PerlReturnStatement>
-       return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
-       (?>(?&PerlOWS)) (?> ; | (?= \} | \z ))
-    ) # End of rule
-
-    (?<PerlPackageDeclaration>
-       package
-           (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
-       (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
-           (?>(?&PerlOWS)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
-    ) # End of rule
-
-    (?<PerlExpression>
-                            (?>(?&PerlLowPrecedenceNotExpression))
-        (?: (?>(?&PerlOWS)) (?>(?&PerlLowPrecedenceInfixOperator))
-            (?>(?&PerlOWS))    (?&PerlLowPrecedenceNotExpression)  )*+
-    ) # End of rule
-
-    (?<PerlLowPrecedenceNotExpression>
-        (?: not \b (?&PerlOWS) )*+  (?&PerlCommaList)
-    ) # End of rule
-
-    (?<PerlCommaList>
-                (?>(?&PerlAssignment))  (?>(?&PerlOWS))
-        (?:
-            (?: (?>(?&PerlComma))          (?&PerlOWS)   )++
-                (?>(?&PerlAssignment))  (?>(?&PerlOWS))
-        )*+
-            (?: (?>(?&PerlComma))          (?&PerlOWS)   )*+
-    ) # End of rule
-
-    (?<PerlAssignment>
-                            (?>(?&PerlConditionalExpression))
-        (?:
-            (?>(?&PerlOWS)) (?>(?&PerlAssignmentOperator))
-            (?>(?&PerlOWS))    (?&PerlConditionalExpression)
-        )*+
-    ) # End of rule
-
-    (?<PerlScalarExpression>
-    (?<PerlConditionalExpression>
-        (?>(?&PerlBinaryExpression))
-        (?:
-            (?>(?&PerlOWS)) \? (?>(?&PerlOWS)) (?>(?&PerlAssignment))
-            (?>(?&PerlOWS))  : (?>(?&PerlOWS))    (?&PerlConditionalExpression)
-        )?+
-    ) # End of rule
-    ) # End of rule
-
-    (?<PerlBinaryExpression>
-                            (?>(?&PerlPrefixPostfixTerm))
-        (?: (?>(?&PerlOWS)) (?>(?&PerlInfixBinaryOperator))
-            (?>(?&PerlOWS))    (?&PerlPrefixPostfixTerm) )*+
-    ) # End of rule
-
-    (?<PerlPrefixPostfixTerm>
-        (?: (?>(?&PerlPrefixUnaryOperator))  (?&PerlOWS) )*+
-        (?>(?&PerlTerm))
-        (?:
-            # Inlined (?&PerlTermPostfixDereference)
-            (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-            (?>
-                (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
-                (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
-
-            |   (?&PerlParenthesesList)
-            |   (?&PerlArrayIndexer)
-            |   (?&PerlHashIndexer)
-            |   \$\*
-            )
-
-            (?:
-                (?>(?&PerlOWS))
-                (?>
-                    ->  (?>(?&PerlOWS))
-                    (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
-                    (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
-                |
-                    (?: -> (?&PerlOWS) )?+
-                    (?> (?&PerlParenthesesList)
-                    |   (?&PerlArrayIndexer)
-                    |   (?&PerlHashIndexer)
-                    |   \$\*
-                    )
+            | # An error (report it, if it's the first)...
+                (?(?{ !defined $PPR::ERROR })
+                    (?> (?&PerlOWS) )
+                    (?! (?: \} | \z ) )
+                    (?{ pos() })
+                    ( (?&PerlExpression) (?&PerlOWS) [^\n]++ | [^;\}]++ )
+                    (?{ $PPR::ERROR //= PPR::ERROR->new(source => $^N, prefix => substr($_, 0, $^R) ) })
+                    (?!)
                 )
-            )*+
+            )
+        ) # End of rule (?<PerlStatement>)
 
-            (?:
-                (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\@%]
-                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-            )?+
-            # End of inlining
-        )?+
-        (?: (?>(?&PerlOWS)) (?&PerlPostfixUnaryOperator) )?+
-    ) # End of rule
-
-    (?<PerlLvalue>
+        (?<PerlSubroutineDeclaration>
         (?>
-            \\?+ [\$\@%] (?>(?&PerlOWS)) (?&PerlIdentifier)
+            (?: (?> my | our | state ) \b      (?>(?&PerlOWS)) )?+
+            sub \b                             (?>(?&PerlOWS))
+            (?>(?&PerlOldQualifiedIdentifier))    (?&PerlOWS)
         |
-            \(                                                                     (?>(?&PerlOWS))
-                (?> \\?+ [\$\@%] (?>(?&PerlOWS)) (?&PerlIdentifier) | undef )      (?>(?&PerlOWS))
-                (?:
-                    (?>(?&PerlComma))                                              (?>(?&PerlOWS))
-                    (?> \\?+ [\$\@%] (?>(?&PerlOWS)) (?&PerlIdentifier) | undef )  (?>(?&PerlOWS))
-                )*+
-                (?: (?>(?&PerlComma)) (?&PerlOWS) )?+
-            \)
+            AUTOLOAD                              (?&PerlOWS)
+        |
+            DESTROY                               (?&PerlOWS)
         )
-    ) # End of rule
-
-    (?<PerlTerm>
-        (?>
-            # Inlined (?&PerlReturnExpression)
-            return \b (?>(?&PerlOWS)) (?&PerlExpression)
-            # End of inlining
-        |
-            # Inlined (?&PerlVariableDeclaration)
-            (?> my | state | our ) \b           (?>(?&PerlOWS))
-            (?: (?&PerlQualifiedIdentifier)        (?&PerlOWS)  )?+
-            (?>(?&PerlLvalue))                  (?>(?&PerlOWS))
-            (?&PerlAttributes)?+
-            # End of inlining
-        |
-            (?&PerlAnonymousSubroutine)
-        |
-            (?&PerlVariable)
-        |
-            (?>(?&PerlNullaryBuiltinFunction))  (?! (?>(?&PerlOWS)) \( )
-        |
-            # Inlined (?&PerlDoBlock) | (?&PerlEvalBlock)
-            (?> do | eval ) (?>(?&PerlOWS)) (?&PerlBlock)
-            # End of inlining
-        |
-            (?&PerlCall)
-        |
-            (?&PerlTypeglob)
-        |
-            (?>(?&PerlParenthesesList))
-            (?: (?>(?&PerlOWS)) (?&PerlArrayIndexer) )?+
-            (?:
-                (?>(?&PerlOWS))
-                (?>
-                    (?&PerlArrayIndexer)
-                |   (?&PerlHashIndexer)
-                )
-            )*+
-        |
-            (?&PerlAnonymousArray)
-        |
-            (?&PerlAnonymousHash)
-        |
-            (?&PerlDiamondOperator)
-        |
-            (?&PerlContextualMatch)
-        |
-            (?&PerlQuotelikeS)
-        |
-            (?&PerlQuotelikeTR)
-        |
-            (?&PerlQuotelikeQX)
-        |
-            (?&PerlLiteral)
-        )
-    ) # End of rule
-
-    (?<PerlTermPostfixDereference>
-       (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-       (?>
-           (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
-           (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
-
-       |   (?&PerlParenthesesList)
-       |   (?&PerlArrayIndexer)
-       |   (?&PerlHashIndexer)
-       |   \$\*
-       )
-
-       (?:
-           (?>(?&PerlOWS))
-           (?>
-               ->  (?>(?&PerlOWS))
-               (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
-               (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
-           |
-               (?: -> (?&PerlOWS) )?+
-               (?> (?&PerlParenthesesList)
-               |   (?&PerlArrayIndexer)
-               |   (?&PerlHashIndexer)
-               |   \$\*
-               )
-           )
-       )*+
-       (?:
-           (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\@%]
-           (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-       )?+
-    ) # End of rule
-
-    (?<PerlControlBlock>
-        (?> # Conditionals...
-            (?> if | unless ) \b                 (?>(?&PerlOWS))
-            (?>(?&PerlParenthesesList))          (?>(?&PerlOWS))
-            (?>(?&PerlBlock))
-
-            (?:
-                                                 (?>(?&PerlOWS))
-                (?>(?&PerlPodSequence))
-                elsif \b                         (?>(?&PerlOWS))
-                (?>(?&PerlParenthesesList))      (?>(?&PerlOWS))
-                (?&PerlBlock)
-            )*+
-
-            (?:
-                                                 (?>(?&PerlOWS))
-                (?>(?&PerlPodSequence))
-                else \b                          (?>(?&PerlOWS))
-                (?&PerlBlock)
-            )?+
-
-        |   # Loops...
-            (?>
-                for(?:each)?+ \b
-                (?>(?&PerlOWS))
-                (?:
-                    (?> # Explicitly aliased iterator variable...
-                        (?> \\ (?>(?&PerlOWS))  (?> my | our | state )
-                        |                       (?> my | our | state )  (?>(?&PerlOWS)) \\
-                        )
-                        (?>(?&PerlOWS))
-                        (?> (?&PerlVariableScalar)
-                        |   (?&PerlVariableArray)
-                        |   (?&PerlVariableHash)
-                        )
-                    |
-                        # Implicitly aliased iterator variable...
-                        (?> (?: my | our | state ) (?>(?&PerlOWS)) )?+
-                        (?&PerlVariableScalar)
-                    )?+
-                    (?>(?&PerlOWS))
-                    (?> (?&PerlParenthesesList) | (?&PerlQuotelikeQW) )
-                |
-                    (?&PPR_three_part_list)
-                )
-            |
-                (?> while | until) \b (?>(?&PerlOWS))
-                (?&PerlParenthesesList)
-            )
-
-            (?>(?&PerlOWS))
-            (?>(?&PerlBlock))
-
-            (?:
-                (?>(?&PerlOWS))   continue
-                (?>(?&PerlOWS))   (?&PerlBlock)
-            )?+
-
-        | # Phasers...
-            (?> BEGIN | END | CHECK | INIT | UNITCHECK ) \b   (?>(?&PerlOWS))
-            (?&PerlBlock)
-
-        | # Switches...
-            (?> given | when ) \b                             (?>(?&PerlOWS))
-            (?>(?&PerlParenthesesList))                            (?>(?&PerlOWS))
-            (?&PerlBlock)
-        |
-            default                                           (?>(?&PerlOWS))
-            (?&PerlBlock)
-        )
-    ) # End of rule
-
-    (?<PerlFormat>
-        format
-        (?: (?>(?&PerlNWS))  (?&PerlQualifiedIdentifier)  )?+
-            (?>(?&PerlOWS))  = [^\n]*+
-            (?&PPR_newline_and_heredoc)
-        (?:
-            (?! \. \n )
-            [^\n\$\@]*+
-            (?:
-                (?>
-                    (?= \$ (?! \s ) )  (?&PerlScalarAccessNoSpace)
-                |
-                    (?= \@ (?! \s ) )  (?&PerlArrayAccessNoSpace)
-                )
-                [^\n\$\@]*+
-            )*+
-            (?&PPR_newline_and_heredoc)
-        )*+
-        \. (?&PerlEndOfLine)
-    ) # End of rule
-
-    (?<PerlStatementModifier>
-        (?> if | for(?:each)?+ | while | unless | until | when )
-        \b
-        (?>(?&PerlOWS))
-        (?&PerlExpression)
-    ) # End of rule
-
-    (?<PerlBlock>
-        \{  (?>(?&PerlStatementSequence))  \}
-    ) # End of rule
-
-    (?<PerlCall>
-        (?>
-            [&]                                    (?>(?&PerlOWS))
-            (?> (?&PerlBlock)
-            |   (?&PerlVariableScalar)
-            |   (?&PerlQualifiedIdentifier)
-            )                                      (?>(?&PerlOWS))
-            (?:
-                \(                                 (?>(?&PerlOWS))
-                    (?: (?>(?&PerlExpression))        (?&PerlOWS)   )?+
-                \)
-            )?+
-        |
-            - (?>(?&PPR_filetest_name))            (?>(?&PerlOWS))
-            (?&PerlPrefixPostfixTerm)?+
-        |
-            (?>(?&PerlBuiltinFunction))            (?>(?&PerlOWS))
-            (?>
-                \(                                 (?>(?&PerlOWS))
-                    (?>
-                        (?= (?>(?&PPR_non_reserved_identifier))
-                            (?>(?&PerlOWS))
-                            (?! \( | (?&PerlComma) )
-                        )
-                        (?&PerlCall)
-                    |
-                        (?>(?&PerlBlock))          (?>(?&PerlOWS))
-                        (?&PerlExpression)?+
-                    |
-                        (?>(?&PPR_indirect_obj))   (?>(?&PerlNWS))
-                        (?&PerlExpression)
-                    |
-                        (?&PerlExpression)?+
-                    )                              (?>(?&PerlOWS))
-                \)
-            |
-                    (?>
-                        (?=
-                            (?>(?&PPR_non_reserved_identifier))
-                            (?>(?&PerlOWS))
-                            (?! \( | (?&PerlComma) )
-                        )
-                        (?&PerlCall)
-                    |
-                        (?>(?&PerlBlock))          (?>(?&PerlOWS))
-                        (?&PerlCommaList)?+
-                    |
-                        (?>(?&PPR_indirect_obj))   (?>(?&PerlNWS))
-                        (?&PerlCommaList)
-                    |
-                        (?&PerlCommaList)?+
-                    )
-            )
-        |
-            (?>(?&PPR_non_reserved_identifier)) (?>(?&PerlOWS))
-            (?>
-                \(                              (?>(?&PerlOWS))
-                    (?: (?>(?&PerlExpression))     (?&PerlOWS)  )?+
-                \)
-            |
-                    (?>
-                        (?=
-                            (?>(?&PPR_non_reserved_identifier))
-                            (?>(?&PerlOWS))
-                            (?! \( | (?&PerlComma) )
-                        )
-                        (?&PerlCall)
-                    |
-                        (?>(?&PerlBlock))           (?>(?&PerlOWS))
-                        (?&PerlCommaList)?+
-                    |
-                        (?>(?&PPR_indirect_obj))        (?&PerlNWS)
-                        (?&PerlCommaList)
-                    |
-                        (?&PerlCommaList)?+
-                    )
-            )
-        )
-    ) # End of rule
-
-    (?<PerlVariableDeclaration>
-        (?> my | state | our ) \b           (?>(?&PerlOWS))
-        (?: (?&PerlQualifiedIdentifier)        (?&PerlOWS)  )?+
-        (?>(?&PerlLvalue))                  (?>(?&PerlOWS))
-        (?&PerlAttributes)?+
-    ) # End of rule
-
-    (?<PerlDoBlock>
-        do (?>(?&PerlOWS)) (?&PerlBlock)
-    ) # End of rule
-
-    (?<PerlEvalBlock>
-        eval (?>(?&PerlOWS)) (?&PerlBlock)
-    ) # End of rule
-
-    (?<PerlAttributes>
-        :
-        (?>(?&PerlOWS))
-        (?>(?&PerlIdentifier))
-        (?:
-            (?= \( ) (?&PPR_quotelike_body)
-        )?+
-
-        (?:
-            (?> (?>(?&PerlOWS)) : (?&PerlOWS) | (?&PerlNWS) )
-            (?>(?&PerlIdentifier))
-            (?:
-                (?= \( ) (?&PPR_quotelike_body)
-            )?+
-        )*+
-    ) # End of rule
-
-    (?<PerlList>
-        (?> (?&PerlParenthesesList) | (?&PerlCommaList) )
-    ) # End of rule
-
-    (?<PerlParenthesesList>
-        \(  (?>(?&PerlOWS))  (?: (?>(?&PerlExpression)) (?&PerlOWS) )?+  \)
-    ) # End of rule
-
-    (?<PerlAnonymousArray>
-        \[  (?>(?&PerlOWS))  (?: (?>(?&PerlExpression)) (?&PerlOWS) )?+  \]
-    ) # End of rule
-
-    (?<PerlAnonymousHash>
-        \{  (?>(?&PerlOWS))  (?: (?>(?&PerlExpression)) (?&PerlOWS) )?+ \}
-    ) # End of rule
-
-    (?<PerlArrayIndexer>
-        \[                          (?>(?&PerlOWS))
-            (?>(?&PerlExpression))  (?>(?&PerlOWS))
-        \]
-    ) # End of rule
-
-    (?<PerlHashIndexer>
-        \{  (?>(?&PerlOWS))
-            (?: -?+ (?&PerlIdentifier) | (?&PerlExpression) )  # (Note: MUST allow backtracking here)
-            (?>(?&PerlOWS))
-        \}
-    ) # End of rule
-
-    (?<PerlDiamondOperator>
-        <<>>    # Perl 5.22 "double diamond"
-      |
-        < (?! < )
-            (?>(?&PPR_balanced_angles))
-        >
-        (?=
-            (?>(?&PerlOWS))
-            (?> \z | [,;\}\])?] | => | : (?! :)        # (
-            |   (?&PerlInfixBinaryOperator) | (?&PerlLowPrecedenceInfixOperator)
-            |   (?= \w) (?> for(?:each)?+ | while | if | unless | until | when )
-            )
-        )
-    ) # End of rule
-
-    (?<PerlComma>
-        (?> , | => )
-    ) # End of rule
-
-    (?<PerlPrefixUnaryOperator>
-        (?> [!\\+~] | \+\+  |  --  | - (?! (?&PPR_filetest_name) \b ) )
-    ) # End of rule
-
-    (?<PerlPostfixUnaryOperator>
-        (?> \+\+  |  -- )
-    ) # End of rule
-
-    (?<PerlInfixBinaryOperator>
-        (?>  [=!][~=]
-        |    cmp
-        |    <= >?+
-        |    >=
-        |    [lg][te]
-        |    eq
-        |    ne
-        |    [+]             (?! [+=] )
-        |     -              (?! [-=] )
-        |    [.]{2,3}+
-        |    [.%x]           (?! [=]  )
-        |    [&|^][.]        (?! [=]  )
-        |    [<>*&|/]{1,2}+  (?! [=]  )
-        |    \^              (?! [=]  )
-        |    ~~
-        )
-    ) # End of rule
-
-    (?<PerlAssignmentOperator>
-        (?:  [<>*&|/]{2}
-          |  [-+.*/%x]
-          |  [&|^][.]?+
-        )?+
-        =
-        (?! > )
-    ) # End of rule
-
-    (?<PerlLowPrecedenceInfixOperator>
-        (?> or | and | xor )
-    ) # End of rule
-
-    (?<PerlAnonymousSubroutine>
-        sub \b
-        (?>(?&PerlOWS))
         (?:
             # Perl pre 5.028
             (?:
@@ -754,1253 +214,1803 @@ our $GRAMMAR = qr{
             (?: (?>(?&PerlAttributes))       (?&PerlOWS) )?+
             (?: (?>(?&PerlParenthesesList))  (?&PerlOWS) )?+    # Parameter list
         )
-        (?&PerlBlock)
-    ) # End of rule
+        (?> ; | (?&PerlBlock) )
+        ) # End of rule (?<PerlSubroutineDeclaration>)
 
-    (?<PerlVariable>
-        (?= [\$\@%] )
+        (?<PerlUseStatement>
+        (?: use | no ) (?>(?&PerlNWS))
         (?>
-            (?&PerlScalarAccess)
-        |   (?&PerlHashAccess)
-        |   (?&PerlArrayAccess)
+            (?&PerlVersionNumber)
+        |
+            (?>(?&PerlQualifiedIdentifier))
+            (?: (?>(?&PerlNWS)) (?&PerlVersionNumber)
+                (?! (?>(?&PerlOWS)) (?> (?&PerlInfixBinaryOperator) | (?&PerlComma) | \? ) )
+            )?+
+            (?: (?>(?&PerlNWS)) (?&PerlPodSequence) )?+
+            (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
         )
-    ) # End of rule
+        (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
+        ) # End of rule (?<PerlUseStatement>)
 
-    (?<PerlTypeglob>
-        \*
+        (?<PerlReturnExpression>
+        return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
+        ) # End of rule (?<PerlReturnExpression>)
+
+        (?<PerlReturnStatement>
+        return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
+        (?>(?&PerlOWSOrEND)) (?> ; | (?= \} | \z ))
+        ) # End of rule (?<PerlReturnStatement>)
+
+        (?<PerlPackageDeclaration>
+        package
+            (?>(?&PerlNWS)) (?>(?&PerlQualifiedIdentifier))
+        (?: (?>(?&PerlNWS)) (?&PerlVersionNumber) )?+
+            (?>(?&PerlOWSOrEND)) (?> ; | (?&PerlBlock) | (?= \} | \z ))
+        ) # End of rule (?<PerlPackageDeclaration>)
+
+        (?<PerlExpression>
+                                (?>(?&PerlLowPrecedenceNotExpression))
+            (?: (?>(?&PerlOWS)) (?>(?&PerlLowPrecedenceInfixOperator))
+                (?>(?&PerlOWS))    (?&PerlLowPrecedenceNotExpression)  )*+
+        ) # End of rule (?<PerlExpression>)
+
+        (?<PerlLowPrecedenceNotExpression>
+            (?: not \b (?&PerlOWS) )*+  (?&PerlCommaList)
+        ) # End of rule (?<PerlLowPrecedenceNotExpression>)
+
+        (?<PerlCommaList>
+                    (?>(?&PerlAssignment))  (?>(?&PerlOWS))
+            (?:
+                (?: (?>(?&PerlComma))          (?&PerlOWS)   )++
+                    (?>(?&PerlAssignment))  (?>(?&PerlOWS))
+            )*+
+                (?: (?>(?&PerlComma))          (?&PerlOWSOrEND)   )*+
+        ) # End of rule (?<PerlCommaList>)
+
+        (?<PerlAssignment>
+                                (?>(?&PerlConditionalExpression))
+            (?:
+                (?>(?&PerlOWS)) (?>(?&PerlAssignmentOperator))
+                (?>(?&PerlOWS))    (?&PerlConditionalExpression)
+            )*+
+        ) # End of rule (?<PerlAssignment>)
+
+        (?<PerlScalarExpression>
+        (?<PerlConditionalExpression>
+            (?>(?&PerlBinaryExpression))
+            (?:
+                (?>(?&PerlOWS)) \? (?>(?&PerlOWS)) (?>(?&PerlAssignment))
+                (?>(?&PerlOWS))  : (?>(?&PerlOWS))    (?&PerlConditionalExpression)
+            )?+
+        ) # End of rule (?<PerlConditionalExpression>)
+        ) # End of rule (?<PerlScalarExpression>)
+
+        (?<PerlBinaryExpression>
+                                (?>(?&PerlPrefixPostfixTerm))
+            (?: (?>(?&PerlOWS)) (?>(?&PerlInfixBinaryOperator))
+                (?>(?&PerlOWS))    (?&PerlPrefixPostfixTerm) )*+
+        ) # End of rule (?<PerlBinaryExpression>)
+
+        (?<PerlPrefixPostfixTerm>
+            (?: (?>(?&PerlPrefixUnaryOperator))  (?&PerlOWS) )*+
+            (?>(?&PerlTerm))
+            (?:
+                # Inlined (?&PerlTermPostfixDereference)
+                (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
+                (?>
+                    (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
+                    (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
+
+                |   (?&PerlParenthesesList)
+                |   (?&PerlArrayIndexer)
+                |   (?&PerlHashIndexer)
+                |   \$\*
+                )
+
+                (?:
+                    (?>(?&PerlOWS))
+                    (?>
+                        ->  (?>(?&PerlOWS))
+                        (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
+                        (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
+                    |
+                        (?: -> (?&PerlOWS) )?+
+                        (?> (?&PerlParenthesesList)
+                        |   (?&PerlArrayIndexer)
+                        |   (?&PerlHashIndexer)
+                        |   \$\*
+                        )
+                    )
+                )*+
+
+                (?:
+                    (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\@%]
+                    (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                )?+
+                # End of inlining
+            )?+
+            (?: (?>(?&PerlOWS)) (?&PerlPostfixUnaryOperator) )?+
+        ) # End of rule (?<PerlPrefixPostfixTerm>)
+
+        (?<PerlLvalue>
+            (?>
+                \\?+ [\$\@%] (?>(?&PerlOWS)) (?&PerlIdentifier)
+            |
+                \(                                                                     (?>(?&PerlOWS))
+                    (?> \\?+ [\$\@%] (?>(?&PerlOWS)) (?&PerlIdentifier) | undef )      (?>(?&PerlOWS))
+                    (?:
+                        (?>(?&PerlComma))                                              (?>(?&PerlOWS))
+                        (?> \\?+ [\$\@%] (?>(?&PerlOWS)) (?&PerlIdentifier) | undef )  (?>(?&PerlOWS))
+                    )*+
+                    (?: (?>(?&PerlComma)) (?&PerlOWS) )?+
+                \)
+            )
+        ) # End of rule (?<PerlLvalue>)
+
+        (?<PerlTerm>
+            (?>
+                # Inlined (?&PerlReturnExpression)
+                return \b (?: (?>(?&PerlOWS)) (?&PerlExpression) )?+
+                # End of inlining
+            |
+                # Inlined (?&PerlVariableDeclaration)
+                (?> my | state | our ) \b           (?>(?&PerlOWS))
+                (?: (?&PerlQualifiedIdentifier)        (?&PerlOWS)  )?+
+                (?>(?&PerlLvalue))                  (?>(?&PerlOWSOrEND))
+                (?&PerlAttributes)?+
+                # End of inlining
+            |
+                (?&PerlAnonymousSubroutine)
+            |
+                (?&PerlVariable)
+            |
+                (?>(?&PerlNullaryBuiltinFunction))  (?! (?>(?&PerlOWS)) \( )
+            |
+                # Inlined (?&PerlDoBlock) | (?&PerlEvalBlock)
+                (?> do | eval ) (?>(?&PerlOWS)) (?&PerlBlock)
+                # End of inlining
+            |
+                (?&PerlCall)
+            |
+                (?&PerlTypeglob)
+            |
+                (?>(?&PerlParenthesesList))
+                (?: (?>(?&PerlOWS)) (?&PerlArrayIndexer) )?+
+                (?:
+                    (?>(?&PerlOWS))
+                    (?>
+                        (?&PerlArrayIndexer)
+                    |   (?&PerlHashIndexer)
+                    )
+                )*+
+            |
+                (?&PerlAnonymousArray)
+            |
+                (?&PerlAnonymousHash)
+            |
+                (?&PerlDiamondOperator)
+            |
+                (?&PerlContextualMatch)
+            |
+                (?&PerlQuotelikeS)
+            |
+                (?&PerlQuotelikeTR)
+            |
+                (?&PerlQuotelikeQX)
+            |
+                (?&PerlLiteral)
+            )
+        ) # End of rule (?<PerlTerm>)
+
+        (?<PerlTermPostfixDereference>
+        (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
         (?>
-            \d++
-        |
-            \^ [][A-Z^_?\\]
-        |
-            \{ \^ [A-Z_] \w*+ \}
-        |
-            (?>(?&PerlOldQualifiedIdentifier))  (?: :: )?+
-        |
-            (?&PerlVariableScalar)
-        |
-            [][!"#\$%&'()*+,./:;<=>?\@\^`|~-]
-        |
-            (?&PerlBlock)
+            (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
+            (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
+
+        |   (?&PerlParenthesesList)
+        |   (?&PerlArrayIndexer)
+        |   (?&PerlHashIndexer)
+        |   \$\*
         )
-        (?:
-            (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
-            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
-        )*+
-        (?:
-            (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-            [\@%]
-            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-        )?+
-    ) # End of rule
 
-    (?<PerlArrayAccess>
-        (?>(?&PerlVariableArray))
-        (?:
-            (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
-            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
-        )*+
-        (?:
-            (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-            [\@%]
-            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-        )?+
-    ) # End of rule
-
-    (?<PerlArrayAccessNoSpace>
-        (?>(?&PerlVariableArrayNoSpace))
-        (?:
-            (?: -> )?+
-            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
-        )*+
-        (?:
-            ->
-            [\@%]
-            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-        )?+
-    ) # End of rule
-
-    (?<PerlArrayAccessNoSpaceNoArrow>
-        (?>(?&PerlVariableArray))
-        (?:
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
-        )*+
-    ) # End of rule
-
-    (?<PerlHashAccess>
-        (?>(?&PerlVariableHash))
-        (?:
-            (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
-            (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
-        )*+
-        (?:
-            (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
-            [\@%]
-            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-        )?+
-    ) # End of rule
-
-    (?<PerlScalarAccess>
-        (?>(?&PerlVariableScalar))
         (?:
             (?>(?&PerlOWS))
-            (?:
-                (?:
-                    (?>(?&PerlOWS))      -> (?>(?&PerlOWS))
-                    (?&PerlParenthesesList)
-                |
-                    (?>(?&PerlOWS))  (?: ->    (?&PerlOWS)  )?+
-                    (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+            (?>
+                ->  (?>(?&PerlOWS))
+                (?> (?&PerlQualifiedIdentifier) | (?&PerlVariableScalar) )
+                (?: (?>(?&PerlOWS)) (?&PerlParenthesesList) )?+
+            |
+                (?: -> (?&PerlOWS) )?+
+                (?> (?&PerlParenthesesList)
+                |   (?&PerlArrayIndexer)
+                |   (?&PerlHashIndexer)
+                |   \$\*
                 )
+            )
+        )*+
+        (?:
+            (?>(?&PerlOWS)) -> (?>(?&PerlOWS)) [\@%]
+            (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+        )?+
+        ) # End of rule (?<PerlTermPostfixDereference>)
+
+        (?<PerlControlBlock>
+            (?> # Conditionals...
+                (?> if | unless ) \b                 (?>(?&PerlOWS))
+                (?>(?&PerlParenthesesList))          (?>(?&PerlOWS))
+                (?>(?&PerlBlock))
+
                 (?:
-                    (?>(?&PerlOWS))  (?: ->    (?&PerlOWS)  )?+
-                    (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                                                    (?>(?&PerlOWS))
+                    (?>(?&PerlPodSequence))
+                    elsif \b                         (?>(?&PerlOWS))
+                    (?>(?&PerlParenthesesList))      (?>(?&PerlOWS))
+                    (?&PerlBlock)
                 )*+
+
+                (?:
+                                                    (?>(?&PerlOWS))
+                    (?>(?&PerlPodSequence))
+                    else \b                          (?>(?&PerlOWS))
+                    (?&PerlBlock)
+                )?+
+
+            |   # Loops...
+                (?>
+                    for(?:each)?+ \b
+                    (?>(?&PerlOWS))
+                    (?:
+                        (?> # Explicitly aliased iterator variable...
+                            (?> \\ (?>(?&PerlOWS))  (?> my | our | state )
+                            |                       (?> my | our | state )  (?>(?&PerlOWS)) \\
+                            )
+                            (?>(?&PerlOWS))
+                            (?> (?&PerlVariableScalar)
+                            |   (?&PerlVariableArray)
+                            |   (?&PerlVariableHash)
+                            )
+                        |
+                            # Implicitly aliased iterator variable...
+                            (?> (?: my | our | state ) (?>(?&PerlOWS)) )?+
+                            (?&PerlVariableScalar)
+                        )?+
+                        (?>(?&PerlOWS))
+                        (?> (?&PerlParenthesesList) | (?&PerlQuotelikeQW) )
+                    |
+                        (?&PPR_three_part_list)
+                    )
+                |
+                    (?> while | until) \b (?>(?&PerlOWS))
+                    (?&PerlParenthesesList)
+                )
+
+                (?>(?&PerlOWS))
+                (?>(?&PerlBlock))
+
+                (?:
+                    (?>(?&PerlOWS))   continue
+                    (?>(?&PerlOWS))   (?&PerlBlock)
+                )?+
+
+            | # Phasers...
+                (?> BEGIN | END | CHECK | INIT | UNITCHECK ) \b   (?>(?&PerlOWS))
+                (?&PerlBlock)
+
+            | # Switches...
+                (?> given | when ) \b                             (?>(?&PerlOWS))
+                (?>(?&PerlParenthesesList))                            (?>(?&PerlOWS))
+                (?&PerlBlock)
+            |
+                default                                           (?>(?&PerlOWS))
+                (?&PerlBlock)
+            )
+        ) # End of rule (?<PerlControlBlock>)
+
+        (?<PerlFormat>
+            format
+            (?: (?>(?&PerlNWS))  (?&PerlQualifiedIdentifier)  )?+
+                (?>(?&PerlOWS))  = [^\n]*+
+                (?&PPR_newline_and_heredoc)
+            (?:
+                (?! \. \n )
+                [^\n\$\@]*+
+                (?:
+                    (?>
+                        (?= \$ (?! \s ) )  (?&PerlScalarAccessNoSpace)
+                    |
+                        (?= \@ (?! \s ) )  (?&PerlArrayAccessNoSpace)
+                    )
+                    [^\n\$\@]*+
+                )*+
+                (?&PPR_newline_and_heredoc)
+            )*+
+            \. (?&PerlEndOfLine)
+        ) # End of rule (?<PerlFormat>)
+
+        (?<PerlStatementModifier>
+            (?> if | for(?:each)?+ | while | unless | until | when )
+            \b
+            (?>(?&PerlOWS))
+            (?&PerlExpression)
+        ) # End of rule (?<PerlStatementModifier>)
+
+        (?<PerlBlock>
+            \{  (?>(?&PerlStatementSequence))  \}
+        ) # End of rule (?<PerlBlock>)
+
+        (?<PerlCall>
+            (?>
+                [&]                                    (?>(?&PerlOWS))
+                (?> (?&PerlBlock)
+                |   (?&PerlVariableScalar)
+                |   (?&PerlQualifiedIdentifier)
+                )                                      (?>(?&PerlOWS))
+                (?:
+                    \(                                 (?>(?&PerlOWS))
+                        (?: (?>(?&PerlExpression))        (?&PerlOWS)   )?+
+                    \)
+                )?+
+            |
+                - (?>(?&PPR_filetest_name))            (?>(?&PerlOWS))
+                (?&PerlPrefixPostfixTerm)?+
+            |
+                (?>(?&PerlBuiltinFunction))            (?>(?&PerlOWS))
+                (?>
+                    \(                                 (?>(?&PerlOWS))
+                        (?>
+                            (?= (?>(?&PPR_non_reserved_identifier))
+                                (?>(?&PerlOWS))
+                                (?! \( | (?&PerlComma) )
+                            )
+                            (?&PerlCall)
+                        |
+                            (?>(?&PerlBlock))          (?>(?&PerlOWS))
+                            (?&PerlExpression)?+
+                        |
+                            (?>(?&PPR_indirect_obj))   (?>(?&PerlNWS))
+                            (?&PerlExpression)
+                        |
+                            (?&PerlExpression)?+
+                        )                              (?>(?&PerlOWS))
+                    \)
+                |
+                        (?>
+                            (?=
+                                (?>(?&PPR_non_reserved_identifier))
+                                (?>(?&PerlOWS))
+                                (?! \( | (?&PerlComma) )
+                            )
+                            (?&PerlCall)
+                        |
+                            (?>(?&PerlBlock))          (?>(?&PerlOWS))
+                            (?&PerlCommaList)?+
+                        |
+                            (?>(?&PPR_indirect_obj))   (?>(?&PerlNWS))
+                            (?&PerlCommaList)
+                        |
+                            (?&PerlCommaList)?+
+                        )
+                )
+            |
+                (?>(?&PPR_non_reserved_identifier)) (?>(?&PerlOWS))
+                (?>
+                    \(                              (?>(?&PerlOWS))
+                        (?: (?>(?&PerlExpression))     (?&PerlOWS)  )?+
+                    \)
+                |
+                        (?>
+                            (?=
+                                (?>(?&PPR_non_reserved_identifier))
+                                (?>(?&PerlOWS))
+                                (?! \( | (?&PerlComma) )
+                            )
+                            (?&PerlCall)
+                        |
+                            (?>(?&PerlBlock))           (?>(?&PerlOWS))
+                            (?&PerlCommaList)?+
+                        |
+                            (?>(?&PPR_indirect_obj))        (?&PerlNWS)
+                            (?&PerlCommaList)
+                        |
+                            (?&PerlCommaList)?+
+                        )
+                )
+            )
+        ) # End of rule (?<PerlCall>)
+
+        (?<PerlVariableDeclaration>
+            (?> my | state | our ) \b           (?>(?&PerlOWS))
+            (?: (?&PerlQualifiedIdentifier)        (?&PerlOWS)  )?+
+            (?>(?&PerlLvalue))                  (?>(?&PerlOWS))
+            (?&PerlAttributes)?+
+        ) # End of rule (?<PerlVariableDeclaration>)
+
+        (?<PerlDoBlock>
+            do (?>(?&PerlOWS)) (?&PerlBlock)
+        ) # End of rule (?<PerlDoBlock>)
+
+        (?<PerlEvalBlock>
+            eval (?>(?&PerlOWS)) (?&PerlBlock)
+        ) # End of rule (?<PerlEvalBlock>)
+
+        (?<PerlAttributes>
+            :
+            (?>(?&PerlOWS))
+            (?>(?&PerlIdentifier))
+            (?:
+                (?= \( ) (?&PPR_quotelike_body)
             )?+
+
+            (?:
+                (?> (?>(?&PerlOWS)) : (?&PerlOWS) | (?&PerlNWS) )
+                (?>(?&PerlIdentifier))
+                (?:
+                    (?= \( ) (?&PPR_quotelike_body)
+                )?+
+            )*+
+        ) # End of rule (?<PerlAttributes>)
+
+        (?<PerlList>
+            (?> (?&PerlParenthesesList) | (?&PerlCommaList) )
+        ) # End of rule (?<PerlList>)
+
+        (?<PerlParenthesesList>
+            \(  (?>(?&PerlOWS))  (?: (?>(?&PerlExpression)) (?&PerlOWS) )?+  \)
+        ) # End of rule (?<PerlParenthesesList>)
+
+        (?<PerlAnonymousArray>
+            \[  (?>(?&PerlOWS))  (?: (?>(?&PerlExpression)) (?&PerlOWS) )?+  \]
+        ) # End of rule (?<PerlAnonymousArray>)
+
+        (?<PerlAnonymousHash>
+            \{  (?>(?&PerlOWS))  (?: (?>(?&PerlExpression)) (?&PerlOWS) )?+ \}
+        ) # End of rule (?<PerlAnonymousHash>)
+
+        (?<PerlArrayIndexer>
+            \[                          (?>(?&PerlOWS))
+                (?>(?&PerlExpression))  (?>(?&PerlOWS))
+            \]
+        ) # End of rule (?<PerlArrayIndexer>)
+
+        (?<PerlHashIndexer>
+            \{  (?>(?&PerlOWS))
+                (?: -?+ (?&PerlIdentifier) | (?&PerlExpression) )  # (Note: MUST allow backtracking here)
+                (?>(?&PerlOWS))
+            \}
+        ) # End of rule (?<PerlHashIndexer>)
+
+        (?<PerlDiamondOperator>
+            <<>>    # Perl 5.22 "double diamond"
+        |
+            < (?! < )
+                (?>(?&PPR_balanced_angles))
+            >
+            (?=
+                (?>(?&PerlOWSOrEND))
+                (?> \z | [,;\}\])?] | => | : (?! :)        # (
+                |   (?&PerlInfixBinaryOperator) | (?&PerlLowPrecedenceInfixOperator)
+                |   (?= \w) (?> for(?:each)?+ | while | if | unless | until | when )
+                )
+            )
+        ) # End of rule (?<PerlDiamondOperator>)
+
+        (?<PerlComma>
+            (?> , | => )
+        ) # End of rule (?<PerlComma>)
+
+        (?<PerlPrefixUnaryOperator>
+            (?> \+\+ | -- | [!\\+~] | - (?! (?&PPR_filetest_name) \b ) )
+        ) # End of rule (?<PerlPrefixUnaryOperator>)
+
+        (?<PerlPostfixUnaryOperator>
+            (?> \+\+  |  -- )
+        ) # End of rule (?<PerlPostfixUnaryOperator>)
+
+        (?<PerlInfixBinaryOperator>
+            (?>  [=!][~=]
+            |    cmp
+            |    <= >?+
+            |    >=
+            |    [lg][te]
+            |    eq
+            |    ne
+            |    [+]             (?! [+=] )
+            |     -              (?! [-=] )
+            |    [.]{2,3}+
+            |    [.%x]           (?! [=]  )
+            |    [&|^][.]        (?! [=]  )
+            |    [<>*&|/]{1,2}+  (?! [=]  )
+            |    \^              (?! [=]  )
+            |    ~~
+            )
+        ) # End of rule (?<PerlInfixBinaryOperator>)
+
+        (?<PerlAssignmentOperator>
+            (?:  [<>*&|/]{2}
+            |  [-+.*/%x]
+            |  [&|^][.]?+
+            )?+
+            =
+            (?! > )
+        ) # End of rule (?<PerlAssignmentOperator>)
+
+        (?<PerlLowPrecedenceInfixOperator>
+            (?> or | and | xor )
+        ) # End of rule (?<PerlLowPrecedenceInfixOperator>)
+
+        (?<PerlAnonymousSubroutine>
+            sub \b
+            (?>(?&PerlOWS))
+            (?:
+                # Perl pre 5.028
+                (?:
+                    (?>
+                        (?&PerlParenthesesList)    # Parameter list
+                    |
+                        \( [^)]*+ \)               # Prototype (
+                    )
+                    (?&PerlOWS)
+                )?+
+                (?: (?>(?&PerlAttributes))  (?&PerlOWS) )?+
+            |
+                # Perl post 5.028
+                (?: (?>(?&PerlAttributes))       (?&PerlOWS) )?+
+                (?: (?>(?&PerlParenthesesList))  (?&PerlOWS) )?+    # Parameter list
+            )
+            (?&PerlBlock)
+        ) # End of rule (?<PerlAnonymousSubroutine>)
+
+        (?<PerlVariable>
+            (?= [\$\@%] )
+            (?>
+                (?&PerlScalarAccess)
+            |   (?&PerlHashAccess)
+            |   (?&PerlArrayAccess)
+            )
+        ) # End of rule (?<PerlVariable>)
+
+        (?<PerlTypeglob>
+            \*
+            (?>
+                \d++
+            |
+                \^ [][A-Z^_?\\]
+            |
+                \{ \^ [A-Z_] \w*+ \}
+            |
+                (?>(?&PerlOldQualifiedIdentifier))  (?: :: )?+
+            |
+                (?&PerlVariableScalar)
+            |
+                [][!"#\$%&'()*+,./:;<=>?\@\^`|~-]
+            |
+                (?&PerlBlock)
+            )
+            (?:
+                (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
+                (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+            )*+
             (?:
                 (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
                 [\@%]
                 (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
             )?+
-        )?+
-    ) # End of rule
+        ) # End of rule (?<PerlTypeglob>)
 
-    (?<PerlScalarAccessNoSpace>
-        (?>(?&PerlVariableScalarNoSpace))
-        (?:
+        (?<PerlArrayAccess>
+            (?>(?&PerlVariableArray))
             (?:
-                (?:
-                    ->
-                    (?&PerlParenthesesList)
-                |
-                    (?: -> )?+
-                    (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
-                )
-                (?:
-                    (?: -> )?+
-                    (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
-                )*+
+                (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
+                (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
+            )*+
+            (?:
+                (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
+                [\@%]
+                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
             )?+
+        ) # End of rule (?<PerlArrayAccess>)
+
+        (?<PerlArrayAccessNoSpace>
+            (?>(?&PerlVariableArrayNoSpace))
+            (?:
+                (?: -> )?+
+                (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
+            )*+
             (?:
                 ->
                 [\@%]
                 (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
             )?+
-        )?+
-    ) # End of rule
+        ) # End of rule (?<PerlArrayAccessNoSpace>)
 
-    (?<PerlScalarAccessNoSpaceNoArrow>
-        (?>(?&PerlVariableScalarNoSpace))
-        (?:
-            (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
-        )*+
-    ) # End of rule
-
-    (?<PerlVariableScalar>
-        \$\$
-        (?! [\$\{\w] )
-    |
-        (?:
-            \$
+        (?<PerlArrayAccessNoSpaceNoArrow>
+            (?>(?&PerlVariableArray))
             (?:
-                [#]
-                (?=  (?> [\$^\w\{:+] | - (?! > ) )  )
-            )?+
-            (?&PerlOWS)
-        )++
-        (?>
-            \d++
-        |
-            \^ [][A-Z^_?\\]
-        |
-            \{ \^ [A-Z_] \w*+ \}
-        |
-            (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
-        |
-            :: (?&PerlBlock)
-        |
-            [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
-        |
-            \{ [!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-] \}
-        |
-            \{ \w++ \}
-        |
-            (?&PerlBlock)
-        )
-    |
-        \$\#
-    ) # End of rule
+                (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList)  )
+            )*+
+        ) # End of rule (?<PerlArrayAccessNoSpaceNoArrow>)
 
-    (?<PerlVariableScalarNoSpace>
-        \$\$
-        (?! [\$\{\w] )
-    |
-        (?:
-            \$
+        (?<PerlHashAccess>
+            (?>(?&PerlVariableHash))
             (?:
-                [#]
-                (?=  (?> [\$^\w\{:+] | - (?! > ) )  )
+                (?>(?&PerlOWS)) (?: -> (?&PerlOWS) )?+
+                (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+            )*+
+            (?:
+                (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
+                [\@%]
+                (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
             )?+
-        )++
-        (?>
-            \d++
-        |
-            \^ [][A-Z^_?\\]
-        |
-            \{ \^ [A-Z_] \w*+ \}
-        |
-            (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
-        |
-            :: (?&PerlBlock)
-        |
-            [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
-        |
-            \{ \w++ \}
-        |
-            (?&PerlBlock)
-        )
-    |
-        \$\#
-    ) # End of rule
+        ) # End of rule (?<PerlHashAccess>)
 
-    (?<PerlVariableArray>
-        \@     (?>(?&PerlOWS))
-        (?: \$    (?&PerlOWS)  )*+
-        (?>
-            \d++
-        |
-            \^ [][A-Z^_?\\]
-        |
-            \{ \^ [A-Z_] \w*+ \}
-        |
-            (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
-        |
-            :: (?&PerlBlock)
-        |
-            [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
-        |
-            (?&PerlBlock)
-        )
-    ) # End of rule
+        (?<PerlScalarAccess>
+            (?>(?&PerlVariableScalar))
+            (?:
+                (?>(?&PerlOWS))
+                (?:
+                    (?:
+                        (?>(?&PerlOWS))      -> (?>(?&PerlOWS))
+                        (?&PerlParenthesesList)
+                    |
+                        (?>(?&PerlOWS))  (?: ->    (?&PerlOWS)  )?+
+                        (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                    )
+                    (?:
+                        (?>(?&PerlOWS))  (?: ->    (?&PerlOWS)  )?+
+                        (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                    )*+
+                )?+
+                (?:
+                    (?>(?&PerlOWS)) -> (?>(?&PerlOWS))
+                    [\@%]
+                    (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                )?+
+            )?+
+        ) # End of rule (?<PerlScalarAccess>)
 
-    (?<PerlVariableArrayNoSpace>
-        \@
-        (?: \$ )*+
-        (?>
-            \d++
-        |
-            \^ [][A-Z^_?\\]
-        |
-            \{ \^ [A-Z_] \w*+ \}
-        |
-            (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
-        |
-            :: (?&PerlBlock)
-        |
-            [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
-        |
-            (?&PerlBlock)
-        )
-    ) # End of rule
+        (?<PerlScalarAccessNoSpace>
+            (?>(?&PerlVariableScalarNoSpace))
+            (?:
+                (?:
+                    (?:
+                        ->
+                        (?&PerlParenthesesList)
+                    |
+                        (?: -> )?+
+                        (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                    )
+                    (?:
+                        (?: -> )?+
+                        (?> \$\* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+                    )*+
+                )?+
+                (?:
+                    ->
+                    [\@%]
+                    (?> \* | (?&PerlArrayIndexer) | (?&PerlHashIndexer) )
+                )?+
+            )?+
+        ) # End of rule (?<PerlScalarAccessNoSpace>)
 
-    (?<PerlVariableHash>
-        %      (?>(?&PerlOWS))
-        (?: \$    (?&PerlOWS)  )*+
-        (?>
-            \d++
-        |
-            \^ [][A-Z^_?\\]
-        |
-            \{ \^ [A-Z_] \w*+ \}
-        |
-            (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
-        |
-            :: (?&PerlBlock)?+
-        |
-            [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
-        |
-            (?&PerlBlock)
-        )
-    ) # End of rule
+        (?<PerlScalarAccessNoSpaceNoArrow>
+            (?>(?&PerlVariableScalarNoSpace))
+            (?:
+                (?> (?&PerlArrayIndexer) | (?&PerlHashIndexer) | (?&PerlParenthesesList) )
+            )*+
+        ) # End of rule (?<PerlScalarAccessNoSpaceNoArrow>)
 
-    (?<PerlLabel>
-        (?! (?> [msy] | q[wrxq]?+ | tr ) \b )
-        (?>(?&PerlIdentifier))
-        : (?! : )
-    ) # End of rule
-
-    (?<PerlLiteral>
-        (?> (?&PerlString)
-        |   (?&PerlQuotelikeQR)
-        |   (?&PerlQuotelikeQW)
-        |   (?&PerlNumber)
-        |   (?&PerlBareword)
-        )
-    ) # End of rule
-
-    (?<PerlString>
-        (?>
-            "  [^"\\]*+  (?: \\. [^"\\]*+ )*+ "
+        (?<PerlVariableScalar>
+            \$\$
+            (?! [\$\{\w] )
         |
-            '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
-        |
-            qq \b
-            (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-            (?&PPR_quotelike_body_interpolated)
-        |
-            q \b
-            (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-            (?&PPR_quotelike_body)
-        |
-            (?&PerlHeredoc)
-        |
-            (?&PerlVString)
-        )
-    ) # End of rule
-
-    (?<PerlQuotelike>
-        (?> (?&PerlString)
-        |   (?&PerlQuotelikeQR)
-        |   (?&PerlQuotelikeQW)
-        |   (?&PerlQuotelikeQX)
-        |   (?&PerlContextualMatch)
-        |   (?&PerlQuotelikeS)
-        |   (?&PerlQuotelikeTR)
-        )
-    ) # End of rule
-
-    (?<PerlHeredoc>
-        # Match the introducer...
-        <<
-        (?<_heredoc_indented> [~]?+ )
-
-        # Match the terminator specification...
-        (?>
-            \\?+   (?<_heredoc_terminator>  (?&PerlIdentifier)              )
-        |
-            (?>(?&PerlOWS))
+            (?:
+                \$
+                (?:
+                    [#]
+                    (?=  (?> [\$^\w\{:+] | - (?! > ) )  )
+                )?+
+                (?&PerlOWS)
+            )++
             (?>
-                "  (?<_heredoc_terminator>  [^"\\]*+  (?: \\. [^"\\]*+ )*+  )  "  #"
+                \d++
             |
-                (?<PPR_HD_nointerp> ' )
-                   (?<_heredoc_terminator>  [^'\\]*+  (?: \\. [^'\\]*+ )*+  )  '  #'
+                \^ [][A-Z^_?\\]
             |
-                `  (?<_heredoc_terminator>  [^`\\]*+  (?: \\. [^`\\]*+ )*+  )  `  #`
+                \{ \^ [A-Z_] \w*+ \}
+            |
+                (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
+            |
+                :: (?&PerlBlock)
+            |
+                [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
+            |
+                \{ [!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-] \}
+            |
+                \{ \w++ \}
+            |
+                (?&PerlBlock)
             )
         |
-                   (?<_heredoc_terminator>                                  )
-        )
+            \$\#
+        ) # End of rule (?<PerlVariableScalar>)
 
-        # Do we need to reset the heredoc cache???
-        (?{
-            if ( ($PPR::_heredoc_origin // q{}) ne $_ ) {
-                %PPR::_heredoc_skip      = ();
-                %PPR::_heredoc_parsed_to = ();
-                $PPR::_heredoc_origin    = $_;
-            }
-        })
+        (?<PerlVariableScalarNoSpace>
+            \$\$
+            (?! [\$\{\w] )
+        |
+            (?:
+                \$
+                (?:
+                    [#]
+                    (?=  (?> [\$^\w\{:+] | - (?! > ) )  )
+                )?+
+            )++
+            (?>
+                \d++
+            |
+                \^ [][A-Z^_?\\]
+            |
+                \{ \^ [A-Z_] \w*+ \}
+            |
+                (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
+            |
+                :: (?&PerlBlock)
+            |
+                [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
+            |
+                \{ \w++ \}
+            |
+                (?&PerlBlock)
+            )
+        |
+            \$\#
+        ) # End of rule (?<PerlVariableScalarNoSpace>)
 
-        # Do we need to cache content lookahead for this heredoc???
-        (?(?{ my $need_to_lookahead = !$PPR::_heredoc_parsed_to{+pos()};
-              $PPR::_heredoc_parsed_to{+pos()} = 1;
-              $need_to_lookahead;
+        (?<PerlVariableArray>
+            \@     (?>(?&PerlOWS))
+            (?: \$    (?&PerlOWS)  )*+
+            (?>
+                \d++
+            |
+                \^ [][A-Z^_?\\]
+            |
+                \{ \^ [A-Z_] \w*+ \}
+            |
+                (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
+            |
+                :: (?&PerlBlock)
+            |
+                [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
+            |
+                (?&PerlBlock)
+            )
+        ) # End of rule (?<PerlVariableArray>)
+
+        (?<PerlVariableArrayNoSpace>
+            \@
+            (?: \$ )*+
+            (?>
+                \d++
+            |
+                \^ [][A-Z^_?\\]
+            |
+                \{ \^ [A-Z_] \w*+ \}
+            |
+                (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
+            |
+                :: (?&PerlBlock)
+            |
+                [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
+            |
+                (?&PerlBlock)
+            )
+        ) # End of rule (?<PerlVariableArrayNoSpace>)
+
+        (?<PerlVariableHash>
+            %      (?>(?&PerlOWS))
+            (?: \$    (?&PerlOWS)  )*+
+            (?>
+                \d++
+            |
+                \^ [][A-Z^_?\\]
+            |
+                \{ \^ [A-Z_] \w*+ \}
+            |
+                (?>(?&PerlOldQualifiedIdentifier)) (?: :: )?+
+            |
+                :: (?&PerlBlock)?+
+            |
+                [][!"#\$%&'()*+,.\\/:;<=>?\@\^`|~-]
+            |
+                (?&PerlBlock)
+            )
+        ) # End of rule (?<PerlVariableHash>)
+
+        (?<PerlLabel>
+            (?! (?> [msy] | q[wrxq]?+ | tr ) \b )
+            (?>(?&PerlIdentifier))
+            : (?! : )
+        ) # End of rule (?<PerlLabel>)
+
+        (?<PerlLiteral>
+            (?> (?&PerlString)
+            |   (?&PerlQuotelikeQR)
+            |   (?&PerlQuotelikeQW)
+            |   (?&PerlNumber)
+            |   (?&PerlBareword)
+            )
+        ) # End of rule (?<PerlLiteral>)
+
+        (?<PerlString>
+            (?>
+                "  [^"\\]*+  (?: \\. [^"\\]*+ )*+ "
+            |
+                '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
+            |
+                qq \b
+                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                (?&PPR_quotelike_body_interpolated)
+            |
+                q \b
+                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                (?&PPR_quotelike_body)
+            |
+                (?&PerlHeredoc)
+            |
+                (?&PerlVString)
+            )
+        ) # End of rule (?<PerlString>)
+
+        (?<PerlQuotelike>
+            (?> (?&PerlString)
+            |   (?&PerlQuotelikeQR)
+            |   (?&PerlQuotelikeQW)
+            |   (?&PerlQuotelikeQX)
+            |   (?&PerlContextualMatch)
+            |   (?&PerlQuotelikeS)
+            |   (?&PerlQuotelikeTR)
+            )
+        ) # End of rule (?<PerlQuotelike>)
+
+        (?<PerlHeredoc>
+            # Match the introducer...
+            <<
+            (?<_heredoc_indented> [~]?+ )
+
+            # Match the terminator specification...
+            (?>
+                \\?+   (?<_heredoc_terminator>  (?&PerlIdentifier)              )
+            |
+                (?>(?&PerlOWS))
+                (?>
+                    "  (?<_heredoc_terminator>  [^"\\]*+  (?: \\. [^"\\]*+ )*+  )  "  #"
+                |
+                    (?<PPR_HD_nointerp> ' )
+                    (?<_heredoc_terminator>  [^'\\]*+  (?: \\. [^'\\]*+ )*+  )  '  #'
+                |
+                    `  (?<_heredoc_terminator>  [^`\\]*+  (?: \\. [^`\\]*+ )*+  )  `  #`
+                )
+            |
+                    (?<_heredoc_terminator>                                  )
+            )
+
+            # Do we need to reset the heredoc cache???
+            (?{
+                if ( ($PPR::_heredoc_origin // q{}) ne $_ ) {
+                    %PPR::_heredoc_skip      = ();
+                    %PPR::_heredoc_parsed_to = ();
+                    $PPR::_heredoc_origin    = $_;
+                }
             })
 
-            # Lookahead to detect and remember trailing contents of heredoc
-            (?=
-                [^\n]*+ \n                                   # Go to the end of the current line
-                (?{ +pos() })                                # Remember the start of the contents
-                (??{ $PPR::_heredoc_skip{+pos()} // q{} })   # Skip earlier heredoc contents
-                (?>                                          # The heredoc contents consist of...
-                    (?:
-                        (?!
-                            (?(?{ $+{_heredoc_indented} }) \h*+ )   # An indent (if it was a <<~)
-                            \g{_heredoc_terminator}                 # The terminator
-                            (?: \n | \z )                           # At an end-of-line
-                        )
-                        (?(<PPR_HD_nointerp>)
-                            [^\n]*+ \n
-                        |
-                            [^\n\$\@]*+
-                            (?:
-                                (?>
-                                    (?{ local $PPR::_heredoc_EOL_start = $^R })
-                                    (?= \$ (?! \s ) )  (?&PerlScalarAccessNoSpace)
-                                    (?{ $PPR::_heredoc_EOL_start })
-                                |
-                                    (?{ local $PPR::_heredoc_EOL_start = $^R })
-                                    (?= \@ (?! \s ) )  (?&PerlArrayAccessNoSpace)
-                                    (?{ $PPR::_heredoc_EOL_start })
-                                )
-                                [^\n\$\@]*+
-                            )*+
-                            \n (??{ $PPR::_heredoc_skip{+pos()} // q{} })
-                        )
-                    )*+
-
-                    (?(?{ $+{_heredoc_indented} }) \h*+ )            # An indent (if it was a <<~)
-                    \g{_heredoc_terminator}                          # The specified terminator
-                    (?: \n | \z )                                    # Followed by EOL
-                )
-
-                # Then memoize the skip for when it's subsequently needed by PerlOWS or PerlNWS...
-                (?{
-                    # Split .{N} repetition into multiple repetitions to avoid the 32766 limit...
-                    $PPR::_heredoc_skip{$^R} = '(?s:'
-                                             . ( '.{32766}' x int((pos() - $^R) / 32766) )
-                                             . '.{' . (pos() - $^R) % 32766 . '})';
+            # Do we need to cache content lookahead for this heredoc???
+            (?(?{ my $need_to_lookahead = !$PPR::_heredoc_parsed_to{+pos()};
+                $PPR::_heredoc_parsed_to{+pos()} = 1;
+                $need_to_lookahead;
                 })
-            )
-        )
 
-    ) # End of rule
+                # Lookahead to detect and remember trailing contents of heredoc
+                (?=
+                    [^\n]*+ \n                                   # Go to the end of the current line
+                    (?{ +pos() })                                # Remember the start of the contents
+                    (??{ $PPR::_heredoc_skip{+pos()} // q{} })   # Skip earlier heredoc contents
+                    (?>                                          # The heredoc contents consist of...
+                        (?:
+                            (?!
+                                (?(?{ $+{_heredoc_indented} }) \h*+ )   # An indent (if it was a <<~)
+                                \g{_heredoc_terminator}                 # The terminator
+                                (?: \n | \z )                           # At an end-of-line
+                            )
+                            (?(<PPR_HD_nointerp>)
+                                [^\n]*+ \n
+                            |
+                                [^\n\$\@]*+
+                                (?:
+                                    (?>
+                                        (?{ local $PPR::_heredoc_EOL_start = $^R })
+                                        (?= \$ (?! \s ) )  (?&PerlScalarAccessNoSpace)
+                                        (?{ $PPR::_heredoc_EOL_start })
+                                    |
+                                        (?{ local $PPR::_heredoc_EOL_start = $^R })
+                                        (?= \@ (?! \s ) )  (?&PerlArrayAccessNoSpace)
+                                        (?{ $PPR::_heredoc_EOL_start })
+                                    )
+                                    [^\n\$\@]*+
+                                )*+
+                                \n (??{ $PPR::_heredoc_skip{+pos()} // q{} })
+                            )
+                        )*+
 
-    (?<PerlQuotelikeQ>
-        (?>
-            '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
-        |
-            \b q \b
-            (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-            (?&PPR_quotelike_body)
-        )
-    ) # End of rule
+                        (?(?{ $+{_heredoc_indented} }) \h*+ )            # An indent (if it was a <<~)
+                        \g{_heredoc_terminator}                          # The specified terminator
+                        (?: \n | \z )                                    # Followed by EOL
+                    )
 
-    (?<PerlQuotelikeQQ>
-        (?>
-            "  [^"\\]*+  (?: \\. [^"\\]*+ )*+ "
-        |
-            \b qq \b
-            (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-            (?&PPR_quotelike_body_interpolated)
-        )
-    ) # End of rule
-
-    (?<PerlQuotelikeQW>
-        (?>
-            qw \b
-            (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-            (?&PPR_quotelike_body)
-        )
-    ) # End of rule
-
-    (?<PerlQuotelikeQX>
-        (?>
-            `  [^`]*+  (?: \\. [^`]*+ )*+  `
-        |
-            qx
-                (?:
-                    (?&PerlOWS) ' (?&PPR_quotelike_body)
-                |
-                    \b (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-                    (?&PPR_quotelike_body_interpolated)
+                    # Then memoize the skip for when it's subsequently needed by PerlOWS or PerlNWS...
+                    (?{
+                        # Split .{N} repetition into multiple repetitions to avoid the 32766 limit...
+                        $PPR::_heredoc_skip{$^R} = '(?s:'
+                                                . ( '.{32766}' x int((pos() - $^R) / 32766) )
+                                                . '.{' . (pos() - $^R) % 32766 . '})';
+                    })
                 )
-        )
-    ) # End of rule
+            )
 
-    (?<PerlQuotelikeS>
-    (?<PerlSubstitution>
-        s \b
-        (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-        (?>
-            # Hashed syntax...
-            (?= [#] )
-            (?>(?&PPR_regex_body_interpolated_unclosed))
-               (?&PPR_quotelike_s_e_check)
-            (?>(?&PPR_quotelike_body_interpolated))
-        |
-            # Bracketed syntax...
-            (?= (?>(?&PerlOWS)) [\[(<\{] )      # )
-            (?>(?&PPR_regex_body_interpolated))
-            (?>(?&PerlOWS))
-               (?&PPR_quotelike_s_e_check)
-            (?>(?&PPR_quotelike_body_interpolated))
-        |
-            # Delimited syntax...
-            (?>(?&PPR_regex_body_interpolated_unclosed))
-               (?&PPR_quotelike_s_e_check)
-            (?>(?&PPR_quotelike_body_interpolated))
-        )
-        [msixpodualgcern]*+
-    ) # End of rule
-    ) # End of rule
+        ) # End of rule (?<PerlHeredoc>)
 
-    (?<PerlQuotelikeTR>
-    (?<PerlTransliteration>
-        (?> tr | y ) \b
-        (?! (?>(?&PerlOWS)) => )
-        (?>
-            # Hashed syntax...
-            (?= [#] )
-            (?>(?&PPR_quotelike_body_interpolated_unclosed))
-               (?&PPR_quotelike_body_interpolated)
-        |
-            # Bracketed syntax...
-            (?= (?>(?&PerlOWS)) [\[(<\{] )      # )
-            (?>(?&PPR_quotelike_body_interpolated))
-            (?>(?&PerlOWS))
-               (?&PPR_quotelike_body_interpolated)
-        |
-            # Delimited syntax...
-            (?>(?&PPR_quotelike_body_interpolated_unclosed))
-               (?&PPR_quotelike_body_interpolated)
-        )
-        [cdsr]*+
-    ) # End of rule
-    ) # End of rule
-
-    (?<PerlContextualQuotelikeM>
-    (?<PerlContextualMatch>
-        (?<PerlQuotelikeM>
-        (?<PerlMatch>
+        (?<PerlQuotelikeQ>
             (?>
-                \/\/
+                '  [^'\\]*+  (?: \\. [^'\\]*+ )*+ '
             |
-                (?>
-                    m (?= [#] )
-                |
-                    m \b
-                    (?! (?>(?&PerlOWS)) => )
-                |
-                    (?= \/ [^/] )
-                )
-                (?&PPR_regex_body_interpolated)
+                \b q \b
+                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                (?&PPR_quotelike_body)
             )
-            [msixpodualgcn]*+
-        ) # End of rule
-        ) # End of rule
-        (?=
-            (?>(?&PerlOWS))
-            (?> \z | [,;\}\])?] | => | : (?! :)
-            |   (?&PerlInfixBinaryOperator) | (?&PerlLowPrecedenceInfixOperator)
-            |   (?= \w) (?> for(?:each)?+ | while | if | unless | until | when )
-            )
-        )
-    ) # End of rule
-    ) # End of rule
+        ) # End of rule (?<PerlQuotelikeQ>)
 
-    (?<PerlQuotelikeQR>
-        qr \b
-        (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-        (?>(?&PPR_regex_body_interpolated))
-        [msixpodualn]*+
-    ) # End of rule
-
-    (?<PerlRegex>
-        (?>
-            (?&PerlMatch)
-        |
-            (?&PerlQuotelikeQR)
-        )
-    ) # End of rule
-
-    (?<PerlContextualRegex>
-        (?>
-            (?&PerlContextualMatch)
-        |
-            (?&PerlQuotelikeQR)
-        )
-    ) # End of rule
-
-
-    (?<PerlBuiltinFunction>
-        # Optimized to match any Perl builtin name, without backtracking...
-        (?=[^\W\d]) # Skip if possible
-        (?>
-             s(?>e(?>t(?>(?>(?>(?>hos|ne)t|gr)en|s(?>erven|ockop))t|p(?>r(?>iority|otoent)|went|grp))|m(?>ctl|get|op)|ek(?>dir)?|lect|nd)|y(?>s(?>write|call|open|read|seek|tem)|mlink)|h(?>m(?>write|read|ctl|get)|utdown|ift)|o(?>cket(?>pair)?|rt)|p(?>li(?>ce|t)|rintf)|(?>cala|ubst)r|t(?>ate?|udy)|leep|rand|qrt|ay|in)
-            | g(?>et(?>p(?>r(?>oto(?>byn(?>umber|ame)|ent)|iority)|w(?>ent|nam|uid)|eername|grp|pid)|s(?>erv(?>by(?>name|port)|ent)|ock(?>name|opt))|host(?>by(?>addr|name)|ent)|net(?>by(?>addr|name)|ent)|gr(?>ent|gid|nam)|login|c)|mtime|lob|oto|rep)
-            | r(?>e(?>ad(?>lin[ek]|pipe|dir)?|(?>quir|vers|nam)e|winddir|turn|set|cv|do|f)|index|mdir|and)
-            | c(?>h(?>o(?>m?p|wn)|r(?>oot)?|dir|mod)|o(?>n(?>tinue|nect)|s)|lose(?>dir)?|aller|rypt)
-            | e(?>nd(?>(?>hos|ne)t|p(?>roto|w)|serv|gr)ent|x(?>i(?>sts|t)|ec|p)|ach|val(?>bytes)?+|of)
-            | l(?>o(?>c(?>al(?>time)?|k)|g)|i(?>sten|nk)|(?>sta|as)t|c(?>first)?|ength)
-            | u(?>n(?>(?>lin|pac)k|shift|def|tie)|c(?>first)?|mask|time)
-            | p(?>r(?>ototype|intf?)|ack(?>age)?|o[ps]|ipe|ush)
-            | d(?>bm(?>close|open)|e(?>fined|lete)|ump|ie|o)
-            | f(?>or(?>m(?>line|at)|k)|ileno|cntl|c|lock)
-            | t(?>i(?>mes?|ed?)|ell(?>dir)?|runcate)
-            | w(?>a(?>it(?>pid)?|ntarray|rn)|rite)
-            | m(?>sg(?>ctl|get|rcv|snd)|kdir|ap)
-            | b(?>in(?>mode|d)|less|reak)
-            | i(?>n(?>dex|t)|mport|octl)
-            | a(?>ccept|larm|tan2|bs)
-            | o(?>pen(?>dir)?|ct|rd)
-            | v(?>alues|ec)
-            | k(?>eys|ill)
-            | quotemeta
-            | join
-            | next
-            | hex
-            | _
-        )
-        \b
-    ) # End of rule
-
-    (?<PerlNullaryBuiltinFunction>
-        # Optimized to match any Perl builtin name, without backtracking...
-        (?= [^\W\d] )  # Skip if possible
-        (?>
-              get(?:(?:(?:hos|ne)t|serv|gr)ent|p(?:(?:roto|w)ent|pid)|login)
-            | end(?:(?:hos|ne)t|p(?:roto|w)|serv|gr)ent
-            | wa(?:ntarray|it)
-            | times?
-            | fork
-            | _
-        )
-        \b
-    ) # End of rule
-
-    (?<PerlVersionNumber>
-        (?>
-            (?&PerlVString)
-        |
-            (?>(?&PPR_digit_seq))
-            (?: \. (?&PPR_digit_seq)?+ )*+
-        )
-    ) # End of rule
-
-    (?<PerlVString>
-        v  (?>(?&PPR_digit_seq))  (?: \. (?&PPR_digit_seq) )*+
-    ) # End of rule
-
-    (?<PerlNumber>
-        [+-]?+
-        (?>
-            0  (?>  x (?&PPR_x_digit_seq)
-               |    b (?&PPR_b_digit_seq)
-               |      (?&PPR_o_digit_seq)
-               )
-        |
+        (?<PerlQuotelikeQQ>
             (?>
-                    (?>(?&PPR_digit_seq))
-                (?: \. (?&PPR_digit_seq)?+ )?+
+                "  [^"\\]*+  (?: \\. [^"\\]*+ )*+ "
             |
-                    \. (?&PPR_digit_seq)
+                \b qq \b
+                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                (?&PPR_quotelike_body_interpolated)
             )
-            (?: [eE] [+-]?+ (?&PPR_digit_seq) )?+
-        )
-    ) # End of rule
+        ) # End of rule (?<PerlQuotelikeQQ>)
 
-    (?<PerlOldQualifiedIdentifier>
-        (?> (?> :: | ' ) \w++  |  [^\W\d]\w*+ )  (?: (?> :: | ' )  \w++ )*+
-    ) # End of rule
+        (?<PerlQuotelikeQW>
+            (?>
+                qw \b
+                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                (?&PPR_quotelike_body)
+            )
+        ) # End of rule (?<PerlQuotelikeQW>)
 
-    (?<PerlQualifiedIdentifier>
-        (?>     ::       \w++  |  [^\W\d]\w*+ )  (?: (?> :: | ' )  \w++ )*+
-    ) # End of rule
+        (?<PerlQuotelikeQX>
+            (?>
+                `  [^`]*+  (?: \\. [^`]*+ )*+  `
+            |
+                qx
+                    (?:
+                        (?&PerlOWS) ' (?&PPR_quotelike_body)
+                    |
+                        \b (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+                        (?&PPR_quotelike_body_interpolated)
+                    )
+            )
+        ) # End of rule (?<PerlQuotelikeQX>)
 
-    (?<PerlIdentifier>
-                                  [^\W\d]\w*+
-    ) # End of rule
+        (?<PerlQuotelikeS>
+        (?<PerlSubstitution>
+            s \b
+            (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+            (?>
+                # Hashed syntax...
+                (?= [#] )
+                (?>(?&PPR_regex_body_interpolated_unclosed))
+                (?&PPR_quotelike_s_e_check)
+                (?>(?&PPR_quotelike_body_interpolated))
+            |
+                # Bracketed syntax...
+                (?= (?>(?&PerlOWS)) [\[(<\{] )      # )
+                (?>(?&PPR_regex_body_interpolated))
+                (?>(?&PerlOWS))
+                (?&PPR_quotelike_s_e_check)
+                (?>(?&PPR_quotelike_body_interpolated))
+            |
+                # Delimited syntax...
+                (?>(?&PPR_regex_body_interpolated_unclosed))
+                (?&PPR_quotelike_s_e_check)
+                (?>(?&PPR_quotelike_body_interpolated))
+            )
+            [msixpodualgcern]*+
+        ) # End of rule (?<PerlSubstitution>)
+        ) # End of rule (?<PerlQuotelikeS>)
 
-    (?<PerlBareword>
-        (?! (?> (?= \w )
-                (?> for(?:each)?+ | while | if | unless | until | use | no | given | when | sub | return )
-            |   (?&PPR_named_op)
-            |   __ (?> END | DATA ) __ (?&PerlEndOfLine)
-            ) \b
+        (?<PerlQuotelikeTR>
+        (?<PerlTransliteration>
+            (?> tr | y ) \b
             (?! (?>(?&PerlOWS)) => )
-        )
-        (?! (?> q[qwrx]?+ | [mys] | tr ) \b
+            (?>
+                # Hashed syntax...
+                (?= [#] )
+                (?>(?&PPR_quotelike_body_interpolated_unclosed))
+                (?&PPR_quotelike_body_interpolated)
+            |
+                # Bracketed syntax...
+                (?= (?>(?&PerlOWS)) [\[(<\{] )      # )
+                (?>(?&PPR_quotelike_body_interpolated))
+                (?>(?&PerlOWS))
+                (?&PPR_quotelike_body_interpolated)
+            |
+                # Delimited syntax...
+                (?>(?&PPR_quotelike_body_interpolated_unclosed))
+                (?&PPR_quotelike_body_interpolated)
+            )
+            [cdsr]*+
+        ) # End of rule (?<PerlTransliteration>)
+        ) # End of rule (?<PerlQuotelikeTR>)
+
+        (?<PerlContextualQuotelikeM>
+        (?<PerlContextualMatch>
+            (?<PerlQuotelikeM>
+            (?<PerlMatch>
+                (?>
+                    \/\/
+                |
+                    (?>
+                        m (?= [#] )
+                    |
+                        m \b
+                        (?! (?>(?&PerlOWS)) => )
+                    |
+                        (?= \/ [^/] )
+                    )
+                    (?&PPR_regex_body_interpolated)
+                )
+                [msixpodualgcn]*+
+            ) # End of rule (?<PerlMatch>)
+            ) # End of rule (?<PerlQuotelikeM>)
+            (?=
+                (?>(?&PerlOWS))
+                (?> \z | [,;\}\])?] | => | : (?! :)
+                |   (?&PerlInfixBinaryOperator) | (?&PerlLowPrecedenceInfixOperator)
+                |   (?= \w) (?> for(?:each)?+ | while | if | unless | until | when )
+                )
+            )
+        ) # End of rule (?<PerlContextualMatch>)
+        ) # End of rule (?<PerlContextualQuotelikeM>)
+
+        (?<PerlQuotelikeQR>
+            qr \b
             (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
-        )
-        (?: :: )?+
-        [^\W\d]\w*+
-        (?: (?: :: | ' )  [^\W\d]\w*+  )*+
-        (?: :: )?+
-        (?! \( )    # )
-    |
-        :: (?! \w | \{ )
-    ) # End of rule
+            (?>(?&PPR_regex_body_interpolated))
+            [msixpodualn]*+
+        ) # End of rule (?<PerlQuotelikeQR>)
 
-    (?<PerlKeyword>
-        (?!)    # None, by default, but can be overridden in a composing regex
-    ) # End of rule
+        (?<PerlRegex>
+            (?>
+                (?&PerlMatch)
+            |
+                (?&PerlQuotelikeQR)
+            )
+        ) # End of rule (?<PerlRegex>)
 
-    (?<PerlPodSequence>
-        (?>(?&PerlOWS))  (?: (?>(?&PerlPod))  (?&PerlOWS) )*+
-    ) # End of rule
-
-    (?<PerlPod>
-        ^ = [^\W\d]\w*+             # A line starting with =<identifier>
-        .*?                         # Up to the first...
-        (?>
-            ^ = cut \b [^\n]*+ $    # ...line starting with =cut
-        |                           # or
-            \z                      # ...EOF
-        )
-    ) # End of rule
+        (?<PerlContextualRegex>
+            (?>
+                (?&PerlContextualMatch)
+            |
+                (?&PerlQuotelikeQR)
+            )
+        ) # End of rule (?<PerlContextualRegex>)
 
 
-    ##### Whitespace matching (part of API) #################################
-
-    (?<PerlOWS>
-        (?:
-            \h++
-        |
-            (?&PPR_newline_and_heredoc)
-        |
-            [#] [^\n]*+
-        |
-            __ (?> END | DATA ) __ \b .*+ \z
-        )*+
-    ) # End of rule
-
-    (?<PerlNWS>
-        (?:
-            \h++
-        |
-            (?&PPR_newline_and_heredoc)
-        |
-            [#] [^\n]*+
-        |
-            __ (?> END | DATA ) __ \b .*+ \z
-        )++
-    ) # End of rule
-
-    (?<PerlEndOfLine>
-        \n
-    ) # End of rule
-
-
-    ###### Internal components (not part of API) ##########################
-
-    (?<PPR_named_op>
-        (?> cmp
-        |   [lg][te]
-        |   eq
-        |   ne
-        |   and
-        |   or
-        |   xor
-        )
-    )
-
-    (?<PPR_non_reserved_identifier>
-        (?! (?>
-               for(?:each)?+ | while | if | unless | until | given | when | default
-            |  sub | format | use | no
-            |  (?&PPR_named_op)
-            |  [msy] | q[wrxq]?+ | tr
-            |   __ (?> END | DATA ) __
+        (?<PerlBuiltinFunction>
+            # Optimized to match any Perl builtin name, without backtracking...
+            (?=[^\W\d]) # Skip if possible
+            (?>
+                s(?>e(?>t(?>(?>(?>(?>hos|ne)t|gr)en|s(?>erven|ockop))t|p(?>r(?>iority|otoent)|went|grp))|m(?>ctl|get|op)|ek(?>dir)?|lect|nd)|y(?>s(?>write|call|open|read|seek|tem)|mlink)|h(?>m(?>write|read|ctl|get)|utdown|ift)|o(?>cket(?>pair)?|rt)|p(?>li(?>ce|t)|rintf)|(?>cala|ubst)r|t(?>ate?|udy)|leep|rand|qrt|ay|in)
+                | g(?>et(?>p(?>r(?>oto(?>byn(?>umber|ame)|ent)|iority)|w(?>ent|nam|uid)|eername|grp|pid)|s(?>erv(?>by(?>name|port)|ent)|ock(?>name|opt))|host(?>by(?>addr|name)|ent)|net(?>by(?>addr|name)|ent)|gr(?>ent|gid|nam)|login|c)|mtime|lob|oto|rep)
+                | r(?>e(?>ad(?>lin[ek]|pipe|dir)?|(?>quir|vers|nam)e|winddir|turn|set|cv|do|f)|index|mdir|and)
+                | c(?>h(?>o(?>m?p|wn)|r(?>oot)?|dir|mod)|o(?>n(?>tinue|nect)|s)|lose(?>dir)?|aller|rypt)
+                | e(?>nd(?>(?>hos|ne)t|p(?>roto|w)|serv|gr)ent|x(?>i(?>sts|t)|ec|p)|ach|val(?>bytes)?+|of)
+                | l(?>o(?>c(?>al(?>time)?|k)|g)|i(?>sten|nk)|(?>sta|as)t|c(?>first)?|ength)
+                | u(?>n(?>(?>lin|pac)k|shift|def|tie)|c(?>first)?|mask|time)
+                | p(?>r(?>ototype|intf?)|ack(?>age)?|o[ps]|ipe|ush)
+                | d(?>bm(?>close|open)|e(?>fined|lete)|ump|ie|o)
+                | f(?>or(?>m(?>line|at)|k)|ileno|cntl|c|lock)
+                | t(?>i(?>mes?|ed?)|ell(?>dir)?|runcate)
+                | w(?>a(?>it(?>pid)?|ntarray|rn)|rite)
+                | m(?>sg(?>ctl|get|rcv|snd)|kdir|ap)
+                | b(?>in(?>mode|d)|less|reak)
+                | i(?>n(?>dex|t)|mport|octl)
+                | a(?>ccept|larm|tan2|bs)
+                | o(?>pen(?>dir)?|ct|rd)
+                | v(?>alues|ec)
+                | k(?>eys|ill)
+                | quotemeta
+                | join
+                | next
+                | hex
+                | _
             )
             \b
-        )
-        (?>(?&PerlQualifiedIdentifier))
-        (?! :: )
-    )
+        ) # End of rule (?<PerlBuiltinFunction>)
 
-    (?<PPR_three_part_list>
-        \(  (?>(?&PerlOWS)) (?: (?>(?&PerlExpression)) (?&PerlOWS) )??
-         ;  (?>(?&PerlOWS)) (?: (?>(?&PerlExpression)) (?&PerlOWS) )??
-         ;  (?>(?&PerlOWS)) (?: (?>(?&PerlExpression)) (?&PerlOWS) )??
-        \)
-    )
-
-    (?<PPR_indirect_obj>
-        (?&PerlBareword)
-    |
-        (?>(?&PerlVariableScalar))
-        (?! (?>(?&PerlOWS)) (?> [<\[\{] | -> ) )
-    )
-
-    (?<PPR_quotelike_body>
-        (?>(?&PPR_quotelike_body_unclosed))
-        \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
-    )
-
-    (?<PPR_balanced_parens>
-        [^)(\\\n]*+
-        (?:
+        (?<PerlNullaryBuiltinFunction>
+            # Optimized to match any Perl builtin name, without backtracking...
+            (?= [^\W\d] )  # Skip if possible
             (?>
-                \\.
+                get(?:(?:(?:hos|ne)t|serv|gr)ent|p(?:(?:roto|w)ent|pid)|login)
+                | end(?:(?:hos|ne)t|p(?:roto|w)|serv|gr)ent
+                | wa(?:ntarray|it)
+                | times?
+                | fork
+                | _
+            )
+            \b
+        ) # End of rule (?<PerlNullaryBuiltinFunction>)
+
+        (?<PerlVersionNumber>
+            (?>
+                (?&PerlVString)
             |
-                \(  (?>(?&PPR_balanced_parens))  \)
+                (?>(?&PPR_digit_seq))
+                (?: \. (?&PPR_digit_seq)?+ )*+
+            )
+        ) # End of rule (?<PerlVersionNumber>)
+
+        (?<PerlVString>
+            v  (?>(?&PPR_digit_seq))  (?: \. (?&PPR_digit_seq) )*+
+        ) # End of rule (?<PerlVString>)
+
+        (?<PerlNumber>
+            [+-]?+
+            (?>
+                0  (?>  x (?&PPR_x_digit_seq)
+                |    b (?&PPR_b_digit_seq)
+                |      (?&PPR_o_digit_seq)
+                )
+            |
+                (?>
+                        (?>(?&PPR_digit_seq))
+                    (?: \. (?&PPR_digit_seq)?+ )?+
+                |
+                        \. (?&PPR_digit_seq)
+                )
+                (?: [eE] [+-]?+ (?&PPR_digit_seq) )?+
+            )
+        ) # End of rule (?<PerlNumber>)
+
+        (?<PerlOldQualifiedIdentifier>
+            (?> (?> :: | ' ) \w++  |  [^\W\d]\w*+ )  (?: (?> :: | ' )  \w++ )*+
+        ) # End of rule (?<PerlOldQualifiedIdentifier>)
+
+        (?<PerlQualifiedIdentifier>
+            (?>     ::       \w++  |  [^\W\d]\w*+ )  (?: (?> :: | ' )  \w++ )*+
+        ) # End of rule (?<PerlQualifiedIdentifier>)
+
+        (?<PerlIdentifier>
+                                    [^\W\d]\w*+
+        ) # End of rule (?<PerlIdentifier>)
+
+        (?<PerlBareword>
+            (?! (?> (?= \w )
+                    (?> for(?:each)?+ | while | if | unless | until | use | no | given | when | sub | return )
+                |   (?&PPR_named_op)
+                |   __ (?> END | DATA ) __ \b
+                ) \b
+                (?! (?>(?&PerlOWS)) => )
+            )
+            (?! (?> q[qwrx]?+ | [mys] | tr ) \b
+                (?> (?= [#] ) | (?! (?>(?&PerlOWS)) => ) )
+            )
+            (?: :: )?+
+            [^\W\d]\w*+
+            (?: (?: :: | ' )  [^\W\d]\w*+  )*+
+            (?: :: )?+
+            (?! \( )    # )
+        |
+            :: (?! \w | \{ )
+        ) # End of rule (?<PerlBareword>)
+
+        (?<PerlKeyword>
+            (?!)    # None, by default, but can be overridden in a composing regex
+        ) # End of rule (?<PerlKeyword>)
+
+        (?<PerlPodSequence>
+            (?>(?&PerlOWS))  (?: (?>(?&PerlPod))  (?&PerlOWS) )*+
+        ) # End of rule (?<PerlPodSequence>)
+
+        (?<PerlPod>
+            ^ = [^\W\d]\w*+             # A line starting with =<identifier>
+            .*?                         # Up to the first...
+            (?>
+                ^ = cut \b [^\n]*+ $    # ...line starting with =cut
+            |                           # or
+                \z                      # ...EOF
+            )
+        ) # End of rule (?<PerlPod>)
+
+
+        ##### Whitespace matching (part of API) #################################
+
+        (?<PerlOWSOrEND>
+            (?:
+                \h++
             |
                 (?&PPR_newline_and_heredoc)
+            |
+                [#] [^\n]*+
+            |
+                __ (?> END | DATA ) __ \b .*+ \z
+            )*+
+        ) # End of rule (?<PerlOWSOrEnd>)
+
+        (?<PerlOWS>
+            (?:
+                \h++
+            |
+                (?&PPR_newline_and_heredoc)
+            |
+                [#] [^\n]*+
+            )*+
+        ) # End of rule (?<PerlOWS>)
+
+        (?<PerlNWS>
+            (?:
+                \h++
+            |
+                (?&PPR_newline_and_heredoc)
+            |
+                [#] [^\n]*+
+            )++
+        ) # End of rule (?<PerlNWS>)
+
+        (?<PerlEndOfLine>
+            \n
+        ) # End of rule (?<PerlEndOfLine>)
+
+
+        ###### Internal components (not part of API) ##########################
+
+        (?<PPR_named_op>
+            (?> cmp
+            |   [lg][te]
+            |   eq
+            |   ne
+            |   and
+            |   or
+            |   xor
             )
+        ) # End of rule (?<PPR_named_op>)
+
+        (?<PPR_non_reserved_identifier>
+            (?! (?>
+                for(?:each)?+ | while | if | unless | until | given | when | default
+                |  sub | format | use | no
+                |  (?&PPR_named_op)
+                |  [msy] | q[wrxq]?+ | tr
+                |   __ (?> END | DATA ) __
+                )
+                \b
+            )
+            (?>(?&PerlQualifiedIdentifier))
+            (?! :: )
+        ) # End of rule (?<PPR_non_reserved_identifier>)
+
+        (?<PPR_three_part_list>
+            \(  (?>(?&PerlOWS)) (?: (?>(?&PerlExpression)) (?&PerlOWS) )??
+            ;  (?>(?&PerlOWS)) (?: (?>(?&PerlExpression)) (?&PerlOWS) )??
+            ;  (?>(?&PerlOWS)) (?: (?>(?&PerlExpression)) (?&PerlOWS) )??
+            \)
+        ) # End of rule (?<PPR_three_part_list>)
+
+        (?<PPR_indirect_obj>
+            (?&PerlBareword)
+        |
+            (?>(?&PerlVariableScalar))
+            (?! (?>(?&PerlOWS)) (?> [<\[\{] | -> ) )
+        ) # End of rule (?<PPR_indirect_obj>)
+
+        (?<PPR_quotelike_body>
+            (?>(?&PPR_quotelike_body_unclosed))
+            \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
+        ) # End of rule (?<PPR_quotelike_body>)
+
+        (?<PPR_balanced_parens>
             [^)(\\\n]*+
-        )*+
-    )
+            (?:
+                (?>
+                    \\.
+                |
+                    \(  (?>(?&PPR_balanced_parens))  \)
+                |
+                    (?&PPR_newline_and_heredoc)
+                )
+                [^)(\\\n]*+
+            )*+
+        ) # End of rule (?<PPR_balanced_parens>)
 
-    (?<PPR_balanced_curlies>
-        [^\}\{\\\n]*+
-        (?:
-            (?>
-                \\.
-            |
-                \{  (?>(?&PPR_balanced_curlies))  \}
-            |
-                (?&PPR_newline_and_heredoc)
-            )
+        (?<PPR_balanced_curlies>
             [^\}\{\\\n]*+
-        )*+
-    )
+            (?:
+                (?>
+                    \\.
+                |
+                    \{  (?>(?&PPR_balanced_curlies))  \}
+                |
+                    (?&PPR_newline_and_heredoc)
+                )
+                [^\}\{\\\n]*+
+            )*+
+        ) # End of rule (?<PPR_balanced_curlies>)
 
-    (?<PPR_balanced_squares>
-        [^][\\\n]*+
-        (?:
-            (?>
-                \\.
-            |
-                \[  (?>(?&PPR_balanced_squares))  \]
-            |
-                (?&PPR_newline_and_heredoc)
-            )
+        (?<PPR_balanced_squares>
             [^][\\\n]*+
-        )*+
-    )
+            (?:
+                (?>
+                    \\.
+                |
+                    \[  (?>(?&PPR_balanced_squares))  \]
+                |
+                    (?&PPR_newline_and_heredoc)
+                )
+                [^][\\\n]*+
+            )*+
+        ) # End of rule (?<PPR_balanced_squares>)
 
-    (?<PPR_balanced_angles>
-        [^><\\\n]*+
-        (?:
-            (?>
-                \\.
-            |
-                <  (?>(?&PPR_balanced_angles))  >
-            |
-                (?&PPR_newline_and_heredoc)
-            )
+        (?<PPR_balanced_angles>
             [^><\\\n]*+
-        )*+
-    )
+            (?:
+                (?>
+                    \\.
+                |
+                    <  (?>(?&PPR_balanced_angles))  >
+                |
+                    (?&PPR_newline_and_heredoc)
+                )
+                [^><\\\n]*+
+            )*+
+        ) # End of rule (?<PPR_balanced_angles>)
 
-    (?<PPR_regex_body_unclosed>
-        (?>
-               [#]
-               [^#\\\n]*+
-               (?:
-                   (?: \\. | (?&PPR_newline_and_heredoc) )
-                   [^#\\\n]*+
-               )*+
-               (?= [#] )
-        |
-            (?>(?&PerlOWS))
+        (?<PPR_regex_body_unclosed>
             (?>
-                \{  (?>(?&PPR_balanced_curlies))            (?= \} )
+                [#]
+                [^#\\\n]*+
+                (?:
+                    (?: \\. | (?&PPR_newline_and_heredoc) )
+                    [^#\\\n]*+
+                )*+
+                (?= [#] )
             |
-                \[  (?>(?&PPR_balanced_squares))            (?= \] )
-            |
-                \(  (?:
-                        \?{1,2} (?= \{ ) (?>(?&PerlBlock))
-                    |
-                        (?>(?&PPR_balanced_parens))
-                    )                                       (?= \) )
-            |
-                 <  (?>(?&PPR_balanced_angles))             (?=  > )
-            |
-                \\
-                    [^\\\n]*+
-                    (
-                        (?&PPR_newline_and_heredoc)
+                (?>(?&PerlOWS))
+                (?>
+                    \{  (?>(?&PPR_balanced_curlies))            (?= \} )
+                |
+                    \[  (?>(?&PPR_balanced_squares))            (?= \] )
+                |
+                    \(  (?:
+                            \?{1,2} (?= \{ ) (?>(?&PerlBlock))
+                        |
+                            (?>(?&PPR_balanced_parens))
+                        )                                       (?= \) )
+                |
+                    <  (?>(?&PPR_balanced_angles))             (?=  > )
+                |
+                    \\
                         [^\\\n]*+
-                    )*+
-                (?= \\ )
-            |
-                 /
-                     [^\\/\n]*+
-                 (?:
-                     (?: \\. | (?&PPR_newline_and_heredoc) )
-                     [^\\/\n]*+
-                 )*+
-                 (?=  / )
-            |
-                (?<PPR_qldel> \S )
+                        (
+                            (?&PPR_newline_and_heredoc)
+                            [^\\\n]*+
+                        )*+
+                    (?= \\ )
+                |
+                    /
+                        [^\\/\n]*+
                     (?:
-                        \\.
-                    |
-                        (?&PPR_newline_and_heredoc)
-                    |
-                        (?! \g{PPR_qldel} ) .
+                        (?: \\. | (?&PPR_newline_and_heredoc) )
+                        [^\\/\n]*+
                     )*+
-                (?= \g{PPR_qldel} )
+                    (?=  / )
+                |
+                    (?<PPR_qldel> \S )
+                        (?:
+                            \\.
+                        |
+                            (?&PPR_newline_and_heredoc)
+                        |
+                            (?! \g{PPR_qldel} ) .
+                        )*+
+                    (?= \g{PPR_qldel} )
+                )
             )
-        )
-    )
+        ) # End of rule (?<PPR_regex_body_unclosed>)
 
-    (?<PPR_quotelike_body_unclosed>
-        (?>
-               [#]
-               [^#\\\n]*+
-               (?:
-                   (?: \\. | (?&PPR_newline_and_heredoc) )
-                   [^#\\\n]*+
-               )*+
-               (?= [#] )
-        |
-            (?>(?&PerlOWS))
+        (?<PPR_quotelike_body_unclosed>
             (?>
-                \{  (?>(?&PPR_balanced_curlies))    (?= \} )
+                [#]
+                [^#\\\n]*+
+                (?:
+                    (?: \\. | (?&PPR_newline_and_heredoc) )
+                    [^#\\\n]*+
+                )*+
+                (?= [#] )
             |
-                \[  (?>(?&PPR_balanced_squares))    (?= \] )
-            |
-                \(  (?>(?&PPR_balanced_parens))     (?= \) )
-            |
-                 <  (?>(?&PPR_balanced_angles))     (?=  > )
-            |
-                \\
-                    [^\\\n]*+
-                    (
-                        (?&PPR_newline_and_heredoc)
+                (?>(?&PerlOWS))
+                (?>
+                    \{  (?>(?&PPR_balanced_curlies))    (?= \} )
+                |
+                    \[  (?>(?&PPR_balanced_squares))    (?= \] )
+                |
+                    \(  (?>(?&PPR_balanced_parens))     (?= \) )
+                |
+                    <  (?>(?&PPR_balanced_angles))     (?=  > )
+                |
+                    \\
                         [^\\\n]*+
-                    )*+
-                (?= \\ )
-            |
-                 /
-                     [^\\/\n]*+
-                 (?:
-                     (?: \\. | (?&PPR_newline_and_heredoc) )
-                     [^\\/\n]*+
-                 )*+
-                 (?=  / )
-            |
-                (?<PPR_qldel> \S )
+                        (
+                            (?&PPR_newline_and_heredoc)
+                            [^\\\n]*+
+                        )*+
+                    (?= \\ )
+                |
+                    /
+                        [^\\/\n]*+
                     (?:
-                        \\.
-                    |
-                        (?&PPR_newline_and_heredoc)
-                    |
-                        (?! \g{PPR_qldel} ) .
+                        (?: \\. | (?&PPR_newline_and_heredoc) )
+                        [^\\/\n]*+
                     )*+
-                (?= \g{PPR_qldel} )
+                    (?=  / )
+                |
+                    (?<PPR_qldel> \S )
+                        (?:
+                            \\.
+                        |
+                            (?&PPR_newline_and_heredoc)
+                        |
+                            (?! \g{PPR_qldel} ) .
+                        )*+
+                    (?= \g{PPR_qldel} )
+                )
             )
-        )
-    )
+        ) # End of rule (?<PPR_quotelike_body_unclosed>)
 
-    (?<PPR_quotelike_body_interpolated>
-        (?>(?&PPR_quotelike_body_interpolated_unclosed))
-        \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
-    )
+        (?<PPR_quotelike_body_interpolated>
+            (?>(?&PPR_quotelike_body_interpolated_unclosed))
+            \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
+        ) # End of rule (?<PPR_quotelike_body_interpolated>)
 
-    (?<PPR_regex_body_interpolated>
-        (?>(?&PPR_regex_body_interpolated_unclosed))
-        \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
-    )
+        (?<PPR_regex_body_interpolated>
+            (?>(?&PPR_regex_body_interpolated_unclosed))
+            \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
+        ) # End of rule (?<PPR_regex_body_interpolated>)
 
-    (?<PPR_balanced_parens_interpolated>
-        [^)(\\\n\$\@]*+
-        (?:
-            (?>
-                \\.
-            |
-                \(  (?>(?&PPR_balanced_parens_interpolated))  \)
-            |
-                (?&PPR_newline_and_heredoc)
-            |
-                (?= \$ (?! [\s\)] ) )  (?&PerlScalarAccessNoSpace)
-            |
-                (?= \@ (?! [\s\)] ) )  (?&PerlArrayAccessNoSpace)
-            |
-                [\$\@]
-            )
+        (?<PPR_balanced_parens_interpolated>
             [^)(\\\n\$\@]*+
-        )*+
-    )
+            (?:
+                (?>
+                    \\.
+                |
+                    \(  (?>(?&PPR_balanced_parens_interpolated))  \)
+                |
+                    (?&PPR_newline_and_heredoc)
+                |
+                    (?= \$ (?! [\s\)] ) )  (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \@ (?! [\s\)] ) )  (?&PerlArrayAccessNoSpace)
+                |
+                    [\$\@]
+                )
+                [^)(\\\n\$\@]*+
+            )*+
+        ) # End of rule (?<PPR_balanced_parens_interpolated>)
 
-    (?<PPR_balanced_curlies_interpolated>
-        [^\}\{\\\n\$\@]*+
-        (?:
-            (?>
-                \\.
-            |
-                \{  (?>(?&PPR_balanced_curlies_interpolated))  \}
-            |
-                (?&PPR_newline_and_heredoc)
-            |
-                (?= \$ (?! [\s\}] ) )  (?&PerlScalarAccessNoSpace)
-            |
-                (?= \@ (?! [\s\}] ) )  (?&PerlArrayAccessNoSpace)
-            |
-                [\$\@]
-            )
+        (?<PPR_balanced_curlies_interpolated>
             [^\}\{\\\n\$\@]*+
-        )*+
-    )
+            (?:
+                (?>
+                    \\.
+                |
+                    \{  (?>(?&PPR_balanced_curlies_interpolated))  \}
+                |
+                    (?&PPR_newline_and_heredoc)
+                |
+                    (?= \$ (?! [\s\}] ) )  (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \@ (?! [\s\}] ) )  (?&PerlArrayAccessNoSpace)
+                |
+                    [\$\@]
+                )
+                [^\}\{\\\n\$\@]*+
+            )*+
+        ) # End of rule (?<PPR_balanced_curlies_interpolated>)
 
-    (?<PPR_balanced_squares_interpolated>
-        [^][\\\n\$\@]*+
-        (?:
-            (?>
-                \\.
-            |
-                \[  (?>(?&PPR_balanced_squares_interpolated))  \]
-            |
-                (?&PPR_newline_and_heredoc)
-            |
-                (?= \$ (?! [\s\]] ) )  (?&PerlScalarAccessNoSpace)
-            |
-                (?= \@ (?! [\s\]] ) )  (?&PerlArrayAccessNoSpace)
-            |
-                [\$\@]
-            )
+        (?<PPR_balanced_squares_interpolated>
             [^][\\\n\$\@]*+
-        )*+
-    )
+            (?:
+                (?>
+                    \\.
+                |
+                    \[  (?>(?&PPR_balanced_squares_interpolated))  \]
+                |
+                    (?&PPR_newline_and_heredoc)
+                |
+                    (?= \$ (?! [\s\]] ) )  (?&PerlScalarAccessNoSpace)
+                |
+                    (?= \@ (?! [\s\]] ) )  (?&PerlArrayAccessNoSpace)
+                |
+                    [\$\@]
+                )
+                [^][\\\n\$\@]*+
+            )*+
+        ) # End of rule (?<PPR_balanced_squares_interpolated>)
 
-    (?<PPR_balanced_angles_interpolated>
-        [^><\\\n\$\@]*+
-        (?:
-            (?>
-                \\.
-            |
-                <  (?>(?&PPR_balanced_angles_interpolated))  >
-            |
-                (?&PPR_newline_and_heredoc)
-            |
-                (?= \$ (?! [\s>] ) )  (?&PerlScalarAccessNoSpace)
-            |
-                (?= \@ (?! [\s>] ) )  (?&PerlArrayAccessNoSpace)
-            |
-                [\$\@]
-            )
+        (?<PPR_balanced_angles_interpolated>
             [^><\\\n\$\@]*+
-        )*+
-    )
-
-    (?<PPR_regex_body_interpolated_unclosed>
-        # Start by working out where it actually ends (ignoring interpolations)...
-        (?=
-            (?>
-                [#]
-                [^#\\\n\$\@]*+
-                (?:
-                    (?>
-                        \\.
-                    |
-                        (?&PPR_newline_and_heredoc)
-                    |
-                        (?= \$ (?! [\s#] ) )  (?&PerlScalarAccessNoSpace)
-                    |
-                        (?= \@ (?! [\s#] ) )  (?&PerlArrayAccessNoSpace)
-                    |
-                        [\$\@]
-                    )
-                    [^#\\\n\$\@]*+
-                )*+
-                (?= [#] )
-            |
-                (?>(?&PerlOWS))
+            (?:
                 (?>
-                    \{  (?>(?&PPR_balanced_curlies_interpolated))    (?= \} )
+                    \\.
                 |
-                    \[  (?>(?&PPR_balanced_squares_interpolated))    (?= \] )
+                    <  (?>(?&PPR_balanced_angles_interpolated))  >
                 |
-                    \(  (?>(?&PPR_balanced_parens_interpolated))     (?= \) )
+                    (?&PPR_newline_and_heredoc)
                 |
-                    <   (?>(?&PPR_balanced_angles_interpolated))     (?=  > )
+                    (?= \$ (?! [\s>] ) )  (?&PerlScalarAccessNoSpace)
                 |
-                    \\
-                        [^\\\n\$\@]*+
-                        (?:
-                            (?>
-                                (?&PPR_newline_and_heredoc)
-                            |
-                                (?= \$ (?! [\s\\] ) )  (?&PerlScalarAccessNoSpace)
-                            |
-                                (?= \@ (?! [\s\\] ) )  (?&PerlArrayAccessNoSpace)
-                            |
-                                [\$\@]
-                            )
-                            [^\\\n\$\@]*+
-                        )*+
-                    (?= \\ )
+                    (?= \@ (?! [\s>] ) )  (?&PerlArrayAccessNoSpace)
                 |
-                    /
-                        [^\\/\n\$\@]*+
-                        (?:
-                            (?>
-                                \\.
-                            |
-                                (?&PPR_newline_and_heredoc)
-                            |
-                                (?= \$ (?! [\s/] ) )  (?&PerlScalarAccessNoSpace)
-                            |
-                                (?= \@ (?! [\s/] ) )  (?&PerlArrayAccessNoSpace)
-                            |
-                                [\$\@]
-                            )
-                            [^\\/\n\$\@]*+
-                        )*+
-                    (?= / )
-                |
-                    -
-                        (?:
-                            \\.
-                        |
-                            (?&PPR_newline_and_heredoc)
-                        |
-                            (?:
-                                (?= \$ (?! [\s-] ) )  (?&PerlScalarAccessNoSpaceNoArrow)
-                            |
-                                (?= \@ (?! [\s-] ) )  (?&PerlArrayAccessNoSpaceNoArrow)
-                            |
-                                [^-]
-                            )
-                        )*+
-                    (?= - )
-                |
-                    (?<PPR_qldel> \S )
-                        (?:
-                            \\.
-                        |
-                            (?&PPR_newline_and_heredoc)
-                        |
-                            (?! \g{PPR_qldel} )
-                            (?:
-                                (?= \$ (?! \g{PPR_qldel} | \s ) )  (?&PerlScalarAccessNoSpace)
-                            |
-                                (?= \@ (?! \g{PPR_qldel} | \s ) )  (?&PerlArrayAccessNoSpace)
-                            |
-                                .
-                            )
-                        )*+
-                    (?= \g{PPR_qldel} )
+                    [\$\@]
                 )
-            )
-        )
+                [^><\\\n\$\@]*+
+            )*+
+        ) # End of rule (?<PPR_balanced_angles_interpolated>)
 
-        (?&PPR_regex_body_unclosed)
-    )
-
-    (?<PPR_quotelike_body_interpolated_unclosed>
-        # Start by working out where it actually ends (ignoring interpolations)...
-        (?=
-            (?>
-                [#]
-                [^#\\\n\$\@]*+
-                (?:
-                    (?>
-                        \\.
-                    |
-                        (?&PPR_newline_and_heredoc)
-                    |
-                        (?= \$ (?! [\s#] ) )  (?&PerlScalarAccessNoSpace)
-                    |
-                        (?= \@ (?! [\s#] ) )  (?&PerlArrayAccessNoSpace)
-                    |
-                        [\$\@]
-                    )
-                    [^#\\\n\$\@]*+
-                )*+
-                (?= [#] )
-            |
-                (?>(?&PerlOWS))
+        (?<PPR_regex_body_interpolated_unclosed>
+            # Start by working out where it actually ends (ignoring interpolations)...
+            (?=
                 (?>
-                    \{  (?>(?&PPR_balanced_curlies_interpolated))    (?= \} )
-                |
-                    \[  (?>(?&PPR_balanced_squares_interpolated))    (?= \] )
-                |
-                    \(  (?>(?&PPR_balanced_parens_interpolated))     (?= \) )
-                |
-                    <   (?>(?&PPR_balanced_angles_interpolated))     (?=  > )
-                |
-                    \\
-                        [^\\\n\$\@]*+
-                        (?:
-                            (?>
-                                (?&PPR_newline_and_heredoc)
-                            |
-                                (?= \$ (?! [\s\\] ) )  (?&PerlScalarAccessNoSpace)
-                            |
-                                (?= \@ (?! [\s\\] ) )  (?&PerlArrayAccessNoSpace)
-                            |
-                                [\$\@]
-                            )
-                            [^\\\n\$\@]*+
-                        )*+
-                    (?= \\ )
-                |
-                    /
-                        [^\\/\n\$\@]*+
-                        (?:
-                            (?>
-                                \\.
-                            |
-                                (?&PPR_newline_and_heredoc)
-                            |
-                                (?= \$ (?! [\s/] ) )  (?&PerlScalarAccessNoSpace)
-                            |
-                                (?= \@ (?! [\s/] ) )  (?&PerlArrayAccessNoSpace)
-                            |
-                                [\$\@]
-                            )
-                            [^\\/\n\$\@]*+
-                        )*+
-                    (?= / )
-                |
-                    -
-                        (?:
-                            \\.
-                        |
-                            (?&PPR_newline_and_heredoc)
-                        |
-                            (?:
-                                (?= \$ (?! [\s-] ) )  (?&PerlScalarAccessNoSpaceNoArrow)
-                            |
-                                (?= \@ (?! [\s-] ) )  (?&PerlArrayAccessNoSpaceNoArrow)
-                            |
-                                [^-]
-                            )
-                        )*+
-                    (?= - )
-                |
-                    (?<PPR_qldel> \S )
-                        (?:
-                            \\.
-                        |
-                            (?&PPR_newline_and_heredoc)
-                        |
-                            (?! \g{PPR_qldel} )
-                            (?:
-                                (?= \$ (?! \g{PPR_qldel} | \s ) )  (?&PerlScalarAccessNoSpace)
-                            |
-                                (?= \@ (?! \g{PPR_qldel} | \s ) )  (?&PerlArrayAccessNoSpace)
-                            |
-                                .
-                            )
-                        )*+
-                    (?= \g{PPR_qldel} )
-                )
-            )
-        )
-
-        (?&PPR_quotelike_body_unclosed)
-    )
-
-    (?<PPR_quotelike_s_e_check>
-        (??{ local $PPR::_quotelike_s_end = -1; '' })
-        (?:
-            (?=
-                (?&PPR_quotelike_body_interpolated)
-                (??{ $PPR::_quotelike_s_end = +pos(); '' })
-                [msixpodualgcrn]*+ e [msixpodualgcern]*+
-            )
-            (?=
-                (?(?{ $PPR::_quotelike_s_end >= 0 })
-                    (?>
-                        (??{ +pos() && +pos() < $PPR::_quotelike_s_end ? '' : '(?!)' })
+                    [#]
+                    [^#\\\n\$\@]*+
+                    (?:
                         (?>
-                            (?&PerlVariable)
+                            \\.
                         |
-                            (?&PerlQuotelike)
+                            (?&PPR_newline_and_heredoc)
                         |
-                            \\?+ .
+                            (?= \$ (?! [\s#] ) )  (?&PerlScalarAccessNoSpace)
+                        |
+                            (?= \@ (?! [\s#] ) )  (?&PerlArrayAccessNoSpace)
+                        |
+                            [\$\@]
                         )
+                        [^#\\\n\$\@]*+
                     )*+
+                    (?= [#] )
+                |
+                    (?>(?&PerlOWS))
+                    (?>
+                        \{  (?>(?&PPR_balanced_curlies_interpolated))    (?= \} )
+                    |
+                        \[  (?>(?&PPR_balanced_squares_interpolated))    (?= \] )
+                    |
+                        \(  (?>(?&PPR_balanced_parens_interpolated))     (?= \) )
+                    |
+                        <   (?>(?&PPR_balanced_angles_interpolated))     (?=  > )
+                    |
+                        \\
+                            [^\\\n\$\@]*+
+                            (?:
+                                (?>
+                                    (?&PPR_newline_and_heredoc)
+                                |
+                                    (?= \$ (?! [\s\\] ) )  (?&PerlScalarAccessNoSpace)
+                                |
+                                    (?= \@ (?! [\s\\] ) )  (?&PerlArrayAccessNoSpace)
+                                |
+                                    [\$\@]
+                                )
+                                [^\\\n\$\@]*+
+                            )*+
+                        (?= \\ )
+                    |
+                        /
+                            [^\\/\n\$\@]*+
+                            (?:
+                                (?>
+                                    \\.
+                                |
+                                    (?&PPR_newline_and_heredoc)
+                                |
+                                    (?= \$ (?! [\s/] ) )  (?&PerlScalarAccessNoSpace)
+                                |
+                                    (?= \@ (?! [\s/] ) )  (?&PerlArrayAccessNoSpace)
+                                |
+                                    [\$\@]
+                                )
+                                [^\\/\n\$\@]*+
+                            )*+
+                        (?= / )
+                    |
+                        -
+                            (?:
+                                \\.
+                            |
+                                (?&PPR_newline_and_heredoc)
+                            |
+                                (?:
+                                    (?= \$ (?! [\s-] ) )  (?&PerlScalarAccessNoSpaceNoArrow)
+                                |
+                                    (?= \@ (?! [\s-] ) )  (?&PerlArrayAccessNoSpaceNoArrow)
+                                |
+                                    [^-]
+                                )
+                            )*+
+                        (?= - )
+                    |
+                        (?<PPR_qldel> \S )
+                            (?:
+                                \\.
+                            |
+                                (?&PPR_newline_and_heredoc)
+                            |
+                                (?! \g{PPR_qldel} )
+                                (?:
+                                    (?= \$ (?! \g{PPR_qldel} | \s ) )  (?&PerlScalarAccessNoSpace)
+                                |
+                                    (?= \@ (?! \g{PPR_qldel} | \s ) )  (?&PerlArrayAccessNoSpace)
+                                |
+                                    .
+                                )
+                            )*+
+                        (?= \g{PPR_qldel} )
+                    )
                 )
             )
-        )?+
+
+            (?&PPR_regex_body_unclosed)
+        ) # End of rule (?<PPR_regex_body_interpolated_unclosed>)
+
+        (?<PPR_quotelike_body_interpolated_unclosed>
+            # Start by working out where it actually ends (ignoring interpolations)...
+            (?=
+                (?>
+                    [#]
+                    [^#\\\n\$\@]*+
+                    (?:
+                        (?>
+                            \\.
+                        |
+                            (?&PPR_newline_and_heredoc)
+                        |
+                            (?= \$ (?! [\s#] ) )  (?&PerlScalarAccessNoSpace)
+                        |
+                            (?= \@ (?! [\s#] ) )  (?&PerlArrayAccessNoSpace)
+                        |
+                            [\$\@]
+                        )
+                        [^#\\\n\$\@]*+
+                    )*+
+                    (?= [#] )
+                |
+                    (?>(?&PerlOWS))
+                    (?>
+                        \{  (?>(?&PPR_balanced_curlies_interpolated))    (?= \} )
+                    |
+                        \[  (?>(?&PPR_balanced_squares_interpolated))    (?= \] )
+                    |
+                        \(  (?>(?&PPR_balanced_parens_interpolated))     (?= \) )
+                    |
+                        <   (?>(?&PPR_balanced_angles_interpolated))     (?=  > )
+                    |
+                        \\
+                            [^\\\n\$\@]*+
+                            (?:
+                                (?>
+                                    (?&PPR_newline_and_heredoc)
+                                |
+                                    (?= \$ (?! [\s\\] ) )  (?&PerlScalarAccessNoSpace)
+                                |
+                                    (?= \@ (?! [\s\\] ) )  (?&PerlArrayAccessNoSpace)
+                                |
+                                    [\$\@]
+                                )
+                                [^\\\n\$\@]*+
+                            )*+
+                        (?= \\ )
+                    |
+                        /
+                            [^\\/\n\$\@]*+
+                            (?:
+                                (?>
+                                    \\.
+                                |
+                                    (?&PPR_newline_and_heredoc)
+                                |
+                                    (?= \$ (?! [\s/] ) )  (?&PerlScalarAccessNoSpace)
+                                |
+                                    (?= \@ (?! [\s/] ) )  (?&PerlArrayAccessNoSpace)
+                                |
+                                    [\$\@]
+                                )
+                                [^\\/\n\$\@]*+
+                            )*+
+                        (?= / )
+                    |
+                        -
+                            (?:
+                                \\.
+                            |
+                                (?&PPR_newline_and_heredoc)
+                            |
+                                (?:
+                                    (?= \$ (?! [\s-] ) )  (?&PerlScalarAccessNoSpaceNoArrow)
+                                |
+                                    (?= \@ (?! [\s-] ) )  (?&PerlArrayAccessNoSpaceNoArrow)
+                                |
+                                    [^-]
+                                )
+                            )*+
+                        (?= - )
+                    |
+                        (?<PPR_qldel> \S )
+                            (?:
+                                \\.
+                            |
+                                (?&PPR_newline_and_heredoc)
+                            |
+                                (?! \g{PPR_qldel} )
+                                (?:
+                                    (?= \$ (?! \g{PPR_qldel} | \s ) )  (?&PerlScalarAccessNoSpace)
+                                |
+                                    (?= \@ (?! \g{PPR_qldel} | \s ) )  (?&PerlArrayAccessNoSpace)
+                                |
+                                    .
+                                )
+                            )*+
+                        (?= \g{PPR_qldel} )
+                    )
+                )
+            )
+
+            (?&PPR_quotelike_body_unclosed)
+        ) # End of rule (?<PPR_quotelike_body_interpolated_unclosed>)
+
+        (?<PPR_quotelike_s_e_check>
+            (??{ local $PPR::_quotelike_s_end = -1; '' })
+            (?:
+                (?=
+                    (?&PPR_quotelike_body_interpolated)
+                    (??{ $PPR::_quotelike_s_end = +pos(); '' })
+                    [msixpodualgcrn]*+ e [msixpodualgcern]*+
+                )
+                (?=
+                    (?(?{ $PPR::_quotelike_s_end >= 0 })
+                        (?>
+                            (??{ +pos() && +pos() < $PPR::_quotelike_s_end ? '' : '(?!)' })
+                            (?>
+                                (?&PerlExpression)
+                            |
+                                \\?+ .
+                            )
+                        )*+
+                    )
+                )
+            )?+
+        ) # End of rule (?<PPR_quotelike_s_e_check>)
+
+        (?<PPR_filetest_name>   [ABCMORSTWXbcdefgkloprstuwxz]          )
+
+        (?<PPR_digit_seq>               \d++ (?: _?+         \d++ )*+  )
+        (?<PPR_x_digit_seq>     [\da-fA-F]++ (?: _?+ [\da-fA-F]++ )*+  )
+        (?<PPR_o_digit_seq>          [0-7]++ (?: _?+      [0-7]++ )*+  )
+        (?<PPR_b_digit_seq>          [0-1]++ (?: _?+      [0-1]++ )*+  )
+
+        (?<PPR_newline_and_heredoc>
+            \n (??{ ($PPR::_heredoc_origin // q{}) eq ($_//q{}) ? ($PPR::_heredoc_skip{+pos()} // q{}) : q{} })
+        ) # End of rule (?<PPR_newline_and_heredoc>)
     )
-
-    (?<PPR_filetest_name>   [ABCMORSTWXbcdefgkloprstuwxz]          )
-
-    (?<PPR_digit_seq>               \d++ (?: _?+         \d++ )*+  )
-    (?<PPR_x_digit_seq>     [\da-fA-F]++ (?: _?+ [\da-fA-F]++ )*+  )
-    (?<PPR_o_digit_seq>          [0-7]++ (?: _?+      [0-7]++ )*+  )
-    (?<PPR_b_digit_seq>          [0-1]++ (?: _?+      [0-1]++ )*+  )
-
-    (?<PPR_newline_and_heredoc>
-        \n (??{ ($PPR::_heredoc_origin // q{}) eq ($_//q{}) ? ($PPR::_heredoc_skip{+pos()} // q{}) : q{} })
-    )
-)
 }xms;
 
 sub decomment {
@@ -2087,6 +2097,20 @@ sub _croak {
     Carp::croak(@_);
 }
 
+sub _report {
+    state $BUFFER = q{ } x 10;
+    state $depth = 0;
+    my ($msg, $increment) = @_;
+    $depth++ if $increment;
+    my $at = pos();
+    my $str = $BUFFER . $_ . $BUFFER;
+    my $pre  = substr($str, $at,    10);
+    my $post = substr($str, $at+10, 10);
+    tr/\n/ / for $pre, $post;
+    warn sprintf("%10s|%-10s|  %s%s\n", $pre, $post, q{ } x $depth, $msg);
+    $depth-- if !$increment;
+}
+
 1; # Magic true value required at end of module
 
 __END__
@@ -2098,7 +2122,7 @@ PPR - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR version 0.000026
+This document describes PPR version 0.000028
 
 
 =head1 SYNOPSIS
@@ -3049,20 +3073,23 @@ Matches any sequence of POD sections,
 separated and /or surrounded by optional whitespace.
 
 
-=head3 C<< (?&PerlOWS) >>
-
-Match zero-or-more characters of optional whitespace,
-including spaces, tabs, newlines,
-comments, POD, and any trailing
-C<__END__> or C<__DATA__> section.
-
-
 =head3 C<< (?&PerlNWS) >>
 
 Match one-or-more characters of necessary whitespace,
-including spaces, tabs, newlines,
-comments, POD, and any trailing
-C<__END__> or C<__DATA__> section.
+including spaces, tabs, newlines, comments, and POD.
+
+
+=head3 C<< (?&PerlOWS) >>
+
+Match zero-or-more characters of optional whitespace,
+including spaces, tabs, newlines, comments, and POD.
+
+
+=head3 C<< (?&PerlOWSOrEND) >>
+
+Match zero-or-more characters of optional whitespace,
+including spaces, tabs, newlines, comments, POD,
+and any trailing C<__END__> or C<__DATA__> section.
 
 
 =head3 C<< (?&PerlEndOfLine) >>

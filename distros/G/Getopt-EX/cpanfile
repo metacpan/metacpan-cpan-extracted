@@ -1,4 +1,4 @@
-requires 'perl' => 5.014;
+requires 'perl' => v5.14;
 
 requires 'List::Util' => 1.45;
 

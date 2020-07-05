@@ -1,5 +1,15 @@
 Revision history for Perl module Mojolicious::Plugin::RevealJS
 
+0.21 2020-06-23
+  - improve display of multiple code blocks on a single slide
+
+0.20 2020-06-20
+  - Fix a bug from reveal-sampler related to indentation
+
+0.19 2020-06-20
+  - Update reveal-sampler to cd4a07d
+  - Add sampler's indentation handling to include_sample
+
 0.18 2018-09-07
   - Add hljs_theme_url stash value
 

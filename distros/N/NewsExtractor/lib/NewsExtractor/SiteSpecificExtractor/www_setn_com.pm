@@ -14,6 +14,7 @@ sub journalist {
         qr{\b文／([\p{Letter}、]+)\b},
         qr{\b (?:三立準氣象 | \p{Letter}{2} 中心) ／ (\p{Letter}+?) 報導\b}x,
         qr{\b健康醫療網記者(\p{Letter}+?)/報導\n}x,
+        qr{\b助理編輯／(\p{Letter}+?)\n}x
     );
 
     my $name;

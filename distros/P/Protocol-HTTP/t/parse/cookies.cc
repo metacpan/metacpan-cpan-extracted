@@ -43,7 +43,7 @@ TEST("response single cookie") {
     p.set_context_request(new Request());
     string raw =
         "HTTP/1.1 200 OK\r\n"
-        "Set-Cookie: key=value; Domain=.crazypanda.ru; Path=/; Max-Age=999; Expires=Thu, 28 Nov 2019 18:43:59 GMT; Secure; HttpOnly; SameSite=Lax\r\n"
+        "Set-Cookie: key=value; Domain=crazypanda.ru; Path=/; Max-Age=999; Expires=Thu, 28 Nov 2019 18:43:59 GMT; Secure; HttpOnly; SameSite=Lax\r\n"
         "Content-Length: 0\r\n"
         "\r\n";
 
@@ -54,7 +54,7 @@ TEST("response single cookie") {
     REQUIRE(res->cookies.get("key"));
     auto coo = res->cookies.get("key").value();
     CHECK(coo.value() == "value");
-    CHECK(coo.domain() == ".crazypanda.ru");
+    CHECK(coo.domain() == "crazypanda.ru");
     CHECK(coo.path() == "/");
     CHECK(coo.max_age() == 999);
     REQUIRE(coo.expires());
@@ -98,5 +98,4 @@ TEST("response multiple cookies") {
     CHECK_FALSE(coo.secure());
     CHECK_FALSE(coo.http_only());
     CHECK(coo.same_site() == Response::Cookie::SameSite::Strict);
-
 }

@@ -17,12 +17,13 @@ with 'CLI::Driver::CommonRole';
 ###### PUBLIC ATTRIBUTES ######
 ###############################
 
-has name          => ( is => 'rw', isa => 'Str' );
-has desc          => ( is => 'rw', isa => 'Str' );
-has is_deprecated => ( is => 'rw', isa => 'Bool' );
-has class         => ( is => 'rw', isa => 'CLI::Driver::Class' );
-has 'method'      => ( is => 'rw', isa => 'CLI::Driver::Method' );
-has 'help'        => ( is => 'rw', isa => 'CLI::Driver::Help' );
+has name           => ( is => 'rw', isa => 'Str' );
+has desc           => ( is => 'rw', isa => 'Str' );
+has is_deprecated  => ( is => 'rw', isa => 'Bool' );
+has class          => ( is => 'rw', isa => 'CLI::Driver::Class' );
+has 'method'       => ( is => 'rw', isa => 'CLI::Driver::Method' );
+has 'help'         => ( is => 'rw', isa => 'CLI::Driver::Help' );
+has 'use_argv_map' => ( is => 'rw', isa => 'Bool' );
 
 ############################
 ###### PUBLIC METHODS ######
@@ -30,195 +31,218 @@ has 'help'        => ( is => 'rw', isa => 'CLI::Driver::Help' );
 
 method parse (HashRef :$href!) {
 
-    if ( $href->{is_deprecated} ) {
+	if ( $href->{is_deprecated} ) {
 
-        my $string = $href->{is_deprecated};
-        my $bool   = 0;
+		my $string = $href->{is_deprecated};
+		my $bool   = 0;
 
-        if ( $string =~ /^true$/i or $string == 1 ) {
-            $bool = 1;
-        }
+		if ( $string =~ /^true$/i or $string == 1 ) {
+			$bool = 1;
+		}
 
-        $self->is_deprecated($bool);
-    }
+		$self->is_deprecated($bool);
+	}
 
-    if ( $href->{class} ) {
+	if ( $href->{class} ) {
 
-        my $class = CLI::Driver::Class->new;
-        my $success = $class->parse( href => $href->{class} );
-        if ( !$success ) {
-            return 0;
-        }
+		my $class   = CLI::Driver::Class->new(use_argv_map => $self->use_argv_map ? 1 : 0);
+		my $success = $class->parse( href => $href->{class} );
+		if ( !$success ) {
+			return 0;
+		}
 
-        $self->class($class);
-    }
-    else {
-        return 0;
-    }
+		$self->class($class);
+	}
+	else {
+		return 0;
+	}
 
-    if ( $href->{method} ) {
+	if ( $href->{method} ) {
 
-        my $method = CLI::Driver::Method->new;
-        my $success = $method->parse( href => $href->{method} );
-        if ( !$success ) {
-            return 0;
-        }
+		my $method  = CLI::Driver::Method->new(use_argv_map => $self->use_argv_map ? 1 : 0);
+		my $success = $method->parse( href => $href->{method} );
+		if ( !$success ) {
+			return 0;
+		}
 
-        $self->method($method);
-    }
-    else {
-        return 0;
-    }
+		$self->method($method);
+	}
+	else {
+		return 0;
+	}
 
-    if ( $href->{desc} ) {
-        $self->desc( $href->{desc} );
-    }
-    
-    my $help = CLI::Driver::Help->new;
-    $help->parse( href => $href->{help} );
-    $self->help($help);
+	if ( $href->{desc} ) {
+		$self->desc( $href->{desc} );
+	}
 
-    return 1;
+	my $help = CLI::Driver::Help->new;
+	$help->parse( href => $href->{help} );
+	$self->help($help);
+
+	return 1;
 }
 
 method usage {
 
-    printf "\nusage: %s %s [opts] [-?]\n", basename($0), $self->name;
-    printf "description: %s\n", $self->desc if $self->desc;
-    print "\n";
-    
-    my $help = $self->help;
+	printf "\nusage: %s %s [opts] [-?]\n", basename($0), $self->name;
+	printf "description: %s\n", $self->desc if $self->desc;
+	print "\n";
 
-    my @opts;
-    push @opts, @{ $self->class->attr };
-    push @opts, @{ $self->method->args };
+	my $help = $self->help;
 
-    ##########################################################################
+	my @opts;
+	push @opts, @{ $self->class->attr };
+	push @opts, @{ $self->method->args };
 
-    my %opts;
-    foreach my $opt (@opts) {
+	##########################################################################
 
-        if ( $opt->required ) {
-            $opts{ $opt->cli_arg } = $opt;
-            #  and $opt->is_hard) {
-            #     $opts{ $opt->cli_arg } = $opt->method_arg;
-            #  }
-        }
-    }
+	my %opts;
+	foreach my $opt (@opts) {
 
-    # print required
-    foreach my $arg ( sort { uc($a) cmp uc($b) } keys %opts ) {
-        my $opt = $opts{$arg};
-        my $val = $opt->method_arg;
-        printf "\t-%s <%s>", $arg, $val;
-        print ' (soft)' if $opt->is_soft;
-        print ' (multi value)' if $opt->is_array;
-        print "\n";
-        printf "\t\t%s\n", $help->get_help( $arg ) if $help->get_help( $arg );
-    }
+		if ( $opt->required ) {
+			$opts{ $opt->cli_arg } = $opt;
 
-    ##########################################################################
+			#  and $opt->is_hard) {
+			#     $opts{ $opt->cli_arg } = $opt->method_arg;
+			#  }
+		}
+	}
 
-    %opts = ();
-    foreach my $opt (@opts) {
+	# print required
+	foreach my $arg ( sort { uc($a) cmp uc($b) } keys %opts ) {
+		my $opt = $opts{$arg};
+		my $val = $opt->method_arg;
+		printf "\t-%s <%s>", $arg, $val;
+		print ' (soft)'        if $opt->is_soft;
+		print ' (multi value)' if $opt->is_array;
+		print "\n";
+		printf "\t\t%s\n", $help->get_help($arg) if $help->get_help($arg);
+	}
 
-        if ( $opt->is_optional and !$opt->is_flag ) {
-            $opts{ $opt->cli_arg } = $opt;
-            #  and $opt->is_hard) {
-            #     $opts{ $opt->cli_arg } = $opt->method_arg;
-            #  }
-        }
-    }
+	##########################################################################
 
-    #   print "\n" if keys %opts;
+	%opts = ();
+	foreach my $opt (@opts) {
 
-    # print optional
-    foreach my $arg ( sort { uc($a) cmp uc($b) } keys %opts ) {
-        my $opt = $opts{$arg};
-        my $val = $opt->method_arg;
-        printf "\t[ -%s <%s> ]", $arg, $val;
-        print ' (multi value)' if $opt->is_array;
-        print "\n";
-        printf "\t\t%s\n", $help->get_help( $arg ) if $help->get_help( $arg );
-    }
+		if ( $opt->is_optional and !$opt->is_flag ) {
+			$opts{ $opt->cli_arg } = $opt;
 
-    ##########################################################################
+			#  and $opt->is_hard) {
+			#     $opts{ $opt->cli_arg } = $opt->method_arg;
+			#  }
+		}
+	}
 
-    %opts = ();
-    foreach my $opt (@opts) {
+	#   print "\n" if keys %opts;
 
-        if ( $opt->is_flag ) {
-            $opts{ $opt->cli_arg } = $opt;
-            #  and $opt->is_hard) {
-            #     $opts{ $opt->cli_arg } = $opt->method_arg;
-            #  }
-        }
-    }
+	# print optional
+	foreach my $arg ( sort { uc($a) cmp uc($b) } keys %opts ) {
+		my $opt = $opts{$arg};
+		my $val = $opt->method_arg;
+		printf "\t[ -%s <%s> ]", $arg, $val;
+		print ' (multi value)' if $opt->is_array;
+		print "\n";
+		printf "\t\t%s\n", $help->get_help($arg) if $help->get_help($arg);
+	}
 
-    #   print "\n" if keys %opts;
+	##########################################################################
 
-    # print flags
-    foreach my $arg ( sort { uc($a) cmp uc($b) } keys %opts ) {
-        my $opt = $opts{$arg};
-        printf "\t[ --%s ]\n", $arg;
-        printf "\t\t%s\n", $help->get_help( $arg ) if $help->get_help( $arg );
-    }
+	%opts = ();
+	foreach my $opt (@opts) {
 
-    ##########################################################################
-    # print examples
-    if( $help->has_examples ){
-        
-        my $cmd = sprintf "%s %s", basename($0), $self->name;
-        
-        print "\n";
-        print "Examples:\n";
-        foreach my $eg ( @{$help->examples} ){
-            printf "\t%s %s\n", $cmd, $eg;
-        }
-    }
-    
-    #########################################################################
+		if ( $opt->is_flag ) {
+			$opts{ $opt->cli_arg } = $opt;
 
-    print "\n";
-    exit;
+			#  and $opt->is_hard) {
+			#     $opts{ $opt->cli_arg } = $opt->method_arg;
+			#  }
+		}
+	}
+
+	#   print "\n" if keys %opts;
+
+	# print flags
+	foreach my $arg ( sort { uc($a) cmp uc($b) } keys %opts ) {
+		my $opt = $opts{$arg};
+		printf "\t[ --%s ]\n", $arg;
+		printf "\t\t%s\n",     $help->get_help($arg) if $help->get_help($arg);
+	}
+
+	##########################################################################
+	# print examples
+	if ( $help->has_examples ) {
+
+		my $cmd = sprintf "%s %s", basename($0), $self->name;
+
+		print "\n";
+		print "Examples:\n";
+		foreach my $eg ( @{ $help->examples } ) {
+			printf "\t%s %s\n", $cmd, $eg;
+		}
+	}
+
+	#########################################################################
+
+	print "\n";
+	exit;
 }
 
 method _new_class {
 
-    my $class      = $self->class;
-    my $class_name = $class->name;
-    my %attr       = $class->get_signature;
+	my $class      = $self->class;
+	my $class_name = $class->name;
+	my %attr       = $class->get_signature;
 
-    load $class_name;
-    my $obj = $class_name->new(%attr);
+	load $class_name;
+	my $obj =
+	  $class_name->new( %attr, use_argv_map => $self->use_argv_map ? 1 : 0 );
 
-    my @soft_req = $class->find_req_attrs( hard => 0, soft => 1 );
+    #
+    # validate required class attributes were provided
+    #
+	my @soft_req = $class->find_req_attrs( hard => 0, soft => 1 );
 
-    foreach my $opt (@soft_req) {
+	foreach my $opt (@soft_req) {
 
-        my $attr = $opt->method_arg;
+		my $attr = $opt->method_arg;
 
-        if ( !defined $obj->$attr ) {
-            confess "failed to determine $attr";
-        }
-    }
-    
-    return $obj;
+		if ( !defined $obj->$attr ) {
+			confess "failed to determine $attr";
+		}
+	}
+	
+	return $obj;
 }
 
 method do {
 
-    my $obj = $self->_new_class;
+    #
+    # this creates an instance of the user class defined in the yaml
+    #
+	my $obj = $self->_new_class;
 
-    my $method      = $self->method;
-    my $method_name = $method->name;
-    my %sig         = $method->get_signature;
+    #
+    # prepare the method args from @ARGV or %ARGV
+    #
+	my $method      = $self->method;
+	my $method_name = $method->name;
+	my %sig         = $method->get_signature;
+	
+	if ( $self->use_argv_map ) {
+		if ( keys %ARGV ) {
+			$self->die("extra args detected: %ARGV");
+		}
+	}
+	else {
+		if (@ARGV) {
+			$self->die("extra args detected: @ARGV");
+		}
+	}
 
-    if (@ARGV) {
-        $self->die( "extra args detected: @ARGV");
-    }
-    
-    return $obj->$method_name(%sig);
+    #
+    # finally invoke the actual method
+    #
+	return $obj->$method_name(%sig);
 }
 
 1;

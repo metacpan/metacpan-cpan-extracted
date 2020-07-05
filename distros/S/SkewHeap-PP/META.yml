@@ -1,0 +1,31 @@
+---
+abstract: 'a fast and flexible heap structure'
+author:
+  - 'Jeff Ober <sysread@fastmail.fm>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SkewHeap-PP
+requires:
+  Exporter: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/sysread/SkewHeap-PP/issues
+  homepage: https://github.com/sysread/SkewHeap-PP
+  repository: https://github.com/sysread/SkewHeap-PP.git
+version: '0.02'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

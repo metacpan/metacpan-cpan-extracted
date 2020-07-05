@@ -1,5 +1,20 @@
 Revision history for JSON-Schema-Draft201909
 
+0.008     2020-06-22 04:24:06Z
+          - fix bad syntax used in a test
+
+0.007     2020-06-21 21:20:33Z
+          - raise some inadequate prereq declarations
+          - fix incorrect canonical uri when evaluating a (sub)schema using a
+            non-canonical uri
+
+0.006     2020-06-19 20:54:40Z
+          - add support for evaluation against a uri
+          - add "add_schema" interface for using additional schema documents
+            within the implementation
+          - support using the "format" keyword as an assertion, with the
+            "validate_formats" option
+
 0.005     2020-06-09 01:54:05Z
           - fix some edge cases with usage of $recursiveAnchor, $recursiveRef
           - fixed several issues with resource identification within schema

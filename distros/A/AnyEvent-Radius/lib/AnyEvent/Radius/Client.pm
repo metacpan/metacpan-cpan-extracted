@@ -7,12 +7,12 @@ use AnyEvent::Handle::UDP;
 
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(qw(
-                handler packer auth_cache
+                handler packer send_cache
                 queue_cv write_cv read_cv
                 sent_cnt reply_cnt queue_cnt
             ));
 
-use Data::Radius::Constants qw(:all);
+use Data::Radius::Constants qw(%RADIUS_PACKET_TYPES);
 use Data::Radius::Dictionary ();
 use Data::Radius::Packet ();
 
@@ -61,8 +61,8 @@ sub new {
         # using authenticator from request to verify reply
         my $request_id = $obj->packer()->request_id($data);
         # FIXME how to react on unknown request_id ?
-        my $authenticator = delete $obj->auth_cache()->{ $request_id };
-        if (! $authenticator) {
+        my $send_info = delete $obj->send_cache()->{ $request_id };
+        if (! $send_info ) {
             # got unknown reply (with wrong request id?)
             if ($h{on_error}) {
                 $h{on_error}->($obj, 'Unknown reply');
@@ -71,21 +71,26 @@ sub new {
                 warn "Error: unknown reply";
             }
         }
-        elsif ( $h{on_read} ) {
-            # how to decode $from
-            # my($port, $host) = AnyEvent::Socket::unpack_sockaddr($from);
-            # my $ip = format_ipv4($host);
+        else {
+            my $on_read = $h{on_read};
+            my $req_callback = $send_info->{callback};
+            if ( $on_read || $req_callback ) {
+                # how to decode $from
+                # my($port, $host) = AnyEvent::Socket::unpack_sockaddr($from);
+                # my $ip = format_ipv4($host);
 
-            my ($type, $req_id, $auth, $av_list) = $obj->packer()->parse($data, $authenticator);
+                my ($type, $req_id, $auth, $av_list) = $obj->packer()->parse($data, $send_info->{authenticator});
 
-            $h{on_read}->($obj, {
-                        type => $type,
-                        request_id => $req_id,
-                        av_list => $av_list,
-                        # from is sockaddr binary data
-                        from => $from,
-                        authenticator => $auth,
-                    });
+                $on_read->($obj, {
+                            type => $type,
+                            request_id => $req_id,
+                            av_list => $av_list,
+                            # from is sockaddr binary data
+                            from => $from,
+                            authenticator => $auth,
+                        }) if $on_read;
+                $req_callback->($type, $av_list) if $req_callback;
+            }
         }
 
         $obj->queue_cv->end;
@@ -97,6 +102,7 @@ sub new {
             if($h{on_read_timeout}) {
                 $h{on_read_timeout}->($obj, $handle);
             }
+            $obj->clear_send_cache();
             # stop queue
             $obj->queue_cv->send;
         }
@@ -109,6 +115,7 @@ sub new {
             if($h{on_write_timeout}) {
                 $h{on_write_timeout}->($obj, $handle);
             }
+            $obj->clear_send_cache();
             # stop queue
             $obj->queue_cv->send;
         }
@@ -121,6 +128,7 @@ sub new {
         # abort all
         $handle->clear_wtimeout();
         $handle->clear_rtimeout();
+        $obj->clear_send_cache();
         $obj->queue_cv->send;
         if ($h{on_error}) {
             $h{on_error}->($obj, $error);
@@ -150,6 +158,19 @@ sub new {
     return $obj;
 }
 
+sub clear_send_cache {
+    my $self = shift;
+    my $send_cache = $self->send_cache();
+    $self->send_cache({});
+    if ($send_cache) {
+        my @ordered_reqids = sort { $send_cache->{$a}{time_cached} <=> $send_cache->{$b}{time_cached} } keys %$send_cache;
+        foreach my $request_id (@ordered_reqids) {
+            if (my $cb = $send_cache->{$request_id}{callback}) {
+                $cb->();
+            }
+        }
+    }
+}
 
 sub _send_packet {
     my ($self, $packet) = @_;
@@ -191,7 +212,7 @@ sub init {
     $self->sent_cnt(0);
     $self->reply_cnt(0);
     $self->queue_cnt(0);
-    $self->auth_cache({});
+    $self->send_cache({});
 }
 
 # close open socket, object is unusable after it was called
@@ -201,9 +222,22 @@ sub destroy {
     $self->handler(undef);
 }
 
+my $_IN_GLOBAL_DESTRUCTION = 0;
+END {
+    $_IN_GLOBAL_DESTRUCTION = 1;
+}
+
 sub DESTROY {
     my $self = shift;
-    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+    if (defined ${^GLOBAL_PHASE}) {
+        # >= 5.14
+        return if (${^GLOBAL_PHASE} eq 'DESTRUCT');
+    }
+    else {
+        # before 5.14, see also Devel::GlobalDestruction
+        return if $_IN_GLOBAL_DESTRUCTION;
+    }
+
     return if (! $self->handler());
     $self->handler()->destroy();
 }
@@ -237,15 +271,21 @@ sub load_dictionary {
 }
 
 # add packet to the queue
-# type - radius code of request
+# type - radius request packet type code or its text alias
 # av_list - list of attributes in {Name => ... Value => ... } form
+# cb - optional callback to be called on result:
+#      - when received response as $cb->($resp_type, $resp_av_list)
+#      - when failed (eg time out, invalid or non matching response)
+#        with empty parameter list cb->();
 sub send_packet {
-    my ($self, $type, $av_list) = @_;
+    my ($self, $type, $av_list, $cb) = @_;
 
     if ($self->queue_cnt >= MAX_QUEUE) {
         # queue overflow
         return undef;
     }
+
+    $type = $RADIUS_PACKET_TYPES{$type} if exists $RADIUS_PACKET_TYPES{$type};
 
     my ($packet, $req_id, $auth) = $self->packer()->build(
                         type => $type,
@@ -253,7 +293,12 @@ sub send_packet {
                         with_msg_auth => 1,
                     );
     # required to verify reply
-    $self->auth_cache()->{ $req_id } = $auth;
+    $self->send_cache()->{ $req_id } = {
+        authenticator => $auth,
+        type => $type,
+        callback => $cb,
+        time_cached => AE::now(),
+    };
 
     $self->_send_packet($packet);
 
@@ -264,22 +309,22 @@ sub send_packet {
 
 sub send_auth {
     my $self = shift;
-    return $self->send_packet(ACCESS_REQUEST, @_);
+    return $self->send_packet(AUTH => @_);
 }
 
 sub send_acct {
     my $self = shift;
-    return $self->send_packet(ACCOUNTING_REQUEST, @_);
+    return $self->send_packet(ACCT => @_);
 }
 
 sub send_pod {
     my $self = shift;
-    return $self->send_packet(DISCONNECT_REQUEST, @_);
+    return $self->send_packet(POD => @_);
 }
 
 sub send_coa {
     my $self = shift;
-    return $self->send_packet(COA_REQUEST, @_);
+    return $self->send_packet(COA => @_);
 }
 
 1;
@@ -371,21 +416,33 @@ and then wait for responses.
 
 Class method to load dictionary - returns the object to be passed to constructor
 
-=item send_packet ( $type, $av_list )
+=item send_packet ( $type, $av_list, $cb )
 
 Builds RADIUS packet using L<Data::Radius::Packet> and store it to outgoing queue.
+
+The type can be either the direct RFC packet type id, or one of its aliases,
+like COA, DM, POD, ACCT, AUTH ... see C<Data::Radius::Constants>
+
+Passing the optional callback $cb to be called upon receiving response to this request in form
+
+  $cb->($resp_type, $resp_av_list)
+
+or with empty parameters in case of missing response - eg. being timed out or unmatched authenticator
+
+  $cb->()
+
 Returns request id.
 Note that it's not possible to schedule more than 255 requests - trying to add more will return undef
 
-=item send_auth ($av_list)
+=item send_auth ($av_list, $cb)
 
-=item send_acct ($av_list)
+=item send_acct ($av_list, $cb)
 
-=item send_pod ($av_list)
+=item send_pod ($av_list, $cb)
 
-=item send_coa ($av_list)
+=item send_coa ($av_list, $cb)
 
-Helper methods to send RADIUS request of required type by L<send_request()>
+Alias methods to send RADIUS request of required type by L<send_packet()>
 
 =item wait()
 

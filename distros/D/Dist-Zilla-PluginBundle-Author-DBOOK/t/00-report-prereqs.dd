@@ -49,6 +49,7 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::PodCoverageTests' => '0',
                                       'Dist::Zilla::Plugin::PodSyntaxTests' => '0',
                                       'Dist::Zilla::Plugin::Prereqs::FromCPANfile' => '0',
+                                      'Dist::Zilla::Plugin::PrereqsFile' => '0.003',
                                       'Dist::Zilla::Plugin::PruneCruft' => '0',
                                       'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0',
                                       'Dist::Zilla::Plugin::Regenerate::AfterReleasers' => '0',

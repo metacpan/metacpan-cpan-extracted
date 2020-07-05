@@ -24,8 +24,7 @@ sub compare_string_arrays
             . scalar(@$arr2) . "\n";
         return $len_cmp;
     }
-    my $i;
-    for ( $i = 0 ; $i < @$arr1 ; $i++ )
+    for my $i ( keys @$arr1 )
     {
         my $item_cmp = $arr1->[$i] cmp $arr2->[$i];
         if ($item_cmp)

@@ -47,7 +47,7 @@ struct ddcxsRefcntIncVisitor
   inline bool operator()(ddcObject *obj) {
     if (obj) {
       ddcxs_obj_refcnt_inc(obj, n_);
-      REFDEBUG(fprintf(stderr, "[debug] RefIncVisit[n=%u]:INC(obj=%s=%p) --> refcnt=%u\n", n_, obj->jsonClass().c_str(), obj, ddcxs_obj_refcnt(obj)));
+      REFDEBUG(fprintf(stderr, "[debug] RefIncVisit[n=%u]:INC(obj=%s=%p) --> refcnt=%lu\n", n_, obj->jsonClass().c_str(), obj, ddcxs_obj_refcnt(obj)));
     }
     return false;
   };
@@ -71,13 +71,13 @@ struct ddcxsRefcntDecVisitor {
     if (!obj) return false;
     if (ddcxs_obj_refcnt(obj) <= n_) {
       //-- last reference: safely delete the object
-      REFDEBUG(fprintf(stderr, "[debug] RefDecVisit[n=%u]:DESTROY(obj=%s=%p) --> refcnt=%u\n", n_, obj->jsonClass().c_str(), obj, ddcxs_obj_refcnt(obj)));
+      REFDEBUG(fprintf(stderr, "[debug] RefDecVisit[n=%u]:DESTROY(obj=%s=%p) --> refcnt=%lu\n", n_, obj->jsonClass().c_str(), obj, ddcxs_obj_refcnt(obj)));
       obj->DisownChildren();
       delete obj;
     } else {
       //-- other references exist; just decrement the local reference count
       ddcxs_obj_refcnt_dec(obj, n_);
-      REFDEBUG(fprintf(stderr, "[debug] RefDecVisit[n=%u]:DEC(obj=%s=%p) --> refcnt=%u\n", n_, obj->jsonClass().c_str(), obj, ddcxs_obj_refcnt(obj)));
+      REFDEBUG(fprintf(stderr, "[debug] RefDecVisit[n=%u]:DEC(obj=%s=%p) --> refcnt=%lu\n", n_, obj->jsonClass().c_str(), obj, ddcxs_obj_refcnt(obj)));
     }
     return false;
   };
@@ -101,7 +101,7 @@ void ddcxsDumpObjectTree(ddcObject *obj, const string& prefix="") {
     string     prfx = prefixes.front();
     stack.pop_front();
     prefixes.pop_front();
-    fprintf(stderr, "%s+ %s=%p : refcnt=%u\n", prfx.c_str(), (optr ? optr->jsonClass().c_str() : "n/a"), optr, ddcxs_obj_refcnt(optr));
+    fprintf(stderr, "%s+ %s=%p : refcnt=%lu\n", prfx.c_str(), (optr ? optr->jsonClass().c_str() : "n/a"), optr, ddcxs_obj_refcnt(optr));
 
     if (optr != NULL) {
       ddcObjectList kids(optr->Children());
@@ -252,7 +252,7 @@ template<typename T> struct ddcxs_typemap<T*> {
       CLASS += var->jsonClass();
       sv_setref_pv( arg, CLASS.c_str(), (void*)var );
       ddcxs_refcnt_inc((ddcObject*)var);
-      REFDEBUG(fprintf(stderr, "[debug] c2perl(obj=%s=%p,refcnt=%u):RETURN; arg.refcnt=%u\n", ((ddcObject*)var)->jsonClass().c_str(), var, ddcxs_obj_refcnt((ddcObject*)var), SvREFCNT(arg)));
+      REFDEBUG(fprintf(stderr, "[debug] c2perl(obj=%s=%p,refcnt=%lu):RETURN; arg.refcnt=%lu\n", ((ddcObject*)var)->jsonClass().c_str(), var, ddcxs_obj_refcnt((ddcObject*)var), SvREFCNT(arg)));
     }
   };
 };

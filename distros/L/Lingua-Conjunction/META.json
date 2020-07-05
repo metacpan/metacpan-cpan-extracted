@@ -5,7 +5,7 @@
       "Damian Conway <damian@conway.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "Lingua::Conjunction" : {
          "file" : "lib/Lingua/Conjunction.pm",
-         "version" : "v2.1.2"
+         "version" : "v2.1.4"
       }
    },
    "release_status" : "stable",
@@ -72,11 +72,14 @@
          "web" : "https://github.com/robrwo/Lingua-Conjunction"
       }
    },
-   "version" : "v2.1.2",
+   "version" : "v2.1.4",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
+      "Ade Ishs <adeishs@cpan.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

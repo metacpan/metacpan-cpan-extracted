@@ -1,9 +1,9 @@
 package BorderStyle::Test::CustomChar;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'BorderStyleBase'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -18,6 +18,12 @@ our %BORDER = (
             req => 1,
         },
     },
+    examples => [
+        {
+            summary => "Use x as the border character",
+            args => {character=>"x"},
+        },
+    ],
 );
 
 sub get_border_char {
@@ -42,7 +48,7 @@ BorderStyle::Test::CustomChar
 
 =head1 VERSION
 
-This document describes version 0.002 of BorderStyle::Test::CustomChar (from Perl distribution BorderStyleBase), released on 2020-06-11.
+This document describes version 0.004 of BorderStyle::Test::CustomChar (from Perl distribution BorderStyleBase), released on 2020-06-19.
 
 =head1 HOMEPAGE
 

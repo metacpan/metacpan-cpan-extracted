@@ -2,8 +2,8 @@ NAME
     Complete::Bash - Completion routines for bash shell
 
 VERSION
-    This document describes version 0.334 of Complete::Bash (from Perl
-    distribution Complete-Bash), released on 2020-01-28.
+    This document describes version 0.335 of Complete::Bash (from Perl
+    distribution Complete-Bash), released on 2020-04-16.
 
 DESCRIPTION
     This module provides routines related to tab completion in bash shell.
@@ -162,16 +162,16 @@ FUNCTIONS
 
     So if command-line is:
 
-     command -MData::Dump bob@example.org
+     command --module=Data::Dump bob@example.org
 
     then they will be parsed as:
 
-     ["command", "-MData", "::", "Dump", "bob", '@', "example.org"]
+     ["command", "--module", "=", "Data", "::", "Dump", "bob", '@', "example.org"]
 
     Normally in Perl applications, we want ":", "@" to be part of word. So
     this routine will convert the above into:
 
-     ["command", "-MData::Dump", 'bob@example.org']
+     ["command", "--module=Data::Dump", 'bob@example.org']
 
     This function is not exported by default, but exportable.
 

@@ -30,7 +30,7 @@ use vars qw($exit_count);
 
 BEGIN
 {
-    *CORE::GLOBAL::exit = sub { $exit_count++; };
+    *CORE::GLOBAL::exit = sub { ++$exit_count; };
 }
 
 use lib './t/lib';
@@ -40,7 +40,7 @@ use Test::More tests => 6;
 use HTML::Widgets::NavMenu::Test::Data;
 use HTML::Widgets::NavMenu::Test::Stdout;
 
-use HTML::Widgets::NavMenu;
+use HTML::Widgets::NavMenu ();
 
 my $test_data = get_test_data();
 

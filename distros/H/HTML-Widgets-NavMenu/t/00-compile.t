@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 20 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'HTML/Widgets/NavMenu.pm',
@@ -15,6 +15,7 @@ my @module_files = (
     'HTML/Widgets/NavMenu/HeaderRole.pm',
     'HTML/Widgets/NavMenu/Iterator/Base.pm',
     'HTML/Widgets/NavMenu/Iterator/Html.pm',
+    'HTML/Widgets/NavMenu/Iterator/Html/Item.pm',
     'HTML/Widgets/NavMenu/Iterator/JQTreeView.pm',
     'HTML/Widgets/NavMenu/Iterator/NavMenu.pm',
     'HTML/Widgets/NavMenu/Iterator/NavMenu/HeaderRole.pm',

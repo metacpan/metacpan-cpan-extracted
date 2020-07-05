@@ -25,21 +25,21 @@ BEGIN {
     notepad()->closeAll();
 }
 
-ok notepad->{_hwnd}, sprintf('ensure Notepad++ has an hWnd: %s', notepad->{hwnd}//'<undef>')
+ok notepad->hwnd(), sprintf('ensure Notepad++ has an hWnd: %s', notepad->hwnd()//'<undef>')
     or BAIL_OUT "could not find Notepad++ hWnd, which will make the rest of this test meaningless";
 
-SetForegroundWindow( notepad->{_hwnd} );
+SetForegroundWindow( notepad->hwnd() );
 select(undef,undef,undef,0.1);   # wait 100ms for response
 note sprintf "\tOriginal GetForegroundWindow(): %s\n", GetForegroundWindow()//'<undef>';
 
-notepad()->menuCommand($nppidm{IDM_DEBUGINFO});
+notepad()->menuCommand($NPPIDM{IDM_DEBUGINFO});
 my $hWnd = WaitWindowLike(0, 'Debug Info', undef, undef, undef, 2); #wait up to 2 seconds for the DebugInfo
 note sprintf "\tWaitWindowLike: GetForegroundWindow(): %s\n", GetForegroundWindow()//'<undef>';
 note sprintf "\tWaitWindowLike: hWnd = '%s'", $hWnd//'<undef>';
 note sprintf "\tWaitWindowLike: wmGETTEXT= '%s'", WMGetText($hWnd)//'<undef>';
 note sprintf "\tWaitWindowLike: text= '%s'", GetWindowText($hWnd)//'<undef>';
 note sprintf "\tWaitWindowLike: class= '%s'", GetClassName($hWnd)//'<undef>';
-isnt $hWnd, notepad->{_hwnd}, 'Debug Info should have popped up by now';
+isnt $hWnd, notepad->hwnd(), 'Debug Info should have popped up by now';
 is my $dlgname = GetWindowText($hWnd), 'Debug Info', 'Debug Info: check dialog name';
 
 # need some way to click the "Copy debug info into clipboard" button...
@@ -57,7 +57,8 @@ PushButton("OK", 0.5);
 my ($ver, $bits) = $debugInfo =~ m/^Notepad\+\+ (v[\d\.]+)\s*\((\d+)-bit\)\s*$/m;
 ok $ver, 'DebugInfo:Notepad++ ver';
 ok $bits, 'DebugInfo:Notepad++ bits';
-diag sprintf "\tNotepad++ %s %s-bit", $ver//'<undef>', $bits//'<undef>';
+diag sprintf "\n\nDEBUG INFO: Notepad++ %s %s-bit\n\n\n", $ver//'<undef>', $bits//'<undef>';
+note sprintf "\n\n%s\n\n\n", $debugInfo//'<undef>';
 
 # perl bits
 like notepad->getPerlBits(), qr/^(32|64)$/, 'getPerlBits()';

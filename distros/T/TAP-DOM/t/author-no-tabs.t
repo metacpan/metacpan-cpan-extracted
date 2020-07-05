@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
@@ -34,8 +34,10 @@ my @files = (
     't/some_tap3.txt',
     't/some_tap5_usebitsets.txt',
     't/some_tap6_autotapversion.txt',
+    't/some_tap_document_data.tap',
     't/some_tap_doublecomments.txt',
     't/some_tap_with_key_values.tap',
+    't/some_tap_with_key_values_insensitive.tap',
     't/tap_archive.t',
     't/tap_dom.t',
     't/tap_dom2.t',
@@ -43,8 +45,12 @@ my @files = (
     't/tap_dom4.t',
     't/tap_dom5_usebitsets.t',
     't/tap_dom6_autotapversion.t',
+    't/tap_dom_document_data.t',
+    't/tap_dom_dontignore_lines.t',
     't/tap_dom_ignore_lines.t',
-    't/tap_dom_key_values.t'
+    't/tap_dom_key_values.t',
+    't/tap_dom_key_values_case_insensitive.t',
+    't/tap_dom_whitespace.t'
 );
 
 notabs_ok($_) foreach @files;

@@ -8,6 +8,7 @@ use utf8;
 use Time::HiRes qw(gettimeofday);
 use File::Temp qw();
 use File::Path;
+use Encode;
 use Cwd qw();
 use Scalar::Util qw(reftype);
 use CGI qw();
@@ -15,13 +16,13 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.93';
+our $VERSION = '2.14';
 
 =encoding utf8
 
 =head1 NAME
 
-JSONP - a module to quickly build JSON/JSONP web services
+JSONP - a module to quickly build JSON/JSONP web services, providing also some syntactic sugar acting a bit like a sort of DSL (domain specific language) for JSON.
 
 =head1 SYNOPSIS
 
@@ -196,31 +197,19 @@ NOTE: in order to get a "pretty print" via serialize method you will need to eit
 	my $deepser = $j->firstnode->serialize; # won't get a pretty print, because deeper than root
 	my $prettydeeper = $j->firstnode->pretty->serialize; # will get a pretty print, because we called I<pretty> first
 
-NOTE: you can even replace a leaf with a new node:
-
-	$j->first = 9;
-
-	... do some things
-
-	$j->first->second = 9;
-	$j->first->second->third = 'Hi!';
-
-this will enable you to discard I<second> leaf value and append to it whatever data structure you like.
-
 =head1 DESCRIPTION
 
 The purpose of JSONP is to give an easy and fast way to build JSON-only web services that can be used even from a different domain from which one they are hosted on. It is supplied only the object interface: this module does not export any symbol, apart the optional pointer to its own instance in the CGI environment (not possible in mod_perl environment).
 Once you have the instance of JSONP, you can build a response hash tree, containing whatever data structure, that will be automatically sent back as JSON object to the calling page. The built-in automatic cookie session keeping uses a secure SHA256 to build the session key. The related cookie is HttpOnly, Secure (only SSL) and with path set way down the one of current script (keep the authentication script in the root of your scripts path to share session among all scripts). For high trusted intranet environments a method to disable the Secure flag has been supplied. The automatically built cookie key will be long exactly 64 chars (hex format).
 You can retrieve parameters supplied from browser either via GET, POST, PUT, or DELETE by accessing the reserved I<params> key of JSONP object. For example the value of a parameter named I<test> will be accessed via $j->params->test. In case of POSTs or PUTs of application/json requests (JSONP application/javascript requests are always loaded as GETs) the JSONP module will transparently detect them and populate the I<params> key with the deserialization of posted JSON, note that in this case the JSON being P(OS|U)Ted must be an object and not an array, having a I<req> param key on the first level of the structure in order to point out the corresponding function to be invoked.
-You have to provide the string name or sub ref (the module accepts either way) of your own I<aaa> and I<login> functions. The AAA (aaa) function will get called upon every request with the session key (retrieved from session cookie or newly created for brand new sessions) as argument. That way you will be free to implement routines for authentication, authorization, access, and session tracking that most suit your needs, together with rules for user/groups to access the methods you expose. Your AAA function must return the session string (if you previously saved it, read on) if a valid session exists under the given key. A return value evaluated as false by perl will result in a 'forbidden' response (you can add as much errors as you want in the I<errors> array of response object). B<Be sure you return a false value if the user is not authenticated!> otherwise you will give access to all users. If you want you can check the invoked method under the req parameter (see query method) in order to implement your own access policies. B<If> the request has been B<a POST or PUT> (B<but not a GET>)The AAA function will be called a second time just before the response to client will be sent out, the module checks for changes in session by concurrent requests that would have executed in meanwhile, and merges their changes with current one by a smart recursive data structure merge routine. Then it will call the AAA function again with the session key as first argument, and a serialized string of the B<session> branch as second (as you would have modified it inside your called function). This way if your AAA function gets called with only one paramenter it is the begin of the request cycle, and you have to retrieve and check the session saved in your storage of chose (memcached, database, whatever), if it gets called with two arguments you can save the updated session object (already serialized as UTF-8 JSON) to the storage under the given key. The B<session> key of JSONP object will be reserved for session tracking, everything you will save in that branch will be passed serialized to your AAA function right before the response to client. It will be also populated after the serialized string you will return from your AAA function at the beginning of the request cycle. The login function will get called with the current session key (from cookie or newly created) as parameter, you can retrieve the username and password passed by the query method, as all other parameters. This way you will be free to give whatever name you like to those two parameters. Return the outcome of login attempt in order to pass back to login javascript call the state of authentication. Whatever value that evaluates to true will be seen as "authentication ok", whatever value that Perl evaluates to false will be seen as "authentication failed". Subsequent calls (after authentication) will track the authentication status by mean of the session string you return from AAA function.
+You have to provide the string name or sub ref (the module accepts either way) of your own I<aaa> and I<login> functions. The AAA (aaa) function will get called upon every request with the session key (retrieved from session cookie or newly created for brand new sessions) as argument. That way you will be free to implement routines for authentication, authorization, access, and session tracking that most suit your needs, together with rules for user/groups to access the methods you expose. Your AAA function must return the session string (if you previously saved it, read on) if a valid session exists under the given key. A return value evaluated as false by perl will result in a 'forbidden' response (you can add as much errors as you want in the I<errors> array of response object). B<Be sure you return a false value if the user is not authenticated!> otherwise you will give access to all users. If you want you can check the invoked method under the req parameter (see query method) in order to implement your own access policies. B<If> the request has been B<a POST or PUT> (B<but not a GET>)The AAA function will be called a second time just before the response to client will be sent out, the module checks for changes in session by concurrent requests that would have executed in meanwhile, and merges their changes with current one by a smart recursive data structure merge routine. Then it will call the AAA function again with the session key as first argument, and a serialized string of the B<session> branch as second (as you would have modified it inside your called function). This way if your AAA function gets called with only one paramenter it is the begin of the request cycle, and you have to retrieve and check the session saved in your storage of chose (memcached, database, whatever), if it gets called with two arguments you can save the updated session object (already serialized as JSON) to the storage under the given key. The B<session> key of JSONP object will be reserved for session tracking, everything you will save in that branch will be passed serialized to your AAA function right before the response to client. It will be also populated after the serialized string you will return from your AAA function at the beginning of the request cycle. The login function will get called with the current session key (from cookie or newly created) as parameter, you can retrieve the username and password passed by the query method, as all other parameters. This way you will be free to give whatever name you like to those two parameters. Return the outcome of login attempt in order to pass back to login javascript call the state of authentication. Whatever value that evaluates to true will be seen as "authentication ok", whatever value that Perl evaluates to false will be seen as "authentication failed". Subsequent calls (after authentication) will track the authentication status by mean of the session string you return from AAA function.
 If you need to add a method/call/feature to your application you have only to add a sub with same name you will pass under I<req> parameter from frontend.
 
 =head2 METHODS
 
 =cut
 
-sub import
-{
+sub import {
 	my ($self, $name) = @_;
 	return if $ENV{MOD_PERL};
 	return unless $name;
@@ -234,14 +223,42 @@ sub import
 
 =head3 new
 
-class constructor, it does not accept any parameter by user. The options have to be set by calling correspondant methods (see below)
+class constructor. The options have to be set by calling correspondant methods (see below). You can pass a Perl object reference (hash or array) or a JSON string to the constructor, and it will populate automatically the objext, note that when you are using the object as a manager for a web service, <Bit must be an hash>.
+
+my $h = {
+	a => 1,
+	b => 2
+}:
+my $j = JSONP->new($h);
+say $j->serialize;
+
+my $a = ['a', 'b', 'c'];
+my $j = JSONP->new($a);
+say $j->serialize;
+
+my $json = '{"a" : 1, "b" : 2}';
+my $j = JSONP->new($json);
+say $j->serialize;
 
 =cut
 
-sub new
-{
-	my ($class) = @_;
-	bless {}, $class;
+sub new {
+	my ($class, $json) = @_;
+
+	return bless {}, $class unless defined $json;
+
+	my $type = reftype($json) // '';
+	return bless $json, $class if $type eq 'HASH' || $type eq 'ARRAY';
+
+	if ($type eq '') {
+		eval{
+			local $SIG{'__DIE__'};
+			$json = JSON->new->decode($json // '');
+		};
+		return bless $json, $class unless $@;
+	}
+
+	return 0;
 }
 
 =head3 run
@@ -250,10 +267,10 @@ executes the subroutine specified by req paramenter, if it exists, and returns t
 
 =cut
 
-sub _auth
-{
+sub _auth {
 	my ($self, $sid, $session) = @_;
 	my $authenticated = eval {
+			local $SIG{'__DIE__'};
 			$self->{_aaa_sub}->($sid, $session);
 	};
 
@@ -266,11 +283,11 @@ sub _auth
 	$authenticated;
 }
 
-sub run
-{
+sub run {
 	my $self = shift;
-	$self->{_authenticated} = 0;
 	$self->{_is_root_element} = 1;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
+	$self->{_authenticated} = 0;
 	$self->{error} = \0;
 	$self->errors = [];
 	$self->{_passthrough} = 0;
@@ -289,6 +306,12 @@ sub run
 	my $r = CGI->new;
 	# this will enable us to give back the unblessed reference
 	my %params = $r->Vars;
+	# we assume all inputs are UTF-8, (XHR default encoding anyway) but check if params are already decoded for safety
+	for (keys %params) {
+		next if utf8::is_utf8($params{$_});
+		# be wary on input UTF-8 format (use strict UTF-8 mode, not loose utf8)
+		$params{$_} = Encode::decode('UTF-8', $params{$_});
+	}
 	my $contype = $r->content_type // '';
 	my $method = $r->request_method;
 	$self->{_request_method} = $method;
@@ -355,7 +378,9 @@ sub run
 			-value		=> $sid,
 			-path		=> $current_path,
 			-secure		=> !$self->{_insecure_session},
-			-httponly	=> 1
+			-httponly	=> 1,
+			# TODO test SameSite on IE11 on Windows 8 and Safari on MacOS X
+			#-samesite	=> 'Strict'
 		};
 		$cookie->{-expires} = "+$$self{_session_expiration}s" if $self->{_session_expiration};
 		$header->{-cookie} = $r->cookie($cookie);
@@ -363,6 +388,7 @@ sub run
 
 	if (! ! $session && defined &$map || $isloginsub) {
 		eval {
+			local $SIG{'__DIE__'};
 			no strict 'refs'; ## no critic
 			my $outcome = &$map($sid);
 			$self->{_authenticated} = $outcome if $isloginsub;
@@ -400,6 +426,13 @@ sub run
 	$self->authenticated = $self->{_authenticated} ? \1 : \0;
 	$header->{'-status'} = $self->{_status_code} || 200;
 	my $callback;
+
+	# debug
+	# my @layers = PerlIO::get_layers(select);
+
+	my $ofh = select;
+	# avoid putting multiple encoding layers on STDOUT
+	binmode($ofh) && binmode($ofh, ':utf8');
 	unless($self->{_passthrough}){
 		$callback = $self->params->callback if $self->{_request_method} eq 'GET';
 		if($callback){
@@ -425,6 +458,7 @@ sub run
 				$header->{'-attachment'} = $self->{_sendfile} =~ /([^\/]+)$/ ? $1 : '';
 			}
 			print $r->header($header);
+			binmode $ofh;
 			print $self->_slurp($self->{_sendfile});
 			unlink $self->{_sendfile} if $self->{_delete_after_download}
 		}
@@ -443,16 +477,14 @@ sub run
 	$self;
 }
 
-sub _slurp
-{
+sub _slurp {
 	my ($self, $filename) = @_;
 	open my $fh, '<', $filename;
 	local $/;
 	<$fh>;
 }
 
-sub _merge
-{
+sub _merge {
 	# merge $_[2] into $_[1]
 	# you must use params directly to make changes
 	# directly on referenced objects, otherwise
@@ -492,9 +524,10 @@ use this method if you need to return HTML instead of JSON, pass the HTML string
 
 =cut
 
-sub html
-{
-	my ($self, $html) = @_;
+sub html {
+	my ($self, $html, $mime) = @_;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
+	$self->{_mimetype} = $mime;
 	$self->{_passthrough} = 1;
 	$self->{_html} = $html;
 	$self;
@@ -512,9 +545,9 @@ use this method if you need to return a file instead of JSON, pass the full file
 
 =cut
 
-sub sendfile
-{
+sub sendfile {
 	my ($self, $filepath, $isTmpFileToDelete) = @_;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	$self->{_passthrough} = 1;
 	$self->{_mimetype} = 'application/octet-stream';
 	$self->{_sendfile} = $filepath;
@@ -530,9 +563,9 @@ call this method to send a file with custom MIME type and/or if you want to set 
 
 =cut
 
-sub file
-{
+sub file {
 	my ($self, $filepath, $mime, $inline, $isTmpFileToDelete) = @_;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	$self->{_passthrough} = 1;
 	$self->{_mimetype} = $mime;
 	$self->{_sendfile} = $filepath;
@@ -553,9 +586,9 @@ is the same as:
 
 =cut
 
-sub debug
-{
+sub debug {
 	my ($self, $switch) = @_;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	$switch = 1 unless defined $switch;
 	$switch = ! ! $switch;
 	$self->{_debug} = $switch;
@@ -575,9 +608,9 @@ is the same as:
 
 =cut
 
-sub pretty
-{
+sub pretty {
 	my ($self, $switch) = @_;
+	return $self unless (reftype $self // '') eq 'HASH';
 	$switch = 1 unless defined $switch;
 	$switch = ! ! $switch;
 	$self->{_pretty} = $switch;
@@ -590,9 +623,9 @@ call this method if you are going to deploy the script under plain http protocol
 
 =cut
 
-sub insecure
-{
+sub insecure {
 	my ($self, $switch) = @_;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	$switch = 1 unless defined $switch;
 	$switch = ! ! $switch;
 	$self->{_insecure_session} = $switch;
@@ -605,9 +638,9 @@ call this method if you want to omit the I<req> parameter and want that a sub wi
 
 =cut
 
-sub rest
-{
+sub rest {
 	my ($self, $switch) = @_;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	$switch = 1 unless defined $switch;
 	$switch = ! ! $switch;
 	$self->{_rest} = $switch;
@@ -620,9 +653,9 @@ call this method with desired expiration time for cookie in B<seconds>, the defa
 
 =cut
 
-sub set_session_expiration
-{
+sub set_session_expiration {
 	my ($self, $expiration) = @_;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	$self->{_session_expiration} = $expiration;
 	$self;
 }
@@ -634,8 +667,7 @@ call this method to retrieve a named parameter, $jsonp->query(paramenter_name) w
 =cut
 
 # TODO remove query method, now it is useless
-sub query
-{
+sub query {
 	my ($self, $param) = @_;
 	$param ? $self->params->{$param} : $self->params;
 }
@@ -647,9 +679,9 @@ call this function to enable output in simple JSON format (not enclosed within j
 
 =cut
 
-sub plain_json
-{
+sub plain_json {
 	my ($self, $switch) = @_;
+	return $self unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	$switch = 1 unless defined $switch;
 	$switch = ! ! $switch;
 	$self->{_plain_json} = $switch;
@@ -662,8 +694,7 @@ pass to this method the reference (or the name, either way will work) of the fun
 
 =cut
 
-sub aaa
-{
+sub aaa {
 	my ($self, $sub) = @_;
 	if (ref $sub eq 'CODE') {
 		$self->{_aaa_sub} = $sub;
@@ -685,8 +716,7 @@ pass to this method the reference (or the name, either way will work) of the fun
 
 =cut
 
-sub login
-{
+sub login {
 	my ($self, $sub) = @_;
 	if (ref $sub eq 'CODE') {
 		$self->{_login_sub} = $sub;
@@ -708,8 +738,7 @@ pass to this method the reference (or the name, either way will work) of the fun
 
 =cut
 
-sub logout
-{
+sub logout {
 	my ($self, $sub) = @_;
 	if (ref $sub eq 'CODE') {
 		$self->{_logout_sub} = $sub;
@@ -731,9 +760,9 @@ call this method in order to return an error message to the calling page. You ca
 
 =cut
 
-sub raiseError
-{
+sub raiseError {
 	my ($self, $message, $code) = @_;
+	return $self unless (reftype $self // '') eq 'HASH';
 	$self->error = \1;
 	push @{$self->{errors}}, (reftype $message // '') eq 'ARRAY' ? @$message : $message;
 	$self->{_status_code} = $code if defined $code;
@@ -747,17 +776,20 @@ call this method to append a JSON object as a perl subtree on a node. This is a 
 	print $j->subtree->newbranchname->name; # will print "JSON object"
 	$j->sublist->graft->('newbranchname', '[{"name" : "first one"}, {"name" : "second one"}]');
 	print $j->sublist->newbranchname->[1]->name; will print "second one"
+	my $index = 1; print $j->sublist->newbranchname->$index->name; will print "second one" as well
 
 This method will return the reference to the newly added element if added successfully, a false value otherwise.
 
 =cut
 
-sub graft
-{
+sub graft {
 	my ($self, $name, $json) = @_;
 
+	return 0 unless (reftype $self // '') eq 'HASH';
+
 	eval{
-		$self->{$name} = JSON->new->allow_nonref->decode($json // '');
+		local $SIG{'__DIE__'};
+		$self->{$name} = JSON->new->decode($json // '');
 	};
 
 	return 0 if $@;
@@ -773,6 +805,7 @@ call this method to add a JSON object to a node-array. This is a native method, 
 	$j->first->second = [{a => 1}, {b = 2}];
 	$j->first->second->stack('{"c":"3"}');
 	say $j->first->second->[2]->c; # will print 3;
+	my $index = 2; say $j->first->second->$index->c; # will print 3 as well
 
 this method of course works only with nodes that are arrays. Be warned that the decoded JSON string will be added as B<element> to the array, so depending of the JSON string you pass, you can have an element that is an hashref (another "node"), a scalar (a "value") or an arrayref (array of arrays, if you want). This method will return the reference to the newly added element if added successfully, a false value otherwise. Combining this to graft method you can do crazy things like this:
 
@@ -782,17 +815,18 @@ this method of course works only with nodes that are arrays. Be warned that the 
 	say $j->firstnode->secondnode->a; # will print 1
 	say $j->firstnode->secondnode->thirdnode->[0]->b; # will print 9
 	say $j->firstnode->secondnode->thirdnode->[0]->fourthnode; # will print 10
+	my $index = 0; say $j->firstnode->secondnode->thirdnode->$index->fourthnode; # will print 10 as well
 
 =cut
 
-sub stack
-{
+sub stack {
 	my ($self, $json) = @_;
 
 	return 0 unless (reftype $self // '') eq 'ARRAY';
 
 	eval{
-		push @$self, JSON->new->allow_nonref->decode($json // '');
+		local $SIG{'__DIE__'};
+		push @$self, JSON->new->decode($json // '');
 	};
 	return 0 if $@;
 
@@ -820,19 +854,69 @@ this method of course works only with nodes that are arrays. Be warned that the 
 
 =cut
 
-sub append
-{
+sub append {
 	my ($self, $el) = @_;
 
 	return 0 unless (reftype $self // '') eq 'ARRAY';
 
-	eval{
-		push @$self, $el;
-	};
-	return 0 if $@;
+	push @$self, $el;
 
 	#_bless_tree returns the node passed to it blessed as JSONP
 	$self->_bless_tree($self->[$#{$self}]);
+}
+
+=head3 loop
+
+when called from an array node it will loop over its elements returning the B<I<reference>> to the current one, so I<you can change it in place>
+or copy its value to perform calculation with a copy. Returning the reference assure that loops over arrays items that evaluate as false
+won't stop until actual array end.
+Of course this method has the overhead of a function call on every cycle, so use it for convenience on small arrays when performance is not critical.
+You can also want to use this when the operation to perform on each cycle take a significant amount of time where the overhead becomes negligible.
+
+	my $j = JSONP->new;
+	$j->an->array = [
+		[11, 12],
+		[21, 22]
+	];
+
+	say $j->an->pretty->serialize;
+
+	while (my $row = $j->an->array->loop) {
+		while (my $field = $$row->loop){
+			my $acopy = $$field;
+			$$field++;
+		}
+	}
+
+	say $j->an->pretty->serialize;
+
+=cut
+
+sub loop {
+	my ($self, $node) = @_;
+	my $refself = reftype $self // '';
+	return undef unless $refself eq 'ARRAY';
+	# use different counter for every array
+	state $indexes = {};
+	my $addr = 0 + $self;
+	my $index = $indexes->{$addr};
+	$index += 0;
+	# array can change during loop
+	my $size = @$self;
+
+	if ($index < $size){
+		# refs are never undef so we can loop
+		# over false scalar items as well
+		return \$self->[$indexes->{$addr}++];
+	} else {
+		#reset counter for next loops
+		# and avoid memory leaks...
+		# note that the loops exited with "last"
+		# will leak few bytes until program end,
+		# with about 8 bytes per loop it's safe
+		delete $indexes->{$addr};
+		return undef;
+	}
 }
 
 =head3 serialize
@@ -854,13 +938,13 @@ for now the module does assume that nodes/leafs will be scalars/hashes/arrays, s
 
 =cut
 
-sub serialize
-{
+sub serialize {
 	my ($self) = @_;
 	my $out;
 	my $pretty = (reftype $self // '') eq 'HASH' && $self->{_pretty} ? 1 : 0;
 	eval{
-		$out = JSON->new->pretty($pretty)->allow_nonref->allow_unknown->allow_blessed->convert_blessed->encode($self);
+		local $SIG{'__DIE__'};
+		$out = JSON->new->pretty($pretty)->allow_unknown->allow_blessed->convert_blessed->encode($self);
 	} || $@;
 }
 
@@ -875,9 +959,9 @@ if creation fails, a boolean false will be retured (void string).
 
 =cut
 
-sub tempdir
-{
+sub tempdir {
 	my ($self, $path) = @_;
+	return '' unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	return $self->{_tempdir}->dirname unless $path;
 	return $self->_makePath($path);
 }
@@ -892,17 +976,17 @@ if creation fails, a boolean false will be returned (void string).
 
 =cut
 
-sub ctwd
-{
+sub ctwd {
 	my ($self, $path) = @_;
+	return '' unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	return chdir $self->{_tempdir} unless $path;
 	$path = $self->_makePath($path);
 	return $path ? chdir $path : '';
 }
 
-sub _makePath
-{
+sub _makePath {
 	my ($self, $path) = @_;
+	return '' unless (reftype $self // '') eq 'HASH' && $self->{_is_root_element};
 	my $mkdirerr;
 	$path = "$$self{_tempdir}/$path";
 	File::Path::make_path($path, {error => \$mkdirerr});
@@ -919,12 +1003,17 @@ sub _makePath
 	$path;
 }
 
-sub _bless_tree
-{
+sub _bless_tree {
 	my ($self, $node) = @_;
+	my $class = ref $self;
 	my $refnode = ref $node;
+	# proceed only with hashes or arrays not already blessed
+	return if $refnode eq $class;
+	#my $reftype = reftype($node) // '';
+	#return unless $reftype eq 'HASH' || $reftype eq 'ARRAY';
+	# to not change class to objects grafted to JSONP tree
 	return unless $refnode eq 'HASH' || $refnode eq 'ARRAY';
-	bless $node, ref $self;
+	bless $node, $class;
 	if ($refnode eq 'HASH'){
 		$self->_bless_tree($node->{$_}) for keys %$node;
 	}
@@ -934,8 +1023,7 @@ sub _bless_tree
 	$node;
 }
 
-sub TO_JSON
-{
+sub TO_JSON {
 	my $self = shift;
 	my $output;
 
@@ -943,15 +1031,19 @@ sub TO_JSON
 
 	$output = {};
 	for(keys %$self){
-		my $skip;
-		my $nodebug = ! $self->{_debug};
-		if($self->{_is_root_element}){
-			$skip++ if $_ =~ /_sub$/;
-			$skip++ if $_ eq 'session' && $nodebug;
-			$skip++ if $_ eq 'params' && $nodebug;
+		my $skip = 0;
+
+		unless($self->{_debug}){
+			if($self->{_is_root_element}){
+				$skip++ if $_ =~ /_sub$/;
+				$skip++ if $_ eq 'session';
+				$skip++ if $_ eq 'params';
+			}
+			$skip++ if $_ =~ /^_/;
 		}
-		$skip++ if $_ =~ /^_/ && $nodebug;
+
 		next if $skip;
+
 		$output->{$_} = $self->{$_};
 	}
 	return $output;
@@ -960,27 +1052,36 @@ sub TO_JSON
 # avoid calling AUTOLOAD on destroy
 sub DESTROY{}
 
-sub AUTOLOAD : lvalue
-{
+sub AUTOLOAD : lvalue {
 	my $classname = ref $_[0];
-	my $validname = q{(?:[^[:cntrl:][:space:][:punct:][:digit:]][^':[:cntrl:]]{0,1023}|\d{1,1024})};
+	my $validname = q{[^:'[:cntrl:]]{0,1024}};
 	our $AUTOLOAD =~ /^${classname}::($validname)$/;
 	my $key = $1;
 	die "illegal key name, must be of $validname form\n$AUTOLOAD" unless $key;
-	my $miss = Want::want('REF OBJECT') ? {} : '';
-	my $retval = $_[0]->{$key};
-	my $isBool = Want::want('SCALAR BOOL') && ((reftype($retval) // '') eq 'SCALAR');
-	return $$retval if $isBool;
-	$_[0]->{$key} = $_[1] // $retval // $miss;
-	$_[0]->_bless_tree($_[0]->{$key}) if ref $_[0]->{$key} eq 'HASH' || ref $_[0]->{$key} eq 'ARRAY';
-	$_[0]->{$key};
+	my $arraynode = (reftype($_[0]) // '') eq 'ARRAY';
+	die "array indexes must be unsigned integers" if $arraynode && $key !~ /^\d+$/;
+	my $miss = want('OBJECT') ? {} : undef;
+	my $retval = $arraynode ? $_[0]->[$key] : $_[0]->{$key}; # can be undef
+	$retval = $_[1] // $retval // $miss;
+	return '' if want('RVALUE') && ! defined $retval;
+	return $$retval if want('BOOL') && (reftype($retval) // '') eq 'SCALAR' && $$retval == $$retval % 2;
+
+	if ($arraynode){
+		$_[0]->[$key] = $retval;
+		$_[0]->_bless_tree($_[0]->[$key]);
+		return $_[0]->[$key];
+	} else {
+		$_[0]->{$key} = $retval;
+		$_[0]->_bless_tree($_[0]->{$key});
+		return $_[0]->{$key};
+	}
 }
 
 =head1 NOTES
 
 =head2 NOTATION CONVENIENCE FEATURES
 
-In order to achieve autovivification notation shortcut, this module does not make use of perlfilter but does rather some gimmick with AUTOLOAD. Because of this, when you are using the convenience shortcut notation you cannot use all the names of public methods of this module (such I<new>, I<import>, I<run>, and others previously listed on this document) as hash keys, and you must always usei hash keys beginning with any Unicode char different from a posix defined space, punctuation, control, or digit char classes, followed from any combination of Unicode codepoints different from posix control chars, ' (apostrophe) and : (colon) chars. If you use a key hold from a variable, you can either use keys composed of only digits. The total lenght of the key must be not bigger than 1024 Unicode chars, this is an artificial limit set for security purposes. You can still set/access hash branches of whatever name using the brace notation. It is nonetheless highly discouraged the usage of underscore beginning keys through brace notation, at least at the top level of response hash hierarchy, in order to avoid possible clashes with private variable members of this very module.
+In order to achieve autovivification notation shortcut, this module does not make use of perlfilter but does rather some gimmick with AUTOLOAD. Because of this, when you are using the convenience shortcut notation you cannot use all the names of public methods of this module (such I<new>, I<import>, I<run>, and others previously listed on this document) as hash keys, and you must always use hash keys composed from any Unicode char that is not a posix defined control char, ' (apostrophe) and : (colon). You can also use keys composed of only digits, but then it must not be a literal, put it in a variable. In that case the key wil be interpreted as array index or hash key depending of the type of node you are calling it upon. The total lenght of the key must be not bigger than 1024 Unicode chars, this is an artificial limit set for security purposes. You can still set/access hash branches of whatever name using the brace notation. It is nonetheless highly discouraged the usage of underscore beginning keys through brace notation, at least at the top level of response hash hierarchy, in order to avoid possible clashes with private variable members of this very module.
 
 =head2 MINIMAL REQUIREMENTS
 
@@ -1010,7 +1111,6 @@ Remember to always:
 
 the author would be happy to receive suggestions and bug notification. If somebody would like to send code and automated tests for this module, I will be happy to integrate it.
 The code for this module is tracked on this L<GitHub page|https://github.com/ANSI-C/JSONP>.
-Many thanks to L<Robert Acock|https://metacpan.org/author/LNATION> for providing improvement suggestions and bug reports.
 
 =head1 LICENSE
 
@@ -1018,7 +1118,7 @@ This library is free software and is distributed under same terms as Perl itself
 
 =head1 COPYRIGHT
 
-Copyright 2014-2019 by Anselmo Canfora.
+Copyright 2014-2038 by Anselmo Canfora.
 
 =cut
 

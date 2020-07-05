@@ -1,6 +1,12 @@
 package OpenTracing::Implementation::DataDog::Span;
 
-our $VERSION = 'v0.30.1';
+=head1 NAME
+
+OpenTracing::Implementation::DataDog::Span - A DataDog Implementation for a Span
+
+=cut
+
+our $VERSION = 'v0.41.2';
 
 use syntax 'maybe';
 
@@ -8,72 +14,97 @@ use Moo;
 
 with 'OpenTracing::Role::Span';
 
-use OpenTracing::Implementation::DataDog::Utils qw(
-    random_64bit_int
-    nano_seconds
+use aliased 'OpenTracing::Implementation::DataDog::SpanContext';
+
+use Types::Standard qw/Str/;
+use Ref::Util qw/is_plain_hashref/;
+use Carp;
+
+=head1 DESCRIPTION
+
+This is a L<OpenTracing Span|OpenTracing::Interface::Span> compliant
+implementation whit DataDog specific extentions
+
+=cut
+
+
+
+=head1 EXTENDED ATTRIBUTES
+
+=cut
+
+
+
+=head2 C<operation_name>
+
+DataDog requires that its length should not exceed 100 characters.
+
+=cut
+
+has '+operation_name' => (
+    isa => Str->where( 'length($_) <= 100' ),
 );
 
-use Types::Standard qw/CodeRef Object/;
 
 
+=head2 C<context>
 
-has span_id => (
-    is => 'ro',
-    init_arg => undef,
-    default => sub{ random_64bit_int() }
+Add coercion from plain hashref
+
+=cut
+
+has '+context' => (
+    coerce
+    => sub { is_plain_hashref $_[0] ? SpanContext->new( %{$_[0]} ) : $_[0] },
+    default
+    => sub { croak "Can not construct a default SpanContext" },
 );
 
-
-
-has child_of => (
-    is => 'ro',
-    isa =>Object, # does Span or does SpanContext
-    required => 1,
-);
-
-
-
-has on_DEMOLISH => (
-    is              => 'ro',
-    isa             => CodeRef,
-    default         => sub { sub { } }
-);
+# OpenTracing does not provide any public method to instantiate a SpanContext.
+# But rootspans do need to have a context which comes from
+# the `$TRACER->extract_context` call, or it returns `undef` if there was no
+# such context.
+# Passing in a plain hash reference instead of a SpanContext will
+# instantiate such context with a 'fresh' `trace_id`
 
 
 
-sub parent_span_id {
-    my $self = shift;
-    
-    my $parent = $self->{ child_of };
-    return unless $parent->does('OpenTracing::Role::Span');
-    
-    return $parent->span_id
-}
-#
-# This may not be the right way to implement it, for the `child_of` attribute
-# may not be such a good idea, maybe it should use references, but not sure how
-# those are used
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTracing::Implementation::DataDog>
+
+Sending traces to DataDog using Agent.
+
+=item L<OpenTracing::Role::Span>
+
+Role for OpenTracing Implementations.
+
+=back
 
 
 
+=head1 AUTHOR
 
-
-sub nano_seconds_start_time { nano_seconds( $_[0]->start_time ) }
-
-sub nano_seconds_duration   { nano_seconds( $_[0]->duration ) }
+Theo van Hoesel <tvanhoesel@perceptyx.com>
 
 
 
-sub DEMOLISH {
-    my $self = shift;
-    my $in_global_destruction = shift;
-    
-    $self->on_DEMOLISH->( $self )
-        unless $in_global_destruction;
-    
-    return
-}
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing::Implementation::DataDog'
+is Copyright (C) 2019 .. 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
 
 
+=cut
 
 1;

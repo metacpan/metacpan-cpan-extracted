@@ -1,7 +1,19 @@
 Revision history for Net::SFTP::Foreign
 
-1.90  Jan 26, 2018
-        - Module metadata updated.
+
+1.91  Jun 24, 2020
+	- ls was not handling the queue size correctly in some
+	  cases.
+	- Some file types were being incorrectly identified (bug
+          report and patch by balakine, #gh16).
+	- Some documentation typos corrected (reported by Felix
+          Ostmann, #gh15).
+
+1.90_01  Oct 4, 2019
+	- Some servers reply to readdir operations on empty
+          directories with a 0 entry listing instead of an EOF. The
+          module was not handling those replies correctly (bug report
+          by Alan F.).
 
 1.89  Feb 2, 2018
 	- Method "ls" has an internal shortcut intended to improve

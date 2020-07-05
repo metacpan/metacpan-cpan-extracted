@@ -6,7 +6,7 @@ use OPCUA::Open62541::Test::Server;
 use OPCUA::Open62541::Test::Client;
 use Test::More tests =>
     OPCUA::Open62541::Test::Server::planning() +
-    OPCUA::Open62541::Test::Client::planning() + 50;
+    OPCUA::Open62541::Test::Client::planning() + 53;
 use Test::Deep;
 use Test::Exception;
 use Test::NoWarnings;
@@ -204,12 +204,14 @@ my $response = {
     },
     'ResponseHeader_serviceResult' => 'Good',
     'ResponseHeader_additionalHeader' => {
-      'ExtensionObject_content_typeId' => {
-	'NodeId_identifier' => 0,
-	'NodeId_identifierType' => 0,
-	'NodeId_namespaceIndex' => 0
+      'ExtensionObject_content' => {
+	'ExtensionObject_content_typeId' => {
+	  'NodeId_identifier' => 0,
+	  'NodeId_identifierType' => 0,
+	  'NodeId_namespaceIndex' => 0
+	},
+	'ExtensionObject_content_body' => undef,
       },
-      'ExtensionObject_content_body' => undef,
       'ExtensionObject_encoding' => 0
     }
   }
@@ -384,6 +386,27 @@ no_leaks_ok { eval {
 	undef,
     );
 } } "sendAsyncBrowseRequest bad callback leak";
+
+### callback changed
+
+$browsed = 0;
+my $callback = sub {
+    my ($c, $d, $i, $r) = @_;
+    pass "callback correct";
+    $browsed = 1;
+};
+is($client->{client}->sendAsyncBrowseRequest(
+    $request,
+    $callback,
+    undef,
+    undef,
+), STATUSCODE_GOOD, "sendAsyncBrowseRequest callback correct");
+$callback = sub {
+    my ($c, $d, $i, $r) = @_;
+    fail "callback correct";
+    $browsed = 1;
+};
+$client->iterate(\$browsed, "callback correct");
 
 ### multiple requests
 # Call sendAsyncBrowseRequest() multiple times.  Check that request

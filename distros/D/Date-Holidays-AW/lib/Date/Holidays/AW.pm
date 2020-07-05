@@ -1,7 +1,7 @@
 use utf8;
 
 package Date::Holidays::AW;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -40,19 +40,63 @@ my %FIXED_DATES = (
         nl  => 'Nationale vlag en volkslied',
         en  => 'Flag day',
     },
-    'kingsday' => {
-        m   => 3,
-        d   => 18,
-        pap => 'Dia di bandera',
-        nl  => 'Nationale vlag en volkslied',
-        en  => 'Flag day',
+    'wimlex' => {
+        m      => 4,
+        d      => 27,
+        nl     => 'Koningsdag',
+        en     => 'Kings day',
+        pap    => 'Dia di Reino',
+        # change day of week if it falls on a sunday
+        dow    => { 7 => -1 },
+        year_started => 2014,
     },
-    'kingsday' => {
-        m   => 4,
-        d   => 27,
-        pap => 'Dia di Reino',
-        nl  => 'Koningsdag',
-        en  => 'Kings day',
+    'minna-princess' => {
+        m  => 8,
+        d  => 31,
+        nl => 'Prinsessedag',
+        en => "Princess's day",
+        pap => 'Dia di Prensesa',
+
+        # change day of week if it falls on a sunday
+        dow          => { 7 => 1 },
+        year_started => 1885,
+        year_ended   => 1890,
+    },
+    'minna-queen' => {
+        m   => 8,
+        d   => 31,
+        nl  => 'Koninginnedag',
+        en  => "Queen's day",
+        pap => 'Dia di Reina',
+
+        # change day of week if it falls on a sunday
+        dow          => { 7 => 1 },
+        year_started => 1891,
+        year_ended   => 1948,
+        },
+    'juliana-beatrix' => {
+        m  => 4,
+        d  => 30,
+        nl => 'Koninginnedag',
+        en => "Queen's day",
+        pap => 'Dia di Reina',
+
+        # change day of week if it falls on a sunday
+        dow          => { 7 => 1 },
+        year_started => 1949,
+        year_ended   => 1979,
+    },
+    'juliana-beatrix-2' => {
+        m  => 4,
+        d  => 30,
+        nl => 'Koninginnedag',
+        en => "Queen's day",
+        pap => 'Dia di Reina',
+
+        # change day of week if it falls on a sunday
+        dow          => { 7 => -1 },
+        year_started => 1980,
+        year_ended   => 2013,
     },
     'labor' => {
         m   => 5,
@@ -122,19 +166,41 @@ sub holidays {
     my %h;
     foreach (keys %FIXED_DATES) {
         my $holiday = $FIXED_DATES{$_};
-        my $dt      = _to_date($holiday->{d}, $holiday->{m}, $year);
+
+        if (my $int = $holiday->{interval}) {
+            next if $year % $int != 0;
+        }
+
+        if (my $start = $holiday->{year_started}) {
+            next if $year < $start;
+        }
+
+        if (my $end = $holiday->{year_ended}) {
+            next if $year > $end;
+        }
+
+        my $dt = _to_date($holiday->{d}, $holiday->{m}, $year);
+
+        if (my $dow = $holiday->{dow}) {
+            my $cur = $dt->dow();
+            foreach (keys %$dow) {
+                next unless $cur == $_;
+                $dt->add(days => $dow->{$_});
+                last;
+            }
+        }
+
         _to_holidays(\%h, $dt, $holiday);
     }
-
 
     my $dt = _to_date(1, 1, $year);
     foreach (keys %EASTER_BASED) {
         my $holiday = $EASTER_BASED{$_};
         my $easter  = DateTime::Event::Easter->new(
             easter => 'western',
-            day => $holiday->{d}
+            day    => $holiday->{d}
         );
-        my $dt      = $easter->following($dt);
+        my $dt = $easter->following($dt);
         _to_holidays(\%h, $dt, $holiday);
     }
 
@@ -185,7 +251,7 @@ Date::Holidays::AW - Aruba's official holidays
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -197,7 +263,7 @@ version 0.002
 
 =head1 DESCRIPTION
 
-A L<Date::Holiday> family member from Aruba
+A L<Date::Holidays> family member from Aruba
 
 =head1 METHODS
 

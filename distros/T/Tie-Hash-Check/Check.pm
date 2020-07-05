@@ -1,15 +1,12 @@
 package Tie::Hash::Check;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Error::Pure::Utils;
 
-# Version.
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Error level.
 $Error::Pure::Utils::LEVEL = 5;
@@ -123,6 +120,7 @@ Tie::Hash::Check - Tied construct for hash key checking.
 =head1 SYNOPSIS
 
  use Tie::Hash::Check;
+
  tie my %hash, 'Tie::Hash::Check', {
          %parameters,
  };
@@ -180,11 +178,9 @@ Tie::Hash::Check - Tied construct for hash key checking.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Tie::Hash::Check;
 
  # Set error type.
@@ -209,21 +205,22 @@ L<Error::Pure::Utils>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Hash-Check>.
+L<https://github.com/michal-josef-spacek/Hash-Check>.
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2009-2016 Michal Špaček
- BSD 2-Clause License
+© 2009-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

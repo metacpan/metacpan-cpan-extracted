@@ -1,22 +1,20 @@
 use strict;
 use warnings;
 
-use Test2::V0;
+use FindBin qw( $Bin );
+use lib "$Bin/../t/lib";
 
 use File::Slurper qw( read_text );
-
 use Markdent::Handler::MinimalTree;
 use Markdent::Parser;
-
-use lib 't/lib';
-
+use Test2::V0;
 use Test::Markdent;
 
 # This test is here just to make sure that there's no hidden state preserved
 # in our use of /g matches in the parser.
 
 my $markdown
-    = read_text('t/mdtest-data/Markdown Documentation - Basics.text');
+    = read_text("$Bin/../t/mdtest-data/Markdown Documentation - Basics.text");
 
 my $th1 = Markdent::Handler::MinimalTree->new();
 my $th2 = Markdent::Handler::MinimalTree->new();

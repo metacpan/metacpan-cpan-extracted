@@ -9,16 +9,16 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.183';
+our $VERSION = '1.184';
 
 use Time::HiRes ();
 use Quiq::Duration;
+use Quiq::AnsiColor;
 use Quiq::Option;
 use Quiq::Path;
 use Quiq::Converter;
 use Quiq::Process;
 use Cwd ();
-use Quiq::AnsiColor;
 
 # -----------------------------------------------------------------------------
 
@@ -163,7 +163,11 @@ sub DESTROY {
         my $pre = $self->{'msgPrefix'};
         my $t = Time::HiRes::gettimeofday-$self->{'t0'};
         my $duration = Quiq::Duration->new($t)->asString(2);
-        printf $fd "%s%s: %s\n",$pre,$prog,$duration;
+
+        # printf $fd "%s%s: %s\n",$pre,$prog,$duration;
+        my $esc = $self->{'cmdAnsiColor'};
+        my $a = Quiq::AnsiColor->new($esc);
+        printf $fd $a->strLn($esc,sprintf "%s%s: %s",$pre,$prog,$duration);
     }
 
     return;
@@ -630,7 +634,7 @@ sub _logCmd {
 
 =head1 VERSION
 
-1.183
+1.184
 
 =head1 AUTHOR
 

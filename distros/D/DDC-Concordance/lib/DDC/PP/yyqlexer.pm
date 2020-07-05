@@ -52,6 +52,9 @@ BEGIN {
   ##-- single-quoted symbols
   $DEF{sq_text} = "(?:[^\']|$DEF{symbol_cescape})*";
 
+  ##-- bareword dates (>= 4 digits of year, otherwise breaks {count(...) #by[$w=1-1]})
+  $DEF{date_bare} = "[+-]?[0-9]{4,}(-[0-9]{1,2}){1,2}";
+
   ##-- regexes
   $DEF{regex_text}     = "(?:(?:\\\\.)|[^\\\\/])*";
   $DEF{regex_modifier} = '[dgimsx]';
@@ -435,8 +438,8 @@ sub yylex {
 	elsif ($lex->{state} ne 'INITIAL' && $$bufr =~ m/\G[\+\-]?[0-9]+(?=$DEF{int_boundary})/po)	{ $type='INTEGER'; }
 	elsif ($lex->{state} ne 'INITIAL' && $$bufr =~ m/\G[\+\-]?[0-9]+\z/p)				{ $type='INTEGER'; }
 
-	elsif ($lex->{state} ne 'INITIAL' && $$bufr =~ m/\G[0-9]{4,}[0-9\-]+(?=$DEF{int_boundary})/po)	{ $type='DATE'; }
-	elsif ($lex->{state} ne 'INITIAL' && $$bufr =~ m/\G[0-9]{4,}[0-9\-]+\z/po)			{ $type='DATE'; }
+	elsif ($lex->{state} ne 'INITIAL' && $$bufr =~ m/\G$DEF{date_bare}(?=$DEF{int_boundary})/po)	{ $type='DATE'; }
+	elsif ($lex->{state} ne 'INITIAL' && $$bufr =~ m/\G$DEF{date_bare}\z/po)			{ $type='DATE'; }
 
 	##-- misc
 	elsif ($$bufr =~ m/\G\s+/p)	{ $type = '__SKIP__'; }
@@ -586,7 +589,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011-2018 by Bryan Jurish
+Copyright (C) 2011-2020 by Bryan Jurish
 
 This package is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

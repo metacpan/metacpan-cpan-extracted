@@ -32,6 +32,7 @@ DESCRIPTION
      
      [MetaProvides::Package]
      [Prereqs::FromCPANfile]
+     [PrereqsFile]
      [Git::Contributors]
      [MetaNoIndex]
      directory = t
@@ -106,9 +107,10 @@ DESCRIPTION
      [ConfirmRelease]
      [UploadToCPAN]
 
-    This bundle assumes that your git repo has the following: a cpanfile
-    with the dist's prereqs, a Changes populated for the current version
-    (see Dist::Zilla::Plugin::NextRelease), and a .gitignore including
+    This bundle assumes that your git repo has the following: a cpanfile,
+    prereqs.json, or prereqs.yml with the dist's prereqs, a Changes
+    populated for the current version (see
+    Dist::Zilla::Plugin::NextRelease), and a .gitignore including
     /Name-Of-Dist-* but not Makefile.PL/Build.PL or META.json.
 
     To faciliate building the distribution for testing or installation

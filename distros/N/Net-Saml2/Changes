@@ -1,121 +1,96 @@
 Revision history for Perl extension Net::SAML2.
 
-0.01_01  Mon  4 Oct 2010 12:47:56 BST
+0.28    04-Jul-2020
 
-      Initial version. 
+        Increment Version for official release
 
-      This version will correctly perform Web Browser SSO, but
-      with caveats. See the embedded documentation for details. 
+0.27-TRIAL    03-Jul-2020
 
-0.10     Tue 11 Jan 2011 15:11:38 GMT
+        Some overhaul of the Moose code and a couple of XML::Sig fixes
+        as well as a fix to work with Perl 5.10 (Upgrade please upgrade)
 
-      First usable version.
+        As a point of interest the external XML::Sig module has been updated
+        and is now capable of replacing Net::SAML2::XML::Sig
 
-      POD, tests, Moose, etc. 
-      Embeds a local copy of XML::Sig
+        eac8408 Update Changes
+        9352be7 Add contributing info
+        2ecbc2b Use default Moose types instead of MooseX::Types::Moose
+        ecee8bf Add predicates to Net::SAML2::Protocol::AuthnRequest
+        7562ff1 Make use of builders instead of using BUILDARGS
+        d46073c Specify Canonical exclusive mode for XML::Sig
+        597d346 RSA|DSAKeyValue have KeyValue element
+        00f6276 Reverse order of Changes file
+        6f1ee32 Merge pull request #1 from waterkip/perl-510
+        ca48803 Fix perl 5.10 issue with `//=` syntax
+        a31840e Fix github action for newer versions of perl Checkout
+                patched Crypt::OpenSSL::VerifyX509
+        6c67af9 Fix perl 5.10 issue with `//=` syntax
+        739673c Release does not need Docker file
+        7c346f7 Update README.md
+        ce250ee Update Makefile Version
+        3d65d76 Try to fix hard coded directory
+        13ceb8c Update changes for version 0.26
 
-0.11     Wed 12 Jan 2011 21:07:42 GMT
+0.26-TRIAL TBD
+      Some major changes in the test suite but overall minor changes to
+      the rest of the module
 
-      Test Updates
+      Thanks to https://github.com/waterkip Wesley Schwengle for the
+      overhaul of the test suite
 
-0.12     Thu 13 Jan 2011 12:59:02 GMT
+      15596bb Increment Version
+      82a8b54 Add pod documentation
+      62817ca Update changes
+      c4c7db6 Remove unneeded manual dependency from github workflow
+      56051db Update testsuite
+      8c62593 Move testapp to author tests
+      f4cec75 Remove Data::Dumper
+      0d1ccd8 Small setup in which Net::SAML2 is build in Docker
+      4746957 Make it easier to inspect makefile.pl and cpanfile
+      bae12de Really need to fix this
+      e399dd2 Missed a hard coded version
+      09ee6f3 Hard coded directory not ideal
+      ab5418d (tag: 0.25) Update Changes and increment the version
 
-      PAUSE-hide the local XML::Sig
+0.25  Tue, 19 May 2020 23:40:26 GMT
 
-0.14     Thu 13 Jan 2011 19:26:46 GMT
+      What happened to version v0.21 to v0.24?
 
-      Add SingleLogout with Redirect binding to SP metadata
-      Rename local copy of XML::Sig.
+      The version of the embeded XML::Sig was higher that that of Net::SAML2
+      which causes some issues in packaging so this release simply skipped the
+      versions 0.21 to 0.24.  Not much else to say
 
-0.15     Wed 09 Feb 2011 14:55:28 GMT
+      Minor changes for the most part but a requested release based on the
+      removal of XML::Cannonical.  In fact that could be the only functionality
+      change present.
 
-      Handle unwrapped base64 certificate data in IdP metadata.
+      80db64d Add provides section of META
+      8b39923 Add github action to test build
+      38b05fd Make t/author/podcoverage.t a developer only test
+      7473f54 XML::Canonical was removed as an option due to its age
+      50d4314 t/09-authn-request.t: update tests for signed requests
+      bf07c83 Generate META.json via dist.ini
+      cac4ad7 Add missing pod info for Protocol/ArtifactResolve.pm
+      b260946 Update README.md
 
-0.16     Tue 01 Mar 2011 09:40:13 GMT
+0.20     Mon 13 Apr 2020 22:25 UTC
 
-      Use the IdP's advertised NameID formats.
+      First official release since 0.17
+      See Changes for updates includes in prior unofficial releases
 
-0.17     Fri 13 Jan 2012 13:41:23 GMT
-
-      Handle the InclusiveNamespaces element in XML Signature
-      Handle embedded certificate data presented without newlines.
-
-0.17_06  Tue 2 May 2017
-
-      Unreleased
-
-      Github Only fork https://github.com/xmikew/perl-Net-SAML2
-
-      e6efb23 (tag: v0.17_06) Bump version
-      211ee5c Bump version
-      b6abed4 Fix XML::Sig.pm verify function to properly handle nodeset
-              returns from ->find. ->find always returns something according
-	      to the documentation. Check ->size to determine proper verify
-	      method (cert, rsa, dsa).
-      f7d26b9 Merge branch 'jfearn-devel'
-      e5f3140 Clean up add in_response_to to  Assertation
-      5d3256a Added support to Sig.pm for sha's > sha1 Fix Sig.pm to only grap
-              the root signature, assertating sigs where breaking it Add some 
-	      strictures and warnings
-      b0adf09 Set proper case on XML::XPath attribute
-      3184145 expose xpath object on the assertion
-      6f46088 - merge post_with_cert branch > Accept cert_text in POST 
-              constructor and pass along to XML::Sig   allows verification
-	      using IDP metadata of POST data.
-      45ef539 Add XML::Writer
-      4e3ff81 - AuthnRequest XML generation moved to XML::Writer - Allow 
-              Subject, AssertionConsumerServiceURL and protocol-binding - 
-	      Remove requirement of Destination attribute.
-      a9a7492 (origin/idp_params) Allow slo_urls and art_urls to be undef
-              - not required by SAMLv2 spec
-      e3ccd0d Merge branch 'multiple_sig_support'
-      2596d6a Sig.pm: use Digest::SHA instead of Digest:SHA1
-      a3e3deb add additional attribute 'key' to Net::SAML2::SP
-      ebd4c76 IdP.pm: simplify $idp->format() a bit
-      13bc56d documentation updates
-      48fc1cb Sig.pm: improve compatibility with simplesamlphp
-      710d85d tell encode_base64 to not add newlines to returned digest
-
-0.19.05  Sat 4 May 2019
-
-      Unreleased
-
-      Github release only https://github.com/timlegge/perl-Net-SAML2/releases
-
-      b37bb43 Cleanup whitespace issues
-      a0d3754 (origin/dev) Cleanup whitespace issues
-      4cb8313 Bump Version
-      6177d15 XML::Tidy is now a dependancy
-      b034e7f Remove comments from XML before processing it
-      8167478 Initial support to remove comments from XML
-      894e6f3 Testing changes to remove comments
-      6ecf28e nameid_format is not required
-      aae8f3b NameIDFormat is optional in metadata
-      a606e20 Update ProtocolMessage.pm
-              xsd:ID cannot start with a number·
-
-      Github fork from https://github.com/alranel/perl-Net-SAML2
-
-      9d2bcb5 Added parsing of substatus
-      3d40cd9 Add validation of InResponseTo and fix a bug in assertion
-              parsing
-      8bfc7c2 Have issuer and destination be populated for all messages
-      9818895 Bugfix: due to an upstream bug, attributes parsing did
-              not work when using custom namespace aliases
-      4fea809 Make CA validation optional; add assertion_index and 
-              attribute_index
-      038d418 One more fix for namespace declarations
-      dd06637 Fix namespace declarations for AuthnRequest
-      cc77b85 Allow empty AuthnContextClassRef and AuthnContextDeclRef
-      91509f5 Quotes
-      29f74d9 Added RequestedAuthnContext to AuthnRequest
-      7f459c3 Added nameidpolicy_format to AuthnRequest
-      6ba6096 Added issuer_namequalifier and issuer_format to AuthnRequest
-      6cc8de3 Bugfix: X509Certificate was not read when input XML didn't use
-              the 'ds:' alias
-      1489051 Make the AuthnRequest attributes writeable
-      f37bdbd Make IdP certificate verification emit a warning instead of 
-              croaking
+      b2af5f7 Ignore Build directories and Build archives
+      4293ece Delete file added by mistake and increment version number
+      bcfcc21 Embedded tabs to Space
+      f792089 Protocol/Assertion.pm: improve documentation and test for in_response_to
+      f7e3965 Improve Redirect dobumentation
+      474f1b7 Fix lib/Net/SAML2/IdP.pm docs
+      3087931 Fix up AuthnRequest docs and improve test
+      4caff6b Add Contributors to dist.ini
+      bd665c4 (additional-tests) Improve AuthnReq documentation
+      a492107 Add link to github repo
+      6fb076c Create README.md
+      963d871 (tag: 0.20.03-TRIAL) Add dist.ini
+      f4232c2 Update changes for 0.20.03 TRIAL
 
 0.20.03 TRIAL
 
@@ -144,43 +119,120 @@ Revision history for Perl extension Net::SAML2.
       17e5aa4 Add additional pod coverage
       7d3a69f Fix pod syntax
 
-0.20     Mon 13 Apr 2020 22:25 UTC
+0.19.05  Sat 4 May 2019
 
-      First official release since 0.17
-      See Changes for updates includes in prior unofficial releases
+      Unreleased
 
-      b2af5f7 Ignore Build directories and Build archives
-      4293ece Delete file added by mistake and increment version number
-      bcfcc21 Embedded tabs to Space
-      f792089 Protocol/Assertion.pm: improve documentation and test for in_response_to
-      f7e3965 Improve Redirect dobumentation
-      474f1b7 Fix lib/Net/SAML2/IdP.pm docs
-      3087931 Fix up AuthnRequest docs and improve test
-      4caff6b Add Contributors to dist.ini
-      bd665c4 (additional-tests) Improve AuthnReq documentation
-      a492107 Add link to github repo
-      6fb076c Create README.md
-      963d871 (tag: 0.20.03-TRIAL) Add dist.ini
-      f4232c2 Update changes for 0.20.03 TRIAL
+      Github release only https://github.com/timlegge/perl-Net-SAML2/releases
 
-0.25    TBD
+      b37bb43 Cleanup whitespace issues
+      a0d3754 (origin/dev) Cleanup whitespace issues
+      4cb8313 Bump Version
+      6177d15 XML::Tidy is now a dependancy
+      b034e7f Remove comments from XML before processing it
+      8167478 Initial support to remove comments from XML
+      894e6f3 Testing changes to remove comments
+      6ecf28e nameid_format is not required
+      aae8f3b NameIDFormat is optional in metadata
+      a606e20 Update ProtocolMessage.pm
+              xsd:ID cannot start with a number·
 
-      What happened to version v0.21 to v0.24?
+      Github fork from https://github.com/alranel/perl-Net-SAML2
 
-      The version of the embeded XML::Sig was higher that that of Net::SAML2
-      which causes some issues in packaging so this release simply skipped the
-      versions 0.21 to 0.24.  Not much else to say
+      9d2bcb5 Added parsing of substatus
+      3d40cd9 Add validation of InResponseTo and fix a bug in assertion
+              parsing
+      8bfc7c2 Have issuer and destination be populated for all messages
+      9818895 Bugfix: due to an upstream bug, attributes parsing did
+              not work when using custom namespace aliases
+      4fea809 Make CA validation optional; add assertion_index and
+              attribute_index
+      038d418 One more fix for namespace declarations
+      dd06637 Fix namespace declarations for AuthnRequest
+      cc77b85 Allow empty AuthnContextClassRef and AuthnContextDeclRef
+      91509f5 Quotes
+      29f74d9 Added RequestedAuthnContext to AuthnRequest
+      7f459c3 Added nameidpolicy_format to AuthnRequest
+      6ba6096 Added issuer_namequalifier and issuer_format to AuthnRequest
+      6cc8de3 Bugfix: X509Certificate was not read when input XML didn't use
+              the 'ds:' alias
+      1489051 Make the AuthnRequest attributes writeable
+      f37bdbd Make IdP certificate verification emit a warning instead of
+              croaking
 
-      Minor changes for the most part but a requested release based on the 
-      removal of XML::Cannonical.  In fact that could be the only functionality
-      change present.
+0.17_06  Tue 2 May 2017
 
-      80db64d Add provides section of META
-      8b39923 Add github action to test build
-      38b05fd Make t/author/podcoverage.t a developer only test
-      7473f54 XML::Canonical was removed as an option due to its age
-      50d4314 t/09-authn-request.t: update tests for signed requests
-      bf07c83 Generate META.json via dist.ini
-      cac4ad7 Add missing pod info for Protocol/ArtifactResolve.pm
-      b260946 Update README.md
+      Unreleased
+
+      Github Only fork https://github.com/xmikew/perl-Net-SAML2
+
+      e6efb23 (tag: v0.17_06) Bump version
+      211ee5c Bump version
+      b6abed4 Fix XML::Sig.pm verify function to properly handle nodeset
+              returns from ->find. ->find always returns something according
+	      to the documentation. Check ->size to determine proper verify
+	      method (cert, rsa, dsa).
+      f7d26b9 Merge branch 'jfearn-devel'
+      e5f3140 Clean up add in_response_to to  Assertation
+      5d3256a Added support to Sig.pm for sha's > sha1 Fix Sig.pm to only grap
+              the root signature, assertating sigs where breaking it Add some
+	      strictures and warnings
+      b0adf09 Set proper case on XML::XPath attribute
+      3184145 expose xpath object on the assertion
+      6f46088 - merge post_with_cert branch > Accept cert_text in POST
+              constructor and pass along to XML::Sig   allows verification
+	      using IDP metadata of POST data.
+      45ef539 Add XML::Writer
+      4e3ff81 - AuthnRequest XML generation moved to XML::Writer - Allow
+              Subject, AssertionConsumerServiceURL and protocol-binding -
+	      Remove requirement of Destination attribute.
+      a9a7492 (origin/idp_params) Allow slo_urls and art_urls to be undef
+              - not required by SAMLv2 spec
+      e3ccd0d Merge branch 'multiple_sig_support'
+      2596d6a Sig.pm: use Digest::SHA instead of Digest:SHA1
+      a3e3deb add additional attribute 'key' to Net::SAML2::SP
+      ebd4c76 IdP.pm: simplify $idp->format() a bit
+      13bc56d documentation updates
+      48fc1cb Sig.pm: improve compatibility with simplesamlphp
+      710d85d tell encode_base64 to not add newlines to returned digest
+
+0.17     Fri 13 Jan 2012 13:41:23 GMT
+
+      Handle the InclusiveNamespaces element in XML Signature
+      Handle embedded certificate data presented without newlines.
+
+0.16     Tue 01 Mar 2011 09:40:13 GMT
+
+      Use the IdP's advertised NameID formats.
+
+0.15     Wed 09 Feb 2011 14:55:28 GMT
+
+      Handle unwrapped base64 certificate data in IdP metadata.
+
+0.14     Thu 13 Jan 2011 19:26:46 GMT
+
+      Add SingleLogout with Redirect binding to SP metadata
+      Rename local copy of XML::Sig.
+
+0.12     Thu 13 Jan 2011 12:59:02 GMT
+
+      PAUSE-hide the local XML::Sig
+
+0.11     Wed 12 Jan 2011 21:07:42 GMT
+
+      Test Updates
+
+0.10     Tue 11 Jan 2011 15:11:38 GMT
+
+      First usable version.
+
+      POD, tests, Moose, etc.
+      Embeds a local copy of XML::Sig
+
+0.01_01  Mon  4 Oct 2010 12:47:56 BST
+
+      Initial version.
+
+      This version will correctly perform Web Browser SSO, but
+      with caveats. See the embedded documentation for details.
 

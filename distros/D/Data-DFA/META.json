@@ -4,7 +4,7 @@
       "philiprbrenan@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4229",
    "license" : [
       "perl_5"
    ],
@@ -23,8 +23,8 @@
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::NFA" : "20191110",
-            "Data::Table::Text" : "20191110",
+            "Data::NFA" : "20200623",
+            "Data::Table::Text" : "20200418",
             "Test2::API" : "0",
             "Test::More" : "0"
          }
@@ -33,7 +33,7 @@
    "provides" : {
       "Data::DFA" : {
          "file" : "lib/Data/DFA.pm",
-         "version" : "20191119"
+         "version" : "20200627"
       },
       "dtdElementDfa" : {
          "file" : "lib/Data/DFA.pm"
@@ -45,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20191119",
+   "version" : "20200627",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

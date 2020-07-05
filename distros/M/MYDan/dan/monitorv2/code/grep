@@ -21,17 +21,16 @@ return sub
             my $c = eval{ YAML::XS::Load $result{$n} };
             if( $@ )
             {
-                $mesg{"$n###sys###get_sysinfo_err"} ++;
+                $mesg{"$n###sys###mydan_rcall_err"} ++;
                 next;
             }
             map{ $mesg{"$n###$_"} = $c->{$_}; }keys %$c;
         }
         else
         {
-            $mesg{"$n###sys###get_sysinfo_err"} ++;
+            $mesg{"$n###sys###mydan_rcall_err"} ++;
         }
     }
 
-    return keys %mesg;
-
+    return %mesg;
 };

@@ -16,19 +16,19 @@ name: MsOffice-Word-Surgeon
 provides:
   MsOffice::Word::Surgeon:
     file: lib/MsOffice/Word/Surgeon.pm
-    version: '1.0'
+    version: '1.01'
   MsOffice::Word::Surgeon::Change:
     file: lib/MsOffice/Word/Surgeon/Change.pm
-    version: '1.0'
+    version: '1.01'
   MsOffice::Word::Surgeon::Run:
     file: lib/MsOffice/Word/Surgeon/Run.pm
-    version: '1.0'
+    version: '1.01'
   MsOffice::Word::Surgeon::Text:
     file: lib/MsOffice/Word/Surgeon/Text.pm
-    version: '1.0'
+    version: '1.01'
   MsOffice::Word::Surgeon::Utils:
     file: lib/MsOffice/Word/Surgeon/Utils.pm
-    version: '1.0'
+    version: '1.01'
 requires:
   Archive::Zip: '0'
   Carp: '0'
@@ -40,5 +40,5 @@ requires:
 resources:
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/damil/MsOffice-Word-Surgeon
-version: '1.0'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

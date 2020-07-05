@@ -12,7 +12,7 @@ TEST("get") {
     auto result = p.parse(raw);
     auto req = result.request;
     CHECK(result.state == State::done);
-    CHECK(req->method == Method::GET);
+    CHECK(req->method_raw() == Method::GET);
     CHECK(req->http_version == 10);
     CHECK(req->uri->to_string() == "/");
 }
@@ -29,7 +29,7 @@ TEST("post") {
     auto result = p.parse(raw);
     auto req = result.request;
     CHECK(result.state == State::done);
-    CHECK(req->method == Method::POST);
+    CHECK(req->method_raw() == Method::POST);
     CHECK(req->http_version == 11);
     CHECK(req->uri->to_string() == "/upload");
 }
@@ -65,7 +65,7 @@ TEST("fragmented method") {
     }
     auto req = result.request;
     CHECK(result.state == State::done);
-    CHECK(req->method == Method::GET);
+    CHECK(req->method_raw() == Method::GET);
     CHECK(req->http_version == 10);
     CHECK(req->headers.get("Header1") == "header1");
 }
@@ -87,7 +87,7 @@ TEST("parsing request byte by byte") {
     }
     auto req = result.request;
     CHECK(result.state == State::done);
-    CHECK(req->method == Method::GET);
+    CHECK(req->method_raw() == Method::GET);
     CHECK(req->http_version == 10);
     CHECK(req->headers.get("Header1") == "header1");
     CHECK(req->headers.get("Header2") == "header2");
@@ -104,7 +104,7 @@ TEST("double first line") {
     auto result = p.parse(raw);
     auto req = result.request;
     CHECK(result.error);
-    CHECK(req->method == Method::GET);
+    CHECK(req->method_raw() == Method::GET);
     CHECK(req->http_version == 10);
 }
 

@@ -62,4 +62,9 @@ template <class T, class R = T> using enable_if_signed_integral_t   = std::enabl
 template <class T, class R = T> using enable_if_unsigned_integral_t = std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, R>;
 template <class T, class R = T> using enable_if_floatp_t            = std::enable_if_t<std::is_floating_point<T>::value, R>;
 
+template <typename T, typename F>         auto static_if(std::true_type, T t, F)  { return t; }
+template <typename T, typename F>         auto static_if(std::false_type, T, F f) { return f; }
+template <bool B, typename T, typename F> auto static_if(T t, F f)                { return static_if(std::integral_constant<bool, B>{}, t, f); }
+template <bool B, typename T>             auto static_if(T t)                     { return static_if(std::integral_constant<bool, B>{}, t, [](auto&&...){}); }
+
 }

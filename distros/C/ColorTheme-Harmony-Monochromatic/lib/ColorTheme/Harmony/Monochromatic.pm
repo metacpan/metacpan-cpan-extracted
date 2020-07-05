@@ -1,9 +1,9 @@
 package ColorTheme::Harmony::Monochromatic;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorTheme-Harmony-Monochromatic'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ All the colors in the theme will have the same hue *h*, but different saturation
 
 Example to see on the terminal:
 
-    % show-color-theme-swatch Harmony::Monochromatic -A h=86
+    % show-color-theme-swatch Harmony::Monochromatic=h,86
 
 _
     dynamic => 1,
@@ -58,6 +58,12 @@ _
             default => 0.5,
         },
     },
+    examples => [
+        {
+            summary => 'A monochromatic red scheme',
+            args => { h => 0 },
+        },
+    ],
 );
 
 sub new {
@@ -106,7 +112,7 @@ ColorTheme::Harmony::Monochromatic - Create a monochromatic color theme
 
 =head1 VERSION
 
-This document describes version 0.004 of ColorTheme::Harmony::Monochromatic (from Perl distribution ColorTheme-Harmony-Monochromatic), released on 2020-06-09.
+This document describes version 0.005 of ColorTheme::Harmony::Monochromatic (from Perl distribution ColorTheme-Harmony-Monochromatic), released on 2020-06-19.
 
 =head1 DESCRIPTION
 
@@ -115,7 +121,7 @@ All the colors in the theme will have the same hue I<h>, but different saturatio
 
 Example to see on the terminal:
 
- % show-color-theme-swatch Harmony::Monochromatic -A h=86
+ % show-color-theme-swatch Harmony::Monochromatic=h,86
 
 =head1 HOMEPAGE
 

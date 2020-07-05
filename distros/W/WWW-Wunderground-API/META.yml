@@ -1,5 +1,5 @@
 ---
-abstract: "Use Weather Underground's JSON/XML API"
+abstract: 'Interface to Weather Underground API (DISCONTINUED)'
 author:
   - 'John Lifsey, C<< <nebulous at crashed.net> >>'
   - 'John Lifsey <nebulous@crashed.net>'
@@ -27,11 +27,11 @@ requires:
   Hash::AsObject: 0
   JSON::MaybeXS: 0
   LWP::Simple: 0
-  Moo: '1.0'
+  Moo: '1.001000'
   XML::Simple: 0
   perl: 5.6.0
 resources:
   homepage: https://github.com/nebulous/WWW-Wunderground-API
   license: http://dev.perl.org/licenses/
   repository: https://github.com/nebulous/WWW-Wunderground-API.git
-version: '0.08'
+version: '0.09'

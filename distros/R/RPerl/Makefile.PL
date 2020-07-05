@@ -2,8 +2,8 @@
 
 use strict;
 use warnings;
-our $VERSION = 0.039_000;
-use 5.010;  # NEED ANSWER, CORRELATION #rp000: is RPerl truly incompatible with Perl v5.8 and earlier?
+our $VERSION = 0.041_000;
+use 5.012;  # NEED ANSWER, CORRELATION #rp000: is RPerl truly incompatible with Perl v5.10 and earlier?
 
 use ExtUtils::MakeMaker;
 
@@ -91,7 +91,7 @@ WriteMakefile(
     VERSION_FROM     => 'lib/RPerl.pm',
     LICENSE          => 'perl_5',
     EXE_FILES        => ['script/rperl'],
-    MIN_PERL_VERSION => '5.10.0',  # NEED ANSWER, CORRELATION #rp000: is RPerl truly incompatible with Perl v5.8 and earlier?
+    MIN_PERL_VERSION => '5.12.0',  # NEED ANSWER, CORRELATION #rp000: is RPerl truly incompatible with Perl v5.10 and earlier?
 #    MAKE             => 'gmake',   # CORRELATION #rp200, Windows + EU::MM + GNU makef
     CONFIGURE_REQUIRES => {
         # DEV NOTE, CORRELATION #rp061: prioritize installation of all dists which are (or may be) dependencies of other dists or components, CONFIGURE_REQUIRES prioritizes installation, PREREQ_PM creates runtime dependency
@@ -109,12 +109,13 @@ WriteMakefile(
 
         # RPERL USER DEPENDENCIES
         'ExtUtils::MakeMaker' => '7.04',      # for compatibility with Inline::C >= v0.75
+        'PPI'                 => '1.242',     # avoid endless loop from exponents of 2+ zeroes; https://github.com/adamkennedy/PPI/pull/230
         'Test::Exception'     => '0.43',      # 0.43 needed because Appveyor testing required it
         'Test::CPAN::Changes' => '0.400002',
         'Test::Number::Delta' => '1.06',      # for compatibility with Perls compiled using -Duselongdouble
         'Test2::Suite'        => '0.000069',  # older versions are broken
         'Perl::Critic'        => '1.121',
-        'Perl::Tidy'          => '20140711',
+        'Perl::Tidy'          => '20191203',  # RT#130394: Allow short nested blocks; had to reformat 19 test files to pass tests again
         'Inline'              => '0.80',
         'Inline::C'           => '0.76',      # wbraswell added CPPFLAGS
         'Inline::CPP'         => '0.74',      # davido & mohawk fixed ntype warnings; davido & wbraswell fixed namespace hack; nanis fixed Win32 filename space bug

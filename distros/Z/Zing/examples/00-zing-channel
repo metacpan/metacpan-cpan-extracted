@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::Channel;
+
+=pod explain
+
+- zing-channel is an append-only queue (or sorts)
+- using a shared channel name, multiple processes can read and replay messages
+- the cursor for each new instance starts at the end ...
+- so recv() only gets new messages from the time of creation
+- you can reset the cursor and replay message from the beginning using reset()
+
+=cut
+
+my $c = Zing::Channel->new(name => 'counter');
+
+for my $i (1..1_000) {
+  $c->send({count => $i});
+}
+
+for my $i (1..1_000) {
+  warn $c->recv->{count};
+}
+
+warn 'channel has', ' ', $c->size, ' ', 'messages';
+
+$c->drop;

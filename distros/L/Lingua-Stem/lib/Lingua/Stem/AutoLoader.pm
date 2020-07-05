@@ -1,7 +1,5 @@
 package Lingua::Stem::AutoLoader;
 
-# $RCSfile: AutoLoader.pm,v $ $Revision: 1.2 $ $Date: 1999/06/17 21:59:24 $ $Author: snowhare $
-
 =head1 NAME
 
 Lingua::Stem::AutoLoader - A manager for autoloading Lingua::Stem modules
@@ -27,6 +25,8 @@ Sets up the autoloader to load the modules in the Lingua::Stem system on demand.
 
 =head1 CHANGES
 
+ 2.30 2020.06.20 - Version renumber for module consistency
+
  1.03 2004.07.25 - Added 'Lingua::Stem::Ru'
 
  1.02 2004.04.26 - Added 'Lingua::Stem::Fr'
@@ -41,9 +41,11 @@ Sets up the autoloader to load the modules in the Lingua::Stem system on demand.
 =cut
 
 use strict;
+use warnings;
+
 use vars qw($VERSION $AUTOLOAD);
 
-$VERSION = "1.02";
+$VERSION = "2.30";
 
 my $_autoloaded_functions = {};
 
@@ -92,13 +94,13 @@ if ($@ ne '') {
 
 =head1 COPYRIGHT
 
-Copyright 1999, Benjamin Franz (<URL:http://www.nihongo.org/snowhare/>) and
+Copyright 1999, Jerilyn Franz <cpan@jerilyn.info> and
 FreeRun Technologies, Inc. (<URL:http://www.freeruntech.com/>). All Rights Reserved.
 This software may be copied or redistributed under the same terms as Perl itelf.
 
 =head1 AUTHOR
 
-Benjamin Franz
+Jerilyn Franz
 
 =head1 TODO
 

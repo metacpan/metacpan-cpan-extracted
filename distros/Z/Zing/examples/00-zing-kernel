@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::Kernel;
+
+=pod explain
+
+- zing-kernel is the core Watcher process
+- it's not strictly necessary but does serve one essential function ...
+- i.e. processes ship logs to a known channel which the kernel collects from ...
+- which is how log-shipping is done
+- the kernel is automatically bootstrapped when apps are launched with Zing ...
+- or anything under the Zing/Zang namespace
+
+=cut
+
+my $z = Zing::Kernel->new(scheme => ['MyApp::Logger', [], 2]);
+
+$z->execute;

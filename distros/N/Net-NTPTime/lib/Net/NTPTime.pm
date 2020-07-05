@@ -1,11 +1,11 @@
 package Net::NTPTime;
 
-require Socket;
+use Socket;
 use base qw(Exporter);
 
 our @EXPORT = qw(get_ntp_time get_unix_time);
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 sub get_ntp_time
 {
@@ -28,23 +28,21 @@ sub get_unix_time
 
 =head1 NAME
 
-Net::NTPTime - Retrieve NTP and UNIX timestamp (unsigned integer) from an NTP server.
+Net::NTPTime
 
 =head1 SYNOPSIS
 
-	use Net::NTPTime;
-	
-	my $unix_time = get_unix_time;
-	
-	my $unix_time = get_unix_time('ntp.server.com');
-	
-	my $ntp_time = get_ntp_time;
-	
-	my $ntp_time = get_ntp_time('ntp.server.com');
+    use Net::NTPTime;
+    my $unix_time = get_unix_time;
+    my $unix_time = get_unix_time('ntp.server.com');
+    my $ntp_time = get_ntp_time;
+    my $ntp_time = get_ntp_time('ntp.server.com');
 
 =head1 DESCRIPTION
 
-Retrieves timestamps in NTP and UNIX formats from an NTP server.
+Retrieve NTP and UNIX timestamp (unsigned integer) from an NTP server.
+
+Pollutes the namespace with two functions: get_unix_time & get_ntp_time
 
 =head1 METHODS
 
@@ -58,13 +56,26 @@ You may include a specific NTP server to ping, or a default server will be used.
 Returns an integer timestamp indicating the number of elapsed seconds since 00:00 01-JAN-1900.
 You may include a specific NTP server to ping, or a default server will be used.
 
-=head1 The real credit goes to Tim Hogard for writing the code to do this. Thanks!
+=head1 Version History
 
-=head1 AUTHOR, COPYRIGHT, and LICENSE
+1.00 - Initial Release
 
-Copyright(C) 2009, phatWares, USA. All rights reserved.
+1.01 - Bug fix (changed "require Socket" to "use Socket")
+
+1.02 - Fixed this POD document
+
+=head1 Author
+
+Brandon Bourret
+
+=head1 License
 
 Permission is granted to use this software under the same terms as Perl itself.
+
 Refer to the L<Perl Artistic|perlartistic> license for details.
+
+=head1 Credits
+
+The real credit goes to Tim Hogard for writing the code to do this. Thanks!
 
 =cut

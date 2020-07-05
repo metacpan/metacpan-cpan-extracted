@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "Devel::Gladiator" : "0",
             "Devel::MAT" : "0.04"
          },
          "requires" : {
@@ -37,7 +38,7 @@
    "provides" : {
       "Test::MemoryGrowth" : {
          "file" : "lib/Test/MemoryGrowth.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -46,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

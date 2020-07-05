@@ -1,5 +1,5 @@
 package Search::Elasticsearch::TestServer;
-$Search::Elasticsearch::TestServer::VERSION = '6.80';
+$Search::Elasticsearch::TestServer::VERSION = '6.81';
 use Moo;
 use Search::Elasticsearch();
 use POSIX 'setsid';
@@ -194,7 +194,7 @@ Search::Elasticsearch::TestServer - A helper class to launch Elasticsearch nodes
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 SYNOPSIS
 

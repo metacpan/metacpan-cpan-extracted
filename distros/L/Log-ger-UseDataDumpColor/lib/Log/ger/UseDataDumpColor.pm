@@ -1,7 +1,9 @@
 package Log::ger::UseDataDumpColor;
 
-our $DATE = '2017-06-28'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-17'; # DATE
+our $DIST = 'Log-ger-UseDataDumpColor'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use Data::Dump::Color ();
 use Log::ger ();
@@ -24,7 +26,7 @@ Log::ger::UseDataDumpColor - Use Data::Dump::Color to dump data structures
 
 =head1 VERSION
 
-This document describes version 0.001 of Log::ger::UseDataDumpColor (from Perl distribution Log-ger-UseDataDumpColor), released on 2017-06-28.
+This document describes version 0.002 of Log::ger::UseDataDumpColor (from Perl distribution Log-ger-UseDataDumpColor), released on 2020-04-17.
 
 =head1 SYNOPSIS
 
@@ -54,7 +56,8 @@ L<Log::ger>
 
 L<Data::Dump::Color>
 
-L<Log::ger::UseDataDump>
+Other modules to set data dumper for Log::ger: L<Log::ger::UseDataDump>,
+L<Log::ger::UseDataDumper>, L<Log::ger::UseDataPrinter>.
 
 =head1 AUTHOR
 
@@ -62,7 +65,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

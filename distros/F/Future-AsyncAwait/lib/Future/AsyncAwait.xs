@@ -74,6 +74,8 @@ typedef SV PADNAME;
 
 #include "lexer-additions.c.inc"
 
+#include "perl-additions.c.inc"
+
 /* Currently no version of perl makes this visible, so we always want it. Maybe
  * one day in the future we can make it version-dependent
  */
@@ -473,6 +475,10 @@ static int magic_free(pTHX_ SV *sv, MAGIC *mg)
 
             case SAVEt_FREEPV:
               Safefree(saved->cur.ptr);
+              break;
+
+            case SAVEt_FREESV:
+              SvREFCNT_dec(saved->saved.sv);
               break;
 
             case SAVEt_SV:
@@ -1191,6 +1197,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
   PADLIST *plist;
   PADNAME **padnames;
   PAD *pad;
+  SV **padsvs;
 
   state->frames = NULL;
 
@@ -1219,6 +1226,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
 
   pad = PadlistARRAY(plist)[CvDEPTH(cv)];
   pad_max = PadMAX(pad);
+  padsvs = PadARRAY(pad);
 
   state->padlen = PadMAX(pad) + 1;
   Newx(state->padslots, state->padlen - 1, SV *);
@@ -1233,21 +1241,22 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
     }
 
     /* Don't fiddle refcount */
-    state->padslots[i-1] = PadARRAY(pad)[i];
+    state->padslots[i-1] = padsvs[i];
     switch(PadnamePV(pname)[0]) {
       case '@':
-        PadARRAY(pad)[i] = MUTABLE_SV(newAV());
+        padsvs[i] = MUTABLE_SV(newAV());
         break;
       case '%':
-        PadARRAY(pad)[i] = MUTABLE_SV(newHV());
+        padsvs[i] = MUTABLE_SV(newHV());
         break;
       case '$':
-        PadARRAY(pad)[i] = newSV(0);
+        padsvs[i] = newSV(0);
         break;
       default:
         panic("TODO: unsure how to steal and switch pad slot with pname %s\n",
           PadnamePV(pname));
-      }
+    }
+    SvPADMY_on(padsvs[i]);
   }
 
   if(PL_curpm)
@@ -1994,7 +2003,7 @@ static OP *pp_await(pTHX)
 
 static OP *newAWAITOP(I32 flags, OP *expr)
 {
-  OP *op = newUNOP(OP_CUSTOM, flags, expr);
+  OP *op = newUNOP_CUSTOM(flags, expr);
   op->op_ppaddr = &pp_await;
 
   return op;
@@ -2082,7 +2091,7 @@ static void check_optree(pTHX_ OP *op, int forbid, COP **last_cop)
  * Keyword plugins
  */
 
-static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
+static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   /* Save the identity of the currently-compiling sub so that 
    * await_keyword_plugin() can check
@@ -2090,7 +2099,7 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
   hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newSVuv(PTR2UV(PL_compcv)));
 }
 
-static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
+static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   /* body might be NULL if an error happened; we check that below so for now
    * just be defensive
@@ -2115,7 +2124,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
   ctx->body = op;
 }
 
-static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
+static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   if(CvLVALUE(ctx->cv))
     warn("Pointless use of :lvalue on async sub");
@@ -2131,7 +2140,7 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
 {
   lex_read_space(0);
 
-  return xs_parse_sublike_any(&parse_asyncsub_hooks, op_ptr);
+  return xs_parse_sublike_any(&parse_asyncsub_hooks, NULL, op_ptr);
 }
 
 static int await_keyword_plugin(pTHX_ OP **op_ptr)
@@ -2214,4 +2223,4 @@ BOOT:
   DMD_SET_MAGIC_HELPER(&vtbl, dumpmagic);
 #endif
 
-  boot_xs_parse_sublike(0.06);
+  boot_xs_parse_sublike(0.10);

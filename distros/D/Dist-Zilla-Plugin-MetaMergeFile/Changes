@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-MetaMergeFile
 
+0.004     2020-06-20 23:37:17+02:00 Europe/Amsterdam
+          - Correct [PrereqsFile] abstract and docs
+
 0.003     2020-04-05 23:10:46+02:00 Europe/Amsterdam
           - Rename PrereqFile to PrereqsFile
 

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Cxn;
-$Search::Elasticsearch::Role::Cxn::VERSION = '6.80';
+$Search::Elasticsearch::Role::Cxn::VERSION = '6.81';
 use Moo::Role;
 use Search::Elasticsearch::Util qw(parse_params throw to_list);
 use List::Util qw(min);
@@ -429,7 +429,7 @@ Search::Elasticsearch::Role::Cxn - Provides common functionality to HTTP Cxn imp
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

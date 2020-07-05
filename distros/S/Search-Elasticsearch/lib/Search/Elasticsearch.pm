@@ -5,7 +5,7 @@ use Moo 2.001000 ();
 use Search::Elasticsearch::Util qw(parse_params load_plugin);
 use namespace::clean;
 
-our $VERSION = '6.80';
+our $VERSION = '6.81';
 
 my %Default_Plugins = (
     client      => [ 'Search::Elasticsearch::Client',       '6_0::Direct' ],
@@ -62,7 +62,7 @@ Search::Elasticsearch - The official client for Elasticsearch
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 SYNOPSIS
 

@@ -10,8 +10,8 @@ $builder->add([['003@', undef, '0', '1234']]);
 my $fields = {
     '003@' => {
         tag       => '003@',
-        required  => 1,
-        subfields => {'0' => {code => '0', required => 1}}
+        required  => \1,
+        subfields => {'0' => {code => '0', required => \1}}
     }
 };
 is_deeply $builder->schema->{fields}, $fields;
@@ -23,9 +23,9 @@ $builder->add(
     ]
 );
 
-$fields->{'003@'}{subfields}{0}{repeatable} = 1;
+$fields->{'003@'}{subfields}{0}{repeatable} = \1;
 $fields->{'144Z'}
-    = {tag => '144Z', subfields => {x => {code => 'x', required => 1}}};
+    = {tag => '144Z', subfields => {x => {code => 'x', required => \1}}};
 
 is_deeply $builder->schema->{fields}, $fields;
 
@@ -53,7 +53,7 @@ $fields->{'144Z'}{subfields}{y} = {code => 'y'};
 $fields->{'028B/00'} = {
     tag        => '028B',
     occurrence => '00',
-    subfields  => {x => {code => 'x', required => 1}}
+    subfields  => {x => {code => 'x', required => \1}}
 };
 
 is_deeply $builder->schema->{fields}, $fields;

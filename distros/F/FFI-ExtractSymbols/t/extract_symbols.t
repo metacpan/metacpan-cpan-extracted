@@ -4,7 +4,7 @@ use Test::More tests => 3;
 use FFI::CheckLib qw( find_lib );
 use FFI::ExtractSymbols;
 
-my $lib = find_lib lib => 'test', symbol => 'my_function', libpath => 'libtest';
+my $lib = find_lib lib => 'test', symbol => 'my_function', libpath => 't/ffi';
 
 note "lib=$lib";
 

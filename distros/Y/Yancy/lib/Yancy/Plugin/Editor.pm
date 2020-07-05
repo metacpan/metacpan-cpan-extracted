@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.061';
+our $VERSION = '1.064';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -83,6 +83,17 @@ our $VERSION = '1.061';
 #pod =head2 title
 #pod
 #pod The title of the page, shown in the title bar and the page header. Defaults to C<Yancy>.
+#pod
+#pod =head2 host
+#pod
+#pod The host to use for the generated OpenAPI spec. Defaults to the current system's hostname
+#pod (via L<Sys::Hostname>).
+#pod
+#pod =head2 info
+#pod
+#pod An OpenAPI info object, as a Perl hashref. See L<the OpenAPI 2.0
+#pod spec|https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#infoObject>
+#pod for what keys are allowed in this hashref.
 #pod
 #pod =head1 HELPERS
 #pod
@@ -181,6 +192,7 @@ has includes => sub { [] };
 has menu_items => sub { +{} };
 has backend =>;
 has schema =>;
+has app => undef, weak => 1;
 
 sub _helper_name {
     my ( $self, $name ) = @_;
@@ -194,6 +206,7 @@ sub register {
     $config->{return_label} //= $app->l( 'Back to Application' );
     $self->backend( $config->{backend} );
     $self->schema( my $schema = $config->{schema} );
+    $self->app( $app );
 
     for my $key ( grep exists $config->{ $_ }, qw( moniker ) ) {
         $self->$key( $config->{ $key } );
@@ -454,20 +467,28 @@ sub _openapi_spec_from_schema {
             name => '$limit',
             type => 'integer',
             in => 'query',
-            description => 'The number of items to return',
+            description => $self->app->l( 'OpenAPI $limit description' ),
         },
         '$offset' => {
             name => '$offset',
             type => 'integer',
             in => 'query',
-            description => 'The index (0-based) to start returning items',
+            description => $self->app->l( 'OpenAPI $offset description' ),
         },
         '$order_by' => {
             name => '$order_by',
             type => 'string',
             in => 'query',
             pattern => '^(?:asc|desc):[^:,]+$',
-            description => 'How to sort the list. A string containing one of "asc" (to sort in ascending order) or "desc" (to sort in descending order), followed by a ":", followed by the field name to sort by.',
+            description => $self->app->l( 'OpenAPI $order_by description' ),
+        },
+        '$match' => {
+            name => '$match',
+            type => 'string',
+            enum => [qw( any all )],
+            default => 'all',
+            in => 'query',
+            description => $self->app->l( 'OpenAPI $match description' ),
         },
     );
     for my $schema_name ( keys %{ $config->{schema} } ) {
@@ -489,47 +510,53 @@ sub _openapi_spec_from_schema {
 
         $paths{ '/' . $schema_name } = {
             get => {
+                description => $self->app->l( 'OpenAPI list description' ),
                 parameters => [
                     { '$ref' => '#/parameters/%24limit' },
                     { '$ref' => '#/parameters/%24offset' },
                     { '$ref' => '#/parameters/%24order_by' },
+                    { '$ref' => '#/parameters/%24match' },
                     map {
                         my $name = $_;
                         my $type = ref $props{ $_ }{type} eq 'ARRAY' ? $props{ $_ }{type}[0] : $props{ $_ }{type};
-                        my $description =
-                           $type eq 'number' || $type eq 'integer' ? "Looks for records where the $type is equal to the value."
-                           : $type eq 'boolean' ? "Looks for records where the boolean is true/false."
-                           : $type eq 'array' ? "Looks for records where the array contains the value."
-                           : "By default, looks for records containing the value anywhere in the column. Use '*' anywhere in the value to anchor the match.";
-
+                        my $description = $self->app->l(
+                           $type eq 'number' || $type eq 'integer' ? 'OpenAPI filter number description'
+                           : $type eq 'boolean' ? 'OpenAPI filter boolean description'
+                           : $type eq 'array' ? 'OpenAPI filter array description'
+                           : 'OpenAPI filter string description'
+                        );
                         {
                         name => $name,
                         in => 'query',
                         type => $type,
-                        description => "Filter the list by the $name field. " . $description,
+                        description => $self->app->l( 'OpenAPI filter description', $name ) . $description,
                     } } grep !exists( $props{ $_ }{'$ref'} ), sort keys %props,
                 ],
                 responses => {
                     200 => {
-                        description => 'List of items',
+                        description => $self->app->l( 'OpenAPI list response' ),
                         schema => {
                             type => 'object',
                             required => [qw( items total )],
                             properties => {
                                 total => {
                                     type => 'integer',
-                                    description => 'The total number of items available',
+                                    description => $self->app->l( 'OpenAPI list total description' ),
                                 },
                                 items => {
                                     type => 'array',
-                                    description => 'This page of items',
+                                    description => $self->app->l( 'OpenAPI list items description' ),
                                     items => { '$ref' => "#/definitions/" . url_escape $schema_name },
+                                },
+                                offset => {
+                                    type => 'integer',
+                                    description => $self->app->l( 'OpenAPI list offset description' ),
                                 },
                             },
                         },
                     },
                     default => {
-                        description => 'Unexpected error',
+                        description => $self->app->l( 'Unexpected error' ),
                         schema => { '$ref' => '#/definitions/_Error' },
                     },
                 },
@@ -545,14 +572,14 @@ sub _openapi_spec_from_schema {
                 ],
                 responses => {
                     201 => {
-                        description => "Entry was created",
+                        description => $self->app->l( 'OpenAPI create response' ),
                         schema => {
                             '$ref' => '#' . join '/', map { url_escape $_ } 'definitions',
                                       $schema_name, 'properties', @id_fields,
                         },
                     },
                     default => {
-                        description => "Unexpected error",
+                        description => $self->app->l( "Unexpected error" ),
                         schema => { '$ref' => "#/definitions/_Error" },
                     },
                 },
@@ -571,21 +598,21 @@ sub _openapi_spec_from_schema {
             ],
 
             get => {
-                description => "Fetch a single item",
+                description => $self->app->l( 'OpenAPI get description' ),
                 responses => {
                     200 => {
-                        description => "Item details",
+                        description => $self->app->l( 'OpenAPI get response' ),
                         schema => { '$ref' => "#/definitions/" . url_escape $schema_name },
                     },
                     default => {
-                        description => "Unexpected error",
+                        description => $self->app->l( "Unexpected error" ),
                         schema => { '$ref' => '#/definitions/_Error' },
                     }
                 }
             },
 
             $schema->{'x-view'} ? () : (put => {
-                description => "Update a single item",
+                description => $self->app->l( 'OpenAPI update description' ),
                 parameters => [
                     {
                         name => "newItem",
@@ -596,24 +623,24 @@ sub _openapi_spec_from_schema {
                 ],
                 responses => {
                     200 => {
-                        description => "Item was updated",
+                        description => $self->app->l( 'OpenAPI update response' ),
                         schema => { '$ref' => "#/definitions/" . url_escape $schema_name },
                     },
                     default => {
-                        description => "Unexpected error",
+                        description => $self->app->l( "Unexpected error" ),
                         schema => { '$ref' => "#/definitions/_Error" },
                     }
                 }
             },
 
             delete => {
-                description => "Delete a single item",
+                description => $self->app->l( 'OpenAPI delete description' ),
                 responses => {
                     204 => {
-                        description => "Item was deleted",
+                        description => $self->app->l( 'OpenAPI delete response' ),
                     },
                     default => {
-                        description => "Unexpected error",
+                        description => $self->app->l( "Unexpected error" ),
                         schema => { '$ref' => '#/definitions/_Error' },
                     },
                 },
@@ -631,7 +658,7 @@ sub _openapi_spec_from_schema {
         produces => [qw( application/json )],
         definitions => {
             _Error => {
-                title => 'OpenAPI Error Object',
+                title => $self->app->l( 'OpenAPI error object' ),
                 type => 'object',
                 properties => {
                     errors => {
@@ -641,11 +668,11 @@ sub _openapi_spec_from_schema {
                             properties => {
                                 message => {
                                     type => "string",
-                                    description => "Human readable description of the error",
+                                    description => $self->app->l( 'OpenAPI error message' ),
                                 },
                                 path => {
                                     type => "string",
-                                    description => "JSON pointer to the input data where the error occur"
+                                    description => $self->app->l( 'OpenAPI error path' ),
                                 }
                             }
                         }
@@ -672,7 +699,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.061
+version 1.064
 
 =head1 SYNOPSIS
 
@@ -755,6 +782,17 @@ The URL to use for the "Back to Application" link. Defaults to C</>.
 =head2 title
 
 The title of the page, shown in the title bar and the page header. Defaults to C<Yancy>.
+
+=head2 host
+
+The host to use for the generated OpenAPI spec. Defaults to the current system's hostname
+(via L<Sys::Hostname>).
+
+=head2 info
+
+An OpenAPI info object, as a Perl hashref. See L<the OpenAPI 2.0
+spec|https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#infoObject>
+for what keys are allowed in this hashref.
 
 =head1 HELPERS
 

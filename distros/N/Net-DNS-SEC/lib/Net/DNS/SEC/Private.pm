@@ -1,9 +1,9 @@
 package Net::DNS::SEC::Private;
 
 #
-# $Id: Private.pm 1705 2018-08-23 10:24:02Z willem $
+# $Id: Private.pm 1786 2020-06-15 15:05:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1705 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1786 $)[1];
 
 
 =head1 NAME
@@ -41,22 +41,23 @@ use warnings;
 use File::Spec;
 use IO::File;
 
+use constant SYMLINK => defined(&CORE::readlink);		# Except Win32, VMS, RISC OS
+
 
 sub new { scalar(@_) > 2 ? &_new_params : &_new_keyfile }
 
 sub _new_keyfile {
 	my ( $class, $file ) = @_;
 
-	my ( $vol, $dir, $keyname ) = File::Spec->splitpath($file);
+	my ($keypath) = SYMLINK ? grep( $_, readlink($file), $file ) : $file;
+	my ( $vol, $dir, $name ) = File::Spec->splitpath($keypath);
 
-	# Format something like: /Kbla.foo.+001+12345.private'
-	# as created by BIND keygen.
-	# We determine the algorithm from the filename.
-	die "$keyname does not appear to be a BIND private key"
-			unless $keyname =~ /^K(.*\.)\+(\d+)\+(\d+)\.private$/;
+	# Format something like: 'Kbla.foo.+001+12345.private' as created by BIND dnssec-keygen.
+	die "$file does not appear to be a BIND private key"
+			unless $name =~ /^K([^+]+)\+(\d+)\+(\d+)\.private$/;
 	my @identifier = ( signame => $1, algorithm => 0 + $2, keytag => 0 + $3 );
 
-	my $handle = new IO::File($file) or die qq(open: "$file" $!);
+	my $handle = new IO::File( $file, '<' ) or die qq(open: "$file" $!);
 
 	my @content;
 	local $_;

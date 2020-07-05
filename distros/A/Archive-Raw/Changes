@@ -1,5 +1,13 @@
 Revision history for Archive-Raw
 
+0.03      2020-07-03 13:20:17+01:00 Europe/London
+
+ - Entry->symlink_type() is only available in newer libarchive
+ versions
+ - Added DiskWriter->close()
+ - Compatibility fixes
+ - Now tested on Windows
+
 0.02      2019-12-13 12:55:27+00:00 Europe/London
 
  - Documentation fixes

@@ -4,13 +4,13 @@
       "Steve Hancock <perltidy@perltidy.sourceforge.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Perl-Tidy",
    "no_index" : {
@@ -39,5 +39,6 @@
          "web" : "https://github.com/perltidy/perltidy"
       }
    },
-   "version" : "20200110"
+   "version" : "20200619",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

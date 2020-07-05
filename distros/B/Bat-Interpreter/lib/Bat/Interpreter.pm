@@ -13,7 +13,7 @@ use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use Bat::Interpreter::Delegate::LineLogger::Silent;
 use namespace::autoclean;
 
-our $VERSION = '0.021';    # VERSION
+our $VERSION = '0.022';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -329,6 +329,7 @@ sub _handle_condition {
         }
     } elsif ( $type eq 'Exists' ) {
         my $path = ${ $condition->{'Exists'} }{'Path'};
+        $path = $self->_variable_substitution( $path, $context );
         $path = $self->_adjust_path($path);
         $context->{'current_line'} .= 'EXIST ' . $path;
         return -e $path;
@@ -471,7 +472,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -516,7 +517,7 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords eva.dominguez Eva Dominguez juanradiego pablo.rodriguez ricardo.gomez Toby Inkster
+=for stopwords eva.dominguez Eva Dominguez juanradiego Nicolas De los Santos pablo.rodriguez ricardo.gomez Toby Inkster
 
 =over 4
 
@@ -531,6 +532,10 @@ Eva Dominguez <meloncego@gmail.com>
 =item *
 
 juanradiego <kilaweo@gmail.com>
+
+=item *
+
+Nicolas De los Santos <ndls05@gmail.com>
 
 =item *
 

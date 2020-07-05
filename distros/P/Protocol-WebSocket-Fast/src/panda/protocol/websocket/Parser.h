@@ -8,7 +8,6 @@
 #include <deque>
 #include <bitset>
 #include <iterator>
-#include <panda/log.h>
 #include <panda/refcnt.h>
 #include <panda/string.h>
 #include <panda/optional.h>
@@ -118,7 +117,7 @@ struct Parser : virtual panda::Refcnt {
 
     StringPair send_control (Opcode opcode, string& payload) {
         if (payload.length() > Frame::MAX_CONTROL_PAYLOAD) {
-            panda_mlog_critical(pwslog, "control frame payload is too long");
+            panda_log_critical("control frame payload is too long");
             payload.offset(0, Frame::MAX_CONTROL_PAYLOAD);
         }
         auto header = _prepare_control_header(opcode);

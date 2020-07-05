@@ -45,6 +45,7 @@ TEST("http version") {
 TEST("request context: follow connection type unless explicitly specified") {
     auto req = Request::Builder().build();
     auto res = Response::Builder().build();
+
     SECTION("request is c=close") {
         req->headers.connection("close");
         SECTION("keep") {}
@@ -56,6 +57,7 @@ TEST("request context: follow connection type unless explicitly specified") {
             "\r\n"
         );
     }
+
     SECTION("request is keep-alive") {
         SECTION("keep") {
             CHECK(res->to_string(req) ==
@@ -69,6 +71,15 @@ TEST("request context: follow connection type unless explicitly specified") {
             CHECK(res->to_string(req) ==
                 "HTTP/1.1 200 OK\r\n"
                 "Connection: close\r\n"
+                "Content-Length: 0\r\n"
+                "\r\n"
+            );
+        }
+        SECTION("ignore keep-alive for http 1.0 req") {
+            req->http_version = 10;
+            res->headers.connection("keep-alive");
+            CHECK(res->to_string(req) ==
+                "HTTP/1.0 200 OK\r\n"
                 "Content-Length: 0\r\n"
                 "\r\n"
             );

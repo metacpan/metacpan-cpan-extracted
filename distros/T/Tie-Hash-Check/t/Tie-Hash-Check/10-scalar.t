@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English;
 use Tie::Hash::Check;
 use Test::More 'tests' => 2;

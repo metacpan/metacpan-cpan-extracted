@@ -1,4 +1,5 @@
 #pragma once
+#include "log.h"
 #include <iosfwd>
 #include <stdint.h>
 #include <type_traits>

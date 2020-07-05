@@ -8,13 +8,13 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
-  CPP::panda::lib: v1.2.9
-  Export::XS: v3.0.0
-  XS::Framework: v1.1.7
-  XS::Install: v1.2.9
-  next::XS: v1.0.6
+  Export::XS: v3.0.5
+  XS::Framework: v1.3.2
+  XS::Install: v1.2.17
+  XS::libpanda: v1.4.0
+  next::XS: v1.0.7
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,10 +25,10 @@ no_index:
     - t
     - inc
 requires:
-  CPP::panda::lib: v1.2.9
-  Export::XS: v3.0.0
-  XS::Framework: v1.1.7
-  XS::Install: v1.2.9
-  next::XS: v1.0.6
-version: v1.0.0
+  Export::XS: v3.0.5
+  XS::Framework: v1.3.2
+  XS::Install: v1.2.17
+  XS::libpanda: v1.4.0
+  next::XS: v1.0.7
+version: v1.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

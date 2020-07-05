@@ -3,7 +3,13 @@ package OpenTracing::SpanProxy;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '1.001'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
+
+use parent qw(OpenTracing::Common);
+
+no indirect;
+use utf8;
 
 =encoding utf8
 
@@ -18,11 +24,6 @@ with spans. It allows the creation of nested subspans, and will automatically
 mark the span as complete when the proxy object is discarded.
 
 =cut
-
-sub new {
-    my ($class, %args) = @_;
-    bless \%args, $class;
-}
 
 =head2 span
 
@@ -39,11 +40,30 @@ Writes a log entry to the L<OpenTracing::Span>.
 =cut
 
 sub id { shift->span->id }
+
 sub trace_id { shift->span->trace_id }
+
 sub parent_id { shift->span->parent_id }
+
 sub log { shift->span->log(@_) }
+
+sub logs { shift->span->logs }
+
+sub tags { shift->span->tags }
+
+sub tag { shift->span->tag(@_) }
+
+sub start_time { shift->span->start_time }
+
 sub duration { shift->span->duration(@_) }
+
 sub finish { shift->span->finish(@_) }
+
+sub is_finished { shift->span->is_finished }
+
+sub operation_name { shift->span->operation_name }
+
+sub flags { shift->span->flags }
 
 =head2 new_span
 
@@ -58,7 +78,10 @@ sub new_span {
         $parent->trace_id,
         $parent->id,
     );
-    $parent->tracer->span($name => %args);
+    $parent->tracer->span(
+        operation_name => $name,
+        %args
+    );
 }
 
 =head2 DESTROY
@@ -71,7 +94,7 @@ L<OpenTracing::Span/finish>.
 sub DESTROY {
     my ($self) = @_;
     return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
-    $self->span->finish;
+    $self->span->finish unless $self->span->is_finished;
     delete $self->{span};
 }
 
@@ -85,5 +108,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
 

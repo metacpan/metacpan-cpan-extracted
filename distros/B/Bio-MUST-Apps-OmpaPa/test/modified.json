@@ -1,0 +1,1 @@
+{"__CLASS__":"Bio::MUST::Apps::OmpaPa::SelectParam","max_copy":5,"min_copy":2,"max_cov":0.9,"min_cov":0.5,"max_eval":50,"min_eval":10,"max_len":60,"min_len":20}

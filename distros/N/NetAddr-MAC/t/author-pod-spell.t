@@ -19,9 +19,18 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 Dean
+EUI
+Gorwits
 Hamstad
 Hamstead
+James
 MAC
 NetAddr
+Oliver
+Sinclair
 dean
+djzort
+james
 lib
+oliver
+virtualization

@@ -1,6 +1,11 @@
 Revision history for MySQL-ORM
 
 =======
+0.16    - Don't add column to ResultX class if it already exists in Result.
+          Example, current table has column called "enabled" and parent table has column
+          "enabled". In these cases, we shouldn't add "enabled" to the ResultX
+          class since it already exists in the Result class.
+
 0.15    - Added a db attribute to the table classes in order to maintain a link
           back to the orm class. Mainly useful in CustomRoles which want to make
           use of methods defined in other CustomRoles on different tables.

@@ -22,6 +22,7 @@ dan/agent/bin/agent
 dan/agent/bin/filecache
 dan/agent/bin/keyupdate
 dan/agent/code/access
+dan/agent/code/antdencli
 dan/agent/code/apps
 dan/agent/code/call
 dan/agent/code/check
@@ -56,9 +57,10 @@ dan/bootstrap/bin/bootstrap
 dan/bootstrap/bin/control
 dan/bootstrap/bin/procupdate
 dan/bootstrap/exec.config/collector
+dan/bootstrap/exec.config/deploy.watch2subscribe
 dan/bootstrap/exec.config/monitor.collector
 dan/bootstrap/exec.config/monitor.supervisory
-dan/bootstrap/exec.config/watch2subscribe
+dan/bootstrap/exec.config/monitorv2.watch2subscribe
 dan/bootstrap/exec/120*whitelist
 dan/bootstrap/exec/3600*keyupdate
 dan/bootstrap/exec/3600_procupdate
@@ -100,6 +102,7 @@ dan/monitor/conf/collect/project2
 dan/monitor/conf/subscribe
 dan/monitorv2/bin/collector
 dan/monitorv2/bin/control
+dan/monitorv2/bin/watch
 dan/monitorv2/code/grep
 dan/monitorv2/code/http
 dan/monitorv2/code/sysinfo
@@ -139,6 +142,7 @@ dan/sync/conf/config
 dan/tools/access
 dan/tools/alarm
 dan/tools/alias
+dan/tools/antdencli
 dan/tools/bigest
 dan/tools/check
 dan/tools/config
@@ -149,9 +153,11 @@ dan/tools/fastmd5
 dan/tools/fileupdate
 dan/tools/gateway
 dan/tools/git
+dan/tools/gitrsync
 dan/tools/go
 dan/tools/grsync
 dan/tools/keys
+dan/tools/lcall
 dan/tools/load
 dan/tools/mcmd
 dan/tools/mrsync
@@ -166,6 +172,7 @@ dan/tools/rsync
 dan/tools/rtail
 dan/tools/secure
 dan/tools/shell
+dan/tools/shellv2
 dan/tools/supervisor
 dan/tools/sync
 dan/tools/tai64nlocal
@@ -220,6 +227,7 @@ def/var/logs/monitor/.gitkeep
 def/var/logs/monitorv2/.gitkeep
 def/var/logs/subscribe/.gitkeep
 def/var/monitor/make/.gitkeep
+def/var/run/monitorv2/.gitkeep
 INSTALL.PL
 lib/MYDan.pm
 lib/MYDan/Agent.pm
@@ -238,8 +246,10 @@ lib/MYDan/Agent/Mrsync.pm
 lib/MYDan/Agent/Path.pm
 lib/MYDan/Agent/Proxy.pm
 lib/MYDan/Agent/Query.pm
+lib/MYDan/AntDen/Cli.pm
 lib/MYDan/API.pm
 lib/MYDan/API/Agent.pm
+lib/MYDan/API/AntDen.pm
 lib/MYDan/Bootstrap.pm
 lib/MYDan/Bootstrap/ProcUpdate.pm
 lib/MYDan/Code.pm

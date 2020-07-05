@@ -14,43 +14,129 @@ module directories in C<@INC>.
 
 =head1 SYNOPSIS
 
+=begin HTML
+
+<span>
+    <a href="https://badge.fury.io/pl/Acme-ful">
+        <img src="https://badge.fury.io/pl/Acme-ful.svg" alt="CPAN Current Version" height="18">
+    </a>
+    <a href="https://cpants.cpanauthors.org/release/RWILLIS/Acme-ful-0.11">
+        <img src="https://cpants.cpanauthors.org/release/RWILLIS/Acme-ful-0.11.svg" alt="CPAN Module Quality" />
+    </a>
+    <a href="https://travis-ci.org/github/ryan-willis/ful.pm">
+        <img src="https://travis-ci.org/ryan-willis/ful.pm.svg?branch=master" alt="Build Status" />
+    </a>
+    <a href="https://coveralls.io/github/ryan-willis/ful.pm?branch=master">
+        <img src="https://coveralls.io/repos/github/ryan-willis/ful.pm/badge.svg?branch=master" alt="Coverage Status" />
+    </a>
+</span>
+
+=end HTML
+
 One line to rule them all.
 
     use ful;
 
-Within C<a-script.pl> when your project looks like this:
+Brings the first C<lib/> directory found by directory ascencion and adds it to
+C<@INC>.
+
+Instead of:
+
+    use lib::relative '../../lib';
+    # or
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    # or even
+    BEGIN {
+        use Path::Tiny;
+        my $base = path(__FILE__)->parent;
+        $base = $base->parent until -d "$base/lib" or $base->is_rootdir;
+        unshift @INC, "$base/lib";
+    }
+
+=head1 USAGE
+
+When you're working within C<a-script.pl> when your project looks like this:
 
     project-root/
     ├── bin/
     │   └── utils/
     │       └── a-script.pl
     ├── lib/
+    │   └── Some/
+    │       └── Module.pm
     ├── vendor/
     │   └── SomeOrg/
     │       └── Some/
     │           └── Module.pm
 
-And that's it.
+Just drop the line before your other C<use> statements:
 
-And if you need more than just the C<project-root/lib> dir, you can do this:
+    use ful;
+    use Some::Module;
+
+And that's all.
+
+If you need more than just the C<project-root/lib> dir, you can do this:
 
     use ful qw/vendor lib/;
+    use Some::Module;
+    use SomeOrg::Some::Module;
 
-Instead of:
+=head1 METHODS
 
-    use lib::relative '../../lib';
-    use lib::relative '../../vendor';
-    # or
-    use FindBin;
-    use lib "$FindBin::Bin/../lib";
-    use lib "$FindBin::Bin/../vendor";
-    # or even
-    BEGIN {
-        use Path::Tiny;
-        my $base = path(__FILE__)->parent;
-        $base = $base->parent until -d "$base/lib" or $base->is_rootdir;
-        unshift @INC, "$base/lib", "$base/vendor";
-    }
+=over 4
+
+=item * crum()
+
+Returns the parent directory for the latest addition to C<@INC>.
+
+=back
+
+=head1 ADVANCED
+
+    use ful \%options;
+
+=head2 OPTIONS
+
+=over 4
+
+=item * C<libdirs =E<gt> \@dirs>
+
+Equivalent to C<use ful qw/lib vendor/;> but can be combined with all other
+options.
+
+    # multiple @INC dirs
+    use ful { libdirs => [qw/lib vendor/] };
+
+    # combined with another option
+    use ful {
+        libdirs => [qw(lib vendor/lib)],
+        dir     => 'vendor/lib',
+    };
+
+=item * C<file =E<gt> $file>, C<target_file =E<gt> $file>, C<target =E<gt> $file>
+
+Finds an existing file to add a sibling directory to C<@INC>.
+
+    # adds 'lib'
+    use ful { file => '.file-in-project-root' };
+
+=item * C<dir =E<gt> $dname>, C<has_dir =E<gt> $dname>, C<child_dir =E<gt> $dname>
+
+Finds an existing directory to add a sibling directory to C<@INC>.
+
+    # adds 'lib'
+    use ful { dir => 'bin' };
+
+=item * C<git =E<gt> 1>
+
+Finds a git repository to add a sibling directory to C<@INC>.
+
+    # adds 'lib'
+    use ful { git => 1 };
+
+=back
 
 =head1 LICENSE
 
@@ -78,16 +164,16 @@ SOFTWARE.
 
 =head1 VERSION
 
-0.07
+0.11
 
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports or ask questions at
-L<https://github.com/ryan-willis/p5-Acme-ful/issues>.
+L<https://github.com/ryan-willis/ful.pm/issues>.
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.11';
 
 use Cwd;
 use File::Spec;
@@ -97,6 +183,8 @@ my $cursor;
 my $FS = 'File::Spec';
 
 our $crum = undef;
+
+sub crum { $crum }
 
 sub import {
     my $me = shift;

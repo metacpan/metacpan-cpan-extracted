@@ -1,11 +1,35 @@
 # CORBA/IDLtree.pm   IDL to symbol tree translator
 # This module is distributed under the same terms as Perl itself.
-# Copyright  (C) 1998-2019, O. Kellogg <okellogg@users.sourceforge.net>
+# Copyright  (C) 1998-2020, O. Kellogg <okellogg@users.sourceforge.net>
 # Main Authors:  Oliver Kellogg, Heiko Schroeder
 #
 # -----------------------------------------------------------------------------
 # Ver. |   Date   | Recent changes (for complete history see file Changes)
 # -----+----------+------------------------------------------------------------
+# 2.04  2020/06/20  * In sub Parse_File_i case $file case $emucpp open $in
+#                     with encoding(UTF-8) to ensure that IDL files are parsed
+#                     as utf8.
+#                   * New sub discard_bom discards a possible Unicode or UTF-8
+#                     BOM (Byte Order Mark) at the start of the given line.
+#                     In sub get_items add optional argument $firstline.
+#                     If $firstline is given and true then discard_bom will be
+#                     called on the first line read from file.
+#                     In sub Parse_File_i outer while-loop add local
+#                     $firstline for call to sub get_items.
+#                   * New sub has_default_branch checks whether the given union
+#                     subordinates contain a DEFAULT branch.  This fixes a bug
+#                     related to checking that a union has an enum type as its
+#                     switch and does not have a default branch.
+#                     A false warning was generated in case the default branch
+#                     was preceded by a comment.
+#                   * Improvements to preprocessor emulation:
+#                     - Support "#if defined XYZ" without parentheses around
+#                       the symbol.  Fix evaluation of the symbol.
+#                     - Do not attempt evaluating preprocessor directives when
+#                       inside multi line comments.
+#                     - Fix handling of #endif in nested #if/#ifdef/#ifndef.
+#                   * In @annoDefs add java_mapping annotations defined by the
+#                     IDL4 to Java mapping proposal.
 # 2.03  2019/04/27  * Fixed a bug related to Dump_Symbols whereby when using
 #                     a string array ref as the optional argument, repeated
 #                     calls to the sub would accumulate the text.
@@ -100,10 +124,9 @@
 
 package CORBA::IDLtree;
 
-# require Exporter;
 require Carp;
 
-use 5.006;
+use 5.008_003;
 use strict 'vars';
 use warnings;
 use Exporter qw(import);
@@ -125,11 +148,11 @@ CORBA::IDLtree - OMG IDL to symbol tree translator
 
 =head1 VERSION
 
-Version 2.03
+Version 2.04
 
 =cut
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 =head1 SYNOPSIS
 
@@ -772,7 +795,7 @@ sub Dump_Symbols;
 
 sub Version ()
 {
-    for ('$Revision$') { #'){
+    for ('$Revision: 29631 $') { #'){
         /: *(\S+)/ and return $VERSION . "_" . $1;
     }
     return $VERSION;
@@ -946,7 +969,10 @@ our %annoEnum = (
                                "BEGIN_DECLARATION",
                                "END_DECLARATION",
                               "AFTER_DECLARATION",
-                             "END_FILE" ]
+                             "END_FILE" ],
+    # IDL4 to Java mapping
+    "NamingConvention"  => [ "IDL_NAMING_CONVENTION",
+                             "JAVA_NAMING_CONVENTION" ]
   );
 
 # Predefined annotation definitions.
@@ -989,7 +1015,13 @@ our @annoDefs = (
                          [ STRING, "text", undef ] ],
     [ "service",         [ STRING, "platform", "*" ] ],
     [ "oneway",          [ BOOLEAN, "value", "TRUE" ] ],
-    [ "ami",             [ BOOLEAN, "value", "TRUE" ] ]
+    [ "ami",             [ BOOLEAN, "value", "TRUE" ] ],
+    # IDL4 to Java mapping
+    [ "java_mapping",    [ STRING,  "constants_container",  "Constants" ],
+                         [ BOOLEAN, "promote_integer_width",    "FALSE" ],
+                         [ "NamingConvention", "apply_naming_convention",
+                                                "IDL_NAMING_CONVENTION" ],
+                         [ STRING,  "string_type",             "String" ] ]
   );
 
 # Temporary store collecting annotations will be flushed when the construct
@@ -1710,12 +1742,15 @@ sub eval_preproc_expr {
     my @arg = @_;
     my $symbol = shift @arg;
     if ($symbol eq 'defined') {
-        shift @arg;   # discard open-paren
+        $arg[0] eq '(' and shift @arg;   # discard open-paren
         $symbol = shift @arg;
-        if ($#arg > 0) {  # there's more than the closing-paren
-            error "warning: #if not yet fully implemented\n";
+        $arg[0] eq ')' and shift @arg;   # discard close-paren
+        if (@arg or $symbol !~ /^\d+$/) {
+            # There is more than the closing paren or
+            # $symbol has an unimplemented (non numeric) value
+            error "warning: #if not fully implemented\n";
         }
-        return ($symbol =~ /^\d/);
+        return $symbol;
     } elsif ($symbol =~ /^[A-z]/) {
         # NB: sub idlsplit has already done symbol substitution
         error "built-in preprocessor does not know how to interpret $symbol";
@@ -1729,9 +1764,38 @@ sub eval_preproc_expr {
 sub skip_input {
     my $count = 0;
     my $in = $fh[$#infilename];
+    my $in_comment = 0;
     while (<$in>) {
-        next unless (/^\s*#/);
-        my @arg = idlsplit($_);
+        $line_number[$currfile]++;
+        chomp;
+        my $l = $_;
+        if ($in_comment) {
+            if ($l =~ /\*\//) {
+                $in_comment = 0;
+            }
+            next;
+        }
+        my $cstart = index($l, "/*");
+        if ($cstart >= 0) {
+            my $cstop  = index($l, "*/");
+            if ($cstop > $cstart) {
+                my $pre = "";
+                if ($cstart > 0) {
+                    $pre = substr($l, 0, $cstart);
+                }
+                $cstop += 2;
+                my $post = "";
+                if ($cstop < length($l)) {
+                    $post = substr($l, $cstop);
+                }
+                $l = $pre . $post;
+            } else {
+                $in_comment = 1;
+                next;
+            }
+        }
+        next unless ($l =~ /^s*#/);
+        my @arg = idlsplit($l);
         my $kw = shift @arg;
         # print (join ('|', @arg) . "\n");
         my $directive = shift @arg;
@@ -1752,18 +1816,38 @@ sub skip_input {
             $count++;
         } elsif ($directive eq 'endif') {
             $count--;
-            if ($count <= 0) {
-                return;
-            }
         }
         # For #elif, the count remains the same.
     }
     error "skip_input: fell off end of file";
 }
 
+# If the given line begins with the Unicode or UTF-8 BOM (Byte Order Mark) then
+# discard the BOM in the returned line.
+sub discard_bom {
+    my $line = shift;
+    if (length($line) > 2) {
+        # Check for UTF-8 BOM (Byte Order Mark) 0xEF,0xBB,0xBF
+        my $ord0 = ord(substr($line, 0, 1));
+        if ($ord0 == 0xFEFF) {
+            $line = substr($line, 1);         # Unicode
+        } elsif ($ord0 == 0xEF) {
+            my $ord1 = ord(substr($line, 1, 1));
+            my $ord2 = ord(substr($line, 2, 1));
+            if ($ord1 == 0xBB && $ord2 == 0xBF) {
+                $line = substr($line, 3);     # UTF-8
+            }
+        }
+    }
+    return $line;
+}
 
 sub get_items {  # returns empty list for end-of-file or fatal error
     my $in = shift;
+    my $firstline;
+    if (@_) {
+        $firstline = shift;
+    }
     my @items = ();
     if (@global_items) {
         @items = @global_items;
@@ -1786,6 +1870,10 @@ sub get_items {  # returns empty list for end-of-file or fatal error
         $l =~ s/\r//g;  # zap DOS line ending
         unless ($locale) {
             $l =~ s/[^[:print:]]/ /g;
+        }
+        if ($firstline) {
+            $l = discard_bom($l);
+            $firstline = 0;
         }
         if ($l =~ /^\s*$/) {           # empty
             if ($in_comment) {
@@ -2338,6 +2426,18 @@ sub parse_annotation_app {
     }
 }
 
+# Check whether the given union subordinates contain a DEFAULT branch.
+sub has_default_branch {
+    my $union_subord = shift;
+    my @members = @{$union_subord};
+    for (my $i = $#members; $i > 0; --$i) {
+        if ($members[$i]->[TYPE] == DEFAULT) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 # Push subordinate - just like perl push() but hides
 # different structure of valuetype subordinates.
 sub pushsub {
@@ -2351,12 +2451,6 @@ sub pushsub {
 
 sub Parse_File_i {
     my ($file, $input_filehandle, $symb, $in_valuetype) = @_;
-
-#    my $file = shift;
-#    my $input_filehandle = "";
-#    if (@_) {
-#        $input_filehandle = shift;   # internal use only
-#    }
 
     my @vt_inheritance = (0, 0);
     my $in;
@@ -2384,7 +2478,7 @@ sub Parse_File_i {
             }
         }
         if ($emucpp) {
-            open($in, $file) or abort("Cannot open file $file");
+            open($in, , '<:encoding(UTF-8)', $file) or abort("Cannot open file $file");		
         } else {
             my $cpp_args = "";
             foreach (keys %defines) {
@@ -2412,7 +2506,9 @@ sub Parse_File_i {
     # They were moved to the global scope in order to support #include
     # statements at arbitrary locations.
     my @arg;
-    while ((@arg = get_items($in))) {
+    my $firstline = 1;
+    while ((@arg = get_items($in, $firstline))) {
+        $firstline = 0;
         if ($verbose > 1) {
             my $line = join(' ', @arg);
             print "IDLtree: parsing $line\n";   # "super verbose mode"
@@ -2644,15 +2740,14 @@ sub Parse_File_i {
             if ($type == UNION && is_a($struct[0], ENUM)) {
                 # For the case of ENUM, check that all enum values
                 # are covered by CASEs.
-                my $maybe_dflt = $struct[$#struct - 1];
                 # No check possible if DEFAULT given.
-                unless ($$maybe_dflt[TYPE] == DEFAULT) {
+                unless (has_default_branch(\@struct)) {
                     my $enumtype = root_type($struct[0]);
                     my %lits_given = ();
                     my $umember;
                     foreach $umember (@struct) {
-                        if ($$umember[TYPE] == CASE) {
-                            foreach (@{$$umember[SUBORDINATES]}) {
+                        if ($umember->[TYPE] == CASE) {
+                            foreach (@{$umember->[SUBORDINATES]}) {
                                 my $stripped_lit = $_;
                                 $stripped_lit =~ s/^.*:://;
                                 $lits_given{$stripped_lit} = 1;
@@ -3457,7 +3552,7 @@ sub is_type {
     my $thing = shift;
     if (isnode($thing)) {
         my $type = $thing->[TYPE];
-        return $type == FIXED 
+        return $type == FIXED
             || $type == BOUNDED_STRING
             || $type == BOUNDED_WSTRING
             || $type == SEQUENCE
@@ -4880,7 +4975,7 @@ Thanks to Heiko Schroeder for contributing.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 1998-2019, Oliver M. Kellogg
+Copyright (C) 1998-2020, Oliver M. Kellogg
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

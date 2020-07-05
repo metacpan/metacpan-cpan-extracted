@@ -61,10 +61,14 @@ $entry = $reader->next();
 isa_ok $entry, 'Archive::Raw::Entry';
 is $entry->pathname, 'dir/file3.txt';
 is $entry->symlink, 'file1.txt';
-is $entry->symlink_type, Archive::Raw->AE_SYMLINK_TYPE_UNDEFINED;
 
-$entry->symlink_type (Archive::Raw->AE_SYMLINK_TYPE_FILE);
-is $entry->symlink_type, Archive::Raw->AE_SYMLINK_TYPE_FILE;
+if (Archive::Raw::libarchive_version > 3002000)
+{
+	is $entry->symlink_type, Archive::Raw->AE_SYMLINK_TYPE_UNDEFINED;
+
+	$entry->symlink_type (Archive::Raw->AE_SYMLINK_TYPE_FILE);
+	is $entry->symlink_type, Archive::Raw->AE_SYMLINK_TYPE_FILE;
+}
 
 $entry->symlink ('file2.txt');
 is $entry->symlink, 'file2.txt';

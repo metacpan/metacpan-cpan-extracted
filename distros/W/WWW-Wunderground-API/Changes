@@ -1,5 +1,8 @@
 Revision history for WWW-Wunderground-API
 
+0.09    2020-06-30
+        Deprecation update
+
 0.08    2015-04-07
         Merge jpjordan's lang enhancements
         cleanup documentation

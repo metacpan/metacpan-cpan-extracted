@@ -1,5 +1,7 @@
-use Test::More;
-use Net::SAML2;
+use Test::Lib;
+use Test::Net::SAML2;
+
+use Net::SAML2::Protocol::Assertion;
 
 my $xml = <<XML;
 <?xml version="1.0"?>
@@ -60,13 +62,8 @@ my $xml = <<XML;
 </samlp:Response>
 XML
 
-my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
-        xml => $xml
-);
-ok($assertion);
-
-is($assertion->session, 's2b087bdce06dbbf9cd4662af82b8b853d4d285c01');
-is($assertion->nameid,  'nKdwzcgBYGt42xovLuctZ60tyafv');
+my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(xml => $xml);
+isa_ok($assertion, 'Net::SAML2::Protocol::Assertion');
 
 is($assertion->in_response_to, 'N3k95Hg41WCHdwc9mqXynLPhB');
 
@@ -74,23 +71,31 @@ is(scalar keys %{ $assertion->attributes }, 2);
 is(scalar @{ $assertion->attributes->{EmailAddress} }, 1);
 is(scalar @{ $assertion->attributes->{Phone2} }, 3);
 
-is($assertion->attributes->{EmailAddress}->[0], 'demo@sso.venda.com');
-is($assertion->attributes->{Phone2}->[0], '123456');
-is($assertion->attributes->{Phone2}->[1], '234567');
-is($assertion->attributes->{Phone2}->[2], '345678');
+is($assertion->session, 's2b087bdce06dbbf9cd4662af82b8b853d4d285c01', 'Session ID is correct');
+is($assertion->nameid,  'nKdwzcgBYGt42xovLuctZ60tyafv', 'Name ID is correct');
+
+cmp_deeply(
+    $assertion->attributes,
+    {
+        EmailAddress => [qw(demo@sso.venda.com)],
+        Phone2       => [qw(123456 234567 345678)]
+    },
+    "Assertion attributes are ok"
+);
 
 isa_ok($assertion->not_before, 'DateTime');
 isa_ok($assertion->not_after,  'DateTime');
-is($assertion->audience, 'http://ct.local');
-is($assertion->valid('foo'), 0);
-is($assertion->valid('http://ct.local'), 0);
+
+is($assertion->audience, 'http://ct.local', "Assertion audience is ct.local");
+is($assertion->valid('foo'),             0, "foo isn't a valid assertion");
+is($assertion->valid('http://ct.local'), 0, "ct.local isn't valid either");
 
 # fudge validity times to test valid()
 $assertion->{not_before} = DateTime->now;
-$assertion->{not_after} = DateTime->now->add( minutes => 15);
-is($assertion->valid('http://ct.local'), 1);
+$assertion->{not_after} = DateTime->now->add(minutes => 15);
+is($assertion->valid('http://ct.local'), 1, "ct.local is valid now");
 
-$assertion->{not_before} = DateTime->now->add( minutes => 5 );
-is($assertion->valid('http://ct.local'), 0);
+$assertion->{not_before} = DateTime->now->add(minutes => 5);
+is($assertion->valid('http://ct.local'), 0, "and invalid again");
 
 done_testing;

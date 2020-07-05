@@ -1,7 +1,7 @@
 package LinuxMint::Releases;
 
-our $DATE = '2018-01-19'; # DATE
-our $VERSION = '0.031'; # VERSION
+our $DATE = '2020-07-01'; # DATE
+our $VERSION = '0.032'; # VERSION
 
 use 5.010001;
 use strict;
@@ -373,7 +373,7 @@ our $data = do {
      bash_version         => 4.3,
      code_name            => "sylvia",
      eoldate              => "2021-04",
-     linux_version        => "4.10.0",
+     linux_version        => "4.10",
      mariadb_version      => "--",
      mysql_version        => "--",
      nginx_version        => undef,
@@ -384,6 +384,57 @@ our $data = do {
      reldate              => "2017-11-27",
      ruby_version         => undef,
      version              => 18.3,
+   },
+   {
+     apache_httpd_version => "--",
+     bash_version         => 4.4,
+     code_name            => "tricia",
+     eoldate              => "2023-04",
+     linux_version        => "5.0",
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.26.1",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "3.6.7",
+     reldate              => "2019-12-18",
+     ruby_version         => undef,
+     version              => 19.3,
+   },
+   {
+     apache_httpd_version => "--",
+     bash_version         => "5.0",
+     code_name            => "debbie",
+     eoldate              => "\xA0",
+     linux_version        => "4.19.98",
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.28.1",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "3.7.3",
+     reldate              => "2020-03-20",
+     ruby_version         => undef,
+     version              => "4-LMDE",
+   },
+   {
+     apache_httpd_version => "--",
+     bash_version         => "5.0",
+     code_name            => "ulyana",
+     eoldate              => "\xA0",
+     linux_version        => 5.4,
+     mariadb_version      => "--",
+     mysql_version        => "--",
+     nginx_version        => undef,
+     perl_version         => "5.30.0",
+     php_version          => "--",
+     postgresql_version   => "--",
+     python_version       => "3.8.2",
+     reldate              => "2020-06-27",
+     ruby_version         => undef,
+     version              => 20,
    },
  ]
 
@@ -412,7 +463,7 @@ LinuxMint::Releases - List LinuxMint releases
 
 =head1 VERSION
 
-This document describes version 0.031 of LinuxMint::Releases (from Perl distribution LinuxMint-Releases), released on 2018-01-19.
+This document describes version 0.032 of LinuxMint::Releases (from Perl distribution LinuxMint-Releases), released on 2020-07-01.
 
 =head1 SYNOPSIS
 
@@ -433,7 +484,7 @@ which in turn is retrieved from L<http://distrowatch.com>.
 
 Usage:
 
- list_linuxmint_releases(%args) -> [status, msg, result, meta]
+ list_linuxmint_releases(%args) -> [status, msg, payload, meta]
 
 REPLACE ME.
 
@@ -618,6 +669,10 @@ Only return records where the 'eoldate' field is less than specified value.
 =item * B<eoldate.xmin> => I<date>
 
 Only return records where the 'eoldate' field is greater than specified value.
+
+=item * B<exclude_fields> => I<array[str]>
+
+Select fields to return.
 
 =item * B<fields> => I<array[str]>
 
@@ -1124,11 +1179,12 @@ Only return records where the 'version' field is greater than specified value.
 
 =item * B<with_field_names> => I<bool>
 
-Return field names in each record (as hash/associative array).
+Return field names in each record (as hashE<sol>associative array).
 
 When enabled, function will return each record as hash/associative array
 (field name => value pairs). Otherwise, function will return each record
 as list/array (field value, field value, ...).
+
 
 =back
 
@@ -1137,7 +1193,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -1175,7 +1231,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

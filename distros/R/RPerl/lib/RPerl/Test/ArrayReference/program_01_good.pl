@@ -1,4 +1,10 @@
 #!/usr/bin/env perl
+
+# [[[ PREPROCESSOR ]]]
+# <<< EXECUTE_SUCCESS: "before loop" >>>
+# <<< EXECUTE_SUCCESS: "$i = 17" >>>
+# <<< EXECUTE_SUCCESS: "after loop" >>>
+
 # [[[ HEADER ]]]
 use RPerl;
 use strict;
@@ -11,7 +17,11 @@ our $VERSION = 0.001_000;
 
 # [[[ OPERATIONS ]]]
 
+print 'before loop', "\n";
+
 my integer_arrayref $i_array = [ 17 ];
 foreach my integer $i ( @{$i_array} ) {
     print '$i = ', $i, "\n";
 }
+
+print 'after loop', "\n";

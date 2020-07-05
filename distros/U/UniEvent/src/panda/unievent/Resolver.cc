@@ -1,5 +1,6 @@
 #include "Resolver.h"
 #include "Timer.h"
+#include <ostream>
 #include <algorithm>
 #include <functional>
 #include <panda/log.h>
@@ -7,7 +8,7 @@
 
 namespace panda { namespace unievent {
 
-log::Module resolver_log_module("EachResolve", log::Level::Warning);
+static log::Module logmod("UniEvent::Resolver", log::WARNING);
 
 static ares_addrinfo empty_ares_addrinfo;
 
@@ -24,19 +25,19 @@ static bool _init () {
 static const bool __init = _init();
 
 static inline void log_socket (const sock_t& sock) {
-    panda_elog_m(resolver_log_module, log::Level::VerboseDebug, {
+    panda_log_verbose_debug(logmod, [&]{
         net::SockAddr sock_peer;
         net::SockAddr sock_from;
         struct sockaddr_storage sa;
         socklen_t sa_len = sizeof(sa);
-        if (getpeername(sock, (sockaddr*)&sa, &sa_len) != -1) sock_peer = (sockaddr*)&sa;
-        if (getsockname(sock, (sockaddr*)&sa, &sa_len) != -1) sock_from = (sockaddr*)&sa;
+        if (getpeername(sock, (sockaddr*)&sa, &sa_len) != -1) sock_peer = net::SockAddr((sockaddr*)&sa, sa_len);
+        if (getsockname(sock, (sockaddr*)&sa, &sa_len) != -1) sock_from = net::SockAddr((sockaddr*)&sa, sa_len);
         log << "sock from: " << sock_from << ", to: " << sock_peer;
     });
 }
 
 Resolver::Worker::Worker (Resolver* r) : resolver(r), ares_async() {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " new for resolver " << r);
+    panda_log_notice(logmod, this << " new Worker for resolver " << r);
 
     ares_options options;
     int optmask = 0;
@@ -63,7 +64,7 @@ Resolver::Worker::~Worker () {
 }
 
 void Resolver::Worker::on_sockstate (sock_t sock, int read, int write) {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " resolver:" << resolver << " sock:" << sock << " mysocks:" << polls.size() << " read:" << read << " write:" << write);
+    panda_log_debug(logmod, this << " resolver:" << resolver << " sock:" << sock << " mysocks:" << polls.size() << " read:" << read << " write:" << write);
     log_socket(sock);
 
     auto it = polls.find(sock);
@@ -85,7 +86,7 @@ void Resolver::Worker::on_sockstate (sock_t sock, int read, int write) {
 }
 
 void Resolver::Worker::handle_poll (int events, const std::error_code& err) {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " events:" << events << " err:" << err);
+    panda_log_debug(logmod, this << " Worker::handle_poll events:" << events << " err:" << err);
     auto sz = polls.size();
     sock_t socks[sz];
     size_t i = 0;
@@ -98,7 +99,7 @@ void Resolver::Worker::handle_poll (int events, const std::error_code& err) {
 }
 
 void Resolver::Worker::resolve (const RequestSP& req) {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " req:" << req.get() << " node:" << req->_node << " service:" << req->_service << " tmt:" << req->_timeout);
+    panda_log_info(logmod, this << " Resolver::Worker started  req:" << req.get() << " node:" << req->_node << " service:" << req->_service << " tmt:" << req->_timeout);
     request = req;
     request->worker = this;
 
@@ -121,7 +122,7 @@ void Resolver::Worker::resolve (const RequestSP& req) {
 }
 
 void Resolver::Worker::on_resolve (int status, int, ares_addrinfo* ai) {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " req:" << request.get() << " status:" << ares_strerror(status) << " async:" << ares_async << " ai:" << ai);
+    panda_log_info(logmod, this << " Resolver::Worker done req:" << request.get() << " status:" << ares_strerror(status) << " async:" << ares_async << " ai:" << ai);
     if (!request) return; // canceled
 
     std::error_code err;
@@ -146,7 +147,7 @@ void Resolver::Worker::on_resolve (int status, int, ares_addrinfo* ai) {
 }
 
 void Resolver::Worker::cancel () {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " req:" << request.get());
+    panda_log_info(logmod, this << " Resolver::Worker cancel req:" << request.get());
     if (!request) return;
     request->worker = nullptr;
     request = nullptr;
@@ -154,7 +155,7 @@ void Resolver::Worker::cancel () {
 }
 
 void Resolver::Worker::finish_resolve (const AddrInfo& addr, const std::error_code& err) {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " req:" << request.get() << " err:" << err);
+    panda_log_info(logmod, this << " Resolver::Worker finish req:" << request.get() << " err:" << err);
     auto req = std::move(request);
     resolver->finish_resolve(req, addr, err);
 }
@@ -169,7 +170,7 @@ Resolver::Resolver (const LoopSP& loop, const Config& cfg) : Resolver(cfg, loop.
 }
 
 Resolver::Resolver (const Config& cfg, Loop* loop) : _loop(loop), cfg(cfg) {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this);
+    panda_log_ctor(logmod);
     add_worker();
     dns_roll_timer = _loop->impl()->new_timer(this);
     dns_roll_timer->set_weak();
@@ -182,7 +183,7 @@ Resolver::~Resolver () {
 }
 
 void Resolver::handle_timer () {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " dns roll timer");
+    panda_log_debug(logmod, this << " dns roll timer");
     for (auto& w : workers) if (w && w->request) {
         ares_process_fd(w->channel, ARES_SOCKET_BAD, ARES_SOCKET_BAD);
         if (w->exc) std::rethrow_exception(std::move(w->exc));
@@ -197,8 +198,7 @@ void Resolver::add_worker () {
 
 void Resolver::resolve (const RequestSP& req) {
     if (req->_port) req->_service = string::from_number(req->_port);
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug,
-                this << " req:" << req.get() << " [" << req->_node << ":" << req->_service << "] use_cache:" << req->_use_cache);
+    panda_log_notice(logmod, this << " start resolving req:" << req.get() << " [" << req->_node << ":" << req->_service << "] use_cache:" << req->_use_cache);
     req->_resolver = this;
     req->running   = true;
     req->loop      = _loop; // keep loop (for loop resolvers)
@@ -206,6 +206,7 @@ void Resolver::resolve (const RequestSP& req) {
     if (req->_use_cache && cfg.cache_limit) {
         auto ai = find(req->_node, req->_service, req->_hints);
         if (ai) {
+            panda_log_notice(logmod, this << " host found in cache req:" << req.get() << " [" << req->_node << ":" << req->_service << "]");
             req->_use_cache = false;
             cache_delayed.push_back(req);
             req->delayed = loop()->delay([=]{
@@ -223,7 +224,7 @@ void Resolver::resolve (const RequestSP& req) {
     if (req->_timeout) {
         auto reqp = req.get();
         req->timer = Timer::once(req->_timeout, [this, reqp](auto&){
-            panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " timed out req:" << reqp);
+            panda_log_notice(logmod, this << " dns timed out req:" << reqp << " [" << reqp->_node << ":" << reqp->_service << "]");
             reqp->cancel(make_error_code(std::errc::timed_out));
         }, _loop);
     }
@@ -250,6 +251,7 @@ void Resolver::resolve (const RequestSP& req) {
 }
 
 void Resolver::resolve_localhost (const RequestSP& req) {
+    panda_log_info(logmod, this << " resolving localhost:" << req.get());
     cache_delayed.push_back(req);
     req->delayed = loop()->delay([=]{
         req->delayed = 0;
@@ -296,8 +298,7 @@ void Resolver::resolve_localhost (const RequestSP& req) {
 
 void Resolver::finish_resolve (const RequestSP& req, const AddrInfo& addr, const std::error_code& err) {
     if (!req->running) return;
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug,
-                this << " req done:" << req.get() << " [" << req->_node << ":" << req->_service << "], err:" << err);
+    panda_log_notice(logmod, this << " dns finish_resolve done:" << req.get() << " [" << req->_node << ":" << req->_service << "], err:" << err << ", addr:" << addr);
 
     if (req->delayed) {
         loop()->cancel_delay(req->delayed);
@@ -319,11 +320,11 @@ void Resolver::finish_resolve (const RequestSP& req, const AddrInfo& addr, const
     }
 
     if (!err && req->_use_cache && cfg.cache_limit) {
-        if (cache.size() >= cfg.cache_limit) {
-            panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " cleaning cache " << cache.size());
-            cache.clear();
+        if (_cache.size() >= cfg.cache_limit) {
+            panda_log_info(logmod, this << " cache limit exceeded, cleaning cache " << _cache.size());
+            _cache.clear();
         }
-        cache.emplace(CacheKey(req->_node, req->_service, req->_hints), CachedAddress{addr});
+        _cache.emplace(CacheKey(req->_node, req->_service, req->_hints), CachedAddress{addr});
     }
 
     req->queued  = false;
@@ -368,7 +369,7 @@ void Resolver::on_resolve (const AddrInfo& addr, const std::error_code& err, con
 }
 
 void Resolver::reset () {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, this);
+    panda_log_debug(logmod, this << " resolver reset");
 
     dns_roll_timer->stop();
 
@@ -391,33 +392,48 @@ void Resolver::reset () {
 }
 
 AddrInfo Resolver::find (const string& node, const string& service, const AddrInfoHints& hints) {
-    auto it = cache.find({node, service, hints});
-    if (it != cache.end()) {
-        panda_log_m(resolver_log_module, log::Level::VerboseDebug, this << " found in cache " << node);
+    auto it = _cache.find({node, service, hints});
+    if (it != _cache.end()) {
+        panda_log_info(logmod, this << " found in cache " << node);
 
         time_t now = time(0);
         if (!it->second.expired(now, cfg.cache_expiration_time)) return it->second.address;
 
-        panda_log_m(resolver_log_module, log::Level::VerboseDebug,this << " expired " << node);
-        cache.erase(it);
+        panda_log_info(logmod, this << " expired " << node);
+        _cache.erase(it);
     }
     return {};
 }
 
-void Resolver::clear_cache () {
-    cache.clear();
+void Resolver::Cache::mark_bad_address (const CacheKey& key, const net::SockAddr& sa) {
+    panda_log_info(logmod, "request for marking bad address " << sa << " for key " << key);
+
+    auto it = find(key);
+    if (it == end()) {
+        panda_log_info(logmod, "key not found " << key);
+        return;
+    }
+
+    auto& ai = it->second.address;
+    if (ai.addr() != sa) {
+        panda_log_info(logmod, "addr doesn't match " << ai.addr() << " != " << sa);
+        return;
+    }
+
+    if (ai.next()) ai = ai.next();
+    else           ai = ai.first();
 }
 
 Resolver::Request::Request (const ResolverSP& r)
     : _resolver(r), _port(0), _use_cache(true), _timeout(DEFAULT_RESOLVE_TIMEOUT), worker(), delayed(), running(), queued()
 {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, "Request() " << this);
+    panda_log_ctor(logmod);
 }
 
-Resolver::Request::~Request () { panda_log_m(resolver_log_module, log::Level::VerboseDebug, "~Request " << this); }
+Resolver::Request::~Request () { panda_log_dtor(logmod); }
 
 void Resolver::Request::cancel (const std::error_code& err) {
-    panda_log_m(resolver_log_module, log::Level::VerboseDebug, "cancel " << this);
+    panda_log_debug(logmod, "cancel " << this);
     if (_resolver) _resolver->finish_resolve(this, nullptr, err);
 }
 
@@ -451,6 +467,11 @@ static std::error_code ares2stderr (int ares_err) {
         case ARES_EADDRGETNETWORKPARAMS : return resolve_errc::no_get_network_params;
         default                         : return errc::unknown_error;
     }
+}
+
+std::ostream& operator<< (std::ostream& os, const Resolver::CacheKey& key) {
+    os << key.node << ":" << (key.service ? key.service : string("0")) << " {" << key.hints << "}";
+    return os;
 }
 
 }}

@@ -2,8 +2,14 @@
 use strict;
 use Test::More;
 use AnyEvent;
+use English qw( -no_match_vars );
 
 BEGIN {
+    if ($OSNAME eq 'MSWin32') {
+        plan skip_all => 'Skip tests for MSWin32 due to used fork()';
+        exit 0;
+    }
+
     eval "use BSD::Resource qw(getrlimit setrlimit RLIMIT_NOFILE)";
     if ($@) {
         plan skip_all => "BSD::Resource required for test";

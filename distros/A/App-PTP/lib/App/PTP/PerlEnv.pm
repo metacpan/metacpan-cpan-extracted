@@ -4,6 +4,7 @@
  
 package App::PTP::PerlEnv;
 
+use 5.022;
 use strict;
 use warnings;
 

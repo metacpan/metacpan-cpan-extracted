@@ -5,10 +5,10 @@ use 5.022;
 # since later versions may break things.
 use Test2::V0;
 use Test2::Bundle::More;
-use Test::Exception ;
+use Test::Exception;
 # use Test::Exception;
-use Data::Printer;
-# use Data::Dumper;
+# use Data::Printer;
+use Data::Dumper;
 
 use Path::Tiny;
 # use Storable 'dclone';
@@ -61,10 +61,10 @@ subtest 'Modified GrandJunction TieBreaker' => sub {
 
 subtest 'object tiebreakers' => sub {
   my $active = {
-    PISTACHIO => 0,
-    ROCKYROAD => 0,
-    CHOCOLATE => 0,
-    VANILLA   => 0,
+    PISTACHIO => 1,
+    ROCKYROAD => 1,
+    CHOCOLATE => 1,
+    VANILLA   => 1,
   };
   my $I5 = Vote::Count->new( BallotSet => read_ballots('t/data/irvtie.txt') );
   my @resolve1 =
@@ -99,36 +99,40 @@ subtest 'object tiebreakers' => sub {
 
   my @resolve7 =
     $I5->TieBreaker( 'none', $active, ( 'VANILLA', 'ROCKYROAD' ) );
-  is( @resolve7, 0, 'None, returnes an empty array.' );
+
+  note( Dumper @resolve7 );
+
+  is( @resolve7, 0, 'None, returns an empty array.' );
 };
 
 subtest 'Precedence' => sub {
-  $ties->TieBreakMethod( 'precedence' );
-  $ties->PrecedenceFile( 't/data/tiebreakerprecedence1.txt');
+  $ties->TieBreakMethod('precedence');
+  $ties->PrecedenceFile('t/data/tiebreakerprecedence1.txt');
 
   my @all4ties =
     qw(VANILLA CHOCOLATE STRAWBERRY PISTACHIO FUDGESWIRL ROCKYROAD MINTCHIP CARAMEL RUMRAISIN BUBBLEGUM CHERRY CHOCCHUNK);
 
   my $allintie = $ties->TieBreakerPrecedence(@all4ties);
-  is ( $allintie->{'winner'}, 'FUDGESWIRL',
-    'all choices in tie chose #1 precedence choice');
+  is( $allintie->{'winner'}, 'FUDGESWIRL',
+    'all choices in tie chose #1 precedence choice' );
   my @mostinties =
     qw(VANILLA CHOCOLATE STRAWBERRY MINTCHIP CARAMEL RUMRAISIN BUBBLEGUM CHERRY CHOCCHUNK);
-  my @mosttied = $ties->TieBreaker(
-      $ties->TieBreakMethod(), $ties->Active(), @mostinties );
-  is_deeply ( \@mosttied, ['MINTCHIP'],
+  my @mosttied =
+    $ties->TieBreaker( $ties->TieBreakMethod(), $ties->Active(),
+    @mostinties );
+  is_deeply( \@mosttied, ['MINTCHIP'],
     'shorter choices without precedence leaders returned right choice' );
 
-  diag( 'switching precedence file');
-  $ties->PrecedenceFile( 't/data/tiebreakerprecedence2.txt');
-  my @tryagain = $ties->TieBreaker(
-      $ties->TieBreakMethod(), $ties->Active(), qw( BUBBLEGUM CARAMEL) );
-  is_deeply ( \@tryagain, ['CARAMEL'],
+  #   diag( 'switching precedence file');
+  $ties->PrecedenceFile('t/data/tiebreakerprecedence2.txt');
+  my @tryagain = $ties->TieBreaker( $ties->TieBreakMethod(),
+    $ties->Active(), qw( BUBBLEGUM CARAMEL) );
+  is_deeply( \@tryagain, ['CARAMEL'],
     'shorter choices without precedence leaders returned right choice' );
   dies_ok(
     sub {
-      $ties->TieBreaker(
-      $ties->TieBreakMethod(), $ties->Active(), qw( FUDGESWIRL CARAMEL)) ;
+      $ties->TieBreaker( $ties->TieBreakMethod(),
+        $ties->Active(), qw( FUDGESWIRL CARAMEL) );
     },
     "choice missing in precedence file is fatal"
   );

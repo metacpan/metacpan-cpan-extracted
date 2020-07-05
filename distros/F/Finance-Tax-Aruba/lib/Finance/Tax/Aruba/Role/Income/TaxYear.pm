@@ -1,5 +1,5 @@
 package Finance::Tax::Aruba::Role::Income::TaxYear;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moose::Role;
 
 # ABSTRACT: A role that implements income tax logic
@@ -9,6 +9,17 @@ requires qw(
     is_year
 );
 
+has pension_employee_perc => (
+    is => 'ro',
+    isa => 'Num',
+    default => 3,
+);
+
+has pension_employer_perc => (
+    is => 'ro',
+    isa => 'Num',
+    default => 3,
+);
 
 has income => (
     is       => 'ro',
@@ -23,6 +34,32 @@ has yearly_income => (
     builder => '_build_yearly_income',
     predicate => 'has_yearly_income',
 );
+
+has pension_employee => (
+    is => 'ro',
+    isa => 'Num',
+    lazy => 1,
+    builder => '_build_pension_employee',
+    predicate => 'has_pension_employee',
+);
+
+has pension_employer => (
+    is => 'ro',
+    isa => 'Num',
+    lazy => 1,
+    builder => '_build_pension_employer',
+    predicate => 'has_pension_employer',
+);
+
+sub _build_pension_employee {
+    my $self = shift;
+    return $self->get_cost($self->yearly_income_gross, $self->pension_employee_perc);
+}
+
+sub _build_pension_employer {
+    my $self = shift;
+    return $self->get_cost($self->yearly_income_gross, $self->pension_employer_perc);
+}
 
 has yearly_income_gross => (
     is => 'ro',
@@ -189,7 +226,9 @@ sub _build_yearly_income_gross {
 
 sub _build_yearly_income {
     my $self = shift;
-    return $self->yearly_income_gross - $self->wervingskosten;
+    return $self->yearly_income_gross
+         - $self->wervingskosten
+         - $self->pension_employee;
 }
 
 sub _get_tax_bracket {
@@ -351,7 +390,7 @@ Finance::Tax::Aruba::Role::Income::TaxYear - A role that implements income tax l
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

@@ -7,6 +7,9 @@ BEGIN {
 		->author('LNATION')
 		->email('email@lnation.org')
 		->version('0.01')
+		->macro('self', sub {
+			my ($self, $value) = @_;
+		})
 		->class('Foo')
 			->abstract('A Testing Module')
 			->our('$one')
@@ -15,9 +18,10 @@ BEGIN {
 			})
 			->new
 			->accessor('test')
+				->example('')
 			->accessor('testing')
 			->sub('one')
-				->code(sub { $one } )
+				->code(sub { &self; $one } )
 			->sub('name')
 				->code(sub {
 					$_[1] + $_[2];

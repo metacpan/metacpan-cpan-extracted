@@ -222,6 +222,7 @@ sub run {
     cmp_deeply(
       $t->tx->res->json,
       {
+        scopes        => ignore(),
         access_token  => re( '^.+$' ),
         token_type    => 'Bearer',
         expires_in    => '3600',

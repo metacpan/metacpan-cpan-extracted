@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.48 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.51 {
 
   use 5.014;
   use Moose;
@@ -79,6 +79,17 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.48 {
       }
 
       \@workflow;
+    },
+  );
+
+  has irc => (
+    is      => 'ro',
+    isa     => 'Maybe[Str]',
+    lazy    => 1,
+    default => sub {
+      my $self = shift;
+      return undef unless $self->chrome->prompt_yn("irc?");
+      $self->chrome->prompt_str("irc url", { default => 'irc://irc.perl.org/#native' });
     },
   );
 
@@ -208,6 +219,8 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.48 {
       github_user    => $self->github_user,
       version_plugin => ($self->perl_version >= 5.014 ? 'PkgVersion::Block' : 0),
       workflow       => $self->workflow,
+      irc            => $self->irc,
+      default_branch => 'main',
     };
 
     my $code = sub {
@@ -293,6 +306,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.48 {
 
     my $git = Git::Wrapper->new($opts->{mint_root});
     $git->init;
+    $git->checkout( '-b' => 'main' );
     $git->commit({ 'allow-empty' => 1, message => "Start with a blank" });
     $git->add($opts->{mint_root});
     $git->commit({ message => "Initial structure" });
@@ -349,7 +363,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.48 {
     }
 
     $git->remote('add', 'origin', "git\@github.com:" . $self->github_user . '/' . $self->zilla->name . '.git');
-    $git->push('origin', 'master') unless $no_github;
+    $git->push('--set-upstream', 'origin', 'main') unless $no_github;
 
     return;
   }
@@ -371,7 +385,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.48
+version 2.51
 
 =head1 DESCRIPTION
 
@@ -430,7 +444,7 @@ dist: xenial
 services:
   - docker
 before_install:
-  - curl https://raw.githubusercontent.com/plicease/cip/master/bin/travis-bootstrap | bash
+  - curl https://raw.githubusercontent.com/plicease/cip/main/bin/travis-bootstrap | bash
   - cip before-install
 install:
   - cip diag
@@ -453,6 +467,9 @@ jobs:
     - env: CIP_TAG=5.12
     - env: CIP_TAG=5.10
     - env: CIP_TAG=5.8
+branches:
+  only:
+    - main
 cache:
   directories:
     - "$HOME/.cip"
@@ -564,6 +581,7 @@ travis_status  = 1
 release_tests  = {{$release_tests}}
 installer      = Author::Plicease::MakeMaker
 github_user    = {{$github_user}}
+default_branch = {{$default_branch}}
 test2_v0       = 1
 {{
 
@@ -575,6 +593,7 @@ test2_v0       = 1
   }
 
   $extra .= "version_plugin = $version_plugin\n" if $version_plugin;
+  $extra .= "irc            = $irc\n" if $irc;
 
   $extra;
 

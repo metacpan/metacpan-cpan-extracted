@@ -3,11 +3,11 @@
 use strict;
 use warnings;
 
-use IO::All;
+use Path::Tiny qw/ path /;
 
 my ($version) =
-    ( map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-        io->file("./lib/HTML/Widgets/NavMenu.pm")->getlines() );
+    ( map { m{\Aversion * = *(\S+)} ? ($1) : () }
+        path("./dist.ini")->lines_utf8() );
 
 if ( !defined($version) )
 {
@@ -15,7 +15,7 @@ if ( !defined($version) )
 }
 
 my @cmd = (
-    "hg", "tag", "-m", "Tagging HTML-Widgets-NavMenu as $version",
+    "git", "tag", "-m", "Tagging HTML-Widgets-NavMenu as $version",
     "cpan-releases/$version",
 );
 

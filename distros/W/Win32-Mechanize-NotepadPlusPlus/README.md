@@ -14,6 +14,20 @@ Notepad++ plugin PythonScript, but I decided to automate the application from th
 from inside a Notepad++ plugin.  But this module uses similar naming conventions and interface to the
 PythonScript plugin.
 
+## REQUIREMENTS
+
+You need to have Notepad++ on your system.
+
+This module will work if Notepad++ is in a standard install location, like `%ProgramFiles%\Notepad++\`
+or `%ProgramFiles(x86)%\Notepad++\`, or if it is in your path: when it can find the executable,
+it will either use the currently-running instance, or will launch a new instance if none are
+currently running.  If it cannot find your executable, the will only work if Notepad++ is
+already running.
+
+The module was developed with Notepad++ v7.7 or newer in mind, though some features should still
+work on older versions of Notepad++.  As Notepad++ adds new features, the minimum version for
+that method will be indicated in the help.
+
 # LIMITATIONS
 
 This is the first public release of the module.  In general, it works.  As with all first releases,
@@ -45,6 +59,33 @@ For a manual install, type the following:
 
 (On Windows machines, you may need to use "dmake" or "gmake" instead of "make", depending on your setup.)
 
+## It didn't install
+
+In general, if the test suite fails and it doesn't install, you will probably need to file a
+[bug report](https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/issues).
+
+Known possible causes include
+
+- Bit mismatch
+
+    Notepad++ and Perl must have the same bits -- 64bit or 32bit.  Make sure they do.
+    If they don't, it will fail in test file `t\02_bits.t`.
+
+- `-1 NOT >= 0` error
+
+    See [issue #28](https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/issues/28):
+    if you get the message
+    `SendMessage_getRawString(): -1 NOT >= 0 at C:\usr\local\share\GitHubSvn\Win32-Mechanize-NotepadPlusPlus\lib/Win32/Mechanize/NotepadPlusPlus/Notepad.pm line 755.`
+    or similar in multiple of the test files, it might be because you have one or
+    more really large files currently open in Notepad++, or you have too many
+    files open.  Either of these can cause a race condition where the test suite
+    expects Notepad++ to respond with all files loaded, but Notepad++ isn't quite
+    ready yet.  In that case, **File > Save Session**, then
+    **File > Close All**.  Exit and restart Notepad++.  The test suite will
+    probably pass now (if not, please comment on issue#28).  Once passing and
+    installed, you can **File > Load Session** to restore your previously
+    active file session.
+
 # AUTHOR
 
 Peter C. Jones `<petercj AT cpan DOT org>`
@@ -55,7 +96,7 @@ or by emailing `<bug-Win32-Mechanize-NotepadPlusPlus AT rt.cpan.org>`
 or thru the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Win32-Mechanize-NotepadPlusPlus](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Win32-Mechanize-NotepadPlusPlus).
 
 <div>
-    <a href="https://metacpan.org/pod/Win32::Mechanize::NotepadPlusPlus><img src="https://img.shields.io/cpan/v/Win32-Mechanize-NotepadPlusPlus.svg?colorB=00CC00" alt="" title="metacpan"></a>
+    <a href="https://metacpan.org/pod/Win32::Mechanize::NotepadPlusPlus"><img src="https://img.shields.io/cpan/v/Win32-Mechanize-NotepadPlusPlus.svg?colorB=00CC00" alt="" title="metacpan"></a>
     <a href="http://matrix.cpantesters.org/?dist=Win32-Mechanize-NotepadPlusPlus"><img src="http://cpants.cpanauthors.org/dist/Win32-Mechanize-NotepadPlusPlus.png" alt="" title="cpan testers"></a>
     <a href="https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/releases"><img src="https://img.shields.io/github/release/pryrt/Win32-Mechanize-NotepadPlusPlus.svg" alt="" title="github release"></a>
     <a href="https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/issues"><img src="https://img.shields.io/github/issues/pryrt/Win32-Mechanize-NotepadPlusPlus.svg" alt="" title="issues"></a>

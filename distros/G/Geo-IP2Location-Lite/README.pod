@@ -19,7 +19,7 @@ package Geo::IP2Location::Lite;
 use strict;
 use warnings;
 
-$Geo::IP2Location::Lite::VERSION = '0.12';
+$Geo::IP2Location::Lite::VERSION = '0.13';
 
 my $UNKNOWN            = "UNKNOWN IP ADDRESS";
 my $NO_IP              = "MISSING IP ADDRESS";
@@ -203,6 +203,9 @@ sub get_record {
 		$mid = int(($low + $high) >> 1);
 		$ipfrom = $obj->read32($handle, $baseaddr + $mid * $dbcolumn * 4);
 		$ipto = $obj->read32($handle, $baseaddr + ($mid + 1) * $dbcolumn * 4);
+
+		return $UNKNOWN if ( ! defined( $ipfrom ) || ! defined( $ipto ) );
+		
 		if (($ipno >= $ipfrom) && ($ipno < $ipto)) {
 			# read whole results string into temp string and parse results from memory
 			my $raw_positions_row;
@@ -400,7 +403,7 @@ http://www.ip2location.com
 
 =head1 VERSION
 
-0.12
+0.13
 
 =head1 AUTHOR
 

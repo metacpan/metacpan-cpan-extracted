@@ -1,5 +1,8 @@
 Revision history for Text::Template
 
+1.59  2020-07-03
+   - Fix syntax error in POD example code.
+
 1.58  2019-09-27
    - Remove hard coded (old) version number from README
 

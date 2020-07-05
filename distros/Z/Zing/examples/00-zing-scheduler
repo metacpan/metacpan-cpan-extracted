@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing;
+use Zing::Queue;
+
+=pod explain
+
+- zing-scheduler is a Launcher process, see ./examples/00-zing-launcher ...
+- but more specifically it listens to a specific *queue* (i.e. scheduled)
+- when an event is received which meets the criteria of an app scheme ...
+- the process spawns (i.e. spawn()) the app in a fire-and-forget manner
+- note: at present, there isn't any rate-limiting and you *can* exhaust ...
+- the process table (fork space)
+
+=cut
+
+my $q = Zing::Queue->new(name => 'scheduled');
+
+$q->drop;
+$q->send({scheme => ['MyApp::Once', [], 1]});
+$q->send({scheme => ['MyApp::Once', [], 1]});
+$q->send({scheme => ['MyApp::Once', [], 1]});
+$q->send({scheme => ['MyApp::Once', [], 1]});
+$q->send({scheme => ['MyApp::Once', [], 1]});
+$q->send({scheme => ['MyApp::Once', [], 1]});
+$q->send({scheme => ['MyApp::Once', [], 1]});
+$q->send({scheme => ['MyApp::Once', [], 1]});
+$q->send({scheme => ['MyApp::Once', [], 1]});
+$q->send({scheme => ['MyApp::Once', [], 1]});
+
+my $z = Zing->new(scheme => ['Zing::Scheduler', [], 4]);
+
+$z->start;

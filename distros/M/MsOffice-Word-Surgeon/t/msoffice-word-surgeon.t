@@ -32,8 +32,9 @@ my $new_xml = $surgeon->replace(qr/\bMsWord\b/,
 
 like $new_xml, qr/edited in Microsoft Word/,  "after replace";
 
+done_testing();
+
 # $surgeon->contents($new_xml);
 # print $surgeon->indented_contents;
 
-done_testing();
-
+# $surgeon->save_as("foo.docx");

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.183';
+our $VERSION = '1.184';
 
 use Quiq::Unindent;
 
@@ -58,7 +58,7 @@ Objekt zurück.
 Generiere Sdoc mit Einrückung 2:
 
   $gen = Quiq::Sdoc::Producer->new(
-      indentation=>2,
+      indentation => 2,
   );
 
 =cut
@@ -70,7 +70,7 @@ sub new {
     # @_: @keyVal
 
     my $self = $class->SUPER::new(
-        indentation=>4,
+        indentation => 4,
     );
     $self->set(@_);
 
@@ -182,6 +182,44 @@ sub document {
         $str .= sprintf qq|%s%s="%s"\n|,$ind,shift,shift;
     }
     $str .= "\n";
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 format() - Format-Abschnitt
+
+=head4 Synopsis
+
+  $str = $gen->format(
+      $format => $code,
+      ...
+  );
+
+=head4 Description
+
+Erzeuge einen Format-Abschnitt für die angegebenen Format/Code-Paare und
+liefere den resultierenden Sdoc-Code zurück.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub format {
+    my $self = shift;
+    # @_: @formatCode
+
+    my $str = "%Format:\n";
+    while (@_) {
+        my $format = shift;
+        my $code = shift;
+        if ($code ne '' && substr($code,-1,1) ne "\n") {
+            $code .= "\n";
+        }
+        $str .= sprintf "\@\@%s\@\@\n%s",$format,$code;
+    }
+    $str .= ".\n\n";
 
     return $str;
 }
@@ -462,7 +500,7 @@ sub eof {
 
 =head1 VERSION
 
-1.183
+1.184
 
 =head1 AUTHOR
 

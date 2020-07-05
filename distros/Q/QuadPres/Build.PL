@@ -18,7 +18,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "QuadPres",
-  "dist_version" => "0.28.2",
+  "dist_version" => "0.28.3",
   "license" => "mit",
   "module_name" => "QuadPres",
   "recursive_test_files" => 1,
@@ -29,7 +29,7 @@ my %module_build_args = (
     "Data::Dumper" => 0,
     "HTML::Widgets::NavMenu::EscapeHtml" => 0,
     "IO::All" => 0,
-    "List::MoreUtils" => 0,
+    "List::Util" => "1.34",
     "MooX" => 0,
     "MooX::late" => "0.010",
     "Path::Tiny" => 0,

@@ -8,7 +8,7 @@ use warnings;
 
 use MIDI::Simple;
 
-our $VERSION = '0.0702';
+our $VERSION = '0.0800';
 
 
 {
@@ -45,8 +45,13 @@ sub tuplet {
     $MIDI::Simple::Length{ $name . $duration } = $MIDI::Simple::Length{$duration} / $factor
 }
 
-
 sub tuple { tuplet(@_) }
+
+
+sub add_duration {
+    my ( $name, $duration ) = @_;
+    $MIDI::Simple::Length{ $name } = $duration;
+}
 
 1;
 
@@ -62,15 +67,10 @@ Music::Duration - Add 32nd, 64th, 128th and tuplet durations to MIDI-Perl
 
 =head1 VERSION
 
-version 0.0702
+version 0.0800
 
 =head1 SYNOPSIS
 
-  # Compare lengths:
-  # perl -MMIDI::Simple -MData::Dumper -e '%x = %MIDI::Simple::Length; print Dumper [ map { "$_ => $x{$_}" } sort { $x{$a} <=> $x{$b} } keys %x ]'
-  # perl -MMusic::Duration -MData::Dumper -e '%x = %MIDI::Simple::Length; print Dumper [ map { "$_ => $x{$_}" } sort { $x{$a} <=> $x{$b} } keys %x ]'
-
-  # In a program:
   use Music::Duration;
 
   Music::Duration::tuplet( 'ten', 'z', 5 ); # 5 divisions in place of an eighth note triplet
@@ -79,11 +79,20 @@ version 0.0702
   # ...
   $black_page->n( 'zten', 'n38' ) for 1 .. 5;
 
+  Music::Duration::add_duration( phi => 1.618 );
+  # ...
+  $black_page->n( 'phi', 'n38' ) for 1 .. 4;
+
+  # Now inspect the known lengths:
+  my %x = %MIDI::Simple::Length;
+  print Dumper [ map { "$_ => $x{$_}" } sort { $x{$a} <=> $x{$b} } keys %x ];
+
 =head1 DESCRIPTION
 
-This module adds 32nd, 64th, and 128th note divisions to
-L<MIDI::Simple> C<%Length>.  It also adds fractional note divisions
-with the B<tuplet()> function.
+This module adds 32nd, 64th, and 128th triplet and dotted note
+divisions to C<%MIDI::Simple::Length>.  It also computes and inserts a
+fractional note division of an existing duration.  Additionally, this
+module will insert any named note duration to the length hash.
 
 32nd durations added:
 
@@ -106,9 +115,9 @@ with the B<tuplet()> function.
   ddon: double dotted 128th note
   ton:  128th note triplet
 
-=head1 FUNCTION
+=head1 FUNCTIONS
 
-=head2 tuplet
+=head2 tuple, tuplet
 
   Music::Duration::tuplet( 'qn', 'z', 5 );
   # $score->n( 'zqn', ... );
@@ -128,9 +137,13 @@ So in the first example, instead of a quarter note, we instead play 5
 beats - a 5-tuple.  In the second, instead of a whole note (of four
 beats), we instead play 7 beats.
 
-=head2 tuple
+=head2 add_duration
 
-Synonym for the B<tuplet> function.
+  Music::Duration::add_duration( $name => $duration );
+
+This simple function just adds a B<name>d B<duration> length to
+C<%MIDI::Simple::Length> so that it can be used to add notes or rests
+to the score.
 
 =head1 SEE ALSO
 
@@ -148,7 +161,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

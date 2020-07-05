@@ -1,54 +1,19 @@
                            PGP::Sign To-Do List
 
 Here's a list of things that have occurred to me that I'd like to see
-added to PGP::Sign at some point, in no particular order.  As this is a
-module I can only work on in my free time, I won't get to implementing any
-of these things as quickly as I'd like.  If you're interested in doing any
-of these, send me mail at rra@stanford.edu to let me know and then have at
-it!  Patches gratefully accepted and will be noted in the README.
-Additions to this file are also welcome.
+added to PGP::Sign at some point, in no particular order.  The amount of
+development time I have for PGP::Sign is extremely limited, and therefore
+most of these are unlikely to ever be done without help.  Pull requests or
+mailed patches are welcome.
 
- * PGP::Sign currently hard-codes a bunch of flags to PGP to tell it to
-   assume data is text.  There should instead be a PGP::Sign::config() sub
-   along the lines of Getopt::Long::config() where one can indicate what
-   PGP options one wants to use.  This would have the side effect of
-   allowing PGP::Sign to work correctly with binary data.
-
- * The global variable interface to setting PGPSTYLE, PGPS, and PGPV
-   should be replaced by that config mechanism as well.  This means that
-   configuration variables would have to take arguments, as in:
-
-        PGP::Sign::config (style => 'PGP2');
-
-   so the interface to config should probably be hash-style.  MUNGE should
-   also be handled this way, and probably the other global variables as
-   well while we're at it.
+ * PGP::Sign currently hard-codes --textmode processing.  This should be
+   configurable via the object constructor to allow use with binary data.
 
  * All of the information about a signature should be available, not just
-   the key ID and whether or not it verified.  It's a little tempting to
-   make PGP::Sign return a queriable object here, but I'd rather stay away
-   from the morass of turning this into OO....
-
- * The second argument to pgp_verify() is utterly pointless, since no PGP
-   implementation I'm aware of gives two hoots about the version header
-   (nor should it).  There *is*, however, need to supply PGP with user
-   armor headers for the signature block, since I believe both Hash and
-   Charset could change the operation of PGP.  So pgp_verify() needs to be
-   fixed so that you can pass it a hash of headers to add to the signature
-   armor.
-
- * PGP::Sign should be extended to handle attached signatures as well, and
-   to be able to hand back a signed document with an attached signature.
-   This isn't even all that hard.
-
- * PGP::Sign currently does not deal correctly with tied arrays when
-   processing input sources, due to using ref rather than UNIVERSAL::isa()
-   to check the type of a source.  This is tricky to fix without breaking
-   Perl 5.003 compatibility, since 5.003 didn't have UNIVERSAL::isa().  I
-   suppose one could check in the 5.004 branch where we look for IO::*
-   stuff and have it be broken only for 5.003, or do a similar switch in
-   several other places....  I don't think it works right with tied file
-   handles right now either.
+   the user ID and whether or not it verified.  The most important
+   additional information to provide is the full key ID (fingerprint).
+   This probably implies there should be a separate method call alongside
+   verify() that returns a rich object.
 
  * Information about why a signature verification failed isn't provided to
    the caller, and the additional parsable error tokens returned by GnuPG
@@ -56,14 +21,8 @@ Additions to this file are also welcome.
    information about exactly why a signature verification failed (no
    public key found, bad signature, malformed data, etc.).
 
-And here's the really big one:
-
- * Despite all the disclaimers, there's really no reason why this couldn't
-   be turned into a more general PGP module, at least to the extent of
-   including support for encryption and decryption.  Of course, the
-   problem for me is that this then potentially puts it into export-
-   controlled territories; the current implementation *only* does signing
-   and verification and contains no hooks for encryption.  I would be
-   happy to work with someone else to tie this module into a larger
-   framework, though, if someone wants to tackle the task of building a
-   general Perl PGP module.
+ * PGP::Sign throws text exceptions on errors, which doesn't allow the
+   caller to cleanly separate the type of failure, the exit status of
+   GnuPG, and GnuPG's standard output and standard error.  It should
+   instead throw a rich object that supports accessor methods for those
+   details.

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use version 0.9917; our $VERSION = version->declare('v2.9.1');
+use version 0.9917; our $VERSION = version->declare('v2.9.2');
 
 
 sub new {

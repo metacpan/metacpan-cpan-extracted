@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More tests => 6;
 
-use HTML::Widgets::NavMenu::Url;
+use HTML::Widgets::NavMenu::Url ();
 
 {
     my $from =

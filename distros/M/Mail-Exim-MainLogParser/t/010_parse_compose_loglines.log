@@ -1,0 +1,21 @@
+#description:message from SpamAssassin
+2010-09-13 05:00:13 [1487] 1Ov4tU-0000Nz-Rm H=mailhost.domain.com [208.42.54.2]:51792 I=[67.215.162.175]:25 Warning: "SpamAssassin as theuser detected message as NOT spam (0.0)"
+#description:arrival
+2010-09-13 05:00:13 [1487] 1Ov4tU-0000Nz-Rm <= maillinglist@domain.com H=mailhost.domain.com [208.42.54.2]:51792 I=[67.215.162.175]:25 P=esmtps X=TLSv1:AES256-SHA:256 CV=no S=21778 id=384a86a39e83be0d9b3a94d1feb3119f@domain.com T="Daily Science Maillinglist: Chameleon" from for user@example.com
+#description:delivery
+2010-09-13 05:00:14 [1534] 1Ov4tU-0000Nz-Rm => user F= P= R=virtual_user T=virtual_userdelivery S=21902 QT=6s DT=0s
+#description:Completed
+2010-09-13 05:00:15 [1534] 1Ov4tU-0000Nz-Rm Completed QT=7s
+#description:timezone
+2003-04-25 11:17:07 +0100 Start queue run: pid=12762
+#description:spam-H-spamhaus
+2020-06-02 21:48:22 H=(hi) [182.75.130.245] rejected MAIL <steve@apple.com>: Remote host 182.75.130.245 is listed by zen.spamhaus.org ###002
+2020-06-11 05:26:45 1jjKQ0-0000s1-Pt <= rent.2.own.helper-realperson=realdomain@libertynewsletter.xyz H=(mail.libertynewsletter.xyz) [63.83.73.74] P=esmtp S=7831 id=0.0.0.6F.1D63FD93C287332.557991@mail.libertynewsletter.xyz
+2020-06-11 05:26:45 1jjKQ0-0000s1-Pt gmail-smtp-in.l.google.com [2607:f8b0:4001:c01::1b] Network is unreachable
+2020-06-11 05:54:06 1jjKqU-00010G-40 <= <> R=1jjKQ0-0000s1-Pt U=exim P=local S=9277
+2020-06-11 09:54:06 1jjKqU-00010G-40 mail.libertynewsletter.xyz [63.83.73.74] Connection refused
+2020-06-11 09:54:06 1jjKqU-00010G-40 == rent.2.own.helper-realperson=realdomain@libertynewsletter.xyz R=dnslookup T=remote_smtp defer (111): Connection refused
+2020-06-11 10:54:07 1jjKqU-00010G-40 == rent.2.own.helper-realperson=realdomain@libertynewsletter.xyz R=dnslookup T=remote_smtp defer (-53): retry time not reached for any host
+2020-06-12 00:54:05 1jjKqU-00010G-40 ** rent.2.own.helper-realperson=realdomain@libertynewsletter.xyz: Unrouteable address
+2020-06-12 00:54:05 1jjKqU-00010G-40 Frozen (delivery error message)
+2020-06-12 01:54:06 1jjKqU-00010G-40 Message is frozen

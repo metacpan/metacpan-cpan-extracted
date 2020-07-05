@@ -2,13 +2,13 @@
 #include "Loop.h"
 #include "Poll.h"
 #include "Timer.h"
-#include "Debug.h"
 #include "Request.h"
 #include "AddrInfo.h"
 
 #include <map>
 #include <ctime>
 #include <vector>
+#include <iosfwd>
 #include <ares.h>
 #include <cstdlib>
 #include <unordered_map>
@@ -41,46 +41,6 @@ struct Resolver : Refcnt, private backend::ITimerImplListener {
             : cache_expiration_time(exptime), cache_limit(limit), query_timeout(query_timeout), workers(workers) {}
     };
 
-    static ResolverSP create_loop_resolver (const LoopSP& loop);
-
-    Resolver (const LoopSP& loop = Loop::default_loop(), uint32_t exptime = DEFAULT_CACHE_EXPIRATION_TIME, size_t limit = DEFAULT_CACHE_LIMIT)
-        : Resolver(loop, Config(exptime, limit)) {}
-    Resolver (const LoopSP& loop, const Config&);
-
-    Resolver (Resolver& other) = delete;
-    Resolver& operator= (Resolver& other) = delete;
-
-    LoopSP loop () const { return _loop; }
-
-    RequestSP resolve ();
-    RequestSP resolve (string node, resolve_fn callback, uint64_t timeout = DEFAULT_RESOLVE_TIMEOUT);
-
-    virtual void resolve (const RequestSP&);
-
-    virtual void reset ();
-
-    AddrInfo find (const string& node, const string& service, const AddrInfoHints& hints);
-
-    uint32_t cache_expiration_time () const { return cfg.cache_expiration_time; }
-    size_t   cache_limit           () const { return cfg.cache_limit; }
-    size_t   cache_size            () const { return cache.size(); }
-    size_t   queue_size            () const { return queue.size(); }
-
-    void cache_expiration_time (uint32_t val) { cfg.cache_expiration_time = val; }
-
-    void cache_limit (size_t val) {
-        cfg.cache_limit = val;
-        if (cache.size() > val) clear_cache();
-    }
-
-    void clear_cache ();
-
-protected:
-    virtual void on_resolve (const AddrInfo&, const std::error_code&, const RequestSP&);
-
-    ~Resolver ();
-
-private:
     struct CachedAddress {
         CachedAddress (const AddrInfo& ai, std::time_t update_time = std::time(0)) : address(ai), update_time(update_time) {}
 
@@ -91,7 +51,7 @@ private:
     };
 
     struct CacheKey : Refcnt {
-        CacheKey (const string& node, const string& service, const AddrInfoHints& hints) : node(node), service(service), hints(hints) {}
+        CacheKey (const string& node, const string& service = {}, const AddrInfoHints& hints = {}) : node(node), service(service), hints(hints) {}
 
         bool operator== (const CacheKey& other) const {
             return node == other.node && service == other.service && hints == other.hints;
@@ -119,7 +79,50 @@ private:
         }
     };
 
-    using Cache  = std::unordered_map<CacheKey, CachedAddress, CacheHash>;
+    struct Cache : std::unordered_map<const CacheKey, CachedAddress, CacheHash> {
+        using Super = std::unordered_map<const CacheKey, CachedAddress, CacheHash>;
+        void mark_bad_address (const CacheKey&, const net::SockAddr&);
+    };
+
+    static ResolverSP create_loop_resolver (const LoopSP& loop);
+
+    Resolver (const LoopSP& loop = Loop::default_loop(), uint32_t exptime = DEFAULT_CACHE_EXPIRATION_TIME, size_t limit = DEFAULT_CACHE_LIMIT)
+        : Resolver(loop, Config(exptime, limit)) {}
+    Resolver (const LoopSP& loop, const Config&);
+
+    Resolver (Resolver& other) = delete;
+    Resolver& operator= (Resolver& other) = delete;
+
+    LoopSP loop () const { return _loop; }
+
+    RequestSP resolve ();
+    RequestSP resolve (string node, resolve_fn callback, uint64_t timeout = DEFAULT_RESOLVE_TIMEOUT);
+
+    virtual void resolve (const RequestSP&);
+
+    virtual void reset ();
+
+    AddrInfo find (const string& node, const string& service = {}, const AddrInfoHints& hints = {});
+
+    uint32_t cache_expiration_time () const { return cfg.cache_expiration_time; }
+    size_t   cache_limit           () const { return cfg.cache_limit; }
+    size_t   queue_size            () const { return queue.size(); }
+
+    Cache& cache () { return _cache; }
+
+    void cache_expiration_time (uint32_t val) { cfg.cache_expiration_time = val; }
+
+    void cache_limit (size_t val) {
+        cfg.cache_limit = val;
+        if (_cache.size() > val) _cache.clear();
+    }
+
+protected:
+    virtual void on_resolve (const AddrInfo&, const std::error_code&, const RequestSP&);
+
+    ~Resolver ();
+
+private:
     using BTimer = backend::TimerImpl;
     using BPoll  = backend::PollImpl;
 
@@ -157,7 +160,7 @@ private:
     Workers  workers;
     Requests queue;
     Requests cache_delayed;
-    Cache    cache;
+    Cache    _cache;
 
     Resolver (const Config&, Loop*);
 
@@ -221,5 +224,7 @@ inline Resolver::RequestSP Resolver::resolve () { return new Request(this); }
 inline Resolver::RequestSP Resolver::resolve (string node, resolve_fn callback, uint64_t timeout) {
     return resolve()->node(node)->on_resolve(callback)->timeout(timeout)->run();
 }
+
+std::ostream& operator<< (std::ostream&, const Resolver::CacheKey&);
 
 }}

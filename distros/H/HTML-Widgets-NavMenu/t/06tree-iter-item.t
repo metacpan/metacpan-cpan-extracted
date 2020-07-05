@@ -38,7 +38,7 @@ sub does_throw_exception
     );
 
     # TEST*2*2*2
-    for ( my $i = 0 ; $i < ( 2**@args_components ) ; $i++ )
+    for ( my $i = 0 ; $i < ( 2**@args_components ) ; ++$i )
     {
         my @args =
             ( map { ( $i & ( 1 << $_ ) ) ? ( @{ $args_components[$_] } ) : () }

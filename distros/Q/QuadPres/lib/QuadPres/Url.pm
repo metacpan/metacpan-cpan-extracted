@@ -1,10 +1,10 @@
 package QuadPres::Url;
-$QuadPres::Url::VERSION = '0.28.2';
+$QuadPres::Url::VERSION = '0.28.3';
 use 5.016;
 use strict;
 use warnings;
 
-use List::MoreUtils qw( notall );
+use List::Util 1.34 qw( notall );
 use Carp ();
 
 use parent 'QuadPres::Base';
@@ -167,9 +167,27 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
 =head1 VERSION
 
-version 0.28.2
+version 0.28.3
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 $url->get_relative_url($other_url)
+
+=head2 $url->get_url()
+
+=head2 $url->mode()
+
+=head2 $url->is_dir()
+
+=head2 $url->url()
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

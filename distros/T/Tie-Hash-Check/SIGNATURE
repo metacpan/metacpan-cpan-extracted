@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,48 +12,48 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 b0584c4c0a3e1b8db353a7ced9cd4473de359737 Changes
-SHA1 d58f64893c01c12d59ebaa5b2b0f53356d7733c7 Check.pm
-SHA1 1e19cdcc3da63edbc31806a70ef1636582de0e1e LICENSE
-SHA1 4bd444faa6c59e95843259abc44d90fd6914c74d MANIFEST
-SHA1 2fdc361ebe736c1d8fe62ff283e07a5f1c198756 META.yml
-SHA1 f55ce4748f34810e6732fd306f8e8c4b6f90e676 Makefile.PL
-SHA1 d7bc5b2a9ce34a8eb783c472ab82d58cf935e101 README
-SHA1 6ddb9066bfb01cf07b3cc8b81cb05dfdce88354f examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 fd2aa351e22dc455447cf757a3acde9ce8c99e76 t/Tie-Hash-Check/01-use.t
-SHA1 57f1e8a09f2188c621f6bc8230c25f3b5ce236fb t/Tie-Hash-Check/02-version.t
-SHA1 5f76542393300fea3d50a81251c5d522e340e6d1 t/Tie-Hash-Check/03-tiehash.t
-SHA1 9948b5226af995705284ffb868f417aca60373ce t/Tie-Hash-Check/04-clear.t
-SHA1 c5e4c6d3fe4dab4319dce292711e09ec87550dce t/Tie-Hash-Check/05-delete.t
-SHA1 34f3507dba5e6113b39e9fbff7be6c5b0bd82cf0 t/Tie-Hash-Check/06-exists.t
-SHA1 b3cb49e2adc3a1cd35105a48d517a99614f829e9 t/Tie-Hash-Check/07-fetch.t
-SHA1 2e598c14cc8b7ef176b8cafc848e414d5a755915 t/Tie-Hash-Check/08-firstkey.t
-SHA1 386b50e2e96b4a47a62f5640be6abed8817f0567 t/Tie-Hash-Check/09-nextkey.t
-SHA1 2062b2f8c9995af90ee6c62e633fd7783026a724 t/Tie-Hash-Check/10-scalar.t
-SHA1 860a81b5c8d8408b98faf3bdb683807e3602b67c t/Tie-Hash-Check/11-store.t
-SHA1 ec2c3c5b052eb0e512ace8ce0900cb130747ed1b xt/Tie-Hash-Check/01-pod_coverage.t
-SHA1 0c4204c6be0e49eef58eb8a8d8aaf59a1ad26618 xt/Tie-Hash-Check/02-pod.t
+SHA256 67f3acaf4fdc10f2a8b448937f90591b03cfcaeeae695a581350422028d90101 Changes
+SHA256 4dd826229dbe6f6e909272906af03296520ca2c45b2792b36c308b87c109cfce Check.pm
+SHA256 30d744ab8a487b17da2f28ebb119f396a36bccf8d4c9f867f4d593ea841afaa6 LICENSE
+SHA256 61816553296927db7b1b406a91f8b70d02da268ca511d0a021a55bc9ad6e4d27 MANIFEST
+SHA256 64dfcd2d5c35b0bf532821743768cf951e728f688987b55b81aeaf1261bf9aad META.yml
+SHA256 ec1923a35056aa7469228f8e18ad2c295814d2bcee75917e8edb6695d2c04663 Makefile.PL
+SHA256 c794d22ea8dbe86132bc6ebb44b689ab44a6d0a03d35e1eb44ae4afe5ba9479b README
+SHA256 04d4196d3df11df9bb44e90ca62a9ce894f93748672f09296cc4eadb1f1382eb examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 5d84ade45076dcc713efeafe0f28f7ba26e73a144244464999efcccf311f829f t/Tie-Hash-Check/01-use.t
+SHA256 f613af813f7d1ba42d111588d6fc6970392e94633e26f48699c6a2d5bf3b10f9 t/Tie-Hash-Check/02-version.t
+SHA256 f1a369f05a367995a08d89eab15e98e9d8bf8d1f5d572f07de9d3724d1ea15ff t/Tie-Hash-Check/03-tiehash.t
+SHA256 567932bb65dcbf19a53dcd238b47c99febd5222d1ddba6f550a97c700c0cc3cd t/Tie-Hash-Check/04-clear.t
+SHA256 5c2fd34576fe0f72ae9ec542b022256dfd1f7fbd65586591ff6a3d1c9fdb7222 t/Tie-Hash-Check/05-delete.t
+SHA256 405193931a18af1ef05171f0c1a8acdb432a7f5d800004714012c5ce3c42d9cc t/Tie-Hash-Check/06-exists.t
+SHA256 9c699d64f1ee0bba582020e061d781c131e3e8f657eb8cd5f65dd0c6988c5ef5 t/Tie-Hash-Check/07-fetch.t
+SHA256 8f2a153defda994d551b7af797d9b45fb3c9a86ca0d8c8d21bdd1ad553c73c14 t/Tie-Hash-Check/08-firstkey.t
+SHA256 8b71a6e47f5431f29ee6cd4f541bbb4e5ae496f14e7ebe10402da456878e57b1 t/Tie-Hash-Check/09-nextkey.t
+SHA256 b35058fa3afaa5f82b1251ef405a3b0fe2a3a239daed3f03ed08bc87f09cd5c4 t/Tie-Hash-Check/10-scalar.t
+SHA256 12a6d3611bcdf0cab311bf8e9ec9b026ecc744ae0e716c696b186dde0555d816 t/Tie-Hash-Check/11-store.t
+SHA256 f84e3ef3a02d4bf0d870c9c9531091046fab899a9d2e5550aa49039fceefbb18 xt/Tie-Hash-Check/01-pod_coverage.t
+SHA256 3c19627c7d7c18cd0a075f006b3e00c021dbcbb5b55a738fd6ddf6719af8610e xt/Tie-Hash-Check/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJXwVSVAAoJEJe+XXKaIuTl4yUIAKUkjJk2VN4EZ2UougkBmmt8
-u/X1fWUUO2j7wmEOQOFDAU/TjPbJ+L6vqHDTOwu8OwVGnEmCJ/KTmQtikZuvS1Vc
-Lqnm51cSvhr3Tsjhqyl3P2vJrP3c/Yj9tzfUyZrpsBOlximcFWZEd0pL7R40J5Db
-1f68vXzrhQop5eerpT75IYqPsrOnXAzpdrmvKsrhmCcN6BEXHb0myvQTOuwmX80s
-V4VVvoz6DCEL31iYGl6noKbJNBjEgskHfR2CO6Ir0mLQnNQWk10L2ECy2eQRc9ei
-51zLYJaQRF/1wgksXZTO9qXQ6N2/ShNkF2EnXQ36B2s40rRHWCJ+Ez2fC4jRmCY=
-=+Dzp
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl7uNTYACgkQKyiOZjWe
+rHYNzwf/XGtJ/VEQMUPn5yGjILCHDyYZlU05BI+OGK6vSY06T070Ins+2nGNTqix
+a3kgD+axJf4i1tDtmhGcTSzlNTKQy8MNMWt0U6Iy08HyCmFmPY1GWsw2Xt1ItRgm
+w7tnPsUWJTC4gDgfss2emiYS3ouDFdYxfQJ91e2mtbB7yFoW+kHJvJz8F5xq4vL0
+62tH/B58Fu8Q9JkV/FYocZ8iaUq6jZEewwc1pDBHQ6aoVlHN56vOSpE5/5PkYyHb
+BxUUTkbZygT1o0bDkC8LhjThBfUXdtknKuhMN+WaXDYy6RaIjIsUPX7uUq+psHhr
+YIJZRi/uMT8+0nINeUcP6R/QA7FHQQ==
+=G2wY
 -----END PGP SIGNATURE-----

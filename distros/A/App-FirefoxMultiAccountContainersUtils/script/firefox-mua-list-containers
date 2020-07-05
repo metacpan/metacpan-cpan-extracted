@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-03'; # DATE
+our $DATE = '2020-06-04'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -41,7 +41,7 @@ firefox-mua-list-containers - Sort Firefox Multi-Account Containers add-on's con
 
 =head1 VERSION
 
-This document describes version 0.006 of firefox-mua-list-containers (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-06-03.
+This document describes version 0.007 of firefox-mua-list-containers (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2020-06-04.
 
 =head1 SYNOPSIS
 

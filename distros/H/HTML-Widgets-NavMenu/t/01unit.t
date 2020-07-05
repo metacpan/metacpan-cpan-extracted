@@ -4,7 +4,7 @@ use strict;
 
 use Test::More tests => 9;
 
-use HTML::Widgets::NavMenu;
+use HTML::Widgets::NavMenu ();
 
 {
     my $text = "test/foo";

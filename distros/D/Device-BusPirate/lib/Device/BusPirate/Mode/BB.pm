@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 
@@ -38,25 +38,25 @@ C<Device::BusPirate::Mode::BB> - use C<Device::BusPirate> in bit-banging mode
 
 =head1 SYNOPSIS
 
- use Device::BusPirate;
+   use Device::BusPirate;
 
- my $pirate = Device::BusPirate->new;
- my $bb = $pirate->enter_mode( "BB" )->get;
+   my $pirate = Device::BusPirate->new;
+   my $bb = $pirate->enter_mode( "BB" )->get;
 
- my $count = 0;
- while(1) {
-    $bb->write(
-       miso => $count == 0,
-       cs   => $count == 1,
-       mosi => $count == 2,
-       clk  => $count == 3,
-       aux  => $count == 4,
-    )->then( sub { $pirate->sleep( 0.5 ) })
-     ->get;
+   my $count = 0;
+   while(1) {
+      $bb->write(
+         miso => $count == 0,
+         cs   => $count == 1,
+         mosi => $count == 2,
+         clk  => $count == 3,
+         aux  => $count == 4,
+      )->then( sub { $pirate->sleep( 0.5 ) })
+       ->get;
 
-   $count++;
-   $count = 0 if $count >= 5;
- }
+     $count++;
+     $count = 0 if $count >= 5;
+   }
 
 =head1 DESCRIPTION
 

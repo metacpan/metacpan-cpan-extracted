@@ -26,7 +26,7 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Net-IPv6Addr
   repository: git://github.com/benkasminbullock/net-ipv6addr.git
-version: '0.96'
+version: '1.01'
 x_contributors:
   - 'Jyrki Soini'
   - 'Joacim Haggmark'

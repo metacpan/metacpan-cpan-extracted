@@ -1,5 +1,12 @@
 Revision history for Perl extension Email::Stuffer
 
+0.018     2020-07-03 17:14:36-04:00 America/New_York
+        - document envelope argument to ->send (thanks, Dan Book)
+        - fix a bug that prevented ->transport from being the first method
+          called (thanks, Alastair Douglas)
+        - fix a typo in the docs (thanks, Steve Dondley)
+        - fix tests when using the latest Email::MIME (thanks, Russell Jenkins)
+
 0.017     2018-03-10 18:01:43-05:00 America/New_York
         - "transport" can now be passed an arrayref in new
         - some minor documentation fixes

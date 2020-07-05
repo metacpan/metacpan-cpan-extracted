@@ -1,5 +1,6 @@
 #include "AddrInfo.h"
 #include <sstream>
+#include <ostream>
 
 namespace panda { namespace unievent {
 
@@ -26,6 +27,11 @@ std::ostream& operator<< (std::ostream& os, const AddrInfo& ai) {
         cur = cur.next();
         if (cur) os << " ";
     }
+    return os;
+}
+
+std::ostream& operator<< (std::ostream& os, const AddrInfoHints& hints) {
+    os << "family=" << hints.family << ", socktype=" << hints.socktype << ", protocol=" << hints.protocol << ", flags=" << hints.flags;
     return os;
 }
 

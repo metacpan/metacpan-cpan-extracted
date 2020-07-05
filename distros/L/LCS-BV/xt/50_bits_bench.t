@@ -26,9 +26,10 @@ if (1) {
   for my $test (@{$tests}) {
     is(kernighan($test->[1]),$test->[2],'kernighan '.$test->[0]);
     is(parallel1($test->[1]),$test->[2],'parallel1 '.$test->[0]);
-    is(parallel2($test->[1]),$test->[2],'parallel2 '.$test->[0]);
-    #is(parallel3($test->[1]),$test->[2],'parallel3 '.$test->[0]);
-    is(best($test->[1]),$test->[2],'best '.$test->[0]);
+    #is(parallel2($test->[1]),$test->[2],'parallel2 '.$test->[0]);
+    is(parallel3($test->[1]),$test->[2],'parallel3 '.$test->[0]);
+    is(best(     $test->[1]),$test->[2],'best '.$test->[0]);
+    #is(lookup(   $test->[1]),$test->[2],'lookup '.$test->[0]);
   }
   done_testing;
 }
@@ -102,6 +103,25 @@ sub parallel2 {
   return $v & 0x000000000000003f;
 }
 
+my @bits =  (
+  0x5555555555555555,
+  0x3333333333333333,
+  0x0f0f0f0f0f0f0f0f,
+  0x00ff00ff00ff00ff,
+  0x0000ffff0000ffff,
+  0x00000000ffffffff,
+);
+my @s    =  (1, 2, 4, 8, 16, 32);
+sub lookup {
+  my $v = shift;
+
+  my $i;
+  for ($i = 0; $i < 6; $i++) {
+     $v = (($v >> $s[$i]) & $bits[$i]) + ($v & $bits[$i]);
+  }
+  return $v;
+}
+
 sub best {
   my $v = shift;
 
@@ -117,7 +137,7 @@ sub best {
 
 if (1) {
   for my $test (@{$tests}) {
-    print $test->[0],"\n";
+    print "\n",$test->[0],"\n";
     my $bits = $test->[1];
     cmpthese( -1, {
        'kernighan' => sub {
@@ -129,12 +149,15 @@ if (1) {
         #'parallel2' => sub {
         #    parallel2($bits)
         #},
-        #'parallel3' => sub {
-        #    parallel3($bits)
-        #},
+        'parallel3' => sub {
+            parallel3($bits)
+        },
         'best' => sub {
             best($bits)
         },
+        #'lookup' => sub {
+        #    lookup($bits)
+        #},
     });
   }
 }
@@ -175,7 +198,15 @@ The best method for counting bits in a 32-bit integer v is the following:
 v = v - ((v >> 1) & 0x55555555);                    // reuse input as temporary
 v = (v & 0x33333333) + ((v >> 2) & 0x33333333);     // temp
 c = ((v + (v >> 4) & 0xF0F0F0F) * 0x1010101) >> 24; // count
-The best bit counting method takes only 12 operations, which is the same as the lookup-table method, but avoids the memory and potential cache misses of a table. It is a hybrid between the purely parallel method above and the earlier methods using multiplies (in the section on counting bits with 64-bit instructions), though it doesn't use 64-bit instructions. The counts of bits set in the bytes is done in parallel, and the sum total of the bits set in the bytes is computed by multiplying by 0x1010101 and shifting right 24 bits.
+
+The best bit counting method takes only 12 operations, which is the same as the lookup-table method,
+but avoids the memory and potential cache misses of a table.
+It is a hybrid between the purely parallel method above and the earlier methods
+using multiplies (in the section on counting bits with 64-bit instructions),
+though it doesn't use 64-bit instructions.
+The counts of bits set in the bytes is done in parallel,
+and the sum total of the bits set in the bytes is computed
+by multiplying by 0x1010101 and shifting right 24 bits.
 
 A generalization of the best bit counting method to integers of bit-widths upto 128 (parameterized by type T) is this:
 

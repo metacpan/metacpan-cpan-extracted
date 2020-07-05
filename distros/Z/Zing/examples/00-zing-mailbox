@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::Mailbox;
+use Zing::Process;
+
+=pod explain
+
+- zing-mailbox is a mailbox for processes
+- this example shows building a mailbox manually, however ...
+- every process automatically gets a mailbox as an attribute
+- mailboxes are implemented as a process-specific pub/sub queue
+- you can easily reply to message received having the addressing handle automatically
+- messages are sent (send()) to a process name, i.e. (send(name, data))
+
+=cut
+
+my $p1 = Zing::Process->new;
+my $p2 = Zing::Process->new;
+
+my $m1 = Zing::Mailbox->new(process => $p1);
+my $m2 = Zing::Mailbox->new(process => $p2);
+
+my $msg;
+
+$m1->send($p2->mailbox->term, {text => 'hey'});
+
+$msg = $m2->recv;
+
+warn 'to', ' ', $p2->name, ', ', $msg->{from}, ' ', 'says', ' ', $msg->{data}{text};
+
+$m2->reply($msg, {text => 'sup'});
+
+$msg = $m1->recv;
+
+warn 'to', ' ', $p1->name, ', ', $msg->{from}, ' ', 'says', ' ', $msg->{data}{text};
+
+$m1->drop;
+$m2->drop;

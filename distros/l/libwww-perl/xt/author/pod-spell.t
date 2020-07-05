@@ -191,6 +191,7 @@ Nicolai
 Nierstrasz
 Nigel
 Nik
+Niko
 Ntlm
 Olaf
 Olly
@@ -265,6 +266,7 @@ Tony
 Toru
 Tourbin
 TraceHTTP
+Tyni
 Tørholm
 UA
 Ugai
@@ -369,6 +371,7 @@ nawglan
 nigelgregoire
 nntp
 nogo
+ntyni
 ohiocore
 olaf
 ondrej

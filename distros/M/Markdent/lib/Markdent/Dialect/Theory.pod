@@ -1,4 +1,4 @@
-package Mardent::Dialect::Theory;
+package Markdent::Dialect::Theory;
 
 =pod
 

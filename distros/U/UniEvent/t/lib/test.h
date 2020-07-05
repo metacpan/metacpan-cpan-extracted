@@ -4,7 +4,6 @@
 #include <thread>
 #include <catch.hpp>
 #include <panda/unievent.h>
-#include <panda/unievent/Debug.h>
 #include <panda/unievent/test/AsyncTest.h>
 
 using namespace panda;

@@ -2,7 +2,7 @@
 
 =pod
 
-=head1 VERSION 1.01
+=head1 VERSION 1.03
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ A catalog of common Vote Counting Systems and their implementation in Vote::Coun
 
 =head2 Borda Count
 
-The Borda Count implementation does not yet cover all common weighting rule variations.
+Methods which assign scores to choices by their ranking. 
 
 =over
 

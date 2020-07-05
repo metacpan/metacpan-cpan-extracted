@@ -1,5 +1,5 @@
 package Search::Elasticsearch::CxnPool::Async::Static::NoPing;
-$Search::Elasticsearch::CxnPool::Async::Static::NoPing::VERSION = '6.80';
+$Search::Elasticsearch::CxnPool::Async::Static::NoPing::VERSION = '6.81';
 use Moo;
 with 'Search::Elasticsearch::Role::CxnPool::Static::NoPing',
     'Search::Elasticsearch::Role::Is_Async';
@@ -42,7 +42,7 @@ Search::Elasticsearch::CxnPool::Async::Static::NoPing - An async CxnPool for con
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 SYNOPSIS
 

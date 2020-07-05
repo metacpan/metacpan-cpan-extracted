@@ -3,7 +3,7 @@ NAME
     Elasticsearch 2.x APIs
 
 VERSION
-    version 6.80
+    version 6.81
 
 DESCRIPTION
     The Search::Elasticsearch::Client::2_0 package provides a client

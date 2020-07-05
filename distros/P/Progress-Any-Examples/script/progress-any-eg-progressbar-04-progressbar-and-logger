@@ -1,0 +1,83 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Log::ger::Output 'Screen';
+use Progress::Any '$progress';
+use Progress::Any::Output 'TermProgressBarColor', freq=>0.25;
+use Time::HiRes qw(sleep);
+
+my $target = $ARGV[0] // 30;
+$progress->target($target);
+for (1..$target) {
+    $progress->update(message => "Doing item $_/$target");
+    if (rand() < 0.2) {
+        log_warn "A warn message at item $_";
+    }
+    if (rand() < 0.05) {
+        log_error "An error message at item $_";
+    }
+    sleep 0.3;
+}
+$progress->finish;
+
+# ABSTRACT: Combining progress bar and Log::ger on the terminal
+# PODNAME: progress-any-eg-progressbar-04-progressbar-and-logger
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+progress-any-eg-progressbar-04-progressbar-and-logger - Combining progress bar and Log::ger on the terminal
+
+=head1 VERSION
+
+This document describes version 0.001 of progress-any-eg-progressbar-04-progressbar-and-logger (from Perl distribution Progress-Any-Examples), released on 2020-06-20.
+
+=head1 SYNOPSIS
+
+ % progress-any-eg-progressbar-04-progressbar-and-logger [target=30]
+
+=head1 DESCRIPTION
+
+This example shows progress bar combined with L<Log::ger> screen output
+(L<Log::ger::Screen>). The message printed out will not clobber the progress bar
+because the progress bar output module
+(L<Progress::Any::Output::TermProgressBarColor>) contains patches to make sure
+of this.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Progress-Any-Examples>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Progress-Any-Examples>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any-Examples>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

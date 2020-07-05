@@ -9,7 +9,7 @@ namespace xs {
 
 static const char* HOOK_METHOD  = "HOOK_CLONE";
 static const int   HOOK_METHLEN = strlen(HOOK_METHOD);
-static const int   CLONE_MAX_DEPTH = 5000;
+static const int   CLONE_MAX_DEPTH = 1000;
 
 static MGVTBL clone_marker;
 
@@ -47,7 +47,9 @@ Sv clone (const Sv& source, int flags) {
 }
 
 static void _clone (pTHX_ SV* dest, SV* source, CrossData*& xdata, I32 depth) {
-    if (depth > CLONE_MAX_DEPTH) throw std::invalid_argument("clone: max depth (5000) reached, it looks like you passed a cycled structure");
+    if (depth > CLONE_MAX_DEPTH) throw std::invalid_argument(
+        std::string("clone: max depth (") + std::to_string(CLONE_MAX_DEPTH) + ") reached, it looks like you passed a cycled structure"
+    );
 
     if (SvROK(source)) { // reference
         SV* source_val = SvRV(source);

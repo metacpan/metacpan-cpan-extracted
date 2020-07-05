@@ -25,7 +25,7 @@ my @expected_files = sort qw(
   .gitignore
   .travis.yml
   Changes
-  cpanfile
+  prereqs.yml
   dist.ini
   LICENSE
   lib/DZT/Minty.pm

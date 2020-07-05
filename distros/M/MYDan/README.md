@@ -65,6 +65,21 @@ MYDan支持两种协议，ssh协议和MYDan自定义协议。推荐使用MYDan�
 
     (等同于: curl -L http://install.mydan.org|bash)
 
+安装方式4:
+
+    (安装到/opt/mydan下)
+    需要安装的服务器不能上网,需要一个可以上网的机器先下载安装包,然后拷贝到服务器进行安装
+
+    安装步骤:
+        1. 新建一个目录,在目录中运行下载安装包命令:
+            curl -s https://raw.githubusercontent.com/MYDan/openapi/master/scripts/mydan/package.sh|bash
+            (也可以只下载某个版本 curl -s https://raw.githubusercontent.com/MYDan/openapi/master/scripts/mydan/package.sh|bash -s Linux:x86_64)
+
+            (等同于: curl -L http://package.mydan.org|bash)
+
+        2. 拷贝名如mydan.agent.20190524140060.Linux.x86_64 的文件到需要安装的服务器上
+        3. 在服务器上运行./mydan.agent.20190524140060.Linux.x86_64 进行安装
+
 ==============================推荐使用方式===================================
 
 第一步: 

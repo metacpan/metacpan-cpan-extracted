@@ -28,6 +28,7 @@ my $moose_basic = {
 };
 
 my $replicated = {
+  'Clone' => 0,
   %$moose_basic,
 };
 
@@ -619,6 +620,7 @@ my $reqs = {
 
   dist_dir => {
     req => {
+      %$admin_script,
       %$test_and_dist_json_any,
       'ExtUtils::MakeMaker' => '6.64',
       'Pod::Inherit'        => '0.91',

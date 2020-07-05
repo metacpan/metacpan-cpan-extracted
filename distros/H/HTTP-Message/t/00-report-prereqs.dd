@@ -10,6 +10,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Clone' => '0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
@@ -23,12 +24,8 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
-                      'recommends' => {
-                                        'Clone' => '0'
-                                      },
                       'requires' => {
                                       'Carp' => '0',
-                                      'Clone' => '0',
                                       'Compress::Raw::Zlib' => '0',
                                       'Encode' => '3.01',
                                       'Encode::Locale' => '1',
@@ -50,6 +47,9 @@ do { my $x = {
                                       'perl' => '5.008001',
                                       'strict' => '0',
                                       'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'Clone' => '0'
                                     }
                     },
        'test' => {

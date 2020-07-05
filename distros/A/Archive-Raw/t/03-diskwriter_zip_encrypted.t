@@ -29,7 +29,7 @@ my $writer = Archive::Raw::DiskWriter->new
 );
 isa_ok $writer, 'Archive::Raw::DiskWriter';
 
-my $output = 't/testextract/';
+my $output = 't/testextract_zip_encrypted/';
 remove_tree ($output);
 
 while (my $entry = $reader->next())
@@ -52,4 +52,8 @@ while (my $entry = $reader->next())
 	ok (-e $filename);
 }
 
+$reader->close();
+$writer->close();
+
 done_testing;
+

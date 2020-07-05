@@ -22,7 +22,10 @@ sub test_backends {
         return;
     }
 
-    my @backends=('Cache::Memory');
+    my @backends=(
+        'Cache::Memory',
+        'Cache::Uncached',
+    );
     ### my @backends=();
 
     my $have_memcached;
@@ -170,8 +173,10 @@ sub test_backends {
 
                     my $got=$cache->get(idx => $idx);
 
-                    $self->assert($buildcount{$idx} == 1,
-                        "Expected build count to be 1, got $buildcount{$idx} on test #$idx, round $round (MEMCACHED not running?)");
+                    if($backend ne 'Cache::Uncached') {
+                        $self->assert($buildcount{$idx} == 1,
+                            "Expected build count to be 1, got $buildcount{$idx} on test #$idx, round $round (MEMCACHED not running?)");
+                    }
 
                     my $expect=$tests{$idx};
 
@@ -182,7 +187,7 @@ sub test_backends {
                         $self->assert($jgot eq $jexpect,
                             "Received '$jgot', expected '$jexpect' for test #$idx, round $round");
 
-                        if($round>1) {
+                        if($round>1 && $backend ne 'Cache::Uncached') {
                             $self->assert($got ne $expect,
                                 "Expected to receive a copy, not the original reference on test #$idx, round $round");
                         }

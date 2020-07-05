@@ -8,7 +8,7 @@ package Future::AsyncAwait::Awaitable;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 =head1 NAME
 

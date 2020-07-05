@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::WWW::Mechanize::Driver.
 
+0.7  Fri Jul 3 2020
+   - Fix testing on YAML 1.30 (where $YAML::LoadBlessed=0)
+
 0.6  Sun Jun 21 2009
    - initial public release
 

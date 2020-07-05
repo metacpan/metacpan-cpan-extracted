@@ -9,7 +9,7 @@ use Mojo::Promise;
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 my $BASE = __PACKAGE__;
 my $X_RE = qr{^x-};
@@ -36,7 +36,7 @@ sub call {
 
 sub call_p {
   my ($self, $op) = (shift, shift);
-  my $code = $self->can("${op}_p") or Carp::croak('[OpenAPI::Client] No such operationId');
+  my $code = $self->can("${op}_p") or return Mojo::Promise->reject('[OpenAPI::Client] No such operationId');
   return $self->$code(@_);
 }
 
@@ -190,6 +190,7 @@ sub _build_tx {
   if (@errors) {
     warn "[@{[ref $self]}] Validation for $url failed: @errors.\n" if DEBUG;
     $tx = Mojo::Transaction::HTTP->new;
+    $tx->req->method(uc $op_spec->{method});
     $tx->req->url($url);
     $tx->res->headers->content_type('application/json');
     $tx->res->body(Mojo::JSON::encode_json({errors => \@errors}));
@@ -320,7 +321,7 @@ You can send XML or any format you like, but this require you to add a new
 "generator":
 
   use Your::XML::Library "to_xml";
-  $client->ua->transactor->add_generators(xml => sub {
+  $client->ua->transactor->add_generator(xml => sub {
     my ($t, $tx, $data) = @_;
     $tx->req->body(to_xml $data);
     return $tx;
@@ -440,7 +441,7 @@ all instances.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017, Jan Henning Thorsen
+Copyright (C) 2017-2020, Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

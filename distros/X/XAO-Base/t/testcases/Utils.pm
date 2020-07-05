@@ -160,10 +160,10 @@ sub test_t2hj {
 
     my %matrix=(
         'plain'                     => 'plain',
-        q(John's)                   => q(John\\'s),
+        q(John's)                   => q(John\\u0027s),
         q(John "Bloody" Baron)      => q(John \\"Bloody\\" Baron),
-        q(C:\\Foo - John's "Files") => q(C:\\\\Foo - John\\'s \\"Files\\"),
-        qq(Two\nTabbed\tLines)      => q(Two\\012Tabbed\\011Lines),
+        q(C:\\Foo - John's "Files") => q(C:\\\\Foo - John\\u0027s \\"Files\\"),
+        qq(Two\nTabbed\tLines)      => q(Two\\u000aTabbed\\u0009Lines),
         qq(smiley - \x{263a})       => qq(smiley - \x{263a}),
     );
     foreach my $t (keys %matrix) {

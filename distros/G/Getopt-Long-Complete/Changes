@@ -1,3 +1,18 @@
+0.315   2020-04-16  Released-By: PERLANCAR; Urgency: medium
+
+	- Tweak demo script again: provide all possible completion when
+	  completing option value for ambiguous option name; this is made
+	  possible by Complete::Getopt::Long 0.479 which return an array of
+	  possible option names in 'opt' argument instead of undef.
+
+
+0.314   2020-04-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] GetOptionsWithCompletion: Return result from GetOptions.
+
+	- Tweak demo script.
+
+
 0.313   2020-04-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Adjust to Complete::Getopt::Long 0.476 which now properly accepts

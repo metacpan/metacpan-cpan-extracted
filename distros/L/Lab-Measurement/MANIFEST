@@ -318,6 +318,7 @@ t/Moose/DataFile/Gnuplot.t
 t/Moose/DataFile/Gnuplot/Compressed.t
 t/Moose/DataFile/Read.t
 t/Moose/DataFolder.t
+t/Moose/Instrument/DummySource.t
 t/Moose/Instrument/HP34410A.t
 t/Moose/Instrument/HP34410A.yml
 t/Moose/Instrument/HP34420A.t
@@ -355,7 +356,8 @@ t/Moose/Instrument/ZI_MFLI.yml
 t/Moose/Instrument/base.t
 t/Moose/Plot.t
 t/Moose/Stabilizer.t
-t/Moose/Sweep-Continuous.t
+t/Moose/Sweep-Continuous-Time.t
+t/Moose/Sweep-Continuous-Voltage.t
 t/Moose/Sweep-Plot.t
 t/Moose/Sweep.t
 t/SCPI/flat.t

@@ -18,6 +18,7 @@ std::string ErrorCategory::message (int condition) const noexcept {
         case errc::unexpected_continue           : return "response code 100-continue was not expected";
         case errc::unsupported_compression       : return "compression method is not supported";
         case errc::unsupported_transfer_encoding : return "transfer encodinng is not supported";
+        case errc::corrupted_cookie_jar          : return "serialized cookie jar seems corrupted";
     }
     return {};
 }

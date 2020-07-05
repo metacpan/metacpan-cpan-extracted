@@ -484,6 +484,21 @@ int Date::days_in_month () {
     RETVAL = THIS->days_in_month();
 }
 
+uint8_t Date::week_of_month ()
+
+uint8_t Date::weeks_in_year ()
+
+void Date::week_of_year () {
+    auto info = THIS->week_of_year();
+    int rcnt = 1;
+    if (GIMME_V == G_ARRAY) {
+        mXPUSHi(info.year);
+        rcnt = 2;
+    }
+    mXPUSHu(info.week);
+    XSRETURN(rcnt);
+}
+
 std::error_code Date::error ()
 
 SV* Date::truncate () {

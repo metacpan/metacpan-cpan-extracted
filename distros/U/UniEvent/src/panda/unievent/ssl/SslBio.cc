@@ -2,11 +2,12 @@
 #include "../Stream.h"
 #include <iomanip>
 
-using panda::string;
 namespace panda { namespace unievent { namespace ssl {
 
+using panda::string;
 using membuf_t = SslBio::membuf_t;
-static const auto& panda_log_module = ssllog;
+
+log::Module panda_log_module("UniEvent::SSL", log::WARNING);
 
 static int bio_new (BIO* bio) {
     membuf_t* b = new membuf_t();
@@ -62,7 +63,7 @@ static int bio_read (BIO* bio, char* out, int _outl) {
     string& buf = b->buf;
 
     panda_log_debug("bio_read " << bio << " len=" << outl << ", have=" << b->buf.length());
-    if(outl == 5 && buf.length() >= 5) panda_elog_m(ssllog, log::VerboseDebug, {
+    if(outl == 5 && buf.length() >= 5) panda_log_verbose_debug([&]{
         log << "buf: ";
         std::ios_base::fmtflags saveflags = log.flags();
         for(int i = 0; i < 5; ++i) {

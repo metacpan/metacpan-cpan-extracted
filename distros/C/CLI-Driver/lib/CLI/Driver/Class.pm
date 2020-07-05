@@ -23,6 +23,8 @@ has attr => (
 	default => sub { [] }
 );
 
+has 'use_argv_map' => ( is => 'rw', isa => 'Bool' );
+
 ############################
 ###### PUBLIC METHODS ######
 ############################

@@ -1,0 +1,41 @@
+                             PGP::Sign Thanks
+
+To Andrew Gierth for the inspiration and motivation to write this and the
+reminder that PGPPASSFD existed, for being one of the two people who
+caught the mistake I made with $? and open3(), and for pointing out a
+missing waitpid() in pgp_verify() that was causing zombies.
+
+To Jon Ribbens for pointing out that $? isn't guaranteed to contain the
+exit status of something called from open3() unless you do a waitpid() for
+it first.
+
+To Andrew Ford for adding PGPPATH support and adding a test suite and code
+in Makefile.PL to search for an installed version of PGP.
+
+To Todd Underwood for the impetus to get this module working under GnuPG
+and PGP 5.0, and to he and Monte Mitzelfelt for the initial GnuPG
+implementation that I based mine on.
+
+To Lupe Christoph for pointing out that Perl 5.005_03 sets close-on-exec
+on file handles created by pipe, requiring an fcntl() call in PGP::Sign to
+unset that.
+
+To J. Porter Clark for information about the socket needed for GnuPG with
+egd support.
+
+To Marco d'Itri for example code on how to use the GnuPG --status-fd
+support, so that parsing of the human-readable output of GnuPG isn't
+needed, and to Autrijus Tang for reminding me that I'd not yet pulled that
+code over from pgpverify.
+
+To David Lawrence and Greg Rose for signcontrol and PGPMoose respectively,
+the motivating applications.
+
+To Phil Zimmermann, because Phil should be listed in the thank you list
+for anything related to PGP, given that he wrote it and went through legal
+hell to make sure we still had it available.
+
+To Werner Koch for GnuPG, which is much nicer than any other PGP
+implementation I've worked with and is free to boot, and for pointing me
+at the right sections of RFC 2440 to explain the OpenPGP standard on
+whitespace munging in text signatures.

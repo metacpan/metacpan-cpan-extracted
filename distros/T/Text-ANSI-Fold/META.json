@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Text::VisualWidth::PP" : "0.05",
-            "perl" : "5.014"
+            "perl" : "v5.14.0"
          }
       },
       "test" : {
@@ -55,7 +55,7 @@
    "provides" : {
       "Text::ANSI::Fold" : {
          "file" : "lib/Text/ANSI/Fold.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Text::ANSI::Fold::Japanese::W3C" : {
          "file" : "lib/Text/ANSI/Fold/Japanese/W3C.pm"
@@ -75,7 +75,7 @@
          "web" : "https://github.com/kaz-utashiro/Text-ANSI-Fold"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

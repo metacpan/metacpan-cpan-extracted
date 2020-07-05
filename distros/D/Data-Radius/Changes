@@ -1,3 +1,12 @@
+1.2.4 2020-07-03
+
+ - Use User-Password attribute name instead of Password (RT#132833)
+
+1.2.3 2020-07-01
+
+ - Export radius constants and aliases via variables for convenient use.
+ - accepting_packet_type method to test if a request was accepted by response
+
 1.2.2 2018-11-29
 
  - Fix: tag for integer attribute does not change the data length

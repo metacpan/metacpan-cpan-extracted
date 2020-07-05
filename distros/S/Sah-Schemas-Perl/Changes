@@ -1,3 +1,9 @@
+0.034   2020-06-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Forgot to load Regexp::Pattern::Perl::Module in
+	  perl::modname_with_optional_args schema.
+
+
 0.033   2020-06-16  Released-By: PERLANCAR; Urgency: medium
 
 	- Move some regexes to Regexp-Pattern-Perl distro to be more

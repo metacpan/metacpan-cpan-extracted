@@ -1,5 +1,5 @@
 package Net::Whois::Raw;
-$Net::Whois::Raw::VERSION = '2.99028';
+$Net::Whois::Raw::VERSION = '2.99029';
 # ABSTRACT: Get Whois information of domains and IP addresses.
 
 require 5.008_001;
@@ -259,7 +259,6 @@ sub whois_query {
 
     ### get server for query
     my $server4query = Net::Whois::Raw::Common::get_server($dom);
-    $server4query = lc $server4query;
 
     if ( Net::Whois::Raw::Common::is_ip6addr( $srv ) ) {
         $srv = "[$srv]";
@@ -481,7 +480,7 @@ Net::Whois::Raw - Get Whois information of domains and IP addresses.
 
 =head1 VERSION
 
-version 2.99028
+version 2.99029
 
 =head1 SYNOPSIS
 

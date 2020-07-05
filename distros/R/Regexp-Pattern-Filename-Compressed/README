@@ -1,0 +1,72 @@
+NAME
+    Regexp::Pattern::Filename::Compressed - Compressed data filename
+
+VERSION
+    This document describes version 0.001 of
+    Regexp::Pattern::Filename::Compressed (from Perl distribution
+    Regexp-Pattern-Filename-Compressed), released on 2020-04-01.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Filename::Compressed::filename_compressed");
+
+DESCRIPTION
+    This is a Regexp::Pattern wrapper for Filename::Compressed.
+
+PATTERNS
+    *   filename_compressed
+
+        Compressed data filename.
+
+        Examples:
+
+        No extension.
+
+         "foo" =~ re("Filename::Compressed::filename_compressed");  # doesn't match
+
+        Not an extension.
+
+         "gz" =~ re("Filename::Compressed::filename_compressed");  # doesn't match
+
+         "foo.gz" =~ re("Filename::Compressed::filename_compressed");  # matches
+
+        Case insensitive.
+
+         "foo bar.TAR.BZ2" =~ re("Filename::Compressed::filename_compressed");  # matches
+
+        Regex is anchored.
+
+         "foo.xz is the file" =~ re("Filename::Compressed::filename_compressed");  # doesn't match
+
+         "foo.mp3" =~ re("Filename::Compressed::filename_compressed");  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Filename-Compressed>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Filename-Compressed>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Filena
+    me-Compressed>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern
+
+    Filename::Compressed
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

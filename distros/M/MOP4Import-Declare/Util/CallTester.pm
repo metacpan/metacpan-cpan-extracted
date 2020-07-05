@@ -42,9 +42,24 @@ sub captures {
   (my MY $self, my ($call, $expect)) = @_;
   my ($method, @args) = @$call;
   my @savedArgs = map {shallow_copy($_)} @args;
-  my $got = Capture::Tiny::capture {
-    $self->{target_object}->$method(@args);
+  my ($got, $stderr, @res);
+  my $raised = do {
+    local $@;
+    eval {
+      ($got, $stderr, @res) = Capture::Tiny::capture {
+        $self->{target_object}->$method(@args);
+      };
+    };
+    $@;
   };
+  if ($raised) {
+    fail join(", ", map(terse_dump($_), @savedArgs));
+    diag "Error: $raised";
+    return;
+  }
+  if ($stderr) {
+    diag "STDERR: $stderr";
+  }
   is($got, $expect
      , sprintf("call:%s(%s) expect:%s"
                , $method

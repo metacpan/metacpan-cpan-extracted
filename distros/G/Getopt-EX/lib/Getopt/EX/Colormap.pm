@@ -1,7 +1,6 @@
 package Getopt::EX::Colormap;
 
-use v5.014;
-use strict;
+use v5.14;
 use warnings;
 
 use Exporter 'import';
@@ -27,12 +26,12 @@ our $NO_RESET_EL = $ENV{GETOPTEX_NO_RESET_EL};
 
 my @nonlinear = do {
     map { ( $_->[0] ) x $_->[1] } (
-	[ 0, 95 ], #   0 ..  94
-	[ 1, 40 ], #  95 .. 134
-	[ 2, 40 ], # 135 .. 174
-	[ 3, 40 ], # 175 .. 224
-	[ 4, 40 ], # 225 .. 254
-	[ 5,  1 ], # 255
+	[ 0, 75 ], #   0 ..  74
+	[ 1, 40 ], #  75 .. 114
+	[ 2, 40 ], # 115 .. 154
+	[ 3, 40 ], # 155 .. 194
+	[ 4, 40 ], # 195 .. 234
+	[ 5, 21 ], # 235 .. 255
     );
 };
 
@@ -124,7 +123,7 @@ my %numbers = (
 sub ansi_numbers {
     local $_ = shift // '';
     my @numbers;
-    my $toggle = new Getopt::EX::ToggleValue value => 10;
+    my $toggle = Getopt::EX::ToggleValue->new(value => 10);
 
     while (m{\G
 	     (?:
@@ -187,7 +186,7 @@ sub ansi_numbers {
 	elsif ($+{name}) {
 	    state $colornames = do {
 		require Graphics::ColorNames;
-		new     Graphics::ColorNames;
+		Graphics::ColorNames->new;
 	    };
 	    if (my $rgb = $colornames->hex($+{name})) {
 		push @numbers, 38 + $toggle->value, rgbhex($rgb);
@@ -321,7 +320,7 @@ sub apply_color {
 
 sub new {
     my $class = shift;
-    my $obj = SUPER::new $class;
+    my $obj = $class->SUPER::new;
     my %opt = @_;
 
     $obj->{CACHE} = {};
@@ -441,8 +440,9 @@ Getopt::EX::Colormap - ANSI terminal color and option support
   GetOptions('colormap|cm:s' => @opt_colormap);
 
   require Getopt::EX::Colormap;
-  my $cm = new Getopt::EX::Colormap;
-  $cm->load_params(@opt_colormap);  
+  my $cm = Getopt::EX::Colormap
+      ->new
+      ->load_params(@opt_colormap);  
 
   print $cm->color('FILE', 'FILE labeled text');
 
@@ -460,10 +460,10 @@ Getopt::EX::Colormap - ANSI terminal color and option support
 =head1 DESCRIPTION
 
 Coloring text capability is not strongly bound to option processing,
-but it may be useful to give simple uniform way to specify complicated
-color setting from command line.
+but it may be useful to give a simple uniform way to specify
+complicated color setting from command line.
 
-This module assumes the color information is given in two ways: one in
+This module assumes color information is given in two ways: one in
 labeled list, and one in indexed list.
 
 This is an example of labeled list:
@@ -472,7 +472,7 @@ This is an example of labeled list:
     --cm 'OTEXT=C,NTEXT=M,*CHANGE=BD/445,DELETE=APPEND=RD/544' \
     --cm 'CMARK=GS,MMARK=YS,CTEXT=G,MTEXT=Y'
 
-Each color definitions are separated by comma (C<,>) and label is
+Each color definitions are separated by comma (C<,>) and labels are
 specified by I<LABEL=> style precedence.  Multiple labels can be set
 for same value by connecting them together.  Label name can be
 specified with C<*> and C<?> wildcard characters.
@@ -533,7 +533,7 @@ terminal :
 
 =over 4
 
-Beginning # can be omitted in 24bit RGB notation.
+Beginning C<#> can be omitted in 24bit hex RGB notation.
 
 When values are all same in 24bit or 12bit RGB, it is converted to 24
 grey level, otherwise 6x6x6 216 color.
@@ -798,9 +798,10 @@ at the module for detail.
     my @colors;
     
     require Getopt::EX::Colormap;
-    my $handler = new Getopt::EX::Colormap
+    my $handler = Getopt::EX::Colormap->new(
         HASH => \%colormap,
-        LIST => \@colors;
+        LIST => \@colors,
+        );
     
     $handler->load_params(@opt_colormap);
 
@@ -890,7 +891,7 @@ behavior.
 Return colorized version of given text.
 
 B<colorize> produces 256 or 24bit colors depending on the value of
-C<Getopt::EX::Colormap::RGB24> variable and environment
+C<$Getopt::EX::Colormap::RGB24> variable and environment
 C<GETOPTEX_RGB24>.
 
 B<colorize24> always produces 24bit color sequence for 24bit/12bit
@@ -964,7 +965,7 @@ terminal.
 However, some terminal, including Apple_Terminal, clear the text on
 the cursor when I<Erase Line> sequence is received at the rightmost
 column of the screen.  If you do not want this behavior, set module
-variable C<Getopt::EX::Colormap::NO_RESET_EL> or
+variable C<$Getopt::EX::Colormap::NO_RESET_EL> or
 C<GETOPTEX_NO_RESET_EL> environment.
 
 

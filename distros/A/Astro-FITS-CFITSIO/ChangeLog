@@ -1,3 +1,18 @@
+2020-06-30  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.pm: $VERSION = '1.14';
+
+	* CFITSIO.pm: change fits_copy_hdutbl to fits_copy_hdutab
+
+2020-06-30  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
+
+	* CFITSIO.pm: $VERSION = '1.13';
+
+	* CFITSIO.pm: sync with cfitsio 3.48, added fits_copy_hdutbl /
+	ffcpht, fits_init_https / ffihtps, fits_cleanup_https / ffchtps,
+	fits_verbose_https / ffvhtps, fits_show_download_progress /
+	ffshdwn, fits_get_timeout / ffgtmo, fits_set_timeout / ffstmo
+
 2018-10-01  Pete Ratzlaff  <pratzlaff@cfa.harvard.edu>
 
 	* CFITSIO.pm: $VERSION = '1.12';

@@ -347,6 +347,16 @@ sub do_build {
 	}
     }
 
+    my $v = Dpkg::Version->new($self->{fields}->{'Version'});
+    if ($sourcestyle =~ m/[kpursKPUR]/) {
+        error(g_('non-native package version does not contain a revision'))
+            if $v->is_native();
+    } else {
+        # FIXME: This will become fatal in the near future.
+        warning(g_('native package version may not have a revision'))
+            unless $v->is_native();
+    }
+
     my ($dirname, $dirbase) = fileparse($dir);
     if ($dirname ne $basedirname) {
 	warning(g_("source directory '%s' is not <sourcepackage>" .
@@ -420,6 +430,11 @@ sub do_build {
         $self->add_file($tarsign);
 
         $self->check_original_tarball_signature($dir, $tarsign);
+    } else {
+        my $key = $self->get_upstream_signing_key($dir);
+        if (-e $key) {
+            warning(g_('upstream signing key but no upstream tarball signature'));
+        }
     }
 
     if ($sourcestyle =~ m/[kpKP]/) {

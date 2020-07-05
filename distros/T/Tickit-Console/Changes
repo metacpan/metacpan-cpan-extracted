@@ -1,5 +1,13 @@
 Revision history for Tickit-Console
 
+0.09    2020-06-22
+        [CHANGES]
+         * Added a way to override `localtime` for timestamp generation
+
+        [BUGFIXES]
+         * Ensure that unit testing of timestamps happens in UTC to avoid
+           timezone-related failures
+
 0.08    2020-06-15
         [CHANGES]
          * Use Object::Pad 0.27 and signatures from perl 5.26

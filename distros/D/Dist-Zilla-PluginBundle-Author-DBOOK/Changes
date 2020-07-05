@@ -1,3 +1,9 @@
+v1.0.3    2020-06-29 00:10:25 EDT
+  - Require [PrereqsFile] version 0.003
+
+v1.0.2    2020-06-28 14:22:55 EDT
+  - Support prereqs.json/prereqs.yml prereqs files with [PrereqsFile]
+
 v1.0.1    2020-03-09 17:52:54 EDT
   - Remove [MetaConfig] to reduce META clutter
 

@@ -13,6 +13,42 @@ check_lib_or_exit(
     incpath		=> '/usr/local/include',
 );
 
+my @have;
+check_lib(
+    function		=> "UA_Server_setAdminSessionContext(NULL, NULL);",
+    not_execute		=> 1,
+    lib			=> 'open62541',
+    header		=> 'open62541/server.h',
+    libpath		=> '/usr/local/lib',
+    incpath		=> '/usr/local/include',
+) and push @have, uc('UA_Server_setAdminSessionContext');
+check_lib(
+    function		=>
+	"UA_NodeId ni; UA_Server_readContainsNoLoops(NULL, ni, NULL);",
+    not_execute		=> 1,
+    lib			=> 'open62541',
+    header		=> 'open62541/server.h',
+    libpath		=> '/usr/local/lib',
+    incpath		=> '/usr/local/include',
+) and push @have, uc('UA_Server_readContainsNoLoops');
+check_lib(
+    function		=> "UA_Client_getState(NULL, NULL, NULL, NULL);",
+    not_execute		=> 1,
+    lib			=> 'open62541',
+    header		=> 'open62541/client.h',
+    libpath		=> '/usr/local/lib',
+    incpath		=> '/usr/local/include',
+) and push @have, uc('UA_Client_getState_3');
+check_lib(
+    function		=> "UA_Client_connectAsync(NULL, NULL);",
+    not_execute		=> 1,
+    lib			=> 'open62541',
+    header		=> 'open62541/client.h',
+    libpath		=> '/usr/local/lib',
+    incpath		=> '/usr/local/include',
+) and push @have, uc('UA_Client_connectAsync');
+my @defines = map { "-DHAVE_$_=1" } @have;
+
 WriteMakefile(
     NAME		=> 'OPCUA::Open62541',
     VERSION_FROM	=> 'lib/OPCUA/Open62541.pm',
@@ -31,6 +67,7 @@ WriteMakefile(
     LIBS		=> ['-L/usr/local/lib -lopen62541'],
     DEFINE		=> '',
     INC			=> '-I. -I/usr/local/include '.
+	"@defines ".
 	'-Wall -Wpointer-arith -Wuninitialized -Wstrict-prototypes '.
 	'-Wmissing-prototypes -Wunused -Wsign-compare -Wshadow '.
 	'-Wno-pointer-sign',
@@ -59,5 +96,7 @@ WriteMakefile(
 	'Test::Warn'		=> 0,
 	'YAML::Tiny'		=> 0,
     },
-    clean		=> { FILES => [ "*.log", "*.utf8", "*.yaml" ] },
+    clean		=> {
+	FILES => [ "*.log", "*.utf8", "*.yaml", "assertlibFPDc52aN.c" ],
+    },
 );

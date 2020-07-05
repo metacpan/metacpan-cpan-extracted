@@ -11,13 +11,16 @@ $| ++;
 
 =head1 SYNOPSIS
 
- $0 [--repo /my/repo ] [--link /my/link] [--version release-x.x.x]
+ $0 [--repo /my/repo || mayi@127.0.0.1::pkg/foo] [--link /my/link] [--version release-x.x.x]
 
     [--path /my/path ( default $repo/data ) ]
     [--keep 10 (default 10)]
     [--taropt '-m']
+    [--rsyncopt '-v']
+    [--stage]
 
     Version 'release-x.x.x' and 'rollback:release-x.x.x' are the same
+    Version 'comeback:release-x.x.x' rollback to before release-x.x.x
     Version backup refers to the $link.backup
     Version backup\d* refers to the $link.backup\d*
 
@@ -25,12 +28,13 @@ $| ++;
 
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->set( keep => 10 )->get(
-     qw( repo=s link=s version=s path=s keep=i taropt=s )
+     qw( repo=s link=s version=s path=s keep=i taropt=s rsyncopt=s stage )
 )->dump();
 
 $option->assert( qw( repo link version ) );
 
 $o{path} = "$o{repo}/data" unless defined  $o{path};
 $o{version} =~ s/^rollback://;
+$o{comeback} = 1 if $o{version} =~ s/^comeback://;
 
 MYDan::Util::Deploy->new( %o )->deploy();

@@ -64,8 +64,8 @@ sub qux {
 
   describe "cli_... APIs", sub {
 
-    describe "MyApp1->cli_info_command_doc(bar)", sub {
-      expect(MyApp1->cli_info_command_doc('bar'))->to_be("This prints contents of foo and also args");
+    describe "MyApp1->cli_inspector->info_command_doc_of(MyApp1, bar)", sub {
+      expect(MyApp1->cli_inspector->info_command_doc_of('MyApp1', 'bar'))->to_be("This prints contents of foo and also args");
     };
   };
 };

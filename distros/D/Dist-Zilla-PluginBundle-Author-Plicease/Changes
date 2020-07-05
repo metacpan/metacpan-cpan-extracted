@@ -1,5 +1,18 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.51      2020-07-05 07:11:23 -0600
+  - Fixed typo in generated Makefile.PL
+
+2.50      2020-07-03 05:55:21 -0600
+  - Prompt for IRC for newly minted dist
+  - Newly minted dist has .travis.yml that only CIs `main` branch
+
+2.49      2020-06-16 17:43:38 -0600
+  - New git repositories are created with a default `main` branch
+    instead of the normal git default.
+  - Set upgrade on main branch on newly minted repos.
+  - Changed default branch for this dists repo to `main`.
+
 2.48      2020-06-12 07:53:34 -0600
   - Bump default minimum perl to 5.8.4
   - Fixed bug where My package could be unintentionally claimed

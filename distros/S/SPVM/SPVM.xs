@@ -34,7 +34,7 @@
 #include "spvm_string_buffer.h"
 #include "spvm_use.h"
 #include "spvm_limit.h"
-#include "spvm_portable.h"
+#include "spvm_runtime_info.h"
 
 #include "spvm_runtime_sub.h"
 
@@ -47,8 +47,7 @@
 #include "spvm_runtime_package_var.h"
 #include "spvm_runtime_arg.h"
 
-#include "spvm_portable.h"
-#include "spvm_csource_builder_exe.h"
+#include "spvm_runtime_info.h"
 
 static const char* MFILE = "SPVM.xs";
 
@@ -271,11 +270,11 @@ compile_spvm(...)
       }
     }
     
-    // Build portable info
-    SPVM_PORTABLE* portable = SPVM_PORTABLE_build_portable(compiler);
+    // Build runtime_info info
+    SPVM_RUNTIME_INFO* runtime_info = SPVM_RUNTIME_INFO_build_runtime_info(compiler);
     
     // Build runtime
-    SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_build_runtime(portable);
+    SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_build_runtime(runtime_info);
     
     // Create env
     SPVM_ENV* env = SPVM_RUNTIME_API_create_env(runtime);
@@ -1202,27 +1201,27 @@ _new_mulnum_array(...)
 
         switch (first_field->basic_type_id) {
           case SPVM_BASIC_TYPE_C_ID_BYTE: {
-            ((SPVM_VALUE_byte*)elems)[(fields_length * index) + field_index] = (SPVM_VALUE_byte)SvIV(sv_field_value);
+            ((int8_t*)elems)[(fields_length * index) + field_index] = (int8_t)SvIV(sv_field_value);
             break;
           }
           case SPVM_BASIC_TYPE_C_ID_SHORT: {
-            ((SPVM_VALUE_short*)elems)[(fields_length * index) + field_index] = (SPVM_VALUE_short)SvIV(sv_field_value);
+            ((int16_t*)elems)[(fields_length * index) + field_index] = (int16_t)SvIV(sv_field_value);
             break;
           }
           case SPVM_BASIC_TYPE_C_ID_INT: {
-            ((SPVM_VALUE_int*)elems)[(fields_length * index) + field_index] = (SPVM_VALUE_int)SvIV(sv_field_value);
+            ((int32_t*)elems)[(fields_length * index) + field_index] = (int32_t)SvIV(sv_field_value);
             break;
           }
           case SPVM_BASIC_TYPE_C_ID_LONG: {
-            ((SPVM_VALUE_long*)elems)[(fields_length * index) + field_index] = (SPVM_VALUE_long)SvIV(sv_field_value);
+            ((int64_t*)elems)[(fields_length * index) + field_index] = (int64_t)SvIV(sv_field_value);
             break;
           }
           case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-            ((SPVM_VALUE_float*)elems)[(fields_length * index) + field_index] = (SPVM_VALUE_float)SvNV(sv_field_value);
+            ((float*)elems)[(fields_length * index) + field_index] = (float)SvNV(sv_field_value);
             break;
           }
           case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-            ((SPVM_VALUE_double*)elems)[(fields_length * index) + field_index] = (SPVM_VALUE_double)SvNV(sv_field_value);
+            ((double*)elems)[(fields_length * index) + field_index] = (double)SvNV(sv_field_value);
             break;
           }
           default:
@@ -1313,7 +1312,7 @@ _new_mulnum_array_from_bin(...)
       break;
     }
     default:
-      assert(0);
+      croak("Unexpected error:set field width");
   }
   
   if (binary_length % (field_length * field_width) != 0) {
@@ -1868,23 +1867,23 @@ call_sub(...)
               int32_t length = av_len(av_elems) + 1;
               
               // Check first value of array reference is no-ref-scalar
-              int32_t first_arg_is_no_ref_scalar;
+              int32_t is_convert_to_string_array;
               if (length > 0) {
                 SV** sv_str_value_ptr = av_fetch(av_elems, 0, 0);
                 SV* sv_str_value = sv_str_value_ptr ? *sv_str_value_ptr : &PL_sv_undef;
                 if (SvROK(sv_str_value)) {
-                  first_arg_is_no_ref_scalar = 0;
+                  is_convert_to_string_array = 0;
                 }
                 else {
-                  first_arg_is_no_ref_scalar = 1;
+                  is_convert_to_string_array = 1;
                 }
               }
               else {
-                first_arg_is_no_ref_scalar = 0;
+                is_convert_to_string_array = 1;
               }
               
               // If arument type is byte[][] and first value of array reference is no-ref-scalar, the value is convert to byte[][]
-              if (arg->basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg->type_dimension == 2 && first_arg_is_no_ref_scalar) {
+              if (arg->basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg->type_dimension == 2 && is_convert_to_string_array) {
                 // New array
                 SPVM_OBJECT* array = env->new_muldim_array_raw(env, SPVM_BASIC_TYPE_C_ID_BYTE, 1, length);
 
@@ -2114,7 +2113,7 @@ call_sub(...)
               
               if (arg_basic_type_id == SPVM_BASIC_TYPE_C_ID_OARRAY) {
                 if (object->type_dimension == 0) {
-                  croak("%dth argument of %s::%s() is invalid object type at %s line %d\n", package_name, sub_name, arg_index + 1, MFILE, __LINE__);
+                  croak("%dth argument of %s::%s() is invalid object type at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
                 }
               }
               else if (arg_basic_type_id == SPVM_BASIC_TYPE_C_ID_ANY_OBJECT && arg_type_dimension == 0) {
@@ -2278,7 +2277,7 @@ call_sub(...)
               sv_field_value = &PL_sv_undef;
             }
             int8_t value = (int8_t)SvIV(sv_field_value);
-            ((SPVM_VALUE_byte*)&ref_stack[ref_stack_top])[field_index] = value;
+            ((int8_t*)&ref_stack[ref_stack_top])[field_index] = value;
           }
           stack[arg_var_id].oval = &ref_stack[ref_stack_top];
           ref_stack_ids[arg_index] = ref_stack_top;
@@ -2345,7 +2344,7 @@ call_sub(...)
               sv_field_value = &PL_sv_undef;
             }
             int16_t value = (int16_t)SvIV(sv_field_value);
-            ((SPVM_VALUE_short*)&ref_stack[ref_stack_top])[field_index] = value;
+            ((int16_t*)&ref_stack[ref_stack_top])[field_index] = value;
           }
           stack[arg_var_id].oval = &ref_stack[ref_stack_top];
           ref_stack_ids[arg_index] = ref_stack_top;
@@ -2411,7 +2410,7 @@ call_sub(...)
               sv_field_value = &PL_sv_undef;
             }
             int32_t value = (int32_t)SvIV(sv_field_value);
-            ((SPVM_VALUE_int*)&ref_stack[ref_stack_top])[field_index] = value;
+            ((int32_t*)&ref_stack[ref_stack_top])[field_index] = value;
           }
           stack[arg_var_id].oval = &ref_stack[ref_stack_top];
           ref_stack_ids[arg_index] = ref_stack_top;
@@ -2477,7 +2476,7 @@ call_sub(...)
               sv_field_value = &PL_sv_undef;
             }
             int64_t value = (int64_t)SvIV(sv_field_value);
-            ((SPVM_VALUE_long*)&ref_stack[ref_stack_top])[field_index] = value;
+            ((int64_t*)&ref_stack[ref_stack_top])[field_index] = value;
           }
           stack[arg_var_id].oval = &ref_stack[ref_stack_top];
           ref_stack_ids[arg_index] = ref_stack_top;
@@ -2543,7 +2542,7 @@ call_sub(...)
               sv_field_value = &PL_sv_undef;
             }
             float value = (float)SvNV(sv_field_value);
-            ((SPVM_VALUE_float*)&ref_stack[ref_stack_top])[field_index] = value;
+            ((float*)&ref_stack[ref_stack_top])[field_index] = value;
           }
           stack[arg_var_id].oval = &ref_stack[ref_stack_top];
           ref_stack_ids[arg_index] = ref_stack_top;
@@ -2609,7 +2608,7 @@ call_sub(...)
               sv_field_value = &PL_sv_undef;
             }
             double value = (double)SvNV(sv_field_value);
-            ((SPVM_VALUE_double*)&ref_stack[ref_stack_top])[field_index] = value;
+            ((double*)&ref_stack[ref_stack_top])[field_index] = value;
           }
           stack[arg_var_id].oval = &ref_stack[ref_stack_top];
           ref_stack_ids[arg_index] = ref_stack_top;
@@ -2625,7 +2624,7 @@ call_sub(...)
   
   // Return
   SV* sv_return_value = NULL;
-  int32_t excetpion_flag;
+  int32_t excetpion_flag = 0;
   switch (sub->return_runtime_type_category) {
     case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_BYTE:
     case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_SHORT:
@@ -2819,7 +2818,7 @@ call_sub(...)
           for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
             SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
             const char* field_name = &runtime->string_pool[field->name_id];
-            SV* sv_field_value = sv_2mortal(newSViv(((SPVM_VALUE_byte*)&ref_stack[ref_stack_id])[field_index]));
+            SV* sv_field_value = sv_2mortal(newSViv(((int8_t*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
@@ -2834,7 +2833,7 @@ call_sub(...)
           for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
             SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
             const char* field_name = &runtime->string_pool[field->name_id];
-            SV* sv_field_value = sv_2mortal(newSViv(((SPVM_VALUE_short*)&ref_stack[ref_stack_id])[field_index]));
+            SV* sv_field_value = sv_2mortal(newSViv(((int16_t*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
@@ -2849,7 +2848,7 @@ call_sub(...)
           for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
             SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
             const char* field_name = &runtime->string_pool[field->name_id];
-            SV* sv_field_value = sv_2mortal(newSViv(((SPVM_VALUE_int*)&ref_stack[ref_stack_id])[field_index]));
+            SV* sv_field_value = sv_2mortal(newSViv(((int32_t*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
@@ -2864,7 +2863,7 @@ call_sub(...)
           for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
             SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
             const char* field_name = &runtime->string_pool[field->name_id];
-            SV* sv_field_value = sv_2mortal(newSViv(((SPVM_VALUE_long*)&ref_stack[ref_stack_id])[field_index]));
+            SV* sv_field_value = sv_2mortal(newSViv(((int64_t*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
@@ -2879,7 +2878,7 @@ call_sub(...)
           for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
             SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
             const char* field_name = &runtime->string_pool[field->name_id];
-            SV* sv_field_value = sv_2mortal(newSVnv(((SPVM_VALUE_float*)&ref_stack[ref_stack_id])[field_index]));
+            SV* sv_field_value = sv_2mortal(newSVnv(((float*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
@@ -2894,7 +2893,7 @@ call_sub(...)
           for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
             SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
             const char* field_name = &runtime->string_pool[field->name_id];
-            SV* sv_field_value = sv_2mortal(newSVnv(((SPVM_VALUE_double*)&ref_stack[ref_stack_id])[field_index]));
+            SV* sv_field_value = sv_2mortal(newSVnv(((double*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
@@ -2982,37 +2981,37 @@ to_elems(...)
           SV* sv_field_value;
           switch (first_field->basic_type_id) {
             case SPVM_BASIC_TYPE_C_ID_BYTE: {
-              SPVM_VALUE_byte field_value = ((SPVM_VALUE_byte*)elems)[(field_length * index) + field_index];
+              int8_t field_value = ((int8_t*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSViv(field_value));
               break;
             }
             case SPVM_BASIC_TYPE_C_ID_SHORT: {
-              SPVM_VALUE_short field_value = ((SPVM_VALUE_short*)elems)[(field_length * index) + field_index];
+              int16_t field_value = ((int16_t*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSViv(field_value));
               break;
             }
             case SPVM_BASIC_TYPE_C_ID_INT: {
-              SPVM_VALUE_int field_value = ((SPVM_VALUE_int*)elems)[(field_length * index) + field_index];
+              int32_t field_value = ((int32_t*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSViv(field_value));
               break;
             }
             case SPVM_BASIC_TYPE_C_ID_LONG: {
-              SPVM_VALUE_long field_value = ((SPVM_VALUE_long*)elems)[(field_length * index) + field_index];
+              int64_t field_value = ((int64_t*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSViv(field_value));
               break;
             }
             case SPVM_BASIC_TYPE_C_ID_FLOAT: {
-              SPVM_VALUE_float field_value = ((SPVM_VALUE_float*)elems)[(field_length * index) + field_index];
+              float field_value = ((float*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSVnv(field_value));
               break;
             }
             case SPVM_BASIC_TYPE_C_ID_DOUBLE: {
-              SPVM_VALUE_double field_value = ((SPVM_VALUE_double*)elems)[(field_length * index) + field_index];
+              double field_value = ((double*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSVnv(field_value));
               break;
             }
             default:
-              assert(0);
+              croak("Unexpected error: set field value");
           }
           SvREFCNT_inc(sv_field_value);
           (void)hv_store(hv_value, field_name, strlen(field_name), sv_field_value, 0);
@@ -3265,44 +3264,6 @@ to_bin(...)
   }
   
   XPUSHs(sv_bin);
-  XSRETURN(1);
-}
-
-MODULE = SPVM::Builder::Exe		PACKAGE = SPVM::Builder::Exe
-
-SV*
-build_main_csource(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  SV* sv_package_name = ST(1);
-
-  HV* hv_self = (HV*)SvRV(sv_self);
-  const char* package_name = SvPV_nolen(sv_package_name);
-  
-  // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
-  SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
-  HV* hv_build = (HV*)SvRV(sv_build);
-  SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  SPVM_RUNTIME* runtime = env->runtime;
-  SPVM_PORTABLE* portable = runtime->portable;
-
-  // String buffer for csource
-  SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
-
-  SPVM_CSOURCE_BUILDER_EXE_build_exe_csource(env, string_buffer, portable, package_name);
-
-  SV* sv_main_csource = sv_2mortal(newSVpv(string_buffer->buffer + 1, string_buffer->length - 1));
-
-  SPVM_STRING_BUFFER_free(string_buffer);
-  
-  XPUSHs(sv_main_csource);
   XSRETURN(1);
 }
 

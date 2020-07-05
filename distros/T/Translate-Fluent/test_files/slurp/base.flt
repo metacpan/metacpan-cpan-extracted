@@ -1,0 +1,9 @@
+
+# Name of the language, in the language
+my-language = Dev Strings
+
+# used in tests to test default to dev language
+# do not translate to other languages
+my-unfound-language = Just a Dev String
+
+

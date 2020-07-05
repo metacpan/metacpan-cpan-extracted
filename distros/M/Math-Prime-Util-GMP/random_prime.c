@@ -10,6 +10,7 @@
 #include "primality.h"
 #include "gmp_main.h"
 #include "isaac.h"
+#include "prime_iterator.h"
 
 static char pr[31] = {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127};
 
@@ -190,6 +191,96 @@ static void _rand_in_bit_interval(mpz_t rop, UV nbits, mpz_t mult)
   mpz_add(rop, rop, lo);
 
   mpz_clear(t); mpz_clear(lo); mpz_clear(hi);
+}
+
+#define _SAFE_REJECT(q, p1, p2, p3, p4, p5) \
+  { uint32_t qm = mpz_fdiv_ui(q, p1*p2*p3*p4*p5); \
+    if ((qm % p1) == 0 || (qm % p1) == (p1>>1)) continue; \
+    if ((qm % p2) == 0 || (qm % p2) == (p2>>1)) continue; \
+    if ((qm % p3) == 0 || (qm % p3) == (p3>>1)) continue; \
+    if ((qm % p4) == 0 || (qm % p4) == (p4>>1)) continue; \
+    if ((qm % p5) == 0 || (qm % p5) == (p5>>1)) continue; \
+  }
+
+void mpz_random_safe_prime(mpz_t p, UV nbits)
+{
+  static const unsigned char small_safe[] = {5,7,11,23,47,59,83,107};
+  mpz_t q, base;
+  uint32_t qmod, PR, tlimit;
+  int verbose;
+  PRIME_ITERATOR(iter);
+
+  switch (nbits) {
+    case 0: case 1: case 2:   mpz_set_ui(p, 0);  return;
+    case 3:   mpz_set_ui(p, small_safe[ 0+isaac_rand(2)]);  return;
+    case 4:   mpz_set_ui(p, 11);  return;
+    case 5:   mpz_set_ui(p, 23);  return;
+    case 6:   mpz_set_ui(p, small_safe[ 4+isaac_rand(2)]);  return;
+    case 7:   mpz_set_ui(p, small_safe[ 6+isaac_rand(2)]);  return;
+    default:  break;
+  }
+
+  mpz_init(q); mpz_init(base);
+
+  if (nbits > 35) {
+    mpz_isaac_urandomb(base, nbits-35);
+    mpz_mul_2exp(base,base,2);
+  }
+  mpz_setbit(base, nbits-1);
+  mpz_setbit(base, 1);
+  mpz_setbit(base, 0);
+  verbose = get_verbose_level();
+  tlimit = (nbits <= 512000) ?  (nbits*(nbits/64.0) + 0.5)  :  4000000000U;
+  while (1) {
+    /* 1. Generate random nbit p */
+    if (nbits > 35) {
+      mpz_set_ui(p, isaac_rand32());
+      mpz_mul_2exp(p, p, nbits-33);
+    } else {
+      mpz_isaac_urandomb(p, nbits-3);
+      mpz_mul_2exp(p, p, 2);
+    }
+    mpz_ior(p, p, base);
+    /* 2. p = 2q+1  =>  q = p >> 1 */
+    mpz_div_2exp(q, p, 1);
+    /* 3. Fast compositeness pretests for both q and p at the same time. */
+    qmod = mpz_fdiv_ui(q, 1155UL);
+    if ( (qmod % 3) != 2 ||
+         (qmod % 5) == 0 || (qmod % 7) == 0 || (qmod % 11) == 0 ||
+         (qmod % 5) == 2 || (qmod % 7) == 3 || (qmod % 11) == 5) continue;
+    if (nbits < 16) {
+      /* 4. Pretest that p isn't easily composite */
+      if (!primality_pretest(p)) continue;
+      /* 5. Pretest that q isn't easily composite */
+      if (!primality_pretest(q)) continue;
+    } else {
+      _SAFE_REJECT(q,  13U,  17U,  19U,  23U,  29U);
+      _SAFE_REJECT(q,  31U,  37U,  41U,  43U,  47U);
+      _SAFE_REJECT(q,  53U,  59U,  61U,  67U,  71U);
+      _SAFE_REJECT(q,  73U,  79U,  83U,  89U,  97U);
+      if (tlimit >= 101) {
+        prime_iterator_setprime(&iter, PR = 101);
+        while (PR <= tlimit) {
+          uint32_t qm = mpz_fdiv_ui(q, PR);
+          if (qm == 0 || qm == (PR>>1)) break;
+          PR = prime_iterator_next(&iter);
+        }
+        if (PR <= tlimit) continue;
+      }
+    }
+    if (verbose > 2) { printf("."); fflush(stdout); }
+    /* 6. BPSW on q and M-R base 2 on p. */
+    if (!is_euler_plumb_pseudoprime(q)) continue;  /* Start faster */
+    if (verbose > 2) { printf("+"); fflush(stdout); }
+    if (!miller_rabin_ui(p, 2)) continue;
+    if (verbose > 2) { printf("*"); fflush(stdout); }
+    if (!_GMP_is_lucas_pseudoprime(q, 2)) continue;
+    if (nbits > 64 && !miller_rabin_ui(q, 2)) continue; /* Verify fast test */
+    break;
+  }
+
+  mpz_clear(base); mpz_clear(q);
+  prime_iterator_destroy(&iter);
 }
 
 /* Gordon's algorithm */

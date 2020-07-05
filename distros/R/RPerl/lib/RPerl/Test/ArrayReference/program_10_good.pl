@@ -1,4 +1,12 @@
 #!/usr/bin/env perl
+
+# [[[ PREPROCESSOR ]]]
+# <<< EXECUTE_SUCCESS: "before loop" >>>
+# <<< EXECUTE_SUCCESS: "$array = [ 17, -23, 1_701 ]" >>>
+# <<< EXECUTE_SUCCESS: "$array = [ -1, 444, 2_987 ]" >>>
+# <<< EXECUTE_SUCCESS: "$array = [ -321, 7, 24_851 ]" >>>
+# <<< EXECUTE_SUCCESS: "after loop" >>>
+
 # [[[ HEADER ]]]
 use RPerl;
 use strict;
@@ -11,6 +19,8 @@ our $VERSION = 0.001_000;
 
 # [[[ OPERATIONS ]]]
 
+print 'before loop', "\n";
+
 # homogeneous 2-dimensional array of arrays, using inner types
 my arrayref_arrayref $array_array = [
     my integer_arrayref $TYPED_array_array_0 = [ 17,   -23, 1_701 ],
@@ -18,5 +28,7 @@ my arrayref_arrayref $array_array = [
     my integer_arrayref $TYPED_array_array_2 = [ -321, 7,   24_851 ]
 ];
 foreach my arrayref $array ( @{$array_array} ) {
-    print '$array = ', Dumper($array), "\n";
+    print '$array = ', integer_arrayref_to_string($array), "\n";
 }
+
+print 'after loop', "\n";

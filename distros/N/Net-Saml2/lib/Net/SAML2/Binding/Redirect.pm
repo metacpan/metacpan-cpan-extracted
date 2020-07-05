@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Moose;
-use MooseX::Types::Moose qw/ Str /;
 use MooseX::Types::URI qw/ Uri /;
 
 
@@ -18,10 +17,10 @@ use Crypt::OpenSSL::X509;
 use File::Slurp qw/ read_file /;
 
 
-has 'key'   => (isa => Str, is => 'ro', required => 1);
-has 'cert'  => (isa => Str, is => 'ro', required => 1);
+has 'key'   => (isa => 'Str', is => 'ro', required => 1);
+has 'cert'  => (isa => 'Str', is => 'ro', required => 1);
 has 'url'   => (isa => Uri, is => 'ro', required => 1, coerce => 1);
-has 'param' => (isa => Str, is => 'ro', required => 1);
+has 'param' => (isa => 'Str', is => 'ro', required => 1);
 
 
 sub sign {
@@ -91,7 +90,7 @@ Net::SAML2::Binding::Redirect
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -164,7 +163,7 @@ This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
   Copyright 2010-2011  Chris Andrews
             2012       Peter Marschall
             2016       Jeff Fearn
-            2020       Timothy Legge
+            2020       Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

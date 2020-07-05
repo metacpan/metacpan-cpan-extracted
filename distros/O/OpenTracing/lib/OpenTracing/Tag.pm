@@ -3,9 +3,13 @@ package OpenTracing::Tag;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '1.001'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(OpenTracing::Common);
+
+no indirect;
+use utf8;
 
 =encoding utf8
 
@@ -48,5 +52,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
 

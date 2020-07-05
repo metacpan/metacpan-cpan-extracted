@@ -1,0 +1,29 @@
+Revision history for Perl extension Authen-TOTP
+
+0.0.7 2020-07-02T11:07:50Z
+    - Moved git repo to github
+    - Added CONTRIBUTING.md file
+    - Changed gen_secret() to accept secret length as argument and made 20 the default
+
+0.0.6 2020-06-18T15:28:22Z
+    - Add (pointless really) requires in cpanfile
+
+0.0.5 2020-06-18T15:25:16Z
+    - Correctly handle either/or modules in cpanfile and module
+
+0.0.4 2020-06-18T14:50:16Z
+    - Added missing test vectors
+    - Switched to Digest::SHA for SHA256 and SHA512 support
+
+0.0.3 2020-06-17T11:17:16Z
+    - use Build.PL directly instead of cpanfile only
+    - Switched to L<Digest::SHA> in order to support SHA256 and SHA512 as well
+
+0.0.2 2020-06-17T09:42:28Z
+
+    - Added Digest::HMAC_SHA1 and MIME::Base32 to cpanfiles requires
+
+0.0.1 2020-06-16T18:44:04Z
+
+    - original version
+

@@ -1,5 +1,5 @@
 package Lab::Instrument::Lakeshore33x;
-$Lab::Instrument::Lakeshore33x::VERSION = '3.701';
+$Lab::Instrument::Lakeshore33x::VERSION = '3.703';
 #ABSTRACT: Lakeshore 33x Temperature controller
 
 use strict;
@@ -936,7 +936,7 @@ Lab::Instrument::Lakeshore33x - Lakeshore 33x Temperature controller
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 

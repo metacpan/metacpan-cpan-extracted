@@ -32,6 +32,7 @@ lib/Connector/Proxy/Config/Std.pm
 lib/Connector/Proxy/Config/Versioned.pm
 lib/Connector/Proxy/DBI.pm
 lib/Connector/Proxy/HTTP.pm
+lib/Connector/Proxy/JSON.pm
 lib/Connector/Proxy/Net/FTP.pm
 lib/Connector/Proxy/Net/LDAP.pm
 lib/Connector/Proxy/Net/LDAP/DN.pm
@@ -60,12 +61,14 @@ t/01-builtin-password.t
 t/01-builtin-static.t
 t/01-iterator.t
 t/01-multi-merge.t
+t/01-multi-reference.t
 t/01-multi-yaml.t
 t/01-multi.t
 t/01-proxy-config-std.t
 t/01-proxy-config-versioned.t
 t/01-proxy-ftp.t
 t/01-proxy-http.t
+t/01-proxy-json.t
 t/01-proxy-net-ldap.t
 t/01-proxy-net-ldap.t.disabled
 t/01-proxy-proc-safeexec-uid.t2
@@ -95,6 +98,7 @@ t/config/ARRAY0x7fe304d1e1e0.txt
 t/config/ARRAY0x7fecf351fff8.txt
 t/config/ARRAY0x7ffb9c51e1e0.txt
 t/config/config.ini
+t/config/config.json
 t/config/config.yaml
 t/config/file
 t/config/password.txt
@@ -118,4 +122,5 @@ t/config/test/list/test/0
 t/config/test/list/test/1
 t/config/test/list/test/2
 t/config/test/list/test/3
+t/config/testumask.txt
 test.pl

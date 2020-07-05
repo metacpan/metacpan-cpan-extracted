@@ -20,7 +20,7 @@ my %opts = (
 
 {
     local $SIG{__WARN__};
-    my $ok = eval { GetOptions(\%opts, qw(help cur=s months=i rate=f from year=s)); };
+    my $ok = eval { GetOptions(\%opts, qw(help cur=s months=i rate=f from year=s), 'pension-employee=f', 'pension-employer=f'); };
     if (!$ok) {
         die($@);
     }
@@ -55,6 +55,12 @@ my $calc = Finance::Tax::Aruba::Income->tax_year(
     $opts{year},
     income => $maandloon,
     months => $opts{months},
+    exists $opts{'pension-employee'}
+        ? (pension_employee_perc => $opts{'pension-employee'},)
+        : (),
+    exists $opts{'pension-employer'}
+        ? (pension_employer_perc => $opts{'pension-employer'},)
+        : (),
 );
 
 sub _p {
@@ -77,15 +83,15 @@ my @order = qw(
     -
     azv
     aov
+    pensioen_employee
     -
     zuiver
     tabelinkomen
     taxed
     rate
-    effective_rate
-    fixed
-    var
-    total
+    fixed_tax
+    var_tax
+    total_tax
     -
     free
     netto
@@ -93,19 +99,19 @@ my @order = qw(
     -
     azv_employer
     aov_employer
-    pensioen
+    pensioen_employer
     cost_employer
     azv_total
     aov_total
+    -
+    gov_gets
+    effective_rate
 );
 
 my $jaarloon_bruto = $calc->yearly_income_gross;
 my $jaarloon       = $calc->yearly_income;
 
-my $vakantiegeld = $jaarloon - ($jaarloon / 1.08);
-my $ziekgeld     = $jaarloon - ($jaarloon / 1.03);
-
-my $pensioen = $calc->get_cost($jaarloon, 6);
+my $pensioen = $calc->pension_employee + $calc->pension_employer;
 my $tax_free = $calc->taxfree_amount;
 
 my $netto = $jaarloon
@@ -116,9 +122,13 @@ my $netto = $jaarloon
 
 my $payable = $netto + $tax_free;
 
-my $company_pays = $jaarloon + $calc->aov_employer + $calc->azv_employer + $pensioen;
+my $company_pays = $jaarloon + $calc->aov_employer + $calc->azv_employer + $calc->pension_employer;
 
-my $effective_rate = 100 - (($payable / $jaarloon) * 100);
+my $azv_total = $calc->azv_employee + $calc->azv_employer;
+my $aov_total = $calc->aov_employee + $calc->aov_employer;
+
+my $gov_gets = $calc->income_tax + $azv_total + $aov_total + $pensioen;
+my $effective_rate = $gov_gets / $jaarloon * 100;
 
 my %year = (
     bruto          => $calc->yearly_income_gross,
@@ -130,9 +140,9 @@ my %year = (
     zuiver         => $calc->zuiver_jaarloon,
     tabelinkomen   => $calc->taxable_wage,
     taxed          => $calc->taxable_amount,
-    fixed          => $calc->tax_fixed,
-    var            => $calc->tax_variable,
-    total          => $calc->income_tax,
+    fixed_tax      => $calc->tax_fixed,
+    var_tax        => $calc->tax_variable,
+    total_tax      => $calc->income_tax,
     rate           => $calc->tax_rate,
     azv_employer   => $calc->azv_employer,
     aov_employer   => $calc->aov_employer,
@@ -140,10 +150,13 @@ my %year = (
     free           => $calc->taxfree_amount,
     netto_inc      => $payable,
     pensioen       => $pensioen,
+    pensioen_employee => $calc->pension_employee,
+    pensioen_employer => $calc->pension_employer,
     cost_employer  => $company_pays,
     effective_rate => $effective_rate,
-    azv_total      => $calc->azv_employee + $calc->azv_employer,
-    aov_total      => $calc->aov_employee + $calc->aov_employer,
+    gov_gets       => $gov_gets,
+    azv_total      => $azv_total,
+    aov_total      => $aov_total,
 );
 
 my %mapping = (
@@ -158,22 +171,27 @@ my %mapping = (
     zuiver         => 'Zuiver jaarloon',
     tabelinkomen   => 'Tabelinkomen',
     taxed          => 'Belastbaar inkomen',
-    fixed          => 'Vaste belasting',
-    var            => 'Variable belasting',
-    total          => 'Totale belastingen',
+    fixed_tax      => 'Vaste belasting',
+    var_tax        => 'Variable belasting',
+    total_tax      => 'Totale belastingen',
     rate           => 'Belastingtarief',
     effective_rate => 'Effectief belastingtarief',
     $opts{rate} ? (conv_rate => "$opts{rate}awg/1eur") : (),
     free           => "Belastingvrije voet",
     netto_inc      => "Uit te betalen loon",
-    pensioen       => "Pensioenkosten (6%)",
+    pensioen_employee => sprintf('Pension (%s%%)', $calc->pension_employee_perc),
+    pensioen_employer => sprintf('Pension (%s%%)', $calc->pension_employer_perc),
+    pensioen       => sprintf('Pension Totaal (%s%%)',
+        $calc->pension_employee_perc + $calc->pension_employer_perc),
     cost_employer  => "Totale loonkosten bedrijf",
 
     azv_total => sprintf('AZV Totaal (%s%%)',
         $calc->azv_percentage_employee + $calc->azv_percentage_employer),
 
     aov_total => sprintf('OAV/AWW Totaal (%s%%)',
-        $calc->aov_percentage_employee + $calc->aov_percentage_employer)
+        $calc->aov_percentage_employee + $calc->aov_percentage_employer),
+
+    gov_gets       => "Social premiums and taxes",
 );
 
 my ($longest) = sort { length($b) <=> length($a) } values %mapping;
@@ -230,7 +248,7 @@ loon.pl - A salary cost calculator
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

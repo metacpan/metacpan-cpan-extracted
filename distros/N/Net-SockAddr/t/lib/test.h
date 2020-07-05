@@ -4,3 +4,5 @@
 
 using namespace panda;
 using namespace panda::net;
+
+SockAddr get_empty_sa();

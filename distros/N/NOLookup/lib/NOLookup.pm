@@ -4,7 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "1.17";
+our $VERSION = "1.19";
 
 
 =pod 
@@ -34,7 +34,7 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Trond Haugen E<lt>trondh@uninett.noE<gt>
+Trond Haugen, E<lt>(nospam)info(at)norid.noE<gt>
 
 =cut
 

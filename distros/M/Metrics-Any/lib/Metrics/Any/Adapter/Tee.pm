@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Tee;
+package Metrics::Any::Adapter::Tee 0.06;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.05';
 
 =head1 NAME
 

@@ -1,2 +1,5 @@
+1.69.0.0    19.06.2020
+    boost upgraded to 1.69
+
 1.68.0.0    30.01.2020
-    initial release (moved from CPP::Boost::Mini) 
+    initial release (moved from CPP::Boost::Mini)

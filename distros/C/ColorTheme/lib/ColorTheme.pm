@@ -1,9 +1,9 @@
 package ColorTheme;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-14'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorTheme'; # DIST
-our $VERSION = '2.1.1'; # VERSION
+our $VERSION = '2.1.2'; # VERSION
 
 1;
 # ABSTRACT: Color themes
@@ -24,7 +24,7 @@ ColorTheme - Color themes
 
 =head1 VERSION
 
-This document describes version 2.1.1 of ColorTheme (from Perl distribution ColorTheme), released on 2020-06-14.
+This document describes version 2.1.2 of ColorTheme (from Perl distribution ColorTheme), released on 2020-06-19.
 
 =head1 DESCRIPTION
 
@@ -128,8 +128,9 @@ Usage:
  my $ctheme_struct = ColorTheme::NAME->get_struct;
  my $ctheme_struct = $ctheme_obj->get_struct;
 
-Provide a method way of getting the L</color theme structure>. A client can also
-access the C<%THEME> package variable directly.
+Provide a method way of getting the L</color theme structure>. Must also work as
+a static method. A client can also access the C<%THEME> package variable
+directly.
 
 =item * get_args
 

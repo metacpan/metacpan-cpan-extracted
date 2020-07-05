@@ -70,8 +70,8 @@ DESCRIPTION
       from the Operating System's measure of the process's Virtual Memory
       size, so as to be able to detect memory usage growth in C libraries
       or XS-level wrapping code, as well as Perl functions. Because Perl
-      does not agressively return unused memory to the Operating System, it
-      is possible that a piece of code could use un-allocated but
+      does not aggressively return unused memory to the Operating System,
+      it is possible that a piece of code could use un-allocated but
       un-reclaimed memory to grow into; resulting in an increase in its
       requirements despite not requesting extra memory from the Operating
       System.
@@ -96,6 +96,28 @@ DESCRIPTION
     allocated memory size, false positives can be minimised, by not
     attempting to assert that certain pieces of code do not grow in memory,
     when in fact it would be expected that they do.
+
+ Devel::Gladiator Integration
+
+    Since version 0.04.
+
+    If Devel::Gladiator is installed, this test module will use it as a
+    second potential source of detecting memory growth. A walk of the Perl
+    memory heap is taken before running the code, in order to count the
+    number of every kind of object present. This is then compared to a
+    second count taken afterwards. Any object types that have increased by
+    at least one per call are reported.
+
+    For example, the output might contain the following extra lines of
+    diagnostic output:
+
+       # Growths in arena object counts:
+       #   ARRAY 1735 -> 11735 (1.00 per call)
+       #   HASH 459 -> 10459 (1.00 per call)
+       #   REF 1387 -> 21387 (2.00 per call)
+       #   REF-ARRAY 163 -> 10163 (1.00 per call)
+       #   REF-HASH 66 -> 10066 (1.00 per call)
+       #   WithContainerSlots 10 -> 10010 (1.00 per call)
 
  Devel::MAT Integration
 

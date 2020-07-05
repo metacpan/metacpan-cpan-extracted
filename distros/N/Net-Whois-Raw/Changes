@@ -1,5 +1,9 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99029  Jun 26 2020 Alexander Nalobin
+    - Fix whois servers of some tlds
+    - Small refactor for get_server()
+
 2.99028  May 9 2020 Eugeny Subachev
     - Deleting duplicates from notfound and servers
     - Fix whois server of xn--ses554g tld

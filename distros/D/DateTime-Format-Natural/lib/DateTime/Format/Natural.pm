@@ -21,7 +21,7 @@ use Params::Validate ':all';
 use Scalar::Util qw(blessed);
 use Storable qw(dclone);
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 validation_options(
     on_fail => sub

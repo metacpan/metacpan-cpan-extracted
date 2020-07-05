@@ -2,17 +2,29 @@
 using std::cout;  using std::cerr;  using std::endl;
 
 #ifndef __CPP__INCLUDED__RPerl__DataStructure__Array__SubTypes1D_h
-#define __CPP__INCLUDED__RPerl__DataStructure__Array__SubTypes1D_h 0.020_000
+#define __CPP__INCLUDED__RPerl__DataStructure__Array__SubTypes1D_h 0.023_000
 
+
+
+
+
+//* NEED DELETE, PRE-TEMPLATE C++; replaced by <rperltypes.h> below
 #include <rperltypes_mode.h> // for definitions of __PERL__TYPES or __CPP__TYPES
 
 // for type-checking subroutines & macros
 #include <RPerl/HelperFunctions.cpp>  // -> HelperFunctions.h
 
 // [[[ DATA TYPES ]]]
+#include <RPerl/DataType/Boolean.h>  // for boolean type used in type-checking subroutines; -> NULL (relies on native C type)
 #include <RPerl/DataType/Integer.cpp>
 #include <RPerl/DataType/Number.cpp>
 #include <RPerl/DataType/String.cpp>
+//*/
+
+//#include <rperltypes.h>  // for dynamic dispatch AKA multiple dispatch; -> (rperltypes_mode.h; HelperFunctions.cpp; Boolean.cpp; UnsignedInteger.cpp; Integer.cpp; Number.cpp; Character.cpp; String.cpp; Array.cpp; Hash.cpp)
+
+
+
 
 // [[[ TYPEDEFS ]]]
 typedef std::vector<integer> integer_arrayref;
@@ -26,12 +38,12 @@ typedef std::vector<string>::iterator string_arrayref_iterator;
 typedef std::vector<string>::const_iterator string_arrayref_const_iterator;
 
 // [[[ TYPE-CHECKING SUBROUTINES ]]]
-void integer_arrayref_CHECK(SV* possible_integer_arrayref);
-void integer_arrayref_CHECKTRACE(SV* possible_integer_arrayref, const char* variable_name, const char* subroutine_name);
-void number_arrayref_CHECK(SV* possible_number_arrayref);
-void number_arrayref_CHECKTRACE(SV* possible_number_arrayref, const char* variable_name, const char* subroutine_name);
-void string_arrayref_CHECK(SV* possible_string_arrayref);
-void string_arrayref_CHECKTRACE(SV* possible_string_arrayref, const char* variable_name, const char* subroutine_name);
+boolean integer_arrayref_CHECK(SV* possible_integer_arrayref, const boolean no_croak = 0);
+boolean integer_arrayref_CHECKTRACE(SV* possible_integer_arrayref, const char* variable_name, const char* subroutine_name, const boolean no_croak = 0);
+boolean number_arrayref_CHECK(SV* possible_number_arrayref, const boolean no_croak = 0);
+boolean number_arrayref_CHECKTRACE(SV* possible_number_arrayref, const char* variable_name, const char* subroutine_name, const boolean no_croak = 0);
+boolean string_arrayref_CHECK(SV* possible_string_arrayref, const boolean no_croak = 0);
+boolean string_arrayref_CHECKTRACE(SV* possible_string_arrayref, const char* variable_name, const char* subroutine_name, const boolean no_croak = 0);
 
 // [[[ OPERATIONS & DATA TYPES REPORTER ]]]
 # ifdef __PERL__TYPES
@@ -54,37 +66,58 @@ void XS_pack_string_arrayref(SV* output_avref, string_arrayref input_vector);
 
 // [[[ STRINGIFY ]]]
 # ifdef __PERL__TYPES
+
 SV* integer_arrayref_to_string_compact(SV* input_avref);
 SV* integer_arrayref_to_string(SV* input_avref);
 SV* integer_arrayref_to_string_pretty(SV* input_avref);
 SV* integer_arrayref_to_string_extend(SV* input_avref);
 SV* integer_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* indent_level);
-SV* number_arrayref_to_string_compact(SV* input_avref);
-SV* number_arrayref_to_string(SV* input_avref);
-SV* number_arrayref_to_string_pretty(SV* input_avref);
-SV* number_arrayref_to_string_extend(SV* input_avref);
-SV* number_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* indent_level);
-SV* string_arrayref_to_string_compact(SV* input_avref);
-SV* string_arrayref_to_string(SV* input_avref);
-SV* string_arrayref_to_string_pretty(SV* input_avref);
-SV* string_arrayref_to_string_extend(SV* input_avref);
-SV* string_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* indent_level);
+SV*  number_arrayref_to_string_compact(SV* input_avref);
+SV*  number_arrayref_to_string(SV* input_avref);
+SV*  number_arrayref_to_string_pretty(SV* input_avref);
+SV*  number_arrayref_to_string_extend(SV* input_avref);
+SV*  number_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* indent_level);
+SV*  string_arrayref_to_string_compact(SV* input_avref);
+SV*  string_arrayref_to_string(SV* input_avref);
+SV*  string_arrayref_to_string_pretty(SV* input_avref);
+SV*  string_arrayref_to_string_extend(SV* input_avref);
+SV*  string_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* indent_level);
+
 # elif defined __CPP__TYPES
+
+template <class CLASSNAME>
+string TEMPLATE_arrayref_to_string_compact(CLASSNAME input_vector);
+template <class CLASSNAME>
+string TEMPLATE_arrayref_to_string(CLASSNAME input_vector);
+template <class CLASSNAME>
+string TEMPLATE_arrayref_to_string_pretty(CLASSNAME input_vector);
+template <class CLASSNAME>
+string TEMPLATE_arrayref_to_string_extend(CLASSNAME input_vector);
+template <class CLASSNAME>
+string TEMPLATE_arrayref_to_string_format(CLASSNAME input_vector, integer format_level, integer indent_level);
+
+// DEV NOTE, CORRELATION #rp320: create DYNAMIC DISPATCH wrappers for TEMPLATE_arrayref_to_string*(), because Inline::CPP does not create Perl bindings for TEMPLATE functions
+string         arrayref_to_string_compact(SV* input_avref, ...);
+string         arrayref_to_string(SV* input_avref, ...);
+string         arrayref_to_string_pretty(SV* input_avref, ...);
+string         arrayref_to_string_extend(SV* input_avref, ...);
+string         arrayref_to_string_format(SV* input_avref, ...);
+
 string integer_arrayref_to_string_compact(integer_arrayref input_vector);
 string integer_arrayref_to_string(integer_arrayref input_vector);
 string integer_arrayref_to_string_pretty(integer_arrayref input_vector);
 string integer_arrayref_to_string_extend(integer_arrayref input_vector);
 string integer_arrayref_to_string_format(integer_arrayref input_vector, integer format_level, integer indent_level);
-string number_arrayref_to_string_compact(number_arrayref input_vector);
-string number_arrayref_to_string(number_arrayref input_vector);
-string number_arrayref_to_string_pretty(number_arrayref input_vector);
-string number_arrayref_to_string_extend(number_arrayref input_vector);
-string number_arrayref_to_string_format(number_arrayref input_vector, integer format_level, integer indent_level);
-string string_arrayref_to_string_compact(string_arrayref input_vector);
-string string_arrayref_to_string(string_arrayref input_vector);
-string string_arrayref_to_string_pretty(string_arrayref input_vector);
-string string_arrayref_to_string_extend(string_arrayref input_vector);
-string string_arrayref_to_string_format(string_arrayref input_vector, integer format_level, integer indent_level);
+string  number_arrayref_to_string_compact(number_arrayref input_vector);
+string  number_arrayref_to_string(number_arrayref input_vector);
+string  number_arrayref_to_string_pretty(number_arrayref input_vector);
+string  number_arrayref_to_string_extend(number_arrayref input_vector);
+string  number_arrayref_to_string_format(number_arrayref input_vector, integer format_level, integer indent_level);
+string  string_arrayref_to_string_compact(string_arrayref input_vector);
+string  string_arrayref_to_string(string_arrayref input_vector);
+string  string_arrayref_to_string_pretty(string_arrayref input_vector);
+string  string_arrayref_to_string_extend(string_arrayref input_vector);
+string  string_arrayref_to_string_format(string_arrayref input_vector, integer format_level, integer indent_level);
 # endif
 
 // [[[ TYPE TESTING ]]]
@@ -103,5 +136,8 @@ number_arrayref number_arrayref_typetest1(integer my_size);
 string string_arrayref_typetest0(string_arrayref people);
 string_arrayref string_arrayref_typetest1(integer my_size);
 # endif
+
+// DEV NOTE, CORRELATION #rp310: separate declaration & implementation of templates
+#include <RPerl/DataStructure/Array/SubTypes1D.tpp>  // -> ??? (relies on <vector> being included via Inline::CPP's AUTO_INCLUDE config option in RPerl/Inline.pm ???)
 
 #endif

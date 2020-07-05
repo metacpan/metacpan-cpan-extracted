@@ -18,10 +18,10 @@ use Geo::Geos::PrecisionModel qw/TYPE_FIXED TYPE_FLOATING TYPE_FLOATING_SINGLE/;
 my $gf = Geo::Geos::GeometryFactory::create();
 
 subtest "CommonBits" => sub {
-    is signExpBits(1234512222226), 0;
-    is numCommonMostSigMantissaBits(1234512222226, 78774), 12;
-    is zeroLowerBits(1234512222226, 4), 1234512222224;
-    is getBit(1234512222226, 4), 1;
+    is signExpBits(123456), 0;
+    is numCommonMostSigMantissaBits(123456, 78774), 37;
+    is zeroLowerBits(123456, 4), 123456;
+    is getBit(123456, 0), 0;
 };
 
 subtest "BitsOp" => sub {

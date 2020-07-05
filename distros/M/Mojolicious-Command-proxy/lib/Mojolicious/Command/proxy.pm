@@ -1,10 +1,10 @@
 package Mojolicious::Command::proxy;
 use Mojo::Base 'Mojolicious::Command';
-use Mojo::Util qw(getopt);
+use Mojo::Util qw(getopt url_escape);
 use Mojo::URL;
 use Mojolicious::Routes;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 has description => 'Proxy web requests elsewhere';
 has usage => sub { shift->extract_usage . "\n" };
@@ -31,6 +31,10 @@ sub proxy {
     my ($c) = @_;
     my $req = $c->req;
     my $path = $c->stash('path');
+    $path = url_escape $path, '^A-Za-z0-9\-._~/'; # route in unescapes, escaping normal stuff except "/" seems reasonable
+    my $query = $c->req->url->query->to_string;
+    $path = join '?', grep length, $path, $query;
+    $c->app->log->debug("Proxying '$path'");
     $path = '/' . $path if $from eq '/'; # weird special behaviour by router
     my $onward_url = $to . $path;
     my $onward_tx = $app->ua->build_tx($req->method => $onward_url);

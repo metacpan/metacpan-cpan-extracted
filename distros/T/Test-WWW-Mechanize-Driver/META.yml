@@ -4,12 +4,16 @@ author:
   - 'The original version of this code written by Dean Serenevy while under'
 build_requires:
   DateTime: 0
+  ExtUtils::MakeMaker: 6.36
   Template: 0
   Test::More: 0
   YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
 distribution_type: module
-generated_by: 'Module::Install version 0.76'
-license: 'Public Domain'
+dynamic_config: 1
+generated_by: 'Module::Install version 1.19'
+license: 'public domain'
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
@@ -30,4 +34,4 @@ requires:
   URI: 0
   URI::QueryParam: 0
   perl: 5.005
-version: 0.6
+version: 0.7

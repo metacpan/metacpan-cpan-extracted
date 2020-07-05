@@ -1,5 +1,8 @@
 Revision history for Bio::GeneDesign
 
+5.56 20.06.19
+  Apparently was missing ::IO module?
+
 5.52 14.02.18
 	Updated RSCU table names, added compatibility sugar for upcoming GUI release
 

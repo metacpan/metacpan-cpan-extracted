@@ -1,5 +1,5 @@
 #ifndef __CPP__INCLUDED__RPerl__HelperFunctions_cpp
-#define __CPP__INCLUDED__RPerl__HelperFunctions_cpp 0.005_100
+#define __CPP__INCLUDED__RPerl__HelperFunctions_cpp 0.006_100
 
 #include <RPerl/HelperFunctions.h>  // -> NULL
 
@@ -13,15 +13,15 @@ int RPerl_SvPOKp(SV* input_sv) { return(SvPOKp(input_sv)); }
 int RPerl_SvAROKp(SV* input_avref) { return(SvAROKp(input_avref)); }
 int RPerl_SvHROKp(SV* input_hvref) { return(SvHROKp(input_hvref)); }
 
-SV * RPerl_AV_ELEMENT(pTHX_ AV * av, SSize_t index) {
-	SV ** svp = av_fetch(av,index,0);
+SV* RPerl_AV_ELEMENT(pTHX_ AV* av, SSize_t index) {
+	SV** svp = av_fetch(av, index, 0);
 	if(svp != NULL)
 		return *svp;
 	else
 		return sv_newmortal();
 }
 
-// NEED ANSWER: what in the hades does this property init function even do?  why do we need it???
+// NEED ANSWER, DEEP BLACK MAGIC: what in the Hades does this property init function even do?  why do we need it???
 // use this to avoid "panic: attempt to copy freed scalar..."
 void RPerl_object_property_init(SV* initee)
 {

@@ -2,7 +2,7 @@ package SVG::XML;
 use strict;
 use warnings;
 
-our $VERSION = '2.84';
+our $VERSION = '2.85';
 
 =pod
 
@@ -164,7 +164,7 @@ sub xmltagclose_ln {
 }
 
 sub dtddecl {
-    my $self = shift;
+    my $self    = shift;
     my $docroot = $self->{-docroot} || 'svg';
     my $id;
 

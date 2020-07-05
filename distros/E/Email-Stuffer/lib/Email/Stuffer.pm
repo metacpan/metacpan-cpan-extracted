@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Email::Stuffer;
 # ABSTRACT: A more casual approach to creating and sending Email:: emails
-$Email::Stuffer::VERSION = '0.017';
+$Email::Stuffer::VERSION = '0.018';
 use Scalar::Util qw(blessed);
 
 #pod =head1 SYNOPSIS
@@ -531,7 +531,7 @@ sub attach {
   $self;
 }
 
-#pod =method attach_file $file [, $attribuet => $value, ... ]
+#pod =method attach_file $file [, $attribute => $value, ... ]
 #pod
 #pod Attachs a file that already exists on the filesystem to the email.
 #pod C<attach_file> will attempt to auto-detect the MIME type, and use the
@@ -605,7 +605,7 @@ sub _slurp {
 #pod =cut
 
 sub transport {
-  my $self = shift;
+  my $self = shift()->_self;
 
   if ( @_ ) {
     # Change the transport
@@ -701,7 +701,15 @@ sub as_string {
 
 #pod =method send
 #pod
+#pod   $stuffer->send;
+#pod
+#pod or
+#pod
+#pod   $stuffer->send({ to => [ $to_1, $to_2 ], from => $sender });
+#pod
 #pod Sends the email via L<Email::Sender::Simple>.
+#pod L<Envelope information|Email::Sender::Manual::QuickStart/"envelope information">
+#pod can be specified in a hash reference.
 #pod
 #pod On failure, returns false.
 #pod
@@ -725,7 +733,15 @@ sub send {
 
 #pod =method send_or_die
 #pod
+#pod   $stuffer->send_or_die;
+#pod
+#pod or
+#pod
+#pod   $stuffer->send_or_die({ to => [ $to_1, $to_2 ], from => $sender });
+#pod
 #pod Sends the email via L<Email::Sender::Simple>.
+#pod L<Envelope information|Email::Sender::Manual::QuickStart/"envelope information">
+#pod can be specified in a hash reference.
 #pod
 #pod On failure, throws an exception.
 #pod
@@ -774,7 +790,7 @@ Email::Stuffer - A more casual approach to creating and sending Email:: emails
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -1023,7 +1039,7 @@ to provide them anyway to be sure. Encoding is Base64 by default. See
 the C<attributes> parameter to L<Email::MIME/create> for the headers you
 can set.
 
-=head2 attach_file $file [, $attribuet => $value, ... ]
+=head2 attach_file $file [, $attribute => $value, ... ]
 
 Attachs a file that already exists on the filesystem to the email.
 C<attach_file> will attempt to auto-detect the MIME type, and use the
@@ -1059,13 +1075,29 @@ scenes) Email::MIME-E<gt>as_string.
 
 =head2 send
 
+  $stuffer->send;
+
+or
+
+  $stuffer->send({ to => [ $to_1, $to_2 ], from => $sender });
+
 Sends the email via L<Email::Sender::Simple>.
+L<Envelope information|Email::Sender::Manual::QuickStart/"envelope information">
+can be specified in a hash reference.
 
 On failure, returns false.
 
 =head2 send_or_die
 
+  $stuffer->send_or_die;
+
+or
+
+  $stuffer->send_or_die({ to => [ $to_1, $to_2 ], from => $sender });
+
 Sends the email via L<Email::Sender::Simple>.
+L<Envelope information|Email::Sender::Manual::QuickStart/"envelope information">
+can be specified in a hash reference.
 
 On failure, throws an exception.
 
@@ -1137,7 +1169,7 @@ Ricardo SIGNES <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Aaron W. Swenson adam adamk@cpan.org adam@phase-n.com Aristotle Pagaltzis Arthur Axel 'fREW' Schmidt Chase Whitener CosmicNet Dan Book John Napiorkowski Josh Stompro Kevin Tew Kieren Diment Kris Matthews Lee Johnson Manni Heumann Pali Ross Attrill Shawn Sorichetti tokuhirom
+=for stopwords Aaron W. Swenson adam adamk@cpan.org adam@phase-n.com Alastair Douglas Aristotle Pagaltzis Arthur Axel 'fREW' Schmidt Chase Whitener CosmicNet Dan Book John Napiorkowski Josh Stompro Kevin Tew Kieren Diment Kris Matthews Lee Johnson Manni Heumann Pali Ricardo Signes Ross Attrill Russell Jenkins Shawn Sorichetti Steve Dondley tokuhirom
 
 =over 4
 
@@ -1156,6 +1188,10 @@ adamk@cpan.org <adamk@cpan.org@88f4d9cd-8a04-0410-9d60-8f63309c3137>
 =item *
 
 adam@phase-n.com <adam@phase-n.com@88f4d9cd-8a04-0410-9d60-8f63309c3137>
+
+=item *
+
+Alastair Douglas <altreus@altre.us>
 
 =item *
 
@@ -1215,11 +1251,23 @@ Pali <pali@cpan.org>
 
 =item *
 
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Ross Attrill <ross.attrill@gmail.com>
 
 =item *
 
+Russell Jenkins <russell.jenkins@strategicdata.com.au>
+
+=item *
+
 Shawn Sorichetti <shawn@coloredblocks.com>
+
+=item *
+
+Steve Dondley <s@dondley.com>
 
 =item *
 

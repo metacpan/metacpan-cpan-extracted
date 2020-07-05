@@ -2,8 +2,8 @@ NAME
     Devel::End::PrintINC - Print @INC and %INC when program ends
 
 VERSION
-    This document describes version 0.001 of Devel::End::PrintINC (from Perl
-    distribution Devel-End-PrintINC), released on 2017-07-14.
+    This document describes version 0.002 of Devel::End::PrintINC (from Perl
+    distribution Devel-End-PrintINC), released on 2020-04-16.
 
 SYNOPSIS
      % perl -MDevel::End::PrintINC -e'...'
@@ -29,11 +29,13 @@ SEE ALSO
 
     Other "Devel::End::*" modules
 
+    Other End::* modules
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

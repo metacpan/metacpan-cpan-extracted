@@ -1,0 +1,22 @@
+#!/bin/sh
+set -e
+
+exec 1>&2
+echo
+
+export PORT=${PORT:-9200}
+export VAULT_TOKEN=${VAULT_TOKEN:-ichanhazcheezburger}
+
+echo "» (re)starting INTEGRATION TEST docker compose infrastructure…"
+docker-compose -p stance_vault_integration_tests -f t/docker-compose.yml down -v
+docker-compose -p stance_vault_integration_tests -f t/docker-compose.yml up -d
+echo "» waiting for http://127.0.0.1:$PORT/ to come online…"
+n=300
+while [[ $n != 0 ]]; do
+  if curl --connect-timeout 1 -sf http://127.0.0.1:$PORT/ >/dev/null; then
+    exit 0
+  fi
+  n=$(( n - 1 ))
+  sleep 0.1
+done
+exit 1

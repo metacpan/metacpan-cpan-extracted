@@ -3,7 +3,7 @@ package Dist::Zilla::Starter;
 use strict;
 use warnings;
 
-our $VERSION = 'v4.0.0';
+our $VERSION = 'v4.0.1';
 
 1;
 
@@ -538,7 +538,8 @@ L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile>, and
 L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker> (or the configured installer
 plugin) add prereqs during this phase. Plugins used to configure the
 distribution's prereqs such as L<[Prereqs]|Dist::Zilla::Plugin::Prereqs>,
-L<[Prereqs::FromCPANfile]|Dist::Zilla::Plugin::Prereqs::FromCPANfile>, and
+L<[Prereqs::FromCPANfile]|Dist::Zilla::Plugin::Prereqs::FromCPANfile>,
+L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile>, and
 L<[AutoPrereqs]|Dist::Zilla::Plugin::AutoPrereqs> will normally run in this
 phase.
 

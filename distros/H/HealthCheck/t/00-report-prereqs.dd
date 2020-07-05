@@ -11,7 +11,13 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'List::Util' => '1.43'
+                                      'Carp' => '0',
+                                      'Hash::Util::FieldHash' => '0',
+                                      'List::Util' => '1.43',
+                                      'Time::HiRes' => '0',
+                                      'parent' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -23,6 +29,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'Test::Strict' => '0'
                                  }

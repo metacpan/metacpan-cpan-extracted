@@ -3,6 +3,7 @@ package Mojo::SAML::Entity;
 use Mojo::Base -base;
 
 use Mojo::XMLSig;
+use Mojo::SAML::Names;
 
 use Carp ();
 use Mojo::DOM;
@@ -41,7 +42,11 @@ sub certificate_for {
   my $attr = ':not([use])';
   if (defined $use) {
     Carp::croak "Unknown certificate use $use" unless exists $uses{$use};
-    $attr = qq!:matches([use="$use"], $attr)!;
+    if ($Mojolicious::VERSION >= 8.42) {
+      $attr = qq!:is([use="$use"], $attr)!;
+    } else {
+      $attr = qq!:matches([use="$use"], $attr)!;
+    }
   }
   require Crypt::OpenSSL::X509;
   my $s = qq!md|KeyDescriptor$attr > ds|KeyInfo > ds|X509Data > ds|X509Certificate!;

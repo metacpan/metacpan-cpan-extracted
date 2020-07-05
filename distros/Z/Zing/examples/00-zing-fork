@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::Fork;
+use Zing::Process;
+
+=pod explain
+
+- zing-fork is responsible for forking processes, ...
+- and connecting forked processes to parents which is useful for monitoring
+- you'll notice that the (4) forks requested in the scheme are ignored here
+- to launch 4 forks, execute() is called multiple times, this is because ...
+- elsewhere, certain process logic needs to relaunch dead forks
+- also, note that terminate() sends a signal to all registered forks
+
+=cut
+
+my $p = Zing::Process->new;
+my $f = Zing::Fork->new(parent => $p, scheme => ['MyApp::Sleep', [], 4]);
+
+$f->execute;
+$f->execute;
+$f->execute;
+$f->execute;
+
+my $pids = join(', ', keys(%{$f->processes}));
+
+warn "killing forked processes ($pids) in 5 secs";
+
+sleep 5;
+
+$f->terminate;
+
+warn "killed processes ($pids)";

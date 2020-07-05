@@ -7,6 +7,7 @@ cpanfile
 lib/App/week.pm
 lib/App/week/colors.pm
 lib/App/week/default.pm
+lib/App/week/olympic.pm
 lib/App/week/teams.pm
 minil.toml
 script/week

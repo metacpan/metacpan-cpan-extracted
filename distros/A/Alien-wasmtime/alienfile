@@ -6,7 +6,7 @@ configure {
   requires 'Path::Tiny';
 };
 
-my $version = $ENV{ALIEN_WASMTIME_VERSION} || 'v0.16.0';
+my $version = $ENV{ALIEN_WASMTIME_VERSION} || 'v0.18.0';
 my $arch = 'x86_64';	
 
 if($^O eq 'linux')
@@ -16,9 +16,7 @@ if($^O eq 'linux')
   {
     if($1 eq 'aarch64')
     {
-      $version = 'dev';
       $arch    = 'aarch64';
-      log "Using dev wasmtime, since the current prod version does not support your arch";
     }
   }
   else

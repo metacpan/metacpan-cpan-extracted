@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Checker;
-$HTML::Spelling::Site::Checker::VERSION = '0.4.3';
+$HTML::Spelling::Site::Checker::VERSION = '0.6.0';
 use strict;
 use warnings;
 use autodie;
@@ -12,7 +12,8 @@ use MooX qw/late/;
 use HTML::Parser 3.00 ();
 use List::MoreUtils qw(any);
 use JSON::MaybeXS qw(decode_json);
-use IO::All qw/ io /;
+use Path::Tiny qw/ path /;
+use Digest ();
 
 has '_inside' =>
     ( is => 'rw', isa => 'HashRef', default => sub { return +{}; } );
@@ -48,20 +49,22 @@ sub _calc_mispellings
 
     binmode STDOUT, ":encoding(utf8)";
 
-    my $calc_cache_io = sub {
-        return io->file( $self->timestamp_cache_fn );
-    };
+    my $cache_fh = path( $self->timestamp_cache_fn );
 
-    my $app_key  = 'HTML-Spelling-Site';
-    my $data_key = 'timestamp_cache';
+    my $app_key     = 'HTML-Spelling-Site';
+    my $data_key    = 'timestamp_cache';
+    my $DIGEST_NAME = 'SHA-256';
+    my $digest_key  = 'digest_cache';
+    my $digest      = Digest->new($DIGEST_NAME);
 
     my $write_cache = sub {
-        my $ref = shift;
-        $calc_cache_io->()->print(
+        my ( $ref, $ddata ) = @_;
+        $cache_fh->spew_raw(
             JSON::MaybeXS->new( canonical => 1 )->encode(
                 {
                     $app_key => {
-                        $data_key => $ref,
+                        $data_key   => $ref,
+                        $digest_key => { $DIGEST_NAME => $ddata, },
                     },
                 },
             )
@@ -70,24 +73,34 @@ sub _calc_mispellings
         return;
     };
 
-    if ( !$calc_cache_io->()->exists() )
+    if ( !$cache_fh->exists() )
     {
-        $write_cache->( +{} );
+        $write_cache->( +{}, +{} );
     }
 
-    my $timestamp_cache =
-        decode_json( scalar( $calc_cache_io->()->slurp() ) )->{$app_key}
-        ->{$data_key};
+    my $main_json       = decode_json( scalar( $cache_fh->slurp_raw() ) );
+    my $timestamp_cache = $main_json->{$app_key}->{$data_key};
+    my $digest_cache =
+        ( $main_json->{$app_key}->{$digest_key}->{$DIGEST_NAME} // +{} );
 
     my $check_word = $self->check_word_cb;
 
 FILENAMES_LOOP:
     foreach my $filename (@$filenames)
     {
+        my $fp    = path($filename);
+        my $mtime = $fp->stat->mtime;
         if ( exists( $timestamp_cache->{$filename} )
-            and $timestamp_cache->{$filename} >=
-            ( io->file($filename)->mtime() ) )
+            and $timestamp_cache->{$filename} >= $mtime )
         {
+            next FILENAMES_LOOP;
+        }
+        my $d = $digest->clone()->addfile( $fp->openr_raw )->b64digest;
+        if ( exists( $digest_cache->{$filename} )
+            and $digest_cache->{$filename} eq $d )
+        {
+            $timestamp_cache->{$filename} = $mtime;
+
             next FILENAMES_LOOP;
         }
 
@@ -160,8 +173,6 @@ s{\A(?:(?:ֹו?(?:ש|ל|מ|ב|כש|לכש|מה|שה|לכשה|ב-))|ו)-?}{};
             }
         };
 
-        open( my $fh, "<:encoding(UTF-8)", $filename );
-
         HTML::Parser->new(
             api_version => 3,
             handlers    => [
@@ -170,17 +181,16 @@ s{\A(?:(?:ֹו?(?:ש|ל|מ|ב|כש|לכש|מה|שה|לכשה|ב-))|ו)-?}{};
                 text  => [ $process_text,                   "dtext" ],
             ],
             marked_sections => 1,
-        )->parse_file($fh);
-
-        close($fh);
+        )->parse_file( $fp->openr_utf8() );
 
         if ($file_is_ok)
         {
-            $timestamp_cache->{$filename} = io->file($filename)->mtime();
+            $timestamp_cache->{$filename} = $mtime;
+            $digest_cache->{$filename}    = $d;
         }
     }
 
-    $write_cache->($timestamp_cache);
+    $write_cache->( $timestamp_cache, $digest_cache );
 
     return { misspellings => \@ret, };
 }
@@ -246,7 +256,7 @@ HTML::Spelling::Site::Checker - does the actual checking.
 
 =head1 VERSION
 
-version 0.4.3
+version 0.6.0
 
 =head1 SYNOPSIS
 

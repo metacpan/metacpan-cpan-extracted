@@ -1,9 +1,9 @@
 package ColorTheme::Harmony::Analogous;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorTheme-Harmony-Analogous'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ Example, for 5 colors, *central_h* of 120 (green) and *h_distance* of 35 then
 `color3` will have hue 120, `color2` 90, `color1` 60, `color4` 150, `color5`
 180. You can see this on the terminal with:
 
-    % show-color-theme-swatch Harmony::Analogous -A central_h=120 -A h_distance=35 -A s=0.8
+    % show-color-theme-swatch Harmony::Analogous=central_h,120,h_distance,35,s,0.8
 
 _
     dynamic => 1,
@@ -57,6 +57,12 @@ _
             default => 1,
         },
     },
+    examples => [
+        {
+            summary => 'An analogous theme around red',
+            args => {central_h=>0},
+        },
+    ],
 );
 
 sub new {
@@ -99,7 +105,7 @@ ColorTheme::Harmony::Analogous - Create theme with colors equidistant in hue
 
 =head1 VERSION
 
-This document describes version 0.004 of ColorTheme::Harmony::Analogous (from Perl distribution ColorTheme-Harmony-Analogous), released on 2020-06-09.
+This document describes version 0.005 of ColorTheme::Harmony::Analogous (from Perl distribution ColorTheme-Harmony-Analogous), released on 2020-06-19.
 
 =head1 DESCRIPTION
 
@@ -112,7 +118,7 @@ Example, for 5 colors, I<central_h> of 120 (green) and I<h_distance> of 35 then
 C<color3> will have hue 120, C<color2> 90, C<color1> 60, C<color4> 150, C<color5>
 180. You can see this on the terminal with:
 
- % show-color-theme-swatch Harmony::Analogous -A central_h=120 -A h_distance=35 -A s=0.8
+ % show-color-theme-swatch Harmony::Analogous=central_h,120,h_distance,35,s,0.8
 
 =head1 HOMEPAGE
 

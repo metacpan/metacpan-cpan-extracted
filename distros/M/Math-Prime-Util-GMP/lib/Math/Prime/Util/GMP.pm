@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::GMP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::GMP::VERSION = '0.51';
+  $Math::Prime::Util::GMP::VERSION = '0.52';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -39,6 +39,7 @@ our @EXPORT_OK = qw(
                      is_proth_prime
                      is_miller_prime
                      miller_rabin_random
+                     is_gaussian_prime
                      lucas_sequence  lucasu  lucasv
                      primes
                      sieve_primes
@@ -48,6 +49,7 @@ our @EXPORT_OK = qw(
                      next_prime
                      prev_prime
                      surround_primes
+                     next_twin_prime
                      trial_factor
                      prho_factor
                      pbrent_factor
@@ -80,7 +82,8 @@ our @EXPORT_OK = qw(
                      totient
                      jordan_totient
                      carmichael_lambda
-                     sqrtint rootint logint
+                     sqrtint rootint logint powint mulint addint subint
+                     divint modint divrem tdivrem negint absint
                      is_power is_prime_power is_semiprime is_square
                      is_carmichael is_fundamental is_totient
                      is_primitive_root
@@ -91,7 +94,7 @@ our @EXPORT_OK = qw(
                      Pi Euler
                      todigits
                      random_prime random_nbit_prime random_ndigit_prime
-                     random_strong_prime
+                     random_safe_prime random_strong_prime
                      random_maurer_prime random_shawe_taylor_prime
                      random_maurer_prime_with_cert
                      random_shawe_taylor_prime_with_cert
@@ -192,7 +195,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords Möbius Deléglise Bézout s-gonal gcdext vecsum vecprod moebius totient liouville znorder znprimroot bernfrac bernreal harmfrac harmreal addreal subreal mulreal divreal logreal expreal powreal rootreal agmreal stirling zeta li ei riemannr lambertw lucasu lucasv OpenPFGW gmpy2 nonresidue chinese tuplets sqrtmod addmod mulmod powmod divmod superset sqrtint rootint logint todigits urandomb urandomr
+=for stopwords Möbius Deléglise Bézout s-gonal gcdext vecsum vecprod moebius totient liouville znorder znprimroot bernfrac bernreal harmfrac harmreal addreal subreal mulreal divreal logreal expreal powreal rootreal agmreal stirling zeta li ei riemannr lambertw lucasu lucasv OpenPFGW gmpy2 nonresidue chinese tuplets sqrtmod addmod mulmod powmod divmod superset sqrtint rootint logint powint mulint addint subint divint modint divrem tdivrem negint absint todigits urandomb urandomr
 
 =head1 NAME
 
@@ -201,7 +204,7 @@ Math::Prime::Util::GMP - Utilities related to prime numbers and factoring, using
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 
 =head1 SYNOPSIS
@@ -698,6 +701,13 @@ While not as fast as the Lucas-Lehmer test for Mersenne
 numbers, it is almost as fast as a single strong pseudoprime test (i.e.
 Miller-Rabin test) while giving a certain answer.
 
+=head2 is_gaussian_prime
+
+Given two integers C<a> and C<b> as input, returns 0 (definitely composite),
+1 (probably prime), or 2 (definitely prime) to indicate whether the
+complex number C<a+bi> is a Guassian prime.  The L</is_prime> function is
+used internally to make the determination.
+
 =head2 is_miller_prime
 
   say "$n is definitely prime" if is_miller_prime($n);
@@ -942,6 +952,14 @@ Note that with a non-zero second argument, the values returned have not
 undergone a full BPSW test; just sieving and a SPSP-2 test.
 
 
+=head2 next_twin_prime
+
+Returns the start of the next twin prime after the input C<n>.  The
+returned value will always be greater than the input.  For a return
+value of C<t>, both C<t> and C<t+2> will be a
+probable prime (using BPSW).
+
+
 =head2 random_nbit_prime
 
   say "random 512-bit prime: ", random_nbit_prime(512);
@@ -949,6 +967,21 @@ undergone a full BPSW test; just sieving and a SPSP-2 test.
 Returns a randomly selected prime of exactly C<n> bits.
 C<undef> is returned if C<n> is less than C<2>.
 The returned prime has passed the C<is_prob_prime> (extra strong BPSW) test.
+
+=head2 random_safe_prime
+
+Returns a randomly selected safe prime of exactly C<n> bits.
+C<n> must be at least C<3>.
+The returned value C<p> will be of the form C<2q+1> where C<q>
+has passed the extra strong BPSW test.  C<p> is guaranteed to be
+a prime if C<q> is prime.
+
+Setting verbose level to 3 or higher will produce progress output not
+unlike openssl.  A C<.> for each candidate that passes pretests, a
+C<+> for those where one is likely prime, and C<*> when both are likely
+prime with only confirmation tests remaining.
+
+This generates safe primes about 4-10x faster than openssl's dhparam.
 
 =head2 random_strong_prime
 
@@ -1727,6 +1760,72 @@ This is the largest integer C<e> such that C<b^e E<lt>= n>.
 
 This corresponds to Pari/GP's C<logint> function.
 
+=head2 powint
+
+Given integers C<a> and C<b>, returns C<a^b>.  For <0^0> we return 1.
+
+The exponent C<b> is converted into an unsigned long.
+
+=head2 mulint
+
+Given integers C<a> and C<b>, returns C<a * b>.
+
+=head2 addint
+
+Given integers C<a> and C<b>, returns C<a + b>.
+
+=head2 subint
+
+Given integers C<a> and C<b>, returns C<a - b>.
+
+=head2 divint
+
+Given integers C<a> and C<b>, returns the quotient C<a / b>.
+
+Floor division is used, so q is rounded towards -inf and
+the remainder has the same sign as the divisor C<b>.
+This is the same as modern L<Math::BigInt/bdiv> and the GMP C<fdiv> functions,
+but not the same as Pari/GP's C<\\> operator.
+
+=head2 modint
+
+Given integers C<a> and C<b>, returns the modulo C<a % b>.
+
+    C<r = a - b * floor(a / b)>
+
+Floor division is used, so q is rounded towards -inf and r has
+the same sign as the divisor C<b>..
+This is the same as modern L<Math::BigInt/bmod> and the GMP C<fdiv> functions,
+but not the same as Pari/GP's C<%> operator.
+
+=head2 divrem
+
+    my($quo, $rem) = divrem($a, $b);
+
+Given integers C<a> and C<b>, returns a list of two items:
+the Euclidean quotient and the Euclidean remainder.
+
+This corresponds to Pari/GP's C<divrem> function.
+There is no explicit function in L<Math::BigInt> that gives
+this division method for signed inputs.
+
+=head2 tdivrem
+
+Given integers C<a> and C<b>, returns a list of two items:
+the truncated quotient and the truncated remainder.
+
+The resulting pair will match
+L<Math::BigInt/btdiv> and L<Math::BigInt/btmod>.
+
+=head2 absint
+
+Given integer C<n>, return C<|n|>, i.e. the absolute value of C<n>.
+
+=head2 negint
+
+Given integer C<n>, return C<-n>.
+
+
 =head2 factor
 
   @factors = factor(640552686568398413516426919223357728279912327120302109778516984973296910867431808451611740398561987580967216226094312377767778241368426651540749005659);
@@ -2229,7 +2328,7 @@ ECM implementation, as well as the many papers by Brent and Montgomery.
 
 =head1 COPYRIGHT
 
-Copyright 2011-2017 by Dana Jacobsen E<lt>dana@acm.orgE<gt>
+Copyright 2011-2019 by Dana Jacobsen E<lt>dana@acm.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

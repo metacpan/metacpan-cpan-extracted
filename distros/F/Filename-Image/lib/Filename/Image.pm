@@ -1,7 +1,9 @@
 package Filename::Image;
 
-our $DATE = '2017-08-12'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-01'; # DATE
+our $DIST = 'Filename-Image'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +12,9 @@ use warnings;
 use Exporter qw(import);
 our @EXPORT_OK = qw(check_image_filename);
 
-our $RE = qr(\.(?:djvu|jpeg|jpg2|svgz|tiff|wbmp|art|bmp|cdr|cdt|cpt|cr2|crw|djv|erf|gif|ico|ief|jng|jp2|jpe|jpf|jpg|jpm|jpx|nef|orf|pat|pbm|pcx|pgm|png|pnm|ppm|psd|ras|rgb|svg|tif|xbm|xpm|xwd)\z)i; # RE
+our $STR_RE = "djvu|jpeg|jpg2|svgz|tiff|wbmp|art|bmp|cdr|cdt|cpt|cr2|crw|djv|erf|gif|ico|ief|jng|jp2|jpe|jpf|jpg|jpm|jpx|nef|orf|pat|pbm|pcx|pgm|png|pnm|ppm|psd|ras|rgb|svg|tif|xbm|xpm|xwd"; # STR_RE
+
+our $RE = qr(\.(?:$STR_RE)\z)i;
 
 sub check_image_filename {
     my %args = @_;
@@ -33,7 +37,7 @@ Filename::Image - Check whether filename indicates being an image file
 
 =head1 VERSION
 
-This document describes version 0.001 of Filename::Image (from Perl distribution Filename-Image), released on 2017-08-12.
+This document describes version 0.002 of Filename::Image (from Perl distribution Filename-Image), released on 2020-04-01.
 
 =head1 SYNOPSIS
 
@@ -81,7 +85,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

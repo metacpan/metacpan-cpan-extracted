@@ -6,7 +6,7 @@ use warnings;
 # Older versions cannot complete the test suite successfully
 use 5.018;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =encoding utf8
@@ -33,6 +33,9 @@ Ryu - asynchronous stream building blocks
 
 Provides data flow processing for asynchronous coding purposes. It's a bit like L<ReactiveX|https://reactivex.io> in
 concept. Where possible, it tries to provide a similar API. It is not a directly-compatible implementation, however.
+
+For more information, start with L<Ryu::Source>. That's where most of the
+useful parts are.
 
 =head2 Why would I be using this?
 
@@ -212,6 +215,8 @@ Some perl modules of relevance:
 
 =item * L<Future::Queue> - a FIFO queue for L<Future> tasks
 
+=item * L<Future::Buffer> - provides equivalent functionality to L<Ryu::Buffer>
+
 =item * L<POE::Filter> - venerable and battle-tested, but slightly short on features due to the focus on protocols
 
 =item * L<Data::Transform> - standalone version of L<POE::Filter>
@@ -242,6 +247,8 @@ syntax is "backwards" (same as grep/map chains in Perl)
 =item * L<Data::Monad>
 
 =item * L<Mojo::Rx> - Mojolicious-specific support for ReactiveX, follows the rxjs API quite closely
+
+=item * L<RxPerl> - same author as L<Mojo::Rx>, this (will eventually!) provide a ReactiveX API without being tied to Mojolicious
 
 =back
 

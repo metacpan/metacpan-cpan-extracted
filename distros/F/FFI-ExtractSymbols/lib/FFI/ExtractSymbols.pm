@@ -2,26 +2,27 @@ package FFI::ExtractSymbols;
 
 use strict;
 use warnings;
-use FFI::ExtractSymbols::ConfigData;
+use File::ShareDir::Dist ();
 use base qw( Exporter );
 
+my $config = File::ShareDir::Dist::dist_config('FFI-ExtractSymbols');
 our @EXPORT = qw( extract_symbols );
 
 # ABSTRACT: Extract symbol names from a shared object or DLL
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
 $FFI::ExtractSymbols::mode = '';
 
-if(FFI::ExtractSymbols::ConfigData->config('posix_nm'))
+if($config->{'posix_nm'})
 {
   require FFI::ExtractSymbols::PosixNm;
 }
-elsif(FFI::ExtractSymbols::ConfigData->config('openbsd_nm'))
+elsif($config->{'openbsd_nm'})
 {
   require FFI::ExtractSymbols::OpenBSD;
 }
-elsif(FFI::ExtractSymbols::ConfigData->config('ms_windows'))
+elsif($config->{'ms_windows'})
 {
   require FFI::ExtractSymbols::Windows;
 }
@@ -44,7 +45,7 @@ FFI::ExtractSymbols - Extract symbol names from a shared object or DLL
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -61,7 +62,7 @@ version 0.03
 
 =head1 DESCRIPTION
 
-This module extracts the symbol names from a DLL or shared object.  The 
+This module extracts the symbol names from a DLL or shared object.  The
 method used depends on the platform.
 
 =head1 FUNCTIONS
@@ -74,14 +75,14 @@ method used depends on the platform.
    data   => sub { ... },
  );
 
-Extracts symbols from the dynamic library (DLL on Windows, shared 
-library most other places) from the library and calls the given 
-callbacks. Each callback is called once for each symbol that matches 
-that type.  Each callback gets two arguments.  The first is the symbol 
-name in a form that can be passed into L<FFI::Platypus#find_symbol>, 
-L<FFI::Platypus#function> or L<FFI::Platypus#attach>.  The second is the 
-exact symbol name as it was extracted from the DLL or shared library.  
-On some platforms this will be prefixed by an underscore.  Some tools, 
+Extracts symbols from the dynamic library (DLL on Windows, shared
+library most other places) from the library and calls the given
+callbacks. Each callback is called once for each symbol that matches
+that type.  Each callback gets two arguments.  The first is the symbol
+name in a form that can be passed into L<FFI::Platypus#find_symbol>,
+L<FFI::Platypus#function> or L<FFI::Platypus#attach>.  The second is the
+exact symbol name as it was extracted from the DLL or shared library.
+On some platforms this will be prefixed by an underscore.  Some tools,
 such as C<c++filt> will require this version as input.  Example:
 
  extract_symbols( 'libfoo.so',
@@ -111,15 +112,15 @@ All symbols in the data section of the DLL or shared object.
 
 =head1 CAVEATS
 
-This module I<may> work on static libraries and object files for some 
+This module I<may> work on static libraries and object files for some
 platforms, but that usage is unsupported and may not be portable.
 
 On windows, depending on the implementation available, this module may
 not differentiate between code and data symbols.  In that case the
 export and code callbacks will be called for both.
 
-On many platforms extra symbols get lumped into DLLs and shared object 
-files so you should account for and ignore getting unexpected symbols 
+On many platforms extra symbols get lumped into DLLs and shared object
+files so you should account for and ignore getting unexpected symbols
 that you probably don't care about.
 
 =head1 SEE ALSO
@@ -136,10 +137,10 @@ Module for checking for the availability of dynamic libraries.
 
 =item L<Parse::nm>
 
-This module can parse the symbol names out of shared object files on 
+This module can parse the symbol names out of shared object files on
 platforms where C<nm> works on those types of files.
 
-It does not work for Windows DLL files.  It also depends on 
+It does not work for Windows DLL files.  It also depends on
 L<Regexp::Assemble> which appears to be unmaintained.
 
 =back

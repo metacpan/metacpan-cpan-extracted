@@ -13,7 +13,7 @@ use constant skip  => true;
 
 use DateTime::Format::Natural::Helpers qw(%flag);
 
-our $VERSION = '1.67';
+our $VERSION = '1.68';
 
 our (%init,
      %timespan,
@@ -170,7 +170,14 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
             thurs => 'thu',
         },
         tokens => {
+            sec  => 'second',
+            secs => 'seconds',
+            min  => 'minute',
             mins => 'minutes',
+            hr   => 'hour',
+            hrs  => 'hours',
+            yr   => 'year',
+            yrs  => 'years',
             '@'  => 'at',
         },
         short => {
@@ -4814,7 +4821,14 @@ also parsable with precision in seconds):
 
 =head2 Aliases
 
+ 1 sec ago
+ 10 secs ago
+ 1 min ago
  5 mins ago
+ 1 hr ago
+ 3 hrs ago
+ 1 yr ago
+ 7 yrs ago
  yesterday @ noon
  tues this week
  final thurs in sep

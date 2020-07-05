@@ -133,3 +133,28 @@ Revision history for StreamFinder
 1.28    2020/04/25
         - Fix failure to include StreamFinder::Spreaker in MANIFEST and 
         to update change log.
+1.29    2020/07/02
+        - Split out video's channel page (that was previously appended onto 
+        the "artist" field) into a new, separate "albumartist" field.  This 
+        affects the video sites:  Brighteon, Vimeo, and Youtube.
+        (Old way was:  artist:="Artist - Artist's video channel URL").  These 
+        are now put into separate fields.
+        - Fix .pls playlists returned by some Tunein stations by stripping off 
+        some garbage Tunein appends in the format:  
+        "stream.pls?DIST=TuneIn&TGT=TuneIn&maxServers=..." and more accurately 
+        obtain title, artist, and album fields for stations vs podcasts.
+        - Fix issue causing some vimeo videos to fail to fetch stream.
+        - Clean up some "dirty" Spreaker titles (convert invalid characters).
+        - Marked StreamFinder::Radionomy depreciated - site appears defunct.
+1.30    2020/07/05
+        - Add "-nopls" option to getURL() to parse ".pls" playlists and 
+        return only a single entry, like "-noplaylists", but pass others 
+        (".m3u" and ".m3u8") through unchanged.  This needed because most 
+        ".m3u*" are playable "HLS" streams, whereas ".pls" playlists are 
+        actually playlists and many players will not play them as-is.
+        - StreamFinder::RadioNet: Fix issue with no streams being fetched for 
+        some stations & clean up titles a bit.
+        - StreamFinder::IHeartRadio: Add year to podcasts, fix some title 
+        and description issues.
+        - StreamFinder::Spreaker: Fix some streams not working, fix "-debug" 
+        option to work.

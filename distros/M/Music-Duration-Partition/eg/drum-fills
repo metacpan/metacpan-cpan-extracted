@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Use local libraries
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw( MIDI-Drummer-Tiny Music-Duration-Partition );
+
+use MIDI::Drummer::Tiny;
+use Music::Duration::Partition;
+
+my $max = shift || 8;   # Loop boundary
+my $bpm = shift || 100; # Beats per minute
+
+# Instantiate a drummer!
+my $d = MIDI::Drummer::Tiny->new(
+    file => "$0.mid",
+    bpm  => $bpm,
+);
+
+# Play the pulse and beat parts simultaneously
+$d->score->synch(
+    \&pulse,
+    \&beat,
+);
+
+# Write the MIDI file to disk
+$d->write;
+
+# Steady pedal hi-hat
+sub pulse {
+    for my $n (1 .. $max) {
+        $d->note($d->quarter, $d->pedal_hh) for 1 .. $max;
+    }
+}
+
+# Backbeat and fills
+sub beat {
+    # Instantiate a new phrase maker
+    my $mdp = Music::Duration::Partition->new(
+        size    => 4,
+        pool    => [qw(qn en sn)],
+        weights => [5, 10, 5],
+    );
+
+    # For each measure...
+    for my $n (1 .. $max) {
+        # Play the backbeat with a crash on 1
+        $d->note(
+            $d->quarter,
+            $_ == 1 ? $d->crash1 : '',
+            $_ % 2 ? $d->kick : $d->snare
+        ) for 1 .. 4;
+
+        # Generate a new rhythmic phrase
+        my $motif = $mdp->motif;
+
+        my $patch;
+
+        # Play the fill motif
+        for my $i (0 .. @$motif - 1) {
+            # Descend the kit for each beat
+            if ($n % 2 == 0) {
+                $patch = $d->snare         if $i == 0 || $i == 1;
+                $patch = $d->hi_tom        if $i == 2;
+                $patch = $d->hi_mid_tom    if $i == 3;
+                $patch = $d->low_mid_tom   if $i == 4;
+                $patch = $d->low_tom       if $i == 5;
+                $patch = $d->hi_floor_tom  if $i == 6;
+                $patch = $d->low_floor_tom if $i == 7;
+            }
+            # Descend the kit but alternate with the snare
+            else {
+                $patch = $d->snare         if $i % 2 == 0;
+                $patch = $d->hi_tom        if $i == 1;
+                $patch = $d->hi_mid_tom    if $i == 3;
+                $patch = $d->low_mid_tom   if $i == 5;
+                $patch = $d->low_tom       if $i == 7;
+                $patch = $d->hi_floor_tom  if $i == 9;
+                $patch = $d->low_floor_tom if $i == 11;
+            }
+
+            # Add the motif-patch note to the score
+            $d->note($motif->[$i], $patch);
+        }
+    }
+
+    # End with a kick-crash!
+    $d->note($d->whole, $d->crash1, $d->kick);
+}

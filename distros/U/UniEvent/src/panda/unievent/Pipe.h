@@ -11,13 +11,13 @@ struct Pipe : virtual Stream {
     static const HandleType TYPE;
 
     Pipe (Loop* loop = Loop::default_loop(), bool ipc = false) : _ipc(ipc) {
-        _ECTOR();
+        panda_log_ctor();
         _init(loop, loop->impl()->new_pipe(this, ipc));
     }
 
     Pipe (bool ipc) : Pipe(Loop::default_loop(), ipc) {}
 
-    ~Pipe () { _EDTOR(); }
+    ~Pipe () { panda_log_dtor(); }
 
     const HandleType& type () const override;
 

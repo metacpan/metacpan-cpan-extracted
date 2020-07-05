@@ -4,7 +4,7 @@
       "Andreas Faafeng <aff@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Parse",
       "Dia",
@@ -28,7 +28,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Parse-Dia-SQL",
    "no_index" : {
@@ -75,6 +75,6 @@
          "url" : "https://github.com/aff/Parse-Dia-SQL"
       }
    },
-   "version" : "0.30",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.31",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

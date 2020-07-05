@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1784 2020-05-24 19:27:13Z willem $
+# $Id: Base.pm 1786 2020-06-15 15:05:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1784 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1786 $)[1];
 
 
 #
@@ -508,8 +508,7 @@ NAMESERVER: foreach my $ns (@ns) {
 
 			my $reply;
 			while ( my ($socket) = $select->can_read($timeout) ) {
-				my $peer = $socket->peerhost;
-				$self->{replyfrom} = $peer;
+				my $peer = $self->{replyfrom} = $socket->peerhost;
 
 				my $buffer = _read_udp( $socket, $self->_packetsz );
 				$self->_diag( "reply from [$peer]", length($buffer), 'bytes' );
@@ -801,12 +800,8 @@ sub _axfr_next {
 	my ($socket) = $select->can_read( $self->{tcp_timeout} );
 	croak $self->errorstring('timed out') unless $socket;
 
-	$self->{replyfrom} = $socket->peerhost;
-
 	my $buffer = _read_tcp($socket);
-	$self->_diag( 'received', length($buffer), 'bytes' );
-
-	my $packet = Net::DNS::Packet->new( \$buffer );
+	my $packet = Net::DNS::Packet->decode( \$buffer );
 	croak $@, $self->errorstring('corrupt packet') if $@;
 
 	return ( $packet, $verify ) unless $verify;

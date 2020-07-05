@@ -23,6 +23,9 @@ DESCRIPTION
     it tries to provide a similar API. It is not a directly-compatible
     implementation, however.
 
+    For more information, start with Ryu::Source. That's where most of the
+    useful parts are.
+
  Why would I be using this?
 
     Eventually some documentation pages might appear, but at the moment
@@ -152,6 +155,8 @@ SEE ALSO
 
       * Future::Queue - a FIFO queue for Future tasks
 
+      * Future::Buffer - provides equivalent functionality to Ryu::Buffer
+
       * POE::Filter - venerable and battle-tested, but slightly short on
       features due to the focus on protocols
 
@@ -190,6 +195,9 @@ SEE ALSO
 
       * Mojo::Rx - Mojolicious-specific support for ReactiveX, follows the
       rxjs API quite closely
+
+      * RxPerl - same author as Mojo::Rx, this (will eventually!) provide a
+      ReactiveX API without being tied to Mojolicious
 
  Other references
 

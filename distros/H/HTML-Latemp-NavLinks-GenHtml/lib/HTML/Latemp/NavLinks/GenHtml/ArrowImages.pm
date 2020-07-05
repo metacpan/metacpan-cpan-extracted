@@ -1,17 +1,16 @@
 package HTML::Latemp::NavLinks::GenHtml::ArrowImages;
-
+$HTML::Latemp::NavLinks::GenHtml::ArrowImages::VERSION = '0.2.9';
 use strict;
 use warnings;
-
-our $VERSION = '0.2.6';
 
 use vars qw($nav_buttons_html);
 
 use parent 'HTML::Latemp::NavLinks::GenHtml';
 
-__PACKAGE__->mk_accessors(qw(
-    _ext
-    )
+__PACKAGE__->mk_accessors(
+    qw(
+        _ext
+        )
 );
 
 sub _init
@@ -21,7 +20,7 @@ sub _init
 
     $self->SUPER::_init(%args);
 
-    $self->_ext($args{ext} || '.png');
+    $self->_ext( $args{ext} || '.png' );
 
     return;
 }
@@ -33,8 +32,8 @@ use Template;
 use Template::Stash;
 
 # Define a method to return a substring.
-$Template::Stash::SCALAR_OPS->{ 'substr' } = sub {
-    return substr($_[0], $_[1], $_[2]);
+$Template::Stash::SCALAR_OPS->{'substr'} = sub {
+    return substr( $_[0], $_[1], $_[2] );
 };
 
 sub _get_nav_buttons_html
@@ -47,20 +46,18 @@ sub _get_nav_buttons_html
 
     my $root = $self->root();
 
-    my $template =
-        Template->new(
+    my $template = Template->new(
         {
             'POST_CHOMP' => 1,
         }
-        );
+    );
 
-    my $vars =
-    {
-        'buttons' => $self->_get_buttons(),
-        'root' => $root,
+    my $vars = {
+        'buttons'        => $self->_get_buttons(),
+        'root'           => $root,
         'with_accesskey' => $with_accesskey,
-        'image_base' => $self->get_image_base(),
-        ext => $self->_ext(),
+        'image_base'     => $self->get_image_base(),
+        ext              => $self->_ext(),
     };
 
     my $nav_links_template = <<'EOF';
@@ -82,10 +79,9 @@ EOF
 
     my $nav_buttons_html = "";
 
-    $template->process(\$nav_links_template, $vars, \$nav_buttons_html);
+    $template->process( \$nav_links_template, $vars, \$nav_buttons_html );
     return $nav_buttons_html;
 }
-
 
 
 sub get_image_base
@@ -100,11 +96,11 @@ sub get_total_html
 {
     my $self = shift;
 
-    return "<ul class=\"nav_links\">\n" .
-        $self->_get_nav_buttons_html(@_) .
-        "\n</ul>";
+    return
+          "<ul class=\"nav_links\">\n"
+        . $self->_get_nav_buttons_html(@_)
+        . "\n</ul>";
 }
-
 
 1;
 
@@ -120,7 +116,7 @@ HTML::Latemp::NavLinks::GenHtml::ArrowImages - A class to generate the image-bas
 
 =head1 VERSION
 
-version 0.2.6
+version 0.2.9
 
 =head1 SYNOPSIS
 
@@ -146,56 +142,9 @@ Can be overrided. Should return the base of the image filename of the module.
 
 Calculates and returns the final HTML.
 
-=head1 AUTHOR
-
-Shlomi Fish, L<http://www.shlomifish.org/> .
-
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-html-latemp-navlinks-genhtml@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-Latemp-NavLinks-GenHtml>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2005 Shlomi Fish, All Rights Reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the MIT X11 license.
-
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2005 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Latemp-NavLinks-GenHtml or by
-email to bug-html-latemp-navlinks-genhtml@rt.cpan.org.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc HTML::Latemp::NavLinks::GenHtml
 
 =head2 Websites
 
@@ -210,15 +159,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-Latemp-NavLinks-GenHtml>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/HTML-Latemp-NavLinks-GenHtml>
+L<https://metacpan.org/release/HTML-Latemp-NavLinks-GenHtml>
 
 =item *
 
@@ -227,30 +168,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Latemp-NavLinks-GenHtml>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/HTML-Latemp-NavLinks-GenHtml>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/HTML-Latemp-NavLinks-GenHtml>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/HTML-Latemp-NavLinks-GenHtml>
 
 =item *
 
@@ -264,7 +181,7 @@ L<http://cpants.cpanauthors.org/dist/HTML-Latemp-NavLinks-GenHtml>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/H/HTML-Latemp-NavLinks-GenHtml>
 
@@ -298,8 +215,29 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/latemp>
+L<https://github.com/thewml/latemp>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/latemp
+  git clone https://github.com/thewml/latemp
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/html-latemp-navlinks-genhtml/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2005 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

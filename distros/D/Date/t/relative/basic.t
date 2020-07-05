@@ -144,11 +144,12 @@ subtest 'constants' => sub {
     is(MIN, "1m");
     is(HOUR, "1h");
     is(DAY, '1D');
+    is(WEEK, '7D');
     is(MONTH, '1M');
     is(YEAR, '1Y');
 
     my $rotest = rdate_const("1Y 1M 1D");
-    foreach my $const (SEC, MIN, HOUR, DAY, MONTH, YEAR, $rotest) {
+    foreach my $const (SEC, MIN, HOUR, DAY, WEEK, MONTH, YEAR, $rotest) {
         my $initial_str = $const->to_string;
         ok(!eval { $const *= 10; 1 }, 'RO-MULS');
         ok(!eval { $const /= 2; 1 }, 'RO-DIVS');

@@ -1,5 +1,8 @@
 #!perl
 
+use strict;
+use warnings;
+
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
     require Test::More;
@@ -16,5 +19,3 @@ if ( $@ ) {
 else {
   all_pod_coverage_ok();;
 }
-
-

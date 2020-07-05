@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::0_90::TestServer;
-$Search::Elasticsearch::Client::0_90::TestServer::VERSION = '6.80';
+$Search::Elasticsearch::Client::0_90::TestServer::VERSION = '6.81';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ Search::Elasticsearch::Client::0_90::TestServer - Client-specific backend for Se
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 AUTHOR
 

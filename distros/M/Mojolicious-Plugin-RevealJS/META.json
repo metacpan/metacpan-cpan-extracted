@@ -1,16 +1,16 @@
 {
-   "abstract" : "Mojolicious Ã¢ÂÂ¤Ã¯Â¸Â Reveal.js",
+   "abstract" : "Mojolicious ❤️ Reveal.js",
    "author" : [
-      "Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>"
+      "Joel Berger, <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.022",
+   "generated_by" : "App::ModuleBuildTiny version 0.028",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mojolicious-Plugin-RevealJS",
    "prereqs" : {
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.022"
+            "App::ModuleBuildTiny" : "0.028"
          }
       },
       "runtime" : {
@@ -35,7 +35,7 @@
    "provides" : {
       "Mojolicious::Plugin::RevealJS" : {
          "file" : "lib/Mojolicious/Plugin/RevealJS.pm",
-         "version" : "0.18"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,7 @@
          "url" : "http://github.com/jberger/Mojolicious-Plugin-RevealJS"
       }
    },
-   "version" : "0.18",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

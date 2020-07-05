@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Token;
-our $VERSION = '1.061';
+our $VERSION = '1.064';
 # ABSTRACT: A simple token-based auth
 
 #pod =head1 SYNOPSIS
@@ -305,7 +305,7 @@ Yancy::Plugin::Auth::Token - A simple token-based auth
 
 =head1 VERSION
 
-version 1.061
+version 1.064
 
 =head1 SYNOPSIS
 

@@ -1,9 +1,9 @@
 package ColorTheme::GraphicsColorNames;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorTheme-GraphicsColorNames'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -20,6 +20,12 @@ our %THEME = (
             pos => 0,
         },
     },
+    examples => [
+        {
+            summary => 'Show Graphics::ColorNames::WWW',
+            args => {scheme => 'WWW'},
+        },
+    ],
 );
 
 sub new {
@@ -64,7 +70,7 @@ ColorTheme::GraphicsColorNames - Display Graphics::ColorNames::* color scheme as
 
 =head1 VERSION
 
-This document describes version 0.001 of ColorTheme::GraphicsColorNames (from Perl distribution ColorTheme-GraphicsColorNames), released on 2020-06-09.
+This document describes version 0.003 of ColorTheme::GraphicsColorNames (from Perl distribution ColorTheme-GraphicsColorNames), released on 2020-06-19.
 
 =head1 HOMEPAGE
 

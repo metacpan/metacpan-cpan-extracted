@@ -1,0 +1,22 @@
+Revision history for Translate-Fluent
+
+0.6.2   2020/Jun/24
+        - add ResourceGroup->slurp_file
+        - change version format to check if pause likes it more
+
+0.6.1   2020/Jun/18
+        - renamed from Locale::Fluent to Translate::Fluent because
+          of the Locale namespace being owned by perl itself.
+
+0.5.3   2020/May/25
+        - add Moo to the list of dependencies
+
+0.5.2   2020/May/23
+        - add Regexp::Grammar to the list of dependencies - opsy
+
+0.5.1   2020/May/23
+        First release
+
+0.01    2019/Jul/26
+        First version, never really released.
+

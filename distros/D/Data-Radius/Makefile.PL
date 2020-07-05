@@ -16,6 +16,7 @@ my %M = (
         'Digest::MD5' => 0,
         'Digest::HMAC_MD5' => 0,
         'Class::Accessor::Fast' => 0,
+        'Const::Fast' => 0,
         'Socket' => "2.021",
     },
     TEST_REQUIRES => {

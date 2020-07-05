@@ -2,7 +2,7 @@ package AnyEvent::Radius;
 # DUMMY
 use strict;
 use warnings;
-our $VERSION = '1.1.1';
+our $VERSION = '1.1.2';
 1;
 
 __END__
@@ -17,7 +17,7 @@ AnyEvent::Radius - modules to implement AnyEvent-based RADIUS client or server
     use AnyEvent::Radius::Client;
 
     my $dict = AnyEvent::Radius::Client->load_dictionary('path-to-radius-dictionary');
-    
+
     sub read_reply_callback {
         # $h is HASH-REF {type, request_id, av_list, from, authenticator}
         my ($self, $h) = @_;
@@ -49,9 +49,9 @@ Sergey Leschenko <sergle.ua at gmail.com>
 PortaOne Development Team <perl-radius at portaone.com> is the current module's maintainer at CPAN.
 
 =head1 COPYRIGHT & LICENSE
- 
+
 Copyright 2016 PortaOne Inc., all rights reserved.
- 
+
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 

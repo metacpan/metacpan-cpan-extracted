@@ -1,6 +1,5 @@
 package Net::SAML2::IdP;
 use Moose;
-use MooseX::Types::Moose qw/ Str Object HashRef ArrayRef /;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
 
@@ -12,14 +11,14 @@ use LWP::UserAgent;
 use XML::XPath;
 
 
-has 'entityid'       => (isa => Str, is => 'ro', required => 1);
-has 'cacert'         => (isa => 'Maybe[Str]', is => 'ro', required => 1);
-has 'sso_urls'       => (isa => HashRef[Str], is => 'ro', required => 1);
-has 'slo_urls'       => (isa => 'Maybe[HashRef[Str]]', is => 'ro', required => 0);
-has 'art_urls'       => (isa => 'Maybe[HashRef[Str]]', is => 'ro', required => 0);
-has 'certs'          => (isa => HashRef[Str], is => 'ro', required => 1);
-has 'formats'        => (isa => HashRef[Str], is => 'ro', required => 1);
-has 'default_format' => (isa => Str, is => 'ro', required => 1);
+has 'entityid' => (isa => 'Str',          is => 'ro', required => 1);
+has 'cacert'   => (isa => 'Maybe[Str]',   is => 'ro', required => 1);
+has 'sso_urls' => (isa => 'HashRef[Str]', is => 'ro', required => 1);
+has 'slo_urls' => (isa => 'Maybe[HashRef[Str]]', is => 'ro');
+has 'art_urls' => (isa => 'Maybe[HashRef[Str]]', is => 'ro');
+has 'certs'    => (isa => 'HashRef[Str]',        is => 'ro', required => 1);
+has 'formats'  => (isa => 'HashRef[Str]',        is => 'ro', required => 1);
+has 'default_format' => (isa => 'Str', is => 'ro', required => 1);
 
 
 sub new_from_url {
@@ -221,7 +220,7 @@ Net::SAML2::IdP
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -305,7 +304,8 @@ This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
             2015       Mike Wisener
             2016       Jeff Fearn
             2017       Alessandro Ranellucci
-            2019-2020  Timothy Legge
+            2019       Timothy Legge
+            2020       Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

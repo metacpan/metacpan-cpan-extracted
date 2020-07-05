@@ -2,6 +2,26 @@ Changes for the DBD::Pg module
 
 RT refers to rt.cpan.org
 
+Version 3.13.0  (released June 17, 2020)
+
+ - Redo the "last_result" internals in dbdimp.c, which 
+     fixes a memory leak.
+   [Greg Sabino Mullane]
+   (RT ticket #132812)
+
+ - Fix regression in Perl length() for returned query results
+   [Jon Jensen]
+   (Github issue #72)
+
+ - Make $sth->finish() do a little less. Notably, even 
+     after calling finish(), pg_error_field will still work
+     on the last action performed.
+   [Greg Sabino Mullane]
+
+ - Tweak tests so Windows boxes pass
+   [Greg Sabino Mullane]
+
+
 Version 3.12.3  (released June 5, 2020)
 
  - Prevent DBI from flipping AutoCommit to 'on' after a failed commit
@@ -1258,7 +1278,7 @@ Version 2.8.1  (released June 11, 2008)
 
 Version 2.8.0  (released June 1, 2008)
 
- - Added in payload strings for LISTEN/NOTIFY in 8.4 via $dbh->pg_notifies()
+ - Added in payload strings for LISTEN/NOTIFY in 9.0 via $dbh->pg_notifies()
    [Greg Sabino Mullane]
  
  - Fixed problem preventing some pg_type bind_arrays from working

@@ -62,3 +62,14 @@ foo #:comment\nbar	foo bar
  x :*/foo,bar/*	x :'*/foo','bar/*'
  x :	x
  x :*	x :'*'
+
+##-- negative dates (v2.2.4)
+Plato #has_date[-427]	Plato #has_date['-427']
+Plato #asc_date[-427,-347]	Plato #asc_date['-427','-347']
+Plato #asc_date[-0427-01-01,-0347-12-31]	Plato #asc_date['-0427-01-01','-0347-12-31']
+
+# bareword dates need at least 4 digits of year
+Plato #asc_date[-427-01-01,-347-12-31]
+
+1066	'1066'
+-424	'-424'

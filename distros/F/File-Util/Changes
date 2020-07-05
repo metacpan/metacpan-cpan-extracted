@@ -1,5 +1,12 @@
 Revision history for Perl extension File::Util.pm
 
+4.201720 2020-06-19
+   - Bugfix for issue where @INC was being disrupted, detailed at
+     https://rt.cpan.org/Ticket/Display.html?id=132060
+
+     Sorry for the delay in fixing it - coronavirus happened to the world :(
+     Good luck everyone and please stay safe.
+
 4.161950 2016-07-12
   - This release fixes a critical bug in the list_dir() method, detailed at
     https://rt.cpan.org/Public/Bug/Display.html?id=115511

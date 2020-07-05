@@ -15,6 +15,10 @@ author/5.30/build-paws/Dockerfile
 author/5.30/build/Dockerfile
 author/5.30/run-paws/Dockerfile
 author/5.30/run/Dockerfile
+author/5.32/build-paws/Dockerfile
+author/5.32/build/Dockerfile
+author/5.32/run-paws/Dockerfile
+author/5.32/run/Dockerfile
 author/build-paws-layer.sh
 author/build-paws.sh
 author/build-perl-runtime.sh
@@ -23,10 +27,10 @@ author/cfn-layer-paws.yml
 author/cfn-layer.yml
 author/cfn-s3.yml
 author/deploy-s3-stack.sh
-author/list-perl-runtime.sh
 author/perlstrip.sh
 author/publish-perl-runtime.sh
 author/regions.txt
+author/update-aws-lambda.pl
 author/validate-account.sh
 author/validate-template.sh
 cpanfile

@@ -23,6 +23,12 @@ has args => (
 	default => sub { [] }
 );
 
+has 'use_argv_map' => ( is => 'rw', isa => 'Bool' );
+
+############################
+###### PUBLIC METHODS ######
+############################
+
 method parse (HashRef :$href!) {
 
 	# self->name

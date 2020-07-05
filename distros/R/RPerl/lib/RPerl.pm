@@ -6,10 +6,10 @@ use strict;
 use warnings;
 
 # DEV NOTE, CORRELATION #rp016: CPAN's underscore-is-beta (NOT RPerl's underscore-is-comma) numbering scheme utilized here, to preserve trailing zeros
-our $VERSION = '5.002000';
+our $VERSION = '7.000000';
 
-#our $VERSION = 20191128;    # NON-RELEASE VERSION NUMBER, OFFICIAL LONGDATE
-#our $VERSION = 2019.332;    # NON-RELEASE VERSION NUMBER, OFFICIAL STARDATE
+#our $VERSION = 20200704;    # NON-RELEASE VERSION NUMBER, OFFICIAL LONGDATE
+#our $VERSION = 2020.186;    # NON-RELEASE VERSION NUMBER, OFFICIAL STARDATE
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
@@ -290,7 +290,7 @@ __END__
 
 =encoding utf8
 
-=for DEV NOTE: BEGIN INLINE CSS DIV
+=for comment DEV NOTE: BEGIN INLINE CSS DIV
 
 =begin html
 
@@ -447,7 +447,7 @@ Filename F<My/FooPackage.pm>:
         { my string $RETURN_TYPE };
         ( my integer $arg ) = @ARG;
         print 'in My::FooPackage::foo_exported_ok(), received $arg = ', $arg, "\n";
-        return ('howdy' x $arg);
+        return('howdy' x $arg);
     }
     
     1;    # end of class
@@ -497,7 +497,7 @@ Filename F<My/BarClass.pm>:
         { my number::method $RETURN_TYPE };
         ( my My::BarClass $self, my integer $arg ) = @ARG;
         print 'in My::BarClass->bar_method2(), received $arg = ', $arg, "\n";
-        return ($self->{bar_number} * $arg);
+        return($self->{bar_number} * $arg);
     }
     
     1;    # end of class

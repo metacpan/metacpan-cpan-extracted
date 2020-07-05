@@ -6,6 +6,8 @@ use routines;
 
 use Test::Auto;
 use Test::More;
+use File::Spec::Functions;
+use File::Temp;
 
 =name
 
@@ -36,6 +38,7 @@ method: base
 method: bless
 method: build
 method: call
+method: chain
 method: child
 method: children
 method: cop
@@ -61,6 +64,7 @@ method: parts
 method: prepend
 method: rebase
 method: require
+method: reload
 method: root
 method: routine
 method: routines
@@ -409,6 +413,72 @@ call(Any @args) : Any
   $space->call('start')
 
   # bless({}, 'Zoo')
+
+=cut
+
+=method chain
+
+The chain method chains one or more method calls and returns the result.
+
+=signature chain
+
+chain(Str | Tuple[Str, Any] @steps) : Any
+
+=example-1 chain
+
+  package Chu::Chu0;
+
+  sub import;
+
+  package main;
+
+  my $space = Data::Object::Space->new('Chu::Chu0');
+
+  $space->chain('bless');
+
+=example-2 chain
+
+  package Chu::Chu1;
+
+  sub import;
+
+  sub new {
+    bless pop;
+  }
+
+  sub frame {
+    [@_]
+  }
+
+  package main;
+
+  my $space = Data::Object::Space->new('Chu::Chu1');
+
+  $space->chain(['bless', {1..4}], 'frame');
+
+  # [ bless( { '1' => 2, '3' => 4 }, 'Chu::Chu1' ) ]
+
+=example-3 chain
+
+  package Chu::Chu2;
+
+  sub import;
+
+  sub new {
+    bless pop;
+  }
+
+  sub frame {
+    [@_]
+  }
+
+  package main;
+
+  my $space = Data::Object::Space->new('Chu::Chu2');
+
+  $space->chain('bless', ['frame', {1..4}]);
+
+  # [ bless( {}, 'Chu::Chu2' ), { '1' => 2, '3' => 4 } ]
 
 =cut
 
@@ -1092,6 +1162,48 @@ require(Str $target) : Any
 
 =cut
 
+=method reload
+
+The reload method attempts to delete and reload the package namespace using the
+L</load> method. B<Note:> Reloading is additive and will overwrite existing
+symbols but does not remove symbols.
+
+=signature reload
+
+reload() : Str
+
+=example-1 reload
+
+  package main;
+
+  use Data::Object::Space;
+
+  # Foo::Gen is generate with $VERSION as 0.01
+
+  my $space = Data::Object::Space->new('foo/gen');
+
+  $space->reload;
+
+  # Foo::Gen
+  # Foo::Gen->VERSION is 0.01
+
+=example-2 reload
+
+  package main;
+
+  use Data::Object::Space;
+
+  # Foo::Gen is regenerated with $VERSION as 0.02
+
+  my $space = Data::Object::Space->new('foo/gen');
+
+  $space->reload;
+
+  # Foo::Gen
+  # Foo::Gen->VERSION is 0.02
+
+=cut
+
 =method root
 
 The root method returns the root package namespace segments (parts). Sometimes
@@ -1106,7 +1218,7 @@ root() : Str
 
   # given: synopsis
 
-  $space->root
+  $space->root;
 
   # Foo
 
@@ -1494,6 +1606,8 @@ my $test = testauto(__FILE__);
 
 my $subs = $test->standard;
 
+my $path = File::Temp::tempdir(CLEANUP => 1);
+
 $subs->synopsis(fun($tryable) {
   ok my $result = $tryable->result;
 
@@ -1599,6 +1713,27 @@ $subs->example(-1, 'call', 'method', fun($tryable) {
 $subs->example(-2, 'call', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   ok $result->isa('Zoo');
+
+  $result
+});
+
+$subs->example(-1, 'chain', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->isa('Chu::Chu0');
+
+  $result
+});
+
+$subs->example(-2, 'chain', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply [ bless( { '1' => 2, '3' => 4 }, 'Chu::Chu1' ) ], $result;
+
+  $result
+});
+
+$subs->example(-3, 'chain', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply [ bless( {}, 'Chu::Chu2' ), { '1' => 2, '3' => 4 } ], $result;
 
   $result
 });
@@ -1857,6 +1992,44 @@ $subs->example(-1, 'rebase', 'method', fun($tryable) {
 $subs->example(-1, 'require', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is $result, 1;
+
+  $result
+});
+
+$subs->example(-1, 'reload', 'method', fun($tryable) {
+  mkdir File::Spec::Functions::catdir($path, 'Foo');
+  my $file = File::Spec::Functions::catfile($path, 'Foo', 'Gen.pm');
+  open my $fh, '>', $file or die "File error: $!";
+  my @subs = map "sub $_ {1}", 'a'..'d';
+  print $fh join ";\n\n", 'package Foo::Gen', 'our $VERSION = 0.01', @subs, 1;
+  close $fh;
+  push @INC, $path;
+
+  ok(my $result = $tryable->result);
+  is($result, 'Foo::Gen');
+  is($Foo::Gen::VERSION, 0.01);
+  is(Foo::Gen->VERSION, 0.01);
+  ok(Foo::Gen->can($_)) for 'a'..'d';
+
+  $result
+});
+
+$subs->example(-2, 'reload', 'method', fun($tryable) {
+  mkdir File::Spec::Functions::catdir($path, 'Foo');
+  my $file = File::Spec::Functions::catfile($path, 'Foo', 'Gen.pm');
+  open my $fh, '>', $file or die "File error: $!";
+  my @subs = map "sub $_ {0}", 'a','e'..'g';
+  print $fh join ";\n\n", 'package Foo::Gen', 'our $VERSION = 0.02', @subs, 1;
+  close $fh;
+  push @INC, $path;
+
+  ok(my $result = $tryable->result);
+  is($result, 'Foo::Gen');
+  is($Foo::Gen::VERSION, 0.02);
+  is(Foo::Gen->VERSION, 0.02);
+  ok(Foo::Gen->can($_)) for 'a', 'e'..'g';
+  ok(Foo::Gen->can($_)) for qw(b c d);
+  ok(!Foo::Gen->a);
 
   $result
 });

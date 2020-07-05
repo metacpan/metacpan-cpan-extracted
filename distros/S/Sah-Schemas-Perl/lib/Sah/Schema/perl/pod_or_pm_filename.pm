@@ -1,9 +1,9 @@
 package Sah::Schema::perl::pod_or_pm_filename;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-16'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 our $schema = [str => {
     summary => 'A .pod or .pm filename, e.g. /path/Foo.pm or /path/Bar/Baz.pod',
@@ -76,7 +76,7 @@ Sah::Schema::perl::pod_or_pm_filename - A .pod or .pm filename, e.g. /path/Foo.p
 
 =head1 VERSION
 
-This document describes version 0.033 of Sah::Schema::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
+This document describes version 0.034 of Sah::Schema::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
 
 =head1 SYNOPSIS
 

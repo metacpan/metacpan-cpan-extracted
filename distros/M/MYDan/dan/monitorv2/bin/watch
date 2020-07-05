@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use POSIX;
+use YAML::XS;
+use File::Basename;
+use MYDan::Util::OptConf;
+use MYDan::Subscribe;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'monitorv2';
+
+=head1 SYNOPSIS
+
+ $0 
+
+ $0 --interval 3
+
+ $0 [--interval seconds]
+
+ $0 [--interval seconds] [--subscribe]
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( interval=i subscribe ) )->dump();
+my %bootstrap = $option->dump( 'bootstrap' );
+
+while(1)
+{
+    system 'clear' if $o{interval};
+
+    my ( $err, %re ) = ( 0 );
+    for ( map{ basename $_ }glob "$bootstrap{exec}/*" )
+    {
+        next unless $_ =~ /^monitorv2\.collector\.(.+)$/;
+        my $name = $1;
+
+        my $mtime = ( stat "$o{run}/$name" )[9];
+        unless( $mtime )
+        {
+            subscribe( $name, $re{$name} = "SysErr: nofind $o{run}/$name" );
+            $err ++;
+            next;
+        }
+        my $conf = eval{ YAML::XS::LoadFile "$o{conf}/$name" };
+        unless( $conf && ref $conf eq 'HASH' && $conf->{interval} )
+        {
+            subscribe( $name, $re{$name} = "SysErr: load config fail" );
+            $err ++;
+            next;
+        }
+
+        unless( $mtime && $conf->{interval} && $mtime + $conf->{interval} + 2 > time )
+        {
+            subscribe( $name, $re{$name} = "SysErr: monitorv2 fail" );
+            $err ++;
+            next;
+        }
+
+        $re{$name} = eval{ YAML::XS::LoadFile "$o{run}/$name" };
+        $re{$name} = $@ if $@;
+
+        $re{$name} = 'ok' if ref $re{$name} eq 'HASH' && ! keys %{$re{$name}};
+        $err ++ unless $re{$name} eq 'ok';
+    }
+
+    my $time = POSIX::strftime( "%Y-%m-%d_%H:%M:%S", localtime );
+    print YAML::XS::Dump $time, \%re, $err;
+
+    exit 0 unless $o{interval};
+    sleep $o{interval};
+}
+
+sub subscribe
+{
+   my ( $name, $mesg, $attr ) = @_;
+
+   return unless $o{subscribe};
+
+   #config's name : foo_sysinfo, app's name : foo
+   my $n = $name;
+   $n =~ s/_[a-zA-Z0-9]+$//;
+
+   MYDan::Subscribe->new()->input( "$name $mesg", $n, "mydan_monitorv2_SysErr" );
+}

@@ -1,11 +1,13 @@
 package Yancy::I18N;
-our $VERSION = '1.061';
+our $VERSION = '1.064';
 # ABSTRACT: Internationalization (i18n) for Yancy
 
 #pod =head1 SYNOPSIS
 #pod
 #pod     # XXX: Show how to set the language of Yancy
 #pod     # XXX: Show how to create a custom lexicon
+#pod     # XXX: Show examples of bracket notation (quant, numf, numerate,
+#pod     # sprintf, and positional parameters)
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -60,12 +62,14 @@ Yancy::I18N - Internationalization (i18n) for Yancy
 
 =head1 VERSION
 
-version 1.061
+version 1.064
 
 =head1 SYNOPSIS
 
     # XXX: Show how to set the language of Yancy
     # XXX: Show how to create a custom lexicon
+    # XXX: Show examples of bracket notation (quant, numf, numerate,
+    # sprintf, and positional parameters)
 
 =head1 DESCRIPTION
 

@@ -16,7 +16,6 @@ struct CheckImpl : HandleImpl {
     virtual void stop  () = 0;
 
     void handle_check () noexcept {
-        panda_mlog_debug(uebacklog, "on check " << loop);
         ltry([&]{ listener->handle_check(); });
     }
 };

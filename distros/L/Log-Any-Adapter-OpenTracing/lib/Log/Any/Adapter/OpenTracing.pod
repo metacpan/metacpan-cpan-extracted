@@ -1,0 +1,53 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Log::Any::Adapter::OpenTracing
+at lib/Log/Any/Adapter/OpenTracing.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Log::Any::Adapter::OpenTracing - Log::Any support for OpenTracing spans
+
+=head1 SYNOPSIS
+
+ use OpenTracing::DSL qw(:v1);
+ use Log::Any qw($log);
+ use Log::Any::Adapter qw(OpenTracing);
+ trace {
+  $log->info('Messages in a span should be logged');
+ };
+ $log->info('Messages outside a span would not be logged');
+
+=head1 DESCRIPTION
+
+This L<Log::Any::Adapter> implementation provides support for log messages attached
+to L<OpenTracing::Span> instances.
+
+It's most likely to be useful in conjunction with L<Log::Any::Adapter::Multiplexor>,
+so that you keep STDERR/file logging and augment spans whenever they are active.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Log::Any::Adapter::Base>
+
+L<delegate_method_to_slot|Log::Any::Adapter::Base/delegate_method_to_slot>, L<new|Log::Any::Adapter::Base/new>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth C<TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2019-2020. Licensed under the same terms as Perl itself.
+

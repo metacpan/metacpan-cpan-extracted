@@ -1,0 +1,76 @@
+NAME
+    Regexp::Pattern::Filename::Archive - Archive filename
+
+VERSION
+    This document describes version 0.001 of
+    Regexp::Pattern::Filename::Archive (from Perl distribution
+    Regexp-Pattern-Filename-Archive), released on 2020-04-01.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Filename::Archive::filename_archive");
+
+DESCRIPTION
+    This is a Regexp::Pattern wrapper for Filename::Archive.
+
+PATTERNS
+    *   filename_archive
+
+        Archive filename.
+
+        Examples:
+
+        No extension.
+
+         "foo" =~ re("Filename::Archive::filename_archive");  # doesn't match
+
+        Not an extension.
+
+         "zip" =~ re("Filename::Archive::filename_archive");  # doesn't match
+
+         "foo.zip" =~ re("Filename::Archive::filename_archive");  # matches
+
+        Plus compression.
+
+         "foo.tar.gz" =~ re("Filename::Archive::filename_archive");  # matches
+
+        Case insensitive.
+
+         "foo bar.TBZ" =~ re("Filename::Archive::filename_archive");  # matches
+
+        Regex is anchored.
+
+         "foo.ARJ is the file" =~ re("Filename::Archive::filename_archive");  # doesn't match
+
+         "foo.txt" =~ re("Filename::Archive::filename_archive");  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Filename-Archive>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Filename-Archive>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Filena
+    me-Archive>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern
+
+    Filename::Archive
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

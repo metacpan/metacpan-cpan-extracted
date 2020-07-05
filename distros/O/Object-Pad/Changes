@@ -1,5 +1,28 @@
 Revision history for Object-Pad
 
+0.31    2020-06-30
+        [CHANGES]
+         * Don't emit a named method for BUILD blocks
+            + Enables subclassing of Moo classes
+         * Begin documenting the (double-experimental) Object::Pad::MOP API
+
+        [BUGFIXES]
+         * Parser fix for `class NAME VERSION extends ...` without a linefeed
+           (RT132903)
+         * Placate some compiler warnings of uninitialised values
+         * Find a different way to trigger class sealing which doesn't depend
+           on `free` magic of hinthash values, in order to avoid core perl bug
+             https://github.com/Perl/perl5/issues/17903
+         * Various small fixes to keep -DDEBUGGING perl happy
+
+0.30    2020-06-20
+        [CHANGES]
+         * Make generated writer methods return $self, for convenient chaining
+         * Apply argument checking to generated accessor methods
+         * Improved performance of constructor, by storing BUILD blocks
+           directly in the class metadata, avoiding runtime method lookup
+         * Updates for XS::Parse::Sublike 0.10
+
 0.29    2020-06-16
         [CHANGES]
          * Accept :override attribute on methods

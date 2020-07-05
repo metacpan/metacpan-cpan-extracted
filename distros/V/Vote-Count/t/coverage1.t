@@ -18,29 +18,23 @@ use Path::Tiny;
 use Vote::Count;
 use Vote::Count::ReadBallots;
 
-my $RCV1 = Vote::Count->new(
-  BallotSet => read_ballots('t/data/data1.txt'), );
-my $Range1 = Vote::Count->new(
+my $RCV1 = Vote::Count->new( BallotSet => read_ballots('t/data/data1.txt'), );
+my $Range1 =
+  Vote::Count->new(
   BallotSet => read_range_ballots('t/data/fastfood.range.json') );
 
 is( $RCV1->BallotSetType(),
-  'rcv',
-  'confirm ballotset type for an rcv ballotset.');
+  'rcv', 'confirm ballotset type for an rcv ballotset.' );
 
-my $invalid = Vote::Count->new(
-  BallotSet => read_ballots('t/data/data1.txt'), );
-$invalid->{'BallotSet'}{'options'} = {'ordrange' => 1};
-dies_ok(
-    sub { $invalid->BallotSetType() ; },
-    "unkown ballot type dies on call of BallotSetType"
-  );
+my $invalid =
+  Vote::Count->new( BallotSet => read_ballots('t/data/data1.txt'), );
+$invalid->{'BallotSet'}{'options'} = { 'ordrange' => 1 };
+dies_ok( sub { $invalid->BallotSetType(); },
+  "unkown ballot type dies on call of BallotSetType" );
 
-$Range1->SetActiveFromArrayRef( [ "FIVEGUYS", "MCDONALDS", "WIMPY" ]);
-is_deeply(
-  $Range1->Active(),
+$Range1->SetActiveFromArrayRef( [ "FIVEGUYS", "MCDONALDS", "WIMPY" ] );
+is_deeply( $Range1->Active(),
   { 'WIMPY' => 1, 'MCDONALDS' => 1, 'FIVEGUYS' => 1 },
-  'SetActiveFromArrayRef');
-
-
+  'SetActiveFromArrayRef' );
 
 done_testing();

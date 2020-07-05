@@ -60,6 +60,25 @@ METHODS
     Returns a Future, although the content of the response is subject to
     change.
 
+ conversations_info
+
+    Provide information about a channel.
+
+    Takes the following named parameters:
+
+      * channel - the channel ID to look up
+
+    and returns a Future which will resolve to a hashref containing {
+    channel => { name => '...' } }.
+
+ join_channel
+
+    Attempt to join the given channel.
+
+    Takes the following named parameters:
+
+      * channel - the channel ID or name to join
+
 METHODS - Internal
 
  endpoints
@@ -112,6 +131,6 @@ AUTHOR
 
 LICENSE
 
-    Copyright Tom Molesworth 2016-2017. Licensed under the same terms as
+    Copyright Tom Molesworth 2016-2020. Licensed under the same terms as
     Perl itself.
 

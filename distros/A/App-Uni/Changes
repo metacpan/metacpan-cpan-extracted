@@ -1,5 +1,10 @@
 Revision history for App-Uni
 
+9.004     2020-07-03 11:55:58-04:00 America/New_York
+        - add the most basic of test files
+        - work with perl 5.32.0, where the secret bit of guts we used has
+          changed (thanks, Dagfinn Ilmari Mannsåker)
+
 9.003     2015-11-05 23:09:51-05:00 America/New_York
         - when printing combining marks, give them a DOTTED CIRCLE
           with which to combing (◌)

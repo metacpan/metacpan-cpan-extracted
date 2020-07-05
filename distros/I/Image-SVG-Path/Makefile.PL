@@ -23,6 +23,7 @@ WriteMakefile (
 	    'Alessandro Ranellucci <aar@cpan.org>',
 	    'Colin Kuskie <colink@cpan.org>',
 	    'Alexander Gorlov',
+	    'kekoa',
 	],
     },
     MIN_PERL_VERSION => '5.006001',

@@ -2,7 +2,7 @@ package Syntax::Highlight::Engine::Simple::HTML;
 use strict;
 use warnings;
 use base qw(Syntax::Highlight::Engine::Simple);
-our $VERSION = '0.05';
+our $VERSION = '0.051';
 
 ### ----------------------------------------------------------------------------
 ### set syntax

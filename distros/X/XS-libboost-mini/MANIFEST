@@ -1,4 +1,5 @@
 Changes
+include/boost/array.hpp
 include/boost/assert.hpp
 include/boost/blank.hpp
 include/boost/blank_fwd.hpp
@@ -280,6 +281,7 @@ include/boost/container_hash/hash_fwd.hpp
 include/boost/core/addressof.hpp
 include/boost/core/checked_delete.hpp
 include/boost/core/demangle.hpp
+include/boost/core/empty_value.hpp
 include/boost/core/enable_if.hpp
 include/boost/core/exchange.hpp
 include/boost/core/explicit_operator_bool.hpp
@@ -291,6 +293,7 @@ include/boost/core/no_exceptions_support.hpp
 include/boost/core/noncopyable.hpp
 include/boost/core/null_deleter.hpp
 include/boost/core/pointer_traits.hpp
+include/boost/core/quick_exit.hpp
 include/boost/core/ref.hpp
 include/boost/core/scoped_enum.hpp
 include/boost/core/swap.hpp
@@ -300,7 +303,7 @@ include/boost/crc.hpp
 include/boost/cstdint.hpp
 include/boost/current_function.hpp
 include/boost/detail/container_fwd.hpp
-include/boost/detail/no_exceptions_support.hpp
+include/boost/detail/iterator.hpp
 include/boost/detail/templated_streams.hpp
 include/boost/detail/workaround.hpp
 include/boost/exception/exception.hpp
@@ -1389,7 +1392,6 @@ include/boost/predef/os/bsd/free.h
 include/boost/predef/os/bsd/net.h
 include/boost/predef/os/bsd/open.h
 include/boost/predef/os/ios.h
-include/boost/predef/os/linux.h
 include/boost/predef/os/macos.h
 include/boost/predef/os/windows.h
 include/boost/predef/platform.h
@@ -1699,6 +1701,7 @@ include/boost/random/variate_generator.hpp
 include/boost/serialization/level.hpp
 include/boost/serialization/level_enum.hpp
 include/boost/static_assert.hpp
+include/boost/swap.hpp
 include/boost/throw_exception.hpp
 include/boost/tti/detail/dcomp_mem_fun.hpp
 include/boost/tti/detail/ddeftype.hpp
@@ -1721,10 +1724,16 @@ include/boost/type_traits/alignment_of.hpp
 include/boost/type_traits/conditional.hpp
 include/boost/type_traits/declval.hpp
 include/boost/type_traits/detail/config.hpp
+include/boost/type_traits/detail/is_function_cxx_03.hpp
+include/boost/type_traits/detail/is_function_cxx_11.hpp
+include/boost/type_traits/detail/is_function_msvc10_fix.hpp
 include/boost/type_traits/detail/is_function_ptr_helper.hpp
 include/boost/type_traits/detail/is_function_ptr_tester.hpp
 include/boost/type_traits/detail/is_mem_fun_pointer_impl.hpp
 include/boost/type_traits/detail/is_mem_fun_pointer_tester.hpp
+include/boost/type_traits/detail/is_member_function_pointer_cxx_03.hpp
+include/boost/type_traits/detail/is_member_function_pointer_cxx_11.hpp
+include/boost/type_traits/detail/is_rvalue_reference_msvc10_fix.hpp
 include/boost/type_traits/detail/yes_no_type.hpp
 include/boost/type_traits/has_trivial_constructor.hpp
 include/boost/type_traits/has_trivial_copy.hpp
@@ -1752,6 +1761,7 @@ include/boost/type_traits/is_integral.hpp
 include/boost/type_traits/is_lvalue_reference.hpp
 include/boost/type_traits/is_member_function_pointer.hpp
 include/boost/type_traits/is_member_pointer.hpp
+include/boost/type_traits/is_noncopyable.hpp
 include/boost/type_traits/is_pod.hpp
 include/boost/type_traits/is_pointer.hpp
 include/boost/type_traits/is_polymorphic.hpp

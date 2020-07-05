@@ -24,7 +24,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Currency
   homepage: https://metacpan.org/release/Sah-Schemas-Currency
   repository: git://github.com/perlancar/perl-Sah-Schemas-Currency.git
-version: '0.006'
+version: '0.008'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

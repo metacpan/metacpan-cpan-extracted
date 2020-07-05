@@ -6,7 +6,7 @@ use 5.022;
 use Test2::V0;
 use Test2::Bundle::More;
 use Test::Exception;
-use Data::Printer;
+use Data::Dumper;
 
 use Path::Tiny;
 
@@ -15,7 +15,7 @@ use Vote::Count::ReadBallots 'read_ballots', 'read_range_ballots';
 
 my $VC1 = Vote::Count->new( BallotSet => read_ballots('t/data/data2.txt'), );
 
-my $A1       = $VC1->Approval();
+# my $A1       = $VC1->Approval();
 my $expectA1 = {
   CARAMEL    => 1,
   CHOCOLATE  => 8,
@@ -27,15 +27,32 @@ my $expectA1 = {
   VANILLA    => 10
 };
 
-is_deeply( $A1->RawCount(), $expectA1,
-  "Approval counted for a small set with no active list" );
+my $expectNonA1 = {
+  CARAMEL    => 14,
+  CHOCOLATE  => 7,
+  MINTCHIP   => 7,
+  PISTACHIO  => 13,
+  ROCKYROAD  => 13,
+  RUMRAISIN  => 14,
+  STRAWBERRY => 10,
+  VANILLA    => 5
+};
+
+is_deeply( $VC1->Approval()->RawCount(),
+  $expectA1, "Approval counted for a small set with no active list" );
+
+# done_testing();
+# =pod
+
+is_deeply( $VC1->NonApproval()->RawCount(),
+  $expectNonA1, "the NonApproval count from the same set" );
 
 my $A2 = $VC1->Approval(
   {
     'VANILLA'   => 1,
     'CHOCOLATE' => 1,
     'CARAMEL'   => 1,
-    'PISTACHIO' => 0
+    'PISTACHIO' => 1,
   }
 );
 my $expectA2 = {
@@ -47,6 +64,10 @@ my $expectA2 = {
 
 is_deeply( $A2->RawCount(), $expectA2,
   "Approval counted a small set with AN active list" );
+
+my $expectNonA2 = {
+
+};
 
 my $Range1 =
   Vote::Count->new(
@@ -91,6 +112,21 @@ my $expectR2A = {
 };
 is_deeply( $R2A->RawCount(), $expectR2A,
   'counted approval for a second range ballotset' );
+
+my $expectR2NONA = {
+  "FIVEGUYS"   => 6,
+  "MCDONALDS"  => 5,
+  "WIMPY"      => 0,
+  "WENDYS"     => 3,
+  "QUICK"      => 3,
+  "BURGERKING" => 11,
+  "INNOUT"     => 10,
+  "CARLS"      => 7,
+  "KFC"        => 4,
+  "TACOBELL"   => 4,
+  "CHICKFILA"  => 6,
+  "POPEYES"    => 4,
+};
 
 my $R2B = $Range2->Approval( undef, 2 );
 my $expectR2B = {

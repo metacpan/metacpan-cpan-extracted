@@ -1,0 +1,95 @@
+NAME
+
+    Sub::Attribute::Prototype - polyfill for :prototype attribute on older
+    perls
+
+SYNOPSIS
+
+       use Sub::Attribute::Prototype;
+    
+       sub afunc :prototype(&@) {
+          ...
+       }
+
+DESCRIPTION
+
+    This polyfill allows a module to use the :prototype function attribute
+    to apply a prototype to a function, even on perls too old to natively
+    support it.
+
+    Perl version 5.20 introduced the :prototype attribute, as part of the
+    wider work surrounding subroutine signatures. This allows a function to
+    declare a prototype even when the use feature 'signatures' pragma is in
+    effect.
+
+    If a newer version of perl switches the defaults to making signature
+    syntax default, it will no longer be possible to write prototype-using
+    functions using the old syntax, so authors will have to use :prototype
+    instead. By using this polyfill module, an author can ensure such
+    syntax is still recognised by perl versions older than 5.20.
+
+    When used on a version of perl new enough to natively support the
+    :prototype attribute (i.e. 5.20 or newer), this module does nothing.
+    Any :prototype attribute syntax used by the user of this module is
+    simply handled by core perl in the normal way.
+
+    When used on an older version of perl, a polyfilled compatibility
+    attribute is provided to the caller to (mostly) perform the same work
+    that newer versions of perl would do; subject to some caveats.
+
+ Caveats
+
+    The following caveats should be noted about the pre-5.20 polyfilled
+    version of the :prototype attribute.
+
+      * Due to the way that attributes are applied to functions, it is not
+      possible to apply the prototype immediately during compiletime.
+      Instead, they must be deferred until a slightly later time. The
+      earliest time that can feasibly be implemented is UNITCHECK time of
+      the importing module.
+
+      This has the unfortunate downside that function prototypes are NOT
+      visible to later functions in the module itself, though they are
+      visible to the importing code in the usual way. This means that
+      exported functions will work just fine from the perspective of a
+      module that uses them, they cannot be used internally within the
+      module itself.
+
+      Because this limitation only applies to the polyfilled version of the
+      attribute for older versions of perl, it means the behavior will
+      differ on a newer version of perl. Thus it is important that if you
+      wish call a prototyped function from other parts of your module, you
+      must use the prototype-defeating form of
+
+         my $result = &one_of_my_functions( @args )
+
+      in order to get reliable behaviour between older and newer perl
+      versions.
+
+      * Perl versions older than 5.20 will provoke a warning in the
+      reserved category when they encounter the attribute syntax provided
+      by this polyfill, even though the polyfill has consumed the
+      attribute. In order not to cause this warning to appear to users of
+      modules using this syntax, it is necessary for this polyfill to
+      suppress the entire reserved warning category. This means that all
+      such warnings will be silenced, including those about different
+      attributes.
+
+      * Because core perl does not have a built-in way for exporter to
+      inject a UNITCHECK block into their importer, it is necessary to use
+      a non-core XS module, B::CompilerPhase::Hook, to provide this. As a
+      result, this polyfill has non-core depenencies when running on older
+      perl versions, and this dependency includes XS (i.e. compiled) code,
+      and is no longer Pure Perl. It will not be possible to use tools such
+      as App::FatPacker to bundle this dependency in order to ship a
+      pure-perl portable script.
+
+    It should be stressed that none of these limitations apply when running
+    on a version of perl 5.20 or later. Though in that case there is no
+    need to use this polyfill at all, because the :prototype attribute will
+    be natively recognised.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

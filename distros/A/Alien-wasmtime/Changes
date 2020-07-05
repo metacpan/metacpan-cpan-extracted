@@ -1,5 +1,11 @@
 Revision history for Alien-wasmtime},
 
+0.11      2020-06-25 16:23:51 -0600
+  - Bump to version 0.18.0 (gh#15)
+  - Arm64 / Aarch64 no longer forced the dev version as 0.18.0
+    properly supports Arm64 (gh#15)
+  - Changed git repository default branch to `main`.
+
 0.10      2020-05-17 08:59:17 -0600
   - Remove memory test from t/alien_wasmtime.t.  This is better
     handled in Wasm::Wasmtime now that the memory allocation

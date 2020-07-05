@@ -1,0 +1,137 @@
+
+=head1 NAME
+
+OpenTracing::WrapScope - Automatically add spans to selected subroutines
+
+
+
+=head1 SYNOPSIS
+
+    use OpenTracing::WrapScope qw/foo Foo::bar/;
+    use Foo;
+      
+    sub foo { ... }
+   
+    package Foo {
+        sub bar { ... }
+    }
+
+or:
+
+    use OpenTracing::WrapScope;
+
+    OpenTracing::WrapScope::install_wrapped('foo');
+    OpenTracing::WrapScope::install_wrapped('Foo::Bar');
+
+which is roughly equivalent to:
+
+    use OpenTracing::AutoScope;
+    
+    sub foo {
+        OpenTracing::AutoScope->start_guarded_span();
+        ...
+    }
+    
+    package Foo {
+        sub bar {
+            OpenTracing::AutoScope->start_guarded_span();
+            ...
+        }
+    }
+
+
+
+=head1 IMPORT ARGUMENTS
+
+import takes subroutine names as arguments, these need to be fully qualified 
+if they are not in the current package. All specified subroutines will have
+spans attached to them. Context and caller frames will be preserved.
+
+The following tags will be automatically added to each span:
+
+=over 4
+
+=item caller.file - filename where the subroutine was called
+
+=item caller.line - line number on which the subroutine was called
+
+=item caller.package - the calling package
+
+=item caller.subname - the name of the calling subroutine (won't be added if there is none)
+
+=item source.file - filename where the subroutine is defined
+
+=item source.line - line on which the subroutine is defined
+
+=item source.package - package in which the subroutine is located
+
+=item source.subname - the name of the subroutine
+
+=back
+
+Additionally, if a wrapped subroutine dies, an additional C<error> tag,
+containing the error message (C<$@>) will be added to the span.
+
+
+=head1 FUNCTIONS
+
+=head2 install_wrapped($sub)
+
+Replaces the specified subroutine with a span-handling version.
+$sub needs to be a fully qualified subroutine name or an unqualified name
+from the current package. The subroutine needs to be defined or a warning
+will be thrown. This warning can be made fatal with:
+
+  use warnings FATAL => 'OpenTracing::WrapScope';
+
+or disabled with:
+
+  no warnings 'OpenTracing::WrapScope';
+
+=head2 wrapped($code_ref)
+
+Returns a version of the given code reference with span handling attached.
+Useful for adding spans to anonymous subroutines.
+
+=head1 CAVEATS
+
+=head2 C<caller>
+
+Because this module overrides caller, it's best to use it as soon as possible,
+before caller-using code is compiled. It likely won't work well with other
+modules which override caller themselves.
+
+=head2 C<Exporter>
+
+Subroutines exported using L<Exporter> or a similar module could split into
+two versions. If the export happens before the span handling is applied to
+a subroutine, only the original version will have a span, the exported
+version will be unmodified.
+
+In order to wrap subroutines in modules utilising L<Exporter>,
+use L<OpenTracing::WrapScope> directly in those modules.
+
+
+
+
+=head1 AUTHOR
+
+Szymon Nieznanski <snieznanski@perceptyx.com>
+
+
+
+=head1 COPYRIGHT AND LICENSE
+
+'OpenTracing::WrapScope'
+is Copyright (C) 2020, Perceptyx Inc
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+
+For details, see the full text of the license in the file LICENSE.
+
+
+=cut

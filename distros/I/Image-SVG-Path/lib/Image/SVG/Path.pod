@@ -50,13 +50,13 @@ produces output
             ];
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.32/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.33/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.32 of Image-SVG-Path
-corresponding to L<git commit 8e97c75cb08b77f120dd312fe43b99842f041e2e|https://github.com/benkasminbullock/Image-SVG-Path/commit/8e97c75cb08b77f120dd312fe43b99842f041e2e> released on Tue Nov 7 13:27:40 2017 +0900.
+This documents version 0.33 of Image-SVG-Path
+corresponding to L<git commit 97a7754b59911531c89c334ae0e7731229fa1bbd|https://github.com/benkasminbullock/Image-SVG-Path/commit/97a7754b59911531c89c334ae0e7731229fa1bbd> released on Sat Jun 27 10:10:03 2020 +0900.
 
 =head1 DESCRIPTION
 
@@ -102,7 +102,7 @@ produces output
     MOVE TO 148 214.
 
 
-(This example is included as L<F<xml-parser.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.32/examples/xml-parser.pl> in the distribution.)
+(This example is included as L<F<xml-parser.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.33/examples/xml-parser.pl> in the distribution.)
 
 
 SVG means "scalable vector graphics" and it is a standard of the W3
@@ -192,7 +192,7 @@ produces output
        type -> closepath
 
 
-(This example is included as L<F<extract-path-info.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.32/examples/extract-path-info.pl> in the distribution.)
+(This example is included as L<F<extract-path-info.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.33/examples/extract-path-info.pl> in the distribution.)
 
 
 The return value is a list of hash references. Each hash reference has
@@ -276,7 +276,7 @@ produces output
     M15.160000,91.180000 C16.400000,91.690000 17.650000,91.410000 18.390000,90.150000 C21.260000,85.250000 24.140000,79.250000 26.750000,73.000000 
 
 
-(This example is included as L<F<test-reverse.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.32/examples/test-reverse.pl> in the distribution.)
+(This example is included as L<F<test-reverse.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.33/examples/test-reverse.pl> in the distribution.)
 
 
 =head2 create_path_string
@@ -788,7 +788,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2017
+2011-2020
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -1,0 +1,30 @@
+---
+abstract: 'Plugin to check if a mx exists for the given mail address'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Validate-WithYAML-Plugin-EmailMX
+provides:
+  Data::Validate::WithYAML::Plugin::EmailMX:
+    file: lib/Data/Validate/WithYAML/Plugin/EmailMX.pm
+    version: '0.01'
+requires:
+  Data::Validate::WithYAML: '0.08'
+  Net::validMX: '2'
+  perl: '5.008'
+resources:
+  bugtracker: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-EmailMX/issues
+  homepage: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-EmailMX
+  repository: git://github.com/reneeb/Data-Validate-WithYAML-Plugin-EmailMX.git
+version: '0.01'
+x_contributors:
+  - 'reneeb <info@perl-services.de>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

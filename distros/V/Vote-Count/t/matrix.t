@@ -256,8 +256,8 @@ subtest 'GetPairResult' => sub {
 };
 
 subtest 'GreatestLoss' => sub {
-  is( $M1->RankGreatestLoss()->Leader()->{'winner'}, 'CARAMEL', 
-    'CARAMEL had greatest loss and is reported as the winner');
+  is( $M1->RankGreatestLoss()->Leader()->{'winner'},
+    'CARAMEL', 'CARAMEL had greatest loss and is reported as the winner' );
   $M1->ResetActive();
   is( $M1->GreatestLoss('FUDGESWIRL'), 2, 'M1 fudgeswirl' );
   $KnotSet->ResetActive();
@@ -292,8 +292,11 @@ subtest 'Range Ballots' => sub {
 
 subtest 'ScoreTable' => sub {
   my $st = $FastFood->ScoreTable();
-  like( $st, qr/\| INNOUT     \| 11    \|/, 
-    'check an expected formated line from ScoreTable');
+  like(
+    $st,
+    qr/\| INNOUT     \| 11    \|/,
+    'check an expected formated line from ScoreTable'
+  );
 };
 
 done_testing();

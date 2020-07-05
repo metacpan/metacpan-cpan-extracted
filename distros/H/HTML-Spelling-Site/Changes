@@ -1,5 +1,10 @@
 Revision history for HTML-Spelling-Site
 
+0.6.0       2020-06-29
+    - Cache the SHA-256 base64 digests and use it in addition to the timestamps.
+        - An optimization.
+    - Convert from using IO::All to using Path::Tiny; subsequent cleanups.
+
 0.4.3       2020-02-08
     - Remove some broken links.
         - https://github.com/shlomif/HTML-Spelling-Site/issues/2

@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-05-24'; # DATE
 our $DIST = 'App-BloomUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,7 +40,7 @@ bloom-filter-calculator - Help calculate num_bits (m) and num_hashes (k)
 
 =head1 VERSION
 
-This document describes version 0.004 of bloom-filter-calculator (from Perl distribution App-BloomUtils), released on 2020-05-24.
+This document describes version 0.006 of bloom-filter-calculator (from Perl distribution App-BloomUtils), released on 2020-05-24.
 
 =head1 SYNOPSIS
 

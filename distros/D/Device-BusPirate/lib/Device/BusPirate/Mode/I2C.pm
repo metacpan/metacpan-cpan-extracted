@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::BusPirate::Mode );
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 
@@ -25,21 +25,21 @@ C<Device::BusPirate::Mode::I2C> - use C<Device::BusPirate> in I2C mode
 
 =head1 SYNOPSIS
 
- use Device::BusPirate;
+   use Device::BusPirate;
 
- my $pirate = Device::BusPirate->new;
- my $i2c = $pirate->enter_mode( "I2C" )->get;
+   my $pirate = Device::BusPirate->new;
+   my $i2c = $pirate->enter_mode( "I2C" )->get;
 
- my $addr = 0x20;
+   my $addr = 0x20;
 
- my $count = 0;
- while(1) {
-    $i2c->send( $addr, chr $count )->get;
-    my $in = ord $i2c->recv( $addr, 1 )->get;
-    printf "Read %02x\n", $in;
+   my $count = 0;
+   while(1) {
+      $i2c->send( $addr, chr $count )->get;
+      my $in = ord $i2c->recv( $addr, 1 )->get;
+      printf "Read %02x\n", $in;
 
-    $count++; $count %= 255;
- }
+      $count++; $count %= 255;
+   }
 
 =head1 DESCRIPTION
 
@@ -81,7 +81,7 @@ Change configuration options. The following options exist:
 
 A string giving the clock speed to use for I2C. Must be one of the values:
 
- 5k 50k 100k 400k
+   5k 50k 100k 400k
 
 =back
 

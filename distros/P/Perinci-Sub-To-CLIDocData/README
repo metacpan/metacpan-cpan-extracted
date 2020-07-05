@@ -3,7 +3,7 @@ NAME
     structure convenient for producing CLI documentation (help/usage/POD)
 
 VERSION
-    This document describes version 0.293 of Perinci::Sub::To::CLIDocData
+    This document describes version 0.294 of Perinci::Sub::To::CLIDocData
     (from Perl distribution Perinci-Sub-To-CLIDocData), released on
     2020-04-27.
 

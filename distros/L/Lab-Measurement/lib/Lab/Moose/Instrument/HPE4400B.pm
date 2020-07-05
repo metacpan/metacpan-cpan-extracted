@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::HPE4400B;
-$Lab::Moose::Instrument::HPE4400B::VERSION = '3.701';
+$Lab::Moose::Instrument::HPE4400B::VERSION = '3.703';
 #ABSTRACT: HP E4400B Series Spectrum Analyzer
 
 use 5.010;
@@ -90,7 +90,7 @@ Lab::Moose::Instrument::HPE4400B - HP E4400B Series Spectrum Analyzer
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 Driver for HP E4400B series spectrum analyzers
 

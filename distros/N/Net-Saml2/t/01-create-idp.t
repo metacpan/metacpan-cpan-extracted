@@ -1,5 +1,6 @@
-use Test::More;
-use Net::SAML2;
+use Test::Lib;
+use Test::Net::SAML2;
+use Net::SAML2::IdP;
 
 my $xml = <<XML;
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -54,17 +55,120 @@ Iavyic/p4gZtXckweq+VTn9CdZp6ZTQtVw==
 </EntityDescriptor>
 XML
 
-my $idp = Net::SAML2::IdP->new_from_xml( xml => $xml, cacert => 't/cacert.pem' );
-ok($idp);
+my $override = override_verify_x509_verify(1);
 
-ok($idp->sso_url($idp->binding('redirect')));
-ok($idp->slo_url($idp->binding('redirect')));
-ok($idp->art_url($idp->binding('soap')));
+my $idp = Net::SAML2::IdP->new_from_xml(
+    xml    => $xml,
+    cacert => 't/cacert.pem'
+);
 
-ok($idp->cert('signing'));
-ok($idp->entityid eq 'http://sso.dev.venda.com/opensso');
+isa_ok($idp, "Net::SAML2::IdP");
 
-ok('urn:oasis:names:tc:SAML:2.0:nameid-format:transient' eq $idp->format('transient'));
-ok('urn:oasis:names:tc:SAML:2.0:nameid-format:persistent' eq $idp->format);
+my $redirect_binding = $idp->binding('redirect');
+my $soap_binding     = $idp->binding('soap');
+
+is(
+    $redirect_binding,
+    'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+    "Has correct binding: HTTP-Redirect"
+);
+is(
+    $soap_binding,
+    'urn:oasis:names:tc:SAML:2.0:bindings:SOAP',
+    "Has correct binding: SOAP"
+);
+
+is(
+    $idp->sso_url($redirect_binding),
+    'http://sso.dev.venda.com/opensso/SSORedirect/metaAlias/idp',
+    'Has correct sso_url'
+);
+is(
+    $idp->slo_url($redirect_binding),
+    'http://sso.dev.venda.com/opensso/IDPSloRedirect/metaAlias/idp',
+    'Has correct slo_url'
+);
+is(
+    $idp->art_url($soap_binding),
+    'http://sso.dev.venda.com/opensso/ArtifactResolver/metaAlias/idp',
+    'Has correct art_url'
+);
+
+looks_like_a_cert($idp->cert('signing'));
+
+is(
+    $idp->entityid,
+    'http://sso.dev.venda.com/opensso',
+    "Has the correct entityid"
+);
+
+is(
+    $idp->format('transient'),
+    'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+    "has correct transient format"
+);
+is(
+    $idp->format,
+    'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+    'has correct persistent format'
+);
+
+{
+    my $xml = path('t/idp-metadata2.xml')->slurp;
+    my $idp = Net::SAML2::IdP->new_from_xml(
+        xml    => $xml,
+        cacert => 't/cacert.pem'
+    );
+    isa_ok($idp, "Net::SAML2::IdP");
+
+    my $redirect_binding = $idp->binding('redirect');
+    my $soap_binding     = $idp->binding('soap');
+
+    is(
+        $redirect_binding,
+        'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+        "Has correct binding: HTTP-Redirect"
+    );
+    is(
+        $soap_binding,
+        'urn:oasis:names:tc:SAML:2.0:bindings:SOAP',
+        "Has correct binding: SOAP"
+    );
+
+    is(
+        $idp->sso_url($redirect_binding),
+        'http://sso.dev.venda.com/opensso/SSORedirect/metaAlias/idp',
+        'Has correct sso_url'
+    );
+    is(
+        $idp->slo_url($redirect_binding),
+        'http://sso.dev.venda.com/opensso/IDPSloRedirect/metaAlias/idp',
+        'Has correct slo_url'
+    );
+    is(
+        $idp->art_url($soap_binding),
+        'http://sso.dev.venda.com/opensso/ArtifactResolver/metaAlias/idp',
+        'Has correct art_url'
+    );
+
+    looks_like_a_cert($idp->cert('signing'), 'Looks like signing certificate');
+
+    is(
+        $idp->entityid,
+        'http://sso.dev.venda.com/opensso',
+        "Has the correct entityid"
+    );
+
+    is(
+        $idp->format('transient'),
+        'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
+        "has correct transient format"
+    );
+    is(
+        $idp->format,
+        'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+        'has correct persistent format'
+    );
+}
 
 done_testing;

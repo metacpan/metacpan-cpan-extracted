@@ -3,7 +3,7 @@ package CHI::Cascade;
 use strict;
 use warnings;
 
-our $VERSION = 0.300_002;
+our $VERSION = 0.300_003;
 
 use Carp;
 
@@ -366,6 +366,8 @@ sub run {
     # It's for internal using.
     my $run_instance = {};
 
+    $run_instance->{stash} = $opts{stash} && ref $opts{stash} eq 'HASH' && $opts{stash} || {};
+
     $run_instance->{run_opts}     = \%opts;
     $run_instance->{ttl}          = undef;
     $run_instance->{target_locks} = {};
@@ -373,7 +375,6 @@ sub run {
     $opts{actual_term} ||= $self->find($target)->{actual_term};
     $self->{stats}{run}++;
 
-    $run_instance->{stash} = $opts{stash} && ref $opts{stash} eq 'HASH' && $opts{stash} || {};
 
     # FIXME to delete in future. Now it's depricated
     $self->{stash} = $run_instance->{stash};

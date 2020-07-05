@@ -1,4 +1,4 @@
-package WebDriver::Tiny 0.102;
+package WebDriver::Tiny 0.103;
 
 use 5.020;
 use feature qw/lexical_subs postderef signatures/;

@@ -14,6 +14,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'HealthCheck::Diagnostic' => '0',
                                       'Redis::Fast' => '0',
+                                      'String::Random' => '0',
                                       'parent' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
@@ -29,6 +30,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test::Differences' => '0',
                                    'Test::MockModule' => '0',
                                    'Test::More' => '0'
                                  }

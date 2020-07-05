@@ -44,7 +44,7 @@ void PipeConnectRequest::exec () {
 }
 
 void PipeConnectRequest::finalize_connect () {
-    panda_mlog_debug(uelog, "PipeConnectRequest::finalize_connect " << this);
+    panda_log_debug("PipeConnectRequest::finalize_connect " << this);
     auto err = handle->impl()->connect(name, impl());
     if (err) return delay([=]{ cancel(err); });
 }

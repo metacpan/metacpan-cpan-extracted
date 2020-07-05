@@ -1,9 +1,9 @@
 package Data::CSel::WrapStruct;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-09'; # DATE
+our $DATE = '2020-04-15'; # DATE
 our $DIST = 'Data-CSel-WrapStruct'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
@@ -201,7 +201,7 @@ Data::CSel::WrapStruct - Wrap data structure into a tree of objects suitable for
 
 =head1 VERSION
 
-This document describes version 0.007 of Data::CSel::WrapStruct (from Perl distribution Data-CSel-WrapStruct), released on 2020-04-09.
+This document describes version 0.008 of Data::CSel::WrapStruct (from Perl distribution Data-CSel-WrapStruct), released on 2020-04-15.
 
 =head1 SYNOPSIS
 
@@ -394,6 +394,24 @@ To set node value, you have to use the C<value()> node method with an argument:
  ...
 
 will then print the expected C<< [0,'x','x'] >>.
+
+=head2 This module is slow!
+
+If you intend to select a data structure with thousands of nodes or more, you're
+probably better off using other approach, for example L<Data::Walk::More>.
+Data::Walk::More provides containers for the nodes you're traversing. For
+example, the CSel expression C<< Hash[has_keys("foo")] > Array > Scalar[value >
+0] >> can be written as:
+
+ walk sub {
+     my $ref = ref $_;
+     return if ref $_; # ... Scalar
+     return if $_ <= 0; # ... [value > 0]
+     return unless ref $Data::Walk::More::containers[-1] eq 'ARRAY'; # ... Array
+     return unless ref $Data::Walk::More::containers[-2] eq 'HASH'; # ... Hash
+     return unless exists $Data::Walk::More::containers[-2]{foo}; # ... [has_keys("foo")]
+     push @matches, $_;
+ }, $data;
 
 =head1 HOMEPAGE
 

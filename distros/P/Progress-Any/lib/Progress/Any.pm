@@ -1,7 +1,7 @@
 package Progress::Any;
 
-our $DATE = '2018-03-26'; # DATE
-our $VERSION = '0.214'; # VERSION
+our $DATE = '2020-06-21'; # DATE
+our $VERSION = '0.215'; # VERSION
 
 use 5.010001;
 use strict;
@@ -43,7 +43,7 @@ our %outputs;     # key = task name, value = [$outputobj, ...]
 
 # return 1 if created, 0 if already created/initialized
 sub _init_indicator {
-    my ($class, $task) = @_;
+    my ($class, $task, $default_target) = @_;
 
     #say "D: _init_indicator($task)";
 
@@ -53,7 +53,7 @@ sub _init_indicator {
     my $progress = bless({
         task        => $task,
         title       => $task,
-        target      => undef,
+        target      => $default_target,
         pos         => 0,
         state       => 'stopped',
 
@@ -66,7 +66,7 @@ sub _init_indicator {
 
     # if we create an indicator named a.b.c, we must also create a.b, a, and ''.
     if ($task =~ s/\.?\w+\z//) {
-        $class->_init_indicator($task);
+        $class->_init_indicator($task, 0);
     }
 
     $progress;
@@ -585,7 +585,7 @@ Progress::Any - Record progress to any output
 
 =head1 VERSION
 
-This document describes version 0.214 of Progress::Any (from Perl distribution Progress-Any), released on 2018-03-26.
+This document describes version 0.215 of Progress::Any (from Perl distribution Progress-Any), released on 2020-06-21.
 
 =head1 SYNOPSIS
 
@@ -1093,6 +1093,8 @@ feature.
 
 =head1 SEE ALSO
 
+L<Progress::Any::Examples> distribution contains example scripts.
+
 Other progress modules on CPAN: L<Term::ProgressBar>,
 L<Term::ProgressBar::Simple>, L<Time::Progress>, among others.
 
@@ -1107,7 +1109,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

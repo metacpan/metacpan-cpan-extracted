@@ -2,7 +2,7 @@ package SVG::Extension;
 use strict;
 use warnings;
 
-our $VERSION = '2.84';
+our $VERSION = '2.85';
 
 =head1 NAME
 
@@ -53,7 +53,7 @@ return the element object
 =cut
 
 sub extension {
-    my $self = shift;
+    my $self  = shift;
     my $class = ref($self) || $self;
 
     return bless $self->SUPER::element(@_), $class;

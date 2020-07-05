@@ -39,12 +39,13 @@ lib/Bio/GeneDesign/Basic.pm
 lib/Bio/GeneDesign/CodonJuggle.pm
 lib/Bio/GeneDesign/Codons.pm
 lib/Bio/GeneDesign/Graph.pm
+lib/Bio/GeneDesign/IO.pm
 lib/Bio/GeneDesign/Oligo.pm
+lib/Bio/GeneDesign/PrefixTree.pm
 lib/Bio/GeneDesign/Random.pm
 lib/Bio/GeneDesign/RestrictionEnzyme.pm
 lib/Bio/GeneDesign/RestrictionEnzymes.pm
 lib/Bio/GeneDesign/ReverseTranslate.pm
-lib/Bio/GeneDesign/PrefixTree.pm
 MANIFEST			This list of files
 META.json
 META.yml

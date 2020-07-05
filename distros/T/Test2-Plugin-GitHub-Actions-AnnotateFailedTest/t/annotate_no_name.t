@@ -23,6 +23,6 @@ like $event, array {
     item event 'Ok';
 };
 
-is $call, [$file, $line, ''], 'annotate with error';
+is $call, [$file, $line, 'Test failed'], 'annotate with error';
 
 done_testing;

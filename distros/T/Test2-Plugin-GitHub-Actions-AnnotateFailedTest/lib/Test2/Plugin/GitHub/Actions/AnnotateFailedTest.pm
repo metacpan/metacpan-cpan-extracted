@@ -11,7 +11,7 @@ use Test2::API qw(
 );
 use URI::Escape qw(uri_escape);
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 sub import {
     my ($class) = @_;
@@ -48,7 +48,11 @@ sub _extract_summary_from_event {
     my $name_or_summary = $event->isa('Test2::Event::Fail') ? $event->name : $event->summary;
     # avoid uninitialized warning for regexp matching
     $name_or_summary //= '';
-    return $name_or_summary =~ /Nameless Assertion/ ? '' : $name_or_summary;
+    if ($name_or_summary =~ /Nameless Assertion/ || ! length $name_or_summary) {
+        return 'Test failed';
+    } else {
+        return $name_or_summary;
+    }
 }
 
 sub _extract_details_from_event {
@@ -63,11 +67,7 @@ sub _issue_error {
 
     my $stderr = test2_stderr();
 
-    if (length $detail) {
-        $stderr->printf("::error file=%s,line=%d::%s\n", $file, $line, _escape_data($detail));
-    } else {
-        $stderr->printf("::error file=%s,line=%d\n", $file, $line);
-    }
+    $stderr->printf("::error file=%s,line=%d::%s\n", $file, $line, _escape_data($detail));
 }
 
 # escape a message of workflow command.

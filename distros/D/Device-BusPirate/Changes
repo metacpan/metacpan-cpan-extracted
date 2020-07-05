@@ -1,5 +1,9 @@
 Revision history for Device-BusPirate
 
+0.20    2020-06-19
+        [CHANGES]
+         * Support UART protocol, transmit-only
+
 0.19    2020-05-02
         [CHANGES]
          * Use ->syswrite_exactly from Future::IO 0.04

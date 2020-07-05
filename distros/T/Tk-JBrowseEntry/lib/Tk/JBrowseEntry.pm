@@ -839,7 +839,7 @@ package Tk::JBrowseEntry;
 BEGIN
 {
 	use vars qw($VERSION $haveHListbox);
-	$VERSION = '5.23';
+	$VERSION = '5.24';
 
 	use strict;
 	use Carp;
@@ -981,7 +981,7 @@ sub Populate
 	$w->{'-browse'} = delete($args->{'-browse'})  if (defined($args->{'-browse'}));
 	$w->{'-tabcomplete'} = 0;
 	$w->{'-tabcomplete'} = delete($args->{'-tabcomplete'})  if (defined($args->{'-tabcomplete'}));
-	$w->{'-altbinding'} = 0;  #NEXT 2 ADDED 20050112 TO SUPPORT ALTERNATE KEY-ACTION MODELS.
+	$w->{'-altbinding'} = '';  #NEXT 2 ADDED 20050112 TO SUPPORT ALTERNATE KEY-ACTION MODELS.
 	$w->{'-altbinding'} = delete($args->{'-altbinding'})  if (defined($args->{'-altbinding'}));
 	#NEXT LINE ADDED 20060429 TO SUPPORT OPTION FOR USER DELETION OF LISTBOX ITEMS.
 	$w->{'-deleteitemsok'} = delete($args->{'-deleteitemsok'})  if (defined($args->{'-deleteitemsok'}));
@@ -1007,9 +1007,7 @@ sub Populate
 	$w->{'-indicator'} = defined($args->{'-indicator'}) ? delete($args->{'-indicator'}) : '0';
 	$w->{'-activestyle'} = defined($args->{'-activestyle'}) ? delete($args->{'-activestyle'}) : 'underline';
 	$w->{'-activestyle'} = defined($args->{'-activestyle'}) ? delete($args->{'-activestyle'}) : 'underline';
-#	$w->{'-colorstate'} = defined($args->{'-colorstate'})
-#		? $args->{'-colorstate'} : 0;
-
+	$w->{'-colorstate'} = defined($args->{'-colorstate'}) ? delete($args->{'-colorstate'}) : 0;
 	my $lpack = delete $args->{-labelPack};   #MOVED ABOVE SUPER:POPULATE 20050120.
 
 	$w->SUPER::Populate($args);
@@ -1033,7 +1031,7 @@ sub Populate
 	#AFTER MUCH T&E: POUNDING OUT THE "e->bindtags()" FUNCTION CALL RESOLVED THIS ISSUE! :D
 	my %entryHash = (-borderwidth => $w->{'-entryborderwidth'}||0, -relief => 'flat',
 			-highlightcolor => $initFG, -highlightbackground => $initBG);
-	if ($args->{'-colorstate'} == 1)
+	if (defined($args->{'-colorstate'}) && $args->{'-colorstate'} == 1)
 	{
 		$entryHash{'-background'} = 'gray95';
 		$entryHash{'-foreground'} = 'black';
@@ -1135,7 +1133,7 @@ sub Populate
 			-deletecmd   => [qw/CALLBACK deleteCmd   DeleteCmd/,   undef],
 			-choices     => [qw/METHOD   choices     Choices/,     undef],
 			-state       => [qw/METHOD   state       State         normal/],
-			-colorstate  => [qw/METHOD   undef       undef         0/],
+			-colorstate  => [qw/PASSIVE  colorState  ColorState         0/],
 			#-colorstate  => [qw/PASSIVE  colorState  ColorState/,  undef],
 			-arrowimage  => [ {-image => $b}, qw/arrowImage ArrowImage/, undef],
 			-variable    => '-textvariable',
@@ -1181,15 +1179,17 @@ no strict 'refs';
 		$var_ref = '';
 		$w->configure(-textvariable => \$var_ref);
 	}
-	eval { $w->{'default'} = $_[1]->{'-default'} || ${$_[1]->{'-variable'}}; };
 
+#print STDERR "---1=".$_[1]."= w=$w= default=".$_[1]->{'-default'}."= var=".$_[1]->{'-variable'}."=\n";
+	eval { $w->{'default'} = $_[1]->{'-default'} || (defined($_[1]->{'-variable'}) ? ${$_[1]->{'-variable'}}
+			: undef); };
 }
 
 sub focus   #CALLED WHENEVER MAIN WIDGET TAKES FOCUS:
 {
 	my ($w) = shift;
 
-	if ($w->{'_ignorefocus'} == 1)  #DON'T CHANGE (SUBWIDGET) FOCUS EVEN THOUGH MAIN WIDGET IS TAKING FOCUS (NEEDED BY CLICKING ON THE FIXED DD-LIST):
+	if (defined($w->{'_ignorefocus'}) && $w->{'_ignorefocus'} == 1)  #DON'T CHANGE (SUBWIDGET) FOCUS EVEN THOUGH MAIN WIDGET IS TAKING FOCUS (NEEDED BY CLICKING ON THE FIXED DD-LIST):
 	{
 		$w->{'_ignorefocus'} = 0;
 		return;
@@ -1244,7 +1244,7 @@ sub SetBindings
 		elsif ($altbinding =~ /Return\=NonEmptyGo/io)
 		{
 			my $textval = $w->get();
-			if ($textval ne '')
+			if (defined($textval) && $textval ne '')
 			{
 				$w->Popdown  if  ($w->{"popped"});   #UNDISPLAYS LISTBOX.
 				$w->Callback(-browsecmd => $w, $w->Subwidget('entry')->get, "entry.${keyModifier}return.go");
@@ -1282,14 +1282,14 @@ sub SetBindings
 
 no strict 'refs';
 		my $var_ref = $w->cget( '-textvariable' );
-		return  unless ($$var_ref =~ /\S/o);  #TEXT FIELD EMPTY, PUNT!
+		return  unless (defined($var_re) && defined($$var_ref) && $$var_ref =~ /\S/o);  #TEXT FIELD EMPTY, PUNT!
 
 		my @listsels = $w->getText('0','end');
 		return  if ($#listsels < 0);  #NO LIST TO SEARCH, SO PUNT!
 
 		my $srchPattern = $$var_ref;
 		my $found = $w->LbFindSelection();   #SEARCH FOR CURRENT TEXT: RETURNS 1 IF FULL MATCH (IN LIST), -1 IF CONTAINS, 0 IF NO MATCH.
-		return  unless ($found);  #NO MATCH, PUNT!
+		return  unless (defined($found) && $found);  #NO MATCH, PUNT!
 
 		my $index;
 		$index = $w->LbIndex(2)  if ($found < 0 && $w->LbFindSelection($srchPattern)); #IF MATCH ONLY CONTAINS TEXT, SEARCH AGAIN STARTING AT *NEXT* ENTRY.
@@ -1302,8 +1302,8 @@ no strict 'refs';
 
 	local *downFn = sub   #HANDLES DOWN-ARROW PRESSED IN ENTRY AREA.
 	{
-		my ($state) = $w->cget( '-state' );
-		return  if ($state eq 'textonly' || $state eq 'disabled' || $w->{'altbinding'} =~ /Down\=None/io);
+		my ($state) = $w->cget( '-state' ) || 'normal';
+		return  if ($state eq 'textonly' || $state eq 'disabled' || $w->{'-altbinding'} =~ /Down\=None/io);
 
 		if ($w->{'-altbinding'} =~ /Down\=Popup/io && $state !~ /text/o)  #MAKE DOWN-ARROW POP UP DD-LIST.
 		{
@@ -1347,7 +1347,7 @@ no strict 'refs';
 
 	local *upFn = sub   #HANDLES UP-ARROW PRESSED IN ENTRY AREA.
 	{
-		my ($state) = $w->cget( '-state' );
+		my ($state) = $w->cget( '-state' ) || 'normal';
 		return  if ($state eq 'textonly' || $state eq 'disabled' || $w->{'-altbinding'} =~ /Up\=None/io);
 
 		if ($w->{'-altbinding'} =~ /Up\=Popup/io && $state !~ /text/o)  #MAKE DOWN-ARROW POP UP DD-LIST.
@@ -1529,7 +1529,7 @@ $w->LbCopySelection(1,'button.button1');
 
 	$b->bind('<space>', sub    #USER HIT SPACEBAR WHILST BUTTON FOCUSED (TOGGLE DD-LIST):
 	{
-		my ($state) = $w->cget( '-state' );
+		my ($state) = $w->cget( '-state' ) || 'normal';
 		return if ($state =~ /text/o || $state eq 'disabled');
 
 		$w->LbFindSelection();
@@ -1538,7 +1538,7 @@ $w->LbCopySelection(1,'button.button1');
 
 	$b->bind('<Return>', sub   #USER HIT [RETURN] KEY WHILST BUTTON FOCUSED (TOGGLE DD-LIST):
 	{
-		my ($state) = $w->cget( '-state' );
+		my ($state) = $w->cget( '-state' ) || 'normal';
 		return if ($state =~ /text/o || $state eq 'disabled');
 
 		$w->LbFindSelection();
@@ -1548,7 +1548,7 @@ $w->LbCopySelection(1,'button.button1');
 
 	$b->bind('<Down>', sub   #USER HIT [DOWN-ARROW] KEY WHILST BUTTON FOCUSED (TOGGLE DD-LIST):
 	{
-		my ($state) = $w->cget( '-state' );
+		my ($state) = $w->cget( '-state' ) || 'normal';
 		return if ($state =~ /text/o || $state eq 'disabled');
 
 		$w->LbFindSelection();
@@ -1584,7 +1584,7 @@ $w->LbCopySelection(1,'button.button1');
 
 	$e->bind('<<LeftTab>>', sub      #ADDED 20070904 PER PATCH FROM WOLFRAM HUMANN (HANDLES REVERSE-TABBING):
 	{
-		my ($state) = $w->cget( '-state' );
+		my ($state) = $w->cget( '-state' ) || 'normal';
 		$w->Popdown  if  ($w->{'popped'});
 		if ($state =~ /only/o || (!$w->{'takefocus'} && !$w->{'btntakesfocus'}))
 		{
@@ -1600,7 +1600,7 @@ $w->LbCopySelection(1,'button.button1');
 
 	$f->bind('<<LeftTab>>', sub   #FRAME HAS FOCUS INSTEAD OF ENTRY WHEN READONLY!:
 	{
-		my ($state) = $w->cget( '-state' );
+		my ($state) = $w->cget( '-state' ) || 'normal';
 		$w->Popdown  if  ($w->{'popped'});
 		if ($state =~ /only/o || (!$w->{'takefocus'} && !$w->{'btntakesfocus'}))
 		{
@@ -1630,7 +1630,7 @@ $w->LbCopySelection(1,'button.button1');
 
 	$b->bind('<Tab>', sub
 	{
-		$w->Popdown(1)  if (!$w->{'-takefocus'});
+		$w->Popdown(1)  if (!$w->{'takefocus'});
 		#DON'T BREAK, JUST ALLOW TAB TO MOVE ON TO NEXT WIDGET.
 	});
 
@@ -2198,7 +2198,7 @@ sub LbFindSelection
 	else
 	{
 		$srchval = $w->get();
-		unless ($srchval =~ /\S/o)
+		unless (defined ($srchval) && $srchval =~ /\S/o)
 		{
 			$w->Subwidget('slistbox')->Subwidget($w->{'-listboxtype'})->activate(0);
 
@@ -2294,7 +2294,7 @@ sub LbIndex   #FETCH THE INDEX OF THE SELECTED OR ACTIVE ENTRY FROM THE DD-LIST:
 				my @listsels = $w->getText('0','end');
 				my $index = $w->{'searchindx'} || 0;
 				my $textval = $w->get();
-				if ($textval =~ /\S/o)
+				if (defined($textval) && $textval =~ /\S/o)
 				{
 					for (my $i=0; $i<=$#listsels;$i++)
 					{
@@ -2346,8 +2346,9 @@ sub _adustLBsize   #ADJUST THE DD-LIST WIDTH / HEIGHT, IF WE NEED TO:
 {
 	my $w = shift;
 	my @l = $w->getText(0, 'end');
-	$w->{'-width'} = $w->{'-maxwidth'}  if ($w->{'-maxwidth'} > 0 && $w->{'-width'} > $w->{'-maxwidth'});
-	my $width = $w->{'-width'};
+	$w->{'-width'} = $w->{'-maxwidth'}  if (defined($w->{'-maxwidth'}) && $w->{'-maxwidth'} > 0 && $w->{'-width'} > $w->{'-maxwidth'});
+	my $w_width = (defined $w->{'-width'}) ? $w->{'-width'} : 0;  #NEEDED B/C PERL'S BECOME A NANNY-STATE W/WARNINGS!
+	my $width = $w_width;
 	unless ($width)
 	{
 		$width = 0;
@@ -2358,7 +2359,7 @@ sub _adustLBsize   #ADJUST THE DD-LIST WIDTH / HEIGHT, IF WE NEED TO:
 		$width = $w->{'-maxwidth'}  if (defined($w->{'-maxwidth'}) 
 				&& $width > $w->{'-maxwidth'} && $w->{'-maxwidth'} > 0);
 	}
-	if ($w->{'-fixedlist'} || $width != $w->{'-width'})  #ADJUST WIDTH IF CHANGED & ALLOWED TO CHANGE:
+	if ($w->{'-fixedlist'} || $width != $w_width)  #ADJUST WIDTH IF CHANGED & ALLOWED TO CHANGE:
 	{
 		++$width;
 		$w->Subwidget('entry')->configure(-width => $width);
@@ -2485,7 +2486,7 @@ sub delete   #DELETE SELECTED ENTRY(S) FROM THE DD-LIST BY INDICES:
 		my ($key, $val);
 		foreach my $i (@_)
 		{
-			$val = $w->get($i);
+			$val = $w->get($i) || '';
 			$key = $w->{'hashref_bydesc'}->{$val};
 			next  unless ($val);
 			delete $w->{'hashref_bydesc'}->{$val}  if (defined $w->{'hashref_bydesc'}->{$val});
@@ -2551,19 +2552,19 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 	my $label  = $w->Subwidget('label');
 	my $button = $w->Subwidget('arrow');
 	my $slistbox = $w->Subwidget('slistbox');
-	my $txtfg = ($w->cget('-colorstate') == 1) ? 'black' : $w->{'-textforeground'} || $frame->cget('-foreground');
-	my $txtbg = ($w->cget('-colorstate') == 1) ? 'gray95' : $w->{'-textbackground'} || $frame->cget('-background');
+	my $txtfg = ($w->{'-colorstate'} == 1) ? 'black' : $w->{'-textforeground'} || $frame->cget('-foreground');
+	my $txtbg = ($w->{'-colorstate'} == 1) ? 'gray95' : $w->{'-textbackground'} || $frame->cget('-background');
 	my $texthlcolor = $frame->cget('-background');
 	my $framehlcolor = $frame->cget('-foreground');
 	my $framehlbg = $texthlcolor;
 	if( $state eq 'readonly')
 	{
 		$framehlcolor = $frame->cget('-foreground') || $entry->cget( '-foreground' );
-		if ($w->cget('-colorstate') == 1)
+		if ($w->{'-colorstate'} == 1)
 		{
 			$txtbg = 'lightgray';
 		}
-		elsif ($w->cget('-colorstate') =~ /^(?:2|dark|readonlydark)$/io
+		elsif ($w->{'-colorstate'} =~ /^(?:2|dark|readonlydark)$/io
 				|| !defined $Tk::Widget::TwilightThreshold)  #DEFINED IF USING OUR MODIFIED "setPalette.pl"!
 		{
 			$txtfg = ($txtbg eq $entry->cget('-readonlybackground')) ? 'gray30' : 'black';
@@ -2579,7 +2580,7 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 				-highlightcolor => $texthlcolor,
 				-highlightbackground => $texthlcolor);
 		#PROGRAMMER NOTE:  ONCE THIS PARAMETER IS "SET", SWITCHING PALETTES WILL *NOT* UPDATE IT!:
-		$entryHash{'-readonlybackground'} = $w->{'-textreadonlybackground'} || 'lightgray'  if ($w->cget('-colorstate') == 1);
+		$entryHash{'-readonlybackground'} = $w->{'-textreadonlybackground'} || 'lightgray'  if ($w->{'-colorstate'} == 1);
 		$entry->configure(%entryHash);
 
 		$button->configure(-state => 'normal', -takefocus => $w->{'btntakesfocus'}, -relief => 'raised',
@@ -2619,7 +2620,7 @@ sub _set_edit_state  #CHANGE APPEARANCES BASED ON CHANGES IN "-STATE" OPTION:
 				-foreground => $txtfg, -background => $txtbg,
 				-highlightcolor => $texthlcolor,
 				-highlightbackground => $texthlcolor);
-		$entryHash{'-disabledbackground'} = ''  if ($w->cget('-colorstate') =~ /^(?:2|dark|disableddark)$/io);
+		$entryHash{'-disabledbackground'} = ''  if ($w->{'-colorstate'} =~ /^(?:2|dark|disableddark)$/io);
 		$entry->configure(%entryHash);
 
 		$button->configure(-state => $state,  -takefocus => 0, -relief => 'flat',

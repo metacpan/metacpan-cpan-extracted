@@ -3,7 +3,7 @@ package File::Slurp;
 use strict;
 use warnings ;
 
-our $VERSION = '9999.30';
+our $VERSION = '9999.32';
 $VERSION = eval $VERSION;
 
 use Carp ;
@@ -102,7 +102,7 @@ sub read_file {
 	my $buf_ref = $opts->{buf_ref} || \$buf;
 	${$buf_ref} = '';
 	my $blk_size = $opts->{blk_size} || 1024 * 1024;
-	if (my $size = -s $fh) {
+	if (my $size = -f $fh && -s _) {
 		$blk_size = $size if $size < $blk_size;
 		my ($pos, $read) = 0;
 		do {
@@ -119,7 +119,7 @@ sub read_file {
 	seek($fh, $opts->{_data_tell}, SEEK_SET) if $opts->{_is_data} && $opts->{_data_tell};
 
 	# line endings if we're on Windows
-	${$buf_ref} =~ s/\015\012/\012/g if $is_win32 && !$opts->{binmode};
+	${$buf_ref} =~ s/\015\012/\012/g if ${$buf_ref} && $is_win32 && !$opts->{binmode};
 
 	# we now have a buffer filled with the file content. Figure out how to
 	# return it to the user
@@ -1092,6 +1092,27 @@ These are exported with
 You can get all subs in the module exported with
 
 	use File::Slurp qw(:all);
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<File::Slurper> - Provides a straightforward set of functions for the most
+common tasks of reading/writing text and binary files.
+
+=item *
+
+L<Path::Tiny> - Lightweight and comprehensive file handling, including simple
+methods for reading, writing, and editing text and binary files.
+
+=item *
+
+L<Mojo::File> - Similar to Path::Tiny for the L<Mojo> toolkit, always works in
+bytes.
+
+=back
 
 =head1 AUTHOR
 

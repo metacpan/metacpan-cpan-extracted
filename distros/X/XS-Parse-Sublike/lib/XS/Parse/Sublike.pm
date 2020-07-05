@@ -8,7 +8,7 @@ package XS::Parse::Sublike;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -48,7 +48,7 @@ requirement; e.g.
 
 =head2 xs_parse_sublike
 
-   int xs_parse_sublike(const struct XSParseSublikeHooks *hooks, OP **op_ptr)
+   int xs_parse_sublike(const struct XSParseSublikeHooks *hooks, void *hookdata, OP **op_ptr)
 
 This function performs the actual parsing of a C<sub>-like keyword. It expects
 the lexer to be at a position just after the introduction keyword has been
@@ -61,12 +61,13 @@ returned directly.
 For a more automated handling of keywords, see L</register_xs_parse_sublike>.
 
 I<hooks> should be a structure that can provide optional function pointers
-used to customise the parsing process at various stages.
+used to customise the parsing process at various stages. I<hookdata> is an
+opaque pointer which is passed through to each of the hook stage functions.
 
 =head2 register_xs_parse_sublike
 
    void register_xs_parse_sublike(const char *keyword,
-     const struct XSParseSublikeHooks *hooks)
+     const struct XSParseSublikeHooks *hooks, void *hookdata)
 
 This function installs a set of parsing hooks to be associated with the given
 keyword. Such a keyword will then be handled automatically by a keyword parser
@@ -76,9 +77,13 @@ When the keyword is encountered, the hook's C<permit> function is first tested
 to see if the keyword is permitted at this point. If the function returns true
 then the keyword is consumed and parsed as per L</xs_parse_sublike>.
 
+I<hookdata> is an opaque pointer which is passed through to each of the hook
+stage functions when they are invoked.
+
 =head2 xs_parse_sublike_any
 
-   int xs_parse_sublike_any(const struct XSParseSublikeHooks *hooks, OP **op_ptr)
+   int xs_parse_sublike_any(const struct XSParseSublikeHooks *hooks, void *hookdata,
+     OP **op_ptr)
 
 This function expects to consume an introduction keyword at the lexer position
 which is either C<sub> or the name of another C<sub>-like keyword, which has
@@ -96,6 +101,9 @@ well as the ones registered with the keyword. This allows their effects to
 combined. The hooks given by the I<hooks> argument are considered to be on the
 "outside" from those of the registered keyword "inside". The outside ones run
 first for all stages, except C<pre_blockend> which runs them inside-out.
+
+I<hookdata> is an opaque pointer which is passed through to each of the hook
+stage functions when they are invoked.
 
 =head1 PARSE CONTEXT
 
@@ -160,7 +168,7 @@ definition.
 
 =item XS_PARSE_SUBLIKE_PART_SIGNATURE
 
-The attributes of the function.
+The parameter signature of the function.
 
 This part can be skipped, but the bit is ignored when in I<require_parts>. It
 is always permitted not to provide a signature for a function definition,
@@ -171,7 +179,7 @@ effect, and only on supporting perl versions.
 
 =head2 The C<permit> Stage
 
-   bool (*permit)(pTHX)
+   bool (*permit)(pTHX_ void *hookdata)
 
 Called by the installed keyword parser hook which is used to handle keywords
 registered by L</register_xs_parse_sublike>. This hook stage should inspect
@@ -186,7 +194,7 @@ of the context.
 
 =head2 The C<pre_subparse> Stage
 
-   void (*pre_subparse)(pTHX_ struct XSParseSublikeContext *ctx)
+   void (*pre_subparse)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 
 Invoked just before C<start_subparse()> is called.
 
@@ -198,7 +206,7 @@ C<attrs> field of the context, then C<block_start()> is called.
 =head2 The optional C<filter_attr> Stage
 
    bool (*filter_attr)(pTHX_ struct XSParseSublikeContext *ctx,
-      SV *attr, SV *val);
+      SV *attr, SV *val, void *hookdata);
 
 If the I<flags> field includes C<XS_PARSE_SUBLIKE_FLAG_FILTERATTRS> then each
 individual attribute is passed through this optional filter function
@@ -213,7 +221,7 @@ to the case where the filter function did not exist.
 
 =head2 The C<post_blockstart> Stage
 
-   void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx)
+   void (*post_blockstart)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 
 Invoked after the C<block_start()> function has been called. This hook stage
 may wish to perform any alterations of C<PL_compcv> or related, inspect or
@@ -229,14 +237,14 @@ signature ops as well.
 
 =head2 The C<pre_blockend> Stage
 
-   void (*pre_blockend)(pTHX_ struct XSParseSublikeContext *ctx)
+   void (*pre_blockend)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 
 Invoked just before the C<block_end()> function is invoked. The hook stage may
 wish to inspect or alter the optree stored in the C<body> context field.
 
 =head2 The C<post_newcv> Stage
 
-   void (*post_newcv)(pTHX_ struct XSParseSublikeContext *ctx)
+   void (*post_newcv)(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 
 Invoked just after C<newATTRSUB()> has been invoked on the optree. The hook
 stage may wish to inspect or alter the CV stored in the C<cv> context field.

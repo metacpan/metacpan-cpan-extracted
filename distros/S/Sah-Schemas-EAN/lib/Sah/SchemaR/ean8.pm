@@ -1,9 +1,9 @@
 package Sah::SchemaR::ean8;
 
-our $DATE = '2019-11-28'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.007'; # VERSION
 
-our $rschema = ["str",[{description=>"\nNondigits [^0-9] will be removed during coercion.\n\nChecksum digit must be valid.\n\n",match=>"\\A[0-9]{8}\\z",summary=>"EAN-8 number","x.perl.coerce_rules"=>["From_str::to_ean8"]}],["str"]];
+our $rschema = ["str",[{description=>"\nNondigits [^0-9] will be removed during coercion.\n\nChecksum digit must be valid.\n\n",examples=>[{valid=>1,validated_value=>96385074,value=>"9638-5074"},{summary=>"Invalid checkdigit",valid=>0,value=>12345678},{summary=>"Less than 8 digits",valid=>0,value=>1234567},{summary=>"More than 8 digits",valid=>0,value=>123456789}],match=>"\\A[0-9]{8}\\z",summary=>"EAN-8 number","x.perl.coerce_rules"=>["From_str::to_ean8"]}],["str"]];
 
 1;
 # ABSTRACT: EAN-8 number
@@ -20,7 +20,7 @@ Sah::SchemaR::ean8 - EAN-8 number
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::SchemaR::ean8 (from Perl distribution Sah-Schemas-EAN), released on 2019-11-28.
+This document describes version 0.007 of Sah::SchemaR::ean8 (from Perl distribution Sah-Schemas-EAN), released on 2020-03-08.
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

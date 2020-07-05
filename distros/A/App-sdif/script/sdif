@@ -34,11 +34,6 @@ diff ... | sdif
 
     --width=#, -W#	specify width of output (default 80)
     --margin=#          specify margin column number (default 0)
-    --color=when	'always' (default), 'never' or 'auto'
-    --nocolor		--color=never
-    --colormap, --cm	specify color map
-    --colortable	show color table
-    --[no]256		on/off ANSI 256 color mode (default on)
     --mark=position	mark position (right, left, center, side) or no
     --column=order	set column order (default ONM)
     --view, -v		viewer mode
@@ -46,14 +41,21 @@ diff ... | sdif
     --[no]prefix	process git --graph output (default on)
     --prefix-pattern    prefix pattern
 
+    --color=when	'always' (default), 'never' or 'auto'
+    --nocolor		--color=never
+    --colormap, --cm	specify color map
+    --colortable	show color table
+    --[no]256		on/off ANSI 256 color mode (default on)
+
     --man		display manual page
     --diff=s		set diff command
     --diffopts=s	set diff command options
 
-    --[no]cdif		use ``cdif'' as word context diff backend
-    --cdifopts=s	set cdif command options
-    --mecab		pass --mecab option to cdif
     --[no]lenience      supress unexpected input warning (default on)
+
+    --[no]cdif		use ``cdif'' as word context diff backend
+    --unit=s		pass through to cdif
+    --cdifopts=s	set cdif command options
 
 =cut
 
@@ -107,16 +109,21 @@ my $opt_column;
 my $opt_view;
 my $opt_ambiguous = 'narrow';
 my $opt_margin = 0;
-my $opt_lenience = 1;
+my $opt_lenience = my $opt_lenience_default = 1;
 our $screen_width;
 
 my $opt_color = 'always';
-my $opt_256 = 1;
+my $opt_256 = my $opt_256_default = 1;
 my $opt_mark = "center";
-my $opt_prefix = 1;
-my $opt_prefix_pattern = q/(?:\\| )*(?:  )*/;
+my $opt_prefix = my $opt_prefix_default = 1;
+my $opt_prefix_pattern = q/(?:\\| )*(?:  )?/;
 my $opt_W;
 my $opt_colortable;
+
+#
+# options only for cdif
+#
+my $opt_unit = my $opt_unit_default = 'word';
 
 binmode STDIN,  ":encoding(utf8)";
 binmode STDOUT, ":encoding(utf8)";
@@ -175,7 +182,8 @@ my @optargs = (
     "colortable" => \$opt_colortable,
     "lenience!" => \$opt_lenience,
 
-    "--mecab" => sub { push @opt_cdifopts, "--mecab" },
+    "unit=s" => \$opt_unit,
+    "mecab!" => sub { $opt_unit = $_[1] ? 'mecab' : $opt_unit_default },
 );
 
 my @SAVEDARGV = @ARGV;
@@ -186,16 +194,26 @@ GetOptions @optargs or usage({status => 1});
 
 warn "\@ARGV = (@SAVEDARGV)\n" if $opt_d;
 
+$App::sdif::Util::NO_WARNINGS = $opt_lenience;
+
+use Text::VisualWidth::PP qw(vwidth);
+use Text::ANSI::Fold qw(ansi_fold :constants);
+
 if ($opt_ambiguous =~ /^(?:detect|auto)$/) {
     use Unicode::EastAsianWidth::Detect qw(is_cjk_lang);
     $opt_ambiguous = is_cjk_lang() ? 'wide' : 'narrow';
 }
 
-$App::sdif::Util::NO_WARNINGS = $opt_lenience;
-
-use Text::VisualWidth::PP qw(vwidth);
 if ($opt_ambiguous =~ /^(?:wide|full)/) {
     $Text::VisualWidth::PP::EastAsian = 1;
+    Text::ANSI::Fold->configure(ambiguous => 'wide');
+}
+
+if ($opt_margin > 0) {
+    Text::ANSI::Fold->configure(
+	linebreak => LINEBREAK_ALL,
+	map { $_ => $opt_margin } qw(margin runin runout),
+	);
 }
 
 my %colormap = do {
@@ -256,12 +274,27 @@ my $painter = do {
 if (defined $opt_cdif and $opt_cdif eq '') {
     $opt_cdif = $default_opt_cdif;
 }
-unshift @opt_cdifopts,
-    $opt_256      ? qw(--256)      : qw(--no-256)   ,
-    $opt_prefix   ? qw(--prefix)   : qw(--no-prefix),
-#   $opt_lenience ? qw(--lenience) : qw(--no-lenience),
-    qw(--prefix-pattern) => $opt_prefix_pattern,
-    @default_opt_cdifopts;
+
+for (
+    [ "unit"     , "=" , \$opt_unit     , $opt_unit_default     ] ,
+    [ "256"      , "!" , \$opt_256      , $opt_256_default      ] ,
+    [ "prefix"   , "!" , \$opt_prefix   , $opt_prefix_default   ] ,
+    [ "lenience" , "!" , \$opt_lenience , $opt_lenience_default ] ,
+    )
+{
+    my($name, $type, $var, $default) = @$_;
+    if ($type eq "!") {
+	next if $$var == $default;
+	unshift @opt_cdifopts, sprintf("--%s%s", $$var ? '' : 'no-', $name);
+    } elsif ($type eq "=") {
+	next if $$var eq $default;
+	unshift @opt_cdifopts, sprintf("--%s=%s", $name, $$var);
+    } else {
+	die;
+    }
+}
+
+unshift @opt_cdifopts, @default_opt_cdifopts;
 
 my($OLD, $NEW, $DIFF);
 if (@ARGV == 2) {
@@ -384,15 +417,6 @@ if ($readfile) {
 
 my @boundary = $opt_onword ? (boundary => 'word') : ();
 my $color_re = qr{ \e \[ [\d;]* [mK] }x;
-
-use Text::ANSI::Fold qw(ansi_fold :constants);
-
-if ($opt_margin > 0) {
-    Text::ANSI::Fold->configure(
-	linebreak => LINEBREAK_ALL,
-	map { $_ => $opt_margin } qw(margin runin runout),
-	);
-}
 
 my $oline = 1;
 my $nline = 1;
@@ -952,7 +976,7 @@ to disable.
 
     option --autocolor --nop
 
-=head2 CDIF
+=head2 WORD DIFFERENCE
 
 While B<sdif> doesn't care about the contents of each modified lines,
 it can read the output from B<cdif> command which show the word
@@ -962,8 +986,9 @@ at least when invoking B<cdif> manually.  Option I<--no-tc> is
 preferable because text color can be handled by B<sdif>.
 
 From version 4.1.0, option B<--cdif> is set by default, so use
-B<--no-cdif> option to disable it.
-
+B<--no-cdif> option to disable it.  Option B<--unit> (default word)
+will be passed through to B<cdif>.  Other B<cdif> options can be
+specified by B<--cdifopts>.
 
 =head1 OPTIONS
 
@@ -1032,10 +1057,14 @@ option accepts optional parameter as an actual B<cdif> command.
 
 Specify options for back-end B<cdif> command.
 
+=item B<--unit>=I<unit>
+
 =item B<--mecab>
 
-Pass B<--mecab> option to back-end B<cdif> command.  Use B<--cdifopts>
-to set other options.
+These options are simply sent to back-end B<cdif> command.  Default is
+B<--unit>=I<word> and I<char> and I<mecab> can be used.  Option
+B<--mecab> is same as B<--unit=mecab>.  Use B<--cdifopts> to set other
+options.
 
 =item B<--diff>=I<command>
 
@@ -1116,7 +1145,7 @@ True by default.
 
 Specify prefix pattern in regex.  Default pattern is:
 
-    (?:\| )*(?:  )*
+    (?:\| )*(?:  )?
 
 This pattern matches B<git> graph style and whitespace indented diff
 output.

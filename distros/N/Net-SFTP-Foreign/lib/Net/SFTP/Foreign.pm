@@ -1,6 +1,6 @@
 package Net::SFTP::Foreign;
 
-our $VERSION = '1.90';
+our $VERSION = '1.91';
 
 use strict;
 use warnings;
@@ -2490,7 +2490,7 @@ sub ls {
     $queue_size = 1 if ($follow_links or $realpath or
 			($wanted and not $delayed_wanted));
     my $max_queue_size = $queue_size || $sftp->{_queue_size};
-    $queue_size ||= 2;
+    $queue_size ||= ($max_queue_size < 2 ? $max_queue_size : 2);
 
     $dir = '.' unless defined $dir;
     $dir = $sftp->_rel2abs($dir);
@@ -2511,64 +2511,59 @@ sub ls {
                 while (@msgid < $queue_size);
 
             my $id = shift @msgid;
-            if (my $msg = $sftp->_get_msg_and_check(SSH2_FXP_NAME, $id,
-                                                    SFTP_ERR_REMOTE_READDIR_FAILED,
-                                                    "Couldn't read directory '$dir'" )) {
-                my $count = $msg->get_int32 or last;
+            my $msg = $sftp->_get_msg_and_check(SSH2_FXP_NAME, $id,
+						SFTP_ERR_REMOTE_READDIR_FAILED,
+						"Couldn't read directory '$dir'" ) or last;
+	    my $count = $msg->get_int32 or last;
 
-                if ($cheap) {
-                    for (1..$count) {
-                        my $fn = $sftp->_fs_decode($msg->get_str);
-                        push @dir, $fn if (!defined $cheap_wanted or $fn =~ $cheap_wanted);
-                        $msg->skip_str;
-                        Net::SFTP::Foreign::Attributes->skip_from_buffer($msg);
-                    }
+	    if ($cheap) {
+		for (1..$count) {
+		    my $fn = $sftp->_fs_decode($msg->get_str);
+		    push @dir, $fn if (!defined $cheap_wanted or $fn =~ $cheap_wanted);
+		    $msg->skip_str;
+		    Net::SFTP::Foreign::Attributes->skip_from_buffer($msg);
+		}
+	    }
+	    else {
+		for (1..$count) {
+		    my $fn = $sftp->_fs_decode($msg->get_str);
+		    my $ln = $sftp->_fs_decode($msg->get_str);
+		    # my $a = $msg->get_attributes;
+		    my $a = Net::SFTP::Foreign::Attributes->new_from_buffer($msg);
+
+		    my $entry =  { filename => $fn,
+				   longname => $ln,
+				   a => $a };
+
+		    if ($follow_links and _is_lnk($a->perm)) {
+
+			if ($a = $sftp->stat($sftp->join($dir, $fn))) {
+			    $entry->{a} = $a;
+			}
+			else {
+			    $sftp->_clear_error_and_status;
+			}
+		    }
+
+		    if ($realpath) {
+			my $rp = $sftp->realpath($sftp->join($dir, $fn));
+			if (defined $rp) {
+			    $fn = $entry->{realpath} = $rp;
+			}
+			else {
+			    $sftp->_clear_error_and_status;
+			}
+		    }
+
+		    if (!$wanted or $delayed_wanted or $wanted->($sftp, $entry)) {
+			push @dir, (($names_only and !$delayed_wanted) ? $fn : $entry);
+		    }
                 }
-                else {
-                    for (1..$count) {
-                        my $fn = $sftp->_fs_decode($msg->get_str);
-                        my $ln = $sftp->_fs_decode($msg->get_str);
-                        # my $a = $msg->get_attributes;
-                        my $a = Net::SFTP::Foreign::Attributes->new_from_buffer($msg);
-
-                        my $entry =  { filename => $fn,
-                                       longname => $ln,
-                                       a => $a };
-
-                        if ($follow_links and _is_lnk($a->perm)) {
-
-                            if ($a = $sftp->stat($sftp->join($dir, $fn))) {
-                                $entry->{a} = $a;
-                            }
-                            else {
-                                $sftp->_clear_error_and_status;
-                            }
-                        }
-
-                        if ($realpath) {
-                            my $rp = $sftp->realpath($sftp->join($dir, $fn));
-                            if (defined $rp) {
-                                $fn = $entry->{realpath} = $rp;
-                            }
-                            else {
-                                $sftp->_clear_error_and_status;
-                            }
-                        }
-
-                        if (!$wanted or $delayed_wanted or $wanted->($sftp, $entry)) {
-                            push @dir, (($names_only and !$delayed_wanted) ? $fn : $entry);
-                        }
-                    }
-                }
-
-                $queue_size ++ if $queue_size < $max_queue_size;
-            }
-            else {
-                $sftp->_set_error if $sftp->{_status} == SSH2_FX_EOF;
-                $sftp->_get_msg for @msgid;
-                last;
-            }
-        }
+	    }
+	    $queue_size++ if $queue_size < $max_queue_size;
+	}
+	$sftp->_set_error if $sftp->{_status} == SSH2_FX_EOF;
+	$sftp->_get_msg for @msgid;
         $sftp->_closedir_save_status($rdh) if $rdh;
     };
     unless ($sftp->{_error}) {
@@ -3826,7 +3821,7 @@ beginning of the system call. That allows one, for instance, to
 connect to the target host through some SSH proxy:
 
   $sftp = Net::SFTP::Foreign->new($host,
-              ssh_cmd => qw(ssh -l user proxy.server ssh));
+              ssh_cmd => [qw(ssh -l user proxy.server ssh)]);
 
 But note that the module will not handle password authentication for
 those proxies.
@@ -5636,7 +5631,7 @@ L<autodie>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2019 Salvador FandiE<ntilde>o (sfandino@yahoo.com).
+Copyright (c) 2005-2020 Salvador FandiE<ntilde>o (sfandino@yahoo.com).
 
 Copyright (c) 2001 Benjamin Trott, Copyright (c) 2003 David Rolsky.
 

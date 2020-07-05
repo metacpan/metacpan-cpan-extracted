@@ -3,11 +3,13 @@ package MOP4Import::Declare;
 use 5.010;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-our $VERSION = '0.050';
+our $VERSION = '0.051';
 use Carp;
 use mro qw/c3/;
 
 use constant DEBUG => $ENV{DEBUG_MOP4IMPORT};
+
+use Sub::Util ();
 
 print STDERR "\nUsing ".__PACKAGE__. " = $VERSION (file '"
   . __FILE__ . "')\n"
@@ -21,10 +23,13 @@ use MOP4Import::Opts
     /;
 use MOP4Import::Util;
 use MOP4Import::FieldSpec;
+use MOP4Import::NamedCodeAttributes qw(MODIFY_CODE_ATTRIBUTES /^m4i_CODE_ATTR_/);
+
+#========================================
 
 our %FIELDS;
 
-sub import {
+sub import :MetaOnly {
   my ($myPack, @decls) = @_;
 
   m4i_log_start() if DEBUG;
@@ -54,7 +59,7 @@ sub always_exports {
   qw(-strict);
 }
 
-sub dispatch_declare {
+sub dispatch_declare :MetaOnly {
   (my $myPack, my Opts $opts, my (@decls)) = m4i_args(@_);
 
   foreach my $declSpec (@decls) {
@@ -86,7 +91,7 @@ our %SIGIL_MAP = qw(* GLOB
 		    @ ARRAY
 		    & CODE);
 
-sub dispatch_import {
+sub dispatch_import :MetaOnly {
   (my $myPack, my Opts $opts, my ($declSpec)) = m4i_args(@_);
 
   my ($name, $exported);
@@ -101,7 +106,7 @@ sub dispatch_import {
   }
 }
 
-sub dispatch_import_no_pragma {
+sub dispatch_import_no_pragma :MetaOnly {
   (my $myPack, my Opts $opts, my (@declSpec)) = m4i_args(@_);
   foreach my $declSpec (@declSpec) {
 
@@ -122,7 +127,7 @@ sub dispatch_import_no_pragma {
   }
 }
 
-sub import_by_regexp {
+sub import_by_regexp :MetaOnly {
   (my $myPack, my Opts $opts, my ($pattern)) = m4i_args(@_);
 
   my $symtab = MOP4Import::Util::symtab($myPack);
@@ -132,7 +137,7 @@ sub import_by_regexp {
   }
 }
 
-sub import_NAME {
+sub import_NAME :MetaOnly {
   (my $myPack, my Opts $opts, my ($name)) = m4i_args(@_);
 
   my $exported = safe_globref($myPack, $name);
@@ -143,7 +148,7 @@ sub import_NAME {
   *{globref($opts->{destpkg}, $name)} = $exported;
 }
 
-sub import_GLOB {
+sub import_GLOB :MetaOnly {
   (my $myPack, my Opts $opts, my ($sigil, $kind, $name)) = m4i_args(@_);
 
   my $exported = safe_globref($myPack, $name);
@@ -154,7 +159,7 @@ sub import_GLOB {
   *{globref($opts->{destpkg}, $name)} = $exported;
 }
 
-sub import_SIGIL {
+sub import_SIGIL :MetaOnly {
   (my $myPack, my Opts $opts, my ($sigil, $kind, $name)) = m4i_args(@_);
 
   my $exported = *{safe_globref($myPack, $name)}{$kind};
@@ -171,7 +176,7 @@ sub import_SIGIL {
 *import_HASH = *import_SIGIL; *import_HASH = *import_SIGIL;
 *import_CODE = *import_SIGIL; *import_CODE = *import_SIGIL;
 
-sub dispatch_declare_pragma {
+sub dispatch_declare_pragma :MetaOnly {
   (my $myPack, my Opts $opts, my ($pragma, @args)) = m4i_args(@_);
   if ($pragma =~ /^[A-Za-z]/
       and my $sub = $myPack->can("declare_$pragma")) {
@@ -185,23 +190,23 @@ sub dispatch_declare_pragma {
 #========================================
 
 # You may want to override these pragrams.
-sub declare_default_pragma {
+sub declare_default_pragma :MetaOnly {
   (my $myPack, my Opts $opts) = m4i_args(@_);
   $myPack->declare_c3($opts);
 }
 
-sub declare_strict {
+sub declare_strict :MetaOnly {
   (my $myPack, my Opts $opts) = m4i_args(@_);
   $_->import for qw(strict warnings); # I prefer fatalized warnings, but...
 }
 
 # Not enabled by default.
-sub declare_fatal {
+sub declare_fatal :MetaOnly {
   (my $myPack, my Opts $opts) = m4i_args(@_);
   warnings->import(qw(FATAL all NONFATAL misc));
 }
 
-sub declare_c3 {
+sub declare_c3 :MetaOnly {
   (my $myPack, my Opts $opts) = m4i_args(@_);
   mro::set_mro($opts->{destpkg}, 'c3');
 }
@@ -213,7 +218,7 @@ sub declare_c3 {
 #
 #   use XXX [import => qw/X Y Z/];
 #
-sub declare_import {
+sub declare_import :MetaOnly {
   (my $myPack, my Opts $opts, my (@import)) = m4i_args(@_);
 
   $myPack->dispatch_import_no_pragma($opts, @import);
@@ -221,7 +226,7 @@ sub declare_import {
 
 #========================================
 
-sub declare_fileless_base {
+sub declare_fileless_base :MetaOnly {
   (my $myPack, my Opts $opts, my (@base)) = m4i_args(@_);
 
   $myPack->declare___add_isa($opts->{objpkg}, @base);
@@ -231,7 +236,7 @@ sub declare_fileless_base {
 
 *declare_base = *declare_parent; *declare_base = *declare_parent;
 
-sub declare_parent {
+sub declare_parent :MetaOnly {
   (my $myPack, my Opts $opts, my (@base)) = m4i_args(@_);
 
   foreach my $fn (@base) {
@@ -242,7 +247,7 @@ sub declare_parent {
   $myPack->declare_fileless_base($opts, @base);
 }
 
-sub declare_as_base {
+sub declare_as_base :MetaOnly {
   (my $myPack, my Opts $opts, my (@fields)) = m4i_args(@_);
 
   print STDERR "Class $opts->{objpkg} inherits $myPack\n"
@@ -257,7 +262,7 @@ sub declare_as_base {
   $myPack->declare_private_constant($opts, MY => $opts->{objpkg}, or_ignore => 1);
 }
 
-sub declare___add_isa {
+sub declare___add_isa :MetaOnly {
   my ($myPack, $objpkg, @parents) = @_;
 
   print STDERR "Class $objpkg extends ".terse_dump(@parents)."\n"
@@ -314,7 +319,7 @@ sub declare___add_isa {
 #
 *declare_as = *declare_naming; *declare_as = *declare_naming;
 
-sub declare_naming {
+sub declare_naming :MetaOnly {
   (my $myPack, my Opts $opts, my ($name)) = m4i_args(@_);
 
   unless (defined $name and $name ne '') {
@@ -324,14 +329,14 @@ sub declare_naming {
   $myPack->declare_constant($opts, $name => $myPack);
 }
 
-sub declare_inc {
+sub declare_inc :MetaOnly {
   (my $myPack, my Opts $opts, my ($pkg)) = m4i_args(@_);
   $pkg //= $opts->{objpkg};
   $pkg =~ s{::}{/}g;
   $INC{$pkg . '.pm'} = 1;
 }
 
-sub declare_constant {
+sub declare_constant :MetaOnly {
   (my $myPack, my Opts $opts, my ($name, $value, %opts)) = m4i_args(@_);
 
   $myPack->declare_private_constant($opts, $name, $value, %opts);
@@ -344,7 +349,7 @@ sub declare_constant {
     . $opts->{objpkg}. "\n" if DEBUG;
 }
 
-sub declare_private_constant {
+sub declare_private_constant :MetaOnly {
   (my $myPack, my Opts $opts, my ($name, $value, %opts)) = m4i_args(@_);
 
   my $or_ignore = delete $opts{or_ignore};
@@ -361,7 +366,7 @@ sub declare_private_constant {
   MOP4Import::Util::define_constant($my_sym, $value);
 }
 
-sub declare_fields {
+sub declare_fields :MetaOnly {
   (my $myPack, my Opts $opts, my (@fields)) = m4i_args(@_);
 
   my $extended = fields_hash($opts->{objpkg});
@@ -421,7 +426,7 @@ sub declare_fields {
   $opts->{objpkg}; # XXX:
 }
 
-sub declare___field {
+sub declare___field :MetaOnly {
   (my $myPack, my Opts $opts, my ($field_class, $name, @rest)) = m4i_args(@_);
   print STDERR "  Declaring field $opts->{objpkg}.$name " if DEBUG;
   my $extended = fields_hash($opts->{objpkg});
@@ -460,7 +465,10 @@ sub declare___field {
         croak "Accessor $opts->{objpkg}::$name is redefined!\nIf you really want to define the accessor by hand, please specify fields spec like: [$name => no_getter => 1, ...].";
       }
     }
-    *{globref($opts->{objpkg}, $name)} = sub :method { $_[0]->{$name} };
+
+    *{globref($opts->{objpkg}, $name)}
+      = Sub::Util::set_subname(join("::", $opts->{objpkg}, $name)
+                               , sub :method { $_[0]->{$name} });
   }
 
   foreach my $delayed (@delayed) {
@@ -471,7 +479,7 @@ sub declare___field {
   $obj;
 }
 
-sub declare___field_with_default {
+sub declare___field_with_default :MetaOnly {
   (my $myPack, my Opts $opts, my FieldSpec $fs, my ($k, $v)) = m4i_args(@_);
 
   $fs->{$k} = $v;
@@ -488,7 +496,7 @@ sub JSON_TYPE_HANDLER {
   'MOP4Import::Util::JSON_TYPE';
 }
 
-sub declare___field_with_json_type {
+sub declare___field_with_json_type :MetaOnly {
   (my $myPack, my Opts $opts, my FieldSpec $fs, my ($kw, $typeSpec)) = m4i_args(@_);
 
   print STDERR "  $fs->{name} json_type: spec=", terse_dump($typeSpec), "\n" if DEBUG;
@@ -500,7 +508,7 @@ sub declare___field_with_json_type {
   #" result=", terse_dump($json_type), "\n"
 }
 
-sub declare_alias {
+sub declare_alias :MetaOnly {
   (my $myPack, my Opts $opts, my ($name, $alias)) = m4i_args(@_);
   print STDERR " Declaring alias $name in $opts->{destpkg} as $alias\n" if DEBUG;
   my $sym = globref($opts->{destpkg}, $name);
@@ -516,7 +524,7 @@ sub declare_alias {
 #    fieldName => defaultValue, ...
 # ]
 #
-sub declare_defaults {
+sub declare_defaults :MetaOnly {
   (my $myPack, my Opts $opts, my (@kvlist)) = m4i_args(@_);
 
   my $fields = fields_hash($opts->{objpkg});
@@ -530,7 +538,7 @@ sub declare_defaults {
   }
 }
 
-sub declare_map_methods {
+sub declare_map_methods :MetaOnly {
   (my $myPack, my Opts $opts, my (@pairs)) = m4i_args(@_);
 
   foreach my $pair (@pairs) {
@@ -541,7 +549,7 @@ sub declare_map_methods {
   }
 }
 
-sub declare_carp_not {
+sub declare_carp_not :MetaOnly {
   (my $myPack, my Opts $opts, my (@carp_not)) = m4i_args(@_);
 
   unless (@carp_not) {

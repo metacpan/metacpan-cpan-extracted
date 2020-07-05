@@ -1,9 +1,9 @@
 package BorderStyle;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-14'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'BorderStyle'; # DIST
-our $VERSION = '2.0.2'; # VERSION
+our $VERSION = '2.0.3'; # VERSION
 
 1;
 # ABSTRACT: Border styles
@@ -24,7 +24,7 @@ BorderStyle - Border styles
 
 =head1 VERSION
 
-This document describes version 2.0.2 of BorderStyle (from Perl distribution BorderStyle), released on 2020-06-14.
+This document describes version 2.0.3 of BorderStyle (from Perl distribution BorderStyle), released on 2020-06-19.
 
 =head1 DESCRIPTION
 
@@ -65,8 +65,8 @@ Usage:
  my $bs_struct = BorderStyle::NAME->get_struct;
  my $bs_struct = $bs_obj->get_struct;
 
-Provide a method way of getting the "border style structure". A client can also
-access the %BORDER package variable directly.
+Provide a method way of getting the "border style structure". Must also work as
+a static method. A client can also access the %BORDER package variable directly.
 
 =item * get_args
 

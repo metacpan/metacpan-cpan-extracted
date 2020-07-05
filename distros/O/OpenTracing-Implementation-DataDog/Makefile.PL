@@ -5,6 +5,6 @@ WriteMakefile(
     'VERSION_FROM'  => 'lib/OpenTracing/Implementation/DataDog.pm',
     'LICENSE'       => 'perl',
     test            => {
-        TESTS       => 't/*.t t/*/*.t',
+        TESTS       => 't/OpenTracing/Implementation/DataDog/*.t t/OpenTracing/Implementation/DataDog/*/*.t',
     },
 );

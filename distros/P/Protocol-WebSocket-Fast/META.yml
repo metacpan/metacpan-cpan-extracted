@@ -3,10 +3,10 @@ abstract: 'very fast WebSocket protocol implementation'
 author:
   - unknown
 build_requires:
-  Date: v5.1.0
+  Date: v5.2.0
   Encode::Base2N: v1.0.2
-  Export::XS: v3.0.4
-  Protocol::HTTP: v1.0.5
+  Export::XS: v3.0.5
+  Protocol::HTTP: v1.0.6
   Test::Catch: v1.0.13
   Test::Deep: '0'
   Test::Exception: '0'
@@ -15,24 +15,24 @@ build_requires:
   Test::Simple: '0.96'
   Test::Warnings: '0'
   URI::XS: v2.0.1
-  XS::Framework: v1.3.0
-  XS::libboost::mini: v1.68.0.0
-  XS::libcatch: v1.1.0
-  XS::libpanda: v1.3.14
+  XS::Framework: v1.3.2
+  XS::libboost::mini: v1.69.0.0
+  XS::libcatch: v2.12.1
+  XS::libpanda: v1.4.0
   XS::librangeV3: v1.0.0
   next::XS: v1.0.7
 configure_requires:
-  Date: v5.1.0
+  Date: v5.2.0
   Encode::Base2N: v1.0.2
-  Export::XS: v3.0.4
-  Protocol::HTTP: v1.0.5
+  Export::XS: v3.0.5
+  Protocol::HTTP: v1.0.6
   Test::Catch: v1.0.13
   URI::XS: v2.0.1
-  XS::Framework: v1.3.0
-  XS::Install: v1.2.16
-  XS::libboost::mini: v1.68.0.0
-  XS::libcatch: v1.1.0
-  XS::libpanda: v1.3.14
+  XS::Framework: v1.3.2
+  XS::Install: v1.2.17
+  XS::libboost::mini: v1.69.0.0
+  XS::libcatch: v2.12.1
+  XS::libpanda: v1.4.0
   XS::librangeV3: v1.0.0
   next::XS: v1.0.7
 dynamic_config: 1
@@ -47,16 +47,16 @@ no_index:
     - t
     - inc
 requires:
-  Date: v5.1.0
+  Date: v5.2.0
   Encode::Base2N: v1.0.2
-  Export::XS: v3.0.4
-  Protocol::HTTP: v1.0.5
+  Export::XS: v3.0.5
+  Protocol::HTTP: v1.0.6
   URI::XS: v2.0.1
-  XS::Framework: v1.3.0
-  XS::Install: v1.2.16
-  XS::libboost::mini: v1.68.0.0
-  XS::libpanda: v1.3.14
+  XS::Framework: v1.3.2
+  XS::Install: v1.2.17
+  XS::libboost::mini: v1.69.0.0
+  XS::libpanda: v1.4.0
   XS::librangeV3: v1.0.0
   next::XS: v1.0.7
-version: v1.1.1
+version: v1.1.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

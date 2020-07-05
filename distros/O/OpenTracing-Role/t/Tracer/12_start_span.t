@@ -184,9 +184,9 @@ subtest "Use 'default_context' when no 'child_of' and no 'active_span'" => sub {
     
     cmp_deeply(
         { @{$call_args} },
-        { baz => 7, qux => 5},
-        "... with the expected pre-processed options for 'build_context'"
-    );
+        { },
+        "... without 'default_span_context_args' options for 'build_context'"
+    ); # that is responsabillity for the implementation
     
     
     

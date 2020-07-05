@@ -1,5 +1,5 @@
 package Lab::SCPI;
-$Lab::SCPI::VERSION = '3.701';
+$Lab::SCPI::VERSION = '3.703';
 #ABSTRACT: Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and parameters against keywords
 
 use 5.010;
@@ -570,7 +570,7 @@ Lab::SCPI - Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and paramet
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 Interface
 

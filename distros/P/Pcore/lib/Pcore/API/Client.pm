@@ -99,7 +99,7 @@ sub _send_http ( $self, $method, $args ) {
         type   => 'rpc',
         method => $method,
         args   => $args,
-        ( defined wantarray ? ( tid => uuid_v1mc_str ) : () ),
+        ( defined wantarray ? ( id => uuid_v1mc_str ) : () ),
     };
 
     my $res = P->http->post(

@@ -10,10 +10,13 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+Alan
 DROLSKY
 DROLSKY's
 Dave
+Dorman
 Event
+Michael
 NoWarnings
 PayPal
 Plugin
@@ -24,3 +27,4 @@ Warning
 autarch
 drolsky
 lib
+mdorman

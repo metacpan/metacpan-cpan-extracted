@@ -1,8 +1,12 @@
-package Raisin::Middleware::Formatter;
+#!perl
+#PODNAME: Raisin::Middleware::Formatter
+#ABSTRACT: A parser/formatter middleware for L<Raisin>.
 
 use strict;
 use warnings;
 
+package Raisin::Middleware::Formatter;
+$Raisin::Middleware::Formatter::VERSION = '0.90';
 use parent 'Plack::Middleware';
 
 use HTTP::Status qw(:constants);
@@ -157,11 +161,20 @@ sub allowed_formats_for_requested_route {
 }
 
 1;
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Raisin::Middleware::Formatter - A parser/formatter middleware for L<Raisin>.
+
+=head1 VERSION
+
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -198,11 +211,13 @@ Parses C<Accept> header for known formatters.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh E<lt>atE<gt> cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

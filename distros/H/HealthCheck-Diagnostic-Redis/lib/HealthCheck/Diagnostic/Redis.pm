@@ -7,10 +7,11 @@ use parent 'HealthCheck::Diagnostic';
 
 use Carp;
 use Redis::Fast;
+use String::Random;
 
 # ABSTRACT: Check for Redis connectivity and operations in HealthCheck
 use version;
-our $VERSION = 'v0.0.4'; # VERSION
+our $VERSION = 'v0.0.5'; # VERSION
 
 sub new {
     my ($class, @params) = @_;
@@ -80,26 +81,74 @@ sub run {
         };
     }
 
-    my ($key, $error) = $redis->randomkey();
-    return {
-        status  => 'CRITICAL',
-        info    => "Error for $description: Getting Random entry failed - $error",
-    } if ($error);
+    # Attempt to get a result from the readability or writeability
+    # test.
+    my $res = $params{read_only}
+        ? $self->test_read_only( $redis, $description, %params )
+        : $self->test_read_write( $redis, $description, %params );
 
-    # At this point, the only way this fails is if there are no entries in the
-    # Redis DB.
-    if ($key) {
-        my $val = $redis->get($key);
-        return {
-            status  => 'CRITICAL',
-            info    => "Error for $description: Failed fetching value of key $key",
-        } unless defined $val;
-    }
-
+    return $res if ref $res eq 'HASH';
     return {
         status => 'OK',
         info   => "Successful connection for $description",
     };
+}
+
+sub test_read_only {
+    my ($self, $redis, $description, %params) = @_;
+
+    my ($key, $error) = ($params{key_name}) || $redis->randomkey;
+    return {
+        status => 'CRITICAL',
+        info   => sprintf( 'Error for %s: Failed getting random entry - %s',
+            $description,
+            $error,
+        ),
+    } if $error;
+
+    # When there is no key, that means we don't have anything in the
+    # database. No need to ping on that.
+    return unless $key || $params{key_name};
+
+    my $val = $redis->get( $key );
+    return {
+        status => 'CRITICAL',
+        info   => sprintf( 'Error for %s: Failed reading value of key %s',
+            $description,
+            $key,
+        ),
+    } unless defined $val;
+}
+
+sub test_read_write {
+    my ($self, $redis, $description, %params) = @_;
+    my $key = $params{key_name} || sprintf(
+        '_health_check_%s',
+        String::Random->new->randregex('[A-Z0-9]{24}'),
+    );
+
+    # Do not overwrite anything in the database.
+    return {
+        status => 'CRITICAL',
+        info   => sprintf( 'Error for %s: Cannot overwrite key %s',
+            $description,
+            $key,
+        ),
+    } if defined $redis->get( $key );
+
+    # Set, get, and delete the temporary value. Also set an expiration
+    # date of 5 seconds after setting just in-case.
+    $redis->set( $key => 'temp', EX => 5 );
+    my $val = $redis->get( $key );
+    $redis->del( $key );
+
+    return {
+        status => 'CRITICAL',
+        info   => sprintf( 'Error for %s: Failed writing to key %s',
+            $description,
+            $key,
+        ),
+    } unless defined $val;
 }
 
 1;
@@ -116,7 +165,7 @@ HealthCheck::Diagnostic::Redis - Check for Redis connectivity and operations in 
 
 =head1 VERSION
 
-version v0.0.4
+version v0.0.5
 
 =head1 SYNOPSIS
 
@@ -144,6 +193,15 @@ This gets populated in the resulting C<info> tag.
 
 The server name to connect to for the test.
 This is required.
+
+=head2 read_only
+
+Run a read-only check, instead of the read-and-write check provided
+by-default.
+
+=head2 key_name
+
+Use a static key name instead of a randomly-generated one.
 
 =head1 DEPENDENCIES
 

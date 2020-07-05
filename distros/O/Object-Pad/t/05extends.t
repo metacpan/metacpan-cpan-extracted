@@ -18,7 +18,7 @@ class Animal 1.23 {
 
 is( $Animal::VERSION, 1.23, 'Versioned class has $VERSION' );
 
-class Spider extends Animal {
+class Spider 4.56 extends Animal {
    sub BUILDARGS {
       my $self = shift;
       return $self->SUPER::BUILDARGS( 8 );
@@ -28,6 +28,8 @@ class Spider extends Animal {
       "An animal with " . $self->legs . " legs";
    }
 }
+
+is( $Spider::VERSION, 4.56, 'Versioned subclass has $VERSION' );
 
 {
    my $spider = Spider->new;

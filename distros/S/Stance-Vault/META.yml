@@ -1,0 +1,29 @@
+---
+abstract: 'A Perl Interface to Hashicorp Vault'
+author:
+  - 'James Hunt'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Stance-Vault
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  perl: '5.008004'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/jhunt/perl-Stance-Vault.git
+version: v1.0.0

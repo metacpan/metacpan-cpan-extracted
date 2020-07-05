@@ -2,6 +2,7 @@ CHANGES
 cpanfile
 lib/OpenTracing/Implementation/NoOp.pm
 lib/OpenTracing/Implementation/NoOp.pod
+lib/OpenTracing/Implementation/NoOp/ContextReference.pm
 lib/OpenTracing/Implementation/NoOp/Scope.pm
 lib/OpenTracing/Implementation/NoOp/ScopeManager.pm
 lib/OpenTracing/Implementation/NoOp/Span.pm
@@ -12,5 +13,11 @@ Makefile.PL
 MANIFEST
 README.md
 t/00_use_ok.t
+t/Implementation/NoOp/ContextReference/01_can_all_ok.t
+t/Implementation/NoOp/Scope/01_can_all_ok.t
+t/Implementation/NoOp/ScopeManager/01_can_all_ok.t
+t/Implementation/NoOp/Span/01_can_all_ok.t
+t/Implementation/NoOp/SpanContext/01_can_all_ok.t
+t/Implementation/NoOp/Tracer/01_can_all_ok.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

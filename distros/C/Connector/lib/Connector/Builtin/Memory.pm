@@ -25,7 +25,6 @@ sub _build_config {
     $self->_config( {} );
 }
 
-
 sub _get_node {
 
     my $self = shift;
@@ -63,10 +62,10 @@ sub get {
     my $self = shift;
     my $value = $self->_get_node( shift );
 
-    return unless (defined $value);
+    return $self->_node_not_exists() unless (defined $value);
 
     if (ref $value ne '') {
-        die "requested value is not a scalar " . Dumper $value;
+        die "requested value is not a scalar";
     }
 
     return $value;
@@ -78,7 +77,7 @@ sub get_size {
     my $self = shift;
     my $node = $self->_get_node( shift );
 
-    return unless(defined $node);
+    return 0 unless(defined $node);
 
     if ( ref $node ne 'ARRAY' ) {
         die "requested value is not a list"
@@ -87,13 +86,14 @@ sub get_size {
     return scalar @{$node};
 }
 
-
 sub get_list {
 
     my $self = shift;
-    my $node = $self->_get_node( shift );
+    my $path = shift;
 
-    return unless(defined $node);
+    my $node = $self->_get_node( $path );
+
+    return $self->_node_not_exists( $path ) unless(defined $node);
 
     if ( ref $node ne 'ARRAY' ) {
         die "requested value is not a list"
@@ -105,9 +105,11 @@ sub get_list {
 sub get_keys {
 
     my $self = shift;
-    my $node = $self->_get_node( shift );
+    my $path = shift;
 
-    return unless(defined $node);
+    my $node = $self->_get_node( $path );
+
+    return @{[]} unless(defined $node);
 
     if ( ref $node ne 'HASH' ) {
         die "requested value is not a hash"
@@ -119,9 +121,11 @@ sub get_keys {
 sub get_hash {
 
     my $self = shift;
-    my $node = $self->_get_node( shift );
+    my $path = shift;
 
-    return unless(defined $node);
+    my $node = $self->_get_node( $path );
+
+    return $self->_node_not_exists( $path ) unless(defined $node);
 
     if ( ref $node ne 'HASH' ) {
         die "requested value is not a hash"
@@ -154,8 +158,10 @@ sub get_meta {
     } elsif (ref $node eq "HASH") {
         my @keys = keys(%{$node});
         $meta = {TYPE  => "hash", VALUE => \@keys };
+    } elsif (blessed($node) && $node->isa('Connector')) {
+        $meta = {TYPE  => "connector", VALUE => $node };
     } else {
-        die "Unsupported node type";
+        die "Unsupported node type: " . ref $node;
     }
     return $meta;
 }
@@ -193,6 +199,11 @@ sub set {
 
     my $entry = shift @path;
 
+    if (!defined $value) {
+        delete $ptr->{$entry};
+        return;
+    }
+
     if (exists $ptr->{$entry}) {
         if (ref $ptr->{$entry} ne ref $value) {
             confess('Try to override data type at node ' . $entry);
@@ -215,4 +226,3 @@ Connector::Builtin::Memory
 =head 1 Description
 
 A connector implementation to allow memory based caching
-

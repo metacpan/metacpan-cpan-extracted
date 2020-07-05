@@ -1,0 +1,84 @@
+Changelog for Zing
+
+0.10 2020-07-02T20:19:56
+ - Add release updates
+ - Fix hot-reloading in Zing/Fork (#172)
+
+0.09 2020-07-02T06:38:04
+ - Built release version 0.09
+ - Add release updates
+ - Address ambiguous use of "ref"
+ - Update POD Template
+ - Add "trace" to Zing::Timer (#167)
+ - Add Domain to Types (#168)
+ - Replace "die" with "confess"
+ - Add "trace" to Zing::Timer
+ - Implement Zing::Timer (#156)
+ - Add "ping" method to Zing/Process (#155)
+ - Implement Zing::Term (#164)
+ - Implement Zing::Domain (#157)
+ - Include missing class examples (#160)
+ - Include support for lifo queues (#158)
+ - Document ZING_DEBUG, ZING_APPDIR, and ZING_PIDDIR (#152)
+ - Prevent fork-bombing in Spawner (#151)
+ - Include logic debug statements (#154)
+ - Implement Zing::Poll (#150)
+ - Update stability and contributing docs (#149)
+
+0.08 2020-06-27T22:38:48
+ - Built release version 0.08
+ - Add release updates
+ - Implement Zing::Ringer (#133)
+ - Implement log filtering by name (#136)
+ - Implement log filtering by tag (#135)
+ - Implement verbose log output (#138)
+ - Cleanup dependencies (#131)
+ - Describe virtual-actors feature (#132)
+ - Implement registry cleanup (#134)
+ - Use init_arg to ignore "name" attr overrides (#124)
+ - Fix log tap output error (#123)
+
+0.07 2020-06-25T17:33:48
+ - Built release version 0.07
+ - Add release updates
+ - Implement internal naming strategy (#119)
+
+0.06 2020-06-25T08:21:14
+ - Built release version 0.06
+ - Add release updates
+ - Update main template
+ - Establish multi-Perl/Redis test CI instances (#116)
+ - Update documentation (#115)
+ - Add transient data store (#114)
+
+0.05 2020-06-24T02:50:22
+ - Built release version 0.05
+ - Add release updates
+ - Fix definitions in release
+
+0.04 2020-06-24T02:19:04
+ - Built release version 0.04
+ - Add release updates
+ - Update main module POD (#108)
+ - Implement Zing::Zang::Watcher (#107)
+ - Remove multiple-inheritance (#106)
+ - Implement Zing::Zang::Worker (#104)
+ - Implement Zing::Zang::Spawner (#103)
+ - Implement Zing::Zang::Launcher (#102)
+ - Implement Zing::Zang::Simple (#101)
+ - Implement Zing::Zang::Single (#100)
+ - Update manifest.skip
+ - Reorganize examples (#92)
+ - Remove "log" attribute handlers (#90)
+
+0.03 2020-06-22T21:15:08
+ - Built release version 0.03
+ - Add release updates
+ - Add "zing" command-line tool
+
+0.02 2020-06-22T20:50:31
+ - Built release version 0.02
+ - Add release updates
+ - Adjust release version
+ - Include examples in release
+ - Initial commit

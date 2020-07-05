@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Zing::Queue;
+use Zing::Zang::Worker;
+
+=pod explain
+
+- when creating zing processes ...
+- typically you will want to subclass a Zing/Process derived class ...
+- however, there are times when you don't need/want to dedicate a class
+
+- the zang-worker is a ready-to-use callback-based zing worker ...
+- see ./examples/00-zing-worker
+
+=cut
+
+my $i = 0;
+my $q = Zing::Queue->new(name => 'tasks');
+my $z = Zing::Zang::Worker->new(
+  on_perform => sub {
+    my ($self) = @_;
+
+    $q->send({ note => join('-', 'note', ++$i) });
+
+    return $self;
+  },
+  on_handle => sub {
+    my ($self, $name, $data) = @_;
+
+    my $note = $data->{note};
+
+    warn join ' ', qq(recevied data:$note from queue $name)
+  },
+  queues => ['tasks'],
+);
+
+$z->execute;

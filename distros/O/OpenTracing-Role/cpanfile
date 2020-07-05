@@ -1,4 +1,4 @@
-requires            "OpenTracing::Interface", '>= 0.202.2';
+requires            "OpenTracing::Interface", '>= 0.204.0';
 requires            "OpenTracing::Types"; # yes, it is part of Interface'
 
 requires            "Carp";

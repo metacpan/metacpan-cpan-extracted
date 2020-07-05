@@ -2,8 +2,8 @@ NAME
     LinuxMint::Releases - List LinuxMint releases
 
 VERSION
-    This document describes version 0.031 of LinuxMint::Releases (from Perl
-    distribution LinuxMint-Releases), released on 2018-01-19.
+    This document describes version 0.032 of LinuxMint::Releases (from Perl
+    distribution LinuxMint-Releases), released on 2020-07-01.
 
 SYNOPSIS
      use LinuxMint::Releases qw(list_linuxmint_release);
@@ -20,7 +20,7 @@ FUNCTIONS
   list_linuxmint_releases
     Usage:
 
-     list_linuxmint_releases(%args) -> [status, msg, result, meta]
+     list_linuxmint_releases(%args) -> [status, msg, payload, meta]
 
     REPLACE ME.
 
@@ -245,6 +245,10 @@ FUNCTIONS
 
         Only return records where the 'eoldate' field is greater than
         specified value.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
 
     *   fields => *array[str]*
 
@@ -882,7 +886,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -916,7 +920,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018, 2017, 2016, 2015 by
+    This software is copyright (c) 2020, 2018, 2017, 2016, 2015 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

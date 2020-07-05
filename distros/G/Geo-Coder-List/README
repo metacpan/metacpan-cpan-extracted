@@ -1,4 +1,4 @@
-Geo-Coder-List Version 0.26
+Geo-Coder-List Version 0.27
 
 INSTALLATION
 
@@ -19,20 +19,17 @@ perldoc command.
 You can also look for information at:
 
     RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Geo-Coder-List
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Geo-Coder-List
+        https://cpanratings.perl.org/d/Geo-Coder-List
 
-    Search CPAN
-        http://search.cpan.org/dist/Geo-Coder-List/
+    MetaCPAN
+        https://metacpan.org/release/Geo-Coder-List
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2016-2019 Nigel Horne
+Copyright (C) 2016-2020 Nigel Horne
 
 This program is released under the following licence: GPL2

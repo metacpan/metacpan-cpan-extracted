@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -ex
+
+cip sudo apt-get update
+
+if echo $CIP_ENV | grep -q system; then
+  cip sudo apt-get install castxml
+else
+  cip sudo apt-get install cmake clang g++ llvm-7-dev libclang-7-dev
+fi
+

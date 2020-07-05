@@ -11,7 +11,7 @@ namespace panda { namespace unievent { namespace backend {
 struct LoopImpl {
     using delayed_fn = function<void()>;
     enum class Type    { LOCAL, GLOBAL, DEFAULT };
-    enum class RunMode { DEFAULT, ONCE, NOWAIT };
+    enum class RunMode { DEFAULT, ONCE, NOWAIT, NOWAIT_FORCE };
 
     std::exception_ptr _exception;
 
@@ -50,6 +50,8 @@ struct LoopImpl {
     virtual uint64_t delay        (const delayed_fn& f, const iptr<Refcnt>& guard = {}) = 0;
     virtual void     cancel_delay (uint64_t id) noexcept = 0;
 
+    virtual void* get() = 0;
+
     template <class Func>
     void ltry (Func&& f) {
         try { f(); }
@@ -61,7 +63,5 @@ struct LoopImpl {
 
     virtual ~LoopImpl () {}
 };
-
-extern log::Module uebacklog;
 
 }}}

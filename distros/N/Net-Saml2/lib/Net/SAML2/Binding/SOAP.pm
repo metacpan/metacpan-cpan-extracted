@@ -1,6 +1,5 @@
 package Net::SAML2::Binding::SOAP;
 use Moose;
-use MooseX::Types::Moose qw/ Str Object /;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
 
@@ -11,14 +10,18 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 
 
-has 'ua'       => (isa => Object, is => 'ro', required => 1,
-                   default => sub { LWP::UserAgent->new });
+has 'ua' => (
+    isa      => 'Object',
+    is       => 'ro',
+    required => 1,
+    default  => sub { LWP::UserAgent->new }
+);
 
 has 'url'      => (isa => Uri, is => 'ro', required => 1, coerce => 1);
-has 'key'      => (isa => Str, is => 'ro', required => 1);
-has 'cert'     => (isa => Str, is => 'ro', required => 1);
-has 'idp_cert' => (isa => Str, is => 'ro', required => 1);
-has 'cacert'   => (isa => Str, is => 'ro', required => 1);
+has 'key'      => (isa => 'Str', is => 'ro', required => 1);
+has 'cert'     => (isa => 'Str', is => 'ro', required => 1);
+has 'idp_cert' => (isa => 'Str', is => 'ro', required => 1);
+has 'cacert'   => (isa => 'Str', is => 'ro', required => 1);
 
 
 sub request {
@@ -44,7 +47,7 @@ sub handle_response {
     my ($self, $response) = @_;
 
     # verify the response
-    my $x = Net::SAML2::XML::Sig->new({ x509 => 1, cert_text => $self->idp_cert });
+    my $x = Net::SAML2::XML::Sig->new({ x509 => 1, cert_text => $self->idp_cert, exclusive => 1, });
     my $ret = $x->verify($response);
     die "bad SOAP response" unless $ret;
 
@@ -76,7 +79,7 @@ sub handle_request {
     my $saml = $parser->findnodes_as_string('/soap-env:Envelope/soap-env:Body/*');
 
     if (defined $saml) {
-        my $x = Net::SAML2::XML::Sig->new({ x509 => 1, cert_text => $self->idp_cert });
+        my $x = Net::SAML2::XML::Sig->new({ x509 => 1, cert_text => $self->idp_cert, exclusive => 1, });
         my $ret = $x->verify($saml);
         die "bad signature" unless $ret;
 
@@ -101,6 +104,7 @@ sub create_soap_envelope {
         x509 => 1,
         key  => $self->key,
         cert => $self->cert,
+        exclusive => 1,
     });
     my $signed_message = $sig->sign($message);
 
@@ -149,7 +153,7 @@ Net::SAML2::Binding::SOAP
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -235,7 +239,8 @@ This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
 
   Copyright 2010-2011  Chris Andrews
             2012       Peter Marschall
-            2019-2020  Timothy Legge
+            2019       Timothy Legge
+            2020       Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

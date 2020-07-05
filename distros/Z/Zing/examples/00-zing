@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing;
+
+=pod explain
+
+- zing is the main module
+- it is also a process itself, a Watcher process
+- it loads (and forks) a scheme
+- it is actually a special kind of Watcher
+- i.e. it loads a kernel process which loads the scheme
+- as a watcher, it maintains the specified number of forks
+- the supervisor tree is zing -> kernel -> app
+
+=cut
+
+my $z = Zing->new(scheme => ['MyApp::Time', [], 1]);
+
+$z->start;

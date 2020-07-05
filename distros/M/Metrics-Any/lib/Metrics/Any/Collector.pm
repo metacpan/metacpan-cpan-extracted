@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Collector;
+package Metrics::Any::Collector 0.06;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.05';
 
 use Carp;
 
@@ -53,10 +51,10 @@ during program startup.
 sub new
 {
    my $class = shift;
-   my ( $pkg, %args ) = @_;
+   my ( $package, %args ) = @_;
 
    return bless {
-      pkg => $pkg,
+      package => $package,
       adapter => undef,
       deferred => [],
       name_prefix => $args{name_prefix},
@@ -174,7 +172,7 @@ not simple strings.
    use Metrics::Any '$metrics', name_prefix => [qw( my_program_name )];
 
    $metrics->make_counter( events =>
-      name => "events",
+      name => [ "events" ],
    );
 
    # Will create a counter named ["my_program_name", "events"] formed by the
@@ -236,7 +234,28 @@ use overload
    'bool' => sub {
       !$_[0]->{adapter} or ref $_[0]->{adapter} ne "Metrics::Any::Adapter::Null"
    },
+   # stringify as itself otherwise bool takes over and it just prints as 1,
+   # leading to much developer confusion
+   '""' => sub { $_[0] },
    fallback => 1;
+
+=head1 METHODS
+
+   $package = $metrics->package
+
+Returns the package name that created the collector; the package in which the
+
+   use Metrics::Any '$metrics';
+
+statement was invoked.
+
+=cut
+
+sub package
+{
+   my $self = shift;
+   return $self->{package};
+}
 
 =head1 METRIC TYPES
 
@@ -338,7 +357,10 @@ sub make_counter
    $self->{$handle} and croak "Already have a metric '$handle'";
    $self->{$handle} = [ counter => @{ $args{labels} // [] } ];
 
-   $self->_adapter_call( make_counter => "$self->{pkg}/$handle", %args );
+   $self->_adapter_call( make_counter => "$self->{package}/$handle",
+      collector => $self,
+      %args
+   );
 }
 
 =head2 inc_counter
@@ -357,7 +379,7 @@ sub inc_counter
 
    my @labelvalues = $self->_labelvalues( counter => $handle, @args );
 
-   $self->adapter->inc_counter_by( "$self->{pkg}/$handle", 1, @labelvalues );
+   $self->adapter->inc_counter_by( "$self->{package}/$handle", 1, @labelvalues );
 }
 
 =head2 inc_counter_by
@@ -375,7 +397,7 @@ sub inc_counter_by
 
    my @labelvalues = $self->_labelvalues( counter => $handle, @args );
 
-   $self->adapter->inc_counter_by( "$self->{pkg}/$handle", $amount, @labelvalues );
+   $self->adapter->inc_counter_by( "$self->{package}/$handle", $amount, @labelvalues );
 }
 
 =head2 Distribution
@@ -435,7 +457,10 @@ sub make_distribution
    $self->{$handle} and croak "Already have a metric '$handle'";
    $self->{$handle} = [ distribution => @{ $args{labels} // [] } ];
 
-   $self->_adapter_call( make_distribution => "$self->{pkg}/$handle", %args );
+   $self->_adapter_call( make_distribution => "$self->{package}/$handle",
+      collector => $self,
+      %args
+   );
 }
 
 =head2 report_distribution
@@ -465,7 +490,7 @@ sub report_distribution
 
    # Support new and legacy name
    my $method = $adapter->can( "report_distribution" ) // "inc_distribution_by";
-   $adapter->$method( "$self->{pkg}/$handle", $amount, @labelvalues );
+   $adapter->$method( "$self->{package}/$handle", $amount, @labelvalues );
 }
 
 *inc_distribution_by = \&report_distribution;
@@ -501,7 +526,10 @@ sub make_gauge
    $self->{$handle} and croak "Already have a metric '$handle'";
    $self->{$handle} = [ gauge => @{ $args{labels} // [] } ];
 
-   $self->_adapter_call( make_gauge => "$self->{pkg}/$handle", %args );
+   $self->_adapter_call( make_gauge => "$self->{package}/$handle",
+      collector => $self,
+      %args
+   );
 }
 
 =head2 inc_gauge
@@ -532,7 +560,7 @@ sub inc_gauge
 
    my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
-   $self->adapter->inc_gauge_by( "$self->{pkg}/$handle", 1, @labelvalues );
+   $self->adapter->inc_gauge_by( "$self->{package}/$handle", 1, @labelvalues );
 }
 
 sub dec_gauge
@@ -542,7 +570,7 @@ sub dec_gauge
 
    my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
-   $self->adapter->inc_gauge_by( "$self->{pkg}/$handle", -1, @labelvalues );
+   $self->adapter->inc_gauge_by( "$self->{package}/$handle", -1, @labelvalues );
 }
 
 sub inc_gauge_by
@@ -552,7 +580,7 @@ sub inc_gauge_by
 
    my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
-   $self->adapter->inc_gauge_by( "$self->{pkg}/$handle", $amount, @labelvalues );
+   $self->adapter->inc_gauge_by( "$self->{package}/$handle", $amount, @labelvalues );
 }
 
 sub dec_gauge_by
@@ -562,7 +590,7 @@ sub dec_gauge_by
 
    my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
-   $self->adapter->inc_gauge_by( "$self->{pkg}/$handle", -$amount, @labelvalues );
+   $self->adapter->inc_gauge_by( "$self->{package}/$handle", -$amount, @labelvalues );
 }
 
 =head2 set_gauge_to
@@ -582,7 +610,7 @@ sub set_gauge_to
 
    my @labelvalues = $self->_labelvalues( gauge => $handle, @args );
 
-   $self->adapter->set_gauge_to( "$self->{pkg}/$handle", $amount, @labelvalues );
+   $self->adapter->set_gauge_to( "$self->{package}/$handle", $amount, @labelvalues );
 }
 
 =head2 Timer
@@ -615,7 +643,10 @@ sub make_timer
    $self->{$handle} and croak "Already have a metric '$handle'";
    $self->{$handle} = [ timer => @{ $args{labels} // [] } ];
 
-   $self->_adapter_call( make_timer => "$self->{pkg}/$handle", %args );
+   $self->_adapter_call( make_timer => "$self->{package}/$handle",
+      collector => $self,
+      %args
+   );
 }
 
 =head2 report_timer
@@ -644,7 +675,7 @@ sub report_timer
 
    # Support new and legacy name
    my $method = $adapter->can( "report_timer" ) // "inc_timer_by";
-   $adapter->$method( "$self->{pkg}/$handle", $duration, @labelvalues );
+   $adapter->$method( "$self->{package}/$handle", $duration, @labelvalues );
 }
 
 *inc_timer_by = \&report_timer;

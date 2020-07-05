@@ -33,17 +33,18 @@
       "runtime" : {
          "requires" : {
             "OpenTracing::Implementation" : "0.03",
-            "OpenTracing::Interface" : "0",
+            "OpenTracing::Interface" : "v0.204.0",
             "aliased" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Most" : "0"
+            "Test::Most" : "0",
+            "Test::OpenTracing::Interface" : "v0.23.0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.07",
+   "version" : "v0.71.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,5 +1,20 @@
 Revision history for Syntax-Keyword-Try
 
+0.13    2020-06-29
+        [BUGFIXES]
+         * Pack correct MANIFEST to include hax/ files
+
+0.12    2020-06-29
+        [CHANGES]
+         * Optional and experimental allocation of a new lexical under
+           `catch my $VAR` syntax (RT130702). However, this syntax may not
+           survive long, as part of the ongoing typed catch design work.
+
+        [BUGFIXES]
+         * Work around perl versions prior to 5.22 built with -DDEBUGGING
+           getting upset about new*OP() being invoked with OP_CUSTOM
+           (RT128562)
+
 0.11    2019-09-07
         [CHANGES]
          * Use wrap_keyword_plugin() instead of direct access to

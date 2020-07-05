@@ -8,9 +8,10 @@ use Carp;
 use Time::HiRes;
 use HTML::Entities;
 
-use constant DEBUG => 0;	# The higher the number, the more is debugged
+use constant DEBUG => 0;	# Default debugging level
 
 # TODO: investigate Geo, Coder::ArcGIS
+# TODO: return a Geo::Location::Point object all the time
 
 =head1 NAME
 
@@ -18,11 +19,11 @@ Geo::Coder::List - Call many Geo-Coders
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =cut
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 our %locations;	# L1 cache, always used
 
 =head1 SYNOPSIS
@@ -42,6 +43,9 @@ Creates a Geo::Coder::List object.
 
 Takes an optional argument 'cache' which takes an cache object that supports
 get() and set() methods.
+Takes an optional argument 'debug',
+the higher the number,
+the more debugging.
 The licences of some geo coders,
 such as Google,
 specifically prohibit caching API calls,
@@ -62,7 +66,7 @@ sub new {
 
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	return bless { %args, geo_coders => [] }, $class;
+	return bless { debug => DEBUG, %args, geo_coders => [] }, $class;
 }
 
 =head2 push
@@ -140,7 +144,7 @@ sub geocode {
 	$location = decode_entities($location);
 
 	my @call_details = caller(0);
-	print "location: $location\n" if(DEBUG);
+	print "location: $location\n" if($self->{'debug'});
 	if((!wantarray) && (my $rc = $self->_cache($location))) {
 		if(ref($rc) eq 'ARRAY') {
 			$rc = @{$rc}[0];
@@ -155,7 +159,7 @@ sub geocode {
 				result => $rc
 			};
 			CORE::push @{$self->{'log'}}, $log;
-			print "cached\n" if(DEBUG);
+			print "cached\n" if($self->{'debug'});
 			return $rc;
 		}
 	}
@@ -163,7 +167,14 @@ sub geocode {
 		if(scalar(@rc)) {
 			my $allempty = 1;
 			foreach (@rc) {
-				if((ref($_) eq 'HASH') || (ref($_) eq 'Geo::Location::Point')) {
+				if(ref($_) eq 'HASH') {
+					if(defined($_->{geometry}{location}{lat})) {
+						$allempty = 0;
+						delete $_->{'geocoder'};
+					} else {
+						delete $_->{'geometry'};
+					}
+				} elsif(ref($_) eq 'Geo::Location::Point') {
 					$allempty = 0;
 					delete $_->{'geocoder'};
 				}
@@ -176,7 +187,7 @@ sub geocode {
 				result => \@rc
 			};
 			CORE::push @{$self->{'log'}}, $log;
-			print "cached\n" if(DEBUG);
+			print "cached\n" if($self->{'debug'});
 			if($allempty) {
 				return;
 			}
@@ -190,14 +201,14 @@ sub geocode {
 		my $geocoder = $g;
 		if(ref($geocoder) eq 'HASH') {
 			if(exists($geocoder->{'limit'}) && defined(my $limit = $geocoder->{'limit'})) {
-				print "limit: $limit\n" if(DEBUG);
+				print "limit: $limit\n" if($self->{'debug'});
 				if($limit <= 0) {
 					next;
 				}
 				$geocoder->{'limit'}--;
 			}
 			if(my $regex = $geocoder->{'regex'}) {
-				print 'consider ', ref($geocoder->{geocoder}), ": $regex\n" if(DEBUG);
+				print 'consider ', ref($geocoder->{geocoder}), ": $regex\n" if($self->{'debug'});
 				if($location !~ $regex) {
 					next;
 				}
@@ -209,9 +220,9 @@ sub geocode {
 		eval {
 			# e.g. over QUERY LIMIT with this one
 			# TODO: remove from the list of geocoders
-			print 'trying ', ref($geocoder), "\n" if(DEBUG);
+			print 'trying ', ref($geocoder), "\n" if($self->{'debug'});
 			if(ref($geocoder) eq 'Geo::GeoNames') {
-				print 'username => ', $geocoder->username(), "\n" if(DEBUG);
+				print 'username => ', $geocoder->username(), "\n" if($self->{'debug'});
 				die 'lost username' if(!defined($geocoder->username()));
 				@rc = $geocoder->geocode($location);
 			} else {
@@ -263,7 +274,8 @@ sub geocode {
 				CORE::push @{$self->{'log'}}, $log;
 				next ENCODER;
 			}
-			print Data::Dumper->new([\$l])->Dump() if(DEBUG >= 2);
+			print ref($geocoder), ': ',
+				Data::Dumper->new([\$l])->Dump() if($self->{'debug'} >= 2);
 			last if(ref($l) eq 'Geo::Location::Point');
 			next if(ref($l) ne 'HASH');
 			if($l->{'error'}) {
@@ -335,7 +347,7 @@ sub geocode {
 					}
 				}
 				if(defined($l->{geometry}{location}{lat})) {
-					print $l->{geometry}{location}{lat}, '/', $l->{geometry}{location}{lng}, "\n" if(DEBUG);
+					print $l->{geometry}{location}{lat}, '/', $l->{geometry}{location}{lng}, "\n" if($self->{'debug'});
 					$l->{geocoder} = $geocoder;
 					my $log = {
 						line => $call_details[2],
@@ -352,8 +364,8 @@ sub geocode {
 		}
 
 		if(scalar(@rc)) {
-			print 'Number of matches from ', ref($geocoder), ': ', scalar(@rc), "\n" if(DEBUG);
-			print Data::Dumper->new([\@rc])->Dump() if(DEBUG >= 2);
+			print 'Number of matches from ', ref($geocoder), ': ', scalar(@rc), "\n" if($self->{'debug'});
+			print Data::Dumper->new([\@rc])->Dump() if($self->{'debug'} >= 2);
 			if(defined($rc[0])) {	# check it's not an empty hash
 				if(wantarray) {
 					$self->_cache($location, \@rc);
@@ -451,7 +463,7 @@ sub reverse_geocode {
 		my $geocoder = $g;
 		if(ref($geocoder) eq 'HASH') {
 			if(exists($geocoder->{'limit'}) && defined(my $limit = $geocoder->{'limit'})) {
-				print "limit: $limit\n" if(DEBUG);
+				print "limit: $limit\n" if($self->{'debug'});
 				if($limit <= 0) {
 					next;
 				}
@@ -459,11 +471,11 @@ sub reverse_geocode {
 			}
 			$geocoder = $g->{'geocoder'};
 		}
-		print 'trying ', ref($geocoder), "\n" if(DEBUG);
+		print 'trying ', ref($geocoder), "\n" if($self->{'debug'});
 		if(wantarray) {
 			my @rc;
 			if(my @locs = $geocoder->reverse_geocode(%params)) {
-				print Data::Dumper->new([\@locs])->Dump() if(DEBUG >= 2);
+				print Data::Dumper->new([\@locs])->Dump() if($self->{'debug'} >= 2);
 				foreach my $loc(@locs) {
 					if(my $name = $loc->{'display_name'}) {
 						# OSM
@@ -516,7 +528,7 @@ sub reverse_geocode {
 			}
 		} elsif(my $rc = $geocoder->reverse_geocode(%params)) {
 			return $rc if(!ref($rc));
-			print Data::Dumper->new([$rc])->Dump() if(DEBUG >= 2);
+			print Data::Dumper->new([$rc])->Dump() if($self->{'debug'} >= 2);
 			if(my $name = $rc->{'display_name'}) {
 				# OSM
 				return $self->_cache($latlng, $name);
@@ -592,8 +604,11 @@ sub _cache {
 	my $key = shift;
 
 	if(my $value = shift) {
+		# Put somthing into the cache
 		$locations{$key} = $value;
 		if($self->{'cache'}) {
+			my $duration;
+			my $rc = $value;
 			if(ref($value) eq 'ARRAY') {
 				foreach my $item(@{$value}) {
 					if(ref($item) eq 'HASH') {
@@ -601,24 +616,58 @@ sub _cache {
 						while(my($key, $value) = each %{$item}) {
 							delete $item->{$key} unless($key eq 'geometry');
 						}
+						if(!defined($item->{geometry}{location}{lat})) {
+							if(defined($item->{geometry})) {
+								# Maybe a temporary lookup failure,
+								# so do a research tomorrow
+								$duration = '1 day';
+							} else {
+								# Probably the place doesn't exist
+								$duration = '1 week';
+							}
+							$rc = undef;
+						}
 					}
+				}
+				if(!defined($duration)) {
+					# Has matched - it won't move
+					$duration = '1 month';
 				}
 			} elsif(ref($value) eq 'HASH') {
 				# foreach my $key(keys(%{$value})) {
 				while(my($key, $value) = each %{$value}) {
 					delete $value->{$key} unless ($key eq 'geometry');
 				}
+				if(defined($value->{geometry}{location}{lat})) {
+					$duration = '1 month';	# It won't move :-)
+				} elsif(defined($value->{geometry})) {
+					# Maybe a temporary lookup failure, so do a research
+					# tomorrow
+					$duration = '1 day';
+					$rc = undef;
+				} else {
+					# Probably the place doesn't exist
+					$duration = '1 week';
+					$rc = undef;
+				}
+			} else {
+				$duration = '1 month';
 			}
 			$self->{'cache'}->set($key, $value, '1 month');
 		}
 		return $value;
 	}
 
+	# Retrieve from the cache
 	if(my $rc = $locations{$key}) {
 		return $rc;
 	}
 	if($self->{'cache'}) {
-		return $self->{'cache'}->get($key);
+		my $rc = $self->{'cache'}->get($key);
+		if((ref($rc) eq 'HASH') && !defined($rc->{geometry}{location}{lat})) {
+			return;
+		}
+		return $rc;
 	}
 }
 
@@ -630,7 +679,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 Please report any bugs or feature requests to C<bug-geo-coder-list at rt.cpan.org>,
 or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List>.
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Geo-Coder-List>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -655,21 +704,21 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-List>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Geo-Coder-List>
+L<https://cpanratings.perl.org/d/Geo-Coder-List>
 
-=item * Search CPAN
+=item * MetaCPAN
 
-L<http://search.cpan.org/dist/Geo-Coder-List/>
+L<https://metacpan.org/release/Geo-Coder-List>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2019 Nigel Horne.
+Copyright 2016-2020 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

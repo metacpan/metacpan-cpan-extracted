@@ -3,11 +3,13 @@ Changes
 examples/bbio-tickit-ui.pl
 examples/read-adc.pl
 examples/set-pwm.pl
+examples/uart-hello.pl
 lib/Device/BusPirate.pm
 lib/Device/BusPirate/Mode.pm
 lib/Device/BusPirate/Mode/BB.pm
 lib/Device/BusPirate/Mode/I2C.pm
 lib/Device/BusPirate/Mode/SPI.pm
+lib/Device/BusPirate/Mode/UART.pm
 lib/Device/Chip/Adapter/BusPirate.pm
 LICENSE
 MANIFEST			This list of files
@@ -19,5 +21,6 @@ t/01serial.t
 t/10bbio.t
 t/20spi.t
 t/30i2c.t
+t/40uart.t
 t/99pod.t
 t/lib/TestBusPirate.pm

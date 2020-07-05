@@ -1,5 +1,13 @@
 Revision history for Perl extension Getopt-EX
 
+v1.19.1 2020-07-03T15:20:43Z
+
+    - Eliminate indirect object call.
+
+v1.19.0 2020-06-29T00:02:05Z
+
+    - Update RGB to 216 colors mapping algorithm.
+
 v1.18.0 2020-05-14T04:58:38Z
 
     - Introduce $<ignore> argument.

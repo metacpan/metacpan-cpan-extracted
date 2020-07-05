@@ -11,6 +11,9 @@ pod_spelling_system:
     - Wasm
     - Wasmtime
     - subcommands
+    - wasm
+    - wasmtime
+    - wat
 
 pod_coverage:
   skip: 0

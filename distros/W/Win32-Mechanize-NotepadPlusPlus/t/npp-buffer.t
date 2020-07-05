@@ -129,12 +129,14 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
 
 # getNumberOpenFiles()
 {
-    my $nb0 = $npp->getNumberOpenFiles(0);
-    my $nb1 = $npp->getNumberOpenFiles(1);
-    my $nbT = $npp->getNumberOpenFiles();
-    ok $nb0, sprintf 'msg{NPPM_GETNBOPENFILES}(0) = %d', $nb0;
-    ok $nb1, sprintf 'msg{NPPM_GETNBOPENFILES}(1) = %d', $nb1;
-    is $nbT, $nb0+$nb1, sprintf 'msg{NPPM_GETNBOPENFILES}()  = %d + %d = %d', $nb0, $nb1, $nbT;
+    my $nb0 = $npp->getNumberOpenFiles($VIEW{PRIMARY_VIEW});
+    my $nb1 = $npp->getNumberOpenFiles($VIEW{SECOND_VIEW});
+    my $nbA = $npp->getNumberOpenFiles($VIEW{ALL_OPEN_FILES});
+    my $nbU = $npp->getNumberOpenFiles();
+    ok $nb0, sprintf 'msg{NPPM_GETNBOPENFILES}(PRIMARY_VIEW) = %d', $nb0;
+    ok $nb1, sprintf 'msg{NPPM_GETNBOPENFILES}(SECOND_VIEW) = %d', $nb1;
+    is $nbA, $nb0+$nb1, sprintf 'msg{NPPM_GETNBOPENFILES}(ALL_OPEN_FILES)  = %d + %d = %d', $nb0, $nb1, $nbA;
+    is $nbU, $nb0+$nb1, sprintf 'msg{NPPM_GETNBOPENFILES}()  = %d + %d = %d', $nb0, $nb1, $nbU;
 }
 
 # activateBufferID
@@ -167,17 +169,15 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     }
 }
 
-# getLangType: similar to getCurrentLang, but needs bufferID; TODO = compare to the $mylang result (propagate thru array to here)
+# getLangType: similar to getCurrentLang, but needs bufferID
+# also verifies getLanguageName
 {
+    my @langNames = ('C++', 'Perl');
     for my $h (@opened) {
         my $lang = $npp->getLangType($h->{bufferID});
         is $lang, $h->{myLang}, sprintf 'msg{NPPM_GETBUFFERLANGTYPE} ->getLangType(0x%08x) = %d', $h->{bufferID}, $lang;
-        TODO: {
-            local $TODO = "need to auto-map language integer to language name (and maybe vice versa)";
-            my $langName;
-            like $langName, qr/^.+$/, sprintf 'LanguageName(%d) = "%s"', $lang, $langName // '<undef>';
-        }
-
+        my $langName = $npp->getLanguageName($lang);
+        is $langName, shift(@langNames), sprintf 'msg{NPPM_GETLANGUAGENAME} ->getLanguageName(%d) = "%s"', $lang, $langName // '<undef>';
     }
 }
 
@@ -204,11 +204,16 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
 
 # getEncoding
 {
+    ok scalar(keys %ENCODINGKEY), sprintf 'Number of encoding keys in %%ENCODINGKEY: %d', scalar keys %ENCODINGKEY;
+    #note sprintf "encoding[%s] = '%s'\n", $_, $ENCODINGKEY{ $_ }//'<undef>' for sort { $a <=> $b } keys %ENCODINGKEY;
+
     my $buff_enc = $npp->getEncoding($opened[0]{bufferID});
     ok $buff_enc, sprintf 'msg{NPPM_GETBUFFERENCODING} ->getEncoding(0x%08x) = %d', $opened[0]{bufferID}, $buff_enc;
+    ok $ENCODINGKEY{ $buff_enc }, sprintf 'encoding key = "%s"', $ENCODINGKEY{ $buff_enc } // '<undef>';
 
     $buff_enc = $npp->getEncoding();
     ok $buff_enc, sprintf 'msg{NPPM_GETBUFFERENCODING} ->getEncoding() = %d', $buff_enc;
+    ok $ENCODINGKEY{ $buff_enc }, sprintf 'encoding key = "%s"', $ENCODINGKEY{ $buff_enc } // '<undef>';
 }
 
 # getFormatType setFormatType
@@ -243,13 +248,13 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     ##################
     # grab the original content for future reference
     my $edwin = $npp->editor()->{_hwobj};
-    my $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
+    my $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
     my $orig_len = length $txt;
     is $orig_len , $partial_length , sprintf 'reloadCurrentDocument: before clearing, verify buffer has reasonable length: %d', $orig_len;
 
     # clear the content, so I will know it is reloaded
-    $edwin->SendMessage( $scimsg{SCI_CLEARALL});
-    $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
+    $edwin->SendMessage( $SCIMSG{SCI_CLEARALL});
+    $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
     $txt =~ s/\0+$//;   # I've told it to grab more characters than there are, so strip out any NULLs that are returned
     is $txt, "", sprintf 'reloadCurrentDocument: verify buffer cleared before reloading';
     is length($txt), 0, sprintf 'reloadBuffer: verify buffer cleared before reloading: length=%d', length($txt);
@@ -258,7 +263,7 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     {
         runCodeAndClickPopup( sub { $npp->reloadCurrentDocument() }, qr/^Reload$/, 0);
         eval {
-            $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length,  { trim => 'wparam', wlength=>1 } );
+            $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length,  { trim => 'wparam', wlength=>1 } );
         } or do {
             diag "eval(getRawString) = '$@'";
             $txt = '';
@@ -274,20 +279,20 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     my $b = $opened[1]{bufferID};
     $npp->activateBufferID( $b );
 
-    $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
+    $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
     $orig_len = length $txt;
     ok $orig_len , sprintf 'reloadBuffer: before clearing, verify buffer has reasonable length: %d', $orig_len;
 
     # clear the content, so I will know it is reloaded
-    $edwin->SendMessage( $scimsg{SCI_CLEARALL});
-    $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
+    $edwin->SendMessage( $SCIMSG{SCI_CLEARALL});
+    $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
     $txt =~ s/\0+$//;   # I've told it to grab more characters than there are, so strip out any NULLs that are returned
     is $txt, "", sprintf 'reloadBuffer: verify buffer cleared before reloading';
     is length($txt), 0, sprintf 'reloadBuffer: verify buffer cleared before reloading: length=%d', length($txt);
 
     # now reload the content
     $npp->reloadBuffer($b);
-    $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
+    $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
     isnt $txt, "", sprintf 'reloadBuffer: verify buffer no longer empty';
     is length($txt), $orig_len , sprintf 'reloadBuffer: verify buffer matches original length: %d vs %d', length($txt), $orig_len;
 
@@ -298,27 +303,27 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
     my $f = wrapGetLongPathName($opened[0]{oFile});
     $npp->activateFile($f);
 
-    $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
+    $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
     $orig_len = length $txt;
     ok $orig_len , sprintf 'reloadFile: before clearing, verify buffer has reasonable length: %d', $orig_len;
 
     # clear the content, so I will know it is reloaded
-    $edwin->SendMessage( $scimsg{SCI_CLEARALL});
-    $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
+    $edwin->SendMessage( $SCIMSG{SCI_CLEARALL});
+    $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
     $txt =~ s/\0+$//;   # I've told it to grab more characters than there are, so strip out any NULLs that are returned
     is $txt, "", sprintf 'reloadFile: verify buffer cleared before reloading';
     is length($txt), 0, sprintf 'reloadFile: verify buffer cleared before reloading: length=%d', length($txt);
 
     # now reload the content
     $npp->reloadFile($f);
-    $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
+    $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
     isnt $txt, "", sprintf 'reloadFile: verify buffer no longer empty';
     is length($txt), $orig_len , sprintf 'reloadFile: verify buffer matches original length: %d vs %d', length($txt), $orig_len;
 
     {
       # clear the content, so I will know it is reloaded
-      $edwin->SendMessage( $scimsg{SCI_CLEARALL});
-      $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
+      $edwin->SendMessage( $SCIMSG{SCI_CLEARALL});
+      $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'wparam', wlength=>1 } );
       $txt =~ s/\0+$//;   # I've told it to grab more characters than there are, so strip out any NULLs that are returned
       is $txt, "", sprintf 'reloadFile with prompt: verify buffer cleared again before reloading';
       is length($txt), 0, sprintf 'reloadFile with prompt: verify buffer cleared again before reloading: length=%d', length($txt);
@@ -327,7 +332,7 @@ foreach ( 'src/Scintilla.h', 'src/convertHeaders.pl' ) {
       {
         runCodeAndClickPopup( sub { $npp->reloadFile($f,1); }, qr/^Reload$/, 0);
         eval {
-            $txt = $edwin->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, 1+$partial_length, { trim => 'retval' } );
+            $txt = $edwin->SendMessage_getRawString( $SCIMSG{SCI_GETTEXT}, 1+$partial_length, { trim => 'retval' } );
             1;
             # hmm, still failing; I wonder if the runCodeAndClickPopup() with its exit is killing some
             # part of the process (or destroying a shared object) that's required for the buffer allocations
@@ -343,8 +348,6 @@ or BAIL_OUT 'isnt empty'
 #myTestHelpers::setDebugInfo(0);
       }
     }
-
-    no Win32::Mechanize::NotepadPlusPlus::__sci_msgs;
 }
 
 

@@ -1,5 +1,20 @@
 Revision history for OpenTracing
 
+1.001     2020-06-29 00:54:31+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - expose ->current_span, to support Log::Any::Adapter::OpenTracing
+    - this is cleared when the span finishes, so that we only accumulate logs within a span
+
+1.000     2020-06-29 00:07:54+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ID generation is now full 128-bit, using Bytes::Random::Secure
+    - async support is now possible (using Syntax::Keyword::Dynamically)
+    - OpenTracing::Integration support (most of these involve external
+    deps, so will end up as separate distributions)
+    - mention OpenTracing::Role in an attempt to reduce confusion
+
 0.004     2020-04-23 02:35:27+08:00 Asia/Kuala_Lumpur
     New features:
 

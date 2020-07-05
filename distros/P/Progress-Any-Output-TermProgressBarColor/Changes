@@ -1,3 +1,9 @@
+0.247   2020-06-20  Released-By: PERLANCAR; Urgency: medium
+
+	- Add option: rownum to allow showing multiple progress bars on
+	  different lines.
+
+
 0.246   2019-07-30  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Didn't use Term::Size::chars() correctly resulting in

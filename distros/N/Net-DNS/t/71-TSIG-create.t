@@ -1,4 +1,4 @@
-# $Id: 71-TSIG-create.t 1779 2020-05-11 09:11:17Z willem $	-*-perl-*-
+# $Id: 71-TSIG-create.t 1786 2020-06-15 15:05:47Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -18,7 +18,7 @@ foreach my $package ( sort keys %prerequisite ) {
 	exit;
 }
 
-plan tests => 20;
+plan tests => 22;
 
 
 my $tsig  = new Net::DNS::RR( type => 'TSIG' );
@@ -42,16 +42,17 @@ my $keyrr = new Net::DNS::RR <<'END';				# dnssec-keygen key pair
 HMAC-SHA256.example. IN KEY 512 3 163 f+JImRXRzLpKseG+bP+W9Vwb2QAgtFuIlRU80OA3NU8=
 END
 
-my $publickey = 'Khmac-sha256.example.+163+52011.key';
+my $privatekey = $keyrr->privatekeyname;
+END { unlink($privatekey) if defined $privatekey; }
+
+my $publickey;
+( $publickey = $privatekey ) =~ s/\.private$/\.key/;
 END { unlink($publickey) if defined $publickey; }
 
 open( KEY, ">", $publickey ) or die "$publickey $!";
-print KEY $keyrr->string;
+print KEY $keyrr->plain;
 close KEY;
 
-
-my $privatekey = $keyrr->privatekeyname;
-END { unlink($privatekey) if defined $privatekey; }
 
 open( KEY, ">", $privatekey ) or die "$privatekey $!";
 print KEY <<'END';
@@ -149,7 +150,7 @@ SKIP: {
 my $dnskey = 'Kbad.example.+161+39562.key';
 END { unlink($dnskey) if defined $dnskey; }
 
-open( KEY, ">$dnskey" ) or die "$dnskey $!";
+open( KEY, ">", $dnskey ) or die "$dnskey $!";
 print KEY <<'END';
 HMAC-SHA1.example. IN DNSKEY 512 3 161 xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
 END
@@ -158,7 +159,43 @@ close KEY;
 {
 	eval { create $class($dnskey); };
 	my ($exception) = split /\n/, "$@\n";
-	ok( $exception, "unrecognised public key\t[$exception]" );
+	ok( $exception, "unrecognised key format\t[$exception]" );
+}
+
+
+my $renamedBINDkey = 'arbitrary.key';
+END { unlink($renamedBINDkey) if defined $renamedBINDkey; }
+
+open( KEY, ">", $renamedBINDkey ) or die "$renamedBINDkey $!";
+print KEY <<'END';
+HMAC-SHA1.example. IN KEY 512 3 161 xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
+END
+close KEY;
+
+my $corruptBINDkey = 'Kcorrupt.example.+161+13198.key';		# unmatched keytag
+END { unlink($corruptBINDkey) if defined $corruptBINDkey; }
+
+open( KEY, ">", $corruptBINDkey ) or die "$corruptBINDkey $!";
+print KEY <<'END';
+HMAC-SHA1.example. IN KEY 512 3 161 xdX9m8UtQNbJUzUgQ4xDtUNZAmU=
+END
+close KEY;
+
+{
+	my @warning;
+	local $SIG{__WARN__} = sub { @warning = @_ };
+	create $class($renamedBINDkey);
+	my ($warning) = split /\n/, "@warning\n";
+	ok( $warning, "renamed BIND public key\t[$warning]" );
+}
+
+
+{
+	my @warning;
+	local $SIG{__WARN__} = sub { @warning = @_ };
+	create $class($corruptBINDkey);
+	my ($warning) = split /\n/, "@warning\n";
+	ok( $warning, "corrupt BIND public key\t[$warning]" );
 }
 
 
@@ -167,7 +204,7 @@ close KEY;
 	local $SIG{__WARN__} = sub { @warning = @_ };
 	create $class( $keyrr->owner, $keyrr->key );
 	my ($warning) = split /\n/, "@warning\n";
-	ok( $warning, "2-argument create:\t[$warning]" );
+	ok( $warning, "2-argument create\t[$warning]" );
 }
 
 

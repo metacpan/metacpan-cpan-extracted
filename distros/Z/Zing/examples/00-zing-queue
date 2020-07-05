@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::Queue;
+
+=pod explain
+
+- zing-queue is a FIFO message queue
+- using a shared queue name, multiple processes can push and pull messages
+- queues are light-weight and inexpensive so things like multiple named queues, ...
+- priority queues, dead-letter queues, delayed-jobs queues, etc, are trivial
+
+=cut
+
+my $q = Zing::Queue->new(name => 'registration');
+
+for my $i (1..1_000) {
+  $q->send({person => "person-$i"});
+}
+
+for my $i (1..1_000) {
+  warn 'acknowledge', ' ', $q->recv->{person};
+}
+
+warn 'queue has', ' ', $q->size, ' ', 'messages';
+
+$q->drop;

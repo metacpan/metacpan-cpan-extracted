@@ -7,7 +7,6 @@ use overload
     'bool'   => \&_op_bool,
     '=='     => \&_op_eq,
     'eq'     => \&_op_eq,
-    '&'      => \&_op_and,
 ;
 
 1;

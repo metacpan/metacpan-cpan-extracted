@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::PubSub;
+
+=pod explain
+
+- zing-pubsub is a generic pub/sub data store
+- it a subclass of Zing/Repo and uses Zing/Store operations
+
+=cut
+
+my $p = Zing::PubSub->new(name => 'sockets');
+
+for my $i (1..10) {
+  for my $j (1..1_000) {
+    $p->send("socket-$i", {value => $j});
+
+    warn "socket-$i", " ", "value-$j", " ", "sent";
+  }
+}
+
+for my $i (1..10) {
+  for my $j (1..1_000) {
+    my $d = $p->recv("socket-$i");
+    my $x = $d->{value};
+
+    warn "socket-$i", " ", "value-$x", " ", "received";
+  }
+}
+
+warn 'pub/sub data saved under', ' ', $p->term;
+
+for my $i (1..10) {
+  for my $j (1..1_000) {
+    $p->drop("socket-$i");
+  }
+}

@@ -1,9 +1,9 @@
 package Net::DNS::RR::TSIG;
 
 #
-# $Id: TSIG.pm 1779 2020-05-11 09:11:17Z willem $
+# $Id: TSIG.pm 1786 2020-06-15 15:05:47Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1779 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1786 $)[1];
 
 
 use strict;
@@ -28,6 +28,8 @@ eval 'require MIME::Base64';
 
 use Net::DNS::DomainName;
 use Net::DNS::Parameters;
+
+use constant SYMLINK => defined(&CORE::readlink);		# Except Win32, VMS, RISC OS
 
 use constant ANY  => classbyname qw(ANY);
 use constant TSIG => typebyname qw(TSIG);
@@ -378,36 +380,34 @@ sub create {
 	} else {
 		require File::Spec;				# ( keyfile, options )
 		require Net::DNS::ZoneFile;
+		my ($keypath) = SYMLINK ? grep( $_, readlink($karg), $karg ) : $karg;
+		my ( $vol, $dir, $name ) = File::Spec->splitpath($keypath);
+		$name =~ m/^K([^+]+)\+\d+\+(\d+)\./;		# BIND dnssec-keygen
+		my ( $keyname, $keytag ) = ( $1, $2 );
+
 		my $keyfile = new Net::DNS::ZoneFile($karg);
-		my ( $vol, $dir, $filename ) = File::Spec->splitpath( $keyfile->name );
+		my ( $algorithm, $secret, $x );
+		while ( $keyfile->_getline ) {
+			/^key "([^"]+)"/     and $keyname   = $1;    # BIND tsig key
+			/algorithm ([^;]+);/ and $algorithm = $1;
+			/secret "([^"]+)";/  and $secret    = $1;
 
-		$filename =~ m/^K([^+]+)\+\d+\+\d+\./;		# BIND dnssec-keygen
-		my $key = $1;
+			/^Algorithm:/ and ( $x, $algorithm ) = split;	 # BIND dnssec private key
+			/^Key:/	      and ( $x, $secret )    = split;
 
-		if ( $key && $filename =~ /\.key$/ ) {
-			my $keyrr = $keyfile->read;		# BIND dnssec public key
-			croak 'key file incompatible with TSIG' if $keyrr->type ne 'KEY';
-			return new Net::DNS::RR(
-				name	  => $keyrr->name,
-				type	  => 'TSIG',
-				algorithm => $keyrr->algorithm,
-				key	  => $keyrr->key,
-				@_
-				);
+			next unless /\bIN\s+KEY\b/;		# BIND dnssec public key
+			my $keyrr = new Net::DNS::RR($_);
+			carp "$karg  does not appear to be a BIND dnssec public key"
+					unless $keytag and ( $keytag == $keyrr->keytag );
+			return $class->create( $keyrr, @_ );
 		}
 
-		my ( $algorithm, $secret, $junk );
-		while ( $keyfile->_getline ) {
-			$key	   = $1 if /^key "([^"]+)"/;	# BIND tsig key
-			$secret	   = $1 if /secret "([^"]+)";/;
-			$algorithm = $1 if /algorithm ([^;]+);/;
-
-			( $junk, $secret )    = split if /^Key:/;	  # BIND dnssec private key
-			( $junk, $algorithm ) = split if /^Algorithm:/;
+		foreach ( $keyname, $algorithm, $secret ) {
+			croak 'key file incompatible with TSIG' unless $_;
 		}
 
 		return new Net::DNS::RR(
-			name	  => $key,
+			name	  => $keyname,
 			type	  => 'TSIG',
 			algorithm => $algorithm,
 			key	  => $secret,

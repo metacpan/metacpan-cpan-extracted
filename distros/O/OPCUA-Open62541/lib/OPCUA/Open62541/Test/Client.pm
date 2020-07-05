@@ -62,7 +62,8 @@ sub run {
     is($self->{client}->getState(), CLIENTSTATE_SESSION,
 	"client: state session");
     # check client did connect(2)
-    ok($self->{log}->loggrep(qr/TCP connection established/, 5),
+    ok($self->{log}->loggrep(
+	qr/TCP connection established|SessionState: Activated/, 5),
 	"client: log grep connected");
 
     return $self;

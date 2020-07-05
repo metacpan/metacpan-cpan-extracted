@@ -1,6 +1,6 @@
 package AppPtpTest;
 
-use 5.018;
+use 5.022;
 use strict;
 use warnings;
 

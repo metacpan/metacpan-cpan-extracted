@@ -1,5 +1,16 @@
 Revision history for Metrics-Any
 
+0.06    2020-07-04
+        [CHANGES]
+         * Added a shareable base class for adapters that store metric values
+         * Pass collector argument into adapter ->make_* methods
+         * Added $collector->package accessor
+         * Added explicit use VERSION declarations to every perl file
+
+        [BUGFIXES]
+         * Ensure that collector will stringify to a nonconfusing result
+           rather than '1' due to its boolify overload
+
 0.05    2020-05-13
         [CHANGES]
          * Renamed distribution and timer reporting methods to more clearly

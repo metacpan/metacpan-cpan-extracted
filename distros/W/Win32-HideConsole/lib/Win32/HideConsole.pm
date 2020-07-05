@@ -9,7 +9,7 @@ use constant SW_SHOWNORMAL => 1;
 
 our @EXPORT = qw(hide_console);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 sub hide_console
 {
@@ -29,7 +29,7 @@ sub hide_console
 
 =head1 NAME
 
-Win32::HideConsole - Use this in GUI applications (Tk, Win32::GUI, etc.) to hide that annoying console window that appears at execution time.
+Win32::HideConsole
 
 =head1 SYNOPSIS
 
@@ -39,33 +39,44 @@ Win32::HideConsole - Use this in GUI applications (Tk, Win32::GUI, etc.) to hide
 	hide_console;
 	
 	my $main_window = MainWindow->new();
-	$main_window->Label(-text => 'A GUI app with the console hidden!',
-						-font => 'arial 14')->pack(-side => 'top');
+	
+	$main_window->Label(
+	   -text => 'A GUI app with the console hidden!',
+	   -font => 'arial 14')->pack(-side => 'top');
+	   
 	$main_window->MainLoop();
 	
-
 =head1 DESCRIPTION
 
-Uses some Win32::API commands to hide the annoying console window that accompanies GUI applications (Tk, Win32::GUI, etc.).
+Use this in GUI applications (Tk, Win32::GUI, etc.) to hide that annoying console window that appears at execution time.
+
+Pollutes the namespace with one function: hide_console
 
 =head1 METHODS
 
-Only a single exported method is provided:
-
-=head2 hide_console;
+=head2 hide_console
 
 Place this command near the beginning of your code (right after the "use" directives) to hide the console window.
 
-=head1 NOTES
+=head1 Version History
+
+1.00 - Initial Release
+
+1.01 - Fixed this POD document
+
+=head1 Author
+
+Brandon Bourret
+
+=head1 License
+
+Permission is granted to use this software under the same terms as Perl itself.
+
+Refer to the L<Perl Artistic|perlartistic> license for details.
+
+=head1 Credits
 
 Credit goes to "jdporter" who posted this clever solution on PerlMonks. I just modified it a bit and put it in module form
 for easy reusability.
-
-=head1 AUTHOR, COPYRIGHT, and LICENSE
-
-Copyright(C) 2009, phatWares, USA. All rights reserved.
-
-Permission is granted to use this software under the same terms as Perl itself.
-Refer to the L<Perl Artistic|perlartistic> license for details.
 
 =cut

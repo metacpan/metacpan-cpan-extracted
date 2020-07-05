@@ -1,11 +1,15 @@
 Build.PL
 Changes
+hax/dumpers.c.inc
 hax/lexer-additions.c.inc
 hax/perl-additions.c.inc
 hax/perl-backcompat.c.inc
 hax/wrap_keyword_plugin.c.inc
 lib/Object/Pad.pm
 lib/Object/Pad.xs
+lib/Object/Pad/MOP/Class.pm
+lib/Object/Pad/MOP/Method.pm
+lib/Object/Pad/MOP/Slot.pm
 LICENSE
 MANIFEST			This list of files
 META.json
@@ -19,6 +23,7 @@ t/04extend-classical.t
 t/05extends.t
 t/06extends-foreign-HASH.t
 t/07extends-foreign-ARRAY.t
+t/08extends-Moo.t
 t/10method-attrs.t
 t/11method-signatures.t
 t/20slots-private.t
@@ -34,6 +39,8 @@ t/70mop-class.t
 t/71mop-create-class.t
 t/72mop-slot.t
 t/73mop-create-slot.t
+t/74mop-method.t
+t/75mop-create-method.t
 t/79mop-generated.t
 t/80async-method.t
 t/80dynamically+Object-Pad.t

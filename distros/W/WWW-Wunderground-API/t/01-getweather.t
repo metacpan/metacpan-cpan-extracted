@@ -4,7 +4,7 @@ use Test::More tests => 16;
 
 use_ok( 'WWW::Wunderground::API' );
 
-my $wun = new WWW::Wunderground::API('KDCA');
+my $wun = WWW::Wunderground::API->new('KDCA');
 isa_ok($wun,'WWW::Wunderground::API','Got a new Wunderground API object');
 if ($wun->api_key) {
   is($wun->api_type,'json','API type properly defaults to JSON');
@@ -29,7 +29,7 @@ is($time,$wun->cache->get('test'), 'BadCache "works." But don\'t use it.');
 
 SKIP: {
   skip "API tests require WUNDERGROUND_API environment variable to be set.", 7 unless $ENV{WUNDERGROUND_API};
-  my $wun = new WWW::Wunderground::API(location=>'KDCA', auto_api=>1);
+  my $wun = WWW::Wunderground::API->new(location=>'KDCA', auto_api=>1);
   isa_ok($wun,'WWW::Wunderground::API','Got a new Wunderground API object');
   like($wun->temp_f, qr/\d+/, 'Regan National has a temperature: '.$wun->temp_f.'f');
   ok(length($wun->raw),'raw returns source data');

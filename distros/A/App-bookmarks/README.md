@@ -11,18 +11,21 @@ SYNOPSIS
     -d              debug
     -a              all files : process arguments and default locations
     -f format       any combination of letters t,u,d as title/url/description (default : tud)
+    -s              find schemeless URLs in text files (default : no)
 
 DESCRIPTION
 -----------
 
 `bookmarks` is a tool to export bookmarks from files supplied as arguments, or
 from browsers default locations (when called without arguments). The following
-browsers and platform are supported :
+sources are supported :
 
 - Safari (Mac)
 - Firefox (Mac/Linux/Windows)
 - Chrome (Mac/Linux/Windows)
 - Internet Explorer (Windows)
+- Plain text (.txt)
+- Markdown (.md)
 
 Files named _*.plist_, _*.sqlite_ and _*Bookmarks_ are processed as Safari, Firefox
 and Chrome bookmarks, respectively. Directories named _*Favorites_ are processed
@@ -49,12 +52,12 @@ Install the wonderful [fzf](https://github.com/junegunn/fzf) (available in
 [App::uricolor](https://github.com/kal247/App-uricolor) (CPAN),
 and add these aliases to your shell :
 
-**Open links(s) with default application :**
+**Open link(s) with default application :**
 ```
 alias lk="bookmarks | uricolor | fzf --ansi --exact --multi | urifind | xargs open"
 ```
 
-**Copy links(s) to clipboard :**
+**Copy link(s) to clipboard :**
 ```
 alias lkc="bookmarks | uricolor | fzf --ansi --exact --multi | urifind | pbcopy"
 ```
@@ -64,6 +67,22 @@ alias lkc="bookmarks | uricolor | fzf --ansi --exact --multi | urifind | pbcopy"
 - `urifind` extracts all URIs. Try `uricolor -s` and `urifind --schemeless` to find schemeless URLs.
 - Selected URIs will open with your default browser or application.
 - Since `open` uses macOS _Launch Services_ to determine which program to run, most common schemes such as `ftp://` or `ssh://` are automatically recognized.
+
+
+CHECK LINKS STATUS
+------------------
+
+These examples use the tool _http_status_ provided by [HTTP::SimpleLinkChecker](https://metacpan.org/pod/HTTP::SimpleLinkChecker) (CPAN).
+
+**Check links and show status :**
+```
+bookmarks -f u | xargs http_status
+```
+
+**Show only broken links (parallel) :**
+```
+bookmarks -f u | xargs -n10 -P16 http_status 2>/dev/null | perl -ne 'print if not /200$/'
+```
 
 
 INSTALLATION

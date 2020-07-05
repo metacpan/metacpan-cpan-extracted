@@ -1,4 +1,3 @@
-.gitignore
 Changes
 lib/Acme/ful.pm
 lib/ful.pm
@@ -8,6 +7,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
 t/00-load.t
+t/01-pod-coverage.t
 t/01-proof.t
 t/lib/Proof01.pm
 t/lib/Proof04.pm

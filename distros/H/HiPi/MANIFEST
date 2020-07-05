@@ -194,9 +194,10 @@ README
 script/hipi-energenie
 SPI.xs
 t/000-load.t
-t/001-gpio.t
-t/002-rfspi.t
-t/003-i2c.t
-t/004-sysfs.t
+t/001-basic.t
+t/010-gpio.t
+t/020-rfspi.t
+t/030-i2c.t
+t/040-sysfs.t
 typemap
 Utils.xs

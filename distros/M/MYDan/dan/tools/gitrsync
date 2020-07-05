@@ -1,0 +1,118 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Digest::MD5;
+use File::Basename;
+
+use MYDan::Util::OptConf;
+use MYDan::Util::FLock;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+ $0 --remotehost host1,host2 [--localpath /tmp/dir1 ] \
+        [--gitaddr https://github.com/MYDan/mayi ] \
+        [--gitkey /tmp/key ] \
+        [--tag mayi.20180518210044] \
+        [--remotedata /tmp/dir2] \
+        [--remotepath /tmp/dir2] \
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get( qw( localpath=s gitaddr=s gitkey=s tag=s 
+    remotehost=s remotedata=s remotepath=s ) )->dump();
+
+$option->assert( qw( localpath gitaddr tag 
+    remotehost remotedata remotepath ) );
+
+my ( $gitaddr, $localpath, $tag ) = @o{qw( gitaddr localpath tag )};
+
+my $md5 = Digest::MD5->new->add( $localpath )->hexdigest;
+my $lock = MYDan::Util::FLock->new( 
+    sprintf "/tmp/gitrsync.%s.lock",
+        Digest::MD5->new->add( $localpath )->hexdigest);
+
+my $ctrl = $o{gitkey} ? "$MYDan::PATH/dan/tools/git -i $o{gitkey}" : 'git';
+
+for( 1 .. 20 )
+{
+    last if $lock->lock();
+    die "Locked by other processes.\n" unless $_ eq 20;
+    sleep 3;
+}
+print "get lock success\n";
+
+my $path = File::Basename::dirname( $localpath );
+my $name = File::Basename::basename( $localpath );
+$option->assert() if $name eq '/';
+
+sub syscmd
+{
+    my ( $cmd, $err ) = @_;
+    my @res = `$cmd`;
+    chomp @res;
+    die "$err: $!\n" if $res[-1] ne "SUCCESS";
+    return @res;
+}
+
+unless( -d $path )
+{
+    die "mkdir $path fail:$!" if system "mkdir -p '$path'";
+}
+
+unless( -d $localpath )
+{
+    die "clone error:$!" if system "cd $path && $ctrl clone --recursive $gitaddr $name";
+}
+
+die "rev-parse error:$!" if system "cd $localpath && $ctrl rev-parse --is-inside-work-tree";
+die "config remote.origin.url error:$!" if system "cd $localpath && $ctrl config remote.origin.url $gitaddr";
+die "fetch error:$!" if system "cd $localpath && $ctrl fetch --tags --progress $gitaddr +refs/heads/*:refs/remotes/origin/*";
+my @tags = syscmd( "cd $localpath && $ctrl show-ref --tags -d && echo SUCCESS", 'show-ref error' );
+map{ print "  $_\n" }@tags;
+
+if( $tag )
+{
+    my $id;
+    map{ $id = $1 if $_ =~ /^([a-z0-9]{40})\s+refs\/tags\/$tag$/;}@tags;
+    die "nofind tags:$tag id\n" unless $id;
+    print "tags: $tag => id: $id\n";
+    die "config core.sparsecheckout error:$!" if system "cd $localpath && $ctrl config core.sparsecheckout true";
+    die "checkout error:$!" if system "cd $localpath && $ctrl checkout -f $id";
+}
+
+die "update submodule fail:$!" if system "cd $localpath && $ctrl submodule update --init --recursive";
+die( "log error:$!" ) if system "cd $localpath && $ctrl log --oneline --graph --all|head -n 30";
+
+my %fail;
+for my $host ( split /,/, $o{remotehost} )
+{
+    eval{
+        print "update host: $host\n";
+        my ( @x, @version, $has )= syscmd( "ssh $host 'ls $o{remotepath}/*/.mydandone && echo SUCCESS'", 'list fail' );
+        map{ push( @version, $1 ) if $_ =~ /\/([^\/]+)\/\.mydandone$/ }@x;
+        print "version:\n"; map{ print "  $_\n"; $has = 1 if $_ eq $tag; }@version;
+
+        if( $has )
+        {
+            print "$host => $tag: This version already exists.\n";
+        }
+        else
+        {
+            syscmd( "ssh $host 'cd $o{remotepath} && rsync -a \"$o{remotedata}/\" \"$tag/\"' && echo SUCCESS",
+                'rsync backup on remote host fail' );
+            die "rsync fail$!" if system "rsync -a '$localpath/' $host:$o{remotepath}/$tag/ --exclude .git --delete";
+            syscmd( "ssh $host 'date > $o{remotepath}/$tag/.mydandone && echo SUCCESS'", 'write .mydandone fail.' );
+        }
+    };
+    if( $@ )
+    {
+        print "update host $host fail:$@\n";
+        $fail{$host} ++;
+    }
+}
+
+my $fail = join ',', keys %fail;
+die "fail host: $fail" if $fail;

@@ -1,7 +1,7 @@
 package XS::libdwarf;
 use 5.012;
 
-our $VERSION = "20200114.6";
+our $VERSION = "20200114.8";
 
 use XS::Loader;
 

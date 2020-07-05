@@ -4,12 +4,11 @@ use Test::More;
 use Test::Warnings;
 use lib 't';
 use Config;
-
-plan skip_all => 'does not work reliable for your platform' if $^O eq 'netbsd';
-plan skip_all => 'does not work reliable for your platform' if $^O eq 'freebsd' && $Config{ptrsize} == 4; # i386-freebsd-thread-multi-64int
-
 use Exception::Backtrace;
 use MyTest;
+
+my $default_depth = MyTest::default_trace_depth();
+plan skip_all => 'does not work reliable for your platform' unless $default_depth;
 
 Exception::Backtrace::install();
 
@@ -21,13 +20,10 @@ subtest "backtraceable exception is thrown" => sub {
 
     my $bt = Exception::Backtrace::get_backtrace_string($@);
     note $bt;
-    if ($bt =~ /panda::exception::exception/) {
-        like $bt, qr/MyTest_xsgen.cc/;
-    }
-    else {
-        like $bt, qr/libpanda\./;
-        like $bt, qr/MyTest((\.)|(_xsgen))/;
-    }
+    my $found = (($bt =~ /panda::exception::exception/) && ($bt =~ /MyTest_xsgen.cc/))
+             || (($bt =~ /libpanda\./) && ($bt =~ /MyTest((\.)|(_xsgen))/))
+             || ($bt =~ /panda::Backtrace::Backtrace/);
+    ok $found, "seems valid backtrace found";
 };
 
 subtest "std::logic_error is thrown" => sub {
@@ -38,13 +34,10 @@ subtest "std::logic_error is thrown" => sub {
 
     my $bt = Exception::Backtrace::get_backtrace_string($@);
     note $bt;
-    if ($bt =~ /panda::Backtrace::Backtrace/) {
-        unlike $bt, qr/panda::exception/;
-    }
-    else {
-        like $bt, qr/libpanda\./;
-        like $bt, qr/MyTest((\.)|(_xsgen))/;
-    }
+    my $found = (($bt =~ /panda::Backtrace::Backtrace/) && ($bt !~ /panda::exception/))
+             || (($bt =~ /libpanda\./) && ($bt =~ /MyTest((\.)|(_xsgen))/))
+             || ($bt =~ /panda::Backtrace::zzz/);
+    ok $found, "seems valid backtrace found";
 };
 
 subtest "perl exception is thrown from C code" => sub {
@@ -55,14 +48,8 @@ subtest "perl exception is thrown from C code" => sub {
 
     my $bt = Exception::Backtrace::get_backtrace_string($@);
     note $bt;
-    if ($bt =~ /panda::Backtrace::Backtrace/) {
-        like $bt, qr/xs::Sub::_call/;
-        unlike $bt, qr/panda::exception/;
-    }
-    else {
-        like $bt, qr/libpanda\./;
-        like $bt, qr/MyTest((\.)|(_xsgen))/;
-    }
+    my $re = qr/(panda::Backtrace::Backtrace)|(libpanda\.)/;
+    like $bt, $re, "seems valid backtrace found";
 };
 
 subtest "exception with newline is thrown" => sub {
@@ -73,13 +60,9 @@ subtest "exception with newline is thrown" => sub {
 
     my $bt = Exception::Backtrace::get_backtrace_string($@);
     note $bt;
-    if ($bt =~ /panda::Backtrace::Backtrace/) {
-        pass "seems ok";
-    }
-    else {
-        like $bt, qr/libpanda\./;
-        like $bt, qr/MyTest((\.)|(_xsgen))/;
-    }
+    my $found = (($bt =~ /panda::Backtrace::Backtrace/))
+             || (($bt =~ /libpanda\./) && ($bt =~ /MyTest((\.)|(_xsgen))/));
+    ok $found, "seems valid backtrace found";
 };
 
 done_testing;

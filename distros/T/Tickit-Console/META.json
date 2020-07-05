@@ -41,11 +41,11 @@
    "provides" : {
       "Tickit::Console" : {
          "file" : "lib/Tickit/Console.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Tickit::Console::Tab" : {
          "file" : "lib/Tickit/Console/Tab.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

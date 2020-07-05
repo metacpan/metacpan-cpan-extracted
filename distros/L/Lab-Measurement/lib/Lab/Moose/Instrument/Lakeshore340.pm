@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Lakeshore340;
-$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.701';
+$Lab::Moose::Instrument::Lakeshore340::VERSION = '3.703';
 #ABSTRACT: Lakeshore Model 340 Temperature Controller
 
 use 5.010;
@@ -285,7 +285,7 @@ Lab::Moose::Instrument::Lakeshore340 - Lakeshore Model 340 Temperature Controlle
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 
@@ -323,7 +323,9 @@ alias for C<get_T>.
 Get sensor units reading (like resistance) of an input channel.
 
 =head2 set_setpoint/get_setpoint
- # set/get SP for loop 1 in whatever units the setpoint is using
+
+Set/get setpoint for loop 1 in whatever units the setpoint is using
+
  $lakeshore->set_setpoint(value => 10, loop => 1); 
  my $setpoint1 = $lakeshore->get_setpoint(loop => 1);
 
@@ -406,7 +408,7 @@ This driver consumes the following roles:
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
-            2020       Simon Reinhardt
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

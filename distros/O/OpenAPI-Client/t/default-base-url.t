@@ -1,5 +1,4 @@
 use Mojo::Base -strict;
-use Mojo::JSON 'true';
 use OpenAPI::Client;
 use Test::More;
 

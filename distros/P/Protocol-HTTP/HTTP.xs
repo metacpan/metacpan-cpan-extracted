@@ -5,11 +5,14 @@ using namespace xs;
 using namespace xs::protocol::http;
 using panda::string;
 using panda::string_view;
+using Date = panda::date::Date;
 
 MODULE = Protocol::HTTP                PACKAGE = Protocol::HTTP
 PROTOTYPES: DISABLE
 
 INCLUDE: xsi/Compression.xsi
+
+INCLUDE: xsi/CookieJar.xsi
 
 INCLUDE: xsi/Error.xsi
 

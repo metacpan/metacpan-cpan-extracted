@@ -1,3 +1,14 @@
+Version 0.07: 2020-07-02
+  * Fix inline subcommands, broken by 0.06 (sivoais).
+
+Version 0.06: 2020-06-30
+  * Fix incorrect and weird handling of short options when "abbreviate" mode is
+    enabled. Only "--" style long options will be considered as possible
+    abbreivations (Pete Sergeant, vague666).
+  * Optionally load subcommands only on demand, for faster startup of large
+    applications (Yanick Champoux).
+  * Fix a documentation error regarding preserve_argv (vague666).
+
 Version 0.05: 2020-02-27
   * Fix "prefer_commandline" import option to work properly (thanks ufoboat).
   * Use Moo::Role->is_role to check whether we're being used in a role

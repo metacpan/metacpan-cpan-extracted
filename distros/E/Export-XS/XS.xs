@@ -45,3 +45,10 @@ Array constants_list (Simple ctx_class) {
     if (!ctx_stash) throw_nopackage(ctx_class);
     RETVAL = constants_list(ctx_stash);
 }
+
+void export_constants (Simple ctx_class, Simple trg_class) {
+    auto ctx_stash = Stash::from_name(ctx_class);
+    auto trg_stash = Stash::from_name(trg_class);
+
+    export_constants(ctx_stash, trg_stash);
+}

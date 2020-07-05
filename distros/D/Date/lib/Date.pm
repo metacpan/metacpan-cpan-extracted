@@ -4,7 +4,7 @@ use Date::Rel;
 use XS::Framework;
 use XS::Install::Payload;
 
-our $VERSION = '5.1.0';
+our $VERSION = '5.2.0';
 
 XS::Loader::bootstrap();
 
@@ -20,6 +20,7 @@ Export::XS::Auto->import(
     MIN          => rdate_const("1m"),
     HOUR         => rdate_const("1h"),
     DAY          => rdate_const("1D"),
+    WEEK         => rdate_const("1W"),
     MONTH        => rdate_const("1M"),
     YEAR         => rdate_const("1Y"),
 );

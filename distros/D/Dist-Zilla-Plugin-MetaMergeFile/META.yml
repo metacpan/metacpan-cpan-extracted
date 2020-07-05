@@ -14,7 +14,7 @@ configure_requires:
   Module::Build::Tiny: '0.034'
   perl: '5.004'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,10 +23,10 @@ name: Dist-Zilla-Plugin-MetaMergeFile
 provides:
   Dist::Zilla::Plugin::MetaMergeFile:
     file: lib/Dist/Zilla/Plugin/MetaMergeFile.pm
-    version: '0.003'
+    version: '0.004'
   Dist::Zilla::Plugin::PrereqsFile:
     file: lib/Dist/Zilla/Plugin/PrereqsFile.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Dist::Zilla::Role::MetaProvider: '0'
   Dist::Zilla::Role::PrereqSource: '0'
@@ -39,8 +39,10 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MetaMergeFile
   repository: git://github.com/Leont/dist-zilla-plugin-metamergefile.git
-version: '0.003'
+version: '0.004'
 x_contributors:
+  - 'Dan Book <grinnz@gmail.com>'
   - 'Leon Timmermans <fawaka@gmail.com>'
-x_generated_by_perl: v5.24.0
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

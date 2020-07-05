@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::Channel;
 use strict;
 use warnings;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub channel {
     my ($self) = @_;

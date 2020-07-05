@@ -1,10 +1,12 @@
 use Module::Build;
 my $build = Module::Build->new
       ( module_name    => 'Lingua::Stem',
-        dist_author    => 'Benjamin Franz <snowhare@nihongo.org>',
+        dist_author    => 'Jerilyn Franz <cpan@jerilyn.info>',
         dist_abstract  => 'Stemming of words in various languages',
-        license        => 'perl',
+        license        => 'perl_5',
         requires       => {
+                                    'perl' => '5.006',
+                                 'warnings'=> 0,
                                     'Carp' => 0,                      
               'Lingua::Stem::Snowball::No' => '1.00',
               'Lingua::Stem::Snowball::Se' => '1.01',
@@ -15,6 +17,35 @@ my $build = Module::Build->new
                      'Lingua::PT::Stemmer' => 0,
                      'Lingua::GL::Stemmer' => 0,
                             'Text::German' => 0,
+        },
+        test_requires       => {
+                                    'perl' => '5.006',
+                                 'warnings'=> 0,
+                                    'Carp' => 0,                      
+              'Lingua::Stem::Snowball::No' => '1.00',
+              'Lingua::Stem::Snowball::Se' => '1.01',
+              'Lingua::Stem::Snowball::Da' => '1.01',
+                        'Lingua::Stem::Fr' => '0.02',
+                        'Lingua::Stem::It' => 0,
+                        'Lingua::Stem::Ru' => 0,
+                     'Lingua::PT::Stemmer' => 0,
+                     'Lingua::GL::Stemmer' => 0,
+                            'Text::German' => 0,
+        },
+        meta_merge => {
+          'meta-spec' => { version => 2 },
+           resources => {
+              bugtracker => {
+                   web  => 'https://github.com/JerilynFranz/perl-Lingua-Stem/issues',
+               },
+               homepage => 'https://github.com/JerilynFranz/perl-Lingua-Stem',
+               license  => ['http://dev.perl.org/licenses/'],
+               repository => {
+                   type => 'git',
+                   url  => 'https://github.com/JerilynFranz/perl-Lingua-Stem.git',
+                   web  => 'https://github.com/JerilynFranz/perl-Lingua-Stem',
+               },
+            },
         },
         build_requires => { },
       )->create_build_script;

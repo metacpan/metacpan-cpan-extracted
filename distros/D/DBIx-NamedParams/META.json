@@ -46,6 +46,7 @@
             "DBI::Const::GetInfoType" : "0",
             "Encode" : "0",
             "Log::Dispatch" : "0",
+            "Scalar::Util" : "0",
             "Term::Encoding" : "0",
             "parent" : "0",
             "perl" : "5.008001",
@@ -56,6 +57,7 @@
          "requires" : {
             "DBD::SQLite" : "1.62",
             "FindBin::libs" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0.98",
             "Test::More::UTF8" : "0",
             "YAML::Syck" : "0"
@@ -65,7 +67,7 @@
    "provides" : {
       "DBIx::NamedParams" : {
          "file" : "lib/DBIx/NamedParams.pm",
-         "version" : "v0.0.9"
+         "version" : "v0.0.10"
       }
    },
    "release_status" : "stable",
@@ -79,7 +81,7 @@
          "web" : "https://github.com/TakeAsh/p-DBIx-NamedParams"
       }
    },
-   "version" : "v0.0.9",
+   "version" : "v0.0.10",
    "x_contributors" : [
       "TakeAsh <take@TakeAsh.net>"
    ],

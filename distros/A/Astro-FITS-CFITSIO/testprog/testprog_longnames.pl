@@ -56,7 +56,7 @@ my ($checksum,$asciisum,$datsum,$datastatus,$hdustatus);
 
 fits_get_version($version);
 
-printf "CFITSIO TESTPROG, v%.3f\n\n",$version;
+printf "CFITSIO TESTPROG\n\n";#, v%.3f\n\n",$version;
 
 print "Try opening then closing a nonexistent file:\n";
 $status=0;

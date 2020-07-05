@@ -6,7 +6,10 @@
 #include <panda/memory.h>
 #include <panda/CallbackDispatcher.h>
 
+using namespace panda;
+
 namespace test {
+
 
     struct Tracer {
         static int copy_calls;
@@ -113,4 +116,7 @@ namespace test {
         }
     };
 
+    const char* external_fn();
 }
+
+using namespace test;

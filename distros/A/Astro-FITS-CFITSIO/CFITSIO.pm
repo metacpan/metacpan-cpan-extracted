@@ -1,5 +1,5 @@
 package Astro::FITS::CFITSIO;
-$VERSION = '1.12';
+$VERSION = '1.14';
 
 use strict;
 use Carp;
@@ -51,6 +51,12 @@ my %__names = (
 	       fftplt => 'fits_create_template',
 	       ffflus => 'fits_flush_file',
 	       ffflsh => 'fits_flush_buffer',
+	       ffihtps => 'fits_init_https',
+	       ffchtps => 'fits_cleanup_https',
+	       ffvhtps => 'fits_verbose_https',
+	       ffshdwn => 'fits_show_download_progress',
+	       ffgtmo => 'fits_get_timeout',
+	       ffstmo => 'fits_set_timeout',
 	       ffclos => 'fits_close_file',
 	       ffdelt => 'fits_delete_file',
 	       ffexist => 'fits_file_exists',
@@ -244,6 +250,7 @@ my %__names = (
 	       ffcrim => 'fits_create_img',
 	       ffcrimll => 'fits_create_imgll',
 	       ffcrtb => 'fits_create_tbl',
+	       ffcpht => 'fits_copy_hdutab',
 	       ffcrhd => 'fits_create_hdu',
 	       ffiimg => 'fits_insert_img',
 	       ffiimgll => 'fits_insert_imgll',

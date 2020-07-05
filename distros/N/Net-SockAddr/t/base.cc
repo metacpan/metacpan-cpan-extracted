@@ -7,9 +7,15 @@ TEST_CASE("base") {
         CHECK(sa.family() == AF_UNSPEC);
     }
 
+    SECTION("copying values") {
+        auto sa = get_empty_sa();
+        CHECK(sa.family() == AF_UNSPEC);
+    }
+
     SECTION("copy ctor") {
         SECTION("from unspec") {
             SockAddr tmp;
+            CHECK(tmp.length() > 0);
             SockAddr sa = tmp;
             CHECK(sa.family() == AF_UNSPEC);
         }
@@ -32,9 +38,22 @@ TEST_CASE("base") {
         #endif
     }
 
+    SECTION("invalid ctor") {
+        SockAddr me = (SockAddr)SockAddr::Inet4("10.10.10.2", 1234);
+        CHECK_THROWS(SockAddr(me.get(), 1));
+    }
+
     SECTION("==") {
         CHECK(SockAddr::Inet4("127.0.0.1", 10) != SockAddr::Inet6("::1", 10));
     }
+
+    SECTION("=") {
+        SockAddr sa = (SockAddr)SockAddr::Inet4("10.10.10.2", 1234);
+        SockAddr sa2;
+        sa2 = sa;
+        CHECK(sa2 == sa);
+    }
+
 
     SECTION("bool") {
         SockAddr sa;
@@ -47,7 +66,7 @@ TEST_CASE("base") {
         SockAddr sa;
         CHECK(sa.ip() == "");
         CHECK(sa.port() == 0);
-        CHECK(sa.length() == 0);
+        CHECK(sa.length() > 0);
 
         sa = SockAddr::Inet4("127.0.0.1", 10);
         CHECK(sa.ip() == "127.0.0.1");
@@ -61,9 +80,34 @@ TEST_CASE("base") {
 
         #ifndef _WIN32
         sa = SockAddr::Unix("/path");
-        CHECK(sa.length() == sizeof(sockaddr_un));
+        CHECK(sa.length() == 8);
         CHECK_THROWS(sa.ip());
         CHECK_THROWS(sa.port());
         #endif
     }
+
+    SECTION("assign_foreign") {
+        SockAddr me = (SockAddr)SockAddr::Inet4("10.10.10.2", 1234);
+        SockAddr other;
+
+        other.assign_foreign([&me](auto ptr, auto sz){
+            memcpy(ptr, me.get(), me.length());
+            *sz = me.length();
+            return true;
+        });
+        CHECK(me == other);
+
+        auto fn = [](auto ptr, auto* sz){
+            auto buff = reinterpret_cast<char*>(ptr);
+            // garbage
+            *buff++ = 99;
+            *buff++ = 99;
+            *buff++ = 99;
+            *buff++ = 99;
+            *sz = 3;
+            return true;
+        };
+        CHECK_THROWS(other.assign_foreign(fn));
+    }
+
 }

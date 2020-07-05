@@ -1,5 +1,13 @@
 Revision history for Getopt::EX -Mi18n module
 
+0.08 2020-06-24T05:49:11Z
+
+    - Change 'country' to 'territory' to conform with standard.
+
+0.07 2020-06-23T14:15:04Z
+
+    - Some os (eg. WSL Ubuntu) does not have locales without codeset (xx_XX).
+
 0.06 2020-06-08T01:52:19Z
 
     - Introduce parameter 'long_lc' and 'country_lc'.

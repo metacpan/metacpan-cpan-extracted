@@ -10,7 +10,9 @@ struct RequestFactory : http::RequestParser::IFactory {
     }
 };
 
-ServerParser::ServerParser (const Parser::Config& cfg) : Parser(true, cfg), _connect_parser(new RequestFactory) {
+static RequestFactory request_factory;
+
+ServerParser::ServerParser (const Parser::Config& cfg) : Parser(true, cfg), _connect_parser(&request_factory) {
     _connect_parser.max_body_size = 0;
 }
 

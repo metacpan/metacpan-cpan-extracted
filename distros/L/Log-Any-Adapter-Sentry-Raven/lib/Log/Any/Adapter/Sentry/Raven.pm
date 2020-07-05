@@ -2,7 +2,7 @@ package Log::Any::Adapter::Sentry::Raven;
 
 # ABSTRACT: Log::Any::Adapter for Sentry::Raven
 use version;
-our $VERSION = 'v0.0.4'; # VERSION
+our $VERSION = 'v0.0.5'; # VERSION
 
 #pod =head1 SYNPOSIS
 #pod
@@ -155,7 +155,7 @@ Log::Any::Adapter::Sentry::Raven - Log::Any::Adapter for Sentry::Raven
 
 =head1 VERSION
 
-version v0.0.4
+version v0.0.5
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 Revision history for FFI-ExtractSymbols
 
+0.04      2020-07-05 08:46:43 -0600
+  - Migrate from Module::Build::FFI to FFI::Build (gh#6)
+
 0.03      2015-02-02 05:39:38 -0500
   - When using nm mode, accept W in addition to T for code symbols
 

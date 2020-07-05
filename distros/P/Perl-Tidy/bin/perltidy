@@ -551,6 +551,10 @@ a syntax error and the braces would not be balanced:
         $self->balance( $self->balance + $amount );
     }
 
+For one of the extensions, module Switch::Plain, colons are marked as labels.
+If you use this module, you may want to also use the B<--nooutdent-labels> flag
+to prevent lines such as 'default:' from being outdented.
+
 This flag is enabled by default but it can be deactivated with B<-nxs>.
 Probably the only reason to deactivate this flag is to generate more diagnostic
 messages when debugging a script.
@@ -587,21 +591,70 @@ this flag is in effect.
 
 =item B<-enc=s>,  B<--character-encoding=s>
 
-where B<s>=B<none> or B<utf8>.  This flag tells perltidy the character encoding
-of both the input and output character streams.  The value B<utf8> causes the
-stream to be read and written as UTF-8.  The value B<none> causes the stream to
-be processed without special encoding assumptions.  At present there is no
-automatic detection of character encoding (even if there is a C<'use utf8'>
-statement in your code) so this flag must be set for streams encoded in UTF-8.
-Incorrectly setting this parameter can cause data corruption, so please
-carefully check the output.
+This flag indicates the character encoding, if any, of the input data stream.
+Perltidy does not look for the encoding directives in the soure stream, such
+as B<use utf8>, and instead relies on this flag to determine the encoding.
+(Note that perltidy often works on snippets of code rather than complete files
+so it cannot rely on B<use utf8> directives).
 
-The default is B<none>.  
+The possible values for B<s> are (1) the name of an encoding recognized by the
+Encode.pm module, (2) B<none> if no encoding is used, or (3) <guess> if
+perltidy should guess.  
 
-The abbreviations B<-utf8> or B<-UTF8> are equivalent to B<-enc=utf8>.
-So to process a file named B<file.pl> which is encoded in UTF-8 you can use:
+For example, the value B<utf8> causes the stream to be read and written as
+UTF-8.  If the input stream cannot be decoded with a specified encoding then
+processing is not done.  
+
+The value B<none> causes the stream to be processed without special encoding
+assumptions.  This is appropriate for files which are written in single-byte
+character encodings such as latin-1.  
+
+The value B<guess> tells perltidy to guess between either utf8 encoding or no
+encoding (meaning one character per byte).  The guess uses the Encode::Guess
+module and this restricted range of guesses covers the most common cases.
+Testing showed that considering any greater number of encodings as guess
+suspects is too risky.
+
+The current default is B<guess>.  
+
+The abbreviations B<-utf8> or B<-UTF8> are equivalent to B<-enc=utf8>, and the
+abbreviation B<-guess> is equivalent to <-enc=guess>.  So to process a file
+named B<file.pl> which is encoded in UTF-8 you can use:
 
    perltidy -utf8 file.pl
+
+or
+   perltidy -guess file.pl
+
+To process a file in B<euc-jp> you could use
+   
+   perltidy -enc=euc-jp file.pl
+
+A perltidy output file is unencoded if the input file is unencoded, and
+otherwise it is encoded as B<utf8>, even if the input encoding was not
+B<utf8>.
+
+=item B<-gcs>,  B<--use-unicode-gcstring>
+
+This flag controls whether or not perltidy may use module Unicode::GCString to
+obtain accurate display widths of wide characters.  The default 
+is B<--nouse-unicode-gcstring>.
+
+If this flag is set, and text is encoded, perltidy will look for the module
+Unicode::GCString and, if found, will use it to obtain character display
+widths.  This can improve displayed vertical alignment for files with wide
+characters.  It is a nice feature but it is off by default to avoid conflicting
+formatting when there are multiple developers.  Perltidy installation does not
+require Unicode::GCString, so users wanting to use this feature need set this
+flag and also to install Unicode::GCString separately.
+
+If this flag is set and perltidy does not find module Unicode::GCString,
+a warning message will be produced and processing will continue but without
+the potential benefit provided by the module.
+
+Also note that actual vertical alignment depends upon the fonts used by the
+text display software, so vertical alignment may not be optimal even when
+Unicode::GCString is used.
 
 =item B<-ole=s>,  B<--output-line-ending=s>
 
@@ -667,9 +720,11 @@ The value given to B<-ci> is also used by some commands when a small
 space is required.  Examples are commands for outdenting labels,
 B<-ola>, and control keywords, B<-okw>.  
 
-When default values are not used, it is suggested that the value B<n>
-given with B<-ci=n> be no more than about one-half of the number of
-spaces assigned to a full indentation level on the B<-i=n> command.
+When default values are not used, it is highly recommended that the value B<n>
+given with B<-ci=n> be no more than about one-half of the number of spaces
+assigned to a full indentation level on the B<-i=n> command.  The reason is
+that discontinuities in the definition and control of continuation indentation
+arise in complex code, and this rule helps to smooth out these discontinuities.
 
 =item B<-sil=n> B<--starting-indentation-level=n>   
 
@@ -1029,12 +1084,32 @@ and look at the .DEBUG file to see the tokenization.
 B<WARNING> Be sure to put these tokens in quotes to avoid having them
 misinterpreted by your command shell.
 
+=item Note: Perltidy does always follow whitespace controls 
+
+The various parameters controlling whitespace within a program are requests which perltidy follows as well as possible, but there are a number of situations where changing whitespace could change program behavior and is not done.  Some of these are obvious; for example, we should not remove the space between the two plus symbols in '$x+ +$y' to avoid creating a '++' operator. Some are more subtle and involve the whitespace around bareword symbols and locations of possible filehandles.  For example, consider the problem of formatting the following subroutine:
+
+   sub print_div {
+      my ($x,$y)=@_;
+      print $x/$y;
+   }
+
+Suppose the user requests that / signs have a space to the left but not to the right. Perltidy will refuse to do this, but if this were done the result would be
+   
+   sub print_div {
+       my ($x,$y)=@_;
+       print $x /$y;
+   }
+
+If formatted in this way, the program will not run (at least with recent versions of perl) because the $x is taken to be a filehandle and / is assumed to start a quote. In a complex program, there might happen to be a / which terminates the multiline quote without a syntax error, allowing the program to run, but incorrectly.
+
+Related issues arise with other binary operator symbols, such as + and -, and in older versions of perl there could be problems with ternary operators.  So to avoid changing program behavior, perltidy has the simple rule that whitespace around possible filehandles is left unchanged.  Likewise, whitespace around barewords is left unchanged.  The reason is that if the barewords are defined in other modules, or in code that has not even been written yet, perltidy will not have seen their prototypes and must treat them cautiously.
+
 =item Space between specific keywords and opening paren
 
 When an opening paren follows a Perl keyword, no space is introduced after the
 keyword, unless it is (by default) one of these:
 
-   my local our and or eq ne if else elsif until unless 
+   my local our and or xor eq ne if else elsif until unless 
    while for foreach return switch case given when
 
 These defaults can be modified with two commands:
@@ -1099,6 +1174,98 @@ applying the different options would be:
         sub usage();    # n=1 [default; follows input]
         sub usage ();   # n=2 [space]
 
+=item B<-kpit=n> or B<--keyword-paren-inner-tightness=n>
+
+The space inside of an opening paren, which itself follows a certain keyword,
+can be controlled by this parameter.  The space on the inside of the
+corresponding closing paren will be treated in the same (balanced) manner.
+This parameter has precedence over any other paren spacing rules.  The values
+of B<n> are as follows:
+
+   -kpit=0 means always put a space (not tight)
+   -kpit=1 means ignore this parameter [default]
+   -kpit=2 means never put a space (tight)
+
+To illustrate, the following snippet is shown formatted in three ways:
+
+    if ( seek( DATA, 0, 0 ) ) { ... }    # perltidy (default)
+    if (seek(DATA, 0, 0)) { ... }        # perltidy -pt=2
+    if ( seek(DATA, 0, 0) ) { ... }      # perltidy -pt=2 -kpit=0
+
+In the second case the -pt=2 parameter makes all of the parens tight. In the
+third case the -kpit=0 flag causes the space within the 'if' parens to have a
+space, since 'if' is one of the keywords to which the -kpit flag applies by
+default.  The remaining parens are still tight because of the -pt=2 parameter.
+
+The set of keywords to which this parameter applies are by default are:
+
+   if elsif unless while until for foreach
+
+These can be changed with the parameter B<-kpitl=s> described in the next section. 
+
+
+=item B<-kpitl=string> or B<--keyword-paren-inner-tightness=string>
+
+This command can be used to change the keywords to which the the B<-kpit=n>
+command applies.  The parameter B<string> is a required list either keywords or
+functions, which should be placed in quotes if there are more than one.  By
+itself, this parameter does not cause any change in spacing, so the B<-kpit=n>
+command is still required.
+
+For example, the commands C<-kpitl="if else while" -kpit=2> will cause the just
+the spaces inside parens following  'if', 'else', and 'while' keywords to
+follow the tightness value indicated by the B<-kpit=2> flag.
+
+=item B<-lop>  or B<--logical-padding>
+
+In the following example some extra space has been inserted on the second
+line between the two open parens. This extra space is called "logical padding"
+and is intended to help align similar things vertically in some logical
+or ternary expressions.  
+
+    # perltidy [default formatting] 
+    $same =
+      (      ( $aP eq $bP )
+          && ( $aS eq $bS )
+          && ( $aT eq $bT )
+          && ( $a->{'title'} eq $b->{'title'} )
+          && ( $a->{'href'} eq $b->{'href'} ) );
+
+Note that this is considered to be a different operation from "vertical
+alignment" because space at just one line is being adjusted, whereas in
+"vertical alignment" the spaces at all lines are being adjusted. So it sort of
+a local version of vertical alignment.
+
+Here is an example involving a ternary operator:
+
+    # perltidy [default formatting] 
+    $bits =
+        $top > 0xffff ? 32
+      : $top > 0xff   ? 16
+      : $top > 1      ? 8
+      :                 1;
+
+This behavior is controlled with the flag B<--logical-padding>, which is set
+'on' by default.  If it is not desired it can be turned off using
+B<--nological-padding> or B<-nlop>.  The above two examples become, with
+B<-nlop>:
+
+    # perltidy -nlop
+    $same =
+      ( ( $aP eq $bP )
+          && ( $aS eq $bS )
+          && ( $aT eq $bT )
+          && ( $a->{'title'} eq $b->{'title'} )
+          && ( $a->{'href'} eq $b->{'href'} ) );
+
+    # perltidy -nlop
+    $bits =
+      $top > 0xffff ? 32
+      : $top > 0xff ? 16
+      : $top > 1    ? 8
+      :               1;
+
+
 =item Trimming whitespace around C<qw> quotes
 
 B<-tqw> or B<--trim-qw> provide the default behavior of trimming
@@ -1109,22 +1276,22 @@ multi-line C<qw> quotes to be left unchanged.  This option will not
 normally be necessary, but was added for testing purposes, because in
 some versions of perl, trimming C<qw> quotes changes the syntax tree.
 
-=item B<-sbq=n>  or B<--space-backslash-quote=n>
+=item b<-sbq=n>  or b<--space-backslash-quote=n>
 
-Lines like
+lines like
 
        $str1=\"string1";
        $str2=\'string2';
 
 can confuse syntax highlighters unless a space is included between the backslash and the single or double quotation mark.
 
-This can be controlled with the value of B<n> as follows:
+this can be controlled with the value of b<n> as follows:
 
     -sbq=0 means no space between the backslash and quote
     -sbq=1 means follow the example of the source code
     -sbq=2 means always put a space between the backslash and quote
 
-The default is B<-sbq=1>, meaning that a space will be used 0if there is one in the source code.
+The default is B<-sbq=1>, meaning that a space will be used if there is one in the source code.
 
 =item Trimming trailing whitespace from lines of POD
 
@@ -1589,6 +1756,11 @@ The comment markers may be placed at any location that a block comment may
 appear.  If they do not appear to be working, use the -log flag and examine the
 F<.LOG> file.  Use B<-nfs> to disable this feature.
 
+This method works for any code. For the specific case of a comma-separated list
+of values, as in this example, another possibility is to insert a blank or
+comment somewhere between the opening and closing parens.  See the section
+L<Controlling List Formatting>.
+
 =item B<-fsb=string>,  B<--format-skipping-begin=string>
 
 The B<-fsb=string> parameter may be used to change the beginning marker for
@@ -1609,6 +1781,9 @@ Some examples show how example strings become patterns:
 The B<-fsb=string> is the corresponding parameter used to change the
 ending marker for format skipping.  The default is equivalent to
 -fse='#<<<'.  
+
+The beginning and ending strings may be the same, but it is preferable
+to make them different for clarity.
 
 =back
 
@@ -2354,19 +2529,18 @@ single perl operator except B<=> on a -wbb flag.
 
 =head2 Controlling List Formatting
 
-Perltidy attempts to place comma-separated arrays of values in tables
-which look good.  Its default algorithms usually work well, and they
-have been improving with each release, but several parameters are
-available to control list formatting.
+Perltidy attempts to format lists of comma-separated values in tables which
+look good.  Its default algorithms usually work well, but sometimes they don't.
+In this case, there are several methods available to control list formatting.
 
-=over 4
-
-=item B<-boc>,  B<--break-at-old-comma-breakpoints>
-
-This flag tells perltidy to try to break at all old commas.  This is not
-the default.  Normally, perltidy makes a best guess at list formatting,
-and seldom uses old comma breakpoints.  Usually this works well,
-but consider:
+A very simple way to prevent perltidy from changing the line breaks
+within a comma-separated list of values is to insert a blank line,
+comment, or side-comment anywhere between the opening and closing
+parens (or braces or brackets).   This causes perltidy to skip
+over its list formatting logic.  (The reason is that any of
+these items put a constraint on line breaks, and perltidy
+needs complete control over line breaks within a container to
+adjust a list layout).  For example, let us consider
 
     my @list = (1,
                 1, 1,
@@ -2374,13 +2548,37 @@ but consider:
                 1, 3, 3, 1,
                 1, 4, 6, 4, 1,);
 
-The default formatting will flatten this down to one line:
+The default formatting, which allows a maximum line length of 80,
+will flatten this down to one line:
 
     # perltidy (default)
     my @list = ( 1, 1, 1, 1, 2, 1, 1, 3, 3, 1, 1, 4, 6, 4, 1, );
 
-which hides the structure. Using B<-boc>, plus additional flags
-to retain the original style, yields
+This formatting loses important information.  If we place a side comment on one
+of the lines, for example, we get the following result with with default formatting 
+parameters:
+
+    my @list = (
+        1,    # a side comment, comment, or blank keeps list intact
+        1, 1,
+        1, 2, 1,
+        1, 3, 3, 1,
+        1, 4, 6, 4, 1,
+    );
+
+We could achieve the same result with a blank line or full comment
+anywhere between the opening and closing parens.
+
+For another possibility see
+the -fs flag in L<Skipping Selected Sections of Code>.
+
+=over 4
+
+=item B<-boc>,  B<--break-at-old-comma-breakpoints>
+
+The B<-boc> flag is another way to prevent comma-separated lists from being
+reformatted.  Using B<-boc> on the above example, plus additional flags to retain 
+the original style, yields
 
     # perltidy -boc -lp -pt=2 -vt=1 -vtc=1
     my @list = (1,
@@ -2390,8 +2588,8 @@ to retain the original style, yields
                 1, 4, 6, 4, 1,);
 
 A disadvantage of this flag is that all tables in the file
-must already be nicely formatted.  For another possibility see
-the -fs flag in L<Skipping Selected Sections of Code>.
+must already be nicely formatted.  
+
 
 =item B<-mft=n>,  B<--maximum-fields-per-table=n>
 
@@ -2525,6 +2723,25 @@ as in this example:
 
 You may want to include the B<-weld-nested-containers> flag in this case to keep 
 nested braces and parens together, as in the last line.
+
+=item B<-bos>,  B<--break-at-old-semicolon-breakpoints>
+
+Semicolons are normally placed at the end of a statement.  This means that formatted lines do not normally begin with semicolons.  If the input stream has some lines which begin with semicolons, these can be retained by setting this flag.  For example, consider
+the following two-line input snippet:
+
+  $z = sqrt($x**2 + $y**2)
+  ;
+
+The default formatting will be:
+
+  $z = sqrt( $x**2 + $y**2 );
+
+The result using B<perltidy -bos> keeps the isolated semicolon:
+
+  $z = sqrt( $x**2 + $y**2 )
+    ;
+
+The default is not to do this, B<-nbos>. 
 
 
 =item B<-bok>,  B<--break-at-old-keyword-breakpoints>
@@ -3177,7 +3394,7 @@ The command B<-dp> or B<--delete-pod> will remove all pod documentation
 
 Two commands which remove comments (but not pod) are: B<-dbc> or
 B<--delete-block-comments> and B<-dsc> or  B<--delete-side-comments>.
-(Hanging side comments will be deleted with block comments here.)
+(Hanging side comments will be deleted with side comments here.)
 
 The negatives of these commands also work, and are the defaults.  When
 block comments are deleted, any leading 'hash-bang' will be retained.
@@ -3198,7 +3415,7 @@ not comments).
 
 The commands which write comments (but not pod) are: B<-tbc> or
 B<--tee-block-comments> and B<-tsc> or  B<--tee-side-comments>.
-(Hanging side comments will be written with block comments here.)
+(Hanging side comments will be written with side comments here.)
 
 The negatives of these commands also work, and are the defaults.  
 
@@ -3835,7 +4052,7 @@ The perltidy binary uses the Perl::Tidy module and is installed when that module
 
 =head1 VERSION
 
-This man page documents perltidy version 20200110
+This man page documents perltidy version 20200619
 
 =head1 BUG REPORTS
 

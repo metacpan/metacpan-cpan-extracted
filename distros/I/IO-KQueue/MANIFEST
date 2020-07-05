@@ -12,3 +12,4 @@ META.yml			Module meta-data (added by MakeMaker)
 README
 t/0load.t
 typemap
+META.json                                Module JSON meta-data (added by MakeMaker)

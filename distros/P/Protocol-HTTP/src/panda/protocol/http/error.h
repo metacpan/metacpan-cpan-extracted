@@ -15,6 +15,7 @@ enum class errc {
     unsupported_transfer_encoding,
     unsupported_compression,
     uncompression_failure,
+    corrupted_cookie_jar,
 };
 
 struct ErrorCategory : std::error_category {

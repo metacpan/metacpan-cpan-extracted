@@ -4,11 +4,12 @@ use warnings;
 use Carp 'croak';
 use Path::Tiny ();
 use Scalar::Util qw(blessed);
+use Module::Runtime 'use_module';
 
 use CLI::Osprey::Descriptive;
 
 # ABSTRACT: Role for CLI::Osprey applications
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.07'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 sub _osprey_option_to_getopt {
@@ -81,7 +82,7 @@ sub _osprey_fix_argv {
   while (defined( my $arg = shift @ARGV )) {
     # As soon as we find a -- or a non-option word, stop processing and leave everything
     # from there onwards in ARGV as either positional args or a subcommand.
-    if ($arg eq '--' or $arg !~ /^-/) {
+    if ($arg eq '--' or $arg eq '-' or $arg !~ /^-/) {
       push @new_argv, $arg, @ARGV;
       last;
     }
@@ -92,13 +93,17 @@ sub _osprey_fix_argv {
     my ($dash, $negative, $arg_name_without_dash)
       = $arg_name_with_dash =~ /^(-+)(no\-)?(.+)$/;
 
-    my $option_name = $abbreviations->{$arg_name_without_dash};
-    if (defined $option_name) {
-      if (@$option_name == 1) {
-        $option_name = $option_name->[0];
-      } else {
-        # TODO: can't we produce a warning saying that it's ambiguous and which options conflict?
-        $option_name = undef;
+    my $option_name;
+    
+    if ($dash eq '--') {
+      my $option_name = $abbreviations->{$arg_name_without_dash};
+      if (defined $option_name) {
+        if (@$option_name == 1) {
+          $option_name = $option_name->[0];
+        } else {
+          # TODO: can't we produce a warning saying that it's ambiguous and which options conflict?
+          $option_name = undef;
+        }
       }
     }
 
@@ -192,11 +197,15 @@ sub new_with_options {
     return $class->osprey_usage(1, $usage);
   }
 
-  if ($subcommand_class) {
-    return $subcommand_class->new_with_options(%params, parent_command => $self, invoked_as => "$params{invoked_as} $subcommand_name");
-  } else {
-    return $self;
-  }
+  return $self unless $subcommand_class;
+
+  use_module($subcommand_class) unless ref $subcommand_class;
+
+  return $subcommand_class->new_with_options(
+      %params,
+      parent_command => $self,
+      invoked_as => "$params{invoked_as} $subcommand_name"
+  );
 }
 
 sub parse_options {
@@ -340,7 +349,7 @@ CLI::Osprey::Role - Role for CLI::Osprey applications
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 AUTHOR
 

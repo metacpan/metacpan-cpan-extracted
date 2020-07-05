@@ -1,3 +1,13 @@
+0.114		2020-06-25	T. R. Wyant
+    Document undef as argument to equation_of_time()
+
+    Update canned magnitude table per Kelso.
+
+    Correct heliocentric_ecliptic*(), I hope. I don't have worked
+    examples, but at least the current computation is sane in that the
+    heliocentric coordinates of the Earth are the complement of the
+    geocentric coordinates of the Sun.
+
 0.113		2020-03-07	T. R. Wyant
     Subroutines equation_of_time(), nutation_in_longitude(),
     nutation_in_obliquity(), and obliquity() are now fatal. They were

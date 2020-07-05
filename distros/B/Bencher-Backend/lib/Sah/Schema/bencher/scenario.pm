@@ -1,7 +1,7 @@
 package Sah::Schema::bencher::scenario;
 
-our $DATE = '2020-05-12'; # DATE
-our $VERSION = '1.049'; # VERSION
+our $DATE = '2020-06-18'; # DATE
+our $VERSION = '1.050'; # VERSION
 
 use strict;
 use warnings;
@@ -65,22 +65,36 @@ Sah::Schema::bencher::scenario - Bencher scenario
 
 =head1 VERSION
 
-This document describes version 1.049 of Sah::Schema::bencher::scenario (from Perl distribution Bencher-Backend), released on 2020-05-12.
+This document describes version 1.050 of Sah::Schema::bencher::scenario (from Perl distribution Bencher-Backend), released on 2020-06-18.
 
 =head1 SYNOPSIS
 
-Using with L<Data::Sah>:
+To check data against this schema (requires L<Data::Sah>):
 
  use Data::Sah qw(gen_validator);
- my $vdr = gen_validator("bencher::scenario*");
- say $vdr->($data) ? "valid" : "INVALID!";
+ my $validator = gen_validator("bencher::scenario*");
+ say $validator->($data) ? "valid" : "INVALID!";
 
- # Data::Sah can also create a validator to return error message, coerced value,
- # even validators in other languages like JavaScript, from the same schema.
- # See its documentation for more details.
+ # Data::Sah can also create validator that returns nice error message string
+ # and/or coerced value. Data::Sah can even create validator that targets other
+ # language, like JavaScript. All from the same schema. See its documentation
+ # for more details.
 
-Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
+To validate function parameters against this schema (requires L<Params::Sah>):
 
+ use Params::Sah qw(gen_validator);
+
+ sub myfunc {
+     my @args = @_;
+     state $validator = gen_validator("bencher::scenario*");
+     $validator->(\@args);
+     ...
+ }
+
+To specify schema in L<Rinci> function metadata and use the metadata with
+L<Perinci::CmdLine> to create a CLI:
+
+ # in lib/MyApp.pm
  package MyApp;
  our %SPEC;
  $SPEC{myfunc} = {
@@ -98,6 +112,21 @@ Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
      my %args = @_;
      ...
  }
+ 1;
+
+ # in myapp.pl
+ package main;
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url=>'MyApp::myfunc')->run;
+
+ # in command-line
+ % ./myapp.pl --help
+ myapp - Routine to do blah ...
+ ...
+
+ % ./myapp.pl --version
+
+ % ./myapp.pl --arg1 ...
 
 =head1 HOMEPAGE
 

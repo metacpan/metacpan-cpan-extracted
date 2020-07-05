@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.183';
+our $VERSION = '1.184';
 
 use Time::HiRes ();
 use Time::Local ();
@@ -175,6 +175,31 @@ our @DayName = qw(Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag);
 sub dayName {
     my $self = shift;
     return $DayName[$self->dayOfWeek];
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 year() - Jahr
+
+=head4 Synopsis
+
+  $year = $t->year;
+
+=head4 Returns
+
+Integer
+
+=head4 Description
+
+Liefere (vierstellige) Jahreszahl.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub year {
+    my $self = shift;
+    return (localtime $$self)[5]+1900;
 }
 
 # -----------------------------------------------------------------------------
@@ -448,7 +473,7 @@ sub asIso {
 
 =head1 VERSION
 
-1.183
+1.184
 
 =head1 AUTHOR
 

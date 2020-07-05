@@ -192,8 +192,7 @@ METHODS
 
       my $history = $backend->history;
 
-    Get history information for job queue. Note that this method is
-    EXPERIMENTAL and might change without warning!
+    Get history information for job queue.
 
     These fields are currently available:
 
@@ -222,6 +221,12 @@ METHODS
       my $result = $results->{jobs}[0]{result};
 
     These options are currently available:
+
+    before
+
+        before => 23
+
+      List only jobs before this id.
 
     ids
 
@@ -415,6 +420,12 @@ METHODS
 
     These options are currently available:
 
+    before
+
+        before => 23
+
+      List only workers before this id.
+
     ids
 
         ids => ['23', '24']
@@ -488,9 +499,9 @@ METHODS
 
       my $bool = $backend->note($job_id, {mojo => 'rocks', minion => 'too'});
 
-    Change one or more metadata fields for a job. It is currently an error
-    to attempt to set a metadata field with a name containing the
-    characters ., [, or ].
+    Change one or more metadata fields for a job. Setting a value to undef
+    will remove the field. It is currently an error to attempt to set a
+    metadata field with a name containing the characters ., [, or ].
 
  receive
 
@@ -531,9 +542,23 @@ METHODS
 
  reset
 
-      $backend->reset;
+      $backend->reset({all => 1});
 
     Reset job queue.
+
+    These options are currently available:
+
+    all
+
+        all => 1
+
+      Reset everything.
+
+    locks
+
+        locks => 1
+
+      Reset only locks.
 
  retry_job
 
@@ -606,15 +631,13 @@ METHODS
         delayed_jobs => 100
 
       Number of jobs in inactive state that are scheduled to run at
-      specific time in the future. Note that this field is EXPERIMENTAL and
-      might change without warning!
+      specific time in the future.
 
     enqueued_jobs
 
         enqueued_jobs => 100000
 
-      Rough estimate of how many jobs have ever been enqueued. Note that
-      this field is EXPERIMENTAL and might change without warning!
+      Rough estimate of how many jobs have ever been enqueued.
 
     failed_jobs
 

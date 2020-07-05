@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+otptool - one-time password tool
+
+=head1 SYNOPSIS
+
+otptool otpauth://...
+
+=cut
+
+use utf8;
+use strict;
+use warnings;
+use open qw(:std :utf8);
+
+use Getopt::Long;
+use Pod::Usage;
+use Pass::OTP qw(otp);
+use Pass::OTP::URI qw(parse);
+
+our $VERSION = $Pass::OTP::VERSION;
+
+Getopt::Long::Configure(qw(auto_version));
+GetOptions(
+    'help|h|?' => sub { pod2usage(-verbose => 2) },
+) || pod2usage(2);
+
+pod2usage(2) if @ARGV == 0;
+pod2usage(2) if $ARGV[0] !~ m#^otpauth://#;
+printf("%s\n", otp(parse($ARGV[0])));
+exit 0;
+
+__END__
+=head1 SEE ALSO
+
+L<Pass::OTP>
+
+L<oathtool(1)>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020 Jan Baier
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut

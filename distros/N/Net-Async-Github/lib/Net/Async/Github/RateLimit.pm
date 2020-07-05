@@ -5,7 +5,7 @@ use warnings;
 
 use Net::Async::Github::RateLimit::Core;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 =head1 NAME
 

@@ -1,3 +1,5 @@
+0.022 2020-06-22 16:28:00+0000
+  -Added suport for variable interpolation on condition IF EXIST
 0.021 2020-01-23 22:00:00+0000
   -Fix bug with goto :eof after previous goto :label
 0.020 2020-01-14 12:00:00+0000

@@ -1,5 +1,32 @@
 Revision history for Music-Duration-Partition
 
+0.0512 2020-06-29 13:12:40
+    - Enhance the eg/drum-fills-advanced program.
+
+0.0511 2020-06-29 09:29:37
+    - Fork the eg/drum-fills program to eg/drum-fills-advanced.
+    - Improve the install suggestions.
+
+0.0510 2020-06-27 13:18:13
+    - Improve the eg/drum-fills program again!
+
+0.0509 2020-06-24 10:38:28
+    - Lose the redundant counter in the eg/drum-fills program.
+
+0.0508 2020-06-24 06:53:16
+    - Fix eg/drum-fills logic.
+
+0.0507 2020-06-19 23:47:01
+    - Die if weights and pool are not equal before using Math::Random::Discrete.
+
+0.0506 2020-06-19 04:40:41
+    - Improve the eg/drum-fills program.
+    - Simplify tests.
+
+0.0505 2020-06-19 03:37:55
+    - Add the eg/drum-fills program.
+    - Improve documentation.
+
 0.0504 2020-04-22 13:47:15
     - Add another test for pool weights.
     - Improve documentation.

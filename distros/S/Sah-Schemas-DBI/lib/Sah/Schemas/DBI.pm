@@ -1,9 +1,9 @@
 package Sah::Schemas::DBI;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-DBI'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to DBI
@@ -20,7 +20,7 @@ Sah::Schemas::DBI - Schemas related to DBI
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schemas::DBI (from Perl distribution Sah-Schemas-DBI), released on 2020-03-04.
+This document describes version 0.004 of Sah::Schemas::DBI (from Perl distribution Sah-Schemas-DBI), released on 2020-03-08.
 
 =head1 HOMEPAGE
 

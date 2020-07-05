@@ -245,10 +245,13 @@ symlink_type (self, ...)
 	Entry self
 
 	CODE:
+#if ARCHIVE_VERSION_NUMBER >= 3004000
 		if (items > 1)
 			archive_entry_set_symlink_type (self->e, SvIV (ST (1)));
-
 		RETVAL = archive_entry_symlink_type (self->e);
+#else
+		croak ("this feature requires libarchive 3.4+");
+#endif
 
 	OUTPUT: RETVAL
 

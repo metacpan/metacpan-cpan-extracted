@@ -8,8 +8,8 @@ my $root = (grep {/^\.$/i} @INC) ? undef : './';
 Test2::Aggregate::run_tests();
 
 my $stats = Test2::Aggregate::run_tests(
-    dirs     => ['xt/aggregate'],
-    root     => './'
+    dirs => ['xt/aggregate'],
+    root => $root
 );
 
 is(scalar(keys %$stats), 2, 'subtests');

@@ -2,19 +2,19 @@ use strict;
 use warnings;
 package Archive::BagIt::Role::Plugin;
 
-use Moose::Role;
+use Moo::Role;
 
 use namespace::autoclean;
 
 has plugin_name => (
   is  => 'ro',
-  isa => 'Str',
+  #isa => 'Str',
   default => __PACKAGE__,
 );
 
 has bagit => (
   is  => 'ro',
-  isa => 'Archive::BagIt::Base',
+  #isa => 'Archive::BagIt::Base',
   required => 1,
   weak_ref => 1,
 );
@@ -25,7 +25,7 @@ sub BUILD {
     $self->bagit->plugins( { $plugin_name => $self });
     return 1;
 }
-no Moose;
+no Moo;
 1;
 
 __END__
@@ -40,7 +40,15 @@ Archive::BagIt::Role::Plugin
 
 =head1 VERSION
 
-version 0.055
+version 0.058
+
+=head1 NAME
+
+Archive::BagIt::Role::Plugin
+
+=head1 VERSION
+
+version 0.058
 
 =head1 AVAILABILITY
 
@@ -57,6 +65,17 @@ and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 You can make new bug reports, and view existing ones, through the
 web interface at L<http://rt.cpan.org>.
+
+=head1 AUTHOR
+
+Rob Schmidt <rjeschmi@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 

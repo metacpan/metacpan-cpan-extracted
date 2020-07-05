@@ -1,5 +1,5 @@
 package HTML::Spelling::Site::Whitelist;
-$HTML::Spelling::Site::Whitelist::VERSION = '0.4.3';
+$HTML::Spelling::Site::Whitelist::VERSION = '0.6.0';
 use strict;
 use warnings;
 use autodie;
@@ -8,7 +8,7 @@ use 5.014;
 
 use MooX (qw( late ));
 
-use IO::All qw/ io /;
+use Path::Tiny qw/ path /;
 
 has '_general_whitelist' => ( is => 'ro', default => sub { return []; } );
 has '_records'           => ( is => 'ro', default => sub { return []; } );
@@ -196,11 +196,11 @@ sub get_sorted_text
     );
 }
 
-sub _get_io
+sub _get_fh
 {
     my ($self) = @_;
 
-    return io->encoding('utf8')->file( $self->filename );
+    return path( $self->filename );
 }
 
 sub is_sorted
@@ -209,7 +209,7 @@ sub is_sorted
 
     $self->parse;
 
-    return ( $self->_get_io->all eq $self->get_sorted_text );
+    return ( $self->_get_fh->slurp_utf8() eq $self->get_sorted_text );
 }
 
 sub write_sorted_file
@@ -218,7 +218,7 @@ sub write_sorted_file
 
     $self->parse;
 
-    $self->_get_io->print( $self->get_sorted_text );
+    $self->_get_fh->spew_utf8( $self->get_sorted_text );
 
     return;
 }
@@ -237,7 +237,7 @@ HTML::Spelling::Site::Whitelist - handles the whitelist file.
 
 =head1 VERSION
 
-version 0.4.3
+version 0.6.0
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
-#include <xs/function.h>
 #include <catch.hpp>
+#include <xs/function.h>
 
 using namespace xs;
 using namespace panda;

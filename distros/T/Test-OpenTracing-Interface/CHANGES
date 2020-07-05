@@ -1,7 +1,13 @@
 CHANGE LOG
 ==========
 
-2020-06-14   v0.22.0
+2020-06-16   v0.23.0
+--------------------
+
+Fix 'getters' we do need them after all
+
+
+2020-06-16   v0.22.0
 --------------------
 
 Remove 'getters' for new version of OpenTracing::Interface 'v0.203.x'

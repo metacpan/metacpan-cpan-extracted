@@ -41,6 +41,14 @@
             "namespace::clean" : "0",
             "perl" : "5.006",
             "strictures" : "2"
+         },
+         "suggests" : {
+            "Data::Dumper::Compact" : "0",
+            "MIDI::Drummer::Tiny" : "0",
+            "MIDI::Util" : "0",
+            "Music::Scales" : "0",
+            "Music::VoiceGen" : "0",
+            "Music::Voss" : "0"
          }
       },
       "test" : {
@@ -65,7 +73,7 @@
          "web" : "https://github.com/ology/Music-Duration-Partition"
       }
    },
-   "version" : "0.0504",
+   "version" : "0.0512",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -315,6 +323,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.014"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "suggests"
+               }
+            },
+            "name" : "Suggests",
             "version" : "6.014"
          },
          {

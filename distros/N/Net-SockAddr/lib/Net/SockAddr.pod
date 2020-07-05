@@ -89,9 +89,12 @@ This module exposes C<panda::net::SockAddr> typemap to use from XS modules. This
         RETVAL = sa->ip();
     }
 
-=head1 AUTHOR
+=head1 AUTHORS
 
 Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda LTD
+
 
 =head1 LICENSE
 

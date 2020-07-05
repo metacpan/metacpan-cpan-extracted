@@ -17,6 +17,7 @@ if($ENV{AUTHOR_TESTING}) {
 		if($ENV{AUTHOR_TESTING}) {
 			$online_tests = are_online();
 		} else {
+			print "On-line tests have been disabled\n";
 			$online_tests = 0;
 		}
 	}

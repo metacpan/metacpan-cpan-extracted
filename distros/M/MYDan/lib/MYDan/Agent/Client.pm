@@ -34,6 +34,8 @@ use MYDan::Util::Hosts;
 use MYDan::Util::FastMD5;
 use AnyEvent::Loop;
 
+use Errno;
+
 our %RUN = ( user => 'root', max => 128, timeout => 300 );
 
 sub new
@@ -118,6 +120,24 @@ sub run
 
     my %hosts = MYDan::Util::Hosts->new()->match( @node );
 
+    my %activity;
+    my $activity = AnyEvent->timer ( after => 30, interval => 30, cb => sub{ 
+        for my $n ( keys %activity )
+        {
+            my ( $w, $t ) = map{ $activity{$n}{$_} }qw( hdl time );
+            unless( $w && $$w && $$w->fh )
+            {
+                delete $activity{$n};
+                next;
+            }
+            if( $t + 30 < AE::now )
+            {
+                $$w->_error( Errno::ENETRESET );
+                delete $activity{$n};
+            }
+        }
+    });
+
     my %cut;
     my $work;$work = sub{
         return unless my $node = shift @node;
@@ -143,6 +163,7 @@ sub run
              &{$run{pcb}}( $efsize, $node ) if $run{pcb};
              my $hdl;
              push @work, \$hdl;
+             $activity{$node} = { time => AE::now, hdl => \$hdl };
              $hdl = new AnyEvent::Handle(
                  fh => $fh,
                  rbuf_max => 10240000,
@@ -153,6 +174,7 @@ sub run
                      $self->unshift_read (
                          chunk => length $self->{rbuf},
                          sub { 
+                             $activity{$node}{time} = AE::now;
                              if ( defined $cut{$node} || length $result{$node} > 102400 )
                              {
                                  $cut{$node} = $_[1]; return; 
@@ -278,6 +300,7 @@ sub run
              &{$run{pcb}}( $efsize, $node, 'Proxy' ) if $run{pcb};
              my $hdl;
              push @work, \$hdl;
+             $activity{$node} = { time => AE::now, hdl => \$hdl };
              $hdl = new AnyEvent::Handle(
                  fh => $fh,
                  rbuf_max => 10240000,
@@ -288,6 +311,7 @@ sub run
                      $self->unshift_read (
                          chunk => length $self->{rbuf},
                          sub { 
+                             $activity{$node}{time} = AE::now;
 
 			     if( $rresult{$node} )
 			     {
@@ -372,7 +396,7 @@ sub run
 
                   on_error => sub {
                       close $fh;
-                      map { $result{$_} = "no_error by proxy $node"; } @node;
+                      map { $result{$_} = "on_error by proxy $node"; } @node;
                   }
               );
 
@@ -396,6 +420,8 @@ sub run
 
     $cv->recv;
     undef $w;
+    undef $activity;
+    %activity = ();
 
     map{ 
          my $end = $cut{$_} =~ /--- (\d+)\n$/ ? "--- $1\n" : '';

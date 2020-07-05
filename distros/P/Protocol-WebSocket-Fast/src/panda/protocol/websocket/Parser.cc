@@ -47,8 +47,8 @@ bool Parser::_parse_frame (Frame& frame) {
         _flags.reset(RECV_FRAME);
         _flags.reset(RECV_INFLATE);
         _utf8_checker.reset();
-        if      (frame.error == errc::invalid_utf8)   _suggested_close_code = CloseCode::INVALID_TEXT;
-        else if (frame.error == errc::max_frame_size) _suggested_close_code = CloseCode::MAX_SIZE;
+        if      (frame.error & errc::invalid_utf8)   _suggested_close_code = CloseCode::INVALID_TEXT;
+        else if (frame.error & errc::max_frame_size) _suggested_close_code = CloseCode::MAX_SIZE;
         else                                          _suggested_close_code = CloseCode::PROTOCOL_ERROR;
 
         return true;
@@ -159,7 +159,7 @@ MessageSP Parser::_get_message () {
     }
 
     if (_message->error) {
-        if (_message->error == errc::max_message_size) _suggested_close_code = CloseCode::MAX_SIZE;
+        if (_message->error & errc::max_message_size) _suggested_close_code = CloseCode::MAX_SIZE;
     }
 
     _flags.reset(RECV_MESSAGE);

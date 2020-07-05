@@ -93,18 +93,18 @@ Basque Spain locale.
 
 =head3 Wide (format)
 
-  urtarrila
-  otsaila
-  martxoa
-  apirila
-  maiatza
-  ekaina
-  uztaila
-  abuztua
-  iraila
-  urria
-  azaroa
-  abendua
+  urtarrilak
+  otsailak
+  martxoak
+  apirilak
+  maiatzak
+  ekainak
+  uztailak
+  abuztuak
+  irailak
+  urriak
+  azaroak
+  abenduak
 
 =head3 Abbreviated (format)
 
@@ -248,15 +248,15 @@ Basque Spain locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5(a), asteartea
-   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22(a), ostirala
-  -0010-09-15T04:44:23 = -10(e)ko irailaren 15(a), larunbata
+   2008-02-05T18:30:30 = 2008(e)ko otsailakren 5(a), asteartea
+   1995-12-22T09:05:02 = 1995(e)ko abenduakren 22(a), ostirala
+  -0010-09-15T04:44:23 = -10(e)ko irailakren 15(a), larunbata
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5(a)
-   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22(a)
-  -0010-09-15T04:44:23 = -10(e)ko irailaren 15(a)
+   2008-02-05T18:30:30 = 2008(e)ko otsailakren 5(a)
+   1995-12-22T09:05:02 = 1995(e)ko abenduakren 22(a)
+  -0010-09-15T04:44:23 = -10(e)ko irailakren 15(a)
 
 =head3 Medium
 
@@ -302,15 +302,15 @@ Basque Spain locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5(a), asteartea 18:30:30 (UTC)
-   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22(a), ostirala 09:05:02 (UTC)
-  -0010-09-15T04:44:23 = -10(e)ko irailaren 15(a), larunbata 04:44:23 (UTC)
+   2008-02-05T18:30:30 = 2008(e)ko otsailakren 5(a), asteartea 18:30:30 (UTC)
+   1995-12-22T09:05:02 = 1995(e)ko abenduakren 22(a), ostirala 09:05:02 (UTC)
+  -0010-09-15T04:44:23 = -10(e)ko irailakren 15(a), larunbata 04:44:23 (UTC)
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5(a) 18:30:30 (UTC)
-   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22(a) 09:05:02 (UTC)
-  -0010-09-15T04:44:23 = -10(e)ko irailaren 15(a) 04:44:23 (UTC)
+   2008-02-05T18:30:30 = 2008(e)ko otsailakren 5(a) 18:30:30 (UTC)
+   1995-12-22T09:05:02 = 1995(e)ko abenduakren 22(a) 09:05:02 (UTC)
+  -0010-09-15T04:44:23 = -10(e)ko irailakren 15(a) 04:44:23 (UTC)
 
 =head3 Medium
 
@@ -473,21 +473,21 @@ Basque Spain locale.
 
 =head3 MMMMW-count-one (MMMM W. 'astea')
 
-   2008-02-05T18:30:30 = otsaila 1. astea
-   1995-12-22T09:05:02 = abendua 3. astea
-  -0010-09-15T04:44:23 = iraila 2. astea
+   2008-02-05T18:30:30 = otsailak 1. astea
+   1995-12-22T09:05:02 = abenduak 3. astea
+  -0010-09-15T04:44:23 = irailak 2. astea
 
 =head3 MMMMW-count-other (MMMM W. 'astea')
 
-   2008-02-05T18:30:30 = otsaila 1. astea
-   1995-12-22T09:05:02 = abendua 3. astea
-  -0010-09-15T04:44:23 = iraila 2. astea
+   2008-02-05T18:30:30 = otsailak 1. astea
+   1995-12-22T09:05:02 = abenduak 3. astea
+  -0010-09-15T04:44:23 = irailak 2. astea
 
 =head3 MMMMd (MMMM d)
 
-   2008-02-05T18:30:30 = otsaila 5
-   1995-12-22T09:05:02 = abendua 22
-  -0010-09-15T04:44:23 = iraila 15
+   2008-02-05T18:30:30 = otsailak 5
+   1995-12-22T09:05:02 = abenduak 22
+  -0010-09-15T04:44:23 = irailak 15
 
 =head3 MMMd (MMM d)
 
@@ -575,21 +575,21 @@ Basque Spain locale.
 
 =head3 yMMMM (y('e')'ko' MMMM)
 
-   2008-02-05T18:30:30 = 2008(e)ko otsaila
-   1995-12-22T09:05:02 = 1995(e)ko abendua
-  -0010-09-15T04:44:23 = -10(e)ko iraila
+   2008-02-05T18:30:30 = 2008(e)ko otsailak
+   1995-12-22T09:05:02 = 1995(e)ko abenduak
+  -0010-09-15T04:44:23 = -10(e)ko irailak
 
 =head3 yMMMMEd (y('e')'ko' MMMM'k' d, E)
 
-   2008-02-05T18:30:30 = 2008(e)ko otsailak 5, ar.
-   1995-12-22T09:05:02 = 1995(e)ko abenduak 22, or.
-  -0010-09-15T04:44:23 = -10(e)ko irailak 15, lr.
+   2008-02-05T18:30:30 = 2008(e)ko otsailakk 5, ar.
+   1995-12-22T09:05:02 = 1995(e)ko abenduakk 22, or.
+  -0010-09-15T04:44:23 = -10(e)ko irailakk 15, lr.
 
 =head3 yMMMMd (y('e')'ko' MMMM'ren' d)
 
-   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5
-   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22
-  -0010-09-15T04:44:23 = -10(e)ko irailaren 15
+   2008-02-05T18:30:30 = 2008(e)ko otsailakren 5
+   1995-12-22T09:05:02 = 1995(e)ko abenduakren 22
+  -0010-09-15T04:44:23 = -10(e)ko irailakren 15
 
 =head3 yMMMd (y MMM d)
 

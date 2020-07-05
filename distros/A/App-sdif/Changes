@@ -1,5 +1,14 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.16.0 2020-06-30T11:21:26Z
+
+    - Introduce --unit option, and integrate -B/--char/--word/--mecab option.
+    - Fixed bug of --ambiguous=wide option not working.
+    - Make sdif not to process diff data in commit message by Minilla.
+
+    Now --prefix-pattern option is not same in sdif/cdif.  Cdif process
+    diff data in commit message but sdif does not.
+
 4.15.2 2020-04-30T15:25:39Z
 
     - Accidentally released wrong dependency version.

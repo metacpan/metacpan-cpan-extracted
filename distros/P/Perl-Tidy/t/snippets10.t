@@ -25,7 +25,7 @@
 # To locate test #13 you can search for its name or the string '#13'
 
 use strict;
-use Test;
+use Test::More;
 use Carp;
 use Perl::Tidy;
 my $rparams;
@@ -494,33 +494,33 @@ foreach ( split( //, $input ) ) { }
             params => "def",
             expect => <<'#8...........',
 \&foo !~~ \&foo;
-\&foo ~~ \&foo;
-\&foo ~~ \&foo;
-\&foo ~~ sub { };
-sub { } ~~ \&foo;
-\&foo ~~ \&bar;
-\&bar ~~ \&foo;
-1 ~~ sub { shift };
-sub { shift } ~~ 1;
-0 ~~ sub { shift };
-sub { shift } ~~ 0;
-1 ~~ sub { scalar @_ };
+\&foo             ~~ \&foo;
+\&foo             ~~ \&foo;
+\&foo             ~~ sub { };
+sub { }           ~~ \&foo;
+\&foo             ~~ \&bar;
+\&bar             ~~ \&foo;
+1                 ~~ sub { shift };
+sub { shift }     ~~ 1;
+0                 ~~ sub { shift };
+sub { shift }     ~~ 0;
+1                 ~~ sub { scalar @_ };
 sub { scalar @_ } ~~ 1;
-[]           ~~ \&bar;
-\&bar        ~~ [];
-{}           ~~ \&bar;
-\&bar        ~~ {};
-qr//         ~~ \&bar;
-\&bar        ~~ qr//;
-a_const      ~~ "a constant";
-"a constant" ~~ a_const;
-a_const      ~~ a_const;
-a_const      ~~ a_const;
-a_const      ~~ b_const;
-b_const      ~~ a_const;
-{}           ~~ {};
-{}           ~~ {};
-{}           ~~ { 1 => 2 };
+[]                ~~ \&bar;
+\&bar             ~~ [];
+{}                ~~ \&bar;
+\&bar             ~~ {};
+qr//              ~~ \&bar;
+\&bar             ~~ qr//;
+a_const           ~~ "a constant";
+"a constant"      ~~ a_const;
+a_const           ~~ a_const;
+a_const           ~~ a_const;
+a_const           ~~ b_const;
+b_const           ~~ a_const;
+{}                ~~ {};
+{}                ~~ {};
+{}                ~~ { 1 => 2 };
 { 1 => 2 } ~~ {};
 { 1 => 2 } ~~ { 1 => 2 };
 { 1 => 2 } ~~ { 1 => 2 };
@@ -1011,29 +1011,36 @@ foreach my $key ( sort keys %{$rtests} ) {
         errorfile => \$errorfile_string,    # not used when -se flag is set
     );
     if ( $err || $stderr_string || $errorfile_string ) {
+        print STDERR "Error output received for test '$key'\n";
         if ($err) {
-            print STDERR
-"This error received calling Perl::Tidy with '$sname' + '$pname'\n";
+            print STDERR "An error flag '$err' was returned\n";
             ok( !$err );
         }
         if ($stderr_string) {
             print STDERR "---------------------\n";
             print STDERR "<<STDERR>>\n$stderr_string\n";
             print STDERR "---------------------\n";
-            print STDERR
-"This error received calling Perl::Tidy with '$sname' + '$pname'\n";
             ok( !$stderr_string );
         }
         if ($errorfile_string) {
             print STDERR "---------------------\n";
             print STDERR "<<.ERR file>>\n$errorfile_string\n";
             print STDERR "---------------------\n";
-            print STDERR
-"This error received calling Perl::Tidy with '$sname' + '$pname'\n";
             ok( !$errorfile_string );
         }
     }
     else {
-        ok( $output, $expect );
+        if ( !is( $output, $expect, $key ) ) {
+            my $leno = length($output);
+            my $lene = length($expect);
+            if ( $leno == $lene ) {
+                print STDERR
+"#> Test '$key' gave unexpected output.  Strings differ but both have length $leno\n";
+            }
+            else {
+                print STDERR
+"#> Test '$key' gave unexpected output.  String lengths differ: output=$leno, expected=$lene\n";
+            }
+        }
     }
 }

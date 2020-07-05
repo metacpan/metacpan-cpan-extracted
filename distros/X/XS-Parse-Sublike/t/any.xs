@@ -14,24 +14,28 @@
 #  include "wrap_keyword_plugin.c.inc"
 #endif
 
-static void func_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
+static void func_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *_logsv)
 {
-  sv_catpvs(get_sv("main::LOG", 0), "Sf");
+  SV *logsv = _logsv;
+  sv_catpvs(logsv, "Sf");
 }
 
-static void func_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
+static void func_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void *_logsv)
 {
-  sv_catpvs(get_sv("main::LOG", 0), "Ef");
+  SV *logsv = _logsv;
+  sv_catpvs(logsv, "Ef");
 }
 
-static void func_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
+static void func_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_logsv)
 {
-  sv_catpvs(get_sv("main::LOG", 0), "Lf");
+  SV *logsv = _logsv;
+  sv_catpvs(logsv, "Lf");
 }
 
-static void func_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
+static void func_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *_logsv)
 {
-  sv_catpvs(get_sv("main::LOG", 0), "Nf");
+  SV *logsv = _logsv;
+  sv_catpvs(logsv, "Nf");
 }
 
 static const struct XSParseSublikeHooks parse_func_hooks = {
@@ -41,24 +45,28 @@ static const struct XSParseSublikeHooks parse_func_hooks = {
   .post_newcv      = func_post_newcv,
 };
 
-static void prefixed_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
+static void prefixed_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *_logsv)
 {
-  sv_catpvs(get_sv("main::LOG", 0), "Sp");
+  SV *logsv = _logsv;
+  sv_catpvs(logsv, "Sp");
 }
 
-static void prefixed_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
+static void prefixed_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void *_logsv)
 {
-  sv_catpvs(get_sv("main::LOG", 0), "Ep");
+  SV *logsv = _logsv;
+  sv_catpvs(logsv, "Ep");
 }
 
-static void prefixed_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
+static void prefixed_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_logsv)
 {
-  sv_catpvs(get_sv("main::LOG", 0), "Lp");
+  SV *logsv = _logsv;
+  sv_catpvs(logsv, "Lp");
 }
 
-static void prefixed_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
+static void prefixed_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *_logsv)
 {
-  sv_catpvs(get_sv("main::LOG", 0), "Np");
+  SV *logsv = _logsv;
+  sv_catpvs(logsv, "Np");
 }
 
 static const struct XSParseSublikeHooks parse_prefixed_hooks = {
@@ -77,7 +85,8 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op_ptr)
 
   lex_read_space(0);
 
-  return xs_parse_sublike_any(&parse_prefixed_hooks, op_ptr);
+  return xs_parse_sublike_any(&parse_prefixed_hooks, SvREFCNT_inc(get_sv("main::LOG", 0)),
+    op_ptr);
 }
 
 MODULE = t::any  PACKAGE = t::any
@@ -85,6 +94,6 @@ MODULE = t::any  PACKAGE = t::any
 BOOT:
   boot_xs_parse_sublike(0);
 
-  register_xs_parse_sublike("func", &parse_func_hooks);
+  register_xs_parse_sublike("func", &parse_func_hooks, SvREFCNT_inc(get_sv("main::LOG", GV_ADD)));
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);

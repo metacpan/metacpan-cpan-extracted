@@ -156,6 +156,16 @@ sub _route_call {
                     # Push path on top of the argument array
                     unshift @args, \@suffix;
                     return $conn->$call( @args );
+                } elsif ( $schema eq 'env' ) {
+
+                    $self->log()->debug("Fetch from ENV with key $target");
+                    # warn if the path is not empty
+                    $self->log()->warn(sprintf("Call redirected to ENV but path is not final (%s)!", join(".",@suffix))) if (@suffix > 0);
+                    if (!exists $ENV{$target}) {
+                        return $self->_node_not_exists();
+                    }
+                    return $ENV{$target};
+
                 } else {
                     $self->_log_and_die("Connector::Multi: unsupported schema for symlink: $schema");
                 }
@@ -171,12 +181,23 @@ sub _route_call {
                         shift @target;
                     }
                 } else {
+                    $self->log()->debug(sprintf("Plain redirect at prefix %s to %s", join(".", @prefix), $meta->{VALUE}));
                     @prefix = ();
-                    $self->log()->debug("Plain redirect to " . join ".", @suffix);
                 }
                 unshift @suffix, @target;
-
+                $self->log()->debug("Final redirect target " . join ".", @suffix);
+                unshift @args, [ @prefix, @suffix ];
+                return $self->$call( @args );
             }
+        } elsif ( $meta && $meta->{TYPE} eq 'connector' ) {
+
+            my $conn = $meta->{VALUE};
+            $self->log()->debug("Got conncetor reference of type ". ref $conn);
+            $self->log()->debug("Dispatch to connector at " . join(".", @prefix));
+            # Push path on top of the argument array
+            unshift @args, \@suffix;
+            return $conn->$call( @args );
+
         } else {
             $ptr_cache->{$path} = 1;
         }
@@ -204,18 +225,26 @@ sub get_connector {
     my $self = shift;
     my $target = shift;
 
-    my $conn = $self->_config()->{$target};
+    # the cache needs to store the absolute path including the prefix
+    my @path = $self->_build_path( $target );
+    my $cache_id = join($self->DELIMITER(), $self->_build_path_with_prefix( \@path ));
+    my $conn = $self->_config()->{$cache_id};
     if ( ! $conn ) {
-        # use the 'root' connector instance
-        my @path = $self->_build_path_with_prefix( $target );
+        # Note - we will use ourselves to read the connectors instance information
+        # this allows to put other connectors inside a connector definition but
+        # also lets connector definition paths depend on PREFIX!
         my $class = $self->get( [ @path, 'class' ] );
         if (!$class) {
-            $self->_log_and_die("Nested connector without class ($target)");
+            my $prefix = $self->_get_prefix() || '-';
+            $self->_log_and_die("Nested connector without class ($target/$prefix)");
         }
-        eval "use $class;1" or $self->_log_and_die("Error use'ing $class: $@");
         $self->log()->debug("Initialize connector $class at $target");
+        eval "use $class;1" or $self->_log_and_die("Error use'ing $class: $@");
         $conn = $class->new( { CONNECTOR => $self, TARGET => $target } );
-        $self->_config()->{$target} = $conn;
+        $self->_config()->{$cache_id} = $conn;
+        $self->log()->trace("Add connector to cache: $cache_id") if ($self->log()->is_trace());
+    } elsif ($self->log()->is_trace()) {
+        $self->log()->trace("Got connector for $target from cache $cache_id");
     }
     return $conn;
 }
@@ -240,7 +269,9 @@ source that Multi accesses for get() requests. If the request returns a referenc
 to a SCALAR, Multi interprets this as a symbolic link. The content of the
 link contains an alias and a target key.
 
-=head1 Example
+=head1 Examples
+
+=head2 Connector References
 
 In this example, we will be using a YAML configuration file that is accessed
 via the connector Connector::Proxy::YAML.
@@ -292,7 +323,23 @@ connector configuration is in the 'connectors' namespace of our primary data sou
       bind_dn: uid=user,ou=Directory Users,dc=example,dc=org
       password: secret
 
-*Inline Redirects*
+
+=head2 Builtin Environment Connector
+
+Similar to connector you can define a redirect to read a value from the
+environment.
+
+    node1:
+        key@: env:OPENPKI_KEY_FROM_ENV
+
+calling get('node1.key') will return the value of the environment variable
+`OPENPKI_KEY_FROM_ENV`.
+
+If the environment variable is not set, undef is returned. Walking over such a
+node raises a warning but will silently swallow the remaining path components
+and return the value of the node.
+
+=head2 Inline Redirects
 
 It is also possible to reference other parts of the configuration using a
 kind of redirect/symlink.
@@ -353,6 +400,18 @@ You can also pass the path as an arrayref, where each element can be a path itse
 
   my $tok = $multi->get( [ 'smartcard.owners', 'bob.tokenid' ]);
 
+*Preset Connector References*
+
+If you create your config inside your code you and have a baseconnector that
+can handle object references (e.g. Connector::Builtin::Memory), you can
+directly set the value of a node to a blessed reference of a Connector class.
+
+    my $sub = Connector::Proxy::Net::LDAP->new( {
+        basedn => "ou=smartcards,dc=example,dc=org"
+    });
+
+    $base->set('smartcard.tokens',  $sub )
+
 =head1 OPTIONS
 
 When creating a new instance, the C<new()> constructor accepts the
@@ -364,6 +423,38 @@ following options:
 
 This is a reference to the Connector instance that Connector::Multi
 uses at the base of all get() requests.
+
+=item PREFIX
+
+You can set a PREFIX that is prepended to all path. There is one important
+caveat to mention: Any redirects made are relative to the prefix set so you can
+use PREFIX only if the configuration was prepared to work with it (e.g. to split
+differnet domains and switch between them using a PREFIX).
+
+    Example:
+
+      branch:
+        foo@: connector:foobar
+
+        foobar:
+          class: ....
+
+Without a PREFIX set, this will return "undef" as the connector is not defined
+at "foobar".
+
+    my $bar = $multi->get( [ 'branch', 'foo', 'bar' ]);
+
+This will work and return the result from the connector call using "bar" as key:
+
+    my $multi = Connector::Multi->new( {
+      BASECONNECTOR => $base,
+      PREFIX => "branch",
+    });
+    my $bar = $multi->get( [ 'branch', 'foo', 'bar' ]);
+
+Note: It is B<DANGEROUS> to use a dynamic PREFIX in the BASECONNECTOR as
+Connector::Multi stores created sub-connectors in a cache using the path as key.
+It is possible to change the prefix of the class itself during runtime.
 
 =back
 

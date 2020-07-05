@@ -7,7 +7,7 @@ use constant {CURRENT_INTERFACE => 'pid.current', MAX_INTERFACE => 'pid.max',};
 has cgroup => sub { Mojo::IOLoop::ReadWriteProcess::CGroup::v2->new };
 
 sub current { shift->cgroup->_list(CURRENT_INTERFACE) }
-sub max { shift->cgroup->_setget(MAX_INTERFACE, @_) }
+sub max     { shift->cgroup->_setget(MAX_INTERFACE, @_) }
 
 1;
 

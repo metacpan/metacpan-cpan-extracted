@@ -9,7 +9,7 @@ sub dateline {
     my ($self) = @_;
     my $text = $self->content_text;
     my ($yyyy, $mm, $dd) = $text =~ m{([0-9]{4})/([0-9]{1,2})/([0-9]{1,2})$};
-    return u(sprintf('%04d/%02d/%02d', $yyyy, $mm, $dd));
+    return defined($yyyy) ? u(sprintf('%04d/%02d/%02d', $yyyy, $mm, $dd)) : undef;
 }
 
 1;

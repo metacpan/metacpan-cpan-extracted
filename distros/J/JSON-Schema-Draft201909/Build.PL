@@ -89,7 +89,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Draft201909",
-      "dist_version" => "0.005",
+      "dist_version" => "0.008",
       "license" => "perl",
       "module_name" => "JSON::Schema::Draft201909",
       "recursive_test_files" => 1,
@@ -101,6 +101,7 @@ EOW
         "List::Util" => "1.50",
         "Mojo::JSON::Pointer" => 0,
         "Mojo::URL" => 0,
+        "Mojolicious" => "7.23",
         "Moo" => 0,
         "MooX::HandlesVia" => 0,
         "MooX::TypeTiny" => "0.002002",

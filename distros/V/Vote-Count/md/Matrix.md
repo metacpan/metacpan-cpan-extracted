@@ -1,6 +1,6 @@
 # Win-Loss Matrix
 
-Condorcet Pairwise Methods require a Win-Loss Matrix. This object takes an RCV BallotSet with an optional Active list and returns the Matrix as an Object. The Ojbect is capable of Scoring itself, Calculating a Smith Set, and identifying Condorcet Winners and Losers.
+Condorcet Pairwise Methods require a Win-Loss Matrix. This object takes an RCV BallotSet with an optional Active list and returns the Matrix as an object. The object is capable of Scoring itself, Calculating a Smith Set, and identifying Condorcet Winners and Losers.
 
 # SYNOPSIS
 

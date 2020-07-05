@@ -1,6 +1,27 @@
 CHANGE LOG
 ==========
 
+2020-06-23 - v0.82.0
+--------------------
+
+### Removed
+    - no longer use `default_span_context_args`, implementation take care of it
+
+
+2020-06-18 - v0.81.3
+--------------------
+
+### Fixed
+    - when calling `build_context` outside `start_span`, defaults will be passed
+
+
+2020-06-16 - v0.81.2
+--------------------
+
+### Fixed
+    - Getters, the APIO definition changed, but these roles were not affected
+
+
 2020-06-16 - v0.81.1
 --------------------
 

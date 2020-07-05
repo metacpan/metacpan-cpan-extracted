@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use English;
 
-use Test::More tests => 21;
+use Test::More tests => 24;
 
 # diag "LOAD MODULE\n";
 
@@ -68,3 +68,25 @@ ok ($conn->exists(''), 'Connector exists');
 ok ($conn->exists('test'), 'Node Exists');
 ok ($conn->exists( [ 'test' ] ), 'Leaf Exists Array');
 ok (!$conn->exists('test2'), 'Not exists');
+
+$conn->mode("8999");
+$conn->ifexists('replace');
+eval { $conn->set('testumask', 'wont see'); };
+like( $EVAL_ERROR, "/Given umask '8999' is not valid/", 'wrong umask');
+
+$conn->mode("0640");
+$conn->set('testumask', 'wont see');
+
+SKIP: {
+    skip  "skipping chown test - set CONN_PATH_USER in ENV", 1 unless ( $ENV{CONN_PATH_USER} );
+    $conn->user($ENV{CONN_PATH_USER} );
+    $conn->set('testuser', 'wont see');
+    is ($ENV{CONN_PATH_USER}, getpwuid(( stat "t/config/testuser.txt")[4]));
+}
+
+SKIP: {
+    skip  "skipping chown test - set CONN_PATH_GROUP in ENV", 1 unless ( $ENV{CONN_PATH_GROUP} );
+    $conn->group($ENV{CONN_PATH_GROUP} );
+    $conn->set('testuser', 'wont see');
+    is ($ENV{CONN_PATH_GROUP}, getgrgid(( stat "t/config/testuser.txt")[5]));
+}

@@ -1,6 +1,6 @@
 package OpenTracing::Role::Tracer;
 
-our $VERSION = 'v0.81.1';
+our $VERSION = 'v0.82.0';
 
 use Moo::Role;
 use syntax qw/maybe/;
@@ -21,12 +21,6 @@ has scope_manager => (
         require 'OpenTracing::Implementation::NoOp::ScopeManager';
         return OpenTracing::Implementation::NoOp::ScopeManager->new
     },
-);
-
-has default_span_context_args => (
-    is              => 'ro',
-    isa             => HashRef[Str],
-    default         => sub{ {} },
 );
 
 sub get_active_span {
@@ -79,7 +73,7 @@ sub start_span {
         unless $ignore_active_span;
     
     my $context;
-
+    
     $context = $child_of
         if is_SpanContext($child_of);
     
@@ -89,19 +83,19 @@ sub start_span {
     $context = $context->new_clone->with_trace_id( $context->trace_id )
         if is_SpanContext($context);
     
-    $context = $self->build_context( %{$self->default_span_context_args} )
+    $context = $self->build_context( )
         unless defined $context;
     
     my $span = $self->build_span(
         operation_name => $operation_name,
         context        => $context,
-
+        
         maybe
         child_of       => $child_of,
-
+        
         maybe
         start_time     => $start_time,
-
+        
         maybe
         tags           => $tags,
     );
@@ -133,12 +127,12 @@ instance_method build_span (
     Maybe[ HashRef[Str] ]       :$tags,
 ) :Return (Span) { };
 
-instance_method build_context (
-    %default_span_context_args,
-) :Return (SpanContext) {
-    ( HashRef[Str] )->assert_valid( { %default_span_context_args } );
-};
 
+instance_method build_context (
+    %span_context_args,
+) :Return (SpanContext) {
+    ( HashRef[Str] )->assert_valid( { %span_context_args } );
+};
 
 
 BEGIN {

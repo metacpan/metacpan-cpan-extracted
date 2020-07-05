@@ -12,7 +12,9 @@ sub headline {
 sub dateline {
     my ($self) = @_;
     my $el = $self->dom->at("div.submitted > span");
-    return $el->text;
+    my $dateline = $el->text;
+    $dateline =~ s{\A ([0-9]{4})\.([0-9]{2})\.([0-9]{2}) \s+ ([0-9]{2}):([0-9]{2}) \z}{$1-$2-$3T$4:$5:00+08:00}x;
+    return $dateline;
 }
 
 sub journalist {

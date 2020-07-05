@@ -1,5 +1,47 @@
 Revision history for TAP-DOM
 
+0.91      2020-06-30
+        - INCOMPATIBILITY WARNING ===
+
+          This release contains several changes towards a more
+          consistent data handling. For casual users nothing
+          substantially should change. But if you are one of the
+          power users out there (I'm looking at you, Amzn), then
+          read this changelog carefully.
+
+        - fix argument handling: pass-through to TAP::DOM, delete
+          newly introduced 'disable_global_kv_data'
+
+        - TAP::Archive reading skips nonexistent files from meta.yml
+
+        - to_tap() works with unblessed inner elements (though the
+          TAP::DOM itself needs bless to call ->to_tap method)
+
+        - new option 'document_data_prefix' to specify the prefix in
+          '# Test-key: value' lines
+
+        - Experimental: Allow TAP preprocessing
+          This can help to reduce the tap line count before it hits
+          the TAP parser, assuming regex processing is faster.
+
+        - Incompatible change: de-confuse 'parse_errors'
+          * it now also contains the count of parse errors not the
+            actual messages anymore - those are now in
+            'parse_errors_msgs'
+
+        - new option 'document_data_ignore' to not cover certain fields
+
+        - new option 'put_dangling_kv_data_under_lazy_plan' to
+          fix a gap when 'disable_global_kv_data' is set.
+
+        - new option 'trim_fieldvalues' to tirm trailing whitespace
+          from document_data/kv_data fields
+
+        - new option 'dontignorelines' (HIGHLY EXPERIMENTAL!) to
+          define exceptions from the 'ignorelines' regex.
+
+        - tapdom_config covers all options now
+
 0.14      2017-02-17
         - new module TAP::DOM::Archive to extract TAP::Archive files
           into a multi-document super DOM

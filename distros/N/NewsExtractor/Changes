@@ -1,3 +1,15 @@
+v0.26.0 2020-07-03T18:13:05+0800
+  - Adjust the dateline output
+
+v0.25.0 2020-07-02T21:40:30+0800
+  - Add a site-specific extractor for www.twreporter.org
+  - Convert extracted dateline to iso8601 format (pts)
+
+v0.24.0 2020-06-29T08:46:10+0800
+  - Convert extracted dateline to iso8601 format (peopo, fountmedia)
+  - Improve the extraction of journalist names on SETN
+  - Handle an error when parsing dateline on www.idn.com.tw
+
 v0.23.0 2020-05-15T23:10:02+0800
   - Improve the extraction of journalist names on CNA, ETToday, turnnewsapp.com
 

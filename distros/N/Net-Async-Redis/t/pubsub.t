@@ -44,6 +44,13 @@ like(exception {
         note 'end';
 }, qr/pubsub/, 'but cannot GET while subscribed');
 
+$sub->events->each(sub {
+    note "Event - " . $_->payload;
+});
+is(exception {
+    $publisher->publish('test::somewhere' => 'example data')->get;
+}, undef, 'can publish without problems');
+
 done_testing;
 
 

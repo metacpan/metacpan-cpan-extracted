@@ -1,6 +1,8 @@
 package MyApp;
 use Mojo::Base 'Mojolicious';
 
+our $VERSION = 0.04;
+
 sub startup {
     my $self = shift;
     

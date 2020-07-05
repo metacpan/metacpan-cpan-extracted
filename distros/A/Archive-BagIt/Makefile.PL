@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,12 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Archive-BagIt",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Archive::BagIt",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Class::Load" => 0,
     "Data::Dumper" => 0,
-    "Data::Printer" => 0,
     "Digest::MD5" => 0,
     "Digest::SHA" => 0,
     "Encode" => 0,
@@ -28,13 +27,14 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "File::stat" => 0,
     "IO::AIO" => 0,
-    "List::Util" => 0,
-    "Moose" => 0,
-    "Moose::Role" => 0,
+    "List::Util" => "1.450",
+    "Moo" => 0,
+    "Moo::Role" => 0,
     "POSIX" => 0,
     "String::CRC32" => 0,
     "Sub::Quote" => 0,
     "Time::HiRes" => 0,
+    "diagnostics" => 0,
     "namespace::autoclean" => 0,
     "open" => 0,
     "parent" => 0,
@@ -43,6 +43,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Printer" => 0,
     "File::Copy" => 0,
     "File::Path" => 0,
     "File::Slurp" => 0,
@@ -52,9 +53,10 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
+    "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.055",
+  "VERSION" => "0.058",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -79,15 +81,17 @@ my %FallbackPrereqs = (
   "IO::AIO" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::Util" => 0,
-  "Moose" => 0,
-  "Moose::Role" => 0,
+  "List::Util" => "1.450",
+  "Moo" => 0,
+  "Moo::Role" => 0,
   "POSIX" => 0,
   "String::CRC32" => 0,
   "Sub::Quote" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Test::Warnings" => 0,
   "Time::HiRes" => 0,
+  "diagnostics" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,
   "open" => 0,

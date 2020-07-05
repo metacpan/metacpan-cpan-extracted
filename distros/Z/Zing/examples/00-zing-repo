@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::Repo;
+
+=pod explain
+
+- zing-repo is the key/val and pub/sub data store superclass
+- it uses Zing/Store operations to perform its operations
+- you shouldn't use it directly, but instead, use it to build other abstractions
+- you may notice in the output that "repo keys present" doesn't include a key ...
+- for "actions", because the actions data-structure is a list which gets deleted ...
+- once all the elements have been removed (pop'd)
+
+=cut
+
+my $r = Zing::Repo->new(name => 'system');
+
+my $state = $r->term('state');
+my $actions = $r->term('actions');
+
+warn 'repo send to state', ' ', $r->store->send($state, {created => time});
+warn 'repo recv from state', ' ', $r->store->recv($state)->{created};
+warn 'repo state term', ' ', $state;
+warn 'repo actions push', ' ', $r->store->push($actions, {created => time});
+warn 'repo actions pull', ' ', $r->store->pull($actions)->{created};
+warn 'repo actions size', ' ', $r->store->size($actions);
+warn 'repo actions term', ' ', $actions;
+
+my $i = join ", ", @{$r->ids};
+
+warn 'repo keys present', ' ', $i;
+warn 'repo data saved under', ' ', $r->term;
+
+$r->drop('state');
+$r->drop('actions');
+$r->drop;

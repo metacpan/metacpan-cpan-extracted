@@ -1,5 +1,14 @@
 Revision history for CtrlO::PDF
 
+0.05 Thu Jul 2 2020
+
+    * Automatically add space for logo whenever starting new page
+    * Make sure space for table if at end of page
+    * Add size option to text
+    * Add move_y_position and change name of current_y
+    * Add options to get and set y position
+    * Add indent option
+
 0.04 Tue Oct 1 2019
 
     * Fix uninitialized value warning when no logo specified (thanks Mike West)

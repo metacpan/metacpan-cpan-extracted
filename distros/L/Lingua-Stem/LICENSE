@@ -1,10 +1,7 @@
+http://dev.perl.org/licenses/
 
-This module is licensed under the same terms and conditions as Perl itself.
+Lingua::Stem is licensed under the same terms as Perl itself
 
-This means that you can, at your option, redistribute is and/or modify it under
-either the terms the GNU Public License (GPL) version 1 or later, or under the
-Perl Artistic License.
+In practice this means it is dual licensed under the GPL1, version 1 or later and the Perl Artistic License as you prefer.
 
-See http://dev.perl.org/licenses/
-
-or the Artistic_License.txt and GPL_License.txt files included with the distribution.
+See the GPL_License.txt and Artistic_License.txt files for the terms of each license

@@ -5,6 +5,7 @@ Makefile.PL
 MANIFEST			This list of files
 src/catch.hpp
 src/catch_reporter_automake.hpp
+src/catch_reporter_sonarqube.hpp
 src/catch_reporter_tap.hpp
 src/catch_reporter_teamcity.hpp
 t/stub.t

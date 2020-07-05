@@ -64,6 +64,11 @@ sub get {
             my @t = split(/:/, $_, 3);
             $self->log()->trace('found line ' . Dumper @t);
             #if ($password eq $t[1]) {
+            if (not defined $t[1]) {
+                $self->log()->info('Password value not defined for ' . $user);
+                return 0;
+            }
+
             if (crypt($password, $t[1]) eq $t[1]) {
                 $self->log()->info('Password accepted for ' . $user);
                 return 1;

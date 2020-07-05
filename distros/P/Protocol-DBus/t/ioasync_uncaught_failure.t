@@ -18,8 +18,6 @@ SKIP: {
         Protocol::DBus::Client::IOAsync::login_session($loop);
     } or skip "Can’t open login session: $@";
 
-    $loop->watch_time( after => 0.1, code => sub { $loop->stop } );
-
     $dbus->initialize()->then(
         sub {
             my $msgr = shift;
@@ -39,7 +37,9 @@ SKIP: {
             )->then(
                 sub { diag "signal sent\n" },
                 sub { diag "signal NOT sent\n" },
-            );
+            )->finally( sub {
+                $loop->watch_time( after => 0.1, code => sub { $loop->stop } );
+            } );
         },
         sub {
             $loop->stop;

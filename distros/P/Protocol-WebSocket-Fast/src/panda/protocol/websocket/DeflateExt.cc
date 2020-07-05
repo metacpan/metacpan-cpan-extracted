@@ -1,7 +1,6 @@
 #include "DeflateExt.h"
 #include <panda/from_chars.h>
 #include <panda/encode/base64.h>
-#include <panda/log.h>
 
 namespace panda { namespace protocol { namespace websocket {
 
@@ -326,7 +325,7 @@ bool DeflateExt::uncompress_impl(Frame& frame) {
                 string err = "zlib::inflate error ";
                 if (rx_stream.msg) err += rx_stream.msg;
                 else err += to_string(r);
-                panda_mlog_info(pwslog, err);
+                panda_log_info(err);
                 frame.error = errc::inflate_error;
                 return false;
             }

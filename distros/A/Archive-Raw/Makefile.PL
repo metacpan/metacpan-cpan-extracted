@@ -24,7 +24,7 @@ our $opt = {};
 
 Getopt::Long::GetOptions(
 	"help" => \&usage,
-	'with-libarchive2-include=s' => \$opt->{'archive'}->{'incdir'},
+	'with-libarchive-include=s' => \$opt->{'archive'}->{'incdir'},
 	'with-libarchive-lib=s@'    => \$opt->{'archive'}->{'libs'},
 ) || die &usage();
 
@@ -141,6 +141,11 @@ foreach my $test (@library_tests) {
 	}
 }
 
+if ($is_windows)
+{
+	$lib .= ' -lbcrypt';
+}
+
 my @deps;
 my @srcs;
 
@@ -209,7 +214,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "0.0",
     "Test::Pod::Coverage" => "0.0"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }

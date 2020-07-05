@@ -1,4 +1,4 @@
-DBIx::Class is Copyright (c) 2005-2018 by mst, castaway, ribasushi, and others.
+DBIx::Class is Copyright (c) 2005-2020 by mst, castaway, ribasushi, and others.
 See AUTHORS and LICENSE included with this distribution. All rights reserved.
 
 NAME
@@ -17,16 +17,13 @@ GETTING HELP/SUPPORT
     particular approach do not hesitate to contact us via any of the
     following options (the list is sorted by "fastest response time"):
 
-    *   IRC: irc.perl.org#dbix-class
-
-    *   Mailing list: <http://lists.scsys.co.uk/mailman/listinfo/dbix-class>
-
     *   RT Bug Tracker:
-        <https://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class>
+        <https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Class>
 
-    *   Twitter: <https://www.twitter.com/dbix_class>
+    *   Email: <mailto:bug-DBIx-Class@rt.cpan.org>
 
-    *   Web Site: <http://www.dbix-class.org/>
+    *   Twitter:
+        <https://twitter.com/intent/tweet?text=%40ribasushi%20%23DBIC>
 
 SYNOPSIS
     For the very impatient: DBIx::Class::Manual::QuickStart
@@ -97,7 +94,7 @@ SYNOPSIS
       # Create a result set to search for artists.
       # This does not query the DB.
       my $johns_rs = $schema->resultset('Artist')->search(
-        # Build your WHERE using an SQL::Abstract structure:
+        # Build your WHERE using an SQL::Abstract::Classic-compatible structure:
         { name => { like => 'John%' } }
       );
 
@@ -181,7 +178,8 @@ HOW TO CONTRIBUTE
 
     *   Current git repository: <https://github.com/Perl5/DBIx-Class>
 
-    *   Travis-CI log: <https://travis-ci.org/Perl5/DBIx-Class/branches>
+    *   Travis-CI log:
+        <https://travis-ci.com/github/Perl5/DBIx-Class/branches>
 
 AUTHORS
     Even though a large portion of the source *appears* to be written by
@@ -193,11 +191,13 @@ AUTHORS
     questions and suggestions have been shown to catalyze monumental
     improvements in consistency, accuracy and performance.
 
-    List of the awesome contributors who made DBIC v0.082841 possible
+    List of the awesome contributors who made DBIC v0.082842 possible
 
         abraxxa: Alexander Hartmaier <abraxxa@cpan.org>
 
         acca: Alexander Kuznetsov <acca@cpan.org>
+
+        acme: Leon Brocard <acme@astray.com>
 
         aherzog: Adam Herzog <adam@herzogdesigns.com>
 
@@ -600,6 +600,8 @@ AUTHORS
         wintermute: Toby Corkindale <tjc@cpan.org>
 
         wreis: Wallace Reis <wreis@cpan.org>
+
+        x86-64 <x86mail@gmail.com>
 
         xenoterracide: Caleb Cushing <xenoterracide@gmail.com>
 

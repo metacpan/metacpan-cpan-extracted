@@ -1,19 +1,24 @@
-machine:
-  environment:
-    PATH: ~/perl5/bin:$PATH
-
-dependencies:
-  pre:
-    - curl -L https://cpanmin.us | perl - App::cpanminus
-    - cpanm --local-lib=~/perl5 local::lib && echo "eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)" >> ~/.bashrc
-    - cpanm --quiet --notest --skip-satisfied Devel::Cover Devel::Cover::Report::Codecov
-    - cpanm --installdeps .
-
-test:
-  override:
-    - perl Build.PL
-    - ./Build build
-    - cover -test
-
-  post:
-    - cover -report codecov
+version: 2.1
+orbs:
+  perl: circleci/perl@1.0.0
+workflows:
+  main:
+    jobs:
+      - perl/build:
+          codecov: true
+          save-to-artifacts: true
+          save-to-workspace: true
+      - perl/test-linux:
+          matrix:
+            parameters:
+              perl-version:
+                - '5.16'
+                - '5.18'
+                - '5.20'
+                - '5.22'
+                - '5.24'
+                - '5.26'
+                - '5.28'
+                - '5.30'
+          requires:
+            - perl/build

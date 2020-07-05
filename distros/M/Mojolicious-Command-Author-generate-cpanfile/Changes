@@ -1,5 +1,13 @@
 Revision history for Perl extension Mojolicious-Command-Author-generate-cpanfile
 
+0.20 2020-06-29T21:03:37Z
+
+0.20 2020-06-29T21:03:18Z
+    - Dump poor custom Perl code parser in favor of Perl::Tokenizer.
+    - Perl 5.18.0 is minimum requirement now (from Perl::Tokenizer).
+    - Consider and select most recent Perl version requirement.
+    - Consider module versions in use statements and select highest.
+
 0.10 2020-06-13T19:42:34Z
     - Parse perl modules and test files for module dependencies.
     - Add command options "-l" for lib and "-t" for t dirs.

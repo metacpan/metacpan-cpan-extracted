@@ -1,6 +1,15 @@
 Revision history File::Slurp
 
-9999.30
+9999.32     2020-06-30
+    - Re-release after fixing MANIFEST
+
+9999.31     2020-06-28
+    - Remove TravisCI and AppVeyor
+    - Test using GitHub Actions/workflows on Windows, Mac, and Linux
+    - Add See Also section to the docs. (PR#24 Thanks, Dan Book)
+    - Add file existence and size checks (RT 132900 - Thanks, Bao Haojun)
+
+9999.30     2020-03-09
     - Altered the atomic version of write_file to use temporary files that
       are also hidden files. (RT #132064)
 

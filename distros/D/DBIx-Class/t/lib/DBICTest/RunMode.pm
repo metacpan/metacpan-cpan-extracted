@@ -25,6 +25,9 @@ BEGIN {
       &$ov;
     };
   }
+
+  # our own test suite doesn't need to see this
+  delete $ENV{DBICDEVREL_SWAPOUT_SQLAC_WITH};
 }
 
 use Path::Class qw/file dir/;
@@ -220,7 +223,7 @@ sub is_ci {
   return (
     ($ENV{TRAVIS}||'') eq 'true'
       and
-    ($ENV{TRAVIS_REPO_SLUG}||'') =~ m|\w+/dbix-class$|
+    ($ENV{TRAVIS_REPO_SLUG}||'') =~ m|\w+/DBIx-Class$|
   )
 }
 

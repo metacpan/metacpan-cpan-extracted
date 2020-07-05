@@ -14,14 +14,6 @@ use IO::Socket;
 
 Device::Yeelight::Light - WiFi Smart LED Light
 
-=head1 VERSION
-
-Version 0.10
-
-=cut
-
-our $VERSION = '0.10';
-
 =head1 SYNOPSIS
 
 This module provides base class for Yeelight smart device
@@ -64,7 +56,6 @@ sub is_supported {
 
     unless ( grep { $method =~ m/::$_$/ } @{ $self->{support} } ) {
         carp "$method is not supported by this device";
-        return;
     }
 
     return 1;

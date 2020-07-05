@@ -10,6 +10,7 @@ Sv new(SV*, SV* arg) {
 }
 
 Sv SimpleGeometryPrecisionReducer::getPrecisionModel() {
+    (void)THIS;
     Object me{ST(0)};
     auto payload = me.payload(&payload_marker);
     Object obj { payload.obj };

@@ -1,0 +1,41 @@
+---
+abstract: 'Add ASCII Art into HTTP Header'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::Arrow: '0'
+configure_requires:
+  Module::Build: '0.40'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Acme-AAHTTPHeader
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+requires:
+  Plack: '0'
+  Plack::Middleware: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  parent: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/bayashi/Plack-Middleware-Acme-AAHTTPHeader/issues
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: http://github.com/bayashi/Plack-Middleware-Acme-AAHTTPHeader
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

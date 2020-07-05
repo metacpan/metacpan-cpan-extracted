@@ -10,6 +10,7 @@ skip_all "No ArangoDB environment variables for testing. See README" unless vali
 skip_all "Can't reach ArangoDB Server" unless server_alive();
 
 my $arango = Arango::Tango->new( );
+skip_all "Credentials problems" unless auth_ok($arango);
 clean_test_environment($arango);
 
 ## 1. Create User

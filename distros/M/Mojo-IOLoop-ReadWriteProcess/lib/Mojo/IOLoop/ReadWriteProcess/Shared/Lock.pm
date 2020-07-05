@@ -19,7 +19,7 @@ sub lock {
   warn "[debug:$$] Attempt to acquire lock " . $self->key if DEBUG;
   my $r = @_ > 0 ? $self->acquire(@_) : $self->acquire(wait => 1, undo => 0);
   warn "[debug:$$] lock Returned : $r" if DEBUG;
-  $self->locked(1) if defined $r && $r == 1;
+  $self->locked(1)                     if defined $r && $r == 1;
   return $r;
 }
 

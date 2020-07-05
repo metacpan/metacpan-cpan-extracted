@@ -12,7 +12,7 @@ package MyLink;
 sub new
 {
     my $class = shift;
-    my $self = shift;
+    my $self  = shift;
     bless $self, $class;
     return $self;
 }
@@ -29,17 +29,18 @@ package main;
 use HTML::Latemp::NavLinks::GenHtml::ArrowImages;
 
 {
-    my $obj =  HTML::Latemp::NavLinks::GenHtml::ArrowImages->new(
-        root => "../../",
+    my $obj = HTML::Latemp::NavLinks::GenHtml::ArrowImages->new(
+        root          => "../../",
         nav_links_obj => {
-            'up' => MyLink->new({direct_url => "my-up-url.html" }),
-            'next' => MyLink->new({direct_url => "the-NExT-URL.xhtml" }),
-            'prev' => MyLink->new({direct_url => "../A-Better-pREVIOUS-URL/" }),
+            'up'   => MyLink->new( { direct_url => "my-up-url.html" } ),
+            'next' => MyLink->new( { direct_url => "the-NExT-URL.xhtml" } ),
+            'prev' =>
+                MyLink->new( { direct_url => "../A-Better-pREVIOUS-URL/" } ),
         }
     );
 
     # TEST
-    ok ($obj, "Testing that \$obj is ok.");
+    ok( $obj, "Testing that \$obj is ok." );
 
     my $expected = <<'EOF';
 <ul class="nav_links">
@@ -62,25 +63,26 @@ alt="Next Page" class="bless" /></a>
 </ul>
 EOF
     chomp($expected);
+
     # TEST
-    eq_or_diff ($obj->get_total_html(), $expected,
-        "Testing that the output is OK."
-    );
+    eq_or_diff( $obj->get_total_html(),
+        $expected, "Testing that the output is OK." );
 }
 
 {
-    my $obj =  HTML::Latemp::NavLinks::GenHtml::ArrowImages->new(
-        root => "../../",
-        ext => '.svg',
+    my $obj = HTML::Latemp::NavLinks::GenHtml::ArrowImages->new(
+        root          => "../../",
+        ext           => '.svg',
         nav_links_obj => {
-            'up' => MyLink->new({direct_url => "my-up-url.html" }),
-            'next' => MyLink->new({direct_url => "the-NExT-URL.xhtml" }),
-            'prev' => MyLink->new({direct_url => "../A-Better-pREVIOUS-URL/" }),
+            'up'   => MyLink->new( { direct_url => "my-up-url.html" } ),
+            'next' => MyLink->new( { direct_url => "the-NExT-URL.xhtml" } ),
+            'prev' =>
+                MyLink->new( { direct_url => "../A-Better-pREVIOUS-URL/" } ),
         }
     );
 
     # TEST
-    ok ($obj, "Testing that \$obj is ok.");
+    ok( $obj, "Testing that \$obj is ok." );
 
     my $expected = <<'EOF';
 <ul class="nav_links">
@@ -105,7 +107,6 @@ EOF
     chomp($expected);
 
     # TEST
-    eq_or_diff ($obj->get_total_html(), $expected,
-        "Testing that the output is OK."
-    );
+    eq_or_diff( $obj->get_total_html(),
+        $expected, "Testing that the output is OK." );
 }

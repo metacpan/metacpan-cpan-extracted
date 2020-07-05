@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.183';
+our $VERSION = '1.184';
 
 =encoding utf8
 
@@ -592,6 +592,10 @@ L<Quiq::Mojolicious::Plugin::Log::Parameters> - Logge Request-Parameter
 
 =item *
 
+L<Quiq::Net> - Allgemeine Netzwerkfunktionalität
+
+=item *
+
 L<Quiq::Object> - Basisklasse für alle Klassen der Klassenbibliothek
 
 =item *
@@ -644,7 +648,7 @@ L<Quiq::PostgreSql::Psql> - Wrapper für psql
 
 =item *
 
-L<Quiq::Process> - Information über den laufenden Prozess
+L<Quiq::Process> - Informationen über den laufenden Prozess
 
 =item *
 
@@ -854,7 +858,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.183
+1.184
 
 =head1 AUTHOR
 

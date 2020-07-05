@@ -57,4 +57,21 @@ is ($x->[7], 0x417A);
 
 # Test to_string_base85.
 is ($x->to_string_base85(), "4)+k&C#VzJ4br>0wv%Yp");
+
+# https://rt.cpan.org/Ticket/Display.html?id=132826
+my $rt132826 = 'FortyGigabitEthernet1/0/100';
+my $rt132826_ok = Net::IPv6Addr::is_ipv6 ($rt132826);
+ok (! $rt132826_ok, "$rt132826 is disallowed");
+# Exactly twenty characters in the first part.
+#                 01234567890123456789
+my $rt132826_1 = 'FortyGigabitEthernet/0/100';
+my ($rt132826_first) = split qr!/!, $rt132826_1;
+ok (length ($rt132826_first) == 20, "Twenty characters in first part");
+my $rt132826_1_ok = Net::IPv6Addr::is_ipv6 ($rt132826_1);
+ok (! $rt132826_1_ok, "$rt132826_1 is disallowed");
+# The following nonsense is still allowed, though.
+my $rt132826_2 = 'FortyGigabitEthernet/0';
+my $rt132826_2_ok = Net::IPv6Addr::is_ipv6 ($rt132826_2);
+ok ($rt132826_2_ok, "$rt132826_2 is allowed");
+
 done_testing ();

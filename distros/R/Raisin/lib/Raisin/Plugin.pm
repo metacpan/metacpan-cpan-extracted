@@ -1,8 +1,12 @@
-package Raisin::Plugin;
+#!perl
+#PODNAME: Raisin::Plugin
+#ABSTRACT: Base class for Raisin plugins
 
 use strict;
 use warnings;
 
+package Raisin::Plugin;
+$Raisin::Plugin::VERSION = '0.90';
 use Carp;
 
 sub new {
@@ -50,9 +54,17 @@ sub register {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Raisin::Plugin - Base class for Raisin plugins.
+Raisin::Plugin - Base class for Raisin plugins
+
+=head1 VERSION
+
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -82,11 +94,13 @@ Registers one or many methods into the application.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh E<lt>atE<gt> cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

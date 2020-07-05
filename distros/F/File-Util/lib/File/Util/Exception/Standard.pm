@@ -1,10 +1,8 @@
 use strict;
 use warnings;
 
-use lib 'lib';
-
 package File::Util::Exception::Standard;
-$File::Util::Exception::Standard::VERSION = '4.161950';
+$File::Util::Exception::Standard::VERSION = '4.201720';
 # ABSTRACT: Standard (non-verbose) error messages
 
 use File::Util::Definitions qw( :all );
@@ -277,7 +275,7 @@ File::Util::Exception::Standard - Standard (non-verbose) error messages
 
 =head1 VERSION
 
-version 4.161950
+version 4.201720
 
 =head1 DESCRIPTION
 

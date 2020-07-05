@@ -23,6 +23,7 @@ my @files = (
     't/access_bag.t',
     't/base.t',
     't/dotbagit.t',
+    't/fast.t',
     't/manifest.t',
     't/payload_files.t',
     't/pod-coverage.t',

@@ -4,7 +4,7 @@ Lingua::Conjunction - Convert lists into simple linguistic conjunctions
 
 # VERSION
 
-version v2.1.2
+version v2.1.4
 
 # SYNOPSIS
 
@@ -45,9 +45,20 @@ Lingua::Conjunction->lang('en');   # use 'and' (default)
 Lingua::Conjunction->lang('es');   # use 'y'
 ```
 
-Supported languages in this version are English, Spanish, French, Italian,
-German, Portuguese, Norwegian, Danish, Dutch, Afrikaans, Swahili, and Latin.
-(Klingon is intentionally not supported.)
+Supported languages in this version are
+Afrikaans,
+Danish,
+Dutch,
+English,
+French,
+German,
+Indonesian,
+Italian,
+Latin,
+Norwegian,
+Portuguese,
+Spanish,
+and Swahili.
 
 You can also set connectives individually:
 
@@ -109,13 +120,14 @@ feature.
 - Robert Rothenberg <rrwo@cpan.org>
 - Damian Conway <damian@conway.org>
 
-# CONTRIBUTOR
+# CONTRIBUTORS
 
-Mohammad S Anwar <mohammad.anwar@yahoo.com>
+- Ade Ishs <adeishs@cpan.org>
+- Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 1999-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -1,91 +1,20 @@
-// Enable strerror_r, fileno
-#ifndef _XOPEN_SOURCE
-#  define _XOPEN_SOURCE 600
-#endif
-
 #include "spvm_native.h"
 
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <stdio.h>
 #include <errno.h>
 
-// io.h - _setmode
-// fcntl.h - _O_BINARY, _O_TEXT
-#ifdef _WIN32
-#include <io.h>
-#include <fcntl.h>
-#endif
-
 static const char* MFILE = "SPVM/IO/File.c";
-
-int32_t SPNATIVE__SPVM__IO__File__init_package_vars(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-  SPVM_SET_PACKAGE_VAR_INT(env, "SPVM::IO::File", "$SEEK_SET", SEEK_SET, MFILE, __LINE__);
-  SPVM_SET_PACKAGE_VAR_INT(env, "SPVM::IO::File", "$SEEK_CUR", SEEK_CUR, MFILE, __LINE__);
-  SPVM_SET_PACKAGE_VAR_INT(env, "SPVM::IO::File", "$SEEK_END", SEEK_END, MFILE, __LINE__);
-  
-  SPVM_SET_PACKAGE_VAR_INT(env, "SPVM::IO::File", "$STDIN", fileno(stdin), MFILE, __LINE__);
-  SPVM_SET_PACKAGE_VAR_INT(env, "SPVM::IO::File", "$STDOUT", fileno(stdout), MFILE, __LINE__);
-  SPVM_SET_PACKAGE_VAR_INT(env, "SPVM::IO::File", "$STDERR", fileno(stderr), MFILE, __LINE__);
-  
-  return SPVM_SUCCESS;
-}
-
-int32_t SPNATIVE__SPVM__IO__File__set_binmode(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-  void* obj_self = stack[0].oval;
-  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
-
-  // File fh
-  void* obj_fh;
-  SPVM_GET_FIELD_OBJECT(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", MFILE, __LINE__);
-  FILE* fh = (FILE*)env->get_pointer(env, obj_fh);
-
-  int32_t binmode = stack[1].ival;
-  (void)binmode;
-
-#ifdef _WIN32
-  if (binmode) {
-    _setmode(_fileno(fh), _O_BINARY);
-  }
-  else {
-    _setmode(_fileno(fh), _O_TEXT);
-  }
-#endif
-  
-  return SPVM_SUCCESS;
-}
-
-int32_t SPNATIVE__SPVM__IO__File__fileno(SPVM_ENV* env, SPVM_VALUE* stack) {
-  // Self
-  void* obj_self = stack[0].oval;
-  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
-  
-  // File fh
-  void* obj_fh;
-  SPVM_GET_FIELD_OBJECT(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", MFILE, __LINE__);
-  FILE* fh = (FILE*)env->get_pointer(env, obj_fh);
-
-  if (fh == NULL) { SPVM_DIE("File handle must be defined", MFILE, __LINE__); }
-  
-  int32_t fno = fileno(fh);
-  
-  stack[0].ival = fno;
-
-  return SPVM_SUCCESS;
-}
 
 int32_t SPNATIVE__SPVM__IO__File__readline(SPVM_ENV* env, SPVM_VALUE* stack) {
   // Self
   void* obj_self = stack[0].oval;
-  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
   
   // File fh
-  void* obj_fh;
-  SPVM_GET_FIELD_OBJECT(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", MFILE, __LINE__);
-  FILE* fh = (FILE*)env->get_pointer(env, obj_fh);
+  void* obj_io_file;
+  SPVM_GET_FIELD_OBJECT(env, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", &obj_io_file, MFILE, __LINE__);
+  FILE* fh = (FILE*)env->get_pointer(env, obj_io_file);
 
   if (fh == NULL) {
     stack[0].oval = NULL;
@@ -115,7 +44,6 @@ int32_t SPNATIVE__SPVM__IO__File__readline(SPVM_ENV* env, SPVM_VALUE* stack) {
         memcpy(new_buffer, buffer, capacity);
         
         int32_t removed = env->remove_mortal(env, scope_id, obj_buffer);
-        assert(removed);
         
         capacity = new_capacity;
         obj_buffer = new_object_buffer;
@@ -154,65 +82,15 @@ int32_t SPNATIVE__SPVM__IO__File__readline(SPVM_ENV* env, SPVM_VALUE* stack) {
   return SPVM_SUCCESS;
 }
 
-int32_t SPNATIVE__SPVM__IO__File__seek(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-  // Self
-  void* obj_self = stack[0].oval;
-  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
-  
-  // File fh
-  void* obj_fh;
-  SPVM_GET_FIELD_OBJECT(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", MFILE, __LINE__);
-  FILE* fh = (FILE*)env->get_pointer(env, obj_fh);
-  
-  // Offset
-  int64_t offset = stack[1].lval;
-  
-  // origin
-  int32_t origin = stack[2].ival;
-  
-  int32_t ret = fseek(fh, offset, origin);
-  
-  stack[0].ival = ret;
-
-  return SPVM_SUCCESS;
-}
-
-int32_t SPNATIVE__SPVM__IO__File__close(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-  // Self
-  void* obj_self = stack[0].oval;
-  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
-  
-  // File fh
-  void* obj_fh;
-  SPVM_GET_FIELD_OBJECT(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", MFILE, __LINE__);
-  FILE* fh = (FILE*)env->get_pointer(env, obj_fh);
-  
-  if (fh) {
-    int32_t ret = fclose(fh);
-    
-    env->set_pointer(env, obj_fh, NULL);
-    
-    stack[0].ival = ret;
-  }
-  else {
-    stack[0].ival = EOF;
-  }
-
-  return SPVM_SUCCESS;
-}
-
 int32_t SPNATIVE__SPVM__IO__File__read(SPVM_ENV* env, SPVM_VALUE* stack) {
 
   // Self
   void* obj_self = stack[0].oval;
-  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
   
   // File fh
-  void* obj_fh;
-  SPVM_GET_FIELD_OBJECT(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", MFILE, __LINE__);
-  FILE* fh = (FILE*)env->get_pointer(env, obj_fh);
+  void* obj_io_file;
+  SPVM_GET_FIELD_OBJECT(env, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", &obj_io_file, MFILE, __LINE__);
+  FILE* fh = (FILE*)env->get_pointer(env, obj_io_file);
 
   // Buffer
   void* obj_buffer = stack[1].oval;
@@ -234,75 +112,38 @@ int32_t SPNATIVE__SPVM__IO__File__read(SPVM_ENV* env, SPVM_VALUE* stack) {
   return SPVM_SUCCESS;
 }
 
-int32_t SPNATIVE__SPVM__IO__File__write(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-  // Self
-  void* obj_self = stack[0].oval;
-  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
-  
-  // File fh
-  void* obj_fh;
-  SPVM_GET_FIELD_OBJECT(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", MFILE, __LINE__);
-  FILE* fh = (FILE*)env->get_pointer(env, obj_fh);
-
-  int32_t length = stack[2].ival;
-
-  // Buffer
-  void* obj_buffer = stack[1].oval;
-  if (obj_buffer == NULL) {
-    stack[0].oval = NULL;
-    return SPVM_SUCCESS;
-  }
-  char* buffer = (char*)env->get_elems_byte(env, obj_buffer);
-  
-  int32_t write_length = fwrite(buffer, 1, length, fh);
-  
-  stack[0].ival = write_length;
-
-  return SPVM_SUCCESS;
-}
-
-int32_t SPNATIVE__SPVM__IO__File__putc(SPVM_ENV* env, SPVM_VALUE* stack) {
-
-  // Self
-  void* obj_self = stack[0].oval;
-  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
-  
-  // File fh
-  void* obj_fh;
-  SPVM_GET_FIELD_OBJECT(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", MFILE, __LINE__);
-  FILE* fh = (FILE*)env->get_pointer(env, obj_fh);
-  
-  // Char
-  char ch = (char)stack[1].bval;
-  
-  
-  int32_t ret = fputc(ch, obj_fh);
-  
-  stack[0].ival = ret;
-
-  return SPVM_SUCCESS;
-}
-
 int32_t SPNATIVE__SPVM__IO__File__print(SPVM_ENV* env, SPVM_VALUE* stack) {
   (void)env;
 
   // Self
   void* obj_self = stack[0].oval;
-  if (!obj_self) { SPVM_DIE("Self must be defined", MFILE, __LINE__); }
   
   // File fh
-  void* obj_fh;
-  SPVM_GET_FIELD_OBJECT(env, obj_fh, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", MFILE, __LINE__);
-  FILE* fh = (FILE*)env->get_pointer(env, obj_fh);
+  void* obj_io_file;
+  SPVM_GET_FIELD_OBJECT(env, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", &obj_io_file, MFILE, __LINE__);
+  FILE* fh = (FILE*)env->get_pointer(env, obj_io_file);
   
   void* string = stack[1].oval;
   
   const char* bytes = (const char*)env->get_elems_byte(env, string);
   int32_t string_length = env->length(env, string);
   
-  for (int32_t i = 0; i < string_length; i++) {
-    fputc(bytes[i], fh);
+  // Print
+  if (string_length > 0) {
+    int32_t write_length = fwrite(bytes, 1, string_length, fh);
+    if (write_length != string_length) {
+      SPVM_DIE("Can't print string to file handle", MFILE, __LINE__);
+    }
+  }
+
+  // Flush buffer to file handle if auto flush is true
+  int8_t auto_flush;
+  SPVM_GET_FIELD_BYTE(env, obj_self, "SPVM::IO::File", "auto_flush", &auto_flush, MFILE, __LINE__);
+  if (auto_flush) {
+    int32_t ret = fflush(fh);//SPVM::IO::File::print (Don't remove this comment for tests)
+    if (ret != 0) {
+      SPVM_DIE("Can't flush buffer to file handle", MFILE, __LINE__);
+    }
   }
   
   return SPVM_SUCCESS;
@@ -328,80 +169,114 @@ int32_t SPNATIVE__SPVM__IO__File__open(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   // Check mode
   int32_t valid_mode;
-  if (strcmp(mode, "r") == 0) {
+  const char* real_mode = NULL;
+  if (strcmp(mode, "<") == 0) {
     valid_mode = 1;
+    real_mode = "rb";
   }
-  else if (strcmp(mode, "w") == 0) {
+  else if (strcmp(mode, ">") == 0) {
     valid_mode = 1;
+    real_mode = "wb";
   }
-  else if (strcmp(mode, "a") == 0) {
+  else if (strcmp(mode, ">>") == 0) {
     valid_mode = 1;
+    real_mode = "wa";
   }
-  else if (strcmp(mode, "rb") == 0) {
+  else if (strcmp(mode, "+<") == 0) {
     valid_mode = 1;
+    real_mode = "r+b";
   }
-  else if (strcmp(mode, "wb") == 0) {
+  else if (strcmp(mode, "+>") == 0) {
     valid_mode = 1;
+    real_mode = "w+b";
   }
-  else if (strcmp(mode, "ab") == 0) {
+  else if (strcmp(mode, "+>>") == 0) {
     valid_mode = 1;
-  }
-  else if (strcmp(mode, "r+") == 0) {
-    valid_mode = 1;
-  }
-  else if (strcmp(mode, "w+") == 0) {
-    valid_mode = 1;
-  }
-  else if (strcmp(mode, "a+") == 0) {
-    valid_mode = 1;
-  }
-  else if (strcmp(mode, "r+b") == 0) {
-    valid_mode = 1;
-  }
-  else if (strcmp(mode, "rb+") == 0) {
-    valid_mode = 1;
-  }
-  else if (strcmp(mode, "w+b") == 0) {
-    valid_mode = 1;
-  }
-  else if (strcmp(mode, "wb+") == 0) {
-    valid_mode = 1;
-  }
-  else if (strcmp(mode, "a+b") == 0) {
-    valid_mode = 1;
-  }
-  else if (strcmp(mode, "ab+") == 0) {
-    valid_mode = 1;
+    real_mode = "a+b";
   }
   else {
     valid_mode = 0;
   }
   if (!valid_mode) {
-    SPVM_DIE("Invalid open mode", MFILE, __LINE__);
+    SPVM_DIE("Invalid open mode %s", mode, MFILE, __LINE__);
   }
   
   errno = 0;
-  FILE* fh = fopen(file_name, mode);
+  FILE* fh = fopen(file_name, real_mode);
   
   if (fh) {
     void* obj_io_file;
-    SPVM_NEW_OBJECT(env, obj_io_file, "SPVM::IO::File", MFILE, __LINE__);
+    SPVM_NEW_OBJECT(env, "SPVM::IO::File", &obj_io_file, MFILE, __LINE__);
 
     void* obj_fh;
-    SPVM_NEW_POINTER(env, obj_fh, "SPVM::IO::FileHandle", fh, MFILE, __LINE__);
+    SPVM_NEW_POINTER(env, "SPVM::IO::FileHandle", fh, &obj_fh, MFILE, __LINE__);
     SPVM_SET_FIELD_OBJECT(env, obj_io_file, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", obj_fh, MFILE, __LINE__);
     
     stack[0].oval = obj_io_file;
   }
   else {
-    char errstr[32];
-#ifdef _WIN32
-    strerror_s(errstr, 32, errno);
-#else
-    strerror_r(errno, errstr, 32);
-#endif
+    const char* errstr = strerror(errno);
     
     SPVM_DIE("Can't open file \"%s\": %s", file_name, errstr, MFILE, __LINE__);
+  }
+  
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__IO__File__flush(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+
+  // Self
+  void* obj_self = stack[0].oval;
+  
+  // File fh
+  void* obj_io_file;
+  SPVM_GET_FIELD_OBJECT(env, obj_self, "SPVM::IO::File", "fh", "SPVM::IO::FileHandle", &obj_io_file, MFILE, __LINE__);
+  FILE* fh = (FILE*)env->get_pointer(env, obj_io_file);
+  
+  int32_t ret = fflush(fh);//SPVM::IO::File::flush (Don't remove this comment for tests)
+  
+  if (ret != 0) {
+    SPVM_DIE("Can't flash to file", MFILE, __LINE__);
+  }
+  
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__IO__File__unlink(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+
+  // File
+  void* obj_file = stack[0].oval;
+  if (!obj_file) { SPVM_DIE("File name must be defined", MFILE, __LINE__); }
+  const char* file = (const char*)env->get_elems_byte(env, obj_file);
+  
+  int32_t ret = remove(file);
+  
+  if (ret != 0) {
+    SPVM_DIE("Can't remove file %s", file, MFILE, __LINE__);
+  }
+  
+  return SPVM_SUCCESS;
+}
+
+int32_t SPNATIVE__SPVM__IO__File__rename(SPVM_ENV* env, SPVM_VALUE* stack) {
+  (void)env;
+
+  // Srouce src_file
+  void* obj_src_file = stack[0].oval;
+  if (!obj_src_file) { SPVM_DIE("Source file name must be defined", MFILE, __LINE__); }
+  const char* src_file = (const char*)env->get_elems_byte(env, obj_src_file);
+
+  // Dist dist_file
+  void* obj_dist_file = stack[1].oval;
+  if (!obj_dist_file) { SPVM_DIE("Dist file name must be defined", MFILE, __LINE__); }
+  const char* dist_file = (const char*)env->get_elems_byte(env, obj_dist_file);
+  
+  int32_t ret = rename(src_file, dist_file);
+  
+  if (ret != 0) {
+    SPVM_DIE("Can't rename %s to %s", src_file, dist_file, MFILE, __LINE__);
   }
   
   return SPVM_SUCCESS;

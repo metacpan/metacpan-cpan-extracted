@@ -1,6 +1,6 @@
 package Bundle::DadaMail;
 
-$VERSION = '0.0.11';
+$VERSION = '0.0.12';
 
 1;
 
@@ -36,33 +36,43 @@ parent
 
 LWP - So many things. Makes the Send a Webpage work, for starters.  actually a required module, but we assume the environment Dada Mail is installed on has this already (I know, never assume!)
 
-IO::Socket::SSL
+Authen::SASL
 
-JSON
+AWS::Signature4 - For sending via Amazon SES
 
-YAML
+Captcha::reCAPTCHA::Mailhide
 
 CSS::Inliner - Used in inlining CSS in HTML email messages. Important for making sure HTML messages look correctly in most all readers.
 
-HTML::Packer - minifies HTML used in HTML email messages
-
 CSS::Packer - minifies CSS used in HTML email messages
 
-HTML::Scrubber - removes Javascript in messages - think discussion lists
+Cwd - for Amazon SES
+
+Crypt::SSLeay - for Amazon SES
 
 DateTime::Event::Recurrence - used for scheduled mass mailings
 
 DateTime - same
 
+DBI - actually a required module, but we assume the environment Dada Mail is installed on has this already (I know, never assume!)
+
+Digest::HMAC
+
+Digest::SHA - for Amazon SES
+
 File::Copy::Recursive - used in the installer 
 
 File::Find::Rule - used for the Perl connector in KCFInder
 
+HTML::Element - used for Dada Mail's "Magic" templates, as well as manipulating HTML documents
+
+HTML::Packer - minifies HTML used in HTML email messages
+
+HTML::Scrubber - removes Javascript in messages - think discussion lists
+
 HTML::Tree - used for Dada Mail's "Magic" templates, as well as manipulating HTML documents
 
-HTML::Element - same
-
-HTML::TreeBuilder - same
+HTML::TreeBuilder -  used for Dada Mail's "Magic" templates, as well as manipulating HTML documents
 
 HTTP::BrowserDetect - Makes reporting of user agents prettier
 
@@ -72,7 +82,19 @@ Google::reCAPTCHA::v3
 
 Gravatar::URL
 
+HTML::FormatText::WithLinks - Plaintext to HTML
+
+IO::Socket::SSL
+
+Image::Resize - used for resizing images when using Drag and Drop in CKEditor
+
+JSON - actually required for Dada Mail - Pure Perl version included, but you probably want to use a faster version
+
+MIME::Base64 - for Amazon SES
+
 Net::Domain
+
+Net::DNS
 
 Net::IMAP::Simple - use for IMAP access
 
@@ -82,45 +104,18 @@ Net::POP3 - used for POP3 access, for example: Bounce Handler and Bridge
 
 Net::SMTP - used for sending via SMTP
 
-Digest::HMAC
-
-Authen::SASL
-
-JSON - actually required for Dada Mail - Pure Perl version included, but you probably want to use a faster version
-
-MIME::Base64
-
 Text::CSV - actually required for Dada Mail - Pure Perl version included, but you probably want to use a faster version
-
-URI::GoogleChart - used for the fancy charts Dada Mail's Tracker plugin uses. 
-
-HTML::FormatText::WithLinks - Plaintext to HTML
-
-Captcha::reCAPTCHA::Mailhide
-
-DBI - actually a required module, but we assume the environment Dada Mail is installed on has this already (I know, never assume!)
-
-XML::FeedPP - for sending out RSS feeds as mass mailings
 
 Time::Piece - used in templates for http://dadamailproject.com/d/features-email_template_syntax.pod.html#Flexible-Date-and-Time-formats
 
-XMLRPC::Lite
-
-Cwd - for Amazon SES
-
-Digest::SHA - for Amazon SES
-
 URI::Escape - for Amazon SES
 
-MIME::Base64 - for Amazon SES
+URI::GoogleChart - used for the fancy charts Dada Mail's Tracker plugin uses. 
 
-Crypt::SSLeay - for Amazon SES
+XML::FeedPP - for sending out RSS feeds as mass mailings
 
 XML::LibXML - for Amazon SES
 
-Net::DNS
+XMLRPC::Lite
 
-Image::Resize - used for resizing images when using Drag and Drop in CKEditor
-
-
-
+YAML

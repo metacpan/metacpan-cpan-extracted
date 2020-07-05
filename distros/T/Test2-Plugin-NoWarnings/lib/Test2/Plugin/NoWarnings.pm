@@ -3,10 +3,11 @@ package Test2::Plugin::NoWarnings;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
-use Test2 1.302096;
-use Test2::API qw( context_do );
+# This is the version that added test2_is_testing_done.
+use Test2 1.302167;
+use Test2::API qw( context_do test2_is_testing_done );
 use Test2::Event::Warning;
 
 my $echo = 0;
@@ -21,19 +22,21 @@ sub import {
 my $_orig_warn_handler = $SIG{__WARN__};
 ## no critic (Variables::RequireLocalizedPunctuationVars)
 $SIG{__WARN__} = sub {
-    my $w = $_[0];
-    $w =~ s/\n+$//g;
+    unless ( test2_is_testing_done() ) {
+        my $w = $_[0];
+        $w =~ s/\n+$//g;
 
-    context_do {
-        my $ctx = shift;
-        $ctx->send_event(
-            'Warning',
-            warning => "Unexpected warning: $w",
-        );
+        context_do {
+            my $ctx = shift;
+            $ctx->send_event(
+                'Warning',
+                warning => "Unexpected warning: $w",
+            );
+        }
+        $_[0];
+
+        return unless $echo;
     }
-    $_[0];
-
-    return unless $echo;
 
     return if $_orig_warn_handler && $_orig_warn_handler eq 'IGNORE';
 
@@ -74,7 +77,7 @@ Test2::Plugin::NoWarnings - Fail if tests warn
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -125,15 +128,21 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Michael Alan Dorman
+
+Michael Alan Dorman <mdorman@ironicdesign.com>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

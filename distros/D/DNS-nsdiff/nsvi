@@ -1,0 +1,255 @@
+#!/usr/bin/perl
+# SPDX-License-Identifier: CC0-1.0
+
+use warnings;
+use strict;
+
+use File::Temp qw(tempfile);
+use Getopt::Std;
+use POSIX;
+
+sub wail { warn "nsvi: @_\n"; }
+sub fail { die "nsvi: @_\n"; }
+sub fale { die "nsvi: @_: $!\n"; }
+
+sub version {
+    while (<DATA>) {
+	print if m{^=head1 VERSION} ... m{^=head1 }
+	  and not m{^=head1 };
+    }
+    exit;
+}
+
+sub usage {
+    print STDERR <<EOF;
+usage: nsvi [options] <zone>
+  Transfer a zone from its server, edit it, then
+  upload the edits using `nsdiff` and `nsupdate`.
+nsvi options:
+  -h                  display full documentation
+  -V                  display version information
+  -n                  interactive confirmation
+  -v                  turn on verbose output
+  -01cCdD             nsdiff options
+  -S num|mode         SOA serial number or mode
+  -s server[#port]    where to AXFR and UPDATE the zone
+  -k keyfile          AXFR and UPDATE TSIG key
+  -y [hmac:]name:key  AXFR and UPDATE TSIG key
+EOF
+    exit 1;
+}
+my %opt;
+usage unless getopts '-hV01cCdDk:ns:S:vy:', \%opt;
+version if $opt{V};
+exec "perldoc -F $0" if $opt{h};
+usage if @ARGV != 1;
+my $zone = shift;
+
+$opt{v} = 'qr' if $opt{v};
+
+my @dig = qw{dig +multiline +onesoa +nocmd +nostats +noadditional};
+push @dig, map "-$_$opt{$_}",
+    grep $opt{$_}, qw{k y};
+if ($opt{s} and $opt{s} =~ m{^(.*)#(\d+)$}) {
+    push @dig, "-p$2", "\@$1";
+} elsif ($opt{s}) {
+    push @dig, "\@$opt{s}";
+} else {
+    push @dig, "\@localhost";
+}
+
+my @nsdiff = qw{nsdiff};
+push @nsdiff, map "-$_",
+    grep $opt{$_}, qw{0 1 c d D};
+push @nsdiff, map "-$_$opt{$_}",
+    grep $opt{$_}, qw{k s S v y};
+push @nsdiff, "-slocalhost" unless $opt{s};
+push @nsdiff, "-u" if $opt{s};
+
+my @nsupdate = qw{nsupdate};
+push @nsupdate, map "-$_$opt{$_}",
+    grep $opt{$_}, qw{k y};
+push @nsupdate, "-l" unless $opt{s};
+
+my $secRRtypes = qr{NSEC|NSEC3|NSEC3PARAM|RRSIG};
+$secRRtypes = qr{$secRRtypes|CDS|CDNSKEY} unless $opt{C};
+$secRRtypes = qr{$secRRtypes|DNSKEY} unless $opt{D};
+$secRRtypes = qr{$secRRtypes|DS} if $opt{d};
+
+my $nl = qr{(?:;[^\n]*)?\n};
+my $rdata = qr{(?:[^()\n]+
+                 |(?:[(]
+                      (?:[^()\n]+|$nl)+
+                     [)])+
+                 )+$nl}x;
+my $dnssec = qr{(?m)^\S+\s+\d+\s+IN\s+($secRRtypes)\s+$rdata};
+
+print "@dig axfr $zone" if $opt{v};
+my $axfr = qx{@dig axfr $zone};
+fail "failed to @dig axfr $zone" unless $axfr and $? == 0;
+
+$axfr =~ s{$dnssec}{}g;
+
+my ($fh,$fn) = tempfile("$zone.XXXXXXXXXX",
+			TMPDIR => 1, UNLINK => 1);
+print $fh $axfr;
+close $fh;
+
+my $vi = $ENV{VISUAL} || $ENV{EDITOR} || "vi";
+
+sub getch {
+    system "stty -icanon";
+    sysread STDIN, my $ch, 1;
+    system "stty icanon";
+    return $ch;
+}
+
+sub retry {
+    wail shift;
+    print "re-edit and try again? (y/N)";
+    next RETRY if getch =~ m{[Yy]};
+    print "\n";
+    exit 1;
+}
+
+RETRY: for (;;) {
+    system "$vi $fn";
+    fail "failed to $vi $fn" unless $? == 0;
+
+    print "@nsdiff $zone $fn" if $opt{v};
+    my $diff = qx{@nsdiff $zone $fn};
+    if ($? == 0) {
+	wail "no change";
+	exit 0;
+    }
+    retry "failed to @nsdiff $zone $fn"
+	unless $diff and $? == 256;
+    if ($opt{n}) {
+	print "$diff\n";
+	print "make update, edit again, or quit? (u/e/Q) ";
+	next RETRY if getch =~ m{[EeRr]};
+	exit 1 unless getch =~ m{[UuYy]};
+    }
+    open my $ph, '|-', @nsupdate
+	or retry "pipe to @nsupdate: $!";
+    print $ph $diff;
+    last if close $ph;
+    retry "pipe to @nsupdate: $!" if $!;
+    retry "failed to @nsupdate";
+}
+
+print "done\n" if $opt{v};
+exit 0;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+nsvi - transfer a zone, edit it, then upload the edits
+
+=head1 SYNOPSIS
+
+nsvi [B<-01cCdDhvV>] [B<-k> I<keyfile>] [B<-y> [I<hmac>:]I<name>:I<key>]
+     [B<-S> I<mode>|I<num>] [B<-s> I<server>] <I<zone>>
+
+=head1 DESCRIPTION
+
+The B<nsvi> program makes an AXFR request for the zone, runs your
+editor so you can make whatever changes you require, then it runs
+B<nsdiff> | B<nsupdate> to push those changes to the server.
+
+Automatically-maintained DNSSEC records are stripped from the zone
+before it is passed to your editor, and you do not need to manually
+adjust the SOA serial number.
+
+=head1 OPTIONS
+
+Most B<nsvi> options are passed to B<nsdiff> and some to B<nsupdate>.
+
+=over
+
+=item B<-h>
+
+Display this documentation.
+
+=item B<-V>
+
+Display version information.
+
+=item B<-v>
+
+Verbose mode.
+
+=item B<-n>
+
+Interactive confirmation.
+
+When you quit the editor, you will be shown the changes, then asked
+whether to make the update (press B<U> or B<Y>), edit again (press
+B<E> or B<R>), or quit (press another key).
+
+=item B<-01cCdD>
+
+=item B<-S> B<mode>|I<num>
+
+These options are passed to B<nsdiff>.
+For details see the nsdiff manual.
+
+=item B<-s> I<server>[#I<port>]
+
+Transfer the zone from the server given in this option, and send the
+update request to the same place. You can specify the server host name
+or IP address, optionally followed by a "#" and the port number.
+
+If you do not use the B<-s> option, the zone will be transferred
+from I<localhost>, and B<nsvi> will use B<nsupdate> B<-l> to update
+the zone.
+
+=item B<-k> I<keyfile>
+
+TSIG key file, passed to B<dig>, B<nsdiff>, and B<nsupdate>.
+
+=item B<-y> [I<hmac>:]I<name>:I<key>
+
+Literal TSIG key, passed to B<dig>, B<nsdiff>, and B<nsupdate>.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over
+
+=item B<TMPDIR>
+
+Location for temporary files.
+
+=item B<VISUAL>
+
+=item B<EDITOR>
+
+Which editor to use. C<$VISUAL> is used if it is set,
+otherwise C<$EDITOR>, otherwise B<vi>.
+
+=back
+
+=head1 VERSION
+
+  This is nsvi-1.82 <https://dotat.at/prog/nsdiff/>
+
+  Written by Tony Finch <fanf2@cam.ac.uk> <dot@dotat.at>
+  at Cambridge University Information Services.
+  You may do anything with this. It has no warranty.
+  <https://creativecommons.org/publicdomain/zero/1.0/>
+
+=head1 ACKNOWLEDGMENTS
+
+Thanks to Tristan Le Guern for the B<-n> option. Thanks to Petr Menšík
+(Red Hat) for providing useful feedback.
+
+=head1 SEE ALSO
+
+nsdiff(1), nsupdate(1), dig(1).
+
+=cut

@@ -17,5 +17,5 @@ on 'develop' => sub {
 
 on 'test' => sub {
     requires    "Test::Most";
-    requires    "Test::OpenTracing::Interface", '>= v0.22';
+    requires    "Test::OpenTracing::Interface", '>= v0.23';
 };

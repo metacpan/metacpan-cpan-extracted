@@ -5,13 +5,13 @@ use strict;
 use warnings;
 use English;
 
-use Test::More tests => 39;
+use Test::More tests => 48;
 use Path::Class;
 use DateTime;
 
 
 use Log::Log4perl;
-Log::Log4perl->easy_init( { level   => 'ERROR' } );
+Log::Log4perl->easy_init( { level   => 'WARN' } );
 
 my ($base, $conn);
 
@@ -134,6 +134,8 @@ is( $conn->get_hash('leafref.hash')->{bob}, '007', 'hash with reference in leaf'
 is( $conn->get('cascaded.reference.bob'), 'token_1', 'reference over connector' );
 is( $conn->get_hash('cascaded.reference')->{bob}, 'token_1', 'reference over connector with hash' );
 
+is( $conn->get('cascaded.walkover.source.joe.tokenid'), 'token_1', 'reference with walkover' );
+
 my @owners = $conn->get_keys('cascaded.connector.hook.owners');
 ok( grep("joe", @owners), 'Hash contains joe' );
 is( scalar @owners, 2, 'Hash has two items' );
@@ -143,3 +145,25 @@ ok ($conn->exists('smartcards.owners.joe'), 'connector node exists');
 ok ($conn->exists('smartcards.owners.joe.tokenid'), 'connector leaf exists');
 ok ($conn->exists( [ 'smartcards', 'owners', 'joe' ] ), 'node exists Array');
 ok (!$conn->exists('smartcards.owners.jeff'), 'connector node not exists');
+
+$ENV{OXI_TEST_FOOBAR} = "foobar";
+is( $conn->get('envvar.foo.bar'), 'foobar', 'reference from env (regular)' );
+#walk over is accepted but prints a warning
+is( $conn->get('envvar.foo.bar.baz'), 'foobar', 'reference from env (walk over)' );
+# should be undef
+is( $conn->get('envvar.foo.baz'), undef, 'reference from env (undef)' );
+
+# should be empty not undef
+$ENV{OXI_TEST_FOOBAR} = "";
+is( $conn->get('envvar.foo.bar'), '', 'reference from env (empty)' );
+
+is( $conn->get('foo'), undef, 'Cache with prefix - no prefix' );
+
+$conn->PREFIX('cache_test.branch1');
+is( $conn->get('foo'), 'test1', 'Cache with prefix - branch 1' );
+
+$conn->PREFIX('cache_test.branch2');
+is( $conn->get('foo'), 'test2', 'Cache with prefix - branch 2' );
+
+$conn->PREFIX('');
+is( $conn->get('foo'), undef, 'Cache with prefix - no prefix' );

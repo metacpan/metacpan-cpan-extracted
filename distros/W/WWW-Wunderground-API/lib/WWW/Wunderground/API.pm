@@ -10,15 +10,15 @@ use Hash::AsObject;
 
 =head1 NAME
 
-WWW::Wunderground::API - Use Weather Underground's JSON/XML API
+WWW::Wunderground::API - Interface to Weather Underground API (DISCONTINUED)
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 has location => (is=>'rw', required=>1);
 has api_key => (is=>'ro', default=>sub { $ENV{WUNDERGROUND_API}||$ENV{WUNDERGROUND_KEY} });
@@ -26,7 +26,7 @@ has api_type => (is=>'rw', lazy=>1, default=>sub { $_[0]->api_key ? 'json' : 'xm
 has cache => (is=>'ro', lazy=>1, default=>sub { WWW::Wunderground::API::BadCache->new });
 has auto_api => (is=>'ro', default=> sub {0} );
 has raw => (is=>'rw', default=>sub{''});
-has lang => (is=>'rw', default=>'EN');
+has lang => (is=>'rw', default=>sub{'EN'});
 has data => (is=>'rw', lazy=>1, default=>sub{ Hash::AsObject->new } );
 
 sub json {
@@ -190,11 +190,20 @@ sub set {
   return $val;
 }
 
+=head1 DEPRECATION Notice
+
+DEPRECATED - The Weather Underground API has been decommissioned.
+As such, this module has no practical value
+
+=head1 DESCRIPTION
+
+Provides an interface to the(defunct) Weather Underground API.
+Conditions, forecast, almanac, satellite and radar maps, etc.
 
 =head1 SYNOPSIS
 
-Connects to the Weather Underground JSON/XML service and parses the response data
-into something usable.
+Connect to the Weather Underground JSON/XML webservice
+and parse the response data into something usable.
 
 The entire response is available in L<Hash::AsObject> form, so
 any data that comes from the server is accessible.
@@ -203,17 +212,17 @@ Print a dump of L</"data()"> to see all of the tasty data bits available.
     use WWW::Wunderground::API;
 
     # location
-    my $wun = new WWW::Wunderground::API('Fairfax, VA');
+    my $wun = WWW::Wunderground::API->new('Fairfax, VA');
 
     # or zipcode
-    my $wun = new WWW::Wunderground::API('22030');
+    my $wun = WWW::Wunderground::API->new('22030');
 
     # or airport identifier
-    my $wun = new WWW::Wunderground::API('KIAD');
+    my $wun = WWW::Wunderground::API->new('KIAD');
 
     # exercise several options
 
-    my $wun = new WWW::Wunderground::API(
+    my $wun = WWW::Wunderground::API->new(
       location => '22152',
       api_key => 'my wunderground api key',
       auto_api => 1,
@@ -261,13 +270,13 @@ Print a dump of L</"data()"> to see all of the tasty data bits available.
 
 Included for backward compatibility only.
 Refetches conditions data from the server. It will be removed in a future release.
-If you specify an api_key then this is equivalent of ->api_call('conditions') and is subject to the same cache
+If you specify an api_key then this is equivalent to $wun->api_call('conditions') and is subject to the same cache
 
 =head2 location()
 
 Set the location. For example:
 
-    my $wun = new WWW::Wunderground::API('22030');
+    my $wun = WWW::Wunderground::API->new('22030');
     my $ffx_temp = $wun->conditions->temp_f;
 
     $wun->location('KJFK');
@@ -278,11 +287,9 @@ Set the location. For example:
 
 Valid locations can be derived from others by calling the geolookup endpoint, but you probably already know where you are.
 
-
 =head2 auto_api
 
 set auto_api to something truthy to have the module automatically make API calls without the use of api_call()
-
 
 =head2 api_call( api_name, <location> )
 
@@ -322,7 +329,6 @@ Any L<Cache::Cache> or L<CHI> cache should work.
 
 Returns raw xml result from wunderground server where applicable
 
-
 =head2 json()
 
 *Deprecated* - use L</"raw()"> instead.
@@ -348,21 +354,19 @@ John Lifsey, C<< <nebulous at crashed.net> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-www-wunderground-api at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Wunderground-API>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WWW-Wunderground-API>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SOURCE
 
-Better yet, fork on github and send me a pull request:
+Better yet, fork the repository on github and send a pull request:
 L<https://github.com/nebulous/WWW-Wunderground-API>
-
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc WWW::Wunderground::API
-
 
 You can also look for information at:
 
@@ -386,21 +390,26 @@ L<http://search.cpan.org/dist/WWW-Wunderground-API/>
 
 =back
 
-=head1 SEEALSO
+=head1 SEE ALSO
 
-If you'd like to scrape from Weather Underground rather than have to use the API, see L<Weather::Underground>.
-WWW::Wunderground::API only supports current conditions without an API key.
+Weather Underground discontinuation notice
+https://apicommunity.wunderground.com/weatherapi/topics/end-of-service-for-the-weather-underground-api
+
+If you'd like to scrape from Weather Underground rather than use the API, see L<Weather::Underground>.
+Without an API key, WWW::Wunderground::API can only get the current weather conditions.
+
+See the wunderground.com API documentation to get a free key, and for more details about available API endpoints.
+L<http://www.wunderground.com/weather/api/d/docs>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 John Lifsey.
+Copyright 2020 John Lifsey.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
 
 =cut
 

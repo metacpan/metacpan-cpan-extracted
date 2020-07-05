@@ -325,7 +325,7 @@ TEST_CASE("FrameSender & Message builder", "[deflate-extension]") {
         FrameHeader fh(Opcode::PING, true, true, false, false, true, (uint32_t)std::rand());
         auto data_string = Frame::compile(fh, payload);
         auto frames_it = client.get_frames(data_string);
-        REQUIRE(frames_it.begin()->error == errc::control_frame_compression);
+        REQUIRE(frames_it.begin()->error & errc::control_frame_compression);
     }
 
     SECTION("send compressed frame bigger then original") {
@@ -360,6 +360,11 @@ TEST_CASE("FrameSender & Message builder", "[deflate-extension]") {
         char buff2[50];
         char buff1_out[50];
         char buff2_out[50];
+
+        memset(buff1, 0, 50);
+        memset(buff2, 0, 50);
+        memset(buff1_out, 0, 50);
+        memset(buff2_out, 0, 50);
 
         z_stream tx_stream1;
         tx_stream1.avail_in = 0;
@@ -403,6 +408,7 @@ TEST_CASE("FrameSender & Message builder", "[deflate-extension]") {
 
         z_stream rx_stream1;
         rx_stream1.avail_in = 0;
+        rx_stream1.next_in = Z_NULL;
         rx_stream1.zalloc = Z_NULL;
         rx_stream1.zfree = Z_NULL;
         rx_stream1.opaque = Z_NULL;
@@ -432,6 +438,11 @@ TEST_CASE("FrameSender & Message builder", "[deflate-extension]") {
         rx_stream2.avail_out = 50;
         r = inflate(&rx_stream2, Z_SYNC_FLUSH);
         REQUIRE(r == Z_OK);
+
+        deflateEnd(&tx_stream1);
+        deflateEnd(&tx_stream2);
+        inflateEnd(&rx_stream1);
+        inflateEnd(&rx_stream2);
     }
 }
 

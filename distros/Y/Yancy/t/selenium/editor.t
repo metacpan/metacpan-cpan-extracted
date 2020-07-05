@@ -149,7 +149,7 @@ my %data = (
     ],
 );
 
-my %fixtures = load_fixtures( 'foreign-key-field', 'composite-key', 'markdown' );
+my %fixtures = load_fixtures( 'foreign-key-field', 'composite-key', 'markdown', 'binary' );
 my ( $backend_url, $backend, %items ) = init_backend( { %$schema, %fixtures }, %data );
 
 sub init_app {
@@ -204,7 +204,7 @@ $t->navigate_ok("/yancy")
     ->main::capture( 'people-new-item-edited' )
     ->send_keys_ok( undef, \'return' )
     ->wait_for( '.toast-header button.close, .alert', 'save toast banner or error' )
-    ->click_ok( '.toast-header button.close', 'dismiss toast banner' )
+    ->main::close_all_toasts
     ->main::capture( 'people-new-item-added' )
     ->live_text_is( 'tbody tr:nth-child(1) td:nth-child(2)', 'Scruffy', 'name is correct' )
     ->live_text_is( 'tbody tr:nth-child(1) td:nth-child(3)', 'janitor@example.com', 'email is correct' )
@@ -248,6 +248,102 @@ subtest 'x-list-columns template' => sub {
       ;
 };
 
+subtest 'x-list-columns missing' => sub {
+    $t->main::add_item( icons => { icon_name => 'Home', icon_data => 'blob' } )
+        ->wait_for( 'table[data-schema=icons] tbody tr' )
+        ->live_element_count_is(
+            'table[data-schema=icons] thead tr:nth-child(1) th', 3,
+            'icons table head has 2 columns + 1 for icons',
+        )
+        ->live_text_like(
+            'table[data-schema=icons] thead tr:nth-child(1) th:nth-child(2)',
+            qr{^\s*ID\s*$},
+            'first column heading has correct label (title in schema)',
+        )
+        ->live_text_like(
+            'table[data-schema=icons] thead tr:nth-child(1) th:nth-child(3)',
+            qr{^\s*Name\s*},
+            'second column heading has correct label (title in schema)',
+        )
+        ->live_element_count_is(
+            'table[data-schema=icons] tbody tr:nth-child(1) td', 3,
+            'icons data row has 2 columns + 1 for icons',
+        )
+        ->live_text_like(
+            'table[data-schema=icons] tbody tr:nth-child(1) td:nth-child(2)',
+            qr{^\s*\d+\s*$},
+            'first column data is correct',
+        )
+        ->live_text_like(
+            'table[data-schema=icons] tbody tr:nth-child(1) td:nth-child(3)',
+            qr{^\s*Home\s*$},
+            'second column data is correct',
+        );
+    my $row_height = $t->driver->execute_script( 'return $("table[data-schema] tbody tr").height()' );
+    # my $cell_width = $t->driver->execute_script( 'return $("table[data-schema] tbody tr td:last-child").width()' );
+    # diag "Size is $cell_width, $row_height";
+    $t->main::add_item(
+            pages => {
+                title => 'Home Page',
+                slug => 'Home',
+                content => qq{# Home\n\nWelcome to my home page.\n\nMake yourself at home.\n\nThis is long to test that long things get truncated},
+            }
+        )
+        ->wait_for( 'table[data-schema=pages] tbody tr' )
+        ->live_element_count_is(
+            'table[data-schema=pages] thead tr:nth-child(1) th', 5,
+            'pages table head has 4 columns (+1 for icons)',
+        )
+        ->live_text_like(
+            'table[data-schema=pages] thead tr:nth-child(1) th:nth-child(2)',
+            qr{^\s*page_id\s*$},
+            'first column heading has correct label (column name)',
+        )
+        ->live_text_like(
+            'table[data-schema=pages] thead tr:nth-child(1) th:nth-child(3)',
+            qr{^\s*title\s*$},
+            'second column heading has correct label (column name)',
+        )
+        ->live_text_like(
+            'table[data-schema=pages] thead tr:nth-child(1) th:nth-child(4)',
+            qr{^\s*slug\s*$},
+            'third column heading has correct label (column name)',
+        )
+        ->live_text_like(
+            'table[data-schema=pages] thead tr:nth-child(1) th:nth-child(5)',
+            qr{^\s*content\s*$},
+            'fourth column heading has correct label (column name)',
+        )
+        ->live_element_count_is(
+            'table[data-schema=pages] tbody tr:nth-child(1) td', 5,
+            'data row has 4 columns (+1 for icons)',
+        )
+        ->live_text_like(
+            'table[data-schema=pages] tbody tr:nth-child(1) td:nth-child(2)',
+            qr{^\s*\d+\s*$},
+            'first column data is correct',
+        )
+        ->live_text_like(
+            'table[data-schema=pages] tbody tr:nth-child(1) td:nth-child(3)',
+            qr{^\s*Home Page\s*$},
+            'second column data is correct',
+        )
+        ->live_text_like(
+            'table[data-schema=pages] tbody tr:nth-child(1) td:nth-child(4)',
+            qr{^\s*Home\s*$},
+            'third column data is correct',
+        )
+        ->live_text_like(
+            'table[data-schema=pages] tbody tr:nth-child(1) td:nth-child(5)',
+            qr{^\s*\# Home},
+            'fourth column data is correct',
+        );
+    my $got_height = $t->driver->execute_script( 'return $("table[data-schema] tbody tr").height()' );
+    # my $got_width = $t->driver->execute_script( 'return $("table[data-schema] tbody tr td:nth-child(5)").width()' );
+    # diag "Size is $got_width, $got_height";
+    is $got_height, $row_height, 'long content in table does not wrap';
+};
+
 subtest 'upload file' => sub {
     # User schema has avatar field
     $t->click_ok( '#sidebar-schema-list a[data-schema=user]' )
@@ -262,7 +358,7 @@ subtest 'upload file' => sub {
         ->click_ok( '#new-item-form [name=access] option:nth-child(1)' )
         ->click_ok( '#new-item-form .save-button' )
         ->wait_for( '.toast-header button.close, .alert', 'save toast banner or error' )
-        ->click_ok( '.toast-header button.close', 'dismiss toast banner' )
+        ->main::close_all_toasts
         ->main::capture( 'user-new-item-added' )
         # Re-open the item to see the existing file
         ->click_ok( 'table tbody tr:nth-child(1) a.edit-button' )
@@ -281,7 +377,7 @@ subtest 'yes/no fields' => sub {
       ->main::scroll_to( '.edit-form .save-button' )
       ->click_ok( '.edit-form .save-button' )
       ->wait_for( '.toast-header button.close, .alert', 'save toast banner or error' )
-      ->click_ok( '.toast-header button.close', 'dismiss toast banner' )
+      ->main::close_all_toasts
       ->click_ok( 'table tbody tr:nth-child(1) a.edit-button' )
       ->wait_for( '.edit-form .yes-no' )
       ->live_element_exists( '.edit-form .yes-no :nth-child(1).active', 'Published is "Yes"' )
@@ -344,7 +440,7 @@ subtest 'foreign key field' => sub {
       # Submit the form
       ->click_ok( '#new-item-form .save-button' )
       ->wait_for( '.toast-header button.close, .alert', 'save toast banner or error' )
-      ->click_ok( '.toast-header button.close', 'dismiss toast banner' )
+      ->main::close_all_toasts
       ->main::capture( 'address-add-saved' )
       ->click_ok( 'table[data-schema=addresses] tbody tr:nth-child(1) a.edit-button' )
       ->wait_for( '.edit-form [data-name=address_type_id].foreign-key.loaded' )
@@ -460,7 +556,7 @@ sub add_item {
     $t->main::scroll_to( '#new-item-form .save-button' )
         ->click_ok( '#new-item-form .save-button' )
         ->wait_for( '.toast-header button.close, .alert', 'save toast banner or error' )
-        #->click_ok( '.toast-header button.close', 'dismiss toast banner' )
+        ->main::close_all_toasts
         ->main::capture( $schema . '-new-item-added' )
         ;
 }
@@ -505,7 +601,7 @@ sub edit_item {
     $t->main::scroll_to( '.edit-form .save-button' )
         ->click_ok( '.edit_form .save-button' )
         ->wait_for( '.toast-header button.close, .alert', 'save toast banner or error' )
-        #->click_ok( '.toast-header button.close', 'dismiss toast banner' )
+        ->main::close_all_toasts
         ->main::capture( $schema . '-item-edited' )
         ;
 }
@@ -520,6 +616,27 @@ sub fill_datetime {
         $_->send_keys_ok( $field, [ split( //, $h ), \'tab' ] );
         $_->send_keys_ok( $field, [ split( //, $n ), \'tab' ] );
         $_->send_keys_ok( $field, [ 'AM' ] );
+    } );
+}
+
+sub close_all_toasts {
+    my ( $t, $selector ) = @_;
+    $t->tap( sub {
+        $_->driver->execute_async_script(q{
+            var callback = arguments[0],
+                toasts = $('.toast').filter( ':visible' ),
+                total = toasts.length,
+                hidden = 0;
+            toasts.each( function ( i, el ) {
+                $( el ).on( 'hidden.bs.toast', function ( el ) {
+                    hidden++;
+                    if ( hidden >= total ) {
+                        callback();
+                    }
+                } );
+                $( el ).toast( 'hide' );
+            } );
+        });
     } );
 }
 

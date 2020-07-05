@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.183';
+our $VERSION = '1.184';
 
 use Quiq::Perl;
 use Encode ();
@@ -715,7 +715,7 @@ sub projectDir {
 
 # -----------------------------------------------------------------------------
 
-=head2 Zeitmessung
+=head2 Zeit
 
 =head3 elapsed() - Vergangene Zeit in Sekunden
 
@@ -986,7 +986,7 @@ sub new {
 
 =head1 VERSION
 
-1.183
+1.184
 
 =head1 AUTHOR
 

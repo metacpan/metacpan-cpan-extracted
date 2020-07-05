@@ -1,17 +1,21 @@
 package ColorThemeBase::Base;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorThemeBase-Static'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
 use parent 'ColorThemeBase::Constructor';
 
 sub get_struct {
-    my $self = shift;
-    \%{"$self->{orig_class}::THEME"};
+    my $self_or_class = shift;
+    if (ref $self_or_class) {
+        \%{"$self_or_class->{orig_class}::THEME"};
+    } else {
+        \%{"$self_or_class\::THEME"};
+    }
 }
 
 sub get_args {
@@ -34,7 +38,7 @@ ColorThemeBase::Base - A suitable base class for all ColorTheme::* modules
 
 =head1 VERSION
 
-This document describes version 0.006 of ColorThemeBase::Base (from Perl distribution ColorThemeBase-Static), released on 2020-06-09.
+This document describes version 0.008 of ColorThemeBase::Base (from Perl distribution ColorThemeBase-Static), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

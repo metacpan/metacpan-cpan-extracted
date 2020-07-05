@@ -1,0 +1,62 @@
+{
+   "abstract" : "Canonicalizes mixed convention EOL/EOF",
+   "author" : [
+      "Jerilyn Franz <cpan@jerilyn.info>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-FixEOL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "1.04",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Text::FixEOL" : {
+         "file" : "lib/Text/FixEOL.pm",
+         "version" : "1.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JerilynFranz/perl-Text-FixEOL/issues"
+      },
+      "homepage" : "https://github.com/JerilynFranz/perl-Text-FixEOL",
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/JerilynFranz/perl-Text-FixEOL.git",
+         "web" : "https://github.com/JerilynFranz/perl-Text-FixEOL"
+      }
+   },
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

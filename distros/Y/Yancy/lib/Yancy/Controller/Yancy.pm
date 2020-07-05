@@ -1,5 +1,5 @@
 package Yancy::Controller::Yancy;
-our $VERSION = '1.061';
+our $VERSION = '1.064';
 # ABSTRACT: Basic controller for displaying content
 
 #pod =head1 SYNOPSIS
@@ -275,6 +275,10 @@ use POSIX qw( ceil );
 #pod
 #pod An array reference of items to display.
 #pod
+#pod =item total
+#pod
+#pod The total number of items that match the given filters.
+#pod
 #pod =item total_pages
 #pod
 #pod The number of pages of items. Can be used for pagination.
@@ -308,6 +312,12 @@ use POSIX qw( ceil );
 #pod One or more fields to order by. Can be specified as C<< <name> >> or
 #pod C<< asc:<name> >> to sort in ascending order or C<< desc:<field> >>
 #pod to sort in descending order.
+#pod
+#pod =item $match
+#pod
+#pod How to match multiple field filters. Can be C<any> or C<all> (default
+#pod C<all>). C<all> means all fields must match for a row to be returned.
+#pod C<any> means at least one field must match for a row to be returned.
 #pod
 #pod =item Additional Field Filters
 #pod
@@ -1003,7 +1013,7 @@ Yancy::Controller::Yancy - Basic controller for displaying content
 
 =head1 VERSION
 
-version 1.061
+version 1.064
 
 =head1 SYNOPSIS
 
@@ -1114,6 +1124,10 @@ The following stash values are set by this method:
 
 An array reference of items to display.
 
+=item total
+
+The total number of items that match the given filters.
+
 =item total_pages
 
 The number of pages of items. Can be used for pagination.
@@ -1147,6 +1161,12 @@ query parameter to allow users to specify their own page size.
 One or more fields to order by. Can be specified as C<< <name> >> or
 C<< asc:<name> >> to sort in ascending order or C<< desc:<field> >>
 to sort in descending order.
+
+=item $match
+
+How to match multiple field filters. Can be C<any> or C<all> (default
+C<all>). C<all> means all fields must match for a row to be returned.
+C<any> means at least one field must match for a row to be returned.
 
 =item Additional Field Filters
 

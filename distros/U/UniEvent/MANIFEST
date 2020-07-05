@@ -50,6 +50,7 @@ lib/UniEvent/Request.pm
 lib/UniEvent/Resolver.pm
 lib/UniEvent/Signal.pm
 lib/UniEvent/Signal.pod
+lib/UniEvent/Ssl.pm
 lib/UniEvent/Stream.pm
 lib/UniEvent/Stream.pod
 lib/UniEvent/SystemError.pm
@@ -106,7 +107,6 @@ src/panda/unievent/backend/WorkImpl.h
 src/panda/unievent/BackendHandle.h
 src/panda/unievent/Check.cc
 src/panda/unievent/Check.h
-src/panda/unievent/Debug.h
 src/panda/unievent/error.cc
 src/panda/unievent/error.h
 src/panda/unievent/forward.h
@@ -121,6 +121,7 @@ src/panda/unievent/Handle.h
 src/panda/unievent/Idle.cc
 src/panda/unievent/Idle.h
 src/panda/unievent/inc.h
+src/panda/unievent/log.h
 src/panda/unievent/Loop.cc
 src/panda/unievent/Loop.h
 src/panda/unievent/Pipe.cc
@@ -139,6 +140,8 @@ src/panda/unievent/ssl/SslBio.cc
 src/panda/unievent/ssl/SslBio.h
 src/panda/unievent/ssl/SslFilter.cc
 src/panda/unievent/ssl/SslFilter.h
+src/panda/unievent/SslContext.cc
+src/panda/unievent/SslContext.h
 src/panda/unievent/Stream.cc
 src/panda/unievent/Stream.h
 src/panda/unievent/StreamFilter.cc
@@ -179,6 +182,7 @@ src/xs/unievent/Prepare.h
 src/xs/unievent/Request.h
 src/xs/unievent/Resolver.h
 src/xs/unievent/Signal.h
+src/xs/unievent/Ssl.h
 src/xs/unievent/Stream.h
 src/xs/unievent/Tcp.h
 src/xs/unievent/Timer.h
@@ -250,9 +254,8 @@ t/prepare.t
 t/resolver.cc
 t/resolver.t
 t/signal.t
-t/tcp/connect-disconnect.t
-t/tcp/connect_timeout.cc
-t/tcp/connect_timeout.t
+t/tcp/connect.cc
+t/tcp/connect.t
 t/tcp/double-free.t
 t/tcp/fork.t
 t/tcp/open.t
@@ -266,12 +269,6 @@ t/timer.t
 t/tty.t
 t/udp/simple.t
 t/udp/udp.t
-t/var/12914/file
-t/var/15402/file
-t/var/20776/file
-t/var/34914/file
-t/var/44557/file
-t/var/9631/file
 t/work.cc
 t/work.t
 UniEvent.xs

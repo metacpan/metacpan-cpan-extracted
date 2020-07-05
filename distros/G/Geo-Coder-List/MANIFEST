@@ -30,7 +30,6 @@ t/list.t
 t/manifest.t
 t/no404s.t
 t/noplan.t
-t/online.enabled
 t/opencage.t
 t/osm.t
 t/ovi.t

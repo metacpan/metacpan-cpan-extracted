@@ -1,9 +1,9 @@
 package Sah::SchemaR::currency::pair;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = ["str",[{description=>"\nCurrency pair is string in the form of *currency1*/*currency2*, where\n*currency1* is called the base currency while *currency2* is the quote (or\nprice) currency. Both must be known currency codes (e.g. USD, or IDR).\n\nCurrency code is checked against <pm:Locale::Codes::Currency_Codes>.\n\nWill be normalized to uppercase.\n\n",examples=>[{valid=>0,value=>""},{valid=>0,value=>"idr"},{res=>"USD/IDR",valid=>1,value=>"usd/idr"},{valid=>0,value=>"usd idr"},{valid=>0,value=>"usd/foo"}],match=>qr(\A\S+/\S+\z),summary=>"Fiat currency pair, e.g. USD/IDR","x.perl.coerce_rules"=>["From_str::to_currency_pair"]}],["str"]];
+our $rschema = ["str",[{description=>"\nCurrency pair is string in the form of *currency1*/*currency2*, where\n*currency1* is called the base currency while *currency2* is the quote (or\nprice) currency. Both must be known currency codes (e.g. USD, or IDR).\n\nCurrency code is checked against <pm:Locale::Codes::Currency_Codes>.\n\nWill be normalized to uppercase.\n\n",examples=>[{valid=>0,value=>""},{valid=>0,value=>"idr"},{valid=>1,validated_value=>"USD/IDR",value=>"usd/idr"},{valid=>0,value=>"usd idr"},{valid=>0,value=>"usd/foo"}],match=>qr(\A\S+/\S+\z),summary=>"Fiat currency pair, e.g. USD/IDR","x.perl.coerce_rules"=>["From_str::to_currency_pair"]}],["str"]];
 
 1;
 # ABSTRACT: Fiat currency pair, e.g. USD/IDR
@@ -20,7 +20,7 @@ Sah::SchemaR::currency::pair - Fiat currency pair, e.g. USD/IDR
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::currency::pair (from Perl distribution Sah-Schemas-Currency), released on 2020-03-04.
+This document describes version 0.008 of Sah::SchemaR::currency::pair (from Perl distribution Sah-Schemas-Currency), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

@@ -45,15 +45,23 @@ sub run
     $logH->autoflush;
 
 
+    my ( $time, $effective ) = ( time, 600 );
     my ( $count, $cb ) = ( 0 );
     $cb = sub {
+
+        my $due = time - $time;
+        $count = 0 if $due > $effective;
+
         if( defined $RUN{count} && $count >= $RUN{count} )
         {
-            syswrite( $logH, unixtai64n(time), " [CLOSE]\n" );
-            exit;
+            syswrite( $logH, unixtai64n(time). " [SLEEP: $effective sec]\n" );
+            sleep $effective;
+            $count = 0;
         }
 
         my ( $err, $wtr, $rdr ) = gensym;
+
+        $time = time;
         my $pid = IPC::Open3::open3( undef, $rdr, $err, "$cmd" );
        
 

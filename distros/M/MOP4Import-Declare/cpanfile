@@ -6,21 +6,20 @@ requires 'rlib'; # XXX:
 
 requires 'JSON::MaybeXS';
 
+requires 'Sub::Util', '>= 1.40'; # For subname
+
 recommends 'Module::Runtime';
 recommends 'YAML::Syck';
 recommends 'Cpanel::JSON::XS', '>= 4.05';
 
 recommends 'File::AddInc';
 
-on configure => sub {
-  requires 'rlib';
-  requires 'Module::Build';
-  requires 'Module::Build::Pluggable';
-  requires 'Module::CPANfile';
-};
+recommends 'Data::Dumper', '>= 2.160';
 
 on build => sub {
-  requires 'rlib'; # XXX:
+  requires 'rlib';
+  requires 'Module::Build::Pluggable::CPANfile';
+  requires 'JSON::PP', '>= 2.273';
 };
 
 on test => sub {

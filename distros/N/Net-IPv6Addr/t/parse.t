@@ -2,7 +2,6 @@ use strict;
 use Test::More;
 use Net::IPv6Addr qw/ipv6_parse is_ipv6/;
 
-# Yeah, so I was listening to it when I wrote the test.
 my $input = "sunshine of your love";
 eval { Net::IPv6Addr::ipv6_parse($input); };
 ok($@, "Error with bad address");

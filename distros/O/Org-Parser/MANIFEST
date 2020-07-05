@@ -8,7 +8,6 @@ Makefile.PL
 README
 dist.ini
 lib/Org/Document.pm
-lib/Org/Dump.pm
 lib/Org/Element.pm
 lib/Org/Element/Block.pm
 lib/Org/Element/BlockRole.pm

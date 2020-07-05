@@ -1,5 +1,11 @@
 Revision history for App-VTide
 
+0.1.13   2020-07-01
+        Updating for release of version 0.1.13
+        Updaging docs (Ivan Wills)
+        Adding the edited files to the title (Ivan Wills)
+        Adding set option that gives you the environment variables to set based on a vtide config (Ivan Wills)
+
 0.1.12   2020-06-02
         Updating for release of version 0.1.12
         Making sure check is as accurate as possible (Ivan Wills)

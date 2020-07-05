@@ -50,7 +50,7 @@ TEST("additional final chunk before other chunks") {
 TEST("response chunks #1") {
     ResponseParser p;
     RequestSP req = new Request();
-    req->method = Method::GET;
+    req->method_raw(Method::GET);
     p.set_context_request(req);
 
     std::vector<string> v = {
@@ -95,7 +95,7 @@ TEST("response chunks #1") {
 TEST("google response 0") {
     ResponseParser p;
     RequestSP req = new Request();
-    req->method = Method::GET;
+    req->method_raw(Method::GET);
     p.set_context_request(req);
     
     string raw =
@@ -122,7 +122,7 @@ TEST("google response 0") {
 TEST("google response 1") {
     ResponseParser p;
     RequestSP req = new Request();
-    req->method = Method::GET;
+    req->method_raw(Method::GET);
     p.set_context_request(req);
     
     ResponseParser::Result result;

@@ -16,7 +16,7 @@ name: FB3-Convert
 provides:
   FB3::Convert:
     file: lib/FB3/Convert.pm
-    version: '0.39'
+    version: '0.42'
   FB3::Convert::Epub:
     file: lib/FB3/Convert/Epub.pm
   FB3::Convert::FB2:
@@ -47,4 +47,4 @@ requires:
   perl: '5.014'
 resources:
   license: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt
-version: '0.39'
+version: '0.42'

@@ -12,8 +12,7 @@
 
 namespace panda { namespace unievent {
 
-log::Module uelog("UniEvent", log::Warning);
-static const auto& panda_log_module = uelog;
+log::Module panda_log_module("UniEvent", log::WARNING);
 
 static std::thread::id main_thread_id = std::this_thread::get_id();
 
@@ -75,7 +74,7 @@ void Loop::_init_default_loop () {
 }
 
 Loop::Loop (Backend* backend, LoopImpl::Type type) {
-    _ECTOR();
+    panda_log_ctor();
     if (!backend) backend = default_backend();
     _backend = backend;
     _impl = backend->new_loop(type);
@@ -83,7 +82,7 @@ Loop::Loop (Backend* backend, LoopImpl::Type type) {
 }
 
 Loop::~Loop () {
-    _EDTOR();
+    panda_log_dtor();
     unregister_loop(this);
     _resolver = nullptr;
     assert(!_handles.size());

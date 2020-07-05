@@ -1,12 +1,6 @@
-NOTE: Astro::FITS::CFITSIO v1.12 requires cfitsio library version
-      3.44 or later. It can be obtained from
-      http://heasarc.gsfc.nasa.gov/fitsio
-
-NOTE: gcc takes a very long time to compile CFITSIO.c (created from
-      CFITSIO.xs) with -O2 optimization. With -O0, it takes about one
-      tenth the time. This is the explanation for the optimization
-      flag below.
-
+NOTE: Astro::FITS::CFITSIO v1.14 requires cfitsio library version
+      3.48 or later. It can be obtained from
+      https://heasarc.gsfc.nasa.gov/fitsio
 
 1. Makefile.PL needs to know where the cfitsio library is installed.
 
@@ -29,7 +23,7 @@ NOTE: gcc takes a very long time to compile CFITSIO.c (created from
 
    % setenv CFITSIO /usr/local/cfitsio  # C shell variants
 
-2. perl Makefile.PL OPTIMIZE=-O0
+2. perl Makefile.PL
 
 3. make
 
@@ -41,12 +35,12 @@ NOTE: gcc takes a very long time to compile CFITSIO.c (created from
 
 6. make install
 
-If compilation fails, please make sure the version of cfitsio you're
-using matches that listed in README as a requirement for this version
-of the module.
+If loading of the module fails, please make sure the version of
+cfitsio you're using matches that listed in README as a requirement
+for this version of the module.
 
 If compilaton succeeds but 'make test' fails due to unresolved
-symbols, you should try explicity setting the libcfitsio.a to link
+symbols, you could try explicity setting the libcfitsio.a to link
 to. In Makefile.PL, add the following key to the WriteMakefile()
 argument list:
 

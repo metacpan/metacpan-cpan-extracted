@@ -1,0 +1,37 @@
+---
+abstract: 'Find and evaluate C/C++ constants for use in Perl'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000060'
+  perl: '5.020'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.020'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Const-Introspect-C
+requires:
+  Capture::Tiny: '0'
+  Data::Section::Simple: '0'
+  FFI::Build: '0'
+  FFI::Platypus: '1.00'
+  Moo: '2.0'
+  Path::Tiny: '0'
+  Ref::Util: '0'
+  Template: '0'
+  perl: '5.020'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/PerlFFI/Const-Introspect-C/issues
+  homepage: https://metacpan.org/pod/Const::Introspect::C
+  repository: git://github.com/PerlFFI/Const-Introspect-C.git
+version: '0.01'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

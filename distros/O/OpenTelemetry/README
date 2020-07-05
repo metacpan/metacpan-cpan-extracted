@@ -1,0 +1,49 @@
+NAME
+
+    OpenTelemetry - support for https://opentelemetry.io application
+    tracing
+
+DESCRIPTION
+
+    OpenTelemetry is due to become the successor to the OpenTracing
+    initiative. It includes additional functionality relating to metrics,
+    and at the time of writing is an evolving specification.
+
+    Current status of the official spec can be tracked here:
+
+    https://github.com/open-telemetry/opentelemetry-specification/blob/master/README.md
+
+    Note that the https://opentracing.io specification is currently more
+    widely supported, but eventually OpenTracing::Any and
+    OpenTelemetry::Any should be able to coëxist in a codebase and support
+    collectors for either system.
+
+    For metrics, see Metrics::Any.
+
+SEE ALSO
+
+ Tools and specifications
+
+      * https://opentelemtry.io - the new standard
+
+      * https://opentracing.io - if you want something that works today
+
+ Other modules
+
+    Some perl modules of relevance:
+
+      * OpenTracing::Manual - this is an independent Moo-based
+      implementation, probably worth a look if you're working mostly with
+      synchronous code.
+
+      * NewRelic::Agent - support for NewRelic's APM system
+
+AUTHOR
+
+    Tom Molesworth TEAM@cpan.org
+
+LICENSE
+
+    Copyright Tom Molesworth 2020. Licensed under the same terms as Perl
+    itself.
+

@@ -12,11 +12,12 @@ my $short_url = "https://sck.pm/shO";
 is( makeashorterlink($long_url), $short_url, "Shorter works" );
 is( makealongerlink($short_url), $long_url,  "Longer works" );
 
-my $long_url_utf8 = uri_unescape("http://blog.celogeek.com/?%E2%9C%93utf8");
+my $url           = "http://blog.celogeek.com/?%E2%9C%93utf8";
+my $long_url_utf8 = uri_unescape($url);
 utf8::decode($long_url_utf8);
-my $short_url_utf8 = "https://sck.pm/PA4";
+my $short_url_utf8 = "https://sck.pm/IWn";
 
 is( makeashorterlink($long_url_utf8), $short_url_utf8, "Shorter works" );
-is( makealongerlink($short_url_utf8), $long_url_utf8,  "Longer works" );
+is( makealongerlink($short_url_utf8), $url,            "Longer works" );
 
 done_testing;

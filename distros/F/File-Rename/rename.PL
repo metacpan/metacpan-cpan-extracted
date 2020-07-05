@@ -97,6 +97,8 @@ renamed.
 If no filenames are given on the command line, filenames will be read
 via standard input.
 
+=head2 Examples (Larry Wall,  1992)
+
 For example, to rename all files matching C<*.bak> to strip the extension,
 you might say
 
@@ -105,6 +107,17 @@ you might say
 To translate uppercase names to lower, you'd use
 
 	rename 'y/A-Z/a-z/' *
+
+=head2 More examples (2020)
+
+You can also use rename to move files between directories, possibly at
+the same time as making other changes (but see B<--filename>)
+
+	rename 'y/A-Z/a-z/;s/^/my_new_dir\//' *.*
+
+You can also write the statements separately (see B<-e>/B<-E>)
+
+	rename -E 'y/A-Z/a-z/' -E 's/^/my_new_dir\//' *.*
 
 =head1 OPTIONS
 

@@ -1,10 +1,25 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         PGP-Sign
-version:      0.20
-version_from: VERSION.pm
-installdirs:  site
+---
+abstract: 'Create detached PGP signatures for data, securely'
+author:
+  - 'Russ Allbery <rra@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PGP-Sign
+provides:
+  PGP::Sign:
+    file: lib/PGP/Sign.pm
+    version: '1.00'
 requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30_01
+  IPC::Run: '0'
+  perl: '5.020'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

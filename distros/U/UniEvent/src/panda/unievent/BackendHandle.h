@@ -15,7 +15,7 @@ struct BackendHandle : Handle {
 protected:
     mutable HandleImpl* _impl;
 
-    BackendHandle () : _impl() { _ECTOR(); }
+    BackendHandle () : _impl() {}
 
     ~BackendHandle () {
         if (_impl) _impl->destroy();

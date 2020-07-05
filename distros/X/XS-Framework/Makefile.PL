@@ -22,7 +22,7 @@ my %params = (
             "typemap$ivbits" => '',
         },
     },
-    MIN_PERL_VERSION => '5.18.0', # required for GV_SUPER
+    MIN_PERL_VERSION => '5.20.0', # we need working COP hints 
     CCFLAGS          => "-Wall -Wextra $ccflags",
     TEST_REQUIRES    => {'Test::Exception' => 0},
     test             => {

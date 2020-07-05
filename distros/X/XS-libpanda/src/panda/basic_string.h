@@ -146,6 +146,7 @@ private:
     static constexpr const size_type BUF_CHARS     = (sizeof(Buffer) - sizeof(Buffer().start)) / sizeof(CharT);
     static constexpr const size_type EBUF_CHARS    = sizeof(ExternalShared) / sizeof(CharT);
     static constexpr const size_type MAX_SSO_BYTES = 3 * sizeof(void*) - 1; // last byte for _state
+    static constexpr const float     GROW_RATE     = 1.6;
     static const CharT TERMINAL;
 
     union {
@@ -180,6 +181,9 @@ public:
 
     template <size_type SIZE> // implicit constructor for literals, literals are expected to be null-terminated
     constexpr basic_string (const CharT (&str)[SIZE]) noexcept : _str_literal(str), _length(SIZE-1), _state(State::LITERAL) {}
+
+    template <size_type SIZE> // implicit constructor for char arrays, array must be null-trminated, behaviour is similar to std::string
+    constexpr basic_string (CharT (&str)[SIZE]) noexcept : basic_string(str, traits_type::length(str)) {}
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
     // GCC < 6 has a bug determining return value type for literals, so this ctor must be implicitly available
@@ -702,12 +706,12 @@ public:
     }
 
     template<class _CharT, typename = typename std::enable_if<std::is_same<_CharT, CharT>::value>::type>
-    size_type rfind (const _CharT* const& s, size_type pos = 0) const {
+    size_type rfind (const _CharT* const& s, size_type pos = npos) const {
         return rfind(s, pos, traits_type::length(s));
     }
 
     template <size_type SIZE>
-    size_type rfind (const CharT (&s)[SIZE], size_type pos = 0) const {
+    size_type rfind (const CharT (&s)[SIZE], size_type pos = npos) const {
         return rfind(s, pos, SIZE-1);
     }
 
@@ -847,7 +851,7 @@ public:
 
     basic_string& append (size_type count, CharT ch) {
         if (count) {
-            _reserve_save(_length + count);
+            _reserve_save_extra(_length + count);
             traits_type::assign(_str + _length, count, ch);
             _length += count;
         }
@@ -857,7 +861,7 @@ public:
     template <class Alloc2>
     basic_string& append (const basic_string<CharT, Traits, Alloc2>& str) {
         if (str._length) { // can't call append(const CharT*, size_type) because otherwise if &str == this a fuckup would occur
-            _reserve_save(_length + str._length);
+            _reserve_save_extra(_length + str._length);
             traits_type::copy(_str + _length, str._str, str._length);
             _length += str._length;
         }
@@ -869,7 +873,7 @@ public:
         if (pos > str._length) throw std::out_of_range("basic_string::append");
         if (count > str._length - pos) count = str._length - pos;
         if (count) { // can't call append(const CharT*, size_type) because otherwise if &str == this a fuckup would occur
-            _reserve_save(_length + count);
+            _reserve_save_extra(_length + count);
             traits_type::copy(_str + _length, str._str + pos, count);
             _length += count;
         }
@@ -878,7 +882,7 @@ public:
 
     basic_string& append (const CharT* s, size_type count) { // 's' MUST NOT BE any part of this->data()
         if (count) {
-            _reserve_save(_length + count);
+            _reserve_save_extra(_length + count);
             traits_type::copy(_str + _length, s, count);
             _length += count;
         }
@@ -1135,7 +1139,10 @@ public:
 
     const CharT* c_str () const {
         if (_state == State::LITERAL) return _str; // LITERALs are NT
-        if (shared_capacity() > _length && _str[_length] == 0) return _str; // if we have r/o space after string, let's see if it's already NT
+        // _str[_length] access to possibly uninititalized memory, UB.
+        // if we have r/o space after string, let's see if it's already NT
+        // if (shared_capacity() > _length && _str[_length] == 0) return _str;
+
         // string is not NT
         if (capacity() <= _length) const_cast<basic_string*>(this)->_reserve_save(_length + 1); // we're in COW mode or don't have space
         _str[_length] = 0;
@@ -1322,19 +1329,21 @@ private:
         if (_state == State::LITERAL) _detach_str(_length);
     }
 
-    void _reserve_save (size_type capacity) {
+    void _reserve_save_extra (size_type capacity) { _reserve_save(capacity, GROW_RATE); }
+
+    void _reserve_save (size_type capacity, float extra = 1) {
         if (capacity < _length) capacity = _length;
         switch (_state) {
-            case State::INTERNAL: _reserve_save_internal(capacity); break;
-            case State::EXTERNAL: _reserve_save_external(capacity); break;
-            case State::LITERAL:  _detach_str(capacity);            break;
-            case State::SSO:      _reserve_save_sso(capacity);      break;
+            case State::INTERNAL: _reserve_save_internal(capacity, extra); break;
+            case State::EXTERNAL: _reserve_save_external(capacity, extra); break;
+            case State::LITERAL:  _detach_str(capacity * extra);           break;
+            case State::SSO:      _reserve_save_sso(capacity, extra);      break;
         }
     }
 
-    void _reserve_save_internal (size_type capacity) {
-        if (_storage.internal->refcnt > 1) _detach_cow(capacity);
-        else if (_storage.internal->capacity < capacity) _internal_realloc(capacity); // need to grow storage
+    void _reserve_save_internal (size_type capacity, float extra) {
+        if (_storage.internal->refcnt > 1) _detach_cow(capacity * extra);
+        else if (_storage.internal->capacity < capacity) _internal_realloc(capacity * extra); // need to grow storage
         else if (_capacity_internal() < capacity) { // may not to grow storage if str is moved to the beginning
             traits_type::move(_storage.internal->start, _str, _length);
             _str = _storage.internal->start;
@@ -1359,9 +1368,9 @@ private:
         }
     }
 
-    void _reserve_save_external (size_type capacity) {
-        if (_storage.external->refcnt > 1) _detach_cow(capacity);
-        else if (_storage.external->capacity < capacity) _external_realloc(capacity); // need to grow storage, switch to INTERNAL/SSO
+    void _reserve_save_external (size_type capacity, float extra) {
+        if (_storage.external->refcnt > 1) _detach_cow(capacity * extra);
+        else if (_storage.external->capacity < capacity) _external_realloc(capacity * extra); // need to grow storage, switch to INTERNAL/SSO
         else if (_capacity_external() < capacity) { // may not to grow storage if str is moved to the beginning
             traits_type::move(_storage.external->ptr, _str, _length);
             _str = _storage.external->ptr;
@@ -1377,9 +1386,9 @@ private:
         _free_external(old_buf, old_dtor);
     }
 
-    void _reserve_save_sso (size_type capacity) {
+    void _reserve_save_sso (size_type capacity, float extra) {
         if (MAX_SSO_CHARS < capacity) {
-            _new_internal_from_sso(capacity);
+            _new_internal_from_sso(capacity * extra);
             return;
         }
         else if (_capacity_sso() < capacity) {
@@ -1505,8 +1514,11 @@ private:
 
 };
 
-template <class C, class T, class A>
-const C basic_string<C,T,A>::TERMINAL = C();
+template <class C, class T, class A> const C basic_string<C,T,A>::TERMINAL = C();
+
+template <class C, class T, class A> const typename basic_string<C,T,A>::size_type basic_string<C,T,A>::npos;
+template <class C, class T, class A> const typename basic_string<C,T,A>::size_type basic_string<C,T,A>::MAX_SSO_CHARS;
+template <class C, class T, class A> const typename basic_string<C,T,A>::size_type basic_string<C,T,A>::MAX_SIZE;
 
 template <class C, class T, class A1, class A2> inline bool operator== (const basic_string<C,T,A1>& lhs, const basic_string<C,T,A2>& rhs) { return lhs.compare(rhs) == 0; }
 template <class C, class T, class A>            inline bool operator== (const C* lhs, const basic_string<C,T,A>& rhs)                     { return rhs.compare(lhs) == 0; }

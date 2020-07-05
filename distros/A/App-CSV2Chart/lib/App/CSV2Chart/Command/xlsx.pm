@@ -1,5 +1,5 @@
 package App::CSV2Chart::Command::xlsx;
-$App::CSV2Chart::Command::xlsx::VERSION = '0.10.0';
+$App::CSV2Chart::Command::xlsx::VERSION = '0.12.0';
 use strict;
 use warnings;
 
@@ -18,12 +18,7 @@ sub abstract
 
 sub opt_spec
 {
-    return (
-        [ "chart-type=s", "Chart Type" ],
-        [ "output|o=s",   "Output path" ],
-        [ "title=s",      "Chart Title" ],
-        [ 'exec|e=s@',    "Execute command on the output" ]
-    );
+    return @{ App::CSV2Chart::API::ToXLSX::_to_xlsx_common_opt_spec() };
 }
 
 sub execute
@@ -39,6 +34,8 @@ sub execute
         {
             input_fh   => $fh,
             output_fn  => $fn,
+            height     => $opt->{height},
+            width      => $opt->{width},
             title      => $opt->{title},
             chart_type => $opt->{'chart_type'},
         }
@@ -64,7 +61,7 @@ csv2chart xlsx - generate an .xlsx file with an embedded chart from CSV data
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

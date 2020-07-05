@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Zing::Data;
+use Zing::Process;
+
+=pod explain
+
+- zing-data is a key/val data store for processes
+- it's meant as a convenience for storing state during execution
+- because the store name is based on the process name ...
+- the store is not meant to be shared and will be destroyed during ...
+- cleanup if the process dies properly
+
+=cut
+
+my $p = Zing::Process->new;
+my $d = Zing::Data->new(process => $p);
+
+for my $i (1..1_000) {
+  warn $d->send({created => "state-$i"});
+  warn $d->recv->{created}, ' ', 'created, saved, and fetched';
+}
+
+warn 'process data saved at', ' ', $d->term;
+
+$d->drop;

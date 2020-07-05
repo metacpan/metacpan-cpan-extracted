@@ -11,7 +11,7 @@ Yancy::Help::Config - How to configure Yancy
 
 =head1 VERSION
 
-version 1.061
+version 1.064
 
 =head1 SYNOPSIS
 
@@ -191,6 +191,10 @@ This can be of any type.
 =item * C<< type => "string", format => "filepath" >> - A file upload
 field (C<< <input type="file"> >>). See L<Yancy::Plugin::File> for more
 information.
+
+=item * C<< type => "string", format => "binary" >> - A field containing binary data.
+This currently does not generate any input field, but it may become
+another way to upload files in the future.
 
 =back
 

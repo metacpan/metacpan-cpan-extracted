@@ -81,7 +81,7 @@ sub dateline {
     elsif ($guess = $dom->at("time[itemprop=datePublished][datetime], h1 time[datetime], .func_time time[pubdate]")) {
         $dateline = $guess->attr('datetime');
     }
-    elsif ($guess = $dom->at(".reporter time, span.time, span.viewtime, header.article-desc time, .timeBox .updatetime span, .caption div.label-date, .contents_page span.date, .main-content span.date, .newsin_date, .news .date, .author .date, ul.info > li.date > span:nth-child(2), #newsHeadline span.datetime, article p.date, .post-meta > .icon-clock > span, .article_info_content span.info_time, .content time.page-date, .c_time, .newsContent p.time, .story_bady_info_author span:nth-child(1), div.title > div.time, div.article-meta div.article-date, address.authorInfor time, .entry-meta .date a, .author-links .posts-date, .top_title span.post_time, .mid-news > .m-left-side > .maintype-wapper > h2, .node-inner > .submitted > span")) {
+    elsif ($guess = $dom->at(".reporter time, span.time, span.viewtime, header.article-desc time, .timeBox .updatetime span, .caption div.label-date, .contents_page span.date, .main-content span.date, .newsin_date, .news .date, .author .date, ul.info > li.date > span:nth-child(2), #newsHeadline span.datetime, article p.date, .post-meta > .icon-clock > span, .article_info_content span.info_time, .content time.page-date, .c_time, .newsContent p.time, .story_bady_info_author span:nth-child(1), div.title > div.time, div.article-meta div.article-date, address.authorInfor time, .entry-meta .date a, .author-links .posts-date, .top_title span.post_time, .node-inner > .submitted > span")) {
         $dateline = $guess->text;
     }
     elsif ($guess = $dom->at("div#articles cite")) {
@@ -99,9 +99,6 @@ sub dateline {
     }
     elsif ($guess = $dom->at("div.contentBox div.content_date")) {
         ($dateline) = $guess->text =~ m#([0-9]{4}\.[0-9]{2}\.[0-9]{2} \| [0-9]{2}:[0-9]{2})#;
-    }
-    elsif ($guess = $dom->at("div.detitle2 > div.cell > div")) {
-        ($dateline) = $guess->text =~ m#([0-9]{4}\.[0-9]{2}\.[0-9]{2})#;
     }
     elsif ($guess = $dom->at("div.content-wrapper-right > div > div > div:nth-child(4), span.f12_15a_g2")) {
         ($dateline) = $guess->text =~ m#([0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2})#;
@@ -133,6 +130,9 @@ sub dateline {
 
     if ($dateline) {
         $dateline = normalize_whitespace($dateline);
+
+        $dateline =~ s<\A ([0-9]{4}) (\p{Punct}) ([0-9]{1,2}) \2 ([0-9]{1,2}) \z>< sprintf('%04d-%02d-%02d', $1, $3, $4) >ex;
+
         if ($dateline =~ /^([0-9]{4})[^0-9]/) {
             if ($1 > ((localtime)[5] + 1900)) {
                 $dateline = undef;

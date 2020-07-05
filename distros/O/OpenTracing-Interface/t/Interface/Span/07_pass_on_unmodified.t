@@ -204,6 +204,13 @@ sub add_tags {
     
 };
 
+sub get_tags {
+    push @main::test_params, [ @_ ];
+    
+    return 'some key', 'this is tag value - what ever'
+    
+};
+
 sub log_data {
     push @main::test_params, [ @_ ];
     
@@ -235,7 +242,7 @@ sub get_baggage_item {
 sub get_baggage_items {
     push @main::test_params, [ @_ ];
     
-    return 'this is a baggage item value - what ever'
+    return 'some key', 'this is a baggage item value - what ever'
     
 };
 
@@ -249,7 +256,9 @@ BEGIN {
 package MySyub::SpanContext;
 
 sub get_baggage_item;
+sub get_baggage_items;
 sub with_baggage_item;
+sub with_baggage_items;
 
 
 

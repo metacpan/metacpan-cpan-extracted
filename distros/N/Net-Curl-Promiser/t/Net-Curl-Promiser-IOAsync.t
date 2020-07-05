@@ -24,8 +24,8 @@ SKIP: {
 
     # This ensures that tests aren’t subject to potential bugs
     # in non-core event loop backends.
-    no warnings 'once';
-    local $IO::Async::Loop::LOOP = 'Select';
+    #no warnings 'once';
+    #local $IO::Async::Loop::LOOP = 'Select';
 
     require Net::Curl::Promiser::IOAsync;
 

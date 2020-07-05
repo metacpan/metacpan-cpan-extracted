@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Sense::Impedance;
-$Lab::Moose::Instrument::SCPI::Sense::Impedance::VERSION = '3.701';
+$Lab::Moose::Instrument::SCPI::Sense::Impedance::VERSION = '3.703';
 #ABSTRACT: Role for the HP/Agilent/Keysight SCPI SENSe:$function:IMPedance subsystem
 
 use Moose::Role;
@@ -54,7 +54,7 @@ Lab::Moose::Instrument::SCPI::Sense::Impedance - Role for the HP/Agilent/Keysigh
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 METHODS
 

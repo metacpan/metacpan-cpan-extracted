@@ -31,7 +31,7 @@ use base 'Exporter';
 
 our @EXPORT = qw(calendar);
 our @EXPORT_OK = qw(date_span);
-our $VERSION = '1.23';
+our $VERSION = '2.0.0';
 
 use Time::Local;
 use Carp;
@@ -66,31 +66,9 @@ week starts with, with the same values as localtime sets for wday
 =cut
 
 sub calendar {
-  my ($mon, $year, $start_day) = @_;
+  my ($mon, $year, $start_day) = _validate_params(@_);
 
-  my @now = (localtime)[4, 5];
-
-  $mon = ($now[0] + 1) unless $mon;
-  $year = ($now[1] + 1900) unless $year;
-  $start_day = 0 unless defined $start_day;
-
-  croak "Year $year out of range" if $year < 1970 && !$dt;
-  croak "Month $mon out of range" if ($mon  < 1 || $mon > 12);
-  croak "Start day $start_day out of range"
-    if ($start_day < 0 || $start_day > 6);
-
-  my $first;
-
-  if ($dt) {
-    $first = DateTime->new(year => $year,
-			   month => $mon,
-			   day => 1)->day_of_week % 7;
-  } else {
-    $first = (localtime timelocal 0, 0, 0, 1, $mon -1, $year)[6];
-  }
-
-  $first -= $start_day;
-  $first += 7 if ($first < 0);
+  my $first = _get_first($mon, $year, $start_day);
 
   my @mon = (1 .. _days($mon, $year));
 
@@ -110,7 +88,7 @@ sub calendar {
 
 =head2 date_span
 
-This function returns a cur-down version of a month data structure which
+This function returns a cut-down version of a month data structure which
 begins and ends on dates other than the first and last dates of the month.
 Any weeks that fall completely outside of the date range are removed from
 the structure and any days within the remaining weeks that fall outside
@@ -141,8 +119,12 @@ if omitted.
 =item start_day
 
 Indicates the day of the week that each week starts with. This takes the same
-values as the optional third parameter to C<calendar>. The default is 0
-(for Sunday).
+values as the optional third parameter to C<calendar>. The default is 1
+(for Monday).
+
+B<NOTE:> As of version 2.0.0, the default C<start_day> has changed. Previously,
+it was Sunday; now, it is Monday. This is so the default behaviour matches
+that of the standard Unix C<cal> command.
 
 =back
 
@@ -156,28 +138,23 @@ program you need to use the module like this:
 sub date_span {
   my %params = @_;
 
-  my @now = (localtime)[4, 5];
+  my ($mon, $year, $start_day) = _validate_params(
+    @params{ qw[mon year start_day] },
+  );
 
-  my $mon   = $params{mon}   || ($now[0] + 1);
-  my $year  = $params{year}  || ($now[1] + 1900);
   my $begin = $params{begin} || 1;
-  my $end    = $params{end}   || _days($mon, $year);
-  my $start_day = defined $params{start_day} ? $params{start_day} : 0;
+  my $end   = $params{end}   || _days($mon, $year);
 
   my @cal = calendar($mon, $year, $start_day);
 
-  while ($cal[0][6] < $begin) {
-    shift @cal;
-  }
+  shift @cal while $cal[0][6] < $begin;
 
   my $i = 0;
   while (defined $cal[0][$i] and $cal[0][$i] < $begin) {
     $cal[0][$i++] = undef;
   }
 
-  while ($cal[-1][0] > $end) {
-    pop @cal;
-  }
+  pop @cal while $cal[-1][0] > $end;
 
   $i = -1;
   while (defined $cal[-1][$i] and $cal[-1][$i] > $end) {
@@ -185,6 +162,25 @@ sub date_span {
   }
 
   return @cal;
+}
+
+sub _get_first {
+  my ($mon, $year, $start_day) = @_;
+
+  my $first;
+
+  if ($dt) {
+    $first = DateTime->new(year => $year,
+      month => $mon,
+      day => 1)->day_of_week % 7;
+  } else {
+    $first = (localtime timelocal 0, 0, 0, 1, $mon -1, $year)[6];
+  }
+
+  $first -= $start_day;
+  $first += 7 if ($first < 0);
+
+  return $first;
 }
 
 sub _days {
@@ -201,6 +197,23 @@ sub _isleap {
   return;
 }
 
+sub _validate_params {
+  my ($mon, $year, $start_day) = @_;
+
+  my @now = (localtime)[4, 5];
+
+  $mon = ($now[0] + 1) unless $mon;
+  $year = ($now[1] + 1900) unless $year;
+  $start_day = 1 unless defined $start_day;
+
+  croak "Year $year out of range" if $year < 1970 && !$dt;
+  croak "Month $mon out of range" if ($mon  < 1 || $mon > 12);
+  croak "Start day $start_day out of range"
+    if ($start_day < 0 || $start_day > 6);
+
+  return ($mon, $year, $start_day);
+}
+
 1;
 __END__
 
@@ -208,9 +221,10 @@ __END__
 
 A simple C<cal> replacement would therefore look like this:
 
-  #!/usr/bin/perl -w
+  #!/usr/bin/perl
 
   use strict;
+  use warnings;
   use Calendar::Simple;
 
   my @months = qw(January February March April May June July August
@@ -233,8 +247,8 @@ module.
 
 =head2 Date Range
 
-This module will make use of DateTime.pm if it is installed. By using
-DateTime.pm it can use any date that DateTime can represent. If DateTime
+This module will make use of L<DateTime> if it is installed. By using
+L<DateTime> it can use any date that C<DateTime> can represent. If L<DateTime>
 is not installed it uses Perl's built-in date handling and therefore
 can't deal with dates before 1970 and it will also have problems with dates
 after 2038 on a 32-bit machine.

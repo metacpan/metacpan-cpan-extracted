@@ -14,10 +14,10 @@ static PERL_THREAD_LOCAL struct {
 } cbn;
 
 struct XSFsPollListener : IFsPollListener, XSListener {
-    void on_fs_poll (const FsPollSP& h, const Fs::FStat& prev, const Fs::FStat& cur, const std::error_code& err) {
+    void on_fs_poll (const FsPollSP& h, const opt<Fs::FStat>& prev, const opt<Fs::FStat>& cur, const std::error_code& err) override {
         call(cbn.on_fs_poll, xs::out(h), xs::out(prev), xs::out(cur), xs::out(err));
     }
-    void on_fs_start (const FsPollSP& h, const Fs::FStat& stat, const std::error_code& err) {
+    void on_fs_start (const FsPollSP& h, const opt<Fs::FStat>& stat, const std::error_code& err) override {
         call(cbn.on_fs_start, xs::out(h), xs::out(stat), xs::out(err));
     }
 };

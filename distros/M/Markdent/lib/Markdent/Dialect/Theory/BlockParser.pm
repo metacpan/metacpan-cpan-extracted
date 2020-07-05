@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 use List::AllUtils qw( insert_after_string sum );
 use Markdent::Event::StartTable;
@@ -64,7 +64,7 @@ my $TableCaption = qr{ ^
                      }xm;
 
 # The use of (?> ... ) in the various regexes below forces the regex engine
-# not to backtrack once it matches the relevant subsection. Using there where
+# not to backtrack once it matches the relevant subsection. Using this where
 # possible _hugely_ speeds up matching, and seems to be safe. At least, the
 # tests pass.
 
@@ -100,8 +100,8 @@ my $TableRow = qr{ (?>$PipeRow)        # must have at least one starting row
                      (?:
                        $ColonRow
                        \n
-                     )*
-                   )                   # ... can have 0+ continuation lines
+                     )*                # ... can have 0+ continuation lines
+                   )
                  }xm;
 
 my $HeaderMarkerLine = qr/^[\-\+=]+\n/xm;
@@ -467,7 +467,7 @@ Markdent::Dialect::Theory::BlockParser - Block parser for Theory's proposed Mark
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 DESCRIPTION
 
@@ -504,7 +504,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dave Rolsky.
+This software is copyright (c) 2020 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

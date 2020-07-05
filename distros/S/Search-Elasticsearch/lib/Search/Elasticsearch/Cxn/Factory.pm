@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Cxn::Factory;
-$Search::Elasticsearch::Cxn::Factory::VERSION = '6.80';
+$Search::Elasticsearch::Cxn::Factory::VERSION = '6.81';
 use Moo;
 use Search::Elasticsearch::Util qw(parse_params load_plugin);
 use namespace::clean;
@@ -47,7 +47,7 @@ Search::Elasticsearch::Cxn::Factory - Used by CxnPools to create new Cxn instanc
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

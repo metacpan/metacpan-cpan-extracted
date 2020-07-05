@@ -9,15 +9,11 @@ package TestCase::Lib::SPVM::Util {
   use SPVM::Time (time);
   use SPVM::EqualityChecker;
   use SPVM::Util;
-  use SPVM::EqualityChecker::Address;
+  use SPVM::EqualityChecker::SameObject;
 
   use SPVM::Util (
     chomp_lf,
     chomp_crlf,
-    complex_darray,
-    complex_farray,
-    complexd,
-    complexf,
     copy_barray,
     copy_sarray,
     copy_iarray,
@@ -1060,56 +1056,6 @@ package TestCase::Lib::SPVM::Util {
     return 1;
   }
 
-  sub test_complex_farray : int () {
-    my $z_array = complex_farray(
-      [FLT_MIN(), 2, 4],
-      [(float)1,  3, 5]
-    );
-
-    if ($z_array->[0]{re} == FLT_MIN() && $z_array->[0]{im} == 1
-      && $z_array->[1]{re} == 2 && $z_array->[1]{im} == 3
-      && $z_array->[2]{re} == 4 && $z_array->[2]{im} == 5)
-    {
-      return 1;
-    }
-    
-    return 0;
-  }
-
-  sub test_complex_darray : int () {
-    my $z_array = complex_darray(
-      [DBL_MIN(), 2, 4],
-      [(double)1, 3, 5]
-    );
-
-    if ($z_array->[0]{re} == DBL_MIN() && $z_array->[0]{im} == 1
-      && $z_array->[1]{re} == 2 && $z_array->[1]{im} == 3
-      && $z_array->[2]{re} == 4 && $z_array->[2]{im} == 5)
-    {
-      return 1;
-    }
-    
-    return 0;
-  }
-  
-  sub test_complexf : int () {
-    my $z = complexf(FLT_MIN(), FLT_MIN() + 1);
-    if ($z->{re} == FLT_MIN() && $z->{im} == FLT_MIN() + 1) {
-      return 1;
-    }
-    
-    return 0;
-  }
-
-  sub test_complexd : int () {
-    my $z = complexd(DBL_MIN(), DBL_MIN() + 1);
-    if ($z->{re} == DBL_MIN() && $z->{im} == DBL_MIN() + 1) {
-      return 1;
-    }
-    
-    return 0;
-  }
-
   sub test_strtoi : int () {
     # 10 digit minimal and return type is int
     {
@@ -2099,7 +2045,7 @@ package TestCase::Lib::SPVM::Util {
       
       my $elems = [$minimal1, $minimal2, $minimal3, $minimal4];
       my $slice = (TestCase::Minimal[])sliceo($elems, 0, 4);
-      unless (SPVM::Util->equals_oarray($slice, [$minimal1, $minimal2, $minimal3, $minimal4], SPVM::EqualityChecker::Address->new)) {
+      unless (SPVM::Util->equals_oarray($slice, [$minimal1, $minimal2, $minimal3, $minimal4], SPVM::EqualityChecker::SameObject->new)) {
         return 0;
       }
     }
@@ -2111,7 +2057,7 @@ package TestCase::Lib::SPVM::Util {
       
       my $elems = [$minimal1, $minimal2, $minimal3, $minimal4];
       my $slice = (TestCase::Minimal[])sliceo($elems, 1, 2);
-      unless (SPVM::Util->equals_oarray($slice, [$minimal2, $minimal3], SPVM::EqualityChecker::Address->new)) {
+      unless (SPVM::Util->equals_oarray($slice, [$minimal2, $minimal3], SPVM::EqualityChecker::SameObject->new)) {
         return 0;
       }
     }
@@ -2234,7 +2180,7 @@ package TestCase::Lib::SPVM::Util {
       
       my $nums = [$minimal1, $minimal2, $minimal3];
       reverseo($nums);
-      unless (SPVM::Util->equals_oarray($nums, [$minimal3, $minimal2, $minimal1], SPVM::EqualityChecker::Address->new)) {
+      unless (SPVM::Util->equals_oarray($nums, [$minimal3, $minimal2, $minimal1], SPVM::EqualityChecker::SameObject->new)) {
         return 0;
       }
     }

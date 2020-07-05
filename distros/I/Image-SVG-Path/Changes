@@ -1,5 +1,10 @@
 Revision history for perl module Image::SVG::Path
 
+0.33 2020-06-27
+
+* Add support for no_shortcuts and absolute for quadratic beziers (kekoa)
+* Improve support for smooth curves (kekoa)
+
 0.32 2017-11-07
 
 * Split path rather than use regex (Alexander Gorlov)

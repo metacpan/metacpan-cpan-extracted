@@ -13,13 +13,13 @@ with 'Vote::Count::TieBreaker';
 
 use Storable 3.15 'dclone';
 
-our $VERSION='1.01';
+our $VERSION='1.03';
 
 =head1 NAME
 
 Vote::Count::IRV
 
-=head1 VERSION 1.01
+=head1 VERSION 1.03
 
 =cut
 
@@ -27,11 +27,7 @@ Vote::Count::IRV
 
 no warnings 'experimental';
 use List::Util qw( min max );
-
-# use Vote::Count::RankCount;
-# use Try::Tiny;
-use TextTableTiny 'generate_markdown_table';
-# use Data::Printer;
+use Vote::Count::TextTableTiny 'generate_markdown_table';
 #use Data::Dumper;
 
 sub _ResolveTie ( $self, $active, $tiebreaker, @choices ) {
@@ -137,7 +133,9 @@ Instant Runoff Voting is also known as Alternative Vote and as the Hare Method.
 
 There is no standard accepted method for IRV tie resolution, Eliminate All is a common one and the default.
 
-Returns a tie when all of the remaining choices are in a tie. An optional value to RunIRV is to specify tiebreaker, see TieBreaker.
+Returns a tie when all of the remaining choices are in a tie. 
+
+An optional value to RunIRV is to specify tiebreaker, see TieBreaker.
 
 =head2 RunIRV
 

@@ -18,6 +18,7 @@ use Test::More 0.88;	# Because of done_testing();
 
 use constant RANDOM_CMD =>
     '2d8S4rU0svlIoqpA01ntUV1w_NWiKZ8TvSbbhnmYkvLPCHhv8ccYxCLIXNlQcnVv';
+use constant CAN_MAN_MAN => run( COMMAND => [ qw{ man -w 1 man } ] ) || 0;
 
 # This mess is because if Devel::Hide or Test::Without::Module is
 # specified on the command line or in an enclosing file, a straight
@@ -57,6 +58,12 @@ BEGIN {
 
     diag '';
     diag $t->configuration( 'Default' );
+    diag 'CAN_MAN_MAN is ', CAN_MAN_MAN ? 'true' : 'false';
+    CAN_MAN_MAN
+	or diag <<'EOD';
+The man (1) program appears to be available, but man -w man appears not
+to work. Tests of man links will be skipped.
+EOD
 
     # Encapsulation violation for testing purposes. DO NOT try this at
     # home.
@@ -131,16 +138,19 @@ BEGIN {
     SKIP: {
 	$t->man()
 	    or skip 'This system does not support the testing of man links', 2;
+	CAN_MAN_MAN
+	    or skip q<This system is unable to run 'man -w man'>, 2;
 
 	my ( $fail, $pass, $skip );
 
-	( $fail, $pass, $skip ) = $t->pod_file_ok( 't/data/pod_ok/man.pod' )
-	    or do {
-	    diag "Fail = $fail; pass = $pass; skip = $skip";
+	( $fail, $pass, $skip ) = $t->pod_file_ok( 't/data/pod_ok/man.pod' );
+	if ( $fail ) {
+	    diag "Fail = $fail; pass = $pass; skip = $skip; CAN_MAN_MAN = ",
+		CAN_MAN_MAN;
 	    # TODO ditch the following once I have sorted out the test
 	    # failure
 	    diag 'Links found: ', explain $t->{_links};
-	};
+	}
 
 	run( COMMAND => [ qw{ man -w 1 }, RANDOM_CMD ] )
 	    and skip "Against all expectation, '@{[ RANDOM_CMD
@@ -220,6 +230,13 @@ BEGIN {
     $t->pod_file_ok( 't/data/pod_ok/bug_leading_format_code.pod' );
 
     $t->pod_file_ok( 't/data/pod_ok/bug_recursion.pod' );
+
+}
+
+{
+    my $t = Test::Pod::LinkCheck::Lite->new(
+	man	=> CAN_MAN_MAN,
+    );
 
     note '';
     $t->all_pod_files_ok( 't/data/pod_ok' );

@@ -1,13 +1,13 @@
 use strict;
 use warnings;
 
-use Test2::V0;
-
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/../t/lib";
 
 use File::Basename qw( basename );
 use File::Find qw( find );
 use File::Slurper qw( read_text );
+use Test2::V0;
 use Test::Markdent;
 
 my @files;
@@ -28,7 +28,7 @@ find(
         },
         no_chdir => 1,
     },
-    't/mdtest-data'
+    "$Bin/../t/mdtest-data",
 );
 
 for my $pair ( sort { $a->[0] cmp $b->[0] } @files ) {

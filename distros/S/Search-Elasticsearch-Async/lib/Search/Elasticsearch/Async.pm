@@ -1,6 +1,6 @@
 package Search::Elasticsearch::Async;
 
-our $VERSION = '6.80';
+our $VERSION = '6.81';
 use Search::Elasticsearch 6.00;
 use Promises 0.93 ();
 use parent 'Search::Elasticsearch';
@@ -47,7 +47,7 @@ Search::Elasticsearch::Async - Async API for Elasticsearch using Promises
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 SYNOPSIS
 

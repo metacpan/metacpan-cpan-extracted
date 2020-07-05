@@ -13,7 +13,7 @@ use Exporter qw/ import /;
 our @EXPORT    = qw( conjunction );
 our @EXPORT_OK = @EXPORT;
 
-our $VERSION = 'v2.1.2';
+our $VERSION = 'v2.1.4';
 
 # Language-specific definitions (these may not be correct, and certainly
 # they are not complete... E-mail corrections and additions to the author
@@ -37,6 +37,7 @@ my %language = (
     'es' => { sep => ',', alt => ";", pen => 1, con => 'y',   dis => 'o' },
     'fi' => { sep => ',', alt => ";", pen => 1, con => 'ja',  dis => 'tai' },
     'fr' => { sep => ',', alt => ";", pen => 0, con => 'et',  dis => 'ou' },
+    'id' => { sep => ',', alt => ";", pen => 1, con => 'dan', dis => 'atau' },
     'it' => { sep => ',', alt => ";", pen => 1, con => 'e',   dis => 'o' },
     'la' => { sep => ',', alt => ";", pen => 1, con => 'et',  dis => 'vel' },
     'nl' => { sep => ',', alt => ';', pen => 1, con => 'en',  dis => 'of' },
@@ -126,7 +127,7 @@ Lingua::Conjunction - Convert lists into simple linguistic conjunctions
 
 =head1 VERSION
 
-version v2.1.2
+version v2.1.4
 
 =head1 SYNOPSIS
 
@@ -163,9 +164,20 @@ calling the appropriate subroutine:
     Lingua::Conjunction->lang('en');   # use 'and' (default)
     Lingua::Conjunction->lang('es');   # use 'y'
 
-Supported languages in this version are English, Spanish, French, Italian,
-German, Portuguese, Norwegian, Danish, Dutch, Afrikaans, Swahili, and Latin.
-(Klingon is intentionally not supported.)
+Supported languages in this version are
+Afrikaans,
+Danish,
+Dutch,
+English,
+French,
+German,
+Indonesian,
+Italian,
+Latin,
+Norwegian,
+Portuguese,
+Spanish,
+and Swahili.
 
 You can also set connectives individually:
 
@@ -230,15 +242,25 @@ Damian Conway <damian@conway.org>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Mohammad S Anwar
+=for stopwords Ade Ishs Mohammad S Anwar
+
+=over 4
+
+=item *
+
+Ade Ishs <adeishs@cpan.org>
+
+=item *
 
 Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 1999-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

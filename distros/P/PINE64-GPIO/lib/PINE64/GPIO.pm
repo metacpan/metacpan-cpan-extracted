@@ -3,7 +3,7 @@ use strict;
 
 package PINE64::GPIO;
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 #global vars
 
@@ -132,35 +132,35 @@ The PineA64's 40-pin PI-2 bus has the same pinout as the Raspberry Pi's
 40-pin GPIO, however this module has it's own GPIO pin numbering
 convention for the 26 GPIO pins as follows:
 
-Module#		Physical#	A64 sys#
-------------------------------------------
-0		3		227
-1		5		226
-2		7		362
-3		11		71
-4		13		233
-5		15		76
-6		19		64
-7		21		65
-8		23		66
-9		29		229
-10		31		230
-11		33		69
-12		35		73
-13		37		80
-14		8		32
-15		10		33
-16		12		72
-17		16		77
-18		18		78
-19		22		79
-20		24		67
-21		26		231
-22		32		68
-23		36		70
-24		38		74
-25		40		75
-
+ Module#		Physical#	A64 sys#
+ ------------------------------------------
+ 0		3		227
+ 1		5		226
+ 2		7		362
+ 3		11		71
+ 4		13		233
+ 5		15		76
+ 6		19		64
+ 7		21		65
+ 8		23		66
+ 9		29		229
+ 10		31		230
+ 11		33		69
+ 12		35		73
+ 13		37		80
+ 14		8		32
+ 15		10		33
+ 16		12		72
+ 17		16		77
+ 18		18		78
+ 19		22		79
+ 20		24		67
+ 21		26		231
+ 22		32		68
+ 23		36		70
+ 24		38		74
+ 25		40		75
+ 
 =head1 METHODS
 
 =head2 new()
@@ -172,7 +172,7 @@ Returns a new C<PINE64::GPIO> object.
 Takes the GPIO pin number and direction as arguments and exports it for use 
 as either an input or output. 
 
-Valid pin number arguments are 0-15, and the direction is either 'in' or 'out'.  
+Valid pin number arguments are 0-25, and the direction is either 'in' or 'out'.  
 
 $p64->gpio_enable(25, 'out');
 

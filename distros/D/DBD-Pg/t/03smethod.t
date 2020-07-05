@@ -21,7 +21,7 @@ my $dbh = connect_database();
 if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 128;
+plan tests => 136;
 
 isnt ($dbh, undef, 'Connect to database for statement handle method testing');
 
@@ -747,6 +747,26 @@ is_deeply ($sth->pg_canonical_names, [
     undef
 ], $t);
 
+$t=q{2Statement handle method "pg_canonical_names" returns expected values};
+$sth = $dbh->prepare('SELECT id, id AS not_id, id + 1 AS not_a_simple FROM dbd_pg_test LIMIT 1');
+$sth->execute;
+
+is_deeply ($sth->pg_canonical_names, [
+    'dbd_pg_testschema.dbd_pg_test.id',
+    'dbd_pg_testschema.dbd_pg_test.id',
+    undef
+], $t);
+
+$t=q{3Statement handle method "pg_canonical_names" returns expected values};
+$sth = $dbh->prepare('SELECT id, id AS not_id, id + 1 AS not_a_simple FROM dbd_pg_test LIMIT 1');
+$sth->execute;
+
+is_deeply ($sth->pg_canonical_names, [
+    'dbd_pg_testschema.dbd_pg_test.id',
+    'dbd_pg_testschema.dbd_pg_test.id',
+    undef
+], $t);
+
 #
 # Test of the statement handle methods "pg_canonical_ids"
 #
@@ -763,6 +783,32 @@ $t=q{first and second array elements must be the same};
 is_deeply ($data->[0], $data->[1], $t);
 
 $sth->finish;
+
+
+#
+# Test for regression reported in GitHub issue #72:
+# Perl length() returns the wrong value on array elements returned by fetchrow_arrayref()
+#
+
+{
+    $t = q{Statement handle fetched strings give correct length()};
+    my @strings = qw(
+        abcdefghij
+        abcd
+        abcdefg
+        abcdefghijklmno
+        a
+        abcdefghijklmnopqrstuvwxyz
+    );
+    $SQL = join(q{ UNION ALL }, ('SELECT ?,?') x @strings) . q{ ORDER BY 1};
+    $sth = $dbh->prepare($SQL);
+    my $i = 0;
+    $sth->execute(map { $i++, $_ } @strings);
+    while (my $row = $sth->fetchrow_arrayref) {
+        is(length($row->[1]), length(shift(@strings)), 'Perl length() of returned string');
+    }
+    $sth->finish;
+}
 
 
 cleanup_database($dbh,'test');

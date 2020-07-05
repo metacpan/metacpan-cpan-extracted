@@ -11,12 +11,7 @@ use Socket ':all';
 use Time::HiRes qw/time/;
 use Net::SockAddr;
 use Net::SSLeay;
-use Panda::Lib::Logger;
 
-#set_native_logger(sub {
-#    my ($level, $cp, $msg) = @_;
-#    say ("$cp $msg");
-#});
 $SIG{PIPE} = 'IGNORE';
 my $l = UE::Loop->default;
 

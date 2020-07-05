@@ -12,7 +12,7 @@ use warnings;
 use LWP::Protocol::https;
 use URI::Escape qw/uri_escape_utf8/;
 use JSON;
-our $VERSION = '0.7';    # VERSION
+our $VERSION = '0.8';    # VERSION
 
 # ABSTRACT: Perl interface to sck.pm
 
@@ -20,7 +20,7 @@ use 5.006;
 
 use parent qw( WWW::Shorten::generic Exporter );
 use vars qw(@EXPORT_OK %EXPORT_TAGS);
-@EXPORT_OK = qw( makeashorterlink makealongerlink );
+@EXPORT_OK   = qw( makeashorterlink makealongerlink );
 %EXPORT_TAGS = ( all => [@EXPORT_OK] );
 
 use Carp;
@@ -70,7 +70,7 @@ WWW::Shorten::SCK - Perl interface to sck.pm
 
 =head1 VERSION
 
-version 0.7
+version 0.8
 
 =head1 SYNOPSIS
 

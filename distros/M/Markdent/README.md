@@ -4,7 +4,7 @@ Markdent - An event-based Markdown parser toolkit
 
 # VERSION
 
-version 0.36
+version 0.37
 
 # SYNOPSIS
 
@@ -129,7 +129,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
@@ -140,6 +140,7 @@ Dave Rolsky <autarch@urth.org>
 - Andrew Speer <andrew.speer@isolutions.com.au>
 - Denis Ibaev <dionys@gmail.com>
 - Jason McIntosh <jmac@appleseed-sc.com>
+- Jonas Smedegaard <dr@jones.dk>
 - Polina Shubina <925043@mai.com>
 - Shlomi Fish <shlomif@shlomifish.org>
 - Stefan Hornburg (Racke) <racke@linuxia.de>
@@ -147,7 +148,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dave Rolsky.
+This software is copyright (c) 2020 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

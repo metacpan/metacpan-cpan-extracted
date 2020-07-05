@@ -1,25 +1,42 @@
 ########################################################################
 # Verifies the message variables when loaded from parent module
-#   %nppm
-#   %nppidm
-#   %scimsg
+#   %NPPMSG
+#   %NPPIDM
+#   %SCIMSG
 ########################################################################
 use 5.010;
 use strict;
 use warnings;
-use Test::More tests => 3;
+sub nNotepad() { 13 };
+use Test::More tests => nNotepad+2;
 
 use Win32::Mechanize::NotepadPlusPlus::Notepad ':vars';
 
-my $count;
+my %hashes = (
+    '%NPPMSG' => \%NPPMSG,
+    '%VIEW' => \%VIEW,
+    '%MODELESS' => \%MODELESS,
+    '%STATUSBAR' => \%STATUSBAR,
+    '%MENUHANDLE' => \%MENUHANDLE,
+    '%INTERNALVAR' => \%INTERNALVAR,
+    '%LANGTYPE' => \%LANGTYPE,
+    '%WINVER' => \%WINVER,
+    '%WINPLATFORM' => \%WINPLATFORM,
+    '%NOTIFICATION' => \%NOTIFICATION,
+    '%DOCSTATUS' => \%DOCSTATUS,
+    '%NPPIDM' => \%NPPIDM,
+    '%ENCODINGKEY' => \%ENCODINGKEY,
+);
 
-eval '$count = scalar keys %nppm; 1' or do { $count = undef; };
-ok defined($count), '%nppm'; note sprintf 'keys %%nppm => %s', defined($count) ? $count : '<undef>';
+for my $name ( sort keys %hashes ) {
+    #diag explain $href;
+    ok scalar keys %{ $hashes{$name} }, "checking $name"
+        or diag "$name = ", explain $hashes{$name};
+}
 
-eval '$count = scalar keys %nppidm; 1' or do { $count = undef; };
-ok defined($count), '%nppidm'; note sprintf 'keys %%nppidm => %s', defined($count) ? $count : '<undef>';
+is scalar @Win32::Mechanize::NotepadPlusPlus::Notepad::EXPORT_VARS, nNotepad, 'number of exportable variables'
+    or diag explain \@Win32::Mechanize::NotepadPlusPlus::Notepad::EXPORT_VARS;
 
-eval '$count = scalar keys %scimsg; 1' or do { $count = undef; };
-ok !defined($count), '%scimsg undefined'; note sprintf 'keys %%scimsg => %s', defined($count) ? $count : '<undef>';
+is_deeply [sort @Win32::Mechanize::NotepadPlusPlus::Notepad::EXPORT_VARS], [sort keys %hashes], 'list of exportable variables';
 
 done_testing;

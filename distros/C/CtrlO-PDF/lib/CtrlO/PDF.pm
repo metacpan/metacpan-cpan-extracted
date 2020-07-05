@@ -12,7 +12,7 @@ use PDF::API2;
 use PDF::Table;
 use PDF::TextBlock;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME 
 
@@ -123,6 +123,11 @@ sub add_page
     $page->mediabox(0, 0, $self->width, $self->height);
     $self->_set_page($page);
     $self->_set__y($self->_y_start_default); # Reset y cursor
+    if ($self->logo && $self->pdf->pages > 1)
+    {
+        $self->_down($self->logo_height);
+        $self->_down($self->logo_padding);
+    }
     # Flag that we have just started a new page. Because text is positioned from
     # its bottom-left corner, we will need to move the cursor down further to
     # account for the font size of the text, but we don't know that yet.
@@ -353,6 +358,46 @@ sub _down
     $self->_set__y($y - $points);
 }
 
+=head2 y_position
+
+Returns the current y position on the page. This value updates as the page is
+written to, and is the location that content will be positioned at the next
+write. Note that the value is measured from the bottom of the page.
+
+=cut
+
+sub y_position
+{   my $self = shift;
+    $self->_y;
+}
+
+=head2 set_y_position($pixels)
+
+Sets the current Y position. See L</current_y>.
+
+=cut
+
+sub set_y_position
+{   my ($self, $y) = @_;
+    $y && $y =~ /^[0-9]+$/
+        or croak "Invalid y value for set_y_position: $y";
+    $self->_set__y($y);
+}
+
+=head2 move_y_position($pixels)
+
+Moves the current Y position, relative to its current value. Positive values
+will move the cursor up the page, negative values down. See L</current_y>.
+
+=cut
+
+sub move_y_position
+{   my ($self, $y) = @_;
+    $y && $y =~ /^[0-9]+$/
+        or croak "Invalid y value for move_y_position: $y";
+    $self->_set__y($self->_y + $y);
+}
+
 has _y => (
     is      => 'rwp',
     lazy    => 1,
@@ -368,7 +413,7 @@ sub _y_start_default
 
 Add a heading. If called on a new page, will automatically move the cursor down
 to account for the heading's height (based on the assumption that one pixel
-equals one point). Options available are C<size>, C<topmargin> and
+equals one point). Options available are C<size>, C<indent>, C<topmargin> and
 C<bottommargin>.
 
 =cut
@@ -386,7 +431,7 @@ sub heading
     my $tb  = PDF::TextBlock->new({
         pdf  => $self->pdf,
         page => $self->page,
-        x    => $self->_x,
+        x    => $self->_x + ($options{indent} || 0),
         y    => $self->_y,
         fonts => {
             b => PDF::TextBlock::Font->new({
@@ -405,14 +450,15 @@ sub heading
 
 =head2 text($text, %options)
 
-Add paragraph text. This will automatically paginate. Options available are C<color>.
+Add paragraph text. This will automatically paginate. Options available are
+C<size>, C<color> and C<indent>.
 
 =cut
 
 sub text
 {   my ($self, $string, %options) = @_;
     my $text = $self->page->text;
-    my $size = 10;
+    my $size = $options{size} || 10;
     $text->font($self->font, $size);
     $text->translate($self->_x, $self->_y);
     $text->fillcolor($options{color}) if $options{color};
@@ -420,18 +466,13 @@ sub text
     if ($self->is_new_page)
     {
         $self->_down($size);
-        if ($self->logo)
-        {
-            $self->_down($self->logo_height);
-            $self->_down($self->logo_padding);
-        }
         $self->_set_is_new_page(0);
     }
 
     my $tb  = PDF::TextBlock->new({
         pdf   => $self->pdf,
         page  => $self->page,
-        x     => $self->_x,
+        x     => $self->_x + ($options{indent} || 0),
         y     => $self->_y,
         w     => $self->_width_print,
         h     => $self->_y - $self->margin - 30,
@@ -457,8 +498,6 @@ sub text
         last unless $string; # while loop does not work with $string
         $self->add_page;
         $self->_down($size);
-        $self->_down($self->logo_height);
-        $self->_down($self->logo_padding);
         $tb  = PDF::TextBlock->new({
             pdf   => $self->pdf,
             page  => $self->page,
@@ -490,6 +529,9 @@ PDF::Table.
 
 sub table
 {   my ($self, %options) = @_;
+
+    # Move onto new page if little space left on this one
+    $self->add_page if $self->_y < 100;
 
     my $table = PDF::Table->new;
 

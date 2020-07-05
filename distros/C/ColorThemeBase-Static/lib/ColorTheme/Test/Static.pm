@@ -1,9 +1,9 @@
 package ColorTheme::Test::Static;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorThemeBase-Static'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Color::RGB::Util 'rand_rgb_color';
 
 our %THEME = (
     v => 2,
-    summary => 'A simple color theme',
+    summary => 'A static color theme',
     items => {
         color1 => 'ff0000',
         color2 => '00ff00',
@@ -28,7 +28,7 @@ our %THEME = (
 );
 
 1;
-# ABSTRACT: A color theme with static list of colors
+# ABSTRACT: A static color theme
 
 __END__
 
@@ -38,11 +38,11 @@ __END__
 
 =head1 NAME
 
-ColorTheme::Test::Static - A color theme with static list of colors
+ColorTheme::Test::Static - A static color theme
 
 =head1 VERSION
 
-This document describes version 0.006 of ColorTheme::Test::Static (from Perl distribution ColorThemeBase-Static), released on 2020-06-09.
+This document describes version 0.008 of ColorTheme::Test::Static (from Perl distribution ColorThemeBase-Static), released on 2020-06-19.
 
 =head1 HOMEPAGE
 

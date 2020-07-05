@@ -22,16 +22,16 @@ subtest "get_indicator, {total_,pos}, {total_,}target, percent_complete" => sub 
     my $p_a  = Progress::Any->get_indicator(task=>"a");
     is($p_a->pos, 0, "a's target");
     is($p_a->total_pos, 0, "a's target");
-    is_deeply($p_a->target, undef, "a's target");
-    is_deeply($p_a->total_target, undef, "a's total target");
-    is_deeply($p_a->percent_complete, undef, "a's percent_complete");
+    is_deeply($p_a->target, 0, "a's target");
+    is_deeply($p_a->total_target, 10, "a's total target");
+    is_deeply($p_a->percent_complete, 0, "a's percent_complete");
 
     my $p_ = Progress::Any->get_indicator(task=>"");
     is($p_->pos, 0, "root's target");
     is($p_->total_pos, 0, "root's target");
-    is_deeply($p_->target, undef, "root's target");
-    is_deeply($p_->total_target, undef, "root's total target");
-    is_deeply($p_->percent_complete, undef, "root's percent_complete");
+    is_deeply($p_->target, 0, "root's target");
+    is_deeply($p_->total_target, 10, "root's total target");
+    is_deeply($p_->percent_complete, 0, "root's percent_complete");
 
     my $p_abd = Progress::Any->get_indicator(task=>"a.b.d", target=>7, pos=>2);
     is($p_abd->pos, 2, "a.b.d's pos");

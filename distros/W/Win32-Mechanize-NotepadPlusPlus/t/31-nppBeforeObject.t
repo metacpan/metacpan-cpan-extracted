@@ -68,7 +68,7 @@ require_ok( 'Win32::Mechanize::NotepadPlusPlus' );
 
 # the objects should match
 note "verify it matches...\n";
-my $mwnd = Win32::Mechanize::NotepadPlusPlus::notepad()->{_hwnd};
+my $mwnd = Win32::Mechanize::NotepadPlusPlus::notepad()->hwnd();
 note "\n\t", sprintf "mwnd = %s\n", $mwnd//'<undef>';
 is $mwnd, $rwnd, 'verify the instance I intentionally ran matches the instance from the Notepad object';
 

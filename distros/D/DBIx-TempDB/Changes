@@ -1,5 +1,12 @@
 Revision history for perl distribution DBIx-TempDB
 
+0.16 2020-06-30T16:49:47+0900
+ - Add DBIx::TempDB::Util
+ - Can clean up temp databases manually
+ - Improved error reporting by replacing die() with croak()
+ - Remove support custom create_database_command
+ - Remove support custom drop_database_command
+
 0.15 2018-07-08T18:57:16+0800
  - Guarantee that database names are lower case #9
    Contributor: Christopher Eveland <chris@eyeson.ai>

@@ -3,17 +3,23 @@ use v5.14.1;
 
 use PICA::Data;
 use PICA::Schema;
+use PICA::Schema::Builder;
 use IO::File;
 use Getopt::Long;
 use Pod::Usage;
+use JSON::PP;
+use List::Util 'sum';
 
 GetOptions(
     'from|f=s'   => \(my $from),
-    'to|t:s'     => \(my $to = 0),
+    'to|t:s'     => \(my $to),
     'schema|s=s' => \(my $schema),
+    'build|b'    => \(my $build),
     'unknown|u!' => \(my $report_unknown),
     'count|c'    => \(my $count),
     'path|p=s'   => \(my $path),
+    'C'          => \(my $color),
+    'M'          => \(my $nocolor),
     'help|?'     => \(my $help)
 ) or pod2usage(2);
 pod2usage(-verbose => 99, -sections => "SYNOPSIS|OPTIONS|DESCRIPTION")
@@ -29,27 +35,65 @@ my %types = (
     xml    => 'XML',
     ppxml  => 'PPXML',
     json   => 'JSON',
+    ndjson => 'JSON',
 );
 
-my $fh;
-if (@ARGV) {
-    if (!$from && $ARGV[0] =~ /\.([a-z]+)$/ && $types{lc $1}) {
-        $from = $ARGV[0];
+my $input = '-';
+$from = shift @ARGV if @ARGV && !$from && $types{lc $ARGV[0]};
+if (!defined $path) {
+    my $pattern = '[012.][0-9.][0-9.][A-Z@.](\$[^|]+)?';
+    my @pathes;
+    while (@ARGV && $ARGV[0] =~ /^$pattern(\|$pattern)*$/) {
+        push @pathes, shift @ARGV;
     }
-    else {
-        $fh = IO::File->new($ARGV[0], "r")
-            or die "failed to open '$ARGV[0]'\n";
-    }
+    $path = join '|', @pathes;
 }
+
+my @pathes;
+my $sfpath;
+if (defined $path) {
+    @pathes = map {
+        my $p = eval {PICA::Path->new($_)};
+        $p || die "invalid pica path: $_\n";
+    } split /\|/, $path;
+
+    $sfpath = sum map {length $_->subfields > 0} @pathes;
+    die
+        "path expressions must either all select fields or select subfields!\n"
+        if $sfpath && $sfpath ne @pathes;
+}
+
+$input = shift @ARGV if @ARGV;
+
+$from = $1 if !$from && $input =~ /\.([a-z]+)$/ && $types{lc $1};
 
 $from = 'plain' unless $from;
 pod2usage("unknown serialization type: $from") unless $types{lc $from};
 
-$to = $from if $to eq '';
+$to = $from unless $to or $count;
 pod2usage("unknown serialization type: $to") unless !$to or $types{lc $to};
 
+if ($sfpath) {
+    $to    = undef;
+    $count = undef;
+}
+
+my $builder;
+if ($build) {
+    $builder = PICA::Schema::Builder->new;
+    $to      = undef;
+}
+
+my $fh = $input eq '-' ? *STDIN : IO::File->new($input, "r")
+    or die "failed to open '$input'\n";
 my $parser = "PICA::Parser::${types{$from}}"->new($fh, bless => 1);
-my $writer = $to ? "PICA::Writer::${types{$to}}"->new(utf8 => 0) : undef;
+
+my %options = (utf8 => 0);
+$options{color}
+    = {tag => 'blue', occurrence => 'blue', code => 'red', value => 'green',}
+    if !$nocolor && ($color || -t *STDOUT);
+
+my $writer = $to ? "PICA::Writer::${types{$to}}"->new(%options) : undef;
 
 my %schema_options = (ignore_unknown => !$report_unknown);
 
@@ -57,21 +101,17 @@ $count = {records => 0, holdings => 0, items => 0, fields => 0,} if $count;
 
 my $invalid = 0;
 if ($schema) {
-    use JSON::PP qw(decode_json);
     my $fh = IO::File->new($schema);
     $schema = PICA::Schema->new(decode_json(join "\n", <$fh>));
 }
 
-if ($path) {
-    my $compiled = eval {PICA::Path->new($path)};
-    die "invalid pica path: $path\n" unless $compiled;
-    $path = $compiled;
-}
-
 while (my $record = $parser->next) {
-    if ($path) {
-        $record = $record->fields($path);
+    if ($sfpath) {
+        say $_ for map {@{$record->match($_, split => 1) // []}} @pathes;
+        next;
     }
+
+    $record = $record->fields(@pathes) if @pathes;
 
     $writer->write($record) if $writer;
     if ($schema) {
@@ -85,6 +125,7 @@ while (my $record = $parser->next) {
             $invalid++;
         }
     }
+    $builder->add($record) if $builder;
     if ($count) {
         $count->{records}++;
         $count->{holdings} += @{$record->holdings};
@@ -102,6 +143,10 @@ if ($count) {
         qw(records invalid holdings items fields);
 }
 
+print JSON::PP->new->indent->space_after->canonical->convert_blessed->encode(
+    $builder->schema)
+    if $builder;
+
 __END__
 
 =head1 NAME
@@ -110,7 +155,7 @@ picadata - parse and validate PICA+ data
 
 =head1 SYNOPSIS
 
-picadata [--from TYPE] [--schema FILE] [--to [TYPE]] {OPTIONS} [FILE]
+picadata [[--from] TYPE] [--schema FILE] [--to [TYPE]] {OPTIONS} [FILE]
 
 =head1 DESCRIPTION
 
@@ -137,6 +182,12 @@ PICA serialization type to enable writing parsed PICA data.
 
 Count number of records, holdings, items, and fields.
 
+=head2 --path, -p
+
+Limit the record to fields specified by a simple PICA Path expression. Multiple
+expressions can be separated by or C<|>. Expressions must either all reference
+fields or all reference subfields, the latter to emit subfield values.
+
 =head2 --schema, -s
 
 L<Avram Schema|http://format.gbv.de/schema/avram/specification> to validate
@@ -146,12 +197,21 @@ against.
 
 Report unknown fields and subfields when validating (disabled by default).
 
-=head2 --path, -p
+=head2 --build, -b
 
-Limit the record to fields specified by a simple PICA Path expression.
+Build an Avram schema from given records.
+
+=head2 -C
+
+Colorize output. Only supported for PICA plain and PICA plus format.
+
+=head2 -M
+
+Monochrome (don't colorize output).
 
 =head1 SEE ALSO
 
-See L<Catmandu::PICA> for more elaborated command line processing of PICA+ data.
+See L<catmandu> for a more elaborated command line tool for data processing
+(transformation, API access...), including PICA+ with L<Catmandu::PICA>.
 
 =cut

@@ -24,6 +24,8 @@ Module::Build -> new (
 		'Getopt::Long'	=> 2.24, # for Configure qw(posix_default);
 		'Test::Pod' 	=> 0,
 		'File::Spec'	=> 0.82, # required for Pod::Parser, for ...
+		'Pod::Parser'	=> 0,
+		'IO::ScalarArray' => 0,
 		'Test::Pod::Coverage' => 0,
 	}
 ) -> create_build_script;

@@ -3,8 +3,6 @@
 
 namespace panda { namespace unievent { namespace backend {
 
-log::Module uebacklog("UniEvent::Backend");
-
 uint64_t HandleImpl::last_id;
 
 void LoopImpl::capture_exception () {

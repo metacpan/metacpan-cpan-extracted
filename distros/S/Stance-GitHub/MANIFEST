@@ -1,0 +1,12 @@
+CONDUCT.md
+CONTRIBUTING.md
+lib/Stance/GitHub.pm
+lib/Stance/GitHub/Issue.pm
+lib/Stance/GitHub/Organization.pm
+lib/Stance/GitHub/Repository.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Data::Dumper;
+use Zing::Launcher;
+
+=pod explain
+
+- zing-launcher is a Worker process, see ./examples/00-zing-worker ...
+- and as such it listens to 1+ queue(s), loads, instantiates, and ...
+- and executes (e.g. execute()) the received app scheme
+
+=cut
+
+(my $p = Zing::Launcher->new)->name;
+
+warn Dumper $p;

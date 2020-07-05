@@ -3,9 +3,9 @@ NAME
     terminal as color bar
 
 VERSION
-    This document describes version 0.246 of
+    This document describes version 0.247 of
     Progress::Any::Output::TermProgressBarColor (from Perl distribution
-    Progress-Any-Output-TermProgressBarColor), released on 2019-07-30.
+    Progress-Any-Output-TermProgressBarColor), released on 2020-06-20.
 
 SYNOPSIS
      use Progress::Any::Output;
@@ -115,6 +115,11 @@ METHODS
         after several seconds of seeming inactivity to indicate users that
         the process is still going on.
 
+    *   rownum => uint
+
+        Default 0. Can be set to put the progress bar at certain rownum.
+        This can be used to display several progress bars together.
+
   keep_delay_showing()
     Can be called to reset the timer that counts down to show progress bar
     when "show_delay" is defined. For example, if "show_delay" is 5 seconds
@@ -181,7 +186,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013
+    This software is copyright (c) 2020, 2018, 2017, 2016, 2015, 2014, 2013
     by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

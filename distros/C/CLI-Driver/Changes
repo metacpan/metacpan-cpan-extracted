@@ -1,5 +1,10 @@
 Revision history for CLI-Driver
 
+0.65 - added feature to allow invocation through a hash of values rather
+       than @ARGV
+       
+0.64 - changes to handle repeatable args
+
 0.63 - converted yaml sorting to use nsort from Util::Medley
 
 0.62 - fixed yaml sorting issue

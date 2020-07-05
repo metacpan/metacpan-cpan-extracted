@@ -1,9 +1,9 @@
 package Sah::Schemas::Currency;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Currency'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 1;
 # ABSTRACT: Various Sah currency schemas
@@ -20,7 +20,7 @@ Sah::Schemas::Currency - Various Sah currency schemas
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::Schemas::Currency (from Perl distribution Sah-Schemas-Currency), released on 2020-03-04.
+This document describes version 0.008 of Sah::Schemas::Currency (from Perl distribution Sah-Schemas-Currency), released on 2020-03-08.
 
 =head1 HOMEPAGE
 

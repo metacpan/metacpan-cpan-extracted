@@ -2,10 +2,8 @@ use 5.006;
 use strict;
 use warnings;
 
-use lib 'lib';
-
 package File::Util;
-$File::Util::VERSION = '4.161950';
+$File::Util::VERSION = '4.201720';
 use File::Util::Definitions qw( :all );
 use File::Util::Interface::Modern qw( :all );
 
@@ -2994,7 +2992,7 @@ File::Util - Easy, versatile, portable file handling
 
 =head1 VERSION
 
-version 4.161950
+version 4.201720
 
 =head1 DESCRIPTION
 

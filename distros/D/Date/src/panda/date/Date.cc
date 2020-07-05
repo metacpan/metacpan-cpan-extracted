@@ -100,6 +100,40 @@ void Date::validate_range () {
     }
 }
 
+uint8_t Date::week_of_month () const {
+    int thu = mday() + 4 - ewday();
+    return (thu + 6) / 7;
+}
+
+void Date::week_of_month (uint8_t val) {
+    int x = mday() + 1 - ewday(); // this week monday
+    x += 7 * (val - week_of_month());
+    if (x <= 0) x = 1;
+    auto days = days_in_month();
+    if (x > days) x = days;
+    mday(x);
+}
+
+uint8_t Date::weeks_in_year (int32_t year) {
+    auto jan1wday = (panda::time::christ_days(year) % 7) + 1;
+    // Years starting with a Thursday and leap years starting with a Wednesday have 53 weeks.
+    return (jan1wday == 4 || (jan1wday == 3 && panda::time::is_leap_year(year))) ? 53 : 52;
+}
+
+Date::WeekOfYear Date::week_of_year () const {
+    uint8_t week = (yday() + 10 - ewday()) / 7;
+    WeekOfYear ret = {week, year()};
+    if (week == 0) {
+        --ret.year;
+        ret.week = weeks_in_year(ret.year);
+    }
+    else if (week == 53 && weeks_in_year(ret.year) == 52) {
+        ++ret.year;
+        ret.week = 1;
+    }
+    return ret;
+}
+
 ptime_t Date::compare (const Date& operand) const {
     if (_has_epoch && operand._has_epoch) return epoch_cmp(_epoch, _mksec, operand._epoch, operand._mksec);
     else if (_zone != operand._zone) return epoch_cmp(epoch(), _mksec, operand.epoch(), operand._mksec);

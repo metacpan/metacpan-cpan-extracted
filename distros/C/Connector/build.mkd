@@ -10,6 +10,15 @@ Note: Replace '1.10' in the examples below with the current version.
     connver=1.10
     git flow release start $connver develop
 
+* Merge in any remote work (optional)
+
+    git remote update
+    git merge <remote-branch>
+
+* Run unit tests
+
+    perl Makefile.PL && make test
+
 * Bump version number in lib/Connector.pm
 
     perl -i -pe "s{our \\\$VERSION = .+}{our \\\$VERSION = '$connver';};" \
@@ -17,11 +26,13 @@ Note: Replace '1.10' in the examples below with the current version.
     git add lib/Connector.pm
     git commit -m "bump version to $connver"
 
-* Make any last-minute fixes
+* Make any last-minute fixes and re-test
+
+    perl Makefile.PL && make test
 
 * Finalize release (write the version number in the TAG\_MSG)
 
-    git flow release finish "$connver"
+    git flow release finish -m "$connver" "$connver"
     git push origin develop master "$connver"
 
 * Build tarball

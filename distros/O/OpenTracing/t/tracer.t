@@ -11,9 +11,10 @@ isa_ok($tracer->process, 'OpenTracing::Process');
 subtest duration => sub {
     isa_ok(my $span = $tracer->span, 'OpenTracing::SpanProxy');
     is($span->duration, undef, 'no duration yet');
-    Time::HiRes::sleep(0.1);
+    Time::HiRes::sleep(0.11);
     is($span->duration, undef, 'still no duration yet');
     $span->finish;
+    ok($span->is_finished, 'span is correctly marked as finished');
     cmp_ok($span->duration, '>=', 0.1, 'span duration is realistic');
     done_testing;
 };

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::1_0::Scroll;
-$Search::Elasticsearch::Client::1_0::Scroll::VERSION = '6.80';
+$Search::Elasticsearch::Client::1_0::Scroll::VERSION = '6.81';
 use Moo;
 use Search::Elasticsearch::Util qw(parse_params throw);
 use namespace::clean;
@@ -126,7 +126,7 @@ Search::Elasticsearch::Client::1_0::Scroll - A helper module for scrolled search
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 SYNOPSIS
 

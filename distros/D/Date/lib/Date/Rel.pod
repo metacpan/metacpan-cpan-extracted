@@ -30,10 +30,16 @@ Creates relative date from string in the following formats:
 =item Simple format [duration]
 
     1Y 2M 3D 4h 5m 6s
+    
+Possible keys: 'Y' or 'y' - years, 'M' - months, 'W' or 'w' - weeks, 'D' or 'd' - days, 'h' - hours, 'm' - minutes, 's' - seconds.
+
+Weeks (w/W) are immediately converted to days (x7) and do not persist in relative date object.
 
 =item ISO8601 time period format [duration]
 
     P1Y2M3DT4H5M6S
+
+    P1Y2M3WT4H5M6S
     
 =item ISO8601 time interval format [interval]
 
@@ -190,6 +196,8 @@ If current object is a duration, fallbacks to FORMAT_ISO8601D
 =back
 
 Any of YMDhms can be absent or negative. If all the parts YMDhms are 0, then "" is returned.
+
+Weeks are only for input, they are converted to days on input.
 
 
 =head4 ""

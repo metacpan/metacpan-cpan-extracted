@@ -6,7 +6,7 @@
 namespace panda { namespace protocol { namespace websocket {
 
 extern const std::error_category& error_category;
-extern log::Module pwslog;
+extern log::Module panda_log_module;
 
 enum class errc {
     garbage_after_connect = 1,

@@ -20,7 +20,7 @@ my $drv = WebDriver::Tiny->new(
     port         => 4444,
 );
 
-$drv->get('http://httpd:8080');
+$drv->get('http://httpd');
 
 is_deeply [ map $_->attr('name'), $drv->('form')->find('input,select') ], [
     'text', "text '", 'text "', 'text \\', 'text ☃',

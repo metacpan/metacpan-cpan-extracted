@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.0004
+    version 0.0005
 
 SYNOPSIS
 
@@ -25,7 +25,7 @@ FUNCTIONS
 
     Checks that the given $thing is a PDL object.
 
- pdl_is($got, $exp, $name);
+ pdl_is($got, $exp, $name)
 
     Checks that piddle $got is same as $exp.
 
@@ -73,7 +73,7 @@ CONTRIBUTOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2018 by Stephan Loyd.
+    This software is copyright (c) 2018-2020 by Stephan Loyd.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

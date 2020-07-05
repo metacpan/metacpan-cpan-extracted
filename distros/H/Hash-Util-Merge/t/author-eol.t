@@ -18,7 +18,6 @@ my @files = (
     'lib/Hash/Util/Merge.pm',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
-    't/author-clean-namespaces.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

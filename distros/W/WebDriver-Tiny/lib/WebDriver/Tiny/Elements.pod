@@ -18,8 +18,6 @@ WebDriver::Tiny::Elements
 
  $elems->send_keys('The quick brown fox jumps over the lazy dog');
 
-=head3 submit
-
 =head3 tap
 
 =head2 Attributes
@@ -36,20 +34,6 @@ WebDriver::Tiny::Elements
 
 Get a serialized HTML fragment describing the element including its
 descendants.
-
-=head3 location
-
-Get an element's location on the page.
-
-Accepts no arguments.
-Returns a hashref containing C<x> and C<y>.
-
-=head3 location_in_view
-
-Get an element's location on the screen once it has been scrolled into view.
-
-Accepts no arguments.
-Returns a hashref containing C<x> and C<y>.
 
 =head3 rect
 

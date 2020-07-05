@@ -27,7 +27,6 @@ my @files = (
     'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
-    'xt/author/pod-no404s.t',
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
     'xt/author/test-version.t',

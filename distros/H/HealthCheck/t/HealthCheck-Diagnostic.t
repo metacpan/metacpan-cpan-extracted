@@ -1,8 +1,5 @@
-use strict;
-use warnings;
-use Test::More;
-
-use HealthCheck::Diagnostic;
+use Test2::V0 -target => 'HealthCheck::Diagnostic',
+    qw< ok is like note context done_testing >;
 
 my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
 
@@ -35,42 +32,45 @@ use warnings 'once';
     local $SIG{__WARN__} = sub { push @warnings, @_ };
 
     my $warning_is = sub {
-        local $Test::Builder::Level = $Test::Builder::Level + 1;
         my ($message) = @_;
+        my $ctx = context();
 
         my $line = ( caller(0) )[2] - 2;
         my $at = 'at ' . __FILE__ . " line $line";
 
         my $warning = shift @warnings;
         $warning =~ s/0x[[:xdigit:]]+/0xHEX/g if $warning;
-        is $warning, "$message $at$nl";
+        my $res = is $warning, "$message $at$nl";
+
+        $ctx->release;
+        return $res;
     };
 
     @results = ({ label => 'As Class', status => 'WARNING' });
     my $expect = $results[0];
 
-    is_deeply( My::HealthCheck::Diagnostic->check, $expect,
+    is( My::HealthCheck::Diagnostic->check, $expect,
         "Called as a class has expected results from hashref");
-    is_deeply( My::HealthCheck::Diagnostic->new->check, $expect,
+    is( My::HealthCheck::Diagnostic->new->check, $expect,
         "Called as an object has expected results from hashref");
 
     ok !@warnings, "No warnings generated with hashref results";
 
     @results = %{ $results[0] };
-    is_deeply( My::HealthCheck::Diagnostic->check, $expect,
+    is( My::HealthCheck::Diagnostic->check, $expect,
         "Called as a class has expected results from even-sized-list");
-    is_deeply( My::HealthCheck::Diagnostic->new->check, $expect,
+    is( My::HealthCheck::Diagnostic->new->check, $expect,
         "Called as an object has expected results from even-sized-list");
 
     ok !@warnings, "No warnings generated with even-sized-list results";
 
     @results = ( 'broken' );
     $expect = { status => 'UNKNOWN' };
-    is_deeply( My::HealthCheck::Diagnostic->check, $expect,
+    is( My::HealthCheck::Diagnostic->check, $expect,
         "Called as a class has expected string result");
     $warning_is->(
         "Invalid return from My::HealthCheck::Diagnostic->run (broken)");
-    is_deeply( My::HealthCheck::Diagnostic->new->check, $expect,
+    is( My::HealthCheck::Diagnostic->new->check, $expect,
         "Called as an object has expected results from string result");
     $warning_is->(
         "Invalid return from My::HealthCheck::Diagnostic->run (broken)");
@@ -79,11 +79,11 @@ use warnings 'once';
 
     @results = ( [ { status => 'broken' } ] );
     $expect = { status => 'UNKNOWN' };
-    is_deeply( My::HealthCheck::Diagnostic->check, $expect,
+    is( My::HealthCheck::Diagnostic->check, $expect,
         "Called as a class has expected arrayref result");
     $warning_is->(
         "Invalid return from My::HealthCheck::Diagnostic->run (ARRAY(0xHEX))");
-    is_deeply( My::HealthCheck::Diagnostic->new->check, $expect,
+    is( My::HealthCheck::Diagnostic->new->check, $expect,
         "Called as an object has expected results from arrayref result");
     $warning_is->(
         "Invalid return from My::HealthCheck::Diagnostic->run (ARRAY(0xHEX))");
@@ -96,7 +96,7 @@ use warnings 'once';
     local *My::HealthCheck::Diagnostic::run = sub { die 'ded' };
     use warnings 'redefine';
     my $at = "at " . __FILE__ . " line " . ( __LINE__ - 2 );
-    is_deeply( My::HealthCheck::Diagnostic->check, {
+    is( My::HealthCheck::Diagnostic->check, {
             status => 'CRITICAL',
             info   => "ded $at.\n",
         }, "Exception in run was caught with CRITICAL consequences" );
@@ -110,38 +110,38 @@ use warnings 'once';
     local *My::HealthCheck::Diagnostic::check = sub { 'invalid' };
     use warnings 'once';
 
-    is_deeply( My::HealthCheck::Diagnostic->check, 'invalid',
+    is( My::HealthCheck::Diagnostic->check, 'invalid',
         "Called as a class has expected invalid result");
     ok !@warnings, "No validation, no warnings as overridden class method";
-    is_deeply( My::HealthCheck::Diagnostic->new->check, 'invalid',
+    is( My::HealthCheck::Diagnostic->new->check, 'invalid',
         "Called as an object has expected results from arrayref result");
     ok !@warnings, "No validation, no warnings as overridden instance method";
 }
 
 { note "Set and retrieve tags";
-    is_deeply [ My::HealthCheck::Diagnostic->new->tags ], [],
+    is [ My::HealthCheck::Diagnostic->new->tags ], [],
         "No tags set, no tags returned";
 
-    is_deeply [
+    is [
         My::HealthCheck::Diagnostic->new( tags => [qw(foo bar)] )->tags ],
         [qw( foo bar )], "Returns the tags passed in.";
 
-    is_deeply [ My::HealthCheck::Diagnostic->tags ], [],
+    is [ My::HealthCheck::Diagnostic->tags ], [],
         "Class method 'tags' has no tags, but also no exception";
 }
 
 {
     note "Attributes are copied into the result";
     @results = (
-        status => 'OK',
+        status  => 'OK',
 
-        foo => 1,
+        foo     => 1,
 
-        multi => { level => 1 },
+        multi   => { level => 1 },
 
-        undef => undef,
-        empty => '',
-        zero  => 0,
+        undef   => undef,
+        empty   => '',
+        zero    => 0,
     );
 
     my $diagnostic = My::HealthCheck::Diagnostic->new(
@@ -161,22 +161,59 @@ use warnings 'once';
     );
     $diagnostic->{qux} = ['u'];
 
-    is_deeply(
+    like(
         $diagnostic->check(
-            id     => 'ignored',
-            label  => 'ignored',
-            status => 'ignored',
-            tags   => [ 'bar', 'baz' ],    # not copied
-            foo    => 'ignored',
+            id      => 'ignored',
+            label   => 'ignored',
+            status  => 'ignored',
+            tags    => [ 'bar', 'baz' ],    # not copied
+            foo     => 'ignored',
+            runtime => 1,
         ),
-        {   id    => "my_id",
-            label => "My Label",
-            tags  => [ 'foo', 'bar' ],
+        {   id      => "my_id",
+            label   => "My Label",
+            tags    => [ 'foo', 'bar' ],
+            runtime => qr{^\d+\.\d\d\d$},
 
             @results,
         },
         "Copied only the expected attributes to the result"
     );
+
+    # Test that runtime is enabled when passing in truthy args.
+    my %runtime_args = (
+        q{1}          => 1,
+        q{'1'}        => '1',
+        q{[]}         => [], # Empty arrayref is truthy.
+    );
+    like (
+        $diagnostic->check(
+            id      => 'ignored',
+            label   => 'ignored',
+            status  => 'ignored',
+            runtime => $runtime_args{ $_ },
+        )->{runtime},
+        qr{^\d+\.\d{3}$},
+        "Runtime is enabled with $_ input arg."
+    ) foreach keys %runtime_args;
+
+    # Test that runtime is disabled when passing in falsy args.
+    %runtime_args = (
+        q{undef} => undef,
+        q{''}    => '',
+        q{0}     => 0,
+        q{'0'}   => '0',
+    );
+    is (
+        $diagnostic->check(
+            id      => 'ignored',
+            label   => 'ignored',
+            status  => 'ignored',
+            runtime => $runtime_args{ $_ },
+        )->{runtime},
+        undef,
+        "Runtime is disabled with $_ input arg."
+    ) foreach keys %runtime_args;
 
     # Don't copy these if they exist, even if undef
     push @results, ( id => undef, label => undef, tags => undef );
@@ -194,13 +231,13 @@ use warnings 'once';
     };
     my $at = sprintf "at %s line %d", __FILE__, __LINE__ - 8;
 
-    is_deeply $got, { @results, status => 'UNKNOWN', info => 'undefined id' },
+    is $got, { @results, status => 'UNKNOWN', info => 'undefined id' },
         "Didn't copy anything that was returned in the result already";
-    is_deeply \@warnings, ["Result 0 has undefined id $at$nl"],
+    is \@warnings, ["Result 0 has undefined id $at$nl"],
         "Warned about undef id in result";
 }
 
-is_deeply(
+is(
     HealthCheck::Diagnostic->summarize( {
         results => [ { results => [ { results => [ {
             results => [ { status => 'OK' }, { status => 'OK' } ]
@@ -212,7 +249,7 @@ is_deeply(
     "Summarize looks at sub-results for a status"
 );
 
-is_deeply( HealthCheck::Diagnostic->summarize( { results => [
+is( HealthCheck::Diagnostic->summarize( { results => [
     { status  => "OK" },
     { status  => "OK", id => "foo" },
     { status  => "OK" },
@@ -259,7 +296,7 @@ is_deeply( HealthCheck::Diagnostic->summarize( { results => [
         } );
     };
 
-    is_deeply $results, { status  => 'UNKNOWN', results => [
+    is $results, { status  => 'UNKNOWN', results => [
             { status => "UNKNOWN", id => "",  info => "invalid id ''" },
             { status => "UNKNOWN", id => "1", info => "undefined id" },
             { status => "UNKNOWN", id => "2", info => "invalid id ''" },
@@ -267,7 +304,7 @@ is_deeply( HealthCheck::Diagnostic->summarize( { results => [
             { status => "UNKNOWN", id => "4", info => "invalid id ''" },
     ] }, "Summarized additional blank results with numbers";
 
-    is_deeply( \@warnings, [ map {"Result $_ $at$nl"}
+    is( \@warnings, [ map {"Result $_ $at$nl"}
         "0- has invalid id ''",
         "0-1 has undefined id",
         "0- has invalid id ''",
@@ -470,10 +507,10 @@ is_deeply( HealthCheck::Diagnostic->summarize( { results => [
         };
         my $at = "at " . __FILE__ . " line " . ( __LINE__ - 2 );
 
-        is_deeply( $got, $test->{expect}, "$name Summarized statuses" )
+        is( $got, $test->{expect}, "$name Summarized statuses" )
             || diag explain $got ;
 
-        is_deeply(
+        is(
             \@warnings,
             [ map {"$_ $at$nl"} @{ $test->{warnings} || [] } ],
             "$name: Warned about incorrect status"
@@ -501,7 +538,7 @@ is_deeply( HealthCheck::Diagnostic->summarize( { results => [
     }
 
     s/0x[[:xdigit:]]+/0xHEX/g for @warnings;
-    is_deeply( \@warnings, [ map {"Result $_ $at$nl"} 
+    is( \@warnings, [ map {"Result $_ $at$nl"} 
         "fine-1 has undefined results",
         "fine-2 has invalid results ''",
         "fine-3 has invalid results 'a-string'",
@@ -539,7 +576,7 @@ is_deeply( HealthCheck::Diagnostic->summarize( { results => [
         } );
     }
 
-    is_deeply( \@warnings, [ map { "Result $_ $at$nl" }
+    is( \@warnings, [ map { "Result $_ $at$nl" }
         "fine-7 has undefined id",
         "fine- has invalid id ''",
         "fine-Not_OK_With_Capital_Letters has invalid id 'Not_OK_With_Capital_Letters'",
@@ -553,7 +590,7 @@ is_deeply( HealthCheck::Diagnostic->summarize( { results => [
 
 { note "Timestamp must be ISO8601";
     my $warnings_ok = sub {
-        local $Test::Builder::Level = $Test::Builder::Level + 1;
+        my $ctx = context();
         my ($timestamp, $num_warnings, $message) = @_;
         $message ||= $timestamp;
 
@@ -566,7 +603,10 @@ is_deeply( HealthCheck::Diagnostic->summarize( { results => [
         my @expect = ("Result 0 has invalid timestamp '$timestamp' $at$nl")
             x ( $num_warnings || 0 );
 
-        is_deeply \@warnings, \@expect, "$message: Expected warnings";
+        my $res = is \@warnings, \@expect, "$message: Expected warnings";
+
+        $ctx->release;
+        return $res;
     };
 
     my @tests = (

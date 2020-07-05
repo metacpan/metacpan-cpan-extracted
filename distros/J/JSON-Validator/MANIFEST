@@ -80,6 +80,7 @@ t/issue-42-cache-control.t
 t/issue-59-oneof-blessed-booleans.t
 t/issue-71-additionalproperties.t
 t/joi.t
+t/jv-allof-and-not.t
 t/jv-allof.t
 t/jv-anyof.t
 t/jv-array.t

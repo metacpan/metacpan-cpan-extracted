@@ -43,7 +43,6 @@ protected:
                 auto& row = reserve[i++]; // if exception is thrown, "i" must be the next unprocessed item
                 if (!row.cb || (row.guard.weak_count() && !row.guard)) continue; // skip callbacks with guard destroyed
                 auto cb = row.cb;
-                panda_mlog_debug(uebacklog, "on delay");
                 cb();
             }
         }, [&] { // return remaining callbacks to pool (if exception is thrown)

@@ -9,7 +9,7 @@ repository 'https://github.com/nebulous/WWW-Wunderground-API.git';
 
 build_requires 'Test::More';
 
-requires 'Moo'=>'1.0';
+requires 'Moo'=>'1.001000';
 requires 'LWP::Simple';
 requires 'XML::Simple';
 requires 'JSON::MaybeXS';

@@ -40,15 +40,15 @@ like:
 
 
 
-OpenTracing provides a instance method for a C<$tracer>, called
+OpenTracing provides an instance method for a C<$tracer>, called
 C<start_active_span> and returns a scope object. But scope object, according to
-the API spec need to be closed by the programmer and it will issue a warning if
+the API spec needs to be closed by the programmer and it will issue a warning if
 not done so.
 
 But that strategy becomes very inconvenient if a programmer wants to do 'return
 early' or bail out half way because of some other conditions.
 
-This being Perl, we can do better and use the feaures that would normally come
+This being Perl, we can do better and use the features that would normally come
 on the end of scope and could use a C<DESTROY> or C<DEMOLISH> method. But that
 would still send out a warning.
 
@@ -66,9 +66,9 @@ be required.
 
 =head2 start_guarded_span
 
-Starts a scope guarded span which will automagically gets closed once the proces
-runs out of the current scope. And it returns nothing tp prevent programmers to
-explicitely close the returned scope.
+Starts a scope guarded span which will automagically get closed once the process
+runs out of the current scope. It returns nothing, in order to prevent programmers
+from explicitly closing the returned scope.
 
 It does not need an operation_name, it will default to the current subroutine
 name. Other than that, it accepts any or all of the options for
@@ -84,7 +84,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-'OpenTracing::Implementation::NoOp' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+'OpenTracing::AutoScope' is Copyright (C) 2019 .. 2020, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

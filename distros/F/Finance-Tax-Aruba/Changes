@@ -1,5 +1,11 @@
 Revision history for Finance-Tax-Aruba
 
+0.002     2020-06-20 13:04:22Z
+
+    * Add pension support for 2020
+    * Fix typo in abstract (SHLOMIF)
+    * Remove unneeded test deps
+
 0.001     2020-06-14 01:03:32Z
 
     * Initial alpha release

@@ -50,6 +50,7 @@ sub run_hook {
 
     if ($hook eq 'package-keyrings') {
         return ('/usr/share/keyrings/debian-keyring.gpg',
+                '/usr/share/keyrings/debian-nonupload.gpg',
                 '/usr/share/keyrings/debian-maintainers.gpg');
     } elsif ($hook eq 'archive-keyrings') {
         return ('/usr/share/keyrings/debian-archive-keyring.gpg');
@@ -464,7 +465,7 @@ sub _build_tainted_by {
         next unless -l $pathname;
 
         my $linkname = readlink $pathname;
-        if ($linkname eq "usr$pathname") {
+        if ($linkname eq "usr$pathname" or $linkname eq "/usr$pathname") {
             $tainted{'merged-usr-via-symlinks'} = 1;
             last;
         }

@@ -3,6 +3,7 @@ package
 use strict;
 use warnings;
 use XS::Install::Payload;
+use Fcntl qw(:flock);   # import LOCK_* constants
 
 sub linearize_dependent {
     my $modules = shift;
@@ -39,17 +40,32 @@ sub linearize_dependent {
 sub cmd_sync_bin_deps {
     my $myself = shift @ARGV;
     my @modules = @ARGV;
-    foreach my $module (@modules) {
+    foreach my $module (sort @modules) {
+        my $file = XS::Install::Payload::binary_module_info_file($module);
+        my $lock_file = "$file.lock";
+        my $fh_lock;
+        open $fh_lock, '>', $lock_file or warn "Cannot open $lock_file for writing: $!\n";
+        if ($fh_lock) {
+            my $ok = eval { flock($fh_lock, LOCK_EX); 1 };
+            warn "Cannot lock $lock_file: $! ($@)\n" unless $ok;
+        }
+
         my $info = XS::Install::Payload::binary_module_info($module) or next;
         my $dependent = $info->{BIN_DEPENDENT} || [];
         my %tmp = map {$_ => 1} grep {$_ ne $module} @$dependent;
         $tmp{$myself} = 1;
         $info->{BIN_DEPENDENT} = linearize_dependent([keys %tmp]);
         delete $info->{BIN_DEPENDENT} unless @{$info->{BIN_DEPENDENT}};
-        my $file = XS::Install::Payload::binary_module_info_file($module);
         my $ok  = eval { module_info_write($file, $info); 1 };
         unless ($ok) {
             warn("Reverse dependency write failed: $@");
+        }
+        if ($fh_lock) {
+            my $ok = eval {
+                flock($fh_lock, LOCK_UN) or warn "Cannot unlock $lock_file: $!\n";
+                unlink($lock_file);
+            };
+            warn "Cannot unlock $lock_file: $! ($@)\n" unless $ok;
         }
     }
 }
@@ -131,9 +147,12 @@ sub module_info_write {
             chmod $mode, $file;
         }
     }
-    open my $fh, '>', $file or die "Cannot open $file for writing: $!, binary data could not be written\n";
+
+    my $temp_file = "$file.$$";
+    open my $fh, '>', $temp_file or die "Cannot open $temp_file for writing: $!, binary data could not be written\n";
     print $fh $content;
     close $fh;
+    rename $temp_file, $file || die("Cannot rename $temp_file to $file\n");
 
     chmod $restore_mode, $file if $restore_mode; # restore old perms if we changed it
 }

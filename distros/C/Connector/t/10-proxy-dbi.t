@@ -8,7 +8,7 @@ use DBI;
 use Log::Log4perl qw(:easy);
 use File::Temp qw/ :POSIX /;
 
-use Test::More;
+use Test::More tests => 22;
 
 eval {
     require DBD::SQLite;
@@ -119,5 +119,3 @@ eval { $res = $conn->get_hash('%test%');};
 ok($EVAL_ERROR);
 
 unlink($dbfile);
-
-done_testing();

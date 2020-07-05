@@ -10,12 +10,9 @@ use Protocol::WebSocket::Fast;
 XS::Loader::load();
 
 if ($ENV{LOGGER}) {
-    require Panda::Lib::Logger;
-    Panda::Lib::Logger::set_native_logger(sub {
-        my ($level, $code, $msg) = @_;
-        say "$level $code $msg";
-    });
-    Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_VERBOSE_DEBUG());
+    require XLog;
+    XLog::set_logger(sub { say $_[1] });
+    XLog::set_level(XLog::VERBOSE_DEBUG());
 }
 
 sub accept_packet {

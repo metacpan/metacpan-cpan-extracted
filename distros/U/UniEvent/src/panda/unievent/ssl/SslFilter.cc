@@ -1,8 +1,6 @@
 #include "SslFilter.h"
 #include "SslBio.h"
-#include "../Debug.h"
 #include "../Stream.h"
-//#include <vector>
 #include <openssl/err.h>
 #include <openssl/dh.h>
 #include <openssl/conf.h>
@@ -16,9 +14,6 @@
 #define PROFILE_STR profile == Profile::CLIENT ? "client" : "server"
 
 namespace panda { namespace unievent { namespace ssl {
-
-log::Module ssllog("UniEvent::SSL", log::Warning);
-static auto& panda_log_module = ssllog;
 
 #define _ESSL(fmt, ...) do { \
     char _log_buf_[1000]; \
@@ -38,11 +33,11 @@ static bool init_openssl_lib () {
 }
 static const bool _init = init_openssl_lib();
 
-static inline SSL_CTX* ssl_ctx_from_method (const SSL_METHOD* method) {
+static inline SslContext ssl_ctx_from_method (const SSL_METHOD* method) {
     if (!method) method = SSLv23_client_method();
     auto context = SSL_CTX_new(method);
     if (!context) throw Error(make_ssl_error_code(SSL_ERROR_SSL));
-    return context;
+    return SslContext::attach(context);
 }
 
 static inline ErrorCode nest_ssl_error (const ErrorCode& err) { return err ? nest_error(errc::ssl_error, err) : err; }
@@ -54,10 +49,10 @@ struct SslWriteRequest : WriteRequest {
 };
 using SslWriteRequestSP = iptr<SslWriteRequest>;
 
-SslFilter::SslFilter (Stream* stream, SSL_CTX* context, const SslFilterSP& server_filter)
+SslFilter::SslFilter (Stream* stream, const SslContext &context, const SslFilterSP& server_filter)
         : StreamFilter(stream, TYPE, PRIORITY), state(State::initial), profile(Profile::UNKNOWN), server_filter(server_filter)
 {
-    _ECTOR();
+    panda_log_ctor();
     if (stream->listening() && !SSL_CTX_check_private_key(context)) throw Error("SSL certificate&key needed to listen()");
     #ifdef RENEGOTIATION_DISABLED
         SSL_CTX_set_options(context, SSL_OP_NO_RENEGOTIATION);
@@ -66,17 +61,16 @@ SslFilter::SslFilter (Stream* stream, SSL_CTX* context, const SslFilterSP& serve
 }
 
 SslFilter::SslFilter (Stream* stream, const SSL_METHOD* method) : SslFilter(stream, ssl_ctx_from_method(method)) {
-    SSL_CTX_free(SSL_get_SSL_CTX(ssl)); // it is refcounted, release ctx created from ssl_ctx_from_method
 }
 
 SslFilter::~SslFilter () {
-    _EDTOR();
+    panda_log_dtor();
     SSL_free(ssl);
 }
 
-void SslFilter::init (SSL_CTX* context) {
-    ssl = SSL_new(context);
-    if (!ssl) throw Error(make_ssl_error_code(SSL_ERROR_SSL));
+void SslFilter::init (const SslContext& context) {
+    auto raw_ssl = SSL_new(context);
+    if (!raw_ssl) throw Error(make_ssl_error_code(SSL_ERROR_SSL));
 
     read_bio = BIO_new(SslBio::method());
     if (!read_bio) throw Error(make_ssl_error_code(SSL_ERROR_SSL));
@@ -86,7 +80,8 @@ void SslFilter::init (SSL_CTX* context) {
 
     SslBio::set_handle(read_bio, handle);
     SslBio::set_handle(write_bio, handle);
-    SSL_set_bio(ssl, read_bio, write_bio);
+    SSL_set_bio(raw_ssl, read_bio, write_bio);
+    ssl = raw_ssl;
 }
 
 void SslFilter::listen () {
@@ -105,7 +100,7 @@ void SslFilter::reset () {
     state = State::initial;
 
     // hard reset
-    SSL* oldssl = ssl;
+    auto oldssl = ssl;
     init(SSL_get_SSL_CTX(oldssl));
     SSL_free(oldssl);
     //// soft reset - openssl docs say it should work, but IT DOES NOT WORK!
@@ -278,7 +273,8 @@ void SslFilter::handle_read (string& encbuf, const ErrorCode& err) {
     int ssl_code = SSL_get_error(ssl, ret);
     _ESSL("errno=%d, err=%d", ssl_code, ERR_GET_LIB(ERR_peek_last_error()));
 
-    if (ssl_code == SSL_ERROR_ZERO_RETURN || ssl_code == SSL_ERROR_WANT_READ) return;
+    if (ssl_code == SSL_ERROR_WANT_READ) return;
+    if (ssl_code == SSL_ERROR_ZERO_RETURN) return NextFilter::handle_eof();
 
     if (ssl_code == SSL_ERROR_WANT_WRITE) { // not sure it is posssible with forbidden renegotiation, docs say that "As at any time it's possible that non-application data needs to be sent, a read function can also cause write operations"
         string wbuf = SslBio::steal_buf(write_bio);
@@ -334,7 +330,7 @@ void SslFilter::handle_write (const ErrorCode& err, const WriteRequestSP& req) {
         if (sslreq->final) {
             negotiation_finished(); // delayed negotiation_finished() for server with the results of last write request
             auto has_message = BIO_ctrl(read_bio, BIO_CTRL_PENDING, 0, nullptr);
-            if (has_message) {
+            if (has_message && server_filter.lock()) { // in case of dead server no need to call callbacks
                 string fake;
                 handle_read(fake, {});
             }

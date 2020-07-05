@@ -10,8 +10,7 @@ use POSIX ":sys_wait_h";
 
 use Path::Tiny 0.058 qw/path tempfile/; # 0.018 needed for rootdir and cwd; 0.058 needed for sibling
 
-use Win32::Mechanize::NotepadPlusPlus qw/:main/;  # for %scimsg
-use Win32::Mechanize::NotepadPlusPlus::__sci_msgs;  # for %scimsg
+use Win32::Mechanize::NotepadPlusPlus qw/:main :vars/;  # for %SCIMSG
 
 =head1 NAME
 
@@ -74,7 +73,7 @@ my $_savePID;
 BEGIN { $_savePID = $$; }
 END   { sleep($_END_DELAY) if $_savePID and $$ != $_savePID; }
 
-our @EXPORT_OK = qw/runCodeAndClickPopup saveUserSession restoreUserSession wrapGetLongPathName/;
+our @EXPORT_OK = qw/runCodeAndClickPopup saveUserSession restoreUserSession wrapGetLongPathName dumper/;
 our @EXPORT = qw/runCodeAndClickPopup/;
 our %EXPORT_TAGS = (
     userSession => [qw/saveUserSession restoreUserSession/],
@@ -107,10 +106,10 @@ sub __runCodeAndClickPopup {
     if(!defined $pid) { # failed
         die "fork failed: $!";
     } elsif(!$pid) {    # child: pid==0
-        my $f = WaitWindowLike(0, $re, undef, undef, 3, 10);
+        my $f = WaitWindowLike(0, $re, undef, undef, 3, 10);    # parent, title, class, id, depth, wait
         my $p = GetParent($f);
         if($DEBUG_INFO) {
-            note "runCodeAndClickPopup(..., $re, $n, $xtraDelay):\n";
+            note "runCodeAndClickPopup(..., /$re/, n:$n, delay:$xtraDelay): ", scalar(localtime), "\n";
             note sprintf qq|\tfound: %d t:"%s" c:"%s"\n\tparent: %d t:"%s" c:"%s"\n|,
                 $f, GetWindowText($f), GetClassName($f),
                 $p, GetWindowText($p), GetClassName($p),
@@ -118,7 +117,9 @@ sub __runCodeAndClickPopup {
         }
         # Because localization, cannot assume YES button will match qr/\&Yes/
         #   instead, assume $n-th child of spawned dialog is always the one that you want
-        my @buttons = FindWindowLike( $f, undef, qr/^Button$/, undef, 2);
+
+        WaitWindowLike($f, undef, qr/^Button$/, undef, 2, 2);   # parent, title, class, id, depth, wait -- wait up to 2s for Button
+        my @buttons = FindWindowLike( $f, undef, qr/^Button$/, undef, 2);   # then list all the buttons
         if($DEBUG_INFO) {
             note sprintf "\tbutton:\t%d t:'%s' c:'%s' id=%d vis:%d grey:%d chkd:%d\n", $_,
                     GetWindowText($_), GetClassName($_), GetWindowID($_),
@@ -135,7 +136,8 @@ sub __runCodeAndClickPopup {
                 print "caller($i): ", join(', ', @c), $/;
             }
         }
-        my $h = $buttons[$n];
+
+        my $h = $buttons[$n] // 0;
         my $id = GetWindowID($h);
         if($DEBUG_INFO) { note sprintf "\tCHOSEN:\t%d t:'%s' c:'%s' id=%d\n", $h, GetWindowText($h), GetClassName($h), $id; }
         sleep($xtraDelay) if $xtraDelay;
@@ -147,7 +149,7 @@ sub __runCodeAndClickPopup {
         exit;   # terminate the child process once I've clicked
     } else {            # parent
         undef $IAMCHILDDONOTRESTORE;
-        $cref->();
+        $cref->(); # run the process
         my $t0 = time;
         while(waitpid(-1, WNOHANG) > 0) {
             last if time()-$t0 > 30;        # no more than 30sec waiting for end
@@ -183,18 +185,31 @@ session.
 
 =cut
 
+sub _mysleep_ms($) {
+    my $t = abs(shift)/1000;
+    if($t < 5) {
+        select(undef, undef, undef, $t);
+    } else {
+        sleep($t);
+    }
+}
+
 sub saveUserSession {
     my ($saveUserFileList, $saveUserSession);
     my $unsaved = 0;
     for my $view (0, 1) {
-        my $nb = notepad()->getNumberOpenFiles($view);
+        _mysleep_ms(1000);      # 400-500ms required; use 1000 for guardband
+        #printf STDERR "__%04d__ v#%d\n", __LINE__, $view;
+        my $nbView = ($VIEW{PRIMARY_VIEW}, $VIEW{SECOND_VIEW})[$view];
+        my $nb = notepad()->getNumberOpenFiles($nbView);
         for my $idoc ( 0 .. $nb-1 ) {
+            #printf STDERR "__%04d__ i#%d\n", __LINE__, $idoc;
             notepad()->activateIndex($view,$idoc);
-            $unsaved++ if editor()->{_hwobj}->SendMessage( $scimsg{SCI_GETMODIFY} );
+            _mysleep_ms(100);
+            $unsaved++ if editor()->{_hwobj}->SendMessage( $SCIMSG{SCI_GETMODIFY} );
             push @$saveUserFileList, notepad()->getCurrentFilename();
         }
     }
-
     if($unsaved) {
         my $err = "\n"x4;
         $err .= sprintf "%s\n", '!'x80;
@@ -227,7 +242,6 @@ sub saveUserSession {
     };
 
     note "saveUserSession: ", $saveUserSession->canonpath(); # don't want to delete the session
-
     return { session => $saveUserSession, list => $saveUserFileList };
 
 }
@@ -300,6 +314,25 @@ sub wrapGetLongPathName {
     $lpszLongPath =~ s/\0*$//g;   # trim trailing NULs
     #printf STDERR "%-07d # GetLongPathNameA( '%s', '%s', %s ) = %s\n", map $_//'<undef>', 0+$ARGV[0], $lpszShortPath, $lpszLongPath, $cchBuffer, $ret;
     return $lpszLongPath;
+}
+
+=over
+
+=item   dumper()
+
+    diag dumper($var1, $var2);
+
+Will look for any characters not in the range C<[\x20-\x7e]> and replace them with a hex notation:
+
+    diag dumper("\n\0");      # prints \x{0A}\x{00}
+
+=back
+
+=cut
+
+sub dumper(@) {
+    my @args = @_;
+    map { $_='<undef>' unless defined $_; s/([^\x20-\x7e])/sprintf'\\x{%02X}',ord($1)/ge; $_ } @args;
 }
 
 

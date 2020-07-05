@@ -3,13 +3,8 @@
 use strict;
 use warnings;
 
-use t::lib qw(diag_message);
-
 use PDL::Core qw(pdl);
-
-use Test2::API qw(intercept);
 use Test2::V0;
-
 use Test2::Tools::PDL;
 
 eval {
@@ -20,48 +15,52 @@ if ($@) { plan skip_all => 'Requires PDL::DateTime'; }
 
 subtest pdldt => sub {
 
-    {
-        my $events = intercept {
+    my $events = intercept {
+        def ok => (
             pdl_is(
                 PDL::DateTime->new_from_datetime( [qw(2018-01-01 2019-01-01)] ),
                 PDL::DateTime->new_from_datetime( [qw(2018-01-01 2019-01-01)] ),
-                'test'
-            );
-        };
-
-        my $event_ok = $events->[0];
-        ok( $event_ok->pass, 'pdl_is($pdldt)' );
-    }
-
-    {
-        my $events = intercept {
-            pdl_is(
+                'simple pass'
+            ),
+            'simple pass'
+        );
+        def ok => (
+            !pdl_is(
                 PDL::DateTime->new_from_datetime( [qw(2018-01-01 2019-01-02)] ),
                 PDL::DateTime->new_from_datetime( [qw(2018-01-01 2019-01-01)] ),
-                'test'
-            );
-        };
-
-        my $event_ok = $events->[0];
-        ok( !$event_ok->pass, 'pdl_is($different_pdldt)' );
-
-        my $diag_message = diag_message($events);
-        diag($diag_message);
-        like( $diag_message, qr/2019-01-01/, 'diag message' );
-    }
-
-    {
-        my $events = intercept {
-            pdl_is(
+                'simple fail'
+            ),
+            'simple fail'
+        );
+        def ok => (
+            !pdl_is(
                 pdl( [ 0, 0 ] ),
                 PDL::DateTime->new_from_datetime( [qw(2018-01-01 2019-01-01)] ),
-                'test'
-            );
-        };
+                'type fail'
+            ),
+            'type fail'
+        );
+    };
 
-        my $event_ok = $events->[0];
-        ok( !$event_ok->pass, 'pdl_is($pdl, $pdldt) is expected to fail' );
-    }
+    do_def;
+
+    like(
+        $events,
+        array {
+            event Ok => sub {
+                call pass => T();
+                call name => 'simple pass';
+            };
+            event Fail => sub {
+                call name => 'simple fail';
+            };
+            event Fail => sub {
+                call name => 'type fail';
+            };
+            end;
+        },
+        "got expected events"
+    );
 };
 
 done_testing;

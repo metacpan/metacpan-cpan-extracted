@@ -1,9 +1,9 @@
 package BorderStyleBase::Constructor;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'BorderStyleBase'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
@@ -62,7 +62,7 @@ BorderStyleBase::Constructor - Provide new()
 
 =head1 VERSION
 
-This document describes version 0.002 of BorderStyleBase::Constructor (from Perl distribution BorderStyleBase), released on 2020-06-11.
+This document describes version 0.004 of BorderStyleBase::Constructor (from Perl distribution BorderStyleBase), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

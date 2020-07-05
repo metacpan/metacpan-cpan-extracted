@@ -1,4 +1,4 @@
-This is the README file for IO::File::Multi (v 1.02), a simple module to
+This is the README file for IO::File::Multi (v 1.04), a simple module to
 handle printing to multiple (output) filehandles, with single print() or
 printf() calls.
 
@@ -13,7 +13,7 @@ If for some reason MakeMaker is broken or you have a personal problem with
 the make command (seek help), you can just copy Multi.pm into your perl
 site directory and everything should be okay.
 
-Author: Nem W Schlecht (nem@plains.nodak.edu)
+Author: Nem W Schlecht (NEMWS@CPAN.org)
 
 Multi.pm - Copyright (c) 1996 by Nem W Schlecht.  All rights reserved.
 This is free software; you can distribute it and/or modify it under the

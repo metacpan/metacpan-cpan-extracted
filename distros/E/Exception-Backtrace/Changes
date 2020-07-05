@@ -1,3 +1,30 @@
+1.0.8    01.07.2020
+    - sync interfaces with XS::libpanda v1.4.6
+    - improve inlined functions and source files handling
+
+1.0.7    29.06.2020
+    - relax test checks due to failure on NetBSD
+
+1.0.6    27.06.2020
+    - cover test cases for raspberry pi
+    - allow fallback on default resolver
+    - fix tests for the case, when perl or xs-modules are compiled
+      without debug info
+
+1.0.5    22.06.2020
+    - more correctly handle on systems with buggy glibc/libunwind
+
+1.0.4    22.06.2020
+    - version bump
+
+1.0.3    19.06.2020
+    - do attach backtrace within DESTROY, as it reports confusion to
+      Exception::Backtrace instead of original code
+    - let it works on Windows too
+    - fix tests on Darwin/MacOSX
+    - simplify internals with XS::libpanda v1.3.15
+    - min perl is 5.20 now
+
 1.0.2    02.04.2020
     - fix tests on FreeBSD with new XS::libpanda
     - slightly improve performance on traces symbolization

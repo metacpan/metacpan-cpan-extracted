@@ -196,7 +196,7 @@ bool
 find_close (SV* self)
 CODE:
   HV* hv = (HV*)SvRV (self);
-  HANDLE handle = (HANDLE)SvUVx (*hv_fetchs (hv, "handle", 1));
+  HANDLE handle = (HANDLE)SvIVx (*hv_fetchs (hv, "handle", 1));
   RETVAL = FindClose (handle);
 OUTPUT:
   RETVAL
@@ -208,7 +208,7 @@ CODE:
 
   HANDLE handle = FindFirstFileW (path, pinfo);
   HV* hv = (HV*)SvRV (self);
-  if (!hv_stores (hv, "handle", newSVuv ((UV)handle)))
+  if (!hv_stores (hv, "handle", newSViv ((IV)handle)))
     { Perl_croak (aTHX_ perr_nohash); }
   if (!hv_stores (hv, "first", newSVpvn ((char *)pinfo->cFileName,
     wcslen (pinfo->cFileName) * sizeof (WCHAR))))
@@ -298,7 +298,7 @@ CODE:
   WIN32_FIND_DATAW pinfo [1];
 
   HV* hv = (HV*)SvRV (self);
-  HANDLE handle = (HANDLE)SvUVx (*hv_fetchs (hv, "handle", 1));
+  HANDLE handle = (HANDLE)SvIVx (*hv_fetchs (hv, "handle", 1));
   if(!FindNextFileW (handle, pinfo))
     { XSRETURN_EMPTY; }
   RETVAL = newSVpvn ((char *)pinfo->cFileName,

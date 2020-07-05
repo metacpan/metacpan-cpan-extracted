@@ -1,9 +1,9 @@
 package TAP::DOM;
-# git description: v0.13-6-g319c024
+# git description: v0.90-1-g29c7f8b
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: TAP as Document Object Model.
-$TAP::DOM::VERSION = '0.14';
+$TAP::DOM::VERSION = '0.91';
 use 5.006;
 use strict;
 use warnings;
@@ -31,7 +31,20 @@ our $IS_YAML      = 1024;
 our $HAS_SKIP     = 2048;
 our $HAS_TODO     = 4096;
 
-our $document_data_regex = qr/^#\s*Test-([^:]+)\s*:\s*(.*)$/;
+our @tap_dom_args = (qw(ignore
+                        ignorelines
+                        dontignorelines
+                        usebitsets
+                        disable_global_kv_data
+                        put_dangling_kv_data_under_lazy_plan
+                        document_data_prefix
+                        document_data_ignore
+                        preprocess_ignorelines
+                        preprocess_tap
+                        lowercase_fieldnames
+                        lowercase_fieldvalues
+                        trim_fieldvalues
+                     ));
 
 use parent 'Exporter';
 our @EXPORT_OK = qw( $IS_PLAN
@@ -63,6 +76,8 @@ our %EXPORT_TAGS = (constants => [ qw( $IS_PLAN
                                        $HAS_TODO
                                     ) ] );
 
+our $obvious_tap_line = qr/(1\.\.|ok\s|not\s+ok\s|#|\s|tap\s+version|pragma|Bail out!)/i;
+
 use Class::XSAccessor
     chained     => 1,
     accessors   => [qw( plan
@@ -78,10 +93,59 @@ use Class::XSAccessor
                         has_problems
                         exit
                         parse_errors
+                        parse_errors_msgs
                         summary
                         tapdom_config
                         document_data
                      )];
+
+sub _capture_group {
+    my ($s, $n) = @_; substr($s, $-[$n], $+[$n] - $-[$n]);
+}
+
+# Optimize the TAP text before parsing it.
+sub preprocess_ignorelines {
+    my %args = @_;
+
+    if ($args{tap}) {
+
+        if (my $ignorelines = $args{ignorelines}) {
+            my $dontignorelines = $args{dontignorelines};
+            my $tap = $args{tap};
+            if ($dontignorelines) {
+                # HIGHLY EXPERIMENTAL!
+                #
+                # We convert the 'dontignorelines' regex into a negative-lookahead
+                # condition and prepend it before the 'ignorelines'.
+                #
+                # Why? Because we want to utilize the cleanup in one single
+                # operation as fast as the regex engine can do it.
+                my $re_dontignorelines = $dontignorelines ? "(?!$dontignorelines)" : '';
+                my $re_filter = qr/^$re_dontignorelines$ignorelines.*[\r\n]*/m; # the /m scope needs to be here!
+                $tap =~ s/$re_filter//g;
+            } else {
+                $tap =~ s/^$ignorelines.*[\r\n]*//mg;
+            }
+            $args{tap} = $tap;
+            delete $args{ignorelines}; # don't try it again during parsing later
+        }
+    }
+
+    return %args
+}
+
+# Filter away obvious non-TAP lines before parsing it.
+sub preprocess_tap {
+    my %args = @_;
+
+    if ($args{tap}) {
+      my $tap = $args{tap};
+        $tap =~ s/^(?!$obvious_tap_line).*[\r\n]*//mg;
+        $args{tap} = $tap;
+    }
+
+    return %args
+}
 
 sub new {
         # hash or hash ref
@@ -94,14 +158,38 @@ sub new {
         my @pragmas;
         my $bailout;
         my %document_data;
+        my %dangling_kv_data;
+
+        %args = preprocess_ignorelines(%args) if $args{preprocess_ignorelines};
+        %args = preprocess_tap(%args)         if $args{preprocess_tap};
 
         my %IGNORE      = map { $_ => 1 } @{$args{ignore}};
         my $IGNORELINES = $args{ignorelines};
+        my $DONTIGNORELINES = $args{dontignorelines};
         my $USEBITSETS  = $args{usebitsets};
         my $DISABLE_GLOBAL_KV_DATA  = $args{disable_global_kv_data};
+        my $PUT_DANGLING_KV_DATA_UNDER_LAZY_PLAN  = $args{put_dangling_kv_data_under_lazy_plan};
+        my $DOC_DATA_PREFIX = $args{document_data_prefix} || 'Test-';
+        my $DOC_DATA_IGNORE = $args{document_data_ignore};
+        my $LOWERCASE_FIELDNAMES = $args{lowercase_fieldnames};
+        my $LOWERCASE_FIELDVALUES = $args{lowercase_fieldvalues};
+        my $TRIM_FIELDVALUES = $args{trim_fieldvalues};
         delete $args{ignore};
         delete $args{ignorelines};
+        delete $args{dontignorelines};
         delete $args{usebitsets};
+        delete $args{disable_global_kv_data};
+        delete $args{put_dangling_kv_data_under_lazy_plan};
+        delete $args{document_data_prefix};
+        delete $args{document_data_ignore};
+        delete $args{preprocess_ignorelines};
+        delete $args{preprocess_tap};
+        delete $args{lowercase_fieldnames};
+        delete $args{lowercase_fieldvalues};
+        delete $args{trim_fieldvalues};
+
+        my $document_data_regex = qr/^#\s*$DOC_DATA_PREFIX([^:]+)\s*:\s*(.*)$/;
+        my $document_data_ignore = defined($DOC_DATA_IGNORE) ? qr/$DOC_DATA_IGNORE/ : undef;
 
         my $parser = new TAP::Parser( { %args } );
 
@@ -111,7 +199,7 @@ sub new {
         while ( my $result = $parser->next ) {
                 no strict 'refs';
 
-                next if $IGNORELINES && $result->raw =~ m/$IGNORELINES/;
+                next if $IGNORELINES && $result->raw =~ m/$IGNORELINES/ && !($DONTIGNORELINES && $result->raw =~ m/$DONTIGNORELINES/);
 
                 my $entry = TAP::DOM::Entry->new;
                 $entry->{is_has} = 0 if $USEBITSETS;
@@ -135,7 +223,17 @@ sub new {
                 }
 
                 # plan
-                $plan = $result->as_string if $result->is_plan;
+                if ($result->is_plan) {
+                  $plan = $result->as_string;
+
+                  # save Dangling kv_data to plan entry. The situation
+                  # that we already collected kv_data but haven't got
+                  # a plan yet should only happen in documents with
+                  # lazy plans (plan at the end).
+                  if ($PUT_DANGLING_KV_DATA_UNDER_LAZY_PLAN and keys %dangling_kv_data) {
+                    $entry->{kv_data}{$_} = $dangling_kv_data{$_} foreach keys %dangling_kv_data;
+                  }
+                }
 
                 # meta info
                 foreach ((qw(has_skip has_todo))) {
@@ -180,18 +278,40 @@ sub new {
                 $entry->{data}         = $result->data if $result->is_yaml && !$IGNORE{data};
 
                 if ($result->is_comment and $result->as_string =~ $document_data_regex)
-                {
-                        my ($key, $value) = ($1, $2);
+                {{ # extra block for 'last'
+                        # we can't use $1, $2 because the regex could contain configured other groups
+                        my ($key, $value) = (_capture_group($result->as_string, -2), _capture_group($result->as_string, -1));
                         $key =~ s/^\s+//; # strip leading  whitespace
                         $key =~ s/\s+$//; # strip trailing whitespace
 
+                        # optional lowercase
+                        $key   = lc $key   if $LOWERCASE_FIELDNAMES;
+                        $value = lc $value if $LOWERCASE_FIELDVALUES;
+
+                        # optional value trimming
+                        $value =~ s/\s+$// if $TRIM_FIELDVALUES; # there can be no leading whitespace
+
+                        # skip this field according to regex
+                        last if $DOC_DATA_IGNORE and $document_data_ignore and $key =~ $document_data_ignore;
+
                         # Store "# Test-key: value" entries also as
-                        # 'kv_data' under their parent ok line.
-                        if ($lines[-1]->is_test) {
+                        # 'kv_data' under their parent line.
+                        # That line should be a test or a plan line, so that its
+                        # place (or "data path") is structurally always the same.
+                        if ($lines[-1]->is_test or $lines[-1]->is_plan) {
                             $lines[-1]->{kv_data}{$key} = $value;
+                        } else {
+                            if (!$plan) {
+                              # We haven't got a plan yet, so that
+                              # kv_data entry would get lost. As we
+                              # might still get a lazy plan at end
+                              # of document, so we save it up for
+                              # that potential plan entry.
+                              $dangling_kv_data{$key} = $value;
+                            }
                         }
                         $document_data{$key} = $value unless $lines[-1]->is_test && $DISABLE_GLOBAL_KV_DATA;
-                }
+                }}
 
                 # yaml and comments are taken as children of the line before
                 if ($result->is_yaml or $result->is_comment and @lines)
@@ -230,9 +350,17 @@ sub new {
 
         my $tapdom_config = TAP::DOM::Config->new
          (
-          ignore      => \%IGNORE,
-          ignorelines => $IGNORELINES,
-          usebitsets  => $USEBITSETS,
+          ignore                               => \%IGNORE,
+          ignorelines                          => $IGNORELINES,
+          dontignorelines                      => $DONTIGNORELINES,
+          usebitsets                           => $USEBITSETS,
+          disable_global_kv_data               => $DISABLE_GLOBAL_KV_DATA,
+          put_dangling_kv_data_under_lazy_plan => $PUT_DANGLING_KV_DATA_UNDER_LAZY_PLAN,
+          document_data_prefix                 => $DOC_DATA_PREFIX,
+          document_data_ignore                 => $DOC_DATA_IGNORE,
+          lowercase_fieldnames                 => $LOWERCASE_FIELDNAMES,
+          lowercase_fieldvalues                => $LOWERCASE_FIELDVALUES,
+          trim_fieldvalues                     => $TRIM_FIELDVALUES,
          );
 
         my $document_data = TAP::DOM::DocumentData->new(%document_data);
@@ -250,7 +378,8 @@ sub new {
                        end_time      => $parser->end_time,
                        has_problems  => $parser->has_problems,
                        exit          => $parser->exit,
-                       parse_errors  => [ $parser->parse_errors ],
+                       parse_errors  => scalar $parser->parse_errors,
+                       parse_errors_msgs  => [ $parser->parse_errors ],
                        summary       => $summary,
                        tapdom_config => $tapdom_config,
                        document_data => $document_data,
@@ -277,8 +406,8 @@ sub _entry_to_tapline
                                 "ok",
                                 ($entry->{number} || ()),
                                 ($entry->{description} || ()),
-                                ($entry->has_skip   ? "# SKIP ".($entry->{explanation} || "")
-                                 : $entry->has_todo ? "# TODO ".($entry->{explanation} || "")
+                                ($entry->{has_skip}   ? "# SKIP ".($entry->{explanation} || "")
+                                 : $entry->{has_todo }? "# TODO ".($entry->{explanation} || "")
                                  : ()),
                                );
         }
@@ -314,8 +443,10 @@ sub to_tap
     my @taplines = $self->_lines_to_tap($self->{lines});
     unshift @taplines, $self->{plan};
     unshift @taplines, "TAP version ".$self->{version};
-    my $tap = join("\n", @taplines)."\n";
-    return $tap;
+
+    return wantarray
+      ? @taplines
+      : join("\n", @taplines)."\n";
 }
 
 1; # End of TAP::DOM
@@ -367,9 +498,162 @@ change, so your data tools can, well, rely on it.
 Constructor which immediately triggers parsing the TAP via TAP::Parser
 and returns a big data structure containing the extracted results.
 
-All parameters are passed through to TAP::Parser, except C<ignore>,
-C<ignorelines> and C<usebitsets>, see sections "HOW TO STRIP DETAILS"
-and "USING BITSETS". Usually the options are just one of those:
+=head3 Synopsis
+
+ my $tap;
+ {
+   local $/; open (TAP, '<', 't/some_tap.txt') or die;
+   $tap = <TAP>;
+   close TAP;
+ }
+ my $tapdata = TAP::DOM->new (
+   tap                                  => $tap
+   disable_global_kv_data               => 1,
+   put_dangling_kv_data_under_lazy_plan => 1,
+   ignorelines                          => '(## |# Test-mymeta_)',
+   dontignorelines                      => '# Test-mymeta_(tool1|tool2)_',
+   preprocess_ignorelines               => 1,
+   preprocess_tap                       => 1,
+   usebitsets                           => 0,
+   ignore                               => ['as_string'], # keep 'raw' which is the unmodified variant
+   document_data_prefix                 => '(MyApp|Test)-',
+   lowercase_fieldnames                 => 1,
+   trim_fieldvalues                     => 1,
+ );
+
+=head3 Arguments
+
+=over 4
+
+=item ignore
+
+Arrayref of fieldnames not to contain in generated TAP::DOM. For
+example you can skip the C<as_string> field which is often a redundant
+variant of C<raw>.
+
+=item ignorelines
+
+A regular expression describing lines to ignore.
+
+Be careful to not screw up semantically relevant lines, like indented
+YAML data.
+
+The regex is internally prepended with a start-of-line C<^> anchor.
+
+=item dontignorelines (EXPERIMENTAL!)
+
+This is the whitelist of lines to B<not> being skipped when using the
+C<ignore> blacklist.
+
+The C<dontignorelines> feature is B<HIGHLY EXPERIMENTAL>, in
+particular in combination with C<preprocess_ignorelines>.
+
+Background: the preprocessing is done in a single regex operation for
+speed reasons, and to do that the C<dontignorelines> regex is turned
+into a I<zero-width negative-lookahead condition> and prepended before
+the C<ignorelines> condition into a combined regex.
+
+Without C<preprocess_ignorelines> it is a relatively harmless
+additional condition during TAP line processing.
+
+Survival tips:
+
+=over 2
+
+=item * have unit tests for your setup
+
+=item * do not use C<^> anchors neither in C<ignorelines> nor in
+C<dontignorelines> but rely on the implicitly prepended anchors.
+
+=item * write both C<ignorelines> and C<dontignorelines> completely
+describing from beginning of line (yet without the C<^> anchor).
+
+=item * do not use it but define C<ignorelines> instead with your own
+zero-width negative-lookaround conditions
+
+=item * know the zero-width negative look-around conditions of your
+use Perl version
+
+=back
+
+=item usebitsets
+
+Instead of having a lot of long boolean fields like
+
+ has_skip => 1
+ has_todo => 0
+
+you can encode all of them into a compact bitset
+
+ is_has => $SOME_NUMERIC_REPRESENTATION
+
+This field must be evaluated later with bit-comparison operators.
+
+Originally meant as memory-saving mechanism it turned out not to be
+worth the hazzle.
+
+=item disable_global_kv_data
+
+Early TAP::DOM versions put all lines like
+
+  # Test-foo: bar
+
+into a global hash. Later these fields are placed as children under
+their parent C<ok>/C<not ok> line but kept globally for backwards
+compatibility. With this flag you can drop the redundant global hash.
+
+But see also C<put_dangling_kv_data_under_lazy_plan>.
+
+=item put_dangling_kv_data_under_lazy_plan
+
+This addresses the situation what to do in case a key/value field from
+a line
+
+  # Test-foo: bar
+
+appears without a parent C<ok>/C<not ok> line and the global kv_data
+hash is disabled. When this option is set it's placed under the plan
+as parent.
+
+=item document_data_prefix
+
+To interpret lines like
+
+  # Test-foo: bar
+
+the C<document_data_prefix> is by default set to C<Test-> so that a
+key/value field
+
+  foo => 'bar'
+
+is generated. However, you can have a regular expression to capture
+other or multiple different values as allowed prefixes.
+
+=item document_data_ignore
+
+This is another regex-based way to avoid generating particular
+fields. This regex is matched against the already extracted keys, and
+stops processing of this field for C<document_data> and C<kv_data>.
+
+=item lowercase_fieldnames
+
+If set to a true value all recognized fields are lowercased.
+
+=item lowercase_fieldvalues
+
+If set to a true value all recognized values are lowercased.
+
+=item trim_fieldvalues
+
+If set to a true value all field values are trimmed of trailing
+whitespace. Note that fields don't have leading whitespace as it's
+already consumed away after the fieldname separator colon C<:>.
+
+=back
+
+All other provided parameters are passed through to TAP::Parser, see
+sections "HOW TO STRIP DETAILS" and "USING BITSETS". Usually the
+options are just one of those:
 
   tap => $some_tap_string
 
@@ -406,7 +690,8 @@ yourself.
   'is_good_plan'  => 0,
   'has_problems'  => 2,
   'skip_all'      => undef,
-  'parse_errors'  => [
+  'parse_errors'  => 1,
+  'parse_errors_msgs'  => [
                       'Bad plan.  You planned 6 tests but ran 8.'
                      ],
   'pragmas'       => [
@@ -615,9 +900,9 @@ Use it like this:
 =head2 Strip unneccessary lines
 
 You can ignore complete lines from the input TAP as if they weren't
-existing. Of course you can break the TAP with this, so usually you
-only apply this to non-TAP lines or diagnostics you are not interested
-in.
+existing by by setting a regular expression in C<ignorelines>. Of
+course you can break the TAP with this, so usually you only apply this
+to non-TAP lines or diagnostics you are not interested in.
 
 My primary use-case is TAP with large parts of logfiles included with
 a prefixed "## " just for dual-using the TAP also as an archive of the
@@ -629,6 +914,39 @@ they only blow up the memory for the TAP-DOM:
                          );
 
 See C<t/some_tap_ignore_lines.t> for an example.
+
+=head2 Pre-process TAP
+
+B<WARNING, experimental features!>
+
+=over 4
+
+=item * preprocess_ignorelines
+
+By setting that option, C<ignorelines> is applied to the input TAP
+text I<before> it is parsed.
+
+This could help to speed up TAP parsing when there is a huge amount of
+non-TAP lines that the regex engine could throw away faster than
+TAP::Parser would parse it line by line.
+
+B<There is a risk>: without that option, only lines are filtered that
+are already parsed as lines by the TAP parser. If applied before
+parsing, the regex could mis-match non-trivial situations.
+
+=item * preprocess_tap
+
+With this option, any lines that don't obviously look like TAP are
+stripped away.
+
+B<There is a substantial risk>, though: the purely line-based regex
+processing could screw up when it mis-matches lines. Parsing TAP is
+not as obvious as it seems first. Just think of unindented YAML or
+indented YAML with strange multi-line spanning values at line starts,
+or the (non-standardized and unsupported) nested indented TAP. So be
+careful!
+
+=back
 
 =head1 USING BITSETS
 
@@ -673,6 +991,72 @@ And the constants can be imported into your namespace:
  use TAP::DOM ':constants';
  if ($tapdom->{lines}[4]{is_has} | $IS_TEST ) {...}
 
+=head1 Tweak the resulting DOM
+
+=head2 Lowercase all key:value fieldnames
+
+By setting option C<lowercase_fieldnames> all field names (hash keys)
+in C<document_data> and C<kv_data> are set to lowercase. This is
+especially helpful to normalize different casing like
+
+ # Test-Strange-Key: some value
+ # Test-strange-key: some value
+ # Test-STRANGE-KEY: some value
+
+etc. all into
+
+  "strange-key" => "some value"
+
+=head2 Lowercase all key:value values
+
+By setting option C<lowercase_fieldvalues> all field values in
+C<document_data> and C<kv_data> are set to lowercase. This is
+especially helpful to normalize different casing like
+
+ # Test-strange-key: Some Value
+ # Test-strange-key: Some value
+ # Test-strange-key: SOME VALUE
+
+etc. all into
+
+  "strange-key" => "some value"
+
+B<Warning:> while the sister option C<lowercase_fieldnames> above is
+obviously helpful to keep the information more together, this
+C<lowercase_fieldvalues> option here should be used with care. You
+loose much more information here which is usually better searched via
+case-insensitive options of the mechanism you use, regular
+expressions, Elasticsearch, etc.
+
+=head2 Placing key:value pairs
+
+Normally a key:value pair C<{foo => bar}> from a line like
+
+  # Test-foo: bar
+
+ends up as entry in a has C<kv_values> under the entry before that
+line - which ideally is either a normal ok/not_ok line or a plan line.
+
+If that's not the case then it is not clear where they belong. Early
+TAP::DOM versions had put them under a global entry C<document_data>.
+
+However this makes these entries inconsistently appear in different
+levels of the DOM. so you can suppress that old behaviour by setting
+C<disable_global_kv_data> to 1.
+
+However, with that option now, there can be lines that appear directly
+at the start with no preceding parent line, in case the plan comes at
+the end of the document. To not loose those key values they can be
+saved up until the plan appears later and put it there. As this
+reorders data inside the DOM differently from the original document
+you must explicitely request that behaviour by setting
+C<put_dangling_kv_data_under_lazy_plan> to 1.
+
+Summary: for consistency it is suggested to set both options:
+
+ disable_global_kv_data => 1,
+ put_dangling_kv_data_under_lazy_plan => 1
+
 =head1 ACCESSORS
 
 =head2 end_time
@@ -684,6 +1068,8 @@ And the constants can be imported into your namespace:
 =head2 is_good_plan
 
 =head2 parse_errors
+
+=head2 parse_errors_msgs
 
 =head2 plan
 
@@ -731,7 +1117,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Steffen Schwigon.
+This software is copyright (c) 2020 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

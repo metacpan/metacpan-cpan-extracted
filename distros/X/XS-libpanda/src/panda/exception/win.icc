@@ -1,114 +1,16 @@
 // adopted from https://github.com/boostorg/stacktrace/tree/develop/include/boost/stacktrace/detail
 
-#include <iostream>
-#include <windows.h>
+//#include <iostream>
 #include <cxxabi.h>
-#include "dbgeng.h"
-
-__CRT_UUID_DECL(IDebugClient,0x27fe5639,0x8407,0x4f47,0x83,0x64,0xee,0x11,0x8f,0xb0,0x8a,0xc8)
-__CRT_UUID_DECL(IDebugControl,0x5182e668,0x105e,0x416e,0xad,0x92,0x24,0xef,0x80,0x04,0x24,0xba)
-__CRT_UUID_DECL(IDebugSymbols,0x8c31e98c,0x983a,0x48a5,0x90,0x16,0x6f,0xe5,0xd6,0x67,0xa9,0x50)
-
+#include "win_debug.h"
+#include <windows.h>
+#include <dbgeng.h>
 
 namespace panda {
 
-
-class com_global_initer {
-    bool _ok;
-
+class SimpleDebuggingSymbols: public debugging_symbols {
+    using debugging_symbols::debugging_symbols;
 public:
-    com_global_initer() noexcept
-        : _ok(false)
-    {
-        // COINIT_MULTITHREADED means that we must serialize access to the objects manually.
-        // This is the fastest way to work. If user calls CoInitializeEx before us - we
-        // can end up with other mode (which is OK for us).
-        //
-        // If we call CoInitializeEx befire user - user may end up with different mode, which is a problem.
-        // So we need to call that initialization function as late as possible.
-        auto res = ::CoInitializeEx(0, COINIT_MULTITHREADED);
-        _ok = (res == S_OK || res == S_FALSE);
-    }
-    com_global_initer(const com_global_initer&) = delete;
-
-    ~com_global_initer() noexcept {
-        if (_ok) { ::CoUninitialize(); }
-    }
-};
-
-template <class T>
-class com_holder {
-    T* holder_;
-
-public:
-    com_holder(const com_global_initer&) noexcept : holder_(nullptr) {}
-
-    T* operator->() const noexcept { return holder_; }
-
-    void** to_void_ptr_ptr() noexcept {
-        return reinterpret_cast<void**>(&holder_);
-    }
-
-    bool is_inited() const noexcept { return !!holder_; }
-
-    ~com_holder() noexcept { if (holder_) { holder_->Release(); } }
-};
-
-class debugging_symbols{
-    debugging_symbols(const debugging_symbols&) = delete;
-
-    static void try_init_com(com_holder< ::IDebugSymbols>& idebug, const com_global_initer& com) noexcept {
-        com_holder< ::IDebugClient> iclient(com);
-        if (S_OK != ::DebugCreate(__uuidof(IDebugClient), iclient.to_void_ptr_ptr())) {
-            return;
-        }
-
-        com_holder< ::IDebugControl> icontrol(com);
-        const bool res0 = (S_OK == iclient->QueryInterface(
-            __uuidof(IDebugControl),
-            icontrol.to_void_ptr_ptr()
-        ));
-        if (!res0) {
-            return;
-        }
-
-        const bool res1 = (S_OK == iclient->AttachProcess(
-            0,
-            ::GetCurrentProcessId(),
-            DEBUG_ATTACH_NONINVASIVE | DEBUG_ATTACH_NONINVASIVE_NO_SUSPEND
-        ));
-        if (!res1) {
-            return;
-        }
-
-        if (S_OK != icontrol->WaitForEvent(DEBUG_WAIT_DEFAULT, INFINITE)) {
-            return;
-        }
-
-        // No cheking: QueryInterface sets the output parameter to NULL in case of error.
-        iclient->QueryInterface(__uuidof(IDebugSymbols), idebug.to_void_ptr_ptr());
-    }
-
-
-    static com_holder< ::IDebugSymbols>& get_thread_local_debug_inst() noexcept {
-        // [class.mfct]: A static local variable or local type in a member function always refers to the same entity, whether
-        // or not the member function is inline.
-        static thread_local com_global_initer com;
-        static thread_local com_holder< ::IDebugSymbols> idebug(com);
-
-        if (!idebug.is_inited()) {
-            try_init_com(idebug, com);
-        }
-
-        return idebug;
-    }
-
-    com_holder< ::IDebugSymbols>& idebug_;
-public:
-    debugging_symbols() noexcept : idebug_( get_thread_local_debug_inst() ) {}
-
-    bool is_inited() const noexcept { return idebug_.is_inited();  }
-
     void gather(const void* addr, Stackframe& f) const noexcept {
         if (!is_inited()) { return; }
         const ULONG64 offset = reinterpret_cast<ULONG64>(addr);
@@ -173,43 +75,36 @@ public:
     }
 };
 
-struct msvc_backtrace : BacktraceInfo {
-
-    msvc_backtrace(std::vector<StackframePtr>&& frames_) : frames(std::move(frames_)) {}
-
-    const std::vector<StackframePtr>& get_frames() const override { return frames; }
-    virtual string to_string() const override { throw "not implemented"; }
-
-    std::vector<StackframePtr> frames;
-};
-
-
 static RawTraceProducer get_default_raw_producer () noexcept {
     return [](void** ptr, int sz) -> int {
-        auto r = ::CaptureStackBackTrace(2, static_cast<unsigned long>(sz), ptr, nullptr);
+        auto r = ::CaptureStackBackTrace(1, static_cast<unsigned long>(sz), ptr, nullptr);
         return r;
     };
 }
 
-static StackframePtr as_frame(const void* ip) noexcept {
-    StackframePtr r{};
-    debugging_symbols idebug;
-    if (!idebug.is_inited()) { return r; }
+struct WinBacktrace: BacktraceBackend {
+    const Backtrace& raw_traces;
+    SimpleDebuggingSymbols idebug;
 
-    r = StackframePtr(new Stackframe());
-    idebug.gather(ip, *r);
-    return r;
+    WinBacktrace(const Backtrace& raw_traces_) noexcept: raw_traces{raw_traces_} {}
+
+    bool produce_frame(StackFrames& frames, size_t i) override {
+        StackframeSP frame;
+        if (!idebug.is_inited()) return false;
+        auto raw_frame = raw_traces.buffer.at(i);
+        frame = StackframeSP(new Stackframe());
+        idebug.gather(raw_frame, *frame);
+        frames.emplace_back(std::move(frame));
+        return true;
+    }
+};
+
+static BacktraceBackendSP win_producer(const Backtrace& raw_traces) noexcept {
+    return new WinBacktrace(raw_traces);
 }
 
 static BacktraceProducer get_default_bt_producer () noexcept {
-    return [](const RawTrace& traces) -> iptr<BacktraceInfo> {
-        std::vector<StackframePtr> frames;
-        for(auto ip: traces) {
-            auto frame = as_frame(ip);
-            if (frame) { frames.emplace_back(std::move(frame)); }
-        }
-        return new msvc_backtrace(std::move(frames));
-    };
+    return win_producer;
 }
 
 }

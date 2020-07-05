@@ -4,7 +4,7 @@ package MyIter;
 
 use strict;
 
-use base 'HTML::Widgets::NavMenu::Tree::Iterator';
+use parent 'HTML::Widgets::NavMenu::Tree::Iterator';
 
 __PACKAGE__->mk_accessors(
     qw(

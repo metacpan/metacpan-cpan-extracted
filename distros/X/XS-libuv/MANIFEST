@@ -343,7 +343,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/after_import.sh
+stub.c
 t/use.t
-uv.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

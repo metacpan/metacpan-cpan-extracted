@@ -11,7 +11,7 @@ local $/ = undef;
 
 my %param = %{ YAML::XS::Load( <> ) };
 
-my( $host, $port, $uuid, $row, $col ) = @{$param{argv}};
+my( $host, $port, $uuid, $row, $col, $md5, $cmd, $ictrl ) = @{$param{argv}};
 $host ||= $ENV{TCPREMOTEIP};
 
 die "nofind user" unless my $user = $ENV{MYDan_sudo} ||  $ENV{MYDan_user};
@@ -34,6 +34,12 @@ unless( $soc )
 {
     print "Connect $host:$port fail\n";
     exit 1;
+}
+
+if( $md5 )
+{
+    my $head = "MYDanConnect_::${md5}::_MYDanConnect";
+    syswrite( $soc, $head, length $head );
 }
 
 exit 0 if fork;
@@ -61,9 +67,13 @@ while ( $poll->handles && $soc ) {
     $poll->poll();
     for my $handle ( $poll->handles( POLLIN ) ) {
         my ( $byte, $data );
-	syswrite( $pty, $data, $byte ) if $handle eq $soc && ( $byte = sysread( $soc, $data, 1024 ) );
+        if( $handle eq $soc && ( $byte = sysread( $soc, $data, 1024 ) ) )
+        {
+            map{ goto CLOSE if 3 == ord $_ }split //, $data if $ictrl;
+            syswrite( $pty, $data, $byte );
+        }
         syswrite( $soc, $data, $byte ) if $handle eq $pty && ( $byte = sysread( $pty, $data, 1024 ) );
-	goto CLOSE unless $byte;
+        goto CLOSE unless $byte;
     }
     if ( $poll->handles( POLLHUP | POLLERR) ) {
         $soc->shutdown( 2 );
@@ -89,7 +99,7 @@ sub bash {
     open(STDIN,  "<&" . $slave->fileno());
     open(STDOUT, ">&" . $slave->fileno());
     open(STDERR, ">&" . $slave->fileno());
-    exec( '/bin/bash -i' );
+    exec( $cmd || '/bin/bash -i' );
 }
 
 kill 'KILL', $pid;

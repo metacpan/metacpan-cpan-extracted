@@ -1,0 +1,54 @@
+NAME
+    Progress::Any::Examples - Examples for Progress::Any
+
+VERSION
+    This document describes version 0.001 of Progress::Any::Examples (from
+    Perl distribution Progress-Any-Examples), released on 2020-06-20.
+
+SYNOPSIS
+    See scripts included in this distribution.
+
+DESCRIPTION
+    This distribution include the following scripts to demonstrate how to
+    use Progress::Any:
+
+    *   progress-any-eg-progressbar-01-simple
+
+    *   progress-any-eg-progressbar-02-multiple-tasks-one-progressbar
+
+    *   progress-any-eg-progressbar-03-progressbar-on-subtask
+
+    *   progress-any-eg-progressbar-04-progressbar-and-logger
+
+    *   progress-any-eg-progressbar-05-multiple-progressbars
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Progress-Any-Examples>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Progress-Any-Examples>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any-Examples
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Progress::Any
+
+    "Progress::Any::Output::*"
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

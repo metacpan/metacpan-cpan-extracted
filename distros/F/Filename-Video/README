@@ -2,8 +2,8 @@ NAME
     Filename::Video - Check whether filename indicates being a video file
 
 VERSION
-    This document describes version 0.001 of Filename::Video (from Perl
-    distribution Filename-Video), released on 2017-08-12.
+    This document describes version 0.002 of Filename::Video (from Perl
+    distribution Filename-Video), released on 2020-04-01.
 
 SYNOPSIS
      use Filename::Video qw(check_video_filename);
@@ -43,7 +43,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2017 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

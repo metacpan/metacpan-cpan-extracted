@@ -1,0 +1,53 @@
+2020-07-02T11:16:21+08:00 : Split Management Dashboard CMD template permissions
+2020-07-01T23:13:38+08:00 : The slave collects the resource utilization rate by the task
+2020-07-01T15:20:10+08:00 : Slave to default monitor the network with the largest traffic
+2020-07-01T14:40:50+08:00 : Add slave.nvidia-smi to crontab
+2020-07-01T11:59:26+08:00 : Ease controller reconnection time
+2020-06-30T20:48:34+08:00 : Add CMD template to dashboard
+2020-06-29T19:28:43+08:00 : Fix: line breaks in dashboard
+2020-06-28T13:08:00+08:00 : Fix vsync encountered a file that does not exist
+2020-06-27T15:17:13+08:00 : Slave executer <docker start> plug-in deals with port mapping
+2020-06-26T22:29:44+08:00 : Slave collects NET, CPU, DISK, GPU, MEM information
+2020-06-25T23:43:28+08:00 : Scheduler adds logs for monitoring
+2020-06-24T22:36:37+08:00 : Add GPU and CUDA info
+2020-06-24T21:22:02+08:00 : fix docker start: --shm-size
+2020-06-24T15:29:07+08:00 : fix bug in scripts/init
+2020-06-24T09:43:57+08:00 : fix scheduler SQL
+2020-06-22T13:11:03+08:00 : Fix: docker start, fork not exit by die's function
+2020-06-21T17:37:31+08:00 : Slave add state 'pulling'
+2020-06-21T09:27:58+08:00 : docker's executer  update
+2020-06-20T10:53:19+08:00 : Slave find GPU resource by /dev/nvidia*
+2020-06-20T10:52:52+08:00 : Optimization tips to antdencli
+2020-06-17T17:25:38+08:00 : executor docker.start process _output's path and /dev/nvidia0
+2020-06-17T14:11:03+08:00 : fix some bug
+2020-06-14T13:23:21+08:00 : Access management of CLI
+2020-06-13T14:58:05+08:00 : Antdencli only allows access to its own resources
+2020-06-13T12:25:42+08:00 : Dashboard add login authentication and management page
+2020-06-12T18:07:41+08:00 : Add owner and name to the job
+2020-06-12T17:12:02+08:00 : If the event module encounters a deleted file, it returns
+2020-06-12T01:56:17+08:00 : Optimize of message's transfer
+2020-06-10T23:28:51+08:00 : fix bug: slave/code/mydan/vsync use a valid die
+2020-06-10T19:32:45+08:00 : Slave limits the output of monitor data
+2020-06-09T16:29:05+08:00 : executer.docker add --shm-size
+2020-06-03T13:05:33+08:00 : Dashboard add API to antdencli
+2020-06-03T11:19:31+08:00 : Executor adds soptcount to force task kill
+2020-06-02T23:05:11+08:00 : scripts/init: slave needs Linux::Inotify2 module
+2020-06-02T21:47:53+08:00 : fix bug: slave.executer.docker.start
+2020-06-02T13:25:02+08:00 : Support for antdencli call docker
+2020-06-01T15:45:30+08:00 : Add docker to the executor of slave
+2020-06-01T11:57:59+08:00 : Dashboard add monitoring to avoid errors: MySQL server has gone away
+2020-05-30T16:47:40+08:00 : Update simulator,Add product
+2020-05-30T16:29:21+08:00 : add free.load_antden, slave uses the command load to download data
+2020-05-30T16:21:56+08:00 : fix: Add SQL in the scheduler DB module
+2020-05-30T16:16:18+08:00 : Dashboard add API to antdencli
+2020-05-30T10:47:36+08:00 : Dashboard uses twiggy to provide services
+2020-05-30T10:28:58+08:00 : Database can use MySQL or SQLite
+2020-05-19T15:22:49+08:00 : add scripts/init
+2020-05-06T20:59:06+08:00 : add simulator
+2020-04-28T18:21:03+08:00 : Add scheduler: pandora
+2020-04-23T19:14:19+08:00 : scheduler does not use unhealthy slave
+2020-04-22T17:43:03+08:00 : dashboard  show the information of ingress, and the scheduler processes the real-time information from slave
+2020-02-19T00:27:35+08:00 : Ingress
+2020-02-15T22:00:41+08:00 : Submit dashboard
+2020-02-15T10:37:30+08:00 : Submit slave,controller,scheduler
+2020-02-15T00:46:10+08:00 : Initial commit

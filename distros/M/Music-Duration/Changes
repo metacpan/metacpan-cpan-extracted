@@ -1,5 +1,9 @@
 Revision history for Music-Duration
 
+0.0800 2020-06-19 00:54:01
+    - Improve documentation.
+    - Add the ultra simple add_duration() function.
+
 0.0702 2019-08-25 02:20:05
     - What the? No POD was parsed on the previous CPAN upload! Trying again...
 

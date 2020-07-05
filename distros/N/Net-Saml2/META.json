@@ -4,7 +4,7 @@
       "Original Author: Chris Andrews  <chrisa@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,6 +36,7 @@
          "requires" : {
             "Carp" : "0",
             "Class::Accessor" : "0",
+            "Crypt::OpenSSL::Bignum" : "0",
             "Crypt::OpenSSL::DSA" : "0",
             "Crypt::OpenSSL::RSA" : "0",
             "Crypt::OpenSSL::Random" : "0",
@@ -50,12 +51,12 @@
             "IO::Compress::RawDeflate" : "0",
             "IO::Uncompress::RawInflate" : "0",
             "LWP::UserAgent" : "0",
+            "List::Util" : "0",
             "MIME::Base64" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
             "MooseX::Types::Common::String" : "0",
             "MooseX::Types::DateTime" : "0",
-            "MooseX::Types::Moose" : "0",
             "MooseX::Types::URI" : "0",
             "URI" : "0",
             "URI::QueryParam" : "0",
@@ -66,6 +67,7 @@
             "XML::XPath" : "0",
             "base" : "0",
             "constant" : "0",
+            "namespace::autoclean" : "0",
             "perl" : "5.008_001",
             "strict" : "0",
             "vars" : "0",
@@ -74,70 +76,82 @@
       },
       "test" : {
          "requires" : {
-            "Data::Dumper" : "0",
+            "Import::Into" : "0",
+            "Path::Tiny" : "0",
+            "Sub::Override" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::Fatal" : "0",
+            "Test::Lib" : "0",
             "Test::More" : "0",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.14",
-            "Test::Pod::Coverage" : "1.04"
+            "Test::Pod::Coverage" : "1.04",
+            "XML::LibXML" : "0",
+            "XML::LibXML::XPathContext" : "0"
          }
       }
    },
    "provides" : {
       "Net::SAML2" : {
          "file" : "lib/Net/SAML2.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::Binding::POST" : {
          "file" : "lib/Net/SAML2/Binding/POST.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::Binding::Redirect" : {
          "file" : "lib/Net/SAML2/Binding/Redirect.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::Binding::SOAP" : {
          "file" : "lib/Net/SAML2/Binding/SOAP.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::IdP" : {
          "file" : "lib/Net/SAML2/IdP.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::Protocol::ArtifactResolve" : {
          "file" : "lib/Net/SAML2/Protocol/ArtifactResolve.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::Protocol::Assertion" : {
          "file" : "lib/Net/SAML2/Protocol/Assertion.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::Protocol::AuthnRequest" : {
          "file" : "lib/Net/SAML2/Protocol/AuthnRequest.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::Protocol::LogoutRequest" : {
          "file" : "lib/Net/SAML2/Protocol/LogoutRequest.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::Protocol::LogoutResponse" : {
          "file" : "lib/Net/SAML2/Protocol/LogoutResponse.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::Role::ProtocolMessage" : {
          "file" : "lib/Net/SAML2/Role/ProtocolMessage.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::SP" : {
          "file" : "lib/Net/SAML2/SP.pm",
-         "version" : "0.25"
+         "version" : "0.28"
+      },
+      "Net::SAML2::Util" : {
+         "file" : "lib/Net/SAML2/Util.pm",
+         "version" : "0.28"
       },
       "Net::SAML2::XML::Sig" : {
          "file" : "lib/Net/SAML2/XML/Sig.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       },
       "Net::SAML2::XML::Util" : {
          "file" : "lib/Net/SAML2/XML/Util.pm",
-         "version" : "0.25"
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -148,7 +162,7 @@
          "web" : "https://github.com/timlegge/perl-Net-SAML2"
       }
    },
-   "version" : "0.25",
+   "version" : "0.28",
    "x_contributors" : [
       "Chris Andrews <chris@nodnol.org>",
       "Oskari Okko Ojala <okko@frantic.com>",
@@ -160,7 +174,7 @@
       "xmikew <github@32ths.com>",
       "Timothy Legge <timlegge@gmail.com>"
    ],
-   "x_generated_by_perl" : "v5.30.2",
+   "x_generated_by_perl" : "v5.30.3",
    "x_maintainers" : [
       "Timothy Legge <timlegge@gmail.com>"
    ],

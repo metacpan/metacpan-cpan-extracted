@@ -1,4 +1,6 @@
-Revision history for Perl extension DBIx::Class::DynamicSubclass.
+0.04  19.06.2020
+        - moved to XS::Install
+        - fix tests warnings
 
 0.03  Wed Jun 25 03:09:34 2007
         - moved to Module::Install, tests fix

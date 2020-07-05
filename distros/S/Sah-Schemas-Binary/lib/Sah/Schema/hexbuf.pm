@@ -1,9 +1,9 @@
 package Sah::Schema::hexbuf;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-Binary'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our $schema = [str => {
     summary => 'Binary data encoded in hexdigits',
@@ -32,7 +32,7 @@ Sah::Schema::hexbuf - Binary data encoded in hexdigits
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::Schema::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2020-03-04.
+This document describes version 0.005 of Sah::Schema::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;
@@ -68,13 +68,13 @@ Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
 
 Sample data:
 
- undef  # valid
+ ""  # valid
 
- undef  # INVALID (Odd number of digits)
+ "f"  # INVALID (Odd number of digits)
 
- undef  # valid
+ "fafafa"  # valid
 
- undef  # INVALID
+ "fafafg"  # INVALID
 
 =head1 HOMEPAGE
 

@@ -40,9 +40,9 @@ subtest 'Score Range Ballots' => sub {
 };
 
 subtest 'RangeBallotPair' => sub {
-  my $VC1 = Vote::Count->new(
-    BallotSet => read_range_ballots('t/data/fastfood.range.json')
-  );
+  my $VC1 =
+    Vote::Count->new(
+    BallotSet => read_range_ballots('t/data/fastfood.range.json') );
   subtest 'RangeBallotPair' => sub {
     is( $VC1->BallotSetType(),
       'range', 'BallotSetType option is set to range' );

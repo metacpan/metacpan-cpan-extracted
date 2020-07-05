@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 #-------------------------------------------------------------------------------
-# Non deterministic finite state machine from regular expression
+# Non deterministic finite state machine from regular expression.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd Inc., 2018
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Data::NFA;
-our $VERSION = 20191110;
+our $VERSION = 20200623;
 require v5.26;
 use warnings FATAL => qw(all);
 use strict;
@@ -76,7 +76,7 @@ sub newNfaState(%)                                                              
 
   my $r = genHash(q(Data::NFA::State),                                          # NFA State
     transitions => undef,                                                       # {symbol => state} : transitions from this state consuming one input symbol
-    jumps       => undef,                                                       # {jump   => 1}     : jumps from this state not consuming any input symbols
+    jumps       => undef,                                                       # {to     => 1}     : jumps from this state not consuming any input symbols
     final       => undef,                                                       # Whether this state is final
    );
 
@@ -110,7 +110,8 @@ sub fromExpr2($$$)                                                              
     $state->jumps->{$_}++ for @to
    };
 
-  my $start = &$next;                                                           # Start state
+  my $start = &$next + 1;                                                       # Start state
+  &$save(undef, {$start=>1});                                                   # Offset the start of each expression by one cell to allow zeroOrMore, oneOrMore to jump back to their beginning without jumping back to the start of a containing choice
 
   if (!ref($expr))                                                              # Element not wrapped with element()
    {&$save({$expr=>$start+1}, undef);
@@ -140,7 +141,7 @@ sub fromExpr2($$$)                                                              
      {my (undef, @elements) = @$expr;
       $states->fromExpr2($_, $symbols) for @elements;
       my $N = &$next;
-      &$save();
+      &$save();                                                                 # Create new empty state
       &$jump($N, $start, $N+1);                                                 # Do it again or move on
      }
     elsif ($structure eq Choice)                                                # Choice
@@ -184,7 +185,7 @@ sub fromExpr2($$$)                                                              
      }
    }
   $states
- }
+ } # fromExpr2
 
 sub propagateFinalState($)                                                      #P Mark the B<$states> that can reach the final state with a jump as final.
  {my ($states) = @_;                                                            # States
@@ -207,7 +208,7 @@ sub propagateFinalState($)                                                      
      }
     last unless $changes;
    }
- }
+ } # propagateFinalState
 
 sub statesReachableViaJumps($$)                                                 #P Find the names of all the B<$states> that can be reached from a specified B<$stateName> via jumps alone.
  {my ($states, $StateName) = @_;                                                # States, name of start state
@@ -236,7 +237,7 @@ sub removeEmptyFields($)                                                        
      }
     delete $$state{final} unless defined $$state{final};
    }
- }
+ } # removeEmptyFields
 
 sub fromExpr(@)                                                                 #S Create an NFA from a regular B<@expression>.
  {my (@expression) = @_;                                                        # Regular expressions
@@ -258,7 +259,7 @@ sub fromExpr(@)                                                                 
   $symbols->($_) for @expression;                                               # Locate all symbols
 
   $states->fromExpr2($_, \%symbols) for @expression;                            # Create state transitions
-  $states->{keys %$states} = newNfaState(final=>1);                                # End state
+  $states->{keys %$states} = newNfaState(final=>1);                             # End state
 
   for my $state(sort keys %$states)                                             # Collapse multiple jumps
    {$$states{$state}->jumps =
@@ -270,11 +271,11 @@ sub fromExpr(@)                                                                 
   $states->removeEmptyFields;                                                   # Remove any empty fields
 
   $states
- }
+ } # fromExpr
 
 sub printFinalState($)                                                          #P Print the final field of the specified B<$state>.
  {my ($state) = @_;                                                             # State
-  $state->final ? 1 : q();
+  defined($state->final) ? 1 : q();
  }
 
 sub printWithJumps($;$)                                                         #P Print the current B<$states> of an NFA with jumps using the specvified B<$title>.
@@ -509,7 +510,7 @@ END
 Non deterministic finite state machine from regular expression.
 
 
-Version 20191110.
+Version 20200621.
 
 
 The following sections describe the methods in each functional area of this
@@ -521,7 +522,7 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 Construct a regular expression that defines the language to be parsed using the following combining operations which can all be imported:
 
-=head2 element($)
+=head2 element($label)
 
 One element. An element can also be represented by a string or number
 
@@ -531,29 +532,28 @@ One element. An element can also be represented by a string or number
 B<Example:>
 
 
-  if (1) {                                                                          
     my $nfa = fromExpr(𝗲𝗹𝗲𝗺𝗲𝗻𝘁("a"));
     ok $nfa->print("Element: a") eq <<END;
   Element: a
-  Location  F  Transitions
-         0     { a => 1 }
-         1  1  undef
+  Location  F  Transitions  Jumps
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2  1  undef        undef\
   END
-    ok  $nfa->isFinal(1);
+    ok  $nfa->isFinal(2);
     ok !$nfa->isFinal(0);
     ok  $nfa->parse(qw(a));
     ok !$nfa->parse(qw(a b));
     ok !$nfa->parse(qw(b));
     ok !$nfa->parse(qw(b a));
-   }
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::NFA::element
 
 
-=head2 sequence(@)
+=head2 sequence(@elements)
 
 Sequence of elements and/or symbols.
 
@@ -563,28 +563,29 @@ Sequence of elements and/or symbols.
 B<Example:>
 
 
-  if (1) {                                                                        
-    my $nfa = fromExpr(𝘀𝗲𝗾𝘂𝗲𝗻𝗰𝗲(element("a"), element("b")));
-    ok $nfa->print("Sequence: ab") eq <<END;
-  Sequence: ab
-  Location  F  Transitions
-         0     { a => 1 }
-         1     { b => 2 }
-         2  1  undef
+    my $nfa = fromExpr(qw(a b));
+    is_deeply $nfa->print("ab"), <<END;
+  ab
+  Location  F  Transitions  Jumps
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2     undef        [3]
+         3     { b => 4 }   undef
+         4  1  undef        undef
   END
+    ok !$nfa->parse(qw());
     ok  $nfa->parse(qw(a b));
     ok !$nfa->parse(qw(b a));
     ok !$nfa->parse(qw(a));
     ok !$nfa->parse(qw(b));
-   }
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::NFA::sequence
 
 
-=head2 optional(@)
+=head2 optional(@element)
 
 An optional sequence of elements and/or symbols.
 
@@ -594,28 +595,31 @@ An optional sequence of elements and/or symbols.
 B<Example:>
 
 
-  if (1) {                                                                        
-    my $nfa = fromExpr(element("a"), 𝗼𝗽𝘁𝗶𝗼𝗻𝗮𝗹(element("b")), element("c"));
-    ok $nfa->print("Optional: ab?c") eq <<END;
-  Optional: ab?c
+    my $nfa = fromExpr("a", 𝗼𝗽𝘁𝗶𝗼𝗻𝗮𝗹("b"), "c");
+    is_deeply $nfa->print("ab?c"), <<END;
+  ab?c
   Location  F  Transitions  Jumps
-         0     { a => 1 }   undef
-         1     { b => 2 }   [2]
-         2     { c => 3 }   undef
-         3  1  undef        undef
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2     undef        [3 .. 6]
+         3     undef        [4, 5, 6]
+         4     { b => 5 }   undef
+         5     undef        [6]
+         6     { c => 7 }   undef
+         7  1  undef        undef
   END
+    ok !$nfa->parse(qw(a));
     ok  $nfa->parse(qw(a b c));
     ok  $nfa->parse(qw(a c));
     ok !$nfa->parse(qw(a c b));
-   }
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::NFA::optional
 
 
-=head2 zeroOrMore(@)
+=head2 zeroOrMore(@element)
 
 Zero or more repetitions of a sequence of elements and/or symbols.
 
@@ -625,57 +629,59 @@ Zero or more repetitions of a sequence of elements and/or symbols.
 B<Example:>
 
 
-  if (1) {                                                                        
-    my $nfa = fromExpr(element("a"), 𝘇𝗲𝗿𝗼𝗢𝗿𝗠𝗼𝗿𝗲(element("b")), element("c"));
-    ok $nfa->print("Zero Or More: ab*c") eq <<END;
-  Zero Or More: ab*c
+    my $nfa = fromExpr("a", 𝘇𝗲𝗿𝗼𝗢𝗿𝗠𝗼𝗿𝗲("b"), "c");
+    is_deeply $nfa->print("ab*c"), <<END;
+  ab*c
   Location  F  Transitions  Jumps
-         0     { a => 1 }   undef
-         1     { b => 2 }   [3]
-         2     undef        [1, 3]
-         3     { c => 4 }   undef
-         4  1  undef        undef
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2     undef        [3, 4, 6, 7]
+         3     undef        [4, 6, 7]
+         4     { b => 5 }   undef
+         5     undef        [3, 4, 6, 7]
+         6     undef        [7]
+         7     { c => 8 }   undef
+         8  1  undef        undef
   END
     ok  $nfa->parse(qw(a c));
     ok  $nfa->parse(qw(a b c));
     ok  $nfa->parse(qw(a b b c));
     ok !$nfa->parse(qw(a b b d));
-   }
-  
-  if (1) {                                                                        
-    my $nfa = fromExpr(element("a"),
-                       𝘇𝗲𝗿𝗼𝗢𝗿𝗠𝗼𝗿𝗲(choice(element("a"),
-                       element("a"))),
-                       element("a"));
-    ok $nfa->print("aChoice: (a(a|a)*a") eq <<END;
-  aChoice: (a(a|a)*a
+
+    my $nfa = fromExpr("a",
+                       𝘇𝗲𝗿𝗼𝗢𝗿𝗠𝗼𝗿𝗲(choice("a",
+                       "a")),
+                       "a");
+    is_deeply $nfa->print("(a(a|a)*a"), <<END;
+  (a(a|a)*a
   Location  F  Transitions  Jumps
-         0     { a => 1 }   undef
-         1     { a => 2 }   [3, 5]
-         2     undef        [1, 3, 4, 5]
-         3     { a => 4 }   undef
-         4     undef        [1, 3, 5]
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2     undef        [3, 4, 5, 7, 8, 10, 11]
+         3     undef        [4, 5, 7, 8, 10, 11]
+         4     undef        [5, 7, 8]
          5     { a => 6 }   undef
-         6  1  undef        undef
+         6     undef        [3, 4, 5, 7 .. 11]
+         7     undef        [8]
+         8     { a => 9 }   undef
+         9     undef        [3, 4, 5, 7, 8, 10, 11]
+        10     undef        [11]
+        11     { a => 12 }  undef
+        12  1  undef        undef
   END
-  
-    is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(1, "a");
-    is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(2, "a");
-    is_deeply [1, 3, 4, 5], $nfa->statesReachableViaSymbol(3, "a");
-  
+
     ok !$nfa->parse(qw(a));
     ok  $nfa->parse(qw(a a));
     ok  $nfa->parse(qw(a a a));
     ok !$nfa->parse(qw(a b a));
-   }
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::NFA::zeroOrMore
 
 
-=head2 oneOrMore(@)
+=head2 oneOrMore(@element)
 
 One or more repetitions of a sequence of elements and/or symbols.
 
@@ -685,36 +691,34 @@ One or more repetitions of a sequence of elements and/or symbols.
 B<Example:>
 
 
-  if (1) {                                                                        
-    my $nfa = fromExpr(element("a"), 𝗼𝗻𝗲𝗢𝗿𝗠𝗼𝗿𝗲(element("b")), element("c"));
-  
-    ok $nfa->print("One or More: ab+c") eq <<END;
+    my $nfa = fromExpr("a", 𝗼𝗻𝗲𝗢𝗿𝗠𝗼𝗿𝗲("b"), "c");
+
+    is_deeply $nfa->print("One or More: ab+c"), <<END;
   One or More: ab+c
   Location  F  Transitions  Jumps
-         0     { a => 1 }   undef
-         1     { b => 2 }   undef
-         2     undef        [1, 3]
-         3     { c => 4 }   undef
-         4  1  undef        undef
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2     undef        [3, 4]
+         3     undef        [4]
+         4     { b => 5 }   undef
+         5     undef        [3, 4, 6, 7]
+         6     undef        [7]
+         7     { c => 8 }   undef
+         8  1  undef        undef
   END
-  
-    is_deeply [],     $nfa->statesReachableViaSymbol(2,"a");
-    is_deeply [1..3], $nfa->statesReachableViaSymbol(2,"b");
-    is_deeply [4],    $nfa->statesReachableViaSymbol(2,"c");
-  
+
     ok !$nfa->parse(qw(a c));
     ok  $nfa->parse(qw(a b c));
     ok  $nfa->parse(qw(a b b c));
     ok !$nfa->parse(qw(a b b d));
-   }
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::NFA::oneOrMore
 
 
-=head2 choice(@)
+=head2 choice(@elements)
 
 Choice from amongst one or more elements and/or symbols.
 
@@ -724,38 +728,36 @@ Choice from amongst one or more elements and/or symbols.
 B<Example:>
 
 
-  if (1) {                                                                        
-    my $nfa = fromExpr(element("a"),
-                       𝗰𝗵𝗼𝗶𝗰𝗲(element("b"), element("c")),
-                       element("d"));
-    ok $nfa->print("Choice: (a(b|c)d") eq <<END;
-  Choice: (a(b|c)d
+    my $nfa = fromExpr("a",
+                       𝗰𝗵𝗼𝗶𝗰𝗲(qw(b c)),
+                       "d");
+    is_deeply $nfa->print("(a(b|c)d"), <<END;
+  (a(b|c)d
   Location  F  Transitions  Jumps
-         0     { a => 1 }   undef
-         1     { b => 2 }   [3]
-         2     undef        [4]
-         3     { c => 4 }   undef
-         4     { d => 5 }   undef
-         5  1  undef        undef
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2     undef        [3, 4, 6, 7]
+         3     undef        [4, 6, 7]
+         4     { b => 5 }   undef
+         5     undef        [8, 9]
+         6     undef        [7]
+         7     { c => 8 }   undef
+         8     undef        [9]
+         9     { d => 10 }  undef
+        10  1  undef        undef
   END
-  
-    is_deeply [],     $nfa->statesReachableViaSymbol(1, "a");
-    is_deeply [2, 4], $nfa->statesReachableViaSymbol(1, "b");
-    is_deeply [4],    $nfa->statesReachableViaSymbol(1, "c");
-    is_deeply ['a'..'d'], [$nfa->symbols];
-  
+
     ok  $nfa->parse(qw(a b d));
     ok  $nfa->parse(qw(a c d));
     ok !$nfa->parse(qw(a b c d));
-   }
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::NFA::choice
 
 
-=head2 except(@)
+=head2 except(@elements)
 
 Choice from amongst all symbols except the ones mentioned
 
@@ -765,35 +767,44 @@ Choice from amongst all symbols except the ones mentioned
 B<Example:>
 
 
-  if (1) {                                                                        
     my $nfa = fromExpr(choice(qw(a b c)), 𝗲𝘅𝗰𝗲𝗽𝘁(qw(c x)), choice(qw(a b c)));
-  
-    ok $nfa->print("(a|b|c)(c!x)(a|b|c):") eq <<END;
-  (a|b|c)(c!x)(a|b|c):
+
+    is_deeply $nfa->print("(a|b|c)(c!x)(a|b|c)"), <<END;
+  (a|b|c)(c!x)(a|b|c)
   Location  F  Transitions  Jumps
-         0     { a => 1 }   [2, 4]
-         1     undef        [5, 7]
-         2     { b => 3 }   undef
-         3     undef        [5, 7]
-         4     { c => 5 }   undef
-         5     { a => 6 }   [7]
-         6     undef        [8, 10, 12]
-         7     { b => 8 }   undef
-         8     { a => 9 }   [10, 12]
-         9  1  undef        [13]
-        10     { b => 11 }  undef
-        11  1  undef        [13]
-        12     { c => 13 }  undef
-        13  1  undef        undef
+         0     undef        [1, 2, 4, 5, 7, 8]
+         1     undef        [2, 4, 5, 7, 8]
+         2     { a => 3 }   undef
+         3     undef        [9, 10, 11, 13, 14]
+         4     undef        [5]
+         5     { b => 6 }   undef
+         6     undef        [9, 10, 11, 13, 14]
+         7     undef        [8]
+         8     { c => 9 }   undef
+         9     undef        [10, 11, 13, 14]
+        10     undef        [11, 13, 14]
+        11     { a => 12 }  undef
+        12     undef        [15, 16, 17, 19, 20, 22, 23]
+        13     undef        [14]
+        14     { b => 15 }  undef
+        15     undef        [16, 17, 19, 20, 22, 23]
+        16     undef        [17, 19, 20, 22, 23]
+        17     { a => 18 }  undef
+        18  1  undef        [24]
+        19     undef        [20]
+        20     { b => 21 }  undef
+        21  1  undef        [24]
+        22     undef        [23]
+        23     { c => 24 }  undef
+        24  1  undef        undef
   END
-  
+
     ok !$nfa->parse(qw(a a));
     ok  $nfa->parse(qw(a a a));
     ok !$nfa->parse(qw(a c a));
-   }
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::NFA::except
 
@@ -802,7 +813,7 @@ This is a static method and so should be invoked as:
 
 Create a non deterministic finite state machine to represent a regular expression.
 
-=head2 fromExpr(@)
+=head2 fromExpr(@expression)
 
 Create an NFA from a regular B<@expression>.
 
@@ -812,43 +823,48 @@ Create an NFA from a regular B<@expression>.
 B<Example:>
 
 
-  if (1) {                                                                           
     my $nfa = 𝗳𝗿𝗼𝗺𝗘𝘅𝗽𝗿
-     (element("a"),
+     ("a",
       oneOrMore(choice(qw(b c))),
-      optional(element("d")),
+      optional("d"),
       element("e")
      );
-  
-    ok $nfa->print("a(b|c)+d?e :") eq <<END;
-  a(b|c)+d?e :
+
+    is_deeply $nfa->print("a(b|c)+d?e"), <<END;
+  a(b|c)+d?e
   Location  F  Transitions  Jumps
-         0     { a => 1 }   undef
-         1     { b => 2 }   [3]
-         2     undef        [1, 3 .. 6]
-         3     { c => 4 }   undef
-         4     undef        [1, 3, 5, 6]
-         5     { d => 6 }   [6]
-         6     { e => 7 }   undef
-         7  1  undef        undef
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2     undef        [3, 4, 5, 7, 8]
+         3     undef        [4, 5, 7, 8]
+         4     undef        [5, 7, 8]
+         5     { b => 6 }   undef
+         6     undef        [3, 4, 5, 7 .. 14]
+         7     undef        [8]
+         8     { c => 9 }   undef
+         9     undef        [3, 4, 5, 7, 8, 10 .. 14]
+        10     undef        [11 .. 14]
+        11     undef        [12, 13, 14]
+        12     { d => 13 }  undef
+        13     undef        [14]
+        14     { e => 15 }  undef
+        15  1  undef        undef
   END
-  
-  
+
     is_deeply ['a'..'e'], [$nfa->symbols];
-  
+
     ok !$nfa->parse(qw(a e));
     ok !$nfa->parse(qw(a d e));
     ok  $nfa->parse(qw(a b c e));
     ok  $nfa->parse(qw(a b c d e));
-   }
-  
 
-This is a static method and so should be invoked as:
+
+This is a static method and so should either be imported or invoked as:
 
   Data::NFA::fromExpr
 
 
-=head2 print($$)
+=head2 print($states, $title)
 
 Print the current B<$states> of the non deterministic finite state automaton using the specified B<$title>. If it is non deterministic, the non deterministic jumps will be shown as well as the transitions table. If deterministic, only the transitions table will be shown.
 
@@ -859,38 +875,43 @@ Print the current B<$states> of the non deterministic finite state automaton usi
 B<Example:>
 
 
-  if (1) {                                                                           
     my $nfa = fromExpr
-     (element("a"),
+     ("a",
       oneOrMore(choice(qw(b c))),
-      optional(element("d")),
+      optional("d"),
       element("e")
      );
-  
-    ok $nfa->𝗽𝗿𝗶𝗻𝘁("a(b|c)+d?e :") eq <<END;
-  a(b|c)+d?e :
+
+    is_deeply $nfa->𝗽𝗿𝗶𝗻𝘁("a(b|c)+d?e"), <<END;
+  a(b|c)+d?e
   Location  F  Transitions  Jumps
-         0     { a => 1 }   undef
-         1     { b => 2 }   [3]
-         2     undef        [1, 3 .. 6]
-         3     { c => 4 }   undef
-         4     undef        [1, 3, 5, 6]
-         5     { d => 6 }   [6]
-         6     { e => 7 }   undef
-         7  1  undef        undef
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2     undef        [3, 4, 5, 7, 8]
+         3     undef        [4, 5, 7, 8]
+         4     undef        [5, 7, 8]
+         5     { b => 6 }   undef
+         6     undef        [3, 4, 5, 7 .. 14]
+         7     undef        [8]
+         8     { c => 9 }   undef
+         9     undef        [3, 4, 5, 7, 8, 10 .. 14]
+        10     undef        [11 .. 14]
+        11     undef        [12, 13, 14]
+        12     { d => 13 }  undef
+        13     undef        [14]
+        14     { e => 15 }  undef
+        15  1  undef        undef
   END
-  
-  
+
     is_deeply ['a'..'e'], [$nfa->symbols];
-  
+
     ok !$nfa->parse(qw(a e));
     ok !$nfa->parse(qw(a d e));
     ok  $nfa->parse(qw(a b c e));
     ok  $nfa->parse(qw(a b c d e));
-   }
-  
 
-=head2 symbols($)
+
+=head2 symbols($states)
 
 Return an array of all the transition symbols.
 
@@ -900,38 +921,43 @@ Return an array of all the transition symbols.
 B<Example:>
 
 
-  if (1) {                                                                           
     my $nfa = fromExpr
-     (element("a"),
+     ("a",
       oneOrMore(choice(qw(b c))),
-      optional(element("d")),
+      optional("d"),
       element("e")
      );
-  
-    ok $nfa->print("a(b|c)+d?e :") eq <<END;
-  a(b|c)+d?e :
+
+    is_deeply $nfa->print("a(b|c)+d?e"), <<END;
+  a(b|c)+d?e
   Location  F  Transitions  Jumps
-         0     { a => 1 }   undef
-         1     { b => 2 }   [3]
-         2     undef        [1, 3 .. 6]
-         3     { c => 4 }   undef
-         4     undef        [1, 3, 5, 6]
-         5     { d => 6 }   [6]
-         6     { e => 7 }   undef
-         7  1  undef        undef
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2     undef        [3, 4, 5, 7, 8]
+         3     undef        [4, 5, 7, 8]
+         4     undef        [5, 7, 8]
+         5     { b => 6 }   undef
+         6     undef        [3, 4, 5, 7 .. 14]
+         7     undef        [8]
+         8     { c => 9 }   undef
+         9     undef        [3, 4, 5, 7, 8, 10 .. 14]
+        10     undef        [11 .. 14]
+        11     undef        [12, 13, 14]
+        12     { d => 13 }  undef
+        13     undef        [14]
+        14     { e => 15 }  undef
+        15  1  undef        undef
   END
-  
-  
+
     is_deeply ['a'..'e'], [$nfa->𝘀𝘆𝗺𝗯𝗼𝗹𝘀];
-  
+
     ok !$nfa->parse(qw(a e));
     ok !$nfa->parse(qw(a d e));
     ok  $nfa->parse(qw(a b c e));
     ok  $nfa->parse(qw(a b c d e));
-   }
-  
 
-=head2 isFinal($$)
+
+=head2 isFinal($states, $state)
 
 Whether, in the B<$states> specifying an NFA the named state B<$state> is a final state.
 
@@ -942,24 +968,23 @@ Whether, in the B<$states> specifying an NFA the named state B<$state> is a fina
 B<Example:>
 
 
-  if (1) {                                                                          
     my $nfa = fromExpr(element("a"));
     ok $nfa->print("Element: a") eq <<END;
   Element: a
-  Location  F  Transitions
-         0     { a => 1 }
-         1  1  undef
+  Location  F  Transitions  Jumps
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2  1  undef        undef\
   END
-    ok  $nfa->𝗶𝘀𝗙𝗶𝗻𝗮𝗹(1);
+    ok  $nfa->𝗶𝘀𝗙𝗶𝗻𝗮𝗹(2);
     ok !$nfa->𝗶𝘀𝗙𝗶𝗻𝗮𝗹(0);
     ok  $nfa->parse(qw(a));
     ok !$nfa->parse(qw(a b));
     ok !$nfa->parse(qw(b));
     ok !$nfa->parse(qw(b a));
-   }
-  
 
-=head2 allTransitions($)
+
+=head2 allTransitions($states)
 
 Return all transitions in the NFA specified by B<$states> as {stateName}{symbol} = [reachable states].
 
@@ -969,53 +994,70 @@ Return all transitions in the NFA specified by B<$states> as {stateName}{symbol}
 B<Example:>
 
 
-  if (1) {                                                                        
-    my $s = q(zeroOrMore(choice(element("a"))));
-  
+    my $s = q(zeroOrMore(choice("a")));
+
     my $nfa = eval qq(fromExpr(sequence($s,$s)));
-  
-    ok $nfa->print("a*a* 1:") eq <<END;
-  a*a* 1:
+
+    is_deeply $nfa->print("a*"), <<END;
+  a*
   Location  F  Transitions  Jumps
-         0  1  { a => 1 }   [2, 4]
-         1  1  undef        [0, 2, 4]
-         2  1  { a => 3 }   [4]
-         3  1  undef        [2, 4]
-         4  1  undef        undef
+         0  1  undef        [1 .. 4, 6 .. 9, 11]
+         1  1  undef        [2, 3, 4, 6 .. 9, 11]
+         2  1  undef        [3, 4, 6 .. 9, 11]
+         3     undef        [4]
+         4     { a => 5 }   undef
+         5  1  undef        [2, 3, 4, 6 .. 9, 11]
+         6  1  undef        [7, 8, 9, 11]
+         7  1  undef        [8, 9, 11]
+         8     undef        [9]
+         9     { a => 10 }  undef
+        10  1  undef        [7, 8, 9, 11]
+        11  1  undef        undef
   END
-  
-    is_deeply [0 .. 4],  $nfa->statesReachableViaSymbol(0, q(a));
-    is_deeply [0 .. 4],  $nfa->statesReachableViaSymbol(1, q(a));
-    is_deeply [2, 3, 4], $nfa->statesReachableViaSymbol(2, q(a));
-    is_deeply [2, 3, 4], $nfa->statesReachableViaSymbol(3, q(a));
-  
+
     ok  $nfa->parse(qw());
     ok  $nfa->parse(qw(a));
+    ok !$nfa->parse(qw(b));
     ok  $nfa->parse(qw(a a));
+    ok !$nfa->parse(qw(b b));
     ok !$nfa->parse(qw(a b));
     ok !$nfa->parse(qw(b a));
-  
-    is_deeply $nfa->𝗮𝗹𝗹𝗧𝗿𝗮𝗻𝘀𝗶𝘁𝗶𝗼𝗻𝘀,  {
-    "0" => { a => [0 .. 4] },
-    "1" => { a => [0 .. 4] },
-    "2" => { a => [2, 3, 4] },
-    "3" => { a => [2, 3, 4] },
-    "4" => { a => [] },
-  };
-  
-    ok $nfa->print("a*a* 2:") eq <<END;
-  a*a* 2:
-  Location  F  Transitions  Jumps
-         0  1  { a => 1 }   [2, 4]
-         1  1  undef        [0, 2, 4]
-         2  1  { a => 3 }   [4]
-         3  1  undef        [2, 4]
-         4  1  undef        undef
-  END
-   }
-  
+    ok !$nfa->parse(qw(c));
 
-=head2 parse($@)
+    is_deeply $nfa->𝗮𝗹𝗹𝗧𝗿𝗮𝗻𝘀𝗶𝘁𝗶𝗼𝗻𝘀, {
+    "0"  => { a => [10, 11, 2 .. 9] },
+    "1"  => { a => [10, 11, 2 .. 9] },
+    "2"  => { a => [10, 11, 2 .. 9] },
+    "3"  => { a => [11, 2 .. 9] },
+    "4"  => { a => [11, 2 .. 9] },
+    "5"  => { a => [10, 11, 2 .. 9] },
+    "6"  => { a => [10, 11, 7, 8, 9] },
+    "7"  => { a => [10, 11, 7, 8, 9] },
+    "8"  => { a => [10, 11, 7, 8, 9] },
+    "9"  => { a => [10, 11, 7, 8, 9] },
+    "10" => { a => [10, 11, 7, 8, 9] },
+    "11" => { a => [] },
+  };
+
+    is_deeply $nfa->print("a*a* 2"), <<END;
+  a*a* 2
+  Location  F  Transitions  Jumps
+         0  1  undef        [1 .. 4, 6 .. 9, 11]
+         1  1  undef        [2, 3, 4, 6 .. 9, 11]
+         2  1  undef        [3, 4, 6 .. 9, 11]
+         3     undef        [4]
+         4     { a => 5 }   undef
+         5  1  undef        [2, 3, 4, 6 .. 9, 11]
+         6  1  undef        [7, 8, 9, 11]
+         7  1  undef        [8, 9, 11]
+         8     undef        [9]
+         9     { a => 10 }  undef
+        10  1  undef        [7, 8, 9, 11]
+        11  1  undef        undef
+  END
+
+
+=head2 parse($states, @symbols)
 
 Parse, using the NFA specified by B<$states>, the list of symbols in L<@symbols>.
 
@@ -1026,22 +1068,21 @@ Parse, using the NFA specified by B<$states>, the list of symbols in L<@symbols>
 B<Example:>
 
 
-  if (1) {                                                                          
     my $nfa = fromExpr(element("a"));
     ok $nfa->print("Element: a") eq <<END;
   Element: a
-  Location  F  Transitions
-         0     { a => 1 }
-         1  1  undef
+  Location  F  Transitions  Jumps
+         0     undef        [1]
+         1     { a => 2 }   undef
+         2  1  undef        undef\
   END
-    ok  $nfa->isFinal(1);
+    ok  $nfa->isFinal(2);
     ok !$nfa->isFinal(0);
     ok  $nfa->𝗽𝗮𝗿𝘀𝗲(qw(a));
     ok !$nfa->𝗽𝗮𝗿𝘀𝗲(qw(a b));
     ok !$nfa->𝗽𝗮𝗿𝘀𝗲(qw(b));
     ok !$nfa->𝗽𝗮𝗿𝘀𝗲(qw(b a));
-   }
-  
+
 
 
 =head2 Data::NFA::State Definition
@@ -1057,7 +1098,7 @@ NFA State
 
 B<final> - Whether this state is final
 
-B<jumps> - {jump   => 1}     : jumps from this state not consuming any input symbols
+B<jumps> - {to     => 1}     : jumps from this state not consuming any input symbols
 
 B<transitions> - {symbol => state} : transitions from this state consuming one input symbol
 
@@ -1065,28 +1106,28 @@ B<transitions> - {symbol => state} : transitions from this state consuming one i
 
 =head1 Private Methods
 
-=head2 newNfa(%)
+=head2 newNfa(%options)
 
 Create a new NFA
 
      Parameter  Description
   1  %options   Options
 
-=head2 newNfaState(%)
+=head2 newNfaState(%options)
 
 Create a new NFA state.
 
      Parameter  Description
   1  %options   Options
 
-=head2 addNewState(%)
+=head2 addNewState($nfa)
 
 Create a new NFA state and add it to an NFA created with L<newNfa>.
 
      Parameter  Description
   1  $nfa       Nfa
 
-=head2 fromExpr2($$$)
+=head2 fromExpr2($states, $expr, $symbols)
 
 Create an NFA from a regular expression.
 
@@ -1095,14 +1136,14 @@ Create an NFA from a regular expression.
   2  $expr      Regular expression constructed from L<element|/element> L<sequence|/sequence> L<optional|/optional> L<zeroOrMore|/zeroOrMore> L<oneOrMore|/oneOrMore> L<choice|/choice>
   3  $symbols   Set of symbols used by the NFA.
 
-=head2 propagateFinalState($)
+=head2 propagateFinalState($states)
 
 Mark the B<$states> that can reach the final state with a jump as final.
 
      Parameter  Description
   1  $states    States
 
-=head2 statesReachableViaJumps($$)
+=head2 statesReachableViaJumps($states, $StateName)
 
 Find the names of all the B<$states> that can be reached from a specified B<$stateName> via jumps alone.
 
@@ -1110,21 +1151,21 @@ Find the names of all the B<$states> that can be reached from a specified B<$sta
   1  $states     States
   2  $StateName  Name of start state
 
-=head2 removeEmptyFields($)
+=head2 removeEmptyFields($states)
 
 Remove empty fields from the B<states> representing an NFA.
 
      Parameter  Description
   1  $states    States
 
-=head2 printFinalState($)
+=head2 printFinalState($state)
 
 Print the final field of the specified B<$state>.
 
      Parameter  Description
   1  $state     State
 
-=head2 printWithJumps($$)
+=head2 printWithJumps($states, $title)
 
 Print the current B<$states> of an NFA with jumps using the specvified B<$title>.
 
@@ -1132,7 +1173,7 @@ Print the current B<$states> of an NFA with jumps using the specvified B<$title>
   1  $states    States
   2  $title     Optional title
 
-=head2 printWithOutJumps($$)
+=head2 printWithOutJumps($states, $title)
 
 Print the current B<$states> of an NFA without jumps using  the specified B<$title>.
 
@@ -1140,7 +1181,7 @@ Print the current B<$states> of an NFA without jumps using  the specified B<$tit
   1  $states    States
   2  $title     Title.
 
-=head2 statesReachableViaSymbol($$$$)
+=head2 statesReachableViaSymbol($states, $StateName, $symbol, $cache)
 
 Find the names of all the states that can be reached from a specified state via a specified symbol and all the jumps available.
 
@@ -1150,7 +1191,7 @@ Find the names of all the states that can be reached from a specified state via 
   3  $symbol     Symbol to reach on
   4  $cache      A hash to be used as a cache
 
-=head2 parse2($$@)
+=head2 parse2($states, $stateName, @symbols)
 
 Parse an array of symbols
 
@@ -1257,7 +1298,7 @@ test unless caller;
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>90;
+use Test::More tests=>122;
 
 #goto latestTest;
 
@@ -1265,11 +1306,12 @@ if (1) {                                                                        
   my $nfa = fromExpr(element("a"));
   ok $nfa->print("Element: a") eq <<END;
 Element: a
-Location  F  Transitions
-       0     { a => 1 }
-       1  1  undef
+Location  F  Transitions  Jumps
+       0     undef        [1]
+       1     { a => 2 }   undef
+       2  1  undef        undef\
 END
-  ok  $nfa->isFinal(1);
+  ok  $nfa->isFinal(2);
   ok !$nfa->isFinal(0);
   ok  $nfa->parse(qw(a));
   ok !$nfa->parse(qw(a b));
@@ -1279,37 +1321,46 @@ END
 
 if (1)
  {my $nfa = fromExpr(q(b));
-  ok $nfa->print("Element: b") eq <<END;
-Element: b
-Location  F  Transitions
-       0     { b => 1 }
-       1  1  undef
+  is_deeply $nfa->print("b"), <<END;
+b
+Location  F  Transitions  Jumps
+       0     undef        [1]
+       1     { b => 2 }   undef
+       2  1  undef        undef
 END
-  ok  $nfa->isFinal(1);
-  ok !$nfa->isFinal(0);
+  ok !$nfa->parse();
+  ok  $nfa->parse(qw(b));
+  ok !$nfa->parse(qw(b b));
+  ok !$nfa->parse(qw(a));
  }
 
 if (1)
  {my $nfa = fromExpr(2);
-  ok $nfa->print("Element: 2") eq <<END;
-Element: 2
-Location  F  Transitions
-       0     { 2 => 1 }
-       1  1  undef
+  is_deeply $nfa->print("2"), <<END;
+2
+Location  F  Transitions  Jumps
+       0     undef        [1]
+       1     { 2 => 2 }   undef
+       2  1  undef        undef
 END
-  ok  $nfa->isFinal(1);
-  ok !$nfa->isFinal(0);
+  ok !$nfa->parse();
+  ok  $nfa->parse(qw(2));
+  ok !$nfa->parse(qw(2 2));
+  ok !$nfa->parse(qw(1));
  }
 
 if (1) {                                                                        #Tsequence
-  my $nfa = fromExpr(sequence(element("a"), element("b")));
-  ok $nfa->print("Sequence: ab") eq <<END;
-Sequence: ab
-Location  F  Transitions
-       0     { a => 1 }
-       1     { b => 2 }
-       2  1  undef
+  my $nfa = fromExpr(qw(a b));
+  is_deeply $nfa->print("ab"), <<END;
+ab
+Location  F  Transitions  Jumps
+       0     undef        [1]
+       1     { a => 2 }   undef
+       2     undef        [3]
+       3     { b => 4 }   undef
+       4  1  undef        undef
 END
+  ok !$nfa->parse(qw());
   ok  $nfa->parse(qw(a b));
   ok !$nfa->parse(qw(b a));
   ok !$nfa->parse(qw(a));
@@ -1317,30 +1368,39 @@ END
  }
 
 if (1) {                                                                        #Toptional
-  my $nfa = fromExpr(element("a"), optional(element("b")), element("c"));
-  ok $nfa->print("Optional: ab?c") eq <<END;
-Optional: ab?c
+  my $nfa = fromExpr("a", optional("b"), "c");
+  is_deeply $nfa->print("ab?c"), <<END;
+ab?c
 Location  F  Transitions  Jumps
-       0     { a => 1 }   undef
-       1     { b => 2 }   [2]
-       2     { c => 3 }   undef
-       3  1  undef        undef
+       0     undef        [1]
+       1     { a => 2 }   undef
+       2     undef        [3 .. 6]
+       3     undef        [4, 5, 6]
+       4     { b => 5 }   undef
+       5     undef        [6]
+       6     { c => 7 }   undef
+       7  1  undef        undef
 END
+  ok !$nfa->parse(qw(a));
   ok  $nfa->parse(qw(a b c));
   ok  $nfa->parse(qw(a c));
   ok !$nfa->parse(qw(a c b));
  }
 
 if (1) {                                                                        #TzeroOrMore
-  my $nfa = fromExpr(element("a"), zeroOrMore(element("b")), element("c"));
-  ok $nfa->print("Zero Or More: ab*c") eq <<END;
-Zero Or More: ab*c
+  my $nfa = fromExpr("a", zeroOrMore("b"), "c");
+  is_deeply $nfa->print("ab*c"), <<END;
+ab*c
 Location  F  Transitions  Jumps
-       0     { a => 1 }   undef
-       1     { b => 2 }   [3]
-       2     undef        [1, 3]
-       3     { c => 4 }   undef
-       4  1  undef        undef
+       0     undef        [1]
+       1     { a => 2 }   undef
+       2     undef        [3, 4, 6, 7]
+       3     undef        [4, 6, 7]
+       4     { b => 5 }   undef
+       5     undef        [3, 4, 6, 7]
+       6     undef        [7]
+       7     { c => 8 }   undef
+       8  1  undef        undef
 END
   ok  $nfa->parse(qw(a c));
   ok  $nfa->parse(qw(a b c));
@@ -1349,21 +1409,21 @@ END
  }
 
 if (1) {                                                                        #ToneOrMore
-  my $nfa = fromExpr(element("a"), oneOrMore(element("b")), element("c"));
+  my $nfa = fromExpr("a", oneOrMore("b"), "c");
 
-  ok $nfa->print("One or More: ab+c") eq <<END;
+  is_deeply $nfa->print("One or More: ab+c"), <<END;
 One or More: ab+c
 Location  F  Transitions  Jumps
-       0     { a => 1 }   undef
-       1     { b => 2 }   undef
-       2     undef        [1, 3]
-       3     { c => 4 }   undef
-       4  1  undef        undef
+       0     undef        [1]
+       1     { a => 2 }   undef
+       2     undef        [3, 4]
+       3     undef        [4]
+       4     { b => 5 }   undef
+       5     undef        [3, 4, 6, 7]
+       6     undef        [7]
+       7     { c => 8 }   undef
+       8  1  undef        undef
 END
-
-  is_deeply [],     $nfa->statesReachableViaSymbol(2,"a");
-  is_deeply [1..3], $nfa->statesReachableViaSymbol(2,"b");
-  is_deeply [4],    $nfa->statesReachableViaSymbol(2,"c");
 
   ok !$nfa->parse(qw(a c));
   ok  $nfa->parse(qw(a b c));
@@ -1372,24 +1432,24 @@ END
  }
 
 if (1) {                                                                        #Tchoice
-  my $nfa = fromExpr(element("a"),
-                     choice(element("b"), element("c")),
-                     element("d"));
-  ok $nfa->print("Choice: (a(b|c)d") eq <<END;
-Choice: (a(b|c)d
+  my $nfa = fromExpr("a",
+                     choice(qw(b c)),
+                     "d");
+  is_deeply $nfa->print("(a(b|c)d"), <<END;
+(a(b|c)d
 Location  F  Transitions  Jumps
-       0     { a => 1 }   undef
-       1     { b => 2 }   [3]
-       2     undef        [4]
-       3     { c => 4 }   undef
-       4     { d => 5 }   undef
-       5  1  undef        undef
+       0     undef        [1]
+       1     { a => 2 }   undef
+       2     undef        [3, 4, 6, 7]
+       3     undef        [4, 6, 7]
+       4     { b => 5 }   undef
+       5     undef        [8, 9]
+       6     undef        [7]
+       7     { c => 8 }   undef
+       8     undef        [9]
+       9     { d => 10 }  undef
+      10  1  undef        undef
 END
-
-  is_deeply [],     $nfa->statesReachableViaSymbol(1, "a");
-  is_deeply [2, 4], $nfa->statesReachableViaSymbol(1, "b");
-  is_deeply [4],    $nfa->statesReachableViaSymbol(1, "c");
-  is_deeply ['a'..'d'], [$nfa->symbols];
 
   ok  $nfa->parse(qw(a b d));
   ok  $nfa->parse(qw(a c d));
@@ -1397,25 +1457,27 @@ END
  }
 
 if (1) {                                                                        #TzeroOrMore
-  my $nfa = fromExpr(element("a"),
-                     zeroOrMore(choice(element("a"),
-                     element("a"))),
-                     element("a"));
-  ok $nfa->print("aChoice: (a(a|a)*a") eq <<END;
-aChoice: (a(a|a)*a
+  my $nfa = fromExpr("a",
+                     zeroOrMore(choice("a",
+                     "a")),
+                     "a");
+  is_deeply $nfa->print("(a(a|a)*a"), <<END;
+(a(a|a)*a
 Location  F  Transitions  Jumps
-       0     { a => 1 }   undef
-       1     { a => 2 }   [3, 5]
-       2     undef        [1, 3, 4, 5]
-       3     { a => 4 }   undef
-       4     undef        [1, 3, 5]
+       0     undef        [1]
+       1     { a => 2 }   undef
+       2     undef        [3, 4, 5, 7, 8, 10, 11]
+       3     undef        [4, 5, 7, 8, 10, 11]
+       4     undef        [5, 7, 8]
        5     { a => 6 }   undef
-       6  1  undef        undef
+       6     undef        [3, 4, 5, 7 .. 11]
+       7     undef        [8]
+       8     { a => 9 }   undef
+       9     undef        [3, 4, 5, 7, 8, 10, 11]
+      10     undef        [11]
+      11     { a => 12 }  undef
+      12  1  undef        undef
 END
-
-  is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(1, "a");
-  is_deeply [1 .. 6],     $nfa->statesReachableViaSymbol(2, "a");
-  is_deeply [1, 3, 4, 5], $nfa->statesReachableViaSymbol(3, "a");
 
   ok !$nfa->parse(qw(a));
   ok  $nfa->parse(qw(a a));
@@ -1424,19 +1486,25 @@ END
  }
 
 if (1)
- {my $nfa = fromExpr(element("a"),
-                     zeroOrMore(choice(element("b"), element("c"))),
-                     element("d"));
-  ok $nfa->print("aChoice: (a(b|c)*d") eq <<END;
-aChoice: (a(b|c)*d
+ {my $nfa = fromExpr("a",
+                     zeroOrMore(choice(qw(b c))),
+                     "d");
+  ok $nfa->print("(a(b|c)*d") eq <<END;
+(a(b|c)*d
 Location  F  Transitions  Jumps
-       0     { a => 1 }   undef
-       1     { b => 2 }   [3, 5]
-       2     undef        [1, 3, 4, 5]
-       3     { c => 4 }   undef
-       4     undef        [1, 3, 5]
-       5     { d => 6 }   undef
-       6  1  undef        undef
+       0     undef        [1]
+       1     { a => 2 }   undef
+       2     undef        [3, 4, 5, 7, 8, 10, 11]
+       3     undef        [4, 5, 7, 8, 10, 11]
+       4     undef        [5, 7, 8]
+       5     { b => 6 }   undef
+       6     undef        [3, 4, 5, 7 .. 11]
+       7     undef        [8]
+       8     { c => 9 }   undef
+       9     undef        [3, 4, 5, 7, 8, 10, 11]
+      10     undef        [11]
+      11     { d => 12 }  undef
+      12  1  undef        undef
 END
 
   ok  $nfa->parse(qw(a d));
@@ -1446,25 +1514,32 @@ END
 
 if (1) {                                                                        #TfromExpr #Tprint #Tsymbols #Tparser
   my $nfa = fromExpr
-   (element("a"),
+   ("a",
     oneOrMore(choice(qw(b c))),
-    optional(element("d")),
+    optional("d"),
     element("e")
    );
 
-  ok $nfa->print("a(b|c)+d?e :") eq <<END;
-a(b|c)+d?e :
+  is_deeply $nfa->print("a(b|c)+d?e"), <<END;
+a(b|c)+d?e
 Location  F  Transitions  Jumps
-       0     { a => 1 }   undef
-       1     { b => 2 }   [3]
-       2     undef        [1, 3 .. 6]
-       3     { c => 4 }   undef
-       4     undef        [1, 3, 5, 6]
-       5     { d => 6 }   [6]
-       6     { e => 7 }   undef
-       7  1  undef        undef
+       0     undef        [1]
+       1     { a => 2 }   undef
+       2     undef        [3, 4, 5, 7, 8]
+       3     undef        [4, 5, 7, 8]
+       4     undef        [5, 7, 8]
+       5     { b => 6 }   undef
+       6     undef        [3, 4, 5, 7 .. 14]
+       7     undef        [8]
+       8     { c => 9 }   undef
+       9     undef        [3, 4, 5, 7, 8, 10 .. 14]
+      10     undef        [11 .. 14]
+      11     undef        [12, 13, 14]
+      12     { d => 13 }  undef
+      13     undef        [14]
+      14     { e => 15 }  undef
+      15  1  undef        undef
 END
-
 
   is_deeply ['a'..'e'], [$nfa->symbols];
 
@@ -1475,160 +1550,251 @@ END
  }
 
 if (1)
- {my $s = q(choice(element(q(a)), element(q(b))));
+ {my $s = q(choice(qw(a b)));
   my $nfa = eval qq(fromExpr($s));
 
-  ok $nfa->print("(a|b):") eq <<END;
-(a|b):
+  is_deeply $nfa->print("(a|b)"), <<END;
+(a|b)
 Location  F  Transitions  Jumps
-       0     { a => 1 }   [2]
-       1  1  undef        [3]
-       2     { b => 3 }   undef
-       3  1  undef        undef
+       0     undef        [1, 2, 4, 5]
+       1     undef        [2, 4, 5]
+       2     { a => 3 }   undef
+       3  1  undef        [6]
+       4     undef        [5]
+       5     { b => 6 }   undef
+       6  1  undef        undef
 END
 
+  ok !$nfa->parse(qw());
   ok  $nfa->parse(qw(a));
   ok  $nfa->parse(qw(b));
-  ok !$nfa->parse(qw(c));
+  ok !$nfa->parse(qw(a a));
   ok !$nfa->parse(qw(a b));
+  ok !$nfa->parse(qw(b a));
+  ok !$nfa->parse(qw(b b));
+  ok !$nfa->parse(qw(c));
  }
 
 if (1)
  {my $s = q(choice(qw(a b)));
   my $nfa = eval qq(fromExpr($s));
 
-  ok $nfa->print("(a|b):") eq <<END;
-(a|b):
+  is_deeply $nfa->print("(a|b)"), <<END;
+(a|b)
 Location  F  Transitions  Jumps
-       0     { a => 1 }   [2]
-       1  1  undef        [3]
-       2     { b => 3 }   undef
-       3  1  undef        undef
-END
- }
-
-if (1)
- {my $s = q(choice(element("a"), element("b")));
-  my $nfa = eval qq(fromExpr(sequence($s,$s)));
-
-  ok $nfa->print("(a|b)(a|b):") eq <<END;
-(a|b)(a|b):
-Location  F  Transitions  Jumps
-       0     { a => 1 }   [2]
-       1     undef        [3, 5]
-       2     { b => 3 }   undef
-       3     { a => 4 }   [5]
-       4  1  undef        [6]
+       0     undef        [1, 2, 4, 5]
+       1     undef        [2, 4, 5]
+       2     { a => 3 }   undef
+       3  1  undef        [6]
+       4     undef        [5]
        5     { b => 6 }   undef
        6  1  undef        undef
 END
+  ok !$nfa->parse(qw());
+  ok  $nfa->parse(qw(a));
+  ok  $nfa->parse(qw(b));
+  ok !$nfa->parse(qw(a a));
+  ok !$nfa->parse(qw(a b));
+  ok !$nfa->parse(qw(b a));
+  ok !$nfa->parse(qw(b b));
+  ok !$nfa->parse(qw(c));
  }
 
 if (1)
- {my $s = q(zeroOrMore(choice(element("a"))));
-  my $nfa = eval qq(fromExpr(sequence($s)));
-
-  ok $nfa->print("a*:") eq <<END;
-a*:
-Location  F  Transitions  Jumps
-       0  1  { a => 1 }   [2]
-       1  1  undef        [0, 2]
-       2  1  undef        undef
-END
- }
-
-if (1) {                                                                        #TallTransitions
-  my $s = q(zeroOrMore(choice(element("a"))));
-
+ {my $s = q(choice(qw(a b)));
   my $nfa = eval qq(fromExpr(sequence($s,$s)));
 
-  ok $nfa->print("a*a* 1:") eq <<END;
-a*a* 1:
+  is_deeply $nfa->print("(a|b)(a|b)"), <<END;
+(a|b)(a|b)
 Location  F  Transitions  Jumps
-       0  1  { a => 1 }   [2, 4]
-       1  1  undef        [0, 2, 4]
-       2  1  { a => 3 }   [4]
-       3  1  undef        [2, 4]
-       4  1  undef        undef
+       0     undef        [1, 2, 3, 5, 6]
+       1     undef        [2, 3, 5, 6]
+       2     undef        [3, 5, 6]
+       3     { a => 4 }   undef
+       4     undef        [7, 8, 9, 11, 12]
+       5     undef        [6]
+       6     { b => 7 }   undef
+       7     undef        [8, 9, 11, 12]
+       8     undef        [9, 11, 12]
+       9     { a => 10 }  undef
+      10  1  undef        [13]
+      11     undef        [12]
+      12     { b => 13 }  undef
+      13  1  undef        undef
 END
+  ok !$nfa->parse(qw());
+  ok !$nfa->parse(qw(a));
+  ok !$nfa->parse(qw(b));
+  ok  $nfa->parse(qw(a a));
+  ok  $nfa->parse(qw(a b));
+  ok  $nfa->parse(qw(b a));
+  ok  $nfa->parse(qw(b b));
+  ok !$nfa->parse(qw(c));
+ }
 
-  is_deeply [0 .. 4],  $nfa->statesReachableViaSymbol(0, q(a));
-  is_deeply [0 .. 4],  $nfa->statesReachableViaSymbol(1, q(a));
-  is_deeply [2, 3, 4], $nfa->statesReachableViaSymbol(2, q(a));
-  is_deeply [2, 3, 4], $nfa->statesReachableViaSymbol(3, q(a));
+if (1)
+ {my $s = q(zeroOrMore(choice("a")));
+  my $nfa = eval qq(fromExpr(sequence($s)));
 
+  is_deeply $nfa->print("a*"), <<END;
+a*
+Location  F  Transitions  Jumps
+       0  1  undef        [1 .. 4, 6]
+       1  1  undef        [2, 3, 4, 6]
+       2  1  undef        [3, 4, 6]
+       3     undef        [4]
+       4     { a => 5 }   undef
+       5  1  undef        [2, 3, 4, 6]
+       6  1  undef        undef
+END
   ok  $nfa->parse(qw());
   ok  $nfa->parse(qw(a));
+  ok !$nfa->parse(qw(b));
   ok  $nfa->parse(qw(a a));
   ok !$nfa->parse(qw(a b));
   ok !$nfa->parse(qw(b a));
+  ok !$nfa->parse(qw(b b));
+  ok !$nfa->parse(qw(c));
+ }
 
-  is_deeply $nfa->allTransitions,  {
-  "0" => { a => [0 .. 4] },
-  "1" => { a => [0 .. 4] },
-  "2" => { a => [2, 3, 4] },
-  "3" => { a => [2, 3, 4] },
-  "4" => { a => [] },
+if (1) {                                                                        #TallTransitions
+  my $s = q(zeroOrMore(choice("a")));
+
+  my $nfa = eval qq(fromExpr(sequence($s,$s)));
+
+  is_deeply $nfa->print("a*"), <<END;
+a*
+Location  F  Transitions  Jumps
+       0  1  undef        [1 .. 4, 6 .. 9, 11]
+       1  1  undef        [2, 3, 4, 6 .. 9, 11]
+       2  1  undef        [3, 4, 6 .. 9, 11]
+       3     undef        [4]
+       4     { a => 5 }   undef
+       5  1  undef        [2, 3, 4, 6 .. 9, 11]
+       6  1  undef        [7, 8, 9, 11]
+       7  1  undef        [8, 9, 11]
+       8     undef        [9]
+       9     { a => 10 }  undef
+      10  1  undef        [7, 8, 9, 11]
+      11  1  undef        undef
+END
+
+  ok  $nfa->parse(qw());
+  ok  $nfa->parse(qw(a));
+  ok !$nfa->parse(qw(b));
+  ok  $nfa->parse(qw(a a));
+  ok !$nfa->parse(qw(b b));
+  ok !$nfa->parse(qw(a b));
+  ok !$nfa->parse(qw(b a));
+  ok !$nfa->parse(qw(c));
+
+  is_deeply $nfa->allTransitions, {
+  "0"  => { a => [10, 11, 2 .. 9] },
+  "1"  => { a => [10, 11, 2 .. 9] },
+  "2"  => { a => [10, 11, 2 .. 9] },
+  "3"  => { a => [11, 2 .. 9] },
+  "4"  => { a => [11, 2 .. 9] },
+  "5"  => { a => [10, 11, 2 .. 9] },
+  "6"  => { a => [10, 11, 7, 8, 9] },
+  "7"  => { a => [10, 11, 7, 8, 9] },
+  "8"  => { a => [10, 11, 7, 8, 9] },
+  "9"  => { a => [10, 11, 7, 8, 9] },
+  "10" => { a => [10, 11, 7, 8, 9] },
+  "11" => { a => [] },
 };
 
-  ok $nfa->print("a*a* 2:") eq <<END;
-a*a* 2:
+  is_deeply $nfa->print("a*a* 2"), <<END;
+a*a* 2
 Location  F  Transitions  Jumps
-       0  1  { a => 1 }   [2, 4]
-       1  1  undef        [0, 2, 4]
-       2  1  { a => 3 }   [4]
-       3  1  undef        [2, 4]
-       4  1  undef        undef
+       0  1  undef        [1 .. 4, 6 .. 9, 11]
+       1  1  undef        [2, 3, 4, 6 .. 9, 11]
+       2  1  undef        [3, 4, 6 .. 9, 11]
+       3     undef        [4]
+       4     { a => 5 }   undef
+       5  1  undef        [2, 3, 4, 6 .. 9, 11]
+       6  1  undef        [7, 8, 9, 11]
+       7  1  undef        [8, 9, 11]
+       8     undef        [9]
+       9     { a => 10 }  undef
+      10  1  undef        [7, 8, 9, 11]
+      11  1  undef        undef
 END
  }
 
 if (1)
  {my $N = 4;
-  my $s = q(zeroOrMore(choice(element("a"), element("b"))));
+  my $s = q(zeroOrMore(choice("a", element("b"))));
   my $nfa = eval qq(fromExpr(($s)x$N));
-  ok $nfa->print("((a|b)*)**$N:") eq <<END;
-((a|b)*)**4:
+  is_deeply $nfa->print("((a|b)*)**$N"), <<END;
+((a|b)*)**4
 Location  F  Transitions  Jumps
-       0  1  { a => 1 }   [2, 4, 6, 8, 10, 12, 14, 16]
-       1  1  undef        [0, 2, 3, 4, 6, 8, 10, 12, 14, 16]
-       2     { b => 3 }   undef
-       3  1  undef        [0, 2, 4, 6, 8, 10, 12, 14, 16]
-       4  1  { a => 5 }   [6, 8, 10, 12, 14, 16]
-       5  1  undef        [4, 6, 7, 8, 10, 12, 14, 16]
+       0  1  undef        [1, 2, 3, 5, 6, 8 .. 11, 13, 14, 16 .. 19, 21, 22, 24 .. 27, 29, 30, 32]
+       1  1  undef        [2, 3, 5, 6, 8 .. 11, 13, 14, 16 .. 19, 21, 22, 24 .. 27, 29, 30, 32]
+       2     undef        [3, 5, 6]
+       3     { a => 4 }   undef
+       4  1  undef        [1, 2, 3, 5 .. 11, 13, 14, 16 .. 19, 21, 22, 24 .. 27, 29, 30, 32]
+       5     undef        [6]
        6     { b => 7 }   undef
-       7  1  undef        [4, 6, 8, 10, 12, 14, 16]
-       8  1  { a => 9 }   [10, 12, 14, 16]
-       9  1  undef        [8, 10, 11, 12, 14, 16]
-      10     { b => 11 }  undef
-      11  1  undef        [8, 10, 12, 14, 16]
-      12  1  { a => 13 }  [14, 16]
-      13  1  undef        [12, 14, 15, 16]
+       7  1  undef        [1, 2, 3, 5, 6, 8 .. 11, 13, 14, 16 .. 19, 21, 22, 24 .. 27, 29, 30, 32]
+       8  1  undef        [9, 10, 11, 13, 14, 16 .. 19, 21, 22, 24 .. 27, 29, 30, 32]
+       9  1  undef        [10, 11, 13, 14, 16 .. 19, 21, 22, 24 .. 27, 29, 30, 32]
+      10     undef        [11, 13, 14]
+      11     { a => 12 }  undef
+      12  1  undef        [9, 10, 11, 13 .. 19, 21, 22, 24 .. 27, 29, 30, 32]
+      13     undef        [14]
       14     { b => 15 }  undef
-      15  1  undef        [12, 14, 16]
-      16  1  undef        undef
+      15  1  undef        [9, 10, 11, 13, 14, 16 .. 19, 21, 22, 24 .. 27, 29, 30, 32]
+      16  1  undef        [17, 18, 19, 21, 22, 24 .. 27, 29, 30, 32]
+      17  1  undef        [18, 19, 21, 22, 24 .. 27, 29, 30, 32]
+      18     undef        [19, 21, 22]
+      19     { a => 20 }  undef
+      20  1  undef        [17, 18, 19, 21 .. 27, 29, 30, 32]
+      21     undef        [22]
+      22     { b => 23 }  undef
+      23  1  undef        [17, 18, 19, 21, 22, 24 .. 27, 29, 30, 32]
+      24  1  undef        [25, 26, 27, 29, 30, 32]
+      25  1  undef        [26, 27, 29, 30, 32]
+      26     undef        [27, 29, 30]
+      27     { a => 28 }  undef
+      28  1  undef        [25, 26, 27, 29 .. 32]
+      29     undef        [30]
+      30     { b => 31 }  undef
+      31  1  undef        [25, 26, 27, 29, 30, 32]
+      32  1  undef        undef
 END
  }
 
 if (1) {                                                                        #Texcept
   my $nfa = fromExpr(choice(qw(a b c)), except(qw(c x)), choice(qw(a b c)));
 
-  ok $nfa->print("(a|b|c)(c!x)(a|b|c):") eq <<END;
-(a|b|c)(c!x)(a|b|c):
+  is_deeply $nfa->print("(a|b|c)(c!x)(a|b|c)"), <<END;
+(a|b|c)(c!x)(a|b|c)
 Location  F  Transitions  Jumps
-       0     { a => 1 }   [2, 4]
-       1     undef        [5, 7]
-       2     { b => 3 }   undef
-       3     undef        [5, 7]
-       4     { c => 5 }   undef
-       5     { a => 6 }   [7]
-       6     undef        [8, 10, 12]
-       7     { b => 8 }   undef
-       8     { a => 9 }   [10, 12]
-       9  1  undef        [13]
-      10     { b => 11 }  undef
-      11  1  undef        [13]
-      12     { c => 13 }  undef
-      13  1  undef        undef
+       0     undef        [1, 2, 4, 5, 7, 8]
+       1     undef        [2, 4, 5, 7, 8]
+       2     { a => 3 }   undef
+       3     undef        [9, 10, 11, 13, 14]
+       4     undef        [5]
+       5     { b => 6 }   undef
+       6     undef        [9, 10, 11, 13, 14]
+       7     undef        [8]
+       8     { c => 9 }   undef
+       9     undef        [10, 11, 13, 14]
+      10     undef        [11, 13, 14]
+      11     { a => 12 }  undef
+      12     undef        [15, 16, 17, 19, 20, 22, 23]
+      13     undef        [14]
+      14     { b => 15 }  undef
+      15     undef        [16, 17, 19, 20, 22, 23]
+      16     undef        [17, 19, 20, 22, 23]
+      17     { a => 18 }  undef
+      18  1  undef        [24]
+      19     undef        [20]
+      20     { b => 21 }  undef
+      21  1  undef        [24]
+      22     undef        [23]
+      23     { c => 24 }  undef
+      24  1  undef        undef
 END
 
   ok !$nfa->parse(qw(a a));
@@ -1639,21 +1805,55 @@ END
 if (1) {
   my $nfa = fromExpr(sequence(qw(a b c)), except(qw(c x)));
 
-  ok $nfa->print("(abc)(c!x):") eq <<END;
-(abc)(c!x):
+  is_deeply $nfa->print("(abc)(c!x)"), <<END;
+(abc)(c!x)
 Location  F  Transitions  Jumps
-       0     { a => 1 }   undef
-       1     { b => 2 }   undef
-       2     { c => 3 }   undef
-       3     { a => 4 }   [5]
-       4  1  undef        [6]
-       5     { b => 6 }   undef
-       6  1  undef        undef
+       0     undef        [1, 2]
+       1     undef        [2]
+       2     { a => 3 }   undef
+       3     undef        [4]
+       4     { b => 5 }   undef
+       5     undef        [6]
+       6     { c => 7 }   undef
+       7     undef        [8, 9, 11, 12]
+       8     undef        [9, 11, 12]
+       9     { a => 10 }  undef
+      10  1  undef        [13]
+      11     undef        [12]
+      12     { b => 13 }  undef
+      13  1  undef        undef
 END
 
   ok  $nfa->parse(qw(a b c a));
   ok  $nfa->parse(qw(a b c b));
   ok !$nfa->parse(qw(a b c c));
+ }
+
+if (1) {
+  my $nfa = fromExpr(choice(zeroOrMore(q(a)), q(b)));
+
+  is_deeply $nfa->print("a*|b+"), <<END;
+a*|b+
+Location  F  Transitions  Jumps
+       0  1  undef        [1, 2, 3, 5 .. 8]
+       1  1  undef        [2, 3, 5 .. 8]
+       2  1  undef        [3, 5, 8]
+       3     { a => 4 }   undef
+       4  1  undef        [2, 3, 5, 8]
+       5  1  undef        [8]
+       6     undef        [7]
+       7     { b => 8 }   undef
+       8  1  undef        undef
+END
+
+  ok  $nfa->parse(qw());
+  ok  $nfa->parse(qw(a));
+  ok  $nfa->parse(qw(a a));
+  ok  $nfa->parse(qw(b));
+  ok !$nfa->parse(qw(b b));
+  ok !$nfa->parse(qw(a b));
+  ok !$nfa->parse(qw(a a b));
+  ok !$nfa->parse(qw(b a));
  }
 
 latestTest:;

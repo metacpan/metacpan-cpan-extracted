@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Client::Direct;
-$Search::Elasticsearch::Role::Client::Direct::VERSION = '6.80';
+$Search::Elasticsearch::Role::Client::Direct::VERSION = '6.81';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::Client';
 use Search::Elasticsearch::Util qw(load_plugin is_compat throw);
@@ -175,7 +175,7 @@ Search::Elasticsearch::Role::Client::Direct - Request parsing for Direct clients
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

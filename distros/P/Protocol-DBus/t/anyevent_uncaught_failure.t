@@ -17,10 +17,7 @@ SKIP: {
 
     my $cv = AnyEvent->condvar();
 
-    my $timer = AnyEvent->timer(
-        after => 0.1,
-        cb => $cv,
-    );
+    my $timer;
 
     $dbus->initialize()->then(
         sub {
@@ -41,7 +38,12 @@ SKIP: {
             )->then(
                 sub { diag "signal sent\n" },
                 sub { diag "signal NOT sent\n" },
-            );
+            )->finally( sub {
+                $timer = AnyEvent->timer(
+                    after => 0.1,
+                    cb => $cv,
+                );
+            } );
         },
         sub {
             $cv->();

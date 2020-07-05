@@ -55,6 +55,17 @@ write (self, entry)
 		archive_check_error (rc, self->ar, archive_write_finish_entry);
 
 void
+close (self)
+	DiskWriter self
+
+	PREINIT:
+		int rc;
+
+	CODE:
+		rc = archive_write_close (self->ar);
+		archive_check_error (rc, self->ar, archive_write_close);
+
+void
 DESTROY (self)
 	DiskWriter self
 

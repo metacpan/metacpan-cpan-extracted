@@ -1,6 +1,7 @@
 language: minimal
 services: docker
 env:
+  - image=perl:5.32
   - image=perl:5.30
   - image=perl:5.28
   - image=perl:5.26
@@ -17,16 +18,31 @@ before_install:
   - docker run $image perl -V
 script:
   - |
-    docker run --init --rm -it -v $PWD:/$TRAVIS_REPO_SLUG -w /$TRAVIS_REPO_SLUG $image bash -c '
+    echo TRAVIS_BUILD_DIR=$TRAVIS_BUILD_DIR
+    echo TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG
+    echo TRAVIS_BRANCH=$TRAVIS_BRANCH
+    docker run --init --rm -it \
+      -e COVERALLS_REPO_TOKEN \
+      -e TRAVIS_BRANCH \
+      -v $PWD:/$TRAVIS_REPO_SLUG -w /$TRAVIS_REPO_SLUG $image \
+      bash -c '
     set -euxo pipefail
-    cpanm -n Devel::Cover::Report::Coveralls
-    cpanm --notest --quiet --installdeps .
+    if [[ -r .git/config ]]; then git checkout $TRAVIS_BRANCH; else echo NO GIT; fi
+    curl -fsSL --compressed https://git.io/cpm > cpm
+    chmod +x cpm
+    ./cpm install -g Devel::Cover Devel::Cover::Report::Coveralls
+    ./cpm install -g
+    which perl
+    perldoc -lm JSON::PP
     ln -vnsf perl-mop4import-declare ../MOP4Import
     cd ../MOP4Import
+    which perl
+    perldoc -lm JSON::PP
+    grep "::PP::VERSION " $(perldoc -lm JSON::PP)
     perl Build.PL
     ./Build build
-     cover -test
+    cover -test
+    cover -report coveralls
     echo DONE
     '
-after_success:
-  cover -report coveralls
+  

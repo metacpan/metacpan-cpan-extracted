@@ -5,7 +5,7 @@ use warnings;
 
 package MyCustom::NavMenu::Iterator;
 
-use base 'HTML::Widgets::NavMenu::Iterator::NavMenu';
+use parent 'HTML::Widgets::NavMenu::Iterator::NavMenu';
 
 sub get_open_sub_menu_tags
 {
@@ -25,7 +25,7 @@ sub get_currently_active_text
 
 package MyCustom::NavMenu;
 
-use base 'HTML::Widgets::NavMenu';
+use parent 'HTML::Widgets::NavMenu';
 
 sub _get_nav_menu_traverser
 {
@@ -41,7 +41,7 @@ use lib './t/lib';
 
 use Test::More tests => 1;
 
-use HTML::Widgets::NavMenu;
+use HTML::Widgets::NavMenu ();
 
 use HTML::Widgets::NavMenu::Test::Data;
 

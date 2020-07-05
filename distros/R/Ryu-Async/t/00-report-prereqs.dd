@@ -19,7 +19,6 @@ do { my $x = {
                                       'Test::More' => '0.96',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
-                                      'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'Test::Version' => '1'
                                     }
@@ -29,11 +28,10 @@ do { my $x = {
                                         'Heap' => '0',
                                         'IO::Async::SSL' => '0.19',
                                         'IO::AsyncX::Sendfile' => '0.002',
-                                        'IO::AsyncX::System' => '0.003',
-                                        'Tickit::Async' => '0.21'
+                                        'IO::AsyncX::System' => '0.003'
                                       },
                       'requires' => {
-                                      'Future' => '0.37',
+                                      'Future' => '0.45',
                                       'IO::Async' => '0.71',
                                       'IO::Async::Handle' => '0',
                                       'IO::Async::Listener' => '0',
@@ -48,7 +46,7 @@ do { my $x = {
                                       'IO::Async::Timer::Periodic' => '0',
                                       'IO::Socket::IP' => '0.37',
                                       'Log::Any' => '1.050',
-                                      'Ryu' => '1.008',
+                                      'Ryu' => '2.001',
                                       'Ryu::Sink' => '0',
                                       'Ryu::Source' => '0',
                                       'Scalar::Util' => '0',
@@ -62,6 +60,9 @@ do { my $x = {
                                       'parent' => '0',
                                       'strict' => '0',
                                       'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'Tickit::Async' => '0.21'
                                     }
                     },
        'test' => {

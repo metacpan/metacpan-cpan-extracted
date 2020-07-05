@@ -4,7 +4,7 @@
       "Thomas R. Wyant, III F<wyant at cpan dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -53,7 +53,7 @@
    "provides" : {
       "Test::Pod::LinkCheck::Lite" : {
          "file" : "lib/Test/Pod/LinkCheck/Lite.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
          "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

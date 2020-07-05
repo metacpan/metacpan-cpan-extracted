@@ -1,0 +1,60 @@
+NAME
+    Pass::OTP - Perl implementation of HOTP / TOTP algorithms
+
+SYNOPSIS
+        use Pass::OTP qw(otp);
+        use Pass::OTP::URI qw(parse);
+
+        my $uri = "otpauth://totp/ACME:john.doe@email.com?secret=HXDMVJECJJWSRB3HWIZR4IFUGFTMXBOZ&issuer=ACME&digits=6";
+        my $otp_code = otp(parse($uri));
+
+DESCRIPTION
+    The "Pass::OTP" module provides implementation of HOTP and TOTP
+    algorithms according to the RFC 4226 and RFC 6238.
+
+FUNCTIONS
+    hotp(%options)
+        Computes HMAC-based One-time Password (RFC 4226).
+
+            HOTP(K,C) = Truncate(HMAC-SHA-1(K,C))
+
+        Step 1: Generate an HMAC-SHA-1 value
+
+            Let HS = HMAC-SHA-1(K,C)
+
+        Step 2: Generate a 4-byte string (Dynamic Truncation)
+
+            Let Sbits = DT(HS)
+
+        Step 3: Compute an HOTP value
+
+            Let Snum = StToNum(Sbits)       # Convert S to a number in 0..2^{31}-1
+            Return D = Snum mod 10^Digit    # D us a number in the range 0..10^{Digit}-1
+
+    totp(%options)
+        Computes Time-based One-time Password (RFC 6238).
+
+            TOTP = HOTP(K,T)
+            T = (Current Unix time - T0) / X
+
+    otp(%options)
+        Convenience wrapper which calls totp/hotp according to options.
+
+SEE ALSO
+    Digest::HMAC
+
+    oathtool(1)
+
+    RFC 4226 RFC 6238
+
+    <https://github.com/google/google-authenticator/wiki/Key-Uri-Format>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2020 Jan Baier
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See <http://dev.perl.org/licenses/> for more information.
+

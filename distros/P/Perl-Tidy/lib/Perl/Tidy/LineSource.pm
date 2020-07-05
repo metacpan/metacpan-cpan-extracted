@@ -8,11 +8,23 @@
 package Perl::Tidy::LineSource;
 use strict;
 use warnings;
-our $VERSION = '20200110';
+our $VERSION = '20200619';
 
 sub new {
 
-    my ( $class, $input_file, $rOpts, $rpending_logfile_message ) = @_;
+    my ( $class, @args ) = @_;
+
+    my %defaults = (
+        input_file               => undef,
+        rOpts                    => undef,
+        rpending_logfile_message => undef,
+    );
+
+    my %args = ( %defaults, @args );
+
+    my $input_file               = $args{input_file};
+    my $rOpts                    = $args{rOpts};
+    my $rpending_logfile_message = $args{rpending_logfile_message};
 
     my $input_line_ending;
     if ( $rOpts->{'preserve-line-endings'} ) {

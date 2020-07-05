@@ -63,7 +63,7 @@ ok($action);
 
 my @result;
 eval { @result = $action->do };
-ok(!$@) or pdump $@;
+ok(!$@) or BAIL_OUT($@); #pdump $@;
 
 #@result = $action->do;
 is_deeply($result[0], ['ra1','ra2'], "Check required attributes array");

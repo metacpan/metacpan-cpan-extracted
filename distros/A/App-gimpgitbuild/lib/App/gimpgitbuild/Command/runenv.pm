@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::runenv;
-$App::gimpgitbuild::Command::runenv::VERSION = '0.18.1';
+$App::gimpgitbuild::Command::runenv::VERSION = '0.26.0';
 use strict;
 use warnings;
 use 5.014;
@@ -54,7 +54,7 @@ __END__
 
 =head1 VERSION
 
-version 0.18.1
+version 0.26.0
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

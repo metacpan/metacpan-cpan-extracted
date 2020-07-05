@@ -54,6 +54,12 @@ is_deeply( [ Getopt::EX::Numbers->new->parse("1:10:3:2")->sequence ],
 	   "direct" );
 
 is_deeply( [ Getopt::EX::Numbers->new(
+		start => 1, end => 10, step=> 3, length => 2
+	     )->sequence ],
+	   [  1,2 ,  4,5 ,  7,8 ,  10,11 ],
+	   "skip parse" );
+
+is_deeply( [ Getopt::EX::Numbers->new(
 		 min => 1, max => 10, start => 1, end => 1
 	     )->parse("1")->range ],
 	   [  [1,1] ],

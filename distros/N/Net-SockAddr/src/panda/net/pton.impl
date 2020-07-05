@@ -4,8 +4,8 @@ using std::errc;
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
-static const int UV__INET_ADDRSTRLEN  = panda::net::IP4_MAX_ADDRSTRLEN;
-static const int UV__INET6_ADDRSTRLEN = panda::net::IP6_MAX_ADDRSTRLEN;
+static const int UV__INET_ADDRSTRLEN  = panda::net::SockAddr::IP4_MAX_ADDRSTRLEN;
+static const int UV__INET6_ADDRSTRLEN = panda::net::SockAddr::IP6_MAX_ADDRSTRLEN;
 static const int UV_EAFNOSUPPORT      = (int)errc::address_family_not_supported;
 static const int UV_ENOSPC            = (int)errc::no_space_on_device;
 static const int UV_EINVAL            = (int)errc::invalid_argument;

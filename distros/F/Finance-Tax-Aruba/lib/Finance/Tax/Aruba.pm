@@ -1,10 +1,10 @@
 use utf8;
 package Finance::Tax::Aruba;
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moose;
 use namespace::autoclean;
 
-# ABSTRACT: A package that deal with tax calculations for Aruba
+# ABSTRACT: A package that deals with tax calculations for Aruba
 
 __PACKAGE__->meta->make_immutable;
 
@@ -16,11 +16,11 @@ __END__
 
 =head1 NAME
 
-Finance::Tax::Aruba - A package that deal with tax calculations for Aruba
+Finance::Tax::Aruba - A package that deals with tax calculations for Aruba
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

@@ -2,13 +2,14 @@ package HealthCheck::Diagnostic;
 
 # ABSTRACT: A base clase for writing health check diagnositics
 use version;
-our $VERSION = 'v1.5.4'; # VERSION: 0.01
+our $VERSION = 'v1.5.5'; # VERSION: 0.01
 
 use 5.010;
 use strict;
 use warnings;
 
 use Carp;
+use Time::HiRes qw< gettimeofday tv_interval >;
 
 # From the O'Reilly Regular Expressions Cookbook 2E, sorta
 # https://www.safaribooksonline.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html
@@ -50,6 +51,11 @@ my $iso8601_timestamp = qr/^(?:
 #pod Or as a class method.
 #pod
 #pod     my $result = HealthCheck::Diagnostic::Sample->check();
+#pod
+#pod Set C<runtime> to a truthy value in the params for check and the
+#pod time spent checking will be returned in the results.
+#pod
+#pod     my $result = HealthCheck::Diagnostic::Sample->check( runtime => 1 );
 #pod
 #pod =head1 DESCRIPTION
 #pod
@@ -212,6 +218,7 @@ sub check {
         unless $class_or_self->can('run');
 
     local $@;
+    my $start = $params{runtime} ? [ gettimeofday ] : undef;
     my @res = eval { local $SIG{__DIE__}; $class_or_self->run(%params) };
     @res = { status => 'CRITICAL', info => "$@" } if $@;
 
@@ -222,6 +229,7 @@ sub check {
         @res = { status => 'UNKNOWN' };
     }
 
+    $res[0]->{runtime} = sprintf "%.03f", tv_interval($start) if $start;
     return $class_or_self->summarize(@res);
 }
 
@@ -416,7 +424,7 @@ HealthCheck::Diagnostic - A base clase for writing health check diagnositics
 
 =head1 VERSION
 
-version v1.5.4
+version v1.5.5
 
 =head1 SYNOPSIS
 
@@ -441,6 +449,11 @@ You can then either instantiate an instance and run the check.
 Or as a class method.
 
     my $result = HealthCheck::Diagnostic::Sample->check();
+
+Set C<runtime> to a truthy value in the params for check and the
+time spent checking will be returned in the results.
+
+    my $result = HealthCheck::Diagnostic::Sample->check( runtime => 1 );
 
 =head1 DESCRIPTION
 

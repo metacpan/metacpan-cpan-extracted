@@ -1,6 +1,17 @@
 IO::KQueue Changes
 ==================
-    
+
+0.37 2020-07-04
+    - Fix building on older FreeBSD versions (BinGOs)
+
+0.36 2020-07-04
+    - Release trial version with no other changes
+
+0.35-TRIAL 2020-06-30
+    - New maintainer ARC (Aaron Crane)
+    - Fixes to build on recent MacOS; now requires Perl 5.10 (though that may
+      change if needed)
+
 0.34
     - Rebuilt tarball without the stupid OSX resource fork files.
 

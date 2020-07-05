@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.48 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.51 {
 
   use 5.014;
   use Moose;
@@ -214,6 +214,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.48 {
                 filename        => 'README',
                 location        => 'build',
           maybe source_filename => $self->payload->{readme_from},
+          maybe default_branch  => $self->payload->{default_branch},
         },
       ]);
 
@@ -223,6 +224,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.48 {
                 filename        => 'README.md',
                 location        => 'root',
           maybe source_filename => $self->payload->{readme_from},
+          maybe default_branch  => $self->payload->{default_branch},
 
           # these are for my ReadmeAnyFromPod wrapper.
                 travis_status   => int(defined $self->payload->{travis_status} ? $self->payload->{travis_status} : 0),
@@ -304,7 +306,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.48
+version 2.51
 
 =head1 SYNOPSIS
 

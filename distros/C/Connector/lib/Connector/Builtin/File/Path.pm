@@ -33,6 +33,24 @@ has ifexists => (
     default => 'replace'
 );
 
+has user => (
+    is  => 'rw',
+    isa => 'Str',
+    default => ''
+);
+
+has group  => (
+    is  => 'rw',
+    isa => 'Str',
+    default => ''
+);
+
+has mode  => (
+    is  => 'rw',
+    isa => 'Str',
+    default => ''
+);
+
 sub _build_config {
     my $self = shift;
 
@@ -125,6 +143,25 @@ sub set {
         return;
     }
 
+    if (my $mode = $self->mode()) {
+        if ($mode =~ m{\A[0-7]{4}\z}) {
+            chmod oct($mode), $filename || die "Unable to change mode to $mode";
+        } else {
+            die "Given umask '$mode' is not valid";
+        }
+    }
+
+    my $uid = -1;
+    my $gid;
+    if (my $user = $self->user()) {
+        $uid = getpwnam($user) or die "$user not known";
+        $gid = -1;
+    }
+
+    if (my $group = $self->group()) {
+        $gid = getgrnam($group) or die "$group not known";
+    }
+
     if ($mode eq 'append' && -f $filename) {
         open (FILE, ">>",$filename) || die "Unable to open file for appending";
     } else {
@@ -133,6 +170,10 @@ sub set {
 
     print FILE $content;
     close FILE;
+
+    if ($gid) {
+        chown ($uid, $gid, $filename) || die "Unable to chown $filename to $uid/$gid";
+    }
 
     #FIXME - some error handling might not hurt
 
@@ -214,6 +255,16 @@ Pattern for Template Toolkit to build the content. The data is passed
 
 =back
 
+=item mode
+
+Filesystem permissions to apply to the file when a file is written using the
+set method. Must be given in octal notation, e.g. 0644. Default is to not set
+the permissions and rely on the systems umask.
+
+=item user / group
+
+Name of a user / group that the file should belong to.
+
 =head1 Supported Methods
 
 =head2 set
@@ -243,4 +294,3 @@ Fetch data from a file. See the file parameter how to control the filename.
     $conn->set('test', { NAME => 'Oliver' });
 
 Results in a file I</var/data/test.txt> with the content I<Hello Oliver>.
-

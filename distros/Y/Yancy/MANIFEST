@@ -135,6 +135,12 @@ t/fixtures/basic/mysql.sql
 t/fixtures/basic/pg.sql
 t/fixtures/basic/schema.json
 t/fixtures/basic/sqlite.sql
+t/fixtures/binary/README.md
+t/fixtures/binary/dbic.pl
+t/fixtures/binary/mysql.sql
+t/fixtures/binary/pg.sql
+t/fixtures/binary/schema.json
+t/fixtures/binary/sqlite.sql
 t/fixtures/composite-key/README.md
 t/fixtures/composite-key/dbic.pl
 t/fixtures/composite-key/mysql.sql
@@ -162,6 +168,9 @@ t/fixtures/markdown/sqlite.sql
 t/helpers.t
 t/i18n.t
 t/lib/Digest/Broken.pm
+t/lib/Local/CamelSchema.pm
+t/lib/Local/CamelSchema/Result/Addresses.pm
+t/lib/Local/CamelSchema/Result/Cities.pm
 t/lib/Local/Controller/Extend/Yancy.pm
 t/lib/Local/Schema.pm
 t/lib/Local/Schema/Result/blog.pm

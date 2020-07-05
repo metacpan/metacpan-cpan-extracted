@@ -1,24 +1,29 @@
 package Net::SAML2::SP;
 use Moose;
-use MooseX::Types::Moose qw/ Str /;
 use MooseX::Types::URI qw/ Uri /;
 
 
 use Crypt::OpenSSL::X509;
 use XML::Generator;
 
+use Net::SAML2::Binding::POST;
+use Net::SAML2::Binding::Redirect;
+use Net::SAML2::Binding::SOAP;
+use Net::SAML2::Protocol::AuthnRequest;
+use Net::SAML2::Protocol::LogoutRequest;
+
 
 has 'url'    => (isa => Uri, is => 'ro', required => 1, coerce => 1);
-has 'id'     => (isa => Str, is => 'ro', required => 1);
-has 'cert'   => (isa => Str, is => 'ro', required => 1);
-has 'key'    => (isa => Str, is => 'ro', required => 1);
+has 'id'     => (isa => 'Str', is => 'ro', required => 1);
+has 'cert'   => (isa => 'Str', is => 'ro', required => 1);
+has 'key'    => (isa => 'Str', is => 'ro', required => 1);
 has 'cacert' => (isa => 'Maybe[Str]', is => 'ro', required => 1);
 
-has 'org_name'         => (isa => Str, is => 'ro', required => 1);
-has 'org_display_name' => (isa => Str, is => 'ro', required => 1);
-has 'org_contact'      => (isa => Str, is => 'ro', required => 1);
+has 'org_name'         => (isa => 'Str', is => 'ro', required => 1);
+has 'org_display_name' => (isa => 'Str', is => 'ro', required => 1);
+has 'org_contact'      => (isa => 'Str', is => 'ro', required => 1);
 
-has '_cert_text' => (isa => Str, is => 'rw', required => 0);
+has '_cert_text' => (isa => 'Str', is => 'rw', required => 0);
 
 
 sub BUILD {
@@ -254,7 +259,7 @@ Net::SAML2::SP
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -381,7 +386,8 @@ This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
   Copyright 2010-2011  Chris Andrews
             2012       Peter Marschall
             2017       Alessandro Ranellucci
-            2019-2020  Timothy Legge
+            2019       Timothy Legge
+            2020       Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

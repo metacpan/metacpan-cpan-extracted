@@ -24,7 +24,7 @@ sub from {
   my ($self, $string) = @_;
   my $g = $self->_vfs;
   $string =~ s/$g//;
-  my @p = splitdir($string);
+  my @p   = splitdir($string);
   my $pre = substr $string, 0, 1;
   shift @p if $pre eq '/';
   my $name = shift @p;
@@ -32,8 +32,8 @@ sub from {
 }
 
 sub _cgroup {
-  path($_[0]->parent ?
-      path($_[0]->_vfs, $_[0]->name // '', $_[0]->parent)
+  path($_[0]->parent
+    ? path($_[0]->_vfs, $_[0]->name // '', $_[0]->parent)
     : path($_[0]->_vfs, $_[0]->name // ''));
 }
 
@@ -60,8 +60,8 @@ sub _flag {
   print $h ($f == 0 ? 0 : 1);
 }
 
-sub _appendln { shift->_append(shift() => pop() . "\n") }
-sub _list { my $c = shift->_cgroup->child(pop); $c->slurp if -e $c }
+sub _appendln  { shift->_append(shift() => pop() . "\n") }
+sub _list      { my $c = shift->_cgroup->child(pop); $c->slurp if -e $c }
 sub _listarray { split(/\n/, shift->_list(@_)) }
 
 sub _contains {
@@ -71,8 +71,8 @@ sub _contains {
 }
 
 sub _setget {
-  $_[2] ?
-    shift->_cgroup->child($_[0])->spurt($_[1])
+  $_[2]
+    ? shift->_cgroup->child($_[0])->spurt($_[1])
     : shift->_cgroup->child($_[0])->slurp;
 }
 

@@ -25,6 +25,8 @@ extern my_perl_auto_t my_perl;
 
 void at_perl_destroy (const panda::function<void()>& f);
 
+bool is_perl_thread ();
+
 void __call_at_perl_destroy  ();
 void __call_at_thread_create ();
 

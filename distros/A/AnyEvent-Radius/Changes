@@ -1,3 +1,10 @@
+1.1.2 2020-07-02
+
+- Added the callback support allowing to collect timed out results
+- requires Data::Radius v1.2.3 for new request aliases
+- Fix global destruction detect for Perl older than 5.14
+- skip tests for MS Windows due to fork() used
+
 1.1.1 2017-06-01
 
 - Data::Radius v1.2.1 is required for test

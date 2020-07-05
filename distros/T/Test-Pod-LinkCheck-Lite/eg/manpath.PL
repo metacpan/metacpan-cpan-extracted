@@ -13,7 +13,7 @@ use File::Spec;
 use List::Util qw{ uniq };
 use Pod::Usage;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use constant PATH_SEP	=> qr/ $Config{path_sep} /smx;
 use constant MANPATH_APPEND	=> qr/ (?<= $Config{path_sep} \z ) /smx;
@@ -382,7 +382,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019 by Thomas R. Wyant, III
+Copyright (C) 2019-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

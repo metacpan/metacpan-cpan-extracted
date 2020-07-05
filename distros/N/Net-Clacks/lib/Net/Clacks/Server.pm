@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 12;
+our $VERSION = 13;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -143,6 +143,10 @@ sub init {
 
     if(!defined($self->{config}->{authtimeout})) {
         $self->{config}->{authtimeout} = 15;
+    }
+
+    if(!defined($self->{config}->{deletedcachetime})) {
+        $self->{config}->{deletedcachetime} = 60 * 60; # 1 hour
     }
 
     my @tcpsockets;
@@ -805,6 +809,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
                         push @outbox, \%tmp;
                     } elsif($clients{$cid}->{buffer} =~ /^KEYSYNC\ (.+?)\ (.+?)\ (.+?)\=(.*)/) {
                         print $clients{$cid}->{buffer}, "\n";
+                        $clients{$cid}->{lastping} = time;
                         my ($ctimestamp, $cmode, $ckey, $cval) = ($1, $2, $3, $4);
 
                         if(!defined($clackscachetime{$ckey})) {
@@ -945,7 +950,7 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
         }
 
         # clean up very old "deleted" entries
-        my $stillvalidtime = time - (7 * 24 * 60 * 60); # 1 week
+        my $stillvalidtime = time - $self->{config}->{deletedcachetime};
         foreach my $key (keys %clackscachetime) {
             next if($clackscachetime{$key} > $stillvalidtime);
             next if(defined($clackscache{$key})); # Still has data

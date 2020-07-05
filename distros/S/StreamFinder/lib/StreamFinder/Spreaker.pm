@@ -4,7 +4,7 @@ StreamFinder::Spreaker - Fetch actual raw streamable URLs on widget.spreaker.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2020 by
+This module is Copyright (C) 2020 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -88,7 +88,7 @@ The purpose is that one needs one of these URLs in order to have the option to
 stream the podcast in one's own choice of media player software rather than 
 using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, and other crapware that can come with that method 
-of playing.  The author uses his own custom all-purpose media player called 
+of play.  The author uses his own custom all-purpose media player called 
 "fauxdacious" (his custom hacked version of the open-source "audacious" 
 audio player).  "fauxdacious" can incorporate this module to decode and play 
 Spreaker.com streams.
@@ -116,12 +116,16 @@ Returns an array of strings representing all stream URLs found.
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
 
-Current options are:  I<"random"> and I<"noplaylists">.  By default, the 
-first ("best"?) stream is returned.  If I<"random"> is specified, then 
-a random one is selected from the list of streams found.  
+Current options are:  I<"random">, I<"nopls">, and I<"noplaylists">.  
+By default, the first ("best"?) stream is returned.  If I<"random"> is 
+specified, then a random one is selected from the list of streams found.  
+If I<"nopls"> is specified, and the stream to be returned is a ".pls" playlist, 
+it is first fetched and the first entry (or a random entry if I<"random"> is 
+specified) is returned.  This is needed by Fauxdacious Mediaplayer.
 If I<"noplaylists"> is specified, and the stream to be returned is a 
-"playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
-in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
+"playlist" (either .pls or .m3u? extension), it is first fetched and the first 
+entry (or a random entry if I<"random"> is specified) in the playlist 
+is returned.
 
 =item $podcast->B<count>()
 
@@ -247,7 +251,7 @@ L<http://search.cpan.org/dist/StreamFinder-Spreaker/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2019 Jim Turner.
+Copyright 2020 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -330,17 +334,33 @@ sub new
 			close IN;
 		}
 	}
+	foreach my $i (qw(agent from conn_cache default_headers local_address ssl_opts max_size
+			max_redirect parse_head protocols_allowed protocols_forbidden requests_redirectable
+			proxy no_proxy)) {
+		push @userAgentOps, $i, $uops{$i}  if (defined $uops{$i});
+	}
+	push (@userAgentOps, 'agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0')
+			unless (defined $uops{'agent'});
+	$uops{'timeout'} = 10  unless (defined $uops{'timeout'});
+	$DEBUG = $uops{'debug'}  if (defined $uops{'debug'});
+
+	while (@_) {
+		if ($_[0] =~ /^\-?debug$/o) {
+			shift;
+			$DEBUG = (defined($_[0]) && $_[0] =~/^[0-9]$/) ? shift : 1;
+		}
+	}
 
 	$url =~ s#\\##g;
 	(my $url2fetch = $url);
 	if ($url =~ /^https?\:/) {
-		$self->{'id'} = $1  if ($url2fetch =~ m#\?episode_id\=([\d]+)#);
+		$self->{'id'} = $1  if ($url2fetch =~ m#\?\w+?\_id\=([\d]+)#);
 	} else {
 		$self->{'id'} = $url;
 		$url2fetch = "https://widget.spreaker.com/player?episode_id=$url";
 	}
 	my $html = '';
-	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	print STDERR "-0(Spreaker): FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@userAgentOps);		
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
@@ -371,6 +391,8 @@ sub new
 	$self->{'year'} = ($html =~ s#\,\"published_at\"\:\"(\d\d\d\d)##s) ? $1 : '';
 		$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 		$self->{'description'} = uri_unescape($self->{'description'});
+	$self->{'title'} =~ s#\\u0027#\"#g;
+	$self->{'description'} =~ s#\\u0027#\"#g;
 	$self->{'iconurl'} = ($html =~ s#\,\"image_url\"\:\"([^\"]+)\"##s) ? $1 : '';
 	$self->{'iconurl'} =~ s#\\##g;
 	$self->{'imageurl'} = ($html =~ s#\,\"image_original_url\"\:\"([^\"]+)\"##s) ? $1 : '';
@@ -395,7 +417,8 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 	my $self = shift;
 	my $arglist = (defined $_[0]) ? join('|',@_) : '';
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i) {
+	if (($arglist =~ /\b\-?nopls\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls)$/i)
+			|| ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i)) {
 		my $plType = $1;
 		my $firstStream = ${$self->{'streams'}}[$idx];
 		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
@@ -416,33 +439,43 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 			}
 		}
 		my @lines = split(/\r?\n/, $html);
-		$firstStream = '';
-		if ($plType =~ /pls/) {  #PLS:
-			my $firstTitle = '';
+		my @plentries = ();
+		my $firstTitle = '';
+		my $plidx = ($arglist =~ /\b\-?random\b/) ? 1 : 0;
+		if ($plType =~ /pls/i) {  #PLS:
 			foreach my $line (@lines) {
-				if ($line =~ m#^\s*File\d+\=(.+)$#) {
-					$firstStream ||= $1;
-				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
+				if ($line =~ m#^\s*File\d+\=(.+)$#o) {
+					push (@plentries, $1);
+				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#o) {
 					$firstTitle ||= $1;
 				}
 			}
 			$self->{'title'} ||= $firstTitle;
-			print STDERR "-getURL(PLS): first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
-		} else {  #m3u8:
+			print STDERR "-getURL(PLS): title=$firstTitle= pl_idx=$plidx=\n"  if ($DEBUG);
+		} elsif ($arglist =~ /\b\-?noplaylists\b/) {  #m3u*:
 			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
 			foreach my $line (@lines) {
-				if ($line =~ m#^\s*([^\#].+)$#) {
+				if ($line =~ m#^\s*([^\#].+)$#o) {
 					my $urlpart = $1;
-					$urlpart =~ s#^\s+##;
-					$urlpart =~ s#^\/##;
-					$firstStream = ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart);
-					last;
+					$urlpart =~ s#^\s+##o;
+					$urlpart =~ s#^\/##o;
+					push (@plentries, ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart));
+					last  unless ($plidx);
 				}
 			}
-			print STDERR "-getURL(m3u?): first=$firstStream=\n"  if ($DEBUG);
+			print STDERR "-getURL(m3u?): pl_idx=$plidx=\n"  if ($DEBUG);
 		}
-		return $firstStream || ${$self->{'streams'}}[$idx];
+		if ($plidx && $#plentries >= 0) {
+			$plidx = int rand scalar @plentries;
+		} else {
+			$plidx = 0;
+		}
+		$firstStream = (defined($plentries[$plidx]) && $plentries[$plidx]) ? $plentries[$plidx]
+				: ${$self->{'streams'}}[$idx];
+
+		return $firstStream;
 	}
+
 	return ${$self->{'streams'}}[$idx];
 }
 

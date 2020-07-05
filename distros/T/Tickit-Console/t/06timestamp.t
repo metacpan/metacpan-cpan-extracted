@@ -21,6 +21,7 @@ $console->set_window( $win );
    my $tab = $console->add_tab(
       name => "Tabname",
       timestamp_format => "[%H:%M:%S] ",
+      localtime => sub { gmtime $_[0] },
    );
 
    $tab->append_line( "First line",
@@ -45,6 +46,7 @@ $console->set_window( $win );
       timestamp_format => String::Tagged->new( "[%H:%M] " )
          ->apply_tag( 1, 2, fg => "red" )
          ->apply_tag( 4, 2, fg => "blue" ),
+      localtime => sub { gmtime $_[0] },
    );
 
    $tab->append_line( "First line",
@@ -68,6 +70,7 @@ $console->set_window( $win );
       name => "Tabname",
       timestamp_format => "[%H:%M] ",
       datestamp_format => "- day is now %Y/%m/%d -",
+      localtime => sub { gmtime $_[0] },
    );
 
    $tab->append_line( "First line",
@@ -101,6 +104,7 @@ $console->set_window( $win );
       name => "Tabname",
       timestamp_format => "[%H:%M] ",
       datestamp_format => "- day is now %Y/%m/%d -",
+      localtime => sub { gmtime $_[0] },
    );
 
    $tab->prepend_line( "First line",

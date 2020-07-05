@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v0.0.4
+    version v0.0.5
 
 SYNOPSIS
 
@@ -32,6 +32,15 @@ ATTRIBUTES
  host
 
     The server name to connect to for the test. This is required.
+
+ read_only
+
+    Run a read-only check, instead of the read-and-write check provided
+    by-default.
+
+ key_name
+
+    Use a static key name instead of a randomly-generated one.
 
 DEPENDENCIES
 

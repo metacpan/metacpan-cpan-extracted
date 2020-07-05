@@ -1,8 +1,7 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
 use v5.14;
+use warnings;
 use utf8;
 
 use App::ansifold qw($VERSION);
@@ -15,7 +14,7 @@ ansifold - fold command handling ANSI terminal sequences
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -124,9 +123,9 @@ L<Text::ANSI::Fold|https://github.com/kaz-utashiro/Text-ANSI-Fold>
 
 L<Getopt::EX::Numbers>
 
-L<https://www.w3.org/TR/2009/NOTE-jlreq-20090604/>,
+L<https://www.w3.org/TR/2012/NOTE-jlreq-20120403/>,
 Requirements for Japanese Text Layout,
-W3C Working Group Note 4 June 2009
+W3C Working Group Note 3 April 2012
 
 =head1 LICENSE
 
@@ -202,7 +201,7 @@ my @width_map;
 my @width_index;
 
 use Getopt::EX::Numbers;
-my $numbers = new Getopt::EX::Numbers;
+my $numbers = Getopt::EX::Numbers->new;
 
 @{$opt{width}} = do {
     map {
@@ -236,11 +235,11 @@ else {
     @{$opt{width}} = grep { $_ } @{$opt{width}}; # remove zero
 }
 
-my $fold = new Text::ANSI::Fold do {
+my $fold = Text::ANSI::Fold->new(
     map  { $_ => $opt{$_} }
     grep { defined $opt{$_} }
-    qw(width boundary padding padchar ambiguous linebreak runin runout);
-};
+    qw(width boundary padding padchar ambiguous linebreak runin runout)
+    );
 
 my $separator = do {
     $opt{separate} =~ s{ ( \\ (.) ) } {

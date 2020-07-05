@@ -234,7 +234,9 @@ __DATA__
 #    define PERL_UNUSED_DECL __attribute__((unused))
 #  endif
 #else
+# if !defined(PERL_UNUSED_DECL)
 #  define PERL_UNUSED_DECL
+# endif
 #endif
 
 #ifndef dNOOP

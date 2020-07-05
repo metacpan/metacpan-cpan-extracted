@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-use HTML::Widgets::NavMenu;
-use File::Path;
-use Template;
+use HTML::Widgets::NavMenu ();
+use File::Path qw/ mkpath /;
+use Template ();
 
 my $css_style = <<"EOF";
 a:hover { background-color : palegreen; }
@@ -409,7 +409,7 @@ foreach my $page (@pages)
 
     # mkpath() throws an exception if it isn't successful, which will cause
     # this program to terminate. This is what we want.
-    mkpath( $1, 0, 0755 );
+    mkpath( $1, 0, oct('0755'), );
     open my $out, ">", $full_path
         or die "Could not open \"$full_path\" for writing!";
 

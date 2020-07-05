@@ -1,5 +1,5 @@
 package Lab::Moose::Connection;
-$Lab::Moose::Connection::VERSION = '3.701';
+$Lab::Moose::Connection::VERSION = '3.703';
 #ABSTRACT: Role for connections
 
 use 5.010;
@@ -69,7 +69,7 @@ Lab::Moose::Connection - Role for connections
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 DESCRIPTION
 

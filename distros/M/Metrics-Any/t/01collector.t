@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -72,6 +72,11 @@ ok( defined $metrics, '$metrics global is defined' );
       'Can report to registered timer' );
    ok( exception { $metrics->report_timer( t2 => ) },
       'Fails attempt to report to unregistered timer' );
+}
+
+# misc
+{
+   is( $metrics->package, "main", '$metrics->package' );
 }
 
 done_testing;

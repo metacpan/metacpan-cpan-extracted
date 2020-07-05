@@ -70,6 +70,28 @@ sub test_document : Test(1) {
 
 # -----------------------------------------------------------------------------
 
+sub test_format : Test(1) {
+    my $self = shift;
+
+    my $gen = Quiq::Sdoc::Producer->new;
+    
+    my $str = $gen->format(
+        HTML => '<p>Hallo</p>',
+        LaTeX => 'Hallo',
+    );
+    $self->is($str,Quiq::Unindent->string(q~
+        %Format:
+        @@HTML@@
+        <p>Hallo</p>
+        @@LaTeX@@
+        Hallo
+        .
+
+    ~));
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_paragraph : Test(2) {
     my $self = shift;
 

@@ -15,7 +15,7 @@ sub co
     push @ret, \@HEAD;
     for my $host(@host)
     {
-        push my @status, $host;
+        my @status = ( $host );
         eval
         {
             my (@line, @s) = MYDan::Collector::Util::qx( "ping -c 20 -f $host 2>/dev/null|tail -2" );

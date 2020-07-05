@@ -1,0 +1,4 @@
+# this is a broken fluent file for tests
+
+# a named arg can't be an inline expression
+test = { some.expression(value: { some.value }) }

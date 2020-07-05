@@ -137,7 +137,6 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
         CHECK(req->compression.type == Compression::GZIP);
         REQUIRE(req->body.to_string() == body_sample);
     }
-
     SECTION("chunked & gzipped") {
         const char * body_raw[] = {
 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vel eros sit amet ex gravida tempor sit amet sit amet nisi. Sed ultrices, enim mattis sagittis tincidunt, tortor quam fermentum lectus, vitae mattis felis diam quis lorem. Suspendisse facilisis lorem dui, porta consectetur velit consectetur ac. Maecenas libero justo, porta in finibus vitae, blandit sed felis. Donec aliquam, leo eget ultrices tincidunt, purus ante ornare ipsum, sit amet auctor nunc ligula id nisi. Praesent sit amet sapien eget orci porta accumsan. Ut sed tortor ligula. Aliquam odio dolor, volutpat vitae elit eget, aliquet accumsan nisl. In ac placerat ligula.",

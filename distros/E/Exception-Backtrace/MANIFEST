@@ -11,17 +11,18 @@ lib/Exception/Backtrace/DualTrace.pod
 lib/Exception/Backtrace/Stackframe.pm
 lib/Exception/Backtrace/Stackframe.pod
 Makefile.PL
+Makefile.test
 MANIFEST			This list of files
 misc/devel-trace.pl
 misc/exception-bactrace.pl
 misc/named-subs.pl
-src/panda/CTrace.cc
-src/panda/CTrace.h
+src/panda/dl.h
 src/panda/dwarf.cc
 src/panda/dwarf.h
 src/panda/glibc-dl.cc
-src/panda/glibc-dl.h
+src/panda/macos-dl.cc
 src/panda/SharedObjectInfo.h
+src/panda/win-dl.cc
 src/xs/backtrace.cc
 src/xs/backtrace.h
 src/xs/DualTrace.cc
@@ -34,6 +35,7 @@ t/05-perl-exceptions.t
 t/06-c-exceptions.t
 t/07-api.t
 t/08-subname.t
+t/09-global-destruction.t
 t/MyTest.pm
 t/MyTest.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)

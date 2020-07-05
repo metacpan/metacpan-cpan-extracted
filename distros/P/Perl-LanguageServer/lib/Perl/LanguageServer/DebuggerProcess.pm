@@ -32,9 +32,9 @@ has 'args' =>
 
 has 'env' =>
     (
-    isa => 'ArrayRef',
+    isa => 'HashRef',
     is  => 'ro',
-    default => sub { [] },
+    default => sub { {} },
     ) ; 
 
 has 'cwd' =>
@@ -87,6 +87,7 @@ sub BUILDARGS
     {
     my ($class, $args) = @_ ;
 
+    $args -> {env} = { @{$args -> {env}} } if (exists $args -> {env} && ref ($args -> {env}) eq 'ARRAY') ;
     $args -> {reload_modules} = delete $args -> {reloadModules}?1:0 ;
     $args -> {stop_on_entry} = delete $args -> {stopOnEntry}?1:0 ;
     $args -> {session_id}    = delete $args -> {__sessionId} || $session_cnt ;
@@ -123,16 +124,20 @@ sub lauch
     my $pid ;
     {
     local %ENV ;
-    foreach (@{$self -> env})
+    foreach (keys %{$self -> env})
         {
         $ENV{$_} = $self -> env -> {$_} ;    
         }
+
+    my $inc = $workspace -> perlinc ;
+    my @inc ;
+    @inc = map { ('-I', $_)} @$inc if ($inc) ;
     
     $ENV{PLSDI_REMOTE} = '127.0.0.1:' . $self -> debug_adapter -> listen_port ;
     $ENV{PLSDI_OPTIONS} = $self -> reload_modules?'reload_modules':'' ;
-    $ENV{PERL5DB}      = 'BEGIN { require Perl::LanguageServer::DebuggerInterface }' ;
+    $ENV{PERL5DB}      = 'BEGIN { $| = 1 ; require Perl::LanguageServer::DebuggerInterface }' ;
     $ENV{PLSDI_SESSION}= $self -> session_id ;
-    $pid = $self -> run_async ([$cmd, '-d', $fn, @{$self -> args}]) ;
+    $pid = $self -> run_async ([$cmd, @inc, '-d', $fn, @{$self -> args}]) ;
     }
 
     $self -> pid ($pid) ;

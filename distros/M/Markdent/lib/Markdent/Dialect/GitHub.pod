@@ -1,4 +1,4 @@
-package Mardent::Dialect::GitHub;
+package Markdent::Dialect::GitHub;
 
 =pod
 

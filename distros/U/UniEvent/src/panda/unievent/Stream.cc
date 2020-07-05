@@ -5,8 +5,6 @@ namespace panda { namespace unievent {
 
 using ssl::SslFilter;
 
-static const auto& panda_log_module = uelog;
-
 #define HOLD_ON(what) StreamSP __hold = what; (void)__hold;
 
 #define INVOKE(h, f, fm, hm, ...) do { \
@@ -22,7 +20,7 @@ static const auto& panda_log_module = uelog;
 } while(0)
 
 Stream::~Stream () {
-    _EDTOR();
+    panda_log_dtor();
 }
 
 string Stream::buf_alloc (size_t cap) noexcept {
@@ -89,12 +87,12 @@ void Stream::finalize_handle_connection (const StreamSP& client, const ErrorCode
         auto read_start_err = client->set_connect_result(true);
         if (read_start_err) err = ErrorCode(errc::read_start_error, read_start_err);
     } else {
-        client->set_connect_result(false);
+        if (client) client->set_connect_result(false);
         err = connection_err;
     }
     panda_log_debug("finalize_handle_connection err: " << err << "client: " << client << ", this: " << this);
 
-    if (req) client->queue.done(req, []{});
+    if (req && client) client->queue.done(req, []{});
     StreamSP self = this;
     connection_event(self, client, err);
     if (_listener) _listener->on_connection(self, client, err);
@@ -206,7 +204,7 @@ void Stream::finalize_write (const WriteRequestSP& req) {
 
 void WriteRequest::handle_event (const ErrorCode& err) {
     panda_log_debug("WriteRequest::handle_event " << this << ", err" << err);
-    if (err == std::errc::broken_pipe) handle->clear_out_connected();
+    if (err & std::errc::broken_pipe) handle->clear_out_connected();
     HOLD_ON(handle);
     INVOKE(handle, last_filter, handle_write, finalize_handle_write, err, this);
 }
@@ -290,7 +288,7 @@ void ShutdownRequest::handle_event (const ErrorCode& err) {
 void ShutdownRequest::notify (const ErrorCode& err) { handle->notify_on_shutdown(err, this); }
 
 void ShutdownRequest::cancel (const ErrorCode& err) {
-    if (timed_out && err == std::errc::operation_canceled) {
+    if (timed_out && err & std::errc::operation_canceled) {
         timed_out = false;
         StreamRequest::cancel(make_error_code(std::errc::timed_out));
     }
@@ -398,12 +396,12 @@ StreamFilterSP Stream::get_filter (const void* type) const {
     return {};
 }
 
-void Stream::use_ssl (SSL_CTX* context)         { add_filter(new SslFilter(this, context)); }
-void Stream::use_ssl (const SSL_METHOD* method) { add_filter(new SslFilter(this, method)); }
+void Stream::use_ssl (const SslContext &context)  { add_filter(new SslFilter(this, context)); }
+void Stream::use_ssl (const SSL_METHOD* method)   { add_filter(new SslFilter(this, method)); }
 
 bool Stream::is_secure () const { return get_filter(SslFilter::TYPE); }
 
-SSL* Stream::get_ssl () const {
+SSL* Stream::get_ssl() const {
     auto filter = get_filter<SslFilter>();
     return filter ? filter->get_ssl() : nullptr;
 }

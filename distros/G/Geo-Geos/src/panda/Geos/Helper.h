@@ -1,4 +1,4 @@
-#include "xs/geos.h"
+#include "xs/geos/geos.h"
 #include <vector>
 #include <geos/geom/Geometry.h>
 #include <geos/geom/GeometryFactory.h>

@@ -38,7 +38,7 @@
    "provides" : {
       "Syntax::Keyword::Try" : {
          "file" : "lib/Syntax/Keyword/Try.pm",
-         "version" : "0.11"
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.11",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

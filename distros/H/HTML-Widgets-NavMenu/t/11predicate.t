@@ -4,7 +4,7 @@ use strict;
 
 use Test::More tests => 65;
 
-use HTML::Widgets::NavMenu::Predicate;
+use HTML::Widgets::NavMenu::Predicate ();
 
 # Spec for this test suite:
 # 1. Test the individual components. (bool, re, and cb)

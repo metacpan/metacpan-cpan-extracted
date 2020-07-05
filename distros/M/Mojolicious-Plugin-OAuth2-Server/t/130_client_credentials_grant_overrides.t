@@ -17,6 +17,8 @@ my $verify_client_sub = sub {
   my ( $c,$client_id,$scopes_ref,$redirect_uri,$response_type )
     = @args{ qw/ mojo_controller client_id scopes redirect_uri response_type / };
 
+  ok( $c,'have a mojo_controller' );
+
   # in reality we would check a config file / the database to confirm the
   # client_id and client_secret match and that the scopes are valid
   return ( 0,'invalid_scope' ) if grep { $_ eq 'cry' } @{ $scopes_ref // [] };
@@ -41,6 +43,8 @@ my $verify_access_token_sub = sub {
 
   my ( $c,$access_token,$scopes_ref,$is_refresh_token )
   	= @args{qw/ mojo_controller access_token scopes is_refresh_token /};
+
+  ok( $c,'have a mojo_controller' );
 
   # and here we should check the access code is valid, not expired, and the
   # passed scopes are allowed for the access token

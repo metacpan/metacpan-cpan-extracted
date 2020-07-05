@@ -10,3 +10,5 @@ os = [
     "MSWin32",
 ]
 
+[FileGatherer]
+exclude_match=['^docs/.*']

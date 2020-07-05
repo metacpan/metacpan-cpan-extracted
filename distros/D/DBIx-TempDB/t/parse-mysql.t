@@ -1,21 +1,10 @@
 use strict;
 use Test::More;
-use DBIx::TempDB;
+use DBIx::TempDB::Util 'parse_sql';
 
-is_deeply(
-  [DBIx::TempDB->_parse_mysql('SET foreign_key_checks=0')],
-  ['SET foreign_key_checks=0'],
-  'SET foreign_key_checks=0'
-);
+is_deeply([parse_sql(mysql => 'SET foreign_key_checks=0')], ['SET foreign_key_checks=0'], 'SET foreign_key_checks=0');
 
-package Mock::DBI;
-my @sql;
-sub do { push @sql, $_ }
-
-package main;
-
-*DBI::connect = sub { bless {}, 'Mock::DBI' };
-DBIx::TempDB->new('mysql://example.com', auto_create => 0, database_name => 'foo')->execute(<<'HERE');
+my @sql = parse_sql mysql => <<'HERE';
 
 SET foreign_key_checks=0;
 

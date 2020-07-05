@@ -1,3 +1,7 @@
+5.2.0    19.06.2020
+           - added WEEK constant
+           - added support for weeks "w" or "W" in relative date simple string format ($date + "1M 2W")
+           - added methods week_of_month(), weeks_in_year(), week_of_year()
 5.1.0    15.04.2020
            - added Common Log Format as input and output date format (example: [10/Oct/1999:21:15:05 +0500])
            - added error() getter to Date::Rel

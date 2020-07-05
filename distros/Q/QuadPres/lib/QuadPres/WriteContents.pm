@@ -1,5 +1,5 @@
 package QuadPres::WriteContents;
-$QuadPres::WriteContents::VERSION = '0.28.2';
+$QuadPres::WriteContents::VERSION = '0.28.3';
 use 5.016;
 use strict;
 use warnings;
@@ -7,7 +7,9 @@ use autodie;
 
 use MooX qw/ late /;
 
-has '_contents' => ( isa => "HashRef", is => "ro", init_arg => "contents" );
+has '_contents' =>
+    ( isa => "HashRef", is => "ro", init_arg => "contents", required => 1, );
+
 
 my @output_contents_keys_order = (qw(url title subs images));
 
@@ -15,7 +17,7 @@ my %output_contents_keys_values =
     ( map { $output_contents_keys_order[$_] => $_ }
         ( 0 .. $#output_contents_keys_order ) );
 
-sub output_contents_get_value
+sub _get_key_order
 {
     my ($key) = (@_);
 
@@ -25,11 +27,11 @@ sub output_contents_get_value
         : scalar(@output_contents_keys_order);
 }
 
-sub output_contents_sort_keys
+sub _sort_keys
 {
     my ($hash) = @_;
     return [
-        sort { output_contents_get_value($a) <=> output_contents_get_value($b) }
+        sort { _get_key_order($a) <=> _get_key_order($b) }
             keys(%$hash)
     ];
 }
@@ -43,7 +45,7 @@ my %special_chars = (
     "\e" => "\\e",
 );
 
-sub string_to_perl
+sub _string_to_perl
 {
     my $s = shift;
     $s =~ s/([\\\"])/\\$1/g;
@@ -54,6 +56,7 @@ sub string_to_perl
     return $s;
 }
 
+
 sub update_contents
 {
     my ($self) = @_;
@@ -62,7 +65,7 @@ sub update_contents
     print {$contents_fh}
         "package Contents;\n\nuse strict;\n\nmy \$contents = \n";
 
-    print {$contents_fh} $self->dump_contents();
+    print {$contents_fh} $self->_stringify_contents();
 
     print {$contents_fh} <<"EOF";
 
@@ -77,7 +80,7 @@ EOF
     close($contents_fh);
 }
 
-sub dump_contents
+sub _stringify_contents
 {
     my $self = shift;
 
@@ -105,7 +108,7 @@ MAIN_LOOP: while ( @branches > 0 )
                 if ( exists( $b->{$field} ) )
                 {
                     $ret .= "${p2}'$field' => \""
-                        . string_to_perl( $b->{$field} ) . "\",\n";
+                        . _string_to_perl( $b->{$field} ) . "\",\n";
                 }
             }
 
@@ -129,7 +132,7 @@ MAIN_LOOP: while ( @branches > 0 )
                 $ret .= "${p2}\[\n";
                 foreach my $img ( @{ $b->{'images'} } )
                 {
-                    $ret .= "${p3}\"" . string_to_perl($img) . "\",\n";
+                    $ret .= "${p3}\"" . _string_to_perl($img) . "\",\n";
                 }
                 $ret .= "${p2}],\n";
             }
@@ -140,7 +143,7 @@ MAIN_LOOP: while ( @branches > 0 )
         else
         {
             push @branches, { 'b' => $b->{'subs'}->[$i], 'i' => -1 };
-            $last_element->{'i'}++;
+            ++( $last_element->{'i'} );
             next MAIN_LOOP;
         }
     }
@@ -156,9 +159,28 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
+QuadPres::WriteContents - write the contents.
+
 =head1 VERSION
 
-version 0.28.2
+version 0.28.3
+
+=head1 SYNOPSIS
+
+    my $obj = QuadPres::WriteContents->new({contents => $contents, });
+    $obj->update_contents();
+
+=head1 DESCTIPTION
+
+QuadPres::WriteContents.
+
+=head1 METHODS
+
+=head2 $writer->update_contents()
+
+Overwrite Contents.pm with the updated contents perl code.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

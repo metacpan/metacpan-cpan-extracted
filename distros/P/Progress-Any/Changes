@@ -1,15 +1,27 @@
-0.214   2018-03-26 (PERLANCAR)
+0.215   2020-06-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Output: Accept -optname => optval, ... as an alternative to
+	  {optname=>val, ...} syntax, to ease specifying on perl one-liners
+	  using -M CLI option.
+
+	- [doc] Mention Progress::Any::Examples.
+
+
+0.214   2018-03-26  Released-By: PERLANCAR
 
 	- Forget to remove old code.
 
 
-0.213   2018-03-26 (PERLANCAR)
+0.213   2018-03-26  Released-By: PERLANCAR
 
 	- [Incompatible change] [internal] Remove output_data structure, store
 	  state in output objects directly. This simplifies things a bit.
 
+	- [Bugfix][Regression] Initialize parent indicators with target=0
+	  so percent-completion can be calculated.
 
-0.212   2018-03-16 (PERLANCAR)
+
+0.212   2018-03-16  Released-By: PERLANCAR
 
         - Make regex to parse template available as package variable
           '$template_regex'.
@@ -18,7 +30,7 @@
           unknown conversion.
 
 
-0.211   2018-03-17 (PERLANCAR)
+0.211   2018-03-17  Released-By: PERLANCAR
 
         - [Incompatible change] update(): Rename 'level' argument to 'priority'.
           High-priority updates are now not frequency-throttled.
@@ -33,26 +45,26 @@
         - [doc] Fix/update/add examples.
 
 
-0.210   2018-03-16 (PERLANCAR)
+0.210   2018-03-16  Released-By: PERLANCAR
 
 	- Observe PROGRESS environment variable to let user turn off
 	  progress updating.
 
 
-0.20    2015-01-27 (PERLANCAR)
+0.20    2015-01-27  Released-By: PERLANCAR
 
 	- Merge Progress::Any::Output back from separate distribution
 	  Progress-Any-Output to Progress-Any (similar to what is done with
 	  Log-Any vs Log-Any-Adapter).
 
 
-0.19    2015-01-22 (PERLANCAR)
+0.19    2015-01-22  Released-By: PERLANCAR
 
 	- Allow message to be coderef for delaying costly calculation, will
 	  be converted to string when sent to output.
 
 
-0.18    2014-10-14 (PERLANCAR)
+0.18    2014-10-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -60,28 +72,28 @@
 	  in the Status section).
 
 
-0.17    2014-10-14 (PERLANCAR)
+0.17    2014-10-14  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Include screenshots.
 
 
-0.16    2014-10-14 (PERLANCAR)
+0.16    2014-10-14  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Show usage example with Perinci::CmdLine.
 
 
-0.15    2014-07-29 (SHARYANTO)
+0.15    2014-07-29  Released-By: SHARYANTO
 
         - No functional changes.
 
         - Fix Synopsis [RT#97563].
 
 
-0.14    2014-05-01 (SHARYANTO)
+0.14    2014-05-01  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -89,32 +101,32 @@
           timing-related and fail on some CT machines [CT].
 
 
-0.13    2014-02-26 (SHARYANTO)
+0.13    2014-02-26  Released-By: SHARYANTO
 
         - Add frequency limiting for updating outputs. Currently set at (at most
           per) 0.5s. Will be configurable in the future.
 
 
-0.12    2013-09-11 (SHARYANTO)
+0.12    2013-09-11  Released-By: SHARYANTO
 
         - No functional changes. Temporarily put some tests (elapsed, etc) on
           RELEASE_TESTING due to fragility of timing/sleep. Will need to use
           time mocking in the future [CT].
 
 
-0.11    2013-09-08 (SHARYANTO)
+0.11    2013-09-08  Released-By: SHARYANTO
 
         - No functional changes. Increase granularity of elapsed tests from
           0.05s to 1s due to faliure in many systems [CT].
 
 
-0.10    2013-09-03 (SHARYANTO)
+0.10    2013-09-03  Released-By: SHARYANTO
 
         - Rework internals and some API. This is the second API revision.
 
         [ENHANCEMENTS]
 
-        - Allow reinitializing 'pos' and 'target' (and all other rw attributes)
+        - Allow reinitializing 'pos' and 'target'  Released-By: and all other rw attributes
           at subsequent get_indicator() for the same task. This is to make
           program more predictable, instead of silently ignoring parameters.
 
@@ -133,7 +145,7 @@
         - The $progress export is now set to the root ('') indicator instead of
           'main', so it includes all indicators.
 
-        - fill_template(): re-rationalize template names: %a (elapsed time)
+        - fill_template(): re-rationalize template names: %a  Released-By: elapsed time
           becomes %e, %c (pos) becomes %P, %C (target) becomes %T, %t (task
           name) becomes %n.
 
@@ -143,12 +155,12 @@
           can use 'message' instead).
 
 
-0.09    2013-05-18 (SHARYANTO)
+0.09    2013-05-18  Released-By: SHARYANTO
 
         - Bugfix: double counting of children's targets.
 
 
-0.08    2013-05-18 (SHARYANTO)
+0.08    2013-05-18  Released-By: SHARYANTO
 
         - Bugfix: update() didn't recognize 'finished' parameter.
 
@@ -156,14 +168,14 @@
           progress indicators.
 
 
-0.07    2013-05-18 (SHARYANTO)
+0.07    2013-05-18  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Add total_target().
 
 
-0.06    2013-05-18 (SHARYANTO)
+0.06    2013-05-18  Released-By: SHARYANTO
 
         [INCOMPATIBLE CHANGES]
 
@@ -171,7 +183,7 @@
           subroutine.
 
 
-0.05    2013-05-18 (SHARYANTO) - Happy birthday, bro!
+0.05    2013-05-18  Released-By: SHARYANTO; Note: Happy birthday, bro!
 
         [INCOMPATIBLE CHANGES]
 
@@ -193,22 +205,22 @@
           makes output simpler and reduce duplicated code.
 
 
-0.04    2013-01-10 (SHARYANTO)
+0.04    2013-01-10  Released-By: SHARYANTO
 
         - No functional changes. More POD tweaks/fixes.
 
 
-0.03    2013-01-10 (SHARYANTO)
+0.03    2013-01-10  Released-By: SHARYANTO
 
         - No functional changes. Update/fix Synopsis.
 
 
-0.02    2012-10-24 (SHARYANTO)
+0.02    2012-10-24  Released-By: SHARYANTO
 
         - Some tweaks/fixes: don't pre-init $progress, give default message to
           reset() and finish().
 
 
-0.01    2012-10-24 (SHARYANTO)
+0.01    2012-10-24  Released-By: SHARYANTO
 
         - First, early release.

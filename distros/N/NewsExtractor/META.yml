@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.23.0
+    version: v0.26.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -54,6 +54,8 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/news_cts_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::news_ebc_net_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/news_ebc_net_tw.pm
+  NewsExtractor::SiteSpecificExtractor::news_pts_org_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/news_pts_org_tw.pm
   NewsExtractor::SiteSpecificExtractor::news_tnn_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/news_tnn_tw.pm
   NewsExtractor::SiteSpecificExtractor::news_tvbs_com_tw:
@@ -66,6 +68,8 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_bcc_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_epochtimes_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_epochtimes_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_fountmedia_io:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_fountmedia_io.pm
   NewsExtractor::SiteSpecificExtractor::www_hkcnews_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_hkcnews_com.pm
   NewsExtractor::SiteSpecificExtractor::www_idn_com_tw:
@@ -88,6 +92,8 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_thestandnews_com.pm
   NewsExtractor::SiteSpecificExtractor::www_ttv_com_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_ttv_com_tw.pm
+  NewsExtractor::SiteSpecificExtractor::www_twreporter_org:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_twreporter_org.pm
   NewsExtractor::SiteSpecificExtractor::www_upmedia_mg:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_upmedia_mg.pm
   NewsExtractor::TXExtractor:
@@ -110,7 +116,7 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.23.0
+version: v0.26.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

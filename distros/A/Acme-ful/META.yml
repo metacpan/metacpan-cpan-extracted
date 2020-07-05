@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::Most: '0.30'
+  Test::Pod::Coverage: '1.10'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -21,10 +22,10 @@ no_index:
 provides:
   Acme::ful:
     file: lib/Acme/ful.pm
-    version: '0.07'
+    version: '0.11'
   ful:
     file: lib/ful.pm
-    version: '0.07'
+    version: '0.11'
 requires:
   Cwd: '3.26'
   File::Spec: '3.32'
@@ -32,6 +33,6 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  repository: git://github.com/ryan-willis/p5-Acme-ful.git
-version: '0.07'
+  repository: git://github.com/ryan-willis/ful.pm.git
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

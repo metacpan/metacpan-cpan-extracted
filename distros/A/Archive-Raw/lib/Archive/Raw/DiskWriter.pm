@@ -1,5 +1,5 @@
 package Archive::Raw::DiskWriter;
-$Archive::Raw::DiskWriter::VERSION = '0.02';
+$Archive::Raw::DiskWriter::VERSION = '0.03';
 use strict;
 use warnings;
 use Archive::Raw;
@@ -10,7 +10,7 @@ Archive::Raw::DiskWriter - libarchive DiskWriter class
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -25,6 +25,10 @@ Create a new disk writer.
 =head2 write( $entry )
 
 Write C<$entry> to disk. C<$entry> should be an L<C<Archive::Raw::Entry>> object.
+
+=head2 close( )
+
+Complete the archive.
 
 =head1 AUTHOR
 

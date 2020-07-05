@@ -1,9 +1,9 @@
 package App::ColorThemeUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'App-ColorThemeUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -31,9 +31,9 @@ sub list_color_theme_modules {
     my %resmeta;
 
     my $mods = Module::List::Tiny::list_modules(
-        "", {list_modules => 1, recurse => 1});
+        "ColorTheme::", {list_modules => 1, recurse => 1});
     for my $mod (sort keys %$mods) {
-        next unless $mod =~ /(\A|::)ColorTheme::/;
+        $mod =~ s/\AColorTheme:://;
         push @res, $mod;
     }
 
@@ -65,7 +65,8 @@ sub show_color_theme_swatch {
     my %args = @_;
     my $width = $args{width} // 80;
 
-    my $theme = Module::Load::Util::instantiate_class_with_optional_args($args{theme});
+    my $theme = Module::Load::Util::instantiate_class_with_optional_args(
+        {ns_prefix=>'ColorTheme'}, $args{theme});
     my @item_names = $theme->list_items;
 
     my $reset = Color::ANSI::Util::ansi_reset();
@@ -112,7 +113,7 @@ App::ColorThemeUtils - CLI utilities related to color themes
 
 =head1 VERSION
 
-This document describes version 0.008 of App::ColorThemeUtils (from Perl distribution App-ColorThemeUtils), released on 2020-06-11.
+This document describes version 0.009 of App::ColorThemeUtils (from Perl distribution App-ColorThemeUtils), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

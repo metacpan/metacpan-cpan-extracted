@@ -1,0 +1,54 @@
+NAME
+    URI::Escape::Any - Use XS-based URI escape module, fallback to
+    URI::Escape
+
+VERSION
+    This document describes version 0.001 of URI::Escape::Any (from Perl
+    distribution URI-Escape-Any), released on 2020-06-18.
+
+SYNOPSIS
+     use URI::Escape::Any;
+
+     my $escaped = uri_escape('/foo');
+
+DESCRIPTION
+    This module tries to load URI::XSEscape, then URI::Escape::XS, then
+    falls back to URI::Escape.
+
+    The export '%escapes' from URI::Escape is currently not provided.
+
+FUNCTIONS
+  uri_escape
+  uri_escape_utf8
+  uri_unescape
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/URI-Escape-Any>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-URI-Escape-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=URI-Escape-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    URI::XSEscape
+
+    URI::Escape::XS
+
+    URI::Escape
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,12 @@
+Build.PL
+lib/Sub/Attribute/Prototype.pm
+MANIFEST			This list of files
+t/00use.t
+t/01prototype.t
+t/02warnings.t
+t/99pod.t
+t/testmodule.pm
+README
+LICENSE
+META.yml
+META.json

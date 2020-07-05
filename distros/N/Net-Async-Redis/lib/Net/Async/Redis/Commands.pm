@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '2.004'; # VERSION
+our $VERSION = '2.005'; # VERSION
 
 =head1 NAME
 
@@ -79,6 +79,7 @@ our %KEY_FINDER = (
     'LINSERT' => 1,
     'LLEN' => 1,
     'LPOP' => 1,
+    'LPOS' => 1,
     'LPUSH' => 1,
     'LPUSHX' => 1,
     'LRANGE' => 1,
@@ -670,6 +671,8 @@ Kill the connection of a client.
 =item * [ID client-id]
 
 =item * [TYPE normal|master|slave|pubsub]
+
+=item * [USER username]
 
 =item * [ADDR ip:port]
 
@@ -2126,6 +2129,33 @@ sub lpop : method {
     $self->execute_command(qw(LPOP) => @args)
 }
 
+=head2 lpos
+
+Return the index of matching elements on a list.
+
+=over 4
+
+=item * key
+
+=item * element
+
+=item * [FIRST rank]
+
+=item * [COUNT num-matches]
+
+=item * [MAXLEN len]
+
+=back
+
+L<https://redis.io/commands/lpos>
+
+=cut
+
+sub lpos : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(LPOS) => @args)
+}
+
 =head2 lpush
 
 Prepend one or multiple elements to a list.
@@ -3147,7 +3177,7 @@ Reset latency data for one or more events.
 
 =over 4
 
-=item * [event]
+=item * [event [event ...]]
 
 =back
 

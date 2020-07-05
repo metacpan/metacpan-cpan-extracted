@@ -27,7 +27,7 @@ ok !$@, 'multiple statements ok' or diag $@;
 
 my $sth = $dbh->prepare("select name from users where name = 'batman'");
 $sth->execute;
-eval { $sth->fetchrow_arrayref->[0] };
+eval { $sth->fetchrow_arrayref };
 ok !$@, 'and multiple statements was actually executed' or diag $@;
 
 done_testing;

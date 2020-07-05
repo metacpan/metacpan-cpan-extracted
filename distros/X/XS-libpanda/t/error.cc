@@ -3,8 +3,6 @@
 
 #define TEST(name) TEST_CASE("error: " name, "[error]")
 
-using namespace panda;
-
 enum MyErr {
     Err1 = 1,
     Err2
@@ -49,7 +47,7 @@ TEST("ErrorCode ctor") {
         CHECK_FALSE(code.next().next());
         CHECK(code.what() == "MyErr2 (2:MyCategory) -> MyErr1 (1:MyCategory)");
         nested_code.clear();
-        CHECK(code.next() == Err1); // check it was copy and no sharing
+        CHECK(code.next().code() == Err1); // check it was copy and no sharing
     }
 }
 
@@ -63,7 +61,7 @@ TEST("ErrorCode methods") {
 TEST("ErrorCode defctor") {
     ErrorCode orig;
     ErrorCode wrap(Err1, orig);
-    CHECK(wrap == Err1);
+    CHECK(wrap & Err1);
     CHECK(wrap.next().code().value() == 0);
 }
 
@@ -75,26 +73,20 @@ TEST("comparisons") {
         (void)(ErrorCode() < ErrorCode());
     }
     SECTION("ErrorCode to error_code") {
-        CHECK(ErrorCode() == std::error_code());
-        CHECK(std::error_code() == ErrorCode());
-        CHECK(ErrorCode(MyErr::Err1) != std::error_code());
-        CHECK(std::error_code() != ErrorCode(MyErr::Err1));
+        CHECK(ErrorCode() & std::error_code());
+        CHECK(std::error_code() & ErrorCode());
         (void)(ErrorCode() < std::error_code());
         (void)(std::error_code() < ErrorCode());
     }
     SECTION("ErrorCode to error code enum") {
-        CHECK(ErrorCode(MyErr::Err1) == MyErr::Err1);
-        CHECK(MyErr::Err1 == ErrorCode(MyErr::Err1));
-        CHECK(ErrorCode(MyErr::Err1) != MyErr::Err2);
-        CHECK(MyErr::Err1 != ErrorCode(MyErr::Err2));
+        CHECK(ErrorCode(MyErr::Err1) & MyErr::Err1);
+        CHECK(MyErr::Err1 & ErrorCode(MyErr::Err1));
         (void)(ErrorCode() < MyErr::Err1);
         (void)(MyErr::Err1 < ErrorCode());
     }
     SECTION("ErrorCode to error cond enum") {
-        CHECK(ErrorCode(make_error_code(std::errc::operation_canceled)) == std::errc::operation_canceled);
-        CHECK(std::errc::operation_canceled == ErrorCode(make_error_code(std::errc::operation_canceled)));
-        CHECK(ErrorCode() != std::errc::operation_canceled);
-        CHECK(std::errc::operation_canceled != ErrorCode());
+        CHECK(ErrorCode(make_error_code(std::errc::operation_canceled)) & std::errc::operation_canceled);
+        CHECK(std::errc::operation_canceled & ErrorCode(make_error_code(std::errc::operation_canceled)));
         (void)(ErrorCode() < std::errc::operation_canceled);
         (void)(std::errc::operation_canceled < ErrorCode());
     }

@@ -38,6 +38,7 @@
             "Data::Sah::Compiler::perl::TH::array" : "0",
             "Data::Sah::Compiler::perl::TH::code" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
+            "Data::Sah::Filter::perl::Firefox::check_profile_name_exists" : "0",
             "Data::Sah::Filter::perl::Str::replace_dashes_with_underscores" : "0",
             "File::Copy" : "0",
             "File::Slurper" : "0",
@@ -46,7 +47,7 @@
             "Log::ger" : "0.037",
             "Perinci::CmdLine::Any" : "0",
             "Perinci::CmdLine::Lite" : "1.827",
-            "Sah::Schema::firefox::profile_name" : "0",
+            "Sah::Schema::firefox::local_profile_name" : "0",
             "Sah::Schema::sortsub::spec" : "0",
             "Sort::Sub" : "0.120",
             "perl" : "5.010001",
@@ -75,7 +76,7 @@
          "web" : "https://github.com/perlancar/perl-App-FirefoxMultiAccountContainersUtils"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

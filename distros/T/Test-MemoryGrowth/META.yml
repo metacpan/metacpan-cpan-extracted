@@ -17,12 +17,13 @@ name: Test-MemoryGrowth
 provides:
   Test::MemoryGrowth:
     file: lib/Test/MemoryGrowth.pm
-    version: '0.03'
+    version: '0.04'
 recommends:
+  Devel::Gladiator: '0'
   Devel::MAT: '0.04'
 requires:
   Test::Builder: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

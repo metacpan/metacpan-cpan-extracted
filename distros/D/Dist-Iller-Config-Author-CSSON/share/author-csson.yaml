@@ -39,7 +39,7 @@ prereqs:
 
   develop:
     requires:
-      - Dist::Zilla: 6.012
+      - Dist::Zilla: 6.015
       - Test::Warnings: 0.026
       - Test::NoTabs: 1.4
 
@@ -54,7 +54,7 @@ plugins:
    - $self.build_file
 
  - +plugin: PromptIfStale
-   +version: 0.055
+   +version: 0.057
    check_all_plugins: 1
    phase: build
 

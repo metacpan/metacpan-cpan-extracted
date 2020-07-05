@@ -1,11 +1,14 @@
 package Bio::MUST::Apps::TwoScalp;
 # ABSTRACT: Main class for two-scalp tool
-$Bio::MUST::Apps::TwoScalp::VERSION = '0.181180';
+$Bio::MUST::Apps::TwoScalp::VERSION = '0.201810';
 use strict;
 use warnings;
 
 use Bio::MUST::Apps::SlaveAligner::Local;
 use Bio::MUST::Apps::TwoScalp::Seq2Seq;
+use Bio::MUST::Apps::TwoScalp::Profile2Profile;
+use Bio::MUST::Apps::TwoScalp::Seqs2Profile;
+use Bio::MUST::Apps::TwoScalp::AlignAll;
 
 1;
 
@@ -19,7 +22,7 @@ Bio::MUST::Apps::TwoScalp - Main class for two-scalp tool
 
 =head1 VERSION
 
-version 0.181180
+version 0.201810
 
 =head1 SYNOPSIS
 

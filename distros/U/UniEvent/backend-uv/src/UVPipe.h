@@ -13,6 +13,7 @@ static inline optional<string> uvx_sockname (const uv_pipe_t* uvhp, Func&& f) {
         if (err != UV_ENOBUFS) throw Error(uvx_error(err));
     }
     panda::string ret(len);
+    ret[0] = 0; /* prevent valgrind complains */
     uvx_strict(f(uvhp, ret.buf(), &len));
     ret.length(len);
     return ret;

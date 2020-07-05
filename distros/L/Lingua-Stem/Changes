@@ -1,3 +1,9 @@
+        2.30 2020.06020 - Cleanup for initial upload to GitHub. Version
+                          numbers for all sub-modules synced on 2.30 for
+                          consistency. Maintainer updated. Build.PL and
+                          Makefile.PL updates. Addition of 'use warnings'
+                          to all files. POD encoding error fix.
+
         0.84 2010.04.29 - Documentation fixes to the En stemmer and removal
                           of the accidentally included lib/Lingua/test.pl file
                           Thanks goes to Aaron Naiman for bringing the

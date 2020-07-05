@@ -129,14 +129,14 @@ bool Mapper::DecoderHandlers::apply_defaults_and_check() {
     const vector<bool> &seen = seen_fields.back();
     const Mapper *mapper = mappers.back();
     const vector<Mapper::Field> &fields = mapper->fields;
-    bool decode_explict_defaults = mapper->decode_explicit_defaults;
+    bool decode_explicit_defaults = mapper->decode_explicit_defaults;
     bool check_required_fields = mapper->check_required_fields;
 
     for (int i = 0, n = fields.size(); i < n; ++i) {
         const Mapper::Field &field = fields[i];
         bool field_seen = seen[i];
 
-        if (!field_seen && decode_explict_defaults && field.has_default) {
+        if (!field_seen && decode_explicit_defaults && field.has_default) {
             SV *target = get_target(&i);
 
             // this is the case where we merged multiple message instances,
@@ -781,7 +781,7 @@ SV *Mapper::make_object(SV *data) const {
 
     if (data) {
         if (!SvROK(data) || SvTYPE(SvRV(data)) != SVt_PVHV)
-            croak("Not an hash reference");
+            croak("Not a hash reference");
 
         if (SvTEMP(data) && SvREFCNT(data) == 1) {
             // steal
@@ -1197,9 +1197,18 @@ bool Mapper::encode_from_array(Sink *sink, Status *status, const Mapper::Field &
     S setter(status);
     Sink sub;
 
+    int size = av_top_index(source) + 1;
+
+    if (size == 0) {
+        // when emitting a packed repeated field, we must avoid invoking
+        // StartSequence if we have no values to encode. Not doing so causes us
+        // to emit a packed field with length=0, which is illegal and breaks
+        // decoders.
+        return true;
+    }
+
     if (!sink->StartSequence(fd.selector.seq_start, &sub))
         return false;
-    int size = av_top_index(source) + 1;
 
     WarnContext::Item &warn_cxt = warn_context->push_level(WarnContext::Array);
     for (int i = 0; i < size; ++i) {
@@ -1268,7 +1277,7 @@ bool Mapper::encode_value(Sink *sink, Status *status, SV *ref) const {
 #endif
 
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
-        croak("Not an hash reference when encoding a %s value", message_def->full_name());
+        croak("Not a hash reference when encoding a %s value", message_def->full_name());
     HV *hv = (HV *) SvRV(ref);
 
     if (!sink->StartMessage())
@@ -1517,7 +1526,7 @@ bool Mapper::encode_from_perl_hash(Sink *sink, Status *status, const Field &fd, 
 #endif
 
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
-        croak("Not an hash reference when encoding field '%s'", fd.full_name().c_str());
+        croak("Not a hash reference when encoding field '%s'", fd.full_name().c_str());
     HV *hash = (HV *) SvRV(ref);
     Sink repeated;
 
@@ -1652,7 +1661,7 @@ bool Mapper::check_from_enum_array(Status *status, const Mapper::Field &fd, AV *
 bool Mapper::check(Status *status, SV *ref) const {
     SvGETMAGIC(ref);
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
-        croak("Not an hash reference when checking a %s value", message_def->full_name());
+        croak("Not a hash reference when checking a %s value", message_def->full_name());
     HV *hv = (HV *) SvRV(ref);
 
     I32 count = hv_iterinit(hv);
@@ -1838,7 +1847,7 @@ SV *MapperField::get_read_hash_ref(HV *self) {
 
     SV *ref = HeVAL(ent);
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
-        croak("Value of field '%s' is not an hash reference", field->full_name().c_str());
+        croak("Value of field '%s' is not a hash reference", field->full_name().c_str());
 
     return ref;
 }
@@ -1864,7 +1873,7 @@ HV *MapperField::get_write_hash(HV *self) {
     } else {
         SV *ref = HeVAL(ent);
         if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
-            croak("Value of field '%s' is not an hash reference", field->full_name().c_str());
+            croak("Value of field '%s' is not a hash reference", field->full_name().c_str());
 
         return (HV *) SvRV(ref);
     }
@@ -2021,7 +2030,7 @@ void MapperField::copy_value(SV *target, SV *value) {
         break;
     case UPB_TYPE_MESSAGE:
         if (SvOK(value) && (!SvROK(value) || SvTYPE(SvRV(value)) != SVt_PVHV))
-            croak("Value for message field '%s' is not an hash reference", field->full_name().c_str());
+            croak("Value for message field '%s' is not a hash reference", field->full_name().c_str());
         sv_setsv(target, value);
         break;
     case UPB_TYPE_ENUM: {
@@ -2164,7 +2173,7 @@ SV *MapperField::get_map(HV *self) {
 
 void MapperField::set_map(HV *self, SV *ref) {
     if (!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVHV)
-        croak("Value for field '%s' is not an hash reference", field->full_name().c_str());
+        croak("Value for field '%s' is not a hash reference", field->full_name().c_str());
     SV *field_ref = get_write_field(self);
 
     if (!SvOK(field_ref)) {

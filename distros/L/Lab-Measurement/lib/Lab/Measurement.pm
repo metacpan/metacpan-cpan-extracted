@@ -1,5 +1,5 @@
 package Lab::Measurement;
-$Lab::Measurement::VERSION = '3.701';
+$Lab::Measurement::VERSION = '3.703';
 #ABSTRACT: Log, describe and plot data on the fly
 
 use strict;
@@ -30,7 +30,7 @@ Lab::Measurement - Log, describe and plot data on the fly
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 

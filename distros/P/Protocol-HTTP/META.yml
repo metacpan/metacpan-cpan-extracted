@@ -3,29 +3,30 @@ abstract: 'very fast HTTP protocol incremental parser and serializer'
 author:
   - unknown
 build_requires:
-  Date: v5.0.3
-  Export::XS: v3.0.4
+  Date: v5.2.0
+  Export::XS: v3.0.5
   Test::Catch: v1.0.13
   Test::Deep: '0'
+  Test::Fatal: '0'
   Test::More: '0'
   Test::Simple: '0.96'
   URI::XS: v2.0.1
-  XS::Framework: v1.2.9
-  XS::libboost::mini: v1.68.0.0
-  XS::libcatch: v1.1.0
-  XS::libpanda: v1.3.14
+  XS::Framework: v1.3.2
+  XS::libboost::mini: v1.69.0.0
+  XS::libcatch: v2.12.1
+  XS::libpanda: v1.4.2
   XS::librangeV3: v1.0.0
   next::XS: v1.0.7
 configure_requires:
-  Date: v5.0.3
-  Export::XS: v3.0.4
+  Date: v5.2.0
+  Export::XS: v3.0.5
   Test::Catch: v1.0.13
   URI::XS: v2.0.1
-  XS::Framework: v1.2.9
-  XS::Install: v1.2.16
-  XS::libboost::mini: v1.68.0.0
-  XS::libcatch: v1.1.0
-  XS::libpanda: v1.3.14
+  XS::Framework: v1.3.2
+  XS::Install: v1.2.18
+  XS::libboost::mini: v1.69.0.0
+  XS::libcatch: v2.12.1
+  XS::libpanda: v1.4.2
   XS::librangeV3: v1.0.0
   next::XS: v1.0.7
 dynamic_config: 1
@@ -40,14 +41,14 @@ no_index:
     - t
     - inc
 requires:
-  Date: v5.0.3
-  Export::XS: v3.0.4
+  Date: v5.2.0
+  Export::XS: v3.0.5
   URI::XS: v2.0.1
-  XS::Framework: v1.2.9
-  XS::Install: v1.2.16
-  XS::libboost::mini: v1.68.0.0
-  XS::libpanda: v1.3.14
+  XS::Framework: v1.3.2
+  XS::Install: v1.2.18
+  XS::libboost::mini: v1.69.0.0
+  XS::libpanda: v1.4.2
   XS::librangeV3: v1.0.0
   next::XS: v1.0.7
-version: v1.0.5
+version: v1.0.9
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

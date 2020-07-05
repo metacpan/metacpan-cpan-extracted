@@ -1,9 +1,9 @@
 package Sah::SchemaR::currency::code;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.008'; # VERSION
 
-our $rschema = ["str",[{description=>"\nAccept only current (not retired) codes. Code will be converted to uppercase.\n\n",examples=>[{valid=>0,value=>""},{res=>"IDR",valid=>1,value=>"idr"},{valid=>0,value=>"foo"}],in=>["AED","AFN","ALL","AMD","ANG","AOA","ARS","AUD","AWG","AZN","BAM","BBD","BDT","BGN","BHD","BIF","BMD","BND","BOB","BOV","BRL","BSD","BTN","BWP","BYN","BZD","CAD","CDF","CHE","CHF","CHW","CLF","CLP","CNY","COP","COU","CRC","CUC","CUP","CVE","CZK","DJF","DKK","DOP","DZD","EGP","ERN","ETB","EUR","FJD","FKP","GBP","GEL","GHS","GIP","GMD","GNF","GTQ","GYD","HKD","HNL","HRK","HTG","HUF","IDR","ILS","INR","IQD","IRR","ISK","JMD","JOD","JPY","KES","KGS","KHR","KMF","KPW","KRW","KWD","KYD","KZT","LAK","LBP","LKR","LRD","LSL","LYD","MAD","MDL","MGA","MKD","MMK","MNT","MOP","MRU","MUR","MVR","MWK","MXN","MXV","MYR","MZN","NAD","NGN","NIO","NOK","NPR","NZD","OMR","PAB","PEN","PGK","PHP","PKR","PLN","PYG","QAR","RON","RSD","RUB","RWF","SAR","SBD","SCR","SDG","SEK","SGD","SHP","SLL","SOS","SRD","SSP","STN","SVC","SYP","SZL","THB","TJS","TMT","TND","TOP","TRY","TTD","TWD","TZS","UAH","UGX","USD","USN","UYI","UYU","UYW","UZS","VES","VND","VUV","WST","XAF","XAG","XAU","XBA","XBB","XBC","XBD","XCD","XDR","XOF","XPD","XPF","XPT","XSU","XUA","YER","ZAR","ZMW","ZWL"],match=>"\\A[A-Z]{3}\\z",summary=>"Currency code","x.perl.coerce_rules"=>["From_str::to_upper"]}],["str"]];
+our $rschema = ["str",[{description=>"\nAccept only current (not retired) codes. Code will be converted to uppercase.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"IDR",value=>"idr"},{valid=>0,value=>"foo"}],in=>["AED","AFN","ALL","AMD","ANG","AOA","ARS","AUD","AWG","AZN","BAM","BBD","BDT","BGN","BHD","BIF","BMD","BND","BOB","BOV","BRL","BSD","BTN","BWP","BYN","BZD","CAD","CDF","CHE","CHF","CHW","CLF","CLP","CNY","COP","COU","CRC","CUC","CUP","CVE","CZK","DJF","DKK","DOP","DZD","EGP","ERN","ETB","EUR","FJD","FKP","GBP","GEL","GHS","GIP","GMD","GNF","GTQ","GYD","HKD","HNL","HRK","HTG","HUF","IDR","ILS","INR","IQD","IRR","ISK","JMD","JOD","JPY","KES","KGS","KHR","KMF","KPW","KRW","KWD","KYD","KZT","LAK","LBP","LKR","LRD","LSL","LYD","MAD","MDL","MGA","MKD","MMK","MNT","MOP","MRU","MUR","MVR","MWK","MXN","MXV","MYR","MZN","NAD","NGN","NIO","NOK","NPR","NZD","OMR","PAB","PEN","PGK","PHP","PKR","PLN","PYG","QAR","RON","RSD","RUB","RWF","SAR","SBD","SCR","SDG","SEK","SGD","SHP","SLL","SOS","SRD","SSP","STN","SVC","SYP","SZL","THB","TJS","TMT","TND","TOP","TRY","TTD","TWD","TZS","UAH","UGX","USD","USN","UYI","UYU","UYW","UZS","VES","VND","VUV","WST","XAF","XAG","XAU","XBA","XBB","XBC","XBD","XCD","XDR","XOF","XPD","XPF","XPT","XSU","XUA","YER","ZAR","ZMW","ZWL"],match=>"\\A[A-Z]{3}\\z",summary=>"Currency code","x.perl.coerce_rules"=>["From_str::to_upper"]}],["str"]];
 
 1;
 # ABSTRACT: Currency code
@@ -20,7 +20,7 @@ Sah::SchemaR::currency::code - Currency code
 
 =head1 VERSION
 
-This document describes version 0.006 of Sah::SchemaR::currency::code (from Perl distribution Sah-Schemas-Currency), released on 2020-03-04.
+This document describes version 0.008 of Sah::SchemaR::currency::code (from Perl distribution Sah-Schemas-Currency), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

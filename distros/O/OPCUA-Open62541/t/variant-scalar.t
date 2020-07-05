@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use OPCUA::Open62541 ':TYPES';
 
-use Test::More tests => 89;
+use Test::More tests => 112;
 use Test::Exception;
 use Test::LeakTrace;
 use Test::NoWarnings;
@@ -98,10 +98,14 @@ $variant->setScalar(-128, TYPES_SBYTE);
 is($variant->getScalar(), -128, "scalar TYPES_SBYTE -128");
 $variant->setScalar(127, TYPES_SBYTE);
 is($variant->getScalar(), 127, "scalar TYPES_SBYTE 127");
-warning_like { $variant->setScalar(-129, TYPES_SBYTE) }
-    (qr/Integer value -129 less than UA_SBYTE_MIN /, "sbyte min" );
-warning_like { $variant->setScalar(128, TYPES_SBYTE) }
-    (qr/Integer value 128 greater than UA_SBYTE_MAX /, "sbyte max" );
+throws_ok { $variant->setScalar(-129, TYPES_SBYTE) }
+    (qr/Integer value -129 less than UA_SBYTE_MIN /, "sbyte min");
+no_leaks_ok { eval { $variant->setScalar(-129, TYPES_SBYTE) } }
+    "sbyte min leak";
+throws_ok { $variant->setScalar(128, TYPES_SBYTE) }
+    (qr/Integer value 128 greater than UA_SBYTE_MAX /, "sbyte max");
+no_leaks_ok { eval { $variant->setScalar(128, TYPES_SBYTE) } }
+    "sbyte max leak";
 ok($variant->hasScalarType(TYPES_SBYTE), "variant TYPES_SBYTE");
 is($variant->getType(), TYPES_SBYTE, "type TYPES_SBYTE");
 
@@ -109,8 +113,10 @@ $variant->setScalar(0, TYPES_BYTE);
 is($variant->getScalar(), 0, "scalar TYPES_BYTE 0");
 $variant->setScalar(255, TYPES_BYTE);
 is($variant->getScalar(), 255, "scalar TYPES_BYTE 255");
-warning_like { $variant->setScalar(256, TYPES_BYTE) }
-    (qr/Unsigned value 256 greater than UA_BYTE_MAX /, "byte max" );
+throws_ok { $variant->setScalar(256, TYPES_BYTE) }
+    (qr/Unsigned value 256 greater than UA_BYTE_MAX /, "byte max");
+no_leaks_ok { eval { $variant->setScalar(256, TYPES_BYTE) } }
+    "byte max leak";
 ok($variant->hasScalarType(TYPES_BYTE), "variant TYPES_BYTE");
 is($variant->getType(), TYPES_BYTE, "type TYPES_BYTE");
 
@@ -120,10 +126,14 @@ $variant->setScalar(-0x8000, TYPES_INT16);
 is($variant->getScalar(), -0x8000, "scalar TYPES_INT16 -0x8000");
 $variant->setScalar(0x7fff, TYPES_INT16);
 is($variant->getScalar(), 0x7fff, "scalar TYPES_INT16 0x7fff");
-warning_like { $variant->setScalar(-0x8001, TYPES_INT16) }
-    (qr/Integer value -32769 less than UA_INT16_MIN /, "int16 min" );
-warning_like { $variant->setScalar(0x8000, TYPES_INT16) }
-    (qr/Integer value 32768 greater than UA_INT16_MAX /, "int16 max" );
+throws_ok { $variant->setScalar(-0x8001, TYPES_INT16) }
+    (qr/Integer value -32769 less than UA_INT16_MIN /, "int16 min");
+no_leaks_ok { eval { $variant->setScalar(-0x8001, TYPES_INT16) } }
+    "int16 min leak";
+throws_ok { $variant->setScalar(0x8000, TYPES_INT16) }
+    (qr/Integer value 32768 greater than UA_INT16_MAX /, "int16 max");
+no_leaks_ok { eval { $variant->setScalar(0x8000, TYPES_INT16) } }
+    "int16 max leak";
 ok($variant->hasScalarType(TYPES_INT16), "variant TYPES_INT16");
 is($variant->getType(), TYPES_INT16, "type TYPES_INT16");
 
@@ -131,8 +141,10 @@ $variant->setScalar(0, TYPES_UINT16);
 is($variant->getScalar(), 0, "scalar TYPES_UINT16 0");
 $variant->setScalar(0xffff, TYPES_UINT16);
 is($variant->getScalar(), 0xffff, "scalar TYPES_UINT16 0xffff");
-warning_like { $variant->setScalar(0x10000, TYPES_UINT16) }
-    (qr/Unsigned value 65536 greater than UA_UINT16_MAX /, "uint16 max" );
+throws_ok { $variant->setScalar(0x10000, TYPES_UINT16) }
+    (qr/Unsigned value 65536 greater than UA_UINT16_MAX /, "uint16 max");
+no_leaks_ok { eval { $variant->setScalar(0x10000, TYPES_UINT16) } }
+    "uint16 max leak";
 ok($variant->hasScalarType(TYPES_UINT16), "variant TYPES_UINT16");
 is($variant->getType(), TYPES_UINT16, "type TYPES_UINT16");
 
@@ -142,10 +154,14 @@ $variant->setScalar(-0x80000000, TYPES_INT32);
 is($variant->getScalar(), -0x80000000, "scalar TYPES_INT32 -0x80000000");
 $variant->setScalar(0x7fffffff, TYPES_INT32);
 is($variant->getScalar(), 0x7fffffff, "scalar TYPES_INT32 0x7fffffff");
-warning_like { $variant->setScalar(-0x80000001, TYPES_INT32) }
-    (qr/Integer value -2147483649 less than UA_INT32_MIN /, "int32 min" );
-warning_like { $variant->setScalar(0x80000000, TYPES_INT32) }
-    (qr/Integer value 2147483648 greater than UA_INT32_MAX /, "int32 max" );
+throws_ok { $variant->setScalar(-0x80000001, TYPES_INT32) }
+    (qr/Integer value -2147483649 less than UA_INT32_MIN /, "int32 min");
+no_leaks_ok { eval { $variant->setScalar(-0x80000001, TYPES_INT32) } }
+    "int32 min leak";
+throws_ok { $variant->setScalar(0x80000000, TYPES_INT32) }
+    (qr/Integer value 2147483648 greater than UA_INT32_MAX /, "int32 max");
+no_leaks_ok { eval { $variant->setScalar(0x80000000, TYPES_INT32) } }
+    "int32 max leak";
 ok($variant->hasScalarType(TYPES_INT32), "variant TYPES_INT32");
 is($variant->getType(), TYPES_INT32, "type TYPES_INT32");
 
@@ -154,8 +170,10 @@ is($variant->getScalar(), 0, "scalar TYPES_UINT32 0");
 $variant->setScalar(0xffffffff, TYPES_UINT32);
 is($variant->getScalar(), 0xffffffff, "scalar TYPES_UINT32 0xffffffff");
 # XXX this only works for Perl on 64 bit platforms
-warning_like { $variant->setScalar(1<<32, TYPES_UINT32) }
-    (qr/Unsigned value 4294967296 greater than UA_UINT32_MAX /, "uint32 max" );
+throws_ok { $variant->setScalar(1<<32, TYPES_UINT32) }
+    (qr/Unsigned value 4294967296 greater than UA_UINT32_MAX /, "uint32 max");
+no_leaks_ok { eval { $variant->setScalar(1<<32, TYPES_UINT32) } }
+    "uint32 max leak";
 ok($variant->hasScalarType(TYPES_UINT32), "variant TYPES_UINT32");
 is($variant->getType(), TYPES_UINT32, "type TYPES_UINT32");
 
@@ -178,6 +196,35 @@ is($variant->getScalar(), 18446744073709551615,
 # no overflow possible
 ok($variant->hasScalarType(TYPES_UINT64), "variant TYPES_UINT64");
 is($variant->getType(), TYPES_UINT64, "type TYPES_UINT64");
+
+$variant->setScalar(0, TYPES_FLOAT);
+is($variant->getScalar(), 0, "scalar TYPES_FLOAT 0");
+$variant->setScalar(1.17549435082229E-38, TYPES_FLOAT);
+is($variant->getScalar(), 1.17549435082229E-38, "scalar TYPES_FLOAT MIN");
+$variant->setScalar(3.4028230607371E+38, TYPES_FLOAT);
+is($variant->getScalar(), 3.4028230607371E+38, "scalar TYPES_FLOAT MAX");
+throws_ok { $variant->setScalar(-3.40282347E+38, TYPES_FLOAT) }
+    (qr/Float value -3.402823e\+38 less than -3.402823e\+38 /,
+    "TYPES_FLOAT min");
+no_leaks_ok { eval { $variant->setScalar(-3.40282347E+38, TYPES_FLOAT) } }
+    "TYPES_FLOAT min leak";
+throws_ok { $variant->setScalar(3.40282347E+38, TYPES_FLOAT) }
+    (qr/Float value 3.402823e\+38 greater than 3.402823e\+38 /,
+    "TYPES_FLOAT max");
+no_leaks_ok { eval { $variant->setScalar(3.40282347E+38, TYPES_FLOAT) } }
+    "TYPES_FLOAT max leak";
+ok($variant->hasScalarType(TYPES_FLOAT), "variant TYPES_FLOAT");
+is($variant->getType(), TYPES_FLOAT, "type TYPES_FLOAT");
+
+$variant->setScalar(0, TYPES_DOUBLE);
+is($variant->getScalar(), 0, "scalar TYPES_DOUBLE 0");
+$variant->setScalar(2.2250738585072014E-308, TYPES_DOUBLE);
+is($variant->getScalar(), 2.2250738585072014E-308, "scalar TYPES_DOUBLE MIN");
+$variant->setScalar(1.7976931348623157E+308, TYPES_DOUBLE);
+is($variant->getScalar(), 1.7976931348623157E+308, "scalar TYPES_DOUBLE MAX");
+# no overflow possible
+ok($variant->hasScalarType(TYPES_DOUBLE), "variant TYPES_DOUBLE");
+is($variant->getType(), TYPES_DOUBLE, "type TYPES_DOUBLE");
 
 my $g;
 {

@@ -1,4 +1,4 @@
-use Test::Most 'die', tests => 10;
+use Test::Most 'die', tests => 14;
 
 use_ok('ful');
 
@@ -18,6 +18,13 @@ use_ok('ful', { dir => '.nonexistent' });
 
 use_ok('ful', { has_dir => 't' });
 
-use_ok('ful', { child_dir => 't' });
+use_ok('ful', { child_dir => 't2' });
+
+require_ok('ful');
+
+like(ful::crum(), qr/\/t$/, 'ful::crum()');
+like($ful::crum, qr/\/t$/, '$ful::crum');
+
+is($ful::crum, ful::crum(), 'ful::crum() == $ful::crum');
 
 done_testing;

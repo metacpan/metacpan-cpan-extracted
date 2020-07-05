@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.48 {
+package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.51 {
 
   use 5.014;
   use Moose;
@@ -46,6 +46,12 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.48 {
     default => sub { [] },
   );
 
+  has default_branch => (
+    is      => 'ro',
+    default => 'master',  # apologize, until I can update all of my repos,
+                          # this needs to use the git default branch name.
+  );
+
   sub mvp_multivalue_args { qw( workflow ) }
 
   around get_readme_content => sub {
@@ -72,7 +78,7 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.48 {
       my $status = '';
       $status .= " [![Build Status](https://api.cirrus-ci.com/github/@{[ $self->cirrus_user ]}/$name.svg)](https://cirrus-ci.com/github/@{[ $self->cirrus_user ]}/$name)" if $cirrus_status;
       $status .= " [![Build Status](https://travis-ci.org/@{[ $self->travis_user ]}/$name.svg)](http://travis-ci.org/@{[ $self->travis_user ]}/$name)" if $self->travis_status;
-      $status .= " [![Build status](https://ci.appveyor.com/api/projects/status/@{[ $self->appveyor ]}/branch/master?svg=true)](https://ci.appveyor.com/project/@{[ $self->appveyor_user ]}/$name/branch/master)" if $self->appveyor;
+      $status .= " [![Build status](https://ci.appveyor.com/api/projects/status/@{[ $self->appveyor ]}/branch/@{[ $self->default_branch ]}?svg=true)](https://ci.appveyor.com/project/@{[ $self->appveyor_user ]}/$name/branch/@{[ $self->default_branch ]})" if $self->appveyor;
 
       foreach my $workflow (@{ $self->workflow })
       {
@@ -103,7 +109,7 @@ Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod
 
 =head1 VERSION
 
-version 2.48
+version 2.51
 
 =head1 SYNOPSIS
 

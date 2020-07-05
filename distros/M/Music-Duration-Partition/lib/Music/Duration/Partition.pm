@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0504';
+our $VERSION = '0.0512';
 
 use Moo;
 use strictures 2;
@@ -55,6 +55,7 @@ has _mrd => (
 
 sub _build__mrd {
     my ($self) = @_;
+    die 'Sizes of weights and pool not equal' unless @{ $self->weights } == @{ $self->pool };
     return Math::Random::Discrete->new($self->weights, $self->pool);
 }
 
@@ -151,7 +152,7 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0504
+version 0.0512
 
 =head1 SYNOPSIS
 
@@ -162,7 +163,7 @@ version 0.0504
   my $mdp = Music::Duration::Partition->new(
     size    => 8,
     pool    => [qw/ qn en sn /],
-    weights => [ 0.2, 0.3, 0.5 ],
+    weights => [ 0.2, 0.3, 0.5 ], # Optional
   );
 
   $mdp->pool_select( sub { ... } ); # Optional
@@ -179,7 +180,7 @@ version 0.0504
 
   $score->write_score('motif.mid');
 
-  # The pool may also be made of MIDI durations
+  # The size and pool may also be made of MIDI durations
   $mdp = Music::Duration::Partition->new(
     size => 100,
     pool => [qw/ d50 d25 /],
@@ -189,7 +190,7 @@ version 0.0504
 
 C<Music::Duration::Partition> partitions a musical duration into
 rhythmic phrases, given by the B<size>, into smaller durations drawn
-from the B<pool> of possible durations.
+from the B<pool> of possibly weighted durations.
 
 =head1 ATTRIBUTES
 
@@ -197,9 +198,9 @@ from the B<pool> of possible durations.
 
   $durations = $mdp->durations;
 
-A hash reference of C<%MIDI::Simple::Length> (keyed by duration name).
+A hash reference of duration lengths (keyed by duration name).
 
-Default: C<%MIDI::Simple::Length>
+Default: C<\%MIDI::Simple::Length>
 
 =head2 size
 
@@ -238,7 +239,8 @@ Default: Random item from B<pool>
 
 Specification of the frequency of pool item selection.
 
-The number of weights must equal number of pool entries.
+The number of weights must equal the number of pool entries.  The
+weights do not have to sum to 1 and can be any relative numbers.
 
 Default: Equal probability for each pool entry
 
@@ -247,6 +249,8 @@ Default: Equal probability for each pool entry
   $verbose = $mdp->verbose;
 
 Show the progress of the B<motif> method.
+
+Default: C<0>
 
 =head1 METHODS
 

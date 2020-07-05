@@ -25,6 +25,8 @@ use SPVM 'TestCase::Point_3i';
 use SPVM 'SPVM::Hash';
 use SPVM 'SPVM::ObjectList';
 
+UNITCHECK { SPVM::init() }
+
 my $BYTE_MAX = 127;
 my $BYTE_MIN = -128;
 my $SHORT_MAX = 32767;
@@ -1258,13 +1260,6 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
     is($values->to_bin, "");
   }
 }
-
-# Complex
-{
-  my $z3 = TestCase::ExchangeAPI->add_complex({re => 0.25, im => 0.5}, {re => 0.5, im => 0.125});
-  is_deeply($z3, {re => 0.75, im => 0.625});
-}
-
 
 # All object is freed
 my $end_memory_blocks_count = SPVM::get_memory_blocks_count();

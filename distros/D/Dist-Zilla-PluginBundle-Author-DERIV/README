@@ -1,0 +1,18 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::DERIV - yet another plugin bundle
+    for Dist::Zilla
+
+DESCRIPTION
+
+    See https://metacpan.org/author/DERIV for modules which may possibly
+    use this.
+
+AUTHOR
+
+    Deriv Services Ltd <DERIV@cpan.org>, but initially started as an exact
+    copy of Dist::Zilla::PluginBundle::Author::TEAM
+
+    Copyright Deriv Services Ltd 2020. Licensed under the same terms as
+    Perl itself.
+

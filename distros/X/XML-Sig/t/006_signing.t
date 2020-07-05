@@ -28,7 +28,7 @@ ok( encode_base64( $signed,'' ), $signed_b64 );
 my $is_valid = $sig->verify( $signed );
 ok( $is_valid == 1);
 
-my $sig2 = XML::Sig->new( { key => 't/rsa.private.key', x509 => 1 } );
+my $sig2 = XML::Sig->new( { key => 't/rsa.private.key', cert => 't/rsa.cert.pem', x509 => 1 } );
 isa_ok( $sig2, 'XML::Sig' );
 my $signed2 = $sig2->sign($xml);
 ok( encode_base64( $signed2,'' ), $signed2_b64 );
@@ -44,7 +44,7 @@ ok( $is_valid3 == 1 );
 
 my $sig4 = XML::Sig->new( { key => 't/pkcs8.private.key' } );
 isa_ok( $sig4, 'XML::Sig' );
-my $signed4 = $sig->sign($xml);
+my $signed4 = $sig4->sign($xml);
 ok( encode_base64( $signed4,'' ), $signed4_b64 );
 my $is_valid4 = $sig4->verify( $signed4 );
 ok( $is_valid4 == 1);

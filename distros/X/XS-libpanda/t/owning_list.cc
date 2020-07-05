@@ -1,11 +1,9 @@
 #include "test.h"
-#include <panda/log.h>
 #include <panda/owning_list.h>
 
-using panda::owning_list;
-using test::Tracer;
+#define TEST(name) TEST_CASE("owning_list: " name, "[owning_list]")
 
-TEST_CASE("empty owning_list" , "[owning_list]") {
+TEST("empty") {
     owning_list<int> list;
     REQUIRE(list.size() == 0);
     for (auto iter = list.begin(); iter != list.end(); ++iter) {
@@ -14,7 +12,7 @@ TEST_CASE("empty owning_list" , "[owning_list]") {
     REQUIRE(true);
 }
 
-TEST_CASE("simple owning_list" , "[owning_list]") {
+TEST("simple") {
     owning_list<int> list;
     list.push_back(10);
     REQUIRE(list.size() == 1);
@@ -26,13 +24,13 @@ TEST_CASE("simple owning_list" , "[owning_list]") {
     REQUIRE(++iter == list.end());
 }
 
-TEST_CASE("2 elements owning_list" , "[owning_list]") {
+TEST("2 elements") {
     owning_list<int> list;
     list.push_back(0);
     list.push_back(1);
     REQUIRE(list.size() == 2);
     auto iter = list.begin();
-    size_t i = 0;
+    int i = 0;
     for (; iter != list.end(); ++iter) {
         REQUIRE(*iter == i);
         ++i;
@@ -40,7 +38,7 @@ TEST_CASE("2 elements owning_list" , "[owning_list]") {
     REQUIRE(iter == list.end());
 }
 
-TEST_CASE("owning_list::remove 0" , "[owning_list]") {
+TEST("remove 0") {
     owning_list<int> list;
     list.push_back(10);
     list.remove(10);
@@ -51,20 +49,20 @@ TEST_CASE("owning_list::remove 0" , "[owning_list]") {
 }
 
 
-TEST_CASE("owning_list::remove 1" , "[owning_list]") {
+TEST("remove 1") {
     owning_list<int> list;
     list.push_back(0);
     list.push_back(2);
     list.remove(2);
     list.push_back(1);
-    size_t i = 0;
+    int i = 0;
     for (auto iter = list.begin(); iter != list.end(); ++iter) {
         REQUIRE(*iter == i++);
     }
     REQUIRE(list.size() == 2);
 }
 
-TEST_CASE("owning_list::remove in iteration" , "[owning_list]") {
+TEST("remove in iteration") {
     owning_list<int> list;
     list.push_back(0);
     list.push_back(2);
@@ -72,7 +70,7 @@ TEST_CASE("owning_list::remove in iteration" , "[owning_list]") {
     for (auto iter = list.begin(); iter != list.end(); ++iter) {
         list.remove(2);
     }
-    size_t i = 0;
+    int i = 0;
     for (auto iter = list.begin(); iter != list.end(); ++iter) {
         REQUIRE(*iter == i++);
     }
@@ -80,7 +78,7 @@ TEST_CASE("owning_list::remove in iteration" , "[owning_list]") {
     REQUIRE(list.size() == 2);
 }
 
-TEST_CASE("owning_list::remove in iteration 2" , "[owning_list]") {
+TEST("remove in iteration 2") {
     owning_list<int> list;
     list.push_back(0);
     list.push_back(1);
@@ -93,7 +91,7 @@ TEST_CASE("owning_list::remove in iteration 2" , "[owning_list]") {
     REQUIRE(list.size() == 1);
 }
 
-TEST_CASE("owning_list::remove in iteration reverse" , "[owning_list]") {
+TEST("remove in iteration reverse") {
     owning_list<int> list;
     list.push_back(0);
     list.push_back(1);
@@ -106,7 +104,7 @@ TEST_CASE("owning_list::remove in iteration reverse" , "[owning_list]") {
     REQUIRE(list.size() == 1);
 }
 
-TEST_CASE("owning_list::remove in iteration reverse ++" , "[owning_list]") {
+TEST("remove in iteration reverse ++") {
     owning_list<int> list;
     list.push_back(0);
     list.push_back(1);
@@ -120,7 +118,7 @@ TEST_CASE("owning_list::remove in iteration reverse ++" , "[owning_list]") {
     REQUIRE(list.size() == 2);
 }
 
-TEST_CASE("owning_list::erase in iteration reverse ++" , "[owning_list]") {
+TEST("erase in iteration reverse ++") {
     owning_list<int> list;
     list.push_back(0);
     list.push_back(1);
@@ -134,7 +132,7 @@ TEST_CASE("owning_list::erase in iteration reverse ++" , "[owning_list]") {
     REQUIRE(list.size() == 2);
 }
 
-TEST_CASE("owning_list::clear Tracer" , "[owning_list]") {
+TEST("clear Tracer") {
     Tracer::refresh();
     owning_list<Tracer> list;
     list.push_back(Tracer(0));
@@ -147,7 +145,7 @@ TEST_CASE("owning_list::clear Tracer" , "[owning_list]") {
     REQUIRE(list.size() == 0);
 }
 
-TEST_CASE("owning_list::remove Tracer" , "[owning_list]") {
+TEST("remove Tracer") {
     Tracer::refresh();
     owning_list<Tracer> list;
     list.push_back(Tracer(0));

@@ -4,74 +4,70 @@
 #include <panda/refcnt.h>
 #include <panda/string.h>
 
-using panda::function;
-using panda::make_function;
-using panda::iptr;
-using panda::function_details::make_method;
-using panda::function_details::tmp_abstract_function;
-using test::Tracer;
+using function_details::make_method;
+using function_details::tmp_abstract_function;
+
+#define TEST(name) TEST_CASE("function: " name, "[function]")
 
 namespace test {
+    void void_func(){}
+    void void_func2(){}
+    void func_int(int){}
+    void func_int16(int16_t){}
+    void func_double(int){}
 
+    int foo2() {return 1;}
+    int plus_one(int a) { return a + 1;}
 
-void void_func(){}
-void void_func2(){}
-void func_int(int){}
-void func_int16(int16_t){}
-void func_double(int){}
+    class Test : public panda::Refcnt {
+    public:
+        int value = 0;
 
-int foo2() {return 1;}
-int plus_one(int a) { return a + 1;}
+        Test(int value) : value(value) {}
+        Test() : value(0) {}
 
-class Test : public panda::Refcnt {
-public:
-    int value = 0;
+        void foo(int) {}
+        void foo2(int) {}
+        int bar() {return value + 40;}
 
-    Test(int value) : value(value) {}
-    Test() : value(0) {}
-
-    void foo(int) {}
-    void foo2(int) {}
-    int bar() {return value + 40;}
-
-    int operator()(int v) {return v;}
-    bool operator == (const Test& oth) const { return value == oth.value;}
-};
+        int operator()(int v) {return v;}
+        bool operator == (const Test& oth) const { return value == oth.value;}
+    };
 }
 
 using namespace test;
 
-TEST_CASE("simplest function", "[function]") {
+TEST("simplest function") {
     function<void(void)> f = &void_func;
     REQUIRE(true);
 }
 
-TEST_CASE("simplest function call", "[function]") {
+TEST("simplest function call") {
     function<int(int)> f;
     f = &plus_one;
     REQUIRE(f(1) == 2);
 }
 
-TEST_CASE("function by reference call", "[function]") {
+TEST("function by reference call") {
     function<int(int)> f;
     f = plus_one;
     REQUIRE(f(1) == 2);
 }
 
-TEST_CASE("simplest lambda call", "[function]") {
+TEST("simplest lambda call") {
     int a = 13;
     function<int(void)> f = [&](){return a;};
     REQUIRE(f() == 13);
 }
 
-TEST_CASE("simplest method call", "[function]") {
+TEST("simplest method call") {
     iptr<Test> t = new Test();
     t->value = 14;
     auto m = make_function(&Test::bar, t);
     REQUIRE(m() == 54);
 }
 
-TEST_CASE("mixedcall", "[function]") {
+TEST("mixedcall") {
     iptr<Test> t = new Test();
     t->value = 14;
     auto f = make_function(&Test::bar, t);
@@ -85,7 +81,7 @@ TEST_CASE("mixedcall", "[function]") {
     REQUIRE(f() == 13);
 }
 
-TEST_CASE("function ptr comparations", "[function]") {
+TEST("function ptr comparations") {
     function<void(void)> f1_void = &void_func;
     function<void(void)> f2_void = &void_func;
     function<void(void)> f3_void = &void_func2;
@@ -97,7 +93,7 @@ TEST_CASE("function ptr comparations", "[function]") {
     REQUIRE(f1_void != tmp_abstract_function(&void_func2));
 }
 
-TEST_CASE("function ptr comparations covariant", "[function]") {
+TEST("function ptr comparations covariant") {
     struct Int {
         void operator()(int) {}
         bool operator==(const Int&) const {
@@ -122,7 +118,7 @@ TEST_CASE("function ptr comparations covariant", "[function]") {
     CHECK(ff1 == ff2);
 }
 
-TEST_CASE("function covariant copy comparations", "[function]") {
+TEST("function covariant copy comparations") {
     bool called = false;
     auto lambda = [&](int a) {
         called = true;
@@ -135,7 +131,7 @@ TEST_CASE("function covariant copy comparations", "[function]") {
     CHECK(f2 == f1);
 }
 
-TEST_CASE("methods comparations", "[function]") {
+TEST("methods comparations") {
     iptr<Test> t = new Test();
     auto m1 = make_function(&Test::foo, t);
     auto m2 = make_method(&Test::foo);
@@ -153,7 +149,7 @@ TEST_CASE("methods comparations", "[function]") {
 
 }
 
-TEST_CASE("lambdas comparations", "[function]") {
+TEST("lambdas comparations") {
     int a = 10;
     function<int(void)> l1 = [&](){return a;};
     auto l2 = l1;
@@ -163,7 +159,7 @@ TEST_CASE("lambdas comparations", "[function]") {
     REQUIRE(l1 != l3);
 }
 
-TEST_CASE("mixed function comparations", "[function]") {
+TEST("mixed function comparations") {
     int a = 10;
     function<int(void)> l = [&](){return a;};
     function<int(void)> f = &foo2;
@@ -175,7 +171,7 @@ TEST_CASE("mixed function comparations", "[function]") {
     REQUIRE(m != f);
 }
 
-TEST_CASE("null function comparations", "[function]") {
+TEST("null function comparations") {
     int a = 10;
     function<int(void)> n;
     function<int(void)> l = [&](){return a;};
@@ -192,7 +188,7 @@ TEST_CASE("null function comparations", "[function]") {
     REQUIRE_FALSE(n == m);
 }
 
-TEST_CASE("functors comparations", "[function]") {
+TEST("functors comparations") {
     function<int(int)> f1 = Test(1);
     function<int(int)> f2 = Test(2);
     function<int(int)> f11 = Test(1);
@@ -204,7 +200,7 @@ TEST_CASE("functors comparations", "[function]") {
     REQUIRE(f1 == tmp1);
 }
 
-TEST_CASE("function copy ellision", "[function]") {
+TEST("function copy ellision") {
     Tracer::refresh();
     {
         function<int(int)> f = Tracer(10);
@@ -218,21 +214,21 @@ TEST_CASE("function copy ellision", "[function]") {
     REQUIRE(Tracer::dtor_calls == 2);
 }
 
-TEST_CASE("covariant return type optional" , "[function]") {
+TEST("covariant return type optional" ) {
     function<panda::optional<int> (int)> cb = [](int a) -> int {
         return a;
     };
     REQUIRE(cb(3).value_or(42) == 3);
 }
 
-TEST_CASE("covariant return type double" , "[function]") {
+TEST("covariant return type double" ) {
     function<double (int)> cb = [](int a) -> int {
         return a;
     };
     REQUIRE(cb(3) == 3.0);
 }
 
-TEST_CASE("contravariance of arguments" , "[function]") {
+TEST("contravariance of arguments" ) {
     function<double (int)> cb = [](double) -> int {
         return 10;
     };
@@ -246,7 +242,7 @@ struct Derrived : Base {
     virtual panda::string name() override { return "override";}
 };
 
-TEST_CASE("contravariance of arguments classes" , "[function]") {
+TEST("contravariance of arguments classes" ) {
     using panda::string;
     function<Base& (Derrived&)> cb = [](Base& b) -> Base& {
         return b;
@@ -265,7 +261,7 @@ function<int(int)> lamda() {
 }
 
 
-TEST_CASE("function memory", "[function]") {
+TEST("function memory") {
 
     Tracer::refresh();
     {
@@ -277,7 +273,7 @@ TEST_CASE("function memory", "[function]") {
 }
 
 
-TEST_CASE("lambda self reference", "[function]") {
+TEST("lambda self reference") {
     int a = 1;
     int b;
     function<void(void)> outer;
@@ -296,7 +292,7 @@ TEST_CASE("lambda self reference", "[function]") {
     REQUIRE(b == 43);
 }
 
-TEST_CASE("no capture self reference", "[function]") {
+TEST("no capture self reference") {
     static int a = 0;
     function<void(int)> outer;
     {
@@ -310,21 +306,21 @@ TEST_CASE("no capture self reference", "[function]") {
     REQUIRE(a == 1);
 }
 
-TEST_CASE("function from null", "[function]") {
+TEST("function from null") {
     void (*fptr)();
     fptr = nullptr;
     function<void()> f = fptr;
     REQUIRE(!f);
 }
 
-TEST_CASE("function from null method", "[function]") {
+TEST("function from null method") {
     auto meth = &Test::bar;
     meth = nullptr;
     auto m = make_function(meth);
     REQUIRE(!m);
 }
 
-TEST_CASE("function from nullable object", "[function]") {
+TEST("function from nullable object") {
     struct S {
         void operator()() const {}
         explicit operator bool() const {
@@ -341,7 +337,7 @@ TEST_CASE("function from nullable object", "[function]") {
     REQUIRE(f);
 }
 
-TEST_CASE("lambda self reference gcc bug", "[function]") {
+TEST("lambda self reference gcc bug") {
     struct SomeStruct {
         void method(int val) {
             function<void(int)> ff = [this](panda::Ifunction<void, int>&, auto... args) mutable {
@@ -360,7 +356,7 @@ TEST_CASE("lambda self reference gcc bug", "[function]") {
     REQUIRE(s.a == 20);
 }
 
-TEST_CASE("lambda self reference auto...", "[function]") {
+TEST("lambda self reference auto...") {
     int a = 10;
     function<int(int)> f = [&](auto...args) -> int {
         static_assert(sizeof...(args) == 1, "auto... resolved as without SELF");

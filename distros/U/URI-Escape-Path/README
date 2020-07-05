@@ -1,0 +1,55 @@
+NAME
+    URI::Escape::Path - Like URI::Escape, but does not escape '/'
+
+VERSION
+    This document describes version 0.001 of URI::Escape::Path (from Perl
+    distribution URI-Escape-Path), released on 2020-06-18.
+
+SYNOPSIS
+     use URI::Escape::Path;
+     # use like you would use URI::Escape
+     my $escaped = uri_escape('/foo bar'); # => "/foo%20bar'
+
+DESCRIPTION
+    This module's "uri_escape()" and "uri_escape_utf8()" functions use this
+    default unsafe character list:
+
+     "^A-Za-z0-9\-\._~"
+
+    instead of URI::Escape's default of:
+
+     "^A-Za-z0-9\-\._~"
+
+FUNCTIONS
+  uri_escape
+  uri_escape_utf8
+  uri_unescape
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/URI-Escape-Path>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-URI-Escape-Path>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=URI-Escape-Path>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    URI::Escape
+
+    URI::Escape::Any
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,5 +1,8 @@
 Revision history for perl module CHI::Cascade
 
+0.3.3 (0.300003)
+    - fixed bug of stash (undefined) when rule method was used (a rarely bug)
+
 0.3.2 (0.300002)
     - [improved] If 'depends' in rule is code then this code will be executed only once (previously it could be executed twice). Same rule is for any item of depends array too.
     - [improved] All code was reformated without tabs

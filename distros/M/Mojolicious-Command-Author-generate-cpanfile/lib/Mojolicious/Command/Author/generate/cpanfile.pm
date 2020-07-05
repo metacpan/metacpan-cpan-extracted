@@ -1,34 +1,30 @@
 package Mojolicious::Command::Author::generate::cpanfile;
 
-our $VERSION = '0.10';
+our $VERSION = '0.20';
 
+use 5.018;
+
+use List::Util 'reduce';
 use Mojo::Base 'Mojolicious::Command';
 use Mojo::Collection 'c';
 use Mojo::File 'path';
 use Mojo::Util 'getopt';
+use Perl::Tokenizer;
+use version 0.77;
 
 has description => 'Generate "cpanfile"';
 
 has usage => sub { shift->extract_usage };
 
-my $COMMENT = qr/(?:(?:#)(?:[^\n]*)(?:\n))/;
-my $DATA    = qr/^__(DATA|END)__$(.)+/ms;
-my $POD     = qr/(?:(^=[a-z]+[0-9]?\b).*?^=cut\b)/ms;
-my $TEXT    = qr/(?:(?|(?:\")(?:[^\\\"]*(?:\\.[^\\\"]*)*)(?:\")|(?:\')(?:[^\\\']*(?:\\.[^\\\']*)*)(?:\')|(?:\`)(?:[^\\\`]*(?:\\.[^\\\`]*)*)(?:\`)))/;
-
-# $module_name => $module_version
-# not defined($module_version): failed to load $module_name without success
-# $module_version == 0: loaded $module_name successfully, doesn't have $VERSION
-my %ModuleInfo;
-
 sub run {
     my ($self, @args) = @_;
     my $path          = path;
     my $lib           = c;
-    my $requires      = {};
+    my $requires      = {Mojolicious => 1};
     my $t             = c;
     my $test_requires = {};
     my $packages      = {};
+    my $versions      = {};
 
     getopt(
         \@args,
@@ -41,56 +37,113 @@ sub run {
     push @$lib, $path->child('lib') unless $lib->size;
     push @$t,   $path->child('t')   unless $t->size;
 
-    $self->_find_dependencies($lib, $requires, $packages);
-    $self->_find_dependencies($t, $test_requires, $packages, qr/\.t$/);
+    $self->_find_dependencies($lib, $requires, $packages, $versions);
+    $self->_find_dependencies($t, $test_requires, $packages, $versions, 1);
 
     delete @$test_requires{keys %$requires};
+
+    # add "perl" to requirements if (use|require) $version exists in sources
+    $requires->{perl} = 1 if $versions->{perl};
+
+    $self->_set_versions($requires, $versions);
+    $self->_set_versions($test_requires, $versions);
+
     $self->render_to_rel_file(
         'cpanfile',
         'cpanfile',
-        {requires => $requires, test_requires => $test_requires});
+        {
+            perl          => delete($requires->{perl}),
+            requires      => $requires,
+            test_requires => $test_requires,
+        });
 }
 
 sub _find_dependencies {
-    my ($self, $paths, $requires, $packages, $match) = @_;
-    my %modules = %$requires;
+    my ($self, $paths, $requires, $packages, $module_versions, $test) = @_;
+    my $match = $test ? qr/\.(pm|t)$/ : qr/\.pm$/;
 
     $paths->uniq->each(sub {
-        shift->list_tree->each(sub {
-            my $file = shift;
-            my $content = $file->slurp;
+        shift->list_tree->grep($match)->each(sub {
+            my $file      = shift;
+            my $code      = $file->slurp;
+            my ($keyword, $module);
 
-            $content =~ s/$TEXT|$POD|$COMMENT|$DATA//g;
-            ++$packages->{$_} for $content =~ /\bpackage\s+(\w+(?:\:\:\w+)*)/gs;
+            perl_tokens {
+                my $token = $_[0];
 
-            return 1 if $match and $file !~ $match;
-            ++$modules{$_}    for $content =~ /\b(?:use|require)\s+(\w+(?:\:\:\w+)*)/gs;
+                return if $token eq 'horizontal_space' or $token eq 'vertical_space';
+
+                my $value = substr($code, $_[1], $_[2] - $_[1]);
+
+                if ($token eq 'keyword') {
+                    if ($value eq 'package' or $value eq 'use' or $value eq 'require') {
+                        $keyword = $value;
+                        undef $module;
+                    }
+                    else {
+                        undef $keyword;
+                    }
+                }
+                elsif ($keyword) {
+                    if ($token eq 'bare_word') {
+                        if ($keyword eq 'package') {
+                            ++$packages->{$value};
+                            undef $keyword;
+                        }
+                        elsif ($keyword eq 'use') {
+                            # use if followed by module name and potentially a version
+                            unless ($module) {
+                                $module = $value;
+                                ++$requires->{$module};
+                            }
+                        }
+                        elsif ($keyword eq 'require') {
+                            # require if followed by module name but no additional version number
+                            ++$requires->{$value};
+                            undef $keyword;
+                        }
+                    }
+                    elsif ($token eq 'number' or $token eq 'v_string') {
+                        if ($keyword eq 'use') {
+                            if ($module) {  # use Module::Name 0.12
+                                push @{$module_versions->{$module}}, $value;
+                                undef $module;
+                            }
+                            else {          # use 5.24.3
+                                push @{$module_versions->{perl}}, $value;
+                            }
+                        }
+                        elsif ($keyword eq 'require') {
+                            push @{$module_versions->{perl}}, $value;
+                        }
+
+                        undef $keyword;
+                    }
+                    else {
+                        undef $keyword;
+                        undef $module;
+                    }
+                }
+            } $code;
         });
     });
 
-    delete @modules{keys %$packages};   # remove own modules
-
-    foreach my $module (keys %modules) {
-        my $version = $self->_module_version($module) // next;
-
-        $requires->{$module} = $version;
-    }
+    delete @$requires{keys %$packages};   # remove own modules
 
     return $self;
 }
 
-sub _module_version {
-    my ($self, $module) = @_;
+sub _set_versions {
+    my ($self, $r, $v) = @_;
 
-    return $ModuleInfo{$module} if exists $ModuleInfo{$module};
-
-    no strict 'refs';
-
-    my $version = eval("require $module") ? ${"${module}::VERSION"} // 0 : undef;
-
-    $ModuleInfo{$module} = $version;
-
-    return $version // 0;
+    foreach my $module_name (keys %$r) {
+        if (my $module_versions = $v->{$module_name}) {
+            $r->{$module_name} = reduce { version->parse($a) > version->parse($b) ? $a : $b } @$module_versions;
+        }
+        else {
+            $r->{$module_name} = undef;
+        }
+    }
 }
 
 1;
@@ -182,7 +235,9 @@ __DATA__
 @@ cpanfile
 # https://metacpan.org/pod/distribution/Module-CPANfile/lib/cpanfile.pod
 
-requires 'Mojolicious', '<%= $Mojolicious::VERSION %>';
+% if ($perl) {
+requires 'perl', '<%= $perl %>';
+% }
 % foreach my $module (sort { lc($a) cmp lc($b) } keys %$requires) {
 requires '<%= $module %>'<% if ($requires->{$module}) { %>, '<%= $requires->{$module} %>'<% } %>;
 % }

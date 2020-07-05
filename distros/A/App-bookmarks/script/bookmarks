@@ -4,15 +4,17 @@
 #
 # bookmarks is a tool to export bookmarks from files supplied as arguments, or
 # from browsers default locations (when called without arguments). The following
-# browsers and platform are supported :
+# sources are supported :
 #
 # - Safari (Mac)
 # - Firefox (Mac/Linux/Windows)
 # - Chrome (Mac/Linux/Windows)
 # - Internet Explorer (Windows)
+# - Plain text (.txt)
+# - Markdown (.md)
 #
 # Files named *.plist, *.sqlite and *Bookmarks are processed as Safari, Firefox
-# and Chrome bookmarks, respectively. Directories named *Favorites" are processed
+# and Chrome bookmarks, respectively. Directories named *Favorites" are processed
 # as Internet Explorer favorites.
 #
 # The fields <title>, <url> and <description> are retrieved (when existing) and
@@ -30,6 +32,7 @@
 #
 # - Since Firefox sets an EXCLUSIVE SQLite lock, a tmp DB file copy is used.
 #
+# 2020.06.29 v0.21 jul : added markdown and text files support
 # 2020.03.10 v0.20 jul : fixed EXCLUSIVE SQLite lock set by Firefox
 # 2019.12.22 v0.19 jul : added chrome support, require, bugfixes
 # 2019.10.22 v0.17 jul : created module
@@ -49,33 +52,37 @@ use Getopt::Std;
 use File::Basename;
 use File::Temp qw(tempdir);
 use File::Copy qw(copy);
+use URI::Find;
+use URI::Find::Schemeless;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 my $program	 = basename($0);
 my $usage    = <<EOF;
 
-Usage: $program [-hVda] [-f format] [file ...]
+Usage: $program [-hVdas] [-f format] [file ...]
 
     -h, --help      help
     -V, --version   version
     -d              debug
     -a              all files : process arguments and default locations
     -f format       any combination of letters t,u,d as title/url/description (default : tud)
+    -s              find schemeless URLs in text files (default : no)
 EOF
 
 # options
 
 my %options = ();
-getopts("hVdaf:q:s:r:", \%options) or die $usage;
+getopts("hVdaf:s", \%options) or die $usage;
 
 my $help        = $options{h} // 0;
 my $version     = $options{V} // 0;
 my $debug       = $options{d} // 0;
 my $all         = $options{a} // 0;
 my $format      = $options{f} // "tud";
-my $quote       = $options{q} // " ";   # TODO ?
-my $fs          = $options{s} // " ";   # TODO ?
-my $rs          = $options{r} // "\n";  # TODO ?
+my $schemeless  = $options{s} // 0;
+my $quote       = " ";   # TODO ?
+my $fs          = " ";   # TODO ?
+my $rs          = "\n";  # TODO ?
 
 die $usage if $help;
 die $VERSION . "\n" if $version;
@@ -308,6 +315,58 @@ sub _iexplorer {
     }
 }
 
+sub _txt {
+
+    my $file = shift // "";
+    warn "\$file: $file\n" if $debug;
+
+	# get uri regex
+	my $class = $schemeless ? "URI::Find::Schemeless" : "URI::Find";	# copy-paste from urifind
+	my $finder = $class->new( sub {
+		my ($uri, $orig_uri) = @_;
+		return $orig_uri;
+	});
+
+	my $regex = $finder->uri_re;
+	$regex = $regex . '|' . $finder->schemeless_uri_re if $schemeless;
+
+    # read file as text
+	open(my $fh, '<:encoding(UTF-8)', $file) or die "unable to read file : $file";
+ 
+	while (my $line = <$fh>)
+	{
+		if ( $line =~ /(.*)\s+($regex)\s+(.*)/ )	# match title url desc
+		{
+	        my $title       = $1;
+	        my $url         = $2;
+	        my $description = $3;
+
+	        $print_bookmark->($title, $url, $description);
+		}	
+	}
+}
+
+sub _md {
+
+    my $file = shift // "";
+    warn "\$file: $file\n" if $debug;
+
+    # read file as text
+	open(my $fh, '<:encoding(UTF-8)', $file) or die "unable to read file : $file";
+
+	while (my $line = <$fh>)
+	{
+		if ( $line =~ /\s*\[(.*)\]\((.*)\)\s*(.*)/ )	# match [title](url) desc
+		{
+	        my $title       = $1;
+	        my $url         = $2;
+	        my $description = $3;
+        
+	        $print_bookmark->($title, $url, $description);
+		}
+	}
+}
+
 
 ############
 # RUN LOOP #
@@ -321,6 +380,8 @@ foreach my $file (@ARGV)
     elsif (-f $file and $name =~ /\.sqlite$/)  { _firefox($file);   }
     elsif (-f $file and $name =~ /Bookmarks$/) { _chrome($file);    }
     elsif (-d $file and $name =~ /Favorites$/) { _iexplorer($file); }
+    elsif (-f $file and $name =~ /\.txt$/)     { _txt($file);       }
+    elsif (-f $file and $name =~ /\.md$/)      { _md($file);        }
     else  { die "unable to process file : $file"; }
 }
 
@@ -341,16 +402,17 @@ bookmarks - Export browser bookmarks as plain text.
     -d              debug
     -a              all files : process arguments and default locations
     -f format       any combination of letters t,u,d as title/url/description (default : tud)
+    -s              find schemeless URLs in text files (default : no)
 
 =head1 DESCRIPTION
 
 bookmarks is a tool to export bookmarks from files supplied as arguments, or
 from browsers default locations (when called without arguments). The following
-browsers and platform are supported : Safari (Mac), Firefox (Mac/Linux/Windows),
-Chrome (Mac/Linux/Windows) and Internet Explorer (Windows). Files named *.plist,
-*.sqlite and *Bookmarks are processed as Safari, Firefox and Chrome bookmarks,
-respectively. Directories named *Favorites are processed as Internet Explorer
-favorites.
+sources are supported : Safari (Mac), Firefox (Mac/Linux/Windows),
+Chrome (Mac/Linux/Windows), Internet Explorer (Windows), plain text (.txt) and
+markdown (.md). Files named *.plist, *.sqlite and *Bookmarks are processed as
+Safari, Firefox and Chrome bookmarks, respectively. Directories named
+*Favorites are processed as Internet Explorer favorites.
 
 =head1 BUGS
 

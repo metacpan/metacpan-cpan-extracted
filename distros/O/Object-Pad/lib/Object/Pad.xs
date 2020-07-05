@@ -23,6 +23,7 @@
 
 #if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_PARSE_SUBSIGNATURE
+#  define HAVE_OP_ARGCHECK
 #endif
 
 #include "perl-additions.c.inc"
@@ -183,6 +184,86 @@ static COP *S_find_cop_for_lvintro(pTHX_ PADOFFSET padix, OP *o, COP **copp)
   return NULL;
 }
 
+#define make_croak_op(message)  S_make_croak_op(aTHX_ message)
+static OP *S_make_croak_op(pTHX_ const char *message)
+{
+  SV *sv = newSVpvn(message, strlen(message));
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+  sv_catpvs(sv, " at %s line %d.\n");
+  /* die sprintf($message, (caller)[1,2]) */
+  return op_convert_list(OP_DIE, 0,
+    op_convert_list(OP_SPRINTF, 0,
+      op_append_list(OP_LIST,
+        newSVOP(OP_CONST, 0, sv),
+        newSLICEOP(0,
+          op_append_list(OP_LIST,
+            newSVOP(OP_CONST, 0, newSViv(1)),
+            newSVOP(OP_CONST, 0, newSViv(2))),
+          newOP(OP_CALLER, 0)))));
+#else
+  /* For some reason I can't work out, the above tree isn't correct. Attempts
+   * to correct it still make OP_SPRINTF crash with "Out of memory!". For now
+   * lets just avoid the sprintf
+   */
+  sv_catpvs(sv, "\n");
+  return newLISTOP(OP_DIE, 0, newOP(OP_PUSHMARK, 0),
+    newSVOP(OP_CONST, 0, sv));
+#endif
+}
+
+#define make_argcheck_ops(required, optional, slurpy)  S_make_argcheck_ops(aTHX_ required, optional, slurpy)
+static OP *S_make_argcheck_ops(pTHX_ int required, int optional, char slurpy)
+{
+#ifdef HAVE_OP_ARGCHECK
+  UNOP_AUX_item *aux = (UNOP_AUX_item *)PerlMemShared_malloc(sizeof(UNOP_AUX_item) * 3);
+  aux[0].iv = required;
+  aux[1].iv = optional;
+  aux[2].iv = slurpy;
+
+  return op_prepend_elem(OP_LINESEQ, newSTATEOP(0, NULL, NULL),
+      op_prepend_elem(OP_LINESEQ, newUNOP_AUX(OP_ARGCHECK, 0, NULL, aux), NULL));
+#else
+  /* Older perls lack the convenience of OP_ARGCHECK so we'll have to build an
+   * optree ourselves. For now we only support required + optional, no slurpy
+   *
+   * This code heavily inspired by Perl_parse_subsignature() in toke.c from perl 5.24
+   */
+
+  OP *ret = NULL;
+
+  if(required > 0) {
+    /* @_ >= required or die ... */
+    OP *checkop = 
+      newSTATEOP(0, NULL,
+        newLOGOP(OP_OR, 0,
+          newBINOP(OP_GE, 0,
+            /* scalar @_ */
+            op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
+            newSVOP(OP_CONST, 0, newSViv(required))),
+          make_croak_op("Too few arguments for subroutine")));
+
+    ret = op_append_list(OP_LINESEQ, ret, checkop);
+  }
+
+  {
+    /* @_ <= (required+optional) or die ... */
+    OP *checkop =
+      newSTATEOP(0, NULL,
+        newLOGOP(OP_OR, 0,
+          newBINOP(OP_LE, 0,
+            /* scalar @_ */
+            op_contextualize(newUNOP(OP_RV2AV, 0, newGVOP(OP_GV, 0, PL_defgv)), G_SCALAR),
+            newSVOP(OP_CONST, 0, newSViv(required + optional))),
+          make_croak_op("Too many arguments for subroutine")));
+
+    ret = op_append_list(OP_LINESEQ, ret, checkop);
+  }
+
+  return ret;
+#endif
+}
+
 typedef void AttributeHandler(pTHX_ void *target, const char *value, void *data);
 
 struct AttributeDefinition {
@@ -208,13 +289,21 @@ typedef struct {
   SLOTOFFSET slotix;
 } SlotMeta;
 
+typedef struct {
+  SV *name;
+  ClassMeta *class;
+  /* We don't store the method body CV; leave that in the class stash */
+} MethodMeta;
+
 /* Metadata about a class */
 struct ClassMeta {
   SV *name;
   HV *stash;
+  ClassMeta *supermeta;
   bool sealed;
   SLOTOFFSET offset;   /* first slot index of this partial within its instance */
-  AV *slots;           /* each AV item is a raw pointer directly to a SlotMeta */
+  AV *slots;           /* each elem is a raw pointer directly to a SlotMeta */
+  AV *methods;         /* each elem is a raw pointer directly to a MethodMeta */
   enum {
     REPR_NATIVE,       /* instances are in native format - blessed AV as slots */
     REPR_HASH,         /* instances are blessed HASHes; our slots live in $self->{"Object::Pad/slots"} */
@@ -223,6 +312,7 @@ struct ClassMeta {
     REPR_AUTOSELECT,   /* pick one of the above depending on foreign_new and SvTYPE()==SVt_PVHV */
   } repr;
   CV *foreign_new;     /* superclass is not Object::Pad, here is the constructor */
+  AV *buildblocks;     /* the BUILD {} phaser blocks; each elem is a CV* directly */
 
   COP *tmpcop;         /* a COP to use during generated constructor */
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
@@ -302,6 +392,21 @@ static SV *S_obj_get_slotsav(pTHX_ SV *self, U8 repr, bool create)
   }
 
   croak("ARGH unhandled repr type");
+}
+
+#define pad_add_self_slots()  S_pad_add_self_slots(aTHX)
+static void S_pad_add_self_slots(pTHX)
+{
+  PADOFFSET padix;
+
+  padix = pad_add_name_pvs("$self", 0, NULL, NULL);
+  if(padix != PADIX_SELF)
+    croak("ARGH: Expected that padix[$self] = 1");
+
+  /* Give it a name that isn't valid as a Perl variable so it can't collide */
+  padix = pad_add_name_pvs("@(Object::Pad/slots)", 0, NULL, NULL);
+  if(padix != PADIX_SLOTS)
+    croak("ARGH: Expected that padix[@slots] = 2");
 }
 
 static XOP xop_methstart;
@@ -403,7 +508,7 @@ static OP *pp_sv(pTHX)
 
 static OP *newSVOP_SV(SV *sv, I32 flags)
 {
-  OP *op = newSVOP(OP_CUSTOM, flags, sv);
+  OP *op = newSVOP_CUSTOM(flags, sv);
   op->op_ppaddr = &pp_sv;
   return op;
 }
@@ -446,13 +551,8 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
    * perls. For now we'll take the small performance hit of RV2AV every time
    */
 
-  PADOFFSET padix = pad_add_name_pvs("$self", 0, NULL, NULL);
-  if(padix != PADIX_SELF)
-    croak("ARGH: Expected that padix[$self] = 1");
-
-  padix = pad_add_name_pvs("@(Object::Pad/slots)", 0, NULL, NULL);
-  if(padix != PADIX_SLOTS)
-    croak("ARGH: Expected that padix[@slots] = 2");
+  pad_add_self_slots();
+  intro_my();
 
   U8 repr = meta->repr;
   if(repr == REPR_AUTOSELECT && !meta->foreign_new)
@@ -461,8 +561,6 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
   ops = op_append_list(OP_LINESEQ, ops,
     newMETHSTARTOP(OPf_MOD, repr)
   );
-
-  intro_my();
 
   /* TODO: Icky horrible implementation; if our slotoffset > 0 then
    * we must be a subclass
@@ -542,6 +640,14 @@ static void S_generate_initslots_method(pTHX_ ClassMeta *meta)
 
     ops = op_append_list(OP_LINESEQ, ops,
       op_convert_list(OP_PUSH, OPf_WANT_VOID, itemops));
+
+    if(!itemops->op_targ) {
+      /* op_convert_list ought to have allocated a pad temporary for push, but
+       * it didn't. Technically only -DDEBUGGING perls will notice this,
+       * because OP_PUSH in G_VOID doesn't use its targ, but it's polite to
+       * provide one all the same. */
+      itemops->op_targ = pad_alloc(itemops->op_type, SVs_PADTMP);
+    }
   }
 
   SvREFCNT_inc(PL_compcv);
@@ -563,6 +669,30 @@ static void S_mop_class_seal(pTHX_ ClassMeta *meta)
   S_generate_initslots_method(aTHX_ meta);
 
   meta->sealed = true;
+}
+
+static XS(xsub_mop_class_seal)
+{
+  dXSARGS;
+  ClassMeta *meta = XSANY.any_ptr;
+
+  PERL_UNUSED_ARG(items);
+
+  if(!PL_parser) {
+    /* We need to generate just enough of a PL_parser to keep newSTATEOP()
+     * happy, otherwise it will SIGSEGV
+     */
+    SAVEVPTR(PL_parser);
+    Newxz(PL_parser, 1, yy_parser);
+    SAVEFREEPV(PL_parser);
+
+    PL_parser->copline = NOLINE;
+#if HAVE_PERL_VERSION(5, 20, 0)
+    PL_parser->preambling = NOLINE;
+#endif
+  }
+
+  mop_class_seal(meta);
 }
 
 /* The metadata on the currently-compiling class */
@@ -588,32 +718,11 @@ static bool S_have_compclassmeta(pTHX)
   return false;
 }
 
-static int on_free_compclassmeta(pTHX_ SV *sv, MAGIC *mg)
-{
-  ClassMeta *meta = (ClassMeta *)mg->mg_ptr;
-
-  mop_class_seal(meta);
-
-  return 0;
-}
-
-static MGVTBL vtbl_compclassmeta = {
-  NULL, /* get */
-  NULL, /* set */
-  NULL, /* len */
-  NULL, /* clear */
-  on_free_compclassmeta,
-};
-
-#define COMPCLASSMETA_SEAL_ON_FREE (1<<0)
-#define compclassmeta_set(meta, flags)  S_compclassmeta_set(aTHX_ meta, flags)
-static void S_compclassmeta_set(pTHX_ ClassMeta *meta, U8 flags)
+#define compclassmeta_set(meta)  S_compclassmeta_set(aTHX_ meta)
+static void S_compclassmeta_set(pTHX_ ClassMeta *meta)
 {
   SV *sv = *hv_fetchs(GvHV(PL_hintgv), "Object::Pad/compclassmeta", GV_ADD);
   sv_setiv(sv, (IV)meta);
-
-  if(flags & COMPCLASSMETA_SEAL_ON_FREE)
-    sv_magicext(sv, NULL, PERL_MAGIC_ext, &vtbl_compclassmeta, (char *)meta, 0);
 }
 
 static XS(injected_constructor);
@@ -622,13 +731,19 @@ static XS(injected_constructor)
   dXSARGS;
   const ClassMeta *meta = XSANY.any_ptr;
   SV *class = ST(0);
-  SV *self;
+  SV *self = NULL;
 
   COP *prevcop = PL_curcop;
   PL_curcop = meta->tmpcop;
   CopLINE_set(PL_curcop, __LINE__);
 
-  I32 nargs;
+  /* An AV storing the @_ args to pass to foreign constructor and all the
+   * build blocks
+   * This does not include $self
+   */
+  AV *args = newAV();
+  SAVEFREESV(args);
+
   {
     /* @args = $class->BUILDARGS(@_) */
     CopLINE_set(PL_curcop, __LINE__);
@@ -640,23 +755,22 @@ static XS(injected_constructor)
      * constructor */
     EXTEND(SP, 1);
 
-    SV **args = SP - items + 2;
-    PUSHMARK(args - 1);
+    SV **argstart = SP - items + 2;
+    PUSHMARK(argstart - 1);
 
     SV **svp;
-    for(svp = SP; svp >= args; svp--)
+    for(svp = SP; svp >= argstart; svp--)
       *(svp+1) = *svp;
-    *args = class;
+    *argstart = class;
     SP++;
     PUTBACK;
 
-    nargs = call_method("BUILDARGS", G_ARRAY);
+    I32 nargs = call_method("BUILDARGS", G_ARRAY);
 
     SPAGAIN;
 
-    /* Save the returned values from destruction */
     for(svp = SP - nargs + 1; svp <= SP; svp++)
-      SvREFCNT_inc(*svp);
+      av_push(args, SvREFCNT_inc(*svp));
 
     FREETMPS;
     LEAVE;
@@ -696,9 +810,9 @@ static XS(injected_constructor)
       SAVETMPS;
 
       PUSHMARK(SP);
-      EXTEND(SP, nargs);
+      EXTEND(SP, 1 + AvFILL(args));
 
-      SV **args = SP - nargs;
+      SV **argstart = SP - AvFILL(args) - 1;
       SV **argtop = SP;
       SV **svp;
 
@@ -706,7 +820,7 @@ static XS(injected_constructor)
 
       /* Push a copy of the args in case the (foreign) constructor mutates
        * them. We still need them for BUILDALL */
-      for(svp = args + 1; svp <= argtop; svp++)
+      for(svp = argstart + 1; svp <= argtop; svp++)
         PUSHs(*svp);
       PUTBACK;
 
@@ -777,28 +891,53 @@ static XS(injected_constructor)
   }
 
   {
-    /* $self->BUILDALL(@args) */
     CopLINE_set(PL_curcop, __LINE__);
-
     ENTER;
     SAVETMPS;
     SPAGAIN;
 
-    EXTEND(SP, 1);
+    /* TODO: This list will be constant for any given class so we should
+     * cache it in the classmeta
+     */
+    AV *all_buildblocks = newAV();
+    SAVEFREESV(all_buildblocks);
 
-    SV **args = SP - nargs + 1;
-    PUSHMARK(args - 1);
+    const ClassMeta *m;
+    for(m = meta; m; m = m->supermeta) {
+      int i;
+      if(!m->buildblocks)
+        continue;
+      SV **elems = AvARRAY(m->buildblocks);
 
-    /* Nudge the args up one and splice `self` in the bottom */
+      for(i = 0; i <= AvFILL(m->buildblocks); i++)
+        av_push(all_buildblocks, SvREFCNT_inc(elems[i]));
+    }
 
-    SV **svp;
-    for(svp = SP; svp >= args; svp--)
-      sv_2mortal(*(svp+1) = *svp);
-    *args = self;
-    SP++;
-    PUTBACK;
+    SV **argsvs = AvARRAY(args);
+    int i;
+    for(i = AvFILL(all_buildblocks); i >= 0; i--) {
+      CV *buildblock = (CV *)AvARRAY(all_buildblocks)[i];
 
-    call_method("BUILDALL", G_VOID);
+      ENTER;
+      SAVETMPS;
+      SPAGAIN;
+
+      EXTEND(SP, 1 + AvFILL(args));
+
+      PUSHMARK(SP);
+
+      PUSHs(self);
+
+      int argi;
+      for(argi = 0; argi <= AvFILL(args); argi++)
+        PUSHs(argsvs[argi]);
+      PUTBACK;
+
+      call_sv((SV *)buildblock, G_VOID);
+
+      FREETMPS;
+      LEAVE;
+    }
 
     FREETMPS;
     LEAVE;
@@ -819,9 +958,12 @@ static ClassMeta *S_mop_create_class(pTHX_ SV *name, SV *superclassname)
 
   meta->sealed = false;
   meta->offset = 0;
-  meta->slots  = newAV();
+  meta->slots   = newAV();
+  meta->methods = newAV();
   meta->repr   = REPR_AUTOSELECT;
   meta->foreign_new = NULL;
+  meta->supermeta = NULL;
+  meta->buildblocks = NULL;
 
   meta->tmpcop = (COP *)newSTATEOP(0, NULL, NULL);
   CopFILE_set(meta->tmpcop, __FILE__);
@@ -862,6 +1004,8 @@ static ClassMeta *S_mop_create_class(pTHX_ SV *name, SV *superclassname)
 
       av_push(isa, newSVpvs("Object::Pad::UNIVERSAL"));
     }
+
+    meta->supermeta = supermeta;
   }
   else {
     /* A base class */
@@ -920,6 +1064,35 @@ static struct AttributeDefinition class_attributes[] = {
   { 0 },
 };
 
+#define mop_class_add_method(class, methodname)  S_mop_class_add_method(aTHX_ class, methodname)
+static MethodMeta *S_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname)
+{
+  AV *methods = meta->methods;
+
+  if(meta->sealed)
+    croak("Cannot add a new method to an already-sealed class");
+
+  if(!methodname || !SvOK(methodname) || !SvCUR(methodname))
+    croak("methodname must not be undefined or empty");
+
+  U32 i;
+  for(i = 0; i < av_count(methods); i++) {
+    MethodMeta *methodmeta = (MethodMeta *)AvARRAY(methods)[i];
+    if(sv_eq(methodmeta->name, methodname))
+      croak("Cannot add another method named %" SVf, methodname);
+  }
+
+  MethodMeta *methodmeta;
+  Newx(methodmeta, 1, MethodMeta);
+
+  methodmeta->name = SvREFCNT_inc(methodname);
+  methodmeta->class = meta;
+
+  av_push(methods, (SV *)methodmeta);
+
+  return methodmeta;
+}
+
 #define mop_class_add_slot(class, slotname)  S_mop_class_add_slot(aTHX_ class, slotname)
 static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
 {
@@ -964,6 +1137,15 @@ static SlotMeta *S_mop_class_add_slot(pTHX_ ClassMeta *meta, SV *slotname)
   return slotmeta;
 }
 
+#define mop_class_add_BUILD(class, cv)  S_mop_class_add_BUILD(aTHX_ class, cv)
+static void S_mop_class_add_BUILD(pTHX_ ClassMeta *meta, CV *cv)
+{
+  if(!meta->buildblocks)
+    meta->buildblocks = newAV();
+
+  av_push(meta->buildblocks, (SV *)cv);
+}
+
 enum {
   ACCESSOR,
   ACCESSOR_READER,
@@ -1004,17 +1186,18 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
 
   I32 save_ix = block_start(TRUE);
 
-  /* TODO: On perl versions 5.26+ we should generate the signature checking
-   * op as well so as to check the size of @_ on invocation
-   */
+  pad_add_self_slots();
+
+  PADOFFSET padix = pad_add_name_sv(slotmeta->name, 0, NULL, NULL);
+  intro_my();
 
   OP *ops = op_append_list(OP_LINESEQ, NULL,
     newSTATEOP(0, NULL, NULL));
   ops = op_append_list(OP_LINESEQ, ops,
     newMETHSTARTOP(0, repr));
 
-  PADOFFSET padix = pad_add_name_sv(slotmeta->name, 0, NULL, NULL);
-  intro_my();
+  ops = op_append_list(OP_LINESEQ, ops,
+    make_argcheck_ops((type == ACCESSOR_WRITER) ? 1 : 0, 0, 0));
 
   ops = op_append_list(OP_LINESEQ, ops,
     newSLOTPADOP(0, OPpSLOTPAD_SV, padix, slotmeta->slotix));
@@ -1025,7 +1208,9 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
       /* fallthrough */
     case ACCESSOR_READER:
       ops = op_append_list(OP_LINESEQ, ops,
-        newPADxVOP(OP_PADSV, padix, 0, 0));
+        newLISTOP(OP_RETURN, 0,
+          newOP(OP_PUSHMARK, 0),
+          newPADxVOP(OP_PADSV, padix, 0, 0)));
       break;
 
     case ACCESSOR_WRITER:
@@ -1033,6 +1218,10 @@ static void S_generate_slot_accessor(pTHX_ SlotMeta *slotmeta, const char *mname
         newBINOP(OP_SASSIGN, 0,
           newOP(OP_SHIFT, 0),
           newPADxVOP(OP_PADSV, padix, 0, 0)));
+      ops = op_append_list(OP_LINESEQ, ops,
+        newLISTOP(OP_RETURN, 0,
+          newOP(OP_PUSHMARK, 0),
+          newPADxVOP(OP_PADSV, PADIX_SELF, 0, 0)));
       break;
 
     default:
@@ -1087,39 +1276,33 @@ static int keyword_class(pTHX_ OP **op_ptr)
 
   lex_read_space(0);
   SV *packagever = lex_scan_version(PARSE_OPTIONAL);
+  lex_read_space(0);
 
   SV *superclassname = NULL;
 
-  /* TODO: This grammar is quite flexible; maybe too much? */
-  while(1) {
+  if(lex_consume("extends")) {
+    if(superclassname)
+      croak("Multiple superclasses are not currently supported");
+
     lex_read_space(0);
+    superclassname = lex_scan_packagename();
 
-    if(lex_consume("extends")) {
-      if(superclassname)
-        croak("Multiple superclasses are not currently supported");
+    lex_read_space(0);
+    SV *superclassver = lex_scan_version(PARSE_OPTIONAL);
 
-      lex_read_space(0);
-      superclassname = lex_scan_packagename();
-
-      lex_read_space(0);
-      SV *superclassver = lex_scan_version(PARSE_OPTIONAL);
-
-      HV *superstash = gv_stashsv(superclassname, 0);
-      if(!superstash || !hv_fetchs(superstash, "new", 0)) {
-        /* Try to `require` the module then attempt a second time */
-        /* load_module() will modify the name argument and take ownership of it */
-        load_module(PERL_LOADMOD_NOIMPORT, newSVsv(superclassname), NULL, NULL);
-        superstash = gv_stashsv(superclassname, 0);
-      }
-
-      if(!superstash)
-        croak("Superclass %" SVf " does not exist", superclassname);
-
-      if(superclassver)
-        ensure_module_version(superclassname, superclassver);
+    HV *superstash = gv_stashsv(superclassname, 0);
+    if(!superstash || !hv_fetchs(superstash, "new", 0)) {
+      /* Try to `require` the module then attempt a second time */
+      /* load_module() will modify the name argument and take ownership of it */
+      load_module(PERL_LOADMOD_NOIMPORT, newSVsv(superclassname), NULL, NULL);
+      superstash = gv_stashsv(superclassname, 0);
     }
-    else
-      break;
+
+    if(!superstash)
+      croak("Superclass %" SVf " does not exist", superclassname);
+
+    if(superclassver)
+      ensure_module_version(superclassname, superclassver);
   }
 
   ClassMeta *meta = mop_create_class(packagename, superclassname);
@@ -1201,13 +1384,15 @@ done:
 
   if(is_block) {
     I32 save_ix = block_start(TRUE);
-    compclassmeta_set(meta, COMPCLASSMETA_SEAL_ON_FREE);
+    compclassmeta_set(meta);
 
     OP *body = parse_stmtseq(0);
     body = block_end(save_ix, body);
 
     if(!lex_consume("}"))
       croak("Expected }");
+
+    mop_class_seal(meta);
 
     LEAVE;
 
@@ -1217,8 +1402,10 @@ done:
     return KEYWORD_PLUGIN_STMT;
   }
   else {
+    SAVEDESTRUCTOR_X(&S_mop_class_seal, meta);
+
     SAVEHINTS();
-    compclassmeta_set(meta, COMPCLASSMETA_SEAL_ON_FREE);
+    compclassmeta_set(meta);
 
     *op_ptr = newOP(OP_NULL, 0);
     return KEYWORD_PLUGIN_STMT;
@@ -1315,7 +1502,17 @@ done:
   return KEYWORD_PLUGIN_STMT;
 }
 
-static bool parse_permit(pTHX)
+/* We use the method-like keyword parser to parse phaser blocks as well as
+ * methods. In order to tell what is going on, hookdata will be an integer
+ * set to one of the following
+ */
+
+enum PhaserType {
+  PHASER_NONE, /* A normal `method`; i.e. not a phaser */
+  PHASER_BUILD,
+};
+
+static bool parse_permit(pTHX_ void *hookdata)
 {
   HV *hints = GvHV(PL_hintgv);
 
@@ -1328,11 +1525,28 @@ static bool parse_permit(pTHX)
   return true;
 }
 
-static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
+static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
+  enum PhaserType type = PTR2UV(hookdata);
   U32 i;
   AV *slots = compclassmeta->slots;
   U32 nslots = av_count(slots);
+
+  switch(type) {
+    case PHASER_NONE:
+      if(ctx->name && strEQ(SvPVX(ctx->name), "BUILD"))
+        warn("method BUILD is discouraged; use a BUILD block instead");
+      break;
+
+    case PHASER_BUILD:
+      break;
+  }
+
+  if(type != PHASER_NONE)
+    /* We need to fool start_subparse() into thinking this is a named function
+     * so it emits a real CV and not a protosub
+     */
+    ctx->name = newSVpvs("(phaser)");
 
   /* Save the methodscope for this subparse, in case of nested methods
    *   (RT132321)
@@ -1371,7 +1585,7 @@ static void parse_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
   LEAVE;
 }
 
-static bool parse_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val)
+static bool parse_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata)
 {
   struct AttributeDefinition *def;
   for(def = method_attributes; def->attrname; def++) {
@@ -1389,7 +1603,7 @@ static bool parse_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr,
   return false;
 }
 
-static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
+static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   /* Splice in the slot scope CV in */
   CV *methodscope = compclassmeta->methodscope;
@@ -1402,24 +1616,13 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx)
 
   CvOUTSIDE(PL_compcv) = methodscope;
 
-  {
-    PADOFFSET padix;
-
-    padix = pad_add_name_pvs("$self", 0, NULL, NULL);
-    if(padix != PADIX_SELF)
-      croak("ARGH: Expected that padix[$self] = 1");
-
-    /* Give it a name that isn't valid as a Perl variable so it can't collide */
-    padix = pad_add_name_pvs("@(Object::Pad/slots)", 0, NULL, NULL);
-    if(padix != PADIX_SLOTS)
-      croak("ARGH: Expected that padix[@slots] = 2");
-
-    intro_my();
-  }
+  pad_add_self_slots();
+  intro_my();
 }
 
-static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
+static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
+  enum PhaserType type = PTR2UV(hookdata);
   SLOTOFFSET offset = compclassmeta->offset;
   PADNAMELIST *slotnames = PadlistNAMES(CvPADLIST(compclassmeta->methodscope));
   I32 nslots = av_count(compclassmeta->slots);
@@ -1476,7 +1679,7 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
     SLOTOFFSET slotix = offset + i;
     PADOFFSET padix = pad_findmy_pv(PadnamePV(slotname), 0);
 
-    U8 private;
+    U8 private = 0;
     switch(PadnamePV(slotname)[0]) {
       case '$': private = OPpSLOTPAD_SV; break;
       case '@': private = OPpSLOTPAD_AV; break;
@@ -1526,12 +1729,45 @@ static void parse_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
     CvOUTSIDE(PL_compcv)     = CvOUTSIDE(outside);
     CvOUTSIDE_SEQ(PL_compcv) = CvOUTSIDE_SEQ(outside);
   }
+
+  if(type != PHASER_NONE) {
+    /* We need to remove the name now to stop newATTRSUB() from creating this
+     * as a named symbol table entry
+     */
+    SvREFCNT_dec(ctx->name);
+    ctx->name = NULL;
+  }
 }
 
-static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx)
+static void parse_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
+  enum PhaserType type = PTR2UV(hookdata);
+
   if(ctx->cv)
     CvMETHOD_on(ctx->cv);
+
+  switch(type) {
+    case PHASER_NONE:
+      if(ctx->cv && ctx->name && strEQ(SvPVX(ctx->name), "BUILD"))
+        /* Legacy behaviour */
+        mop_class_add_BUILD(compclassmeta, (CV *)SvREFCNT_inc((SV *)ctx->cv));
+
+      if(ctx->cv && ctx->name)
+        mop_class_add_method(compclassmeta, ctx->name);
+      break;
+
+    case PHASER_BUILD:
+      mop_class_add_BUILD(compclassmeta, ctx->cv); /* steal */
+      break;
+  }
+
+  /* Any phaser should parse as if it was a named method. By setting a junk
+   * name here we fool XS::Parse::Sublike into thinking it just parsed a named
+   * method, so it emits an OP_NULL into the optree and behaves like a
+   * statement
+   */
+  if(type != PHASER_NONE)
+    ctx->name = newSVpvs("(phaser)");
 }
 
 static struct XSParseSublikeHooks parse_method_hooks = {
@@ -1544,17 +1780,10 @@ static struct XSParseSublikeHooks parse_method_hooks = {
   .post_newcv      = parse_post_newcv,
 };
 
-static void parse_BUILD_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx)
-{
-  ctx->name = newSVpvs("BUILD");
-
-  return parse_pre_subparse(aTHX_ ctx);
-}
-
 static struct XSParseSublikeHooks parse_BUILD_hooks = {
   .skip_parts = XS_PARSE_SUBLIKE_PART_NAME|XS_PARSE_SUBLIKE_PART_ATTRS,
   /* no permit */
-  .pre_subparse    = parse_BUILD_pre_subparse,
+  .pre_subparse    = parse_pre_subparse,
   .post_blockstart = parse_post_blockstart,
   .pre_blockend    = parse_pre_blockend,
   .post_newcv      = parse_post_newcv,
@@ -1569,7 +1798,8 @@ static int keyword_BUILD(pTHX_ OP **op_ptr)
 
   lex_read_space(0);
 
-  return xs_parse_sublike(&parse_BUILD_hooks, op_ptr);
+  return xs_parse_sublike(&parse_BUILD_hooks, (void *)PHASER_BUILD,
+    op_ptr);
 }
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
@@ -1643,10 +1873,17 @@ _begin_class(name, superclassname)
   {
     ClassMeta *meta = mop_create_class(name, superclassname);
 
-    compclassmeta_set(meta, COMPCLASSMETA_SEAL_ON_FREE);
+    compclassmeta_set(meta);
 
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta));
+
+    CV *cv = newXS(NULL, &xsub_mop_class_seal, __FILE__);
+    CvXSUBANY(cv).any_ptr = meta;
+
+    if(!PL_unitcheckav)
+      PL_unitcheckav = newAV();
+    av_push(PL_unitcheckav, (SV *)cv);
   }
   OUTPUT:
     RETVAL
@@ -1655,7 +1892,6 @@ MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Class
 
 SV *
 new(class, name)
-    SV *class
     SV *name
   CODE:
   {
@@ -1677,6 +1913,94 @@ name(self)
   }
   OUTPUT:
     RETVAL
+
+void
+superclasses(self)
+    SV *self
+  PPCODE:
+  {
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    if(meta->supermeta) {
+      PUSHs(sv_newmortal());
+      sv_setref_uv(ST(0), "Object::Pad::MOP::Class", PTR2UV(meta->supermeta));
+      XSRETURN(1);
+    }
+
+    XSRETURN(0);
+  }
+
+void
+add_BUILD(self, code)
+    SV *self
+    CV *code
+  CODE:
+  {
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    mop_class_add_BUILD(meta, (CV *)SvREFCNT_inc((SV *)code));
+  }
+
+SV *
+add_method(self, mname, code)
+    SV *self
+    SV *mname
+    CV *code
+  CODE:
+  {
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    if(SvOK(mname) && SvPOK(mname) && strEQ(SvPVX(mname), "BUILD")) {
+      warn("Adding a method called BUILD is not recommended; use ->add_BUILD directly");
+      mop_class_add_BUILD(meta, (CV *)SvREFCNT_inc((SV *)code));
+      XSRETURN(0);
+    }
+
+    MethodMeta *methodmeta = mop_class_add_method(meta, sv_mortalcopy(mname));
+
+    I32 klen = SvCUR(mname);
+    if(SvUTF8(mname))
+      klen = -klen;
+
+    GV **gvp = (GV **)hv_fetch(meta->stash, SvPVX(mname), klen, GV_ADD);
+
+    gv_init_sv(*gvp, meta->stash, mname, 0);
+    GvMULTI_on(*gvp);
+
+    GvCV_set(*gvp, (CV *)SvREFCNT_inc(code));
+
+    RETVAL = newSV(0);
+    sv_setref_uv(RETVAL, "Object::Pad::MOP::Method", PTR2UV(methodmeta));
+  }
+  OUTPUT:
+    RETVAL
+
+void
+get_own_method(self, methodname)
+    SV *self
+    SV *methodname
+  PPCODE:
+  {
+    ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
+
+    AV *methods = meta->methods;
+    U32 nmethods = av_count(methods);
+
+    U32 i;
+    for(i = 0; i < nmethods; i++) {
+      MethodMeta *methodmeta = (MethodMeta *)AvARRAY(methods)[i];
+
+      if(!sv_eq(methodmeta->name, methodname))
+        continue;
+
+      ST(0) = sv_newmortal();
+      sv_setref_iv(ST(0), "Object::Pad::MOP::Method", PTR2UV(methodmeta));
+      XSRETURN(1);
+    }
+
+    croak("Class %" SVf " does not have a method called '%" SVf "'",
+      meta->name, methodname);
+  }
 
 SV *
 add_slot(self, slotname)
@@ -1721,6 +2045,30 @@ get_slot(self, slotname)
       meta->name, slotname);
   }
 
+MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Method
+
+SV *
+name(self)
+    SV *self
+  ALIAS:
+    name  = 0
+    class = 1
+  CODE:
+  {
+    MethodMeta *meta = NUM2PTR(MethodMeta *, SvUV(SvRV(self)));
+    switch(ix) {
+      case 0: RETVAL = SvREFCNT_inc(meta->name); break;
+      case 1:
+        RETVAL = newSV(0);
+        sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
+        break;
+
+      default: RETVAL = NULL;
+    }
+  }
+  OUTPUT:
+    RETVAL
+
 MODULE = Object::Pad    PACKAGE = Object::Pad::MOP::Slot
 
 SV *
@@ -1738,6 +2086,8 @@ name(self)
         RETVAL = newSV(0);
         sv_setref_uv(RETVAL, "Object::Pad::MOP::Class", PTR2UV(meta->class));
         break;
+
+      default: RETVAL = NULL;
     }
   }
   OUTPUT:
@@ -1803,6 +2153,6 @@ BOOT:
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
 
-  boot_xs_parse_sublike(0.09); /* hooks.filter_attr */
+  boot_xs_parse_sublike(0.10); /* hookdata */
 
-  register_xs_parse_sublike("method", &parse_method_hooks);
+  register_xs_parse_sublike("method", &parse_method_hooks, (void *)PHASER_NONE);

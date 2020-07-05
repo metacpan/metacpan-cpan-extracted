@@ -1,17 +1,21 @@
 package BorderStyleBase;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'BorderStyleBase'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
 use parent 'BorderStyleBase::Constructor';
 
 sub get_struct {
-    my $self = shift;
-    \%{"$self->{orig_class}::BORDER"};
+    my $self_or_class = shift;
+    if (ref $self_or_class) {
+        \%{"$self_or_class->{orig_class}::BORDER"};
+    } else {
+        \%{"$self_or_class\::BORDER"};
+    }
 }
 
 sub get_args {
@@ -57,7 +61,7 @@ BorderStyleBase - A suitable base class for most BorderStyle::* modules
 
 =head1 VERSION
 
-This document describes version 0.002 of BorderStyleBase (from Perl distribution BorderStyleBase), released on 2020-06-11.
+This document describes version 0.004 of BorderStyleBase (from Perl distribution BorderStyleBase), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

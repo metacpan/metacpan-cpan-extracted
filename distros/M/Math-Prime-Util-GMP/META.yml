@@ -22,7 +22,7 @@ no_index:
 provides:
   Math::Prime::Util::GMP:
     file: lib/Math/Prime/Util/GMP.pm
-    version: '0.51'
+    version: '0.52'
 recommends:
   Math::Prime::Util: '0.68'
 requires:
@@ -36,5 +36,5 @@ resources:
   homepage: https://github.com/danaj/Math-Prime-Util-GMP
   license: http://dev.perl.org/licenses/
   repository: https://github.com/danaj/Math-Prime-Util-GMP
-version: '0.51'
+version: '0.52'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

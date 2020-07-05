@@ -1,5 +1,5 @@
 package Lab::MultiChannelInstrument;
-$Lab::MultiChannelInstrument::VERSION = '3.701';
+$Lab::MultiChannelInstrument::VERSION = '3.703';
 #ABSTRACT: Multi-channel instrument base class
 
 use strict;
@@ -320,7 +320,7 @@ Lab::MultiChannelInstrument - Multi-channel instrument base class
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 COPYRIGHT AND LICENSE
 

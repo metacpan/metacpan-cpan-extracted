@@ -1,4 +1,14 @@
+
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
+
+0.27 2020-07-03T00:25:15Z
+  - Fix CircleCI build
+  - Fix perl required version
+
+0.26 2020-07-02T18:21:18Z
+  - Apply tools/tidy with Perl::Tidy 20200110
+  - Allow stopping the entire process group of the process
+  - Change minimum perl to 5.16   
 
 0.25 2020-04-08T14:48:01Z
    - In "stop" sleep only after sending the first signal to speedup termination by okurz

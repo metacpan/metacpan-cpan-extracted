@@ -1,6 +1,18 @@
 Changelog for Data-Object-Space
 
-2.08 2020-06-05T02:39:39
+2.10 2020-07-02T18:57:01
+ - Add release updates
+ - Fix "reload" method package reloading (#74)
+
+2.09 2020-07-02T15:45:32
+ - Built release version 2.09
+ - Add release updates
+ - Add "reload" method (#71)
+ - Never attempt to load "main" package (#69)
+ - Add "chain" method (#67)
+
+2.08 2020-06-05T02:39:41
+ - Built release version 2.08
  - Add release updates
  - Add "tryload" method (#62)
  - Add "all" method to exec on all parents (#63)

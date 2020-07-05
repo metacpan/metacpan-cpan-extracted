@@ -10,7 +10,7 @@
 
 #include "XSParseSublike.h"
 
-static bool red_permit(pTHX)
+static bool red_permit(pTHX_ void *_)
 {
   if(!hv_fetchs(GvHV(PL_hintgv), "t::registrations/red", 0))
     return false;
@@ -18,7 +18,7 @@ static bool red_permit(pTHX)
   return true;
 }
 
-static void red_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
+static void red_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 {
   /* Throw away the entire function body; replace it with a constant */
   op_free(ctx->body);
@@ -30,7 +30,7 @@ static const struct XSParseSublikeHooks parse_red_hooks = {
   .pre_blockend = red_pre_blockend,
 };
 
-static bool blue_permit(pTHX)
+static bool blue_permit(pTHX_ void *_)
 {
   if(!hv_fetchs(GvHV(PL_hintgv), "t::registrations/blue", 0))
     return false;
@@ -38,7 +38,7 @@ static bool blue_permit(pTHX)
   return true;
 }
 
-static void blue_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx)
+static void blue_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *_)
 {
   /* Throw away the entire function body; replace it with a constant */
   op_free(ctx->body);
@@ -55,5 +55,5 @@ MODULE = t::registrations  PACKAGE = t::registrations
 BOOT:
   boot_xs_parse_sublike(0);
 
-  register_xs_parse_sublike("func", &parse_red_hooks);
-  register_xs_parse_sublike("func", &parse_blue_hooks);
+  register_xs_parse_sublike("func", &parse_red_hooks, NULL);
+  register_xs_parse_sublike("func", &parse_blue_hooks, NULL);

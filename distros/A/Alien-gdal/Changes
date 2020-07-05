@@ -1,5 +1,13 @@
 Revision history for Alien::gdal
 
+1.21 20200107
+    - Share builds:
+      - Update makefile for long lines only on GDAL < 3.1.1,
+        as 3.1.1 has been patched.
+      - Existing install files will be re-used instead of rebuilt
+        if they satisfy the minimum version and
+        $ENV{ALIEN_SHARE_RECYCLE} is set to a true value.
+
 1.20 20200602
     - Share builds:
       - Modify make steps to exit on first failure.

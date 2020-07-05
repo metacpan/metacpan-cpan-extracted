@@ -27,7 +27,7 @@ SYNOPSIS
             print "Value: " . shift;
         })->get;
     
-        # ... or with Future::AsyncAwait
+        # ... or with Future::AsyncAwait (recommended)
         await $redis->connect;
         my $value = await $redis->get('some_key');
         $value ||= await $redis->set(some_key => 'some_value');
@@ -225,6 +225,16 @@ METHODS - Transactions
       print "$success succeeded\m";
       return Future->done;
      })->retain;
+
+METHODS - Clientside caching
+
+    Enable clientside caching by passing a true value for
+    client_side_caching_enabled in "configure" or "new". This is currently
+    experimental, and only operates on "get" in Net::Async::Redis::Commands
+    requests.
+
+    See https://redis.io/topics/client-side-caching for more details on
+    this feature.
 
 METHODS - Generic
 

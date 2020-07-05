@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BorderStyleUtils
   homepage: https://metacpan.org/release/App-BorderStyleUtils
   repository: git://github.com/perlancar/perl-App-BorderStyleUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

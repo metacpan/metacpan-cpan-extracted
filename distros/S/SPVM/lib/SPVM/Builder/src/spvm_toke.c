@@ -176,26 +176,24 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               char* cur_file = NULL;
               FILE* fh = NULL;
               int32_t module_include_pathes_length = compiler->module_include_pathes->length;
-              {
-                int32_t i;
-                for (i = 0; i < module_include_pathes_length; i++) {
-                  const char* include_path = (const char*) SPVM_LIST_fetch(compiler->module_include_pathes, i);
-                  
-                  // File name
-                  int32_t file_name_length = (int32_t)(strlen(include_path) + 1 + strlen(cur_rel_file));
-                  cur_file = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, file_name_length + 1);
-                  sprintf(cur_file, "%s/%s", include_path, cur_rel_file);
-                  cur_file[file_name_length] = '\0';
-                  
-                  // Open source file
-                  fh = fopen(cur_file, "rb");
-                  if (fh) {
-                    compiler->cur_file = cur_file;
-                    break;
-                  }
-                  errno = 0;
+              for (int32_t i = 0; i < module_include_pathes_length; i++) {
+                const char* include_path = (const char*) SPVM_LIST_fetch(compiler->module_include_pathes, i);
+                
+                // File name
+                int32_t file_name_length = (int32_t)(strlen(include_path) + 1 + strlen(cur_rel_file));
+                cur_file = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, file_name_length + 1);
+                sprintf(cur_file, "%s/%s", include_path, cur_rel_file);
+                cur_file[file_name_length] = '\0';
+                
+                // Open source file
+                fh = fopen(cur_file, "rb");
+                if (fh) {
+                  compiler->cur_file = cur_file;
+                  break;
                 }
+                errno = 0;
               }
+              
               if (!fh) {
                 if (op_use->uv.use->is_require) {
                   op_use->uv.use->load_fail = 1;
@@ -211,17 +209,24 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 }
                 else {
                   fprintf(stderr, "Can't locate %s in @INC (@INC contains:", cur_rel_file);
-                  {
-                    int32_t i;
-                    for (i = 0; i < module_include_pathes_length; i++) {
-                      const char* include_path = (const char*) SPVM_LIST_fetch(compiler->module_include_pathes, i);
-                      fprintf(stderr, " %s", include_path);
-                    }
+                  for (int32_t i = 0; i < module_include_pathes_length; i++) {
+                    const char* include_path = (const char*) SPVM_LIST_fetch(compiler->module_include_pathes, i);
+                    fprintf(stderr, " %s", include_path);
                   }
                   fprintf(stderr, ") at %s line %d\n", op_use->file, op_use->line);
                   compiler->error_count++;
                   return 0;
                 }
+              }
+              
+              // Skip if already loaded
+              const char* found_module_file = SPVM_HASH_fetch(compiler->module_file_symtable, compiler->cur_file, strlen(compiler->cur_file));
+              if (found_module_file) {
+                continue;
+              }
+              else {
+                // Add module file symtable
+                SPVM_HASH_insert(compiler->module_file_symtable, cur_file, strlen(compiler->cur_file), (char*)compiler->cur_file);
               }
               
               compiler->cur_file = cur_file;
@@ -710,89 +715,94 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
       case '\'': {
         compiler->bufptr++;
         char ch = 0;
-
-        if (*compiler->bufptr == '\\') {
-          compiler->bufptr++;
-          if (*compiler->bufptr == '0') {
-            ch = '\0';
+        
+        if (*compiler->bufptr == '\'') {
+          SPVM_COMPILER_error(compiler, "Character Literal must have one character at %s line %d\n", compiler->cur_file, compiler->cur_line);
+        }
+        else {
+          if (*compiler->bufptr == '\\') {
             compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 'a') {
-            ch = '\a';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 'b') {
-            ch = '\b';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 'f') {
-            ch = '\f';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 't') {
-            ch = '\t';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 'r') {
-            ch = '\r';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == 'n') {
-            ch = '\n';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == '\'') {
-            ch = '\'';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == '"') {
-            ch = '\"';
-            compiler->bufptr++;
-          }
-          else if (*compiler->bufptr == '\\') {
-            ch = '\\';
-            compiler->bufptr++;
-          }
-          // Hex ascii code
-          else if (*compiler->bufptr == 'x') {
-            compiler->bufptr++;
-            if (*compiler->bufptr == '0' || *compiler->bufptr == '1' || *compiler->bufptr == '2' || *compiler->bufptr == '3' || *compiler->bufptr == '4' || *compiler->bufptr == '5' || *compiler->bufptr == '6' || *compiler->bufptr == '7') {
-              char* num_str = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 3);
-              num_str[0] = *compiler->bufptr;
+            if (*compiler->bufptr == '0') {
+              ch = '\0';
               compiler->bufptr++;
-              if (
-                isdigit(*compiler->bufptr)
-                || *compiler->bufptr == 'a'  || *compiler->bufptr == 'b'  || *compiler->bufptr == 'c'  || *compiler->bufptr == 'd'  || *compiler->bufptr == 'e'  || *compiler->bufptr == 'f'
-                || *compiler->bufptr == 'A'  || *compiler->bufptr == 'B'  || *compiler->bufptr == 'C'  || *compiler->bufptr == 'D'  || *compiler->bufptr == 'E'  || *compiler->bufptr == 'F'
-              )
-              {
-                num_str[1] = *compiler->bufptr;
+            }
+            else if (*compiler->bufptr == 'a') {
+              ch = '\a';
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == 'b') {
+              ch = '\b';
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == 'f') {
+              ch = '\f';
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == 't') {
+              ch = '\t';
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == 'r') {
+              ch = '\r';
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == 'n') {
+              ch = '\n';
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == '\'') {
+              ch = '\'';
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == '"') {
+              ch = '\"';
+              compiler->bufptr++;
+            }
+            else if (*compiler->bufptr == '\\') {
+              ch = '\\';
+              compiler->bufptr++;
+            }
+            // Hex ascii code
+            else if (*compiler->bufptr == 'x') {
+              compiler->bufptr++;
+              if (*compiler->bufptr == '0' || *compiler->bufptr == '1' || *compiler->bufptr == '2' || *compiler->bufptr == '3' || *compiler->bufptr == '4' || *compiler->bufptr == '5' || *compiler->bufptr == '6' || *compiler->bufptr == '7') {
+                char* num_str = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, 3);
+                num_str[0] = *compiler->bufptr;
                 compiler->bufptr++;
-                char *end;
-                ch = (char)strtol(num_str, &end, 16);
+                if (
+                  isdigit(*compiler->bufptr)
+                  || *compiler->bufptr == 'a'  || *compiler->bufptr == 'b'  || *compiler->bufptr == 'c'  || *compiler->bufptr == 'd'  || *compiler->bufptr == 'e'  || *compiler->bufptr == 'f'
+                  || *compiler->bufptr == 'A'  || *compiler->bufptr == 'B'  || *compiler->bufptr == 'C'  || *compiler->bufptr == 'D'  || *compiler->bufptr == 'E'  || *compiler->bufptr == 'F'
+                )
+                {
+                  num_str[1] = *compiler->bufptr;
+                  compiler->bufptr++;
+                  char *end;
+                  ch = (char)strtol(num_str, &end, 16);
+                }
+                else {
+                  SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+                }
               }
               else {
                 SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
               }
             }
             else {
-              SPVM_COMPILER_error(compiler, "Invalid ascii code in escape character of charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+              SPVM_COMPILER_error(compiler, "Invalid escape character in charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
             }
           }
           else {
-            SPVM_COMPILER_error(compiler, "Invalid escape character in charater literal at %s line %d\n", compiler->cur_file, compiler->cur_line);
+            ch = *compiler->bufptr;
+            compiler->bufptr++;
           }
-        }
-        else {
-          ch = *compiler->bufptr;
-          compiler->bufptr++;
-        }
-          
-        if (*compiler->bufptr == '\'') {
-          compiler->bufptr++;
-        }
-        else {
-          SPVM_COMPILER_error(compiler, "Can't find character literal terminiator at %s line %d\n", compiler->cur_file, compiler->cur_line);
+            
+          if (*compiler->bufptr == '\'') {
+            compiler->bufptr++;
+          }
+          else {
+            SPVM_COMPILER_error(compiler, "Can't find character literal terminiator at %s line %d\n", compiler->cur_file, compiler->cur_line);
+          }
         }
         
         // Constant 
@@ -1146,15 +1156,15 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   }
                 }
                 else {
-                  if (isalnum(*char_ptr)) {
-                    SPVM_COMPILER_error(compiler, "Invalid escape character in string literal \"\\%c\" at %s line %d\n", *char_ptr, compiler->cur_file, compiler->cur_line);
-                  }
-                  else {
+                  if (ispunct(*char_ptr)) {
                     str[str_length] = '\\';
                     str_length++;
                     str[str_length] = *char_ptr;
                     str_length++;
                     char_ptr++;
+                  }
+                  else {
+                    SPVM_COMPILER_error(compiler, "Invalid escape character in string literal \"\\%c\" at %s line %d\n", *char_ptr, compiler->cur_file, compiler->cur_line);
                   }
                 }
               }
@@ -1262,6 +1272,20 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, var_name, compiler->cur_file, compiler->cur_line);
 
             yylvalp->opval = op_name;
+
+            // Variable name can't conatain __
+            if (strstr(var_name, "__")) {
+              SPVM_COMPILER_error(compiler, "Variable name \"%s\" must not contains __ at %s line %d\n", var_name, compiler->cur_file, compiler->cur_line);
+            }
+
+            // Variable name can't start with number
+            if (isdigit(var_name[1])) {
+              SPVM_COMPILER_error(compiler, "Variable name \"%s\" must not start with number at %s line %d\n", var_name, compiler->cur_file, compiler->cur_line);
+            }
+
+            if (strlen(var_name) > 1 && var_name[var_name_length_without_sigil] == ':' && var_name[var_name_length_without_sigil - 1] == ':') {
+              SPVM_COMPILER_error(compiler, "Variable name \"%s\" must not end with \"::\" at %s line %d\n", var_name, compiler->cur_file, compiler->cur_line);
+            }
             
             // Package variable
             return VAR_NAME;
@@ -1939,7 +1963,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           // Symbol name can't conatain __
           if (strstr(keyword, "__")) {
-            SPVM_COMPILER_error(compiler, "Symbol name can't contain __ at %s line %d\n", compiler->cur_file, compiler->cur_line);
+            SPVM_COMPILER_error(compiler, "Symbol name \"%s\" must not contains __ at %s line %d\n", keyword, compiler->cur_file, compiler->cur_line);
           }
           
           SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, keyword, compiler->cur_file, compiler->cur_line);

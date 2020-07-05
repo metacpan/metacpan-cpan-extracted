@@ -1,0 +1,4 @@
+backup
+jpg
+^MYMETA\.yml$
+^MYMETA\.json$

@@ -5,8 +5,6 @@
 
 namespace test {
 
-using namespace panda;
-
 template <typename T>
 struct test_string {
     using Allocator  = typename test::Allocator<T>;
@@ -16,10 +14,11 @@ struct test_string {
     using ExternalShared = typename String::ExternalShared;
     template <class A> using AnyString = panda::basic_string<T, std::char_traits<T>, A>;
 
-    static const size_t MAX_SSO_CHARS = String::MAX_SSO_CHARS;
-    static const size_t BUF_CHARS     = (sizeof(size_t) + sizeof(uint32_t)) / sizeof(T);
-    static const size_t EBUF_CHARS    = 4*sizeof(void*)/sizeof(T);
-    static const size_t CHAR_SIZE     = sizeof(T);
+    static constexpr const size_t MAX_SSO_CHARS = String::MAX_SSO_CHARS;
+    static constexpr const size_t BUF_CHARS     = (sizeof(size_t) + sizeof(uint32_t)) / sizeof(T);
+    static constexpr const size_t EBUF_CHARS    = 4*sizeof(void*)/sizeof(T);
+    static constexpr const size_t CHAR_SIZE     = sizeof(T);
+    static constexpr const float  GROW_RATE     = 1.6;
     static const T      LITERAL[38];
     static const size_t LITERAL_LEN   = sizeof(LITERAL)/sizeof(T)-1;
     static const T      EMPTY[1];
@@ -30,19 +29,24 @@ struct test_string {
         return cnt;
     }
 
-    template <class A> static void REQUIRE_STR (const AnyString<A>& str, const T* src, size_t len, size_t cap, size_t shcap) {
+    template <bool grow = false, class A> static void REQUIRE_STR (const AnyString<A>& str, const T* src, size_t len, size_t cap, size_t shcap) {
+        if (grow) {
+            cap *= GROW_RATE;
+            shcap *= GROW_RATE;
+        }
+
         REQUIRE(str.length() == len);
         CHECK(std::basic_string<T>(str.data(), len) == std::basic_string<T>(src, len));
         CHECK(str.capacity() == cap);
         CHECK(str.shared_capacity() == shcap);
     }
-    template <class A> static void REQUIRE_STR  (const AnyString<A>& str, const T* src, size_t len, size_t cap)    { REQUIRE_STR(str, src, len, cap, cap); }
-    template <class A> static void REQUIRE_STR  (const AnyString<A>& str, const T* src, size_t len)                { REQUIRE_STR(str, src, len, len); }
-    template <class A> static void REQUIRE_STR  (const AnyString<A>& str, const T* src)                            { REQUIRE_STR(str, src, slen(src)); }
-    template <class A> static void REQUIRE_STR  (const AnyString<A>& str, StdString src, size_t cap, size_t shcap) { REQUIRE_STR(str, src.data(), src.size(), cap, shcap); }
-    template <class A> static void REQUIRE_STR  (const AnyString<A>& str, StdString src, size_t cap)               { REQUIRE_STR(str, src, cap, cap); }
-    template <class A> static void REQUIRE_STR  (const AnyString<A>& str, StdString src)                           { REQUIRE_STR(str, src, src.size()); }
-    template <class A> static void REQUIRE_STRM (const AnyString<A>& str, StdString src)                           { REQUIRE_STR(str, src, str.capacity(), str.shared_capacity()); }
+    template <bool grow = false, class A> static void REQUIRE_STR  (const AnyString<A>& str, const T* src, size_t len, size_t cap)    { REQUIRE_STR<grow>(str, src, len, cap, cap); }
+    template <bool grow = false, class A> static void REQUIRE_STR  (const AnyString<A>& str, const T* src, size_t len)                { REQUIRE_STR<grow>(str, src, len, len); }
+    template <bool grow = false, class A> static void REQUIRE_STR  (const AnyString<A>& str, const T* src)                            { REQUIRE_STR<grow>(str, src, slen(src)); }
+    template <bool grow = false, class A> static void REQUIRE_STR  (const AnyString<A>& str, StdString src, size_t cap, size_t shcap) { REQUIRE_STR<grow>(str, src.data(), src.size(), cap, shcap); }
+    template <bool grow = false, class A> static void REQUIRE_STR  (const AnyString<A>& str, StdString src, size_t cap)               { REQUIRE_STR<grow>(str, src, cap, cap); }
+    template <bool grow = false, class A> static void REQUIRE_STR  (const AnyString<A>& str, StdString src)                           { REQUIRE_STR<grow>(str, src, src.size()); }
+    template <bool grow = false, class A> static void REQUIRE_STRM (const AnyString<A>& str, StdString src)                           { REQUIRE_STR<grow>(str, src, str.capacity(), str.shared_capacity()); }
 
     static void CHECK_ALLOCS (int allocated_cnt = 0, int allocated = 0, int deallocated_cnt = 0, int deallocated = 0, int reallocated_cnt = 0, int reallocated = 0, int ext_deallocated_cnt = 0, int ext_deallocated = 0, int ext_shbuf_deallocated = 0) {
         auto stat = get_allocs();
@@ -2123,11 +2127,11 @@ struct test_string {
             }
             SECTION("has no space") {
                 s.offset(2, cnt-4); // 2 free from head and tail
-                s.insert(s.length(), cstr("world")); // 5 insterted
-                REQUIRE_STR(s, mstr("a", cnt-4)+mstr("world"), cnt+1); // moved to the beginning
+                s.insert(s.length(), cstr("world")); // 5 inserted
+                REQUIRE_STR<true>(s, mstr("a", cnt-4)+mstr("world"), cnt+1); // moved to the beginning
                 auto stat = get_allocs();
                 REQUIRE(stat.allocated_cnt == 1);
-                REQUIRE(stat.allocated == (int)BUF_CHARS+cnt+1);
+                REQUIRE(stat.allocated == (int)(BUF_CHARS+(cnt+1)*GROW_RATE));
             }
         }
         SECTION("begin") {
@@ -2217,8 +2221,8 @@ struct test_string {
         SECTION("end") {
             s.length(s.length() - 10);
             s.insert(s.length(), cstr("hello"));
-            REQUIRE_STR(s, mstr("a", 40)+mstr("hello"), 45);
-            CHECK_ALLOCS(1, BUF_CHARS+45);
+            REQUIRE_STR<true>(s, mstr("a", 40)+mstr("hello"), 45);
+            CHECK_ALLOCS(1, BUF_CHARS+45*GROW_RATE);
         };
         SECTION("begin") {
             s.offset(10, 30);
@@ -2243,8 +2247,8 @@ struct test_string {
                 auto exp = mstr(" hello");
                 String s(LITERAL);
                 s.insert(s.length(), exp.c_str());
-                REQUIRE_STR(s, StdString(LITERAL)+exp);
-                CHECK_ALLOCS(1, BUF_CHARS + LITERAL_LEN + exp.size());
+                REQUIRE_STR<true>(s, StdString(LITERAL)+exp);
+                CHECK_ALLOCS(1, BUF_CHARS + (LITERAL_LEN + exp.size())*GROW_RATE);
             }
             SECTION("begin") {
                 auto exp = mstr("hello ");

@@ -1,20 +1,21 @@
-requires        "OpenTracing::Role", '>= 0.06, < 0.80.0'; # moving more to roles
+requires        "OpenTracing::Role", '>= v0.82.0';
 requires        "OpenTracing::Implementation", '0.03';
 
 requires        "Carp";
 requires        "Exporter";
 requires        "HTTP::Request";
+requires        "HTTP::Response::Maker";
 requires        "JSON::MaybeXS";
 requires        "LWP::UserAgent";
 requires        "Moo";
 requires        "Moo::Role";
-requires        "MooX::Attribute::ENV";
+requires        "MooX::Attribute::ENV", '>= 0.02';
 requires        "MooX::HandlesVia";
+requires        "MooX::Enumeration";
 requires        "PerlX::Maybe";
 requires        "Ref::Util";
 requires        "Sub::Trigger::Lock";
 requires        "Syntax::Feature::Maybe";
-requires        "Time::HiRes";
 requires        "Try::Tiny";
 requires        "Types::Common::String";
 requires        "Types::Interface";
@@ -28,6 +29,10 @@ on 'develop' => sub {
 };
 
 on 'test' => sub {
+    requires    "Ref::Util";
+    requires    "Test::JSON";
     requires    "Test::Most";
+    requires    "Test::MockModule";
     requires    "Test::OpenTracing::Interface";
+    requires    "Test::URI";
 };

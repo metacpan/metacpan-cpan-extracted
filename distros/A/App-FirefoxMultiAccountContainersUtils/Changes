@@ -1,3 +1,9 @@
+0.007   2020-06-04  Released-By: PERLANCAR; Urgency: low
+
+	- Use schema firefox::local_profile_name instead of
+	  firefox::profile_name.
+
+
 0.006   2020-06-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utilities: firefox-mua-list-containers,

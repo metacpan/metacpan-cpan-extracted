@@ -343,6 +343,24 @@ sub test_basename : Test(3) {
 
 # -----------------------------------------------------------------------------
 
+sub test_basePath : Test(4) {
+    my $self = shift;
+
+    my $base = Quiq::Path->basePath('datei');
+    $self->is($base,'datei');
+
+    $base = Quiq::Path->basePath('datei.ext');
+    $self->is($base,'datei');
+
+    $base = Quiq::Path->basePath('/ein/pfad/datei.ext');
+    $self->is($base,'/ein/pfad/datei');
+
+    $base = Quiq::Path->basePath('/ein/pfad/datei.ext1.ext2');
+    $self->is($base,'/ein/pfad/datei.ext1');
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_chmod : Test(3) {
     my $self = shift;
 
@@ -392,6 +410,18 @@ sub test_delete : Test(5) {
 
     Quiq::Path->delete($dir);
     $self->ok(!-e $dir);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_dir : Test(2) {
+    my $self = shift;
+
+    my $base = Quiq::Path->dir('datei.ext');
+    $self->is($base,'');
+
+    $base = Quiq::Path->dir('/ein/pfad/datei.ext');
+    $self->is($base,'/ein/pfad');
 }
 
 # -----------------------------------------------------------------------------

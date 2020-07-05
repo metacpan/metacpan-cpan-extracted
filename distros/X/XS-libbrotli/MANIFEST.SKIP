@@ -1,7 +1,7 @@
 \bbrotli/_build/
 
 
-#!start included /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/lib/5.30.1/ExtUtils/MANIFEST.SKIP
+#!start included /home/syber/perl5/perlbrew/perls/5.30.3/lib/5.30.3/ExtUtils/MANIFEST.SKIP
 # Avoid version control files.
 \bRCS\b
 \bCVS\b
@@ -74,5 +74,5 @@
 
 # Avoid AppVeyor file
 ^\.?appveyor.yml
-#!end included /home/b/perl5/perlbrew/perls/perl-debug-5.30.1/lib/5.30.1/ExtUtils/MANIFEST.SKIP
+#!end included /home/syber/perl5/perlbrew/perls/5.30.3/lib/5.30.3/ExtUtils/MANIFEST.SKIP
 

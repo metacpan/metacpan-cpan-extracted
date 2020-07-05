@@ -3,6 +3,7 @@ Changes
 Dockerfile
 LICENSE
 META.json
+Makefile
 README.md
 cpanfile
 lib/Slack/RTM/Bot.pm

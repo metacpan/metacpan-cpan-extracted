@@ -1,0 +1,79 @@
+{
+   "abstract" : "Multi-Process Management System",
+   "author" : [
+      "Al Newkirk <awncorp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Zing",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Cli" : "2.03",
+            "Data::Object::Space" : "2.10",
+            "Data::Object::Types" : "0.04",
+            "FlightRecorder" : "0.09",
+            "JSON" : "4.02",
+            "Redis" : "1.996",
+            "Time::Crontab" : "0.04",
+            "Time::Piece" : "1.3401",
+            "perl" : "5.014",
+            "routines" : "0.02",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Object::Class" : "2.02",
+            "Data::Object::ClassHas" : "2.01",
+            "Data::Object::Cli" : "2.03",
+            "Data::Object::Space" : "2.10",
+            "Data::Object::Types" : "0.04",
+            "FlightRecorder" : "0.09",
+            "JSON" : "4.02",
+            "Redis" : "1.996",
+            "Test::Auto" : "0.12",
+            "Test::Trap" : "v0.3.4",
+            "Time::Crontab" : "0.04",
+            "Time::Piece" : "1.3401",
+            "perl" : "5.014",
+            "routines" : "0.02",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/iamalnewkirk/zing/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Zing",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/iamalnewkirk/zing.git",
+         "web" : "https://github.com/iamalnewkirk/zing"
+      }
+   },
+   "version" : "0.10",
+   "x_authority" : "cpan:AWNCORP",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Apache-2.0"
+}
+

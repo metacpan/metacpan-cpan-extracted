@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use 5.12.0;
 
-our $VERSION = '0.18';
+our $VERSION = '0.21';
 $VERSION = eval $VERSION;
 
 use Mojo::Home;
@@ -60,12 +60,14 @@ sub _include_code {
     % my $text = stash 'revealjs.private.text';
     % my $file = stash 'revealjs.private.file';
     % my $lang = stash 'revealjs.private.lang';
-    <pre><code class="<%= $lang %>" data-trim>
-      <%= $text =%>
-    </code></pre>
-    % if (defined $file) {
-    <p class="filename" style="float: right; text-color: white; font-size: small;"><%= $file %></p>
-    % }
+    <div class="mojo include-code">
+      <pre><code class="<%= $lang %>" data-trim>
+        <%= $text =%>
+      </code></pre>
+      % if (defined $file) {
+      <p class="filename mojo sample-annotation" style="float: right; text-color: white; font-size: small;"><%= $file %></p>
+      % }
+    </div>
   INCLUDE
 
   $filename = undef if exists $opts{include_filename} && !$opts{include_filename};
@@ -83,10 +85,12 @@ sub _include_code {
 sub _include_sample {
   my ($c, $sample, %opts) = @_;
   my $template = <<'  INCLUDE';
-    <pre><%= t code => @$code %></pre>
-    % if (defined $annotation) {
-    <p class="sample-annotation" style="float: right; text-color: white; font-size: small;"><%= $annotation %></p>
-    % }
+    <div class="mojo include-code">
+      <pre><%= t code => @$code %></pre>
+      % if (defined $annotation) {
+      <p class="mojo sample-annotation" style="float: right; text-color: white; font-size: small;"><%= $annotation %></p>
+      % }
+    </div>
   INCLUDE
 
   my (@code, %data);
@@ -96,10 +100,11 @@ sub _include_sample {
     push @code, class => $lang;
   }
 
-  $data{sample}        = $sample;
-  $data{trim}          = $opts{trim}     if exists $opts{trim};
-  $data{noescape}      = $opts{noescape} if exists $opts{noescape};
-  $data{'sample-mark'} = $opts{mark}     if exists $opts{mark};
+  $data{sample}          = $sample;
+  $data{trim}            = $opts{trim}     if exists $opts{trim};
+  $data{noescape}        = $opts{noescape} if exists $opts{noescape};
+  $data{'sample-mark'}   = $opts{mark}     if exists $opts{mark};
+  $data{'sample-indent'} = $opts{indent}   if exists $opts{indent};
   push @code, data => \%data;
 
   my $anno_default = $sample;
@@ -166,7 +171,7 @@ It also provides a few simple helpers.
 Future versions of the plugin will allow setting of configuration like themes.
 
 The bundled version of Reveal.js is currently 3.7.0.
-The bundled version of reveal-sampler is currently b04a34e.
+The bundled version of reveal-sampler is currently cd4a07d.
 
 Note that this module is in an alpha form!
 The author makes no compatibilty promises.
@@ -382,6 +387,16 @@ If this is not set, the client-side code will also attempt to set it based on th
 
 Sets lines to be marked by the client.
 This follows the documentation at L<https://github.com/ldionne/reveal-sampler>.
+
+=item indent
+
+Instructs reveal-sampler to "keep" or "remove" any overall indentation in the sample.
+This follows the documentation at L<https://github.com/ldionne/reveal-sampler>.
+
+Note that the default behavior (for when "indent" is not set) can be set in L</init>.
+The default (from the plugin itself), is false.
+
+  $c->stash( init => { sampler => { removeIndentation => \1 } } );
 
 =item trim
 

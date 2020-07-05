@@ -1,0 +1,86 @@
+{
+   "abstract" : "C-family abstract syntax tree output tool",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Clang-CastXML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Which" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::Module" : "0.000060",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000060",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Which" : "0",
+            "Moo" : "2.0",
+            "Path::Tiny" : "0",
+            "Ref::Util" : "0",
+            "StackTrace::Auto" : "0",
+            "Throwable" : "0",
+            "XML::Parser" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Hide" : "0",
+            "Test2::V0" : "0.000060",
+            "Test::XML" : "0",
+            "YAML" : "0",
+            "perl" : "5.020"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlFFI/Clang-CastXML/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Clang::CastXML",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PerlFFI/Clang-CastXML.git",
+         "web" : "https://github.com/PerlFFI/Clang-CastXML"
+      }
+   },
+   "version" : "0.01",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
+}
+

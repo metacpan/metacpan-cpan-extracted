@@ -1,6 +1,7 @@
 # this file tests how bag information could be accessed
 BEGIN { chdir 't' if -d 't' }
 
+use warnings;
 use utf8;
 use open ':std', ':encoding(utf8)';
 use Test::More tests => 19;

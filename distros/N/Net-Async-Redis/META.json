@@ -44,17 +44,17 @@
             "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
             "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
+            "Cache::LRU" : "0.04",
             "Class::Method::Modifiers" : "0",
             "Digest::CRC" : "0.22",
             "Future" : "0.42",
-            "Future::AsyncAwait" : "0.34",
+            "Future::AsyncAwait" : "0.40",
             "IO::Async" : "0",
             "IO::Async::Notifier" : "0",
             "IO::Async::Stream" : "0",
@@ -107,47 +107,47 @@
    "provides" : {
       "Net::Async::Redis" : {
          "file" : "lib/Net/Async/Redis.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Cluster" : {
          "file" : "lib/Net/Async/Redis/Cluster.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Cluster::Node" : {
          "file" : "lib/Net/Async/Redis/Cluster/Node.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Commands" : {
          "file" : "lib/Net/Async/Redis/Commands.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Multi" : {
          "file" : "lib/Net/Async/Redis/Multi.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Protocol" : {
          "file" : "lib/Net/Async/Redis/Protocol.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Server" : {
          "file" : "lib/Net/Async/Redis/Server.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Server::Connection" : {
          "file" : "lib/Net/Async/Redis/Server/Connection.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Server::Database" : {
          "file" : "lib/Net/Async/Redis/Server/Database.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Subscription" : {
          "file" : "lib/Net/Async/Redis/Subscription.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       },
       "Net::Async::Redis::Subscription::Message" : {
          "file" : "lib/Net/Async/Redis/Subscription/Message.pm",
-         "version" : "2.004"
+         "version" : "2.005"
       }
    },
    "release_status" : "stable",
@@ -162,7 +162,7 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis"
       }
    },
-   "version" : "2.004",
+   "version" : "2.005",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>",

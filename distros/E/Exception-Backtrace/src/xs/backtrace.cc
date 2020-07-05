@@ -9,41 +9,15 @@ using namespace panda;
 using panda::Backtrace;
 using xs::my_perl;
 
-
-#ifndef FORCEINLINE
-#    if defined(_MSC_VER)
-#        define FORCEINLINE __forceinline
-#    elif defined(__GNUC_) && _GNUC__ > 3
-#        define FORCEINLINE inline _attribute_ ((_always_inline_))
-#    else
-#        define FORCEINLINE inline
-#    endif
+#ifndef CvHASGV
+    // for perls < 5.22
+    #define CvHASGV(cv) cBOOL(SvANY(cv)->xcv_gv_u.xcv_gv)
 #endif
 
-static FORCEINLINE I32 __dopoptosub_at (const PERL_CONTEXT* cxstk, I32 startingblock) {
-    I32 i;
-    for (i = startingblock; i >= 0; i--) {
-        const PERL_CONTEXT * const cx = &cxstk[i];
-        switch (CxTYPE(cx)) {
-        default:  continue;
-        case CXt_SUB:
-            /* in sub foo { /(?{...})/ }, foo ends up on the CX stack
-             * twice; the first for the normal foo() call, and the second
-             * for a faked up re-entry into the sub to execute the
-             * code block. Hide this faked entry from the world. */
-            if (cx->cx_type & CXp_SUB_RE_FAKE)
-                continue;
-            /* FALLTHROUGH */
-        case CXt_EVAL:
-        case CXt_FORMAT:
-            DEBUG_l( Perl_deb(aTHX_ "(dopoptosub_at(): found sub at cx=%ld)\n", (long)i));
-            return i;
-        }
-    }
-    return i;
-}
 
 namespace xs {
+
+using PerlTraceSP = iptr<PerlTrace>;
 
 static string stringize_arg(SV* it) {
     string value;
@@ -105,9 +79,9 @@ static std::vector<string> get_args(const PERL_CONTEXT* cx) {
     return r;
 }
 
-static PerlTrace* get_trace() noexcept {
+static PerlTraceSP get_trace() noexcept {
     dTHX;
-    std::vector<StackframePtr> frames;
+    std::vector<StackframeSP> frames;
     I32 level = 0;
     const PERL_CONTEXT *dbcx = nullptr;
     const PERL_CONTEXT* cx = caller_cx(level, &dbcx);
@@ -138,7 +112,7 @@ static PerlTrace* get_trace() noexcept {
 
         auto args = get_args(cx);
 
-        StackframePtr frame(new Stackframe());
+        StackframeSP frame(new Stackframe());
         frame->library = library;
         frame->file = file;
         frame->line_no = line;
@@ -258,25 +232,32 @@ Ref _is_safe_to_wrap(Sv& ex, bool add_frame_info) {
 
 };
 
-static void attach_backtraces(Ref except) {
+static void attach_backtraces(Ref except, const PerlTraceSP& perl_trace) {
     auto it = except.value();
     if (!it.payload_exists(&backtrace_c_marker)) {
         auto bt = new Backtrace();
         it.payload_attach(bt, &backtrace_c_marker);
     }
     if (!it.payload_exists(&backtrace_perl_marker)) {
-        auto bt = get_trace();
-        it.payload_attach(xs::out<BacktraceInfo*>(bt), &backtrace_perl_marker);
+        it.payload_attach(xs::out<BacktraceInfo*>(perl_trace.get()), &backtrace_perl_marker);
     }
 }
 
 Sv safe_wrap_exception(Sv ex) {
     auto ref = _is_safe_to_wrap(ex, false);
     if (ref) {
-        attach_backtraces(ref);
+        auto perl_traces = get_trace();
+        auto& frames = perl_traces->get_frames();
+        bool in_destroy = std::any_of(frames.begin(), frames.end(), [](auto& frame) { return frame->name == "DESTROY"; } );
+        if (in_destroy) {
+            // we don't want to corrupt Perl's warning with Exception::Backtrace handler, instead let it warns
+            // to the origin of the exception
+            return Simple::undef;
+        }
+        attach_backtraces(ref, perl_traces);
         return Sv(ref);
     }
-    return ex;
+    return Simple::undef;
 }
 
 

@@ -89,6 +89,7 @@ $t->post_ok( $token_route => form => \%valid_token_params )
 cmp_deeply(
   $t->tx->res->json,
   {
+    scopes        => ignore(),
     access_token  => re( '^.+$' ),
     token_type    => 'Bearer',
     expires_in    => $TTL,

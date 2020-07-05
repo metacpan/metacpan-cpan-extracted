@@ -57,5 +57,7 @@ Util/CommentedJson.pm
 Util/compat_double_diamond.pm
 Util/compat_double_diamond_5_20.pm
 Util/FindMethods.pm
+Util/Inspector.pm
 Util/JSON_TYPE.pm
+Util/ResolveSymlinks.pm
 whyfields.pod

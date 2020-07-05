@@ -3,14 +3,15 @@ use warnings;
 
 use Test::More;
 use Test::MockModule;
-use Data::Dumper;
+use Test::Differences;
 
 BEGIN { use_ok('HealthCheck::Diagnostic::Redis') };
 
 diag(qq(HealthCheck::Diagnostic::Redis Perl $], $^X));
 
 my %fake_redis_store = (
-    random_key => 1234,
+    recent_key    => 1234,
+    read_this_key => 'once upon a time',
 );
 
 # Mock the Redis module so that we can pretend to have good and bad hosts.
@@ -31,13 +32,21 @@ $mock->mock( get => sub {
     my ($self, $key) = @_;
     return $fake_redis_store{$key};
 } );
+$mock->mock( set => sub {
+    my ($self, $key, $val) = @_;
+    $fake_redis_store{ $key } = $val;
+} );
+$mock->mock( del => sub {
+    my ($self, $key) = @_;
+    delete $fake_redis_store{ $key };
+} );
 $mock->mock( ping => sub {
     my $self = shift;
     return $self->{server} =~ /badping/ ? 0 : 1;
 } );
 $mock->mock( randomkey => sub {
     my $self = shift;
-    return 'random_key';
+    return 'recent_key';
 } );
 # We have to mock out destroy, or things break terribly because of Redis::Fast
 # AUTOLOAD...
@@ -96,5 +105,41 @@ $mock->mock( DESTROY => sub {} );
     ok $@, "Check with no host dies.";
     like $@, qr/^No host/, "Error is No Host.";
 }
+
+# Test that we can specify the key to read.
+{
+    my $result = HealthCheck::Diagnostic::Redis->check(
+        host      => 'good-host1',
+        key_name  => 'reed_this_key',
+        read_only => 1,
+    );
+    is $result->{status}, 'CRITICAL',
+        'Look for static key that does not exist.';
+    like $result->{info}, qr/Failed reading value of key reed_this_key/,
+        'Mention key in failure';
+
+    $result = HealthCheck::Diagnostic::Redis->check(
+        host      => 'good-host1',
+        key_name  => 'read_this_key',
+        read_only => 1,
+    );
+    is $result->{status}, 'OK', 'Look for static key that exists.';
+
+    $result = HealthCheck::Diagnostic::Redis->check(
+        host      => 'good-host1',
+        key_name  => 'read_this_key',
+    );
+    is $result->{status}, 'CRITICAL',
+        'Fail when writing to key that already exists.';
+    like $result->{info}, qr/Cannot overwrite key read_this_key/,
+        'Mention key in failure.';
+}
+
+
+# Make sure that the redis keys were deleted.
+eq_or_diff( \%fake_redis_store, {
+    recent_key    => 1234,
+    read_this_key => 'once upon a time',
+}, 'Fake redis store is emptied back to default.' );
 
 done_testing;

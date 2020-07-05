@@ -1,4 +1,3 @@
-cares.xs
 Changes
 lib/XS/libcares.pm
 lib/XS/libcares.pod
@@ -350,6 +349,7 @@ libcares/windows_port.c
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+stub.c
 t/use.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

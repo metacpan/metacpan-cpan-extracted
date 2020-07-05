@@ -9,17 +9,20 @@ local $/ = undef;
 
 my ( %param, %stat ) = %{ YAML::XS::Load( <> ) };
 
+local $/ = "\n";
+
 my $info = MYDan::Collector::Stat->new( %{$param{argv}} )->eval;
 
 for( @{$info->stat()} )
 {
     next unless $_->[0][0] eq 'TEST';
     shift @$_;
-	for( @$_ )
-	{
-		my ( $test, $stat, $group, $info ) = @$_[0,1,11,13];
-		$stat{"$group###$test"} = $info if $stat eq 'err';
-	}
+    for( @$_ )
+    {
+        my ( $test, $stat, $group, $info ) = @$_[0,10,11,13];
+        $stat{"$group###$test"} = $info if $stat eq 'err';
+        $stat{"syswarn###$test"} = 'nodata' if $stat eq 'warn';
+    }
 }
 
 print( YAML::XS::Dump \%stat ) if %stat;

@@ -4,7 +4,7 @@ Test2::Plugin::NoWarnings - Fail if tests warn
 
 # VERSION
 
-version 0.08
+version 0.09
 
 # SYNOPSIS
 
@@ -55,15 +55,19 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
+# CONTRIBUTOR
+
+Michael Alan Dorman <mdorman@ironicdesign.com>
+
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

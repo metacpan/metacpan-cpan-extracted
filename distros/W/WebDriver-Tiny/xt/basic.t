@@ -12,7 +12,7 @@ my $drv = WebDriver::Tiny->new(
     port         => 4444,
 );
 
-$drv->get('http://httpd:8080');
+$drv->get('http://httpd');
 
 like $drv->window, qr/^[-\w]+$/, 'window';
 
@@ -33,15 +33,15 @@ is_deeply [ map $_->text, $drv->('h3')->split ], [qw/foo bar/], 'split';
 
 is $drv->title, 'Frosty the ☃', 'title';
 
-is $drv->url, 'http://httpd:8080/', 'url';
+is $drv->url, 'http://httpd/', 'url';
 
 ( my $bottom = $drv->( 'go to bottom', method => 'link_text' ) )->click;
 
-is $drv->url, 'http://httpd:8080/#bottom', 'click';
+is $drv->url, 'http://httpd/#bottom', 'click';
 
 ( my $top = $drv->( 'go to top', method => 'link_text' ) )->click;
 
-is $drv->url, 'http://httpd:8080/#top', 'click';
+is $drv->url, 'http://httpd/#top', 'click';
 
 is_deeply $drv->( 'to top', method => 'partial_link_text' ), $top,
     'partial_link_text matching one';

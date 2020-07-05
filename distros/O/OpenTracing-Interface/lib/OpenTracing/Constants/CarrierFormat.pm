@@ -4,6 +4,8 @@ use warnings;
 use parent 'Exporter';
 use Package::Constants;
 
+our $VERSION = 'v0.204.0';
+
 use constant {
     OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS => 'HTTP_HEADERS',
     OPENTRACING_CARRIER_FORMAT_BINARY       => 'BINARY',

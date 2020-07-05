@@ -40,6 +40,16 @@
 		<script src="revealjs/lib/js/html5shiv.js"></script>
 		<![endif]-->
 
+    <style>
+      div.mojo.include-code:after {
+        content: "";
+        display: block;
+        clear: both;
+      }
+      div.mojo.include-code p.mojo.sample-annotation {
+        margin: 5px 0 10px 0;
+      }
+    </style>
     %= include 'revealjs_head'
 	</head>
 

@@ -92,7 +92,7 @@ package Astro::Coord::ECI;
 use strict;
 use warnings;
 
-our $VERSION = '0.113';
+our $VERSION = '0.114';
 
 use Astro::Coord::ECI::Utils qw{ @CARP_NOT :mainstream };
 use Carp;
@@ -887,7 +887,7 @@ sub ecliptic_longitude {
 =item $seconds = $self->equation_of_time( $time );
 
 This method returns the equation of time at the given B<dynamical>
-time.
+time. If the time is C<undef>, the invocant's dynamical time is used.
 
 The algorithm is from W. S. Smart's "Text-Book on Spherical Astronomy",
 as reported in Jean Meeus' "Astronomical Algorithms", 2nd Edition,
@@ -1696,9 +1696,15 @@ sub heliocentric_ecliptic_cartesian {
 		heliocentric_ecliptic_cartesian => \@args,
 	    },
 	};
+	my $sun = $self->get( 'sun' )
+	    or croak q{Attribute 'sun' not set};
+	my ( $X_sun, $Y_sun, $Z_sun ) = $sun->universal(
+	    $self->universal() )->ecliptic_cartesian();
+	my ( $X, $Y, $Z ) = ( $args[0] + $X_sun, $args[1] + $Y_sun,
+	    $args[2] + $Z_sun );
+	$self->ecliptic_cartesian( $X, $Y, $Z );
 	$self->{specified} = 'heliocentric_ecliptic_cartesian';
 	$self->{inertial} = 1;
-	$self->_convert_heliocentric_ecliptic_cartesian_to_eci();
     } elsif ( @args ) {
 	croak 'heliocentric_ecliptic_cartesian() wants 0, 1, 3 or 4 arguments';
     } else {
@@ -1706,7 +1712,17 @@ sub heliocentric_ecliptic_cartesian {
 	    and return @{
 		$self->{_ECI_cache}{inertial}{heliocentric_ecliptic_cartesian}
 	    };
-	return $self->_convert_eci_to_heliocentric_ecliptic_cartesian();
+	my $sun = $self->get( 'sun' )
+	    or croak q{Attribute 'sun' not set};
+	my ( $X_self, $Y_self, $Z_self ) = $self->ecliptic_cartesian();
+	my ( $X_sun, $Y_sun, $Z_sun ) = $sun->universal(
+	    $self->universal() )->ecliptic_cartesian();
+
+	my @hec = ( $X_self - $X_sun, $Y_self - $Y_sun, $Z_self - $Z_sun );
+
+	$self->set( equinox_dynamical => $self->dynamical() );
+	$self->{_ECI_cache}{inertial}{heliocentric_ecliptic_cartesian} = \@hec;
+	return @hec;
     }
     return $self;
 }
@@ -3452,70 +3468,6 @@ sub _convert_eci_to_ecef {
     defined wantarray
 	or return;
     return @ecef;
-}
-
-sub _convert_eci_to_heliocentric_ecliptic_cartesian {
-    my ( $self ) = @_;
-
-    my ( $x, $y, $z ) = $self->eci();
-
-    # $x = km in the direction of the Vernal Equinox
-    # $y = km in the direction 90 degrees east of the Vernal Equinox
-    # $z = km perpendicular to the equator.
-    # So we need to rotate z toward y by the obliquity of the ecliptic
-
-    my $dynamical = $self->dynamical();
-    my $epsilon = $self->obliquity( $dynamical );
-    my $sin_epsilon = sin $epsilon;
-    my $cos_epsilon = cos $epsilon;
-
-    my $Z = $z * $cos_epsilon - $y * $sin_epsilon;
-    my $Y = $z * $sin_epsilon + $y * $cos_epsilon;
-
-    my $sun = $self->get( 'sun' )
-	or croak q{Attribute 'sun' not set};
-    my ( $X_s, $Y_s, $Z_s ) = $sun->universal( $self->universal() )->eci();
-
-    my @hec = ( $x - $X_s, $Y - $Y_s, $Z - $Z_s );
-
-    $self->set( equinox_dynamical => $dynamical );
-    $self->{_ECI_cache}{inertial}{heliocentric_ecliptic_cartesian} = \@hec;
-
-    defined wantarray
-	or return;
-    return @hec;
-}
-
-sub _convert_heliocentric_ecliptic_cartesian_to_eci {
-    my ( $self ) = @_;
-
-    my ( $x, $y, $z ) = $self->heliocentric_ecliptic_cartesian();
-
-    # $x = km in the direction of the Vernal Equinox
-    # $y = km in the direction 90 degrees east of the Vernal Equinox
-    # $z = km perpendicular to the ecliptic.
-    # So we need to rotate z toward y by the obliquity of the ecliptic
-
-    my $dynamical = $self->dynamical();
-    my $epsilon = $self->obliquity( $dynamical );
-    my $sin_epsilon = sin $epsilon;
-    my $cos_epsilon = cos $epsilon;
-
-    my $Z =   $z * $cos_epsilon + $y * $sin_epsilon;
-    my $Y = - $z * $sin_epsilon + $y * $cos_epsilon;
-
-    my $sun = $self->get( 'sun' )
-	or croak q{Attribute 'sun' not set};
-    my ( $X_s, $Y_s, $Z_s ) = $sun->universal( $self->universal() )->eci();
-
-    my @eci = ( $x + $X_s, $Y + $Y_s, $Z + $Z_s );
-
-    $self->set( equinox_dynamical => $dynamical );
-    $self->{_ECI_cache}{inertial}{eci} = \@eci;
-
-    defined wantarray
-	or return;
-    return @eci;
 }
 
 #	my @args = _expand_args_default_station( @_ )

@@ -58,7 +58,6 @@ Resolver::RequestSP Resolver::resolve (Sv node_or_params, SV* callback = NULL, d
     }
     
     if (cb) req->on_resolve([cb](const AddrInfo& addr, const std::error_code& err, const Resolver::RequestSP& req) {
-        panda_mlog_verbose_debug(uelog, "xs on_resolve");
         auto salistref = Scalar::undef;
         if (!err) {
             auto salist = Array::create();
@@ -91,11 +90,15 @@ size_t Resolver::cache_limit (Sv newval = Sv()) {
     RETVAL = THIS->cache_limit();
 }
 
-size_t Resolver::cache_size ()
+size_t Resolver::cache_size () {
+    RETVAL = THIS->cache().size();
+}
 
 size_t Resolver::queue_size ()
 
-void Resolver::clear_cache ()
+void Resolver::clear_cache () {
+    THIS->cache().clear();
+}
 
 void Resolver::reset ()
 

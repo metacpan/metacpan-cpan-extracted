@@ -7,6 +7,7 @@ lib/Metrics/Any/Adapter/Null.pm
 lib/Metrics/Any/Adapter/Stderr.pm
 lib/Metrics/Any/Adapter/Tee.pm
 lib/Metrics/Any/Adapter/Test.pm
+lib/Metrics/Any/AdapterBase/Stored.pm
 lib/Metrics/Any/Collector.pm
 LICENSE
 MANIFEST			This list of files
@@ -19,9 +20,10 @@ t/02adapter-early.t
 t/03adapter-late.t
 t/04adapter-string-parse.t
 t/10adapter-null.t
-t/11adapter-test.t
-t/12adapter-file.t
-t/13adapter-tee.t
+t/11adapter-file.t
+t/12adapter-tee.t
+t/13adapter-stored.t
+t/14adapter-test.t
 t/20name-prefix.t
 t/21nonstrict.t
 t/99pod.t

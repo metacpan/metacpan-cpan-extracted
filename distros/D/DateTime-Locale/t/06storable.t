@@ -37,7 +37,7 @@ my $dir = tempdir( CLEANUP => 1 );
 
     open my $fh, '>', $file or die $!;
     print {$fh} $frozen or die $!;
-    close $fh or die $!;
+    close $fh           or die $!;
 }
 
 {
@@ -60,7 +60,7 @@ EOF
 
     open my $fh, '>', $pl_file or die $!;
     print {$fh} $code or die $!;
-    close $fh or die $!;
+    close $fh         or die $!;
 
     my $id = capturex( $^X, $pl_file, $data_file );
     chomp $id;

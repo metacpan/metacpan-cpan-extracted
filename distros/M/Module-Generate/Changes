@@ -20,3 +20,6 @@ Revision history for Module-Generate
 
 0.09    2020-05-01
 	- Allow for sub routine code and phases to be passed as strings or coderefs
+
+0.13	2020-06-25
+	- Improve test coverage

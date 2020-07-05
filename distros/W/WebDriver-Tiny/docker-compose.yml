@@ -5,7 +5,10 @@ services:
         logging:
             driver: none
     httpd:
-        image: trinitronx/python-simplehttpserver
+        command:
+            - -d
+            - /var/www
+        image: larsks/thttpd
         logging:
             driver: none
         volumes:

@@ -1,6 +1,8 @@
 Test::WWW::Mechanize::Driver
 ============================
 
+https://github.com/duelafn/Test-WWW-Mechanize-Driver
+
 Write Test::WWW::Mechanize tests in YAML. This module will load the tests
 make a plan and run the tests. Supports every-page tests, SKIP, TODO, and
 any object supporting the Test::WWW::Mechanize interface.
@@ -17,10 +19,6 @@ This module requires these other modules and libraries (perls older than
   - YAML                     or equivalent
   - Template                 only if you use template values
   - DateTime                 only if you use template values
-
-For a complete tree of dependencies, see:
-
-  http://deps.cpantesters.org/?module=Test::WWW::Mechanize::Driver
 
 
 INSTALLATION

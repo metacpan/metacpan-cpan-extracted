@@ -24,7 +24,7 @@ use Config;
 use Getopt::ArgvFile default=>1;
 use Getopt::Long qw / GetOptionsFromArray :config pass_through /;
 
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 
 use constant CASE_INSENSITIVE_OS => ($^O eq 'MSWin32');
 
@@ -90,7 +90,14 @@ sub build {
     my %tmp   = map {($_ => '--link')} (@dll_list, @$alien_sys_installs);
     my @links = reverse %tmp;
 
-    say 'Alien sys dlls added: ' . join ' ', @$alien_sys_installs;
+    if (@$alien_sys_installs) {
+        say 'Alien sys dlls added: ' . join ' ', @$alien_sys_installs;
+        say '';
+    }
+    else {
+      say "No alien system dlls detected\n";
+    }
+
     say 'Detected link list: '   . join ' ', @links;
 
     my @command = (
@@ -100,7 +107,7 @@ sub build {
         @args_for_pp,
     );
 
-    say 'CMD:' . join ' ', @command;
+    say 'CMD: ' . join ' ', @command;
     system (@command) == 0
       or die "system @command failed: $?";
 
@@ -121,11 +128,12 @@ sub get_autolink_list {
     my @system_paths;
 
     if ($OSNAME =~ /MSWin32/i) {
-        #  skip anything under the C:\Windows folder
-        #  and no longer existant folders 
-        my $system_root = $ENV{SystemRoot};
-        @system_paths = grep {$_ =~ m|^\Q$system_root\E|i} @exe_path;
-        @exe_path = grep {(-e $_) and $_ !~ m|^\Q$system_root\E|i} @exe_path;
+        #  skip anything under the C:\Windows folder,
+        #  blank entries
+        #  and no longer extant folders 
+        my $system_root = $ENV{SystemRoot} || $ENV{WINDIR};
+        @system_paths = grep {$_ and $_ =~ m|^\Q$system_root\E|i} @exe_path;
+        @exe_path     = grep {$_ and (-e $_) and $_ !~ m|^\Q$system_root\E|i} @exe_path;
         #say "PATHS: " . join ' ', @exe_path;
     }
     #  what to skip for linux or mac?
@@ -232,9 +240,11 @@ sub get_autolink_list {
             push @missing2, $file;
         }
         
-        say STDERR "\nUnable to locate these DLLS, packed script might not work: "
-        . join  ' ', sort {$a cmp $b} @missing2;
-        say '';
+        if (@missing2) {
+            say STDERR "\nUnable to locate these DLLS, packed script might not work: "
+                     . join  ' ', sort {$a cmp $b} @missing2;
+            say '';
+        }
     }
 
     return wantarray ? @l2 : \@l2;
@@ -327,7 +337,7 @@ sub get_autolink_list_ldd {
                 delete $dlls{$name};
             }
             elsif (
-                 $path =~ m{^(?:/usr)?/lib(?:32|64)/}  #  system lib
+                 $path =~ m{^(?:/usr)?/lib(?:32|64)?/}  #  system lib
               or $path =~ m{\Qdarwin-thread-multi-2level/auto/share/dist/Alien\E}  #  alien in share
               or $name =~ m{^lib(?:c|gcc_s|stdc\+\+)\.}  #  should already be packed?
               ) {

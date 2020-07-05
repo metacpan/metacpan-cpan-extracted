@@ -32,6 +32,8 @@
       },
       "runtime" : {
          "requires" : {
+            "HTTP::Request" : "0",
+            "OpenTracing::Constants::CarrierFormat" : "0",
             "OpenTracing::GlobalTracer" : "0",
             "OpenTracing::Implementation" : "0",
             "Time::HiRes" : "0"
@@ -39,11 +41,14 @@
       },
       "test" : {
          "requires" : {
-            "Test::Most" : "0"
+            "CGI::Application" : "0",
+            "Test::MockObject" : "0",
+            "Test::Most" : "0",
+            "Test::OpenTracing::Integration" : "v0.101.2"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "v0.100.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

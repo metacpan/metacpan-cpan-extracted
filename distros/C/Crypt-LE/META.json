@@ -40,7 +40,7 @@
             "Log::Log4perl" : "1.27",
             "MIME::Base64" : "3.11",
             "Module::Load" : "0.28",
-            "Net::SSLeay" : "1.49",
+            "Net::SSLeay" : "1.55",
             "Scalar::Util" : "0",
             "Time::Piece" : "1.27",
             "Time::Seconds" : "0",
@@ -51,15 +51,15 @@
    "provides" : {
       "Crypt::LE" : {
          "file" : "lib/Crypt/LE.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Crypt::LE::Challenge::Simple" : {
          "file" : "lib/Crypt/LE/Challenge/Simple.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       },
       "Crypt::LE::Complete::Simple" : {
          "file" : "lib/Crypt/LE/Complete/Simple.pm",
-         "version" : "0.35"
+         "version" : "0.36"
       }
    },
    "release_status" : "stable",
@@ -72,6 +72,6 @@
          "url" : "https://github.com/do-know"
       }
    },
-   "version" : "0.35",
+   "version" : "0.36",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

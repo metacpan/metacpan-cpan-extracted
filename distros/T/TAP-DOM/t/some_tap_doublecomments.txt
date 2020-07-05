@@ -1,5 +1,5 @@
 TAP Version 13
-1..2
+1..3
 ## first chunk of comments I do not want to see in TAP-DOM
 ## Apr 13 18:47:54 ss5-netbook kernel: [103586.251753] usb usb2: root hub lost power or was reset
 ## Apr 13 18:47:54 ss5-netbook kernel: [103586.251807] usb usb3: root hub lost power or was reset
@@ -23,3 +23,6 @@ ok 2 - zomtec
        value: 2
    ...
 # A comment I want to see in TAP-DOM
+THIS IS NOT A TAP LINE
+AND THIS ONE IS ALSO NOT A TAP LINE
+ok 3 - and another one

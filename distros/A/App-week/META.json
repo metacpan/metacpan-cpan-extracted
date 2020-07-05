@@ -42,7 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.18.0",
+            "Getopt::EX" : "v1.19.0",
+            "Getopt::EX::i18n" : "0.08",
             "Getopt::EX::termcolor" : "1.06",
             "Text::ANSI::Fold" : "1.03",
             "Text::VisualWidth::PP" : "0.05",
@@ -58,13 +59,16 @@
    "provides" : {
       "App::week" : {
          "file" : "lib/App/week.pm",
-         "version" : "0.10"
+         "version" : "0.13"
       },
       "App::week::colors" : {
          "file" : "lib/App/week/colors.pm"
       },
       "App::week::default" : {
          "file" : "lib/App/week/default.pm"
+      },
+      "App::week::olympic" : {
+         "file" : "lib/App/week/olympic.pm"
       },
       "App::week::teams" : {
          "file" : "lib/App/week/teams.pm"
@@ -81,8 +85,11 @@
          "web" : "https://github.com/kaz-utashiro/App-week"
       }
    },
-   "version" : "0.10",
+   "version" : "0.13",
    "x_authority" : "cpan:UTASHIRO",
+   "x_contributors" : [
+      "Shlomi Fish <shlomif@shlomifish.org>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 0
 }

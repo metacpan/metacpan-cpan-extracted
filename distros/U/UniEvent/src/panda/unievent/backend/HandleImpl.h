@@ -1,5 +1,4 @@
 #pragma once
-#include "../Debug.h"
 #include "../error.h"
 #include "LoopImpl.h"
 #include <panda/string.h>
@@ -46,14 +45,14 @@ struct RequestImpl {
     HandleImpl*       handle;
     IRequestListener* listener;
 
-    RequestImpl (HandleImpl* h, IRequestListener* l) : handle(h), listener(l) { _ECTOR(); }
+    RequestImpl (HandleImpl* h, IRequestListener* l) : handle(h), listener(l) { panda_log_ctor(); }
 
     void handle_event (const std::error_code& err) noexcept {
         handle->loop->ltry([&]{ listener->handle_event(err); });
     }
 
     virtual void destroy () noexcept = 0;
-    virtual ~RequestImpl () { _EDTOR(); }
+    virtual ~RequestImpl () { panda_log_dtor(); }
 };
 
 }}}

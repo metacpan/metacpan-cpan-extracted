@@ -1,8 +1,8 @@
 # -*- Mode: CPerl -*-
-use Test::More tests=>23;
+use Test::More; # tests=>23;
 use DDC::XS;
 
-##-- 1..4: CQAnd: perl only
+##-- CQAnd: perl only
 my $qa = DDC::XS::CQTokExact->new('','a');
 my $qb = DDC::XS::CQTokExact->new('','b');
 my $qc = DDC::XS::CQTokExact->new('','c');
@@ -13,13 +13,13 @@ is($qand->toString, q((@'a' && @'b')), "CQAnd:str");
 $qand->setDtr2($qc);
 is($qand->toString, q((@'a' && @'c')), "CQAnd:setDtr2:str");
 
-##-- 5..7: CQOr: parsed
+##-- CQOr: parsed
 my $qor = DDC::XS->parse('a || b');
 ok($qor, "CQOr:parse");
 is($qor->getDtr1->toString, "'a'", "CQOr:dtr1:str");
 is($qor->getDtr2->toString, "'b'", "CQOr:dtr2:str");
 
-##-- 8..11: CQSeq
+##-- CQSeq
 my $qseq = DDC::XS->parse('"@foo #2 @bar #=1 @{baz,bonk}"');
 my $items = $qseq->getItems;
 my $ops   = $qseq->getDistOps;
@@ -30,7 +30,7 @@ $_ = '=' foreach (@$ops);
 $qseq->setDistOps($ops);
 ok(!(grep {$_ ne '='} @{$qseq->getDistOps//[]}), "CQSeq:ops:set");
 
-##-- 12..14: CQSet
+##-- CQSet
 my $qset = DDC::XS->parse('@{blip,blop}');
 my $vals = $qset->getValues;
 ok($qset, "CQSet:parse");
@@ -39,17 +39,23 @@ $vals = [qw(a b c)];
 $qset->setValues($vals);
 is(join(' ', sort @{$qset->getValues//[]}), 'a b c', "CQSet:vals:set");
 
-##-- 15..16: CQRegex
+##-- CQRegex
 my $qre = DDC::XS->parse('/flip\.flop/');
 ok($qre, "CQRegex:parse");
 is($qre->getValue, "flip\\.flop", "CQRegex:value");
 
-##-- 17..18: expanders
+##-- CQRegex: mantis #47973
+my $restr = 'slash\/escape';
+$qre = DDC::XS->parse( "/$restr/" );
+is($qre->getValue, $restr, 'CQRegex:slash-escape:value' );
+is($qre->toString, "/$restr/", 'CQRegex:slash-escape:toString' );
+
+##-- expanders
 my $qx = DDC::XS->parse('foo |bar|baz');
 ok($qx, "expanders:parse");
 is(join(' ',@{$qx->getExpanders//[]}), 'bar baz', "expanders:chain");
 
-##-- 19..21 : WITH aliases
+##-- WITH aliases
 my $qwith = DDC::XS->parse('foo &= bar');
 ok($qwith && $qwith->isa('DDC::XS::CQWith'), "with:&=");
 
@@ -59,10 +65,12 @@ ok($qwithor && $qwithor->isa('DDC::XS::CQWithor'), "withor:|=");
 my $qwithout = DDC::XS->parse('foo != bar');
 ok($qwithout && $qwithout->isa('DDC::XS::CQWithout'), "without:!=");
 
-##-- 22..23 : CQAndImplicit
+##-- CQAndImplicit
 my $qandi = DDC::XS->parse('foo bar');
 ok($qandi && $qandi->isa('DDC::XS::CQAndImplicit'), "implicit-and:isa");
 ok($qandi && $qandi->isa('DDC::XS::CQAnd'),         "implicit-and:isa(and)");
 
 print "\n";
+done_testing();
+
 

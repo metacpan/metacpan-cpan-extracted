@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::0_90::Role::Scroll;
-$Search::Elasticsearch::Client::0_90::Role::Scroll::VERSION = '6.80';
+$Search::Elasticsearch::Client::0_90::Role::Scroll::VERSION = '6.81';
 use Moo::Role;
 requires 'finish';
 use Search::Elasticsearch::Util qw(parse_params throw);
@@ -64,7 +64,7 @@ Search::Elasticsearch::Client::0_90::Role::Scroll - Provides common functionalit
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 AUTHOR
 

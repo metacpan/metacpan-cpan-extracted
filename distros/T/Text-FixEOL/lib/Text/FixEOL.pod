@@ -28,37 +28,6 @@ It canonicalizes EOL as \n (the platform defined EOL) if it does not know the pa
 platform. Can also 'fix' the end-of-file mark if needed and ensure that the last line of
 the string is EOL terminated.
 
-=head1 CHANGES
-
- 1.00 2005.05.02 - Initial Release
-
- 1.01 2005.05.03 - Changes to Build.PL to have Test::NoWarnings
-                   and Test::More as prerequisite modules and changes
-                   to META.yml to try to make CPANPLUS happy. Small documentation
-                   change to 'new'. No functional changes.
-
- 1.02 2005.05.05 - Added more build tests and made various bug
-                   fixes and tweaks. 100% code coverage for
-                   tests reached. Added Test::Pod to tests.
-                   Changed text in POD for licence to correctly
-                   identify license as dual Artistic/GPL.
-
- 1.03 2005.06.17 - Removed NoWarnings test to improve ability to build on
-                   older installations. Added pod coverage test. Made all
-                   pod tests optional. No functional changes.
-
- 1.04 2005.09.09 - Tweaked POD build tests. Tweaked META.yml. Extended
-                   license statement and appended liability disclaimer.
-                   Appended Artistic and GPL licenses to distribution.
-                   No functional changes.
-
- 1.05 2005.09.13 - Changed pod tests to be more CPANTS friendly.
-                   Removed usage of 'warnings' pragma  and 'our'
-                   for Perl 5.005 compatibility.
-
- 1.06 2011.07.30 - Replaced inadvertent Unicode usage in POD with non-Unicode.
-                   No functional changes.
-
 =head1 METHODS
 
 =over 4
@@ -364,21 +333,69 @@ mode rather than the mnemomic used for configuration.
 
 =back
 
+=head1 VERSION
+
+1.08 released 2020.06.19
+
+=head1 CHANGES
+
+ 1.00 2005.05.02 - Initial Release
+
+ 1.01 2005.05.03 - Changes to Build.PL to have Test::NoWarnings
+                   and Test::More as prerequisite modules and changes
+                   to META.yml to try to make CPANPLUS happy. Small documentation
+                   change to 'new'. No functional changes.
+
+ 1.02 2005.05.05 - Added more build tests and made various bug
+                   fixes and tweaks. 100% code coverage for
+                   tests reached. Added Test::Pod to tests.
+                   Changed text in POD for licence to correctly
+                   identify license as dual Artistic/GPL.
+
+ 1.03 2005.06.17 - Removed NoWarnings test to improve ability to build on
+                   older installations. Added pod coverage test. Made all
+                   pod tests optional. No functional changes.
+
+ 1.04 2005.09.09 - Tweaked POD build tests. Tweaked META.yml. Extended
+                   license statement and appended liability disclaimer.
+                   Appended Artistic and GPL licenses to distribution.
+                   No functional changes.
+
+ 1.05 2005.09.13 - Changed pod tests to be more CPANTS friendly.
+                   Removed usage of 'warnings' pragma  and 'our'
+                   for Perl 5.005 compatibility.
+
+ 1.06 2011.07.30 - Replaced inadvertent Unicode usage in POD with non-Unicode.
+                   No functional changes.
+
+ 1.07 2020.06.19 - Maintainer update. Relicensed under the MIT License.
+                   Minor tweaks to build process. Added meta_merge info
+                   for GitHub. Set minimum Perl version to 5.006 and
+                   added warnings.
+
+ 1.08 2020.06.19 - Fixed Module::Build perl requires. Removed unused 'DEBUG' method.
+
+=head1 AUTHOR
+
+Jerilyn Franz <cpan@jerilyn.info>
+
 =head1 COPYRIGHT
 
-2005 Benjamin Franz <snowhare@nihongo.org>.
+Copyright (c) Jerilyn Franz. All rights reserved.
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it
-and/or modify it under the same terms and conditions as
-Perl itself.
+This module is licensed under the MIT License
 
-This means that you can, at your option, redistribute it and/or modify it under
-either the terms the GNU Public License (GPL) version 1 or later, or under the
-Perl Artistic License.
+Copyright 2020 Jerilyn Franz 
 
-See http://dev.perl.org/licenses/
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+See https://opensource.org/licenses/MIT
 
 =head1 DISCLAIMER
 
@@ -405,9 +422,5 @@ None known.
 =head1 TODO
 
 Nothing.
-
-=head1 VERSION
-
-1.06 released 2011.07.30
 
 =cut

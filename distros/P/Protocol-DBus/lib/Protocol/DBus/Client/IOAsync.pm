@@ -154,6 +154,14 @@ sub _set_watches_and_create_messenger {
     };
 }
 
+sub _pause {
+    ${ $_[0]->{'watch_sr'} }->want_readready(0);
+}
+
+sub _resume {
+    ${ $_[0]->{'watch_sr'} }->want_readready(1);
+}
+
 sub DESTROY {
     my $watch_sr = delete $_[0]{'watch_sr'};
 

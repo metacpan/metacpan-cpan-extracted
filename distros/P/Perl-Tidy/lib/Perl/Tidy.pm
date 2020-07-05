@@ -3,7 +3,7 @@
 #
 #    perltidy - a perl script indenter and formatter
 #
-#    Copyright (c) 2000-2019 by Steve Hancock
+#    Copyright (c) 2000-2020 by Steve Hancock
 #    Distributed under the GPL license agreement; see file COPYING
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -85,7 +85,6 @@ use vars qw{
   @EXPORT
   $missing_file_spec
   $fh_stderr
-  $rOpts_character_encoding
   $Warn_count
 };
 
@@ -94,6 +93,7 @@ use vars qw{
 
 use Cwd;
 use Encode ();
+use Encode::Guess;
 use IO::File;
 use File::Basename;
 use File::Copy;
@@ -110,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20200110';
+    $VERSION = '20200619';
 }
 
 sub streamhandle {
@@ -131,7 +131,16 @@ sub streamhandle {
     # object               object
     #                      (check for 'print' method for 'w' mode)
     #                      (check for 'getline' method for 'r' mode)
-    my ( $filename, $mode ) = @_;
+
+    # An optional flag $is_encoded_data may be given, as follows:
+
+    # Case 1. Any non-empty string: encoded data is being transferred, set
+    # encoding to be utf8 for files and for stdin.
+
+    # Case 2. Not given, or an empty string: unencoded binary data is being
+    # transferred, set binary mode for files and for stdin.
+
+    my ( $filename, $mode, $is_encoded_data ) = @_;
 
     my $ref = ref($filename);
     my $New;
@@ -140,10 +149,10 @@ sub streamhandle {
     # handle a reference
     if ($ref) {
         if ( $ref eq 'ARRAY' ) {
-            $New = sub { Perl::Tidy::IOScalarArray->new(@_) };
+            $New = sub { Perl::Tidy::IOScalarArray->new( $filename, $mode ) };
         }
         elsif ( $ref eq 'SCALAR' ) {
-            $New = sub { Perl::Tidy::IOScalar->new(@_) };
+            $New = sub { Perl::Tidy::IOScalar->new( $filename, $mode ) };
         }
         else {
 
@@ -198,11 +207,33 @@ EOM
             $New = sub { $mode eq 'w' ? *STDOUT : *STDIN }
         }
         else {
-            $New = sub { IO::File->new(@_) };
+            $New = sub { IO::File->new( $filename, $mode ) };
         }
     }
-    $fh = $New->( $filename, $mode )
-      or Warn("Couldn't open file:$filename in mode:$mode : $!\n");
+    $fh = $New->( $filename, $mode );
+    if ( !$fh ) {
+
+        Warn("Couldn't open file:$filename in mode:$mode : $!\n");
+
+    }
+    else {
+
+        # Case 1: handle encoded data
+        if ($is_encoded_data) {
+            if ( ref($fh) eq 'IO::File' ) {
+                $fh->binmode(":raw:encoding(UTF-8)");
+            }
+            elsif ( $fh eq '-' ) {
+                binmode STDOUT, ":raw:encoding(UTF-8)";
+            }
+        }
+
+        # Case 2: handle unencoded data
+        else {
+            if    ( ref($fh) eq 'IO::File' ) { $fh->binmode(); }
+            elsif ( $fh eq '-' )             { binmode STDOUT }
+        }
+    }
 
     return $fh, ( $ref or $filename );
 }
@@ -327,6 +358,8 @@ sub perltidy {
         formatter             => undef,
         logfile               => undef,
         errorfile             => undef,
+        teefile               => undef,
+        debugfile             => undef,
         perltidyrc            => undef,
         source                => undef,
         stderr                => undef,
@@ -381,6 +414,8 @@ EOM
     my $destination_stream = $input_hash{'destination'};
     my $errorfile_stream   = $input_hash{'errorfile'};
     my $logfile_stream     = $input_hash{'logfile'};
+    my $teefile_stream     = $input_hash{'teefile'};
+    my $debugfile_stream   = $input_hash{'debugfile'};
     my $perltidyrc_stream  = $input_hash{'perltidyrc'};
     my $source_stream      = $input_hash{'source'};
     my $stderr_stream      = $input_hash{'stderr'};
@@ -617,8 +652,6 @@ EOM
         user => '',
     );
 
-    $rOpts_character_encoding = $rOpts->{'character-encoding'};
-
     # be sure we have a valid output format
     unless ( exists $default_file_extension{ $rOpts->{'format'} } ) {
         my $formats = join ' ',
@@ -729,6 +762,16 @@ EOM
         unshift( @ARGV, '-' ) unless @ARGV;
     }
 
+    # Flag for loading module Unicode::GCString for evaluating text width:
+    #   undef = ok to use but not yet loaded
+    #       0 = do not use; failed to load or not wanted
+    #       1 = successfully loaded and ok to use
+    # The module is not actually loaded unless/until it is needed
+    my $loaded_unicode_gcstring;
+    if ( !$rOpts->{'use-unicode-gcstring'} ) {
+        $loaded_unicode_gcstring = 0;
+    }
+
     #---------------------------------------------------------------
     # Ready to go...
     # main loop to process all files in argument list
@@ -763,6 +806,14 @@ EOM
             # unexpected perltidy.LOG files.
             if ( !defined($logfile_stream) ) {
                 $logfile_stream = Perl::Tidy::DevNull->new();
+
+                # Likewise for .TEE and .DEBUG output
+            }
+            if ( !defined($teefile_stream) ) {
+                $teefile_stream = Perl::Tidy::DevNull->new();
+            }
+            if ( !defined($debugfile_stream) ) {
+                $debugfile_stream = Perl::Tidy::DevNull->new();
             }
         }
         elsif ( $input_file eq '-' ) {    # '-' indicates input from STDIN
@@ -855,7 +906,7 @@ EOM
         # rerun perltidy over and over with wildcard input.
         if (
             !$source_stream
-            && (   $input_file =~ /$forbidden_file_extensions/o
+            && (   $input_file =~ /$forbidden_file_extensions/
                 || $input_file eq 'DIAGNOSTICS' )
           )
         {
@@ -864,9 +915,11 @@ EOM
         }
 
         # the 'source_object' supplies a method to read the input file
-        my $source_object =
-          Perl::Tidy::LineSource->new( $input_file, $rOpts,
-            $rpending_logfile_message );
+        my $source_object = Perl::Tidy::LineSource->new(
+            input_file               => $input_file,
+            rOpts                    => $rOpts,
+            rpending_logfile_message => $rpending_logfile_message,
+        );
         next unless ($source_object);
 
         my $max_iterations      = $rOpts->{'iterations'};
@@ -875,55 +928,165 @@ EOM
         my %saw_md5;
         my $digest_input = 0;
 
+        my $buf = '';
+        while ( my $line = $source_object->get_line() ) {
+            $buf .= $line;
+        }
+
+        # Decode the input stream if necessary requested
+        my $encoding_in              = "";
+        my $rOpts_character_encoding = $rOpts->{'character-encoding'};
+        my $encoding_log_message;
+
+        # Case 1. See if we already have an encoded string. In that
+        # case, we have to ignore any encoding flag.
+        if ( utf8::is_utf8($buf) ) {
+            $encoding_in = "utf8";
+        }
+
+        # Case 2. No input stream encoding requested.  This is appropriate
+        # for single-byte encodings like ascii, latin-1, etc
+        elsif ( !$rOpts_character_encoding
+            || $rOpts_character_encoding eq 'none' )
+        {
+
+            # nothing to do
+        }
+
+        # Case 3. guess input stream encoding if requested
+        elsif ( $rOpts_character_encoding =~ /^guess$/i ) {
+
+            # The guessing strategy is simple: use Encode::Guess to guess
+            # an encoding.  If and only if the guess is utf8, try decoding and
+            # use it if successful.  Otherwise, we proceed assuming the
+            # characters are encoded as single bytes (same as if 'none' had
+            # been specified as the encoding).
+
+            # In testing I have found that including additional guess 'suspect'
+            # encodings sometimes works but can sometimes lead to disaster by
+            # using an incorrect decoding.  The user can always specify a
+            # specific input encoding.
+            my $buf_in = $buf;
+
+            my $decoder = guess_encoding( $buf_in, 'utf8' );
+            if ( ref($decoder) ) {
+                $encoding_in = $decoder->name;
+                if ( $encoding_in !~ /^(UTF-8|utf8)$/ ) {
+                    $encoding_in = "";
+                    $buf         = $buf_in;
+                    $encoding_log_message .= <<EOM;
+Guessed encoding '$encoding_in' is not utf8; no encoding will be used
+EOM
+                }
+                else {
+
+                    eval { $buf = $decoder->decode($buf_in); };
+                    if ($@) {
+
+                        $encoding_log_message .= <<EOM;
+Guessed encoding '$encoding_in' but decoding was unsuccessful; no encoding is used
+EOM
+
+                        # Note that a guess failed, but keep going
+                        # This warning can eventually be removed
+                        Warn(
+"file: $input_file: bad guess to decode source as $encoding_in\n"
+                        );
+                        $encoding_in = "";
+                        $buf         = $buf_in;
+                    }
+                    else {
+                        $encoding_log_message .= <<EOM;
+Guessed encoding '$encoding_in' successfully decoded
+EOM
+                    }
+                }
+            }
+        }
+
+        # Case 4. Decode with a specific encoding
+        else {
+            $encoding_in = $rOpts_character_encoding;
+            eval {
+                $buf = Encode::decode( $encoding_in, $buf,
+                    Encode::FB_CROAK | Encode::LEAVE_SRC );
+            };
+            if ($@) {
+
+                # Quit if we cannot decode by the requested encoding;
+                # Something is not right.
+                Warn(
+"skipping file: $display_name: Unable to decode source as $encoding_in\n"
+                );
+                next;
+            }
+            else {
+                $encoding_log_message .= <<EOM;
+Specified encoding '$encoding_in' successfully decoded
+EOM
+            }
+        }
+
+        # Set the encoding to be used for all further i/o: If we have
+        # decoded the data with any format, then we must continue to
+        # read and write it as encoded data, and we will normalize these
+        # operations with utf8.  If we have not decoded the data, then
+        # we must not treat it as encoded data.
+        my $is_encoded_data = $encoding_in ? 'utf8' : "";
+
+       # Define the function to determine the display width of character strings
+        my $length_function = sub { return length( $_[0] ) };
+        if ($is_encoded_data) {
+
+            # Delete any Byte Order Mark (BOM), which can cause trouble
+            $buf =~ s/^\x{FEFF}//;
+
+            # Try to load Unicode::GCString for defining text display width, if
+            # requested, when the first encoded file is encountered
+            if ( !defined($loaded_unicode_gcstring) ) {
+                eval { require Unicode::GCString };
+                $loaded_unicode_gcstring = !$@;
+                if ( $@ && $rOpts->{'use-unicode-gcstring'} ) {
+                    Warn(<<EOM);
+----------------------
+Unable to load Unicode::GCString: $@
+Processing continues but some vertical alignment may be poor
+To prevent this warning message, you can either:
+- install module Unicode::GCString, or
+- remove '--use-unicode-gcstring' or '-gcs' from your perltidyrc or command line
+----------------------
+EOM
+                }
+            }
+            if ($loaded_unicode_gcstring) {
+                $length_function = sub {
+                    return Unicode::GCString->new( $_[0] )->columns;
+                };
+            }
+        }
+
+        # MD5 sum of input file is evaluated before any prefilter
+        if ( $rOpts->{'assert-tidy'} || $rOpts->{'assert-untidy'} ) {
+            $digest_input = $md5_hex->($buf);
+        }
+
         # Prefilters and postfilters: The prefilter is a code reference
         # that will be applied to the source before tidying, and the
         # postfilter is a code reference to the result before outputting.
-        if (
-            $prefilter
-            || (   $rOpts_character_encoding
-                && $rOpts_character_encoding eq 'utf8' )
-            || $rOpts->{'assert-tidy'}
-            || $rOpts->{'assert-untidy'}
-            || $do_convergence_test
-          )
-        {
-            my $buf = '';
-            while ( my $line = $source_object->get_line() ) {
-                $buf .= $line;
-            }
 
-            if (   $rOpts_character_encoding
-                && $rOpts_character_encoding eq 'utf8'
-                && !utf8::is_utf8($buf) )
-            {
-                eval {
-                    $buf = Encode::decode( 'UTF-8', $buf,
-                        Encode::FB_CROAK | Encode::LEAVE_SRC );
-                };
-                if ($@) {
-                    Warn(
-"skipping file: $input_file: Unable to decode source as UTF-8\n"
-                    );
-                    next;
-                }
-            }
-
-            # MD5 sum of input file is evaluated before any prefilter
-            if ( $rOpts->{'assert-tidy'} || $rOpts->{'assert-untidy'} ) {
-                $digest_input = $md5_hex->($buf);
-            }
-
-            $buf = $prefilter->($buf) if $prefilter;
+        $buf = $prefilter->($buf) if $prefilter;
 
         # starting MD5 sum for convergence test is evaluated after any prefilter
-            if ($do_convergence_test) {
-                my $digest = $md5_hex->($buf);
-                $saw_md5{$digest} = 1;
-            }
-
-            $source_object = Perl::Tidy::LineSource->new( \$buf, $rOpts,
-                $rpending_logfile_message );
+        if ($do_convergence_test) {
+            my $digest = $md5_hex->($buf);
+            $saw_md5{$digest} = 0;
         }
+
+        $source_object = Perl::Tidy::LineSource->new(
+            input_file               => \$buf,
+            rOpts                    => $rOpts,
+            rpending_logfile_message => $rpending_logfile_message,
+        );
 
         # register this file name with the Diagnostics package
         $diagnostics_object->set_input_file($input_file)
@@ -1006,35 +1169,41 @@ EOM
             }
         }
 
-        # the 'sink_object' knows how to write the output file
+        my $fh_tee;
         my $tee_file = $fileroot . $dot . "TEE";
+        if ($teefile_stream) { $tee_file = $teefile_stream }
+        if (   $rOpts->{'tee-pod'}
+            || $rOpts->{'tee-block-comments'}
+            || $rOpts->{'tee-side-comments'} )
+        {
+            ( $fh_tee, my $tee_filename ) =
+              Perl::Tidy::streamhandle( $tee_file, 'w', $is_encoded_data );
+            if ( !$fh_tee ) {
+                Warn("couldn't open TEE file $tee_file: $!\n");
+            }
+        }
 
         my $line_separator = $rOpts->{'output-line-ending'};
         if ( $rOpts->{'preserve-line-endings'} ) {
             $line_separator = find_input_line_ending($input_file);
         }
 
-        # Eventually all I/O may be done with binmode, but for now it is
-        # only done when a user requests a particular line separator
-        # through the -ple or -ole flags
-        my $binmode = defined($line_separator)
-          || defined($rOpts_character_encoding);
         $line_separator = "\n" unless defined($line_separator);
 
+        # the 'sink_object' knows how to write the output file
         my ( $sink_object, $postfilter_buffer );
-        if (   $postfilter
-            || $rOpts->{'assert-tidy'}
-            || $rOpts->{'assert-untidy'} )
-        {
-            $sink_object =
-              Perl::Tidy::LineSink->new( \$postfilter_buffer, $tee_file,
-                $line_separator, $rOpts, $rpending_logfile_message, $binmode );
-        }
-        else {
-            $sink_object =
-              Perl::Tidy::LineSink->new( $output_file, $tee_file,
-                $line_separator, $rOpts, $rpending_logfile_message, $binmode );
-        }
+        my $use_buffer =
+             $postfilter
+          || $rOpts->{'assert-tidy'}
+          || $rOpts->{'assert-untidy'};
+
+        $sink_object = Perl::Tidy::LineSink->new(
+            output_file    => $use_buffer ? \$postfilter_buffer : $output_file,
+            line_separator => $line_separator,
+            rOpts          => $rOpts,
+            rpending_logfile_message => $rpending_logfile_message,
+            is_encoded_data          => $is_encoded_data,
+        );
 
         #---------------------------------------------------------------
         # initialize the error logger for this file
@@ -1044,13 +1213,22 @@ EOM
         my $log_file = $fileroot . $dot . "LOG";
         if ($logfile_stream) { $log_file = $logfile_stream }
 
-        my $logger_object =
-          Perl::Tidy::Logger->new( $rOpts, $log_file, $warning_file,
-            $fh_stderr, $saw_extrude, $display_name );
+        my $logger_object = Perl::Tidy::Logger->new(
+            rOpts           => $rOpts,
+            log_file        => $log_file,
+            warning_file    => $warning_file,
+            fh_stderr       => $fh_stderr,
+            saw_extruce     => $saw_extrude,
+            display_name    => $display_name,
+            is_encoded_data => $is_encoded_data,
+        );
         write_logfile_header(
             $rOpts,        $logger_object, $config_file,
             $rraw_options, $Windows_type,  $readable_options,
         );
+        $logger_object->write_logfile_entry($encoding_log_message)
+          if $encoding_log_message;
+
         if ( ${$rpending_logfile_message} ) {
             $logger_object->write_logfile_entry( ${$rpending_logfile_message} );
         }
@@ -1063,8 +1241,10 @@ EOM
         #---------------------------------------------------------------
         my $debugger_object = undef;
         if ( $rOpts->{DEBUG} ) {
+            my $debug_file = $fileroot . $dot . "DEBUG";
+            if ($debugfile_stream) { $debug_file = $debugfile_stream }
             $debugger_object =
-              Perl::Tidy::Debugger->new( $fileroot . $dot . "DEBUG" );
+              Perl::Tidy::Debugger->new( $debug_file, $is_encoded_data );
         }
 
         #---------------------------------------------------------------
@@ -1075,29 +1255,37 @@ EOM
         my $sink_object_final     = $sink_object;
         my $debugger_object_final = $debugger_object;
         my $logger_object_final   = $logger_object;
+        my $fh_tee_final          = $fh_tee;
 
         foreach my $iter ( 1 .. $max_iterations ) {
 
             # send output stream to temp buffers until last iteration
             my $sink_buffer;
             if ( $iter < $max_iterations ) {
-                $sink_object =
-                  Perl::Tidy::LineSink->new( \$sink_buffer, $tee_file,
-                    $line_separator, $rOpts, $rpending_logfile_message,
-                    $binmode );
+                $sink_object = Perl::Tidy::LineSink->new(
+                    output_file              => \$sink_buffer,
+                    line_separator           => $line_separator,
+                    rOpts                    => $rOpts,
+                    rpending_logfile_message => $rpending_logfile_message,
+                    is_encoded_data          => $is_encoded_data,
+                );
             }
             else {
                 $sink_object = $sink_object_final;
             }
 
-            # Save logger, debugger output only on pass 1 because:
+            # Save logger, debugger and tee output only on pass 1 because:
             # (1) line number references must be to the starting
             # source, not an intermediate result, and
             # (2) we need to know if there are errors so we can stop the
             # iterations early if necessary.
+            # (3) the tee option only works on first pass if comments are also
+            # being deleted.
+
             if ( $iter > 1 ) {
                 $debugger_object = undef;
                 $logger_object   = undef;
+                $fh_tee          = undef;
             }
 
             #------------------------------------------------------------
@@ -1113,16 +1301,21 @@ EOM
                 $formatter = $user_formatter;
             }
             elsif ( $rOpts->{'format'} eq 'html' ) {
-                $formatter =
-                  Perl::Tidy::HtmlWriter->new( $fileroot, $output_file,
-                    $actual_output_extension, $html_toc_extension,
-                    $html_src_extension );
+                $formatter = Perl::Tidy::HtmlWriter->new(
+                    input_file         => $fileroot,
+                    html_file          => $output_file,
+                    extension          => $actual_output_extension,
+                    html_toc_extension => $html_toc_extension,
+                    html_src_extension => $html_src_extension,
+                );
             }
             elsif ( $rOpts->{'format'} eq 'tidy' ) {
                 $formatter = Perl::Tidy::Formatter->new(
                     logger_object      => $logger_object,
                     diagnostics_object => $diagnostics_object,
                     sink_object        => $sink_object,
+                    length_function    => $length_function,
+                    fh_tee             => $fh_tee,
                 );
             }
             else {
@@ -1172,9 +1365,11 @@ EOM
             if ( $iter < $max_iterations ) {
 
                 $sink_object->close_output_file();
-                $source_object =
-                  Perl::Tidy::LineSource->new( \$sink_buffer, $rOpts,
-                    $rpending_logfile_message );
+                $source_object = Perl::Tidy::LineSource->new(
+                    input_file               => \$sink_buffer,
+                    rOpts                    => $rOpts,
+                    rpending_logfile_message => $rpending_logfile_message,
+                );
 
                 # stop iterations if errors or converged
                 my $stop_now = $tokenizer->report_tokenization_errors();
@@ -1187,7 +1382,7 @@ EOM
                 elsif ($do_convergence_test) {
 
                     my $digest = $md5_hex->($sink_buffer);
-                    if ( !$saw_md5{$digest} ) {
+                    if ( !defined( $saw_md5{$digest} ) ) {
                         $saw_md5{$digest} = $iter;
                     }
                     else {
@@ -1206,6 +1401,10 @@ EOM
                             $diagnostics_object->write_diagnostics(
                                 $convergence_log_message)
                               if $diagnostics_object;
+
+# Uncomment to search for blinking states
+# Warn( "$display_name: blinking; iter $iter same as for $saw_md5{$digest}\n" );
+
                         }
                         else {
                             $convergence_log_message = <<EOM;
@@ -1236,6 +1435,7 @@ EOM
         # for second and higher iterations
         $debugger_object = $debugger_object_final;
         $logger_object   = $logger_object_final;
+        $fh_tee          = $fh_tee_final;
 
         $logger_object->write_logfile_entry($convergence_log_message)
           if $convergence_log_message;
@@ -1243,14 +1443,15 @@ EOM
         #---------------------------------------------------------------
         # Perform any postfilter operation
         #---------------------------------------------------------------
-        if (   $postfilter
-            || $rOpts->{'assert-tidy'}
-            || $rOpts->{'assert-untidy'} )
-        {
+        if ($use_buffer) {
             $sink_object->close_output_file();
-            $sink_object =
-              Perl::Tidy::LineSink->new( $output_file, $tee_file,
-                $line_separator, $rOpts, $rpending_logfile_message, $binmode );
+            $sink_object = Perl::Tidy::LineSink->new(
+                output_file              => $output_file,
+                line_separator           => $line_separator,
+                rOpts                    => $rOpts,
+                rpending_logfile_message => $rpending_logfile_message,
+                is_encoded_data          => $is_encoded_data,
+            );
 
             my $buf =
                 $postfilter
@@ -1275,9 +1476,11 @@ EOM
                 }
             }
 
-            $source_object =
-              Perl::Tidy::LineSource->new( \$buf, $rOpts,
-                $rpending_logfile_message );
+            $source_object = Perl::Tidy::LineSource->new(
+                input_file               => \$buf,
+                rOpts                    => $rOpts,
+                rpending_logfile_message => $rpending_logfile_message,
+            );
             while ( my $line = $source_object->get_line() ) {
                 $sink_object->write_line($line);
             }
@@ -1329,18 +1532,15 @@ EOM
             # everything if we closed it.
             seek( $output_file, 0, 0 )
               or Die("unable to rewind a temporary file for -b option: $!\n");
-            my $fout = IO::File->new("> $input_file")
-              or Die(
+
+            my ( $fout, $iname ) =
+              Perl::Tidy::streamhandle( $input_file, 'w', $is_encoded_data );
+            if ( !$fout ) {
+                Die(
 "problem re-opening $input_file for write for -b option; check file and directory permissions: $!\n"
-              );
-            if ($binmode) {
-                if (   $rOpts->{'character-encoding'}
-                    && $rOpts->{'character-encoding'} eq 'utf8' )
-                {
-                    binmode $fout, ":raw:encoding(UTF-8)";
-                }
-                else { binmode $fout }
+                );
             }
+
             my $line;
             while ( $line = $output_file->getline() ) {
                 $fout->print($line);
@@ -1371,8 +1571,9 @@ EOM
                     #rt128477: avoid inconsistent owner/group and suid/sgid
                     if ( $uid_i != $uid_o || $gid_i != $gid_o ) {
 
-               # try to change owner and group to match input file if in -b mode
-               # note: chown returns number of files successfully changed
+                        # try to change owner and group to match input file if
+                        # in -b mode.  Note: chown returns number of files
+                        # successfully changed.
                         if ( $in_place_modify
                             && chown( $uid_i, $gid_i, $output_file ) )
                         {
@@ -1729,6 +1930,7 @@ sub generate_options {
     ###########################
     $add_option->( 'backup-and-modify-in-place', 'b',     '!' );
     $add_option->( 'backup-file-extension',      'bext',  '=s' );
+    $add_option->( 'character-encoding',         'enc',   '=s' );
     $add_option->( 'force-read-binary',          'f',     '!' );
     $add_option->( 'format',                     'fmt',   '=s' );
     $add_option->( 'iterations',                 'it',    '=i' );
@@ -1741,8 +1943,8 @@ sub generate_options {
     $add_option->( 'quiet',                      'q',     '!' );
     $add_option->( 'standard-error-output',      'se',    '!' );
     $add_option->( 'standard-output',            'st',    '!' );
+    $add_option->( 'use-unicode-gcstring',       'gcs',   '!' );
     $add_option->( 'warning-output',             'w',     '!' );
-    $add_option->( 'character-encoding',         'enc',   '=s' );
 
     # options which are both toggle switches and values moved here
     # to hide from tidyview (which does not show category 0 flags):
@@ -1795,6 +1997,9 @@ sub generate_options {
     $add_option->( 'brace-tightness',                           'bt',    '=i' );
     $add_option->( 'delete-old-whitespace',                     'dws',   '!' );
     $add_option->( 'delete-semicolons',                         'dsm',   '!' );
+    $add_option->( 'keyword-paren-inner-tightness',             'kpit',  '=i' );
+    $add_option->( 'keyword-paren-inner-tightness-list',        'kpitl', '=s' );
+    $add_option->( 'logical-padding',                           'lop',   '!' );
     $add_option->( 'nospace-after-keyword',                     'nsak',  '=s' );
     $add_option->( 'nowant-left-space',                         'nwls',  '=s' );
     $add_option->( 'nowant-right-space',                        'nwrs',  '=s' );
@@ -1896,6 +2101,7 @@ sub generate_options {
     $add_option->( 'break-at-old-keyword-breakpoints',   'bok', '!' );
     $add_option->( 'break-at-old-logical-breakpoints',   'bol', '!' );
     $add_option->( 'break-at-old-method-breakpoints',    'bom', '!' );
+    $add_option->( 'break-at-old-semicolon-breakpoints', 'bos', '!' );
     $add_option->( 'break-at-old-ternary-breakpoints',   'bot', '!' );
     $add_option->( 'break-at-old-attribute-breakpoints', 'boa', '!' );
     $add_option->( 'ignore-old-breakpoints',             'iob', '!' );
@@ -2003,14 +2209,12 @@ sub generate_options {
     %option_range = (
         'format'             => [ 'tidy', 'html', 'user' ],
         'output-line-ending' => [ 'dos',  'win',  'mac', 'unix' ],
-        'character-encoding' => [ 'none', 'utf8' ],
-
-        'space-backslash-quote' => [ 0, 2 ],
-
-        'block-brace-tightness'    => [ 0, 2 ],
-        'brace-tightness'          => [ 0, 2 ],
-        'paren-tightness'          => [ 0, 2 ],
-        'square-bracket-tightness' => [ 0, 2 ],
+        'space-backslash-quote'         => [ 0, 2 ],
+        'block-brace-tightness'         => [ 0, 2 ],
+        'keyword-paren-inner-tightness' => [ 0, 2 ],
+        'brace-tightness'               => [ 0, 2 ],
+        'paren-tightness'               => [ 0, 2 ],
+        'square-bracket-tightness'      => [ 0, 2 ],
 
         'block-brace-vertical-tightness'            => [ 0, 2 ],
         'brace-vertical-tightness'                  => [ 0, 2 ],
@@ -2071,6 +2275,7 @@ sub generate_options {
       break-at-old-keyword-breakpoints
       comma-arrow-breakpoints=5
       nocheck-syntax
+      character-encoding=guess
       closing-side-comment-interval=6
       closing-side-comment-maximum-text=20
       closing-side-comment-else-flag=0
@@ -2089,6 +2294,8 @@ sub generate_options {
       indent-columns=4
       iterations=1
       keep-old-blank-lines=1
+      keyword-paren-inner-tightness=1
+      logical-padding
       long-block-line-count=8
       look-for-autoloader
       look-for-selfloader
@@ -2107,7 +2314,6 @@ sub generate_options {
       nostatic-side-comments
       notabs
       nowarning-output
-      character-encoding=none
       one-line-block-semicolons=1
       one-line-block-nesting=0
       outdent-labels
@@ -2119,6 +2325,7 @@ sub generate_options {
       pass-version-line
       noweld-nested-containers
       recombine
+      nouse-unicode-gcstring
       valign
       short-concatenation-item-length=8
       space-for-semicolon
@@ -2183,8 +2390,9 @@ sub generate_options {
         'cb'             => [qw(cuddled-else)],
         'cuddled-blocks' => [qw(cuddled-else)],
 
-        'utf8' => [qw(character-encoding=utf8)],
-        'UTF8' => [qw(character-encoding=utf8)],
+        'utf8'  => [qw(character-encoding=utf8)],
+        'UTF8'  => [qw(character-encoding=utf8)],
+        'guess' => [qw(character-encoding=guess)],
 
         'swallow-optional-blank-lines'   => [qw(kbl=0)],
         'noswallow-optional-blank-lines' => [qw(kbl=1)],
@@ -4001,4 +4209,3 @@ sub do_syntax_check {
 }
 
 1;
-

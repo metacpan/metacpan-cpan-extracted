@@ -8,6 +8,7 @@ use File::Spec ();
 use File::Copy ();
 use File::Temp qw(tempdir);
 use Carp ();
+use Socket qw( $CR );
 
 use Test::Count::FileMutator ();
 use IO::Scalar               ();
@@ -59,13 +60,17 @@ sub _mycopy
 
     $mutator->modify();
 
-    open my $in, "<", $fn
+    open my $in, "<:raw", $fn
         or die "Could not open '$fn' - $!.";
 
     my $found = 0;
 LINES_LOOP:
     while ( my $l = <$in> )
     {
+        if ( $l =~ /$CR/ )
+        {
+            die "crlf found!";
+        }
         chomp($l);
         if ( $l eq "use Test::More tests => 3;" )
         {
@@ -101,7 +106,7 @@ LINES_LOOP:
 
     $mutator->modify();
 
-    open my $in, "<", $fn
+    open my $in, "<:raw", $fn
         or die "Could not open '$fn' - $!.";
 
     my $found = 0;
@@ -109,6 +114,10 @@ LINES_LOOP:
 LINES_LOOP:
     while ( my $l = <$in> )
     {
+        if ( $l =~ /$CR/ )
+        {
+            die "crlf found!";
+        }
         chomp($l);
         if ( ($value) = $l =~ m{\A\s+plan tests => (\d+);\z} )
         {

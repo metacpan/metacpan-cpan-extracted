@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/Azure/SAS/Timestamp.pm
+minil.toml
+t/00_compile.t
+t/010_use_timestamp.t
+t/110_values_timestamp.t
+META.yml
+MANIFEST

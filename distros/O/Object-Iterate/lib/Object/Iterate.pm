@@ -1,14 +1,8 @@
 package Object::Iterate;
-use strict;
+use v5.20;
 
 use warnings;
 no warnings;
-
-use subs qw(_check_object);
-use vars qw(
-	@EXPORT_OK %EXPORT_TAGS
-	$Next $More $Init $Final
-	);
 
 =encoding utf8
 
@@ -79,13 +73,13 @@ our %EXPORT_TAGS = (
 	all => \@EXPORT_OK,
 	);
 
-our $VERSION     = '1.142';
+our $VERSION     = '1.143';
 
 
-$Next  = '__next__';
-$More  = '__more__';
-$Init  = '__init__';
-$Final = '__final__';
+our $Next  = '__next__';
+our $More  = '__more__';
+our $Init  = '__init__';
+our $Final = '__final__';
 
 sub _check_object {
 	croak( "iterate object has no $Next() method" )
@@ -112,12 +106,11 @@ stays out of your way.
 	while( $object->__more__ )
 		{
 		local $_ = $object->__next__;
-
 		...BLOCK...
 		}
 =cut
 
-sub iterate (&$) {
+sub iterate :prototype(&$) {
 	my $sub    = shift;
 	my $object = shift;
 
@@ -125,9 +118,7 @@ sub iterate (&$) {
 
 	while( $object->$More() ) {
 		local $_;
-
 		$_ = $object->$Next();
-
 		$sub->();
 		}
 
@@ -144,16 +135,14 @@ returns all of the elements for which the BLOCK returns TRUE.
 This is a grep for something that cannot be represented as a
 list at one time.
 
-	while( $object->__more__ )
-		{
+	while( $object->__more__ ) {
 		local $_ = $object->__next__;
-
 		push @output, $_ if ...BLOCK...;
 		}
 
 =cut
 
-sub igrep (&$) {
+sub igrep :prototype(&$) {
 	my $sub    = shift;
 	my $object = shift;
 
@@ -161,12 +150,9 @@ sub igrep (&$) {
 
 	my @output = ();
 
-	while( $object->$More() )
-		{
+	while( $object->$More() ) {
 		local $_;
-
 		$_ = $object->$Next();
-
 		push @output, $_ if $sub->();
 		}
 
@@ -195,8 +181,7 @@ list at one time.
 
 =cut
 
-sub imap (&$)
-	{
+sub imap :prototype(&$) {
 	my $sub    = shift;
 	my $object = shift;
 
@@ -204,12 +189,9 @@ sub imap (&$)
 
 	my @output = ();
 
-	while( $object->$More )
-		{
+	while( $object->$More ) {
 		local $_;
-
 		$_ = $object->$Next;
-
 		push @output, $sub->();
 		}
 
@@ -258,7 +240,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2002-2018, brian d foy <bdfoy@cpan.org>. All rights reserved.
+Copyright © 2002-2020, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License 2.0.

@@ -63,6 +63,7 @@ my %attr = (
 	Variant_type			=> TYPES_BYTESTRING,
 	Variant_scalar			=> "bytestring $octets unicode",
     },
+    VariableAttributes_valueRank	=> VALUERANK_SCALAR,
     VariableAttributes_dataType		=> TYPES_BYTESTRING,
     VariableAttributes_accessLevel	=>
 	ACCESSLEVELMASK_READ | ACCESSLEVELMASK_WRITE,

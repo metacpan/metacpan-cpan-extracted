@@ -1,9 +1,9 @@
 package Sah::Schema::dbi::connstr;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-04'; # DATE
+our $DATE = '2020-03-08'; # DATE
 our $DIST = 'Sah-Schemas-DBI'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our $schema = [str => {
     summary => 'DBI connection string',
@@ -37,7 +37,7 @@ Sah::Schema::dbi::connstr - DBI connection string
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::Schema::dbi::connstr (from Perl distribution Sah-Schemas-DBI), released on 2020-03-04.
+This document describes version 0.004 of Sah::Schema::dbi::connstr (from Perl distribution Sah-Schemas-DBI), released on 2020-03-08.
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ Using with L<Data::Sah>:
  # even validators in other languages like JavaScript, from the same schema.
  # See its documentation for more details.
 
-Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
+Using in L<Rinci> function metadata (to be used with L<Perinci::CmdLine>, etc):
 
  package MyApp;
  our %SPEC;
@@ -73,15 +73,15 @@ Using in L<Rinci> function metadata (to be used in L<Perinci::CmdLine>, etc):
 
 Sample data:
 
- undef  # INVALID
+ ""  # INVALID
 
- undef  # valid
+ "dbi:SQLite:dbname=foo"  # valid
 
- undef  # INVALID
+ "DBI:SQLite:dbname=foo"  # INVALID
 
- undef  # INVALID
+ "dbi:Foo"  # INVALID
 
- undef  # valid
+ "dbi:Foo:bar=baz"  # valid
 
 =head1 DESCRIPTION
 

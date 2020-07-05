@@ -117,7 +117,7 @@ BEGIN
     fileattr => [@aAttribs],
     volflags => [@aVolFlags]
     );
-  $VERSION = '2.0';
+  $VERSION = '2.1';
   require XSLoader;
   XSLoader::load ('Win32::LongPath', $VERSION);
   }
@@ -999,7 +999,7 @@ if (!defined $sPath)
   { return; }
 $self->{dirpath} = _denormalize_path ($sPath);
 $self->find_first_file (_normalize_path (catfile ($sDir, '*')));
-if ($self->{handle} == 4294967295)
+if ($self->{handle} == -1)
   { return; }
 $self->{first} = _denormalize_path ($self->{first});
 set_last_error (0);

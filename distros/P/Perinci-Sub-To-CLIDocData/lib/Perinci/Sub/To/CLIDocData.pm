@@ -3,7 +3,7 @@ package Perinci::Sub::To::CLIDocData;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-04-27'; # DATE
 our $DIST = 'Perinci-Sub-To-CLIDocData'; # DIST
-our $VERSION = '0.293'; # VERSION
+our $VERSION = '0.294'; # VERSION
 
 use 5.010001;
 use strict;
@@ -431,15 +431,22 @@ sub gen_cli_doc_data_from_meta {
         my @opts;
         for my $ospec (sort keys %{ $ggls_res->[3]{'func.specmeta'} }) {
             my $ospecmeta = $ggls_res->[3]{'func.specmeta'}{$ospec};
+
             my $argprop = defined $ospecmeta->{arg} ? $args_prop{ $ospecmeta->{arg} } : undef;
             # only include args that have not been mentioned in positional
             next if defined $ospecmeta->{arg} && !$argprop;
             # only inlude common options that are not a specific action that are
             # invoked on its own
-            next if defined $ospecmeta->{common_opt} && $common_opts->{ $ospecmeta->{common_opt} }{usage};
+
+            my $copt = defined $ospecmeta->{common_opt} ? $common_opts->{ $ospecmeta->{common_opt} } : undef;
+            next if defined $ospecmeta->{common_opt} && $copt->{usage};
             push @opts, "[".Getopt::Long::Util::humanize_getopt_long_opt_spec({
                 separator=>" | ",
-                value_label=>($argprop->{'x.cli.opt_value_label'} // $argprop->{caption}),
+                value_label=>(
+                    $argprop ?
+                        ($argprop->{'x.cli.opt_value_label'} // $argprop->{caption}) :
+                        ($copt->{value_label})
+                    ),
             }, $ospec)."]";
         }
 
@@ -517,7 +524,7 @@ Perinci::Sub::To::CLIDocData - From Rinci function metadata, generate structure 
 
 =head1 VERSION
 
-This document describes version 0.293 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2020-04-27.
+This document describes version 0.294 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2020-04-27.
 
 =head1 SYNOPSIS
 

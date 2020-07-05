@@ -8,7 +8,7 @@ require URI;
 use Storable qw/dclone/;
 
 my $Test = Test::Builder->new;
-our $VERSION = 0.6;
+our $VERSION = 0.7;
 our $TODO;
 our $CURRENT_GROUP;
 
@@ -692,7 +692,7 @@ release it to the public.
 
  Dean Serenevy
  dean@serenevy.net
- http://dean.serenevy.net/
+ https://serenevy.net/
 
 =head1 LICENSE
 

@@ -3,9 +3,9 @@
 package Getopt::Long::Complete;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-10'; # DATE
+our $DATE = '2020-04-16'; # DATE
 our $DIST = 'Getopt-Long-Complete'; # DIST
-our $VERSION = '0.313'; # VERSION
+our $VERSION = '0.315'; # VERSION
 
 use strict;
 use warnings;
@@ -120,12 +120,14 @@ sub GetOptionsWithCompletion {
         $opt_permute ? 'permute' : 'no_permute',
         $opt_pass_through ? 'pass_through' : 'no_pass_through',
     );
+    my $res;
     if ($hash) {
-        Getopt::Long::GetOptions($hash, @_);
+        $res = Getopt::Long::GetOptions($hash, @_);
     } else {
-        Getopt::Long::GetOptions(@_);
+        $res = Getopt::Long::GetOptions(@_);
     }
     Getopt::Long::Configure($old_conf);
+    $res;
 }
 
 sub GetOptions {
@@ -147,7 +149,7 @@ Getopt::Long::Complete - A drop-in replacement for Getopt::Long, with shell tab 
 
 =head1 VERSION
 
-This document describes version 0.313 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2020-04-10.
+This document describes version 0.315 of Getopt::Long::Complete (from Perl distribution Getopt-Long-Complete), released on 2020-04-16.
 
 =head1 SYNOPSIS
 
@@ -192,7 +194,7 @@ Example:
          my %args  = @_;
          my $word  = $args{word}; # the word to be completed
          my $type  = $args{type}; # 'optname', 'optval', or 'arg'
-         my $opt   = $args{opt};
+         my $opt   = $args{opt}; # can be an array of options if ambiguous, e.g. ['--on-fail', '--on-full']
          if ($type eq 'optval' && $opt eq '--on-fail') {
              return complete_array_elem(array=>[qw/die warn ignore/], word=>$word);
          } elsif ($type eq 'optval' && ($opt eq '--user' || $opt eq '-U')) {

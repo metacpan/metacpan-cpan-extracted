@@ -1,20 +1,17 @@
 package IO::KQueue;
 
 use strict;
-use vars qw($VERSION @ISA @EXPORT $AUTOLOAD $MAX_EVENTS);
+use warnings;
 
-use DynaLoader ();
-use Exporter ();
-
-use Errno;
+use Exporter qw(import);
+use XSLoader;
 
 BEGIN {
-$VERSION = '0.34';
+our $VERSION = '0.37';
 
-$MAX_EVENTS = 1000;
+our $MAX_EVENTS = 1000;
 
-@ISA = qw(Exporter DynaLoader);
-@EXPORT = qw(
+our @EXPORT = qw(
     EV_ADD
     EV_DELETE
     EV_ENABLE
@@ -54,7 +51,7 @@ $MAX_EVENTS = 1000;
     KQ_UDATA
 );
 
-bootstrap IO::KQueue $VERSION;
+XSLoader::load(__PACKAGE__, $VERSION);
 }
 
 use constant EV_ADD => (constant('EV_ADD'))[1];
@@ -100,7 +97,7 @@ sub DESTROY {
 }
 
 sub AUTOLOAD {
-    my $sub = $AUTOLOAD;
+    my $sub = our $AUTOLOAD;
     (my $constname = $sub) =~ s/.*:://;
     my ($err, $val) = constant($constname);
     if (defined($err)) {

@@ -14,7 +14,7 @@ my $xml = $svg->dtddecl();
 
 ok( $xml, "dtd reclaration" );
 
-like( $xml, qr/DOCTYPE svg /, "doctype found" );
+like( $xml, qr/DOCTYPE svg /,                       "doctype found" );
 like( $xml, qr{ PUBLIC "-//W3C//DTD SVG 1.0//EN" }, "PUBLIC found" );
 like( $xml, qr{ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">},
     "SVG 1.0 TR" );

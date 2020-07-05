@@ -192,10 +192,12 @@ for f in $dynamic_ext; do
    esac
 done
 
-: Prepare dependency lists for Makefile.
+: Prepare dependency lists for Makefile.  Non-Unix systems likely will also
+: require changes in make_ext.pl
 dynamic_list=' '
 dynamic_ext_re="lib/auto/re/re.$dlext"
 extra_dep='
+cpan/Pod-Simple/pm_to_blib: dist/if/pm_to_blib
 ext/Pod-Functions/pm_to_blib: cpan/Pod-Simple/pm_to_blib cpan/Pod-Escapes/pm_to_blib pod/perlfunc.pod
 cpan/IO-Compress/pm_to_blib: dist/lib/pm_to_blib
 '
@@ -587,7 +589,7 @@ esac
 
 $spitshell >>$Makefile <<'!NO!SUBS!'
 
-perltoc_pod_prereqs = extra.pods pod/perl5303delta.pod pod/perlapi.pod pod/perlintern.pod pod/perlmodlib.pod pod/perluniprops.pod
+perltoc_pod_prereqs = extra.pods pod/perl5320delta.pod pod/perlapi.pod pod/perlintern.pod pod/perlmodlib.pod pod/perluniprops.pod
 generated_pods = pod/perltoc.pod $(perltoc_pod_prereqs)
 generated_headers = uudmap.h bitcount.h mg_data.h
 
@@ -1103,7 +1105,7 @@ catamount)
 $spitshell >>$Makefile <<!GROK!THIS!
 .PHONY: makeppport
 makeppport: \$(MINIPERL_EXE) \$(CONFIGPM)
-	-@for f in Makefile.PL PPPort_pm.PL PPPort_xs.PL ppport_h.PL; do \
+	-@for f in Makefile.PL PPPort_pm.PL RealPPPort_xs.PL ppport_h.PL; do \
 	(cd ext/Devel-PPPort && `pwd`/run.sh ../../$(MINIPERL_EXE) -I../../lib \$\$f); \
 	done
 
@@ -1151,9 +1153,9 @@ pod/perlintern.pod: $(MINIPERL_EXE) autodoc.pl embed.fnc
 pod/perlmodlib.pod: $(MINIPERL_EXE) pod/perlmodlib.PL MANIFEST
 	$(MINIPERL) pod/perlmodlib.PL -q
 
-pod/perl5303delta.pod: pod/perldelta.pod
-	$(RMS) pod/perl5303delta.pod
-	$(LNS) perldelta.pod pod/perl5303delta.pod
+pod/perl5320delta.pod: pod/perldelta.pod
+	$(RMS) pod/perl5320delta.pod
+	$(LNS) perldelta.pod pod/perl5320delta.pod
 
 extra.pods: $(MINIPERL_EXE)
 	-@test ! -f extra.pods || rm -f `cat extra.pods`
@@ -1655,15 +1657,15 @@ minitest_prep:
 	@echo "You may see some irrelevant test failures if you have been unable"
 	@echo "to build lib/Config.pm, or the Unicode data files."
 	@echo " "
-	- cd t && (rm -f $(PERL_EXE); $(LNS) ../$(MINIPERL_EXE) $(PERL_EXE))
+	cd t && (rm -f $(PERL_EXE); $(LNS) ../$(MINIPERL_EXE) $(PERL_EXE))
 
 MINITEST_TESTS = base/*.t comp/*.t cmd/*.t run/*.t io/*.t re/*.t opbasic/*.t op/*.t uni/*.t perf/*.t
 
 minitest: $(MINIPERL_EXE) minitest_prep
-	- cd t && $(RUN_PERL) TEST $(MINITEST_TESTS) <$(devtty)
+	cd t && $(RUN_PERL) TEST $(MINITEST_TESTS) <$(devtty)
 
 minitest-notty minitest_notty: $(MINIPERL_EXE) minitest_prep
-	- cd t && PERL_SKIP_TTY_TEST=1 $(RUN_PERL) TEST $(MINITEST_TESTS)
+	cd t && PERL_SKIP_TTY_TEST=1 $(RUN_PERL) TEST $(MINITEST_TESTS)
 
 # Test via harness
 

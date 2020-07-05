@@ -1,8 +1,12 @@
-package Raisin::Entity::Object;
+#!perl
+#PODNAME: Raisin::Entity::Object
+#ABSTRACT: An expose object.
 
 use strict;
 use warnings;
 
+package Raisin::Entity::Object;
+$Raisin::Entity::Object::VERSION = '0.90';
 use Plack::Util::Accessor qw(
     desc
     name
@@ -52,9 +56,17 @@ sub display_name {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Raisin::Entity::Object - An expose object.
+
+=head1 VERSION
+
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -97,11 +109,13 @@ or L<Raisin::Entity::Object/name> otherwise.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh E<lt>atE<gt> cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

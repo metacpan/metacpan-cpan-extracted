@@ -37,7 +37,6 @@ no_index:
     - DBIx::Class::Storage::BlockRunner
     - DBIx::Class::Carp
     - DBIx::Class::_Util
-    - DBIx::Class::ResultSet::Pager
 requires:
   Class::Accessor::Grouped: 0.10012
   Class::C3::Componentised: 1.0009
@@ -46,15 +45,13 @@ requires:
   Context::Preserve: 0.01
   DBI: 1.57
   Data::Dumper::Concise: 2.020
-  Data::Page: 2.00
   Devel::GlobalDestruction: 0.09
   Hash::Merge: 0.12
-  List::Util: 1.16
   MRO::Compat: 0.12
   Module::Find: 0.07
   Moo: 2.000
   Path::Class: 0.18
-  SQL::Abstract: 1.81
+  SQL::Abstract::Classic: 1.91
   Scope::Guard: 0.03
   Sub::Name: 0.04
   Text::Balanced: 2.00
@@ -62,16 +59,15 @@ requires:
   namespace::clean: 0.24
   perl: 5.8.1
 resources:
-  IRC: irc://irc.perl.org/#dbix-class
-  MailingList: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbix-class
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Class
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Perl5/DBIx-Class
-version: 0.082841
+version: 0.082842
 x_authority: cpan:RIBASUSHI
 x_contributors:
   - 'abraxxa: Alexander Hartmaier <abraxxa@cpan.org>'
   - 'acca: Alexander Kuznetsov <acca@cpan.org>'
+  - 'acme: Leon Brocard <acme@astray.com>'
   - 'aherzog: Adam Herzog <adam@herzogdesigns.com>'
   - 'Alexander Keusch <cpan@keusch.at>'
   - 'alexrj: Alessandro Ranellucci <aar@cpan.org>'
@@ -273,6 +269,7 @@ x_contributors:
   - 'willert: Sebastian Willert <willert@cpan.org>'
   - 'wintermute: Toby Corkindale <tjc@cpan.org>'
   - 'wreis: Wallace Reis <wreis@cpan.org>'
+  - 'x86-64 <x86mail@gmail.com>'
   - 'xenoterracide: Caleb Cushing <xenoterracide@gmail.com>'
   - 'xmikew: Mike Wisener <xmikew@32ths.com>'
   - 'yrlnry: Mark Jason Dominus <mjd@plover.com>'

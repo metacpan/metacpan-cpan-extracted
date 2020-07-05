@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-12-24'; # DATE
-our $VERSION = '1.043'; # VERSION
+our $DATE = '2020-06-18'; # DATE
+our $VERSION = '1.050'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,7 +32,7 @@ bencher - A benchmark framework (CLI)
 
 =head1 VERSION
 
-This document describes version 1.043 of bencher (from Perl distribution Bencher), released on 2019-12-24.
+This document describes version 1.050 of bencher (from Perl distribution Bencher), released on 2020-06-18.
 
 =head1 SYNOPSIS
 
@@ -321,6 +321,9 @@ iterations to do (e.g. 10, or 100). Or, can also be set to a negative number
 
 When benchmarking with <pm:Benchmark::Dumb::SimpleTime>, this value is a
 positive integer which means the number of iterations to perform.
+
+When profiling, a number greater than 1 will set a repetition loop (e.g. C<<
+for(1..100){ ... } >>).
 
 This setting overrides `default_precision` property in the scenario.
 
@@ -1065,6 +1068,14 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
 =back
 
 =head2 Result options
@@ -1075,7 +1086,7 @@ you want to pipe the result for more post-processing. In this case you can use
 
 Put additional note in the result.
 
-=item B<--result-dir>=I<dirname>
+=item B<--result-dir>=I<s>
 
 Directory to use when saving benchmark result.
 
@@ -1083,7 +1094,7 @@ Default is from `BENCHER_RESULT_DIR` environment variable, or the home
 directory.
 
 
-=item B<--result-filename>=I<filename>
+=item B<--result-filename>=I<s>
 
 Filename to use when saving benchmark result.
 
@@ -1310,7 +1321,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

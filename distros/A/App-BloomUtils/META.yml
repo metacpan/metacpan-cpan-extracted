@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-BloomUtils
   homepage: https://metacpan.org/release/App-BloomUtils
   repository: git://github.com/perlancar/perl-App-BloomUtils.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

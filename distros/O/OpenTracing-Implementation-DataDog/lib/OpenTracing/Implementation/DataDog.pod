@@ -5,6 +5,26 @@ OpenTracing::Implementation::DataDog - Sending traces to DataDog using Agent
 
 
 
+=head1 VERSION
+
+This is version 'v0.41.2'
+
+
+
+=head1 WARNING
+
+This version is for
+
+=over
+
+=item L<OpenTracing::Interface> version B<v0.204.x>
+
+=item L<OpenTracing::Role> vesion B<v0.81.2>
+
+=back
+
+
+
 =head1 SYNOPSIS
 
     use alias "OpenTracing::Implementation::DataDog", 'Implementation';
@@ -53,7 +73,7 @@ L<OpenTracing::Implementation::NoOp::Tracer> implementation.
 =item agent
 
 A hasreference with instantiation options for
-L<OpenTracing::Implementation::DataDog::Agent>.
+L<OpenTracing::Implementation::DataDog::Client>.
 
 =item default_context
 
@@ -85,7 +105,8 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-'OpenTracing::Implementation::NoOp' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+'OpenTracing::Implementation::DataDog'
+is Copyright (C) 2019 .. 2020, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

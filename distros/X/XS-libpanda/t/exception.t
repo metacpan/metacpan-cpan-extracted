@@ -6,9 +6,12 @@ use Config;
 use Test::More;
 use Test::Catch;
 
-#    *bsd 32bit: libunwind: EHHeaderParser::decodeTableEntry: bad fde: CIE ID is not zero
+# *bsd 32bit: libunwind: EHHeaderParser::decodeTableEntry: bad fde: CIE ID is not zero
+# https://forums.freebsd.org/threads/freebsd-12-0-libunwind-error.70851/
 # other: should be ok
-plan skip_all => 'backtrace is not supported on 32bit systems' if ($Config{ptrsize} == 4) && ($^O =~ /(bsd)/);
+
+my $frames_count = MyTest::call_dump_trace();
+plan skip_all => 'it seems the system has buggy glibc/libunwind, no sense to test' if !$frames_count;
 
 catch_run('[exception]');
 

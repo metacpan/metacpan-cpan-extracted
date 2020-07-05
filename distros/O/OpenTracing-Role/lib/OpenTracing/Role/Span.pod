@@ -80,6 +80,14 @@ See L<OpenTracing::Interface::Span/"add_tags">.
 
 
 
+=head2 C<get_tags>
+
+This will return a Hash of key/value pairs.
+
+See L<OpenTracing::Interface::Span/"get_tags">.
+
+
+
 =head2 C<log_data>
 
 Adds a log record to the span.
@@ -200,7 +208,10 @@ Its usefulnes currently is for dealing with c<span> inside C<Tracer>.
 See L<< C<finish> >>.
 
 
-=head1 INSTANCE METHODS
+=head1 ADDITONAL INSTANCE METHODS
+
+These methods are just for the convenience building an implementation, and are
+not part of the OpenTracing Interface..
 
 
 
@@ -209,6 +220,14 @@ See L<< C<finish> >>.
 The accessor for the L<< C<operatation_name> >>
 
 =over
+
+=item Parameter(s)
+
+=over
+
+I<none>
+
+=back
 
 =item Returns
 
@@ -229,6 +248,14 @@ not.
 
 =over
 
+=item Parameter(s)
+
+=over
+
+I<none>
+
+=back
+
 =item Returns
 
 =over
@@ -247,6 +274,14 @@ The identifier of the C<Span> itself, through its span context.
 
 =over
 
+=item Parameter(s)
+
+=over
+
+I<none>
+
+=back
+
 =item Returns
 
 =over
@@ -264,6 +299,14 @@ The identifier of the C<Span> itself, through its span context.
 The identifier of the parent C<Span>
 
 =over
+
+=item Parameter(s)
+
+=over
+
+I<none>
+
+=back
 
 =item Returns
 
@@ -284,6 +327,14 @@ L<< C<start_time> >> or L<< C<finish_time> >> has not been set yet.
 
 =over
 
+=item Parameter(s)
+
+=over
+
+I<none>
+
+=back
+
 =item Returns
 
 =over
@@ -302,6 +353,14 @@ A helper method to make it explicit that the time is in floating point, and not
 the usual integer number of seconds since epoch.
 
 =over
+
+=item Parameter(s)
+
+=over
+
+I<none>
+
+=back
 
 =item Returns
 

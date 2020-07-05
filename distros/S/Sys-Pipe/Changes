@@ -1,0 +1,8 @@
+Revision history for Perl module Sys::Pipe
+
+0.02 Tue 23 June 2020
+- Fix pre-5.8.9 perls
+- Fix Win32 installs (for what it’s worth …)
+
+0.01 Mon 22 June 2020
+- Initial release

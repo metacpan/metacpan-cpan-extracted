@@ -3,7 +3,7 @@ package threads::farm;
 # Set the version information
 # Make sure we do everything by the book from now on
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 use strict;
 
 # Make sure we can do threads
@@ -13,7 +13,7 @@ use strict;
 
 use threads ();
 use threads::shared qw(share cond_wait cond_broadcast);
-use threads::shared::queue::any;
+use Thread::Queue::Any;
 use Storable ();
 
 # Satisfy -require-
@@ -35,7 +35,7 @@ sub new {
 
     my $class = shift;
     my $self = bless shift,$class;
-    $self->{'queue'} = threads::shared::queue::any->new;
+    $self->{'queue'} = Thread::Queue::Any->new;
     $self->{'autoshutdown'} = 1 unless exists $self->{'autoshutdown'};
 
 # Initialize the hired/fired hash, jid counter, result hash and shutdown flag
@@ -638,6 +638,6 @@ code references can B<not> be serialized and therefor not be passed.
 
 =head1 SEE ALSO
 
-L<threads>, L<threads::shared::queue::any>, L<Storable>.
+L<threads>, L<Thread::Queue::Any>, L<Storable>.
 
 =cut

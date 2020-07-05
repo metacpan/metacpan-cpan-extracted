@@ -142,7 +142,7 @@ package Astro::Coord::ECI::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.113';
+our $VERSION = '0.114';
 our @ISA = qw{Exporter};
 
 use Carp;
@@ -431,7 +431,7 @@ sub atmospheric_extinction {
 =item $jd = date2jd ($sec, $min, $hr, $day, $mon, $yr)
 
 This subroutine converts the given date to the corresponding Julian day.
-The inputs are as for B<Time::Local::timegm>; $mon is in the range 0 -
+The inputs are a Perl date and time; $mon is in the range 0 -
 11, and $yr is from 1900, with earlier years being negative. The year 1
 BC is represented as -1900.
 
@@ -609,7 +609,8 @@ at the given universal time. That is,
 if $time is universal time.
 
 The algorithm is from Jean Meeus' "Astronomical Algorithms", 2nd
-Edition, Chapter 10, page 78.
+Edition, Chapter 10, page 78. Meeus notes that this is actually an
+observed quantity, and the algorithm is an approximation.
 
 =cut
 
@@ -676,7 +677,7 @@ sub epoch2datetime {
     my ($time) = @_;
     my $day = floor ($time / SECSPERDAY);
     my $sec = $time - $day * SECSPERDAY;
-    ($day, my $mon, my $yr, my $greg, my $leap) = jd2date (
+    ($day, my $mon, my $yr, undef, my $leap) = jd2date (
 	my $jd = $day + JD_OF_EPOCH);
     $day = floor ($day + .5);
     my $min = floor ($sec / 60);
@@ -826,7 +827,7 @@ C<Time::Local::timegm()> (if not.)
 
 This subroutine interprets years as Gregorian years.
 
-The difference between this and c<time_gm()> is that C<time_gm()>
+The difference between this and C<time_gm()> is that C<time_gm()>
 interprets the year the way C<Time::Local::timegm()> does.  For that
 reason, this subroutine is preferred over c<time_gm()>.
 

@@ -31,7 +31,7 @@
     
     number = "-"? $sign digit+ $digit %number;
 
-    simple_part = (number [Yy] %year) | (number "M" %month) | (number [Dd] %day) | (number "h" %hour) | (number "m" %min) | (number "s" %sec);
+    simple_part = (number [Yy] %year) | (number "M" %month) | (number [Dd] %day) | (number [Ww] %week) | (number "h" %hour) | (number "m" %min) | (number "s" %sec);
     simple = (simple_part (space+ simple_part)*) %{ format |= InputFormat::simple; };
     
     iso8601_duration = (
@@ -45,7 +45,7 @@ namespace panda { namespace date {
 
 %% write data;
 
-#define NSAVE(dest) { dest = acc; acc = 0; }
+#define NSAVE(dest) { dest += acc; acc = 0; }
         
 errc DateRel::parse (string_view str, int available_formats) {
     _year = _month = _day = _hour = _min = _sec = 0;

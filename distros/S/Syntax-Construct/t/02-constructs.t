@@ -21,12 +21,30 @@ use Syntax::Construct ();
 
 
 sub skippable {
-    my ($test, $reason, $value) = @_;
-    return "SKIP: { $test or skip $reason, 1; return $value } 'SKIPPED'"
+    my ($test, $reason, $code, $value) = @_;
+    return "SKIP: { $test or skip $reason, 1; $code; return $value } 'SKIPPED'"
 }
 
 
 my %tests = (
+    '5.032' => [
+        [ 'unicode13.0',
+          '"\N{NINJA}\N{DODO}"'
+          . ' eq "\N{U+1F977}\N{U+1F9A4}"',
+          1 ],
+        [ 'chained-comparisons',
+          'my ($x, $y, $z) = (1, 2, 3); $x < $y < $z',
+          # Constants don't work, see https://github.com/Perl/perl5/issues/17917
+          1 ],
+        [ 'unicode-identifier-status',
+          '(chr(9001) x 2) =~ /\p{Identifier_Status=Restricted}\p{Identifier_Type=Deprecated}/',
+          "1" ],
+        [ 'unicode-name-property',
+          'my $letter = "B"; "\N{BISON}\N{BEAVER}" =~ m{^\p{na=/$letter(ISON|EAVER)/}+$}',
+          1
+      ]
+    ],
+
     '5.030' => [
         [ 'unicode12.1',
           '"\N{FREEZING FACE}\N{SLOTH}\N{SQUARE ERA NAME REIWA}"'
@@ -41,7 +59,7 @@ my %tests = (
               'eval{setlocale(LC_ALL, "tr_TR.UTF-8") eq "tr_TR.UTF-8" or die;'
                   . ' lc "I" eq "\N{LATIN SMALL LETTER DOTLESS I}"}',
               '": testing locale not supported"',
-              1),
+              "", '1'),
           1 ],
     ],
 
@@ -95,7 +113,7 @@ my %tests = (
           1 ],
         [ 'fileno-dir', 'use File::Spec;'
               . skippable('opendir my $D, "File::Spec"->curdir',
-                          '": $!"',
+                          '": $!"', "",
                           'defined fileno $D || !! $!'),
           1, MAY_WORK_IN_OLDER ],  # $! might be set.
         [ '()x=',
@@ -223,7 +241,9 @@ my %tests = (
         [ '\gN',
           '"aba" =~ /(a)b\g{1}/;', 1],
         [ 'readline()',
-          'local *ARGV = *DATA{IO}; chomp(my $x = readline()); $x',
+          skippable('eval "require 5.8.1"',
+                    '": 5.8.1 required"',
+                    'local *ARGV = *DATA{IO}; chomp(my $x = readline())', '$x'),
           'readline default' ],
         [ 'stack-file-test',
           '-e -f $^X', 1],
@@ -258,6 +278,10 @@ for my $version (keys %tests) {
         my $load_error = $@;
         my $value = eval $triple->[1];
         my $run_error = $@;
+
+        # Debug skippable
+        # print STDERR "RUN: $triple->[1]\nRET: $value.\nERR: $run_error.\n";
+
         if ($can) {
             if ($was_removed) {
                 is($loaded, undef, "$triple->[0] not loaded");
@@ -267,13 +291,13 @@ for my $version (keys %tests) {
                 ok($run_error, "$triple->[0] doens't run");
                 $count += 2;
             } else {
-                if ('SKIPPED' ne $value) {
+                if ('SKIPPED' ne ($value || "")) {
                     is($value, $triple->[2], $triple->[0]);
                 }
             }
         } else {
             like($load_error,
-                 qr/^Unsupported construct \Q$triple->[0]\E at .*?02-constructs\.t line [0-9]+ \(Perl $vf needed\)\n/,
+                 qr/^Unsupported construct \Q$triple->[0]\E at .*?02-constructs\.t line [0-9]+ \(Perl \Q$vf\E needed\)\n/,
                  "$triple->[0] not supported");
             if (($value || "") ne 'SKIPPED'
                 && ($triple->[3] || "") ne MAY_WORK_IN_OLDER

@@ -21,7 +21,7 @@ use DateTime::Format::ISO8601;
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.711';
+our $VERSION = '0.712';
 
 Readonly my @VALID_RSVP_TYPES => qw(yes no maybe interested);
 
@@ -36,6 +36,7 @@ has 'original_source' => (
     isa => InstanceOf['URI'],
     is => 'lazy',
     coerce => sub { URI->new($_[0]) },
+    clearer => '_clear_original_source',
 );
 
 has 'source_html' => (
@@ -132,7 +133,10 @@ has 'response' => (
 class_has 'ua' => (
     isa => InstanceOf['LWP::UserAgent'],
     is => 'rw',
-    default => sub { LWP::UserAgent->new },
+    default => sub {
+        # Set the user-agent string to e.g. "Web::Mention/0.711"
+        LWP::UserAgent->new( agent => "$_[0]/$VERSION" );
+    },
 );
 
 class_has 'max_content_length' => (
@@ -1015,19 +1019,6 @@ properties.)
 
 The type of webmention this is. One of:
 
-=head3 verify
-
- my $is_verified = $wm->verify
-
-This B<verifies> the webmention, confirming that the content located at
-the source URL contains the target URL. Returns 1 if so, and 0
-otherwise. Will also return 0 if it cannot fetch the content at all,
-after one try.
-
-Sets C<is_tested> to 1 as a side-effect.
-
-See also L<"is_verified">.
-
 =over
 
 =item *
@@ -1059,6 +1050,19 @@ rsvp
 This list is based on the W3C Post Type Discovery document
 (L<https://www.w3.org/TR/post-type-discovery/#response-algorithm>), and
 adds a "quotation" type.
+
+=head3 verify
+
+ my $is_verified = $wm->verify
+
+This B<verifies> the webmention, confirming that the content located at
+the source URL contains the target URL. Returns 1 if so, and 0
+otherwise. Will also return 0 if it cannot fetch the content at all,
+after one try.
+
+Sets C<is_tested> to 1 as a side-effect.
+
+See also L<"is_verified">.
 
 =head1 SERIALIZATION
 

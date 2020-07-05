@@ -18,7 +18,7 @@ my (undef,undef,$dbh) = connect_database();
 if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 273;
+plan tests => 284;
 
 isnt ($dbh, undef, 'Connect to database for handle attributes testing');
 
@@ -526,7 +526,17 @@ is ($sth->{'NUM_OF_FIELDS'}, 2, $t);
 
 $t='Statement handle attribute "NAME" works correctly for SELECT statements';
 my $colnames = ['Sheep', 'id'];
-is_deeply ($sth->{'NAME'}, $colnames, $t);
+my $actual = $sth->{'NAME'};
+is_deeply ($actual, $colnames, $t);
+
+$t='Statement handle attribute "NAME" returns correct string lengths';
+is (length($actual->[0]), 5, $t);
+is (length($actual->[1]), 2, $t);
+my $expected_length = 5;
+for my $x (@$actual) {
+    is (length($x), $expected_length, $t);
+    $expected_length -= 3;
+}
 
 $t='Statement handle attribute "NAME_lc" works correctly for SELECT statements';
 $colnames = ['sheep', 'id'];
@@ -574,8 +584,9 @@ is ($sth->{'NUM_OF_PARAMS'}, 1, $t);
 $t='Statement handle attribute "NUM_OF_FIELDS" works correctly after finish';
 is ($sth->{'NUM_OF_FIELDS'}, 2, $t);
 
-$t='Statement handle attribute "NAME" returns undef after finish';
-is_deeply ($sth->{'NAME'}, undef, $t);
+$t='Statement handle attribute "NAME" returns values after finish';
+$colnames = ['Sheep', 'id'];
+is_deeply ($sth->{'NAME'}, $colnames, $t);
 
 $t='Statement handle attribute "NAME_lc" returns values after finish';
 $colnames = ['sheep', 'id'];
@@ -597,17 +608,21 @@ $t='Statement handle attribute "NAME_uc_hash" works correctly after finish';
 $colnames = {'SHEEP' => 0, ID => 1};
 is_deeply ($sth->{'NAME_uc_hash'}, $colnames, $t);
 
-$t='Statement handle attribute "TYPE" returns undef after finish';
-is_deeply ($sth->{'TYPE'}, undef, $t);
+$t='Statement handle attribute "TYPE" works correctly after finish';
+$colnames = [4, 6];
+is_deeply ($sth->{'TYPE'}, $colnames, $t);
 
 $t='Statement handle attribute "PRECISION" works correctly after finish';
-is_deeply ($sth->{'PRECISION'}, undef, $t);
+$colnames = [4, 8];
+is_deeply ($sth->{'PRECISION'}, $colnames, $t);
 
 $t='Statement handle attribute "SCALE" works correctly after finish';
-is_deeply ($sth->{'SCALE'}, undef, $t);
+$colnames = [undef,undef];
+is_deeply ($sth->{'SCALE'}, $colnames, $t);
 
 $t='Statement handle attribute "NULLABLE" works correctly after finish';
-is_deeply ($sth->{NULLABLE}, undef, $t);
+$colnames = [2,2];
+is_deeply ($sth->{NULLABLE}, $colnames, $t);
 
 ## Test UPDATE queries
 
@@ -619,24 +634,20 @@ is_deeply ($sth->{'NUM_OF_FIELDS'}, undef, $t);
 $t='Statement handle attribute "NAME" returns empty arrayref for updates';
 is_deeply ($sth->{'NAME'}, [], $t);
 
-## These cause assertion errors, may be a DBI bug.
-## Commenting out for now until we can examine closer
-## Please see: http://www.nntp.perl.org/group/perl.cpan.testers/2008/08/msg2012293.html
+$t='Statement handle attribute "NAME_lc" returns empty arrayref for updates';
+is_deeply ($sth->{'NAME_lc'}, [], $t);
 
-#$t='Statement handle attribute "NAME_lc" returns empty arrayref for updates';
-#is_deeply ($sth->{'NAME_lc'}, [], $t);
+$t='Statement handle attribute "NAME_uc" returns empty arrayref for updates';
+is_deeply ($sth->{'NAME_uc'}, [], $t);
 
-#$t='Statement handle attribute "NAME_uc" returns empty arrayref for updates';
-#is_deeply ($sth->{'NAME_uc'}, [], $t);
+$t='Statement handle attribute "NAME_hash" returns empty hashref for updates';
+is_deeply ($sth->{'NAME_hash'}, {}, $t);
 
-#$t='Statement handle attribute "NAME_hash" returns empty hashref for updates';
-#is_deeply ($sth->{'NAME_hash'}, {}, $t);
+$t='Statement handle attribute "NAME_uc_hash" returns empty hashref for updates';
+is_deeply ($sth->{'NAME_lc_hash'}, {}, $t);
 
-#$t='Statement handle attribute "NAME_uc_hash" returns empty hashref for updates';
-#is_deeply ($sth->{'NAME_lc_hash'}, {}, $t);
-
-#$t='Statement handle attribute "NAME_uc_hash" returns empty hashref for updates';
-#is_deeply ($sth->{'NAME_uc_hash'}, {}, $t);
+$t='Statement handle attribute "NAME_uc_hash" returns empty hashref for updates';
+is_deeply ($sth->{'NAME_uc_hash'}, {}, $t);
 
 $t='Statement handle attribute "TYPE" returns empty arrayref for updates';
 is_deeply ($sth->{'TYPE'}, [], $t);
@@ -689,10 +700,10 @@ SKIP: {
     $t='Statement handle attribute "PRECISION" returns correct info for RETURNING updates';
     is_deeply ($sth->{'PRECISION'}, [4,6,1], $t);
 
-    $t='Statement handle attribute "SCALE" returns correct info for RETURNING updates';
+    $t='Statement handle attribute "SCALE3" returns correct info for RETURNING updates';
     is_deeply ($sth->{'SCALE'}, [undef,2,undef], $t);
 
-    $t='Statement handle attribute "NULLABLE" returns empty arrayref for updates';
+    $t='Statement handle attribute "NULLABLE4" returns correct values for updates';
     is_deeply ($sth->{'NULLABLE'}, [0,1,1], $t);
 
     $dbh->do('UPDATE dbd_pg_test SET id = 1 WHERE id = 99');
@@ -1294,7 +1305,18 @@ like ($@, qr{ERRSTR}, $t);
 is ($dbh->errstr, 'ERRSTR', $t);
 is ($dbh->err, '42', $t);
 $dbh->{HandleSetErr} = 0;
+
+my $x = $dbh->errstr;
+$t='Database handle method "errstr" gives correct string length';
+is (length($x), 6, $t);
 $dbh->rollback();
+eval {
+    $dbh->do('SELECT 1/0');
+};
+$x = $dbh->errstr;
+ok (length($x) > 6, $t);
+$dbh->rollback();
+
 
 #
 # Test of the handle attribute "ErrCount"

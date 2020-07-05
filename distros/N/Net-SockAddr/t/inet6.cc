@@ -32,6 +32,17 @@ TEST_CASE("inet6") {
         CHECK(sa.ip() == "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
     }
 
+#if 0
+    /* this is real data, we seems coming from resolver; it seems resolver is buggy,
+     * but we decided to assume it correct*/
+    SECTION("from bytes") {
+        char data[] = "\n\000\000\000\000\000\000\000";
+        SockAddr sa((sockaddr*) data, 8);
+        CHECK(sa.is_inet6());
+    }
+#endif
+
+
     SECTION("localhost") {
         SockAddr::Inet6 sa("::1", 0);
         CHECK(sa.ip() == "::1");

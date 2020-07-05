@@ -3,7 +3,7 @@ package Net::Curl::Promiser;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =encoding utf-8
 
@@ -176,7 +176,11 @@ Returns I<OBJ>.
 sub cancel_handle {
     my ($self, $easy) = @_;
 
-    $self->{'to_fail'}{$easy} = [ $easy ];
+    $self->_is_pending($easy) or die "Cannot cancel non-pending request!";
+
+    # We need to cancel immediately so that our N::C::Multi object
+    # removes the handle before the next event loop iteration.
+    $self->_finish_handle($easy, 1);
 
     return $self;
 }
@@ -193,9 +197,17 @@ Returns I<OBJ>.
 sub fail_handle {
     my ($self, $easy, $reason) = @_;
 
+    $self->_is_pending($easy) or die "Cannot fail non-pending request!";
+
     $self->{'to_fail'}{$easy} = [ $easy, \$reason ];
 
     return $self;
+}
+
+sub _is_pending {
+    my ($self, $easy) = @_;
+
+    return $self->{'callbacks'}{$easy} || $self->{'deferred'}{$easy};
 }
 
 #----------------------------------------------------------------------

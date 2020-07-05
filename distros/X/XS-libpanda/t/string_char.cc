@@ -2,9 +2,6 @@
 TEST_CASE("basic_string<char>", "[string][string_char]") { test::test_string<char>::run(); }
 
 void test_compilation_warnings () {
-    using panda::string;
-    using panda::string_view;
-
     {
         struct {
             uint64_t a;

@@ -17,10 +17,10 @@ name: Tickit-Console
 provides:
   Tickit::Console:
     file: lib/Tickit/Console.pm
-    version: '0.08'
+    version: '0.09'
   Tickit::Console::Tab:
     file: lib/Tickit/Console/Tab.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Object::Pad: '0.27'
   String::Tagged: '0.10'
@@ -32,5 +32,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

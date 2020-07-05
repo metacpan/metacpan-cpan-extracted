@@ -6,9 +6,9 @@ use lib './t/lib';
 
 use Test::More tests => 30;
 
-use HTML::Widgets::NavMenu;
-use HTML::Widgets::NavMenu::HeaderRole;
-use HTML::Widgets::NavMenu::JQueryTreeView;
+use HTML::Widgets::NavMenu                 ();
+use HTML::Widgets::NavMenu::HeaderRole     ();
+use HTML::Widgets::NavMenu::JQueryTreeView ();
 
 use HTML::Widgets::NavMenu::Test::Data;
 

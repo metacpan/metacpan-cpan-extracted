@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,8 +22,10 @@ no_index:
     - inc
 requires:
   Class::Accessor::Fast: '0'
+  Const::Fast: '0'
   Digest::HMAC_MD5: '0'
   Digest::MD5: '0'
   Socket: '2.021'
   perl: v5.10.0
-version: v1.2.2
+version: v1.2.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

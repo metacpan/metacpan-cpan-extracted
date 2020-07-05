@@ -76,7 +76,7 @@ if( $ENV{box} )
 
     mysystem "rsync -a box/ box.i/";
     mysystem "rsync -a dan/node/ box.i/node/";
-    map { mysystem "rsync -a dan/tools/$_ box.i/tools/" } qw(range mcmd mssh expect vssh go rsync alias unalias sync config whois gateway git diskSpaceControl supervisor secure reborn check fastmd5 os );
+    map { mysystem "rsync -a dan/tools/$_ box.i/tools/" } qw(range mcmd mssh expect vssh go rsync alias unalias sync config whois gateway git gitrsync diskSpaceControl supervisor secure reborn check fastmd5 os );
     
 
     my @sed = (

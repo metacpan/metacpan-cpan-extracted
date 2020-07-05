@@ -1,7 +1,10 @@
 Revision history for Mail-DataFeed-Abusix
 
+1.20200617.1 2020-06-17 23:01:27+00:00 UTC
+  - Allow time to be passed in
+
 1.20200331.1 2020-03-31 03:20:53+00:00 UTC
-    - Avoid a warning
+  - Avoid a warning
 
 1.20181128 2018-11-28 15:19:10+11:00 Australia/Melbourne
-    - First release
+  - First release

@@ -1,5 +1,17 @@
 Revision history for Perl extension MOP4Import::Declare
 
+0.051    2020-06-28
+    * GH-81 - Reintroduce `--flatten` 
+    * GH-80 - Allow opts in ->cli_encode_as([$fmt,\%opts], @records)
+    * GH-79 - change Data::Dumper options for --output=dump
+    * GH-78 - make --output=ndjson as default format
+    * GH-77 - cli_read_file - pass %opts to each format readers 
+    * GH-75 - Change NamedCodeAttributes to Exporter
+    * GH-74 - Prepare MOP4Import::Util::Inspector to implement zsh completer
+    * GH-73 - Rename run() to cli_run(). (run() was too generic as an API entry name.)
+    * GH-72 - Fix tsv output and add cli_encode_as($outputFmt, @records)
+    * GH-57 - separate cli_array (returns `\@args`) and cli_list (returns `@args`) 
+
 0.050    2019-09-11
     * MOP4Import::Base::CLI_JSON is introduced with many cli_xxx APIs.
     * Other important changes follows:

@@ -137,7 +137,7 @@ like( $email, qr/Adam Kennedy/,  'Email contains from name' );
 like( $email, qr/phase-n/,       'Email contains to string' );
 like( $email, qr/Hello/,         'Email contains subject string' );
 like( $email, qr/I am an email/, 'Email contains text_body' );
-like( $email, qr{Content-Type: text/plain; name="dist\.ini"}, 'Email contains attachment content-Type' );
+like( $email, qr{Content-Type: text/plain; name=(?:"dist\.ini"|dist\.ini)}, 'Email contains attachment content-Type' );
 
 # attach_file with no such file
 $error = exception { Email::Stuffer->attach_file( 'no such file' ) };

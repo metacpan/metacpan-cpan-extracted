@@ -1,0 +1,14 @@
+package SPVM::EqualityChecker::SameObject {
+  sub new : SPVM::EqualityChecker::SameObject () {
+    return new SPVM::EqualityChecker::SameObject;
+  }
+  
+  sub : int ($self : self, $obj1 : object, $obj2 : object) {
+    if ($obj1 == $obj2) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+}

@@ -1,5 +1,9 @@
 Revision history for `ansifold' command.
 
+1.04 2020-07-05T01:25:37Z
+
+    - Eliminate indirect object call.
+
 1.03 2020-06-09T08:20:13Z
 
     - Use Text::ANSI::Fold 1.06

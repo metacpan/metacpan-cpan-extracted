@@ -1,15 +1,14 @@
 package Net::SAML2::Protocol::LogoutResponse;
 use Moose;
-use MooseX::Types::Moose qw/ Str /;
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
 
-has 'status'      => (isa => Str, is => 'ro', required => 1);
-has 'substatus'   => (isa => Str, is => 'ro', required => 0);
-has 'response_to' => (isa => Str, is => 'ro', required => 1);
+has 'status'      => (isa => 'Str', is => 'ro', required => 1);
+has 'substatus'   => (isa => 'Str', is => 'ro', required => 0);
+has 'response_to' => (isa => 'Str', is => 'ro', required => 1);
 
 
 sub new_from_xml {
@@ -84,7 +83,7 @@ Net::SAML2::Protocol::LogoutResponse
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -160,7 +159,8 @@ This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
   Copyright 2010-2011  Chris Andrews
             2012       Peter Marschall
             2017       Alessandro Ranellucci
-            2019-2020  Timothy Legge
+            2019       Timothy Legge
+            2020       Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

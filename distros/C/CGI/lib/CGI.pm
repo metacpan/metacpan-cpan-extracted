@@ -7,7 +7,7 @@ use strict;
 use warnings;
 #/;
 
-$CGI::VERSION='4.49';
+$CGI::VERSION='4.50';
 
 use CGI::Util qw(rearrange rearrange_header make_attributes unescape escape expires ebcdic2ascii ascii2ebcdic);
 
@@ -89,6 +89,9 @@ sub initialize_globals {
 
     # make param('PUTDATA') act like file upload
     $PUTDATA_UPLOAD = 0;
+
+    # Add QUERY_STRING to POST request
+    $APPEND_QUERY_STRING = 0;
 
     # Other globals that you shouldn't worry about.
     undef $Q;
@@ -553,6 +556,12 @@ sub init {
 	  ) {
 	  my($boundary) = $ENV{'CONTENT_TYPE'} =~ /boundary=\"?([^\";,]+)\"?/;
 	  $self->read_multipart($boundary,$content_length);
+	  if ($APPEND_QUERY_STRING) {
+	    # Some people want to have their cake and eat it too!
+	    # Set $APPEND_QUERY_STRING = 1 to have the contents of the query string
+	    # APPENDED to the POST data.
+	    $query_string .= (length($query_string) ? '&' : '') . $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
+	  }
 	  last METHOD;
       } 
 
@@ -651,10 +660,12 @@ sub init {
             $self->read_from_client(\$query_string,$content_length,0);
         }
 	  }
-	  # Some people want to have their cake and eat it too!
-	  # Uncomment this line to have the contents of the query string
-	  # APPENDED to the POST data.
-	  # $query_string .= (length($query_string) ? '&' : '') . $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
+	  if ($APPEND_QUERY_STRING) {
+	    # Some people want to have their cake and eat it too!
+	    # Set $APPEND_QUERY_STRING = 1 to have the contents of the query string
+	    # APPENDED to the POST data.
+	    $query_string .= (length($query_string) ? '&' : '') . $ENV{'QUERY_STRING'} if defined $ENV{'QUERY_STRING'};
+	  }
 	  last METHOD;
       }
 

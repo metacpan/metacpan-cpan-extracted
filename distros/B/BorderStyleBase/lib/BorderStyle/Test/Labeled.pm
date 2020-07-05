@@ -1,9 +1,9 @@
 package BorderStyle::Test::Labeled;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-11'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'BorderStyleBase'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use parent 'BorderStyleBase';
 
 our %BORDER = (
     v => 2,
-    summary => 'A border style that uses labeled characters as described in specification',
+    summary => 'A border style that uses labeled characters as described in specification, to show which character goes where',
     chars => [                 # y
         # 0    1    2    3 <-- x
         ['A', 'b', 'C', 'D'],  # 0
@@ -38,7 +38,7 @@ BorderStyle::Test::Labeled
 
 =head1 VERSION
 
-This document describes version 0.002 of BorderStyle::Test::Labeled (from Perl distribution BorderStyleBase), released on 2020-06-11.
+This document describes version 0.004 of BorderStyle::Test::Labeled (from Perl distribution BorderStyleBase), released on 2020-06-19.
 
 =head1 HOMEPAGE
 

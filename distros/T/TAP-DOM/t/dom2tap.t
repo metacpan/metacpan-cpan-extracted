@@ -68,4 +68,9 @@ my $tap2 = $tapdom->to_tap;
 my $tapdom2 = TAP::DOM->new( tap => $tap2 );
 check_tap("regenerated TAP", $tapdom2);
 
+# wantarray
+my @tap2 = $tapdom->to_tap;
+is(scalar(@tap2), 20, "to_tap - wantarray");
+is ($tap2, join("\n", @tap2)."\n", "to_tap - scalar is concatenated array");
+
 done_testing();

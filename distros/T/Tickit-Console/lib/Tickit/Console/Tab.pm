@@ -8,7 +8,7 @@ use Object::Pad 0.27;
 
 use Tickit::Widget::Tabbed;
 
-package Tickit::Console::Tab 0.08;
+package Tickit::Console::Tab 0.09;
 class Tickit::Console::Tab
    extends Tickit::Widget::Tabbed::Tab;
 
@@ -51,6 +51,15 @@ If defined, every time a line is added to the buffer, if it starts a new day
 since the previous message (because the format yields a different string),
 this message is added as well to the scroller.
 
+=item localtime => CODE
+
+If defined, provides an alternative function to C<CORE::localtime> for
+converting an epoch value into a timestamp. For example, this may be set to
+
+   sub { gmtime $_[0] }
+
+to generate timestamps in UTC instead of using the local timezone.
+
 =back
 
 =cut
@@ -61,6 +70,7 @@ has $_on_line;
 
 has $_timestamp_format;
 has $_datestamp_format;
+has $_localtime;
 
 BUILD ( $tabbed, %args )
 {
@@ -71,6 +81,8 @@ BUILD ( $tabbed, %args )
 
    $_timestamp_format = $args{timestamp_format};
    $_datestamp_format = $args{datestamp_format};
+
+   $_localtime = $args{localtime} // sub ( $time ) { localtime $time };
 }
 
 =head1 METHODS
@@ -172,7 +184,7 @@ method _make_item_with_timestamp ( $string, %opts )
 {
    if( my $timestamp_format = delete $opts{timestamp_format} // $_timestamp_format ) {
       my $time = delete $opts{time} // time();
-      my $timestamp = strftime( $timestamp_format, localtime $time );
+      my $timestamp = strftime( $timestamp_format, $_localtime->( $time ) );
 
       $string = $timestamp . $string;
    }
@@ -184,7 +196,7 @@ method append_line ( $string, %opts )
 {
    if( my $datestamp_format = delete $opts{datestamp_format} // $_datestamp_format ) {
       my $time = $opts{time} //= time();
-      my $plain = POSIX::strftime( $datestamp_format, my @t = localtime $time );
+      my $plain = POSIX::strftime( $datestamp_format, my @t = $_localtime->( $time ) );
 
       if( ( $_dusk_datestamp // "" ) ne $plain ) {
          my $datestamp = strftime( $datestamp_format, @t );
@@ -213,7 +225,7 @@ method prepend_line ( $string, %opts )
    my $datestamp_item;
    if( my $datestamp_format = delete $opts{datestamp_format} // $_datestamp_format ) {
       my $time = $opts{time} //= time();
-      my $plain = POSIX::strftime( $datestamp_format, my @t = localtime $time );
+      my $plain = POSIX::strftime( $datestamp_format, my @t = $_localtime->( $time ) );
 
       $_scroller->shift if ( $_dawn_datestamp // "" ) eq $plain;
 

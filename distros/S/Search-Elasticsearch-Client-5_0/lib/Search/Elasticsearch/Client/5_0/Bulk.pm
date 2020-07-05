@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::5_0::Bulk;
-$Search::Elasticsearch::Client::5_0::Bulk::VERSION = '6.80';
+$Search::Elasticsearch::Client::5_0::Bulk::VERSION = '6.81';
 use Moo;
 with 'Search::Elasticsearch::Client::5_0::Role::Bulk',
     'Search::Elasticsearch::Role::Is_Sync';
@@ -77,7 +77,7 @@ Search::Elasticsearch::Client::5_0::Bulk - A helper module for the Bulk API
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 SYNOPSIS
 

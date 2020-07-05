@@ -99,12 +99,14 @@ my $responses = [{
     },
     'ResponseHeader_serviceResult' => 'Good',
     'ResponseHeader_additionalHeader' => {
-      'ExtensionObject_content_typeId' => {
-	'NodeId_identifier' => 0,
-	'NodeId_identifierType' => 0,
-	'NodeId_namespaceIndex' => 0
+      'ExtensionObject_content' => {
+	'ExtensionObject_content_typeId' => {
+	  'NodeId_identifier' => 0,
+	  'NodeId_identifierType' => 0,
+	  'NodeId_namespaceIndex' => 0
+	},
+	'ExtensionObject_content_body' => undef,
       },
-      'ExtensionObject_content_body' => undef,
       'ExtensionObject_encoding' => 0
     }
   }
@@ -174,12 +176,14 @@ my $responses = [{
     },
     'ResponseHeader_serviceResult' => 'Good',
     'ResponseHeader_additionalHeader' => {
-      'ExtensionObject_content_typeId' => {
-	'NodeId_identifier' => 0,
-	'NodeId_identifierType' => 0,
-	'NodeId_namespaceIndex' => 0
+      'ExtensionObject_content' => {
+	'ExtensionObject_content_typeId' => {
+	  'NodeId_identifier' => 0,
+	  'NodeId_identifierType' => 0,
+	  'NodeId_namespaceIndex' => 0
+	},
+	'ExtensionObject_content_body' => undef,
       },
-      'ExtensionObject_content_body' => undef,
       'ExtensionObject_encoding' => 0
     }
   }

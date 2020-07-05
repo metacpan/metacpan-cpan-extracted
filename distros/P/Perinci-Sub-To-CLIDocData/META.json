@@ -69,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-To-CLIOptSpec"
       }
    },
-   "version" : "0.293",
+   "version" : "0.294",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

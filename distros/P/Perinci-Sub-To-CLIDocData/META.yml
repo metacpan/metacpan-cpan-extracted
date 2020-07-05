@@ -33,7 +33,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-To-CLIDocData
   homepage: https://metacpan.org/release/Perinci-Sub-To-CLIDocData
   repository: git://github.com/perlancar/perl-Perinci-Sub-To-CLIOptSpec.git
-version: '0.293'
+version: '0.294'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

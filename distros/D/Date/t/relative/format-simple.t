@@ -49,6 +49,12 @@ subtest 'Y' => sub {
     is $rel->to_string($fmt), "12Y";
 };
 
+subtest 'W' => sub {
+    my $rel = new Date::Rel("2W");
+    is $rel->day, 14;
+    is $rel->to_string($fmt), "14D";
+};
+
 subtest 'YMDhms' => sub {
     my $rel = new Date::Rel("1Y 2M 3D 4h 5m 6s");
     is($rel->sec, 6);

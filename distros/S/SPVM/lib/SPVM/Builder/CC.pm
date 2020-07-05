@@ -12,6 +12,7 @@ use File::Copy 'copy', 'move';
 use File::Path 'mkpath';
 use DynaLoader;
 use Config;
+use File::Find 'find';
 
 use File::Basename 'dirname', 'basename';
 
@@ -24,8 +25,6 @@ sub new {
 }
 
 sub category { shift->{category} }
-
-sub quiet { shift->{quiet} }
 
 sub builder { shift->{builder} }
 
@@ -63,30 +62,14 @@ sub build {
   }
 }
 
-sub copy_dll_to_build_dir {
-  my ($self, $package_name, $category) = @_;
-  
-  my $dll_file = $self->get_dll_file_dist($package_name);
-  
-  my $dll_rel_file = SPVM::Builder::Util::convert_package_name_to_dll_category_rel_file($package_name, $category);
-  
-  my $build_dir = $self->builder->{build_dir};
-  
-  my $dll_build_dir = "$build_dir/work/lib/$dll_rel_file";
-  
-  my $dll_build_dir_dir = dirname $dll_build_dir;
-  
-  mkpath $dll_build_dir_dir;
-  
-  copy $dll_file, $dll_build_dir
-    or confess "Can't copy $dll_file to $dll_build_dir";
-}
-
 sub get_dll_file_runtime {
   my ($self, $package_name) = @_;
   
   my $dll_rel_file = SPVM::Builder::Util::convert_package_name_to_dll_category_rel_file($package_name, $self->category);
   my $build_dir = $self->{build_dir};
+  
+  return unless defined $build_dir;
+  
   my $lib_dir = "$build_dir/work/lib";
   my $dll_file = "$lib_dir/$dll_rel_file";
   
@@ -124,7 +107,22 @@ sub get_config_runtime {
   }
   else {
     if ($category eq 'native') {
-      confess "Can't find $config_file: $@";
+      my $error = <<"EOS";
+Can't find $config_file.
+
+Config file must contains at least the following code
+----------------------------------------------
+use strict;
+use warnings;
+
+use SPVM::Builder::Config;
+my \$bconf = SPVM::Builder::Config->new_c99;
+
+\$bconf;
+----------------------------------------------
+$@
+EOS
+      confess $error;
     }
     else {
       $bconf = SPVM::Builder::Config->new_c99;
@@ -137,21 +135,65 @@ sub get_config_runtime {
 sub bind_subs {
   my ($self, $dll_file, $package_name, $sub_names) = @_;
   
-  # Load pre-required dlls
+  # m library is maybe not dynamic link library
+  my %must_not_load_libs = map { $_ => 1 } ('m');
+  
+  # Load pre-required dynamic library
   my $category = $self->category;
   my $bconf = $self->get_config_runtime($package_name, $category);
-  my $dll_infos = $bconf->parse_dll_infos;
-  
-  my $libpth = $Config{libpth};
-  my @dll_load_paths = split(/ +/, $libpth);
-  my $build_lib_dir = $self->{build_dir} . '/lib';
-  push @dll_load_paths, $build_lib_dir;
+  my $lib_dirs = $bconf->get_lib_dirs;
+  {
+    local @DynaLoader::dl_library_path = (@$lib_dirs, @DynaLoader::dl_library_path);
+    my $libs = $bconf->get_libs;
+    for my $lib (@$libs) {
+      unless ($must_not_load_libs{$lib}) {
+        my ($lib_file) = DynaLoader::dl_findfile("-l$lib");
+        my $dll_libref = DynaLoader::dl_load_file($lib_file);
+        unless ($dll_libref) {
+          my $dl_error = DynaLoader::dl_error();
+          confess "Can't load dll file \"$dll_file\": $dl_error";
+        }
+      }
+    }
+  }
   
   for my $sub_name (@$sub_names) {
     my $sub_abs_name = "${package_name}::$sub_name";
 
     my $cfunc_name = $self->create_cfunc_name($package_name, $sub_name);
-    my $cfunc_address = SPVM::Builder::Util::get_dll_func_address($dll_file, $cfunc_name);
+    my $cfunc_address;
+    if ($dll_file) {
+      my $dll_libref = DynaLoader::dl_load_file($dll_file);
+      if ($dll_libref) {
+        $cfunc_address = DynaLoader::dl_find_symbol($dll_libref, $cfunc_name);
+        unless ($cfunc_address) {
+          my $dl_error = DynaLoader::dl_error();
+          my $error = <<"EOS";
+Can't find native function \"$cfunc_name\" corresponding to $sub_abs_name in \"$dll_file\"
+
+You must write the following definition.
+--------------------------------------------------
+#include <spvm_native.h>
+
+int32_t $cfunc_name(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  return SPVM_SUCCESS;
+}
+--------------------------------------------------
+
+$dl_error
+EOS
+          confess $error;
+        }
+      }
+      else {
+        my $dl_error = DynaLoader::dl_error();
+        confess "Can't load dll file \"$dll_file\": $dl_error";
+      }
+    }
+    else {
+      confess "DLL file is not specified";
+    }
     
     if ($category eq 'native') {
       $self->bind_sub_native($package_name, $sub_name, $cfunc_address);
@@ -166,13 +208,13 @@ sub build_dll {
   my ($self, $package_name, $sub_names, $opt) = @_;
   
   # Compile source file and create object files
-  my $object_file = $self->compile($package_name, $opt);
+  my $object_files = $self->compile($package_name, $opt);
   
   # Link object files and create shared objectrary
   $self->link(
     $package_name,
     $sub_names,
-    $object_file,
+    $object_files,
     $opt
   );
 }
@@ -182,8 +224,11 @@ sub compile {
 
   # Build directory
   my $build_dir = $self->{build_dir};
-  unless (defined $build_dir && -d $build_dir) {
-    confess "SPVM build directory must be specified for runtime " . $self->category . " build";
+  if (defined $build_dir) {
+    mkpath $build_dir;
+  }
+  else {
+    confess "SPVM_BUILD_DIR environment variable must be set for compile";
   }
   
   # Input directory
@@ -210,6 +255,17 @@ sub compile {
   my $config_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file_with_ext($package_name, $category, 'config');
   my $config_file = "$src_dir/$config_rel_file";
   
+  # Native Directory
+  my $native_dir = $config_file;
+  $native_dir =~ s/\.config$//;
+  $native_dir .= '.native';
+  
+  # Include directory
+  my $native_include_dir = "$native_dir/include";
+  
+  # Source directory
+  my $native_src_dir = "$native_dir/src";
+
   # Config
   my $bconf;
   if (-f $config_file) {
@@ -218,22 +274,25 @@ sub compile {
   else {
     $bconf = SPVM::Builder::Config->new_c99;;
   }
+  
+  # Add native include dir
+  unshift @{$bconf->get_include_dirs}, $native_include_dir;
 
   # Quiet output
-  my $quiet = defined $bconf->get_quiet ? $bconf->get_quiet : $self->quiet;
+  my $quiet = $bconf->get_quiet;
   
-  # Source file
+  # SPVM Subroutine source file
   my $src_rel_file_no_ext = SPVM::Builder::Util::convert_package_name_to_category_rel_file_without_ext($package_name, $category);
-  my $src_file_no_ext = "$src_dir/$src_rel_file_no_ext";
+  my $spvm_sub_src_file_no_ext = "$src_dir/$src_rel_file_no_ext";
   my $src_ext = $bconf->get_ext;
   unless (defined $src_ext) {
     confess "Source extension is not specified";
   }
-  my $src_file = "$src_file_no_ext.$src_ext";
-  unless (-f $src_file) {
-    confess "Can't find source file $src_file";
+  my $spvm_sub_src_file = "$spvm_sub_src_file_no_ext.$src_ext";
+  unless (-f $spvm_sub_src_file) {
+    confess "Can't find source file $spvm_sub_src_file";
   }
-
+  
   # CBuilder configs
   my $ccflags = $bconf->get_ccflags;
   
@@ -244,68 +303,177 @@ sub compile {
   # Compile source files
   my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
   
-  # Object file
-  my $object_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file_with_ext($package_name, $category, 'o');
-  my $object_file = "$object_dir/$object_rel_file";
+  # Parse source code dependency
+  my $dependency = $self->_parse_native_src_dependency($native_include_dir, $native_src_dir);
+
+  # Native source files
+  my @native_src_files = sort keys %$dependency;
   
-  # Do compile. This is same as make command
-  my $do_compile;
-  if ($package_name =~ /^anon/) {
-    $do_compile = 1;
-  }
-  else {
-    if (!-f $object_file) {
+  # Compile source files
+  my $object_files = [];
+  my $is_native_src;
+  for my $src_file ($spvm_sub_src_file, @native_src_files) {
+    my $object_file;
+    # Native object file name
+    if ($is_native_src) {
+      my $object_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file_with_ext($package_name, $category, 'native');
+      
+      my $object_file_base = $src_file;
+      $object_file_base =~ s/^\Q$native_src_dir//;
+      $object_file_base =~ s/^[\\\/]//;
+      
+      $object_file_base =~ s/\.[^\.]+$/.o/;
+      $object_file = "$object_dir/$object_rel_file/$object_file_base";
+      
+      my $object_dir = dirname $object_file;
+      mkpath $object_dir;
+    }
+    # SPVM subroutine object file name
+    else {
+      my $object_rel_file = SPVM::Builder::Util::convert_package_name_to_category_rel_file_with_ext($package_name, $category, 'o');
+      $object_file = "$object_dir/$object_rel_file";
+    }
+    
+    # Do compile. This is same as make command
+    my $do_compile;
+    if ($package_name =~ /^anon/) {
       $do_compile = 1;
     }
     else {
-      if (defined $bconf->get_cache && !$bconf->get_cache) {
+      if ($bconf->get_force_compile) {
         $do_compile = 1;
       }
       else {
-        # Source file modified time is newer than object file
-        my $mod_time_src = (stat($src_file))[9];
-        my $mod_time_object = (stat($object_file))[9];
-        if ($mod_time_src > $mod_time_object) {
+        if (!-f $object_file) {
           $do_compile = 1;
         }
         else {
-          # Config file modified time is newer than object file
+          # Do compile if one of dependency files(source file and include files and config file) is newer than object file
+          my @dependency_files;
           if (-f $config_file) {
-            my $mod_time_config = (stat($config_file))[9];
-            my $mod_time_object = (stat($object_file))[9];
-            if ($mod_time_config > $mod_time_object) {
+            push @dependency_files, $config_file;
+          }
+          push @dependency_files, $src_file;
+          my $dependency_files_native = $dependency->{$src_file};
+          if ($dependency_files_native) {
+            for my $dependency_file_native (@$dependency_files_native) {
+              push @dependency_files, $dependency_file_native;
+            }
+          }
+          
+          my $mod_time_object_file = (stat($object_file))[9];
+          for my $dependency_file (@dependency_files) {
+            my $mod_time_dependency_file = (stat($dependency_file))[9];
+            if ($mod_time_dependency_file > $mod_time_object_file) {
               $do_compile = 1;
+              last;
             }
           }
         }
       }
     }
+    
+    if ($do_compile) {
+      eval {
+        # Compile source file
+        $cbuilder->compile(
+          source => $src_file,
+          object_file => $object_file,
+          include_dirs => $bconf->get_include_dirs,
+          extra_compiler_flags => $bconf->get_extra_compiler_flags,
+        );
+      };
+      if (my $error = $@) {
+        confess $error;
+      }
+    }
+    push @$object_files, $object_file;
+    
+    $is_native_src = 1;
   }
   
-  if ($do_compile) {
-    eval {
-      # Compile source file
-      $cbuilder->compile(
-        source => $src_file,
-        object_file => $object_file,
-        extra_compiler_flags => $bconf->get_extra_compiler_flags,
-      );
-    };
-    if (my $error = $@) {
-      confess $error;
+  return $object_files;
+}
+
+sub _parse_native_src_dependency {
+  my ($self, $include_dir, $src_dir) = @_;
+  
+  # Get header files
+  my @include_file_names;
+  if (-d $include_dir) {
+    find(
+      {
+        wanted => sub {
+          my $include_file_name = $File::Find::name;
+          if (-f $include_file_name) {
+            push @include_file_names, $include_file_name;
+          }
+        },
+        no_chdir => 1,
+      },
+      $include_dir,
+    );
+  }
+  
+  # Get source files
+  my @src_file_names;
+  if (-d $src_dir) {
+    find(
+      {
+        wanted => sub {
+          my $src_file_name = $File::Find::name;
+          if (-f $src_file_name) {
+            push @src_file_names, $src_file_name;
+          }
+        },
+        no_chdir => 1,
+      },
+      $src_dir,
+    );
+  }
+  
+  my $dependencies = {};
+  for my $include_file_name (@include_file_names) {
+    my $include_file_name_no_ext_rel = $include_file_name;
+    $include_file_name_no_ext_rel =~ s/^\Q$include_dir//;
+    $include_file_name_no_ext_rel =~ s/^[\\\/]//;
+    $include_file_name_no_ext_rel =~ s/\.[^\\\/]+$//;
+    
+    my $match_at_least_one;
+    for my $src_file_name (@src_file_names) {
+      my $src_file_name_no_ext_rel = $src_file_name;
+      $src_file_name_no_ext_rel =~ s/^\Q$src_dir//;
+      $src_file_name_no_ext_rel =~ s/^[\\\/]//;
+      $src_file_name_no_ext_rel =~ s/\.[^\\\/]+$//;
+      
+      if ($src_file_name_no_ext_rel eq $include_file_name_no_ext_rel) {
+        $dependencies->{$src_file_name} ||= [];
+        push @{$dependencies->{$src_file_name}}, $include_file_name;
+        $match_at_least_one++;
+      }
+    }
+    
+    # If not match at least one, we assume the header files is common file
+    unless ($match_at_least_one) {
+      for my $src_file_name (@src_file_names) {
+        push @{$dependencies->{$src_file_name}}, $include_file_name;
+      }
     }
   }
   
-  return $object_file;
+  return $dependencies;
 }
 
 sub link {
-  my ($self, $package_name, $sub_names, $object_file, $opt) = @_;
+  my ($self, $package_name, $sub_names, $object_files, $opt) = @_;
 
   # Build directory
   my $build_dir = $self->{build_dir};
-  unless (defined $build_dir && -d $build_dir) {
-    confess "SPVM build directory must be specified for runtime " . $self->category . " build";
+  if (defined $build_dir) {
+    mkpath $build_dir;
+  }
+  else {
+    confess "SPVM_BUILD_DIR environment variable must be set for linking" . $self->category . " build";
   }
   
   # Input directory
@@ -346,11 +514,40 @@ sub link {
     $bconf = SPVM::Builder::Util::load_config($config_file);
   }
   else {
-    $bconf = SPVM::Builder::Config->new_c99;;
+    if ($category eq 'native') {
+      my $error = <<"EOS";
+Can't find $config_file.
+
+Config file must contains at least the following code
+----------------------------------------------
+use strict;
+use warnings;
+
+use SPVM::Builder::Config;
+my \$bconf = SPVM::Builder::Config->new_c99;
+
+\$bconf;
+----------------------------------------------
+
+EOS
+      confess $error;
+    }
+    else {
+      $bconf = SPVM::Builder::Config->new_c99;
+    }
   }
 
+  # Native Directory
+  my $native_dir = $config_file;
+  $native_dir =~ s/\.config$//;
+  $native_dir .= '.native';
+  
+  # Library directory
+  my $native_lib_dir = "$native_dir/lib";
+  $bconf->add_lib_dirs($native_lib_dir);
+
   # Quiet output
-  my $quiet = defined $bconf->get_quiet ? $bconf->get_quiet : $self->quiet;
+  my $quiet = $bconf->get_quiet;
   
   # CBuilder configs
   my $lddlflags = $bconf->get_lddlflags;
@@ -376,12 +573,17 @@ sub link {
   
   my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
   my $tmp_dll_file;
+  my $lib_dirs_str = join(' ', map { "-L$_" } @{$bconf->get_lib_dirs});
+  my $libs_str = join(' ', map { "-l$_" } @{$bconf->get_libs});
+  my $extra_linker_flag = $bconf->get_extra_linker_flags;
+  
+  $extra_linker_flag = "$lib_dirs_str $libs_str $extra_linker_flag";
   eval {
     $tmp_dll_file = $cbuilder->link(
-      objects => [$object_file],
+      objects => $object_files,
       module_name => $package_name,
       dl_func_list => $cfunc_names,
-      extra_linker_flags => $bconf->get_extra_linker_flags,
+      extra_linker_flags => $extra_linker_flag
     );
   };
   if (my $error = $@) {
@@ -416,8 +618,11 @@ sub build_dll_precompile_runtime {
 
   # Build directory
   my $build_dir = $self->{build_dir};
-  unless (defined $build_dir && -d $build_dir) {
-    confess "SPVM build directory must be specified for runtime " . $self->category . " build";
+  if (defined $build_dir) {
+    mkpath $build_dir;
+  }
+  else {
+    confess "SPVM_BUILD_DIR environment variable must be set for build precompile subroutine in runtime";
   }
   
   # Object directory
@@ -459,8 +664,11 @@ sub build_dll_native_runtime {
 
   # Build directory
   my $build_dir = $self->{build_dir};
-  unless (defined $build_dir && -d $build_dir) {
-    confess "SPVM build directory must be specified for runtime " . $self->category . " build";
+  if (defined $build_dir) {
+    mkpath $build_dir;
+  }
+  else {
+    confess "SPVM_BUILD_DIR environment variable must be set for build native subroutine in runtime";
   }
   
   my $object_dir = "$build_dir/work/object";
@@ -483,10 +691,10 @@ sub build_dll_native_runtime {
 sub build_dll_precompile_dist {
   my ($self, $package_name, $sub_names) = @_;
   
-  my $object_dir = "spvm_build/work/object";
+  my $object_dir = ".spvm_build/work/object";
   mkpath $object_dir;
   
-  my $src_dir = "spvm_build/work/src";
+  my $src_dir = ".spvm_build/work/src";
   mkpath $src_dir;
 
   my $lib_dir = 'blib/lib';
@@ -515,7 +723,7 @@ sub build_dll_native_dist {
   
   my $src_dir = 'lib';
 
-  my $object_dir = "spvm_build/work/object";
+  my $object_dir = ".spvm_build/work/object";
   mkpath $object_dir;
 
   my $lib_dir = 'blib/lib';

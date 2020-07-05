@@ -1,0 +1,43 @@
+{
+   "abstract" : "Create detached PGP signatures for data, securely",
+   "author" : [
+      "Russ Allbery <rra@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PGP-Sign",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Run" : "0",
+            "perl" : "5.020"
+         }
+      }
+   },
+   "provides" : {
+      "PGP::Sign" : {
+         "file" : "lib/PGP/Sign.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

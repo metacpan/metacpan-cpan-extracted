@@ -10,9 +10,10 @@ use parent qw( DBI );
 use DBI::Const::GetInfoType;
 use Log::Dispatch;
 use POSIX qw( strftime );
+use Scalar::Util qw( reftype );
 use Term::Encoding qw( term_encoding );
 
-use version 0.77; our $VERSION = version->declare("v0.0.9");
+use version 0.77; our $VERSION = version->declare("v0.0.10");
 
 our $KeepBindingIfNoKey = 0;
 
@@ -91,7 +92,7 @@ sub driver_typename_map {
 sub prepare_ex {
     my ( $self, $sqlex, $refHash ) = @_;
     my $ret       = undef;
-    my $validHash = defined($refHash) && ref($refHash) eq 'HASH';
+    my $validHash = defined($refHash) && ( reftype($refHash) || '' ) eq 'HASH';
     if ( $sqlex =~ /\:([\w]+)\+-($_SQL_Types)\b/ ) {
         if ($validHash) {
             $sqlex =~ s/\:([\w]+)\+-($_SQL_Types)\b/_parse_ex1($refHash,$1,$2);/ge;
@@ -156,7 +157,7 @@ sub _parse_ex2 {
 sub bind_param_ex {
     no warnings 'uninitialized';
     my ( $self, $refHash ) = @_;
-    if ( !defined($refHash) || ref($refHash) ne 'HASH' ) {
+    if ( !defined($refHash) || ( reftype($refHash) || '' ) ne 'HASH' ) {
         croak("bind_param_ex need a hash reference.");
     }
     my $thisFunc = _thisFuncName();
@@ -298,6 +299,8 @@ When the hash reference doesn't have the key that is same to the parameter name,
 L<Tao::DBI>
 
 L<DBIx::NamedBinding>
+
+L<SQL::NamedPlaceholder>
 
 =head2 DBD informations
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package App::Uni;
 # ABSTRACT: command-line utility to find or display Unicode characters
-$App::Uni::VERSION = '9.003';
+$App::Uni::VERSION = '9.004';
 #pod =encoding utf8
 #pod
 #pod =head1 NAME
@@ -62,6 +62,7 @@ sub _do_help {
     "uni -n SEARCH-TERMS... - find codepoints with matching names",
     "uni -c STRINGS...      - print out the codepoints in a string",
     "uni -u CODEPOINTS...   - look up and print hex codepoints",
+    "uni -x HEX-OCTETS...   - given the sequence of octets, in hex, decode",
     "",
     "Other switches:",
     "    -8                 - also show the UTF-8 bytes to encode\n";
@@ -79,6 +80,7 @@ sub run {
       "u" => \$opt{u_numbers},
       "n" => \$opt{names},
       "s" => \$opt{single},
+      "x" => \$opt{hex_octets},
       "8" => \$opt{utf8},
       "help|?" => \$opt{help},
     );
@@ -87,7 +89,7 @@ sub run {
 
   $class->_do_help if $opt{help};
 
-  my $n = grep { $_ } @opt{qw(explode u_numbers names single)};
+  my $n = grep { $_ } @opt{qw(explode u_numbers names single hex_octets)};
 
   $class->_do_help("ERROR: only one mode switch allowed!") if $n > 1;
 
@@ -97,6 +99,7 @@ sub run {
             : $opt{u_numbers}                     ? \&do_u_numbers
             : $opt{names}                         ? \&do_names
             : $opt{single}                        ? \&do_single
+            : $opt{hex_octets}                    ? \&do_hex_octets
             : @argv == 1 && length $argv[0] == 1  ? \&do_single
             :                                       \&do_dwim;
 
@@ -113,6 +116,18 @@ sub do_single {
 
 sub do_explode {
   print_chars( explode_strings($_[0]), $_[1] );
+}
+
+sub do_hex_octets {
+  my $string = '';
+  for my $hunk (@{ $_[0] }) {
+    die "input hunk $hunk is not an even-length hex string\n"
+      unless $hunk =~ /\A[0-9A-F]+\z/i && length($hunk) % 2 == 0;
+
+    $string .= chr oct "0x$_" for $hunk =~ /(..)/g;
+  }
+
+  print_chars( explode_strings([ Encode::decode_utf8($string) ], $_[1]) );
 }
 
 sub explode_strings {
@@ -157,7 +172,7 @@ sub print_chars {
 
     # U+25CC DOTTED CIRCLE
     my $c2 = Unicode::GCString->new(
-      $c =~ /\p{COMBINING MARK}/ ? "\x{25CC}$c" : $c
+      $c =~ /\pM/ ? "\x{25CC}$c" : $c
     );
     my $l  = $c2->columns;
 
@@ -209,28 +224,34 @@ sub chars_by_name {
     }
   }
 
-  my $corpus = require 'unicore/Name.pl';
-  die "somebody beat us here" if $corpus eq '1';
+  state $corpus = do 'unicore/Name.pl';
+  unless (defined $corpus) {
+      die "couldn't parse unicore/Name.pl: $@" if $@;
+      die "couldn't read unicore/Name.pl: $!" if $!;
+      die "unicore/Name.pl returned undef";
+  }
 
-  my @lines = split /\cJ/, $corpus;
+  # https://github.com/perl/perl5/commit/b555069b72f93a232deba173dc7bf7892cfa5868
+  my ($entry_sep, $field_sep) = "$]" >= 5.031010 ? ("\n\n", "\n") : ("\n", "\t");
+  my @entries = split $entry_sep, $corpus;
   my @chars;
 
   my %seen;
-  LINE: for my $line (@lines) {
-    my $i = index($line, "\t");
-    next if rindex($line, " ", $i) >= 0; # no sequences
+  ENTRY: for my $entry (@entries) {
+    my $i = index($entry, $field_sep);
+    next if rindex($entry, " ", $i) >= 0; # no sequences
 
-    my $name = substr($line, $i+1);
-    my $ord  = hex substr($line, 0, $i);
+    my $name = substr($entry, $i+1);
+    my $ord  = hex substr($entry, 0, $i);
 
     for (@terms) {
-      next LINE unless $name =~ $_->{pattern}
-                or     defined $_->{ord} && $_->{ord} == $ord;
+      next ENTRY unless $name =~ $_->{pattern}
+                 or     defined $_->{ord} && $_->{ord} == $ord;
     }
 
-    my $c = chr hex substr $line, 0, $i;
+    my $c = chr hex substr $entry, 0, $i;
     next if $seen{$c}++;
-    push @chars, chr hex substr $line, 0, $i;
+    push @chars, chr hex substr $entry, 0, $i;
   }
 
   return \@chars;
@@ -261,7 +282,7 @@ App::Uni - command-line utility to find or display Unicode characters
 
 =head1 VERSION
 
-version 9.003
+version 9.004
 
 =head1 SYNOPSIS
 
@@ -302,6 +323,22 @@ Thank-you, Larry, for everything. ♡
 =head1 AUTHOR
 
 Ricardo Signes <rjbs@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Dagfinn Ilmari Mannsåker Ricardo Signes
+
+=over 4
+
+=item *
+
+Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

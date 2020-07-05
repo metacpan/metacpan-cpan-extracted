@@ -7,7 +7,7 @@ use Pod::Usage;
 use strict;
 use warnings;
 
-my $VERSION = '5.54';
+my $VERSION = '5.56';
 my $GDV = "GD_Filter_Enzymes$VERSION";
 
 local $| = 1;
@@ -235,7 +235,7 @@ __END__
 
 =head1 VERSION
 
-  Version 5.54
+  Version 5.56
 
 =head1 DESCRIPTION
 

@@ -30,12 +30,14 @@ my @files = (
     't/author-no-breakpoints.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
+    't/author-pod-no404s.t',
     't/author-pod-spell.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-pause-permissions.t',
+    't/release-test-legal.t',
     't/release-unused-vars.t'
 );
 

@@ -8,7 +8,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
     ($folded, $remain) = ansi_fold($text, $width, [ option ]);
 
     use Text::ANSI::Fold;
-    my $f = new Text::ANSI::Fold width => 80, boundary => 'word';
+    my $f = Text::ANSI::Fold->new(width => 80, boundary => 'word');
     $f->configure(ambiguous => 'wide');
     ($folded, $remain) = $f->fold($text);
 
@@ -19,13 +19,13 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
     }
 
     use Text::ANSI::Fold qw(:constants);
-    my $fold = new Text::ANSI::Fold
+    my $fold = Text::ANSI::Fold->new(
         width     => 70,
         boundary  => 'word',
         linebreak => LINEBREAK_ALL,
         runin     => 4,
         runout    => 4,
-        ;
+        );
 
 # DESCRIPTION
 
@@ -75,9 +75,10 @@ using default width with additional parameter:
 You can create an object to hold parameters, which is effective during
 object life time.  For example, 
 
-    my $f = new Text::ANSI::Fold
+    my $f = Text::ANSI::Fold->new(
         width => 80,
-        boundary => 'word';
+        boundary => 'word',
+        );
 
 makes an object folding on word boundaries with 80 columns width.
 Then you can use this without parameters.
@@ -124,7 +125,7 @@ Actually, text can be set by **new** or **configure** method through
 When using **chops** method, **width** parameter can take array
 reference, and chops text into given width list.
 
-    my $fold = new Text::ANSI::Fold;
+    my $fold = Text::ANSI::Fold->new;
     my @list = $fold->text("1223334444")->chops(width => [ 1, 2, 3 ]);
     # return ("1", "22", "333") and keep "4444"
 
@@ -137,7 +138,7 @@ function as well as **new** and **configure** method.
 
     Text::ANSI::Fold->configure(boundary => 'word');
 
-    my $f = new Text::ANSI::Fold boundary => 'word';
+    my $f = Text::ANSI::Fold->new(boundary => 'word');
 
     $f->configure(boundary => 'word');
 
@@ -214,13 +215,13 @@ characters with prohibited character handling.
     use open IO => 'utf8', ':std';
     
     use Text::ANSI::Fold qw(:constants);
-    my $fold = new Text::ANSI::Fold
+    my $fold = Text::ANSI::Fold->new(
         width     => 70,
         boundary  => 'word',
         linebreak => LINEBREAK_ALL,
         runin     => 4,
         runout    => 4,
-        ;
+        );
     
     $, = "\n";
     while (<>) {

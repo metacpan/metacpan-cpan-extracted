@@ -2,8 +2,8 @@ NAME
     Carp::Patch::Config - Set some Carp variables
 
 VERSION
-    This document describes version 0.005 of Carp::Patch::Config (from Perl
-    distribution Carp-Patch-Config), released on 2019-12-09.
+    This document describes version 0.006 of Carp::Patch::Config (from Perl
+    distribution Carp-Patch-Config), released on 2020-06-19.
 
 SYNOPSIS
      % perl -MCarp::Patch::Config=-MaxArgNums,20,-Dump,1 -d:Confess ...
@@ -19,19 +19,25 @@ PATCH CONFIGURATION
 
         This is not an actual configuration for Carp, but a shortcut for:
 
-         # when value is 0
+         # when value is 0 or 'none'
          $Carp::RefArgFormatter = undef;
  
-         # when value is 1
+         # when value is 1 or 'Data::Dmp'
          $Carp::RefArgFormatter = sub {
              require Data::Dmp;
              Data::Dmp::dmp($_[0]);
          };
  
-         # when value is 2
+         # when value is 2 or 'Data::Dump'
          $Carp::RefArgFormatter = sub {
              require Data::Dump;
              Data::Dump::dump($_[0]);
+         };
+ 
+         # when value is 3 or 'Data::Dump::ObjectAsString'
+         $Carp::RefArgFormatter = sub {
+             require Data::Dump::ObjectAsString;
+             Data::Dump::ObjectAsString::dump($_[0]);
          };
 
     *   -MaxArgLen => int
@@ -64,7 +70,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

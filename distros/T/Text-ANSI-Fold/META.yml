@@ -26,19 +26,19 @@ no_index:
 provides:
   Text::ANSI::Fold:
     file: lib/Text/ANSI/Fold.pm
-    version: '1.06'
+    version: '1.07'
   Text::ANSI::Fold::Japanese::W3C:
     file: lib/Text/ANSI/Fold/Japanese/W3C.pm
   Text::ANSI::Fold::Japanese::Wikipedia:
     file: lib/Text/ANSI/Fold/Japanese/Wikipedia.pm
 requires:
   Text::VisualWidth::PP: '0.05'
-  perl: '5.014'
+  perl: v5.14.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/Text-ANSI-Fold/issues
   homepage: https://github.com/kaz-utashiro/Text-ANSI-Fold
   repository: git://github.com/kaz-utashiro/Text-ANSI-Fold.git
-version: '1.06'
+version: '1.07'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

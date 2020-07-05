@@ -3,14 +3,15 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Test;
+package Metrics::Any::Adapter::Test 0.06;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.05';
+use base qw( Metrics::Any::AdapterBase::Stored );
 
 use Carp;
+
+use List::Util 1.29 qw( pairs );
 
 =head1 NAME
 
@@ -45,7 +46,14 @@ use the L</override_timer_duration> method.
 
 =cut
 
-my %metrics;
+my $singleton;
+
+sub new
+{
+   my $class = shift;
+   return $singleton //= $class->SUPER::new( @_ );
+}
+
 my $timer_duration;
 
 =head1 METHODS
@@ -72,16 +80,50 @@ and label values in declared order after the name and before the C<=> symbol:
 
 =cut
 
+use constant {
+   DIST_COUNT => 0,
+   DIST_TOTAL => 1,
+};
+
+sub store_distribution
+{
+   shift;
+   my ( $storage, $amount ) = @_;
+
+   $storage //= [ 0, 0 ];
+   $storage->[DIST_COUNT] += 1;
+   $storage->[DIST_TOTAL] += $amount;
+
+   return $storage;
+}
+
+*store_timer = \&store_distribution;
+
 sub metrics
 {
-   my $class = shift;
+   my $self = shift;
+   ref $self or $self = Metrics::Any::Adapter::Test->new;
 
-   my $ret = "";
-   foreach my $key ( sort keys %metrics ) {
-      $ret .= "$key = $metrics{$key}\n";
-   }
+   my @ret;
 
-   return $ret;
+   $self->walk( sub {
+      my ( $type, $name, $labels, $value ) = @_;
+
+      $name .= sprintf " %s:%s", $_->key, $_->value for pairs @$labels;
+
+      if( $type eq "counter" or $type eq "gauge" ) {
+         push @ret, "$name = $value";
+      }
+      elsif( $type eq "distribution" or $type eq "timer" ) {
+         push @ret, "${name}_count = " . $value->[DIST_COUNT];
+         push @ret, "${name}_total = " . $value->[DIST_TOTAL];
+      }
+      else {
+         warn "Unsure how to handle metric of type $type\n";
+      }
+   } );
+
+   return join "", map { "$_\n" } @ret;
 }
 
 =head2 clear
@@ -94,9 +136,11 @@ This class method removes all of the stored values of reported metrics.
 
 sub clear
 {
-   shift;
+   my $self = shift;
+   ref $self or $self = Metrics::Any::Adapter::Test->new;
 
-   undef %metrics;
+   $self->clear_values;
+
    undef $timer_duration;
 }
 
@@ -118,109 +162,14 @@ sub override_timer_duration
    ( $timer_duration ) = @_;
 }
 
-sub new
-{
-   return bless {}, shift;
-}
-
-sub _make
-{
-   my $self = shift;
-   my ( $type, $handle, %args ) = @_;
-
-   my $name = $args{name};
-   $name = join "_", @$name if ref $name eq "ARRAY";
-
-   $self->{$handle} = {
-      type   => $type,
-      name   => $name,
-      labels => $args{labels},
-   };
-}
-
-sub _key
-{
-   my $self = shift;
-   my ( $handle, $suffix, @labelvalues ) = @_;
-
-   my $meta = $self->{$handle};
-
-   my $key = $meta->{name};
-   $key .= $suffix if defined $suffix;
-
-   if( my $labels = $meta->{labels} ) {
-      $key .= " $labels->[$_]:$labelvalues[$_]" for 0 .. $#$labels;
-   }
-
-   return $key;
-}
-
-sub make_counter { shift->_make( counter => @_ ) }
-
-sub inc_counter_by
-{
-   my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
-
-   $self->{$handle}{type} eq "counter" or
-      croak "$handle is not a counter metric";
-
-   $metrics{ $self->_key( $handle, undef, @labelvalues ) } += $amount;
-}
-
-sub make_distribution { shift->_make( distribution => @_ ) }
-
-sub report_distribution
-{
-   my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
-
-   $self->{$handle}{type} eq "distribution" or
-      croak "$handle is not a distribution metric";
-
-   # TODO: Some buckets?
-   $metrics{ $self->_key( $handle, "_count", @labelvalues ) } += 1;
-   $metrics{ $self->_key( $handle, "_total", @labelvalues ) } += $amount;
-}
-
-sub make_gauge { shift->_make( gauge => @_ ) }
-
-sub inc_gauge_by
-{
-   my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
-
-   $self->{$handle}{type} eq "gauge" or
-      croak "$handle is not a gauge metric";
-
-   $metrics{ $self->_key( $handle, undef, @labelvalues ) } += $amount;
-}
-
-sub set_gauge_to
-{
-   my $self = shift;
-   my ( $handle, $amount, @labelvalues ) = @_;
-
-   $self->{$handle}{type} eq "gauge" or
-      croak "$handle is not a gauge metric";
-
-   $metrics{ $self->_key( $handle, undef, @labelvalues ) } = $amount;
-}
-
-sub make_timer { shift->_make( timer => @_ ) }
-
 sub report_timer
 {
    my $self = shift;
    my ( $handle, $duration, @labelvalues ) = @_;
 
-   $self->{$handle}{type} eq "timer" or
-      croak "$handle is not a timer metric";
-
    $duration = $timer_duration if defined $timer_duration;
 
-   $metrics{ $self->_key( $handle, "_count", @labelvalues ) } += 1;
-   $metrics{ $self->_key( $handle, "_total", @labelvalues ) } += $duration;
+   $self->SUPER::report_timer( $handle, $duration, @labelvalues );
 }
 
 =head1 AUTHOR

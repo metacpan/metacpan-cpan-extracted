@@ -1,3 +1,8 @@
+0.008   2020-06-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Make %argopt_{firefox,chrome,opera,vivaldi}_cmd available.
+
+
 0.007   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utility: start-browsers, restart-browsers.

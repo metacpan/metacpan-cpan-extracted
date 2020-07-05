@@ -1,0 +1,9 @@
+Revision history for Perl extension SMS::Send::VoIP::MS.
+
+0.02 2020-06-29
+  - Updates for release to CPAN
+    - Added scripts/perl-SMS-Send-VoIP-MS-send_sms.pl
+    - Updated lib/SMS/Send/VoIP/MS.pm
+
+0.01 2020-06-02
+  - original version

@@ -1,5 +1,13 @@
 Revision history for XS-Parse-Sublike
 
+0.10    2020-06-20
+        [BREAKING CHANGES]
+         * New ABI version 3
+
+        [CHANGES]
+         * Pass an additional 'hookdata' parameter around between caller and
+           hook stage functions
+
 0.09    2020-06-15
         [CHANGES]
          * Define API for an optional stage for filtering and applying

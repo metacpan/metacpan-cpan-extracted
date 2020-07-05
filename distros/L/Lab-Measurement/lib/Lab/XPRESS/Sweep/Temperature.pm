@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::Temperature;
 #ABSTRACT: Temperature sweep
-$Lab::XPRESS::Sweep::Temperature::VERSION = '3.701';
+$Lab::XPRESS::Sweep::Temperature::VERSION = '3.703';
 use Lab::XPRESS::Sweep;
 use Statistics::Descriptive;
 use Time::HiRes qw/usleep/;
@@ -408,7 +408,7 @@ Lab::XPRESS::Sweep::Temperature - Temperature sweep
 
 =head1 VERSION
 
-version 3.701
+version 3.703
 
 =head1 SYNOPSIS
 

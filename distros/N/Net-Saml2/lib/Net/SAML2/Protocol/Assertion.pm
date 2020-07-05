@@ -1,23 +1,23 @@
 package Net::SAML2::Protocol::Assertion;
 use Moose;
-use MooseX::Types::Moose qw/ Str HashRef ArrayRef /;
 use MooseX::Types::DateTime qw/ DateTime /;
 use MooseX::Types::Common::String qw/ NonEmptySimpleStr /;
 use DateTime;
 use DateTime::Format::XSD;
 use Net::SAML2::XML::Util qw/ no_comments /;
+use XML::XPath;
 
 with 'Net::SAML2::Role::ProtocolMessage';
 
 
-has 'attributes' => (isa => HashRef [ArrayRef], is => 'ro', required => 1);
-has 'session'    => (isa => Str,               is => 'ro', required => 1);
-has 'nameid'     => (isa => Str,               is => 'ro', required => 1);
+has 'attributes' => (isa => 'HashRef[ArrayRef]', is => 'ro', required => 1);
+has 'session'    => (isa => 'Str',               is => 'ro', required => 1);
+has 'nameid'     => (isa => 'Str',               is => 'ro', required => 1);
 has 'not_before' => (isa => DateTime,          is => 'ro', required => 1);
 has 'not_after'  => (isa => DateTime,          is => 'ro', required => 1);
 has 'audience'   => (isa => NonEmptySimpleStr, is => 'ro', required => 1);
 has 'xpath'      => (isa => 'XML::XPath', is => 'ro', required => 1);
-has 'in_response_to' => (isa => Str,           is => 'ro', required => 1);
+has 'in_response_to' => (isa => 'Str',           is => 'ro', required => 1);
 
 
 
@@ -113,7 +113,7 @@ Net::SAML2::Protocol::Assertion
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,8 @@ This software is copyright (c) 2020 by Chris Andrews and Others; in detail:
             2015       Mike Wisener
             2016       Jeff Fearn
             2017       Alessandro Ranellucci
-            2019-2020  Timothy Legge
+            2019       Timothy Legge
+            2020       Timothy Legge, Wesley Schwengle
 
 
 This is free software; you can redistribute it and/or modify it under

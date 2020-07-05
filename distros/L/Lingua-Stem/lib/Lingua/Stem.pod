@@ -1,3 +1,4 @@
+=encoding UTF8
 
 =head1 NAME
 
@@ -120,6 +121,8 @@ The script for the benchmark is included in the examples/ directory of this
 distribution as benchmark_stemmers.plx.
 
 =head1 CHANGES
+
+ 2.30 2020.06.20 - Version renumber for module consistency
 
  0.84 2010.04.29 - Documentation fixes to the En stemmer and removal
                    of the accidentally included lib/Lingua/test.pl file
@@ -450,7 +453,7 @@ are processing a lot of data.
 
 =head1 VERSION
 
- 0.84 2008.07.27
+ 2.30 2020.06.20
 
 =head1 NOTES
 
@@ -471,7 +474,7 @@ family stemming, use lower case words, only, for exceptions.
 
 =head1 AUTHORS
 
- Benjamin Franz <snowhare@nihongo.org>
+ Jerilyn Franz <cpan@jerilyn.info>
  Jim Richardson  <imr@maths.usyd.edu.au>
 
 =head1 CREDITS
@@ -503,7 +506,7 @@ Copyright 1999-2004
 
 Freerun Technologies, Inc (Freerun),
 Jim Richardson, University of Sydney <imr@maths.usyd.edu.au>
-and Benjamin Franz <snowhare@nihongo.org>. All rights reserved.
+and Jerilyn Franz <cpan@jerilyn.info>. All rights reserved.
 
 Text::German was written and is copyrighted by Ulrich Pfeifer.
 
@@ -517,7 +520,7 @@ written and are copyrighted by Ask Solem Hoel.
 
 Lingua::Stemmer::GL and Lingua::PT::Stemmer were written and are copyrighted by Xern.
 
-Lingua::Stem::Fr was written and is copyrighted by  Aldo Calpini and Sébastien Darribere-Pley.
+Lingua::Stem::Fr was written and is copyrighted by Aldo Calpini and Sébastien Darribere-Pley.
 
 Lingua::Stem::Ru was written and is copyrighted by Aleksandr Guidrevitch.
 

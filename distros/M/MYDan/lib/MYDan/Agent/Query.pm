@@ -68,7 +68,8 @@ sub dump
 
         if( $o{role} && $o{role} eq 'client' )
         {
-            $auth = ( getpwnam $user )[7].'/.ssh';
+            my $home = $ENV{HOME} || ( getpwnam $user )[7];
+            $auth = $home.'/.ssh';
             $query->{user} = $ENV{MYDan_username} if $ENV{MYDan_username};
         }
 

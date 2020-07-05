@@ -1,9 +1,9 @@
 package Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-16'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 use 5.010001;
 use strict;
@@ -75,7 +75,7 @@ Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildca
 
 =head1 VERSION
 
-This document describes version 0.033 of Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
+This document describes version 0.034 of Data::Sah::Coerce::perl::To_array::From_str_or_array::expand_perl_modname_wildcard (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

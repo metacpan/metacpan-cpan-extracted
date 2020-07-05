@@ -1,7 +1,7 @@
 package TAP::DOM::Archive;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Handle TAP:Archive files
-$TAP::DOM::Archive::VERSION = '0.14';
+$TAP::DOM::Archive::VERSION = '0.91';
 use 5.006;
 use strict;
 use warnings;
@@ -12,17 +12,31 @@ sub new {
 
         my %args = (@_ == 1) ? %{$_[0]} : @_;
 
+        require TAP::DOM;
+
         # Drop arguments which don't make sense here and would confuse
         # TAP::Parser called via TAP::DOM later.
         delete $args{tap};
         delete $args{sources};
         delete $args{exec};
 
-        require TAP::DOM;
+        my %tap_dom_args = ();
+        foreach (@TAP::DOM::tap_dom_args) {
+            if (defined $args{$_}) {
+                $tap_dom_args{$_} = $args{$_};
+                delete $args{$_};
+            }
+        }
+
         my $tap_documents = _read_tap_from_archive(\%args);
+
         my $tap_dom_list  = {
             meta => $tap_documents->{meta},
-            dom  => [ map { TAP::DOM->new(tap => $_) } @{$tap_documents->{tap}} ],
+            dom  => [
+                map { TAP::DOM->new(tap => $_, %tap_dom_args) }
+                grep { defined $_ }
+                @{$tap_documents->{tap}}
+            ],
         };
         return bless $tap_dom_list, $class;
 }
@@ -141,7 +155,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Steffen Schwigon.
+This software is copyright (c) 2020 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

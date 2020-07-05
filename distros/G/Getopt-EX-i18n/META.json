@@ -57,7 +57,7 @@
    "provides" : {
       "Getopt::EX::i18n" : {
          "file" : "lib/Getopt/EX/i18n.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       },
       "Getopt::EX::i18n::iso3361" : {
          "file" : "lib/Getopt/EX/i18n/iso3361.pm"
@@ -80,7 +80,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-i18n"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

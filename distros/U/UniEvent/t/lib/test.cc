@@ -8,12 +8,15 @@
 
 Variation variation;
 
-SSL_CTX* get_ssl_ctx() {
-    static SSL_CTX* ctx = nullptr;
+SslContext get_ssl_ctx() {
+    static SslContext ctx = nullptr;
     if (ctx) {
         return ctx;
     }
-    ctx = SSL_CTX_new(SSLv23_server_method());
+    auto raw = SSL_CTX_new(SSLv23_server_method());
+    if (!raw) throw Error(make_ssl_error_code(SSL_ERROR_SSL));
+    ctx = SslContext::attach(raw);
+
     SSL_CTX_use_certificate_file(ctx, "t/cert/ca.pem", SSL_FILETYPE_PEM);
     SSL_CTX_use_PrivateKey_file(ctx, "t/cert/ca.key", SSL_FILETYPE_PEM);
     SSL_CTX_check_private_key(ctx);

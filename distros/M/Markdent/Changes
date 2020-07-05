@@ -1,3 +1,9 @@
+0.37   2020-07-03
+
+- The markdent-html CLI script now accepts `--file -` for reading Markdown
+  from stdin. Based on a patch by Jonas Smedegaard. GH #23.
+
+
 0.36   2019-11-26
 
 - Fix somewhat broken HTML parsing. The change in 0.35 caused the parser to

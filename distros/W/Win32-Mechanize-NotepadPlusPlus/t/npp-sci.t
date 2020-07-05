@@ -21,12 +21,12 @@ isa_ok $sci, "Win32::Mechanize::NotepadPlusPlus::Editor"
     or BAIL_OUT(sprintf 'invalid object:%s returned from createScintilla()', $sci//'<undef>');
     note sprintf "\tsci = %s\n", $sci//'<undef>';
 
-note sprintf "->createScintilla() has hwnd = %s\n", $sci->{_hwnd} // '<undef>';
-ok 0+$sci->{_hwnd}, 'returned hwnd is non-zero' or BAIL_OUT('invalid hwnd from createScintilla');
+note sprintf "->createScintilla() has hwnd = %s\n", $sci->hwnd() // '<undef>';
+ok 0+$sci->hwnd(), 'returned hwnd is non-zero' or BAIL_OUT('invalid hwnd from createScintilla');
 
-my $class = GetClassName($sci->{_hwnd});
+my $class = GetClassName($sci->hwnd());
 is $class, 'Scintilla', 'class(hwnd) is Scintilla';
-note sprintf "\tclass(h:%s) = '%s'\n", $sci->{_hwnd}, $class // '<undef>';
+note sprintf "\tclass(h:%s) = '%s'\n", $sci->hwnd(), $class // '<undef>';
 
 # destroy should return true, but disable 'deprecated' warnings
 {

@@ -3,10 +3,10 @@ use warnings;
 use Test::More;
 use DBIx::TempDB;
 
-plan skip_all => 'TEST_DB_DSN=mysql://root@/blog_test' unless $ENV{TEST_DB_DSN};
-plan skip_all => 'Mojolicious is required'             unless eval 'require Mojolicious; 1';
+plan skip_all => 'TEST_BLOG_DSN=mysql://root@/blog_test' unless $ENV{TEST_BLOG_DSN};
+plan skip_all => 'Mojolicious is required'               unless eval 'require Mojolicious; 1';
 
-my $tmpdb = DBIx::TempDB->new($ENV{TEST_DB_DSN});
+my $tmpdb = DBIx::TempDB->new($ENV{TEST_BLOG_DSN});
 $ENV{BLOG_DSN} = $tmpdb->url;
 
 require File::Spec;

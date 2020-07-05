@@ -1,12 +1,11 @@
+use v5.14;
 package App::ansifold;
-use 5.014;
-use strict;
+our $VERSION = "1.04";
+
 use warnings;
 
 use Exporter 'import';
 our @EXPORT_OK = qw($VERSION);
-
-our $VERSION = "1.03";
 
 1;
 __END__

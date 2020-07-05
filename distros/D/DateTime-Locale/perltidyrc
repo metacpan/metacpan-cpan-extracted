@@ -1,3 +1,4 @@
+--iterations=2
 -l=78
 -i=4
 -ci=4
@@ -20,3 +21,4 @@
 --no-outdent-long-comments
 --iterations=2
 -wbb="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="
+--character-encoding=none

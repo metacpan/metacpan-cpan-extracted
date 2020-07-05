@@ -20,6 +20,7 @@ t/inet4.t
 t/inet6.cc
 t/inet6.t
 t/lib/MyTest.pm
+t/lib/test.cc
 t/lib/test.h
 t/unix.cc
 t/unix.t

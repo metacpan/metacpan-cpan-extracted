@@ -4,7 +4,7 @@ using panda::string;
 
 namespace xs {
 
-string PerlTrace::to_string() const {
+string PerlTrace::to_string() const noexcept {
     string r;
     for (const auto& frame : frames) {
         r += frame->library;

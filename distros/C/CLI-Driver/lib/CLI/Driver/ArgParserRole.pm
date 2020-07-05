@@ -96,7 +96,8 @@ method _parse_req_args_v2 (HashRef :$type_href!,
         hard       => 1,
         cli_arg    => $cli_arg,
         method_arg => $method_arg,
-        is_array   => $is_array
+        is_array   => $is_array,
+        use_argv_map => $self->use_argv_map ? 1 : 0
     );
 }
 
@@ -133,7 +134,8 @@ method _parse_req_args_v1 (HashRef :$type_href!,
             hard       => $hard,
             cli_arg    => $cli_arg,
             method_arg => $method_arg,
-            is_array   => $is_array
+            is_array   => $is_array,
+            use_argv_map => $self->use_argv_map ? 1 : 0
           );
     }
 
@@ -149,7 +151,7 @@ method _parse_opt_attrs (HashRef :$type_href) {
 method _parse_opt_args (HashRef :$type_href) {
 
     my @ret;
-
+    
     foreach my $cli_arg ( keys %$type_href ) {
 
         my $method_arg = $type_href->{$cli_arg};
@@ -163,9 +165,10 @@ method _parse_opt_args (HashRef :$type_href) {
             required   => 0,
             cli_arg    => $cli_arg,
             method_arg => $method_arg,
-            is_array   => $is_array
+            is_array   => $is_array,
+            use_argv_map => $self->use_argv_map ? 1 : 0
         );
-
+        
         push @ret, $opt;
     }
 
@@ -191,6 +194,7 @@ method _parse_flag_args (HashRef :$type_href) {
             cli_arg    => $cli_arg,
             method_arg => $method_arg,
             flag       => 1,
+            use_argv_map => $self->use_argv_map ? 1 : 0,
         );
 
         push @ret, $opt;
@@ -214,11 +218,11 @@ method _parse_args (HashRef :$href!) {
 method __parse_args (HashRef :$args_href!) {
 
     my @args;
-
+    
     foreach my $type ( keys %$args_href ) {
 
         my $type_href = $args_href->{$type};
-
+        
         if ( defined $type_href ) {
             if ( $type =~ /^opt/ ) {
                 my @opt = $self->_parse_opt_args( type_href => $type_href );
@@ -237,7 +241,7 @@ method __parse_args (HashRef :$args_href!) {
             }
         }
     }
-
+    
     return \@args;
 }
 

@@ -1,10 +1,9 @@
-#include <catch.hpp>
-#include <panda/string.h>
+#include "test.h"
 #include <panda/traits.h>
 
-using namespace panda;
+#define TEST(name) TEST_CASE("traits: " name, "[traits]")
 
-TEST_CASE("bool_or", "[traits]") {
+TEST("bool_or") {
     struct N {};
 
     REQUIRE(bool_or(nullptr, true) == false);

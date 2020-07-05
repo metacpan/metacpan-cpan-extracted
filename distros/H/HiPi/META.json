@@ -53,7 +53,7 @@
    "provides" : {
       "HiPi" : {
          "file" : "lib/HiPi.pm",
-         "version" : "0.82"
+         "version" : "0.84"
       },
       "HiPi::Class" : {
          "file" : "lib/HiPi/Class.pm",
@@ -663,7 +663,7 @@
       },
       "HiPi::RaspberryPi" : {
          "file" : "lib/HiPi/RaspberryPi.pm",
-         "version" : "0.81"
+         "version" : "0.83"
       },
       "HiPi::Utils" : {
          "file" : "lib/HiPi/Utils.pm",
@@ -693,6 +693,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.82",
+   "version" : "0.84",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

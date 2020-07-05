@@ -17,6 +17,14 @@ sub _rpcnot_didChangeConfiguration
 
     #print STDERR "perl = ", dump ($req -> params -> {settings}{perl}), "\n" ;
 
+    my $perlcmd = $req -> params -> {settings}{perl}{perlCmd} ;
+    if ($perlcmd) 
+        {
+        $workspace -> perlcmd ($perlcmd);
+        }
+
+    print STDERR "perlcmd = ", dump ( $workspace -> perlcmd), "\n" ;
+
     my $uri   = $req -> params -> {settings}{perl}{sshWorkspaceRoot} ;
     if ($uri)
         {
@@ -57,7 +65,7 @@ sub _rpcnot_didChangeConfiguration
     if ($filter)
         {
         $filter = [$filter] if (!ref $filter) ;    
-        $workspace -> file_filter_regex ('(?:' . join ('|', map { "\\Q$_\\E" } @$filter ) . ')$') ;    
+        $workspace -> file_filter_regex ('(?:' . join ('|', map { quotemeta($_) } @$filter ) . ')$') ;    
         }
 
     print STDERR "file_filter_regex = ", dump ( $workspace -> file_filter_regex), "\n" ;    
@@ -69,9 +77,16 @@ sub _rpcnot_didChangeConfiguration
         $workspace -> ignore_dir ({ map { ( $_ => 1 ) } @$dirs }) ;    
         }
 
-    print STDERR "file_filter_regex = ", dump ( $workspace -> file_filter_regex), "\n" ;    
+    print STDERR "ignore_dir = ", dump ( $workspace -> ignore_dir), "\n" ;    
+
+    if (!exists ($workspace -> config -> {workspaceFolders}) || @{$workspace -> config -> {workspaceFolders}} == 0)
+        {
+        $workspace -> config -> {workspaceFolders} = [{ uri => $workspace -> config -> {rootUri} }] ;
+        }
 
     $workspace -> set_workspace_folders ($workspace -> config -> {workspaceFolders} ) ;
+
+    $workspace -> show_local_vars ($workspace -> config -> {showLocalVars} ) ;
 
     async
         {

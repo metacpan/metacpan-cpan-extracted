@@ -3,7 +3,7 @@ package Ryu::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 =head1 NAME
 
@@ -65,13 +65,15 @@ use URI::tcp;
 
 use curry::weak;
 
-use Log::Any qw($log);
 use Syntax::Keyword::Try;
 
-use Ryu '0.030';
+use Ryu '2.000';
 use Ryu::Source;
 
 use Ryu::Async::Process;
+use Scalar::Util qw(blessed weaken);
+
+use Log::Any qw($log);
 
 =head1 METHODS
 
@@ -93,8 +95,6 @@ The exact details of this are likely to change in future, but a few things that 
 =cut
 
 sub from {
-    use Scalar::Util qw(blessed weaken);
-    use namespace::clean qw(blessed weaken);
     my $self = shift;
 
     if(my $class = blessed $_[0]) {
@@ -158,8 +158,6 @@ will be added as a child of this instance.
 =cut
 
 sub from_stream {
-    use Scalar::Util qw(blessed weaken);
-    use namespace::clean qw(blessed weaken);
     my ($self, $stream) = @_;
 
     my $src = $self->source(label => 'from');
@@ -193,8 +191,6 @@ sub from_stream {
 }
 
 sub to_stream {
-    use Scalar::Util qw(blessed weaken);
-    use namespace::clean qw(blessed weaken);
     my ($self, $stream) = @_;
 
     my $sink = $self->sink(label => 'from');
@@ -473,6 +469,56 @@ sub udp_server {
     );
 }
 
+=head2 tcp_server
+
+Creates a listening TCP socket, and provides a L<Ryu::Async::Server>
+instance which will emit a new event every time a client connects.
+
+=cut
+
+sub tcp_server {
+    my ($self, %args) = @_;
+
+    my $uri = delete $args{uri};
+    $uri //= do {
+        $args{host} //= '0.0.0.0';
+        'tcp://' . join ':', $args{host}, $args{port} // ();
+    };
+    $uri = URI->new($uri) unless ref $uri;
+    $log->debugf("TCP server %s", $uri->as_string);
+
+    my $src = $self->source;
+    my $sink = $self->sink;
+
+    $self->add_child(
+        my $server = IO::Async::Listener->new(
+            on_stream => sub {
+                my ($sock, $msg, $addr) = @_;
+                $log->debugf("TCP server [%s] had %s from %s", $uri->as_string, $msg, $addr);
+                $src->emit(
+                    Ryu::Async::Packet->new(
+                        payload => $msg,
+                        from    => $addr
+                    )
+                )
+            },
+        )
+    );
+    $sink->source->each(sub { $server->send($_->payload, 0, $_->addr) });
+    my $port_f = $server->listen(
+        service  => $uri->port // 0,
+        socktype => 'stream'
+    )->then(sub {
+        my ($listener) = @_;
+        Future->done($listener->read_handle->sockport)
+    });
+    Ryu::Async::Server->new(
+        port     => $port_f,
+        incoming => $src,
+        outgoing => undef,
+    );
+}
+
 sub timeout {
     my ($self, $input, $output, $delay) = @_;
     $self->add_child(
@@ -518,14 +564,16 @@ sub sink {
     my ($self, %args) = @_;
     my $label = delete($args{label}) // do {
         my $label = (caller 1)[3];
-        $label =~ s/^Database::Async::/Da/g;
-        $label =~ s/^Net::Async::/Na/g;
-        $label =~ s/^IO::Async::/Ia/g;
-        $label =~ s/^Web::Async::/Wa/g;
-        $label =~ s/^Job::Async::/Ja/g;
-        $label =~ s/^Tickit::Async::/Ta/g;
-        $label =~ s/^Tickit::Widget::/TW/g;
-        $label =~ s/::([^:]*)$/->$1/;
+        for($label) {
+            s/^Database::Async::/Da/g;
+            s/^Net::Async::/Na/g;
+            s/^IO::Async::/Ia/g;
+            s/^Web::Async::/Wa/g;
+            s/^Job::Async::/Ja/g;
+            s/^Tickit::Async::/Ta/g;
+            s/^Tickit::Widget::/TW/g;
+            s/::([^:]*)$/->$1/;
+        }
         $label
     };
     Ryu::Sink->new(

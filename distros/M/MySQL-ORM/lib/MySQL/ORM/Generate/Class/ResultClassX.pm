@@ -58,6 +58,10 @@ method generate {
 	my @attr;
 	my %seen;
 	my @columns = $self->table->get_columns;
+	
+	# Initialize seen columns to match current tables columns.
+	# This is to avoid adding duplicate columns to resultx class
+	%seen = map{ $_->name => 1 } @columns;
 
 	foreach my $column (@columns) {
 		$seen{ $column->name }++;

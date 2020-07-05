@@ -10,13 +10,13 @@
 
 #include "XSParseSublike.h"
 
-static bool parts_permit(pTHX);
+static bool parts_permit(pTHX_ void *_);
 
 static struct XSParseSublikeHooks parse_parts_hooks = {
   .permit = parts_permit,
 };
 
-static bool parts_permit(pTHX)
+static bool parts_permit(pTHX_ void *_)
 {
   parse_parts_hooks.require_parts = 0;
   parse_parts_hooks.skip_parts     = 0;
@@ -40,4 +40,4 @@ MODULE = t::parts  PACKAGE = t::parts
 BOOT:
   boot_xs_parse_sublike(0);
 
-  register_xs_parse_sublike("parts", &parse_parts_hooks);
+  register_xs_parse_sublike("parts", &parse_parts_hooks, NULL);

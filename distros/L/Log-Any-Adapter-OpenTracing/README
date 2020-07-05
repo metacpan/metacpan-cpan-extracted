@@ -1,0 +1,32 @@
+NAME
+
+    Log::Any::Adapter::OpenTracing - Log::Any support for OpenTracing spans
+
+SYNOPSIS
+
+     use OpenTracing::DSL qw(:v1);
+     use Log::Any qw($log);
+     use Log::Any::Adapter qw(OpenTracing);
+     trace {
+      $log->info('Messages in a span should be logged');
+     };
+     $log->info('Messages outside a span would not be logged');
+
+DESCRIPTION
+
+    This Log::Any::Adapter implementation provides support for log messages
+    attached to OpenTracing::Span instances.
+
+    It's most likely to be useful in conjunction with
+    Log::Any::Adapter::Multiplexor, so that you keep STDERR/file logging
+    and augment spans whenever they are active.
+
+AUTHOR
+
+    Tom Molesworth TEAM@cpan.org
+
+LICENSE
+
+    Copyright Tom Molesworth 2019-2020. Licensed under the same terms as
+    Perl itself.
+

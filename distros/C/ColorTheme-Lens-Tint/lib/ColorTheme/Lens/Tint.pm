@@ -1,9 +1,9 @@
 package ColorTheme::Lens::Tint;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorTheme-Lens-Tint'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use strict;
 use warnings;
@@ -35,6 +35,12 @@ _
             default => 50,
         },
     },
+    examples => [
+        {
+            summary => 'Tint another color theme with lots of red',
+            args => {theme => 'Test::Static', color=>'ff0000', percent=>90},
+        },
+    ],
 );
 
 sub new {
@@ -45,7 +51,7 @@ sub new {
 
     require Module::Load::Util;
     $self->{orig_theme_class} = Module::Load::Util::instantiate_class_with_optional_args(
-        $self->{args}{theme});
+        {ns_prefix=>'ColorTheme'}, $self->{args}{theme});
 
     $self;
 }
@@ -90,7 +96,7 @@ ColorTheme::Lens::Tint - Tint other theme
 
 =head1 VERSION
 
-This document describes version 0.001 of ColorTheme::Lens::Tint (from Perl distribution ColorTheme-Lens-Tint), released on 2020-06-09.
+This document describes version 0.002 of ColorTheme::Lens::Tint (from Perl distribution ColorTheme-Lens-Tint), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@ package Mojo::SAML;
 
 use Mojo::Base -strict;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 $VERSION = eval $VERSION;
 
 use constant ();
@@ -165,12 +165,18 @@ This is (as with all the rest) still highly experimental.
 
 L<http://github.com/jberger/Mojo-SAML>
 
+=head1 CONTRIBUTORS
+
+Giuseppe Di Terlizzi (giterlizzi)
+
+Mohammad S Anwar (manwar)
+
 =head1 AUTHOR
 
 Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Joel Berger
+Copyright (C) 2018 by L</AUTHOR> and L</CONTRIBUTORS>
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

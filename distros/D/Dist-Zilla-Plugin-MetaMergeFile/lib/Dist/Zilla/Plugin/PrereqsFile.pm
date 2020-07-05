@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::PrereqsFile;
-$Dist::Zilla::Plugin::PrereqsFile::VERSION = '0.003';
+$Dist::Zilla::Plugin::PrereqsFile::VERSION = '0.004';
 use Moose;
 use namespace::autoclean;
 
@@ -44,7 +44,7 @@ __PACKAGE__->meta->make_immutable;
 
 1;
 
-#ABSTRACT: Add arbitrary metadata using a mergefile
+#ABSTRACT: Add static prereqs using a prereqs file
 
 __END__
 
@@ -54,11 +54,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::PrereqsFile - Add arbitrary metadata using a mergefile
+Dist::Zilla::Plugin::PrereqsFile - Add static prereqs using a prereqs file
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -76,11 +76,11 @@ version 0.003
 
 =head1 DESCRIPTION
 
-This plugin implements prereq files. These allow you to easily add arbitrary prerequisites to your metafiles.
+This plugin implements prereqs files. These allow you to easily add static prerequisites to your metadata.
 
-=head2 Why metamerge files?
+=head2 Why prereqs files?
 
-Prereq files are somewhat similar to cpanfiles, but with an important difference. They don't involve evaluating code to produce data, data should be data.
+Prereqs files are somewhat similar to cpanfiles, but with an important difference. They don't involve evaluating code to produce data, data should be data.
 
 =head2 Names and formats
 

@@ -1,3 +1,11 @@
+0.479   2020-04-16  Released-By: PERLANCAR; Urgency: medium
+
+	- When completing option value for --opt=^ and option name is
+	  ambiguous, return an array of all possible option names in 'opt'
+	  argument instead of undef; so the completion routine can decide
+	  to provide all completion values.
+
+
 0.478   2020-04-16  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] For an optional with optional value (optname:s), when

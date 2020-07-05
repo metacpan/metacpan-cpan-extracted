@@ -79,8 +79,7 @@ sub set {
     my $mesg = $self->_run_search( { ARGS => \@args }, { noattrs => 1} );
 
     if ($mesg->is_error()) {
-        $self->log()->error("LDAP search failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
-        return $self->_node_not_exists( \@args );
+        $self->_log_and_die("LDAP search failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
     }
 
     if ($mesg->count() > 1) {
@@ -121,8 +120,7 @@ sub set {
 
     $mesg = $entry->update( $self->ldap() );
     if ($mesg->is_error()) {
-        $self->log()->error("LDAP update failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
-        return $self->_node_not_exists( \@args );
+        $self->_log_and_die("LDAP update failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
     }
 
     return 1;

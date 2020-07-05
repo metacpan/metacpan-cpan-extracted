@@ -107,25 +107,21 @@ private:
     bool contains_impl (const std::error_code& c) const;
 };
 
-inline bool operator== (const ErrorCode& lhs, const ErrorCode& rhs) noexcept { return lhs.code() == rhs.code(); }
-inline bool operator== (const ErrorCode& lhs, const std::error_code& rhs) noexcept { return lhs.code() == rhs; }
-inline bool operator== (const std::error_code& lhs, const ErrorCode& rhs) noexcept { return lhs == rhs.code(); }
-inline bool operator== (const ErrorCode& lhs, const std::error_condition& rhs) noexcept { return lhs.code() == rhs; }
-inline bool operator== (const std::error_condition& lhs, const ErrorCode& rhs) noexcept { return lhs == rhs.code(); }
-template <class E, typename = std::enable_if_t<std::is_error_code_enum<E>::value || std::is_error_condition_enum<E>::value, void>>
-inline bool operator== (const ErrorCode& ec, E e) noexcept { return ec.code() == make_error_code(e); }
-template <class E, typename = std::enable_if_t<std::is_error_code_enum<E>::value || std::is_error_condition_enum<E>::value, void>>
-inline bool operator== (E e, const ErrorCode& ec) noexcept { return ec.code() == make_error_code(e); }
+struct StrictErrorCode  {
+    StrictErrorCode(const ErrorCode& ec) : base(ec) {}
+    const ErrorCode& base;
+};
 
-inline bool operator!= (const ErrorCode& lhs, const ErrorCode& rhs) noexcept { return lhs.code() != rhs.code(); }
-inline bool operator!= (const ErrorCode& lhs, const std::error_code& rhs) noexcept { return lhs.code() != rhs; }
-inline bool operator!= (const std::error_code& lhs, const ErrorCode& rhs) noexcept { return lhs != rhs.code(); }
-inline bool operator!= (const ErrorCode& lhs, const std::error_condition& rhs) noexcept { return lhs.code() != rhs; }
-inline bool operator!= (const std::error_condition& lhs, const ErrorCode& rhs) noexcept { return lhs != rhs.code(); }
+inline bool operator== (const StrictErrorCode& lhs, const StrictErrorCode& rhs) noexcept { return lhs.base.code() == rhs.base.code(); }
+inline bool operator!= (const StrictErrorCode& lhs, const StrictErrorCode& rhs) noexcept { return !(lhs == rhs); }
+
+inline bool operator& (const ErrorCode& lhs, const std::error_code& rhs) noexcept { return lhs.contains(rhs); }
+inline bool operator& (const std::error_code& lhs, const ErrorCode& rhs) noexcept { return rhs.contains(lhs); }
+
 template <class E, typename = std::enable_if_t<std::is_error_code_enum<E>::value || std::is_error_condition_enum<E>::value, void>>
-inline bool operator!= (const ErrorCode& ec, E e) noexcept { return ec.code() != make_error_code(e); }
+inline bool operator& (const ErrorCode& ec, E e) noexcept { return ec.contains(make_error_code(e)); }
 template <class E, typename = std::enable_if_t<std::is_error_code_enum<E>::value || std::is_error_condition_enum<E>::value, void>>
-inline bool operator!= (E e, const ErrorCode& ec) noexcept { return ec.code() != make_error_code(e); }
+inline bool operator& (E e, const ErrorCode& ec) noexcept { return ec.contains(make_error_code(e)); }
 
 inline bool operator< (const ErrorCode& lhs, const ErrorCode& rhs) noexcept { return lhs.code() < rhs.code(); }
 inline bool operator< (const ErrorCode& lhs, const std::error_code& rhs) noexcept { return lhs.code() < rhs; }

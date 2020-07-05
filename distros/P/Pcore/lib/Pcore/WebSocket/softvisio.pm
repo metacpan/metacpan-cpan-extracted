@@ -5,6 +5,7 @@ use Pcore::Util::Data qw[to_b64];
 use Pcore::Util::UUID qw[uuid_v1mc_str];
 use Pcore::Util::Scalar qw[is_res weaken is_plain_arrayref];
 use Clone qw[];
+use Data::MessagePack qw[];
 
 with qw[Pcore::WebSocket::Handle];
 
@@ -24,7 +25,7 @@ has auth      => ( init_arg => undef );
 has _listener => ( init_arg => undef );    # ConsumerOf['Pcore::Core::Event::Listener']
 has _auth_id => ( 1, init_arg => undef );
 has _auth_cb => ( sub { [] }, init_arg => undef );    # client only
-has _rpc_cb  => ( sub { {} }, init_arg => undef );    # HashRef, tid => $cb
+has _rpc_cb  => ( sub { {} }, init_arg => undef );    # HashRef, id => $cb
 
 const our $PROTOCOL => 'softvisio';
 
@@ -34,6 +35,7 @@ const our $TX_TYPE_RPC   => 'rpc';
 
 my $CBOR = Pcore::Util::Data::get_cbor();
 my $JSON = Pcore::Util::Data::get_json( utf8 => 1 );
+my $MP   = Data::MessagePack->new;
 
 sub rpc_call ( $self, $method, @args ) {
 
@@ -51,7 +53,7 @@ sub rpc_call ( $self, $method, @args ) {
     };
 
     if ( defined wantarray ) {
-        my $cv = $self->{_rpc_cb}->{ $msg->{tid} = uuid_v1mc_str } = P->cv;
+        my $cv = $self->{_rpc_cb}->{ $msg->{id} = uuid_v1mc_str } = P->cv;
 
         $self->_send_msg($msg);
 
@@ -123,7 +125,26 @@ sub _on_text ( $self, $data_ref ) {
 }
 
 sub _on_bin ( $self, $data_ref ) {
-    my $msg = eval { $CBOR->decode( $data_ref->$* ) };
+    my $msg;
+
+    if ( $self->{use_cbor} ) {
+        $msg = eval { $CBOR->decode( $data_ref->$* ) };
+    }
+    elsif ( $self->{use_mp} ) {
+        $msg = eval { $MP->unpack( $data_ref->$* ) };
+    }
+    else {
+        $msg = eval { $CBOR->decode( $data_ref->$* ) };
+
+        if ( !$@ ) {
+            $self->{use_cbor} = 1;
+        }
+        else {
+            $msg = eval { $MP->unpack( $data_ref->$* ) };
+
+            $self->{use_mp} = 1 if !$@;
+        }
+    }
 
     # unable to decode message
     return if $@;
@@ -168,10 +189,10 @@ sub _on_message ( $self, $msg ) {
 
                 # RPC calls are not supported by this peer
                 if ( !$self->{on_rpc} ) {
-                    if ( $tx->{tid} ) {
+                    if ( $tx->{id} ) {
                         $self->_send_msg( {
                             type   => $TX_TYPE_RPC,
-                            tid    => $tx->{tid},
+                            id     => $tx->{id},
                             result => {
                                 status => 400,
                                 reason => 'RPC calls are not supported',
@@ -188,10 +209,10 @@ sub _on_message ( $self, $msg ) {
                         $@->sendlog if $@;
 
                         # response is required
-                        if ( ( my $tid = $tx->{tid} ) && $auth_id == $self->{_auth_id} ) {
+                        if ( ( my $id = $tx->{id} ) && $auth_id == $self->{_auth_id} ) {
                             $self->_send_msg( {
                                 type   => $TX_TYPE_RPC,
-                                tid    => $tid,
+                                id     => $id,
                                 result => $@ || !@res ? res 500 : is_res $res[0] ? $res[0] : res @res,
                             } );
                         }
@@ -201,9 +222,9 @@ sub _on_message ( $self, $msg ) {
                 }
             }
 
-            # method is not specified, this is RPC response, tid is required
-            elsif ( $tx->{tid} ) {
-                if ( my $cb = delete $self->{_rpc_cb}->{ $tx->{tid} } ) {
+            # method is not specified, this is RPC response, id is required
+            elsif ( $tx->{id} ) {
+                if ( my $cb = delete $self->{_rpc_cb}->{ $tx->{id} } ) {
 
                     # convert result to response object
                     $cb->( bless $tx->{result}, 'Pcore::Util::Result::Class' );
@@ -296,8 +317,8 @@ sub _reset ( $self, $status = undef ) {
 
     # call pending callbacks
     if ( $self->{_rpc_cb}->%* ) {
-        for my $tid ( keys $self->{_rpc_cb}->%* ) {
-            my $cb = delete $self->{_rpc_cb}->{$tid};
+        for my $id ( keys $self->{_rpc_cb}->%* ) {
+            my $cb = delete $self->{_rpc_cb}->{$id};
 
             $cb->( Clone::clone($status) );
         }
@@ -307,11 +328,16 @@ sub _reset ( $self, $status = undef ) {
 }
 
 sub _send_msg ( $self, $msg ) {
-    if ( $self->{use_json} ) {
-        $self->send_text( \$JSON->encode($msg) );
-    }
-    else {
+
+    if ( $self->{use_cbor} ) {
         $self->send_bin( \$CBOR->encode($msg) );
+    }
+
+    # elsif ( $self->{use_mp} ) {
+    #     $self->send_bin( \$MP->pack($msg) );
+    # }
+    else {
+        $self->send_text( \$JSON->encode($msg) );
     }
 
     return;
@@ -357,12 +383,12 @@ sub resume_events ($self) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 88                   | * Private subroutine/method '_on_connect' declared but not used                                                |
-## |      | 99                   | * Private subroutine/method '_on_disconnect' declared but not used                                             |
-## |      | 112                  | * Private subroutine/method '_on_text' declared but not used                                                   |
-## |      | 125                  | * Private subroutine/method '_on_bin' declared but not used                                                    |
+## |      | 90                   | * Private subroutine/method '_on_connect' declared but not used                                                |
+## |      | 101                  | * Private subroutine/method '_on_disconnect' declared but not used                                             |
+## |      | 114                  | * Private subroutine/method '_on_text' declared but not used                                                   |
+## |      | 127                  | * Private subroutine/method '_on_bin' declared but not used                                                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 138                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (22)               |
+## |    3 | 159                  | Subroutines::ProhibitExcessComplexity - Subroutine "_on_message" with high complexity score (22)               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

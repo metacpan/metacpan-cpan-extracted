@@ -10,13 +10,14 @@ with 'Vote::Count::TieBreaker',
   'Vote::Count::Approval',
   'Vote::Count::Borda',
   'Vote::Count::Log',
-  'Vote::Count::Range';
+  'Vote::Count::Score',
+  ;
 
 use Vote::Count::RankCount;
 
 no warnings 'experimental';
 use List::Util qw( min max sum );
-use TextTableTiny qw/generate_markdown_table/;
+use Vote::Count::TextTableTiny qw/generate_markdown_table/;
 use Sort::Hash;
 
 # use Try::Tiny;
@@ -25,13 +26,13 @@ use Sort::Hash;
 
 use YAML::XS;
 
-our $VERSION='1.01';
+our $VERSION='1.03';
 
 =head1 NAME
 
 Vote::Count::Matrix
 
-=head1 VERSION 1.01
+=head1 VERSION 1.03
 
 =cut
 
@@ -406,7 +407,7 @@ sub PairingVotesTable ( $self ) {
 
 =head1 Win-Loss Matrix
 
-Condorcet Pairwise Methods require a Win-Loss Matrix. This object takes an RCV BallotSet with an optional Active list and returns the Matrix as an Object. The Ojbect is capable of Scoring itself, Calculating a Smith Set, and identifying Condorcet Winners and Losers.
+Condorcet Pairwise Methods require a Win-Loss Matrix. This object takes an RCV BallotSet with an optional Active list and returns the Matrix as an object. The object is capable of Scoring itself, Calculating a Smith Set, and identifying Condorcet Winners and Losers.
 
 
 =head1 SYNOPSIS

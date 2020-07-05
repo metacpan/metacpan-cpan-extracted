@@ -18,7 +18,7 @@ use strict;
 use warnings;
 use English;
 use Net::LDAP;
-
+use Data::Dumper;
 
 use Moose;
 extends 'Connector::Proxy::Net::LDAP';
@@ -142,7 +142,7 @@ sub set {
         $self->_log_and_die('The value must be a hash reference.');
     }
 
-    $self->log()->debug('Set called on ' . \@args );
+    $self->log()->debug('Set called on ' . Dumper \@args );
 
     # Check if a pkey/dn is passed
     if ($params->{pkey}) {
@@ -151,24 +151,22 @@ sub set {
             $self->log()->warn('Set by dn had no result: '.$params->{pkey});
             return $self->_node_not_exists(\@args);
         }
-    } else {
-        # Try to find the entry
-        my $mesg = $self->_run_search({ ARGS => \@args }, { noattrs => 1});
+    }
 
-        if ($mesg->is_error()) {
-            $self->log()->error("LDAP search failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
-            return $self->_node_not_exists( \@args );
-        }
+    my $mesg = $self->_run_search({ ARGS => \@args }, { noattrs => 1});
 
-        if ($mesg->count() > 1) {
-            $self->_log_and_die('Set by filter had multiple results: ' . join "|", @args );
-        }
+    # Try to find the entry
+    if ($mesg->is_error()) {
+        $self->_log_and_die("LDAP search failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
+    }
 
-        # Check if autocreate is configured
-        if ($mesg->count() == 1) {
-            $entry = $mesg->entry(0);
-            $self->log()->debug('Entry found ' . $entry->dn());
-        }
+    if ($mesg->count() > 1) {
+        $self->_log_and_die('Set by filter had multiple results: ' . join "|", @args );
+    }
+
+    if ($mesg->count() == 1) {
+        $entry = $mesg->entry(0);
+        $self->log()->debug('Entry found ' . $entry->dn());
     }
 
     my $action = $self->action();
@@ -217,8 +215,7 @@ sub set {
 
     my $mesg = $entry->update( $self->ldap() );
     if ($mesg->is_error()) {
-        $self->log()->error("LDAP update failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() . ")" );
-        return $self->_node_not_exists( \@args );
+        $self->_log_and_die("LDAP update failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() . ")" );
     }
 
     return 1;

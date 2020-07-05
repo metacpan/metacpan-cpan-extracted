@@ -381,17 +381,17 @@ subtest 'Unicode and escaped selectors' => sub {
   is $dom->at(qq{html [id="\\\n\\2603 x"]})->text,      'Snowman', 'right text';
   is $dom->at(qq{html [id="\\\n\\002603x"]})->text,     'Snowman', 'right text';
   is $dom->at(qq{html [id="\\\\2603 x"]})->text,        'Snowman', 'right text';
-  is $dom->at('#☃x')->text,                           'Snowman', 'right text';
-  is $dom->at('div#☃x')->text,                        'Snowman', 'right text';
-  is $dom->at('html div#☃x')->text,                   'Snowman', 'right text';
-  is $dom->at('[id^="☃"]')->text,                     'Snowman', 'right text';
-  is $dom->at('div[id^="☃"]')->text,                  'Snowman', 'right text';
-  is $dom->at('html div[id^="☃"]')->text,             'Snowman', 'right text';
-  is $dom->at('html > div[id^="☃"]')->text,           'Snowman', 'right text';
-  is $dom->at('[id^=☃]')->text,                       'Snowman', 'right text';
-  is $dom->at('div[id^=☃]')->text,                    'Snowman', 'right text';
-  is $dom->at('html div[id^=☃]')->text,               'Snowman', 'right text';
-  is $dom->at('html > div[id^=☃]')->text,             'Snowman', 'right text';
+  is $dom->at('#☃x')->text,                             'Snowman', 'right text';
+  is $dom->at('div#☃x')->text,                          'Snowman', 'right text';
+  is $dom->at('html div#☃x')->text,                     'Snowman', 'right text';
+  is $dom->at('[id^="☃"]')->text,                       'Snowman', 'right text';
+  is $dom->at('div[id^="☃"]')->text,                    'Snowman', 'right text';
+  is $dom->at('html div[id^="☃"]')->text,               'Snowman', 'right text';
+  is $dom->at('html > div[id^="☃"]')->text,             'Snowman', 'right text';
+  is $dom->at('[id^=☃]')->text,                         'Snowman', 'right text';
+  is $dom->at('div[id^=☃]')->text,                      'Snowman', 'right text';
+  is $dom->at('html div[id^=☃]')->text,                 'Snowman', 'right text';
+  is $dom->at('html > div[id^=☃]')->text,               'Snowman', 'right text';
   is $dom->at(".\\\n\\002665")->text,                   'Heart',   'right text';
   is $dom->at('.\\2665')->text,                         'Heart',   'right text';
   is $dom->at("html .\\\n\\002665")->text,              'Heart',   'right text';
@@ -402,26 +402,26 @@ subtest 'Unicode and escaped selectors' => sub {
   is $dom->at(qq{[class\$="\\2665"]})->text,            'Heart',   'right text';
   is $dom->at('.x')->text,                              'Heart',   'right text';
   is $dom->at('html .x')->text,                         'Heart',   'right text';
-  is $dom->at('.♥')->text,                            'Heart',   'right text';
-  is $dom->at('html .♥')->text,                       'Heart',   'right text';
-  is $dom->at('div.♥')->text,                         'Heart',   'right text';
-  is $dom->at('html div.♥')->text,                    'Heart',   'right text';
-  is $dom->at('[class$="♥"]')->text,                  'Heart',   'right text';
-  is $dom->at('div[class$="♥"]')->text,               'Heart',   'right text';
-  is $dom->at('html div[class$="♥"]')->text,          'Heart',   'right text';
-  is $dom->at('html > div[class$="♥"]')->text,        'Heart',   'right text';
-  is $dom->at('[class$=♥]')->text,                    'Heart',   'right text';
-  is $dom->at('div[class$=♥]')->text,                 'Heart',   'right text';
-  is $dom->at('html div[class$=♥]')->text,            'Heart',   'right text';
-  is $dom->at('html > div[class$=♥]')->text,          'Heart',   'right text';
-  is $dom->at('[class~="♥"]')->text,                  'Heart',   'right text';
-  is $dom->at('div[class~="♥"]')->text,               'Heart',   'right text';
-  is $dom->at('html div[class~="♥"]')->text,          'Heart',   'right text';
-  is $dom->at('html > div[class~="♥"]')->text,        'Heart',   'right text';
-  is $dom->at('[class~=♥]')->text,                    'Heart',   'right text';
-  is $dom->at('div[class~=♥]')->text,                 'Heart',   'right text';
-  is $dom->at('html div[class~=♥]')->text,            'Heart',   'right text';
-  is $dom->at('html > div[class~=♥]')->text,          'Heart',   'right text';
+  is $dom->at('.♥')->text,                              'Heart',   'right text';
+  is $dom->at('html .♥')->text,                         'Heart',   'right text';
+  is $dom->at('div.♥')->text,                           'Heart',   'right text';
+  is $dom->at('html div.♥')->text,                      'Heart',   'right text';
+  is $dom->at('[class$="♥"]')->text,                    'Heart',   'right text';
+  is $dom->at('div[class$="♥"]')->text,                 'Heart',   'right text';
+  is $dom->at('html div[class$="♥"]')->text,            'Heart',   'right text';
+  is $dom->at('html > div[class$="♥"]')->text,          'Heart',   'right text';
+  is $dom->at('[class$=♥]')->text,                      'Heart',   'right text';
+  is $dom->at('div[class$=♥]')->text,                   'Heart',   'right text';
+  is $dom->at('html div[class$=♥]')->text,              'Heart',   'right text';
+  is $dom->at('html > div[class$=♥]')->text,            'Heart',   'right text';
+  is $dom->at('[class~="♥"]')->text,                    'Heart',   'right text';
+  is $dom->at('div[class~="♥"]')->text,                 'Heart',   'right text';
+  is $dom->at('html div[class~="♥"]')->text,            'Heart',   'right text';
+  is $dom->at('html > div[class~="♥"]')->text,          'Heart',   'right text';
+  is $dom->at('[class~=♥]')->text,                      'Heart',   'right text';
+  is $dom->at('div[class~=♥]')->text,                   'Heart',   'right text';
+  is $dom->at('html div[class~=♥]')->text,              'Heart',   'right text';
+  is $dom->at('html > div[class~=♥]')->text,            'Heart',   'right text';
   is $dom->at('[class~="x"]')->text,                    'Heart',   'right text';
   is $dom->at('div[class~="x"]')->text,                 'Heart',   'right text';
   is $dom->at('html div[class~="x"]')->text,            'Heart',   'right text';
@@ -431,8 +431,8 @@ subtest 'Unicode and escaped selectors' => sub {
   is $dom->at('html div[class~=x]')->text,              'Heart',   'right text';
   is $dom->at('html > div[class~=x]')->text,            'Heart',   'right text';
   is $dom->at('html'), $html, 'right result';
-  is $dom->at('#☃x')->parent,     $html, 'right result';
-  is $dom->at('#☃x')->root,       $html, 'right result';
+  is $dom->at('#☃x')->parent,       $html, 'right result';
+  is $dom->at('#☃x')->root,         $html, 'right result';
   is $dom->children('html')->first, $html, 'right result';
   is $dom->to_string, $html, 'right result';
   is $dom->content,   $html, 'right result';
@@ -1250,25 +1250,25 @@ EOF
   is $dom->at('p + div')->text,               'G', 'right text';
   is $dom->at('ul + h1 + p + p + div')->text, 'G', 'right text';
   is $dom->at('ul + h1 ~ p + div')->text,     'G', 'right text';
-  is $dom->at('h1 ~ #♥')->text,             'E', 'right text';
-  is $dom->at('h1 + #♥')->text,             'E', 'right text';
-  is $dom->at('#♥~#☃')->text,             'F', 'right text';
-  is $dom->at('#♥+#☃')->text,             'F', 'right text';
-  is $dom->at('#♥+#☃>b')->text,           'H', 'right text';
+  is $dom->at('h1 ~ #♥')->text,               'E', 'right text';
+  is $dom->at('h1 + #♥')->text,               'E', 'right text';
+  is $dom->at('#♥~#☃')->text,                 'F', 'right text';
+  is $dom->at('#♥+#☃')->text,                 'F', 'right text';
+  is $dom->at('#♥+#☃>b')->text,               'H', 'right text';
   is $dom->at('#♥ > #☃'), undef, 'no result';
   is $dom->at('#♥ #☃'),   undef, 'no result';
   is $dom->at('#♥ + #☃ + :nth-last-child(1)')->text,  'G', 'right text';
   is $dom->at('#♥ ~ #☃ + :nth-last-child(1)')->text,  'G', 'right text';
   is $dom->at('#♥ + #☃ ~ :nth-last-child(1)')->text,  'G', 'right text';
   is $dom->at('#♥ ~ #☃ ~ :nth-last-child(1)')->text,  'G', 'right text';
-  is $dom->at('#♥ + :nth-last-child(2)')->text,         'F', 'right text';
-  is $dom->at('#♥ ~ :nth-last-child(2)')->text,         'F', 'right text';
+  is $dom->at('#♥ + :nth-last-child(2)')->text,       'F', 'right text';
+  is $dom->at('#♥ ~ :nth-last-child(2)')->text,       'F', 'right text';
   is $dom->at('#♥ + #☃ + *:nth-last-child(1)')->text, 'G', 'right text';
   is $dom->at('#♥ ~ #☃ + *:nth-last-child(1)')->text, 'G', 'right text';
   is $dom->at('#♥ + #☃ ~ *:nth-last-child(1)')->text, 'G', 'right text';
   is $dom->at('#♥ ~ #☃ ~ *:nth-last-child(1)')->text, 'G', 'right text';
-  is $dom->at('#♥ + *:nth-last-child(2)')->text,        'F', 'right text';
-  is $dom->at('#♥ ~ *:nth-last-child(2)')->text,        'F', 'right text';
+  is $dom->at('#♥ + *:nth-last-child(2)')->text,      'F', 'right text';
+  is $dom->at('#♥ ~ *:nth-last-child(2)')->text,      'F', 'right text';
 };
 
 subtest 'Scoped selectors' => sub {
@@ -2876,6 +2876,40 @@ EOF
 subtest 'Reusing partial DOM trees' => sub {
   my $dom = Mojo::DOM->new->parse('<div><b>Test</b></div>');
   is $dom->at('div')->prepend($dom->at('b'))->root, '<b>Test</b><div><b>Test</b></div>', 'right result';
+};
+
+subtest 'Real world table with optional elements' => sub {
+  my $dom = Mojo::DOM->new->parse(<<EOF);
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>key</th>
+          <th>secret</th>
+          <th>expires</th>
+          <th>action</th>
+      </thead>
+      <tbody>
+        <tr id="api_key_4">
+          <td class="key">PERCIVALKEY01</td>
+          <td class="secret">PERCIVALSECRET01</td>
+          <td class="expiration">2020-06-18 11:12:03 +0000</td>
+        <tr id="api_key_5">
+          <td class="key">PERCIVALKEY02</td>
+          <td class="secret">PERCIVALSECRET02</td>
+          <td class="expiration">never</td>
+      </tbody>
+    </table>
+  </body>
+</html>
+EOF
+  is $dom->at('thead tr th')->text,            'key',                       'right text';
+  is $dom->at('#api_key_4 .key')->text,        'PERCIVALKEY01',             'right text';
+  is $dom->at('#api_key_4 .secret')->text,     'PERCIVALSECRET01',          'right text';
+  is $dom->at('#api_key_4 .expiration')->text, '2020-06-18 11:12:03 +0000', 'right text';
+  is $dom->at('#api_key_5 .expiration')->text, 'never',                     'right text';
 };
 
 done_testing();

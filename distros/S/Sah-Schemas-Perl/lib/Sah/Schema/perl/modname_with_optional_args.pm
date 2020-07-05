@@ -1,9 +1,11 @@
 package Sah::Schema::perl::modname_with_optional_args;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-16'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
+
+use Regexp::Pattern::Perl::Module ();
 
 our $schema = [str => {
     summary => 'Perl module name (e.g. Foo::Bar) with optional arguments (e.g. Foo::Bar=arg1,arg2)',
@@ -52,7 +54,7 @@ Sah::Schema::perl::modname_with_optional_args - Perl module name (e.g. Foo::Bar)
 
 =head1 VERSION
 
-This document describes version 0.033 of Sah::Schema::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
+This document describes version 0.034 of Sah::Schema::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
 
 =head1 SYNOPSIS
 

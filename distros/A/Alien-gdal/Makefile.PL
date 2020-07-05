@@ -4,7 +4,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %common_reqs = (
-    "Alien::Build" => "1.55",  #  needed for version_atleast
+    "Alien::Build" => "2.25",  #  needed for clean_install
     "ExtUtils::MakeMaker" => "6.52",
     "Alien::Build::MM" => "1.41",
     "Alien::patch" => 0,
@@ -69,7 +69,12 @@ my %WriteMakefileArgs = (
 use Alien::Build::MM;
 my $abmm = Alien::Build::MM->new (
     #my_alienfile_meta => 0,
+    clean_install => 1,
 );
+sub MY::install {
+  $abmm->mm_install(@_);
+}
+
 %WriteMakefileArgs = $abmm->mm_args(
     %WriteMakefileArgs,
 );

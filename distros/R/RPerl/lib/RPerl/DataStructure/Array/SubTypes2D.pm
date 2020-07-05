@@ -3,7 +3,7 @@ package RPerl::DataStructure::Array::SubTypes2D;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.017_000;
+our $VERSION = 0.019_000;
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
@@ -31,9 +31,28 @@ package    # hide from PAUSE indexing
 package    # hide from PAUSE indexing
     string;
 
+# [[[ ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ ARRAY REF ARRAY (2-dimensional) ]]]
+
+# array of (refs to arrays)
+package  # hide from PAUSE indexing
+    arrayref_array;
+use strict;
+use warnings;
+use parent -norequire, qw(array);
+
 # [[[ ARRAY REF ARRAY REF (2-dimensional) ]]]
 # [[[ ARRAY REF ARRAY REF (2-dimensional) ]]]
 # [[[ ARRAY REF ARRAY REF (2-dimensional) ]]]
+
+# DEV NOTE, CORRELATION #rp046: FOO::method package declaration must be above FOO package's new() subroutine to avoid error "No such class"
+# method returning (ref to array) of (refs to arrays)
+package  # hide from PAUSE indexing
+    arrayref_arrayref::method;
+use strict;
+use warnings;
+use parent -norequire, qw(method);
 
 # (ref to array) of (refs to arrays)
 package  # hide from PAUSE indexing
@@ -42,10 +61,25 @@ use strict;
 use warnings;
 use parent -norequire, qw(arrayref);
 
-# [[[ HOMOGENEOUS ARRAY REF ARRAY REF (2-dimensional) ]]] 
-# [[[ HOMOGENEOUS ARRAY REF ARRAY REF (2-dimensional) ]]] 
-# [[[ HOMOGENEOUS ARRAY REF ARRAY REF (2-dimensional) ]]] 
+# [[[ INTEGER ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ INTEGER ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ INTEGER ARRAY REF ARRAY (2-dimensional) ]]]
 
+# no method-return-type or type-checking or stringify for array types, only arrayref types;
+# DEV NOTE, CORRELATION #rp031: Perl can not pass @array or %hash by value, must always pass scalar $arrayref or $hashref by reference
+
+# array of (refs to (arrays of integers))
+package  # hide from PAUSE indexing
+    integer_arrayref_array;
+use strict;
+use warnings;
+use parent -norequire, qw(arrayref_array);
+
+# [[[ INTEGER ARRAY REF ARRAY REF (2-dimensional) ]]]
+# [[[ INTEGER ARRAY REF ARRAY REF (2-dimensional) ]]]
+# [[[ INTEGER ARRAY REF ARRAY REF (2-dimensional) ]]]
+
+# DEV NOTE, CORRELATION #rp046: FOO::method package declaration must be above FOO package's new() subroutine to avoid error "No such class"
 # method returning (ref to array) of (refs to (arrays of integers))
 package  # hide from PAUSE indexing
     integer_arrayref_arrayref::method;
@@ -87,6 +121,25 @@ sub new {
     return $retval;
 }
 
+# [[[ NUMBER ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ NUMBER ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ NUMBER ARRAY REF ARRAY (2-dimensional) ]]]
+
+# no method-return-type or type-checking or stringify for array types, only arrayref types;
+# DEV NOTE, CORRELATION #rp031: Perl can not pass @array or %hash by value, must always pass scalar $arrayref or $hashref by reference
+
+# array of (refs to (arrays of numbers))
+package  # hide from PAUSE indexing
+    number_arrayref_array;
+use strict;
+use warnings;
+use parent -norequire, qw(arrayref_array);
+
+# [[[ NUMBER ARRAY REF ARRAY REF (2-dimensional) ]]]
+# [[[ NUMBER ARRAY REF ARRAY REF (2-dimensional) ]]]
+# [[[ NUMBER ARRAY REF ARRAY REF (2-dimensional) ]]]
+
+# DEV NOTE, CORRELATION #rp046: FOO::method package declaration must be above FOO package's new() subroutine to avoid error "No such class"
 # method returning (ref to array) of (refs to (arrays of numbers))
 package  # hide from PAUSE indexing
     number_arrayref_arrayref::method;
@@ -118,6 +171,25 @@ sub new {
     return $retval;
 }
 
+# [[[ STRING ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ STRING ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ STRING ARRAY REF ARRAY (2-dimensional) ]]]
+
+# no method-return-type or type-checking or stringify for array types, only arrayref types;
+# DEV NOTE, CORRELATION #rp031: Perl can not pass @array or %hash by value, must always pass scalar $arrayref or $hashref by reference
+
+# array of (refs to (arrays of strings))
+package  # hide from PAUSE indexing
+    string_arrayref_array;
+use strict;
+use warnings;
+use parent -norequire, qw(arrayref_array);
+
+# [[[ STRING ARRAY REF ARRAY REF (2-dimensional) ]]]
+# [[[ STRING ARRAY REF ARRAY REF (2-dimensional) ]]]
+# [[[ STRING ARRAY REF ARRAY REF (2-dimensional) ]]]
+
+# DEV NOTE, CORRELATION #rp046: FOO::method package declaration must be above FOO package's new() subroutine to avoid error "No such class"
 # method returning (ref to array) of (refs to (arrays of strings))
 package  # hide from PAUSE indexing
     string_arrayref_arrayref::method;
@@ -149,6 +221,25 @@ sub new {
     return $retval;
 }
 
+# [[[ SCALAR ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ SCALAR ARRAY REF ARRAY (2-dimensional) ]]]
+# [[[ SCALAR ARRAY REF ARRAY (2-dimensional) ]]]
+
+# no method-return-type or type-checking or stringify for array types, only arrayref types;
+# DEV NOTE, CORRELATION #rp031: Perl can not pass @array or %hash by value, must always pass scalar $arrayref or $hashref by reference
+
+# array of (refs to (arrays of scalartypes))
+package  # hide from PAUSE indexing
+    scalartype_arrayref_array;
+use strict;
+use warnings;
+use parent -norequire, qw(arrayref_array);
+
+# [[[ SCALAR ARRAY REF ARRAY REF (2-dimensional) ]]]
+# [[[ SCALAR ARRAY REF ARRAY REF (2-dimensional) ]]]
+# [[[ SCALAR ARRAY REF ARRAY REF (2-dimensional) ]]]
+
+# DEV NOTE, CORRELATION #rp046: FOO::method package declaration must be above FOO package's new() subroutine to avoid error "No such class"
 # method returning (ref to array) of (refs to (arrays of scalartypes))
 package  # hide from PAUSE indexing
     scalartype_arrayref_arrayref::method;
@@ -180,9 +271,31 @@ sub new {
     return $retval;
 }
 
-# [[[ HASH REF ARRAY REF ]]]
-# [[[ HASH REF ARRAY REF ]]]
-# [[[ HASH REF ARRAY REF ]]]
+# [[[ HASH REF ARRAY (2-dimensional) ]]]
+# [[[ HASH REF ARRAY (2-dimensional) ]]]
+# [[[ HASH REF ARRAY (2-dimensional) ]]]
+
+# no method-return-type or type-checking or stringify for array types, only arrayref types;
+# DEV NOTE, CORRELATION #rp031: Perl can not pass @array or %hash by value, must always pass scalar $arrayref or $hashref by reference
+
+# array of (refs to hashes)
+package  # hide from PAUSE indexing
+    hashref_array;
+use strict;
+use warnings;
+use parent -norequire, qw(array);
+
+# [[[ HASH REF ARRAY REF (2-dimensional) ]]]
+# [[[ HASH REF ARRAY REF (2-dimensional) ]]]
+# [[[ HASH REF ARRAY REF (2-dimensional) ]]]
+
+# DEV NOTE, CORRELATION #rp046: FOO::method package declaration must be above FOO package's new() subroutine to avoid error "No such class"
+# method returning (ref to array) of (refs to hashes)
+package  # hide from PAUSE indexing
+    hashref_arrayref::method;
+use strict;
+use warnings;
+use parent -norequire, qw(method);
 
 # (ref to array) of (refs to hashs)
 package  # hide from PAUSE indexing
@@ -193,10 +306,31 @@ use parent -norequire, qw(arrayref);
 
 
 # NEED ANSWER: are object arrays really 2-D, or are they 1-D???
+# NEED ANSWER: are object arrays really 2-D, or are they 1-D???
+# NEED ANSWER: are object arrays really 2-D, or are they 1-D???
+
+# [[[ OBJECT ARRAY ]]]
+# [[[ OBJECT ARRAY ]]]
+# [[[ OBJECT ARRAY ]]]
+
+# array of objects
+package  # hide from PAUSE indexing
+    object_array;
+use strict;
+use warnings;
+use parent -norequire, qw(array);
 
 # [[[ OBJECT ARRAY REF ]]]
 # [[[ OBJECT ARRAY REF ]]]
 # [[[ OBJECT ARRAY REF ]]]
+
+# DEV NOTE, CORRELATION #rp046: FOO::method package declaration must be above FOO package's new() subroutine to avoid error "No such class"
+# method returning (ref to array) of objects
+package  # hide from PAUSE indexing
+    object_arrayref::method;
+use strict;
+use warnings;
+use parent -norequire, qw(method);
 
 # (ref to array) of objects
 package  # hide from PAUSE indexing

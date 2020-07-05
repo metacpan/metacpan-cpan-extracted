@@ -97,6 +97,7 @@ my %WriteMakefileArgs = (
     "List::Util" => "1.50",
     "Mojo::JSON::Pointer" => 0,
     "Mojo::URL" => 0,
+    "Mojolicious" => "7.23",
     "Moo" => 0,
     "MooX::HandlesVia" => 0,
     "MooX::TypeTiny" => "0.002002",
@@ -129,7 +130,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -145,6 +146,7 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Mojo::JSON::Pointer" => 0,
   "Mojo::URL" => 0,
+  "Mojolicious" => "7.23",
   "Moo" => 0,
   "MooX::HandlesVia" => 0,
   "MooX::TypeTiny" => "0.002002",

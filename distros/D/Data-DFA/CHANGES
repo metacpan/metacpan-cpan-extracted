@@ -1,0 +1,5 @@
+2020.06.21 Added &shortPaths, &longPaths
+2020.06.21 Fixed loss of first state problem where the first state got sorted to somewhere other than position 1 in the dfa
+2020.06.21 (a*|b+) was accepting "a b", now it does not - required fix to Data::NFA as well
+2020.06.23 Added &loops
+2020.06.27 Added: &parseDtdElementAST, &Data::DFA::Parser::fail

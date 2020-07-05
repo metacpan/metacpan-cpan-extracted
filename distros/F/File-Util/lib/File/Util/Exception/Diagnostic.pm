@@ -1,10 +1,8 @@
 use strict;
 use warnings;
 
-use lib 'lib';
-
 package File::Util::Exception::Diagnostic;
-$File::Util::Exception::Diagnostic::VERSION = '4.161950';
+$File::Util::Exception::Diagnostic::VERSION = '4.201720';
 # ABSTRACT: Diagnostic (verbose) error messages
 
 use File::Util::Definitions qw( :all );
@@ -645,7 +643,7 @@ File::Util::Exception::Diagnostic - Diagnostic (verbose) error messages
 
 =head1 VERSION
 
-version 4.161950
+version 4.201720
 
 =head1 DESCRIPTION
 

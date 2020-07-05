@@ -45,6 +45,11 @@ DESCRIPTION
     Please also see "NOTES" about MANIFEST.SKIP issues, especially if you
     are using Module::Build or writing your own MANIFEST.SKIP.
 
+    Signatures made with Module::Signature prior to version 0.82 used the
+    SHA1 algorithm by default. SHA1 is now considered broken, and therefore
+    module authors are strongly encouraged to regenerate their SIGNATURE
+    files. Users verifying old SHA1 signature files will receive a warning.
+
 VARIABLES
     No package variables are exported by default.
 
@@ -56,6 +61,11 @@ VARIABLES
     $SIGNATURE
         The filename for a distribution's signature file. Defaults to
         "SIGNATURE".
+
+    $AUTHOR
+        The key ID used for signature. If empty/null/0, "gpg"'s configured
+        default ID, or the most recently added key within the secret keyring
+        for "Crypt::OpenPGP", will be used for the signature.
 
     $KeyServer
         The OpenPGP key server for fetching the author's public key
@@ -76,15 +86,14 @@ VARIABLES
 
     $Cipher
         The default cipher used by the "Digest" module to make signature
-        files. Defaults to "SHA1", but may be changed to other ciphers via
-        the "MODULE_SIGNATURE_CIPHER" environment variable if the SHA1
+        files. Defaults to "SHA256", but may be changed to other ciphers via
+        the "MODULE_SIGNATURE_CIPHER" environment variable if the SHA256
         cipher is undesirable for the user.
 
         The cipher specified in the SIGNATURE file's first entry will be
-        used to validate its integrity. For "SHA1", the user needs to have
-        any one of these four modules installed: Digest::SHA, Digest::SHA1,
-        Digest::SHA::PurePerl, or (currently nonexistent)
-        Digest::SHA1::PurePerl.
+        used to validate its integrity. For "SHA256", the user needs to have
+        any one of these modules installed: Digest::SHA, Digest::SHA256, or
+        Digest::SHA::PurePerl.
 
     $Preamble
         The explanatory text written to newly generated SIGNATURE files
@@ -92,6 +101,9 @@ VARIABLES
 
 ENVIRONMENT
     Module::Signature honors these environment variables:
+
+    MODULE_SIGNATURE_AUTHOR
+        Works like $AUTHOR.
 
     MODULE_SIGNATURE_CIPHER
         Works like $Cipher.
@@ -242,7 +254,7 @@ NOTES
     Truskett's Test::Signature might be a better choice.
 
 SEE ALSO
-    Digest, Digest::SHA, Digest::SHA1, Digest::SHA::PurePerl
+    Digest, Digest::SHA, Digest::SHA::PurePerl
 
     ExtUtils::Manifest, Crypt::OpenPGP, Test::Signature
 
@@ -253,7 +265,10 @@ SEE ALSO
 AUTHORS
     Audrey Tang <cpan@audreyt.org>
 
-CC0 1.0 Universal
+LICENSE
+    This work is under a CC0 1.0 Universal License, although a portion of
+    the documentation (as detailed above) is under the Perl license.
+
     To the extent possible under law, 唐鳳 has waived all copyright and
     related or neighboring rights to Module-Signature.
 

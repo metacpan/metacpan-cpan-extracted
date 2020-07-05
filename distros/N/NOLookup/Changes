@@ -1,5 +1,24 @@
 Revision history for Perl extension NOLookup
 
+1.19 2020-06-30
+     - Added more RDAP support.
+     - Also added some whois utility functions for converting RDAP to
+       Norid whois output (rdap2whois behaviour).
+       Useful for testing, for users familiar with the whois output
+       format, and in case RDAP shall be used as a registrarwhois
+       proxy, in which case some full access layer should be offered
+       by Norid.
+     - Changed to use dist.ini and Dist::Zilla for build/release
+
+1.18 2020-06-03
+     - Added support for lookup to the Norid RDAP service.
+       - NOLookup::RDAP::RDAPLookup
+       - bin/no_rdap.pl : example program
+       - t/04test_rdap.t
+         layer tests controlled by env variables.
+       See POD for usage.
+     - t/03test_whois.t : added some test for whois
+
 1.17 2019-03-31
 
      - NOLookup::Brreg::DataLookup, NOLookup::BrregDifi::DataLookup:

@@ -1,5 +1,12 @@
 Revision history for ExtUtils-Install
 
+2.16
+
+- Use File::Spec->catfile to compose filenames
+- Use self-cleaning tempdir to conduct tests
+- only run POD test under AUTHOR_TESTING
+- marked some internals as private
+
 2.14
 
 - Fix tests for when perl path contains a space

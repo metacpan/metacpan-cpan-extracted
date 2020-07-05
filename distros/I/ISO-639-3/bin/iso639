@@ -1,0 +1,105 @@
+#!perl
+#-*-perl-*-
+#
+# convert between 2-letter and 3-letter language codes
+#
+# USAGE: ./iso639 [-2|-3|-m|-n|-k] [langcode]*
+#
+# convert to 3-letter-code if 2-letter code is given and vice versa
+# -2 ... print 2-letter code (even if the input is a 2-letter code)
+# -3 ... print 3-letter code (even if the input is a 3-letter code)
+# -m ... print macro language instead of local language variants
+# -n ... don't print a final new-line
+# -p ... convert language pairs
+# -P ... convert language pairs and sort alphabetically
+#
+
+=head1 NAME
+
+iso639 - a simple script to convert language codes
+
+=head1 SYNOPSIS
+
+  iso639 [OPTIONS] LANGCODE*
+
+This converts all language codes given as LANGCODE to corresponding language names. OPTIONS can be set to convert between different variants of language codes or to convert from language names to codes.
+
+=head2 OPTIONS
+
+  -2: convert to two-letter code (ISO 639-1)
+  -3: convert to three-letter code (ISO 639-3)
+  -m: convert to three-letter code but return the macro-language if available (ISO 639-3)
+  -n: don't print a final new line
+  -k: keep original code if no mapping is found
+
+=cut
+
+
+# use 5.006;
+use strict;
+use warnings;
+
+use lib 'lib';
+use ISO::639::3 qw/:all/;
+
+use open ':locale';
+use vars qw($opt_2 $opt_3 $opt_h $opt_m $opt_n $opt_k $opt_p $opt_P);
+use Getopt::Std;
+use Pod::Usage;
+
+&getopts('23hkmnpP');
+
+&pod2usage if ($opt_h);
+my $type = $opt_2 ? 'iso639-1' : $opt_3 ? 'iso639-3' : $opt_m ? 'macro' : 'name';
+my @converted = ($opt_p || $opt_P) ?
+    map($_ = convert_pairs($type,$_,$opt_P,$opt_k), @ARGV) :
+    map($_ = convert_iso639($type,$_,$opt_k), @ARGV);
+
+if ($type eq 'name' and @converted){
+    print '"',join('" "',@converted),'"';
+}
+else{
+    print join(' ',@converted);
+}
+print "\n" unless ($opt_n);
+
+
+## convert language pairs instead of single language codes
+## assume that they are joined using a single hyphen
+sub convert_pairs{
+    my ($type, $langs, $sorted, $keep) = @_;
+    my @converted = map($_ = convert_iso639($type,$_,$keep), split(/\-/,$langs));
+    @converted = sort @converted if ($sorted);
+    return join('-',@converted);
+}
+
+=head1 ACKNOWLEDGEMENTS
+
+The language codes are taken from SIL International L<https://iso639-3.sil.org>. Please, check the terms of use listed at L<https://iso639-3.sil.org/code_tables/download_tables>. The current version uses the UTF-8 tables distributed in C< iso-639-3_Code_Tables_20200130.zip> from that website. This module adds some non-standard codes that are not specified in the original tables to be compatible with some ad-hoc solutions in some resources and tools.
+
+
+=head1 LICENSE AND COPYRIGHT
+
+ ---------------------------------------------------------------------------
+ Copyright (c) 2020 Joerg Tiedemann
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ---------------------------------------------------------------------------
+
+=cut

@@ -1,15 +1,14 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
-use Test2::V0;
+use FindBin qw( $Bin );
+use lib "$Bin/../../t/lib";
 
+use Data::Dumper;
 use Markdent::Handler::HTMLFilter;
 use Markdent::Handler::MinimalTree;
 use Markdent::Parser;
-
-use lib 't/lib';
-
+use Test2::V0;
 use Test::Markdent;
 
 {

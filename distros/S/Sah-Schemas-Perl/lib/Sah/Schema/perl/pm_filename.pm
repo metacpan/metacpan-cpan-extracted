@@ -1,9 +1,9 @@
 package Sah::Schema::perl::pm_filename;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-16'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.034'; # VERSION
 
 our $schema = [str => {
     summary => 'A .pm filename, e.g. /path/Foo.pm',
@@ -74,7 +74,7 @@ Sah::Schema::perl::pm_filename - A .pm filename, e.g. /path/Foo.pm
 
 =head1 VERSION
 
-This document describes version 0.033 of Sah::Schema::perl::pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2020-06-16.
+This document describes version 0.034 of Sah::Schema::perl::pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2020-06-19.
 
 =head1 SYNOPSIS
 

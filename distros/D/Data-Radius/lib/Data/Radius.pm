@@ -3,7 +3,7 @@ package Data::Radius;
 use strict;
 use warnings;
 
-our $VERSION = '1.2.2';
+our $VERSION = '1.2.4';
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ Data::Radius - module to encode/decode RADIUS messages
         type => ACCESS_REQUEST,
         av_list => [
             { Name => 'User-Name', Value => 'JonSnow'},
-            { Name => 'Password', Value => 'Castle Black' },
+            { Name => 'User-Password', Value => 'Castle Black' },
             { Name => 'Message-Authenticator', Value => '' },
         ],
     );

@@ -16,6 +16,7 @@ Test2::Aggregate - Aggregate tests for increased speed
 =head1 SYNOPSIS
 
     use Test2::Aggregate;
+    use Test2::V0; # Or 'use Test::More' etc if your suite uses an other framework
 
     Test2::Aggregate::run_tests(
         dirs => \@test_dirs
@@ -25,33 +26,37 @@ Test2::Aggregate - Aggregate tests for increased speed
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 =head1 DESCRIPTION
 
 Aggregates all tests specified with C<dirs> (which can even be individual tests)
 to avoid forking, reloading etc that can help with performance (dramatically if
-you have numerous small tests) and also facilitate group profiling.
+you have numerous small tests) and also facilitate group profiling. It is quite
+common to have tests that take over a second of startup time for milliseconds of
+actual runtime - L<Test2::Aggregate> removes that overhead.
 Test files are expected to end in B<.t> and are run as subtests of a single
 aggregate test.
 
 A bit similar (mainly in intent) to L<Test::Aggregate>, but no inspiration was
 drawn from the specific module, so simpler in concept and execution, which
-makes it more likely to work with your test suite (especially if you use modern
-tools like Test2). It does not even try to package each test by default, which may
-be good or bad (e.g. redefines), depending on your requirements.
+makes it much more likely to work with your test suite (especially if you use modern
+tools like L<Test2::Suite>). It does not even try to package each test by default
+(there is an option), which may be good or bad, depending on your requirements.
 
 Generally, the way to use this module is to try to aggregate sets of quick tests
-(e.g. unit tests). Try to iterativelly add tests to the aggregator, dropping those
-that do not work. Trying an entire suite in one go is a bad idea, an incompatible
-test can break the run failing all the subsequent tests (especially when doing
-things like globally redefining built-ins etc). The module can usually work with
-L<Test::More> suites, but will have more issues than when you use the more modern
-L<Test2::Suite> (see notes).
+(e.g. unit tests). Try to iterativelly add tests to the aggregator, using the C<lists>
+option, so you can easily edit and remove those that do not work. Trying an entire,
+large, suite in one go is not a good idea, as an incompatible test can break the
+run making the subsequent tests fail (especially when doing things like globally
+redefining built-ins etc) - see the module usage notes for help.
+
+The module can work with L<Test::Builder> / L<Test::More> suites, but you will
+have less issues with L<Test2::Suite> (see notes).
 
 =head1 METHODS
  
@@ -75,6 +80,7 @@ L<Test2::Suite> (see notes).
         stats_output  => $stats_output_path,  # optional
         extend_stats  => 0,                   # optional
         test_warnings => 0,                   # optional
+        allow_errors  => 0,                   # optional
         pre_eval      => $code_to_eval,       # optional
         dry_run       => 0                    # optional
     );
@@ -106,9 +112,12 @@ end in C<.t>.
 
 Arrayref of flat files from which each line will be pushed to C<dirs> (so they
 have a lower precedence - note C<root> still applies, don't include it in the
-paths inside the list files). If the path does not exist, it will be silently
-ignored, however the "official" way to skip a line without checking it as a path
-is to start with a C<#> to denote a comment.
+paths inside the list files). If the path does not exist, it will currently be
+silently ignored, however the "official" way to skip a line without checking it
+as a path is to start with a C<#> to denote a comment.
+
+This option is nicely combined with the C<--exclude-list> option of C<yath> (the
+L<Test2::Harness>) to skip the individual runs of the tests you aggregated.
 
 =item * C<exclude> (optional)
 
@@ -133,8 +142,8 @@ test. Useful for testing modules with special namespace requirements.
 =item * C<package> (optional)
 
 Will package each test in its own namespace. While it may help avoid things like
-redefine warnings, from experience it doesn't often prove helpful (it may break
-tests when aggregating them), so it is disabled by default.
+redefine warnings, from experience, it can break some tests, so it is disabled
+by default.
 
 =item * C<override> (optional)
 
@@ -177,6 +186,12 @@ test which expects zero as the number of tests which had STDERR output.
 The STDERR output of each test will be printed at the end of the test run (and
 included in the test run result hash), so if you want to see warnings the moment
 they are generated leave this option disabled.
+
+=item * C<allow_errors> (optional)
+
+If enabled, it will allow errors that exit tests prematurely (so they may return
+a pass if one of their subtests had passed). The option is available to enable
+old behaviour (version <= 0.12), before the module stopped allowing this.
 
 =item * C<dry_run> (optional)
 
@@ -358,13 +373,20 @@ sub _run_tests {
             $start = Time::HiRes::time() if $args->{stats_output};
             $stats{$test}{timestamp} = _timestamp();
 
+            my $exec_error;
             my $result = subtest $iter. "Running test $test" => sub {
                 eval $args->{pre_eval} if $args->{pre_eval};
 
-                $args->{dry_run} ? Test2::V0::ok($test)
-                  : $args->{package}
-                  ? eval "package Test::$i" . '::' . "$count; do '$test';"
-                  : do $test;
+                if ($args->{dry_run}) {
+                    Test2::V0::ok($test);
+                } else {
+                    $args->{package}
+                        ? eval "package Test::$i" . '::' . "$count; do '$test';"
+                        : do $test;
+                    $exec_error = $@;
+                }
+                Test2::V0::is($exec_error, '', 'Execution should not fail/warn')
+                        if !$args->{allow_errors} && $exec_error;
             };
 
             warn "<-Test2::Aggregate\n" if $args->{test_warnings};
@@ -446,7 +468,8 @@ the end of the test etc.
 
 Unit tests are usually great for aggregating. You could use the hash that C<run_tests>
 returns in a script that tries to add more tests automatically to an aggregate list
-to see which added tests passed and keep them, dropping failures.
+to see which added tests passed and keep them, dropping failures. See later in the
+notes for a detailed example.
 
 Trying to aggregate too many tests into a single one can be counter-intuitive as
 you would ideally want to parallelize your test suite (so a super-long aggregated
@@ -471,10 +494,27 @@ Although the module tries to load C<Test2> with minimal imports to not interfere
 it is generally better to do C<use Test::More;> in your aggregating test (i.e.
 alongside with C<use Test2::Aggregate>).
 
-One more caveat is that C<Test2::Aggregate::run_tests> uses C<subtest> from the
-L<Test2::Suite>, which on rare occasions can return a true value when a L<Test::More>
-subtest fails by running no tests, so you could have a failed test show up as
-having a 100 C<pass_perc> in the C<Test2::Aggregate::run_tests> output.
+=head2 BEGIN / END Blocks
+
+C<BEGIN> / C<END> blocks will run at the start/end of each test and any overrides
+etc you might have set will apply to the rest of the tests, so if you use them you
+probably need to make changes for aggregation. An example of such a change is when
+you have a C<*GLOBAL::CORE::exit> override to test scripts that can call C<exit()>.
+A solution is to use something like L<Test::Trap>: 
+
+ BEGIN {
+     unless ($Test::Trap::VERSION) { # Avoid warnings for multiple loads in aggregation
+         require Test::Trap;
+         Test::Trap->import();
+     }
+ }
+
+=head2 Test::Class
+
+L<Test::Class> is sort of an aggregator itself. You make your tests into modules
+and then load them on the same C<.t> file, so ideally you will not end up with many
+C<.t> files that would require further aggregation. If you do, due to the L<Test::Class>
+implementation specifics, those C<.t> files won't run under L<Test2::Aggregator>.
 
 =head2 $ENV{AGGREGATE_TESTS}
 
@@ -499,6 +539,71 @@ disable warnings on redefines only for tests that run aggregated:
 
 Another idea is to make the test die when it is run under the aggregator, if, at
 design time, you know it is not supposed to run aggregated.
+
+=head2 Example aggregating strategy
+
+There are many approaches you could do to use C<Test2::Aggregate> with an existing
+test suite, so for example you can start by making a list of the test files you
+are trying to aggregate:
+
+ find t -name '*.t' > all.lst
+
+If you have a substantial test suite, perhaps try with a portion of it (a subdir?)
+instead of the entire suite. In any case, try running them aggregated like this:
+
+ use Test2::Aggregate;
+ use Test2::V0; # Or Test::More;
+
+ my $stats = Test2::Aggregate::run_tests(
+    lists => ['all.lst'],
+ );
+
+ open OUT, ">pass.lst";
+ foreach my $test (sort {$stats->{$a}->{test_no} <=> $stats->{$b}->{test_no}} keys %$stats) {
+     print OUT "$test\n" if $stats->{$test}->{pass_perc};
+ }
+ close OUT;
+
+ done_testing();
+
+Run the above with C<prove> or C<yath> in verbose mode, so that in case the run
+hangs (it can happen), you can see where it did so and edit C<all.lst> removing
+the offending test.
+
+If the run completes, you have a "starting point" - i.e. a list that can run under
+the aggregator in C<pass.lst>.
+You can try adding back some of the failed tests - test failures can be cascading,
+so some might be passing if added back, or have small issues you can address.
+
+Try adding C<test_warnings =E<gt> 1> to C<run_tests> to fix warnings as well, unless
+it is common for your tests to have C<STDERR> output.
+
+To have your entire suite run aggregated tests together once and not repeat them
+along with the other, non-aggregated, tests, it is a good idea to use the
+C<--exclude-list> option of the C<Test2::Harness>.
+
+Hopefully your tests can run in parallel (C<prove/yath -j>), in which case you
+would split your aggregated tests into multiple lists to have them run in parallel.
+Here is an example of a wrapper around C<yath>, to easily handle multiple lists:
+
+ BEGIN {
+     my @args = ();
+     foreach (@ARGV) {
+         if (/--exclude-lists=(\S+)/) {
+             my $all = 't/aggregate/aggregated.tests';
+             `awk '{print "t/"\$0}' $1 > $all`;
+             push @args, "--exclude-list=$all";
+         } else { push @args, $_ if $_; }
+     }
+     push @args, qw(-P...) # Preload module list (useful for non-aggregated tests)
+         unless grep {/--cover/} @args;
+     @ARGV = @args;
+ }
+ exec ('yath', @ARGV);
+
+You would call it with something like C<--exclude-lists=t/aggregate/*.lst>, and
+the tests listed will be excluded (you will have them running aggregated through
+their own C<.t> files using L<Test2::Aggregate>).
 
 =head1 AUTHOR
 

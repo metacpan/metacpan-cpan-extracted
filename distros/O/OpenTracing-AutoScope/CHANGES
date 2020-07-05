@@ -2,6 +2,33 @@ CHANGE LOG
 ==========
 
 
+2020-07-01 - v0.101.0
+---------------------
+
+### Added
+  - `install_wrapped`
+  - `wrapped`
+
+### Changed
+  - tags are being prefixed and contain caller info
+  - emits warnings for missing subroutines instead of `die`
+
+### Fixed
+  - various typos and grammer issues in POD
+
+
+2020-06-26 - v0.100.0
+---------------------
+
+Re-Release
+
+### Added
+  - WrapScope
+
+### Changed
+  - AutoScope
+
+
 2020-01-16 - v0.01
 ------------------
 

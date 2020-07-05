@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Client::2_0::Direct::Cluster;
-$Search::Elasticsearch::Client::2_0::Direct::Cluster::VERSION = '6.80';
+$Search::Elasticsearch::Client::2_0::Direct::Cluster::VERSION = '6.81';
 use Moo;
 with 'Search::Elasticsearch::Client::2_0::Role::API';
 with 'Search::Elasticsearch::Role::Client::Direct';
@@ -17,7 +17,7 @@ Search::Elasticsearch::Client::2_0::Direct::Cluster - A client for running clust
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 DESCRIPTION
 

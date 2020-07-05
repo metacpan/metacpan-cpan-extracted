@@ -215,6 +215,8 @@ L<Protocol::HTTP::Message>
 
 L<Protocol::HTTP::Compression>
 
+L<Protocol::HTTP::CookieJar>
+
 L<URI::XS>
 
 

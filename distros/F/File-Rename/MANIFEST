@@ -3,7 +3,6 @@ CONTRIBUTING
 Build.PL
 Makefile.PL
 MANIFEST
-MANIFEST.SKIP
 README
 t/File-Rename.t
 t/File-Rename-E.t
@@ -17,6 +16,7 @@ t/File-Rename-list.t
 t/File-Rename-list-null.t
 t/File-Rename-require.t
 t/File-Rename-V.t
+t/rename-examples.t
 t/pod.t
 t/pod-coverage.t
 t/testlib.pl

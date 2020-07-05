@@ -1,5 +1,8 @@
 Revision history for Calendar::Julian
 
+0.17  Thu Jun 25 01:20:00 2020
+      - Proposed fix for RT #132849, thanks @SREZIC.
+
 0.16  Fri Oct 25 21:40:00 2019
       - Added dependency on Date::Julian::Simple v0.11.
 

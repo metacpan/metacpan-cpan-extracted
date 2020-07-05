@@ -3,7 +3,11 @@ package OpenTracing::DSL;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '1.001'; # VERSION
+our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
+
+no indirect;
+use utf8;
 
 =encoding utf8
 
@@ -25,8 +29,11 @@ OpenTracing::DSL - application tracing
 
 =cut
 
+use Syntax::Keyword::Try;
+
 use Exporter qw(import export_to_level);
 
+use Log::Any qw($log);
 use OpenTracing::Any qw($tracer);
 
 our %EXPORT_TAGS = (
@@ -34,11 +41,47 @@ our %EXPORT_TAGS = (
 );
 our @EXPORT_OK = $EXPORT_TAGS{v1}->@*;
 
+=head2 trace
+
+Takes a block of code and provides it with an L<OpenTracing::SpanProxy>.
+
+ trace {
+  my ($span) = @_;
+  $span->tag(
+   'extra.details' => '...'
+  );
+ } operation_name => 'your_code';
+
+Returns whatever your code did.
+
+If the block of code throws an exception, that'll cause the span to be
+marked as an error.
+
+=cut
+
 sub trace(&;@) {
     my ($code, %args) = @_;
-    my $name = delete($args{operation_name}) // 'unknown';
-    my $span = $tracer->span($name, %args);
-    return $code->($span);
+    $args{operation_name} //= 'unknown';
+    my $span = $tracer->span(%args);
+    try {
+        return $code->($span);
+    } catch {
+        my $err = $@;
+        eval {
+            $span->tag(
+                error => 1,
+                'operation.status' => 'failed'
+            );
+            $span->log(
+                event   => 'general exception',
+                payload => "$err"
+            );
+            1
+        } or $log->warnf('Exception during span exception handler - %s', $@);
+        die $err;
+    } finally {
+        undef $span
+    }
 }
 
 1;
@@ -51,5 +94,5 @@ Tom Molesworth <TEAM@cpan.org>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2018-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2018-2020. Licensed under the same terms as Perl itself.
 

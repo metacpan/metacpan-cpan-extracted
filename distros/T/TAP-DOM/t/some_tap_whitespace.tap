@@ -1,0 +1,22 @@
+TAP Version 13
+#
+# uname -a:
+# Linux master 4.20.0-rc2-00052-g5929a1f0ff30-dirty #10 Tue Nov 20 16:38:31 CET 2018 x86_64 GNU/Linux
+#
+# benchmark parameters:
+# Test-linux-cmdline-bmk.fast: 1
+# Test-foo: bar
+#
+[18] Unrelated non-tap line
+ok - foo # SKIP no foo available
+# 1..1
+[18] Receive long file on port 1
+ok - bar # SKIP no bar available
+# 1..1
+# EOF
+1..1
+not ok 1 - execution - run scenario.yml
+  ---
+  message: Test timed out after 1200 seconds. Was expecting: end of TAP test output (TAP TEST FINISH)
+  severity: fail
+  ...

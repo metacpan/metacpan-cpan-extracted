@@ -25,7 +25,7 @@ my $score = MIDI::Util::setup_score( bpm => $bpm );
 $score->synch(
     \&top,
     \&bottom,
-    \&beat,
+    \&pulse,
 );
 
 $score->write_score("$0.mid");
@@ -89,7 +89,7 @@ sub bottom {
     $score->n( 'wn', $pitches[0] );
 }
 
-sub beat {
+sub pulse {
     my $d = MIDI::Drummer::Tiny->new( bpm => $bpm, score => $score );
 
     for my $n ( 1 .. $max ) {

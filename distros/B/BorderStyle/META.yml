@@ -20,7 +20,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=BorderStyle
   homepage: https://metacpan.org/release/BorderStyle
   repository: git://github.com/perlancar/perl-BorderStyle.git
-version: 2.0.2
+version: 2.0.3
 x_Dist_Zilla:
   perl:
     version: '5.030002'

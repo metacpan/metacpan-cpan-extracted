@@ -1,0 +1,165 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use MYDan::AntDen::Cli;
+use MYDan::Util::OptConf;
+
+=head1 SYNOPSIS
+
+ $0 [--run ./abc.sh] #If the image parameter exists, you may not need the run parameter
+      [--image ubuntu]
+      [--group foo] or [--hostip 192.168.1.12] or [--gpu 'Tesla T4' | 'TITAN Xp']
+      [--port 8080] [--domain foo.com]
+      [--name jobname ]
+      [--nice 5]
+      [--count 1]
+      [--resources CPU:100,MEM:50,GPU:2]
+      [--datasets abc,foo]
+      [--volume /tmp/abc:/tmp/abcd,/foo:/bar]
+
+ $0 [--list]
+ $0 [--ri]         #resource information
+ $0 [--info J.20200526.141337.852564.866]
+ $0 [--stop J.20200526.141337.852564.866]
+ $0 [--tail J.20200526.141337.852564.866 || T.20200526.141337.852564.866.001]
+ $0 [--top J.20200526.141337.852564.866 || T.20200526.141337.852564.866.001]
+ $0 [--shell J.20200526.141337.852564.866 || T.20200526.141337.852564.866.001]
+ $0 [--nvidia-smi J.20200526.141337.852564.866 || T.20200526.141337.852564.866.001]
+ $0 [--listoutput J.20200526.141337.852564.866/ || T.20200526.141337.852564.866.001/bar/abc/123/]
+ $0 [--download J.20200526.141337.852564.866/abc.txt || T.20200526.141337.852564.866.001/abc/foo/abc.svc] --to /tmp/filename.txt
+
+ $0 [--listdatasets]
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->set( nice => 5, count => 1, resources => 'CPU:100,MEM:50', name => 'jobname'  )
+    ->get( qw( run=s datasets=s name=s nice=i group=s count=i resources=s list ri gpu=s port=i domain=s
+         info=s stop=s tail=s top=s shell=s nvidia-smi=s image=s volume=s hostip=s listoutput=s download=s to=s listdatasets ) )->dump();
+ 
+my $antden = MYDan::AntDen::Cli->new();
+
+if( $o{gpu} )
+{
+    $o{group} = 'devtest2' if $o{gpu} eq 'Tesla T4';
+    $o{group} = 'devtest' if $o{gpu} eq 'TITAN Xp';
+}
+
+$o{run} = '_null_' if $o{image} && ! defined $o{run};
+
+if( $o{run} )
+{
+    my $jobid = $antden->run( %o );
+    print "[INFO]Jobid: $jobid\n";
+    exec "$0 --tail $jobid";
+}
+elsif( $o{list} )
+{
+    my $job = $antden->list( %o );
+    my @key = qw( id jobid name nice group status );
+    unshift @$job, +{ map{ $_ => $_ }@key };
+    map{ my $j = $_; printf "%s\n", join "\t", map{ $j->{$_}} @key } @$job;
+}
+elsif( $o{ri} )
+{
+    my $res = $antden->resources( %o );
+    printf "Resources:\n  %s\n\n", join ' ', map{ "$_->[0]($_->[1]/$_->[2])" }@{$res->{total}};
+    print "Machine\n";
+    #my @key = qw( ip hostname envhard envsoft switchable group workable role resources mon );
+    #    unshift @{$res->{machine}}, +{ map{ $_ => $_ }@key };
+    #map{ my $j = $_; printf "  %s\n", join "\t", map{ $j->{$_}} @key } @{$res->{machine}};
+
+    for my $m ( @{$res->{machine}} )
+    {
+        print '-' x 70, "\n";
+        print "ip: $m->{ip}\n";
+        print "  hostname: $m->{hostname}\n";
+        print "  envhard: $m->{envhard}\n";
+        print "  envsoft: $m->{envsoft}\n";
+        print "  switchable: $m->{switchable}\n";
+        print "  workable: $m->{workable}\n";
+        print "  group: $m->{group}\n";
+        print "  role: $m->{role}\n";
+        print "  resources: $m->{resources}\n";
+        print "  mon: $m->{mon}\n";
+        print "\n";
+    }
+}
+elsif( $o{info} )
+{
+    my $info = $antden->info( jobid => $o{info} );
+    print YAML::XS::Dump $info;
+}
+elsif( $o{stop} )
+{
+    my $jobid = $antden->stop( jobid => $o{stop} );
+    print "stop $jobid done.\n";
+}
+elsif( $o{tail} )
+{
+    $antden->tail( jobid => $o{tail} );
+}
+elsif( $o{top} )
+{
+    $antden->top( jobid => $o{top} );
+}
+elsif( $o{shell} )
+{
+    $antden->shell( jobid => $o{shell} );
+}
+elsif( $o{'nvidia-smi'} )
+{
+    $antden->nvidiasmi( jobid => $o{'nvidia-smi'} );
+}
+elsif( $o{'listoutput'} )
+{
+    my ( $jobid, $listoutput ) = split /\//, $o{'listoutput'}, 2;
+    $listoutput = '' unless defined $listoutput;
+    $antden->listoutput( jobid => $jobid, listoutput => $listoutput );
+}
+elsif( $o{'download'} )
+{
+    my ( $jobid, $download ) = split /\//, $o{'download'}, 2;
+    $option->assert() unless defined $o{'to'};
+    $antden->download( jobid => $jobid, download => $download, to => $o{'to'} );
+}
+elsif( $o{listdatasets} )
+{
+    map{ print "$_\n"; }(
+       "test-nlp1",
+       "examples",
+       "similar-english-sentence-generation",
+       "similar-chinese-sentence-generation",
+       "similar-chinese-sentence-generation-bpe",
+       "multi-channel-wakeup-test",
+       "tmp-wakeup-val2",
+       "wakeup-train-xiaobao-mix",
+       "nlp-test-speed-43",
+       "nlp-test-speed-09",
+       "multi-channel-wakeup-version1",
+       "nlp-test-speed-08",
+       "nlp-test-speed-67",
+       "wakeup-val",
+       "wakeup-train-xiaobao",
+       "nlp-test-train-09",
+       "nlp-test-09",
+       "tts-train-data",
+       "cluster-28-gray-bk",
+       "imagenet",
+       "tmp-wakeup-val",
+       "nlp-test-speed"
+    );
+}
+else
+{
+    my $user = `id -un`; chop $user;
+    my $home = $ENV{HOME} || ( getpwnam $user )[7];
+    $user = $ENV{MYDan_username} if $ENV{MYDan_username};
+    printf "\nhome: [$home] user: [$user] api:[%s] mydan:[%s]\n\n",
+        $option->dump('api')->{addr}, $option->dump('agent')->{role};
+    $option->assert();
+}
+
+exit 0;
+

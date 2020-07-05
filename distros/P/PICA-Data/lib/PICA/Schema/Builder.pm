@@ -1,7 +1,7 @@
 package PICA::Schema::Builder;
 use v5.14.1;
 
-our $VERSION = '1.08';
+our $VERSION = '1.11';
 
 use PICA::Schema qw(field_identifier);
 use Scalar::Util qw(reftype);
@@ -25,7 +25,7 @@ sub add {
 
         # check whether field is repeated within thin record
         if ($field_identifiers{$id}) {
-            $fields->{$id}{repeatable} = 1;
+            $fields->{$id}{repeatable} = \1;
         }
         else {
             $field_identifiers{$id} = 1;
@@ -35,7 +35,7 @@ sub add {
         if (!$fields->{$id}) {
             $fields->{$id} = {counter => 0, tag => $tag, subfields => {},};
             $fields->{$id}{occurrence} = $occ if length $id gt 4;
-            $fields->{$id}{required}   = 1 unless $self->{counter};
+            $fields->{$id}{required}   = \1 unless $self->{counter};
         }
         else {
             $fields->{$id}{counter}++;
@@ -48,7 +48,7 @@ sub add {
 
             # check whether subfield is repeated within this field
             if ($subfield_codes{$code}) {
-                $subfields->{$code}{repeatable} = 1;
+                $subfields->{$code}{repeatable} = \1;
             }
             else {
                 $subfield_codes{$code} = 1;
@@ -56,7 +56,7 @@ sub add {
 
             if (!$subfields->{$code}) {
                 $subfields->{$code} = {code => $code};
-                $subfields->{$code}{required} = 1
+                $subfields->{$code}{required} = \1
                     unless $fields->{$id}{counter};
             }
         }

@@ -1,5 +1,5 @@
 package QuadPres::Config;
-$QuadPres::Config::VERSION = '0.28.2';
+$QuadPres::Config::VERSION = '0.28.3';
 use 5.016;
 use strict;
 use warnings;
@@ -150,9 +150,39 @@ __END__
 
 =encoding UTF-8
 
+=head1 NAME
+
 =head1 VERSION
 
-version 0.28.2
+version 0.28.3
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 base_path
+
+=head2 cfg
+
+=head2 get_hard_disk_dest_dir
+
+=head2 get_server_dest_dir
+
+=head2 get_setgid_group
+
+=head2 get_src_archive_path
+
+=head2 get_upload_cmdline
+
+=head2 get_upload_path
+
+=head2 get_upload_util
+
+=head2 get_val
+
+=head2 get_version_control
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

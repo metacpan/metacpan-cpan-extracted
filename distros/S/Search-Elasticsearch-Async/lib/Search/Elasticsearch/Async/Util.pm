@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Async::Util;
-$Search::Elasticsearch::Async::Util::VERSION = '6.80';
+$Search::Elasticsearch::Async::Util::VERSION = '6.81';
 use Moo;
 use Scalar::Util qw(blessed);
 use Sub::Exporter -setup => { exports => ['thenable'] };
@@ -29,7 +29,7 @@ Search::Elasticsearch::Async::Util - A utility class for internal use by Elastic
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 AUTHOR
 

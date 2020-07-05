@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.183';
+our $VERSION = '1.184';
 
 use Quiq::Html::Tag;
 
@@ -162,7 +162,7 @@ sub html {
 
 =head1 VERSION
 
-1.183
+1.184
 
 =head1 AUTHOR
 

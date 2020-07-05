@@ -2,7 +2,6 @@ Changes
 lib/Syntax/Highlight/Engine/Simple/HTML.pm
 Makefile.PL
 MANIFEST
-README
 README.pod
 t/00.load.t
 t/highlight.t

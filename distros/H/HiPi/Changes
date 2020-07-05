@@ -1,3 +1,10 @@
+Version 0.84  - 20 June 2020
+                Fix test suite failure on non Linux systems ( for CPAN )
+
+Version 0.83  - 20 June 2020
+                Updated for changed /proc/cpuinfo Hardware output in latest
+                builds of Raspberry Pi OS
+                
 Version 0.82  - 14 June 2020
                 Updated Energenie and HopeRF69 interfaces allowing use of other
                 RF69HW and RF69W module breakouts.

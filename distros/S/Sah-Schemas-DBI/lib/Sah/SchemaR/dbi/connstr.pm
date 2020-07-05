@@ -1,7 +1,7 @@
 package Sah::SchemaR::dbi::connstr;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our $rschema = ["str",[{description=>"\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"dbi:SQLite:dbname=foo"},{valid=>0,value=>"DBI:SQLite:dbname=foo"},{valid=>0,value=>"dbi:Foo"},{valid=>1,value=>"dbi:Foo:bar=baz"}],match=>"\\Adbi:\\w+:.+\\z",summary=>"DBI connection string","x.completion"=>["dbi_connstr"]}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::dbi::connstr - DBI connection string
 
 =head1 VERSION
 
-This document describes version 0.003 of Sah::SchemaR::dbi::connstr (from Perl distribution Sah-Schemas-DBI), released on 2020-03-04.
+This document describes version 0.004 of Sah::SchemaR::dbi::connstr (from Perl distribution Sah-Schemas-DBI), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

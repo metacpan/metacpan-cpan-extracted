@@ -19,15 +19,15 @@ use Win32::Mechanize::NotepadPlusPlus qw/:main :vars/;
 
 # setStatusBar
 {
-    my $ret = notepad()->setStatusBar( $nppm{STATUSBAR_DOC_TYPE}, "I have ruined the status bar: sorry!" );
-    ok $ret, 'setStatusBar(nppm{STATUSBAR_DOC_TYPE}): retval'; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
+    my $ret = notepad()->setStatusBar( $STATUSBAR{STATUSBAR_DOC_TYPE}, "I have ruined the status bar: sorry!" );
+    ok $ret, 'setStatusBar(STATUSBAR{STATUSBAR_DOC_TYPE}): retval'; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
 
     # need the current language type and language description to be able to revert the section
     my $langType = notepad()->getLangType();    # get language-type index for the current buffer
     ok defined($langType), 'getLangType(): retval'; note sprintf qq(\t=> "%s"\n), $langType // '<undef>';
-    my $langDesc = notepad()->getLanguageDesc($langType); # not yet implemented
+    my $langDesc = notepad()->getLanguageDesc($langType);
     ok $langDesc, 'getLanguageDesc()'; note sprintf qq(\t=> "%s"\n), $langDesc;
-    my $langName = notepad()->getLanguageName($langType); # not yet implemented
+    my $langName = notepad()->getLanguageName($langType);
     ok $langName, 'getLanguageName()'; note sprintf qq(\t=> "%s"\n), $langName;
 
     $ret = notepad()->setStatusBar( 'STATUSBAR_DOC_TYPE', $langDesc );
@@ -196,122 +196,22 @@ local $TODO = undef;
     is $ret, 1, 'messageBox(): retval = OK'; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
 
     # prompt
-    runCodeAndClickPopup( sub { $ret = notepad()->prompt('prompt', 'default'); }, qr/^\Qprompt\E$/, 0 );
+    runCodeAndClickPopup( sub { $ret = notepad()->prompt('prompt', 'title', 'default'); }, qr/^\Qtitle\E$/, 0 );
     is $ret, 'default', 'prompt(): retval = "default"'; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
 
     # prompt: cancel
-    runCodeAndClickPopup( sub { $ret = notepad()->prompt('prompt', 'default'); }, qr/^\Qprompt\E$/, 1 );
+    runCodeAndClickPopup( sub { $ret = notepad()->prompt('prompt', 'title', 'default'); }, qr/^\Qtitle\E$/, 1 );
     is $ret, undef, 'prompt(): cancel: retval is undef'; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
+
+    # prompt: new test case to make sure that without title and default, it will use "PerlScript notepad->prompt()" and ""
+    runCodeAndClickPopup( sub { $ret = notepad()->prompt('prompt'); }, qr/^\QPerlScript notepad->prompt()\E$/, 0 );
+    is $ret, '', 'prompt("prompt",undef,undef): search for title="PerlScript notepad->prompt()" -> retval = ""'; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
+
 }
 
-# menuCommand
-{
-    my $ret = notepad()->menuCommand('IDM_VIEW_CLONE_TO_ANOTHER_VIEW');
-    ok $ret, 'menuCommand("IDM_VIEW_CLONE_TO_ANOTHER_VIEW"): retval from string-param'; note sprintf qq(\t=> "0x%08x"\n), $ret // '<undef>';
-
-    # close the cloned window, which also tests value-based menuCommand...
-    $ret = notepad()->menuCommand($nppidm{IDM_FILE_CLOSE});
-    ok $ret, 'menuCommand(nppidm{IDM_FILE_CLOSE}): retval from value-param'; note sprintf qq(\t=> "0x%08x"\n), $ret // '<undef>';
-}
-
-# runMenuCommand
-{
-    # for runMenuCommand, I am going to SHA-256 on active selection; which means I need a selection, and need to know what it is.
-    my $expected = 'a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e';
-    my $algorithm = 'SHA-256';
-
-    # 1. create new file
-    notepad()->newFile();
-    select undef,undef,undef,0.25;
-
-    # 2. add known text
-    editor()->{_hwobj}->SendMessage_sendRawString( $scimsg{SCI_SETTEXT}, 0, "Hello World" );
-    select undef,undef,undef,0.25;
-
-    # 3. select that text
-    notepad()->menuCommand('IDM_EDIT_SELECTALL');
-    select undef,undef,undef,0.25;
-
-    # 4. run the menu command
-    my $ret = notepad()->runMenuCommand( "Tools | $algorithm", 'Generate from selection into clipboard');
-    unless(defined $ret) {
-        $algorithm = 'MD5';
-        $expected = 'b10a8db164e0754105b7a99be72e3fe5';
-        $ret = notepad()->runMenuCommand( "Tools | $algorithm", 'Generate from selection into clipboard');
-    }
-    ok $ret, "runMenuCommand(Tools | $algorithm | Generate from selection into clipboard): retval"; note sprintf qq(\t=> "%s"\n), $ret // '<undef>';
-
-    # 5. paste the resulting text
-    notepad()->menuCommand('IDM_EDIT_PASTE');
-
-    # 6. get the resulting textlength and text
-    my $len = editor()->{_hwobj}->SendMessage( $scimsg{SCI_GETTEXTLENGTH} );    note sprintf qq(\t=> "%s"\n), $len // '<undef>';
-    {
-        my $txt;
-        eval {
-            $txt = editor()->{_hwobj}->SendMessage_getRawString( $scimsg{SCI_GETTEXT}, $len+1, { trim => 'wparam' } );
-        } or do {
-            diag "eval(getRawString) = '$@'";
-            $txt = '';
-        };
-        $txt =~ s/[\0\s]+$//;   # remove trailing spaces and nulls
-        is $txt, $expected, "runMenuCommand(): resulting $algorithm text"; note sprintf qq(\t%s => "%s"\n), $algorithm, $txt // '<undef>';
-    }
-
-    # 7. clear the editor, so I can close without a dialog
-    editor()->{_hwobj}->SendMessage_sendRawString( $scimsg{SCI_SETTEXT}, 0, "\0" );
-
-    # 8. close
-    notepad()->close();
-}
-
-# runPluginCommand
-{
-    # for runPluginCommand, I cannot guarantee the presence of any give plugin, so (until I have the ability to add to menu) try to just do Plugins Admin dialog
-    #   some experimenting showed (..., qr/^Plugins Admin$/, 4) as the appropriate args
-    my $ret;
-    myTestHelpers->setDebugInfo(0);
-    runCodeAndClickPopup( sub { $ret = notepad()->runPluginCommand( 'Plugins Admin...') }, qr/^Plugins Admin$/, 4, 1 ); # wait an extra 1s before pushing the button, which makes it more reliable
-
-    if(defined $ret) {
-        ok $ret, 'runPluginCommand(Plugins | Plugins Admin...): retval' or diag sprintf qq(\t=> "%s"\n), $ret // '<undef>';
-    } else {
-        use Win32::GuiTest 1.64 qw':FUNC !SendMessage';
-        diag "runPluginCommand(Plugins Admin...) didn't work, and I don't know why... Trying alternative";
-        my $menuID = notepad()->{_menuID}; note "notepad()->{_menuID} = ", $menuID//'<undef>';
-        my $count = GetMenuItemCount( $menuID ); note "GetMenuItemCount() = ", $count // '<undef>';
-        my $submenu;
-        for my $idx ( 0 .. $count-1 ) {
-            my %h = GetMenuItemInfo( $menuID, $idx );
-            if( $h{type} eq 'string' ) {
-                (my $cleanText = $h{text}) =~ s/(\&|\t.*)//;
-                note sprintf "\t%-20s | %s\n", $h{text}, $cleanText;
-                $submenu = GetSubMenu($menuID, $idx) if $cleanText eq 'Plugins';
-            }
-        }
-        note sprintf "Plugins submenu #%s#\n", $submenu // '<undef>';
-        my $does_have_folder;
-        my $does_have_admin;
-        if(defined $submenu) {
-            note "submenu GetMenuItemCount() = ", my $count = GetMenuItemCount( $submenu ) // '<undef>';
-            for my $idx ( 0 .. $count-1 ) {
-                my %h = GetMenuItemInfo( $submenu, $idx );
-                if( $h{type} eq 'string' ) {
-                    (my $cleanText = $h{text}) =~ s/(\&|\t.*)//;
-                    note sprintf "\t%-20s | %s\n", $h{text}, $cleanText;
-                    $does_have_admin = 1 if $cleanText =~ /Plugins Admin/;
-                    $does_have_folder = 1 if $cleanText =~ /Open Plugins Folder/;
-                }
-            }
-        }
-        ok !$does_have_admin, 'Plugins | Plugins Admin should not exist, because runPluginCommand(Plugins | Plugins Admin) didnt work'; diag sprintf "\tdoes have admin = %s", $does_have_admin//'<undef>';
-
-        if($does_have_folder) {
-            $ret = notepad()->runPluginCommand('Open Plugins Folder...');
-            ok $ret, 'runPluginCommand(Plugins | Open Plugins Folder...): retval' or diag sprintf qq(\t=> "%s"\n), $ret // '<undef>';
-            diag "Sorry for opening the extra Explorer window. You may close it now.\n";
-        }
-    }
-}
+# moved to npp-menucmd.t:
+#   menuCommand
+#   runMenuCommand
+#   runPluginCommand
 
 done_testing;

@@ -3,8 +3,13 @@
 #define PERLIO_NOT_STDIO 0  /* dont hook IO */
 #define PERL_NO_GET_CONTEXT /* we want efficiency for threaded perls */
 
+#ifdef _WIN32
+    // perl breaks <cmath> with its fucking "isnan" macro on windows, including math.h fixes the issue
+    #include <math.h>
+#endif
+
 #ifdef __cplusplus
-    // perl breaks <algorithm> because of "seed" macro, so include it earlier to help XS code forget about this issue
+    // perl breaks <algorithm> because of its fucking "seed" macro, so include it earlier to help XS code forget about this issue
     // we can't just undef this macro as we do for "do_open", because "seed" is used by other macros
     #include <algorithm>
 

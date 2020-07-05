@@ -93,9 +93,19 @@ sub m4i_opts {
     # Shorthand of MOP4Import::Opts->new(caller => [caller]).
     Opts->new(caller => $arg);
 
+  } elsif (ref $arg eq 'HASH' and m4i_opts_alike($arg)) {
+    # pass-thru when m4i_opts-compatible plain HASH is given.
+    $arg;
+
   } else {
-    Carp::croak("Unknown argument!");
+    Carp::croak("Unknown argument! ". MOP4Import::Util::terse_dump($arg));
   }
+}
+
+sub m4i_opts_alike {
+  my ($arg) = @_;
+  not grep {not exists $arg->{$_}}
+    qw(caller callpack filename line)
 }
 
 sub m4i_args {

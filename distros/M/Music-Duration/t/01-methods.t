@@ -34,4 +34,8 @@ Music::Duration::tuple( 'wn', 'z', 5 );
 my $expected = 4 / 5;
 is $MIDI::Simple::Length{zwn}, $expected, 'zwn 5-tuple';
 
+$expected = '1.618';
+Music::Duration::add_duration( phi => $expected );
+is $MIDI::Simple::Length{phi}, $expected, 'phi';
+
 done_testing();

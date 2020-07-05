@@ -2,19 +2,10 @@
 use 5.012;
 use warnings;
 use lib 't/lib';
-use UniEvent;
-use Panda::Lib::Logger;
+use MyTest;
 
 XS::Loader::load('MyTest');
 $SIG{PIPE} = 'IGNORE';
-
-if ($ENV{LOGGER}) {
-    Panda::Lib::Logger::set_native_logger(sub {
-        my ($level, $code, $msg) = @_;
-        say "$level $code $msg";
-    });
-    Panda::Lib::Logger::set_log_level(Panda::Lib::Logger::LOG_VERBOSE_DEBUG);
-}
 
 my $conns = shift(@ARGV) || 1;
 my $len  = shift(@ARGV) || 10;

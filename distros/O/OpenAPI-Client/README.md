@@ -4,7 +4,7 @@ OpenAPI::Client - A client for talking to an Open API powered server
 
 # DESCRIPTION
 
-[OpenAPI::Client](https://metacpan.org/pod/OpenAPI::Client) can generating classes that can talk to an Open API server.
+[OpenAPI::Client](https://metacpan.org/pod/OpenAPI%3A%3AClient) can generating classes that can talk to an Open API server.
 This is done by generating a custom class, based on a Open API specification,
 with methods that transform parameters into a HTTP request.
 
@@ -44,7 +44,7 @@ custom endpoint.
 ## Client
 
 The OpenAPI API specification will be used to generate a sub-class of
-[OpenAPI::Client](https://metacpan.org/pod/OpenAPI::Client) where the "operationId", inside of each path definition, is
+[OpenAPI::Client](https://metacpan.org/pod/OpenAPI%3A%3AClient) where the "operationId", inside of each path definition, is
 used to generate methods:
 
     use OpenAPI::Client;
@@ -62,7 +62,7 @@ used to generate methods:
     # With parameters
     $tx = $client->listPets({limit => 10});
 
-See [Mojo::Transaction](https://metacpan.org/pod/Mojo::Transaction) for more information about what you can do with the
+See [Mojo::Transaction](https://metacpan.org/pod/Mojo%3A%3ATransaction) for more information about what you can do with the
 `$tx` object, but you often just want something like this:
 
     # Check for errors
@@ -71,8 +71,8 @@ See [Mojo::Transaction](https://metacpan.org/pod/Mojo::Transaction) for more inf
     # Extract data from the JSON responses
     say $tx->res->json->{pets}[0]{name};
 
-Check out ["error" in Mojo::Transaction](https://metacpan.org/pod/Mojo::Transaction#error), ["req" in Mojo::Transaction](https://metacpan.org/pod/Mojo::Transaction#req) and
-["res" in Mojo::Transaction](https://metacpan.org/pod/Mojo::Transaction#res) for some of the most used methods in that class.
+Check out ["error" in Mojo::Transaction](https://metacpan.org/pod/Mojo%3A%3ATransaction#error), ["req" in Mojo::Transaction](https://metacpan.org/pod/Mojo%3A%3ATransaction#req) and
+["res" in Mojo::Transaction](https://metacpan.org/pod/Mojo%3A%3ATransaction#res) for some of the most used methods in that class.
 
 # CUSTOMIZATION
 
@@ -90,7 +90,7 @@ You can send XML or any format you like, but this require you to add a new
 "generator":
 
     use Your::XML::Library "to_xml";
-    $client->ua->transactor->add_generators(xml => sub {
+    $client->ua->transactor->add_generator(xml => sub {
       my ($t, $tx, $data) = @_;
       $tx->req->body(to_xml $data);
       return $tx;
@@ -98,7 +98,7 @@ You can send XML or any format you like, but this require you to add a new
 
     $client->addHero({}, xml => {name => "Supergirl"});
 
-See [Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo::UserAgent::Transactor) for more details.
+See [Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo%3A%3AUserAgent%3A%3ATransactor) for more details.
 
 # EVENTS
 
@@ -106,12 +106,12 @@ See [Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo::UserAgent::Tran
 
     $client->on(after_build_tx => sub { my ($client, $tx) = @_ })
 
-This event is emitted after a [Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo::UserAgent::Transactor) object has been
+This event is emitted after a [Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo%3A%3AUserAgent%3A%3ATransactor) object has been
 built, just before it is passed on to the ["ua"](#ua). Note that all validation has
 already been run, so alternating the `$tx` too much, might cause an invalid
 request on the server side.
 
-A special ["env" in Mojo::Message::Request](https://metacpan.org/pod/Mojo::Message::Request#env) variable will be set, to reference the
+A special ["env" in Mojo::Message::Request](https://metacpan.org/pod/Mojo%3A%3AMessage%3A%3ARequest#env) variable will be set, to reference the
 operationId:
 
     $tx->req->env->{operationId};
@@ -124,20 +124,20 @@ Note that this usage of `env()` is currently EXPERIMENTAL:
 
     $base_url = $client->base_url;
 
-Returns a [Mojo::URL](https://metacpan.org/pod/Mojo::URL) object with the base URL to the API. The default value
+Returns a [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) object with the base URL to the API. The default value
 comes from `schemes`, `basePath` and `host` in the Open API specification.
 
 ## pre\_processor
 
 ["pre\_processor"](#pre_processor) is deprecated.
 
-Use ["after\_build\_tx"](#after_build_tx) and ["generators" in Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo::UserAgent::Transactor#generators) instead.
+Use ["after\_build\_tx"](#after_build_tx) and ["generators" in Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo%3A%3AUserAgent%3A%3ATransactor#generators) instead.
 
 ## ua
 
     $ua = $client->ua;
 
-Returns a [Mojo::UserAgent](https://metacpan.org/pod/Mojo::UserAgent) object which is used to execute requests.
+Returns a [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent) object which is used to execute requests.
 
 # METHODS
 
@@ -158,19 +158,19 @@ matching text "No such operationId".
 named parameter in the [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object).
 
 `%content` is used for the body of the request, where the key need to be
-either "body" or a matching ["generators" in Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo::UserAgent::Transactor#generators). Example:
+either "body" or a matching ["generators" in Mojo::UserAgent::Transactor](https://metacpan.org/pod/Mojo%3A%3AUserAgent%3A%3ATransactor#generators). Example:
 
     $client->addHero({}, body => "Some data");
     $client->addHero({}, json => {name => "Supergirl"});
 
-`$tx` is a [Mojo::Transaction](https://metacpan.org/pod/Mojo::Transaction) object.
+`$tx` is a [Mojo::Transaction](https://metacpan.org/pod/Mojo%3A%3ATransaction) object.
 
 ## call\_p
 
     $promise = $client->call_p($operationId => $params, %content);
     $promise->then(sub { my $tx = shift });
 
-As ["call"](#call) above, but returns a [Mojo::Promise](https://metacpan.org/pod/Mojo::Promise) object.
+As ["call"](#call) above, but returns a [Mojo::Promise](https://metacpan.org/pod/Mojo%3A%3APromise) object.
 
 ## new
 
@@ -178,7 +178,7 @@ As ["call"](#call) above, but returns a [Mojo::Promise](https://metacpan.org/pod
     $client = OpenAPI::Client->new($specification, %attributes);
 
 Returns an object of a generated class, with methods generated from the Open
-API specification located at `$specification`. See ["schema" in JSON::Validator](https://metacpan.org/pod/JSON::Validator#schema)
+API specification located at `$specification`. See ["schema" in JSON::Validator](https://metacpan.org/pod/JSON%3A%3AValidator#schema)
 for valid versions of `$specification`.
 
 Note that the class is cached by perl, so loading a new specification from the
@@ -193,20 +193,20 @@ Extra `%attributes`:
 
 - coerce
 
-    See ["coerce" in JSON::Validator](https://metacpan.org/pod/JSON::Validator#coerce). Default to "booleans,numbers,strings".
+    See ["coerce" in JSON::Validator](https://metacpan.org/pod/JSON%3A%3AValidator#coerce). Default to "booleans,numbers,strings".
 
 ## validator
 
     $validator = $client->validator;
     $validator = $class->validator;
 
-Returns a [JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON::Validator::OpenAPI::Mojolicious) object for a generated
+Returns a [JSON::Validator::OpenAPI::Mojolicious](https://metacpan.org/pod/JSON%3A%3AValidator%3A%3AOpenAPI%3A%3AMojolicious) object for a generated
 class. Not that this is a global variable, so changing the object will affect
 all instances.
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2017, Jan Henning Thorsen
+Copyright (C) 2017-2020, Jan Henning Thorsen
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

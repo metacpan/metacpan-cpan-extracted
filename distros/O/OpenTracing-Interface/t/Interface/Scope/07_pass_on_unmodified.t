@@ -91,6 +91,7 @@ sub overwrite_operation_name { ... };
 sub finish                   { ... };
 sub add_tag                  { ... };
 sub add_tags                 { ... };
+sub get_tags                 { ... };
 sub log_data                 { ... };
 sub add_baggage_item         { ... };
 sub add_baggage_items        { ... };

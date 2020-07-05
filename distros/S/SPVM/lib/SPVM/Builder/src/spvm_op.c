@@ -1516,6 +1516,9 @@ SPVM_OP* SPVM_OP_build_field_access(SPVM_COMPILER* compiler, SPVM_OP* op_term, S
   
   field_access->op_term = op_term;
   field_access->op_name = op_name_field;
+  
+  const char* field_name = op_name_field->uv.name;
+
   op_field_access->uv.field_access = field_access;
   
   return op_field_access;
@@ -1604,7 +1607,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   const char* package_name = op_type->uv.type->basic_type->name;
 
   if (!is_anon && islower(package_name[0])) {
-    SPVM_COMPILER_error(compiler, "Package name must start with upper case \"%s\" at %s line %d\n", package_name, op_package->file, op_package->line);
+    SPVM_COMPILER_error(compiler, "Package name \"%s\" must start with upper case at %s line %d\n", package_name, op_package->file, op_package->line);
   }
   
   SPVM_HASH* package_symtable = compiler->package_symtable;
@@ -1967,9 +1970,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       if (found_field) {
         SPVM_COMPILER_error(compiler, "Redeclaration of field \"%s::%s\" at %s line %d\n", package_name, field_name, field->op_field->file, field->op_field->line);
       }
-      else if (package->fields->length > SPVM_LIMIT_C_FIELDS_MAX_COUNT) {
-        SPVM_COMPILER_error(compiler, "Too many field declarations at %s line %d\n", field->op_field->file, field->op_field->line);
-      }
       else {
         field->id = compiler->fields->length;
         SPVM_LIST_push(compiler->fields, field);
@@ -2014,9 +2014,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         
         if (found_package_var) {
           SPVM_COMPILER_error(compiler, "Redeclaration of package variable \"%s::%s\" at %s line %d\n", package_name, package_var_name, package_var->op_package_var->file, package_var->op_package_var->line);
-        }
-        else if (package->package_vars->length > SPVM_LIMIT_C_PACKAGE_VARS_MAX_COUNT) {
-          SPVM_COMPILER_error(compiler, "Too many package variable declarations at %s line %d\n", package_var->op_package_var->file, package_var->op_package_var->line);
         }
         else {
           package_var->id = compiler->package_vars->length;
@@ -2142,9 +2139,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         
         if (found_sub) {
           SPVM_COMPILER_error(compiler, "Redeclaration of sub \"%s\" at %s line %d\n", sub_name, sub->op_sub->file, sub->op_sub->line);
-        }
-        else if (package->subs->length > SPVM_LIMIT_C_SUBS_MAX_COUNT) {
-          SPVM_COMPILER_error(compiler, "Too many sub declarations at %s line %d\n", sub_name, sub->op_sub->file, sub->op_sub->line);
         }
         // Unknown sub
         else {
@@ -2296,12 +2290,11 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
 
   // Create field information
   SPVM_FIELD* field = SPVM_FIELD_new(compiler);
-  
-  // Name
+
+  // Field Name
   field->op_name = op_name_field;
-  
   field->name = op_name_field->uv.name;
-  
+
   // Type
   field->type = op_type->uv.type;
   

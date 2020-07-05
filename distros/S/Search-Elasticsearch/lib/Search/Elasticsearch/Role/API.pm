@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::API;
-$Search::Elasticsearch::Role::API::VERSION = '6.80';
+$Search::Elasticsearch::Role::API::VERSION = '6.81';
 use Moo::Role;
 requires 'api_version';
 requires 'api';
@@ -95,7 +95,7 @@ Search::Elasticsearch::Role::API - Provides common functionality for API impleme
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 AUTHOR
 

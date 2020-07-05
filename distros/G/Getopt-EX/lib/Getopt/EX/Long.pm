@@ -1,6 +1,6 @@
 package Getopt::EX::Long;
 
-use strict;
+use v5.14;
 use warnings;
 use Carp;
 
@@ -35,11 +35,11 @@ sub GetOptionsFromArray {
 
     set_default() if $ConfigOption{AUTO_DEFAULT};
 
-    $loader //= new Getopt::EX::Loader do {
+    $loader //= Getopt::EX::Loader->new(do {
 	map {
 	    exists $ConfigOption{$_} ? ( $_ => $ConfigOption{$_} ) : ()
 	} @Getopt::EX::Loader::OPTIONS
-    };
+    });
 
     $loader->deal_with($argv);
 
@@ -122,9 +122,9 @@ sub new {
 	@exconfig = Getopt::EX::Long::get_default();
     }
 
-    my $obj = SUPER::new $class @_;
+    my $obj = $class->SUPER::new(@_);
 
-    my $loader = $obj->{exloader} = new Getopt::EX::Loader @exconfig;
+    my $loader = $obj->{exloader} = Getopt::EX::Loader->new(@exconfig);
 
     $obj;
 }
@@ -155,9 +155,10 @@ Getopt::EX::Long - Getopt::Long compatible glue module
   or
 
   require Getopt::EX::Long;
-  my $parser = new Getopt::EX::Long::Parser
+  my $parser = Getopt::EX::Long::Parser->new(
 	config   => [ Getopt::Long option ... ],
-	exconfig => [ Getopt::EX::Long option ...];
+	exconfig => [ Getopt::EX::Long option ...],
+  );
 
 =head1 DESCRIPTION
 

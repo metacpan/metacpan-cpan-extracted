@@ -6,11 +6,13 @@
 #include <openssl/conf.h>
 #include <openssl/engine.h>
 
-using SslHolder = std::unique_ptr<SSL_CTX, std::function<void(SSL_CTX*)>>;
 
-static SslHolder get_client_context(string name) {
+static SslContext get_client_context(string name) {
     auto ctx = SSL_CTX_new(SSLv23_client_method());
-    SslHolder r(ctx, [](auto* ctx){ SSL_CTX_free(ctx); });
+    if (!ctx) throw Error(make_ssl_error_code(SSL_ERROR_SSL));
+
+    auto r = SslContext::attach(ctx);
+
     string path("t/cert/");
     string ca = path + "/ca.pem";
     string cert = path + "/" + name + ".pem";
@@ -35,9 +37,11 @@ static SslHolder get_client_context(string name) {
     return r;
 }
 
-static SslHolder get_server_context(string ca_name) {
+static SslContext get_server_context(string ca_name) {
     auto ctx = SSL_CTX_new(SSLv23_server_method());
-    SslHolder r(ctx, [](auto* ctx){ SSL_CTX_free(ctx); });
+
+    auto r = SslContext::attach(ctx);
+
     string path("t/cert");
     string cert = path + "/" + ca_name + ".pem";
     string key = path + "/" + ca_name + ".key";
@@ -69,14 +73,14 @@ TEST_CASE("client custom certificate", "[ssl]") {
     auto server_cert = get_server_context("ca");
     auto server_sa = SockAddr::Inet4("127.0.0.1", 0);
     server->bind(server_sa);
-    server->use_ssl(server_cert.get());
+    server->use_ssl(server_cert);
     server->listen(10000);
 
     StreamSP session;
 
     TcpSP client = new Tcp(test.loop, AF_INET);
     auto client_cert = get_client_context("01-alice");
-    client->use_ssl(client_cert.get());
+    client->use_ssl(client_cert);
 
     server->connection_event.add([&](auto, auto s, auto& err) {
         test.happens("c");
@@ -103,7 +107,7 @@ TEST_CASE("default client w/o certificate", "[ssl]") {
     auto server_cert = get_server_context("ca");
     auto server_sa = SockAddr::Inet4("127.0.0.1", 0);
     server->bind(server_sa);
-    server->use_ssl(server_cert.get());
+    server->use_ssl(server_cert);
     server->listen(10000);
 
     StreamSP session;
@@ -112,7 +116,7 @@ TEST_CASE("default client w/o certificate", "[ssl]") {
 
     server->connection_event.add([&](auto, auto, auto& err) {
         REQUIRE(err);
-        REQUIRE(err == errc::ssl_error);
+        REQUIRE(err & errc::ssl_error);
         test.loop->stop();
     });
 
@@ -129,14 +133,14 @@ TEST_CASE("server with different CA", "[ssl]") {
     auto server_cert = get_server_context("ca2");
     auto server_sa = SockAddr::Inet4("127.0.0.1", 0);
     server->bind(server_sa);
-    server->use_ssl(server_cert.get());
+    server->use_ssl(server_cert);
     server->listen(10000);
 
     StreamSP session;
 
     TcpSP client = new Tcp(test.loop, AF_INET);
     auto client_cert = get_client_context("01-alice");
-    client->use_ssl(client_cert.get());
+    client->use_ssl(client_cert);
 
     server->connection_event.add([&](auto, auto&, auto& err) {
         REQUIRE(err);

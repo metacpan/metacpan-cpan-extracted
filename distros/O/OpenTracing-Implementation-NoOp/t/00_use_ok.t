@@ -7,6 +7,7 @@ BEGIN {
     use_ok('OpenTracing::Implementation::NoOp::Span');
     use_ok('OpenTracing::Implementation::NoOp::SpanContext');
     use_ok('OpenTracing::Implementation::NoOp::Tracer');
+    use_ok('OpenTracing::Implementation::NoOp::ContextReference');
 };
 
 done_testing;

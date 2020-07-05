@@ -1,3 +1,5 @@
+.pre-commit-hooks.yaml
+bbs.t
 bin/perltidy
 BUGS.md
 CHANGES.md
@@ -52,7 +54,8 @@ Makefile.PL
 MANIFEST			This list of files
 pm2pl
 README.md
-t/filter_example.t.SKIP
+t/atee.t
+t/filter_example.t
 t/snippets1.t
 t/snippets10.t
 t/snippets11.t
@@ -61,7 +64,12 @@ t/snippets13.t
 t/snippets14.t
 t/snippets15.t
 t/snippets16.t
+t/snippets17.t
+t/snippets18.t
+t/snippets19.t
 t/snippets2.t
+t/snippets20.t
+t/snippets21.t
 t/snippets3.t
 t/snippets4.t
 t/snippets5.t

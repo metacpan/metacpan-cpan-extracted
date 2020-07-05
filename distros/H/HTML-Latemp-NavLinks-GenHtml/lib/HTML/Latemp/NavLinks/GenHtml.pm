@@ -1,5 +1,5 @@
 package HTML::Latemp::NavLinks::GenHtml;
-
+$HTML::Latemp::NavLinks::GenHtml::VERSION = '0.2.9';
 use warnings;
 use strict;
 
@@ -7,19 +7,19 @@ use 5.008;
 
 use parent 'Class::Accessor';
 
-__PACKAGE__->mk_accessors(qw(
-    nav_links_obj
-    root
-    ));
+__PACKAGE__->mk_accessors(
+    qw(
+        nav_links_obj
+        root
+        )
+);
 
-
-our $VERSION = '0.2.6';
 
 
 sub new
 {
     my $class = shift;
-    my $self = {};
+    my $self  = {};
     bless $self, $class;
     $self->_init(@_);
     return $self;
@@ -30,8 +30,8 @@ sub _init
     my $self = shift;
     my (%args) = @_;
 
-    $self->root($args{root});
-    $self->nav_links_obj($args{nav_links_obj});
+    $self->root( $args{root} );
+    $self->nav_links_obj( $args{nav_links_obj} );
 
     return $self;
 }
@@ -41,29 +41,28 @@ sub _get_buttons
 {
     my $self = shift;
 
-    my @buttons =
-    (
+    my @buttons = (
         {
-            'dir' => "prev",
+            'dir'    => "prev",
             'button' => "left",
-            'title' => "Previous Page",
+            'title'  => "Previous Page",
         },
         {
-            'dir' => "up",
+            'dir'    => "up",
             'button' => "up",
-            'title' => "Up in the Site",
+            'title'  => "Up in the Site",
         },
         {
-            'dir' => "next",
+            'dir'    => "next",
             'button' => "right",
-            'title' => "Next Page",
+            'title'  => "Next Page",
         },
     );
 
     foreach my $button (@buttons)
     {
         my $dir = $button->{'dir'};
-        if ($button->{'exists'} = exists($self->nav_links_obj->{$dir}))
+        if ( $button->{'exists'} = exists( $self->nav_links_obj->{$dir} ) )
         {
             $button->{'link_obj'} = $self->nav_links_obj->{$dir};
         }
@@ -71,7 +70,6 @@ sub _get_buttons
 
     return \@buttons;
 }
-
 
 1;
 
@@ -88,7 +86,7 @@ navigation links.
 
 =head1 VERSION
 
-version 0.2.6
+version 0.2.9
 
 =head1 SYNOPSIS
 
@@ -106,58 +104,9 @@ Initialises the object.
 
 Calculates the HTML and returns it.
 
-=head1 AUTHOR
-
-Shlomi Fish, L<http://www.shlomifish.org/> .
-
-=head1 BUGS
-
-Please report any bugs or feature requests to
-C<bug-html-latemp-navlinks-genhtml@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTML-Latemp-NavLinks-GenHtml>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
-
-=head1 ACKNOWLEDGEMENTS
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2005 Shlomi Fish, All Rights Reserved.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the MIT X11 license.
-
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2005 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Latemp-NavLinks-GenHtml or by
-email to bug-html-latemp-navlinks-genhtml@rt.cpan.org.
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc HTML::Latemp::NavLinks::GenHtml
 
 =head2 Websites
 
@@ -172,15 +121,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/HTML-Latemp-NavLinks-GenHtml>
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/HTML-Latemp-NavLinks-GenHtml>
+L<https://metacpan.org/release/HTML-Latemp-NavLinks-GenHtml>
 
 =item *
 
@@ -189,30 +130,6 @@ RT: CPAN's Bug Tracker
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Latemp-NavLinks-GenHtml>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/HTML-Latemp-NavLinks-GenHtml>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/HTML-Latemp-NavLinks-GenHtml>
-
-=item *
-
-CPAN Forum
-
-The CPAN Forum is a web forum for discussing Perl modules.
-
-L<http://cpanforum.com/dist/HTML-Latemp-NavLinks-GenHtml>
 
 =item *
 
@@ -226,7 +143,7 @@ L<http://cpants.cpanauthors.org/dist/HTML-Latemp-NavLinks-GenHtml>
 
 CPAN Testers
 
-The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
 
 L<http://www.cpantesters.org/distro/H/HTML-Latemp-NavLinks-GenHtml>
 
@@ -260,8 +177,29 @@ The code is open to the world, and available for you to hack on. Please feel fre
 with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
 from your repository :)
 
-L<http://bitbucket.org/shlomif/latemp>
+L<https://github.com/thewml/latemp>
 
-  hg clone ssh://hg@bitbucket.org/shlomif/latemp
+  git clone https://github.com/thewml/latemp
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/html-latemp-navlinks-genhtml/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2005 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

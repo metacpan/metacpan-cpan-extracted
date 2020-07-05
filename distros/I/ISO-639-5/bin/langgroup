@@ -1,0 +1,107 @@
+#!perl
+#-*-perl-*-
+
+
+=head1 NAME
+
+langgroup - print language groups according to ISO639-5
+
+=head1 SYNOPSIS
+
+  langgroup [OPTIONS] LANGCODE*
+
+
+=head2 OPTIONS
+
+  -h: help
+  -c: group children
+  -g: group languages
+  -G: group by grandparent
+  -n: don't print final newline
+  -p: print parent code of each given language code
+
+=cut
+
+
+# use 5.006;
+use strict;
+use warnings;
+
+use lib 'lib';
+use ISO::639::5 qw/:all/;
+
+use open ':locale';
+use vars qw($opt_c $opt_g $opt_G $opt_h $opt_n $opt_p);
+use Getopt::Std;
+use Pod::Usage;
+
+&getopts('cgGhnp');
+
+&pod2usage if ($opt_h);
+
+my @codes = @ARGV;
+if ($opt_p){
+    my @converted = map($_ = language_parent($_), @ARGV);
+    print join(' ',@converted);
+    print "\n" unless ($opt_n);
+}
+elsif ($opt_g || $opt_G){
+    my %groups = ();
+    foreach (@ARGV){
+	my $parent = language_parent($_) || $_;
+	$parent = language_parent($parent) || $parent if ($opt_G);
+	$groups{$parent}{$_}++;
+    }
+    foreach (sort keys %groups){
+	if ($opt_n){
+	    print join('+',sort keys %{$groups{$_}}),' ';
+	}
+	else{
+	    print $_,"\t";
+	    print join(' ',sort keys %{$groups{$_}}),"\n";
+	}
+    }
+}
+else{
+    foreach (@ARGV){
+	if ($opt_c){
+	    print join(' ',language_group_children($_));
+	}
+	else{
+	    print join(' ',language_group($_));
+	}
+	print "\n" if ($#ARGV || ! $opt_n);
+    }
+}
+
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Language codes and groups are extracted from Unicode CLDR.
+
+=head1 LICENSE AND COPYRIGHT
+
+ ---------------------------------------------------------------------------
+ Copyright (c) 2020 Joerg Tiedemann
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+ ---------------------------------------------------------------------------
+
+=cut

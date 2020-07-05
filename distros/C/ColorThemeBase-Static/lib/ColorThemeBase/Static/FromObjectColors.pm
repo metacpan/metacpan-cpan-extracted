@@ -1,9 +1,9 @@
 package ColorThemeBase::Static::FromObjectColors;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorThemeBase-Static'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use strict 'subs', 'vars';
 #use warnings;
@@ -48,7 +48,7 @@ ColorThemeBase::Static::FromObjectColors - Base class for color theme modules wi
 
 =head1 VERSION
 
-This document describes version 0.006 of ColorThemeBase::Static::FromObjectColors (from Perl distribution ColorThemeBase-Static), released on 2020-06-09.
+This document describes version 0.008 of ColorThemeBase::Static::FromObjectColors (from Perl distribution ColorThemeBase-Static), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

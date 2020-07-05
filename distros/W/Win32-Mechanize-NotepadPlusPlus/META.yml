@@ -40,13 +40,13 @@ no_index:
 provides:
   Win32::Mechanize::NotepadPlusPlus:
     file: lib/Win32/Mechanize/NotepadPlusPlus.pm
-    version: '0.001002'
+    version: '0.004001'
   Win32::Mechanize::NotepadPlusPlus::Editor:
     file: lib/Win32/Mechanize/NotepadPlusPlus/Editor.pm
-    version: '0.001002'
+    version: '0.004001'
   Win32::Mechanize::NotepadPlusPlus::Notepad:
     file: lib/Win32/Mechanize/NotepadPlusPlus/Notepad.pm
-    version: '0.001002'
+    version: '0.004001'
 requires:
   Carp: '0'
   Config: '0'
@@ -66,5 +66,5 @@ requires:
 resources:
   bugtracker: https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus/issues
   repository: https://github.com/pryrt/Win32-Mechanize-NotepadPlusPlus.git
-version: '0.001002'
+version: '0.004001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

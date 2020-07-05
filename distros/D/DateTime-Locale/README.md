@@ -4,7 +4,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 # VERSION
 
-version 1.25
+version 1.26
 
 # SYNOPSIS
 
@@ -120,7 +120,7 @@ Here is an example of making a custom locale based off of `en-US`:
     say DateTime->now( locale => 'en-US' )->strftime('%X');
 
 The keys that should be present in the hash are the same as the accessor
-methods provided by [DateTime::Locale::FromData](https://metacpan.org/pod/DateTime::Locale::FromData), except for the following:
+methods provided by [DateTime::Locale::FromData](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3AFromData), except for the following:
 
 - The `*_code` methods
 
@@ -185,7 +185,7 @@ to extract the CLDR data.
 
 # SEE ALSO
 
-[DateTime::Locale::Base](https://metacpan.org/pod/DateTime::Locale::Base)
+[DateTime::Locale::Base](https://metacpan.org/pod/DateTime%3A%3ALocale%3A%3ABase)
 
 datetime@perl.org mailing list
 
@@ -219,7 +219,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
@@ -235,7 +235,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2003 - 2019 by Dave Rolsky.
+This software is copyright (c) 2003 - 2020 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

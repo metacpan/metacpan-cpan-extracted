@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Graphics-Fig",
    "no_index" : {
@@ -33,11 +33,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Graphics::ColorNames" : "3.5",
             "Image::Info" : "1.37",
             "Math::Trig" : "1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.3"
+   "version" : "v1.0.4",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,4 +1,7 @@
+=encoding utf8
+
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Ryu::Async
 at lib/Ryu/Async.pm
@@ -123,6 +126,11 @@ This provides a sink for L<Ryu::Async::Client/outgoing> packets, and a source fo
 Returns a L<Ryu::Async::Client> instance.
 
 =head2 udp_server
+
+=head2 tcp_server
+
+Creates a listening TCP socket, and provides a L<Ryu::Async::Server>
+instance which will emit a new event every time a client connects.
 
 =head2 sink
 

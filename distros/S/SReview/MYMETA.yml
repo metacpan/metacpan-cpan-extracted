@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SReview
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '0'
+  DateTime::Format::ISO8601: '0'
+  Mojo::JSON: '0'
+  Mojo::Pg: '0'
+  Mojolicious::Plugin::OpenAPI: '0'
+  Moose: '0'
+  Net::Amazon::S3: '0'
+version: v0.6.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

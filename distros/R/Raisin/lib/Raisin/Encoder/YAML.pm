@@ -1,8 +1,12 @@
-package Raisin::Encoder::YAML;
+#!perl
+#PODNAME: Raisin::Encoder::YAML
+#ABSTRACT: YAML serialization plugin for Raisin.
 
 use strict;
 use warnings;
 
+package Raisin::Encoder::YAML;
+$Raisin::Encoder::YAML::VERSION = '0.90';
 use Encode qw(encode_utf8 decode_utf8);
 use YAML qw(Dump Load);
 
@@ -15,9 +19,17 @@ sub deserialize { Load( decode_utf8($_[1]) ) }
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Raisin::Encoder::YAML - YAML serialization plugin for Raisin.
+
+=head1 VERSION
+
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -25,11 +37,13 @@ Provides C<content_type>, C<serialize> methods.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh E<lt>atE<gt> cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

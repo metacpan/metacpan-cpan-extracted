@@ -11,5 +11,6 @@ cover_db
 pod2htm*.tmp
 Archive-BagIt-*
 .idea/*
+.idea
 _Deparsed*
 *.iml

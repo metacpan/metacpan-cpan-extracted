@@ -3,7 +3,7 @@ package App::ModuleBuildTiny::Dist;
 use 5.010;
 use strict;
 use warnings;
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 
 use CPAN::Meta;
 use Carp qw/croak/;
@@ -16,6 +16,7 @@ use File::Spec::Functions qw/catfile catdir rel2abs/;
 use File::Slurper qw/write_text read_binary/;
 use ExtUtils::Manifest qw/manifind maniskip maniread/;
 use Module::Runtime 'require_module';
+use Pod::Escapes qw/e2char/;
 
 use Env qw/@PERL5LIB @PATH/;
 
@@ -68,11 +69,16 @@ sub generate_readme {
 	return decode_utf8($content);
 }
 
+sub load_jsonyaml {
+	my $file = shift;
+	require Parse::CPAN::Meta;
+	return Parse::CPAN::Meta->load_file($file);
+}
+
 sub load_mergedata {
 	my $mergefile = shift;
 	if (defined $mergefile and -r $mergefile) {
-		require Parse::CPAN::Meta;
-		return Parse::CPAN::Meta->load_file($mergefile);
+		return load_jsonyaml($mergefile);
 	}
 	return;
 }
@@ -120,6 +126,22 @@ sub checkmeta {
 	die sprintf "Version mismatch between module and meta, did you forgot to run regenerate? (%s versus %s)", $detected_version, $meta_version if $detected_version != $meta_version;
 }
 
+sub load_prereqs {
+	if (-f 'prereqs.json') {
+		return load_jsonyaml('prereqs.json');
+	}
+	elsif (-f 'prereqs.yml') {
+		return load_jsonyaml('prereqs.yml');
+	}
+	elsif (-f 'cpanfile') {
+		require Module::CPANfile;
+		return Module::CPANfile->load('cpanfile')->prereq_specs;
+	}
+	else {
+		return {};
+	}
+}
+
 sub new {
 	my ($class, %opts) = @_;
 	my $mergefile = $opts{mergefile} || (grep { -f } qw/metamerge.json metamerge.yml/)[0];
@@ -128,19 +150,16 @@ sub new {
 	my $filename = distfilename($distname);
 
 	require Module::Metadata; Module::Metadata->VERSION('1.000009');
-	my $data = Module::Metadata->new_from_file($filename, collect_pod => 1) or die "Couldn't analyse $filename: $!";
-	my @authors = map { / \A \s* (.+?) \s* \z /x } grep { /\S/ } split /\n/, $data->pod('AUTHOR') // $data->pod('AUTHORS') // '' or warn "Could not parse any authors from `=head1 AUTHOR` in $filename";
-	if (read_binary($filename) =~ /^=encoding (?i:utf)-?8$/m) {
-		$_ = decode_utf8($_) for @authors;
-	}
+	my $data = Module::Metadata->new_from_file($filename, collect_pod => 1, decode_pod => 1) or die "Couldn't analyse $filename: $!";
+	my @authors = map { s/E<([^>]+)>/e2char($1)/ge; m/ \A \s* (.+?) \s* \z /x } grep { /\S/ } split /\n/, $data->pod('AUTHOR') // $data->pod('AUTHORS') // '' or warn "Could not parse any authors from `=head1 AUTHOR` in $filename";
 	my $license = detect_license($data, $filename, \@authors);
 
-	my $load_meta = !%{ $opts{regenerate} || {} } && uptodate('META.json', 'cpanfile', $mergefile);
+	my $load_meta = !%{ $opts{regenerate} || {} } && uptodate('META.json', 'cpanfile', 'prereqs.json', 'prereqs.yml', $mergefile);
 	my $meta = $load_meta ? CPAN::Meta->load_file('META.json', { lazy_validation => 0 }) : do {
 		my ($abstract) = ($data->pod('NAME') // '')  =~ / \A \s+ \S+ \s? - \s? (.+?) \s* \z /x or warn "Could not parse abstract from `=head1 NAME` in $filename";
 		my $version = $data->version($data->name) // die "Cannot parse \$VERSION from $filename";
 
-		my $prereqs = -f 'cpanfile' ? do { require Module::CPANfile; Module::CPANfile->load('cpanfile')->prereq_specs } : {};
+		my $prereqs = load_prereqs();
 		$prereqs->{configure}{requires}{'Module::Build::Tiny'} //= mbt_version();
 		$prereqs->{develop}{requires}{'App::ModuleBuildTiny'} //= $VERSION;
 

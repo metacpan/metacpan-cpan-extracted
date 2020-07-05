@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+oathtool - alternative Perl implementation of oathtool(1), one-time password tool
+
+=head1 SYNOPSIS
+
+oathtool [options] KEY | URI
+
+    Options:
+        -h, --help
+        -v, --version
+        -a, --algorithm
+        --hotp
+        --totp[=STRING]
+        -b, --base32
+        -c, --counter=INT
+        -s, --time-step-size, --period=SECONDS
+        -S, --start-time=UNIX_TIME
+        -N, --now=UNIX_TIME
+        -d, --digits=INT
+
+    URI: otpauth://....
+
+=cut
+
+use utf8;
+use strict;
+use warnings;
+use open qw(:std :utf8);
+
+use Getopt::Long;
+use Pod::Usage;
+use Pass::OTP qw(otp);
+use Pass::OTP::URI qw(parse);
+
+our $VERSION = '1.2';
+
+pod2usage(2) if @ARGV == 0;
+my %options;
+$options{secret} = pop if $ARGV[-1] !~ /^-/;
+
+Getopt::Long::Configure(qw(auto_version));
+GetOptions(\%options,
+    'help|h|?' => sub { pod2usage(-verbose => 2) },
+    'algorithm|a=s',
+    'hotp',
+    'totp:s',
+    'base32|b',
+    'counter|c=i',
+    'period|time-step-size|s=s',
+    'start-time|S=s',
+    'now|N=s',
+    'digits|d=i',
+) || pod2usage(2);
+
+pod2usage(2) if @ARGV == 0 and not defined $options{secret};
+
+$options{type} = 'totp' if defined $options{totp};
+$options{algorithm} = $options{totp} if defined $options{totp} and $options{totp} ne '';
+%options = parse($options{secret}) if $options{secret} =~ m#^otpauth://#;
+
+my $code = otp(%options);
+print "$code\n";
+exit 0;
+
+__END__
+=head1 SEE ALSO
+
+L<Pass::OTP>
+
+L<oathtool(1)>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2020 Jan Baier
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut

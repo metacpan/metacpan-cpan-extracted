@@ -13,10 +13,13 @@ do { my $x = {
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
+                                      'Data::Validate::Domain' => '0',
+                                      'Email::Address::XS' => '1.01',
                                       'Encode' => '0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
+                                      'Net::IDN::Encode' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
@@ -33,6 +36,7 @@ do { my $x = {
                                       'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
+                                      'Time::Moment' => '0',
                                       'perl' => '5.006'
                                     }
                     },
@@ -45,6 +49,7 @@ do { my $x = {
                                       'List::Util' => '1.50',
                                       'Mojo::JSON::Pointer' => '0',
                                       'Mojo::URL' => '0',
+                                      'Mojolicious' => '7.23',
                                       'Moo' => '0',
                                       'MooX::HandlesVia' => '0',
                                       'MooX::TypeTiny' => '0.002002',
@@ -61,6 +66,14 @@ do { my $x = {
                                       'perl' => 'v5.16.0',
                                       'strict' => '0',
                                       'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'Class::XSAccessor' => '0',
+                                      'Data::Validate::Domain' => '0',
+                                      'Email::Address::XS' => '1.01',
+                                      'Net::IDN::Encode' => '0',
+                                      'Time::Moment' => '0',
+                                      'Type::Tiny::XS' => '0'
                                     }
                     },
        'test' => {
@@ -134,6 +147,7 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::PodWeaver' => '4.008',
                                            'Dist::Zilla::Plugin::Prereqs' => '0',
                                            'Dist::Zilla::Plugin::Prereqs::AuthorDeps' => '0.006',
+                                           'Dist::Zilla::Plugin::Prereqs::Soften' => '0',
                                            'Dist::Zilla::Plugin::PromptIfStale' => '0',
                                            'Dist::Zilla::Plugin::Readme' => '0',
                                            'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.142180',

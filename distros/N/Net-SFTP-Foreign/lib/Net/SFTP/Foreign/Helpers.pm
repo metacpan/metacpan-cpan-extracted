@@ -302,9 +302,14 @@ sub _gen_converter {
     }
 }
 
-sub _is_lnk { (0120000 & shift) == 0120000 }
-sub _is_dir { (0040000 & shift) == 0040000 }
-sub _is_reg { (0100000 & shift) == 0100000 }
+use constant S_IFMT  => 0170000;
+use constant S_IFLNK => 0120000;
+use constant S_IFDIR => 0040000;
+use constant S_IFREG => 0100000;
+
+sub _is_lnk { (S_IFMT & shift) == S_IFLNK }
+sub _is_dir { (S_IFMT & shift) == S_IFDIR }
+sub _is_reg { (S_IFMT & shift) == S_IFREG }
 
 sub _file_part {
     my $path = shift;

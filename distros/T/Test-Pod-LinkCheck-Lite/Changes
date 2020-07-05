@@ -1,3 +1,7 @@
+0.005		2020-06-26	T. R. Wyant
+    Skip man tests if 'man -w man' can not be executed. Thanks to Alceu
+    Rodrigues de Freitas Junior, whose OpenBSD smoker picked this up.
+
 0.004		2019-10-30	T. R. Wyant
     Optionally fail URL links that redirect. The user can provide code
     to determine which redirections are allowed.

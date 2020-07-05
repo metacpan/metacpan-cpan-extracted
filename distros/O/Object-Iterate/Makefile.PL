@@ -44,7 +44,7 @@ my $github    = 'https://github.com/briandfoy/object-iterate';
 my $main_file = catfile( 'lib', split /::/, "$module.pm" );
 
 my %WriteMakefile = (
-	'MIN_PERL_VERSION' => '5.008',
+	'MIN_PERL_VERSION' => '5.020',
 
 	'NAME'          => $module,
 	'ABSTRACT_FROM' => $main_file,
@@ -62,7 +62,7 @@ my %WriteMakefile = (
 
 	'TEST_REQUIRES' => {
 		'Test::Data' => '0',
-		'Test::More' => '0.94',
+		'Test::More' => '1',
 		},
 
 	'PREREQ_PM'     => {

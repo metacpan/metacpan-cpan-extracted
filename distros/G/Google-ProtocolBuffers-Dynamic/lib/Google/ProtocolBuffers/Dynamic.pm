@@ -9,7 +9,7 @@ use Exporter ();
 # @EXPORT_OK/%EXPORT_TAGS are set up in XS
 *import = \&Exporter::import;
 
-our $VERSION = '0.27'; # VERSION
+our $VERSION = '0.29'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -87,7 +87,7 @@ Google::ProtocolBuffers::Dynamic - fast and complete protocol buffer implementat
 
 =head1 VERSION
 
-version 0.27
+version 0.29
 
 =head1 SYNOPSIS
 
@@ -222,7 +222,7 @@ For a field named C<foo> the message class will have an item getter
 $msg->set_foo($key, $value) >>).
 
 C<< $msg->get_foo_map >> and C<< $msg->set_foo_map >> act as
-getter/setter for the whole map, taking/returning an hash reference.
+getter/setter for the whole map, taking/returning a hash reference.
 
 The C<< map<key, value> >> syntax is only available for C<proto3>, see
 see L</implicit_maps> to emulate map support when using C<proto2>.
@@ -436,7 +436,7 @@ Maps the specified message (recursively) under the Perl package prefix,
 using the full package name of the message.  It silently skips any
 already mapped types (although it will still recurse in to them).
 
-In particular, this is quite usefull to automatically map a message
+In particular, this is quite useful to automatically map a message
 that uses messages types defined in other packages.
 
 You might also want to map a required message to a specified package

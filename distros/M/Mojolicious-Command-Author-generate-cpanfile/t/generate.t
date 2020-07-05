@@ -24,17 +24,6 @@ sub module_version {
     *Mojolicious::Command::Author::generate::cpanfile::path = sub {
         Mock::Mojo::File->new('.');
     };
-
-    *Mojolicious::Command::Author::generate::cpanfile::_module_version = sub {
-        my ($module) = $_[1];
-
-        return () if $module =~ /fnord/i;
-
-        my $version = $module =~ /^Mojo::/ ? 0 : module_version($module);
-
-        return ($module, $version);
-    };
-
 }
 
 chdir $dir;
@@ -45,7 +34,7 @@ like $err, qr/^Unknown option: x/, 'right error output';
 ok !-e $cpanfile->rel_file('cpanfile'), 'cpanfile does not exist';
 
 ($out, $err) = run_run();
-like $out, qr/\[write\].*\/cpanfile/, 'right success output';
+like $out, qr/cpanfile/, 'right success output';
 ok !$err, 'no error output';
 ok -e $cpanfile->rel_file('cpanfile'), 'cpanfile exists';
 
@@ -54,20 +43,23 @@ my $content = $cpanfile->rel_file('cpanfile')->slurp;
 is $content, <<EOT, 'right cpanfile content';
 # https://metacpan.org/pod/distribution/Module-CPANfile/lib/cpanfile.pod
 
-requires 'Mojolicious', '$Mojolicious::VERSION';
-requires 'IO::File', '@{[module_version("IO::File")]}';
-requires 'List::Util', '@{[module_version("List::Util")]}';
+requires 'perl', '5.20.1';
+requires 'constant';
+requires 'IO::File';
+requires 'List::Util', '1.39';
 requires 'Mojo::Base';
-requires 'Storable', '@{[module_version("Storable")]}';
+requires 'Mojolicious';
+requires 'Storable';
 
 on test => sub {
-    requires 'Test::Fatal', '@{[module_version("Test::Fatal")]}';
-    requires 'Test::Mojo', '@{[module_version("Test::Mojo")]}';
-    requires 'Test::More', '@{[module_version("Test::More")]}';
+    requires 'File::Temp', '0.23';
+    requires 'Test::Fatal';
+    requires 'Test::Mojo';
+    requires 'Test::More';
 };
 EOT
 
-$cpanfile->rel_file('cpanfile')->remove;
+unlink($cpanfile->rel_file('cpanfile'));
 
 ($out, $err) = run_run(qw(-r Net::OpenSSH -r Mojolicious::Plugin::OpenAPI -l src -t xt));
 like $out, qr/cpanfile/, 'right success output';
@@ -79,11 +71,12 @@ $content = $cpanfile->rel_file('cpanfile')->slurp;
 is $content, <<EOT, 'right cpanfile content';
 # https://metacpan.org/pod/distribution/Module-CPANfile/lib/cpanfile.pod
 
-requires 'Mojolicious', '$Mojolicious::VERSION';
-requires 'Acme::DWIM', '@{[module_version("Acme::DWIM")]}';
-requires 'Catalyst', '@{[module_version("Catalyst")]}';
-requires 'Mojolicious::Plugin::OpenAPI', '@{[module_version("Mojolicious::Plugin::OpenAPI")]}';
-requires 'Net::OpenSSH', '@{[module_version("Net::OpenSSH")]}';
+requires 'Acme::DWIM';
+requires 'Catalyst', 'v5.9.0';
+requires 'constant';
+requires 'Mojolicious';
+requires 'Mojolicious::Plugin::OpenAPI';
+requires 'Net::OpenSSH';
 
 EOT
 
@@ -131,8 +124,11 @@ __DATA__
 
 @@ ./lib/My::A.pm
 
+require 5.018;
 use Mojo::Base 'My::Base';
-use List::Util 'sum';
+use List::Util 1.39 'sum';
+
+use constant FUBAR => 1.0;
 
 sub frobnicate { "frobnitz " . sum(@_) }
 
@@ -140,8 +136,8 @@ sub frobnicate { "frobnitz " . sum(@_) }
 
 @@ ./lib/My::B.pm
 
+use 5.20.1;
 use Mojo::Base 'My::Base';
-use Class::Fnord;
 use IO::File;
 
 sub new {
@@ -153,17 +149,26 @@ sub new {
 sub to_string {
     my $self = shift;
     
-    return map { join(",", "$_: " . $self->{$_}) } keys %$self;
+    return map { s/"//g; join(",", "$_: " . $self->{$_}) } keys %$self;
 }
+
+=head1 DESCRIPTION
+
+  "fool me"
+  use CGI::Debug;
+
+=cut
+
 
 @@ ./src/Other::C.pm
 
-use Catalyst qw/-Debug/;
-use Acme::DWIM;
+use Catalyst v5.9.0 qw/-Debug/;
+require Acme::DWIM;
+
+use constant SNAFU => 4.0;
 
 sub foo : Chained('/') Args() {
     my ( $self, $c ) = @_;
-    require Class::Fnord;
     $c->forward('Other::C::View::TT');
 }
 
@@ -185,7 +190,8 @@ done_testing;
 
 package My::Test::Foo;
 
-use File::Temp;
+use File::Temp 0.23;
+use List::Util '1.33';
 
 ok 1;
 

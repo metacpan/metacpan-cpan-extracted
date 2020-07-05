@@ -1,5 +1,5 @@
 package Archive::Raw::Entry;
-$Archive::Raw::Entry::VERSION = '0.02';
+$Archive::Raw::Entry::VERSION = '0.03';
 use strict;
 use warnings;
 use Archive::Raw;
@@ -10,7 +10,7 @@ Archive::Raw::Context - libarchive Entry class
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

@@ -7,31 +7,34 @@
 package Perl::Tidy::Debugger;
 use strict;
 use warnings;
-our $VERSION = '20200110';
+our $VERSION = '20200619';
 
 sub new {
 
-    my ( $class, $filename ) = @_;
+    my ( $class, $filename, $is_encoded_data ) = @_;
 
     return bless {
         _debug_file        => $filename,
         _debug_file_opened => 0,
         _fh                => undef,
+        _is_encoded_data   => $is_encoded_data,
     }, $class;
 }
 
 sub really_open_debug_file {
 
-    my $self       = shift;
-    my $debug_file = $self->{_debug_file};
-    my $fh;
-    unless ( $fh = IO::File->new("> $debug_file") ) {
+    my $self            = shift;
+    my $debug_file      = $self->{_debug_file};
+    my $is_encoded_data = $self->{_is_encoded_data};
+    my ( $fh, $filename ) =
+      Perl::Tidy::streamhandle( $debug_file, 'w', $is_encoded_data );
+    if ( !$fh ) {
         Perl::Tidy::Warn("can't open $debug_file: $!\n");
     }
     $self->{_debug_file_opened} = 1;
     $self->{_fh}                = $fh;
-    print $fh
-      "Use -dump-token-types (-dtt) to get a list of token type codes\n";
+    $fh->print(
+        "Use -dump-token-types (-dtt) to get a list of token type codes\n");
     return;
 }
 
@@ -65,16 +68,12 @@ sub write_debug_entry {
 
     my $input_line_number = $line_of_tokens->{_line_number};
     my $line_type         = $line_of_tokens->{_line_type};
-    ##my $rtoken_array      = $line_of_tokens->{_token_array};
 
     my ( $j, $num );
 
     my $token_str              = "$input_line_number: ";
     my $reconstructed_original = "$input_line_number: ";
     my $block_str              = "$input_line_number: ";
-
-    #$token_str .= "$line_type: ";
-    #$reconstructed_original .= "$line_type: ";
 
     my $pattern   = "";
     my @next_char = ( '"', '"' );
@@ -101,7 +100,7 @@ sub write_debug_entry {
         # This can only happen if a programming error has been made
         # because all valid tokens are non-blank
         if ( $type_str eq ' ' ) {
-            print $fh "BLANK TOKEN on the next line\n";
+            $fh->print("BLANK TOKEN on the next line\n");
             $type_str = $next_char[$i_next];
             $i_next   = 1 - $i_next;
         }
@@ -113,13 +112,11 @@ sub write_debug_entry {
     }
 
     # Write what you want here ...
-    # print $fh "$input_line\n";
-    # print $fh "$pattern\n";
-    print $fh "$reconstructed_original\n";
-    print $fh "$token_str\n";
+    # $fh->print "$input_line\n";
+    # $fh->print "$pattern\n";
+    $fh->print("$reconstructed_original\n");
+    $fh->print("$token_str\n");
 
-    #print $fh "$block_str\n";
     return;
 }
 1;
-

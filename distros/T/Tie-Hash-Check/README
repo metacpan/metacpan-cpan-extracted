@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Tie::Hash::Check;
+
      tie my %hash, 'Tie::Hash::Check', {
              %parameters,
      };
@@ -44,11 +45,9 @@ ERRORS
              Key '%s' doesn't exist.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Tie::Hash::Check;
 
      # Set error type.
@@ -70,17 +69,18 @@ DEPENDENCIES
     Error::Pure, Error::Pure::Utils.
 
 REPOSITORY
-    <https://github.com/tupinek/Hash-Check>.
+    <https://github.com/michal-josef-spacek/Hash-Check>.
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2009-2016 Michal Špaček
-     BSD 2-Clause License
+    © 2009-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

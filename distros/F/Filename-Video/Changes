@@ -1,3 +1,8 @@
-0.001   2017-08-12 (PERLANCAR))
+0.002   2020-04-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Provide $STR_RE.
+
+
+0.001   2017-08-12  Released-By: PERLANCAR
 
         - First release.

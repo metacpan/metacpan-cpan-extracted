@@ -1,0 +1,48 @@
+MODULE = Protocol::HTTP              PACKAGE = Protocol::HTTP::CookieJar
+PROTOTYPES: DISABLE
+
+CookieJar* CookieJar::new (string data = {}) {
+    RETVAL = new CookieJar(data);
+}
+
+void parse_cookies(const string& data) {
+    CookieJar::DomainCookies dc;
+    auto ret = CookieJar::parse_cookies(data, dc);
+    EXTEND(SP, 2);
+    mXPUSHs(xs::out(ret).detach());
+    mXPUSHs(xs::out(dc).detach());
+    XSRETURN(2);
+}
+
+string CookieJar::to_string(bool include_session = false, Date* now = nullptr) {
+    RETVAL = THIS->to_string(include_session, (now ? *now : Date::now()));
+}
+
+void CookieJar::clear()
+
+void CookieJar::add(const string& name, const Response::Cookie& cookies, URISP origin, const Date* now = nullptr) {
+    THIS->add(name, cookies, origin, (now ? *now : Date::now()));
+}
+
+CookieJar::Cookies CookieJar::remove(string domain = "", string name = "", string path = "/")
+
+Sv CookieJar::all_cookies() {
+    RETVAL = xs::out(THIS->domain_cookies);
+}
+
+Sv CookieJar::find(URISP request_uri, URISP context_uri = request_uri, Date* now = nullptr, bool top_level = true) {
+    RETVAL = xs::out(THIS->find(request_uri, context_uri, (now ? *now : Date::now()), top_level));
+}
+
+void CookieJar::collect(const Response& res, URISP request_uri, Date* now = nullptr) {
+    THIS->collect(res, request_uri, (now ? *now : Date::now()));
+}
+
+void CookieJar::populate(Request& request, URISP context_uri = request.uri, bool top_level = true, Date* now = nullptr) {
+    THIS->populate(request, context_uri, top_level, (now ? *now : Date::now()));
+}
+
+void CookieJar::set_ignore(Sub sub) {
+    auto fn = xs::sub2function<CookieJar::ignore_fn>(sub);
+    THIS->set_ignore(fn);
+}

@@ -1,0 +1,13 @@
+Revision history for Perl module cPanel::APIClient
+
+0.04 - 4 Jul 2020
+- Fix missing Test::MockModule dependency.
+
+0.03 - 3 Jul 2020
+- Add repository information to Makefile.PL.
+
+0.02 - 3 Jul 2020
+- Trivial documentation update
+
+0.01 - 3 Jul 2020
+- Initial release

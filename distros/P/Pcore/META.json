@@ -93,6 +93,7 @@
             "Crypt::OpenSSL::RSA" : "v0.310.0",
             "DBD::SQLite" : "v1.58.0",
             "DBI" : "v1.641.0",
+            "Data::MessagePack" : "v1.10.0",
             "Data::UUID" : "v1.221.0",
             "Data::UUID::MT" : "v1.1.0",
             "Devel::Refcount" : "0",
@@ -146,7 +147,7 @@
             "XML::Hash::XS" : "v0.53.0",
             "YAML::XS" : "v0.76.0",
             "common::header" : "v0.3.2",
-            "perl" : "v5.30.0"
+            "perl" : "v5.32.0"
          }
       },
       "test" : {
@@ -167,6 +168,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore"
       }
    },
-   "version" : "v0.136.1",
+   "version" : "v0.137.3",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

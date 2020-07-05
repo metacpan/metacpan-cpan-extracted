@@ -1,3 +1,7 @@
+v4.0.1    2020-06-28 14:48:00 EDT
+  - Update minting profile to generate revision 4 config.
+  - Recommend [PrereqsFile] for declaring prereqs.
+
 v4.0.0    2020-02-17 16:34:14 EST
   - Revision 4 added.
     - Removed [MetaConfig] to declutter generated META files.

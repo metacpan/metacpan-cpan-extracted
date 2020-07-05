@@ -19,22 +19,31 @@ Options:
     -y      Display year calendar.
     -Y[n]   Display n years of calendar
     -c n    Display calendar in n column (default 3).
+    -l      Display I18N options (See below)
+
+    --theme theme
+            Apply color theme
 
 Color options:
 
     --colormap  Specify colormap
     --rgb24     Use 24bit RGB color ANSI sequence
 
-Module options:
+I18N options:
 
-    --mono
-    --lavender
-    --green
-    --pastel
+    -l          Display I18N options
+    --i18n      Enable I18n options
+    --i18n-v    Display with Territory/Lange information
+
+Color modules:
+
+    -Mcolors
+    -Mteams
+    -Molympic
 
 =head1 VERSION
 
-Version 0.10
+Version 0.13
 
 =head1 DESCRIPTION
 
@@ -57,19 +66,29 @@ Date can given like:
     $ week 9/23        # 9/23 of current year
     $ week 23          # 23rd of current month
 
-Greater number is handled as year.  Next command display calendar of
-year 1752.
+Greater number is handled as year.  Next command displays the calendar of
+the year 1752.
 
     $ week 1752
 
-Use option B<-y> to show one year calendar.  Number of years can be
-specified by B<-Y> option, and implicitly set B<-y> option.
+Use option B<-y> to show one year calendar.  The number of years can be
+specified by the B<-Y> option, which will implicitly set the B<-y> option.
 
     $ week -y          # display this year's calendar
 
     $ week -Y2c6       # display 2 years calendar in 6 column
 
     $ week -Y 1752     # display 1752 years of calendar (takes long)
+
+It is possible display calendar in various language by setting C<LANG>
+environment.
+
+    LANG=et_EE week
+
+This command is come with B<-Mi18n> module which provides easy way to
+specify language by command option.  Option B<-l> displays option list
+provided by B<-Mi18n> module and option B<--i18n> and B<--i18n-v>
+enables them.
 
 =head1 COLORMAP
 
@@ -96,6 +115,18 @@ option with B<LABEL>=I<colorspec> syntax.  Default color is:
     --colormap  THISWEEK=L05/445 \
     --colormap THISMONTH=555/113
 
+Besides above, color for day-of-week names can be specified
+individually by following labels.  No color is assigned to these
+labels by default.
+
+    DOW_SU
+    DOW_MO
+    DOW_TU
+    DOW_WE
+    DOW_TH
+    DOW_FR
+    DOW_SA
+
 Three digit means 216 RGB values from 000 to 555, and Lxx means 24
 gray scales.  Colormap is handled by L<Getopt::EX::Colormap> module;
 use `perldoc Getopt::EX::Colormap` for detail.
@@ -106,13 +137,16 @@ all following arguments here, so that insert this option at the end.
 
     option default $<move> --cm 'THISDAY=+F'
 
-=head1 FILES
+=head1 I18N
 
 =over 4
 
-=item F<~/.weekrc>
+=item B<--i18n>
 
-Start up file.
+=item B<--i18n-v>
+
+Both of these enables I18N options and Territory/Language information
+will be shown if used B<--i18n-v>.
 
 =back
 
@@ -134,16 +168,41 @@ load appropriate module automatically in default start up module
 
 =item B<-Mteams>
 
-    --team teamname
-
     --tigers, --tigers-rev
     --giants, --giants-rev
     --lions, --lions-rev
+
+=item B<-Molympic>
+
+    --tokyo2020, --tokyo2020-rev
+
+=item B<--theme>
+
+Option B<--theme> is defined in default module, and choose given theme
+option according to the background color of the terminal. If you have
+next setting in your C<~/.weekrc>:
+
+    option --theme tokyo2020
+
+Option B<--tokyo2020> is set for light terminal, and
+B<--tokyo2020-rev> is set for dark terminal.
 
 =back
 
 Feel free to update these modules and send pull request to github
 site.
+
+=head1 FILES
+
+=over 4
+
+=item F<~/.weekrc>
+
+Start up file.  Use like this:
+
+    option default --i18n-v --theme tokyo2020
+
+=back
 
 =head1 SEE ALSO
 
@@ -151,9 +210,15 @@ L<https://github.com/kaz-utashiro/App-week>
 
 L<https://github.com/kaz-utashiro/Getopt-EX-termcolor>
 
+L<https://github.com/kaz-utashiro/Getopt-EX-i18n>
+
 L<Getopt::EX::Colormap>
 
 L<https://qiita.com/kaz-utashiro/items/603f4bca39e397afc91c>
+
+L<https://qiita.com/kaz-utashiro/items/38cb50a4d0cd34b6cce6>
+
+L<https://qiita.com/kaz-utashiro/items/be37a4d703f9d2208ed1>
 
 =head1 AUTHOR
 
@@ -202,6 +267,13 @@ my %colormap = (
 	 THISDAYS => "555/113",
 	 THISWEEK => "L05/445",
 	THISMONTH => "555/113",
+	   DOW_SU => "",
+	   DOW_MO => "",
+	   DOW_TU => "",
+	   DOW_WE => "",
+	   DOW_TH => "",
+	   DOW_FR => "",
+	   DOW_SA => "",
     );
 
 my $months = 0;
@@ -303,7 +375,6 @@ elsif ($months > 1) {
 	use integer;
 	$opt_B = ($months - 1) / 2;
 	$opt_A = $months - $opt_B - 1;
-	warn Dumper $opt_B, $opt_A;
     }
 }
 elsif ($opt_year or defined $opt_Y) {
@@ -380,7 +451,7 @@ sub calref {
 	);
 
     $cal[0] = color($label{month}, $cal[0]);
-    $cal[1] = color($label{week}, $cal[1]) if $label{week};
+    $cal[1] = color($label{week}, state $week = week_line($cal[1]));
     map {
 	s/(?= \d\b|\d\d\b)( ?$d\b)/color("THISDAY", $1)/e if $d;
 	$_ = color($label{days}, $_);
@@ -389,10 +460,29 @@ sub calref {
     return \@cal;
 }
 
+use Text::ANSI::Fold;
+
+sub split_week {
+    state $fold = new Text::ANSI::Fold width => [ (1, 2) x 7, 1 ];
+    $fold->text(+shift)->chops;
+}
+
+sub week_line {
+    my $week = shift;
+    my @week = split_week $week;
+    for (0..6) {
+	my $label = "DOW_" . qw(SU MO TU WE TH FR SA)[$_];
+	if (my $color = $colormap{$label}) {
+	    my $indx = $_ * 2 + 1;
+	    $week[$indx] = color($label, $week[$indx]);
+	}
+    }
+    join '', @week;
+}
+
 package App::week::CalYear {
     use Encode;
     use open IO => ':utf8';
-    use Text::ANSI::Fold;
     use Text::VisualWidth::PP qw(vwidth);
     sub TIEARRAY {
 	my $pkg = shift;
@@ -421,8 +511,8 @@ package App::week::CalYear {
 	@monthline == 4 or die "cal(1) command format error.\n";
 	state $fields = do {
 	    use Unicode::EastAsianWidth;
-	    my $dow_re = qr/\p{InFullwidth}|[ \w]\w/;
-	    $cal[ $monthline[0] + 1 ] =~ 
+	    my $dow_re = qr/\p{InFullwidth}|[ \S]\S/;
+	    $cal[ $monthline[0] + 1 ] =~
 		m{^   (\s*)
 		      ( (?: $dow_re [ ]){6} $dow_re ) (\s+)
 		      ( (?: $dow_re [ ]){6} $dow_re ) (\s+)

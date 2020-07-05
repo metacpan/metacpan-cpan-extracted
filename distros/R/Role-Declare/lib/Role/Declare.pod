@@ -128,6 +128,27 @@ It's arguments are the same as for L<ArrayRef> constraint from L<Type::Tiny>.
 
 Same as L<:ReturnList> but will always allow an empty list.
 
+=head2 :ReturnTuple
+
+Takes the same arguments as L<Tuple> from L<Type::Tiny> and checks list
+context return value in a similar fashion to L<:ReturnList>.
+
+=head2 :ReturnCycleTyple
+
+Analogically to L<:ReturnTuple>, applies the L<CycleTyple> constraint
+to the returned list.
+
+=head2 :ReturnHash
+
+Requires a list of key-value pairs to be returned in list context.
+Takes a single argument, similar to L<:Return>, which specifies the value
+type (key type is always C<Str>). For example, to require hash with C<Int> values:
+
+  class_method $method () : ReturnHash(Int) { ... }
+
+B<Note>: A hash reference is not an accepted return value in this case,
+use C<:Return(HashRef)> or C<:ReturnList(HashRef)> to check for it.
+
 =head2 :ReturnSelf
 
 Require the method to return its invocant.

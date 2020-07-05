@@ -115,6 +115,24 @@ the user to name the full sub-module name ("Net::Clacks::Client").
 In this release, a new disconnect() method was added to L<Net::Clacks::ClacksCache>. This will allow to disconnect
 cleanly from the server.
 
+=head2 VERSION 13
+
+Before this version, L<Net::Clacks::Server> will always cache deleted keys for one week. Caching is needed for clean
+reconnection of interclacks links.
+
+But the long caching time can lead to all sorts of problems, especially with things like cached web sessions or temporary
+cookies, that sort of thing. Cache time of deleted keys is really a trade off between the ability of interclacks links to
+sync cleanly after long interruptions of the connection and the memory and bandwidth required to do so.
+
+Version 13 now defaults to 1 hour (3600 seconds) of caching deleted keys. This can be changed in the
+"deletedcachetime" config setting.
+
+Syncing now also better handles timeout situations during long sync by avoiding them. Well, i hope it does. Fingers
+crossed, really...
+
+This release is backwards compatible with Version 12. But it is highly recommended to upgrade at least all server nodes
+to this version as soon as possible to avoid all sorts of problems.
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

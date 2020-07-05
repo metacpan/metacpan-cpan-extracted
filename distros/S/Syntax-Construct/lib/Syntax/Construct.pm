@@ -4,9 +4,14 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.016';
+our $VERSION = '1.018';
 
-my %introduces = ( '5.030' => [qw[
+my %introduces = ( '5.032' => [qw[
+                                  unicode13.0 chained-comparisons
+                                  unicode-identifier-status
+                                  unicode-name-property
+                             ]],
+                   '5.030' => [qw[
                                   unicode12.1 uniprop_wildcards qr'N
                                   turkic-casing
                              ]],
@@ -143,6 +148,9 @@ my %alias = (
     # 5.030
     'named-char-in-single-quoted-regex' => "qr'N",
     'unicode-12.1' => 'unicode12.1',
+    # 5.032
+    'unicode-13.0' => 'unicode13.0',
+    'unicode-identifier-type' => 'unicode-identifier-status',
 );
 
 my %_introduced = map {
@@ -248,7 +256,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.016
+Version 1.018
 
 =head1 SYNOPSIS
 
@@ -793,6 +801,28 @@ See L<perl5300delta/Turkic UTF-8 locales are now seamlessly supported>.
 B<Beware:> the actual behaviour depends on the operating system's
 locale support. E.g. FreeBSD, DragonFly, and Solaris are known not to
 support it.
+
+=head2 5.032
+
+=head3 unicode13.0
+
+L<perldelta/Unicode 13.0 is supported>
+
+Alias: unicode-13.0
+
+=head3 chained-comparisons
+
+L<perldelta/Chained comparisons capability>
+
+=head3 unicode-identifier-status
+
+L<perldelta/New Unicode properties Identifier_Status and Identifier_Type supported>
+
+Alias: unicode-identifier-type
+
+=head3 unicode-name-property
+
+L<It is now possible to write \p{Name=...} in perldelta|perldelta/It>
 
 =for completeness
 =head2 old

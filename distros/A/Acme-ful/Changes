@@ -1,3 +1,5 @@
+0.08  2020-06-22
+  - added ful::crum() method to use instead of $ful::crum
 
 0.07  2020-06-12
   - final changes for Kwalitee

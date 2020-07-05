@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'definitions';
+
+use Data::Dumper;
+use Zing::Flow;
+
+=pod explain
+
+- zing-flow represents an event-loop step/tick
+- the flow is implemented as a simplified linked-list
+- multiple flows can be appended, prepend, or injected ...
+- anywhere in-between without rebuilding the "chain"
+- the term "flow" was used to denote logic flows given that the ...
+- event-loop can use any flow (logic chain)
+
+=cut
+
+my $f1 = Zing::Flow->new(name => 'one', code => sub {1});
+my $f2 = $f1->next(Zing::Flow->new(name => 'two', code => sub {2}));
+my $f3 = $f1->bottom->next(Zing::Flow->new(name => 'three', code => sub {3}));
+
+warn Dumper $f1;

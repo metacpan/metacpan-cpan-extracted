@@ -45,26 +45,47 @@ const SockAddr::Inet6 SockAddr::Inet6::sa_loopback(SockAddr::Inet6::addr_loopbac
 
 static system_error _not_supported () { return system_error(make_error_code(errc::address_family_not_supported)); }
 
-SockAddr::SockAddr (const sockaddr* _sa) {
+void SockAddr::validate (const sockaddr* sa, size_t length) {
+    if (length < BASE_LEN || length > sizeof(SockAddr)) throw system_error(make_error_code(errc::bad_address));
+    switch (sa->sa_family) {
+      #ifndef _WIN32
+        case AF_UNIX:
+      #endif
+        case AF_UNSPEC:
+        case AF_INET:
+        case AF_INET6:
+            break;
+        default: throw _not_supported();
+    }
+}
+
+SockAddr::SockAddr (const sockaddr* _sa, size_t length) {
+    validate(_sa, length);
     switch (_sa->sa_family) {
         case AF_UNSPEC : sa.sa_family = AF_UNSPEC; break;
         case AF_INET   : sa4 = *(const sockaddr_in*)_sa; break;
         case AF_INET6  : sa6 = *(const sockaddr_in6*)_sa; break;
         #ifndef _WIN32
-        case AF_UNIX   : sau = *(const sockaddr_un*)_sa; break;
+        case AF_UNIX   : memcpy(&this->sa, _sa, length);
+                         fix_unix_path(length);
+                         break;
         #endif
-        default        : throw _not_supported();
     }
+}
+
+SockAddr& SockAddr::operator= (const SockAddr& oth) {
+    if (this != &oth) memcpy(&sa, &oth.sa, oth.length());
+    return *this;
 }
 
 bool SockAddr::operator== (const SockAddr& oth) const {
     if (family() != oth.family()) return false;
     switch (family()) {
         case AF_UNSPEC : return true;
-        case AF_INET   : return !std::memcmp(&sa4, &oth.sa4, sizeof(sa4));
-        case AF_INET6  : return !std::memcmp(&sa6, &oth.sa6, sizeof(sa6));
+        case AF_INET   : return !memcmp(&sa4, &oth.sa4, sizeof(sockaddr_in));
+        case AF_INET6  : return !memcmp(&sa6, &oth.sa6, sizeof(sockaddr_in6));
         #ifndef _WIN32
-        case AF_UNIX   : return !std::strcmp(sau.sun_path, oth.sau.sun_path);
+        case AF_UNIX   : return !strcmp(sau.sun_path, oth.sau.sun_path);
         #endif
         default        : throw _not_supported();
     }
@@ -90,15 +111,24 @@ uint16_t SockAddr::port () const {
 
 size_t SockAddr::length () const {
     switch (sa.sa_family) {
-        case AF_UNSPEC: return 0;
-        case AF_INET:   return sizeof(sa4);
-        case AF_INET6:  return sizeof(sa6);
+        case AF_UNSPEC: return BASE_LEN;
+        case AF_INET:   return sizeof(sockaddr_in);
+        case AF_INET6:  return sizeof(sockaddr_in6);
         #ifndef _WIN32
-        case AF_UNIX:   return sizeof(sau);
+        case AF_UNIX:   return BASE_LEN + strlen(sau.sun_path) + 1; /* null-byte */
         #endif
         default: throw _not_supported();
     }
 }
+
+#ifndef _WIN32
+void SockAddr::fix_unix_path (size_t length) noexcept {
+    assert(sa.sa_family == AF_UNIX);
+    // write null-byte by force
+    if (length <= BASE_LEN) sau.sun_path[0] = 0;
+    else                    sau.sun_path[length - BASE_LEN - 1] = 0;
+}
+#endif
 
 std::ostream& operator<< (std::ostream& os, const SockAddr& sa) {
     switch (sa.family()) {
@@ -119,7 +149,7 @@ std::ostream& operator<< (std::ostream& os, const SockAddr& sa) {
 
 SockAddr::Inet4::Inet4 (const string_view& ip, uint16_t port) {
     _NULL_TERMINATE(ip, ipstr);
-    memset(&sa4, 0, sizeof(sa4));
+    memset(&sa4, 0, sizeof(sockaddr_in));
     sa4.sin_family = AF_INET;
     sa4.sin_port = htons(port);
     auto err = inet_pton4(ipstr, (unsigned char*)&(sa4.sin_addr));
@@ -127,7 +157,7 @@ SockAddr::Inet4::Inet4 (const string_view& ip, uint16_t port) {
 }
 
 SockAddr::Inet4::Inet4 (const in_addr& addr, uint16_t port) {
-    memset(&sa4, 0, sizeof(sa4));
+    memset(&sa4, 0, sizeof(sockaddr_in));
     sa4.sin_family = AF_INET;
     sa4.sin_port = htons(port);
     sa4.sin_addr = addr;
@@ -143,7 +173,7 @@ string SockAddr::Inet4::ip () const {
 }
 
 SockAddr::Inet6::Inet6 (const string_view& ip, uint16_t port, uint32_t scope_id, uint32_t flowinfo) {
-    memset(&sa6, 0, sizeof(sa6));
+    memset(&sa6, 0, sizeof(sockaddr_in6));
     sa6.sin6_family   = AF_INET6;
     sa6.sin6_port     = htons(port);
     sa6.sin6_flowinfo = htonl(flowinfo);
@@ -175,7 +205,7 @@ SockAddr::Inet6::Inet6 (const string_view& ip, uint16_t port, uint32_t scope_id,
 }
 
 SockAddr::Inet6::Inet6 (const in6_addr& addr, uint16_t port, uint32_t scope_id, uint32_t flowinfo) {
-    memset(&sa6, 0, sizeof(sa6));
+    memset(&sa6, 0, sizeof(sockaddr_in6));
     sa6.sin6_family   = AF_INET6;
     sa6.sin6_port     = htons(port);
     sa6.sin6_addr     = addr;

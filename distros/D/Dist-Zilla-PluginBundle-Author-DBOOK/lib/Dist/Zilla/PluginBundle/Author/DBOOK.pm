@@ -8,7 +8,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
 use namespace::clean;
 use Data::Section -setup;
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.0.3';
 
 sub configure {
 	my $self = shift;
@@ -28,7 +28,7 @@ sub configure {
 	$self->add_plugins([GithubMeta => \%githubmeta_config]);
 	$self->add_plugins([ReadmeAnyFromPod => 'Readme_Github' => { type => 'pod', filename => 'README.pod', location => 'root', phase => 'release' }]);
 	$self->add_plugins([GenerateFile => 'Generate_Contrib' => { filename => 'CONTRIBUTING.md', content => [split /\n/, ${$self->section_data('CONTRIBUTING.md')}] }]);
-	$self->add_plugins('MetaProvides::Package', 'Prereqs::FromCPANfile', 'Git::Contributors');
+	$self->add_plugins('MetaProvides::Package', 'Prereqs::FromCPANfile', 'PrereqsFile', 'Git::Contributors');
 	$self->add_plugins([MetaNoIndex => { directory => [ qw/t xt inc share eg examples/ ] }]);
 	
 	my $irc = $self->payload->{irc} // '';
@@ -113,6 +113,7 @@ This is the plugin bundle that DBOOK uses. It is equivalent to:
  
  [MetaProvides::Package]
  [Prereqs::FromCPANfile]
+ [PrereqsFile]
  [Git::Contributors]
  [MetaNoIndex]
  directory = t
@@ -187,10 +188,11 @@ This is the plugin bundle that DBOOK uses. It is equivalent to:
  [ConfirmRelease]
  [UploadToCPAN]
 
-This bundle assumes that your git repo has the following: a L<cpanfile> with
-the dist's prereqs, a C<Changes> populated for the current version (see
-L<Dist::Zilla::Plugin::NextRelease>), and a C<.gitignore> including
-C</Name-Of-Dist-*> but not C<Makefile.PL>/C<Build.PL> or C<META.json>.
+This bundle assumes that your git repo has the following: a L<cpanfile>,
+F<prereqs.json>, or F<prereqs.yml> with the dist's prereqs, a F<Changes>
+populated for the current version (see L<Dist::Zilla::Plugin::NextRelease>),
+and a F<.gitignore> including C</Name-Of-Dist-*> but not
+C<Makefile.PL>/C<Build.PL> or C<META.json>.
 
 To faciliate building the distribution for testing or installation without
 L<Dist::Zilla>, and provide important information about the distribution in

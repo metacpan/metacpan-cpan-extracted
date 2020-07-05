@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/001_load.t
+t/002_live.t
+t/empty.ini
+t/test.ini
+lib/SMS/Send/VoIP/MS.pm
+perl-SMS-Send-VoIP-MS.spec
+scripts/perl-SMS-Send-VoIP-MS-send_sms.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

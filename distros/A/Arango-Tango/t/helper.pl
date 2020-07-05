@@ -6,6 +6,12 @@ sub server_alive {
     return HTTP::Tiny->new->get("http://$ENV{ARANGO_DB_HOST}:$port")->{success};
 }
 
+sub auth_ok {
+    my $arango = shift;
+    my $x = eval { $arango->version; };
+    return !($@ && $arango->{last_error} == 401);
+}
+
 sub clean_test_environment {
     my $arango = shift;
 

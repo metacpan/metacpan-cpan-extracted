@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+1.07 2020-07-04T05:54:58Z
+
+    - Eliminate indirect object call.
+
 1.06 2020-06-09T06:30:59Z
 
     - Fix ANSI reset handling bug.

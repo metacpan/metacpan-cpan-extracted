@@ -18,6 +18,19 @@ corpus/false.wasm
 corpus/hello.c
 corpus/hello.wasm
 dist.ini
+example/01-hello-world/hello.c
+example/01-hello-world/hello.wasm
+example/02-echo/echo.c
+example/02-echo/echo.wasm
+example/03-call-perl/Makefile
+example/03-call-perl/foo.c
+example/03-call-perl/foo.wasm
+example/03-call-perl/lib/Bar/Baz.pm
+example/04-call-wasm/Makefile
+example/04-call-wasm/foo.c
+example/04-call-wasm/foo.wasm
+example/04-call-wasm/lib/Bar/Baz.c
+example/04-call-wasm/lib/Bar/Baz.wasm
 lib/App/plasm.pm
 maint/cip-before-install
 maint/cip-before-install-inside
@@ -26,6 +39,7 @@ t/00_diag.t
 t/app_plasm.t
 t/app_plasm_dump.t
 t/app_plasm_run.t
+t/app_plasm_wat.t
 t/lib/Run.pm
 t/plasm.t
 xt/author/critic.t

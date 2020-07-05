@@ -3,7 +3,7 @@ NAME
     wih XPack as plugin for Search::Elasticsearch
 
 VERSION
-    version 6.80
+    version 6.81
 
 SYNOPSIS
         use Search::Elasticsearch();

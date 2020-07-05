@@ -1,6 +1,19 @@
 Changelog for HealthCheck-Diagnostic-Redis
 
-v0.0.4 2020-05-12T16:06:24
+v0.0.5 2020-07-01T19:54:57
+ - Update README (Brandon Messineo)
+ - Use `set` instead of `setex` (Brandon Messineo)
+ - Set expiration on key when setting value (Brandon Messineo)
+ - Rename test method names (Brandon Messineo)
+ - Add a write test for the health-check (Brandon Messineo)
+ - Support a `key_name` field for the health-check (Brandon Messineo)
+ - Create tests making sure that the redis store is in the right state
+   (Brandon Messineo)
+ - Move read_ability tests out into their own method (Brandon Messineo)
+ - Change the test name for the read-only key (Brandon Messineo)
+ - Remove unused package (Brandon Messineo)
+
+v0.0.4 2020-05-12T15:19:10
  - No changes found
 
 v0.0.3 2020-05-12T15:19:10

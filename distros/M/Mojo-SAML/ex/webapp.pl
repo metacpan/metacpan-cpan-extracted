@@ -28,12 +28,26 @@ use Mojo::Util;
 
 =cut
 
+my %ns = (
+  saml => 'urn:oasis:names:tc:SAML:2.0:assertion',
+  samlp => 'urn:oasis:names:tc:SAML:2.0:protocol',
+);
+
 my $config = app->plugin('Config');
 my $login  = sub {
   my $c = shift;
   my $response = $c->saml->response;
-  # real app would extract username and redirect
-  $c->render(text => "$response", format => 'xml');
+
+  return $c->render(text => "$response", format => 'xml')
+    unless $c->saml->response_success;
+
+  my $username = eval { $response->at('samlp|Response > saml|Assertion > saml|Subject > saml|NameID', %ns)->text };
+
+  return $c->render(text => "$response", format => 'xml')
+    unless $username;
+
+  $c->session(username => $username);
+  $c->redirect_to('/private');
 };
 my $saml = app->plugin('SAML', {
   handle_login => $login,
@@ -55,11 +69,19 @@ my $attr_srv = AttributeConsumingService->new(
 );
 push @{$saml->sp_metadata->attribute_consuming_services}, $attr_srv;
 
+get '/' => { text => 'Public' };
+
 get '/private' => sub {
   my $c = shift;
   return $c->saml->authn_request
     unless $c->session->{username};
   $c->render(text => 'PRIVATE!');
+};
+
+get '/logout' => sub {
+  my $c = shift;
+  $c->session(expires => 1);
+  $c->redirect_to('/');
 };
 
 app->start;

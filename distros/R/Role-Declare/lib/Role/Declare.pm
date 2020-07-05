@@ -1,7 +1,7 @@
 package Role::Declare;
 use strict;
 use warnings;
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 use Attribute::Handlers;
 use Carp qw[ croak ];
@@ -56,11 +56,10 @@ sub ReturnMaybe : ATTR(CODE,BEGIN) {
 }
 
 sub _make_list_check {
-    my ($constraint_spec, %args) = @_;
+    my ($constraint, %args) = @_;
     my $allow_empty = $args{allow_empty};
-    croak 'List constraint not defined' if not @$constraint_spec;
+    croak 'List constraint not defined' if not $constraint;
 
-    my $constraint = ArrayRef($constraint_spec);
     return sub {
         my $orig   = shift;
         my $retval = [&$orig];
@@ -71,14 +70,39 @@ sub _make_list_check {
 
 sub ReturnList : ATTR(CODE,BEGIN) {
     my ($referent, $data) = @_[ REFERENT, DATA ];
-    _install_list_hook($referent, _make_list_check($data, allow_empty => 0));
+    my $type = ArrayRef($data);
+    _install_list_hook($referent, _make_list_check($type, allow_empty => 0));
     return;
 }
 
 sub ReturnMaybeList : ATTR(CODE,BEGIN) {
     my ($referent, $data) = @_[ REFERENT, DATA ];
-    _install_list_hook($referent, _make_list_check($data, allow_empty => 1));
+    my $type = ArrayRef($data);
+    _install_list_hook($referent, _make_list_check($type, allow_empty => 1));
     return;
+}
+
+sub ReturnTuple : ATTR(CODE,BEGIN) {
+    my ($referent, $data) = @_[ REFERENT, DATA ];
+
+    my $type = Tuple($data);
+    _install_list_hook($referent, _make_list_check($type, allow_empty => 0));
+    return;
+}
+
+sub ReturnCycleTuple : ATTR(CODE,BEGIN) {
+    my ($referent, $data) = @_[ REFERENT, DATA ];
+
+    my $type = CycleTuple($data);
+    _install_list_hook($referent, _make_list_check($type, allow_empty => 0));
+    return;
+}
+
+sub ReturnHash : ATTR(CODE,BEGIN) {
+    my $data = $_[DATA];
+    croak 'Only a single constraint is supported' if @$data != 1;
+    unshift @$data, Str;
+    goto &ReturnCycleTuple;
 }
 
 sub _make_self_check {
@@ -90,7 +114,7 @@ sub _make_self_check {
         my $self           = &$orig;
         return $self if not defined $self and $allow_undef;
         return $self if ref $self and refaddr($self) eq $orig_self_addr;
-        die "$self was not the original invocant";
+        croak "$self was not the original invocant";
     };
 }
 

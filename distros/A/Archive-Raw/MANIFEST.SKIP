@@ -5,6 +5,7 @@ Raw.def
 MYMETA.json.lock
 const-c-constants.inc
 const-xs-constants.inc
+libarchive-v3.4.3-win64.zip
 .*\.o
 .*\.a
 .*\.pc$

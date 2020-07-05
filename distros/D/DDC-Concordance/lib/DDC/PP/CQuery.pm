@@ -273,7 +273,7 @@ sub new {
 sub OperatorKey { return '/_/'; }
 sub ValueString {
   my $re = defined($_[0]{Value}) ? $_[0]{Value} : '';
-  $re =~ s{/}{\\/}g;
+  #$re =~ s{/}{\\/}g; ##-- no; see mantis #47973
   return ($_[0]{RegexNegated} ? '!' : '')."/$re/";
 }
 

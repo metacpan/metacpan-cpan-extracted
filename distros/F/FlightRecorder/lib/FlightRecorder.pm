@@ -14,7 +14,7 @@ use Data::Object::ClassHas;
 with 'Data::Object::Role::Pluggable';
 with 'Data::Object::Role::Throwable';
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 # ATTRIBUTES
 

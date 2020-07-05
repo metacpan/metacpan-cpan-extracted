@@ -1,0 +1,15 @@
+CONDUCT.md
+CONTRIBUTING.md
+lib/Stance/Vault.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+Stance-Vault-1.0.0/META.json
+Stance-Vault-1.0.0/META.yml
+t/10-kv.t
+t/docker-compose.yml
+t/setup
+t/teardown
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

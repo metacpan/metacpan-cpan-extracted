@@ -1,0 +1,35 @@
+0.000007  2020-07-01 20:08:35-07:00 America/Los_Angeles
+
+    - Fix open.t on windows
+    - Add debugging to sysopen.t
+    - add sysopen clone without plugint o make sure plugin is the segv source
+
+0.000006  2020-06-30 22:05:42-07:00 America/Los_Angeles
+
+    - More XS fixes to avoid segv's
+
+0.000005  2020-06-29 21:18:02-07:00 America/Los_Angeles
+
+    - Some XS cleanup, remove dups
+    - Split unit tests into multiple to help narrow downa segv on testers
+
+0.000004  2020-06-28 20:25:52-07:00 America/Los_Angeles
+
+    - Add XS to grab filenames from open/sysopen
+    - Better filename extraction, less missed files.
+
+0.000003  2020-06-25 21:57:37-07:00 America/Los_Angeles
+
+    - Clean up and optimize XS
+    - Fix XS thread safety issues
+    - Update benchmarks
+    - Add no_event import option
+    - Make sure event is fired from both processes in event of a fork
+
+0.000002  2020-06-24 22:52:36-07:00 America/Los_Angeles
+
+    - Fix typos
+
+0.000001  2020-06-24 22:32:00-07:00 America/Los_Angeles
+
+    - Initial Release

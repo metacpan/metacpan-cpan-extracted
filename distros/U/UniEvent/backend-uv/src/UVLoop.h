@@ -38,9 +38,15 @@ struct UVLoop : LoopImpl {
     bool _run (RunMode mode) override {
         uvloop->stop_flag = 0; // fix bug when UV immediately exits run() if stop() was called before run()
         switch (mode) {
-            case RunMode::DEFAULT: return uv_run(uvloop, UV_RUN_DEFAULT);
-            case RunMode::ONCE   : return uv_run(uvloop, UV_RUN_ONCE);
-            case RunMode::NOWAIT : return uv_run(uvloop, UV_RUN_NOWAIT);
+            case RunMode::DEFAULT      : return uv_run(uvloop, UV_RUN_DEFAULT);
+            case RunMode::ONCE         : return uv_run(uvloop, UV_RUN_ONCE);
+            case RunMode::NOWAIT       : return uv_run(uvloop, UV_RUN_NOWAIT);
+            case RunMode::NOWAIT_FORCE : {
+                uvloop->active_handles++;
+                auto ret = uv_run(uvloop, UV_RUN_NOWAIT);
+                uvloop->active_handles--;
+                return ret;
+            }
         }
         assert(0);
     }
@@ -75,6 +81,8 @@ struct UVLoop : LoopImpl {
 
     uint64_t delay        (const delayed_fn& f, const iptr<Refcnt>& guard = {}) override { return _delayer.add(f, guard); }
     void     cancel_delay (uint64_t id)                                noexcept override { _delayer.cancel(id); }
+
+    virtual void* get() {return uvloop;}
 
 private:
     uv_loop_t _uvloop_body;

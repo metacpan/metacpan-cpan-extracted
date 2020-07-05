@@ -1,0 +1,57 @@
+
+hello = Hello, world!
+
+goodbye = Good Bye, and thanks for all the fish!
+
+/* This should be junk
+ * All the way to the next comment
+ */
+
+
+# this next one should be a Term, not a Message
+-name = theMage
+  .surname = Merlin
+  .gender  = {
+    $role ->
+      *[formal] mage
+       [informal] MrMage
+       [obnoxious] dude
+  }
+
+## this next one is a Message with an attribute
+dreams = They don't know and they don't dream
+  .verse-2 = that the dreams controls life
+  .verse-3 = every time a man dreams...
+
+### This is also a comment, and the next is a whole verse in one
+whole-dream = They don't know and they don't dreams
+              That the dream controls life
+              Everytime a man dreams
+              Life jumps and advances
+              Like a colorful ball
+              In the hands of an infant
+              
+
+multi-line = { "They don't know that the dream
+Is a constant in life
+As concret and defined
+As anything else" }
+
+math-pi = { 3.1415 }
+
+-math-constant = The value of constant { $name } is { $value }
+
+math-value-of-pi = { -math-constant( name: "pi", value: 3.1415 ) }
+
+today = { DATE( "today", tz: "utc" ) }
+
+tha_day = { today } is tha day!
+
+fullname = { -name } { -name.surname } { -name.gender(role: "formal", "test" ) } { -name.gender( role: "obnoxious" ) }
+
+role = { $role }
+
+compose-dreams = { dreams }; 
+    { dreams.verse-2 }; 
+    { dreams.verse-3 }
+

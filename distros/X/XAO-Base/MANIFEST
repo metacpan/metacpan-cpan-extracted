@@ -10,6 +10,7 @@ lib/XAO/Cache.pm
 lib/XAO/DO/Atom.pm
 lib/XAO/DO/Cache/Memcached.pm
 lib/XAO/DO/Cache/Memory.pm
+lib/XAO/DO/Cache/Uncached.pm
 lib/XAO/DO/Config.pm
 lib/XAO/DO/Embeddable.pm
 lib/XAO/Errors.pm

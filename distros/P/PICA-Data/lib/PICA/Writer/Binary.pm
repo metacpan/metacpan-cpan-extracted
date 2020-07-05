@@ -1,7 +1,7 @@
 package PICA::Writer::Binary;
 use v5.14.1;
 
-our $VERSION = '1.08';
+our $VERSION = '1.11';
 
 use charnames qw(:full);
 

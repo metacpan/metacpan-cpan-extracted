@@ -7,7 +7,7 @@
 package Perl::Tidy::FileWriter;
 use strict;
 use warnings;
-our $VERSION = '20200110';
+our $VERSION = '20200619';
 
 # Maximum number of little messages; probably need not be changed.
 my $MAX_NAG_MESSAGES = 6;
@@ -41,18 +41,6 @@ sub new {
         _max_output_line_length     => 0,
         _max_output_line_length_at  => 0,
     }, $class;
-}
-
-sub tee_on {
-    my $self = shift;
-    $self->{_line_sink_object}->tee_on();
-    return;
-}
-
-sub tee_off {
-    my $self = shift;
-    $self->{_line_sink_object}->tee_off();
-    return;
 }
 
 sub get_output_line_number {

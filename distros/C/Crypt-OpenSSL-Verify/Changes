@@ -1,11 +1,34 @@
 Version History
 
+0.22 03-Jul-2020
+
+    Increment version for official release
+
+0.21-TRIAL 03-Jul-2020
+
+    Fix cpantesters issue with indented if statement
+
+        128a7dd Fix incorrect indent issue with if statement
+
+0.20-TRIAL 02-Jul-2020
+
+    Fix issues with verifying certificates based on trusted
+    certs using the local CApath or CAfile
+
+        edb8cc0 Update Changes and enable tests for 5.32
+        b299e0e Update Changes and Increment to version 0.20
+        f58121e Merge pull request #10 from issue7
+        58bc456 Allow verification of an intermediate certificate using local root store
+        fdcaf73 Fixes #6 remove new_from_x509 documents
+        663e21b Fixes #7 - Revert the changes to CAPath and CAFile, make it closer to openSSL verify
+        e548214 META.yml missing for cpan info update
+
 0.19    16-Jun-2020
 
     Issue latest based on 0.18-TRIAL
     No other changes
 
-        Increment Version 0.19 and update Changes file
+        618095a (tag: 0.19) Increment Version 0.19 and Changes update
 
 0.18-TRIAL
 

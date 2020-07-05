@@ -1,3 +1,5 @@
+1.1.2    19.06.2020
+           - improve logging
 1.1.1    15.04.2020
            - using Error with backtrace for all thrown exceptions
 1.1.0    10.04.2020

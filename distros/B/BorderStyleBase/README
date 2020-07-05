@@ -2,8 +2,8 @@ NAME
     BorderStyleBase - A suitable base class for most BorderStyle::* modules
 
 VERSION
-    This document describes version 0.002 of BorderStyleBase (from Perl
-    distribution BorderStyleBase), released on 2020-06-11.
+    This document describes version 0.004 of BorderStyleBase (from Perl
+    distribution BorderStyleBase), released on 2020-06-19.
 
 DESCRIPTION
 HOMEPAGE

@@ -109,7 +109,7 @@ sub start {
           set_pipes      => 0,
           internal_pipes => 1,
           code           => sub {
-            $_[0]->enable_subreaper if $self->subreaper;
+            $_[0]->enable_subreaper     if $self->subreaper;
             $self->namespace->isolate() if $self->unshare & CLONE_NEWNS;
             $fn->(@_);
           });

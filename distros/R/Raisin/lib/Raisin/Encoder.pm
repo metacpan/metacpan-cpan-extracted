@@ -1,8 +1,12 @@
-package Raisin::Encoder;
+#!perl
+#PODNAME: Raisin::Encoder
+#ABSTRACT: A helper for L<Raisin::Middleware::Formatter> over encoder modules
 
 use strict;
 use warnings;
 
+package Raisin::Encoder;
+$Raisin::Encoder::VERSION = '0.90';
 use Plack::Util;
 use Plack::Util::Accessor qw(registered);
 
@@ -55,9 +59,17 @@ sub media_types_map_flat_hash {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Raisin::Encoder - A helper for L<Raisin::Middleware::Formatter> over encoder modules.
+Raisin::Encoder - A helper for L<Raisin::Middleware::Formatter> over encoder modules
+
+=head1 VERSION
+
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -106,11 +118,13 @@ Returns a hash of media types and associated formats.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh E<lt>atE<gt> cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

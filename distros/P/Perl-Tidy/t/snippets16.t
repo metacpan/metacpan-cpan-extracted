@@ -18,11 +18,13 @@
 #15 ndsm1.ndsm
 #16 rt131288.def
 #17 rt130394.rt130394
+#18 git18.def
+#19 here2.def
 
 # To locate test #13 you can search for its name or the string '#13'
 
 use strict;
-use Test;
+use Test::More;
 use Carp;
 use Perl::Tidy;
 my $rparams;
@@ -95,6 +97,31 @@ my $Package = $Self->RepositoryGet( %Param, Result => 'SCALAR' );
 my %Structure = $Self->PackageParse( String => $Package );
 ----------
 
+        'git18' => <<'----------',
+# parsing stuff like 'x17' before fat comma
+my %bb = (
+    123x18 => '123x18',
+    123 x19 => '123 x19', 
+    123x 20 => '123x 20',
+    2 x 7    => '2 x 7', 
+    x40      => 'x40',
+    'd' x17    => "'d' x17",
+    c x17    => 'c x17', 
+);
+foreach my $key ( keys %bb ) {
+    print "key='$key' => $bb{$key}\n";
+}
+----------
+
+        'here2' => <<'----------',
+$_ = "";
+s|(?:)|"${\<<END}"
+ok $test - here2.in "" in multiline s///e outside eval
+END
+|e;
+print $_ || "not ok $test\n";
+----------
+
         'multiple_equals' => <<'----------',
 # ignore second '=' here
 $|          = $debug = 1 if $opt_d;
@@ -142,6 +169,8 @@ sub get_val() { }
 sub get_Val  () { }
 
 sub Get_val		() { }
+my $sub1=sub                     () { };
+my $sub2=sub () { };
 ----------
     };
 
@@ -159,6 +188,8 @@ sub get_val() { }
 sub get_Val () { }
 
 sub Get_val () { }
+my $sub1 = sub () { };
+my $sub2 = sub () { };
 #1...........
         },
 
@@ -171,6 +202,8 @@ sub get_val () { }
 sub get_Val () { }
 
 sub Get_val () { }
+my $sub1 = sub () { };
+my $sub2 = sub () { };
 #2...........
         },
 
@@ -265,7 +298,7 @@ my $incname   = $indname . ( $indtot > 1 ? $indno : "" );
 # not a good alignment
 sub head {
     match_on_type @_ => Null => sub { die "Cannot get head of Null" },
-      ArrayRef => sub { $_->[0] };
+      ArrayRef       => sub { $_->[0] };
 }
 
 #10...........
@@ -368,6 +401,39 @@ $style == OptArgs2::STYLE_FULL ? 'FullUsage' : 'NormalUsage',
 $factorial = sub { reduce { $a * $b } 1 .. 11 };
 #17...........
         },
+
+        'git18.def' => {
+            source => "git18",
+            params => "def",
+            expect => <<'#18...........',
+# parsing stuff like 'x17' before fat comma
+my %bb = (
+    123 x 18 => '123x18',
+    123 x 19 => '123 x19',
+    123 x 20 => '123x 20',
+    2 x 7    => '2 x 7',
+    x40      => 'x40',
+    'd' x 17 => "'d' x17",
+    c x17    => 'c x17',
+);
+foreach my $key ( keys %bb ) {
+    print "key='$key' => $bb{$key}\n";
+}
+#18...........
+        },
+
+        'here2.def' => {
+            source => "here2",
+            params => "def",
+            expect => <<'#19...........',
+$_ = "";
+s|(?:)|"${\<<END}"
+ok $test - here2.in "" in multiline s///e outside eval
+END
+|e;
+print $_ || "not ok $test\n";
+#19...........
+        },
     };
 
     my $ntests = 0 + keys %{$rtests};
@@ -396,29 +462,36 @@ foreach my $key ( sort keys %{$rtests} ) {
         errorfile => \$errorfile_string,    # not used when -se flag is set
     );
     if ( $err || $stderr_string || $errorfile_string ) {
+        print STDERR "Error output received for test '$key'\n";
         if ($err) {
-            print STDERR
-"This error received calling Perl::Tidy with '$sname' + '$pname'\n";
+            print STDERR "An error flag '$err' was returned\n";
             ok( !$err );
         }
         if ($stderr_string) {
             print STDERR "---------------------\n";
             print STDERR "<<STDERR>>\n$stderr_string\n";
             print STDERR "---------------------\n";
-            print STDERR
-"This error received calling Perl::Tidy with '$sname' + '$pname'\n";
             ok( !$stderr_string );
         }
         if ($errorfile_string) {
             print STDERR "---------------------\n";
             print STDERR "<<.ERR file>>\n$errorfile_string\n";
             print STDERR "---------------------\n";
-            print STDERR
-"This error received calling Perl::Tidy with '$sname' + '$pname'\n";
             ok( !$errorfile_string );
         }
     }
     else {
-        ok( $output, $expect );
+        if ( !is( $output, $expect, $key ) ) {
+            my $leno = length($output);
+            my $lene = length($expect);
+            if ( $leno == $lene ) {
+                print STDERR
+"#> Test '$key' gave unexpected output.  Strings differ but both have length $leno\n";
+            }
+            else {
+                print STDERR
+"#> Test '$key' gave unexpected output.  String lengths differ: output=$leno, expected=$lene\n";
+            }
+        }
     }
 }

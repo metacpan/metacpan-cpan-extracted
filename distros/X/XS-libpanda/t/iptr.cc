@@ -1,12 +1,6 @@
 #include "test.h"
 #include <panda/refcnt.h>
 
-using panda::iptr;
-using panda::weak_iptr;
-using test::Tracer;
-using panda::Refcnt;
-using panda::Refcntd;
-
 static int on_delete_calls = 0;
 
 struct Test : Tracer, Refcnt {

@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '2.004';
+our $VERSION = '2.005';
 
 =head1 NAME
 
@@ -40,7 +40,7 @@ Net::Async::Redis - talk to Redis servers via L<IO::Async>
         print "Value: " . shift;
     })->get;
 
-    # ... or with Future::AsyncAwait
+    # ... or with Future::AsyncAwait (recommended)
     await $redis->connect;
     my $value = await $redis->get('some_key');
     $value ||= await $redis->set(some_key => 'some_value');
@@ -162,6 +162,7 @@ use IO::Async::Stream;
 use Ryu::Async;
 use URI;
 use URI::redis;
+use Cache::LRU;
 
 use Log::Any qw($log);
 
@@ -342,6 +343,66 @@ around [qw(discard exec)] => sub {
     $f->retain
 };
 
+=head1 METHODS - Clientside caching
+
+Enable clientside caching by passing a true value for C<client_side_caching_enabled> in
+L</configure> or L</new>. This is currently B<experimental>, and only operates on
+L<Net::Async::Redis::Commands/get> requests.
+
+See L<https://redis.io/topics/client-side-caching> for more details on this feature.
+
+=cut
+
+async sub client_side_connection {
+    my ($self) = @_;
+    return if $self->{client_side_connection};
+    my $f = $self->{client_side_cache_ready} = $self->loop->new_future;
+    $self->{client_side_connection} = my $redis = ref($self)->new(
+        host => $self->host,
+        port => $self->port,
+        auth => $self->{auth},
+    );
+    $self->add_child($redis);
+    my $id = await $redis->client_id;
+    my $sub = await $redis->subscribe('__redis__:invalidate');
+    $sub->events->each(sub {
+        $log->tracef('Invalidating key %s', $_->payload);
+        $self->client_side_cache->remove($_->payload);
+    });
+    $f->done;
+}
+
+sub client_side_cache_ready {
+    my ($self) = @_;
+    my $f = $self->{client_side_cache_ready} or return Future->fail('client-side cache is not enabled');
+    return $f->without_cancel;
+}
+
+sub client_side_cache {
+    my ($self) = @_;
+    $self->{client_side_cache} //= Cache::LRU->new(
+        size => $self->client_side_cache_size,
+    );
+}
+
+sub client_side_cache_enabled { defined shift->{client_side_cache_size} }
+sub client_side_cache_size { shift->{client_side_cache_size} }
+
+around get => async sub {
+    my ($code, $self, $k) = @_;
+    my $use_cache = $self->client_side_cache_enabled;
+    if($use_cache) {
+        $log->tracef('Check cache for [%s]', $k);
+        my $v = $self->client_side_cache->get($k);
+        return $v if defined $v;
+        $log->tracef('Key [%s] was not cached', $k);
+    }
+    my $v = await $self->$code($k);
+    $self->client_side_cache->set($k => $v) if $use_cache;
+    return $v;
+};
+
+
 =head1 METHODS - Generic
 
 =head2 keys
@@ -486,7 +547,9 @@ sub on_message {
 
     my $next = shift @{$self->{pending}} or die "No pending handler";
     $self->next_in_pipeline if @{$self->{awaiting_pipeline}};
-    warn "our [@$data] entry is ready, original was @{[$next->[0]]}??" if $next->[1]->is_ready;
+    return if $next->[1]->is_cancelled;
+    # This shouldn't happen, preferably
+    $log->errorf("our [%s] entry is ready, original was [%s]??", $data, $next->[0]) if $next->[1]->is_ready;
     $next->[1]->done($data);
 }
 
@@ -495,11 +558,14 @@ sub next_in_pipeline {
     my $depth = $self->pipeline_depth;
     until($depth and $self->{pending}->@* >= $depth) {
         return unless my $next = shift @{$self->{awaiting_pipeline}};
-        $log->tracef("Have free space in pipeline, sending %s", $next->[0]);
-        push @{$self->{pending}}, $next;
-        my $data = $self->protocol->encode_from_client($next->[0]);
+        my $cmd = join ' ', @{$next->[0]};
+        $log->tracef("Have free space in pipeline, sending %s", $cmd);
+        push @{$self->{pending}}, [ $cmd, $next->[1] ];
+        my $data = $self->protocol->encode_from_client(@{$next->[0]});
         $self->stream->write($data);
     }
+    # Ensure last ->write is in void context
+    return;
 }
 
 sub on_error_message {
@@ -675,7 +741,7 @@ sub execute_command {
         $log->tracef("Pipeline depth now %d/%d", 0 + @{$self->{pending}}, $depth);
         if($depth && $self->{pending}->@* >= $depth) {
             $log->tracef("Pipeline full, deferring %s (%d others in that queue)", $cmd, 0 + @{$self->{awaiting_pipeline}});
-            push @{$self->{awaiting_pipeline}}, [ $cmd, $f ];
+            push @{$self->{awaiting_pipeline}}, [ \@cmd, $f ];
             return $f;
         }
         my $data = $self->protocol->encode_from_client(@cmd);
@@ -756,11 +822,46 @@ sub configure {
     $self->{pending_multi} //= [];
     $self->{pending} //= [];
     $self->{awaiting_pipeline} //= [];
-    for (qw(host port auth uri pipeline_depth stream_read_len stream_write_len on_disconnect)) {
+    for (qw(
+        host
+        port
+        auth
+        pipeline_depth
+        stream_read_len
+        stream_write_len
+        on_disconnect
+    )) {
         $self->{$_} = delete $args{$_} if exists $args{$_};
     }
-    $self->{uri} = URI->new($self->{uri}) unless ref $self->uri;
+
+    # Be more lenient with the URI parameter, since it's tedious to
+    # need the redis:// prefix every time... after all, what else
+    # would we expect it to be?
+    if(exists $args{uri}) {
+        my $uri = delete $args{uri};
+        $uri = "redis://$uri" unless ref($uri) or $uri =~ /^redis:/;
+        $self->{uri} = $uri;
+    }
+    if(exists $args{client_side_cache_size}) {
+        $self->{client_side_cache_size} = delete $args{client_side_cache_size};
+        delete $self->{client_side_cache};
+        if($self->loop) {
+            $self->remove_child(delete $self->{client_side_connection}) if $self->{client_side_connection};
+            $self->client_side_connection->retain;
+        }
+    }
+    my $uri = $self->{uri} = URI->new($self->{uri}) unless ref $self->uri;
+    if($uri) {
+        $self->{host} //= $uri->host;
+        $self->{port} //= $uri->port;
+    }
     $self->next::method(%args)
+}
+
+sub _add_to_loop {
+    my ($self, $loop) = @_;
+    delete $self->{client_side_connection};
+    $self->client_side_connection->retain if $self->client_side_cache_size;
 }
 
 1;

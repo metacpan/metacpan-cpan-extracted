@@ -51,7 +51,7 @@ subtest 'semaphore' => sub {
     process(
       sub {
         my $sem = semaphore(key => $sem_key);
-        my $e = 1;
+        my $e   = 1;
         if ($sem->acquire({wait => 1, undo => 0})) {
           $e = 0;
           $sem->release();
@@ -150,7 +150,7 @@ subtest 'lock section' => sub {
 subtest 'concurrent memory read/write' => sub {
   use IPC::SysV 'ftok';
 
-  my $k = ftok($0, 0);
+  my $k   = ftok($0, 0);
   my $mem = shared_memory(key => $k);
   $mem->_lock->remove;
   my $default = shared_memory;

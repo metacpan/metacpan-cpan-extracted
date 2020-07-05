@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.35';
+our $VERSION = '0.36';
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ Crypt::LE - Let's Encrypt API interfacing module and client.
 
 =head1 VERSION
 
-Version 0.35
+Version 0.36
 
 =head1 SYNOPSIS
 
@@ -244,8 +244,9 @@ User-agent name to use while sending requests to Let's Encrypt servers. By defau
 
 =item C<server>
 
-Server URL address to connect to (http or https prefix is required). Only needed if the default live or staging server URLs have changed and this module
-has not yet been updated with the new information. You can then explicitly set the URL you need.
+Server URL to connect to. Only needed if the default live or staging server URLs have changed and this module has not yet been updated with the new
+information or if you are using a custom server supporting ACME protocol. Note: the value is supposed to point to the root of the API (for example:
+https://some.server/acme/) rather than the directory handler. This parameter might be deprecated in the future in favour of the 'dir' one below.
 
 =item C<live>
 
@@ -257,9 +258,14 @@ SSL certificates.
 Activates printing debug messages to the standard output when set. If set to 1, only standard messages are printed. If set to any greater value, then structures and
 server responses are printed as well.
 
+=item C<dir>
+
+Full URL of a 'directory' handler on the server (the actual name of the handler can be different in certain configurations, where multiple handlers
+are mapped). Only needed if you are using a custom server supporting ACME protocol. This parameter replaces the 'server' one.
+
 =item C<autodir>
 
-Enables automatic retrieval of the resource directory (required for normal API processing) from Let's Encrypt servers. Enabled by default.
+Enables automatic retrieval of the resource directory (required for normal API processing) from the servers. Enabled by default.
 
 =item C<delay>
 
@@ -291,6 +297,7 @@ sub new {
     my $self = {
         ua      => '',
         server  => '',
+        dir     => '',
         live    => 0,
         debug   => 0,
         autodir => 1,
@@ -304,6 +311,14 @@ sub new {
     # Init UA
     $self->{ua} = HTTP::Tiny->new( agent => $self->{ua} || __PACKAGE__ . " v$VERSION", verify_SSL => 1 );
     # Init server
+    if ($self->{server}) {
+        # Custom server - drop the protocol if given (defaults to https later). If that leaves nothing, the check below
+        # will set the servers to LE standard ones.
+        $self->{server}=~s~^\w+://~~;
+    }
+    if ($self->{dir}) {
+        $self->{dir} = "https://$self->{dir}" unless $self->{dir}=~m~^https?://~i;
+    }
     unless ($self->{server}) {
         if ($self->{version} > 1) {
             $self->{server} = $self->{live} ? 'acme-v02.api.letsencrypt.org' : 'acme-staging-v02.api.letsencrypt.org';
@@ -674,7 +689,7 @@ Returns: OK | INVALID_DATA | LOAD_ERROR.
 sub directory {
     my ($self, $reload) = @_;
     if (!$self->{directory} or $reload) {
-        my ($status, $content) = $self->_request("https://$self->{server}/directory");
+        my ($status, $content) = $self->{dir} ? $self->_request($self->{dir}) : $self->_request("https://$self->{server}/directory");
         if ($status == SUCCESS and $content and (ref $content eq 'HASH')) {
             if ($content->{newAccount}) {
                 unless ($self->version) {
@@ -759,8 +774,13 @@ sub register {
     } elsif ($status == CREATED) {
         $self->{new_registration} = 1;
         $self->{registration_info} = $content;
-        $self->{tos_changed} = 1 if $self->{links}->{'terms-of-service'};
-        $self->_debug("New key is now registered, reg path: $self->{directory}->{reg}. You need to accept TOS at $self->{links}->{'terms-of-service'}");
+        $self->{tos_changed} = 0;
+        my $tos_message = '';
+        if ($self->{links}->{'terms-of-service'}) {
+            $self->{tos_changed} = 1;
+            $tos_message = "You need to accept TOS at $self->{links}->{'terms-of-service'}";
+        }
+        $self->_debug("New key is now registered, reg path: $self->{directory}->{reg}. $tos_message");
     } else {
         return $self->_status(ERROR, $content);
     }
@@ -770,7 +790,7 @@ sub register {
             $self->{contact_details} = $self->{registration_info}->{contact};
         }
     }
-    if (!$self->{registration_id} and $self->{directory}->{reg}=~/\/(\d+)$/) {
+    if (!$self->{registration_id} and $self->{directory}->{reg}=~/\/([^\/]+)$/) {
         $self->{registration_id} = $1;
     }
     $self->_debug("Account ID: $self->{registration_id}") if $self->{registration_id};
@@ -850,7 +870,9 @@ sub request_challenge {
             my $domain = $content->{identifier}->{value};
             $domain = "*.$domain" if $content->{wildcard};
             foreach my $challenge (@{$content->{challenges}}) {
-                unless ($challenge and (ref $challenge eq 'HASH') and $challenge->{type} and ($challenge->{url} or $challenge->{uri}) and $challenge->{status}) {
+                unless ($challenge and (ref $challenge eq 'HASH') and $challenge->{type} and
+                       ($challenge->{url} or $challenge->{uri}) and
+                       ($challenge->{status} or $content->{status})) {
                     $self->_debug("Challenge for domain $domain does not contain required fields.");
                     next;
                 }
@@ -861,6 +883,7 @@ sub request_challenge {
                 }
                 $valid_challenge = 1 if ($challenge->{status} eq 'valid');
                 $challenge->{uri} ||= $challenge->{url};
+                $challenge->{status} ||= $content->{status};
                 $self->{challenges}->{$domain}->{$type} = $challenge;
             }
             if ($self->{challenges} and exists $self->{challenges}->{$domain}) {
@@ -1497,7 +1520,7 @@ sub check_expiration {
     } else {
         $res=~s/^[^:]+/https/;
         my $probe = HTTP::Tiny->new(
-            agent => "Mozilla/5.0 (compatible; ZeroSSL Crypt::LE v$VERSION agent; https://ZeroSSL.com/)",
+            agent => "Mozilla/5.0 (compatible; Crypt::LE v$VERSION agent; https://Do-Know.com/)",
             verify_SSL => 1,
             timeout => $timeout || 10,
             SSL_options => { SSL_verify_callback => _verify_crt(\$exp) },
@@ -1536,7 +1559,7 @@ sub der2pem {
 =head2 export_pfx($file, $pass, $cert, $key, [ $ca ], [ $tag ])
 
 Exports given certificate, CA chain and a private key into a PFX/P12 format with a given password.
-Optionally you can specify a text to go into pfx instead of the default "ZeroSSL exported".
+Optionally you can specify a text to go into pfx instead of the default "Crypt::LE exported".
 
 Returns: OK | UNSUPPORTED | INVALID_DATA | ERROR.
 
@@ -1549,7 +1572,7 @@ sub export_pfx {
     return $self->_status(INVALID_DATA, "Password is required") unless $pass;
     my $pkcs12 = Crypt::OpenSSL::PKCS12->new();
     eval {
-        $pkcs12->create($cert, $key, $pass, $file, $ca, $tag || "ZeroSSL exported");
+        $pkcs12->create($cert, $key, $pass, $file, $ca, $tag || "Crypt::LE exported");
     };
     return $self->_status(UNSUPPORTED, $unsupported) if ($@ and $@=~/Usage/);
     return $self->_status(ERROR, $@) if $@;
@@ -1676,6 +1699,7 @@ sub _request {
         my $rv = 'Resource directory does not contain expected fields.';
         return wantarray ? (INVALID_DATA, $rv) : $rv;
     }
+    $self->_debug("Connecting to $url");
     $payload = $self->_translate($payload);
     my $resp;
     $opts ||= {};
@@ -1919,10 +1943,6 @@ L<http://search.cpan.org/dist/Crypt-LE/>
 
 =item * Project homepage
 
-L<https://ZeroSSL.com/>
-
-=item * Company homepage
-
 L<https://Do-Know.com/>
 
 
@@ -1931,7 +1951,7 @@ L<https://Do-Know.com/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016-2019 Alexander Yezhov.
+Copyright 2016-2020 Alexander Yezhov.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License (2.0). You may obtain a

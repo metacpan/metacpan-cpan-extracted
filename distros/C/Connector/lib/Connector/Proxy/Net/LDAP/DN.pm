@@ -107,8 +107,7 @@ sub set {
     my $mesg = $self->_run_search( { ARGS => \@args }, { noattrs => 1} );
 
     if ($mesg->is_error()) {
-        $self->log()->error("LDAP search failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
-        return $self->_node_not_exists( \@args );
+        $self->_log_and_die("LDAP search failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() .")" );
     }
 
     if ($mesg->count() == 0) {
@@ -119,12 +118,9 @@ sub set {
     foreach my $entry ( $mesg->entries()) {
         if (lc($entry->dn()) eq $match_dn) {
             $entry->delete();
-            #$entry->update( $ldap ); # Looks like delete is effective immediately
-
             my $mesg = $entry->update( $self->ldap() );
             if ($mesg->is_error()) {
-                $self->log()->error("LDAP update failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() . ")");
-                return $self->_node_not_exists( \@args );
+                $self->_log_and_die("LDAP update failed error code " . $mesg->code() . " (error: " . $mesg->error_desc() . ")");
             }
             $self->log()->debug('Delete LDAP entry by DN: '.$params->{pkey});
             return 1;

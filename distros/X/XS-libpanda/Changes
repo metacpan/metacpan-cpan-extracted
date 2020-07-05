@@ -1,4 +1,38 @@
-1.3.14   xx.xx.2020
+1.4.6    01.07.2020
+            - exceptions: use more performant backtraces gathering interfaces
+1.4.5    28.06.2020
+            - exceptions: fix segfaults on *BSD
+1.4.4    27.06.2020
+            - exceptions: allow fallback on default resolver
+            - exceptions, unix/glibc:: dump frame info even if symbol isn't available
+            - fix compilation issues on win32
+1.4.3    24.06.2020
+            - exceptions: fix tests on *BSD
+1.4.2    23.06.2020
+            - exceptions: fix test for raspberry pi
+1.4.1    22.06.2020
+            - exceptions: more correctly handle on systems with buggy glibc/libunwind
+            - exceptions: disable test on systems with buggy glibc/libunwind
+1.4.0    19.06.2020
+            - basic_string: avoid access to uninitialized memory in c_str()
+            - basic_string: distinguish char array from const char array in constructor for safety
+            - logger: add root logging macros, add function to codepoint
+            - logger: add formatter feature
+            - logger: use formatter by default, pass to simple logger API compiled string
+            - logger: make logger/formatter usage and changing thread safe via iptr-on-atomic
+            - logger: add pattern formatter (used by default)
+            - logger: improve logger API with variadic macros
+            - logger: fix main module initialization order
+            - logger: add console logger impl
+            - logger: add multi logger
+            - exceptions: export Windows Debugger Enginge in API
+            - exceptions: add default to_string implementation
+            - exceptions: BacktraceInfo has reasonable default implementation
+            - exceptions: add Backtrace::dump_trace() default stack trace dumper
+            - massively speedup multiple "+=" operations without reserve() for basic_string
+            - fix rfind() and find_last* default value for "pos" in string and string_view
+            - remove useless xs file
+1.3.14   02.04.2020
             - exceptions: add default backtrace producer (info gather info from symbols)
             - exceptions: enable tests for all *nix systems
             - fix logging on global destruction
@@ -9,7 +43,7 @@
 1.3.12   13.02.2020
            - bad_expected_access<ErrorCode> specialization for better error messages
            - remove copy ctor and copy= from excepted(), throw exc if copy= to object with not checked error
-           - workaround thread_local global dtor bug in freebsd 
+           - workaround thread_local global dtor bug in freebsd
            - improve ErrorCode
            - add noexcept to some basic_string ctors
            - global tls ptr storage is now destroyed with statics, not with thread_locals
@@ -33,7 +67,7 @@
            - improve backtrace interface (glibc only)
            - fix SunOS compilation
 1.3.4    17.01.2020
-           - fix compilation warnings 
+           - fix compilation warnings
 1.3.3    14.01.2020
            - improve basic_string
 1.3.2    14.01.2020
@@ -61,7 +95,7 @@
            - string map containers test compilation fix for GCC 5
 1.2.6    30.07.2019
            - fix compilation warnings for some compilers
-           - fix panda::string tests for 32bit systems 
+           - fix panda::string tests for 32bit systems
            - fix panda::string tests for clang4-6
 1.2.5    25.07.2019
            - require newer XS::Install

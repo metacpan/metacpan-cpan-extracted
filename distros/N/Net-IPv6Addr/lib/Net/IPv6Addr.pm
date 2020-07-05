@@ -6,24 +6,26 @@ use warnings;
 our @ISA = qw(Exporter);
 our @EXPORT = qw();
 our @EXPORT_OK = qw(
+		       from_bigint
 		       in_network
 		       in_network_of_size
 		       ipv6_chkip
 		       ipv6_parse
 		       is_ipv6
-		       to_string_preferred
-		       to_string_compressed
+		       to_array
 		       to_bigint
 		       to_intarray
-		       to_array
-		       to_string_ip6_int
 		       to_string_base85
+		       to_string_compressed
+		       to_string_ip6_int
 		       to_string_ipv4
 		       to_string_ipv4_compressed
-		       from_bigint
+		       to_string_preferred
 	       );
+
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.96';
+
+our $VERSION = '1.01';
 
 use Carp;
 use Net::IPv4Addr;
@@ -41,9 +43,6 @@ use Math::Base85;
 
 my $h = qr/[a-f0-9]{1,4}/i;
 
-# Match one to three digits
-
-#my $d = qr/[0-9]{1,3}/;
 my $ipv4 = "((25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))";
 
 # base-85
@@ -94,7 +93,7 @@ my %ipv6_patterns = (
 	\&parse_mixed_ipv6v4_compressed,
     ],
     'base85' => [
-	qr/$x$n/,
+	qr/^$x$n$/,
 	\&ipv6_parse_base85,
     ],
 );
@@ -126,7 +125,7 @@ sub getargs
 	($ip, $pfx) = @_;
     }
     elsif (@_ == 1) {
-	($ip, $pfx) = split(m!/!, $_[0])
+	($ip, $pfx) = split(m!/!, $_[0], 2)
     }
     else {
 	mycroak "wrong number of arguments (need 1 or 2)";
@@ -180,8 +179,8 @@ sub ipv6_parse_preferred
 {
     my $ip = shift;
     match_or_die ($ip, 'preferred');
-    my @pieces = split(/:/, $ip);
-    splice(@pieces, 8);
+    my @pieces = split (/:/, $ip);
+    splice (@pieces, 8);
     return map { hex } @pieces;
 }
 
@@ -195,7 +194,7 @@ sub ipv6_parse_compressed
     my $colons = ($ip =~ tr/:/:/);
     my $expanded = ':' x (9 - $colons);
     $ip =~ s/::/$expanded/;
-    my @pieces = split(/:/, $ip, 8);
+    my @pieces = split (/:/, $ip, 8);
     return map { hex } @pieces;
 }
 
@@ -291,12 +290,14 @@ sub ipv6_parse_base85
 # |_|    \__,_|_.__/|_|_|\___|
 #                            
 
+# Public
+
 sub new
 {
     my $proto = shift;
-    my $class = ref($proto) || $proto;
+    my $class = ref ($proto) || $proto;
     my $maybe_ip = shift;
-    my $parser = ipv6_chkip($maybe_ip);
+    my $parser = ipv6_chkip ($maybe_ip);
     if (ref $parser ne 'CODE') {
 	mycroak "invalid IPv6 address $maybe_ip";
     }
@@ -306,6 +307,7 @@ sub new
     return $self;
 }
 
+# Public
 
 sub ipv6_chkip
 {
@@ -328,12 +330,13 @@ sub ipv6_chkip
     return $parser;
 }
 
+# Public
 
 sub ipv6_parse
 {
     my ($ip, $pfx) = getargs (@_);
 
-    if (! ipv6_chkip($ip)) {
+    if (! ipv6_chkip ($ip)) {
 	mycroak "invalid IPv6 address $ip";
     }
 
@@ -358,6 +361,7 @@ sub ipv6_parse
     return "$ip/$pfx";
 }
 
+# Public
 
 sub is_ipv6
 {
@@ -371,6 +375,7 @@ sub is_ipv6
     return $r;
 }
 
+# Public
 
 sub to_string_preferred
 {
@@ -381,6 +386,7 @@ sub to_string_preferred
     return v6part (@$self);
 }
 
+# Public
 
 sub to_string_compressed
 {
@@ -406,6 +412,8 @@ sub to_string_compressed
     return $expanded;
 }
 
+# Private
+
 sub bytes
 {
     my ($in) = @_;
@@ -414,16 +422,22 @@ sub bytes
     return ($high, $low);
 }
 
+# Private
+
 sub v4part
 {
     my ($t, $b) = @_;
     return join('.', bytes ($t), bytes ($b));
 }
 
+# Private
+
 sub v6part
 {
     return join(':', map { sprintf("%x", $_) } @_);
 }
+
+# Public
 
 sub to_string_ipv4
 {
@@ -436,6 +450,7 @@ sub to_string_ipv4
     return "$v6part:$v4part";
 }
 
+# Public
 
 sub to_string_ipv4_compressed
 {
@@ -450,6 +465,7 @@ sub to_string_ipv4_compressed
     return "$v6part$v4part";
 }
 
+# Public
 
 sub to_string_base85
 {
@@ -466,6 +482,7 @@ sub to_string_base85
     return Math::Base85::to_base85($bigint);
 }
 
+# Public
 
 sub to_bigint
 {
@@ -483,6 +500,7 @@ sub to_bigint
     return $bigint;
 }
 
+# Public
 
 sub to_array
 {
@@ -493,6 +511,7 @@ sub to_array
     return map {sprintf "%04x", $_} @$self;
 }
 
+# Public
 
 sub to_intarray
 {
@@ -503,6 +522,7 @@ sub to_intarray
     return @$self;
 }
 
+# Public
 
 sub to_string_ip6_int
 {
@@ -526,6 +546,7 @@ sub validate_netsize
     }
 }
 
+# Public
 
 sub in_network_of_size
 {
@@ -562,6 +583,7 @@ sub in_network_of_size
     return bless \@parts;
 }
 
+# Public
 
 sub in_network
 {
@@ -591,6 +613,8 @@ sub in_network
     }
     return 1;
 }
+
+# Public
 
 sub from_bigint
 {

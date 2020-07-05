@@ -1,0 +1,23 @@
+#!perl
+
+BEGIN {
+  unless ($ENV{AUTHOR_TESTING}) {
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
+  }
+}
+
+
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/Progress/Any/Examples.pm','script/progress-any-eg-progressbar-01-simple','script/progress-any-eg-progressbar-02-multiple-tasks-one-progressbar','script/progress-any-eg-progressbar-03-progressbar-on-subtask','script/progress-any-eg-progressbar-04-progressbar-and-logger','script/progress-any-eg-progressbar-05-multiple-progressbars'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

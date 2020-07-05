@@ -1,0 +1,14 @@
+.gitignore
+.travis.yml
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+Pipe.xs
+README.md
+lib/Sys/Pipe.pm
+ppport.h
+t/pipe_block.t
+t/pipe_nonblock.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

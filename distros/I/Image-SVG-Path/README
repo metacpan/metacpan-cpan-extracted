@@ -12,7 +12,7 @@
                         
 
 
-This is the README for Image::SVG::Path version 0.32.
+This is the README for Image::SVG::Path version 0.33.
 
 Image::SVG::Path is a "module" for the Perl computer programming language,
 a library of computer code to install on a computer.  This document
@@ -85,12 +85,11 @@ parser for that condensed format.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?Image::SVG::Path
     * http://metacpan.org/release/Image-SVG-Path
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -111,11 +110,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Image::SVG::Path
 
-To install the module from the source file, Image-SVG-Path-0.32.tar.gz,
+To install the module from the source file, Image-SVG-Path-0.33.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Image-SVG-Path-0.32.tar.gz
-    cd Image-SVG-Path-0.32
+    tar xfz Image-SVG-Path-0.33.tar.gz
+    cd Image-SVG-Path-0.33
     perl Makefile.PL
     make
     make install
@@ -140,6 +139,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Nov  7 13:39:12 2017.
+This README was written on Sat Jun 27 10:11:55 2020.
 
 -----------------------------------------------------------------------------

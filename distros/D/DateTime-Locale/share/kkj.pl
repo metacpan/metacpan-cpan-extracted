@@ -144,7 +144,7 @@
     "f\N{U+025b}",
     "njapi",
     "nyukul",
-    11,
+    "M11",
     "\N{U+0253}ul\N{U+0253}us\N{U+025b}",
   ],
   month_format_narrow => [
@@ -172,7 +172,7 @@
     "f\N{U+025b}",
     "njapi",
     "nyukul",
-    11,
+    "M11",
     "\N{U+0253}ul\N{U+0253}us\N{U+025b}",
   ],
   month_stand_alone_abbreviated => [
@@ -186,7 +186,7 @@
     "f\N{U+025b}",
     "njapi",
     "nyukul",
-    11,
+    "M11",
     "\N{U+0253}ul\N{U+0253}us\N{U+025b}",
   ],
   month_stand_alone_narrow => [
@@ -214,7 +214,7 @@
     "f\N{U+025b}",
     "njapi",
     "nyukul",
-    11,
+    "M11",
     "\N{U+0253}ul\N{U+0253}us\N{U+025b}",
   ],
   name => "Kako",
@@ -266,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 36,
+  version => 37,
 }

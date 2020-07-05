@@ -122,8 +122,8 @@
     "CD",
   ],
   era_narrow => [
-    "CH",
-    "CD",
+    "B",
+    "A",
   ],
   era_wide => [
     "Ciise Hortii",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 36,
+  version => 37,
 }

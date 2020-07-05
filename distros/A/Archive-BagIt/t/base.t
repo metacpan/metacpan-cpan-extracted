@@ -1,9 +1,11 @@
 
 BEGIN { chdir 't' if -d 't' }
 
+use warnings;
 use utf8;
 use open ':std', ':encoding(utf8)';
 use Test::More 'no_plan';
+use Test::Warnings;
 use strict;
 
 
@@ -35,13 +37,13 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
   ok($bag,        "Object created");
   isa_ok ($bag,   $Class);
 
-  note "checksum algos:".p $bag->checksum_algos;
-  note "manifest files:".p $bag->manifest_files;
-  note "bag path:".p $bag->bag_path;
-  note "metadata path: ".p $bag->metadata_path;
-  note p $bag->tagmanifest_files;
-  note p $bag->manifest_entries;
-  note p $bag->tagmanifest_entries;
+  note ("checksum algos:", explain $bag->checksum_algos);
+  note ("manifest files:", explain $bag->manifest_files);
+  note ("bag path:", explain $bag->bag_path);
+  note ("metadata path: ", explain $bag->metadata_path);
+  note explain $bag->tagmanifest_files;
+  note explain $bag->manifest_entries;
+  note explain $bag->tagmanifest_entries;
 
   my $result = $bag->verify_bag;
   ok($result,     "Bag verifies");
@@ -58,7 +60,13 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
   copy($SRC_FILES."/thréê", $DST_BAG);
 
   note "making bag $DST_BAG";
-  my $bag = $Class->make_bag($DST_BAG);
+  my $bag;
+  my $warning = Test::Warnings::warning { $bag = $Class->make_bag($DST_BAG) };
+  like (
+    $warning ,
+    qr/no payload path/,
+    'Got expexted warning from make_bag()',
+  ) or diag 'got unexpected warnings:' , explain($warning);
 
   ok ($bag,       "Object created");
   isa_ok ($bag,   $Class);

@@ -7,7 +7,7 @@ use warnings;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.25';
+$VERSION = '0.28';
 
 use base qw(Class::Accessor);
 Net::SAML2::XML::Sig->mk_accessors(qw(canonicalizer key));
@@ -50,6 +50,7 @@ sub new {
     $self->{ 'canonicalizer' } =
         exists $params->{ canonicalizer } ? $params->{ canonicalizer } : 'XML::CanonicalizeXML';
     $self->{ 'x509' } = exists $params->{ x509 } ? 1 : 0;
+    $self->{ 'exclusive' } = exists $params->{ exclusive } ? $params->{ exclusive } : 1;
     if ( exists $params->{ 'key' } ) {
         $self->_load_key( $params->{ 'key' } );
     }
@@ -171,7 +172,11 @@ sub verify {
             );
             my $keyinfo_nodeset;
             foreach my $key_info_sig_type ( qw/X509Data RSAKeyValue DSAKeyValue/ ) {
-                $keyinfo_nodeset = $self->{parser}->find("/descendant::dsig:Signature[1]/dsig:KeyInfo/dsig:$key_info_sig_type", $signature_node);
+                if ( $key_info_sig_type eq 'X509Data' ) {
+                    $keyinfo_nodeset = $self->{parser}->find("/descendant::dsig:Signature[1]/dsig:KeyInfo/dsig:$key_info_sig_type", $signature_node);
+                } else {
+                    $keyinfo_nodeset = $self->{parser}->find("/descendant::dsig:Signature[1]/dsig:KeyInfo/dsig:KeyValue/dsig:$key_info_sig_type", $signature_node);
+                }
                 if ( $keyinfo_nodeset->size ) {
                     my $verify_method = $verify_dispatch{$key_info_sig_type};
                     if ( ! $self->$verify_method($keyinfo_nodeset->get_node(0), $signed_info_canon, $signature) ) {
@@ -654,7 +659,7 @@ sub _canonicalize_xml {
         # adjust prefixlist from attribute for XML::CanonicalizeXML's format
         $prefixlist =~ s/ /,/g;
 
-        return XML::CanonicalizeXML::canonicalize( $xml, $xpath, $prefixlist, 1, $comments );
+        return XML::CanonicalizeXML::canonicalize( $xml, $xpath, $prefixlist, $self->{ exclusive }, $comments );
     }
     else {
         confess "Unknown XML canonicalizer module.";
@@ -675,7 +680,7 @@ Net::SAML2::XML::Sig
 
 =head1 VERSION
 
-version 0.25
+version 0.28
 
 =head1 SYNOPSIS
 
@@ -904,6 +909,12 @@ XML::Canonical was removed as an option due to its age
 =item XML::CanonicalizerXML (default)
 
 =back
+
+=item B<exclusive>
+
+The XML::CanonicalizerXML exclusive method.  exclusive is an int to specify exclusive canonicalization (1 = exclusive, 0 = non-exclusive, 2 = exclusive v1.1)
+
+default = 1
 
 =item B<x509>
 

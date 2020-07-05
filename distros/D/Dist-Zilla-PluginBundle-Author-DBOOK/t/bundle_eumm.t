@@ -15,7 +15,7 @@ my $tzil = Builder->from_config(
         ['@Author::DBOOK' => { pod_tests => 1 }],
       ),
       path('source', 'lib', 'DZT', 'Sample.pm') => "package DZT::Sample;\nour \$VERSION = '0.001';\n1",
-      path('source', 'cpanfile') => "requires 'perl' => '5.006';\ntest_requires 'Test::More' => '0.88';\n",
+      path('source', 'prereqs.json') => '{"runtime":{"requires":{"perl":"5.006"}},"test":{"requires":{"Test::More":"0.88"}}}',
       path('source', 'Changes') => "{{\$NEXT}}\n  - Tested plugin bundle\n",
       path('source', '.gitignore') => "/DZT-Sample-*\n",
     },
@@ -24,7 +24,7 @@ my $tzil = Builder->from_config(
 
 my $git = Git::Wrapper->new(path($tzil->tempdir)->child('source'));
 $git->init;
-$git->add(qw(dist.ini cpanfile Changes .gitignore lib/DZT/Sample.pm));
+$git->add(qw(dist.ini prereqs.json Changes .gitignore lib/DZT/Sample.pm));
 
 $tzil->build;
 
@@ -32,7 +32,7 @@ my @expected_files = sort qw(
   Makefile.PL
   Changes
   CONTRIBUTING.md
-  cpanfile
+  prereqs.json
   dist.ini
   lib/DZT/Sample.pm
   INSTALL

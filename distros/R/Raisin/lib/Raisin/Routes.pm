@@ -1,8 +1,12 @@
-package Raisin::Routes;
+#!perl
+#PODNAME: Raisin::Routes
+#ABSTRACT: A routing class for Raisin.
 
 use strict;
 use warnings;
 
+package Raisin::Routes;
+$Raisin::Routes::VERSION = '0.90';
 use Carp;
 use Plack::Util::Accessor qw(
     cache
@@ -109,9 +113,17 @@ sub find {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Raisin::Routes - A routing class for Raisin.
+
+=head1 VERSION
+
+version 0.90
 
 =head1 SYNOPSIS
 
@@ -140,13 +152,9 @@ application code.
 
     $r->add(method => 'GET', path => '/user', params => $params, code => $code);
 
-=cut
-
 =item B<Looking for a route>
 
     $r->find($method, $path);
-
-=cut
 
 =back
 
@@ -180,11 +188,13 @@ This module was inspired by L<Kelp::Routes>.
 
 =head1 AUTHOR
 
-Artur Khabibullin - rtkh E<lt>atE<gt> cpan.org
+Artur Khabibullin <rtkh@cpan.org>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This module and all the modules in this package are governed by the same license
-as Perl itself.
+This software is copyright (c) 2019 by Artur Khabibullin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -6,7 +6,7 @@ use warnings;
 use feature qw(postderef);
 no warnings qw(experimental::postderef);
 # ABSTRACT: Send SMTP transaction data to the Abusix transaction feed
-our $VERSION = '1.20200331.1'; ## VERSION
+our $VERSION = '1.20200617.1'; ## VERSION
 use Digest::MD5 qw(md5_hex);
 use IO::Socket;
 
@@ -24,6 +24,7 @@ use IO::Socket;
   has used_tls => ( is => 'rw', default => undef );
   has used_auth => ( is => 'rw', default => undef );
   has mail_from_domain => ( is => 'rw' );
+  has time => ( is => 'rw', lazy => 1, builder => '_build_time' );
 
 
 
@@ -54,10 +55,15 @@ sub send {
 
 }
 
+sub _build_time {
+  my ($self) = @_;
+  return time;
+}
+
 sub _build_report {
   my ($self,$args) = @_;
 
-  my $time = $args->{_time} // time(); # Ability to override time for testing!
+  my $time = $args->{_time} // $self->time; # Ability to override time for testing!
   my $extended_json = ''; # Reserved for future use, should be empty.
 
   my $packet = join( "\n",
@@ -102,7 +108,7 @@ Mail::DataFeed::Abusix - Send SMTP transaction data to the Abusix transaction fe
 
 =head1 VERSION
 
-version 1.20200331.1
+version 1.20200617.1
 
 =head1 SYNOPSIS
 

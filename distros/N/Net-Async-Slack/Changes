@@ -1,6 +1,15 @@
 
 Revision history for Net-Async-Slack
 
+0.004     2020-06-27 23:43:38+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - ->conversations_info for channel lookup
+
+    Bugs fixed:
+
+    - RTM connection handling fixed
+
 0.003     2019-04-28 06:03:53+08:00 Asia/Kuala_Lumpur
     No new features.
 

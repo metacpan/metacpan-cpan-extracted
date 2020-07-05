@@ -1,7 +1,7 @@
-using std::cout;  using std::cerr;  using std::endl;  using std::to_string;
+using std::cout;  using std::cerr;  using std::endl;  //using std::to_string;  // NEED DELETE, PRE-TEMPLATE C++
 
 #ifndef __CPP__INCLUDED__RPerl__DataStructure__Array__SubTypes1D_cpp
-#define __CPP__INCLUDED__RPerl__DataStructure__Array__SubTypes1D_cpp 0.022_000
+#define __CPP__INCLUDED__RPerl__DataStructure__Array__SubTypes1D_cpp 0.024_000
 
 #include <RPerl/DataStructure/Array/SubTypes1D.h>  // -> ??? (relies on <vector> being included via Inline::CPP's AUTO_INCLUDE config option in RPerl/Inline.pm)
 
@@ -19,11 +19,11 @@ using std::cout;  using std::cerr;  using std::endl;  using std::to_string;
 // [[[ TYPE-CHECKING ]]]
 
 // DEV NOTE: for() loops are statements not expressions, so they can't be embedded in ternary operators, and thus this type-checking must be done with subroutines instead of macros
-void integer_arrayref_CHECK(SV* possible_integer_arrayref)
+boolean integer_arrayref_CHECK(SV* possible_integer_arrayref, const boolean no_croak)
 {
     // DEV NOTE: the following two if() statements are functionally equivalent to the arrayref_CHECK() macro, but with integer-specific error codes
-    if ( not( SvOK(possible_integer_arrayref) ) ) { croak( "\nERROR EIVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger_arrayref value expected but undefined/null value found,\ncroaking" ); }
-    if ( not( SvAROKp(possible_integer_arrayref) ) ) { croak( "\nERROR EIVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger_arrayref value expected but non-arrayref value found,\ncroaking" ); }
+    if ( not( SvOK(possible_integer_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR EIVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger_arrayref value expected but undefined/null value found,\ncroaking") }
+    if ( not( SvAROKp(possible_integer_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR EIVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger_arrayref value expected but non-arrayref value found,\ncroaking") }
 
     AV* possible_integer_array;
     integer possible_integer_array_length;
@@ -38,15 +38,17 @@ void integer_arrayref_CHECK(SV* possible_integer_arrayref)
         possible_integer_array_element = av_fetch(possible_integer_array, i, 0);
 
         // DEV NOTE: the following two if() statements are functionally equivalent to the integer_CHECK() macro & subroutine, but with array-specific error codes
-        if (not(SvOK(*possible_integer_array_element))) { croak("\nERROR EIVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger value expected but undefined/null value found at index %"INTEGER",\ncroaking", i); }
-        if (not(SvIOKp(*possible_integer_array_element))) { croak("\nERROR EIVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger value expected but non-integer value found at index %"INTEGER",\ncroaking", i); }
+        if (not(SvOK(*possible_integer_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR EIVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger value expected but undefined/null value found at index %"INTEGER",\ncroaking", i) }
+        if (not(SvIOKp(*possible_integer_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR EIVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger value expected but non-integer value found at index %"INTEGER",\ncroaking", i) }
     }
+
+    return 1;
 }
 
-void integer_arrayref_CHECKTRACE(SV* possible_integer_arrayref, const char* variable_name, const char* subroutine_name)
+boolean integer_arrayref_CHECKTRACE(SV* possible_integer_arrayref, const char* variable_name, const char* subroutine_name, const boolean no_croak)
 {
-    if ( not( SvOK(possible_integer_arrayref) ) ) { croak( "\nERROR EIVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger_arrayref value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name ); }
-    if ( not( SvAROKp(possible_integer_arrayref) ) ) { croak( "\nERROR EIVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger_arrayref value expected but non-arrayref value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name ); }
+    if ( not( SvOK(possible_integer_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR EIVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger_arrayref value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name) }
+    if ( not( SvAROKp(possible_integer_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR EIVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger_arrayref value expected but non-arrayref value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name) }
 
     AV* possible_integer_array;
     integer possible_integer_array_length;
@@ -60,15 +62,17 @@ void integer_arrayref_CHECKTRACE(SV* possible_integer_arrayref, const char* vari
     {
         possible_integer_array_element = av_fetch(possible_integer_array, i, 0);
 
-        if (not(SvOK(*possible_integer_array_element))) { croak("\nERROR EIVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger expected but undefined/null value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name); }
-        if (not(SvIOKp(*possible_integer_array_element))) { croak("\nERROR EIVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger value expected but non-integer value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name); }
+        if (not(SvOK(*possible_integer_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR EIVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger expected but undefined/null value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name) }
+        if (not(SvIOKp(*possible_integer_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR EIVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ninteger value expected but non-integer value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name) }
     }
+
+    return 1;
 }
 
-void number_arrayref_CHECK(SV* possible_number_arrayref)
+boolean number_arrayref_CHECK(SV* possible_number_arrayref, const boolean no_croak)
 {
-    if ( not( SvOK(possible_number_arrayref) ) ) { croak( "\nERROR ENVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber_arrayref value expected but undefined/null value found,\ncroaking" ); }
-    if ( not( SvAROKp(possible_number_arrayref) ) ) { croak( "\nERROR ENVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber_arrayref value expected but non-arrayref value found,\ncroaking" ); }
+    if ( not( SvOK(possible_number_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR ENVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber_arrayref value expected but undefined/null value found,\ncroaking") }
+    if ( not( SvAROKp(possible_number_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR ENVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber_arrayref value expected but non-arrayref value found,\ncroaking") }
 
     AV* possible_number_array;
     integer possible_number_array_length;
@@ -82,15 +86,17 @@ void number_arrayref_CHECK(SV* possible_number_arrayref)
     {
         possible_number_array_element = av_fetch(possible_number_array, i, 0);
 
-        if (not(SvOK(*possible_number_array_element))) { croak("\nERROR ENVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber value expected but undefined/null value found at index %"INTEGER",\ncroaking", i); }
-        if (not(SvNOKp(*possible_number_array_element) || SvIOKp(*possible_number_array_element))) { croak("\nERROR ENVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber value expected but non-number value found at index %"INTEGER",\ncroaking", i); }
+        if (not(SvOK(*possible_number_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR ENVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber value expected but undefined/null value found at index %"INTEGER",\ncroaking", i) }
+        if (not(SvNOKp(*possible_number_array_element) || SvIOKp(*possible_number_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR ENVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber value expected but non-number value found at index %"INTEGER",\ncroaking", i) }
     }
+
+    return 1;
 }
 
-void number_arrayref_CHECKTRACE(SV* possible_number_arrayref, const char* variable_name, const char* subroutine_name)
+boolean number_arrayref_CHECKTRACE(SV* possible_number_arrayref, const char* variable_name, const char* subroutine_name, const boolean no_croak)
 {
-    if ( not( SvOK(possible_number_arrayref) ) ) { croak( "\nERROR ENVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber_arrayref value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name ); }
-    if ( not( SvAROKp(possible_number_arrayref) ) ) { croak( "\nERROR ENVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber_arrayref value expected but non-arrayref value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name ); }
+    if ( not( SvOK(possible_number_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR ENVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber_arrayref value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name) }
+    if ( not( SvAROKp(possible_number_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR ENVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber_arrayref value expected but non-arrayref value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name) }
 
     AV* possible_number_array;
     integer possible_number_array_length;
@@ -104,15 +110,17 @@ void number_arrayref_CHECKTRACE(SV* possible_number_arrayref, const char* variab
     {
         possible_number_array_element = av_fetch(possible_number_array, i, 0);
 
-        if (not(SvOK(*possible_number_array_element))) { croak("\nERROR ENVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber value expected but undefined/null value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name); }
-        if (not(SvNOKp(*possible_number_array_element) || SvIOKp(*possible_number_array_element))) { croak("\nERROR ENVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber value expected but non-number value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name); }
+        if (not(SvOK(*possible_number_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR ENVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber value expected but undefined/null value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name) }
+        if (not(SvNOKp(*possible_number_array_element) || SvIOKp(*possible_number_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR ENVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nnumber value expected but non-number value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name) }
     }
+
+    return 1;
 }
 
-void string_arrayref_CHECK(SV* possible_string_arrayref)
+boolean string_arrayref_CHECK(SV* possible_string_arrayref, const boolean no_croak)
 {
-    if ( not( SvOK(possible_string_arrayref) ) ) { croak( "\nERROR EPVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring_arrayref value expected but undefined/null value found,\ncroaking" ); }
-    if ( not( SvAROKp(possible_string_arrayref) ) ) { croak( "\nERROR EPVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring_arrayref value expected but non-arrayref value found,\ncroaking" ); }
+    if ( not( SvOK(possible_string_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR EPVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring_arrayref value expected but undefined/null value found,\ncroaking") }
+    if ( not( SvAROKp(possible_string_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR EPVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring_arrayref value expected but non-arrayref value found,\ncroaking") }
 
     AV* possible_string_array;
     integer possible_string_array_length;
@@ -126,15 +134,17 @@ void string_arrayref_CHECK(SV* possible_string_arrayref)
     {
         possible_string_array_element = av_fetch(possible_string_array, i, 0);
 
-        if (not(SvOK(*possible_string_array_element))) { croak("\nERROR EPVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring value expected but undefined/null value found at index %"INTEGER",\ncroaking", i); }
-        if (not(SvPOKp(*possible_string_array_element))) { croak("\nERROR EPVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring value expected but non-string value found at index %"INTEGER",\ncroaking", i); }
+        if (not(SvOK(*possible_string_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR EPVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring value expected but undefined/null value found at index %"INTEGER",\ncroaking", i) }
+        if (not(SvPOKp(*possible_string_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR EPVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring value expected but non-string value found at index %"INTEGER",\ncroaking", i) }
     }
+
+    return 1;
 }
 
-void string_arrayref_CHECKTRACE(SV* possible_string_arrayref, const char* variable_name, const char* subroutine_name)
+boolean string_arrayref_CHECKTRACE(SV* possible_string_arrayref, const char* variable_name, const char* subroutine_name, const boolean no_croak)
 {
-    if ( not( SvOK(possible_string_arrayref) ) ) { croak( "\nERROR EPVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring_arrayref value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name ); }
-    if ( not( SvAROKp(possible_string_arrayref) ) ) { croak( "\nERROR EPVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring_arrayref value expected but non-arrayref value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name ); }
+    if ( not( SvOK(possible_string_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR EPVAVRV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring_arrayref value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name) }
+    if ( not( SvAROKp(possible_string_arrayref) ) ) { CROAK_OR_RETURN(no_croak, "\nERROR EPVAVRV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring_arrayref value expected but non-arrayref value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name) }
 
     AV* possible_string_array;
     integer possible_string_array_length;
@@ -148,9 +158,11 @@ void string_arrayref_CHECKTRACE(SV* possible_string_arrayref, const char* variab
     {
         possible_string_array_element = av_fetch(possible_string_array, i, 0);
 
-        if (not(SvOK(*possible_string_array_element))) { croak("\nERROR EPVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring value expected but undefined/null value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name); }
-        if (not(SvPOKp(*possible_string_array_element))) { croak("\nERROR EPVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring value expected but non-string value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name); }
+        if (not(SvOK(*possible_string_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR EPVAVRV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring value expected but undefined/null value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name) }
+        if (not(SvPOKp(*possible_string_array_element))) { CROAK_OR_RETURN(no_croak, "\nERROR EPVAVRV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\nstring value expected but non-string value found at index %"INTEGER",\nin variable %s from subroutine %s,\ncroaking", i, variable_name, subroutine_name) }
     }
+
+    return 1;
 }
 
 // [[[ TYPEMAP PACK/UNPACK FOR __CPP__TYPES ]]]
@@ -162,7 +174,7 @@ void string_arrayref_CHECKTRACE(SV* possible_string_arrayref, const char* variab
 // convert from (Perl SV containing RV to (Perl AV of (Perl SVs containing IVs))) to (C++ std::vector of integers)
 integer_arrayref XS_unpack_integer_arrayref(SV* input_avref)
 {
-//  fprintf(stderr, "in CPPOPS_CPPTYPES XS_unpack_integer_arrayref(), top of subroutine\n");
+    fprintf(stderr, "in CPPOPS_CPPTYPES XS_unpack_integer_arrayref(), top of subroutine\n");
 //  integer_arrayref_CHECK(input_avref);
     integer_arrayref_CHECKTRACE(input_avref, "input_avref", "XS_unpack_integer_arrayref()");
 
@@ -250,7 +262,7 @@ void XS_pack_integer_arrayref(SV* output_avref, integer_arrayref input_vector)
 // convert from (Perl SV containing RV to (Perl AV of (Perl SVs containing NVs))) to (C++ std::vector of numbers)
 number_arrayref XS_unpack_number_arrayref(SV* input_avref)
 {
-//  fprintf(stderr, "in CPPOPS_CPPTYPES XS_unpack_number_arrayref(), top of subroutine\n");
+    fprintf(stderr, "in CPPOPS_CPPTYPES XS_unpack_number_arrayref(), top of subroutine\n");
 //  number_arrayref_CHECK(input_avref);
     number_arrayref_CHECKTRACE(input_avref, "input_avref", "XS_unpack_number_arrayref()");
 
@@ -308,7 +320,7 @@ void XS_pack_number_arrayref(SV* output_avref, number_arrayref input_vector)
 // convert from (Perl SV containing RV to (Perl AV of (Perl SVs containing PVs))) to (C++ std::vector of std::strings)
 string_arrayref XS_unpack_string_arrayref(SV* input_avref)
 {
-//  fprintf(stderr, "in CPPOPS_CPPTYPES XS_unpack_string_arrayref(), top of subroutine\n");
+    fprintf(stderr, "in CPPOPS_CPPTYPES XS_unpack_string_arrayref(), top of subroutine\n");
 //  string_arrayref_CHECK(input_avref);
     string_arrayref_CHECKTRACE(input_avref, "input_avref", "XS_unpack_string_arrayref()");
 
@@ -375,22 +387,34 @@ void XS_pack_string_arrayref(SV* output_avref, string_arrayref input_vector)
 
 // call actual stringify routine, format level -2 (compact), indent level 0
 SV* integer_arrayref_to_string_compact(SV* input_avref) {
-    return integer_arrayref_to_string_format(input_avref, newSViv(-2), newSViv(0));
+    return integer_arrayref_to_string_format(input_avref, newSViv(-2), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES integer_arrayref_to_string_compact(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(-2), newSViv(0), TYPE_integer_arrayref);
 }
 
 // call actual stringify routine, format level -1 (normal), indent level 0, DEFAULT
 SV* integer_arrayref_to_string(SV* input_avref) {
-    return integer_arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0));
+    return integer_arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES integer_arrayref_to_string(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0), TYPE_integer_arrayref);
 }
 
 // call actual stringify routine, format level 0 (pretty), indent level 0
 SV* integer_arrayref_to_string_pretty(SV* input_avref) {
-    return integer_arrayref_to_string_format(input_avref, newSViv(0), newSViv(0));
+    return integer_arrayref_to_string_format(input_avref, newSViv(0), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES integer_arrayref_to_string_pretty(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0), TYPE_integer_arrayref);
 }
 
 // call actual stringify routine, format level 1 (expand), indent level 0
 SV* integer_arrayref_to_string_expand(SV* input_avref) {
-    return integer_arrayref_to_string_format(input_avref, newSViv(1), newSViv(0));
+    return integer_arrayref_to_string_format(input_avref, newSViv(1), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES integer_arrayref_to_string_expand(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0), TYPE_integer_arrayref);
 }
 
 // DEV NOTE: direct manipulation of the Perl Stack shown in /* block comments */
@@ -399,12 +423,13 @@ SV* integer_arrayref_to_string_expand(SV* input_avref) {
 //void integer_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* indent_level)
 SV* integer_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* indent_level)
 {
+//* NEED DELETE, PRE-TEMPLATE C++
 //  Inline_Stack_Vars;
 //define Inline_Stack_Vars  dXSARGS  // from INLINE.h
 //  dXSARGS;
 //  define dXSARGS dSP; dAXMARK; dITEMS  // from XSUB.h
-/*  dSP;
-   dAXMARK; */
+//  dSP;
+//  dAXMARK;
 //  dITEMS;
 
 //    fprintf(stderr, "in CPPOPS_PERLTYPES integer_arrayref_to_string(), top of subroutine...\n");
@@ -469,11 +494,11 @@ SV* integer_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* ind
 
 //  Inline_Stack_Reset;
 //define Inline_Stack_Reset      sp = mark  // from INLINE.h
-/*  sp = mark; */
+//  sp = mark;
 
 //  Inline_Stack_Push(sv_2mortal(output_sv));
 //define Inline_Stack_Push(x)   XPUSHs(x)  // from INLINE.h
-/*  XPUSHs(sv_2mortal(output_sv));  // mortalize because we created output_sv with newSV() in this function */
+//  XPUSHs(sv_2mortal(output_sv));  // mortalize because we created output_sv with newSV() in this function
     return(output_sv);
 
 //  Inline_Stack_Done;
@@ -483,33 +508,50 @@ SV* integer_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* ind
 //  Inline_Stack_Return(1);
 //define Inline_Stack_Return(x) XSRETURN(x)  // from INLINE.h
 //  XSRETURN(1);
+// */
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES integer_arrayref_to_string_format(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, format_level, indent_level, TYPE_integer_arrayref);
 }
 
 // DEV NOTE: 1-D format levels are 1 less than 2-D format levels
 
 // call actual stringify routine, format level -2 (compact), indent level 0
 SV* number_arrayref_to_string_compact(SV* input_avref) {
-    return number_arrayref_to_string_format(input_avref, newSViv(-2), newSViv(0));
+//    return number_arrayref_to_string_format(input_avref, newSViv(-2), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES number_arrayref_to_string_compact(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(-2), newSViv(0), TYPE_number_arrayref);
 }
 
 // call actual stringify routine, format level -1 (normal), indent level 0, DEFAULT
 SV* number_arrayref_to_string(SV* input_avref) {
-    return number_arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0));
+//    return number_arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES number_arrayref_to_string(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0), TYPE_number_arrayref);
 }
 
 // call actual stringify routine, format level 0 (pretty), indent level 0
 SV* number_arrayref_to_string_pretty(SV* input_avref) {
-    return number_arrayref_to_string_format(input_avref, newSViv(0), newSViv(0));
+//    return number_arrayref_to_string_format(input_avref, newSViv(0), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES number_arrayref_to_string_pretty(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(0), newSViv(0), TYPE_number_arrayref);
 }
 
 // call actual stringify routine, format level 1 (expand), indent level 0
 SV* number_arrayref_to_string_expand(SV* input_avref) {
-    return number_arrayref_to_string_format(input_avref, newSViv(1), newSViv(0));
+//    return number_arrayref_to_string_format(input_avref, newSViv(1), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES number_arrayref_to_string_expand(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(1), newSViv(0), TYPE_number_arrayref);
 }
 
 // convert from (Perl SV containing RV to (Perl AV of (Perl SVs containing NVs))) to Perl-parsable (Perl SV containing PV)
 SV* number_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* indent_level)
 {
+/* NEED DELETE, PRE-TEMPLATE C++
 //  fprintf(stderr, "in CPPOPS_PERLTYPES number_arrayref_to_string(), top of subroutine\n");
 //  number_arrayref_CHECK(input_avref);
     number_arrayref_CHECKTRACE(input_avref, "input_avref", "number_arrayref_to_string()");
@@ -578,33 +620,50 @@ SV* number_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* inde
 //  fprintf(stderr, "in CPPOPS_PERLTYPES number_arrayref_to_string(), bottom of subroutine\n");
 
     return(output_sv);
+*/
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES number_arrayref_to_string_format(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, format_level, indent_level, TYPE_number_arrayref);
 }
 
 // DEV NOTE: 1-D format levels are 1 less than 2-D format levels
 
 // call actual stringify routine, format level -2 (compact), indent level 0
 SV* string_arrayref_to_string_compact(SV* input_avref) {
-    return string_arrayref_to_string_format(input_avref, newSViv(-2), newSViv(0));
+    return string_arrayref_to_string_format(input_avref, newSViv(-2), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES string_arrayref_to_string_compact(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(-2), newSViv(0), TYPE_string_arrayref);
 }
 
 // call actual stringify routine, format level -1 (normal), indent level 0, DEFAULT
 SV* string_arrayref_to_string(SV* input_avref) {
-    return string_arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0));
+    return string_arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES string_arrayref_to_string(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(-1), newSViv(0), TYPE_string_arrayref);
 }
 
 // call actual stringify routine, format level 0 (pretty), indent level 0
 SV* string_arrayref_to_string_pretty(SV* input_avref) {
-    return string_arrayref_to_string_format(input_avref, newSViv(0), newSViv(0));
+    return string_arrayref_to_string_format(input_avref, newSViv(0), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES string_arrayref_to_string_pretty(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(0), newSViv(0), TYPE_string_arrayref);
 }
 
 // call actual stringify routine, format level 1 (expand), indent level 0
 SV* string_arrayref_to_string_expand(SV* input_avref) {
-    return string_arrayref_to_string_format(input_avref, newSViv(1), newSViv(0));
+    return string_arrayref_to_string_format(input_avref, newSViv(1), newSViv(0));  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES string_arrayref_to_string_expand(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, newSViv(1), newSViv(0), TYPE_string_arrayref);
 }
 
 // convert from (Perl SV containing RV to (Perl AV of (Perl SVs containing PVs))) to Perl-parsable (Perl SV containing PV)
 SV* string_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* indent_level)
 {
+//* NEED DELETE, PRE-TEMPLATE C++
 //  fprintf(stderr, "in CPPOPS_PERLTYPES string_arrayref_to_string(), top of subroutine\n");
 //  string_arrayref_CHECK(input_avref);
     string_arrayref_CHECKTRACE(input_avref, "input_avref", "string_arrayref_to_string()");
@@ -687,41 +746,136 @@ SV* string_arrayref_to_string_format(SV* input_avref, SV* format_level, SV* inde
 //  fprintf(stderr, "in CPPOPS_PERLTYPES string_arrayref_to_string(), bottom of subroutine\n");
 
     return(output_sv);
+//*/
+
+    fprintf(stderr, "in CPPOPS_PERLTYPES string_arrayref_to_string_format(), about to call arrayref_to_string_format() DYNAMIC DISPATCH & return value...\n");
+    return arrayref_to_string_format(input_avref, format_level, indent_level, TYPE_string_arrayref);
 }
 
 # elif defined __CPP__TYPES
+
+
+
+
+
+
+// VERY x 7: rename TEMPLATE_arrayref_to_string*() to arrayref_to_string*() so it can be called directly from compiled C++ again, will be ignored by Inline::CPP due to use of C++ templates
+// VERY x 7: rename TEMPLATE_arrayref_to_string*() to arrayref_to_string*() so it can be called directly from compiled C++ again, will be ignored by Inline::CPP due to use of C++ templates
+// VERY x 7: rename TEMPLATE_arrayref_to_string*() to arrayref_to_string*() so it can be called directly from compiled C++ again, will be ignored by Inline::CPP due to use of C++ templates
+
+
+
+// DEV NOTE, CORRELATION #rp320: create DYNAMIC DISPATCH wrappers for TEMPLATE_arrayref_to_string*(), because Inline::CPP does not create Perl bindings for TEMPLATE functions
+// use elipses to create dynamic dispatch functions which receive their arguments on the Perl stack instead of via the C stack
+// https://metacpan.org/pod/Inline::CPP#Example-5-Elipses-Revisited-(and-Overloading-or-Templates)
+
+// DYNAMIC DISPATCH: call TEMPLATE_arrayref_to_string_compact(), passing input_avref via DYNAMIC XS_unpack_*_arrayref()
+string arrayref_to_string_compact(SV* input_avref, ...) {
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string_compact(input_avref), top of subroutine\n");
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string_compact(input_avref), have sv_dump(input_avref) =\n");
+    sv_dump(input_avref);
+
+    return "NEED CODE HERE!!!";
+};
+
+// DYNAMIC DISPATCH: call TEMPLATE_arrayref_to_string(), passing input_avref via DYNAMIC XS_unpack_*_arrayref()
+string arrayref_to_string(SV* input_avref, ...) {
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string(), top of subroutine\n");
+
+    dXSARGS;  // creates a variable 'items' containing a parameter count
+    // NEED ANSWER: do we still need to check for (items < 1), because explicit declaration of argument input_avref tells C++ what to expect but does not tell Perl what to pass?
+    if (items < 1) { croak("ERROR EDD320: DYNAMIC DISPATCH; Too few arguments in call to function ", __func__, ", croaking"); }
+    if (items > 1) { croak("ERROR EDD321: DYNAMIC DISPATCH; Too many arguments in call to function ", __func__, ", croaking"); }
+
+    // NEED ANSWER: is this line necessary, since input_avref is declared in the function header?
+    input_avref = ST(0);
+
+    // determine input_avref type
+    type_enum input_avref_type = type_fast_enum(input_avref);
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string(), about to call TEMPLATE_arrayref_to_string() & return value...\n");
+
+    // DYNAMIC DISPATCH based on input_avref_type
+    switch (input_avref_type) {
+        case TYPE_integer_arrayref: return TEMPLATE_arrayref_to_string(XS_unpack_integer_arrayref(input_avref));
+        case TYPE_number_arrayref:  return TEMPLATE_arrayref_to_string(XS_unpack_number_arrayref( input_avref));
+        case TYPE_string_arrayref:  return TEMPLATE_arrayref_to_string(XS_unpack_string_arrayref( input_avref));
+        default: croak("ERROR EDD322: DYNAMIC DISPATCH; Unrecognized or invalid input_avref_type = ", input_avref_type, ", croaking");
+    }
+
+    return "ERROR EDD322";
+};
+
+string arrayref_to_string_pretty(SV* input_avref, ...) {
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string_pretty(input_avref), top of subroutine\n");
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string_pretty(input_avref), have sv_dump(input_avref) =\n");
+    sv_dump(input_avref);
+
+    return "NEED CODE HERE!!!";
+};
+
+string arrayref_to_string_extend(SV* input_avref, ...) {
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string_extend(input_avref), top of subroutine\n");
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string_extend(input_avref), have sv_dump(input_avref) =\n");
+    sv_dump(input_avref);
+
+    return "NEED CODE HERE!!!";
+};
+
+string arrayref_to_string_format(SV* input_avref, ...) {
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string_format(input_avref), top of subroutine\n");
+    fprintf(stderr, "in CPPOPS_CPPTYPES DYNAMIC arrayref_to_string_format(input_avref), have sv_dump(input_avref) =\n");
+    sv_dump(input_avref);
+
+    return "NEED CODE HERE!!!";
+};
+
+
 
 // DEV NOTE: 1-D format levels are 1 less than 2-D format levels
 
 // call actual stringify routine, format level -2 (compact), indent level 0
 string integer_arrayref_to_string_compact(integer_arrayref input_vector)
 {
-    return integer_arrayref_to_string_format(input_vector, -2, 0);
+//    return integer_arrayref_to_string_format(input_vector, -2, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string_compact(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, -2, 0);
 }
 
 // call actual stringify routine, format level -1 (normal), indent level 0, DEFAULT
 string integer_arrayref_to_string(integer_arrayref input_vector)
 {
-    return integer_arrayref_to_string_format(input_vector, -1, 0);
+//    return integer_arrayref_to_string_format(input_vector, -1, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, -1, 0);
 }
 
 // call actual stringify routine, format level 0 (pretty), indent level 0
 string integer_arrayref_to_string_pretty(integer_arrayref input_vector)
 {
-    return integer_arrayref_to_string_format(input_vector, 0, 0);
+//    return integer_arrayref_to_string_format(input_vector, 0, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string_pretty(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, 0, 0);
 }
 
 // call actual stringify routine, format level 1 (expand), indent level 0
 string integer_arrayref_to_string_expand(integer_arrayref input_vector)
 {
-    return integer_arrayref_to_string_format(input_vector, 1, 0);
+//    return integer_arrayref_to_string_format(input_vector, 1, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string_expand(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, 1, 0);
 }
 
 // convert from (C++ std::vector of integers) to Perl-parsable (C++ std::string)
 string integer_arrayref_to_string_format(integer_arrayref input_vector, integer format_level, integer indent_level)
 {
-//    fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string(), top of subroutine...\n");
-//    fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string(), received format_level = %"INTEGER", indent_level = %"INTEGER"\n", format_level, indent_level);
+/* NEED DELETE, PRE-TEMPLATE C++
+//    fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string_format(), top of subroutine...\n");
+//    fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string_format(), received format_level = %"INTEGER", indent_level = %"INTEGER"\n", format_level, indent_level);
 
     // declare local variables
     ostringstream output_stream;
@@ -734,7 +888,7 @@ string integer_arrayref_to_string_format(integer_arrayref input_vector, integer 
     string indent = "";
     for (i = 0; i < indent_level; i++) { indent += "    "; }
 
-//  fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string(), have input_vector_length = %"INTEGER"\n", input_vector_length);
+//  fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string_format(), have input_vector_length = %"INTEGER"\n", input_vector_length);
 
     // pre-begin with optional indent, depending on format level
     if (format_level >= 1) { output_stream << indent; }
@@ -767,10 +921,14 @@ string integer_arrayref_to_string_format(integer_arrayref input_vector, integer 
     // end output string with right-square-bracket, as required for all RPerl arrays
     output_stream << ']';
 
-//  fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string(), after for() loop, have output_stream =\n%s\n", (char *)(output_stream.str().c_str()));
-//  fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string(), bottom of subroutine\n");
+//  fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string_format(), after for() loop, have output_stream =\n%s\n", (char *)(output_stream.str().c_str()));
+//  fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string_format(), bottom of subroutine\n");
 
     return(output_stream.str());
+*/
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES integer_arrayref_to_string_format(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, format_level, indent_level);
 }
 
 // DEV NOTE: 1-D format levels are 1 less than 2-D format levels
@@ -778,31 +936,44 @@ string integer_arrayref_to_string_format(integer_arrayref input_vector, integer 
 // call actual stringify routine, format level -2 (compact), indent level 0
 string number_arrayref_to_string_compact(number_arrayref input_vector)
 {
-    return number_arrayref_to_string_format(input_vector, -2, 0);
+//    return number_arrayref_to_string_format(input_vector, -2, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string_compact(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, -2, 0);
 }
 
 // call actual stringify routine, format level -1 (normal), indent level 0, DEFAULT
 string number_arrayref_to_string(number_arrayref input_vector)
 {
-    return number_arrayref_to_string_format(input_vector, -1, 0);
+//    return number_arrayref_to_string_format(input_vector, -1, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, -1, 0);
 }
 
 // call actual stringify routine, format level 0 (pretty), indent level 0
 string number_arrayref_to_string_pretty(number_arrayref input_vector)
 {
-    return number_arrayref_to_string_format(input_vector, 0, 0);
+//    return number_arrayref_to_string_format(input_vector, 0, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string_pretty(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, 0, 0);
 }
 
 // call actual stringify routine, format level 1 (expand), indent level 0
 string number_arrayref_to_string_expand(number_arrayref input_vector)
 {
-    return number_arrayref_to_string_format(input_vector, 1, 0);
+//    return number_arrayref_to_string_format(input_vector, 1, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string_expand(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, 1, 0);
 }
 
 // convert from (C++ std::vector of numbers) to Perl-parsable (C++ std::string)
 string number_arrayref_to_string_format(number_arrayref input_vector, integer format_level, integer indent_level)
 {
-//  fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string(), top of subroutine\n");
+/* NEED DELETE, PRE-TEMPLATE C++
+//  fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string_format(), top of subroutine\n");
 
     // declare local variables
     ostringstream output_stream;
@@ -815,7 +986,7 @@ string number_arrayref_to_string_format(number_arrayref input_vector, integer fo
     string indent = "";
     for (i = 0; i < indent_level; i++) { indent += "    "; }
 
-//  fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string(), have input_vector_length = %"INTEGER"\n", input_vector_length);
+//  fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string_format(), have input_vector_length = %"INTEGER"\n", input_vector_length);
 
     // pre-begin with optional indent, depending on format level
     if (format_level >= 1) { output_stream << indent; }
@@ -851,10 +1022,14 @@ string number_arrayref_to_string_format(number_arrayref input_vector, integer fo
     // end output string with right-square-bracket, as required for all RPerl arrays
     output_stream << ']';
 
-//  fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string(), after for() loop, have output_stream =\n%s\n", (char *)(output_stream.str().c_str()));
-//  fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string(), bottom of subroutine\n");
+//  fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string_format(), after for() loop, have output_stream =\n%s\n", (char *)(output_stream.str().c_str()));
+//  fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string_format(), bottom of subroutine\n");
 
     return(output_stream.str());
+*/
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES number_arrayref_to_string_format(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, format_level, indent_level);
 }
 
 // DEV NOTE: 1-D format levels are 1 less than 2-D format levels
@@ -862,31 +1037,44 @@ string number_arrayref_to_string_format(number_arrayref input_vector, integer fo
 // call actual stringify routine, format level -2 (compact), indent level 0
 string string_arrayref_to_string_compact(string_arrayref input_vector)
 {
-    return string_arrayref_to_string_format(input_vector, -2, 0);
+//    return string_arrayref_to_string_format(input_vector, -2, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string_compact(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, -2, 0);
 }
 
 // call actual stringify routine, format level -1 (normal), indent level 0, DEFAULT
 string string_arrayref_to_string(string_arrayref input_vector)
 {
-    return string_arrayref_to_string_format(input_vector, -1, 0);
+//    return string_arrayref_to_string_format(input_vector, -1, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, -1, 0);
 }
 
 // call actual stringify routine, format level 0 (pretty), indent level 0
 string string_arrayref_to_string_pretty(string_arrayref input_vector)
 {
-    return string_arrayref_to_string_format(input_vector, 0, 0);
+//    return string_arrayref_to_string_format(input_vector, 0, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string_pretty(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, 0, 0);
 }
 
 // call actual stringify routine, format level 1 (expand), indent level 0
 string string_arrayref_to_string_expand(string_arrayref input_vector)
 {
-    return string_arrayref_to_string_format(input_vector, 1, 0);
+//    return string_arrayref_to_string_format(input_vector, 1, 0);  // NEED DELETE, PRE-TEMPLATE C++
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string_expand(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, 1, 0);
 }
 
 // convert from (C++ std::vector of std::strings) to Perl-parsable (C++ std::string)
 string string_arrayref_to_string_format(string_arrayref input_vector, integer format_level, integer indent_level)
 {
-//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string(), top of subroutine\n");
+/* NEED DELETE, PRE-TEMPLATE C++
+//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string_format(), top of subroutine\n");
 
     // declare local variables
 //  ostringstream output_stream;
@@ -901,7 +1089,7 @@ string string_arrayref_to_string_format(string_arrayref input_vector, integer fo
     string indent = "";
     for (i = 0; i < indent_level; i++) { indent += "    "; }
 
-//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string(), have input_vector_length = %"INTEGER"\n", input_vector_length);
+//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string_format(), have input_vector_length = %"INTEGER"\n", input_vector_length);
 
     // pre-begin with optional indent, depending on format level
     if (format_level >= 1) { output_string += indent; }
@@ -955,12 +1143,16 @@ string string_arrayref_to_string_format(string_arrayref input_vector, integer fo
 //  output_stream << ']';
     output_string += "]";
 
-//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string(), after for() loop, have output_stream =\n%s\n", (char *)(output_stream.str().c_str()));
-//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string(), after for() loop, have output_string =\n%s\n", output_string.c_str());
-//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string(), bottom of subroutine\n");
+//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string_format(), after for() loop, have output_stream =\n%s\n", (char *)(output_stream.str().c_str()));
+//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string_format(), after for() loop, have output_string =\n%s\n", output_string.c_str());
+//  fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string_format(), bottom of subroutine\n");
 
 //  return(output_stream.str());
     return(output_string);
+*/
+
+    fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_to_string_format(), about to call TEMPLATE_arrayref_to_string_format() & return value...\n");
+    return TEMPLATE_arrayref_to_string_format(input_vector, format_level, indent_level);
 }
 
 # else
@@ -984,6 +1176,8 @@ SV* integer_arrayref_typetest0(SV* lucky_integers)
 /*  SV* output_sv; */
 //  integer_arrayref_CHECK(lucky_integers);
     integer_arrayref_CHECKTRACE(lucky_integers, "lucky_integers", "integer_arrayref_typetest0()");
+
+// DEBUG
 //  AV* lucky_integers_deref = (AV*)SvRV(lucky_integers);
 //  integer how_lucky = av_len(lucky_integers_deref) + 1;
 //  integer i;
@@ -1051,7 +1245,7 @@ SV* number_arrayref_typetest0(SV* lucky_numbers)
 //  number_arrayref_CHECK(lucky_numbers);
     number_arrayref_CHECKTRACE(lucky_numbers, "lucky_numbers", "number_arrayref_typetest0()");
 
-/*
+/* DEBUG
     AV* lucky_numbers_deref = (AV*)SvRV(lucky_numbers);
     integer how_lucky = av_len(lucky_numbers_deref) + 1;
     integer i;
@@ -1086,7 +1280,7 @@ SV* string_arrayref_typetest0(SV* people)
 //  string_arrayref_CHECK(people);
     string_arrayref_CHECKTRACE(people, "people", "string_arrayref_typetest0()");
 
-/*
+/* DEBUG
     AV* people_deref = (AV*)SvRV(people);
     integer i;
     for (i = 0;  i < (av_len(people_deref) + 1);  ++i)
@@ -1118,7 +1312,7 @@ SV* string_arrayref_typetest1(SV* my_size)
 
 string integer_arrayref_typetest0(integer_arrayref lucky_integers)
 {
-/*
+/* DEBUG
     integer how_lucky = lucky_integers.size();
     integer i;
     for (i = 0;  i < how_lucky;  ++i)
@@ -1142,7 +1336,7 @@ integer_arrayref integer_arrayref_typetest1(integer my_size)
 
 string number_arrayref_typetest0(number_arrayref lucky_numbers)
 {
-/*
+/* DEBUG
     integer how_lucky = lucky_numbers.size();
     integer i;
     for (i = 0;  i < how_lucky;  ++i)
@@ -1167,7 +1361,7 @@ number_arrayref number_arrayref_typetest1(integer my_size)
 //string string_arrayref_typetest0(string_arrayref people) { integer i;  for (i = 0;  i < people.size();  ++i) { fprintf(stderr, "in CPPOPS_CPPTYPES fprintf(stderr, ) string_arrayref_typetest0(), have person %"INTEGER" = '%s', BARBAR\n", i, people[i].c_str()); }  return(string_arrayref_to_string(people) + "BARBAR"); }
 string string_arrayref_typetest0(string_arrayref people)
 {
-/*
+/* DEBUG
     integer i;
     for (i = 0;  i < people.size();  ++i)
     {
@@ -1184,7 +1378,8 @@ string_arrayref string_arrayref_typetest1(integer my_size)
     people.resize((size_t)my_size);
     for (i = 0;  i < my_size;  ++i)
     {
-        people[i] = "Jeffy Ten! " + std::to_string(i) + "/" + std::to_string(my_size - 1) + " CPPOPS_CPPTYPES";
+        people[i] = "Jeffy Ten! " + to_string(i) + "/" + to_string(my_size - 1) + " CPPOPS_CPPTYPES";
+//        people[i] = "Jeffy Ten! " + std::to_string(i) + "/" + std::to_string(my_size - 1) + " CPPOPS_CPPTYPES";  // NEED DELETE, PRE-TEMPLATE C++
 //      fprintf(stderr, "in CPPOPS_CPPTYPES string_arrayref_typetest1(), bottom of for() loop, have i = %"INTEGER", (my_size - 1) = %"INTEGER", just set another Jeffy, BARBAR\n", i, (my_size - 1));
     }
     return(people);

@@ -16,8 +16,6 @@ SKIP: {
         Protocol::DBus::Client::Mojo::login_session();
     } or skip "Can’t open login session: $@";
 
-    Mojo::IOLoop->timer( 0.1 => sub { Mojo::IOLoop->stop } );
-
     $dbus->initialize()->then(
         sub {
             my $msgr = shift;
@@ -37,7 +35,9 @@ SKIP: {
             )->then(
                 sub { diag "signal sent\n" },
                 sub { diag "signal NOT sent\n" },
-            );
+            )->finally( sub {
+                Mojo::IOLoop->timer( 0.1 => sub { Mojo::IOLoop->stop } );
+            } );
         },
         sub {
             Mojo::IOLoop->stop;

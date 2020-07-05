@@ -120,12 +120,12 @@ brotli/setup.py
 brotli/WORKSPACE
 Changes
 lib/XS/libbrotli.pm
-libbrotli.xs
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 misc/after_import.sh
 misc/CMakeLists.txt.patch
+stub.c
 t/00-use_ok.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

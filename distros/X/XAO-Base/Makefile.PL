@@ -138,6 +138,16 @@ WriteMakefile(
         'BaseConfig.PL'         => '$(INST_LIB)/XAO/BaseConfig.pm',
     },
     'MIN_PERL_VERSION'  => '5.10.1',
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type    => 'git',
+                url     => 'git://github.com/amaltsev/XAO-Base.git',
+                web     => 'https://github.com/amaltsev/XAO-Base',
+            },
+        },
+    },
 );
 
 sub MY::postamble

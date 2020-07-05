@@ -1,3 +1,17 @@
+1.0.9    25.06.2020
+           - $request->method_str now returns stringified effective method
+           - fix compilation issues on *BSD
+           - fix tests on *BSD
+1.0.8    22.06.2020
+           - version bump
+1.0.7    22.06.2020
+           - fix tests: make them timezone- and randomizer- neutral
+1.0.6    19.06.2020
+           - by default request has METHOD_UNSPECIFIED, during serialization
+              the proper method is deduced (i.e. post or get_
+           - allow uploading forms in a request as 'multipart/form-data' or
+             as 'application/x-www-form-urlencoded'
+           - add CookieJar package
 1.0.5    03.04.2020
            - fix Makefile.PL for perls < 5.22
 1.0.4    03.04.2020

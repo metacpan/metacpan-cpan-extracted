@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A package that deal with tax calculations for Aruba",
+  "ABSTRACT" => "A package that deals with tax calculations for Aruba",
   "AUTHOR" => "Wesley Schwengle <waterkip\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -35,13 +35,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Import::Into" => "1.002003",
-    "Sub::Override" => 0,
     "Test::Deep" => 0,
-    "Test::More" => "0.96",
-    "Test::Most" => 0
+    "Test::More" => "0.96"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,16 +52,13 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Import::Into" => "1.002003",
   "List::Util" => 0,
   "Module::Pluggable" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
   "Pod::Usage" => 0,
-  "Sub::Override" => 0,
   "Test::Deep" => 0,
   "Test::More" => "0.96",
-  "Test::Most" => 0,
   "Text::Table" => 0,
   "namespace::autoclean" => 0
 );

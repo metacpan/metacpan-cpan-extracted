@@ -33,6 +33,7 @@ Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Servic
                 'file_contents' => $file_contents
         ); 
         # B2 file ID (fGUID) is now in $b2client->{b2_response}{fileId}
+        # Best to load $file_contents via Path::Tiny's slurp_raw() method
 
         # download that file to /opt/majestica/tmp
         $b2client->b2_download_file_by_name('GingerAnna','ginger_was_perfect.jpg','/opt/majestica/tmp');
@@ -78,6 +79,17 @@ Key again, so copy it immediately.
 
 Please store the Application Key pair in a secure way, preferably encrypted 
 when not in use by your software.
+
+\# NOTE: BACKBLAZE B2 IS NOW S3-COMPATIBLE
+
+Backblaze has added an S3-compatible API, which you can read about here:
+
+        https://www.backblaze.com/b2/docs/s3_compatible_api.html
+
+They are continuing to support their native B2 API, so I will continue
+to use and support this module.  I have not tested the S3 modules with
+Backblaze, but if you already have an S3 integration, it is work checking
+out how Paws::S3 or Awes::S3 works with Backblaze.
 
 # METHODS
 
@@ -138,6 +150,10 @@ Example 2: Uploading when the file is loaded into a scalar:
                 'new_file_name' => 'ginger_was_perfect.jpg',
                 'file_contents' => $file_contents
         );      
+
+NOTE: If you are going to use the 'file\_contents' method, it's best
+to load the scalar using the 'slurp\_raw' method in Path::Tiny.
+(I believe 'read\_file' in File::Slurp will work, but have yet to test.)
 
 You can also pass a 'content-type' key with the MIME type for the new
 file.  The default is 'b2/auto'.
@@ -317,11 +333,15 @@ B2 API Docs:  https://www.backblaze.com/b2/docs/
 
 Backblaze::B2 - V1 API Client for B2
 
+Paws::S3 - If using Backblaze's S3-compatible API.
+
 # AUTHOR / BUGS
 
 Eric Chernoff <eric@weaverstreet.net>
 
 Please send me a note with any bugs or suggestions.
+
+Thanks to ESTRABD for submitting a bugfix when using the 'file\_contents' option in the b2\_upload\_file() method.
 
 # LICENSE
 

@@ -1,7 +1,5 @@
 package Lingua::Stem::En;
 
-# $RCSfile: En.pm,v $ $Revision: 1.4 $ $Date: 1999/06/24 23:33:37 $ $Author: snowhare $
-
 =head1 NAME
 
 Lingua::Stem::En - Porter's stemming algorithm for 'generic' English
@@ -52,7 +50,7 @@ support for the British -ise suffix.
  2000.09.14 - 2.12 Fixed *major* :( implementation error of Porter's algorithm
               Error was entirely my fault - I completely forgot to include
               rule sets 2,3, and 4 starting with Lingua::Stem 0.30. 
-              -- Benjamin Franz
+              -- Jerilyn Franz
 
  2003.09.28 - 2.13 Corrected documentation error pointed out by Simon Cozens.
 
@@ -62,7 +60,10 @@ support for the British -ise suffix.
 
  2006.02.14 - 2.15 Added ability to pass word list by 'handle' for in-place stemming.
 
- 2009.07.27   2.16 Documentation Fix
+ 2009.07.27 - 2.16 Documentation Fix
+
+ 2020.06.20 - 2.30 Version renumber for module consistency.
+
 =cut
 
 #######################################################################
@@ -70,11 +71,12 @@ support for the British -ise suffix.
 #######################################################################
 
 use strict;
+use warnings;
 require Exporter;
 use Carp;
 use vars qw (@ISA @EXPORT_OK @EXPORT %EXPORT_TAGS $VERSION);
 BEGIN {
-    $VERSION     = "2.16";
+    $VERSION     = "2.30";
     @ISA         = qw (Exporter);
     @EXPORT      = ();
     @EXPORT_OK   = qw (stem clear_stem_cache stem_caching);
@@ -584,13 +586,13 @@ written by Jim Richardson.
   jimr@maths.usyd.edu.au or http://www.maths.usyd.edu.au:8000/jimr.html
 
   Integration in Lingua::Stem by 
-  Benjamin Franz, FreeRun Technologies,
-  snowhare@nihongo.org or http://www.nihongo.org/snowhare/
+  Jerilyn Franz, FreeRun Technologies,
+  <cpan@jerilyn.info>
 
 =head1 COPYRIGHT
 
 Jim Richardson, University of Sydney
-Benjamin Franz, FreeRun Technologies
+Jerilyn Franz, FreeRun Technologies
 
 This code is freely available under the same terms as Perl.
 

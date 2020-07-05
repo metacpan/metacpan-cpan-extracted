@@ -10,7 +10,7 @@ my $drv = WebDriver::Tiny->new(
     port         => 4444,
 );
 
-$drv->get('http://httpd:8080');
+$drv->get('http://httpd');
 
 is $drv->js('return "foo"'), 'foo', q/js('return "foo"')/;
 

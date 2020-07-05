@@ -93,7 +93,7 @@ note 'error handling';
 {
     my $plus
         = "X01A \x{1F}01\x{1E}001A/0 \x{1F}01\x{1E}001A/AB \x{1F}01\x{1E}";
-    warnings_exist {PICA::Parser::Plus->new(\$plus)->next} [
+    warnings_exist {PICA::Parser::Plus->new(\$plus)->next}[
         qr{no valid PICA field structure},
         qr{no valid PICA field structure},
         qr{no valid PICA field structure}
@@ -102,7 +102,7 @@ note 'error handling';
     dies_ok {PICA::Parser::Plus->new(\$plus, strict => 1)->next}
     'die on faulty fields with option strict';
     my $plain = "X01@ \$01\n\n001@/0 \$01\n\n001@/AB \$01";
-    warnings_exist {PICA::Parser::Plain->new(\$plain)->next} [
+    warnings_exist {PICA::Parser::Plain->new(\$plain)->next}[
         qr{no valid PICA field structure},
         qr{no valid PICA field structure},
         qr{no valid PICA field structure}

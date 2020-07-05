@@ -41,8 +41,7 @@ sub _get_unshare_syscall {
   my $prctl_call
     = $machine
     =~ /^i[3456]86|^blackfin|cris|frv|h8300|m32r|m68k|microblaze|mn10300|sh|parisc$/
-    ?
-    310
+    ? 310
     : $machine eq "s390" ? 303
 
     : $machine eq "x86_64" ? 272
@@ -109,7 +108,7 @@ sub mount {
     0);
 
   warn "mount is unavailable on this platform." if $!{EINVAL};
-  warn "Mount failed! $!" if $!;
+  warn "Mount failed! $!"                       if $!;
   return $ret;
 }
 
@@ -119,7 +118,7 @@ sub unshare {
   my $ret = syscall(_get_unshare_syscall(), $opts, 0, 0);
 
   warn "unshare is unavailable on this platform." if $!{EINVAL};
-  warn "Unshare failed! $!" if $!;
+  warn "Unshare failed! $!"                       if $!;
   return $ret;
 }
 

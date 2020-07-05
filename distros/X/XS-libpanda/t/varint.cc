@@ -1,9 +1,9 @@
 #include "test.h"
 #include <panda/varint.h>
 
-using namespace panda;
+#define TEST(name) TEST_CASE("varint: " name, "[varint]")
 
-TEST_CASE("varint encode", "[varint]") {
+TEST("encode") {
     CHECK(varint_encode(0) == string("\0"));
     CHECK(varint_encode(1) == string("\1"));
     CHECK(varint_encode(127) == string("\x7f"));
@@ -12,7 +12,7 @@ TEST_CASE("varint encode", "[varint]") {
     CHECK(varint_encode(129) == string("\x81\1"));
 }
 
-TEST_CASE("varint decode", "[varint]") {
+TEST("decode") {
     string start = GENERATE(string(""), string("\0"), string("\x80"));
     CHECK(varint_decode(start + string("\0"), start.length()) == 0);
     CHECK(varint_decode(start + string("\1"), start.length()) == 1);
@@ -22,7 +22,7 @@ TEST_CASE("varint decode", "[varint]") {
     CHECK(varint_decode(start + string("\x81\1"), start.length()) == 129);
 }
 
-TEST_CASE("varint cross check", "[varint]") {
+TEST("cross check") {
     for (uint32_t i = 0; i < 256; ++i) {
         if (varint_decode(varint_encode(i)) != i) {
             FAIL(i);
@@ -36,7 +36,7 @@ TEST_CASE("varint cross check", "[varint]") {
     REQUIRE(true);
 }
 
-TEST_CASE("varint_s cross check", "[varint]") {
+TEST("varint_s cross check") {
     for (int i = 256; i < 256; ++i) {
         if (varint_decode_s(varint_encode_s(i)) != i) {
             FAIL(i);
@@ -52,7 +52,7 @@ TEST_CASE("varint_s cross check", "[varint]") {
     REQUIRE(true);
 }
 
-TEST_CASE("VarIntStack", "[varint]") {
+TEST("VarIntStack") {
     VarIntStack stack;
     stack.push(300);
     stack.push(400);
@@ -61,7 +61,7 @@ TEST_CASE("VarIntStack", "[varint]") {
     CHECK(stack.top() == 300);
 }
 
-TEST_CASE("VarIntStack iterator", "[varint]") {
+TEST("VarIntStack iterator") {
     VarIntStack stack;
     SECTION("empty") {
         REQUIRE(stack.begin() == stack.end());

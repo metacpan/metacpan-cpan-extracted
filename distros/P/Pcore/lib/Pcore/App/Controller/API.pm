@@ -103,7 +103,7 @@ sub _http_api_router ( $self, $auth, $data ) {
             if ( !$tx->{method} ) {
                 push $response->@*,
                   { type   => $TX_TYPE_RPC,
-                    tid    => $tx->{tid},
+                    id     => $tx->{id},
                     result => {
                         status => 400,
                         reason => 'Method is required',
@@ -113,17 +113,17 @@ sub _http_api_router ( $self, $auth, $data ) {
                 next;
             }
 
-            my $tid = $tx->{tid};
+            my $id = $tx->{id};
 
-            $cv->begin if $tid;
+            $cv->begin if $id;
 
             Coro::async_pool {
                 my $res = $auth->api_call( $tx->{method}, $tx->{args}->@* );
 
-                if ($tid) {
+                if ($id) {
                     push $response->@*,
                       { type   => $TX_TYPE_RPC,
-                        tid    => $tx->{tid},
+                        id     => $tx->{id},
                         result => $res,
                       };
 

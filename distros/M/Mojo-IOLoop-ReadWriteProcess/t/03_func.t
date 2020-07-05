@@ -23,7 +23,7 @@ subtest _new_err => sub {
 subtest write_pidfile => sub {
   use Mojo::File 'tempfile';
   my $pidfile = tempfile;
-  my $p = process(code => sub { exit 0 }, pidfile => $pidfile);
+  my $p       = process(code => sub { exit 0 }, pidfile => $pidfile);
   $p->write_pidfile;
   ok !$pidfile->slurp;
 };

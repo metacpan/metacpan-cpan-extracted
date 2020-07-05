@@ -1,6 +1,5 @@
 #pragma once
 #include "Loop.h"
-#include "Debug.h"
 #include "error.h"
 #include <cstdint>
 #include <panda/string.h>
@@ -41,10 +40,11 @@ protected:
     friend Loop;
     using buf_alloc_fn = function<string(size_t cap)>;
 
-    Handle () : _weak() { _ECTOR(); }
+    Handle () : _weak() { panda_log_ctor(); }
     Handle (const Handle&) = delete;
 
     ~Handle () {
+        panda_log_dtor();
         if (!_loop) return; // _init() has never been called (like exception in end class ctor)
         _loop->unregister_handle(this);
     }

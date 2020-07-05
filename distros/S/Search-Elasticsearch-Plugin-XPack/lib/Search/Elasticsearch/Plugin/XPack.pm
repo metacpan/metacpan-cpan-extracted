@@ -2,7 +2,7 @@ package Search::Elasticsearch::Plugin::XPack;
 
 use Moo;
 
-our $VERSION = '6.80';
+our $VERSION = '6.81';
 use Search::Elasticsearch 6.00 ();
 
 #===================================
@@ -27,7 +27,7 @@ Search::Elasticsearch::Plugin::XPack - NOOP for backward compatibility wih XPack
 
 =head1 VERSION
 
-version 6.80
+version 6.81
 
 =head1 SYNOPSIS
 

@@ -140,13 +140,19 @@ SOURCE REPOSITORY
 
     http://github.com/jberger/Mojo-SAML
 
+CONTRIBUTORS
+
+    Giuseppe Di Terlizzi (giterlizzi)
+
+    Mohammad S Anwar (manwar)
+
 AUTHOR
 
     Joel Berger, <joel.a.berger@gmail.com>
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2018 by Joel Berger This library is free software; you
-    can redistribute it and/or modify it under the same terms as Perl
-    itself.
+    Copyright (C) 2018 by "AUTHOR" and "CONTRIBUTORS" This library is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
 

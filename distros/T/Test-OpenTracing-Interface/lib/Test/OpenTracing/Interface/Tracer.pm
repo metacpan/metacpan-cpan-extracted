@@ -28,7 +28,7 @@ Test::OpenTracing::Interface::Tracer - compliance testing
 use strict;
 use warnings;
 
-our $VERSION = 'v0.22.0';
+our $VERSION = 'v0.23.0';
 
 
 use Test::OpenTracing::Interface;

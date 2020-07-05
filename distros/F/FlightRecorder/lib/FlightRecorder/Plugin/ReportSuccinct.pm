@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'FlightRecorder::Plugin::Report';
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 # METHODS
 

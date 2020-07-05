@@ -10,15 +10,16 @@ use Moose::Role;
 no warnings 'experimental';
 use List::Util qw( min max sum );
 use Path::Tiny;
+# use Data::Dumper;
 #use Data::Printer;
 
-our $VERSION='1.01';
+our $VERSION='1.03';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 1.01
+=head1 VERSION 1.03
 
 =head1 Synopsis
 
@@ -195,8 +196,8 @@ sub TieBreaker ( $I, $tiebreaker, $active, @choices ) {
   }
   elsif ( $tiebreaker eq 'approval' ) {
     $ranked = $I->Approval($choices_hashref);
-    # } elsif ( $tiebreaker eq 'topcount') {
-    #   $ranked = $I->TopCount( $choices_hashref );
+  } elsif ( $tiebreaker eq 'topcount') {
+      $ranked = $I->TopCount( $choices_hashref );
   }
   elsif ( $tiebreaker eq 'grandjunction' ) {
     my $GJ = $I->TieBreakerGrandJunction(@choices);

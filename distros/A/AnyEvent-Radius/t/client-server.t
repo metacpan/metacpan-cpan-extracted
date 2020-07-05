@@ -1,8 +1,14 @@
 use strict;
-use Test::More tests => 7;
+use Test::More;
 use AnyEvent;
+use English qw( -no_match_vars );
 
 BEGIN {
+    if ($OSNAME eq 'MSWin32') {
+        plan skip_all => 'Skip tests for MSWin32 due to used fork()';
+        exit 0;
+    }
+
     use_ok("AnyEvent::Radius::Client") || exit 1;
     use_ok("AnyEvent::Radius::Server") || exit 1;
 };
@@ -25,7 +31,7 @@ my $child = fork();
 if ($child) {
     # request to server
     sleep 1;
-    
+
     my $replies = 0;
     my %user = ();
     my $radius_reply = sub {
@@ -49,7 +55,7 @@ if ($child) {
                     secret => $secret,
                     on_read => $radius_reply,
                 );
-    
+
     my $id = $nas->send_auth([
                 {Id => AV_USERNAME, Name => 'User-Name', Type => 'string', Value => 'chip'},
                 {Id => AV_PASSWORD, Name => 'Password', Type => 'string', Value => 'pwd'},

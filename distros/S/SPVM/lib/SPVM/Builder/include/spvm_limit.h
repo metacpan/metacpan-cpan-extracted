@@ -4,32 +4,17 @@
 #include "spvm_base.h"
 
 enum {
-  // Sub max count in a package
-  SPVM_LIMIT_C_SUBS_MAX_COUNT = UINT16_MAX,
-
-  // Fields max count in a package
-  SPVM_LIMIT_C_FIELDS_MAX_COUNT = UINT16_MAX,
-
-  // Package variables max count in a package
-  SPVM_LIMIT_C_PACKAGE_VARS_MAX_COUNT = UINT16_MAX,
-
-  // Switch statements max count in a package
-  SPVM_LIMIT_C_SWITCHES_MAX_COUNT = UINT16_MAX,
-
-  // Line max count in a sub
-  SPVM_LIMIT_C_LINES_MAX_COUNT = UINT16_MAX,
-
-  // Opcodes max count in a subroutine
-  SPVM_LIMIT_C_OPCODES_MAX_COUNT = UINT16_MAX,
+  // Max count of sub arguments
+  SPVM_LIMIT_C_SUB_ARGS_MAX_COUNT = 255,
   
-  // Sub arguments max count
-  SPVM_LIMIT_C_SUB_ARGS_MAX_COUNT = UINT8_MAX,
-
-  // valut fields count max
-  SPVM_LIMIT_C_VALUE_FIELDS_MAX_COUNT = 16,
-
-  // valut fields count min
-  SPVM_LIMIT_C_VALUE_FIELDS_MIN_COUNT = 1,
+  // mulnum fields count min
+  SPVM_LIMIT_C_MULNUM_T_FIELDS_MIN_COUNT = 1,
+  
+  // Max count of mulnum fields
+  SPVM_LIMIT_C_MULNUM_T_FIELDS_MAX_COUNT = 255,
+  
+  // mulnum fields count max
+  SPVM_LIMIT_C_ARRAY_DIMENSION_MAX_COUNT = 255,
 };
 
 #endif

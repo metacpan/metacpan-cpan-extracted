@@ -1,7 +1,7 @@
 package Sah::SchemaR::hexbuf;
 
-our $DATE = '2020-03-04'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-03-08'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 our $rschema = ["str",[{examples=>[{valid=>1,value=>""},{summary=>"Odd number of digits",valid=>0,value=>"f"},{valid=>1,value=>"fafafa"},{valid=>0,value=>"fafafg"}],match=>qr(\A([0-9A-fa-f][0-9A-fa-f])*\z),summary=>"Binary data encoded in hexdigits"}],["str"]];
 
@@ -20,7 +20,7 @@ Sah::SchemaR::hexbuf - Binary data encoded in hexdigits
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2020-03-04.
+This document describes version 0.005 of Sah::SchemaR::hexbuf (from Perl distribution Sah-Schemas-Binary), released on 2020-03-08.
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ use strict;
 BEGIN { eval { require warnings; warnings->import } }
 
 our @EXPORT_OK = qw( rename );
-our $VERSION = '1.10';
+our $VERSION = '1.13';
 
 sub import {
     require Exporter;

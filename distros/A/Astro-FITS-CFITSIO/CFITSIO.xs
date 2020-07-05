@@ -1874,6 +1874,19 @@ ffcrtb(fptr,tbltype,naxis2,tfields,ttype,tform,tunit,extname,status)
 	OUTPUT:
 		status
 
+int
+ffcpht(infptr,outfptr,firstrow,nrows,status)
+	fitsfile * infptr
+	fitsfile * outfptr
+	LONGLONG firstrow
+	LONGLONG nrows
+	int &status
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_copy_hdutab = 1
+		fitsfilePtr::create_copy_hdutab = 2
+	OUTPUT:
+		status
+
 FitsFile *
 create_template(filename,tpltfile,status)
 	char * filename
@@ -2228,6 +2241,42 @@ ffflus(fptr,status)
 	ALIAS:
 		Astro::FITS::CFITSIO::fits_flush_file = 1
 		fitsfilePtr::flush_file = 2
+	OUTPUT:
+		status
+
+int
+ffihtps()
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_init_https = 1
+
+int
+ffchtps()
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_cleanup_https = 1
+
+void
+ffvhtps(flag)
+	int flag
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_verbose_https = 1
+
+void
+ffshdwn(flag)
+	int flag
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_show_download_progress = 1
+
+int
+ffgtmo()
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_get_timeout = 1
+
+int
+ffstmo(seconds, status)
+	int seconds
+	int &status
+	ALIAS:
+		Astro::FITS::CFITSIO::fits_set_timeout = 1
 	OUTPUT:
 		status
 

@@ -50,8 +50,8 @@ our $knownSession = tempfile( TEMPLATE => 'nppKnownSession_XXXXXXXX', SUFFIX => 
     my $ret = notepad()->closeAll();
     ok $ret, sprintf 'closeAll(): retval = %d', $ret;
 
-    my $nOpen = notepad()->getNumberOpenFiles(0);
-    is $nOpen, 1, sprintf 'closeAll(): getNumberOpenFiles(0) = %d', $nOpen;
+    my $nOpen = notepad()->getNumberOpenFiles($VIEW{PRIMARY_VIEW});
+    is $nOpen, 1, sprintf 'closeAll(): getNumberOpenFiles(PRIMARY) = %d', $nOpen;
 
     my $fName = notepad()->getCurrentFilename();
     like $fName, qr/^new \d/i, sprintf 'closeAll(): getCurrentFilename() = "%s"', $fName;
@@ -71,8 +71,8 @@ our $knownSession = tempfile( TEMPLATE => 'nppKnownSession_XXXXXXXX', SUFFIX => 
     my $ret = notepad()->loadSession( $knownSession->absolute->canonpath );
     ok $ret, sprintf 'loadSession("%s"): retval = %d', $knownSession->absolute->canonpath, $ret;
 
-    my $nOpen = notepad()->getNumberOpenFiles(0);
-    is $nOpen, 2, sprintf 'loadSession(): getNumberOpenFiles(0) = %d', $nOpen;
+    my $nOpen = notepad()->getNumberOpenFiles($VIEW{PRIMARY_VIEW});
+    is $nOpen, 2, sprintf 'loadSession(): getNumberOpenFiles(PRIMARY) = %d', $nOpen;
 
     my @files = map { $_->[0] } @{ notepad()->getFiles() };
     for my $i (0,1) {
@@ -94,7 +94,7 @@ our $knownSession = tempfile( TEMPLATE => 'nppKnownSession_XXXXXXXX', SUFFIX => 
 #       => give it a name
 {
     my $text = sprintf 'saveAs("%s")', $fnew1->basename();
-    editor()->{_hwobj}->SendMessage_sendRawString( $scimsg{SCI_SETTEXT}, 0, $text );
+    editor()->{_hwobj}->SendMessage_sendRawString( $SCIMSG{SCI_SETTEXT}, 0, $text );
 
     my $ret = notepad()->saveAs( $fnew1->absolute->canonpath() );
     ok $ret, sprintf 'saveAs(): retval = %d', $ret;
@@ -132,7 +132,7 @@ our $knownSession = tempfile( TEMPLATE => 'nppKnownSession_XXXXXXXX', SUFFIX => 
 
     my $text = "this is new text";
     my $expect = length($text);
-    editor()->{_hwobj}->SendMessage_sendRawString( $scimsg{SCI_SETTEXT}, 0, $text );
+    editor()->{_hwobj}->SendMessage_sendRawString( $SCIMSG{SCI_SETTEXT}, 0, $text );
 
     my $ret = notepad()->save();
     ok $ret, sprintf 'save(): retval = %d', $ret;
@@ -161,7 +161,7 @@ our $knownSession = tempfile( TEMPLATE => 'nppKnownSession_XXXXXXXX', SUFFIX => 
 #       => _after_ editing both open files
 #       => need to make sure that it changes on disk
 {
-    my $nView0 = notepad()->getNumberOpenFiles(0);
+    my $nView0 = notepad()->getNumberOpenFiles($VIEW{PRIMARY_VIEW});
     is $nView0, 4, sprintf 'saveAllFiles(): first make sure expected number are open: %d', $nView0;
 
     # last modified when?
@@ -173,7 +173,7 @@ our $knownSession = tempfile( TEMPLATE => 'nppKnownSession_XXXXXXXX', SUFFIX => 
     for my $di ( $nView0-1,$nView0-2 ) {
         notepad()->activateIndex(0,$di);
         my $text = sprintf qq(editing "%s"\r\n%s\r\n), notepad->getCurrentFilename(), scalar localtime;
-        editor()->{_hwobj}->SendMessage_sendRawString( $scimsg{SCI_SETTEXT}, 0, $text );
+        editor()->{_hwobj}->SendMessage_sendRawString( $SCIMSG{SCI_SETTEXT}, 0, $text );
         sleep(1);
     }
 
@@ -193,7 +193,7 @@ our $knownSession = tempfile( TEMPLATE => 'nppKnownSession_XXXXXXXX', SUFFIX => 
     my $ret = notepad()->closeAllButCurrent();
     ok $ret, sprintf 'closeAllButCurrent(): ret = %d', $ret;
 
-    my $num = notepad()->getNumberOpenFiles(0);
+    my $num = notepad()->getNumberOpenFiles($VIEW{PRIMARY_VIEW});
     is $num, 1, sprintf 'closeAllButCurrent(): %d file%s open', $num, $num==1?'':'s';
 }
 

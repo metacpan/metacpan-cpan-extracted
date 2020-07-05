@@ -8,7 +8,7 @@ package Syntax::Keyword::Try;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 use Carp;
 
@@ -95,10 +95,23 @@ still propagate exceptions up to callers as normal.
       STATEMENTS...
    }
 
+Or
+
+   ...
+   catch my $var {
+      STATEMENTS...
+   }
+
+I<Experimental; since version 0.12.>
+
 A C<catch> statement provides a block of code to the preceding C<try>
 statement that will be invoked in the case that the main block of code throws
 an exception. The C<catch> block can inspect the raised exception by looking
-in C<$@> in the usual way.
+in C<$@> in the usual way. Optionally, a new lexical variable can be
+introduced to store the exception in. This new form is experimental and is
+likely to change in a future version, as part of the wider attempt to
+introduce typed dispatch. Using it will provoke an C<experimental> category
+warning on supporting perl versions.
 
 Presence of this C<catch> statement causes any exception thrown by the
 preceding C<try> block to be non-fatal to the surrounding code. If the
@@ -286,11 +299,51 @@ L<TryCatch> and L<Syntax::Feature::Try> both attempt to provide a kind of
 typed dispatch where different classes of exception are caught by different
 blocks of code, or propagated up entirely to callers.
 
-The author considers the lack of such ability in this module to be a feature.
-That kind of dispatch on type matching of a controlling expression is too
-useful a behaviour to be constrained to exception catching. If the language is
-to provide such a facility, it should be more universally applicable as a
-stand-alone independent ability.
+This is likely to be the next experimental development on this module, in
+ongoing preparation for a time when it can be moved into core perl syntax.
+While at first I was heistant to implement this as a special-case in
+C<try/catch> syntax, my other work thinking about the codenamed "dumbmatch"
+syntax feature leads me to thinking that actually typed dispatch of C<catch>
+blocks is sufficiently different from value dispatch in a more general case
+(such as "dumbmatch"). Exception dispatch in perl needs to handle both C<isa>
+and string regexp testing at the same site.
+
+My latest thinking on this front may involve some syntax such as:
+
+   try {
+      ...
+   }
+   catch my $e
+      (isa Some::Exception::Class) { ... },
+      (=~ m/^An error message /)   { ... }
+
+or
+
+   try {
+      ...
+   }
+   catch ($e isa Some::Exception::Class) { ... },
+         ($e =~ m/^An error message /)   { ... }
+
+Or maybe the C<catch> keyword would be repeated per line, though that then
+involves repeating the error variable name also:
+
+   try {
+      ...
+   }
+   catch my $e (isa Some::Exception::Class) { ... }
+   catch my $e (=~ m/^An error message /)   { ... }
+
+or
+
+   try {
+      ...
+   }
+   catch ($e isa Some::Exception::Class) { ... }
+   catch ($e =~ m/^An error message /)   { ... }
+
+The design thoughts continue on the RT ticket
+L<https://rt.cpan.org/Ticket/Display.html?id=123918>.
 
 =cut
 

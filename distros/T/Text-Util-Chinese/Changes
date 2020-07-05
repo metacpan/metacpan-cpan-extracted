@@ -1,3 +1,6 @@
+0.08	2020-06-27T23:26:07+0800
+	- Add new subroutine: looks_like_simplified_chinese
+
 0.07	2020-04-21T20:24:57+0800
 	- Add new subroutine: word_iterator
 	- Add new subroutine: presuf_iterator

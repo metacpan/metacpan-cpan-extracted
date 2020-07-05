@@ -1,0 +1,19 @@
+Changes
+lib/Code/ART.pm
+lib/Code/ART/API/Vim.pm
+vim/perlart.vim
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/assignment.t
+t/errors.t
+t/failures.t
+t/function.t
+t/hoist_autoclosure.t
+t/hoist_closure.t
+t/hoist_var.t
+t/rename_variables.t
+t/simple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -8,7 +8,7 @@ sub new {
 	my $self = shift;
 	my %args = @_;
 	$self = bless(\%args, $self);
-	
+
 	return $self;
 }
 
@@ -60,7 +60,7 @@ B<WebService::Gyazo::B::Image> helps you if you use WebService::Gyazo::B.
 
 =head1 METHODS
 
-=head2 C<new>
+=head2 C<_new>
 
 	my $imageId = '1111111111111111';
 	my $image = WebService::Gyazo::B::Image->new(id => $imageId);

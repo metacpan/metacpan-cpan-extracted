@@ -11,7 +11,7 @@ use Scalar::Util qw(blessed);
 
 use base 'Date::Holidays::Adapter';
 
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -332,7 +332,7 @@ Date::Holidays - Date::Holidays::* adapter and aggregator for all your holiday n
 
 =head1 VERSION
 
-The documentation describes version 1.22 of Date::Holidays
+The documentation describes version 1.23 of Date::Holidays
 
 =head1 FEATURES
 
@@ -364,7 +364,7 @@ The documentation describes version 1.22 of Date::Holidays
         day   => 25
     );
 
-    # Inquire and get a set of local namenames for national holiday in a given country
+    # Inquire and get a set of local names for national holiday in a given country
     my $hashref = $dh->holidays(
         year => 2004
     );
@@ -953,6 +953,10 @@ Please see L<Task::Date::Holidays|https://metacpan.org/pod/Task::Date::Holidays>
 =head1 ACKNOWLEDGEMENTS
 
 =over
+
+=item * Karen Etheridge (ETHER)
+
+=item * Neil Bowers (NEILB)
 
 =item * Miquel Ruiz, PR fixing a bug with regions for ES, supporting Data::Holidays::CA_ES resulting in 1.22
 

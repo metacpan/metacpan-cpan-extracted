@@ -40,9 +40,12 @@ subtest '_best_two find top two for Automatic Runoff' => sub {
 subtest 'STAR' => sub {
   is( $tennessee->STAR(), 'NASHVILLE', 'STAR chose NASHVILLE for Tennessee' );
   is( $fastfood->STAR(),  'INNOUT',    'STAR chose InNOut for fastfood' );
-  is( $tietop->STAR( $tietop->Active() ), 0, 'STAR returned 0 when there was a tie' );  
-  is( $fastfood->STAR( { 'CARLS' => 1, 'KFC' => 1, 'WIMPY' => 1 } ),  'CARLS',    'Changed ActiveSet for fastfood' );  
-  is( $fastfood->STAR( { 'QUICK' => 1, 'KFC' => 1, 'WENDYS' => 1 } ),  'WENDYS',    'another ActiveSet for fastfood' ); 
+  is( $tietop->STAR( $tietop->Active() ),
+    0, 'STAR returned 0 when there was a tie' );
+  is( $fastfood->STAR( { 'CARLS' => 1, 'KFC' => 1, 'WIMPY' => 1 } ),
+    'CARLS', 'Changed ActiveSet for fastfood' );
+  is( $fastfood->STAR( { 'QUICK' => 1, 'KFC' => 1, 'WENDYS' => 1 } ),
+    'WENDYS', 'another ActiveSet for fastfood' );
 };
 
 done_testing();

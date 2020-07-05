@@ -4,7 +4,7 @@ StreamFinder::Banned.Video - Fetch actual raw streamable video URLs from banned.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2019 by
+This module is Copyright (C) 2020 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -86,7 +86,7 @@ The purpose is that one needs one of these URLs in order to have the option to
 stream the video in one's own choice of media player software rather than 
 using their web browser and accepting any / all flash, ads, javascript, 
 cookies, trackers, web-bugs, censorship, and other crapware that can come with 
-that method of playing.  The author uses his own custom all-purpose media 
+that method of play.  The author uses his own custom all-purpose media 
 player called "fauxdacious" (his custom hacked version of the open-source 
 "audacious" audio player).  "fauxdacious" can incorporate this module to decode 
 and play banned.video streams.
@@ -123,12 +123,16 @@ Returns an array of strings representing all stream URLs found.
 Similar to B<get>() except it only returns a single stream representing 
 the first valid stream found.  
 
-Current options are:  I<"random"> and I<"noplaylists">.  By default, the 
-first ("best"?) stream is returned.  If I<"random"> is specified, then 
-a random one is selected from the list of streams found.  
+Current options are:  I<"random">, I<"nopls">, and I<"noplaylists">.  
+By default, the first ("best"?) stream is returned.  If I<"random"> is 
+specified, then a random one is selected from the list of streams found.  
+If I<"nopls"> is specified, and the stream to be returned is a ".pls" playlist, 
+it is first fetched and the first entry (or a random entry if I<"random"> is 
+specified) is returned.  This is needed by Fauxdacious Mediaplayer.
 If I<"noplaylists"> is specified, and the stream to be returned is a 
-"playlist" (.pls or .m3u? extension), it is first fetched and the first entry 
-in the playlist is returned.  This is needed by Fauxdacious Mediaplayer.
+"playlist" (either .pls or .m3u? extension), it is first fetched and the first 
+entry (or a random entry if I<"random"> is specified) in the playlist 
+is returned.
 
 =item $video->B<count>()
 
@@ -253,7 +257,7 @@ L<http://search.cpan.org/dist/StreamFinder-BannedVideo/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 Jim Turner.
+Copyright 2020 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -489,7 +493,8 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 	my $self = shift;
 	my $arglist = (defined $_[0]) ? join('|',@_) : '';
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
-	if ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i) {
+	if (($arglist =~ /\b\-?nopls\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls)$/i)
+			|| ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i)) {
 		my $plType = $1;
 		my $firstStream = ${$self->{'streams'}}[$idx];
 		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
@@ -510,33 +515,43 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 			}
 		}
 		my @lines = split(/\r?\n/, $html);
-		$firstStream = '';
-		if ($plType =~ /pls/) {  #PLS:
-			my $firstTitle = '';
+		my @plentries = ();
+		my $firstTitle = '';
+		my $plidx = ($arglist =~ /\b\-?random\b/) ? 1 : 0;
+		if ($plType =~ /pls/i) {  #PLS:
 			foreach my $line (@lines) {
-				if ($line =~ m#^\s*File\d+\=(.+)$#) {
-					$firstStream ||= $1;
-				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#) {
+				if ($line =~ m#^\s*File\d+\=(.+)$#o) {
+					push (@plentries, $1);
+				} elsif ($line =~ m#^\s*Title\d+\=(.+)$#o) {
 					$firstTitle ||= $1;
 				}
 			}
 			$self->{'title'} ||= $firstTitle;
-			print STDERR "-getURL(PLS): first=$firstStream= title=$firstTitle=\n"  if ($DEBUG);
-		} else {  #m3u8:
+			print STDERR "-getURL(PLS): title=$firstTitle= pl_idx=$plidx=\n"  if ($DEBUG);
+		} elsif ($arglist =~ /\b\-?noplaylists\b/) {  #m3u*:
 			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
 			foreach my $line (@lines) {
-				if ($line =~ m#^\s*([^\#].+)$#) {
+				if ($line =~ m#^\s*([^\#].+)$#o) {
 					my $urlpart = $1;
-					$urlpart =~ s#^\s+##;
-					$urlpart =~ s#^\/##;
-					$firstStream = ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart);
-					last;
+					$urlpart =~ s#^\s+##o;
+					$urlpart =~ s#^\/##o;
+					push (@plentries, ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart));
+					last  unless ($plidx);
 				}
 			}
-			print STDERR "-getURL(m3u?): first=$firstStream=\n"  if ($DEBUG);
+			print STDERR "-getURL(m3u?): pl_idx=$plidx=\n"  if ($DEBUG);
 		}
-		return $firstStream || ${$self->{'streams'}}[$idx];
+		if ($plidx && $#plentries >= 0) {
+			$plidx = int rand scalar @plentries;
+		} else {
+			$plidx = 0;
+		}
+		$firstStream = (defined($plentries[$plidx]) && $plentries[$plidx]) ? $plentries[$plidx]
+				: ${$self->{'streams'}}[$idx];
+
+		return $firstStream;
 	}
+
 	return ${$self->{'streams'}}[$idx];
 }
 

@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Null;
+package Metrics::Any::Adapter::Null 0.06;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.05';
 
 =head1 NAME
 

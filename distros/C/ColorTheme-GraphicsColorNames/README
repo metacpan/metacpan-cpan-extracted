@@ -3,9 +3,9 @@ NAME
     scheme as color theme
 
 VERSION
-    This document describes version 0.001 of ColorTheme::GraphicsColorNames
+    This document describes version 0.003 of ColorTheme::GraphicsColorNames
     (from Perl distribution ColorTheme-GraphicsColorNames), released on
-    2020-06-09.
+    2020-06-19.
 
 HOMEPAGE
     Please visit the project's homepage at

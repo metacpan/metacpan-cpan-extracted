@@ -7,6 +7,7 @@ README
 t/00-load.t
 t/bail.t
 t/dirs.t
+t/errors.t
 t/file.t
 t/lists.t
 t/override.t
@@ -26,5 +27,6 @@ xt/author/critic.t
 xt/author/manifest.t
 xt/author/pod-coverage.t
 xt/author/pod.t
+xt/failing/error.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

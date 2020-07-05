@@ -1,6 +1,6 @@
 NAME
 
-    Mojolicious::Plugin::RevealJS - Mojolicious Ã¢ÂÂ¤Ã¯Â¸Â Reveal.js
+    Mojolicious::Plugin::RevealJS - Mojolicious ❤️ Reveal.js
 
 SYNOPSIS
 
@@ -23,7 +23,7 @@ DESCRIPTION
     the plugin will allow setting of configuration like themes.
 
     The bundled version of Reveal.js is currently 3.7.0. The bundled
-    version of reveal-sampler is currently b04a34e.
+    version of reveal-sampler is currently cd4a07d.
 
     Note that this module is in an alpha form! The author makes no
     compatibilty promises.
@@ -196,6 +196,17 @@ HELPERS
 
       Sets lines to be marked by the client. This follows the documentation
       at https://github.com/ldionne/reveal-sampler.
+
+    indent
+
+      Instructs reveal-sampler to "keep" or "remove" any overall
+      indentation in the sample. This follows the documentation at
+      https://github.com/ldionne/reveal-sampler.
+
+      Note that the default behavior (for when "indent" is not set) can be
+      set in "init". The default (from the plugin itself), is false.
+
+        $c->stash( init => { sampler => { removeIndentation => \1 } } );
 
     trim
 

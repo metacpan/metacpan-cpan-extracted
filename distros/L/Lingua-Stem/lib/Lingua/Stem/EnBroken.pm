@@ -1,7 +1,5 @@
 package Lingua::Stem::EnBroken;
 
-# $RCSfile: En.pm,v $ $Revision: 1.4 $ $Date: 1999/06/24 23:33:37 $ $Author: snowhare $
-
 =head1 NAME
 
 Lingua::Stem::EnBroken - Porter's stemming algorithm for 'generic' English
@@ -57,6 +55,7 @@ support for the British -ise suffix.
 #######################################################################
 
 use strict;
+use warnings;
 use Exporter;
 use Carp;
 use vars qw (@ISA @EXPORT_OK @EXPORT %EXPORT_TAGS $VERSION);
@@ -66,7 +65,7 @@ BEGIN {
     @EXPORT_OK   = qw (stem clear_stem_cache stem_caching);
     %EXPORT_TAGS = ();
 }
-$VERSION = "2.13";
+$VERSION = "2.30";
 
 my $Stem_Caching  = 0;
 my $Stem_Cache    = {};
@@ -340,13 +339,13 @@ written by Jim Richardson.
   jimr@maths.usyd.edu.au or http://www.maths.usyd.edu.au:8000/jimr.html
 
   Integration in Lingua::Stem by
-  Benjamin Franz, FreeRun Technologies,
-  snowhare@nihongo.org or http://www.nihongo.org/snowhare/
+  Jerilyn Franz, FreeRun Technologies,
+  <cpan@jerilyn.info> 
 
 =head1 COPYRIGHT
 
 Jim Richardson, University of Sydney
-Benjamin Franz, FreeRun Technologies
+Jerilyn Franz, FreeRun Technologies
 
 This code is freely available under the same terms as Perl.
 

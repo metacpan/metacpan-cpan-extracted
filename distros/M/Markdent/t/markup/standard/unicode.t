@@ -4,7 +4,8 @@ use utf8;
 
 use Test2::V0;
 
-use lib 't/lib';
+use FindBin qw( $Bin );
+use lib "$Bin/../../../t/lib";
 
 use Test::Markdent;
 

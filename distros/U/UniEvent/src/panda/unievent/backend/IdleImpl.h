@@ -16,7 +16,6 @@ struct IdleImpl : HandleImpl {
     virtual void stop  () = 0;
 
     void handle_idle () noexcept {
-        panda_mlog_debug(uebacklog, "on idle " << loop);
         ltry([&]{ listener->handle_idle(); });
     }
 };

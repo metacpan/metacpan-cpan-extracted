@@ -38,8 +38,10 @@ my @files = qw(
     debian/dpkg.cron.daily
     debian/dpkg.postrm
     scripts/dpkg-maintscript-helper.sh
+    scripts/dpkg-realpath.sh
 );
 my @shellcheck_opts = (
+    '--exclude=SC1090', # Allow non-constant source.
     '--exclude=SC2039', # Allow local keyword.
     '--exclude=SC2166', # Allow -a and -o.
     '--exclude=SC2034', # Allow unused variables for colors.

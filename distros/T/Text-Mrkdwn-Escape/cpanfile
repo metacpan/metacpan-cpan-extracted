@@ -1,0 +1,16 @@
+requires "Exporter" => "0";
+requires "parent" => "0";
+requires "perl" => "5.026";
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Test::Perl::Critic" => "0";
+  requires "Test::Spelling" => "0.12";
+};

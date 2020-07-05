@@ -90,6 +90,11 @@ sub SendMessage_getUcs2le {
     return $text;
 }
 
+my $DEBUG_RAW = 0;
+sub __trace_raw_string { $DEBUG_RAW = 1; }
+sub __untrace_raw_string { $DEBUG_RAW = 0; }
+# use editor->{_hwobj}->__trace_autogen(); to enable debugging for the auto-generated methods
+
 # $obj->SendMessage_getRawString( $message_id, $wparam ):
 #   issues a SendMessage, and grabs a string up to 1024 bytes;
 #   does not change encoding
@@ -103,30 +108,45 @@ sub SendMessage_getRawString {
     my $msgid = shift; croak "no message id sent" unless defined $msgid;
     my $wparam = shift || 0;
 
+
     # process args: determine length of strings, in bytes
     my $args = shift || { };
     my $trim = exists $args->{trim} ? $args->{trim} : undef;
     my $charlength = exists $args->{charlength} ? $args->{charlength}//1 : 1;
     my $wlength = exists $args->{wlength} ? $args->{wlength} : 0;
+    carp sprintf "\n\nSendMessage_getRawString(hwnd(0x%08x),%s,%s,{%s})\n", $self->hwnd, $msgid, $wparam, join(',', %$args) if $DEBUG_RAW;
 
     $trim = 'retval' if $wlength and !defined $trim;
+    $trim = '<undef>' unless defined $trim;
 
     my $wrv = $wlength ? 0 : $wparam;
 
-    my $length =    $trim eq 'wparam'       ? $wparam :                                   # wparam => characters in string
+    carp sprintf "\tid=%s trim=%s wrv=%s wlength=%s BEFORE LENGTH\n", map {$_ // '<undef>'} $msgid, $trim, $wrv, $wlength if $DEBUG_RAW;
+    carp sprintf "\tdebug retval=%s\n", $self->SendMessage( $msgid, $wrv, 0)//'<undef>' if $DEBUG_RAW;
+    my $length =
+                    $trim eq 'wparam'       ? $wparam :                                   # wparam => characters in string
+                    $trim eq 'retval+1'     ? 1+$self->SendMessage( $msgid, $wrv, 0) :    # SendMessage result => characters, need to add char for \0
                     $trim eq 'retval'       ? $self->SendMessage( $msgid, $wrv, 0) :      # SendMessage result => characters
                     !defined($trim)         ? $MAX_PATH :                                 # no length limit, so use MAX_PATH
                     1*$trim eq $trim        ? 0+$trim :                                   # numeric
-                    die "unknown trim $trim";
+                    die "unknown trim '$trim'";
+    carp sprintf "\tid=%s trim=%s wrv=%s wlength=%s length=%s\n", map {$_ // '<undef>'} $msgid, $trim, $wrv, $wlength, $length if $DEBUG_RAW;
 
+    # specifically for retval-based, just return empty string and dont bother with second SendMessage if the first SendMessage said length would be 0 bytes.
+    if($trim eq 'retval' and 0==$length) { return ""; }
+
+    # otherwise, assume the user lied to us, and grab one character
     $length = 1 unless $length>0; # make sure it's always at least one character
     $length *= $charlength;
 
     if($wlength) {
         # the SendMessage() retval already gave strlen+1
-        $wparam = $length;           # so make wparam ask for full length
-        $length-=1 if $length>1;     # but only grab the stringlength from it
+        # carp sprintf "\tin the if(wlength) section\n";
+        $wparam = $length;           # so make wparam ask for full length (including NUL)
+        --$length;                   # but only grab the stringlength from it (excluding NUL)
+        return "" if $length<1;      # no need to ask again if that says the length would be zero
     }
+    carp(sprintf "\tdebug wlength=%s, wparam=%s, length=%s\n", map($_//'<undef>', $wlength, $wparam, $length)) if $DEBUG_RAW;
 
     # prepare virtual buffer
     my $buf_uc2le = Win32::GuiTest::AllocateVirtualBuffer( $self->hwnd, 1+$length );
@@ -135,17 +155,17 @@ sub SendMessage_getRawString {
     # grab the raw string from HWND
     my $rslt = $self->SendMessage( $msgid, $wparam, $buf_uc2le->{ptr});
     croak "SendMessage_getRawString(): $rslt NOT >= 0" if $rslt<0;
-    #carp "SendMessage_getRawStr(@{[$self->hwnd]}, $msgid, $wparam, @{[$buf_uc2le]} ) = $rslt";
+    carp sprintf "\tSendMessage(hwnd(0x%08x),%s,%s,{%s})\n", $self->hwnd, $msgid, $wparam, join(',', %$buf_uc2le) if $DEBUG_RAW;
 
     # transfer from virtual buffer to perl
     my $rbuf = Win32::GuiTest::ReadFromVirtualBuffer( $buf_uc2le, $length );
     Win32::GuiTest::FreeVirtualBuffer( $buf_uc2le );
-    #use Data::Dumper; $Data::Dumper::Useqq=1;
-    #carp "raw before trim => ", Dumper $rbuf;
+    use Data::Dumper; $Data::Dumper::Useqq=1;
+    carp "\traw before trim => ", Dumper $rbuf if $DEBUG_RAW;
 
     # trim down to $length bytes (where $length already adjusted for $charlength bytes per char
     $rbuf = substr $rbuf, 0, $length if length($rbuf) > $length;
-    #carp "raw after trim => ", Dumper $rbuf;
+    carp "\traw after trim => ", Dumper $rbuf if $DEBUG_RAW;
 
     return $rbuf;   # return the raw string
 }
@@ -172,10 +192,11 @@ sub SendMessage_sendRawString {
     my $wparam = shift; croak "no wparam sent" unless defined $wparam;
     my $lparam_string = shift; croak "no lparam string sent" unless defined $lparam_string;
 
-
     # copy string into virtual buffer
     my $buf_str = Win32::GuiTest::AllocateVirtualBuffer( $self->hwnd, 1+length($lparam_string) );
-    Win32::GuiTest::WriteToVirtualBuffer( $buf_str, $lparam_string );
+    # 2020-Apr-10: add "if length()" to prevent "WriteProcessMemory failed with error 87: the parameter is incorrect" during automated testing
+    #   (don't know why it worked okay locally, but not on appveyor ci environment)
+    Win32::GuiTest::WriteToVirtualBuffer( $buf_str, $lparam_string ) if length($lparam_string);
 
     # send the message with the string ptr as the lparam
     my $rslt = Win32::GuiTest::SendMessage($self->hwnd, $msgid, $wparam, $buf_str->{ptr});

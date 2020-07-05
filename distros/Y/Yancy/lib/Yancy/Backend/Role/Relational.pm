@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::Relational;
-our $VERSION = '1.061';
+our $VERSION = '1.064';
 # ABSTRACT: A role to give a relational backend relational capabilities
 
 #pod =head1 SYNOPSIS
@@ -150,6 +150,13 @@ my %SQL2OAPITYPE = (
     SQL_VARBINARY() => { type => 'string', format => 'binary' },
     SQL_BINARY() => { type => 'string', format => 'binary' },
     SQL_BLOB() => { type => 'string', format => 'binary' },
+    SQL_VARCHAR() => sub {
+        my ( $c ) = @_;
+        # MySQL uses this type for BLOBs, too...
+        return { type => 'string', format => 'binary' }
+            if ( $c->{mysql_type_name} // '' ) =~ /blob/i;
+        return { type => 'string' };
+    },
 );
 # SQLite fallback
 my %SQL2TYPENAME = (
@@ -157,7 +164,7 @@ my %SQL2TYPENAME = (
     SQL_INTEGER() => [ qw(int integer smallint bigint tinyint rowid) ],
     SQL_REAL() => [ qw(double float money numeric real) ],
     SQL_TYPE_TIMESTAMP() => [ qw(timestamp datetime) ],
-    SQL_BLOB() => [ qw(blob) ],
+    SQL_BLOB() => [ qw(blob longblob mediumblob tinyblob) ],
 );
 my %TYPENAME2SQL = map {
     my $sql = $_;
@@ -183,7 +190,12 @@ requires qw(
 
 sub new {
     my ( $class, $backend, $schema ) = @_;
-    if ( !ref $backend ) {
+    if ( blessed $backend && !$backend->isa( $class->mojodb_class ) ) {
+        # This prevents random objects being sent to us, like the
+        # Mojo::MySQL version 0.01 that may somehow be installed...
+        die "$class requires a " . $class->mojodb_class . ' object. Got a ' . blessed( $backend ) . ' object instead';
+    }
+    elsif ( !ref $backend ) {
         my $found = (my $connect = $backend) =~ s#^.*?:##;
         $backend = $class->mojodb_class->new( $found ? $class->mojodb_prefix.":$connect" : () );
     }
@@ -406,10 +418,8 @@ sub read_schema {
     # Foreign keys
     for my $table ( @table_names ) {
         my @foreign_keys;
-        for my $foreign_table ( @table_names ) {
-            my $sth = $db->dbh->foreign_key_info( $dbcatalog, $dbschema, $foreign_table, $dbcatalog, $dbschema, $table );
-            next unless $sth; # Pg returns null if no foreign keys
-            push @foreign_keys, @{ $sth->fetchall_arrayref( {} ) };
+        if ( my $sth = $db->dbh->foreign_key_info( (undef)x3, $dbcatalog, $dbschema, $table ) ) {
+            @foreign_keys = @{ $sth->fetchall_arrayref( {} ) };
         }
 
         for my $fk ( @foreign_keys ) {
@@ -451,7 +461,7 @@ Yancy::Backend::Role::Relational - A role to give a relational backend relationa
 
 =head1 VERSION
 
-version 1.061
+version 1.064
 
 =head1 SYNOPSIS
 

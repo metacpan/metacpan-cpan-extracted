@@ -21,7 +21,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,27 +37,26 @@ no_index:
 provides:
   Ryu::Async:
     file: lib/Ryu/Async.pm
-    version: '0.016'
+    version: '0.017'
   Ryu::Async::Client:
     file: lib/Ryu/Async/Client.pm
-    version: '0.016'
+    version: '0.017'
   Ryu::Async::Packet:
     file: lib/Ryu/Async/Packet.pm
-    version: '0.016'
+    version: '0.017'
   Ryu::Async::Process:
     file: lib/Ryu/Async/Process.pm
-    version: '0.016'
+    version: '0.017'
   Ryu::Async::Server:
     file: lib/Ryu/Async/Server.pm
-    version: '0.016'
+    version: '0.017'
 recommends:
   Heap: '0'
   IO::Async::SSL: '0.19'
   IO::AsyncX::Sendfile: '0.002'
   IO::AsyncX::System: '0.003'
-  Tickit::Async: '0.21'
 requires:
-  Future: '0.37'
+  Future: '0.45'
   IO::Async: '0.71'
   IO::Async::Handle: '0'
   IO::Async::Listener: '0'
@@ -72,7 +71,7 @@ requires:
   IO::Async::Timer::Periodic: '0'
   IO::Socket::IP: '0.37'
   Log::Any: '1.050'
-  Ryu: '1.008'
+  Ryu: '2.001'
   Ryu::Sink: '0'
   Ryu::Source: '0'
   Scalar::Util: '0'
@@ -90,7 +89,8 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Ryu-Async/issues
   homepage: https://github.com/team-at-cpan/Ryu-Async
   repository: https://github.com/team-at-cpan/Ryu-Async.git
-version: '0.016'
+version: '0.017'
 x_authority: cpan:TEAM
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

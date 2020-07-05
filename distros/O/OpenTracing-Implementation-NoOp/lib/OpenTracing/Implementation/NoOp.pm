@@ -3,7 +3,7 @@ package OpenTracing::Implementation::NoOp;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = 'v0.71.1';
 
 
 

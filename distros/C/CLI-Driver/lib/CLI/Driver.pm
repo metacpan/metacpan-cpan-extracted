@@ -10,7 +10,7 @@ use CLI::Driver::Action;
 
 with 'CLI::Driver::CommonRole';
 
-our $VERSION = 0.63;
+our $VERSION = 0.65;
 
 =head1 NAME
 
@@ -81,15 +81,33 @@ use constant DEFAULT_CLI_DRIVER_FILE => 'cli-driver.yml';
 ##############################################################################
 
 has path => (
-    is      => 'rw',
-    isa     => 'Str',
+	is  => 'rw',
+	isa => 'Str',
 );
 
 has file => (
-    is      => 'ro',
-    isa     => 'Str',
-    lazy    => 1,
-    builder => '_build_file'
+	is      => 'ro',
+	isa     => 'Str',
+	lazy    => 1,
+	builder => '_build_file'
+);
+
+#
+# Overrides @ARGV for fetching command arguments.  Contents example:
+#
+# {
+#    classAttrName1 => 'abc',
+#    classAttrName2 => 'def',
+#    methodArgName1	=> 'ghi'
+# }
+#
+# Notice the cli switches are not part of the map.
+#
+has argv_map => (
+	is        => 'rw',
+	isa       => 'HashRef',
+	predicate => 'has_argv_map',
+	writer    => '_set_argv_map',
 );
 
 ##############################################################################
@@ -97,54 +115,61 @@ has file => (
 ##############################################################################
 
 has actions => (
-    is      => 'rw',
-    isa     => 'ArrayRef[CLI::Driver::Action]',
-    lazy    => 1,
-    builder => '_build_actions',
+	is      => 'rw',
+	isa     => 'ArrayRef[CLI::Driver::Action]',
+	lazy    => 1,
+	builder => '_build_actions',
 );
 
 ##############################################################################
 ### PRIVATE ATTRIBUTES
 ##############################################################################
 
-has _orig_argv => (
-    is => 'rw',
-    isa => 'ArrayRef',
-    default => sub {[ @ARGV ]}
-);
-
 ##############################################################################
 ### PUBLIC METHODS
 ##############################################################################
 
+method BUILD (@argv) {
+
+	if ( $self->has_argv_map ) {
+		$self->_build_global_argv_map( $self->argv_map );
+	}
+}
+
+method set_argv_map (HashRef $argv_map) {
+
+	$self->_set_argv_map( {%$argv_map} );
+	$self->_build_global_argv_map( $self->argv_map );
+}
+
 method get_action (Str :$name!) {
 
-    my $actions = $self->get_actions;
+	my $actions = $self->get_actions;
 
-    foreach my $action (@$actions) {
-        if ( $action->name eq $name ) {
-            return $action;
-        }
-    }
+	foreach my $action (@$actions) {
+		if ( $action->name eq $name ) {
+			return $action;
+		}
+	}
 }
 
 method get_actions (Bool :$want_hashref = 0) {
 
-    my @ret = @{ $self->actions };
+	my @ret = @{ $self->actions };
 
-    if ($want_hashref) {
+	if ($want_hashref) {
 
-        my %actions;
-        foreach my $action (@ret) {
-            my $name = $action->name;
-            next if $name =~ /dummy/i;
-            $actions{$name} = $action;
-        }
+		my %actions;
+		foreach my $action (@ret) {
+			my $name = $action->name;
+			next if $name =~ /dummy/i;
+			$actions{$name} = $action;
+		}
 
-        return \%actions;
-    }
+		return \%actions;
+	}
 
-    return \@ret;
+	return \@ret;
 }
 
 ##############################################################################
@@ -153,63 +178,76 @@ method get_actions (Bool :$want_hashref = 0) {
 
 method _find_file {
 
-    my @path;
-    if ($self->path) {
-        push @path, split(/:/, $self->path);
-    }
-    
-    push @path, DEFAULT_CLI_DRIVER_PATH;
+	my @path;
+	if ( $self->path ) {
+		push @path, split( /:/, $self->path );
+	}
 
-    foreach my $path (@path) {
-        my $fullpath = sprintf "%s/%s", $path, $self->file;
-        if ( -f $fullpath ) {
-            return $fullpath;
-        }
-    }
+	push @path, DEFAULT_CLI_DRIVER_PATH;
 
-    my $msg = sprintf "unable to find %s in: %s", $self->file,
-      join( ', ', @path );
-    confess $msg;
+	foreach my $path (@path) {
+		my $fullpath = sprintf "%s/%s", $path, $self->file;
+		if ( -f $fullpath ) {
+			return $fullpath;
+		}
+	}
+
+	my $msg = sprintf "unable to find %s in: %s", $self->file,
+	  join( ', ', @path );
+	confess $msg;
 }
 
 method _build_actions {
 
-    my @actions;
+	my @actions;
 
-    my $driver_file = $self->_find_file;
-    my $actions = $self->_parse_yaml( path => $driver_file );
+	my $driver_file = $self->_find_file;
+	my $actions     = $self->_parse_yaml( path => $driver_file );
 
-    foreach my $action_name ( keys %$actions ) {
+	foreach my $action_name ( keys %$actions ) {
 
-        my $action = CLI::Driver::Action->new( name => $action_name );
-        my $success = $action->parse( href => $actions->{$action_name} );
-        if ($success) {
-            push @actions, $action;
-        }
-    }
+		my $action = CLI::Driver::Action->new(
+			name         => $action_name,
+			use_argv_map => $self->has_argv_map ? 1 : 0
+		);
+		
+		my $success = $action->parse( href => $actions->{$action_name} );
+		if ($success) {
+			push @actions, $action;
+		}
+	}
 
-    return \@actions;
+	return \@actions;
 }
 
 method _parse_yaml (Str :$path!) {
 
-    my $actions;
-    eval {
-        my $yaml = YAML::Tiny->read($path);
-        $actions = $yaml->[0];
-    };
-    confess $@ if $@;
+	my $actions;
+	eval {
+		my $yaml = YAML::Tiny->read($path);
+		$actions = $yaml->[0];
+	};
+	confess $@ if $@;
 
-    return $actions;
+	return $actions;
 }
 
 method _build_file {
 
-    if ( $ENV{CLI_DRIVER_FILE} ) {
-        return $ENV{CLI_DRIVER_FILE};
-    }
+	if ( $ENV{CLI_DRIVER_FILE} ) {
+		return $ENV{CLI_DRIVER_FILE};
+	}
 
-    return DEFAULT_CLI_DRIVER_FILE;
+	return DEFAULT_CLI_DRIVER_FILE;
+}
+
+method _build_global_argv_map (HashRef $argv_map) {
+
+	%ARGV = ();
+
+	foreach my $key ( keys %$argv_map ) {
+		$ARGV{$key} = $argv_map->{$key};
+	}
 }
 
 1;

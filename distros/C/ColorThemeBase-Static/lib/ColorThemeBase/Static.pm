@@ -1,9 +1,9 @@
 package ColorThemeBase::Static;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-09'; # DATE
+our $DATE = '2020-06-19'; # DATE
 our $DIST = 'ColorThemeBase-Static'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use parent 'ColorThemeBase::Static::FromStructColors';
 
@@ -22,7 +22,7 @@ ColorThemeBase::Static - Base class for color theme modules with static list of 
 
 =head1 VERSION
 
-This document describes version 0.006 of ColorThemeBase::Static (from Perl distribution ColorThemeBase-Static), released on 2020-06-09.
+This document describes version 0.008 of ColorThemeBase::Static (from Perl distribution ColorThemeBase-Static), released on 2020-06-19.
 
 =head1 DESCRIPTION
 

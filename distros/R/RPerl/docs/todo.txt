@@ -34,6 +34,8 @@ DOING
         std::vector should be array and std::unique_ptr<std::vector> should be arrayref, etc.
         ArrayDereference & HashDerefence operators should actually dereference (unwrap) std::unique_ptr in CPPOPS_CPPTYPES, deref AVRV to AV in CPPOPS_PERLTYPES, etc. 
         implement pertinent operators: scalar, keys, values
+        stringify functions integer_array_to_string(), number_array_to_string(), integer_hash_to_string(), number_hash_to_string(), etc.
+        somewhere in physicsperl or mathperl, there is a fake reference unwrap function for Perl, possibly for GMP or SSE or some other special C(++) data type 
 
     foreach() loop and keys() operator in CPPOPS_CPPTYPES
 
@@ -262,6 +264,7 @@ RPERL.ORG
 
 RPERL COMMAND-LINE FRONT-END
     --noWarnings option does not suppress WEXRP00, `export RPERL_WARNINGS=0` does
+    CORRELATION #rp140: `rperl ./some_program.pl` fails to run binary executable after compile, when PATH does not include '.'
 
 UNSIGNED INTEGER FIX
     full boolean support via Boolean.cpp/h, rperltypes.pm, SvBOKp(), etc.
@@ -482,6 +485,8 @@ GRAMMAR
     add WORD_LPAREN & WORD_SCOPED_LPAREN to become WordScopedLParen, and friends, to disallow space between subroutine name and parens in subroutine call
         update Learning RPerl section 4.2.1 & lib/RPerl/Test/Subroutine/program_* accordingly
     should VARIABLE_SYMBOL be allowing scoped variable identifiers, since these are not currently supported by the compiler?
+    should LITERAL_STRING allow single-quote strings which contain an odd number of backslashes?  'howdy \@array' and 'howdy \\@array' are identical in Perl but only the second is allowed in RPerl 
+    upgrade OP18_TERNARY to support 'SubExpression COLON SubExpression' instead of just 'ScalarVariableOrLiteral COLON ScalarVariableOrLiteral'
 
 COMPILER
     uncompile, store list of compiled dependencies inside compiled files themselves, for optional use during uncompile

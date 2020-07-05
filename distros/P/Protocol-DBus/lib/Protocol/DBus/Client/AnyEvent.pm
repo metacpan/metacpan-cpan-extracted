@@ -169,11 +169,9 @@ sub _set_watches_and_create_messenger {
 
         $flush_cr->();
 
-        $self->{'_read_watch'} = AnyEvent->io(
-            fh => $fileno,
-            poll => 'r',
-            cb => $self->_create_get_message_callback(),
-        );
+        $self->{'_read_callback'} = $self->_create_get_message_callback();
+
+        $self->_resume();
 
         my $read_watch_sr = \$self->{'_read_watch'};
 
@@ -183,6 +181,20 @@ sub _set_watches_and_create_messenger {
     }
 
     return $flush_cr;
+}
+
+sub _pause {
+    $_[0]->{'_read_watch'} = undef;
+}
+
+sub _resume {
+    my ($self) = @_;
+
+    $self->{'_read_watch'} ||= AnyEvent->io(
+        fh => $self->{'db'}->fileno(),
+        poll => 'r',
+        cb => $self->{'_read_callback'},
+    );
 }
 
 1;

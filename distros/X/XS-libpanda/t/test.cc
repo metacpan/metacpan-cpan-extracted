@@ -8,4 +8,6 @@ namespace test {
     int Tracer::dtor_calls = 0;
 
     Stat allocs;
+
+    const char* external_fn() { return "lorem impsum"; }
 }

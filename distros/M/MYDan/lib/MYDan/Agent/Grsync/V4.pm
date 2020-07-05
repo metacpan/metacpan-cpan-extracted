@@ -48,7 +48,7 @@ sub run
     };
  
     my ( $load, $loadok );
-    $task{load} = [ keys %{$task{src}} ];
+    $task{load} = [ keys %{$task{src}} ] unless defined $task{load};
     if( @{$task{load}} )
     {
         my $path = "$MYDan::PATH/tmp";

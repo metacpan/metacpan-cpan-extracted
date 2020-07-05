@@ -9,7 +9,7 @@ local $/ = undef;
 my %param = %{ YAML::XS::Load( <> ) };
 
 local $/ = "\n";
-my ( %argv, $grep ) = %{$param{argv}};
+my ( %argv, %grep ) = %{$param{argv}};
 my ( $cmd, $test ) = @argv{qw( cmd test )};
 
 my @cmd = `$cmd`; chop @cmd;

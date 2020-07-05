@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2020-06-03 12:45:43 */
+/* this file was auto-generated at 2020-06-27 10:28:11 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -1415,6 +1415,7 @@ const tld_t tld_list[] = {
     { "xn--45br5cyl", 13, TLD_TYPE_COUNTRY_CODE },
     { "xn--45brj9c", 12, TLD_TYPE_COUNTRY_CODE },
     { "xn--45q11c", 11, TLD_TYPE_GENERIC },
+    { "xn--4dbrk0ce", 13, TLD_TYPE_NOT_ASSIGNED },
     { "xn--4gbrim", 11, TLD_TYPE_GENERIC },
     { "xn--54b7fta0cc", 15, TLD_TYPE_COUNTRY_CODE },
     { "xn--55qw42g", 12, TLD_TYPE_GENERIC },
@@ -1491,7 +1492,7 @@ const tld_t tld_list[] = {
     { "xn--kgbechtv", 13, TLD_TYPE_TEST },
     { "xn--kprw13d", 12, TLD_TYPE_COUNTRY_CODE },
     { "xn--kpry57d", 12, TLD_TYPE_COUNTRY_CODE },
-    { "xn--kpu716f", 12, TLD_TYPE_GENERIC },
+    { "xn--kpu716f", 12, TLD_TYPE_NOT_ASSIGNED },
     { "xn--kput3i", 11, TLD_TYPE_GENERIC },
     { "xn--l1acc", 10, TLD_TYPE_COUNTRY_CODE },
     { "xn--lgbbat1ad8j", 16, TLD_TYPE_COUNTRY_CODE },
@@ -1533,7 +1534,7 @@ const tld_t tld_list[] = {
     { "xn--otu796d", 12, TLD_TYPE_GENERIC },
     { "xn--p1acf", 10, TLD_TYPE_GENERIC },
     { "xn--p1ai", 9, TLD_TYPE_COUNTRY_CODE },
-    { "xn--pbt977c", 12, TLD_TYPE_GENERIC },
+    { "xn--pbt977c", 12, TLD_TYPE_NOT_ASSIGNED },
     { "xn--pgbs0dh", 12, TLD_TYPE_COUNTRY_CODE },
     { "xn--pssy2u", 11, TLD_TYPE_GENERIC },
     { "xn--q7ce6a", 11, TLD_TYPE_COUNTRY_CODE },

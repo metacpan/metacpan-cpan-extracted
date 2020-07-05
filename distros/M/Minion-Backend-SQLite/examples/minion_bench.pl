@@ -25,7 +25,7 @@ my $url = Mojo::URL->new->scheme('sqlite')->path($tempdir->child('temp.db'));
 my $minion = Minion->new(SQLite => $url);
 $minion->add_task(foo => sub { });
 $minion->add_task(bar => sub { });
-$minion->reset;
+$minion->reset({all => 1});
 
 # Enqueue
 say "Clean start with $ENQUEUE jobs";

@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.12';
+our $VERSION = '0.16';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -127,22 +127,22 @@ sub new {
 		POD => "Instantiate a new $CLASS{CURRENT}{NAME} object.",
 		EXAMPLE => "$CLASS{CURRENT}{NAME}\-\>new"
 	};
-	$CLASS{CURRENT}{SUBS}{CURRENT}{CODE} = $sub || eval "sub {
+	$CLASS{CURRENT}{SUBS}{CURRENT}{CODE} = $sub ? $sub : eval "sub {
 		my (\$cls, \%args) = (shift, scalar \@_ == 1 ? \%{\$_[0]} : \@_);
-		bless \\%args, \$cls;	
+		bless \\%args, \$cls;
 	}";
 	return $self;
 }
 
 sub accessor {
-	my ($self, $sub) = @_;
+	my ($self, $sub, $code) = @_;
 	$CLASS{CURRENT}{SUBS}{CURRENT} = $CLASS{CURRENT}{SUBS}{$sub} = {
 		INDEX => $SUB_INDEX++,
 		ACCESSOR => 1,
 		POD => "get or set ${sub}.",
 		EXAMPLE => "\$obj->${sub}\;\n\n\t\$obj->${sub}(\$value)\;"
 	};
-	$CLASS{CURRENT}{SUBS}{CURRENT}{CODE} = eval "sub {
+	$CLASS{CURRENT}{SUBS}{CURRENT}{CODE} = $code ? $code : eval "sub {
 		my (\$self, \$value) = \@_;
 		if (defined \$value) {
 			\$self->{$sub} = \$value;
@@ -157,6 +157,16 @@ sub sub {
 	$CLASS{CURRENT}{SUBS}{CURRENT} = $CLASS{CURRENT}{SUBS}{$sub} = {
 		INDEX => $SUB_INDEX++
 	};
+	return $self;
+}
+
+sub macro {
+	my ($self, $name, $code) = @_;
+	$code = ref $code ? Dumper $code : $code;
+	$code =~ s/\$VAR1 = //;
+	$code =~ s/sub\s*//;
+	$code =~ s/{\s*\n*|\s*\n*};$//g;
+	$CLASS{MACRO}{$name} = $code;
 	return $self;
 }
 
@@ -181,8 +191,9 @@ sub example {
 sub generate {
 	my ($self, %args) = @_;
 
-	my @classes = sort grep { $_ !~ m/^(LIB|AUTHOR|EMAIL|VERSION|DIST|CURRENT)$/ } keys %CLASS;
-	my $lib = $CLASS{LIB} || "./";
+	my @classes = sort grep { $_ !~ m/^(LIB|AUTHOR|EMAIL|VERSION|DIST|CURRENT|MACRO)$/ } keys %CLASS;
+
+	my $lib = $CLASS{LIB} || ".";
 	if ($CLASS{DIST}) {
 		my $distro = delete $CLASS{DIST};
 		Module::Starter->create_distro(
@@ -200,19 +211,19 @@ sub generate {
 	for my $class (@classes) {
 		my $cls = _perl_tidy(
 			sprintf(
-				qq{package %s; use strict; use warnings;%s\n%s\n%s\n%s\n1;\n\n__END__%s }, 
+				qq{package %s; use strict; use warnings;%s\n%s\n%s\n%s\n1;\n\n__END__%s },
 					$class,
 					_build_use($CLASS{$class}),
 					_build_global($CLASS{$class}{GLOBAL}),
 					_build_phase($CLASS{$class}),
-					_build_subs($CLASS{$class}), 
+					_build_subs($CLASS{$class}),
 					_build_pod($class, $CLASS{$class})
 			)
 		);
 		$class =~ s/\:\:/\//g;
-		my $file = sprintf "%s/%s.pm", $lib || '.', $class;
+		my $file = sprintf "%s/%s.pm", $lib, $class;
 		_make_path($file);
-		open my $fh, '>', $file or die "Cannot open file to write $!";
+		open(my $fh, '>', $file) or die "Cannot open file to write $!";
 		print $fh $cls;
 		close $fh;
 	}
@@ -225,9 +236,7 @@ sub _make_path {
 		$path .= "/$_";
 		$path =~ m/(.*)/;
 		if (! -d $1) {
-			mkdir $1  or Carp::croak(qq/
-				Cannot open file for writing $!
-			/);
+			mkdir $1 or die "Cannot open file for writing $!";
 		}
 	}
 	return $path;
@@ -269,8 +278,10 @@ sub _build_subs {
 	my ($class) = @_;
 	my @codes;
 	delete $class->{SUBS}{CURRENT};
-	for my $sub (sort { 
-		$class->{SUBS}{$a}{INDEX} <=> $class->{SUBS}{$b}{INDEX} 
+
+	my $MACROS = join '|', map { quotemeta($_) } keys %{$CLASS{MACRO}};
+	for my $sub (sort {
+		$class->{SUBS}{$a}{INDEX} <=> $class->{SUBS}{$b}{INDEX}
 	} keys %{$class->{SUBS}}) {
 		my $code;
 		if ($class->{SUBS}{$sub}{CODE}) {
@@ -280,6 +291,7 @@ sub _build_subs {
 			$code =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
 			$code =~ s/{\s*\n*/{/;
 			$code =~ s/};$/}/;
+			$code =~ s/\&($MACROS)/$CLASS{MACRO}{$1}/g;
 			$code = sprintf "sub %s %s", $sub, $code;
 		} else {
 			$code = sprintf "sub %s {\n\n\n}", $sub;
@@ -292,25 +304,25 @@ sub _build_subs {
 sub _build_pod {
 	my ($class, $definition) = @_;
 	my $d = do { no strict 'refs'; \*{"Module::Generate::DATA"} };
-	return '' unless defined fileno $d;
 	seek $d, 0, 0;
 	my $content = join '', <$d>;
 	$content =~ s/^.*\n__DATA__\n/\n/s;
 	$content =~ s/\n__END__\n.*$/\n/s;
 	my (@subs, @access);
-	for my $sub (sort { 
-		$definition->{SUBS}{$a}{INDEX} <=> $definition->{SUBS}{$b}{INDEX} 
+	for my $sub (sort {
+		$definition->{SUBS}{$a}{INDEX} <=> $definition->{SUBS}{$b}{INDEX}
 	} keys %{$definition->{SUBS}}) {
+		my $spod = $definition->{SUBS}{$sub}{POD} ? $definition->{SUBS}{$sub}{POD} : "";
 		if ($definition->{SUBS}{$sub}{ACCESSOR}) {
-			push @access, $definition->{SUBS}{$sub}{EXAMPLE} 
-				? sprintf("=head2 %s\n\n%s\n\n\t%s", 
-					$sub, ($definition->{SUBS}{$sub}{POD} || ""), ($definition->{SUBS}{$sub}{EXAMPLE} || ""))
-				: sprintf("=head2 %s\n\n%s", $sub, $definition->{SUBS}{$sub}{POD} || "");
+			push @access, $definition->{SUBS}{$sub}{EXAMPLE}
+				? sprintf("=head2 %s\n\n%s\n\n\t%s",
+					$sub, $spod, $definition->{SUBS}{$sub}{EXAMPLE})
+				: sprintf("=head2 %s\n\n%s", $sub, $spod);
 		} else {
-			push @subs, $definition->{SUBS}{$sub}{EXAMPLE} 
-				? sprintf("=head2 %s\n\n%s\n\n\t%s", 
-					$sub, ($definition->{SUBS}{$sub}{POD} || ""), ($definition->{SUBS}{$sub}{EXAMPLE} || ""))
-				: sprintf("=head2 %s\n\n%s", $sub, $definition->{SUBS}{$sub}{POD} || "");
+			push @subs, $definition->{SUBS}{$sub}{EXAMPLE}
+				? sprintf("=head2 %s\n\n%s\n\n\t%s",
+					$sub, $spod, $definition->{SUBS}{$sub}{EXAMPLE})
+				: sprintf("=head2 %s\n\n%s", $sub, $spod);
 		}
 	}
 
@@ -326,21 +338,24 @@ sub _build_pod {
 
 	my $lcname = lc($class);
 	(my $safename = $class) =~ s/\:\:/-/g;
-	$CLASS{EMAIL} =~ s/\@/ at /; 
+	$CLASS{EMAIL} =~ s/\@/ at / if $CLASS{EMAIL};
 	my %params = (
 		lcname => $lcname,
 		safename => $safename,
 		name => $class,
-		abstract => $definition->{ABSTRACT} || sprintf('The great new %s!', $class),
+		abstract => ($definition->{ABSTRACT} ? $definition->{ABSTRACT} : sprintf('The great new %s!', $class)),
 		version => $definition->{VERSION} || '0.01',
 		subs => join("\n\n", @subs),
-		synopsis => $definition->{SYNOPSIS} || sprintf("\n\tuse %s;\n\n\tmy \$foo = %s->new();\n\n\t...", $class, $class),
+		synopsis => ($definition->{SYNOPSIS}
+			? $definition->{SYNOPSIS}
+			: sprintf("\n\tuse %s;\n\n\tmy \$foo = %s->new();\n\n\t...", $class, $class)
+		),
 		author => $CLASS{AUTHOR} || "AUTHOR",
 		email => $CLASS{EMAIL} || "EMAIL"
 	);
 
 	my $reg = join "|", keys %params;
-	
+
 	$content =~ s/\{\{($reg)\}\}/$params{$1}/g;
 
 	return $content;
@@ -359,10 +374,10 @@ sub _perl_tidy {
 		source      => \$source,
 		destination => \$dest_string,
 		stderr      => \$stderr_string,
-		errorfile   => \$errorfile_string,   
+		errorfile   => \$errorfile_string,
 	);
 
-	if ($error) {
+	if ($stderr_string) {
 		# serious error in input parameters, no tidied output
 		print "<<STDERR>>\n$stderr_string\n";
 		die "Exiting because of serious errors\n";
@@ -450,7 +465,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.12
+Version 0.16
 
 =cut
 
@@ -551,7 +566,7 @@ The version number of the distribution/module.
 =head2 class
 
 Start a new class/package/module..
-	
+
 	my $class = Module::Generate->class('Planes');
 
 =cut
@@ -580,7 +595,7 @@ Declare modules that should be included in the class.
 
 =head2 base
 
-Establish an ISA relationship with base classes at compile time. 
+Establish an ISA relationship with base classes at compile time.
 
 Unless you are using the fields pragma, consider this discouraged in favor of the lighter-weight parent.
 
@@ -590,7 +605,7 @@ Unless you are using the fields pragma, consider this discouraged in favor of th
 
 =head2 paarent
 
-Establish an ISA relationship with base classes at compile time. 
+Establish an ISA relationship with base classes at compile time.
 
 	$class->parent(qw/Foo Bar/);
 
@@ -672,7 +687,7 @@ equivalent to:
 
 	sub new {
 		my ($cls, %args) = (shift, scalar @_ == 1 ? %{$_[0]} : @_);
-		bless \%args, $cls;	
+		bless \%args, $cls;
 	}
 
 optionally you can pass your own sub routine.
@@ -687,7 +702,7 @@ Define a accessor.
 
 equivalent to:
 
-	sub test {	
+	sub test {
 		my ($self, $value) = @_;
 		if ($value) {
 			$self->{$sub} = $value;
@@ -698,7 +713,7 @@ equivalent to:
 =head2 sub
 
 Define a sub routine/method.
-	
+
 	my $sub = $class->sub('name');
 
 =cut
@@ -732,7 +747,7 @@ Provide a code example which will be suffixed to the pod definition.
 =head2 build
 
 Compile the code.
-	
+
 	$sub->build(%args);
 
 =cut

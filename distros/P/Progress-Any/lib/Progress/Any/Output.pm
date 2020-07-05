@@ -1,7 +1,9 @@
 package Progress::Any::Output;
 
-our $DATE = '2018-03-26'; # DATE
-our $VERSION = '0.214'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-21'; # DATE
+our $DIST = 'Progress-Any'; # DIST
+our $VERSION = '0.215'; # VERSION
 
 use 5.010001;
 use strict;
@@ -20,9 +22,17 @@ sub _set_or_add {
 
     my $opts;
     if (@_ && ref($_[0]) eq 'HASH') {
-        $opts = shift;
+        $opts = {%{shift()}}; # shallow copy
     } else {
         $opts = {};
+    }
+
+    # allow adding options via -name => val syntax, for ease in using via -M in
+    # one-liners.
+    while (1) {
+        last unless @_ && $_[0] =~ /\A-(.+)/;
+        $opts->{$1} = $_[1];
+        splice @_, 0, 2;
     }
 
     my $output = shift or die "Please specify output name";
@@ -73,7 +83,7 @@ Progress::Any::Output - Assign output to progress indicators
 
 =head1 VERSION
 
-This document describes version 0.214 of Progress::Any::Output (from Perl distribution Progress-Any), released on 2018-03-26.
+This document describes version 0.215 of Progress::Any::Output (from Perl distribution Progress-Any), released on 2020-06-21.
 
 =head1 SYNOPSIS
 
@@ -96,6 +106,10 @@ or:
  use Progress::Any::Output 'TermProgressBarColor', width=>50, ...;
 
 To assign output to a certain (sub)task:
+
+ use Progress::Any::Output -task => "main.download", 'TermMessage';
+
+or:
 
  use Progress::Any::Output;
  Progress::Any::Output->set({task=>'main.download'}, 'TermMessage');
@@ -149,7 +163,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

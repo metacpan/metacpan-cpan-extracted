@@ -1,10 +1,8 @@
 use strict;
 use warnings;
 
-use lib 'lib';
-
 package File::Util::Exception;
-$File::Util::Exception::VERSION = '4.161950';
+$File::Util::Exception::VERSION = '4.201720';
 # ABSTRACT: Base exception class for File::Util
 
 use File::Util::Definitions qw( :all );
@@ -202,7 +200,7 @@ File::Util::Exception - Base exception class for File::Util
 
 =head1 VERSION
 
-version 4.161950
+version 4.201720
 
 =head1 DESCRIPTION
 

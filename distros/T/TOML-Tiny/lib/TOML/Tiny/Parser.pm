@@ -1,6 +1,6 @@
 package TOML::Tiny::Parser;
 # ABSTRACT: parser used by TOML::Tiny
-$TOML::Tiny::Parser::VERSION = '0.07';
+$TOML::Tiny::Parser::VERSION = '0.08';
 use strict;
 use warnings;
 no warnings qw(experimental);
@@ -339,7 +339,7 @@ TOML::Tiny::Parser - parser used by TOML::Tiny
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 AUTHOR
 

@@ -48,7 +48,7 @@
          "web" : "https://github.com/perlancar/perl-BorderStyle"
       }
    },
-   "version" : "2.0.2",
+   "version" : "2.0.3",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

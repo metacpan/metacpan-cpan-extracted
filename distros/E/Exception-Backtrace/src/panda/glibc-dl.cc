@@ -1,8 +1,10 @@
+#if !defined(__APPLE__) && !defined(_WIN32)
+
 #include <link.h>
 #include <limits.h>     // PATH_MAX
 #include <unistd.h>
 #include <sys/stat.h>
-#include "glibc-dl.h"
+#include "dl.h"
 
 
 namespace panda { namespace backtrace {
@@ -31,7 +33,7 @@ int dl_iterate(struct dl_phdr_info *info, size_t, void* data){
             //printf("\t\t header %2d: address=%10p .. %10p [%s at %10p]\n", j, (void *) start, (void*) end, info->dlpi_name, info->dlpi_addr);
         }
         auto begin = static_cast<std::uint64_t>(info->dlpi_addr);
-        container->emplace_back(SharedObjectInfo{begin, static_cast<std::uint64_t>(end), name});
+        container->emplace_back(SharedObjectInfo{begin, static_cast<std::uint64_t>(end), false, name});
     }
 
     return 0;
@@ -43,3 +45,5 @@ void gather_info(SharedObjectMap& map) {
 }
 
 }}
+
+#endif

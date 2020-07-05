@@ -70,6 +70,7 @@ Ibaev
 Image
 Internal
 Jason
+Jonas
 LineBreak
 MARKDENT
 Manual
@@ -93,6 +94,7 @@ SHAs
 Shlomi
 Shubina
 Simple
+Smedegaard
 SpanParser
 Speer
 Standard
@@ -127,6 +129,7 @@ blockquotes
 colspan
 dionys
 doctype
+dr
 drolsky
 escapeable
 esque
