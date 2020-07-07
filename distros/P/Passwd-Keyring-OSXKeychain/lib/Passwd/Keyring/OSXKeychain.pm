@@ -19,11 +19,11 @@ Passwd::Keyring::OSXKeychain - Password storage implementation based on OSX/Keyc
 
 =head1 VERSION
 
-Version 0.3002
+Version 0.4000
 
 =cut
 
-our $VERSION = '0.3002';
+our $VERSION = '0.4000';
 
 =head1 WARNING
 
@@ -257,7 +257,7 @@ Marcin Kasperski
 =head1 BUGS
 
 Please report any bugs or feature requests to
-issue tracker at L<https://bitbucket.org/Mekk/perl-keyring-osxkeychain>.
+issue tracker at L<https://helixteamhub.cloud/mekk/projects/perl/issues>.
 
 =head1 SUPPORT
 
@@ -271,7 +271,7 @@ L<http://search.cpan.org/~mekk/Passwd-Keyring-OSXKeychain/>
 
 Source code is tracked at:
 
-L<https://bitbucket.org/Mekk/perl-keyring-osxkeychain>
+L<https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-osxkeychain>
 
 =head1 LICENSE AND COPYRIGHT
 

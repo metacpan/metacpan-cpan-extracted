@@ -10,7 +10,7 @@ use Moose::Role;
 no warnings 'experimental';
 use List::Util qw( min max );
 use Vote::Count::RankCount;
-use TextTableTiny 'generate_markdown_table';
+use Vote::Count::TextTableTiny 'generate_markdown_table';
 
 use Math::BigRat try => 'GMP';
 use Storable 'dclone';
@@ -18,13 +18,13 @@ use Data::Printer;
 
 # ABSTRACT: TopCount and related methods for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='1.03';
+our $VERSION='1.05';
 
 =head1 NAME
 
 Vote::Count::TopCount
 
-=head1 VERSION 1.03
+=head1 VERSION 1.05
 
 =head1 Synopsis
 

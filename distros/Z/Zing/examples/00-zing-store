@@ -20,8 +20,8 @@ my $s = Zing::Store->new(name => 'system');
 warn 'repo send to state', ' ', $s->send('state', {created => time});
 warn 'repo recv from state', ' ', $s->recv('state')->{created};
 warn 'repo state term', ' ', $s->term('state');
-warn 'repo actions push', ' ', $s->push('actions', {created => time});
-warn 'repo actions pull', ' ', $s->pull('actions')->{created};
+warn 'repo actions push', ' ', $s->rpush('actions', {created => time});
+warn 'repo actions pull', ' ', $s->lpull('actions')->{created};
 warn 'repo actions size', ' ', $s->size('actions');
 
 $s->drop('state');

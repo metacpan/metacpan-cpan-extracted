@@ -12,7 +12,9 @@ dist.ini
 lib/MySQL/Workbench/Parser.pm
 lib/MySQL/Workbench/Parser/Column.pm
 lib/MySQL/Workbench/Parser/Index.pm
+lib/MySQL/Workbench/Parser/MySQLParser.pm
 lib/MySQL/Workbench/Parser/Table.pm
+lib/MySQL/Workbench/Parser/View.pm
 t/01_base.t
 t/02_datetime.t
 t/03_index.t
@@ -23,6 +25,7 @@ t/07_helper.t
 t/08_croaks.t
 t/09_datatypes.t
 t/10_flags.t
+t/11_view.t
 t/actions.mwb
 t/author-pod-coverage.t
 t/author-pod-syntax.t
@@ -34,3 +37,5 @@ t/flags.mwb.bak
 t/index.mwb
 t/lint.mwb
 t/test.mwb
+t/view.mwb
+t/view.mwb.bak

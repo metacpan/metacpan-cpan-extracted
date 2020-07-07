@@ -4,7 +4,9 @@ use strict;
 use warnings;
 use Test::More;
 
-if($ENV{GNOME_KEYRING_CONTROL}) {
+if($ENV{DESKTOP_SESSION}
+   || $ENV{DBUS_SESSION_BUS_ADDRESS}
+   || $ENV{GNOME_KEYRING_CONTROL}) {
     plan tests => 11;
 } else {
     plan skip_all => "Keyring not available (not running under Gnome?), skipping tests";

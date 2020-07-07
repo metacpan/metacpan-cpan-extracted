@@ -4,7 +4,7 @@ use v5.10.1;
 use Test::Nginx::Socket::Lua -Base;
 use Test::Nginx::Util qw( $ServerPort $ServerAddr );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 sub get_best_long_bracket_level ($);
 sub quote_as_lua_str ($);
@@ -102,13 +102,18 @@ _EOC_
                     end
 _EOC_
         } else {
-            $new_http_server_config .= <<_EOC_;
+            if (defined $block->gen_dgram_request) {
+                $new_http_server_config .= $block->gen_dgram_request;
+
+            } else {
+                $new_http_server_config .= <<_EOC_;
                     local bytes, err = sock:send('trigger dgram req')
                     if not bytes then
                         ngx.say("send stream request error: ", err)
                         return
                     end
 _EOC_
+            }
         }
 
         if (defined $block->abort) {

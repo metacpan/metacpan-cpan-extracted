@@ -1,6 +1,14 @@
 Change history for MySQL::Workbench::Parser
 ===========================================
 
+1.10 2020-07-06 21:34:00
+
+  * add attribute 'tables' to new View class
+
+1.09 2020-07-06 17:21:00
+
+  * add feature to parse views defined in the workbench file
+
 1.08 2019-01-16 07:35:00
 
   * store detailed information about datatype of a column in the column object

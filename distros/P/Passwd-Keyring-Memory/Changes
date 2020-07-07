@@ -1,5 +1,8 @@
 Revision history for Keyring-MemoryOnly
 
+1.0000	2020-07-05
+        Switching hosting to helix as bitbucket is shut down.
+
 0.2405	2015-01-06
 	Adding kwalitee tests
 

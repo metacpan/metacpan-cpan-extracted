@@ -1,204 +1,249 @@
 Revision history for Perl extension Text::Starfish.
 
-0.01  12 Dec 2002
-	- original version; created by h2xs 1.21 with options
-		-X -n Text::Starfish
+1.35 7 Jul 2020 Tue 08:24:21 ADT
+ - documentation improvements
+ - fixing bug with test 20-simple_html: removing call to "comment"
+   since CGI module is not available by default
 
-0.05  29 Mar 2005
-	- removed <? ... ?> from html
-	- add .html.sfish to html extensions
-	- removed some bugs in testing
-	- function read_records added
-	- changing die to croak
-	- read_record, line continuation changed: \ \n leaves \n
-	  embedded in string, \n[ \t] is removed from string
-	- minor modifications (allow no \n at the end for read_record)
-	- consider wantarray in read_records
-	- minor bugs
-	- read_starfish_conf executes each starfish.conf in the
-	  appropriate directory
-	- documentation improvement
+1.34 6 Jul 2020 Mon 13:36:52 ADT
+ - documentation improvements
+ - fixed problem with test 20-simple (unnecessary use of CGI.pm)
 
-1.01  3 May 2005
-	- introduced comments within records in read_records
-	- bug fixing regarding testing method
-	- added rmHook function
-	- introduced special 'default' to addHook
-	- fixing tests
-	- removed addHookComment and addHookUnComment, 'ignore'
-	  in addHook should be used instead
-	- requiring suffix in addition to prefix in scan,
-	- allowing '' prefix and suffix
+1.33 6 Jul 2020
+ - fixing bug with :prototype attribute, I guess it fails on earlier
+   versions of Perl; removing it:
+   Changing back echo :prototype (@) to echo(@)
 
-1.02  4 May 2005
-	- addHook updated to consider REPLACE option
+1.32 5 Jul 2020
+ - documentation improvements
+ - testing improvements: test case renaming:
+ - testfiles/07-html-cgi.html.sfish  was: 02.html.sfish
+ - testfiles/07-html-cgi_html.out    was: 02_html.out
+ - testfiles/08-tex		     was: 03
+ - testfiles/09-text		     was: 05
+ - testfiles/10-tex		     was: 06
+ - testfiles/11-make		     was: 07
+ - testfiles/12-make		     was: 08
+ - testfiles/13-html		     was: 09
+ - testfiles/14-text		     was: 02
+ - testfiles/15-text                 was: 3
+ - testfiles/16-rmHook               was: 4
+ - testfiles/17-A_java - a more complex Java test
+ - testfiles/18-p_t_java             was: 17
+ - testfiles/19-p_t_java             was: 18
+ - testing improvements, and addition of new tests
+ - removing variable $Revision
+ - started work on separate treatment of output delimiters:
+   * to define as a new style variable OutDelimiters, and
+   * to introduce number, e.g., //1+ .. //1- if the output
+     contains //+ string, or similarly //2+ etc.
+ - Changing opening output delimiter "\n#+\n" to "#+\n" and similarly to
+   other styles.  This is a significant change that may break some existing
+   programs. It is an ongoing process for the other styles.
+ - Changes in html style: numbering in delimiters, removal of newline
+ - Changes in makefile style: numbering of delimiters, removal of a newline
+ - Changes in python style: numbering of delimiters, removal of a newline
+ - Changing prototype echo($@) to echo(@)
 
-1.03  25 Feb 2006
-	- started support for Python
-	- allow begin and end to be regexes, using _index
-	- better code snippet error reporting (line numbers)
-	- introduced last_update
-	- added function rmAllHooks
-	- improved scanning to support lookback in prefix
-	  specification
-	- added code as $f argument in the addHook method
+1.31 13 Jun 2020
+ - documentation improvements
+ - new simple testcases in Java: 02, 03, 04, 05
+ - change in Java escape suffix to reduce empty line
+ - adding //<? Java prefix hook
+ - test output improvement, moving test case 01->06-addHook
 
-1.04  18 May 2007
-	- documentation improvement
-	- makefile style improved to include indentation, similarly
-	  to Python; improved Python indentation in the case of
-	  one-line embedded code.
-	- Python style improvements
-	- finally intorduced proper regex hooks, should replace begin
-	  and end
-	- the method name Text::Starfish->run changed to process_files
-	- added starfishfile function; simplifies starfish script and
- 	  makes Perl-inline use of starfish easier
-	- intoduced function digest, which operates on text units,
-	  which are normally files
-	- OUTFILE internal vs external check
-	- added include function
+1.30 24 Apr 2020
+ - documentation improvements
+ - README first line generation made better using a final routine
+ - make $Star available in the final routines
+ - adapted test 35 to test for $Star
+ - added to be used for make: make_add_dirs_to_generate_if_needed,
+   make_gen_dirs_to_generate, and @DirGenerateIfNeeded
+ - revised read_records function
 
-1.05  28 May 2007
-	- minor bug (read_records not visible)
-	- changed name starfishfiles to starfish_cmd
-	- fixing warnings (-w), and possible bugs
-	- added getinclude and changed include to more php-like
+1.29 14 Sep 2019
+ - documentation improvements
+ - fixed test 35 (missing test file)
 
-1.06  28 May 2007
-        - fixed additional warning with Exporter (getcwd clash)
+1.28 14 Sep 2019
+ - documentation improvements
+ - replaced `pwd` with getcwd() in testing to avoid errors in different
+   operating systems (Windows)
 
-1.07  17 Jul 2007
-	- debugging and major overhaul of test.pl for Windows by
-	  Charles Ikeson
-	- enforcing left-most, shortest match
-	- debuging of Makefile and Python styles
+1.27 14 Sep 2019
+ - documentation improvements
+ - changed final routine into an array of routines
+ - intoduce method add_final to add a final routine
 
-1.08  19 Jul 2007
-	- new accepts options, -infile=* is one of them
-	- new calls setStyle
-	- loadinclude introduced
-	- option -copyhooks introduced into new, loadinclude, getinclude
-	- report.pdf added to the distribution
-	- changes to documentation
+1.26 13 Sep 2019
+ - documentation improvements
+ - .sf extension added as equivalent to .html.sfish with emphasis to be
+   used for cgi/php style
+ - added <?sf ... !> hook to sf style
+ - added $Starf->{Final} routine
 
-1.09  19 Jul 2007
-	- debugging
+1.25 15 Apr 2019
+ - documentation improvements
 
-1.10  19 Sep 2007
-	- introduced HTML templating style, .html.sfish
-	- documentation improvement
-	- debugging (minor, makefile style)
-	- debugging: a serious memory leak in scanning
+1.24 4 Feb 2017
+ - fixed a bug in scan - added sfish_ignore_outer feature
 
-1.11  5 Jan 2010
-	- added a hook to tex mode to handle %<? .. !> in replace mode
-	- added a hook in TeX mode to include <? .. !>
-	- documentation updates
+1.23 4 Feb 2017
+ - documentation improvements
+ - fixed some test cases (ok 19) permission check
+ - improved testing framework
+ - fixed test case (ok 20) randomized hash keys
+ - (ok 21) (ok 27) (ok 28) all test cases fixed.
+ - added tests 33 and 34 for new feature
+ - added sfish_add_tag feature
 
-1.12  18 Jan 2010
-	- added 'echo' evaluation
-	- improvement (filename not necessarily first in loadinclude)
-	- add_hook introduced to replace addHook; including hook type
-	- debugging: makefile and python style
-	- removing `our' to fix testing problems
+1.22 16 May 2016
+ - documentation improvements
+ - fixed test case 02 (ok 3) if module CGI is not available
 
-1.13  20 Jan 2010
-	- fixing testing problems: perl should be invoked with $^X
+1.21 13 May 2016
+ - documentation improvements
 
-1.14  20 Jan 2010
-	- fixing another testing problem
+1.20 12 May 2016
+ - fixed test case 01 (ok 2) if module CGI is not available
 
-1.15  21 Jan 2011 07:50:10
-	- documentation improvements
-	- new function: current_year
-	- code improvements
+1.19 11 May 2016
+ - documentation improvements and updates
+ - removed extra \n in makefile style, just before #- It should be
+   implemented in other styles too.
+ - fixed a bug in Python and makefile modes
+ - corrected test case 07
+ - added testcase 30 ("ok 16")
 
-1.16  21 Jan 2011 08:17:05
-	- documentation improvements
+1.18 13 May 2015
+ - iteration with replacement is performed on original input until the
+   final run
+ - documentation updates
+ - updates related to Perl change in including modifiers in stored regular
+   expressions
 
-1.17  4 Jul 2012
-	- documentation improvements
-	- install procedure improvement
-        - introduced method: resetHooks
-	- created related module Text::Starfish::Perl
+1.17 4 Jul 2012
+ - documentation improvements
+ - install procedure improvement - introduced method: resetHooks
+ - created related module Text::Starfish::Perl
 
-1.18  13 May 2015
-	- iteration with replacement is performed on original input
-  	  until the final run
-	- documentation updates
-	- updates related to Perl change in including modifiers in
-	  stored regular expressions
+1.16 21 Jan 2011 08:17:05
+ - documentation improvements
 
-1.19  11 May 2016
-	- documentation improvements and updates
-	- removed extra \n in makefile style, just before #-
-          It should be implemented in other styles too.
-	- fixed a bug in Python and makefile modes
-	- corrected test case 07
-	- added testcase 30 ("ok 16")
+1.15 21 Jan 2011 07:50:10
+ - documentation improvements
+ - new function: current_year
+ - code improvements
 
-1.20  12 May 2016
-	- fixed test case 01 (ok 2) if module CGI is not available
+1.14 20 Jan 2010
+ - fixing another testing problem
 
-1.21  13 May 2016
-	- documentation improvements
+1.13 20 Jan 2010
+ - fixing testing problems: perl should be invoked with $^X
 
-1.22  16 May 2016
-	- documentation improvements
-	- fixed test case 02 (ok 3) if module CGI is not available
+1.12 18 Jan 2010
+ - added 'echo' evaluation
+ - improvement (filename not necessarily first in loadinclude)
+ - add_hook introduced to replace addHook; including hook type
+ - debugging: makefile and python style
+ - removing `our' to fix testing problems
 
-1.23  4 Feb 2017
-	- documentation improvements
-	- fixed some test cases (ok 19) permission check
-	- improved testing framework
-	- fixed test case (ok 20) randomized hash keys
-	- (ok 21) (ok 27) (ok 28) all test cases fixed.
-	- added tests 33 and 34 for new feature
-	- added sfish_add_tag feature
+1.11 5 Jan 2010
+ - added a hook to tex mode to handle %<? .. !> in replace mode
+ - added a hook in TeX mode to include <? .. !>
+ - documentation updates
 
-1.24  4 Feb 2017
-        - fixed a bug in scan
-	- added sfish_ignore_outer feature
+1.10 19 Sep 2007
+ - introduced HTML templating style, .html.sfish
+ - documentation improvement
+ - debugging (minor, makefile style)
+ - debugging: a serious memory leak in scanning
 
-1.25  15 Apr 2019
-	- documentation improvements
+1.09 19 Jul 2007
+ - debugging
 
-1.26  13 Sep 2019
-	- documentation improvements
-	- .sf extension added as equivalent to .html.sfish
-	  with emphasis to be used for cgi/php style
-	- added <?sf ... !> hook to sf style
-	- added $Starf->{Final} routine
+1.08 19 Jul 2007
+ - new accepts options, -infile=* is one of them
+ - new calls setStyle
+ - loadinclude introduced
+ - option -copyhooks introduced into new, loadinclude, getinclude
+ - report.pdf added to the distribution
+ - changes to documentation
 
-1.27  14 Sep 2019
-	- documentation improvements
-	- changed final routine into an array of routines
-	- intoduce method add_final to add a final routine
+1.07 17 Jul 2007
+ - debugging and major overhaul of test.pl for Windows by Charles Ikeson
+ - enforcing left-most, shortest match
+ - debuging of Makefile and Python styles
 
-1.28  14 Sep 2019
-	- documentation improvements
-	- replaced `pwd` with getcwd() in testing to avoid errors in
-	  different operating systems (Windows)
+1.06 28 May 2007
+ - fixed additional warning with Exporter (getcwd clash)
 
-1.29  14 Sep 2019
-	- documentation improvements
-	- fixed test 35 (missing test file)
+1.05 28 May 2007
+ - minor bug (read_records not visible)
+ - changed name starfishfiles to starfish_cmd
+ - fixing warnings (-w), and possible bugs
+ - added getinclude and changed include to more php-like
 
-1.30  24 Apr 2020
-	- documentation improvements
-	- README first line generation made better using a final
-	  routine
-	- make $Star available in the final routines
-	- adapted test 35 to test for $Star
-	- added to be used for make:
-	  make_add_dirs_to_generate_if_needed,
-	  make_gen_dirs_to_generate, and @DirGenerateIfNeeded
-	- revised read_records function
+1.04 18 May 2007
+ - documentation improvement
+ - makefile style improved to include indentation, similarly to Python;
+   improved Python indentation in the case of one-line embedded code.
+ - Python style improvements
+ - finally intorduced proper regex hooks, should replace begin and end
+ - the method name Text::Starfish->run changed to process_files
+ - added starfishfile function; simplifies starfish script and makes
+   Perl-inline use of starfish easier
+ - intoduced function digest, which operates on text units, which are
+   normally files
+ - OUTFILE internal vs external check
+ - added include function
 
-1.31  13 Jun 2020
-	- documentation improvements
-	- new simple testcases in Java: 02, 03, 04, 05
-	- change in Java escape suffix to reduce empty line
-	- adding //<? Java prefix hook
-	- test output improvement, moving test case 01->06-addHook
+1.03 25 Feb 2006
+ - started support for Python
+ - allow begin and end to be regexes, using _index
+ - better code snippet error reporting (line numbers)
+ - introduced last_update
+ - added function rmAllHooks
+ - improved scanning to support lookback in prefix specification
+ - added code as $f argument in the addHook method
+
+1.02 4 May 2005
+ - addHook updated to consider REPLACE option
+
+1.01 3 May 2005
+ - introduced comments within records in read_records
+ - bug fixing regarding testing method
+ - added rmHook function
+ - introduced special 'default' to addHook
+ - fixing tests
+ - removed addHookComment and addHookUnComment, 'ignore' in addHook should
+   be used instead
+ - requiring suffix in addition to prefix in scan,
+ - allowing '' prefix and suffix
+
+0.05 29 Mar 2005
+ - removed <? ... ?> from html
+ - add .html.sfish to html extensions
+ - removed some bugs in testing
+ - function read_records added
+ - changing die to croak
+ - read_record, line continuation changed: \ \n leaves \n embedded in
+   string, \n[ \t] is removed from string
+ - minor modifications (allow no \n at the end for read_record)
+ - consider wantarray in read_records
+ - minor bugs
+ - read_starfish_conf executes each starfish.conf in the appropriate
+   directory
+ - documentation improvement
+
+0.01 12 Dec 2002
+ - original version; created by h2xs 1.21 with options -X -n Text::Starfish
+
+0.001 2001
+ - the project Starfish started under the name SLePerl.pl, or an
+   abbreviation for Something like ePerl.  After a search for related
+   software that could fulfill the need that I had, the closest thing was
+   the system ePerl by David Ljung Madison at
+   http://marginalhacks.com/Hacks/ePerl/, however it did not offer all the
+   features that I needed.
+ - The work on the project as an unnamed project started in 1998.

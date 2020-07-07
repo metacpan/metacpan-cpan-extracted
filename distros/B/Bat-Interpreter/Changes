@@ -1,5 +1,7 @@
+0.023 2020-07-06 20:40:00+0000
+  -Add support for CALL comand with absolute windows path
 0.022 2020-06-22 16:28:00+0000
-  -Added suport for variable interpolation on condition IF EXIST
+  -Add support for variable interpolation on condition IF EXIST
 0.021 2020-01-23 22:00:00+0000
   -Fix bug with goto :eof after previous goto :label
 0.020 2020-01-14 12:00:00+0000

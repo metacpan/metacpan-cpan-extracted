@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.11.1';
+$Git::Hooks::VERSION = '2.12.0';
 use 5.010;
 use utf8;
 use Carp;
@@ -132,7 +132,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.11.1
+version 2.12.0
 
 =head1 SYNOPSIS
 
@@ -1245,6 +1245,19 @@ after the review is stored.
 Allowed values are NONE, OWNER, OWNER_REVIEWERS, and ALL.
 
 If not set, the default is ALL.
+
+=head2 error-prefix STRING
+
+This option specifies a fixed string that will be inserted as a prefix to all
+the lines in the error messages produced by the
+L<Git::Repository::Plugin::GitHooks::fault> method.
+
+It's useful, for instance, to produce error messages for
+<Gitlab|https://docs.gitlab.com/ee/administration/server_hooks.html#custom-error-messages>
+as in:
+
+  [githooks]
+    error-prefix = "GL-HOOK-ERR: "
 
 =head2 error-header CMD
 

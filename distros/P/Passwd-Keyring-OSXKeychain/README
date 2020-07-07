@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.3002
+    Version 0.4000
 
 WARNING
 
@@ -97,7 +97,7 @@ AUTHOR
 BUGS
 
     Please report any bugs or feature requests to issue tracker at
-    https://bitbucket.org/Mekk/perl-keyring-osxkeychain.
+    https://helixteamhub.cloud/mekk/projects/perl/issues.
 
 SUPPORT
 
@@ -111,7 +111,7 @@ SUPPORT
 
     Source code is tracked at:
 
-    https://bitbucket.org/Mekk/perl-keyring-osxkeychain
+    https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-osxkeychain
 
 LICENSE AND COPYRIGHT
 

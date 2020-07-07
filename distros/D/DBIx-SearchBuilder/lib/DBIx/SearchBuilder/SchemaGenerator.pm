@@ -88,8 +88,8 @@ sub CreateTableSQLStatements {
 
 =for public_doc CreateTableSQLText
 
-Returns a string containg a sequence of SQL statements to create tables for all of
-the models added to the SchemaGenerator.
+Returns a string containing a sequence of SQL statements to create tables for
+all of the models added to the SchemaGenerator.
 
 =cut
 

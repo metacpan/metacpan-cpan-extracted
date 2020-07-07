@@ -32,7 +32,7 @@ package Rex::Commands::Partition;
 use strict;
 use warnings;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 require Rex::Exporter;
 use base qw(Rex::Exporter);
@@ -191,7 +191,7 @@ sub partition {
   # info:
   # disk size, partition start, partition end is in MB
 
-  unless ( ( defined $option{grow} ) xor( defined $option{size} ) ) {
+  unless ( ( defined $option{grow} ) xor ( defined $option{size} ) ) {
     die('You have to specify exactly one of grow or size options.');
   }
 

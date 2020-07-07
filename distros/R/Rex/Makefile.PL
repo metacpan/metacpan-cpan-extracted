@@ -8,7 +8,21 @@ use warnings;
 use 5.010001;
 use ExtUtils::MakeMaker 7.1101;
 
-die 'OS unsupported' if ( $^O eq 'MSWin32' && scalar((Win32::GetOSVersion())[1]) < 6 );
+if ( $^O eq 'MSWin32' ) {
+  my ( undef, $major, $minor ) = Win32::GetOSVersion();
+
+  if ( $major < 6 ) {
+    die 'OS unsupported';
+  }
+  elsif ( $major == 6 && $minor < 2 ) {
+    die 'OS unsupported';
+  }
+}
+
+use File::ShareDir::Install;
+$File::ShareDir::Install::INCLUDE_DOTFILES = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+install_share dist => "share";
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "the friendly automation framework",
@@ -17,7 +31,8 @@ my %WriteMakefileArgs = (
     "Test::UseAllModules" => "0.15"
   },
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "7.1101"
+    "ExtUtils::MakeMaker" => "7.1101",
+    "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Rex",
   "EXE_FILES" => [
@@ -83,15 +98,17 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Find" => 0,
     "File::Temp" => 0,
     "Parallel::ForkManager" => 0,
     "String::Escape" => 0,
     "Test::Deep" => 0,
     "Test::More" => 0,
     "Test::UseAllModules" => "0.15",
+    "autodie" => 0,
     "utf8" => 0
   },
-  "VERSION" => "1.11.0",
+  "VERSION" => "1.12.0",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/issue/*.t"
   }
@@ -109,6 +126,7 @@ my %FallbackPrereqs = (
   "Exporter" => 0,
   "Fcntl" => 0,
   "File::Basename" => 0,
+  "File::Find" => 0,
   "File::Spec" => 0,
   "File::Spec::Unix" => 0,
   "File::Spec::Win32" => 0,
@@ -149,6 +167,7 @@ my %FallbackPrereqs = (
   "XML::Simple" => 0,
   "YAML" => ">= 0, != 1.25",
   "attributes" => 0,
+  "autodie" => 0,
   "base" => 0,
   "constant" => 0,
   "lib" => 0,
@@ -180,3 +199,9 @@ if ( $^O =~ /MSWin/i ) {
 }
 
 WriteMakefile(%WriteMakefileArgs);
+
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

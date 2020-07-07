@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MySQL-Workbench-Parser",
    "prereqs" : {
@@ -34,6 +34,8 @@
             "File::Spec" : "3.40",
             "List::MoreUtils" : "0.33",
             "Moo" : "1.003001",
+            "Parse::RecDescent" : "0",
+            "SQL::Translator" : "1.61",
             "Scalar::Util" : "1.32",
             "XML::LibXML" : "2.0019",
             "YAML::Tiny" : "1.64",
@@ -51,19 +53,27 @@
    "provides" : {
       "MySQL::Workbench::Parser" : {
          "file" : "lib/MySQL/Workbench/Parser.pm",
-         "version" : "1.08"
+         "version" : "1.10"
       },
       "MySQL::Workbench::Parser::Column" : {
          "file" : "lib/MySQL/Workbench/Parser/Column.pm",
-         "version" : "1.08"
+         "version" : "1.10"
       },
       "MySQL::Workbench::Parser::Index" : {
          "file" : "lib/MySQL/Workbench/Parser/Index.pm",
-         "version" : "1.08"
+         "version" : "1.10"
+      },
+      "MySQL::Workbench::Parser::MySQLParser" : {
+         "file" : "lib/MySQL/Workbench/Parser/MySQLParser.pm",
+         "version" : "1.10"
       },
       "MySQL::Workbench::Parser::Table" : {
          "file" : "lib/MySQL/Workbench/Parser/Table.pm",
-         "version" : "1.08"
+         "version" : "1.10"
+      },
+      "MySQL::Workbench::Parser::View" : {
+         "file" : "lib/MySQL/Workbench/Parser/View.pm",
+         "version" : "1.10"
       }
    },
    "release_status" : "stable",
@@ -78,7 +88,7 @@
          "web" : "http://github.com/reneeb/MySQL-Workbench-Parser"
       }
    },
-   "version" : "1.08",
+   "version" : "1.10",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
@@ -86,6 +96,6 @@
       "reneeb <info@perl-services.de>",
       "Renee <reb@perl-services.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

@@ -52,6 +52,6 @@
          "web" : "https://github.com/plenigo/plenigo_perl_sdk"
       }
    },
-   "version" : "3.0001",
+   "version" : "3.0002",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

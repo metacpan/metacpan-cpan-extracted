@@ -11,5 +11,7 @@ dist.ini
 lib/Types/Algebraic.pm
 t/00-load.t
 t/author-pod-syntax.t
+t/default.t
 t/maybe.t
+t/pattern-order.t
 t/tree.t

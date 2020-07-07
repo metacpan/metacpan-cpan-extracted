@@ -10,7 +10,7 @@ use strict;
 use warnings;
 use Rex::Commands;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 sub new {
   my $that  = shift;

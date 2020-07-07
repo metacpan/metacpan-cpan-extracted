@@ -26,8 +26,8 @@ my $actions = $r->term('actions');
 warn 'repo send to state', ' ', $r->store->send($state, {created => time});
 warn 'repo recv from state', ' ', $r->store->recv($state)->{created};
 warn 'repo state term', ' ', $state;
-warn 'repo actions push', ' ', $r->store->push($actions, {created => time});
-warn 'repo actions pull', ' ', $r->store->pull($actions)->{created};
+warn 'repo actions push', ' ', $r->store->rpush($actions, {created => time});
+warn 'repo actions pull', ' ', $r->store->lpull($actions)->{created};
 warn 'repo actions size', ' ', $r->store->size($actions);
 warn 'repo actions term', ' ', $actions;
 

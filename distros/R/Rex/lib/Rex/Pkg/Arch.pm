@@ -9,7 +9,7 @@ package Rex::Pkg::Arch;
 use strict;
 use warnings;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 use Rex::Helper::Run;
 use Rex::Commands::File;
@@ -27,7 +27,7 @@ sub new {
 
   if ( Rex::has_feature_version('1.5') ) {
     $self->{commands} = {
-      install => 'pacman --noprogressbar --noconfirm --needed -S %s',
+      install         => 'pacman --noprogressbar --noconfirm --needed -S %s',
       install_version => 'pacman --noprogressbar --noconfirm --needed -S %s', # makes no sense to specify the package version
       update_system   => 'pacman --noprogressbar --noconfirm -Su',
       dist_update_system => 'pacman --noprogressbar --noconfirm -Su',
@@ -37,7 +37,7 @@ sub new {
   }
   else {
     $self->{commands} = {
-      install => 'pacman --noprogressbar --noconfirm --needed -S %s',
+      install         => 'pacman --noprogressbar --noconfirm --needed -S %s',
       install_version => 'pacman --noprogressbar --noconfirm --needed -S %s', # makes no sense to specify the package version
       update_system   => 'pacman --noprogressbar --noconfirm -Syu',
       dist_update_system => 'pacman --noprogressbar --noconfirm -Syu',

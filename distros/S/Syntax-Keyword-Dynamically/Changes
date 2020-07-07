@@ -1,5 +1,12 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.05    2020-07-06
+        [CHANGES]
+         * Added explicit use VERSION declarations to every perl file
+
+        [BUGFIXES]
+         * Fixes to keep perl built with -DDEBUGGING happy
+
 0.04    2020-02-25 18:00:37
         [BUGFIXES]
          * Support various operators assigning into pad lexicals which the

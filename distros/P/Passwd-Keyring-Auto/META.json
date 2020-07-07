@@ -4,7 +4,7 @@
       "Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "passwords",
       "security",
@@ -16,7 +16,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Passwd-Keyring-Auto",
    "prereqs" : {
@@ -59,7 +59,7 @@
    "provides" : {
       "Passwd::Keyring::Auto" : {
          "file" : "lib/Passwd/Keyring/Auto.pm",
-         "version" : "0.7201"
+         "version" : "1.0000"
       },
       "Passwd::Keyring::Auto::App" : {
          "file" : "lib/Passwd/Keyring/Auto/App.pm"
@@ -92,15 +92,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bitbucket.org/Mekk/perl-keyring-auto/issues"
+         "web" : "https://helixteamhub.cloud/mekk/projects/perl/issues"
       },
-      "homepage" : "http://bitbucket.org/Mekk/perl-keyring-auto",
+      "homepage" : "https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://bitbucket.org/Mekk/perl-keyring-auto"
+         "url" : "https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto"
       }
    },
-   "version" : "0.7201"
+   "version" : "1.0000",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

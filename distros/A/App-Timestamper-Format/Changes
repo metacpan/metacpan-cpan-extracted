@@ -1,5 +1,12 @@
 Revision history for App-Timestamper-Format
 
+0.2.0      2020-07-07
+    - dzil cleanups.
+    - Fix "=head1 NAME" in bin/ts-format
+        - https://github.com/metacpan/metacpan-web/issues/2347
+        - Thanks to @oalders.
+    - Other documentation cleanups.
+
 0.0.2      2017-02-10
     - Add t/test-filter.t .
     - Add TidyAll tests.

@@ -4,7 +4,7 @@
       "Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "keyring",
       "passwords"
@@ -14,13 +14,14 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Passwd-Keyring-Memory",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Pod::Readme" : "0",
+            "Pod::Markdown" : "2.0",
+            "Pod::Readme" : "1.001002",
             "Test::More" : "0"
          }
       },
@@ -38,21 +39,22 @@
    "provides" : {
       "Passwd::Keyring::Memory" : {
          "file" : "lib/Passwd/Keyring/Memory.pm",
-         "version" : "0.2405"
+         "version" : "1.0000"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bitbucket.org/Mekk/perl-keyring-memory/issues"
+         "web" : "https://helixteamhub.cloud/mekk/projects/perl/issues"
       },
-      "homepage" : "http://bitbucket.org/Mekk/perl-keyring-memory",
+      "homepage" : "https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-memory",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://bitbucket.org/Mekk/perl-keyring-memory"
+         "url" : "https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-memory"
       }
    },
-   "version" : "0.2405"
+   "version" : "1.0000",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

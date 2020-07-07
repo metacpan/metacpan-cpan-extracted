@@ -35,7 +35,7 @@ sub new {
   my @ccflags_include_dirs = $self->_remove_include_dirs_from_ccflags;
   
   # Add ccflags include dir
-  $self->add_include_dirs(@ccflags_include_dirs);
+  $self->unshift_include_dirs(@ccflags_include_dirs);
   
   # SPVM::Builder::Config directory
   my $spvm_builder_config_dir = $INC{"SPVM/Builder/Config.pm"};
@@ -47,11 +47,14 @@ sub new {
   # Add SPVM include directory to ccflags
   my $spvm_include_dir = $spvm_builder_dir;
   $spvm_include_dir .= '/include';
-  $self->add_include_dirs($spvm_include_dir);
+  $self->unshift_include_dirs($spvm_include_dir);
 
   # Remove and get lib dir from lddlflags
   my @lib_dirs_in_lddlflags = $self->_remove_lib_dirs_from_lddlflags;
-  $self->add_lib_dirs(@lib_dirs_in_lddlflags);
+  $self->unshift_lib_dirs(@lib_dirs_in_lddlflags);
+
+  # Optimize
+  $self->set_optimize('-O3');
 
   return $self;
 }
@@ -64,9 +67,6 @@ sub new_c99 {
   # C99
   $self->set_std('c99');
   
-  # Optimize
-  $self->set_optimize('-O3');
-  
   # NativeAPI
   $self->set_ext('c');
   
@@ -78,9 +78,6 @@ sub new_cpp {
   
   my $self = SPVM::Builder::Config->new;
   
-  # Optimize
-  $self->set_optimize('-O3');
-  
   # CC
   $self->set_cc('g++');
   
@@ -91,66 +88,6 @@ sub new_cpp {
   $self->set_ext('cpp');
   
   return $self;
-}
-
-sub get_include_dirs {
-  my ($self, $include_dirs) = @_;
-  
-  return $self->{include_dirs};
-}
-
-sub set_include_dirs {
-  my ($self, $include_dirs) = @_;
-  
-  $self->{include_dirs} = $include_dirs;
-  
-  return $self;
-}
-
-sub add_include_dirs {
-  my ($self, @include_dirs) = @_;
-  
-  unshift @{$self->{include_dirs}}, @include_dirs;
-}
-
-sub get_lib_dirs {
-  my ($self, $lib_dirs) = @_;
-  
-  return $self->{lib_dirs};
-}
-
-sub set_lib_dirs {
-  my ($self, $lib_dirs) = @_;
-  
-  $self->{lib_dirs} = $lib_dirs;
-  
-  return $self;
-}
-
-sub add_lib_dirs {
-  my ($self, @lib_dirs) = @_;
-  
-  unshift @{$self->{lib_dirs}}, @lib_dirs;
-}
-
-sub get_libs {
-  my ($self, $libs) = @_;
-  
-  return $self->{libs};
-}
-
-sub set_libs {
-  my ($self, $libs) = @_;
-  
-  $self->{libs} = $libs;
-  
-  return $self;
-}
-
-sub use_lib {
-  my ($self, @libs) = @_;
-  
-  unshift @{$self->{libs}}, @libs;
 }
 
 sub get_ext {
@@ -181,84 +118,6 @@ sub set_quiet {
   return $self;
 }
 
-sub set_extra_compiler_flags {
-  my ($self, $extra_compiler_flags) = @_;
-  
-  $self->{extra_compiler_flags} = $extra_compiler_flags;
-  
-  return $self;
-}
-
-sub get_extra_compiler_flags {
-  my $self = shift;
-  
-  return $self->{extra_compiler_flags};
-}
-
-sub add_extra_compiler_flags {
-  my ($self, $new_extra_compiler_flags) = @_;
-  
-  my $extra_compiler_flags = $self->{extra_compiler_flags};
-  $extra_compiler_flags = '' unless defined $extra_compiler_flags;
-  
-  $extra_compiler_flags .= " $new_extra_compiler_flags";
-  
-  $self->{extra_compiler_flags} = $extra_compiler_flags;
-}
-
-sub set_extra_linker_flags {
-  my ($self, $extra_linker_flags) = @_;
-  
-  $self->{extra_linker_flags} = $extra_linker_flags;
-  
-  return $self;
-}
-
-sub get_extra_linker_flags {
-  my $self = shift;
-  
-  return $self->{extra_linker_flags};
-}
-
-sub add_extra_linker_flags {
-  my ($self, $new_extra_linker_flags) = @_;
-  
-  my $extra_linker_flags = $self->{extra_linker_flags};
-  $extra_linker_flags = '' unless defined $extra_linker_flags;
-  
-  $extra_linker_flags .= " $new_extra_linker_flags";
-  
-  $self->{extra_linker_flags} = $extra_linker_flags;
-}
-
-sub get_force_compile {
-  my ($self, $force_compile) = @_;
-  
-  return $self->{force_compile};
-}
-
-sub set_force_compile {
-  my ($self, $force_compile) = @_;
-  
-  $self->{force_compile} = $force_compile;
-  
-  return $self;
-}
-
-sub replace_all_config {
-  my ($self, $config) = @_;
-  
-  $self->{config} = $config;
-}
-
-sub to_hash {
-  my $self = shift;
-  
-  my $hash_config = {%{$self->{config}}};
-  
-  return $hash_config;
-}
-
 sub get_config {
   my ($self, $name) = @_;
   
@@ -273,12 +132,16 @@ sub set_config {
   return $self;
 }
 
-sub set_ccflags {
-  my ($self, $ccflags) = @_;
+sub get_cc {
+  my ($self, $cc) = @_;
   
-  $self->set_config(ccflags => $ccflags);
+  return $self->get_config('cc');
+}
+
+sub set_cc {
+  my ($self, $cc) = @_;
   
-  return $self;
+  return $self->set_config(cc => $cc);
 }
 
 sub get_ccflags {
@@ -287,7 +150,15 @@ sub get_ccflags {
   return $self->get_config('ccflags');
 }
 
-sub add_ccflags {
+sub set_ccflags {
+  my ($self, $ccflags) = @_;
+  
+  $self->set_config(ccflags => $ccflags);
+  
+  return $self;
+}
+
+sub append_ccflags {
   my ($self, $new_ccflags) = @_;
   
   my $ccflags = $self->get_config('ccflags');
@@ -297,6 +168,144 @@ sub add_ccflags {
   $self->set_config('ccflags' => $ccflags);
   
   return $self;
+}
+
+sub prepend_ccflags {
+  my ($self, $new_ccflags) = @_;
+  
+  my $ccflags = $self->get_config('ccflags');
+  
+  $ccflags = "$new_ccflags $ccflags";
+  
+  $self->set_config('ccflags' => $ccflags);
+  
+  return $self;
+}
+
+sub get_cccdlflags {
+  my $self = shift;
+  
+  return $self->get_config('cccdlflags');
+}
+
+sub set_cccdlflags {
+  my ($self, $cccdlflags) = @_;
+  
+  $self->set_config(cccdlflags => $cccdlflags);
+  
+  return $self;
+}
+
+sub append_cccdlflags {
+  my ($self, $new_cccdlflags) = @_;
+  
+  my $cccdlflags = $self->get_config('cccdlflags');
+  
+  $cccdlflags .= " $new_cccdlflags";
+  
+  $self->set_config('cccdlflags' => $cccdlflags);
+  
+  return $self;
+}
+
+sub prepend_cccdlflags {
+  my ($self, $new_cccdlflags) = @_;
+  
+  my $cccdlflags = $self->get_config('cccdlflags');
+  
+  $cccdlflags = "$new_cccdlflags $cccdlflags";
+  
+  $self->set_config('cccdlflags' => $cccdlflags);
+  
+  return $self;
+}
+
+sub get_archlibexp {
+  my $self = shift;
+  
+  return $self->get_config('archlibexp');
+}
+
+sub set_archlibexp {
+  my ($self, $archlibexp) = @_;
+  
+  $self->set_config(archlibexp => $archlibexp);
+  
+  return $self;
+}
+
+sub get_optimize {
+  my ($self, $optimize) = @_;
+  
+  return $self->get_config('optimize');
+}
+
+sub set_optimize {
+  my ($self, $optimize) = @_;
+  
+  return $self->set_config(optimize => $optimize);
+}
+
+sub get_extra_compiler_flags {
+  my $self = shift;
+  
+  return $self->{extra_compiler_flags};
+}
+
+sub set_extra_compiler_flags {
+  my ($self, $extra_compiler_flags) = @_;
+  
+  $self->{extra_compiler_flags} = $extra_compiler_flags;
+  
+  return $self;
+}
+
+sub append_extra_compiler_flags {
+  my ($self, $new_extra_compiler_flags) = @_;
+  
+  my $extra_compiler_flags = $self->{extra_compiler_flags};
+  $extra_compiler_flags = '' unless defined $extra_compiler_flags;
+  
+  $extra_compiler_flags .= " $new_extra_compiler_flags";
+  
+  $self->{extra_compiler_flags} = $extra_compiler_flags;
+}
+
+sub prepend_extra_compiler_flags {
+  my ($self, $new_extra_compiler_flags) = @_;
+  
+  my $extra_compiler_flags = $self->{extra_compiler_flags};
+  $extra_compiler_flags = '' unless defined $extra_compiler_flags;
+  
+  $extra_compiler_flags = "$new_extra_compiler_flags $extra_compiler_flags";
+  
+  $self->{extra_compiler_flags} = $extra_compiler_flags;
+}
+
+sub get_include_dirs {
+  my ($self, $include_dirs) = @_;
+  
+  return $self->{include_dirs};
+}
+
+sub set_include_dirs {
+  my ($self, $include_dirs) = @_;
+  
+  $self->{include_dirs} = $include_dirs;
+  
+  return $self;
+}
+
+sub unshift_include_dirs {
+  my ($self, @include_dirs) = @_;
+  
+  unshift @{$self->{include_dirs}}, @include_dirs;
+}
+
+sub push_include_dirs {
+  my ($self, @include_dirs) = @_;
+  
+  push @{$self->{include_dirs}}, @include_dirs;
 }
 
 sub set_std {
@@ -330,28 +339,10 @@ sub delete_std {
   return $self;
 }
 
-sub set_cc {
-  my ($self, $cc) = @_;
+sub get_ld {
+  my ($self, $ld) = @_;
   
-  return $self->set_config(cc => $cc);
-}
-
-sub get_cc {
-  my ($self, $cc) = @_;
-  
-  return $self->get_config('cc');
-}
-
-sub set_optimize {
-  my ($self, $optimize) = @_;
-  
-  return $self->set_config(optimize => $optimize);
-}
-
-sub get_optimize {
-  my ($self, $optimize) = @_;
-  
-  return $self->get_config('optimize');
+  return $self->get_config('ld');
 }
 
 sub set_ld {
@@ -360,10 +351,10 @@ sub set_ld {
   return $self->set_config(ld => $ld);
 }
 
-sub get_ld {
-  my ($self, $ld) = @_;
+sub get_lddlflags {
+  my $self = shift;
   
-  return $self->get_config('ld');
+  return $self->get_config('lddlflags');
 }
 
 sub set_lddlflags {
@@ -374,13 +365,7 @@ sub set_lddlflags {
   return $self;
 }
 
-sub get_lddlflags {
-  my $self = shift;
-  
-  return $self->get_config('lddlflags');
-}
-
-sub add_lddlflags {
+sub append_lddlflags {
   my ($self, $new_lddlflags) = @_;
   
   my $lddlflags = $self->get_config('lddlflags');
@@ -390,6 +375,142 @@ sub add_lddlflags {
   $self->set_config('lddlflags' => $lddlflags);
   
   return $self;
+}
+
+sub prepend_lddlflags {
+  my ($self, $new_lddlflags) = @_;
+  
+  my $lddlflags = $self->get_config('lddlflags');
+  
+  $lddlflags = "$new_lddlflags $lddlflags";
+  
+  $self->set_config('lddlflags' => $lddlflags);
+  
+  return $self;
+}
+
+sub get_shrpenv {
+  my $self = shift;
+  
+  return $self->get_config('shrpenv');
+}
+
+sub set_shrpenv {
+  my ($self, $shrpenv) = @_;
+  
+  $self->set_config(shrpenv => $shrpenv);
+  
+  return $self;
+}
+
+sub get_lib_dirs {
+  my ($self, $lib_dirs) = @_;
+  
+  return $self->{lib_dirs};
+}
+
+sub set_lib_dirs {
+  my ($self, $lib_dirs) = @_;
+  
+  $self->{lib_dirs} = $lib_dirs;
+  
+  return $self;
+}
+
+sub unshift_lib_dirs {
+  my ($self, @lib_dirs) = @_;
+  
+  unshift @{$self->{lib_dirs}}, @lib_dirs;
+}
+
+sub get_libs {
+  my ($self, $libs) = @_;
+  
+  return $self->{libs};
+}
+
+sub set_libs {
+  my ($self, $libs) = @_;
+  
+  $self->{libs} = $libs;
+  
+  return $self;
+}
+
+sub unshift_libs {
+  my ($self, @libs) = @_;
+  
+  unshift @{$self->{libs}}, @libs;
+}
+
+sub push_libs {
+  my ($self, @libs) = @_;
+  
+  push @{$self->{libs}}, @libs;
+}
+
+sub get_extra_linker_flags {
+  my $self = shift;
+  
+  return $self->{extra_linker_flags};
+}
+
+sub set_extra_linker_flags {
+  my ($self, $extra_linker_flags) = @_;
+  
+  $self->{extra_linker_flags} = $extra_linker_flags;
+  
+  return $self;
+}
+
+sub append_extra_linker_flags {
+  my ($self, $new_extra_linker_flags) = @_;
+  
+  my $extra_linker_flags = $self->{extra_linker_flags};
+  $extra_linker_flags = '' unless defined $extra_linker_flags;
+  
+  $extra_linker_flags .= " $new_extra_linker_flags";
+  
+  $self->{extra_linker_flags} = $extra_linker_flags;
+}
+
+sub prepend_extra_linker_flags {
+  my ($self, $new_extra_linker_flags) = @_;
+  
+  my $extra_linker_flags = $self->{extra_linker_flags};
+  $extra_linker_flags = '' unless defined $extra_linker_flags;
+  
+  $extra_linker_flags = "$new_extra_linker_flags $extra_linker_flags";
+  
+  $self->{extra_linker_flags} = $extra_linker_flags;
+}
+
+sub get_force_compile {
+  my ($self, $force_compile) = @_;
+  
+  return $self->{force_compile};
+}
+
+sub set_force_compile {
+  my ($self, $force_compile) = @_;
+  
+  $self->{force_compile} = $force_compile;
+  
+  return $self;
+}
+
+sub replace_all_config {
+  my ($self, $config) = @_;
+  
+  $self->{config} = $config;
+}
+
+sub to_hash {
+  my $self = shift;
+  
+  my $hash_config = {%{$self->{config}}};
+  
+  return $hash_config;
 }
 
 sub _remove_include_dirs_from_ccflags {
@@ -462,6 +583,12 @@ L<SPVM::Builder::Config> is configuration of c/c++ compile and link.
   
 Create L<SPVM::Builder::Config> object.
 
+=head2 new_c99
+  
+  my $bconf = SPVM::Builder::Config->new_c99;
+
+Create defaulgt build config. This is L<SPVM::Builder::Config> object.
+
 =head2 replace_all_config
 
   my $config = {cc => 'g++', ld => 'g++'};
@@ -517,17 +644,155 @@ Set C<cc>.
 
 Get C<cc>.
 
-=head2 set_optimize
+=head2 set_cc
 
-  $bconf->set_optimize($optimize);
+  $bconf->set_cc($cc);
 
-Set C<optimize>.
+Set C<cc>.
+
+=head2 get_cc
+
+  my $cc = $bconf->get_cc;
+
+Get C<cc>.
+
+=head2 get_ccflags
+
+  my $ccflags = $bconf->get_ccflags;
+
+Get C<ccflags> option using C<get_config> method.
+
+C<ccflags> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
+
+Default is copied from $Config{ccflags}.
+
+=head2 set_ccflags
+
+  $bconf->set_ccflags($ccflags);
+
+Set C<ccflags> using C<set_config> method.
+
+See C<get_ccflags> method about C<ccflags> option.
+
+=head2 append_ccflags
+
+  $bconf->append_ccflags($ccflags);
+
+Add new C<ccflags> after current C<ccflags> using C<get_config> and C<set_config> method.
+
+See C<get_ccflags> method about C<ccflags> option.
+
+=head2 prepend_ccflags
+
+  $bconf->prepend_ccflags($ccflags);
+
+Add new C<ccflags> before current C<ccflags> using C<get_config> and C<set_config> method.
+
+See C<get_ccflags> method about C<ccflags> option.
+
+=head2 get_cccdlflags
+
+  my $cccdlflags = $bconf->get_cccdlflags;
+
+Get C<cccdlflags> option using C<get_config> method.
+
+C<cccdlflags> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
+
+Default is copied from $Config{cccdlflags}.
+
+=head2 set_cccdlflags
+
+  $bconf->set_cccdlflags($cccdlflags);
+
+Set C<cccdlflags> using C<set_config> method.
+
+See C<get_cccdlflags> method about C<cccdlflags> option.
+
+=head2 append_cccdlflags
+
+  $bconf->append_cccdlflags($cccdlflags);
+
+Add new C<cccdlflags> after current C<cccdlflags> using C<get_config> and C<set_config> method.
+
+See C<get_cccdlflags> method about C<cccdlflags> option.
+
+=head2 prepend_cccdlflags
+
+  $bconf->prepend_cccdlflags($cccdlflags);
+
+Add new C<cccdlflags> before current C<cccdlflags> using C<get_config> and C<set_config> method.
+
+See C<get_cccdlflags> method about C<cccdlflags> option.
+
+=head2 get_archlibexp
+
+  my $archlibexp = $bconf->get_archlibexp;
+
+Get C<archlibexp> option using C<get_config> method.
+
+C<archlibexp> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
+
+Default is copied from $Config{archlibexp}.
+
+=head2 set_archlibexp
+
+  $bconf->set_archlibexp($archlibexp);
+
+Set C<archlibexp> using C<set_config> method.
+
+See C<get_archlibexp> method about C<archlibexp> option.
 
 =head2 get_optimize
 
   my $optimize = $bconf->get_optimize;
 
-Get C<optimize>.
+Get C<optimize> option using C<get_config> method.
+
+C<optimize> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method 
+
+Default is copied from $Config{optimize}.
+
+=head2 set_optimize
+
+  $bconf->set_optimize($optimize);
+
+Set C<optimize> using C<set_config> method.
+
+See C<get_optimize> method about C<optimize> option.
+
+=head2 get_extra_compiler_flags
+
+  my $extra_compiler_flags = $bconf->get_extra_compiler_flags;
+
+Get C<extra_compiler_flags>.
+
+C<extra_compiler_flags> is passed to C<extra_compiler_flags> option of L<ExtUtils::CBuilder> C<compile> method.
+
+Default is empty string.
+
+=head2 set_extra_compiler_flags
+
+  $bconf->set_extra_compiler_flags($extra_compiler_flags);
+
+Set C<extra_compiler_flags>.
+
+See C<get_extra_compiler_flags> method about C<extra_compiler_flags> option.
+
+=head2 append_extra_compiler_flags
+
+  $bconf->append_extra_compiler_flags($extra_compiler_flags);
+
+Add new C<extra_compiler_flags> after current C<extra_compiler_flags>.
+
+See C<get_extra_compiler_flags> method about C<extra_compiler_flags> option.
+
+=head2 prepend_extra_compiler_flags
+
+  $bconf->prepend_extra_compiler_flags($extra_compiler_flags);
+
+Add new C<extra_compiler_flags> before current C<extra_compiler_flags>.
+
+See C<get_extra_compiler_flags> method about C<extra_compiler_flags> option.
 
 =head2 set_ld
 
@@ -541,73 +806,99 @@ Set C<ld>.
 
 Get C<ld>.
 
-=head2 set_lddlflags
-
-  $bconf->set_lddlflags($lddlflags);
-
-Set C<lddlflags>.
-
 =head2 get_lddlflags
 
   my $lddlflags = $bconf->get_lddlflags;
 
-Get C<lddlflags>.
+Get C<lddlflags> option using C<get_config> method.
 
-=head2 add_lddlflags
+C<lddlflags> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
 
-  $bconf->add_lddlflags($lddlflags);
+Default is copied from $Config{lddlflags}.
 
-Add C<lddlflags> after current C<lddlflags>.
+=head2 set_lddlflags
 
-=head2 new_c99
-  
-  my $bconf = SPVM::Builder::Config->new_c99;
+  $bconf->set_lddlflags($lddlflags);
 
-Create defaulgt build config. This is L<SPVM::Builder::Config> object.
+Set C<lddlflags> using C<set_config> method.
 
-=head2 get_extra_compiler_flags
+See C<get_lddlflags> method about C<lddlflags> option.
 
-  my $extra_compiler_flags = $bconf->get_extra_compiler_flags;
+=head2 append_lddlflags
 
-Get C<extra_compiler_flags>.
+  $bconf->append_lddlflags($lddlflags);
 
-=head2 set_extra_compiler_flags
+Add new C<lddlflags> after current C<lddlflags> using C<get_config> and C<set_config> method.
 
-  $bconf->set_extra_compiler_flags($extra_compiler_flags);
+See C<get_lddlflags> method about C<lddlflags> option.
 
-Set C<extra_compiler_flags>.
+=head2 prepend_lddlflags
 
-=head2 add_extra_compiler_flags
+  $bconf->prepend_lddlflags($lddlflags);
 
-  $bconf->add_extra_compiler_flags($extra_compiler_flags);
+Add new C<lddlflags> before current C<lddlflags> using C<get_config> and C<set_config> method.
 
-Add new C<extra_compiler_flags> after current C<extra_compiler_flags>.
+See C<get_lddlflags> method about C<lddlflags> option.
+
+=head2 get_shrpenv
+
+  my $shrpenv = $bconf->get_shrpenv;
+
+Get C<shrpenv> option using C<get_config> method.
+
+C<shrpenv> option is passed to C<config> option of L<ExtUtils::CBuilder> C<new> method.
+
+Default is copied from $Config{shrpenv}.
+
+=head2 set_shrpenv
+
+  $bconf->set_shrpenv($shrpenv);
+
+Set C<shrpenv> using C<set_config> method.
+
+See C<get_shrpenv> method about C<shrpenv> option.
 
 =head2 get_extra_linker_flags
 
   my $extra_linker_flags = $bconf->get_extra_linker_flags;
 
-Get C<extra_linker_flags>.
+Get C<extra_linker_flags> option.
+
+C<extra_linker_flags> option is passed to C<extra_compiler_flags> option of L<ExtUtils::CBuilder> C<link> method.
+
+Default is emtpy string.
 
 =head2 set_extra_linker_flags
 
   $bconf->set_extra_linker_flags($extra_linker_flags);
 
-Set C<extra_linker_flags>.
+Set C<extra_linker_flags> option.
 
-=head2 add_extra_linker_flags
+See C<get_extra_linker_flags> method about C<extra_linker_flags> option.
 
-  $bconf->add_extra_linker_flags($extra_linker_flags);
+=head2 append_extra_linker_flags
 
-Add new C<extra_linker_flags> after current C<extra_linker_flags>.
+  $bconf->append_extra_linker_flags($extra_linker_flags);
+
+Add new C<extra_linker_flags> option after current C<extra_linker_flags> option.
+
+See C<get_extra_linker_flags> method about C<extra_linker_flags> option.
+
+=head2 prepend_extra_linker_flags
+
+  $bconf->prepend_extra_linker_flags($extra_linker_flags);
+
+Add new C<extra_linker_flags> option before current C<extra_linker_flags> option.
+
+See C<get_extra_linker_flags> method about C<extra_linker_flags> option.
 
 =head2 get_include_dirs
 
   my $include_dirs = $bconf->get_include_dirs;
 
-Get C<include_dirs> field. This field is array refernce.
+Get C<include_dirs> option. This option is array refernce.
 
-C<include_dirs> field is used by C<compile> method of L<SPVM::Builder::CC> to set -I<inculde_dir>.
+C<include_dirs> option is used by C<compile> method of L<SPVM::Builder::CC> to set -I<inculde_dir>.
 
 Default is "SPVM/Builder/include" of one up of directory SPVM::Buidler::Config.pm loaded and the values of -I<include_dir> in $Config{ccflags}.
 
@@ -615,25 +906,33 @@ Default is "SPVM/Builder/include" of one up of directory SPVM::Buidler::Config.p
 
   $bconf->set_include_dirs($include_dirs);
 
-Set C<include_dirs> field. This field is array refernce.
+Set C<include_dirs> option. This option is array refernce.
 
-See C<get_include_dirs> method about C<include_dirs> field.
+See C<get_include_dirs> method about C<include_dirs> option.
 
-=head2 add_lib_dirs
+=head2 unshift_include_dirs
 
-  $bconf->add_lib_dirs($lib_dir1, $lib_dir2, ...);
+  $bconf->unshift_include_dirs($include_dir1, $include_dir2, ...);
 
-Add a element before the first element of C<lib_dirs> field.
+Add a element before the first element of C<include_dirs> option.
 
-See C<get_lib_dirs> method about C<lib_dirs> field.
+See C<get_lib_dirs> method about C<lib_dirs> option.
+
+=head2 push_include_dirs
+
+  $bconf->push_include_dirs($include_dir1, $include_dir2, ...);
+
+Add a element after the last element of C<include_dirs> option.
+
+See C<get_lib_dirs> method about C<lib_dirs> option.
 
 =head2 get_lib_dirs
 
   my $lib_dirs = $bconf->get_lib_dirs;
 
-Get C<lib_dirs> field. This field is array refernce.
+Get C<lib_dirs> option. This option is array refernce.
 
-C<lib_dirs> field is used by C<compile> method of L<SPVM::Builder::CC> to set -L<lib_dir>.
+C<lib_dirs> option is used by C<compile> method of L<SPVM::Builder::CC> to set -L<lib_dir>.
 
 Default is the values of -L<lib_dir> in $Config{lddlflags}.
 
@@ -641,80 +940,88 @@ Default is the values of -L<lib_dir> in $Config{lddlflags}.
 
   $bconf->set_lib_dirs($lib_dirs);
 
-Set C<lib_dirs> field. This field is array refernce.
+Set C<lib_dirs> option. This option is array refernce.
 
-See C<get_lib_dirs> method about C<lib_dirs> field.
+See C<get_lib_dirs> method about C<lib_dirs> option.
 
-=head2 add_lib_dirs
+=head2 unshift_lib_dirs
 
-  $bconf->add_lib_dirs($lib_dir1, $lib_dir2, ...);
+  $bconf->unshift_lib_dirs($lib_dir1, $lib_dir2, ...);
 
-Add a element before the first element of C<lib_dirs> field.
+Add a element before the first element of C<lib_dirs> option.
 
-See C<get_lib_dirs> method about C<lib_dirs> field.
+See C<get_lib_dirs> method about C<lib_dirs> option.
 
-=head2 add_lib_dirs
+=head2 push_lib_dirs
 
-  $bconf->add_lib_dirs($lib_dir1, $lib_dir2, ...);
+  $bconf->push_lib_dirs($lib_dir1, $lib_dir2, ...);
 
-Add a element before the first element of C<lib_dirs> field.
+Add a element after the last element of C<lib_dirs> option.
 
-See C<get_lib_dirs> method about C<lib_dirs> field.
+See C<get_lib_dirs> method about C<lib_dirs> option.
 
 =head2 get_libs
 
   my $libs = $bconf->get_libs;
 
-Get C<libs> field. This field is array refernce.
+Get C<libs> option. This option is array refernce.
 
-C<libs> field is used by C<link> method of L<SPVM::Builder::CC> to set -l<lib>.
+C<libs> option is used by C<link> method of L<SPVM::Builder::CC> to set -l<lib>.
+
+Don't prefix '-l' or 'lib' for library name. 'gsl' is ok. 'libgsl', '-lgsl' is not ok.
 
 =head2 set_libs
 
   $bconf->set_libs($libs);
 
-Set C<libs> field. This field is array refernce.
+Set C<libs> option. This option is array refernce.
 
-See C<get_libs> method about C<libs> field.
+See C<get_libs> method about C<libs> option.
 
-=head2 use_lib
+=head2 unshift_libs
 
-  $bconf->use_lib($lib1, $lib2, ...);
+  $bconf->unshift_libs($lib1, $lib2, ...);
 
-Add a library after the last element of C<libs> field.
+Add a library before the first element of C<libs> option.
 
-Don't use prefix '-l' or 'lib' for library name.
+See C<get_libs> method about C<libs> option.
 
-See C<get_libs> method about C<libs> field.
+=head2 push_libs
+
+  $bconf->push_libs($lib1, $lib2, ...);
+
+Add a library after the last element of C<libs> option.
+
+See C<get_libs> method about C<libs> option.
 
 =head2 get_force_compile
 
   my $force_compile = $bconf->get_force_compile;
 
-Get C<force_compile> field.
+Get C<force_compile> option.
 
-C<force_compile> field is used by C<compile> method of L<SPVM::Builder::CC> to determine whether the method should force compilation of source codes without cache.
+C<force_compile> option is used by C<compile> method of L<SPVM::Builder::CC> to determine whether the method should force compilation of source codes without cache.
 
 =head2 set_force_compile
 
   $bconf->set_force_compile($force_compile);
 
-Set C<force_compile> field.
+Set C<force_compile> option.
 
-See C<get_force_compile> method about C<force_compile> field.
+See C<get_force_compile> method about C<force_compile> option.
 
-=head2 quiet
+=head2 get_quiet
 
   my $quiet = $bconf->get_quiet;
 
-Get C<quiet> field.
+Get C<quiet> option.
 
-C<quiet> field is used by C<compile> method of L<SPVM::Builder::CC> to determine whether the method output compiler messages , default to C<1>.
+C<quiet> option is used by C<compile> method of L<SPVM::Builder::CC> to determine whether the method output compiler messages , default to C<1>.
 
 =head2 set_quiet
 
   $bconf->set_quiet($quiet);
 
-Set C<quiet> field.
+Set C<quiet> option.
 
-See C<get_quiet> method about C<quiet> field.
+See C<get_quiet> method about C<quiet> option.

@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 use File::Find;
-use HTTP::Tiny;
 use JSON ();
 use JSON::SchemaValidator;
 

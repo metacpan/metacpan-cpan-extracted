@@ -58,7 +58,7 @@ Zing::Types
 
 =inherits
 
-Zing::Watcher
+Zing::Kernel
 
 =cut
 
@@ -74,7 +74,7 @@ L<"the actor model"|https://en.wikipedia.org/wiki/Actor_model>.
 
 =method start
 
-The start method builds a L<Zing::Kernel> and executes its event-loop.
+The start method prepares the L<Zing::Kernel> and executes its event-loop.
 
 =signature start
 

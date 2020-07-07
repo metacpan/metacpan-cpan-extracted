@@ -3,9 +3,10 @@ package Test::Nginx::Socket;
 use lib 'lib';
 use lib 'inc';
 
+use v5.10.1;
 use Test::Base -Base;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use POSIX qw( SIGQUIT SIGKILL SIGTERM SIGHUP );
 use Encode;
@@ -13,7 +14,7 @@ use Encode;
 use Time::HiRes qw(sleep time);
 use Test::LongString;
 use List::MoreUtils qw( any );
-use List::Util qw( sum );
+use List::Util qw( sum min );
 use IO::Select ();
 use File::Temp qw( tempfile );
 use Digest::MD5 ();
@@ -33,7 +34,7 @@ our @EXPORT = qw( env_to_nginx is_str plan run_tests run_test
   repeat_each config_preamble worker_connections
   master_process_enabled
   no_long_string workers master_on master_off
-  log_level no_shuffle no_root_location
+  log_level no_shuffle no_root_location use_hup
   server_name
   server_addr server_root html_dir server_port server_port_for_client
   timeout no_nginx_manager check_accum_error_log
@@ -41,10 +42,13 @@ our @EXPORT = qw( env_to_nginx is_str plan run_tests run_test
   add_response_body_check
 );
 
+our $CheckLeakCount = $ENV{TEST_NGINX_CHECK_LEAK_COUNT} // 100;
+our $UseHttp2 = $Test::Nginx::Util::UseHttp2;
 our $TotalConnectingTimeouts = 0;
 our $PrevNginxPid;
 
 sub send_request ($$$$@);
+sub send_http2_req ($$$);
 
 sub run_filter_helper($$$);
 sub run_test_helper ($$);
@@ -63,6 +67,7 @@ sub value_contains ($$);
 
 $RunTestHelper = \&run_test_helper;
 $CheckErrorLog = \&check_error_log;
+$CheckShutdownErrorLog = \&check_shutdown_error_log;
 
 sub set_http_config_filter ($) {
     $FilterHttpConfig = shift;
@@ -643,7 +648,7 @@ sub run_test_helper ($$) {
             }
             $PrevNginxPid = $ngx_pid;
             my @rss_list;
-            for (my $i = 0; $i < 100; $i++) {
+            for (my $i = 0; $i < $CheckLeakCount; $i++) {
                 sleep 0.02;
                 my $out = `ps -eo pid,rss|grep $ngx_pid`;
                 if ($? != 0 && !is_running($ngx_pid)) {
@@ -785,6 +790,10 @@ again:
             }
 
             check_error_log($block, $res, $dry_run, $repeated_req_idx, $need_array);
+
+            if (!defined $block->ignore_response) {
+                check_access_log($block, $dry_run, $repeated_req_idx);
+            }
         }
 
         $req_idx++;
@@ -805,6 +814,10 @@ again:
     test_stap($block, $dry_run);
 
     check_error_log($block, $res, $dry_run, $repeated_req_idx, $need_array);
+
+    if (!defined $block->ignore_response) {
+        check_access_log($block, $dry_run, $repeated_req_idx);
+    }
 }
 
 
@@ -1033,11 +1046,59 @@ sub value_contains ($$) {
     return undef;
 }
 
+sub check_access_log ($$$) {
+    my ($block, $dry_run, $repeated_req_idx) = @_;
+    my $name = $block->name;
+    my $lines;
+
+    if (defined $block->access_log) {
+        my $pats = $block->access_log;
+
+        if (!ref $pats) {
+            chomp $pats;
+            my @lines = split /\n+/, $pats;
+            $pats = \@lines;
+
+        } elsif (ref $pats eq 'Regexp') {
+            $pats = [$pats];
+
+        } else {
+            my @clone = @$pats;
+            $pats = \@clone;
+        }
+
+        $lines ||= access_log_data();
+        for my $line (@$lines) {
+            for my $pat (@$pats) {
+                next if !defined $pat;
+                if (ref $pat && $line =~ /$pat/ || $line =~ /\Q$pat\E/) {
+                    SKIP: {
+                        skip "$name - access_log - tests skipped due to $dry_run", 1 if $dry_run;
+                        pass("$name - pattern \"$pat\" matches a line in access.log (req $repeated_req_idx)");
+                    }
+                    undef $pat;
+                }
+            }
+        }
+
+        for my $pat (@$pats) {
+            if (defined $pat) {
+                SKIP: {
+                    skip "$name - access_log - tests skipped due to $dry_run", 1 if $dry_run;
+                    fail("$name - pattern \"$pat\" should match a line in access.log (req $repeated_req_idx)");
+                    #die join("", @$lines);
+                }
+            }
+        }
+    }
+}
+
 sub check_error_log ($$$$) {
     my ($block, $res, $dry_run, $repeated_req_idx, $need_array) = @_;
     my $name = $block->name;
     my $lines;
 
+    my $check_write_guard_message = 1;
     my $check_alert_message = 1;
     my $check_crit_message = 1;
     my $check_emerg_message = 1;
@@ -1099,6 +1160,12 @@ sub check_error_log ($$$$) {
     if (defined $block->error_log) {
         my $pats = $block->error_log;
 
+        if (value_contains($pats,
+                           "writing a global lua variable"))
+        {
+            undef $check_write_guard_message;
+        }
+
         if (value_contains($pats, "[alert")) {
             undef $check_alert_message;
         }
@@ -1154,6 +1221,12 @@ sub check_error_log ($$$$) {
         #warn "HERE";
         my $pats = $block->no_error_log;
 
+        if (value_contains($pats,
+                           "writing a global lua variable"))
+        {
+            undef $check_write_guard_message;
+        }
+
         if (value_contains($pats, "[alert")) {
             undef $check_alert_message;
         }
@@ -1181,6 +1254,7 @@ sub check_error_log ($$$$) {
 
         my %found;
         $lines ||= error_log_data();
+        my $i = 0;
         for my $line (@$lines) {
             for my $pat (@$pats) {
                 next if !defined $pat;
@@ -1198,10 +1272,19 @@ sub check_error_log ($$$$) {
                         skip "$name - no_error_log - tests skipped due to $dry_run ($line)", 1 if $dry_run;
                         my $ln = fmt_str($line);
                         my $p = fmt_str($pat);
-                        fail("$name - pattern \"$p\" should not match any line in error.log but matches line \"$ln\" (req $repeated_req_idx)");
+                        my @more_lines;
+                        for (my $j = $i + 1; $j < min($i + 10, @$lines - 1); $j++) {
+                            push @more_lines, $lines->[$j];
+                        }
+
+                        fail("$name - pattern \"$p\" should not match any line in error.log but matches line \"$ln\" (req $repeated_req_idx)\n"
+                             . join "", @more_lines);
                     }
                 }
             }
+
+        } continue {
+            $i++;
         }
 
         for my $pat (@$pats) {
@@ -1216,13 +1299,24 @@ sub check_error_log ($$$$) {
         }
     }
 
+    if ($check_write_guard_message && !$dry_run) {
+        $lines ||= error_log_data();
+        for my $line (@$lines) {
+            #warn "test $pat\n";
+            if ($line =~ /writing a global lua variable/) {
+                my $ln = fmt_str($line);
+                warn("WARNING: $name - $ln\n");
+            }
+        }
+    }
+
     if ($check_alert_message && !$dry_run) {
         $lines ||= error_log_data();
         for my $line (@$lines) {
             #warn "test $pat\n";
             if ($line =~ /\[alert\]/) {
                 my $ln = fmt_str($line);
-                warn("WARNING: $name - $ln");
+                warn("WARNING: $name - $ln\n");
             }
         }
     }
@@ -1233,7 +1327,7 @@ sub check_error_log ($$$$) {
             #warn "test $pat\n";
             if ($line =~ /\[crit\]/) {
                 my $ln = fmt_str($line);
-                warn("WARNING: $name - $ln");
+                warn("WARNING: $name - $ln\n");
             }
         }
     }
@@ -1251,6 +1345,119 @@ sub check_error_log ($$$$) {
 
     for my $line (@$lines) {
         #warn "test $pat\n";
+        if ($line =~ /\bAssertion .*?failed\b/) {
+            my $tb = Test::More->builder;
+            $tb->no_ending(1);
+
+            chomp $line;
+            fail("$name - $line\n");
+        }
+    }
+}
+
+sub check_shutdown_error_log ($$) {
+    my ($block, $dry_run) = @_;
+    my $name = $block->name;
+    my $lines;
+
+    my $pats = $block->shutdown_error_log;
+
+    if (!ref $pats) {
+        chomp $pats;
+        my @lines = split /\n+/, $pats;
+        $pats = \@lines;
+
+    } elsif (ref $pats eq 'Regexp') {
+        $pats = [$pats];
+
+    } else {
+        my @clone = @$pats;
+        $pats = \@clone;
+    }
+
+    if (defined $block->no_shutdown_error_log) {
+        # warn "HERE";
+        my $pats = $block->no_shutdown_error_log;
+
+        if (!ref $pats) {
+            chomp $pats;
+            my @lines = split /\n+/, $pats;
+            $pats = \@lines;
+
+        } elsif (ref $pats eq 'Regexp') {
+            $pats = [$pats];
+
+        } else {
+            my @clone = @$pats;
+            $pats = \@clone;
+        }
+
+        my %found;
+        $lines ||= error_log_data();
+        # warn "error log data: ", join "\n", @$lines;
+        for my $line (@$lines) {
+            for my $pat (@$pats) {
+                next if !defined $pat;
+                #warn "test $pat\n";
+                if ((ref $pat && $line =~ /$pat/) || $line =~ /\Q$pat\E/) {
+                    if ($found{$pat}) {
+                        my $tb = Test::More->builder;
+                        $tb->no_ending(1);
+
+                    } else {
+                        $found{$pat} = 1;
+                    }
+
+                    SKIP: {
+                        skip "$name - no_shutdown_error_log - tests skipped due to $dry_run ($line)", 1 if $dry_run;
+                        my $ln = fmt_str($line);
+                        my $p = fmt_str($pat);
+                        fail("$name - pattern \"$p\" should not match any line in error.log but matches line \"$ln\"");
+                    }
+                }
+            }
+        }
+
+        for my $pat (@$pats) {
+            next if $found{$pat};
+            if (defined $pat) {
+                SKIP: {
+                    skip "$name - no_shutdown_error_log - tests skipped due to $dry_run", 1 if $dry_run;
+                    my $p = fmt_str($pat);
+                    pass("$name - pattern \"$p\" does not match a line in error.log");
+                }
+            }
+        }
+    }
+
+    $lines ||= error_log_data();
+    #warn "error log data: ", join "\n", @$lines;
+    for my $line (@$lines) {
+        for my $pat (@$pats) {
+            next if !defined $pat;
+
+            if (ref $pat && $line =~ /$pat/ || $line =~ /\Q$pat\E/) {
+                SKIP: {
+                    skip "$name - shutdown_error_log - tests skipped due to dry_run", 1 if $dry_run;
+                    pass("$name - pattern \"$pat\" matches a line in error.log");
+                }
+                undef $pat;
+            }
+        }
+    }
+
+    for my $pat (@$pats) {
+        if (defined $pat) {
+            SKIP: {
+                skip "$name - shutdown_error_log - tests skipped due to dry_run", 1 if $dry_run;
+                fail("$name - pattern \"$pat\" should match a line in error.log");
+                #die join("", @$lines);
+            }
+        }
+    }
+
+    for my $line (@$lines) {
+        #warn "test $line\n";
         if ($line =~ /\bAssertion .*? failed\.$/) {
             my $tb = Test::More->builder;
             $tb->no_ending(1);
@@ -1559,6 +1766,42 @@ sub parse_response($$$) {
     return ( $res, $raw_headers, $left );
 }
 
+sub send_http2_req ($$$) {
+    my ($block, $req, $timeout) = @_;
+
+    my $name = $block->name;
+
+    my $cmd = gen_curl_cmd_from_req($block, $req);
+
+    if ($Test::Nginx::Util::Verbose) {
+        warn "running cmd @$cmd";
+    }
+
+    my $ok = IPC::Run::run($cmd, \(my $in), \(my $out), \(my $err),
+                           IPC::Run::timeout($timeout));
+
+    if (!defined $ok) {
+        fail "failed to run curl: $?: " . ($err // '');
+        return;
+    }
+
+    if (!$out) {
+        if ($err) {
+            fail "$name - command \"@$cmd\" generates stderr output: $err";
+            return;
+        }
+
+        fail "$name - curl command \"@$cmd\" generates no stdout output";
+        return;
+    }
+
+    if ($err) {
+        warn "WARNING: $name - command \"@$cmd\" generates stderr output: $err";
+    }
+
+    return $out;
+}
+
 sub send_request ($$$$@) {
     my ( $req, $middle_delay, $timeout, $block, $tries ) = @_;
 
@@ -1644,6 +1887,10 @@ sub send_request ($$$$@) {
             #warn "Found HEAD request!\n";
             $head_req = 1;
         }
+    }
+
+    if (use_http2($block)) {
+        return send_http2_req($block, $req, $timeout), $head_req;
     }
 
     #my $flags = fcntl $sock, F_GETFL, 0
@@ -1956,11 +2203,22 @@ sub gen_curl_cmd_from_req ($$) {
 
     my @args = ('curl', '-i');
 
+    if ($Test::Nginx::Util::Verbose) {
+        push @args, "-vv";
+
+    } else {
+        push @args, '-sS';
+    }
+
+    if (use_http2($block)) {
+        push @args, '--http2', '--http2-prior-knowledge';
+    }
+
     if ($meth eq 'HEAD') {
         push @args, '-I';
 
-    } elsif ($meth ne 'GET') {
-        warn "WARNING: --- curl: request method $meth not supported yet.\n";
+    } else {
+        push @args, "-X", $meth;
     }
 
     if ($http_ver ne '1.1') {
@@ -1986,19 +2244,36 @@ sub gen_curl_cmd_from_req ($$) {
 
     #warn "headers: @headers ", scalar(@headers), "\n";
 
+    my $found_content_type;
+
     for my $h (@headers) {
         #warn "h: $h\n";
         if ($h =~ /^\s*User-Agent\s*:\s*(.*\S)/i) {
             push @args, '-A', $1;
 
         } else {
+            if ($h =~ /^\s*Content-Type\s*:/i) {
+                $found_content_type = 1;
+            }
+
             push @args, '-H', $h;
         }
     }
 
-    if ($req =~ m{\G.+}gcs) {
-        warn "WARNING: --- curl: request body not supported.\n";
+    if ($req =~ m{\G(.+)}gcsm) {
+        #warn "!! POST body data len: ", length($1);
+        if (!$found_content_type) {
+            push @args, "-H", 'Content-Type: ';
+        }
+        push @args, '--data-binary', $1;
     }
+
+    my $timeout = $block->timeout;
+    if (!$timeout) {
+        $timeout = timeout();
+    }
+
+    push @args, '--connect-timeout', $timeout;
 
     my $link;
     {
@@ -2288,8 +2563,10 @@ This is definitely one of the most useful and frequently used features.
 =item C<--- SKIP>
 
 Skips the surrounding test block unconditionally. You can use C<--- skip_nginx>
-and C<--- skip_nginx2> providied this module (see their documentation below)
-to conditionally skip tests according to the current NGINX server versions.
+and C<--- skip_nginx2> providied by this module (see their documentation below)
+to conditionally skip tests according to the current NGINX server versions. You
+can also use C<--- skip_openssl> (see its documentation below) to conditionally
+skip tests according to the current OpenSSL version.
 
 =back
 
@@ -2347,6 +2624,11 @@ Other configuration Perl functions I<must> be called before calling this C<run_t
 By default, the test scaffold always shuffles the order of the test blocks automatically. Calling this function before
 calling C<run_tests> will disable the shuffling.
 
+=head2 use_hup
+
+Calling this function before calling C<run_tests> will make the current test
+scaffold behave as if C<TEST_NGINX_USE_HUP> was set to 1.
+
 =head2 no_long_string
 
 By default, failed string equality test will use the L<Test::LongString> module to generate the error message. Calling this function
@@ -2371,6 +2653,34 @@ Call this function with an integer argument before C<run_tests()> to ask the tes
 to run the specified number of duplicate requests for each test block. When it is called without argument, it returns the current setting.
 
 Default to 1.
+
+=head2 shutdown_error_log
+
+You can use this section to check the error log generated during nginx exit.
+
+For example,
+
+    --- shutdown_error_log
+    cleanup resolver
+
+or an example for using an array value,
+
+    --- shutdown_error_log eval
+    ["cleanup", "resolver"]
+
+B<WARNING:> skip the shutdown_error_log tests under the HUP reload mode.
+
+=head2 no_shutdown_error_log
+
+Very much like the C<--- shutdown_error_log> section, but does the opposite test, i.e.,
+pass only when the specified patterns of lines do not appear in the F<error.log> file at all.
+
+Here is an example:
+
+    --- no_shutdown_error_log
+    [error]
+
+This test will fail when any of the line in the F<error.log> file contains the string C<"[error]">.
 
 =head2 env_to_nginx
 
@@ -2438,6 +2748,14 @@ DYLD_FORCE_FLAT_NAMESPACE
 =item *
 
 ASAN_OPTIONS
+
+=item *
+
+MOCKNOEAGAIN_VERBOSE
+
+=item *
+
+MOCKNOEAGAIN
 
 =back
 
@@ -2646,6 +2964,20 @@ Performs intelligent string comparison subtests which honors both C<no_long_stri
 =head1 Sections supported
 
 The following sections are supported:
+
+=head2 http2
+
+Enforces the test scaffold to use the HTTP/2 wire protocol to send the test request.
+
+Under the hood, the test scaffold uses the `curl` command-line utility to do the wire communication
+with the NGINX server. The `curl` utility must be recent enough to support both the C<--http2>
+and C<--http2-prior-knowledge> command-line options.
+
+B<WARNING:> not all the sections and features are supported when this C<--- http2> section is
+specified. For example, this section cannot be used with C<--- pipelined_requests> or
+C<--- raw_request>.
+
+See also the L<TEST_NGINX_USE_HTTP2> system environment for the "http2" test mode.
 
 =head2 config
 
@@ -2880,7 +3212,7 @@ For example,
 
 will produce the following line (to C<stderr>) while running this test block:
 
-    # curl -i -H 'X-Foo: 3' -A openresty 'http://127.0.0.1:1984/foo/bar?baz=3'
+    # curl -i -sS -H 'X-Foo: 3' -A openresty 'http://127.0.0.1:1984/foo/bar?baz=3'
 
 You need to remember to set the C<TEST_NGINX_NO_CLEAN> environment to 1 to prevent the nginx
 and other processes from quitting automatically upon test exits.
@@ -3192,6 +3524,27 @@ must also match a line in F<error.log>.
 
 By default, only the part of the error logs corresponding to the current request is checked. You can make it check accumulated error logs by calling the C<check_accum_error_log> Perl function before calling C<run_tests> in the boilerplate Perl code above the C<__DATA__> line.
 
+=head2 access_log
+
+Similar to the L<error_log> section, but for asserting appearance of patterns in the nginx access log file.
+
+Below is an example:
+
+    === TEST 1: check access log
+    --- config
+        location /t {
+            content_by_lua_block {
+                ngx.say("hello")
+            }
+        }
+
+    --- request
+    GET /t
+    --- response_body
+    hello
+    --- access_log
+    GET /t
+
 =head2 abort
 
 Makes the test scaffold not to treat C<--- timeout> expiration as a test failure.
@@ -3316,6 +3669,12 @@ Below is an example from ngx_headers_more module's test suite:
 
 Do not attempt to parse the response or run the response related subtests.
 
+=head2 reload_fails
+
+Allows the NGINX HUP reload fails, which means that the server will still use the previous test block's nginx configuration.
+
+This only makes sense in the HUP reload testing mode.
+
 =head2 user_files
 
 With this section you can create a file that will be copied in the
@@ -3417,6 +3776,36 @@ For example:
     --- response_body
     --- skip_nginx2
     2: < 0.8.53 and >= 0.8.41
+
+=head2 skip_openssl
+
+Skip the specified number of subtests (in the current test block)
+for the specified version range of OpenSSL.
+
+The format for this section is
+
+    --- skip_openssl
+    <subtest-count>: <op> <version>
+
+The <subtest-count> value must be a positive integer.
+The <op> value could be either C<< > >>, C<< >= >>, C<< < >>, or C<< <= >>.
+The <version> part is a valid OpenSSL version number, like C<1.1.1> or C<1.1.0h>.
+
+An example is
+
+    === TEST 1: sample
+    --- config
+        location /t { echo hello; }
+    --- request
+        GET /t
+    --- response_body
+    --- skip_openssl
+    2: < 1.1.1
+
+That is, skipping 2 subtests in this test block for OpenSSL versions older than 1.1.1.
+
+This C<skip_openssl> section only allows you to specify one boolean expression as
+the skip condition.
 
 =head2 todo
 
@@ -3740,6 +4129,28 @@ All environment variables starting with C<TEST_NGINX_> are expanded in the
 sections used to build the configuration of the server that tests automatically
 starts. The following environment variables are supported by this module:
 
+=head2 TEST_NGINX_REUSE_PORT
+
+When this environment is set to a true value, the test scaffold would add the "resuseport"
+parameter to the "listen" directive automatically generated in F<nginx.conf>.
+
+=head2 TEST_NGINX_USE_HTTP2
+
+Enables the "http2" test mode by enforcing using the (plain text) HTTP/2 protocol to send the
+test request.
+
+Under the hood, the test scaffold uses the `curl` command-line utility to do the wire communication
+with the NGINX server. The `curl` utility must be recent enough to support both the C<--http2>
+and C<--http2-prior-knowledge> command-line options.
+
+B<WARNING:> not all the sections and features are supported in the "http2" test mode. For example, the L<pipelined_requests> and
+L<raw_request> will still use the HTTP/1 protocols even in the "http2" test mode. Similarly, test blocks explicitly require
+the HTTP 1.0 protocol will still use HTTP 1.0.
+
+One can enable HTTP/2 mode for an individual test block by specifying the L<http2> section, as in
+
+    --- http2
+
 =head2 TEST_NGINX_VERBOSE
 
 Controls whether to output verbose debugging messages in Test::Nginx. Default to empty.
@@ -3829,6 +4240,12 @@ and here is an example of leaking:
 Even very small leaks can be amplified and caught easily by this
 testing mode because their slopes will usually be far above C<1.0>.
 
+One can configure the number of sample points via the L<TEST_NGINX_CHECK_LEAK_COUNT>
+system environment, for example, to sample 1000 data points, we can set
+the following environment I<before> running the test:
+
+    export TEST_NGINX_CHECK_LEAK_COUNT=1000
+
 For now, only C<GET>, C<POST>, C<PUT>, and C<HEAD> requests are supported
 (due to the limited HTTP support in both C<ab> and C<weighttp>).
 Other methods specified in the test cases will turn to C<GET> with force.
@@ -3837,6 +4254,13 @@ The tests in this mode will always succeed because this mode also
 enforces the "dry-run" mode.
 
 Test blocks carrying the "--- no_check_leak" directive will be skipped in this testing mode.
+
+=head2 TEST_NGINX_CHECK_LEAK_COUNT
+
+Takes a number value which controls how many data points to be sampled
+in the "check leak" test mode. See L<TEST_NGINX_CHECK_LEAK> for more details.
+
+Defaults to 100.
 
 =head2 TEST_NGINX_USE_HUP
 
@@ -3900,6 +4324,13 @@ a valgrind.suppress file.
 If this environment is set to the number C<1> or any other
 non-zero numbers, then it is equivalent to taking the value
 C<--tool=memcheck --leak-check=full>.
+
+=head2 TEST_NGINX_USE_RR
+
+Uses Mozilla rr to record the execution of the nginx server run by the test
+scaffold.
+
+This feature is experimental.
 
 =head2 TEST_NGINX_USE_STAP
 
@@ -4002,6 +4433,20 @@ C<prove -j8 -r t> runs the test suite under F<t/> in 8 parallel jobs, utilizing 
 
 Note that only test suite I<without> external shared and writable service dependencies (like Memcached,
 Redis or MySQL) can run in parallel in this way, obviously.
+
+=head2 TEST_NGINX_WORKER_USER
+
+Sets the user account used to run the nginx worker processes when the master process is enabled.
+This requires root access to run the nginx master process. For instance,
+
+    export TEST_NGINX_WORKER_USER='agentzh'
+
+Defaults to the `root` when the master is run by `root` also. Otherwise defaults to the current
+user.
+
+One can also add an optional user group separated by spaces, as in
+
+    export TEST_NGINX_WORKER_USER='agentzh wheel'
 
 =head2 Valgrind Integration
 

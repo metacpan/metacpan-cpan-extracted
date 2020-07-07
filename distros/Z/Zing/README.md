@@ -26,7 +26,7 @@ Perl 5. If you're unfamiliar with this architectural pattern, learn more about
 
 This package inherits behaviors from:
 
-[Zing::Watcher](https://metacpan.org/pod/Zing::Watcher)
+[Zing::Kernel](https://metacpan.org/pod/Zing::Kernel)
 
 # LIBRARIES
 
@@ -52,7 +52,7 @@ This package implements the following methods:
 
     start() : Kernel
 
-The start method builds a [Zing::Kernel](https://metacpan.org/pod/Zing::Kernel) and executes its event-loop.
+The start method prepares the [Zing::Kernel](https://metacpan.org/pod/Zing::Kernel) and executes its event-loop.
 
 - start example #1
 
@@ -119,7 +119,7 @@ These classes facilitate message-passing and communications:
 
 - [Zing::Channel](https://metacpan.org/pod/Zing::Channel): Shared Communication
 - [Zing::Data](https://metacpan.org/pod/Zing::Data): Process Data
-- [Zing::Domain](https://metacpan.org/pod/Zing::Domain): Aggregate Root
+- [Zing::Domain](https://metacpan.org/pod/Zing::Domain): Shared State Management
 - [Zing::Dropbox](https://metacpan.org/pod/Zing::Dropbox): Transient Store
 - [Zing::KeyVal](https://metacpan.org/pod/Zing::KeyVal): Key/Value Store
 - [Zing::Mailbox](https://metacpan.org/pod/Zing::Mailbox): Process Mailbox
@@ -155,6 +155,7 @@ These classes are ready-made process implementations using callbacks:
 - [Zing::Zang::Simple](https://metacpan.org/pod/Zing::Zang::Simple): Process Performer
 - [Zing::Zang::Single](https://metacpan.org/pod/Zing::Zang::Single): Single-Task Process
 - [Zing::Zang::Spawner](https://metacpan.org/pod/Zing::Zang::Spawner): Process Spawner
+- [Zing::Zang::Timer](https://metacpan.org/pod/Zing::Zang::Timer): Timer Process
 - [Zing::Zang::Watcher](https://metacpan.org/pod/Zing::Zang::Watcher): Process Watcher
 - [Zing::Zang::Worker](https://metacpan.org/pod/Zing::Zang::Worker): Worker Process
 
@@ -179,22 +180,27 @@ message-passing.
 ## asynchronous
 
     # in process (1)
+    use Zing::Domain;
     use Zing::Process;
 
+    my $d1 = Zing::Domain->new(name => 'peers');
     my $p1 = Zing::Process->new(name => 'p1');
 
+    $d1->push('mailboxes', $p1->mailbox->term);
     $p1->execute;
 
     # in process (2)
+    use Zing::Domain;
     use Zing::Process;
 
+    my $d2 = Zing::Domain->new(name => 'peers');
     my $p2 = Zing::Process->new(name => 'p2');
 
-    my $friends = $p2->registry->keys;
+    my $mailboxes = $d2->get('mailboxes');
 
-    for my $friend (@$friends) {
+    for my $address (@$mailboxes) {
       # send each registered process a message
-      $p2->send($friend, { discovery => $p2->term });
+      $p2->send($address, { discovery => $p2->mailbox->term });
     }
 
     $p2->execute;
@@ -316,7 +322,11 @@ scale your deployments without changing your implementations.
     ZING_HOST=0.0.0.0
     ZING_HOST=68.80.90.100
 
+    # configure the system datastore (defaults to 'Zing::Redis')
+    ZING_STORE='Zing::Redis'
+
     # configure Redis driver without touching your source code
+    ZING_REDIS='server=127.0.0.1:6379'
     ZING_REDIS='every=1_000_000,reconnect=60'
     ZING_REDIS='sentinels=127.0.0.1:12345|127.0.0.1:23456,sentinels_cnx_timeout=0.1'
     ZING_REDIS='server=192.168.0.1:6379,debug=0'
@@ -594,6 +604,20 @@ feature is enabled by the [Zing::Launcher](https://metacpan.org/pod/Zing::Launch
 [The Pyakka Project](https://github.com/jodal/pykka)
 
 [The Reactive Manifesto](http://www.reactivemanifesto.org)
+
+# DISCLOSURES
+
+The following is a list of all the known ways Zing is not like a traditional
+actor-model system:
+
+- In Zing, actors act independently and aren't beholden to a system manager.
+- In Zing, actors are always active (each runs its own infinite event-loop).
+- In Zing, actors can communicate unrestricted (no approved communicators).
+- In Zing, actors can block using `poll` but do not block by default.
+- In Zing, the default datastore/backend is [Redis](https://redis.io) which means
+the system is (by default) subject to the guarantees and limitations of that
+system. Data is serialized as [JSON](https://json.org) and stored in
+plain-text.
 
 # AUTHOR
 

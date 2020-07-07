@@ -13,12 +13,11 @@ Passwd::Keyring::Auto - interface to secure password storage(s)
 
 =head1 VERSION
 
-Version 0.7201
-
+Version 1.0000
 
 =cut
 
-our $VERSION = '0.7201';
+our $VERSION = '1.0000';
 
 =head1 SYNOPSIS
 
@@ -359,7 +358,7 @@ Marcin Kasperski
 =head1 BUGS
 
 Please report any bugs or feature requests to
-issue tracker at L<https://bitbucket.org/Mekk/perl-keyring-auto>.
+issue tracker at L<https://helixteamhub.cloud/mekk/projects/perl/issues>.
 
 =head1 SUPPORT
 
@@ -373,7 +372,7 @@ L<http://search.cpan.org/~mekk/Passwd-Keyring-Auto/>
 
 Source code is tracked at:
 
-L<https://bitbucket.org/Mekk/perl-keyring-auto>
+L<https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto>
 
 =head1 LICENSE AND COPYRIGHT
 

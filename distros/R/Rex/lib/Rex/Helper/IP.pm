@@ -9,7 +9,7 @@ package Rex::Helper::IP;
 use strict;
 use warnings;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 use Data::Validate::IP 'is_ipv4', 'is_ipv6';
 

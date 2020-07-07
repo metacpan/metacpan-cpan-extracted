@@ -3,7 +3,7 @@ package Test::Compile;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.4.0");
+use version; our $VERSION = qv("v2.4.1");
 use parent 'Exporter';
 use UNIVERSAL::require;
 use Test::Compile::Internal;

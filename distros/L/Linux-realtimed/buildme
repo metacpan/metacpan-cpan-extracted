@@ -1,0 +1,6 @@
+#!/bin/bash
+rm ./MANIFEST
+perl Makefile.PL 
+make manifest 
+make dist clean
+rm MANIFEST.bak Makefile.old

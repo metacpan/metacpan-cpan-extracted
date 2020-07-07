@@ -4,7 +4,7 @@
       "Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "passwords",
       "security",
@@ -19,7 +19,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Passwd-Keyring-Gnome",
    "prereqs" : {
@@ -27,7 +27,8 @@
          "requires" : {
             "ExtUtils::CBuilder" : "0",
             "Module::Build" : "0.19",
-            "Pod::Readme" : "0",
+            "Pod::Markdown" : "2.0",
+            "Pod::Readme" : "1.001002",
             "Test::More" : "0",
             "Test::Pod::Coverage" : "1.0"
          }
@@ -48,21 +49,22 @@
    "provides" : {
       "Passwd::Keyring::Gnome" : {
          "file" : "lib/Passwd/Keyring/Gnome.pm",
-         "version" : "0.3003"
+         "version" : "1.0000"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bitbucket.org/Mekk/perl-keyring-gnome/issues"
+         "web" : "https://helixteamhub.cloud/mekk/projects/perl/issues"
       },
-      "homepage" : "http://bitbucket.org/Mekk/perl-keyring-gnome",
+      "homepage" : "https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-gnome",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://bitbucket.org/Mekk/perl-keyring-gnome"
+         "url" : "https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-gnome"
       }
    },
-   "version" : "0.3003"
+   "version" : "1.0000",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

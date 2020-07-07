@@ -1,5 +1,9 @@
 Revision history for Perl extension Test-Compile
 
+v2.4.1    2020-07-06
+    - Fix if perl is installed in a dir with a space in it's path
+    - Fix for Strwberry perl without Devel::CheckOS
+
 v2.4.0    2020-03-29
     - RT-132153: Be more verbose when in verbose mode
     - Update copyright

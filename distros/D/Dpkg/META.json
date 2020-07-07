@@ -20,6 +20,9 @@
    "name" : "Dpkg",
    "prereqs" : {
       "configure" : {
+         "recommends" : {
+            "Module::Signature" : "0"
+         },
          "requires" : {
             "Module::Build" : "0.4004"
          }
@@ -248,7 +251,7 @@
       },
       "Dpkg::Path" : {
          "file" : "lib/Dpkg/Path.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       },
       "Dpkg::Shlibs" : {
          "file" : "lib/Dpkg/Shlibs.pm",
@@ -376,6 +379,6 @@
          "web" : "https://git.dpkg.org/cgit/dpkg/dpkg.git"
       }
    },
-   "version" : "v1.20.3",
+   "version" : "v1.20.4",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

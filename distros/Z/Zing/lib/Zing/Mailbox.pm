@@ -15,7 +15,7 @@ extends 'Zing::PubSub';
 
 use Zing::Term;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 
@@ -45,7 +45,7 @@ fun new_target($self) {
 # METHODS
 
 method recv() {
-  return $self->store->pull($self->term);
+  return $self->store->lpull($self->term);
 }
 
 method message(HashRef $val) {
@@ -57,7 +57,7 @@ method reply(HashRef $bag, HashRef $val) {
 }
 
 method send(Str $key, HashRef $val) {
-  return $self->store->push($self->term($key), $self->message($val));
+  return $self->store->rpush($self->term($key), $self->message($val));
 }
 
 method size() {
@@ -180,7 +180,7 @@ The recv method receives a single new message from the mailbox.
 
   reply(HashRef $bag, HashRef $value) : Int
 
-The reply method sends a message to the mailbox represented by the C<$data>
+The reply method sends a message to the mailbox represented by the C<$bag>
 received and returns the size of the recipient mailbox.
 
 =over 4

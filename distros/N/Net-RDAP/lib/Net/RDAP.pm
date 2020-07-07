@@ -17,7 +17,7 @@ use Net::RDAP::SearchResult;
 use vars qw($VERSION);
 use strict;
 
-$VERSION = 0.14;
+$VERSION = 0.15;
 
 =pod
 
@@ -381,10 +381,13 @@ sub fetch {
 	#
 	$request->header('Authorization' => sprintf('Basic %s', encode_base64(join(':', ($args{'user'}, $args{'pass'}))))) if ($args{'user'} && $args{'pass'});
 
+	#
+	# path to local copy of the remote resource
+	#
 	my $file = sprintf(
 		'%s/Net-RDAP-cache-%s.json',
 		($ENV{'TMPDIR'} || '/tmp'),
-		sha1_hex($url),
+		sha1_hex($url->isa('URI') ? $url->as_string : $url),
 	);
 
 	#

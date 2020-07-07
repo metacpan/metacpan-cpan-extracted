@@ -3,7 +3,7 @@ package Test::Nginx::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use base 'Exporter';
 
@@ -13,7 +13,7 @@ use HTTP::Response;
 use Cwd qw( cwd );
 use List::Util qw( shuffle );
 use Time::HiRes qw( sleep );
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
 use File::Find qw(find);
 use File::Temp qw( tempfile :POSIX );
 use Scalar::Util qw( looks_like_number );
@@ -24,11 +24,18 @@ use Carp qw( croak );
 
 our $ConfigVersion;
 our $FilterHttpConfig;
+my $LoadedIPCRun;
 
 our $NoLongString = undef;
 our $FirstTime = 1;
 
+our $ReusePort = $ENV{TEST_NGINX_REUSE_PORT};
+
+our $UseHttp2 = $ENV{TEST_NGINX_USE_HTTP2};
+
 our $UseHup = $ENV{TEST_NGINX_USE_HUP};
+
+our $UseRr = $ENV{TEST_NGINX_USE_RR};
 
 our $Verbose = $ENV{TEST_NGINX_VERBOSE};
 
@@ -36,6 +43,8 @@ our $LatestNginxVersion = 0.008039;
 
 our $NoNginxManager = $ENV{TEST_NGINX_NO_NGINX_MANAGER} || 0;
 our $Profiling = 0;
+
+sub use_http2 ($);
 
 our $InSubprocess;
 our $RepeatEach = 1;
@@ -69,10 +78,17 @@ our $ServerAddr = '127.0.0.1';
 
 our $ServerName = 'localhost';
 
+our $WorkerUser = $ENV{TEST_NGINX_WORKER_USER};
+if (defined $WorkerUser && $WorkerUser !~ /^\w+(?:\s+\w+)?$/) {
+    die "Bad value in the env TEST_NGINX_WORKER_USER: $WorkerUser\n";
+}
+
 our $StapOutFileHandle;
 
 our @RandStrAlphabet = ('A' .. 'Z', 'a' .. 'z', '0' .. '9',
     '#', '@', '-', '_', '^');
+
+our $PrevBlock;
 
 our $ErrLogFilePos;
 
@@ -219,6 +235,10 @@ sub no_shuffle () {
 
 sub no_nginx_manager () {
     $NoNginxManager = 1;
+}
+
+sub use_hup() {
+    $UseHup = 1;
 }
 
 our @CleanupHandlers;
@@ -384,6 +404,7 @@ sub master_process_enabled (@) {
 }
 
 our @EXPORT = qw(
+    use_http2
     env_to_nginx
     is_str
     check_accum_error_log
@@ -402,6 +423,7 @@ our @EXPORT = qw(
     stap_out_fname
     bail_out
     add_cleanup_handler
+    access_log_data
     error_log_data
     setup_server_root
     write_config_file
@@ -420,6 +442,7 @@ our @EXPORT = qw(
     $ConfFile
     $RunTestHelper
     $CheckErrorLog
+    $CheckShutdownErrorLog
     $FilterHttpConfig
     $NoNginxManager
     $RepeatEach
@@ -443,12 +466,15 @@ our @EXPORT = qw(
     server_port
     server_port_for_client
     no_nginx_manager
+    use_hup
 );
 
 
 if ($Profiling || $UseValgrind || $UseStap) {
     $DaemonEnabled          = 'off';
-    $MasterProcessEnabled   = 'off';
+    if (!$UseValgrind) {
+        $MasterProcessEnabled   = 'off';
+    }
 }
 
 our $ConfigPreamble = '';
@@ -459,9 +485,11 @@ sub config_preamble ($) {
 
 our $RunTestHelper;
 our $CheckErrorLog;
+our $CheckShutdownErrorLog;
 
 our $NginxVersion;
 our $NginxRawVersion;
+our $OpenSSLVersion;
 
 sub add_block_preprocessor(&) {
     unshift @BlockPreprocessors, shift;
@@ -616,6 +644,23 @@ sub cleanup () {
     }
 }
 
+sub access_log_data () {
+    sleep $TestNginxSleep * 3;
+
+    open my $in, $AccLogFile or do {
+        if ($AccLogFile ne "off") {
+            die "open $AccLogFile failed: $!";
+        }
+
+        return undef;
+    };
+
+    my @lines = <$in>;
+
+    close $in;
+    return \@lines;
+}
+
 sub error_log_data () {
     # this is for logging in the log-phase which is after the server closes the connection:
     sleep $TestNginxSleep * 3;
@@ -637,6 +682,29 @@ sub error_log_data () {
     return \@lines;
 }
 
+sub check_prev_block_shutdown_error_log () {
+    my $block = $PrevBlock;
+
+    if (!defined $block) {
+        return;
+    }
+
+    my $name = $block->name;
+    my $dry_run;
+
+    if (defined $block->shutdown_error_log) {
+        if ($UseHup) {
+            $dry_run = 1;
+        }
+
+        if ($ENV{TEST_NGINX_NO_CLEAN}) {
+            $dry_run = 1;
+        }
+
+        $CheckShutdownErrorLog->($block, $dry_run);
+    }
+}
+
 sub run_tests () {
     $NginxVersion = get_nginx_version();
 
@@ -652,55 +720,41 @@ sub run_tests () {
         for my $hdl (@BlockPreprocessors) {
             $hdl->($block);
         }
+
         run_test($block);
+
+        $PrevBlock = $block;
     }
 
     cleanup();
 }
 
-sub setup_server_root () {
+sub setup_server_root ($) {
+    my $first_time = shift;
+
     if (-d $ServRoot) {
+        # Take special care, so we won't accidentally remove
+        # real user data when TEST_NGINX_SERVROOT is mis-used.
+        remove_tree($ConfDir, glob("$ServRoot/*_cache"),
+                    glob("$ServRoot/*_temp"));
+
         if ($UseHup) {
             find({ bydepth => 1, no_chdir => 1, wanted => sub {
-                 if (-d $_) {
-                     if ($_ ne $ServRoot && $_ ne $LogDir) {
-                         #warn "removing directory $_";
-                         rmdir $_ or warn "Failed to rmdir $_\n";
-                     }
+                if (! -d $_) {
+                    if ($_ =~ /(?:\bnginx\.pid|\.sock|\.crt|\.key)$/) {
+                        return unless $first_time;
+                    }
 
-                 } else {
-                     if ($_ =~ /\bnginx\.pid$/) {
-                         return;
-                     }
-
-                     #warn "removing file $_";
-                     system("rm $_") == 0 or warn "Failed to remove $_\n";
-                 }
+                    #warn "removing file $_";
+                    system("rm $_") == 0 or warn "Failed to remove $_\n";
+                }
 
             }}, $ServRoot);
 
         } else {
-
-            # Take special care, so we won't accidentally remove
-            # real user data when TEST_NGINX_SERVROOT is mis-used.
-            my $rc = system("rm -rf $ConfDir > /dev/null");
-            if ($rc != 0) {
-                if ($rc == -1) {
-                    bail_out "Cannot remove $ConfDir: $rc: $!\n";
-
-                } else {
-                    bail_out "Can't remove $ConfDir: $rc";
-                }
-            }
-
-            system("rm -rf $HtmlDir > /dev/null") == 0 or
-                bail_out "Can't remove $HtmlDir";
-            system("rm -rf $LogDir > /dev/null") == 0 or
-                bail_out "Can't remove $LogDir";
-            system("rm -rf $ServRoot/*_temp > /dev/null") == 0 or
-                bail_out "Can't remove $ServRoot/*_temp";
-            system("rmdir $ServRoot > /dev/null") == 0 or
-                bail_out "Can't remove $ServRoot (not empty?)";
+            remove_tree($HtmlDir, $LogDir);
+            rmdir $ServRoot or
+                bail_out "Can't remove $ServRoot (not empty?): $!";
         }
     }
     if (!-d $ServRoot) {
@@ -711,8 +765,10 @@ sub setup_server_root () {
         mkdir $LogDir or
             bail_out "Failed to do mkdir $LogDir\n";
     }
-    mkdir $HtmlDir or
-        bail_out "Failed to do mkdir $HtmlDir\n";
+    if (!-d $HtmlDir) {
+        mkdir $HtmlDir or
+            bail_out "Failed to do mkdir $HtmlDir\n";
+    }
 
     my $index_file = "$HtmlDir/index.html";
 
@@ -787,6 +843,8 @@ sub write_user_files ($) {
                 }
             }
 
+            $body = expand_env_in_text($body);
+
             open my $out, ">$path" or
                 bail_out "$name - Cannot open $path for writing: $!\n";
             binmode $out;
@@ -815,11 +873,14 @@ sub write_config_file ($$) {
     if ($UseHup) {
         master_on(); # config reload is buggy when master is off
 
-    } elsif ($UseValgrind || $UseStap) {
+    } elsif ($UseValgrind) {
+        #master_off();
+
+    } elsif ($UseStap && defined $block->stap) {
         master_off();
     }
 
-    $http_config = expand_env_in_config($http_config);
+    $http_config = expand_env_in_text($http_config);
 
     if (!defined $config) {
         $config = '';
@@ -841,7 +902,7 @@ sub write_config_file ($$) {
 
     if (defined $PostponeOutput) {
         if ($PostponeOutput !~ /^\d+$/) {
-            bail_out "Bad TEST_NGINX_POSTPOHNE_OUTPUT value: $PostponeOutput\n";
+            bail_out "Bad TEST_NGINX_POSTPONE_OUTPUT value: $PostponeOutput\n";
         }
         $extra_http_config .= "\n    postpone_output $PostponeOutput;\n";
     }
@@ -857,13 +918,13 @@ sub write_config_file ($$) {
         }
     }
 
-    $main_config = expand_env_in_config($main_config);
+    $main_config = expand_env_in_text($main_config);
 
     if (!defined $post_main_config) {
         $post_main_config = '';
     }
 
-    $post_main_config = expand_env_in_config($post_main_config);
+    $post_main_config = expand_env_in_text($post_main_config);
 
     if ($CheckLeak || $Benchmark) {
         $LogLevel = 'warn';
@@ -905,6 +966,16 @@ _EOC_
         print $out "env $v;\n";
     }
 
+    my $listen_opts = '';
+
+    if (use_http2($block)) {
+        $listen_opts .= " http2";
+    }
+
+    if ($ReusePort) {
+        $listen_opts .= " reuseport";
+    }
+
     print $out <<_EOC_;
 #env LUA_PATH;
 #env LUA_CPATH;
@@ -921,7 +992,7 @@ http {
 $http_config
 
     server {
-        listen          $ServerPort;
+        listen          $ServerPort$listen_opts;
         server_name     '$server_name';
 
         client_max_body_size 30M;
@@ -951,7 +1022,7 @@ _EOC_
     if ($UseHup) {
         print $out <<_EOC_;
     server {
-        listen          $ServerPort;
+        listen          $ServerPort$listen_opts;
         server_name     'Test-Nginx';
 
         location = /ver {
@@ -986,7 +1057,16 @@ _EOC_
 
     print $out <<_EOC_;
 env ASAN_OPTIONS;
+env MOCKNOEAGAIN_VERBOSE;
+env MOCKNOEAGAIN;
 _EOC_
+
+    if (defined $WorkerUser) {
+        print $out "user $WorkerUser;\n";
+
+    } elsif ($> == 0) {  # being root
+        print $out "user root;\n";
+    }
 
     close $out;
 }
@@ -995,19 +1075,35 @@ sub get_canon_version (@) {
     sprintf "%d.%03d%03d", $_[0], $_[1], $_[2];
 }
 
+sub get_canon_version_for_OpenSSL (@) {
+    if (defined $_[3]) {
+        return sprintf "%d.%03d%03d%03d", $_[0], $_[1], $_[2], ord($_[3]) - ord('a');
+    }
+
+    get_canon_version @_;
+}
+
 sub get_nginx_version () {
     my $out = `$NginxBinary -V 2>&1`;
     if (!defined $out || $? != 0) {
-        bail_out("Failed to get the version of the Nginx in PATH");
+        $out //= "";
+        bail_out("Failed to get the version of the Nginx in PATH: $out");
     }
-    if ($out =~ m{(?:nginx|openresty)/(\d+)\.(\d+)\.(\d+)}s) {
+
+    if ($out =~ m{built with OpenSSL (\d+)\.(\d+)\.(\d+)([a-z])}s) {
+        $OpenSSLVersion = get_canon_version_for_OpenSSL($1, $2, $3, $4);
+    }
+
+    if ($out =~ m{(?:nginx|openresty)[^/]*/(\d+)\.(\d+)\.(\d+)}s) {
         $NginxRawVersion = "$1.$2.$3";
         return get_canon_version($1, $2, $3);
     }
+
     if ($out =~ m{\w+/(\d+)\.(\d+)\.(\d+)}s) {
         $NginxRawVersion = "$1.$2.$3";
         return get_canon_version($1, $2, $3);
     }
+
     bail_out("Failed to parse the output of \"nginx -V\": $out\n");
 }
 
@@ -1040,9 +1136,9 @@ sub show_all_chars ($) {
     $s;
 }
 
-sub test_config_version ($) {
-    my $name = shift;
-    my $total = 35;
+sub test_config_version ($$) {
+    my ($name, $block) = @_;
+    my $total = 200;
     my $sleep = sleep_time();
     my $nsucc = 0;
 
@@ -1050,7 +1146,15 @@ sub test_config_version ($) {
 
     for (my $tries = 1; $tries <= $total; $tries++) {
 
-        my $ver = `curl -s -S -H 'Host: Test-Nginx' --connect-timeout 2 'http://$ServerAddr:$ServerPort/ver'`;
+        my $extra_curl_opts = '';
+
+        if (use_http2($block)) {
+            $extra_curl_opts .= ' --http2 --http2-prior-knowledge';
+        }
+
+        my $cmd = "curl$extra_curl_opts -sS -H 'Host: Test-Nginx' --connect-timeout 2 'http://$ServerAddr:$ServerPort/ver'";
+        #warn $cmd;
+        my $ver = `$cmd`;
         #chop $ver;
 
         if ($Verbose) {
@@ -1064,7 +1168,7 @@ sub test_config_version ($) {
                 sleep $sleep;
             }
 
-            if ($nsucc >= 10) {
+            if ($nsucc >= 20) {
                 #warn "MATCHED!!!\n";
                 return;
             }
@@ -1097,7 +1201,8 @@ sub test_config_version ($) {
     my $tb = Test::More->builder;
     $tb->no_ending(1);
 
-    Test::More::fail("$name - failed to reload configuration");
+    Test::More::fail("$name - failed to reload configuration after $total "
+                     . "failed test requests");
 }
 
 sub parse_headers ($) {
@@ -1119,20 +1224,20 @@ sub parse_headers ($) {
     return \%headers;
 }
 
-sub expand_env_in_config ($) {
-    my $config = shift;
+sub expand_env_in_text ($) {
+    my $text = shift;
 
-    if (!defined $config) {
+    if (!defined $text) {
         return;
     }
 
-    $config =~ s/\$(TEST_NGINX_[_A-Z0-9]+)/
+    $text =~ s/\$(TEST_NGINX_[_A-Z0-9]+)/
         if (!defined $ENV{$1}) {
             bail_out "No environment $1 defined.\n";
         }
         $ENV{$1}/eg;
 
-    $config;
+    $text;
 }
 
 sub check_if_missing_directives () {
@@ -1216,7 +1321,7 @@ sub run_test ($) {
 
     my $config = $block->config;
 
-    $config = expand_env_in_config($config);
+    $config = expand_env_in_text($config);
 
     my $dry_run = 0;
     my $should_restart = 1;
@@ -1300,9 +1405,14 @@ sub run_test ($) {
 
     my $skip_nginx = $block->skip_nginx;
     my $skip_nginx2 = $block->skip_nginx2;
+    my $skip_openssl = $block->skip_openssl;
     my $skip_eval = $block->skip_eval;
     my $skip_slave = $block->skip_slave;
     my ($tests_to_skip, $should_skip, $skip_reason);
+
+    if (defined $block->reload_fails || defined $block->http2) {
+        $block->set_value("no_check_leak", 1);
+    }
 
     if (($CheckLeak || $Benchmark) && defined $block->no_check_leak) {
         $should_skip = 1;
@@ -1401,6 +1511,39 @@ sub run_test ($) {
         }
     }
 
+    if (defined $skip_openssl) {
+        if ($skip_openssl =~ m{
+                ^ \s* (\d+) \s* : \s*
+                    ([<>]=?) \s* (\d+)\.(\d+)\.(\d+)([a-z])?
+                    (?: \s* : \s* (.*) )?
+                \s*$}x) {
+            $tests_to_skip = $1;
+            my ($op, $ver1, $ver2, $ver3, $ver4) = ($2, $3, $4, $5, $6);
+            $skip_reason = $7;
+            if (!$skip_reason) {
+                if (!defined $OpenSSLVersion) {
+                    $skip_reason = "Not built with OpenSSL";
+
+                } elsif (defined $ver4) {
+                    $skip_reason = "OpenSSL version $op $ver1.$ver2.$ver3$ver4";
+
+                } else {
+                    $skip_reason = "OpenSSL version $op $ver1.$ver2.$ver3";
+                }
+            }
+
+            my $ver = get_canon_version_for_OpenSSL($ver1, $ver2, $ver3, $ver4);
+            if (!defined $OpenSSLVersion or eval "$OpenSSLVersion $op $ver") {
+                $should_skip = 1;
+            }
+
+        } else {
+            bail_out("$name - Invalid --- skip_openssl spec: " .
+                $skip_openssl);
+            die;
+        }
+    }
+
     if (!defined $skip_reason) {
         $skip_reason = "various reasons";
     }
@@ -1490,7 +1633,7 @@ sub run_test ($) {
                         goto start_nginx;
                     }
 
-                    setup_server_root();
+                    setup_server_root($first_time);
                     write_user_files($block);
                     write_config_file($block, $config);
 
@@ -1517,7 +1660,14 @@ sub run_test ($) {
                                 warn "$name\n";
                             }
 
-                            test_config_version($name);
+                            if (defined $block->reload_fails) {
+                                sleep 0.3;
+
+                            } else {
+                                test_config_version($name, $block);
+                            }
+
+                            check_prev_block_shutdown_error_log();
 
                             goto request;
 
@@ -1551,6 +1701,8 @@ sub run_test ($) {
 
 start_nginx:
 
+        check_prev_block_shutdown_error_log();
+
         unless ($nginx_is_running) {
             if ($Verbose) {
                 warn "starting nginx from scratch\n";
@@ -1559,7 +1711,7 @@ start_nginx:
             #system("killall -9 nginx");
 
             #warn "*** Restarting the nginx server...\n";
-            setup_server_root();
+            setup_server_root($first_time);
             write_user_files($block);
             write_config_file($block, $config);
             #warn "nginx binary: $NginxBinary";
@@ -1576,10 +1728,15 @@ start_nginx:
             }
 
             my $cmd;
+
             if ($NginxVersion >= 0.007053) {
                 $cmd = "$NginxBinary -p $ServRoot/ -c $ConfFile > /dev/null";
             } else {
                 $cmd = "$NginxBinary -c $ConfFile > /dev/null";
+            }
+
+            if ($UseRr) {
+                $cmd = "rr record $cmd";
             }
 
             if ($UseValgrind) {
@@ -1720,8 +1877,11 @@ start_nginx:
                 my $i = 0;
                 $ErrLogFilePos = 0;
                 my ($exec_failed, $coredump, $exit_code);
+                my $waited = 0;
 
 RUN_AGAIN:
+
+                #warn "CMD: $cmd";
                 system($cmd);
 
                 my $status = $?;
@@ -1785,6 +1945,14 @@ RUN_AGAIN:
                         $dry_run = "the lack of directive $directive";
 
                     } else {
+                        $i++;
+                        my $delay = 0.1 * $i;
+                        if ($delay > 1) {
+                            $delay = 1;
+                        }
+                        sleep $delay;
+                        $waited += $delay;
+                        goto RUN_AGAIN if $waited < 30;
                         bail_out("$name - Cannot start nginx using command \"$cmd\" (status code $status).");
                     }
                 }
@@ -2333,7 +2501,7 @@ retry:
                 sleep $TestNginxSleep;
 
                 if (-f $PidFile) {
-                    if ($i++ < 5) {
+                    if ($i++ < 20) {
                         if ($Verbose) {
                             warn "nginx not quitted, retrying...\n";
                         }
@@ -2388,6 +2556,8 @@ END {
         }
     }
 
+    check_prev_block_shutdown_error_log();
+
     if ($Randomize) {
         if (defined $ServRoot && -d $ServRoot && $ServRoot =~ m{/t/servroot_\d+}) {
             system("rm -rf $ServRoot");
@@ -2415,6 +2585,70 @@ sub can_run {
         return $abs if -f $abs && -x $abs;
     }
 
+    return undef;
+}
+
+sub use_http2 ($) {
+    my $block = shift;
+
+    my $cached = $block->test_nginx_enabled_http2;
+    if (defined $cached) {
+        return $cached;
+    }
+
+    if (defined $block->http2) {
+        if ($block->raw_request) {
+            bail_out("cannot use --- http2 with --- raw_request");
+        }
+
+        if ($block->pipelined_requests) {
+            bail_out("cannot use --- http2 with --- pipelined_requests");
+        }
+
+        $block->set_value("test_nginx_enabled_http2", 1);
+
+        if (!$LoadedIPCRun) {
+            require IPC::Run;
+            $LoadedIPCRun = 1;
+        }
+        return 1;
+    }
+
+    if ($UseHttp2) {
+        if ($block->raw_request) {
+            warn "WARNING: ", $block->name, " - using raw_request HTTP/2, will not use HTTP/2\n";
+            $block->set_value("test_nginx_enabled_http2", 0);
+            return undef;
+        }
+
+        if ($block->pipelined_requests) {
+            warn "WARNING: ", $block->name, " - using pipelined_requests, will not use HTTP/2\n";
+            $block->set_value("test_nginx_enabled_http2", 0);
+            return undef;
+        }
+
+        if (!defined $block->request) {
+            $block->set_value("test_nginx_enabled_http2", 0);
+            return undef;
+        }
+
+        if (!ref $block->request && $block->request =~ m{HTTP/1\.0}s) {
+            warn "WARNING: ", $block->name, " - explicitly rquires HTTP 1.0, so will not use HTTP/2\n";
+            $block->set_value("test_nginx_enabled_http2", 0);
+            return undef;
+        }
+
+        $block->set_value("test_nginx_enabled_http2", 1);
+
+        if (!$LoadedIPCRun) {
+            require IPC::Run;
+            $LoadedIPCRun = 1;
+        }
+
+        return 1;
+    }
+
+    $block->set_value("test_nginx_enabled_http2", 0);
     return undef;
 }
 

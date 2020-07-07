@@ -1,0 +1,471 @@
+%<?
+% 
+% $Star->addHook(qr/^%slide:(.*\n)/,sub{my $self=shift; my $all=shift;
+%    my $arg=shift; return $arg; });
+% $Star->addHook(qr/^%sl,l:(.*\n)/,sub{my $self=shift; my $all=shift;
+%    my $arg=shift; return $arg; });
+% $Star->addHook(qr/^[ \t]*\n/, sub { return "\n" });
+% $Star->addHook(qr/^.*\n/, 'comment');
+%!>
+
+%sl,l:\newcommand{\lecturenumber}{4}
+%sl,l:\newcommand{\lecturedate}{17-Sep-2007}
+
+%slide:\input{slides-start}
+%slide:\foilhead{}\begin{center}CSCI 6509\\Advanced Topics in Natural Language Processing\end{center}
+%slide:
+%slide:\vspace{1cm}
+%slide:\begin{center}
+%slide:\hrule
+%slide:
+%slide:\vspace{1cm}
+%slide:%\begin{tabbing}
+%slide:%xxxxxxxxxxxxxxxx\=\kill
+%slide:%\>  Time:\' Tuesdays and Thursdays 13:05--14:25\nltabbing
+%slide:%\> Location:\' Teaching Lab 3, CS building\nltabbing
+%slide:%\end{tabbing}
+%slide:
+%slide:{\large\bf
+%slide:%Part I: Linguistic Background\\[2ex]
+%slide:Lecture \lecturenumber:\\[2ex]
+%slide:Syntax; Semantics; Probabilistic Approach to NLP\\[2ex]
+%slide:\rm\normalsize
+%slide:\url{http://www.cs.dal.ca/~vlado/csci6509}\\[2ex]
+%slide:Vlado Keselj\\[2ex]
+%slide:Faculty of Computer Science\\[2ex]
+%slide:Dalhousie University
+%slide:}
+%slide:\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Lecture Notes
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\lecture{\lecturedate}{Syntax; Semantics; Probabilistic Approach to NLP}
+
+%\vspace{1cm}\hrule
+\section*{Previous Lecture}
+
+%slide:\foilhead{Previous Lecture}
+%slide:\par\vspace{1cm}\hrule\vspace{1cm}
+
+%sl,l:\begin{center}
+%sl,l:\begin{itemize}
+%sl,l: \item Closed word categories (continued): \begin{itemize}
+%sl,l:  \item possesive pronouns (PRP\$)
+%sl,l:  \item Wh-pronouns (WP) and Wh-possessives (WP\$)
+%sl,l:  \item prepositions (IN)
+%sl,l:  \item particles (RP)
+%sl,l:  \item possesive ending (POS)
+%sl,l:  \item modal verbs (MD), and auxiliaries
+%sl,l:  \item infinitive word `to' (TO)
+%sl,l:  \item qualifiers (RB)
+%sl,l:  \item wh-adverbs (WRB)
+%sl,l:  \item conjunctions (CC)
+%sl,l:  \item interjections (UH)
+%sl,l: \end{itemize}
+%slide:\newpage
+%sl,l: \item Open word categories
+%sl,l: \begin{itemize}
+%sl,l: \item Morphological processes:
+%sl,l: \begin{itemize}
+%sl,l: \item inflection \item derivation \item
+%sl,l:        compounding \end{itemize}
+%sl,l: \item nouns (NN, NNS, NNP, NNPS)
+%sl,l: \item adjectives (JJ, JJR, JJS)
+%sl,l: \item numbers (CD)
+%sl,l: \item verbs (VB, VBP, VBZ, VBG, VBD, VBN)
+%sl,l: \item adverbs (RB, RBR, RBS)
+%sl,l: \end{itemize}
+%sl,l:\end{itemize}
+%sl,l:\end{center}
+
+%\hrule\vspace{1cm}
+
+\newpage
+\subsection{Remaining POS Classes}
+
+\subsubsection{Foreign Words (FW)}
+
+Examples: de (tour de France),
+perestroika, pro, des
+
+\subsubsection{List Items (LS)}
+
+Examples:
+1, 2, 3, 4, a., b., c., first, second, etc.
+
+\subsubsection{Punctuation}
+
+\begin{tabbing}
+Examplesxxxxxxxxx\=Tagxxxxx\=Description\kill
+Examples\>Tag\>Description\\
+\rule[2mm]{.6\textwidth}{0.5pt}\\
+\verb/,/		\>\verb/,/	\>comma\\
+\verb/; : ... - --/	\>\verb/:/	\>midsentence separator\\
+\verb/. ! ?/		\>\verb/./	\>sentence end\\
+\verb/( { [ </		\>\verb/(/	\>open parenthesis\\
+\verb/) } ] >/		\>\verb/)/ 	\>closed parenthesis\\
+\verb/` `` non-``/	\>\verb/``/	\>open quote\\
+\verb/' ''/		\>\verb/''/	\>closed quote\\
+\verb/$ c HK$ CAN$/	\>\verb/$/	\>dollar sign\\
+\verb/#/		\>\verb/#/	\>pound sign\\
+\verb/- + & @ * ** ffr/ \>\verb/SYM/	\>everything else
+\end{tabbing}
+
+
+%slide:\foilhead{Remaining POS Classes}
+%slide:
+%slide:\vspace{1cm}{\bf --- Foreign Words (FW)}
+%slide:
+%slide:Examples: de (tour de France),
+%slide:perestroika, pro, des
+%slide:
+%slide:\vspace{1cm}{\bf --- List Items (LS)}
+%slide:
+%slide:Examples:
+%slide:1, 2, 3, 4, a., b., c., first, second, etc.
+%slide:
+%slide:\vspace{1cm}{\bf --- Punctuation}
+%slide:
+%slide:\foilhead{Punctuation}
+%slide:
+%slide:\begin{tabbing}
+%slide:Examplesxxxxxxxxxxxxxxxxx\=Tagxxxxx\=Description\kill
+%slide:Examples\>Tag\>Description\\
+%slide:\rule[2mm]{.8\textwidth}{0.5pt}\\
+%slide:\verb/,/		\>\verb/,/	\>comma\\
+%slide:\verb/; : ... - --/	\>\verb/:/	\>midsentence separator\\
+%slide:\verb/. ! ?/		\>\verb/./	\>sentence end\\
+%slide:\verb/( { [ </		\>\verb/(/	\>open parenthesis\\
+%slide:\verb/) } ] >/		\>\verb/)/ 	\>closed parenthesis\\
+%slide:\verb/` `` non-``/	\>\verb/``/	\>open quote\\
+%slide:\verb/' ''/		\>\verb/''/	\>closed quote\\
+%slide:\verb/$ c HK$ CAN$/	\>\verb/$/	\>dollar sign\\
+%slide:\verb/#/		\>\verb/#/	\>pound sign\\
+%slide:\verb/- + & @ * ** ffr/ \>\verb/SYM/	\>everything else
+%slide:\end{tabbing}
+
+%slide:\foilhead{Some Tagged Examples}
+%slide:\begin{verbatim}
+%slide:The/DT grand/JJ jury/NN commented/VBD on/IN
+%slide:a/DT number/NN of/IN other/JJ topics/NNS ./.
+%slide:
+%slide:Book/VB that/DT flight/NN ./.
+%slide:
+%slide:Does/VBZ that/DT flight/NN serve/VB dinner/NN ?/.
+%slide:
+%slide:It/PRP does/VBZ a/DT first-rate/JJ job/NN ./.
+%slide:
+%slide:``/`` When/WRB the/DT sell/NN programs/NNS hit/VBP
+%slide:,/, you/PRP can/MD hear/VB the/DT order/NN
+%slide:printers/NNS start/VB to/TO go/VB ''/'' on/IN the/DT
+%slide:Big/NNP Board/NNP trading/NN floor/NN ,/, says/VBZ
+%slide:one/CD specialist/NN there/RB ./.
+%slide:
+%slide:``/`` Do/VBP you/PRP make/VB sweatshirts/NNS or/CC
+%slide:sparkplugs/NNS ?/.
+%slide:\end{verbatim}
+
+
+\clearpageforcoursenotes
+
+%slide:\foilhead{Syntax}
+%slide:
+%slide:Reading: Chapter 9
+%slide:
+%slide:Syntax $=$ sentence structure; i.e., study of the phrase structure
+%slide:
+%slide:\begin{itemize}
+%slide:\item words are not randomly ordered ---
+%slide:word order is important and non-trivial
+%slide:\item There are ``free-order'' langauges (e.g., Latin, Russian), but
+%slide:  they are not completely free-order.
+%slide:\item a hierarchical view of sentence structure: \begin{itemize}
+%slide:\item words form phrases
+%slide:\item phrases form clauses
+%slide:\item clauses form sentences \end{itemize}
+%slide:\end{itemize}
+%slide:
+%slide:The main NLP problem in syntax is {\em parsing;} i.e., given a
+%slide:sentence, find a correct structure of the sentence (typically a parse
+%slide:tree).
+
+\section{Syntax}
+
+Syntax $=$ Phrase Structure
+
+\begin{itemize}
+\item words are not randomly ordered\\
+word order is important and non-trivial
+\item There are ``free-order'' langauges (Latin Russian)\\
+not completely free-order
+\item words form phrases
+\item phrases form clauses
+\item clauses form sentences
+\end{itemize}
+
+The main NLP problem in syntax is {\em parsing;} i.e., given a
+sentence, find a correct structure of the sentence
+
+``Structure'' is typically a parse tree.
+
+%slide:\foilhead{Example}
+%slide:
+%slide:That man caught the butterfly with a net.
+%slide:\begin{itemize}
+%slide:\item Syntactic tree example 
+%slide:\item Induced grammar example
+%slide:\item Context-Free Grammar example
+%slide:\end{itemize}
+
+\subsection*{Example}
+
+That man caught the butterfly with a net.
+
+\subsection{Context-Free Grammars (CFG)}
+%slide:\foilhead{Context-Free Grammars (CFG)}
+%slide:
+%slide:CFG is a touple $(V,T,P,S)$
+%slide:
+%slide:\begin{itemize}
+%slide:\item $V$ is a set of variables or non-terminals, e.g., $V=\{$S, NP, DT, NN, VP, VBD, PP, IN$\}$
+%slide:\item $T$ is a set of terminals, words, or lexemes, e.g., $T=\{$That,
+%slide:man, caught, the, butterfly, with, a, net$\}$
+%slide:\item $S$ is the start symbol $S\in T$
+%slide:\item $P$ is a set of rules in the form:
+%slide:\[ \textit{S} \rightarrow \textit{NP}\;\textit{VP}, \;\; \textit{NP}
+%slide:\rightarrow \textit{DT}\;\textit{NN}, \;\;
+%slide:\textit{DT}\rightarrow \textrm{That} \ldots \]
+%slide:\end{itemize}
+
+CFG is a touple $(V,T,P,S)$
+
+\begin{itemize}
+\item $V$ is a set of variables or non-terminals, e.g., $V=\{$S, NP, DT, NN, VP, VBD, PP, IN$\}$
+\item $T$ is a set of terminals, words, or lexemes, e.g., $T=\{$That,
+man, caught, the, butterfly, with, a, net$\}$
+\item $S$ is the start symbol $S\in T$
+\item $P$ is a set of rules in the form:
+\begin{verbatim}
+S -> NP VP, NP -> DT NN, DT -> That, etc.
+\end{verbatim}
+\end{itemize}
+
+%slide:\foilhead{Some Notions Related to CFGs}
+
+
+\subsection{Bracket Representation of a Parse Tree}
+
+\begin{verbatim}
+(S (NP (DT That)
+       (NN man))
+   (VP (VBD caught)
+       (NP (DT the)
+           (NN butterfly))
+       (PP (IN with)
+           (NP (DT a)
+               (NN net)
+)  )   )   )
+\end{verbatim}
+
+%slide:\foilhead{Bracket Representation of a Parse Tree}
+%slide:
+%slide:\vspace{2cm}
+%slide:\begin{verbatim}
+%slide:(S (NP (DT That)
+%slide:       (NN man))
+%slide:   (VP (VBD caught)
+%slide:       (NP (DT the)
+%slide:           (NN butterfly))
+%slide:       (PP (IN with)
+%slide:           (NP (DT a)
+%slide:               (NN net)
+%slide:)  )   )   )
+%slide:\end{verbatim}
+
+\subsection{Typical Natural Language CF Rules}
+
+\subsubsection{Sentence (S)}
+
+\begin{verbatim}
+S -> NP VP
+S -> VP
+S -> Aux NP VP
+S -> Wh-NP VP
+S -> Wh-NP Aux NP VP
+S -> NP
+\end{verbatim}
+
+%slide:\foilhead{Typical Phrase Structure in English}
+%slide:
+%slide:\mytitle{Sentence (S)}
+%slide:
+%slide:\begin{verbatim}
+%slide:S -> NP VP
+%slide:S -> VP
+%slide:S -> Aux NP VP
+%slide:S -> Wh-NP VP
+%slide:S -> Wh-NP Aux NP VP
+%slide:S -> NP
+%slide:\end{verbatim}
+
+\subsubsection{Noun Phrase (NP)}
+
+Typical:
+\begin{verbatim}
+NP -> DT JJ* NN PP*
+\end{verbatim}
+
+%slide:\mytitle{Noun Phrase (NP)}
+%slide:
+%slide:Typical:
+%slide:\begin{verbatim}
+%slide:NP -> DT JJ* NN PP*
+%slide:\end{verbatim}
+
+\subsubsection{Prepositional Phrase (PP)}
+
+Typical:
+\begin{verbatim}
+PP -> IN NP
+\end{verbatim}
+
+\subsubsection{Verb Phrase (VP)}
+
+Typical:
+\begin{verbatim}
+VP -> VB PP*
+VP -> VB NP PP*
+VP -> VB NP NP PP*
+\end{verbatim}
+
+%slide:\foilhead{Prepositional Phrase (PP)}
+%slide:
+%slide:Typical:
+%slide:\begin{verbatim}
+%slide:PP -> IN NP
+%slide:\end{verbatim}
+%slide:
+%slide:\mytitle{Verb Phrase (VP)}
+%slide:
+%slide:Typical:
+%slide:\begin{verbatim}
+%slide:VP -> VB PP*
+%slide:VP -> VB NP PP*
+%slide:VP -> VB NP NP PP*
+%slide:\end{verbatim}
+%slide:
+%slide:\mytitle{Adjective Phrase (AP)}
+%slide:
+%slide:\begin{itemize}
+%slide:\item less common
+%slide:\item example: She is {\em very sure of herself.}
+%slide:\end{itemize}
+%slide:
+%slide:\foilhead{Are Natural Languages Context-Free?}
+%slide:
+%slide:CFGs are usually not sufficient for NL parsing because of Natural
+%slide:Language Phenomena.
+
+\subsubsection{Adjective Phrase (AP)}
+
+\begin{itemize}
+\item less common
+\item example: She is {\em very sure of herself.}
+\end{itemize}
+
+
+\bigskip
+CFGs are usually not sufficient for NL parsing because of Natural
+Language Phenomena.
+
+\subsection{Natural Language Phenomena}
+
+Examples: Agreement, Movement, Subcategorization
+
+\subsubsection{Agreement}
+
+\begin{itemize}
+\item subject-verb agreement
+
+For example, ``I work.'' and ``He works.'' vs. *``I works.'' and *``He work.''
+
+\item specifier-head agreement
+
+For example, ``This book.'' and ``These books.'' vs. *``This books.''
+and ``These book.''
+
+\end{itemize}
+
+Agreement can be a non-local dependency, e.g:
+
+The {\bf women} who found the wallet {\bf were} given a reward.
+\vspace{1cm}
+
+\subsubsection{Movement}
+
+E.g, wh-movement
+
+\begin{tabbing}
+{\bf Which book} should Peter buy \= ?\\
+{\em filler} \> {\em gap}
+\end{tabbing}
+
+
+\subsubsection{Subcategorization}
+
+Example:\\
+The problem disappeared. and\\
+The defendant denied the accusation.
+\\are two valid sentences, however, the following two are
+grammatically incorrect:\\
+*The problem disappeared the accusation. and\\
+*The defendant denied.
+
+Explanation:
+\begin{itemize}
+\item ``disappear'' does not take an object (verb valence)
+\item ``deny'' requires an object
+\end{itemize}
+
+
+\subsection{Heads and Dependency}
+
+\subsubsection{Heads and Dependency}
+
+\begin{itemize}
+\item the parse tree of ``That man caught the butterfly with a net.''
+\item annotate dependencies, head words
+\end{itemize}
+
+\centerline{\includegraphics[height=5cm]{heads}}
+
+\subsubsection{Head-feature Principle}
+
+The features of a phrase are normally transfered from the features of
+the head word.
+
+\subsubsection{Dependency Tree}
+
+\begin{itemize}
+\item dependency grammar
+\item example with ``That man caught the butterfly with a net.''
+\end{itemize}
+
+\section{Semantics}
+
+\subsection{Lexical Semantics}
+
+...
+
+
+One of the simplest models of this kind is the Na\"{\i}ve Bayes Model.
+
+%slide:{\bf Natural Language Phenomena}
+%slide:
+%slide:\begin{itemize}
+%slide:\item Agreement
+%slide:\item Movement
+%slide:\item Subcategorization
+%slide:\end{itemize}
+%slide:\end{document}

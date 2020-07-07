@@ -4,7 +4,7 @@
 #
 
 package Parallel::WorkUnit::Procedural;
-$Parallel::WorkUnit::Procedural::VERSION = '2.191821';
+$Parallel::WorkUnit::Procedural::VERSION = '2.201890';
 use v5.8;
 
 # ABSTRACT: Provide procedural paradigm forking with ability to pass back data
@@ -72,7 +72,7 @@ Parallel::WorkUnit::Procedural - Provide procedural paradigm forking with abilit
 
 =head1 VERSION
 
-version 2.191821
+version 2.201890
 
 =head1 SYNOPSIS
 
@@ -190,7 +190,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Joelle Maslak.
+This software is copyright (c) 2020 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

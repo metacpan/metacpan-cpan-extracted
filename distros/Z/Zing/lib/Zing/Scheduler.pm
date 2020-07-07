@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'Zing::Launcher';
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # METHODS
 

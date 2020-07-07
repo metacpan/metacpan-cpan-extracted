@@ -17,14 +17,14 @@ use Storable 3.15 'dclone';
 
 no warnings 'experimental';
 
-our $VERSION='1.03';
+our $VERSION='1.05';
 
 =head1 NAME
 
 Vote::Count
 
 
-=head1 VERSION 1.03
+=head1 VERSION 1.05
 
 =cut
 

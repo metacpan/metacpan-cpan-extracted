@@ -1,3 +1,7 @@
+v0.27.0 2020-07-06T22:17:57+0800
+  - Add a site-specific extractor for new.ctv.com.tw
+  - Add a site-specific extractor for hk.crntt.com
+
 v0.26.0 2020-07-03T18:13:05+0800
   - Adjust the dateline output
 

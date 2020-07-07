@@ -14,8 +14,9 @@ use XML::LibXML;
 use YAML::Tiny;
 
 use MySQL::Workbench::Parser::Table;
+use MySQL::Workbench::Parser::View;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 has lint => ( is => 'ro', default => sub { 1 } );
 
@@ -32,7 +33,17 @@ has tables => (
         all { blessed $_ && $_->isa( 'MySQL::Workbench::Parser::Table' ) }@{$_[0]} ;
     },
     lazy    => 1,
-    builder => \&_parse,
+    builder => \&_parse_tables,
+);
+
+has views => (
+    is  => 'rwp',
+    isa => sub {
+        ref $_[0] && ref $_[0] eq 'ARRAY' &&
+        all { blessed $_ && $_->isa( 'MySQL::Workbench::Parser::View' ) }@{$_[0]} ;
+    },
+    lazy    => 1,
+    builder => \&_parse_views,
 );
 
 has datatypes => (
@@ -61,6 +72,10 @@ sub dump {
         push @{$info{tables}}, $table->as_hash;
     } 
 
+    for my $view ( @{ $self->views } ) {
+        push @{$info{views}}, $view->as_hash;
+    }
+
     my $yaml = YAML::Tiny->new;
     $yaml->[0] = \%info;
 
@@ -72,6 +87,20 @@ sub get_datatype {
 
     my $datatypes = $self->datatypes;
     return $datatypes->{$_[0]};
+}
+
+sub _parse_tables {
+    my ($self) = shift;
+
+    $self->_parse;
+    $self->tables;
+}
+
+sub _parse_views {
+    my ($self) = shift;
+
+    $self->_parse;
+    $self->views;
 }
 
 sub _parse {
@@ -126,8 +155,35 @@ sub _parse {
     }
 
     $self->_lint( \@tables ) if $self->lint;
-
     $self->_set_tables( \@tables );
+
+    my @views;
+
+    my @view_nodes = $dom->documentElement->findnodes( './/value[@struct-name="db.mysql.View"]' );
+
+    my %column_mapping;
+    if ( @view_nodes ) {
+
+        TABLE: 
+        for my $table ( @tables ) { 
+            my $name = $table->name; 
+         
+            for my $col ( @{ $table->columns } ) { 
+                my $col_name = $col->name; 
+                $column_mapping{$name}->{$col_name} = $col;
+            } 
+        }
+    }
+
+    for my $view_node ( @view_nodes ) {
+        push @views, MySQL::Workbench::Parser::View->new(
+            node           => $view_node,
+            column_mapping => \%column_mapping,
+            parser         => $self,
+        );
+    }
+
+    $self->_set_views( \@views );
 }
 
 sub _lint {
@@ -205,7 +261,7 @@ MySQL::Workbench::Parser - parse .mwb files created with MySQL Workbench
 
 =head1 VERSION
 
-version 1.08
+version 1.10
 
 =head1 SYNOPSIS
 
@@ -250,6 +306,12 @@ returns the MySQL name of the datatype
 An array of L<MySQL::Workbench::Parser::Table> objects
 
     my @tables = $parser->tables;
+
+=item * views
+
+An array of L<MySQL::Workbench::Parser::View> objects
+
+    my @views = $parser->views;
 
 =item * file
 

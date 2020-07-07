@@ -3,7 +3,7 @@ package plenigo;
 use strict;
 use warnings;
 
-our $VERSION = '3.0001';
+our $VERSION = '3.0002';
 
 =head1 NAME
 

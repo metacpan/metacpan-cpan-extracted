@@ -24,7 +24,6 @@ t/boilerplate.t
 t/cpan-meta-json.t
 t/cpan-meta.t
 t/kwalitee.t
-t/kwalitee_extra.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

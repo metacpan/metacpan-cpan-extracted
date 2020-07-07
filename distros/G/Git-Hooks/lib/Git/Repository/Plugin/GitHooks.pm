@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.11.1';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.12.0';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -859,6 +859,10 @@ EOS
         $faults .= "\n$colors->{footer}" . qx{$footer} . "$colors->{reset}\n"; ## no critic (ProhibitBacktickOperators)
     }
 
+    if (my $prefix = $git->get_config(githooks => 'error-prefix')) {
+        $faults =~ s/^/$prefix/gm;
+    }
+
     return $faults;
 }
 
@@ -1595,7 +1599,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.11.1
+version 2.12.0
 
 =head1 SYNOPSIS
 

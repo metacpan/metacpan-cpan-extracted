@@ -19,13 +19,15 @@ use Encode 'encode', 'decode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0706';
+our $VERSION = '0.0708';
 
 my $SPVM_INITED;
 my $BUILDER;
 
 require XSLoader;
 XSLoader::load('SPVM', $VERSION);
+
+my $loaded_spvm_modules = {};
 
 sub import {
   my ($class, $package_name) = @_;
@@ -37,180 +39,172 @@ sub import {
 
   # Add package informations
   if (defined $package_name) {
-    if ($package_name =~ /\.spvm$/) {
-      my $file = $package_name;
-      my $line = (caller)[2];
-      
-      my $package_info = {
-        name => 'Main',
-        file => $file,
-        line => $line
-      };
-      push @{$BUILDER->{package_infos}}, $package_info;
+    my ($file, $line) = (caller)[1, 2];
+    my $package_info = {
+      name => $package_name,
+      file => $file,
+      line => $line
+    };
+    push @{$BUILDER->{package_infos}}, $package_info;
+    
+    $BUILDER->build_spvm;
+    unless ($BUILDER->compile_success) {
+      exit(255);
     }
-    else {
-      my ($file, $line) = (caller)[1, 2];
-      my $package_info = {
-        name => $package_name,
-        file => $file,
-        line => $line
-      };
-      push @{$BUILDER->{package_infos}}, $package_info;
-    }
+
+    # Bind SPVM subroutine to Perl
+    bind_to_perl($BUILDER);
+
+    my $package_names = $BUILDER->get_package_names;
   }
 }
 
 sub init {
   unless ($SPVM_INITED) {
     if (my $builder = $BUILDER) {
-      $builder->build_spvm;
-      unless ($builder->compile_success) {
-        exit(255);
-      }
-      
       # Call begin blocks
       $builder->call_begin_blocks;
-      
-      # Bind SPVM subroutine to Perl
-      bind_to_perl($builder);
     }
     $SPVM_INITED = 1;
   }
 }
 
 my $package_name_h = {};
+my $binded_package_name_h = {};
 sub bind_to_perl {
   my $builder = shift;
   
   my $package_names = $builder->get_package_names;
   for my $package_name (@$package_names) {
-    
-    my $sub_names = $builder->get_sub_names($package_name);
-    
-    for my $sub_name (@$sub_names) {
-      if ($sub_name eq 'DESTROY') {
-        next;
-      }
+    unless ($binded_package_name_h->{$package_name}) {
+      my $sub_names = $builder->get_sub_names($package_name);
       
-      my $sub_abs_name = "${package_name}::$sub_name";
-      
-      # Define SPVM subroutine
-      no strict 'refs';
-      
-      my ($package_name, $sub_name) = $sub_abs_name =~ /^(?:(.+)::)(.*)/;
-      unless ($package_name_h->{$package_name}) {
-        
-        my $code = "package $package_name; our \@ISA = ('SPVM::BlessedObject::Package');";
-        eval $code;
-        
-        if (my $error = $@) {
-          confess $error;
+      for my $sub_name (@$sub_names) {
+        if ($sub_name eq 'DESTROY') {
+          next;
         }
-        $package_name_h->{$package_name} = 1;
-      }
-      
-      # Declare subroutine
-      *{"$sub_abs_name"} = sub {
-        confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
         
-        my $return_value;
-        eval { $return_value = SPVM::call_sub($package_name, $sub_name, @_) };
-        my $error = $@;
-        if ($error) {
-          confess $error;
+        my $sub_abs_name = "${package_name}::$sub_name";
+        
+        # Define SPVM subroutine
+        no strict 'refs';
+        
+        my ($package_name, $sub_name) = $sub_abs_name =~ /^(?:(.+)::)(.*)/;
+        unless ($package_name_h->{$package_name}) {
+          
+          my $code = "package $package_name; our \@ISA = ('SPVM::BlessedObject::Package');";
+          eval $code;
+          
+          if (my $error = $@) {
+            confess $error;
+          }
+          $package_name_h->{$package_name} = 1;
         }
-        $return_value;
-      };
+        
+        # Declare subroutine
+        *{"$sub_abs_name"} = sub {
+          SPVM::init() unless $SPVM_INITED;
+          
+          my $return_value;
+          eval { $return_value = SPVM::call_sub($package_name, $sub_name, @_) };
+          my $error = $@;
+          if ($error) {
+            confess $error;
+          }
+          $return_value;
+        };
+      }
     }
+    $binded_package_name_h->{$package_name} = 1;
   }
 }
 
 sub get_exception {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::get_exception($BUILDER->{env}, @_);
 }
 sub set_exception {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::set_exception($BUILDER->{env}, @_);
 }
 sub get_memory_blocks_count {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::get_memory_blocks_count($BUILDER->{env}, @_);
 }
 sub call_sub {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::call_sub($BUILDER->{env}, @_);
 }
 sub new_byte_array {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_byte_array($BUILDER->{env}, @_);
 }
 sub new_byte_array_from_bin {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_byte_array_from_bin($BUILDER->{env}, @_);
 }
 sub new_byte_array_from_string {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_byte_array_from_string($BUILDER->{env}, @_);
 }
 sub new_short_array {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_short_array($BUILDER->{env}, @_);
 }
 sub new_short_array_from_bin {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_short_array_from_bin($BUILDER->{env}, @_);
 }
 sub new_int_array {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_int_array($BUILDER->{env}, @_);
 }
 sub new_int_array_from_bin {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_int_array_from_bin($BUILDER->{env}, @_);
 }
 sub new_long_array {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_long_array($BUILDER->{env}, @_);
 }
 sub new_long_array_from_bin {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_long_array_from_bin($BUILDER->{env}, @_);
 }
 sub new_float_array {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_float_array($BUILDER->{env}, @_);
 }
 sub new_float_array_from_bin {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_float_array_from_bin($BUILDER->{env}, @_);
 }
 sub new_double_array {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_double_array($BUILDER->{env}, @_);
 }
 sub new_double_array_from_bin {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_double_array_from_bin($BUILDER->{env}, @_);
 }
 sub new_string {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_string($BUILDER->{env}, @_);
 }
 sub new_string_from_bin {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_string_from_bin($BUILDER->{env}, @_);
 }
 sub new_object_array {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_object_array($BUILDER->{env}, @_);
 }
 sub new_mulnum_array {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_mulnum_array($BUILDER->{env}, @_);
 }
 sub new_mulnum_array_from_bin {
-  confess "SPVM is not initialized. SPVM::init() must be call. Recommended: UNITCHECK { SPVM::init() }" unless $SPVM_INITED;
+  SPVM::init() unless $SPVM_INITED;
   SPVM::ExchangeAPI::new_mulnum_array_from_bin($BUILDER->{env}, @_);
 }
 
@@ -249,9 +243,6 @@ Use SPVM Module from Perl
   
   use SPVM 'MyMath';
   
-  # Initialize SPVM
-  UNITCHECK { SPVM::init() }
-
   # Call subroutine
   my $total = MyMath->sum([3, 6, 8, 9]);
 
@@ -289,9 +280,6 @@ Call SPVM Precompile Subroutine from Perl
   
   use SPVM 'MyMath';
   
-  # Initialize SPVM
-  UNITCHECK { SPVM::init() }
-
   # Call precompile subroutine
   my $total_precompile = MyMath->sum_precompile([3, 6, 8, 9]);
   
@@ -345,9 +333,6 @@ Use SPVM Native Subroutine from Perl
   
   use SPVM 'MyMath';
   
-  # Initialize SPVM
-  UNITCHECK { SPVM::init() }
-
   # Call native subroutine
   my $total_native = MyMath->sum_native([3, 6, 8, 9]);
   
@@ -654,9 +639,6 @@ You may be surprised to know that SPVM subroutines can be called directly from P
   
   use SPVM 'MyMath';
   
-  # Initialize SPVM
-  UNITCHECK { SPVM::init() }
-
   # Call subroutine
   my $total = MyMath->sum([3, 6, 8, 9]);
   
@@ -665,11 +647,6 @@ You may be surprised to know that SPVM subroutines can be called directly from P
 To load an SPVM module from Perl, use the following syntax.
 
   use SPVM 'MyMath';
-
-Initialize SPVM after load needed all SPVM modules.
-
-  # Initialize SPVM
-  UNITCHECK { SPVM::init() }
 
 Call SPVM subroutine from Perl.
 
@@ -871,7 +848,9 @@ In bash, you can set SPVM_BUILD_DIR to the following.
 
 =head1 CAUTION
 
-SPVM 1.0 is First Major Release. 
+This release is beta release before SPVM 1.0. Features is changed without warnings. 
+
+SPVM 1.0 is First Major Release
 
 But Full backward compatibility is not guaranteed because SPVM is not used much in corporate work yet.
 

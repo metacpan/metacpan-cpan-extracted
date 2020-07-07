@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2019 Joelle Maslak
+# Copyright (C) 2015-2020 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -14,8 +14,7 @@ use warnings;
 use autodie;
 
 use Carp;
-use Test::More;
-use Test::Exception;
+use Test2::V0;
 
 SKIP: {
     if ( !eval { require AnyEvent } ) {
@@ -31,23 +30,35 @@ SKIP: {
                   # But hopefully nobody has that slow of a machine!
 
     # Instantiate the object
-    require_ok('Parallel::WorkUnit');
+    use Parallel::WorkUnit;
     my $wu = Parallel::WorkUnit->new();
     $wu->use_anyevent(1);
 
     ok( defined($wu), "Constructer returned object" );
     is( $wu->count, 0, "no processes running before spawning any" );
 
-    dies_ok { $wu->max_children(-1); } 'Die when set max children to -1';
-    dies_ok { $wu->max_children(0); } 'Die when set max children to 0';
-    dies_ok { $wu->max_children('abc'); } 'Die when set max children to non-int';
+    like(
+        dies { $wu->max_children(-1); },
+        qr/max_children must be set to a positive integer/,
+        'Die when set max children to -1',
+    );
+    like(
+        dies { $wu->max_children(0); },
+        qr/max_children must be set to a positive integer/,
+        'Die when set max children to 0',
+    );
+    like(
+        dies { $wu->max_children('abc'); },
+        qr/max_children must be set to a positive integer/,
+        'Die when set max children to non-int',
+    );
 
     is( $wu->max_children(), 5, 'Max children defaults to 5' );
 
-    lives_ok { $wu->max_children(10) } 'Max children set to 10';
+    $wu->max_children(10);
     is( $wu->max_children(), 10, 'Max children is 10' );
 
-    lives_ok { $wu->max_children(2) } 'Max children set to 2';
+    $wu->max_children(2);
     is( $wu->max_children(), 2, 'Max children defaults to 2' );
 
     # We're going to spawn 10 children and test the return value, just to
@@ -81,7 +92,7 @@ SKIP: {
     # We're going to spawn 10 children and test the return value, just to
     # make sure it queue() works basically like async().  This time, though,
     # we are testing with an unlimited max_children
-    lives_ok { $wu->max_children(undef) } 'Max children set to undef';
+    $wu->max_children(undef);
     is( $wu->max_children(), undef, 'Max children defaults to undef' );
 
     $PROCS = 10;
@@ -105,7 +116,7 @@ SKIP: {
     }
     is( $wu->count, 0, "no processes running after waitall()" );
 
-    lives_ok { $wu->max_children(2) } 'Max children set to 2';
+    $wu->max_children(2);
     is( $wu->max_children(), 2, 'Max children defaults to 2' );
 
     # Queue up 10 processes
@@ -186,12 +197,16 @@ SKIP: {
     my @cmp;
     for ( my $i = 0; $i < 50000; $i++ ) { push @cmp, $i; }
 
-    is_deeply( $results[0], \@cmp, 'Array reference contains proper values' );
+    is( $results[0], \@cmp, 'Array reference contains proper values' );
 
     # We want to test that we properly handle a child process that die()'s.
 
     $wu->queue( sub { die "Error!"; } );
-    dies_ok { $wu->waitall(); } 'Die when child throws an error';
+    like(
+        dies { $wu->waitall(); },
+        qr/Error!/,
+        'Die when child throws an error',
+    );
 
     # We want to test that we handle a process that returns undef properly
 

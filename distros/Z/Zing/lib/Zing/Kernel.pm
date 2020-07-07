@@ -17,7 +17,7 @@ use Zing::Channel;
 use Zing::Logic::Kernel;
 use Zing::Term;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 

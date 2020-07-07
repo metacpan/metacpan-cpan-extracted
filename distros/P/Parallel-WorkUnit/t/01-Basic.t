@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2018 Joelle Maslak
+# Copyright (C) 2015-2020 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -13,8 +13,7 @@ use warnings;
 use autodie;
 
 use Carp;
-use Test::More tests => 65;
-use Test::Exception;
+use Test2::V0;
 
 # Set Timeout
 local $SIG{ALRM} = sub { die "timeout\n"; };
@@ -25,7 +24,7 @@ alarm 120;    # It would be nice if we did this a better way, since
               # But hopefully nobody has that slow of a machine!
 
 # Instantiate the object
-require_ok('Parallel::WorkUnit');
+use Parallel::WorkUnit;
 my $wu = Parallel::WorkUnit->new();
 ok( defined($wu), "Constructer returned object" );
 is( $wu->count, 0, "no processes running before spawning any" );
@@ -112,12 +111,16 @@ is( Scalar::Util::reftype( $RESULTS{BIG} ), 'ARRAY', 'Array reference properly r
 my @cmp;
 for ( my $i = 0; $i < 50000; $i++ ) { push @cmp, $i; }
 
-is_deeply( $RESULTS{BIG}, \@cmp, 'Array reference contains proper values' );
+is( $RESULTS{BIG}, \@cmp, 'Array reference contains proper values' );
 
 # We want to test that we properly handle a child process that die()'s.
 
 $wu->async( sub { die "Error!"; }, sub { return; } );
-dies_ok { $wu->waitall(); } 'Die when child throws an error';
+like(
+    dies { $wu->waitall(); },
+    qr/Error!/,
+    "Die when child throws an error",
+);
 
 # We want to test that we handle a process that returns undef properly
 
@@ -140,6 +143,8 @@ pass("Duplicate wait() call exits properly");
 $wu->waitall();
 pass("Unnecessary waitall() call exits properly");
 ok( !defined( $wu->waitone() ), 'Unnecessary waitone() call exits properly' );
+
+done_testing();
 
 # The below subs are the callbacks
 

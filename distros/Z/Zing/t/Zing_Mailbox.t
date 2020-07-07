@@ -100,7 +100,7 @@ recv() : Maybe[HashRef]
 
 =method reply
 
-The reply method sends a message to the mailbox represented by the C<$data>
+The reply method sends a message to the mailbox represented by the C<$bag>
 received and returns the size of the recipient mailbox.
 
 =signature reply

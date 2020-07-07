@@ -4,7 +4,7 @@
       "Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4231",
    "keywords" : [
       "passwords",
       "security",
@@ -20,7 +20,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Passwd-Keyring-OSXKeychain",
    "prereqs" : {
@@ -42,6 +42,7 @@
             "Capture::Tiny" : "0.20",
             "Encode" : "0.00",
             "IPC::System::Simple" : "1.18",
+            "List::Util" : "1.29",
             "perl" : "5.006"
          }
       }
@@ -49,7 +50,7 @@
    "provides" : {
       "Passwd::Keyring::OSXKeychain" : {
          "file" : "lib/Passwd/Keyring/OSXKeychain.pm",
-         "version" : "0.3002"
+         "version" : "0.4000"
       },
       "Passwd::Keyring::OSXKeychain::PasswordTranslate" : {
          "file" : "lib/Passwd/Keyring/OSXKeychain/PasswordTranslate.pm"
@@ -58,16 +59,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://bitbucket.org/Mekk/perl-keyring-osxkeychain/issues"
+         "web" : "https://helixteamhub.cloud/mekk/projects/perl/issues"
       },
-      "homepage" : "http://bitbucket.org/Mekk/perl-keyring-osxkeychain",
+      "homepage" : "https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-osxkeychain",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://bitbucket.org/Mekk/perl-keyring-osxkeychain"
+         "url" : "https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-osxkeychain"
       }
    },
-   "version" : "0.3002",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.4000",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

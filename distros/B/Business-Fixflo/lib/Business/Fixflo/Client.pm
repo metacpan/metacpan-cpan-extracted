@@ -452,7 +452,9 @@ sub _set_request_headers {
     if ( $self->api_key ) {
         $auth_string = "Bearer " . $self->api_key;
     } else {
-        $auth_string = "basic " . encode_base64( join( ":",$self->username,$self->password ) );
+        my $username = $self->username // '';
+        my $password = $self->password // '';
+        $auth_string = "basic " . encode_base64( join( ":",$username,$password ) );
     }
 
     $req->header( 'Authorization' => $auth_string );

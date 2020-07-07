@@ -44,9 +44,7 @@ our @EXPORT_OK = qw(
 use Exporter qw(import);
 use POSIX qw(:errno_h :sys_wait_h);
 use Carp;
-use Cwd qw(realpath);
 use File::Temp;
-use File::Find;
 use File::Copy qw(cp);
 use File::Basename;
 
@@ -56,7 +54,7 @@ use Dpkg::Control;
 use Dpkg::Checksums;
 use Dpkg::Version;
 use Dpkg::Compression;
-use Dpkg::Path qw(check_files_are_the_same);
+use Dpkg::Path qw(check_files_are_the_same check_directory_traversal);
 use Dpkg::Vendor qw(run_vendor_hook);
 use Dpkg::Source::Format;
 use Dpkg::OpenPGP;
@@ -248,9 +246,16 @@ sub init_options {
          'debian/source/local-patch-header',
          'debian/files',
          'debian/files.new';
+    $self->{options}{copy_orig_tarballs} //= 0;
+
     # Skip debianization while specific to some formats has an impact
     # on code common to all formats
     $self->{options}{skip_debianization} //= 0;
+    $self->{options}{skip_patches} //= 0;
+
+    # Set default validation checks.
+    $self->{options}{require_valid_signature} //= 0;
+    $self->{options}{require_strong_checksums} //= 0;
 
     # Set default compressor for new formats.
     $self->{options}{compression} //= 'xz';
@@ -549,21 +554,9 @@ sub extract {
 
     # Check for directory traversals.
     if (not $self->{options}{skip_debianization}) {
-        my $canon_newdir = realpath($newdirectory);
-        my $check_symlinks = sub {
-            my $canon_pathname = realpath($_);
-            return if $canon_pathname =~ m/^\Q$canon_newdir\E/;
-
-            error(g_("pathname '%s' points outside source root"), $_);
-        };
         # We need to add a trailing slash to handle the debian directory
         # possibly being a symlink.
-        find({
-            wanted => $check_symlinks,
-            no_chdir => 1,
-            follow => 1,
-            follow_skip => 2,
-        }, "$newdirectory/debian/");
+        check_directory_traversal($newdirectory, "$newdirectory/debian/");
     }
 
     # Store format if non-standard so that next build keeps the same format

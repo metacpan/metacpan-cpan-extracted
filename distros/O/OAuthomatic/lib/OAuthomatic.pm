@@ -6,7 +6,7 @@ package OAuthomatic;
 
 
 use Moose;
-our $VERSION = '0.0201'; # VERSION
+our $VERSION = '0.0202'; # VERSION
 use namespace::sweep;
 # FIXME: switch to Moo
 use MooseX::AttributeShortcuts;
@@ -544,7 +544,7 @@ OAuthomatic - automate setup of access to OAuth-secured resources. Intended espe
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 SYNOPSIS
 
@@ -1171,10 +1171,8 @@ E. Hammer-Lahav for well written and understandable RFC 5849.
 
 =head1 SOURCE REPOSITORY
 
-Source code is maintained in L<Mercurial|http://mercurial.selenic.com>
-repository at L<bitbucket.org/Mekk/perl-oauthomatic|https://bitbucket.org/Mekk/perl-oauthomatic>:
-
-    hg clone https://bitbucket.org/Mekk/perl-oauthomatic
+Source code is maintained in L<Mercurial|http://www.mercurial-scm.org>
+repository at L<helixteamhub.cloud/mekk/projects/perl/repositories/oauthomatic|https://helixteamhub.cloud/mekk/projects/perl/repositories/oauthomatic>
 
 See C<README-development.pod> in source distribution for info how to
 build module from source.
@@ -1187,7 +1185,7 @@ Issues can be reported at:
 
 =item *
 
-L<Bitbucket issue tracker|https://bitbucket.org/Mekk/perl-oauthomatic/issues>
+L<repository issue tracker|https://helixteamhub.cloud/mekk/projects/perl/issues>
 
 =item *
 

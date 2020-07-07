@@ -1,0 +1,9 @@
+#<? @javafiles = <*.java>;
+#   echo "all: @javafiles\n";
+#   echo map { s/\.java$//; "$_.class: $_.java; javac $_.java\n" } @javafiles;
+#!>#+
+all: A.java B.java C.java
+A.class: A.java; javac A.java
+B.class: B.java; javac B.java
+C.class: C.java; javac C.java
+#-

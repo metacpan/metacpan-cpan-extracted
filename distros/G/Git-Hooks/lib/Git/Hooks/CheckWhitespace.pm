@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Hooks::CheckWhitespace;
 # ABSTRACT: Git::Hooks plugin for checking whitespace errors
-$Git::Hooks::CheckWhitespace::VERSION = '2.11.1';
+$Git::Hooks::CheckWhitespace::VERSION = '2.12.0';
 use 5.010;
 use utf8;
 use Log::Any '$log';
@@ -148,7 +148,7 @@ Git::Hooks::CheckWhitespace - Git::Hooks plugin for checking whitespace errors
 
 =head1 VERSION
 
-version 2.11.1
+version 2.12.0
 
 =head1 SYNOPSIS
 

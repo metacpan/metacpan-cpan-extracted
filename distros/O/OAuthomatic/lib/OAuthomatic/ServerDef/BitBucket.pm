@@ -39,7 +39,7 @@ OAuthomatic::ServerDef::BitBucket - OAuth parameters for BitBucket
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 DESCRIPTION
 

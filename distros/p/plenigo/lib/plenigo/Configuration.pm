@@ -22,7 +22,7 @@ package plenigo::Configuration;
 use Moo;
 use Carp qw(confess);
 
-our $VERSION = '3.0001';
+our $VERSION = '3.0002';
 
 has access_token => (
     is       => 'ro',
@@ -46,7 +46,7 @@ has api_host_stage => (
 
 has api_url => (
     is      => 'rw',
-    default => '/api/v3/'
+    default => '/api/v3.0/'
 );
 
 1;

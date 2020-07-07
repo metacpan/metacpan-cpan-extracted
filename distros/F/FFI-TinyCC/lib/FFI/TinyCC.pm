@@ -11,7 +11,7 @@ use File::Spec;
 use File::ShareDir::Dist qw( dist_share );
 
 # ABSTRACT: Tiny C Compiler for FFI
-our $VERSION = '0.29'; # VERSION
+our $VERSION = '0.30'; # VERSION
 
 
 sub _dlext ()
@@ -179,7 +179,7 @@ sub detect_sysinclude_path
     my($fh, $filename) = File::Temp::tempfile( "tryXXXX", SUFFIX => '.c', UNLINK => 1 );
     close $fh;
     
-    my @lines = `$Config{cpp} -v $filename 2>&1`;
+    my @lines = `$Config{cpprun} -v $filename 2>&1`;
     
     shift @lines while defined $lines[0] && $lines[0] !~ /^#include </;
     shift @lines;
@@ -336,7 +336,7 @@ FFI::TinyCC - Tiny C Compiler for FFI
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 SYNOPSIS
 

@@ -23,6 +23,8 @@ my %WriteMakefileArgs = (
     "File::Spec" => "3.40",
     "List::MoreUtils" => "0.33",
     "Moo" => "1.003001",
+    "Parse::RecDescent" => 0,
+    "SQL::Translator" => "1.61",
     "Scalar::Util" => "1.32",
     "XML::LibXML" => "2.0019",
     "YAML::Tiny" => "1.64"
@@ -32,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::LongString" => "0.16"
   },
-  "VERSION" => "1.08",
+  "VERSION" => "1.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +49,8 @@ my %FallbackPrereqs = (
   "File::Spec" => "3.40",
   "List::MoreUtils" => "0.33",
   "Moo" => "1.003001",
+  "Parse::RecDescent" => 0,
+  "SQL::Translator" => "1.61",
   "Scalar::Util" => "1.32",
   "Test::Exception" => 0,
   "Test::LongString" => "0.16",

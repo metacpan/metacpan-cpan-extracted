@@ -28,7 +28,7 @@ use Carp qw(confess);
 use plenigo::Ex;
 use plenigo::RestClient;
 
-our $VERSION = '3.0001';
+our $VERSION = '3.0002';
 
 has configuration => (
     is       => 'ro',
@@ -54,3 +54,5 @@ sub createLoginTokens {
         return %{$result{'response_content'}};
     }
 }
+
+1;

@@ -19,7 +19,7 @@ use Zing::Queue;
 use Time::Crontab;
 use Time::Piece;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 
@@ -104,7 +104,7 @@ method handle_timer_event($name) {
 
   for (my $i = 0; $i < @{$self->schedules}; $i++) {
     # run each schedule initially, and then once per minute
-    last if $_tick == (
+    next if $_tick == (
       $self->{tick}[$i] || 0
     );
 

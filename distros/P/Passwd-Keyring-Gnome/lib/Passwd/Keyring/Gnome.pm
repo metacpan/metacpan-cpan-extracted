@@ -15,11 +15,11 @@ Passwd::Keyring::Gnome - Password storage implementation based on GNOME Keyring.
 
 =head1 VERSION
 
-Version 0.3003
+Version 1.0000
 
 =cut
 
-our $VERSION = '0.3003';
+our $VERSION = '1.0000';
 
 bootstrap Passwd::Keyring::Gnome $VERSION;
 
@@ -151,8 +151,8 @@ Marcin Kasperski
 
 =head1 BUGS
 
-Please report any bugs or feature requests to 
-issue tracker at L<https://bitbucket.org/Mekk/perl-keyring-gnome>.
+Please report any bugs or feature requests to
+issue tracker at L<https://helixteamhub.cloud/mekk/projects/perl/issues>.
 
 =head1 SUPPORT
 
@@ -166,11 +166,11 @@ L<http://search.cpan.org/~mekk/Passwd-Keyring-Gnome/>
 
 Source code is tracked at:
 
-L<https://bitbucket.org/Mekk/perl-keyring-gnome>
+L<https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-gnome>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Marcin Kasperski.
+Copyright 2012-2020 Marcin Kasperski.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

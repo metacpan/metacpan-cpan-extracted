@@ -30,7 +30,7 @@ sub _createRestClient {
         host    => $self->configuration->use_stage ? $self->configuration->api_host_stage : $self->configuration->api_host,
         timeout => 10,
     });
-    $client->addHeader('plenigoToken', $self->configuration->access_token);
+    $client->addHeader('X-plenigo-token', $self->configuration->access_token);
     $client->addHeader('Content-Type', 'application/json');
     $client->addHeader('Accept', 'application/json');
 
@@ -40,15 +40,13 @@ sub _createRestClient {
 sub _checkResponse {
     my ($self, $client) = @_;
 
-    if ($client->responseCode == 400) {
-        plenigo::Ex->throw({ code => 400, message => 'The given parameters could not be processed.', errorDetails => decode_json($client->responseContent) });
-    }
-    if ($client->responseCode == 401) {
-        plenigo::Ex->throw({ code => 401, message => 'API request could not be authorized. Company id or/and secret is/are not correct.' });
-    }
-    if ($client->responseCode == 500) {
-        plenigo::Ex->throw({ code => 500, message => 'There was an internal error. Please try again later.' });
-    }
+    return if $client->responseCode < 400;
+
+    plenigo::Ex->throw({
+        code         => $client->responseCode,
+        message      => decode_json($client->responseContent)->{errorMessage} || 'Bad Request',
+        errorDetails => decode_json($client->responseContent || '{}'),
+    });
 }
 
 sub get {

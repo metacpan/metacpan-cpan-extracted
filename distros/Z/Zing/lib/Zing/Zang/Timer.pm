@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Timer';
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 

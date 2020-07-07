@@ -1,7 +1,7 @@
 This archive contains the distribution App-turbocopy,
-version 0.001:
+version 0.003:
 
-  CLI utility to copying files in more effective way
+  CLI utility to copying files in more effective way using async IO
 
 This software is copyright (c) 2020 by Andreas Romeyke.
 

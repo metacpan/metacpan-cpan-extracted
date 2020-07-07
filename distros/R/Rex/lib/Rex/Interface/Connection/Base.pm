@@ -9,7 +9,7 @@ package Rex::Interface::Connection::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 use Rex::Interface::Fs;
 use Rex::Interface::Exec;

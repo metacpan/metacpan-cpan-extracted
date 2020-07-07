@@ -14,16 +14,16 @@ extends 'Zing::PubSub';
 
 use Zing::Term;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # METHODS
 
 method recv() {
-  return $self->store->pull($self->term);
+  return $self->store->lpull($self->term);
 }
 
 method send(HashRef $val) {
-  return $self->store->push($self->term, $val);
+  return $self->store->rpush($self->term, $val);
 }
 
 method size() {

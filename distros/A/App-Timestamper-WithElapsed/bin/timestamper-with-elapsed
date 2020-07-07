@@ -15,12 +15,12 @@ __END__
 
 =head1 NAME
 
-App::Timestamper::WithElapsed - display the timestamp STDIN lines were received and the elapsed
+timestamper-with-elapsed - display the timestamp STDIN lines were received and the elapsed
 seconds since the last received line.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 

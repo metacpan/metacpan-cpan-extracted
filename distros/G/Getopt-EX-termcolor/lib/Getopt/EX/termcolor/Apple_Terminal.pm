@@ -18,7 +18,7 @@ L<Getopt::EX::termcolor>
 
 package Getopt::EX::termcolor::Apple_Terminal;
 
-use strict;
+use v5.14;
 use warnings;
 use Data::Dumper;
 

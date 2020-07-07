@@ -18,11 +18,10 @@ t/05-many-sets-and-gets-with-name.t
 t/06-recovering-with-app-change.t
 t/07-ugly-chars.t
 t/08-verylong-params.t
-t/boilerplate.t
 t/cpan-meta-json.t
 t/cpan-meta.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 t/kwalitee.t
-t/kwalitee_extra.t
+README.md

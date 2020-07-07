@@ -4,5 +4,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+bin/turbocopy.pl
 dist.ini
+dist.ini~
 lib/App/turbocopy.pm

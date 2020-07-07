@@ -1,10 +1,6 @@
 #!perl
 
-use strict;
-use warnings;
-
-require Zing::Cli;
-
+use Zing::Cli;
 run Zing::Cli;
 
 =encoding utf8
@@ -27,6 +23,7 @@ Multi-Process Management System
 
     clean            Prune the process registry
     logs             Tap logs and output to STDOUT
+    monitor          Monitor the specified application (start if not started)
     pid              Display an application process ID
     restart          Restart the specified application
     start            Start the specified application
@@ -37,16 +34,19 @@ Multi-Process Management System
 
     -I,--libdir, +1  [string] Directory for @INC
     -a,--appdir      [string] Directory of the app file
+    -b,--backlog     [flag] Produce log output using the backlog
     -d,--piddir      [string] Directory for the pid file
+    -g,--global      [flag] Tap the "global" log channel (defaults to "local")
     -l,--level       [string] Reduce log output by log-level
     -p,--process     [string] Reduce log output by process name
+    -s,--search, +1  [string] Reduce log output by search string
     -t,--tag         [string] Reduce log output by process tag
     -v,--verbose     [flag] Produce verbose log output
 
 =head1 DESCRIPTION
 
-This tool lets you start, stop, and tap thee logs of Perl 5 processes using the
-L<Zing> toolkit from the command-line.
+This tool lets you start, stop, and monitor Perl 5 processes using the L<Zing>
+toolkit from the command-line.
 
 =head1 AUTHOR
 

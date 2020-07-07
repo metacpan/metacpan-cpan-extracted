@@ -1,5 +1,9 @@
 Revision history for perl module JSON::SchemaValidator
 
+1.02 2020-07-07T06:42:24Z
+
+ - Remove unneeded HTTP::Tiny use
+
 1.01 2020-07-03T06:03:03Z
 
  - Initial release

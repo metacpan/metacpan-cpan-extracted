@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015,2018 Joelle Maslak
+# Copyright (C) 2015-2020 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -15,8 +15,7 @@ use autodie;
 
 use Carp;
 use Storable;
-use Test::More tests => 4;
-use Test::Exception;
+use Test2::V0;
 
 # Set Timeout
 local $SIG{ALRM} = sub { die "timeout\n"; };
@@ -27,7 +26,7 @@ alarm 120;    # It would be nice if we did this a better way, since
               # But hopefully nobody has that slow of a machine!
 
 # Instantiate the object
-require_ok('Parallel::WorkUnit');
+use Parallel::WorkUnit;
 my $wu = Parallel::WorkUnit->new();
 ok( defined($wu), "Constructer returned object" );
 
@@ -41,7 +40,11 @@ SKIP: {
 
     $wu->async( sub { qr{xxx} }, sub { $result = shift; } );
 
-    dies_ok { $wu->waitall(); } 'Child throws a storable error for regex';
+    like(
+        dies { $wu->waitall(); },
+        qr/Can't store REGEXP items/,
+        'Child throws a storable error for regex',
+    );
 }
 
 $wu->async(
@@ -53,5 +56,11 @@ $wu->async(
     }
 );
 
-dies_ok { $wu->waitall(); } 'Child throws a storable error for code';
+like(
+    dies { $wu->waitall(); },
+    qr/Can't store CODE items/,
+    'Child throws a storable error for code',
+);
+
+done_testing();
 

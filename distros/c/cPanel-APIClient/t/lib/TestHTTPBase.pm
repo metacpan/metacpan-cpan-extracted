@@ -15,11 +15,16 @@ use parent 'TestBase';
 
 use Test::More;
 
+use Config;
+
 use constant _CP_REQUIRE => (
     [ 'HTTP::Message' => 6.07 ],
     'HTTP::Request',
     'HTTP::Response',
     'MockCpsrvd::cpanel',
+    sub {
+        die 'Need real fork!' if !$Config::Config{'d_fork'};
+    },
 );
 
 sub TRANSPORT {
@@ -27,7 +32,7 @@ sub TRANSPORT {
 
     return [
         $self->TRANSPORT_PIECE(),
-        hostname         => "localhost",
+        hostname         => '127.0.0.1',    # “localhost” confuses Windows
         tls_verification => 'off',
     ];
 }

@@ -1,23 +1,72 @@
-2 - simple test, variable testing
-3 - repeated test 2
+01-use test:	simple test to verify "use Text::Starfish";
+02-simple_java: simple Java example with Test and Release versions
+03-simple_java: simple Java example, similar to 02
+04-simple_java: simple Java with replace
+05-simple_java: simple Java, 2nd version, with replace
+06-addHook:     testing hook adding, with replace; Renamed 01 -> 06-addHook
+07-html-cgi:    .html.sfish style with replace, simple use CGI
+		renamed, was 02 (02.html.sfish 02_html.out)
+08-tex:         .tex style with a lot of patterns (previous memory
+		issue); with replace; renamed 03 (03_tex.in 03_tex.out) to
+		08-tex (08-tex_tex.in 08-tex_tex.out)
+09-text:	simple addHook test in default text mode (09-text.in
+		09-text.out)
+		renamed: 05 (05.in 05.out) to 09-text
+10-tex:	       C-preprocessor-like behaviour in (La)TeX (10-tex.in
+	       10-tex.out); using addHook with changing evaluate
+	       function;
+	       renamed: 06 (06.in 06.out) -> 10-tex
+11-make:       test of Makefile mode (11-make_Makefile.in
+	       11-make_Makefile.out);
+	       renamed: 07 (07_Makefile.in 07_Makefile.out) -> 11-make
+12-make:       Makefile mode (12-make_Makefile.in
+	       12-make_Makefile.out);
+	       renamed: 08 (08_Makefile.in 08_Makefile.out) -> 12-make
+13-html:       HTML mode with addHook, with replace, (13-html_html.in
+	       13-html_html.out)
+	       renamed: 09 -> 13-html
+14-text:       simple plain text testing, variables, historical
+	       notation from SLePerl but not active
+	       files: 14-text.in 14.text.out
+	       renamed 2 (2.in 2.out)
+15-text:       repeated test 14-test with updated input to check that
+	       it stays unchanged; files: 15-text.in 15-text.out
+	       renamed 3 (3.in 3.out)
+16-rmHook:     default mode with hook removal (rmHook)
+               files: 16-rmHook.in 16-rmHook.out
+	       renamed 4 (4.in 4.out)
+17-A_java:     a more complex Java example
+	       files: 17-A_java.in 17-A_java.out
+18-p_t_java:   another simple Java test to be used in tandem with the
+	       next one.  files: 18-p_t_java.in 18-p_t_java.out
+	       renamed: 17 with p_t.java and 17.out
+19-p_t_java:   similar to the previous (18) but now with -e option
+	       files: 19-p_t_java.in 19-p_t_java.out
+	       renamed: 18 with p_t.java and 18.out
+20-simple_html: simple test for html style
+21-make:	Makefile test
 
-01 - testing hook adding, with replace
-02 - testing .html.sfish style
-03 - testing .tex with a lot of patterns (previous memory issue)
+22-tex		in progress.  Similar to 08-tex but in update mode, in
+		order to fix regex hooks to use OutDelimiters
 
-7 - html example
+NEEDS RENAMING AND DOC UPDATES:
+6 - using -o option, very similar to 10-tex (6.in 6.out) TeX style
+8 - test of some functions getmakefilelist (8.in 8.out) default style
+9 - working with macros, with -o option (9_java.in 9_java.out)
+30 - testing with Loops, HTML style, collecting ToC (30.html.sfish
+     30_html.out)
+ok 21 - testing HideMacros with 9_java.out to 10_java.out
+ok 22 - testing 10_java.out(10.java) to 11_java.out
+ok 23 - (Skip under Windows) testing -mode= option
 
 13,14,15 - testing some macros //m!newdefe
 
 16 - testing .tex file (tex style, after init config)
 
-17,18 - simple example with p_t.java
-
 19,20 - testing html -> html, file permissions: if the output file is
-    specified and mode is not give, it should not be changed.
+    specified and mode is not given, it should not be changed.
 
 21 - HTML example 2
-
 22 - HTML example 3
 
 25 - Makefile example
@@ -28,4 +77,6 @@
 
 34 - testing sfish_add_tag in LaTeX, and also sfish_ignore_outer
 
-35 - testing add_final, in addition to some features from test 34
+35 - TeX mode, replace, -o, testing add_final, in addition to some
+     features from test 34
+     to rename to 39-tex-add_final

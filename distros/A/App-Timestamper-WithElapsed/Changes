@@ -1,5 +1,11 @@
 Revision history for App-Timestamper-WithElapsed
 
+0.2.1       2020-07-07
+    - Fix the =head1 NAME in bin/timestamper-with-elapsed
+        - https://github.com/metacpan/metacpan-web/issues/2347
+        - Thanks to @oalders .
+    - Add a --help / -h flag.
+
 0.2.0       2020-06-12
     - [Bug Fix] Stop running the loop and process on EOF.
     - [New Feature] Add the --from-start flag.

@@ -78,7 +78,7 @@ find-secret-leakage-in-git-diff.pl
 
 =head1 VERSION
 
-version 2.11.1
+version 2.12.0
 
 =head1 SYNOPSIS
 

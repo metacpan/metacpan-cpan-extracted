@@ -85,10 +85,10 @@ my $builder = $class->new(
     meta_merge => {
         keywords => [ qw/ passwords security secure-storage keyring / ],
         resources => {
-            license     => ['http://dev.perl.org/licenses/'],
-            homepage    => 'http://bitbucket.org/Mekk/perl-keyring-auto',
-            repository => 'http://bitbucket.org/Mekk/perl-keyring-auto',
-            bugtracker => 'https://bitbucket.org/Mekk/perl-keyring-auto/issues',
+            license    => ['http://dev.perl.org/licenses/'],
+            homepage   => 'https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto',
+            repository => 'https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto',
+            bugtracker => 'https://helixteamhub.cloud/mekk/projects/perl/issues',
         },
     },
     # distmeta  => 1,

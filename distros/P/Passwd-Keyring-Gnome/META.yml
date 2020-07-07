@@ -5,14 +5,15 @@ author:
 build_requires:
   ExtUtils::CBuilder: '0'
   Module::Build: '0.19'
-  Pod::Readme: '0'
+  Pod::Markdown: '2.0'
+  Pod::Readme: '1.001002'
   Test::More: '0'
   Test::Pod::Coverage: '1.0'
 configure_requires:
   ExtUtils::PkgConfig: '1.12'
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 keywords:
   - passwords
   - security
@@ -29,13 +30,14 @@ name: Passwd-Keyring-Gnome
 provides:
   Passwd::Keyring::Gnome:
     file: lib/Passwd/Keyring/Gnome.pm
-    version: '0.3003'
+    version: '1.0000'
 requires:
   File::ShareDir: '1.00'
   perl: '5.006'
 resources:
-  bugtracker: https://bitbucket.org/Mekk/perl-keyring-gnome/issues
-  homepage: http://bitbucket.org/Mekk/perl-keyring-gnome
+  bugtracker: https://helixteamhub.cloud/mekk/projects/perl/issues
+  homepage: https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-gnome
   license: http://dev.perl.org/licenses/
-  repository: http://bitbucket.org/Mekk/perl-keyring-gnome
-version: '0.3003'
+  repository: https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-gnome
+version: '1.0000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,8 +1,6 @@
 #!/usr/bin/perl
 # (c) 2001-2020 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
 #
-# $Id: $
-#
 # starfish - a script for using Starfish.pm
 #
 # The script runs the function starfish_cmd with a list of files and

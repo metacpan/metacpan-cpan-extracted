@@ -17,7 +17,7 @@ use Zing::Registry;
 use FlightRecorder;
 use File::Spec;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 our $name = 'zing <{command}> [<{app}>] [options]';
 
@@ -29,6 +29,7 @@ sub auto {
     logs => '_handle_logs',
     pid => '_handle_pid',
     restart => '_handle_restart',
+    monitor => '_handle_monitor',
     update => '_handle_update',
     start => '_handle_start',
     stop => '_handle_stop',
@@ -41,6 +42,7 @@ sub subs {
     logs => 'Tap logs and output to STDOUT',
     pid => 'Display an application process ID',
     restart => 'Restart the specified application',
+    monitor => 'Monitor the specified application (start if not started)',
     update => 'Hot-reload application processes',
     start => 'Start the specified application',
     stop => 'Stop the specified application',
@@ -53,6 +55,16 @@ sub spec {
       desc => 'Directory of the app file',
       type => 'string',
       flag => 'a',
+    },
+    backlog => {
+      desc => 'Produce log output using the backlog',
+      type => 'flag',
+      flag => 'b',
+    },
+    global => {
+      desc => 'Tap the "global" log channel (defaults to "local")',
+      type => 'flag',
+      flag => 'g',
     },
     process => {
       desc => 'Reduce log output by process name',
@@ -74,6 +86,12 @@ sub spec {
       desc => 'Directory for the pid file',
       type => 'string',
       flag => 'd',
+    },
+    search => {
+      desc => 'Reduce log output by search string',
+      type => 'string',
+      flag => 's',
+      args => '@',
     },
     tag => {
       desc => 'Reduce log output by process tag',
@@ -105,7 +123,12 @@ sub _handle_clean {
 sub _handle_logs {
   my ($self) = @_;
 
-  my $c = Zing::Channel->new(name => '$journal');
+  my $c = Zing::Channel->new(
+    name => '$journal',
+    (target => $self->opts->global ? 'global' : 'local')
+  );
+
+  $c->reset if $self->opts->backlog;
 
   while (1) {
     next unless my $info = $c->recv;
@@ -129,8 +152,38 @@ sub _handle_logs {
       next unless $tag =~ /$filter/;
     }
 
+    if (my $search = $self->opts->search) {
+      for my $search (@$search) {
+        @$lines = grep /$search/, @$lines;
+      }
+    }
+
     print STDOUT $from, ' ', $tag, ' ', $_, "\n" for @$lines;
   }
+
+  return $self;
+}
+
+sub _handle_monitor {
+  my ($self) = @_;
+
+  my $app = $self->args->app;
+
+  if (!$app) {
+    print $self->help, "\n";
+    return $self->okay;
+  }
+
+  my $piddir = $self->opts->piddir
+    || $ENV{ZING_PIDDIR}
+    || $ENV{ZING_HOME}
+    || File::Spec->curdir;
+
+  my $pidfile = File::Spec->catfile($piddir, "$app.pid");
+
+  $self->opts->tag($app) if !$self->opts->tag;
+  $self->_handle_start if !-e $pidfile;
+  $self->_handle_logs;
 
   return $self;
 }
@@ -210,13 +263,17 @@ sub _handle_start {
     return $self->fail;
   }
 
+  if (ref $scheme->[1] eq 'ARRAY') {
+    unshift @{$scheme->[1]}, tag => $app; # auto-tagging
+  }
+
   my $daemon = Zing::Daemon->new(
     name => $app,
     app => Zing->new(scheme => $scheme),
     ($piddir ? (pid_dir => $piddir) : ()),
   );
 
-  $daemon->start;
+  $daemon->execute;
 
   return $self;
 }

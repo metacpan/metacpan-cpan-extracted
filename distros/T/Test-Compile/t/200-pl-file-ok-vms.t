@@ -1,8 +1,12 @@
 #!perl -w
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More;
 use Test::Compile qw( pl_file_ok );
+
+plan skip_all => 'No Devel::CheckOS, skipping'
+    unless Devel::CheckOS->require;
+plan tests => 1;
 
 # cheap emulation
 $^O = 'VMS';

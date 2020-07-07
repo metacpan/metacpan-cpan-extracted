@@ -14,7 +14,7 @@ extends 'Zing::PubSub';
 
 use Zing::Term;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # BUILDERS
 
@@ -43,7 +43,7 @@ method reset() {
 }
 
 method send(HashRef $val) {
-  return $self->store->push($self->term, $val);
+  return $self->store->rpush($self->term, $val);
 }
 
 method size() {

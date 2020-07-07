@@ -3,17 +3,15 @@
 #
 #  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Dynamically;
+package Syntax::Keyword::Dynamically 0.05;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.04';
 
 use Carp;
 
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 

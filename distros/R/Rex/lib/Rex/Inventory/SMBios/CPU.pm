@@ -9,7 +9,7 @@ package Rex::Inventory::SMBios::CPU;
 use strict;
 use warnings;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 use Rex::Inventory::SMBios::Section;
 use Rex::Logger;

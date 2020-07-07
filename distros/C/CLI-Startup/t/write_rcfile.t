@@ -16,8 +16,9 @@ use Cwd;
 
 # Create a temp directory
 my $dir    = getcwd();
-my $rcfile = "$dir/tmp/rcfile";
-mkdir "$dir/tmp";
+my $tmp    = "$dir/tmp.$$";
+my $rcfile = "$tmp/rcfile.$$";
+mkdir $tmp;
 
 # Identify the supported formats:
 my $libs = {
@@ -140,7 +141,7 @@ for my $format ( sort keys %$libs )
 
 
 # Clean up
-unlink $_ for glob("$dir/tmp/*");
-rmdir "$dir/tmp";
+unlink $_ for glob("$tmp/*");
+rmdir "$tmp";
 
 done_testing();

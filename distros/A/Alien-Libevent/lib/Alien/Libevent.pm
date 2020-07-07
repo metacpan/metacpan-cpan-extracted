@@ -3,11 +3,11 @@ package Alien::Libevent;
 use strict;
 use warnings;
 
-our $VERSION = '0.01004';
+our $VERSION = '2.2';
 
 =head1 NAME
 
-Alien::Libevent - Wrapper for installing libevent v1.4.13
+Alien::Libevent - Wrapper for installing libevent
 
 =head1 DESCRIPTION
 
@@ -20,9 +20,12 @@ you're interested.
 
 =head1 AUTHOR
 
+Thibault Duponchelle E<lt>thibault.duponchelle@gmail.comE<gt>
 Johannes Plunien E<lt>plu@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
+
+Copyright 2020 by Thibault Duponchelle
 
 Copyright 2009 by Johannes Plunien
 
@@ -39,7 +42,7 @@ it under the same terms as Perl itself.
 
 =head1 REPOSITORY
 
-L<http://github.com/plu/alien-libevent/>
+L<https://github.com/thibaultduponchelle/Alien-Libevent>
 
 =cut
 

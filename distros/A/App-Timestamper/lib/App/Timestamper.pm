@@ -1,5 +1,5 @@
 package App::Timestamper;
-$App::Timestamper::VERSION = '0.2.0';
+$App::Timestamper::VERSION = '0.2.1';
 use 5.014;
 use strict;
 use warnings;
@@ -23,19 +23,23 @@ sub new
 
 sub _init
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    my $argv = [@{$args->{argv}}];
+    my $argv = [ @{ $args->{argv} } ];
 
-    my $help = 0;
-    my $man = 0;
+    my $help    = 0;
+    my $man     = 0;
     my $version = 0;
-    if (! (my $ret = GetOptionsFromArray(
-        $argv,
-        'help|h' => \$help,
-        man => \$man,
-        version => \$version,
-    )))
+    if (
+        !(
+            my $ret = GetOptionsFromArray(
+                $argv,
+                'help|h' => \$help,
+                man      => \$man,
+                version  => \$version,
+            )
+        )
+        )
     {
         die "GetOptions failed!";
     }
@@ -47,7 +51,7 @@ sub _init
 
     if ($man)
     {
-        pod2usage(-verbose => 2);
+        pod2usage( -verbose => 2 );
     }
 
     if ($version)
@@ -63,10 +67,11 @@ sub run
 {
     my ($self) = @_;
 
-    local @ARGV = @{$self->{_argv}};
+    local @ARGV = @{ $self->{_argv} };
     STDOUT->autoflush(1);
 
-    App::Timestamper::Filter::TS->new->fh_filter(\*ARGV, sub {print $_[0];});
+    App::Timestamper::Filter::TS->new->fh_filter( \*ARGV,
+        sub { print $_[0]; } );
 
     return;
 }
@@ -77,13 +82,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::Timestamper - prefix lines with the timestamps of their arrivals.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -142,12 +149,6 @@ the iterations which you can plot using your favourite spreadsheet program
 or visualation framework.
 
 Hope it helps.
-
-=encoding utf8
-
-=head1 VERSION
-
-version 0.2.0
 
 =head1 COMMON REQUESTS
 
@@ -215,36 +216,9 @@ L<http://www.youtube.com/results?search_query=chumbawamba%20tubthumping>
 
 =back
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2015 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/App-Timestamper/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc App::Timestamper
 
 =head2 Websites
 
@@ -263,35 +237,11 @@ L<https://metacpan.org/release/App-Timestamper>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Timestamper>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Timestamper>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Timestamper>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Timestamper>
 
 =item *
 
@@ -342,5 +292,26 @@ from your repository :)
 L<https://github.com/shlomif/App-Timestamper>
 
   git clone git://github.com/shlomif/App-Timestamper.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/App-Timestamper/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

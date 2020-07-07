@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v1.1.5
+    version v1.1.6
 
 SYNOPSIS
 
@@ -77,6 +77,18 @@ ATTRIBUTES
 
     A coderef that returns a Net::AMQP::RabbitMQ or Net::RabbitMQ or
     compatible object, or the object itself.
+
+    If using a coderef, the first returned value should always be the
+    RabbitMQ object. If more than one value is returned, the second is
+    assumed to be a Boolean "should_disconnect" flag (see below).
+
+ should_disconnect
+
+    An optional Boolean value specifying whether to call ->disconnect on
+    the RabbitMQ object after doing the health check. The default is false.
+
+    If specified as a parameter, it will override any value that might be
+    returned by a "rabbit_mq" coderef as described above.
 
  queue
 

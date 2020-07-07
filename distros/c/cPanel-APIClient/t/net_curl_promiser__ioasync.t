@@ -30,6 +30,13 @@ use constant _CP_REQUIRE => (
     'Net::Curl::Promiser::IOAsync',
 );
 
+sub runtests {
+    no warnings 'once';
+    local $IO::Async::Loop::LOOP = 'Select';
+
+    return shift()->SUPER::runtests();
+}
+
 sub TRANSPORT_PIECE {
     my ($self) = @_;
 

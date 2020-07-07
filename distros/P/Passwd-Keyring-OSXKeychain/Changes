@@ -1,5 +1,8 @@
 Revision history for Keyring-OSXKeychain
 
+0.4000	2020-07-05
+        Switching hosting to helix as bitbucket is shut down.
+
 0.3002	2016-11-13
 	Added missing Test::Most dependency (which caused various
 	cpantesters failures).

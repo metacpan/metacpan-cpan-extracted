@@ -32,10 +32,12 @@ can_ok(
         create
 
         AssignedAgent
+        AssignedTeam
         Id
         BlockId
         BlockName
         ExternalPropertyRef
+        PropertyManager
         PropertyAddressId
         KeyReference
         Address

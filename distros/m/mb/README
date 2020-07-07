@@ -1,0 +1,42 @@
+NAME
+
+  mb - run Perl script written in MBCS
+
+SYNOPSIS
+
+  $ perl mb.pm              MBCS_Perl_script.pl
+  $ perl mb.pm -e big5      MBCS_Perl_script.pl
+  $ perl mb.pm -e big5hkscs MBCS_Perl_script.pl
+  $ perl mb.pm -e eucjp     MBCS_Perl_script.pl
+  $ perl mb.pm -e gb18030   MBCS_Perl_script.pl
+  $ perl mb.pm -e gbk       MBCS_Perl_script.pl
+  $ perl mb.pm -e sjis      MBCS_Perl_script.pl
+  $ perl mb.pm -e uhc       MBCS_Perl_script.pl
+  $ perl mb.pm -e utf8      MBCS_Perl_script.pl
+
+DESCRIPTION
+
+  mb.pm is a transpiler that to translate multibyte script to US-ASCII script
+  and run it.
+
+  What is better than Sjis software ?
+  1) implemented by single file
+  2) supports many encodings of MBCS by only one software
+  3) easy to change encoding of your scripts
+
+  What is lost from Sjis software ?
+  1) MacOS 9 not suppoted
+  2) codepoint range of regexp or tr/// not supported enough
+  3) uc(), ucfirst(), lc(), lcfirst(), and fc() not supported
+
+SUPPORTED PERL VERSIONS
+
+  perl version 5.005_03 to newest perl
+
+SEE ALSO
+
+  https://metacpan.org/author/INA
+  http://backpan.cpantesters.org/authors/id/I/IN/INA/
+  https://metacpan.org/release/Jacode4e-RoundTrip
+  https://metacpan.org/release/Jacode4e
+  https://metacpan.org/release/Jacode

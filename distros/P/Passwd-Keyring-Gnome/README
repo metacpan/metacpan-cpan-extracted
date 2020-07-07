@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.3003
+    Version 1.0000
 
 SYNOPSIS
 
@@ -84,7 +84,7 @@ AUTHOR
 BUGS
 
     Please report any bugs or feature requests to issue tracker at
-    https://bitbucket.org/Mekk/perl-keyring-gnome.
+    https://helixteamhub.cloud/mekk/projects/perl/issues.
 
 SUPPORT
 
@@ -98,11 +98,11 @@ SUPPORT
 
     Source code is tracked at:
 
-    https://bitbucket.org/Mekk/perl-keyring-gnome
+    https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-gnome
 
 LICENSE AND COPYRIGHT
 
-    Copyright 2012 Marcin Kasperski.
+    Copyright 2012-2020 Marcin Kasperski.
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published

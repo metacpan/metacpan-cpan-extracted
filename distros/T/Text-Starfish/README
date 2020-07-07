@@ -1,37 +1,52 @@
-Text::Starfish version 1.31
+Text::Starfish version 1.35
 ===========================
 Note: The above lines are generated based on the following code:
 <? read_starfish_conf(); &set_readme_line1; !>
 
-The Text::Starfish module supports processing of embedded Perl code in
-an arbitrary text.  Documentation is part of the file Starfish.pm
-using the pod format.  To convert it into manual page format, type
-something like the following:
+The Text::Starfish module and starfish command-line utility support
+processing of embedded Perl code in an arbitrary text and provide for
+flexible text patterns that identify such code or activate more
+general text replacement.
 
-	  pod2html Starfish.pm
+The main Starfish web site is
+http://web.cs.dal.ca/~vlado/srcperl/starfish/starfish.html.
+
+Documentation is part of the file Starfish.pm in the Pod format.  To
+convert it into the manual page format, use the following commands
+('$' is just a shell prompt, do not type it!):
+
+ $ pod2html Starfish.pm
+
 
 INSTALLATION
 
 To install this module type the following:
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ $ make install
 
 If you do not have permissions to install the module in the
 system-wide module repository, you can install it locally; e.g.,
-perl Makefile.PL PREFIX=/home/mydir
+
+ $ perl Makefile.PL PREFIX=/home/mydir
 
 DEPENDENCIES
 
-No significant dependecies, as far as I know.  Let me know if you find
-something important to add.
+No significant dependencies, as far as I know.  All used Perl modules
+should be a part of Perl core.  Let me know if you find something
+important to add.
 
-COPYRIGHT AND LICENCE
+AUTHORS
 
-Copyright 2001-2020 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
+ 2001-2020 Vlado Keselj http://web.cs.dal.ca/~vlado
+ 	   and contributing authors:
+      2007 Charles Ikeson (overhaul of test.pl)
+
+LICENSE
 
 This script is provided "as is" without express or implied warranty.
 This is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+the same terms as Perl itself, or more precisely, it is provided under
+The Artistic License 1.0 (see the file LICENSE).

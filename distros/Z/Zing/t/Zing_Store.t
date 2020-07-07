@@ -19,26 +19,28 @@ Zing::Store
 
 =tagline
 
-Storage Abstraction
+Storage Interface
 
 =cut
 
 =abstract
 
-Redis Storage Abstraction
+Data Storage Interface
 
 =cut
 
 =includes
 
+method: args
 method: drop
 method: dump
 method: keys
-method: pop
-method: pull
-method: push
 method: load
+method: lpull
+method: lpush
 method: recv
+method: rpull
+method: rpush
 method: send
 method: size
 method: slot
@@ -63,22 +65,39 @@ Zing::Types
 
 =cut
 
-=attributes
+=description
 
-redis: ro, opt, Redis
+This package provides a data persistence interface to be implemented by data
+storage abstractions.
 
 =cut
 
-=description
+=method args
 
-This package provides a L<Redis> adapter for use with data storage
-abstractions.
+The args method parses strings with key/value data (typically from an
+environment variable) meant to be used in object construction.
+
+=signature args
+
+args(Str $env) : (Any)
+
+=example-1 args
+
+  # given: synopsis
+
+  [$store->args('port=0001,debug=0')]
+
+=example-2 args
+
+  # given: synopsis
+
+  [$store->args('ports=0001|0002,debug=0')]
 
 =cut
 
 =method drop
 
-The drop method removes (drops) the item from the datastore.
+The drop method should remove items from the datastore by key.
 
 =signature drop
 
@@ -94,7 +113,8 @@ drop(Str $key) : Int
 
 =method dump
 
-The dump method encodes and returns the data provided as JSON.
+The dump method should encode and return the data provided in a format suitable
+for the underlying storage mechanism.
 
 =signature dump
 
@@ -110,8 +130,8 @@ dump(HashRef $data) : Str
 
 =method keys
 
-The keys method returns a list of keys under the namespace of the datastore or
-provided key.
+The keys method should return a list of keys under the namespace provided
+including itself.
 
 =signature keys
 
@@ -127,88 +147,81 @@ keys(Str @keys) : ArrayRef[Str]
 
   # given: synopsis
 
-  $store->send('model', { status => 'ok' });
+  # $store->send('model', { status => 'ok' });
 
   my $keys = $store->keys('model');
 
 =cut
 
-=method pop
+=method rpull
 
-The pop method pops data off of the bottom of a list in the datastore.
+The rpull method should pop data off of the bottom of a list in the datastore.
 
-=signature pop
+=signature rpull
 
-pop(Str $key) : Maybe[HashRef]
+rpull(Str $key) : Maybe[HashRef]
 
-=example-1 pop
-
-  # given: synopsis
-
-  $store->pop('collection');
-
-=example-2 pop
+=example-1 rpull
 
   # given: synopsis
 
-  $store->push('collection', { status => 1 });
-  $store->push('collection', { status => 2 });
+  $store->rpull('collection');
 
-  $store->pop('collection');
+=example-2 rpull
+
+  # given: synopsis
+
+  # $store->rpush('collection', { status => 1 });
+  # $store->rpush('collection', { status => 2 });
+
+  $store->rpull('collection');
 
 =cut
 
-=method pull
+=method lpull
 
-The pull method pops data off of the top of a list in the datastore.
+The lpull method should pop data off of the top of a list in the datastore.
 
-=signature pull
+=signature lpull
 
-pull(Str $key) : Maybe[HashRef]
+lpull(Str $key) : Maybe[HashRef]
 
-=example-1 pull
-
-  # given: synopsis
-
-  $store->pull('collection');
-
-=example-2 pull
+=example-1 lpull
 
   # given: synopsis
 
-  $store->push('collection', { status => 'ok' });
+  $store->lpull('collection');
 
-  $store->pull('collection');
+=example-2 lpull
+
+  # given: synopsis
+
+  # $store->rpush('collection', { status => 'ok' });
+
+  $store->lpull('collection');
 
 =cut
 
-=method push
+=method rpush
 
-The push method pushed data onto the bottom of a list in the datastore.
+The rpush method should push data onto the bottom of a list in the datastore.
 
-=signature push
+=signature rpush
 
-push(Str $key, HashRef $val) : Int
+rpush(Str $key, HashRef $val) : Int
 
-=example-1 push
-
-  # given: synopsis
-
-  $store->push('collection', { status => 'ok' });
-
-=example-2 push
+=example-1 rpush
 
   # given: synopsis
 
-  $store->push('collection', { status => 'ok' });
-
-  $store->push('collection', { status => 'ok' });
+  $store->rpush('collection', { status => 'ok' });
 
 =cut
 
 =method load
 
-The load method decodes the JSON data provided and returns the data as a hashref.
+The load method should decode the data provided and returns the data as a
+hashref.
 
 =signature load
 
@@ -224,7 +237,7 @@ load(Str $data) : HashRef
 
 =method recv
 
-The recv method fetches and returns data from the datastore by its key.
+The recv method should fetch and return data from the datastore by its key.
 
 =signature recv
 
@@ -240,7 +253,7 @@ recv(Str $key) : Maybe[HashRef]
 
   # given: synopsis
 
-  $store->send('model', { status => 'ok' });
+  # $store->send('model', { status => 'ok' });
 
   $store->recv('model');
 
@@ -248,7 +261,8 @@ recv(Str $key) : Maybe[HashRef]
 
 =method send
 
-The send method commits data to the datastore with its key and returns truthy.
+The send method should commit data to the datastore with its key and return
+truthy (or falsy if not).
 
 =signature send
 
@@ -264,7 +278,7 @@ send(Str $key, HashRef $val) : Str
 
 =method size
 
-The size method returns the size of a list in the datastore.
+The size method should return the size of a list in the datastore.
 
 =signature size
 
@@ -280,7 +294,7 @@ size(Str $key) : Int
 
   # given: synopsis
 
-  $store->push('collection', { status => 'ok' });
+  # $store->rpush('collection', { status => 'ok' });
 
   my $size = $store->size('collection');
 
@@ -288,7 +302,8 @@ size(Str $key) : Int
 
 =method slot
 
-The slot method returns the data from a list in the datastore by its index.
+The slot method should return the data from a list in the datastore by its
+position in the list.
 
 =signature slot
 
@@ -304,7 +319,7 @@ slot(Str $key, Int $pos) : Maybe[HashRef]
 
   # given: synopsis
 
-  $store->push('collection', { status => 'ok' });
+  # $store->rpush('collection', { status => 'ok' });
 
   my $model = $store->slot('collection', 0);
 
@@ -312,7 +327,8 @@ slot(Str $key, Int $pos) : Maybe[HashRef]
 
 =method term
 
-The term method generates a term (safe string) for the datastore.
+The term method generates a term (safe string) for the datastore. This method
+doesn't need to be implemented.
 
 =signature term
 
@@ -328,7 +344,8 @@ term(Str @keys) : Str
 
 =method test
 
-The test method returns truthy if the specific key (or datastore) exists.
+The test method should return truthy if the specific key exists in the
+datastore.
 
 =signature test
 
@@ -338,7 +355,7 @@ test(Str $key) : Int
 
   # given: synopsis
 
-  $store->push('collection', { status => 'ok' });
+  # $store->rpush('collection', { status => 'ok' });
 
   $store->test('collection');
 
@@ -346,9 +363,28 @@ test(Str $key) : Int
 
   # given: synopsis
 
-  $store->drop('collection');
+  # $store->drop('collection');
 
   $store->test('collection');
+
+=cut
+
+=method lpush
+
+The lpush method should push data onto the top of a list in the datastore.
+
+=signature lpush
+
+lpush(Str $key) : Int
+
+=example-1 lpush
+
+  # given: synopsis
+
+  # $store->rpush('collection', { status => '1' });
+  # $store->rpush('collection', { status => '2' });
+
+  $store->lpush('collection', { status => '0' });
 
 =cut
 
@@ -364,127 +400,171 @@ $subs->synopsis(fun($tryable) {
   $result
 });
 
-$subs->example(-1, 'drop', 'method', fun($tryable) {
-  ok !(my $result = $tryable->result);
-  is $result, 0;
+$subs->example(-1, 'args', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, ['port', '0001', 'debug', 0];
 
-  $result
+  (@$result)
+});
+
+$subs->example(-2, 'args', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, ['ports', ['0001', '0002'], 'debug', 0];
+
+  (@$result)
+});
+
+$subs->example(-1, 'drop', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"drop" not implemented/;
+  });
+  ok my $result = $tryable->result;
+
+  1
 });
 
 $subs->example(-1, 'dump', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"dump" not implemented/;
+  });
   ok my $result = $tryable->result;
-  like $result, qr/"status"\s*:\s*"ok"/;
 
-  $result
+  ''
 });
 
 $subs->example(-1, 'keys', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"keys" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is @$result, 0;
 
-  $result
+  []
 });
 
 $subs->example(-2, 'keys', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"keys" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is @$result, 1;
 
-  $result
+  []
 });
 
-$subs->example(-1, 'pop', 'method', fun($tryable) {
-  ok !(my $result = $tryable->result);
+$subs->example(-1, 'rpull', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"rpull" not implemented/;
+  });
+  ok my $result = $tryable->result;
 
-  $result
+  {}
 });
 
-$subs->example(-2, 'pop', 'method', fun($tryable) {
+$subs->example(-2, 'rpull', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"rpull" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is_deeply $result, {status => 2};
 
-  $result
+  {}
 });
 
-$subs->example(-1, 'pull', 'method', fun($tryable) {
+$subs->example(-1, 'lpull', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"lpull" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is_deeply $result, {status => 1};
 
-  $result
+  {}
 });
 
-$subs->example(-2, 'pull', 'method', fun($tryable) {
+$subs->example(-2, 'lpull', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"lpull" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is_deeply $result, {status => 'ok'};
 
-  $result
+  {}
 });
 
-$subs->example(-1, 'push', 'method', fun($tryable) {
+$subs->example(-1, 'rpush', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"rpush" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is $result, 1;
 
-  $result
-});
-
-$subs->example(-2, 'push', 'method', fun($tryable) {
-  ok my $result = $tryable->result;
-  is $result, 3;
-
-  $result
+  1
 });
 
 $subs->example(-1, 'load', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"load" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is_deeply $result, {status => 'ok'};
 
-  $result
+  {}
 });
 
 $subs->example(-1, 'recv', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"recv" not implemented/;
+  });
   ok my $result = $tryable->result;
 
-  $result
+  {}
 });
 
 $subs->example(-2, 'recv', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"recv" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is_deeply $result, {status => 'ok'};
 
-  $result
+  {}
 });
 
 $subs->example(-1, 'send', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"send" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is $result, 'OK';
 
-  $result
+  ''
 });
 
 $subs->example(-1, 'size', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"size" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is $result, 3;
 
-  $result
+  1
 });
 
 $subs->example(-2, 'size', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"size" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is $result, 4;
 
-  $result
+  1
 });
 
 $subs->example(-1, 'slot', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"slot" not implemented/;
+  });
   ok my $result = $tryable->result;
 
-  $result
+  {}
 });
 
 $subs->example(-2, 'slot', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"slot" not implemented/;
+  });
   ok my $result = $tryable->result;
-  is_deeply $result, {status => 'ok'};
 
-  $result
+  {}
 });
 
 $subs->example(-1, 'term', 'method', fun($tryable) {
@@ -495,15 +575,30 @@ $subs->example(-1, 'term', 'method', fun($tryable) {
 });
 
 $subs->example(-1, 'test', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"test" not implemented/;
+  });
   ok my $result = $tryable->result;
 
-  $result
+  1
 });
 
 $subs->example(-2, 'test', 'method', fun($tryable) {
-  ok !(my $result = $tryable->result);
+  $tryable->default(fun ($error) {
+    like $error, qr/"test" not implemented/;
+  });
+  ok my $result = $tryable->result;
 
-  $result
+  1
+});
+
+$subs->example(-1, 'lpush', 'method', fun($tryable) {
+  $tryable->default(fun ($error) {
+    like $error, qr/"lpush" not implemented/;
+  });
+  ok my $result = $tryable->result;
+
+  1
 });
 
 ok 1 and done_testing;

@@ -9,6 +9,7 @@ Table of Contents
 * [DESCRIPTION](#description)
 * [User Guide](#user-guide)
 * [Nginx C modules that use Test::Nginx to drive their test suites](#nginx-c-modules-that-use-testnginx-to-drive-their-test-suites)
+* [INSTALLATION](#installation)
 * [SOURCE REPOSITORY](#source-repository)
 * [DEBIAN PACKAGES](#debian-packages)
 * [Community](#community)
@@ -22,23 +23,23 @@ Table of Contents
 
 This distribution provides two testing modules for Nginx C module development:
 
-- [Test::Nginx::Socket](https://metacpan.org/pod/Test::Nginx::Socket) (This is highly recommended.)
+- [Test::Nginx::Socket](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ASocket) (This is highly recommended.)
 
     This library also has the following subclasses:
 
-    - [Test::Nginx::Socket::Lua](https://metacpan.org/pod/Test::Nginx::Socket::Lua)
-    - [Test::Nginx::Socket::Lua::Stream](https://metacpan.org/pod/Test::Nginx::Socket::Lua::Stream)
-    - [Test::Nginx::Socket::Lua::Dgram](https://metacpan.org/pod/Test::Nginx::Socket::Lua::Dgram)
+    - [Test::Nginx::Socket::Lua](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ASocket%3A%3ALua)
+    - [Test::Nginx::Socket::Lua::Stream](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ASocket%3A%3ALua%3A%3AStream)
+    - [Test::Nginx::Socket::Lua::Dgram](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ASocket%3A%3ALua%3A%3ADgram)
 
-- [Test::Nginx::LWP](https://metacpan.org/pod/Test::Nginx::LWP) (This is obsolete.)
+- [Test::Nginx::LWP](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ALWP) (This is obsolete.)
 
-All of them are based on [Test::Base](https://metacpan.org/pod/Test::Base).
+All of them are based on [Test::Base](https://metacpan.org/pod/Test%3A%3ABase).
 
-Usually, [Test::Nginx::Socket](https://metacpan.org/pod/Test::Nginx::Socket) is preferred because it works on a much lower
-level and not that fault tolerant like [Test::Nginx::LWP](https://metacpan.org/pod/Test::Nginx::LWP).
+Usually, [Test::Nginx::Socket](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ASocket) is preferred because it works on a much lower
+level and not that fault tolerant like [Test::Nginx::LWP](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ALWP).
 
 Also, a lot of connection hang issues (like wrong `r->main->count` value in nginx
-0.8.x) can only be captured by [Test::Nginx::Socket](https://metacpan.org/pod/Test::Nginx::Socket) because Perl's [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) client
+0.8.x) can only be captured by [Test::Nginx::Socket](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ASocket) because Perl's [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) client
 will close the connection itself which will conceal such issues from
 the testers.
 
@@ -136,6 +137,26 @@ You can find a comprehensive user guide on this test framework in my upcoming bo
 
 [Back to TOC](#table-of-contents)
 
+# INSTALLATION
+
+If you have \`cpan\` installed, you can simply run the command to install this module:
+
+    sudo cpan Test::Nginx
+
+If you want to install from the source code directory directly, you can run
+
+    sudo cpan .
+
+If you prefer `cpanm` to `cpan` (like I do!), you can replace `cpan` in the commands above with `cpanm`.
+
+Otherwise you can install this module in the good old way below:
+
+    perl Makefile.PL
+    make
+    sudo make install
+
+[Back to TOC](#table-of-contents)
+
 # SOURCE REPOSITORY
 
 This module has a Git repository on Github, which has access for all.
@@ -195,7 +216,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 # SEE ALSO
 
-[Test::Nginx::LWP](https://metacpan.org/pod/Test::Nginx::LWP), [Test::Nginx::Socket](https://metacpan.org/pod/Test::Nginx::Socket), [Test::Base](https://metacpan.org/pod/Test::Base).
+[Test::Nginx::LWP](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ALWP), [Test::Nginx::Socket](https://metacpan.org/pod/Test%3A%3ANginx%3A%3ASocket), [Test::Base](https://metacpan.org/pod/Test%3A%3ABase).
 
 [Back to TOC](#table-of-contents)
 

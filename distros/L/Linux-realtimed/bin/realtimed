@@ -1,0 +1,695 @@
+#!/usr/bin/perl
+use POSIX qw (setsid setuid setgid getuid geteuid WNOHANG);
+use open ':encoding(UTF-8)';
+use Linux::Inotify2;
+use Sys::Syslog;
+use Time::HiRes;
+use warnings;
+use strict;
+use Socket;
+#use Fcntl;
+use JSON;
+use v5.10;
+use EV;
+
+BEGIN {
+	sub lg ($;$$) {
+		my ($message, $activity, $priority) = @_;
+		$priority //= 'info';
+		state $status = {};
+		my $curtime = [Time::HiRes::gettimeofday()];
+		my $elapsed = '';
+		if($activity) {
+			$elapsed = Time::HiRes::tv_interval($status->{$activity}->{timestamp}) if $status->{$activity}->{timestamp};
+			$status->{$activity}->{timestamp} = $curtime;
+			$elapsed = qq|- elapsed time: ${\sprintf("%.6f", $elapsed)} seconds| if $elapsed;
+		}
+
+		my @caller = caller(1);
+		syslog $priority , '%s %s %s', $message, $elapsed, "at line $caller[2]";
+	}
+
+	my @priorities = ('emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug');
+
+	{
+		no strict 'refs'; ## no critic
+		for (@priorities) {
+			my $priority = $_;
+			*{__PACKAGE__ . "::$priority"} = sub ($;$) {
+				my ($message, $activity) = @_;
+				lg $message, $activity, $priority;
+			};
+		}
+	}
+}
+
+# resolved to name this daemon "realtimed" cause
+# suitable names already taken by other entities:
+# inotifyd by Alpine Linux
+# notifyd by Cyrus IMAP
+# eventd by eventd.org
+my $myrelpath = __FILE__;
+open my $fh, '<', $myrelpath;
+my $fd = fileno $fh;
+my $myfullpath = readlink("/proc/$$/fd/$fd");
+close $fh;
+my $programname = 'realtimed';
+$programname = $1 if $myfullpath =~ m{([^/]+)$};
+
+openlog $programname, 'ndelay,pid', 'daemon';
+info "detected current realtimed relative path as: $myrelpath";
+info "detected current realtimed absolute path as: $myfullpath";
+info "detected program name as: $programname";
+
+my $euid = geteuid;
+my $uid = getuid;
+my $user = getpwuid($uid);
+my $euser = getpwuid($euid);
+my $rootuser = getpwuid(0);
+
+unless ($euid == $uid){
+	my $msg = "you ($user) are executing this program with setuid to $euser credentials, exiting";
+	emerg $msg;
+	say $msg;
+	exit;
+}
+
+unless ($uid == 0){
+	my $msg = "you are executing this program with $user credentials, this program requires $rootuser (uid 0) credentials to work";
+	emerg $msg;
+	say $msg;
+	exit;
+}
+
+my $pidfile = "/var/run/${programname}.pid";
+if ( -e $pidfile ) {
+	my $msg = "unable to open PID file $pidfile";
+	open my $fh, '<', $pidfile or emerg $msg && die $msg;
+	my $pid = <$fh>;
+	close $fh;
+	if($pid) {
+		alert "PID file $pidfile already existent for process $pid";
+		if (kill 0, $pid) {
+			emerg "preexistent process $pid still running, exiting";
+			stopDaemon(1);
+		}
+	}
+	alert "removing PID file $pidfile for defunct process $pid, that probably didn't shut down properly";
+	unlink $pidfile;
+}
+
+my $confdir = "/etc/$programname";
+unless ( -e $confdir && -d $confdir ){
+	# no need for 'mkdir -p' or make_path from File::Path cause /etc must exists
+	warning "main configuration directory $confdir does not exist, creating it";
+	mkdir $confdir, 0755 or crit "cannot create conf directory $confdir" && exit 0;
+}
+
+my $rsyslogconffile = "/etc/rsyslog.d/${programname}.conf";
+unless(-e $rsyslogconffile && -T $rsyslogconffile) {
+	my $message = "$programname rsyslog conf file $rsyslogconffile does not exist, creating it";
+	warning $message;
+	say $message;
+
+	my $rsyslogconf = qq{\$template	$programname,"%TIMESTAMP:::date-rfc3339% %syslogtag% %syslogseverity-text%%msg:::sp-if-no-1st-sp%%msg:::drop-last-lf%\\n"
+:programname, isequal, "$programname" -/var/log/${programname}.log;$programname & stop
+};
+
+	# we assume rsyslog is installed, as it is for all main Linux distributions
+	open my $fh, '>', $rsyslogconffile or die "cannot set rsyslog template: $@ $!";
+	print $fh $rsyslogconf;
+	close $fh;
+
+	info 'restarting rsyslog:';
+	info qx{systemctl restart rsyslog};
+
+	info 'closing and reopening syslog';
+	closelog;
+	openlog $programname, 'ndelay,pid', 'daemon';
+	info 'syslog reopened';
+}
+
+my $systemdservicefile = "/etc/systemd/system/${programname}.service";
+unless(-e $systemdservicefile && -T $systemdservicefile) {
+	warning "$programname systemd conf file $systemdservicefile does not exist, creating it";
+
+	my $systemdconf = qq{[Unit]
+Description=$programname daemon
+#Requires=Network.target
+#After=Network.target
+
+[Service]
+Type=notify
+NotifyAccess=all
+ExecStart=$myfullpath
+KillSignal=SIGTERM
+SendSIGKILL=no
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=multi-user.target};
+
+	# we assume systemd is the init system of choice, as it is for all main Linux distributions
+	open my $fh, '>', $systemdservicefile or die "cannot set systemd service file: $@ $!";
+	print $fh $systemdconf;
+	close $fh;
+	qx{/bin/systemctl daemon-reload};
+	my @messages = (
+		"created systemd service file at $systemdservicefile",
+		"already activated it via 'systemctl daemon-reload' command",
+		"exiting the program, from now on you can start it via 'systemctl start $programname' and stop it with 'systemctl stop $programname'",
+		"if you want to set the execution of this daemon at startup please use the command 'systemctl enable $programname'",
+		"you can run the daemon also by simply running $programname, but it is not advised since systemd won't monitor it",
+		"'systemctl reload $programname' is not needed since $programname detects and applies config changes automatically while running",
+		"the config changes are triggered when you close a config file, configuration change happens in realtime without losing incoming events",
+		"to get current running configuration in JSON format saved in dir $confdir just issue 'kill -s HUP \$(cat /var/run/realtimed.pid)'"
+	);
+
+	for(@messages){
+		notice $_;
+		say $_;
+	}
+
+	stopDaemon();
+}
+
+$SIG{__WARN__} = sub {
+	warning shift;
+};
+
+$SIG{__DIE__} = sub {
+	emerg shift;
+};
+
+sub DESTROY {}
+
+notice 'starting program, going to fork and setsid', 'startup';
+
+info 'going to fork first time';
+exit 0 if fork;
+info 'successfully forked first time, going to call setsid()';
+setsid;
+info 'setsid called, going to fork second time';
+exit 0 if fork;
+info 'successfully forked second time';
+chdir '/';
+umask(0);
+if( systemdReady() ){
+	info "successfully notified systemd about $programname startup";
+} else {
+	err "failed to notify systemd about $programname startup, probably systemd is going to send TERM signal to it";
+}
+
+my $msg = "unable to open PID file $pidfile";
+open $fh, '+>', $pidfile or emerg $msg && die $msg;
+if (print $fh $$){
+	info "written $$ PID on file $pidfile";
+} else {
+	emerg "cannot write PID $$ on file $pidfile";
+}
+close $fh;
+
+my $execpath = $ENV{PATH};
+$ENV{PATH} = '';
+
+open STDOUT, '>', '/dev/null' or die 'unable to redirect STDOUT to /dev/null';
+open STDERR, '>', '/dev/null' or die 'unable to redirect STDERR to /dev/null';
+open STDIN,  '<', '/dev/null' or die 'unable to redirect STDIN  to /dev/null';
+
+notice 'program started', 'startup';
+
+my $eventNames = [
+	'IN_ACCESS',
+	'IN_MODIFY',
+	'IN_ATTRIB',
+	'IN_CLOSE_WRITE',
+	'IN_CLOSE_NOWRITE',
+	'IN_OPEN',
+	'IN_MOVED_FROM',
+	'IN_MOVED_TO',
+	'IN_CREATE',
+	'IN_DELETE',
+	'IN_DELETE_SELF',
+	'IN_MOVE_SELF',
+
+	'IN_ALL_EVENTS',
+
+	'IN_ONESHOT',
+	'IN_ONLYDIR',
+	'IN_DONT_FOLLOW',
+	'IN_EXCL_UNLINK',
+	'IN_MASK_ADD',
+
+	'IN_CLOSE',
+	'IN_MOVE',
+];
+
+my $en = Linux::Inotify2->new;
+my %eventValue;
+for(@$eventNames){
+	my $val = $en->$_;
+	$eventValue{$_} = $val;
+}
+
+my %eventName;
+for (0..11){
+	my $val = 2 ** $_;
+	my @it = grep { $en->$_ == $val } @$eventNames;
+	$eventName{$val} = $it[0];
+}
+
+my $childs = {};
+
+my $cwatch = EV::child 0, 0, sub {
+	my $w = shift;
+	my $exitstatus = $w->rstatus;
+	my $chldpid = $w->rpid;
+	my $object = $childs->{$chldpid}->{object}       ;
+	my $command   = $childs->{$chldpid}->{command}         ;
+	my $arguments = $childs->{$chldpid}->{arguments}       ;
+	my $eventName = $childs->{$chldpid}->{eventName}       ;
+	my $file      = $childs->{$chldpid}->{file}            ;
+	info "command '$command $arguments' with PID $chldpid triggered by event $eventName on file $file in object $object completed with exit status $exitstatus", $chldpid;
+	delete $childs->{$chldpid};
+
+	# EV takes care to reap childs for me, following code won't work properly
+#	while( (my $chldpid = waitpid(-1, WNOHANG)) > 0 ){
+#		my $object = $childs->{$chldpid}->{object}       ;
+#		my $command   = $childs->{$chldpid}->{command}         ;
+#		my $arguments = $childs->{$chldpid}->{arguments}       ;
+#		my $eventName = $childs->{$chldpid}->{eventName}       ;
+#		my $file      = $childs->{$chldpid}->{file}            ;
+#		info "command $command $arguments with PID $chldpid triggered by event $eventName on file $file in object $object completed successfully", $chldpid;
+#		delete $childs->{$chldpid};
+#	}
+
+};
+
+my $hwatch = EV::signal 'HUP', sub{
+	info "caught HUP signal, going to write currentconf in $confdir";
+	printCurrentConf();
+};
+
+my %twatch;
+for ('INT', 'QUIT', 'TERM') {
+	my $signal = $_;
+	$twatch{$_} = EV::signal $signal, sub {
+		crit "caught $signal signal trying to shut down gracefully";
+		stopDaemon();
+	};
+}
+
+my $confevents = IN_CLOSE_WRITE | IN_MOVED_TO | IN_ONLYDIR | IN_DONT_FOLLOW;
+my $incnf = Linux::Inotify2->new;
+$incnf->watch($confdir, $confevents, sub {
+	my $e = shift;
+	# TODO choose a native realtimed JSON conf format
+});
+my $cnfwatch = EV::io $incnf->fileno, EV::READ, sub { $incnf->poll };
+
+my $forks = 0;
+my $cnfdirs;
+my $systemincrontab = '/etc/incron.d';
+my $userincrontab = '/var/spool/incron';
+my @cnfdirs = ($systemincrontab, $userincrontab);
+for (@cnfdirs){
+	$cnfdirs->{$_}->{in} = Linux::Inotify2->new;
+	my $node = $cnfdirs->{$_};
+	$node->{iw} = $node->{in}->watch($_, $confevents, sub {
+		my $e = shift;
+		my $eventName = eventsList($e->mask);
+		my $directory = $e->w->name;
+		my $file = $e->name;
+		return if $file =~ /^\./; # skip hidden files
+		return if $file =~ /~/; # skip temp files
+		return if $file =~ /^\d+$/; # skip temp files created by system
+		info "config file $file in directory $directory got event $eventName";
+		parseIncrondConfig();
+	});
+	$node->{ew} = EV::io $node->{in}->fileno, EV::READ, sub { $node->{in}->poll };
+}
+
+my $direvents = IN_CREATE | IN_DELETE | IN_MOVED_TO | IN_MOVED_FROM | IN_ONLYDIR | IN_DONT_FOLLOW;
+notice 'using epoll backend for event loop' if EV::backend == EV::BACKEND_EPOLL;
+notice "file descriptors: 'cd /proc/$$/fd && watch -bcd -n 1 ls -l'";
+
+my $dirtree = {
+	curversion => 0,
+	conf       => {}
+};
+
+parseIncrondConfig();
+EV::run;
+
+sub systemdReady {
+	# systemd does not support double fork technique, cause in "forking" service mode it waits for only first process to exit
+	# furthermore systemd is completely BROKEN on this cause it attempts to read pid file BEFORE the parent process exits
+	# (notoriously Poettering doesn't care about POSIX at all) so using notify mode talking directly with notification socket
+	# rather than using sd_notify via Linux::Systemd::Daemon that is an XS module using also Moo* nonsense stuff for no reason
+	my $systemdSocketAddr = $ENV{NOTIFY_SOCKET} // '';
+	#$systemdSocketAddr = '/tmp/test.sock';
+	$systemdSocketAddr = pack_sockaddr_un($systemdSocketAddr);
+	socket(my $systemdSocket, AF_UNIX, SOCK_DGRAM, PF_UNSPEC) or return 0;
+	connect $systemdSocket, $systemdSocketAddr or return 0;
+	binmode $systemdSocket;
+	send($systemdSocket, "READY=1\nSTATUS=$programname successfully started\nMAINPID=$$", 0, $systemdSocketAddr);
+	# debugging stuff
+	# nc -lUuvDk /tmp/test.sock
+	# nc -Uu /tmp/test.sock
+	# export NOTIFY_SOCKET=/tmp/test.sock
+	# systemd-notify --ready --status='test'
+}
+
+sub stopDaemon {
+	my $alreadyRunning = shift;
+	unlink $pidfile unless $alreadyRunning;
+	EV::break;
+	closelog;
+	exit 0;
+}
+
+sub parseIncrondConfig {
+	my $curversion = $dirtree->{curversion};
+	my $nextversion = $curversion + 1;
+	for my $dir (@cnfdirs) {
+		my $dh;
+		opendir $dh, $dir or crit "unable to open conf dir $dir" && return;
+		my @files = grep { -T $_->{file} } map { {file => "$dir/$_", filename => $_} } grep { !/^\.+$/ } readdir $dh;
+		closedir $dh;
+		for my $item (@files) {
+			my $file = $item->{file};
+			my $user = $dir eq $userincrontab ? $item->{filename} : $rootuser;
+			my $userid = getpwnam($user);
+			my $groupid = getgrnam($user); # choose 'personal' user's group
+			my %paths;
+			open my $fh, '<', $file;
+			while (<$fh>) {
+				chomp $_;
+				next if $_ =~ /^\s*#/;
+				next if $_ =~ /^\s*$/;
+				my $errline = "$file: skipping invalid conf line, wrong text format: '$_'";
+				# see https://linux.die.net/man/5/incrontab for info about incrontab format
+				my ($path, $events, $command, $arguments) = m|^\s*(/\S+[^/])\s+(\S+)\s+(\S+)\s*(.*)$| or notice $errline and next;
+				$errline = "config file $file: skipping invalid conf line, wrong path format: '$path'";
+				$path = getCanonicalPath($path);
+				notice $errline and next unless $path;
+				if ($paths{$path}) {
+					# incrond specifications dictate only one path occurency for every table
+					warning "path $path is duplicated in $file configuration file, incrond does not supports multiple commands on same path in single configuration file, but $programname yes";
+					warning "be warned if you intend to use this same configuration file also with incrond. Affected line: '$_'";
+					# next;
+				}
+				$errline = "$file: skipping invalid conf line, wrong events format: '$events'";
+				my $recursive = $events =~ /recursive=true/;
+				$recursive += 0;
+				$events =~ s/recursive=\S+//;
+				unless ($events =~ /\d+/) {
+					my $numevents = 0;
+					my @events = split /,/, $events;
+					my $numsymbols = scalar @events;
+					@events = grep {!!$_} map {0 + $eventValue{$_}} @events;
+					notice $errline and next unless $numsymbols == scalar @events;
+					$numevents |= $_ for @events;
+					$events = $numevents;
+				}
+
+				my $textevents = eventsList($events);
+
+				$errline = "$file: skipping invalid conf line - wrong or not executable or aliased command for user $user: '$command'";
+				# sysadmins and users MUST ENSURE that commands executed with given user rights are not dangerous ( example rm -rf ...)
+				$ENV{PATH} = $execpath;
+				my $runnable = qx{runuser -l $user -c 'if test -x "\$(command -v $command)"; then echo 1; else echo 0; fi;'};
+				chomp $runnable;
+				$ENV{PATH} = '';
+				unless ($runnable && $runnable eq '1') {
+					notice "$errline - output: $runnable";
+					next;
+				}
+
+				initTree({
+					path => $path,
+					events => $events,
+					eventNames	=> $textevents,
+					recursive => $recursive,
+					user => $user,
+					command => $command,
+					arguments => $arguments,
+					version => $nextversion,
+					userid => $userid,
+					groupid => $groupid
+				});
+			}
+		}
+	}
+
+	watchDir($dirtree->{conf}->{$nextversion});
+	$dirtree->{curversion}++;
+	releaseInotifyWatchers($dirtree->{conf}->{$curversion}) if $curversion; # if $curversion 0 daemon just started and no previous config
+	delete $dirtree->{conf}->{$curversion};
+	printCurrentConf();
+}
+
+sub getCanonicalPath {
+	my ($path) = @_;
+
+	unless( -e $path ){
+		err "dir $path does not exist";
+		return '';
+	}
+
+	if ( -d $path) {
+		my $dh; my $fd;
+		opendir $dh, $path;
+		$fd = fileno $dh;
+		$path = readlink("/proc/$$/fd/$fd");
+		closedir $dh;
+	} else {
+		my $fh; my $fd;
+		open $fh, '<', $path;
+		$fd = fileno $fh;
+		$path = readlink("/proc/$$/fd/$fd");
+		close $fh;
+	}
+	return $path;
+}
+
+sub initTree {
+	my ($conf) = @_;
+	my $path = getCanonicalPath($conf->{path});
+	return unless $path;
+	my $curpath = '';
+	my @path = split m|/|, $path;
+	shift @path;
+	my $version = $conf->{version};
+	$dirtree->{conf}->{$version} //= {};
+	my $node = $dirtree->{conf}->{$version};
+	for (@path) {
+		$curpath .= "/$_";
+		$node->{$curpath} = { path => $curpath } unless $node->{$curpath};
+		$node = $node->{$curpath};
+		next unless $curpath eq $path;
+#		$node->{conf} //= {};
+#		$node = $node->{conf};
+		$node->{events} |= $conf->{events};
+		$node->{textevents} = eventsList($node->{events});
+		$node->{recursive} ||= $conf->{recursive};
+		$node->{triggers} //= [];
+		push @{$node->{triggers}}, $conf;
+	}
+}
+
+sub releaseInotifyWatchers {
+	my ($node) = @_;
+	return unless ref $node eq 'HASH';
+	$node->{iw}->cancel if defined $node->{iw};
+	for(keys %$node){
+		next if $_ eq 'path';
+		next if $_ eq 'events';
+		next if $_ eq 'recursive';
+		releaseInotifyWatchers($node->{$_});
+	}
+}
+
+sub watchDir {
+	my ($node) = @_;
+	unless(defined $node->{events}){
+		for(keys %$node){
+			next if $_ eq 'path';
+			next if $_ eq 'events';
+			next if $_ eq 'recursive';
+			watchDir($node->{$_});
+		}
+		return;
+	}
+	my $recursive = $node->{recursive};
+	my $triggers = $node->{triggers};
+	my $events = $node->{events};
+	my $dir = $node->{path};
+
+	unless($node->{iw} && $node->{ew}) { # avoid watchers duplication
+		my $in = Linux::Inotify2->new;
+		$node->{iw} = $in->watch($node->{path}, $events | $direvents, sub {
+			my $e = shift;
+
+			# realtimed itself triggers opendir events while parsing dir tree, we need to filter them out, sorry
+			# return if $e->IN_ISDIR && $e->IN_OPEN;
+
+			$e->{eventMask} = $e->mask;
+			$e->{eventName} = eventsList($e->mask);
+			$e->{node} = $node;
+			eventQueueOverflowed($e) if $e->mask & IN_Q_OVERFLOW;
+			manageEvents($e) if $e->mask & $events;
+			return unless $recursive && $e->IN_ISDIR && $e->mask & $direvents;
+			my $dir = $e->fullname;
+
+			for ('IN_DELETE', 'IN_MOVED_FROM') {
+				next unless $e->$_;
+				info "removing monitoring to $dir after event $_";
+				releaseInotifyWatchers($node->{$dir});
+				delete $node->{$dir} and last;
+			}
+
+			for ('IN_CREATE', 'IN_MOVED_TO') {
+				next unless $e->$_;
+				$node->{$dir}->{path} = $dir;
+				$node->{$dir}->{events} = $node->{events};
+				$node->{$dir}->{triggers} //= [];
+				push @{$node->{$dir}->{triggers}}, grep {$_->{recursive}} @{$node->{triggers}};
+				$node->{$dir}->{recursive} = $node->{recursive};
+				info "going to add recursive monitoring to $dir after event $$e{eventName}";
+				watchDir($node->{$dir}) and last;
+			}
+		});
+
+		# EV watchers are released when there are no remaining references to themselves
+		# so to release them it suffices to delete the data tree on which they are grafted
+		$node->{ew} = EV::io $in->fileno, EV::READ, sub {$in->poll};
+	}
+
+	my $dh;
+	opendir $dh, $dir or return; # this daemon is supposed to be run under root, return SHOULD NEVER happen
+	for (grep { -d $_ && ! -l $_ } map { "$dir/$_" } grep { ! /^\.+$/ } readdir $dh) { # here we need to filter out symlinks
+		$node->{$_}->{path} = $_;
+		$node->{$_}->{events} = $events;
+		$node->{$_}->{triggers} //= [];
+		push @{$node->{$_}->{triggers}}, grep {$_->{recursive}} @$triggers;
+		$node->{$_}->{recursive} = $recursive;
+		watchDir($node->{$_});
+	}
+	closedir $dh;
+}
+
+sub manageEvents {
+	my $e = shift;
+	my $object = $e->w->name;
+	my $file = $e->name;
+	my $event = $e->{eventName};
+	my $numevent = $e->{eventMask};
+	my $textevent = $event;
+	my @triggers;
+	if(ref $e->{node}->{triggers} eq 'ARRAY') {
+		@triggers = @{$e->{node}->{triggers}};
+	}
+
+	for my $trigger (@triggers){
+		my $path = $trigger->{path};
+		my $recursive = $trigger->{recursive};
+		my $version = $trigger->{version};
+		# TODO testme
+		unless($path eq $object || $recursive) {
+			my $msg = "skip event cause $path is not equal to $object and is not recursive";
+			notice $msg and next;
+		}
+		my $events = $trigger->{events};
+		next unless $events & $e->mask;
+		unless($version == $dirtree->{curversion}){
+			# TODO test this condition with a script that triggers at same time events and config updates
+			# manage events that can occur within few milliseconds that lie between configuration update trigger and its actual uptake without losing a beat
+			my $msg = "ignoring event $event version $version different from current version $$dirtree{curversion} on filename: " . $e->name . ' in object ' . $e->w->name;
+			notice $msg and next;
+		}
+		# TODO
+
+		my $command = $trigger->{command};
+		my $arguments = $trigger->{arguments};
+
+		$arguments =~ s/\$\$/\\\$/g;
+		$arguments =~ s/\$\@/$object/g;
+		$arguments =~ s/\$#/$file/g;
+		$arguments =~ s/\$\%/$textevent/g;
+		$arguments =~ s/\$\&/$numevent/g;
+
+		debug "going to fork for exec", "forking$forks";
+		# tipically fork here takes about 1.3 milliseconds, so we are limited to about 700 process spawn/sec, I guess incrond can fork at least twice as fast cause of our Perl interpreter overhead
+		# so this will scale much better on events processing, thanks to EV's epoll() usage (where incrond uses select() apparently) but it is going to be about two times slower on actual process spawning
+		# if event bursts do not overflow event queue, the system should keep up with at least about 2.5 million commands ran per hour, number of events processed can be of course much much higher
+		# we don't know behaviour of EV while attempting to use vfork() or posix_spawn via POSIX::RT::Spawn (that seems that also does not compile anymore from Perl 5.28 onwards)
+		# so not attempting to use them here. Also no idea about using Linux clone() call, but seems that posix_spawn would be just perfect for our purposes. Preforking seems an overkill as well here
+		# enabling hugepages could lead also to faster fork(), but seems that we need to touch too many knobs to take advantage of it
+		my $chldpid = fork;
+
+		unless (defined $chldpid){
+			crit "fork failed for command $command on event $event in object $object on file $file";
+			next;
+		}
+
+		unless($chldpid) {
+			EV::break; # not sure it could be beneficial
+			unless ($trigger->{user} eq $rootuser) {
+				setuid($trigger->{userid});
+				unless ($!) {
+					crit "cannot assume user $$trigger{user} credentials" and exit 0;
+				}
+				setgid($trigger->{groupid});
+				unless ($!) {
+					crit "cannot assume group $$trigger{user} credentials" and exit 0;
+				}
+			}
+
+			if( -d $object ) {
+				my $msg = "cannot chdir to $object while attempting execution of command $command with $$trigger{user} credentials upon event $event on file $file in directory $object";
+				chdir $object or err $msg && exit 0;
+			}
+
+			$ENV{PATH} = $execpath;
+			exec $command, $arguments; # goodbye
+		}
+
+		debug "fork done", "forking$forks";
+		$forks++;
+		$dirtree->{managedEvents} = $forks;
+		info "attempting execution of command $command with PID $chldpid and $$trigger{user} credentials upon event $event on file $file in object $object ", $chldpid;
+		$childs->{$chldpid}->{object} = $object;
+		$childs->{$chldpid}->{command} = $command;
+		$childs->{$chldpid}->{arguments} = $arguments;
+		$childs->{$chldpid}->{eventName} = $e->{eventName};
+		$childs->{$chldpid}->{eventMask} = $e->mask;
+		$childs->{$chldpid}->{file} = $file;
+	}
+}
+
+sub eventQueueOverflowed {
+	my $e = shift;
+	# TODO log event queue for given inotify watcher overflowed
+	# try to raise system limits
+}
+
+sub printCurrentConf {
+	my $curtime = [Time::HiRes::gettimeofday()];
+	my ($sec, $min, $hour, $mday, $mon, $year) = localtime($curtime->[0]);
+	#my $label = sprintf '%u-%02u-%02uT%02u:%02u:%09.6f ', $year+1900, ++$mon, $mday, $hour, $min, $sec + $curtime->[1] / 10**6;
+	my $label = "$$.$$dirtree{curversion}";
+	open my $fh, '>', "$confdir/conf.$label.json";
+	print $fh JSON->new->pretty->canonical->allow_unknown->allow_blessed->convert_blessed->encode($dirtree);
+	close $fh;
+}
+
+sub eventsList {
+	my $mask = shift;
+	my @names;
+	for(@$eventNames) {
+		next if $_ eq 'IN_ALL_EVENTS';
+		push @names, $_ if $mask & $en->$_;
+	}
+	join ',', @names;
+}

@@ -35,7 +35,7 @@ OAuthomatic::OAuthInteraction - handle browser redirects happening during OAuth 
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 SYNOPSIS
 

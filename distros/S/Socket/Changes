@@ -1,5 +1,11 @@
 Revision history for Socket
 
+2.030   2020-06-07
+        [CHANGES]
+         * Prepare for a stricter perl:
+            + use strict; use warnings in all unit tests (RT132846)
+            + declare use v5.6.1 in all perl files
+
 2.029   2019-02-20 19:19:12
         [BUGFIXES]
          * Old MinGW lacks ADDRESS_FAMILY; use USHORT instead (RT128550)

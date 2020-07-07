@@ -1,5 +1,35 @@
 Revision history for Rex
 
+1.12.0 2020-07-05 Ferenc Erki <erkiferenc@gmail.com>
+ [BUG FIXES]
+ - Discontinue support for Windows 7, Windows Server 2008 R2, and older
+ - Avoid caching of Bash completion options to support multiple Rexfiles
+ - Fix calling get_file_path from Rexfile
+ - Fix quoting of rsync parameters
+ - Fix local download rsync operations
+ - Fix determining local connections for rsync operations
+
+ [ENHANCEMENTS]
+ - Extend Bash completion with known hosts
+ - Support wildcards in get_file_path
+ - Split out temp file naming logic
+
+ [NEW FEATURES]
+ - Enable Bash completion of available CLI options
+ - Add tab completion for Zsh
+ - Enable local rsync operations
+ - Distribute tab completion scripts
+
+ [REVISION]
+ - Use author tests to check tidiness of bin files
+ - Use Symbol to manipulate Perl symbols
+ - Add initial rsync tests
+ - Test rsync with spaces in source path
+ - Test rsync with wildcard in source path
+ - Add initial test for temp file names
+ - Simplify temp file naming logic
+ - Use set semantics for directory comparisons
+
 1.11.0 2020-06-05 Ferenc Erki <erkiferenc@gmail.com>
  [BUG FIXES]
  - Make group resource idempotent

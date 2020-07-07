@@ -27,7 +27,7 @@ package Rex::Commands::Run;
 use strict;
 use warnings;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 #require Exporter;
 require Rex::Exporter;
@@ -152,8 +152,8 @@ If you want to end the command upon receiving a certain output:
 =cut
 
 our $LAST_OUTPUT; # this variable stores the last output of a run.
- # so that it is possible to get for example the output of an apt-get update
- # that is called through >> install "foo" <<
+                  # so that it is possible to get for example the output of an apt-get update
+                  # that is called through >> install "foo" <<
 
 sub run {
   my $cmd = shift;

@@ -1134,7 +1134,7 @@ static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
     PADOFFSET padix;
     for(padix = 1; padix <= fpad; padix++) {
       PADNAME *pname = (padix <= fnames) ? pnames[padix] : NULL;
-      SV *newval;
+      SV *newval = NULL;
 
       if(padname_is_normal_lexical(pname)) {
         /* No point copying a normal lexical slot because the suspend logic is
@@ -1169,11 +1169,10 @@ static CV *MY_cv_dup_for_suspend(pTHX_ CV *orig)
 
           newval = MUTABLE_SV(newproto);
         }
-        else if(origpad[padix])
-          newval = SvREFCNT_inc_NN(origpad[padix]);
-#else
-        newval = SvREFCNT_inc_NN(origpad[padix]);
+        else
 #endif
+        if(origpad[padix])
+          newval = SvREFCNT_inc_NN(origpad[padix]);
       }
       else {
         newval = newSV(0);

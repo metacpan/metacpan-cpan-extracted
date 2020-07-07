@@ -40,6 +40,12 @@ sub make_singleton{
         $instance->initialize();
     }
 
+    if( ! $instance->can("DESTROY")){
+
+        *{$clase . '::DESTROY'} = sub {}
+
+    }
+
     $instance;
 }
 

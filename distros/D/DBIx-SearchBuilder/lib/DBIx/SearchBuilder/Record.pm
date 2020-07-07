@@ -112,16 +112,16 @@ basically the same.
 
 Enter, DBIx::SearchBuilder::Record. 
 
-With::Record, you can in the simple case, remove all of that code and 
-replace it by defining two methods and inheriting some code.  Its pretty 
-simple, and incredibly powerful.  For more complex cases, you can, gasp, 
-do more complicated things by overriding certain methods.  Lets stick with
-the simple case for now. 
+With Record, you can in the simple case, remove all of that code and
+replace it by defining two methods and inheriting some code.  It's pretty
+simple, and incredibly powerful.  For more complex cases, you can
+do more complicated things by overriding certain methods.  Let's stick with
+the simple case for now.
 
-The two methods in question are '_Init' and '_ClassAccessible', all they 
+The two methods in question are L</_Init> and L</_ClassAccessible>. All they
 really do are define some values and send you on your way.  As you might 
-have guessed the '_' suggests that these are private methods, they are. 
-They will get called by your record objects constructor.  
+have guessed the '_' means that these are private methods.
+They will get called by your record object's constructor.
 
 =over 4
 
@@ -139,7 +139,7 @@ what they do at this time.
 
 =back
 
-And really, thats it.  So lets have some sample code.
+And really, that's it.  So let's have some sample code.
 
 =head2 An Annotated Example
 
@@ -199,8 +199,8 @@ define ourself as a subclass of ::Record.
 
 Here we set our handle and table name, while its not obvious so far, we'll 
 see later that $handle (line: 006) gets passed via ::Record::new when a 
-new instance is created.  Thats actually an important concept, the DB handle 
-is not bound to a single object but rather, its shared across objects. 
+new instance is created.  That's actually an important concept: the DB handle
+is not bound to a single object but rather, it is shared across objects.
 
   013: 
   014: sub _ClassAccessible {
@@ -286,13 +286,13 @@ the last example.
   015: print "Foo : ", $s->Foo(), "\n";
   016: print "Bar : ", $s->Bar(), "\n";
 
-Thats all you have to to get the data, now to change the data!
+That's all you have to to get the data. Now to change the data!
 
   017:
   018: $s->SetBar('NewBar');
 
-Pretty simple! Thats really all there is to it.  Set<Field>($) returns 
-a boolean and a string describing the problem.  Lets look at an example of
+Pretty simple! That's really all there is to it.  Set<Field>($) returns
+a boolean and a string describing the problem.  Let's look at an example of
 what will happen if we try to set a 'Id' which we previously defined as 
 read only. 
 
@@ -320,7 +320,7 @@ exactly	map to database fields.
   026: 	           'Foo' => 'Foooooo', 
   027: 	           'Bar' => 'Barrrrr');
 
-Poof! A new row in the database has been created!  Now lets delete the 
+Poof! A new row in the database has been created!  Now let's delete the
 object! 
 
   028:
@@ -329,11 +329,11 @@ object!
   031: $s1->LoadById(4);
   032: $s1->Delete();
 
-And its gone. 
+And it's gone.
 
-For simple use, thats more or less all there is to it.  In the future, I hope to exapand 
-this HowTo to discuss using container classes,  overloading, and what 
-ever else I think of.
+For simple use, that's more or less all there is to it.  In the future, we
+hope to expand this how-to to discuss using container classes, overloading,
+etc.
 
 =head1 METHOD NAMING
 
@@ -1024,7 +1024,7 @@ structure and calls LoadById on recently created object with the
 current column value as argument. It uses the array reference as
 the object constructor's arguments.
 Subclasses can override _Object to insert custom access control or
-define default contructor arguments.
+define default constructor arguments.
 
 Note that if you are using a C<Schema> with a C<REFERENCES> field, 
 this is unnecessary: the method to access the column's value will

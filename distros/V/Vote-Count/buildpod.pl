@@ -168,6 +168,7 @@ warn $versionline;
       path( "./lib/Vote/$name.pod")->spew($pod);
   }
   for my $pm ( values %pmkeys ) {
+warn "fixing $pm"    ;
     my $pmtext = path($pm)->slurp;
     unless ($pmtext =~ /\#FOOTER/) { $pmtext .= $footer ; }
     path($pm)->spew( fix_version( $pmtext, $version) );

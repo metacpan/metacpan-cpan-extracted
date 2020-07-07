@@ -3,7 +3,7 @@ package Test::Compile::Internal;
 use warnings;
 use strict;
 
-use version; our $VERSION = qv("v2.4.0");
+use version; our $VERSION = qv("v2.4.1");
 use File::Spec;
 use UNIVERSAL::require;
 use Test::Builder;
@@ -372,7 +372,7 @@ sub _perl_file_compiles {
 
     my @inc = ('blib/lib', @INC);
     my $taint = $self->_is_in_taint_mode($file);
-    my $command = join(" ", ($^X, (map { "-I$_" } @inc), "-c$taint", $file));
+    my $command = join(" ", (qq{"$^X"}, (map { qq{"-I$_"} } @inc), "-c$taint", $file));
     if ( $self->verbose() ) {
         $self->{test}->diag("Executing: " . $command);
     }

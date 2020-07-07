@@ -1,5 +1,13 @@
 Revision history for Perl module cPanel::APIClient
 
+0.05
+- Fix cancel() tests and documentation.
+- Use pure-Perl IO::Async in tests.
+  (Avoids epoll EBADF bug: https://rt.cpan.org/Public/Bug/Display.html?id=132537)
+- Use pure-Perl AnyEvent in tests. (Just to be safe.)
+- Require fixed Net::Curl::Promiser in cancel test.
+- Skip tests that need a real fork() in non-fork OSes.
+
 0.04 - 4 Jul 2020
 - Fix missing Test::MockModule dependency.
 

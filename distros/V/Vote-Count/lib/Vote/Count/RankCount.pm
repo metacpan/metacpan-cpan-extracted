@@ -11,13 +11,13 @@ use Vote::Count::TextTableTiny qw/generate_markdown_table/;
 use Sort::Hash;
 # use Data::Printer;
 
-our $VERSION='1.03';
+our $VERSION='1.05';
 
 =head1 NAME
 
 Vote::Count::RankCount
 
-=head1 VERSION 1.03
+=head1 VERSION 1.05
 
 =cut
 

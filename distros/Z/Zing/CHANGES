@@ -1,6 +1,29 @@
 Changelog for Zing
 
-0.10 2020-07-02T20:19:56
+0.12 2020-07-07T02:36:23
+ - Add release updates
+ - Update documentation in "zing" application (#202)
+ - Implement "monitor" CLI command (#196)
+ - Rename internal store "list" methods (#198)
+ - Leverage snapshotting to build domains faster (#200)
+
+0.11 2020-07-05T21:34:34
+ - Built release version 0.11
+ - Add release updates
+ - Tweak documentation
+ - Fix "once per minute" timer execution (#193)
+ - Fix Zing/Store args parser (#191)
+ - Fix Zing/Domain false start issue (#190)
+ - Allow log search using backlog (#187)
+ - Allow log search by pattern(s) (#185)
+ - Allow "tapping" the "global" journal channel (#183)
+ - Optimize Zing (main module) (#181)
+ - Simply send, recv, reply for processes (#176)
+ - Document actor-model "deviations" (#177)
+ - Allow ZING_STORE to define a custom backend (#179)
+
+0.10 2020-07-02T20:20:02
+ - Built release version 0.10
  - Add release updates
  - Fix hot-reloading in Zing/Fork (#172)
 

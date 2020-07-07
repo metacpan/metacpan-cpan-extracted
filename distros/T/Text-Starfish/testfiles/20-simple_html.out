@@ -1,0 +1,14 @@
+<!--<? echo "<"."!-- AUTOMATICALLY GENERATED - DO NOT EDIT --".">";
+!>--><!-- + --><!-- AUTOMATICALLY GENERATED - DO NOT EDIT --><!-- - -->
+<HTML><HEAD>
+<TITLE>Some title</TITLE>
+</HEAD>
+<BODY>
+<!--<? $name='Simba'; echo "Hi $name!" !>--><!-- + -->Hi Simba!<!-- - -->
+
+<!--<? echo "This is a more complex example: <!-- - -->
+and check the update." !>--><!-- +1 -->This is a more complex example: <!-- - -->
+and check the update.<!-- -1 -->
+
+</BODY>
+</HTML>

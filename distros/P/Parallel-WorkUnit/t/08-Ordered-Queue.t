@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2019 Joelle Maslak
+# Copyright (C) 2015-2020 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -13,8 +13,7 @@ use warnings;
 use autodie;
 
 use Carp;
-use Test::More tests => 134;
-use Test::Exception;
+use Test2::V0;
 
 # Set Timeout
 local $SIG{ALRM} = sub { die "timeout\n"; };
@@ -25,12 +24,12 @@ alarm 120;    # It would be nice if we did this a better way, since
               # But hopefully nobody has that slow of a machine!
 
 # Instantiate the object
-require_ok('Parallel::WorkUnit');
+use Parallel::WorkUnit;
 my $wu = Parallel::WorkUnit->new();
 ok( defined($wu), "Constructer returned object" );
 is( $wu->count, 0, "no processes running before spawning any" );
 
-lives_ok { $wu->max_children(2) } 'Max children set to 2';
+$wu->max_children(2);
 is( $wu->max_children(), 2, 'Max children defaults to 2' );
 
 # We're going to spawn 10 children and test the return value, just to
@@ -70,7 +69,7 @@ is( $wu->count, 0, "no processes running after waitall()" );
 # We're going to spawn 10 children and test the return value, just to
 # make sure it queue() works basically like async().  This time, though,
 # we are testing with an unlimited max_children
-lives_ok { $wu->max_children(undef) } 'Max children set to undef';
+$wu->max_children(undef);
 is( $wu->max_children(), undef, 'Max children defaults to undef' );
 
 $PROCS = 10;
@@ -94,7 +93,7 @@ for ( 0 .. $PROCS - 1 ) {
 }
 is( $wu->count, 0, "no processes running after waitall()" );
 
-lives_ok { $wu->max_children(2) } 'Max children set to 2';
+$wu->max_children(2);
 is( $wu->max_children(), 2, 'Max children defaults to 2' );
 
 # Queue up 10 processes
@@ -175,12 +174,16 @@ is( Scalar::Util::reftype( $results[0] ), 'ARRAY', 'Array reference properly ret
 my @cmp;
 for ( my $i = 0; $i < 50000; $i++ ) { push @cmp, $i; }
 
-is_deeply( $results[0], \@cmp, 'Array reference contains proper values' );
+is( $results[0], \@cmp, 'Array reference contains proper values' );
 
 # We want to test that we properly handle a child process that die()'s.
 
 $wu->queue( sub { die "Error!"; } );
-dies_ok { $wu->waitall(); } 'Die when child throws an error';
+like(
+    dies { $wu->waitall(); },
+    qr/Error!/,
+    'Die when child throws an error',
+);
 
 # We want to test that we handle a process that returns undef properly
 
@@ -200,4 +203,6 @@ pass("Duplicate waitone() call exits properly");
 $wu->waitall();
 pass("Unnecessary waitall() call exits properly");
 ok( !defined( $wu->waitone() ), 'Unnecessary waitone() call exits properly' );
+
+done_testing();
 

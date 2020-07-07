@@ -5,7 +5,7 @@ use warnings;
 
 # PODNAME: oauthomatic_predefined_servers
 # ABSTRACT: list all predefined server definitions
-our $VERSION = '0.0201'; # VERSION
+our $VERSION = '0.0202'; # VERSION
 
 
 {
@@ -59,7 +59,7 @@ oauthomatic_predefined_servers - list all predefined server definitions
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 DESCRIPTION
 

@@ -4,13 +4,14 @@ author:
   - 'Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>'
 build_requires:
   Module::Build: '0.19'
-  Pod::Readme: '0'
+  Pod::Markdown: '2.0'
+  Pod::Readme: '1.001002'
   Test::More: '0'
   Test::Pod::Coverage: '1.0'
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 keywords:
   - passwords
   - security
@@ -26,7 +27,7 @@ name: Passwd-Keyring-KDEWallet
 provides:
   Passwd::Keyring::KDEWallet:
     file: lib/Passwd/Keyring/KDEWallet.pm
-    version: '0.60'
+    version: '1.0001'
 requires:
   File::ShareDir: '1.00'
   Net::DBus: '0'
@@ -34,8 +35,9 @@ requires:
   Try::Tiny: '0'
   perl: '5.006'
 resources:
-  bugtracker: https://bitbucket.org/Mekk/perl-keyring-kdewallet/issues
-  homepage: http://bitbucket.org/Mekk/perl-keyring-kdewallet
+  bugtracker: https://helixteamhub.cloud/mekk/projects/perl/issues
+  homepage: https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-kdewallet
   license: http://dev.perl.org/licenses/
-  repository: http://bitbucket.org/Mekk/perl-keyring-kdewallet
-version: '0.60'
+  repository: https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-kdewallet
+version: '1.0001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -40,7 +40,7 @@ OAuthomatic::SecretStorage - Save and restore confidential OAuth tokens
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 DESCRIPTION
 

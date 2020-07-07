@@ -45,6 +45,21 @@ sub Connect {
     return ($rv); 
 }
 
+=head2 BuildDSN
+
+Extend L<DBIx::SearchBuilder::Handle/BuildDNS> to force
+C<client_encoding> to be UTF-8, so that character strings can be
+safely passed to, and retrieved from, the database.  See
+L<DBD::Pg/Encoding>.
+
+=cut
+
+sub BuildDSN {
+    my $self = shift;
+    $self->SUPER::BuildDSN(@_);
+    $self->{'dsn'} .= ';client_encoding=UTF8';
+    return $self->{'dsn'};
+}
 
 =head2 Insert
 
@@ -106,7 +121,7 @@ sub IdSequenceName {
     my $table = shift;
 
     return $self->{'_sequences'}{$table} if (exists $self->{'_sequences'}{$table});
-    #Lets get the id of that row we just inserted
+    # Let's get the id of that row we just inserted
     my $seq;
     my $colinfosth = $self->dbh->column_info( undef, undef, lc($table), '%' );
     while ( my $foo = $colinfosth->fetchrow_hashref ) {

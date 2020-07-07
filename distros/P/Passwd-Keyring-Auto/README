@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.7201
+    Version 1.0000
 
 SYNOPSIS
 
@@ -317,7 +317,7 @@ AUTHOR
 BUGS
 
     Please report any bugs or feature requests to issue tracker at
-    https://bitbucket.org/Mekk/perl-keyring-auto.
+    https://helixteamhub.cloud/mekk/projects/perl/issues.
 
 SUPPORT
 
@@ -331,7 +331,7 @@ SUPPORT
 
     Source code is tracked at:
 
-    https://bitbucket.org/Mekk/perl-keyring-auto
+    https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto
 
 LICENSE AND COPYRIGHT
 

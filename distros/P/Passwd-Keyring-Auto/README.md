@@ -4,7 +4,7 @@ Passwd::Keyring::Auto - interface to secure password storage(s)
 
 # VERSION
 
-Version 0.7201
+Version 1.0000
 
 # SYNOPSIS
 
@@ -110,7 +110,7 @@ they limit user choice, but hardcode choices if you like):
 - force => 'Backend'
 
     Try only given backend and nothing else. Expects short backend name.
-    For example `force=`'Gnome'> means [Passwd::Keyring::Gnome](https://metacpan.org/pod/Passwd::Keyring::Gnome) is to be
+    For example `force=`'Gnome'> means [Passwd::Keyring::Gnome](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AGnome) is to be
     used and nothing else.
 
 - prefer=>'Backend'    or    prefer => \['Backend1', 'Backend2', ...\]
@@ -119,8 +119,8 @@ they limit user choice, but hardcode choices if you like):
     even if by default they are not considered suitable for OS in use).
 
     For example `prefer=`\['OSXKeychain', 'KDEWallet'\]> asks module to try
-    [Passwd::Keyring::OSXKeychain](https://metacpan.org/pod/Passwd::Keyring::OSXKeychain) first, then
-    [Passwd::Keyring::KDEWallet](https://metacpan.org/pod/Passwd::Keyring::KDEWallet), then other options (if any) in module
+    [Passwd::Keyring::OSXKeychain](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AOSXKeychain) first, then
+    [Passwd::Keyring::KDEWallet](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AKDEWallet), then other options (if any) in module
     own preference.
 
 - forbid=>'Backend'     or    forbid => \['Backend1', 'Backend2', ...\]
@@ -143,12 +143,12 @@ Backend-specific parameters:
     It is recommended to use configuration file instead.
 
 The function in it's simplest form should not fail (it falls back to
-[Passwd::Keyring::Memory](https://metacpan.org/pod/Passwd::Keyring::Memory) if everything else fails), but it may croak
+[Passwd::Keyring::Memory](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AMemory) if everything else fails), but it may croak
 if some keyring is enforced or if Memory is forbidden or uninstalled.
 
 # KEYRING METHODS
 
-See [Passwd::Keyring::Auto::KeyringAPI](https://metacpan.org/pod/Passwd::Keyring::Auto::KeyringAPI) for operations available on
+See [Passwd::Keyring::Auto::KeyringAPI](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AAuto%3A%3AKeyringAPI) for operations available on
 keyring objects.
 
 # CONFIGURATION FILE
@@ -171,7 +171,7 @@ relate to other backend selection methods.
 By default, config file is looked in `~/.passwd-keyring.cfg` on
 Linux/Unix and `~/Local Settings/Application Data/.passwd-keyring.cfg` 
 on Windows (more exactly: `.passwd-keyring.cfg` in directory reported by
-`my_data` function from [File::HomeDir](https://metacpan.org/pod/File::HomeDir)).
+`my_data` function from [File::HomeDir](https://metacpan.org/pod/File%3A%3AHomeDir)).
 
 Environment variable `PASSWD_KEYRING_CONFIG` can be used to
 override this setting (and should contain path of the configuration
@@ -201,7 +201,7 @@ Example:
     PWSafe3.file=~/tests/xyz/passwd-keyring-tokens.pwsafe3
 
 `prefer`, `forbid` and `force` define appropriate steering values,
-as documented in [Passwd::Keyring::Auto](https://metacpan.org/pod/Passwd::Keyring::Auto). Space is used to separate
+as documented in [Passwd::Keyring::Auto](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AAuto). Space is used to separate
 multiple values.
 
 `;` can be used to start line comments.
@@ -231,7 +231,7 @@ variables):
 
     Use given backend and nothing else. For example, by setting
     `PASSWD_KEYRING_FORCE=KDEWallet` user may enforce use of
-    [Passwd::Keyring::KDEWallet](https://metacpan.org/pod/Passwd::Keyring::KDEWallet).
+    [Passwd::Keyring::KDEWallet](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AKDEWallet).
 
     This variable is completely ignored if `force` parameter was
     specified, and causes runtime error if specified backend is not
@@ -281,12 +281,12 @@ Once calculated, those params are used in the following way:
 The following library defaults are used:
 
 - there is no default for `force`;
-- `forbid` is calculated according to the operating system (so [Passwd::Keyring::OSXKeychain](https://metacpan.org/pod/Passwd::Keyring::OSXKeychain) is forbidden everywhere except Mac OS/X, [Passwd::Keyring::Gnome](https://metacpan.org/pod/Passwd::Keyring::Gnome) is forbidden on Windows and Mac, etc);
-- `prefer` is calculated according to operating system and detected session characteristics (so, if Gnome or Ubuntu session is detected, [Passwd::Keyring::Gnome](https://metacpan.org/pod/Passwd::Keyring::Gnome) is preferred, and if we have KDE, we prefer [Passwd::Keyring:KDEWallet](https://metacpan.org/pod/Passwd::Keyring:KDEWallet), etc).
+- `forbid` is calculated according to the operating system (so [Passwd::Keyring::OSXKeychain](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AOSXKeychain) is forbidden everywhere except Mac OS/X, [Passwd::Keyring::Gnome](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AGnome) is forbidden on Windows and Mac, etc);
+- `prefer` is calculated according to operating system and detected session characteristics (so, if Gnome or Ubuntu session is detected, [Passwd::Keyring::Gnome](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AGnome) is preferred, and if we have KDE, we prefer [Passwd::Keyring:KDEWallet](https://metacpan.org/pod/Passwd%3A%3AKeyring%3AKDEWallet), etc).
 
 # FURTHER INFORMATION
 
-[Passwd::Keyring::Auto::KeyringAPI](https://metacpan.org/pod/Passwd::Keyring::Auto::KeyringAPI) describes methods available on keyring objects
+[Passwd::Keyring::Auto::KeyringAPI](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AAuto%3A%3AKeyringAPI) describes methods available on keyring objects
 and provides some additional detail on keyring construction.
 
 # AUTHOR
@@ -296,7 +296,7 @@ Marcin Kasperski
 # BUGS
 
 Please report any bugs or feature requests to
-issue tracker at [https://bitbucket.org/Mekk/perl-keyring-auto](https://bitbucket.org/Mekk/perl-keyring-auto).
+issue tracker at [https://helixteamhub.cloud/mekk/projects/perl/issues](https://helixteamhub.cloud/mekk/projects/perl/issues).
 
 # SUPPORT
 
@@ -310,7 +310,7 @@ You can also look for information at:
 
 Source code is tracked at:
 
-[https://bitbucket.org/Mekk/perl-keyring-auto](https://bitbucket.org/Mekk/perl-keyring-auto)
+[https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto](https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto)
 
 # LICENSE AND COPYRIGHT
 

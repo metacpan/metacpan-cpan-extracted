@@ -29,6 +29,7 @@ my $ballots_burlington = read_ballots('t/data/burlington2009.txt');
 my $ballots_evils      = read_ballots('t/data/evils.txt');
 my $ballots_tied       = read_ballots('t/data/ties1.txt');
 my $ballots_cwinner_irvtied    = read_ballots('t/data/ties2.txt');
+my $drops_winner = read_ballots('t/data/irvdropscondorcetwinner.txt');
 
 subtest 'simple set where irv winner and condorcet match' => sub {
     my $S1 = Vote::Count::Method::CondorcetVsIRV->new(
@@ -43,8 +44,6 @@ subtest 'simple set where irv winner and condorcet match' => sub {
 };
 
 subtest 'case where regular irv drops smith irv IRV winner' => sub {
-
-    my $smithirvunequal = read_ballots('t/data/irvdropsmithirvwinner.txt');
 
     my $S2 = Vote::Count::Method::CondorcetVsIRV->new(
         'BallotSet' => $ballots_smithirvunequal, );
@@ -76,6 +75,16 @@ subtest 'condorcet winner does not violate later harm (evils)' => sub {
     );
     my $T1run1 = $T1->CondorcetVsIRV( 'smithsetirv' => 0 );
     is( $T1run1->{'winner'}, 'LESSER_EVIL', 'LESSER_EVIL is the winner.' );
+};
+
+subtest 'irv drops condorcet winner' => sub {
+    my $U1 = Vote::Count::Method::CondorcetVsIRV->new(
+        'BallotSet'      => $drops_winner,
+        'TieBreakMethod' => 'none',
+    );
+    my $U1run1 = $U1->CondorcetVsIRV( 'smithsetirv' => 0, 'simple' => 0 );
+    is( $U1run1->{'winner'}, 'VANILLA', '? is the winner.' );
+    note( $U1->logt() );
 };
 
 subtest 'condorcet winner does violate later harm (burlington2009)' => sub {
@@ -195,8 +204,8 @@ subtest 'edge case coverage issue irvistie' => sub {
     );
     like(
         $TieIRV->logt(),
-        qr/IRV and Condorcet Tied, No Winner/,
-        'With the tie the log should tell us: IRV and Condorcet Tied, No Winner'
+        qr/There is no Condorcet or IRV winner/,
+        'With the tie the log should tell us there is no winner'
     );
   note( 'Edge Case Test when there is a condorcet winner and irv ties');
     my $TieIRVC = Vote::Count::Method::CondorcetVsIRV->new(

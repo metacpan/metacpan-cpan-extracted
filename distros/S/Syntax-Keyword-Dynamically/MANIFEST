@@ -1,7 +1,7 @@
 AsyncAwait.h
 Build.PL
 Changes
-eachperl-test.sh
+hax/perl-additions.c.inc
 hax/wrap_keyword_plugin.c.inc
 lib/Syntax/Keyword/Dynamically.pm
 lib/Syntax/Keyword/Dynamically.xs
@@ -15,7 +15,8 @@ t/01dynamically.t
 t/02tiescalar.t
 t/03lost-values.t
 t/80await+dynamically.t
-t/80dynamically+Object::Pad.t
+t/80dynamically+Object-Pad.t
 t/80dynamically+Sentinel.t
+t/81async-method+dynamically.t
 t/99pod.t
 tom-test.pl

@@ -1,0 +1,53 @@
+# starfish
+## Text-Starfish &mdash; A Perl-based System for Text-Embedded Programming and Preprocessing
+
+The Text::Starfish module and starfish command-line utility support
+processing of embedded Perl code in an arbitrary text and provide for
+flexible text patterns that identify such code or activate more
+general text replacement.
+
+The main Starfish web site is
+http://web.cs.dal.ca/~vlado/srcperl/starfish/starfish.html.
+
+Documentation is part of the file Starfish.pm in the Pod format.  To
+convert it into the manual page format, use the following commands
+('$' is just a shell prompt, do not type it!):
+```
+ $ pod2html Starfish.pm
+```
+
+## INSTALLATION
+
+To install this module type the following:
+```
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ $ make install
+```
+
+If you do not have permissions to install the module in the
+system-wide module repository, you can install it locally; e.g.,
+```
+ $ perl Makefile.PL PREFIX=/home/mydir
+```
+
+## DEPENDENCIES
+
+No significant dependencies, as far as I know.  All used Perl modules
+should be a part of Perl core.  Let me know if you find something
+important to add.
+
+## AUTHORS
+
+ 2001-2020 Vlado Keselj http://web.cs.dal.ca/~vlado
+ 	   and contributing authors:
+      2007 Charles Ikeson (overhaul of test.pl)
+
+## LICENSE
+
+This script is provided "as is" without express or implied warranty.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, or more precisely, it is provided under
+The Artistic License 1.0 (see the file LICENSE).
+

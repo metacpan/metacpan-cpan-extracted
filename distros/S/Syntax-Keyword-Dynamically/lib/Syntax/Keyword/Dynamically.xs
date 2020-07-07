@@ -17,6 +17,11 @@
 #  include "wrap_keyword_plugin.c.inc"
 #endif
 
+#define HAVE_PERL_VERSION(R, V, S) \
+    (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
+
+#include "perl-additions.c.inc"
+
 static bool is_async = FALSE;
 
 #ifdef MULTIPLICITY
@@ -368,6 +373,9 @@ static OP *pp_startdyn(pTHX)
   }
   else {
     save_freesv(SvREFCNT_inc(var));
+    /* When save_item() is restored it won't reset the SvPADMY flag properly.
+     * This upsets -DDEBUGGING perls, so we'll have to save the flags too */
+    save_set_svflags(var, SvFLAGS(var), SvFLAGS(var));
     save_item(var);
   }
 
@@ -377,7 +385,7 @@ static OP *pp_startdyn(pTHX)
 #define newSTARTDYNOP(flags, expr)  MY_newSTARTDYNOP(aTHX_ flags, expr)
 static OP *MY_newSTARTDYNOP(pTHX_ I32 flags, OP *expr)
 {
-  OP *ret = newUNOP(OP_CUSTOM, flags, expr);
+  OP *ret = newUNOP_CUSTOM(flags, expr);
   cUNOPx(ret)->op_ppaddr = &pp_startdyn;
   return ret;
 }

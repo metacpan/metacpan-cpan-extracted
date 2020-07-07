@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.19'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,6 +29,7 @@ requires:
   IO::Select: 0
   IO::Socket: 0
   IO::Socket::INET: 0
+  IPC::Run: 0
   LWP::UserAgent: 0
   List::MoreUtils: 0
   List::Util: 0
@@ -42,4 +43,4 @@ requires:
 resources:
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/openresty/test-nginx
-version: '0.26'
+version: '0.27'

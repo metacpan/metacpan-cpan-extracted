@@ -37,7 +37,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Keyword::Declare" : "0",
+            "Keyword::Declare" : "0.001015",
             "Moops" : "0",
             "PPR" : "0",
             "perl" : "5.022"
@@ -61,7 +61,7 @@
          "web" : "https://github.com/Eckankar/Types-Algebraic"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Sebastian Paaske T\u00f8rholm <Eckankar@gmail.com>"
    ],

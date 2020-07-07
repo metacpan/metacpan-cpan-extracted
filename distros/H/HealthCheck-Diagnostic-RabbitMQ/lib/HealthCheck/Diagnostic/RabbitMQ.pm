@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic::RabbitMQ;
 
 # ABSTRACT: Check connectivity and queues on a RabbitMQ server
 use version;
-our $VERSION = 'v1.1.5'; # VERSION
+our $VERSION = 'v1.1.6'; # VERSION
 
 use 5.010;
 use strict;
@@ -70,16 +70,29 @@ sub check {
     # The rabbit_mq param was only "known" so we could choose between
     # one that was passed to check and the one on the instance.
     my $rabbit_mq = delete $decision_params{rabbit_mq};
+    my $should_disconnect = 0;
     if (ref $rabbit_mq eq 'CODE') {
         local $@;
-        $rabbit_mq = eval { local $SIG{__DIE__}; $rabbit_mq->(%params) };
+        ($rabbit_mq, $should_disconnect) = eval {
+            local $SIG{__DIE__};
+            $rabbit_mq->(%params);
+        };
         if ($@) {
-            return $self->summarize({ status => 'CRITICAL', info => $@ })
+            return $self->summarize({ status => 'CRITICAL', info => "$@" })
         }
     }
 
     croak("'rabbit_mq' must have '$method' method") unless $rabbit_mq and do {
         local $@; eval { local $SIG{__DIE__}; $rabbit_mq->can($method) } };
+
+    # Any "should_disconnect" in the params or the instance should take
+    # precedence over what might have been returned by a coderef:
+    #
+    $should_disconnect = exists $params{should_disconnect}
+                              ? $params{should_disconnect}
+                              : (ref $self && exists $self->{should_disconnect})
+                                     ? $self->{should_disconnect}
+                                     : $should_disconnect;
 
     # In theory we could default to random channel in the
     # range of 1..$rabbit_mq->get_max_channel
@@ -94,6 +107,7 @@ sub check {
         %params,
         %decision_params,
         rabbit_mq => $rabbit_mq,
+        should_disconnect => $should_disconnect,
     );
 
     # Make sure we report what we actually *used*
@@ -131,7 +145,11 @@ sub run {
     my $data;
     {
         local $@;
-        $data = eval { local $SIG{__DIE__}; $cb->() };
+        eval {
+            local $SIG{__DIE__};
+            $data = $cb->();
+            $rabbit_mq->disconnect if $params{should_disconnect};
+        };
 
         if ( my $e = $@ ) {
             my $file = quotemeta __FILE__;
@@ -201,7 +219,7 @@ HealthCheck::Diagnostic::RabbitMQ - Check connectivity and queues on a RabbitMQ 
 
 =head1 VERSION
 
-version v1.1.5
+version v1.1.6
 
 =head1 SYNOPSIS
 
@@ -277,6 +295,19 @@ Can be passed either to C<new> or C<check>.
 A coderef that returns a
 L<Net::AMQP::RabbitMQ> or L<Net::RabbitMQ> or compatible object,
 or the object itself.
+
+If using a coderef, the first returned value should always be the
+RabbitMQ object.  If more than one value is returned, the second is
+assumed to be a Boolean L</should_disconnect> flag (see below).
+
+=head2 should_disconnect
+
+An optional Boolean value specifying whether to call C<< ->disconnect >>
+on the RabbitMQ object after doing the health check.  The default is
+false.
+
+If specified as a parameter, it will override any value that might
+be returned by a L</rabbit_mq> coderef as described above.
 
 =head2 queue
 

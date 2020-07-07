@@ -6,12 +6,9 @@ LIST=first second third\
  fourth fifth
 
 <? echo join("\n", getmakefilelist $Star->{INFILE}, 'LIST')
-!>
-#+
+!>#+
 first
 second
 third
 fourth
-fifth
-#-
-
+fifth#-

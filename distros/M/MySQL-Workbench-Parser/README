@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.08
+    version 1.10
 
 SYNOPSIS
 
@@ -48,6 +48,12 @@ ATTRIBUTES
       An array of MySQL::Workbench::Parser::Table objects
 
           my @tables = $parser->tables;
+
+      * views
+
+      An array of MySQL::Workbench::Parser::View objects
+
+          my @views = $parser->views;
 
       * file
 

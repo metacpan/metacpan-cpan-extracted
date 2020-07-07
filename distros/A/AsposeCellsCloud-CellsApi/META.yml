@@ -3,9 +3,7 @@ abstract: 'Aspose.Cells Cloud SDK for Perl'
 author:
   - Aspose.Cells
 build_requires:
-  ExtUtils::MakeMaker: '0'
-configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0.10'
 dynamic_config: 0
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -20,7 +18,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: v20.5.3
+    version: 20.6
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Object::AboveAverage:
@@ -431,6 +429,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/TextItemsResponse.pm
   AsposeCellsCloud::Object::TextOptions:
     file: lib/AsposeCellsCloud/Object/TextOptions.pm
+  AsposeCellsCloud::Object::TextWaterMarkerRequest:
+    file: lib/AsposeCellsCloud/Object/TextWaterMarkerRequest.pm
   AsposeCellsCloud::Object::TextureFill:
     file: lib/AsposeCellsCloud/Object/TextureFill.pm
   AsposeCellsCloud::Object::ThemeColor:
@@ -524,11 +524,11 @@ requires:
   Module::Runtime: '0'
   Scalar::Util: '0'
   Test::Exception: '0'
-  Test::More: '0.10'
   URI::Escape: '0'
   URI::Query: '0'
+  perl: v5.6.0
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: v20.5.3
+version: '20.6'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

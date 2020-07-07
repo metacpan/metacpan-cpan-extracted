@@ -19,13 +19,13 @@ Zing::Domain
 
 =tagline
 
-Aggregate Root
+Shared State Management
 
 =cut
 
 =abstract
 
-Aggregate Root Construct
+Shared State Management Construct
 
 =cut
 
@@ -33,7 +33,6 @@ Aggregate Root Construct
 
 method: apply
 method: change
-method: data
 method: decr
 method: del
 method: get
@@ -42,6 +41,7 @@ method: pop
 method: push
 method: set
 method: shift
+method: state
 method: unshift
 
 =cut
@@ -66,7 +66,6 @@ Zing::Types
 
 name: ro, req, Str
 channel: ro, opt, Channel
-threshold: ro, opt, Str
 
 =cut
 
@@ -107,23 +106,7 @@ change(Str $op, Str $key, Any @val) : Object
 
   # given: synopsis
 
-  $domain->change('incr', 'karma');
-
-=cut
-
-=method data
-
-The data method returns the raw aggregate data associated with the object.
-
-=signature data
-
-data() : HashRef
-
-=example-1 data
-
-  # given: synopsis
-
-  $domain->data;
+  $domain->change('incr', 'karma', 1);
 
 =cut
 
@@ -283,6 +266,22 @@ shift(Str $key) : Object
 
 =cut
 
+=method state
+
+The state method returns the raw aggregate data associated with the object.
+
+=signature state
+
+state() : HashRef
+
+=example-1 state
+
+  # given: synopsis
+
+  $domain->state;
+
+=cut
+
 =method unshift
 
 The unshift method unshifts data onto the stack associated with a specific key.
@@ -319,42 +318,35 @@ $subs->example(-1, 'apply', 'method', fun($tryable) {
 
 $subs->example(-1, 'change', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is $result->data->{karma}, 1;
-
-  $result
-});
-
-$subs->example(-1, 'data', 'method', fun($tryable) {
-  ok my $result = $tryable->result;
-  is_deeply $result, {karma => 1};
+  is $result->state->{karma}, 1;
 
   $result
 });
 
 $subs->example(-1, 'decr', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is $result->data->{karma}, 0;
+  is $result->state->{karma}, 0;
 
   $result
 });
 
 $subs->example(-2, 'decr', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is $result->data->{karma}, -2;
+  is $result->state->{karma}, -2;
 
   $result
 });
 
 $subs->example(-1, 'del', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  ok !exists $result->data->{missing};
+  ok !exists $result->state->{missing};
 
   $result
 });
 
 $subs->example(-2, 'del', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  ok !exists $result->data->{email};
+  ok !exists $result->state->{email};
 
   $result
 });
@@ -374,49 +366,61 @@ $subs->example(-2, 'get', 'method', fun($tryable) {
 
 $subs->example(-1, 'incr', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is $result->data->{karma}, -1;
+  is $result->state->{karma}, -1;
 
   $result
 });
 
 $subs->example(-2, 'incr', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is $result->data->{karma}, 4;
+  is $result->state->{karma}, 4;
 
   $result
 });
 
 $subs->example(-1, 'pop', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is @{$result->data->{history}}, 0;
+  is @{$result->state->{history}}, 0;
 
   $result
 });
 
 $subs->example(-1, 'push', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is @{$result->data->{history}}, 1;
+  is @{$result->state->{history}}, 1;
 
   $result
 });
 
 $subs->example(-1, 'set', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is $result->data->{updated}, 1234567890;
+  is $result->state->{updated}, 1234567890;
 
   $result
 });
 
 $subs->example(-1, 'shift', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is @{$result->data->{history}}, 0;
+  is @{$result->state->{history}}, 0;
+
+  $result
+});
+
+$subs->example(-1, 'state', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, {
+    'email' => 'me@example.com',
+    'history' => [],
+    'karma' => 4,
+    'updated' => 1234567890
+  };
 
   $result
 });
 
 $subs->example(-1, 'unshift', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is @{$result->data->{history}}, 1;
+  is @{$result->state->{history}}, 1;
 
   $result
 });

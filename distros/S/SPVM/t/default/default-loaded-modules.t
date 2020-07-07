@@ -6,13 +6,20 @@ use warnings;
 
 use Test::More 'no_plan';
 
+use SPVM 'SPVM::Byte';
+use SPVM 'SPVM::Short';
+use SPVM 'SPVM::Int';
+use SPVM 'SPVM::Long';
+use SPVM 'SPVM::Float';
+use SPVM 'SPVM::Double';
+
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use SPVM;
 
-UNITCHECK { SPVM::init() }
+
 
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();

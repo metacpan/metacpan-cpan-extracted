@@ -44,6 +44,7 @@ my $builder = $class->new(
         'IPC::System::Simple' => '1.18',
         'Capture::Tiny' => '0.20',
         'Encode' => '0.00',
+        'List::Util' => '1.29',
     },
 
     create_makefile_pl => 'traditional',
@@ -55,10 +56,10 @@ my $builder = $class->new(
     meta_merge => {
         keywords => [ qw/ passwords security secure-storage keyring Mac OSX keychain keyring / ],
         resources => {
-            license     => 'http://dev.perl.org/licenses/',
-            homepage    => 'http://bitbucket.org/Mekk/perl-keyring-osxkeychain',
-            repository => 'http://bitbucket.org/Mekk/perl-keyring-osxkeychain',
-            bugtracker => 'https://bitbucket.org/Mekk/perl-keyring-osxkeychain/issues',
+            license    => 'http://dev.perl.org/licenses/',
+            homepage   => 'https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-osxkeychain',
+            repository => 'https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-osxkeychain',
+            bugtracker => 'https://helixteamhub.cloud/mekk/projects/perl/issues',
         },
     },
 );

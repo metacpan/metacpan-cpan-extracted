@@ -1,3 +1,27 @@
+=begin comment
+
+Copyright (c) 2020 Aspose.Cells Cloud
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=end comment
+
+=cut
 
 
 package AsposeCellsCloud::CellsApi;
@@ -9,17 +33,14 @@ use utf8;
 use Exporter;
 use Carp qw( croak );
 use Log::Any qw($log);
-use File::Slurp;
 
 use AsposeCellsCloud::ApiClient;
 
 use base "Class::Data::Inheritable";
 
+my  $VERSION = '20.6';
 
 __PACKAGE__->mk_classdata('method_documentation' => {});
-
-
-our $VERSION = '20.5.4';
 
 sub new {
     my $class = shift;
@@ -26197,6 +26218,107 @@ sub cells_workbook_put_workbook_create {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('WorkbookResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_workbook_put_workbook_water_marker
+#
+# Set workbook background image.
+# 
+# @param string $name  (required)
+# @param string $folder  (optional)
+# @param string $storage storage name. (optional)
+# @param TextWaterMarkerRequest $text_water_marker_request The text water marker request. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'storage name.',
+        required => '0',
+    },
+    'text_water_marker_request' => {
+        data_type => 'TextWaterMarkerRequest',
+        description => 'The text water marker request.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_workbook_put_workbook_water_marker' } = { 
+    	summary => 'Set workbook background image.',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_workbook_put_workbook_water_marker {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_workbook_put_workbook_water_marker");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/watermarker';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'text_water_marker_request'}) {
+        $_body_data = $args{'text_water_marker_request'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
 

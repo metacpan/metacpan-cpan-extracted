@@ -69,7 +69,10 @@ See that module’s documentation for details of how to use it.
 
 This class allows you to cancel an in-progress query, thus:
 
-    $cp->cancel($pending, 'This is why.');
+    $cp_service_obj->cancel($pending);
+
+Note that the L<cPanel::APIClient::Pending> object’s promise will remain
+pending indefinitely.
 
 =cut
 

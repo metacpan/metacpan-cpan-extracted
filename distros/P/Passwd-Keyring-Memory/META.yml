@@ -3,12 +3,13 @@ abstract: 'fallback keyring for environments'
 author:
   - 'Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>'
 build_requires:
-  Pod::Readme: '0'
+  Pod::Markdown: '2.0'
+  Pod::Readme: '1.001002'
   Test::More: '0'
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 keywords:
   - keyring
   - passwords
@@ -20,12 +21,13 @@ name: Passwd-Keyring-Memory
 provides:
   Passwd::Keyring::Memory:
     file: lib/Passwd/Keyring/Memory.pm
-    version: '0.2405'
+    version: '1.0000'
 requires:
   perl: '5.006'
 resources:
-  bugtracker: https://bitbucket.org/Mekk/perl-keyring-memory/issues
-  homepage: http://bitbucket.org/Mekk/perl-keyring-memory
+  bugtracker: https://helixteamhub.cloud/mekk/projects/perl/issues
+  homepage: https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-memory
   license: http://dev.perl.org/licenses/
-  repository: http://bitbucket.org/Mekk/perl-keyring-memory
-version: '0.2405'
+  repository: https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-memory
+version: '1.0000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

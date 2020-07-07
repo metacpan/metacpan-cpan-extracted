@@ -13,7 +13,7 @@ use Bat::Interpreter::Delegate::Executor::PartialDryRunner;
 use Bat::Interpreter::Delegate::LineLogger::Silent;
 use namespace::autoclean;
 
-our $VERSION = '0.022';    # VERSION
+our $VERSION = '0.023';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -213,7 +213,7 @@ sub _handle_special_command {
         if ( $token =~ /^:/ ) {
             $self->_goto_label( $token, $context, 1 );
         } else {
-            ( my $first_word ) = $token =~ /\A([^:\s]+)/;
+            ( my $first_word ) = $token =~ /\A([^\s]+)/;
             if ( $first_word =~ /(\.[^.]+)$/ ) {
                 ( my $extension ) = $first_word =~ /(\.[^.]+)$/;
                 if ( $extension eq '.exe' ) {
@@ -472,7 +472,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -517,7 +517,7 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords eva.dominguez Eva Dominguez juanradiego Nicolas De los Santos pablo.rodriguez ricardo.gomez Toby Inkster
+=for stopwords eva.dominguez Eva juanradiego Nicolas De los Santos pablo.rodriguez ricardo.gomez Toby Inkster
 
 =over 4
 
@@ -527,7 +527,7 @@ eva.dominguez <eva.dominguez@meteologica.com>
 
 =item *
 
-Eva Dominguez <meloncego@gmail.com>
+Eva <meloncego@gmail.com>
 
 =item *
 

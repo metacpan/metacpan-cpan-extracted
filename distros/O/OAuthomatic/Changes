@@ -1,5 +1,8 @@
 Release history for OAuthomatic
 
+0.0202  2020-07-03
+        Switching hosting to helix as bitbucket is shut down.
+
 0.0201  2015-01-21
 
         Fixed error happening on older perls (wrong isa usage).

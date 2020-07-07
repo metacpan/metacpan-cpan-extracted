@@ -6,15 +6,13 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   Symbol: '0'
-  Test2::Tools::Warnings: '0'
   Test2::V0: '0'
-  Test::Exception: '0'
   Test::More: '0'
   Test::UseAllModules: '0.15'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,10 +21,10 @@ name: Parallel-WorkUnit
 provides:
   Parallel::WorkUnit:
     file: lib/Parallel/WorkUnit.pm
-    version: '2.191821'
+    version: '2.201890'
   Parallel::WorkUnit::Procedural:
     file: lib/Parallel/WorkUnit/Procedural.pm
-    version: '2.191821'
+    version: '2.201890'
 recommends:
   AnyEvent: '7.14'
 requires:
@@ -49,8 +47,9 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Parallel-WorkUnit/issues
   repository: git://github.com/jmaslak/Parallel-WorkUnit.git
-version: '2.191821'
+version: '2.201890'
 x_contributor_covenant:
   version: 0.02
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

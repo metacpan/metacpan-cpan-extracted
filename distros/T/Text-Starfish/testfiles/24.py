@@ -17,8 +17,7 @@ def mkhtaccessfile (reviewersdir, reviewerid, reviewername, reviewerlogin):
     file.lock('w|')
     #<? echo "s = \"\"\"\\\nAuthType Basic\n".
     # '';
-    #!>
-    #+
+    #!>#+
 s = """\
 AuthType Basic
 

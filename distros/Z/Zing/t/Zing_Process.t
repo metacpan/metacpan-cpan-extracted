@@ -35,6 +35,9 @@ method: exercise
 method: execute
 method: metadata
 method: ping
+method: recv
+method: reply
+method: send
 method: shutdown
 method: signal
 method: spawn
@@ -181,6 +184,91 @@ ping(Int $pid) : Bool
   # given: synopsis
 
   $process->ping(12345);
+
+=cut
+
+=method recv
+
+The recv method is a proxy for L<Zing::Mailbox/recv> and receives a single new
+message from the mailbox.
+
+=signature recv
+
+recv() : Maybe[HashRef]
+
+=example-1 recv
+
+  # given: synopsis
+
+  $process->recv;
+
+=example-2 recv
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $peer->send($process, { note => 'ehlo' });
+
+  $process->recv;
+
+=cut
+
+=method reply
+
+The reply method is a proxy for L<Zing::Mailbox/reply> and sends a message to
+the mailbox represented by the C<$bag> received.
+
+=signature reply
+
+reply(HashRef $bag, HashRef $value) : Int
+
+=example-1 reply
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $peer->send($process, { note => 'ehlo' });
+
+  my $mail = $process->recv;
+
+  $process->reply($mail, { note => 'helo' });
+
+=cut
+
+=method send
+
+The send method is a proxy for L<Zing::Mailbox/send> and sends a new message to
+the mailbox specified.
+
+=signature send
+
+send(Mailbox | Process | Str $to, HashRef $data) : Int
+
+=example-1 send
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $process->send($peer, { note => 'invite' });
+
+=example-2 send
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $process->send($peer->mailbox, { note => 'invite' });
+
+=example-3 send
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $process->send($peer->mailbox->term, { note => 'invite' });
 
 =cut
 
@@ -339,6 +427,46 @@ $subs->example(-1, 'ping', 'method', fun($tryable) {
 
   local $ENV{ZING_TEST_KILL} = 1;
   ok $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'recv', 'method', fun($tryable) {
+  ok !(my $result = $tryable->result);
+
+  $result
+});
+
+$subs->example(-2, 'recv', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result->{data}, { note => 'ehlo' };
+
+  $result
+});
+
+$subs->example(-1, 'reply', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'send', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+$subs->example(-2, 'send', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 1;
+
+  $result
+});
+
+$subs->example(-3, 'send', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is $result, 1;
 
   $result
 });

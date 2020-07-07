@@ -9,7 +9,7 @@ package Rex::Virtualization::VBox::status;
 use strict;
 use warnings;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 use Rex::Virtualization::VBox::list;
 

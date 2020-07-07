@@ -9,7 +9,7 @@ use warnings;
 {
     package OAuthomaticForgetTokens;
     use Moose;
-    our $VERSION = '0.0201'; # VERSION
+    our $VERSION = '0.0202'; # VERSION
     with 'MooseX::Getopt';
     has 'password_group' => (is=>'ro', isa=>'Str', required=>1);
     has 'site_name' => (is=>'ro', isa=>'Str', required=>1);
@@ -36,7 +36,7 @@ oauthomatic_forget_tokens - remove remembered tokens for given site
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 DESCRIPTION
 

@@ -11,11 +11,9 @@ use routines;
 use Data::Object::Class;
 use Data::Object::ClassHas;
 
-extends 'Zing::Watcher';
+extends 'Zing::Kernel';
 
-use Zing::Kernel;
-
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 
@@ -28,7 +26,7 @@ has 'scheme' => (
 # METHODS
 
 method start() {
-  Zing::Kernel->new(scheme => $self->scheme)->execute;
+  return $self->execute;
 }
 
 1;
@@ -71,7 +69,7 @@ L<"the actor model"|https://en.wikipedia.org/wiki/Actor_model>.
 
 This package inherits behaviors from:
 
-L<Zing::Watcher>
+L<Zing::Kernel>
 
 =cut
 
@@ -107,7 +105,7 @@ This package implements the following methods:
 
   start() : Kernel
 
-The start method builds a L<Zing::Kernel> and executes its event-loop.
+The start method prepares the L<Zing::Kernel> and executes its event-loop.
 
 =over 4
 
@@ -198,7 +196,7 @@ L<Zing::Data>: Process Data
 
 =item *
 
-L<Zing::Domain>: Aggregate Root
+L<Zing::Domain>: Shared State Management
 
 =item *
 
@@ -318,6 +316,10 @@ L<Zing::Zang::Spawner>: Process Spawner
 
 =item *
 
+L<Zing::Zang::Timer>: Timer Process
+
+=item *
+
 L<Zing::Zang::Watcher>: Process Watcher
 
 =item *
@@ -353,22 +355,27 @@ message-passing.
 =head2 asynchronous
 
   # in process (1)
+  use Zing::Domain;
   use Zing::Process;
 
+  my $d1 = Zing::Domain->new(name => 'peers');
   my $p1 = Zing::Process->new(name => 'p1');
 
+  $d1->push('mailboxes', $p1->mailbox->term);
   $p1->execute;
 
   # in process (2)
+  use Zing::Domain;
   use Zing::Process;
 
+  my $d2 = Zing::Domain->new(name => 'peers');
   my $p2 = Zing::Process->new(name => 'p2');
 
-  my $friends = $p2->registry->keys;
+  my $mailboxes = $d2->get('mailboxes');
 
-  for my $friend (@$friends) {
+  for my $address (@$mailboxes) {
     # send each registered process a message
-    $p2->send($friend, { discovery => $p2->term });
+    $p2->send($address, { discovery => $p2->mailbox->term });
   }
 
   $p2->execute;
@@ -500,7 +507,11 @@ scale your deployments without changing your implementations.
   ZING_HOST=0.0.0.0
   ZING_HOST=68.80.90.100
 
+  # configure the system datastore (defaults to 'Zing::Redis')
+  ZING_STORE='Zing::Redis'
+
   # configure Redis driver without touching your source code
+  ZING_REDIS='server=127.0.0.1:6379'
   ZING_REDIS='every=1_000_000,reconnect=60'
   ZING_REDIS='sentinels=127.0.0.1:12345|127.0.0.1:23456,sentinels_cnx_timeout=0.1'
   ZING_REDIS='server=192.168.0.1:6379,debug=0'
@@ -802,6 +813,40 @@ L<The Orleans Project|http://dotnet.github.io/orleans>
 L<The Pyakka Project|https://github.com/jodal/pykka>
 
 L<The Reactive Manifesto|http://www.reactivemanifesto.org>
+
+=head1 DISCLOSURES
+
+The following is a list of all the known ways Zing is not like a traditional
+actor-model system:
+
+=over 4
+
+=item *
+
+In Zing, actors act independently and aren't beholden to a system manager.
+
+=item *
+
+In Zing, actors are always active (each runs its own infinite event-loop).
+
+=item *
+
+In Zing, actors can communicate unrestricted (no approved communicators).
+
+=item *
+
+In Zing, actors can block using C<poll> but do not block by default.
+
+=item *
+
+In Zing, the default datastore/backend is L<Redis|https://redis.io> which means
+the system is (by default) subject to the guarantees and limitations of that
+system. Data is serialized as L<JSON|https://json.org> and stored in
+plain-text.
+
+=back
+
+=cut
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 package Vote::Count::TextTableTiny;
-$Vote::Count::TextTableTiny::VERSION = '1.03';
+$Vote::Count::TextTableTiny::VERSION = '1.05';
 use parent 'Exporter';
 use List::Util qw();
 use Carp qw/ croak /;
@@ -336,6 +336,29 @@ This software is copyright (c) 2012 by Creighton Higgins.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+#FOOTER
+
+=pod
+
+BUG TRACKER
+
+L<https://github.com/brainbuz/Vote-Count/issues>
+
+AUTHOR
+
+John Karr (BRAINBUZ) brainbuz@cpan.org
+
+CONTRIBUTORS
+
+Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+
+LICENSE
+
+This module is released under the GNU Public License Version 3. See license file for details. For more information on this license visit L<http://fsf.org>.
 
 =cut
 

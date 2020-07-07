@@ -4,6 +4,7 @@ NAME
 
 SYNOPSIS
 
+       use v5.14;
        use Future::AsyncAwait;
     
        async sub do_a_thing
@@ -203,7 +204,7 @@ SUPPORTED USES
     On perl versions 5.26 and later async sub syntax supports the
     signatures feature if it is enabled:
 
-       use 5.026;
+       use v5.26;
        use feature 'signatures';
     
        async sub quart($x, $y)

@@ -12,7 +12,7 @@ use warnings;
 use Rex::Logger;
 use Rex::TaskList;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 my $INSTANCE;
 

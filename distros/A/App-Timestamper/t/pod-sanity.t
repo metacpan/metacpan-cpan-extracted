@@ -1,11 +1,10 @@
 #!/usr/bin/perl
 
-use 5.014;
-
 use strict;
 use warnings;
+use 5.014;
 
-use File::Spec;
+use File::Spec ();
 use Test::More tests => 2;
 
 sub _slurp
@@ -24,18 +23,19 @@ sub _slurp
 }
 
 {
-    my $fn = File::Spec->catfile(
-        File::Spec->curdir(), "lib", "App", "Timestamper.pm"
-    );
+    my $fn = File::Spec->catfile( File::Spec->curdir(), "lib", "App",
+        "Timestamper.pm" );
 
     my $contents = _slurp($fn);
 
     # TEST
-    like ($contents, qr/^=head1 COMMON REQUESTS$/ms,
-        "Common requests is found.");
+    like(
+        $contents,
+        qr/^=head1 COMMON REQUESTS$/ms,
+        "Common requests is found."
+    );
 
     # TEST
-    like ($contents, qr/pony/i,
-        "Pony was found.");
+    like( $contents, qr/pony/i, "Pony was found." );
 }
 

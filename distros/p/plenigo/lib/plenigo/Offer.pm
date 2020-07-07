@@ -23,7 +23,7 @@ package plenigo::Offer;
 use Moo;
 use Carp qw(confess);
 
-our $VERSION = '3.0001';
+our $VERSION = '3.0002';
 
 has customer_id => (
     is => 'rw'

@@ -1,0 +1,50 @@
+/**
+   A more complex Java test
+*/
+// Uncomment version:
+//<?   $Version = 'Test';    !>
+//<? # $Version = 'Release'; !>
+
+public class A {
+
+  public static int main(String[] args) {
+
+    //<? $O = "    ".($Version eq 'Test' ?
+    // 'System.out.println("Test version");' :
+    // 'System.out.println("Release version");' );
+    //!>
+
+    // Let us see what happens when output contains //- string:
+    //<? echo "//- and again: //-\n" !>
+
+    // We get something like this:
+    //<? echo "//- and again: //-\n" !>//1+
+//- and again: //-
+//1-
+
+    // Or for example:
+    //<? echo "//- and again: //-\n//1-\n" !>//2+
+//- and again: //-
+//1-
+//2-
+
+    // and so on:
+    //<? echo "//- and again: //-\n//1-\n//2-\n" !>//1+
+//- and again: //-
+//1-
+
+    // more tests 
+    //<? echo "//- and again: //-\n//1-\n//2-\n//3-\n" !>//1+
+//- and again: //-
+//1-
+
+    //<? echo "how about this\n//1-\n//2-\n//3-\n" !>//4+
+//- and again: //-
+//1-
+//2-
+//3-
+//4-
+
+    return 0;
+  }
+}

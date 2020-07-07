@@ -1,11 +1,17 @@
 Revision history for Keyring-Gnome
 
+1.0000	2020-07-05
+        Switching hosting to helix as bitbucket is shut down.
+
+        (tests) Test run on wider range of systems (d-bus is checked,
+        not the legacy GNOME_KEYRING_CONTROL variable).
+
 0.3003	2015-01-06
 	Adding kwalitee tests
 
 0.3002	2013-07-04
 	A few improvements in documentation and tests: 
-        - fixed bitbucket #1 - wrong example of set_password,
+        - fixed bb #1 - wrong example of set_password,
         - renamed example and ensured it is distributed,
         - named some tests better
 

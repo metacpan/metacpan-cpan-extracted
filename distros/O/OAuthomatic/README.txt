@@ -6,7 +6,7 @@ NAME
 
 VERSION
 
-    version 0.0201
+    version 0.0202
 
 SYNOPSIS
 
@@ -615,11 +615,10 @@ THANKS
 
 SOURCE REPOSITORY
 
-    Source code is maintained in Mercurial <http://mercurial.selenic.com>
-    repository at bitbucket.org/Mekk/perl-oauthomatic
-    <https://bitbucket.org/Mekk/perl-oauthomatic>:
-
-        hg clone https://bitbucket.org/Mekk/perl-oauthomatic
+    Source code is maintained in Mercurial <http://www.mercurial-scm.org>
+    repository at
+    helixteamhub.cloud/mekk/projects/perl/repositories/oauthomatic
+    <https://helixteamhub.cloud/mekk/projects/perl/repositories/oauthomatic>
 
     See README-development.pod in source distribution for info how to build
     module from source.
@@ -628,8 +627,8 @@ ISSUE TRACKER
 
     Issues can be reported at:
 
-      * Bitbucket issue tracker
-      <https://bitbucket.org/Mekk/perl-oauthomatic/issues>
+      * repository issue tracker
+      <https://helixteamhub.cloud/mekk/projects/perl/issues>
 
       * CPAN bug tracker
       <https://rt.cpan.org/Dist/Display.html?Queue=OAuthomatic>

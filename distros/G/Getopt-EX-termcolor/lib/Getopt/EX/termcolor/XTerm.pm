@@ -21,7 +21,6 @@ L<https://www.xfree86.org/current/ctlseqs.html>
 package Getopt::EX::termcolor::XTerm;
 
 use v5.14;
-use strict;
 use warnings;
 
 use Exporter 'import';
@@ -53,6 +52,7 @@ sub get_color {
 }
 
 our $debug = $ENV{DEBUG_GETOPTEX};
+our $TIMEOUT = $ENV{TERMCOLOR_XTERM_TIMEOUT} || 0.1;
 
 use constant {
     CSI => "\e[", # Control Sequence Introducer
@@ -112,7 +112,7 @@ sub ask {
     open my $tty, "+<", "/dev/tty" or return;
     ReadMode "cbreak", $tty;
     printflush $tty $request;
-    my $timeout = 0.1;
+    my $timeout = $TIMEOUT;
     my $answer = '';
     while (defined (my $key = ReadKey $timeout, $tty)) {
 	if (0 and $debug) {

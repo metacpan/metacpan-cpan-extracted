@@ -24,7 +24,7 @@ use Zing::Node;
 use Zing::Registry;
 use Zing::Term;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 
@@ -246,6 +246,29 @@ method metadata() {
     process => $self->node->pid,
     server => $self->server->name,
     tag => $self->tag,
+  }
+}
+
+method recv() {
+  return $self->mailbox->recv;
+}
+
+method reply(HashRef $mail, HashRef $data) {
+  return $self->mailbox->send($mail->{from}, $data);
+}
+
+method send(Mailbox | Process | Str $to, HashRef $data) {
+  if (!ref $to) {
+    return $self->mailbox->send(Zing::Term->new($to)->mailbox, $data);
+  }
+  elsif ($to->isa('Zing::Mailbox')) {
+    return $self->mailbox->send($to->term, $data);
+  }
+  elsif ($to->isa('Zing::Process')) {
+    return $self->mailbox->send($to->mailbox->term, $data);
+  }
+  else {
+    return $self->mailbox->send(Zing::Term->new($to)->mailbox, $data);
   }
 }
 
@@ -562,6 +585,109 @@ The ping method returns truthy if the process of the PID provided is active.
   # given: synopsis
 
   $process->ping(12345);
+
+=back
+
+=cut
+
+=head2 recv
+
+  recv() : Maybe[HashRef]
+
+The recv method is a proxy for L<Zing::Mailbox/recv> and receives a single new
+message from the mailbox.
+
+=over 4
+
+=item recv example #1
+
+  # given: synopsis
+
+  $process->recv;
+
+=back
+
+=over 4
+
+=item recv example #2
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $peer->send($process, { note => 'ehlo' });
+
+  $process->recv;
+
+=back
+
+=cut
+
+=head2 reply
+
+  reply(HashRef $bag, HashRef $value) : Int
+
+The reply method is a proxy for L<Zing::Mailbox/reply> and sends a message to
+the mailbox represented by the C<$bag> received.
+
+=over 4
+
+=item reply example #1
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $peer->send($process, { note => 'ehlo' });
+
+  my $mail = $process->recv;
+
+  $process->reply($mail, { note => 'helo' });
+
+=back
+
+=cut
+
+=head2 send
+
+  send(Mailbox | Process | Str $to, HashRef $data) : Int
+
+The send method is a proxy for L<Zing::Mailbox/send> and sends a new message to
+the mailbox specified.
+
+=over 4
+
+=item send example #1
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $process->send($peer, { note => 'invite' });
+
+=back
+
+=over 4
+
+=item send example #2
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $process->send($peer->mailbox, { note => 'invite' });
+
+=back
+
+=over 4
+
+=item send example #3
+
+  # given: synopsis
+
+  my $peer = Zing::Process->new;
+
+  $process->send($peer->mailbox->term, { note => 'invite' });
 
 =back
 

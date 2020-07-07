@@ -1,8 +1,15 @@
-0.002   2019-05-08 (PERLANCAR)
+0.003   2020-04-17  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Log::ger::UseDataDrinter.
+
+
+0.002   2019-05-08  Released-By: PERLANCAR
 
 	- Default to Useqq=1 to show unprintable characters.
 
 
-0.001   2018-06-10 (PERLANCAR)
+0.001   2018-06-10  Released-By: PERLANCAR
 
         - First release.

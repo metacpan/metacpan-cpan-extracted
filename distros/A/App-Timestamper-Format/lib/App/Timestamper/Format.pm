@@ -1,14 +1,13 @@
 package App::Timestamper::Format;
-$App::Timestamper::Format::VERSION = '0.0.2';
+$App::Timestamper::Format::VERSION = '0.2.0';
 use 5.014;
 use strict;
 use warnings;
 
-use IO::Handle;
 use Getopt::Long 2.36 qw(GetOptionsFromArray);
 use Pod::Usage qw/pod2usage/;
 
-use App::Timestamper::Format::Filter::TS;
+use App::Timestamper::Format::Filter::TS ();
 
 sub new
 {
@@ -23,19 +22,23 @@ sub new
 
 sub _init
 {
-    my ($self, $args) = @_;
+    my ( $self, $args ) = @_;
 
-    my $argv = [@{$args->{argv}}];
+    my $argv = [ @{ $args->{argv} } ];
 
-    my $help = 0;
-    my $man = 0;
+    my $help    = 0;
+    my $man     = 0;
     my $version = 0;
-    if (! (my $ret = GetOptionsFromArray(
-        $argv,
-        'help|h' => \$help,
-        man => \$man,
-        version => \$version,
-    )))
+    if (
+        !(
+            my $ret = GetOptionsFromArray(
+                $argv,
+                'help|h' => \$help,
+                man      => \$man,
+                version  => \$version,
+            )
+        )
+        )
     {
         die "GetOptions failed!";
     }
@@ -47,12 +50,12 @@ sub _init
 
     if ($man)
     {
-        pod2usage(-verbose => 2);
+        pod2usage( -verbose => 2 );
     }
 
     if ($version)
     {
-        print "timestamper version $App::Timestamper::VERSION .\n";
+        print "ts-format version $App::Timestamper::VERSION .\n";
         exit(0);
     }
 
@@ -63,10 +66,11 @@ sub run
 {
     my ($self) = @_;
 
-    local @ARGV = @{$self->{_argv}};
+    local @ARGV = @{ $self->{_argv} };
     STDOUT->autoflush(1);
 
-    App::Timestamper::Format::Filter::TS->new->fh_filter(\*ARGV, sub {print $_[0];});
+    App::Timestamper::Format::Filter::TS->new->fh_filter( \*ARGV,
+        sub { print $_[0]; } );
 
     return;
 }
@@ -77,13 +81,15 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 App::Timestamper::Format - prefix lines with formatted timestamps of their arrivals.
 
 =head1 VERSION
 
-version 0.0.2
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -93,8 +99,8 @@ version 0.0.2
 
 =head1 DESCRIPTION
 
-App::Timestamper is a pure-Perl command line program that filters the input
-so the formatted timestamps based on the C<TIMESTAMPER_FORMAT> env var are
+App::Timestamper::Format is a pure-Perl command line program that filters the input
+so the formatted timestamps based on the C<TIMESTAMPER_FORMAT> environment variable are
 prefixed to the lines based on the time of the arrival.
 
 So if the input was something like:
@@ -108,12 +114,6 @@ It will become something like:
     11:12:00\tFirst Line
     11:12:02\tSecond Line
     11:12:04\tThird Line
-
-=encoding utf-8
-
-=head1 VERSION
-
-version 0.0.2
 
 =head1 SUBROUTINES/METHODS
 
@@ -153,36 +153,9 @@ L<http://www.youtube.com/results?search_query=chumbawamba%20tubthumping>
 
 =back
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/app-timestamper-format/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc App::Timestamper::Format
 
 =head2 Websites
 
@@ -201,35 +174,11 @@ L<https://metacpan.org/release/App-Timestamper-Format>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Timestamper-Format>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-Timestamper-Format>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/App-Timestamper-Format>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Timestamper-Format>
 
 =item *
 
@@ -280,5 +229,26 @@ from your repository :)
 L<https://github.com/shlomif/App-Timestamper-Format>
 
   git clone https://github.com/shlomif/App-Timestamper-Format.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/app-timestamper-format/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

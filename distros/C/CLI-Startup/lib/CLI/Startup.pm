@@ -24,7 +24,7 @@ use Getopt::Long qw{
 use Exporter 'import';
 our @EXPORT_OK = qw/startup/;
 
-our $VERSION = '0.28';    # Don't forget to update the manpage version, too!
+our $VERSION = '0.29';    # Don't forget to update the manpage version, too!
 
 use Readonly;
 Readonly my $V_FOR_VERBOSE => 'ALIAS OF VERBOSE';
@@ -240,8 +240,7 @@ sub _usage_message
     # Print the requested message, if any
     if ( defined $msg )
     {
-        ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
-        $message .= sprintf '%s: FATAL: %s\n', $name, $msg;
+        $message .= sprintf "\%s: FATAL: \%s\n", $name, $msg;
     }
 
     # Now print the help message.
@@ -1283,7 +1282,7 @@ CLI::Startup - Simple initialization for command-line scripts
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =head1 SYNOPSIS
 

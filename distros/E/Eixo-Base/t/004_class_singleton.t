@@ -37,6 +37,29 @@ has(
 
 __PACKAGE__->make_singleton();
 
+package FooDestroy;
+
+use strict;
+use Eixo::Base::Clase 'Eixo::Base::Singleton';
+
+has(
+    a=>10,
+    destroy_called=>undef
+);
+
+sub DESTROY{
+
+
+    if(${^GLOBAL_PHASE} ne 'DESTRUCT'){
+    
+        return $_[0]->destroy_called(1);
+    }
+
+
+}
+
+__PACKAGE__->make_singleton();
+
 package Main;
 
 use t::test_base;
@@ -95,5 +118,8 @@ unless($Config{'osname'} eq 'MSWin32'){
     }
 }
 
+ok(FooDestroy->a == 10 && !FooDestroy->destroy_called, "Singleton with destroy method can be instantiated");
+
+ok(FooDestroy->DESTROY && FooDestroy->destroy_called == 1, "Singleton's own destroy method can be defined");
 
 done_testing();

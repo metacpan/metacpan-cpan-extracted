@@ -113,6 +113,9 @@ sub Connect  {
     # Set the handle
     $self->dbh($handle);
 
+    # Cache version info
+    $self->DatabaseVersion;
+
     return 1;
 }
 
@@ -309,9 +312,23 @@ sub Disconnect  {
     my $dbh = $self->dbh;
     return unless $dbh;
     $self->Rollback(1);
-    return $dbh->disconnect;
-}
 
+    my $ret = $dbh->disconnect;
+
+    # DBD::mysql with MariaDB 10.2+ could cause segment faults when
+    # interacting with a disconnected handle, here we unset
+    # dbh to inform other code that there is no connection any more.
+    # See also https://github.com/perl5-dbi/DBD-mysql/issues/306
+
+    if (   $self->isa('DBIx::SearchBuilder::Handle::mysql')
+        && $self->{'database_version'} =~ /mariadb/i
+        && $self->{'database_version'} ge '10.2' )
+    {
+        $self->dbh(undef);
+    }
+
+    return $ret;
+}
 
 
 =head2 dbh [HANDLE]
@@ -816,7 +833,7 @@ would be committed or rolled back.
 If there is no transaction in progress then method throw
 warning unless action is forced.
 
-Method returns true on success or false if error occured.
+Method returns true on success or false if an error occurred.
 
 =cut
 

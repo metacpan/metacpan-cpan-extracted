@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 keywords:
   - passwords
   - security
@@ -24,7 +24,7 @@ name: Passwd-Keyring-Auto
 provides:
   Passwd::Keyring::Auto:
     file: lib/Passwd/Keyring/Auto.pm
-    version: '0.7201'
+    version: '1.0000'
   Passwd::Keyring::Auto::App:
     file: lib/Passwd/Keyring/Auto/App.pm
   Passwd::Keyring::Auto::App::ConfigCreate:
@@ -62,8 +62,9 @@ requires:
   namespace::clean: '0'
   perl: v5.6.0
 resources:
-  bugtracker: https://bitbucket.org/Mekk/perl-keyring-auto/issues
-  homepage: http://bitbucket.org/Mekk/perl-keyring-auto
+  bugtracker: https://helixteamhub.cloud/mekk/projects/perl/issues
+  homepage: https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto
   license: http://dev.perl.org/licenses/
-  repository: http://bitbucket.org/Mekk/perl-keyring-auto
-version: '0.7201'
+  repository: https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-auto
+version: '1.0000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -18,16 +18,22 @@ name: MySQL-Workbench-Parser
 provides:
   MySQL::Workbench::Parser:
     file: lib/MySQL/Workbench/Parser.pm
-    version: '1.08'
+    version: '1.10'
   MySQL::Workbench::Parser::Column:
     file: lib/MySQL/Workbench/Parser/Column.pm
-    version: '1.08'
+    version: '1.10'
   MySQL::Workbench::Parser::Index:
     file: lib/MySQL/Workbench/Parser/Index.pm
-    version: '1.08'
+    version: '1.10'
+  MySQL::Workbench::Parser::MySQLParser:
+    file: lib/MySQL/Workbench/Parser/MySQLParser.pm
+    version: '1.10'
   MySQL::Workbench::Parser::Table:
     file: lib/MySQL/Workbench/Parser/Table.pm
-    version: '1.08'
+    version: '1.10'
+  MySQL::Workbench::Parser::View:
+    file: lib/MySQL/Workbench/Parser/View.pm
+    version: '1.10'
 requires:
   Archive::Zip: '1.30'
   Carp: '0'
@@ -35,6 +41,8 @@ requires:
   File::Spec: '3.40'
   List::MoreUtils: '0.33'
   Moo: '1.003001'
+  Parse::RecDescent: '0'
+  SQL::Translator: '1.61'
   Scalar::Util: '1.32'
   XML::LibXML: '2.0019'
   YAML::Tiny: '1.64'
@@ -43,7 +51,7 @@ resources:
   bugtracker: http://github.com/reneeb/MySQL-Workbench-Parser/issues
   homepage: http://github.com/reneeb/MySQL-Workbench-Parser
   repository: git://github.com/reneeb/MySQL-Workbench-Parser.git
-version: '1.08'
+version: '1.10'
 x_contributors:
   - 'Graham Knop <haarg@haarg.org>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

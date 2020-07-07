@@ -169,7 +169,7 @@ obtained by performing a C<help> query:
 
 	my $help = $svc->help;
 
-The return value is a L<Net::RDAP::Object::Help> object.
+The return value is a L<Net::RDAP::Help> object.
 
 =head1 COPYRIGHT
 

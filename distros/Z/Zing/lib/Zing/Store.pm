@@ -5,93 +5,78 @@ use 5.014;
 use strict;
 use warnings;
 
-use registry 'Zing::Types';
+use registry;
 use routines;
 
 use Data::Object::Class;
-use Data::Object::ClassHas;
 
-use JSON -convert_blessed_universally;
+use Carp ();
 
-our $VERSION = '0.10'; # VERSION
-
-# ATTRIBUTES
-
-has 'redis' => (
-  is => 'ro',
-  isa => 'Redis',
-  new => 1,
-);
-
-fun new_redis($self) {
-  require Redis;
-  state $redis = Redis->new(
-    # e.g. ZING_REDIS='server=127.0.0.1:9999,debug=0'
-    map +($$_[0], $#{$$_[1]} ? $$_[1] : $$_[1][0]),
-    map [$$_[0], [split /\|/, $$_[1]]],
-    map [split /=/], split /,\s*/,
-    $ENV{ZING_REDIS} || ''
-  );
-}
+our $VERSION = '0.12'; # VERSION
 
 # METHODS
 
-method drop(Str $key) {
-  return $self->redis->del($key);
+sub args {
+  map +($$_[0], $#{$$_[1]} ? $$_[1] : $$_[1][0]),
+  map [$$_[0], [split /\|/, $$_[1]]],
+  map [split /=/], split /,\s*/,
+  $_[1] || ''
 }
 
-method dump(HashRef $data) {
-  return JSON->new->allow_nonref->convert_blessed->encode($data);
+sub drop {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "drop" not implemented);
 }
 
-method keys(Str @keys) {
-  return [map $self->redis->keys($self->term(@$_)), [@keys], [@keys, '*']];
+sub dump {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "dump" not implemented);
 }
 
-method pop(Str $key) {
-  my $get = $self->redis->rpop($key);
-  return $get ? $self->load($get) : $get;
+sub keys {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "keys" not implemented);
 }
 
-method pull(Str $key) {
-  my $get = $self->redis->lpop($key);
-  return $get ? $self->load($get) : $get;
+sub load {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "load" not implemented);
 }
 
-method push(Str $key, HashRef $val) {
-  my $set = $self->dump($val);
-  return $self->redis->rpush($key, $set);
+sub lpull {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "lpull" not implemented);
 }
 
-method load(Str $data) {
-  return JSON->new->allow_nonref->convert_blessed->decode($data);
+sub lpush {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "lpush" not implemented);
 }
 
-method recv(Str $key) {
-  my $get = $self->redis->get($key);
-  return $get ? $self->load($get) : $get;
+sub recv {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "recv" not implemented);
 }
 
-method send(Str $key, HashRef $val) {
-  my $set = $self->dump($val);
-  return $self->redis->set($key, $set);
+sub rpull {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "rpull" not implemented);
 }
 
-method size(Str $key) {
-  return $self->redis->llen($key);
+sub rpush {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "rpush" not implemented);
 }
 
-method slot(Str $key, Int $pos) {
-  my $get = $self->redis->lindex($key, $pos);
-  return $get ? $self->load($get) : $get;
+sub send {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "send" not implemented);
 }
 
-method term(Str @keys) {
-  return join(':', @keys);
+sub size {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "size" not implemented);
 }
 
-method test(Str $key) {
-  return int $self->redis->exists($key);
+sub slot {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "slot" not implemented);
+}
+
+sub term {
+  shift; return join(':', @_);
+}
+
+sub test {
+  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "test" not implemented);
 }
 
 1;
@@ -100,13 +85,13 @@ method test(Str $key) {
 
 =head1 NAME
 
-Zing::Store - Storage Abstraction
+Zing::Store - Storage Interface
 
 =cut
 
 =head1 ABSTRACT
 
-Redis Storage Abstraction
+Data Storage Interface
 
 =cut
 
@@ -122,8 +107,8 @@ Redis Storage Abstraction
 
 =head1 DESCRIPTION
 
-This package provides a L<Redis> adapter for use with data storage
-abstractions.
+This package provides a data persistence interface to be implemented by data
+storage abstractions.
 
 =cut
 
@@ -135,23 +120,38 @@ L<Zing::Types>
 
 =cut
 
-=head1 ATTRIBUTES
-
-This package has the following attributes:
-
-=cut
-
-=head2 redis
-
-  redis(Redis)
-
-This attribute is read-only, accepts C<(Redis)> values, and is optional.
-
-=cut
-
 =head1 METHODS
 
 This package implements the following methods:
+
+=cut
+
+=head2 args
+
+  args(Str $env) : (Any)
+
+The args method parses strings with key/value data (typically from an
+environment variable) meant to be used in object construction.
+
+=over 4
+
+=item args example #1
+
+  # given: synopsis
+
+  [$store->args('port=0001,debug=0')]
+
+=back
+
+=over 4
+
+=item args example #2
+
+  # given: synopsis
+
+  [$store->args('ports=0001|0002,debug=0')]
+
+=back
 
 =cut
 
@@ -159,7 +159,7 @@ This package implements the following methods:
 
   drop(Str $key) : Int
 
-The drop method removes (drops) the item from the datastore.
+The drop method should remove items from the datastore by key.
 
 =over 4
 
@@ -177,7 +177,8 @@ The drop method removes (drops) the item from the datastore.
 
   dump(HashRef $data) : Str
 
-The dump method encodes and returns the data provided as JSON.
+The dump method should encode and return the data provided in a format suitable
+for the underlying storage mechanism.
 
 =over 4
 
@@ -195,8 +196,8 @@ The dump method encodes and returns the data provided as JSON.
 
   keys(Str @keys) : ArrayRef[Str]
 
-The keys method returns a list of keys under the namespace of the datastore or
-provided key.
+The keys method should return a list of keys under the namespace provided
+including itself.
 
 =over 4
 
@@ -214,7 +215,7 @@ provided key.
 
   # given: synopsis
 
-  $store->send('model', { status => 'ok' });
+  # $store->send('model', { status => 'ok' });
 
   my $keys = $store->keys('model');
 
@@ -226,7 +227,8 @@ provided key.
 
   load(Str $data) : HashRef
 
-The load method decodes the JSON data provided and returns the data as a hashref.
+The load method should decode the data provided and returns the data as a
+hashref.
 
 =over 4
 
@@ -240,92 +242,52 @@ The load method decodes the JSON data provided and returns the data as a hashref
 
 =cut
 
-=head2 pop
+=head2 lpull
 
-  pop(Str $key) : Maybe[HashRef]
+  lpull(Str $key) : Maybe[HashRef]
 
-The pop method pops data off of the bottom of a list in the datastore.
+The lpull method should pop data off of the top of a list in the datastore.
 
 =over 4
 
-=item pop example #1
+=item lpull example #1
 
   # given: synopsis
 
-  $store->pop('collection');
+  $store->lpull('collection');
 
 =back
 
 =over 4
 
-=item pop example #2
+=item lpull example #2
 
   # given: synopsis
 
-  $store->push('collection', { status => 1 });
-  $store->push('collection', { status => 2 });
+  # $store->rpush('collection', { status => 'ok' });
 
-  $store->pop('collection');
-
-=back
-
-=cut
-
-=head2 pull
-
-  pull(Str $key) : Maybe[HashRef]
-
-The pull method pops data off of the top of a list in the datastore.
-
-=over 4
-
-=item pull example #1
-
-  # given: synopsis
-
-  $store->pull('collection');
-
-=back
-
-=over 4
-
-=item pull example #2
-
-  # given: synopsis
-
-  $store->push('collection', { status => 'ok' });
-
-  $store->pull('collection');
+  $store->lpull('collection');
 
 =back
 
 =cut
 
-=head2 push
+=head2 lpush
 
-  push(Str $key, HashRef $val) : Int
+  lpush(Str $key) : Int
 
-The push method pushed data onto the bottom of a list in the datastore.
-
-=over 4
-
-=item push example #1
-
-  # given: synopsis
-
-  $store->push('collection', { status => 'ok' });
-
-=back
+The lpush method should push data onto the top of a list in the datastore.
 
 =over 4
 
-=item push example #2
+=item lpush example #1
 
   # given: synopsis
 
-  $store->push('collection', { status => 'ok' });
+  # $store->rpush('collection', { status => '1' });
+  # $store->rpush('collection', { status => '2' });
 
-  $store->push('collection', { status => 'ok' });
+  $store->lpush('collection', { status => '0' });
 
 =back
 
@@ -335,7 +297,7 @@ The push method pushed data onto the bottom of a list in the datastore.
 
   recv(Str $key) : Maybe[HashRef]
 
-The recv method fetches and returns data from the datastore by its key.
+The recv method should fetch and return data from the datastore by its key.
 
 =over 4
 
@@ -353,9 +315,58 @@ The recv method fetches and returns data from the datastore by its key.
 
   # given: synopsis
 
-  $store->send('model', { status => 'ok' });
+  # $store->send('model', { status => 'ok' });
 
   $store->recv('model');
+
+=back
+
+=cut
+
+=head2 rpull
+
+  rpull(Str $key) : Maybe[HashRef]
+
+The rpull method should pop data off of the bottom of a list in the datastore.
+
+=over 4
+
+=item rpull example #1
+
+  # given: synopsis
+
+  $store->rpull('collection');
+
+=back
+
+=over 4
+
+=item rpull example #2
+
+  # given: synopsis
+
+  # $store->rpush('collection', { status => 1 });
+  # $store->rpush('collection', { status => 2 });
+
+  $store->rpull('collection');
+
+=back
+
+=cut
+
+=head2 rpush
+
+  rpush(Str $key, HashRef $val) : Int
+
+The rpush method should push data onto the bottom of a list in the datastore.
+
+=over 4
+
+=item rpush example #1
+
+  # given: synopsis
+
+  $store->rpush('collection', { status => 'ok' });
 
 =back
 
@@ -365,7 +376,8 @@ The recv method fetches and returns data from the datastore by its key.
 
   send(Str $key, HashRef $val) : Str
 
-The send method commits data to the datastore with its key and returns truthy.
+The send method should commit data to the datastore with its key and return
+truthy (or falsy if not).
 
 =over 4
 
@@ -383,7 +395,7 @@ The send method commits data to the datastore with its key and returns truthy.
 
   size(Str $key) : Int
 
-The size method returns the size of a list in the datastore.
+The size method should return the size of a list in the datastore.
 
 =over 4
 
@@ -401,7 +413,7 @@ The size method returns the size of a list in the datastore.
 
   # given: synopsis
 
-  $store->push('collection', { status => 'ok' });
+  # $store->rpush('collection', { status => 'ok' });
 
   my $size = $store->size('collection');
 
@@ -413,7 +425,8 @@ The size method returns the size of a list in the datastore.
 
   slot(Str $key, Int $pos) : Maybe[HashRef]
 
-The slot method returns the data from a list in the datastore by its index.
+The slot method should return the data from a list in the datastore by its
+position in the list.
 
 =over 4
 
@@ -431,7 +444,7 @@ The slot method returns the data from a list in the datastore by its index.
 
   # given: synopsis
 
-  $store->push('collection', { status => 'ok' });
+  # $store->rpush('collection', { status => 'ok' });
 
   my $model = $store->slot('collection', 0);
 
@@ -443,7 +456,8 @@ The slot method returns the data from a list in the datastore by its index.
 
   term(Str @keys) : Str
 
-The term method generates a term (safe string) for the datastore.
+The term method generates a term (safe string) for the datastore. This method
+doesn't need to be implemented.
 
 =over 4
 
@@ -461,7 +475,8 @@ The term method generates a term (safe string) for the datastore.
 
   test(Str $key) : Int
 
-The test method returns truthy if the specific key (or datastore) exists.
+The test method should return truthy if the specific key exists in the
+datastore.
 
 =over 4
 
@@ -469,7 +484,7 @@ The test method returns truthy if the specific key (or datastore) exists.
 
   # given: synopsis
 
-  $store->push('collection', { status => 'ok' });
+  # $store->rpush('collection', { status => 'ok' });
 
   $store->test('collection');
 
@@ -481,7 +496,7 @@ The test method returns truthy if the specific key (or datastore) exists.
 
   # given: synopsis
 
-  $store->drop('collection');
+  # $store->drop('collection');
 
   $store->test('collection');
 

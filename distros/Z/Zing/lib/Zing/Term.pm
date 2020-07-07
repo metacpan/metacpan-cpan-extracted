@@ -19,7 +19,7 @@ use Scalar::Util ();
 
 use overload '""' => 'string';
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 

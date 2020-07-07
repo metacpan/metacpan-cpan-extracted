@@ -32,7 +32,6 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => "0.108",
     "Sort::Hash" => 0,
     "Storable" => "3.15",
-    "TextTableTiny" => 0,
     "Time::Piece" => 0,
     "Try::Tiny" => 0,
     "YAML::XS" => 0,
@@ -49,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::Exception" => 0
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,7 +76,6 @@ my %FallbackPrereqs = (
   "Test2::Tools::Exception" => 0,
   "Test2::V0" => 0,
   "Test::Exception" => 0,
-  "TextTableTiny" => 0,
   "Time::Piece" => 0,
   "Try::Tiny" => 0,
   "YAML::XS" => 0,

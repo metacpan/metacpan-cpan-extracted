@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Test::Future::AsyncAwait::Awaitable;
+package Test::Future::AsyncAwait::Awaitable 0.43;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.42';
 
 use Test::More;
 

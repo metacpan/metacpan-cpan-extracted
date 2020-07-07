@@ -1,5 +1,10 @@
 Revision history for Business-Fixflo
 
+0.38     2020-07-06
+        - Add PropertyManager to Business::Fixflo::Property
+        - Add AssignedTeam to Business::Fixflo::Property
+        - Fix warning in _set_request_headers with empty user/passwd
+
 0.37     2019-11-08
         - Add Landlord to Business::Fixflo::Issue
         - Add IsDeleted to Business::Fixflo::Property

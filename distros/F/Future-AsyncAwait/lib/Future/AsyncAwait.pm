@@ -3,17 +3,15 @@
 #
 #  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait;
+package Future::AsyncAwait 0.43;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.42';
 
 use Carp;
 
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 require Future;
 
@@ -23,6 +21,7 @@ C<Future::AsyncAwait> - deferred subroutine syntax for futures
 
 =head1 SYNOPSIS
 
+   use v5.14;
    use Future::AsyncAwait;
 
    async sub do_a_thing
@@ -217,7 +216,7 @@ Plain lexical variables are preserved across an C<await> deferral:
 On perl versions 5.26 and later C<async sub> syntax supports the C<signatures>
 feature if it is enabled:
 
-   use 5.026;
+   use v5.26;
    use feature 'signatures';
 
    async sub quart($x, $y)

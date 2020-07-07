@@ -7,16 +7,19 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "CLI utility to copying files in more effective way",
+  "ABSTRACT" => "CLI utility to copying files in more effective way using async IO",
   "AUTHOR" => "Andreas Romeyke <pause\@andreas-romeyke.de>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "App-turbocopy",
+  "EXE_FILES" => [
+    "bin/turbocopy.pl"
+  ],
   "LICENSE" => "perl",
   "NAME" => "App::turbocopy",
   "PREREQ_PM" => {},
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => ""
   }

@@ -2,7 +2,7 @@
 # Yes, we want to make sure things work in taint mode
 
 #
-# Copyright (C) 2015-2018 Joelle Maslak
+# Copyright (C) 2015-2020 Joelle Maslak
 # All Rights Reserved - See License
 #
 
@@ -14,9 +14,8 @@ use warnings;
 use autodie;
 
 use Carp;
-use Test::More;
-use Test::Exception;
-use Test2::Tools::Warnings;
+use Test2::V0;
+# use Test2::Tools::Warnings;
 
 my %RESULTS;
 
@@ -36,7 +35,7 @@ SKIP: {
                   # But hopefully nobody has that slow of a machine!
 
     # Instantiate the object
-    require_ok('Parallel::WorkUnit');
+    use Parallel::WorkUnit;
     my $wu = Parallel::WorkUnit->new( { use_anyevent => 1 } );
     ok( defined($wu), "Constructer returned object" );
     is( $wu->count, 0, "no processes running before spawning any" );
@@ -123,27 +122,43 @@ SKIP: {
     my @cmp;
     for ( my $i = 0; $i < 50000; $i++ ) { push @cmp, $i; }
 
-    is_deeply( $RESULTS{BIG}, \@cmp, 'Array reference contains proper values' );
+    is( $RESULTS{BIG}, \@cmp, 'Array reference contains proper values' );
 
     # We want to test that we properly handle a child process that die()'s.
 
     $wu->async( sub { die "Error!"; }, sub { return; } );
-    dies_ok { $wu->waitall(); } 'Die when child throws an error (waitall)';
+    like(
+        dies { $wu->waitall(); },
+        qr/Error!/,
+        'Die when child throws an error (waitall)'
+    );
 
     # Same thing, but with waitone
     $wu->async( sub { die "Error!"; }, sub { return; } );
-    dies_ok { $wu->waitone(); } 'Die when child throws an error (waitone)';
+    like(
+        dies { $wu->waitall(); },
+        qr/Error!/,
+        'Die when child throws an error (waitone)'
+    );
 
     # Same thing, but with wait
     my $pid = $wu->async( sub { die "Error!"; }, sub { return; } );
-    dies_ok { $wu->wait($pid); } 'Die when child throws an error (wait(pid))';
+    like(
+        dies { $wu->waitall(); },
+        qr/Error!/,
+        'Die when child throws an error (wait(pid))'
+    );
 
     # Same thing, but with wait and another process waitalling
     $pid = $wu->async( sub { die "Error!"; }, sub { return; } );
     my $wu2 = Parallel::WorkUnit->new( { use_anyevent => 1 } );
     $wu2->async( sub { sleep .1; }, sub { return; } );
     $wu2->waitall();
-    dies_ok { $wu->wait($pid); } 'Die when child throws an error (wait(pid))';
+    like(
+        dies { $wu->wait($pid); },
+        qr/Error!/,
+        'Die when child throws an error (wait(pid))',
+    );
 
     # We want to test that we handle a process that returns undef properly
 

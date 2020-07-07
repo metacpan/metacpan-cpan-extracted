@@ -7,6 +7,7 @@ use Net::DBus;
 use Try::Tiny;
 use Proc::SyncExec qw/sync_exec/;
 use Carp;
+use File::Which;
 
 =head1 NAME
 
@@ -14,11 +15,11 @@ Passwd::Keyring::KDEWallet - Password storage implementation based on KDE Wallet
 
 =head1 VERSION
 
-Version 0.60
+Version 1.0001
 
 =cut
 
-our $VERSION = '0.60';
+our $VERSION = '1.0001';
 
 our $APP_NAME = "Passwd::Keyring";
 our $FOLDER_NAME = "Perl-Passwd-Keyring";
@@ -106,8 +107,10 @@ sub new {
     $self->{app} = $args{app} || 'Passwd::Keyring::KDEWallet';
     $self->{group} = $args{group} || 'Passwd::Keyring::default';
     $self->{dont_start_daemon} = $args{dont_start_daemon} || '';
-    $self->{kwalletd_path} = $args{kwalletd_path} || 'kwalletd';
+    $self->{service_name}  = 'org.kde.kwalletd';
+    $self->{module_name}   = '/modules/kwalletd';
     bless $self, $cls;
+    $self->{kwalletd_path} = $args{kwalletd_path} || $self->_which_kwalletd;
 
     #$self->{bus} = Net::DBus->find()
     $self->{bus} = Net::DBus->session()
@@ -125,6 +128,19 @@ sub new {
     return $self;
 }
 
+sub _which_kwalletd {
+  my ($self) = @_;
+  for my $kwalletd ('kwalletd','kwalletd5') {
+    my $which = which($kwalletd);
+    if ($which) {
+      $self->{service_name}  = "org.kde.$kwalletd";
+      $self->{module_name}   = "/modules/$kwalletd";
+      return $which;
+    }
+  }
+  croak("KWallet not available (no binary found)");
+}
+
 # Called from the constructor, setups self->{kwallet} attribute (top level
 # service object)
 sub _init_kwallet {
@@ -138,7 +154,7 @@ sub _init_kwallet {
     my $kwallet_svc;
     my $error;
     try {
-        $kwallet_svc = $self->{bus}->get_service('org.kde.kwalletd');
+        $kwallet_svc = $self->{bus}->get_service($self->{service_name});
     } catch {
         $error = $_;
         chomp($error);
@@ -183,7 +199,7 @@ sub _init_kwallet {
     }
 
     $self->{kwallet} = $kwallet_svc->get_object(
-        '/modules/kwalletd', 'org.kde.KWallet')
+        $self->{module_name}, 'org.kde.KWallet')
       or croak("Kwallet not available (can't find wallet)");
 }
 
@@ -277,7 +293,7 @@ Approach inspired by L<http://www.perlmonks.org/?node_id=869620>.
 =head1 BUGS
 
 Please report any bugs or feature requests to
-issue tracker at L<https://bitbucket.org/Mekk/perl-keyring-kdewallet>.
+issue tracker at L<https://helixteamhub.cloud/mekk/projects/perl/issues>.
 
 =head1 SUPPORT
 
@@ -291,11 +307,11 @@ L<http://search.cpan.org/~mekk/Passwd-Keyring-KDEWallet/>
 
 Source code is tracked at:
 
-L<https://bitbucket.org/Mekk/perl-keyring-kdewallet>
+L<https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-kdewallet>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Marcin Kasperski.
+Copyright 2012-2020 Marcin Kasperski.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

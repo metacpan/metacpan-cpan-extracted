@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+use v5.10;
+open my $fh, '>', '~/testRealtimedChildsEnvironment.txt';
+my $out = qx{/usr/bin/whoami};
+say $fh $out;
+say $fh "$_\n" for @ARGV;

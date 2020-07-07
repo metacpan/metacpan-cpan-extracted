@@ -46,7 +46,7 @@ use Carp qw(confess);
 use plenigo::Ex;
 use plenigo::RestClient;
 
-our $VERSION = '3.0001';
+our $VERSION = '3.0002';
 
 has configuration => (
     is       => 'ro',
@@ -65,6 +65,30 @@ sub _build__rest_client {
 
 =cut
 
+sub getAccessRights {
+    my ($self, $customer_id) = @_;
+
+    my %result = $self->_rest_client->get("accessRights/$customer_id");
+
+    my @access_right_unique_ids = map {
+        $_->{accessRightUniqueId}
+    } @{$result{response_content}->{items}};
+
+    return $self->hasAccess($customer_id, @access_right_unique_ids);
+}
+
+sub getGrantedAccessRightsItems {
+    my ($self, $customer_id) = @_;
+
+    my %access_rights = $self->getAccessRights($customer_id);
+
+    return [
+        grep {
+            $_->{accessGranted}
+        } @{$access_rights{items}}
+    ];
+}
+
 =head2 hasAccess($customer_id, @product_ids)
 
  Test if a customer has access rights.
@@ -75,7 +99,10 @@ sub hasAccess {
     my ($self, $customer_id, @access_right_unique_ids) = @_;
 
     my $rest_client = plenigo::RestClient->new(configuration => $self->configuration);
-    my %result = $rest_client->get('accessRights/' . $customer_id . '/hasAccess', { accessRightsUniqueId => @access_right_unique_ids });
+    my %result = $rest_client->get(
+        'accessRights/' . $customer_id . '/hasAccess',
+        { accessRightUniqueIds => join(',', @access_right_unique_ids) }
+    );
     if ($result{'response_code'} == 403) {
         return('accessGranted' => 0)
     }

@@ -1,5 +1,13 @@
 Revision history for Future-AsyncAwait
 
+0.43    2020-07-06
+        [CHANGES]
+         * Added explicit use VERSION declarations to every perl file
+
+        [BUGFIXES]
+         * Don't segfault when awaiting in closures that capture outer 'our'
+           variables (RT132945)
+
 0.42    2020-06-29
         [BUGFIXES]
          * Fixes for assert failures on -DDEBUGGING perls:

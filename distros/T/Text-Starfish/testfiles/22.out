@@ -1,22 +1,13 @@
 # A simple example, after running SLePerl.pl on the following file:
-#     <? $O= "test" !>
-#+
-test
-#-
+#     <? $O= "test" !>#+
+test#-
 
-
-<? echo "Hello world!" !>
-#+
-Hello world!
-#-
-
+<? echo "Hello world!" !>#+
+Hello world!#-
 
 <?
-# echo "Hello 2nd!" !>
-#+
-Hello 2nd!
-#-
-
+# echo "Hello 2nd!" !>#+
+Hello 2nd!#-
 
 <? # nothing !>
 

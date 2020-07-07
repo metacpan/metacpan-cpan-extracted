@@ -9,7 +9,7 @@ package Rex::Helper::SSH2;
 use strict;
 use warnings;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 require Exporter;
 use Data::Dumper;
@@ -32,8 +32,8 @@ sub net_ssh2_exec {
   # REQUIRE_TTY can be turned off by feature no_tty
   if ( !Rex::Config->get_no_tty ) {
     $chan->pty("xterm"); # set to xterm, due to problems with vt100.
-     # if vt100 sometimes the restart of services doesn't work and need a sleep .000001 after the command...
-     # strange bug...
+                         # if vt100 sometimes the restart of services doesn't work and need a sleep .000001 after the command...
+                         # strange bug...
     $chan->pty_size( 4000, 80 );
   }
   $chan->blocking(1);

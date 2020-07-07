@@ -11,3 +11,6 @@
 
 0.04 2020-07-04T20:46:00Z
     - Added variable $VERSION in files of tests.
+
+0.05 2020-07-06T13:02:00Z
+    - Defined version minimal to Mojolicious.

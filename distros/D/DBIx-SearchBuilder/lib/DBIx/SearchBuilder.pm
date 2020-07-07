@@ -4,7 +4,7 @@ package DBIx::SearchBuilder;
 use strict;
 use warnings;
 
-our $VERSION = "1.67";
+our $VERSION = "1.68";
 
 use Clone qw();
 use Encode qw();
@@ -812,7 +812,7 @@ matching SUBCLAUSE tags will be grouped together in the final SQL statement.
 
 Example:
 
-Suppose you want to create Limit statments which would produce results
+Suppose you want to create Limit statements which would produce results
 the same as the following SQL:
 
    SELECT * FROM Users WHERE EmailAddress OR Name OR RealName OR Email LIKE $query;
@@ -978,8 +978,8 @@ sub _GenericRestriction {
 
     my $ClauseId = $args{'SUBCLAUSE'} || ($args{'ALIAS'} . "." . $args{'FIELD'});
 
-    # If we're trying to get a leftjoin restriction, lets set
-    # $restriction to point htere. otherwise, lets construct normally
+    # If we're trying to get a leftjoin restriction, let's set
+    # $restriction to point there. Otherwise, let's construct normally.
 
     my $restriction;
     if ( $args{'LEFTJOIN'} ) {

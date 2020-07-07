@@ -1,0 +1,4 @@
+#<? @javafiles = <*.java>;
+#   echo "all: @javafiles\n";
+#   echo map { s/\.java$//; "$_.class: $_.java; javac $_.java\n" } @javafiles;
+#!>

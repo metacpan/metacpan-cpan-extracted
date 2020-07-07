@@ -58,7 +58,7 @@
    "provides" : {
       "Getopt::EX::termcolor" : {
          "file" : "lib/Getopt/EX/termcolor.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "Getopt::EX::termcolor::Apple_Terminal" : {
          "file" : "lib/Getopt/EX/termcolor/Apple_Terminal.pm"
@@ -81,7 +81,7 @@
          "web" : "https://github.com/kaz-utashiro/Getopt-EX-termcolor"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

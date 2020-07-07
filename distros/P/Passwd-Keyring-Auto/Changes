@@ -1,7 +1,10 @@
 Revision history for Keyring::Auto
 
+1.0000	2020-07-05
+        Switching hosting to helix as bitbucket is shut down.
+
 0.7201	2015-12-10
-    	#1 Added README.md for good BitBucket presentation
+    	#1 Added README.md for better repository-page presentation
 
 	    #3 Disabled most tests if run under root, as running them in such context
 	    just caused various failures.

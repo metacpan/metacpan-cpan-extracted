@@ -4,16 +4,7 @@
 =head2 Grabbing the source
 
 This code is maintained in Mercurial repository at 
-L<bitbucket.org/Mekk/perl-oauthomatic|https://bitbucket.org/Mekk/perl-oauthomatic>:
-
-    hg clone https://bitbucket.org/Mekk/perl-oauthomatic
-
-or
-
-    hg clone ssh://hg@bitbucket.org/Mekk/perl-oauthomatic
-
-If you can't speak Mercurial,
-L<Download repository|https://bitbucket.org/Mekk/perl-oauthomatic/downloads>.
+L<helixteamhub.cloud/mekk/projects/perl/repositories/oauthomatic|https://helixteamhub.cloud/mekk/projects/perl/repositories/oauthomatic>.
 
 Released versions can be downloaded from CPAN:
 
@@ -61,13 +52,12 @@ To install locally:
 
 =head2 Contributing
 
-Preferable form: BitBucket pull requst (fork repository on BitBucket,
-implement changes, issue pull request). 
+Preferable form: pull request.
 
 I will also accept patches - Mercurial bundle, git-diff or plain diff
 (in this order of preference). In case of diffs, please specify the
-version diff is made against. Patches may be attached to either
-BitBucket (preferably), or CPAN issue tracker.
+version diff is made against. Patches may be attached to Helix, or
+CPAN issue tracker.
 
 For bigger changes, please open issue and describe your idea before
 working on the code.
@@ -99,7 +89,7 @@ build, test, and publish to CPAN:
 
 push source changes:
 
-    hg push bitbucket
+    hg push helix
 
 =back 
 

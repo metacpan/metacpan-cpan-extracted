@@ -1,5 +1,9 @@
 Revision history for Types-Algebraic
 
+0.03  2020-07-07 20:26:01 CEST
+        - Properly compile the default keyword.
+        - Bump dependency on Keyword::Declare to 0.001015, as we use features from it.
+
 0.02  2020-07-05 15:27:13 CEST
         - Remove uses of postfix dereferencing, causing test failures when not enabled.
         - Bump perl version required to v5.22 for simplicity.

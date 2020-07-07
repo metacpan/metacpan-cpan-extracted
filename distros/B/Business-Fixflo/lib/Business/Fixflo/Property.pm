@@ -25,10 +25,12 @@ extends 'Business::Fixflo::Resource';
 
     Id
     AssignedAgent
+    AssignedTeam
     BlockId
     BlockName
     Created
     ExternalPropertyRef
+    PropertyManager
     PropertyAddressId
     KeyReference
     Address
@@ -44,11 +46,13 @@ use Carp qw/ confess /;
 has [ qw/
     Id
     AssignedAgent
+    AssignedTeam
     BlockId
     BlockName
     Created
     ExternalPropertyRef
     PropertyAddressId
+    PropertyManager
     KeyReference
     UpdateDate
     IsDeleted

@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 use Zing::Channel;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # ATTRIBUTES
 
@@ -33,59 +33,80 @@ fun new_channel($self) {
   Zing::Channel->new(name => $self->name)
 }
 
-has 'threshold' => (
-  is => 'ro',
-  isa => 'Str',
-  def => 1_000,
-);
-
 # BUILDERS
 
 fun BUILD($self) {
-  return $self->apply if $self->channel->reset;
+  $self->channel->{cursor}-- if $self->channel->{cursor};
+
+  return $self->apply;
+}
+
+# SHIMS
+
+sub _copy {
+  my ($data) = @_;
+
+  if (!defined $data) {
+    return undef;
+  }
+  elsif (ref $data eq 'ARRAY') {
+    my $copy = [];
+    for (my $i = 0; $i < @$data; $i++) {
+      $copy->[$i] = _copy($data->[$i]);
+    }
+    return $copy;
+  }
+  elsif (ref $data eq 'HASH') {
+    my $copy = {};
+    for my $key (keys %$data) {
+      $copy->{$key} = _copy($data->{$key});
+    }
+    return $copy;
+  }
+  else {
+    return $data;
+  }
 }
 
 # METHODS
 
 method apply() {
-  if ($self->channel->renew) {
-    undef $self->{data} if $self->channel->size;
-  }
+  undef $self->{state} if $self->channel->renew;
 
   while (my $data = $self->recv) {
     my $op = $data->{op};
     my $key = $data->{key};
     my $val = $data->{val};
 
-    unless ($self->{data}) {
-      $self->{data} = $data->{snapshot} if $data->{snapshot};
+    if ($data->{snapshot} && !$self->{state}) {
+      $self->{state} = _copy($data->{snapshot});
     }
 
     local $@;
 
     if ($op eq 'decr') {
-      eval{($self->data->{$key} //= 0) -= ($val->[0] // 1)};
+      eval{($self->state->{$key} //= 0) -= ($val->[0] // 0)};
     }
     elsif ($op eq 'del') {
-      eval{CORE::delete $self->data->{$key}};
+      eval{CORE::delete $self->state->{$key}};
     }
     elsif ($op eq 'incr') {
-      eval{($self->data->{$key} //= 0 ) += ($val->[0] // 1)};
+      eval{($self->state->{$key} //= 0 ) += ($val->[0] // 0)};
     }
     elsif ($op eq 'pop') {
-      eval{CORE::pop @{$self->data->{$key}}};
+      eval{CORE::pop @{$self->state->{$key}}};
     }
     elsif ($op eq 'push') {
-      eval{CORE::push @{$self->data->{$key}}, @$val};
+      eval{CORE::push @{$self->state->{$key}}, @$val};
     }
     elsif ($op eq 'set') {
-      eval{$self->data->{$key} = $val->[0]};
+      eval{$self->state->{$key} = $val->[0]};
     }
     elsif ($op eq 'shift') {
-      eval{CORE::shift @{$self->data->{$key}}};
+      eval{CORE::shift @{$self->state->{$key}}};
     }
     elsif ($op eq 'unshift') {
-      eval{CORE::unshift @{$self->data->{$key}}, @$val};
+      eval{CORE::unshift @{$self->state->{$key}}, @$val};
     }
   }
 
@@ -95,12 +116,10 @@ method apply() {
 method change(Str $op, Str $key, Any @val) {
   my %fields = (
     key => $key,
-    snapshot => $self->data,
+    snapshot => _copy($self->state),
     time => time,
     val => [@val],
   );
-
-  $self->channel->drop if $self->channel->size >= $self->threshold;
 
   if ($op eq 'decr') {
     $self->send({ %fields, op => 'decr' });
@@ -133,12 +152,8 @@ method change(Str $op, Str $key, Any @val) {
   return $self->apply;
 }
 
-method data() {
-  return $self->{data} ||= {};
-}
-
 method get(Str $key) {
-  return $self->apply->data->{$key};
+  return $self->apply->state->{$key};
 }
 
 method decr(Str $key, Int $val = 1) {
@@ -177,6 +192,10 @@ method shift(Str $key) {
   return $self->apply->change('shift', $key);
 }
 
+method state() {
+  return $self->{state} ||= {};
+}
+
 method unshift(Str $key, Any @val) {
   return $self->apply->change('unshift', $key, @val);
 }
@@ -187,13 +206,13 @@ method unshift(Str $key, Any @val) {
 
 =head1 NAME
 
-Zing::Domain - Aggregate Root
+Zing::Domain - Shared State Management
 
 =cut
 
 =head1 ABSTRACT
 
-Aggregate Root Construct
+Shared State Management Construct
 
 =cut
 
@@ -245,14 +264,6 @@ This attribute is read-only, accepts C<(Str)> values, and is required.
 
 =cut
 
-=head2 threshold
-
-  threshold(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is optional.
-
-=cut
-
 =head1 METHODS
 
 This package implements the following methods:
@@ -290,25 +301,7 @@ method is used internally and shouldn't need to be called directly.
 
   # given: synopsis
 
-  $domain->change('incr', 'karma');
-
-=back
-
-=cut
-
-=head2 data
-
-  data() : HashRef
-
-The data method returns the raw aggregate data associated with the object.
-
-=over 4
-
-=item data example #1
-
-  # given: synopsis
-
-  $domain->data;
+  $domain->change('incr', 'karma', 1);
 
 =back
 
@@ -497,6 +490,24 @@ The shift method shifts data off of the stack associated with a specific key.
   # given: synopsis
 
   $domain->shift('history');
+
+=back
+
+=cut
+
+=head2 state
+
+  state() : HashRef
+
+The state method returns the raw aggregate data associated with the object.
+
+=over 4
+
+=item state example #1
+
+  # given: synopsis
+
+  $domain->state;
 
 =back
 

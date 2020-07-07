@@ -15,7 +15,7 @@ extends 'Zing::Repo';
 use Zing::Poll;
 use Zing::Term;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 # METHODS
 
@@ -24,11 +24,11 @@ method poll(Str $key) {
 }
 
 method recv(Str $key) {
-  return $self->store->pull($self->term($key));
+  return $self->store->lpull($self->term($key));
 }
 
 method send(Str $key, HashRef $val) {
-  return $self->store->push($self->term($key), $val);
+  return $self->store->rpush($self->term($key), $val);
 }
 
 method term(Str @keys) {

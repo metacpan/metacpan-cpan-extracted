@@ -1,7 +1,6 @@
-use Zing::Store;
-
 package Redis;
 
+# safety measure
 unless ($ENV{TEST_REDIS}) {
   *{"Redis::new"} = $INC{'Redis.pm'} = sub {
     require Carp;
@@ -9,92 +8,11 @@ unless ($ENV{TEST_REDIS}) {
   };
 }
 
-package Zing::Store;
-
-our $DATA = {};
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::drop"} = sub {
-    my ($self, $key) = @_;
-    return int(!!delete $DATA->{$key});
-  };
-}
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::keys"} = sub {
-    my ($self, @key) = @_;
-    my $re = join('|', $self->term(@key), $self->term(@key, '.*'));
-    return [grep /$re/, keys %$DATA];
-  };
-}
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::pop"} = sub {
-    my ($self, $key) = @_;
-    my $get = pop @{$DATA->{$key}} if $DATA->{$key};
-    return $get ? $self->load($get) : $get;
-  };
-}
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::pull"} = sub {
-    my ($self, $key) = @_;
-    my $get = shift @{$DATA->{$key}} if $DATA->{$key};
-    return $get ? $self->load($get) : $get;
-  };
-}
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::push"} = sub {
-    my ($self, $key, $val) = @_;
-    my $set = $self->dump($val);
-    return push @{$DATA->{$key}}, $set;
-  };
-}
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::recv"} = sub {
-    my ($self, $key) = @_;
-    my $get = $DATA->{$key};
-    return $get ? $self->load($get) : $get;
-  };
-}
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::send"} = sub {
-    my ($self, $key, $val) = @_;
-    my $set = $self->dump($val);
-    $DATA->{$key} = $set;
-    return 'OK';
-  };
-}
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::size"} = sub {
-    my ($self, $key) = @_;
-    return $DATA->{$key} ? scalar(@{$DATA->{$key}}) : 0;
-  };
-}
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::slot"} = sub {
-    my ($self, $key, $pos) = @_;
-    my $get = $DATA->{$key}->[$pos];
-    return $get ? $self->load($get) : $get;
-  };
-}
-
-unless ($ENV{TEST_REDIS}) {
-  *{"Zing::Store::test"} = sub {
-    my ($self, $key) = @_;
-    return int exists $DATA->{$key};
-  };
-}
-
 package Test::Zing;
 
 BEGIN {
   $ENV{ZING_HOST} = '0.0.0.0';
+  $ENV{ZING_STORE} = 'Test::Zing::Store';
 }
 
 use Zing::Daemon;
@@ -102,6 +20,7 @@ use Zing::Fork;
 use Zing::Logic;
 use Zing::Loop;
 use Zing::Process;
+use Zing::Redis;
 use Zing::Timer;
 
 use Data::Object::Space;
@@ -113,18 +32,6 @@ our $PIDS = $$ + 1;
   my $space = Data::Object::Space->new(
     'Zing/Daemon'
   );
-  $space->inject(debug => sub {
-    0 # noop
-  });
-  $space->inject(fatal => sub {
-    0 # noop
-  });
-  $space->inject(info => sub {
-    0 # noop
-  });
-  $space->inject(warn => sub {
-    0 # noop
-  });
   $space->inject(fork => sub {
     $ENV{ZING_TEST_FORK} || $PIDS++;
   });
@@ -188,6 +95,25 @@ our $PIDS = $$ + 1;
   $space->inject(_kill => sub {
     $ENV{ZING_TEST_KILL} || 0;
   });
+}
+
+# Zing/Redis
+{
+  my $space = Data::Object::Space->new(
+    'Zing/Redis'
+  );
+  my $other = Data::Object::Space->new(
+    'Test/Zing/Store'
+  );
+  unless ($ENV{TEST_REDIS}) {
+    $space->load;
+    $other->load;
+    for my $routine (@{$other->routines}) {
+      next if $routine eq 'dump';
+      next if $routine eq 'load';
+      $space->inject($routine, $other->package->can($routine));
+    }
+  }
 }
 
 # Zing/Timer

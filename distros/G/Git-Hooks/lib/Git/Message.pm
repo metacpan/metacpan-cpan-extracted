@@ -3,7 +3,7 @@ use warnings;
 
 package Git::Message;
 # ABSTRACT: A Git commit message
-$Git::Message::VERSION = '2.11.1';
+$Git::Message::VERSION = '2.12.0';
 use 5.010;
 use utf8;
 use Carp;
@@ -195,7 +195,7 @@ Git::Message - A Git commit message
 
 =head1 VERSION
 
-version 2.11.1
+version 2.12.0
 
 =head1 SYNOPSIS
 

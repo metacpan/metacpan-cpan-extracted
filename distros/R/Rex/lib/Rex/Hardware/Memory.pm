@@ -9,7 +9,7 @@ package Rex::Hardware::Memory;
 use strict;
 use warnings;
 
-our $VERSION = '1.11.0'; # VERSION
+our $VERSION = '1.12.0'; # VERSION
 
 use Rex::Hardware::Host;
 use Rex::Commands::Run;

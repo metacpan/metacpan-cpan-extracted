@@ -11,7 +11,7 @@ sub dateline {
 
     my $dateline = ($el_date->text =~ s/[年月]/-/gr =~ s/日//r);
     $dateline =~ s/\b([0-9])\b/0$1/g;
-    $dateline .= 'T23:59:59+0800';
+    $dateline .= 'T23:59:59+08:00';
     return $dateline;
 }
 

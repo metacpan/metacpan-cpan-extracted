@@ -4,7 +4,7 @@ Passwd::Keyring::OSXKeychain - Password storage implementation based on OSX/Keyc
 
 # VERSION
 
-Version 0.3002
+Version 0.4000
 
 # WARNING
 
@@ -39,7 +39,7 @@ storage for passwords and similar sensitive data.
         $keyring->clear_password($username, "blahblah.com");
     }
 
-Note: see [Passwd::Keyring::Auto::KeyringAPI](https://metacpan.org/pod/Passwd::Keyring::Auto::KeyringAPI) for detailed comments
+Note: see [Passwd::Keyring::Auto::KeyringAPI](https://metacpan.org/pod/Passwd%3A%3AKeyring%3A%3AAuto%3A%3AKeyringAPI) for detailed comments
 on keyring method semantics (this document is installed with
 `Passwd::Keyring::Auto` package).
 
@@ -95,7 +95,7 @@ Marcin Kasperski
 # BUGS
 
 Please report any bugs or feature requests to
-issue tracker at [https://bitbucket.org/Mekk/perl-keyring-osxkeychain](https://bitbucket.org/Mekk/perl-keyring-osxkeychain).
+issue tracker at [https://helixteamhub.cloud/mekk/projects/perl/issues](https://helixteamhub.cloud/mekk/projects/perl/issues).
 
 # SUPPORT
 
@@ -109,7 +109,7 @@ You can also look for information at:
 
 Source code is tracked at:
 
-[https://bitbucket.org/Mekk/perl-keyring-osxkeychain](https://bitbucket.org/Mekk/perl-keyring-osxkeychain)
+[https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-osxkeychain](https://helixteamhub.cloud/mekk/projects/perl/repositories/keyring-osxkeychain)
 
 # LICENSE AND COPYRIGHT
 

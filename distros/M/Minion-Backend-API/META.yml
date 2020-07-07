@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Minion: '0'
-  Mojolicious: '0'
+  Mojolicious: '7.13'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -23,11 +23,11 @@ no_index:
 requires:
   Carp: '0'
   Minion: '0'
-  Mojolicious: '0'
+  Mojolicious: '7.13'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/lucas1/Minion-Backend-API/issues
   homepage: https://github.com/lucas1/Minion-Backend-API
   repository: https://github.com/lucas1/Minion-Backend-API
-version: 0.04
+version: 0.05
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

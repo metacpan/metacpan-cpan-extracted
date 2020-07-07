@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.80.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,42 +12,42 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
 SHA1 312bb7b5c24257f55575daeaa6f9cc22cd60f734 .gitignore
-SHA1 3a3111da29c451e7626f04541f24e2eb817ecb36 Changes
+SHA1 4811031057a4f7f05c4d6dc6e2f246288a0ee810 Changes
 SHA1 f9526289f15de085cbe55ce253b5964856fc3092 MANIFEST
-SHA1 ed6b392d54112ee960acf0c95777e4e1d81ba60b META.yml
-SHA1 6c9a672528cb66e5ab5ad053b2df792f1d0bbb03 Makefile.PL
+SHA1 bf1048ea866bf8930ea7bd4e388374721c9d3ad6 META.yml
+SHA1 b0c522e2124d6984fdb054f6be15f79be0f6b46a Makefile.PL
 SHA1 d7a41642c368f2a587587e09f9e815d434feebff README
 SHA1 5a53d12d5cccd94845a6a7cc105cd9be34e20f1c ROADMAP
 SHA1 e7c7c7c91025072d25da78c93cefa2bc0aaf2b35 ex/Example/Model/Address.pm
 SHA1 f821661849153c21ad99393b6a3ea6720fdaf581 ex/Example/Model/Employee.pm
 SHA1 9689368197327e7b38af7f3d1f863e918ed4fa98 ex/create_tables.pl
-SHA1 9d3b2104a620fbaa1e5291400cb14385b205c8da inc/Module/AutoInstall.pm
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 93283b6d98078acdd04b242b3e994258821f4fe5 inc/Module/Install/AutoInstall.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 653ebec88b7033eb8acb527abdd78a9c6b63b7fc lib/DBIx/SearchBuilder.pm
-SHA1 bc661f89d65e6a86aa1d55e57bc6b33084cf4c1c lib/DBIx/SearchBuilder/Handle.pm
+SHA1 fe85f4bb1c9da8c8fe3c58cf37ed126771dd81af inc/Module/AutoInstall.pm
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 6d0f3583ae3a240ed0d75aa436ac6b44163de8bb inc/Module/Install/AutoInstall.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 85254e101a40b265981d7165d2b8cf0277ebfed2 inc/Module/Install/Include.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 257843cf64421115bc9e3c59f182353da407f5ac lib/DBIx/SearchBuilder.pm
+SHA1 8c8e3715995ce3b929b87fbd016fbf7c0d1ac815 lib/DBIx/SearchBuilder/Handle.pm
 SHA1 55d337e6dd1ab5aecc39d2ae491bffb12e9ca449 lib/DBIx/SearchBuilder/Handle/Informix.pm
 SHA1 4efdcaefa5f94d994b052d1b343d2f5164ef4b52 lib/DBIx/SearchBuilder/Handle/ODBC.pm
 SHA1 1ace11fc43c5f90aa207740743f159053b7cc8b3 lib/DBIx/SearchBuilder/Handle/Oracle.pm
-SHA1 c575fb3f778fe9c5ac31661f9ce6f52b847d8a77 lib/DBIx/SearchBuilder/Handle/Pg.pm
+SHA1 19ce11b6c24fb171a6b0f4c868d5376612e95c80 lib/DBIx/SearchBuilder/Handle/Pg.pm
 SHA1 7d0f133923bd66d4492e490fed981f562135c9a7 lib/DBIx/SearchBuilder/Handle/SQLite.pm
 SHA1 ec3fbc03b27c008d93a52b6b7fb0076529e5fcc8 lib/DBIx/SearchBuilder/Handle/Sybase.pm
 SHA1 3e7a6e7dd00dc59f9948288eb8235782ac2cd668 lib/DBIx/SearchBuilder/Handle/mysql.pm
 SHA1 877685aaff265e36fa37298c372aa56864f68aa5 lib/DBIx/SearchBuilder/Handle/mysqlPP.pm
-SHA1 665b010058702c1700a3a8d94cfc9f4f9b5fd385 lib/DBIx/SearchBuilder/Record.pm
+SHA1 38738026dc0c9f3ef05c30795c76411788f84fd9 lib/DBIx/SearchBuilder/Record.pm
 SHA1 4f58ebd740259da95e430d1f28ee9a887336a41f lib/DBIx/SearchBuilder/Record/Cachable.pm
-SHA1 a15065e472797e2bfe8149f04d3bdc58f67a7a6d lib/DBIx/SearchBuilder/SchemaGenerator.pm
+SHA1 12b3cad19841ecec8e16c2a30273fce2c0bc6532 lib/DBIx/SearchBuilder/SchemaGenerator.pm
 SHA1 f59ad14464f1520aa4f9dacdf437047081a94741 lib/DBIx/SearchBuilder/Union.pm
 SHA1 1eb4e838ff1d8d927bfe177bf578df246802b03d lib/DBIx/SearchBuilder/Unique.pm
 SHA1 25d794fce7a34c6b40470e1d347872d8d25df88a lib/DBIx/SearchBuilder/Util.pm
@@ -79,17 +79,12 @@ SHA1 afd320ea000cbe83b08691cc37bea45da20002d3 t/testmodels.pl
 SHA1 ceb2fad4e6973b7b30f0e83abc14cfb80ac93efe t/utils.pl
 -----BEGIN PGP SIGNATURE-----
 
-iQIcBAEBAgAGBQJXjSoWAAoJEDdW4lQxRAUgSpIP/1eYwaQxb7Ekh+CMpCINer7X
-Au3aqqtmQ7rKnfF9UZ9xIU18C/Y8KwgWMK989wQ+Rk5c594Yk3O+hj8lmiFB0fie
-z4gbO/nGydw1QqhiXdrJyq/u9n6hwPW1d2A80FOFfMdkUrjnFSGT6GXYFsORpU3T
-l3YY0iTHx3vsrJqFM6mkXnt/8Ois7taBRrazAl00fiwrgcSDDrxarsm2g4voVr47
-A4zMnqgEO+wHDnOWrBl4VMagi1lffpFWdfTVTOeOxYueMtWxiOkbmcihXwEJz5A2
-LhnkTnA0eadh03bjk5Hf8f2lK96NUgp84u11Gt3sBu65p/s1bpfFo8jkJ5ofhAzd
-GtMJUresq0CaFcwNOAHc8dFy25Ua4cavJdOMgosRfHKisoIblkfVQ9YL0OoRppb4
-fAt8PH7UGJCfEyPN965itVlOxIMt2SYi+fyLsht81W5FFrbxjejz/srJd2SczMYN
-Snmi3jRp3SuDEB37zS+y7fMTXaWqApas8CYvPltCezIkne1PNcZ73JbdQFeKQItT
-0SP1Q3UzGKHJBEnomLcjeM+qAFsYy8ITLZWpLXDu07SB3Cvjbpx2Tls+cwNDqo77
-S1csuzKJMXbJwlDUXsr3IJH9RHfM0HdDPztdQl58tDDts6JE3Mt5T1HPObsGbqSJ
-w54s8BeQfNKlIZ1+sG2j
-=4Nr1
+iQEzBAEBCAAdFiEEFelFwSnB+u9xCpouFedxUadmpRQFAl8DjO8ACgkQFedxUadm
+pRS6Jgf/bcUiBCMvsKTyWqJblt8D7snHRfglo7bKs080WyADZG8U9CvvWtV2hIRJ
+NINzb0eDWkq8vX0p0wyyp8KdslxHY+h1s2kZVErJob5ScoEgm9ZhWFtMTCgetF3O
+83HGgovN+cuinfRn7yy3NUJhXRkfdL+D6evY+lmpnyX7YoX6CceTjDndZBQYciKY
+SlGNDyP0xbXQiKOWR5WdpR+8rSdOVTFcvW0kmruxB4NjSgixo927ZUjBRpbCGn+J
+M4uD3Df3sudDx5uJwKAx8Ap70QSzTG1/YEggi/TX3fIP6CXJ1Cbj/qthMGk9bPd1
+n43ZNlk4XldCCTb7V2+4ZvoyoRZnAw==
+=GL86
 -----END PGP SIGNATURE-----

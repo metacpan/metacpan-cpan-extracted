@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -94,6 +94,24 @@ use List::Util qw( sum );
    is_deeply( [ $fret->get ], [ "outerXX", "outerXX" ],
       '$fret now ready after done for closure'
    );
+}
+
+# Closure with `our` capture (RT132945)
+{
+   our $capture = "outer";
+
+   my $closure = async sub {
+      $capture .= "X";
+      await $_[0];
+      return $capture;
+   };
+
+   my $f1 = Future->new;
+   my $fret = $closure->( $f1 );
+
+   $f1->done;
+
+   is( $fret->get, "outerX", '$fret now ready after done for closure with our capture' );
 }
 
 done_testing;

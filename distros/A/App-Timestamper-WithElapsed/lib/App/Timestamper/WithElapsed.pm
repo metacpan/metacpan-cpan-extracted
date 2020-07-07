@@ -1,5 +1,5 @@
 package App::Timestamper::WithElapsed;
-$App::Timestamper::WithElapsed::VERSION = '0.2.0';
+$App::Timestamper::WithElapsed::VERSION = '0.2.1';
 use strict;
 use warnings;
 use 5.014;
@@ -49,8 +49,24 @@ sub _init
     my $argv = ( $args->{argv} // [] );
 
     my $from_start;
-    GetOptionsFromArray( $argv, 'from-start!' => \$from_start, )
-        or die $!;
+    my $help;
+    GetOptionsFromArray(
+        $argv,
+        'from-start!' => \$from_start,
+        'h|help'      => \$help,
+    ) or die $!;
+    if ($help)
+    {
+        print <<"EOF";
+$0 - timestamps with "elapsed since last updates
+
+--from-start     Display the time that has passed since the start of the process
+                 rather than absolute epoch time.
+
+--help           This help display.
+EOF
+        exit;
+    }
     $self->_from_start($from_start);
     return;
 }
@@ -128,7 +144,7 @@ seconds since the last received line.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 

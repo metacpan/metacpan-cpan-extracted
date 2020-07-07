@@ -145,7 +145,7 @@ OAuthomatic::SecretStorage::Keyring - Save tokens in secure storage, using L<Pas
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 DESCRIPTION
 

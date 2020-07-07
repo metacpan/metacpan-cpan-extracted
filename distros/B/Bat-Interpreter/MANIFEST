@@ -41,7 +41,11 @@ t/09-GEQ_operator.cmd
 t/09-GEQ_operator.t
 t/10-call_command.cmd
 t/10-call_command.t
+t/10-call_command_path_with_colon.cmd
+t/10-call_command_path_with_colon.t
+t/10-call_command_path_with_colon_linux.cmd
 t/10-call_command_subcall.cmd
+t/10-call_command_subcall_path_with_colon.cmd
 t/11-for_loop.cmd
 t/11-for_loop.t
 t/12-env_variables.cmd

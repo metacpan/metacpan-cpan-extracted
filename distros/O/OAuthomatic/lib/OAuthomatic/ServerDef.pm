@@ -96,7 +96,7 @@ OAuthomatic::ServerDef - Predefined URLs for some services
 
 =head1 VERSION
 
-version 0.0201
+version 0.0202
 
 =head1 DESCRIPTION
 

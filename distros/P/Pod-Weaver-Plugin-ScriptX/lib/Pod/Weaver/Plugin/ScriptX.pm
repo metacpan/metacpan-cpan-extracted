@@ -1,14 +1,24 @@
 package Pod::Weaver::Plugin::ScriptX;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2019-12-25'; # DATE
+our $DATE = '2020-04-16'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-ScriptX'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
+
+sub _md2pod {
+    require Markdown::To::POD;
+
+    my ($self, $md) = @_;
+    my $pod = Markdown::To::POD::markdown_to_pod($md);
+    # make sure we add a couple of blank lines in the end
+    $pod =~ s/\s+\z//s;
+    $pod . "\n\n\n";
+}
 
 sub _process_module {
     no strict 'refs';
@@ -66,6 +76,21 @@ sub _process_module {
             });
     } # CONFIGURATION
 
+    # add DESCRIPTION section
+    {
+        my @pod;
+
+        push @pod, $self->_md2pod($meta->{description})
+            if $meta->{description};
+
+        $self->add_text_to_section(
+            $document, join("", @pod), 'DESCRIPTION',
+            {
+                after_section => ['SYNOPSIS'],
+                ignore => 1,
+            });
+    }
+
     $self->log(["Generated POD for '%s'", $filename]);
 }
 
@@ -96,7 +121,7 @@ Pod::Weaver::Plugin::ScriptX - Plugin to use when building ScriptX::* distributi
 
 =head1 VERSION
 
-This document describes version 0.001 of Pod::Weaver::Plugin::ScriptX (from Perl distribution Pod-Weaver-Plugin-ScriptX), released on 2019-12-25.
+This document describes version 0.002 of Pod::Weaver::Plugin::ScriptX (from Perl distribution Pod-Weaver-Plugin-ScriptX), released on 2020-04-16.
 
 =head1 SYNOPSIS
 
@@ -111,7 +136,9 @@ the following:
 
 =over
 
-=item * Create "CONFIGURATION" POD section from the meta
+=item * Create "CONFIGURATION" POD section from the meta's conf
+
+=item * Add text to Description section from meta's description
 
 =back
 
@@ -145,7 +172,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

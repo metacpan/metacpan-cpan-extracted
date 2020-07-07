@@ -1,5 +1,13 @@
 Revision history for Passwd::Keyring::KDEWallet
 
+1.0001	2020-07-05
+        (BB#1) Proper support for starting and detecting kwalletd on 
+        newer distributions (where both binary name, and service name,
+        changed). Patch by anonymous author.
+
+1.0000	2020-07-05
+        Switching hosting to helix as bitbucket is shut down.
+
 0.60	2015-01-26
 	In case kwalletd is not running, we try to start it, and
         wait a little bit. Only if that fails we fail. There is
@@ -11,7 +19,7 @@ Revision history for Passwd::Keyring::KDEWallet
 0.2007	2013-07-04
 	Distribute example script.
 
-	(bitbucket #1) Documentation contained wrong example of using set_password
+	(bb #1) Documentation contained wrong example of using set_password
 
 0.2006	2012-11-20
 	Tests don't fail but are skipped when module is built on
