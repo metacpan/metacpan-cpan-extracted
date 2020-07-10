@@ -6,7 +6,7 @@ CGI::Ex::Auth - Handle logins nicely.
 
 =head1 VERSION
 
-version 2.49
+version 2.50
 
 =cut
 
@@ -23,7 +23,7 @@ use Digest::MD5 qw(md5_hex);
 use CGI::Ex;
 use Carp qw(croak);
 
-our $VERSION = '2.49'; # VERSION
+our $VERSION = '2.50'; # VERSION
 
 ###----------------------------------------------------------------###
 

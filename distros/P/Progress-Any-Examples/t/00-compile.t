@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Progress/Any/Examples.pm'
@@ -17,7 +17,8 @@ my @scripts = (
     'script/progress-any-eg-progressbar-02-multiple-tasks-one-progressbar',
     'script/progress-any-eg-progressbar-03-progressbar-on-subtask',
     'script/progress-any-eg-progressbar-04-progressbar-and-logger',
-    'script/progress-any-eg-progressbar-05-multiple-progressbars'
+    'script/progress-any-eg-progressbar-05-multiple-progressbars',
+    'script/progress-any-eg-progressbar-06-reusing-task'
 );
 
 # no fake home requested

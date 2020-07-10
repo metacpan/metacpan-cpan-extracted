@@ -59,6 +59,20 @@ sub accepts {
     return 0;
 }
 
+package IV_BOOL;
+use base 'IV_ANY';
+sub new { my $class = shift; bless {@_}, $class }
+sub accepts {
+    my ($self, $value, $path) = @_;
+    return 1 if ($self->nillable and not defined $value)
+             or ($self->empty and defined $value and !ref $value and $value eq '')
+             or (ref($value) =~ /^JSON::PP::Boolean$/);
+
+    my $val = ref $value || $value;
+    $self->error("Value '$val' is not a boolean at path " . ($path || '/'));
+    return 0;
+}
+
 package IV_ARRAY;
 use base 'IV_ANY';
 sub new {
@@ -208,7 +222,7 @@ package Mojolicious::Plugin::InputValidation;
 use Mojo::Base 'Mojolicious::Plugin';
 no strict 'subs';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Mojo::Util 'monkey_patch';
 
@@ -217,6 +231,7 @@ sub iv_object   { IV_OBJECT->new(@_) }
 sub iv_array    { IV_ARRAY->new(@_) }
 sub iv_int      { IV_INT->new(@_) }
 sub iv_float    { IV_FLOAT->new(@_) }
+sub iv_bool     { IV_BOOL->new(@_) }
 sub iv_word     { IV_WORD->new(@_) }
 sub iv_any      { IV_ANY->new(@_) }
 
@@ -227,6 +242,7 @@ sub import {
     monkey_patch $caller, 'iv_array',    \&iv_array;
     monkey_patch $caller, 'iv_int',      \&iv_int;
     monkey_patch $caller, 'iv_float',    \&iv_float;
+    monkey_patch $caller, 'iv_bool',     \&iv_bool;
     monkey_patch $caller, 'iv_word',     \&iv_word;
     monkey_patch $caller, 'iv_any',      \&iv_any;
 }
@@ -295,6 +311,7 @@ Mojolicious::Plugin::InputValidation - Validate incoming requests
           price     => iv_float,
           revision  => iv_int,
           isbn      => iv_any(pattern => qr/^[0-9\-]{10,13}$/),
+          advertise => iv_bool,
       })) {
           return $c->render(status => 400, text => $error);
       }
@@ -369,6 +386,16 @@ leading dash.
       foo => iv_float,
       bar => iv_float(optional => 1),
       baz => iv_float(nillable => 1),
+  }
+
+=item iv_bool
+
+This type matches booleans: true and false.
+
+  {
+      foo => iv_bool,
+      bar => iv_bool(optional => 1),
+      baz => iv_bool(nillable => 1),
   }
 
 =item iv_word

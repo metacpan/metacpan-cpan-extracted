@@ -249,19 +249,15 @@ ssh_get_issue_banner(ssh_session session)
         RETVAL = ssh_get_issue_banner(session);
     OUTPUT: RETVAL
 
-#
-
+# change since version 0.8.0
 int
 ssh_session_is_known_server(ssh_session session)
     CODE:
+#if LIBSSH_VERSION_INT >= 2048
         RETVAL = ssh_session_is_known_server(session);
-    OUTPUT: RETVAL
-
-# Deprecated
-int
-ssh_is_server_known(ssh_session session)
-    CODE:
+#else
         RETVAL = ssh_is_server_known(session);
+#endif
     OUTPUT: RETVAL
 
 ssh_key 
@@ -271,21 +267,11 @@ ssh_get_server_publickey(ssh_session session)
         int success;
         
         RETVAL = NULL;
+#if LIBSSH_VERSION_INT >= 2048
         success = ssh_get_server_publickey(session, &key);
-        if (success == SSH_OK) {
-            RETVAL = key;
-        }
-    OUTPUT: RETVAL
-
-# Deprecated
-ssh_key 
-ssh_get_publickey(ssh_session session)
-    CODE:
-        ssh_key key;
-        int success;
-        
-        RETVAL = NULL;
+#else
         success = ssh_get_publickey(session, &key);
+#endif
         if (success == SSH_OK) {
             RETVAL = key;
         }
@@ -325,14 +311,11 @@ ssh_get_hexa(unsigned char *what)
 int
 ssh_session_update_known_hosts(ssh_session session)
     CODE:
+#if LIBSSH_VERSION_INT >= 2048
         RETVAL = ssh_session_update_known_hosts(session);
-    OUTPUT: RETVAL
-
-# Deprecated
-int
-ssh_write_knownhost(ssh_session session)
-    CODE:
+#else
         RETVAL = ssh_write_knownhost(session);
+#endif
     OUTPUT: RETVAL
 
 const char *
@@ -425,6 +408,12 @@ int
 ssh_channel_request_exec(ssh_channel channel, char *cmd)
     CODE:
         RETVAL = ssh_channel_request_exec(channel, cmd);
+    OUTPUT: RETVAL
+
+int
+ssh_channel_request_shell(ssh_channel channel)
+    CODE:
+        RETVAL = ssh_channel_request_shell(channel);
     OUTPUT: RETVAL
 
 int

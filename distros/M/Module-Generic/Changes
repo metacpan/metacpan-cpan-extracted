@@ -1,5 +1,14 @@
 Revision history for Perl module Module::Generic
 
+0.12.16 2020-06-17T15:03:17+0900
+    - Added the helper method _is_a to simplify the check for object class
+    - Added method get() and list() in Module::Generic::Array
+    - Added method tr in Module::Generic::Scalar
+    - Corrected error in exiting a for/foreach loop in Module::Generic::Array
+    - Switched clone() method to using XS module Clone::clone()
+    - Added methods new_array, new_hash, new_number and new_scalar in Module::Generic to make it more convenient to create object from those classes
+    - Added some missing documentation to Module::Generic::Scalar
+
 0.12.15 2020-06-16T12:22:19+0900
     - Fixed some test units
 

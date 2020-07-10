@@ -1,3 +1,16 @@
+0.011 2020-07-09 00:55:04-0500
+  - Updates build parameters for MuPDF v1.17.0.
+
+  - Only build mutool binary.
+
+    See <https://github.com/project-renard/p5-Alien-MuPDF/issues/47>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/pull/48>,
+    <https://github.com/project-renard/p5-Alien-MuPDF/pull/51>.
+
+  - Skip embedding some fonts to decrease build size (-DTOFU -DTOFU_CJK).
+
+  - Several Windows build fixes.
+
 0.010 2018-01-04 20:40:51-0600
   - Expand the download regex so that x.y.z versions match. This change was
     introduced with MuPDF v1.12.0.

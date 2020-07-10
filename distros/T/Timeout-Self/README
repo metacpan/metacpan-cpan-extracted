@@ -1,16 +1,59 @@
-SYNOPSIS
+NAME
+    Timeout::Self - Run alarm() at the start of program to timeout run
 
+VERSION
+    This document describes version 0.020 of Timeout::Self (from Perl
+    distribution Timeout-Self), released on 2020-07-10.
+
+SYNOPSIS
     In a script:
 
      # run for at most 30 seconds
-     use Timeout::Self qw(30);
+     use Timeout::Self 30;
+     # do stuffs
 
     From the command line:
 
      % perl -MTimeout::Self=30 yourscript.pl
 
 DESCRIPTION
+    This module lets you set a time limit on program execution, by
+    installing a handler in $SIG{ALRM} that simply dies, and then calling
+    "alarm()" with the specified number of seconds.
 
-    This module simply installs a $SIG{ALRM} that dies, and an alarm() call
-    with a certain value.
+    Caveat: it doesn't play perfectly nice with programs that fork. While
+    the alarm handler gets cloned to the child process by Perl, the alarm is
+    not set again so the child process will not time out. You can call
+    alarm() again in the child process if you want to timeout the child too.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Timeout-Self>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Timeout-Self>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Timeout-Self>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Sys::RunUntil can timeout your script by number of clock seconds or CPU
+    seconds. It performs "fork()" at the beginning of program run.
+
+    Timing out a process can also be done by a supervisor process, for
+    example see Proc::Govern, IPC::Run (see "timeout()").
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

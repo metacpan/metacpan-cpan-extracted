@@ -6,34 +6,6 @@ use warnings;
 require Exporter;
 our @ISA = qw( Exporter );
 
-#------------------------------------------------------------
-#
-# This section lifted directly from Debug::Show v0.0
-#
-# https://metacpan.org/pod/Debug::Show
-#
-# Thanks to Zefram
-#
-use B::CallChecker qw( cv_set_call_checker );
-BEGIN {
-    # B::Generate provides a broken version of B::COP->warnings, which
-    # makes B::Deparse barf [rt.cpan.org #70396], and of B::SVOP->sv,
-    # which makes B::Concise emit rubbish [rt.cpan.org #70398].
-    # This works around it by restoring the non-broken versions,
-    # provided that B::Generate hasn't already been loaded.  If it
-    # was loaded by someone else, better hope they worked around it
-    # the same way.
-    require B;
-    my $cop_warnings = \&B::COP::warnings;
-    my $svop_sv = \&B::SVOP::sv;
-    require B::Generate;
-    no warnings "redefine";
-    *B::COP::warnings = $cop_warnings;
-    *B::SVOP::sv = $svop_sv;
-    B::Generate->VERSION(1.33);
-}
-#------------------------------------------------------------
-
 use Carp qw( croak );
 
 #pod =head1 NAME
@@ -101,7 +73,8 @@ our $VERSION = '1.01';
 #pod
 #pod If the condition evaluates to true for C<-if>, or false for C<-unless>,
 #pod then any subs are exported as-is.  Otherwise, any subs in C<@EXPORT_OK>
-#pod are replaced with stubs that get optimized away by the compiler.
+#pod are replaced with stubs that get optimized away by the compiler (with
+#pod one exception - see L</CAVEATS> below).
 #pod
 #pod You can specify either C<-if> or C<-unless>, but not both.  Croaks if
 #pod both are specified, or if you specify the same option more than once.
@@ -151,6 +124,20 @@ sub import
         }
     }
 
+    # Pulling in B::CallChecker and/or B::Generate to optimize away
+    # the exported symbols can break test coverage metrics generated
+    # by Devel::Cover.  We probably want to check coverage on the actual
+    # exports anyway, so if Devel::Cover is in play assume we *should*
+    # export everything:
+    #
+    # (took this conditional logic directly from Devel::Cover)
+    #
+    $should_export_subs = 1 if (
+        $INC{'Devel/Cover.pm'}                                ||
+        ($ENV{HARNESS_PERL_SWITCHES} || "") =~ /Devel::Cover/ ||
+        ($ENV{PERL5OPT}              || "") =~ /Devel::Cover/
+    );
+
     # If the "if" condition is false, or the "unless" condition is true,
     # replace any exportable subs with something that will get optimized away:
     #
@@ -171,6 +158,9 @@ sub import
                 # Save a copy of the original code:
                 $their_original_coderefs{$symbol} = \&$symbol;
 
+                require B::CallChecker;
+                require B::Generate;
+
                 # Replace the sub being imported with a void prototype sub
                 # that gets optimized away:
                 #
@@ -188,20 +178,24 @@ sub import
                     #
                     # Thanks to Zefram
                     #
-                    cv_set_call_checker(\&$symbol, sub ($$$) {
-                        my($entersubop, undef, undef) = @_;
-                        # B::Generate doesn't offer a way to explicitly free ops.
-                        # We ought to be able to implicitly free $entersubop via
-                        # constant folding, by something like
-                        #
-                        #     return B::LOGOP->new("and", 0,
-                        #         B::SVOP->new("const", 0, !1),
-                        #         $entersubop);
-                        #
-                        # but empirically that causes memory corruption and it's
-                        # not clear why.  For the time being, leak $entersubop.
-                        return B::SVOP->new("const", 0, !1);
-                    }, \!1);
+                    B::CallChecker::cv_set_call_checker(
+                        \&$symbol,
+                        sub ($$$) {
+                            my($entersubop, undef, undef) = @_;
+                            # B::Generate doesn't offer a way to explicitly free ops.
+                            # We ought to be able to implicitly free $entersubop via
+                            # constant folding, by something like
+                            #
+                            #     return B::LOGOP->new("and", 0,
+                            #         B::SVOP->new("const", 0, !1),
+                            #         $entersubop);
+                            #
+                            # but empirically that causes memory corruption and it's
+                            # not clear why.  For the time being, leak $entersubop.
+                            return B::SVOP->new("const", 0, !1);
+                        },
+                        \!1
+                    );
                     #
                     #---------------------------------------------------------
                 }
@@ -222,6 +216,19 @@ sub import
     }
 }
 
+#pod =head1 CAVEATS
+#pod
+#pod This module uses L<B::CallChecker> and L<B::Generate> under the covers
+#pod to optimize away the exported subroutines.  Loading one or the other
+#pod of those modules can potentially break test coverage metrics generated
+#pod by L<Devel::Cover> in mysterious ways.
+#pod
+#pod To avoid this problem, subroutines are never optimized away
+#pod if L<Devel::Cover> is in use, and are always exported as-is
+#pod regardless of any C<-if> or C<-unless> conditions.  (You probably
+#pod want L<Devel::Cover> to assess the coverage of your real exported
+#pod subroutines in any case.)
+#pod
 #pod =head1 SEE ALSO
 #pod
 #pod L<Exporter>
@@ -338,7 +345,7 @@ Exporter::ConditionalSubs
 
 =head1 VERSION
 
-version v1.10.1
+version v1.11.0
 
 =head1 SYNOPSIS
 
@@ -400,10 +407,24 @@ a boolean, or a coderef that returns true/false.
 
 If the condition evaluates to true for C<-if>, or false for C<-unless>,
 then any subs are exported as-is.  Otherwise, any subs in C<@EXPORT_OK>
-are replaced with stubs that get optimized away by the compiler.
+are replaced with stubs that get optimized away by the compiler (with
+one exception - see L</CAVEATS> below).
 
 You can specify either C<-if> or C<-unless>, but not both.  Croaks if
 both are specified, or if you specify the same option more than once.
+
+=head1 CAVEATS
+
+This module uses L<B::CallChecker> and L<B::Generate> under the covers
+to optimize away the exported subroutines.  Loading one or the other
+of those modules can potentially break test coverage metrics generated
+by L<Devel::Cover> in mysterious ways.
+
+To avoid this problem, subroutines are never optimized away
+if L<Devel::Cover> is in use, and are always exported as-is
+regardless of any C<-if> or C<-unless> conditions.  (You probably
+want L<Devel::Cover> to assess the coverage of your real exported
+subroutines in any case.)
 
 =head1 SEE ALSO
 

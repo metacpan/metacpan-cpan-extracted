@@ -1,0 +1,30 @@
+Some experiments with hooks.
+
+<? echo "Hello world!" !>#+
+Hello world!#-
+
+In this example, let us add a regex hook which may be useful in some
+HTML documents.  The anonymous function takes $self as the first
+argument, the second argument is the whole match, and other arguments
+are parenthesized parts of the regular expression:
+<? set_out_delimiters("\n#","+\n","\n#","-");
+   add_hook('regex', qr/^.section:(\w+)\s+(.*)/m,
+   sub { $_="<a name=\"$_[2]\"><h3>$_[3]</h3></a>" }) !>
+
+We will try this hook here:
+.section:overview Document Overview
+#+
+<a name="overview"><h3>Document Overview</h3></a>
+#-
+The next line.
+
+Let us now experiment with removing and adding hooks.
+<? rm_hook('be', '<?', '!'.'>');
+   add_hook('be', '<?new', '!'.'>');
+!>
+
+<? echo "This should not work." !>
+<?new echo "But, this should."  !>
+#+
+But, this should.
+#-

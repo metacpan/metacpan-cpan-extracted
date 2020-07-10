@@ -47,7 +47,7 @@ progress-any-eg-progressbar-03-progressbar-on-subtask - Two tasks, progress bar 
 
 =head1 VERSION
 
-This document describes version 0.001 of progress-any-eg-progressbar-03-progressbar-on-subtask (from Perl distribution Progress-Any-Examples), released on 2020-06-20.
+This document describes version 0.003 of progress-any-eg-progressbar-03-progressbar-on-subtask (from Perl distribution Progress-Any-Examples), released on 2020-07-09.
 
 =head1 SYNOPSIS
 

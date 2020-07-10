@@ -3,7 +3,7 @@ use warnings;
 use feature qw( state );
 
 package WWW::RoboCop;
-$WWW::RoboCop::VERSION = '0.000004';
+our $VERSION = '0.000100';
 use Carp qw( croak );
 use Moo;
 use MooX::HandlesVia;
@@ -15,7 +15,7 @@ use Types::URI -all;
 use URI;
 use WWW::Mechanize;
 
-has is_url_whitelisted => (
+has is_url_allowed => (
     is          => 'ro',
     isa         => CodeRef,
     handles_via => 'Code',
@@ -34,9 +34,11 @@ has report_for_url => (
             my $referring_url = shift;    # URI object
             return {
                 $response->redirects
-                ? ( redirects => [
+                ? (
+                    redirects => [
                         map {
-                            {   status => $_->code,
+                            {
+                                status => $_->code,
                                 uri    => $_->request->uri,
                             }
                         } $response->redirects
@@ -76,22 +78,22 @@ sub _get {
     my $url           = shift;
     my $referring_url = shift;
 
-    my $response = $self->ua->get( $url );
-    my $report = $self->_log_response( $response, $referring_url );
+    my $response = $self->ua->get($url);
+    my $report   = $self->_log_response( $response, $referring_url );
     $self->_add_url_to_history( $url, $report );
 
     my @links = $self->ua->find_all_links;
 
-    foreach my $link ( @links ) {
+    foreach my $link (@links) {
 
         # this just points back at the same url
         next if substr( $link->url, 0, 1 ) eq '#';
 
         my $uri = URI->new( $link->url_abs );
-        $uri->fragment( undef );    # fragments result in duplicate urls
+        $uri->fragment(undef);    # fragments result in duplicate urls
 
-        next if $self->_has_processed_url( $uri );
-        next unless $uri->can( 'host' );    # no mailto: links
+        next if $self->_has_processed_url($uri);
+        next unless $uri->can('host');    # no mailto: links
         next unless $self->_should_follow_link( $link, $url );
 
         $self->_get( $uri, $url );
@@ -101,10 +103,10 @@ sub _get {
 sub crawl {
     my $self = shift;
 
-    state $check = compile( Uri );
-    my ( $url ) = $check->( @_ );
+    state $check = compile(Uri);
+    my ($url) = $check->(@_);
 
-    $self->_get( $url );
+    $self->_get($url);
 }
 
 sub get_report {
@@ -124,7 +126,7 @@ WWW::RoboCop - Police your URLs!
 
 =head1 VERSION
 
-version 0.000004
+version 0.000100
 
 =head1 SYNOPSIS
 
@@ -133,7 +135,7 @@ version 0.000004
     use WWW::RoboCop;
 
     my $robocop = WWW::RoboCop->new(
-        is_url_whitelisted => sub {
+        is_url_allowed => sub {
             state $count = 0;
             return $count++ < 5; # just crawl 5 URLs
         },
@@ -154,8 +156,8 @@ version 0.000004
 BETA BETA BETA!
 
 C<WWW::RoboCop> is a dead simple, somewhat opinionated robot.  Given a starting
-page, this module will crawl only URLs which have been whitelisted by the
-C<is_url_whitelisted> callback.  It then creates a report of all visited pages,
+page, this module will crawl only URLs which have been allowed by the
+C<is_url_allowed> callback.  It then creates a report of all visited pages,
 keyed on URL.  You are encouraged to provide your own report creation callback
 so that you can collect all of the information which you require for each URL.
 
@@ -167,7 +169,7 @@ Creates and returns a new C<WWW::RoboCop> object.
 
 Below are the arguments which you may pass to C<new> when creating an object.
 
-=head3 is_url_whitelisted
+=head3 is_url_allowed
 
 This argument is required.  You must provide an anonymous subroutine which will
 return true or false based on some arbitrary criteria which you provide.  The
@@ -182,7 +184,7 @@ Your sub might look something like this:
     use WWW::RoboCop;
 
     my $robocop = WWW::RoboCop->new(
-        is_url_whitelisted => sub {
+        is_url_allowed => sub {
             my $link          = shift;
             my $referring_url = shift;
 
@@ -226,7 +228,7 @@ like this:
     };
 
     my $robocop = WWW::RoboCop->new(
-        is_url_whitelisted => sub { ... },
+        is_url_allowed => sub { ... },
         report_for_url     => $reporter,
     );
 
@@ -260,21 +262,21 @@ and going off to read Hacker News while you wait.
     );
 
     my $robocop = WWW::RoboCop->new(
-        is_url_whitelisted => sub { ... },
+        is_url_allowed => sub { ... },
         ua => WWW::Mechanize::Cached->new( cache => $cache ),
     );
 
 If you're not using a Cached agent, be sure to disable autocheck.
 
     my $robocop = WWW::RoboCop->new(
-        is_url_whitelisted => sub { ... },
+        is_url_allowed => sub { ... },
         ua => WWW::Mechanize->new( autocheck => 0 ),
     );
 
 =head2 crawl( $url )
 
 This method sets the C<WWW::RoboCop> in motion.  The robot will only come to a
-halt once has exhausted all of the whitelisted URLs it can find.
+halt once has exhausted all of the allowed URLs it can find.
 
 =head2 get_report
 
@@ -300,7 +302,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by MaxMind, Inc..
+This software is Copyright (c) 2015 by MaxMind, Inc.
 
 This is free software, licensed under:
 

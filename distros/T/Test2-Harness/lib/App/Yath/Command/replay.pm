@@ -2,7 +2,7 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '1.000019';
+our $VERSION = '1.000020';
 
 use App::Yath::Options;
 require App::Yath::Command::test;
@@ -68,6 +68,12 @@ sub run {
 
             $self->{+TESTS_SEEN}++   if $e->{facet_data}->{harness_job_launch};
             $self->{+ASSERTS_SEEN}++ if $e->{facet_data}->{assert};
+
+            if ($jobs && $e->{facet_data}->{harness_job_start}) {
+              $jobs->{ $e->{job_id} } = 1
+                if $jobs->{ $e->{facet_data}->{harness_job_start}{rel_file} }
+                || $jobs->{ $e->{facet_data}->{harness_job_start}{abs_file} };
+            }
 
             if (my $final = $e->{facet_data}->{harness_final}) {
                 $self->{+FINAL_DATA} = $final;

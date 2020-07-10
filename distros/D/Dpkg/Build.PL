@@ -17,10 +17,26 @@ if (-e 'Build.PL.in') {
 my $class = Module::Build->subclass(
     class => 'Module::Build::Dpkg',
     code => q{
+        require IPC::Cmd;
+
+        sub find_command {
+            my (@alts) = @_;
+
+            foreach my $cmd (@alts) {
+                my $pathname = IPC::Cmd::can_run($cmd);
+                return $pathname if defined $pathname;
+            }
+            die "error: cannot find any of @alts\n";
+        }
+
         sub subst {
             my ($self, $file) = @_;
             my $path = $self->install_path();
             my $version = $self->dist_version();
+
+            my $progmake = find_command(qw(gmake make));
+            my $progpatch = find_command(qw(gpatch patch));
+            my $progtar = find_command(qw(gtar tar));
 
             unlink "blib/$file"
                 or die "error: cannot remove blib/$file: $!\n";
@@ -30,6 +46,9 @@ my $class = Module::Build->subclass(
                 or die "error: cannot create blib/$file: $!\n";
             while (<$fhin>) {
                 s{our \$PROGVERSION = .*;}{our \$PROGVERSION = '$version';};
+                s{our \$PROGMAKE = .*;}{our \$PROGMAKE = '$progmake';};
+                s{our \$PROGPATCH = .*;}{our \$PROGPATCH = '$progpatch';};
+                s{our \$PROGTAR = .*;}{our \$PROGTAR = '$progtar';};
                 s{our \$CONFDIR = .*;}{our \$CONFDIR = '$path->{conf}';};
                 s{our \$DATADIR = .*;}{our \$DATADIR = '$path->{data}';};
                 s{our \$ADMINDIR = .*;}{our \$ADMINDIR = '$path->{admin}';};
@@ -54,6 +73,8 @@ my $class = Module::Build->subclass(
             local $ENV{DPKG_TEST_MODE} = 'cpan';
             local $ENV{DPKG_DATADIR} = 'data';
             local $ENV{DPKG_ORIGINS_DIR} = 't/origins';
+            # To avoid requiring dpkg(1).
+            local $ENV{DEB_BUILD_ARCH} = 'amd64';
             $self->SUPER::ACTION_test;
         }
     },
@@ -62,7 +83,7 @@ my $class = Module::Build->subclass(
 my $build = $class->new(
     dist_name       => 'Dpkg',
     dist_abstract   => 'Debian Package Manager Perl modules',
-    dist_version    => '1.20.4',
+    dist_version    => '1.20.5',
     dist_author     => 'Dpkg Developers <debian-dpkg@lists.debian.org>',
     license         => 'GPL_2',
 

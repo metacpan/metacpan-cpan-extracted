@@ -1,5 +1,4 @@
 use Test::Most;
-use Test::Moose;
 
 use constant PACKAGE => 'Bible::OBML';
 
@@ -12,9 +11,8 @@ sub main {
     my $self = PACKAGE->new;
     isa_ok( $self, PACKAGE );
 
-    does_ok( $self, 'Throwable' );
-    has_attribute_ok( $self, $_, qq{attribute "$_" exists} ) for ( qw( html bible acronyms refs ) );
     can_ok( PACKAGE, $_ ) for ( qw(
+        html bible acronyms refs
         read_file write_file parse render canonicalize smartify desmartify
     ) );
 

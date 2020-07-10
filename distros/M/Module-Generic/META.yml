@@ -35,6 +35,7 @@ requires:
   POSIX: 1.53_01
   Regexp::Common: '2017060201'
   Scalar::Util: '1.50'
+  Sub::Util: '1.54'
   Tie::Hash: '1.05'
   Want: '0.29'
   common::sense: '0'
@@ -44,5 +45,5 @@ requires:
   perl: '5.026001'
   strict: '0'
   warnings: '0'
-version: v0.12.15
+version: v0.12.16
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

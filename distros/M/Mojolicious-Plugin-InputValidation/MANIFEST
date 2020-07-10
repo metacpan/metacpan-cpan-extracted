@@ -5,5 +5,6 @@ MANIFEST			This list of files
 README.md
 t/01-input-validation.t
 t/02-mojo-lite.t
+t/03-boolean.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

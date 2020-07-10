@@ -10,7 +10,7 @@ use File::Copy qw( move );
 use base qw( Module::Build::FFI );
 
 # ABSTRACT: (Deprecated) Build Perl extensions in Free Pascal with FFI
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.54'; # VERSION
 
 
 __PACKAGE__->add_property( ffi_pascal_extra_compiler_flags =>
@@ -200,7 +200,7 @@ Module::Build::FFI::Pascal - (Deprecated) Build Perl extensions in Free Pascal w
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 DESCRIPTION
 

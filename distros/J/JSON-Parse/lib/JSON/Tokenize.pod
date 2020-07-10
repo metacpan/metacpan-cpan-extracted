@@ -48,8 +48,8 @@ This outputs
 
 =head1 VERSION
 
-This documents version 0.56 of JSON::Tokenize corresponding to
-L<git commit c00e1e8b7dfc7958de6700700ee20582f81b56a6|https://github.com/benkasminbullock/JSON-Parse/commit/c00e1e8b7dfc7958de6700700ee20582f81b56a6> released on Mon Feb 17 13:10:15 2020 +0900.
+This documents version 0.57 of JSON::Tokenize corresponding to
+L<git commit 42e099ed38a3e85daed46f53bf367fa2b828e152|https://github.com/benkasminbullock/JSON-Parse/commit/42e099ed38a3e85daed46f53bf367fa2b828e152> released on Thu Jul 9 07:16:33 2020 +0900.
 
 
 

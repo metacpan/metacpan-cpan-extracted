@@ -1,6 +1,6 @@
 package OpenTracing::Role::Tracer;
 
-our $VERSION = 'v0.82.0';
+our $VERSION = 'v0.83.0';
 
 use Moo::Role;
 use syntax qw/maybe/;
@@ -11,7 +11,7 @@ use Ref::Util qw/is_plain_hashref/;
 use Role::Declare -lax;
 use Try::Tiny;
 use Types::Common::Numeric qw/PositiveOrZeroNum/;
-use Types::Standard qw/Maybe HashRef Object Str/;
+use Types::Standard qw/Maybe HashRef Object Str ArrayRef/;
 
 has scope_manager => (
     is              => 'ro',
@@ -106,17 +106,17 @@ sub start_span {
     return $span
 }
 
+use constant Carrier => Object | HashRef | ArrayRef;
+
 instance_method extract_context(
-    Str    $carrier_format,
-    Object $carrier
+    Carrier                     $carrier,
 ) :ReturnMaybe(SpanContext) {}
 
 
 instance_method inject_context(
-    Str    $carrier_format,
-    Object $carrier,
-    SpanContext $span_context
-) :Return(Object) {}
+    Carrier                     $carrier,
+    Maybe[ SpanContext ]        $span_context = undef,
+) :Return(Carrier) {}
 
 
 instance_method build_span (

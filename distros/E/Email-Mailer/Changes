@@ -1,5 +1,9 @@
 Revision history for Email::Mailer
 
+1.10      2020-07-09 07:54:45-07:00 America/Los_Angeles
+        - Update test regex files patterns
+        - Update Travis YAML
+
 1.09      2018-09-28 16:22:39-07:00 America/Los_Angeles
         - Fix bug for generating text from HTML that includes <hr>
 

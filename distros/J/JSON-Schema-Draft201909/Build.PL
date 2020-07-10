@@ -89,7 +89,7 @@ EOW
         "Karen Etheridge <ether\@cpan.org>"
       ],
       "dist_name" => "JSON-Schema-Draft201909",
-      "dist_version" => "0.008",
+      "dist_version" => "0.009",
       "license" => "perl",
       "module_name" => "JSON::Schema::Draft201909",
       "recursive_test_files" => 1,
@@ -98,7 +98,7 @@ EOW
         "File::ShareDir" => 0,
         "JSON::MaybeXS" => "1.004001",
         "JSON::PP" => 0,
-        "List::Util" => "1.50",
+        "List::Util" => "1.55",
         "Mojo::JSON::Pointer" => 0,
         "Mojo::URL" => 0,
         "Mojolicious" => "7.23",
@@ -124,9 +124,9 @@ EOW
       },
       "test_requires" => {
         "File::Spec" => 0,
-        "List::Util" => "1.50",
         "Module::Metadata" => 0,
         "Scalar::Util" => 0,
+        "Storable" => 0,
         "Test::Deep" => 0,
         "Test::Deep::UnorderedPairs" => 0,
         "Test::Fatal" => 0,
@@ -144,9 +144,9 @@ EOW
 
     my %fallback_build_requires = (
       "File::Spec" => 0,
-      "List::Util" => "1.50",
       "Module::Metadata" => 0,
       "Scalar::Util" => 0,
+      "Storable" => 0,
       "Test::Deep" => 0,
       "Test::Deep::UnorderedPairs" => 0,
       "Test::Fatal" => 0,

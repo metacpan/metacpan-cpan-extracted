@@ -1,3 +1,30 @@
+dpkg (1.20.5) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * Revert change to prefix the specs file spec string self_spec with +
+    instead of *. The prefix is supposed to go in the text itself
+    instead of the spec name, which already had it. This change only
+    apparently fixed the issue at hand because gcc started parsing it as
+    the «[SUFFIX]:» case, completely disabling the PIE handling.
+    Thanks to Thorsten Glaser <tg@mirbsd.de>.
+  * Perl modules:
+    - Dpkg::Source::Package::V1: Explicitly initialize constructor options to
+      their implicit values, otherwise other code end up assuming different
+      defaults. This is required here too as this class does not call the
+      initialization from its parent.
+  * Build system:
+    - Detect the GNU program variants for make, patch and tar in the CPAN
+      distribution to replace in the Dpkg module.
+    - Set DEB_BUILD_ARCH to a dummy “amd64” in the CPAN distribution tests
+      to not require a dpkg(1) in the system.
+  * Test suite:
+    - Only print the Dpkg::Path::check_directory_traversal() error on failure.
+
+  [ Updated scripts translations ]
+  * German (Helge Kreutzmann).
+
+ -- Guillem Jover <guillem@debian.org>  Wed, 08 Jul 2020 05:40:39 +0200
+
 dpkg (1.20.4) unstable; urgency=medium
 
   [ Guillem Jover ]

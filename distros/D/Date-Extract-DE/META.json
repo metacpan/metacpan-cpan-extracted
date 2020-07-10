@@ -28,6 +28,7 @@
             "DateTime::Incomplete" : "0",
             "Moose" : "0.64",
             "MooseX::ClassAttribute" : "0",
+            "Regexp::Assemble" : "0.38",
             "namespace::autoclean" : "0.05",
             "perl" : "v5.12.0",
             "version" : "0.77"
@@ -42,7 +43,7 @@
    "provides" : {
       "Date::Extract::DE" : {
          "file" : "lib/Date/Extract/DE.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.6"
       }
    },
    "release_status" : "stable",
@@ -57,6 +58,6 @@
          "url" : "https://github.com/apa-it/date-extract-de"
       }
    },
-   "version" : "v0.0.5",
+   "version" : "v0.0.6",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

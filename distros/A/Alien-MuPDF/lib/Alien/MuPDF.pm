@@ -1,5 +1,5 @@
 package Alien::MuPDF;
-$Alien::MuPDF::VERSION = '0.010';
+$Alien::MuPDF::VERSION = '0.011';
 use strict;
 use warnings;
 
@@ -33,14 +33,14 @@ sub libs {
 sub Inline {
 	my ($self, $lang) = @_;
 
-	if('C') {
+	if( $lang eq 'C' ) {
 		my $params = Alien::Base::Inline(@_);
 		$params->{MYEXTLIB} .= ' ' .
 			join( " ",
 				map { File::Spec->catfile(
 					File::Spec->rel2abs(Alien::MuPDF->dist_dir),
 					'lib',  $_ ) }
-				qw(libmupdf.a libmupdfthird.a)
+				qw(libmupdf.a libmupdf-third.a)
 			);
 		$params->{PRE_HEAD} = <<'		EOF';
 		#if defined(_MSC_VER) || defined(__MINGW32__)
@@ -64,7 +64,7 @@ Alien::MuPDF - Alien package for the MuPDF PDF rendering library
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 METHODS
 

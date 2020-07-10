@@ -2,6 +2,13 @@ CHANGE LOG
 ==========
 
 
+2020-07-08 v0.205.0
+-------------------
+
+Redefine `inject_context` and `extract_context`, which no longer require a
+OPENTRACING_CARRIER_FORMAT, but should use 'auto-detect'
+
+
 2020-06-16 v0.204.0
 -------------------
 

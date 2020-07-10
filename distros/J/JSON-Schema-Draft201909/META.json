@@ -76,7 +76,7 @@
             "File::ShareDir" : "0",
             "JSON::MaybeXS" : "1.004001",
             "JSON::PP" : "0",
-            "List::Util" : "1.50",
+            "List::Util" : "1.55",
             "Mojo::JSON::Pointer" : "0",
             "Mojo::URL" : "0",
             "Mojolicious" : "7.23",
@@ -112,9 +112,9 @@
          },
          "requires" : {
             "File::Spec" : "0",
-            "List::Util" : "1.50",
             "Module::Metadata" : "0",
             "Scalar::Util" : "0",
+            "Storable" : "0",
             "Test::Deep" : "0",
             "Test::Deep::UnorderedPairs" : "0",
             "Test::Fatal" : "0",
@@ -211,19 +211,19 @@
    "provides" : {
       "JSON::Schema::Draft201909" : {
          "file" : "lib/JSON/Schema/Draft201909.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "JSON::Schema::Draft201909::Document" : {
          "file" : "lib/JSON/Schema/Draft201909/Document.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "JSON::Schema::Draft201909::Error" : {
          "file" : "lib/JSON/Schema/Draft201909/Error.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       },
       "JSON::Schema::Draft201909::Result" : {
          "file" : "lib/JSON/Schema/Draft201909/Result.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -238,7 +238,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Draft201909"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"
@@ -1157,7 +1157,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.008",
+                  "tag" : "v0.009",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

@@ -1,7 +1,7 @@
 package Progress::Any;
 
-our $DATE = '2020-06-21'; # DATE
-our $VERSION = '0.215'; # VERSION
+our $DATE = '2020-07-09'; # DATE
+our $VERSION = '0.216'; # VERSION
 
 use 5.010001;
 use strict;
@@ -359,7 +359,10 @@ sub _should_update_output {
         # finishing, update the output to show finished state
         return 1;
     } elsif ($output->{force_update}) {
-        # force update
+        # this is an undocumented force update for now, the output itself or
+        # something else can set this to force an update. but this will only be
+        # done once because we delete the key; if another update wants to be
+        # forced, they need to set this again.
         delete $output->{force_update};
         return 1;
     } elsif ($priority eq 'high') {
@@ -393,6 +396,7 @@ sub update {
 
     my $message  = delete($args{message});
     my $priority = delete($args{priority}) // 'normal';
+    my $force_update = delete($args{force_update});
     die "Unknown argument(s) to update(): ".join(", ", keys(%args))
         if keys(%args);
 
@@ -405,7 +409,8 @@ sub update {
         while (1) {
             if ($outputs{$task}) {
                 for my $output (@{ $outputs{$task} }) {
-                    next unless $self->_should_update_output($output, $now, $priority);
+                    next unless $force_update ||
+                        $self->_should_update_output($output, $now, $priority);
                     if (ref($message) eq 'CODE') {
                         $message = $message->();
                     }
@@ -437,6 +442,11 @@ sub stop {
 sub finish {
     my ($self, %args) = @_;
     $self->update(pos=>$self->{target}, state=>'finished', %args);
+}
+
+sub reset {
+    my ($self, %args) = @_;
+    $self->update(pos=>0, state=>'started', %args);
 }
 
 our $template_regex = qr{( # all=1
@@ -585,7 +595,7 @@ Progress::Any - Record progress to any output
 
 =head1 VERSION
 
-This document describes version 0.215 of Progress::Any (from Perl distribution Progress-Any), released on 2020-06-21.
+This document describes version 0.216 of Progress::Any (from Perl distribution Progress-Any), released on 2020-07-09.
 
 =head1 SYNOPSIS
 
@@ -904,6 +914,11 @@ ignore updates lower than a certain level.
 
 Can be set to C<finished> to finish a task.
 
+=item * force_update => BOOL
+
+Default false. Some outputs choose only to update themselves after a certain
+amount of time or number of updates have passed; this forces their update.
+
 =back
 
 =head2 finish
@@ -917,6 +932,20 @@ Equivalent to:
  $progress->update(
      ( pos => $progress->target ) x !!defined($progress->target),
      state => 'finished',
+     %args,
+ );
+
+=head2 reset
+
+Usage:
+
+ $progress->reset(%args)
+
+Equivalent to:
+
+ $progress->update(
+     pos => 0,
+     state => 'started',
      %args,
  );
 

@@ -44,7 +44,11 @@ $s->chomp;
 is( $s, 'Hello world', 'chomp' );
 $s->chop;
 is( $s, 'Hello worl', 'chop' );
-is( $s->crypt( 'key' ), 'keqUNAuo7.kCQ', 'crypt' );
+## OpenBSD does not have des crypt it seems and uses blowfish instead
+unless( $^O eq 'openbsd' )
+{
+    is( $s->crypt( 'key' ), 'keqUNAuo7.kCQ', 'crypt' );
+}
 is( $s->fc( 'Hello worl' ), 1, 'fc' );
 is( Module::Generic::Scalar->new( '0xAf' )->hex, 175, 'hex' );
 isa_ok( Module::Generic::Scalar->new( '0xAf' )->hex, 'Module::Generic::Number' );
@@ -93,6 +97,9 @@ is( $s->substr( 2, 13 ), 'disapprove of', 'substr' );
 is( $s->substr( 2, 13, 'really do not approve' ), 'disapprove of', 'substr substituted part' );
 is( $s, 'I really do not approve what you say, but I will defend to the death your right to say it', 'substr -> substitution' );
 
+my $sz = Module::Generic::Scalar->new( "I am not so sure" );
+is( $sz->tr( '[a-j]', '[0-9]' ), 'I 0m not so sur4', 'tr' );
+
 ok( $s->like( qr/\bapprove[[:blank:]\h]+what\b/ ), 'like' );
 
 my $undef = Module::Generic::Scalar->new( undef() );
@@ -119,6 +126,7 @@ isa_ok( $obj->name, 'Module::Generic::Scalar', 'object field is a Module::Generi
 is( $obj->type, undef(), 'Test object type property is undef()' );
 is( $obj->name->uc, 'DAVE', 'Object chain method ok' );
 is( $obj->type->length, undef(), 'Chained, but eventually undef' );
+is( $obj->name, 'Dave', 'Overloaded scalar object in scalar context' );
 
 package MyObject;
 BEGIN

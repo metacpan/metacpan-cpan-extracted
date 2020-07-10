@@ -6,7 +6,7 @@ CGI::Ex::Fill - Fast but compliant regex based form filler
 
 =head1 VERSION
 
-version 2.49
+version 2.50
 
 =cut
 
@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use Exporter qw(import);
 
-our $VERSION = '2.49'; # VERSION
+our $VERSION = '2.50'; # VERSION
 our @EXPORT    = qw(form_fill);
 our @EXPORT_OK = qw(fill form_fill html_escape get_tagval_by_key swap_tagval_by_key);
 
@@ -246,6 +246,7 @@ sub fill {
         next if ! $opts;
         my $tag    = $1;
         my $name   = get_tagval_by_key(\$tag, 'name');
+        next if ! defined($name) || ! length($name);
         my $values = $ignore->{$name} ? [] : $get_form_value->($name, 'all');
         if ($#$values != -1) {
             my $n = $opts =~ s{

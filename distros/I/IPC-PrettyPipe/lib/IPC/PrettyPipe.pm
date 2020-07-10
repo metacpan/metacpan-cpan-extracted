@@ -5,7 +5,7 @@ package IPC::PrettyPipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 use Carp;
 
 use List::Util qw[ sum ];
@@ -31,9 +31,62 @@ with 'IPC::PrettyPipe::Queue::Element';
 
 use namespace::clean;
 
+use overload 'fallback' => 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use overload '|=' => sub {
+    $_[0]->add( $_[1] );
+    return $_[0];
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use overload '|' => sub {
+    my $swap = pop;
+    my $pipe = IPC::PrettyPipe->new;
+    $pipe->add( $_ ) for ( $swap ? reverse( @_ ) : @_ );
+    $pipe;
+};
+
+
 BEGIN {
     IPC::PrettyPipe::Arg::Format->shadow_attrs( fmt => sub { 'arg' . shift } );
 }
+
+
+
 
 
 
@@ -87,12 +140,26 @@ has argfmt => (
 
 
 
+
+
+
+
+
 has streams => (
-    is       => 'ro',
-    default  => sub { IPC::PrettyPipe::Queue->new },
+    is      => 'lazy',
+    default => sub {
+        IPC::PrettyPipe::Queue->new( elements => $_[0]->_init_streams );
+    },
     init_arg => undef,
 );
 
+
+has _init_streams => (
+    is       => 'ro',
+    isa      => ArrayRef [ InstanceOf ['IPC::PrettyPipe::Stream'] ],
+    init_arg => 'streams',
+    default  => sub { [] },
+);
 
 has _init_cmds => (
     is        => 'ro',
@@ -128,6 +195,22 @@ has cmds => (
     init_arg => undef,
 );
 
+
+
+
+
+
+
+
+
+
+
+has merge_pipes => (
+    is      => 'rw',
+    default => 1,
+    isa     => Bool,
+);
+
 has _executor_arg => (
     is       => 'rw',
     init_arg => 'executor',
@@ -139,7 +222,6 @@ has _executor_arg => (
 has _executor => (
     is      => 'rw',
     isa     => ConsumerOf ['IPC::PrettyPipe::Executor'],
-    handles => 'IPC::PrettyPipe::Executor',
     lazy    => 1,
     clearer => 1,
     default => sub {
@@ -180,6 +262,12 @@ sub executor {
 
 
 
+sub run {
+    my ( $self ) = @_;
+
+    $self->_executor->run( $self );
+}
+
 
 has _renderer_arg => (
     is       => 'rw',
@@ -191,7 +279,6 @@ has _renderer_arg => (
 has _renderer => (
     is      => 'rw',
     isa     => ConsumerOf ['IPC::PrettyPipe::Renderer'],
-    handles => 'IPC::PrettyPipe::Renderer',
     lazy    => 1,
     clearer => 1,
     default => sub {
@@ -204,6 +291,15 @@ has _renderer => (
           : $_[0]->_backend_factory( Render => $backend );
     },
 );
+
+
+
+
+
+
+
+
+
 
 
 
@@ -230,6 +326,13 @@ sub renderer {
 
 
 
+
+sub render {
+
+    my $self = shift;
+
+    $self->_renderer()->render( $self );
+}
 
 
 
@@ -324,42 +427,57 @@ sub add {
         ] );
 
 
-    my $cmd;
-
     $argfmt->copy_from( $attr->{argfmt} ) if defined $attr->{argfmt};
     $argfmt->copy_from( IPC::PrettyPipe::Arg::Format->new_from_hash( $attr ) );
 
 
     if ( $attr->{cmd}->$_isa( 'IPC::PrettyPipe::Cmd' ) ) {
 
-        $cmd = delete $attr->{cmd};
+        my $cmd = delete $attr->{cmd};
 
         croak(
             "cannot specify additional arguments when passing a Cmd object\n" )
           if keys %$attr;
+
+        $self->cmds->push( $cmd );
+
+        return $cmd;
     }
 
     elsif ( $attr->{cmd}->$_isa( 'IPC::PrettyPipe' ) ) {
 
-        $cmd = delete $attr->{cmd};
+        my $cmd = delete $attr->{cmd};
 
         croak(
             "cannot specify additional arguments when passing a Pipe object\n" )
           if keys %$attr;
+
+        if ( $self->merge_pipes && $cmd->streams->empty ) {
+            $self->cmds->push( $_ ) foreach @{ $cmd->cmds->elements };
+            return $self;
+        }
+        else {
+
+            $self->cmds->push( $cmd );
+            return $cmd;
+        }
     }
 
     else {
 
-        $cmd = IPC::PrettyPipe::Cmd->new(
+        my $cmd = IPC::PrettyPipe::Cmd->new(
             cmd    => $attr->{cmd},
             argfmt => $argfmt->clone,
             exists $attr->{args} ? ( args => $attr->{args} ) : (),
         );
+
+        $self->cmds->push( $cmd );
+
+        return $cmd;
+
     }
 
-    $self->cmds->push( $cmd );
-
-    return $cmd;
+    die( "NOTREACHED" );
 }
 
 
@@ -436,17 +554,18 @@ sub ffadd {
 
             my $cmd;
 
-            if ( ( $cmd = $t->[0])->$_isa( 'IPC::PrettyPipe' ) ) {
-                croak( "In an array containing an IPC::PrettyPipe object, it must be the only element\n" )
-                  if @$t > 1;
+            if ( ( $cmd = $t->[0] )->$_isa( 'IPC::PrettyPipe' ) ) {
+                croak(
+                    "In an array containing an IPC::PrettyPipe object, it must be the only element\n"
+                ) if @$t > 1;
             }
 
             else {
 
                 $cmd = IPC::PrettyPipe::Cmd->new(
-                                                    cmd    => shift( @$t ),
-                                                    argfmt => $argfmt->clone
-                                                   );
+                    cmd    => shift( @$t ),
+                    argfmt => $argfmt->clone
+                );
                 $cmd->ffadd( @$t );
             }
 
@@ -709,7 +828,7 @@ sub _backend_factory {
         "requested $type module ($req) either doesn't exist or doesn't consume $role\n"
     ) if !defined $module;
 
-    return $module->new( pipe => $self, @_ );
+    return $module->new( @_ );
 }
 
 
@@ -756,7 +875,7 @@ IPC::PrettyPipe - manage human readable external command execution pipelines
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -843,17 +962,20 @@ details.  These override any specified via the L</argfmt> object.
 
 =head2 streams
 
-  $streams = $pipe->streams;
-
-A L<IPC::PrettyPipe::Queue> object containing the
-L<IPC::PrettyPipe::Stream> objects associated with the pipe. Created
-automatically.
+An arrayref of L<IPC::PrettyPipe::stream> objects.
 
 =head2 cmds
 
 I<Optional>. The value should be an arrayref of commands to load into
 the pipe.  The contents of the array are passed to the L</ffadd>
 method for processing.
+
+=head2 merge_pipes
+
+Typically, adding a pipe to a pipe via L<add> results in the addition
+of a nested pipe.  If C<merge_pipes> is true, its commands will be directly
+added if the added pipe hasn't changed the default streams.  This
+defaults to true.
 
 =head2 executor
 
@@ -875,16 +997,26 @@ L<IPC::PrettyPipe::Render::Template::Tiny>.
 
   # initialize the pipe with commands
   $pipe = IPC::PrettyPipe->new(
-    cmds => [ $cmd1, $cmd2 ], %attrs
+    cmds => [ $cmd1, $cmd2 ],
+    %attributes
   );
 
   # initialize the pipe with a single command
   $pipe = IPC::PrettyPipe->new( $cmd );
 
   # create an empty pipeline, setting defaults
-  $pipe = IPC::PrettyPipe->new( %attrs );
+  $pipe = IPC::PrettyPipe->new( %attributes );
 
-=head2 B<cmds>
+See L</ATTRIBUTES> for a description of the available attributes.
+
+=head2 streams
+
+  $streams = $pipe->streams;
+
+A L<IPC::PrettyPipe::Queue> object containing the
+L<IPC::PrettyPipe::Stream> objects associated with the pipe.
+
+=head2 cmds
 
   $cmds = $pipe->cmds;
 
@@ -897,11 +1029,18 @@ L<IPC::PrettyPipe::Cmd> objects associated with the pipe.
 
 Execute the pipeline.
 
+=head2 renderer
+
+  $renderer = $self->renderer;
+  $new_renderer = $self->renderer( $new_renderer );
+
+Get or set a pipe's renderer.
+
 =head2 render
 
   my $string = $pipe->render
 
-Return a prettified string of the pipeline.
+Return the rendered pipeline;
 
 =head2 add
 
@@ -1054,23 +1193,56 @@ results in
           input stdin \
           output output_file
 
+=head1 OPERATORS
+
+=head2 |=
+
+The C<|=> operator is equivalent to calling the L</add> method on the
+pipe:
+
+  $pipe |= $cmd;
+  $pipe |= $other_pipe;
+
+is the same as
+
+  $pipe->add( $cmd );
+  $pipe->add( $other_pipe );
+
+=head2 |
+
+The C<|> operator is equivalent to creating a new pipe and adding
+the operands of the C<|> operator, e.g.
+
+  $pipe1 | $obj
+
+is the same as
+
+  do {
+    my $tpipe = IPC::PrettyPipe->new;
+    $tpipe->add( $pipe1 );
+    $tpipe->add( $obj );
+    $tpipe
+  };
+
+where C<$obj> may be either an L<IPC::PrettyPipe> or L<IPC::PrettyPipe::Cmd> object.
+
 =for Pod::Coverage BUILDARGS BUILD
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
-email to
-L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-ipc-prettypipe@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe
 
-=head1 SOURCE
+=head2 Source
 
-The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
-and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+Source is available at
+
+  https://gitlab.com/djerius/ipc-prettypipe
+
+and may be cloned from
+
+  https://gitlab.com/djerius/ipc-prettypipe.git
 
 =head1 AUTHOR
 

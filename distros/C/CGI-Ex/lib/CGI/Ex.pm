@@ -6,7 +6,7 @@ CGI::Ex - CGI utility suite - makes powerful application writing fun and easy
 
 =head1 VERSION
 
-version 2.49
+version 2.50
 
 =for markdown [![master](https://travis-ci.org/ljepson/CGI-Ex.svg?branch=master)](https://travis-ci.org/ljepson/CGI-Ex)
 
@@ -23,7 +23,7 @@ version 2.49
 
 use 5.006;
 use strict;
-our $VERSION = '2.49'; # VERSION
+our $VERSION = '2.50'; # VERSION
 
 our ($PREFERRED_CGI_MODULE,
      $PREFERRED_CGI_REQUIRED,
@@ -138,8 +138,9 @@ sub get_form {
     my %hash = ();
     ### this particular use of $cgi->param in list context is safe
     local $CGI::LIST_CONTEXT_WARN = 0;
+    my $mp = $obj->can('multi_param') ? 1 : 0;
     foreach my $key ($obj->param) {
-        my @val = $obj->param($key);
+        my @val = $mp ? $obj->multi_param($key) : $obj->param($key);
         $hash{$key} = ($#val <= 0) ? $val[0] : \@val;
     }
     return $self->{'form'} = \%hash;

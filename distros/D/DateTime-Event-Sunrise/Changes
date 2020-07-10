@@ -1,12 +1,18 @@
 Revision history for Perl extension DateTime::Event::Sunrise.
 
+0.0506  Thu 2020-07-09
+        - add trace statements to better understand how the computation works.
+        - overhaul the precise algorithm.
+        - check the precise algorithm against data from the NOAA solar calculator and from Stellarium (ticket 132336)
+	- a better fix for ticket 110016, to make the algorithm really converge toward the proper value.
+
 0.0505  Mon 2015-12-07
-      - Fix ticket 110016, to prevent endless loops
-        (thank you http://geocoder.opencagedata.com/)
-        Actually a stop-gap measure, until the overhaul of the precise algorithm.
+        - Fix ticket 110016, to prevent endless loops
+          (thank you https://geocoder.opencagedata.com/)
+          Actually a stop-gap measure, until the overhaul of the precise algorithm.
 
 0.0504  Thu 2014-07-24
-        - add the "is_polar_night", "is_polar_day" and "is_day_and_night" boolean methods, 
+        - add the "is_polar_night", "is_polar_day" and "is_day_and_night" boolean methods,
           one half of fixing ticket RT91783
         - add a "silent" build parameter, which removes the warnings about the sun never rising / never setting
           the other half of fixing ticket RT91783
@@ -34,34 +40,34 @@ Revision history for Perl extension DateTime::Event::Sunrise.
 0.05    Fri Jan 9 2004
        - Added sunrise_sunset_span method. This will return rise/set time
          for one day (as a span object). Request # 4785 on rt.cpan.org
-	 Added sunrise_datetime, sunset_datetime method.
+         Added sunrise_datetime, sunset_datetime method.
 
 0.0402  Tues, Nov 25 2003
        - Changed the convert_hour to convert to seconds (as a duration)
          Then add the duration to the day. This will provide seconds for
-	 the DateTime Object. 
+         the DateTime Object.
        - Added many tests (Cities around the world). I have verified the
          entries in the data section of the tests within +- 2 min. using
-	 the information from the Naval Observatory (aa.usno.navy.mil).
+         the information from the Naval Observatory (aa.usno.navy.mil).
 
 0.0401  Thurs Oct 8 2003
        - changed the _sunrise sub to include the timezone information
        - (I don't like the way I did this needs more research)
 
 0.04   Fri May 30 7:40 2003
-       - Fixed a bug in _sunrise 
+       - Fixed a bug in _sunrise
          The problem was I was setting the hours/min for the rise/set times
          I needed to create a duration and add the duration to the DateTime
          Object.
 
 0.03   Tues April 29 14:00 2003
        - initial release to CPAN
-       
+
 0.02   Mon April 21 13:20:00 2003
         - doc tweaks. Flavio S. Glock
         - renamed sun_rise_set to sunrise_sunset
         - gets methods from DateTime::Set
 
 0.01   Mon Mar 21 10:01:50 2003
-	- original version; created by Ron Hill
+        - original version; created by Ron Hill
 

@@ -6,18 +6,17 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Test::Moose: '0'
   Test::More: '0'
   Test::Most: '0'
   constant: '0'
-  perl: '5.012'
+  perl: '5.016'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.012'
+  perl: '5.016'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,15 +29,14 @@ requires:
   Mojo::File: '0'
   Mojo::URL: '0'
   Mojo::UserAgent: '0'
-  Moose: '0'
-  MooseX::Privacy: '0'
-  Throwable: '0'
-  Try::Tiny: '0'
-  perl: '5.012'
+  exact: '0'
+  exact::class: '0'
+  perl: '5.016'
 resources:
   bugtracker: https://github.com/gryphonshafer/Bible-OBML-Gateway/issues
   homepage: https://github.com/gryphonshafer/Bible-OBML-Gateway
   repository: https://github.com/gryphonshafer/Bible-OBML-Gateway.git
-version: '1.03'
-x_generated_by_perl: v5.28.1
+version: '1.05'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -3,18 +3,13 @@ abstract: 'Documentation and tools for using Platypus with the C++ programming l
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  ExtUtils::CBuilder: '0'
   FFI::CheckLib: '0'
-  Module::Build: '0.38'
-  Module::Build::FFI: '0.18'
 configure_requires:
-  ExtUtils::CBuilder: '0'
-  ExtUtils::CppGuess: '0'
+  ExtUtils::MakeMaker: '6.64'
+  FFI::Build::MM: '1.00'
   File::Which: '0'
-  Module::Build: '0.38'
-  Module::Build::FFI: '0.18'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,17 +17,16 @@ meta-spec:
 name: FFI-Platypus-Lang-CPP
 no_index:
   directory:
+    - t
+    - inc
     - examples
-provides:
-  FFI::Platypus::Lang::CPP:
-    file: lib/FFI/Platypus/Lang/CPP.pm
-    version: '0.04'
 requires:
   FFI::ExtractSymbols: '0'
-  FFI::Platypus: '0.18'
+  FFI::Platypus: '1.00'
   perl: '5.008001'
 resources:
-  bugtracker: http://github.com/plicease/FFI-Platypus-Lang-CPP/issues
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/plicease/FFI-Platypus-Lang-CPP
-version: '0.04'
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/PerlFFI/FFI-Platypus-Lang-Rust/issues
+  repository: https://github.com/PerlFFI/FFI-Platypus-Lang-Rust.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

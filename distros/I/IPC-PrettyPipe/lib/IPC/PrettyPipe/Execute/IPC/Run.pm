@@ -12,87 +12,127 @@ use IPC::Run ();
 use Carp     ();
 
 use Moo;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use namespace::clean;
-
-
-
-
-
-
-
-
-has pipe => (
-    is       => 'ro',
-    isa      => InstanceOf ['IPC::PrettyPipe'],
-    required => 1,
-);
 
 # This attribute encapsulates an IPC::Run harness, tieing its creation
 # to an IO::ReStoreFH object to ensure that filehandles are stored &
 # restored properly.  The IPC::Run harness is created on-demand just
-# before it is used.  A separate object could be used, but then
-# IPC::PrettyPipe:Execute::IPC::Run turns into a *really* thin shell
-# around it.  no need for an extra layer.
-
+# before it is used.
 
 has _harness => (
-    is      => 'ro',
-    lazy    => 1,
-    handles => [qw[ run start pump finish ]],
+    is      => 'rwp',
     clearer => 1,
-
-    default => sub {
-
-        my $self = shift;
-
-        # While the harness is instantiated, we store the current fh's
-        $self->_storefh;
-
-        my @harness;
-
-        my @cmds = @{ $self->pipe->cmds->elements };
-
-        while ( @cmds ) {
-
-            my $cmd = shift @cmds;
-
-            if ( $cmd->isa( 'IPC::PrettyPipe::Cmd' ) ) {
-
-                push @harness, '|' if @harness;
-
-                push @harness,
-                  [
-                   $cmd->cmd,
-                   map { $_->render( flatten => 1 ) } @{ $cmd->args->elements },
-                  ];
-
-                push @harness,
-                  map { $_->spec, $_->has_file ? $_->file : () }
-                  @{ $cmd->streams->elements };
-            }
-            elsif ( $cmd->isa( 'IPC::PrettyPipe' ) ) {
-
-                croak( "cannot chain sub-pipes which have streams" )
-                  unless $cmd->streams->empty;
-                unshift @cmds, @{ $cmd->cmds->elements };
-            }
-        }
-
-        return IPC::Run::harness( @harness );
-    },
-
+    predicate => 1,
+    init_arg => undef,
 );
 
 # store the IO::Restore object; created on demand by _harness.default
 # don't create it otherwise!
 has _storefh => (
-    is      => 'ro',
-    lazy    => 1,
-    default => sub { $_[0]->pipe->_storefh },
+    is      => 'rwp',
+    predicate => 1,
+    init_arg => undef,
     clearer => 1
 );
+
+sub _create_harness {
+    my ( $self, $pipe ) = @_;
+
+    # While the harness is instantiated, we store the current fh's
+    $self->_set__storefh( $pipe->_storefh);
+
+    my @harness;
+
+    my @cmds = @{ $pipe->cmds->elements };
+
+    while ( @cmds ) {
+
+        my $cmd = shift @cmds;
+
+        if ( $cmd->isa( 'IPC::PrettyPipe::Cmd' ) ) {
+
+            push @harness, '|' if @harness;
+
+            push @harness,
+              [
+                $cmd->cmd,
+                map { $_->render( flatten => 1 ) } @{ $cmd->args->elements },
+              ];
+
+            push @harness,
+              map { $_->spec, $_->has_file ? $_->file : () }
+              @{ $cmd->streams->elements };
+        }
+        elsif ( $cmd->isa( 'IPC::PrettyPipe' ) ) {
+
+            croak( "cannot chain sub-pipes which have streams" )
+              unless $cmd->streams->empty;
+            unshift @cmds, @{ $cmd->cmds->elements };
+        }
+    }
+
+    $self->_set__harness( IPC::Run::harness(@harness) );
+}
+
+
+
+
+
+
+
+
+
+
+
+sub run {
+    my ( $self, $pipe ) = @_;
+    $self->_create_harness( $pipe);
+    $self->_harness->run;
+}
+
+
+
+
+
+
+
+
+
+
+sub start {
+    my ( $self, $pipe ) = @_;
+    $self->_create_harness( $pipe );
+    $self->_harness->start;
+}
+
+
+
+
+
+
+
+
+sub pump {
+    my $self = shift;
+    Carp::croak( "must call run method to create harness\n" )
+        unless $self->_has_harness;
+    $self->_harness->pump;
+}
+
+
+
+
+
+
+
+sub finish {
+    my $self = shift;
+    Carp::croak( "must call run method to create harness\n" )
+        unless $self->_has_harness;
+    $self->_harness->finish;
+}
 
 # the IO::ReStoreFH object lives only as long as the
 # IPC::Run harness object, and that lives only
@@ -102,24 +142,18 @@ after 'run', 'finish' => sub {
     my $self = shift;
 
     try {
-
         # get rid of harness first to avoid possible closing of file
         # handles while the child is running.  of course the child
         # shouldn't be running at this point, but what the heck
         $self->_clear_harness;
-
     }
 
     catch {
-
         Carp::croak $_;
-
     }
 
     finally {
-
         $self->_clear_storefh;
-
     };
 
 };
@@ -151,7 +185,7 @@ IPC::PrettyPipe::Execute::IPC::Run - execution backend using IPC::Run
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -196,49 +230,44 @@ When using the proxied methods, the caller must ensure that the
 B<L</finish>> method is invoked to ensure that the parent processes'
 file descriptors are properly restored.
 
-=head1 ATTRIBUTES
+=head1 METHODS
 
-=head2 pipe
+=head2 run
 
-The C<IPC::PrettyPipe> object which will provide the commands
-
-=head1 Methods
-
-=over
-
-=item B<run>
+  $self->run( $pipe );
 
 Run the pipeline.
 
-=item B<start>
+=head2 start
 
-Invoke the B<L<IPC::Run>> B<L<start|IPC::Run/start>> method.
+  $self->start( $pipe );
 
-=item B<pump>
+Create a L<IPC::Run> harness and invoke its L<start|IPC::Run/start>
+method.
+
+=head2 pump
 
 Invoke the B<L<IPC::Run>> B<L<pump|IPC::Run/pump>> method.
 
-=item B<finish>
+=head2 finish
 
 Invoke the B<L<IPC::Run>> B<L<finish|IPC::Run/finish>> method.
 
-=back
+=head1 SUPPORT
 
-=head1 BUGS
+=head2 Bugs
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
-email to
-L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
+Please report any bugs or feature requests to bug-ipc-prettypipe@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+=head2 Source
 
-=head1 SOURCE
+Source is available at
 
-The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
-and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+  https://gitlab.com/djerius/ipc-prettypipe
+
+and may be cloned from
+
+  https://gitlab.com/djerius/ipc-prettypipe.git
 
 =head1 SEE ALSO
 

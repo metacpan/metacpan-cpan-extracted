@@ -27,7 +27,9 @@ SYNOPSIS
 
     Perl:
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
+     
+     my $ffi = FFI::Platypus->new( api => 1 );
      $ffi->lang('Fortran');
      $ffi->lib('./libadd.so'); # or add.dll on Windows
      
@@ -67,15 +69,6 @@ CAVEATS
     pointers. Confusingly Platypus uses a star (*) suffix to indicate a
     pointer, and Fortran uses a star to indicate the size of types.
 
-    This module currently uses and is bundled with a fork of ExtUtils::F77
-    called Module::Build::FFI::Fortran::ExtUtilsF77. It is used to probe
-    for a Fortran compiler, which can be problematic if you want to bundle
-    Fortran 90 or Fortran 95 code, as it only knows about Fortran 77. On
-    some platforms (such as those using gfortran) the same command is
-    invoked to build all versions of fortran. On some (usually those with a
-    f77 command) a f90 or f95 command is required to build code for newer
-    versions of Fortran. We attempt to work around these limitations.
-
 METHODS
 
     Generally you will not use this class directly, instead interacting
@@ -110,9 +103,9 @@ EXAMPLES
 
     Perl:
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
-     my $ffi = FFI::Platypus->new;
+     my $ffi = FFI::Platypus->new( api => 1 );
      $ffi->lang('Fortran');
      $ffi->lib('./libsub.so');
      
@@ -140,7 +133,7 @@ EXAMPLES
      recursive function fib(x) result(ret)
        integer, intent(in) :: x
        integer :: ret
-       
+     
        if (x == 1 .or. x == 2) then
          ret = 1
        else
@@ -151,9 +144,9 @@ EXAMPLES
 
     Perl:
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
-     my $ffi = FFI::Platypus->new;
+     my $ffi = FFI::Platypus->new( api => 1 );
      $ffi->lang('Fortran');
      $ffi->lib('./libfib.so');
      
@@ -178,7 +171,7 @@ EXAMPLES
        complex*16 :: c
        real*8 :: r
        real*8 :: i
-       
+     
        r = real(c)
        i = aimag(c)
      
@@ -186,11 +179,12 @@ EXAMPLES
 
     Perl:
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      use Math::Complex;
      
-     my $ffi->lang('Fortran');
-     my $ffi->lib('./libcomplex.so');
+     my $ffi = FFI::Platypus->new( api => 1 );
+     $ffi->lang('Fortran');
+     $ffi->lib('./libcomplex.so');
      
      $ffi->attach(
        complex_decompose => ['real_8[2]','real_8*','real_8*'] => 'void',
@@ -215,13 +209,14 @@ EXAMPLES
      
      print "${r} + ${i}i\n";
 
-    Discussion: More recent versions of libffi support complex types, but
-    they are not supported by FFI::Platypus yet. There is a work around,
-    however, at least for complex types passes as arguments. They are
-    really two just two real*4 or real*8 types joined together like an
-    array or record of two elements. Thus we can pass in a complex type to
-    a Fortran subroutine as an array of two floating points. Take care
-    though, as this technique DOES NOT work for return types.
+    Discussion: More recent versions of libffi and FFI::Platypus support
+    complex types, but not pointers to complex types, so they aren't (yet)
+    much use when calling Fortran, which is pass by reference. There is a
+    work around, however, at least for complex types passes as arguments.
+    They are really two just two real*4 or real*8 types joined together
+    like an array or record of two elements. Thus we can pass in a complex
+    type to a Fortran subroutine as an array of two floating points. Take
+    care though, as this technique DOES NOT work for return types.
 
     From my research, some Fortran compilers pass in the return address of
     the return value as the first argument for functions that return a
@@ -247,9 +242,9 @@ EXAMPLES
 
     Perl:
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
-     my $ffi = FFI::Platypus->new;
+     my $ffi = FFI::Platypus->new( api => 1 );
      $ffi->lang('Fortran');
      $ffi->lib('./libfixed.so');
      
@@ -284,7 +279,7 @@ EXAMPLES
        implicit none
        integer, dimension(2,5) :: a
        integer :: i,n
-       
+     
        do i=1,5
          print *, a(1,i), a(2,i)
        end do
@@ -292,9 +287,9 @@ EXAMPLES
 
     Perl:
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
-     my $ffi = FFI::Platypus->new;
+     my $ffi = FFI::Platypus->new( api => 1 );
      $ffi->lang('Fortran');
      $ffi->lib('./libfixed.so');
      
@@ -334,9 +329,9 @@ EXAMPLES
        integer, dimension(size) :: a
        integer :: i
        integer :: ret
-       
+     
        ret = 0
-       
+     
        do i=1,size
          ret = ret + a(i)
        end do
@@ -344,23 +339,23 @@ EXAMPLES
 
     Perl:
 
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      
-     my $ffi = FFI::Platypus->new;
+     my $ffi = FFI::Platypus->new( api => 1 );
      $ffi->lang("Fortran");
      $ffi->lib("./libvar_array.so");
      
-     sub sum_array
-     {
-       my $size = @_;
-       $ffi->function(
-         sum_array => ['integer*',"integer[$size]"] => 'integer'
-       )->call(\$size, \@_);
-     }
+     $ffi->attach( sum_array => ['integer*','integer[]'] => 'integer',
+       sub {
+         my $f = shift;
+         my $size = scalar @_;
+         $f->(\$size, \@_);
+       },
+     );
      
      my @a = (1..10);
      my @b = (25..30);
-    
+     
      print sum_array(1..10), "\n";
      print sum_array(25..30), "\n";
 
@@ -369,11 +364,12 @@ EXAMPLES
      55
      165
 
-    Discussion: Fortran allows variable-length arrays. Unfortunately
-    Platypus does not yet support this type. In this example, we work
-    around this by creating an FFI function object with the correct type of
-    fixed length array and call that. The downside to this is that it is
-    quite slow, but it does allow you to do it at least.
+    Discussion: Fortran allows variable-length arrays. To indicate a
+    variable length array use the [] notation without a length. Note that
+    this works for argument types, where Perl knows the length of an array,
+    but it will not work for return types, where Perl has no way of
+    determining the size of the returned array (you can probably fake it
+    with an opaque type and a wrapper function though).
 
 SUPPORT
 
@@ -418,7 +414,7 @@ SEE ALSO
 
       The Core Platypus documentation.
 
-    Module::Build::FFI::Fortran
+    FFI::Build + FFI::Build::File::Fortran
 
       Bundle Fortran with your FFI / Perl extension.
 
@@ -432,44 +428,4 @@ COPYRIGHT AND LICENSE
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
-
-    This software comes bundled with a forked version of ExtUtils::F77
-    called Module::Build::FFI::Fortran::ExtUtilsF77. ExtUtils::F77 comes
-    with this statement regarding its license:
-
-      Copyright (c) 2001 by Karl Glazebrook. All rights reserved.  This distribution 
-      is free software; you can redistribute it and/or modify it under the same 
-      terms as Perl itself.
-    
-      THIS SOFTWARE IS PROVIDED BY THE CONTRIBUTORS ``AS IS'' AND ANY EXPRESS
-      OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-      WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-      ARE DISCLAIMED.  IN NO EVENT SHALL THE CONTRIBUTORS BE LIABLE FOR ANY
-      DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-      DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-      OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-      HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
-      STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-      IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-      POSSIBILITY OF SUCH DAMAGE.
-    
-      BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-      FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
-      OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-      PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-      EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-      WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-      THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS
-      WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
-      ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
-    
-      IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-      WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-      REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR
-      DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL
-      DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM
-      (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
-      INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF
-      THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER
-      OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 

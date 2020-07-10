@@ -23,9 +23,7 @@ my %options = (
     parser      => 'struct',
 );
 
-ok my $importer = Catmandu::Importer::SRU->new(%options);
-my $rec      = $importer->next;
-my $expected = [
+my $rec1 = [
     'oai_dc:dc',
     {
         'xmlns:dc'     => 'http://purl.org/dc/elements/1.1/',
@@ -42,10 +40,7 @@ my $expected = [
     ]
 ];
 
-is_deeply $rec, $expected, 'first';
-
-$rec      = $importer->next;
-$expected = [
+my $rec2 = [
     'oai_dc:dc',
     {
         'xmlns:dc'     => 'http://purl.org/dc/elements/1.1/',
@@ -54,7 +49,14 @@ $expected = [
     [['dc:title', {}, ['Another Title']]]
 ];
 
-is_deeply $rec, $expected, 'second';
+my $importer = Catmandu::Importer::SRU->new(%options);
+my $rec      = $importer->next;
+
+is_deeply $rec, $rec1, 'first';
+
+$rec = $importer->next;
+
+is_deeply $rec, $rec2, 'second';
 
 my $reader = XML::Struct::Reader->new(ns => 'strip', attributes => 0);
 $options{parser} = sub {
@@ -63,8 +65,8 @@ $options{parser} = sub {
 };
 $importer = Catmandu::Importer::SRU->new(%options);
 $importer->next;
-$rec      = $importer->next;
-$expected = [dc => [['title' => ['Another Title']]]];
+$rec = $importer->next;
+my $expected = [dc => [['title' => ['Another Title']]]];
 
 is_deeply $rec, $expected, 'reader options';
 

@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Progress/Any/Examples.pm','script/progress-any-eg-progressbar-01-simple','script/progress-any-eg-progressbar-02-multiple-tasks-one-progressbar','script/progress-any-eg-progressbar-03-progressbar-on-subtask','script/progress-any-eg-progressbar-04-progressbar-and-logger','script/progress-any-eg-progressbar-05-multiple-progressbars'];
+my $filenames = ['lib/Progress/Any/Examples.pm','script/progress-any-eg-progressbar-01-simple','script/progress-any-eg-progressbar-02-multiple-tasks-one-progressbar','script/progress-any-eg-progressbar-03-progressbar-on-subtask','script/progress-any-eg-progressbar-04-progressbar-and-logger','script/progress-any-eg-progressbar-05-multiple-progressbars','script/progress-any-eg-progressbar-06-reusing-task'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

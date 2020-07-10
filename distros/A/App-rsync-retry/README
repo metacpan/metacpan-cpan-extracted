@@ -2,8 +2,8 @@ NAME
     App::rsync::retry - Rsync wrapper to retry on transfer errrors
 
 VERSION
-    This document describes version 0.006 of App::rsync::retry (from Perl
-    distribution App-rsync-retry), released on 2020-06-12.
+    This document describes version 0.007 of App::rsync::retry (from Perl
+    distribution App-rsync-retry), released on 2020-07-10.
 
 SYNOPSIS
     See included script rsync-retry.

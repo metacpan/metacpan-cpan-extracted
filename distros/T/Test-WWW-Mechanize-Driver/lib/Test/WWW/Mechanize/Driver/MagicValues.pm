@@ -19,7 +19,7 @@ whose name was stored in the reference.
 
 package FileContents;
 use strict; use warnings;
-our $VERSION = 1.0;
+our $VERSION = '1.0';
 
 use overload '""' => sub {
   my $x = shift;
@@ -53,7 +53,7 @@ The current date as a DateTime object.
 
 package ApplyTemplate;
 use strict; use warnings;
-our $VERSION = 1.0;
+our $VERSION = '1.0';
 
 use overload '""' => sub {
   my $x = shift;
@@ -83,7 +83,7 @@ whose name was stored in the reference.
 
 package Stacked;
 use strict; use warnings;
-our $VERSION = 1.0;
+our $VERSION = '1.0';
 
 use overload '""' => sub {
   my $x = shift;

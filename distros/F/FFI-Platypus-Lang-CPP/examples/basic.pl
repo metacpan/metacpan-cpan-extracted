@@ -3,10 +3,10 @@ use warnings;
 
 package Foo;
 
-use FFI::Platypus;
+use FFI::Platypus 1.00;
 use FFI::Platypus::Memory qw( malloc free );
 
-my $ffi = FFI::Platypus->new;
+my $ffi = FFI::Platypus->new( api => 1 );
 $ffi->lang('CPP');
 $ffi->lib('./basic.so');
 
@@ -19,7 +19,7 @@ $ffi->custom_type( Foo => {
 $ffi->attach( [ 'Foo::Foo()'     => '_new'     ] => ['Foo']  => 'void' );
 $ffi->attach( [ 'Foo::~Foo()'    => '_DESTROY' ] => ['Foo']  => 'void' );
 $ffi->attach( [ 'Foo::get_bar()' => 'get_bar'  ] => ['Foo']  => 'int'  );
-$ffi->attach( [ 'Foo::set_bar(int)' 
+$ffi->attach( [ 'Foo::set_bar(int)'
                                  => 'set_bar'  ] => ['Foo','int']
                                                              => 'void' );
 

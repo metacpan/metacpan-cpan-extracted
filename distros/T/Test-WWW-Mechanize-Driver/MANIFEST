@@ -1,23 +1,12 @@
+Build.PL
 Changes
-inc/Module/Install.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Test/WWW/Mechanize/Driver.pm
 lib/Test/WWW/Mechanize/Driver/MagicValues.pm
 lib/Test/WWW/Mechanize/Driver/Manual.pod
 lib/Test/WWW/Mechanize/Driver/Util.pm
 lib/Test/WWW/Mechanize/Driver/YAMLLoader.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
-META.yml
-MYMETA.json
-MYMETA.yml
 README
 t/00-my_mech.t
 t/05-basic.t
@@ -49,3 +38,5 @@ t/webpages/home_post_stuff.yml
 t/webpages/map.yml
 t/webpages/tutors.yml
 t/webpages/tutors2.yml
+META.yml
+META.json

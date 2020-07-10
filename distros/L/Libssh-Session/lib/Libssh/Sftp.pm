@@ -7,7 +7,7 @@ use POSIX;
 use Libssh::Session;
 use Exporter qw(import);
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 use constant SSH_OK => 0;
 use constant SSH_ERROR => -1;
@@ -68,7 +68,7 @@ sub error {
 
 sub init {
     my ($self, %options) = @_;
-    
+
     if (!defined($options{session}) || 
         !$options{session}->isa('Libssh::Session')) {
         $self->set_err(msg => 'error allocating SFTP session: need to set session option');
@@ -83,14 +83,14 @@ sub init {
         $self->set_err(msg => 'error allocating SFTP session: need to have a session authenticated');
         return SSH_ERROR;
     } 
-    
+
     $self->{ssh_session} = $options{session};
     $self->{sftp_session} = sftp_new($session);
     if (!defined($self->{sftp_session})) {
         $self->set_err(msg => 'error allocating SFTP session: ' . $options{session}->get_error());
-        return undef;
+        return SSH_ERROR;
     }
-        
+
     my $ret = sftp_init($self->{sftp_session});
     if ($ret != SSH_OK) {
         my $msg = 'error initializing SFTP session: ' . sftp_get_error($self->{sftp_session});
@@ -99,7 +99,7 @@ sub init {
         $self->set_err(msg => $msg);
         return $ret;
     }
-        
+
     return SSH_OK;
 }
 

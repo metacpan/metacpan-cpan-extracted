@@ -14,7 +14,7 @@ sub myconfigure() {
     if (prompt("Use default options (y/n)?", "y") =~ /^y/i) {
         my $cfg = &build_auto();
 
-        if ($^O =~ /^(free|net)bsd$/i) {
+        if ($^O =~ /^(free|net)bsd$/i || $^O eq "dragonfly") {
             $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.bsd";
         }
         elsif ($^O eq "openbsd") {
@@ -30,6 +30,11 @@ sub myconfigure() {
             if ($Config{'cf_by'} eq "strawberry-perl") {
                 $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= " CC=$Config{'ccname'}";
             }
+        }
+        elsif ($^O eq "cygwin") {
+            $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.windows-gmake";
+            $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= ' RM="rm -f"';
+            $cfg->{'LD'} = "cc"; # either g++, but need install gcc-g++
         }
 
         return $cfg;

@@ -56,6 +56,8 @@ BEGIN {
 use common qw(Schema);
 =cut
 
+use DBIx::Class::Sims;
+
 my $source = bless {
   runner => { predictable_values => 0 },
 }, 'DBIx::Class::Sims::Source';

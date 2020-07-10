@@ -168,9 +168,6 @@ subtest 'evaluate a uri' => sub {
   );
 };
 
-# TODO: test ->evaluate(..., $non_canonical_uri) -- resource index should contain both the
-# non-canonical id and the $id from within the schema resource.
-
 subtest 'add a uri resource' => sub {
   my $js = JSON::Schema::Draft201909->new;
   cmp_deeply(
@@ -495,6 +492,93 @@ subtest '$ref to non-canonical uri' => sub {
       ],
     },
     'canonical_uri starts out containing a fragment and can be appended to during traversal',
+  );
+};
+
+subtest 'register a document against multiple uris; do not allow duplicate uris' => sub {
+  my $js = JSON::Schema::Draft201909->new;
+  my $document = JSON::Schema::Draft201909::Document->new(
+    schema => {
+      '$id' => 'https://foo.com',
+      maximum => 1,
+    });
+  $js->add_schema($document);
+
+  cmp_deeply(
+    { $js->_resource_index },
+    {
+      'https://foo.com' => {
+        path => '',
+        canonical_uri => str('https://foo.com'),
+        document => shallow($document),
+      },
+    },
+    'resource index from the document is copied to the main object',
+  );
+
+  $js->add_schema('https://uri2.com', $document);
+
+  cmp_deeply(
+    { $js->_resource_index },
+    my $main_resource_index = {
+      'https://foo.com' => {
+        path => '', canonical_uri => str('https://foo.com'), document => shallow($document) },
+      'https://uri2.com' => {
+        path => '', canonical_uri => str('https://foo.com'), document => shallow($document) },
+    },
+    'add a secondary uri for the same document',
+  );
+
+  cmp_deeply(
+    { $document->resource_index },
+    my $doc_resource_index = {
+      'https://foo.com' => { path => '', canonical_uri => str('https://foo.com') },
+      'https://uri2.com' => { path => '', canonical_uri => str('https://foo.com') },
+    },
+    'secondary uri added to the document also',
+  );
+
+  like(
+    exception { $js->add_schema('https://uri2.com', { x => 1 }) },
+    qr!\Quri "https://uri2.com" conflicts with an existing schema resource\E!,
+    'cannot call add_schema with the same URI as for another schema',
+  );
+
+  like(
+    exception { $js->add_schema('https://uri3.com', { '$id' => 'https://foo.com', x => 1 }) },
+    qr!\Quri "https://foo.com" conflicts with an existing schema resource\E!,
+    'cannot reuse the same $id in another document',
+  );
+
+  cmp_deeply(
+    { $js->_resource_index },
+    $main_resource_index,
+    'resource index remains unchanged after erroneous add_schema calls',
+  );
+
+  is(
+    $js->add_schema('https://uri4.com', +{ %{ $document->schema } }),
+    $document,
+    'adding the same schema *content* again does not fail, and returns the original document object',
+  );
+
+  cmp_deeply(
+    { $document->resource_index },
+    {
+      'https://uri4.com' => { path => '', canonical_uri => str('https://foo.com') },
+      %$doc_resource_index,
+    },
+    'original document had the new uri added to it',
+  );
+
+  cmp_deeply(
+    { $js->_resource_index },
+    {
+      'https://uri4.com' => {
+        path => '', canonical_uri => str('https://foo.com'), document => shallow($document) },
+      %$main_resource_index,
+    },
+    'new uri was added against the original document (no new document created)',
   );
 };
 

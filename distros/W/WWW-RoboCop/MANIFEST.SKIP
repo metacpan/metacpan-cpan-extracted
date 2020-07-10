@@ -1,0 +1,7 @@
+.build
+cpanfile.snapshot
+.git
+.gitignore
+local
+MANIFEST.SKIP
+.tidyallrc

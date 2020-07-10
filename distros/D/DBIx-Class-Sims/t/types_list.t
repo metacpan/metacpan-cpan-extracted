@@ -2,6 +2,7 @@
 use strictures 2;
 
 use Test2::V0 qw( done_testing bag item is );
+use DBIx::Class::Sims;
 
 is(
   [ DBIx::Class::Sims->sim_types ],

@@ -1,7 +1,7 @@
 package Mail::DKIM::Verifier;
 use strict;
 use warnings;
-our $VERSION = '1.20200513.1'; # VERSION
+our $VERSION = '1.20200708'; # VERSION
 # ABSTRACT: verifies a DKIM-signed message
 
 # Copyright 2005-2009 Messiah College. All rights reserved.
@@ -62,8 +62,8 @@ sub handle_header {
             local $SIG{__DIE__};
             my $signature = Mail::DKIM::Signature->parse($line);
             $self->add_signature($signature);
-        };
-        if ($@) {
+	    1
+        } || do {
 
             # the only reason an error should be thrown is if the
             # signature really is unparse-able
@@ -72,7 +72,7 @@ sub handle_header {
 
             chomp( my $E = $@ );
             $self->{signature_reject_reason} = $E;
-        }
+        };
     }
 
     if ( lc($field_name) eq 'domainkey-signature' ) {
@@ -80,8 +80,8 @@ sub handle_header {
             local $SIG{__DIE__};
             my $signature = Mail::DKIM::DkSignature->parse($line);
             $self->add_signature($signature);
-        };
-        if ($@) {
+	    1
+        } || do {
 
             # the only reason an error should be thrown is if the
             # signature really is unparse-able
@@ -90,7 +90,7 @@ sub handle_header {
 
             chomp( my $E = $@ );
             $self->{signature_reject_reason} = $E;
-        }
+        };
     }
 }
 
@@ -255,12 +255,12 @@ sub check_public_key {
             $empty_g_means_wildcard );
 
         die $@ if $@;
-    };
-    if ($@) {
+	1
+    } || do {
         my $E = $@;
         chomp $E;
         $self->{signature_reject_reason} = "public key: $E";
-    }
+    };
     return $result;
 }
 
@@ -336,13 +336,13 @@ sub _check_and_verify_signature {
 
     # get public key
     my $pkey;
-    eval { $pkey = $signature->get_public_key; };
-    if ($@) {
+    eval { $pkey = $signature->get_public_key; 1 }
+    || do {
         my $E = $@;
         chomp $E;
         $self->{signature_reject_reason} = "public key: $E";
         return ( 'invalid', $self->{signature_reject_reason} );
-    }
+    };
 
     unless ( $self->check_public_key( $signature, $pkey ) ) {
         return ( 'invalid', $self->{signature_reject_reason} );
@@ -362,8 +362,8 @@ sub _check_and_verify_signature {
     eval {
         $result = $algorithm->verify() ? 'pass' : 'fail';
         $details = $algorithm->{verification_details} || $@;
-    };
-    if ($@) {
+	1
+    } || do {
 
         # see also add_signature
         chomp( my $E = $@ );
@@ -375,7 +375,7 @@ sub _check_and_verify_signature {
         }
         $result  = 'fail';
         $details = $E;
-    }
+    };
     return ( $result, $details );
 }
 
@@ -493,7 +493,7 @@ Mail::DKIM::Verifier - verifies a DKIM-signed message
 
 =head1 VERSION
 
-version 1.20200513.1
+version 1.20200708
 
 =head1 SYNOPSIS
 

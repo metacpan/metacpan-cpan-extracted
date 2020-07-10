@@ -1,7 +1,7 @@
 package Mail::DKIM::PublicKey;
 use strict;
 use warnings;
-our $VERSION = '1.20200513.1'; # VERSION
+our $VERSION = '1.20200708'; # VERSION
 # ABSTRACT: Represents a DKIM key
 
 # Copyright 2005 Messiah College. All rights reserved.
@@ -151,8 +151,8 @@ sub check {
     eval {
         local $SIG{__DIE__};
         $self->cork;
-    };
-    if ($@) {
+	1
+    } || do {
 
         # see also finish_body
         chomp( my $E = $@ );
@@ -163,7 +163,7 @@ sub check {
             $E = "OpenSSL $1";
         }
         die "$E\n";
-    }
+    };
 
     # check service type
     if ( my $s = $self->get_tag('s') ) {
@@ -315,11 +315,11 @@ sub verify {
     eval {
         local $SIG{__DIE__};
         $rtrn = $self->cork->verify( $prms{'Text'}, $prms{'Signature'} );
+	1
+    } || do {
+	$self->errorstr($@);
+	return;
     };
-
-    $@
-      and $self->errorstr($@),
-      return;
 
     return $rtrn;
 }
@@ -464,7 +464,7 @@ Mail::DKIM::PublicKey - Represents a DKIM key
 
 =head1 VERSION
 
-version 1.20200513.1
+version 1.20200708
 
 =head1 CONSTRUCTOR
 

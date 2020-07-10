@@ -1,14 +1,14 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Test script for DateTime::Event::Sunrise
-#     Copyright (C) 2003, 2004, 2013 Ron Hill and Jean Forget
+#     Copyright © 2003, 2004, 2013, 2020 Ron Hill and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     L<https://dev.perl.org/licenses/artistic.html>
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
 #
@@ -24,7 +24,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#     Inc., <https://www.fsf.org/>.
 #
 use strict;
 use POSIX qw(floor ceil);
@@ -52,12 +52,12 @@ my $dt2 = DateTime->new( year   => 2000,
 my $sunrise = DateTime::Event::Sunrise ->sunrise(
                      longitude  =>'-118',
                      latitude   => '33',
-                     upper_limb => 1,                     
+                     upper_limb => 1,
 );
 my $sunset = DateTime::Event::Sunrise ->sunset(
                      longitude  =>'-118',
                      latitude   => '33',
-                     upper_limb => 1,                     
+                     upper_limb => 1,
                      );
 
 my $tmp_rise = $sunrise->current($dt);
@@ -66,29 +66,29 @@ my $tmp_set  = $sunset->current($dt);
 is ($tmp_rise->datetime, '2000-06-19T05:42:07', 'current sunrise');
 is ($tmp_set->datetime,  '2000-06-19T20:04:49', 'current sunset');
 
-is ( $sunrise->current( $tmp_rise )->set_time_zone( 'America/Los_Angeles' )->datetime, 
+is ( $sunrise->current( $tmp_rise )->set_time_zone( 'America/Los_Angeles' )->datetime,
      '2000-06-19T05:42:07', 'current sunrise unchanged');
-is ( $sunset->current( $tmp_set )->set_time_zone( 'America/Los_Angeles' )->datetime, 
+is ( $sunset->current( $tmp_set )->set_time_zone( 'America/Los_Angeles' )->datetime,
      '2000-06-19T20:04:49', 'current sunset unchanged');
 
-is ( $sunrise->next( $tmp_rise )->set_time_zone( 'America/Los_Angeles' )->datetime, 
+is ( $sunrise->next( $tmp_rise )->set_time_zone( 'America/Los_Angeles' )->datetime,
      '2000-06-20T05:42:19', 'next sunrise');
-is ( $sunset->next( $tmp_set )->set_time_zone( 'America/Los_Angeles' )->datetime, 
+is ( $sunset->next( $tmp_set )->set_time_zone( 'America/Los_Angeles' )->datetime,
      '2000-06-20T20:05:03', 'next sunset');
 
-is ( $sunrise->previous( $tmp_rise )->set_time_zone( 'America/Los_Angeles' )->datetime, 
+is ( $sunrise->previous( $tmp_rise )->set_time_zone( 'America/Los_Angeles' )->datetime,
      '2000-06-18T05:41:56', 'previous sunrise');
-is ( $sunset->previous( $tmp_set )->set_time_zone( 'America/Los_Angeles' )->datetime, 
+is ( $sunset->previous( $tmp_set )->set_time_zone( 'America/Los_Angeles' )->datetime,
      '2000-06-18T20:04:33', 'previous sunset');
 
-is ( $sunrise->contains( $tmp_rise ), 
+is ( $sunrise->contains( $tmp_rise ),
      1, 'is sunrise');
-is ( $sunset->contains( $tmp_set ), 
+is ( $sunset->contains( $tmp_set ),
      1, 'is sunset');
 
-is ( $sunrise->contains( $dt ), 
+is ( $sunrise->contains( $dt ),
      0, 'is not sunrise');
-is ( $sunset->contains( $dt ), 
+is ( $sunset->contains( $dt ),
      0, 'is not sunset');
 
 # I need to check this test, Flavio has changed this as of ver 0.14 od spanset
@@ -107,7 +107,7 @@ is ( $sunset->contains( $dt ),
 my $sun = DateTime::Event::Sunrise ->new(
                      longitude  =>'-118',
                      latitude   => '33',
-                     upper_limb => 1,                     
+                     upper_limb => 1,
 );
 
 my $tmp_set1 = $sun->sunrise_sunset_span($dt);
@@ -149,12 +149,12 @@ for  (@data) {
     my $sunrise = DateTime::Event::Sunrise->sunrise(
       longitude => $long,
       latitude  => $lat,
-      upper_limb => 0,                     
+      upper_limb => 0,
     );
     my $sunset = DateTime::Event::Sunrise->sunset(
       longitude => $long,
       latitude  => $lat,
-      upper_limb => 0,                     
+      upper_limb => 0,
     );
 
     my $cloned_date = $dt3->clone();

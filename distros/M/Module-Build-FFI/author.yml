@@ -9,6 +9,7 @@ pod_spelling_system:
     - libtest
     - fibonacci
     - rustc
+    - Fortran
 
 pod_coverage:
   skip: 0

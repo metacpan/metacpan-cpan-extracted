@@ -1,3 +1,8 @@
+0.144   2020-04-18  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: complete-firefox-profile-name.
+
+
 0.143   2020-02-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: complete-tz-offset.

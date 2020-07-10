@@ -28,6 +28,7 @@ WriteMakefile(
     	'POSIX'         => '1.53_01',
     	'Regexp::Common'=> '2017060201',
     	'Scalar::Util'	=> '1.50',
+    	'Sub::Util'     => '1.54',
     	'Tie::Hash'     => '1.05',
     	'Want'			=> '0.29',
     },

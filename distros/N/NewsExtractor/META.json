@@ -45,7 +45,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.27.0"
+         "version" : "v0.28.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -94,6 +94,9 @@
       },
       "NewsExtractor::SiteSpecificExtractor::hk_crntt_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/hk_crntt_com.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::hk_on_cc" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/hk_on_cc.pm"
       },
       "NewsExtractor::SiteSpecificExtractor::money_udn_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/money_udn_com.pm"
@@ -173,6 +176,9 @@
       "NewsExtractor::SiteSpecificExtractor::www_upmedia_mg" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_upmedia_mg.pm"
       },
+      "NewsExtractor::SiteSpecificExtractor::www_xinhuanet_com" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_xinhuanet_com.pm"
+      },
       "NewsExtractor::TXExtractor" : {
          "file" : "lib/NewsExtractor/TXExtractor.pm"
       },
@@ -184,7 +190,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.27.0",
+   "version" : "v0.28.0",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

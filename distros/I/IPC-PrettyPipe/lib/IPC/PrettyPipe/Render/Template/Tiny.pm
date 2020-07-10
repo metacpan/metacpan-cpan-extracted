@@ -13,7 +13,7 @@ use Type::Params qw[ validate ];
 use Moo;
 
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 BEGIN {
     if ( $^O =~ /Win32/i ) {
@@ -32,28 +32,6 @@ use namespace::clean;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-has pipe => (
-    is       => 'rw',
-    isa      => InstanceOf ['IPC::PrettyPipe'],
-    required => 1,
-);
 
 
 
@@ -95,6 +73,26 @@ has colors => (
             },
         };
     },
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+has colorize => (
+    is => 'rw',
+    isa => Bool,
+    default => 1,
 );
 
 
@@ -211,13 +209,15 @@ sub render {
 
     my $self = shift;
 
-    my ( $args ) = validate(
+    my ( $pipe, $args ) = validate(
         \@_,
+        InstanceOf[ 'IPC::PrettyPipe' ],
         slurpy Dict [
             colorize => Optional [Bool],
         ] );
 
-    $args->{colorize} //= 1;    ## no critic (ProhibitAccessOfPrivateData)
+    $args->{colorize} = $self->colorize    ## no critic (ProhibitAccessOfPrivateData)
+      unless exists $args->{colorize};
 
     my %color;
     _colorize( $self->colors, \%color );
@@ -230,24 +230,25 @@ sub render {
     # generate non-colorized version so can get length of records to
     # pad out any continuation lines
     my @output;
-    $self->_render_pipe( $self->pipe, { indent => '' },  \@output);
+    $self->_render_pipe( $pipe, { indent => '' }, \@output );
 
     my @records = map { expand( $_ ) } map { split( /\n/, $_ ) } @output;
     my @lengths = map { length } @records;
-    my $max = List::Util::max( @lengths ) + 4;
+    my $max     = List::Util::max( @lengths ) + 4;
 
     if ( $args->{colorize} ) {
         @output = ();
-        $self->_render_pipe( $self->pipe, { indent => '', color => \%color },  \@output);
+        $self->_render_pipe( $pipe, { indent => '', color => \%color },
+            \@output );
         @records = map { expand( $_ ) } map { split( /\n/, $_ ) } @output;
     }
 
     foreach ( @records ) {
-        my $pad =  ' ' x ($max - shift @lengths);
+        my $pad = ' ' x ( $max - shift @lengths );
         s/\\$/$pad \\/;
     }
 
-    return join ("\n", @records ) . "\n";
+    return join( "\n", @records ) . "\n";
 }
 
 sub _render_pipe {
@@ -309,7 +310,7 @@ IPC::PrettyPipe::Render::Template::Tiny - rendering backend using B<Template::Ti
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -330,20 +331,14 @@ L<IPC::PrettyPipe> using the L<Template::Tiny> module.
 
 =head1 ATTRIBUTES
 
-=head2 pipe
-
-The L<IPC::PrettyPipe> object to render.
-
-=head2 pipe
-
-  $pipe = $renderer->pipe;
-  $renderer->pipe( $pipe );
-
-Retrieve or set the L<IPC::PrettyPipe> object to render.
-
 =head2 colors
 
 A color specification; see L</Rendered Colors>.
+
+=head2 colorize
+
+A Boolean value indicating whether output should be colorized.  This may be overridden
+in a call to L</render>.  Defaults to true.
 
 =head2 cmd_template
 
@@ -370,6 +365,13 @@ Construct a new renderer.  Typically this is done automatically by L<IPC::Pretty
 
 Retrieve or set the colors to be output; see L</Rendered Colors>.
 
+=head2 colorize
+
+  $bool = $renderer->colorize;
+  $renderer->colorize( $bool );
+
+Set or get the C<colorize> attribute.
+
 =head2 cmd_template
 
   $cmd_template = $renderer->cmd_template;
@@ -388,7 +390,7 @@ for pipes.  See L</Rendering Templates>.
 
 =head2 render
 
-  $renderer->render( %options );
+  $renderer->render( $pipe, %options );
 
 The following options are available:
 
@@ -498,21 +500,21 @@ stored as a hashref with the following default contents:
       },
   },
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
-email to
-L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-ipc-prettypipe@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe
 
-=head1 SOURCE
+=head2 Source
 
-The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
-and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+Source is available at
+
+  https://gitlab.com/djerius/ipc-prettypipe
+
+and may be cloned from
+
+  https://gitlab.com/djerius/ipc-prettypipe.git
 
 =head1 SEE ALSO
 

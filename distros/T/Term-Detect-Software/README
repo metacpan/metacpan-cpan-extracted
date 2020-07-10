@@ -3,8 +3,8 @@ NAME
     capabilities
 
 VERSION
-    This document describes version 0.222 of Term::Detect::Software (from
-    Perl distribution Term-Detect-Software), released on 2019-08-21.
+    This document describes version 0.223 of Term::Detect::Software (from
+    Perl distribution Term-Detect-Software), released on 2020-07-10.
 
 SYNOPSIS
      use Term::Detect::Software qw(detect_terminal detect_terminal_cached);
@@ -84,19 +84,20 @@ FUNCTIONS
 
 FAQ
   What is this module for? Why not Term::Terminfo or Term::Encoding?
-    This module is first written for Text::ANSITable so that the module can
+    This module was first written for Text::ANSITable so that the latter can
     provide good defaults when displaying formatted and colored tables,
     especially on popular terminal emulation software like Konsole (KDE's
     default terminal), gnome-terminal (GNOME's default), Terminal (XFCE's
     default), xterm, rxvt.
 
-    The module works by trying to figure out the terminal emulation software
-    because the information provided by Term::Terminfo and Term::Encoding
-    are sometimes not specific enough. For example, Term::Encoding can
-    return utf-8 when running under rxvt, but since the software currently
-    lacks Unicode support we shouldn't display Unicode characters. Another
-    example is color depth: Term::Terminfo currently doesn't recognize
-    Konsole's 24bit color support and only gives "max_colors" 256.
+    This module works by trying to figure out the terminal emulation
+    software because the information provided by Term::Terminfo and
+    Term::Encoding are sometimes not specific enough. For example,
+    Term::Encoding can return utf-8 when running under rxvt, but since the
+    software currently lacks Unicode support we shouldn't display Unicode
+    characters. Another example is color depth: Term::Terminfo currently
+    doesn't recognize Konsole's 24bit color support and only gives
+    "max_colors" 256.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -122,7 +123,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019, 2015, 2014, 2013 by
+    This software is copyright (c) 2020, 2019, 2015, 2014, 2013 by
     perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under

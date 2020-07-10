@@ -1,0 +1,19 @@
+Some experiments with hooks.
+
+Hello world!
+
+In this example, let us add a regex hook which may be useful in some
+HTML documents.  The anonymous function takes $self as the first
+argument, the second argument is the whole match, and other arguments
+are parenthesized parts of the regular expression:
+
+
+We will try this hook here:
+<a name="overview"><h3>Document Overview</h3></a>
+The next line.
+
+Let us now experiment with removing and adding hooks.
+
+
+<? echo "This should not work." !>
+But, this should.

@@ -10,7 +10,7 @@ use File::Copy qw( copy );
 use base qw( Module::Build::FFI );
 
 # ABSTRACT: (Deprecated) Build Perl extensions in Rust with FFI
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.54'; # VERSION
 
 
 __PACKAGE__->add_property( ffi_rust_extra_compiler_flags =>
@@ -172,7 +172,7 @@ Module::Build::FFI::Rust - (Deprecated) Build Perl extensions in Rust with FFI
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 DESCRIPTION
 

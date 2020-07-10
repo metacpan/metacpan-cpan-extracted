@@ -9,6 +9,10 @@ use Test::More 0.98;
 use Test::Exception;
 use Time::HiRes qw(sleep);
 
+# XXX test finish()
+# XXX test reset()
+# XXX test update() argument: force_update
+
 subtest "get_indicator, {total_,pos}, {total_,}target, percent_complete" => sub {
     %Progress::Any::indicators = ();
 

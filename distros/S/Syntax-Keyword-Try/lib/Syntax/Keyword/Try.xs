@@ -446,12 +446,27 @@ static int try_keyword(pTHX_ OP **op)
     lex_read_space(0);
 
     if(lex_consume("my")) {
+      Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED),
+        "'catch my VAR' syntax is deprecated and will be removed a later version");
+
+      lex_read_space(0);
+      catchvar = parse_lexvar();
+
+      lex_read_space(0);
+
+      intro_my();
+    }
+    else if(lex_consume("(")) {
 #ifdef WARN_EXPERIMENTAL
       Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-        "'catch my VAR' syntax is experimental and may be changed or removed without notice");
+        "'catch (VAR)' syntax is experimental and may be changed or removed without notice");
 #endif
       lex_read_space(0);
       catchvar = parse_lexvar();
+
+      lex_read_space(0);
+      if(!lex_consume(")"))
+        croak("Expected close paren for catch (VAR)");
 
       lex_read_space(0);
 

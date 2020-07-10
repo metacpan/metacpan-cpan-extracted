@@ -48,7 +48,7 @@ my $lconv = POSIX::localeconv();
 #         )];
 #         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
 ## POSIX::setlocale( &POSIX::LC_ALL, $prev_locale );
-my( $sep_space, $tho_sep, $dec_sep );
+my( $sep_space, $tho_sep, $dec_sep, $n );
 if( scalar( keys( %$lconv ) ) )
 {
     $sep_space = $lconv->{p_sep_by_space} > 0 ? qr/[[:blank:]\h]+/ : '';
@@ -58,12 +58,15 @@ if( scalar( keys( %$lconv ) ) )
     $dec_sep = CORE::length( $lconv->{decimal_point} )
         ? $lconv->{decimal_point}
         : $lconv->{mon_decimal_point};
+    $n = Module::Generic::Number->new( 10, precision => 2, debug => 0 );
 }
 else
 {
     diag( "No locale could be found for language \"$ENV{LANG}\"" );
+    $tho_sep = ',';
+    $dec_sep = '.';
+    $n = Module::Generic::Number->new( 10, precision => 2, thousand => $tho_sep, decimal => $dec_sep, debug => 0 );
 }
-my $n = Module::Generic::Number->new( 10, precision => 2, debug => 0 );
 if( !defined( $n ) )
 {
     diag( "Error: '$Module::Generic::Number::ERROR'" );

@@ -6,6 +6,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use Test::More 0.96;
 use Test::Fatal;
 use Test::Deep;
+use Storable 'dclone';
 use JSON::Schema::Draft201909;
 use lib 't/lib';
 use Helper;
@@ -293,6 +294,7 @@ subtest '$recursiveAnchor is not at a schema resource root' => sub {
     },
   );
 
+  $schema = dclone($schema);
   $schema->{'$defs'}{myobject}{'$id'} = 'myobject.json';
 
   cmp_deeply(
@@ -417,6 +419,236 @@ subtest '$recursiveAnchor and $recursiveRef - standard usecases' => sub {
       valid => bool(1),
     },
     'validation makes use of the override that is now in scope',
+  );
+};
+
+subtest '$recursiveRef without $recursiveAnchor' => sub {
+  my $schema = {
+    '$id' => 'strings_only',
+    '$defs' => {
+      allow_ints => {
+        '$id' => 'allow_ints',
+        anyOf => [
+          { type => 'integer' },
+          { type => 'object', additionalProperties => { '$ref' => '#' } },
+        ],
+      },
+    },
+    anyOf => [
+      { type => 'string' },
+      { type => 'object', additionalProperties => { '$ref' => '#' } },
+    ],
+  };
+
+  cmp_deeply(
+    $js->evaluate(
+      { foo => 1 },
+      $schema,
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => my $errors = [
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf/0/type',
+          absoluteKeywordLocation => 'strings_only#/anyOf/0/type',
+          error => 'wrong type (expected string)',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/anyOf/1/additionalProperties/$ref/anyOf/0/type',
+          absoluteKeywordLocation => 'strings_only#/anyOf/0/type',
+          error => 'wrong type (expected string)',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/anyOf/1/additionalProperties/$ref/anyOf/1/type',
+          absoluteKeywordLocation => 'strings_only#/anyOf/1/type',
+          error => 'wrong type (expected object)',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/anyOf/1/additionalProperties/$ref/anyOf',
+          absoluteKeywordLocation => 'strings_only#/anyOf',
+          error => 'no subschemas are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf/1/additionalProperties',
+          absoluteKeywordLocation => 'strings_only#/anyOf/1/additionalProperties',
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf',
+          absoluteKeywordLocation => 'strings_only#/anyOf',
+          error => 'no subschemas are valid',
+        },
+      ],
+    },
+    '$ref - one level recursion',
+  );
+
+  $js->{_resource_index} = {};
+
+  cmp_deeply(
+    $js->evaluate(
+      { foo => 1 },
+      $js->_json_decoder->decode($js->_json_decoder->encode($schema) =~ s/\$ref/\$recursiveRef/gr),
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => $js->_json_decoder->decode($js->_json_decoder->encode($errors) =~ s/\$ref/\$recursiveRef/gr),
+    },
+    '$recursiveRef with no $recursiveAnchor in scope has the same outcome',
+  );
+};
+
+subtest '$recursiveAnchor in our dynamic scope, but not in the target schema' => sub {
+  my $schema = {
+    '$id' => 'base',
+    '$recursiveAnchor' => true,
+    anyOf => [
+      { type => 'boolean' },
+      {
+        type => 'object',
+        additionalProperties => {
+          '$id' => 'inner',
+          # note: no $recursiveAnchor here! so we do NOT recurse to the base.
+          anyOf => [
+            { type => 'integer' },
+            { type => 'object', additionalProperties => { '$recursiveRef' => '#' } },
+          ],
+        },
+      },
+    ],
+  };
+
+  cmp_deeply(
+    $js->evaluate(
+      { foo => { bar => 1 } },
+      $schema,
+    )->TO_JSON,
+    {
+      valid => bool(1),
+    },
+    '$recursiveAnchor does not exist in the target schema - local recursion only, so integers match',
+  );
+
+  cmp_deeply(
+    $js->evaluate(
+      { foo => true },
+      $schema,
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf/0/type',
+          absoluteKeywordLocation => 'base#/anyOf/0/type',
+          error => 'wrong type (expected boolean)',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/anyOf/1/additionalProperties/anyOf/0/type',
+          absoluteKeywordLocation => 'inner#/anyOf/0/type',
+          error => 'wrong type (expected integer)',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/anyOf/1/additionalProperties/anyOf/1/type',
+          absoluteKeywordLocation => 'inner#/anyOf/1/type',
+          error => 'wrong type (expected object)',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/anyOf/1/additionalProperties/anyOf',
+          absoluteKeywordLocation => 'inner#/anyOf',
+          error => 'no subschemas are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf/1/additionalProperties',
+          absoluteKeywordLocation => 'base#/anyOf/1/additionalProperties',
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf',
+          absoluteKeywordLocation => 'base#/anyOf',
+          error => 'no subschemas are valid',
+        },
+      ],
+    },
+    '$recursiveAnchor does not exist in the target schema - no recursion',
+  );
+
+  cmp_deeply(
+    $js->evaluate(
+      { foo => { bar => true } },
+      $schema,
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf/0/type',
+          absoluteKeywordLocation => 'base#/anyOf/0/type',
+          error => 'wrong type (expected boolean)',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/anyOf/1/additionalProperties/anyOf/0/type',
+          absoluteKeywordLocation => 'inner#/anyOf/0/type',
+          error => 'wrong type (expected integer)',
+        },
+        {
+          instanceLocation => '/foo/bar',
+          keywordLocation => '/anyOf/1/additionalProperties/anyOf/1/additionalProperties/$recursiveRef/anyOf/0/type',
+          absoluteKeywordLocation => 'inner#/anyOf/0/type',
+          error => 'wrong type (expected integer)',
+        },
+        {
+          instanceLocation => '/foo/bar',
+          keywordLocation => '/anyOf/1/additionalProperties/anyOf/1/additionalProperties/$recursiveRef/anyOf/1/type',
+          absoluteKeywordLocation => 'inner#/anyOf/1/type',
+          error => 'wrong type (expected object)',
+        },
+        {
+          instanceLocation => '/foo/bar',
+          keywordLocation => '/anyOf/1/additionalProperties/anyOf/1/additionalProperties/$recursiveRef/anyOf',
+          absoluteKeywordLocation => 'inner#/anyOf',
+          error => 'no subschemas are valid',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/anyOf/1/additionalProperties/anyOf/1/additionalProperties',
+          absoluteKeywordLocation => 'inner#/anyOf/1/additionalProperties',
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '/foo',
+          keywordLocation => '/anyOf/1/additionalProperties/anyOf',
+          absoluteKeywordLocation => 'inner#/anyOf',
+          error => 'no subschemas are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf/1/additionalProperties',
+          absoluteKeywordLocation => 'base#/anyOf/1/additionalProperties',
+          error => 'not all properties are valid',
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/anyOf',
+          absoluteKeywordLocation => 'base#/anyOf',
+          error => 'no subschemas are valid',
+        },
+      ],
+    },
+    '$recursiveAnchor does not exist in the target schema - local recursion only',
   );
 };
 

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 16 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'IPC/PrettyPipe.pm',
@@ -19,6 +19,7 @@ my @module_files = (
     'IPC/PrettyPipe/Format.pm',
     'IPC/PrettyPipe/Queue.pm',
     'IPC/PrettyPipe/Queue/Element.pm',
+    'IPC/PrettyPipe/Render/Struct.pm',
     'IPC/PrettyPipe/Render/Template/Tiny.pm',
     'IPC/PrettyPipe/Renderer.pm',
     'IPC/PrettyPipe/Stream.pm',

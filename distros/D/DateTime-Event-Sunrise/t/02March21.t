@@ -1,13 +1,13 @@
 #
 #     Test script for DateTime::Event::Sunrise
-#     Copyright (C) 2013 Ron Hill and Jean Forget
+#     Copyright © 2013, 2020 Ron Hill and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     L<https://dev.perl.org/licenses/artistic.html>
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
 #
@@ -23,7 +23,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#     Inc., <https://www.fsf.org/>.
 #
 use strict;
 use POSIX qw(floor ceil);
@@ -31,10 +31,11 @@ use Test::More;
 use DateTime;
 use DateTime::Event::Sunrise;
 
+# Values for Paris (2°20'E, 48°50' N) computed with Stellarium
 my @tests = split "\n", <<'TEST';
-2.33  48.83 1 20 18:04:42
-2.33  48.83 1 21 18:06:12
-2.33  48.83 1 22 18:07:43
+2.33  48.83 1 20 18:03:53
+2.33  48.83 1 21 18:05:23
+2.33  48.83 1 22 18:06:54
 92.33 48.83 0 20 12:03:10
 92.33 48.83 0 21 12:04:41
 92.33 48.83 0 22 12:06:11
@@ -43,15 +44,20 @@ TEST
 plan (tests => scalar @tests);
 
 foreach (@tests) {
-  my ($lon, $lat, $precise, $dd, $res) = split ' ', $_;
+  my ($lon, $lat, $precise, $dd, $expected) = split ' ', $_;
   my $sunset = DateTime::Event::Sunrise->sunset(longitude  => $lon,
                                                  latitude  => $lat,
                                                  precise   => $precise,
                                                  upper_limb => 0,
                                                 );
   my  $day =  DateTime->new(year => 2008, month => 3, day => $dd, time_zone => 'UTC');
+  my  $set = $sunset->next($day);
+  # fuzz factor ± 1 mn
+  my  $sunset    = $set->clone                        ->strftime("%H:%M:%S");
+  my  $sunset_lo = $set->clone->subtract(minutes => 1)->strftime("%H:%M:%S");
+  my  $sunset_hi = $set->clone->add     (minutes => 1)->strftime("%H:%M:%S");
 
-  is ($sunset->next($day)->strftime("%H:%M:%S"), $res);
+  ok ($sunset_lo le $expected && $sunset_hi ge $expected, "comparing $sunset with $expected");
 
 }
 

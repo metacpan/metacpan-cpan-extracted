@@ -1,5 +1,10 @@
 Revision history for Perl extension EAV::XS.
 
+0.4.10 Wed Jul  8 23:44:04 UTC 2020
+	- add support for DragonFly
+	- update IANA database
+	- add support for cygwin
+
 0.4.9  Sat Jun 27 07:36:30 UTC 2020
 	- update IANA database
 

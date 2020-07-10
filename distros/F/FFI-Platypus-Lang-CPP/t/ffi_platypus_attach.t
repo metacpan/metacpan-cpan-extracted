@@ -2,15 +2,15 @@ use strict;
 use warnings;
 use Test::More;
 use FFI::CheckLib qw( find_lib );
-use FFI::Platypus;
+use FFI::Platypus 1.00;
 
-my $libtest = find_lib lib => 'test', libpath => 'libtest';
+my $libtest = find_lib lib => 'test', libpath => 't/ffi/_build';
 plan skip_all => 'test requires a C++ compiler'
   unless $libtest;
 
 plan tests => 2;
 
-my $ffi = FFI::Platypus->new;
+my $ffi = FFI::Platypus->new( api => 1 );
 $ffi->lang('CPP');
 $ffi->lib($libtest);
 

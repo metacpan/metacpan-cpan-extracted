@@ -3,14 +3,14 @@ Subject: Override \$subject with this
 To: person_1@example.com
 Date: [^\n]+
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="[^"]+"
+Content-Type: multipart/mixed; boundary="?[^"]+"?
 Content-Transfer-Encoding: 7bit
 
 
 --\S+
 Date: [^\n]+
 MIME-Version: 1.0
-Content-Type: multipart/alternative; boundary="[^"]+"
+Content-Type: multipart/alternative; boundary="?[^"]+"?
 Content-Transfer-Encoding: 7bit
 
 

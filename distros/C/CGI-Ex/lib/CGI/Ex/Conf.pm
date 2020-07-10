@@ -6,7 +6,7 @@ CGI::Ex::Conf - Conf Reader/Writer for many different data format types
 
 =head1 VERSION
 
-version 2.49
+version 2.50
 
 =cut
 
@@ -22,7 +22,7 @@ use Carp qw(croak);
 
 our @EXPORT_OK = qw(conf_read conf_write in_cache);
 
-our $VERSION = '2.49'; # VERSION
+our $VERSION = '2.50'; # VERSION
 
 our $DEFAULT_EXT = 'conf';
 our @DEFAULT_PATHS;

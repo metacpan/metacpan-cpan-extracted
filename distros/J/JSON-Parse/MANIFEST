@@ -44,6 +44,8 @@ t/object.t
 t/perl-monks-1165399.t
 t/read-file.t
 t/rfc7159.t
+t/string-bug-44.json
+t/string-bug-44.t
 t/syntax-error-1.json
 t/syntax.t
 t/test-empty-string.t

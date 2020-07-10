@@ -1,0 +1,82 @@
+{
+   "abstract" : "Drive Test::WWW::Mechanize Object Using YAML Configuration Files",
+   "author" : [
+      "dean@serenevy.net"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-WWW-Mechanize-Driver",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DateTime" : "0",
+            "Template" : "0",
+            "YAML" : "0"
+         },
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Test::Builder" : "0",
+            "Test::WWW::Mechanize" : "0",
+            "URI" : "0",
+            "URI::QueryParam" : "0",
+            "perl" : "v5.5.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Template" : "0",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "ApplyTemplate" : {
+         "file" : "lib/Test/WWW/Mechanize/Driver/MagicValues.pm",
+         "version" : "1.0"
+      },
+      "FileContents" : {
+         "file" : "lib/Test/WWW/Mechanize/Driver/MagicValues.pm",
+         "version" : "1.0"
+      },
+      "Stacked" : {
+         "file" : "lib/Test/WWW/Mechanize/Driver/MagicValues.pm",
+         "version" : "1.0"
+      },
+      "Test::WWW::Mechanize::Driver" : {
+         "file" : "lib/Test/WWW/Mechanize/Driver.pm",
+         "version" : "1.0"
+      },
+      "Test::WWW::Mechanize::Driver::Util" : {
+         "file" : "lib/Test/WWW/Mechanize/Driver/Util.pm",
+         "version" : "1.0"
+      },
+      "Test::WWW::Mechanize::Driver::YAMLLoader" : {
+         "file" : "lib/Test/WWW/Mechanize/Driver/YAMLLoader.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/duelafn/Test-WWW-Mechanize-Driver",
+      "repository" : {
+         "url" : "https://github.com/duelafn/Test-WWW-Mechanize-Driver"
+      }
+   },
+   "version" : "1.0",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

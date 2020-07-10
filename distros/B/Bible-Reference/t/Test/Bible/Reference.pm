@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use parent 'Test::Class';
 use Test::Most;
-use Test::Moose;
 
 use constant TEST_PACKAGE_NAME => 'Bible::Reference';
 
@@ -16,14 +15,13 @@ sub instantiation : Test( startup => 4 ) {
     shift->{obj} = $obj;
 }
 
-sub attributes_and_classes : Test(8) {
+sub attributes_and_classes : Test(7) { # 8
     my $obj = shift->{obj};
-    has_attribute_ok( $obj, $_, qq{attribute "$_" exists} ) for ( qw(
+    can_ok( $obj, $_ ) for ( qw(
         acronyms sorting bible
         require_verse_match require_book_ucfirst
     ) );
     can_ok( $obj, $_ ) for ( qw( _in in ) );
-    throws_ok( sub { $obj->_in }, qr/Attribute _in is private/, '_in() is private' );
 }
 
 sub bible_type : Test(6) {

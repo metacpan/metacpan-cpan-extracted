@@ -5,7 +5,7 @@ requires "Carp" => "0";
 requires "Config" => "0";
 requires "Cwd" => "0";
 requires "Data::Dumper" => "0";
-requires "Data::UUID" => "1.148";
+requires "Data::UUID" => "0";
 requires "Exporter" => "0";
 requires "Fcntl" => "0";
 requires "File::Find" => "0";
@@ -59,6 +59,7 @@ suggests "HTTP::Tiny::Multipart" => "0.08";
 suggests "IO::Pager" => "1.00";
 suggests "JSON::MaybeXS" => "0";
 suggests "Term::ANSIColor" => "4.03";
+suggests "Test2::Plugin::Cover" => "0.000007";
 suggests "Test2::Plugin::IOEvents" => "0.001001";
 
 on 'test' => sub {

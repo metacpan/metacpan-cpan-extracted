@@ -24,6 +24,7 @@
           price     => iv_float,
           revision  => iv_int,
           isbn      => iv_any(pattern => qr/^[0-9\-]{10,13}$/),
+          advertise => iv_bool,
       })) {
           return $c->render(status => 400, text => $error);
       }

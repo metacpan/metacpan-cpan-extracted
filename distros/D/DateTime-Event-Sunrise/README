@@ -1,4 +1,4 @@
-DateTime/Event/Sunrise version 0.0505
+DateTime/Event/Sunrise version 0.0506
 =====================================
 
 This module will return a DateTime Object for sunrise and sunset for a
@@ -35,7 +35,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2003, 2013, 2015 Ron Hill and Jean Forget
+Copyright © 2003, 2013, 2015, 2020 Ron Hill and Jean Forget
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5.16.3. For more details, see the full

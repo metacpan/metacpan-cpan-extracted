@@ -1,22 +1,29 @@
-Build.PL
+.travis.yml
 Changes
 CONTRIBUTING
 examples/basic.cpp
 examples/basic.pl
-inc/My/ModuleBuild.pm
-inc/run/readme.pl
+examples/exception.cpp
+examples/exception.pl
+examples/wrapper.cpp
+examples/wrapper.pl
+fbx.json
 INSTALL
 lib/FFI/Platypus/Lang/CPP.pm
-libtest/basic.cpp
 LICENSE
+maint/cip-before-install
+maint/readme.pl
+maint/releaseprep
+Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
+MANIFEST.SKIP
 README
 SUPPORT
 t/00_diag.t
-t/00_diag.txt
 t/01_use.t
 t/02_types.t
+t/ffi/basic.cpp
 t/ffi_platypus_attach.t
 t/lang.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

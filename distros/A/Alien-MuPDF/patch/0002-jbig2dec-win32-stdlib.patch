@@ -1,0 +1,21 @@
+From 244d8b7a976ad1d3256cfc42dfff6ba7d607e5b2 Mon Sep 17 00:00:00 2001
+From: Zakariyya Mughal <zaki.mughal@gmail.com>
+Date: Mon, 11 May 2020 19:22:17 -0500
+Subject: [PATCH] Add stdlib to Windows header
+
+Need to have stdlib.h header or the linker will complain with an error
+about duplicate symbols.
+
+---
+
+diff --git a/thirdparty/jbig2dec/config_win32.h b/thirdparty/jbig2dec/config_win32.h
+index 959d07e..9cfb9bf 100644
+--- a/thirdparty/jbig2dec/config_win32.h
++++ b/thirdparty/jbig2dec/config_win32.h
+@@ -63,5 +63,6 @@ typedef unsigned __int64 uint64_t;
+ 
+ /* Not VS -- it had best behave */
+ # include <stdint.h>
++# include <stdlib.h>
+ 
+ #endif /* _MSC_VER */

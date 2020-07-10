@@ -1,5 +1,11 @@
 Revision history for DBIx::Class::Sims (ordered by revision number).
 
+0.500011 Jul 08 2020 20:00:00 PDT
+   - Fix syntax error existing in 5.10.1
+
+0.500010 Jul 08 2020 19:00:00 PDT
+   - Remove vendoring of DateTime::Event::Random
+
 0.500001 Mar 04 2020 04:00:00 PDT
    - Ooops. I forgot to update the MANIFEST.
 

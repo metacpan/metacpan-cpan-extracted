@@ -1,5 +1,8 @@
 Revision history for Perl extension Libssh.
 
+0.8 2020-06-29
+  - Add ssh_channel_request_shell binding
+
 0.7 2019-10-09
   - Add keyboard-interactive authentication method mapping (thanks to brodafly)
   - Add an example to multiple parrallel server executions (thanks to brodafly)

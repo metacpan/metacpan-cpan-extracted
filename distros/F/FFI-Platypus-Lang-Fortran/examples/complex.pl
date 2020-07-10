@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-use FFI::Platypus;
+use FFI::Platypus 1.00;
 use Math::Complex;
 
-my $ffi = FFI::Platypus->new;
+my $ffi = FFI::Platypus->new( api => 1 );
 $ffi->lang('Fortran');
 $ffi->lib('./libcomplex.so');
 
@@ -30,4 +30,4 @@ $ffi->attach(
 
 my($r,$i) = complex_decompose(1.5 + 2.5*i);
 
-print "${r} + ${i}i\n"; 
+print "${r} + ${i}i\n";

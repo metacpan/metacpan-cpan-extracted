@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000019';
+our $VERSION = '1.000020';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -376,6 +376,13 @@ Can be specified multiple times
 =item --no-cover
 
 Use Devel::Cover to calculate test coverage. This disables forking. If no args are specified the following are used: -silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
+
+
+=item --cover-files
+
+=item --no-cover-files
+
+Use Test2::Plugin::Cover to collect coverage data for what files are touched by what tests. Unlike Devel::Cover this has very little performance impact (About 4% difference)
 
 
 =item --daemon

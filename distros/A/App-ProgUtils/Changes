@@ -1,3 +1,10 @@
+0.202   2020-04-16  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] proglist: Allow empty query
+
+        - [doc] Cross-mention proglist and list-all-programs-in-path.
+
+
 0.201   2019-10-17  Released-By: PERLANCAR; Urgency: medium
 
 	- [ux] Simplify CLI scripts by turning off config/env reading to
@@ -65,7 +72,7 @@
 	- Add utility: progpath.
 
 
-0.11     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+0.11     2014-08-16  Released-By: SHARYANTO; Note: Happy 19th CPAN Day!
 
          - Use Perinci::CmdLine::Any.
 

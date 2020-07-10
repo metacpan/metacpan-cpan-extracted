@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
@@ -100,11 +100,22 @@ use Syntax::Keyword::Try;
 {
    no if HAVE_WARN_EXPERIMENTAL, warnings => 'experimental';
 
+   # new style
+   try {
+      die "caught\n";
+   }
+   catch ( $e ) {
+      is( $e, "caught\n", 'exception is caught into new lexical' );
+   }
+
+   no warnings 'deprecated';
+
+   # old style
    try {
       die "caught\n";
    }
    catch my $e {
-      is( $e, "caught\n", 'exception is caught into new lexical' );
+      is( $e, "caught\n", 'exception is caught into new lexical (old style)' );
    }
 }
 

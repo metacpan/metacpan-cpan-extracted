@@ -4,7 +4,7 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.012"
+            "perl" : "5.016"
          }
       },
       "develop" : {
@@ -41,11 +41,9 @@
             "Mojo::File" : "0",
             "Mojo::URL" : "0",
             "Mojo::UserAgent" : "0",
-            "Moose" : "0",
-            "MooseX::Privacy" : "0",
-            "Throwable" : "0",
-            "Try::Tiny" : "0",
-            "perl" : "5.012"
+            "exact" : "0",
+            "exact::class" : "0",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -53,11 +51,10 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::Moose" : "0",
             "Test::More" : "0",
             "Test::Most" : "0",
             "constant" : "0",
-            "perl" : "5.012",
+            "perl" : "5.016",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -75,8 +72,9 @@
          "web" : "https://github.com/gryphonshafer/Bible-OBML-Gateway"
       }
    },
-   "version" : "1.03",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "1.05",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use feature 'current_sub';
@@ -60,7 +60,7 @@ before _add_resources => sub {
     my ($key, $value) = @$pair;
     if (my $existing = $self->_get_resource($key)) {
       croak 'a schema resource is already indexed with uri "'.$key.'"'
-        if $existing->{path} != $value->{path}
+        if $existing->{path} ne $value->{path}
           or $existing->{canonical_uri} ne $value->{canonical_uri};
     }
 
@@ -79,7 +79,7 @@ sub BUILD {
   croak 'canonical_uri cannot contain a fragment' if defined $self->canonical_uri->fragment;
 
   my $original_uri = $self->canonical_uri->clone;
-  my $schema = $self->data;
+  my $schema = $self->schema;
   my %identifiers = _traverse_for_identifiers($schema, '', $original_uri->clone);
 
   if (is_plain_hashref($self->schema) and my $id = $self->get('/$id')) {
@@ -107,7 +107,7 @@ sub _traverse_for_identifiers {
     if (exists $data->{'$id'} and JSON::Schema::Draft201909->_is_type('string', $data->{'$id'})) {
       my $uri = Mojo::URL->new($data->{'$id'});
       if (not length $uri->fragment) {
-        $canonical_uri = $uri->base($canonical_uri)->to_abs;
+        $canonical_uri = $uri->is_abs ? $uri : $uri->base($canonical_uri)->to_abs;
         $canonical_uri->fragment(undef);
         $identifiers{$canonical_uri} = { path => $path, canonical_uri => $canonical_uri->clone };
       }
@@ -151,7 +151,7 @@ JSON::Schema::Draft201909::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

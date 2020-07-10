@@ -7,7 +7,7 @@ use JSON::Parse;
 our @EXPORT_OK = qw/tokenize_json tokenize_start tokenize_next tokenize_start tokenize_end tokenize_type tokenize_child tokenize_text/;
 our %EXPORT_TAGS = ('all' => \@EXPORT_OK);
 use Carp;
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 sub tokenize_text
 {

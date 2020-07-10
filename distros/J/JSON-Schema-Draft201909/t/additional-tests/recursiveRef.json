@@ -33,7 +33,7 @@
     {
         "description": "$recursiveRef without using nesting",
         "schema": {
-            "$id": "http://localhost:4242",
+            "$id": "http://localhost:4242/recursiveRef2/schema.json",
             "$defs": {
                 "myobject": {
                     "$id": "myobject.json",
@@ -83,7 +83,7 @@
     {
         "description": "$recursiveRef with nesting",
         "schema": {
-            "$id": "http://localhost:4242",
+            "$id": "http://localhost:4242/recursiveRef3/schema.json",
             "$recursiveAnchor": true,
             "$defs": {
                 "myobject": {
@@ -128,6 +128,145 @@
                 "description": "two levels, properties match with $recursiveRef",
                 "data": { "foo": { "bar": 1 } },
                 "valid": true
+            }
+        ]
+    },
+    {
+        "description": "$recursiveRef with $recursiveAnchor: false works like $ref",
+        "schema": {
+            "$id": "http://localhost:4242/recursiveRef4/schema.json",
+            "$recursiveAnchor": false,
+            "$defs": {
+                "myobject": {
+                    "$id": "myobject.json",
+                    "$recursiveAnchor": false,
+                    "anyOf": [
+                        { "type": "string" },
+                        {
+                            "type": "object",
+                            "additionalProperties": { "$recursiveRef": "#" }
+                        }
+                    ]
+                }
+            },
+            "anyOf": [
+                { "type": "integer" },
+                { "$ref": "#/$defs/myobject" }
+            ]
+        },
+        "tests": [
+            {
+                "description": "integer matches at the outer level",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "single level match",
+                "data": { "foo": "hi" },
+                "valid": true
+            },
+            {
+                "description": "integer does not match as a property value",
+                "data": { "foo": 1 },
+                "valid": false
+            },
+            {
+                "description": "two levels, properties match with inner definition",
+                "data": { "foo": { "bar": "hi" } },
+                "valid": true
+            },
+            {
+                "description": "two levels, integer does not match as a property value",
+                "data": { "foo": { "bar": 1 } },
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "$recursiveRef with no $recursiveAnchor works like $ref",
+        "schema": {
+            "$id": "http://localhost:4242/recursiveRef5/schema.json",
+            "$defs": {
+                "myobject": {
+                    "$id": "myobject.json",
+                    "$recursiveAnchor": false,
+                    "anyOf": [
+                        { "type": "string" },
+                        {
+                            "type": "object",
+                            "additionalProperties": { "$recursiveRef": "#" }
+                        }
+                    ]
+                }
+            },
+            "anyOf": [
+                { "type": "integer" },
+                { "$ref": "#/$defs/myobject" }
+            ]
+        },
+        "tests": [
+            {
+                "description": "integer matches at the outer level",
+                "data": 1,
+                "valid": true
+            },
+            {
+                "description": "single level match",
+                "data": { "foo": "hi" },
+                "valid": true
+            },
+            {
+                "description": "integer does not match as a property value",
+                "data": { "foo": 1 },
+                "valid": false
+            },
+            {
+                "description": "two levels, properties match with inner definition",
+                "data": { "foo": { "bar": "hi" } },
+                "valid": true
+            },
+            {
+                "description": "two levels, integer does not match as a property value",
+                "data": { "foo": { "bar": 1 } },
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "$recursiveRef with no $recursiveAnchor in the initial target schema resource",
+        "schema": {
+            "$id": "http://localhost:4242/recursiveRef6/base.json",
+            "$recursiveAnchor": true,
+            "anyOf": [
+                { "type": "boolean" },
+                {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$id": "http://localhost:4242/recursiveRef6/inner.json",
+                        "$comment": "there is no $recursiveAnchor: true here, so we do NOT recurse to the base",
+                        "anyOf": [
+                            { "type": "integer" },
+                            { "type": "object", "additionalProperties": { "$recursiveRef": "#" } }
+                        ]
+                    }
+                }
+            ]
+        },
+        "tests": [
+            {
+                "description": "leaf node does not match; no recursion",
+                "data": { "foo": true },
+                "valid": false
+            },
+            {
+                "description": "leaf node matches: recursion only uses inner schema",
+                "data": { "foo": { "bar": 1 } },
+                "valid": true
+            },
+            {
+                "description": "leaf node does not match: recursion only uses inner schema",
+                "data": { "foo": { "bar": true } },
+                "valid": false
             }
         ]
     }

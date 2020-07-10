@@ -7,7 +7,7 @@ use Exporter qw(import);
 use XSLoader;
 use Time::HiRes;
 
-our $VERSION = '0.7';
+our $VERSION = '0.8';
 
 XSLoader::load('Libssh::Session', $VERSION);
 
@@ -254,7 +254,7 @@ sub get_publickey {
     my ($self, %options) = @_;
     
     $self->{pubkey} = undef;
-    return ssh_get_publickey($self->{ssh_session});
+    return ssh_get_server_publickey($self->{ssh_session});
 }
 
 sub get_server_publickey {
@@ -286,7 +286,7 @@ sub get_hexa {
 sub is_server_known {
     my ($self, %options) = @_;
     
-    return ssh_is_server_known($self->{ssh_session});
+    return ssh_session_is_known_server($self->{ssh_session});
 }
 
 sub is_known_server {
@@ -299,7 +299,7 @@ sub is_known_server {
 sub write_knownhost {
     my ($self, %options) = @_;
     
-    return ssh_write_knownhost($self->{ssh_session});
+    return ssh_session_update_known_hosts($self->{ssh_session});
 }
 
 sub update_known_hosts {
@@ -545,8 +545,16 @@ sub add_command_internal {
     $self->{slots}->{$channel_id}->{stderr} = '';
     $self->{slots}->{$channel_id}->{read} = 0;
 
-    $self->channel_request_exec(channel => ${$self->{channels}->{$channel_id}},
-                                cmd => $options{command}->{cmd});
+    if (defined($options{command}->{cmd}) && $options{command}->{cmd} ne '') {
+        $self->channel_request_exec(
+            channel => ${$self->{channels}->{$channel_id}},
+            cmd => $options{command}->{cmd}
+        );
+    } else {
+        $self->channel_request_shell(
+            channel => ${$self->{channels}->{$channel_id}}
+        );
+    }
     if (defined($options{command}->{input_data})) {
         if ($self->channel_write(channel => ${$self->{channels}->{$channel_id}}, data => $options{command}->{input_data}) == SSH_ERROR) {
             $self->close_channel(channel_id => $channel_id);
@@ -557,7 +565,7 @@ sub add_command_internal {
             }
             return undef;
         }
-        
+
         # Force to finish it
         $self->channel_send_eof(channel => ${$self->{channels}->{$channel_id}});
     }
@@ -774,6 +782,12 @@ sub channel_request_exec {
     my ($self, %options) = @_;
     
     return ssh_channel_request_exec($options{channel}, $options{cmd});
+}
+
+sub channel_request_shell {
+    my ($self, %options) = @_;
+    
+    return ssh_channel_request_shell($options{channel});
 }
 
 sub channel_close {

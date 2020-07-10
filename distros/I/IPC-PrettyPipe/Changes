@@ -1,5 +1,28 @@
 Revision history for IPC-PrettyPipe
 
+0.13      2020-07-08 17:28:45-04:00 America/New_York
+
+    [API BREAKAGE]
+
+      * Constructors for render and execute classes are no longer
+        passed an IPC::PrettyPipe object.  It was poor design to do
+        so, and was because I was the wrong kind of lazy.  Instead,
+        the pipe object is passed to the render/run methods.
+
+    [ENHANCEMENTS]
+
+      * |= and | operators are overloaded for pipes and commands
+        to make it easier to construct pipes.
+
+      * nested pipes are by default merged if possible.
+        the IPC::PrettyPipe->merge_pipes attribute controls this.
+
+      * new render module, Struct, renders the pipeline as Perl
+        structures.  Useful for testing pipeline generation.
+
+      * The Text::Template renderer constructor can be passed
+        the colorize attribute.
+
 0.12      2018-12-21 14:02:48-05:00 America/New_York
 
       * No changes from previous release.

@@ -67,9 +67,10 @@
          "web" : "https://github.com/fastmail/mail-dkim/"
       }
    },
-   "version" : "1.20200513.1",
+   "version" : "1.20200708",
    "x_contributors" : [
       "Bron Gondwana <brong@fastmail.fm>",
+      "Christian Jaeger <ch@christianjaeger.ch>",
       "Damien MASCR\u00c9 <damienmascre@free.fr>",
       "jasonlong <jasonlong@f38efd27-133c-0410-a3cc-a5f95e9cf04f>",
       "Jose\u0301 Borges Ferreira <jose.ferreira@bitsighttech.com>",

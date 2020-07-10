@@ -89,3 +89,4 @@ if($post_diag)
 spacer;
 
 done_testing;
+

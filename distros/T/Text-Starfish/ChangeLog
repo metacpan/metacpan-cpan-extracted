@@ -1,6 +1,15 @@
 Revision history for Perl extension Text::Starfish.
 
-1.35 7 Jul 2020 Tue 08:24:21 ADT
+1.36 9 Jul 2020
+ - documentation improvements
+ - added test 22-hooks in order to more thoroughly test hooks
+ - testing improvements (refactoring), introducing Makefile for development
+ - making add_hook available as the function
+ - adding function set_out_delimiters
+ - introducing rm_hook, to depricate rmHook
+ - finished change of 0-hook to OutDelimiters parameter
+
+1.35 7 Jul 2020
  - documentation improvements
  - fixing bug with test 20-simple_html: removing call to "comment"
    since CGI module is not available by default

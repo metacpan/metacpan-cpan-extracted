@@ -1,5 +1,8 @@
 Revision history for Perl extension Hash::Merge.
 
+0.301	2020-06-18
+    - fix object-based interface memory leak (RT#132627) (Thanks to mithaldu)
+
 0.300	2018-03-09
     - fix old EU::MM support (RT#123915)
     - rename specify_behavior and improve SYNOPSIS (RT#123785)

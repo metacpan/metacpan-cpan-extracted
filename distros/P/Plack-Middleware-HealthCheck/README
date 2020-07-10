@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v0.0.3
+    version v0.0.4
 
 SYNOPSIS
 
@@ -18,6 +18,9 @@ SYNOPSIS
     You can serve the results from different "health_check_paths" than the
     default, and you can specify which query parameters, other than the
     always allowed tags, are passed to the check with "allowed_params".
+    Runtime support is enabled by default, but can be overridden by
+    specifying an "allowed_params" configuration, like the one below, that
+    does not include runtime.
 
         $psgi_app = HealthCheck::Diagnostic::LoadAverage->wrap( $psgi_app,
             health_check       => HealthCheck->new(...),
@@ -85,8 +88,11 @@ ATTRIBUTES
     A list of query_params to pass through to check. Parameters are passed
     with the values in arrayrefs.
 
-    Defaults to undef, although tags are always passed by
+    Defaults to runtime, and tags are always passed by
     "serve_health_check".
+
+    The runtime parameter defaults to true if pretty is specified, or it is
+    in the query string without a value.
 
 METHODS
 

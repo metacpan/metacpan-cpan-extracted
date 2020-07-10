@@ -2,7 +2,7 @@ Changes
 lib/Hash/Merge.pm
 MAINTAINER.md
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/Auto/00-load.t

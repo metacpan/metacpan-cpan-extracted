@@ -1,9 +1,9 @@
 package Progress::Any::Examples;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-20'; # DATE
+our $DATE = '2020-07-09'; # DATE
 our $DIST = 'Progress-Any-Examples'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Examples for Progress::Any
@@ -20,7 +20,7 @@ Progress::Any::Examples - Examples for Progress::Any
 
 =head1 VERSION
 
-This document describes version 0.001 of Progress::Any::Examples (from Perl distribution Progress-Any-Examples), released on 2020-06-20.
+This document describes version 0.003 of Progress::Any::Examples (from Perl distribution Progress-Any-Examples), released on 2020-07-09.
 
 =head1 SYNOPSIS
 
@@ -42,6 +42,8 @@ L<Progress::Any>:
 =item * L<progress-any-eg-progressbar-04-progressbar-and-logger>
 
 =item * L<progress-any-eg-progressbar-05-multiple-progressbars>
+
+=item * L<progress-any-eg-progressbar-06-reusing-task>
 
 =back
 

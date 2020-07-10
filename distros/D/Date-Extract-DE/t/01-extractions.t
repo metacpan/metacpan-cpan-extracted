@@ -93,6 +93,60 @@ my @examples = (
                 qw/2021-07-05 2021-07-06 2021-07-07 2021-07-08/
         ]
     },
+    {   text => "MATTERSBURG Nun ist es endgültig beschlossene Sache:
+Der Mattersburger Musiksommer findet heuer nicht statt. Die Veranstaltungsreihe
+(an drei Freitagen im August spielen stets Musikbands plus Vorgruppen auf) ist ein fixer
+Bestandteil bei den Mattersburger Events und auch heuer waren die
+Termine (für 7. 14. und 21. August) und die Bands fixiert.",
+        dts => [
+            map { { date => $_, context => '14. und 21. August' } }
+                qw/2020-08-14 2020-08-21/
+        ]
+    },
+    {   text => "MATTERSBURG Nun ist es endgültig beschlossene Sache:
+Der Mattersburger Musiksommer findet heuer nicht statt. Die Veranstaltungsreihe
+(an drei Freitagen im August spielen stets Musikbands plus Vorgruppen auf) ist ein fixer
+Bestandteil bei den Mattersburger Events und auch heuer waren die
+Termine (für 5. 12. und 19. August) und die Bands fixiert.",
+        dts => [
+            map { { date => $_, context => '5. 12. und 19. August' } }
+                qw/2019-12-05 2020-08-19/
+        ]
+    },
+    {   text => "MATTERSBURG Nun ist es endgültig beschlossene Sache:
+Der Mattersburger Musiksommer findet heuer nicht statt. Die Veranstaltungsreihe
+(an drei Freitagen im August spielen stets Musikbands plus Vorgruppen auf) ist ein fixer
+Bestandteil bei den Mattersburger Events und auch heuer waren die
+Termine (für 7., 14., 21. und 28. August) und die Bands fixiert.",
+        dts => [
+            map { { date => $_, context => '7., 14., 21. und 28. August' } }
+                qw/2020-08-07 2020-08-14 2020-08-21 2020-08-28/
+        ]
+    },
+    {   text =>
+            "Am vierten und fünfzehnten März fanden die Tests statt. Der dreiundzwanzigste März wird der Tag der Bekanntgabe der Ergebnisse sein",
+        dts => [
+            {   date    => '2020-03-04',
+                context => 'vierten und fünfzehnten März'
+            },
+            {   date    => '2020-03-15',
+                context => 'vierten und fünfzehnten März'
+            },
+            { date => '2020-03-23', context => 'dreiundzwanzigste März' }
+        ]
+    },
+    {   text =>
+            "Am 3. April 98 war der Komet zu sehen. Das nächste Mal wird am  5. Oktober '21 sein. Das erste Mal wurde der Komet am 2. März 1567 erwähnt.",
+        dts => [
+            { date => '1998-04-03', context => '3. April 98' },
+            { date => '2021-10-05', context => '5. Oktober \'21' },
+            { date => '1567-03-02', context => '2. März 1567' },
+        ]
+    },
+    {   text =>
+            'Der erste Mai 921 war das Datum der ersten urkundlichen Erwähung',
+        dts => [ { date => '0921-05-01', context => 'erste Mai 921' } ]
+    },
 );
 
 my $ref_date = Date::Simple::ymd( 2020, 01, 01 );
@@ -119,7 +173,15 @@ foreach (@examples) {
 
     my $extractions = $parser->extract_with_context( $_->{text} );
     my $expected    = $_->{dts};
-    is_deeply( $extractions, $expected,
-        sprintf( 'Example %s: All expected extractions found', $i, ) );
+    is_deeply(
+        $extractions,
+        $expected,
+        sprintf(
+            'Example %s: All expected extractions found ([%s] vs. [%s])',
+            $i,
+            join( ',', map { '"' . $_->{context} . '"' } @$extractions ),
+            join( ',', map { '"' . $_->{context} . '"' } @$expected )
+        )
+    );
 }
 done_testing;

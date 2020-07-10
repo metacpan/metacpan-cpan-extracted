@@ -122,7 +122,7 @@ alter the mechanize object's state should be placed in the actions array.
 If included, the entire test group will be skipped or marked TODO. The
 value of these options will be used as the message passed to Test::Builder.
 
-=back 4
+=back
 
 =head2 Action Items
 

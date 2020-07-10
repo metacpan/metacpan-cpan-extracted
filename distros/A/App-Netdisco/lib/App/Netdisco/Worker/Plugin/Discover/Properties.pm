@@ -5,7 +5,7 @@ use App::Netdisco::Worker::Plugin;
 use aliased 'App::Netdisco::Worker::Status';
 
 use App::Netdisco::Transport::SNMP ();
-use App::Netdisco::Util::Permission 'check_acl_no';
+use App::Netdisco::Util::Permission qw/check_acl_no check_acl_only/;
 use App::Netdisco::Util::FastResolver 'hostnames_resolve_async';
 use App::Netdisco::Util::Device 'get_device';
 use App::Netdisco::Util::DNS 'hostname_from_ip';
@@ -53,8 +53,22 @@ register_worker({ phase => 'early', driver => 'snmp' }, sub {
 
   $device->set_column( num_ports  => $snmp->ports );
   $device->set_column( snmp_class => $snmp->class );
+  $device->set_column( snmp_engineid => unpack('H*', $snmp->snmpEngineID) );
 
   $device->set_column( last_discover => \'now()' );
+
+  # protection for failed SNMP gather
+  if ($device->in_storage) {
+      my $ip = $device->ip;
+      my $protect = setting('snmp_field_protection')->{'device'} || {};
+      my %dirty = $device->get_dirty_columns;
+      foreach my $field (keys %dirty) {
+          next unless check_acl_only($ip, $protect->{$field});
+          if (!defined $dirty{$field} or $dirty{$field} eq '') {
+              return $job->cancel("discover cancelled: $ip failed to return valid $field");
+          }
+      }
+  }
 
   schema('netdisco')->txn_do(sub {
     $device->update_or_insert(undef, {for => 'update'});
@@ -78,6 +92,39 @@ register_worker({ phase => 'early', driver => 'snmp' }, sub {
   }
 
   return Status->info(" [$device] device - OK to continue discover");
+});
+
+register_worker({ phase => 'early', driver => 'snmp' }, sub {
+  my ($job, $workerconf) = @_;
+
+  my $device = $job->device;
+  return unless $device->in_storage;
+
+  my $snmp = App::Netdisco::Transport::SNMP->reader_for($device)
+    or return Status->defer("discover failed: could not SNMP connect to $device");
+
+  my $pass = Status->info(" [$device] device - OK to continue discover");
+  my $interfaces = $snmp->interfaces;
+
+  # OK if no interfaces
+  return $pass if 0 == scalar keys %$interfaces;
+  # OK if any value is not the same as key
+  return $pass if scalar grep {$_ ne $interfaces->{$_}} keys %$interfaces;
+  # OK if any non-digit in values
+  return $pass if scalar grep {$_ !~ m/^[0-9]+$/} values %$interfaces;
+
+  # gather ports
+  my $device_ports = {map {($_->port => $_)}
+                          $device->ports(undef, {prefetch => 'properties'})->all};
+  # OK if no ports
+  return $pass if 0 == scalar keys %$device_ports;
+  # OK if any interface value is a port name
+  foreach my $port (keys %$device_ports) {
+      return $pass if scalar grep {$port eq $_} values %$interfaces;
+  }
+
+  # else cancel
+  return $job->cancel("discover cancelled: $device failed to return valid interfaces");
 });
 
 register_worker({ phase => 'early', driver => 'snmp' }, sub {

@@ -3,6 +3,7 @@ use 5.010_001;
 use strict;
 use warnings FATAL => 'all';
 
+use lib '.';
 use inc::Module::Install 0.91;
 
 homepage 'http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ASims';

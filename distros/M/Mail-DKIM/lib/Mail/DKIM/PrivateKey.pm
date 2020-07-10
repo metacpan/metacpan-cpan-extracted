@@ -1,7 +1,7 @@
 package Mail::DKIM::PrivateKey;
 use strict;
 use warnings;
-our $VERSION = '1.20200513.1'; # VERSION
+our $VERSION = '1.20200708'; # VERSION
 # ABSTRACT: a private key loaded in memory for DKIM signing
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -74,11 +74,11 @@ sub convert {
     eval {
         local $SIG{__DIE__};
         $cork = new_private_key Crypt::OpenSSL::RSA($pkcs);
+	1
+    } || do {
+	$self->errorstr($@);
+	return;
     };
-
-    $@
-      and $self->errorstr($@),
-      return;
 
     $cork
       or return;
@@ -132,7 +132,7 @@ Mail::DKIM::PrivateKey - a private key loaded in memory for DKIM signing
 
 =head1 VERSION
 
-version 1.20200513.1
+version 1.20200708
 
 =head1 SYNOPSIS
 

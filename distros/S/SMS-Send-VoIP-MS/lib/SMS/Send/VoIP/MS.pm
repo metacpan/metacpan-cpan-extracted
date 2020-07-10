@@ -5,11 +5,11 @@ use URI;
 use JSON::XS qw{decode_json};
 use base qw{SMS::Send::Driver::WebService};
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 NAME
 
-SMS::Send::VoIP::MS - SMS::Send driver for VoIP.ms
+SMS::Send::VoIP::MS - SMS::Send driver for VoIP.ms Web Services
 
 =head1 SYNOPSIS
 
@@ -32,11 +32,13 @@ SMS::Send::VoIP::MS - SMS::Send driver for VoIP.ms
 
 =head1 DESCRIPTION
 
-SMS::Send driver for VoIP.ms service.
+SMS::Send driver for VoIP.ms Web Services.
 
 =head1 METHODS
 
 =head2 send_sms
+
+  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035551212');
 
 =cut
 
@@ -60,7 +62,7 @@ sub send_sms {
   #https://voip.ms/api/v1/rest.php?api_username={user}&api_password={pass}&method=sendSMS&did={from_phone}&dst={to_phone}&message=hello+world
 
   my $response         = $self->uat->get($url); #isa HASH from HTTP::Tiny
-  die(sprintf("HTTP Error: %s %s", $response->{'status'}, $response->{'reason'})) unless $response->{'success'};
+  die(sprintf('HTTP Error: %s %s', $response->{'status'}, $response->{'reason'})) unless $response->{'success'};
   $self->{'__content'} = $response->{'content'};
   #{"status":"success","sms":40702183}
   my $data             = decode_json($response->{'content'});
@@ -74,6 +76,8 @@ sub send_sms {
 
 Sets and returns the username string value which is passed to the web service as "api_username"
 
+  $sms->username("override");
+
 =cut
 
 #see SMS::Send::Driver::WebService->username
@@ -81,6 +85,8 @@ Sets and returns the username string value which is passed to the web service as
 =head2 password
 
 Sets and returns the password string value which is passed to the web service as "api_password"
+
+  $sms->password("override");
 
 =cut
 
@@ -94,10 +100,10 @@ Sets and returns the "did" string value (Direct Inward Dialing Number aka the Fr
 
 sub did {
   my $self       = shift;
-  $self->{"did"} = shift if @_;
-  $self->{"did"} = $self->cfg_property("did") unless defined $self->{"did"};
-  die("Error: property did required (Direct Inward Dialing Phone Number)") unless defined $self->{"did"};
-  return $self->{"did"};
+  $self->{'did'} = shift if @_;
+  $self->{'did'} = $self->cfg_property('did') unless defined $self->{'did'};
+  die('Error: property did required (Direct Inward Dialing Phone Number)') unless defined $self->{'did'};
+  return $self->{'did'};
 }
 
 =head2 url

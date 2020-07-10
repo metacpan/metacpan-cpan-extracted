@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/rsync/retry.pm','script/rsync-retry','script/rsync-retry-on-all'];
+my $filenames = ['lib/App/rsync/retry.pm','script/rsync-retry','script/rsync-retry-on-all','script/rsyncr'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

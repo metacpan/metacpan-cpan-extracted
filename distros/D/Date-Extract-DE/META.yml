@@ -17,7 +17,7 @@ name: Date-Extract-DE
 provides:
   Date::Extract::DE:
     file: lib/Date/Extract/DE.pm
-    version: v0.0.5
+    version: v0.0.6
 requires:
   Date::Range: '0'
   Date::Simple: '0'
@@ -25,6 +25,7 @@ requires:
   DateTime::Incomplete: '0'
   Moose: '0.64'
   MooseX::ClassAttribute: '0'
+  Regexp::Assemble: '0.38'
   namespace::autoclean: '0.05'
   perl: v5.12.0
   version: '0.77'
@@ -32,5 +33,5 @@ resources:
   bugtracker: https://github.com/apa-it/date-extract-de/issues
   license: http://opensource.org/licenses/gpl-2.0.php
   repository: https://github.com/apa-it/date-extract-de
-version: v0.0.5
+version: v0.0.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

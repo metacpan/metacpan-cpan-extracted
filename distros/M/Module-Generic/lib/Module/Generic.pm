@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.12.15
+## Version v0.12.16
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/08/24
-## Modified 2020/06/16
+## Modified 2020/06/19
 ## 
 ##----------------------------------------------------------------------------
 package Module::Generic;
@@ -15,6 +15,8 @@ BEGIN
     use strict;
     use warnings::register;
     use Scalar::Util qw( openhandle );
+    use Sub::Util ();
+    use Clone ();
     use Data::Dumper;
     use Data::Printer 
     {
@@ -41,7 +43,7 @@ BEGIN
     @EXPORT      = qw( );
     @EXPORT_OK   = qw( subclasses );
     %EXPORT_TAGS = ();
-    $VERSION     = 'v0.12.15';
+    $VERSION     = 'v0.12.16';
     $VERBOSE     = 0;
     $DEBUG       = 0;
     $SILENT_AUTOLOAD      = 1;
@@ -261,20 +263,34 @@ sub clear_error
     return( 1 );
 }
 
+# sub clone
+# {
+#     my $self  = shift( @_ );
+#     if( Scalar::Util::reftype( $self ) eq 'HASH' )
+#     {
+#         return( bless( { %$self } => ( ref( $self ) || $self ) ) );
+#     }
+#     elsif( Scalar::Util::reftype( $self ) eq 'ARRAY' )
+#     {
+#         return( bless( [ @$self ] => ( ref( $self ) || $self ) ) );
+#     }
+#     else
+#     {
+#         return( $self->error( "Cloning is unsupported for type \"", ref( $self ), "\". Only hash or array references are supported." ) );
+#     }
+# }
+
 sub clone
 {
     my $self  = shift( @_ );
-    if( Scalar::Util::reftype( $self ) eq 'HASH' )
+    try
     {
-        return( bless( { %$self } => ( ref( $self ) || $self ) ) );
+        $self->message( 3, "Cloning object '", overload::StrVal( $self ), "'." );
+        return( Clone::clone( $self ) );
     }
-    elsif( Scalar::Util::reftype( $self ) eq 'ARRAY' )
+    catch( $e )
     {
-        return( bless( [ @$self ] => ( ref( $self ) || $self ) ) );
-    }
-    else
-    {
-        return( $self->error( "Cloning is unsupported for type \"", ref( $self ), "\". Only hash or array references are supported." ) );
+        return( $self->error( "Error cloning object \"", overload::StrVal( $self ), "\": $e" ) );
     }
 }
 
@@ -1104,6 +1120,28 @@ sub error
                 warn( $@ ? $o : $enc_str ) if( $should_display_warning );
             }
         }
+        
+        if( overload::Overloaded( $self ) )
+        {
+            my $overload_meth_ref = overload::Method( $self, '""' );
+            my $overload_meth_name = Sub::Util::subname( $overload_meth_ref );
+            ## use Sub::Identify ();
+            ## my( $over_file, $over_line ) = Sub::Identify::get_code_location( $overload_meth_ref );
+            # my( $over_call_pack, $over_call_file, $over_call_line ) = caller();
+            my $call_sub = (caller(1))[3];
+            # my $call_hash = (caller(0))[10];
+            # my @call_keys = CORE::keys( %$call_hash );
+            # print( STDERR "\$self is overloaded and stringification method is '$overload_meth', its sub name is '$overload_meth_name' from file '$over_file' at line '$over_line' and our caller subroutine is '$call_sub' from file '$over_call_file' at line '$over_call_line' with hint hash keys '@call_keys'.\n" );
+            ## overloaded method name can be, for example: My::Package::as_string
+            ## or, for anonymous sub: My::Package::__ANON__[lib/My/Package.pm:12]
+            ## caller sub will reliably be the same, so we use it to check if we are called from an overloaded stringification and return undef right here.
+            ## Want::want check of being called in an OBJECT context triggers a perl segmentation fault
+            if( $overload_meth_name eq $call_sub )
+            {
+                return;
+            }
+        }
+        
         ## https://metacpan.org/pod/Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef
         ## https://perlmonks.org/index.pl?node_id=741847
         ## Because in list context this would create a lit with one element undef()
@@ -1168,7 +1206,10 @@ sub init
         {
             ## $self->_message( 3, "Got an hash ref" );
             my $h = shift( @args );
+            my $debug_value;
+            $debug_value = $h->{debug} if( CORE::exists( $h->{debug} ) );
             $vals = [ %$h ];
+            unshift( @$vals, debug => $debug_value ) if( CORE::defined( $debug_value ) );
             ## $vals = [ %{$_[0]} ];
         }
         elsif( ref( $args[0] ) eq 'ARRAY' )
@@ -1730,6 +1771,30 @@ sub message_switch
     return( 1 );
 }
 
+sub new_array
+{
+    my $self = shift( @_ );
+    return( Module::Generic::Array->new( @_ ) );
+}
+
+sub new_hash
+{
+    my $self = shift( @_ );
+    return( Module::Generic::Hash->new( @_ ) );
+}
+
+sub new_number
+{
+    my $self = shift( @_ );
+    return( Module::Generic::Number->new( @_ ) );
+}
+
+sub new_scalar
+{
+    my $self = shift( @_ );
+    return( Module::Generic::Scalar->new( @_ ) );
+}
+
 sub noexec { $_[0]->{_msg_no_exec_sub} = 1; return( $_[0] ); }
 
 ## Purpose is to get an error object thrown from another package, and make it ours and pass it along
@@ -1943,6 +2008,17 @@ sub __instantiate_object
 ## If _instantiate_object is inherited, it will yield unpredictable results
 sub _instantiate_object { return( shift->__instantiate_object( @_ ) ); }
 
+sub _is_a
+{
+    my $self = shift( @_ );
+    my $obj = shift( @_ );
+    my $pkg = shift( @_ );
+    no overloading;
+    return if( !$obj || !$pkg );
+    return if( !$self->_is_object( $obj ) );
+    return( $obj->isa( $pkg ) );
+}
+
 sub _is_class_loaded { shift( @_ ); return( Class::Load::is_class_loaded( @_ ) ); }
 
 ## UNIVERSAL::isa works for both array or array as objects
@@ -1956,7 +2032,19 @@ sub _is_object { return( Scalar::Util::blessed( $_[1] ) ); }
 
 sub _is_scalar{ return( Scalar::Util::reftype( $_[1] ) eq 'SCALAR' ); }
 
-sub _load_class { shift( @_ ); return( Class::Load::load_class( @_ ) ); }
+sub _load_class
+{
+    my $self = shift( @_ );
+    my $class = shift( @_ ) || return( $self->error( "No package name was provided to load." ) );
+    try
+    {
+        return( Class::Load::load_class( "$class" ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( $e ) );
+    }
+}
 
 sub _obj2h
 {
@@ -2822,7 +2910,7 @@ sub _set_get_object_array_object
     {
         my $that = ( scalar( @_ ) == 1 && UNIVERSAL::isa( $_[0], 'ARRAY' ) ) ? shift( @_ ) : [ @_ ];
         ## $self->message( 3, "Received following data to store as array object: ", sub{ $self->dump( $that ) } );
-        my $ref = $self->_set_get_object_array( $field, $class, $that );
+        my $ref = $self->_set_get_object_array( $field, $class, $that ) || return;
         ## $self->message( 3, "Object array returned is: ", sub{ $self->dump( $ref ) } );
         $data->{ $field } = Module::Generic::Array->new( $ref );
         ## $self->message( 3, "Now value for field '$field' is: ", $data->{ $field }, " which contains: '", $data->{ $field }->join( "', '" ), "'." );
@@ -2935,7 +3023,10 @@ sub _set_get_scalar_as_object
             return;
         }
     }
-    return( $v );
+    else
+    {
+        return( $v );
+    }
 }
 
 sub _set_get_scalar_or_object
@@ -3740,15 +3831,17 @@ BEGIN
     use Scalar::Util ();
     use Want;
     ## use Data::Dumper;
-    use overload ('""'  => 'as_string',
-                  '=='  => sub { _obj_eq(@_) },
-                  '!='  => sub { !_obj_eq(@_) },
-                  'eq'  => sub { _obj_eq(@_) },
-                  'ne'  => sub { !_obj_eq(@_) },
-                  '%{}' => 'as_hash',
-                  fallback => 1,
-                 );
-    our( $VERSION ) = '0.1.0';
+    use overload (
+        # Turned out to be not such a good ide as it create unexpected results, especially when this is an array of overloaded objects
+        # '""'  => 'as_string',
+        '=='  => sub { _obj_eq(@_) },
+        '!='  => sub { !_obj_eq(@_) },
+        'eq'  => sub { _obj_eq(@_) },
+        'ne'  => sub { !_obj_eq(@_) },
+        '%{}' => 'as_hash',
+        fallback => 1,
+    );
+    our( $VERSION ) = 'v0.1.1';
 };
 
 sub new
@@ -3828,7 +3921,8 @@ sub each
     ## Index starts from 0
     while( my( $i, $v ) = CORE::each( @$self ) )
     {
-        $code->( $i, $v ) || CORE::last;
+        local $_ = $v;
+        CORE::defined( $code->( $i, $v ) ) || CORE::last;
     }
     return( $self );
 }
@@ -3840,6 +3934,17 @@ sub exists
     return( $self->_number( CORE::scalar( CORE::grep( /^$this$/, @$self ) ) ) );
 }
 
+sub first
+{
+    my $self = shift( @_ );
+    return( $self->[0] ) if( CORE::length( $self->[0] ) );
+    if( Want::want( 'OBJECT' ) )
+    {
+        rreturn( Module::Generic::Null->new );
+    }
+    return( $self->[0] );
+}
+
 sub for
 {
     my $self = CORE::shift( @_ );
@@ -3847,7 +3952,8 @@ sub for
     return if( ref( $code ) ne 'CODE' );
     CORE::for( my $i = 0; $i < scalar( @$self ); $i++ )
     {
-        $code->( $i, $self->[ $i ] ) || CORE::last;
+        local $_ = $self->[ $i ];
+        CORE::defined( $code->( $i, $self->[ $i ] ) ) || CORE::last;
     }
     return( $self );
 }
@@ -3859,9 +3965,17 @@ sub foreach
     return if( ref( $code ) ne 'CODE' );
     CORE::foreach my $v ( @$self )
     {
-        $code->( $v ) || CORE::last;
+        local $_ = $v;
+        CORE::defined( $code->( $v ) ) || CORE::last;
     }
     return( $self );
+}
+
+sub get
+{
+    my $self = CORE::shift( @_ );
+    my $offset = CORE::shift( @_ );
+    return( $self->[ CORE::int( $offset ) ] );
 }
 
 sub grep
@@ -3902,7 +4016,20 @@ sub keys
     return( $self->new( [ CORE::keys( @$self ) ] ) );
 }
 
+sub last
+{
+    my $self = shift( @_ );
+    return( $self->[-1] ) if( CORE::length( $self->[-1] ) );
+    if( Want::want( 'OBJECT' ) )
+    {
+        rreturn( Module::Generic::Null->new );
+    }
+    return( $self->[-1] );
+}
+
 sub length { return( $_[0]->_number( scalar( @{$_[0]} ) ) ); }
+
+sub list { return( @{$_[0]} ); }
 
 sub map
 {
@@ -3910,7 +4037,11 @@ sub map
     my $code = CORE::shift( @_ );
     return if( ref( $code ) ne 'CODE' );
     my $ref = [ CORE::map( $code->( $_ ), @$self ) ];
-    if( Want::want( 'LIST' ) )
+    if( Want::want( 'OBJECT' ) )
+    {
+        return( $self->new( $ref ) );
+    }
+    elsif( Want::want( 'LIST' ) )
     {
         return( @$ref );
     }
@@ -3962,6 +4093,8 @@ sub reverse
         return( $self->new( $ref ) );
     }
 }
+
+sub scalar { return( shift->length ); }
 
 sub set
 {
@@ -4181,7 +4314,7 @@ BEGIN
         },
         fallback => 1,
     );
-    our( $VERSION ) = 'v0.2.2';
+    our( $VERSION ) = 'v0.2.3';
 };
 
 ## sub new { return( shift->_new( @_ ) ); }
@@ -4405,6 +4538,8 @@ sub pad
     return( $self );
 }
 
+sub pos { return( $_[0]->_number( @_ > 1 ? ( CORE::pos( ${$_[0]} ) = $_[1] ) : CORE::pos( ${$_[0]} ) ) ); }
+
 sub quotemeta { return( __PACKAGE__->_new( CORE::quotemeta( ${$_[0]} ) ) ); }
 
 sub right { return( $_[0]->_new( CORE::substr( ${$_[0]}, ( CORE::int( $_[1] ) * -1 ) ) ) ); }
@@ -4507,6 +4642,15 @@ sub substr
     return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset, $length, $replacement ) ) ) if( CORE::defined( $length ) && CORE::defined( $replacement ) );
     return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset, $length ) ) ) if( CORE::defined( $length ) );
     return( __PACKAGE__->_new( CORE::substr( ${$self}, $offset ) ) );
+}
+
+## The 3 dash here are just so my editor does not get confused with colouring
+sub tr ###
+{
+    my $self = CORE::shift( @_ );
+    my( $search, $replace, $opts ) = @_;
+    eval( "\$\$self =~ CORE::tr/$search/$replace/$opts" );
+    return( $self );
 }
 
 sub trim
@@ -5595,6 +5739,8 @@ sub round2
     }
 }
 
+sub scalar { return( shift->as_string ); }
+
 sub sign_neg { return( shift->_set_get_prop( 'sign_neg', @_ ) ); }
 
 sub sign_pos { return( shift->_set_get_prop( 'sign_pos', @_ ) ); }
@@ -5905,7 +6051,7 @@ sub each
     return( $self->error( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead." ) ) if( ref( $code ) ne 'CODE' );
     while( my( $k, $v ) = CORE::each( %$self ) )
     {
-        $code->( $k, $v ) || CORE::last;
+        CORE::defined( $code->( $k, $v ) ) || CORE::last;
     }
     return( $self );
 }
@@ -5921,10 +6067,13 @@ sub foreach
     return( $self->error( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead." ) ) if( ref( $code ) ne 'CODE' );
     CORE::foreach my $k ( CORE::keys( %$self ) )
     {
-        $code->( $k, $self->{ $k } ) || CORE::last;
+        local $_ = $self->{ $k };
+        CORE::defined( $code->( $k, $self->{ $k } ) ) || CORE::last;
     }
     return( $self );
 }
+
+sub get { return( $_[0]->{ $_[1] } ); }
 
 sub json
 {
@@ -6005,6 +6154,8 @@ sub merge
 }
 
 sub reset { %{$_[0]} = () };
+
+sub set { $_[0]->{ $_[1] } = $_[2]; }
 
 sub undef { %{$_[0]} = () };
 
@@ -6500,7 +6651,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.12.15
+    v0.12.16
 
 =head1 DESCRIPTION
 
@@ -6928,6 +7079,22 @@ Provided with a boolean value, this toggles on or off all the calls to L</"messa
 
 In reality this is not really needed, because L</"message"> will, at the beginning check if the object has the debug flag on and if not returns undef.
 
+=head2 new_array
+
+Instantiate a new L<Module::Generic::Array> object. If any arguments are provided, it will pass it to L<Module::Generic::Array/new> and return the object.
+
+=head2 new_hash
+
+Instantiate a new L<Module::Generic::Hash> object. If any arguments are provided, it will pass it to L<Module::Generic::Hash/new> and return the object.
+
+=head2 new_number
+
+Instantiate a new L<Module::Generic::Number> object. If any arguments are provided, it will pass it to L<Module::Generic::Number/new> and return the object.
+
+=head2 new_scalar
+
+Instantiate a new L<Module::Generic::Scalar> object. If any arguments are provided, it will pass it to L<Module::Generic::Scalar/new> and return the object.
+
 =head2 noexec
 
 Sets the module property I<_msg_no_exec_sub> to true, so that any call to L</"message"> whose arguments include a reference to a sub routine, will not try to execute the code. For example, imagine you have a sub routine such as:
@@ -7059,6 +7226,24 @@ This is a support method used by L</"_instantiate_object">
 =head2 _instantiate_object
 
 This does the same thing as L</"__instantiate_object"> and the purpose is for this method to be potentially superseded in your own module. In your own module, you would call L</"__instantiate_object">
+
+=head2 _is_a
+
+Provided with an object and a package name and this will return true if the object is a blessed object from this package name (or a sub package of it), or false if not.
+
+The value of this is to reduce the burden of having to check whether the object actually exists, i.e. is not null or undef, if it is an object and if it is from that class. This allows to do it in just one method call like this:
+
+    if( $self->_is_a( $obj, 'My::Package' ) )
+    {
+        # Do something
+    }
+
+Of course, if you are sure the object is actually an object, then you can directly do:
+
+    if( $obj->isa( 'My::Package' ) )
+    {
+        # Do something
+    }
 
 =head2 _is_class_loaded
 

@@ -344,4 +344,13 @@ is_deeply($cp{oo}, {foo => {key => 'left'}}, 'Custom Precedent - Object on Objec
     main::ok($merged);
 }
 
+{
+    my $destroyed = 0;
+    no warnings 'once';
+    local *Hash::Merge::DESTROY = sub { $destroyed = 1 };
+    use warnings;
+    Hash::Merge->new;
+    ok $destroyed, "instance did not leak";
+}
+
 done_testing;

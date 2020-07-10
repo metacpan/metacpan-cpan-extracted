@@ -1,49 +1,24 @@
-==================================================
-Changes from 2019-02-21 00:00:00 +0000 to present.
-==================================================
+Changelog for Exporter-ConditionalSubs
 
---------------------------------------------
-version v1.10.1 at 2020-02-21 19:40:05 +0000
---------------------------------------------
+v1.11.0 2020-07-09T15:41:47
+ - Update README (Andrew Hewus Fresh)
+ - SM-2590  Documentation (Larry Leszczynski)
+ - SM-2590  Clean up requires (Larry Leszczynski)
+ - SM-2590  Do not stub out exports if Devel::Cover in use (Larry
+   Leszczynski)
+ - SM-2590  Upgrade B::Generate (Larry Leszczynski)
 
-  Change: 958d1902382ffebeee9a939fe2c19ea4d631d2bc
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-20 13:14:04 +0000
+v1.10.1 2020-02-21T18:26:56
+ - Update version in README (Andrew Hewus Fresh)
+ - Update cpanfile (Andrew Hewus Fresh)
+ - Fix boilerplate test to not be TODO (Andrew Hewus Fresh)
+ - Move author and release tests where they go (Andrew Hewus Fresh)
+ - Update distribution files (Andrew Hewus Fresh)
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
 
-    Update version in README 
-
-  Change: 0cc332ee592ad9d93382dbf447f66e9fc7120a59
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-20 13:13:49 +0000
-
-    Update cpanfile 
-
-  Change: 6ba2dfddf6ee59c42ceee5e3f2838757dd37d81d
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-19 19:29:09 +0000
-
-    Fix boilerplate test to not be TODO
-
-    And stop trying to check the now dynamic Changes file. 
-
-  Change: a5b4af44dab7183967a9e65cb6007cb8da37dd97
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-19 19:22:19 +0000
-
-    Move author and release tests where they go 
-
-  Change: 637d93993269b35db388717a928f6bb525b6f575
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-19 19:22:19 +0000
-
-    Update distribution files 
-
-  Change: 1a742960f28acb87018db22614e528970ed65a45
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-02-19 18:53:04 +0000
-
-    Convert to Dist::Zilla::PluginBundle::Author::GSG 
-
-===============================================
-Plus 1 release after 2019-02-21 00:00:00 +0000.
-===============================================
+v1.10.0 2015-05-20T01:41:38
+ - More .gitignore (Larry Leszczynski)
+ - Version update to 1.01 for CPAN (Larry Leszczynski)
+ - Logical defined-or not available before 5.10 (Larry Leszczynski)
+ - Add .gitignore (Larry Leszczynski)
+ - initial content upload (Steven Arnott)

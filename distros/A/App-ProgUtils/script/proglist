@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2019-10-17'; # DATE
-our $VERSION = '0.201'; # VERSION
+our $DATE = '2020-04-16'; # DATE
+our $VERSION = '0.202'; # VERSION
 
 use 5.010;
 use strict;
@@ -17,16 +17,26 @@ $SPEC{proglist} = {
     args => {
         query => {
             schema => 're*',
-            req => 1,
+            req => 0,
             pos => 0,
         },
     },
     examples => [
         {
+            summary => 'List all programs that have "font" in their name',
             argv => [qw/font/],
             test => 0,
             'x.doc.show_result'=>0,
         },
+        {
+            summary => 'List all programs',
+            argv => [],
+            test => 0,
+            'x.doc.show_result'=>0,
+        },
+    ],
+    links => [
+        {url=>'prog:list-all-programs-in-path'},
     ],
 };
 sub proglist {
@@ -34,7 +44,7 @@ sub proglist {
 
     my %args = @_;
 
-    my $re = $args{query};
+    my $re = $args{query} || qr//;
 
     my @res;
     for my $dir (split /:/, $ENV{PATH}) {
@@ -70,17 +80,23 @@ proglist - List programs matching query
 
 =head1 VERSION
 
-This document describes version 0.201 of proglist (from Perl distribution App-ProgUtils), released on 2019-10-17.
+This document describes version 0.202 of proglist (from Perl distribution App-ProgUtils), released on 2020-04-16.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % proglist [options] <query>
+ % proglist [options] [query]
 
 Examples:
 
+List all programs that have "font" in their name:
+
  % proglist font
+
+List all programs:
+
+ % proglist
 
 =head1 OPTIONS
 
@@ -90,7 +106,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--query>=I<s>*
+=item B<--query>=I<s>
 
 =back
 
@@ -130,6 +146,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -197,13 +217,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<list-all-programs-in-path>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

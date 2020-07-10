@@ -4,7 +4,7 @@ package YAML::PP::Schema;
 use B;
 use Module::Load qw//;
 
-our $VERSION = '0.022'; # VERSION
+our $VERSION = '0.023'; # VERSION
 
 use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE /;
 
@@ -53,6 +53,7 @@ sub new {
         scalarref => undef,
         refref => undef,
         coderef => undef,
+        glob => undef,
         tied_equals => {},
     );
     my $self = bless {
@@ -265,6 +266,12 @@ sub add_representer {
     }
     if (defined(my $coderef = $args{coderef})) {
         $representers->{coderef} = {
+            code => $args{code},
+        };
+        return;
+    }
+    if (defined(my $glob = $args{glob})) {
+        $representers->{glob} = {
             code => $args{code},
         };
         return;

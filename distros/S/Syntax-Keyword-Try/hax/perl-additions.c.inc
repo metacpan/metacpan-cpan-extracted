@@ -45,9 +45,11 @@ static OP *newPADxVOP(I32 type, PADOFFSET padix, I32 flags, U32 private)
 #if HAVE_PERL_VERSION(5,22,0)
 #  define newLOGOP_CUSTOM(flags, first, other)  newLOGOP(OP_CUSTOM, flags, first, other)
 #  define newSVOP_CUSTOM(flags, sv)             newSVOP(OP_CUSTOM, flags, sv)
+#  define newUNOP_CUSTOM(flags, first)          newUNOP(OP_CUSTOM, flags, first)
 #else
 #  define newLOGOP_CUSTOM(flags, first, other)  S_newLOGOP_CUSTOM(aTHX_ flags, first, other)
 #  define newSVOP_CUSTOM(flags, sv)             S_newSVOP_CUSTOM(aTHX_ flags, sv)
+#  define newUNOP_CUSTOM(flags, first)          S_newUNOP_CUSTOM(aTHX_ flags, first)
 
 static OP *S_newLOGOP_CUSTOM(pTHX_ U32 flags, OP *first, OP *other)
 {
@@ -90,6 +92,18 @@ static OP *S_newSVOP_CUSTOM(pTHX_ U32 flags, SV *sv)
   svop->op_flags = 0;
   svop->op_private = 0;
   return (OP *)svop;
+}
+
+static OP *S_newUNOP_CUSTOM(pTHX_ U32 flags, OP *first)
+{
+  UNOP *unop;
+  NewOp(1101, unop, 1, UNOP);
+  unop->op_type = (OPCODE)OP_CUSTOM;
+  unop->op_ppaddr = NULL; /* Because caller only overrides it anyway */
+  unop->op_first = first;
+  unop->op_flags = (U8)(flags | OPf_KIDS);
+  unop->op_private = (U8)(1 | (flags >> 8));
+  return (OP *)unop;
 }
 
 #endif

@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 use Test::More tests => 1;
-use FFI::Platypus;
+use FFI::Platypus 1.00;
 
 subtest 'Pascal' => sub {
   plan tests => 3;
 
-  my $ffi = FFI::Platypus->new(lang => 'Fortran');
+  my $ffi = FFI::Platypus->new( api => 1, lang => 'Fortran');
   eval { $ffi->type('integer') };
   is $@, '', 'integer is an okay type';
   eval { $ffi->type('foo_t') };

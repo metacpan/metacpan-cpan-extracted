@@ -1,5 +1,12 @@
 Revision history for Module-Build-FFI
 
+0.54      2020-07-07 16:06:11 -0600
+  - Fix incorrectly versioned Module::Build::FFI::Fortran
+    so that it matches the other versions in this dist.
+
+0.53      2020-07-07 14:26:06 -0600
+  - Moved Module::Build::FFI::Fortran into this dist
+
 0.52      2019-11-14 16:06:07 -0700
   - Meta fixes.
 

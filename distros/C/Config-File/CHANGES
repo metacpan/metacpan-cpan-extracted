@@ -1,5 +1,10 @@
-UNRELEASED
-1.52 (15-Nov-2018):
+1.54 (8-Jun-2020):
+ - No code changes - just updated META and information
+
+1.53 (8-Jun-2020):
+ - No changes - just another release for CPAN
+
+1.52 (22-May-2020):
  - Less problematic build CPAN RT#132165
 
 1.51 (15-Nov-2018):

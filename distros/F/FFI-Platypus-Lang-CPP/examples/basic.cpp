@@ -1,4 +1,4 @@
-// on Linux compile with: g++ --shared -o basic.so basic.cpp
+// on Linux compile with: g++ -fPIC --shared -o basic.so basic.cpp
 // elsewhere, consult your C++ compiler documentation
 
 class Foo {

@@ -28,6 +28,7 @@ lib/NewsExtractor/SiteSpecificExtractor/UDN.pm
 lib/NewsExtractor/SiteSpecificExtractor/ctee_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/estate_ltn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/hk_crntt_com.pm
+lib/NewsExtractor/SiteSpecificExtractor/hk_on_cc.pm
 lib/NewsExtractor/SiteSpecificExtractor/money_udn_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/new_ctv_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/newnet_tw.pm
@@ -54,6 +55,7 @@ lib/NewsExtractor/SiteSpecificExtractor/www_thestandnews_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_ttv_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_twreporter_org.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_upmedia_mg.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_xinhuanet_com.pm
 lib/NewsExtractor/TXExtractor.pm
 lib/NewsExtractor/TextUtil.pm
 lib/NewsExtractor/Types.pm

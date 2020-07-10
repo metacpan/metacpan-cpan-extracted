@@ -1,5 +1,12 @@
 Revision history for Bible::Reference
 
+1.04      2020-07-09 08:10:08-07:00 America/Los_Angeles
+        - Remove subroutine signatures to allow operation back to Perl 5.14
+
+1.03      2020-07-08 18:13:37-07:00 America/Los_Angeles
+        - Remove Moose dependency; replace with exact and exact::class
+        - Update Travis YAML
+
 1.02      2017-08-21 18:13:34-07:00 America/Los_Angeles
         - Add as_chapters() and as_runs() methods
         - Fix as_books() grouping logic (to fix an edge-case bug)

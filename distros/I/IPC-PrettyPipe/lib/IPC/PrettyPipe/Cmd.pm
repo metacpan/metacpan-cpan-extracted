@@ -25,18 +25,76 @@ use String::ShellQuote 'shell_quote';
 
 use Moo;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 with 'IPC::PrettyPipe::Queue::Element';
 
 use namespace::clean;
 
+use overload 'fallback' => 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use overload '|' => sub {
+    my $swap = pop;
+    my $pipe = IPC::PrettyPipe->new;
+    $pipe->add( $_ ) for ( $swap ? reverse( @_ ) : @_ );
+    $pipe;
+};
 
 # need access to has method which will get removed at the end of the
 # compilation of this module
 BEGIN {
     IPC::PrettyPipe::Arg::Format->shadow_attrs( fmt => sub { 'arg' . shift } );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 has cmd => (
     is       => 'ro',
@@ -54,17 +112,100 @@ has _init_args => (
     clearer   => 1,
 );
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 has args => (
     is       => 'ro',
     default  => sub { IPC::PrettyPipe::Queue->new },
     init_arg => undef,
 );
 
+
+
+
+
+
+
+
+
+
 has streams => (
     is       => 'ro',
     default  => sub { IPC::PrettyPipe::Queue->new },
     init_arg => undef,
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 has argfmt => (
     is      => 'ro',
@@ -112,7 +253,66 @@ sub BUILD {
     return;
 }
 
+
+
+
+
+
+
+
+
+
 sub quoted_cmd { shell_quote( $_[0]->cmd ) }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub add {
 
@@ -198,7 +398,54 @@ sub add {
 }
 
 
-# free form add
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sub ffadd {
 
     my $self = shift;
@@ -267,6 +514,20 @@ sub ffadd {
     return;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sub stream {
 
     my $self = shift;
@@ -301,6 +562,15 @@ sub stream {
 }
 
 
+
+
+
+
+
+
+
+
+
 sub valmatch {
     my $self    = shift;
     my $pattern = shift;
@@ -308,6 +578,32 @@ sub valmatch {
     # find number of matches;
     return sum 0, map { $_->valmatch( $pattern ) } @{ $self->args->elements };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub valsubst {
     my $self = shift;
@@ -380,7 +676,7 @@ IPC::PrettyPipe::Cmd - A command in an B<IPC::PrettyPipe> pipeline
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -423,7 +719,7 @@ version 0.12
 =head1 DESCRIPTION
 
 B<IPC::PrettyPipe::Cmd> objects are containers for the individual
-commands in a pipeline created by B<L<IPC::PrettyPipe>>.  A command
+commands in a pipeline created by L<IPC::PrettyPipe>.  A command
 may have one or more arguments, some of which are options consisting
 of a name and an optional value.
 
@@ -432,35 +728,13 @@ C<-> for short options).  B<IPC::PrettyPipe::Cmd> makes no distinction
 between option and non-option arguments.  The latter are simply
 specified as arguments with a blank prefix.
 
-=for Pod::Coverage BUILDARGS BUILD
+=head1 ATTRIBUTES
 
-=head1 METHODS
+=head2 cmd
 
-=head2 Constructor
+The program to execute.  Required.
 
-=over
-
-=item B<new>
-
-  # constructor with named arguments
-  $cmd = IPC::PrettyPipe::Cmd->new( cmd => $cmd, %attr );
-
-  # concise constructor interface
-  $cmd = IPC::PrettyPipe::Cmd->new( $cmd );
-  $cmd = IPC::PrettyPipe::Cmd->new( [ $cmd, $args ] );
-
-Construct a B<IPC::PrettyPipe::Cmd> object encapsulating C<$cmd>.
-C<$cmd> must be specified.
-
-The available attributes are:
-
-=over
-
-=item C<cmd>
-
-The program to execute.
-
-=item C<args>
+=head2 args
 
 I<Optional>. Arguments for the program.  C<args> may be
 
@@ -472,7 +746,7 @@ A scalar, e.g. a single argument;
 
 =item *
 
-An B<L<IPC::PrettyPipe::Arg>> object;
+An L<IPC::PrettyPipe::Arg> object;
 
 =item *
 
@@ -482,31 +756,84 @@ supplied to the command in a random order.
 =item *
 
 An array reference containing more complex argument specifications.
-Its elements are processed with the B<L</ffadd>> method.
+Its elements are processed with the L</ffadd> method.
 
 =back
 
-=item C<argpfx>, C<argsep>
+=head2 argpfx
+
+=head2 argsep
 
 I<Optional>.  The default prefix and separation attributes for
-command arguments.  See B<L<IPC::PrettyPipe::Arg>> for more
-details.  These override any specified via the C<L</argfmt>> object.
+command arguments.  See L<IPC::PrettyPipe::Arg> for more
+details.  These override any specified via the L</argfmt> object.
 
-=item C<argfmt>
+=head2 argfmt
 
-I<Optional>. An B<L<IPC::PrettyPipe::Arg::Format>> object which will be used to
+I<Optional>. An L<IPC::PrettyPipe::Arg::Format> object which will be used to
 specify the default prefix and separation attributes for arguments to
-commands.  May be overridden by C<L</argpfx>> and C<L</argsep>>.
+commands.  May be overridden by L</argpfx> and L</argsep>.
 
-=back
+=head1 METHODS
 
-=back
+=head2 new
 
-=head2 Other methods
+  # constructor with named arguments
+  $cmd = IPC::PrettyPipe::Cmd->new( cmd => $cmd, %attributes );
 
-=over
+  # concise constructor interface
+  $cmd = IPC::PrettyPipe::Cmd->new( $cmd );
+  $cmd = IPC::PrettyPipe::Cmd->new( [ $cmd, $args ] );
 
-=item B<add>
+Construct a B<IPC::PrettyPipe::Cmd> object encapsulating C<$cmd>.
+C<$cmd> must be specified.  See L</ATTRIBUTES> for a description
+of the available attributes.
+
+=head2 cmd
+
+  $name = $cmd->cmd
+
+Return the name of the program to execute.
+
+=head2 args
+
+  $args = $cmd->args;
+
+Return a L<IPC::PrettyPipe::Queue> object containing the
+L<IPC::PrettyPipe::Arg> objects associated with the command.
+
+=head2 B<streams>
+
+  $streams = $cmd->streams
+
+Return a L<IPC::PrettyPipe::Queue> object containing the
+L<IPC::PrettyPipe::Stream> objects associated with the command.
+
+=head2 argpfx
+
+=head2 argsep
+
+=head2 argfmt
+
+  $obj->argpfx( $new_pfx );
+  $obj->argsep( $new_sep );
+  $obj->argfmt( $format_obj );
+
+Retrieve (when called with no arguments) or modify (when called with
+an argument) the similarly named object attributes.  See
+L<IPC::PrettyPipe::Arg> for more information.  Changing them
+affects new, not existing, arguments
+
+C<$format_obj> is an L<IPC::PrettyPipe::Arg::Format> object;
+
+=head2 quoted_cmd
+
+  $name = $cmd->quoted_cmd;
+
+Return the name of the command, appropriately quoted for passing as a
+single word to a Bourne compatible shell.
+
+=head2 add
 
   $cmd->add( $args );
   $cmd->add( arg => $args, %options );
@@ -532,7 +859,7 @@ values:
 
 =item *
 
-an B<L<IPC::PrettyPipe::Arg>> object;
+an L<IPC::PrettyPipe::Arg> object;
 
 =item *
 
@@ -550,51 +877,9 @@ command in a random order.
 
 =back
 
-=item C<argpfx> => I<string>
-
-=item C<argsep> => I<string>
-
-These override the object's C<argpfx> and C<argsep> attributes for this
-argument only.
-
-=item C<argfmt> => B<L<IPC::PrettyPipe::Arg::Format>> object
-
-This will override the format attributes for this argument only.
-
 =back
 
-=item B<args>
-
-  $args = $cmd->args;
-
-Return a B<L<IPC::PrettyPipe::Queue>> object containing the
-B<L<IPC::PrettyPipe::Arg>> objects associated with the command.
-
-=item B<argpfx>,
-
-=item B<argsep>
-
-=item B<argfmt>
-
-Retrieve (when called with no arguments) or modify (when called with
-an argument) the similarly named object attributes.  See
-B<L<IPC::PrettyPipe::Arg>> for more information.  Changing them
-affects new, not existing, arguments;
-
-=item B<cmd>
-
-  $name = $cmd->cmd
-
-Return the name of the command.
-
-=item B<quoted_cmd>
-
-  $name = $cmd->quoted_cmd
-
-Return the name of the command, appropriately quoted for passing as a
-single word to a Bourne compatible shell.
-
-=item B<ffadd>
+=head2 ffadd
 
   $cmd->ffadd( @arguments );
 
@@ -605,7 +890,7 @@ may contain any of the following items:
 
 =item *
 
-an B<L<IPC::PrettyPipe::Arg>> object
+an L<IPC::PrettyPipe::Arg> object
 
 =item *
 
@@ -623,12 +908,12 @@ command in a random order.
 
 =item *
 
-An B<L<IPC::PrettyPipe::Arg::Format>> object, specifying the prefix
+An L<IPC::PrettyPipe::Arg::Format> object, specifying the prefix
 and separator attributes for successive arguments.
 
 =item *
 
-An B<L<IPC::PrettyPipe::Stream>> object
+An L<IPC::PrettyPipe::Stream> object
 
 =item *
 
@@ -640,7 +925,7 @@ used for that parameter.
 
 =back
 
-=item B<stream>
+=head2 B<stream>
 
   $cmd->stream( $stream_obj );
   $cmd->stream( $spec );
@@ -648,25 +933,18 @@ used for that parameter.
 
 Add an I/O stream to the command.  It may be passed either a stream
 specification (L<IPC::PrettyPipe::Stream::Utils/Stream Specification>)
-or an B<L<IPC::PrettyPipe::Stream>> object.
+or an L<IPC::PrettyPipe::Stream> object.
 
-See B<L<IPC::PrettyPipe::Stream>> for more information.
+See L<IPC::PrettyPipe::Stream> for more information.
 
-=item B<streams>
-
-  $streams = $cmd->streams
-
-Return a B<L<IPC::PrettyPipe::Queue>> object containing the
-B<L<IPC::PrettyPipe::Stream>> objects associated with the command.
-
-=item B<valmatch>
+=head2 valmatch
 
   $n = $cmd->valmatch( $pattern );
 
 Returns the number of arguments whose value matches the passed
 regular expression.
 
-=item B<valsubst>
+=head2 valsubst
 
   $cmd->valsubst( $pattern, $value, %options );
 
@@ -690,23 +968,43 @@ precedence.
 
 =back
 
-=back
+=head1 OPERATORS
 
-=head1 BUGS
+=head2 |
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
-email to
-L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
+The C<|> operator is equivalent to creating a new pipe and adding
+the operands of the C<|> operator, e.g.
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+  $cmd | $obj
 
-=head1 SOURCE
+is the same as
 
-The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
-and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+  do {
+    my $tpipe = IPC::PrettyPipe->new;
+    $tpipe->add( $cmd );
+    $tpipe->add( $obj );
+    $tpipe
+  };
+
+where C<$obj> may be either an L<IPC::PrettyPipe> or L<IPC::PrettyPipe::Cmd> object.
+
+=for Pod::Coverage BUILDARGS BUILD
+
+=head1 SUPPORT
+
+=head2 Bugs
+
+Please report any bugs or feature requests to bug-ipc-prettypipe@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe
+
+=head2 Source
+
+Source is available at
+
+  https://gitlab.com/djerius/ipc-prettypipe
+
+and may be cloned from
+
+  https://gitlab.com/djerius/ipc-prettypipe.git
 
 =head1 SEE ALSO
 

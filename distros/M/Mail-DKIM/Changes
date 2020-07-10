@@ -1,5 +1,8 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 
+1.20200708 2020-07-08 UTC
+  * Safer internal use of eval
+
 1.20200513.1 2020-05-13 UTC
   * ARC: When sealing, don't die on an unparsable Authentication-Results header.
 

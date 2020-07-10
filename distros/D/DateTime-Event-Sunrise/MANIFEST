@@ -13,5 +13,6 @@ t/04basic.t
 t/05polar.t
 t/06checks.t
 t/07loop.t
+t/08precise.t
 META.yml                                 Module meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

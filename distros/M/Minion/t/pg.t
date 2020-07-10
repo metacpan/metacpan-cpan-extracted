@@ -28,9 +28,9 @@ subtest 'Nothing to repair' => sub {
 };
 
 subtest 'Migrate up and down' => sub {
-  is $minion->backend->pg->migrations->active, 20, 'active version is 20';
+  is $minion->backend->pg->migrations->active, 21, 'active version is 21';
   is $minion->backend->pg->migrations->migrate(0)->active, 0, 'active version is 0';
-  is $minion->backend->pg->migrations->migrate->active, 20, 'active version is 20';
+  is $minion->backend->pg->migrations->migrate->active, 21, 'active version is 21';
 };
 
 subtest 'Register and unregister' => sub {
@@ -1055,6 +1055,88 @@ subtest 'Job dependencies' => sub {
   is $job->id, $id, 'right id';
   is_deeply $job->info->{parents}, [-1, -2], 'right parents';
   ok $job->finish, 'job finished';
+  $worker->unregister;
+};
+
+subtest 'Sequences' => sub {
+  my $worker = $minion->worker->register;
+  my $id     = $minion->enqueue('test' => [] => {sequence => 'host:localhost'});
+  is $minion->job($id)->info->{previous}, undef, 'new sequence';
+  is $minion->job($id)->info->{next},     undef, 'new sequence';
+  my $id2 = $minion->enqueue('test' => [] => {sequence => 'host:localhost'});
+  is $minion->job($id2)->info->{previous}, $id,  'sequence in progress';
+  is $minion->job($id)->info->{next},      $id2, 'sequence in progress';
+  my $id3 = $minion->enqueue('test' => [] => {sequence => 'host:localhost', priority => 5});
+  is $minion->job($id3)->info->{previous}, $id2, 'sequence in progress';
+  is $minion->job($id)->info->{next},      $id2, 'sequence in progress';
+  my $job = $worker->dequeue(0);
+  is $job->id, $id, 'right id';
+  is $job->info->{sequence}, 'host:localhost', 'right sequence';
+  is $job->info->{priority}, 0,                'right priority';
+  is_deeply $job->info->{children}, [$id2], 'right children';
+  is_deeply $job->info->{parents}, [], 'no parents';
+  ok $job->finish, 'job finished';
+  my $job2 = $worker->dequeue(0);
+  is $job2->id, $id2, 'right id';
+  is $job2->info->{sequence}, 'host:localhost', 'right sequence';
+  is $job2->info->{previous}, $id,  'sequence in progress';
+  is $job2->info->{next},     $id3, 'sequence in progress';
+  is $job2->info->{priority}, 0, 'right priority';
+  is_deeply $job2->info->{children}, [$id3], 'right children';
+  is_deeply $job2->info->{parents},  [$id],  'right parents';
+  ok $job2->finish, 'job finished';
+  my $job3 = $worker->dequeue(0);
+  is $job3->id, $id3, 'right id';
+  is $job3->info->{sequence}, 'host:localhost', 'right sequence';
+  is $job3->info->{previous}, $id2, 'sequence in progress';
+  is $job3->info->{next},     undef, 'sequence is ending for now';
+  is $job3->info->{priority}, 5,     'right priority';
+  is_deeply $job3->info->{children}, [], 'no children';
+  is_deeply $job3->info->{parents}, [$id2], 'right parents';
+  ok $job3->finish, 'job finished';
+
+  my $id4 = $minion->enqueue('test' => [] => {sequence => 'host:localhost'});
+  is_deeply $job3->info->{children}, [$id4], 'right children';
+  my $job4 = $worker->dequeue(0);
+  is $job4->id, $id4, 'right id';
+  is $job4->info->{sequence}, 'host:localhost', 'right sequence';
+  is_deeply $job4->info->{children}, [], 'no children';
+  is_deeply $job4->info->{parents}, [$id3], 'right parents';
+  ok $job4->finish, 'job finished';
+
+  my $id5  = $minion->enqueue('test' => [] => {sequence => 'host:localhost', parents => [$id, $id2]});
+  my $job5 = $worker->dequeue(0);
+  is $job5->id, $id5, 'right id';
+  is $job5->info->{sequence}, 'host:localhost', 'right sequence';
+  is_deeply $job5->info->{children}, [], 'no children';
+  is_deeply $job5->info->{parents}, [$id4, $id, $id2], 'right parents';
+  ok $job5->finish, 'job finished';
+  ok $minion->job($id5)->remove, 'job removed';
+
+  my $id6  = $minion->enqueue('test' => [] => {sequence => 'host:localhost'});
+  my $job6 = $worker->dequeue(0);
+  is $job6->id, $id6, 'right id';
+  is $job6->info->{sequence}, 'host:localhost', 'right sequence';
+  is $job6->info->{previous}, undef,            'sequence restarted';
+  is $job6->info->{next},     undef,            'sequence restarted';
+  is $job4->info->{next}, $id5, 'sequence restarted';
+  is_deeply $job6->info->{children}, [], 'no children';
+  is_deeply $job6->info->{parents},  [], 'no parents';
+  ok $job6->finish, 'job finished';
+
+  $id  = $minion->enqueue('test' => [] => {sequence => 'host:mojolicious.org'});
+  $job = $worker->dequeue(0);
+  is $job->id, $id, 'right id';
+  is $job->info->{sequence}, 'host:mojolicious.org', 'right sequence';
+  is_deeply $job->info->{children}, [], 'no children';
+  is_deeply $job->info->{parents},  [], 'no parents';
+  ok $job->finish, 'job finished';
+
+  is $minion->jobs({sequences => ['host:mojolicious.org']})->total, 1, 'one job';
+  is $minion->jobs({sequences => ['host:mojolicious.org']})->next->{id}, $id, 'same id';
+  is $minion->jobs({sequences => ['host:metacpan.org']})->total, 0, 'no jobs';
+  is $minion->jobs({sequences => ['host:localhost']})->total,    5, 'five jobs';
+  is $minion->jobs({sequences => ['host:localhost', 'host:mojolicious.org']})->total, 6, 'six jobs';
   $worker->unregister;
 };
 

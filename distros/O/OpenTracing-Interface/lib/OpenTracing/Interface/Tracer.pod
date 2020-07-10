@@ -287,10 +287,7 @@ into a B<cloned> carrier.
     my $http_headers = HTTP::Headers->new( ... );
     
     my $cntx_headers =
-        $tracer->inject_context(
-            OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS => $http_headers,
-            $opentracing_spancontext
-    );
+        $tracer->inject_context( $http_headers, $opentracing_spancontext );
     
     my $request = HTTP::Request->new(
         GET => 'https://...', $cntx_headers
@@ -309,19 +306,23 @@ C<trace_id>, C<span_id> and possibly all the C<baggage_items>.
 
 =over
 
-=item OPENTRACING_CARRIER_FORMAT, an Enum
-
-A way to specify the format of the carrier. See
-L<OpenTracing::Constants::CarrierFormat> for an overview.
-
 =item carrier
 
-Most likely, a 'object' but the specs describe plain text map too, and binary
-data.
+Most likely, a 'object' but a plain array or hash reference should be acceptable
+too and will have the implementation specific key/value pairs added. 
 
-=item span_context, A B<required> C<SpanContext>
+=back
+
+=item Optional Positional Parameter(s)
+
+=over
+
+=item span_context, An B<optional> C<SpanContext>
+
 The span context containing the the information that needs to be added to the
 carrier.
+
+If omited, the context of the active span will be used.
 
 =back
 
@@ -348,18 +349,15 @@ C<SpanContext>.
     get '/some_service' => sub {
         my $http_headers = YourFramework->request->headers;
         
-        my $opentracing_context = $TRACER->extract_context(
-            OPENTRACING_FORMAT_HTTP_HEADERS => $http_headers
-        );
+        my $opentracing_context = $TRACER->extract_context( $http_headers );
         
         ...
         
     }
 
-This may return C<undef> iff the carrier can be understood, based on the
-given C<OPENTRACING_CARRIER_FORMAT>, and no relevant information could be
-detected. This usually happens at incomming request that are not part of a
-ditributed service.
+This may return C<undef> iff the carrier can be understood, and no relevant
+information could be detected. This usually happens at incomming request that
+are not part of a ditributed service.
 
 =over
 
@@ -367,15 +365,10 @@ ditributed service.
 
 =over
 
-=item OPENTRACING_CARRIER_FORMAT, an Enum
-
-A way to specify the format of the carrier. See
-L<OpenTracing::Constants::CarrierFormat> for an overview.
-
 =item carrier
 
-Most likely, a 'object' but the specs describe plain text map too, and binary
-data.
+Most likely, a 'object' but a plain array or hash reference containing
+implementation specific key/value pairs should be acceptable too. 
 
 =back
 

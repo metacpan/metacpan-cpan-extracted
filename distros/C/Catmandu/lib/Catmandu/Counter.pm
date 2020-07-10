@@ -2,7 +2,7 @@ package Catmandu::Counter;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2012';
+our $VERSION = '1.2013';
 
 use Moo::Role;
 use namespace::clean;
@@ -10,13 +10,16 @@ use namespace::clean;
 has count => (is => 'rwp', default => sub {0});
 
 sub inc_count {
-    my $self = $_[0];
-    $self->_set_count($self->count + 1);
+    my ($self, $n) = @_;
+    $n //= 1;
+    $self->_set_count($self->count + $n);
 }
 
 sub dec_count {
-    my $self = $_[0];
-    $self->count ? $self->_set_count($self->count - 1) : 0;
+    my ($self, $n) = @_;
+    $n //= 1;
+    my $count = $self->count - $n;
+    $self->_set_count($count > 0 ? $count : 0);
 }
 
 sub reset_count {

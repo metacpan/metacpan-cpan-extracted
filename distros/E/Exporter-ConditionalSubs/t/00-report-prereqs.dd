@@ -16,7 +16,7 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'B::CallChecker' => '0',
-                                      'B::Generate' => '0'
+                                      'B::Generate' => '1.42'
                                     }
                     },
        'test' => {

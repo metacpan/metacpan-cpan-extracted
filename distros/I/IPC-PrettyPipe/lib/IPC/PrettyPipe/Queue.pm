@@ -4,27 +4,101 @@ package IPC::PrettyPipe::Queue;
 
 use Moo;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
+
+use Safe::Isa;
+use Types::Standard -types;
 
 use namespace::clean;
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+sub BUILD {
+
+    my $self = shift;
+
+    if ( @{ $self->elements } ) {
+
+        for ( @{ $self->elements } ) {
+            $_->_set_first( 0 );
+            $_->_set_last( 0 );
+        }
+
+        $self->elements->[0]->_set_first( 1 );
+        $self->elements->[-1]->_set_last( 1 );
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 has elements => (
-    is       => 'ro',
-    init_arg => undef,
-    default  => sub { [] },
+    is      => 'ro',
+    isa     => ArrayRef [ ConsumerOf ['IPC::PrettyPipe::Queue::Element'] ],
+    default => sub { [] },
 );
+
+
+
+
+
+
+
+
 
 sub empty { !!!@{ $_[0]->elements } }
 
-sub nelements { scalar @{ $_[0]->elements } }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub push {
 
     my ( $self, $elem ) = ( shift, shift );
 
-    die( "incompatible element\n" )
-      unless $elem->does( 'IPC::PrettyPipe::Queue::Element' );
+    die(
+        "attempt to push an incompatible element onto an IPC::PrettyPipe::Queue\n"
+    ) unless $elem->$_does( 'IPC::PrettyPipe::Queue::Element' );
 
     my $elements = $self->elements;
 
@@ -70,11 +144,11 @@ IPC::PrettyPipe::Queue - A simple queue
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
-  $q = IPC::PrettyPipe::Queue->new;
+  $q = IPC::PrettyPipe::Queue->new( elements => [...] );
 
   $q->push( $elem );
 
@@ -87,44 +161,55 @@ This module provides a simple queue for objects which perform the
 B<L<IPC::PrettyPipe::Queue::Element>> role.  No object should be in more than
 one queue at a time.
 
+=head1 ATTRIBUTES
+
+=head2 elements
+
+The initial set of queue elements.  This should be an arrayref of objects
+which consume the L<IPC::PrettyPipe::Queue::Element> role.x
+
 =head1 METHODS
 
 The following methods are available:
 
 =over
 
-=item new
+=back
 
-  $q = IPC::PrettyPipe::Queue->new;
+=head2 new
 
-Construct an empty queue.
+  $q = IPC::PrettyPipe::Queue->new( %attributes );
 
-=item push
+Construct a new queue.  See L</ATTRIBUTES> for the available attributes.
+
+=head2 elements
+
+  $elements = $q->elements;
+
+Returns an arrayref containing the queue's elements.
+
+=head2 empty
+
+  $is_q_empty = $q->empty;
+
+Returns true if there are no elements in the queue.
+
+=head2 nelements
+
+  $nelements = $q->nelements;
+
+Returns the number of elements in the queue.
+
+sub nelements { scalar @{ $_[0]->elements } }
+
+=head2 push
 
   $q->push( $element );
 
 Push the element on the end of the queue.  The element must perform
 the B<L<IPC::PrettyPipe::Queue::Element>> role.
 
-=item empty
-
-  $is_q_empty = $q->empty;
-
-Returns true if there are no elements in the queue.
-
-=item elements
-
-  $elements = $q->elements;
-
-Returns an arrayref containing the queue's elements.
-
-=item nelements
-
-  $nelements = $q->nelements;
-
-Returns the number of elements in the queue.
-
-=back
+=for Pod::Coverage BUILD
 
 =head1 COPYRIGHT & LICENSE
 
@@ -139,21 +224,21 @@ may find a copy at
 
 Diab Jerius E<lt>djerius@cfa.harvard.eduE<gt>
 
-=head1 BUGS
+=head1 SUPPORT
 
-Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe> or by
-email to
-L<bug-IPC-PrettyPipe@rt.cpan.org|mailto:bug-IPC-PrettyPipe@rt.cpan.org>.
+=head2 Bugs
 
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Please report any bugs or feature requests to bug-ipc-prettypipe@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-PrettyPipe
 
-=head1 SOURCE
+=head2 Source
 
-The development version is on github at L<https://github.com/djerius/ipc-prettypipe>
-and may be cloned from L<git://github.com/djerius/ipc-prettypipe.git>
+Source is available at
+
+  https://gitlab.com/djerius/ipc-prettypipe
+
+and may be cloned from
+
+  https://gitlab.com/djerius/ipc-prettypipe.git
 
 =head1 SEE ALSO
 

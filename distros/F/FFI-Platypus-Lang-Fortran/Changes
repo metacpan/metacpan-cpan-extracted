@@ -1,5 +1,10 @@
 Revision history for Perl module FFI::Platypus::Lang::Fortran
 
+0.12 2020-07-07 14:37:46 -0600
+  - Moved to PerlFFI GitHub org
+  - Migrated to EUMM for installer
+  - Module::Build::FFI::Fortran was moved into the Module-Build-FFI dist
+
 0.11 2020-04-20 15:01:46 -0400
   - Use i- prefix in Fortran 77 tests to force integer return value (gh#10)
   - Explicitly specify Test::More 0.98 as prereq for required featuers (gh#10)

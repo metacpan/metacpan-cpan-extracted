@@ -48,7 +48,7 @@
          "web" : "https://github.com/benkasminbullock/JSON-Parse"
       }
    },
-   "version" : "0.56",
+   "version" : "0.57",
    "x_contributors" : [
       "Shlomi Fish <shlomif@cpan.org>",
       "kolmogorov42"

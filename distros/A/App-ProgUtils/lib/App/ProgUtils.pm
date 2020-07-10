@@ -1,7 +1,9 @@
 package App::ProgUtils;
 
-our $DATE = '2019-10-17'; # DATE
-our $VERSION = '0.201'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-16'; # DATE
+our $DIST = 'App-ProgUtils'; # DIST
+our $VERSION = '0.202'; # VERSION
 
 use 5.010001;
 use strict;
@@ -57,6 +59,9 @@ $SPEC{list_all_programs_in_path} = {
             },
         },
     },
+    links => [
+        {url=>'prog:proglist'},
+    ],
 };
 sub list_all_programs_in_path {
     my %args = @_;
@@ -91,7 +96,7 @@ App::ProgUtils - Command line to manipulate programs in PATH
 
 =head1 VERSION
 
-This document describes version 0.201 of App::ProgUtils (from Perl distribution App-ProgUtils), released on 2019-10-17.
+This document describes version 0.202 of App::ProgUtils (from Perl distribution App-ProgUtils), released on 2020-04-16.
 
 =head1 SYNOPSIS
 
@@ -138,6 +143,7 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<with_path> => I<bool>
+
 
 =back
 
@@ -210,7 +216,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -80,7 +80,7 @@ KEYWORDS
     Or
 
        ...
-       catch my $var {
+       catch ($var) {
           STATEMENTS...
        }
 
@@ -278,16 +278,9 @@ OTHER MODULES
     dispatch in perl needs to handle both isa and string regexp testing at
     the same site.
 
-    My latest thinking on this front may involve some syntax such as:
-
-       try {
-          ...
-       }
-       catch my $e
-          (isa Some::Exception::Class) { ... },
-          (=~ m/^An error message /)   { ... }
-
-    or
+    My latest thinking on this front may involve some syntax looking
+    simplar to a sub with a signature that declares a single parameter,
+    such as:
 
        try {
           ...
@@ -295,16 +288,7 @@ OTHER MODULES
        catch ($e isa Some::Exception::Class) { ... },
              ($e =~ m/^An error message /)   { ... }
 
-    Or maybe the catch keyword would be repeated per line, though that then
-    involves repeating the error variable name also:
-
-       try {
-          ...
-       }
-       catch my $e (isa Some::Exception::Class) { ... }
-       catch my $e (=~ m/^An error message /)   { ... }
-
-    or
+    Or maybe the catch keyword would be repeated per line:
 
        try {
           ...

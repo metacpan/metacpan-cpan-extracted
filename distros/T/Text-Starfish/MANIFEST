@@ -59,6 +59,10 @@ testfiles/21-make/Makefile.out
 testfiles/21-make/A.java
 testfiles/21-make/B.java
 testfiles/21-make/C.java
+testfiles/22-hooks/Makefile
+testfiles/22-hooks/text.in
+testfiles/22-hooks/text.out
+testfiles/22-hooks/text-replace.out
 testfiles/14.out
 testfiles/15.java
 testfiles/15.out

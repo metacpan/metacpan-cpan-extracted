@@ -1,5 +1,4 @@
 use Test::Most;
-use Test::Moose;
 
 use constant PACKAGE => 'Bible::OBML::HTML';
 
@@ -11,10 +10,7 @@ sub main {
 
     my $self = PACKAGE->new;
     isa_ok( $self, PACKAGE );
-
-    does_ok( $self, 'Throwable' );
-    has_attribute_ok( $self, $_, qq{attribute "$_" exists} ) for ( qw( obml settings template ) );
-    can_ok( PACKAGE, $_ ) for ( qw( from_file from_obml from_data ) );
+    can_ok( PACKAGE, $_ ) for ( qw( obml settings template from_file from_obml from_data ) );
 
     my $content = join( "\n",
         q\~ Jude 1 ~\,

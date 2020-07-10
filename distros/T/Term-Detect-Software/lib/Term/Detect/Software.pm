@@ -1,7 +1,9 @@
 package Term::Detect::Software;
 
-our $DATE = '2019-08-21'; # DATE
-our $VERSION = '0.222'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-07-10'; # DATE
+our $DIST = 'Term-Detect-Software'; # DIST
+our $VERSION = '0.223'; # VERSION
 
 use 5.010001;
 use strict;
@@ -138,7 +140,7 @@ sub detect_terminal {
             }
 
             # [0] is shell
-            my $proc = @$ppids >= 1 ? $ppids->[1]{name} : '';
+            my $proc = @$ppids >= 2 ? $ppids->[1]{name} : '';
             #say "D:proc=$proc";
             if ($proc ~~ $gnome_terminal_terms) {
                 push @dbg, "detect: gnome-terminal via procname ($proc)";
@@ -234,7 +236,7 @@ Term::Detect::Software - Detect terminal (emulator) software and its capabilitie
 
 =head1 VERSION
 
-This document describes version 0.222 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2019-08-21.
+This document describes version 0.223 of Term::Detect::Software (from Perl distribution Term-Detect-Software), released on 2020-07-10.
 
 =head1 SYNOPSIS
 
@@ -322,13 +324,13 @@ applications or modules to avoid repeating detection process.
 
 =head2 What is this module for? Why not Term::Terminfo or Term::Encoding?
 
-This module is first written for L<Text::ANSITable> so that the module can
+This module was first written for L<Text::ANSITable> so that the latter can
 provide good defaults when displaying formatted and colored tables, especially
 on popular terminal emulation software like Konsole (KDE's default terminal),
 gnome-terminal (GNOME's default), Terminal (XFCE's default), xterm, rxvt.
 
-The module works by trying to figure out the terminal emulation software because
-the information provided by L<Term::Terminfo> and L<Term::Encoding> are
+This module works by trying to figure out the terminal emulation software
+because the information provided by L<Term::Terminfo> and L<Term::Encoding> are
 sometimes not specific enough. For example, Term::Encoding can return L<utf-8>
 when running under rxvt, but since the software currently lacks Unicode support
 we shouldn't display Unicode characters. Another example is color depth:
@@ -363,7 +365,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2015, 2014, 2013 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

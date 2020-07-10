@@ -1,9 +1,9 @@
 package Progress::Any::Output;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-21'; # DATE
+our $DATE = '2020-07-09'; # DATE
 our $DIST = 'Progress-Any'; # DIST
-our $VERSION = '0.215'; # VERSION
+our $VERSION = '0.216'; # VERSION
 
 use 5.010001;
 use strict;
@@ -83,7 +83,7 @@ Progress::Any::Output - Assign output to progress indicators
 
 =head1 VERSION
 
-This document describes version 0.215 of Progress::Any::Output (from Perl distribution Progress-Any), released on 2020-06-21.
+This document describes version 0.216 of Progress::Any::Output (from Perl distribution Progress-Any), released on 2020-07-09.
 
 =head1 SYNOPSIS
 

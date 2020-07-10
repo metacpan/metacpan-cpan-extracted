@@ -12,7 +12,7 @@ use Config;
 use base qw( Module::Build );
 
 # ABSTRACT: (Deprecated) Build Perl extensions in C with FFI
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.54'; # VERSION
 
 
 __PACKAGE__->add_property( ffi_libtest_dir =>
@@ -313,7 +313,7 @@ Module::Build::FFI - (Deprecated) Build Perl extensions in C with FFI
 
 =head1 VERSION
 
-version 0.52
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -348,9 +348,9 @@ Attach it to Perl in your main module (C<lib/Foo/Bar.pm>):
 
  package Foo::Bar;
  
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  
- my $ffi = FFI::Platypus->new;
+ my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->package;  # search for symbols in your bundled C code
  $ffi->attach( hello_world => [] => 'void');
 
@@ -392,10 +392,10 @@ can use to test your FFI module with.  You can use FFI::CheckLib to
 find the library from your test:
 
  use Test::More;
- use FFI::Platypus;
+ use FFI::Platypus 1.00;
  use FFI::CheckLib;
  
- FFI::Platypus->new->lib(find_lib lib => 'test', libpath => 'libtest');
+ FFI::Platypus->new( api => 1 )->lib(find_lib lib => 'test', libpath => 'libtest');
 
 [version 0.18]
 

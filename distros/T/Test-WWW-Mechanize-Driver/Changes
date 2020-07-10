@@ -1,5 +1,10 @@
 Revision history for Perl extension Test::WWW::Mechanize::Driver.
 
+1.0  Wed Jul 8 2020
+   - Switch to Module::Build
+   - Address all Kwalitee warnings
+   - Don't ship MYMETA.*, Closes #132963
+
 0.7  Fri Jul 3 2020
    - Fix testing on YAML 1.30 (where $YAML::LoadBlessed=0)
 

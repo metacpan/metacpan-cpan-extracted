@@ -393,6 +393,7 @@ perl_get_string (json_parse_t * parser, STRLEN prefixlen)
 	/* Set the point of copying bytes back to the beginning of
 	   buffer. We don't reset the memory in buffer. */
 	b = buffer;
+	size = b - buffer;
     }
     NEXTBYTE;
 

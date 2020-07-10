@@ -3,14 +3,14 @@ Subject: Test Email
 To: to@example.com
 Date: [^\n]+
 MIME-Version: 1\.0
-Content-Type: multipart/mixed; boundary="[^"]+"
+Content-Type: multipart/mixed; boundary="?[^"]+"?
 Content-Transfer-Encoding: 7bit
 
 
 --\S+
 Date: [^\n]+
 MIME-Version: 1\.0
-Content-Type: multipart/alternative; boundary="[^"]+"
+Content-Type: multipart/alternative; boundary="?[^"]+"?
 Content-Transfer-Encoding: 7bit
 
 
@@ -30,7 +30,7 @@ This is a generic message for testing purposes only with regard to some stuff an
 --\S+
 Date: [^\n]+
 MIME-Version: 1\.0
-Content-Type: multipart/related; boundary="[^"]+"
+Content-Type: multipart/related; boundary="?[^"]+"?
 Content-Transfer-Encoding: 7bit
 
 
@@ -56,7 +56,7 @@ MIME-Version: 1\.0
 --\S+
 Date: [^\n]+
 MIME-Version: 1\.0
-Content-Type: image/gif; name="blank\.gif"
+Content-Type: image/gif; name="?blank\.gif"?
 .*
 Content-ID: <\d+>
 

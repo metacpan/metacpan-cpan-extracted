@@ -44,13 +44,14 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-SRU/issues
   homepage: https://github.com/LibreCat/Catmandu-SRU
   repository: https://github.com/LibreCat/Catmandu-SRU.git
-version: '0.428'
+version: '0.429'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'
   - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
   - 'Jakob Voss <jakob@nichtich.de>'
   - 'Jakob Voss <voss@gbv.de>'
+  - 'Johann Rolschewski <johann@rolschewski.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
   - 'Johann Rolschewski <rolschewski@gmail.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

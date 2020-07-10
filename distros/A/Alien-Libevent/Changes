@@ -1,5 +1,8 @@
 Revision history for Alien-Libevent
 
+2.3      Tue Jul 08 2020
+         - Fix pkg-config for client modules
+
 2.2      Tue Jul 07 2020
          - META updates
 

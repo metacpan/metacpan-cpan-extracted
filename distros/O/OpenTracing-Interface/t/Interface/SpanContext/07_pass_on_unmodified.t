@@ -99,13 +99,13 @@ sub get_baggage_items {
 sub with_baggage_item {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MySyub::SpanContext'
+    return bless {}, 'MyStub::SpanContext'
 };
 
 sub with_baggage_items {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MySyub::SpanContext'
+    return bless {}, 'MyStub::SpanContext'
 };
 
 BEGIN {
@@ -115,7 +115,7 @@ BEGIN {
 
 
 
-package MySyub::SpanContext;
+package MyStub::SpanContext;
 
 sub get_baggage_item;
 sub get_baggage_items;

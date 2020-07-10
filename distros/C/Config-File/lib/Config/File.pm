@@ -8,7 +8,7 @@ use IO::File;
 use vars qw($VERSION @ISA @EXPORT_OK);
 @ISA       = qw/Exporter/;
 @EXPORT_OK = qw/read_config_file/;
-$VERSION   = '1.52';
+$VERSION   = '1.54';
 
 sub read_config_file($) {
     my ( $conf, $file, $fh, $line_num );
@@ -161,17 +161,19 @@ deprecated (and will thus issue a warning). Please update your code!
 
 =head1 AUTHOR
 
-Development was started by Sebastien J. Gross <seb@sjgross.org>, and since 
-2003 it is maintained by Gunnar Wolf <gwolf@gwolf.org>.
+Development was started by Sebastien J. Gross <seb@sjgross.org>. Maintained by
+Gunnar Wolf <gwolf@gwolf.org> until 2018 when Stockholm University (Johan
+Wassberg and Mikael Nordin) took over maintainance.
 
 All rights reserved.  This program is free software; you can redistribute
 it and/or modify it under the terms of the GPL.
 
 =head1 VERSION
 
-Version 1.52
+Version 1.54
 Copyright (c) 2002 Sebastien J. Gross. All rights reserved.
-Copyright (c) 2003-2009 Gunnar Wolf. All rights reserved.
+Copyright (c) 2003-2018 Gunnar Wolf. All rights reserved.
+Copyright (c) 2018- Stockholm University. All rights reserved.
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GPL v2 (or later, at your choice).
 

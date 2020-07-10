@@ -1,46 +1,38 @@
 package Bible::OBML::HTML;
 # ABSTRACT: Render OBML as HTML
 
-use 5.012;
+use 5.014;
 
-use Moose;
+use exact;
+use exact::class;
 use Template;
 use Bible::OBML;
 
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
-with 'Throwable';
+has obml => sub { Bible::OBML->new };
 
-has obml => ( is => 'ro', isa => 'Bible::OBML', default => sub { Bible::OBML->new } );
+has settings => sub { +{
+    FILTERS => {
+        verse_collapse => sub {
+            my ($text) = @_;
 
-has settings => (
-    is      => 'rw',
-    isa     => 'HashRef',
-    default => sub { +{
-        FILTERS => {
-            verse_collapse => sub {
-                my ($text) = @_;
+            $text =~ s/\s{2,}/ /msg;
+            $text =~ s/^\s+|\s+$//msg;
+            $text =~ s/\s+(?=<sup\b)|//msg;
+            $text =~ s/(?<=i>)\s+(?=[^\sa-zA-Z0-9])//msg;
 
-                $text =~ s/\s{2,}/ /msg;
-                $text =~ s/^\s+|\s+$//msg;
-                $text =~ s/\s+(?=<sup\b)|//msg;
-                $text =~ s/(?<=i>)\s+(?=[^\sa-zA-Z0-9])//msg;
-
-                return $text;
-            },
-            fn_tidy => sub {
-                my ($text) = @_;
-                $text =~ s/<[^>]*?>//g;
-                return $text;
-            }
+            return $text;
         },
-    } },
-);
+        fn_tidy => sub {
+            my ($text) = @_;
+            $text =~ s/<[^>]*?>//g;
+            return $text;
+        }
+    },
+} };
 
-has template => (
-    is      => 'rw',
-    isa     => 'Str',
-    default => q{
+has template => q{
         [%
             crossreferences = [];
             footnotes       = [];
@@ -175,8 +167,7 @@ has template => (
                 [% END %]
             </div>
         </div>
-    },
-);
+};
 
 sub from_file {
     my ( $self, $file, $skip_smartify ) = @_;
@@ -220,7 +211,6 @@ sub _html {
     return $output;
 }
 
-__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -235,7 +225,7 @@ Bible::OBML::HTML - Render OBML as HTML
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
 =for test_synopsis my( $obml, $filename, $data, $skip_smartify );
 
@@ -334,15 +324,7 @@ L<GitHub|https://github.com/gryphonshafer/Bible-OBML>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bible-OBML>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bible::OBML>
-
-=item *
-
-L<AnnoCPAN|http://annocpan.org/dist/Bible-OBML>
 
 =item *
 
@@ -368,7 +350,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is copyright (c) 2020 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

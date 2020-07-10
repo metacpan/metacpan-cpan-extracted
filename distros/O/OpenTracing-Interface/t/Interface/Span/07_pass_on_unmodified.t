@@ -172,7 +172,7 @@ package MyTest::Span;
 sub get_context {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MySyub::SpanContext'
+    return bless {}, 'MyStub::SpanContext'
     
 };
 
@@ -253,7 +253,7 @@ BEGIN {
 
 
 
-package MySyub::SpanContext;
+package MyStub::SpanContext;
 
 sub get_baggage_item;
 sub get_baggage_items;

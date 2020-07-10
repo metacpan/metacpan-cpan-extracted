@@ -4,7 +4,7 @@
       "Thibault Duponchelle <thibault.duponchelle@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.4702, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,14 +16,7 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc",
-         "bundled",
-         "my"
-      ],
-      "package" : [
-         "DynaLoader",
-         "in",
-         "version"
+         "inc"
       ]
    },
    "prereqs" : {
@@ -33,9 +26,7 @@
             "Archive::Tar" : "0",
             "Config" : "0",
             "HTTP::Tiny" : "0.044",
-            "IO::Socket::SSL" : "1.56",
             "Mojo::DOM58" : "1.00",
-            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
@@ -69,7 +60,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.2",
+   "version" : "2.3",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.26",
       "requires" : {
@@ -77,9 +68,7 @@
             "Archive::Tar" : "0",
             "Config" : "0",
             "HTTP::Tiny" : "0.044",
-            "IO::Socket::SSL" : "1.56",
             "Mojo::DOM58" : "1.00",
-            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"

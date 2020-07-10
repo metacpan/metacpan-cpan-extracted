@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,75 +15,51 @@
    "name" : "FFI-Platypus-Lang-Fortran",
    "no_index" : {
       "directory" : [
+         "t",
+         "inc",
          "examples"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "File::Which" : "0",
-            "Module::Build" : "0.38",
-            "Module::Build::FFI" : "0.22"
+            "FFI::Build::MM" : "0",
+            "File::ShareDir::Dist" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "FFI::Platypus" : "0.22",
-            "File::Which" : "0",
-            "Module::Build" : "0.38",
-            "Module::Build::FFI" : "0.22"
+            "ExtUtils::F77" : "1.24",
+            "ExtUtils::MakeMaker" : "6.64",
+            "FFI::Platypus" : "1.00",
+            "File::ShareDir::Dist::Install" : "0.07",
+            "File::Which" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "FFI::Build" : "0.04",
-            "FFI::Platypus" : "0.51",
+            "FFI::Build" : "1.00",
+            "FFI::Platypus" : "1.00",
             "File::Which" : "0",
-            "Module::Build::FFI" : "0.22",
-            "perl" : "5.008001"
+            "perl" : "5.008004"
          }
       },
       "test" : {
-         "requires" : {
-            "FFI::Build" : "0.04",
-            "FFI::CheckLib" : "0",
-            "File::Which" : "0",
-            "Module::Build::FFI" : "0.22",
-            "Test::More" : "0.98"
-         }
-      }
-   },
-   "provides" : {
-      "FFI::Build::File::Fortran" : {
-         "file" : "lib/FFI/Build/File/Fortran.pm",
-         "version" : "0.11"
-      },
-      "FFI::Platypus::Lang::Fortran" : {
-         "file" : "lib/FFI/Platypus/Lang/Fortran.pm",
-         "version" : "0.11"
-      },
-      "Module::Build::FFI::Fortran" : {
-         "file" : "lib/Module/Build/FFI/Fortran.pm",
-         "version" : "0.11"
-      },
-      "Module::Build::FFI::Fortran::ExtUtilsF77" : {
-         "file" : "lib/Module/Build/FFI/Fortran/ExtUtilsF77.pm",
-         "version" : "0.11"
+         "requires" : {}
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/Perl5-FFI/FFI-Platypus-Lang-Fortran/issues"
+         "web" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Fortran/issues"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
-         "url" : "http://github.com/Perl5-FFI/FFI-Platypus-Lang-Fortran"
+         "type" : "git",
+         "url" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Fortran.git",
+         "web" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Fortran"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

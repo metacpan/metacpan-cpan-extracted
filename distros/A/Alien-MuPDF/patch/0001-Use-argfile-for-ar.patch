@@ -1,0 +1,37 @@
+From 88ebf290c4cff02a97be170cd5c9f3dc578df937 Mon Sep 17 00:00:00 2001
+From: Zakariyya Mughal <zaki.mughal@gmail.com>
+Date: Fri, 8 May 2020 06:25:39 -0500
+Subject: [PATCH] Use argfile for ar
+
+The command line for using `ar` can get too long particularly on Windows
+(which has a limit of 8191 characters under `cmd.exe`).
+---
+ Makefile | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 814a592..e003d47 100644
+--- a/Makefile
++++ b/Makefile
+@@ -54,6 +54,7 @@ MKTGTDIR = mkdir -p $(dir $@)
+ CC_CMD = $(QUIET_CC) $(MKTGTDIR) ; $(CC) $(CFLAGS) -MMD -MP -o $@ -c $<
+ CXX_CMD = $(QUIET_CXX) $(MKTGTDIR) ; $(CXX) $(CFLAGS) -MMD -MP -o $@ -c $<
+ AR_CMD = $(QUIET_AR) $(MKTGTDIR) ; $(AR) cr $@ $^
++AR_CMD_FILE = $(QUIET_AR) $(MKTGTDIR) ; $(AR) cr $@ @$@.in
+ ifdef RANLIB
+   RANLIB_CMD = $(QUIET_RANLIB) $(RANLIB) $@
+ endif
+@@ -65,7 +66,9 @@ OBJCOPY_CMD = $(QUIET_OBJCOPY) $(MKTGTDIR) ; $(LD) -r -b binary -o $@ $<
+ # --- Rules ---
+ 
+ $(OUT)/%.a :
+-	$(AR_CMD)
++	$(file >$@.in,$^)
++	$(AR_CMD_FILE)
++	@rm $@.in
+ 	$(RANLIB_CMD)
+ 
+ $(OUT)/%.exe: %.c
+-- 
+2.20.1
+

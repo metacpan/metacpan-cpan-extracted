@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 51 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 52 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CompleteCLIs.pm'
@@ -27,6 +27,7 @@ my @scripts = (
     'script/complete-env',
     'script/complete-env-elem',
     'script/complete-file',
+    'script/complete-firefox-profile-name',
     'script/complete-float',
     'script/complete-gid',
     'script/complete-group',

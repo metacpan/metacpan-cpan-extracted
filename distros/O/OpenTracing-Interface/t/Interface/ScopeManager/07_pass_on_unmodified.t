@@ -18,7 +18,7 @@ subtest "pass on arguments for 'activate_span'" => sub {
     
     my $test_object = bless {}, 'MyTest::ScopeManager';
     
-    my $duck_span = bless {}, 'MySyub::Span';
+    my $duck_span = bless {}, 'MyStub::Span';
     
     lives_ok {
         $test_object->activate_span( $duck_span )
@@ -77,14 +77,14 @@ package MyTest::ScopeManager;
 sub activate_span {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MySyub::Scope'
+    return bless {}, 'MyStub::Scope'
     
 };
 
 sub get_active_scope {
     push @main::test_params, [ @_ ];
     
-    return bless {}, 'MySyub::Scope'
+    return bless {}, 'MyStub::Scope'
     
 };
 
@@ -95,14 +95,14 @@ BEGIN {
 
 
 
-package MySyub::Scope;
+package MyStub::Scope;
 
 sub close;
 sub get_span;
 
 
 
-package MySyub::Span;
+package MyStub::Span;
 
 sub get_context              { ... };
 sub overwrite_operation_name { ... };

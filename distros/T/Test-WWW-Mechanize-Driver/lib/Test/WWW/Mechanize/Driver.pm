@@ -8,7 +8,7 @@ require URI;
 use Storable qw/dclone/;
 
 my $Test = Test::Builder->new;
-our $VERSION = 0.7;
+our $VERSION = '1.0';
 our $TODO;
 our $CURRENT_GROUP;
 

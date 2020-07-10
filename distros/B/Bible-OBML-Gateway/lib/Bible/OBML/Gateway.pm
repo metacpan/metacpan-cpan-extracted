@@ -1,53 +1,42 @@
 package Bible::OBML::Gateway;
 # ABSTRACT: Bible Gateway content conversion to Open Bible Markup Language (OBML)
 
-use 5.012;
+use 5.016;
 
-use Moose;
-use MooseX::Privacy;
+use exact;
+use exact::class;
 use Mojo::DOM;
 use Mojo::File;
 use Mojo::URL;
 use Mojo::UserAgent;
-use Try::Tiny;
 use Bible::OBML;
 use Bible::Reference 1.02;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.05'; # VERSION
 
-with 'Throwable';
+has ua  => sub { return Mojo::UserAgent->new };
+has url => sub { return Mojo::URL->new('https://www.biblegateway.com/passage/') };
 
-has ua => ( isa => 'Mojo::UserAgent', is => 'rw', lazy => 1, default => sub {
-    return Mojo::UserAgent->new;
-} );
-has url => ( isa => 'Mojo::URL', is => 'rw', lazy => 1, default => sub {
-    return Mojo::URL->new('https://www.biblegateway.com/passage/');
-} );
-has translation => ( isa => 'Str', is => 'rw', lazy => 1, default => 'NIV' );
-has obml        => ( isa => 'Str', is => 'rw' );
-has data        => ( isa => 'ArrayRef[HashRef]', is => 'rw' );
+has translation => 'NIV';
+has obml        => undef;
+has data        => undef;
 
-has _reference => ( isa => 'Bible::Reference', is => 'rw', lazy => 1, traits => ['Private'], default => sub {
+has _reference => sub {
     return Bible::Reference->new(
         bible    => 'Protestant',
         acronyms => 1,
         sorting  => 1,
     );
-} );
-has _obml_lib => (
-    isa     => 'Bible::OBML',
-    is      => 'rw',
-    lazy    => 1,
-    traits  => ['Private'],
-    default => sub { Bible::OBML->new },
-);
-has _body => ( isa => 'Str', is => 'rw', traits  => ['Private'] );
-has _dom  => ( isa => 'Mojo::DOM', is => 'rw', traits  => ['Private'] );
+};
+
+has _obml_lib => sub { Bible::OBML->new };
+has _body     => undef;
+has _dom      => undef;
 
 sub get {
     my ( $self, $book_chapter, $translation ) = @_;
-    $self->throw('Book/chapter not defined in call to get()') unless ($book_chapter);
-    $self->throw('Verse ranges and partial chapter ranges not supported') if ( $book_chapter =~ /[:-]/ );
+    croak('Book/chapter not defined in call to get()') unless ($book_chapter);
+    croak('Verse ranges and partial chapter ranges not supported') if ( $book_chapter =~ /[:-]/ );
 
     my $url = $self->url->query({
         search  => $book_chapter,
@@ -55,13 +44,13 @@ sub get {
     })->to_string;
 
     my $result = $self->ua->get($url)->result;
-    $self->throw(qq{Failed to get "$book_chapter" via "$url"})
+    croak(qq{Failed to get "$book_chapter" via "$url"})
         unless ( $result and $result->code == 200 and $result->dom->at('h1.bcv') );
 
     return $self->_parse( $result->body, $result->dom );
 }
 
-private_method _parse => sub {
+sub _parse {
     my ( $self, $body, $dom ) = @_;
 
     $self->_body($body);
@@ -173,6 +162,7 @@ private_method _parse => sub {
     $obml =~ s/\*\]/*/g;
     $obml =~ s/=[^=\n]+=\n+(=[^=\n]+=)/$1/msg;
     $obml =~ s/<span.*?>(.*?)<\/span>/$1/msg;
+    $obml =~ s/(\*[^\*\{\[]+)(\s*\{[^\}]*\}\s*|\s*\[[^\]]*\]\s*)/$1*$2*/msg;
 
     utf8::decode($obml);
     $obml = $self->_obml_lib->desmartify($obml);
@@ -182,30 +172,29 @@ private_method _parse => sub {
     $self->obml( $self->_obml_lib->render( $self->data ) );
 
     return $self;
-};
+}
 
 sub html {
     my ($self) = @_;
-    $self->throw('No result to return HTML for') unless ( $self->_body );
+    croak('No result to return HTML for') unless ( $self->_body );
     return $self->_body;
 }
 
 sub save {
     my ( $self, $filename ) = @_;
-    $self->throw('No filename provided to save to') unless ($filename);
-    $self->throw('No result to return HTML for') unless ( $self->_body );
+    croak('No filename provided to save to') unless ($filename);
+    croak('No result to return HTML for') unless ( $self->_body );
     Mojo::File->new($filename)->spurt( $self->_body );
     return $self;
 }
 
 sub load {
     my ( $self, $filename ) = @_;
-    $self->throw('No filename provided to save to') unless ($filename);
+    croak('No filename provided to save to') unless ($filename);
     $self->_parse( Mojo::File->new($filename)->slurp );
     return $self;
 }
 
-__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -220,7 +209,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 1.03
+version 1.05
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway.svg)](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-OBML-Gateway/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-OBML-Gateway)
@@ -253,7 +242,7 @@ The following methods are supported.
 Instantiates a new gateway object. You can optionally pass a translation
 acronym to be used on subsequent requests.
 
-    my $bg = Bible::OBML::Gateway->new('NIV');
+    my $bg = Bible::OBML::Gateway->new( translation => 'NIV' );
 
 =head2 translation
 
@@ -318,15 +307,7 @@ L<GitHub|https://github.com/gryphonshafer/Bible-OBML-Gateway>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bible-OBML-Gateway>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bible::OBML::Gateway>
-
-=item *
-
-L<AnnoCPAN|http://annocpan.org/dist/Bible-OBML-Gateway>
 
 =item *
 
@@ -352,7 +333,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is copyright (c) 2020 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

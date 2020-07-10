@@ -23,11 +23,7 @@ sub finalize {
     my @params;
     if (ref $p eq 'HASH') {
         while (my ($k, $v) = each %$p) {
-            if (ref $v eq 'ARRAY') {
-                for (@$v) {
-                    push @params, encode_utf8($k), encode_utf8($_);
-                }
-            } elsif (ref $v) {
+            if (ref $v) {
                 push @params, encode_utf8($k), $v;
             } else {
                 push @params, encode_utf8($k), encode_utf8($v);

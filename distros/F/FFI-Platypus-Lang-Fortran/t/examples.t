@@ -22,7 +22,7 @@ my @pl_files  = grep !/^compile\.pl$/, bsd_glob '*.pl';
 subtest 'compile fortran' => sub {
 
   plan tests => scalar @for_files;
-  
+
   foreach my $for_file (@for_files)
   {
     my $so_file = "lib$for_file";
@@ -42,7 +42,7 @@ subtest 'compile fortran' => sub {
 subtest 'run perl' => sub {
 
   plan tests => scalar @pl_files;
-  
+
   foreach my $pl_file (@pl_files)
   {
     my @cmd = ($^X, '-Mblib', $pl_file);

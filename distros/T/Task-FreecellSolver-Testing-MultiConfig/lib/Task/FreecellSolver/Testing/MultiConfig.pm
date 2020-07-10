@@ -1,5 +1,5 @@
 package Task::FreecellSolver::Testing::MultiConfig;
-$Task::FreecellSolver::Testing::MultiConfig::VERSION = '0.0.2';
+$Task::FreecellSolver::Testing::MultiConfig::VERSION = '0.0.3';
 use warnings;
 use strict;
 
@@ -21,7 +21,7 @@ the Freecell Solver multi-config test suite.
 
 =head1 VERSION
 
-version 0.0.2
+version 0.0.3
 
 =head1 TASK CONTENTS
 
@@ -43,17 +43,21 @@ version 0.0.2
 
 =head3 L<Dist::Zilla::PluginBundle::SHLOMIF>
 
+=head3 L<HTML::Spelling::Site::Whitelist>
+
+=head3 L<Perl::Critic::Freenode>
+
 =head3 L<Pod::Weaver::PluginBundle::SHLOMIF>
 
 =head3 L<Pod::Weaver::Section::Support>
 
-=head3 L<HTML::Spelling::Site::Whitelist>
-
-=head3 L<Test::Pod::Coverage>
+=head3 L<Task::FreecellSolver::Testing>
 
 =head3 L<Test::HTML::Recursive::DeprecatedTags>
 
-=head3 L<Task::FreecellSolver::Testing>
+=head3 L<Test::Perl::Critic::Policy>
+
+=head3 L<Test::Pod::Coverage>
 
 =head1 AUTHOR
 

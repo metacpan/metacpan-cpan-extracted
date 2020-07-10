@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ISBNUtils/format_isbn10
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2018-08-23'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-04-15'; # DATE
 our $DIST = 'App-ISBNUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,7 +38,7 @@ format-isbn10 - Format ISBN 10, print error if number is invalid
 
 =head1 VERSION
 
-This document describes version 0.002 of format-isbn10 (from Perl distribution App-ISBNUtils), released on 2018-08-23.
+This document describes version 0.003 of format-isbn10 (from Perl distribution App-ISBNUtils), released on 2020-04-15.
 
 =head1 SYNOPSIS
 
@@ -98,6 +99,10 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
 
 =back
 
@@ -171,7 +176,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

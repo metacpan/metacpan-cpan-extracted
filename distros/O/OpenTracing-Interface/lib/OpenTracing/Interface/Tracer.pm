@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = 'v0.204.0';
+our $VERSION = 'v0.205.0';
 
 
 use Role::Declare -lax; # so missing named parameters default to undef
@@ -13,6 +13,8 @@ use Role::Declare -lax; # so missing named parameters default to undef
 use OpenTracing::Types qw/ContextReference Scope ScopeManager Span SpanContext/;
 use Types::Standard qw/ArrayRef Bool Dict HashRef Maybe Object Str/;
 use Types::Common::Numeric qw/PositiveOrZeroNum/;
+
+use constant Carrier => Object | HashRef | ArrayRef;
 
 use Carp;
 
@@ -60,16 +62,14 @@ instance_method start_span(
 
 
 instance_method inject_context(
-    Str    $carrier_format,
-    Object $carrier,
-    SpanContext $span_context
-) :Return(Object) {}
+    Carrier $carrier,
+    Maybe[ SpanContext ] $span_context = undef,
+) :Return(Carrier) {} # a clone preferably
 
 
 
 instance_method extract_context(
-    Str    $carrier_format,
-    Object $carrier
+    Carrier $carrier,
 ) :ReturnMaybe(SpanContext) {}
 
 

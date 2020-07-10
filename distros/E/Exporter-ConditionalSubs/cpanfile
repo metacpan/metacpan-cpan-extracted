@@ -1,5 +1,5 @@
 requires 'B::CallChecker';
-requires 'B::Generate';
+requires 'B::Generate', '>= 1.42';
 
 on develop => sub {
     requires 'Pod::Coverage';

@@ -3,17 +3,15 @@
 #
 #  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try;
+package Syntax::Keyword::Try 0.14;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.13';
 
 use Carp;
 
 require XSLoader;
-XSLoader::load( __PACKAGE__, $VERSION );
+XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 
@@ -98,7 +96,7 @@ still propagate exceptions up to callers as normal.
 Or
 
    ...
-   catch my $var {
+   catch ($var) {
       STATEMENTS...
    }
 
@@ -308,16 +306,8 @@ blocks is sufficiently different from value dispatch in a more general case
 (such as "dumbmatch"). Exception dispatch in perl needs to handle both C<isa>
 and string regexp testing at the same site.
 
-My latest thinking on this front may involve some syntax such as:
-
-   try {
-      ...
-   }
-   catch my $e
-      (isa Some::Exception::Class) { ... },
-      (=~ m/^An error message /)   { ... }
-
-or
+My latest thinking on this front may involve some syntax looking simplar to a
+C<sub> with a signature that declares a single parameter, such as:
 
    try {
       ...
@@ -325,16 +315,7 @@ or
    catch ($e isa Some::Exception::Class) { ... },
          ($e =~ m/^An error message /)   { ... }
 
-Or maybe the C<catch> keyword would be repeated per line, though that then
-involves repeating the error variable name also:
-
-   try {
-      ...
-   }
-   catch my $e (isa Some::Exception::Class) { ... }
-   catch my $e (=~ m/^An error message /)   { ... }
-
-or
+Or maybe the C<catch> keyword would be repeated per line:
 
    try {
       ...

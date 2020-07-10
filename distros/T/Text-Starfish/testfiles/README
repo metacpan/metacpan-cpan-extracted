@@ -45,9 +45,7 @@
 	       renamed: 18 with p_t.java and 18.out
 20-simple_html: simple test for html style
 21-make:	Makefile test
-
-22-tex		in progress.  Similar to 08-tex but in update mode, in
-		order to fix regex hooks to use OutDelimiters
+22-hooks:	Experiments with hooks
 
 NEEDS RENAMING AND DOC UPDATES:
 6 - using -o option, very similar to 10-tex (6.in 6.out) TeX style

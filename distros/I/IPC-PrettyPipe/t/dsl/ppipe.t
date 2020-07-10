@@ -90,10 +90,9 @@ subtest 'nested pipes' => sub {
 
 
         {
-            my $pipe = $p->cmds->elements->[1];
-            isa_ok( $pipe, 'IPC::PrettyPipe' );
-            is( $pipe->argpfx,                      undef );
-            is( $pipe->cmds->elements->[0]->argpfx, undef );
+            my $cmd = $p->cmds->elements->[1];
+            isa_ok( $cmd, 'IPC::PrettyPipe::Cmd' );
+            is( $cmd->argpfx, undef );
         }
 
     };

@@ -1,5 +1,9 @@
 Revision history for Perl module FFI::Platypus::Lang::CPP
 
+0.05 2020-07-07 15:31:17 -0600
+  - Moved to the PerlFFI GitHub org
+  - Migrated to EUMM
+
 0.04  Feb 2, 2015
   - Update documentation.
 

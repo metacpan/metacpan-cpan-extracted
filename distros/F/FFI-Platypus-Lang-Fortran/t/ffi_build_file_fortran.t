@@ -14,7 +14,7 @@ plan skip_all => 'Test requires Fortran compiler'
 subtest 'basic' => sub {
 
   my $file = FFI::Build::File::Fortran->new(['corpus', 'ffi_build_file_fortran', 'add.f']);
-  
+
   isa_ok $file, 'FFI::Build::File::Fortran';
   isa_ok $file, 'FFI::Build::File::C';
   isa_ok $file, 'FFI::Build::File::Base';
@@ -28,7 +28,7 @@ subtest 'compile' => sub {
   my $file = FFI::Build::File::Fortran->new([qw( corpus ffi_build_file_fortran add.f )]);
   my $object = $file->build_item;
   isa_ok $object, 'FFI::Build::File::Object';
-  
+
   is_deeply
     [ $object->build_item ],
     [];

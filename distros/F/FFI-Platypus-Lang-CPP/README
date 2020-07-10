@@ -5,6 +5,14 @@ NAME
 
 SYNOPSIS
 
+    NOTE: The original author of this module considered the techniques used
+    by and documented by this module to be somewhate experimental even back
+    in 2015 when he wrote it. The original author now thinks that it is
+    probably safer to write a C API layer between your C++ library and Perl
+    rather than try to call C++ directly as advocated by this module. While
+    the original author has not yet deprecated this module, users of this
+    module should consider its limitations before using it.
+
     C++:
 
      // on Linux compile with: g++ --shared -o basic.so basic.cpp
@@ -63,10 +71,10 @@ SYNOPSIS
 
      package Foo;
      
-     use FFI::Platypus;
+     use FFI::Platypus 1.00;
      use FFI::Platypus::Memory qw( malloc free );
      
-     my $ffi = FFI::Platypus->new;
+     my $ffi = FFI::Platypus->new( api => 1 )
      $ffi->lang('CPP');
      $ffi->lib('./basic.so');
      
@@ -79,7 +87,7 @@ SYNOPSIS
      $ffi->attach( [ 'Foo::Foo()'     => '_new'     ] => ['Foo']  => 'void' );
      $ffi->attach( [ 'Foo::~Foo()'    => '_DESTROY' ] => ['Foo']  => 'void' );
      $ffi->attach( [ 'Foo::get_bar()' => 'get_bar'  ] => ['Foo']  => 'int'  );
-     $ffi->attach( [ 'Foo::set_bar(int)' 
+     $ffi->attach( [ 'Foo::set_bar(int)'
                                       => 'set_bar'  ] => ['Foo','int']
                                                                   => 'void' );
      
@@ -126,9 +134,9 @@ DESCRIPTION
     that subject.
 
     Note that in addition to using pre-compiled C++ libraries you can
-    bundle C++ code with your Perl distribution using Module::Build::FFI.
-    For a complete example, which attempts to address the caveats listed
-    below you can take a look at this sample distro on GitHub:
+    bundle C++ code with your Perl distribution using FFI::Build. For a
+    complete example, which attempts to address the caveats listed below
+    you can take a look at this sample distro on GitHub:
 
     https://github.com/plicease/Color-FFI
 
@@ -288,8 +296,148 @@ METHODS
 
 EXAMPLES
 
-    See the above "SYNOPSIS" or the examples directory that came with this
-    distribution.
+ Using a C++ class without writing bundling any C/C++ code
+
+    The example in the "SYNOPSIS" shows how you can use a C++ class without
+    writing any wrapper code, though you will have to guess or determine
+    the instance size of the class.
+
+ Using a C++ class with a wrapper
+
+    (For the full source for this example, see examples/wrapper.{pl,cpp}
+    that came with this distribution)
+
+    Sometimes it is easier to write wrapper functions around your new and
+    delete operations. Consider if you add these functions to the C++
+    source to the example in the "SYNOPSIS".
+
+     // These could also be class methods
+     extern "C" Foo*
+     Foo_new()
+     {
+       return new Foo();
+     }
+     
+     extern "C" void
+     Foo_delete(Foo *foo)
+     {
+       delete foo;
+     }
+
+    Now we can use this class without having to know in the perl code what
+    the size of the class is. We declare the constructor and destructor in
+    Perl space like this:
+
+     $ffi->attach( [ 'Foo_new'        => 'new'      ] => []       => 'Foo' );
+     $ffi->attach( [ 'Foo_delete'     => 'DESTROY'  ] => ['Foo']  => 'void' );
+
+    We've also removed the Perl new and DESTROY wrappers as they are
+    unnecessary now, and so the the C++ functions are attached directly to
+    their intended names.
+
+ Exceptions
+
+    (For the full source of this example, see examples/exception.{pl,cpp}
+    that came with this distribution)
+
+    If your library throws an exception and you do not catch it in C++ it
+    is going to kill your program. As an example, suppose set_bar in the
+    example above throws an exception:
+
+     void
+     Foo::set_bar(int value)
+     {
+       if(value > 512)
+         throw new FooException("too hot");
+       if(value < 0)
+         throw new FooException("too cold");
+        bar = value;
+     }
+
+    Now if you try to use set_bar with a bad value like this from Perl:
+
+     $foo->set_bar(-2);
+
+    it will crash your Perl program.
+
+     terminate called after throwing an instance of 'FooException'
+     Abort
+
+    To handle this, you need to write a wrapper around the set_bar method.
+
+     static FooException *last_exception = NULL;
+     
+     extern "C" FooException *
+     Foo_get_exception()
+     {
+       return last_exception;
+     }
+     
+     extern "C" void
+     Foo_reset_exception()
+     {
+       if(last_exception != NULL)
+         delete last_exception;
+       last_exception = NULL;
+     }
+     
+     extern "C" void
+     Foo_set_bar(Foo *foo, int value)
+     {
+       try
+       {
+         Foo_reset_exception();
+         foo->set_bar(value);
+       }
+       catch(FooException *e)
+       {
+         last_exception = e;
+       }
+     }
+
+    Next we will write an interface to the FooException class in Perl:
+
+     package FooException;
+     
+     use overload '""' => sub { "exception: " . $_[0]->message . "\n" };
+     
+     $ffi->custom_type( FooException => {
+       native_type => 'opaque',
+       perl_to_native => sub { ${ $_[0] } },
+       native_to_perl => sub {
+         defined $_[0]
+         ? (bless \$_[0], 'FooException')
+         : ();
+       },
+     });
+     
+     $ffi->attach(
+       [ 'Foo_get_exception' => 'get_exception' ] => [] => 'FooException'
+     );
+     
+     $ffi->attach(
+       [ 'FooException::message()' => 'message' ] => ['FooException'] => 'string'
+     );
+
+    And finally we write a wrapper for the Perl set_bar method.
+
+     $ffi->attach( [ 'Foo_set_bar'    => '_set_bar' ] => ['Foo','int']
+                                                                  => 'void' );
+     sub set_bar
+     {
+       my($self, $value) = @_;
+       $self->_set_bar($value);
+       my $error = FooException->get_exception;
+       die $error if $error;
+     }
+
+    And now when we give set_bar a bogus value we get a Perl exception
+    instead of an application crash:
+
+     exception: too cold
+
+    So we can easily wrap the call to set_bar in a Perl eval if we want to
+    catch the exception and handle it.
 
 SUPPORT
 
@@ -297,14 +445,14 @@ SUPPORT
     should, or if you have a feature request, please open an issue on this
     project's GitHub issue tracker:
 
-    https://github.com/plicease/FFI-Platypus-Lang-CPP/issues
+    https://github.com/PerlFFI/FFI-Platypus-Lang-CPP/issues
 
 CONTRIBUTING
 
     If you have implemented a new feature or fixed a bug then you may make
     a pull reequest on this project's GitHub repository:
 
-    https://github.com/plicease/FFI-Platypus-Lang-CPP/issues
+    https://github.com/PerlFFI/FFI-Platypus-Lang-CPP/issues
 
     Caution: if you do this too frequently I may nominate you as the new
     maintainer. Extreme caution: if you like that sort of thing.
@@ -330,7 +478,7 @@ SEE ALSO
 
       The Core Platypus documentation.
 
-    Module::Build::FFI
+    FFI::Build + FFI::Build::File::CXX
 
       Bundle C or C++ with your FFI / Perl extension.
 

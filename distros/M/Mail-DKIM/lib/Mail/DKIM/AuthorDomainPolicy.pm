@@ -1,7 +1,7 @@
 package Mail::DKIM::AuthorDomainPolicy;
 use strict;
 use warnings;
-our $VERSION = '1.20200513.1'; # VERSION
+our $VERSION = '1.20200708'; # VERSION
 # ABSTRACT: represents an Author Domain Signing Practices (ADSP) record
 
 # Copyright 2005-2009 Messiah College.
@@ -22,9 +22,11 @@ sub fetch {
     my $class = shift;
     my %prms  = @_;
 
-    my $self = eval {
+    my $self;
+    my $had_error= not eval {
         local $SIG{__DIE__};
-        $class->SUPER::fetch(%prms);
+        $self= $class->SUPER::fetch(%prms);
+	1
     };
     my $E = $@;
 
@@ -51,7 +53,7 @@ sub fetch {
         }
     }
 
-    die $E if $E;
+    die $E if $had_error;
     return $self;
 }
 
@@ -193,7 +195,7 @@ Mail::DKIM::AuthorDomainPolicy - represents an Author Domain Signing Practices (
 
 =head1 VERSION
 
-version 1.20200513.1
+version 1.20200708
 
 =head1 DESCRIPTION
 

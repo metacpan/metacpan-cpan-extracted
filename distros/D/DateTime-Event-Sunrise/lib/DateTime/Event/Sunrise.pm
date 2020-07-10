@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Perl DateTime extension for computing the sunrise/sunset on a given day
-#     Copyright (C) 1999-2004, 2013-2014 Ron Hill and Jean Forget
+#     Copyright © 1999-2004, 2013-2014, 2020 Ron Hill and Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
@@ -19,7 +19,7 @@ use Params::Validate qw(:all);
 use Set::Infinite qw(inf $inf);
 use vars qw( $VERSION $RADEG $DEGRAD @ISA );
 @ISA     = qw( Exporter );
-$VERSION = '0.0505';
+$VERSION = '0.0506';
 $RADEG   = ( 180 / pi );
 $DEGRAD  = ( pi / 180 );
 my $INV360 = ( 1.0 / 360.0 );
@@ -52,6 +52,7 @@ sub new {
           precise    => { type => SCALAR, default => '0' },
           upper_limb => { type => SCALAR, default => '0' },
           silent     => { type => SCALAR, default => '0' },
+          trace      => { type => GLOB | GLOBREF | SCALAR, default => '0' },
       }
     );
 
@@ -67,19 +68,19 @@ sub new {
 
     #
     #
-    # FUNCTIONAL SEQUENCE for sunrise 
+    # FUNCTIONAL SEQUENCE for sunrise
     #
     # _GIVEN
     # A sunrise object that was created by the new method
     #
     # _THEN
     #
-    # setup subs for following/previous sunrise times  
-    #   
+    # setup subs for following/previous sunrise times
+    #
     #
     # _RETURN
     #
-    # A new DateTime::Set recurrence object 
+    # A new DateTime::Set recurrence object
     #
 sub sunrise {
 
@@ -98,15 +99,15 @@ sub sunrise {
 
     #
     #
-    # FUNCTIONAL SEQUENCE for sunset  
-    # 
+    # FUNCTIONAL SEQUENCE for sunset
+    #
     # _GIVEN
-    # 
+    #
     # A sunrise object that was created by the new method
     # _THEN
     #
     # Setup subs for following/previous sunset times
-    # 
+    #
     #
     # _RETURN
     #
@@ -132,15 +133,15 @@ sub sunset {
     # FUNCTIONAL SEQUENCE for sunset_datetime
     #
     # _GIVEN
-    # 
+    #
     # A sunrise object
     # A DateTime object
-    # 
+    #
     # _THEN
     #
-    #  Validate the DateTime object is valid  
-    #  Compute sunrise and sunset  
-    #      
+    #  Validate the DateTime object is valid
+    #  Compute sunrise and sunset
+    #
     #
     # _RETURN
     #
@@ -155,7 +156,7 @@ sub sunset_datetime {
     if ( ! $dt->isa('DateTime') ) {
         croak("Dates need to be DateTime objects");
     }
-    my ( undef, $tmp_set ) = _sunrise( $self, $dt );
+    my ( undef, $tmp_set ) = _sunrise( $self, $dt, 0, 1 );
     return $tmp_set;
 }
 
@@ -164,15 +165,15 @@ sub sunset_datetime {
     # FUNCTIONAL SEQUENCE for sunrise_datetime
     #
     # _GIVEN
-    # 
+    #
     # A sunrise object
     # A DateTime object
-    # 
+    #
     # _THEN
     #
-    #  Validate the DateTime object is valid  
-    #  Compute sunrise and sunset  
-    #      
+    #  Validate the DateTime object is valid
+    #  Compute sunrise and sunset
+    #
     #
     # _RETURN
     #
@@ -187,7 +188,7 @@ sub sunrise_datetime {
     if ( ! $dt->isa('DateTime') ) {
         croak("Dates need to be DateTime objects");
     }
-    my ( $tmp_rise, undef ) = _sunrise( $self, $dt );
+    my ( $tmp_rise, undef ) = _sunrise( $self, $dt, 1, 0 );
     return $tmp_rise;
 }
 
@@ -196,15 +197,15 @@ sub sunrise_datetime {
     # FUNCTIONAL SEQUENCE for sunrise_sunset_span
     #
     # _GIVEN
-    # 
+    #
     # A sunrise object
     # A DateTime object
-    # 
+    #
     # _THEN
     #
-    #  Validate the DateTime object is valid  
-    #  Compute sunrise and sunset  
-    #      
+    #  Validate the DateTime object is valid
+    #  Compute sunrise and sunset
+    #
     #
     # _RETURN
     #
@@ -219,7 +220,7 @@ sub sunrise_sunset_span {
     if ( ! $dt->isa('DateTime') ) {
         croak("Dates need to be DateTime objects");
     }
-    my ( $tmp_rise, $tmp_set ) = _sunrise( $self, $dt );
+    my ( $tmp_rise, $tmp_set ) = _sunrise( $self, $dt, 1, 1 );
 
     return DateTime::Span->from_datetimes(
       start => $tmp_rise,
@@ -231,13 +232,13 @@ sub sunrise_sunset_span {
 # FUNCTIONAL SEQUENCE for is_polar_night
 #
 # _GIVEN
-# 
+#
 # A sunrise object
 # A DateTime object
-# 
+#
 # _THEN
 #
-#  Validate the DateTime object is valid  
+#  Validate the DateTime object is valid
 #  Compute sunrise and sunset
 #
 # _RETURN
@@ -253,7 +254,7 @@ sub is_polar_night {
     if ( ! $dt->isa('DateTime') ) {
         croak("Dates need to be DateTime objects");
     }
-    my ( undef, undef, $rise_season, $set_season ) = _sunrise( $self, $dt, 1 );
+    my ( undef, undef, $rise_season, $set_season ) = _sunrise( $self, $dt, 1, 1, 1 );
     return ($rise_season < 0 || $set_season < 0);
 }
 
@@ -261,13 +262,13 @@ sub is_polar_night {
 # FUNCTIONAL SEQUENCE for is_polar_day
 #
 # _GIVEN
-# 
+#
 # A sunrise object
 # A DateTime object
-# 
+#
 # _THEN
 #
-#  Validate the DateTime object is valid  
+#  Validate the DateTime object is valid
 #  Compute sunrise and sunset
 #
 # _RETURN
@@ -283,7 +284,7 @@ sub is_polar_day {
     if ( ! $dt->isa('DateTime') ) {
         croak("Dates need to be DateTime objects");
     }
-    my ( undef, undef, $rise_season, $set_season ) = _sunrise( $self, $dt, 1 );
+    my ( undef, undef, $rise_season, $set_season ) = _sunrise( $self, $dt, 1, 1, 1 );
     return ($rise_season > 0 || $set_season > 0);
 }
 
@@ -291,13 +292,13 @@ sub is_polar_day {
 # FUNCTIONAL SEQUENCE for is_day_and_night
 #
 # _GIVEN
-# 
+#
 # A sunrise object
 # A DateTime object
-# 
+#
 # _THEN
 #
-#  Validate the DateTime object is valid  
+#  Validate the DateTime object is valid
 #  Compute sunrise and sunset
 #
 # _RETURN
@@ -313,25 +314,24 @@ sub is_day_and_night {
     if ( ! $dt->isa('DateTime') ) {
         croak("Dates need to be DateTime objects");
     }
-    my ( undef, undef, $rise_season, $set_season ) = _sunrise( $self, $dt, 1 );
+    my ( undef, undef, $rise_season, $set_season ) = _sunrise( $self, $dt, 1, 1, 1 );
     return ($rise_season == 0 && $set_season == 0);
 }
 
     #
     #
-    # FUNCTIONAL SEQUENCE for _following_sunrise 
+    # FUNCTIONAL SEQUENCE for _following_sunrise
     #
     # _GIVEN
-    # 
+    #
     # A sunrise object
     # A DateTime object
-    # 
+    #
     # _THEN
     #
-    #  Validate the DateTime object is valid  
-    #  Compute sunrise and return if it is greater 
+    #  Validate the DateTime object is valid
+    #  Compute sunrise and return if it is greater
     #  than the original if not add one day and recompute
-    #      
     #
     # _RETURN
     #
@@ -343,22 +343,22 @@ sub _following_sunrise {
     my $dt   = shift;
     croak( "Dates need to be DateTime objects (" . ref($dt) . ")" )
       unless ( $dt->isa('DateTime') );
-    my ( $tmp_rise, undef ) = _sunrise( $self, $dt );
+    my ( $tmp_rise, undef ) = _sunrise( $self, $dt, 1, 0 );
     return $tmp_rise if $tmp_rise > $dt;
     my $d = DateTime::Duration->new(
       days => 1,
     );
     my $new_dt = $dt + $d;
-    ( $tmp_rise, undef ) = _sunrise( $self, $new_dt );
+    ( $tmp_rise, undef ) = _sunrise( $self, $new_dt, 1, 0 );
     return $tmp_rise if $tmp_rise > $dt;
     $new_dt = $new_dt + $d;
-    ( $tmp_rise, undef ) = _sunrise( $self, $new_dt );
+    ( $tmp_rise, undef ) = _sunrise( $self, $new_dt, 1, 0 );
     return $tmp_rise;
 }
 
     #
     #
-    # FUNCTIONAL SEQUENCE for _previous_sunrise 
+    # FUNCTIONAL SEQUENCE for _previous_sunrise
     #
     # _GIVEN
     # A sunrise object
@@ -372,7 +372,7 @@ sub _following_sunrise {
     #
     # _RETURN
     #
-    # A new DateTime Object that contains the sunrise time 
+    # A new DateTime Object that contains the sunrise time
     #
 sub _previous_sunrise {
 
@@ -380,22 +380,22 @@ sub _previous_sunrise {
     my $dt   = shift;
     croak( "Dates need to be DateTime objects (" . ref($dt) . ")" )
       unless ( $dt->isa('DateTime') );
-    my ( $tmp_rise, undef ) = _sunrise( $self, $dt );
+    my ( $tmp_rise, undef ) = _sunrise( $self, $dt, 1, 0 );
     return $tmp_rise if $tmp_rise < $dt;
     my $d = DateTime::Duration->new(
       days => 1,
     );
     my $new_dt = $dt - $d;
-    ( $tmp_rise, undef ) = _sunrise( $self, $new_dt );
+    ( $tmp_rise, undef ) = _sunrise( $self, $new_dt, 1, 0 );
     return $tmp_rise if $tmp_rise < $dt;
     $new_dt = $new_dt - $d;
-    ( $tmp_rise, undef ) = _sunrise( $self, $new_dt );
+    ( $tmp_rise, undef ) = _sunrise( $self, $new_dt, 1, 0 );
     return $tmp_rise;
 }
 
     #
     #
-    # FUNCTIONAL SEQUENCE for _following_sunset  
+    # FUNCTIONAL SEQUENCE for _following_sunset
     #
     # _GIVEN
     # A sunrise object
@@ -403,8 +403,8 @@ sub _previous_sunrise {
     #
     # _THEN
     #
-    #  Validate the DateTime object is valid  
-    #  Compute sunset and return if it is greater 
+    #  Validate the DateTime object is valid
+    #  Compute sunset and return if it is greater
     #  than the original if not add one day and recompute
     #
     # _RETURN
@@ -417,22 +417,22 @@ sub _following_sunset {
     my $dt   = shift;
     croak( "Dates need to be DateTime objects (" . ref($dt) . ")" )
       unless ( ref($dt) eq 'DateTime' );
-    my ( undef, $tmp_set ) = _sunrise( $self, $dt );
+    my ( undef, $tmp_set ) = _sunrise( $self, $dt, 0, 1 );
     return $tmp_set if $tmp_set > $dt;
     my $d = DateTime::Duration->new(
       days => 1,
     );
     my $new_dt = $dt + $d;
-    ( undef, $tmp_set ) = _sunrise( $self, $new_dt );
+    ( undef, $tmp_set ) = _sunrise( $self, $new_dt, 0, 1 );
     return $tmp_set if $tmp_set > $dt;
     $new_dt = $new_dt + $d;
-    ( undef, $tmp_set ) = _sunrise( $self, $new_dt );
+    ( undef, $tmp_set ) = _sunrise( $self, $new_dt, 0, 1 );
     return $tmp_set;
 }
 
     #
     #
-    # FUNCTIONAL SEQUENCE for _previous_sunset 
+    # FUNCTIONAL SEQUENCE for _previous_sunset
     #
     # _GIVEN
     #  A sunrise object
@@ -443,10 +443,10 @@ sub _following_sunset {
     # Validate the DateTime Object
     # Compute sunset and return if it is less than
     # the original object if not subtract one day and recompute
-    #  
+    #
     # _RETURN
     #
-    # A DateTime object with sunset time 
+    # A DateTime object with sunset time
     #
 sub _previous_sunset {
 
@@ -454,189 +454,292 @@ sub _previous_sunset {
     my $dt   = shift;
     croak( "Dates need to be DateTime objects (" . ref($dt) . ")" )
       unless ( $dt->isa('DateTime') );
-    my ( undef, $tmp_set ) = _sunrise( $self, $dt );
+    my ( undef, $tmp_set ) = _sunrise( $self, $dt, 0, 1 );
     return $tmp_set if $tmp_set < $dt;
     my $d = DateTime::Duration->new(
       days => 1,
     );
     my $new_dt = $dt - $d;
-    ( undef, $tmp_set ) = _sunrise( $self, $new_dt );
+    ( undef, $tmp_set ) = _sunrise( $self, $new_dt, 0, 1 );
     return $tmp_set if $tmp_set < $dt;
     $new_dt = $new_dt - $d;
-    ( undef, $tmp_set ) = _sunrise( $self, $new_dt );
+    ( undef, $tmp_set ) = _sunrise( $self, $new_dt, 0, 1 );
     return $tmp_set;
 }
 
-    #
-    #
-    # FUNCTIONAL SEQUENCE for _sunrise 
-    #
-    # _GIVEN
-    #  A sunrise object and a DateTime object
-    #
-    # _THEN
-    #
-    # Check if precise is set to one if so
-    # initially compute sunrise/sunset (using division
-    # by 15.04107 instead of 15.0) then recompute rise/set time
-    # using exact moment last computed. IF precise is set
-    # to zero devide by 15.0 (only once)
-    # 
-    # Bug in this sub, I was blindly setting the hour and min without
-    # checking if it was neg. a neg. value for hours/min is not correct
-    # I changed the routine to use a duration then add the duration.
-    #
-    # _RETURN
-    # 
-    # two DateTime objects with the date and time for sunrise and sunset
-    # two season flags for sunrise and sunset respectively
-    #
+#
+#
+# FUNCTIONAL SEQUENCE for _sunrise
+#
+# _GIVEN
+#  A sunrise object and a DateTime object
+#  three booleans, to control the iterative computations and the warning messages
+#
+# _THEN
+#
+# Check if precise is set to one if so
+# initially compute sunrise/sunset (using division
+# by 15.04107 instead of 15.0) then recompute rise/set time
+# using exact moment last computed. IF precise is set
+# to zero divide by 15.0 (only once)
+# UPDATE: actually, with the precise algorithm as currently implemented
+# the 15.0 value gives better results than the 15.04107 value. Results
+# cross-checked with the NOAA's solar calculator, with Astro::Coords + Astro::PAL
+# and with Stellarium
+#
+# If using the precise algorithm, the $want_sunrise and $want_sunset booleans control the computation
+# of the corresponding events, to eliminate computations that will be discarded upon return
+# from the sub (that is, "stored" into undef).
+# These booleans are not used for the basic algorithm.
+#
+# The $silent boolean, if provided, override the silent attribute of the sunrise object
+# to control the emission of warnings.
+#
+# _RETURN
+#
+# two DateTime objects with the date and time for sunrise and sunset
+# two season flags for sunrise and sunset respectively
+#
 sub _sunrise {
 
-    my ($self, $dt, $silent) = @_;
+    my ($self, $dt, $want_sunrise, $want_sunset, $silent) = @_;
     my $cloned_dt = $dt->clone;
     my $altit     = $self->{altitude};
     my $precise   = defined( $self->{precise} ) ? $self->{precise} : 0;
+    my $trace     = defined( $self->{trace}   ) ? $self->{trace}   : 0;
     unless (defined $silent) {
       $silent    = defined( $self->{silent}  ) ? $self->{silent}  : 0;
     }
     $cloned_dt->set_time_zone('floating');
 
-    if ($precise) {
+    if (!$precise) {
+      if ($trace) {
+        printf $trace "\nBasic computation for %s, lon %.3f, lat %.3f, altitude %.3f, upper limb %d\n"
+                                             , $dt->ymd
+                                             , $self->{longitude}
+                                             , $self->{latitude}
+                                             , $self->{altitude}
+                                             , $self->{upper_limb};
+      }
+      my $d = days_since_2000_Jan_0($cloned_dt) + 0.5 - $self->{longitude} / 360.0;
+      my $revsub = \&rev180; # normalizing angles around 0 degrees
+      my ( $h1, $h2, $season ) = _sunrise_sunset( $d
+                                                , $self->{longitude}
+                                                , $self->{latitude}
+                                                , $altit
+                                                , 15.0
+                                                , $self->{upper_limb}
+                                                , $silent
+                                                , $trace
+                                                , $revsub);
+      my ( $seconds_rise, $seconds_set ) = convert_hour( $h1, $h2 );
+      my $rise_dur = DateTime::Duration->new( seconds => $seconds_rise );
+      my $set_dur  = DateTime::Duration->new( seconds => $seconds_set );
+      my $tmp_dt1  = DateTime->new(
+        year      => $dt->year,
+        month     => $dt->month,
+        day       => $dt->day,
+        hour      => 0,
+        minute    => 0,
+        time_zone => 'UTC'
+      );
 
+      my $rise_time = $tmp_dt1 + $rise_dur;
+      my $set_time  = $tmp_dt1 + $set_dur;
+      my $tz        = $dt->time_zone;
+      $rise_time->set_time_zone($tz) unless $tz->is_floating;
+      $set_time ->set_time_zone($tz) unless $tz->is_floating;
+      return ( $rise_time, $set_time, $season, $season );
+    }
+
+    else {
+      my $ang_speed = 15.0;
+      my $d = days_since_2000_Jan_0($cloned_dt) - $self->{longitude} / 360.0; # UTC decimal days at midnight LMT
+      my $tmp_dt1 = DateTime->new(
+        year      => $dt->year,
+        month     => $dt->month,
+        day       => $dt->day,
+        hour      => 0,
+        minute    => 0,
+        time_zone => 'UTC'
+      );
+      my $tz = $dt->time_zone;
+      my $rise_time;
+      my $set_time;
+      my $rise_season;
+      my $set_season;
+      my $revsub = sub { _rev_lon($_[0], $self->{longitude}) }; # normalizing angles around the local longitude
+
+      if ($want_sunrise) {
+        if ($trace) {
+          printf $trace "\nPrecise sunrise computation for %s, lon %.3f, lat %.3f, altitude %.3f, upper limb %d angular speed %.5f\n"
+                                                         , $dt->ymd
+                                                         , $self->{longitude}
+                                                         , $self->{latitude}
+                                                         , $self->{altitude}
+                                                         , $self->{upper_limb}
+                                                         , $ang_speed;
+        }
         # This is the initial start
 
-        my $d = days_since_2000_Jan_0($cloned_dt) + 0.5 - $self->{longitude} / 360.0;
-        my ($tmp_rise_1, $tmp_set_1, $rise_season) = _sunrise_sunset( $d, $self->{longitude}, $self->{latitude}, $altit,
-                                                                     15.04107, $self->{upper_limb}, $silent);
-        my $set_season = $rise_season;
-
-        # Now we have the initial rise/set times next recompute d using the exact moment
-        # recompute sunrise
-
-        my $tmp_rise_2 = 9;
-        my $tmp_rise_3 = 0;
-
-        my $counter = 0;
-        until ( equal( $tmp_rise_2, $tmp_rise_3, 8 ) ) {
-
-            my $d_sunrise_1 = $d + $tmp_rise_1 / 24.0;
-            ($tmp_rise_2, undef, undef) = _sunrise_sunset($d_sunrise_1, $self->{longitude}, $self->{latitude},
-                                                          $altit, 15.04107, $self->{upper_limb}, $silent);
-            $tmp_rise_1 = $tmp_rise_3;
-            my $d_sunrise_2 = $d + $tmp_rise_2 / 24.0;
-            ($tmp_rise_3, undef, $rise_season) = _sunrise_sunset($d_sunrise_2, $self->{longitude}, $self->{latitude},
-                                                                 $altit, 15.04107, $self->{upper_limb}, $silent);
-            last if ++$counter > 10;
+        my $h1_lmt = 12; # LMT decimal hours, noon then the successive values of sunrise
+        my $h1_utc;      # UTC decimal hours, noon LMT then the successive values of sunrise
+        for my $counter (1..9) {
+          # 9 is a arbitrary value to stop runaway loops. Normally, we should leave at the second or third iteration
+          my $h2_utc;
+          ($h2_utc, undef, $rise_season) = _sunrise_sunset( $d + $h1_lmt / 24
+                                                          , $self->{longitude}
+                                                          , $self->{latitude}
+                                                          , $altit
+                                                          , $ang_speed
+                                                          , $self->{upper_limb}
+                                                          , $silent
+                                                          , $trace
+                                                          , $revsub);
+          if ($rise_season != 0) {
+            $h1_utc = $h2_utc;
+            last;
+          }
+          $h1_utc = $h1_lmt - $self->{longitude} / 15;
+          if (equal($h1_utc, $h2_utc, 5)) {
+            # equal within 1e-5 hour, less than 0.04 second
+            $h1_utc = $h2_utc;
+            last;
+          }
+          $h1_utc = $h2_utc;
+          $h1_lmt = $h1_utc + $self->{longitude} / 15;
         }
-
-        my $tmp_set_2 = 9;
-        my $tmp_set_3 = 0;
-
-        $counter = 0;
-        until ( equal( $tmp_set_2, $tmp_set_3, 8 ) ) {
-
-            my $d_sunset_1 = $d + $tmp_set_1 / 24.0;
-            (undef, $tmp_set_2, undef) = _sunrise_sunset( $d_sunset_1, $self->{longitude}, $self->{latitude},
-                                                          $altit, 15.04107, $self->{upper_limb}, $silent);
-            $tmp_set_1 = $tmp_set_3;
-            my $d_sunset_2 = $d + $tmp_set_2 / 24.0;
-            (undef, $tmp_set_3, $set_season) = _sunrise_sunset( $d_sunset_2, $self->{longitude}, $self->{latitude},
-                                                                $altit, 15.04107, $self->{upper_limb}, $silent);
-            last if ++$counter > 10;
-
-        }
-
-        my ( $second_rise, $second_set ) = convert_hour( $tmp_rise_3, $tmp_set_3 );
-
+        my $second_rise = _convert_1_hour($h1_utc);
         # This is to fix the datetime object to use a duration
         # instead of blindly setting the hour/min
-        my $rise_dur = DateTime::Duration->new( seconds => $second_rise );
-        my $set_dur  = DateTime::Duration->new( seconds => $second_set );
-
-        my $tmp_dt1 = DateTime->new(
-          year      => $dt->year,
-          month     => $dt->month,
-          day       => $dt->day,
-          hour      => 0,
-          minute    => 0,
-          time_zone => 'UTC'
-        );
-
-        my $rise_time = $tmp_dt1 + $rise_dur;
-        my $set_time  = $tmp_dt1 + $set_dur;
-        my $tz        = $dt->time_zone;
+        my $rise_dur  = DateTime::Duration->new( seconds => $second_rise );
+        $rise_time = $tmp_dt1 + $rise_dur;
         $rise_time->set_time_zone($tz) unless $tz->is_floating;
-        $set_time->set_time_zone($tz) unless $tz->is_floating;
-        return ( $rise_time, $set_time, $rise_season, $set_season );
-    }
-    else {
-        my $d = days_since_2000_Jan_0($cloned_dt) + 0.5 - $self->{longitude} / 360.0;
-        my ( $h1, $h2, $season ) = _sunrise_sunset( $d, $self->{longitude}, $self->{latitude}, $altit, 15.0, $self->{upper_limb}, $silent);
-        my ( $seconds_rise, $seconds_set ) = convert_hour( $h1, $h2 );
-        my $rise_dur = DateTime::Duration->new( seconds => $seconds_rise );
-        my $set_dur  = DateTime::Duration->new( seconds => $seconds_set );
-        my $tmp_dt1  = DateTime->new(
-          year      => $dt->year,
-          month     => $dt->month,
-          day       => $dt->day,
-          hour      => 0,
-          minute    => 0,
-          time_zone => 'UTC'
-        );
+      }
 
-        my $rise_time = $tmp_dt1 + $rise_dur;
-        my $set_time  = $tmp_dt1 + $set_dur;
-        my $tz        = $dt->time_zone;
-        $rise_time->set_time_zone($tz) unless $tz->is_floating;
-        $set_time->set_time_zone($tz) unless $tz->is_floating;
-        return ( $rise_time, $set_time, $season, $season );
+      if ($want_sunset) {
+        if ($trace) {
+          printf $trace "\nPrecise sunset computation for %s, lon %.3f, lat %.3f, altitude %.3f, upper limb %d angular speed %.5f\n"
+                                                        , $dt->ymd
+                                                        , $self->{longitude}
+                                                        , $self->{latitude}
+                                                        , $self->{altitude}
+                                                        , $self->{upper_limb}
+                                                        , $ang_speed;
+        }
+        my $h3_lmt = 12; # LMT decimal hours, noon then the successive values of sunset
+        my $h3_utc;      # UTC decimal hours, noon LMT then the successive values of sunset
+        for my $counter (1..9) {
+          # 9 is a arbitrary value to stop runaway loops. Normally, we should leave at the second or third iteration
+          my $h4_utc;
+          (undef, $h4_utc, $set_season) = _sunrise_sunset( $d + $h3_lmt / 24
+                                                         , $self->{longitude}
+                                                         , $self->{latitude}
+                                                         , $altit
+                                                         , $ang_speed
+                                                         , $self->{upper_limb}
+                                                         , $silent
+                                                         , $trace
+                                                         , $revsub);
+          if ($set_season != 0) {
+            $h3_utc = $h4_utc;
+            last;
+          }
+          $h3_utc = $h3_lmt - $self->{longitude} / 15;
+          if (equal($h3_utc, $h4_utc, 5)) {
+            # equal within 1e-5 hour, less than 0.04 second
+            $h3_utc = $h4_utc;
+            last;
+          }
+          $h3_utc = $h4_utc;
+          $h3_lmt = $h3_utc + $self->{longitude} / 15;
+        }
+
+        my $second_set = _convert_1_hour( $h3_utc );
+        # This is to fix the datetime object to use a duration
+        # instead of blindly setting the hour/min
+        my $set_dur   = DateTime::Duration->new( seconds => $second_set );
+        $set_time  = $tmp_dt1 + $set_dur;
+        $set_time ->set_time_zone($tz) unless $tz->is_floating;
+      }
+
+      return ( $rise_time, $set_time, $rise_season, $set_season );
     }
 
 }
 
-    #
-    #
-    # FUNCTIONAL SEQUENCE for _sunrise_sunset 
-    #
-    # _GIVEN
-    # 
-    #  days since Jan 0 2000, longitude, latitude, reference sun height $h and the "upper limb" and "silent" flags
-    # _THEN
-    #
-    #  Compute the sunrise/sunset times for that day   
-    #      
-    # _RETURN
-    #
-    #  sunrise and sunset times as hours (GMT Time) 
-    #  season flag: -1 for polar night, +1 for midnight sun, 0 for day and night
-    #
+#
+#
+# FUNCTIONAL SEQUENCE for _sunrise_sunset
+#
+# _GIVEN
+#
+#  days since Jan 0 2000,
+#    the fractional part is the UTC time of day. E.g.  7458.66667 represents 2020-06-01T16:00:00 UTC
+#  longitude,
+#  latitude,
+#  reference sun height,
+#     all three in decimal degrees
+#  angular speed
+#     either Earth's spin 15.04107 degrees per hour or the combination or Earth's spin with Earth-Sun mean orbital speed 15 degrees per hour
+# "upper limb" flag
+#  and "silent" flag
+#
+# _THEN
+#
+#  Compute the sunrise/sunset times for that day
+#
+# _RETURN
+#
+#  sunrise and sunset times as hours (GMT Time)
+#  season flag: -1 for polar night, +1 for midnight sun, 0 for day and night
+#
 sub _sunrise_sunset {
 
-    my ( $d, $lon, $lat, $altit, $h, $upper_limb, $silent ) = @_;
+    my ( $d, $lon, $lat, $altit, $ang_spd, $upper_limb, $silent, $trace, $revsub ) = @_;
+
+    if ($trace) {
+      printf $trace "\n";
+    }
 
     # Compute local sidereal time of this moment
-    my $sidtime = revolution(GMST0($d) + 180.0 + $lon);
+    my $gmst0   = GMST0($d);
+    #my $sidtime = revolution($gmst0 + 180.0 + $lon);
+    my $sidtime = revolution($gmst0 + 180.0);
 
     # Compute Sun's RA + Decl + distance at this moment
-    my ($sRA, $sdec, $sr) = sun_RA_dec($d);
+    my ($sRA, $sdec, $sr) = sun_RA_dec($d, $lon, $trace);
 
-    # Compute time when Sun is at south - in hours UT
-    my $tsouth  = 12.0 - rev180( $sidtime - $sRA ) / $h;
+    # Compute time when Sun is at south - in hours (LMT then UTC)
+    my $tsouth_lmt  = 12.0 - $revsub->( $sidtime - $sRA ) / 15;
+    my $tsouth      = $tsouth_lmt - $lon / 15;
 
     # Compute the Sun's apparent radius, degrees
     my $sradius = 0.2666 / $sr;
 
+    if ($trace) {
+      printf $trace "For day $d (%s), GMST0 $gmst0 %s %s\n",            _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_angle($gmst0  ), _fmt_dur($gmst0   / 15);
+      printf $trace "For day $d (%s), sidereal time $sidtime, %s %s\n", _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_angle($sidtime), _fmt_dur($sidtime / 15);
+      printf $trace "For day $d (%s), right asc $sRA %s %s\n",          _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_angle($sRA    ), _fmt_dur($sRA     / 15);
+      printf $trace "For day $d (%s), declination $sdec %s %s\n",       _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_angle($sdec   ), _fmt_dur($sdec    / 15);
+      printf $trace "For day $d (%s), solar noon at $tsouth (%s)\n",    _fmt_hr(24 * ($d - int($d)), $lon, 0), _fmt_hr($tsouth, $lon, 0);
+    }
     # Do correction to upper limb, if necessary
     if ($upper_limb) {
         $altit -= $sradius;
     }
 
-    # Compute the diurnal arc that the Sun traverses to reach 
+    # Compute the diurnal arc that the Sun traverses to reach
     # the specified height altit:
 
     my $cost = (sind($altit) - sind($lat) * sind($sdec))
                / (cosd($lat) * cosd($sdec));
+
+    if ($trace) {
+      print $trace "altit = $altit, sind(altit) = ", sind($altit), ", lat = $lat, sind(lat) = ", sind($lat), "\n";
+      print $trace "sdec = $sdec, sind(sdec) = ", sind($sdec), ", lat = $lat, cosd(lat) = ", cosd($lat), "\n";
+      print $trace "sdec = $sdec, cosd(sdec) = ", cosd($sdec), ", cost = $cost\n";
+    }
 
     my $t;
     my $season = 0;
@@ -655,31 +758,39 @@ sub _sunrise_sunset {
         $season = +1;
     }
     else {
-        $t = acosd($cost) / 15.0;    # The diurnal arc, hours
+      my $arc = acosd($cost);    # The diurnal arc
+      $t = $arc / $ang_spd;      # Time to traverse the diurnal arc, hours
+      if ($trace) {
+        printf $trace "Diurnal arc $arc -> $t hours (%s)\n", _fmt_dur($t);
+      }
     }
 
-    # Store rise and set times - in hours UT 
+    # Store rise and set times - in hours UT
 
     my $hour_rise_ut = $tsouth - $t;
     my $hour_set_ut  = $tsouth + $t;
+    if ($trace) {
+      printf $trace "For day $d (%s), sunrise at $hour_rise_ut (%s)\n", _fmt_hr(24 * ($d - int($d)), $lon), _fmt_hr($hour_rise_ut, $lon);
+      printf $trace "For day $d (%s), sunset  at $hour_set_ut (%s)\n",  _fmt_hr(24 * ($d - int($d)), $lon), _fmt_hr($hour_set_ut , $lon);
+    }
     return ( $hour_rise_ut, $hour_set_ut, $season );
 
 }
 
     #
     #
-    # FUNCTIONAL SEQUENCE for GMST0 
+    # FUNCTIONAL SEQUENCE for GMST0
     #
     # _GIVEN
     # Day number
     #
     # _THEN
     #
-    # computes GMST0, the Greenwich Mean Sidereal Time  
-    # at 0h UT (i.e. the sidereal time at the Greenwhich meridian at  
-    # 0h UT).  GMST is then the sidereal time at Greenwich at any     
+    # computes GMST0, the Greenwich Mean Sidereal Time
+    # at 0h UT (i.e. the sidereal time at the Greenwhich meridian at
+    # 0h UT).  GMST is then the sidereal time at Greenwich at any
     # time of the day.
-    # 
+    #
     #
     # _RETURN
     #
@@ -687,7 +798,7 @@ sub _sunrise_sunset {
     #
 sub GMST0 {
     my ($d) = @_;
-    my $sidtim0 = revolution( ( 180.0 + 356.0470 + 282.9404 ) + ( 0.9856002585 + 4.70935E-5 ) * $d );
+    my $sidtim0 = revolution( ( 180.0 + 356.0470 + 282.9404 ) + ( 0.9856002585 + 4.70935E-5 ) * $d);
     return $sidtim0;
 }
 
@@ -702,8 +813,8 @@ sub GMST0 {
     #
     # Computes the Sun's ecliptic longitude and distance
     # at an instant given in d, number of days since
-    # 2000 Jan 0.0. 
-    # 
+    # 2000 Jan 0.0.
+    #
     #
     # _RETURN
     #
@@ -714,20 +825,20 @@ sub sunpos {
 
     my ($d) = @_;
 
-    #                       Mean anomaly of the Sun 
-    #                       Mean longitude of perihelion 
-    #                         Note: Sun's mean longitude = M + w 
-    #                       Eccentricity of Earth's orbit 
-    #                       Eccentric anomaly 
-    #                       x, y coordinates in orbit 
-    #                       True anomaly 
+    #                       Mean anomaly of the Sun
+    #                       Mean longitude of perihelion
+    #                         Note: Sun's mean longitude = M + w
+    #                       Eccentricity of Earth's orbit
+    #                       Eccentric anomaly
+    #                       x, y coordinates in orbit
+    #                       True anomaly
 
-    # Compute mean elements 
+    # Compute mean elements
     my $Mean_anomaly_of_sun = revolution( 356.0470 + 0.9856002585 * $d );
     my $Mean_longitude_of_perihelion = 282.9404 + 4.70935E-5 * $d;
     my $Eccentricity_of_Earth_orbit  = 0.016709 - 1.151E-9 * $d;
 
-    # Compute true longitude and radius vector 
+    # Compute true longitude and radius vector
     my $Eccentric_anomaly = $Mean_anomaly_of_sun
                             + $Eccentricity_of_Earth_orbit * $RADEG
                               * sind($Mean_anomaly_of_sun)
@@ -753,40 +864,44 @@ sub sunpos {
 
     #
     #
-    # FUNCTIONAL SEQUENCE for sun_RA_dec 
+    # FUNCTIONAL SEQUENCE for sun_RA_dec
     #
     # _GIVEN
-    # day number, $r and $lon (from sunpos) 
+    # day number, $r and $lon (from sunpos)
     #
     # _THEN
     #
     # compute RA and dec
-    # 
+    #
     #
     # _RETURN
     #
     # Sun's Right Ascension (RA), Declination (dec) and distance (r)
-    # 
+    #
     #
 sub sun_RA_dec {
 
-    my ($d) = @_;
+    my ($d, $lon_noon, $trace) = @_;
 
-    # Compute Sun's ecliptical coordinates 
+    # Compute Sun's ecliptical coordinates
     my ( $r, $lon ) = sunpos($d);
+    if ($trace) {
+      #my $datetime = DateTime->new(year => 1999, month => 12, day => 31)->add(days => $d)->ymd;
+      printf $trace "For day $d (%s), solar noon at ecliptic longitude $lon %s\n", _fmt_hr(24 * ($d - int($d)), $lon_noon), _fmt_angle($lon);
+    }
 
-    # Compute ecliptic rectangular coordinates (z=0) 
+    # Compute ecliptic rectangular coordinates (z=0)
     my $x = $r * cosd($lon);
     my $y = $r * sind($lon);
 
-    # Compute obliquity of ecliptic (inclination of Earth's axis) 
+    # Compute obliquity of ecliptic (inclination of Earth's axis)
     my $obl_ecl = 23.4393 - 3.563E-7 * $d;
 
-    # Convert to equatorial rectangular coordinates - x is unchanged 
+    # Convert to equatorial rectangular coordinates - x is unchanged
     my $z = $y * sind($obl_ecl);
     $y = $y * cosd($obl_ecl);
 
-    # Convert to spherical coordinates 
+    # Convert to spherical coordinates
     my $RA  = atan2d( $y, $x );
     my $dec = atan2d( $z, sqrt( $x * $x + $y * $y ) );
 
@@ -796,7 +911,7 @@ sub sun_RA_dec {
 
     #
     #
-    # FUNCTIONAL SEQUENCE for days_since_2000_Jan_0 
+    # FUNCTIONAL SEQUENCE for days_since_2000_Jan_0
     #
     # _GIVEN
     # A Datetime object
@@ -853,9 +968,9 @@ sub atan2d {
     #
     # _THEN
     #
-    # reduces any angle to within the first revolution 
+    # reduces any angle to within the first revolution
     # by subtracting or adding even multiples of 360.0
-    # 
+    #
     #
     # _RETURN
     #
@@ -867,23 +982,45 @@ sub revolution {
     return ( $x - 360.0 * floor( $x * $INV360 ) );
 }
 
-    #
-    #
-    # FUNCTIONAL SEQUENCE for rev180
-    #
-    # _GIVEN
-    # 
-    # any angle in degrees
-    #
-    # _THEN
-    #
-    # Reduce input to within +180..+180 degrees
-    # 
-    #
-    # _RETURN
-    #
-    # angle that was reduced
-    #
+#
+#
+# FUNCTIONAL SEQUENCE for _rev_lon
+#
+# _GIVEN
+#
+# two angles in degrees, the variable angle and the reference angle (longitude)
+#
+# _THEN
+#
+# Reduce input variable angle  to within reference-180 .. reference+180 degrees
+#
+#
+# _RETURN
+#
+# angle that was reduced
+#
+sub _rev_lon {
+    my ($x, $lon) = @_;
+    return $lon + rev180($x - $lon);
+}
+
+#
+#
+# FUNCTIONAL SEQUENCE for rev180
+#
+# _GIVEN
+#
+# any angle in degrees
+#
+# _THEN
+#
+# Reduce input to within -180..+180 degrees
+#
+#
+# _RETURN
+#
+# angle that was reduced
+#
 sub rev180 {
 
     my ($x) = @_;
@@ -896,7 +1033,7 @@ sub rev180 {
     # FUNCTIONAL SEQUENCE for equal
     #
     # _GIVEN
-    # 
+    #
     # Two floating point numbers and Accuracy
     #
     # _THEN
@@ -906,7 +1043,7 @@ sub rev180 {
     #
     # _RETURN
     #
-    # True if the numbers are equal 
+    # True if the numbers are equal
     #
 sub equal {
 
@@ -917,10 +1054,10 @@ sub equal {
 
     #
     #
-    # FUNCTIONAL SEQUENCE for convert_hour 
+    # FUNCTIONAL SEQUENCE for convert_hour
     #
     # _GIVEN
-    # Hour_rise, Hour_set 
+    # Hour_rise, Hour_set
     # hours are in UT
     #
     # _THEN
@@ -937,9 +1074,96 @@ sub convert_hour {
 
     my ( $hour_rise_ut, $hour_set_ut ) = @_;
     my $seconds_rise = floor( $hour_rise_ut * 60 * 60 );
-    my $seconds_set  = floor( $hour_set_ut * 60 * 60 );
+    my $seconds_set  = floor( $hour_set_ut  * 60 * 60 );
 
     return ( $seconds_rise, $seconds_set );
+}
+#
+#
+# FUNCTIONAL SEQUENCE for _convert_1_hour
+#
+# _GIVEN
+# A UT time in hours
+#
+# _THEN
+#
+# split out the hours and minutes
+# Oct 20 2003
+# will convert hours to seconds and return this
+# let DateTime handle the conversion
+#
+# _RETURN
+#
+# number of seconds
+sub _convert_1_hour {
+
+    my ( $hour ) = @_;
+    my $seconds = floor( $hour * 3600 );
+
+    return $seconds;
+}
+
+sub _fmt_hr {
+  my ($hr, $lon, $is_lmt) = @_;
+  my ($lmt, $utc);
+  if ($is_lmt) {
+    $lmt = $hr;
+    $utc = $lmt - $lon / 15;
+  }
+  else {
+    $utc = $hr;
+    $lmt = $utc + $lon / 15;
+  }
+  my $hr_h_utc = $utc;         my $hr_h_lmt = $lmt;
+  my $hr_d_utc = $utc / 24;    my $hr_d_lmt = $lmt / 24;
+  my $hr_utc   = floor($utc);  my $hr_lmt   = floor($lmt);
+  $utc        -= $hr_utc;      $lmt        -= $hr_lmt;
+  $utc        *= 60;           $lmt        *= 60;
+  my $mn_utc   = floor($utc);  my $mn_lmt   = floor($lmt);
+  $utc        -= $mn_utc;      $lmt        -= $mn_lmt;
+  $utc        *= 60;           $lmt        *= 60;
+  my $sc_utc   = floor($utc);  my $sc_lmt   = floor($lmt);
+  return sprintf("UTC: %02d:%02d:%02d %f h %f d, LMT: %02d:%02d:%02d %f h %f d", $hr_utc, $mn_utc, $sc_utc, $hr_h_utc, $hr_d_utc
+                                                                               , $hr_lmt, $mn_lmt, $sc_lmt, $hr_h_lmt, $hr_d_lmt);
+}
+
+#
+# Formatting a duration in hours, minutes, seconds.
+# Also used for angles with a 24-hour scale instead of the usual 360-degree scale
+# (right ascension, sidereal time...)
+#
+sub _fmt_dur {
+  my ($dur) = @_;
+  my $sign = '';
+  if ($dur < 0) {
+    $sign = '-';
+    $dur *= -1;
+  }
+  my $hr = floor($dur);
+  $dur  -= $hr;
+  $dur  *= 60;
+  my $mn = floor($dur);
+  $dur  -= $mn;
+  $dur  *= 60;
+  my $sc = floor($dur);
+  return sprintf("%s%02d h %02d mn %02d s", $sign, $hr, $mn, $sc);
+}
+
+sub _fmt_angle {
+  my ($angle) = @_;
+  my $sign = '';
+  if ($angle < 0) {
+    $sign = '-';
+    $angle *= -1;
+  }
+  my $hr = floor($angle);
+  $angle  -= $hr;
+  $angle  *= 60;
+  my $mn = floor($angle);
+  $angle  -= $mn;
+  $angle  *= 60;
+  my $sc = floor($angle);
+  return sprintf(q<%s%02d°%02d'%02d">, $sign, $hr, $mn, $sc);
 }
 
 1962; # Hint: sung by RZ, better known as BD
@@ -1086,6 +1310,19 @@ your F<STDERR> stream.
 
 Default value is 0, for backward compatibility.
 
+=item trace
+
+This parameter should  either be a false value or  a filehandle opened
+for output.  In the  latter case,  a few messages  are printed  to the
+filehandle, which  allows the programmer to  see step by step  how the
+sunrise and the sunset are computed.
+
+Used for  analysis and debugging purposes.  You need to read  the text
+F<doc/astronomical-notes.pod> in  the sister  module L<Astro::Sunrise>
+to understand what the traced values represent.
+
+Default value is C<0>, which does not produce trace messages.
+
 =back
 
 =head2 sunrise, sunset
@@ -1103,13 +1340,13 @@ for the same day, but with the time of the sunrise or sunset, respectively.
 
 =head2 sunrise_sunset_span
 
-This method applies to C<DateTime::Event::Sunrise> objects. It accepts a 
+This method applies to C<DateTime::Event::Sunrise> objects. It accepts a
 C<DateTime> object as the second parameter. It returns a C<DateTime::Span>
 object, beginning at sunrise and ending at sunset.
 
 =head2 is_polar_night, is_polar_day, is_day_and_night
 
-These methods apply to C<DateTime::Event::Sunrise> objects. They accept a 
+These methods apply to C<DateTime::Event::Sunrise> objects. They accept a
 C<DateTime> object as the second parameter. They return a boolean indicating
 the following condutions:
 
@@ -1134,31 +1371,31 @@ See DateTime::Set.
 =head1 EXTENDED EXAMPLES
 
   my $dt = DateTime->new( year   => 2000,
-                         month  => 6,
-                         day    => 20,
+                          month  => 6,
+                          day    => 20,
                   );
 
   my $sunrise = DateTime::Event::Sunrise ->sunrise (
                         longitude =>'-118',
-                        latitude =>'33',
-                        altitude => '-0.833',
+                        latitude  =>'33',
+                        altitude  => '-0.833',
                         precise   => '1'
                   );
 
   my $sunset = DateTime::Event::Sunrise ->sunset (
                         longitude =>'-118',
-                        latitude =>'33',
-                        altitude => '-0.833',
+                        latitude  =>'33',
+                        altitude  => '-0.833',
                         precise   => '1'
                   );
 
-  my $tmp_rise = $sunrise->next( $dt ); 
- 
+  my $tmp_rise = $sunrise->next( $dt );
+
   my $dt2 = DateTime->new( year   => 2000,
-                         month  => 12,
-                         day    => 31,
+                           month  => 12,
+                           day    => 31,
                    );
- 
+
   # iterator
   my $dt_span = DateTime::Span->new( start =>$dt, end=>$dt2 );
   my $set = $sunrise->intersection($dt_span);
@@ -1168,21 +1405,21 @@ See DateTime::Set.
   }
 
   # is it day or night?
-  my $day_set = DateTime::SpanSet->from_sets( 
+  my $day_set = DateTime::SpanSet->from_sets(
     start_set => $sunrise, end_set => $sunset );
   print $day_set->contains( $dt ) ? 'day' : 'night';
 
   my $dt = DateTime->new( year   => 2000,
-		   month  => 6,
-		   day    => 20,
-		   time_zone => 'America/Los_Angeles',
-		    );
+                   month  => 6,
+                   day    => 20,
+                   time_zone => 'America/Los_Angeles',
+                    );
 
   my $sunrise = DateTime::Event::Sunrise ->new(
-		       longitude =>'-118' ,
-		       latitude  => '33',
-		       altitude  => '-0.833',
-		       precise   => '1'
+                       longitude =>'-118' ,
+                       latitude  => '33',
+                       altitude  => '-0.833',
+                       precise   => '1'
 
   );
 
@@ -1205,7 +1442,7 @@ On the other hand, the latitude signs follow the usual convention:
 Northen latitudes are positive,
 
 Southern latitudes are negative.
- 
+
 =head2 Sun Height
 
 There are a number of sun heights to choose from. The default is
@@ -1251,11 +1488,11 @@ Astronomical twilight (the sky is completely dark)
 
 =head2 Notes on the Precise Algorithm
 
-The original method only gives an approximate value of the Sun's rise/set times. 
-The error rarely exceeds one or two minutes, but at high latitudes, when the Midnight Sun 
-soon will start or just has ended, the errors may be much larger. If you want higher accuracy, 
+The original method only gives an approximate value of the Sun's rise/set times.
+The error rarely exceeds one or two minutes, but at high latitudes, when the Midnight Sun
+soon will start or just has ended, the errors may be much larger. If you want higher accuracy,
 you must then select the precise variant of the algorithm. This feature is new as of version 0.7. Here is
-what I have tried to accomplish with this.
+what I (module creator) have tried to accomplish with this.
 
 
 =over 4
@@ -1263,29 +1500,42 @@ what I have tried to accomplish with this.
 =item a)
 
 Compute sunrise or sunset as always, with one exception: to convert LHA from degrees to hours,
-divide by 15.04107 instead of 15.0 (this accounts for the difference between the solar day 
+divide by 15.04107 instead of 15.0 (this accounts for the difference between the solar day
 and the sidereal day.
 
 =item b)
 
-Re-do the computation but compute the Sun's RA and Decl, and also GMST0, for the moment 
+Re-do the computation but compute the Sun's RA and Decl, and also GMST0, for the moment
 of sunrise or sunset last computed.
 
 =item c)
 
-Iterate b) until the computed sunrise or sunset no longer changes significantly. 
+Iterate b) until the computed sunrise or sunset no longer changes significantly.
 Usually 2 iterations are enough, in rare cases 3 or 4 iterations may be needed.
 
 =back
 
+However, I (second module maintainer) have checked with a few external
+sources, to obtain test data. And actually, using the value 15.0 gives
+results closer to what Stellarium  and the NOAA solar calculator give.
+So I will use value 15.0, unless I find a bug in the precise algorithm
+as presently implemented.
+
 =head2 Notes on polar locations
 
-If the location is beyond either polar circle, and if the date is 
-near either solstice, there can be midnight sun or polar night.
-In this case, there is neither sunrise nor sunset, and
-the module C<carp>s that the sun never rises or never sets.
-Then, it returns the time at which the sun is at its highest
-or lowest point.
+If the location is beyond either polar circle, and if the date is near
+either solstice,  there can be  midnight sun  or polar night.  In this
+case, there  is neither  sunrise nor sunset,  and the  module C<carp>s
+that the sun never  rises or never sets. Then, it  returns the time at
+which the sun is at its highest or lowest point.
+
+When computing twilights instead of  sunrises / sunsets, the limit for
+polar locations extends a little beyond the polar circle. For example,
+for  nautical twilights  (12 degrees  below the  horizon), the  limits
+where midnight sun might happen is  12 degrees southward of the Arctic
+Circle  and 12  degrees northward  of the  Antarctic Circle,  that is,
+about 54° latitude instead of 66°33′.
+
 
 =head1 DEPENDENCIES
 
@@ -1331,7 +1581,13 @@ I guess that it is linked with a ambiguous value resulting from a 0/0 computatio
 Using a longitude of 177 degrees, or any longitude near the 180 meridian, may also give
 curious results, especially with the precise algorithm.
 
-The precise algorithm should be overhauled.
+The precise algorithm should be thoroughly analysed, to understand why
+the value 15.04107 advised by Paul Schlyter does not give the expected
+results.
+
+The precise algorithm is not tested with polar locations. At least, it
+is tested with a near-polar location,  Fairbanks, at the time when the
+night is at its shortest, that is, in June.
 
 =head1 AUTHORS
 
@@ -1352,13 +1608,18 @@ for providing help with converting Paul's C code to perl.
 for providing the the interface to the DateTime::Set
 module.
 
+=item Eric Jensen
+
+for  positive and  interesting advices  about the  new version  of the
+module
+
 =back
 
 =head1 CREDITS
 
 =over 4
 
-=item Paul Schlyter, Stockholm, Sweden 
+=item Paul Schlyter, Stockholm, Sweden
 
 for his excellent web page on the subject.
 
@@ -1366,7 +1627,7 @@ for his excellent web page on the subject.
 
 for suggestions.
 
-=item People at L<http://geocoder.opencagedata.com/>
+=item People at L<https://geocoder.opencagedata.com/>
 
 for noticing an endless loop condition in L<Astro::Sunrise> and for fixing it.
 
@@ -1380,8 +1641,8 @@ This program is distributed under the same terms as Perl 5.16.3:
 GNU Public License version 1 or later and Perl Artistic License
 
 You can find the text of the licenses in the F<LICENSE> file or at
-L<http://www.perlfoundation.org/artistic_license_1_0>
-and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+L<https://dev.perl.org/licenses/artistic.html>
+and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 
 Here is the summary of GPL:
 
@@ -1397,7 +1658,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+Inc., <https://www.fsf.org/>.
 
 =head2 Original C program
 
@@ -1434,17 +1695,23 @@ THE SOFTWARE.
 
 perl(1).
 
-DateTime Web page at http://datetime.perl.org/
+DateTime Web page at L<http://datetime.perl.org/>
 
-DateTime::Set
+L<DateTime::Set>
 
-DateTime::SpanSet
+L<DateTime::SpanSet>
 
-Astro::Sunrise
+L<Astro::Sunrise>
 
-DateTime::Event::Jewish::Sunrise
+L<DateTime::Event::Jewish::Sunrise>
 
-Paul Schlyter's homepage at http://stjarnhimlen.se/english.html
+L<Astro::Coords>
+
+L<Astro::PAL>
+
+Paul Schlyter's homepage at L<https://stjarnhimlen.se/english.html>
+
+The NOAA solar calculator at L<https://www.esrl.noaa.gov/gmd/grad/solcalc/>
 
 =cut
 

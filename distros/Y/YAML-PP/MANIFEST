@@ -105,6 +105,8 @@ t/49.include.t
 t/50.clone.t
 t/51.directives.t
 t/52.preserve.t
+t/53.customtag-alias.t
+t/54.glob.t
 t/data/include/circular1.yaml
 t/data/include/circular2.yaml
 t/data/include/include.yaml

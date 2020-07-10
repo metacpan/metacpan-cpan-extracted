@@ -1,13 +1,13 @@
 #
 #     Configuration script for DateTime::Event::Sunrise
-#     Copyright (C) 2003, 2004, 2013, 2015 Ron Hill and Jean Forget
+#     Copyright © 2003, 2004, 2013, 2015, 2020 Ron Hill and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
-#     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     L<https://dev.perl.org/licenses/artistic.html>
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
 #
@@ -23,7 +23,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., <http://www.fsf.org/>.
+#     Inc., <https://www.fsf.org/>.
 #
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
@@ -52,6 +52,7 @@ WriteMakefile(
                              'ExtUtils::MakeMaker' => '6.57_02', # the first version to accept several authors in an arrayref
                            },
     META_MERGE       => {
+       dynamic_config => 0,
        prereqs => {
          runtime => {
            requires => {
@@ -72,7 +73,7 @@ WriteMakefile(
        provides       => {
            'DateTime::Event::Sunrise' => {
                 file => 'lib/DateTime/Event/Sunrise.pm',
-                version => '0.0505',
+                version => '0.0506',
            },
        },
        'meta-spec' => { version => 2 },

@@ -11,7 +11,7 @@ use XML::LibXML;
 use XML::LibXML::XPathContext;
 use namespace::clean;
 
-our $VERSION = '0.428';
+our $VERSION = '0.429';
 
 with 'Catmandu::Importer';
 
@@ -22,7 +22,7 @@ has version      => (is => 'ro', default  => sub {'1.1'});
 has operation    => (is => 'ro', default  => sub {'searchRetrieve'});
 has recordSchema => (is => 'ro', default  => sub {'dc'});
 has userAgent    => (is => 'ro', default  => sub {'Mozilla/5.0'});
-has http_client => (
+has http_client  => (
     is      => 'ro',
     lazy    => 1,
     builder => sub {
@@ -34,12 +34,8 @@ has http_client => (
 has sortKeys => (is => 'ro');
 has parser =>
     (is => 'rw', default => sub {'simple'}, coerce => \&_coerce_parser);
-has limit => (
-    is      => 'ro',
-    isa     => sub {check_natural($_[0]);},
-    lazy    => 1,
-    default => sub {10}
-);
+has limit =>
+    (is => 'ro', isa => \&check_natural, lazy => 1, default => sub {10});
 has total => (is => 'ro');
 
 # internal stuff.
@@ -241,8 +237,12 @@ sub _nextRecord {
     # check for a exhaused recordset.
     if ($self->_n >= $self->limit) {
         $self->{_start} += $self->limit;
-        $self->{_n}                = 0;
-        $self->{_currentRecordSet} = $self->_nextRecordSet;
+
+        my $total = $self->{_currentRecordSet}{meta}{numberOfRecords};
+        if (!defined $total || $self->{_start} <= $total) {
+            $self->{_n}                = 0;
+            $self->{_currentRecordSet} = $self->_nextRecordSet;
+        }
     }
 
     # return the next record or metadata.

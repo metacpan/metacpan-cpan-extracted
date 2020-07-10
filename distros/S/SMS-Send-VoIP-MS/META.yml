@@ -1,5 +1,5 @@
 ---
-abstract: 'SMS::Send driver for VoIP.ms'
+abstract: 'SMS::Send driver for VoIP.ms Web Services'
 author:
   - 'Michael R. Davis <mrdvt92>'
 build_requires:
@@ -23,4 +23,4 @@ requires:
   SMS::Send::Driver::WebService: 0
   Test::Simple: 0
   URI: 0
-version: 0.02
+version: 0.03

@@ -70,7 +70,7 @@ sub test_run {
             if ( $have_logfile ) {
                 my $log;
 
-                ok( $log = eval { do ( rel2abs($logfile) ) }, 'parse' );
+                ok( $log = eval { do( rel2abs( $logfile ) ) }, 'parse' );
                 is( $log, $expected, 'content' );
 
             }

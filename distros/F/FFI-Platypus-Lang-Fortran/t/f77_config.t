@@ -1,28 +1,17 @@
 use strict;
 use warnings;
 use Test::More tests => 1;
-use Module::Build::FFI::Fortran;
+use File::ShareDir::Dist qw( dist_config );
 
-my $config = Module::Build::FFI::Fortran->_f77_config;
+my $config = dist_config 'FFI::Platypus-Lang-Fortran';
 
 diag '';
 diag '';
 diag '';
 
-if(-r 'config.log')
+foreach my $key (sort keys %{ $config->{f77} })
 {
-  my $fh;
-  open $fh, '<', 'config.log';
-  diag $_ for <$fh>;
-  close $fh;
-  
-  diag '';
-  diag '';
-}
-
-foreach my $key (sort keys %$config)
-{
-  diag "$key=", $config->{$key};
+  diag "$key=", $config->{f77}->{$key};
 }
 
 diag '';

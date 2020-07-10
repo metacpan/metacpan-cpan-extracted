@@ -1,5 +1,5 @@
 {
-   "abstract" : "SMS::Send driver for VoIP.ms",
+   "abstract" : "SMS::Send driver for VoIP.ms Web Services",
    "author" : [
       "Michael R. Davis <mrdvt92>"
    ],
@@ -41,5 +41,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "version" : "0.03"
 }

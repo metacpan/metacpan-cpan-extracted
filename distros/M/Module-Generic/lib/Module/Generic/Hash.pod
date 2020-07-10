@@ -204,15 +204,43 @@ Provided with with a reference to a subroutine, this will do a loop using L<perl
 
 If the code returns false, it will exit the L<perlfunc/"while"> loop.
 
+To exit the loop, return C<undef()>, for example:
+
+    $a->each(sub
+    {
+        my( $k, $v ) = @_;
+        return if( $key eq $not_this_one );
+        print( "ok, this one\n" );
+    });
+
 =head2 exists
 
 Given a hash key, this will return true or false depending if the hash key exists. This uses L<perlfunc/"exists">.
 
 =head2 for
 
-Same as L<perlfunc/"foreach">, given a reference to a subroutine, and this will execute foreach and call the code providing it as arguments the hash key and value.
+This is simply an alias for L</foreach>
 
-It exists the foreach loop if the code returns false.
+=head2 foreach
+
+Same as L<perlfunc/"foreach">, given a reference to a subroutine, and this will execute foreach and call the code providing it as arguments the hash key and value. For convenience, C<$_> is also available and represent the 2nd argument, i.e. the value.
+
+To exit the loop, return C<undef()>, for example:
+
+    $a->foreach(sub
+    {
+        my( $k, $v ) = @_;
+        return if( $key eq $not_this_one );
+        print( "ok, this one\n" );
+    });
+
+=head2 get
+
+Provided with an hash key and this will return whatever value was set.
+
+    $a->get( 'last_name' ); # Return 'Doe' maybe?
+
+See L</set> for the opposite method, i.e. setting a key value.
 
 =head2 json
 
@@ -259,6 +287,12 @@ Currently the only parameter possible is I<overwrite>. By default this is set to
 =head2 reset
 
 This simply empty the hash. See also L</"undef"> for the same result.
+
+=head2 set
+
+Provided with a key and a value, and this adds it to the hash, possibly overwriting any previous entry.
+
+See L</get> for the opposite method, i.e. to get the key value.
 
 =head2 undef
 

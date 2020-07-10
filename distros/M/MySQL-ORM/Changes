@@ -1,6 +1,9 @@
 Revision history for MySQL-ORM
 
 =======
+0.17    - Pass __lite on table creation to avoid excessive dbh->clone calls which
+          can result in large numbers of database connections being used.
+
 0.16    - Don't add column to ResultX class if it already exists in Result.
           Example, current table has column called "enabled" and parent table has column
           "enabled". In these cases, we shouldn't add "enabled" to the ResultX

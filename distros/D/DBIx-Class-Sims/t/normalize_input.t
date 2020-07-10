@@ -4,6 +4,7 @@ use strictures 2;
 use Test2::V0 qw( done_testing subtest is );
 
 use File::Temp qw( tempfile );
+use DBIx::Class::Sims;
 
 my $sub = \&DBIx::Class::Sims::normalize_input;
 

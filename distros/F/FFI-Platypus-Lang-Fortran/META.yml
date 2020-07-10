@@ -3,19 +3,16 @@ abstract: 'Documentation and tools for using Platypus with Fortran'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  FFI::Build: '0.04'
-  FFI::CheckLib: '0'
-  File::Which: '0'
-  Module::Build: '0.38'
-  Module::Build::FFI: '0.22'
-  Test::More: '0.98'
+  FFI::Build::MM: '0'
+  File::ShareDir::Dist: '0'
 configure_requires:
-  FFI::Platypus: '0.22'
+  ExtUtils::F77: '1.24'
+  ExtUtils::MakeMaker: '6.64'
+  FFI::Platypus: '1.00'
+  File::ShareDir::Dist::Install: '0.07'
   File::Which: '0'
-  Module::Build: '0.38'
-  Module::Build::FFI: '0.22'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,30 +20,17 @@ meta-spec:
 name: FFI-Platypus-Lang-Fortran
 no_index:
   directory:
+    - t
+    - inc
     - examples
-provides:
-  FFI::Build::File::Fortran:
-    file: lib/FFI/Build/File/Fortran.pm
-    version: '0.11'
-  FFI::Platypus::Lang::Fortran:
-    file: lib/FFI/Platypus/Lang/Fortran.pm
-    version: '0.11'
-  Module::Build::FFI::Fortran:
-    file: lib/Module/Build/FFI/Fortran.pm
-    version: '0.11'
-  Module::Build::FFI::Fortran::ExtUtilsF77:
-    file: lib/Module/Build/FFI/Fortran/ExtUtilsF77.pm
-    version: '0.11'
 requires:
-  FFI::Build: '0.04'
-  FFI::Platypus: '0.51'
+  FFI::Build: '1.00'
+  FFI::Platypus: '1.00'
   File::Which: '0'
-  Module::Build::FFI: '0.22'
-  perl: '5.008001'
+  perl: '5.008004'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: http://github.com/Perl5-FFI/FFI-Platypus-Lang-Fortran/issues
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/Perl5-FFI/FFI-Platypus-Lang-Fortran
-version: '0.11'
+  bugtracker: https://github.com/PerlFFI/FFI-Platypus-Lang-Fortran/issues
+  repository: https://github.com/PerlFFI/FFI-Platypus-Lang-Fortran.git
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

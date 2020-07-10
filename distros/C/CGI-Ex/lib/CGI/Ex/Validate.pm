@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '2.49'; # VERSION
+our $VERSION = '2.50'; # VERSION
 our $QR_EXTRA = qr/^(\w+_error|as_(array|string|hash)_\w+|no_\w+)/;
 our @UNSUPPORTED_BROWSERS = (qr/MSIE\s+5.0\d/i);
 our $JS_URI_PATH;

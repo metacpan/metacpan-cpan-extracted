@@ -1,70 +1,50 @@
 package Bible::OBML;
 # ABSTRACT: Open Bible Markup Language parser and renderer
 
-use 5.012;
+use 5.014;
 
-use Moose;
-use Moose::Util::TypeConstraints;
-use MooseX::Privacy;
+use exact;
+use exact::class;
 use Text::Balanced qw( extract_delimited extract_bracketed );
 use Text::Wrap 'wrap';
 use Bible::OBML::HTML;
 use Bible::Reference 1.02;
 use Clone 'clone';
 
-our $VERSION = '1.10'; # VERSION
+our $VERSION = '1.12'; # VERSION
 
-with 'Throwable';
+has bible    => 'Protestant';
+has acronyms => 1;
+has refs     => 'as_books';
+has html     => sub { Bible::OBML::HTML->new( obml => shift ) };
 
-has html => (
-    is      => 'ro',
-    isa     => 'Bible::OBML::HTML',
-    default => sub { Bible::OBML::HTML->new( obml => shift ) },
-);
+has _reference => sub { Bible::Reference->new( acronyms => 1 ) };
 
-has bible    => is => 'rw', trigger => sub { shift->_update_ref }, isa => 'Str',  default => 'Protestant';
-has acronyms => is => 'rw', trigger => sub { shift->_update_ref }, isa => 'Bool', default => 1;
-
-has refs => (
-    is      => 'rw',
-    isa     => enum( [ qw( refs as_books as_chapters as_runs as_verses ) ] ),
-    default => 'as_books',
-);
-
-has _reference => (
-    is      => 'rw',
-    isa     => 'Bible::Reference',
-    default => sub { Bible::Reference->new( acronyms => 1 ) },
-    traits  => ['Private'],
-);
-
-sub BUILD {
-    shift->_update_ref;
-}
-
-private_method _update_ref => sub {
-    my ($self) = @_;
+sub new {
+    my ( $self, @params ) = @_;
+    $self = $self->SUPER::new(@params);
 
     $self->_reference->bible( $self->bible );
     $self->_reference->acronyms( $self->acronyms );
-};
+
+    return $self;
+}
 
 sub read_file {
     my ( $self, $filename ) = @_;
-    open( my $file, '<:encoding(utf8)', $filename ) or $self->throw("Unable to read file $filename; $!");
+    open( my $file, '<:encoding(utf8)', $filename ) or croak "Unable to read file $filename; $!";
     return join( '', <$file> );
 }
 
 sub write_file {
     my ( $self, $filename, $content ) = @_;
-    open( my $file, '>:encoding(utf8)', $filename ) or $self->throw("Unable to write file $filename; $!");
+    open( my $file, '>:encoding(utf8)', $filename ) or croak "Unable to write file $filename; $!";
     print $file $content;
     return;
 }
 
 sub parse {
     my ( $self, $content ) = @_;
-
     # remove comments
     $content =~ s/^\s*#.*?(?>\r?\n)//msg;
 
@@ -346,7 +326,6 @@ sub render {
 
 sub smartify {
     my ( $self, $text ) = @_;
-
     # extraction
 
     my ( $processed, $extract, @bits, @sub_bits );
@@ -480,7 +459,6 @@ sub canonicalize {
     return;
 }
 
-__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -495,7 +473,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 1.10
+version 1.12
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-OBML.svg)](https://travis-ci.org/gryphonshafer/Bible-OBML)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-OBML/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-OBML)
@@ -729,15 +707,7 @@ L<GitHub|https://github.com/gryphonshafer/Bible-OBML>
 
 =item *
 
-L<CPAN|http://search.cpan.org/dist/Bible-OBML>
-
-=item *
-
 L<MetaCPAN|https://metacpan.org/pod/Bible::OBML>
-
-=item *
-
-L<AnnoCPAN|http://annocpan.org/dist/Bible-OBML>
 
 =item *
 
@@ -765,7 +735,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Gryphon Shafer.
+This software is copyright (c) 2020 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

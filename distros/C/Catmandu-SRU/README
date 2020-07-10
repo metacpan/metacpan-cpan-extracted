@@ -58,7 +58,7 @@ MODULES
 
     Catmandu::Importer::SRU::Parser::picaxml
 
-    Catmandu::Fix::sru_search
+    Catmandu::Fix::search_sru
 
 SEE ALSO
 

@@ -1,5 +1,9 @@
 Revision history for CGI-Ex.
 
+2.50      2020-07-07 22:03:55-06:00 America/Denver
+
+  * Allow for optionally using multi_param if the object supports it
+
 2.49      2020-03-05 10:42:23-07:00 America/Denver
   * Switch to Dist::Zilla for building dist (this release is thanks to Charles McGarvey)
   * Fix CI config to work with dzil

@@ -29,6 +29,7 @@ Renderer
 Run
 Smithsonian
 Stream
+Struct
 Template
 Tiny
 Types

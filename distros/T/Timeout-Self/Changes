@@ -1,5 +1,12 @@
-Revision history for Timeout-Self
+0.020   2020-07-10  Released-By: PERLANCAR; Urgency: low
 
-0.01    2015-01-15 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Add note about forking (RT#124222). Thanks gortan.
+
+        - Mention Sys::RunUntil, Proc::Govern, IPC::Run.
+
+
+0.01    2015-01-15  Released-By: PERLANCAR
 
         - First release.

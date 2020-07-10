@@ -30,7 +30,6 @@ t/add_relationship.t
 t/add_sims.t
 t/before_create.t
 t/classes/column.t
-t/classes/item.t
 t/classes/relationship.t
 t/classes/runner.t
 t/classes/source.t

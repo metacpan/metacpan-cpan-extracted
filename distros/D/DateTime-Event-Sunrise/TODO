@@ -27,7 +27,7 @@ Play the Devel::Cover game
 I know that you can have 100% code coverage and still
 have bugs in your module. Yet, having a poor coverage
 is a sure recipe to have lurking bugs in your code.
-So I will strive to have a better code coverage, 
+So I will strive to have a better code coverage,
 while not forgetting to expand the data coverage.
 
 Yet, the original author has provided six trigonometrical
@@ -41,12 +41,14 @@ in the Devel::Cover reports.
 Other topics
 ------------
 
-I have mentionned data coverage. In fact, the "precise" algorithm
-is not truly checked. It is colored in green with Devel::Cover,
-but I have not compared its output with another source.
-
 Since this module is OO, there could be convenience accessors,
-retrieving the longitude and the latitude of a given 
+retrieving the longitude and the latitude of a given
 DT::E::Sunrise object.
 
 There is always room for improvement in the documentation.
+
+The precise algorithm should be more thoroughly analysed to understand
+why the  15.04107 value  advised by  Paul Schlyter  does not  give the
+proper  results. And  it should  be  tested with  polar locations  and
+special dates (solstices, transition between day+night and polar night
+or between day+night and midnight sun).

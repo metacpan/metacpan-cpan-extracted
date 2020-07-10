@@ -34,7 +34,7 @@ is($importer->url,
 
 my $marcparser = Catmandu::Importer::SRU::Parser::marcxml->new;
 my @parsers    = (
-    'marcxml', '+Catmandu::Importer::SRU::Parser::marcxml',
+    'marcxml',   '+Catmandu::Importer::SRU::Parser::marcxml',
     $marcparser, sub {$marcparser->parse($_[0]);}
 );
 
@@ -89,8 +89,8 @@ note("Testing namespace");
             $record->{record}->[-1],
             [
                 '245', '1', '0', 'a', 'Code4Lib journal',
-                'h', 'Elektronische Ressource',
-                'b', 'C4LJ'
+                'h',   'Elektronische Ressource',
+                'b',   'C4LJ'
             ],
             'marc has datafield'
         );

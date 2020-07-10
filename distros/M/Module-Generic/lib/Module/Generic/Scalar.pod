@@ -12,7 +12,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.3
 
 =head1 DESCRIPTION
 
@@ -32,6 +32,22 @@ Provided with scalar reference, an array or just a regular string and this retur
 
 If an array reference or an array-based object is provided like L<Module::Generic::Array>, this will concatenate all the array elements
 
+=head2 as_boolean
+
+Returns a L<Module::Generic::Boolean> object with its value set to true or false based on the value of the scalar object.
+
+    # $s is 1
+    $s->as_boolean; # sets to true
+    # $s is 0
+    $s->as_boolean; # sets to false
+    # $s is hello
+    $s->as_boolean: # sets to true
+    # $s is undefined or empty
+    $s->as_boolean: # sets to false
+    # etc...
+
+L<Module::Generic::Boolean> objects are very useful because they can be used in perl as o or 1 to indicate false or true, but when used in json, they are automatically converted to C<false> or C<true>
+
 =head2 as_string
 
 Returns the object string as a string.
@@ -40,6 +56,12 @@ Returns the object string as a string.
     print( "Hello $s\n" );
     # Hello Mary Jane
 
+=head2 capitalise
+
+Returns a new L<Module::Generic::Scalar> object representing the string with the words capitalised, done in a smart way. That is the special words like C<and>, C<but>, C<if>, C<on>, C<or>, C<the>, C<to>, etc. are not capitalised.
+
+This is based on the work done by L<John Gruber and Aristotle Pagaltzis|https://gist.github.com/gruber/9f9e8650d68b13ce4d78>
+
 =head2 chomp
 
 Just like L<perlfunc/"chomp">, this remove the trailing new lines in the string, if any.
@@ -47,6 +69,18 @@ Just like L<perlfunc/"chomp">, this remove the trailing new lines in the string,
 =head2 chop
 
 Just like L<perlfunc/"chop">, this remove the trailing character in the string, no matter what it is.
+
+=head2 clone
+
+Returns a copy of the object.
+
+=head2 crypt
+
+This takes a "salt" and returns an encrypted version of the string. See L<perlfunc/crypt>. Note that this does not work well on some BSD systems.
+
+=head2 defined
+
+Returns true or false whether the string object contains a defined string, i.e. not C<undef>
 
 =head2 fc
 
@@ -73,6 +107,40 @@ Given a sub string and an optional position, and this returns the position at wh
 
 See L<oerlfunc/"index">
 
+=head2 is_alpha
+
+Returns true if the string contains only alphabetic characters, or else it returns false.
+
+This uses perl's C<[[:alpha:]]> to test.
+
+=head2 is_alpha_numeric
+
+Returns true if the string contains only alphabetic or numeric characters, or else it returns false.
+
+This uses perl's C<[[:alnum:]]> to test.
+
+=head2 is_empty
+
+Returns true if the string is zero in length, or else it returns false.
+
+=head2 is_lower
+
+Returns true if the string contains only lower case characters, or else it returns false.
+
+This uses perl's C<[[:lower:]]> to test.
+
+=head2 is_numeric
+
+Returns true if the string contains only numeric characters, or else it returns false.
+
+This uses L<Scalar::Util/looks_like_number>
+
+=head2 is_upper
+
+Returns true if the string contains only upper case characters, or else it returns false.
+
+This uses perl's C<[[:upper:]]> to test.
+
 =head2 lc
 
 Given a string, this return a new L<Module::Generic::Scalar> object with the string all in lower case.
@@ -80,6 +148,15 @@ Given a string, this return a new L<Module::Generic::Scalar> object with the str
 =head2 lcfirst
 
 Given a string, this return a new L<Module::Generic::Scalar> object with the first character of the string in lower case.
+
+=head2 left
+
+Provided with a number and this will get the chunk starting from the left of the string object.
+
+    Module::Generic::Scalar->new( "Hello world" )->left( 5 );
+    # will produce: Hello
+
+See also L</right>
 
 =head2 length
 
@@ -92,13 +169,56 @@ Provided with a string or a regular express and this return the value of the reg
     my $s = "I disapprove of what you say, but I will defend to the death your right to say it";
     print( "Matches? ", $s->like( qr/\bapprove[[:blank:]\h]+what\b/ ) ? 'yes' : 'no', "\n" ); # print yes
 
+=head2 ltrim
+
+This removes any new line and space characters, i.e. C<\r> and C<\n> at the B<begining> of the string.
+
+It takes an optional argument that can be an alternative string to remove at the end of the sstring or a regular expression, such as one provided with L</perlfunc/qr>
+
+    $s->ltrim( qr/[[:blank:]\h]+/ ); # Remove all kind of leading whitespaces
+
+It returns the object itself for chaining.
+
+See also L</rtrim>
+
+=head2 match
+
+Provided with a string or a regular expression like the one created with L<perlfunc/qr> and this returns true or false whether the string object matched or not.
+
+    # $s is "Hello world"
+    $s->match( 'world' ); # pass
+    $s->match( qr/WORLD/i ); # pass
+    $s->match( 'monde' ); # obviously fail
+
 =head2 ord
 
 This returns the value of L<perlfunc/"ord"> on the string, as a L<Module::Generic::Number> object.
 
+=head2 pad
+
+Provided with a number n and a string and this will create n instance of the string. If the number is positive, the string will be placed at the begining and if negative, it will be placed at the end
+
+    $s->pad( 3, 'X' );
+    # XXXHello world
+
+    $s->padd( -3, 'X' );
+    # Hello worldXXX
+
+=head2 pos
+
+This sets or gets the position inside the string object. See L<perlfunc/pos> for detail about this.
+
 =head2 quotemeta
 
 Given a string, this return a new L<Module::Generic::Scalar> object with the given string characters escapeed with L<perlfunc/"quotemeta">.
+
+=head2 replace
+
+Provided with a string or a regular expression and a replacement string and this will replace all instance of the string or regular expression with the replacement string provided.
+
+    # $s is Hello world
+    $s->replace( ' ', '_' ); # Hello_world
+    $s->replace( qr/[[:blank:]\h]+/, '_' ); # Hello_world
 
 =head2 reset
 
@@ -108,11 +228,36 @@ This empty the string inside the object.
 
 Given a string, this return a new L<Module::Generic::Scalar> object with the given string cin reverse order.
 
+=head2 right
+
+Provided with a number and this will get the chunk starting from the right of the string object.
+
+    Module::Generic::Scalar->new( "Hello world" )->right( 5 );
+    # will produce: world
+
+See also L</left>
+
 =head2 rindex
 
 Given a sub string and an optional position, and this returns the position at which the sub string was found, starting from the end.
 
 See L<oerlfunc/"rindex">
+
+=head2 rtrim
+
+This removes any new line and space characters, i.e. C<\r> and C<\n> at the B<end> of the string.
+
+It takes an optional argument that can be an alternative string to remove at the end of the sstring or a regular expression, such as one provided with L</perlfunc/qr>
+
+    $s->rtrim( qr/[[:blank:]\h]+/ ); # Remove all kind of trailing whitespaces
+
+It returns the object itself for chaining.
+
+See also L</ltrim>
+
+=head2 scalar
+
+Returns the string within this scalar object. This calls L</"as_string">
 
 =head2 set
 
@@ -134,6 +279,16 @@ Provided with an offset, an optional length and an optional replacement string, 
 
 See L<perlfunc/"substr"> for more information.
 
+=head2 tr
+
+Provided with a search list and a replacement list and this will perform just like the perl core L<perlfunc/tr> function.
+
+It also accepts options like C<cdsr> and returns the resulting value.
+
+=head2 trim
+
+Provided with a target string or a regular expression, and this will remove any occurence of them in the string object.
+
 =head2 uc
 
 Given a string, this return a new L<Module::Generic::Scalar> object with the string all in upper case.
@@ -141,6 +296,26 @@ Given a string, this return a new L<Module::Generic::Scalar> object with the str
 =head2 ucfirst
 
 Given a string, this return a new L<Module::Generic::Scalar> object with the first character of the string in upper case.
+
+=head2 undef
+
+Sets the underlying string object to undef.
+
+This would make
+
+    print( $s->defined ? 'defined' : 'undefined', "\n" );
+
+return false, but becareful that you cannot do:
+
+    print( $s ? 'defined' : 'undefined', "\n" );
+
+Because $s is the object so it would always return true.
+
+If you stringify it like
+
+    print( "$s" ? 'defined' : 'undefined', "\n" );
+
+It would still return as defined, because this would be a defined string, albeit empty
 
 =head1 SEE ALSO
 

@@ -8,7 +8,7 @@ use warnings;
 use Moo;
 use JSON::RPC::Legacy::Client;
 
-our $VERSION  = '0.10';
+our $VERSION  = '0.11';
 
 has jsonrpc  => (is => "lazy", default => sub { "JSON::RPC::Legacy::Client"->new });
 has user     => (is => 'ro');
@@ -80,7 +80,7 @@ sub AUTOLOAD {
    # For self signed certs
    if ($self->verify_hostname eq 0) {
       $client->ua->ssl_opts( verify_hostname => 0,
-                             SSL_verify_mode => 'SSL_VERIFY_NONE' );
+                             SSL_verify_mode => 0 );
    }
 
    my $obj = {
@@ -142,27 +142,27 @@ Bitcoin::RPC::Client - Bitcoin Core JSON RPC Client
       host     => "127.0.0.1",
    );
 
-   # Check the block height of our bitcoin node
-   #     https://bitcoin.org/en/developer-reference#getblockchaininfo
+   # Check the block height of bitcoin node
+   #     https://developer.bitcoin.org/reference/rpc/getblockchaininfo.html
    $chaininfo = $btc->getblockchaininfo;
    $blocks = $chaininfo->{blocks};
 
    # Estimate a reasonable transaction fee
-   #     https://bitcoin.org/en/developer-reference#estimatefee
+   #     https://developer.bitcoin.org/reference/rpc/estimatesmartfee.html
    $fee = $btc->estimatesmartfee(6);
    $feerate = $fee->{feerate};
 
    # Set the transaction fee
-   #     https://bitcoin.org/en/developer-reference#settxfee
+   #     https://developer.bitcoin.org/reference/rpc/settxfee.html
    $settx = $btc->settxfee($feerate);
 
-   # Check your balance
+   # Check balance
    # (JSON::Boolean objects must be passed as boolean parameters)
-   #     https://bitcoin.org/en/developer-reference#getbalance
-   $balance = $btc->getbalance("yourAccountName", 1, JSON::true);
+   #     https://developer.bitcoin.org/reference/rpc/getbalance.html
+   $balance = $btc->getbalance("*", 1, JSON::true);
 
    # Send to an address
-   #     https://bitcoin.org/en/developer-reference#sendtoaddress
+   #     https://developer.bitcoin.org/reference/rpc/sendtoaddress.html
    $transid = $btc->sendtoaddress("1DopyzQi9mX3huvGacfjpzCKFug2Dtvykp","0.01");
 
    # See ex/example.pl for more in depth JSON handling:

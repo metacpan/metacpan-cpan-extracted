@@ -1,6 +1,6 @@
 package Test::WWW::Mechanize::Driver::YAMLLoader;
 use strict; use warnings;
-our $VERSION = 1.0;
+our $VERSION = '1.0';
 
 =pod
 

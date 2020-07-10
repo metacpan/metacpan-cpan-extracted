@@ -5,7 +5,7 @@ use warnings;
 use Carp qw/croak/;
 use XSLoader;
 
-our $VERSION= '4.014'; # Don't forget to update the TestCompat set for testing against installed encoders!
+our $VERSION= '4.017'; # Don't forget to update the TestCompat set for testing against installed encoders!
 our $XS_VERSION= $VERSION; $VERSION= eval $VERSION;
 
 # not for public consumption, just for testing.
@@ -268,9 +268,30 @@ somewhere between 9997 and 10003 nested structures depending on their types.
 If set to a non-zero value (default: 0), then C<Sereal::Decoder> will refuse
 to deserialize any hash/dictionary (or hash-based object) with more than
 that number of entries. This is to be able to respond quickly to any future
-hash-collision attacks on Perl's hash function. Chances are, you don't want
-or need this. For a gentle introduction to the topic from the cryptographic
-point of view, see L<http://en.wikipedia.org/wiki/Collision_attack>.
+hash-collision attacks on Perl's hash function, and also the memory exhaustion
+attacks on Sereal itself. For a gentle introduction to the topic from the
+cryptographic point of view, see L<http://en.wikipedia.org/wiki/Collision_attack>.
+
+=head3 max_num_array_entries
+
+If set to a non-zero value (default: 0), then C<Sereal::Decoder> will refuse
+to deserialize any array with more than that number of entries.
+This is to be able to respond quickly to any future memory exhaustion attacks on
+Sereal.
+
+=head3 max_string_length
+
+If set to a non-zero value (default: 0), then C<Sereal::Decoder> will refuse
+to deserialize any string with more than that number of characters.
+This is to be able to respond quickly to any future memory exhaustion attacks on
+Sereal.
+
+=head3 max_uncompressed_size
+
+If set to a non-zero value (default: 0), then C<Sereal::Decoder> will refuse
+to deserialize any blob with a size that exceds the value when uncompressed.
+This is to be able to respond quickly to any future memory exhaustion attacks on
+Sereal.
 
 =head3 incremental
 

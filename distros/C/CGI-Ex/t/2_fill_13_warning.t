@@ -7,7 +7,7 @@
 =cut
 
 use strict;
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 # emits warnings for HTML::FIF <= 0.22
 
@@ -21,9 +21,15 @@ SKIP: {
     my $html = qq{<input type="submit" value="Commit">};
 
     my $q = CGI->new;
-
     $q->param( "name", "John Smith" );
-    my $output = CGI::Ex::Fill::form_fill($html, $q);
 
+    my $output = CGI::Ex::Fill::form_fill($html, $q);
     ok($html =~ m!<input( type="submit"| value="Commit"){2}>!);
+
+    my @warn;
+    local $SIG{'__WARN__'} = sub { push @warn, [@_] };
+
+    $html = qq{<select id="noname"><option value="foo">Foo</option></select>};
+    $output = CGI::Ex::Fill::form_fill($html, $q);
+    ok(!@warn, 'no warning if name is not set') or diag explain \@warn;
 };

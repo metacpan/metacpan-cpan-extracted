@@ -1,18 +1,18 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.007-2-g70c74cd
+package JSON::Schema::Draft201909; # git description: v0.008-13-g8fa1a6c
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use feature 'fc';
 use JSON::MaybeXS 1.004001 'is_bool';
 use Syntax::Keyword::Try 0.11;
 use Carp qw(croak carp);
-use List::Util 1.33 qw(any pairs);
+use List::Util 1.55 qw(any pairs first uniqint);
 use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref is_plain_coderef);
 use Mojo::JSON::Pointer;
 use Mojo::URL;
@@ -85,6 +85,7 @@ sub add_schema {
   croak 'cannot add a schema with a uri with a fragment' if defined $uri->fragment;
 
   if (not @_) {
+    # TODO: resolve $uri against $self->base_uri
     my ($schema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
     return if not defined $schema or not defined wantarray;
     return $self->_get_resource($canonical_uri->clone->fragment(undef))->{document};
@@ -93,12 +94,20 @@ sub add_schema {
   my $document = $_[0]->$_isa('JSON::Schema::Draft201909::Document') ? shift
     : JSON::Schema::Draft201909::Document->new(schema => shift, $uri ? (canonical_uri => $uri) : ());
 
-  $self->_add_resources(
-    map +( $_->[0] => +{ %{$_->[1]}, document => $document } ),
-      $document->_resource_pairs
-  ) if not (grep $_->{document} == $document, $self->_resource_values);
+  if (not grep $_->{document} == $document, $self->_resource_values) {
+    my $schema_content = $self->_json_decoder->encode($document->schema);
+    if (my $existing_doc = first { $self->_json_decoder->encode($_->schema) eq $schema_content }
+        uniqint map $_->{document}, $self->_resource_values) {
+      # we already have this schema content in another document object.
+      $document = $existing_doc;
+    }
+    else {
+      $self->_add_resources(map +($_->[0] => +{ %{$_->[1]}, document => $document }),
+        $document->_resource_pairs);
+    }
+  }
 
-  if ("$uri" and not $self->_get_resource($uri)) {
+  if ("$uri") {
     $document->_add_resources($uri, { path => '', canonical_uri => $document->canonical_uri });
     $self->_add_resources($uri => { path => '', canonical_uri => $document->canonical_uri, document => $document });
   }
@@ -149,6 +158,7 @@ sub evaluate {
     my ($schema, $canonical_uri);
 
     if (not ref $schema_reference or $schema_reference->$_isa('Mojo::URL')) {
+      # TODO: resolve $uri against base_uri
       ($schema, $canonical_uri) = $self->_fetch_schema_from_uri($schema_reference);
     }
     else {
@@ -234,7 +244,8 @@ sub _eval_keyword_id {
 
   assert_keyword_type($state, $schema, 'string');
 
-  my $uri = Mojo::URL->new($schema->{'$id'})->base($state->{canonical_schema_uri})->to_abs;
+  my $uri = Mojo::URL->new($schema->{'$id'});
+  $uri = $uri->base($state->{canonical_schema_uri})->to_abs if not $uri->is_abs;
   abort($state, '$id value "%s" cannot have a non-empty fragment', $schema->{'$id'})
     if length $uri->fragment;
 
@@ -289,27 +300,22 @@ sub _eval_keyword_recursiveAnchor {
   return 1;
 }
 
-sub _fetch_and_eval_ref_uri {
-  my ($self, $data, $schema, $state, $uri) = @_;
-
-  my ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
-  abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
-
-  return $self->_eval($data, $subschema,
-    +{ %$state,
-      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/'.$state->{keyword},
-      canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
-      schema_path => '',
-    });
-}
-
 sub _eval_keyword_ref {
   my ($self, $data, $schema, $state) = @_;
 
   assert_keyword_type($state, $schema, 'string');
 
-  my $uri = Mojo::URL->new($schema->{'$ref'})->base($state->{canonical_schema_uri})->to_abs;
-  return $self->_fetch_and_eval_ref_uri($data, $schema, $state, $uri);
+  my $uri = Mojo::URL->new($schema->{'$ref'});
+  $uri = $uri->base($state->{canonical_schema_uri})->to_abs if not $uri->is_abs;
+  my ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
+  abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
+
+  return $self->_eval($data, $subschema,
+    +{ %$state,
+      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
+      canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
+      schema_path => '',
+    });
 }
 
 sub _eval_keyword_recursiveRef {
@@ -317,13 +323,30 @@ sub _eval_keyword_recursiveRef {
 
   assert_keyword_type($state, $schema, 'string');
 
-  my $base = $state->{recursive_anchor_uri} // Mojo::URL->new;
-  my $uri = Mojo::URL->new($schema->{'$recursiveRef'})->base($base)->to_abs;
+  my $target_uri = Mojo::URL->new($schema->{'$recursiveRef'});
+  $target_uri = $target_uri->base($state->{canonical_schema_uri})->to_abs if not $target_uri->is_abs;
+  my ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($target_uri);
+  abort($state, 'unable to find resource %s', $target_uri) if not defined $subschema;
 
-  abort($state, 'cannot resolve a $recursiveRef with a non-empty fragment against a $recursiveAnchor location with a canonical URI containing a fragment')
-    if $schema->{'$recursiveRef'} ne '#' and length $base->fragment;
+  if ($self->_is_type('boolean', $subschema->{'$recursiveAnchor'})
+      and $subschema->{'$recursiveAnchor'}) {
+    my $uri = Mojo::URL->new($schema->{'$recursiveRef'});
+    my $base = $state->{recursive_anchor_uri} // $state->{canonical_schema_uri};
+    $uri = $uri->base($base)->to_abs if not $uri->is_abs;
 
-  return $self->_fetch_and_eval_ref_uri($data, $schema, $state, $uri);
+    abort($state, 'cannot resolve a $recursiveRef with a non-empty fragment against a $recursiveAnchor location with a canonical URI containing a fragment')
+      if $schema->{'$recursiveRef'} ne '#' and length $base->fragment;
+
+    ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
+    abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
+  }
+
+  return $self->_eval($data, $subschema,
+    +{ %$state,
+      traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$recursiveRef',
+      canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
+      schema_path => '',
+    });
 }
 
 sub _eval_keyword_vocabulary {
@@ -641,23 +664,18 @@ sub _eval_keyword_if {
   my ($self, $data, $schema, $state) = @_;
 
   return 1 if not exists $schema->{then} and not exists $schema->{else};
-  if ($self->_eval($data, $schema->{if},
+  my $keyword = $self->_eval($data, $schema->{if},
       +{ %$state,
         schema_path => $state->{schema_path}.'/if',
         short_circuit => 1, # for now, until annotations are collected
         errors => [],
-      })) {
-    return 1 if not exists $schema->{then};
-    return 1 if $self->_eval($data, $schema->{then},
-      +{ %$state, schema_path => $state->{schema_path}.'/then' });
-    return E({ %$state, keyword => 'then' }, 'subschema is not valid');
-  }
-  else {
-    return 1 if not exists $schema->{else};
-    return 1 if $self->_eval($data, $schema->{else},
-      +{ %$state, schema_path => $state->{schema_path}.'/else' });
-    return E({ %$state, keyword => 'else' }, 'subschema is not valid');
-  }
+      })
+    ? 'then' : 'else';
+
+  return 1 if not exists $schema->{$keyword};
+  return 1 if $self->_eval($data, $schema->{$keyword},
+    +{ %$state, schema_path => $state->{schema_path}.'/'.$keyword });
+  return E({ %$state, keyword => $keyword }, 'subschema is not valid');
 }
 
 sub _eval_keyword_dependentSchemas {
@@ -713,8 +731,7 @@ sub _eval_keyword_items {
       +{ %$state,
         data_path => $state->{data_path}.'/'.$idx,
         schema_path => $state->{schema_path}.'/items/'.$idx,
-      },
-    );
+      });
     $valid = 0;
     last if $state->{short_circuit} and not exists $schema->{additionalItems};
   }
@@ -756,8 +773,7 @@ sub _eval_keyword_contains {
           errors => \@errors,
           data_path => $state->{data_path}.'/'.$idx,
           schema_path => $state->{schema_path}.'/contains',
-        })
-    ) {
+        })) {
       ++$num_valid;
       last if $state->{short_circuit}
         and (not exists $schema->{maxContains} or $num_valid > $schema->{maxContains})
@@ -1149,21 +1165,26 @@ has _resource_index => (
   default => sub { {} },
 );
 
-before _add_resources => sub {
-  my $self = shift;
+
+around _add_resources => sub {
+  my ($orig, $self) = (shift, shift);
+
+  my @resources;
   foreach my $pair (sort { $a->[0] cmp $b->[0] } pairs @_) {
     my ($key, $value) = @$pair;
     if (my $existing = $self->_get_resource($key)) {
-      # we allow overwriting canonical_uri = '' to allow for ad hoc evaluation of
-      # schemas that lack all identifiers altogether; we drop *all* resources from that document
-      $self->_remove_resource(
-          grep $self->_get_resource($_)->{document} == $existing->{document}, $self->_resource_keys)
-        if $key eq '';
-
-      croak 'uri "'.$key.'" conflicts with an existing schema resource'
-        if ($key ne '' and $existing->{canonical_uri} ne '')
-          and $existing->{path} ne $value->{path}
-            or $existing->{canonical_uri} ne $value->{canonical_uri};
+      if ($key eq '') {
+        # we allow overwriting canonical_uri = '' to allow for ad hoc evaluation of schemas that
+        # lack all identifiers altogether; we drop *all* resources from that document
+        $self->_remove_resource(
+          grep $self->_get_resource($_)->{document} == $existing->{document}, $self->_resource_keys);
+      }
+      else {
+        next if $existing->{path} eq $value->{path}
+          and $existing->{canonical_uri} eq $value->{canonical_uri}
+          and $existing->{document} == $value->{document};
+        croak 'uri "'.$key.'" conflicts with an existing schema resource';
+      }
     }
     elsif ($self->CACHED_METASCHEMAS->{$key}) {
       croak 'uri "'.$key.'" conflicts with an existing meta-schema resource';
@@ -1175,7 +1196,11 @@ before _add_resources => sub {
 
     croak sprintf('canonical_uri cannot contain a plain-name fragment (%s)', $value->{canonical_uri})
       if ($fragment // '') =~ m{^[^/]};
+
+    push @resources, $key => $value;
   }
+
+  $self->$orig(@resources) if @resources;
 };
 
 use constant CACHED_METASCHEMAS => {
@@ -1205,8 +1230,9 @@ sub _get_or_load_resource {
     my $schema = $self->_json_decoder->decode($file->slurp_raw);
     my $document = JSON::Schema::Draft201909::Document->new(schema => $schema);
 
+    # we have already performed the appropriate collision checks, so we bypass them here
     $self->_add_resources_unsafe(
-      map +( $_->[0] => +{ %{$_->[1]}, document => $document } ),
+      map +($_->[0] => +{ %{$_->[1]}, document => $document }),
         $document->_resource_pairs
     );
 
@@ -1250,7 +1276,7 @@ has _json_decoder => (
   is => 'ro',
   isa => HasMethods[qw(encode decode)],
   lazy => 1,
-  default => sub { JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1) },
+  default => sub { JSON::MaybeXS->new(allow_nonref => 1, canonical => 1, utf8 => 1) },
 );
 
 # shorthand for creating and appending json pointers
@@ -1314,7 +1340,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -1342,8 +1368,8 @@ L<JSON::Schema::Draft201909::Result/output_format>.
 
 =head2 short_circuit
 
-When true, evaluation will immediately return upon encountering the first validation failure, rather
-than continuing to find all errors.
+When true, evaluation will return early in any execution path as soon as the outcome can be
+determined, rather than continuing to find all possible errors.
 
 Defaults to true when C<output_format> is C<flag>, and false otherwise.
 

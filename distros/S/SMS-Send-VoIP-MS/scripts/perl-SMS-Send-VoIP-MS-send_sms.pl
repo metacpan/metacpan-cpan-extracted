@@ -6,12 +6,12 @@ use DateTime;
 use SMS::Send::VoIP::MS;
 
 my $opt      = {};
-getopts("u:p:f:d", $opt); #debug
+getopts('u:p:f:d', $opt); #debug
 my $syntax   = qq{$0 [-u username] [-p password] [-f from_phone] [-d] to_phone "text"\n};
-my $username = $opt->{"u"}; #default undef from INI file
-my $password = $opt->{"p"}; #default undef from INI file
-my $from     = $opt->{"f"}; #default undef from INI file
-my $debug    = $opt->{"d"} ? 1 : 0;
+my $username = $opt->{'u'}; #default undef from INI file
+my $password = $opt->{'p'}; #default undef from INI file
+my $from     = $opt->{'f'}; #default undef from INI file
+my $debug    = $opt->{'d'} ? 1 : 0;
 my $to       = shift or die($syntax);
 my $text     = shift or die($syntax);
 my $service  = SMS::Send::VoIP::MS->new(username=>$username, password=>$password, did=>$from);
@@ -33,7 +33,7 @@ __END__
 
 =head1 NAME
 
-perl-SMS-Send-VoIP-MS-send_sms.pl - SMS::Send::Kannel::SMSbox Example script
+perl-SMS-Send-VoIP-MS-send_sms.pl - SMS::Send::VoIP::MS Example script
 
 
 =head1 SYNOPSIS

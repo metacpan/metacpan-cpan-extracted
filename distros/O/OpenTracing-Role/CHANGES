@@ -1,6 +1,13 @@
 CHANGE LOG
 ==========
 
+2020-07-08 - v0.83.0
+--------------------
+
+### Changed
+    - `inject_context` and `extract_context` are redefined, according to the API
+
+
 2020-06-23 - v0.82.0
 --------------------
 

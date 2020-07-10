@@ -19,6 +19,7 @@ ok (defined $eav, "new EAV::XS");
 
     while (<$fh>) {
         chomp();
+        s/\r$//; # pff, cygwin...
         ok ($eav->is_email($_), "pass: " . $_);
         $testnum++;
     }
@@ -32,6 +33,7 @@ ok (defined $eav, "new EAV::XS");
 
     while (<$fh>) {
         chomp();
+        s/\r$//;
 #        diag("must fail: " . $_);
         my $test = $eav->is_email($_);
 

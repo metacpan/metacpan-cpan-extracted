@@ -1,6 +1,5 @@
 .gitattributes
 .travis.yml
-Build.PL
 Changes
 CONTRIBUTING
 corpus/ffi_build/project-fortran/add1.f
@@ -20,32 +19,30 @@ examples/sub.f
 examples/sub.pl
 examples/var_array.f90
 examples/var_array.pl
-inc/My/ModuleBuild.pm
-inc/run/readme.pl
+inc/mymm-build.pl
 INSTALL
 lib/FFI/Build/File/Fortran.pm
 lib/FFI/Platypus/Lang/Fortran.pm
-lib/Module/Build/FFI/Fortran.pm
-lib/Module/Build/FFI/Fortran/ExtUtilsF77.pm
 LICENSE
 maint/cip-before-install
+maint/readme.pl
 maint/releaseprep
+Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 README
 SUPPORT
 t/00_diag.t
-t/00_diag.txt
 t/01_use.t
 t/02_types.t
 t/examples.t
 t/f77_config.t
 t/ffi/add.f
-t/ffi/f90/f90add.f90
-t/ffi/f95/f95add.f95
+t/ffi/f90add.f90
+t/ffi/f95add.f95
 t/ffi_build__fortran.t
 t/ffi_build_file_fortran.t
 t/ffi_platypus_attach.t
 t/lang.t
 t/lib/Test/Cleanup.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

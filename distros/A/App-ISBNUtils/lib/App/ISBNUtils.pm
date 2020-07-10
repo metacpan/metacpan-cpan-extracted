@@ -1,7 +1,7 @@
 package App::ISBNUtils;
 
-our $DATE = '2018-08-23'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2020-04-15'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -67,7 +67,7 @@ App::ISBNUtils - Command-line utilities related to ISBN
 
 =head1 VERSION
 
-This document describes version 0.002 of App::ISBNUtils (from Perl distribution App-ISBNUtils), released on 2018-08-23.
+This document describes version 0.003 of App::ISBNUtils (from Perl distribution App-ISBNUtils), released on 2020-04-15.
 
 =head1 DESCRIPTION
 
@@ -79,6 +79,10 @@ This distribution contains the following command-line utilities related to ISBN:
 
 =item * L<format-isbn13>
 
+=item * L<parse-amazon-book-page>
+
+=item * L<search-isbn-by-title>
+
 =back
 
 =head1 FUNCTIONS
@@ -88,7 +92,7 @@ This distribution contains the following command-line utilities related to ISBN:
 
 Usage:
 
- format_isbn10(%args) -> [status, msg, result, meta]
+ format_isbn10(%args) -> [status, msg, payload, meta]
 
 Format ISBN 10, print error if number is invalid.
 
@@ -103,6 +107,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<isbn10>* => I<isbn10>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -110,18 +115,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 format_isbn13
 
 Usage:
 
- format_isbn13(%args) -> [status, msg, result, meta]
+ format_isbn13(%args) -> [status, msg, payload, meta]
 
 Format ISBN 13, print error if number is invalid.
 
@@ -135,6 +141,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<isbn13>* => I<isbn13>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -142,7 +149,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -174,7 +181,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -13,7 +13,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -29,6 +29,10 @@ Provided with an optional array reference or an array object such as L<Module::G
 
 Returns an hash reference with the keys being the array elements and the hash values their offset value.
 
+=head2 clone
+
+Creates a clone of the current array object and returns it.
+
 =head2 delete
 
 Provided with an offset value and an optional length, and this will remove data from the array at the given offset and for the given length.
@@ -39,11 +43,30 @@ It returns a list of elements removed in list context or an array reference of i
 
 =head2 each
 
-Returns the next element in the array.
+Provided with a code reference such as a reference to a subroutine, and this will execute the code passing it the array offset and the current value as the 2 arguements. The current value is also accessible with C<$_>
+
+    $a->each(sub
+    {
+        print( "I got $_\n" );
+        # could also write:
+        # print( "I got $_[1] at offset $_[0]\n" );
+    });
+
+To exit the loop, return C<undef()>, for example:
+
+    $a->each(sub
+    {
+        return if( $_ eq $not_this_one );
+        print( "ok, this one\n" );
+    });
 
 =head2 exists
 
 Provided with a value and this returns the number of match, as an L<Module::Generic::Number> object, if it is found in the array, or false otherwise.
+
+=head2 first
+
+Returns the first element of the array, if any. If there are none, to ensure chaining will work, it will return a L<Module::Generic::Null> object.
 
 =head2 for
 
@@ -55,7 +78,17 @@ Provided with a subroutine reference and this will call the subroutine reference
         # do something
     })
 
+C<$_> is made available and contains the value of C<$val>
+
 It returns the object itself so this can be chained.
+
+To exit the loop, return C<undef()>, for example:
+
+    $a->for(sub
+    {
+        return if( $_ eq $not_this_one );
+        print( "ok, this one\n" );
+    });
 
 =head2 foreach
 
@@ -69,9 +102,33 @@ Provided with a subroutine reference and this will call the subroutine reference
 
 It returns the object itself so this can be chained.
 
+C<$_> is made available and contains the value of C<$val>
+
+To exit the loop, return C<undef()>, for example:
+
+    $a->foreach(sub
+    {
+        return if( $_ eq $not_this_one );
+        print( "ok, this one\n" );
+    });
+
+=head2 get
+
+Provided an integer representing an offset and this returns the corresponding value in the array. Offsets start from 0. A blank value will be treated as 0.
+
+    my $a = Module::Generic::Array->new( [qw( abc def ghi )] );
+    $a->get( 1 ); # def
+    $a->get( '' ); # abc
+    $a->get( undef() ); # abc
+    $a->get( -1 ); # ghi
+
 =head2 grep
 
 Provided with some data, and this will do a grep on the array.
+
+If the data provided is a code reference or a reference to a subroutine, the code reference will be called for each array entry, and C<$_> will also be available for each entry.
+
+If the data is a regular expression, each array entry is tested against it.
 
 It returns a list of matches found in ilst context and a new L<Module::Generic::Array> in scalar context.
 
@@ -83,13 +140,29 @@ Provided with a string, or expression just as documented in L<perlfunc/"join"> a
 
 This works as documented in L<perlfunc/"keys"> and returns a list of offset values for each entry in the array.
 
+=head2 last
+
+Returns the last element of the array. If there are none, instead it will return a L<Module::Generic::Null> to ensure chaining will still work.
+
 =head2 length
 
 Returns the size of the array, starting from 1, as a L<Module::Generic::Number> object.
 
+=head2 list
+
+Reeturns the array as a list
+
+    my $a = Module::Generic::Array->new( [qw( Joe John Mary )] );
+    print( "@$a" ); # Joe John Mary
+    my @people = $a->list; # @people now is ( "Joe", "John", "Mary" )
+
 =head2 map
 
-Provided with a reference to a subroutine and this will call the subroutine for each element of the array and return the result.
+Provided with a reference to a subroutine and this will call the subroutine for each element of the array and return a list in list context or a new L<Module::Generic::Array> otherwise.
+
+For each iteration of the array, C<$_> is made available.
+
+    print( $a->map(sub{ $_->value })->join( "\n" ), "\n" );
 
 =head2 pop
 
@@ -115,6 +188,10 @@ This empty the array, just like L</"undef">
 =head2 reverse
 
 Returns a the array in reverse order in list context or a new L<Module::Generic::Array> object of it in scalar context.
+
+=head2 scalar
+
+Returns the size of the array. It basically calls L</length>
 
 =head2 set
 

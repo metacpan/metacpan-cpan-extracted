@@ -7,7 +7,7 @@ use base qw( FFI::Build::File::C );
 use constant default_suffix => '.f';
 use constant default_encoding => ':utf8';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 NAME
 
@@ -65,13 +65,9 @@ sub _base_args
 
 The Core Platypus documentation.
 
-=item L<FFI::Build>
+=item L<FFI::Build> + L<FFI::Build::File::Fortran>
 
 Tool to build bundled libraries with your Perl dist.
-
-=item L<Module::Build::FFI::Fortran>
-
-Bundle Fortran with your FFI / Perl extension.
 
 =back
 

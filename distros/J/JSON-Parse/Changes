@@ -1,3 +1,7 @@
+0.57 2020-07-09
+
+* Bug fix for long strings
+
 0.56 2020-02-06
 
 * Allow build on Solaris and SunOS

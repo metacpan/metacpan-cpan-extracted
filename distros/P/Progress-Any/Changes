@@ -1,3 +1,10 @@
+0.216   2020-07-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Add reset().
+
+	- Add optional argument 'force_update' to update().
+
+
 0.215   2020-06-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Output: Accept -optname => optval, ... as an alternative to

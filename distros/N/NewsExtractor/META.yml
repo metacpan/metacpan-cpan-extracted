@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.27.0
+    version: v0.28.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -48,6 +48,8 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/estate_ltn_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::hk_crntt_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/hk_crntt_com.pm
+  NewsExtractor::SiteSpecificExtractor::hk_on_cc:
+    file: lib/NewsExtractor/SiteSpecificExtractor/hk_on_cc.pm
   NewsExtractor::SiteSpecificExtractor::money_udn_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/money_udn_com.pm
   NewsExtractor::SiteSpecificExtractor::new_ctv_com_tw:
@@ -100,6 +102,8 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_twreporter_org.pm
   NewsExtractor::SiteSpecificExtractor::www_upmedia_mg:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_upmedia_mg.pm
+  NewsExtractor::SiteSpecificExtractor::www_xinhuanet_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_xinhuanet_com.pm
   NewsExtractor::TXExtractor:
     file: lib/NewsExtractor/TXExtractor.pm
   NewsExtractor::TextUtil:
@@ -120,7 +124,7 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.27.0
+version: v0.28.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

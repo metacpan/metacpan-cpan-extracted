@@ -16,12 +16,6 @@ BEGIN {
 use Term::ANSIColor ();
 
 
-has pipe => (
-    is       => 'rw',
-    isa      => InstanceOf ['IPC::PrettyPipe'],
-    required => 1,
-);
-
 has colors => (
     is      => 'rw',
     isa     => HashRef,
@@ -109,7 +103,7 @@ sub _colorize {
 
 sub render {
 
-    my $self = shift;
+    my ( $self, $pipe ) = @_;
 
     my ( $args ) = validate(
         \@_,
@@ -134,7 +128,7 @@ sub render {
         \$self->template,
         {
             ## no critic (ProhibitAccessOfPrivateData)
-            pipe => $self->pipe,
+            pipe => $pipe,
             $args->{colorize} ? ( color => \%color ) : (),
         },
         \$output,
