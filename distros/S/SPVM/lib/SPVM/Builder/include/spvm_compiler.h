@@ -54,6 +54,9 @@ struct SPVM_compiler {
   
   // Current enum value
   int32_t current_enum_value;
+
+  // Current package base;
+  int32_t cur_package_base;
   
   // AST grammar
   SPVM_OP* op_grammar;
@@ -85,6 +88,12 @@ struct SPVM_compiler {
   // Packages
   SPVM_LIST* packages;
 
+  // added_package_names tmp
+  SPVM_LIST* tmp_added_package_names;
+  
+  // added_packages
+  SPVM_LIST* added_packages;
+
   // module file symtable
   SPVM_HASH* module_file_symtable;
   
@@ -108,12 +117,6 @@ struct SPVM_compiler {
 
   // Field ops
   SPVM_LIST* fields;
-  
-  // String pool
-  SPVM_STRING_BUFFER* string_pool;
-  
-  // String symbol table
-  SPVM_HASH* string_symtable;
   
   char* next_double_quote_start_bufptr;
 };

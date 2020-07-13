@@ -1,6 +1,10 @@
 #PODNAME: Lab::XPRESS::Utilities
 #ABSTRACT: Global utility functions for XPRESS
 
+use v5.20;
+
+no strict; # FIXME
+
 #note: this is no "package"
 
 use Term::ReadKey;
@@ -148,7 +152,7 @@ Lab::XPRESS::Utilities - Global utility functions for XPRESS
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -158,6 +162,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2013       Andreas K. Huettel
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -4,7 +4,7 @@ use utf8;
 
 use Text::ANSI::Fold;
 
-my $fold = new Text::ANSI::Fold;
+my $fold = Text::ANSI::Fold->new;
 
 sub folded {
     my $obj = shift;
@@ -37,14 +37,15 @@ is(folded($fold, $_, width => 7), "aaa bbb", "boundary: word");
 is(folded($fold, $_, width => 9), "aaa bbb c", "boundary: word");
 
 
-$fold = new Text::ANSI::Fold width => 3;
+$fold = Text::ANSI::Fold->new(width => 3);
 $_ = "●●●●●";
 is(folded($fold, $_), "●●●", "Ambiguous");
 is(folded($fold, $_, ambiguous => 'wide'), "●", "Ambiguous: WIDE");
 
-$fold = new Text::ANSI::Fold
+$fold = Text::ANSI::Fold->new(
     width => 3,
-    ambiguous => 'wide';
+    ambiguous => 'wide',
+    );
 $_ = "●●●●●";
 is(folded($fold, $_), "●", "Ambiguous: WIDE");
 

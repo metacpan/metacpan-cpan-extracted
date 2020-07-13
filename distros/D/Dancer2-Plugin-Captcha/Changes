@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Captcha
 
+0.14  Fri Jul 10 09:25:00 2020
+      - Updated pod document, thanks Sergiy Borodych.
+
 0.13  Fri Nov 01 19:25:00 2019
       - Updated copyright year details.
 

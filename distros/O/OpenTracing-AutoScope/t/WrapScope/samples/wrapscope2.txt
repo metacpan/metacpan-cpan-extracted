@@ -1,0 +1,2 @@
+Sample2::foo
+Sample2::bar

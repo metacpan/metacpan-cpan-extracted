@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-# Copyright 2007, 2008, 2009 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2014, 2017, 2019 Kevin Ryde
 
 # This file is part of Gtk2-Ex-WidgetCursor.
 #
@@ -18,7 +18,23 @@
 # with Gtk2-Ex-WidgetCursor.  If not, see <http://www.gnu.org/licenses/>.
 
 include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/class/perlmodule.mk
-include /usr/share/cdbs/1/rules/simple-patchsys.mk
+include /usr/share/cdbs/1/class/perl-makemaker.mk
 
 DEB_INSTALL_EXAMPLES_libgtk2-ex-widgetcursor-perl = examples/*
+
+
+# common-binary-post-install-indep::
+# 	sed -i \
+# 	  -e 's:F<examples:F</usr/share/doc/libgtk2-ex-widgetcursor-perl/examples:g' \
+# 	  -e 's:An F</usr:A F</usr:g' \
+# 	  debian/libgtk2-ex-widgetcursor-perl/usr/share/perl5/Gtk2/Ex/WidgetCursor.pm
+#
+# 	sed -i \
+# 	  -e 's:[\\]fIexamples:\\fI/usr/share/doc/libgtk2-ex-widgetcursor-perl/examples:g' \
+# 	  -e 's:An [\\]fI/usr:A \\fI/usr:g' \
+# 	  debian/libgtk2-ex-widgetcursor-perl/usr/share/man/man3/Gtk2::Ex::WidgetCursor.3pm
+
+# =for me -- examples/timebusy.pl becomes /usr/share/doc/... in the deb
+
+# =for me -- becomes /usr/share/doc/... in the deb
+# =for me -- becomes /usr/share/doc/... in the deb

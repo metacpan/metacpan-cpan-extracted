@@ -24,7 +24,6 @@ struct SPVM_package {
   SPVM_HASH* package_var_symtable;
   SPVM_LIST* subs;
   SPVM_HASH* sub_symtable;
-  SPVM_HASH* sub_name_symtable;
   SPVM_LIST* fields;
   SPVM_HASH* field_symtable;
   SPVM_SUB* sub_destructor;
@@ -37,17 +36,7 @@ struct SPVM_package {
   SPVM_LIST* info_basic_type_ids;
   SPVM_HASH* info_basic_type_id_symtable;
   SPVM_LIST* info_switch_infos;
-  SPVM_HASH* string_symtable;
-  SPVM_CONSTANT_POOL* constant_pool;
-  SPVM_HASH* constant_pool_32bit_value_symtable;
-  SPVM_HASH* constant_pool_32bit2_value_symtable;
-  SPVM_HASH* constant_pool_64bit_value_symtable;
-  int32_t constant_pool_base;
-  int32_t no_dup_field_access_field_ids_constant_pool_id;
-  int32_t no_dup_package_var_access_package_var_ids_constant_pool_id;
-  int32_t no_dup_call_sub_sub_ids_constant_pool_id;
-  int32_t no_dup_basic_type_ids_constant_pool_id;
-  int32_t object_field_indexes_constant_pool_id;
+  SPVM_LIST* info_constants;
   const char* module_file;
   const char* module_rel_file;
   SPVM_OP* op_type;

@@ -1,6 +1,6 @@
 Summary: Log Handler
 Name: perl-Log-Handler
-Version: 0.84
+Version: 0.90
 Release: 1%{dist}
 License: GPL+ or Artistic
 Group: Development/Libraries

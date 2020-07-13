@@ -1,9 +1,10 @@
 package Lab::Moose::Sweep::Continuous::Time;
-$Lab::Moose::Sweep::Continuous::Time::VERSION = '3.703';
+$Lab::Moose::Sweep::Continuous::Time::VERSION = '3.710';
 #ABSTRACT: Time sweep
 
+use v5.20;
 
-use 5.010;
+
 use Moose;
 use Time::HiRes qw/time sleep/;
 use Carp;
@@ -134,7 +135,7 @@ Lab::Moose::Sweep::Continuous::Time - Time sweep
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -159,7 +160,7 @@ version 3.703
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
-            2020       Simon Reinhardt
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

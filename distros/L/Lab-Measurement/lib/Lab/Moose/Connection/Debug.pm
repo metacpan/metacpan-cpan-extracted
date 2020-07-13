@@ -1,9 +1,10 @@
 package Lab::Moose::Connection::Debug;
-$Lab::Moose::Connection::Debug::VERSION = '3.703';
-#ABSTRACT: Debug connection
+$Lab::Moose::Connection::Debug::VERSION = '3.710';
+#ABSTRACT: Debug connection, printing / reading on terminal
+
+use v5.20;
 
 use Moose;
-use 5.010;
 use namespace::autoclean;
 use Data::Dumper;
 use YAML::XS;
@@ -16,6 +17,7 @@ has verbose => (
     default => 1,
 );
 
+
 sub Write {
     my $self = shift;
     my %args = @_;
@@ -23,6 +25,7 @@ sub Write {
         carp "Write called with args:\n", Dump \%args, "\n";
     }
 }
+
 
 sub Read {
     my $self = shift;
@@ -34,6 +37,7 @@ sub Read {
     return $retval;
 }
 
+
 sub Query {
     my $self = shift;
     my %args = @_;
@@ -43,6 +47,7 @@ sub Query {
     chomp $retval;
     return $retval;
 }
+
 
 sub Clear {
     my $self = shift;
@@ -64,11 +69,11 @@ __END__
 
 =head1 NAME
 
-Lab::Moose::Connection::Debug - Debug connection
+Lab::Moose::Connection::Debug - Debug connection, printing / reading on terminal
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -87,12 +92,34 @@ version 3.703
 Debug connection object. Print out C<Write> commands and prompt answer for
 C<Read> commands.
 
+=head1 METHODS
+
+=head2 Write
+
+If the connection option verbose is set, output the content of all write
+commands to the terminal. Otherwise, do nothing.
+
+=head2 Read
+
+Output the arguments of the read command to the terminal, and request
+a response there, which is given as result of the read.
+
+=head2 Query
+
+Output the arguments of the query command to the terminal, and request
+a response there, which is given as result of the query.
+
+=head2 Clear
+
+Output "Clear called" on the terminal.
+
 =head1 COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

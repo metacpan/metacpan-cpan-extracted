@@ -15,6 +15,11 @@
 # You should have received a copy of the GNU General Public License along
 # with Graph-Graph6.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# ENHANCE-ME: Maybe an append option to append to a $filename instead of
+# re-write it.  Perhaps 
+
+
 package Graph::Writer::Graph6;
 use 5.004;
 use strict;
@@ -23,7 +28,7 @@ use Graph::Writer;
 
 use vars '@ISA','$VERSION';
 @ISA = ('Graph::Writer');
-$VERSION = 7;
+$VERSION = 8;
 
 
 sub _init  {
@@ -83,7 +88,7 @@ sub _write_graph {
 1;
 __END__
 
-=for stopwords Ryde ascii undirected multi-edges
+=for stopwords Ryde ascii undirected multi-edges multiedged countedged ok
 
 =head1 NAME
 
@@ -98,6 +103,9 @@ Graph::Writer::Graph6 - write Graph.pm in graph6, sparse6 or digraph6 format
  $writer->write_graph($graph, 'filename.txt');
  $writer->write_graph($graph, $filehandle);
 
+ # or one-off create and use
+ Graph::Writer::Graph6->new->write_graph($graph,'filename.txt');
+
 =head1 CLASS HIERARCHY
 
 C<Graph::Writer::Graph6> is a subclass of C<Graph::Writer>.
@@ -107,8 +115,8 @@ C<Graph::Writer::Graph6> is a subclass of C<Graph::Writer>.
 
 =head1 DESCRIPTION
 
-C<Graph::Writer::Graph6> writes a C<Graph.pm> graph to a file in graph6,
-sparse6 or digraph6 format.  These formats are per
+C<Graph::Writer::Graph6> writes a C<Graph.pm> graph to a file or file handle
+in graph6, sparse6 or digraph6 format.  These formats are per
 
 =over 4
 
@@ -127,7 +135,7 @@ written.  If there's edges both ways then a multi-edge is written.
 digraph6 represents a directed graph, possibly with self-loops but no
 multi-edges.  Any multi-edges in C<$graph> are written just once.  If
 C<$graph> is undirected then an edge in written in both directions (though
-usually graph6 or sparse6 would be preferred in that case).
+usually graph6 or sparse6 would be preferred for undirected).
 
 The formats have no vertex names and no attributes.  In the current
 implementation C<$graph-E<gt>vertices()> is sorted alphabetically (C<sort>)
@@ -154,9 +162,7 @@ appropriate.
 
 =item C<$writer-E<gt>write_graph($graph, $filename_or_fh)>
 
-Write C<$graph> to C<$filename_or_fh> in the selected C<format>.  A final
-newline C<"\n"> is written so this is suitable for writing multiple graphs
-one after the other.
+Write C<$graph> to C<$filename_or_fh> in the selected C<format>.
 
 C<$graph> is either a C<Graph.pm> object or something sufficiently
 compatible.  There's no check on the actual class of C<$graph>.  (Don't
@@ -164,21 +170,35 @@ mistakenly pass a C<Graph::Easy> here.  It's close enough that it runs, but
 doesn't give a consistent vertex order and might miss edges on undirected
 graphs.)
 
+C<$filename_or_fh> can be a string filename.  The file is replaced with the
+graph.
+
+C<$filename_or_fh> can be a reference which is taken to be a file handle and
+the graph is written to it.  Multiple graphs can be written to a handle one
+after the other to make a file or other output of several graphs.  The
+format includes a final newline "\n" terminator in all cases.
+
+    my $writer = Graph::Writer::Graph6->new;
+    $writer->write_graph($graph1, \*STDOUT);
+    $writer->write_graph($graph2, \*STDOUT);
+
 =back
 
 =head1 BUGS
 
-For graph6 and digraph6, the current implementation uses C<Graph.pm> method
-C<has_edge()> and makes O(N^2) calls to it for a graph of N vertices.  The
-overhead of this means writing a graph of many vertices is not particularly
-fast.  For a graph of relatively few edges getting all C<edges()> at once
-would be faster, but in that case writing sparse6 would be both smaller and
-faster, provided that format is suitable for a given application.
+Writing a big graph in graph6 and digraph6 format is not particularly fast.
+The current implementation uses C<Graph.pm> method C<has_edge()> and makes
+O(N^2) calls to it for a graph of N vertices.  The overhead of this becomes
+significant for big graphs.  For a graph of relatively few edges getting all
+C<edges()> at once would be faster, but in that case writing sparse6 would
+be both smaller and faster, if that format is suitable for a given
+application.
 
-C<Graph.pm> 0.96 had a bug on undirected multiedged graphs where its
+C<Graph.pm> 0.96 had a bug on multiedged undirected graphs where its
 C<edges()> method sometimes did not return all the edges of the graph,
 causing sparse6 output to miss some edges.  This likely affects other things
-too so use version 0.97 for such a graph (or countedged undirected was ok).
+too so use version 0.97 for such a graph (or countedged undirected was ok if
+that suits).
 
 =head1 SEE ALSO
 

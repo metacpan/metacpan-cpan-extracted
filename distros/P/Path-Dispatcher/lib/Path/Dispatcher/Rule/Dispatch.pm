@@ -1,9 +1,10 @@
 package Path::Dispatcher::Rule::Dispatch;
 # ABSTRACT: redispatch
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
+use MooX::TypeTiny;
 use Type::Utils qw(class_type);
 
 extends 'Path::Dispatcher::Rule';
@@ -40,7 +41,7 @@ Path::Dispatcher::Rule::Dispatch - redispatch
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

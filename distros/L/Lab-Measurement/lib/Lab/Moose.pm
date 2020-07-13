@@ -1,10 +1,11 @@
 package Lab::Moose;
-$Lab::Moose::VERSION = '3.703';
+$Lab::Moose::VERSION = '3.710';
 #ABSTRACT: Convenient loaders and constructors for L<Lab::Moose::Instrument>, L<Lab::Moose::Sweep>, L<Lab::Moose::DataFolder> and L<Lab::Moose::DataFile>
+
+use v5.20;
 
 use warnings;
 use strict;
-use 5.010;
 
 use MooseX::Params::Validate;
 use Moose::Util::TypeConstraints qw/subtype as where message/;
@@ -151,7 +152,7 @@ Lab::Moose - Convenient loaders and constructors for L<Lab::Moose::Instrument>, 
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -254,6 +255,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018-2019  Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

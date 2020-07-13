@@ -1,9 +1,10 @@
 package Path::Dispatcher::Rule::Tokens;
 # ABSTRACT: predicate is a list of tokens
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
+use MooX::TypeTiny;
 use Types::Standard qw(Str ArrayRef Bool);
 
 extends 'Path::Dispatcher::Rule';
@@ -160,7 +161,7 @@ Path::Dispatcher::Rule::Tokens - predicate is a list of tokens
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

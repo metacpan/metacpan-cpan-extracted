@@ -1,10 +1,10 @@
 package Path::Dispatcher::Rule;
 # ABSTRACT: predicate and codeblock
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
-
+use MooX::TypeTiny;
 use Types::Standard qw(Bool);
 use Path::Dispatcher::Match;
 
@@ -102,7 +102,7 @@ Path::Dispatcher::Rule - predicate and codeblock
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

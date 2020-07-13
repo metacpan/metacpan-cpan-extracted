@@ -28,11 +28,12 @@ my $wac_res = $wac->createTask({
     websiteKey => '6Le-wvkSAAAAAPBMRTvw0Q4Muexq9bi0DJwx_mJ-'
 }) or die $wac->errstr;
 die $wac_res->{errorDescription} if $wac_res->{errorId};
+my $taskId = $wac_res->{taskId};
 
 sleep 20;
 my $recaptcha_res;
 while (1) {
-    $wac_res = $wac->getTaskResult($wac_res->{taskId});
+    $wac_res = $wac->getTaskResult($taskId);
     die $wac_res->{errorDescription} if $wac_res->{errorId};
 
     warn Dumper(\$wac_res);

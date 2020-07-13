@@ -11,32 +11,30 @@ use routines;
 use Data::Object::Class;
 use Data::Object::ClassHas;
 
-use Zing::Channel;
+extends 'Zing::Channel';
 
-our $VERSION = '0.12'; # VERSION
+use Zing::Term;
+
+use Scalar::Util ();
+
+our $VERSION = '0.13'; # VERSION
 
 # ATTRIBUTES
 
-has 'name' => (
+has 'metadata' => (
   is => 'ro',
-  isa => 'Str',
-  req => 1,
-);
-
-has 'channel' => (
-  is => 'ro',
-  isa => 'Channel',
+  isa => 'HashRef',
   new => 1,
 );
 
-fun new_channel($self) {
-  Zing::Channel->new(name => $self->name)
+fun new_metadata($self) {
+  {}
 }
 
 # BUILDERS
 
 fun BUILD($self) {
-  $self->channel->{cursor}-- if $self->channel->{cursor};
+  $self->{cursor}-- if $self->{cursor};
 
   return $self->apply;
 }
@@ -71,7 +69,7 @@ sub _copy {
 # METHODS
 
 method apply() {
-  undef $self->{state} if $self->channel->renew;
+  undef $self->{state} if $self->renew;
 
   while (my $data = $self->recv) {
     my $op = $data->{op};
@@ -108,6 +106,8 @@ method apply() {
     elsif ($op eq 'unshift') {
       eval{CORE::unshift @{$self->state->{$key}}, @$val};
     }
+
+    $self->emit($key, $data);
   }
 
   return $self;
@@ -116,6 +116,7 @@ method apply() {
 method change(Str $op, Str $key, Any @val) {
   my %fields = (
     key => $key,
+    metadata => $self->metadata,
     snapshot => _copy($self->state),
     time => time,
     val => [@val],
@@ -152,16 +153,46 @@ method change(Str $op, Str $key, Any @val) {
   return $self->apply;
 }
 
-method get(Str $key) {
-  return $self->apply->state->{$key};
-}
-
 method decr(Str $key, Int $val = 1) {
   return $self->apply->change('decr', $key, $val);
 }
 
 method del(Str $key) {
   return $self->apply->change('del', $key);
+}
+
+method emit(Str $key, HashRef $data) {
+  my $handlers = $self->handlers->{$key};
+
+  return $self if !$handlers;
+
+  for my $handler (@$handlers) {
+    $handler->[1]->($self, $data);
+  }
+
+  return $self;
+}
+
+method get(Str $key) {
+  return $self->apply->state->{$key};
+}
+
+method handlers() {
+  return $self->{handlers} ||= {};
+}
+
+method ignore(Str $key, Maybe[CodeRef] $sub) {
+  return $self if !$self->handlers->{$key};
+
+  return do { delete $self->handlers->{$key}; $self } if !$sub;
+
+  my $ref = Scalar::Util::refaddr($sub);
+
+  @{$self->handlers->{$key}} = grep {$ref ne $$_[0]} @{$self->handlers->{$key}};
+
+  delete $self->handlers->{$key} if !@{$self->handlers->{$key}};
+
+  return $self;
 }
 
 method incr(Str $key, Int $val = 1) {
@@ -176,14 +207,6 @@ method push(Str $key, Any @val) {
   return $self->apply->change('push', $key, @val);
 }
 
-method recv() {
-  return $self->channel->recv;
-}
-
-method send(HashRef $data) {
-  return $self->channel->send($data);
-}
-
 method set(Str $key, Any $val) {
   return $self->apply->change('set', $key, $val);
 }
@@ -194,6 +217,18 @@ method shift(Str $key) {
 
 method state() {
   return $self->{state} ||= {};
+}
+
+method listen(Str $key, CodeRef $sub) {
+  my $ref = Scalar::Util::refaddr($sub);
+
+  push @{$self->ignore($key, $sub)->handlers->{$key}}, [$ref, $sub];
+
+  return $self;
+}
+
+method term() {
+  return Zing::Term->new($self)->domain;
 }
 
 method unshift(Str $key, Any @val) {
@@ -234,6 +269,14 @@ a full history of state changes.
 
 =cut
 
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Zing::Channel>
+
+=cut
+
 =head1 LIBRARIES
 
 This package uses type constraints from:
@@ -248,19 +291,11 @@ This package has the following attributes:
 
 =cut
 
-=head2 channel
+=head2 metadata
 
-  channel(Channel)
+  metadata(HashRef)
 
-This attribute is read-only, accepts C<(Channel)> values, and is optional.
-
-=cut
-
-=head2 name
-
-  name(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is required.
+This attribute is read-only, accepts C<(HashRef)> values, and is optional.
 
 =cut
 
@@ -365,6 +400,37 @@ The del method deletes the data associated with a specific key.
 
 =cut
 
+=head2 emit
+
+  emit(Str $key, HashRef $data) : Object
+
+The emit method executes any callbacks registered using the L</listen> method
+associated with a specific key.
+
+=over 4
+
+=item emit example #1
+
+  # given: synopsis
+
+  $domain->emit('email', { val => ['me@example.com'] });
+
+=back
+
+=over 4
+
+=item emit example #2
+
+  # given: synopsis
+
+  $domain->listen('email', sub { my ($self, $data) = @_; $self->{event} = $data; });
+
+  $domain->emit('email', { val => ['me@example.com'] });
+
+=back
+
+=cut
+
 =head2 get
 
   get(Str $key) : Any
@@ -395,6 +461,75 @@ The get method return the data associated with a specific key.
 
 =cut
 
+=head2 ignore
+
+  ignore(Str $key, Maybe[CodeRef] $sub) : Any
+
+The ignore method removes the callback specified by the L</listen>, or all
+callbacks associated with a specific key if no specific callback if provided.
+
+=over 4
+
+=item ignore example #1
+
+  # given: synopsis
+
+  $domain->ignore('email');
+
+=back
+
+=over 4
+
+=item ignore example #2
+
+  # given: synopsis
+
+  my $callback = sub { my ($self, $data) = @_; $self->{event} = $data; };
+
+  $domain->listen('email', $callback);
+
+  $domain->ignore('email', $callback);
+
+=back
+
+=over 4
+
+=item ignore example #3
+
+  # given: synopsis
+
+  my $callback_1 = sub { my ($self, $data) = @_; $self->{event} = [$data, 2]; };
+
+  $domain->listen('email', $callback_1);
+
+  my $callback_2 = sub { my ($self, $data) = @_; $self->{event} = [$data, 1]; };
+
+  $domain->listen('email', $callback_2);
+
+  $domain->ignore('email', $callback_1);
+
+=back
+
+=over 4
+
+=item ignore example #4
+
+  # given: synopsis
+
+  my $callback_1 = sub { my ($self, $data) = @_; $self->{event} = [$data, 1]; };
+
+  $domain->listen('email', $callback_1);
+
+  my $callback_2 = sub { my ($self, $data) = @_; $self->{event} = [$data, 2]; };
+
+  $domain->listen('email', $callback_2);
+
+  $domain->ignore('email');
+
+=back
+
+=cut
+
 =head2 incr
 
   incr(Str $key, Int $val = 1) : Object
@@ -418,6 +553,62 @@ The incr method increments the data associated with a specific key.
   # given: synopsis
 
   $domain->incr('karma', 5);
+
+=back
+
+=cut
+
+=head2 listen
+
+  listen(Str $key, CodeRef $sub) : Object
+
+The listen method registers callbacks associated with a specific key which
+will be invoked by the L</emit> method or whenever an event matching the key
+specified is received and applied.
+
+=over 4
+
+=item listen example #1
+
+  # given: synopsis
+
+  $domain->ignore('email');
+
+  $domain->listen('email', sub { my ($self, $data) = @_; $self->{event} = $data; });
+
+=back
+
+=over 4
+
+=item listen example #2
+
+  # given: synopsis
+
+  $domain->ignore('email');
+
+  my $callback = sub { my ($self, $data) = @_; $self->{event} = $data; };
+
+  $domain->listen('email', $callback);
+
+  $domain->listen('email', $callback);
+
+=back
+
+=over 4
+
+=item listen example #3
+
+  # given: synopsis
+
+  $domain->ignore('email');
+
+  my $callback_1 = sub { my ($self, $data) = @_; $self->{event} = [$data, 1]; };
+
+  $domain->listen('email', $callback_1);
+
+  my $callback_2 = sub { my ($self, $data) = @_; $self->{event} = [$data, 2]; };
+
+  $domain->listen('email', $callback_2);
 
 =back
 

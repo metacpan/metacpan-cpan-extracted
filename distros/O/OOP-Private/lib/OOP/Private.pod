@@ -1,0 +1,131 @@
+=encoding utf8
+
+=head1 NAME
+
+OOP::Private - private and protected functions and methods.
+
+=head1 SYNOPSIS
+
+    package Foo;
+    use OOP::Private;
+
+    sub new {
+        my ($class, $self) = @_;
+        bless $self, $class;
+    }
+
+    sub callPublicMethod {
+        my $self = shift;
+        $self -> privateMethod;
+    }
+
+    sub callPrivateMethod: Private {
+        my $self = shift;
+        printf "%s: $s\n", $$self{foo}, $$self{bar};
+    }
+
+    1;
+
+Elsewhere:
+
+    use Foo;
+    my $inst = new Foo { foo => "Foo", bar => "Bar" };
+    $inst -> callPublicMethod;  # Outputs "Foo: Bar"
+    $inst -> callPrivateMethod; # Croaks "Attempt to call private subroutine Foo::callPrivateMethod blabla"
+
+=head1 DESCRIPTION
+
+This package defines two attributes - C<Private> and C<Protected>.
+
+C<Private> sub can't be accessed from anywhere except the package it's defined in.
+
+C<Protected> sub can be accessed from child classes. Depth of inheritance doesn't matter (C<UNIVERSAL::isa>).
+ This is the only difference. Everything else that is true for C<Private> also applies to C<Protected>.
+
+=head1 PERFORMANCE
+
+Subs modified by this package are just a bit slower than pure ones. It's a matter of nanoseconds.
+ Anyway, I was benchmarking this code more than a year before writing this pod and too lazy to do it again,
+ so no benchmarks will be added soon.
+
+=head1 CAVEATS
+
+Well, everything has drawbacks.
+
+If some method inherited from parent relies on that parent's private methods,
+ then child must not redefine those (private) methods.
+
+Les't assume that we have the following parent package:
+
+    package Parent;
+    use OOP::Private;
+
+    sub doPublicStuff { shift -> doPrivateStuff }
+    sub doPrivateStuff: Private { 9999 }
+
+    1;
+
+And the following child:
+
+    package Child;
+    use base "Parent";
+
+    sub doPrivateStuff: Private {
+        # anything
+    }
+
+In that case. C<< Child -> new -> doPrivateStuff >> will throw the "Attempt to call private ... in Parent.pm" error.
+
+Yes, you got it right. Parent's C<doPublicStuff> doesn't use C<doPrivateStuff> from its own package anymore - it tries to use child's one instead.
+ But expectedly fails. If you don't mark child's method as C<Private>, it won't fail, though child's method will still be used instead of the original one.
+
+You can go further and also redefine C<doPublicStuff> in the child package, in that case no errors will occur.
+ Anyway, your package will not be able to call parent's C<doPublicStuff> anymore. Neither will its inheriters.
+
+Because of that, it's highly advised to use tools like L<this|https://metacpan.org/pod/Class::Method::Modifiers#fresh-method(s)-=%3E-sub-{-...-};>
+ for defining children methods in large projects with complicated class hierarchy.
+
+=head1 ALTERNATIVES
+
+There's still a lot of ways to define private methods. Some of them below:
+
+=head2 L<Class::Method::Modifiers>
+
+Can be combined with this module (as advised above, for example) or replace it entirely.
+
+=head2 L<Moose>
+
+Super-Yoba OOP system targeted at Java coders I believe. Significantly slows your code down.
+ Maybe appropriate for long-living async daemons, but definitely not recommended for scripts.
+
+=head2 Alternative syntax for anonymous coderefs
+
+Perl doesn't support lexical scoping for subs, sure, but what about scalars?
+
+Did you know that coderefs can be called using the method notation?
+
+    my $doStuff = sub {
+        my $self = shift;
+
+        do_something $self;
+    };
+
+    my $obj = Class -> new;
+
+    $obj -> $doStuff; # Actually, left-side operand doesn't even have to be a blessed reference. Even a string will do. Fukken amazing.
+
+The only drawback in that case is that, if the code inside $doStuff fails, then package/line number report from C<die>/C<croak> output will most likely be useless.
+ Also, you now have to prepend a method name with a dollar. But it's not a drawback.
+ Seriously, show me anyone who doesn't love dollars.
+
+=head1 AUTHOR
+
+Copyright © Anonchique Aiteeshnique <anonymous@cpan.org>
+
+=head1 LICENSE
+
+Artistic 2.0, see LICENSE
+
+=head1 VERSION
+
+1.01

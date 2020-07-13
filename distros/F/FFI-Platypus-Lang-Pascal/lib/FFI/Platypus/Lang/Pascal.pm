@@ -6,7 +6,7 @@ use Carp qw( croak );
 use FFI::Platypus;
 use FFI::ExtractSymbols;
 
-our $VERSION = '0.06';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -187,7 +187,7 @@ Platypus are documented here.
  my $hashref = FFI::Platypus::Lang::Pascal->native_type_map;
 
 This returns a hash reference containing the native aliases for the
-Free Pascal programming languages.  That is the keys are native C++
+Free Pascal programming languages.  That is the keys are native Pascal
 types and the values are libffi native types.
 
 Types are in camel case.  For example use C<ShortInt>, not C<Shortint>
@@ -233,7 +233,7 @@ sub native_type_map
  # prints ADD_ADD$SMALLINT$SMALLINT$$SMALLINT
  print $mangler->("add(smallint,smallint):smallint");
 
-Returns a subroutine reference that will "mangle" C++ names.
+Returns a subroutine reference that will "mangle" Pascal names.
 
 =cut
 
@@ -314,7 +314,7 @@ If something does not work as advertised, or the way that you think it
 should, or if you have a feature request, please open an issue on this 
 project's GitHub issue tracker:
 
-L<https://github.com/Perl5-FFI/FFI-Platypus-Lang-Pascal/issues>
+L<https://github.com/PerlFFI/FFI-Platypus-Lang-Pascal/issues>
 
 This project's GitHub issue tracker listed above is not Write-Only.  If
 you want to contribute then feel free to browse through the existing
@@ -336,7 +336,7 @@ improve things.
 If you have implemented a new feature or fixed a bug then you may make a 
 pull reequest on this project's GitHub repository:
 
-L<https://github.com/Perl5-FFI/FFI-Platypus-Lang-Pascal/pulls>
+L<https://github.com/PerlFFI/FFI-Platypus-Lang-Pascal/pulls>
 
 =head1 SEE ALSO
 
@@ -346,7 +346,7 @@ L<https://github.com/Perl5-FFI/FFI-Platypus-Lang-Pascal/pulls>
 
 The Core Platypus documentation.
 
-=item L<Module::Build::FFI::Pascal>
+=item L<FFI::Build> + L<FFI::Build::File::Pascal>
 
 Bundle Free Pascal with your FFI / Perl extension.
 

@@ -1,10 +1,10 @@
 {
-   "abstract" : "a small proxy that can be useful when you embed gists in your website",
+   "abstract" : "a small proxy that can be useful when you use Google fonts in your website",
    "author" : [
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -29,7 +29,7 @@
    "provides" : {
       "Mojolicious::Plugin::GoogleFontProxy" : {
          "file" : "lib/Mojolicious/Plugin/GoogleFontProxy.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -44,10 +44,10 @@
          "web" : "http://github.com/reneeb/Mojolicious-Plugin-GoogleFontProxy"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

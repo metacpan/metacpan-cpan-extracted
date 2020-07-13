@@ -1,6 +1,8 @@
 package Lab::Moose::Instrument::SCPI::Unit;
-$Lab::Moose::Instrument::SCPI::Unit::VERSION = '3.703';
+$Lab::Moose::Instrument::SCPI::Unit::VERSION = '3.710';
 #ABSTRACT: Role for SCPI UNIT subsystem.
+
+use v5.20;
 
 use Moose::Role;
 use Lab::Moose::Instrument qw/setter_params getter_params validated_channel_setter validated_getter/;
@@ -41,7 +43,7 @@ Lab::Moose::Instrument::SCPI::Unit - Role for SCPI UNIT subsystem.
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 METHODS
 
@@ -57,6 +59,7 @@ Set/Get amplitude units for the input, output and display.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Eugeniy E. Mikhailov
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

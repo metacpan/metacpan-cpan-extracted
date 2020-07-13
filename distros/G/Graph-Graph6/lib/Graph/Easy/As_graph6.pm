@@ -24,7 +24,7 @@ use Graph::Graph6;
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-our $VERSION = 7;
+our $VERSION = 8;
 
 
 package Graph::Easy;
@@ -123,15 +123,15 @@ L<http://cs.anu.edu.au/~bdm/data/formats.txt>
 
 =back
 
-graph6 represents an undirected graph without self-loops or multi-edges.
-Any self-loops in C<$graph> are ignored.  Multi-edges are written just once
-and if C<$graph> is directed then an edge of either direction is written.
+graph6 format is an undirected graph without self-loops or multi-edges.  Any
+self-loops in C<$graph> are ignored.  Multi-edges are written just once and
+if C<$graph> is directed then an edge of either direction is written.
 
-sparse6 represents an undirected graph possibly with multi-edges and self
+sparse6 format is an undirected graph possibly with multi-edges and self
 loops.  If C<$graph> is directed then an edge in either direction is
 written.  If there's edges both ways then a multi-edge is written.
 
-digraph6 represents a directed graph, possibly with self-loops but no
+digraph6 format is a directed graph, possibly with self-loops but no
 multi-edges.  Any multi-edges in C<$graph> are written just once.  If
 C<$graph> is undirected then an edge in written in both directions (though
 usually graph6 or sparse6 would be preferred in that case).

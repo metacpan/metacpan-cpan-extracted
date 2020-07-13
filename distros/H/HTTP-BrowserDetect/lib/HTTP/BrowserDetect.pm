@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.27';
+our $VERSION = '3.28';
 
 use vars qw(@ALL_TESTS);
 
@@ -2461,7 +2461,7 @@ sub robot_beta {
 sub os {
     my ($self) = @_;
 
-    return undef unless defined $self->{user_agent};
+    return undef    unless defined $self->{user_agent};
     $self->_init_os unless $self->{os_tests};
     return $self->{os};
 }
@@ -2469,7 +2469,7 @@ sub os {
 sub os_string {
     my ($self) = @_;
 
-    return undef unless defined $self->{user_agent};
+    return undef    unless defined $self->{user_agent};
     $self->_init_os unless $self->{os_tests};
     return $self->{os_string};
 }
@@ -2858,7 +2858,7 @@ sub _language_country {
         my @parts = split( /;/, $1 );
         foreach my $part (@parts) {
 
-            # 'vw' for WebView is not language code. Details here: https://developer.chrome.com/multidevice/user-agent#webview_user_agent
+            # 'wv' for WebView is not language code. Details here: https://developer.chrome.com/multidevice/user-agent#webview_user_agent
             if ( $part =~ /^\s*([a-z]{2})\s*$/
                 && !( $self->webview && $1 eq 'wv' ) ) {
                 return { language => uc $1 };
@@ -2974,7 +2974,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.27
+version 3.28
 
 =head1 SYNOPSIS
 

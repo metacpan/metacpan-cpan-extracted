@@ -3,4 +3,5 @@
 set -ex
 
 cip sudo apt-get update
-cip sudo apt-get -y install g++ fp-compiler-3.0.0
+cip sudo apt-get -y install g++ fp-compiler-3.0.4 libffi-dev
+cip exec cpanm -v Path::Tiny FFI::Platypus File::Which ExtUtils::MakeMaker

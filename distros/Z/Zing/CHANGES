@@ -1,6 +1,21 @@
 Changelog for Zing
 
-0.12 2020-07-07T02:36:23
+0.13 2020-07-11T13:53:04
+ - Add release updates
+ - Update "emit" signature in Zing/Domain
+ - Update zing synopsis
+ - Implement Zing::Domain "subscriptions" (#217)
+ - Allow Zing::Domain events to send metadata (#215)
+ - Refactor "resources" command as "terms" (#213)
+ - Implement "service" and service importing (#211)
+ - Implement "resources" command in Zing/Cli (#209)
+ - Update TEMPLATE_MAIN "features" ordering
+ - Update TEMPLATE_MAIN "actor-model" explanation
+ - Zing/Domain subclasses Zing/Channel (#207)
+ - Document ZING_TARGET configuration (#205)
+
+0.12 2020-07-07T02:36:28
+ - Built release version 0.12
  - Add release updates
  - Update documentation in "zing" application (#202)
  - Implement "monitor" CLI command (#196)

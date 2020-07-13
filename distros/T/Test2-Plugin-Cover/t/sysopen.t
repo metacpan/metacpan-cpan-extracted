@@ -3,6 +3,8 @@ use Test2::V0 -target => 'Test2::Plugin::Cover';
 use Path::Tiny qw/path/;
 use Fcntl qw/O_RDONLY/;
 
+skip_all 'disabled';
+
 $CLASS->clear;
 my $fh;
 

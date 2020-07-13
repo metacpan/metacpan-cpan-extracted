@@ -1,8 +1,9 @@
 package Lab::SCPI;
-$Lab::SCPI::VERSION = '3.703';
+$Lab::SCPI::VERSION = '3.710';
 #ABSTRACT: Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and parameters against keywords
 
-use 5.010;
+use v5.20;
+
 use warnings;
 no warnings 'recursion';
 use strict;
@@ -570,7 +571,7 @@ Lab::SCPI - Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and paramet
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 Interface
 
@@ -685,6 +686,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2016       Charles Lane, Simon Reinhardt
             2017       Andreas K. Huettel
             2019       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

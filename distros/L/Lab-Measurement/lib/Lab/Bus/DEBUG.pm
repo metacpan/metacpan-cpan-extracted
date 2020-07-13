@@ -1,9 +1,10 @@
 package Lab::Bus::DEBUG;
 #ABSTRACT: Interactive debug bus
-$Lab::Bus::DEBUG::VERSION = '3.703';
+$Lab::Bus::DEBUG::VERSION = '3.710';
+use v5.20;
+
 use warnings;
 use strict;
-use 5.010;
 
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -237,7 +238,7 @@ Lab::Bus::DEBUG - Interactive debug bus
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 DESCRIPTION
 
@@ -254,6 +255,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2013       Andreas K. Huettel
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

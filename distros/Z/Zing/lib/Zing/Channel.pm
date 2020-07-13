@@ -14,7 +14,7 @@ extends 'Zing::PubSub';
 
 use Zing::Term;
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 # BUILDERS
 

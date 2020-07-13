@@ -1,9 +1,10 @@
 package Lab::Instrument::Source;
 #ABSTRACT: Generic voltage source base class
-$Lab::Instrument::Source::VERSION = '3.703';
+$Lab::Instrument::Source::VERSION = '3.710';
+use v5.20;
+
 use strict;
 use warnings;
-use 5.010;
 
 use Lab::Exception;
 use Lab::Instrument;
@@ -564,7 +565,7 @@ Lab::Instrument::Source - Generic voltage source base class
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 DESCRIPTION
 
@@ -782,6 +783,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2014       Alexei Iankilevitch, Alois Dirnaichner, Christian Butschkow
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

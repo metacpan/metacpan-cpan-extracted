@@ -1,6 +1,8 @@
 package Lab::XPRESS::Data::XPRESS_DataFile;
-$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.703';
+$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.710';
 #ABSTRACT: XPRESS data file module
+
+use v5.20;
 
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
@@ -610,7 +612,7 @@ Lab::XPRESS::Data::XPRESS_DataFile - XPRESS data file module
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -621,7 +623,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2014       Christian Butschkow
             2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
-            2020       Simon Reinhardt
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

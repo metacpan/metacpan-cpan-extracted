@@ -1,6 +1,8 @@
 package Lab::Instrument::U2000;
 #ABSTRACT: Agilent U2000 series USB Power Sensor
-$Lab::Instrument::U2000::VERSION = '3.703';
+$Lab::Instrument::U2000::VERSION = '3.710';
+use v5.20;
+
 use strict;
 use Lab::Instrument;
 
@@ -249,7 +251,7 @@ Lab::Instrument::U2000 - Agilent U2000 series USB Power Sensor
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 DESCRIPTION
 
@@ -307,6 +309,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2012       Hermann Kraus
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -41,8 +41,7 @@ head-or-end of line prohibition character is also supported.  Set
 the linebreak mode to enable it.
 
 Use exported **ansi\_fold** function to fold original text, with number
-of visual columns you want to cut off the text.  Width parameter have
-to be a number greater than zero.
+of visual columns you want to cut off the text.
 
     ($folded, $remain, $w) = ansi_fold($text, $width);
 
@@ -51,7 +50,8 @@ the rest.
 
 Additional third result is the visual width of folded text.  You may
 want to know how many columns returned string takes for further
-processing.
+processing.  If the width parameter is negative, it returns string
+untouched and the visual width of it.
 
 This function returns at least one character in any situation.  If you
 provide Asian wide string and just one column as width, it trims off
@@ -129,6 +129,11 @@ reference, and chops text into given width list.
     my @list = $fold->text("1223334444")->chops(width => [ 1, 2, 3 ]);
     # return ("1", "22", "333") and keep "4444"
 
+If the width value is 0, it returns empty string.
+
+Negative width value takes all the rest of holded string in
+**retrieve** and **chops** method.
+
 # OPTIONS
 
 Option parameter can be specified as name-value list for **ansi\_fold**
@@ -144,8 +149,10 @@ function as well as **new** and **configure** method.
 
 - **width** => _n_, _\[ n, m, ... \]_
 
-    Specify folding width.  Array reference can be specified but works
-    only with **chops** method.
+    Specify folding width.  Negative value means all the rest.
+
+    Array reference can be specified but works only with **chops** method,
+    and retunrs empty string for zero width.
 
 - **boundary** => "word"
 

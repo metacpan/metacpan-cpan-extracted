@@ -12,7 +12,7 @@ use Mojo::UserAgent;
 use Bible::OBML;
 use Bible::Reference 1.02;
 
-our $VERSION = '1.05'; # VERSION
+our $VERSION = '1.06'; # VERSION
 
 has ua  => sub { return Mojo::UserAgent->new };
 has url => sub { return Mojo::URL->new('https://www.biblegateway.com/passage/') };
@@ -163,6 +163,7 @@ sub _parse {
     $obml =~ s/=[^=\n]+=\n+(=[^=\n]+=)/$1/msg;
     $obml =~ s/<span.*?>(.*?)<\/span>/$1/msg;
     $obml =~ s/(\*[^\*\{\[]+)(\s*\{[^\}]*\}\s*|\s*\[[^\]]*\]\s*)/$1*$2*/msg;
+    $obml =~ s|<[^>]*>||msg;
 
     utf8::decode($obml);
     $obml = $self->_obml_lib->desmartify($obml);
@@ -209,7 +210,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway.svg)](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-OBML-Gateway/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-OBML-Gateway)

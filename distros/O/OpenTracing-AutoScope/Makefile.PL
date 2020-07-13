@@ -6,6 +6,6 @@ WriteMakefile(
     'ABSTRACT_FROM' => 'lib/OpenTracing/AutoScope.pod',
     'LICENSE'       => 'perl',
     test            => {
-        TESTS       => 't/*.t t/WrapScope/*.t',
+        TESTS       => 't/*.t t/WrapScope/*.t  t/WrapScope/ConfigGenerator/*.t',
     },
 );

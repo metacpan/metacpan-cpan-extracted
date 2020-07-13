@@ -1,3 +1,13 @@
+0.000009  2020-07-11 23:42:31-07:00 America/Los_Angeles
+
+    - Fix another extraction bug
+
+0.000008  2020-07-11 23:24:23-07:00 America/Los_Angeles
+
+    - Disable sysopen
+    - Better filename extraction logic
+    - test for filename extraction
+
 0.000007  2020-07-01 20:08:35-07:00 America/Los_Angeles
 
     - Fix open.t on windows

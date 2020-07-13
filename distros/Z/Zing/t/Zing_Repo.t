@@ -32,7 +32,6 @@ Generic Store Abstraction
 =includes
 
 method: drop
-method: ids
 method: keys
 method: term
 method: test
@@ -83,22 +82,6 @@ drop(Str @keys) : Int
   # given: synopsis
 
   $repo->drop('text-1');
-
-=cut
-
-=method ids
-
-The ids method returns a list of IDs (keys) stored under the datastore namespace.
-
-=signature ids
-
-ids() : ArrayRef[Str]
-
-=example-1 ids
-
-  # given: synopsis
-
-  my $ids = $repo->ids;
 
 =cut
 
@@ -173,12 +156,6 @@ $subs->synopsis(fun($tryable) {
 
 $subs->example(-1, 'drop', 'method', fun($tryable) {
   ok !(my $result = $tryable->result);
-
-  $result
-});
-
-$subs->example(-1, 'ids', 'method', fun($tryable) {
-  ok my $result = $tryable->result;
 
   $result
 });

@@ -31,7 +31,7 @@ sub check_domains ( $self, $domains ) {
 
     my $res = P->http->get( $url, proxy => $self->{proxy} );
 
-    retun $res if !$res;
+    return $res if !$res;
 
     my $data = P->data->from_xml( $res->{data} );
 

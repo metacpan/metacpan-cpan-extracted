@@ -1,6 +1,8 @@
 package Lab::Moose::Instrument::SCPI::Format;
-$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.703';
+$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.710';
 #ABSTRACT: Role for SCPI FORMat subsystem.
+
+use v5.20;
 
 use Moose::Role;
 use Lab::Moose::Instrument qw/setter_params getter_params validated_getter/;
@@ -74,7 +76,7 @@ Lab::Moose::Instrument::SCPI::Format - Role for SCPI FORMat subsystem.
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 METHODS
 
@@ -112,7 +114,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020       Sam Bingner
+            2020       Andreas K. Huettel, Sam Bingner
 
 
 This is free software; you can redistribute it and/or modify it under

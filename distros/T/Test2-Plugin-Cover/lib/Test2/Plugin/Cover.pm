@@ -9,7 +9,7 @@ use File::Spec();
 
 my $SEP = File::Spec->catfile('', '');
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000009';
 
 our %FILES;
 
@@ -58,17 +58,38 @@ sub extract {
     my $class = shift;
     my ($file) = @_;
 
-    # No hope :-(
-    return if $file =~ m/^\(eval \d+\)$/;
-
-    # Easy
-    return $file if -e $file;
-
-    # Moose like to write "blah blah (defined at filename line 123)"
-    return $1 if $file =~ m/defined at (.+) line \d+/;
-
     # If we opened a file with 2-arg open
-    $file =~ s/^[\+\-]?(?:>|>>|<|\|)[\+\-]?//;
+    $file =~ s/^[\+\-]?(?:>{1,2}|<|\|)[\+\-]?//;
+
+    # Sometimes things get nested and we need to extract and then extract again...
+    while (1) {
+        # No hope :-(
+        return if $file =~ m/^\(eval( \d+\)?)$/;
+
+        # Easy
+        return $file if -e $file;
+
+        my $start = $file;
+
+        # Moose like to write "blah blah (defined at filename line 123)"
+        $file = $1 if $file =~ m/(?:defined|declared) (?:at|in) (.+) at line \d+/;
+        $file = $1 if $file =~ m/(?:defined|declared) (?:at|in) (.+) line \d+/;
+        $file = $1 if $file =~ m/\(eval \d+\)\[(.+):\d+\]/;
+        $file = $1 if $file =~ m/\((.+)\) line \d+/;
+        $file = $1 if $file =~ m/\((.+)\) at line \d+/;
+
+        # Extracted everything away
+        return unless $file;
+
+        # Not going to change anymore
+        last if $file eq $start;
+    }
+
+    # These characters are rare in file names, but common in calls where files
+    # could not be determined, so we probably failed to extract. If this
+    # assumption is wrong for someone they can write a custom extract, this is
+    # not a bug.
+    return if $file =~ m/([\[\]\(\)]|->|\beval\b)/;
 
     # If we have a foo.bar pattern, or a string that contains this platforms
     # file separator we will condifer it a valid file.
@@ -138,6 +159,12 @@ exits. In most formaters the event will only show up as a comment on STDOUT
 C< # This test covered N source files. >. However tools such as
 L<Test2::Harness::UI> can make full use of the coverage information contained
 in the event.
+
+=head2 NOTE: SYSOPEN HOOK DISABLED
+
+The sysopen hook is currently disabled because of an unknown segv error on some
+platforms. I am not certain if it will be enabled again. calls to subs, and
+calls to open are still hooked.
 
 =head1 INTENDED USE CASE
 

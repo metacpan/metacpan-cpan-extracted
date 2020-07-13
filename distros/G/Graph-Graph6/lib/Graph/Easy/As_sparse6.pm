@@ -21,7 +21,7 @@ use strict;
 use warnings;
 use Graph::Easy::As_graph6;
 
-our $VERSION = 7;
+our $VERSION = 8;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012 Kevin Ryde
 
 # This file is part of Gtk2-Ex-WidgetCursor.
 #
@@ -45,12 +45,6 @@ MyTestHelpers::glib_gtk_versions();
 
 
 #-----------------------------------------------------------------------------
-
-# sub my_ignore {
-#   my ($ref) = @_;
-#   return (Test::Weaken::ExtraBits::ignore_global_function($ref)
-#           || Test::Weaken::Gtk2::ignore_default_display($ref));
-# }
 
 {
   my $leaks = Test::Weaken::leaks (sub { Gtk2::Ex::WidgetCursor->new });

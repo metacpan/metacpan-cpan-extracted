@@ -9,12 +9,15 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
+use vars qw($MSWin32_MBCS);
+$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+
 @test = (
 # 1
     sub { mb::eval(q{ open FILE,">5006.A";  print FILE 'A'; close FILE; }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ open FILE,">5006.ソ"; print FILE 'A'; close FILE; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ open FILE,">5006.ソ"; print FILE 'A'; close FILE; }) },
     sub { mb::eval(q{ unlink "5006.A";  }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ unlink "5006.ソ"; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ unlink "5006.ソ"; }) },
     sub {1},
     sub {1},
     sub {1},

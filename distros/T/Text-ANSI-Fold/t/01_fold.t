@@ -14,6 +14,7 @@ is(folded($_, 1), "1",             "ASCII: 1");
 is(folded($_, 10), "1234567890",   "ASCII: 10");
 is(folded($_, length), $_,         "ASCII: just");
 is(folded($_, length($_) * 2), $_, "ASCII: long");
+is(folded($_, -1), $_,             "ASCII: negative");
 
 $_ = "１２３４５６７８９０１２３４５６７８９０１２３４５６７８９０";
 is(folded($_, 1), "１", "WIDE: 1");

@@ -1,3 +1,9 @@
+0.248   2020-07-10  Released-By: PERLANCAR; Urgency: medium
+
+	- [bugfix] Do proper per-instance monkey-patching to avoid artefacts
+	  when there are multiple instances of us (RT#132860).
+
+
 0.247   2020-06-20  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: rownum to allow showing multiple progress bars on

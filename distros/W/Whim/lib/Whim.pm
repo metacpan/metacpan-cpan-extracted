@@ -8,7 +8,7 @@ use Whim::Core;
 
 use Path::Tiny;
 
-our $VERSION = '1.2020.06.22.0';
+our $VERSION = '1.2020.07.12.0';
 
 has info => "This is Whim, version $VERSION, by Jason McIntosh.";
 
@@ -62,6 +62,7 @@ sub startup {
     $r->post('/')->to('listen#receive');
 
     $r->get('/display_wms')->to('display#display');
+    $r->get('/summarize_wms')->to('display#summarize');
 
     # Mojolicious's 'Unknown command' error message is confusing, so
     # we do our own check for command-knownness.

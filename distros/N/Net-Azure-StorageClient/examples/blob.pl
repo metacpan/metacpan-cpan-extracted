@@ -1,4 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+
+use warnings;
 use strict;
 use lib qw( lib );
 use Getopt::Long qw/:config posix_default no_ignore_case bundling auto_help/;
@@ -49,7 +51,7 @@ if (! $accesskey ) {
 }
 
 if ( (! $account ) || (! $accesskey ) ) {
-    die 
+    die
     'Your account and primary access key of Windows Azure Blob Storage are required.';
 }
 
@@ -60,7 +62,7 @@ if (! $method ) {
 }
 
 if (! $method ) {
-    die 
+    die
     "Option '--method' is required.";
 }
 

@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 use 5.010_001;
 
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 
 our @WARNINGS;
 

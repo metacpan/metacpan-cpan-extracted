@@ -30,9 +30,9 @@
 #     https://hog.grinvin.org/data/trees/trees06.g6
 #     ./graph-easy-print.pl trees06.g6
 #
-# The nauty tools genspecialg (which on Debian is program name
-# nauty-genspecialg) can make directed graphs.  For example 2,3 bipartite
-# then print with the program here
+# The nauty tools "genspecialg" program (which on Debian is
+# "nauty-genspecialg") can make directed graphs.  For example generate a
+# directed complete bipartite 2,3 then print with the program here
 #
 #     nauty-genspecialg -z -b2,3 >/tmp/foo.d6
 #     ./graph-easy-print.pl /tmp/foo.d6

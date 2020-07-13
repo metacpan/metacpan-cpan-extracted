@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2019, 2020 Kevin Ryde
 
 # MyOEIS.pm is shared by several distributions.
 #
@@ -37,9 +37,11 @@ sub import {
   }
 }
 
+# Return $aref, $i_start, $filename
 sub read_values {
   my ($anum, %option) = @_;
   ### read_values() ...
+  ### %option
 
   if ($without) {
     return;
@@ -49,8 +51,9 @@ sub read_values {
   my $filename;
   my $next;
   if (my $seq = eval { require Math::NumSeq::OEIS::File;
-                       Math::NumSeq::OEIS::File->new (anum => $anum) }) {
-    ### from seq ...
+                       Math::NumSeq::OEIS::File->new (anum => $anum,
+                                                      _b_filename => $option{'bfilename'}) }) {
+    ### $seq
     $next = sub {
       my ($i, $value) = $seq->next;
       return $value;
@@ -108,11 +111,13 @@ sub compare_values {
   my %option = @_;
   require MyTestHelpers;
   my $anum = $option{'anum'} || croak "Missing anum parameter";
+  my $name = $option{'name'}; if (!defined $name) { $name = ""; }
   my $func = $option{'func'} || croak "Missing func parameter";
   my ($bvalues, $lo, $filename) = MyOEIS::read_values
     ($anum,
      max_count => $option{'max_count'},
-     max_value => $option{'max_value'});
+     max_value => $option{'max_value'},
+     bfilename => $option{'bfilename'});
   my $diff;
   if ($bvalues) {
     if (my $fixup = $option{'fixup'}) {
@@ -125,6 +130,8 @@ sub compare_values {
     if (ref $got ne 'ARRAY') {
       croak "Oops, func return not an arrayref";
     }
+    ### $got
+    ### $bvalues
     $diff = diff_nums($got, $bvalues);
     if ($diff) {
       MyTestHelpers::diag ("bvalues: ",join_values($bvalues));
@@ -134,7 +141,7 @@ sub compare_values {
   if (defined $Test::TestLevel) {
     require Test;
     local $Test::TestLevel = $Test::TestLevel + 1;
-    Test::skip (! $bvalues, $diff, undef, "$anum");
+    Test::skip (! $bvalues, $diff, undef, "$anum $name");
   } elsif (defined $diff) {
     print "$diff\n";
   }
@@ -191,6 +198,10 @@ sub diff_nums {
       }
       $diff = "different pos=$i numbers got=$got want=$want";
     }
+  }
+  if (@$gotaref < @$wantaref) {
+    if (defined $diff) { $diff .= ', '; }
+    $diff .= 'got ends prematurely';
   }
   return $diff;
 }
@@ -486,8 +497,7 @@ sub path_n_to_singles {
   my ($path, $n_end) = @_;
   my $ret = 0;
   foreach my $n ($path->n_start .. $n_end) {
-    my ($x,$y) = $path->n_to_xy($n) or next;
-    my @n_list = $path->xy_to_n_list($x,$y);
+    my @n_list = $path->n_to_n_list($n);
     if (@n_list == 1
         || (@n_list == 2
             && $n == $n_list[0]
@@ -507,8 +517,7 @@ sub path_n_to_doubles {
   my ($path, $n_end) = @_;
   my $ret = 0;
   foreach my $n ($path->n_start .. $n_end) {
-    my ($x,$y) = $path->n_to_xy($n) or next;
-    my @n_list = $path->xy_to_n_list($x,$y);
+    my @n_list = $path->n_to_n_list($n);
     if (@n_list == 2
         && $n == $n_list[0]
         && $n_list[1] <= $n_end) {
@@ -533,8 +542,7 @@ sub path_n_to_visited {
   my ($path, $n_end) = @_;
   my $ret = 0;
   foreach my $n ($path->n_start .. $n_end) {
-    my ($x,$y) = $path->n_to_xy($n) or next;
-    my @n_list = $path->xy_to_n_list($x,$y);
+    my @n_list = $path->n_to_n_list($n);
     if ($n_list[0] == $n) {  # relying on sorted @n_list
       $ret++;
     }

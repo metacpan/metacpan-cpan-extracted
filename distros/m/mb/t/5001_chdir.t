@@ -9,15 +9,18 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
+use vars qw($MSWin32_MBCS);
+$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+
 @test = (
 # 1
     sub {                                        mb::eval(q{ mkdir "5001.A", 0777; }) },
     sub {                                        mb::eval(q{ chdir "5001.A";       }) },
     sub {                                        mb::eval(q{ chdir "..";           }) },
     sub {                                        mb::eval(q{ rmdir "5001.A";       }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/;     mb::eval(q{ mkdir "5001.ソ",0777; }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ chdir "5001.ソ";      }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/;     mb::eval(q{ rmdir "5001.ソ";      }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS;     mb::eval(q{ mkdir "5001.ソ",0777; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ chdir "5001.ソ";      }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS;     mb::eval(q{ rmdir "5001.ソ";      }) },
     sub {1},
     sub {1},
     sub {1},

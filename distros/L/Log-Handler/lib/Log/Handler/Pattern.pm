@@ -41,7 +41,7 @@ use Time::HiRes;
 use Log::Handler::Output;
 use constant START_TIME => scalar Time::HiRes::gettimeofday;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 my $progname = $0;
 $progname =~ s@.*[/\\]@@;
 
@@ -56,7 +56,7 @@ sub get_pattern {
         '%P'  => {  name => 'pid',
                     code => \&_get_pid },
         '%H'  => {  name => 'hostname',
-                    code => \&Sys::Hostname::hostname },
+                    code => sub { Sys::Hostname::hostname() } },
         '%N'  => {  name => 'newline',
                     code => sub { "\n" } },
         '%S'  => {  name => 'progname',

@@ -22,7 +22,7 @@ use warnings;
 use Graph::Graph6;
 use Graph::Easy::Parser;
 
-our $VERSION = 7;
+our $VERSION = 8;
 our @ISA = ('Graph::Easy::Parser');
 
 # uncomment this to run the ### lines

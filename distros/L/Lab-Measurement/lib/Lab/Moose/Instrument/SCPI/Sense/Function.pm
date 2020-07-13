@@ -1,6 +1,8 @@
 package Lab::Moose::Instrument::SCPI::Sense::Function;
-$Lab::Moose::Instrument::SCPI::Sense::Function::VERSION = '3.703';
+$Lab::Moose::Instrument::SCPI::Sense::Function::VERSION = '3.710';
 #ABSTRACT: Role for the SCPI SENSe:FUNCtion subsystem
+
+use v5.20;
 
 use Moose::Role;
 use Lab::Moose::Instrument::Cache;
@@ -48,7 +50,7 @@ Lab::Moose::Instrument::SCPI::Sense::Function - Role for the SCPI SENSe:FUNCtion
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 DESCRIPTION
 
@@ -80,6 +82,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

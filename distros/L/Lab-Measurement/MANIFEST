@@ -247,6 +247,7 @@ lib/Lab/Moose/Instrument/SpectrumAnalyzer.pm
 lib/Lab/Moose/Instrument/VNASweep.pm
 lib/Lab/Moose/Instrument/Yokogawa7651.pm
 lib/Lab/Moose/Instrument/YokogawaGS200.pm
+lib/Lab/Moose/Instrument/ZI_HF2LI.pm
 lib/Lab/Moose/Instrument/ZI_MFIA.pm
 lib/Lab/Moose/Instrument/ZI_MFLI.pm
 lib/Lab/Moose/Instrument/Zhinst.pm

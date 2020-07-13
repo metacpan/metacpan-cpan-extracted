@@ -9,6 +9,7 @@ debian/source/format
 debian/watch
 devel/alphabetical-length.pl
 devel/lib/Math/NumSeq/numseq-oeis.t
+devel/seven-segments.pl
 lib/Math/NumSeq/AlphabeticalLength.pm
 lib/Math/NumSeq/AlphabeticalLengthSteps.pm
 lib/Math/NumSeq/OEIS/Catalogue/Plugin/Alpha.pm
@@ -32,6 +33,7 @@ xt/0-Test-YAML-Meta.t
 xt/MyOEIS.pm
 xt/oeis/AlphabeticalLength-oeis.t
 xt/oeis/NumSeq-Alpha-oeis.t
+xt/oeis/SevenSegments-oeis.t
 xtools/my-check-copyright-years.sh
 xtools/my-check-spelling.sh
 xtools/my-deb.sh

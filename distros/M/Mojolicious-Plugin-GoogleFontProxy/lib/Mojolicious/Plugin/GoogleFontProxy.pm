@@ -1,12 +1,12 @@
 package Mojolicious::Plugin::GoogleFontProxy;
 
-# ABSTRACT: a small proxy that can be useful when you embed gists in your website
+# ABSTRACT: a small proxy that can be useful when you use Google fonts in your website
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
-our $CSS_URL_FORMAT    = 'https://fonts.googleapis.com/css?family=%s';
+our $CSS_URL_FORMAT    = 'https://fonts.googleapis.com/css%s?family=%s';
 our $FONT_URL_FORMAT   = 'https://fonts.gstatic.com/s/%s';
 our $USER_AGENT_STRING = '';
 
@@ -28,17 +28,26 @@ sub register {
             return if $format ne 'html' && $format ne 'css';
 
             $$content =~ s{
-                https://fonts.googleapis.com/css\?family=(.*?)(['"])
-            }{$c->url_for( 'google-proxy-css', file => $1 ) . $2;}xge;
+                https://fonts.googleapis.com/css
+                    (?<version>[0-9]?)
+                    \?family=(?<file>.*?)
+                    (?<suffix>['"])
+            }{$c->url_for(
+                'google-proxy-css',
+                version => $+{version} || 0,
+                file    => $+{file},
+              ) . $+{suffix};
+            }xge;
         }
     );
 
-    $app->routes->get( '/google/css/*file' )->to( cb => sub {
+    $app->routes->get( '/google/css/:version/*file' )->to( cb => sub {
         my $c = shift;
 
         $c->render_later;
 
-        my $url = sprintf $CSS_URL_FORMAT, $c->param('file');
+        my $version   = $c->param('version') || '';
+        my $url       = sprintf $CSS_URL_FORMAT, $version, $c->param('file');
         my $ua_string = $USER_AGENT_STRING || $c->tx->req->headers->user_agent;
 
         $c->ua->get( $url => { 'User-Agent' => $ua_string } => sub {
@@ -80,11 +89,11 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::GoogleFontProxy - a small proxy that can be useful when you embed gists in your website
+Mojolicious::Plugin::GoogleFontProxy - a small proxy that can be useful when you use Google fonts in your website
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

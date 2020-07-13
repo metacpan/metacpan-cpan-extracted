@@ -9,6 +9,9 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
+use vars qw($MSWin32_MBCS);
+$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+
 @test = (
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 1
 ---
@@ -3985,105 +3988,105 @@ END2
 s/./1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_dot})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_dot]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 569
 s/\B/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_B})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_B]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 570
 s/\D/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_D})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_D]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 571
 s/\H/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_H})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_H]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 572
 s/\N/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_N})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_N]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 573
 s/\R/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_R})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_R]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 574
 s/\S/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_S})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_S]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 575
 s/\V/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_V})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_V]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 576
 s/\W/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_W})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_W]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 577
 s/\b/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_b})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_b]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 578
 s/\d/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_d})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_d]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 579
 s/\h/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_h})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_h]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 580
 s/\s/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_s})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_s]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 581
 s/\v/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_v})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_v]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 582
 s/\w/1/
 
 END1
-s{(\G${mb::_anchor})@{[qr/(?:@{mb::_w})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
+s{(\G${mb::_anchor})@{[qr/(?:@{[@mb::_w]})/ ]}@{[mb::_s_passed()]}}{$1 . qq /1/}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 583
@@ -4503,105 +4506,105 @@ END2
 s:.:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_dot})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_dot]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 643
 s:\B:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_B})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_B]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 644
 s:\D:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_D})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_D]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 645
 s:\H:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_H})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_H]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 646
 s:\N:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_N})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_N]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 647
 s:\R:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_R})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_R]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 648
 s:\S:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_S})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_S]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 649
 s:\V:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_V})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_V]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 650
 s:\W:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_W})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_W]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 651
 s:\b:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_b})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_b]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 652
 s:\d:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_d})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_d]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 653
 s:\h:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_h})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_h]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 654
 s:\s:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_s})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_s]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 655
 s:\v:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_v})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_v]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 656
 s:\w:1:
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_w})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_w]})` ]}@{[mb::_s_passed()]}}{$1 . qq :1:}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 657
@@ -5021,105 +5024,105 @@ END2
 s@.@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_dot})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_dot]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 717
 s@\B@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_B})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_B]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 718
 s@\D@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_D})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_D]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 719
 s@\H@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_H})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_H]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 720
 s@\N@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_N})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_N]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 721
 s@\R@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_R})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_R]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 722
 s@\S@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_S})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_S]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 723
 s@\V@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_V})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_V]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 724
 s@\W@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_W})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_W]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 725
 s@\b@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_b})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_b]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 726
 s@\d@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_d})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_d]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 727
 s@\h@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_h})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_h]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 728
 s@\s@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_s})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_s]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 729
 s@\v@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_v})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_v]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 730
 s@\w@1@
 
 END1
-s{(\G${mb::_anchor})@{[qr`(?:@{mb::_w})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
+s{(\G${mb::_anchor})@{[qr`(?:@{[@mb::_w]})` ]}@{[mb::_s_passed()]}}{$1 . qq @1@}e
 
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 731

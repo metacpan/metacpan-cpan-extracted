@@ -1,3 +1,10 @@
+v0.30.0 2020-07-12T17:10:32+0800
+  - Add a site-specific extractor for focustaiwan.tw
+  - Improve extraction of dateline and journailst for a few existing news sites.
+
+v0.29.0 2020-07-11T18:33:51+0800
+  - Add a site-specific extractor for news.cctv.com
+
 v0.28.0 2020-07-09T23:28:40+0800
   - Add a site-specific extractor for www.xinhuanet.com
   - Add a site-specific extractor for hk.on.cc

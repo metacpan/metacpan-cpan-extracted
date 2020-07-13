@@ -1,6 +1,8 @@
 package Lab::XPRESS::Sweep::Frame;
 #ABSTRACT: Frames for nested sweep structures
-$Lab::XPRESS::Sweep::Frame::VERSION = '3.703';
+$Lab::XPRESS::Sweep::Frame::VERSION = '3.710';
+use v5.20;
+
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
 use Lab::Exception;
@@ -84,7 +86,7 @@ Lab::XPRESS::Sweep::Frame - Frames for nested sweep structures
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -180,6 +182,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2014       Christian Butschkow
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

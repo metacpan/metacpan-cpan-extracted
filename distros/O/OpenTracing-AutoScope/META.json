@@ -33,11 +33,14 @@
       "runtime" : {
          "requires" : {
             "B::Hooks::EndOfScope" : "0",
+            "List::MoreUtils" : "0",
             "OpenTracing::GlobalTracer" : "0",
             "OpenTracing::Implementation::NoOp" : "0",
+            "PPI" : "0",
             "PerlX::Maybe" : "0",
             "Scope::Context" : "0",
-            "Sub::Info" : "0"
+            "Sub::Info" : "0",
+            "YAML::XS" : "0"
          }
       },
       "test" : {
@@ -48,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.101.0",
+   "version" : "v0.102.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

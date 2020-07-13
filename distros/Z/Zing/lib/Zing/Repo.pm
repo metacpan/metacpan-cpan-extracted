@@ -16,7 +16,7 @@ use Zing::Server;
 use Zing::Store;
 use Zing::Term;
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 # ATTRIBUTES
 
@@ -53,7 +53,7 @@ has 'target' => (
 );
 
 fun new_target($self) {
-  'local'
+  $ENV{ZING_TARGET} || 'local'
 }
 
 # METHODS
@@ -62,12 +62,8 @@ method drop(Str @keys) {
   return $self->store->drop($self->term(@keys));
 }
 
-method ids() {
-  return $self->store->keys($self->term);
-}
-
 method keys() {
-  return [map {my $re = quotemeta $self->term; s/^$re://r} @{$self->ids}];
+  return $self->store->keys($self->term);
 }
 
 method term(Str @keys) {
@@ -175,24 +171,6 @@ The drop method returns truthy if the data was removed from the store.
   # given: synopsis
 
   $repo->drop('text-1');
-
-=back
-
-=cut
-
-=head2 ids
-
-  ids() : ArrayRef[Str]
-
-The ids method returns a list of IDs (keys) stored under the datastore namespace.
-
-=over 4
-
-=item ids example #1
-
-  # given: synopsis
-
-  my $ids = $repo->ids;
 
 =back
 

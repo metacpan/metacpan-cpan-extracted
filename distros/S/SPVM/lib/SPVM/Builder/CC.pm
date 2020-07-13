@@ -29,36 +29,34 @@ sub category { shift->{category} }
 sub builder { shift->{builder} }
 
 sub build {
-  my ($self, $opt) = @_;
+  my ($self, $package_name, $opt) = @_;
+    
+  my $category = $self->{category};
+  my $sub_names;
+  if ($category eq 'native') {
+    $sub_names = $self->builder->get_native_sub_names($package_name)
+  }
+  elsif ($category eq 'precompile') {
+    $sub_names = $self->builder->get_precompile_sub_names($package_name)
+  }
   
-  my $package_names = $self->builder->get_package_names;
-  for my $package_name (@$package_names) {
+  if (@$sub_names) {
+    # Shared library is already installed in distribution directory
+    my $dll_file = $self->get_dll_file_dist($package_name);
     
-    my $category = $self->{category};
-    my $sub_names;
-    if ($category eq 'native') {
-      $sub_names = $self->builder->get_native_sub_names($package_name)
-    }
-    elsif ($category eq 'precompile') {
-      $sub_names = $self->builder->get_precompile_sub_names($package_name)
-    }
-    
-    if (@$sub_names) {
-      # Shared library is already installed in distribution directory
-      my $dll_file = $self->get_dll_file_dist($package_name);
-      
-      # Try runtime compile if shared objectrary is not found
-      unless (-f $dll_file) {
-        if ($category eq 'native') {
-          $self->build_dll_native_runtime($package_name, $sub_names);
-        }
-        elsif ($category eq 'precompile') {
-          $self->build_dll_precompile_runtime($package_name, $sub_names);
-        }
-        $dll_file = $self->get_dll_file_runtime($package_name);
+    # Try runtime compile if shared objectrary is not found
+    unless (-f $dll_file) {
+      if ($category eq 'native') {
+        $self->build_dll_native_runtime($package_name, $sub_names);
+        $self->builder->{already_build_native_packages_h}->{$package_name} = 1;
       }
-      $self->bind_subs($dll_file, $package_name, $sub_names);
+      elsif ($category eq 'precompile') {
+        $self->build_dll_precompile_runtime($package_name, $sub_names);
+        $self->builder->{already_build_precompile_packages_h}->{$package_name} = 1;
+      }
+      $dll_file = $self->get_dll_file_runtime($package_name);
     }
+    $self->bind_subs($dll_file, $package_name, $sub_names);
   }
 }
 
@@ -304,7 +302,7 @@ sub compile {
   my $cbuilder = ExtUtils::CBuilder->new(quiet => $quiet, config => $config);
   
   # Parse source code dependency
-  my $dependency = $self->_parse_native_src_dependency($native_include_dir, $native_src_dir);
+  my $dependency = $self->_parse_native_src_dependency($native_include_dir, $native_src_dir, $src_ext);
 
   # Native source files
   my @native_src_files = sort keys %$dependency;
@@ -396,7 +394,7 @@ sub compile {
 }
 
 sub _parse_native_src_dependency {
-  my ($self, $include_dir, $src_dir) = @_;
+  my ($self, $include_dir, $src_dir, $src_ext) = @_;
   
   # Get header files
   my @include_file_names;
@@ -441,6 +439,9 @@ sub _parse_native_src_dependency {
     
     my $match_at_least_one;
     for my $src_file_name (@src_file_names) {
+      # Skip if file have no source extension
+      next unless $src_file_name =~ /\Q.$src_ext\E$/;
+      
       my $src_file_name_no_ext_rel = $src_file_name;
       $src_file_name_no_ext_rel =~ s/^\Q$src_dir//;
       $src_file_name_no_ext_rel =~ s/^[\\\/]//;
@@ -456,6 +457,8 @@ sub _parse_native_src_dependency {
     # If not match at least one, we assume the header files is common file
     unless ($match_at_least_one) {
       for my $src_file_name (@src_file_names) {
+        # Skip if file have no source extension
+        next unless $src_file_name =~ /\Q.$src_ext\E$/;
         push @{$dependencies->{$src_file_name}}, $include_file_name;
       }
     }
@@ -795,3 +798,7 @@ sub create_source_precompile {
 }
 
 1;
+
+=head1 NAME
+
+SPVM::Builder::CC - Native code Compiler and linker. Wrapper of ExtUtils::CBuilder for SPVM

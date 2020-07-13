@@ -14,7 +14,7 @@ Lab::Measurement::Installation - Installation guide for Lab::Measurement
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 Introduction
 
@@ -27,7 +27,9 @@ see the documentation of these packages for more details.
 
 =over
 
-=item * Install L<Strawberry Perl|http://strawberryperl.com/download/5.20.3.3/strawberry-perl-5.20.3.3-32bit.msi>. If you want to use NI-VISA, see the comments on supported perl versions in L<Lab::VISA::Installation>
+=item * Install L<Strawberry
+Perl|http://strawberryperl.com/download/5.30.2.1/strawberry-perl-5.30.2.1-64bit.msi>. If
+you want to use NI-VISA (e.g. for GPIB, USB-TMC, or VXI-11 connections), see the comments on supported perl versions in L<Lab::VISA::Installation>
 
 =item * Install gnuplot 5 (not mandatory)
 
@@ -35,14 +37,14 @@ see the documentation of these packages for more details.
 
 =item * L<Download|http://sourceforge.net/project/showfiles.php?group_id=2055>, extract and put it somewhere
 
-=item * Add the directory containing C<gnuplot.exe> to the path:
-My Computer => Properties => Advanced => Environment Variables
+=item * During installation, check the option which adds the gnuplot to the
+PATH environment variable
 
 =back
 
 =item * Build and install. Open cmd.exe and run
 
- cpan -T Lab::Measurement
+ cpanm --verbose --no-test Lab::Measurement
 
 =item * If you need the NI-VISA backend for your instruments follow L<Lab::VISA's installation guide|Lab::VISA::Installation>
 
@@ -64,7 +66,7 @@ as far as possible. Full support for Lab::Measurement is  provided, e.g., by L<G
 
 =item * Install Lab::Measurement (as root):
 
- cpanm Lab::Measurement
+ cpanm --verbose Lab::Measurement
 
 =item * If you use GPIB, you need the
 L<Linux-GPIB|http://linux-gpib.sourceforge.net> drivers, library
@@ -92,6 +94,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2011-2012  Andreas K. Huettel
             2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
+            2020       Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -35,8 +35,11 @@ method: apply
 method: change
 method: decr
 method: del
+method: emit
 method: get
+method: ignore
 method: incr
+method: listen
 method: pop
 method: push
 method: set
@@ -62,10 +65,15 @@ Zing::Types
 
 =cut
 
+=inherits
+
+Zing::Channel
+
+=cut
+
 =attributes
 
-name: ro, req, Str
-channel: ro, opt, Channel
+metadata: ro, opt, HashRef
 
 =cut
 
@@ -156,6 +164,31 @@ del(Str $key) : Object
 
 =cut
 
+=method emit
+
+The emit method executes any callbacks registered using the L</listen> method
+associated with a specific key.
+
+=signature emit
+
+emit(Str $key, HashRef $data) : Object
+
+=example-1 emit
+
+  # given: synopsis
+
+  $domain->emit('email', { val => ['me@example.com'] });
+
+=example-2 emit
+
+  # given: synopsis
+
+  $domain->listen('email', sub { my ($self, $data) = @_; $self->{event} = $data; });
+
+  $domain->emit('email', { val => ['me@example.com'] });
+
+=cut
+
 =method get
 
 The get method return the data associated with a specific key.
@@ -180,6 +213,61 @@ get(Str $key) : Any
 
 =cut
 
+=method ignore
+
+The ignore method removes the callback specified by the L</listen>, or all
+callbacks associated with a specific key if no specific callback if provided.
+
+=signature ignore
+
+ignore(Str $key, Maybe[CodeRef] $sub) : Any
+
+=example-1 ignore
+
+  # given: synopsis
+
+  $domain->ignore('email');
+
+=example-2 ignore
+
+  # given: synopsis
+
+  my $callback = sub { my ($self, $data) = @_; $self->{event} = $data; };
+
+  $domain->listen('email', $callback);
+
+  $domain->ignore('email', $callback);
+
+=example-3 ignore
+
+  # given: synopsis
+
+  my $callback_1 = sub { my ($self, $data) = @_; $self->{event} = [$data, 2]; };
+
+  $domain->listen('email', $callback_1);
+
+  my $callback_2 = sub { my ($self, $data) = @_; $self->{event} = [$data, 1]; };
+
+  $domain->listen('email', $callback_2);
+
+  $domain->ignore('email', $callback_1);
+
+=example-4 ignore
+
+  # given: synopsis
+
+  my $callback_1 = sub { my ($self, $data) = @_; $self->{event} = [$data, 1]; };
+
+  $domain->listen('email', $callback_1);
+
+  my $callback_2 = sub { my ($self, $data) = @_; $self->{event} = [$data, 2]; };
+
+  $domain->listen('email', $callback_2);
+
+  $domain->ignore('email');
+
+=cut
+
 =method incr
 
 The incr method increments the data associated with a specific key.
@@ -199,6 +287,52 @@ incr(Str $key, Int $val = 1) : Object
   # given: synopsis
 
   $domain->incr('karma', 5);
+
+=cut
+
+=method listen
+
+The listen method registers callbacks associated with a specific key which
+will be invoked by the L</emit> method or whenever an event matching the key
+specified is received and applied.
+
+=signature listen
+
+listen(Str $key, CodeRef $sub) : Object
+
+=example-1 listen
+
+  # given: synopsis
+
+  $domain->ignore('email');
+
+  $domain->listen('email', sub { my ($self, $data) = @_; $self->{event} = $data; });
+
+=example-2 listen
+
+  # given: synopsis
+
+  $domain->ignore('email');
+
+  my $callback = sub { my ($self, $data) = @_; $self->{event} = $data; };
+
+  $domain->listen('email', $callback);
+
+  $domain->listen('email', $callback);
+
+=example-3 listen
+
+  # given: synopsis
+
+  $domain->ignore('email');
+
+  my $callback_1 = sub { my ($self, $data) = @_; $self->{event} = [$data, 1]; };
+
+  $domain->listen('email', $callback_1);
+
+  my $callback_2 = sub { my ($self, $data) = @_; $self->{event} = [$data, 2]; };
+
+  $domain->listen('email', $callback_2);
 
 =cut
 
@@ -351,6 +485,20 @@ $subs->example(-2, 'del', 'method', fun($tryable) {
   $result
 });
 
+$subs->example(-1, 'emit', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok !$result->{event};
+
+  $result
+});
+
+$subs->example(-2, 'emit', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result->{event}, { val => ['me@example.com'] };
+
+  $result
+});
+
 $subs->example(-1, 'get', 'method', fun($tryable) {
   ok !(my $result = $tryable->result);
 
@@ -360,6 +508,37 @@ $subs->example(-1, 'get', 'method', fun($tryable) {
 $subs->example(-2, 'get', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is $result, 'me@example.com';
+
+  $result
+});
+
+$subs->example(-1, 'ignore', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok !$result->handlers->{email};
+
+  $result
+});
+
+$subs->example(-2, 'ignore', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok !$result->handlers->{email};
+
+  $result
+});
+
+$subs->example(-3, 'ignore', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->handlers->{email};
+  is scalar(@{$result->handlers->{email}}), 1;
+  $result->emit('email', { val => [1] });
+  is_deeply $result->{event}, [{ val => [1] }, 1];
+
+  $result
+});
+
+$subs->example(-4, 'ignore', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok !$result->handlers->{email};
 
   $result
 });
@@ -374,6 +553,30 @@ $subs->example(-1, 'incr', 'method', fun($tryable) {
 $subs->example(-2, 'incr', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is $result->state->{karma}, 4;
+
+  $result
+});
+
+$subs->example(-1, 'listen', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->handlers->{email};
+  is scalar(@{$result->handlers->{email}}), 1;
+
+  $result
+});
+
+$subs->example(-2, 'listen', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->handlers->{email};
+  is scalar(@{$result->handlers->{email}}), 1;
+
+  $result
+});
+
+$subs->example(-3, 'listen', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  ok $result->handlers->{email};
+  is scalar(@{$result->handlers->{email}}), 2;
 
   $result
 });

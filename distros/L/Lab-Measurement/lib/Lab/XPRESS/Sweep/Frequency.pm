@@ -1,6 +1,8 @@
 package Lab::XPRESS::Sweep::Frequency;
-$Lab::XPRESS::Sweep::Frequency::VERSION = '3.703';
+$Lab::XPRESS::Sweep::Frequency::VERSION = '3.710';
 #ABSTRACT: Frequency sweep
+
+use v5.20;
 
 use Lab::XPRESS::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
@@ -100,7 +102,7 @@ Lab::XPRESS::Sweep::Frequency - Frequency sweep
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -266,6 +268,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

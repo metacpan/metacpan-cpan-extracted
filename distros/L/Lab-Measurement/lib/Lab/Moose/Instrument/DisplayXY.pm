@@ -1,8 +1,9 @@
 package Lab::Moose::Instrument::DisplayXY;
-$Lab::Moose::Instrument::DisplayXY::VERSION = '3.703';
+$Lab::Moose::Instrument::DisplayXY::VERSION = '3.710';
 #ABSTRACT: Display with y vs x traces Role for Lab::Moose::Instrument
 
-use 5.010;
+use v5.20;
+
 
 use PDL::Core qw/pdl cat nelem sclr/;
 use PDL::NiceSlice;
@@ -312,7 +313,7 @@ Lab::Moose::Instrument::DisplayXY - Display with y vs x traces Role for Lab::Moo
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 DESCRIPTION
 
@@ -456,6 +457,7 @@ Returns number of points in the trace.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Eugeniy E. Mikhailov, Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

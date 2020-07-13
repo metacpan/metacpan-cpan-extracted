@@ -46,8 +46,8 @@ sub _upload ( $self, $auth, $args, $on_start, $on_finish, $on_hash = undef ) {
 
             return 200,
               { id               => $id,
-                chunk_size       => $self->{upload_chunk_size},
-                hash_is_required => $args->{hash_is_required}
+                chunkSize       => $self->{upload_chunk_size},
+                hashIsRequired => $args->{hash_is_required}
               };
         }
 
@@ -77,7 +77,7 @@ sub _upload ( $self, $auth, $args, $on_start, $on_finish, $on_hash = undef ) {
             }
         }
 
-        my $chunk = P->data->from_b64( delete $args->{chunk} );
+        my $chunk = delete $args->{chunk};
 
         $upload->{uploaded_size} += length $chunk;
 

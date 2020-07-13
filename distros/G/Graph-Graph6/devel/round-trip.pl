@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2017 Kevin Ryde
+# Copyright 2015, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -19,6 +19,7 @@
 
 use 5.005;
 use strict;
+use IPC::Run;
 
 use Graph;
 use Graph::Writer::Graph6;
@@ -32,8 +33,24 @@ use Graph::Easy::As_graph6;
 use Graph::Easy::As_sparse6;
 
 # uncomment this to run the ### lines
-# use Smart::Comments;
+use Smart::Comments;
 
+
+my $nauty_copyg = '/so/nauty/nauty27b11/copyg';
+
+sub run_copyg {
+  my ($str, @args) = @_;
+  my $new_str;
+  unless (IPC::Run::run([$nauty_copyg, @args],
+                          '<',  \$str,
+                          '>',  \$new_str,
+                          '2>', \my $stderr_str)) {
+    print "nauty-copyg ",join(' ',@args)," error\n";
+    print $stderr_str;
+    exit 1;
+  }
+  return $new_str;
+}
 
 my $t = 0;
 my $count = 0;
@@ -44,17 +61,17 @@ for (;;) {
   }
   $count++;
 
-  my $graph = Graph->new;        # (undirected => 1);
-  my $easy = Graph::Easy->new;   # (undirected => 1);
+  my $graph = Graph->new      (undirected => 1);
+  my $easy = Graph::Easy->new (undirected => 1);
 
   my $num_vertices = int(rand(100)) + 1;
+  # $num_vertices = 8;
   my @vertices;
   foreach my $i (1 .. $num_vertices) {
     my $vertex = sprintf '%02d', $i;
     $graph->add_vertex($vertex);
     $easy->add_vertex($vertex);
   }
-  $num_vertices = 2;
 
   my $num_edges = int(rand(64));
   foreach (1 .. $num_edges) {
@@ -66,6 +83,7 @@ for (;;) {
   $num_edges = $graph->edges;
 
   my $header = int(rand(2));
+  # $header = 0;
 
   my $g6_str;
   {
@@ -95,6 +113,70 @@ for (;;) {
       print $d6_str;
     }
   }
+
+  {
+    # nauty-copyg graph6 unchanged
+    # Force copyg through sparse6 since input format == output format is
+    # merely a cat.
+    my $intermediate = run_copyg($g6_str, '-s');
+    my $new_str = run_copyg($intermediate, '-g');
+    if ($new_str ne $g6_str) {
+      print "\nnauty-copyg graph6\n";
+      print "num vertices $num_vertices\n";
+      print "num edges    $num_edges\n";
+      print "original:\n";
+      show_str($g6_str);
+      print "to s6 intermediate:\n";
+      show_str($intermediate);
+      print "round trip:\n";
+      show_str($new_str);
+      exit 1;
+    }
+  }
+
+  if ($graph->self_loop_vertices == 0) {
+    # nauty-copyg sparse6 unchanged
+    # Force copyg through graph6 since input format == output format is
+    # merely a cat.
+    my $intermediate = run_copyg($s6_str, '-g');
+    my $new_str = run_copyg($intermediate, '-s');
+    if ($new_str ne $s6_str) {
+      print "\nnauty-copyg sparse6\n";
+      print "num vertices $num_vertices\n";
+      print "num edges    $num_edges\n";
+      print "original:\n";
+      show_str($s6_str);
+      print "round trip:\n";
+      show_str($new_str);
+      exit 1;
+    }
+  }
+
+  # copyg to same output is merely a cat
+  # {
+  #   # nauty-copyg digraph6 unchanged
+  #   my ($new_str, $stderr_str);
+  #   unless (IPC::Run::run([$nauty_copyg, '-z'],
+  #                         '<',\$d6_str,
+  #                         '>',\$new_str,
+  #                         '2>',\$stderr_str)) {
+  #     print "nauty-copyg error\n";
+  #     print $stderr_str;
+  #     print "input:\n";
+  #     print $d6_str;
+  #     exit 1;
+  #   }
+  #   if ($new_str ne $d6_str) {
+  #     print "nauty-copyg digraph6\n";
+  #     print "num vertices $num_vertices\n";
+  #     print "num edges    $num_edges\n";
+  #     print "original:\n";
+  #     show_str($d6_str);
+  #     print "round trip:\n";
+  #     show_str($new_str);
+  #     exit 1;
+  #   }
+  # }
 
   {
     # Graph::Easy::Parser then ->as_graph6 same file content

@@ -1,9 +1,10 @@
 package Lab::Moose::Sweep::Continuous::Voltage;
-$Lab::Moose::Sweep::Continuous::Voltage::VERSION = '3.703';
+$Lab::Moose::Sweep::Continuous::Voltage::VERSION = '3.710';
 #ABSTRACT: Continuous sweep of voltage
 
+use v5.20;
 
-use 5.010;
+
 use Moose;
 use Carp;
 use Time::HiRes 'time';
@@ -27,7 +28,7 @@ Lab::Moose::Sweep::Continuous::Voltage - Continuous sweep of voltage
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -40,6 +41,7 @@ version 3.703
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

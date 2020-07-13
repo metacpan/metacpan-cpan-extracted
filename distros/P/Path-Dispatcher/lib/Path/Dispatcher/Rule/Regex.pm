@@ -1,9 +1,10 @@
 package Path::Dispatcher::Rule::Regex;
 # ABSTRACT: predicate is a regular expression
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
+use MooX::TypeTiny;
 use Types::Standard qw(RegexpRef);
 
 extends 'Path::Dispatcher::Rule';
@@ -61,7 +62,7 @@ Path::Dispatcher::Rule::Regex - predicate is a regular expression
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

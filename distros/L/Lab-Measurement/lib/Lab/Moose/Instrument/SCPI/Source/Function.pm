@@ -1,6 +1,8 @@
 package Lab::Moose::Instrument::SCPI::Source::Function;
-$Lab::Moose::Instrument::SCPI::Source::Function::VERSION = '3.703';
+$Lab::Moose::Instrument::SCPI::Source::Function::VERSION = '3.710';
 #ABSTRACT: Role for the SCPI SOURce:FUNCtion subsystem
+
+use v5.20;
 
 use Moose::Role;
 use Moose::Util::TypeConstraints 'enum';
@@ -40,7 +42,7 @@ Lab::Moose::Instrument::SCPI::Source::Function - Role for the SCPI SOURce:FUNCti
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 METHODS
 
@@ -57,6 +59,7 @@ Query/Set the type of output signal.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2017-2018  Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

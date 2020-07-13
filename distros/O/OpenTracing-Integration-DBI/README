@@ -1,0 +1,23 @@
+NAME
+
+    OpenTracing::Integration::DBI - support DBI tracing
+
+SYNOPSIS
+
+     use OpenTracing::Integration qw(DBI);
+     my $dbh = DBI->connect(...);
+     $dbh->selectall_arrayref(qw{select * from information_schema.tables});
+
+DESCRIPTION
+
+    See OpenTracing::Integration for more details.
+
+AUTHOR
+
+    Tom Molesworth TEAM@cpan.org
+
+LICENSE
+
+    Copyright Tom Molesworth 2020. Licensed under the same terms as Perl
+    itself.
+

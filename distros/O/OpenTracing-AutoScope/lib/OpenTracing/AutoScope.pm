@@ -3,7 +3,7 @@ package OpenTracing::AutoScope;
 use strict;
 use warnings;
 
-our $VERSION = '0.101.0';
+our $VERSION = 'v0.102.0';
 
 
 

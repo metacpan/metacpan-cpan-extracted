@@ -9,7 +9,7 @@ use Module::Runtime 'use_module';
 use CLI::Osprey::Descriptive;
 
 # ABSTRACT: Role for CLI::Osprey applications
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 sub _osprey_option_to_getopt {
@@ -96,10 +96,10 @@ sub _osprey_fix_argv {
     my $option_name;
     
     if ($dash eq '--') {
-      my $option_name = $abbreviations->{$arg_name_without_dash};
-      if (defined $option_name) {
-        if (@$option_name == 1) {
-          $option_name = $option_name->[0];
+      my $option_names = $abbreviations->{$arg_name_without_dash};
+      if (defined $option_names) {
+        if (@$option_names == 1) {
+          $option_name = $option_names->[0];
         } else {
           # TODO: can't we produce a warning saying that it's ambiguous and which options conflict?
           $option_name = undef;
@@ -349,7 +349,7 @@ CLI::Osprey::Role - Role for CLI::Osprey applications
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ use warnings;
 use Moo;
 
 # ABSTRACT: A class to wrap coderef subcommands
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 has 'name' => (
@@ -61,7 +61,7 @@ CLI::Osprey::InlineSubcommand - A class to wrap coderef subcommands
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 AUTHOR
 

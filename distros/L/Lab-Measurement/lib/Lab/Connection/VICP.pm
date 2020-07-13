@@ -1,6 +1,8 @@
 package Lab::Connection::VICP;
 #ABSTRACT: VICP ethernet protocol connection
-$Lab::Connection::VICP::VERSION = '3.703';
+$Lab::Connection::VICP::VERSION = '3.710';
+use v5.20;
+
 use strict;
 use Time::HiRes qw (usleep sleep);
 use Lab::Connection::GPIB;
@@ -88,7 +90,7 @@ Lab::Connection::VICP - VICP ethernet protocol connection
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -159,6 +161,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Charles Lane
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -1,10 +1,10 @@
 package Path::Dispatcher::Match;
 # ABSTRACT: the result of a successful rule match
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
-
+use MooX::TypeTiny;
 use Type::Utils qw(class_type);
 use Types::Standard qw(Str ArrayRef HashRef Undef);
 use Path::Dispatcher::Path;
@@ -87,7 +87,7 @@ Path::Dispatcher::Match - the result of a successful rule match
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@
 
 # 0-Test-Pod.t -- run Test::Pod if available
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2009, 2010, 2011 Kevin Ryde
 
 # 0-Test-Pod.t is shared by several distributions.
 #
@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License along
 # with this file.  If not, see <http://www.gnu.org/licenses/>.
 
+use 5.004;
 use strict;
-use warnings;
 use Test::More;
 
 # all_pod_files_ok() is new in Test::Pod 1.00

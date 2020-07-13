@@ -1,10 +1,10 @@
 package Path::Dispatcher::Rule::CodeRef;
 # ABSTRACT: predicate is any subroutine
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
-
+use MooX::TypeTiny;
 use Types::Standard qw(CodeRef);
 extends 'Path::Dispatcher::Rule';
 
@@ -39,7 +39,7 @@ Path::Dispatcher::Rule::CodeRef - predicate is any subroutine
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

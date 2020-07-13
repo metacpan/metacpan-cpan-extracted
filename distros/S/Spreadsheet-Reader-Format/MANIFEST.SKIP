@@ -1,0 +1,12 @@
+^t/01-load\.t
+^t/02-pod\.t
+^t/03-tap_harness_tests\.t
+^DevelopmentNotes.txt
+^.gitignore
+^.git
+^.build
+^blib/
+.*\.bin
+^MYMETA
+^Supporting_Documentation/.*
+^lib/Moose/*

@@ -1,11 +1,12 @@
 package Lab::Moose::Sweep;
-$Lab::Moose::Sweep::VERSION = '3.703';
+$Lab::Moose::Sweep::VERSION = '3.710';
 #ABSTRACT: Base class for high level sweeps
+
+use v5.20;
 
 # Step/List and Continuous sweep are implemented as subclasses
 
 
-use 5.010;
 use Moose;
 use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints 'enum';
@@ -506,7 +507,7 @@ Lab::Moose::Sweep - Base class for high level sweeps
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 DESCRIPTION
 
@@ -518,6 +519,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Simon Reinhardt
             2018       Andreas K. Huettel, Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

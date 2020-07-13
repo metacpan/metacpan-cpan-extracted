@@ -13,7 +13,7 @@ use Zing::Logic::Worker;
 
 extends 'Zing::Process';
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 # BUILDERS
 

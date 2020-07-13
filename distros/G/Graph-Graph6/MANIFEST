@@ -10,6 +10,7 @@ debian/watch
 devel/all9-1.dot
 devel/dimacs.pl
 devel/graphviz2.pl
+devel/hog-size-distribution.pl
 devel/hog.pl
 devel/lib/Graph/DIMACS.pm
 devel/lib/Graph/Writer/Matrix.pm
@@ -23,6 +24,9 @@ devel/taint.pl
 examples/graph-easy-print.pl
 examples/graph-random.pl
 examples/graphviz2-geng.pl
+examples/hog-fetch-all.pl
+examples/hog-fetch-search.pl
+examples/hog-fetch.pl
 lib/Graph/Easy/As_graph6.pm
 lib/Graph/Easy/As_sparse6.pm
 lib/Graph/Easy/Parser/Graph6.pm

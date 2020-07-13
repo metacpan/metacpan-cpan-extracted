@@ -1,6 +1,7 @@
 package Path::Dispatcher::Rule::Chain;
+# ABSTRACT: Chain rules for Path::Dispatcher
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
 extends 'Path::Dispatcher::Rule::Always';
@@ -33,11 +34,11 @@ __END__
 
 =head1 NAME
 
-Path::Dispatcher::Rule::Chain
+Path::Dispatcher::Rule::Chain - Chain rules for Path::Dispatcher
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SUPPORT
 

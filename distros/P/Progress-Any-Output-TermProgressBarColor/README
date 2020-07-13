@@ -3,9 +3,9 @@ NAME
     terminal as color bar
 
 VERSION
-    This document describes version 0.247 of
+    This document describes version 0.248 of
     Progress::Any::Output::TermProgressBarColor (from Perl distribution
-    Progress-Any-Output-TermProgressBarColor), released on 2020-06-20.
+    Progress-Any-Output-TermProgressBarColor), released on 2020-07-10.
 
 SYNOPSIS
      use Progress::Any::Output;

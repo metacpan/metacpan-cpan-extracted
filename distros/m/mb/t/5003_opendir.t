@@ -9,6 +9,9 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
+use vars qw($MSWin32_MBCS);
+$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+
 END {
     closedir(DIR1);
     closedir(DIR2);
@@ -23,7 +26,7 @@ END
     sub { not mb::eval(<<'END') },
         opendir(DIR2,"5003.NOTEXIST.A");
 END
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(<<'END') },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(<<'END') },
         opendir(DIR3,"5003.NOTEXIST.ソ");
 END
     sub {1},
@@ -66,20 +69,20 @@ END
     sub { mb::eval(q{ rmdir "5003.A"; }) },
     sub {1},
 # 31
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ mkdir "5003.ソ", 0777; }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ open FILE,">5003.ソ/A";  print FILE 'A'; close FILE; }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ open FILE,">5003.ソ/B";  print FILE 'A'; close FILE; }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ open FILE,">5003.ソ/C";  print FILE 'A'; close FILE; }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(<<'END') },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ mkdir "5003.ソ", 0777; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ open FILE,">5003.ソ/A";  print FILE 'A'; close FILE; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ open FILE,">5003.ソ/B";  print FILE 'A'; close FILE; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ open FILE,">5003.ソ/C";  print FILE 'A'; close FILE; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(<<'END') },
         opendir(DIR,"5003.ソ");
         @_ = readdir(DIR);
         closedir(DIR);
         scalar(@_) == 5;
 END
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ unlink "5003.ソ/A"; }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ unlink "5003.ソ/B"; }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ unlink "5003.ソ/C"; }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ rmdir "5003.ソ"; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ unlink "5003.ソ/A"; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ unlink "5003.ソ/B"; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ unlink "5003.ソ/C"; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ rmdir "5003.ソ"; }) },
     sub {1},
 #
 );

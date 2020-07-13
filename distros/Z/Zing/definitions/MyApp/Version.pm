@@ -5,6 +5,10 @@ use parent 'Zing::Process';
 
 our $VERSION = time;
 
+sub install {
+  [__PACKAGE__, [], 1]
+}
+
 sub perform {
   my ($self) = @_;
 

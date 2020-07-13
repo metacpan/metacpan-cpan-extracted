@@ -1,11 +1,7 @@
-use strict;
-use warnings;
-use Test::More tests => 1;
+use Test2::V0 -no_srand => 1;
 use FFI::Platypus;
 
 subtest 'Pascal' => sub {
-  plan tests => 3;
-
   my $ffi = FFI::Platypus->new(lang => 'Pascal');
   eval { $ffi->type('Integer') };
   is $@, '', 'int is not an okay type';
@@ -14,6 +10,6 @@ subtest 'Pascal' => sub {
   note $@;
   eval { $ffi->type('sint16') };
   is $@, '', 'sint16 is an okay type';
-
 };
 
+done_testing;

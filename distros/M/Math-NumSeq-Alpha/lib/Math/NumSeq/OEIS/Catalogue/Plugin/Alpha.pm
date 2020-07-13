@@ -1,4 +1,4 @@
-# Copyright 2012, 2013 Kevin Ryde
+# Copyright 2012, 2013, 2015, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq-Alpha.
 #
@@ -20,12 +20,12 @@ use 5.004;
 use strict;
 
 use vars '$VERSION', '@ISA';
-$VERSION = 3;
+$VERSION = 4;
 use Math::NumSeq::OEIS::Catalogue::Plugin;
 @ISA = ('Math::NumSeq::OEIS::Catalogue::Plugin');
 
 use constant::defer info_arrayref => sub {
-  # Lingua::Any::Numbers prior to version 0.45 fails to load in "perl -T"
+  # Lingua::Any::Numbers before version 0.45 fails to load in "perl -T"
   # taint mode.  Might like to treat that as no languages available, but
   # can't trap a taint error with an eval{}.  If you're using taint mode
   # then get Lingua::Any::Numbers version 0.45.
@@ -194,6 +194,11 @@ use constant::defer info_arrayref => sub {
            anum  => 'A010371',
            class => 'Math::NumSeq::SevenSegments',
            parameters => [ seven => 4, nine => 6 ],
+          },
+          {
+           anum  => 'A277116',
+           class => 'Math::NumSeq::SevenSegments',
+           parameters => [  ],
           },
 
          ];

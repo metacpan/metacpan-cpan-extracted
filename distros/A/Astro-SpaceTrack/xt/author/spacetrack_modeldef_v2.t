@@ -119,7 +119,7 @@ if ( $rslt->is_success() ) {
          "Field" : "APOGEE",
          "Key" : "",
          "Null" : "YES",
-         "Type" : "bigint(11)"
+         "Type" : "bigint(10) unsigned"
       },
       {
          "Default" : null,
@@ -127,7 +127,7 @@ if ( $rslt->is_success() ) {
          "Field" : "PERIGEE",
          "Key" : "",
          "Null" : "YES",
-         "Type" : "bigint(11)"
+         "Type" : "bigint(10) unsigned"
       },
       {
          "Default" : null,
@@ -824,11 +824,11 @@ if ( $rslt->is_success() ) {
    "controller" : "basicspacedata",
    "data" : [
       {
-         "Default" : null,
+         "Default" : "",
          "Extra" : "",
          "Field" : "COUNTRY",
          "Key" : "",
-         "Null" : "YES",
+         "Null" : "NO",
          "Type" : "varchar(100)"
       },
       {

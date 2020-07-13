@@ -4,7 +4,7 @@ use utf8;
 
 use Text::ANSI::Fold;
 
-my $fold = new Text::ANSI::Fold;
+my $fold = Text::ANSI::Fold->new;
 
 sub chops {
     my $obj = shift;
@@ -35,6 +35,16 @@ $fold->configure(text => "122333444455555", width => [ 1..5 ]);
 is_deeply(chops($fold),
 	  [ "1", "22", "333", "4444", "55555" ],
 	  "array (exact)");
+
+$fold->configure(text => "122333444455555", width => [ 1..4, -1 ]);
+is_deeply(chops($fold),
+	  [ "1", "22", "333", "4444", "55555" ],
+	  "array (negative)");
+
+$fold->configure(text => "122333444455555", width => [ 1, 2, 3, -1, 5 ]);
+is_deeply(chops($fold),
+	  [ "1", "22", "333", "444455555" ],
+	  "array (negative in the middle)");
 
 $fold->configure(text => "1223334444555556", width => [ 1..10 ]);
 is_deeply(chops($fold),

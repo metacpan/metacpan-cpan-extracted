@@ -13,6 +13,7 @@ cpanfile
 dist.ini
 lib/Test2/EventFacet/Coverage.pm
 lib/Test2/Plugin/Cover.pm
+t/extract.t
 t/lib/Fake1.pm
 t/lib/Fake2.pm
 t/open.t

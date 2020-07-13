@@ -1,9 +1,10 @@
 package Lab::Moose::Connection::Zhinst;
-$Lab::Moose::Connection::Zhinst::VERSION = '3.703';
+$Lab::Moose::Connection::Zhinst::VERSION = '3.710';
 #ABSTRACT: Connection back end to Zurich Instrument's LabOne measurement control API
 
+use v5.20;
 
-use 5.010;
+
 
 use Moose;
 use MooseX::Params::Validate;
@@ -199,7 +200,7 @@ Lab::Moose::Connection::Zhinst - Connection back end to Zurich Instrument's LabO
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -220,6 +221,7 @@ method calls. The YAML commands are produced in Lab::Moose::Instrument::Zhinst.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

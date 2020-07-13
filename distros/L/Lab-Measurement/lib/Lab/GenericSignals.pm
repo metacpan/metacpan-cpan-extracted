@@ -1,6 +1,8 @@
 package Lab::GenericSignals;
-$Lab::GenericSignals::VERSION = '3.703';
+$Lab::GenericSignals::VERSION = '3.710';
 #ABSTRACT: Signal handling
+
+use v5.20;
 
 use warnings;
 use strict;
@@ -33,7 +35,7 @@ Lab::GenericSignals - Signal handling
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -44,6 +46,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
             2019       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

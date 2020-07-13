@@ -79,7 +79,7 @@ int32_t SPVM_TOKE_convert_unicode_codepoint_to_utf8(int32_t uc, uint8_t* dst) {
 
 // Get token
 int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
-
+  
   // Save buf pointer
   compiler->befbufptr = compiler->bufptr;
 
@@ -103,6 +103,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
   compiler->state_var_expansion = SPVM_TOKE_C_STATE_VAR_EXPANSION_DEFAULT;
 
   while(1) {
+    if (compiler->bufptr == NULL) {
+      compiler->bufptr = "";
+    }
     // Get current character
     char ch = *compiler->bufptr;
     
@@ -151,6 +154,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               continue;
             }
             else {
+              // Add addede package names in this compile
+              SPVM_LIST_push(compiler->tmp_added_package_names, (void*)package_name);
+              
               // change :: to / and add ".spvm"
               int32_t cur_rel_file_length = (int32_t)(strlen(package_name) + 6);
               char* cur_rel_file = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, cur_rel_file_length + 1);
@@ -184,6 +190,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 cur_file = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, file_name_length + 1);
                 sprintf(cur_file, "%s/%s", include_path, cur_rel_file);
                 cur_file[file_name_length] = '\0';
+                
+                // \ is replaced to /
+                for (int32_t i = 0; i < file_name_length; i++) {
+                  if (cur_file[i] == '\\') {
+                    cur_file[i] = '/';
+                  }
+                }
                 
                 // Open source file
                 fh = fopen(cur_file, "rb");
@@ -1637,12 +1650,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   return BYTE;
                 }
                 break;
-              case 'B' :
-                if (strcmp(keyword, "BEGIN") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_BEGIN);
-                  return BEGIN;
-                }
-                break;
               case 'c' :
                 if (strcmp(keyword, "callback_t") == 0) {
                   SPVM_OP* op_descriptor = SPVM_OP_new_op_descriptor(compiler, SPVM_DESCRIPTOR_C_ID_CALLBACK_T, compiler->cur_file, compiler->cur_line);
@@ -1734,6 +1741,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "int") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_INT);
                   return INT;
+                }
+                break;
+              case 'I' :
+                if (strcmp(keyword, "INIT") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_INIT);
+                  return INIT;
                 }
                 break;
               case 'l' :

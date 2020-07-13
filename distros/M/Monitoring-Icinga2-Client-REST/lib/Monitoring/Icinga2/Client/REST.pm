@@ -10,7 +10,7 @@ use URI::Escape;
 use JSON;
 use Encode qw( encode_utf8 );
 use Scalar::Util 'looks_like_number';
-use version 0.77; our $VERSION = version->declare('2.0.3');
+use version 0.77; our $VERSION = version->declare('2.0.4');
 
 sub new {
     my ($class, $hostname, $port, $path, $version, $insecure) = @_;

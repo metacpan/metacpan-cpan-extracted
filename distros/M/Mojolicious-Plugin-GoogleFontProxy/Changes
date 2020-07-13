@@ -1,6 +1,10 @@
 Revision history for Mojolicious-Plugin-GoogleFontProxy
 =======================================================
 
+0.03  2020-07-10 12:14:00
+
+  * fix url parsing: there might be a version after 'css'
+
 0.02  2018-05-17 10:58:00
 
   * fix url replacement: take the delimiter found in the text...

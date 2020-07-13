@@ -1,9 +1,10 @@
 package Lab::Moose::Sweep::Step::Repeat;
-$Lab::Moose::Sweep::Step::Repeat::VERSION = '3.703';
+$Lab::Moose::Sweep::Step::Repeat::VERSION = '3.710';
 #ABSTRACT: Repeat something (e.g. some sweep) N times
 
+use v5.20;
 
-use 5.010;
+
 use Moose;
 use Carp;
 extends 'Lab::Moose::Sweep::Step';
@@ -41,7 +42,7 @@ Lab::Moose::Sweep::Step::Repeat - Repeat something (e.g. some sweep) N times
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -67,6 +68,7 @@ version 3.703
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

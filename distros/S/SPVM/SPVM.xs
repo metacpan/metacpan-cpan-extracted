@@ -13,11 +13,12 @@
 #include <inttypes.h>
 #include <stdint.h>
 
+#include "spvm_api.h"
+
 #include "spvm_compiler.h"
 #include "spvm_hash.h"
 #include "spvm_list.h"
 #include "spvm_util_allocator.h"
-#include "spvm_runtime.h"
 #include "spvm_op.h"
 #include "spvm_sub.h"
 #include "spvm_package.h"
@@ -34,20 +35,8 @@
 #include "spvm_string_buffer.h"
 #include "spvm_use.h"
 #include "spvm_limit.h"
-#include "spvm_runtime_info.h"
-
-#include "spvm_runtime_sub.h"
-
-#include "spvm_runtime.h"
-#include "spvm_runtime_api.h"
-#include "spvm_runtime_basic_type.h"
-#include "spvm_runtime_package.h"
-#include "spvm_runtime_sub.h"
-#include "spvm_runtime_field.h"
-#include "spvm_runtime_package_var.h"
-#include "spvm_runtime_arg.h"
-
-#include "spvm_runtime_info.h"
+#include "spvm_compiler_allocator.h"
+#include "spvm_my.h"
 
 static const char* MFILE = "SPVM.xs";
 
@@ -128,46 +117,45 @@ compile_spvm(...)
   (void)RETVAL;
   
   SV* sv_self = ST(0);
+  SV* sv_name = ST(1);
+  SV* sv_file = ST(2);
+  SV* sv_line = ST(3);
+  
   HV* hv_self = (HV*)SvRV(sv_self);
   
-  SPVM_COMPILER* compiler = SPVM_COMPILER_new();
-  
-  SV** sv_package_infos_ptr = hv_fetch(hv_self, "package_infos", strlen("package_infos"), 0);
-  SV* sv_package_infos = sv_package_infos_ptr ? *sv_package_infos_ptr : &PL_sv_undef;
-  AV* av_package_infos = (AV*)SvRV(sv_package_infos);
-  
-  int32_t av_package_infos_length = (int32_t)av_len(av_package_infos) + 1;
-  
-  {
-    int32_t i;
-    for (i = 0; i < av_package_infos_length; i++) {
-      SV** sv_package_info_ptr = av_fetch(av_package_infos, i, 0);
-      SV* sv_package_info = sv_package_info_ptr ? *sv_package_info_ptr : &PL_sv_undef;
-      HV* hv_package_info = (HV*)SvRV(sv_package_info);
-      
-      // Name
-      SV** sv_name_ptr = hv_fetch(hv_package_info, "name", strlen("name"), 0);
-      SV* sv_name = sv_name_ptr ? *sv_name_ptr : &PL_sv_undef;
-      const char* name = SvPV_nolen(sv_name);
-      
-      // File
-      SV** sv_file_ptr = hv_fetch(hv_package_info, "file", strlen("file"), 0);
-      SV* sv_file = sv_file_ptr ? *sv_file_ptr : &PL_sv_undef;
-      const char* file = SvPV_nolen(sv_file);
-      
-      // Line
-      SV** sv_line_ptr = hv_fetch(hv_package_info, "line", strlen("line"), 0);
-      SV* sv_line = sv_line_ptr ? *sv_line_ptr : &PL_sv_undef;
-      int32_t line = (int32_t)SvIV(sv_line);
-      
-      // push package to compiler use stack
-      SPVM_OP* op_name_package = SPVM_OP_new_op_name(compiler, name, file, line);
-      SPVM_OP* op_type_package = SPVM_OP_build_basic_type(compiler, op_name_package);
-      SPVM_OP* op_use_package = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, file, line);
-      SPVM_OP_build_use(compiler, op_use_package, op_type_package, NULL, 0);
-      SPVM_LIST_push(compiler->op_use_stack, op_use_package);
-    }
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  if (SvOK(sv_compiler)) {
+    compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   }
+  else {
+    compiler = SPVM_COMPILER_new();
+    size_t iv_compiler = PTR2IV(compiler);
+    SV* sviv_compiler = sv_2mortal(newSViv(iv_compiler));
+    SV* sv_compiler = sv_2mortal(newRV_inc(sviv_compiler));
+    (void)hv_store(hv_self, "compiler", strlen("compiler"), SvREFCNT_inc(sv_compiler), 0);
+  }
+  
+  // Name
+  const char* name = SvPV_nolen(sv_name);
+  char* name_copy = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, sv_len(sv_name) + 1);
+  memcpy(name_copy, name, sv_len(sv_name));
+  
+  // File
+  const char* file = SvPV_nolen(sv_file);
+  char* file_copy = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, sv_len(sv_file) + 1);
+  memcpy(file_copy, file, sv_len(sv_file));
+  
+  // Line
+  int32_t line = (int32_t)SvIV(sv_line);
+  
+  // push package to compiler use stack
+  SPVM_OP* op_name_package = SPVM_OP_new_op_name(compiler, name_copy, file_copy, line);
+  SPVM_OP* op_type_package = SPVM_OP_build_basic_type(compiler, op_name_package);
+  SPVM_OP* op_use_package = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_USE, file_copy, line);
+  SPVM_OP_build_use(compiler, op_use_package, op_type_package, NULL, 0);
+  SPVM_LIST_push(compiler->op_use_stack, op_use_package);
   
   // Add include paths
   AV* av_include_paths = get_av("main::INC", 0);;
@@ -183,6 +171,7 @@ compile_spvm(...)
   }
 
   // Compile SPVM
+  compiler->cur_package_base = compiler->packages->length;
   SPVM_COMPILER_compile(compiler);
 
   SV* sv_compile_success;
@@ -194,90 +183,8 @@ compile_spvm(...)
   }
   
   if (compiler->error_count == 0) {
-    // Copy package load path to builder
-    for (int32_t package_id = 0; package_id < compiler->packages->length; package_id++) {
-      SPVM_PACKAGE* package = SPVM_LIST_fetch(compiler->packages, package_id);
-      const char* package_name = package->name;
-      
-      const char* module_file = package->module_file;
-      SV* sv_module_file = sv_2mortal(newSVpv(module_file, 0));
-
-      SV** sv_packages_ptr = hv_fetch(hv_self, "packages", strlen("packages"), 0);
-      SV* sv_packages = sv_packages_ptr ? *sv_packages_ptr : &PL_sv_undef;
-      HV* hv_packages = (HV*)SvRV(sv_packages);
-      
-      // Create package info hash reference if not exists
-      {
-        SV** sv_package_info_ptr = hv_fetch(hv_packages, package_name, strlen(package_name), 0);
-        if (!sv_package_info_ptr) {
-          HV* hv_package_info = (HV*)sv_2mortal((SV*)newHV());
-          SV* sv_package_info = sv_2mortal(newRV_inc((SV*)hv_package_info));
-          (void)hv_store(hv_packages, package_name, strlen(package_name), SvREFCNT_inc(sv_package_info), 0);
-        }
-      }
-      
-      // Package
-      SV** sv_package_info_ptr = hv_fetch(hv_packages, package_name, strlen(package_name), 0);
-      SV* sv_package_info = sv_package_info_ptr ? *sv_package_info_ptr : &PL_sv_undef;
-      HV* hv_package_info = (HV*)SvRV(sv_package_info);
-      
-      // Package load path
-      (void)hv_store(hv_package_info, "module_file", strlen("module_file"), SvREFCNT_inc(sv_module_file), 0);
-
-      // Create subs hash reference if not exists
-      {
-        SV** sv_subs_ptr = hv_fetch(hv_package_info, "subs", strlen("subs"), 0);
-        if (!sv_subs_ptr) {
-          HV* hv_subs = (HV*)sv_2mortal((SV*)newHV());
-          SV* sv_subs = sv_2mortal(newRV_inc((SV*)hv_subs));
-          (void)hv_store(hv_package_info, "subs", strlen("subs"), SvREFCNT_inc(sv_subs), 0);
-        }
-      }
-
-      // Subroutines
-      SV** sv_subs_ptr = hv_fetch(hv_package_info, "subs", strlen("subs"), 0);
-      SV* sv_subs = sv_subs_ptr ? *sv_subs_ptr : &PL_sv_undef;
-      HV* hv_subs = (HV*)SvRV(sv_subs);
-      
-      for (int32_t sub_index = 0; sub_index < package->subs->length; sub_index++) {
-        SPVM_SUB* sub = SPVM_LIST_fetch(package->subs, sub_index);
-        const char* sub_name = sub->name;
-        SV* sv_sub_name = sv_2mortal(newSVpv(sub_name, 0));
-
-        // Create sub info hash reference if not exists
-        {
-          SV** sv_sub_info_ptr = hv_fetch(hv_subs, sub_name, strlen(sub_name), 0);
-          if (!sv_sub_info_ptr) {
-            HV* hv_sub_info = (HV*)sv_2mortal((SV*)newHV());
-            SV* sv_sub_info = sv_2mortal(newRV_inc((SV*)hv_sub_info));
-            (void)hv_store(hv_subs, sub_name, strlen(sub_name), SvREFCNT_inc(sv_sub_info), 0);
-          }
-        }
-        SV** sv_sub_info_ptr = hv_fetch(hv_subs, sub_name, strlen(sub_name), 0);
-        SV* sv_sub_info = sv_sub_info_ptr ? *sv_sub_info_ptr : &PL_sv_undef;
-        HV* hv_sub_info = (HV*)SvRV(sv_sub_info);
-        
-        // Subroutine have_native_desc
-        int32_t sub_have_native_desc = sub->flag & SPVM_SUB_C_FLAG_NATIVE;
-        SV* sv_sub_have_native_desc = sv_2mortal(newSViv(sub_have_native_desc));
-
-        // Subroutine have_precompile_desc
-        int32_t sub_have_precompile_desc = sub->flag & SPVM_SUB_C_FLAG_PRECOMPILE;
-        SV* sv_sub_have_precompile_desc = sv_2mortal(newSViv(sub_have_precompile_desc));
-
-        (void)hv_store(hv_sub_info, "have_native_desc", strlen("have_native_desc"), SvREFCNT_inc(sv_sub_have_native_desc), 0);
-        (void)hv_store(hv_sub_info, "have_precompile_desc", strlen("have_precompile_desc"), SvREFCNT_inc(sv_sub_have_precompile_desc), 0);
-      }
-    }
-    
-    // Build runtime_info info
-    SPVM_RUNTIME_INFO* runtime_info = SPVM_RUNTIME_INFO_build_runtime_info(compiler);
-    
-    // Build runtime
-    SPVM_RUNTIME* runtime = SPVM_RUNTIME_API_build_runtime(runtime_info);
-    
     // Create env
-    SPVM_ENV* env = SPVM_RUNTIME_API_create_env(runtime);
+    SPVM_ENV* env = SPVM_API_create_env(compiler);
     
     // Set ENV
     size_t iv_env = PTR2IV(env);
@@ -285,12 +192,207 @@ compile_spvm(...)
     SV* sv_env = sv_2mortal(newRV_inc(sviv_env));
     (void)hv_store(hv_self, "env", strlen("env"), SvREFCNT_inc(sv_env), 0);
   }
-
-  // Free compiler
-  SPVM_COMPILER_free(compiler);
   
   XPUSHs(sv_compile_success);
   
+  XSRETURN(1);
+}
+
+SV*
+get_precompile_sub_names(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_package_name = ST(1);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  // Name
+  const char* package_name = SvPV_nolen(sv_package_name);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  AV* av_precompile_sub_names = (AV*)sv_2mortal((SV*)newAV());
+  SV* sv_precompile_sub_names = sv_2mortal(newRV_inc((SV*)av_precompile_sub_names));
+  
+  // Copy package load path to builder
+  SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, package_name, strlen(package_name));
+
+  for (int32_t sub_index = 0; sub_index < package->subs->length; sub_index++) {
+    SPVM_SUB* sub = SPVM_LIST_fetch(package->subs, sub_index);
+    if (sub->flag & SPVM_SUB_C_FLAG_PRECOMPILE) {
+      const char* sub_name = sub->name;
+      SV* sv_sub_name = sv_2mortal(newSVpv(sub_name, 0));
+      av_push(av_precompile_sub_names, SvREFCNT_inc(sv_sub_name));
+    }
+  }
+  
+  XPUSHs(sv_precompile_sub_names);
+  XSRETURN(1);
+}
+
+SV*
+get_native_sub_names(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_package_name = ST(1);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  // Name
+  const char* package_name = SvPV_nolen(sv_package_name);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  AV* av_native_sub_names = (AV*)sv_2mortal((SV*)newAV());
+  SV* sv_native_sub_names = sv_2mortal(newRV_inc((SV*)av_native_sub_names));
+  
+  // Copy package load path to builder
+  SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, package_name, strlen(package_name));
+
+  for (int32_t sub_index = 0; sub_index < package->subs->length; sub_index++) {
+    SPVM_SUB* sub = SPVM_LIST_fetch(package->subs, sub_index);
+    if (sub->flag & SPVM_SUB_C_FLAG_NATIVE) {
+      const char* sub_name = sub->name;
+      SV* sv_sub_name = sv_2mortal(newSVpv(sub_name, 0));
+      av_push(av_native_sub_names, SvREFCNT_inc(sv_sub_name));
+    }
+  }
+  
+  XPUSHs(sv_native_sub_names);
+  XSRETURN(1);
+}
+
+SV*
+get_sub_names(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_package_name = ST(1);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  // Name
+  const char* package_name = SvPV_nolen(sv_package_name);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  AV* av_sub_names = (AV*)sv_2mortal((SV*)newAV());
+  SV* sv_sub_names = sv_2mortal(newRV_inc((SV*)av_sub_names));
+  
+  // Copy package load path to builder
+  SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, package_name, strlen(package_name));
+
+  for (int32_t sub_index = 0; sub_index < package->subs->length; sub_index++) {
+    SPVM_SUB* sub = SPVM_LIST_fetch(package->subs, sub_index);
+    const char* sub_name = sub->name;
+    SV* sv_sub_name = sv_2mortal(newSVpv(sub_name, 0));
+    av_push(av_sub_names, SvREFCNT_inc(sv_sub_name));
+  }
+  
+  XPUSHs(sv_sub_names);
+  XSRETURN(1);
+}
+
+SV*
+get_package_names(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  AV* av_package_names = (AV*)sv_2mortal((SV*)newAV());
+  SV* sv_package_names = sv_2mortal(newRV_inc((SV*)av_package_names));
+  
+  for (int32_t package_index = 0; package_index < compiler->packages->length; package_index++) {
+    SPVM_PACKAGE* package = SPVM_LIST_fetch(compiler->packages, package_index);
+    const char* package_name = package->name;
+    SV* sv_package_name = sv_2mortal(newSVpv(package_name, 0));
+    av_push(av_package_names, SvREFCNT_inc(sv_package_name));
+  }
+  
+  XPUSHs(sv_package_names);
+  XSRETURN(1);
+}
+
+SV*
+get_added_package_names(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  AV* av_added_package_names = (AV*)sv_2mortal((SV*)newAV());
+  SV* sv_added_package_names = sv_2mortal(newRV_inc((SV*)av_added_package_names));
+  
+  for (int32_t added_package_index = 0; added_package_index < compiler->added_packages->length; added_package_index++) {
+    SPVM_PACKAGE* added_package = SPVM_LIST_fetch(compiler->added_packages, added_package_index);
+    const char* added_package_name = added_package->name;
+    SV* sv_added_package_name = sv_2mortal(newSVpv(added_package_name, 0));
+    av_push(av_added_package_names, SvREFCNT_inc(sv_added_package_name));
+  }
+  
+  XPUSHs(sv_added_package_names);
+  XSRETURN(1);
+}
+
+SV*
+get_module_file(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  SV* sv_package_name = ST(1);
+
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  // Name
+  const char* package_name = SvPV_nolen(sv_package_name);
+
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  // Copy package load path to builder
+  SPVM_PACKAGE* package = SPVM_HASH_fetch(compiler->package_symtable, package_name, strlen(package_name));
+  const char* module_file = package->module_file;
+  SV* sv_module_file = sv_2mortal(newSVpv(module_file, 0));
+
+  XPUSHs(sv_module_file);
   XSRETURN(1);
 }
 
@@ -308,7 +410,7 @@ call_begin_blocks(...)
   SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
-  SPVM_RUNTIME_API_call_begin_blocks(env);
+  SPVM_API_call_begin_blocks(env);
 }
 
 SV*
@@ -324,10 +426,9 @@ DESTROY(...)
   SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
   if (SvOK(sv_env)) {
     SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-    SPVM_RUNTIME* runtime = env->runtime;
+    SPVM_COMPILER* compiler = env->compiler;
     
-    SPVM_RUNTIME_API_free_env(env);
-    SPVM_RUNTIME_API_free_runtime(runtime);
+    SPVM_API_free_env(env);
   }
 }
 
@@ -354,7 +455,7 @@ bind_sub_native(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
 
   // Package name
   const char* package_name = SvPV_nolen(sv_package_name);
@@ -366,14 +467,14 @@ bind_sub_native(...)
   void* native_address = INT2PTR(void*, SvIV(sv_native_address));
   
   // Basic type
-  SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_RUNTIME_API_basic_type(env, package_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
   
   // Package name
-  SPVM_RUNTIME_PACKAGE* package = &runtime->packages[basic_type->package_id];
+  SPVM_PACKAGE* package = basic_type->package;
   
   // Set native address to subroutine
-  SPVM_RUNTIME_SUB* sub = SPVM_RUNTIME_API_sub(env, package, sub_name);
-  runtime->sub_cfunc_addresses[sub->id] = native_address;
+  SPVM_SUB* sub = SPVM_API_sub(env, package, sub_name);
+  sub->native_address = native_address;
   
   XSRETURN(0);
 }
@@ -396,13 +497,13 @@ build_package_csource_precompile(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
   
   // Basic type
-  SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_RUNTIME_API_basic_type(env, package_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
   
   // Package name
-  SPVM_RUNTIME_PACKAGE* package = &runtime->packages[basic_type->package_id];
+  SPVM_PACKAGE* package = basic_type->package;
 
   int32_t package_id = package->id;
   
@@ -443,7 +544,7 @@ bind_sub_precompile(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
 
   // Package name
   const char* package_name = SvPV_nolen(sv_package_name);
@@ -452,13 +553,13 @@ bind_sub_precompile(...)
   const char* sub_name = SvPV_nolen(sv_sub_name);
   
   // Basic type
-  SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_RUNTIME_API_basic_type(env, package_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
   
   // Package name
-  SPVM_RUNTIME_PACKAGE* package = &runtime->packages[basic_type->package_id];
+  SPVM_PACKAGE* package = basic_type->package;
 
-  SPVM_RUNTIME_SUB* sub = SPVM_RUNTIME_API_sub(env, package, sub_name);
-  runtime->sub_cfunc_addresses[sub->id] = sub_precompile_address;
+  SPVM_SUB* sub = SPVM_API_sub(env, package, sub_name);
+  sub->precompile_address = sub_precompile_address;
   
   XSRETURN(0);
 }
@@ -1009,9 +1110,9 @@ _new_object_array(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
   
-  SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_RUNTIME_API_basic_type(env, basic_type_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, basic_type_name);
   assert(basic_type);
   
   // New array
@@ -1076,14 +1177,14 @@ _new_muldim_array(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
 
   int32_t element_type_dimension = (int32_t)SvIV(sv_element_type_dimension);
 
   // Element type id
   const char* basic_type_name = SvPV_nolen(sv_basic_type_name);
   
-  SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_RUNTIME_API_basic_type(env, basic_type_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, basic_type_name);
   assert(basic_type);
   
   // New array
@@ -1147,9 +1248,9 @@ _new_mulnum_array(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
   
-  SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_RUNTIME_API_basic_type(env, basic_type_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, basic_type_name);
   
   if (basic_type == NULL) {
     croak("Not found %s at %s line %d\n", basic_type_name, MFILE, __LINE__);
@@ -1167,16 +1268,16 @@ _new_mulnum_array(...)
 
     if (sv_derived_from(sv_element, "HASH")) {
       
-      SPVM_RUNTIME_PACKAGE* package = &runtime->packages[basic_type->package_id];
+      SPVM_PACKAGE* package = basic_type->package;
       assert(package);
       
-      SPVM_RUNTIME_FIELD* first_field = &runtime->fields[package->fields_base];
+      SPVM_FIELD* first_field = SPVM_LIST_fetch(package->fields, 0);
       assert(first_field);
 
       void* elems = (void*)env->get_elems_int(env, array);
       
       HV* hv_value = (HV*)SvRV(sv_element);
-      int32_t fields_length = package->fields_length;
+      int32_t fields_length = package->fields->length;
       // Field exists check
       int32_t hash_keys_length = 0;
       while (hv_iternext(hv_value)) {
@@ -1186,9 +1287,9 @@ _new_mulnum_array(...)
         croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
       }
 
-      for (int32_t field_index = 0; field_index < package->fields_length; field_index++) {
-        SPVM_RUNTIME_FIELD* field = &runtime->fields[package->fields_base + field_index];
-        const char* field_name = &runtime->string_pool[field->name_id];
+      for (int32_t field_index = 0; field_index < package->fields->length; field_index++) {
+        SPVM_FIELD* field = SPVM_LIST_fetch(package->fields, field_index);
+        const char* field_name = field->name;
         
         SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
         SV* sv_field_value;
@@ -1199,7 +1300,7 @@ _new_mulnum_array(...)
           croak("Value element must be defined at %s line %d\n", MFILE, __LINE__);
         }
 
-        switch (first_field->basic_type_id) {
+        switch (first_field->type->basic_type->id) {
           case SPVM_BASIC_TYPE_C_ID_BYTE: {
             ((int8_t*)elems)[(fields_length * index) + field_index] = (int8_t)SvIV(sv_field_value);
             break;
@@ -1265,28 +1366,28 @@ _new_mulnum_array_from_bin(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
   
-  SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_RUNTIME_API_basic_type(env, basic_type_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, basic_type_name);
   
   if (basic_type == NULL) {
-    const char* basic_type_name = &runtime->string_pool[basic_type->name_id];
+    const char* basic_type_name = basic_type->name;
     croak("Can't load %s at %s line %d\n", basic_type_name, MFILE, __LINE__);
   }
 
-  SPVM_RUNTIME_PACKAGE* package = &runtime->packages[basic_type->package_id];
+  SPVM_PACKAGE* package = basic_type->package;
   assert(package);
   
-  SPVM_RUNTIME_FIELD* first_field = &runtime->fields[package->fields_base];
+  SPVM_FIELD* first_field = SPVM_LIST_fetch(package->fields, 0);
   assert(first_field);
 
-  int32_t field_length = package->fields_length;
+  int32_t field_length = package->fields->length;
 
   int32_t array_length;
   
   
   int32_t field_width;
-  switch (first_field->basic_type_id) {
+  switch (first_field->type->basic_type->id) {
     case SPVM_BASIC_TYPE_C_ID_BYTE: {
       field_width = 1;
       break;
@@ -1326,7 +1427,7 @@ _new_mulnum_array_from_bin(...)
   int32_t basic_type_id = array->basic_type_id;
   int32_t dimension = array->type_dimension;
   
-  switch (first_field->basic_type_id) {
+  switch (first_field->type->basic_type->id) {
     case SPVM_BASIC_TYPE_C_ID_BYTE: {
       int8_t* elems = env->get_elems_byte(env, array);
       if (array_length > 0) {
@@ -1471,25 +1572,25 @@ call_sub(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
   
   const char* package_name = SvPV_nolen(sv_package_name);
   const char* sub_name = SvPV_nolen(sv_sub_name);
 
   // Basic type
-  SPVM_RUNTIME_BASIC_TYPE* basic_type = SPVM_RUNTIME_API_basic_type(env, package_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
   
   // Package name
-  SPVM_RUNTIME_PACKAGE* package = &runtime->packages[basic_type->package_id];
+  SPVM_PACKAGE* package = basic_type->package;
 
   if (package == NULL) {
     croak("Subroutine not found %s %s at %s line %d\n", package_name, sub_name, MFILE, __LINE__);
   }
-  SPVM_RUNTIME_SUB* sub = SPVM_RUNTIME_API_sub(env, package, sub_name);
+  SPVM_SUB* sub = SPVM_API_sub(env, package, sub_name);
   if (sub == NULL) {
     croak("Subroutine not found %s %s at %s line %d\n", package_name, sub_name, MFILE, __LINE__);
   }
-  const char* sub_signature = &runtime->string_pool[sub->signature_id];
+  const char* sub_signature = sub->signature;
   int32_t sub_id = env->get_sub_id(env, package_name, sub_name, sub_signature);
   if (sub_id < 0) {
     croak("Subroutine not found %s %s at %s line %d\n", package_name, sub_signature, MFILE, __LINE__);
@@ -1512,15 +1613,27 @@ call_sub(...)
     
     int32_t arg_index;
     // Check argument count
-    if (items - arg_start != sub->arg_ids_length) {
+    if (items - arg_start != sub->args->length) {
       croak("Invalid invocant or arguments count in %s->%s() at %s line %d\n", package_name, sub_name, MFILE, __LINE__);
     }
     
     int32_t arg_var_id = 0;
-    for (arg_index = 0; arg_index < sub->arg_ids_length; arg_index++) {
-      SPVM_RUNTIME_ARG* arg = &runtime->args[sub->arg_ids_base + arg_index];
+    for (arg_index = 0; arg_index < sub->args->length; arg_index++) {
+      SPVM_MY* arg = SPVM_LIST_fetch(sub->args, arg_index);
 
       SV* sv_value = ST(arg_index + arg_start);
+      
+      // Convert to runtime type
+      int32_t arg_runtime_basic_type_id;
+      int32_t arg_runtime_type_dimension;
+      if (arg->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING) {
+        arg_runtime_basic_type_id = SPVM_BASIC_TYPE_C_ID_BYTE;
+        arg_runtime_type_dimension = arg->type->dimension + 1;
+      }
+      else {
+        arg_runtime_basic_type_id = arg->type->basic_type->id;
+        arg_runtime_type_dimension = arg->type->dimension;
+      }
       
       switch (arg->runtime_type_category) {
         case SPVM_TYPE_C_RUNTIME_TYPE_BYTE : {
@@ -1563,16 +1676,16 @@ call_sub(...)
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
-            int32_t arg_basic_type_id = arg->basic_type_id;
-            SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+            int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+            SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-            SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+            SPVM_PACKAGE* arg_package = arg_basic_type->package;
             assert(arg_package);
 
-            SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+            SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
             assert(arg_first_field);
             
-            int32_t fields_length = arg_package->fields_length;
+            int32_t fields_length = arg_package->fields->length;
             // Field exists check
             int32_t hash_keys_length = 0;
             while (hv_iternext(hv_value)) {
@@ -1582,9 +1695,9 @@ call_sub(...)
               croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
             }
             
-            for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-              SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-              const char* field_name = &runtime->string_pool[field->name_id];
+            for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+              SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+              const char* field_name = field->name;
 
               SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
               SV* sv_field_value;
@@ -1597,7 +1710,7 @@ call_sub(...)
               int8_t value = (int8_t)SvIV(sv_field_value);
               stack[arg_var_id + field_index].bval = value;
             }
-            arg_var_id += arg_package->fields_length;
+            arg_var_id += arg_package->fields->length;
           }
           else {
             croak("%dth argument of %s::%s() must be hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
@@ -1608,16 +1721,16 @@ call_sub(...)
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
-            int32_t arg_basic_type_id = arg->basic_type_id;
-            SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+            int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+            SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-            SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+            SPVM_PACKAGE* arg_package = arg_basic_type->package;
             assert(arg_package);
 
-            SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+            SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
             assert(arg_first_field);
             
-            int32_t fields_length = arg_package->fields_length;
+            int32_t fields_length = arg_package->fields->length;
             // Field exists check
             int32_t hash_keys_length = 0;
             while (hv_iternext(hv_value)) {
@@ -1627,9 +1740,10 @@ call_sub(...)
               croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
             }
             
-            for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-              SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-              const char* field_name = &runtime->string_pool[field->name_id];
+            
+            for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+              SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+              const char* field_name = field->name;
 
               SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
               SV* sv_field_value;
@@ -1642,7 +1756,7 @@ call_sub(...)
               int16_t value = (int16_t)SvIV(sv_field_value);
               stack[arg_var_id + field_index].sval = value;
             }
-            arg_var_id += arg_package->fields_length;
+            arg_var_id += arg_package->fields->length;
           }
           else {
             croak("%dth argument of %s::%s() must be hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
@@ -1653,16 +1767,16 @@ call_sub(...)
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
-            int32_t arg_basic_type_id = arg->basic_type_id;
-            SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+            int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+            SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-            SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+            SPVM_PACKAGE* arg_package = arg_basic_type->package;
             assert(arg_package);
 
-            SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+            SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
             assert(arg_first_field);
             
-            int32_t fields_length = arg_package->fields_length;
+            int32_t fields_length = arg_package->fields->length;
             // Field exists check
             int32_t hash_keys_length = 0;
             while (hv_iternext(hv_value)) {
@@ -1672,9 +1786,9 @@ call_sub(...)
               croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
             }
 
-            for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-              SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-              const char* field_name = &runtime->string_pool[field->name_id];
+            for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+              SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+              const char* field_name = field->name;
 
               SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
               SV* sv_field_value;
@@ -1687,7 +1801,7 @@ call_sub(...)
               int32_t value = (int32_t)SvIV(sv_field_value);
               stack[arg_var_id + field_index].ival = value;
             }
-            arg_var_id += arg_package->fields_length;
+            arg_var_id += arg_package->fields->length;
           }
           else {
             croak("%dth argument of %s::%s() must be hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
@@ -1698,16 +1812,16 @@ call_sub(...)
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
-            int32_t arg_basic_type_id = arg->basic_type_id;
-            SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+            int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+            SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-            SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+            SPVM_PACKAGE* arg_package = arg_basic_type->package;
             assert(arg_package);
 
-            SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+            SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
             assert(arg_first_field);
             
-            int32_t fields_length = arg_package->fields_length;
+            int32_t fields_length = arg_package->fields->length;
             // Field exists check
             int32_t hash_keys_length = 0;
             while (hv_iternext(hv_value)) {
@@ -1717,9 +1831,9 @@ call_sub(...)
               croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
             }
             
-            for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-              SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-              const char* field_name = &runtime->string_pool[field->name_id];
+            for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+              SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+              const char* field_name = field->name;
 
               SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
               SV* sv_field_value;
@@ -1732,7 +1846,7 @@ call_sub(...)
               int64_t value = (int64_t)SvIV(sv_field_value);
               stack[arg_var_id + field_index].lval = value;
             }
-            arg_var_id += arg_package->fields_length;
+            arg_var_id += arg_package->fields->length;
           }
           else {
             croak("%dth argument of %s::%s() must be hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
@@ -1743,16 +1857,16 @@ call_sub(...)
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
-            int32_t arg_basic_type_id = arg->basic_type_id;
-            SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+            int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+            SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-            SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+            SPVM_PACKAGE* arg_package = arg_basic_type->package;
             assert(arg_package);
 
-            SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+            SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
             assert(arg_first_field);
             
-            int32_t fields_length = arg_package->fields_length;
+            int32_t fields_length = arg_package->fields->length;
             // Field exists check
             int32_t hash_keys_length = 0;
             while (hv_iternext(hv_value)) {
@@ -1762,9 +1876,9 @@ call_sub(...)
               croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
             }
             
-            for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-              SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-              const char* field_name = &runtime->string_pool[field->name_id];
+            for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+              SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+              const char* field_name = field->name;
 
               SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
               SV* sv_field_value;
@@ -1777,7 +1891,7 @@ call_sub(...)
               float value = (float)SvNV(sv_field_value);
               stack[arg_var_id + field_index].fval = value;
             }
-            arg_var_id += arg_package->fields_length;
+            arg_var_id += arg_package->fields->length;
           }
           else {
             croak("%dth argument of %s::%s() must be hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
@@ -1788,16 +1902,16 @@ call_sub(...)
           if (sv_derived_from(sv_value, "HASH")) {
             HV* hv_value = (HV*)SvRV(sv_value);
 
-            int32_t arg_basic_type_id = arg->basic_type_id;
-            SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+            int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+            SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-            SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+            SPVM_PACKAGE* arg_package = arg_basic_type->package;
             assert(arg_package);
 
-            SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+            SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
             assert(arg_first_field);
             
-            int32_t fields_length = arg_package->fields_length;
+            int32_t fields_length = arg_package->fields->length;
             // Field exists check
             int32_t hash_keys_length = 0;
             while (hv_iternext(hv_value)) {
@@ -1807,9 +1921,9 @@ call_sub(...)
               croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
             }
             
-            for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-              SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-              const char* field_name = &runtime->string_pool[field->name_id];
+            for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+              SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+              const char* field_name = field->name;
 
               SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
               SV* sv_field_value;
@@ -1822,7 +1936,7 @@ call_sub(...)
               double value = (double)SvNV(sv_field_value);
               stack[arg_var_id + field_index].dval = value;
             }
-            arg_var_id += arg_package->fields_length;
+            arg_var_id += arg_package->fields->length;
           }
           else {
             croak("%dth argument of %s::%s() must be hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
@@ -1842,7 +1956,7 @@ call_sub(...)
           }
           else {
             // If arument type is byte[] and value is perl non-ref-scalar, the value is converted to byte[]
-            if (arg->basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg->type_dimension == 1 && !SvROK(sv_value)) {
+            if (arg_runtime_basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg_runtime_type_dimension == 1 && !SvROK(sv_value)) {
               // Copy
               sv_value = sv_2mortal(newSVsv(sv_value));
               
@@ -1883,7 +1997,7 @@ call_sub(...)
               }
               
               // If arument type is byte[][] and first value of array reference is no-ref-scalar, the value is convert to byte[][]
-              if (arg->basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg->type_dimension == 2 && is_convert_to_string_array) {
+              if (arg_runtime_basic_type_id == SPVM_BASIC_TYPE_C_ID_BYTE && arg_runtime_type_dimension == 2 && is_convert_to_string_array) {
                 // New array
                 SPVM_OBJECT* array = env->new_muldim_array_raw(env, SPVM_BASIC_TYPE_C_ID_BYTE, 1, length);
 
@@ -1916,8 +2030,8 @@ call_sub(...)
                 sv_value = sv_marray;
               }
               // 1-dimension array
-              else if (arg->type_dimension == 1) {
-                switch (arg->basic_type_id) {
+              else if (arg_runtime_type_dimension == 1) {
+                switch (arg_runtime_basic_type_id) {
                   case SPVM_BASIC_TYPE_C_ID_BYTE: {
                     // New array
                     void* array = env->new_byte_array_raw(env, length);
@@ -2108,8 +2222,8 @@ call_sub(...)
             
             if (sv_isobject(sv_value) && sv_derived_from(sv_value, "SPVM::BlessedObject")) {
               SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_value);
-              int32_t arg_basic_type_id = arg->basic_type_id;
-              int32_t arg_type_dimension = arg->type_dimension;
+              int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+              int32_t arg_type_dimension = arg_runtime_type_dimension;
               
               if (arg_basic_type_id == SPVM_BASIC_TYPE_C_ID_OARRAY) {
                 if (object->type_dimension == 0) {
@@ -2245,16 +2359,16 @@ call_sub(...)
             croak("%dth argument of %s::%s() must be scalar reference to hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
           }
           
-          int32_t arg_basic_type_id = arg->basic_type_id;
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
       
-          SPVM_RUNTIME_FIELD* first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(first_field);
           
-          int32_t fields_length = arg_package->fields_length;
+          int32_t fields_length = arg_package->fields->length;
           // Field exists check
           int32_t hash_keys_length = 0;
           while (hv_iternext(hv_value)) {
@@ -2264,9 +2378,9 @@ call_sub(...)
             croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
           }
           
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
 
             SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
             SV* sv_field_value;
@@ -2312,16 +2426,16 @@ call_sub(...)
             croak("%dth argument of %s::%s() must be scalar reference to hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
           }
           
-          int32_t arg_basic_type_id = arg->basic_type_id;
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
       
-          SPVM_RUNTIME_FIELD* first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(first_field);
           
-          int32_t fields_length = arg_package->fields_length;
+          int32_t fields_length = arg_package->fields->length;
           // Field exists check
           int32_t hash_keys_length = 0;
           while (hv_iternext(hv_value)) {
@@ -2331,9 +2445,9 @@ call_sub(...)
             croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
           }
           
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
 
             SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
             SV* sv_field_value;
@@ -2378,16 +2492,16 @@ call_sub(...)
             croak("%dth argument of %s::%s() must be scalar reference to hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
           }
           
-          int32_t arg_basic_type_id = arg->basic_type_id;
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
       
-          SPVM_RUNTIME_FIELD* first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(first_field);
 
-          int32_t fields_length = arg_package->fields_length;
+          int32_t fields_length = arg_package->fields->length;
           // Field exists check
           int32_t hash_keys_length = 0;
           while (hv_iternext(hv_value)) {
@@ -2397,9 +2511,9 @@ call_sub(...)
             croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
           }
           
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
 
             SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
             SV* sv_field_value;
@@ -2444,16 +2558,16 @@ call_sub(...)
             croak("%dth argument of %s::%s() must be scalar reference to hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
           }
 
-          int32_t arg_basic_type_id = arg->basic_type_id;
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
       
-          SPVM_RUNTIME_FIELD* first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(first_field);
 
-          int32_t fields_length = arg_package->fields_length;
+          int32_t fields_length = arg_package->fields->length;
           // Field exists check
           int32_t hash_keys_length = 0;
           while (hv_iternext(hv_value)) {
@@ -2463,9 +2577,9 @@ call_sub(...)
             croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
           }
           
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
 
             SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
             SV* sv_field_value;
@@ -2510,16 +2624,16 @@ call_sub(...)
             croak("%dth argument of %s::%s() must be scalar reference to hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
           }
 
-          int32_t arg_basic_type_id = arg->basic_type_id;
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
       
-          SPVM_RUNTIME_FIELD* first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(first_field);
 
-          int32_t fields_length = arg_package->fields_length;
+          int32_t fields_length = arg_package->fields->length;
           // Field exists check
           int32_t hash_keys_length = 0;
           while (hv_iternext(hv_value)) {
@@ -2529,9 +2643,9 @@ call_sub(...)
             croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
           }
           
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
 
             SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
             SV* sv_field_value;
@@ -2576,16 +2690,16 @@ call_sub(...)
             croak("%dth argument of %s::%s() must be scalar reference to hash reference at %s line %d\n", arg_index + 1, package_name, sub_name, MFILE, __LINE__);
           }
 
-          int32_t arg_basic_type_id = arg->basic_type_id;
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          int32_t arg_basic_type_id = arg_runtime_basic_type_id;
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
 
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
       
-          SPVM_RUNTIME_FIELD* first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(first_field);
 
-          int32_t fields_length = arg_package->fields_length;
+          int32_t fields_length = arg_package->fields->length;
           // Field exists check
           int32_t hash_keys_length = 0;
           while (hv_iternext(hv_value)) {
@@ -2595,9 +2709,9 @@ call_sub(...)
             croak("Value element hash key is lacked at %s line %d\n", MFILE, __LINE__);
           }
           
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
 
             SV** sv_field_value_ptr = hv_fetch(hv_value, field_name, strlen(field_name), 0);
             SV* sv_field_value;
@@ -2623,6 +2737,17 @@ call_sub(...)
   }
   
   // Return
+
+  int32_t sub_return_runtime_basic_type_id;
+  int32_t sub_return_runtime_type_dimension;
+  if (sub->return_type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING) {
+    sub_return_runtime_basic_type_id = SPVM_BASIC_TYPE_C_ID_BYTE;
+    sub_return_runtime_type_dimension = sub->return_type->dimension + 1;
+  }
+  else {
+    sub_return_runtime_basic_type_id = sub->return_type->basic_type->id;
+    sub_return_runtime_type_dimension = sub->return_type->dimension;
+  }
   SV* sv_return_value = NULL;
   int32_t excetpion_flag = 0;
   switch (sub->return_runtime_type_category) {
@@ -2633,26 +2758,23 @@ call_sub(...)
     case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_FLOAT:
     case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_DOUBLE:
     {
-      int32_t sub_return_basic_type_id = sub->return_basic_type_id;
-      int32_t sub_return_type_dimension = sub->return_type_dimension;
-
       excetpion_flag = env->call_sub(env, sub_id, stack);
       
-      SPVM_RUNTIME_BASIC_TYPE* sub_return_basic_type = &runtime->basic_types[sub_return_basic_type_id];
+      SPVM_BASIC_TYPE* sub_return_basic_type = SPVM_LIST_fetch(compiler->basic_types, sub_return_runtime_basic_type_id);
 
-      SPVM_RUNTIME_PACKAGE* sub_return_package = &runtime->packages[sub_return_basic_type->package_id];
+      SPVM_PACKAGE* sub_return_package = sub_return_basic_type->package;
       assert(sub_return_package);
       
-      SPVM_RUNTIME_FIELD* sub_return_first_field = &runtime->fields[sub_return_package->fields_base];
+      SPVM_FIELD* sub_return_first_field = SPVM_LIST_fetch(sub_return_package->fields, 0);
       assert(sub_return_first_field);
       
       HV* hv_value = (HV*)sv_2mortal((SV*)newHV());
-      for (int32_t field_index = 0; field_index < sub_return_package->fields_length; field_index++) {
-        SPVM_RUNTIME_FIELD* field = &runtime->fields[sub_return_package->fields_base + field_index];
-        const char* field_name = &runtime->string_pool[field->name_id];
+      for (int32_t field_index = 0; field_index < sub_return_package->fields->length; field_index++) {
+        SPVM_FIELD* field = SPVM_LIST_fetch(sub_return_package->fields, field_index);
+        const char* field_name = field->name;
         
         SV* sv_field_value = NULL;
-        switch (sub_return_first_field->basic_type_id) {
+        switch (sub_return_first_field->type->basic_type->id) {
           case SPVM_BASIC_TYPE_C_ID_BYTE: {
             sv_field_value = sv_2mortal(newSViv(stack[field_index].bval));
             break;
@@ -2692,6 +2814,7 @@ call_sub(...)
     case SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY:
     case SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY:
     {
+
       excetpion_flag = env->call_sub(env, sub_id, stack);
       if (!excetpion_flag) {
         void* return_value = stack[0].oval;
@@ -2699,12 +2822,12 @@ call_sub(...)
         if (return_value != NULL) {
           env->inc_ref_count(env, return_value);
           
-          if (sub->return_type_dimension > 0 || sub->return_basic_type_id == SPVM_BASIC_TYPE_C_ID_OARRAY) {
+          if (sub_return_runtime_type_dimension > 0 || sub_return_runtime_basic_type_id == SPVM_BASIC_TYPE_C_ID_OARRAY) {
             sv_return_value = SPVM_XS_UTIL_new_sv_object(env, return_value, "SPVM::BlessedObject::Array");
           }
-          else if (sub->return_type_dimension == 0) {
-            SPVM_RUNTIME_BASIC_TYPE* sub_return_basic_type = &runtime->basic_types[env->get_object_basic_type_id(env, return_value)];
-            const char* basic_type_name = &runtime->string_pool[sub_return_basic_type->name_id];
+          else if (sub_return_runtime_type_dimension == 0) {
+            SPVM_BASIC_TYPE* sub_return_basic_type = SPVM_LIST_fetch(compiler->basic_types, env->get_object_basic_type_id(env, return_value));
+            const char* basic_type_name = sub_return_basic_type->name;
 
             SV* sv_basic_type_name = sv_2mortal(newSVpv(basic_type_name, 0));
             
@@ -2772,10 +2895,23 @@ call_sub(...)
 
   // Restore reference value
   if (args_contain_ref) {
-    for (int32_t arg_index = 0; arg_index < sub->arg_ids_length; arg_index++) {
+    for (int32_t arg_index = 0; arg_index < sub->args->length; arg_index++) {
       SV* sv_value = ST(arg_index + arg_start);
       
-      SPVM_RUNTIME_ARG* arg = &runtime->args[sub->arg_ids_base + arg_index];
+      SPVM_MY* arg = SPVM_LIST_fetch(sub->args, arg_index);
+      
+      // Convert to runtime type
+      int32_t arg_runtime_basic_type_id;
+      int32_t arg_runtime_type_dimension;
+      if (arg->type->basic_type->id == SPVM_BASIC_TYPE_C_ID_STRING) {
+        arg_runtime_basic_type_id = SPVM_BASIC_TYPE_C_ID_BYTE;
+        arg_runtime_type_dimension = arg->type->dimension + 1;
+      }
+      else {
+        arg_runtime_basic_type_id = arg->type->basic_type->id;
+        arg_runtime_type_dimension = arg->type->dimension;
+      }
+
       int32_t ref_stack_id = ref_stack_ids[arg_index];
       switch (arg->runtime_type_category) {
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_BYTE : {
@@ -2809,90 +2945,90 @@ call_sub(...)
           break;
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_BYTE: {
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
-          SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(arg_first_field);
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
             SV* sv_field_value = sv_2mortal(newSViv(((int8_t*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_SHORT: {
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
-          SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(arg_first_field);
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
             SV* sv_field_value = sv_2mortal(newSViv(((int16_t*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_INT: {
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
-          SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(arg_first_field);
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
             SV* sv_field_value = sv_2mortal(newSViv(((int32_t*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_LONG: {
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
-          SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(arg_first_field);
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
             SV* sv_field_value = sv_2mortal(newSViv(((int64_t*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_FLOAT: {
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
-          SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(arg_first_field);
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
             SV* sv_field_value = sv_2mortal(newSVnv(((float*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
           break;
         }
         case SPVM_TYPE_C_RUNTIME_TYPE_REF_MULNUM_DOUBLE: {
-          SPVM_RUNTIME_BASIC_TYPE* arg_basic_type = &runtime->basic_types[arg->basic_type_id];
+          SPVM_BASIC_TYPE* arg_basic_type = SPVM_LIST_fetch(compiler->basic_types, arg_runtime_basic_type_id);
           HV* hv_value = (HV*)SvRV(SvRV(sv_value));
-          SPVM_RUNTIME_PACKAGE* arg_package = &runtime->packages[arg_basic_type->package_id];
+          SPVM_PACKAGE* arg_package = arg_basic_type->package;
           assert(arg_package);
-          SPVM_RUNTIME_FIELD* arg_first_field = &runtime->fields[arg_package->fields_base];
+          SPVM_FIELD* arg_first_field = SPVM_LIST_fetch(arg_package->fields, 0);
           assert(arg_first_field);
-          for (int32_t field_index = 0; field_index < arg_package->fields_length; field_index++) {
-            SPVM_RUNTIME_FIELD* field = &runtime->fields[arg_package->fields_base + field_index];
-            const char* field_name = &runtime->string_pool[field->name_id];
+          for (int32_t field_index = 0; field_index < arg_package->fields->length; field_index++) {
+            SPVM_FIELD* field = SPVM_LIST_fetch(arg_package->fields, field_index);
+            const char* field_name = field->name;
             SV* sv_field_value = sv_2mortal(newSVnv(((double*)&ref_stack[ref_stack_id])[field_index]));
             (void)hv_store(hv_value, field_name, strlen(field_name), SvREFCNT_inc(sv_field_value), 0);
           }
@@ -2938,7 +3074,7 @@ to_elems(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
 
   // Array must be SPVM::BlessedObject::Array or SPVM::BlessedObject::Array
   if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::BlessedObject::Array"))) {
@@ -2956,30 +3092,30 @@ to_elems(...)
   
   AV* av_values = (AV*)sv_2mortal((SV*)newAV());
   if (is_array_type) {
-    SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
+    SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
     int32_t element_type_dimension = dimension - 1;
 
     if (array->runtime_type_category == SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY) {
       
       for (int32_t index = 0; index < length; index++) {
-        SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[array->basic_type_id];
+        SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, array->basic_type_id);
         
-        SPVM_RUNTIME_PACKAGE* package = &runtime->packages[basic_type->package_id];
+        SPVM_PACKAGE* package = basic_type->package;
         assert(package);
         
-        SPVM_RUNTIME_FIELD* first_field = &runtime->fields[package->fields_base];
+        SPVM_FIELD* first_field = SPVM_LIST_fetch(package->fields, 0);
         assert(first_field);
 
         void* elems = (void*)env->get_elems_int(env, array);
         
         HV* hv_value = (HV*)sv_2mortal((SV*)newHV());
-        int32_t field_length = package->fields_length;
-        for (int32_t field_index = 0; field_index < package->fields_length; field_index++) {
-          SPVM_RUNTIME_FIELD* field = &runtime->fields[package->fields_base + field_index];
-          const char* field_name = &runtime->string_pool[field->name_id];
+        int32_t field_length = package->fields->length;
+        for (int32_t field_index = 0; field_index < package->fields->length; field_index++) {
+          SPVM_FIELD* field = SPVM_LIST_fetch(package->fields, field_index);
+          const char* field_name = field->name;
 
           SV* sv_field_value;
-          switch (first_field->basic_type_id) {
+          switch (first_field->type->basic_type->id) {
             case SPVM_BASIC_TYPE_C_ID_BYTE: {
               int8_t field_value = ((int8_t*)elems)[(field_length * index) + field_index];
               sv_field_value = sv_2mortal(newSViv(field_value));
@@ -3023,7 +3159,7 @@ to_elems(...)
     else if (array->runtime_type_category == SPVM_TYPE_C_RUNTIME_TYPE_OBJECT_ARRAY) {
       for (int32_t index = 0; index < length; index++) {
         // Element type id
-        SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[array->basic_type_id];
+        SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, array->basic_type_id);
 
         // Index
         SPVM_OBJECT* value = env->get_elem_object(env, array, index);
@@ -3038,7 +3174,7 @@ to_elems(...)
             sv_value = SPVM_XS_UTIL_new_sv_object(env, value, "SPVM::BlessedObject::Array");
           }
           else {
-            const char* basic_type_name = &runtime->string_pool[basic_type->name_id];
+            const char* basic_type_name = basic_type->name;
             SV* sv_basic_type_name = sv_2mortal(newSVpv(basic_type_name, 0));
             sv_value = SPVM_XS_UTIL_new_sv_object(env, value, SvPV_nolen(sv_basic_type_name));
           }
@@ -3142,7 +3278,7 @@ to_bin(...)
   SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
   
   // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)env->runtime;
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
 
   // Array must be SPVM::BlessedObject::Array object or SPVM::BlessedObject::Sgtring
   if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::BlessedObject::Array"))) {
@@ -3160,19 +3296,19 @@ to_bin(...)
   
   SV* sv_bin;
   if (is_array_type) {
-    SPVM_RUNTIME_BASIC_TYPE* basic_type = &runtime->basic_types[basic_type_id];
+    SPVM_BASIC_TYPE* basic_type = SPVM_LIST_fetch(compiler->basic_types, basic_type_id);
     int32_t element_type_dimension = dimension - 1;
 
     if (array->runtime_type_category == SPVM_TYPE_C_RUNTIME_TYPE_MULNUM_ARRAY) {
-      SPVM_RUNTIME_PACKAGE* package = &runtime->packages[basic_type->package_id];
+      SPVM_PACKAGE* package = basic_type->package;
       assert(package);
       
-      SPVM_RUNTIME_FIELD* first_field = &runtime->fields[package->fields_base];
+      SPVM_FIELD* first_field = SPVM_LIST_fetch(package->fields, 0);
       assert(first_field);
 
-      int32_t field_length = package->fields_length;
+      int32_t field_length = package->fields->length;
 
-      switch (first_field->basic_type_id) {
+      switch (first_field->type->basic_type->id) {
         case SPVM_BASIC_TYPE_C_ID_BYTE: {
           int8_t* elems = env->get_elems_byte(env, array);
           

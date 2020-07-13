@@ -35,6 +35,9 @@ void
 hb_buffer_clear_contents( hb_buffer_t *buf )
 
 void
+hb_buffer_reset( hb_buffer_t *buf )
+
+void
 hb_buffer_add_utf8(hb_buffer_t *buf, bytestring_t s, size_t length(s), unsigned int offset=0, size_t len=-1)
 
 hb_blob_t *
@@ -81,6 +84,62 @@ PREINIT:
 CODE:
   lang = hb_buffer_get_language(buf);
   s = hb_language_to_string(lang);
+  RETVAL = newSVpvn(s, strlen(s));
+OUTPUT:
+  RETVAL
+
+int
+hb_buffer_set_script( hb_buffer_t *buf, bytestring_t s, size_t length(s) )
+PREINIT:
+  hb_script_t script;
+CODE:
+  script = hb_script_from_string(s, XSauto_length_of_s);
+  if ( script ) {
+    hb_buffer_set_script( buf, script );
+    RETVAL = 1;
+  }
+  else
+    XSRETURN_UNDEF;
+OUTPUT:
+  RETVAL
+
+SV *
+hb_buffer_get_script( hb_buffer_t *buf )
+PREINIT:
+  hb_script_t script;
+  hb_tag_t tag;
+  char s[5];
+CODE:
+  script = hb_buffer_get_script(buf);
+  tag = hb_script_to_iso15924_tag(script);
+  hb_tag_to_string(tag, s);
+  RETVAL = newSVpvn(s, 4);
+OUTPUT:
+  RETVAL
+
+int
+hb_buffer_set_direction( hb_buffer_t *buf, bytestring_t s, size_t length(s) )
+PREINIT:
+  hb_direction_t dir;
+CODE:
+  dir = hb_direction_from_string(s, XSauto_length_of_s);
+  if ( dir ) {
+    hb_buffer_set_direction( buf, dir );
+    RETVAL = 1;
+  }
+  else
+    XSRETURN_UNDEF;
+OUTPUT:
+  RETVAL
+
+SV *
+hb_buffer_get_direction( hb_buffer_t *buf )
+PREINIT:
+  hb_direction_t dir;
+  const char *s;
+CODE:
+  dir = hb_buffer_get_direction(buf);
+  s = hb_direction_to_string(dir);
   RETVAL = newSVpvn(s, strlen(s));
 OUTPUT:
   RETVAL

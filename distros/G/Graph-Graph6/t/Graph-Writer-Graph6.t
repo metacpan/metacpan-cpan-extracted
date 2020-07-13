@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License along
 # with Graph-Graph6.  If not, see <http://www.gnu.org/licenses/>.
 
+use 5.006;
 use strict;
 use Test;
 
@@ -33,7 +34,7 @@ use lib 't';
 use MyTestHelpers;
 BEGIN { MyTestHelpers::nowarnings() }
 
-my $test_count = (tests => 15)[1];
+my $test_count = (tests => 17)[1];
 plan tests => $test_count;
 
 if (! $have_graph) {
@@ -64,7 +65,7 @@ my $filename = 'Graph-Writer-Graph6-t.tmp';
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 7;
+  my $want_version = 8;
   ok ($Graph::Writer::Graph6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Writer::Graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Writer::Graph6->VERSION($want_version); 1 }, 1,
@@ -77,17 +78,8 @@ my $filename = 'Graph-Writer-Graph6-t.tmp';
 #------------------------------------------------------------------------------
 # formats.txt graph6 example
 
-# write to fh and read back
-sub try_write {
-  my ($graph, @options) = @_;
-  {
-    my $writer = Graph::Writer::Graph6->new (@options);
-    my $fh;
-    (open $fh, '+>', $filename
-     and $writer->write_graph($graph, $fh)
-     and close $fh
-    ) or die "Cannot write $filename; $!";
-  }
+# Return the slurped content of $filename.
+sub filename_read_and_remove {
   my $str;
   {
     my $fh;
@@ -98,6 +90,15 @@ sub try_write {
   }
   unlink $filename;
   return $str;
+}
+
+# Write $graph to $filename, with writer "@options".
+# Read back the graph6 string from $filename and return that string.
+sub try_write {
+  my ($graph, @options) = @_;
+  my $writer = Graph::Writer::Graph6->new (@options);
+  $writer->write_graph($graph, $filename) or die "Cannot write $filename; $!";
+  return filename_read_and_remove();
 }
 
 {
@@ -156,7 +157,7 @@ sub try_write {
   my $str;
   {
     my $fh;
-    (open $fh, '<', $filename
+    (open $fh, "<$filename"
      and read $fh, $str, 1000
      and close $fh
     ) or die "Cannot read $filename: $!";
@@ -198,6 +199,31 @@ sub try_write {
       "&BG_\n");
 }
 
+
+#------------------------------------------------------------------------------
+
+{
+  # two writes to same file, overwrites
+  my $graph = Graph->new (undirected => 1);
+  my $writer = Graph::Writer::Graph6->new;
+  $writer->write_graph($graph, $filename);
+  $writer->write_graph($graph, $filename);
+  my $str = filename_read_and_remove();
+  ok ($str, "?\n");
+}
+{
+  # two writes to same filehandle, appends
+
+  my $graph = Graph->new (undirected => 1);
+  my $writer = Graph::Writer::Graph6->new;
+  my $fh;
+  open $fh, ">$filename" or die "Cannot write $filename; $!";
+  $writer->write_graph($graph, $fh) or die "Cannot write $filename; $!";
+  $writer->write_graph($graph, $fh) or die "Cannot write $filename; $!";
+  close $fh or die;
+  my $str = filename_read_and_remove();
+  ok ($str, "?\n?\n");
+}
 
 #------------------------------------------------------------------------------
 unlink $filename;

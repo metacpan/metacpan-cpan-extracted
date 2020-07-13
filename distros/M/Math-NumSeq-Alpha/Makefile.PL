@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2012, 2013, 2014, 2015 Kevin Ryde
+# Copyright 2012, 2013, 2014, 2015, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq-Alpha.
 #
@@ -19,8 +19,8 @@
 
 
 # Maybe:
-# A008522 Numbers that contain the letter `t'.
-# A008553 Numbers that contain the letter `y'.
+# A008522 Numbers that contain the letter "t".
+# A008553 Numbers that contain the letter "y".
 
 
 use 5.004;
@@ -65,7 +65,8 @@ WriteMakefile
 
      recommends =>
      {
-      # version 0.44 excludes "CONLANG" from available() languages
+      # depends is any version of Lingua::Any::Numbers, but:
+      # version 0.44 fixes "CONLANG" in available() languages
       # version 0.45 works in -T taint mode
       'Lingua::Any::Numbers' => '0.45',
      },
@@ -73,6 +74,25 @@ WriteMakefile
      { test =>
        { suggests =>
          { 'Data::Float' => 0, }
+       },
+     },
+
+     # Math::NumSeq::Alpha gets the dist name, no actual module of that name
+     provides =>
+     { 'Math::NumSeq::Alpha' => { file => 'META.yml',
+                                  version => 4,
+                                },
+       'Math::NumSeq::AlphabeticalLength' =>
+       { file => 'lib/Math/NumSeq/AlphabeticalLength.pm',
+         version => 4,
+       },
+       'Math::NumSeq::AlphabeticalLengthSteps' =>
+       { file => 'lib/Math/NumSeq/AlphabeticalLengthSteps.pm',
+         version => 4,
+       },
+       'Math::NumSeq::SevenSegments' =>
+       { file => 'lib/Math/NumSeq/SevenSegments.pm',
+         version => 4,
        },
      },
    },

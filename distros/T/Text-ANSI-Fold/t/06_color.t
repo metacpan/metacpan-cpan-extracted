@@ -6,7 +6,7 @@ use Data::Dumper;
 
 use Text::ANSI::Fold qw(:constants);
 
-my $fold = new Text::ANSI::Fold;
+my $fold = Text::ANSI::Fold->new;
 
 sub color {
     my $code = { r => 31 , b => 34 }->{+shift};

@@ -60,52 +60,6 @@ The start method prepares the [Zing::Kernel](https://metacpan.org/pod/Zing::Kern
 
         $zing->start;
 
-# COMMANDS
-
-Given the following process (actor):
-
-    # in lib/MyApp.pm
-
-    package MyApp;
-
-    use parent 'Zing::Single';
-
-    sub perform {
-      # do something (once)
-    }
-
-    1;
-
-With an application cartridge specifying 4 forks:
-
-    # in app/myapp
-
-    ['MyApp', [], 4]
-
-The [zing](https://metacpan.org/pod/zing) command-line application lets you manage Zing applications from the
-command-line using these commands:
-
-## start
-
-    $ zing start app/myapp
-
-The `start` command loads an application _cartridge_ which returns a
-["scheme"](https://metacpan.org/pod/Zing::Types#scheme) and runs it as a daemon.
-
-## stop
-
-    $ zing stop app/myapp
-
-The `stop` command finds a running application by its PID (process ID) and
-terminates the process.
-
-## logs
-
-    $ zing logs --level fatal
-
-The `logs` command taps the centralized log source and outputs new events to
-STDOUT (standard output).
-
 # PRIMATIVES
 
 This distribution provides a collection of actor-model primitives which can be
@@ -120,7 +74,6 @@ These classes facilitate message-passing and communications:
 - [Zing::Channel](https://metacpan.org/pod/Zing::Channel): Shared Communication
 - [Zing::Data](https://metacpan.org/pod/Zing::Data): Process Data
 - [Zing::Domain](https://metacpan.org/pod/Zing::Domain): Shared State Management
-- [Zing::Dropbox](https://metacpan.org/pod/Zing::Dropbox): Transient Store
 - [Zing::KeyVal](https://metacpan.org/pod/Zing::KeyVal): Key/Value Store
 - [Zing::Mailbox](https://metacpan.org/pod/Zing::Mailbox): Process Mailbox
 - [Zing::PubSub](https://metacpan.org/pod/Zing::PubSub): Pub/Sub Store
@@ -168,10 +121,12 @@ of features currently enabled by this toolkit:
 
     use Zing::Process;
 
-    my $p1 = Zing::Process->new(name => 'p1');
-    my $p2 = Zing::Process->new(name => 'p2');
+    my $p1 = Zing::Process->new;
+    my $p2 = Zing::Process->new;
 
-    $p1->mailbox->send($p2->mailbox->term, { action => 'greeting' });
+    $p1->send($p2, { action => 'greetings' });
+
+    say $p2->recv->{action}; # got it?
 
 This distribution provides a toolkit for creating processes (actors) which can
 be run in isolation and which communicate with other processes through
@@ -309,11 +264,14 @@ scale your deployments without changing your implementations.
 
 ## configuration
 
-    # configure the namespace (defaults to "main")
+    # configure the namespace
     ZING_NS=app
 
     # enable process debugging tracing
     ZING_DEBUG=1
+
+    # configure the namespace, same as ZING_NS (defaults to "main")
+    ZING_HANDLE=app
 
     # configure where the command-line tool finds catridges
     ZING_HOME=/tmp
@@ -321,6 +279,9 @@ scale your deployments without changing your implementations.
     # configure the hostname used in process registration
     ZING_HOST=0.0.0.0
     ZING_HOST=68.80.90.100
+
+    # configure the resource target (e.g. when distributing across multiple hosts)
+    ZING_TARGET='global' # or 'local'
 
     # configure the system datastore (defaults to 'Zing::Redis')
     ZING_STORE='Zing::Redis'
@@ -586,6 +547,52 @@ monitoring supervised processes.
 This distribution provides the ability to use virtual actors, which are
 processes (actors) created on-demand as a result of some system event. This
 feature is enabled by the [Zing::Launcher](https://metacpan.org/pod/Zing::Launcher) and [Zing::Spawner](https://metacpan.org/pod/Zing::Spawner) superclasses.
+
+# COMMANDS
+
+Given the following process (actor):
+
+    # in lib/MyApp.pm
+
+    package MyApp;
+
+    use parent 'Zing::Single';
+
+    sub perform {
+      # do something (once)
+    }
+
+    1;
+
+With an application cartridge specifying 4 forks:
+
+    # in app/myapp
+
+    ['MyApp', [], 4]
+
+The [zing](https://metacpan.org/pod/zing) command-line application lets you manage Zing applications from the
+command-line using these commands:
+
+## start
+
+    $ zing start app/myapp
+
+The `start` command loads an application _cartridge_ which returns a
+["scheme"](https://metacpan.org/pod/Zing::Types#scheme) and runs it as a daemon.
+
+## stop
+
+    $ zing stop app/myapp
+
+The `stop` command finds a running application by its PID (process ID) and
+terminates the process.
+
+## logs
+
+    $ zing logs --level fatal
+
+The `logs` command taps the centralized log source and outputs new events to
+STDOUT (standard output).
 
 # SEE ALSO
 

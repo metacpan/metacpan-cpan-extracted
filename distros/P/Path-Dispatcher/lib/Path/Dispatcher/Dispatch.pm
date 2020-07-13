@@ -1,9 +1,10 @@
 package Path::Dispatcher::Dispatch;
 # ABSTRACT: a list of matches
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
+use MooX::TypeTiny;
 use Try::Tiny;
 use Carp qw(confess);
 use Types::Standard qw(ArrayRef);
@@ -84,7 +85,7 @@ Path::Dispatcher::Dispatch - a list of matches
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

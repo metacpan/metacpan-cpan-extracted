@@ -288,7 +288,7 @@ union SPVM_value {
 
 
 struct SPVM_env {
-  void* runtime_package_vars_heap_offset;
+  void* package_vars_heap;
   void* object_header_byte_size;
   void* object_weaken_backref_head_offset;
   void* object_ref_count_offset;
@@ -303,7 +303,7 @@ struct SPVM_env {
   void* long_object_basic_type_id;
   void* float_object_basic_type_id;
   void* double_object_basic_type_id;
-  void* runtime;
+  void* compiler;
   void* exception_object;
   void* native_mortal_stack;
   void* native_mortal_stack_top;
@@ -407,5 +407,6 @@ struct SPVM_env {
   void* (*get_type_name)(SPVM_ENV* env, void* object);
   SPVM_ENV* (*new_env)(SPVM_ENV* env);
   void (*free_env)(SPVM_ENV* env);
+  int32_t memory_blocks_count;
 };
 #endif

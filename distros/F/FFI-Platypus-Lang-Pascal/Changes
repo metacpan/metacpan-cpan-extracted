@@ -1,5 +1,18 @@
 Revision history for Perl module FFI::Platypus::Lang::Pascal
 
+0.09 2020-07-12 09:29:33 -0600
+  - Added File::chdir as a configure prereq
+    (this was used, but undeclared in the previous two releases)
+
+0.08 2020-07-10 18:22:20 -0600
+  - Added Path::Tiny as a configure / runtime prereq
+    (this was used, but undeclared in the previous release)
+
+0.07 2020-07-10 11:56:34 -0600
+  - Migrate from Module::Build::FFI to FFI::Build
+  - Migrate from Module::Build to EUMM
+  - Added FFI::Build::File::Pascal
+
 0.06 2019-01-14 20:19:35 -0500
   - Move Module::Build::FFI::Pascal to Module-Build-FFI
 

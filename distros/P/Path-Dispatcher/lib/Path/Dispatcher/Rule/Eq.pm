@@ -1,9 +1,10 @@
 package Path::Dispatcher::Rule::Eq;
 # ABSTRACT: predicate is a string equality
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
+use MooX::TypeTiny;
 use Types::Standard qw(Str Bool);
 
 extends 'Path::Dispatcher::Rule';
@@ -89,7 +90,7 @@ Path::Dispatcher::Rule::Eq - predicate is a string equality
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

@@ -1,9 +1,9 @@
 package Progress::Any::Output::TermProgressBarColor;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-20'; # DATE
+our $DATE = '2020-07-10'; # DATE
 our $DIST = 'Progress-Any-Output-TermProgressBarColor'; # DIST
-our $VERSION = '0.247'; # VERSION
+our $VERSION = '0.248'; # VERSION
 
 use 5.010001;
 use strict;
@@ -14,16 +14,14 @@ require Win32::Console::ANSI if $^O =~ /Win/;
 
 $|++;
 
-# patch handle
-my ($ph1, $ph2);
-
 sub _patch {
     my $out = shift;
 
-    return if $ph1;
+    return if $out->{patch_handle1};
+
     require Monkey::Patch::Action;
     if (defined &{"Log::Any::Adapter::Screen::hook_before_log"}) {
-        $ph1 = Monkey::Patch::Action::patch_package(
+        $out->{patch_handle1} = Monkey::Patch::Action::patch_package(
             'Log::Any::Adapter::Screen', 'hook_before_log', 'replace',
             sub {
                 # we install a hook to clean up progress indicator first before
@@ -33,7 +31,7 @@ sub _patch {
             }
         );
     } elsif (defined  &{"Log::ger::Output::Screen::hook_before_log"}) {
-        $ph1 = Monkey::Patch::Action::patch_package(
+        $out->{patch_handle1} = Monkey::Patch::Action::patch_package(
             'Log::ger::Output::Screen', 'hook_before_log', 'replace',
             sub {
                 # we install a hook to clean up progress indicator first before
@@ -45,10 +43,11 @@ sub _patch {
     }
 
     if (defined &{"Log::Any::Adapter::Screen::hook_after_log"}) {
-        $ph2 = Monkey::Patch::Action::patch_package(
+        $out->{patch_handle2} = Monkey::Patch::Action::patch_package(
             'Log::Any::Adapter::Screen', 'hook_after_log', 'replace',
             sub {
                 my ($self, $msg) = @_;
+
                 # make sure we print a newline after logging so progress bar
                 # starts at column 1
                 print { $self->{_fh} } "\n" unless $msg =~ /\R\z/;
@@ -61,7 +60,7 @@ sub _patch {
             }
         );
     } elsif (defined &{"Log::ger::Output::Screen::hook_after_log"}) {
-        $ph2 = Monkey::Patch::Action::patch_package(
+        $out->{patch_handle2} = Monkey::Patch::Action::patch_package(
             'Log::ger::Output::Screen', 'hook_after_log', 'replace',
             sub {
                 my ($ctx, $msg) = @_;
@@ -80,8 +79,9 @@ sub _patch {
 }
 
 sub _unpatch {
-    undef $ph1;
-    undef $ph2;
+    my $self = shift;
+    undef $self->{patch_handle1};
+    undef $self->{patch_handle2};
 }
 
 sub _template_length {
@@ -332,7 +332,7 @@ Progress::Any::Output::TermProgressBarColor - Output progress to terminal as col
 
 =head1 VERSION
 
-This document describes version 0.247 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2020-06-20.
+This document describes version 0.248 of Progress::Any::Output::TermProgressBarColor (from Perl distribution Progress-Any-Output-TermProgressBarColor), released on 2020-07-10.
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package App::GitHubUtils;
 
-our $DATE = '2019-05-29'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2020-04-27'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -212,7 +212,7 @@ App::GitHubUtils - Utilities related to GitHub
 
 =head1 VERSION
 
-This document describes version 0.004 of App::GitHubUtils (from Perl distribution App-GitHubUtils), released on 2019-05-29.
+This document describes version 0.005 of App::GitHubUtils (from Perl distribution App-GitHubUtils), released on 2020-04-27.
 
 =head1 DESCRIPTION
 
@@ -257,6 +257,7 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
+
 
 
 =head2 git_clone_from_github
@@ -309,6 +310,7 @@ Arguments ('*' denotes required arguments):
 
 If not specified, will use C<login> from C<github-cmd.conf> file.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -352,7 +354,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

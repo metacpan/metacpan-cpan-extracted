@@ -19,7 +19,7 @@ use Scalar::Util ();
 
 use overload '""' => 'string';
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 # ATTRIBUTES
 
@@ -81,15 +81,9 @@ fun BUILDARGS($self, $item, @data) {
   if (Scalar::Util::blessed($item)) {
     my $local = sprintf 'local(%s)', Zing::Server->new->name;
 
-    @data = map {s/[^a-zA-Z0-9-\$\.]/-/g; lc} map {split /:/} @data;
+    @data = map {split /:/} @data;
 
-    if ($item->isa('Zing::Channel')) {
-      $args->{symbol} = $symbols->{'Zing::Channel'};
-      $args->{target} = $item->target eq 'global' ? 'global' : $local;
-      $args->{bucket} = $item->name;
-      $args->{facets} = [@data];
-    }
-    elsif ($item->isa('Zing::Data')) {
+    if ($item->isa('Zing::Data')) {
       my ($bucket, @facets) = split /:/, $item->name;
       $args->{symbol} = $symbols->{'Zing::Data'};
       $args->{target} = $local;
@@ -98,7 +92,13 @@ fun BUILDARGS($self, $item, @data) {
     }
     elsif ($item->isa('Zing::Domain')) {
       $args->{symbol} = $symbols->{'Zing::Domain'};
-      $args->{target} = $item->channel->target eq 'global' ? 'global' : $local;
+      $args->{target} = $item->target eq 'global' ? 'global' : $local;
+      $args->{bucket} = $item->name;
+      $args->{facets} = [@data];
+    }
+    elsif ($item->isa('Zing::Channel')) {
+      $args->{symbol} = $symbols->{'Zing::Channel'};
+      $args->{target} = $item->target eq 'global' ? 'global' : $local;
       $args->{bucket} = $item->name;
       $args->{facets} = [@data];
     }
@@ -156,7 +156,7 @@ fun BUILDARGS($self, $item, @data) {
     else {
       Carp::confess qq(Error in term: Unrecognizable "object");
     }
-    $args->{handle} = $ENV{ZING_NS} || 'main';
+    $args->{handle} = ($ENV{ZING_HANDLE} || $ENV{ZING_NS} || 'main') =~ s/\W/-/gr;
     $args->{system} = 'zing';
   }
   elsif(defined $item && !ref $item) {

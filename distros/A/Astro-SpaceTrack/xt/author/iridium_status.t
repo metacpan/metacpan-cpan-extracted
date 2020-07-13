@@ -155,7 +155,6 @@ foreach (
  25344   Iridium 73     [-]      Tumbling
  25467   Iridium 82     [-]      Tumbling
  25527   Iridium 2      [-]      Tumbling
- 27376   Iridium 96     [-]      Tumbling
 KELSO
 	["Rod Sladen's Iridium Constellation Status",
 	sladen => <<'SLADEN'],
@@ -190,7 +189,6 @@ KELSO
  25344   Iridium 73     [-]      Plane 1
  25467   Iridium 82     [-]      Plane 6 - Failed on station?
  25527   Iridium 2      [-]      Plane 5
- 27376   Iridium 96     [-]      Plane 4 - Failed on station?
 SLADEN
         $space_track_skip ? () :
 	[ "Space Track Iridium status",
@@ -287,7 +285,7 @@ SLADEN
  27373   Iridium 90     [D]      Decayed 2019-01-23
  27374   Iridium 94     [D]      Decayed 2018-04-18
  27375   Iridium 95     [D]      Decayed 2019-03-25
- 27376   Iridium 96     [?]      SpaceTrack
+ 27376   Iridium 96     [D]      Decayed 2020-05-30
  27450   Iridium 97     [D]      Decayed 2019-12-27
  27451   Iridium 98     [D]      Decayed 2018-08-24
 SPACETRACK

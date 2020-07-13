@@ -1,6 +1,8 @@
 package Lab::Measurement;
-$Lab::Measurement::VERSION = '3.703';
+$Lab::Measurement::VERSION = '3.710';
 #ABSTRACT: Log, describe and plot data on the fly
+
+use v5.20;
 
 use strict;
 use warnings;
@@ -30,7 +32,7 @@ Lab::Measurement - Log, describe and plot data on the fly
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -80,6 +82,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2016       Andreas K. Huettel, Simon Reinhardt
             2017-2018  Andreas K. Huettel
             2019       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

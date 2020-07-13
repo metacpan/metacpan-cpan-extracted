@@ -1,0 +1,70 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.28',
+                                    'Test::More' => '0'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Module::Build' => '0.28',
+                                        'perl' => 'v5.10.0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CleanNamespaces' => '0.15',
+                                      'Test::EOF' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoBreakpoints' => '0.15',
+                                      'Test::NoTabs' => '0',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.12'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Digest::MD5' => '0',
+                                      'Digest::SHA' => '0',
+                                      'Encode' => '0',
+                                      'File::Basename' => '0',
+                                      'File::Find' => '0',
+                                      'File::Path' => '0',
+                                      'File::Spec' => '0',
+                                      'HTTP::Date' => '0',
+                                      'LWP::UserAgent' => '0',
+                                      'MIME::Base64' => '0',
+                                      'Thread::Semaphore' => '0',
+                                      'URI::QueryParam' => '0',
+                                      'XML::Simple' => '0',
+                                      'namespace::clean' => '0',
+                                      'parent' => '0',
+                                      'perl' => 'v5.10.0',
+                                      'strict' => '0',
+                                      'threads' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => 'v5.10.0'
+                                 }
+                 }
+     };
+  $x;
+ }

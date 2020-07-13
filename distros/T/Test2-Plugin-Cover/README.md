@@ -16,6 +16,12 @@ exits. In most formaters the event will only show up as a comment on STDOUT
 [Test2::Harness::UI](https://metacpan.org/pod/Test2%3A%3AHarness%3A%3AUI) can make full use of the coverage information contained
 in the event.
 
+## NOTE: SYSOPEN HOOK DISABLED
+
+The sysopen hook is currently disabled because of an unknown segv error on some
+platforms. I am not certain if it will be enabled again. calls to subs, and
+calls to open are still hooked.
+
 # INTENDED USE CASE
 
 This tool is not intended to record comprehensive coverage information, if you

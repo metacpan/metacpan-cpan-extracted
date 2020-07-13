@@ -3,7 +3,7 @@ package OpenTracing::Integration::HTTP::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.002'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 no indirect;
@@ -23,6 +23,8 @@ OpenTracing::Integration::HTTP::Tiny - support L<HTTP::Tiny> tracing
 =head1 DESCRIPTION
 
 See L<OpenTracing::Integration> for more details.
+
+Since this is a core module, it's included in the L<OpenTracing> core distribution as well.
 
 =cut
 

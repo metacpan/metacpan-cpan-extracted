@@ -71,7 +71,7 @@ EOW
 } # end BEGIN
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "flexible and extensible dispatch",
+  "ABSTRACT" => "Flexible and extensible dispatch",
   "AUTHOR" => "Shawn M Moore, C<< <sartak at bestpractical.com> >>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -86,6 +86,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Moo" => 0,
     "Moo::Role" => 0,
+    "MooX::TypeTiny" => 0,
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
     "Type::Tiny" => 0,
@@ -102,7 +103,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.07",
+  "VERSION" => "1.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -114,6 +115,7 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Moo" => 0,
   "Moo::Role" => 0,
+  "MooX::TypeTiny" => 0,
   "Scalar::Util" => 0,
   "Test::Fatal" => 0,
   "Test::More" => 0,

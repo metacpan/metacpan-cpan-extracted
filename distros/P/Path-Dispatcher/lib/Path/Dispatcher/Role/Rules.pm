@@ -1,7 +1,7 @@
 package Path::Dispatcher::Role::Rules;
 # ABSTRACT: "has a list of rules"
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo::Role;
 use Carp qw(confess);
@@ -52,7 +52,7 @@ Path::Dispatcher::Role::Rules - "has a list of rules"
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 DESCRIPTION
 

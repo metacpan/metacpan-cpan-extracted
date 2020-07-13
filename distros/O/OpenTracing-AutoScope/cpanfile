@@ -1,8 +1,11 @@
 requires            'B::Hooks::EndOfScope';
+requires            'List::MoreUtils';
 requires            'OpenTracing::GlobalTracer';
 requires            'OpenTracing::Implementation::NoOp';
 requires            'Sub::Info';
 requires            'PerlX::Maybe';
+requires            'YAML::XS';
+requires            'PPI';
 
 requires            'Scope::Context';
 

@@ -2,7 +2,7 @@
 
 # 0-Test-DistManifest.t -- run Test::DistManifest if available
 
-# Copyright 2009, 2010 Kevin Ryde
+# Copyright 2009, 2010, 2011 Kevin Ryde
 
 # 0-Test-DistManifest.t is shared by several distributions.
 #
@@ -19,8 +19,8 @@
 # You should have received a copy of the GNU General Public License along
 # with this file.  If not, see <http://www.gnu.org/licenses/>.
 
+use 5.004;
 use strict;
-use warnings;
 use Test::More;
 
 # This is only an author test really and it only really does much in a

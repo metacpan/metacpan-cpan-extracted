@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/arc/p5-io-kqueue/issues
   repository: git://github.com/arc/p5-io-kqueue.git
-version: '0.37'
+version: '0.39'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

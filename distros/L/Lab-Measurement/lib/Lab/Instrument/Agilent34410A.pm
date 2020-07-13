@@ -1,11 +1,12 @@
 package Lab::Instrument::Agilent34410A;
 #ABSTRACT: HP/Agilent/Keysight 34410A or 34411A digital multimeter
-$Lab::Instrument::Agilent34410A::VERSION = '3.703';
+$Lab::Instrument::Agilent34410A::VERSION = '3.710';
+use v5.20;
+
 
 
 use warnings;
 use strict;
-use 5.010;
 
 use Time::HiRes qw (usleep);
 use Lab::Instrument;
@@ -719,7 +720,7 @@ Lab::Instrument::Agilent34410A - HP/Agilent/Keysight 34410A or 34411A digital mu
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -1012,6 +1013,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2014       Christian Butschkow
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

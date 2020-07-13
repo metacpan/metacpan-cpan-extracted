@@ -9,10 +9,13 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
+use vars qw($MSWin32_MBCS);
+$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+
 open(FILE,">@{[__FILE__]}.1"   ); print FILE q{ 1 }; close(FILE);
 open(FILE,">@{[__FILE__]}.2"   ); print FILE q{ 1 }; close(FILE);
 open(FILE,">@{[__FILE__]}.3"   ); print FILE q{ 1 }; close(FILE);
-if ($^O =~ /MSWin32/) { 
+if ($MSWin32_MBCS) { 
     open(FILE,">@{[__FILE__]}.1表\"); print FILE q{ 1 }; close(FILE);
     open(FILE,">@{[__FILE__]}.2表\"); print FILE q{ 1 }; close(FILE);
     open(FILE,">@{[__FILE__]}.3表\"); print FILE q{ 1 }; close(FILE);
@@ -53,10 +56,10 @@ if ($^O =~ /MSWin32/) {
     sub {1},
     sub {1},
 # 31
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('"*.1表" "*.2表" "*.3表"'); scalar(@_) == 3   }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('"*.1表" "*.2表" "*.3表"'); $_[0] =~ /\.1表$/ }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('"*.1表" "*.2表" "*.3表"'); $_[1] =~ /\.2表$/ }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('"*.1表" "*.2表" "*.3表"'); $_[2] =~ /\.3表$/ }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('"*.1表" "*.2表" "*.3表"'); scalar(@_) == 3   }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('"*.1表" "*.2表" "*.3表"'); $_[0] =~ /\.1表$/ }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('"*.1表" "*.2表" "*.3表"'); $_[1] =~ /\.2表$/ }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('"*.1表" "*.2表" "*.3表"'); $_[2] =~ /\.3表$/ }) },
     sub {1},
     sub {1},
     sub {1},
@@ -64,10 +67,10 @@ if ($^O =~ /MSWin32/) {
     sub {1},
     sub {1},
 # 41
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('*.1表 *.2表 *.3表'); scalar(@_) == 3   }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('*.1表 *.2表 *.3表'); $_[0] =~ /\.1表$/ }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('*.1表 *.2表 *.3表'); $_[1] =~ /\.2表$/ }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('*.1表 *.2表 *.3表'); $_[2] =~ /\.3表$/ }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('*.1表 *.2表 *.3表'); scalar(@_) == 3   }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('*.1表 *.2表 *.3表'); $_[0] =~ /\.1表$/ }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('*.1表 *.2表 *.3表'); $_[1] =~ /\.2表$/ }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ chdir($FindBin::Bin); @_ = mb::dosglob('*.1表 *.2表 *.3表'); $_[2] =~ /\.3表$/ }) },
     sub {1},
     sub {1},
     sub {1},
@@ -79,9 +82,9 @@ if ($^O =~ /MSWin32/) {
     sub { mb::_unlink("@{[__FILE__]}.1"   ); },
     sub { mb::_unlink("@{[__FILE__]}.2"   ); },
     sub { mb::_unlink("@{[__FILE__]}.3"   ); },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::_unlink("@{[__FILE__]}.1表\"); },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::_unlink("@{[__FILE__]}.2表\"); },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; mb::_unlink("@{[__FILE__]}.3表\"); },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::_unlink("@{[__FILE__]}.1表\"); },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::_unlink("@{[__FILE__]}.2表\"); },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::_unlink("@{[__FILE__]}.3表\"); },
     sub {1},
     sub {1},
     sub {1},

@@ -1,8 +1,9 @@
 package Lab::Moose::Instrument::ZI_MFLI;
-$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.703';
+$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.710';
 #ABSTRACT: Zurich Instruments MFLI Lock-in Amplifier
 
-use 5.010;
+use v5.20;
+
 use Moose;
 use MooseX::Params::Validate;
 use Lab::Moose::Instrument::Cache;
@@ -525,7 +526,7 @@ Lab::Moose::Instrument::ZI_MFLI - Zurich Instruments MFLI Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -537,7 +538,7 @@ version 3.703
      oscillator => 1, # 0 is default
      connection_options => {
          host => '132.188.12.13',
-         port => 8004,
+         port => 8004, # Note: The HF2LI uses port 8005.
      });
 
  $mfli->set_frequency(value => 10000);
@@ -718,7 +719,8 @@ Get demodulator X and Y output measurement values.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
-            2019-2020  Simon Reinhardt
+            2019       Simon Reinhardt
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

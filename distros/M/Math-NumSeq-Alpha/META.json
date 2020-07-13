@@ -4,13 +4,13 @@
       "Kevin Ryde <user42_kevin@yahoo.com.au>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-NumSeq-Alpha",
    "no_index" : {
@@ -54,6 +54,24 @@
          }
       }
    },
+   "provides" : {
+      "Math::NumSeq::Alpha" : {
+         "file" : "META.yml",
+         "version" : "4"
+      },
+      "Math::NumSeq::AlphabeticalLength" : {
+         "file" : "lib/Math/NumSeq/AlphabeticalLength.pm",
+         "version" : "4"
+      },
+      "Math::NumSeq::AlphabeticalLengthSteps" : {
+         "file" : "lib/Math/NumSeq/AlphabeticalLengthSteps.pm",
+         "version" : "4"
+      },
+      "Math::NumSeq::SevenSegments" : {
+         "file" : "lib/Math/NumSeq/SevenSegments.pm",
+         "version" : "4"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://user42.tuxfamily.org/math-numseq/index.html",
@@ -61,5 +79,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "3"
+   "version" : 4,
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

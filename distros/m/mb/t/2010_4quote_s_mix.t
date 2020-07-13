@@ -9,6 +9,9 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
+use vars qw($MSWin32_MBCS);
+$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+
 @test = (
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 1
 s(1)(1)
@@ -333,14 +336,14 @@ END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 65
 s#1#1#
 END1
-s{(\G${mb::_anchor})@{[qr#1# ]}@{[mb::_s_passed()]}}{$1 . qq #1#}e
+s{(\G${mb::_anchor})@{[qr#1# ]}@{[mb::_s_passed()]}}{$1 . qq#1#}e
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 66
 s #comment
 (1)#1#
 END1
 s #comment
-{(\G${mb::_anchor})@{[qr (1) ]}@{[mb::_s_passed()]}}{$1 . qq #1#}e
+{(\G${mb::_anchor})@{[qr (1) ]}@{[mb::_s_passed()]}}{$1 . qq#1#}e
 END2
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 67
 s #comment

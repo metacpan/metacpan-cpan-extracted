@@ -1,6 +1,8 @@
 package Lab::Connection::USBtmc;
 #ABSTRACT: F</dev/usbtmc> Linux USB Test&Measurement kernel driver connection
-$Lab::Connection::USBtmc::VERSION = '3.703';
+$Lab::Connection::USBtmc::VERSION = '3.710';
+use v5.20;
+
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -96,7 +98,7 @@ Lab::Connection::USBtmc - F</dev/usbtmc> Linux USB Test&Measurement kernel drive
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -178,6 +180,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2012       Florian Olbrich, Hermann Kraus
             2016       Charles Lane, Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

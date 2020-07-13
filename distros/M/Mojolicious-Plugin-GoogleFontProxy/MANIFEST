@@ -11,3 +11,4 @@ dist.ini
 lib/Mojolicious/Plugin/GoogleFontProxy.pm
 t/basic.t
 t/css.t
+t/css2.t

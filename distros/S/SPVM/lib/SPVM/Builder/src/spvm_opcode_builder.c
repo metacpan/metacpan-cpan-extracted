@@ -35,7 +35,6 @@
 #include "spvm_basic_type.h"
 #include "spvm_case_info.h"
 #include "spvm_array_field_access.h"
-#include "spvm_constant_pool.h"
 
 void SPVM_OPCODE_BUILDER_get_runtime_type(SPVM_COMPILER* compiler, int32_t basic_type_id, int32_t dimension, int32_t* runtime_basic_type_id, int32_t* runtime_type_dimension) {
   // Runtime type
@@ -101,7 +100,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
   
   {
     int32_t package_index;
-    for (package_index = 0; package_index < compiler->packages->length; package_index++) {
+    for (package_index = compiler->cur_package_base; package_index < compiler->packages->length; package_index++) {
       SPVM_PACKAGE* package = SPVM_LIST_fetch(compiler->packages, package_index);
       SPVM_LIST* subs = package->subs;
       {
@@ -167,7 +166,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
           assert(sub->id > -1);
           assert(sub->op_name);
           assert(sub->return_type);
-          assert(sub->file);
+          assert(sub->package->module_file);
           
           if (sub->flag & SPVM_SUB_C_FLAG_NATIVE) {
             continue;
@@ -2364,7 +2363,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                 break;
                               case SPVM_BASIC_TYPE_C_ID_LONG:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_CONSTANT_LONG);
-                                opcode.operand1 = constant->constant_pool_id;
+                                opcode.operand1 = constant->constant_id;
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
                               case SPVM_BASIC_TYPE_C_ID_FLOAT:
@@ -2374,7 +2373,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                                 break;
                               case SPVM_BASIC_TYPE_C_ID_DOUBLE:
                                 SPVM_OPCODE_BUILDER_set_opcode_id(compiler, &opcode, SPVM_OPCODE_C_ID_MOVE_CONSTANT_DOUBLE);
-                                opcode.operand1 = constant->constant_pool_id;
+                                opcode.operand1 = constant->constant_id;
                                 mem_id_out = SPVM_OP_get_mem_id(compiler, op_assign_dist);
                                 break;
                               default:
@@ -2395,7 +2394,7 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                             SPVM_CONSTANT* constant = op_assign_src->uv.constant;
 
                             opcode.operand0 = mem_id_out;
-                            opcode.operand1 = constant->constant_pool_id;
+                            opcode.operand1 = constant->constant_id;
 
                             SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode);
                           }
@@ -3804,17 +3803,12 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           SPVM_OPCODE opcode_switch_info;
                           memset(&opcode_switch_info, 0, sizeof(SPVM_OPCODE));
                           
-                          if (switch_info->id == SPVM_SWITCH_INFO_C_ID_TABLE_SWITCH) {
-                            opcode_switch_info.id = SPVM_OPCODE_C_ID_TABLE_SWITCH;
-                          }
-                          else if (switch_info->id == SPVM_SWITCH_INFO_C_ID_LOOKUP_SWITCH) {
-                            opcode_switch_info.id = SPVM_OPCODE_C_ID_LOOKUP_SWITCH;
-                          }
+                          opcode_switch_info.id = SPVM_OPCODE_C_ID_LOOKUP_SWITCH;
 
                           int32_t mem_id_in = SPVM_OP_get_mem_id(compiler, op_assign_src->first);
                           opcode_switch_info.operand0 = mem_id_in;
 
-                          opcode_switch_info.operand1 = switch_info->constant_pool_id;
+                          opcode_switch_info.operand1 = switch_info->switch_id;
 
                           SPVM_OPCODE_ARRAY_push_opcode(compiler, opcode_array, &opcode_switch_info);
                           
@@ -3837,58 +3831,18 @@ void SPVM_OPCODE_BUILDER_build_opcode_array(SPVM_COMPILER* compiler) {
                           if (default_opcode_rel_index == 0) {
                             default_opcode_rel_index = opcode_array->length - sub_opcodes_base;
                           }
-                          package->constant_pool->values[switch_info->constant_pool_id] = default_opcode_rel_index;
+                          SPVM_SWITCH_INFO* default_opcode_rel_index_switch_info = package->info_switch_infos->values[switch_info->switch_id];
+                          default_opcode_rel_index_switch_info->default_opcode_rel_index = default_opcode_rel_index;
 
-                          // Table switch constant pool
-                          if (switch_info->id == SPVM_SWITCH_INFO_C_ID_TABLE_SWITCH) {
+                          // Match values and branchs
+                          for (int32_t i = 0; i < switch_info->case_infos->length; i++) {
+                            SPVM_CASE_INFO* case_info = SPVM_LIST_fetch(switch_info->case_infos, i);
                             
-                            // Min
-                            int32_t min = package->constant_pool->values[switch_info->constant_pool_id + 1];
+                            // Match value
                             
-                            // Max
-                            int32_t max = package->constant_pool->values[switch_info->constant_pool_id + 2];
-                            
-                            // Length
-                            int32_t range = max - min + 1;
-                            
-                            // Match values and branchs
-                            for (int32_t i = min; i <= max; i++) {
-                              // Match value
-
-                              SPVM_CASE_INFO* found_case_info = NULL;
-                              for (int32_t case_index = 0; case_index < switch_info->case_infos->length; case_index++) {
-                                SPVM_CASE_INFO* case_info = SPVM_LIST_fetch(switch_info->case_infos, case_index);
-                                if (i == case_info->constant->value.ival) {
-                                  found_case_info = case_info;
-                                  break;
-                                }
-                              }
-                              
-                              // Branch
-                              int32_t offset = i - min;
-                              if (found_case_info) {
-                                package->constant_pool->values[switch_info->constant_pool_id + 3 + offset] = found_case_info->opcode_rel_index;
-                              }
-                              else {
-                                package->constant_pool->values[switch_info->constant_pool_id + 3 + offset] = default_opcode_rel_index;
-                              }
-                            }
-                          }
-                          // Lookup switch constant pool
-                          else if (switch_info->id == SPVM_SWITCH_INFO_C_ID_LOOKUP_SWITCH) {
-                            
-                            // Match values and branchs
-                            for (int32_t i = 0; i < switch_info->case_infos->length; i++) {
-                              SPVM_CASE_INFO* case_info = SPVM_LIST_fetch(switch_info->case_infos, i);
-                              
-                              // Match value
-                              
-                              // Branch
-                              package->constant_pool->values[(switch_info->constant_pool_id + 2 + 2 * i) + 1] = case_info->opcode_rel_index;
-                            }
-                          }
-                          else {
-                            assert(0);
+                            // Branch
+                            SPVM_CASE_INFO* branch_opcode_rel_index_case_info = switch_info->case_infos->values[i];
+                            branch_opcode_rel_index_case_info->opcode_rel_index = case_info->opcode_rel_index;
                           }
                           
                           break;

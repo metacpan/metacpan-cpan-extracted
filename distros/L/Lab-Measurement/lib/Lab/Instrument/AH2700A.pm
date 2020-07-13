@@ -1,6 +1,8 @@
 package Lab::Instrument::AH2700A;
 #ABSTRACT: Andeen-Hagerling AH2700A ultra-precision capacitance bridge
-$Lab::Instrument::AH2700A::VERSION = '3.703';
+$Lab::Instrument::AH2700A::VERSION = '3.710';
+use v5.20;
+
 use strict;
 use Time::HiRes qw (usleep);
 use Lab::Instrument;
@@ -479,7 +481,7 @@ Lab::Instrument::AH2700A - Andeen-Hagerling AH2700A ultra-precision capacitance 
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -488,6 +490,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2013       Christian Butschkow
             2016       Andreas K. Huettel, Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

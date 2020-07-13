@@ -1,8 +1,9 @@
 package Lab::Moose::Instrument::SpectrumAnalyzer;
-$Lab::Moose::Instrument::SpectrumAnalyzer::VERSION = '3.703';
+$Lab::Moose::Instrument::SpectrumAnalyzer::VERSION = '3.710';
 #ABSTRACT: Role of Generic Spectrum Analyzer for Lab::Moose::Instrument
 
-use 5.010;
+use v5.20;
+
 
 use PDL::Core qw/pdl cat nelem/;
 
@@ -265,7 +266,7 @@ Lab::Moose::Instrument::SpectrumAnalyzer - Role of Generic Spectrum Analyzer for
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 DESCRIPTION
 
@@ -389,6 +390,7 @@ Use like this
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Eugeniy E. Mikhailov
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

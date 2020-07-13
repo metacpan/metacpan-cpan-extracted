@@ -1,8 +1,9 @@
 package Lab::Moose::Stabilizer;
-$Lab::Moose::Stabilizer::VERSION = '3.703';
+$Lab::Moose::Stabilizer::VERSION = '3.710';
 #ABSTRACT: Sensor stabilizer subroutine
 
-use 5.010;
+use v5.20;
+
 use warnings;
 use strict;
 use Lab::Moose ();
@@ -139,7 +140,7 @@ Lab::Moose::Stabilizer - Sensor stabilizer subroutine
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 DESCRIPTION
 
@@ -172,6 +173,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

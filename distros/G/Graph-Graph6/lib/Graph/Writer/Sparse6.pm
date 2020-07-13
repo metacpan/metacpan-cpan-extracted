@@ -23,7 +23,7 @@ use Graph::Writer::Graph6;
 
 use vars '@ISA','$VERSION';
 @ISA = ('Graph::Writer::Graph6');
-$VERSION = 7;
+$VERSION = 8;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -42,7 +42,7 @@ sub _init  {
 1;
 __END__
 
-=for stopwords Ryde ascii undirected multi-edge multi-edges multiedged countedged ok
+=for stopwords Ryde ascii Superclass
 
 =head1 NAME
 
@@ -57,6 +57,8 @@ Graph::Writer::Sparse6 - write Graph.pm in sparse6 format
  $writer->write_graph($graph, 'filename.txt');
  $writer->write_graph($graph, $filehandle);
 
+ Graph::Writer::Sparse6->new->write_graph($graph,'filename.txt');
+
 =head1 CLASS HIERARCHY
 
 C<Graph::Writer::Sparse6> is a subclass of C<Graph::Writer>.
@@ -70,8 +72,8 @@ should not be relied on, only C<Graph::Writer>.
 
 =head1 DESCRIPTION
 
-C<Graph::Writer::Sparse6> writes a C<Graph.pm> graph to a file in sparse6
-format.  It is the same as
+C<Graph::Writer::Sparse6> writes a C<Graph.pm> graph to a file or file
+handle in sparse6 format.  It is the same as
 
     my $writer = Graph::Writer::Graph6->new (format => 'sparse6');
 

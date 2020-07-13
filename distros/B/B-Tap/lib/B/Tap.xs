@@ -150,11 +150,11 @@ static void rewrite_op(pTHX_ OP* target, OP* orig, OP* replacement, int depth) {
         break;
     }
 
-    if (target->op_sibling) {
-        if (target->op_sibling == orig) {
-            target->op_sibling = replacement;
+    if (OpSIBLING(target)) {
+        if (OpSIBLING(target) == orig) {
+            OpMORESIB_set(target, replacement);
         } else {
-            rewrite_op(aTHX_ (OP*)target->op_sibling, orig, replacement, depth);
+            rewrite_op(aTHX_ (OP*)OpSIBLING(target), orig, replacement, depth);
         }
     }
 }
@@ -193,7 +193,7 @@ CODE:
     /* Rewrite op tree. */
     OP * orig_op = (OP*)opp;
     OP * next_op = orig_op->op_next;
-    OP * sibling_op = orig_op->op_sibling;
+    OP * sibling_op = OpSIBLING(orig_op);
 
     /*
      * Before:
@@ -226,7 +226,7 @@ CODE:
     b_tap->op_flags    = (orig_op->op_flags & OPf_WANT) | OPf_KIDS;
     b_tap->op_first    = orig_op;
     b_tap->op_last     = (OP*)push_sv;
-    b_tap->op_sibling  = sibling_op;
+    OpMORESIB_set(b_tap, sibling_op);
 
     orig_op->op_next   = (OP*)push_sv;
     push_sv->op_next   = (OP*)b_tap;

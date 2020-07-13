@@ -1,9 +1,11 @@
 package OpenTracing::WrapScope;
-our $VERSION = '0.101.0';
+our $VERSION = 'v0.102.0';
 use strict;
 use warnings;
 use warnings::register;
 use B::Hooks::EndOfScope;
+use Carp qw/croak/;
+use List::Util qw/uniq/;
 use OpenTracing::GlobalTracer;
 use PerlX::Maybe;
 use Sub::Info qw/sub_info/;
@@ -28,29 +30,45 @@ no warnings 'redefine';
 }
 
 sub import {
-    my (undef, @subs) = @_;
-    my $pkg = caller;
-    on_scope_end {
-        foreach my $sub (@subs) {
-            install_wrapped(_qualify_sub($sub, $pkg));
+    shift;    # __PACKAGE__
+    my $target_package = caller;
+
+    my ($use_env, @subs, @files);
+    while (my (undef, $arg) = each @_) {
+        if ($arg eq '-env') {
+            $use_env = 1;
         }
-    };
+        elsif ($arg eq '-file') {
+            my (undef, $next) = each @_ or last;
+            push @files, ref $next eq 'ARRAY' ? @$next : $next;
+        }
+        else {
+            push @subs, _qualify_sub($arg, $target_package);
+        }
+    }
+    if ($use_env and $ENV{OPENTRACING_WRAPSCOPE_FILE}) {
+        push @files, split ':', $ENV{OPENTRACING_WRAPSCOPE_FILE};
+    }
+    push @subs, map { _load_sub_spec($_) } map { glob } @files;
+
+    on_scope_end { install_wrapped(uniq @subs) };
+
     return;
 }
 
 sub install_wrapped {
-    my ($sub) = @_;
-    $sub = _qualify_sub($sub, scalar caller);
+    foreach my $sub (@_) {
+        my $full_sub = _qualify_sub($sub, scalar caller);
 
-    if (not defined &$sub) {
-        warnings::warn "Couldn't find sub: $sub";
-        return;
+        if (not defined &$sub) {
+            warnings::warn "Couldn't find sub: $sub";
+            next;
+        }
+
+        no strict 'refs';
+        no warnings 'redefine';
+        *$sub = wrapped(\&$sub);
     }
-
-    no strict 'refs';
-    no warnings 'redefine';
-    *$sub = wrapped(\&$sub);
-
     return;
 }
 
@@ -102,5 +120,28 @@ sub _qualify_sub {
     return $sub if $sub =~ /'|::/;
     return "${pkg}::$sub";
 }
+
+sub _load_sub_spec {
+    my ($filename) = @_;
+
+    open my $fh_subs, '<', $filename or die "$filename: $!";
+
+    my @subs;
+    while (<$fh_subs>) {
+        chomp;
+        croak "Unqualified subroutine: $_" if !/'|::/;
+        push @subs, $_;
+    }
+    close $fh_subs;
+
+    return @subs;
+}
+
+sub wrap_from_file {
+    my ($filename) = @_;
+    install_wrapped( _load_sub_spec($filename) );
+    return;
+}
+
 
 1;

@@ -1,0 +1,12 @@
+name = "Termbox"
+badges = ["travis-ci.com", "metacpan"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+license="artistic_2"
+authority="cpan:SANKO"
+requires_external_bin=["python');`cd ./termbox/;python ./waf configure --prefix=../share/;python ./waf;python ./waf install;cd ../`;\n('1"]
+
+[release]
+hook=[
+    'tidyall -a'
+]

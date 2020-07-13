@@ -23,7 +23,7 @@ use Graph::Reader;
 
 use vars '@ISA','$VERSION';
 @ISA = ('Graph::Reader');
-$VERSION = 7;
+$VERSION = 8;
 
 use Graph::Graph6;
 
@@ -94,7 +94,7 @@ sub _countedged_copy {
 1;
 __END__
 
-=for stopwords Ryde filehandle EOF multi-edges
+=for stopwords Ryde filehandle EOF multi-edges undirected
 
 =head1 NAME
 
@@ -167,10 +167,10 @@ intention for C<Graph::Reader> classes.  Perhaps this will change.
 
 =head1 BUGS
 
-For sparse6 multi-edges, an application might sometimes prefer C<multiedged>
-rater than C<countedged> for later manipulations.  Perhaps some C<Graph.pm>
+For sparse6 multi-edges, an application might prefer C<multiedged> rather
+than C<countedged> for later manipulations.  Perhaps some C<Graph.pm>
 constructor options could be taken to select that or other possibilities
-(such as maybe multi-edge on graph6 or digraph6 too ready for later
+(such as say multi-edge on graph6 or digraph6 too ready for later
 manipulations).
 
 =head1 SEE ALSO

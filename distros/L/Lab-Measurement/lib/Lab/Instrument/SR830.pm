@@ -1,6 +1,8 @@
 package Lab::Instrument::SR830;
-$Lab::Instrument::SR830::VERSION = '3.703';
+$Lab::Instrument::SR830::VERSION = '3.710';
 #ABSTRACT: Stanford Research SR830 lock-in amplifier
+
+use v5.20;
 
 use strict;
 use Lab::Instrument;
@@ -268,7 +270,7 @@ Lab::Instrument::SR830 - Stanford Research SR830 lock-in amplifier
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -391,6 +393,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
             2019       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

@@ -82,7 +82,7 @@ kevent(kq, timeout=&PL_sv_undef)
         croak("malloc failed");
     }
     
-    if (timeout != &PL_sv_undef) {
+    if (SvOK(timeout)) {
         I32 time = SvIV(timeout);
         if (time >= 0) {
             t.tv_sec = time / 1000;
@@ -122,7 +122,7 @@ kevent2(kq, timeout=&PL_sv_undef)
     struct timespec t;
     struct timespec *tbuf = (struct timespec *)0;
   CODE:
-    if (timeout != &PL_sv_undef) {
+    if (SvOK(timeout)) {
         I32 time = SvIV(timeout);
         if (time >= 0) {
             t.tv_sec = time / 1000;

@@ -1,11 +1,12 @@
 package Lab::Moose::Instrument::HP34420A;
-$Lab::Moose::Instrument::HP34420A::VERSION = '3.703';
+$Lab::Moose::Instrument::HP34420A::VERSION = '3.710';
 #ABSTRACT: HP 34420A nanovolt meter.
+
+use v5.20;
 
 # So far only one channel. Could add support for two channels
 # by using validated_channel_(setter/getter) in the SCPI/SENSE roles.
 
-use 5.010;
 
 use Moose;
 use Moose::Util::TypeConstraints 'enum';
@@ -71,7 +72,7 @@ Lab::Moose::Instrument::HP34420A - HP 34420A nanovolt meter.
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -120,6 +121,7 @@ Set/get used measurement channel. Allowed values: C<FRON[1], FRON2>.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

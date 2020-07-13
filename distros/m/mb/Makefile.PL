@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{mb},
-    'VERSION'   => q{0.01},
+    'VERSION'   => q{0.03},
     'ABSTRACT'  => q{run Perl script written in MBCS},
     'PREREQ_PM' => {
         'Carp' => '0',

@@ -1,6 +1,14 @@
 IO::KQueue Changes
 ==================
 
+0.39 2020-07-10
+    - Fix no-lib packaging error (arc)
+
+0.38 2020-07-10
+    - Fix POD error (manwar)
+    - Fix undef detection in XS code (Alexander Bluhm)
+    - Move library file to lib/ (arc)
+
 0.37 2020-07-04
     - Fix building on older FreeBSD versions (BinGOs)
 

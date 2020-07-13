@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -44,7 +44,7 @@ require Graph::Easy::As_sparse6;
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 7;
+  my $want_version = 8;
   ok ($Graph::Easy::As_sparse6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Easy::As_sparse6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Easy::As_sparse6->VERSION($want_version); 1 }, 1,

@@ -1,12 +1,13 @@
 package Lab::Instrument::Yokogawa7651;
 #ABSTRACT: Yokogawa 7651 DC source
-$Lab::Instrument::Yokogawa7651::VERSION = '3.703';
+$Lab::Instrument::Yokogawa7651::VERSION = '3.710';
+use v5.20;
+
 use warnings;
 use strict;
 use Time::HiRes qw/usleep/;
 
 
-use 5.010;
 
 use Lab::Instrument;
 use Lab::Instrument::Source;
@@ -786,7 +787,7 @@ Lab::Instrument::Yokogawa7651 - Yokogawa 7651 DC source
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -1052,6 +1053,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2015       Andreas K. Huettel, Christian Butschkow
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

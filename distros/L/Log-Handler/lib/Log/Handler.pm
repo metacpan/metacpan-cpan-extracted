@@ -505,7 +505,7 @@ write operations.
     0 - to disable it
     1 - to enable it
 
-If you set C<die_on_errors> to 0 then you have to controll it yourself.
+If you set C<die_on_errors> to 0 then you have to control it yourself.
 
     $log->info("info message") or die $log->errstr();
 
@@ -517,7 +517,7 @@ If you set C<die_on_errors> to 0 then you have to controll it yourself.
 
 This option is set to 1 by default.
 
-Take a look to the decription of the method C<reload> for more
+Take a look to the description of the method C<reload> for more
 information about this option.
 
 =item B<filter_message>
@@ -1160,7 +1160,7 @@ use Log::Handler::Pattern;
 use UNIVERSAL;
 use base qw(Log::Handler::Levels);
 
-our $VERSION = "0.88";
+our $VERSION = "0.90";
 our $ERRSTR  = "";
 
 # $TRACE and $CALLER_LEVEL are both used as global

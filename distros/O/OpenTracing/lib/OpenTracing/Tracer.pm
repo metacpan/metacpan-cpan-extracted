@@ -3,7 +3,7 @@ package OpenTracing::Tracer;
 use strict;
 use warnings;
 
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.002'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 no indirect;
@@ -33,6 +33,10 @@ use Scalar::Util qw(refaddr);
 use Time::HiRes ();
 
 use Log::Any qw($log);
+
+=head1 METHODS
+
+=cut
 
 sub new {
     my ($class, %args) = @_;
@@ -64,9 +68,28 @@ sub process {
     }
 }
 
+=head2 is_enabled
+
+Returns true if this tracer is currently enabled.
+
+=cut
+
 sub is_enabled { shift->{is_enabled} }
 
+=head2 enable
+
+Enable the current tracer.
+
+=cut
+
 sub enable { shift->{is_enabled} = 1 }
+
+=head2 disable
+
+Disable the current tracer.
+
+=cut
+
 sub disable { shift->{is_enabled} = 0 }
 
 =head2 spans
@@ -121,7 +144,7 @@ sub current_span { shift->{current_span} }
 sub finish_span {
     my ($self, $span) = @_;
     $log->tracef('Finishing span %s', $span);
-    undef $self->{current_span} if refaddr($self->{current_span}) == refaddr($span);
+    undef $self->{current_span} if $self->{current_span} and refaddr($self->{current_span}) == refaddr($span);
     push @{$self->{finished_spans} //= []}, $span;
 }
 

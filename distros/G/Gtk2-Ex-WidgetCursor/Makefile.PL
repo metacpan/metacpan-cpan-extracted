@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 Kevin Ryde
 
 # This file is part of Gtk2-Ex-WidgetCursor.
 #
@@ -21,15 +21,13 @@ use 5.008;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-use lib 'inc';
-use MyMakeMakerExtras;
 
-MyMakeMakerExtras::WriteMakefile
-  (NAME         => 'Gtk2-Ex-WidgetCursor',
+WriteMakefile
+  (NAME         => 'Gtk2::Ex::WidgetCursor',
    ABSTRACT     => 'Mouse pointer cursor management for Gtk widgets.',
    VERSION_FROM => 'lib/Gtk2/Ex/WidgetCursor.pm',
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
    MIN_PERL_VERSION => '5.008',
 
@@ -45,15 +43,11 @@ MyMakeMakerExtras::WriteMakefile
                     'Scalar::Util' => '1.18',
                    },
 
-   META_MERGE
-   => { resources
-        => { homepage => 'http://user42.tuxfamily.org/gtk2-ex-widgetcursor/index.html' },
-#         optional_features
-#         => { maximum_tests
-#              => { description => 'Have "make test" do as much as possible.',
-#                   requires => { 
-#                               },
-#                 },
-#            },
-      },
+   META_MERGE =>
+   { resources =>
+     { homepage => 'http://user42.tuxfamily.org/gtk2-ex-widgetcursor/index.html',
+       license  => 'http://www.gnu.org/licenses/gpl.html',
+     },
+     no_index => { directory=>['devel','xt'], },
+   },
   );

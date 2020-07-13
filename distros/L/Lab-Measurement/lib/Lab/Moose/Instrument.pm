@@ -1,8 +1,9 @@
 package Lab::Moose::Instrument;
-$Lab::Moose::Instrument::VERSION = '3.703';
+$Lab::Moose::Instrument::VERSION = '3.710';
 #ABSTRACT: Base class for instrument drivers
 
-use 5.010;
+use v5.20;
+
 use Moose;
 use MooseX::StrictConstructor;
 use Moose::Util::TypeConstraints qw(enum duck_type);
@@ -273,7 +274,7 @@ Lab::Moose::Instrument - Base class for instrument drivers
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -426,7 +427,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020       Sam Bingner
+            2020       Andreas K. Huettel, Sam Bingner
 
 
 This is free software; you can redistribute it and/or modify it under

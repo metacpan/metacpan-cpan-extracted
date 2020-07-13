@@ -1,7 +1,7 @@
 package Path::Dispatcher::Rule::Intersection;
 # ABSTRACT: all rules must match
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
 extends 'Path::Dispatcher::Rule';
@@ -39,7 +39,7 @@ Path::Dispatcher::Rule::Intersection - all rules must match
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

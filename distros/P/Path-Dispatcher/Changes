@@ -1,5 +1,9 @@
 Revision history for Path-Dispatcher
 
+1.08      2020-07-12 02:40:52Z
+        - add abstracts to modules that were missing them (RT#132909)
+        - add MooX::TypeTiny for optimized type checks
+
 1.07      2020-02-29 20:55:07Z
         - Switch from Any::Moose to Moo and Types::Standard
         based on PRs from chresomanci and hashbangperl

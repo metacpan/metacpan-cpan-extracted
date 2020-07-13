@@ -9,6 +9,9 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
+use vars qw($MSWin32_MBCS);
+$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+
 BEGIN { open(FILE,">@{[__FILE__]}.txt"); print FILE "Aƒ¿‚ "; close(FILE); }
 END   { unlink("@{[__FILE__]}.txt") }
 
@@ -26,8 +29,8 @@ END   { unlink("@{[__FILE__]}.txt") }
     sub {1},
 # 11
     sub { my $r=qx!echo A     | $^X -e "use lib qq{$FindBin::Bin/../lib}; use mb; print mb::getc"!;                   $r eq 'A'     },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; my $r=qx!echo Aƒ¿   | $^X -e "use lib qq{$FindBin::Bin/../lib}; use mb; print mb::getc.mb::getc"!;          $r eq 'Aƒ¿'   },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; my $r=qx!echo Aƒ¿‚  | $^X -e "use lib qq{$FindBin::Bin/../lib}; use mb; print mb::getc.mb::getc.mb::getc"!; $r eq 'Aƒ¿‚ ' },
+    sub { return 'SKIP' unless $MSWin32_MBCS; my $r=qx!echo Aƒ¿   | $^X -e "use lib qq{$FindBin::Bin/../lib}; use mb; print mb::getc.mb::getc"!;          $r eq 'Aƒ¿'   },
+    sub { return 'SKIP' unless $MSWin32_MBCS; my $r=qx!echo Aƒ¿‚  | $^X -e "use lib qq{$FindBin::Bin/../lib}; use mb; print mb::getc.mb::getc.mb::getc"!; $r eq 'Aƒ¿‚ ' },
     sub {1},
     sub {1},
     sub {1},

@@ -23,7 +23,7 @@ use Graph::Writer;
 
 use vars '@ISA','$VERSION';
 @ISA = ('Graph::Writer');
-$VERSION = 7;
+$VERSION = 8;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;

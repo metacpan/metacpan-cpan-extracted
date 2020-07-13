@@ -27,6 +27,13 @@ use MyGraphs;
 # use Smart::Comments;
 
 {
+  # empty graph
+  require Graph::Graph6;
+  Graph::Graph6::write_graph(format => 'sparse6',
+                             fh => \*STDOUT, num_vertices=>0);
+  exit 0;
+}
+{
   # Graph::Reader::Graph6 multi-edge
   require Graph::Reader::Graph6;
   my $s6_str = ':A'.chr(0x20+63)."\n";

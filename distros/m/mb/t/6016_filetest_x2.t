@@ -9,20 +9,19 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
-mb::eval <<'END';
-    open FILE,">6016.bat"; print FILE "\x00"; close FILE;
-    open FILE,">6016.cmd"; print FILE "\x00"; close FILE;
-    open FILE,">6016.com"; print FILE "\x00"; close FILE;
-    open FILE,">6016.exe"; print FILE "\x00"; close FILE;
-END
+use vars qw($MSWin32_MBCS);
+$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+
+open FILE,">6016.bat"; print FILE "\x00"; close FILE;
+open FILE,">6016.cmd"; print FILE "\x00"; close FILE;
+open FILE,">6016.com"; print FILE "\x00"; close FILE;
+open FILE,">6016.exe"; print FILE "\x00"; close FILE;
 
 END {
-    mb::eval <<'END';
-        unlink "6016.bat";
-        unlink "6016.cmd";
-        unlink "6016.com";
-        unlink "6016.exe";
-END
+    unlink "6016.bat";
+    unlink "6016.cmd";
+    unlink "6016.com";
+    unlink "6016.exe";
 }
 
 @test = (

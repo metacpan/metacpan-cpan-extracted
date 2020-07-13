@@ -2,7 +2,7 @@ package WebService::AntiCaptcha;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp 'croak';
 use LWP::UserAgent;
@@ -150,6 +150,32 @@ with proxy
         "proxyPassword" => "proxyPasswordHere",
         "userAgent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
     }) or die $wac->errstr;
+
+=head2 FunCaptchaTaskProxyless
+
+L<https://anticaptcha.atlassian.net/wiki/spaces/API/pages/325877766/FunCaptchaTaskProxyless+-+funcaptcha+without+proxy>
+
+    my $res = $wac->createTask({
+        type => 'FunCaptchaTaskProxyless',
+        websiteURL => 'https://client-demo.arkoselabs.com/solo-animals',
+        websitePublicKey => $public_key
+    });
+
+=head2 FunCaptchaTask
+
+L<https://anticaptcha.atlassian.net/wiki/spaces/API/pages/65634347/FunCaptchaTask+-+rotating+captcha+funcaptcha.com>
+
+    my $res = $wac->createTask({
+        type => 'FunCaptchaTask',
+        websiteURL => 'https://client-demo.arkoselabs.com/solo-animals',
+        websitePublicKey => $public_key,
+        "proxyType" => "http",
+        "proxyAddress" => "8.8.8.8",
+        "proxyPort" => 8080,
+        "proxyLogin" => "proxyLoginHere",
+        "proxyPassword" => "proxyPasswordHere",
+        "userAgent" => "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36"
+    });
 
 =head2 getTaskResult
 

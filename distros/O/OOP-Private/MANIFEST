@@ -1,0 +1,15 @@
+Changes
+lib/OOP/Private.pm
+lib/OOP/Private.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-require.t
+t/01-regular-code.t
+t/02-inheritance.t
+t/lib/OOP/Private/Test/Child.pm
+t/lib/OOP/Private/Test/Parent.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

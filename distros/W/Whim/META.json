@@ -72,7 +72,7 @@
    "provides" : {
       "Whim" : {
          "file" : "lib/Whim.pm",
-         "version" : "v1.2020.6.22.0"
+         "version" : "v1.2020.7.12.0"
       },
       "Whim::Command::listen" : {
          "file" : "lib/Whim/Command/listen.pm"
@@ -110,7 +110,7 @@
          "web" : "https://github.com/jmacdotorg/whim"
       }
    },
-   "version" : "1.2020.06.22.0",
+   "version" : "1.2020.07.12.0",
    "x_authority" : "cpan:JMAC",
    "x_contributors" : [
       "Brian Wisti <brianwisti@pobox.com>"

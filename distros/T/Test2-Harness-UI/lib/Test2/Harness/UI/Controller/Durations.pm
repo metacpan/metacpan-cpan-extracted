@@ -2,7 +2,7 @@ package Test2::Harness::UI::Controller::Durations;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Data::GUID;
 use List::Util qw/max/;
@@ -28,49 +28,38 @@ sub handle {
     my $project_name = $route->{project} or die error(404 => 'No project');
     my $short        = $route->{short} || 15;
     my $medium       = $route->{medium} || 30;
-    my $state_id     = $route->{state_id};
 
     my $schema  = $self->{+CONFIG}->schema;
     my $project = $schema->resultset('Project')->find({name => $project_name});
 
     my $data;
     if ($project) {
-        if (my $state = $schema->resultset('DurationsState')->find({state_id => $state_id, project_id => $project->project_id})) {
-            $data = $state->durations();
-        }
-        else {
-            my $dbh = $self->{+CONFIG}->connect;
+        my $dbh = $self->{+CONFIG}->connect;
 
-            my $sth = $dbh->prepare(<<"        EOT");
-            SELECT rel_file AS file, AVG(duration)
-                FROM durations
-               WHERE project_id = ?
+        my $sth = $dbh->prepare(<<"        EOT");
+            SELECT jobs.file, AVG(jobs.duration)
+              FROM jobs
+              JOIN runs USING(run_id)
+             WHERE runs.project_id = ?
+               AND jobs.duration IS NOT NULL
+               AND jobs.file IS NOT NULL
             GROUP BY file
         EOT
 
-            $sth->execute($project->project_id) or die $sth->errstr;
-            my $rows = $sth->fetchall_arrayref;
+        $sth->execute($project->project_id) or die $sth->errstr;
+        my $rows = $sth->fetchall_arrayref;
 
-            $data = {};
-            for my $row (@$rows) {
-                my ($file, $time) = @$row;
-                if ($time < $short) {
-                    $data->{$file} = 'SHORT';
-                }
-                elsif ($time < $medium) {
-                    $data->{$file} = 'MEDIUM';
-                }
-                else {
-                    $data->{$file} = 'LONG';
-                }
+        $data = {};
+        for my $row (@$rows) {
+            my ($file, $time) = @$row;
+            if ($time < $short) {
+                $data->{$file} = 'SHORT';
             }
-
-            if ($state_id) {
-                $schema->resultset('DurationsState')->create({
-                    state_id   => $state_id,
-                    durations  => $data,
-                    project_id => $project->project_id,
-                }) or die "Could not create durations state";
+            elsif ($time < $medium) {
+                $data->{$file} = 'MEDIUM';
+            }
+            else {
+                $data->{$file} = 'LONG';
             }
         }
     }
@@ -101,7 +90,7 @@ __END__
 
 =head1 NAME
 
-Test2::Harness::UI::Controller::Jobs
+Test2::Harness::UI::Controller::Durations
 
 =head1 DESCRIPTION
 

@@ -1,4 +1,7 @@
 Revision history for WebService-AntiCaptcha
 
+0.02  2020-07-13 12:13:08 CST
+        - add example for FunCaptchaTaskProxyless/FunCaptchaTask
+
 0.01  2017-08-29 16:58:46 CST
         - Initial release

@@ -2,6 +2,14 @@ CHANGE LOG
 ==========
 
 
+2020-07-10 - v0.102.0
+---------------------
+
+### Added
+  - on `use` of WrapScope, it now accepts `-file` and `-env` arguments
+  - `generate_wrap_config` for creating config files
+
+
 2020-07-01 - v0.101.0
 ---------------------
 

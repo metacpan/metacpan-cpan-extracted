@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.0, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,12 +26,12 @@ no_index:
 provides:
   B::Tap:
     file: lib/B/Tap.pm
-    version: '0.15'
+    version: '0.16'
   Devel::CallTrace::Result:
     file: lib/Devel/CodeObserver.pm
   Devel::CodeObserver:
     file: lib/Devel/CodeObserver.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   B: '0'
   B::Deparse: '0'
@@ -43,6 +43,9 @@ resources:
   bugtracker: https://github.com/tokuhirom/B-Tap/issues
   homepage: https://github.com/tokuhirom/B-Tap
   repository: git://github.com/tokuhirom/B-Tap.git
-version: '0.15'
+version: '0.16'
+x_authority: cpan:TOKUHIROM
 x_contributors:
   - 'Brian Fraser <fraserbn@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

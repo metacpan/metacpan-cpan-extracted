@@ -1,5 +1,4 @@
 .travis.yml
-Build.PL
 Changes
 CONTRIBUTING
 examples/add.pas
@@ -9,20 +8,21 @@ examples/mylib.pl
 inc/My/ModuleBuild.pm
 inc/run/readme.pl
 INSTALL
+lib/FFI/Build/File/Pascal.pm
 lib/FFI/Platypus/Lang/Pascal.pm
-libtest/myunit.pas
-libtest/test.pas
 LICENSE
 maint/cip-before-install
 maint/releaseprep
+Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 README
 SUPPORT
-t/00_diag.t
-t/00_diag.txt
-t/01_use.t
-t/02_types.t
+t/ffi/myunit.pas
+t/ffi/test.fbx
+t/ffi/test.pas
+t/ffi_build_file_pascal.t
 t/ffi_platypus_attach.t
 t/lang.t
+t/types.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

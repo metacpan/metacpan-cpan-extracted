@@ -1,0 +1,22 @@
+NAME
+
+    OpenTracing::Integration::Email::Sender - support Email::Sender tracing
+
+SYNOPSIS
+
+     use OpenTracing::Integration qw(Email::Sender);
+     HTTP::Tiny->new->get('https://metacpan.org');
+
+DESCRIPTION
+
+    See OpenTracing::Integration for more details.
+
+AUTHOR
+
+    Tom Molesworth TEAM@cpan.org
+
+LICENSE
+
+    Copyright Tom Molesworth 2020. Licensed under the same terms as Perl
+    itself.
+

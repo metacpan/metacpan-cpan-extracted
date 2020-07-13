@@ -1,6 +1,8 @@
 package Lab::Instrument::ITC;
 #ABSTRACT: Oxford Instruments ITC Intelligent Temperature Control
-$Lab::Instrument::ITC::VERSION = '3.703';
+$Lab::Instrument::ITC::VERSION = '3.710';
+use v5.20;
+
 use strict;
 use Lab::Instrument;
 use Lab::MultiChannelInstrument;
@@ -454,7 +456,7 @@ Lab::Instrument::ITC - Oxford Instruments ITC Intelligent Temperature Control
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -606,6 +608,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2014       Christian Butschkow
             2016       Christian Butschkow, Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

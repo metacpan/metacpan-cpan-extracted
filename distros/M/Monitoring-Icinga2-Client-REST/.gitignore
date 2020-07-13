@@ -1,0 +1,22 @@
+*.bak
+*.old
+*.orig
+*.rej
+*.tar.gz
+*.tmp
+*~
+.build/
+/*.tar.gz
+ */Build
+/MYMETA.*
+/Makefile
+/Module-Build-*
+/Module-Build-Tiny-*
+/PM_to_blib
+/_build
+/_build_params
+/blib
+/blib
+/cover_db
+/pm_to_blib
+test.pl

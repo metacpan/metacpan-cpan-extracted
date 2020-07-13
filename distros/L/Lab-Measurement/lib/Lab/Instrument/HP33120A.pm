@@ -1,7 +1,8 @@
 package Lab::Instrument::HP33120A;
 #ABSTRACT: HP 33120A 15MHz function/arbitrary waveform generator
-$Lab::Instrument::HP33120A::VERSION = '3.703';
-use 5.006;
+$Lab::Instrument::HP33120A::VERSION = '3.710';
+use v5.20;
+
 use strict;
 use warnings;
 use Lab::Instrument;
@@ -1836,7 +1837,7 @@ Lab::Instrument::HP33120A - HP 33120A 15MHz function/arbitrary waveform generato
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -2586,6 +2587,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Charles Lane, Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

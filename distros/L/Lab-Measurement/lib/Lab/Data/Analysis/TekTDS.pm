@@ -1,7 +1,8 @@
 package Lab::Data::Analysis::TekTDS;
 #ABSTRACT: Analysis routine for Tektronix TDS1000/TDS2000/etc. scopes
-$Lab::Data::Analysis::TekTDS::VERSION = '3.703';
-use 5.006;
+$Lab::Data::Analysis::TekTDS::VERSION = '3.710';
+use v5.20;
+
 use strict;
 use warnings;
 use Carp;
@@ -321,7 +322,7 @@ Lab::Data::Analysis::TekTDS - Analysis routine for Tektronix TDS1000/TDS2000/etc
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SUBROUTINES/METHODS
 
@@ -394,6 +395,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2016       Charles Lane
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

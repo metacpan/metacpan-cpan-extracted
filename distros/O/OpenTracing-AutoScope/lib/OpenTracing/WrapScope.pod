@@ -72,6 +72,42 @@ The following tags will be automatically added to each span:
 Additionally, if a wrapped subroutine dies, an additional C<error> tag,
 containing the error message (C<$@>) will be added to the span.
 
+=head2 -file
+
+List of subroutine names can be read from text files.
+Only a simple list of subroutines is supported with each line containing
+a single subroutine name, the subroutine needs to be fully qualified,
+regardless of where L<OpenTracing::WrapScope> is used.
+The effect is the same as using the subroutine names directly.
+Multiple files can be specified at once.
+
+Suppose you have a file called C<wrapscope.conf> with the following contents:
+
+  Foo::bar
+  Foo::baz
+  main::run
+
+You could wrap these subroutines by using:
+
+  use OpenTracing::WrapScope -file => 'wrapscope.conf';
+
+Mutiple filenames can be specified by using an arrayref:
+
+  use OpenTracing::WrapScope -file => [ 'config/wrap_base.conf', 'config/wrap_extra.conf' ];
+
+or a shell glob (expanded using the L<glob> builtin):
+
+  use OpenTracing::WrapScope -file => 'config/wrap*.conf';
+
+=head2 -env
+
+If this argument is specified, arguments for L<-file> will be read from
+B<OPENTRACING_WRAPSCOPE_FILE>. This environment variable can contain a single
+filename/glob or multiple ones separated by colons:
+
+  OPENTRACING_WRAPSCOPE_FILE=wrapscope.conf
+  OPENTRACING_WRAPSCOPE_FILE=config/wrap_base.conf:config/wrap_extra.conf
+  OPENTRACING_WRAPSCOPE_FILE='config/wrap*.conf'
 
 =head1 FUNCTIONS
 
@@ -92,6 +128,12 @@ or disabled with:
 
 Returns a version of the given code reference with span handling attached.
 Useful for adding spans to anonymous subroutines.
+
+=head2 wrap_from_file($filename)
+
+Read a list of subroutines from $filename and install scope handlers in them.
+The file should contain a list of subroutines (identical to the one accepted
+by C<-file> in import()).
 
 =head1 CAVEATS
 

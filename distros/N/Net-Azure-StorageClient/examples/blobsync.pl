@@ -6,7 +6,7 @@ use Pod::Usage qw/pod2usage/;
 use Net::Azure::StorageClient::Blob;
 use Data::Dumper;
 use threads;
-use Time::HiRes;  
+use Time::HiRes;
 
 my $account = '';
 my $accesskey = '';
@@ -52,12 +52,12 @@ if (! $accesskey ) {
 }
 
 if ( (! $account ) || (! $accesskey ) ) {
-    die 
+    die
     'Your account and primary access key of Windows Azure Blob Storage are required.';
 }
 
 if ( ! $direction || ! $path || ! $directory ) {
-    die 
+    die
     "Option '--direction', '--path' and '--directory' is required.";
 }
 
@@ -72,13 +72,15 @@ my $blobService = Net::Azure::StorageClient::Blob->new( account_name => $account
 
 my $params = { direction => $direction };
 $params->{ include_invisible } = $include_invisible;
-my @exclude_items = split( /,/, $excludes ) if $excludes;
-$params->{ excludes } = \@exclude_items  if $excludes;
+if ($excludes) {
+    my @exclude_items = split( /,/, $excludes );
+    $params->{ excludes } = \@exclude_items;
+}
 $params->{ use_thread } = $use_thread;
 
-my $start = Time::HiRes::time;  
+my $start = Time::HiRes::time;
 my $res = $blobService->sync( $path, $directory, $params );
-my $score = sprintf( "%0.2f", Time::HiRes::time - $start ); 
+my $score = sprintf( "%0.2f", Time::HiRes::time - $start );
 
 if (! $silence ) {
     if ( ( ref $res ) eq 'ARRAY' ) {

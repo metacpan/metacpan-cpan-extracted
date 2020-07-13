@@ -1,5 +1,12 @@
 Revision history for OpenTracing
 
+1.002     2020-07-13 01:54:48+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - warning when current span was not defined
+
 1.001     2020-06-29 00:54:31+08:00 Asia/Kuala_Lumpur
     New features:
 

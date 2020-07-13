@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Kernel';
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 # ATTRIBUTES
 
@@ -119,60 +119,6 @@ The start method prepares the L<Zing::Kernel> and executes its event-loop.
 
 =cut
 
-=head1 COMMANDS
-
-Given the following process (actor):
-
-  # in lib/MyApp.pm
-
-  package MyApp;
-
-  use parent 'Zing::Single';
-
-  sub perform {
-    # do something (once)
-  }
-
-  1;
-
-With an application cartridge specifying 4 forks:
-
-  # in app/myapp
-
-  ['MyApp', [], 4]
-
-The L<zing> command-line application lets you manage Zing applications from the
-command-line using these commands:
-
-=cut
-
-=head2 start
-
-  $ zing start app/myapp
-
-The C<start> command loads an application I<cartridge> which returns a
-L<"scheme"|Zing::Types/scheme> and runs it as a daemon.
-
-=cut
-
-=head2 stop
-
-  $ zing stop app/myapp
-
-The C<stop> command finds a running application by its PID (process ID) and
-terminates the process.
-
-=cut
-
-=head2 logs
-
-  $ zing logs --level fatal
-
-The C<logs> command taps the centralized log source and outputs new events to
-STDOUT (standard output).
-
-=cut
-
 =head1 PRIMATIVES
 
 This distribution provides a collection of actor-model primitives which can be
@@ -197,10 +143,6 @@ L<Zing::Data>: Process Data
 =item *
 
 L<Zing::Domain>: Shared State Management
-
-=item *
-
-L<Zing::Dropbox>: Transient Store
 
 =item *
 
@@ -341,10 +283,12 @@ of features currently enabled by this toolkit:
 
   use Zing::Process;
 
-  my $p1 = Zing::Process->new(name => 'p1');
-  my $p2 = Zing::Process->new(name => 'p2');
+  my $p1 = Zing::Process->new;
+  my $p2 = Zing::Process->new;
 
-  $p1->mailbox->send($p2->mailbox->term, { action => 'greeting' });
+  $p1->send($p2, { action => 'greetings' });
+
+  say $p2->recv->{action}; # got it?
 
 This distribution provides a toolkit for creating processes (actors) which can
 be run in isolation and which communicate with other processes through
@@ -494,11 +438,14 @@ scale your deployments without changing your implementations.
 
 =head2 configuration
 
-  # configure the namespace (defaults to "main")
+  # configure the namespace
   ZING_NS=app
 
   # enable process debugging tracing
   ZING_DEBUG=1
+
+  # configure the namespace, same as ZING_NS (defaults to "main")
+  ZING_HANDLE=app
 
   # configure where the command-line tool finds catridges
   ZING_HOME=/tmp
@@ -506,6 +453,9 @@ scale your deployments without changing your implementations.
   # configure the hostname used in process registration
   ZING_HOST=0.0.0.0
   ZING_HOST=68.80.90.100
+
+  # configure the resource target (e.g. when distributing across multiple hosts)
+  ZING_TARGET='global' # or 'local'
 
   # configure the system datastore (defaults to 'Zing::Redis')
   ZING_STORE='Zing::Redis'
@@ -793,6 +743,60 @@ monitoring supervised processes.
 This distribution provides the ability to use virtual actors, which are
 processes (actors) created on-demand as a result of some system event. This
 feature is enabled by the L<Zing::Launcher> and L<Zing::Spawner> superclasses.
+
+=cut
+
+=head1 COMMANDS
+
+Given the following process (actor):
+
+  # in lib/MyApp.pm
+
+  package MyApp;
+
+  use parent 'Zing::Single';
+
+  sub perform {
+    # do something (once)
+  }
+
+  1;
+
+With an application cartridge specifying 4 forks:
+
+  # in app/myapp
+
+  ['MyApp', [], 4]
+
+The L<zing> command-line application lets you manage Zing applications from the
+command-line using these commands:
+
+=cut
+
+=head2 start
+
+  $ zing start app/myapp
+
+The C<start> command loads an application I<cartridge> which returns a
+L<"scheme"|Zing::Types/scheme> and runs it as a daemon.
+
+=cut
+
+=head2 stop
+
+  $ zing stop app/myapp
+
+The C<stop> command finds a running application by its PID (process ID) and
+terminates the process.
+
+=cut
+
+=head2 logs
+
+  $ zing logs --level fatal
+
+The C<logs> command taps the centralized log source and outputs new events to
+STDOUT (standard output).
 
 =cut
 

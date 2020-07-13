@@ -14,7 +14,7 @@ use Data::Object::ClassHas;
 use Socket;
 use Sys::Hostname;
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 # ATTRIBUTES
 

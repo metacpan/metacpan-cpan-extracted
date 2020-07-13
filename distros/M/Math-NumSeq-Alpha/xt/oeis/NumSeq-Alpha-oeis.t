@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2020 Kevin Ryde
 
 # This file is part of Math-NumSeq-Alpha.
 #
@@ -640,10 +640,10 @@ sub check_class {
 # OEIS-Other vs files
 
 {
-  system("perl ../ns/tools/make-oeis-catalogue.pl --module=TempOther --other=only") == 0
-    or die;
-  require 'lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm';
-  unlink  'lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm' or die;
+  # system("perl ../ns/tools/make-oeis-catalogue.pl --module=TempOther --other=only") == 0
+  #   or die;
+  # require 'lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm';
+  # unlink  'lib/Math/NumSeq/OEIS/Catalogue/Plugin/TempOther.pm' or die;
 
   MyTestHelpers::diag ("\"Other\" uncatalogued sequences:");
   my $aref = Math::NumSeq::OEIS::Catalogue::Plugin::TempOther::info_arrayref();

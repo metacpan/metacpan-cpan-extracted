@@ -1,5 +1,8 @@
 Revision history for Locale-CA
 
+0.03	Sun Jul 12 21:52:50 EDT 2020
+	Added support for French
+
 0.02 Mon Sep 28 10:35:37 EDT 2015
 	Changed Quebec to QC, and added 'and Labrador' to
 		Newfoundland

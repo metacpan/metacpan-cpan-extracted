@@ -85,6 +85,6 @@ BOOT:
         orig_openhandler = PL_ppaddr[OP_OPEN];
         PL_ppaddr[OP_OPEN] = my_openhandler;
 
-        orig_sysopenhandler = PL_ppaddr[OP_SYSOPEN];
-        PL_ppaddr[OP_SYSOPEN] = my_sysopenhandler;
+        //orig_sysopenhandler = PL_ppaddr[OP_SYSOPEN];
+        //PL_ppaddr[OP_SYSOPEN] = my_sysopenhandler;
     }

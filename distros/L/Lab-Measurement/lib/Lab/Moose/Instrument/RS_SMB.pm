@@ -1,8 +1,9 @@
 package Lab::Moose::Instrument::RS_SMB;
-$Lab::Moose::Instrument::RS_SMB::VERSION = '3.703';
+$Lab::Moose::Instrument::RS_SMB::VERSION = '3.710';
 #ABSTRACT: Rohde & Schwarz SMB Signal Generator
 
-use 5.010;
+use v5.20;
+
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -179,7 +180,7 @@ Lab::Moose::Instrument::RS_SMB - Rohde & Schwarz SMB Signal Generator
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -230,6 +231,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

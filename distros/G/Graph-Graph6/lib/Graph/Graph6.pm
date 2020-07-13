@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -27,7 +27,7 @@ our @ISA = ('Exporter');
 our @EXPORT_OK = ('read_graph','write_graph',
                   'HEADER_GRAPH6','HEADER_SPARSE6','HEADER_DIGRAPH6');
 
-our $VERSION = 7;
+our $VERSION = 8;
 
 # uncomment this to run the ### lines
 # use Smart::Comments;
@@ -249,7 +249,7 @@ sub read_graph {
         ### $b
         ### to v: $v
 
-        while ($bits < $width) {
+        while ($bits < $width) {      # fill $n,$bits to >= $width many bits
           my $n2 = $read_byte->();
           if ($n2 < 0) {
             ### end n2 ...
@@ -384,9 +384,9 @@ sub _number_to_string {
     $str = '';
     $bitpos = 0;
   }
-  for ( ; $bitpos >= 0; $bitpos -= 6) {     # big endian, high to low
+  do {     # big endian, high to low
     $str .= chr( (($n >> $bitpos) & 0x3F) + 63 );
-  }
+  } while (($bitpos-=6) >= 0);
   return $str;
 }
 
@@ -511,6 +511,10 @@ sub write_graph {
       }
       return 1;
     };
+
+    # When doing a "set v" for a new to >= v+2, the b[i] bit can be either 0
+    # or 1.  When 1 it means v++ increment, and the x[i]=to is still >v so
+    # set v.  The code here follows the nauty tools ntos6() and emits b[i]=1.
 
     my $v = 0;
     while (my ($from, $to) = $edge_iterator->()) {
@@ -650,15 +654,18 @@ These formats represent a graph (a graph theory graph) with vertices
 numbered 0 to n-1 encoded into printable ASCII characters in the range C<?>
 to C<~>.  The maximum number of vertices is 2^36-1.
 
-graph6 and sparse6 represent an undirected graph.  graph6 is an upper
-triangle adjacency matrix of bits.  Its encoding is 6 bits per character so
-N vertices is a file size roughly N^2/12 bytes.  sparse6 lists edges as
-pairs of vertices i,j and is good for graphs with relatively few edges.
-sparse6 can have multi-edges and self loops.  graph6 cannot.
+graph6 represents an undirected graph by an upper triangle adjacency matrix
+of bits.  It has no self-loops or multi-edges.  Its encoding is 6 bits per
+character so N vertices is a file size roughly N^2/12 bytes.
+
+sparse6 represents an undirected graph by a list of edges i,j.  This is good
+for graphs with relatively few edges.  It can have self-loops and
+multi-edges.  The file size is somewhere from B=E*(W+1)/6 to 2*B bytes for E
+edges and bit width W bits for the biggest vertex number N-1.
 
 digraph6 represents a directed graph as an NxN adjacency matrix encoded 6
-bits per character so a file size roughly N^2/6 bytes.  It can include self
-loops.
+bits per character so file size N^2/6 bytes.  It can include self-loops but
+no multi-edges.
 
 =cut
 
@@ -677,19 +684,11 @@ This module reads and writes in a "native" way as integer vertex numbers 0
 to n-1.  See L</SEE ALSO> below for C<Graph.pm>, C<Graph::Easy> and
 C<GraphViz2> interfaces.
 
-These formats are used by the Nauty tools
-
-=over
-
-L<http://cs.anu.edu.au/~bdm/nauty> and 
-L<http://pallini.di.uniroma1.it>
-
-=back
-
-as output for generated graphs and input for calculations of automorphism
-groups, canonicalizing, and more.  The House of Graphs
-L<http://hog.grinvin.org> takes graph6 for searches and uploads and includes
-it among download formats.
+These formats are used by the Nauty tools L<http://cs.anu.edu.au/~bdm/nauty>
+and L<http://pallini.di.uniroma1.it> as output for generated graphs and
+input for calculations of automorphism groups, canonicalizing, and more.
+The House of Graphs L<http://hog.grinvin.org> takes graph6 for searches and
+uploads and includes it among download formats.
 
 =head1 FUNCTIONS
 
@@ -717,8 +716,8 @@ The return value is
     croak()   if invalid content or file error
     undef     if error_func returns instead of dying
 
-C<filename>, C<fh> or C<str> is the input.  The output is the number of
-vertices and a list of edges.
+C<filename>, C<fh> or C<str> is the input.  The output is number of vertices
+and list of edges provided by calls or ref targets.
 
 The number of vertices n is stored to C<num_vertices_ref> or call to
 C<num_vertices_func>, or both.
@@ -770,8 +769,8 @@ and within that increasing C<$to>.  But the suggestion is not to rely on
 edge order (only on C<$from E<lt>= $to> for graph6 and sparse6 noted above).
 
 In C<perl -T> taint mode, C<$num_vertices> and edge C<$from,$to> outputs are
-tainted in the usual way for reading from a file, a tainted C<str>, or an
-C<fh> handle of a file or tie of something tainted.
+tainted in the usual way for reading from file, from tainted C<str>, or from
+C<fh> handle of file or tie of something tainted.
 
 =back
 
@@ -807,8 +806,7 @@ scalar ref to store to, so for example
     # or
     write_graph(str_ref => \my $str, ...)
 
-C<format> defaults to the dense C<"graph6">, or can be C<"sparse6"> or
-C<"digraph6">
+C<format> defaults to C<"graph6">, or can be C<"sparse6"> or C<"digraph6">
 
     write_graph(format => "sparse6", ...)
 
@@ -825,7 +823,7 @@ as the maximum vertex has at least one edge).  Must have C<num_vertices <
 
 C<edge_aref> is an arrayref of edges which are in turn arrayref pairs of
 integers C<[$from,$to]>.  They can be in any order but all must be integers
-in the range 0 to <$num_vertices-1> inclusive.  For graph6 and sparse6
+in the range 0 to C<$num_vertices-1> inclusive.  For graph6 and sparse6
 (being undirected) the C<$from,$to> pairs can be either way around.  graph6
 ignores self-loops and writes duplicates just once each.  sparse6 can have
 self-loops and repeated entries for multi-edges.  digraph6 can have
@@ -895,7 +893,7 @@ L<http://user42.tuxfamily.org/graph-graph6/index.html>
 
 =head1 LICENSE
 
-Copyright 2015, 2016, 2017 Kevin Ryde
+Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 
 Graph-Graph6 is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by the

@@ -1,0 +1,7 @@
+name = "B-Tap"
+# badges = ["travis-ci.com"]
+authority="cpan:TOKUHIROM"
+
+module_maker="ModuleBuild"
+static_install = "auto"
+

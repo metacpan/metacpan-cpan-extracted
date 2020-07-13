@@ -4,13 +4,13 @@
       "Jonny Schulz"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Log-Handler",
    "prereqs" : {
@@ -46,7 +46,7 @@
    "provides" : {
       "Log::Handler" : {
          "file" : "lib/Log/Handler.pm",
-         "version" : "0.88"
+         "version" : "0.90"
       },
       "Log::Handler::Config" : {
          "file" : "lib/Log/Handler/Config.pm",
@@ -90,7 +90,7 @@
       },
       "Log::Handler::Pattern" : {
          "file" : "lib/Log/Handler/Pattern.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "Log::Handler::Plugin::Config::General" : {
          "file" : "lib/Log/Handler/Plugin/Config/General.pm",
@@ -111,5 +111,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.88"
+   "version" : "0.90",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

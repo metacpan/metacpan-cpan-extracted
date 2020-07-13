@@ -1,5 +1,6 @@
 CHANGES
 cpanfile
+bin/generate_wrap_config.pl
 lib/OpenTracing/AutoScope.pm
 lib/OpenTracing/AutoScope.pod
 lib/OpenTracing/WrapScope.pm
@@ -10,12 +11,35 @@ MANIFEST
 README.md
 t/00_use_ok.t
 t/01_can_methods.t
-t/guarded-span.t
+t/WrapScope/ConfigGenerator/examine_files.t
+t/WrapScope/ConfigGenerator/list_subs.t
+t/WrapScope/ConfigGenerator/sample_tree/Secret/Encryption.pm
+t/WrapScope/ConfigGenerator/sample_tree/Secret/Passwords.pm
+t/WrapScope/ConfigGenerator/sample_tree/TopLvl1.pm
+t/WrapScope/ConfigGenerator/sample_tree/TopLvl2.pm
+t/WrapScope/ConfigGenerator/sample_tree/bin/foo.pl
+t/WrapScope/ConfigGenerator/samples/imported.pm
+t/WrapScope/ConfigGenerator/samples/multiple_packages.pm
+t/WrapScope/ConfigGenerator/samples/multiple_packages_block_syntax.pm
+t/WrapScope/ConfigGenerator/samples/no_packages.pm
+t/WrapScope/ConfigGenerator/samples/wrapped.pm
 t/WrapScope/caller.t
 t/WrapScope/context.t
 t/WrapScope/errors.t
+t/WrapScope/external.t
+t/WrapScope/files-arrayref.t
+t/WrapScope/files-env.t
+t/WrapScope/files-glob.t
+t/WrapScope/files.t
 t/WrapScope/hierarchy.t
 t/WrapScope/lifespan.t
 t/WrapScope/post-declare.t
+t/WrapScope/samples/lib/Samples.pm
+t/WrapScope/samples/sample3.txt
+t/WrapScope/samples/wrapscope1.txt
+t/WrapScope/samples/wrapscope2.txt
+t/WrapScope/tags.t
+t/WrapScope/warnings.t
+t/guarded-span.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -168,7 +168,7 @@ const char* const SPVM_OP_C_ID_NAMES[] = {
   "RW",
   "RO",
   "WO",
-  "BEGIN",
+  "INIT",
   "REQUIRE",
   "IF_REQUIRE",
   "CURRENT_PACKAGE",
@@ -1571,7 +1571,11 @@ SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPV
 
 SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages) {
   
-  SPVM_OP* op_grammar = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_GRAMMAR, op_packages->file, op_packages->line);
+  if (!compiler->op_grammar) {
+    compiler->op_grammar = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_GRAMMAR, op_packages->file, op_packages->line);
+  }
+  
+  SPVM_OP* op_grammar = compiler->op_grammar;
   SPVM_OP_insert_child(compiler, op_grammar, op_grammar->last, op_packages);
 
   return op_grammar;
@@ -1600,6 +1604,9 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     compiler->anon_package_length++;
     SPVM_OP* op_name_package = SPVM_OP_new_op_name(compiler, name_package, op_package->file, op_package->line);
     op_type = SPVM_OP_build_basic_type(compiler, op_name_package);
+    
+    // Add addede package names in this compile
+    SPVM_LIST_push(compiler->tmp_added_package_names, (void*)name_package);
   }
   
   package->op_type = op_type;
@@ -1684,13 +1691,13 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           for (int32_t i = 0; i < sub_names->length; i++) {
             const char* sub_name = SPVM_LIST_fetch(sub_names, i);
             
-            const char* found_sub_name = SPVM_HASH_fetch(package->sub_name_symtable, sub_name, strlen(sub_name));
+            const char* found_sub_name = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
             if (found_sub_name) {
               SPVM_COMPILER_error(compiler, "Redeclaration of sub in use statement \"%s\" at %s line %d\n", sub_name, op_decl->file, op_decl->line);
             }
             // Unknown sub
             else {
-              SPVM_HASH_insert(package->sub_name_symtable, sub_name, strlen(sub_name), (void*)sub_name);
+              SPVM_HASH_insert(package->sub_symtable, sub_name, strlen(sub_name), (void*)sub_name);
             }
           }
         }
@@ -1935,24 +1942,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       }
     }
     
-    // Sort fields(except value package)
-    if (package->category != SPVM_PACKAGE_C_CATEGORY_VALUE) {
-      for (int32_t i = 0; i < (package->fields->length - 1); i++) {
-        for (int32_t j = (package->fields->length - 1); j > i; j--) {
-          SPVM_FIELD* field1 = SPVM_LIST_fetch(package->fields, j-1);
-          SPVM_FIELD* field2 = SPVM_LIST_fetch(package->fields, j);
-          
-          void** values = package->fields->values;
-
-          if (strcmp(field1->name, field2->name) > 0) {
-            SPVM_FIELD* temp = values[j-1];
-            values[j-1] = values[j];
-            values[j] = temp;
-          }
-        }
-      }
-    }
-    
     // Field declarations
     for (int32_t i = 0; i < package->fields->length; i++) {
       SPVM_FIELD* field = SPVM_LIST_fetch(package->fields, i);
@@ -1980,22 +1969,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       }
     }
 
-    // Sort package variables
-    for (int32_t i = 0; i < (package->package_vars->length - 1); i++) {
-      for (int32_t j = (package->package_vars->length - 1); j > i; j--) {
-        SPVM_PACKAGE_VAR* package_var1 = SPVM_LIST_fetch(package->package_vars, j-1);
-        SPVM_PACKAGE_VAR* package_var2 = SPVM_LIST_fetch(package->package_vars, j);
-        
-        void** values = package->package_vars->values;
-
-        if (strcmp(package_var1->name, package_var2->name) > 0) {
-          SPVM_PACKAGE_VAR* temp = values[j-1];
-          values[j-1] = values[j];
-          values[j] = temp;
-        }
-      }
-    }
-
     // Package variable declarations
     {
       int32_t i;
@@ -2003,13 +1976,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         SPVM_PACKAGE_VAR* package_var = SPVM_LIST_fetch(package->package_vars, i);
         const char* package_var_name = package_var->name;
 
-        // Add package var name to string pool
-        int32_t found_string_pool_id = (intptr_t)SPVM_HASH_fetch(compiler->string_symtable, package_var_name, strlen(package_var_name) + 1);
-        if (found_string_pool_id == 0) {
-          int32_t string_pool_id = SPVM_STRING_BUFFER_add_len(compiler->string_pool, (char*)package_var_name, strlen(package_var_name) + 1);
-          SPVM_HASH_insert(compiler->string_symtable, package_var_name, strlen(package_var_name) + 1, (void*)(intptr_t)string_pool_id);
-        }
-        
         SPVM_PACKAGE_VAR* found_package_var = SPVM_HASH_fetch(package->package_var_symtable, package_var_name, strlen(package_var_name));
         
         if (found_package_var) {
@@ -2022,22 +1988,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
           
           // Add op package
           package_var->package = package;
-        }
-      }
-    }
-    
-    // Sort subs
-    for (int32_t i = 0; i < (package->subs->length - 1); i++) {
-      for (int32_t j = (package->subs->length - 1); j > i; j--) {
-        SPVM_SUB* sub1 = SPVM_LIST_fetch(package->subs, j-1);
-        SPVM_SUB* sub2 = SPVM_LIST_fetch(package->subs, j);
-        
-        void** values = package->subs->values;
-
-        if (strcmp(sub1->name, sub2->name) > 0) {
-          SPVM_SUB* temp = values[j-1];
-          values[j-1] = values[j];
-          values[j] = temp;
         }
       }
     }
@@ -2064,13 +2014,6 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         
         SPVM_OP* op_name_sub = sub->op_name;
         const char* sub_name = op_name_sub->uv.name;
-
-        // Add sub name to string pool
-        int32_t found_string_pool_id = (intptr_t)SPVM_HASH_fetch(compiler->string_symtable, sub_name, strlen(sub_name) + 1);
-        if (found_string_pool_id == 0) {
-          int32_t string_pool_id = SPVM_STRING_BUFFER_add_len(compiler->string_pool, (char*)sub_name, strlen(sub_name) + 1);
-          SPVM_HASH_insert(compiler->string_symtable, sub_name, strlen(sub_name) + 1, (void*)(intptr_t)string_pool_id);
-        }
 
         // Method check
         
@@ -2142,7 +2085,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
         }
         // Unknown sub
         else {
-          const char* found_sub_name = SPVM_HASH_fetch(package->sub_name_symtable, sub_name, strlen(sub_name));
+          const char* found_sub_name = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
           if (found_sub_name) {
             SPVM_COMPILER_error(compiler, "Redeclaration of sub \"%s\" at %s line %d\n", sub_name, sub->op_sub->file, sub->op_sub->line);
           }
@@ -2370,8 +2313,6 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   // Create sub information
   sub->op_name = op_name_sub;
   
-  sub->file = op_sub->file;
-  sub->line = op_sub->line;
   sub->name = sub->op_name->uv.name;
   
   if (op_dot3) {
@@ -2379,8 +2320,8 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
   }
   
   sub->is_begin = is_begin;
-  if (!is_begin && strcmp(sub_name, "BEGIN") == 0) {
-    SPVM_COMPILER_error(compiler, "\"BEGIN\" is reserved for BEGIN block at %s line %d\n", op_name_sub->file, op_name_sub->line);
+  if (!is_begin && strcmp(sub_name, "INIT") == 0) {
+    SPVM_COMPILER_error(compiler, "\"INIT\" is reserved for INIT block at %s line %d\n", op_name_sub->file, op_name_sub->line);
   }
   
   // Descriptors
@@ -2510,7 +2451,7 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
     
     // 3. Add list of temporary variable declarations to first of block
     {
-      SPVM_OP* op_list_tmp_mys = SPVM_OP_new_op_list(compiler, sub->file, sub->line);
+      SPVM_OP* op_list_tmp_mys = SPVM_OP_new_op_list(compiler, op_sub->file, op_sub->line);
       SPVM_OP_insert_child(compiler, op_list_statement, op_list_statement->last, op_list_tmp_mys);
       sub->op_list_tmp_mys = op_list_tmp_mys;
     }

@@ -1,0 +1,95 @@
+{
+   "abstract" : "Formatting for various spreadsheet readers",
+   "author" : [
+      "Jed Lund <jandrew@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Spreadsheet-Reader-Format",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.04"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::Flexible" : "0",
+            "DateTime::TimeZone" : "2.09",
+            "DateTimeX::Format::Excel" : "0.014",
+            "Encode" : "0",
+            "IO::File" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Test::Exception" : "0.43",
+            "Test::Moose" : "2.1801",
+            "Type::Coercion" : "0",
+            "Type::Library" : "1.000",
+            "Type::Tiny" : "0",
+            "Type::Utils" : "0",
+            "Types::Standard" : "0",
+            "lib" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Data::Dumper" : "0",
+            "MooseX::ShortCut::BuildInstance" : "v1.8.0",
+            "Test::Moose" : "2.1801",
+            "Test::Most" : "0",
+            "Test::TypeTiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Spreadsheet::Reader::Format" : {
+         "file" : "lib/Spreadsheet/Reader/Format.pm",
+         "version" : "v0.6.5"
+      },
+      "Spreadsheet::Reader::Format::FmtDefault" : {
+         "file" : "lib/Spreadsheet/Reader/Format/FmtDefault.pm",
+         "version" : "v0.6.5"
+      },
+      "Spreadsheet::Reader::Format::ParseExcelFormatStrings" : {
+         "file" : "lib/Spreadsheet/Reader/Format/ParseExcelFormatStrings.pm",
+         "version" : "v0.6.5"
+      },
+      "Spreadsheet::Reader::Format::Types" : {
+         "file" : "lib/Spreadsheet/Reader/Format/Types.pm",
+         "version" : "v0.6.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hakonhagland/p5-spreadsheet-reader-format/issues"
+      },
+      "homepage" : "https://github.com/hakonhagland/p5-spreadsheet-reader-format",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hakonhagland/p5-spreadsheet-reader-format.git",
+         "web" : "https://github.com/hakonhagland/p5-spreadsheet-reader-format"
+      }
+   },
+   "version" : "v0.6.5",
+   "x_authority" : "cpan:JANDREW",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -13,12 +13,12 @@ check_lib_or_exit(
 );
 
 my %make = (
-    ABSTRACT_FROM => 'KQueue.pm',
+    ABSTRACT_FROM => 'lib/IO/KQueue.pm',
     AUTHOR => 'Matt Sergeant <matt@sergeant.org>',
     CONFIGURE_REQUIRES => { 'Devel::CheckLib' => 0 },
     NAME => 'IO::KQueue',
     PREREQ_PM => { 'XSLoader' => 0 },
-    VERSION_FROM => 'KQueue.pm',
+    VERSION_FROM => 'lib/IO/KQueue.pm',
     META_MERGE => {
         "meta-spec" => { version => 2 },
         resources => {

@@ -1,8 +1,9 @@
 package Lab::Moose::Connection::Socket;
-$Lab::Moose::Connection::Socket::VERSION = '3.703';
+$Lab::Moose::Connection::Socket::VERSION = '3.710';
 #ABSTRACT: Transfer IEEE 488.2 / SCPI messages over TCP
 
-use 5.010;
+use v5.20;
+
 
 use Moose;
 use MooseX::Params::Validate;
@@ -160,7 +161,7 @@ Lab::Moose::Connection::Socket - Transfer IEEE 488.2 / SCPI messages over TCP
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -224,6 +225,7 @@ Append this to each write command. Default: C<"\n">.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2017       Andreas K. Huettel, Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

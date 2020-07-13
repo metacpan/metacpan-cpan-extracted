@@ -1,6 +1,8 @@
 package Lab::Instrument::MG369xB;
 #ABSTRACT: Anritsu MG369xB series signal generator
-$Lab::Instrument::MG369xB::VERSION = '3.703';
+$Lab::Instrument::MG369xB::VERSION = '3.710';
+use v5.20;
+
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);
@@ -182,7 +184,7 @@ Lab::Instrument::MG369xB - Anritsu MG369xB series signal generator
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 CAVEATS/BUGS
 
@@ -205,6 +207,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2013-2014  Andreas K. Huettel
             2016       Simon Reinhardt
             2017       Andreas K. Huettel
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

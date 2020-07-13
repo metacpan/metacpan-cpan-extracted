@@ -22,7 +22,7 @@ use warnings;
 use Moo;
 use Graph::Graph6;
 
-our $VERSION = 7;
+our $VERSION = 8;
 
 
 has graph => (default  => sub {

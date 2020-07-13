@@ -1,10 +1,10 @@
 package Path::Dispatcher::Path;
 # ABSTRACT: path and some optional metadata
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
-
+use MooX::TypeTiny;
 use Types::Standard qw(Str HashRef);
 use overload q{""} => sub { shift->path };
 
@@ -63,7 +63,7 @@ Path::Dispatcher::Path - path and some optional metadata
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

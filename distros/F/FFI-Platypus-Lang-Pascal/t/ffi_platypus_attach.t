@@ -1,14 +1,10 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use FFI::CheckLib qw( find_lib );
 use FFI::Platypus;
 
-my $libtest = find_lib lib => 'test', libpath => 'libtest';
-plan skip_all => 'test requires Free Pascal'
+my $libtest = find_lib lib => 'test', libpath => 't/ffi';
+skip_all 'test requires Free Pascal'
   unless $libtest;
-
-plan tests => 2;
 
 my $ffi = FFI::Platypus->new;
 $ffi->lang('Pascal');
@@ -20,7 +16,7 @@ subtest lib => sub {
 };
 
 subtest unit => sub {
-  plan skip_all => 'not the best way to do it';
+  skip_all 'not the best way to do it';
   $ffi->attach( ['Add.Add(SmallInt;SmallInt):SmallInt'=>'add'] => ['Integer', 'Integer'] => 'Integer');
 
   is add(1,2), 3, 'add(1,2) = 3';
@@ -53,4 +49,6 @@ subtest unit => sub {
     isnt $@, '', "ambig $ambig";
     note $@ if $@;
   }
-}
+};
+
+done_testing;

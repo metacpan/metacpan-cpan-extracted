@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2013, 2017 Kevin Ryde
 
 # This file is part of Gtk2-Ex-WidgetCursor.
 #
@@ -31,7 +31,7 @@ Gtk2->disable_setlocale;  # leave LC_NUMERIC alone for version nums
 Gtk2->init_check
   or plan skip_all => 'due to no DISPLAY available';
 
-plan tests => 57;
+plan tests => 62;
 MyTestHelpers::glib_gtk_versions();
 
 # return an arrayref
@@ -50,7 +50,7 @@ sub leftover_fields {
 # VERSION
 
 {
-  my $want_version = 15;
+  my $want_version = 16;
   is ($Gtk2::Ex::WidgetCursor::VERSION, $want_version, 'VERSION variable');
   is (Gtk2::Ex::WidgetCursor->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Gtk2::Ex::WidgetCursor->VERSION($want_version); 1 },
@@ -149,7 +149,7 @@ my $display_name = $default_display->get_name;
 #
 ok (glib_boxed_equal (Gtk2::Ex::WidgetCursor->invisible_cursor,
                       Gtk2::Ex::WidgetCursor->invisible_cursor),
-    'same invisible cursor object on repeat calls');
+    'invisible_cursor() object same on two calls');
 
 # different invisible object on different displays
 SKIP: {
@@ -160,11 +160,22 @@ SKIP: {
   }
   my $c1 = Gtk2::Ex::WidgetCursor->invisible_cursor ($d1);
   my $c2 = Gtk2::Ex::WidgetCursor->invisible_cursor ($d2);
-  isnt ($c1, $c2);
+  isnt ($c1, $c2, 'invisible_cursor() different on different displays');
 }
 
 # an invisible cursor hung on a display doesn't keep that object alive
 # forever
+#
+# Crib note: must destroy the cursor object before destroying the display
+# object (either closed or still open), since in Gtk 2.22 the cursor object
+# doesn't seem to hold a ref to the display object and bad things happen on
+# using the cursor after the display is gone.
+#
+# For the code here the cursor obj is weak here and hard in $d->{'_invis'}.
+# The destroy of those $d fields seems to happen soon enough during the
+# destroy of $d to work -- as long as you don't hold a hard ref to $c
+# anywhere else.
+#
 SKIP: {
   require Scalar::Util;
   my $d = Gtk2::Gdk::Display->open ($display_name);
@@ -172,16 +183,17 @@ SKIP: {
     skip 'due to only one GdkDisplay available', 1;
   }
   my $c = Gtk2::Ex::WidgetCursor->invisible_cursor ($d);
-  my $weak = $d;
-  Scalar::Util::weaken ($weak);
+  Scalar::Util::weaken ($c);
   $d->close;
-  $d = undef;
-  is ($weak, undef);
+  Scalar::Util::weaken ($d);
+  is ($d, undef, 'display weakened away');
+  is ($c, undef, 'invisible_cursor() weakened away with display');
 }
 
 
 # WidgetCursor should be garbage collected
 {
+  diag "gc";
   my $widget = Gtk2::Label->new ('hi');
   my $wobj = Gtk2::Ex::WidgetCursor->new (widget => $widget);
   Scalar::Util::weaken ($wobj);
@@ -195,6 +207,7 @@ SKIP: {
 
 # WidgetCursor should be garbage collected when active
 {
+  diag "gc when active";
   my $widget = Gtk2::Label->new ('hi');
   my $wobj = Gtk2::Ex::WidgetCursor->new (widget => $widget,
                                           active => 1);
@@ -347,11 +360,35 @@ SKIP: {
   my $hand1 = Gtk2::Gdk::Cursor->new ('hand1');
   %notifies = ();
   $wcursor->set (cursor_object => $hand1);
-  ok (glib_boxed_equal ($wcursor->get('cursor'), $hand1));
-  is ($wcursor->get('cursor-name'), 'hand1');
-  # boxed objects not equal
-  ok (glib_boxed_equal ($wcursor->get('cursor-object'), $hand1));
-  is_deeply (\%notifies, {cursor=>1,cursor_name=>1,cursor_object=>1});
+  ok (glib_boxed_equal ($wcursor->get('cursor'), $hand1),
+      'set() cursor-object "hand1" - get cursor');
+  is ($wcursor->get('cursor-name'), 'hand1',
+      'set() cursor-object "hand1" - get cursor-name');
+  ok (glib_boxed_equal ($wcursor->get('cursor-object'), $hand1),
+      'set() cursor-object "hand1" - get cursor-object');
+  is_deeply (\%notifies, {cursor=>1,cursor_name=>1,cursor_object=>1},
+      'set() cursor-object "hand1" - notify triple');
+
+  # cursor-object object
+  %notifies = ();
+  my $rootwin = Gtk2::Gdk->get_default_root_window;
+  my $pixmap = Gtk2::Gdk::Pixmap->new ($rootwin, 1, 1, -1);
+  my $bitmap = Gtk2::Gdk::Pixmap->new ($rootwin, 1, 1, 1);
+  my $cursor_obj = Gtk2::Gdk::Cursor->new_from_pixmap
+    ($pixmap,
+     $bitmap,
+     Gtk2::Gdk::Color->new(0,0,0,0), # fg
+     Gtk2::Gdk::Color->new(0,0,0,0), # bg
+     0,0); # x,y hotspot
+  $wcursor->set (cursor_object => $cursor_obj);
+  ok (glib_boxed_equal ($wcursor->get('cursor'), $cursor_obj),
+      'set() cursor-object pixmap - get cursor');
+  is ($wcursor->get('cursor-name'), undef,
+      'set() cursor-object pixmap - get cursor-name');
+  ok (glib_boxed_equal ($wcursor->get('cursor-object'), $cursor_obj),
+      'set() cursor-object pixmap - get cursor-object');
+  is_deeply (\%notifies, {cursor=>1,cursor_name=>1,cursor_object=>1},
+             'set() cursor-object pixmap - notify triple');
 
   # cursor() method
   %notifies = ();

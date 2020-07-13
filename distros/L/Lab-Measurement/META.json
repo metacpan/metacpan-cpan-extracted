@@ -31,8 +31,7 @@
             "File::Temp" : "0",
             "Perl::Tidy" : "0",
             "Test::More" : "0",
-            "lib" : "0",
-            "perl" : "5.020"
+            "lib" : "0"
          }
       },
       "runtime" : {
@@ -93,7 +92,7 @@
             "integer" : "0",
             "namespace::autoclean" : "0.20",
             "parent" : "0",
-            "perl" : "5.020",
+            "perl" : "v5.20.0",
             "sigtrap" : "0",
             "strict" : "0",
             "utf8" : "0",
@@ -117,8 +116,7 @@
             "Test::Tester" : "0",
             "Text::Diff" : "0",
             "aliased" : "0",
-            "lib" : "0",
-            "perl" : "5.020"
+            "lib" : "0"
          }
       }
    },
@@ -136,7 +134,7 @@
       "x_IRC" : "irc://chat.freenode.net/#labmeasurement",
       "x_MailingList" : "https://www-mailman.uni-regensburg.de/mailman/listinfo/lab-measurement-users"
    },
-   "version" : "3.703",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "3.710",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

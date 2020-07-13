@@ -1,0 +1,72 @@
+NAME
+    Regexp::Pattern::Filename::Image - Image filename
+
+VERSION
+    This document describes version 0.001 of
+    Regexp::Pattern::Filename::Image (from Perl distribution
+    Regexp-Pattern-Filename-Image), released on 2020-04-01.
+
+SYNOPSIS
+     use Regexp::Pattern; # exports re()
+     my $re = re("Filename::Image::filename_image");
+
+DESCRIPTION
+    This is a Regexp::Pattern wrapper for Filename::Image.
+
+PATTERNS
+    *   filename_image
+
+        Image filename.
+
+        Examples:
+
+        No extension.
+
+         "foo" =~ re("Filename::Image::filename_image");  # doesn't match
+
+        Not an extension.
+
+         "jpg" =~ re("Filename::Image::filename_image");  # doesn't match
+
+         "foo.jpg" =~ re("Filename::Image::filename_image");  # matches
+
+        Case insensitive.
+
+         "foo bar.GIF" =~ re("Filename::Image::filename_image");  # matches
+
+        Regex is anchored.
+
+         "foo.GIF is the file" =~ re("Filename::Image::filename_image");  # doesn't match
+
+         "foo.mp3" =~ re("Filename::Image::filename_image");  # doesn't match
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Regexp-Pattern-Filename-Image>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Regexp-Pattern-Filename-Image>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Regexp-Pattern-Filena
+    me-Image>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Regexp::Pattern
+
+    Filename::Image
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

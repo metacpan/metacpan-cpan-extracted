@@ -2,7 +2,7 @@ package Test2::Harness::UI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 use Router::Simple;
 use Text::Xslate(qw/mark_raw/);
@@ -23,6 +23,7 @@ use Test2::Harness::UI::Controller::Jobs;
 use Test2::Harness::UI::Controller::Events;
 
 use Test2::Harness::UI::Controller::Durations;
+use Test2::Harness::UI::Controller::Coverage;
 
 use Test2::Harness::UI::Util qw/share_dir/;
 use Test2::Harness::UI::Response qw/resp error/;
@@ -63,9 +64,10 @@ sub init {
     $router->connect('/event/:id'        => {controller => 'Test2::Harness::UI::Controller::Events', from => 'single_event'});
     $router->connect('/event/:id/events' => {controller => 'Test2::Harness::UI::Controller::Events', from => 'event'});
 
-    $router->connect('/durations/:project'                          => {controller => 'Test2::Harness::UI::Controller::Durations'});
-    $router->connect('/durations/:project/:short/:medium'           => {controller => 'Test2::Harness::UI::Controller::Durations'});
-    $router->connect('/durations/:project/:short/:medium/:state_id' => {controller => 'Test2::Harness::UI::Controller::Durations'});
+    $router->connect('/durations/:project'                => {controller => 'Test2::Harness::UI::Controller::Durations'});
+    $router->connect('/durations/:project/:short/:medium' => {controller => 'Test2::Harness::UI::Controller::Durations'});
+
+    $router->connect('/coverage/:project' => {controller => 'Test2::Harness::UI::Controller::Coverage'});
 
     $router->connect('/download/:id' => {controller => 'Test2::Harness::UI::Controller::Download'});
 }

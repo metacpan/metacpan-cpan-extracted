@@ -1,0 +1,62 @@
+Revision history for Spreadsheet-Reader-Format
+
+Uses the change tracking convention
++ New feature.
+- Removed/deprecated feature.
+! Bug fix.
+* Place holder
+
+NOTE: This software is designated as beta quality until this notice is removed.  The goal is to
+be used for Spreadsheet::Reader::ExcelXML and adjusted to work with Spreadsheet::ParseExcel prior
+to the 1.0 release.
+
+v0.6.5    2020-07-11 07:16:38+00:00 UTC
+
+    * Another cool change
+
+v0.6.4    2017-04-17 11:58:14-07:00 America/Los_Angeles
+
+    ! Updated DateTime::Timezone requirements to 2.09 to pass (Thanks Ryan Voots)
+
+v0.6.2    2017-02-10 13:45:16-08:00 America/Los_Angeles
+
+	! Updated the version requirement for DateTimeX::Format::Excel
+    ! Updated the file to work better with Log::Shiras::Unhide when debugging;
+
+v0.4.0    2016-05-14 20:44:52-07:00 America/Los_Angeles
+
+	! Fix a CPAN testers fail where Test::Moose wasn't loaded in time
+
+v0.2.10   2016-04-08 09:53:28-07:00 America/Los_Angeles
+
+	! attempted bug fix for failing test http://www.cpantesters.org/cpan/report/8f98c448-fcf0-11e5-836b-24d6fcd2507e
+		Initially forcing Test::Exception 0.43 as required for testing
+
+v0.2.8    2016-04-05 18:52:49-07:00 America/Los_Angeles
+
+	! Workbook instance required the wrong class - fixed and added a test
+	! Fixed the SYNOPSIS callout for 'FormatInterface' (->Format)
+
+v0.2.6    2016-04-02 21:45:26-07:00 America/Los_Angeles
+
+	! Attempt to fix coveralls testing
+
+v0.2.4    2016-04-02 21:11:28-07:00 America/Los_Angeles
+
+	! Fixed the coveralls and travis-ci badges
+
+v0.2.2    2016-04-02 21:04:02-07:00 America/Los_Angeles
+
+	! Fixed the github badge
+
+v0.2.0    2016-04-02 20:49:52-07:00 America/Los_Angeles
+
+	+ Added the badges
+
+v0.1_3    2016-04-02 20:39:46-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+	! Turn on AutoPrereqs for Dist::Zilla to get all the pre-reqs
+
+v0.1_1    2016-04-02 20:30:23-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+	+ Initial release to move the formatter out of Spreadsheet::XLSX::Reader::LibXML

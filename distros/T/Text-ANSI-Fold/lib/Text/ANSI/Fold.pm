@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "1.07";
+our $VERSION = "1.08";
 
 use Carp;
 use Text::VisualWidth::PP 'vwidth';
@@ -163,6 +163,10 @@ sub fold {
     my $linebreak = $opt{linebreak} // $obj->{linebreak};
     my $runin     = $opt{runin}     // $obj->{runin};
     my $runout    = $opt{runout}    // $obj->{runout};
+
+    if ($width < 0) {
+	$width = ~0 >> 1; # INT_MAX
+    }
 
     if (not defined $width or $width < 1) {
 	croak "invalid width";
@@ -427,8 +431,7 @@ head-or-end of line prohibition character is also supported.  Set
 the linebreak mode to enable it.
 
 Use exported B<ansi_fold> function to fold original text, with number
-of visual columns you want to cut off the text.  Width parameter have
-to be a number greater than zero.
+of visual columns you want to cut off the text.
 
     ($folded, $remain, $w) = ansi_fold($text, $width);
 
@@ -437,7 +440,8 @@ the rest.
 
 Additional third result is the visual width of folded text.  You may
 want to know how many columns returned string takes for further
-processing.
+processing.  If the width parameter is negative, it returns string
+untouched and the visual width of it.
 
 This function returns at least one character in any situation.  If you
 provide Asian wide string and just one column as width, it trims off
@@ -515,6 +519,11 @@ reference, and chops text into given width list.
     my @list = $fold->text("1223334444")->chops(width => [ 1, 2, 3 ]);
     # return ("1", "22", "333") and keep "4444"
 
+If the width value is 0, it returns empty string.
+
+Negative width value takes all the rest of holded string in
+B<retrieve> and B<chops> method.
+
 =head1 OPTIONS
 
 Option parameter can be specified as name-value list for B<ansi_fold>
@@ -532,8 +541,10 @@ function as well as B<new> and B<configure> method.
 
 =item B<width> => I<n>, I<[ n, m, ... ]>
 
-Specify folding width.  Array reference can be specified but works
-only with B<chops> method.
+Specify folding width.  Negative value means all the rest.
+
+Array reference can be specified but works only with B<chops> method,
+and retunrs empty string for zero width.
 
 =item B<boundary> => "word"
 

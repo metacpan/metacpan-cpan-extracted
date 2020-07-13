@@ -38,6 +38,36 @@ BEGIN { unshift @INC, '../gmaker/lib'; }
 
 
 {
+  # sparse6 multiple self-loops
+  my $graph = Graph->new (undirected => 1, multiedged=>1);
+  $graph->add_edge(0,1);
+  $graph->add_edge(0,2);
+  $graph->add_edge(0,3);
+  $graph->add_edge(0,0);
+  $graph->add_edge(1,1);
+  $graph->add_edge(2,2);
+  $graph->add_edge(3,3);
+  Graph::Writer::Graph6->new(format=>'sparse6')->write_graph($graph,'/dev/stdout');
+  exit 0;
+}
+{
+  # sparse6 multiple self-loops
+  my $graph = Graph->new (undirected=>1, multiedged=>1);
+  $graph->add_vertex(0);
+  Graph::Writer::Graph6->new (format=>'graph6')->write_graph($graph,'/dev/stdout');
+  Graph::Writer::Graph6->new (format=>'digraph6')->write_graph($graph,'/dev/stdout');
+  Graph::Writer::Graph6->new (format=>'sparse6')->write_graph($graph,'/dev/stdout');
+  $graph->add_edge(0,0);
+  Graph::Writer::Graph6->new (format=>'sparse6')->write_graph($graph,'/dev/stdout');
+  $graph->add_edge(0,0);
+  Graph::Writer::Graph6->new (format=>'sparse6')->write_graph($graph,'/dev/stdout');
+  $graph->add_edge(0,0);
+  Graph::Writer::Graph6->new (format=>'sparse6')->write_graph($graph,'/dev/stdout');
+  $graph->add_edge(0,0);
+  Graph::Writer::Graph6->new (format=>'sparse6')->write_graph($graph,'/dev/stdout');
+  exit 0;
+}
+{
   # exact sparse6 depends how many increment v vs bigger jumps
 
   # could start sparse6 encoding and stop if bigger than graph6 ...

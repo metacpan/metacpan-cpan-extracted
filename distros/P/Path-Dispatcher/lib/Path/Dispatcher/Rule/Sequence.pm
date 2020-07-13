@@ -1,9 +1,10 @@
 package Path::Dispatcher::Rule::Sequence;
 # ABSTRACT: a sequence of rules
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
+use MooX::TypeTiny;
 use Types::Standard qw(Str);
 
 extends 'Path::Dispatcher::Rule';
@@ -100,7 +101,7 @@ Path::Dispatcher::Rule::Sequence - a sequence of rules
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

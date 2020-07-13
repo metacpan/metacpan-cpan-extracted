@@ -15,54 +15,58 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
-SHA1 5b33d540d7bddd5169f6a1a9c624cb2309809352 Changes
-SHA1 665acee6b7cbaa352f865ec47f4500e90aaa4915 MANIFEST
+SHA1 fe4cd309476307f4d75695308dd6fb35251eac23 Changes
+SHA1 5a7103feb7c28dc8758fa40f5a23304df8757de4 MANIFEST
 SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
-SHA1 11a720338c93a4ae33608ed392d071aaf3bfc7c9 META.json
-SHA1 236b9a0abd275632df4207d6bb13885d7d635a9d META.yml
+SHA1 73b0b10a14514d0f4ade2c39a08908a3f4326f92 META.json
+SHA1 a8b9b5284fbd9977ed7f0794a479cbb63274d0f8 META.yml
 SHA1 9189bc7266ef10c2bf6f73fc11f3d8bd84052525 Makefile.PL
-SHA1 938c03a73e1a1e35106044d8b8d045d92e0b6da3 debian/changelog
+SHA1 fbe35de94688d6d633ed649a48b86b3aea915b81 debian/changelog
 SHA1 b6abd567fa79cbe0196d093a067271361dc6ca8b debian/compat
-SHA1 89d5f3d3d870f80a12295e16e01d03c63970d9f9 debian/control
-SHA1 75e7e7071fe4deec2ffd230591b33dd6da041cc6 debian/copyright
+SHA1 c1b068cfbc187b74891e72d3a87affaea2ef6f23 debian/control
+SHA1 7b29bee4c40095deb408b08ffc0269022cea8617 debian/copyright
 SHA1 eb2d6782f547b81ccb77a1d2050ebef2cb9e9304 debian/rules
 SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
-SHA1 4fb7c678220a81130b0352f2e3e229f3b9d2bbeb debian/watch
+SHA1 6d5e6b08e1e9d2cb0c9aa7118a016e4e7d44ae5f debian/watch
 SHA1 4c2b5420f51a45e13b9a96232e750db971d7d2fd devel/all9-1.dot
 SHA1 18ad29b72403d4fc4ef8a6acadb83277c469d9ac devel/dimacs.pl
 SHA1 06701811565d554aa085494ea9decc2542bb51ac devel/graphviz2.pl
+SHA1 41f1dc454e039b420148e5841534bc2b5905c09e devel/hog-size-distribution.pl
 SHA1 bd9e6a6643205699317d386f10eb255ad1f5e91e devel/hog.pl
-SHA1 e031f10eba0ad7039cb6e52b1b995f9c350315b5 devel/lib/Graph/DIMACS.pm
-SHA1 daf73c26967116644ed854f20bfbc0d4a0987a11 devel/lib/Graph/Writer/Matrix.pm
-SHA1 e6962bdb4110d2325496cb912a56ed289da2a48d devel/lib/MyGraphs.pm
+SHA1 01126d9b349b073333899582c6507ac10363a423 devel/lib/Graph/DIMACS.pm
+SHA1 aabdeea8dcb60d2e0c5c32a201bcf69b511798ec devel/lib/Graph/Writer/Matrix.pm
+SHA1 7da636d83263e18bc03e4bc3b4b4790425344172 devel/lib/MyGraphs.pm
 SHA1 0f66e8e76d295fd6c2fed7590b2ef9f37e882b3a devel/listen.pl
-SHA1 91738e9e26300d8ea7eacc2e9c915ff90d33c5c4 devel/misc.pl
+SHA1 856eec19ae68cd483bc87ea60ba6dda6c33648eb devel/misc.pl
 SHA1 717d3dc7b19b2f8e8cedc724931b919bd255806d devel/random.pl
-SHA1 76697635e1550aa7c56ec4015cff5f8702178f2a devel/round-trip.pl
-SHA1 53f143737183eff3e9bdeb7991ebef5452198aec devel/run.pl
+SHA1 5e38bba1b6060997abcd5faaaab5f933c1b57d76 devel/round-trip.pl
+SHA1 18399509d304dc2b5ba4a807b0469a726196c49e devel/run.pl
 SHA1 d6f63377df4f34eff9a503e6498f72ca37f5ab14 devel/taint.pl
-SHA1 2fdd27e96b3f1427780d1f722de2ff7c4ad1df09 examples/graph-easy-print.pl
-SHA1 9951ff6262ff30ac94c779c54de41b4b15a6c7c6 examples/graph-random.pl
-SHA1 ca70cce96af21c858626722bab4f8504d55e1c7c examples/graphviz2-geng.pl
-SHA1 63508bce879e353ecb21db7bafd371dc12ee4837 lib/Graph/Easy/As_graph6.pm
-SHA1 fda21aeea3ddc01d16ead97bb00a89faee3c4397 lib/Graph/Easy/As_sparse6.pm
-SHA1 8214fd806f398c42b24fd57b99f6995a6fb6e49b lib/Graph/Easy/Parser/Graph6.pm
-SHA1 a2eef1d8d4ef3811fad8133c6947785d9a737b4f lib/Graph/Graph6.pm
-SHA1 ba985c571af45d80f9e8474feb151016176e4a2b lib/Graph/Reader/Graph6.pm
-SHA1 f2d611d93cd5bb04ef1bc0a3abc0bf44beef349c lib/Graph/Writer/Graph6.pm
-SHA1 a48231cbbac7064427db431f104ef4165ad9779e lib/Graph/Writer/Sparse6.pm
-SHA1 e352e490864290f46df1f05a3b9b1b7a8cf3c574 lib/GraphViz2/Parse/Graph6.pm
-SHA1 2cd9bb11893c7126b82ec244dad17b89113102be t/Graph-Easy-As_graph6.t
-SHA1 62a54744b4e9d21c7fbce01e807d79a50786a70d t/Graph-Easy-As_sparse6.t
-SHA1 a3b235a829008f88192fecb2555f1becdffbce60 t/Graph-Easy-Parser-Graph6.t
+SHA1 4cc8f2001200fb022b97bbcc181d07d8b655656e examples/graph-easy-print.pl
+SHA1 b466d1c6970739cab9cb5aac7d5264834ed65031 examples/graph-random.pl
+SHA1 406a02ff74d381b38d4a4ae17bb2499b0c581708 examples/graphviz2-geng.pl
+SHA1 023bbbc054b5baf1d4caf6f0d5ef512cc0492db4 examples/hog-fetch-all.pl
+SHA1 f3fbfd4398879b25d23d21837dde2dc967c82c1a examples/hog-fetch-search.pl
+SHA1 a718bf1c4a03883c7aea9193b9cf1c4b308a4775 examples/hog-fetch.pl
+SHA1 e413d1f24d8ac92421665919dff24350c5eeb718 lib/Graph/Easy/As_graph6.pm
+SHA1 08874072602d128a5fd121bba185f1fd1f94897b lib/Graph/Easy/As_sparse6.pm
+SHA1 3f39f6cfd1a6506f702c94b7aa551e9fea4623f9 lib/Graph/Easy/Parser/Graph6.pm
+SHA1 219be6c624b5758479fa9c4305fcb78a69c811b0 lib/Graph/Graph6.pm
+SHA1 339276ec47b9a44b1869114c5aa00e5a36075ed3 lib/Graph/Reader/Graph6.pm
+SHA1 e3e8fda8d4d8e714b51d2e5919102b6449075864 lib/Graph/Writer/Graph6.pm
+SHA1 56cbaffd7aa7cea7a42811835034a3bdff7dc6b0 lib/Graph/Writer/Sparse6.pm
+SHA1 dc4b925621a431ce3c458aebb3a4f07353b4b1eb lib/GraphViz2/Parse/Graph6.pm
+SHA1 5859b120022d62f9fd1e72c9688769c1ce6bb169 t/Graph-Easy-As_graph6.t
+SHA1 f5aa2ff044eff2faf1e472f25fa57461ea133a6a t/Graph-Easy-As_sparse6.t
+SHA1 2f6bad4929491a3978da2c023a1f7c6c734ef8e6 t/Graph-Easy-Parser-Graph6.t
 SHA1 85c98a39284db32da7a2eaff30222c6361a497d7 t/Graph-Graph6-import.t
 SHA1 79e8f0b4e109cee7c24d689c72f44882cde34e7b t/Graph-Graph6-taint.t
-SHA1 5b45617b5daf47d8b59143af5bda6543fb3a77e9 t/Graph-Graph6.t
-SHA1 d2f04e2a12bba10de64c59ba28d518a86dda2e37 t/Graph-Reader-Graph6.t
-SHA1 5493c351d07703dd30b6704a796f30f7bc45badc t/Graph-Writer-Graph6.t
-SHA1 1a339af5c60fabf07cf5fbc3d9645ee9b1cae47e t/Graph-Writer-Sparse6.t
-SHA1 0216a8097b9109d0c54cea57490eceb9b49c335f t/GraphViz2-Parse-Graph6.t
-SHA1 06c940e7638c14b6f72bc3c1345978ff1f8671cb t/MyTestHelpers.pm
+SHA1 069c12edd9a7d4086a0c1d3c729a0b68dc5d25f8 t/Graph-Graph6.t
+SHA1 53f85f08ca1d9d44bb797769c29625569086cef2 t/Graph-Reader-Graph6.t
+SHA1 625f62c248e91e9a3193396c9da57b80931ccee4 t/Graph-Writer-Graph6.t
+SHA1 dd4f6fe27ab290d4b38ec30c707bd5bd412905fe t/Graph-Writer-Sparse6.t
+SHA1 ae9a22bf386006c845a73f6a0e8194584568ea24 t/GraphViz2-Parse-Graph6.t
+SHA1 1492e22b8369d4bc7fdbaec67c1e82bd86217d3d t/MyTestHelpers.pm
 SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
 SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
 SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
@@ -70,11 +74,11 @@ SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
 SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
 SHA1 aeeab05c346c11824a2bb2cc3f3bdb0c522604e2 xt/0-Test-YAML-Meta.t
 SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
-SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
-SHA1 51069b694ce78fde7d42ed539322fae579948d40 xtools/my-check-copyright-years.sh
+SHA1 12a2050a485cdb81be1277c7ddfffb97244e63a7 xt/0-no-debug-left-on.t
+SHA1 ae00f0e8a121ab6ebf12d1b67dd728d5858f100b xtools/my-check-copyright-years.sh
 SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
-SHA1 e9aa27fd220d39ef0054cfcf32516f8a033f75f1 xtools/my-check-spelling.sh
-SHA1 f8eada68e38ca3f44a69afa32c090e7ac343f0bb xtools/my-deb.sh
+SHA1 9ed6300828b33694a3858aa42d0a7e8b182c5576 xtools/my-check-spelling.sh
+SHA1 ae66494ab986a8605d6f0c18ca034a7106e6a90c xtools/my-deb.sh
 SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
 SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
 SHA1 eec6a78c6ed57242d151597b048df6ea5efc5cc4 xtools/my-pc.sh
@@ -82,17 +86,17 @@ SHA1 5c86dd9ca3d2ecf3ee9d90da1537b71e56c8b321 xtools/my-wunused.sh
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJZKO6SAAoJEPjQtOfS0hGRm2wP/RXhyEH4gRD4nGkMmnQHtoWq
-Ewjs3tfPljo91FrRS84V+Zc2G+3cBqbL3CV3x7N1rlZ0gkj+OSWucQcqG6kdFAIg
-Rrf+bh+BscJMXZvEvfYEEBTJq1X5q4KdHRNXREUxT9w6J8ygsSBJX8CXjhr4OeJp
-JCxGj4EAKazqRAgbodxIiHH+xNe/d6QqoeGgqH0X7KyW/5cvyKQg2mY0xiuavB6D
-1C6WLtpRMhJSPGeKAl+0FWrNE0L6ERQ+8N02JRiyZZ00oQbc9uOStr9AJhy8eqAe
-MoYF96eEvV5gTvNH8q9AQtxqbsiSLSuq6UeVjJmBVOtu4hPU2G4hYZXw0A4S6jTO
-geW2ABhu1IMycvRaab6D6AEzIeXqemXs5ML6QTWoTLV+k1be0D9i8WiNIZxaYl4S
-crhDvK1N6Yu1F5z2ZOV8kJH4jWOTOEuEK1rRZAwh0JpIR5U4g13T4FNMSzw86oi7
-xzSCLGdnXhdmWOuNQ5dDe0iYsrSLwdalpBlFjlqXybHNSuAoGUQSOvEEL+XYfy4b
-dCm9wK4n/h0yklw8s8Guy2E+41Lx6jlknr7GG6/tPLQJxX13Z0e3BuwPbD0YRtmU
-lEl5kCNwoP9toDtvZH3E1Sriko141RPQpA5ZPrIcZoAk7ePnVu7KxLwEEF52EEnW
-c7cDiqclW+v+Yj2IoCYL
-=HUSa
+iQIcBAEBAgAGBQJbYrVjAAoJEPjQtOfS0hGR/84P/3Vn3NQpVvHMjJfneApBVTO7
++URBB3+7k8BfErYZO16zZMQctghdytj67I3hIzo+pR6NKIopNx4+gQBAn3nfQgwO
+pENG6sS7JvbODGF3bFcmwzm3thCB2HZwbbcytVJMEGziLicREnYOqhSaalNrrEun
+n5Qy6AVVfetP2ywhJ5wGbj+neByLvj7rFycPQh+absU8DCSivv4hyGw3fSfRKAXX
+e0iI2mhDUP6k/QD0FU1e4t3Bnprof+bZFFusP7zSLXJ4Yg3jmzEWh5Bjh8be/SJ6
+LdtlM1sL1ubLyTpdMXuvJVo8OtB5mtoFntlj5wQg9Pqp80TQthYdvXbb/oTm7wWK
+vweP2siJl2LOOXc8CXdQYIxzRQ9/ZCJ44CSzB2bgUqp+wdkkpaqp1PBvPnCepKvf
+M4pJfe+p0P1OrDy9LLpm4a+hQ27j5TzfJYFwAAKEf/osHPT0EeqaRPTyTgtF7zNa
+NV48hxbGI59xESDCnY2KUYJnqAibuu9cAB5hc97Fth7rVnhh5ywbyLcw+kJ6EdDT
+RfJ5YrFjk34mRpJ/q3K0xJDt35tQCOZq08ccC+khH+0vcVyynaTI0YwmvHnkaeXy
+twtcBMrx+6DtoBVJCPLpObf8Mn0BhU6oN5+3CAu9gP9pJ/KVKwXbiMo+kbQCoFet
+teDgbStGdWPHgbwpNKyA
+=7cVT
 -----END PGP SIGNATURE-----

@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.01';
+$VERSION = '0.03';
 $VERSION = $VERSION;
 
 # internal use
@@ -54,33 +54,6 @@ if ($^X =~ /jperl/i) {
     die "script '@{[__FILE__]}' can run on only perl, not JPerl\n";
 }
 
-# prototypes
-sub main ();
-sub detect_system_encoding ();
-sub parse (;$);
-sub parse_expr ();
-sub parse_expr_balanced ($);
-sub parse_heredocument_as_q_endswith ($);
-sub parse_heredocument_as_qq_endswith ($);
-sub parse_q__like_balanced ($);
-sub parse_q__like_endswith ($);
-sub parse_q__like ($);
-sub parse_qq_like_balanced ($);
-sub parse_qq_like_endswith ($);
-sub parse_qq_like ($);
-sub parse_re_codepoint_class ($);
-sub parse_re_as_q_endswith ($$);
-sub parse_re_balanced ($$);
-sub parse_re_endswith ($$);
-sub parse_re ($$);
-sub parse_re_modifier ();
-sub parse_tr_modifier ();
-sub codepoint_tr ($$);
-sub quotee_of ($);
-sub escape_q ($$);
-sub escape_qq ($$);
-sub escape_to_hex ($$);
-
 # this file is used as command on command line
 if ($0 eq __FILE__) {
     main();
@@ -120,7 +93,7 @@ sub import {
 
 #---------------------------------------------------------------------
 # running as command
-sub main () {
+sub main {
 
     # usage
     if (scalar(@ARGV) == 0) {
@@ -950,7 +923,7 @@ sub mb::ucfirst (;$) {
 
 #---------------------------------------------------------------------
 # implement of special variable $1,$2,$3,...
-sub mb::_CAPTURE (;$) {
+sub mb::_CAPTURE {
     if ($mb::last_s_passed) {
         if (defined $_[0]) {
 
@@ -997,7 +970,7 @@ sub mb::_CAPTURE (;$) {
 
 #---------------------------------------------------------------------
 # implement of special variable @+
-sub mb::_LAST_MATCH_END (@) {
+sub mb::_LAST_MATCH_END {
 
     # perl 5.005 does not support @+, so it need CORE::eval
 
@@ -1021,7 +994,7 @@ sub mb::_LAST_MATCH_END (@) {
 
 #---------------------------------------------------------------------
 # implement of special variable @-
-sub mb::_LAST_MATCH_START (@) {
+sub mb::_LAST_MATCH_START {
 
     # perl 5.005 does not support @-, so it need CORE::eval
 
@@ -1045,7 +1018,7 @@ sub mb::_LAST_MATCH_START (@) {
 
 #---------------------------------------------------------------------
 # implement of special variable $&
-sub mb::_MATCH () {
+sub mb::_MATCH {
     if (defined($&)) {
         if ($mb::last_s_passed) {
             if (defined($1) and (CORE::substr($&, 0, CORE::length($1)) eq $1)) {
@@ -1071,7 +1044,7 @@ sub mb::_MATCH () {
 
 #---------------------------------------------------------------------
 # implement of special variable $`
-sub mb::_PREMATCH () {
+sub mb::_PREMATCH {
     if (defined($&)) {
         if ($mb::last_s_passed) {
             return $1;
@@ -1092,21 +1065,21 @@ sub mb::_PREMATCH () {
 
 #---------------------------------------------------------------------
 # flag off if last m// was pass
-sub mb::_m_passed () {
+sub mb::_m_passed {
     $mb::last_s_passed = 0;
     return '';
 }
 
 #---------------------------------------------------------------------
 # flag on if last s/// was pass
-sub mb::_s_passed () {
+sub mb::_s_passed {
     $mb::last_s_passed = 1;
     return '';
 }
 
 #---------------------------------------------------------------------
 # ignore case of m//i, qr//i, s///i
-sub mb::_ignorecase ($) {
+sub mb::_ignorecase {
     local($_) = @_;
     my $regexp = '';
 
@@ -1205,7 +1178,7 @@ sub mb::_ignorecase ($) {
 
 #---------------------------------------------------------------------
 # custom codepoint class in qq-like regular expression
-sub mb::_cc ($) {
+sub mb::_cc {
     my($classmate) = @_;
     if ($classmate =~ s{\A \^ }{}xms) {
         return '(?:(?!' . parse_re_codepoint_class($classmate) . ")${mb::x})";
@@ -1217,7 +1190,7 @@ sub mb::_cc ($) {
 
 #---------------------------------------------------------------------
 # makes clustered code point from string
-sub mb::_clustered_codepoint ($) {
+sub mb::_clustered_codepoint {
     if (my @codepoint = $_[0] =~ /\G(${mb::x})/xmsgc) {
         if (CORE::length($codepoint[$#codepoint]) == 1) {
             return $_[0];
@@ -1233,21 +1206,21 @@ sub mb::_clustered_codepoint ($) {
 
 #---------------------------------------------------------------------
 # open for append by undefined filehandle
-sub mb::_open_a ($$) {
+sub mb::_open_a {
     $_[0] = Symbol::gensym();
     return open($_[0], ">>$_[1]");
 }
 
 #---------------------------------------------------------------------
 # open for read by undefined filehandle
-sub mb::_open_r ($$) {
+sub mb::_open_r {
     $_[0] = Symbol::gensym();
     return open($_[0], $_[1]);
 }
 
 #---------------------------------------------------------------------
 # open for write by undefined filehandle
-sub mb::_open_w ($$) {
+sub mb::_open_w {
     $_[0] = Symbol::gensym();
     return open($_[0], $_[1]);
 }
@@ -1757,20 +1730,24 @@ sub mb::_z (;*@) {
 
 #---------------------------------------------------------------------
 # detect system encoding any of big5, big5hkscs, eucjp, gb18030, gbk, sjis, uhc, utf8
-sub detect_system_encoding () {
+sub detect_system_encoding {
 
     # running on Microsoft Windows
     if ($OSNAME =~ /MSWin32/) {
-        my($codepage) = qx{chcp} =~ m/([0-9]{3,5})\Z/;
-        return {qw(
-            932   sjis
-            936   gbk
-            949   uhc
-            950   big5
-            951   big5hkscs
-            20932 eucjp
-            54936 gb18030
-        )}->{$codepage} || 'utf8';
+        if (my($codepage) = qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/) {
+            return {qw(
+                932   sjis
+                936   gbk
+                949   uhc
+                950   big5
+                951   big5hkscs
+                20932 eucjp
+                54936 gb18030
+            )}->{$codepage};
+        }
+        else {
+            return 'utf8';
+        }
     }
 
     # running on Oracle Solaris
@@ -1881,7 +1858,7 @@ my @here_document_delimiter = ();
 
 #---------------------------------------------------------------------
 # parse script
-sub parse (;$) {
+sub parse {
     local $_ = shift if @_;
 
     $term = 0;
@@ -1899,7 +1876,7 @@ sub parse (;$) {
 
 #---------------------------------------------------------------------
 # parse expression in script
-sub parse_expr () {
+sub parse_expr {
     my $parsed = '';
     my $R = '(?>\\r\\n|\\r|\\n)';
 
@@ -2422,6 +2399,11 @@ sub parse_expr () {
             $replacement = $replacement[1]; # q-type quotee
         }
 
+        # s##qq-quotee#
+        elsif ($replacement[0] =~ /\A [#] /xms) {
+            $replacement = 'qq' . $replacement[0]; # qq-type quotee
+        }
+
         # s//qq-quotee/
         else {
             $replacement = 'qq ' . $replacement[0]; # qq-type quotee
@@ -2862,7 +2844,7 @@ sub parse_expr () {
 
 #---------------------------------------------------------------------
 # parse expression in balanced blackets
-sub parse_expr_balanced ($) {
+sub parse_expr_balanced {
     my($open_bracket) = @_;
     my $close_bracket = {qw| ( ) { } [ ] < > |}->{$open_bracket} || die;
     my $parsed = $open_bracket;
@@ -2896,7 +2878,7 @@ sub parse_expr_balanced ($) {
 
 #---------------------------------------------------------------------
 # parse <<'HERE_DOCUMENT' as q-like
-sub parse_heredocument_as_q_endswith ($) {
+sub parse_heredocument_as_q_endswith {
     my($endswith) = @_;
     my $parsed = '';
     while (1) {
@@ -2923,7 +2905,7 @@ END
 
 #---------------------------------------------------------------------
 # parse <<"HERE_DOCUMENT" as qq-like
-sub parse_heredocument_as_qq_endswith ($) {
+sub parse_heredocument_as_qq_endswith {
     my($endswith) = @_;
     my $parsed = '';
     my $nest_escape = 0;
@@ -3094,7 +3076,7 @@ END
 
 #---------------------------------------------------------------------
 # parse q{string} in balanced blackets
-sub parse_q__like_balanced ($) {
+sub parse_q__like_balanced {
     my($open_bracket) = @_;
     my $close_bracket = {qw| ( ) { } [ ] < > |}->{$open_bracket} || die;
     my $parsed = $open_bracket;
@@ -3122,7 +3104,7 @@ sub parse_q__like_balanced ($) {
 
 #---------------------------------------------------------------------
 # parse q/string/ that ends with a character
-sub parse_q__like_endswith ($) {
+sub parse_q__like_endswith {
     my($endswith) = @_;
     my $parsed = $endswith;
     while (1) {
@@ -3142,7 +3124,7 @@ sub parse_q__like_endswith ($) {
 
 #---------------------------------------------------------------------
 # parse q/string/ common routine
-sub parse_q__like ($) {
+sub parse_q__like {
     my($closewith) = @_;
     if (/\G (\\\\) /xmsgc) {
         return $1;
@@ -3164,7 +3146,7 @@ END
 
 #---------------------------------------------------------------------
 # parse qq{string} in balanced blackets
-sub parse_qq_like_balanced ($) {
+sub parse_qq_like_balanced {
     my($open_bracket) = @_;
     my $close_bracket = {qw| ( ) { } [ ] < > |}->{$open_bracket} || die;
     my $parsed_as_q  = $open_bracket;
@@ -3268,7 +3250,7 @@ sub parse_qq_like_balanced ($) {
 
 #---------------------------------------------------------------------
 # parse qq/string/ that ends with a character
-sub parse_qq_like_endswith ($) {
+sub parse_qq_like_endswith {
     my($endswith) = @_;
     my $parsed_as_q  = $endswith;
     my $parsed_as_qq = $endswith;
@@ -3360,7 +3342,7 @@ sub parse_qq_like_endswith ($) {
 
 #---------------------------------------------------------------------
 # parse qq/string/ common routine
-sub parse_qq_like ($) {
+sub parse_qq_like {
     my($closewith) = @_;
     my $parsed_as_q  = '';
     my $parsed_as_qq = '';
@@ -3494,7 +3476,7 @@ END
 
 #---------------------------------------------------------------------
 # parse code point class
-sub parse_re_codepoint_class ($) {
+sub parse_re_codepoint_class {
     my($classmate) = @_;
     my $parsed = '';
     my @sbcs = ();
@@ -3627,7 +3609,7 @@ END
 
 #---------------------------------------------------------------------
 # parse qr'regexp' as q-like
-sub parse_re_as_q_endswith ($$) {
+sub parse_re_as_q_endswith {
     my($operator, $endswith) = @_;
     my $parsed = $endswith;
     while (1) {
@@ -3756,7 +3738,7 @@ END
 
 #---------------------------------------------------------------------
 # parse qr{regexp} in balanced blackets
-sub parse_re_balanced ($$) {
+sub parse_re_balanced {
     my($operator, $open_bracket) = @_;
     my $close_bracket = {qw| ( ) { } [ ] < > |}->{$open_bracket} || die;
     my $parsed = $open_bracket;
@@ -3839,7 +3821,7 @@ sub parse_re_balanced ($$) {
 
 #---------------------------------------------------------------------
 # parse qr/regexp/ that ends with a character
-sub parse_re_endswith ($$) {
+sub parse_re_endswith {
     my($operator, $endswith) = @_;
     my $parsed = $endswith;
     my $nest_escape = 0;
@@ -3911,7 +3893,7 @@ sub parse_re_endswith ($$) {
 
 #---------------------------------------------------------------------
 # parse qr/regexp/ common routine
-sub parse_re ($$) {
+sub parse_re {
     my($operator, $closewith) = @_;
     my $parsed = '';
 
@@ -3949,21 +3931,21 @@ END
     }
 
     # /./ or \any
-    elsif (/\G \.  /xmsgc) { $parsed .= '(?:@{mb::_dot})'; }
-    elsif (/\G \\B /xmsgc) { $parsed .= '(?:@{mb::_B})';   }
-    elsif (/\G \\D /xmsgc) { $parsed .= '(?:@{mb::_D})';   }
-    elsif (/\G \\H /xmsgc) { $parsed .= '(?:@{mb::_H})';   }
-    elsif (/\G \\N /xmsgc) { $parsed .= '(?:@{mb::_N})';   }
-    elsif (/\G \\R /xmsgc) { $parsed .= '(?:@{mb::_R})';   }
-    elsif (/\G \\S /xmsgc) { $parsed .= '(?:@{mb::_S})';   }
-    elsif (/\G \\V /xmsgc) { $parsed .= '(?:@{mb::_V})';   }
-    elsif (/\G \\W /xmsgc) { $parsed .= '(?:@{mb::_W})';   }
-    elsif (/\G \\b /xmsgc) { $parsed .= '(?:@{mb::_b})';   }
-    elsif (/\G \\d /xmsgc) { $parsed .= '(?:@{mb::_d})';   }
-    elsif (/\G \\h /xmsgc) { $parsed .= '(?:@{mb::_h})';   }
-    elsif (/\G \\s /xmsgc) { $parsed .= '(?:@{mb::_s})';   }
-    elsif (/\G \\v /xmsgc) { $parsed .= '(?:@{mb::_v})';   }
-    elsif (/\G \\w /xmsgc) { $parsed .= '(?:@{mb::_w})';   }
+    elsif (/\G \.  /xmsgc) { $parsed .= '(?:@{[@mb::_dot]})'; }
+    elsif (/\G \\B /xmsgc) { $parsed .= '(?:@{[@mb::_B]})';   }
+    elsif (/\G \\D /xmsgc) { $parsed .= '(?:@{[@mb::_D]})';   }
+    elsif (/\G \\H /xmsgc) { $parsed .= '(?:@{[@mb::_H]})';   }
+    elsif (/\G \\N /xmsgc) { $parsed .= '(?:@{[@mb::_N]})';   }
+    elsif (/\G \\R /xmsgc) { $parsed .= '(?:@{[@mb::_R]})';   }
+    elsif (/\G \\S /xmsgc) { $parsed .= '(?:@{[@mb::_S]})';   }
+    elsif (/\G \\V /xmsgc) { $parsed .= '(?:@{[@mb::_V]})';   }
+    elsif (/\G \\W /xmsgc) { $parsed .= '(?:@{[@mb::_W]})';   }
+    elsif (/\G \\b /xmsgc) { $parsed .= '(?:@{[@mb::_b]})';   }
+    elsif (/\G \\d /xmsgc) { $parsed .= '(?:@{[@mb::_d]})';   }
+    elsif (/\G \\h /xmsgc) { $parsed .= '(?:@{[@mb::_h]})';   }
+    elsif (/\G \\s /xmsgc) { $parsed .= '(?:@{[@mb::_s]})';   }
+    elsif (/\G \\v /xmsgc) { $parsed .= '(?:@{[@mb::_v]})';   }
+    elsif (/\G \\w /xmsgc) { $parsed .= '(?:@{[@mb::_w]})';   }
 
     # \o{...}
     elsif (/\G \\o\{ (.*?) \} /xmsgc) {
@@ -4106,7 +4088,7 @@ END
 
 #---------------------------------------------------------------------
 # parse modifiers of qr///here
-sub parse_re_modifier () {
+sub parse_re_modifier {
     my $modifier_i = '';
     my $modifier_not_cegir = '';
     my $modifier_cegr = '';
@@ -4132,7 +4114,7 @@ sub parse_re_modifier () {
 
 #---------------------------------------------------------------------
 # parse modifiers of tr///here
-sub parse_tr_modifier () {
+sub parse_tr_modifier {
     my $modifier_not_r = '';
     my $modifier_r = '';
     while (1) {
@@ -4151,7 +4133,7 @@ sub parse_tr_modifier () {
 
 #---------------------------------------------------------------------
 # makes code point class from string
-sub codepoint_tr ($$) {
+sub codepoint_tr {
     my($searchlist) = $_[0] =~ /\A [\x00-\xFF] (.*) [\x00-\xFF] \z/xms;
     my $look_ahead = ($_[1] =~ /c/) ? '(?:(?!' : '(?:(?=';
     my $charclass = '';
@@ -4206,7 +4188,7 @@ END
 
 #---------------------------------------------------------------------
 # get quotee from quoted "quotee"
-sub quotee_of ($) {
+sub quotee_of {
     if (CORE::length($_[0]) >= 2) {
         return CORE::substr($_[0],1,-1);
     }
@@ -4217,7 +4199,7 @@ sub quotee_of ($) {
 
 #---------------------------------------------------------------------
 # escape q/string/ as q-like quote
-sub escape_q ($$) {
+sub escape_q {
     my($codepoint, $endswith) = @_;
     if ($codepoint =~ /\A ([^\x00-\x7F]) (\Q$endswith\E) \z/xms) {
         return "$1\\$2";
@@ -4232,7 +4214,7 @@ sub escape_q ($$) {
 
 #---------------------------------------------------------------------
 # escape qq/string/ as qq-like quote
-sub escape_qq ($$) {
+sub escape_qq {
     my($codepoint, $endswith) = @_;
 
     # m@`@    --> m`\x60`
@@ -4257,7 +4239,7 @@ sub escape_qq ($$) {
 
 #---------------------------------------------------------------------
 # escape qq/string/ or qr/regexp/ to hex
-sub escape_to_hex ($$) {
+sub escape_to_hex {
     my($codepoint, $endswith) = @_;
     if ($codepoint =~ /\A ([^\x00-\x7F]) (\Q$endswith\E) \z/xms) {
         return sprintf('\x%02X\x%02X', CORE::ord($1), CORE::ord($2));
@@ -4561,14 +4543,14 @@ To install this software without make, type the following:
   lc                        lc
   lcfirst                   lcfirst
   length                    length
-  no Your::Module;          no  Your::Module;
+  no Your::Module;          no Your::Module;
   ord                       ord
   reverse                   reverse
   rindex                    rindex
   substr                    substr
   uc                        uc
   ucfirst                   ucfirst
-  use Your::Module;         use  Your::Module;
+  use Your::Module;         use Your::Module;
   -----------------------------------------------------------------
 
 =head1 Porting from script in JPerl4, and JPerl5
@@ -4626,27 +4608,27 @@ To install this software without make, type the following:
   ------------------------------------------------------------------
   hex   character
   ------------------------------------------------------------------
-  21    [!]
-  22    ["]
-  23    [#]
-  24    [$]
-  25    [%]
-  26    [&]
-  27    [']
-  28    [(]
-  29    [)]
-  2A    [*]
-  2B    [+]
-  2C    [,]
-  2D    [-]
-  2E    [.]
-  2F    [/]
-  3A    [:]
-  3B    [;]
-  3C    [<]
-  3D    [=]
-  3E    [>]
-  3F    [?]
+  21    [!]    
+  22    ["]    
+  23    [#]    regexp comment
+  24    [$]    sigil of scalar variable
+  25    [%]    
+  26    [&]    
+  27    [']    
+  28    [(]    regexp group and capture
+  29    [)]    regexp group and capture
+  2A    [*]    regexp matches zero or more times
+  2B    [+]    regexp matches one or more times
+  2C    [,]    
+  2D    [-]    
+  2E    [.]    regexp matches any octet
+  2F    [/]    
+  3A    [:]    
+  3B    [;]    
+  3C    [<]    
+  3D    [=]    
+  3E    [>]    
+  3F    [?]    regexp matches zero or one times
   40    [@]    sigil of array variable
   5B    [[]    regexp bracketed character class
   5C    [\]    backslashed escapes
@@ -4656,7 +4638,7 @@ To install this software without make, type the following:
   7B    [{]    regexp quantifier
   7C    [|]    regexp alternation
   7D    [}]    regexp quantifier
-  7E    [~]
+  7E    [~]    
   ------------------------------------------------------------------
 
 =head1 How to escape DAMEMOJI
@@ -4779,6 +4761,18 @@ To install this software without make, type the following:
   split qr@^@                                mb::_split qr{@{[qr`^`m ]}}
   split qr@MBCS-quotee@cgimosx               mb::_split qr{@{[mb::_ignorecase(qr`OO-quotee`mosx)]}}cg
   split qr@MBCS-quotee@cgmosx                mb::_split qr{@{[qr`OO-quotee`mosx ]}}cg
+  m#MBCS-quotee#cgimosx                      m{\G${mb::_anchor}@{[mb::_ignorecase(qr#OO-quotee#mosx)]}@{[mb::_m_passed()]}}cg
+  m#MBCS-quotee#cgmosx                       m{\G${mb::_anchor}@{[qr#OO-quotee#mosx ]}@{[mb::_m_passed()]}}cg
+  s#MBCS-regexp#MBCS-replacement#eegimosxr   s{(\G${mb::_anchor})@{[mb::_ignorecase(qr#OO-regexp#mosx)]}@{[mb::_s_passed()]}}{$1 . mb::eval mb::eval q#OO-replacement#}egr
+  s#MBCS-regexp#MBCS-replacement#eegmosxr    s{(\G${mb::_anchor})@{[qr#OO-regexp#mosx ]}@{[mb::_s_passed()]}}{$1 . mb::eval mb::eval q#OO-replacement#}egr
+  qr#MBCS-quotee#cgimosx                     qr{\G${mb::_anchor}@{[mb::_ignorecase(qr#OO-quotee#mosx)]}@{[mb::_m_passed()]}}cg
+  qr#MBCS-quotee#cgmosx                      qr{\G${mb::_anchor}@{[qr#OO-quotee#mosx ]}@{[mb::_m_passed()]}}cg
+  split m#^#                                 mb::_split qr{@{[qr#^#m ]}}
+  split m#MBCS-quotee#cgimosx                mb::_split qr{@{[mb::_ignorecase(qr#OO-quotee#mosx)]}}cg
+  split m#MBCS-quotee#cgmosx                 mb::_split qr{@{[qr#OO-quotee#mosx ]}}cg
+  split qr#^#                                mb::_split qr{@{[qr#^#m ]}}
+  split qr#MBCS-quotee#cgimosx               mb::_split qr{@{[mb::_ignorecase(qr#OO-quotee#mosx)]}}cg
+  split qr#MBCS-quotee#cgmosx                mb::_split qr{@{[qr#OO-quotee#mosx ]}}cg
   $`                                         mb::_PREMATCH()
   ${`}                                       mb::_PREMATCH()
   $PREMATCH                                  mb::_PREMATCH()
@@ -5231,16 +5225,15 @@ Ideally, We'd like to achieve these five Goals:
 Old byte-oriented programs should not spontaneously break on the old
 byte-oriented data they used to work on.
 
-This software attempts to achieve this goal by mimicking the behavior
-of JPerl.
+This software attempts to achieve this goal by embedded functions work as
+traditional and stably.
 
 =item * Goal #2:
 
 Old byte-oriented programs should magically start working on the new
 character-oriented data when appropriate.
 
-This software is not a magician. So there is no ability to see your
-mind and run the program.
+This software is not a magician, so cannot see your mind and run it.
 
 You must decide and write octet semantics or codepoint semantics yourself
 in case by case.
@@ -5260,11 +5253,10 @@ figure of Goal #1 and Goal #2.
       New --- New character-oriented
 
 There is a combination from (a) to (e) in data, script, and interpreter
-of old and new. Let's add the Encode module and this software did not
-exist at time of be written this document and JPerl did exist.
+of old and new. Let's add JPerl, utf8 pragma, and this software.
 
                         (a)     (b)     (c)     (d)     (e)
-                                      JPerl,mb        Encode
+                                      JPerl,mb        utf8
       +--------------+-------+-------+-------+-------+-------+
       | data         |  Old  |  Old  |  New  |  Old  |  New  |
       +--------------+-------+-------+-------+-------+-------+
@@ -5276,8 +5268,8 @@ exist at time of be written this document and JPerl did exist.
       New --- New character-oriented
 
 The reason why JPerl is very excellent is that it is at the position of
-(c). That is, it is not necessary to write a special code to process new
-codepoint oriented script.
+(c). That is, it is almost not necessary to write a special code to process
+new codepoint oriented script.
 
 =item * Goal #3:
 
@@ -5291,16 +5283,14 @@ It is impossible. Because the following time is necessary.
 (2) Time of processing regular expression by escaped script while
     multibyte anchoring.
 
-Someday, I want to ask Larry Wall about this goal in elevator.
-
 =item * Goal #4:
 
 Perl should remain one language, rather than forking into a
 byte-oriented Perl and a character-oriented Perl.
 
-JPerl remains one Perl language by forking to two interpreters.
-However, the Perl core team did not desire fork of the interpreter.
-As a result, Perl language forked contrary to goal #4.
+JPerl remains one Perl "language" by forking to two "interpreters."
+However, the Perl core team did not desire fork of the "interpreter."
+As a result, Perl "language" forked contrary to goal #4.
 
 A codepoint oriented perl is not necessary to make it specially,
 because a byte-oriented perl can already treat the binary data.
@@ -5310,7 +5300,7 @@ a filter program.
 And you will get support from the Perl community, when you solve the
 problem by the Perl script.
 
-mb.pm modulino keeps one language and one interpreter.
+mb.pm modulino keeps one "language" and one "interpreter."
 
 =item * Goal #5:
 
@@ -5365,7 +5355,7 @@ This project was originated by INABA Hitoshi.
 =head1 LICENSE AND COPYRIGHT
 
 This software is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself. See L<perlartistic>.
+modify it under the same terms as Perl itself. See perlartistic.
 
 This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -5373,21 +5363,20 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 =head1 SEE ALSO
 
- L<perlunicode>, L<Encode>, L<open>, L<utf8>, L<bytes>, 
- L<Arabic>, L<Big5>, L<Big5HKSCS>, L<CP932::R2>, L<CP932IBM::R2>, L<CP932NEC::R2>, 
- L<CP932X::R2>, L<Char::Arabic>, L<Char::Big5HKSCS>, L<Char::Big5Plus>, L<Char::Cyrillic>, 
- L<Char::EUCJP>, L<Char::EUCTW>, L<Char::GB18030>, L<Char::GBK>, L<Char::Greek>, 
- L<Char::HP15>, L<Char::Hebrew>, L<Char::INFORMIXV6ALS>, L<Char::JIS8>, L<Char::KOI8R>, 
- L<Char::KOI8U>, L<Char::KPS9566>, L<Char::Latin1>, L<Char::Latin10>, L<Char::Latin2>, 
- L<Char::Latin3>, L<Char::Latin4>, L<Char::Latin5>, L<Char::Latin6>, L<Char::Latin7>, 
- L<Char::Latin8>, L<Char::Latin9>, L<Char::OldUTF8>, L<Char::Sjis>, L<Char::TIS620>, 
- L<Char::UHC>, L<Char::USASCII>, L<Char::UTF2>, L<Char::Windows1252>, L<Char::Windows1258>, 
- L<Cyrillic>, L<GBK>, L<Greek>, L<IOas::CP932>, L<IOas::CP932IBM>, L<IOas::CP932NEC>, 
- L<IOas::CP932X>, L<IOas::SJIS2004>, L<Jacode>, L<Jacode4e>, L<Jacode4e::RoundTrip>, 
- L<KOI8R>, L<KOI8U>, L<KPS9566>, L<KSC5601>, L<Latin1>, L<Latin10>, L<Latin2>, L<Latin3>, 
- L<Latin4>, L<Latin5>, L<Latin6>, L<Latin7>, L<Latin8>, L<Latin9>, L<Modern::Open>, 
- L<SJIS2004::R2>, L<Sjis>, L<UTF2>, L<UTF8::R2>, L<Windows1250>, L<Windows1252>, 
- L<Windows1254>, L<Windows1257>, L<Windows1258>, 
+ perlunicode, Encode, open, utf8, bytes, Arabic, Big5, Big5HKSCS, CP932::R2,
+ CP932IBM::R2, CP932NEC::R2, CP932X::R2, Char::Arabic, Char::Big5HKSCS,
+ Char::Big5Plus, Char::Cyrillic, Char::EUCJP, Char::EUCTW, Char::GB18030,
+ Char::GBK, Char::Greek, Char::HP15, Char::Hebrew, Char::INFORMIXV6ALS,
+ Char::JIS8, Char::KOI8R, Char::KOI8U, Char::KPS9566, Char::Latin1,
+ Char::Latin10, Char::Latin2, Char::Latin3, Char::Latin4, Char::Latin5,
+ Char::Latin6, Char::Latin7, Char::Latin8, Char::Latin9, Char::OldUTF8,
+ Char::Sjis, Char::TIS620, Char::UHC, Char::USASCII, Char::UTF2,
+ Char::Windows1252, Char::Windows1258, Cyrillic, GBK, Greek, IOas::CP932,
+ IOas::CP932IBM, IOas::CP932NEC, IOas::CP932X, IOas::SJIS2004, Jacode,
+ Jacode4e, Jacode4e::RoundTrip, KOI8R, KOI8U, KPS9566, KSC5601, Latin1,
+ Latin10, Latin2, Latin3, Latin4, Latin5, Latin6, Latin7, Latin8, Latin9,
+ Modern::Open, SJIS2004::R2, Sjis, UTF2, UTF8::R2, Windows1250, Windows1252,
+ Windows1254, Windows1257, Windows1258.
 
  Announcing Perl 7
  Jun 24, 2020 by brian d foy

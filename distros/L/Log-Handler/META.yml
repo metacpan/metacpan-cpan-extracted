@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Log-Handler
 provides:
   Log::Handler:
     file: lib/Log/Handler.pm
-    version: '0.88'
+    version: '0.90'
   Log::Handler::Config:
     file: lib/Log/Handler/Config.pm
     version: '0.09'
@@ -48,7 +48,7 @@ provides:
     version: '0.08'
   Log::Handler::Pattern:
     file: lib/Log/Handler/Pattern.pm
-    version: '0.07'
+    version: '0.08'
   Log::Handler::Plugin::Config::General:
     file: lib/Log/Handler/Plugin/Config/General.pm
     version: '0.02'
@@ -79,4 +79,5 @@ requires:
   UNIVERSAL: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.88'
+version: '0.90'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,4 @@
-Copyright 2011, 2012, 2013, 2014, 2015 Kevin Ryde
+Copyright 2011, 2012, 2013, 2014, 2015, 2020 Kevin Ryde
 
 This file is part of Math-NumSeq-Alpha.
 
@@ -15,6 +15,9 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with Math-NumSeq-Alpha.  If not, see <http://www.gnu.org/licenses/>.
 
+
+Version 4, June 2020
+    - SevenSegments new "six" option
 
 Version 3, June 2015
     - catalogue allow for Lingua::Any::Numbers not loading in taint mode

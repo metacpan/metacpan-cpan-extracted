@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Getopt::Long::Descriptive subclass for CLI::Osprey use
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 
 use Getopt::Long::Descriptive 0.100;
@@ -28,7 +28,7 @@ CLI::Osprey::Descriptive - Getopt::Long::Descriptive subclass for CLI::Osprey us
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 DESCRIPTION
 

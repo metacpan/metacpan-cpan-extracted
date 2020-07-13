@@ -1,0 +1,11 @@
+use strict;
+use warnings;
+use lib 'lib';
+
+our $DIR;
+
+{
+  verbose => 2,
+  source  => ["$DIR/test.pas"],
+}
+

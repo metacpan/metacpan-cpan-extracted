@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016 Kevin Ryde
+# Copyright 2015, 2016, 2017 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -66,7 +66,7 @@ my $filename = 'Graph-Writer-Sparse6-t.tmp';
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 7;
+  my $want_version = 8;
   ok ($Graph::Writer::Sparse6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Writer::Sparse6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Writer::Sparse6->VERSION($want_version); 1 }, 1,
@@ -79,6 +79,8 @@ my $filename = 'Graph-Writer-Sparse6-t.tmp';
 #------------------------------------------------------------------------------
 # formats.txt sparse6 example
 
+# Write $graph to $filename, with writer "@options".
+# Read back the sparse6 string from $filename and return that string.
 sub try_write {
   my ($graph, @options) = @_;
   {

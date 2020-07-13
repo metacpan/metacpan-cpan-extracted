@@ -1,7 +1,7 @@
-package Path::Dispatcher; # git description: 1.04-27-g5a00454
-# ABSTRACT: flexible and extensible dispatch
+package Path::Dispatcher; # git description: v1.07-5-ge7be931
+# ABSTRACT: Flexible and extensible dispatch
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
 use 5.008001;
@@ -104,11 +104,11 @@ __END__
 
 =head1 NAME
 
-Path::Dispatcher - flexible and extensible dispatch
+Path::Dispatcher - Flexible and extensible dispatch
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

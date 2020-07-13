@@ -1,7 +1,7 @@
 package Path::Dispatcher::Rule::Empty;
 # ABSTRACT: matches only the empty path
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
 extends 'Path::Dispatcher::Rule';
@@ -30,7 +30,7 @@ Path::Dispatcher::Rule::Empty - matches only the empty path
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 DESCRIPTION
 

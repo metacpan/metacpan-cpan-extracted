@@ -1,5 +1,15 @@
 Revision history for HarfBuzz::Shaper.
 
+0.023
+
+    - Fix language setting.
+    - Add set/get script and direction.
+      Thanks for PhilterPaper to contribute code.
+    - Add reset method. Resets font/size/script/direction/language.
+      Optionally resets font/face cache as well.
+    - (XS) Add hb_buffer_reset.
+    - Improve documentation.
+
 0.022 2020-06-05
 
     - Update tests for harfbuzz 2.6.6. Thanks to ppisar for fixing this.

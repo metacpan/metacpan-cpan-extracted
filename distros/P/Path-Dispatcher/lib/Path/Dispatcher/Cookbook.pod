@@ -1,4 +1,5 @@
 # PODNAME: Path::Dispatcher::Cookbook
+# ABSTRACT: A cookbook for Path::Dispatcher
 
 __END__
 
@@ -8,11 +9,11 @@ __END__
 
 =head1 NAME
 
-Path::Dispatcher::Cookbook
+Path::Dispatcher::Cookbook - A cookbook for Path::Dispatcher
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 NAME
 

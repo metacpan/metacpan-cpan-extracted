@@ -1,11 +1,12 @@
 package Lab::XPRESS::Sweep::Temperature;
 #ABSTRACT: Temperature sweep
-$Lab::XPRESS::Sweep::Temperature::VERSION = '3.703';
+$Lab::XPRESS::Sweep::Temperature::VERSION = '3.710';
+use v5.20;
+
 use Lab::XPRESS::Sweep;
 use Statistics::Descriptive;
 use Time::HiRes qw/usleep/;
 use strict;
-use 5.010;
 
 our @ISA = ('Lab::XPRESS::Sweep');
 
@@ -408,7 +409,7 @@ Lab::XPRESS::Sweep::Temperature - Temperature sweep
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -583,6 +584,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
             2014       Christian Butschkow
             2015       Alois Dirnaichner
             2016-2017  Andreas K. Huettel, Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

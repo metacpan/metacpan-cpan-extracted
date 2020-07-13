@@ -9,6 +9,7 @@ lib/B/Tap.pm
 lib/B/Tap.xs
 lib/B/ppport.h
 lib/Devel/CodeObserver.pm
+minil.toml
 t/00_compile.t
 t/01_simple.t
 t/02_entersub.t

@@ -1,0 +1,64 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::PluginBundle::Author::TEAM' => '0',
+                                      'Software::License::Perl_5' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Class::Method::Modifiers' => '0',
+                                      'Email::Address::XS' => '0',
+                                      'Email::Sender::Simple' => '0',
+                                      'Email::Simple::Header' => '0',
+                                      'Log::Any' => '0',
+                                      'OpenTracing' => '1.001',
+                                      'OpenTracing::DSL' => '0',
+                                      'OpenTracing::Integration' => '0',
+                                      'Role::Tiny::With' => '0',
+                                      'Syntax::Keyword::Try' => '0',
+                                      'indirect' => '0',
+                                      'strict' => '0',
+                                      'utf8' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Email::Sender' => '0',
+                                   'Email::Sender::Transport::Test' => '0',
+                                   'Email::Simple' => '0',
+                                   'Email::Simple::Creator' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Log::Any::Adapter' => '0',
+                                   'OpenTracing::Any' => '0',
+                                   'Test::CheckDeps' => '0.010',
+                                   'Test::More' => '0.98',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

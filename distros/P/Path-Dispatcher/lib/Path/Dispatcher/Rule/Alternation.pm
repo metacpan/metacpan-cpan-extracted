@@ -1,7 +1,7 @@
 package Path::Dispatcher::Rule::Alternation;
 # ABSTRACT: any rule must match
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
 extends 'Path::Dispatcher::Rule';
@@ -45,7 +45,7 @@ Path::Dispatcher::Rule::Alternation - any rule must match
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

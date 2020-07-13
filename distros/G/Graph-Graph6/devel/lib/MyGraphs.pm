@@ -1,4 +1,4 @@
-# Copyright 2015, 2016, 2017 Kevin Hyde
+# Copyright 2015, 2016, 2017, 2018 Kevin Hyde
 #
 # This file is shared by a couple of distributions.
 #
@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU General Public License along
 # with this file.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# (Some tests in gmaker xt/MyGraphs-various.t)
 
 package MyGraphs;
 use 5.010;
@@ -54,16 +56,25 @@ use vars '@EXPORT_OK';
               'Graph_to_sparse6_str',
               'Graph_to_graph6_str',
               'Graph_from_graph6_str',
+
               'Graph_triangle_is_even',
-              'Graph_has_claw',
+              'Graph_triangle_search','Graph_find_triangle',
+              'Graph_has_triangle','Graph_triangle_count',
+
+              'Graph_claw_search',
+              'Graph_has_claw','Graph_claw_count','Graph_claw_count',
+
               'Graph_clique_number',
               'Graph_width_list',
               'Graph_find_all_4cycles',
               'Graph_rename_vertex','Graph_pad_degree',
               'Graph_eccentricity_path',
               'Graph_tree_centre_vertices',
+              'Graph_tree_domnum',
               'Graph_tree_domsets_count','Graph_tree_minimal_domsets_count',
               'Graph_is_domset','Graph_is_minimal_domset',
+              'Graph_domset_is_minimal',
+              'Graph_minimal_domsets_count_by_pred',
 
               'edge_aref_num_vertices',
               'edge_aref_is_subgraph',
@@ -82,11 +93,11 @@ use vars '@EXPORT_OK';
 
               'make_tree_iterator_edge_aref',
               'make_graph_iterator_edge_aref',
-              'hog_searches_html',
+              'hog_searches_html','hog_grep',
               'postscript_view_file',
 
               'Graph_to_GraphViz2',
-              'Graph_strip_hanging_cycles',
+              'Graph_delete_hanging_cycles',
 
               'Graph_subtree_depth',
               'Graph_subtree_children',
@@ -108,7 +119,9 @@ use vars '@EXPORT_OK';
 sub postscript_view_file {
   my ($filename, %options) = @_;
   require IPC::Run;
-  my @command = ('gv','--scale=.4',$filename);
+  my @command = ('gv',
+                 '--scale=.7',
+                 $filename);
   if ($options{'synchronous'}) {
     IPC::Run::run(\@command);
   } else {
@@ -133,7 +146,7 @@ sub Graph_Easy_view {
   # per Graph::Easy::As_graphviz
   print $dot $graph->as_graphviz;
 
-  graphviz_view_file($dot_filename);
+  graphviz_view_file($dot_filename, %options);
 }
 
 # $str is DOT format graph
@@ -215,6 +228,35 @@ sub Graph_Easy_print_adjacency_matrix {
 #------------------------------------------------------------------------------
 # Graph.pm extras
 
+sub Graph_print_adjacency_matrix {
+  my ($graph) = @_;
+  my @vertices = sort {$a <=> $b} $graph->vertices;
+  if (grep {! /^\d+$/} @vertices) {
+    @vertices = sort {$a <=> $b} @vertices;
+  } else {
+    @vertices = sort {$a <=> $b} @vertices;
+  }
+  print "[";
+  foreach my $from (0 .. $#vertices) {
+    foreach my $to (0 .. $#vertices) {
+      print $graph->has_edge($vertices[$from], $vertices[$to]) ? '1' : '0',
+        $to==$#vertices ? ($from==$#vertices ? ']' : ';') : ',';
+    }
+    # print "\n";
+  }
+}
+sub Graph_loopcount {
+  my ($graph) = @_;
+  my $loopcount = 0;
+  foreach my $edge ($graph->edges) {
+    $loopcount += ($edge->[0] eq $edge->[1]);
+  }
+  return $loopcount;
+}
+
+
+# modify $graph to branch reduce, meaning all degree-2 vertices are
+# contracted out by deleting and joining their neighbours with an edge
 sub Graph_branch_reduce {
   my ($graph) = @_;
   ### Graph_branch_reduce() ...
@@ -237,13 +279,15 @@ sub Graph_branch_reduce {
 # return a list of the immediate children of vertex $v
 # children are vertices compared numerically $child >= $v
 sub Graph_vertex_children {
-  my ($graph, $v) = @_;
-  my @children = grep {$_ ge $v} $graph->neighbours($v);
+  my ($graph, $v, %options) = @_;
+  my $cmp = $options{'cmp'} || \&cmp_numeric;
+  my @children = grep {$cmp->($_,$v)>0} $graph->neighbours($v);
   return @children;
 }
 sub Graph_vertex_num_children {
-  my ($graph, $v) = @_;
-  return scalar(grep {$_ ge $v} $graph->neighbours($v));
+  my ($graph, $v, %options) = @_;
+  my @children = Graph_vertex_children($graph,$v, %options);
+  return scalar(@children);
 }
 
 # $graph is a Graph.pm, show it graphically
@@ -252,11 +296,17 @@ sub Graph_vertex_num_children {
 sub Graph_view {
   my ($graph, %options) = @_;
   ### Graph_view(): %options
-  $options{'vertex_name_type'}
-    //= $graph->get_graph_attribute('vertex_name_type')
-    // ($graph->get_graph_attribute('xy') ? 'xy' : undef)
-    // '';
-  if ($options{'vertex_name_type'} =~ /^xy/) {
+
+  my $is_xy = ($graph->get_graph_attribute('vertex_name_type_xy')
+               || $graph->get_graph_attribute('xy')
+               || do {
+                 my $type = $graph->get_graph_attribute('vertex_name_type');
+                 defined $type && $type =~ /^xy/ }
+               || do {
+                 my ($v) = $graph->vertices;
+                 defined $v && defined($graph->get_vertex_attribute($v,'x')) });
+  ### $is_xy
+  if ($is_xy) {
     my $graphviz2 = Graph_to_GraphViz2($graph, %options);
     GraphViz2_view($graphviz2, driver=>'neato', %options);
     return;
@@ -264,7 +314,8 @@ sub Graph_view {
 
   require Graph::Convert;
   my $easy = Graph::Convert->as_graph_easy($graph);
-  $easy->set_attribute('flow','south');
+  $easy->set_attribute('flow',
+                       $graph->get_graph_attribute('flow') // 'south');
   if (defined(my $name = $graph->get_graph_attribute('name'))) {
     $easy->set_attribute('label',$name);
   }
@@ -336,6 +387,7 @@ sub Graph_tree_height {
 
 # Return a list of arrayrefs [$v,$v,...] which are the vertices at
 # successive depths of tree $graph.  The first arrayref contains the tree root.
+# Within each row vertices are sorted first by parent, then by given cmp.
 sub Graph_vertices_by_depth {
   my ($graph, %options) = @_;
   my $root = $options{'root'} // Graph_tree_root($graph);
@@ -396,12 +448,14 @@ sub Graph_tree_print {
     ### numeric: $cmp==\&cmp_numeric
     my @vertices = $graph->vertices;
     my @vertices_by_depth = Graph_vertices_by_depth($graph, cmp => $cmp);
+    ### @vertices_by_depth
     my %column;
     my %children;
 
     foreach my $v (@vertices) {
-      $children{$v} = [ sort $cmp Graph_vertex_children($graph,$v) ];
+      $children{$v} = [ sort $cmp Graph_vertex_children($graph,$v,cmp=>$cmp) ];
       $column{$v} = 0;
+      ### children: "$v children ".join(',',@{$children{$v}})
     }
 
     my $are_siblings = sub {
@@ -411,11 +465,8 @@ sub Graph_tree_print {
       return $p1 eq $p2;
     };
 
-    my $more;
-    do {
-      $more = 0;
-
-      # no overlaps within row
+  OUTER: for (;;) {
+      # avoid overlaps within row
       foreach my $depth (0 .. $#vertices_by_depth) {
         my $aref = $vertices_by_depth[$depth];
         foreach my $i (1 .. $#$aref) {
@@ -424,26 +475,31 @@ sub Graph_tree_print {
           my $c = $column{$v1} + length($v1)
             + ($are_siblings->($v1,$v2) ? $sibling_gap : $gap);
           if ($column{$v2} < $c) {
+            ### overlap in row: "depth=$depth  $v2 to column $c"
             $column{$v2} = $c;
-            $more = 1;
+            next OUTER;
           }
         }
       }
 
       # parent half-way along children,
       # or children moved up if parent further along
-      foreach my $v (@vertices) {
-        my $children_aref = $children{$v};
+      foreach my $p (@vertices) {
+        my $children_aref = $children{$p};
         next unless @$children_aref;
         my $min = $column{$children_aref->[0]};
         my $max = $column{$children_aref->[-1]} + length($children_aref->[-1]);
-        my $c = int(($max + $min - length($v))/2);
-        if ($column{$v} < $c) {
-          $column{$v} = $c;
-          $more = 1;
-        } elsif ($column{$v} > $c) {
-          $column{$children_aref->[0]}++;
-          $more = 1;
+        my $c = int(($max + $min - length($p))/2);
+        if ($column{$p} < $c) {
+          ### parent: "parent p=$p move up to middle $c  ($min to $max)"
+          $column{$p} = $c;
+          next OUTER;
+        }
+        if ($column{$p} > $c) {
+          my $v = $children_aref->[0];
+          $column{$v}++;
+          ### parent: "parent $p at $column{$v} > mid $c, advance first child c=$v (".join(',',@$children_aref).") to column $column{$v}"
+          next OUTER;
         }
       }
 
@@ -456,11 +512,11 @@ sub Graph_tree_print {
         my $c = $column{$v2} - length($v1) - $sibling_gap;
         if ($column{$v1} < $c) {
           $column{$v1} = $c;
-          $more = 1;
+          next OUTER;
         }
       }
-
-    } while ($more);
+      last;
+    }
 
     my $total_column = max(map {$column{$_}+length($_)} @vertices) + 3;
     my @lines;
@@ -601,8 +657,50 @@ sub Graph_xy_print {
     print "\n";
   }
 
-  print "     ";
+  print " ";
   foreach my $x ($x_min .. $x_max) {
+    printf "%4d", $x;
+  }
+  print "\n";
+}
+
+sub Graph_xy_print_triangular {
+  my ($graph) = @_;
+  my @vertices = $graph->vertices;
+  my @points = map {[split /,/]} @vertices;
+  my @x = map {$_->[0]} @points;
+  my @y = map {$_->[1]} @points;
+  my $x_min = (@x ? min(@x) - 1 : 0);
+  my $x_max = (@x ? max(@x) + 1 : 0);
+  my $y_min = (@y ? min(@y) - 1 : 0);
+  my $y_max = (@y ? max(@y) + 1 : 0);
+  foreach my $y (reverse $y_min .. $y_max) {
+    printf "%3s ", '';
+    foreach my $x ($x_min .. $x_max) {
+      my $from = "$x,$y";
+      # vertical edge to above
+      print $graph->has_edge($from, ($x  ).",".($y+1)) ? "|" : " ";
+      print $graph->has_edge(($x).",".($y+1), ($x+1).",".($y)) ? "\\"
+        : $graph->has_edge($from, ($x+1).",".($y+1)) ? "/" : " ";
+    }
+    print "\n";
+
+    printf "%3d ", $y;
+    foreach my $x ($x_min .. $x_max) {
+      my $from = "$x,$y";
+      # horizontal edge to next
+      print $graph->has_vertex($from) ? "*" 
+        : $graph->has_edge(($x-1).",".$y, ($x+1).",".$y) ? "-"
+        : " ";
+      print $graph->has_edge(($x-1).",".$y, ($x+1).",".$y)
+        || $graph->has_edge($from, ($x+1).",".$y) 
+        || $graph->has_edge($from, ($x+2).",".$y) ? "-" : " ";
+    }
+    print "\n";
+  }
+
+  print "       ", ($x_min&1 ? '  ' : '');
+  for (my $x = $x_min+($x_min&1); $x <= $x_max; $x+=2) {
     printf "%4d", $x;
   }
   print "\n";
@@ -879,13 +977,49 @@ sub edge_aref_degrees_distinct {
 
 #------------------------------------------------------------------------------
 
+use constant::defer hog_filename => sub {
+  return "$ENV{HOME}/HOG/all.g6";
+};
+use constant::defer hog_mmap_ref => sub {
+  require File::Map;
+  my $mmap;
+  File::Map::map_file ($mmap, hog_filename());
+  return \$mmap;
+};
+sub hog_grep {
+  my ($str) = @_;
+  ### hog_grep(): $str
+  $str =~ s/\n$//;
+  my $mmap_ref = hog_mmap_ref();
+  return $$mmap_ref =~ /^\Q$str\E$/m;
+}
+
+sub hog_compare {
+  my ($id, $g6_str) = @_;
+  require File::Slurp;
+  my $filename = "$ENV{HOME}/HOG/graph_$id.g6";
+  my $file_str = File::Slurp::read_file($filename);
+  my $canon_g6_str = graph6_str_to_canonical($g6_str);
+  my $canon_file_str = graph6_str_to_canonical($file_str);
+  if ($g6_str ne $file_str) {
+    print "id=$id wrong\n";
+    print "string $g6_str";
+    print "file   $file_str";
+    print "canon string $canon_g6_str";
+    print "canon file   $canon_file_str";
+    croak "wrong";
+  }
+}
+
 # hog_searches_html($graph,$graph,...)
 # Create a /tmp/hog-searches.html of forms to search hog for each $graph.
 # Each $graph is either Graph.pm or Graph::Easy.
 #
 sub hog_searches_html {
   my @graphs = @_;
+  ### hog_searches_html() ...
 
+  require HTML::Entities;
   my $html_filename = '/tmp/hog-searches.html';
   my $hog_url = 'https://hog.grinvin.org';
   # $hog_url = 'http://localhost:10000';
@@ -900,7 +1034,10 @@ HERE
   foreach my $i (0 .. $#graphs) {
     my $graph = $graphs[$i];
     ### graph: "$graph"
-    if (! blessed($graph)) {
+    if (! ref $graph) {
+      ### convert graph6 string ...
+      $graph = Graph_from_graph6_str($graph);
+    } elsif (! blessed($graph)) {
       ### convert edge_aref ...
       if (ref $graph) {
         $graph = edge_aref_to_Graph_Easy($graph);
@@ -910,6 +1047,7 @@ HERE
     }
     my $graph6_filename = "/tmp/$i.g6";
     my $png_filename = "/tmp/$i.png";
+    ### $graph6_filename
 
     if ($graph->isa('Graph::Easy')) {
       require Graph::Easy::As_graph6;
@@ -927,6 +1065,7 @@ HERE
     my $num_vertices = $graph->vertices;
     my $num_edges    = $graph->edges;
     my $name;
+    my $flow = 'south';
     my $vertex_name_type;
     if ($graph->isa('Graph::Easy')) {
       $name = $graph->get_attribute('label');
@@ -935,16 +1074,27 @@ HERE
     } else {
       $name = $graph->get_graph_attribute('name');
       $vertex_name_type = $graph->get_graph_attribute('vertex_name_type');
+      $flow = $graph->get_graph_attribute('flow') // $flow;
     }
     $vertex_name_type //= '';
     $name //= '';
-    my $canonical = graph6_str_to_canonical($graph6_str);
+
+    my $graph6_canonical = graph6_str_to_canonical($graph6_str);
+    my $canonical = $graph6_canonical;
     if (length($canonical) > 30) {
       $canonical = '';
     } else {
-      require HTML::Entities;
       $canonical = "<br> canonical "
         . HTML::Entities::encode_entities($canonical);
+    }
+
+    my $got = '';
+    if (hog_grep($graph6_canonical)) {
+      my $str = $graph6_canonical;
+      $str =~ s/\n+$//;
+      print "$i HOG got $str  n=$num_vertices\n";
+      $got = "<br> got in "
+        . HTML::Entities::encode_entities(hog_filename()) . "\n";
     }
 
     print $h <<"HERE";
@@ -954,12 +1104,11 @@ HERE
   $graph6_size bytes,
   $num_vertices vertices,
   $num_edges edges
-  $name$canonical
+  $name$canonical$got
 HERE
 
     if ($num_vertices == 0) {
       print $h "empty\n";
-      next;
     }
     print $h <<"HERE";
   <FORM name="DoSearchGraphFromFile" id="DoSearchGraphFromFile"
@@ -974,8 +1123,17 @@ HERE
 HERE
 
     if ($num_vertices <= 60) {
-      if ($vertex_name_type =~ /^xy/) {
-        my $graphviz2 = Graph_to_GraphViz2($graph);
+      my $is_xy = $graph->isa('Graph')
+        && ($graph->get_graph_attribute('vertex_name_type_xy')
+            || $graph->get_graph_attribute('xy')
+            || do {
+              my $type = $graph->get_graph_attribute('vertex_name_type');
+              defined $type && $type =~ /^xy/ }
+            || do {
+              my ($v) = $graph->vertices;
+              defined $v && defined($graph->get_vertex_attribute($v,'x')) });
+      if ($is_xy) {
+        my $graphviz2 = Graph_to_GraphViz2($graphs[$i]);
         $graphviz2->run(format => 'png',
                         output_file=>$png_filename,
                         driver => 'neato');
@@ -990,7 +1148,7 @@ HERE
         foreach my $v (1,0) {
           if (defined($easy->node($v))) {
             $easy->set_attribute('root',$v);  # for as_graphviz()
-            $easy->set_attribute('flow','south');  # for as_graphviz()
+            $easy->set_attribute('flow',$flow);  # for as_graphviz()
           }
         }
         ### Graph-Easy num nodes: scalar($easy->nodes)
@@ -1010,10 +1168,10 @@ HERE
   }
 
   print $h <<'HERE';
-</body>
+  </body>
 </html>
 HERE
-  close $h or die;
+    close $h or die;
 
   print "mozilla file://$html_filename >/dev/null 2>&1 &\n";
 }
@@ -1078,10 +1236,16 @@ sub graph6_str_to_canonical {
     return $g6_str;
   }
 
+  unless ($g6_str =~ /\n$/) { $g6_str .= "\n"; }
+  if ($g6_str =~ /\n.*\n/s) { croak "multiple newlines in g6 string"; }
+
   my $canonical;
   my $err;
   require IPC::Run;
-  if (! IPC::Run::run(['nauty-labelg','-i2'],
+  if (! IPC::Run::run(['nauty-labelg',
+                       '-g',  # graph6 output
+                       # '-i2',
+                      ],
                       '<',\$g6_str,
                       '>',\$canonical,
                       '2>',\$err)) {
@@ -1138,6 +1302,78 @@ sub Graph_from_edge_aref {
   return $graph;
 }
 
+sub Graph_from_vpar {
+  my ($vpar, @options) = @_;
+  require Graph;
+  my $graph = Graph->new (@options);
+  $graph->set_graph_attribute('flow','south');
+  $graph->add_vertices(1 .. $#$vpar);
+  foreach my $v (1 .. $#$vpar) {
+    if ($vpar->[$v]) {
+      $graph->add_edge ($v, $vpar->[$v]);
+    } else {
+      $graph->set_graph_attribute('root',$v);
+    }
+  }
+  return $graph;
+}
+
+sub Graph_to_vpar {
+  my ($graph, $root) = @_;
+  $root //= Graph_tree_root($graph);
+  ### $root
+  my @vpar;
+  my @vertices = sort $graph->vertices;
+  unshift @vertices, undef;
+  ### @vertices
+  my %vertex_to_v;
+  foreach my $v (1 .. $#vertices) { $vertex_to_v{$vertices[$v]} = $v; }
+  my %seen;
+  $vpar[$vertex_to_v{$root}] = 0;
+  $seen{$root} = 1;
+  my @pending = ($root);
+  while (@pending) {
+    my $vertex = pop @pending;
+    my $v = $vertex_to_v{$vertex};
+    ### vertex: "$vertex  v=$v"
+    my @neighbours = $graph->neighbours($vertex);
+    ### @neighbours
+    my $p = 0;
+    $seen{$vertex} = 1;
+    $vpar[$v] = 0;
+    foreach my $neighbour (@neighbours) {
+      if ($seen{$neighbour}) {
+        $p = $vertex_to_v{$neighbour};
+        $vpar[$v] = $p;
+        ### set: "$v parent $p"
+      } else {
+        push @pending, $neighbour;
+      }
+    }
+  }
+  return \@vpar;
+}
+sub Graph_vpar_str {
+  my ($graph) = @_;
+  my $vpar = Graph_to_vpar($graph);
+  my $str = "[";
+  foreach my $v (1 .. $#$vpar) {
+    $str .= ($vpar->[$v] // 'undef');
+    if ($v != $#$vpar) { $str .= ","; }
+  }
+  $str .= "]";
+}
+sub Graph_print_vpar {
+  my ($graph) = @_;
+  my $vpar = Graph_to_vpar($graph);
+  print "[";
+  foreach my $v (1 .. $#$vpar) {
+    print $vpar->[$v] // 'undef';
+    if ($v != $#$vpar) { print ","; }
+  }
+  print "]\n";
+}
+
 #------------------------------------------------------------------------------
 # triangles
 
@@ -1145,7 +1381,7 @@ sub Graph_from_edge_aref {
 #      a
 #     / \
 #    b---c
-# Return true if it is an even triangle.  For an even triangle every other
+# Return true if this is an even triangle.  For an even triangle every other
 # vertex in the graph has an edge going to an even number of the vertices
 # a,b,c.  This means either no edges to them, or edges to exactly 2 of them.
 #
@@ -1167,19 +1403,88 @@ sub Graph_triangle_is_even {
   return 1;
 }
 
-#------------------------------------------------------------------------------
-# claws
+# $graph is a Graph.pm.
+# Call $stop = $callback->($a,$b,$c) for each triangle in $graph.
+# If the return $stop is true then stop the search.
+# The return is the $stop value, or undef at end of search.
+#
+#      c
+#     / \
+#    a---b
+#
+# Triangles are found one way only, so if a,b,c then no calls also for
+# permutations like b,a,c.  It's unspecified exactly which vertices are the
+# $a,$b,$c in the callback (though the current code has then in ascending
+# alphabetical order).
+# 
+sub Graph_triangle_search {
+  my ($graph, $callback) = @_;
+  foreach my $a ($graph->vertices) {
+    my @a_neighbours = sort $graph->neighbours($a);
 
-# ($a,$b,$c,$d) = Graph_find_claw($graph);
-# Return a list of vertices which are a claw (a 4-star) within $graph, as an
-# induced subgraph.  $a is the centre.
+    foreach my $bi (0 .. $#a_neighbours-2) {
+      my $b = $a_neighbours[$bi];
+      next if $b lt $a;
+
+      foreach my $ci ($bi+1 .. $#a_neighbours-1) {
+        my $c = $a_neighbours[$ci];
+        if ($graph->has_edge($b,$c)) {
+          if (my $stop = $callback->($a,$b,$c)) {
+            return $stop;
+          }
+        }
+      }
+    }
+  }
+  return undef;
+}
+
+# $graph is a Graph.pm.
+# ($a,$b,$c) = Graph_find_triangle($graph);
+# Return a list of vertices which are a triangle within $graph.
+# If no triangles then return an empty list;
+#      c
+#     / \
+#    a---b
+sub Graph_find_triangle {
+  my ($graph) = @_;
+  my @ret;
+  Graph_triangle_search($graph, sub {@ret = @_});
+  return @ret;
+}
+
+# $graph is a Graph.pm.
+# Return true if $graph contains a triangle.
+sub Graph_has_triangle {
+  my ($graph) = @_;
+  return Graph_triangle_search($graph, sub {1});
+}
+
+# $graph is a Graph.pm.
+# Return the number of triangles in $graph.
+sub Graph_triangle_count {
+  my ($graph) = @_;
+  my $count = 0;
+  Graph_triangle_search($graph, sub { $count++; return 0});
+  return $count;
+}
+
+
+#------------------------------------------------------------------------------
+# Claws
+
+# $graph is a Graph.pm.
+# Call $stop = $callback->($a,$b,$c,$d) for each claw in $graph.
+# $a is the centre.
+# If the return $stop is true then stop the search.
+# The return is the $stop value, or undef at end of search.
 #      b
 #     /
 #    a--c
 #     \
 #      d
-sub Graph_find_claw {
-  my ($graph) = @_;
+sub Graph_claw_search {
+  my ($graph, $callback) = @_;
   foreach my $a ($graph->vertices) {
     my @a_neighbours = $graph->neighbours($a);
 
@@ -1194,21 +1499,47 @@ sub Graph_find_claw {
           my $d = $a_neighbours[$di];
           next if $graph->has_edge($b,$d) || $graph->has_edge($c,$d);
 
-          return ($a,$b,$c,$d);
+          if (my $stop = $callback->($a,$b,$c,$d)) {
+            return $stop;
+          }
         }
       }
     }
   }
-  return;
+  return undef;
 }
 
+# $graph is a Graph.pm.
+# ($a,$b,$c,$d) = Graph_find_claw($graph);
+# Return a list of vertices which are a claw (a 4-star) within $graph, as an
+# induced subgraph.  $a is the centre.
+# If no claws then return an empty list;
+#      b
+#     /
+#    a--c
+#     \
+#      d
+sub Graph_find_claw {
+  my ($graph) = @_;
+  my @ret;
+  Graph_claw_search($graph, sub {@ret = @_});
+  return @ret;
+}
+
+# $graph is a Graph.pm.
 # Return true if $graph contains a claw (star-4) as an induced subgraph.
 sub Graph_has_claw {
   my ($graph) = @_;
-  my @claw = Graph_find_claw($graph);
-  ### found claw: @claw
-  ### result: @claw > 0
-  return @claw > 0;
+  return Graph_claw_search($graph, sub {1});
+}
+
+# $graph is a Graph.pm.
+# Return the number of induced claws in $graph.
+sub Graph_claw_count {
+  my ($graph) = @_;
+  my $count = 0;
+  Graph_claw_search($graph, sub { $count++; return 0});
+  return $count;
 }
 
 #------------------------------------------------------------------------------
@@ -1235,7 +1566,9 @@ sub Graph_width_list {
   return @widths;
 }
 
-# return true if all vertices of $graph have same degree
+# $graph is a Graph.pm.
+# Return true if all vertices of $graph have same degree.
+#
 sub Graph_is_regular {
   my ($graph) = @_;
   my $degree;
@@ -1247,6 +1580,11 @@ sub Graph_is_regular {
   return 1;
 }
 
+# $graph and $subgraph are Graph.pm objects.
+# Return true if $subgraph is a subgraph of $graph.
+# This is a check of graph structure.  The vertex names in the two can be
+# different.
+#
 sub Graph_is_subgraph {
   my ($graph, $subgraph) = @_;
   my $num_vertices = $graph->vertices;
@@ -1269,12 +1607,13 @@ sub edge_aref_from_Graph {
 }
 
 sub Graph_is_induced_subgraph {
-  my ($graph, $subgraph) = @_;
+  my ($graph, $subgraph, %options) = @_;
   my @graph_vertices    = sort $graph->vertices;
   my @subgraph_vertices = sort $subgraph->vertices;
   ### @graph_vertices
   ### @subgraph_vertices
 
+  my @ret;
   my @used = (0) x (scalar(@graph_vertices) + 1);
   my @map = (-1) x (scalar(@subgraph_vertices) + 1);
   my $pos = 0;
@@ -1288,7 +1627,7 @@ sub Graph_is_induced_subgraph {
         $pos--;
         ### backtrack to pos: $pos
         if ($pos < 0) {
-          return 0;
+          last OUTER;
         }
         next OUTER;
       }
@@ -1323,12 +1662,24 @@ sub Graph_is_induced_subgraph {
       #   print "  $subgraph_vertices[$p] <-> $graph_vertices[$map[$p]]\n";
       # }
 
-      return join(', ',
-                  map {"$subgraph_vertices[$_]=$graph_vertices[$map[$_]]"}
-                  0 .. $#subgraph_vertices);
-      return 1;
+      if ($options{'all_maps'}) {
+        push @ret, { map {$subgraph_vertices[$_] => $graph_vertices[$map[$_]]}
+                     0 .. $#subgraph_vertices};
+        ### new map: $ret[-1]
+        $pos--;
+      } else {
+        return join(', ',
+                    map {"$subgraph_vertices[$_]=$graph_vertices[$map[$_]]"}
+                    0 .. $#subgraph_vertices);
+      }
     }
     $map[$pos] = -1;
+  }
+
+  if ($options{'all_maps'}) {
+    return @ret;
+  } else {
+    return 0;
   }
 }
 
@@ -1425,8 +1776,7 @@ sub edge_aref_is_induced_subgraph {
 }
 
 sub edge_aref_is_subgraph {
-  my ($edge_aref, $subgraph_edge_aref,
-      %option) = @_;
+  my ($edge_aref, $subgraph_edge_aref, %option) = @_;
   ### edge_aref_is_subgraph() ...
   ### $edge_aref
   ### $subgraph_edge_aref
@@ -1670,6 +2020,11 @@ sub Graph_terminal_Wiener_part_at_vertex {
 
 #------------------------------------------------------------------------------
 
+# $graph is a Graph.pm.
+# Return a new Graph.pm which is its line graph.
+# Each vertex of the line graph is an edge of $graph and edges in the line
+# graph are between those $graph edges with a vertex in common.
+#
 sub Graph_line_graph {
   my ($graph) = @_;
   my $line = Graph->new (undirected => $graph->is_undirected);
@@ -1722,9 +2077,10 @@ use constant::defer Graph_Beineke_graphs => sub {
     } 1 .. 9;
 };
 
-# $graph is a Graph.pm graph.
-# Return true if $graph is a line graph, but checking none of Beineke G1 to
+# $graph is a Graph.pm.
+# Return true if $graph is a line graph, by checking none of Beineke G1 to
 # G9 are induced subgraphs.
+#
 sub Graph_is_line_graph_by_Beineke {
   my ($graph) = @_;
   ### Graph_is_line_graph_by_Beineke() ...
@@ -1744,18 +2100,23 @@ sub Graph_is_line_graph_by_Beineke {
 
 # file:///usr/share/doc/graphviz/html/info/attrs.html
 
+# $graph is a Graph.pm object.
+# Return a GraphViz2 object.
+#
 sub Graph_to_GraphViz2 {
   my ($graph, %options) = @_;
   ### Graph_to_GraphViz2: %options
   require GraphViz2;
   $options{'vertex_name_type'}
     //= $graph->get_graph_attribute('vertex_name_type') // '';
-  my $xy = ($options{'vertex_name_type'} =~ /^xy/);
-  my $xy_triangular = ($options{'vertex_name_type'} =~ /^xy-triangular/);
-  ### $xy
+  my $is_xy = ($options{'vertex_name_type'} =~ /^xy/);
+  my $is_xy_triangular
+    = ($options{'vertex_name_type'} =~ /^xy-triangular/
+       || $graph->get_graph_attribute('vertex_name_type_xy_triangular'));
+  ### $is_xy
 
   my $name = $graph->get_graph_attribute('name');
-  my $flow = ($options{'flow'} // 'down');
+  my $flow = ($options{'flow'} // $graph->get_graph_attribute('flow') // 'down');
   my $graphviz2 = GraphViz2->new
     (directed => $graph->is_directed,
      graph  => { (defined $name ? (label   => $name) : ()),
@@ -1767,14 +2128,18 @@ sub Graph_to_GraphViz2 {
 
   foreach my $v ($graph->vertices) {
     my @attrs;
-    if ($xy) {
+    if ($is_xy) {
       my ($x,$y) = split /,/, $v;
-      if ($xy_triangular) {
+      if ($is_xy_triangular) {
         $x *= 1/2;
         $y = sprintf '%.5f', $y*sqrt(3)/2;
       }
       push @attrs, pin=>1, pos=>"$x,$y";
       ### @attrs
+    } elsif (defined(my $x = $graph->get_vertex_attribute($v,'x'))
+             && defined(my $y = $graph->get_vertex_attribute($v,'y'))) {
+      ### pin at: "$x,$y"
+      push @attrs, pin=>1, pos=>"$x,$y";
     }
     $graphviz2->add_node(name => $v,
                          margin => '0.03,0.02',  # cf default 0.11,0.055
@@ -1789,6 +2154,8 @@ sub Graph_to_GraphViz2 {
   return $graphviz2;
 }
 
+# $graphviz2 is a GraphViz2 object.
+#
 sub GraphViz2_view {
   my ($graphviz2, %options) = @_;
 
@@ -1805,26 +2172,49 @@ sub GraphViz2_view {
   #                );
 }
 
+sub parent_aref_view {
+  my ($aref) = @_;
+  Graph_Easy_view(parent_aref_to_Graph_Easy($aref));
+}
+
 #------------------------------------------------------------------------------
 
+# $name is a vertex name.
+# Return a form suitable for use as a PGF/Tikz node name.
+# ENHANCE-ME: not quite right, would want to fixup most parens and more too.
+#
 sub vertex_name_to_tikz {
   my ($name) = @_;
   $name =~ s/[,:]/-/g;
   return $name;
 }
 
+# $graph is an undirected Graph.pm.
+# Print some PGF/Tikz TeX nodes and edges.
+# The output is a bit rough, and usually must be massaged by hand.
+#
 sub Graph_print_tikz {
   my ($graph) = @_;
+
+  my $is_xy = $graph->get_graph_attribute('vertex_name_type_xy');
 
   my @vertices = sort $graph->vertices;
   my $flow = 'east';
   my $rows = int(sqrt(scalar(@vertices)));
   my $r = 0;
   my $c = 0;
+  my %seen_vn;
   foreach my $v (@vertices) {
     my $x = ($flow eq 'west' ? -$c : $c);
+
     my $vn = vertex_name_to_tikz($v);
-    print "  \\node ($vn) at ($x,$r) [my box] {$v};\n";
+    if (exists $seen_vn{$vn}) {
+      croak "Oops, duplicate tikz vertex name for \"$v\" and \"$seen_vn{$vn}\"";
+    }
+    $seen_vn{$vn} = $v;
+
+    my $at = ($is_xy ? $v : "$x,$r");
+    print "  \\node ($vn) at ($at) [my box] {$v};\n";
     $r++;
     if ($r >= $rows) {
       $c++;
@@ -1851,13 +2241,39 @@ sub Graph_print_tikz {
   print "\n";
 }
 
+sub Graph_print_dreadnaut {
+  my ($graph) = @_;
+  my @vertices = sort {$a<=>$b} $graph->vertices;
+  print "n=",scalar(@vertices),' $=',$vertices[0]," g";
+  my $comma = '';
+  my $prev_i = 0;
+  foreach my $i (0 .. $#vertices) {
+    foreach my $j ($i+1 .. $#vertices) {
+      if ($graph->has_edge($vertices[$i], $vertices[$j])) {
+        print $comma;
+        if ($i != $prev_i) {
+          print " $i:";
+          $prev_i = $i;
+        }
+        print $j;
+        $comma = ',';
+        $prev_i = $i;
+      }
+    }
+    if ($comma) { $comma = ';'; }
+  }
+  print ".\n";
+}
 
 #------------------------------------------------------------------------------
 
-# Return the clique number of Graph.pm $graph.
+# $graph is an undirected Graph.pm.
+# Return the clique number of $graph.
 # The clique number is the number of vertices in the maximum clique
-# (complete graph) contained.
-# Brute force search here, much too slow for many vertices.
+# (complete graph) contained in $graph.
+# Currently this is a brute force search, so quite slow and suitable only for
+# small number of vertices.
+#
 sub Graph_clique_number {
   my ($graph) = @_;
 
@@ -1897,9 +2313,53 @@ sub Graph_clique_number {
 
 #------------------------------------------------------------------------------
 
+# length of the smallest cycle in $graph
+sub Graph_girth {
+  my ($graph) = @_;
+  ### Graph_girth() ...
+  my $num_vertices = scalar $graph->vertices;
+  my $girth;
+ OUTER: foreach my $from ($graph->vertices) {
+    ### $from
+    my %seen = ($from => 1);
+    my @pending = ($from);
+    foreach my $len (1 .. ($girth||$num_vertices)) {
+      ### at: "len=$len pending=".join(',',@pending)
+      my @new_pending;
+      foreach my $to (map {$graph->neighbours($_)} @pending) {
+        if ($len>2 && $to eq $from) {
+          ### cycle: "to=$to len=$len"
+          $girth = $len;
+          next OUTER;
+        }
+        unless ($seen{$to}++) {
+          push @new_pending, $to;
+        }
+      }
+      @pending = @new_pending;
+    }
+  }
+  return $girth;
+}
+    
+
+# $graph is an undirected Graph.pm.
+# If $v is in a hanging cycle, other than the attachment point, then return
+# an arrayref of the vertices of that cycle other than the attachment point
+# (in an unspecified order).
+# For example,
+#
+#            4---5
+#             \ /
+#      1---2---3---6
+#
+# has hanging cycle 3,4,5.  $v=4 or $v=5 gives return is [4,5].
+# If $v is not in a hanging cycle then return undef.
+#
 sub Graph_is_hanging_cycle {
   my ($graph, $v) = @_;
-  if ($graph->degree($v) != 2) { return 0; }
+  if ($graph->degree($v) != 2) { return undef; }
+
   my %cycle = ($v => 1);
   my @pending = $graph->neighbours($v);
   my @end;
@@ -1920,7 +2380,17 @@ sub Graph_is_hanging_cycle {
   }
 }
 
-sub Graph_strip_hanging_cycles {
+# $graph is an undirected Graph.pm.
+# Modify $graph to remove any hanging cycles.
+# For example,
+#
+#            4---5
+#             \ /
+#      1---2---3---6
+#
+# has hanging cycle 3,4,5.  Vertices 4,5 are removed.
+#
+sub Graph_delete_hanging_cycles {
   my ($graph) = @_;
   my $count = 0;
  MORE: for (;;) {
@@ -2020,8 +2490,9 @@ sub Graph_find_all_4cycles {
 
 # $graph is a tree
 # $v is a child node of $parent
-# return the depth of the subtree $v and deeper underneath $parent
-# if $v is a leaf then it is the entire subtree and the return is depth 1
+# Return the depth of the subtree $v and deeper underneath $parent.
+# If $v is a leaf then it is the entire subtree and the return is depth 1.
+#
 sub Graph_subtree_depth {
   my ($graph, $parent, $v) = @_;
   ### $parent
@@ -2050,7 +2521,18 @@ sub Graph_subtree_children {
 #------------------------------------------------------------------------------
 # Hamiltonian
 
-# by slow search
+# $graph is a Graph.pm.
+# Return true if it has a Hamiltonian cycle (a cycle visiting all vertices
+# once each).  Key/value options are
+#
+#     type => "cycle" or "path" (default "cycle")
+#
+# type "path" means search for a Hamiltonian path (a path visiting all
+# vertices once each).
+#
+# Currently this is a depth first search so quite slow and suitable only for
+# a small number of vertices.
+#
 sub Graph_is_Hamiltonian {
   my ($graph, %options) = @_;
   my $type = $options{'type'} || 'cycle';
@@ -2064,6 +2546,7 @@ sub Graph_is_Hamiltonian {
   }
 
   foreach my $start ($type eq 'path' ? (@vertices) : ($vertices[0])) {
+    if ($options{'verbose'}) { print "try start $start\n"; }
     my @path = ($start);
     my %visited = ($path[0] => 1);
     my @nn = (-1);
@@ -2184,12 +2667,20 @@ sub parent_aref_to_Graph_Easy {
 
 #------------------------------------------------------------------------------
 
+# $graph is a Graph.pm.
+# Modify $graph by changing the name of vertex $old_name to $new_name.
+# If $old_name and $new_name are the same then do nothing.
+# Otherwise $new_name should not exist already.
+#
 sub Graph_rename_vertex {
   my ($graph, $old_name, $new_name) = @_;
   ### $old_name
   ### $new_name
 
   return if $old_name eq $new_name;
+  if ($graph->has_vertex($new_name)) {
+    croak "Graph vertex \"$new_name\" exists already";
+  }
 
   $graph->add_vertex($new_name);
   foreach my $edge ($graph->edges_at($old_name)) {
@@ -2203,13 +2694,17 @@ sub Graph_rename_vertex {
   $graph->delete_vertex($old_name);
 }
 
-# return a new vertex name for $graph
+# $graph is a Graph.pm.
+# Return a new vertex name for $graph, one which does not otherwise occur in
+# $graph.
+#
 sub Graph_new_vertex_name {
-  my ($graph) = @_;
+  my ($graph, $prefix) = @_;
+  if (! defined $prefix) { $prefix = ''; }
   my $upto = $graph->get_graph_attribute('Graph_new_vertex_name_upto') // 0;
   $upto++;
   $graph->set_graph_attribute('Graph_new_vertex_name_upto',$upto);
-  return $upto;
+  return "$prefix$upto";
 }
 
 # $graph is a Graph.pm.
@@ -2236,8 +2731,9 @@ sub Graph_degree_sequence {
 #------------------------------------------------------------------------------
 
 # $graph is a Graph.pm.
-# Replace each vertex by an N-star (star of $N vertices).
+# Replace each vertex by a star of N vertices.
 # Existing edges become edges between an arm of the new stars.
+# All vertices must be degree <= N-1 (the arms of the stars)
 #
 # Key/value options are
 #
@@ -2412,7 +2908,10 @@ sub Graph_cycle_replacement {
 
 #------------------------------------------------------------------------------
 
-# return a list of vertices which are a path achieving the eccentricity of $v
+# $graph is a Graph.pm.
+# Return a list of vertices which are a path achieving the eccentricity of $u.
+#
+# FIXME: is $graph->longest_path args ($u,$v) a documented feature?
 sub Graph_eccentricity_path {
   my ($graph, $u) = @_;
   $graph->expect_undirected;
@@ -2432,6 +2931,7 @@ sub Graph_eccentricity_path {
 
 #------------------------------------------------------------------------------
 
+# $graph is a Graph.pm undirected tree.
 # Return ($eccentricity, $vertex,$vertex) which is the centre 1 or 2 vertex
 # names and their eccentricity.
 # Only tested on bicentral trees.
@@ -2478,12 +2978,17 @@ sub Graph_tree_centre_vertices {
   }
 }
 
+# $graph is an undirected connected Graph.pm.
+# Return a list of its leaf vertices.
+#
 sub Graph_leaf_vertices {
   my ($graph) = @_;
   return grep {$graph->vertex_degree($_)<=1} $graph->vertices;
 }
 
-# return a list of vertices which attain the diameter of tree $graph
+# $graph is a Graph.pm undirected tree.
+# Return a list of vertices which attain the diameter of tree $graph.
+#
 sub Graph_tree_diameter_path {
   my ($graph) = @_;
   if ($graph->vertices == 0) { return; }
@@ -2532,7 +3037,145 @@ sub Graph_tree_diameter_path {
   return @$path;
 }
 
+# $graph is an undirected connected Graph.pm.
+# Return the number of paths attaining the diameter of $graph.
+# A path u--v is counted just once, not also v--u.
+#
+sub Graph_diameter_count {
+  my ($graph) = @_;
+  if ($graph->vertices <= 1) {
+    return 1;
+  }
+  my $diameter = 0;
+  my $count = 0;
+  $graph->for_shortest_paths(sub {
+                               my ($t, $u,$v, $n) = @_;
+                               my $len = $t->path_length($u,$v);
+                               if ($len > $diameter) {
+                                 ### new high path length: $len
+                                 $count = 0;
+                                 $diameter = $len;
+                               }
+                               if ($len == $diameter) {
+                                 $count++;
+                                 ### equal high path length to count: $count
+                               }
+                             });
+  ### $diameter
+  return ($graph->is_undirected ? $count/2 : $count);
+}
+
+# $graph is a Graph.pm.
+# Insert $n new vertices into each of its edges.
+# If $n omitted or undef then default 1 vertex in each edge.
+sub Graph_subdivide {
+  my ($graph, $n) = @_;
+  if (! defined $n) { $n = 1; }
+  foreach my $edge ($graph->edges) {
+    $graph->delete_edge (@$edge);
+    my $prefix = "$edge->[0]-$edge->[1]-";
+    $graph->add_path ($edge->[0],
+                      (map {Graph_new_vertex_name($graph,$prefix)} 1 .. $n),
+                      $edge->[1]);
+  }
+  if ($n && $graph->edges
+      && defined (my $name = $graph->get_graph_attribute('name'))) {
+    $graph->set_graph_attribute (name =>
+                                 "$name subdivision".($n > 1 ? " $n" : ""));
+  }
+  return $graph;
+}
+
 #------------------------------------------------------------------------------
+# Independence Number
+
+# $graph is a Graph.pm undirected tree or forest.
+# Return its independence number.
+#
+sub Graph_tree_indnum {
+  my ($graph) = @_;
+  ### Graph_tree_indnum: "num_vertices ".scalar($graph->vertices)
+  $graph->expect_acyclic;
+
+  $graph = $graph->copy;
+  my $indnum = 0;
+  my %exclude;
+ OUTER: while ($graph->vertices) {
+    foreach my $v ($graph->vertices) {
+      my $degree = $graph->vertex_degree($v);
+      next unless $degree <= 1;
+      my ($u) = $graph->neighbours($v);
+      ### consider: "$v degree $degree neighbours ".($u//'undef')
+
+      if (delete $exclude{$v}) {
+        ### exclude ...
+      } else {
+        ### leaf include ...
+        $indnum++;
+        if (defined $u) { $exclude{$u} = 1; }
+      }
+      $graph->delete_vertex($v);
+      next OUTER;
+    }
+    die "oops, not a tree";
+  }
+  return $indnum;
+}
+
+sub Graph_make_most_indomsets {
+  my ($n) = @_;
+  my $graph = Graph->new (undirected=>1);
+  my $v = 0;
+  while ($n > 0) {
+    if ($v) { $graph->add_edge(0,$v) };  # to x
+    my $u = $v;
+    my $size = 3 + (($n%3)!=0);
+    foreach my $i (0 .. $size-1) { # triangle or complete-4
+      foreach my $j (0 .. $i-1) {
+        $graph->add_edge($u+$i, $u+$j);
+      }
+    }
+    $n -= $size;
+    $v += $size;
+  }
+  return $graph;
+}
+
+sub Graph_is_indset {
+  my ($graph,$aref) = @_;
+  foreach my $from (@$aref) {
+    foreach my $to (@$aref) {
+      if ($graph->has_edge($from,$to)) {
+        return 0;
+      }
+    }
+  }
+  return 1;
+}
+
+sub Graph_indnum_and_count {
+  my ($graph) = @_;
+  require Algorithm::ChooseSubsets;
+  my @vertices = sort $graph->vertices;
+  my $it = Algorithm::ChooseSubsets->new(\@vertices);
+  my $indnum = 0;
+  my $count = 0;
+  while (my $aref = $it->next) {
+    if (Graph_is_indset($graph,$aref)) {
+      if (@$aref == $indnum) {
+        $count++;
+      } elsif (@$aref > $indnum) {
+        $indnum = @$aref;
+        $count = 1;
+      }
+    }
+  }
+  return ($indnum, $count);
+}
+
+
+#------------------------------------------------------------------------------
+# Dominating Sets Count
 
 # with(n)   = prod(child any)     # sets including parent
 # undom(n)  = prod(child dom)     # sets without parent and parent undominated
@@ -2553,6 +3196,9 @@ sub Graph_tree_diameter_path {
 #                                                2 without dom
 #   cannot e,1,3
 
+# $graph is a Graph.pm tree.
+# Return the number of dominating sets in $graph.
+#
 sub Graph_tree_domsets_count {
   my ($graph) = @_;
   require Math::BigInt;
@@ -2642,21 +3288,6 @@ sub Graph_tree_domsets_count {
   #  }
 }
 
-# v_with = prod (c_with_req + c_without)
-#        = prod (c_with - c_with_unreq + c_without)
-#        = prod (c_with - c_without + c_without)
-#        = prod (c_with)
-# with_req   = at least one c undom
-#            = with - with_unreq
-# with_unreq = all c are dom
-#            = prod(c_with_req + c_without_dom)
-# v_without = prod(c_domsets)
-# v_without_undom = prod(c_without_dom)
-# without_dom = v_without - without_dom
-# domsets = with_min + without_dom
-# v_with_min    = prod(c_domsets) - v_with_notmin
-# v_with_notmin = prod(c_with)     all c dominate v, so v not minimal
-#
 #        1 2 3 4 5
 # path 1,1,2,2,4,4,7,9,13,18,25,36,49
 #   1   with=1=1+0  without=0=0+1  domsets=1+0 = 1
@@ -2673,107 +3304,111 @@ sub Graph_tree_domsets_count {
 #   2,4,5   with_unreq but itself not minimal
 #
 
+# $graph is a Graph.pm tree.
+# Return the number of minimal dominating sets in $graph.
+#
 sub Graph_tree_minimal_domsets_count {
   my ($graph) = @_;
+  return tree_minimal_domsets_count_data_ret
+    (Graph_tree_minimal_domsets_count_data($graph));
+}
+
+# $graph is a Graph.pm tree.
+# Return a hashref of data counting minimal dominating sets in $graph.
+#
+sub Graph_tree_minimal_domsets_count_data {
+  my ($graph) = @_;
   require Math::BigInt;
+  $graph->vertices
+    || return tree_minimal_domsets_count_data_initial();  # empty graph
   $graph = $graph->copy;
-  $graph->vertices || return 1;  # empty graph
-  my $zero = Math::BigInt->new(0);
-  my $one  = Math::BigInt->new(1);
   my %data;
   foreach my $v ($graph->vertices) {
-    my $is_leaf = $graph->vertex_degree($v);
-    $data{$v} = { with_req_self             => $one,
-                  with_req_below_gross      => $one,
-                  with_req_below_sub        => $one,
-                  with_notmin_unless_undom_above_gross => $one,
-                  without_dom_notsole_gross => $one,
-                  without_dom_sole          => $zero,
-                  without_undom             => $one,
-                };
+    $data{$v} = tree_minimal_domsets_count_data_initial();
   }
  OUTER: for (;;) {
-    foreach my $v (sort $graph->vertices) {
-      my $degree = $graph->vertex_degree($v);
+    foreach my $c (sort {$a cmp $b} $graph->vertices) {
+      my $degree = $graph->vertex_degree($c);
       next unless $degree <= 1;
 
-      my $c_without_undom
-        = $data{$v}->{'without_undom'};
+      my ($v) = $graph->neighbours($c)
+        or return $data{$c};  # root
 
-      my $c_without_dom_notsole_gross
-        = $data{$v}->{'without_dom_notsole_gross'};
-      my $c_without_dom_notsole
-        = $c_without_dom_notsole_gross - $c_without_undom;
-
-      my $c_without_dom_sole = $data{$v}->{'without_dom_sole'};
-      my $c_without_dom      = $c_without_dom_sole + $c_without_dom_notsole;
-
-      my $c_with_req_self        = $data{$v}->{'with_req_self'};
-      my $c_with_req_below_gross = $data{$v}->{'with_req_below_gross'};
-      my $c_with_req_below_sub   = $data{$v}->{'with_req_below_sub'};
-      my $c_with_req_below = $c_with_req_below_gross - $c_with_req_below_sub;
-      my $c_with           = $c_with_req_self + $c_with_req_below;
-
-      my $c_with_notmin_unless_undom_above_gross
-        = $data{$v}->{'with_notmin_unless_undom_above_gross'};
-      my $c_with_notmin_unless_undom_above
-        = $c_with_notmin_unless_undom_above_gross - $c_without_undom;
-
-      my ($u) = $graph->neighbours($v);
-
-      ### c_mindomsets: ($c_with + $c_without_dom).""
-
-      ### consider: "to ".($u//'none')." deg=$degree"
-      ### c_with_req_self       : "$c_with_req_self"
-      ### c_with_req_below_gross : "$c_with_req_below_gross"
-      ### c_with_req_below_sub   : "$c_with_req_below_sub"
-      ### c_with_req_below      : "$c_with_req_below"
-      ### c_with                : "$c_with"
-      ### c_with_notmin_unless_undom_above_gross : "$c_with_notmin_unless_undom_above_gross"
-      ### c_with_notmin_unless_undom_above      : "$c_with_notmin_unless_undom_above"
-      ### c_without_dom_sole    : "$c_without_dom_sole"
-      ### c_without_dom_notsole : "$c_without_dom_notsole"
-      ### c_without_undom       : "$c_without_undom"
-
-      if ($degree == 0) {
-        ### return: "$c_with + $c_without_dom"
-        return $c_with + $c_without_dom;
-      }
-
-      #---------
-
-      # v_with_req_self = prod(c_without_dom_notsole)
-      $data{$u}->{'with_req_self'} *= $c_without_dom_notsole;
-
-      $data{$u}->{'with_req_below_gross'} *=
-        ($c_with_req_below + $c_without_dom_notsole + $c_without_undom);
-      $data{$u}->{'with_req_below_sub'} *=
-        ($c_with_req_below + $c_without_dom_notsole                   );
-
-      # =1 child c_with_notmin_unless_undom_above
-      $data{$u}->{'without_dom_sole'}
-        = $data{$u}->{'without_dom_sole'} * $c_without_dom
-        + $data{$u}->{'without_undom'}    * $c_with_notmin_unless_undom_above;
-
-      $data{$u}->{'without_dom_notsole_gross'}
-        *= ($c_with           + $c_without_dom);
-
-      $data{$u}->{'with_notmin_unless_undom_above_gross'}
-        *= ($c_with_req_below + $c_without_dom);
-
-      # v_without_undom = prod(c_without_dom)
-      $data{$u}->{'without_undom'} *= $c_without_dom;
-
-      delete $data{$v};
-      $graph->delete_vertex($v);
+      $data{$v} //= tree_minimal_domsets_count_data_initial();
+      tree_minimal_domsets_count_data_product_into
+        ($data{$v},
+         delete($data{$c}) // tree_minimal_domsets_count_data_initial());
+      $graph->delete_vertex($c);
       next OUTER;
     }
     die "oops, not a tree  $graph";
   }
 }
+sub tree_minimal_domsets_count_data_initial {
+  my $zero = Math::BigInt->new(0);
+  my $one  = Math::BigInt->new(1);
+  $zero = 0;
+  $one  = 1;
+  return { with              => $one,
+           with_notreq       => $one,
+           with_min_notreq   => $one,
+           without_dom_sole  => $zero,
+           without_notsole   => $one,
+           without_undom     => $one,
+         };
+}
+sub tree_minimal_domsets_count_data_ret {
+  my ($data) = @_;
+  return ($data  ->{'with'}
+          - $data->{'with_notreq'}
+          + $data->{'with_min_notreq'}
+          + $data->{'without_dom_sole'}
+          + $data->{'without_notsole'}
+          - $data->{'without_undom'});
+}
 
+# The args are 0 or more tree_minimal_domsets hashrefs.
+# Return their product.  This is a tree_minimal_domsets hashref for a
+# vertex which has the given args as child vertices.
+#
+sub tree_minimal_domsets_count_data_product {
+  return tree_minimal_domsets_count_data_product_into
+    (tree_minimal_domsets_count_data_initial(), @_);
+}
+
+# $p is a tree_minimal_domsets hashref and zero or more further args likewise
+# which are children of $p.
+# Return their product for $p with those children.
+#
+sub tree_minimal_domsets_count_data_product_into {
+  ### tree_minimal_domsets_count_data_product_into() ...
+  my $p = shift;
+  ### $p
+  foreach my $v (@_) {
+    # ### $v
+    my $v_with_notmin_notreq  = $v->{'with_notreq'} - $v->{'with_min_notreq'};
+    my $v_without_dom_notsole = $v->{'without_notsole'} - $v->{'without_undom'};
+    my $v_without_dom         = $v->{'without_dom_sole'} + $v_without_dom_notsole;
+    my $v_mindom              = ($v->{'with'} - $v_with_notmin_notreq   # with_min
+                                 + $v_without_dom);
+
+    my $v_with_req = $v->{'with'} - $v->{'with_notreq'};
+    $p->{'with'}            *= $v_with_req + $v->{'without_notsole'};
+    $p->{'with_notreq'}     *= $v_with_req + $v_without_dom_notsole;
+    $p->{'with_min_notreq'} *=               $v_without_dom_notsole;
+
+    $p->{'without_dom_sole'} = ($p->{'without_dom_sole'} * $v_without_dom
+                                + $p->{'without_undom'} * $v_with_notmin_notreq);
+    $p->{'without_notsole'} *= $v_mindom;
+    $p->{'without_undom'}   *= $v_without_dom;
+  }
+  return $p;
+}
+
+# $graph is a Graph.pm.
 # $aref is an arrayref of vertex names.
 # Return true if these vertices are a dominating set in $graph.
+#
 sub Graph_is_domset {
   my ($graph, $aref) = @_;
   my %vertices = map {$_=>1} $graph->vertices;
@@ -2782,10 +3417,12 @@ sub Graph_is_domset {
   return keys(%vertices) == 0;
 }
 
+# $graph is a Graph.pm.
 # $aref is an arrayref of vertex names.
-# Return true if these vertices are minimal in the amount of $graph they
+# Return true if these vertices are minimal for the amount of $graph they
 # dominate, meaning any vertex removed would reduce the amount of $graph
 # dominated.
+#
 sub Graph_domset_is_minimal {
   my ($graph, $aref) = @_;
   my %count;
@@ -2803,12 +3440,34 @@ sub Graph_domset_is_minimal {
   return 1;
 }
 
+# $graph is a Graph.pm.
 # $aref is an arrayref of vertex names.
 # Return true if these vertices are a minimal dominating set in $graph.
+#
 sub Graph_is_minimal_domset {
   my ($graph, $aref) = @_;
   return Graph_is_domset($graph,$aref) && Graph_domset_is_minimal($graph,$aref);
 }
+
+# Return the number of minimal dominating sets in $graph by iterating
+# through all vertex sets and testing by the Graph_is_minimal_domset()
+# predicate.  This is quite slow so suitable only for small number of
+# vertices.
+#
+sub Graph_minimal_domsets_count_by_pred {
+  my ($graph) = @_;
+  require Algorithm::ChooseSubsets;
+  my $count = 0;
+  my @vertices = sort $graph->vertices;
+  my $it = Algorithm::ChooseSubsets->new(\@vertices);
+  while (my $aref = $it->next) {
+    if (Graph_is_minimal_domset($graph,$aref)) {
+      $count++;
+    }
+  }
+  return $count;
+}
+
 
 #------------------------------------------------------------------------------
 # Domination Number
@@ -2817,31 +3476,43 @@ sub Graph_is_minimal_domset {
 # Number of a Tree", Information Processing Letters, volume 4, number 2,
 # November 1975, pages 41-44.
 
-sub Graph_tree_domination_number {
+# $graph is a Graph.pm undirected tree or forest.
+# Return its domination number.
+#
+sub Graph_tree_domnum {
   my ($graph) = @_;
+  ### Graph_tree_domnum: "num_vertices ".scalar($graph->vertices)
+  $graph->expect_acyclic;
+
   $graph = $graph->copy;
   my $domnum = 0;
   my %mtype = map {$_=>'bound'} $graph->vertices;
- OUTER: for (;;) {
+ OUTER: while ($graph->vertices) {
     foreach my $v ($graph->vertices) {
       my $degree = $graph->vertex_degree($v);
+      next unless $degree <= 1;
       ### consider: $v
       ### $degree
-      if ($degree == 0) {
-        ### end: $mtype{$v}
-        return $domnum + ($mtype{$v} ne 'free');
-      }
-      next unless $degree == 1;
 
       my ($u) = $graph->neighbours($v);
       if ($mtype{$v} eq 'free') {
-        # delete
+        ### free, delete ...
+
       } elsif ($mtype{$v} eq 'bound') {
-        $mtype{$u} = 'required';
+        ### bound ...
+        if (defined $u) {
+          ### set neighbour $u required ...
+          $mtype{$u} = 'required';
+        } else {
+          ### no neighbour, domnum++ ...
+          $domnum++;
+        }
 
       } elsif ($mtype{$v} eq 'required') {
+        ### required, domnum++ ...
         $domnum++;
-        if ($mtype{$u} eq 'bound') {
+        if (defined $u && $mtype{$u} eq 'bound') {
+          ### set neighbour $u free ...
           $mtype{$u} = 'free';
         }
       } else {
@@ -2853,8 +3524,46 @@ sub Graph_tree_domination_number {
     }
     die "oops, not a tree";
   }
+  return $domnum;
 }
 
+
+
+#------------------------------------------------------------------------------
+
+
+# $graph is a Graph.pm and $sptg is its $graph->SPT_Dijkstra() tree.
+# Set $sptg vertex attribute "count" on each vertex $v which gives the count
+# of number of paths from SPT_Dijkstra_root to that $v.
+#
+sub Graph_SPT_counts {
+  my ($graph,$sptg, %options) = @_;
+  my $start = $sptg->get_graph_attribute('SPT_Dijkstra_root');
+  my $one = $options{'one'} || 1;
+  $sptg ->set_vertex_attribute ($start,'count',$one);
+  foreach my $from (sort {($sptg->get_vertex_attribute($a,'weight') || 0)
+                            <=>
+                            ($sptg->get_vertex_attribute($b,'weight') || 0)}
+                    $sptg->vertices) {
+    my $target_distance
+      = ($sptg->get_vertex_attribute($from,'weight') || 0) + 1;
+    my $from_count = $sptg ->get_vertex_attribute($from,'count');
+    ### from: $from . ' weight ' .($sptg->get_vertex_attribute($from,'weight') || 0)
+    ### $from_count
+    ### $target_distance
+    foreach my $to ($graph->neighbours($from)) {
+      if (($sptg->get_vertex_attribute($to,'weight') || 0)
+          == $target_distance) {
+        ### to: $to . ' weight ' .($sptg->get_vertex_attribute($to,'weight') || 0)
+        $sptg ->set_vertex_attribute
+          ($to,'count',
+           $from_count + ($sptg ->get_vertex_attribute($to,'count') || 0));
+      } else {
+        ### skip: $to . ' weight ' .($sptg->get_vertex_attribute($to,'weight') || 0)
+      }
+    }
+  }
+}
 
 
 #------------------------------------------------------------------------------

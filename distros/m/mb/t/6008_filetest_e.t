@@ -9,15 +9,18 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
-mb::eval <<'END';
-    mkdir "6008.777.A",0777;
-    mkdir "6008.000.A",0000;
-    open FILE,">6008.0B.A";          print FILE '';                          close FILE;
-    open FILE,">6008.1B.binary.A";   print FILE "\x00";                      close FILE;
-    open FILE,">6008.1B.text.A";     print FILE "A";                         close FILE;
-    open FILE,">6008.512B.binary.A"; print FILE "\x00" x 52, "A" x (512-52); close FILE;
-    open FILE,">6008.512B.text.A";   print FILE "\x00" x 51, "A" x (512-51); close FILE;
-    if ($^O =~ /MSWin32/) {
+use vars qw($MSWin32_MBCS);
+$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+
+mkdir "6008.777.A",0777;
+mkdir "6008.000.A",0000;
+open FILE,">6008.0B.A";          print FILE '';                          close FILE;
+open FILE,">6008.1B.binary.A";   print FILE "\x00";                      close FILE;
+open FILE,">6008.1B.text.A";     print FILE "A";                         close FILE;
+open FILE,">6008.512B.binary.A"; print FILE "\x00" x 52, "A" x (512-52); close FILE;
+open FILE,">6008.512B.text.A";   print FILE "\x00" x 51, "A" x (512-51); close FILE;
+if ($MSWin32_MBCS) {
+    mb::eval <<'END';
         mkdir "6008.777.ソ",0777;
         mkdir "6008.000.ソ",0000;
         open FILE,">6008.0B.ソ";          print FILE '';                          close FILE;
@@ -25,11 +28,11 @@ mb::eval <<'END';
         open FILE,">6008.1B.text.ソ";     print FILE "A";                         close FILE;
         open FILE,">6008.512B.binary.ソ"; print FILE "\x00" x 52, "A" x (512-52); close FILE;
         open FILE,">6008.512B.text.ソ";   print FILE "\x00" x 51, "A" x (512-51); close FILE;
-    }
 END
+}
 
 END {
-    mb::eval <<'END';
+    mb::eval sprintf <<'END', $MSWin32_MBCS;
         close FH1;
         close FH2;
         unlink "6008.0B.A";
@@ -37,7 +40,7 @@ END {
         unlink "6008.1B.text.A";
         unlink "6008.512B.binary.A";
         unlink "6008.512B.text.A";
-        if ($^O =~ /MSWin32/) {
+        if (%s) {
             closedir DH1;
             closedir DH2;
             rmdir "6008.777.ソ";
@@ -56,58 +59,58 @@ END
 
 @test = (
 # 1
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.NOTEXIST.A"    }) xor mb::eval(q{ -e "6008.NOTEXIST.ソ"    }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.777.A"         }) xor mb::eval(q{ -e "6008.777.ソ"         }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.000.A"         }) xor mb::eval(q{ -e "6008.000.ソ"         }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.0B.A"          }) xor mb::eval(q{ -e "6008.0B.ソ"          }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.1B.binary.A"   }) xor mb::eval(q{ -e "6008.1B.binary.ソ"   }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.1B.text.A"     }) xor mb::eval(q{ -e "6008.1B.text.ソ"     }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.512B.binary.A" }) xor mb::eval(q{ -e "6008.512B.binary.ソ" }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.512B.text.A"   }) xor mb::eval(q{ -e "6008.512B.text.ソ"   }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.NOTEXIST.A"    }) xor mb::eval(q{ -e "6008.NOTEXIST.ソ"    }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.777.A"         }) xor mb::eval(q{ -e "6008.777.ソ"         }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.000.A"         }) xor mb::eval(q{ -e "6008.000.ソ"         }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.0B.A"          }) xor mb::eval(q{ -e "6008.0B.ソ"          }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.1B.binary.A"   }) xor mb::eval(q{ -e "6008.1B.binary.ソ"   }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.1B.text.A"     }) xor mb::eval(q{ -e "6008.1B.text.ソ"     }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.512B.binary.A" }) xor mb::eval(q{ -e "6008.512B.binary.ソ" }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.512B.text.A"   }) xor mb::eval(q{ -e "6008.512B.text.ソ"   }) },
     sub {1},
     sub {1},
 # 11
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.NOTEXIST.A"   ) xor (-e "6008.NOTEXIST.ソ"   ) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.777.A"        ) xor (-e "6008.777.ソ"        ) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.000.A"        ) xor (-e "6008.000.ソ"        ) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.0B.A"         ) xor (-e "6008.0B.ソ"         ) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.1B.binary.A"  ) xor (-e "6008.1B.binary.ソ"  ) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.1B.text.A"    ) xor (-e "6008.1B.text.ソ"    ) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.512B.binary.A") xor (-e "6008.512B.binary.ソ") }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.512B.text.A"  ) xor (-e "6008.512B.text.ソ"  ) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.NOTEXIST.A"   ) xor (-e "6008.NOTEXIST.ソ"   ) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.777.A"        ) xor (-e "6008.777.ソ"        ) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.000.A"        ) xor (-e "6008.000.ソ"        ) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.0B.A"         ) xor (-e "6008.0B.ソ"         ) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.1B.binary.A"  ) xor (-e "6008.1B.binary.ソ"  ) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.1B.text.A"    ) xor (-e "6008.1B.text.ソ"    ) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.512B.binary.A") xor (-e "6008.512B.binary.ソ") }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.512B.text.A"  ) xor (-e "6008.512B.text.ソ"  ) }) },
     sub {1},
     sub {1},
 # 21
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ open(FH1,"6008.NOTEXIST.A"   ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.NOTEXIST.ソ"    }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ opendir(DH1,"6008.777.A"     ); my $r = eval q{ -e DH1 }; closedir DH1; $r                                   }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ opendir(DH1,"6008.000.A"     ); my $r = eval q{ -e DH1 }; closedir DH1; $r                                   }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ open(FH1,"6008.0B.A"         ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.0B.ソ"          }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ open(FH1,"6008.1B.binary.A"  ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.1B.binary.ソ"   }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ open(FH1,"6008.1B.text.A"    ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.1B.text.ソ"     }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ open(FH1,"6008.512B.binary.A"); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.512B.binary.ソ" }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ open(FH1,"6008.512B.text.A"  ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.512B.text.ソ"   }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ open(FH1,"6008.NOTEXIST.A"   ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.NOTEXIST.ソ"    }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ opendir(DH1,"6008.777.A"     ); my $r = eval q{ -e DH1 }; closedir DH1; $r                                   }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ opendir(DH1,"6008.000.A"     ); my $r = eval q{ -e DH1 }; closedir DH1; $r                                   }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ open(FH1,"6008.0B.A"         ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.0B.ソ"          }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ open(FH1,"6008.1B.binary.A"  ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.1B.binary.ソ"   }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ open(FH1,"6008.1B.text.A"    ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.1B.text.ソ"     }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ open(FH1,"6008.512B.binary.A"); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.512B.binary.ソ" }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ open(FH1,"6008.512B.text.A"  ); my $r = -e FH1; close FH1;    $r }) xor mb::eval(q{ -e "6008.512B.text.ソ"   }) },
     sub {1},
     sub {1},
 # 31
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.NOTEXIST.A"    }) xor mb::eval(q{ open(FH2,"6008.NOTEXIST.ソ"   ); -e FH2 }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not                                              mb::eval(q{ opendir(DH2,"6008.777.ソ"     ); -e DH2 }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not                                              mb::eval(q{ opendir(DH2,"6008.000.ソ"     ); -e DH2 }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.0B.A"          }) xor mb::eval(q{ open(FH2,"6008.0B.ソ"         ); -e FH2 }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.1B.binary.A"   }) xor mb::eval(q{ open(FH2,"6008.1B.binary.ソ"  ); -e FH2 }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.1B.text.A"     }) xor mb::eval(q{ open(FH2,"6008.1B.text.ソ"    ); -e FH2 }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.512B.binary.A" }) xor mb::eval(q{ open(FH2,"6008.512B.binary.ソ"); -e FH2 }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not CORE::eval(q{ -e "6008.512B.text.A"   }) xor mb::eval(q{ open(FH2,"6008.512B.text.ソ"  ); -e FH2 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.NOTEXIST.A"    }) xor mb::eval(q{ open(FH2,"6008.NOTEXIST.ソ"   ); -e FH2 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not                                              mb::eval(q{ opendir(DH2,"6008.777.ソ"     ); -e DH2 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not                                              mb::eval(q{ opendir(DH2,"6008.000.ソ"     ); -e DH2 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.0B.A"          }) xor mb::eval(q{ open(FH2,"6008.0B.ソ"         ); -e FH2 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.1B.binary.A"   }) xor mb::eval(q{ open(FH2,"6008.1B.binary.ソ"  ); -e FH2 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.1B.text.A"     }) xor mb::eval(q{ open(FH2,"6008.1B.text.ソ"    ); -e FH2 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.512B.binary.A" }) xor mb::eval(q{ open(FH2,"6008.512B.binary.ソ"); -e FH2 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not CORE::eval(q{ -e "6008.512B.text.A"   }) xor mb::eval(q{ open(FH2,"6008.512B.text.ソ"  ); -e FH2 }) },
     sub {1},
     sub {1},
 # 41
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ open(FH1,"6008.NOTEXIST.A"   ); open(FH2,"6008.NOTEXIST.ソ"   ); (-e FH1) xor (-e FH2) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ opendir(DH1,"6008.777.A"     ); opendir(DH2,"6008.777.ソ"     ); (-e DH1) xor (-e DH2) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ opendir(DH1,"6008.000.A"     ); opendir(DH2,"6008.000.ソ"     ); (-e DH1) xor (-e DH2) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ open(FH1,"6008.0B.A"         ); open(FH2,"6008.0B.ソ"         ); (-e FH1) xor (-e FH2) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ open(FH1,"6008.1B.binary.A"  ); open(FH2,"6008.1B.binary.ソ"  ); (-e FH1) xor (-e FH2) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ open(FH1,"6008.1B.text.A"    ); open(FH2,"6008.1B.text.ソ"    ); (-e FH1) xor (-e FH2) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ open(FH1,"6008.512B.binary.A"); open(FH2,"6008.512B.binary.ソ"); (-e FH1) xor (-e FH2) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ open(FH1,"6008.512B.text.A"  ); open(FH2,"6008.512B.text.ソ"  ); (-e FH1) xor (-e FH2) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ open(FH1,"6008.NOTEXIST.A"   ); open(FH2,"6008.NOTEXIST.ソ"   ); (-e FH1) xor (-e FH2) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ opendir(DH1,"6008.777.A"     ); opendir(DH2,"6008.777.ソ"     ); (-e DH1) xor (-e DH2) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ opendir(DH1,"6008.000.A"     ); opendir(DH2,"6008.000.ソ"     ); (-e DH1) xor (-e DH2) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ open(FH1,"6008.0B.A"         ); open(FH2,"6008.0B.ソ"         ); (-e FH1) xor (-e FH2) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ open(FH1,"6008.1B.binary.A"  ); open(FH2,"6008.1B.binary.ソ"  ); (-e FH1) xor (-e FH2) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ open(FH1,"6008.1B.text.A"    ); open(FH2,"6008.1B.text.ソ"    ); (-e FH1) xor (-e FH2) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ open(FH1,"6008.512B.binary.A"); open(FH2,"6008.512B.binary.ソ"); (-e FH1) xor (-e FH2) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ open(FH1,"6008.512B.text.A"  ); open(FH2,"6008.512B.text.ソ"  ); (-e FH1) xor (-e FH2) }) },
     sub {1},
     sub {1},
 # 51
@@ -133,14 +136,14 @@ END
     sub {1},
     sub {1},
 # 71
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.NOTEXIST.ソ"   ) xor (-e _) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.777.ソ"        ) xor (-e _) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.000.ソ"        ) xor (-e _) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.0B.ソ"         ) xor (-e _) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.1B.binary.ソ"  ) xor (-e _) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.1B.text.ソ"    ) xor (-e _) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.512B.binary.ソ") xor (-e _) }) },
-    sub { return 'SKIP' if $^O !~ /MSWin32/; not mb::eval(q{ (-e "6008.512B.text.ソ"  ) xor (-e _) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.NOTEXIST.ソ"   ) xor (-e _) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.777.ソ"        ) xor (-e _) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.000.ソ"        ) xor (-e _) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.0B.ソ"         ) xor (-e _) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.1B.binary.ソ"  ) xor (-e _) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.1B.text.ソ"    ) xor (-e _) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.512B.binary.ソ") xor (-e _) }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(q{ (-e "6008.512B.text.ソ"  ) xor (-e _) }) },
     sub {1},
     sub {1},
 #

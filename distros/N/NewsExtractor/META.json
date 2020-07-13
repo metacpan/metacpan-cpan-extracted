@@ -45,7 +45,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.28.0"
+         "version" : "v0.30.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -92,6 +92,9 @@
       "NewsExtractor::SiteSpecificExtractor::estate_ltn_com_tw" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/estate_ltn_com_tw.pm"
       },
+      "NewsExtractor::SiteSpecificExtractor::focustaiwan_tw" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/focustaiwan_tw.pm"
+      },
       "NewsExtractor::SiteSpecificExtractor::hk_crntt_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/hk_crntt_com.pm"
       },
@@ -106,6 +109,9 @@
       },
       "NewsExtractor::SiteSpecificExtractor::newnet_tw" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/newnet_tw.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::news_cctv_com" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/news_cctv_com.pm"
       },
       "NewsExtractor::SiteSpecificExtractor::news_cts_com_tw" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/news_cts_com_tw.pm"
@@ -190,7 +196,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.28.0",
+   "version" : "v0.30.0",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

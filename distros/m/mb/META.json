@@ -1,6 +1,6 @@
 {
     "name" : "mb",
-    "version" : "0.01",
+    "version" : "0.03",
     "abstract" : "run Perl script written in MBCS",
     "author" : [
         "ina <ina@cpan.org>"

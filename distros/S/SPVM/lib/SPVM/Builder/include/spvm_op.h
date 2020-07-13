@@ -168,7 +168,7 @@ enum {
   SPVM_OP_C_ID_RW,
   SPVM_OP_C_ID_RO,
   SPVM_OP_C_ID_WO,
-  SPVM_OP_C_ID_BEGIN,
+  SPVM_OP_C_ID_INIT,
   SPVM_OP_C_ID_REQUIRE,
   SPVM_OP_C_ID_IF_REQUIRE,
   SPVM_OP_C_ID_CURRENT_PACKAGE,
@@ -307,7 +307,6 @@ SPVM_OP* SPVM_OP_new_op_descriptor(SPVM_COMPILER* compiler, int32_t id, const ch
 SPVM_OP* SPVM_OP_get_parent(SPVM_COMPILER* compiler, SPVM_OP* op_target);
 void SPVM_OP_get_before(SPVM_COMPILER* compiler, SPVM_OP* op_target, SPVM_OP** op_before_ptr, int32_t* next_is_child_ptr);
 
-void SPVM_OP_build_constant_pool(SPVM_COMPILER* compiler);
 SPVM_OP* SPVM_OP_cut_op(SPVM_COMPILER* compiler, SPVM_OP* op_target);
 void SPVM_OP_replace_op(SPVM_COMPILER* compiler, SPVM_OP* op_target, SPVM_OP* op_replace);
 SPVM_OP* SPVM_OP_new_op_void(SPVM_COMPILER* compiler, const char* file, int32_t line);

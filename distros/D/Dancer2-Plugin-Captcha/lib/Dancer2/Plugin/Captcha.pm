@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Captcha;
 
-$Dancer2::Plugin::Captcha::VERSION   = '0.13';
+$Dancer2::Plugin::Captcha::VERSION   = '0.14';
 $Dancer2::Plugin::Captcha::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Captcha - Dancer2 add-on for CAPTCHA.
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
@@ -101,10 +101,12 @@ The following keys can be assigned to method 'new':
     | scramble   | If set, the characters will be scrambled.                    |
     | angle      | Sets the angle (0-360) for scrambled/normal characters.      |
     | thickness  | Sets the line drawing width.                                 |
-    | mdmax      | The minimum length if the random string. Default is 6.       |
-    | md_data    | Default character set used to create the random string is    |
+    | rndmax     | The minimum length if the random string. Default is 6.       |
+    | rnd_data   | Default character set used to create the random string is    |
     |            | [0..9].                                                      |
     +------------+--------------------------------------------------------------+
+
+See L<GD::SecurityImage/new> for more details.
 
 =head2 create
 
@@ -158,10 +160,11 @@ near it will be used and colored.
 
 =head1 METHODS
 
-=head2 generate_captcha(\%params)
+=head2 generate_captcha(\%params, $id)
 
-It returns captcha image as per the given parameters. If  the key 'random' is not
-defined then the default character sets [0..9] will be used.
+It returns captcha image as per the given parameters and C<$id> is the captcha
+ID (optional, default value is 'default'). If  the key 'random' is not defined
+then the default character sets [0..9] will be used.
 
     get '/get_captcha' => sub {
         return generate_captcha({
@@ -218,7 +221,8 @@ register generate_captcha => sub {
 =head2 is_valid_captcha($input, $id)
 
 The C<$input> is the captcha  code  entered by the user and C<$id> is the captcha
-ID. It returns 0 or 1 depending on whether the captcha matches or not.
+ID (optional, default value is 'default'). It returns 0 or 1 depending on whether
+the captcha matches or not.
 
     post '/validate_captcha' => sub {
         return "Invalid captcha code."
@@ -243,7 +247,8 @@ register is_valid_captcha => sub {
 
 =head2 remove_captcha($id)
 
-The C<$id> is the captcha ID. It removes the captcha from the session.
+The C<$id> is the captcha ID (optional, default value is 'default').
+It removes the captcha from the session.
 
 =cut
 
@@ -305,7 +310,7 @@ Inspired by the package L<Dancer::Plugin::Captcha::SecurityImage> (Alessandro Ra
 
 =head1 SEE ALSO
 
-L<Dancer::Plugin::Captcha::SecurityImage>
+L<Dancer::Plugin::Captcha::SecurityImage>, L<GD::SecurityImage>
 
 =head1 BUGS
 

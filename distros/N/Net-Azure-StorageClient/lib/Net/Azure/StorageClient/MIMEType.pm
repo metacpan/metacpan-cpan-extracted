@@ -1,10 +1,12 @@
-package Net::Azure::StorageClient::MIMEType;
+#!perl
+# ABSTRACT: MIME related functions for Azure Blob Storage client
+
 use strict;
 use warnings;
-{
-  $Net::Azure::StorageClient::MIMEType = '0.1';
-}
+use v5.10;
 
+package Net::Azure::StorageClient::MIMEType;
+$Net::Azure::StorageClient::MIMEType::VERSION = '0.6';
 sub new {
     my $class = shift;
     my $obj = bless {}, $class;
@@ -12,17 +14,14 @@ sub new {
 }
 
 sub init {
-    my $obj = shift;
-    my %args = @_;
+    my ($obj, %args) = @_;
     $obj->{ default } = $args{ default } || 'application/octet-stream';
     return $obj;
 }
 
 sub get_mimetype {
-    my $self = shift;
-    my $filename = shift;
-    my $default = shift;
-    if ( ( ref $self ) ne 'Azure::StorageClient::MIMEType' ) {
+    my ($self, $filename, $default) = @_;
+    if ( ref $self ne 'Azure::StorageClient::MIMEType' ) {
         $default = $filename;
         $filename = $self;
     }
@@ -116,19 +115,45 @@ sub get_mimetype {
         'xlsx'   => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'json'   => 'application/json',
     };
-    if ( $filename =~ /\.([^.]+)\z/ ) {
+    if ( $filename =~ m/\.([^.]+)\z/ ) {
         my $extension = lc( $1 );
         if ( $extension && $mime_types->{ $extension } ) {
             return $mime_types->{ $extension };
         }
     }
     if (! $default ) {
-        if ( ( ref $self ) eq 'Azure::StorageClient::MIMEType' ) {
+        if ( ref $self eq 'Azure::StorageClient::MIMEType' ) {
             $default = $self->{ default };
         }
     }
-    $default = 'application/octet-stream' unless $default;
-    return $default;
+    return $default || 'application/octet-stream';
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Net::Azure::StorageClient::MIMEType - MIME related functions for Azure Blob Storage client
+
+=head1 VERSION
+
+version 0.6
+
+=head1 AUTHOR
+
+Junnama Noda <junnama@alfasado.jp>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Junnama Noda.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

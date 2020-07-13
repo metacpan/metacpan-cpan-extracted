@@ -1,4 +1,6 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+
+use warnings;
 use strict;
 use lib qw( lib );
 use File::Temp qw( tempdir );
@@ -6,38 +8,31 @@ use Test::More;
 my $res;
 my $error = 0;
 
-my $account_name = '';
-my $primary_access_key = '';
-
-if (! $account_name ) {
-    diag 'Please enter your account name of Windows Azure Blob Storage:';
-    $account_name = <STDIN>;
-    chomp( $account_name );
+if ($ENV{AUTOMATED_TESTING}) {
+    plan skip_all =>
+    'Testing this module required account and primary access key of Windows Azure Blob Storage.';
 }
 
-if (! $primary_access_key ) {
-    diag 'Please enter your primary access key of Windows Azure Blob Storage:';
-    $primary_access_key = <STDIN>;
-    chomp( $primary_access_key );
-}
+my $account_name = $ENV{TESTING_AZURE_ACCOUNT_NAME};
+my $primary_access_key = $ENV{TESTING_AZURE_ACCESS_KEY};
+
+diag 'Please provide an account name of Windows Azure Blob Storage via TESTING_AZURE_ACCOUNT_NAME'
+    unless $account_name;
+
+diag 'Please provide a primary access key of Windows Azure Blob Storage via TESTING_AZURE_ACCESS_KEY'
+    unless $primary_access_key;
 
 if ( (! $account_name ) || (! $primary_access_key ) ) {
     plan skip_all =>
     'Testing this module required account and primary access key of Windows Azure Blob Storage.';
-} else {
-    plan tests => 17;
 }
-
-use_ok( 'Net::Azure::StorageClient' );
-use_ok( 'Net::Azure::StorageClient::Blob' );
-
-if ( (! $account_name ) || (! $primary_access_key ) ) {
-    die "account_name and primary_access_key are required."
+else {
+    plan tests => 15;
 }
 
 my $tempdir = tempdir();
 my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) = localtime( time );
-my $ts = sprintf( "%04d%02d%02d%02d%02d%02d", $year + 1900, $mon + 1, $mday, $hour, $min, $sec );
+my $ts = sprintf( '%04d%02d%02d%02d%02d%02d', $year + 1900, $mon + 1, $mday, $hour, $min, $sec );
 my $container = 'test-container-' . $ts;
 
 my $client = Net::Azure::StorageClient->new(

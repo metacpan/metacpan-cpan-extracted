@@ -16,8 +16,6 @@
 #include "spvm_list.h"
 #include "spvm_opcode_array.h"
 #include "spvm_sub.h"
-#include "spvm_runtime.h"
-#include "spvm_runtime_api.h"
 #include "spvm_sub.h"
 #include "spvm_field.h"
 #include "spvm_package_var.h"
@@ -55,9 +53,8 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->op_constants = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->module_include_pathes = SPVM_COMPILER_ALLOCATOR_alloc_list(compiler, 0);
   compiler->opcode_array = SPVM_OPCODE_ARRAY_new(compiler);
-  compiler->string_pool = SPVM_STRING_BUFFER_new(0);
-  compiler->string_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
   compiler->module_file_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, 0);
+  compiler->added_packages = SPVM_LIST_new(0);
 
   // Add basic types
   SPVM_COMPILER_add_basic_types(compiler);
@@ -291,6 +288,12 @@ void SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
   SPVM_yydebug = 0;
 #endif
   
+  // Initialize added package names
+  if (compiler->tmp_added_package_names) {
+    SPVM_LIST_free(compiler->tmp_added_package_names);
+  }
+  compiler->tmp_added_package_names = SPVM_LIST_new(0);
+
   /* Parse */
   int32_t parse_error_flag = SPVM_yyparse(compiler);
   if (parse_error_flag) {
@@ -310,6 +313,15 @@ void SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
   SPVM_OPCODE_BUILDER_build_opcode_array(compiler);
   if (compiler->error_count > 0) {
     return;
+  }
+  
+  // Add added package names if compile is success
+  SPVM_LIST_free(compiler->added_packages);
+  compiler->added_packages = SPVM_LIST_new(0);
+  for (int32_t i = 0; i < compiler->tmp_added_package_names->length; i++) {
+    const char* package_name = (const char*)SPVM_LIST_fetch(compiler->tmp_added_package_names, i);
+    SPVM_PACKAGE* pakcage = SPVM_HASH_fetch(compiler->package_symtable, package_name, strlen(package_name));
+    SPVM_LIST_push(compiler->added_packages, pakcage);
   }
 }
 
@@ -549,9 +561,6 @@ void SPVM_COMPILER_free(SPVM_COMPILER* compiler) {
   
   // Free opcode array
   SPVM_OPCODE_ARRAY_free(compiler, compiler->opcode_array);
-  
-  // Free string pool
-  SPVM_STRING_BUFFER_free(compiler->string_pool);
   
   free(compiler);
 }

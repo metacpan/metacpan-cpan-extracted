@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2015, 2016, 2017 Kevin Ryde
+# Copyright 2015, 2016, 2017, 2018 Kevin Ryde
 #
 # This file is part of Graph-Graph6.
 #
@@ -27,14 +27,14 @@ BEGIN { MyTestHelpers::nowarnings() }
 # uncomment this to run the ### lines
 # use Smart::Comments;
 
-plan tests => 105;
+plan tests => 117;
 
 require Graph::Graph6;
 my $filename = 'Graph-Graph6-t.tmp';
 
 #------------------------------------------------------------------------------
 {
-  my $want_version = 7;
+  my $want_version = 8;
   ok ($Graph::Graph6::VERSION, $want_version, 'VERSION variable');
   ok (Graph::Graph6->VERSION,  $want_version, 'VERSION class method');
   ok (eval { Graph::Graph6->VERSION($want_version); 1 }, 1,
@@ -330,6 +330,57 @@ foreach my $elem (['0', '0'],
   ok (aref_stringize(\@edges), '[[0,1],[0,2],[1,2],[5,6]]');
 }
 
+{
+  # sparse6
+  # b[i]=1 or b[i]=0 same for setting v when to>=v+2
+  #
+  foreach my $str (":CoJ\n", ":COJ\n") {
+    my @edges;
+    my $num_vertices;
+    my $ret = Graph::Graph6::read_graph(str              => $str,
+                                        num_vertices_ref => \$num_vertices,
+                                        edge_aref        => \@edges);
+    ok ($ret, 1);
+    ok ($num_vertices, 4);
+    ok (aref_stringize(\@edges), '[[0,2],[1,2]]');
+  }
+}
+
+{
+  # sparse6
+  my $str = ":GoBN_\n";
+  my @edges;
+  my $num_vertices;
+  my $ret = Graph::Graph6::read_graph(str              => $str,
+                                      num_vertices_ref => \$num_vertices,
+                                      edge_aref        => \@edges);
+  ok ($ret, 1);
+  ok ($num_vertices, 8);
+  ok (aref_stringize(\@edges), '[[0,4],[3,4],[3,4],[0,6]]');
+}
+{
+  # :GoBN_
+  # [length 7]
+  # 001000 110000 000011 001111 100000
+  # round trip:
+  #
+  # [length 6]
+  # 001000 110000 001110 000011
+
+  # sparse6
+  my $str = ":GoMB\n";
+  my @edges;
+  my $num_vertices;
+  my $ret = Graph::Graph6::read_graph(str              => $str,
+                                      num_vertices_ref => \$num_vertices,
+                                      edge_aref        => \@edges);
+  ok ($ret, 1);
+  ok ($num_vertices, 8);
+  ok (aref_stringize(\@edges), '[[0,4],[0,6]]');
+}
+
+
+
 #------------------------------------------------------------------------------
 # write_graph() -- graph6
 
@@ -528,11 +579,12 @@ foreach my $elem (['0', '0'],
     # n=4 edges 0-2, 1-2
     # : N(4) 0-10    0-00 0-01   0-11
     #        set v=2 edge edge   pad
+    # :COJ
+    # :CoJ
     $try->(':' . chr(63+4) . chr(63+16) . chr(63+11));
     ok ($num_vertices, 4);
     ok ($edges, '0-2,1-2,');
   }
-
 }
 
 #------------------------------------------------------------------------------

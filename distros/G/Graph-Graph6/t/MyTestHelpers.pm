@@ -1,6 +1,6 @@
 # MyTestHelpers.pm -- my shared test script helpers
 
-# Copyright 2008, 2009, 2010, 2011, 2012, 2015, 2017 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2011, 2012, 2015, 2017, 2018 Kevin Ryde
 
 # MyTestHelpers.pm is shared by several distributions.
 #

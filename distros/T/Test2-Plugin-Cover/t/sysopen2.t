@@ -2,6 +2,8 @@ use Test2::V0;
 use Path::Tiny qw/path/;
 use Fcntl qw/O_RDONLY/;
 
+skip_all 'disabled';
+
 # This test is identical to the other sysopen test, except it does not use
 # Test2::Plugin::Cover. The idea is to weed out sysopen errors not related to
 # the plugin.

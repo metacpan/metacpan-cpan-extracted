@@ -1,8 +1,9 @@
 package Lab::Moose::Countdown;
-$Lab::Moose::Countdown::VERSION = '3.703';
+$Lab::Moose::Countdown::VERSION = '3.710';
 #ABSTRACT: Verbose countdown/delay with pretty printing of remaining time
 
-use 5.010;
+use v5.20;
+
 use warnings;
 use strict;
 
@@ -55,7 +56,7 @@ Lab::Moose::Countdown - Verbose countdown/delay with pretty printing of remainin
 
 =head1 VERSION
 
-version 3.703
+version 3.710
 
 =head1 SYNOPSIS
 
@@ -84,6 +85,7 @@ Default C<$prefix> is C<"Sleeping for">.
 This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Simon Reinhardt
+            2020       Andreas K. Huettel
 
 
 This is free software; you can redistribute it and/or modify it under

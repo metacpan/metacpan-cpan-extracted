@@ -1,9 +1,10 @@
 package Path::Dispatcher::Rule::Under;
 # ABSTRACT: rules under a predicate
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Moo;
+use MooX::TypeTiny;
 use Type::Tiny;
 use Type::Utils qw(class_type);
 
@@ -94,7 +95,7 @@ Path::Dispatcher::Rule::Under - rules under a predicate
 
 =head1 VERSION
 
-version 1.07
+version 1.08
 
 =head1 SYNOPSIS
 

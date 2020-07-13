@@ -12,8 +12,9 @@ sub folded {
     $folded;
 }
 
-$fold = new Text::ANSI::Fold
-    linebreak => LINEBREAK_ALL;
+$fold = Text::ANSI::Fold->new(
+    linebreak => LINEBREAK_ALL,
+    );
 
 $_ = "「吾輩は猫である。」「（名前は）まだない。」";
 is(folded($_, width => 14), "「吾輩は猫であ",             "normal");

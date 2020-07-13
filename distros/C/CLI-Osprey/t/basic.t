@@ -41,6 +41,15 @@ subtest 'subcommand' => sub {
 	is ( $stderr, '', "empty stderr" );
     };
 
+    subtest "hyphenated options" => sub {
+	local @ARGV = qw ( yell --excitement-level 2 );
+	my ( $stdout, $stderr, @result ) =
+	   capture { MyTest::Class::Basic->new_with_options->run };
+
+	is ( $stdout, "HELLO WORLD!!!\n", "message sent to stdout" );
+	is ( $stderr, '', "empty stderr" );
+    };
+
     subtest "inline" => sub {
 	local @ARGV = qw ( whisper );
 	my ( $stdout, $stderr, @result ) =
