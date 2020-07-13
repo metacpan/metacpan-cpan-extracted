@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 13;
+our $VERSION = 14;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -543,12 +543,25 @@ sub run { ## no critic (Subroutines::ProhibitExcessComplexity)
             my $cid = $clientsocket->_getClientID();
 
             my $totalread = 0;
+            my $readchunksleft = 3;
             while(1) {
                 my $rawbuffer;
-                sysread($clients{$cid}->{socket}, $rawbuffer, 1_000_000); # Read at most 1 Meg at a time
+                my $readok = 0;
+                eval {
+                    sysread($clients{$cid}->{socket}, $rawbuffer, 1_000_000); # Read at most 1 Meg at a time
+                    $readok = 1;
+                };
+                if(!$readok) {
+                    push @toremove, $cid;
+                    last;
+                }
                 if(defined($rawbuffer) && length($rawbuffer)) {
                     $totalread += length($rawbuffer);
                     push @{$clients{$cid}->{charbuffer}}, split//, $rawbuffer;
+                    $readchunksleft--;
+                    if(!$readchunksleft) {
+                        last;
+                    }
                     next;
                 }
                 last;

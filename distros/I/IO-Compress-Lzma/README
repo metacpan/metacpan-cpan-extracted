@@ -1,11 +1,11 @@
 
                             IO-Compress-Lzma
 
-                             Version 2.093
+                             Version 2.094
 
-                            7 December 2019
+                             13 July 2020
 
-       Copyright (c) 2009-2019 Paul Marquess. All rights reserved.
+       Copyright (c) 2009-2020 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
            and/or modify it under the same terms as Perl itself.
 
@@ -85,7 +85,7 @@ To help me help you, I need all of the following information:
         If you haven't installed IO-Compress-Lzma then search IO::Compress::Lzma.pm
         for a line like this:
 
-          $VERSION = "2.093" ;
+          $VERSION = "2.094" ;
 
  2. If you are having problems building IO-Compress-Lzma, send me a
     complete log of what happened. Start by unpacking the IO-Compress-Lzma

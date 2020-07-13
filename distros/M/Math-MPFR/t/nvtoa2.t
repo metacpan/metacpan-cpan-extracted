@@ -30,20 +30,20 @@ use Test::More;
 # achieved with as few as 4 mantissa digits.
 #
 # In this script we test the correctness of nvtoa() differently, depending upon
-# whether perl is prone to mis-assignment, or not.
+# whether perl is prone to mis-assignment of values, or not.
 #
-# For perls whose NV is the "Double-Double" long double, perl is prone to mis-assignment
-# and $reliable is set to false, irrespective of the value of $].
+# For perls whose NV is the "Double-Double" long double or for perls running on Cygwin, perl
+# is prone to mis-assignment and $reliable is set to false, irrespective of the value of $].
 #
-# Else, in order for perl to be deemed reliable (in which case we set $reliable to true),
-# perls whose nvtype is NOT __float128, need to be at version 5.29.4 (or later) &&
-#    if perl's nvtype is "double", then $Config{d_strtod} needs to be defined
-#    or if perl's nvtype is "long double", then $Config{d_strtold} needs to be defined.
-# All perl's whose nvtype is __float128 assign correctly and $reliable is set to true for
-# them, irrespective of the value of $] (the perl version).
+# All perl's whose nvtype is __float128 (except those running on Cygwin) assign correctly and
+# $reliable is set to true for them, irrespective of the value of $].
 #
-# All perls that don't fit any of the above categories are deemed unreliable, and
-# $reliable is set to false.
+# For all other builds of perl, $reliable will be set to true if and only if:
+# 1) $] >= 5.03 && $Config{nvtype} eq 'double' && defined($Config{d_strtod})
+# OR
+# 2) $] >= 5.03 && $Config{nvtype} eq 'long double' && defined($Config{d_strtold})
+#
+# $reliable is set to false for all remaining perls that have not been specified above.
 #
 # If $reliable is true, we simply assign the values using perl - otherwise we assign them
 # using Math::MPFR's atonv() function, which is also deemed reliable.
@@ -82,11 +82,14 @@ else                                           { $MAX_DIG = 34;   # NV is Double
 my $reliable = 0;
 
 if(
-   $Config{nvtype} eq '__float128'
-   ||
-   ($] > 5.029005 && $Config{nvtype} eq 'double' && defined($Config{d_strtod}))
-   ||
-   ($] > 5.029005 && $Config{nvtype} eq 'long double' && defined($Config{d_strtold}) && $MAX_DIG != 34)
+   $^O !~/cygwin/i
+   && (
+       $Config{nvtype} eq '__float128'
+       ||
+       ($] > 5.029005 && $Config{nvtype} eq 'double' && defined($Config{d_strtod}))
+       ||
+       ($] > 5.029005 && $Config{nvtype} eq 'long double' && defined($Config{d_strtold}) && $MAX_DIG != 34)
+      )
   ) {
 
   warn "Using perl for string to NV assignment. (Perl deemed reliable)\n";

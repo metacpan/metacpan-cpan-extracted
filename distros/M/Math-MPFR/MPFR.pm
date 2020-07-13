@@ -4,7 +4,7 @@
     use POSIX;
     use Config;
     use Math::MPFR::Prec;
-    use Math::MPFR::Random;
+    use Math::MPFR::Random; # Needs to be loaded before Math::MPFR
 
     use constant  GMP_RNDN              => 0;
     use constant  GMP_RNDZ              => 1;
@@ -37,7 +37,7 @@
     use constant MPFR_FREE_GLOBAL_CACHE => 2;
     use constant LITTLE_ENDIAN          => $Config{byteorder} =~ /^1/ ? 1 : 0;
     use constant MM_HP                  => LITTLE_ENDIAN ? 'h*' : 'H*';
-
+    use constant MPFR_3_1_6_OR_LATER    => Math::MPFR::Random::_MPFR_VERSION() > 196869 ? 1 : 0;
 
     use subs qw(MPFR_VERSION MPFR_VERSION_MAJOR MPFR_VERSION_MINOR
                 MPFR_VERSION_PATCHLEVEL MPFR_VERSION_STRING
@@ -101,7 +101,8 @@ Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear Rmpfr_clears
 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
 Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_cmp Rmpfr_cmp_d Rmpfr_cmp_f
 Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui
-Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_const_catalan Rmpfr_const_euler
+Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui Rmpfr_total_order_p
+Rmpfr_const_catalan Rmpfr_const_euler
 Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth
 Rmpfr_csc Rmpfr_csch
 Rmpfr_deref2 Rmpfr_dim Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui
@@ -174,18 +175,18 @@ Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 Rmpfr_buildopt_float128_p Rmpfr_buildopt_sharedcache_p prec_cast bytes
 MPFR_DBL_DIG MPFR_LDBL_DIG MPFR_FLT128_DIG
-mpfr_max_orig_len mpfr_min_inter_prec mpfr_min_inter_base mpfr_max_orig_base
+mpfr_max_orig_len mpfr_min_inter_prec
 Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_set
 Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
 Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
 Rmpfr_round_nearest_away rndna
-atonv nvtoa atodouble doubletoa Rmpfr_dot Rmpfr_get_str_ndigits
+atonv nvtoa atodouble doubletoa numtoa atonum Rmpfr_dot Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
 );
 
-    our $VERSION = '4.13';
+    our $VERSION = '4.14';
     #$VERSION = eval $VERSION;
 
-    DynaLoader::bootstrap Math::MPFR $VERSION;
+    Math::MPFR->DynaLoader::bootstrap($VERSION);
 
     %Math::MPFR::EXPORT_TAGS =(mpfr => [qw(
 GMP_RNDN GMP_RNDZ GMP_RNDU GMP_RNDD
@@ -206,7 +207,8 @@ Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range Rmpfr_clear Rmpfr_clears
 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag Rmpfr_clear_nanflag
 Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_cmp Rmpfr_cmp_d Rmpfr_cmp_f
 Rmpfr_cmp_ld Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_ui
-Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_const_catalan Rmpfr_const_euler
+Rmpfr_cmp_ui_2exp Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui Rmpfr_total_order_p
+Rmpfr_const_catalan Rmpfr_const_euler
 Rmpfr_const_log2 Rmpfr_const_pi Rmpfr_cos Rmpfr_cosh Rmpfr_cot Rmpfr_coth
 Rmpfr_csc Rmpfr_csch
 Rmpfr_deref2 Rmpfr_dim Rmpfr_div Rmpfr_div_2exp Rmpfr_div_2si Rmpfr_div_2ui
@@ -279,12 +281,12 @@ Rmpfr_set_divby0 Rmpfr_clear_divby0 Rmpfr_divby0_p
 Rmpfr_buildopt_tune_case Rmpfr_frexp Rmpfr_grandom Rmpfr_z_sub Rmpfr_buildopt_gmpinternals_p
 Rmpfr_buildopt_float128_p Rmpfr_buildopt_sharedcache_p prec_cast
 MPFR_DBL_DIG MPFR_LDBL_DIG MPFR_FLT128_DIG
-mpfr_max_orig_len mpfr_min_inter_prec mpfr_min_inter_base mpfr_max_orig_base
+mpfr_max_orig_len mpfr_min_inter_prec
 Rmpfr_fmodquo Rmpfr_fpif_export Rmpfr_fpif_import Rmpfr_flags_clear Rmpfr_flags_set
 Rmpfr_flags_test Rmpfr_flags_save Rmpfr_flags_restore Rmpfr_rint_roundeven Rmpfr_roundeven
 Rmpfr_nrandom Rmpfr_erandom Rmpfr_fmma Rmpfr_fmms Rmpfr_log_ui Rmpfr_gamma_inc Rmpfr_beta
 Rmpfr_round_nearest_away rndna
-atonv nvtoa atodouble doubletoa Rmpfr_dot Rmpfr_get_str_ndigits
+atonv nvtoa atodouble doubletoa numtoa atonum Rmpfr_dot Rmpfr_get_str_ndigits Rmpfr_get_str_ndigits_alt
 )]);
 
 
@@ -587,6 +589,16 @@ sub MPFR_LDBL_DIG           () {return _LDBL_DIG()}
 sub MPFR_FLT128_DIG         () {return _FLT128_DIG()}
 sub GMP_LIMB_BITS           () {return _GMP_LIMB_BITS()}
 sub GMP_NAIL_BITS           () {return _GMP_NAIL_BITS()}
+
+sub atonum {
+    if(MPFR_3_1_6_OR_LATER) {
+      my $copy = $_[0];               # Don't mess with $_[0] flags
+      my $ret = "$copy" + 0;
+      return $ret if _itsa($ret) < 3; # IV
+      return atonv($_[0]);            # NV
+    }
+    die("atonum needs atonv, but atonv is not available with this version (", MPFR_VERSION_STRING, ") of the mpfr library");
+}
 
 sub mpfr_min_inter_prec {
     die "Wrong number of args to mpfr_min_inter_prec()" unless @_ == 3;

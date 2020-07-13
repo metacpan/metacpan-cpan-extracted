@@ -6,7 +6,17 @@ use Test::Exception;
 use Test::More;
 use Test::Warn;
 
-foreach my $type (qw(Plain Plus XML Binary JSON)) {
+my $first = pica_parser(plain => 't/files/pica.plain')->next;
+ok $first->{_id} eq '12345', 'record _id';
+ok $first->{record}->[0][0] eq '002@', 'tag from first field';
+is_deeply $first->{record}->[1], ['003@', '', 0 => '12345'], 'second field';
+is_deeply $first->{record}->[4], ['012X', '', 0 => '0', x => '', y => ''],
+    'empty subfields';
+is $first->{record}->[6]->[7], '柳经纬主编;', 'Unicode';
+is_deeply $first->{record}->[11],
+    ['145Z', '40', 'a', '$', 'b', 'test$', 'c', '...'], 'sub field with $';
+
+foreach my $type (qw(Plain Plus JSON Binary XML PPXML)) {
     my $module = "PICA::Parser::$type";
     my $file   = 't/files/pica.' . lc($type);
 
@@ -17,16 +27,7 @@ foreach my $type (qw(Plain Plus XML Binary JSON)) {
     my $record = $parser->next;
     isnt ref($record), 'PICA::Data', 'not blessed by default';
 
-    ok $record->{_id} eq '12345', 'record _id';
-    ok $record->{record}->[0][0] eq '002@', 'tag from first field';
-    is_deeply $record->{record}->[1], ['003@', '', 0 => '12345'],
-        'second field';
-    is_deeply $record->{record}->[4],
-        ['012X', '', 0 => '0', x => '', y => ''], 'empty subfields';
-    is $record->{record}->[6]->[7], '柳经纬主编;', 'Unicode';
-    is_deeply $record->{record}->[11],
-        ['145Z', '40', 'a', '$', 'b', 'test$', 'c', '...'],
-        'sub field with $';
+    is_deeply $record, $first;
 
     ok $parser->next()->{_id} eq '67890', 'next record';
     ok !$parser->next, 'parsed all records';
@@ -41,30 +42,17 @@ foreach my $type (qw(Plain Plus XML Binary JSON)) {
             'read from handle';
     }
 
-    my $data = do {local (@ARGV, $/) = $file; <>};
+    # read file as Unicode text string
+    my $data = do {
+        open my $fh, "<:encoding(UTF-8)", $file;
+        join '', <$fh>;
+    };
 
     # read from string reference
-    $parser = eval "PICA::Parser::$type->new(\\\$data, bless => 1 )";
-    isa_ok $parser, "PICA::Parser::$type";
-    $record = $parser->next;
-    isa_ok $record, 'PICA::Data';
-    is $record->{record}->[6]->[7], '柳经纬主编;', 'Unicode';
+    $record = pica_parser($type, \$data)->next;
+    is $record->{record}[6][7], '柳经纬主编;',
+        'Unicode from string reference';
 
-}
-
-note 'PICA::Parser::PPXML';
-{
-    use PICA::Parser::PPXML;
-    my $parser = PICA::Parser::PPXML->new('./t/files/ppxml.xml');
-    is ref($parser), "PICA::Parser::PPXML", "parser from file";
-    my $record = $parser->next;
-    isnt ref($record), 'PICA::Data', 'not blessed by default';
-    ok $record->{_id} eq '1027146724', 'record _id';
-    ok $record->{record}->[0][0] eq '001@', 'tag from first field';
-    is_deeply $record->{record}->[7], ['003@', '', '0', '1027146724'],
-        'id field';
-    ok $parser->next()->{_id} eq '988352591', 'next record';
-    ok !$parser->next, 'parsed all records';
 }
 
 # TODO: dump.dat, bgb.example, sru_picaxml.xml
@@ -123,35 +111,6 @@ note '3-digit occurrence';
     my $parser = PICA::Parser::Plus->new(\$data);
     my $record = $parser->next;
     is $record->{record}->[1]->[1], '102', '3-digit occurrence';
-}
-
-SKIP: {
-    my $str
-        = '003@ '
-        . PICA::Parser::Plus::SUBFIELD_INDICATOR . '01234'
-        . PICA::Parser::Plus::END_OF_FIELD . '021A '
-        . PICA::Parser::Plus::SUBFIELD_INDICATOR
-        . 'aHello $¥!'
-        . PICA::Parser::Plus::END_OF_RECORD;
-
-    skip "utf8 is driving me crazy", 1;
-
-    # TODO: why UTF-8 encoded while PICA plain is not?
-    # See https://travis-ci.org/gbv/PICA-Data/builds/35711139
-    use Encode;
-    $record = [
-        ['003@', '', '0', '1234'],
-
-        # ok in perl <= 5.16
-        ['021A', '', 'a', encode('UTF-8', "Hello \$\N{U+00A5}!")]
-
-        # ok in perl >= 5.18
-        # [ '021A', '', 'a', 'Hello $¥!' ]
-    ];
-
-    open my $fh, '<', \$str;
-    is_deeply pica_parser(plus => $fh)->next,
-        {_id => 1234, record => $record}, 'Plus format UTF-8 from string';
 }
 
 done_testing;

@@ -7,7 +7,7 @@ use diagnostics;
 use mro 'c3';
 use English;
 use Carp;
-our $VERSION = 13;
+our $VERSION = 14;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -235,8 +235,20 @@ sub doNetwork {
 
     if(length($self->{outbuffer})) {
         my $brokenpipe = 0;
-        local $SIG{PIPE} = sub { $brokenpipe = 1; };
-        my $written = syswrite($self->{socket}, $self->{outbuffer});
+        my $writeok = 0;
+        my $written;
+        eval {
+            local $SIG{PIPE} = sub { $brokenpipe = 1; };
+            $written = syswrite($self->{socket}, $self->{outbuffer});
+            $writeok = 1;
+        };
+
+        if($brokenpipe || !$writeok) {
+            $self->{needreconnect} = 1;
+            push @{$self->{inlines}}, "TIMEOUT";
+            return;
+        }
+
         if(defined($written) && $written) {
             $workCount += $written;
             if(length($self->{outbuffer}) == $written) {
@@ -246,11 +258,6 @@ sub doNetwork {
             }
         }
 
-        if($brokenpipe) {
-            $self->{needreconnect} = 1;
-            push @{$self->{inlines}}, "TIMEOUT";
-            return;
-        }
     }
 
     {
@@ -268,7 +275,16 @@ sub doNetwork {
     my $totalread = 0;
     while(1) {
         my $buf;
-        sysread($self->{socket}, $buf, 10_000); # Read in at most 10kB at once
+        my $readok = 0;
+        eval {
+            sysread($self->{socket}, $buf, 10_000); # Read in at most 10kB at once
+            $readok = 1;
+        };
+        if(!$readok) {
+            $self->{needreconnect} = 1;
+            push @{$self->{inlines}}, "TIMEOUT";
+            return;
+        }
         if(defined($buf) && length($buf)) {
             $totalread += length($buf);
             #print STDERR "+ $buf\n--\n";

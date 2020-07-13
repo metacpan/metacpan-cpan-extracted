@@ -4,13 +4,13 @@
       "Bryan Jurish <moocow@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-DDC-Concordance",
    "prereqs" : {
@@ -23,7 +23,7 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "0.005",
-            "File::ShareDir" : "1.00",
+            "Net::SSLeay" : "1.49",
             "perl" : "v5.8.9"
          }
       },
@@ -37,7 +37,7 @@
    "provides" : {
       "Alien::DDC::Concordance" : {
          "file" : "lib/Alien/DDC/Concordance.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

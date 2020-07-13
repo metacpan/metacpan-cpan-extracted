@@ -1,5 +1,10 @@
 Revision history for PICA::Data
 
+1.12 2020-07-13T12:13:55Z
+    - picadata: add option --number
+    - Rewrite PPXML Writer
+    - Internally use Unicode strings
+
 1.11 2020-07-01T10:57:27Z
     - picadata: --count does not echo records by default
     - picadata: detect ndjson file extension

@@ -1,7 +1,7 @@
 package PICA::Parser::Plain;
 use v5.14.1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use charnames ':full';
 use Carp qw(carp croak);
@@ -15,8 +15,9 @@ sub END_OF_RECORD      {"\N{LINE FEED}"}
 sub _next_record {
     my ($self) = @_;
 
-    my $plain = undef;
-    while (my $line = $self->{reader}->getline) {
+    my $plain  = undef;
+    my $reader = $self->{reader};
+    while (my $line = <$reader>) {
         last if $line =~ /^\s*$/;
         $plain .= $line;
     }
@@ -64,7 +65,7 @@ sub _next_record {
                     }
                     else {
                         $tokens[-1] .= $code;
-                        $code  = substr $value, 0, 1;
+                        $code = substr $value, 0, 1;
                         $value = substr $value, 1;
                     }
                 }

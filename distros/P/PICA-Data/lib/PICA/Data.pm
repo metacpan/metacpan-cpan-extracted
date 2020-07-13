@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
@@ -14,6 +14,7 @@ our $EPN_PATH = PICA::Path->new('203@/..0');
 
 use Carp qw(croak);
 use Scalar::Util qw(reftype blessed);
+use Encode qw(decode);
 use List::Util qw(first any);
 use IO::Handle;
 use PICA::Path;
@@ -56,7 +57,7 @@ sub pica_value {
     my ($record, $path) = @_;
 
     $record = $record->{record} if reftype $record eq 'HASH';
-    $path   = eval {PICA::Path->new($path)} unless ref $path;
+    $path = eval {PICA::Path->new($path)} unless ref $path;
     return unless defined $path;
 
     foreach my $field (@$record) {
@@ -158,6 +159,7 @@ use PICA::Parser::XML;
 use PICA::Parser::Plus;
 use PICA::Parser::Plain;
 use PICA::Parser::Binary;
+use PICA::Parser::PPXML;
 use PICA::Parser::JSON;
 use PICA::Writer::XML;
 use PICA::Writer::Plus;
@@ -240,7 +242,7 @@ sub string {
     $options{fh} = \$string;
     $options{start} //= 0;
     pica_writer($type => %options)->write($pica);
-    return $string;
+    return decode('UTF-8', $string);
 }
 
 sub TO_JSON {

@@ -2,7 +2,7 @@ package Alien::DDC::Concordance;
 use strict;
 use warnings;
 use parent 'Alien::Base';
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 __END__
 

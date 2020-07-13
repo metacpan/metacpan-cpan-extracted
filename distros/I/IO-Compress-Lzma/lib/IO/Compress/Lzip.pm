@@ -5,14 +5,14 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.093 ;
+use IO::Compress::Base 2.094 ;
 
-use IO::Compress::Base::Common  2.093 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzip 2.093 ;
+use IO::Compress::Base::Common  2.094 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzip 2.094 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzipError);
 
-$VERSION = '2.093';
+$VERSION = '2.094';
 $LzipError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -804,7 +804,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2019 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution Alien::DDC::Concordance
 
+v0.006 Mon, 13 Jul 2020 12:37:58 +0200 moocow
+	+ added dependency Net::SSLeay >= v1.49 as required by current Alien::Base::ModuleBuild for https downloads
+
 v0.005 Wed, 10 Apr 2019 10:14:43 +0200 moocow
 	+ add --disable-jemalloc option to alien configure call
 	+ attempt to fix jemalloc segfaults on fedora 28 (RT #129101)

@@ -21,10 +21,7 @@ use Scalar::Util qw(reftype);
 use JSON::PP;
 
 my @pica_records = (
-    [
-        ['003@', '', '0', '1041318383'],
-        ['021A', '', 'a', "Hello \$\N{U+00A5}!"],
-    ],
+    [['003@', '', '0', '1041318383'], ['021A', '', 'a', 'Hello $¥!'],],
     {record => [['028C', '01', d => 'Emma', a => 'Goldman']]}
 );
 
@@ -65,7 +62,7 @@ note 'PICA::Writer::Plus';
     }
     close $fh;
 
-    my $out  = do {local (@ARGV, $/) = $filename; <>};
+    my $out = do {local (@ARGV, $/) = $filename; <>};
     my $PLUS = <<'PLUS';
 003@ 01041318383021A aHello $¥!
 028C/01 dEmmaaGoldman
@@ -80,7 +77,7 @@ note 'PICA::Writer::XML';
     my ($fh, $filename) = tempfile();
     my $schema = {
         fields => {
-            '003@'    => {label     => 'PPN', url => 'http://example.org/'},
+            '003@' => {label => 'PPN', url => 'http://example.org/'},
             '028C/01' => {subfields => {d => {pica3 => ', '}}}
         }
     };
@@ -147,8 +144,8 @@ note 'PICA::Writer::PPXML';
     $writer->end;
     close $fh;
 
-    my $out = do {local (@ARGV, $/) = $filename;                <>};
-    my $in  = do {local (@ARGV, $/) = 't/files/slim_ppxml.xml'; <>};
+    my $out = do {local (@ARGV, $/) = $filename; <>};
+    my $in = do {local (@ARGV, $/) = 't/files/slim_ppxml.xml'; <>};
 
     is_xml($out, $in, 'PPXML writer');
 }
@@ -167,9 +164,9 @@ note 'PICA::Writer::Generic';
     foreach my $record (@pica_records) {
         $writer->write($record);
     }
-    close $fh;
+    $writer->end;
 
-    my $out  = do {local (@ARGV, $/) = $filename; <>};
+    my $out = do {local (@ARGV, $/) = $filename; <>};
     my $PLUS = <<'PLUS';
 003@ #01041318383%021A #aHello $¥!%
 
@@ -187,7 +184,7 @@ PLUS
     foreach my $record (@pica_records) {
         $writer->write($record);
     }
-    close $fh;
+    $writer->end;
 
     my $out = do {local (@ARGV, $/) = $filename; <>};
 
@@ -201,16 +198,20 @@ note 'PICA::Writer::JSON';
     my $writer = PICA::Writer::JSON->new(fh => \$out);
     my $record = $pica_records[0];
     $writer->write($record);
+    $writer->end;
     is $out, encode_json([@$record]) . "\n", 'JSON (array)';
 
     $out    = "";
+    $writer = PICA::Writer::JSON->new(fh => \$out);
     $record = $pica_records[1];
     $writer->write($record);
+    $writer->end;
     is $out, encode_json($record->{record}) . "\n", 'JSON (hash)';
 
-    $out    = "";
+    $out = "";
     $writer = PICA::Writer::JSON->new(fh => \$out, pretty => 1);
     $writer->write($record);
+    $writer->end;
     like $out, qr/^\[\n\s+\[/m, 'JSON (pretty)';
 }
 
@@ -221,12 +222,6 @@ note 'PICA::Data';
     foreach my $record (@pica_records) {
         bless $record, 'PICA::Data';
         $record->write(plain => \$append);
-
-        my $str = encode('UTF-8', $record->string);
-        my $r   = pica_parser('plain', \$str)->next;
-
-        $record = $record->{record} if reftype $record eq 'HASH';
-        is_deeply $r->{record}, $record, 'record->string';
     }
 
     my $PLAIN = <<'PLAIN';
@@ -237,10 +232,10 @@ note 'PICA::Data';
 
 PLAIN
 
-    is $append, $PLAIN, 'record->write';
+    is $append, $PLAIN, 'record->write (multiple records)';
 
     my $record = bless $pica_records[1], 'PICA::Data';
-    my $json   = JSON::PP->new->utf8->convert_blessed->encode($record);
+    my $json = JSON::PP->new->utf8->convert_blessed->encode($record);
     is "$json\n", $record->string('JSON'), 'encode as JSON via TO_JSON';
 }
 
@@ -263,7 +258,7 @@ note 'undefined occurrence';
     $writer->write($pica_record);
     close $fh;
 
-    my $out  = do {local (@ARGV, $/) = $filename; <>};
+    my $out = do {local (@ARGV, $/) = $filename; <>};
     my $PLUS = <<'PLUS';
 003@ 01041318383
 PLUS

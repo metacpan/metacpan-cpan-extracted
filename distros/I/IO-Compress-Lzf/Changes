@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  2.094 13 July 2020
+
+      * No changes
+
   2.093 7 December 2019
 
       * Fixed minor typo in the pod.
@@ -10,7 +14,7 @@ CHANGES
   2.092 4 December 2019
 
       * No changes
-      
+
   2.091 23 November 2019
 
       * No Changes
@@ -296,5 +300,3 @@ CHANGES
   2.000_08 2 March 2006
 
       * Split IO::Compress::Lzop into its own distribution.
-
-

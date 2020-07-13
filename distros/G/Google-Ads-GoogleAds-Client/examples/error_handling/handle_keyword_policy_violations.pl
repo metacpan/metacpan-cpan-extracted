@@ -34,13 +34,13 @@ use FindBin qw($Bin);
 use lib "$Bin/../../lib";
 use Google::Ads::GoogleAds::Client;
 use Google::Ads::GoogleAds::Utils::GoogleAdsHelper;
-use Google::Ads::GoogleAds::V3::Resources::AdGroupCriterion;
-use Google::Ads::GoogleAds::V3::Common::KeywordInfo;
-use Google::Ads::GoogleAds::V3::Enums::KeywordMatchTypeEnum qw(EXACT);
-use Google::Ads::GoogleAds::V3::Enums::AdGroupCriterionStatusEnum qw(ENABLED);
+use Google::Ads::GoogleAds::V4::Resources::AdGroupCriterion;
+use Google::Ads::GoogleAds::V4::Common::KeywordInfo;
+use Google::Ads::GoogleAds::V4::Enums::KeywordMatchTypeEnum qw(EXACT);
+use Google::Ads::GoogleAds::V4::Enums::AdGroupCriterionStatusEnum qw(ENABLED);
 use
-  Google::Ads::GoogleAds::V3::Services::AdGroupCriterionService::AdGroupCriterionOperation;
-use Google::Ads::GoogleAds::V3::Utils::ResourceNames;
+  Google::Ads::GoogleAds::V4::Services::AdGroupCriterionService::AdGroupCriterionOperation;
+use Google::Ads::GoogleAds::V4::Utils::ResourceNames;
 
 use Getopt::Long qw(:config auto_help);
 use Pod::Usage;
@@ -54,23 +54,23 @@ use Cwd qw(abs_path);
 # code.
 #
 # Running the example with -h will print the command line usage.
-my $customer_id = "INSERT_CUSTOMER_ID_HERE";
-my $ad_group_id = "INSERT_AD_GROUP_ID_HERE";
-my $keyword     = "abortion";
+my $customer_id  = "INSERT_CUSTOMER_ID_HERE";
+my $ad_group_id  = "INSERT_AD_GROUP_ID_HERE";
+my $keyword_text = "medication";
 
 sub handle_keyword_policy_violations {
-  my ($api_client, $customer_id, $ad_group_id, $keyword) = @_;
+  my ($api_client, $customer_id, $ad_group_id, $keyword_text) = @_;
 
   # Configure the keyword text and match type settings.
-  my $keyword_info = Google::Ads::GoogleAds::V3::Common::KeywordInfo->new({
-    text      => $keyword,
+  my $keyword_info = Google::Ads::GoogleAds::V4::Common::KeywordInfo->new({
+    text      => $keyword_text,
     matchType => EXACT
   });
 
   # Construct an ad group criterion using the keyword info above.
   my $ad_group_criterion =
-    Google::Ads::GoogleAds::V3::Resources::AdGroupCriterion->new({
-      adGroup => Google::Ads::GoogleAds::V3::Utils::ResourceNames::ad_group(
+    Google::Ads::GoogleAds::V4::Resources::AdGroupCriterion->new({
+      adGroup => Google::Ads::GoogleAds::V4::Utils::ResourceNames::ad_group(
         $customer_id, $ad_group_id
       ),
       status  => ENABLED,
@@ -79,7 +79,7 @@ sub handle_keyword_policy_violations {
 
   # Create an ad group criterion operation.
   my $ad_group_criterion_operation =
-    Google::Ads::GoogleAds::V3::Services::AdGroupCriterionService::AdGroupCriterionOperation
+    Google::Ads::GoogleAds::V4::Services::AdGroupCriterionService::AdGroupCriterionOperation
     ->new({create => $ad_group_criterion});
 
   # Try sending a mutate request to add the keyword.
@@ -184,25 +184,25 @@ if (abs_path($0) ne abs_path(__FILE__)) {
 }
 
 # Get Google Ads Client, credentials will be read from ~/googleads.properties.
-my $api_client = Google::Ads::GoogleAds::Client->new({version => "V3"});
+my $api_client = Google::Ads::GoogleAds::Client->new();
 
 # By default examples are set to die on any server returned fault.
 $api_client->set_die_on_faults(0);
 
 # Parameters passed on the command line will override any parameters set in code.
 GetOptions(
-  "customer_id=s" => \$customer_id,
-  "ad_group_id=i" => \$ad_group_id,
-  "keyword=s"     => \$keyword
+  "customer_id=s"  => \$customer_id,
+  "ad_group_id=i"  => \$ad_group_id,
+  "keyword_text=s" => \$keyword_text
 );
 
 # Print the help message if the parameters are not initialized in the code nor
 # in the command line.
-pod2usage(2) if not check_params($customer_id, $ad_group_id, $keyword);
+pod2usage(2) if not check_params($customer_id, $ad_group_id, $keyword_text);
 
 # Call the example.
 handle_keyword_policy_violations($api_client, $customer_id =~ s/-//gr,
-  $ad_group_id, $keyword);
+  $ad_group_id, $keyword_text);
 
 =pod
 
@@ -229,6 +229,6 @@ handle_keyword_policy_violations.pl [options]
     -help                       Show the help message.
     -customer_id                The Google Ads customer ID.
     -ad_group_id                The ad group ID.
-    -keyword                    [optional] The keyword to be added to the ad group.
+    -keyword_text               [optional] The keyword to be added to the ad group.
 
 =cut

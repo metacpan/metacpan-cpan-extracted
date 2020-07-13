@@ -34,6 +34,7 @@ t/10-data.t
 t/15-path.t
 t/16-match.t
 t/20-parser.t
+t/25-encoding.t
 t/30-writer.t
 t/40-holdings.t
 t/50-schema.t
@@ -45,8 +46,8 @@ t/files/pica.binary
 t/files/pica.json
 t/files/pica.plain
 t/files/pica.plus
+t/files/pica.ppxml
 t/files/pica.xml
-t/files/ppxml.xml
 t/files/schema-tests.yaml
 t/files/slim_ppxml.xml
 t/files/sru_picaxml.xml

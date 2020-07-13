@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.093 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.094 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.093 ;
-use IO::Uncompress::Adapter::UnLzma 2.093 ;
+use IO::Uncompress::Base 2.094 ;
+use IO::Uncompress::Adapter::UnLzma 2.094 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzmaError);
 
-$VERSION = '2.093';
+$VERSION = '2.094';
 $UnLzmaError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -232,20 +232,6 @@ IO::Uncompress::UnLzma - Read lzma files/buffers
     close($z)
 
 =head1 DESCRIPTION
-
-B<WARNING -- This is a Beta release>.
-
-=over 5
-
-=item * DO NOT use in production code.
-
-=item * The documentation is incomplete in places.
-
-=item * Parts of the interface defined here are tentative.
-
-=item * Please report any problems you find.
-
-=back
 
 This module provides a Perl interface that allows the reading of
 lzma files/buffers.
@@ -955,7 +941,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2019 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

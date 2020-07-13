@@ -1,9 +1,11 @@
 package PICA::Parser::Base;
 use v5.14.1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Carp qw(croak);
+use Scalar::Util qw(reftype);
+use Encode qw(encode);
 
 sub _new {
     my $class = shift;
@@ -29,9 +31,19 @@ sub new {
     if (!$@ && defined $ishandle) {
         $self->{reader} = $input;
     }
-    elsif ((ref $input and ref $input eq 'SCALAR') or -e $input) {
-        open($self->{reader}, "<:encoding(utf-8)", $input)
-            or croak "cannot read from file $input\n";
+    elsif ($input !~ /\n/ and -e $input) {
+        open($self->{reader}, "<:encoding(UTF-8)", $input)
+            or croak "Failed to read from file $input\n";
+    }
+    elsif ((ref $input and reftype $input eq 'SCALAR')) {
+        $input = encode('UTF-8', $$input);
+        open($self->{reader}, "<:encoding(UTF-8)", \$input)
+            or croak "Failed to read from string reference\n";
+    }
+    elsif ($input =~ /\n/) {
+        $input = encode('UTF-8', $input);
+        open($self->{reader}, "<:encoding(UTF-8)", \$input)
+            or croak "Failed to read from string\n";
     }
     else {
         croak "file or filehandle $input does not exists";
@@ -120,7 +132,7 @@ them fatal by setting the I<strict> parameter to 1.
 =head2 new( [ $input | fh => $input ] [ %options ] )
 
 Initialize parser to read from a given file, handle (e.g. L<IO::Handle>), or
-string reference. L<PICA::Parser::XML> also detects plain XML strings.
+reference to a Unicode string. L<PICA::Parser::XML> also detects plain XML strings.
 
 =head2 next
 

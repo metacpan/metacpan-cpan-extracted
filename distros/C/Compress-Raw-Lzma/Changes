@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  2.094 13 July 2020
+
+      * Issue with Append mode & SvOOK
+        Issue https://github.com/pmqs/Compress-Raw-Lzma/issues/4
+        10fbd83afbf02b255bfac79fc38f6b507bc93b4e
+
   2.093 7 December 2019
 
       * Lzma.xs -- add allocator to lzma_properties_decode

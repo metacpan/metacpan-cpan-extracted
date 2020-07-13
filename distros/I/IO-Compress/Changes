@@ -1,6 +1,34 @@
 CHANGES
 -------
 
+  2.094 13 July 2020
+
+      * bin/zipdetails version 2
+
+        7acb49ff4ca67051deaffd7f988556dae0dd884b small update
+        f5988eebc21a4d0b96e0b094e6e9bf8d3dcb1763 Better error messages for missing Zip64 records
+        d224dcc321dd1ff120345ac3a19286ecdc79776f Add note about warning output
+        4caa0e5117c4c214f457d90f9a87d00772a79622 Add --version option
+        6c045c859d2b6bab0398833f207d7f9b803bbbab Version 2
+        df97743ffa1da816936e8ef504c9d561d66bb0ed Beef up some error cases
+        073129c4f44ebd3cc2c5381ffa824fc09b474c29 Rename a couple of unused signatures
+        72568c7d9edfd3e2fb6647dce6ea511e9caa186c update comment
+        1088199809cabb9c565ac23f065988683aacd323 Merge branch 'master' of https://github.com/pmqs/IO-Compress
+        ad987ab95e3f3fa02fcf526736ad2da78d327460 Merge pull request #10 from fabiensanglard/master
+        ac76d1b3d3f23077b1700778226edd68c50d81a8 fix typo
+        5950d7e724479f0eceffe68ae515ac117ff6a5ef Don't output "Extra Payload" if length is zero
+        dbd3160decd9b761dbad7aaae2ec46c0173125ef Merge pull request #12 from fabiensanglard/extra
+        7ae4a98124c9195ca5286e3ac7d2cbe37fa2b644 Recover from bad extra subfield
+        3e12e62916da31c003a7273293bc32bb9a31f85f Fix typo
+        f3a0a4717433d32743f17d40adc30e11bea60868 Fix wrong START offset
+        6f078dca715473276556afb0b8582bb69efa7230 Typo for Implode string "Shannon-Fano Trees"
+        4e25fed1a8e29518fa38f0610a5ca33ca41e9d89 some small documentation updates.
+        1be04bf4bd5fb023ad276ecabdbc170823bac465 Add decoder for 'Open Packaging Growth Hint'
+        2da58735bdbd1149863014dd08a7cea0334f52d5 update compression method 16
+        82a9612676ae192747b8bcbf586b09408c3b72ce Add extra fields 0x20-0x23 from APPNOTE 6.3.5
+        bc5e2ffbc560b236bc3be0f977ce744f2a2afbfb remove trailing whitespace
+        3f70119190671b00eb432e36904aa9dbb2fb8f69 minor documentation changes
+
   2.093 7 December 2019
 
       * No changes

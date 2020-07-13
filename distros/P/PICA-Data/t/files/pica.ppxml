@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.oclcpica.org/xmlns/ppxml-1.0">
+  <record>
+    <global opacflag="" status="">
+      <tag id="002@" occ="">
+        <subf id="0">Aan</subf>
+      </tag>
+      <tag id="003@" occ="">
+        <subf id="0">12345</subf>
+      </tag>
+      <tag id="010@" occ="">
+        <subf id="a">chi</subf>
+      </tag>
+      <tag id="011@" occ="">
+        <subf id="a">2004</subf>
+        <subf id="n">2004.01</subf>
+      </tag>
+      <tag id="012X" occ="">
+        <subf id="0">0</subf>
+        <subf id="x"/>
+        <subf id="y"/>
+      </tag>
+      <tag id="019@" occ="">
+        <subf id="a">XB-CN</subf>
+      </tag>
+      <tag id="021A" occ="">
+        <subf id="a">我国民事立法的回顾与展望</subf>
+        <subf id="f">History and perspective of China civil law</subf>
+        <subf id="h">柳经纬主编;</subf>
+      </tag>
+    </global>
+    <owner iln="120">
+      <local>
+        <tag id="101@" occ="">
+          <subf id="a">120</subf>
+          <subf id="c">PICA</subf>
+          <subf id="d">Oldenburg, IBIT Universität Oldenburg &lt;715&gt;</subf>
+        </tag>
+        <tag id="101B" occ="">
+          <subf id="0">15-01-09</subf>
+          <subf id="t">15:32:38.000</subf>
+        </tag>
+        <tag id="101D" occ="">
+          <subf id="0">15-01-09</subf>
+          <subf id="b">9330</subf>
+          <subf id="a">0715</subf>
+        </tag>
+        <tag id="101U" occ="">
+          <subf id="0">utf8</subf>
+        </tag>
+        <tag id="145Z" occ="40">
+          <subf id="a">$</subf>
+          <subf id="b">test$</subf>
+          <subf id="c">...</subf>
+        </tag>
+      </local>
+      <copy occ="1" opacflag="" status="" epn="917400194">
+        <tag id="201B" occ="1">
+          <subf id="0">15-01-09</subf>
+          <subf id="t">15:32:38.000</subf>
+        </tag>
+        <tag id="201D" occ="1">
+          <subf id="0">15-01-09</subf>
+          <subf id="b">9330</subf>
+          <subf id="a">0715</subf>
+        </tag>
+        <tag id="201U" occ="1">
+          <subf id="0">utf8</subf>
+        </tag>
+        <tag id="203@" occ="1">
+          <subf id="0">917400194</subf>
+          <subf id="x"/>
+          <subf id="y"/>
+        </tag>
+        <tag id="208@" occ="1">
+          <subf id="a">15-01-09</subf>
+          <subf id="b">z</subf>
+        </tag>
+        <tag id="209A" occ="1">
+          <subf id="f">108</subf>
+          <subf id="a">401-06356/09</subf>
+          <subf id="d">g</subf>
+          <subf id="x">00</subf>
+        </tag>
+      </copy>
+    </owner>
+  </record>
+  <record>
+    <global opacflag="" status="">
+      <tag id="003@" occ="">
+        <subf id="0">67890</subf>
+      </tag>
+    </global>
+  </record>
+</collection>

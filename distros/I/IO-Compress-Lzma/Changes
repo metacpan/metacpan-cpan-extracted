@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  2.094 13 July 2020
+
+      * No changes
+
   2.093 7 December 2019
 
       * Fixed minor typo in the pod.
@@ -10,7 +14,7 @@ CHANGES
   2.092 5 December 2019
 
       * t/oooprereq.t: Fix list of dumped packages
-        90ebd567797ac332b210ef01a5af19af86eb94bc 
+        90ebd567797ac332b210ef01a5af19af86eb94bc
 
       * t/oooprereq.t:Dump version data
         227544c3ee3ffc181d0ffa93d60e5846930b497f
@@ -27,7 +31,7 @@ CHANGES
   2.089 3 November 2019
 
       * No Changes
-      
+
   2.088 31 October 2019
 
       *  Beef up reset for zip usecase
@@ -38,14 +42,14 @@ CHANGES
 
       * Add Support Details
         5f34bf369cceabc8c06fb40ec6e9db32291a85b8
-    
+
       * Documentation Updates
         1e5b9d5f99be6b7a104b96e3349c2c63acf3a7b5
 
   2.087 10 August 2019
 
       * No Changes
-      
+
   2.086 31 March 2019
 
       * Moved source to github https://github.com/pmqs/IO-Compress-Lzma
@@ -53,7 +57,7 @@ CHANGES
       * Add META_MERGE to Makefile.PL
 
       * Added meta-json.t & meta-yaml.t
-      
+
   2.084 5 January 2019
 
       * Added support for lzip
@@ -192,17 +196,17 @@ CHANGES
 
   2.037 20 June 2011
 
-      * Handle "Cannot Allocate Memory" issue with Extreme test in 
+      * Handle "Cannot Allocate Memory" issue with Extreme test in
         t/105oneshot-zip-lzma-only.t
 
   2.036 18 June 2011
 
       * IO::Compress::Adapter
-        Added interface to allow creation of LZMA stream for use in a 
+        Added interface to allow creation of LZMA stream for use in a
         zip file
 
       * IO::Unxompress::Adapter
-        Added interface to allow reading of LZMA stream in a 
+        Added interface to allow reading of LZMA stream in a
         zip file
 
   2.035 6 May 2011
@@ -240,4 +244,3 @@ CHANGES
   2.023 9 November 2009
 
       * First public beta
-

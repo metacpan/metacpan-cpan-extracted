@@ -7,9 +7,9 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '4.13';
+our $VERSION = '4.14';
 #$VERSION = eval $VERSION;
-DynaLoader::bootstrap Math::MPFR::Random $VERSION;
+Math::MPFR::Random->DynaLoader::bootstrap($VERSION);
 
 @Math::MPFR::Random::EXPORT = ();
 @Math::MPFR::Random::EXPORT_OK = ();

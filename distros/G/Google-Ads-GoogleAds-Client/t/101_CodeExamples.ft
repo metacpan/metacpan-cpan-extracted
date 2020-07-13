@@ -24,7 +24,7 @@ use lib qw(. lib t/utils);
 use TestAPIUtils;
 use TestUtils qw(get_test_client read_client_properties);
 
-use Test::More (tests => 78);
+use Test::More (tests => 80);
 
 # Get the API client for the functional tests.
 my $api_client = get_test_client();
@@ -95,11 +95,7 @@ my $label_id = TestAPIUtils::create_label($api_client, $customer_id);
 ################################## Examples ##################################
 
 # account_management
-require qw(examples/account_management/approve_merchant_center_link.pl);
-ok(
-  approve_merchant_center_link($api_client, $customer_id),
-  "Test of approve_merchant_center_link example."
-);
+# NOTE: Skip the approve_merchant_center_link.pl as it requires a merchant account.
 require qw(examples/account_management/create_customer.pl);
 ok(create_customer($api_client, $manager_customer_id),
   "Test of create_customer example.");
@@ -128,7 +124,7 @@ ok(
 require qw(examples/advanced_operations/add_ad_customizer.pl);
 ok(
   add_ad_customizer(
-    $api_client, $customer_id, $search_ad_group_id, $display_ad_group_id
+    $api_client, $customer_id, [$search_ad_group_id, $display_ad_group_id]
   ),
   "Test of add_ad_customizer example."
 );
@@ -144,6 +140,7 @@ ok(
   add_app_campaign($api_client, $customer_id),
   "Test of add_app_campaign example."
 );
+# NOTE: Skip the add_display_upload_ad.pl as it requires additional setup.
 require qw(examples/advanced_operations/add_dynamic_page_feed.pl);
 ok(
   add_dynamic_page_feed(
@@ -298,10 +295,10 @@ ok(
   "Test of add_campaign_labels example."
 );
 require qw(
-  examples/campaign_management/add_complete_campaigns_using_mutate_job.pl);
+  examples/campaign_management/add_complete_campaigns_using_batch_job.pl);
 ok(
-  add_complete_campaigns_using_mutate_job($api_client, $customer_id),
-  "Test of add_complete_campaigns_using_mutate_job example."
+  add_complete_campaigns_using_batch_job($api_client, $customer_id),
+  "Test of add_complete_campaigns_using_batch_job example."
 );
 # NOTE: Skip the create_campaign_experiment.pl as it requires additional setup.
 require qw(
@@ -346,12 +343,12 @@ ok(
 require qw(examples/error_handling/handle_keyword_policy_violations.pl);
 ok(
   handle_keyword_policy_violations(
-    $api_client, $customer_id, $search_ad_group_id, "abortion"
+    $api_client, $customer_id, $search_ad_group_id, "medication"
   ),
   "Test of handle_keyword_policy_violations example."
 );
 require qw(examples/error_handling/handle_partial_failure.pl);
-ok(handle_partial_failure($api_client, $customer_id, $search_ad_group_id),
+ok(handle_partial_failure($api_client, $customer_id, $search_campaign_id),
   "Test of handle_partial_failure example.");
 require qw(examples/error_handling/handle_rate_exceeded_error.pl);
 ok(handle_rate_exceeded_error($api_client, $customer_id, $search_ad_group_id),
@@ -382,6 +379,18 @@ ok(add_prices($api_client, $customer_id, $search_campaign_id),
 require qw(examples/extensions/add_sitelinks.pl);
 ok(add_sitelinks($api_client, $customer_id, $search_campaign_id),
   "Test of add_sitelinks example.");
+require qw(examples/extensions/add_sitelinks_using_feeds.pl);
+ok(
+  add_sitelinks_using_feeds(
+    $api_client, $customer_id, $display_campaign_id, $display_ad_group_id
+  ),
+  "Test of add_sitelinks_using_feeds example."
+);
+
+# feeds
+# NOTE: Skip the remove_feed_items.pl as it requires additional setup.
+# NOTE: Skip the remove_flights_feed_item_attribute_value.pl as it requires additional setup.
+# NOTE: Skip the update_flights_feed_item_string_attribute_value.pl as it requires additional setup.
 
 # hotel_ads
 # NOTE: Skip the ad_hotel_ad.pl as it requires additional setup.
@@ -428,6 +437,21 @@ ok(
   ),
   "Test of generate_keyword_ideas example."
 );
+require qw(examples/planning/get_ad_group_criterion_cpc_bid_simulations.pl);
+ok(
+  get_ad_group_criterion_cpc_bid_simulations(
+    $api_client, $customer_id, $display_ad_group_id
+  ),
+  "Test of get_ad_group_criterion_cpc_bid_simulations example."
+);
+require
+  qw(examples/planning/get_campaign_criterion_bid_modifier_simulations.pl);
+ok(
+  get_campaign_criterion_bid_modifier_simulations(
+    $api_client, $customer_id, $display_campaign_id
+  ),
+  "Test of get_campaign_criterion_bid_modifier_simulations example."
+);
 
 # recommendations
 # NOTE: Skip the apply_recommendation.pl as it requires additional setup.
@@ -461,12 +485,10 @@ ok(
   add_remarketing_action($api_client, $customer_id),
   "Test of add_remarketing_action example."
 );
-# NOTE: Skip the remove_feed_items.pl as it requires additional setup.
-# NOTE: Skip the remove_flights_feed_item_string_attribute_value.pl as it requires additional setup.
-# NOTE: Skip the update_flights_feed_item_string_attribute_value.pl as it requires additional setup.
 # NOTE: Skip the upload_call_conversion.pl as it requires additional setup.
 # NOTE: Skip the upload_conversion_adjustment.pl as it requires additional setup.
 # NOTE: Skip the upload_offline_conversion.pl as it requires additional setup.
+# NOTE: Skip the upload_store_sales_transactions.pl as it requires additional setup.
 
 # reporting
 require qw(examples/reporting/get_hotel_ads_performance.pl);
@@ -479,6 +501,7 @@ ok(
   get_keyword_stats($api_client, $customer_id),
   "Test of get_keyword_stats example."
 );
+# NOTE: Skip the parallel_report_download.pl as it conflicts with JSON::SL.
 
 # shopping_ads
 # NOTE: Skip the add_listing_scope.pl as it requires a merchant account.

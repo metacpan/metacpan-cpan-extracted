@@ -133,6 +133,13 @@ crossed, really...
 This release is backwards compatible with Version 12. But it is highly recommended to upgrade at least all server nodes
 to this version as soon as possible to avoid all sorts of problems.
 
+=head2 VERSION 14
+
+Version 14 has only internal bugfixes and no externally incompatible changes.
+
+The main "feature" of this release is more internal error checking. This is to detect broken connections sooner and a bit
+more reliable.
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

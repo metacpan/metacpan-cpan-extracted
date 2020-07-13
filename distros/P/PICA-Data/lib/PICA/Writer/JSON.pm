@@ -1,7 +1,7 @@
 package PICA::Writer::JSON;
 use v5.14.1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Scalar::Util qw(reftype);
 use JSON::PP;
@@ -15,7 +15,6 @@ sub write_record {
     my $json = $self->{json};
     unless ($json) {
         $json = JSON::PP->new(%$self);
-        $json->utf8 unless exists $self->{utf8};
         $json->$_($self->{$_})
             for grep {exists $self->{$_}}
             qw(pretty ascii latin1 utf8 indent space_before space_after canonical);

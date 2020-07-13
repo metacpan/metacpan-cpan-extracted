@@ -1,3 +1,15 @@
+v0.138.5 2020-07-13T09:52:11Z
+ - profile set_password api method renamed
+
+v0.138.4 2020-07-13T09:10:14Z
+ - upload protocol updated
+
+v0.138.3 2020-07-13T08:14:26Z
+ - docker linked
+
+v0.138.2 2020-07-13T08:07:07Z
+ - docker linked
+
 v0.138.0 2020-07-12T13:23:56Z
  - namesilo api fixed
  - upload protocol updated

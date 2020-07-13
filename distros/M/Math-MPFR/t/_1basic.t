@@ -4,7 +4,7 @@ use Config;
 use Math::MPFR qw(:mpfr);
 use Math::MPFR::V;
 
-print "1..8\n";
+print "1..9\n";
 
 warn "\n# Using Math::MPFR version ", $Math::MPFR::VERSION, "\n";
 warn "# MPFR_VERSION is ", MPFR_VERSION, "\n";
@@ -62,10 +62,10 @@ if(!$@) {
             : warn "# mpfr library thresholds file: $evaluate\n";
 }
 
-if($Math::MPFR::VERSION eq '4.13') {print "ok 1\n"}
+if($Math::MPFR::VERSION eq '4.14') {print "ok 1\n"}
 else {print "not ok 1 $Math::MPFR::VERSION\n"}
 
-if(Math::MPFR::_get_xs_version() eq '4.13') {print "ok 2\n"}
+if(Math::MPFR::_get_xs_version() eq '4.14') {print "ok 2\n"}
 else {
   warn "Module version: $Math::MPFR::VERSION\nXS version: ", Math::MPFR::_get_xs_version(), "\n";
   print "not ok 2\n";
@@ -121,6 +121,12 @@ if($Math::MPFR::VERSION eq $Math::MPFR::V::VERSION) {print "ok 8\n"}
 else {
   warn "\$Math::MPFR::V::VERSION: $Math::MPFR::V::VERSION \n";
   print "not ok 8\n";
+}
+
+if(Math::MPFR::Random::_MPFR_VERSION() == Math::MPFR::_MPFR_VERSION()) {print "ok 9\n"}
+else {
+  warn Math::MPFR::Random::_MPFR_VERSION(), " != ", Math::MPFR::_MPFR_VERSION(), "\n";
+  print "not ok 9\n";
 }
 
 if($rebuild == 1) {

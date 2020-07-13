@@ -1,9 +1,11 @@
 package PICA::Parser::XML;
 use v5.14.1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Carp qw(croak);
+use Scalar::Util qw(reftype);
+use Encode qw(encode);
 use XML::LibXML::Reader;
 
 use parent 'PICA::Parser::Base';
@@ -20,15 +22,20 @@ sub new {
             or croak "cannot read from filehandle $input\n";
         $self->{xml_reader} = $reader;
     }
-    elsif (defined $input && $input !~ /\n/ && -e $input) {
+    elsif ($input !~ /\n/ && -e $input) {
         my $reader = XML::LibXML::Reader->new(location => $input)
             or croak "cannot read from file $input\n";
         $self->{xml_reader} = $reader;
     }
-    elsif (defined $input && length $input > 0) {
-        $input = ${$input} if (ref($input) // '' eq 'SCALAR');
+    elsif ((ref $input and reftype $input eq 'SCALAR')) {
+        $input = encode('UTF-8', $$input);    # Unicode to raw bytes
         my $reader = XML::LibXML::Reader->new(string => $input)
-            or croak "cannot read XML string $input\n";
+            or croak "cannot read XML string reference\n";
+        $self->{xml_reader} = $reader;
+    }
+    elsif (defined $input && length $input > 0) {
+        my $reader = XML::LibXML::Reader->new(string => $input)
+            or croak "cannot read XML string\n";
         $self->{xml_reader} = $reader;
     }
     else {

@@ -9,8 +9,8 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    This module needs the MPFR and GMP C libraries. (Install the
    GMP library first as it is a pre-requisite for MPFR.)
 
-   The GMP library is available from http://gmplib.org
-   The MPFR library is available from http://www.mpfr.org/
+   The GMP library is available from https://gmplib.org
+   The MPFR library is available from https://www.mpfr.org/
 
    Documentation for current mpfr functions can be found at:
    www.mpfr.org/mpfr-current/mpfr.html#Function-and-Type-Index
@@ -236,7 +236,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
       Rmpfr_get_float128() or Rmpfr_get_NV()
 
     This will also mean that overloaded operations that receive an
-    NV will evaluate that (__float128) NV to it's full precision.
+    NV will evaluate that (__float128) NV to its full precision.
     And assigning the NV as Math::MPFR->new($nv) will also work as
     intended.
 
@@ -247,7 +247,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
       Rmpfr_set_NV() and Rmpfr_get_NV() will still set/get
       __float128 values.
       Also, overloaded operations that receive an NV will still
-      evaluate that (__float128) NV to it's full precision.
+      evaluate that (__float128) NV to its full precision.
       It's only Rmpfr_set_float128() and Rmpfr_get_float128() that
       will not be available.
 
@@ -911,13 +911,23 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     is set to the same value and the value of $exp is meaningless (and
     should be ignored).
 
-   $ui1 = Rmpfr_get_str_ndigits($ui2, $ui3); # mpfr-4.1.0 and later only
+   $ui1 = Rmpfr_get_str_ndigits($ui2, $ui3); # new with mpfr-4.1.0
+     Note: $ui2 must be in the range 2..62 (inclusive).
      Return the minimal integer $ui1 such that any number of precision
      $ui3 bits, when output with $ui1 digits in radix $ui2 with rounding
      to nearest, can be recovered exactly when read again, still with
      rounding to nearest.
-     More precisely, we have $ui1 = 1 + ceil($ui3*log(2)/log($ui2)), with $ui3
-     replaced by $ui3-1 if $ui2 is a power of 2.
+     More precisely, we have $ui1 = 1 + ceil($ui3 * log(2) / log($ui2)),
+     with $ui3 decremented by 1 if $ui2 is a power of 2.
+     This function wraps mpfr_get_str_ndigits if mpfr version is 4.1.0
+     or later. Otherwise it calls Rmpfr_get_str_ndigits_alt, which does
+     not require mpfr-4.1.0.
+
+   $ui1 = Rmpfr_get_str_ndigits_alt($ui2, $ui3);
+     Provided as a fallback (though it can also be called separately)
+     for Rmpfr_get_str_ndigits when mpfr version is older than 4.1.0.
+     Unlike Rmpfr_get_str_ndigits, this function does not require that
+     $ui2 is in the range 2..62.
 
    ##########
 
@@ -1079,6 +1089,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    $si = Rmpfr_cmp($op1, $op2);
    $si = Rmpfr_cmpabs($op1, $op2);
+   $si = Rmpfr_cmpabs_ui($op, $ui);  # requires mpfr-4.1.0 and later
    $si = Rmpfr_cmp_ui($op, $ui);
    $si = Rmpfr_cmp_si($op, $si);
    $si = Rmpfr_cmp_d($op, $double);
@@ -1087,16 +1098,31 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $si = Rmpfr_cmp_q($op, $q); # $q is a mpq object
    $si = Rmpfr_cmp_f($op, $f); # $f is a mpf object
    $si = Rmpfr_cmp_NV($op, $nv);
-    Compare 1st and 2nd args. In the case of 'Rmpfr_cmpabs()'
-    compare the absolute values of the 2 args.  Return a positive
-    value if 1st arg > 2nd arg, zero if 1st arg = 2nd arg, and a
-    negative value if 1st arg < 2nd arg.  Both args are considered
-    to their full own precision, which may differ. In case 1st and
-    2nd args are of same sign but different, the absolute value
-    returned is one plus the absolute difference of their exponents.
-    If one of the operands is NaN (Not-a-Number), return zero
-    and set the erange flag.
+    Compare 1st and 2nd args. In the case of 'Rmpfr_cmpabs()' and
+    'Rmpfr_cmpabs_ui' compare the absolute values of the 2 args.
+    Return a positive value if 1st arg > 2nd arg, zero if
+    1st arg = 2nd arg, and a negative value if 1st arg < 2nd arg.
+    Both args are considered to their full own precision, which may
+    differ. In case 1st and 2nd args are of same sign but different,
+    the absolute value returned is one plus the absolute difference
+    of their exponents. If one of the operands is NaN (Not-a-Number),
+    return zero and set the erange flag.
 
+   $si = Rmpfr_total_order_p($op1, $op2); # new with mpfr-4.1.0
+    This function implements the totalOrder predicate from IEEE
+    754-2008, where -NaN < -Inf < negative finite numbers < -0 < +0
+    < positive finite numbers < +Inf < +NaN. It returns a non-zero
+    value (true) when X is smaller than or equal to Y for this order
+    relation, and zero (false) otherwise.
+    Contrary to 'Rmpfr_cmp($x, $y)', which returns a ternary value,
+    'Rmpfr_total_order_p' returns a binary value (zero or non-zero).
+    In particular, 'Rmpfr_total_order_p($x, $x)' returns true,
+    'Rmpfr_total_order_p(-0, +0)' returns true and
+    'Rmpfr_total_order_p(+0, -0)' returns false.
+    The sign bit of NaN also matters.
+    This function falls back to our own implementation if the mpfr
+    version is older than 4.1.0 (because, in that case,
+    mpfr_total_order_p is unavailable).
 
    $si = Rmpfr_cmp_ui_2exp($op, $ui, $si);
    $si = Rmpfr_cmp_si_2exp($op, $si, $si);
@@ -1482,7 +1508,7 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
    $ui = Rmpfr_out_str([$prefix,] $op, $base, $digits, $round [, $suffix]);
     BEST TO USE TRmpfr_out_str INSTEAD
     Output $op to STDOUT, as a string of digits in base $base,
-    rounded in direction $round.  $base may be i the range 2 to 62
+    rounded in direction $round.  $base may be in the range 2 to 62
     (or -36..-2, 2 .. 62 if Math::MPFR has been built against
     mpfr-4.1.0 or later).
     Print $digits significant digits exactly, or if $digits is 0,
@@ -1686,23 +1712,6 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
 
    MISCELLANEOUS
 
-   $nv = atodouble($str); # Needs mpfr-3.1.6 or later
-    Sets the $nv to the value of the double that's represented by
-    the string $str.
-    If $Config{nvtype} is double, it therefore returns the same
-    value as atonv.
-    See atonv(), immediately below.
-
-   $nv = atonv($str); # Needs mpfr-3.1.6 or later
-    Sets $nv to the NV value represented by the string $str.
-    If $str expresses a base 2 value, begin it with '0b' or '0B'.
-    If $str expresses a base 16 value, begin it with '0x' or '0X.
-    For example:
-      atonv('0x0.89p5'), atonv('0x0.112@2'), atonv('17.125') and
-      atonv('0b0.10001001e5') all return 17.125.
-    NOTE: ORIGINALLY TOOK 2 ARGUMENTS - NOW TAKES ONLY 1, as of
-          Math-MPFR-4.07.
-
    $str = doubletoa($nv [, $x]); # Available only when
                                  # $Config{nvsize} == 8.
                                  # Else use nvtoa().
@@ -1723,6 +1732,13 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
     will be incremented. This feature can be disabled by providing
     the FB=0 argument to the 'perl Makefile.PL' step of the
     Math::MPFR build.
+
+   $nv = atodouble($str); # Needs mpfr-3.1.6 or later
+    Sets the $nv to the value of the double that's represented by
+    the string $str.
+    If $Config{nvtype} is double, it therefore returns the same
+    value as atonv.
+    See atonv() below.
 
    $str = nvtoa($nv); # Available irrespective of $Config{nvsize}
                       # and $Config{nvtype}
@@ -1749,6 +1765,26 @@ Math::MPFR - perl interface to the MPFR (floating point) library.
             requires mpfr-3.1.6 or later.
             With double-double NVs, nvtoa() currently requires
             mpfr-4.0.0 or later.
+
+   $nv = atonv($str); # Needs mpfr-3.1.6 or later
+    Sets $nv to the NV value represented by the string $str.
+    If $str expresses a base 2 value, begin it with '0b' or '0B'.
+    If $str expresses a base 16 value, begin it with '0x' or '0X.
+    For example:
+      atonv('0x0.89p5'), atonv('0x0.112@2'), atonv('17.125') and
+      atonv('0b0.10001001e5') all return 17.125.
+    NOTE: ORIGINALLY TOOK 2 ARGUMENTS - NOW TAKES ONLY 1, as of
+          Math-MPFR-4.07.
+
+   $str = numtoa($sv);
+    As for nvtoa() but prints out UVs and IVs in integer format.
+    (If UV-precision is greater than NV-precision then nvtoa()
+    output can lose precision as it prints out UVs and IVs in floating
+    point format.)
+
+   $sv = atonum($str); # Needs mpfr-3.1.6 or later
+    If $str numifies to an IV, return that IV.
+    Else return the NV that is returned by atonv($str).
 
    $MPFR_version = Rmpfr_get_version();
     Returns the version of the MPFR library (eg 4.0.2) being used by

@@ -1,7 +1,7 @@
 package PICA::Parser::PPXML;
 use v5.14.1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use parent 'PICA::Parser::XML';
 
@@ -22,9 +22,10 @@ sub _next_record {
         my @field;
 
         # get field tag number
-        my $tag        = $field->getAttribute('id');
-        my $occurrence = $field->getAttribute('occ') // '';
-        push(@field, ($tag, $occurrence));
+        my $tag = $field->getAttribute('id');
+        my $occ = $field->getAttribute('occ') // '';
+        $occ = sprintf '%02d', $occ if $occ ne '';
+        push(@field, ($tag, $occ));
 
         # get all subfields
         foreach my $subfield ($field->getElementsByLocalName('subf')) {

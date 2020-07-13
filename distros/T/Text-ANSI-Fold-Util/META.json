@@ -1,0 +1,80 @@
+{
+   "abstract" : "Text::ANSI::Fold utilities",
+   "author" : [
+      "Kazumasa Utashiro."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Text-ANSI-Fold-Util",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.45",
+            "Text::ANSI::Fold" : "1.08",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Text::ANSI::Fold::Util" : {
+         "file" : "lib/Text/ANSI/Fold/Util.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Fold-Util/issues"
+      },
+      "homepage" : "https://github.com/kaz-utashiro/Text-ANSI-Fold-Util",
+      "repository" : {
+         "url" : "git://github.com/kaz-utashiro/Text-ANSI-Fold-Util.git",
+         "web" : "https://github.com/kaz-utashiro/Text-ANSI-Fold-Util"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:UTASHIRO",
+   "x_contributors" : [
+      "Kazumasa Utashiro <kaz@utashiro.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

@@ -15,8 +15,8 @@ use Test::More  ;
 #use CompTestUtils;
 
 
-BEGIN 
-{ 
+BEGIN
+{
     # use Test::NoWarnings, if available
     my $extra = 0 ;
     $extra = 1
@@ -25,13 +25,13 @@ BEGIN
 
     my $count = 0 ;
     if ($] < 5.005) {
-        $count = 103 ;
+        $count = 199 ;
     }
     elsif ($] >= 5.006) {
-        $count = 689 ;
+        $count = 785 ;
     }
     else {
-        $count = 131 ;
+        $count = 227 ;
     }
 
     plan tests => $count + $extra;
@@ -100,12 +100,12 @@ EOM
 
         my $hello = "I am a HAL 9000 computer" ;
         my @hello = split('', $hello) ;
-        my ($err, $x, $X, $status); 
-     
+        my ($err, $x, $X, $status);
+
         ($x, $err) = $compress_class->new();
         isa_ok $x, "Compress::Raw::Lzma::Encoder";
         cmp_ok $err, '==', LZMA_OK, "status is LZMA_OK" ;
-     
+
         is $x->uncompressedBytes(), 0, "uncompressedBytes() == 0" ;
         is $x->compressedBytes(), 0, "compressedBytes() == 0" ;
 
@@ -115,31 +115,31 @@ EOM
         {
             $status = $x->code($_, $X) ;
             last unless $status == LZMA_OK ;
-        
+
             $Answer .= $X ;
         }
-         
+
         cmp_ok $status, '==', LZMA_OK, "code returned LZMA_OK" ;
-        
+
         cmp_ok  $x->flush($X), '==', LZMA_STREAM_END, "flush returned LZMA_OK" ;
         $Answer .= $X ;
-         
+
         is $x->uncompressedBytes(), length $hello, "uncompressedBytes ok" ;
         is $x->compressedBytes(), length $Answer, "compressedBytes ok" ;
-         
+
         cmp_ok $x->flush($X), '==', LZMA_STREAM_END, "flush returned LZMA_STREAM_END";
         $Answer .= $X ;
 
         #open F, ">/tmp/xx1"; print F $Answer ; close F;
         my @Answer = split('', $Answer) ;
-         
+
         my $k;
         ok(($k, $err) = $uncompress_class->new(AppendOutput => 0,
                                                ConsumeInput => 0));
         isa_ok $k, "Compress::Raw::Lzma::Decoder" ;
-        cmp_ok $err, '==', LZMA_OK, "status is LZMA_OK" 
+        cmp_ok $err, '==', LZMA_OK, "status is LZMA_OK"
             or diag "GOT $err\n";
-     
+
         is $k->compressedBytes(), 0, "compressedBytes() == 0" ;
         is $k->uncompressedBytes(), 0, "uncompressedBytes() == 0" ;
         my $GOT = '';
@@ -150,9 +150,9 @@ EOM
             $status = $k->code($_, $Z) ;
             $GOT .= $Z ;
             last if $status == LZMA_STREAM_END or $status != LZMA_OK ;
-         
+
         }
-         
+
         cmp_ok $status, '==', LZMA_STREAM_END, "Got LZMA_STREAM_END" ;
         is $GOT, $hello, "uncompressed data matches ok" ;
         is $k->compressedBytes(), length $Answer, "compressedBytes ok" ;
@@ -163,39 +163,39 @@ EOM
 
     if (1)
     {
-        # bzdeflate/bzinflate - small buffer with a number
+        # code/code - small buffer with a number
         # ==============================
 
         my $hello = 6529 ;
-     
+
         ok  my ($x, $err) = $compress_class->new(AppendOutput => 1) ;
         ok $x ;
         cmp_ok $err, '==', LZMA_OK ;
-     
+
         my $status;
         my $Answer = '';
-         
+
         cmp_ok $x->code($hello, $Answer), '==', LZMA_OK ;
-        
+
         cmp_ok $x->flush($Answer), '==', LZMA_STREAM_END, "flush returned LZMA_STREAM_END";
-         
+
         my @Answer = split('', $Answer) ;
-         
+
         my $k;
         ok(($k, $err) = $uncompress_class->new(AppendOutput => 1,
                                                          ConsumeInput => 0) );
         ok $k ;
         cmp_ok $err, '==', LZMA_OK ;
-         
+
         #my $GOT = '';
         my $GOT ;
         foreach (@Answer)
         {
             $status = $k->code($_, $GOT) ;
             last if $status == LZMA_STREAM_END or $status != LZMA_OK ;
-         
+
         }
-         
+
         cmp_ok $status, '==', LZMA_STREAM_END ;
         is $GOT, $hello ;
 
@@ -204,7 +204,7 @@ EOM
     if(1)
     {
 
-    # bzdeflate/bzinflate options - AppendOutput
+    # code/code options - AppendOutput
     # ================================
 
         # AppendOutput
@@ -212,11 +212,11 @@ EOM
 
         my $hello = "I am a HAL 9000 computer" ;
         my @hello = split('', $hello) ;
-         
+
         ok  my ($x, $err) = $compress_class->new(AppendOutput => 1), "  Created lzma object" ;
         ok $x ;
         cmp_ok $err, '==', LZMA_OK, "Status is LZMA_OK" ;
-         
+
         my $status;
         my $X;
         foreach (@hello)
@@ -224,32 +224,32 @@ EOM
             $status = $x->code($_, $X) ;
             last unless $status == LZMA_OK ;
         }
-         
+
         cmp_ok $status, '==', LZMA_OK ;
-         
+
         cmp_ok $x->flush($X), '==', LZMA_STREAM_END ;
-         
-         
+
+
         my @Answer = split('', $X) ;
-         
+
         my $k;
         ok(($k, $err) = $uncompress_class->new( {-AppendOutput =>1}));
         ok $k ;
         cmp_ok $err, '==', LZMA_OK ;
-         
+
         my $Z;
         foreach (@Answer)
         {
             $status = $k->code($_, $Z) ;
             last if $status == LZMA_STREAM_END or $status != LZMA_OK ;
-         
+
         }
-         
+
         cmp_ok $status, '==', LZMA_STREAM_END ;
         is $Z, $hello ;
     }
 
-     
+
     if(1)
     {
 
@@ -260,12 +260,12 @@ EOM
         my $contents = '' ;
         foreach (1 .. 50000)
           { $contents .= chr int rand 255 }
-        
-        
+
+
         ok my ($x, $err) = $compress_class->new(AppendOutput => 0) ;
         ok $x, "  lzma object ok" ;
         cmp_ok $err, '==', LZMA_OK,"  status is LZMA_OK" ;
-         
+
         is $x->uncompressedBytes(), 0, "  uncompressedBytes() == 0" ;
         is $x->compressedBytes(), 0, "  compressedBytes() == 0" ;
 
@@ -274,18 +274,18 @@ EOM
         my $status =  $x->code($contents, $X);
         #cmp_ok $x->code($contents, $X), '==', LZMA_OK, "  compressed ok" ;
         cmp_ok $status, '==', LZMA_OK, "  compressed ok" ;
-        
+
         #$Y = $X{key} ;
         $Y = $X ;
-         
-         
+
+
         #cmp_ok $x->flush($X{key}), '==', LZMA_OK ;
         #$Y .= $X{key} ;
         cmp_ok $x->flush($X), '==', LZMA_STREAM_END ;
         $Y .= $X ;
-         
-         
-     
+
+
+
         my $keep = $Y ;
 
         my $k;
@@ -293,7 +293,7 @@ EOM
                                                          ConsumeInput => 0) );
         ok $k ;
         cmp_ok $err, '==', LZMA_OK ;
-         
+
         #cmp_ok $k->code($Y, $Z{key}), '==', LZMA_STREAM_END ;
         #ok $contents eq $Z{key} ;
         cmp_ok $k->code($Y, $Z), '==', LZMA_STREAM_END ;
@@ -305,16 +305,16 @@ EOM
                                                           ConsumeInput => 0)) ;
         ok $k ;
         cmp_ok $err, '==', LZMA_OK ;
-        
-        my $s ; 
+
+        my $s ;
         my $out ;
         my @bits = split('', $keep) ;
         foreach my $bit (@bits) {
             $s = $k->code($bit, $out) ;
         }
-        
+
         cmp_ok $s, '==', LZMA_STREAM_END ;
-         
+
         ok $contents eq $out ;
 
 
@@ -326,15 +326,15 @@ EOM
         title "lzma - check remaining buffer after LZMA_STREAM_END, Consume $consume";
 
         ok my $x = $compress_class->new(AppendOutput => 0) ;
-     
+
         my ($X, $Y, $Z);
         cmp_ok $x->code($hello, $X), '==', LZMA_OK;
         cmp_ok $x->flush($Y), '==', LZMA_STREAM_END;
         $X .= $Y ;
-     
+
         ok my $k = $uncompress_class->new(AppendOutput => 0,
                                                     ConsumeInput => $consume) ;
-     
+
         my $first = substr($X, 0, 2) ;
         my $remember_first = $first ;
         my $last  = substr($X, 2) ;
@@ -366,8 +366,8 @@ EOM
 
         ok my $k = $uncompress_class->new(AppendOutput => 0,
                                                     ConsumeInput => 1) ;
-         
-        my $Z; 
+
+        my $Z;
         eval { $k->code("abc", $Z) ; };
         like $@, mkErr("Compress::Raw::Lzma::Decoder::code input parameter cannot be read-only when ConsumeInput is specified");
 
@@ -383,23 +383,23 @@ EOM
         foreach (1 .. 5000)
           { $contents .= chr int rand 255 }
         ok  my $x = $compress_class->new(AppendOutput => 1) ;
-         
+
         my $X ;
         my $status = $x->code(substr($contents,0), $X);
         cmp_ok $status, '==', LZMA_OK ;
-        
+
         cmp_ok $x->flush($X), '==', LZMA_STREAM_END  ;
-         
+
         my $append = "Appended" ;
         $X .= $append ;
-         
+
         ok my $k = $uncompress_class->new(AppendOutput => 1,
                                                     ConsumeInput => 1) ;
-         
-        my $Z; 
+
+        my $Z;
         my $keep = $X ;
         $status = $k->code(substr($X, 0), $Z) ;
-         
+
         cmp_ok $status, '==', LZMA_STREAM_END ;
         #print "status $status X [$X]\n" ;
         is $contents, $Z ;
@@ -415,35 +415,35 @@ EOM
 
         my $hello = "I am a HAL 9000 computer" ;
         my @hello = split('', $hello) ;
-        my ($err, $x, $X, $status); 
-     
+        my ($err, $x, $X, $status);
+
         ok( ($x, $err) = $compress_class->new(AppendOutput => 0) );
         ok $x ;
         cmp_ok $err, '==', LZMA_OK ;
-     
+
         $X = "" ;
         my $Answer = '';
         foreach (@hello)
         {
             $status = $x->code($_, $X) ;
             last unless $status == LZMA_OK ;
-        
+
             $Answer .= $X ;
         }
-         
+
         cmp_ok $status, '==', LZMA_OK ;
-        
+
         cmp_ok  $x->flush($X), '==', LZMA_STREAM_END ;
         $Answer .= $X ;
-         
+
         my @Answer = split('', $Answer) ;
-         
+
         my $k;
         ok(($k, $err) = $uncompress_class->new(AppendOutput => 1,
                                                         ConsumeInput => 0) );
         ok $k ;
         cmp_ok $err, '==', LZMA_OK ;
-     
+
         my $GOT ;
         my $Z;
         $Z = 1 ;#x 2000 ;
@@ -452,7 +452,7 @@ EOM
             $status = $k->code($_, $GOT) ;
             last if $status == LZMA_STREAM_END or $status != LZMA_OK ;
         }
-         
+
         cmp_ok $status, '==', LZMA_STREAM_END ;
         is $GOT, $hello ;
 
@@ -472,31 +472,131 @@ EOM
         cmp_ok $x->code($data, $X), '==',  LZMA_OK ;
 
         cmp_ok $x->flush($X), '==', LZMA_STREAM_END ;
-         
+
         my $append = "Appended" ;
         $X .= $append ;
         my $keep = $X ;
-         
+
         ok my $k = $uncompress_class->new( AppendOutput => 1,
                                                     ConsumeInput => 1);
-         
+
     #    cmp_ok $k->code(substr($X, 0, -1), $Z), '==', LZMA_STREAM_END ; ;
         cmp_ok $k->code(substr($X, 0), $Z), '==', LZMA_STREAM_END ; ;
-         
+
         ok $hello eq $Z ;
         is $X, $append;
-        
+
         $X = $keep ;
         $Z = '';
         ok $k = $uncompress_class->new( AppendOutput => 1,
                                                     ConsumeInput => 0);
-         
+
         cmp_ok $k->code(substr($X, 0, -1), $Z), '==', LZMA_STREAM_END ; ;
         #cmp_ok $k->code(substr($X, 0), $Z), '==', LZMA_STREAM_END ; ;
-         
+
         ok $hello eq $Z ;
         is $X, $keep;
-        
+
+    }
+
+
+    {
+        title 'RT#132734: test inflate append OOK output parameter';
+        # https://github.com/pmqs/Compress-Raw-Bzip2/issues/2
+
+        my $hello = "I am a HAL 9000 computer" ;
+        my $data = $hello ;
+
+        my($X, $Z);
+
+        ok my $x = $compress_class->new( {-AppendOutput => 1} );
+
+        cmp_ok $x->code($data, $X), '==',  LZMA_OK ;
+
+        cmp_ok $x->flush($X), '==', LZMA_STREAM_END ;
+
+        ok my $k = $uncompress_class->new( {-AppendOutput => 1,
+                                                -ConsumeInput => 1} ) ;
+        $Z = 'prev. ' ;
+        substr($Z, 0, 4, ''); # chop off first 4 characters using offset
+        cmp_ok $Z, 'eq', '. ' ;
+
+        # use Devel::Peek ; Dump($Z) ; # shows OOK flag
+
+        # if (1) { # workaround
+        #     my $prev = $Z;
+        #     undef $Z ;
+        #     $Z = $prev ;
+        # }
+
+        cmp_ok $k->code($X, $Z), '==', LZMA_STREAM_END ;
+        # use Devel::Peek ; Dump($Z) ; # No OOK flag
+
+        cmp_ok $Z, 'eq', ". $hello" ;
+    }
+
+
+    {
+        title 'RT#132734: test deflate append OOK output parameter';
+        # https://github.com/pmqs/Compress-Raw-Bzip2/issues/2
+
+        my $hello = "I am a HAL 9000 computer" ;
+        my $data = $hello ;
+
+        my($X, $Z);
+
+        $X = 'prev. ' ;
+        substr($X, 0, 6, ''); # chop off all characters using offset
+        cmp_ok $X, 'eq', '' ;
+
+        # use Devel::Peek ; Dump($X) ; # shows OOK flag
+
+        # if (1) { # workaround
+        #     my $prev = $Z;
+        #     undef $Z ;
+        #     $Z = $prev ;
+        # }
+
+        ok my $x = $compress_class->new( { -AppendOutput => 1 } );
+
+        cmp_ok $x->code($data, $X), '==',  LZMA_OK ;
+
+        cmp_ok $x->flush($X), '==', LZMA_STREAM_END ;
+
+        ok my $k = $uncompress_class->new( {-AppendOutput => 1,
+                                                -ConsumeInput => 1} ) ;
+        cmp_ok $k->code($X, $Z), '==', LZMA_STREAM_END ;
+
+        is $Z, $hello ;
+    }
+
+
+    {
+        title 'RT#132734: test flush append OOK output parameter';
+        # https://github.com/pmqs/Compress-Raw-Bzip2/issues/2
+
+        my $hello = "I am a HAL 9000 computer" ;
+        my $data = $hello ;
+
+        my($X, $Z);
+
+        my $F = 'prev. ' ;
+        substr($F, 0, 6, ''); # chop off all characters using offset
+        cmp_ok $F, 'eq', '' ;
+
+        # use Devel::Peek ; Dump($F) ; # shows OOK flag
+
+        ok my $x = $compress_class->new( {-AppendOutput => 1 });
+
+        cmp_ok $x->code($data, $X), '==',  LZMA_OK ;
+
+        cmp_ok $x->flush($F), '==', LZMA_STREAM_END ;
+
+        ok my $k = $uncompress_class->new( {-AppendOutput => 1,
+                                                -ConsumeInput => 1} ) ;
+        cmp_ok $k->code($X . $F, $Z), '==', LZMA_STREAM_END ;
+
+        is $Z, $hello ;
     }
 
     exit if $] < 5.006 ;
@@ -507,33 +607,33 @@ EOM
 
         my $hello = "I am a HAL 9000 computer" ;
         my @hello = split('', $hello) ;
-        my ($err, $x, $X, $status); 
-     
+        my ($err, $x, $X, $status);
+
         ok( ($x, $err) = $compress_class->new (AppendOutput => 1) );
         ok $x ;
         cmp_ok $err, '==', LZMA_OK ;
-     
+
         $X = "" ;
         my $Answer = '';
         foreach (@hello)
         {
             $status = $x->code($_, substr($Answer, length($Answer))) ;
             last unless $status == LZMA_OK ;
-        
+
         }
-         
+
         cmp_ok $status, '==', LZMA_OK ;
-        
+
         cmp_ok  $x->flush(substr($Answer, length($Answer))), '==', LZMA_STREAM_END ;
-         
+
         my @Answer = split('', $Answer) ;
-         
+
         my $k;
         ok(($k, $err) = $uncompress_class->new(AppendOutput => 1,
                                                         ConsumeInput => 0) );
         ok $k ;
         cmp_ok $err, '==', LZMA_OK ;
-     
+
         my $GOT = '';
         my $Z;
         $Z = 1 ;#x 2000 ;
@@ -542,7 +642,7 @@ EOM
             $status = $k->code($_, substr($GOT, length($GOT))) ;
             last if $status == LZMA_STREAM_END or $status != LZMA_OK ;
         }
-         
+
         cmp_ok $status, '==', LZMA_STREAM_END ;
         is $GOT, $hello ;
 
@@ -554,34 +654,34 @@ EOM
 
         my $hello = "I am a HAL 9000 computer" ;
         my @hello = split('', $hello) ;
-        my ($err, $x, $X, $status); 
-     
+        my ($err, $x, $X, $status);
+
         ok( ($x, $err) = $compress_class->new (AppendOutput => 1) );
         ok $x ;
         cmp_ok $err, '==', LZMA_OK ;
-     
+
         $X = "" ;
         my $Answer = '';
         foreach (@hello)
         {
             $status = $x->code($_, substr($Answer, 0)) ;
             last unless $status == LZMA_OK ;
-        
+
         }
-         
+
         cmp_ok $status, '==', LZMA_OK ;
-        
+
         cmp_ok  $x->flush(substr($Answer, 0)), '==', LZMA_STREAM_END ;
-         
+
         my @Answer = split('', $Answer) ;
-         
+
         # append, consume, limit
         my $k;
         ok(($k, $err) = $uncompress_class->new(AppendOutput => 1,
                                                         ConsumeInput => 0) );
         ok $k ;
         cmp_ok $err, '==', LZMA_OK ;
-     
+
         my $GOT = '';
         my $Z;
         $Z = 1 ;#x 2000 ;
@@ -590,15 +690,15 @@ EOM
             $status = $k->code($_, substr($GOT, 0)) ;
             last if $status == LZMA_STREAM_END or $status != LZMA_OK ;
         }
-         
+
         cmp_ok $status, '==', LZMA_STREAM_END ;
         is $GOT, $hello ;
     }
 
 }
 
-for my $class ([qw(AloneEncoder AloneDecoder)], 
-               [qw(StreamEncoder StreamDecoder)], 
+for my $class ([qw(AloneEncoder AloneDecoder)],
+               [qw(StreamEncoder StreamDecoder)],
                [qw(RawEncoder RawDecoder)] ,
                [qw(EasyEncoder AutoDecoder)] ,
            )

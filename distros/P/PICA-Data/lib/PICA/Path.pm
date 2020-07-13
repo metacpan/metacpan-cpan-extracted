@@ -1,8 +1,8 @@
 package PICA::Path;
 use v5.14.1;
-use bytes;
+use utf8;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
@@ -159,7 +159,7 @@ sub match_subfields {
         }
 
         my $subfields = $self->[2];
-        $subfields =~ s{[^a-zA-Z0-9]}{}g;
+        $subfields =~ s{.*\[(.+)\].*}{\1}g;
         for my $subfield (split('', $subfields)) {
             my $value = $subfield_href->{$subfield} // [undef];
             if (defined $from) {

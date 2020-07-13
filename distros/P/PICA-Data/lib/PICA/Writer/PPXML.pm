@@ -1,98 +1,108 @@
 package PICA::Writer::PPXML;
 use v5.14.1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Scalar::Util qw(reftype);
 use XML::LibXML;
-use constant NS => 'http://www.oclcpica.org/xmlns/ppxml-1.0';
 use PICA::Path;
 
-use parent 'PICA::Writer::Base';
+use parent 'PICA::Writer::XML';
 
-sub new {
-    my $self = PICA::Writer::Base::new(@_);
-    $self->{doc}        = XML::LibXML::Document->new("1.0", "UTF-8");
-    $self->{collection} = $self->{doc}->createElement("collection");
-    $self->{doc}->addChild($self->{collection});
-    $self;
+our $ILN = PICA::Path->new('101@$a');
+our $EPN = PICA::Path->new('203@$0');
+
+sub namespace {
+    'http://www.oclcpica.org/xmlns/ppxml-1.0';
+}
+
+sub write_field {
+    my ($self, $field) = @_;
+
+    my $writer = $self->{writer};
+
+    $writer->startTag('tag', id => $field->[0], occ => 1 * $field->[1] || "");
+    for (my $i = 2; $i < scalar @$field; $i += 2) {
+        $writer->dataElement('subf', $field->[$i + 1], id => $field->[$i]);
+    }
+    $writer->endTag('tag');
 }
 
 sub write_record {
     my ($self, $record) = @_;
     $record = $record->{record} if reftype $record eq 'HASH';
 
-    my $el_record = $self->{collection}->addNewChild("", "record");
-    $el_record->setNamespace(NS, "ppxml");
+    my $writer = $self->{writer};
 
-    my $el_current = $el_record->addNewChild(NS, "global");
-    $el_current->setAttribute("opacflag", "");
-    $el_current->setAttribute("status",   "");
+    $writer->startTag('record');
 
-    my $tag;
-    my $path;
-    $path = PICA::Path->new('101@a');
-    my @ilns = $path->record_subfields($record);
+    $writer->startTag('global', opacflag => "", status => "");
+    $self->write_field($_) for grep {$_->[0] =~ /^0/} @$record;
+    $writer->endTag('global');
 
-    $path = PICA::Path->new('203@0');
-    my @epns = $path->record_subfields($record);
-    my $y    = 0;
-    foreach my $field (@$record)
-    {    # so lange bis die Lokaldaten anfagen -> dann elem owner
-        if ($field->[0] eq '101@') {
+    my @fields = grep {$_->[0] =~ /^[12]/} @$record;
 
-            # new element owner
-            my $el_owner = $el_record->addNewChild(NS, "owner");
-            $el_owner->setAttribute("iln", $ilns[$y]);
+    while (@fields) {
+        my $iln;
+        my @local;
 
-            # new element local
-            my $el_local = $el_owner->addNewChild(NS, "local");
-            $tag = _add_tag($el_local, $field->[0], $field->[1]);
-            _add_subfields($tag, $field);
-
-            # current element is now new element copy
-            $el_current = $el_owner->addNewChild(NS, "copy");
-            $el_current->setAttribute("occ",      "");
-            $el_current->setAttribute("opacflag", "");
-            $el_current->setAttribute("status",   "");
-            $el_current->setAttribute("epn",      $epns[$y]);
-            $y += 1;
-            next;
+       # collect level 1 fields up to the first level 2 field or the next 101@
+        while (@fields and $fields[0][0] =~ /^1/) {
+            if ($fields[0][0] eq '101@') {
+                last if defined $iln;
+                ($iln) = $ILN->match_subfields($fields[0]);
+            }
+            push @local, shift(@fields);
         }
-        $el_current->setAttribute("occ", _occ($field->[1]))
-            if $el_current->hasAttribute('occ');
-        $tag = _add_tag($el_current, $field->[0], $field->[1]);
-        _add_subfields($tag, $field);
+
+        my %copy;
+        while (@fields && $fields[0][0] =~ /^2/) {
+            my $occ = 1 * $fields[0][1] // "";
+            push @{$copy{$occ}}, shift @fields;
+        }
+
+        if (%copy) {
+            for my $occ (sort keys %copy) {
+                $self->write_owner($iln, \@local, $copy{$occ});
+            }
+        }
+        else {
+            $self->write_owner($iln, \@local);
+        }
     }
+
+    $writer->endTag('record');
 }
 
-sub _occ {
-    my ($occ) = @_;
-    $occ = (Scalar::Util::looks_like_number($occ)) ? $occ * 1 : '';
-}
+sub write_owner {
+    my ($self, $iln, $local, $copy) = @_;
 
-sub _add_tag {
-    my ($el, $id, $occ) = @_;
-    my $tag = $el->addNewChild(NS, "tag");
-    $tag->setAttribute("id",  $id);
-    $tag->setAttribute("occ", _occ($occ));
-    return $tag;
-}
+    my $writer = $self->{writer};
 
-sub _add_subfields {
-    my ($el, $field) = @_;
+    $writer->startTag('owner', iln => $iln // "");
 
-    my $sf;
-    for (my $i = 2; $i < @{$field}; $i += 2) {
-        $sf = $el->addNewChild(NS, "subf");
-        $sf->setAttribute("id", $field->[$i]);
-        $sf->appendText($field->[$i + 1]);
+    if (@$local) {
+        $writer->startTag('local');
+        $self->write_field($_) for @$local;
+        $writer->endTag('local');
     }
-}
 
-sub end {
-    my ($self) = @_;
-    $self->{doc}->toFH($self->{fh}, 2);
+    if ($copy) {
+        my $occ = 1 * $copy->[0][1] // '';
+        my ($epn)
+            = map {$EPN->match_subfields($_)} grep {$_->[0] eq '203@'} @$copy;
+        $writer->startTag(
+            'copy',
+            occ      => $occ,
+            epn      => $epn,
+            opacflag => "",
+            status   => ""
+        );
+        $self->write_field($_) for @$copy;
+        $writer->endTag('copy');
+    }
+
+    $writer->endTag('owner');
 }
 
 1;
@@ -121,10 +131,6 @@ The counterpart of this module is L<PICA::Parser::PPXML>.
 
 =head1 METHODS
 
-See L<PICA::Writer::Base> for descrition of other methods.
-
-=head2 end
-
-Writes the document directly to a filehandle.
+See L<PICA::Writer::Base> for description of other methods.
 
 =cut

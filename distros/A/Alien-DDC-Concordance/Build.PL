@@ -39,6 +39,7 @@ my $builder = $class->new
    requires => {
 		'perl'        => '5.8.9',
 		'Alien::Base' => '0.005',
+		'Net::SSLeay' => '1.49', ##-- else https download fails with "Internal Exception at .../Alien/Base/ModuleBuild/File.pm line 28."
 	       },
    dist_author => 'Bryan Jurish <moocow@cpan.org>',
    alien_name => 'ddc',

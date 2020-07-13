@@ -25,12 +25,12 @@ use FindBin qw($Bin);
 use lib "$Bin/../../lib";
 use Google::Ads::GoogleAds::Client;
 use Google::Ads::GoogleAds::Utils::GoogleAdsHelper;
-use Google::Ads::GoogleAds::V3::Resources::CampaignBidModifier;
-use Google::Ads::GoogleAds::V3::Common::InteractionTypeInfo;
-use Google::Ads::GoogleAds::V3::Enums::InteractionTypeEnum qw(CALLS);
+use Google::Ads::GoogleAds::V4::Resources::CampaignBidModifier;
+use Google::Ads::GoogleAds::V4::Common::InteractionTypeInfo;
+use Google::Ads::GoogleAds::V4::Enums::InteractionTypeEnum qw(CALLS);
 use
-  Google::Ads::GoogleAds::V3::Services::CampaignBidModifierService::CampaignBidModifierOperation;
-use Google::Ads::GoogleAds::V3::Utils::ResourceNames;
+  Google::Ads::GoogleAds::V4::Services::CampaignBidModifierService::CampaignBidModifierOperation;
+use Google::Ads::GoogleAds::V4::Utils::ResourceNames;
 
 use Getopt::Long qw(:config auto_help);
 use Pod::Usage;
@@ -44,33 +44,33 @@ use Cwd qw(abs_path);
 # code.
 #
 # Running the example with -h will print the command line usage.
-my $customer_id  = "INSERT_CUSTOMER_ID_HERE";
-my $campaign_id  = "INSERT_CAMPAIGN_ID_HERE";
-my $bid_modifier = "INSERT_BID_MODIFIER_HERE";
+my $customer_id        = "INSERT_CUSTOMER_ID_HERE";
+my $campaign_id        = "INSERT_CAMPAIGN_ID_HERE";
+my $bid_modifier_value = "INSERT_BID_MODIFIER_VALUE_HERE";
 
 sub add_campaign_bid_modifier {
-  my ($api_client, $customer_id, $campaign_id, $bid_modifier) = @_;
+  my ($api_client, $customer_id, $campaign_id, $bid_modifier_value) = @_;
 
   # Create a campaign bid modifier for call interactions with the specified
   # campaign ID and bid modifier value.
   my $campaign_bid_modifier =
-    Google::Ads::GoogleAds::V3::Resources::CampaignBidModifier->new({
-      campaign => Google::Ads::GoogleAds::V3::Utils::ResourceNames::campaign(
+    Google::Ads::GoogleAds::V4::Resources::CampaignBidModifier->new({
+      campaign => Google::Ads::GoogleAds::V4::Utils::ResourceNames::campaign(
         $customer_id, $campaign_id
       ),
       # Make the bid modifier apply to call interactions.
       interactionType =>
-        Google::Ads::GoogleAds::V3::Common::InteractionTypeInfo->new({
+        Google::Ads::GoogleAds::V4::Common::InteractionTypeInfo->new({
           type => CALLS
         }
         ),
       # Set the bid modifier value.
-      bidModifier => $bid_modifier
+      bidModifier => $bid_modifier_value
     });
 
   # Create a campaign bid modifier operation.
   my $campaign_bid_modifier_operation =
-    Google::Ads::GoogleAds::V3::Services::CampaignBidModifierService::CampaignBidModifierOperation
+    Google::Ads::GoogleAds::V4::Services::CampaignBidModifierService::CampaignBidModifierOperation
     ->new({
       create => $campaign_bid_modifier
     });
@@ -93,25 +93,26 @@ if (abs_path($0) ne abs_path(__FILE__)) {
 }
 
 # Get Google Ads Client, credentials will be read from ~/googleads.properties.
-my $api_client = Google::Ads::GoogleAds::Client->new({version => "V3"});
+my $api_client = Google::Ads::GoogleAds::Client->new();
 
 # By default examples are set to die on any server returned fault.
 $api_client->set_die_on_faults(1);
 
 # Parameters passed on the command line will override any parameters set in code.
 GetOptions(
-  "customer_id=s"  => \$customer_id,
-  "campaign_id=i"  => \$campaign_id,
-  "bid_modifier=f" => \$bid_modifier
+  "customer_id=s"        => \$customer_id,
+  "campaign_id=i"        => \$campaign_id,
+  "bid_modifier_value=f" => \$bid_modifier_value
 );
 
 # Print the help message if the parameters are not initialized in the code nor
 # in the command line.
-pod2usage(2) if not check_params($customer_id, $campaign_id, $bid_modifier);
+pod2usage(2)
+  if not check_params($customer_id, $campaign_id, $bid_modifier_value);
 
 # Call the example.
 add_campaign_bid_modifier($api_client, $customer_id =~ s/-//gr,
-  $campaign_id, $bid_modifier);
+  $campaign_id, $bid_modifier_value);
 
 =pod
 
@@ -130,6 +131,6 @@ add_campaign_bid_modifier.pl [options]
     -help                       Show the help message.
     -customer_id                The Google Ads customer ID.
     -campaign_id                The campaign ID.
-    -bid_modifier               The bid modifier value.
+    -bid_modifier_value         The bid modifier value.
 
 =cut

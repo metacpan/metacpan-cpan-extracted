@@ -126,6 +126,18 @@ SV * Rmpfr_randinit_lc_2exp_size(pTHX_ SV * size) {
      croak("Rmpfr_randinit_lc_2exp_size function failed");
 }
 
+/* Provide a duplicate of Math::MPFR::_MPFR_VERSION. *
+ * This allows MPFR.pm to determine the value of     *
+ * MPFR_VERSION at compile time.                     */
+
+SV * _MPFR_VERSION(pTHX) {
+#if defined(MPFR_VERSION)
+     return newSVuv(MPFR_VERSION);
+#else
+     return &PL_sv_undef;
+#endif
+}
+
 void DESTROY(gmp_randstate_t * p) {
      gmp_randclear(*p);
      Safefree(p);
@@ -167,4 +179,11 @@ Rmpfr_randinit_lc_2exp_size (size)
 CODE:
   RETVAL = Rmpfr_randinit_lc_2exp_size (aTHX_ size);
 OUTPUT:  RETVAL
+
+SV *
+_MPFR_VERSION ()
+CODE:
+  RETVAL = _MPFR_VERSION (aTHX);
+OUTPUT:  RETVAL
+
 

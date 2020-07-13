@@ -1,7 +1,7 @@
 package PICA::Schema::Builder;
 use v5.14.1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use PICA::Schema qw(field_identifier);
 use Scalar::Util qw(reftype);
@@ -35,7 +35,7 @@ sub add {
         if (!$fields->{$id}) {
             $fields->{$id} = {counter => 0, tag => $tag, subfields => {},};
             $fields->{$id}{occurrence} = $occ if length $id gt 4;
-            $fields->{$id}{required}   = \1 unless $self->{counter};
+            $fields->{$id}{required} = \1 unless $self->{counter};
         }
         else {
             $fields->{$id}{counter}++;

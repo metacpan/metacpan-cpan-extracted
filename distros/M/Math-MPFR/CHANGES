@@ -1,3 +1,18 @@
+
+4.14
+ - Add numtoa() and atonum().
+ - #include <inttypes.h> at beginning of grisu3.h to address:
+   https://www.cpantesters.org/cpan/report/0d8a8dfd-6bf4-1014-a7c0-8323ad4a5811
+ - Fix https://www.cpantesters.org/cpan/report/3622b742-4202-11ea-8c53-8f701f24ea8f
+   by amending Makefile.PL
+ - Add some debug statements throughout nvtoa() in MPFR.xs - relies on NVTOA_DEBUG=1
+   being provided as a Makefile.PL command line argument .
+ - Correct test 5 of t/numtoa.t for DoubleDouble nvtype.
+ - Add wrapping of mpfr_total_order_p (previously missed) which is new in 4.1.0.
+ - Add wrapping of mpfr_cmpabs_ui (previously missed) which is new in 4.1.0.
+ - In atonv() pre-processing replace " & " with " && " as the former (which was a
+   mistake, anyway) is not guaranteed to yield the correct result.
+
 4.13
  - Fix bug in t/rndna.t and t/rndna2.t (exposed by:
    http://www.cpantesters.org/cpan/report/90030d18-8f4f-11e9-a14c-c69b77725194 )
@@ -356,7 +371,7 @@
    (documented for the first time in 2.3.0).
  - Add Rmpfr_init_set_ld.
  - Add Rmpfr_deref2 to the list of exportable functions, and
-   document it's usage in the POD section.
+   document its usage in the POD section.
  - Rmpfr_deref2 now has the mpfr library allocate (and free) memory
    for the mantissa.
  - Add Rmpfr_hypot (previously missed).

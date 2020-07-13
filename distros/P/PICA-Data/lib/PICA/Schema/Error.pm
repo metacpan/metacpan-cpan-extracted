@@ -17,7 +17,7 @@ sub new {
     $error->{message} = _field_error_message($error, $id);
 
     while (my ($code, $sf) = each %{$error->{subfields} // {}}) {
-        $sf->{code}    = $code;
+        $sf->{code} = $code;
         $sf->{message} = _subfield_error_message($sf, $id);
     }
 
@@ -30,7 +30,7 @@ sub message {
 
 sub _subfield_error_message {
     my $error = shift;
-    my $id    = (shift // '') . '$' . $error->{code};
+    my $id = (shift // '') . '$' . $error->{code};
 
     if ($error->{required}) {
         "missing subfield $id";

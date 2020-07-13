@@ -11,7 +11,7 @@ sub API_read ( $self, $auth, @ ) {
     return $res;
 }
 
-sub API_change_password ( $self, $auth, $password ) {
+sub API_set_password ( $self, $auth, $password ) {
     my $res = $self->{api}->{backend}->user_set_password( $auth->{user_id}, $password );
 
     return $res;

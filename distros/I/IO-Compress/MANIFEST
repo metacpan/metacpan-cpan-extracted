@@ -154,6 +154,7 @@ t/compress/zlib-generic.pl
 t/files/bad-efs.zip
 t/files/meta.xml
 t/files/test.ods
+t/files/testfile1.odt
 t/files/encrypt-aes.zip
 t/files/encrypt-standard.zip
 t/files/jar.zip

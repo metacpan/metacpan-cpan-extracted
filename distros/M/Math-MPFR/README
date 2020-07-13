@@ -20,10 +20,10 @@ Because this module wraps the MPFR functions, it requires that both
 the GMP C library and the MPFR C library have been installed.
 
 For the GMP library see:
-http://gmplib.org
+https://gmplib.org
 
 For the MPFR library see:
-http://www.mpfr.org
+https://www.mpfr.org
 
 Minimum required version of gmp is gmp-4.2.0.
 Minimum required version of mpfr is mpfr-3.0.0.

@@ -55,6 +55,8 @@ sub rpc_call ( $self, $method, @args ) {
     if ( defined wantarray ) {
         my $cv = $self->{_rpc_cb}->{ $msg->{id} = uuid_v1mc_str } = P->cv;
 
+        $msg->{tid} = $msg->{id};
+
         $self->_send_msg($msg);
 
         return $cv->recv;
@@ -134,6 +136,8 @@ sub _on_bin ( $self, $data_ref ) {
         $msg = eval { $MP->unpack( $data_ref->$* ) };
     }
     else {
+        local $SIG{__WARN__} = sub {};
+
         $msg = eval { $CBOR->decode( $data_ref->$* ) };
 
         if ( !$@ ) {
@@ -184,15 +188,18 @@ sub _on_message ( $self, $msg ) {
         # RPC
         elsif ( $tx->{type} eq $TX_TYPE_RPC ) {
 
+            my $id = $tx->{id} // $tx->{tid};
+
             # method is specified, this is rpc call
             if ( $tx->{method} ) {
 
                 # RPC calls are not supported by this peer
                 if ( !$self->{on_rpc} ) {
-                    if ( $tx->{id} ) {
+                    if ( $id ) {
                         $self->_send_msg( {
                             type   => $TX_TYPE_RPC,
-                            id     => $tx->{id},
+                            id     => $id,
+                            tid    => $id,
                             result => {
                                 status => 400,
                                 reason => 'RPC calls are not supported',
@@ -209,10 +216,11 @@ sub _on_message ( $self, $msg ) {
                         $@->sendlog if $@;
 
                         # response is required
-                        if ( ( my $id = $tx->{id} ) && $auth_id == $self->{_auth_id} ) {
+                        if ( $id && $auth_id == $self->{_auth_id} ) {
                             $self->_send_msg( {
                                 type   => $TX_TYPE_RPC,
                                 id     => $id,
+                                tid    => $id,
                                 result => $@ || !@res ? res 500 : is_res $res[0] ? $res[0] : res @res,
                             } );
                         }
@@ -223,8 +231,8 @@ sub _on_message ( $self, $msg ) {
             }
 
             # method is not specified, this is RPC response, id is required
-            elsif ( $tx->{id} ) {
-                if ( my $cb = delete $self->{_rpc_cb}->{ $tx->{id} } ) {
+            elsif ( $id ) {
+                if ( my $cb = delete $self->{_rpc_cb}->{ $id } ) {
 
                     # convert result to response object
                     $cb->( bless $tx->{result}, 'Pcore::Util::Result::Class' );

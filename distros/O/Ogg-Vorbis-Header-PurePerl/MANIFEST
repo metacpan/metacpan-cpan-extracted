@@ -1,10 +1,12 @@
 Changes
 Makefile.PL
 MANIFEST
-PurePerl.pm
+lib/Ogg/Vorbis/Header/PurePerl.pm
 README
-test.pl
-test.ogg
-ogginfo.pl
+t/01-require.t
+t/02-basic.t
+t/test.ogg
+examples/ogginfo.pl
 LICENSE.GPL
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

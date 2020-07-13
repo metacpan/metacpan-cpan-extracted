@@ -24,10 +24,10 @@ use FindBin qw($Bin);
 use lib "$Bin/../../lib";
 use Google::Ads::GoogleAds::Client;
 use Google::Ads::GoogleAds::Utils::GoogleAdsHelper;
-use Google::Ads::GoogleAds::V3::Resources::CampaignLabel;
+use Google::Ads::GoogleAds::V4::Resources::CampaignLabel;
 use
-  Google::Ads::GoogleAds::V3::Services::CampaignLabelService::CampaignLabelOperation;
-use Google::Ads::GoogleAds::V3::Utils::ResourceNames;
+  Google::Ads::GoogleAds::V4::Services::CampaignLabelService::CampaignLabelOperation;
+use Google::Ads::GoogleAds::V4::Utils::ResourceNames;
 
 use Getopt::Long qw(:config auto_help);
 use Pod::Usage;
@@ -42,14 +42,16 @@ use Cwd qw(abs_path);
 #
 # Running the example with -h will print the command line usage.
 my $customer_id  = "INSERT_CUSTOMER_ID_HERE";
-my $campaign_ids = "INSERT_CAMPAIGN_IDS_HERE";
+my $campaign_id1 = "INSERT_CAMPAIGN_ID_1_HERE";
+my $campaign_id2 = "INSERT_CAMPAIGN_ID_2_HERE";
+my $campaign_ids = [];
 my $label_id     = "INSERT_LABEL_ID_HERE";
 
 sub add_campaign_labels {
   my ($api_client, $customer_id, $campaign_ids, $label_id) = @_;
 
   my $label_resource_name =
-    Google::Ads::GoogleAds::V3::Utils::ResourceNames::label($customer_id,
+    Google::Ads::GoogleAds::V4::Utils::ResourceNames::label($customer_id,
     $label_id);
 
   my $campaign_label_operations = [];
@@ -58,8 +60,8 @@ sub add_campaign_labels {
   foreach my $campaign_id (@$campaign_ids) {
     # Create a campaign label.
     my $campaign_label =
-      Google::Ads::GoogleAds::V3::Resources::CampaignLabel->new({
-        campaign => Google::Ads::GoogleAds::V3::Utils::ResourceNames::campaign(
+      Google::Ads::GoogleAds::V4::Resources::CampaignLabel->new({
+        campaign => Google::Ads::GoogleAds::V4::Utils::ResourceNames::campaign(
           $customer_id, $campaign_id
         ),
         label => $label_resource_name
@@ -67,7 +69,7 @@ sub add_campaign_labels {
 
     # Create a campaign label operation.
     my $campaign_label_operation =
-      Google::Ads::GoogleAds::V3::Services::CampaignLabelService::CampaignLabelOperation
+      Google::Ads::GoogleAds::V4::Services::CampaignLabelService::CampaignLabelOperation
       ->new({
         create => $campaign_label
       });
@@ -98,7 +100,7 @@ if (abs_path($0) ne abs_path(__FILE__)) {
 }
 
 # Get Google Ads Client, credentials will be read from ~/googleads.properties.
-my $api_client = Google::Ads::GoogleAds::Client->new({version => "V3"});
+my $api_client = Google::Ads::GoogleAds::Client->new();
 
 # By default examples are set to die on any server returned fault.
 $api_client->set_die_on_faults(1);
@@ -106,20 +108,18 @@ $api_client->set_die_on_faults(1);
 # Parameters passed on the command line will override any parameters set in code.
 GetOptions(
   "customer_id=s"  => \$customer_id,
-  "campaign_ids=s" => \$campaign_ids,
+  "campaign_ids=s" => \@$campaign_ids,
   "label_id=i"     => \$label_id
 );
+$campaign_ids = [$campaign_id1, $campaign_id2] unless @$campaign_ids;
 
 # Print the help message if the parameters are not initialized in the code nor
 # in the command line.
 pod2usage(2) if not check_params($customer_id, $campaign_ids, $label_id);
 
 # Call the example.
-add_campaign_labels(
-  $api_client,
-  $customer_id =~ s/-//gr,
-  [split(/[,\s]+/, $campaign_ids)], $label_id
-);
+add_campaign_labels($api_client, $customer_id =~ s/-//gr,
+  $campaign_ids, $label_id);
 
 =pod
 
@@ -137,7 +137,7 @@ add_campaign_labels.pl [options]
 
     -help                       Show the help message.
     -customer_id                The Google Ads customer ID.
-    -campaign_ids               The comma separated list of campaign IDs.
+    -campaign_ids               The campaign IDs to which the label will be added.
     -label_id                   The label ID.
 
 =cut

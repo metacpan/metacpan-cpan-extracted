@@ -15,10 +15,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "lzma.h" 
+#include "lzma.h"
 
 #define NEED_sv_2pv_nolen
-#include "ppport.h" 
+#include "ppport.h"
 
 #if PERL_REVISION == 5 && (PERL_VERSION < 8 || (PERL_VERSION == 8 && PERL_SUBVERSION < 4 ))
 
@@ -53,18 +53,18 @@ typedef struct di_stream {
     //bool     is_tainted;
     bool        forZip;
     void*       extraAddress ;
-    lzma_stream stream ; 
+    lzma_stream stream ;
 
     lzma_filter filters[LZMA_FILTERS_MAX + 1];
     SV* sv_filters[LZMA_FILTERS_MAX];
 
-    uInt     bufsize; 
+    uInt     bufsize;
     int      last_error ;
 
     uint64_t    bytesInflated ;
     uint64_t    compressedBytes ;
     uint64_t    uncompressedBytes ;
-    
+
 } di_stream;
 
 typedef di_stream * deflateStream ;
@@ -169,7 +169,7 @@ static const char my_l_errmsg[][34] = {
                 sv_setpv(var, ((err) ? GetErrorString(err) : "")) ;     \
                 SvNOK_on(var);
 
-   
+
 #if defined(__SYMBIAN32__)
 # define NO_WRITEABLE_DATA
 #endif
@@ -201,8 +201,8 @@ int error_no ;
 {
     dTHX;
     char * errstr ;
-  
-    errstr = (char*) my_l_errmsg[error_no]; 
+
+    errstr = (char*) my_l_errmsg[error_no];
 
     return errstr ;
 }
@@ -296,7 +296,7 @@ void my_free (void* opaque, void* ptr)
     PERL_UNUSED_VAR(opaque);
     safefree(ptr);
 
-    return; 
+    return;
 }
 
 static di_stream *
@@ -320,7 +320,7 @@ InitStream()
     s->stream.allocator = allocator;
 
     return s ;
-    
+
 }
 
 static void
@@ -347,11 +347,11 @@ setupFilters(di_stream* s, AV* filters, const char* properties)
     if (properties) {
         s->filters[0].id = LZMA_FILTER_LZMA1;
 
-        if (lzma_properties_decode(&s->filters[0], s->stream.allocator, 
+        if (lzma_properties_decode(&s->filters[0], s->stream.allocator,
                 (const uint8_t*)properties, 5) != LZMA_OK)
             return FALSE;
 
-        s->extraAddress = (void*)s->filters[0].options; 
+        s->extraAddress = (void*)s->filters[0].options;
 
         ++i;
     }
@@ -402,7 +402,7 @@ destroyStream(di_stream * s)
     }
 }
 
-static SV* 
+static SV*
 #ifdef CAN_PROTOTYPE
 deRef(SV * sv, char * string)
 #else
@@ -429,7 +429,7 @@ char * string;
             croak("%s: buffer parameter is a reference to a reference", string) ;
     }
 
-    if (!SvOK(sv)) { 
+    if (!SvOK(sv)) {
         sv = sv_2mortal(newSVpv("", 0));
     }
 
@@ -448,7 +448,7 @@ char * string ;
     dTHX;
     bool wipe = 0 ;
     STRLEN na;
-    
+
     SvGETMAGIC(sv);
     wipe = ! SvOK(sv) ;
 
@@ -612,7 +612,7 @@ SV* output ;
 
 #include "constants.h"
 
-MODULE = Compress::Raw::Lzma PACKAGE = Compress::Raw::Lzma   
+MODULE = Compress::Raw::Lzma PACKAGE = Compress::Raw::Lzma
 
 REQUIRE:	1.924
 PROTOTYPES:	DISABLE
@@ -624,7 +624,7 @@ BOOT:
         PERL_UNUSED_VAR(trace);
     }
 
-	
+
 
 MODULE = Compress::Raw::Lzma PACKAGE = Compress::Raw::Lzma PREFIX = MY_
 
@@ -635,19 +635,19 @@ MY_LZMA_VERSION()
 uint32_t
 lzma_version_number()
 
-const char * 
-lzma_version_string() 
+const char *
+lzma_version_string()
 
 #define MY_LZMA_VERSION_STRING() LZMA_VERSION_STRING
-const char * 
-MY_LZMA_VERSION_STRING() 
+const char *
+MY_LZMA_VERSION_STRING()
 
 #define MY_LZMA_FILTER_LZMA1() LZMA_FILTER_LZMA1
-uint64_t 
+uint64_t
 MY_LZMA_FILTER_LZMA1()
 
 #define MY_LZMA_BACKWARD_SIZE_MAX() LZMA_BACKWARD_SIZE_MAX
-uint64_t 
+uint64_t
 MY_LZMA_BACKWARD_SIZE_MAX()
 
 lzma_bool
@@ -658,31 +658,31 @@ lzma_bool
 lzma_mode_is_supported(mode)
     lzma_mode mode
 
-lzma_bool 
+lzma_bool
 lzma_check_is_supported(check)
     lzma_check check
 
-uint32_t 
-lzma_check_size(check) 
+uint32_t
+lzma_check_size(check)
     lzma_check check
 
-size_t 
+size_t
 lzma_stream_buffer_bound(uncompressed_size)
     size_t uncompressed_size
 
-lzma_bool 
+lzma_bool
 lzma_filter_encoder_is_supported(id)
     lzma_vli id
 
-lzma_bool 
+lzma_bool
 lzma_filter_decoder_is_supported(id)
     lzma_vli id
 
-uint64_t 
+uint64_t
 lzma_easy_encoder_memusage(preset)
     uint32_t preset
 
-uint64_t 
+uint64_t
 lzma_easy_decoder_memusage(preset)
     uint32_t preset
 
@@ -729,7 +729,7 @@ lzma_alone_encoder(Class, flags, bufsize, filters)
         XPUSHs(sv) ;
     }
   }
-  
+
 void
 lzma_raw_encoder(Class, flags, bufsize, filters, forZip)
     const char * Class
@@ -775,7 +775,7 @@ lzma_raw_encoder(Class, flags, bufsize, filters, forZip)
         XPUSHs(sv) ;
     }
   }
-  
+
 void
 lzma_stream_encoder(Class, flags, bufsize, filters, check=LZMA_CHECK_CRC32)
     const char * Class
@@ -821,7 +821,7 @@ lzma_stream_encoder(Class, flags, bufsize, filters, check=LZMA_CHECK_CRC32)
         XPUSHs(sv) ;
     }
   }
-  
+
 
 void
 lzma_easy_encoder(Class, flags, bufsize, preset=LZMA_PRESET_DEFAULT, check=LZMA_CHECK_CRC32)
@@ -866,10 +866,10 @@ lzma_easy_encoder(Class, flags, bufsize, preset=LZMA_PRESET_DEFAULT, check=LZMA_
         XPUSHs(sv) ;
     }
   }
-  
-  
 
-MODULE = Compress::Raw::Lzma::Encoder PACKAGE = Compress::Raw::Lzma::Encoder   
+
+
+MODULE = Compress::Raw::Lzma::Encoder PACKAGE = Compress::Raw::Lzma::Encoder
 
 
 void
@@ -881,11 +881,11 @@ DESTROY(s)
 
 
 
-DualType 
+DualType
 code (s, buf, output)
     Compress::Raw::Lzma::Encoder	s
     SV *	buf
-    SV * 	output 
+    SV * 	output
     uInt	cur_length = NO_INIT
     uInt	increment = NO_INIT
     lzma_ret	RETVAL = LZMA_OK;
@@ -897,30 +897,31 @@ code (s, buf, output)
 
     /* If the input buffer is a reference, dereference it */
     buf = deRef(buf, (char*)"code") ;
- 
+
     /* initialise the input buffer */
-#ifdef UTF8_AVAILABLE    
+#ifdef UTF8_AVAILABLE
     if (DO_UTF8(buf) && !sv_utf8_downgrade(buf, 1))
          croak("Wide character in " COMPRESS_CLASS "::code input parameter");
-#endif         
+#endif
     s->stream.next_in = (uint8_t*)SvPV_nomg(buf, origlen) ;
     s->stream.avail_in = origlen;
-     
+
     //if (is_tainted)
         //setTainted(output);
     /* and retrieve the output buffer */
     output = deRef_l(output, (char*)"code") ;
-#ifdef UTF8_AVAILABLE    
+#ifdef UTF8_AVAILABLE
     if (DO_UTF8(output) && !sv_utf8_downgrade(output, 1))
          croak("Wide character in " COMPRESS_CLASS "::code output parameter");
-#endif         
+#endif
 
-    if((s->flags & FLAG_APPEND_OUTPUT) != FLAG_APPEND_OUTPUT) {
+    if((s->flags & FLAG_APPEND_OUTPUT) == FLAG_APPEND_OUTPUT) {
+        SvOOK_off(output);
+    } else {
         SvCUR_set(output, 0);
-        /* sv_setpvn(output, "", 0); */
     }
 
-    if (s->forZip) 
+    if (s->forZip)
         addZipProperties(s, output) ;
 
     cur_length =  SvCUR(output) ;
@@ -941,22 +942,22 @@ code (s, buf, output)
 
         RETVAL = lzma_code(&(s->stream), LZMA_RUN);
 
-        if (RETVAL == LZMA_STREAM_END) 
+        if (RETVAL == LZMA_STREAM_END)
             break;
-        if (RETVAL != LZMA_OK) 
+        if (RETVAL != LZMA_OK)
             break;
 
         /* if (RETVAL == LZMA_BUF_ERROR) { */
-        
+
             if (s->stream.avail_out == 0)
                 continue ;
             if (s->stream.avail_in == 0) {
                 RETVAL = LZMA_OK ;
                 break ;
             }
-        
 
-        if (RETVAL != LZMA_OK) 
+
+        if (RETVAL != LZMA_OK)
             break;
     }
 
@@ -971,12 +972,12 @@ code (s, buf, output)
     }
     OUTPUT:
 	RETVAL
-  
+
 
 DualType
 flush(s, output, f=LZMA_FINISH)
     Compress::Raw::Lzma::Encoder	s
-    SV * output 
+    SV * output
     uInt	cur_length = NO_INIT
     uInt	increment = NO_INIT
     uInt    bufinc = NO_INIT
@@ -987,21 +988,22 @@ flush(s, output, f=LZMA_FINISH)
     //if (is_tainted)
         //setTainted(output);
     bufinc = s->bufsize;
-  
+
     s->stream.avail_in = 0; /* should be zero already anyway */
-  
+
     /* retrieve the output buffer */
     output = deRef_l(output, (char*)"flush") ;
-#ifdef UTF8_AVAILABLE    
+#ifdef UTF8_AVAILABLE
     if (DO_UTF8(output) && !sv_utf8_downgrade(output, 1))
          croak("Wide character in " COMPRESS_CLASS "::flush input parameter");
-#endif         
-    if((s->flags & FLAG_APPEND_OUTPUT) != FLAG_APPEND_OUTPUT) {
+#endif
+    if((s->flags & FLAG_APPEND_OUTPUT) == FLAG_APPEND_OUTPUT) {
+        SvOOK_off(output);
+    } else {
         SvCUR_set(output, 0);
-        /* sv_setpvn(output, "", 0); */
     }
 
-    if (s->forZip) 
+    if (s->forZip)
         addZipProperties(s, output) ;
 
     cur_length =  SvCUR(output) ;
@@ -1021,21 +1023,21 @@ flush(s, output, f=LZMA_FINISH)
         }
 
         RETVAL = lzma_code(&(s->stream), f);
-    
+
         /* deflate has finished flushing only when it hasn't used up
-         * all the available space in the output buffer: 
+         * all the available space in the output buffer:
          */
         /* if (s->stream.avail_out != 0 || RETVAL < 0 ) */
         if (RETVAL != LZMA_OK)
             break;
     }
-  
+
     /* TODO -- ??? */
     /* RETVAL =  (RETVAL == LZMA_STREAM_END ? LZMA_OK : RETVAL) ; */
     s->last_error = RETVAL ;
 
     s->compressedBytes    += cur_length + increment - s->stream.avail_out ;
-  
+
     if (RETVAL == LZMA_STREAM_END) {
         SvPOK_only(output);
         SvCUR_set(output, cur_length + increment - s->stream.avail_out) ;
@@ -1115,7 +1117,7 @@ lzma_auto_decoder(Class, flags, bufsize, memlimit=UINT64_MAX, fl=0)
         XPUSHs(sv) ;
     }
   }
- 
+
 void
 lzma_raw_decoder(Class, flags, bufsize, filters, properties)
     const char* Class
@@ -1162,7 +1164,7 @@ lzma_raw_decoder(Class, flags, bufsize, filters, properties)
         XPUSHs(sv) ;
     }
   }
- 
+
 MODULE = Compress::Raw::Lzma::Decoder PACKAGE = Compress::Raw::Lzma::Decoder
 
 void
@@ -1173,11 +1175,11 @@ DESTROY(s)
     destroyStream(s) ;
 
 
-DualType 
+DualType
 code (s, buf, output)
     Compress::Raw::Lzma::Decoder	s
     SV *	buf
-    SV * 	output 
+    SV * 	output
     uInt	cur_length = 0;
     uInt	prefix_length = 0;
     uInt	increment = 0;
@@ -1185,9 +1187,9 @@ code (s, buf, output)
     STRLEN  na = NO_INIT ;
     STRLEN  origlen = NO_INIT
   PREINIT:
-#ifdef UTF8_AVAILABLE    
+#ifdef UTF8_AVAILABLE
     bool	out_utf8  = FALSE;
-#endif    
+#endif
   CODE:
     //bool is_tainted = getTaint3;
     //if (is_tainted)
@@ -1201,24 +1203,26 @@ code (s, buf, output)
             croak(UNCOMPRESS_CLASS "::code input parameter cannot be read-only when ConsumeInput is specified");
         SvPV_force(buf, na);
     }
-#ifdef UTF8_AVAILABLE    
+#ifdef UTF8_AVAILABLE
     if (DO_UTF8(buf) && !sv_utf8_downgrade(buf, 1))
          croak("Wide character in " UNCOMPRESS_CLASS "::code input parameter");
-#endif         
-    
+#endif
+
     /* initialise the input buffer */
     s->stream.next_in = (uint8_t*)SvPV_nomg(buf, origlen) ;
     s->stream.avail_in = origlen;
-	
+
     /* and retrieve the output buffer */
     output = deRef_l(output, (char*)"inflate") ;
-#ifdef UTF8_AVAILABLE    
+#ifdef UTF8_AVAILABLE
     if (DO_UTF8(output))
          out_utf8 = TRUE ;
     if (DO_UTF8(output) && !sv_utf8_downgrade(output, 1))
          croak("Wide character in " UNCOMPRESS_CLASS "::code output parameter");
-#endif         
-    if((s->flags & FLAG_APPEND_OUTPUT) != FLAG_APPEND_OUTPUT) {
+#endif
+    if((s->flags & FLAG_APPEND_OUTPUT) == FLAG_APPEND_OUTPUT) {
+        SvOOK_off(output);
+    } else {
         SvCUR_set(output, 0);
     }
 
@@ -1229,13 +1233,13 @@ code (s, buf, output)
 
     if (SvLEN(output)) {
         prefix_length = cur_length =  SvCUR(output) ;
-    
+
         if (s->flags & FLAG_LIMIT_OUTPUT && SvLEN(output) - cur_length - 1 < bufinc)
         {
             Sv_Grow(output, bufinc + cur_length + 1) ;
         }
-    
-        /* Only setup the stream output pointers if there is spare 
+
+        /* Only setup the stream output pointers if there is spare
            capacity in the outout SV
         */
         if (SvLEN(output) > cur_length + 1)
@@ -1245,10 +1249,10 @@ code (s, buf, output)
             s->stream.avail_out = increment;
         }
     }
-    
+
 
     s->bytesInflated = 0;
-    
+
     while (1) {
 
         if (s->stream.avail_out == 0) {
@@ -1281,10 +1285,10 @@ code (s, buf, output)
             }
         }
 
-        if (RETVAL != LZMA_OK) 
+        if (RETVAL != LZMA_OK)
             break;
     }
-   
+
     s->last_error = RETVAL ;
     if (RETVAL == LZMA_OK || RETVAL == LZMA_STREAM_END || RETVAL == LZMA_BUF_ERROR) {
 	    unsigned in ;
@@ -1296,10 +1300,10 @@ code (s, buf, output)
         SvPOK_only(output);
         SvCUR_set(output, prefix_length + s->bytesInflated) ;
 	*SvEND(output) = '\0';
-#ifdef UTF8_AVAILABLE    
+#ifdef UTF8_AVAILABLE
         if (out_utf8)
             sv_utf8_upgrade(output);
-#endif        
+#endif
         SvSETMAGIC(output);
 
 	/* fix the input buffer */
@@ -1307,7 +1311,7 @@ code (s, buf, output)
 	    in = s->stream.avail_in ;
 	    SvCUR_set(buf, in) ;
 	    if (in)
-	        Move(s->stream.next_in, SvPVX(buf), in, char) ;	
+	        Move(s->stream.next_in, SvPVX(buf), in, char) ;
             *SvEND(buf) = '\0';
             //if (is_tainted)
                 //setTainted(buf);
@@ -1341,7 +1345,7 @@ int
 id(filter)
     Lzma::Filter    filter
   CODE:
-    RETVAL = filter->id;    
+    RETVAL = filter->id;
   OUTPUT:
 	RETVAL
 
@@ -1362,10 +1366,10 @@ _mk(want_lzma2, dict_size, lc, lp, pb, mode, nice_len, mf, depth)
     uint32_t dict_size
     uint32_t lc
     uint32_t lp
-    uint32_t pb 
+    uint32_t pb
     lzma_mode mode
-    uint32_t nice_len 
-    lzma_match_finder mf 
+    uint32_t nice_len
+    lzma_match_finder mf
     uint32_t depth
     CODE:
         lzma_options_lzma* p;
@@ -1440,7 +1444,7 @@ new()
 
 lzma_bool
 lzma_lzma_preset(s, preset)
-    Compress::Raw::Lzma::Options s 
+    Compress::Raw::Lzma::Options s
     uint32_t preset
 
 void

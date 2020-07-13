@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  2.094 13 July 2020
+
+      * Issue with Append mode & SvOOK
+        https://github.com/pmqs/Compress-Raw-Bzip2/issues/2
+        e6f1fa7d86a4c631b82b7c923a5def3e274925fa
+
   2.093 7 December 2019
 
       * No changes
@@ -8,7 +14,7 @@ CHANGES
   2.092 4 December 2019
 
       * No changes
-      
+
   2.091 23 November 2019
 
       * Silence compiler warnings
@@ -18,7 +24,7 @@ CHANGES
   2.089 3 November 2019
 
       * No Changes
-      
+
   2.088 31 October 2019
 
       * Add Support Details
@@ -30,7 +36,7 @@ CHANGES
   2.087 10 August 2019
 
       * No Changes
-      
+
   2.086 31 March 2019
 
       * Moved source to github https://github.com/pmqs/Compress-Raw-Bzip2
@@ -38,7 +44,7 @@ CHANGES
       * Add META_MERGE to Makefile.PL
 
       * Added meta-json.t & meta-yaml.t
-      
+
   2.084 5 January 2019
 
       * No Changes
@@ -111,7 +117,7 @@ CHANGES
 
   2.061 19 May 2013
 
-      * silence compiler warning by making 2nd parameter to 
+      * silence compiler warning by making 2nd parameter to
         DispStream a const char*
 
   2.060 7 January 2013
@@ -136,12 +142,12 @@ CHANGES
         [#79811]
 
       * update to ppport.h that includes SvPV_nomg_nolen
-        [#78080] 
+        [#78080]
 
   2.055 4 August 2012
 
       * Fix misuse of magic in API
-        [#78080] 
+        [#78080]
 
   2.052 29 April 2012
 
@@ -337,4 +343,3 @@ CHANGES
   2.000_10 13 March 2006
 
       * Created Compress::Raw::Bzip2
-

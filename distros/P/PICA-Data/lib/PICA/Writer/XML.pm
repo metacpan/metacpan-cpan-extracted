@@ -1,12 +1,16 @@
 package PICA::Writer::XML;
 use v5.14.1;
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 
 use Scalar::Util qw(reftype);
 use XML::Writer;
 
 use parent 'PICA::Writer::Base';
+
+sub namespace {
+    'info:srw/schema/5/picaXML-v1.0';
+}
 
 sub new {
     my $self = PICA::Writer::Base::new(@_);
@@ -16,8 +20,7 @@ sub new {
         DATA_INDENT => 2
     );
     $self->{writer}->xmlDecl('UTF-8');
-    $self->{writer}
-        ->startTag('collection', xmlns => 'info:srw/schema/5/picaXML-v1.0');
+    $self->{writer}->startTag('collection', xmlns => $self->namespace);
     $self;
 }
 
@@ -30,7 +33,7 @@ sub write_record {
 
     $writer->startTag('record');
     foreach my $field (@$record) {
-        my $id   = $field->[0];
+        my $id = $field->[0];
         my @attr = (tag => $field->[0]);
         if (defined $field->[1] && $field->[1] ne '') {
             push @attr, occurrence => $field->[1];

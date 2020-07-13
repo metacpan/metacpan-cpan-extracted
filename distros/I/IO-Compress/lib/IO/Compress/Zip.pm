@@ -4,30 +4,30 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.093 qw(:Status );
-use IO::Compress::RawDeflate 2.093 ();
-use IO::Compress::Adapter::Deflate 2.093 ;
-use IO::Compress::Adapter::Identity 2.093 ;
-use IO::Compress::Zlib::Extra 2.093 ;
-use IO::Compress::Zip::Constants 2.093 ;
+use IO::Compress::Base::Common  2.094 qw(:Status );
+use IO::Compress::RawDeflate 2.094 ();
+use IO::Compress::Adapter::Deflate 2.094 ;
+use IO::Compress::Adapter::Identity 2.094 ;
+use IO::Compress::Zlib::Extra 2.094 ;
+use IO::Compress::Zip::Constants 2.094 ;
 
 use File::Spec();
 use Config;
 
-use Compress::Raw::Zlib  2.093 (); 
+use Compress::Raw::Zlib  2.094 (); 
 
 BEGIN
 {
     eval { require IO::Compress::Adapter::Bzip2 ; 
-           import  IO::Compress::Adapter::Bzip2 2.093 ; 
+           import  IO::Compress::Adapter::Bzip2 2.094 ; 
            require IO::Compress::Bzip2 ; 
-           import  IO::Compress::Bzip2 2.093 ; 
+           import  IO::Compress::Bzip2 2.094 ; 
          } ;
          
     eval { require IO::Compress::Adapter::Lzma ; 
-           import  IO::Compress::Adapter::Lzma 2.093 ; 
+           import  IO::Compress::Adapter::Lzma 2.094 ; 
            require IO::Compress::Lzma ; 
-           import  IO::Compress::Lzma 2.093 ; 
+           import  IO::Compress::Lzma 2.094 ; 
          } ;
 }
 
@@ -36,7 +36,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, %DEFLATE_CONSTANTS, $ZipError);
 
-$VERSION = '2.093';
+$VERSION = '2.094';
 $ZipError = '';
 
 @ISA = qw(IO::Compress::RawDeflate Exporter);
@@ -1338,7 +1338,7 @@ This parameter defaults to 0.
 
 =head3 File Naming Options
 
-A quick bit of zip file terminology -- A zip archive consists of one or more I<archive members>, where each member has an associated 
+A quick bit of zip file terminology -- A zip archive consists of one or more I<archive members>, where each member has an associated
 filename, known as the I<archive member name>.
 
 The options listed in this section control how the I<archive member name> (or filename) is stored the zip archive.
@@ -1355,7 +1355,7 @@ By default when adding a filename to the zip archive, the I<archive member name>
 You should only need to use this option if you want the I<archive member name>
 to be different from the uncompressed filename or when the input is a filehandle or a buffer.
 
-The default behaviour for what I<archive member name> is used when the C<Name> option 
+The default behaviour for what I<archive member name> is used when the C<Name> option
 is I<not> specified depends on the form of the C<$input> parameter:
 
 =over 5
@@ -1365,11 +1365,11 @@ is I<not> specified depends on the form of the C<$input> parameter:
 If the C<$input> parameter is a filename, the
 value of C<$input> will be used for the I<archive member name> .
 
-=item * 
+=item *
 If the C<$input> parameter is not a filename,
 the I<archive member name> will be an empty string.
 
-=back 
+=back
 
 Note that both the C<CanonicalName> and C<FilterName> options
 can modify the value used for the I<archive member name>.
@@ -1484,7 +1484,7 @@ archive.
 
 The default is 0.
 
-=back 
+=back
 
 =head3 Deflate Compression Options
 
@@ -2087,7 +2087,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2019 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  2.094 13 July 2020
+
+      * Issue with Append mode & SvOOK
+        https://github.com/pmqs/Compress-Raw-Zlib/issues/3
+        80ee0524012f46c5984c2d57649af0b07f82c750
+
   2.093 7 December 2019
 
       * No Changes
@@ -8,7 +14,7 @@ CHANGES
   2.092 4 December 2019
 
       * No Changes
-      
+
   2.091 23 November 2019
 
       * Silence "macro expands to multiple statements" warning
@@ -547,4 +553,3 @@ CHANGES
   2.000_00 21 August 2005
 
       * First Beta relase of Compress::zlib rewrite.
-

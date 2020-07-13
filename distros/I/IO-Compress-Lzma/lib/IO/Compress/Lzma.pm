@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.093 ;
+use IO::Compress::Base 2.094 ;
 
-use IO::Compress::Base::Common  2.093 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzma 2.093 ;
+use IO::Compress::Base::Common  2.094 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzma 2.094 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzmaError);
 
-$VERSION = '2.093';
+$VERSION = '2.094';
 $LzmaError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -161,20 +161,6 @@ IO::Compress::Lzma - Write lzma files/buffers
     close $z ;
 
 =head1 DESCRIPTION
-
-B<WARNING -- This is a Beta release>.
-
-=over 5
-
-=item * DO NOT use in production code.
-
-=item * The documentation is incomplete in places.
-
-=item * Parts of the interface defined here are tentative.
-
-=item * Please report any problems you find.
-
-=back
 
 This module provides a Perl interface that allows writing lzma
 compressed data to files or buffer.
@@ -785,7 +771,7 @@ See the Changes file.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2019 Paul Marquess. All rights reserved.
+Copyright (c) 2005-2020 Paul Marquess. All rights reserved.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

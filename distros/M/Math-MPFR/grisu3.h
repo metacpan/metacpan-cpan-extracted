@@ -6,7 +6,7 @@
 	by Florian Loitsch, available at
 	http://www.cs.tufts.edu/~nr/cs257/archive/florian-loitsch/printf.pdf */
 
-
+#include <inttypes.h>
 #include <assert.h> /* assert */
 
 #ifdef _MSC_VER

@@ -1,6 +1,10 @@
 CHANGES
 -------
 
+  2.094 13 July 2020
+
+      * No changes
+
   2.093 7 December 2019
 
       * No changes
@@ -8,7 +12,7 @@ CHANGES
   2.092 4 December 2019
 
       * No changes
-    
+
   2.091 12 November 2019
 
       * No Changes
@@ -20,7 +24,7 @@ CHANGES
   2.089 3 November 2019
 
       * No Changes
-      
+
   2.088 31 October 2019
 
       * Add Support Details
@@ -32,7 +36,7 @@ CHANGES
   2.087 10 August 2019
 
       * No Changes
-      
+
   2.086 31 March 2019
 
       * Moved source to github https://github.com/pmqs/IO-Compress-Lzop
@@ -298,5 +302,3 @@ CHANGES
   2.000_08 2 March 2006
 
       * Split IO::Compress::Lzop into its own distribution.
-
-
