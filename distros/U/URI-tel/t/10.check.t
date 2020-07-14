@@ -52,9 +52,30 @@ BEGIN
 		}
 		is( $tel->canonical, $ref->{canon} );
 		my $countries = $tel->country;
+		if( join( ',', map( $_->{ 'cc' }, @$countries ) ) eq '' && scalar( @{$ref->{country}} ) )
+		{
+			print( STDERR "$u\n" );
+			printf( STDERR "Context: %s\n", $tel->context );
+			printf( STDERR "Canonical: %s\n", $tel->canonical->as_string );
+			printf( STDERR "Aton: %s\n", $tel->aton );
+		# 	printf( "Country: %s\n", scalar( $u->country )->[0]->{name} );
+			printf( STDERR "Country: %s\n", join( ', ', map( $_->{name}, @{$tel->country} ) ) );
+			printf( STDERR "Country code: %s\n", $tel->country_code );
+			my $countries = $tel->country;
+			my $codes = join( ',', map( $_->{ 'cc' }, @$countries ) );
+			print( STDERR "Country codes: $codes\n" );
+			printf( STDERR "Country name: %s\n", $tel->country_name );
+			printf( STDERR "IDD: %s\n", scalar( $tel->country )->[0]->{idd}->[0] );
+			printf( STDERR "Is global? %s\n", $tel->is_global ? 'yes' : 'no' );
+			
+			require Data::Dumper;
+			print( STDERR "Something wrong with $ref->{tel}\n" );
+			print( STDERR Data::Dumper::Dumper( $countries ), "\n" );
+			exit( 1 );
+		}
 		#diag( sprintf( "Tel $ref->{tel} has %d countries", scalar( @$countries ) ) );
-		is( join( ',', map( $_->{ 'cc' }, @$countries ) ), join( ',', @{$ref->{country}} ) );
-		is( "$tel", $ref->{uri} );
+		is( join( ',', map( $_->{ 'cc' }, @$countries ) ), join( ',', @{$ref->{country}} ), "Country codes for $ref->{tel}" );
+		is( "$tel", $ref->{uri}, "Stringification of $ref->{tel}" );
 	}
 	## 22
 	my $tel1 = URI::tel->new( '+81-03-1234-5678' );
@@ -80,7 +101,7 @@ BEGIN
 	## 27
 	#print( "Prepending context now.\n" );
 	$tel3->prepend_context( 1 );
-	is( $tel3, 'tel:+81.03-1234-5678', "Prepending context" );
+	is( $tel3, 'tel:+81-03-1234-5678', "Prepending context for $tel3" );
 }
 
 __END__

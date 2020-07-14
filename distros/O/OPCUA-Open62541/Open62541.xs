@@ -2522,6 +2522,15 @@ UA_Server_readDataType(server, nodeId, outDataType)
 	RETVAL
 
 UA_StatusCode
+UA_Server_write(server, value)
+	OPCUA_Open62541_Server		server
+	OPCUA_Open62541_WriteValue	value
+    CODE:
+	RETVAL = UA_Server_write(server->sv_server, value);
+    OUTPUT:
+	RETVAL
+
+UA_StatusCode
 UA_Server_writeDataType(server, nodeId, newDataType)
 	OPCUA_Open62541_Server		server
 	OPCUA_Open62541_NodeId		nodeId

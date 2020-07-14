@@ -21,6 +21,7 @@ lib/NewsExtractor/Error.pm
 lib/NewsExtractor/Extractor.pm
 lib/NewsExtractor/GenericExtractor.pm
 lib/NewsExtractor/JSONLDExtractor.pm
+lib/NewsExtractor/Role/ContentTextExtractor.pm
 lib/NewsExtractor/SiteSpecificExtractor.pm
 lib/NewsExtractor/SiteSpecificExtractor/ChinaTimes.pm
 lib/NewsExtractor/SiteSpecificExtractor/ETtoday.pm
@@ -39,6 +40,8 @@ lib/NewsExtractor/SiteSpecificExtractor/news_ebc_net_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/news_pts_org_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/news_tnn_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/news_tvbs_com_tw.pm
+lib/NewsExtractor/SiteSpecificExtractor/newtalk_tw.pm
+lib/NewsExtractor/SiteSpecificExtractor/talk_ltn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/turnnewsapp_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_bcc_com_tw.pm

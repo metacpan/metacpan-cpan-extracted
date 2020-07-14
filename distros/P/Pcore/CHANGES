@@ -1,3 +1,7 @@
+v0.139.0 2020-07-14T14:11:24Z
+ - resources updated
+ - switched to the new upload protocol
+
 v0.138.5 2020-07-13T09:52:11Z
  - profile set_password api method renamed
 

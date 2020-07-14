@@ -5,7 +5,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.184';
+our $VERSION = '1.185';
+
+use Quiq::JavaScript;
 
 # -----------------------------------------------------------------------------
 
@@ -45,7 +47,7 @@ Label rechts neben der Checkbox.
 
 =item name => $name (Default: undef)
 
-Name, unter dem der Button kommuniziert wird.
+Name, unter dem die Checkbox kommuniziert wird.
 
 =item onClick => $js (Default: undef)
 
@@ -161,12 +163,12 @@ sub html {
         value => $option,
         checked => defined($value) && $value eq $option? 1: 0,
         title => $title,
-        onclick => $onClick,
+        onclick => Quiq::JavaScript->line($onClick),
     );
     if ($label ne '') {
         $html .= $label;
     }
-    $html .= "\n";
+    # $html .= "\n";
 
     return $html;
 }
@@ -175,7 +177,7 @@ sub html {
 
 =head1 VERSION
 
-1.184
+1.185
 
 =head1 AUTHOR
 

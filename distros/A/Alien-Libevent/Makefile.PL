@@ -25,9 +25,6 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Alien-Libevent",
   "LICENSE" => "perl",
   "NAME" => "Alien::Libevent",
-  "PREREQ_PM" => {
-    "Alien::Base" => "0.038"
-  },
   META_MERGE => {
         resources => {
             license     => 'http://dev.perl.org/licenses/',
@@ -39,8 +36,21 @@ my %WriteMakefileArgs = (
     },
 );
 
+my %FallbackPrereqs = (
+  "Alien::Base" => "0.038",
+);
+
 my $abmm = Alien::Build::MM->new;
 %WriteMakefileArgs = $abmm->mm_args(%WriteMakefileArgs);
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  delete $WriteMakefileArgs{TEST_REQUIRES};
+  delete $WriteMakefileArgs{BUILD_REQUIRES};
+  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
 WriteMakefile(%WriteMakefileArgs);
 

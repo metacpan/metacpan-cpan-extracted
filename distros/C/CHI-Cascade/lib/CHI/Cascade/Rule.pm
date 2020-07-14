@@ -106,11 +106,11 @@ sub ttl {
     return undef;
 }
 
-sub target      { shift->{matched_target}       }
-sub params      { shift->{params}               }
-sub cascade     { shift->{cascade}              }
-sub dep_values  { shift->{dep_values}           }
-sub stash       { shift->{run_instance}{stash}  }
+sub target      { shift->{matched_target} }
+sub params      { shift->{params}         }
+sub cascade     { shift->{cascade}        }
+sub dep_values  { shift->{dep_values}     }
+sub stash       { $_[0]->{run_instance} && $_[0]->{run_instance}{stash} || die "The run_instance is not defined!" }
 
 1;
 __END__

@@ -12,7 +12,7 @@ use Mojo::Promise;
 use curry;
 use Exporter 'import';
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 our @EXPORT_OK = qw(promise_code);
 
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
@@ -433,11 +433,38 @@ Register renderer in L<Mojolicious> application.
 Exportable is the function C<promise_code>, which returns a hash-ref
 suitable for passing as the 8th argument to L<GraphQL::Execution/execute>.
 
+=head1 SUBSCRIPTIONS
+
+To use subscriptions within your web app, just insert this JavaScript:
+
+  <script src="//unpkg.com/subscriptions-transport-ws@0.9.16/browser/client.js"></script>
+  # ...
+  const subscriptionsClient = new window.SubscriptionsTransportWs.SubscriptionClient(websocket_uri, {
+    reconnect: true
+  });
+  subscriptionsClient.request({
+    query: "subscription s($c: [String!]) {subscribe(channels: $c) {channel username dateTime message}}",
+    variables: { c: channel },
+  }).subscribe({
+    next(payload) {
+      var msg = payload.data.subscribe;
+      console.log(msg.username + ' said', msg.message);
+    },
+    error: console.error,
+  });
+
+Note the use of parameterised queries, where you only need to change
+the C<variables> parameter. The above is adapted from the sample app,
+L<https://github.com/graphql-perl/sample-mojolicious>.
+
 =head1 SEE ALSO
 
 L<GraphQL>
 
 L<GraphQL::Plugin::Convert>
+
+L<https://github.com/apollographql/subscriptions-transport-ws#client-browser>
+- Apollo documentation
 
 =head1 AUTHOR
 

@@ -1,4 +1,6 @@
 package App::Acmeman::Log;
+use strict;
+use warnings;
 use File::Basename;
 use parent 'Exporter';
 

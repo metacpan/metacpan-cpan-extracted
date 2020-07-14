@@ -9,7 +9,6 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(CERT_FILE KEY_FILE CA_FILE);
 our %EXPORT_TAGS = ( files => [ qw(CERT_FILE KEY_FILE CA_FILE) ] );
-our $VERSION = '1.00';
 
 use constant {
     CERT_FILE => 0,

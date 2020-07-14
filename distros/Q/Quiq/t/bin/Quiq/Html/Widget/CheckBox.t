@@ -23,14 +23,16 @@ sub test_html : Test(2) {
     my $h = Quiq::Html::Tag->new('html5');
 
     my $html = Quiq::Html::Widget::CheckBox->html($h);
-    $self->is($html,qq|<input type="checkbox">\n|);
+    # $self->is($html,qq|<input type="checkbox">\n|);
+    $self->is($html,qq|<input type="checkbox">|);
 
     $html = Quiq::Html::Widget::CheckBox->html($h,
         name => 'aktiv',
         option => 1,
         value => '',
     );
-    $self->is($html,qq|<input type="checkbox" name="aktiv" value="1">\n|);
+    # $self->is($html,qq|<input type="checkbox" name="aktiv" value="1">\n|);
+    $self->is($html,qq|<input type="checkbox" name="aktiv" value="1">|);
 }
 
 # -----------------------------------------------------------------------------

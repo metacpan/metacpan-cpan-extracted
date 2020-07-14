@@ -14,11 +14,13 @@ if (my ($i) = grep {$ARGV[$_] =~ /^-(\d+)$/} (0 .. @ARGV - 1)) {
     $number = -(splice @ARGV, $i, 1);
 }
 
+my $abbrev = grep {$_ eq '-B'} @ARGV;
+
 GetOptions(
     'from|f=s'   => \(my $from),
     'to|t:s'     => \(my $to),
     'schema|s=s' => \(my $schema),
-    'build|b'    => \(my $build),
+    'build|B|b'  => \(my $build),
     'unknown|u!' => \(my $report_unknown),
     'count|c'    => \(my $count),
     'path|p=s'   => \(my $path),
@@ -45,11 +47,10 @@ my %types = (
 );
 
 my $input = '-';
-$from = shift @ARGV if @ARGV && !$from && $types{lc $ARGV[0]};
 if (!defined $path) {
     my $pattern = '[012.][0-9.][0-9.][A-Z@.](\$[^|]+)?';
     my @pathes;
-    while (@ARGV && $ARGV[0] =~ /^$pattern(\|$pattern)*$/) {
+    while (@ARGV && $ARGV[0] =~ /^$pattern(\s*\|\s*($pattern)?)*$/) {
         push @pathes, shift @ARGV;
     }
     $path = join '|', @pathes;
@@ -61,7 +62,7 @@ if (defined $path) {
     @pathes = map {
         my $p = eval {PICA::Path->new($_)};
         $p || die "invalid pica path: $_\n";
-    } split /\|/, $path;
+    } grep {$_ ne ""} split /\s*\|\s*/, $path;
 
     $sfpath = sum map {length $_->subfields > 0} @pathes;
     die
@@ -155,9 +156,11 @@ if ($count) {
         qw(records invalid holdings items fields);
 }
 
-print JSON::PP->new->indent->space_after->canonical->convert_blessed->encode(
-    $builder->schema)
-    if $builder;
+if ($builder) {
+    my $JSON = JSON::PP->new->indent->space_after->canonical->convert_blessed;
+    my $schema = $builder->schema;
+    print $JSON->encode($abbrev ? $schema->abbreviated : $schema);
+}
 
 __END__
 
@@ -167,7 +170,7 @@ picadata - parse and validate PICA+ data
 
 =head1 SYNOPSIS
 
-picadata [[--from] TYPE] [--schema FILE] [--to [TYPE]] {OPTIONS} [FILE]
+picadata [--from TYPE] [--schema FILE] [--to TYPE] {OPTIONS} [FILE]
 
 =head1 DESCRIPTION
 
@@ -204,10 +207,6 @@ Limit the record to fields specified by a simple PICA Path expression. Multiple
 expressions can be separated by or C<|>. Expressions must either all reference
 fields or all reference subfields, the latter to emit subfield values.
 
-=head2 --number, -n
-
-Stop ofter parsing C<n> records. Option can be abbreviated as C<-1>, C<-2>...
-
 =head2 --schema, -s
 
 L<Avram Schema|http://format.gbv.de/schema/avram/specification> to validate
@@ -215,11 +214,11 @@ against.
 
 =head2 --unknown, -u
 
-Report unknown fields and subfields when validating (disabled by default).
+Report unknown fields and subfields on validation (disabled by default).
 
-=head2 --build, -b
+=head2 --build, -b, -B
 
-Build an Avram schema from given records.
+Build an Avram schema from records. Option C<-B> abbreviates the schema.
 
 =head2 -C
 

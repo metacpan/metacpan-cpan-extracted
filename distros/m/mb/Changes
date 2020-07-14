@@ -1,5 +1,14 @@
 Revision history for this software.
 
+0.05  2020-07-15 00:00:00
+  - removed some tests to avoid FAIL on MSWin32(I beg better idea).
+  - created by INABA Hitoshi
+
+0.04  2020-07-14 00:00:00
+  - allows calling subroutines without parentheses, chop, chr, do, dosglob, eval, index, index_byte, lc, lcfirst, length, ord, require, reverse, rindex, rindex_byte, substr, tr, uc, ucfirst, split, chdir, and unlink
+  - self support confess() for MBCS encoding
+  - created by INABA Hitoshi
+
 0.03  2020-07-13 00:00:00
   - support s###
   - fix (?:@{mb::_dot}) to (?:@{[@mb::_dot]}), and so on

@@ -53,6 +53,7 @@ OPCUA_Open62541_ReferenceTypeAttributes	T_PTROBJ_PACKED
 OPCUA_Open62541_VariableAttributes	T_PTROBJ_PACKED
 OPCUA_Open62541_VariableTypeAttributes	T_PTROBJ_PACKED
 OPCUA_Open62541_ViewAttributes		T_PTROBJ_PACKED
+OPCUA_Open62541_WriteValue		T_PTROBJ_PACKED
 # special objects, not converted to hashes
 OPCUA_Open62541_Server			T_PTROBJ_SPECIAL
 OPCUA_Open62541_ServerConfig		T_PTROBJ_SPECIAL

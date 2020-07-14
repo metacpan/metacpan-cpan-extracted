@@ -4,13 +4,6 @@ author:
   - 'Thibault Duponchelle <thibault.duponchelle@gmail.com>'
 build_requires:
   Alien::Build::MM: '0.25'
-  Archive::Tar: '0'
-  Config: '0'
-  HTTP::Tiny: '0.044'
-  Mojo::DOM58: '1.00'
-  Sort::Versions: '0'
-  URI: '0'
-  URI::Escape: '0'
 configure_requires:
   Alien::Build: '1.19'
   Alien::Build::MM: '0.25'
@@ -35,7 +28,7 @@ resources:
   homepage: https://metacpan.org/release/Alien-Libevent
   license: http://dev.perl.org/licenses/
   repository: https://github.com/thibaultduponchelle/Alien-Libevent.git
-version: '2.3'
+version: '2.4'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.26'
   requires:
@@ -43,7 +36,9 @@ x_alienfile:
       Archive::Tar: '0'
       Config: '0'
       HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
       Mojo::DOM58: '1.00'
+      Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'

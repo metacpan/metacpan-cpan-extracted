@@ -4,11 +4,10 @@ use warnings;
 use parent 'App::Acmeman::Source';
 
 sub new {
-    my $self;
     shift; # Skip class name.
-    eval {
+    my $self = eval {
 	require App::Acmeman::Source::Apache;
-        $self = new App::Acmeman::Source::Apache(@_);
+        new App::Acmeman::Source::Apache(@_);
     };
     if ($@) {
 	(my $s = $@) =~ s{ at /.+$}{};

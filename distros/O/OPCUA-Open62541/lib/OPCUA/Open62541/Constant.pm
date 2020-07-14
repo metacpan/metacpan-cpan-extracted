@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.014';
+our $VERSION = '0.020';
 
 # Even if we declare more than 10k constants, this is a fast way to do it.
 my $consts = <<'EOCONST';

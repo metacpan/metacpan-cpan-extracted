@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.28';
+our $VERSION = '3.29';
 
 use vars qw(@ALL_TESTS);
 
@@ -80,6 +80,7 @@ our @BROWSER_TESTS = qw(
     epiphany       ucbrowser        dalvik
     edge           pubsub           adm
     brave          imagesearcherpro polaris
+    edgelegacy
 );
 
 our @IE_TESTS = qw(
@@ -631,7 +632,7 @@ sub _init_core {
     # Detect engine
     $self->{engine_version} = undef;
 
-    if ( $ua =~ m{(?:edg|edga|edge|edgios)/([\d.]+)} ) {
+    if ( $ua =~ m{edge/([\d\.]+)} ) {
         $tests->{edgehtml}      = 1;
         $self->{engine_version} = $1;
     }
@@ -675,11 +676,17 @@ sub _init_core {
         $browser = 'epiphany';
         $browser_tests->{epiphany} = 1;
     }
-    elsif ( $ua =~ m{(?:edg|edga|edge|edgios)/[\d.]+} ) {
+    elsif ( $ua =~ m{(?:edg|edga|edgios)/[\d.]+} ) {
         $browser        = 'edge';
         $browser_string = 'Edge';
 
         $browser_tests->{edge} = 1;
+    }
+    elsif ( $ua =~ m{edge/[\d.]+} ) {
+        $browser        = 'edge';
+        $browser_string = 'Edge';
+
+        $browser_tests->{edgelegacy} = 1;
     }
     elsif (
         $ua =~ m{
@@ -1820,7 +1827,10 @@ sub _init_version {
         # specific approaches and go straight to the generic ones.
     }
     elsif ( $browser_tests->{edge} ) {
-        ( $major, $minor, $beta ) = $ua =~ m{Edge/(\d+)(.\d+)(.\d+)?};
+        ( $major, $minor, $beta ) = $ua =~ m{Edge/(\d+)\.(\d+)\.?(\d+)?}i;
+        ( $major, $minor, $beta )
+            = $ua =~ m{(?:Edg|EdgA|EdgiOS)/(\d+)\.(\d+)\.?(\d+)\.?(\d+)?}i
+            unless defined $major;
     }
     elsif ( $browser_tests->{safari} ) {
 
@@ -2715,7 +2725,7 @@ sub engine_string {
         return 'MSIE';
     }
 
-    if ( $self->edge ) {
+    if ( $self->edgelegacy ) {
         return 'EdgeHTML';
     }
 
@@ -2974,7 +2984,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.28
+version 3.29
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.184';
+our $VERSION = '1.185';
 
 use Quiq::Css;
 use Quiq::Template;
@@ -1397,7 +1397,7 @@ sub tag {
 
         if ($key eq 'style' && ref($val)) {
             # liefert undef, wenn Array leer ist
-            $val = Quiq::Css->rules(@$val);
+            $val = Quiq::Css->properties(@$val);
         }
         if (defined $val) {
             if ($checkLevel >= 2) {
@@ -2178,7 +2178,7 @@ sub import {
 
 =head1 VERSION
 
-1.184
+1.185
 
 =head1 AUTHOR
 

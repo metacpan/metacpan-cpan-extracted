@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use base 'Template::Base';
 
-our $VERSION   = '3.008';
+our $VERSION   = '3.009';
 
 our $DEBUG;
 $DEBUG     = 0 unless defined $DEBUG;
@@ -35,7 +35,7 @@ our $PLUGINS   = 'Template::Plugins';
 our $PROVIDER  = 'Template::Provider';
 our $SERVICE   = 'Template::Service';
 our $STASH;
-$STASH     = 'Template::Stash::XS';
+$STASH     = 'Template::Stash';
 our $CONSTANTS = 'Template::Namespace::Constants';
 
 our $LATEX_PATH;

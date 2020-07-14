@@ -81,10 +81,10 @@ sub _upload ( $self, $auth, $args, $on_start, $on_finish, $on_hash = undef ) {
         }
 
         # NOTE new protocol
-        # my $chunk = delete $args->{chunk};
+        my $chunk = delete $args->{chunk};
 
         # NOTE old protocol
-        my $chunk = P->data->from_b64( delete $args->{chunk} );
+        # my $chunk = P->data->from_b64( delete $args->{chunk} );
 
         $upload->{uploaded_size} += length $chunk;
 

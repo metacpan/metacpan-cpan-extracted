@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<collection>
-  <ppxml:record xmlns:ppxml="http://www.oclcpica.org/xmlns/ppxml-1.0">
+<ppxml:collection xmlns:ppxml="http://www.oclcpica.org/xmlns/ppxml-1.0">
+  <ppxml:record>
     <ppxml:global opacflag="" status="">
       <ppxml:tag id="001@" occ="">
         <ppxml:subf id="0">11-12,66</ppxml:subf>
@@ -225,4 +225,4 @@
       </ppxml:copy>
     </ppxml:owner>
   </ppxml:record>
-</collection>
+</ppxml:collection>

@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.28'
+version: '3.29'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -605,7 +605,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.28
+          tag: v3.29
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -747,6 +747,7 @@ x_contributors:
   - 'Marco Fontani <MFONTANI@cpan.org>'
   - 'Maros Kollar <maros@k-1.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'motxx <motohiko.ave@gmail.com>'
   - 'Nicolas Doye <nic@worldofnic.org>'
   - 'Olaf Alders <olaf.alders@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'

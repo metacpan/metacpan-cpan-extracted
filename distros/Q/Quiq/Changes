@@ -1,3 +1,42 @@
+1.185 2020-07-14
+================
+
+[Quiq::Database::ResultSet]
+* asTable() - Newline angefügt
+
+[Quiq::Epuch]
+* tzOffset() - Methode hinzugefügt
+
+[Quiq::Html::Widget::Button]
+* html() - Wert des Attributs "onClick" wird einzeilig gemacht
+
+[Quiq::Html::Widget::CheckBox]
+* html() - Wert des Attributs "onClick" wird einzeilig gemacht
+
+[Quiq::Html::Tag]
+* tag() - Behandlung von Attribut "style" korrigiert
+
+[Quiq::PlotlyJs]
+* Klasse hinzugefügt
+
+[Quiq::PlotlyJs::TimeSeries]
+* Überarbeitet. Wird abgelöst durch Quiq::PlotlyJs::TimeSeries::DiagramGroup.
+
+[Quiq::PlotlyJs::TimeSeries::DiagramGroup]
+* Klasse hinzugefügt
+
+[Quiq::PlotlyJs::TimeSeries::Parameter]
+* Klasse hinzugefügt
+
+[Quiq::Process]
+* Doku bearbeitet
+
+[Quiq::String]
+* joinLines() - Methode hinzugefügt
+
+[Quiq::Unindent]
+* Optionale Zeilenfortsetzung zu allen Methoden hinzugefügt
+
 1.184 2020-06-29
 ================
 

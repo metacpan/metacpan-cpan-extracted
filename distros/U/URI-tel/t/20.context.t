@@ -28,7 +28,9 @@ BEGIN
 			}
 			$i--;
 		}
-		push( @tels, { test => "\+${idd}-${local}", expect => '+' . $idd } );
+		#my $ccodes = join( ',', map( $_->{cc}, @{$URI::tel::COUNTRIES->{ $idd }} ) );
+		my $cc = $URI::tel::COUNTRIES->{ $idd }->[0]->{cc};
+		push( @tels, { test => "\+${idd}-${local}", expect => '+' . $idd, cc => $cc } );
 	}
 	foreach my $test ( @tels )
 	{
@@ -36,8 +38,9 @@ BEGIN
 		my $idd = $t->context;
 		$idd =~ s/-//g;
 		is( $idd, $test->{expect}, $test->{test} );
+		is( $t->country_code, $test->{cc}, $test->{test} );
 	}
-	done_testing( scalar( @tels ) );
+	done_testing( scalar( @tels ) * 2 );
 }
 
 __END__

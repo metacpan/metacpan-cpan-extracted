@@ -60,7 +60,6 @@
 *.otap.co;*.otap.co
 *.owo.codes;*.owo.codes
 *.pg;*.pg
-*.platform.sh;*.platform.sh
 *.platformsh.site;*.platformsh.site
 *.quipelements.com;*.quipelements.com
 *.r.appspot.com;*.r.appspot.com
@@ -265,7 +264,6 @@ aibetsu.hokkaido.jp;aibetsu.hokkaido.jp
 aichi.jp;aichi.jp
 aid.pl;aid.pl
 aig;aig
-aigo;aigo
 aikawa.kanagawa.jp;aikawa.kanagawa.jp
 ainan.ehime.jp;ainan.ehime.jp
 aioi.hyogo.jp;aioi.hyogo.jp
@@ -737,6 +735,7 @@ bbs.tr;bbs.tr
 bbt;bbt
 bbva;bbva
 bc.ca;bc.ca
+bc.platform.sh;bc.platform.sh
 bcg;bcg
 bci.dnstrace.pro;bci.dnstrace.pro
 bcn;bcn
@@ -1396,6 +1395,7 @@ cloudeity.net;cloudeity.net
 cloudera.site;cloudera.site
 cloudfront.net;cloudfront.net
 cloudfunctions.net;cloudfunctions.net
+cloudjiffy.net;cloudjiffy.net
 cloudns.asia;cloudns.asia
 cloudns.biz;cloudns.biz
 cloudns.cc;cloudns.cc
@@ -1754,6 +1754,7 @@ cruises;cruises
 cryptonomic.net;cryptonomic.net
 cs.it;cs.it
 csc;csc
+csx.cc;csx.cc
 ct.it;ct.it
 ct.us;ct.us
 cu;cu
@@ -1963,6 +1964,7 @@ dontexist.net;dontexist.net
 dontexist.org;dontexist.org
 doomdns.com;doomdns.com
 doomdns.org;doomdns.org
+dopaas.com;dopaas.com
 doshi.yamanashi.jp;doshi.yamanashi.jp
 dot;dot
 dovre.no;dovre.no
@@ -2220,7 +2222,6 @@ edu.za;edu.za
 edu.zm;edu.zm
 education;education
 education.museum;education.museum
-education.tas.edu.au;education.tas.edu.au
 educational.museum;educational.museum
 educator.aero;educator.aero
 edugit.org;edugit.org
@@ -2282,6 +2283,7 @@ eniwa.hokkaido.jp;eniwa.hokkaido.jp
 enna.it;enna.it
 enonic.io;enonic.io
 ens.tn;ens.tn
+ent.platform.sh;ent.platform.sh
 enterprisecloud.nu;enterprisecloud.nu
 enterprises;enterprises
 entertainment.aero;entertainment.aero
@@ -2342,6 +2344,7 @@ eu.com;eu.com
 eu.int;eu.int
 eu.meteorapp.com;eu.meteorapp.com
 eu.org;eu.org
+eu.platform.sh;eu.platform.sh
 eun.eg;eun.eg
 eurovision;eurovision
 eus;eus
@@ -3532,6 +3535,7 @@ iitate.fukushima.jp;iitate.fukushima.jp
 iiyama.nagano.jp;iiyama.nagano.jp
 iizuka.fukuoka.jp;iizuka.fukuoka.jp
 iizuna.nagano.jp;iizuna.nagano.jp
+ik-server.com;ik-server.com
 ikano;ikano
 ikaruga.nara.jp;ikaruga.nara.jp
 ikata.ehime.jp;ikata.ehime.jp
@@ -3876,6 +3880,7 @@ jan-mayen.no;jan-mayen.no
 java;java
 jaworzno.pl;jaworzno.pl
 jcb;jcb
+jcloud.ik-server.com;jcloud.ik-server.com
 jcp;jcp
 jdevcloud.com;jdevcloud.com
 jdf.br;jdf.br
@@ -3884,6 +3889,14 @@ jeep;jeep
 jefferson.museum;jefferson.museum
 jeju.kr;jeju.kr
 jelastic.com;jelastic.com
+jelastic.regruhosting.ru;jelastic.regruhosting.ru
+jelastic.saveincloud.net;jelastic.saveincloud.net
+jelastic.team;jelastic.team
+jele.cloud;jele.cloud
+jele.club;jele.club
+jele.host;jele.host
+jele.io;jele.io
+jele.site;jele.site
 jelenia-gora.pl;jelenia-gora.pl
 jeonbuk.kr;jeonbuk.kr
 jeonnam.kr;jeonnam.kr
@@ -6068,6 +6081,7 @@ ooshika.nagano.jp;ooshika.nagano.jp
 open;open
 openair.museum;openair.museum
 opencraft.hosting;opencraft.hosting
+opensocial.site;opensocial.site
 operaunite.com;operaunite.com
 opoczno.pl;opoczno.pl
 opole.pl;opole.pl
@@ -6350,6 +6364,7 @@ padova.it;padova.it
 padua.it;padua.it
 page;page
 pagefrontapp.com;pagefrontapp.com
+pages.wiardweb.com;pages.wiardweb.com
 pagespeedmobilizer.com;pagespeedmobilizer.com
 pagexl.com;pagexl.com
 palace.museum;palace.museum
@@ -6724,6 +6739,7 @@ reggio-calabria.it;reggio-calabria.it
 reggio-emilia.it;reggio-emilia.it
 reggiocalabria.it;reggiocalabria.it
 reggioemilia.it;reggioemilia.it
+regruhosting.ru;regruhosting.ru
 rehab;rehab
 reise;reise
 reisen;reisen
@@ -7053,6 +7069,7 @@ sauda.no;sauda.no
 sauherad.no;sauherad.no
 savannahga.museum;savannahga.museum
 save;save
+saveincloud.net;saveincloud.net
 saves-the-whales.com;saves-the-whales.com
 savona.it;savona.it
 saxo;saxo
@@ -8267,6 +8284,7 @@ us.gov.pl;us.gov.pl
 us.kg;us.kg
 us.na;us.na
 us.org;us.org
+us.platform.sh;us.platform.sh
 usa.museum;usa.museum
 usa.oita.jp;usa.oita.jp
 usantiques.museum;usantiques.museum
@@ -8572,6 +8590,7 @@ wf;wf
 whaling.museum;whaling.museum
 whoswho;whoswho
 wi.us;wi.us
+wiardweb.com;wiardweb.com
 wielun.pl;wielun.pl
 wien;wien
 wien.funkfeuer.at;wien.funkfeuer.at
@@ -8615,6 +8634,7 @@ world;world
 worse-than.tv;worse-than.tv
 wow;wow
 wpdevcloud.com;wpdevcloud.com
+wpenginepowered.com;wpenginepowered.com
 writesthisblog.com;writesthisblog.com
 wroc.pl;wroc.pl
 wroclaw.pl;wroclaw.pl
@@ -9009,7 +9029,6 @@ zw;zw
 慈善;xn--30rr7y
 我爱你;xn--6qq986b3xl
 手机;xn--kput3i
-手表;xn--kpu716f
 招聘;xn--otu796d
 政务;xn--zfr164b
 政府;xn--mxtq1m
@@ -9034,7 +9053,6 @@ zw;zw
 澳门;xn--mix082f
 点看;xn--3pxu8k
 熊本.jp;xn--8pvr4u.jp
-珠宝;xn--pbt977c
 石川.jp;xn--5rtp49c.jp
 神奈川.jp;xn--ntso0iqx3a.jp
 福井.jp;xn--elqq16h.jp

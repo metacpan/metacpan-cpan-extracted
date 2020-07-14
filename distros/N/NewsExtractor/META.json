@@ -45,7 +45,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.30.0"
+         "version" : "v0.31.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -73,6 +73,9 @@
       },
       "NewsExtractor::JSONLDExtractor" : {
          "file" : "lib/NewsExtractor/JSONLDExtractor.pm"
+      },
+      "NewsExtractor::Role::ContentTextExtractor" : {
+         "file" : "lib/NewsExtractor/Role/ContentTextExtractor.pm"
       },
       "NewsExtractor::SiteSpecificExtractor" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor.pm"
@@ -127,6 +130,12 @@
       },
       "NewsExtractor::SiteSpecificExtractor::news_tvbs_com_tw" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/news_tvbs_com_tw.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::newtalk_tw" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/newtalk_tw.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::talk_ltn_com_tw" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/talk_ltn_com_tw.pm"
       },
       "NewsExtractor::SiteSpecificExtractor::turnnewsapp_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/turnnewsapp_com.pm"
@@ -196,7 +205,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.30.0",
+   "version" : "v0.31.0",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

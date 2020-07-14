@@ -1,5 +1,12 @@
 Revision history for Kafka package
 
+1.08
+    Add support SASL authentication support
+
+    Use Dist::Zilla static_install
+
+    Migrate to milla
+
 1.07 Sun September 17 2017
 
     Added support for v1 Messages at Producer side, which allows

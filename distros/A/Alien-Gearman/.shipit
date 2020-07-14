@@ -1,1 +1,0 @@
-steps = CheckChangeLog, DistTest, Commit, MakeDist, UploadCPAN

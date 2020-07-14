@@ -22,14 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build::MM" : "0.25",
-            "Archive::Tar" : "0",
-            "Config" : "0",
-            "HTTP::Tiny" : "0.044",
-            "Mojo::DOM58" : "1.00",
-            "Sort::Versions" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
+            "Alien::Build::MM" : "0.25"
          }
       },
       "configure" : {
@@ -60,7 +53,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.3",
+   "version" : "2.4",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.26",
       "requires" : {
@@ -68,7 +61,9 @@
             "Archive::Tar" : "0",
             "Config" : "0",
             "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"

@@ -30,7 +30,7 @@ package Template::Grammar;
 use strict;
 use warnings;
 
-our $VERSION  = '3.008';
+our $VERSION  = '3.009';
 
 my (@RESERVED, %CMPOP, $LEXTABLE, $RULES, $STATES);
 my ($factory, $rawstart);
@@ -138,3808 +138,3900 @@ BEGIN {
 $STATES = [
 	{#State 0
 		ACTIONS => {
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			'LITERAL' => 51,
-			'NOT' => 43,
-			"{" => 45,
-			'SET' => 37,
-			'META' => 38,
-			'CLEAR' => 39,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			"\${" => 33,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'DEBUG' => 66,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'NEXT' => 53,
-			'TEXT' => 56,
-			'IF' => 57,
-			'USE' => 12,
-			"(" => 14,
-			'REF' => 15,
-			"[" => 16,
-			'LAST' => 9,
-			'THROW' => 10,
-			"\"" => 11,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'FILTER' => 6,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'FILTER' => 68,
+			'WHILE' => 60,
+			'USE' => 59,
+			"(" => 61,
+			"{" => 62,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'SET' => 52,
+			'META' => 53,
+			'NEXT' => 49,
+			'IF' => 34,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			'THROW' => 38,
+			'STOP' => 39,
+			"[" => 41,
+			'NUMBER' => 23,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'GET' => 27,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'FOR' => 30,
+			'LAST' => 14,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'WRAPPER' => 19,
+			'CLEAR' => 20,
+			'RETURN' => 22,
+			"\${" => 21,
 			";" => -18,
-			'NUMBER' => 1,
-			'MACRO' => 25,
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'RAWPERL' => 20,
-			'GET' => 22,
-			'IDENT' => 24,
-			'FOR' => 23,
-			"\$" => 17,
-			'CALL' => 18
+			'TEXT' => 7,
+			'CALL' => 8,
+			'MACRO' => 10,
+			'UNLESS' => 9,
+			'DEFAULT' => 2,
+			'PROCESS' => 4
 		},
 		DEFAULT => -3,
 		GOTOS => {
-			'expr' => 44,
-			'node' => 46,
-			'lterm' => 47,
-			'setlist' => 13,
-			'directive' => 52,
-			'filter' => 50,
-			'use' => 32,
-			'condition' => 31,
-			'capture' => 2,
-			'ident' => 34,
-			'anonblock' => 35,
-			'atomdir' => 36,
-			'switch' => 3,
-			'defblock' => 7,
-			'chunks' => 8,
-			'wrapper' => 40,
-			'loop' => 63,
-			'rawperl' => 26,
-			'view' => 65,
-			'assign' => 69,
+			'loop' => 45,
+			'statement' => 11,
+			'template' => 54,
+			'atomdir' => 6,
+			'directive' => 51,
+			'defblockname' => 50,
+			'atomexpr' => 35,
+			'setlist' => 37,
+			'rawperl' => 3,
+			'sterm' => 36,
+			'block' => 1,
+			'lterm' => 42,
+			'try' => 5,
+			'view' => 40,
+			'ident' => 24,
+			'condition' => 33,
+			'perl' => 73,
+			'anonblock' => 28,
 			'macro' => 70,
-			'block' => 29,
-			'atomexpr' => 73,
-			'template' => 71,
-			'item' => 72,
-			'try' => 30,
-			'chunk' => 58,
-			'defblockname' => 19,
-			'term' => 55,
-			'sterm' => 54,
-			'statement' => 21,
-			'perl' => 61
+			'filter' => 69,
+			'use' => 72,
+			'chunk' => 71,
+			'item' => 29,
+			'node' => 57,
+			'term' => 15,
+			'wrapper' => 56,
+			'capture' => 55,
+			'assign' => 18,
+			'expr' => 58,
+			'chunks' => 63,
+			'defblock' => 65,
+			'switch' => 64
 		}
 	},
 	{#State 1
-		DEFAULT => -114
+		DEFAULT => -1
 	},
 	{#State 2
-		DEFAULT => -11
+		ACTIONS => {
+			'IDENT' => 13,
+			'LITERAL' => 75,
+			"\${" => 21,
+			"\$" => 48
+		},
+		GOTOS => {
+			'item' => 29,
+			'ident' => 74,
+			'assign' => 18,
+			'node' => 57,
+			'setlist' => 76
+		}
 	},
 	{#State 3
-		DEFAULT => -22
+		DEFAULT => -15
 	},
 	{#State 4
 		ACTIONS => {
-			";" => 74
+			"\$" => 79,
+			"\"" => 80,
+			'LITERAL' => 82,
+			'FILENAME' => 81,
+			'IDENT' => 84,
+			'NUMBER' => 83
+		},
+		GOTOS => {
+			'names' => 78,
+			'name' => 86,
+			'filename' => 87,
+			'filepart' => 77,
+			'nameargs' => 85
 		}
 	},
 	{#State 5
-		ACTIONS => {
-			'LITERAL' => 77,
-			'IDENT' => 84,
-			'FILENAME' => 83,
-			"\$" => 82,
-			"\"" => 81,
-			'NUMBER' => 79
-		},
-		GOTOS => {
-			'filename' => 80,
-			'filepart' => 78,
-			'nameargs' => 76,
-			'name' => 85,
-			'names' => 75
-		}
-	},
-	{#State 6
-		ACTIONS => {
-			"\"" => 91,
-			"\${" => 33,
-			'NUMBER' => 79,
-			"\$" => 93,
-			'IDENT' => 92,
-			'FILENAME' => 83,
-			'LITERAL' => 86
-		},
-		GOTOS => {
-			'nameargs' => 87,
-			'lvalue' => 88,
-			'filename' => 80,
-			'item' => 89,
-			'filepart' => 78,
-			'names' => 75,
-			'lnameargs' => 90,
-			'name' => 85
-		}
-	},
-	{#State 7
-		DEFAULT => -9
-	},
-	{#State 8
-		ACTIONS => {
-			'LAST' => 9,
-			'THROW' => 10,
-			"\"" => 11,
-			"[" => 16,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			";" => -18,
-			'NUMBER' => 1,
-			'FILTER' => 6,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'CALL' => 18,
-			"\$" => 17,
-			'GET' => 22,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'RAWPERL' => 20,
-			'NOT' => 43,
-			"{" => 45,
-			'LITERAL' => 51,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			"\${" => 33,
-			'CLEAR' => 39,
-			'META' => 38,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'SET' => 37,
-			'DEBUG' => 66,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'TEXT' => 56,
-			'IF' => 57,
-			'NEXT' => 53,
-			'DEFAULT' => 60,
-			'WHILE' => 59
-		},
-		DEFAULT => -2,
-		GOTOS => {
-			'rawperl' => 26,
-			'view' => 65,
-			'loop' => 63,
-			'try' => 30,
-			'item' => 72,
-			'atomexpr' => 73,
-			'assign' => 69,
-			'macro' => 70,
-			'term' => 55,
-			'sterm' => 54,
-			'chunk' => 94,
-			'defblockname' => 19,
-			'perl' => 61,
-			'statement' => 21,
-			'expr' => 44,
-			'filter' => 50,
-			'directive' => 52,
-			'setlist' => 13,
-			'lterm' => 47,
-			'node' => 46,
-			'ident' => 34,
-			'capture' => 2,
-			'condition' => 31,
-			'use' => 32,
-			'wrapper' => 40,
-			'defblock' => 7,
-			'switch' => 3,
-			'anonblock' => 35,
-			'atomdir' => 36
-		}
-	},
-	{#State 9
-		DEFAULT => -39
-	},
-	{#State 10
-		ACTIONS => {
-			"\$" => 82,
-			"\"" => 81,
-			'NUMBER' => 79,
-			'LITERAL' => 77,
-			'IDENT' => 84,
-			'FILENAME' => 83
-		},
-		GOTOS => {
-			'nameargs' => 95,
-			'filename' => 80,
-			'filepart' => 78,
-			'name' => 85,
-			'names' => 75
-		}
-	},
-	{#State 11
-		DEFAULT => -177,
-		GOTOS => {
-			'quoted' => 96
-		}
-	},
-	{#State 12
-		ACTIONS => {
-			'LITERAL' => 86,
-			'IDENT' => 92,
-			"\$" => 93,
-			'NUMBER' => 79,
-			"\${" => 33,
-			"\"" => 91,
-			'FILENAME' => 83
-		},
-		GOTOS => {
-			'item' => 89,
-			'filename' => 80,
-			'lvalue' => 88,
-			'nameargs' => 87,
-			'name' => 85,
-			'lnameargs' => 97,
-			'names' => 75,
-			'filepart' => 78
-		}
-	},
-	{#State 13
-		ACTIONS => {
-			'LITERAL' => 100,
-			'IDENT' => 24,
-			"\$" => 17,
-			"\${" => 33,
-			'COMMA' => 101
-		},
-		DEFAULT => -19,
-		GOTOS => {
-			'assign' => 98,
-			'node' => 46,
-			'item' => 72,
-			'ident' => 99
-		}
-	},
-	{#State 14
-		ACTIONS => {
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\$" => 17,
-			'IDENT' => 24,
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43,
-			'REF' => 15,
-			"(" => 14,
-			"[" => 16,
-			'LITERAL' => 51
-		},
-		GOTOS => {
-			'item' => 72,
-			'node' => 46,
-			'lterm' => 47,
-			'assign' => 102,
-			'ident' => 104,
-			'term' => 55,
-			'sterm' => 54,
-			'expr' => 103
-		}
-	},
-	{#State 15
-		ACTIONS => {
-			'IDENT' => 24,
-			"\${" => 33,
-			"\$" => 17
-		},
-		GOTOS => {
-			'item' => 72,
-			'ident' => 105,
-			'node' => 46
-		}
-	},
-	{#State 16
-		ACTIONS => {
-			"]" => 106,
-			'REF' => 15,
-			"[" => 16,
-			'LITERAL' => 109,
-			'IDENT' => 24,
-			"\$" => 17,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\"" => 11,
-			"{" => 45
-		},
-		GOTOS => {
-			'sterm' => 112,
-			'term' => 111,
-			'ident' => 108,
-			'range' => 110,
-			'item' => 72,
-			'list' => 107,
-			'node' => 46,
-			'lterm' => 47
-		}
-	},
-	{#State 17
-		ACTIONS => {
-			'IDENT' => 113
-		}
-	},
-	{#State 18
-		ACTIONS => {
-			'LITERAL' => 109,
-			"[" => 16,
-			'REF' => 15,
-			"(" => 14,
-			'NOT' => 43,
-			"{" => 45,
-			"\"" => 11,
-			'IDENT' => 24,
-			"\${" => 33,
-			'NUMBER' => 1,
-			"\$" => 17
-		},
-		GOTOS => {
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72,
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 55,
-			'expr' => 114
-		}
-	},
-	{#State 19
-		ACTIONS => {
-			'IDENT' => 116
-		},
-		DEFAULT => -87,
-		GOTOS => {
-			'blockargs' => 115,
-			'metadata' => 117,
-			'meta' => 118
-		}
-	},
-	{#State 20
-		DEFAULT => -78,
-		GOTOS => {
-			'@5-1' => 119
-		}
-	},
-	{#State 21
-		ACTIONS => {
-			";" => 120
-		}
-	},
-	{#State 22
-		ACTIONS => {
-			'REF' => 15,
-			"(" => 14,
-			'IDENT' => 24,
-			"[" => 16,
-			'LITERAL' => 109,
-			"\${" => 33,
-			'NUMBER' => 1,
-			"\"" => 11,
-			"\$" => 17,
-			'NOT' => 43,
-			"{" => 45
-		},
-		GOTOS => {
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72,
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 55,
-			'expr' => 121
-		}
-	},
-	{#State 23
-		ACTIONS => {
-			"{" => 45,
-			"\$" => 17,
-			"\"" => 11,
-			'NUMBER' => 1,
-			"\${" => 33,
-			'LITERAL' => 109,
-			"[" => 16,
-			'IDENT' => 123,
-			'REF' => 15
-		},
-		GOTOS => {
-			'ident' => 108,
-			'sterm' => 54,
-			'term' => 124,
-			'loopvar' => 122,
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46
-		}
-	},
-	{#State 24
-		DEFAULT => -131
-	},
-	{#State 25
-		ACTIONS => {
-			'IDENT' => 125
-		}
-	},
-	{#State 26
-		DEFAULT => -15
-	},
-	{#State 27
-		ACTIONS => {
-			"(" => 14,
-			'REF' => 15,
-			'LITERAL' => 109,
-			"[" => 16,
-			'IDENT' => 24,
-			"\$" => 17,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\"" => 11,
-			'NOT' => 43,
-			"{" => 45
-		},
-		GOTOS => {
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 55,
-			'expr' => 126,
-			'item' => 72,
-			'node' => 46,
-			'lterm' => 47
-		}
-	},
-	{#State 28
-		ACTIONS => {
-			";" => 127
-		}
-	},
-	{#State 29
-		DEFAULT => -1
-	},
-	{#State 30
 		DEFAULT => -24
 	},
-	{#State 31
-		DEFAULT => -21
-	},
-	{#State 32
-		DEFAULT => -13
-	},
-	{#State 33
-		ACTIONS => {
-			"\$" => 17,
-			"\"" => 11,
-			'NUMBER' => 1,
-			"\${" => 33,
-			'LITERAL' => 109,
-			'IDENT' => 24,
-			'REF' => 15
-		},
-		GOTOS => {
-			'ident' => 108,
-			'sterm' => 128,
-			'item' => 72,
-			'node' => 46
-		}
-	},
-	{#State 34
-		ACTIONS => {
-			'DOT' => 129,
-			'ASSIGN' => 130
-		},
-		DEFAULT => -110
-	},
-	{#State 35
-		DEFAULT => -10
-	},
-	{#State 36
+	{#State 6
 		ACTIONS => {
 			";" => -20
 		},
 		DEFAULT => -27
 	},
-	{#State 37
+	{#State 7
+		DEFAULT => -6
+	},
+	{#State 8
 		ACTIONS => {
-			"\$" => 17,
-			"\${" => 33,
-			'LITERAL' => 100,
-			'IDENT' => 24
+			'REF' => 17,
+			'NOT' => 12,
+			'IDENT' => 13,
+			"\${" => 21,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61,
+			"\$" => 48,
+			"\"" => 47,
+			'NUMBER' => 23,
+			'LITERAL' => 89
 		},
 		GOTOS => {
-			'item' => 72,
-			'ident' => 132,
-			'assign' => 69,
-			'node' => 46,
-			'setlist' => 131
+			'ident' => 88,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
+			'item' => 29,
+			'expr' => 90,
+			'lterm' => 42
+		}
+	},
+	{#State 9
+		ACTIONS => {
+			'LITERAL' => 89,
+			"\${" => 21,
+			"(" => 61,
+			"{" => 62,
+			"[" => 41,
+			"\"" => 47,
+			"\$" => 48,
+			'REF' => 17,
+			'NUMBER' => 23,
+			'NOT' => 12,
+			'IDENT' => 13
+		},
+		GOTOS => {
+			'expr' => 91,
+			'ident' => 88,
+			'item' => 29,
+			'lterm' => 42,
+			'term' => 15,
+			'sterm' => 36,
+			'node' => 57
+		}
+	},
+	{#State 10
+		ACTIONS => {
+			'IDENT' => 92
+		}
+	},
+	{#State 11
+		ACTIONS => {
+			";" => 93
+		}
+	},
+	{#State 12
+		ACTIONS => {
+			"(" => 61,
+			"{" => 62,
+			"[" => 41,
+			'LITERAL' => 89,
+			"\${" => 21,
+			'NUMBER' => 23,
+			'IDENT' => 13,
+			'NOT' => 12,
+			"\"" => 47,
+			'REF' => 17,
+			"\$" => 48
+		},
+		GOTOS => {
+			'lterm' => 42,
+			'sterm' => 36,
+			'term' => 15,
+			'node' => 57,
+			'expr' => 94,
+			'ident' => 88,
+			'item' => 29
+		}
+	},
+	{#State 13
+		DEFAULT => -130
+	},
+	{#State 14
+		DEFAULT => -39
+	},
+	{#State 15
+		DEFAULT => -146
+	},
+	{#State 16
+		ACTIONS => {
+			"\$" => 79,
+			"\"" => 80,
+			'LITERAL' => 82,
+			'FILENAME' => 81,
+			'IDENT' => 84,
+			'NUMBER' => 83
+		},
+		GOTOS => {
+			'names' => 78,
+			'filename' => 87,
+			'name' => 86,
+			'filepart' => 77,
+			'nameargs' => 95
+		}
+	},
+	{#State 17
+		ACTIONS => {
+			'IDENT' => 13,
+			"\${" => 21,
+			"\$" => 48
+		},
+		GOTOS => {
+			'item' => 29,
+			'ident' => 96,
+			'node' => 57
+		}
+	},
+	{#State 18
+		DEFAULT => -149
+	},
+	{#State 19
+		ACTIONS => {
+			'LITERAL' => 82,
+			"\$" => 79,
+			"\"" => 80,
+			'IDENT' => 84,
+			'NUMBER' => 83,
+			'FILENAME' => 81
+		},
+		GOTOS => {
+			'filename' => 87,
+			'name' => 86,
+			'names' => 78,
+			'nameargs' => 97,
+			'filepart' => 77
+		}
+	},
+	{#State 20
+		DEFAULT => -38
+	},
+	{#State 21
+		ACTIONS => {
+			'NUMBER' => 23,
+			'IDENT' => 13,
+			"\"" => 47,
+			"\$" => 48,
+			'REF' => 17,
+			'LITERAL' => 89,
+			"\${" => 21
+		},
+		GOTOS => {
+			'ident' => 88,
+			'item' => 29,
+			'sterm' => 98,
+			'node' => 57
+		}
+	},
+	{#State 22
+		DEFAULT => -36
+	},
+	{#State 23
+		DEFAULT => -113
+	},
+	{#State 24
+		ACTIONS => {
+			'ASSIGN' => 99,
+			'DOT' => 100
+		},
+		DEFAULT => -109
+	},
+	{#State 25
+		ACTIONS => {
+			'FILENAME' => 81,
+			'IDENT' => 84,
+			'NUMBER' => 83,
+			"\$" => 79,
+			"\"" => 80,
+			'LITERAL' => 82
+		},
+		GOTOS => {
+			'name' => 86,
+			'filename' => 87,
+			'names' => 78,
+			'nameargs' => 101,
+			'filepart' => 77
+		}
+	},
+	{#State 26
+		ACTIONS => {
+			'IDENT' => 13,
+			'NOT' => 12,
+			'REF' => 17,
+			"{" => 62,
+			"[" => 41,
+			"(" => 61,
+			"\${" => 21,
+			'NUMBER' => 23,
+			"\$" => 48,
+			"\"" => 47,
+			'LITERAL' => 89
+		},
+		GOTOS => {
+			'lterm' => 42,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
+			'ident' => 88,
+			'expr' => 102,
+			'item' => 29
+		}
+	},
+	{#State 27
+		ACTIONS => {
+			'LITERAL' => 89,
+			"\"" => 47,
+			"\$" => 48,
+			'NUMBER' => 23,
+			"\${" => 21,
+			"(" => 61,
+			"{" => 62,
+			"[" => 41,
+			'REF' => 17,
+			'NOT' => 12,
+			'IDENT' => 13
+		},
+		GOTOS => {
+			'sterm' => 36,
+			'term' => 15,
+			'node' => 57,
+			'lterm' => 42,
+			'item' => 29,
+			'expr' => 103,
+			'ident' => 88
+		}
+	},
+	{#State 28
+		DEFAULT => -10
+	},
+	{#State 29
+		ACTIONS => {
+			"(" => 104
+		},
+		DEFAULT => -128
+	},
+	{#State 30
+		ACTIONS => {
+			'NUMBER' => 23,
+			'IDENT' => 107,
+			"\"" => 47,
+			"\$" => 48,
+			'REF' => 17,
+			"[" => 41,
+			"{" => 62,
+			'LITERAL' => 89,
+			"\${" => 21
+		},
+		GOTOS => {
+			'sterm' => 36,
+			'term' => 106,
+			'node' => 57,
+			'loopvar' => 105,
+			'lterm' => 42,
+			'item' => 29,
+			'ident' => 88
+		}
+	},
+	{#State 31
+		ACTIONS => {
+			'ASSIGN' => 108
+		},
+		DEFAULT => -112
+	},
+	{#State 32
+		ACTIONS => {
+			'LITERAL' => 110,
+			'NUMBER' => 83,
+			'IDENT' => 109,
+			'FILENAME' => 81
+		},
+		DEFAULT => -87,
+		GOTOS => {
+			'blockname' => 112,
+			'filepart' => 77,
+			'filename' => 114,
+			'blockargs' => 111,
+			'meta' => 113,
+			'metadata' => 115
+		}
+	},
+	{#State 33
+		DEFAULT => -21
+	},
+	{#State 34
+		ACTIONS => {
+			'LITERAL' => 89,
+			"\${" => 21,
+			"(" => 61,
+			"[" => 41,
+			"{" => 62,
+			"\"" => 47,
+			"\$" => 48,
+			'REF' => 17,
+			'NUMBER' => 23,
+			'NOT' => 12,
+			'IDENT' => 13
+		},
+		GOTOS => {
+			'lterm' => 42,
+			'sterm' => 36,
+			'term' => 15,
+			'node' => 57,
+			'expr' => 116,
+			'ident' => 88,
+			'item' => 29
+		}
+	},
+	{#State 35
+		ACTIONS => {
+			'IF' => 122,
+			'WRAPPER' => 117,
+			'FOR' => 118,
+			'UNLESS' => 119,
+			'FILTER' => 121,
+			'WHILE' => 120
+		}
+	},
+	{#State 36
+		DEFAULT => -104
+	},
+	{#State 37
+		ACTIONS => {
+			"\$" => 48,
+			'IDENT' => 13,
+			'COMMA' => 124,
+			'LITERAL' => 75,
+			"\${" => 21
+		},
+		DEFAULT => -19,
+		GOTOS => {
+			'node' => 57,
+			'assign' => 123,
+			'ident' => 74,
+			'item' => 29
 		}
 	},
 	{#State 38
 		ACTIONS => {
-			'IDENT' => 116
+			'LITERAL' => 82,
+			"\$" => 79,
+			"\"" => 80,
+			'IDENT' => 84,
+			'NUMBER' => 83,
+			'FILENAME' => 81
 		},
 		GOTOS => {
-			'meta' => 118,
-			'metadata' => 133
+			'names' => 78,
+			'filename' => 87,
+			'name' => 86,
+			'filepart' => 77,
+			'nameargs' => 125
 		}
 	},
 	{#State 39
-		DEFAULT => -38
+		DEFAULT => -37
 	},
 	{#State 40
-		DEFAULT => -42
+		DEFAULT => -14
 	},
 	{#State 41
 		ACTIONS => {
-			'NUMBER' => 79,
-			"\"" => 81,
-			"\$" => 82,
-			'FILENAME' => 83,
-			'IDENT' => 84,
-			'LITERAL' => 77
+			"\${" => 21,
+			'LITERAL' => 89,
+			"{" => 62,
+			"[" => 41,
+			"\$" => 48,
+			'REF' => 17,
+			"\"" => 47,
+			'IDENT' => 13,
+			'NUMBER' => 23,
+			"]" => 126
 		},
 		GOTOS => {
-			'names' => 75,
-			'name' => 85,
-			'nameargs' => 134,
-			'filepart' => 78,
-			'filename' => 80
+			'term' => 127,
+			'sterm' => 128,
+			'node' => 57,
+			'ident' => 88,
+			'lterm' => 42,
+			'range' => 130,
+			'list' => 129,
+			'item' => 29
 		}
 	},
 	{#State 42
-		DEFAULT => -36
+		DEFAULT => -103
 	},
 	{#State 43
 		ACTIONS => {
-			"\$" => 17,
-			'NUMBER' => 1,
-			"\${" => 33,
-			'IDENT' => 24,
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43,
-			"(" => 14,
-			'REF' => 15,
-			"[" => 16,
-			'LITERAL' => 109
+			'FILENAME' => 81,
+			'IDENT' => 84,
+			'NUMBER' => 83,
+			"\$" => 79,
+			"\"" => 80,
+			'LITERAL' => 82
 		},
 		GOTOS => {
-			'expr' => 135,
-			'ident' => 108,
-			'term' => 55,
-			'sterm' => 54,
-			'lterm' => 47,
-			'node' => 46,
-			'item' => 72
+			'nameargs' => 131,
+			'filepart' => 77,
+			'name' => 86,
+			'filename' => 87,
+			'names' => 78
 		}
 	},
 	{#State 44
-		ACTIONS => {
-			'CAT' => 145,
-			'BINOP' => 139,
-			'CMPOP' => 143,
-			"?" => 141,
-			'AND' => 138,
-			'OR' => 140,
-			"+" => 142,
-			"/" => 136,
-			'MOD' => 137,
-			";" => -16,
-			'DIV' => 144
-		},
-		DEFAULT => -26
-	},
-	{#State 45
-		ACTIONS => {
-			"\$" => 17,
-			"\${" => 33,
-			'LITERAL' => 149,
-			'IDENT' => 24
-		},
-		DEFAULT => -120,
+		DEFAULT => -78,
 		GOTOS => {
-			'param' => 146,
-			'params' => 150,
-			'item' => 148,
-			'hash' => 147
+			'@5-1' => 132
 		}
 	},
+	{#State 45
+		DEFAULT => -23
+	},
 	{#State 46
-		DEFAULT => -128
+		ACTIONS => {
+			";" => 133
+		}
 	},
 	{#State 47
-		DEFAULT => -104
+		DEFAULT => -176,
+		GOTOS => {
+			'quoted' => 134
+		}
 	},
 	{#State 48
 		ACTIONS => {
-			'LITERAL' => 77,
-			'FILENAME' => 83,
-			'IDENT' => 84,
-			"\$" => 82,
-			'NUMBER' => 79,
-			"\"" => 81
-		},
-		GOTOS => {
-			'name' => 85,
-			'names' => 75,
-			'filename' => 80,
-			'filepart' => 78,
-			'nameargs' => 151
+			'IDENT' => 135
 		}
 	},
 	{#State 49
+		DEFAULT => -40
+	},
+	{#State 50
 		ACTIONS => {
-			'IDENT' => 152,
-			'FILENAME' => 83,
-			'LITERAL' => 156,
-			'NUMBER' => 79
+			'IDENT' => 136
 		},
 		DEFAULT => -87,
 		GOTOS => {
-			'metadata' => 117,
-			'filepart' => 78,
-			'meta' => 118,
-			'blockname' => 155,
-			'blockargs' => 153,
-			'filename' => 154
+			'metadata' => 115,
+			'blockargs' => 137,
+			'meta' => 113
 		}
-	},
-	{#State 50
-		DEFAULT => -43
 	},
 	{#State 51
-		ACTIONS => {
-			'ASSIGN' => 157
-		},
-		DEFAULT => -113
-	},
-	{#State 52
 		DEFAULT => -8
 	},
-	{#State 53
-		DEFAULT => -40
-	},
-	{#State 54
-		DEFAULT => -105
-	},
-	{#State 55
-		DEFAULT => -147
-	},
-	{#State 56
-		DEFAULT => -6
-	},
-	{#State 57
+	{#State 52
 		ACTIONS => {
-			'NOT' => 43,
-			"{" => 45,
-			"\$" => 17,
-			"\"" => 11,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"[" => 16,
-			'LITERAL' => 109,
-			'IDENT' => 24,
-			"(" => 14,
-			'REF' => 15
+			'LITERAL' => 75,
+			"\${" => 21,
+			"\$" => 48,
+			'IDENT' => 13
 		},
 		GOTOS => {
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46,
-			'term' => 55,
-			'sterm' => 54,
-			'ident' => 108,
-			'expr' => 158
+			'node' => 57,
+			'setlist' => 138,
+			'item' => 29,
+			'assign' => 18,
+			'ident' => 74
 		}
 	},
+	{#State 53
+		ACTIONS => {
+			'IDENT' => 136
+		},
+		GOTOS => {
+			'meta' => 113,
+			'metadata' => 139
+		}
+	},
+	{#State 54
+		ACTIONS => {
+			'' => 140
+		}
+	},
+	{#State 55
+		DEFAULT => -11
+	},
+	{#State 56
+		DEFAULT => -42
+	},
+	{#State 57
+		DEFAULT => -127
+	},
 	{#State 58
-		DEFAULT => -5
+		ACTIONS => {
+			'CAT' => 147,
+			'AND' => 149,
+			'CMPOP' => 148,
+			"+" => 150,
+			'MOD' => 141,
+			'BINOP' => 145,
+			"/" => 144,
+			";" => -16,
+			"?" => 142,
+			'OR' => 143,
+			'DIV' => 146
+		},
+		DEFAULT => -26
 	},
 	{#State 59
 		ACTIONS => {
-			"[" => 16,
-			'LITERAL' => 109,
-			'IDENT' => 24,
-			"(" => 14,
-			'REF' => 15,
-			'NOT' => 43,
-			"{" => 45,
-			"\$" => 17,
-			"\"" => 11,
-			'NUMBER' => 1,
-			"\${" => 33
+			"\$" => 151,
+			"\"" => 152,
+			"\${" => 21,
+			'LITERAL' => 155,
+			'FILENAME' => 81,
+			'IDENT' => 157,
+			'NUMBER' => 83
 		},
 		GOTOS => {
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46,
-			'term' => 55,
-			'ident' => 108,
-			'sterm' => 54,
-			'expr' => 159
+			'item' => 156,
+			'filepart' => 77,
+			'names' => 78,
+			'nameargs' => 158,
+			'lvalue' => 154,
+			'lnameargs' => 153,
+			'name' => 86,
+			'filename' => 87
 		}
 	},
 	{#State 60
 		ACTIONS => {
-			'IDENT' => 24,
-			'LITERAL' => 100,
-			"\${" => 33,
-			"\$" => 17
+			"(" => 61,
+			"[" => 41,
+			"{" => 62,
+			'LITERAL' => 89,
+			"\${" => 21,
+			'NUMBER' => 23,
+			'NOT' => 12,
+			'IDENT' => 13,
+			"\"" => 47,
+			'REF' => 17,
+			"\$" => 48
 		},
 		GOTOS => {
-			'item' => 72,
-			'ident' => 99,
-			'setlist' => 160,
-			'assign' => 69,
-			'node' => 46
+			'item' => 29,
+			'ident' => 88,
+			'expr' => 159,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
+			'lterm' => 42
 		}
 	},
 	{#State 61
-		DEFAULT => -25
+		ACTIONS => {
+			"\"" => 47,
+			"\$" => 48,
+			'REF' => 17,
+			'NUMBER' => 23,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LITERAL' => 31,
+			"\${" => 21,
+			"(" => 61,
+			"[" => 41,
+			"{" => 62
+		},
+		GOTOS => {
+			'item' => 29,
+			'assign' => 161,
+			'expr' => 160,
+			'lterm' => 42,
+			'ident' => 162,
+			'node' => 57,
+			'sterm' => 36,
+			'term' => 15
+		}
 	},
 	{#State 62
 		ACTIONS => {
-			"\"" => 11,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\$" => 17,
-			'NOT' => 43,
-			"{" => 45,
-			'REF' => 15,
-			"(" => 14,
-			'IDENT' => 24,
-			"[" => 16,
-			'LITERAL' => 109
+			"\$" => 48,
+			'LITERAL' => 163,
+			"\${" => 21,
+			'IDENT' => 13
 		},
+		DEFAULT => -119,
 		GOTOS => {
-			'term' => 55,
-			'sterm' => 54,
-			'ident' => 108,
-			'expr' => 161,
-			'lterm' => 47,
-			'node' => 46,
-			'item' => 72
+			'item' => 165,
+			'params' => 167,
+			'param' => 164,
+			'hash' => 166
 		}
 	},
 	{#State 63
-		DEFAULT => -23
+		ACTIONS => {
+			"\"" => 47,
+			"\$" => 48,
+			'PERL' => 46,
+			'META' => 53,
+			'SET' => 52,
+			'NEXT' => 49,
+			'IF' => 34,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			"[" => 41,
+			'THROW' => 38,
+			'STOP' => 39,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'FILTER' => 68,
+			"(" => 61,
+			"{" => 62,
+			'WHILE' => 60,
+			'USE' => 59,
+			";" => -18,
+			'CALL' => 8,
+			'TEXT' => 7,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'DEFAULT' => 2,
+			'PROCESS' => 4,
+			'GET' => 27,
+			'NUMBER' => 23,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'FOR' => 30,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'LAST' => 14,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'WRAPPER' => 19,
+			"\${" => 21,
+			'RETURN' => 22,
+			'CLEAR' => 20
+		},
+		DEFAULT => -2,
+		GOTOS => {
+			'term' => 15,
+			'node' => 57,
+			'wrapper' => 56,
+			'capture' => 55,
+			'expr' => 58,
+			'assign' => 18,
+			'switch' => 64,
+			'defblock' => 65,
+			'ident' => 24,
+			'condition' => 33,
+			'perl' => 73,
+			'filter' => 69,
+			'anonblock' => 28,
+			'macro' => 70,
+			'item' => 29,
+			'chunk' => 168,
+			'use' => 72,
+			'atomexpr' => 35,
+			'sterm' => 36,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'lterm' => 42,
+			'view' => 40,
+			'try' => 5,
+			'loop' => 45,
+			'statement' => 11,
+			'atomdir' => 6,
+			'defblockname' => 50,
+			'directive' => 51
+		}
 	},
 	{#State 64
-		DEFAULT => -37
+		DEFAULT => -22
 	},
 	{#State 65
-		DEFAULT => -14
+		DEFAULT => -9
 	},
 	{#State 66
 		ACTIONS => {
-			'NUMBER' => 79,
-			"\"" => 81,
-			"\$" => 82,
-			'FILENAME' => 83,
+			'FILENAME' => 81,
+			'NUMBER' => 83,
 			'IDENT' => 84,
-			'LITERAL' => 77
+			"\"" => 80,
+			"\$" => 79,
+			'LITERAL' => 82
 		},
 		GOTOS => {
-			'names' => 75,
-			'name' => 85,
-			'nameargs' => 162,
-			'filepart' => 78,
-			'filename' => 80
+			'nameargs' => 169,
+			'filepart' => 77,
+			'filename' => 87,
+			'name' => 86,
+			'names' => 78
 		}
 	},
 	{#State 67
 		ACTIONS => {
-			'LITERAL' => 77,
-			'FILENAME' => 83,
-			'IDENT' => 84,
-			"\$" => 82,
-			'NUMBER' => 79,
-			"\"" => 81
-		},
-		GOTOS => {
-			'nameargs' => 163,
-			'filename' => 80,
-			'filepart' => 78,
-			'name' => 85,
-			'names' => 75
+			";" => 170
 		}
 	},
 	{#State 68
 		ACTIONS => {
-			'NUMBER' => 79,
-			"\"" => 81,
-			"\$" => 82,
-			'FILENAME' => 83,
-			'IDENT' => 84,
-			'LITERAL' => 77
+			"\$" => 151,
+			"\"" => 152,
+			"\${" => 21,
+			'LITERAL' => 155,
+			'FILENAME' => 81,
+			'IDENT' => 157,
+			'NUMBER' => 83
 		},
 		GOTOS => {
-			'nameargs' => 164,
-			'filename' => 80,
-			'filepart' => 78,
-			'name' => 85,
-			'names' => 75
+			'filename' => 87,
+			'name' => 86,
+			'lnameargs' => 171,
+			'lvalue' => 154,
+			'nameargs' => 158,
+			'names' => 78,
+			'filepart' => 77,
+			'item' => 156
 		}
 	},
 	{#State 69
-		DEFAULT => -150
+		DEFAULT => -43
 	},
 	{#State 70
 		DEFAULT => -12
 	},
 	{#State 71
-		ACTIONS => {
-			'' => 165
-		}
+		DEFAULT => -5
 	},
 	{#State 72
-		ACTIONS => {
-			"(" => 166
-		},
-		DEFAULT => -129
+		DEFAULT => -13
 	},
 	{#State 73
-		ACTIONS => {
-			'WRAPPER' => 172,
-			'IF' => 170,
-			'FOR' => 167,
-			'FILTER' => 169,
-			'UNLESS' => 168,
-			'WHILE' => 171
-		}
+		DEFAULT => -25
 	},
 	{#State 74
-		DEFAULT => -76,
-		GOTOS => {
-			'@4-2' => 173
+		ACTIONS => {
+			'ASSIGN' => 172,
+			'DOT' => 100
 		}
 	},
 	{#State 75
 		ACTIONS => {
-			"+" => 176,
-			"(" => 175
+			'ASSIGN' => 108
+		}
+	},
+	{#State 76
+		ACTIONS => {
+			"\$" => 48,
+			'COMMA' => 124,
+			'LITERAL' => 75,
+			'IDENT' => 13,
+			"\${" => 21
 		},
-		DEFAULT => -157,
+		DEFAULT => -31,
+		GOTOS => {
+			'node' => 57,
+			'ident' => 74,
+			'assign' => 123,
+			'item' => 29
+		}
+	},
+	{#State 77
+		DEFAULT => -171
+	},
+	{#State 78
+		ACTIONS => {
+			"(" => 173,
+			"+" => 175
+		},
+		DEFAULT => -156,
 		GOTOS => {
 			'args' => 174
 		}
 	},
-	{#State 76
-		DEFAULT => -33
-	},
-	{#State 77
-		DEFAULT => -170
-	},
-	{#State 78
-		DEFAULT => -172
-	},
 	{#State 79
-		DEFAULT => -175
+		ACTIONS => {
+			'IDENT' => 13,
+			"\${" => 21,
+			"\$" => 48
+		},
+		GOTOS => {
+			'node' => 57,
+			'ident' => 176,
+			'item' => 29
+		}
 	},
 	{#State 80
-		ACTIONS => {
-			'DOT' => 177
-		},
-		DEFAULT => -169
+		DEFAULT => -176,
+		GOTOS => {
+			'quoted' => 177
+		}
 	},
 	{#State 81
-		DEFAULT => -177,
-		GOTOS => {
-			'quoted' => 178
-		}
+		DEFAULT => -172
 	},
 	{#State 82
-		ACTIONS => {
-			'IDENT' => 24,
-			"\$" => 17,
-			"\${" => 33
-		},
-		GOTOS => {
-			'item' => 72,
-			'ident' => 179,
-			'node' => 46
-		}
+		DEFAULT => -169
 	},
 	{#State 83
-		DEFAULT => -173
-	},
-	{#State 84
 		DEFAULT => -174
 	},
+	{#State 84
+		DEFAULT => -173
+	},
 	{#State 85
-		DEFAULT => -167
+		DEFAULT => -34
 	},
 	{#State 86
-		ACTIONS => {
-			'ASSIGN' => -162
-		},
-		DEFAULT => -170
+		DEFAULT => -166
 	},
 	{#State 87
-		DEFAULT => -159
+		ACTIONS => {
+			'DOT' => 178
+		},
+		DEFAULT => -168
 	},
 	{#State 88
 		ACTIONS => {
-			'ASSIGN' => 180
-		}
+			'DOT' => 100
+		},
+		DEFAULT => -109
 	},
 	{#State 89
-		DEFAULT => -160
+		DEFAULT => -112
 	},
 	{#State 90
 		ACTIONS => {
-			";" => 181
-		}
+			'MOD' => 141,
+			'BINOP' => 145,
+			"/" => 144,
+			"?" => 142,
+			'OR' => 143,
+			'DIV' => 146,
+			'CAT' => 147,
+			'AND' => 149,
+			'CMPOP' => 148,
+			"+" => 150
+		},
+		DEFAULT => -29
 	},
 	{#State 91
-		DEFAULT => -177,
-		GOTOS => {
-			'quoted' => 182
+		ACTIONS => {
+			"+" => 150,
+			'CMPOP' => 148,
+			'AND' => 149,
+			'CAT' => 147,
+			'DIV' => 146,
+			'OR' => 143,
+			"?" => 142,
+			";" => 179,
+			"/" => 144,
+			'BINOP' => 145,
+			'MOD' => 141
 		}
 	},
 	{#State 92
 		ACTIONS => {
-			'ASSIGN' => -131
-		},
-		DEFAULT => -174
-	},
-	{#State 93
-		ACTIONS => {
-			'IDENT' => 183,
-			"\$" => 17,
-			"\${" => 33
+			'NEXT' => 49,
+			'CALL' => 8,
+			'UNLESS' => 9,
+			'SET' => 52,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'THROW' => 38,
+			'STOP' => 39,
+			'PROCESS' => 4,
+			"[" => 41,
+			'INCLUDE' => 43,
+			'IF' => 34,
+			'DEFAULT' => 2,
+			'FILTER' => 68,
+			'FOR' => 30,
+			'BLOCK' => 180,
+			'LITERAL' => 31,
+			'NUMBER' => 23,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'SWITCH' => 26,
+			'GET' => 27,
+			'WHILE' => 60,
+			"(" => 183,
+			"{" => 62,
+			'WRAPPER' => 19,
+			'RETURN' => 22,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'LAST' => 14,
+			'DEBUG' => 16,
+			'REF' => 17
 		},
 		GOTOS => {
-			'node' => 46,
-			'ident' => 179,
-			'item' => 72
+			'atomexpr' => 35,
+			'node' => 57,
+			'setlist' => 37,
+			'term' => 15,
+			'sterm' => 36,
+			'wrapper' => 56,
+			'lterm' => 42,
+			'assign' => 18,
+			'expr' => 182,
+			'try' => 5,
+			'switch' => 64,
+			'ident' => 162,
+			'mdir' => 181,
+			'loop' => 45,
+			'perl' => 73,
+			'condition' => 33,
+			'atomdir' => 6,
+			'filter' => 69,
+			'directive' => 184,
+			'item' => 29
 		}
 	},
+	{#State 93
+		DEFAULT => -7
+	},
 	{#State 94
-		DEFAULT => -4
+		ACTIONS => {
+			'MOD' => 141,
+			"/" => 144,
+			'BINOP' => 145,
+			'DIV' => 146,
+			'CMPOP' => 148,
+			'CAT' => 147,
+			"+" => 150
+		},
+		DEFAULT => -142
 	},
 	{#State 95
-		DEFAULT => -35
+		DEFAULT => -41
 	},
 	{#State 96
 		ACTIONS => {
-			'IDENT' => 24,
-			'TEXT' => 185,
-			"\"" => 188,
-			"\${" => 33,
-			"\$" => 17,
-			";" => 186
+			'DOT' => 100
 		},
-		GOTOS => {
-			'node' => 46,
-			'quotable' => 187,
-			'ident' => 184,
-			'item' => 72
-		}
+		DEFAULT => -110
 	},
 	{#State 97
-		DEFAULT => -73
+		ACTIONS => {
+			";" => 185
+		}
 	},
 	{#State 98
-		DEFAULT => -148
+		ACTIONS => {
+			"}" => 186
+		}
 	},
 	{#State 99
 		ACTIONS => {
-			'DOT' => 129,
-			'ASSIGN' => 189
+			'INSERT' => 66,
+			'NUMBER' => 23,
+			'TRY' => 67,
+			'SWITCH' => 26,
+			'GET' => 27,
+			'FILTER' => 68,
+			'FOR' => 30,
+			'BLOCK' => 180,
+			'LITERAL' => 31,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LAST' => 14,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'WHILE' => 60,
+			"(" => 61,
+			"{" => 62,
+			'WRAPPER' => 19,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'RETURN' => 22,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'NEXT' => 49,
+			'CALL' => 8,
+			'UNLESS' => 9,
+			'SET' => 52,
+			'IF' => 34,
+			'DEFAULT' => 2,
+			'THROW' => 38,
+			'STOP' => 39,
+			'PROCESS' => 4,
+			"[" => 41,
+			'INCLUDE' => 43
+		},
+		GOTOS => {
+			'ident' => 162,
+			'mdir' => 188,
+			'loop' => 45,
+			'condition' => 33,
+			'perl' => 73,
+			'filter' => 69,
+			'atomdir' => 6,
+			'item' => 29,
+			'directive' => 184,
+			'atomexpr' => 35,
+			'sterm' => 36,
+			'term' => 15,
+			'setlist' => 37,
+			'node' => 57,
+			'wrapper' => 56,
+			'lterm' => 42,
+			'expr' => 187,
+			'assign' => 18,
+			'try' => 5,
+			'switch' => 64
 		}
 	},
 	{#State 100
 		ACTIONS => {
-			'ASSIGN' => 157
+			"\${" => 21,
+			"\$" => 48,
+			'NUMBER' => 190,
+			'IDENT' => 13
+		},
+		GOTOS => {
+			'node' => 189,
+			'item' => 29
 		}
 	},
 	{#State 101
-		DEFAULT => -149
+		ACTIONS => {
+			";" => 191
+		}
 	},
 	{#State 102
 		ACTIONS => {
-			")" => 190
+			"/" => 144,
+			'CMPOP' => 148,
+			'BINOP' => 145,
+			'AND' => 149,
+			'MOD' => 141,
+			'CAT' => 147,
+			'DIV' => 146,
+			'OR' => 143,
+			"+" => 150,
+			"?" => 142,
+			";" => 192
 		}
 	},
 	{#State 103
 		ACTIONS => {
-			'AND' => 138,
-			"?" => 141,
-			'DIV' => 144,
-			'BINOP' => 139,
-			")" => 191,
-			'CAT' => 145,
-			'MOD' => 137,
-			'CMPOP' => 143,
-			"+" => 142,
-			"/" => 136,
-			'OR' => 140
-		}
+			'BINOP' => 145,
+			"/" => 144,
+			'MOD' => 141,
+			'OR' => 143,
+			'DIV' => 146,
+			"?" => 142,
+			'AND' => 149,
+			'CMPOP' => 148,
+			'CAT' => 147,
+			"+" => 150
+		},
+		DEFAULT => -28
 	},
 	{#State 104
-		ACTIONS => {
-			'DOT' => 129,
-			'ASSIGN' => 189
-		},
-		DEFAULT => -110
+		DEFAULT => -156,
+		GOTOS => {
+			'args' => 193
+		}
 	},
 	{#State 105
 		ACTIONS => {
-			'DOT' => 129
-		},
-		DEFAULT => -111
+			";" => 194
+		}
 	},
 	{#State 106
-		DEFAULT => -108
+		DEFAULT => -156,
+		GOTOS => {
+			'args' => 195
+		}
 	},
 	{#State 107
 		ACTIONS => {
-			"\$" => 17,
-			'COMMA' => 193,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'IDENT' => 24,
-			"\"" => 11,
-			"{" => 45,
-			"]" => 194,
-			'REF' => 15,
-			"[" => 16,
-			'LITERAL' => 109
+			'IN' => 197,
+			'ASSIGN' => 196
 		},
-		GOTOS => {
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46,
-			'term' => 192,
-			'ident' => 108,
-			'sterm' => 54
-		}
+		DEFAULT => -130
 	},
 	{#State 108
 		ACTIONS => {
-			'DOT' => 129
+			'IDENT' => 13,
+			'NOT' => 12,
+			'NUMBER' => 23,
+			"\$" => 48,
+			'REF' => 17,
+			"\"" => 47,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61,
+			"\${" => 21,
+			'LITERAL' => 89
 		},
-		DEFAULT => -110
-	},
-	{#State 109
-		DEFAULT => -113
-	},
-	{#State 110
-		ACTIONS => {
-			"]" => 195
+		GOTOS => {
+			'item' => 29,
+			'ident' => 88,
+			'expr' => 198,
+			'node' => 57,
+			'sterm' => 36,
+			'term' => 15,
+			'lterm' => 42
 		}
 	},
+	{#State 109
+		ACTIONS => {
+			'ASSIGN' => 199
+		},
+		DEFAULT => -173
+	},
+	{#State 110
+		DEFAULT => -85
+	},
 	{#State 111
-		DEFAULT => -117
+		ACTIONS => {
+			";" => 200
+		}
 	},
 	{#State 112
-		ACTIONS => {
-			'TO' => 196
-		},
-		DEFAULT => -105
+		DEFAULT => -83
 	},
 	{#State 113
-		DEFAULT => -133
+		DEFAULT => -99
 	},
 	{#State 114
 		ACTIONS => {
-			"/" => 136,
-			"+" => 142,
-			'OR' => 140,
-			'DIV' => 144,
-			'MOD' => 137,
-			'AND' => 138,
-			"?" => 141,
-			'CMPOP' => 143,
-			'BINOP' => 139,
-			'CAT' => 145
+			'DOT' => 178
 		},
-		DEFAULT => -29
+		DEFAULT => -84
 	},
 	{#State 115
 		ACTIONS => {
-			";" => 197
+			'IDENT' => 136,
+			'COMMA' => 201
+		},
+		DEFAULT => -86,
+		GOTOS => {
+			'meta' => 202
 		}
 	},
 	{#State 116
 		ACTIONS => {
-			'ASSIGN' => 198
+			'BINOP' => 145,
+			"/" => 144,
+			'MOD' => 141,
+			'OR' => 143,
+			'DIV' => 146,
+			";" => 203,
+			"?" => 142,
+			'AND' => 149,
+			'CMPOP' => 148,
+			'CAT' => 147,
+			"+" => 150
 		}
 	},
 	{#State 117
 		ACTIONS => {
-			'IDENT' => 116,
-			'COMMA' => 199
+			'FILENAME' => 81,
+			'IDENT' => 84,
+			'NUMBER' => 83,
+			"\$" => 79,
+			"\"" => 80,
+			'LITERAL' => 82
 		},
-		DEFAULT => -86,
 		GOTOS => {
-			'meta' => 200
+			'filepart' => 77,
+			'nameargs' => 204,
+			'names' => 78,
+			'name' => 86,
+			'filename' => 87
 		}
 	},
 	{#State 118
-		DEFAULT => -100
+		ACTIONS => {
+			"\"" => 47,
+			"\$" => 48,
+			'REF' => 17,
+			'NUMBER' => 23,
+			'IDENT' => 107,
+			'LITERAL' => 89,
+			"\${" => 21,
+			"{" => 62,
+			"[" => 41
+		},
+		GOTOS => {
+			'loopvar' => 205,
+			'lterm' => 42,
+			'term' => 106,
+			'sterm' => 36,
+			'node' => 57,
+			'ident' => 88,
+			'item' => 29
+		}
 	},
 	{#State 119
 		ACTIONS => {
-			";" => 201
+			"\"" => 47,
+			"\$" => 48,
+			'NUMBER' => 23,
+			'LITERAL' => 89,
+			'REF' => 17,
+			'NOT' => 12,
+			'IDENT' => 13,
+			"\${" => 21,
+			"(" => 61,
+			"{" => 62,
+			"[" => 41
+		},
+		GOTOS => {
+			'lterm' => 42,
+			'expr' => 206,
+			'item' => 29,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
+			'ident' => 88
 		}
 	},
 	{#State 120
-		DEFAULT => -7
+		ACTIONS => {
+			"(" => 61,
+			"{" => 62,
+			"[" => 41,
+			'LITERAL' => 89,
+			"\${" => 21,
+			'NUMBER' => 23,
+			'NOT' => 12,
+			'IDENT' => 13,
+			"\"" => 47,
+			"\$" => 48,
+			'REF' => 17
+		},
+		GOTOS => {
+			'item' => 29,
+			'expr' => 207,
+			'ident' => 88,
+			'sterm' => 36,
+			'term' => 15,
+			'node' => 57,
+			'lterm' => 42
+		}
 	},
 	{#State 121
 		ACTIONS => {
-			'OR' => 140,
-			"+" => 142,
-			"/" => 136,
-			'MOD' => 137,
-			'DIV' => 144,
-			'BINOP' => 139,
-			'CAT' => 145,
-			'CMPOP' => 143,
-			'AND' => 138,
-			"?" => 141
+			"\"" => 152,
+			"\$" => 151,
+			'LITERAL' => 155,
+			"\${" => 21,
+			'FILENAME' => 81,
+			'NUMBER' => 83,
+			'IDENT' => 157
 		},
-		DEFAULT => -28
+		GOTOS => {
+			'lvalue' => 154,
+			'lnameargs' => 208,
+			'nameargs' => 158,
+			'filename' => 87,
+			'name' => 86,
+			'filepart' => 77,
+			'item' => 156,
+			'names' => 78
+		}
 	},
 	{#State 122
 		ACTIONS => {
-			";" => 202
+			"[" => 41,
+			"{" => 62,
+			"(" => 61,
+			"\${" => 21,
+			'LITERAL' => 89,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'NUMBER' => 23,
+			'REF' => 17,
+			"\$" => 48,
+			"\"" => 47
+		},
+		GOTOS => {
+			'lterm' => 42,
+			'item' => 29,
+			'expr' => 209,
+			'term' => 15,
+			'sterm' => 36,
+			'node' => 57,
+			'ident' => 88
 		}
 	},
 	{#State 123
-		ACTIONS => {
-			'ASSIGN' => 203,
-			'IN' => 204
-		},
-		DEFAULT => -131
+		DEFAULT => -147
 	},
 	{#State 124
-		DEFAULT => -157,
-		GOTOS => {
-			'args' => 205
-		}
+		DEFAULT => -148
 	},
 	{#State 125
-		ACTIONS => {
-			"{" => 45,
-			'NOT' => 43,
-			"\"" => 11,
-			'THROW' => 10,
-			'LAST' => 9,
-			'LITERAL' => 51,
-			"[" => 16,
-			'BLOCK' => 210,
-			'PROCESS' => 48,
-			'REF' => 15,
-			"(" => 206,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'FILTER' => 6,
-			'WRAPPER' => 41,
-			'RETURN' => 42,
-			'CLEAR' => 39,
-			'PERL' => 4,
-			'SET' => 208,
-			'INCLUDE' => 5,
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'DEBUG' => 66,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'INSERT' => 68,
-			'IF' => 57,
-			'CALL' => 18,
-			'NEXT' => 53,
-			"\$" => 17,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'DEFAULT' => 60,
-			'GET' => 22,
-			'WHILE' => 59
-		},
-		GOTOS => {
-			'directive' => 211,
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30,
-			'filter' => 50,
-			'assign' => 69,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'expr' => 209,
-			'loop' => 63,
-			'perl' => 61,
-			'wrapper' => 40,
-			'atomdir' => 36,
-			'switch' => 3,
-			'mdir' => 207,
-			'term' => 55,
-			'ident' => 104,
-			'sterm' => 54,
-			'condition' => 31
-		}
+		DEFAULT => -35
 	},
 	{#State 126
-		ACTIONS => {
-			'OR' => 140,
-			"/" => 136,
-			"+" => 142,
-			'CMPOP' => 143,
-			'MOD' => 137,
-			'CAT' => 145,
-			'BINOP' => 139,
-			'DIV' => 144,
-			"?" => 141,
-			'AND' => 138,
-			";" => 212
-		}
+		DEFAULT => -107
 	},
 	{#State 127
-		ACTIONS => {
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'NEXT' => 53,
-			'IF' => 57,
-			'TEXT' => 56,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'DEBUG' => 66,
-			'SET' => 37,
-			'WRAPPER' => 41,
-			'RETURN' => 42,
-			'META' => 38,
-			'CLEAR' => 39,
-			"\${" => 33,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			'LITERAL' => 51,
-			'NOT' => 43,
-			"{" => 45,
-			'RAWPERL' => 20,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'GET' => 22,
-			"\$" => 17,
-			'CALL' => 18,
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'MACRO' => 25,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'FILTER' => 6,
-			'NUMBER' => 1,
-			";" => -18,
-			'REF' => 15,
-			'USE' => 12,
-			"(" => 14,
-			"[" => 16,
-			"\"" => 11,
-			'THROW' => 10,
-			'LAST' => 9
-		},
-		DEFAULT => -3,
-		GOTOS => {
-			'expr' => 44,
-			'directive' => 52,
-			'filter' => 50,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'capture' => 2,
-			'ident' => 34,
-			'use' => 32,
-			'condition' => 31,
-			'chunks' => 8,
-			'defblock' => 7,
-			'wrapper' => 40,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'switch' => 3,
-			'view' => 65,
-			'rawperl' => 26,
-			'loop' => 63,
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30,
-			'assign' => 69,
-			'macro' => 70,
-			'block' => 213,
-			'defblockname' => 19,
-			'chunk' => 58,
-			'sterm' => 54,
-			'term' => 55,
-			'perl' => 61,
-			'statement' => 21
-		}
+		DEFAULT => -116
 	},
 	{#State 128
 		ACTIONS => {
-			"}" => 214
-		}
+			'TO' => 210
+		},
+		DEFAULT => -104
 	},
 	{#State 129
 		ACTIONS => {
-			'IDENT' => 24,
-			"\$" => 17,
-			"\${" => 33,
-			'NUMBER' => 216
+			'COMMA' => 211,
+			'LITERAL' => 89,
+			"\"" => 47,
+			"\$" => 48,
+			'NUMBER' => 23,
+			"\${" => 21,
+			"{" => 62,
+			"[" => 41,
+			'REF' => 17,
+			"]" => 212,
+			'IDENT' => 13
 		},
 		GOTOS => {
-			'item' => 72,
-			'node' => 215
+			'ident' => 88,
+			'item' => 29,
+			'lterm' => 42,
+			'sterm' => 36,
+			'term' => 213,
+			'node' => 57
 		}
 	},
 	{#State 130
 		ACTIONS => {
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'TRY' => 28,
-			'DEBUG' => 66,
-			'UNLESS' => 27,
-			'INSERT' => 68,
-			"\$" => 17,
-			'NEXT' => 53,
-			'CALL' => 18,
-			'IF' => 57,
-			'WHILE' => 59,
-			'GET' => 22,
-			'DEFAULT' => 60,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'LAST' => 9,
-			'THROW' => 10,
-			"\"" => 11,
-			'NOT' => 43,
-			"{" => 45,
-			"(" => 14,
-			'PROCESS' => 48,
-			'BLOCK' => 210,
-			'REF' => 15,
-			"[" => 16,
-			'LITERAL' => 51,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'SET' => 208,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'CLEAR' => 39,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'FILTER' => 6
-		},
-		GOTOS => {
-			'assign' => 69,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'directive' => 211,
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30,
-			'filter' => 50,
-			'loop' => 63,
-			'expr' => 217,
-			'atomdir' => 36,
-			'switch' => 3,
-			'mdir' => 218,
-			'perl' => 61,
-			'wrapper' => 40,
-			'condition' => 31,
-			'sterm' => 54,
-			'term' => 55,
-			'ident' => 104
+			"]" => 214
 		}
 	},
 	{#State 131
-		ACTIONS => {
-			'IDENT' => 24,
-			"\$" => 17,
-			"\${" => 33,
-			'COMMA' => 101,
-			'LITERAL' => 100
-		},
-		DEFAULT => -30,
-		GOTOS => {
-			'node' => 46,
-			'assign' => 98,
-			'ident' => 99,
-			'item' => 72
-		}
+		DEFAULT => -33
 	},
 	{#State 132
 		ACTIONS => {
-			'DOT' => 129,
-			'ASSIGN' => 219
+			";" => 215
 		}
 	},
 	{#State 133
-		ACTIONS => {
-			'IDENT' => 116,
-			'COMMA' => 199
-		},
-		DEFAULT => -17,
+		DEFAULT => -76,
 		GOTOS => {
-			'meta' => 200
+			'@4-2' => 216
 		}
 	},
 	{#State 134
 		ACTIONS => {
-			";" => 220
+			"\$" => 48,
+			"\"" => 221,
+			";" => 220,
+			"\${" => 21,
+			'TEXT' => 219,
+			'IDENT' => 13
+		},
+		GOTOS => {
+			'node' => 57,
+			'quotable' => 218,
+			'item' => 29,
+			'ident' => 217
 		}
 	},
 	{#State 135
-		ACTIONS => {
-			'BINOP' => 139,
-			'CMPOP' => 143,
-			"+" => 142,
-			"/" => 136,
-			'MOD' => 137,
-			'CAT' => 145,
-			'DIV' => 144
-		},
-		DEFAULT => -143
+		DEFAULT => -132
 	},
 	{#State 136
 		ACTIONS => {
-			"[" => 16,
-			'LITERAL' => 109,
-			'REF' => 15,
-			"(" => 14,
-			"{" => 45,
-			'NOT' => 43,
-			"\"" => 11,
-			'IDENT' => 24,
-			"\${" => 33,
-			'NUMBER' => 1,
-			"\$" => 17
-		},
-		GOTOS => {
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46,
-			'expr' => 221,
-			'ident' => 108,
-			'sterm' => 54,
-			'term' => 55
+			'ASSIGN' => 199
 		}
 	},
 	{#State 137
 		ACTIONS => {
-			"[" => 16,
-			'LITERAL' => 109,
-			'IDENT' => 24,
-			"(" => 14,
-			'REF' => 15,
-			"{" => 45,
-			'NOT' => 43,
-			"\$" => 17,
-			"\"" => 11,
-			'NUMBER' => 1,
-			"\${" => 33
-		},
-		GOTOS => {
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72,
-			'expr' => 222,
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 55
+			";" => 222
 		}
 	},
 	{#State 138
 		ACTIONS => {
-			"(" => 14,
-			'REF' => 15,
-			'LITERAL' => 109,
-			"[" => 16,
-			"\"" => 11,
-			'NOT' => 43,
-			"{" => 45,
-			'IDENT' => 24,
-			"\$" => 17,
-			'NUMBER' => 1,
-			"\${" => 33
+			'LITERAL' => 75,
+			'COMMA' => 124,
+			"\$" => 48,
+			"\${" => 21,
+			'IDENT' => 13
 		},
+		DEFAULT => -30,
 		GOTOS => {
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72,
-			'expr' => 223,
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 55
+			'node' => 57,
+			'ident' => 74,
+			'assign' => 123,
+			'item' => 29
 		}
 	},
 	{#State 139
 		ACTIONS => {
-			'IDENT' => 24,
-			"\$" => 17,
-			"\${" => 33,
-			'NUMBER' => 1,
-			"[" => 16,
-			'LITERAL' => 109,
-			"(" => 14,
-			'REF' => 15,
-			'NOT' => 43,
-			"{" => 45,
-			"\"" => 11
+			'IDENT' => 136,
+			'COMMA' => 201
 		},
+		DEFAULT => -17,
 		GOTOS => {
-			'expr' => 224,
-			'ident' => 108,
-			'term' => 55,
-			'sterm' => 54,
-			'item' => 72,
-			'node' => 46,
-			'lterm' => 47
+			'meta' => 202
 		}
 	},
 	{#State 140
-		ACTIONS => {
-			"(" => 14,
-			'REF' => 15,
-			"[" => 16,
-			'LITERAL' => 109,
-			'IDENT' => 24,
-			"\$" => 17,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\"" => 11,
-			'NOT' => 43,
-			"{" => 45
-		},
-		GOTOS => {
-			'expr' => 225,
-			'term' => 55,
-			'sterm' => 54,
-			'ident' => 108,
-			'item' => 72,
-			'node' => 46,
-			'lterm' => 47
-		}
+		DEFAULT => 0
 	},
 	{#State 141
 		ACTIONS => {
-			'IDENT' => 24,
-			"\$" => 17,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'LITERAL' => 109,
-			"[" => 16,
-			"(" => 14,
-			'REF' => 15,
-			'NOT' => 43,
-			"{" => 45,
-			"\"" => 11
+			'NOT' => 12,
+			'IDENT' => 13,
+			'NUMBER' => 23,
+			"\$" => 48,
+			'REF' => 17,
+			"\"" => 47,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61,
+			"\${" => 21,
+			'LITERAL' => 89
 		},
 		GOTOS => {
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46,
-			'term' => 55,
-			'ident' => 108,
-			'sterm' => 54,
-			'expr' => 226
+			'item' => 29,
+			'expr' => 223,
+			'ident' => 88,
+			'sterm' => 36,
+			'term' => 15,
+			'node' => 57,
+			'lterm' => 42
 		}
 	},
 	{#State 142
 		ACTIONS => {
-			'REF' => 15,
-			"(" => 14,
-			'IDENT' => 24,
-			'LITERAL' => 109,
-			"[" => 16,
-			"\"" => 11,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\$" => 17,
-			"{" => 45,
-			'NOT' => 43
+			'LITERAL' => 89,
+			'NUMBER' => 23,
+			"\$" => 48,
+			"\"" => 47,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61,
+			"\${" => 21,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'REF' => 17
 		},
 		GOTOS => {
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72,
-			'term' => 55,
-			'sterm' => 54,
-			'ident' => 108,
-			'expr' => 227
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
+			'ident' => 88,
+			'lterm' => 42,
+			'item' => 29,
+			'expr' => 224
 		}
 	},
 	{#State 143
 		ACTIONS => {
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\$" => 17,
-			'IDENT' => 24,
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43,
-			'REF' => 15,
-			"(" => 14,
-			'LITERAL' => 109,
-			"[" => 16
+			'NOT' => 12,
+			'IDENT' => 13,
+			'REF' => 17,
+			"(" => 61,
+			"[" => 41,
+			"{" => 62,
+			"\${" => 21,
+			'NUMBER' => 23,
+			"\"" => 47,
+			"\$" => 48,
+			'LITERAL' => 89
 		},
 		GOTOS => {
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46,
-			'term' => 55,
-			'ident' => 108,
-			'sterm' => 54,
-			'expr' => 228
+			'lterm' => 42,
+			'expr' => 225,
+			'item' => 29,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
+			'ident' => 88
 		}
 	},
 	{#State 144
 		ACTIONS => {
-			'IDENT' => 24,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\$" => 17,
-			"[" => 16,
-			'LITERAL' => 109,
-			'REF' => 15,
-			"(" => 14,
-			'NOT' => 43,
-			"{" => 45,
-			"\"" => 11
+			"\$" => 48,
+			'REF' => 17,
+			"\"" => 47,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'NUMBER' => 23,
+			"\${" => 21,
+			'LITERAL' => 89,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61
 		},
 		GOTOS => {
-			'expr' => 229,
-			'ident' => 108,
-			'term' => 55,
-			'sterm' => 54,
-			'item' => 72,
-			'node' => 46,
-			'lterm' => 47
+			'ident' => 88,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
+			'expr' => 226,
+			'item' => 29,
+			'lterm' => 42
 		}
 	},
 	{#State 145
 		ACTIONS => {
-			'NOT' => 43,
-			"{" => 45,
-			"\"" => 11,
-			"\${" => 33,
-			'NUMBER' => 1,
-			"\$" => 17,
-			'IDENT' => 24,
-			"[" => 16,
-			'LITERAL' => 109,
-			'REF' => 15,
-			"(" => 14
+			"\$" => 48,
+			"\"" => 47,
+			'NUMBER' => 23,
+			'LITERAL' => 89,
+			'REF' => 17,
+			'IDENT' => 13,
+			'NOT' => 12,
+			"\${" => 21,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61
 		},
 		GOTOS => {
-			'term' => 55,
-			'sterm' => 54,
-			'ident' => 108,
-			'expr' => 230,
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46
+			'item' => 29,
+			'ident' => 88,
+			'expr' => 227,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
+			'lterm' => 42
 		}
 	},
 	{#State 146
-		DEFAULT => -123
+		ACTIONS => {
+			'LITERAL' => 89,
+			'NUMBER' => 23,
+			"\$" => 48,
+			"\"" => 47,
+			"{" => 62,
+			"[" => 41,
+			"(" => 61,
+			"\${" => 21,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'REF' => 17
+		},
+		GOTOS => {
+			'node' => 57,
+			'sterm' => 36,
+			'term' => 15,
+			'lterm' => 42,
+			'item' => 29,
+			'ident' => 88,
+			'expr' => 228
+		}
 	},
 	{#State 147
 		ACTIONS => {
-			"}" => 231
+			'REF' => 17,
+			"\$" => 48,
+			"\"" => 47,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'NUMBER' => 23,
+			"\${" => 21,
+			'LITERAL' => 89,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61
+		},
+		GOTOS => {
+			'expr' => 229,
+			'item' => 29,
+			'lterm' => 42,
+			'ident' => 88,
+			'node' => 57,
+			'sterm' => 36,
+			'term' => 15
 		}
 	},
 	{#State 148
 		ACTIONS => {
-			'ASSIGN' => 232
+			'NUMBER' => 23,
+			"\$" => 48,
+			"\"" => 47,
+			'LITERAL' => 89,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'REF' => 17,
+			"{" => 62,
+			"[" => 41,
+			"(" => 61,
+			"\${" => 21
+		},
+		GOTOS => {
+			'ident' => 88,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
+			'expr' => 230,
+			'item' => 29,
+			'lterm' => 42
 		}
 	},
 	{#State 149
 		ACTIONS => {
-			'ASSIGN' => 233
+			'LITERAL' => 89,
+			'NUMBER' => 23,
+			"\"" => 47,
+			"\$" => 48,
+			"(" => 61,
+			"{" => 62,
+			"[" => 41,
+			"\${" => 21,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'REF' => 17
+		},
+		GOTOS => {
+			'lterm' => 42,
+			'item' => 29,
+			'expr' => 231,
+			'node' => 57,
+			'sterm' => 36,
+			'term' => 15,
+			'ident' => 88
 		}
 	},
 	{#State 150
 		ACTIONS => {
-			'IDENT' => 24,
-			'LITERAL' => 149,
-			'COMMA' => 234,
-			"\${" => 33,
-			"\$" => 17
+			"\${" => 21,
+			"(" => 61,
+			"{" => 62,
+			"[" => 41,
+			'REF' => 17,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'LITERAL' => 89,
+			"\"" => 47,
+			"\$" => 48,
+			'NUMBER' => 23
 		},
-		DEFAULT => -119,
 		GOTOS => {
-			'item' => 148,
-			'param' => 235
+			'lterm' => 42,
+			'sterm' => 36,
+			'term' => 15,
+			'node' => 57,
+			'expr' => 232,
+			'ident' => 88,
+			'item' => 29
 		}
 	},
 	{#State 151
-		DEFAULT => -34
+		ACTIONS => {
+			"\${" => 21,
+			"\$" => 48,
+			'IDENT' => 233
+		},
+		GOTOS => {
+			'ident' => 176,
+			'item' => 29,
+			'node' => 57
+		}
 	},
 	{#State 152
-		ACTIONS => {
-			'ASSIGN' => 198
-		},
-		DEFAULT => -174
+		DEFAULT => -176,
+		GOTOS => {
+			'quoted' => 234
+		}
 	},
 	{#State 153
-		ACTIONS => {
-			";" => 236
-		}
+		DEFAULT => -73
 	},
 	{#State 154
 		ACTIONS => {
-			'DOT' => 177
-		},
-		DEFAULT => -84
+			'ASSIGN' => 235
+		}
 	},
 	{#State 155
-		DEFAULT => -83
+		ACTIONS => {
+			'ASSIGN' => -161
+		},
+		DEFAULT => -169
 	},
 	{#State 156
-		DEFAULT => -85
+		DEFAULT => -159
 	},
 	{#State 157
 		ACTIONS => {
-			"\"" => 11,
-			'NOT' => 43,
-			"{" => 45,
-			'REF' => 15,
-			"(" => 14,
-			'LITERAL' => 109,
-			"[" => 16,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\$" => 17,
-			'IDENT' => 24
+			'ASSIGN' => -130
 		},
-		GOTOS => {
-			'expr' => 237,
-			'sterm' => 54,
-			'term' => 55,
-			'ident' => 108,
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72
-		}
+		DEFAULT => -173
 	},
 	{#State 158
-		ACTIONS => {
-			'MOD' => 137,
-			";" => 238,
-			'DIV' => 144,
-			'OR' => 140,
-			"+" => 142,
-			"/" => 136,
-			'BINOP' => 139,
-			'CAT' => 145,
-			'CMPOP' => 143,
-			'AND' => 138,
-			"?" => 141
-		}
+		DEFAULT => -158
 	},
 	{#State 159
 		ACTIONS => {
-			'BINOP' => 139,
-			'CAT' => 145,
-			'MOD' => 137,
-			'CMPOP' => 143,
-			";" => 239,
-			"?" => 141,
-			'AND' => 138,
-			'DIV' => 144,
-			'OR' => 140,
-			"+" => 142,
-			"/" => 136
+			";" => 236,
+			"?" => 142,
+			"+" => 150,
+			'OR' => 143,
+			'DIV' => 146,
+			'CAT' => 147,
+			'MOD' => 141,
+			'AND' => 149,
+			'BINOP' => 145,
+			'CMPOP' => 148,
+			"/" => 144
 		}
 	},
 	{#State 160
 		ACTIONS => {
-			'COMMA' => 101,
-			"\${" => 33,
-			"\$" => 17,
-			'IDENT' => 24,
-			'LITERAL' => 100
-		},
-		DEFAULT => -31,
-		GOTOS => {
-			'item' => 72,
-			'ident' => 99,
-			'assign' => 98,
-			'node' => 46
+			'OR' => 143,
+			'DIV' => 146,
+			")" => 237,
+			"?" => 142,
+			'BINOP' => 145,
+			"/" => 144,
+			'MOD' => 141,
+			"+" => 150,
+			'AND' => 149,
+			'CMPOP' => 148,
+			'CAT' => 147
 		}
 	},
 	{#State 161
 		ACTIONS => {
-			";" => 240,
-			"?" => 141,
-			'AND' => 138,
-			'DIV' => 144,
-			'BINOP' => 139,
-			'CAT' => 145,
-			'MOD' => 137,
-			'CMPOP' => 143,
-			"+" => 142,
-			"/" => 136,
-			'OR' => 140
+			")" => 238
 		}
 	},
 	{#State 162
-		DEFAULT => -41
+		ACTIONS => {
+			'DOT' => 100,
+			'ASSIGN' => 172
+		},
+		DEFAULT => -109
 	},
 	{#State 163
 		ACTIONS => {
-			";" => 241
+			'ASSIGN' => 239
 		}
 	},
 	{#State 164
-		DEFAULT => -32
+		DEFAULT => -122
 	},
 	{#State 165
-		DEFAULT => 0
+		ACTIONS => {
+			'ASSIGN' => 240
+		}
 	},
 	{#State 166
-		DEFAULT => -157,
-		GOTOS => {
-			'args' => 242
+		ACTIONS => {
+			"}" => 241
 		}
 	},
 	{#State 167
 		ACTIONS => {
-			'IDENT' => 123,
-			"[" => 16,
-			'LITERAL' => 109,
-			'REF' => 15,
-			"{" => 45,
-			"\${" => 33,
-			'NUMBER' => 1,
-			"\"" => 11,
-			"\$" => 17
+			"\${" => 21,
+			'LITERAL' => 163,
+			'COMMA' => 243,
+			'IDENT' => 13,
+			"\$" => 48
 		},
+		DEFAULT => -118,
 		GOTOS => {
-			'term' => 124,
-			'sterm' => 54,
-			'ident' => 108,
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46,
-			'loopvar' => 243
+			'param' => 242,
+			'item' => 165
 		}
 	},
 	{#State 168
-		ACTIONS => {
-			"\$" => 17,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'IDENT' => 24,
-			'NOT' => 43,
-			"{" => 45,
-			"\"" => 11,
-			"[" => 16,
-			'LITERAL' => 109,
-			"(" => 14,
-			'REF' => 15
-		},
-		GOTOS => {
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46,
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 55,
-			'expr' => 244
-		}
+		DEFAULT => -4
 	},
 	{#State 169
-		ACTIONS => {
-			'IDENT' => 92,
-			'LITERAL' => 86,
-			"\"" => 91,
-			'NUMBER' => 79,
-			"\${" => 33,
-			"\$" => 93,
-			'FILENAME' => 83
-		},
-		GOTOS => {
-			'filename' => 80,
-			'nameargs' => 87,
-			'lvalue' => 88,
-			'item' => 89,
-			'filepart' => 78,
-			'lnameargs' => 245,
-			'names' => 75,
-			'name' => 85
-		}
+		DEFAULT => -32
 	},
 	{#State 170
 		ACTIONS => {
-			"\$" => 17,
-			'NUMBER' => 1,
-			"\${" => 33,
-			'IDENT' => 24,
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43,
-			"(" => 14,
-			'REF' => 15,
-			"[" => 16,
-			'LITERAL' => 109
+			"\"" => 47,
+			"\$" => 48,
+			'PERL' => 46,
+			'META' => 53,
+			'SET' => 52,
+			'NEXT' => 49,
+			'IF' => 34,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			"[" => 41,
+			'THROW' => 38,
+			'STOP' => 39,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'FILTER' => 68,
+			"(" => 61,
+			"{" => 62,
+			'WHILE' => 60,
+			'USE' => 59,
+			";" => -18,
+			'TEXT' => 7,
+			'CALL' => 8,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'DEFAULT' => 2,
+			'PROCESS' => 4,
+			'GET' => 27,
+			'NUMBER' => 23,
+			'SWITCH' => 26,
+			'VIEW' => 25,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'FOR' => 30,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'LAST' => 14,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'WRAPPER' => 19,
+			'CLEAR' => 20,
+			'RETURN' => 22,
+			"\${" => 21
 		},
+		DEFAULT => -3,
 		GOTOS => {
-			'term' => 55,
-			'ident' => 108,
-			'sterm' => 54,
-			'expr' => 246,
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46
+			'expr' => 58,
+			'assign' => 18,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'capture' => 55,
+			'wrapper' => 56,
+			'term' => 15,
+			'node' => 57,
+			'filter' => 69,
+			'macro' => 70,
+			'anonblock' => 28,
+			'item' => 29,
+			'chunk' => 71,
+			'use' => 72,
+			'perl' => 73,
+			'condition' => 33,
+			'ident' => 24,
+			'view' => 40,
+			'try' => 5,
+			'lterm' => 42,
+			'block' => 244,
+			'atomexpr' => 35,
+			'sterm' => 36,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'atomdir' => 6,
+			'defblockname' => 50,
+			'directive' => 51,
+			'statement' => 11,
+			'loop' => 45
 		}
 	},
 	{#State 171
 		ACTIONS => {
-			'NOT' => 43,
-			"{" => 45,
-			"\$" => 17,
-			"\"" => 11,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'LITERAL' => 109,
-			"[" => 16,
-			'IDENT' => 24,
-			"(" => 14,
-			'REF' => 15
-		},
-		GOTOS => {
-			'expr' => 247,
-			'ident' => 108,
-			'term' => 55,
-			'sterm' => 54,
-			'item' => 72,
-			'lterm' => 47,
-			'node' => 46
+			";" => 245
 		}
 	},
 	{#State 172
 		ACTIONS => {
-			'IDENT' => 84,
-			'FILENAME' => 83,
-			'LITERAL' => 77,
-			"\"" => 81,
-			'NUMBER' => 79,
-			"\$" => 82
+			"\"" => 47,
+			'REF' => 17,
+			"\$" => 48,
+			'NUMBER' => 23,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LITERAL' => 89,
+			"\${" => 21,
+			"(" => 61,
+			"{" => 62,
+			"[" => 41
 		},
 		GOTOS => {
-			'nameargs' => 248,
-			'filename' => 80,
-			'filepart' => 78,
-			'name' => 85,
-			'names' => 75
+			'term' => 15,
+			'sterm' => 36,
+			'node' => 57,
+			'lterm' => 42,
+			'item' => 29,
+			'expr' => 246,
+			'ident' => 88
 		}
 	},
 	{#State 173
-		ACTIONS => {
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'MACRO' => 25,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'GET' => 22,
-			'RAWPERL' => 20,
-			'CALL' => 18,
-			"\$" => 17,
-			"[" => 16,
-			'REF' => 15,
-			'USE' => 12,
-			"(" => 14,
-			'THROW' => 10,
-			"\"" => 11,
-			'LAST' => 9,
-			'FILTER' => 6,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'NUMBER' => 1,
-			";" => -18,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			'DEBUG' => 66,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'IF' => 57,
-			'TEXT' => 56,
-			'NEXT' => 53,
-			'LITERAL' => 51,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			'NOT' => 43,
-			"{" => 45,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'META' => 38,
-			'CLEAR' => 39,
-			'SET' => 37,
-			"\${" => 33
-		},
-		DEFAULT => -3,
+		DEFAULT => -156,
 		GOTOS => {
-			'use' => 32,
-			'condition' => 31,
-			'capture' => 2,
-			'ident' => 34,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'switch' => 3,
-			'chunks' => 8,
-			'defblock' => 7,
-			'wrapper' => 40,
-			'expr' => 44,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'directive' => 52,
-			'filter' => 50,
-			'defblockname' => 19,
-			'chunk' => 58,
-			'sterm' => 54,
-			'term' => 55,
-			'statement' => 21,
-			'perl' => 61,
-			'loop' => 63,
-			'view' => 65,
-			'rawperl' => 26,
-			'block' => 249,
-			'assign' => 69,
-			'macro' => 70,
-			'atomexpr' => 73,
-			'try' => 30,
-			'item' => 72
+			'args' => 247
 		}
 	},
 	{#State 174
 		ACTIONS => {
-			'REF' => 15,
-			"(" => 14,
-			"[" => 16,
-			'LITERAL' => 253,
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43,
-			'IDENT' => 24,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'COMMA' => 251,
-			"\$" => 17
+			"\${" => 21,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61,
+			'REF' => 17,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'COMMA' => 253,
+			'LITERAL' => 249,
+			"\$" => 48,
+			"\"" => 47,
+			'NUMBER' => 23
 		},
-		DEFAULT => -164,
+		DEFAULT => -163,
 		GOTOS => {
-			'expr' => 254,
-			'term' => 55,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36,
 			'ident' => 252,
-			'sterm' => 54,
-			'lterm' => 47,
-			'node' => 46,
-			'param' => 250,
-			'item' => 255
+			'lterm' => 42,
+			'item' => 250,
+			'param' => 251,
+			'expr' => 248
 		}
 	},
 	{#State 175
-		DEFAULT => -157,
+		ACTIONS => {
+			'NUMBER' => 83,
+			'IDENT' => 84,
+			'FILENAME' => 81,
+			'LITERAL' => 82,
+			"\"" => 80
+		},
 		GOTOS => {
-			'args' => 256
+			'filepart' => 77,
+			'name' => 254,
+			'filename' => 87
 		}
 	},
 	{#State 176
 		ACTIONS => {
-			'NUMBER' => 79,
-			"\"" => 81,
-			'FILENAME' => 83,
-			'IDENT' => 84,
-			'LITERAL' => 77
+			'DOT' => 100
 		},
+		DEFAULT => -156,
 		GOTOS => {
-			'name' => 257,
-			'filename' => 80,
-			'filepart' => 78
+			'args' => 255
 		}
 	},
 	{#State 177
 		ACTIONS => {
-			'NUMBER' => 79,
-			'FILENAME' => 83,
-			'IDENT' => 84
+			"\$" => 48,
+			";" => 220,
+			"\"" => 256,
+			'IDENT' => 13,
+			"\${" => 21,
+			'TEXT' => 219
 		},
 		GOTOS => {
-			'filepart' => 258
+			'quotable' => 218,
+			'node' => 57,
+			'ident' => 217,
+			'item' => 29
 		}
 	},
 	{#State 178
 		ACTIONS => {
-			"\$" => 17,
-			";" => 186,
-			"\"" => 259,
-			"\${" => 33,
-			'TEXT' => 185,
-			'IDENT' => 24
+			'FILENAME' => 81,
+			'IDENT' => 84,
+			'NUMBER' => 83
 		},
 		GOTOS => {
-			'node' => 46,
-			'quotable' => 187,
-			'ident' => 184,
-			'item' => 72
+			'filepart' => 257
 		}
 	},
 	{#State 179
 		ACTIONS => {
-			'DOT' => 129
+			'NEXT' => 49,
+			'SET' => 52,
+			'META' => 53,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'THROW' => 38,
+			'STOP' => 39,
+			"[" => 41,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			'IF' => 34,
+			'FILTER' => 68,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'WHILE' => 60,
+			'USE' => 59,
+			"(" => 61,
+			"{" => 62,
+			'CALL' => 8,
+			'TEXT' => 7,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			";" => -18,
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'FOR' => 30,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'NUMBER' => 23,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'GET' => 27,
+			'WRAPPER' => 19,
+			"\${" => 21,
+			'RETURN' => 22,
+			'CLEAR' => 20,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LAST' => 14,
+			'DEBUG' => 16,
+			'REF' => 17
 		},
-		DEFAULT => -157,
+		DEFAULT => -3,
 		GOTOS => {
-			'args' => 260
+			'setlist' => 37,
+			'rawperl' => 3,
+			'sterm' => 36,
+			'atomexpr' => 35,
+			'block' => 258,
+			'lterm' => 42,
+			'try' => 5,
+			'view' => 40,
+			'loop' => 45,
+			'statement' => 11,
+			'directive' => 51,
+			'defblockname' => 50,
+			'atomdir' => 6,
+			'node' => 57,
+			'term' => 15,
+			'capture' => 55,
+			'wrapper' => 56,
+			'chunks' => 63,
+			'switch' => 64,
+			'defblock' => 65,
+			'assign' => 18,
+			'expr' => 58,
+			'ident' => 24,
+			'perl' => 73,
+			'condition' => 33,
+			'use' => 72,
+			'item' => 29,
+			'chunk' => 71,
+			'macro' => 70,
+			'anonblock' => 28,
+			'filter' => 69
 		}
 	},
 	{#State 180
 		ACTIONS => {
-			'LITERAL' => 77,
-			'FILENAME' => 83,
-			'IDENT' => 84,
-			"\$" => 82,
-			'NUMBER' => 79,
-			"\"" => 81
-		},
-		GOTOS => {
-			'names' => 75,
-			'name' => 85,
-			'nameargs' => 261,
-			'filepart' => 78,
-			'filename' => 80
+			";" => 259
 		}
 	},
 	{#State 181
-		ACTIONS => {
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'RAWPERL' => 20,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			"\$" => 17,
-			'CALL' => 18,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			"[" => 16,
-			'LAST' => 9,
-			"\"" => 11,
-			'THROW' => 10,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'FILTER' => 6,
-			";" => -18,
-			'NUMBER' => 1,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'DEBUG' => 66,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'NEXT' => 53,
-			'TEXT' => 56,
-			'IF' => 57,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			'LITERAL' => 51,
-			'NOT' => 43,
-			"{" => 45,
-			'SET' => 37,
-			'CLEAR' => 39,
-			'META' => 38,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			"\${" => 33
-		},
-		DEFAULT => -3,
-		GOTOS => {
-			'setlist' => 13,
-			'node' => 46,
-			'lterm' => 47,
-			'filter' => 50,
-			'directive' => 52,
-			'expr' => 44,
-			'switch' => 3,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'wrapper' => 40,
-			'chunks' => 8,
-			'defblock' => 7,
-			'condition' => 31,
-			'use' => 32,
-			'ident' => 34,
-			'capture' => 2,
-			'block' => 262,
-			'assign' => 69,
-			'macro' => 70,
-			'try' => 30,
-			'item' => 72,
-			'atomexpr' => 73,
-			'loop' => 63,
-			'view' => 65,
-			'rawperl' => 26,
-			'statement' => 21,
-			'perl' => 61,
-			'sterm' => 54,
-			'term' => 55,
-			'defblockname' => 19,
-			'chunk' => 58
-		}
+		DEFAULT => -91
 	},
 	{#State 182
 		ACTIONS => {
-			'IDENT' => 24,
-			'TEXT' => 185,
-			"\${" => 33,
-			"\"" => 263,
-			"\$" => 17,
-			";" => 186
+			"+" => 150,
+			'CAT' => 147,
+			'AND' => 149,
+			'CMPOP' => 148,
+			"?" => 142,
+			'OR' => 143,
+			'DIV' => 146,
+			'MOD' => 141,
+			'BINOP' => 145,
+			"/" => 144
 		},
-		GOTOS => {
-			'item' => 72,
-			'ident' => 184,
-			'node' => 46,
-			'quotable' => 187
-		}
+		DEFAULT => -26
 	},
 	{#State 183
 		ACTIONS => {
-			'ASSIGN' => -133
-		},
-		DEFAULT => -131
-	},
-	{#State 184
-		ACTIONS => {
-			'DOT' => 129
-		},
-		DEFAULT => -178
-	},
-	{#State 185
-		DEFAULT => -179
-	},
-	{#State 186
-		DEFAULT => -180
-	},
-	{#State 187
-		DEFAULT => -176
-	},
-	{#State 188
-		DEFAULT => -112
-	},
-	{#State 189
-		ACTIONS => {
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43,
-			'REF' => 15,
-			"(" => 14,
-			"[" => 16,
-			'LITERAL' => 109,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\$" => 17,
-			'IDENT' => 24
+			'REF' => 17,
+			"\$" => 48,
+			"\"" => 47,
+			'NOT' => 12,
+			'IDENT' => 260,
+			'NUMBER' => 23,
+			"\${" => 21,
+			'LITERAL' => 31,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61
 		},
 		GOTOS => {
-			'item' => 72,
-			'node' => 46,
-			'lterm' => 47,
-			'expr' => 264,
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 55
+			'lterm' => 42,
+			'item' => 29,
+			'expr' => 160,
+			'assign' => 161,
+			'sterm' => 36,
+			'term' => 15,
+			'node' => 57,
+			'margs' => 261,
+			'ident' => 162
 		}
 	},
+	{#State 184
+		DEFAULT => -92
+	},
+	{#State 185
+		ACTIONS => {
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'MACRO' => 10,
+			'UNLESS' => 9,
+			'TEXT' => 7,
+			'CALL' => 8,
+			";" => -18,
+			"\${" => 21,
+			'CLEAR' => 20,
+			'RETURN' => 22,
+			'WRAPPER' => 19,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'LAST' => 14,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'FOR' => 30,
+			'GET' => 27,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'NUMBER' => 23,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			"[" => 41,
+			'STOP' => 39,
+			'THROW' => 38,
+			'IF' => 34,
+			'META' => 53,
+			'SET' => 52,
+			'NEXT' => 49,
+			"\$" => 48,
+			"\"" => 47,
+			'PERL' => 46,
+			"{" => 62,
+			"(" => 61,
+			'WHILE' => 60,
+			'USE' => 59,
+			'FILTER' => 68,
+			'TRY' => 67,
+			'INSERT' => 66
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'expr' => 58,
+			'assign' => 18,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'capture' => 55,
+			'wrapper' => 56,
+			'term' => 15,
+			'node' => 57,
+			'filter' => 69,
+			'macro' => 70,
+			'anonblock' => 28,
+			'item' => 29,
+			'chunk' => 71,
+			'use' => 72,
+			'perl' => 73,
+			'condition' => 33,
+			'ident' => 24,
+			'view' => 40,
+			'try' => 5,
+			'lterm' => 42,
+			'block' => 262,
+			'atomexpr' => 35,
+			'sterm' => 36,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'atomdir' => 6,
+			'defblockname' => 50,
+			'directive' => 51,
+			'statement' => 11,
+			'loop' => 45
+		}
+	},
+	{#State 186
+		DEFAULT => -131
+	},
+	{#State 187
+		ACTIONS => {
+			'BINOP' => 145,
+			"/" => 144,
+			'COMMA' => -150,
+			'MOD' => 141,
+			'LITERAL' => -150,
+			'OR' => 143,
+			'DIV' => 146,
+			"\$" => -150,
+			";" => -150,
+			"?" => 142,
+			'AND' => 149,
+			'CMPOP' => 148,
+			"\${" => -150,
+			'CAT' => 147,
+			'IDENT' => -150,
+			"+" => 150
+		},
+		DEFAULT => -26
+	},
+	{#State 188
+		DEFAULT => -89
+	},
+	{#State 189
+		DEFAULT => -125
+	},
 	{#State 190
-		DEFAULT => -145
+		DEFAULT => -126
 	},
 	{#State 191
-		DEFAULT => -146
+		DEFAULT => -74,
+		GOTOS => {
+			'@3-3' => 263
+		}
 	},
 	{#State 192
-		DEFAULT => -115
+		ACTIONS => {
+			";" => -18,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'CALL' => 8,
+			'TEXT' => 7,
+			'DEFAULT' => 2,
+			'PROCESS' => 4,
+			'GET' => 27,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'NUMBER' => 23,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'FOR' => 30,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'LAST' => 14,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'RETURN' => 22,
+			'WRAPPER' => 19,
+			"\$" => 48,
+			"\"" => 47,
+			'PERL' => 46,
+			'META' => 53,
+			'SET' => 52,
+			'NEXT' => 49,
+			'IF' => 34,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			"[" => 41,
+			'STOP' => 39,
+			'THROW' => 38,
+			'TRY' => 67,
+			'INSERT' => 66,
+			'FILTER' => 68,
+			"{" => 62,
+			"(" => 61,
+			'USE' => 59,
+			'WHILE' => 60
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'wrapper' => 56,
+			'capture' => 55,
+			'node' => 57,
+			'term' => 15,
+			'assign' => 18,
+			'expr' => 58,
+			'switch' => 64,
+			'chunks' => 63,
+			'defblock' => 65,
+			'ident' => 24,
+			'anonblock' => 28,
+			'macro' => 70,
+			'filter' => 69,
+			'use' => 72,
+			'chunk' => 71,
+			'item' => 29,
+			'condition' => 33,
+			'perl' => 73,
+			'block' => 264,
+			'atomexpr' => 35,
+			'setlist' => 37,
+			'rawperl' => 3,
+			'sterm' => 36,
+			'try' => 5,
+			'view' => 40,
+			'lterm' => 42,
+			'loop' => 45,
+			'atomdir' => 6,
+			'directive' => 51,
+			'defblockname' => 50,
+			'statement' => 11
+		}
 	},
 	{#State 193
-		DEFAULT => -116
+		ACTIONS => {
+			"\${" => 21,
+			"(" => 61,
+			"[" => 41,
+			"{" => 62,
+			'REF' => 17,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LITERAL' => 249,
+			'COMMA' => 253,
+			"\"" => 47,
+			")" => 265,
+			"\$" => 48,
+			'NUMBER' => 23
+		},
+		GOTOS => {
+			'lterm' => 42,
+			'sterm' => 36,
+			'term' => 15,
+			'node' => 57,
+			'expr' => 248,
+			'param' => 251,
+			'ident' => 252,
+			'item' => 250
+		}
 	},
 	{#State 194
-		DEFAULT => -106
+		DEFAULT => -56,
+		GOTOS => {
+			'@1-3' => 266
+		}
 	},
 	{#State 195
-		DEFAULT => -107
+		ACTIONS => {
+			'REF' => 17,
+			'IDENT' => 13,
+			'NOT' => 12,
+			"\${" => 21,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61,
+			"\$" => 48,
+			"\"" => 47,
+			'NUMBER' => 23,
+			'LITERAL' => 249,
+			'COMMA' => 253
+		},
+		DEFAULT => -64,
+		GOTOS => {
+			'expr' => 248,
+			'ident' => 252,
+			'param' => 251,
+			'item' => 250,
+			'lterm' => 42,
+			'term' => 15,
+			'sterm' => 36,
+			'node' => 57
+		}
 	},
 	{#State 196
 		ACTIONS => {
-			'IDENT' => 24,
-			'LITERAL' => 109,
-			"\"" => 11,
-			'REF' => 15,
-			"\${" => 33,
-			'NUMBER' => 1,
-			"\$" => 17
+			"{" => 62,
+			"[" => 41,
+			"\${" => 21,
+			'LITERAL' => 89,
+			'IDENT' => 13,
+			'NUMBER' => 23,
+			'REF' => 17,
+			"\$" => 48,
+			"\"" => 47
 		},
 		GOTOS => {
-			'item' => 72,
-			'ident' => 108,
-			'sterm' => 265,
-			'node' => 46
+			'sterm' => 36,
+			'term' => 267,
+			'node' => 57,
+			'ident' => 88,
+			'lterm' => 42,
+			'item' => 29
 		}
 	},
 	{#State 197
 		ACTIONS => {
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'CALL' => 18,
-			"\$" => 17,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'RAWPERL' => 20,
-			'LAST' => 9,
-			"\"" => 11,
-			'THROW' => 10,
-			"[" => 16,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			";" => -18,
-			'NUMBER' => 1,
-			'FILTER' => 6,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'DEBUG' => 66,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'TEXT' => 56,
-			'IF' => 57,
-			'NEXT' => 53,
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'NOT' => 43,
-			"{" => 45,
-			'LITERAL' => 51,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			"\${" => 33,
-			'CLEAR' => 39,
-			'META' => 38,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'SET' => 37
+			"[" => 41,
+			"{" => 62,
+			'LITERAL' => 89,
+			"\${" => 21,
+			'NUMBER' => 23,
+			'IDENT' => 13,
+			"\"" => 47,
+			'REF' => 17,
+			"\$" => 48
 		},
-		DEFAULT => -3,
 		GOTOS => {
-			'defblockname' => 19,
-			'chunk' => 58,
-			'sterm' => 54,
-			'term' => 55,
-			'perl' => 61,
-			'statement' => 21,
-			'view' => 65,
-			'rawperl' => 26,
-			'loop' => 63,
-			'atomexpr' => 73,
-			'try' => 30,
-			'item' => 72,
-			'template' => 266,
-			'block' => 29,
-			'macro' => 70,
-			'assign' => 69,
-			'capture' => 2,
-			'ident' => 34,
-			'use' => 32,
-			'condition' => 31,
-			'chunks' => 8,
-			'defblock' => 7,
-			'wrapper' => 40,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'switch' => 3,
-			'expr' => 44,
-			'directive' => 52,
-			'filter' => 50,
-			'node' => 46,
-			'lterm' => 47,
-			'setlist' => 13
+			'ident' => 88,
+			'node' => 57,
+			'term' => 268,
+			'sterm' => 36,
+			'item' => 29,
+			'lterm' => 42
 		}
 	},
 	{#State 198
 		ACTIONS => {
-			"\"" => 269,
-			'NUMBER' => 268,
-			'LITERAL' => 267
-		}
+			'OR' => 143,
+			"?" => 142,
+			'MOD' => 141,
+			'AND' => 149,
+			'DIV' => 146,
+			"/" => 144,
+			'BINOP' => 145,
+			"+" => 150,
+			'CMPOP' => 148,
+			'CAT' => 147
+		},
+		DEFAULT => -151
 	},
 	{#State 199
-		DEFAULT => -99
+		ACTIONS => {
+			"\"" => 269,
+			'LITERAL' => 270,
+			'NUMBER' => 271
+		}
 	},
 	{#State 200
-		DEFAULT => -98
+		ACTIONS => {
+			'FILTER' => 68,
+			'TRY' => 67,
+			'INSERT' => 66,
+			"{" => 62,
+			"(" => 61,
+			'USE' => 59,
+			'WHILE' => 60,
+			'NEXT' => 49,
+			'META' => 53,
+			'SET' => 52,
+			"\$" => 48,
+			"\"" => 47,
+			'PERL' => 46,
+			"[" => 41,
+			'STOP' => 39,
+			'THROW' => 38,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			'IF' => 34,
+			'FOR' => 30,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'GET' => 27,
+			'SWITCH' => 26,
+			'VIEW' => 25,
+			'NUMBER' => 23,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'RETURN' => 22,
+			'WRAPPER' => 19,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'LAST' => 14,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'TEXT' => 7,
+			'CALL' => 8,
+			";" => -18,
+			'PROCESS' => 4,
+			'DEFAULT' => 2
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'perl' => 73,
+			'condition' => 33,
+			'use' => 72,
+			'chunk' => 71,
+			'item' => 29,
+			'anonblock' => 28,
+			'macro' => 70,
+			'filter' => 69,
+			'ident' => 24,
+			'defblock' => 65,
+			'chunks' => 63,
+			'switch' => 64,
+			'assign' => 18,
+			'expr' => 58,
+			'node' => 57,
+			'term' => 15,
+			'wrapper' => 56,
+			'capture' => 55,
+			'statement' => 11,
+			'directive' => 51,
+			'defblockname' => 50,
+			'atomdir' => 6,
+			'loop' => 45,
+			'lterm' => 42,
+			'try' => 5,
+			'view' => 40,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'sterm' => 36,
+			'atomexpr' => 35,
+			'block' => 272
+		}
 	},
 	{#State 201
-		ACTIONS => {
-			'TEXT' => 270
-		}
+		DEFAULT => -98
 	},
 	{#State 202
-		DEFAULT => -56,
-		GOTOS => {
-			'@1-3' => 271
-		}
+		DEFAULT => -97
 	},
 	{#State 203
 		ACTIONS => {
-			"\"" => 11,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\$" => 17,
-			"{" => 45,
-			'REF' => 15,
-			'IDENT' => 24,
-			"[" => 16,
-			'LITERAL' => 109
+			"{" => 62,
+			"(" => 61,
+			'WHILE' => 60,
+			'USE' => 59,
+			'FILTER' => 68,
+			'TRY' => 67,
+			'INSERT' => 66,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			"[" => 41,
+			'STOP' => 39,
+			'THROW' => 38,
+			'IF' => 34,
+			'META' => 53,
+			'SET' => 52,
+			'NEXT' => 49,
+			"\$" => 48,
+			"\"" => 47,
+			'PERL' => 46,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'RETURN' => 22,
+			'WRAPPER' => 19,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'LAST' => 14,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'FOR' => 30,
+			'GET' => 27,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'NUMBER' => 23,
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'TEXT' => 7,
+			'CALL' => 8,
+			";" => -18
 		},
+		DEFAULT => -3,
 		GOTOS => {
-			'term' => 272,
-			'sterm' => 54,
-			'ident' => 108,
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72
+			'loop' => 45,
+			'atomdir' => 6,
+			'defblockname' => 50,
+			'directive' => 51,
+			'statement' => 11,
+			'block' => 273,
+			'atomexpr' => 35,
+			'sterm' => 36,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'view' => 40,
+			'try' => 5,
+			'lterm' => 42,
+			'ident' => 24,
+			'filter' => 69,
+			'macro' => 70,
+			'anonblock' => 28,
+			'item' => 29,
+			'chunk' => 71,
+			'use' => 72,
+			'condition' => 33,
+			'perl' => 73,
+			'capture' => 55,
+			'wrapper' => 56,
+			'term' => 15,
+			'node' => 57,
+			'expr' => 58,
+			'assign' => 18,
+			'switch' => 64,
+			'chunks' => 63,
+			'defblock' => 65
 		}
 	},
 	{#State 204
-		ACTIONS => {
-			"\$" => 17,
-			"\"" => 11,
-			"\${" => 33,
-			'NUMBER' => 1,
-			"{" => 45,
-			'REF' => 15,
-			'LITERAL' => 109,
-			"[" => 16,
-			'IDENT' => 24
-		},
-		GOTOS => {
-			'item' => 72,
-			'node' => 46,
-			'lterm' => 47,
-			'term' => 273,
-			'ident' => 108,
-			'sterm' => 54
-		}
+		DEFAULT => -66
 	},
 	{#State 205
-		ACTIONS => {
-			'IDENT' => 24,
-			'NUMBER' => 1,
-			"\${" => 33,
-			'COMMA' => 251,
-			"\$" => 17,
-			'REF' => 15,
-			"(" => 14,
-			'LITERAL' => 253,
-			"[" => 16,
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43
-		},
-		DEFAULT => -64,
-		GOTOS => {
-			'ident' => 252,
-			'sterm' => 54,
-			'term' => 55,
-			'expr' => 254,
-			'item' => 255,
-			'param' => 250,
-			'lterm' => 47,
-			'node' => 46
-		}
+		DEFAULT => -58
 	},
 	{#State 206
 		ACTIONS => {
-			"(" => 14,
-			'REF' => 15,
-			'LITERAL' => 51,
-			"[" => 16,
-			"\"" => 11,
-			'NOT' => 43,
-			"{" => 45,
-			'IDENT' => 275,
-			"\$" => 17,
-			"\${" => 33,
-			'NUMBER' => 1
+			'OR' => 143,
+			'DIV' => 146,
+			"+" => 150,
+			"?" => 142,
+			'BINOP' => 145,
+			'AND' => 149,
+			"/" => 144,
+			'CMPOP' => 148,
+			'CAT' => 147,
+			'MOD' => 141
 		},
-		GOTOS => {
-			'expr' => 103,
-			'sterm' => 54,
-			'ident' => 104,
-			'term' => 55,
-			'assign' => 102,
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72,
-			'margs' => 274
-		}
+		DEFAULT => -47
 	},
 	{#State 207
-		DEFAULT => -92
+		ACTIONS => {
+			"?" => 142,
+			"+" => 150,
+			'DIV' => 146,
+			'OR' => 143,
+			'CAT' => 147,
+			'MOD' => 141,
+			'CMPOP' => 148,
+			"/" => 144,
+			'AND' => 149,
+			'BINOP' => 145
+		},
+		DEFAULT => -61
 	},
 	{#State 208
-		ACTIONS => {
-			"\${" => 33,
-			"\$" => 17,
-			'IDENT' => 24,
-			'LITERAL' => 100
-		},
-		GOTOS => {
-			'item' => 72,
-			'ident' => 99,
-			'setlist' => 131,
-			'assign' => 69,
-			'node' => 46
-		}
+		DEFAULT => -81
 	},
 	{#State 209
 		ACTIONS => {
-			'MOD' => 137,
-			'DIV' => 144,
-			'OR' => 140,
-			"+" => 142,
-			"/" => 136,
-			'CAT' => 145,
-			'BINOP' => 139,
-			'CMPOP' => 143,
-			"?" => 141,
-			'AND' => 138
+			"?" => 142,
+			"+" => 150,
+			'OR' => 143,
+			'DIV' => 146,
+			'MOD' => 141,
+			'CAT' => 147,
+			'AND' => 149,
+			'BINOP' => 145,
+			'CMPOP' => 148,
+			"/" => 144
 		},
-		DEFAULT => -26
+		DEFAULT => -45
 	},
 	{#State 210
 		ACTIONS => {
-			";" => 276
+			"\"" => 47,
+			'REF' => 17,
+			"\$" => 48,
+			'NUMBER' => 23,
+			'IDENT' => 13,
+			'LITERAL' => 89,
+			"\${" => 21
+		},
+		GOTOS => {
+			'ident' => 88,
+			'item' => 29,
+			'sterm' => 274,
+			'node' => 57
 		}
 	},
 	{#State 211
-		DEFAULT => -93
+		DEFAULT => -115
 	},
 	{#State 212
+		DEFAULT => -105
+	},
+	{#State 213
+		DEFAULT => -114
+	},
+	{#State 214
+		DEFAULT => -106
+	},
+	{#State 215
 		ACTIONS => {
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'MACRO' => 25,
-			'CALL' => 18,
-			"\$" => 17,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'GET' => 22,
-			'RAWPERL' => 20,
-			"\"" => 11,
-			'THROW' => 10,
-			'LAST' => 9,
-			"[" => 16,
-			'REF' => 15,
-			"(" => 14,
-			'USE' => 12,
-			'NUMBER' => 1,
+			'TEXT' => 275
+		}
+	},
+	{#State 216
+		ACTIONS => {
+			'NUMBER' => 23,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'GET' => 27,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'FOR' => 30,
+			'LAST' => 14,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'WRAPPER' => 19,
+			'RETURN' => 22,
+			"\${" => 21,
+			'CLEAR' => 20,
 			";" => -18,
-			'FILTER' => 6,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'DEBUG' => 66,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'IF' => 57,
-			'TEXT' => 56,
-			'NEXT' => 53,
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'NOT' => 43,
-			"{" => 45,
-			'LITERAL' => 51,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			"\${" => 33,
-			'WRAPPER' => 41,
-			'RETURN' => 42,
-			'CLEAR' => 39,
-			'META' => 38,
-			'SET' => 37
+			'CALL' => 8,
+			'TEXT' => 7,
+			'MACRO' => 10,
+			'UNLESS' => 9,
+			'DEFAULT' => 2,
+			'PROCESS' => 4,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'FILTER' => 68,
+			'USE' => 59,
+			'WHILE' => 60,
+			"(" => 61,
+			"{" => 62,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'SET' => 52,
+			'META' => 53,
+			'NEXT' => 49,
+			'IF' => 34,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			'THROW' => 38,
+			'STOP' => 39,
+			"[" => 41
 		},
 		DEFAULT => -3,
 		GOTOS => {
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30,
+			'condition' => 33,
+			'perl' => 73,
+			'anonblock' => 28,
 			'macro' => 70,
-			'assign' => 69,
-			'block' => 277,
-			'view' => 65,
-			'rawperl' => 26,
-			'loop' => 63,
-			'perl' => 61,
-			'statement' => 21,
-			'defblockname' => 19,
-			'chunk' => 58,
-			'term' => 55,
-			'sterm' => 54,
-			'directive' => 52,
-			'filter' => 50,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'expr' => 44,
-			'chunks' => 8,
-			'defblock' => 7,
-			'wrapper' => 40,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'switch' => 3,
-			'capture' => 2,
-			'ident' => 34,
-			'use' => 32,
-			'condition' => 31
+			'filter' => 69,
+			'use' => 72,
+			'chunk' => 71,
+			'item' => 29,
+			'ident' => 24,
+			'assign' => 18,
+			'expr' => 58,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'node' => 57,
+			'term' => 15,
+			'capture' => 55,
+			'wrapper' => 56,
+			'statement' => 11,
+			'atomdir' => 6,
+			'directive' => 51,
+			'defblockname' => 50,
+			'loop' => 45,
+			'lterm' => 42,
+			'try' => 5,
+			'view' => 40,
+			'atomexpr' => 35,
+			'setlist' => 37,
+			'rawperl' => 3,
+			'sterm' => 36,
+			'block' => 276
 		}
-	},
-	{#State 213
-		ACTIONS => {
-			'FINAL' => 279,
-			'CATCH' => 280
-		},
-		DEFAULT => -72,
-		GOTOS => {
-			'final' => 278
-		}
-	},
-	{#State 214
-		DEFAULT => -132
-	},
-	{#State 215
-		DEFAULT => -126
-	},
-	{#State 216
-		DEFAULT => -127
 	},
 	{#State 217
 		ACTIONS => {
-			";" => -151,
-			"\${" => -151,
-			'DIV' => 144,
-			'OR' => 140,
-			'CAT' => 145,
-			"?" => 141,
-			'LITERAL' => -151,
-			'MOD' => 137,
-			"\$" => -151,
-			'COMMA' => -151,
-			'IDENT' => -151,
-			"+" => 142,
-			"/" => 136,
-			'BINOP' => 139,
-			'CMPOP' => 143,
-			'AND' => 138
+			'DOT' => 100
 		},
-		DEFAULT => -26
+		DEFAULT => -177
 	},
 	{#State 218
-		DEFAULT => -89
+		DEFAULT => -175
 	},
 	{#State 219
-		ACTIONS => {
-			'NUMBER' => 1,
-			"\${" => 33,
-			'FILTER' => 6,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'CLEAR' => 39,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'SET' => 208,
-			'NOT' => 43,
-			"{" => 45,
-			'THROW' => 10,
-			"\"" => 11,
-			'LAST' => 9,
-			"[" => 16,
-			'LITERAL' => 51,
-			'REF' => 15,
-			'PROCESS' => 48,
-			'BLOCK' => 210,
-			"(" => 14,
-			'IF' => 57,
-			'CALL' => 18,
-			'NEXT' => 53,
-			"\$" => 17,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'DEFAULT' => 60,
-			'GET' => 22,
-			'WHILE' => 59,
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'DEBUG' => 66,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'INSERT' => 68
-		},
-		GOTOS => {
-			'condition' => 31,
-			'ident' => 104,
-			'term' => 55,
-			'sterm' => 54,
-			'switch' => 3,
-			'mdir' => 281,
-			'atomdir' => 36,
-			'wrapper' => 40,
-			'perl' => 61,
-			'loop' => 63,
-			'expr' => 217,
-			'setlist' => 13,
-			'assign' => 69,
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72,
-			'try' => 30,
-			'filter' => 50,
-			'directive' => 211,
-			'atomexpr' => 73
-		}
+		DEFAULT => -178
 	},
 	{#State 220
+		DEFAULT => -179
+	},
+	{#State 221
+		DEFAULT => -111
+	},
+	{#State 222
 		ACTIONS => {
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			"\$" => 17,
-			'CALL' => 18,
-			'RAWPERL' => 20,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'LAST' => 9,
-			'THROW' => 10,
-			"\"" => 11,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			"[" => 16,
+			'FILTER' => 68,
+			'TRY' => 67,
+			'INSERT' => 66,
+			"{" => 62,
+			"(" => 61,
+			'WHILE' => 60,
+			'USE' => 59,
+			'META' => 53,
+			'SET' => 52,
+			'NEXT' => 49,
+			"\$" => 48,
+			"\"" => 47,
+			'PERL' => 46,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			"[" => 41,
+			'STOP' => 39,
+			'THROW' => 38,
+			'IF' => 34,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'FOR' => 30,
+			'GET' => 27,
+			'SWITCH' => 26,
+			'VIEW' => 25,
+			'NUMBER' => 23,
+			'CLEAR' => 20,
+			'RETURN' => 22,
+			"\${" => 21,
+			'WRAPPER' => 19,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'LAST' => 14,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'MACRO' => 10,
+			'UNLESS' => 9,
+			'TEXT' => 7,
+			'CALL' => 8,
 			";" => -18,
-			'NUMBER' => 1,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'FILTER' => 6,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'DEBUG' => 66,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'NEXT' => 53,
-			'TEXT' => 56,
-			'IF' => 57,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'NOT' => 43,
-			"{" => 45,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			'LITERAL' => 51,
-			"\${" => 33,
-			'SET' => 37,
-			'CLEAR' => 39,
-			'META' => 38,
-			'WRAPPER' => 41,
-			'RETURN' => 42
+			'PROCESS' => 4,
+			'DEFAULT' => 2
 		},
 		DEFAULT => -3,
 		GOTOS => {
-			'expr' => 44,
-			'filter' => 50,
-			'directive' => 52,
-			'setlist' => 13,
-			'lterm' => 47,
-			'node' => 46,
-			'ident' => 34,
-			'capture' => 2,
-			'condition' => 31,
-			'use' => 32,
-			'wrapper' => 40,
-			'chunks' => 8,
-			'defblock' => 7,
-			'switch' => 3,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'view' => 65,
-			'rawperl' => 26,
-			'loop' => 63,
-			'item' => 72,
-			'try' => 30,
-			'atomexpr' => 73,
+			'try' => 5,
+			'view' => 40,
+			'lterm' => 42,
+			'block' => 1,
+			'atomexpr' => 35,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'sterm' => 36,
+			'atomdir' => 6,
+			'directive' => 51,
+			'defblockname' => 50,
+			'statement' => 11,
+			'template' => 277,
+			'loop' => 45,
+			'assign' => 18,
+			'expr' => 58,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'wrapper' => 56,
+			'capture' => 55,
+			'node' => 57,
+			'term' => 15,
+			'anonblock' => 28,
 			'macro' => 70,
-			'block' => 282,
-			'assign' => 69,
-			'term' => 55,
-			'sterm' => 54,
-			'defblockname' => 19,
-			'chunk' => 58,
-			'perl' => 61,
-			'statement' => 21
+			'filter' => 69,
+			'use' => 72,
+			'item' => 29,
+			'chunk' => 71,
+			'perl' => 73,
+			'condition' => 33,
+			'ident' => 24
 		}
 	},
-	{#State 221
-		ACTIONS => {
-			'MOD' => 137,
-			'DIV' => 144
-		},
-		DEFAULT => -135
-	},
-	{#State 222
-		DEFAULT => -138
-	},
 	{#State 223
-		ACTIONS => {
-			'MOD' => 137,
-			"/" => 136,
-			"+" => 142,
-			'CMPOP' => 143,
-			'BINOP' => 139,
-			'DIV' => 144,
-			'CAT' => 145
-		},
-		DEFAULT => -141
+		DEFAULT => -137
 	},
 	{#State 224
 		ACTIONS => {
-			'MOD' => 137,
-			"+" => 142,
-			"/" => 136,
-			'DIV' => 144
-		},
-		DEFAULT => -134
+			'OR' => 143,
+			":" => 278,
+			'DIV' => 146,
+			"+" => 150,
+			"?" => 142,
+			'BINOP' => 145,
+			'AND' => 149,
+			"/" => 144,
+			'CMPOP' => 148,
+			'MOD' => 141,
+			'CAT' => 147
+		}
 	},
 	{#State 225
 		ACTIONS => {
-			'BINOP' => 139,
-			'CMPOP' => 143,
-			"+" => 142,
-			"/" => 136,
-			'MOD' => 137,
-			'CAT' => 145,
-			'DIV' => 144
+			'DIV' => 146,
+			"/" => 144,
+			'BINOP' => 145,
+			"+" => 150,
+			'CAT' => 147,
+			'CMPOP' => 148,
+			'MOD' => 141
 		},
-		DEFAULT => -142
+		DEFAULT => -141
 	},
 	{#State 226
 		ACTIONS => {
-			'OR' => 140,
-			"+" => 142,
-			"/" => 136,
-			'MOD' => 137,
-			'DIV' => 144,
-			'BINOP' => 139,
-			":" => 283,
-			'CAT' => 145,
-			'CMPOP' => 143,
-			'AND' => 138,
-			"?" => 141
-		}
+			'DIV' => 146,
+			'MOD' => 141
+		},
+		DEFAULT => -134
 	},
 	{#State 227
 		ACTIONS => {
-			'DIV' => 144,
-			"/" => 136,
-			'MOD' => 137
+			'MOD' => 141,
+			"/" => 144,
+			'DIV' => 146,
+			"+" => 150
 		},
-		DEFAULT => -136
+		DEFAULT => -133
 	},
 	{#State 228
 		ACTIONS => {
-			'MOD' => 137,
-			"/" => 136,
-			"+" => 142,
-			'BINOP' => 139,
-			'DIV' => 144
+			'MOD' => 141
 		},
-		DEFAULT => -139
+		DEFAULT => -136
 	},
 	{#State 229
 		ACTIONS => {
-			'MOD' => 137
+			'MOD' => 141,
+			"+" => 150,
+			'CMPOP' => 148,
+			'DIV' => 146,
+			'BINOP' => 145,
+			"/" => 144
 		},
-		DEFAULT => -137
+		DEFAULT => -139
 	},
 	{#State 230
 		ACTIONS => {
-			'DIV' => 144,
-			'CMPOP' => 143,
-			'BINOP' => 139,
-			"/" => 136,
-			"+" => 142,
-			'MOD' => 137
+			'MOD' => 141,
+			"+" => 150,
+			'DIV' => 146,
+			'BINOP' => 145,
+			"/" => 144
+		},
+		DEFAULT => -138
+	},
+	{#State 231
+		ACTIONS => {
+			"+" => 150,
+			'CMPOP' => 148,
+			'CAT' => 147,
+			'DIV' => 146,
+			"/" => 144,
+			'BINOP' => 145,
+			'MOD' => 141
 		},
 		DEFAULT => -140
 	},
-	{#State 231
-		DEFAULT => -109
-	},
 	{#State 232
 		ACTIONS => {
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43,
-			"(" => 14,
-			'REF' => 15,
-			'LITERAL' => 109,
-			"[" => 16,
-			"\$" => 17,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'IDENT' => 24
+			'MOD' => 141,
+			"/" => 144,
+			'DIV' => 146
 		},
-		GOTOS => {
-			'item' => 72,
-			'node' => 46,
-			'lterm' => 47,
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 55,
-			'expr' => 284
-		}
+		DEFAULT => -135
 	},
 	{#State 233
 		ACTIONS => {
-			'LITERAL' => 109,
-			"[" => 16,
-			"(" => 14,
-			'REF' => 15,
-			"{" => 45,
-			'NOT' => 43,
-			"\"" => 11,
-			'IDENT' => 24,
-			"\$" => 17,
-			"\${" => 33,
-			'NUMBER' => 1
+			'ASSIGN' => -132
 		},
-		GOTOS => {
-			'expr' => 285,
-			'term' => 55,
-			'sterm' => 54,
-			'ident' => 108,
-			'lterm' => 47,
-			'node' => 46,
-			'item' => 72
-		}
+		DEFAULT => -130
 	},
 	{#State 234
-		DEFAULT => -122
+		ACTIONS => {
+			"\$" => 48,
+			"\"" => 279,
+			";" => 220,
+			'IDENT' => 13,
+			"\${" => 21,
+			'TEXT' => 219
+		},
+		GOTOS => {
+			'node' => 57,
+			'quotable' => 218,
+			'item' => 29,
+			'ident' => 217
+		}
 	},
 	{#State 235
-		DEFAULT => -121
+		ACTIONS => {
+			"\"" => 80,
+			"\$" => 79,
+			'LITERAL' => 82,
+			'FILENAME' => 81,
+			'NUMBER' => 83,
+			'IDENT' => 84
+		},
+		GOTOS => {
+			'filepart' => 77,
+			'nameargs' => 280,
+			'names' => 78,
+			'filename' => 87,
+			'name' => 86
+		}
 	},
 	{#State 236
-		ACTIONS => {
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'META' => 38,
-			'CLEAR' => 39,
-			'SET' => 37,
-			"\${" => 33,
-			'LITERAL' => 51,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			'NOT' => 43,
-			"{" => 45,
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'IF' => 57,
-			'TEXT' => 56,
-			'NEXT' => 53,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			'DEBUG' => 66,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'FILTER' => 6,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'NUMBER' => 1,
-			";" => -18,
-			"[" => 16,
-			'REF' => 15,
-			'USE' => 12,
-			"(" => 14,
-			'THROW' => 10,
-			"\"" => 11,
-			'LAST' => 9,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'GET' => 22,
-			'RAWPERL' => 20,
-			'CALL' => 18,
-			"\$" => 17,
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'MACRO' => 25
-		},
-		DEFAULT => -3,
+		DEFAULT => -59,
 		GOTOS => {
-			'defblockname' => 19,
-			'chunk' => 58,
-			'term' => 55,
-			'sterm' => 54,
-			'statement' => 21,
-			'perl' => 61,
-			'loop' => 63,
-			'view' => 65,
-			'rawperl' => 26,
-			'assign' => 69,
-			'block' => 286,
-			'macro' => 70,
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30,
-			'use' => 32,
-			'condition' => 31,
-			'capture' => 2,
-			'ident' => 34,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'switch' => 3,
-			'chunks' => 8,
-			'defblock' => 7,
-			'wrapper' => 40,
-			'expr' => 44,
-			'node' => 46,
-			'lterm' => 47,
-			'setlist' => 13,
-			'directive' => 52,
-			'filter' => 50
+			'@2-3' => 281
 		}
 	},
 	{#State 237
-		ACTIONS => {
-			'MOD' => 137,
-			"+" => 142,
-			"/" => 136,
-			'AND' => 138,
-			'BINOP' => 139,
-			'CMPOP' => 143,
-			'DIV' => 144,
-			'OR' => 140,
-			"?" => 141,
-			'CAT' => 145
-		},
-		DEFAULT => -152
+		DEFAULT => -145
 	},
 	{#State 238
-		ACTIONS => {
-			'REF' => 15,
-			"(" => 14,
-			'USE' => 12,
-			"[" => 16,
-			'THROW' => 10,
-			"\"" => 11,
-			'LAST' => 9,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'FILTER' => 6,
-			'NUMBER' => 1,
-			";" => -18,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'MACRO' => 25,
-			'RAWPERL' => 20,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'GET' => 22,
-			"\$" => 17,
-			'CALL' => 18,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			'LITERAL' => 51,
-			"{" => 45,
-			'NOT' => 43,
-			'SET' => 37,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'CLEAR' => 39,
-			'META' => 38,
-			"\${" => 33,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'DEBUG' => 66,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'NEXT' => 53,
-			'IF' => 57,
-			'TEXT' => 56
-		},
-		DEFAULT => -3,
-		GOTOS => {
-			'loop' => 63,
-			'view' => 65,
-			'rawperl' => 26,
-			'block' => 287,
-			'assign' => 69,
-			'macro' => 70,
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30,
-			'defblockname' => 19,
-			'chunk' => 58,
-			'sterm' => 54,
-			'term' => 55,
-			'statement' => 21,
-			'perl' => 61,
-			'expr' => 44,
-			'node' => 46,
-			'lterm' => 47,
-			'setlist' => 13,
-			'directive' => 52,
-			'filter' => 50,
-			'use' => 32,
-			'condition' => 31,
-			'capture' => 2,
-			'ident' => 34,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'switch' => 3,
-			'chunks' => 8,
-			'defblock' => 7,
-			'wrapper' => 40
-		}
+		DEFAULT => -144
 	},
 	{#State 239
-		DEFAULT => -59,
+		ACTIONS => {
+			"(" => 61,
+			"[" => 41,
+			"{" => 62,
+			'LITERAL' => 89,
+			"\${" => 21,
+			'NUMBER' => 23,
+			'NOT' => 12,
+			'IDENT' => 13,
+			"\"" => 47,
+			"\$" => 48,
+			'REF' => 17
+		},
 		GOTOS => {
-			'@2-3' => 288
+			'ident' => 88,
+			'node' => 57,
+			'sterm' => 36,
+			'term' => 15,
+			'item' => 29,
+			'expr' => 282,
+			'lterm' => 42
 		}
 	},
 	{#State 240
 		ACTIONS => {
-			'LAST' => 9,
-			"\"" => 11,
-			'THROW' => 10,
-			"[" => 16,
-			'USE' => 12,
-			"(" => 14,
-			'REF' => 15,
-			";" => -18,
-			'NUMBER' => 1,
-			'FILTER' => 6,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'MACRO' => 25,
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'CALL' => 18,
-			"\$" => 17,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'RAWPERL' => 20,
-			"{" => 45,
-			'NOT' => 43,
-			'LITERAL' => 51,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			"\${" => 33,
-			'META' => 38,
-			'CLEAR' => 39,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'SET' => 37,
-			'DEBUG' => 66,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			'TEXT' => 56,
-			'IF' => 57,
-			'NEXT' => 53,
-			'DEFAULT' => 60,
-			'WHILE' => 59
+			'IDENT' => 13,
+			'NOT' => 12,
+			'NUMBER' => 23,
+			"\$" => 48,
+			'REF' => 17,
+			"\"" => 47,
+			"{" => 62,
+			"[" => 41,
+			"(" => 61,
+			"\${" => 21,
+			'LITERAL' => 89
 		},
-		DEFAULT => -3,
 		GOTOS => {
-			'rawperl' => 26,
-			'view' => 65,
-			'loop' => 63,
-			'try' => 30,
-			'item' => 72,
-			'atomexpr' => 73,
-			'macro' => 70,
-			'assign' => 69,
-			'block' => 289,
-			'sterm' => 54,
-			'term' => 55,
-			'chunk' => 58,
-			'defblockname' => 19,
-			'perl' => 61,
-			'statement' => 21,
-			'expr' => 44,
-			'filter' => 50,
-			'directive' => 52,
-			'setlist' => 13,
-			'node' => 46,
-			'lterm' => 47,
-			'ident' => 34,
-			'capture' => 2,
-			'condition' => 31,
-			'use' => 32,
-			'wrapper' => 40,
-			'defblock' => 7,
-			'chunks' => 8,
-			'switch' => 3,
-			'anonblock' => 35,
-			'atomdir' => 36
+			'term' => 15,
+			'sterm' => 36,
+			'node' => 57,
+			'lterm' => 42,
+			'item' => 29,
+			'expr' => 283,
+			'ident' => 88
 		}
 	},
 	{#State 241
-		DEFAULT => -74,
-		GOTOS => {
-			'@3-3' => 290
-		}
+		DEFAULT => -108
 	},
 	{#State 242
-		ACTIONS => {
-			"\"" => 11,
-			")" => 291,
-			"{" => 45,
-			'NOT' => 43,
-			"(" => 14,
-			'REF' => 15,
-			"[" => 16,
-			'LITERAL' => 253,
-			"\$" => 17,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'COMMA' => 251,
-			'IDENT' => 24
-		},
-		GOTOS => {
-			'lterm' => 47,
-			'node' => 46,
-			'item' => 255,
-			'param' => 250,
-			'ident' => 252,
-			'sterm' => 54,
-			'term' => 55,
-			'expr' => 254
-		}
+		DEFAULT => -120
 	},
 	{#State 243
-		DEFAULT => -58
+		DEFAULT => -121
 	},
 	{#State 244
 		ACTIONS => {
-			'OR' => 140,
-			"/" => 136,
-			"+" => 142,
-			'CMPOP' => 143,
-			'MOD' => 137,
-			'BINOP' => 139,
-			'CAT' => 145,
-			'DIV' => 144,
-			'AND' => 138,
-			"?" => 141
+			'FINAL' => 284,
+			'CATCH' => 285
 		},
-		DEFAULT => -47
+		DEFAULT => -72,
+		GOTOS => {
+			'final' => 286
+		}
 	},
 	{#State 245
-		DEFAULT => -81
+		ACTIONS => {
+			'GET' => 27,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'NUMBER' => 23,
+			'FOR' => 30,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'LAST' => 14,
+			'CLEAR' => 20,
+			'RETURN' => 22,
+			"\${" => 21,
+			'WRAPPER' => 19,
+			";" => -18,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'CALL' => 8,
+			'TEXT' => 7,
+			'DEFAULT' => 2,
+			'PROCESS' => 4,
+			'TRY' => 67,
+			'INSERT' => 66,
+			'FILTER' => 68,
+			"{" => 62,
+			"(" => 61,
+			'WHILE' => 60,
+			'USE' => 59,
+			"\$" => 48,
+			"\"" => 47,
+			'PERL' => 46,
+			'NEXT' => 49,
+			'META' => 53,
+			'SET' => 52,
+			'IF' => 34,
+			"[" => 41,
+			'STOP' => 39,
+			'THROW' => 38,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'lterm' => 42,
+			'view' => 40,
+			'try' => 5,
+			'sterm' => 36,
+			'setlist' => 37,
+			'rawperl' => 3,
+			'atomexpr' => 35,
+			'block' => 287,
+			'statement' => 11,
+			'defblockname' => 50,
+			'directive' => 51,
+			'atomdir' => 6,
+			'loop' => 45,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'expr' => 58,
+			'assign' => 18,
+			'term' => 15,
+			'node' => 57,
+			'capture' => 55,
+			'wrapper' => 56,
+			'condition' => 33,
+			'perl' => 73,
+			'chunk' => 71,
+			'item' => 29,
+			'use' => 72,
+			'filter' => 69,
+			'macro' => 70,
+			'anonblock' => 28,
+			'ident' => 24
+		}
 	},
 	{#State 246
 		ACTIONS => {
-			'AND' => 138,
-			"?" => 141,
-			'CMPOP' => 143,
-			'BINOP' => 139,
-			'CAT' => 145,
-			"/" => 136,
-			"+" => 142,
-			'OR' => 140,
-			'DIV' => 144,
-			'MOD' => 137
+			'AND' => 149,
+			'OR' => 143,
+			"?" => 142,
+			'MOD' => 141,
+			"+" => 150,
+			'CMPOP' => 148,
+			'CAT' => 147,
+			'DIV' => 146,
+			'BINOP' => 145,
+			"/" => 144
 		},
-		DEFAULT => -45
+		DEFAULT => -150
 	},
 	{#State 247
 		ACTIONS => {
-			"/" => 136,
-			"+" => 142,
-			'OR' => 140,
-			'DIV' => 144,
-			"?" => 141,
-			'AND' => 138,
-			'CMPOP' => 143,
-			'MOD' => 137,
-			'BINOP' => 139,
-			'CAT' => 145
+			'IDENT' => 13,
+			'NOT' => 12,
+			'REF' => 17,
+			"(" => 61,
+			"{" => 62,
+			"[" => 41,
+			"\${" => 21,
+			'NUMBER' => 23,
+			"\"" => 47,
+			")" => 288,
+			"\$" => 48,
+			'LITERAL' => 249,
+			'COMMA' => 253
 		},
-		DEFAULT => -61
+		GOTOS => {
+			'ident' => 252,
+			'node' => 57,
+			'sterm' => 36,
+			'term' => 15,
+			'item' => 250,
+			'param' => 251,
+			'expr' => 248,
+			'lterm' => 42
+		}
 	},
 	{#State 248
-		DEFAULT => -66
+		ACTIONS => {
+			'MOD' => 141,
+			'OR' => 143,
+			"?" => 142,
+			'AND' => 149,
+			"/" => 144,
+			'BINOP' => 145,
+			'DIV' => 146,
+			'CMPOP' => 148,
+			'CAT' => 147,
+			"+" => 150
+		},
+		DEFAULT => -152
 	},
 	{#State 249
 		ACTIONS => {
-			'END' => 292
-		}
+			'ASSIGN' => 239
+		},
+		DEFAULT => -112
 	},
 	{#State 250
-		DEFAULT => -154
+		ACTIONS => {
+			'ASSIGN' => 240,
+			"(" => 104
+		},
+		DEFAULT => -128
 	},
 	{#State 251
-		DEFAULT => -156
+		DEFAULT => -153
 	},
 	{#State 252
 		ACTIONS => {
-			'ASSIGN' => 293,
-			'DOT' => 129
+			'DOT' => 100,
+			'ASSIGN' => 289
 		},
-		DEFAULT => -110
+		DEFAULT => -109
 	},
 	{#State 253
-		ACTIONS => {
-			'ASSIGN' => 233
-		},
-		DEFAULT => -113
+		DEFAULT => -155
 	},
 	{#State 254
-		ACTIONS => {
-			'OR' => 140,
-			'DIV' => 144,
-			"?" => 141,
-			'CAT' => 145,
-			"+" => 142,
-			"/" => 136,
-			'MOD' => 137,
-			'AND' => 138,
-			'BINOP' => 139,
-			'CMPOP' => 143
-		},
-		DEFAULT => -153
+		DEFAULT => -165
 	},
 	{#State 255
 		ACTIONS => {
-			"(" => 166,
-			'ASSIGN' => 232
+			'LITERAL' => 249,
+			'COMMA' => 253,
+			"\$" => 48,
+			"\"" => 47,
+			'NUMBER' => 23,
+			"\${" => 21,
+			"{" => 62,
+			"[" => 41,
+			"(" => 61,
+			'REF' => 17,
+			'NOT' => 12,
+			'IDENT' => 13
 		},
-		DEFAULT => -129
-	},
-	{#State 256
-		ACTIONS => {
-			"\$" => 17,
-			'NUMBER' => 1,
-			"\${" => 33,
-			'COMMA' => 251,
-			'IDENT' => 24,
-			"\"" => 11,
-			")" => 294,
-			'NOT' => 43,
-			"{" => 45,
-			"(" => 14,
-			'REF' => 15,
-			"[" => 16,
-			'LITERAL' => 253
-		},
+		DEFAULT => -162,
 		GOTOS => {
-			'sterm' => 54,
-			'ident' => 252,
-			'term' => 55,
-			'expr' => 254,
-			'lterm' => 47,
-			'node' => 46,
-			'item' => 255,
-			'param' => 250
+			'lterm' => 42,
+			'expr' => 248,
+			'param' => 251,
+			'item' => 250,
+			'term' => 15,
+			'sterm' => 36,
+			'node' => 57,
+			'ident' => 252
 		}
 	},
+	{#State 256
+		DEFAULT => -167
+	},
 	{#State 257
-		DEFAULT => -166
+		DEFAULT => -170
 	},
 	{#State 258
-		DEFAULT => -171
+		ACTIONS => {
+			'ELSE' => 292,
+			'ELSIF' => 290
+		},
+		DEFAULT => -50,
+		GOTOS => {
+			'else' => 291
+		}
 	},
 	{#State 259
-		DEFAULT => -168
+		ACTIONS => {
+			"(" => 61,
+			"{" => 62,
+			'WHILE' => 60,
+			'USE' => 59,
+			'FILTER' => 68,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			"[" => 41,
+			'THROW' => 38,
+			'STOP' => 39,
+			'IF' => 34,
+			'META' => 53,
+			'SET' => 52,
+			'NEXT' => 49,
+			"\"" => 47,
+			"\$" => 48,
+			'PERL' => 46,
+			'WRAPPER' => 19,
+			'CLEAR' => 20,
+			'RETURN' => 22,
+			"\${" => 21,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'LAST' => 14,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'FOR' => 30,
+			'GET' => 27,
+			'NUMBER' => 23,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'CALL' => 8,
+			'TEXT' => 7,
+			'MACRO' => 10,
+			'UNLESS' => 9,
+			";" => -18
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'block' => 293,
+			'atomexpr' => 35,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'sterm' => 36,
+			'try' => 5,
+			'view' => 40,
+			'lterm' => 42,
+			'loop' => 45,
+			'atomdir' => 6,
+			'directive' => 51,
+			'defblockname' => 50,
+			'statement' => 11,
+			'capture' => 55,
+			'wrapper' => 56,
+			'node' => 57,
+			'term' => 15,
+			'assign' => 18,
+			'expr' => 58,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'ident' => 24,
+			'anonblock' => 28,
+			'macro' => 70,
+			'filter' => 69,
+			'use' => 72,
+			'chunk' => 71,
+			'item' => 29,
+			'condition' => 33,
+			'perl' => 73
+		}
 	},
 	{#State 260
 		ACTIONS => {
-			'IDENT' => 24,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'COMMA' => 251,
-			"\$" => 17,
-			"[" => 16,
-			'LITERAL' => 253,
-			'REF' => 15,
-			"(" => 14,
-			"{" => 45,
-			'NOT' => 43,
-			"\"" => 11
+			'IDENT' => -96,
+			'COMMA' => -96,
+			")" => -96
 		},
-		DEFAULT => -163,
-		GOTOS => {
-			'expr' => 254,
-			'ident' => 252,
-			'term' => 55,
-			'sterm' => 54,
-			'param' => 250,
-			'item' => 255,
-			'node' => 46,
-			'lterm' => 47
-		}
+		DEFAULT => -130
 	},
 	{#State 261
-		DEFAULT => -158
+		ACTIONS => {
+			'IDENT' => 295,
+			'COMMA' => 294,
+			")" => 296
+		}
 	},
 	{#State 262
 		ACTIONS => {
-			'END' => 295
+			'END' => 297
 		}
 	},
 	{#State 263
 		ACTIONS => {
-			'ASSIGN' => -161
+			'WHILE' => 60,
+			'USE' => 59,
+			"{" => 62,
+			"(" => 61,
+			'TRY' => 67,
+			'INSERT' => 66,
+			'FILTER' => 68,
+			'IF' => 34,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			'STOP' => 39,
+			'THROW' => 38,
+			"[" => 41,
+			'PERL' => 46,
+			"\$" => 48,
+			"\"" => 47,
+			'SET' => 52,
+			'META' => 53,
+			'NEXT' => 49,
+			'LAST' => 14,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'RETURN' => 22,
+			'WRAPPER' => 19,
+			'SWITCH' => 26,
+			'VIEW' => 25,
+			'NUMBER' => 23,
+			'GET' => 27,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'FOR' => 30,
+			'DEFAULT' => 2,
+			'PROCESS' => 4,
+			";" => -18,
+			'MACRO' => 10,
+			'UNLESS' => 9,
+			'CALL' => 8,
+			'TEXT' => 7
 		},
-		DEFAULT => -168
+		DEFAULT => -3,
+		GOTOS => {
+			'try' => 5,
+			'view' => 40,
+			'lterm' => 42,
+			'block' => 298,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'sterm' => 36,
+			'atomexpr' => 35,
+			'directive' => 51,
+			'defblockname' => 50,
+			'atomdir' => 6,
+			'statement' => 11,
+			'loop' => 45,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'assign' => 18,
+			'expr' => 58,
+			'wrapper' => 56,
+			'capture' => 55,
+			'node' => 57,
+			'term' => 15,
+			'use' => 72,
+			'item' => 29,
+			'chunk' => 71,
+			'macro' => 70,
+			'anonblock' => 28,
+			'filter' => 69,
+			'condition' => 33,
+			'perl' => 73,
+			'ident' => 24
+		}
 	},
 	{#State 264
 		ACTIONS => {
-			"/" => 136,
-			"+" => 142,
-			'MOD' => 137,
-			'AND' => 138,
-			'CMPOP' => 143,
-			'BINOP' => 139,
-			'OR' => 140,
-			'DIV' => 144,
-			"?" => 141,
-			'CAT' => 145
+			'CASE' => 299
 		},
-		DEFAULT => -151
+		DEFAULT => -55,
+		GOTOS => {
+			'case' => 300
+		}
 	},
 	{#State 265
-		DEFAULT => -118
+		DEFAULT => -129
 	},
 	{#State 266
 		ACTIONS => {
-			'END' => 296
+			'FILTER' => 68,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'USE' => 59,
+			'WHILE' => 60,
+			"(" => 61,
+			"{" => 62,
+			'SET' => 52,
+			'META' => 53,
+			'NEXT' => 49,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			'THROW' => 38,
+			'STOP' => 39,
+			"[" => 41,
+			'IF' => 34,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'FOR' => 30,
+			'NUMBER' => 23,
+			'SWITCH' => 26,
+			'VIEW' => 25,
+			'GET' => 27,
+			'WRAPPER' => 19,
+			"\${" => 21,
+			'CLEAR' => 20,
+			'RETURN' => 22,
+			'LAST' => 14,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'TEXT' => 7,
+			'CALL' => 8,
+			'MACRO' => 10,
+			'UNLESS' => 9,
+			";" => -18,
+			'PROCESS' => 4,
+			'DEFAULT' => 2
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'expr' => 58,
+			'assign' => 18,
+			'defblock' => 65,
+			'switch' => 64,
+			'chunks' => 63,
+			'wrapper' => 56,
+			'capture' => 55,
+			'term' => 15,
+			'node' => 57,
+			'filter' => 69,
+			'macro' => 70,
+			'anonblock' => 28,
+			'chunk' => 71,
+			'item' => 29,
+			'use' => 72,
+			'perl' => 73,
+			'condition' => 33,
+			'ident' => 24,
+			'view' => 40,
+			'try' => 5,
+			'lterm' => 42,
+			'block' => 301,
+			'atomexpr' => 35,
+			'sterm' => 36,
+			'setlist' => 37,
+			'rawperl' => 3,
+			'atomdir' => 6,
+			'defblockname' => 50,
+			'directive' => 51,
+			'statement' => 11,
+			'loop' => 45
 		}
 	},
 	{#State 267
-		DEFAULT => -101
+		DEFAULT => -156,
+		GOTOS => {
+			'args' => 302
+		}
 	},
 	{#State 268
-		DEFAULT => -103
+		DEFAULT => -156,
+		GOTOS => {
+			'args' => 303
+		}
 	},
 	{#State 269
 		ACTIONS => {
-			'TEXT' => 297
+			'TEXT' => 304
 		}
 	},
 	{#State 270
-		ACTIONS => {
-			'END' => 298
-		}
+		DEFAULT => -100
 	},
 	{#State 271
-		ACTIONS => {
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'META' => 38,
-			'CLEAR' => 39,
-			'SET' => 37,
-			"\${" => 33,
-			'LITERAL' => 51,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			"{" => 45,
-			'NOT' => 43,
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'IF' => 57,
-			'TEXT' => 56,
-			'NEXT' => 53,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			'DEBUG' => 66,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'FILTER' => 6,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'NUMBER' => 1,
-			";" => -18,
-			"[" => 16,
-			'REF' => 15,
-			'USE' => 12,
-			"(" => 14,
-			"\"" => 11,
-			'THROW' => 10,
-			'LAST' => 9,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'GET' => 22,
-			'RAWPERL' => 20,
-			'CALL' => 18,
-			"\$" => 17,
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'MACRO' => 25
-		},
-		DEFAULT => -3,
-		GOTOS => {
-			'loop' => 63,
-			'rawperl' => 26,
-			'view' => 65,
-			'assign' => 69,
-			'block' => 299,
-			'macro' => 70,
-			'atomexpr' => 73,
-			'try' => 30,
-			'item' => 72,
-			'chunk' => 58,
-			'defblockname' => 19,
-			'term' => 55,
-			'sterm' => 54,
-			'statement' => 21,
-			'perl' => 61,
-			'expr' => 44,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'directive' => 52,
-			'filter' => 50,
-			'use' => 32,
-			'condition' => 31,
-			'capture' => 2,
-			'ident' => 34,
-			'anonblock' => 35,
-			'atomdir' => 36,
-			'switch' => 3,
-			'defblock' => 7,
-			'chunks' => 8,
-			'wrapper' => 40
-		}
+		DEFAULT => -102
 	},
 	{#State 272
-		DEFAULT => -157,
-		GOTOS => {
-			'args' => 300
+		ACTIONS => {
+			'END' => 305
 		}
 	},
 	{#State 273
-		DEFAULT => -157,
+		ACTIONS => {
+			'ELSE' => 292,
+			'ELSIF' => 290
+		},
+		DEFAULT => -50,
 		GOTOS => {
-			'args' => 301
+			'else' => 306
 		}
 	},
 	{#State 274
-		ACTIONS => {
-			")" => 304,
-			'IDENT' => 302,
-			'COMMA' => 303
-		}
+		DEFAULT => -117
 	},
 	{#State 275
 		ACTIONS => {
-			'COMMA' => -97,
-			'IDENT' => -97,
-			")" => -97
-		},
-		DEFAULT => -131
+			'END' => 307
+		}
 	},
 	{#State 276
 		ACTIONS => {
-			"\${" => 33,
-			'META' => 38,
-			'CLEAR' => 39,
-			'WRAPPER' => 41,
-			'RETURN' => 42,
-			'SET' => 37,
-			"{" => 45,
-			'NOT' => 43,
-			'LITERAL' => 51,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			'TEXT' => 56,
-			'IF' => 57,
-			'NEXT' => 53,
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'DEBUG' => 66,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			";" => -18,
-			'NUMBER' => 1,
-			'FILTER' => 6,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'LAST' => 9,
-			"\"" => 11,
-			'THROW' => 10,
-			"[" => 16,
-			'USE' => 12,
-			"(" => 14,
-			'REF' => 15,
-			'CALL' => 18,
-			"\$" => 17,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'RAWPERL' => 20,
-			'MACRO' => 25,
-			'UNLESS' => 27,
-			'TRY' => 28
-		},
-		DEFAULT => -3,
-		GOTOS => {
-			'condition' => 31,
-			'use' => 32,
-			'ident' => 34,
-			'capture' => 2,
-			'switch' => 3,
-			'anonblock' => 35,
-			'atomdir' => 36,
-			'wrapper' => 40,
-			'defblock' => 7,
-			'chunks' => 8,
-			'expr' => 44,
-			'setlist' => 13,
-			'lterm' => 47,
-			'node' => 46,
-			'filter' => 50,
-			'directive' => 52,
-			'sterm' => 54,
-			'term' => 55,
-			'chunk' => 58,
-			'defblockname' => 19,
-			'statement' => 21,
-			'perl' => 61,
-			'loop' => 63,
-			'rawperl' => 26,
-			'view' => 65,
-			'macro' => 70,
-			'block' => 305,
-			'assign' => 69,
-			'item' => 72,
-			'try' => 30,
-			'atomexpr' => 73
+			'END' => 308
 		}
 	},
 	{#State 277
 		ACTIONS => {
-			'ELSE' => 306,
-			'ELSIF' => 308
-		},
-		DEFAULT => -50,
-		GOTOS => {
-			'else' => 307
+			'END' => 309
 		}
 	},
 	{#State 278
 		ACTIONS => {
-			'END' => 309
+			'NOT' => 12,
+			'IDENT' => 13,
+			'NUMBER' => 23,
+			'REF' => 17,
+			"\$" => 48,
+			"\"" => 47,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61,
+			"\${" => 21,
+			'LITERAL' => 89
+		},
+		GOTOS => {
+			'item' => 29,
+			'expr' => 310,
+			'lterm' => 42,
+			'ident' => 88,
+			'node' => 57,
+			'term' => 15,
+			'sterm' => 36
 		}
 	},
 	{#State 279
 		ACTIONS => {
-			";" => 310
-		}
+			'ASSIGN' => -160
+		},
+		DEFAULT => -167
 	},
 	{#State 280
-		ACTIONS => {
-			'NUMBER' => 79,
-			";" => 312,
-			'FILENAME' => 83,
-			'IDENT' => 84,
-			'DEFAULT' => 313
-		},
-		GOTOS => {
-			'filename' => 311,
-			'filepart' => 78
-		}
+		DEFAULT => -157
 	},
 	{#State 281
-		DEFAULT => -90
+		ACTIONS => {
+			'LAST' => 14,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'WRAPPER' => 19,
+			'RETURN' => 22,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'NUMBER' => 23,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'GET' => 27,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'FOR' => 30,
+			'DEFAULT' => 2,
+			'PROCESS' => 4,
+			";" => -18,
+			'CALL' => 8,
+			'TEXT' => 7,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'WHILE' => 60,
+			'USE' => 59,
+			"(" => 61,
+			"{" => 62,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'FILTER' => 68,
+			'IF' => 34,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			'THROW' => 38,
+			'STOP' => 39,
+			"[" => 41,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'SET' => 52,
+			'META' => 53,
+			'NEXT' => 49
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'ident' => 24,
+			'perl' => 73,
+			'condition' => 33,
+			'filter' => 69,
+			'anonblock' => 28,
+			'macro' => 70,
+			'item' => 29,
+			'chunk' => 71,
+			'use' => 72,
+			'term' => 15,
+			'node' => 57,
+			'wrapper' => 56,
+			'capture' => 55,
+			'expr' => 58,
+			'assign' => 18,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'loop' => 45,
+			'statement' => 11,
+			'atomdir' => 6,
+			'defblockname' => 50,
+			'directive' => 51,
+			'atomexpr' => 35,
+			'sterm' => 36,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'block' => 311,
+			'lterm' => 42,
+			'view' => 40,
+			'try' => 5
+		}
 	},
 	{#State 282
 		ACTIONS => {
-			'END' => 314
-		}
+			'CMPOP' => 148,
+			'CAT' => 147,
+			"+" => 150,
+			"/" => 144,
+			'BINOP' => 145,
+			'DIV' => 146,
+			'AND' => 149,
+			'MOD' => 141,
+			'OR' => 143,
+			"?" => 142
+		},
+		DEFAULT => -123
 	},
 	{#State 283
 		ACTIONS => {
-			'IDENT' => 24,
-			"\${" => 33,
-			'NUMBER' => 1,
-			"\$" => 17,
-			"[" => 16,
-			'LITERAL' => 109,
-			'REF' => 15,
-			"(" => 14,
-			"{" => 45,
-			'NOT' => 43,
-			"\"" => 11
+			"/" => 144,
+			'BINOP' => 145,
+			'DIV' => 146,
+			'CAT' => 147,
+			'CMPOP' => 148,
+			"+" => 150,
+			'MOD' => 141,
+			"?" => 142,
+			'OR' => 143,
+			'AND' => 149
 		},
-		GOTOS => {
-			'item' => 72,
-			'node' => 46,
-			'lterm' => 47,
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 55,
-			'expr' => 315
-		}
+		DEFAULT => -124
 	},
 	{#State 284
 		ACTIONS => {
-			'AND' => 138,
-			'BINOP' => 139,
-			'CMPOP' => 143,
-			'MOD' => 137,
-			"+" => 142,
-			"/" => 136,
-			"?" => 141,
-			'CAT' => 145,
-			'DIV' => 144,
-			'OR' => 140
-		},
-		DEFAULT => -125
+			";" => 312
+		}
 	},
 	{#State 285
 		ACTIONS => {
-			'CAT' => 145,
-			"?" => 141,
-			'OR' => 140,
-			'DIV' => 144,
-			'BINOP' => 139,
-			'CMPOP' => 143,
-			'AND' => 138,
-			"+" => 142,
-			"/" => 136,
-			'MOD' => 137
+			'FILENAME' => 81,
+			'IDENT' => 84,
+			'NUMBER' => 83,
+			";" => 315,
+			'DEFAULT' => 313
 		},
-		DEFAULT => -124
+		GOTOS => {
+			'filepart' => 77,
+			'filename' => 314
+		}
 	},
 	{#State 286
 		ACTIONS => {
@@ -3948,1124 +4040,1120 @@ $STATES = [
 	},
 	{#State 287
 		ACTIONS => {
-			'ELSE' => 306,
-			'ELSIF' => 308
-		},
-		DEFAULT => -50,
-		GOTOS => {
-			'else' => 317
+			'END' => 317
 		}
 	},
 	{#State 288
-		ACTIONS => {
-			"\"" => 11,
-			'THROW' => 10,
-			'LAST' => 9,
-			"[" => 16,
-			'REF' => 15,
-			'USE' => 12,
-			"(" => 14,
-			'NUMBER' => 1,
-			";" => -18,
-			'FILTER' => 6,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'MACRO' => 25,
-			'CALL' => 18,
-			"\$" => 17,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'GET' => 22,
-			'RAWPERL' => 20,
-			"{" => 45,
-			'NOT' => 43,
-			'LITERAL' => 51,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			"\${" => 33,
-			'WRAPPER' => 41,
-			'RETURN' => 42,
-			'META' => 38,
-			'CLEAR' => 39,
-			'SET' => 37,
-			'DEBUG' => 66,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			'IF' => 57,
-			'TEXT' => 56,
-			'NEXT' => 53,
-			'DEFAULT' => 60,
-			'WHILE' => 59
-		},
-		DEFAULT => -3,
-		GOTOS => {
-			'directive' => 52,
-			'filter' => 50,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'expr' => 44,
-			'chunks' => 8,
-			'defblock' => 7,
-			'wrapper' => 40,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'switch' => 3,
-			'capture' => 2,
-			'ident' => 34,
-			'use' => 32,
-			'condition' => 31,
-			'atomexpr' => 73,
-			'try' => 30,
-			'item' => 72,
-			'block' => 318,
-			'macro' => 70,
-			'assign' => 69,
-			'view' => 65,
-			'rawperl' => 26,
-			'loop' => 63,
-			'perl' => 61,
-			'statement' => 21,
-			'defblockname' => 19,
-			'chunk' => 58,
-			'term' => 55,
-			'sterm' => 54
-		}
+		DEFAULT => -164
 	},
 	{#State 289
 		ACTIONS => {
-			'CASE' => 319
+			"\"" => 47,
+			"\$" => 48,
+			'REF' => 17,
+			'NUMBER' => 23,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'LITERAL' => 89,
+			"\${" => 21,
+			"(" => 61,
+			"[" => 41,
+			"{" => 62
 		},
-		DEFAULT => -55,
 		GOTOS => {
-			'case' => 320
+			'lterm' => 42,
+			'sterm' => 36,
+			'term' => 15,
+			'node' => 57,
+			'expr' => 318,
+			'ident' => 88,
+			'item' => 29
 		}
 	},
 	{#State 290
 		ACTIONS => {
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'GET' => 22,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'RAWPERL' => 20,
-			'CALL' => 18,
-			"\$" => 17,
-			"[" => 16,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			'LAST' => 9,
-			'THROW' => 10,
-			"\"" => 11,
-			'FILTER' => 6,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			";" => -18,
-			'NUMBER' => 1,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'DEBUG' => 66,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'TEXT' => 56,
-			'IF' => 57,
-			'NEXT' => 53,
-			'LITERAL' => 51,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			'NOT' => 43,
-			"{" => 45,
-			'CLEAR' => 39,
-			'META' => 38,
-			'WRAPPER' => 41,
-			'RETURN' => 42,
-			'SET' => 37,
-			"\${" => 33
+			'LITERAL' => 89,
+			'NUMBER' => 23,
+			"\$" => 48,
+			"\"" => 47,
+			"[" => 41,
+			"{" => 62,
+			"(" => 61,
+			"\${" => 21,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'REF' => 17
 		},
-		DEFAULT => -3,
 		GOTOS => {
-			'loop' => 63,
-			'view' => 65,
-			'rawperl' => 26,
-			'macro' => 70,
-			'block' => 321,
-			'assign' => 69,
-			'try' => 30,
-			'item' => 72,
-			'atomexpr' => 73,
-			'term' => 55,
-			'sterm' => 54,
-			'defblockname' => 19,
-			'chunk' => 58,
-			'statement' => 21,
-			'perl' => 61,
-			'expr' => 44,
-			'setlist' => 13,
-			'node' => 46,
-			'lterm' => 47,
-			'filter' => 50,
-			'directive' => 52,
-			'condition' => 31,
-			'use' => 32,
-			'ident' => 34,
-			'capture' => 2,
-			'switch' => 3,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'wrapper' => 40,
-			'chunks' => 8,
-			'defblock' => 7
+			'ident' => 88,
+			'term' => 15,
+			'sterm' => 36,
+			'node' => 57,
+			'expr' => 319,
+			'item' => 29,
+			'lterm' => 42
 		}
 	},
 	{#State 291
-		DEFAULT => -130
+		ACTIONS => {
+			'END' => 320
+		}
 	},
 	{#State 292
-		DEFAULT => -77
+		ACTIONS => {
+			";" => 321
+		}
 	},
 	{#State 293
 		ACTIONS => {
-			"(" => 14,
-			'REF' => 15,
-			"[" => 16,
-			'LITERAL' => 109,
-			'IDENT' => 24,
-			"\$" => 17,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43
-		},
-		GOTOS => {
-			'expr' => 322,
-			'ident' => 108,
-			'term' => 55,
-			'sterm' => 54,
-			'lterm' => 47,
-			'node' => 46,
-			'item' => 72
+			'END' => 322
 		}
 	},
 	{#State 294
-		DEFAULT => -165
+		DEFAULT => -95
 	},
 	{#State 295
-		DEFAULT => -80
+		DEFAULT => -94
 	},
 	{#State 296
-		DEFAULT => -82
-	},
-	{#State 297
 		ACTIONS => {
-			"\"" => 323
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'NEXT' => 49,
+			'CALL' => 8,
+			'UNLESS' => 9,
+			'SET' => 52,
+			'IF' => 34,
+			'DEFAULT' => 2,
+			'THROW' => 38,
+			'STOP' => 39,
+			'PROCESS' => 4,
+			"[" => 41,
+			'INCLUDE' => 43,
+			'INSERT' => 66,
+			'NUMBER' => 23,
+			'TRY' => 67,
+			'SWITCH' => 26,
+			'GET' => 27,
+			'FILTER' => 68,
+			'FOR' => 30,
+			'LITERAL' => 31,
+			'BLOCK' => 180,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LAST' => 14,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'WHILE' => 60,
+			"(" => 61,
+			"{" => 62,
+			'WRAPPER' => 19,
+			"\${" => 21,
+			'CLEAR' => 20,
+			'RETURN' => 22
+		},
+		GOTOS => {
+			'node' => 57,
+			'setlist' => 37,
+			'sterm' => 36,
+			'term' => 15,
+			'atomexpr' => 35,
+			'wrapper' => 56,
+			'lterm' => 42,
+			'try' => 5,
+			'switch' => 64,
+			'assign' => 18,
+			'expr' => 182,
+			'loop' => 45,
+			'ident' => 162,
+			'mdir' => 323,
+			'perl' => 73,
+			'condition' => 33,
+			'directive' => 184,
+			'item' => 29,
+			'atomdir' => 6,
+			'filter' => 69
 		}
 	},
-	{#State 298
-		DEFAULT => -79
+	{#State 297
+		DEFAULT => -65
 	},
-	{#State 299
+	{#State 298
 		ACTIONS => {
 			'END' => 324
 		}
 	},
+	{#State 299
+		ACTIONS => {
+			'REF' => 17,
+			"\$" => 48,
+			"\"" => 47,
+			";" => 326,
+			'DEFAULT' => 327,
+			'IDENT' => 13,
+			'NUMBER' => 23,
+			"\${" => 21,
+			'LITERAL' => 89,
+			"[" => 41,
+			"{" => 62
+		},
+		GOTOS => {
+			'item' => 29,
+			'lterm' => 42,
+			'ident' => 88,
+			'node' => 57,
+			'sterm' => 36,
+			'term' => 325
+		}
+	},
 	{#State 300
-		ACTIONS => {
-			"\"" => 11,
-			"{" => 45,
-			'NOT' => 43,
-			'REF' => 15,
-			"(" => 14,
-			'LITERAL' => 253,
-			"[" => 16,
-			'COMMA' => 251,
-			'NUMBER' => 1,
-			"\${" => 33,
-			"\$" => 17,
-			'IDENT' => 24
-		},
-		DEFAULT => -62,
-		GOTOS => {
-			'param' => 250,
-			'item' => 255,
-			'node' => 46,
-			'lterm' => 47,
-			'expr' => 254,
-			'term' => 55,
-			'sterm' => 54,
-			'ident' => 252
-		}
-	},
-	{#State 301
-		ACTIONS => {
-			"\"" => 11,
-			'NOT' => 43,
-			"{" => 45,
-			"(" => 14,
-			'REF' => 15,
-			'LITERAL' => 253,
-			"[" => 16,
-			"\$" => 17,
-			'COMMA' => 251,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'IDENT' => 24
-		},
-		DEFAULT => -63,
-		GOTOS => {
-			'item' => 255,
-			'param' => 250,
-			'lterm' => 47,
-			'node' => 46,
-			'ident' => 252,
-			'sterm' => 54,
-			'term' => 55,
-			'expr' => 254
-		}
-	},
-	{#State 302
-		DEFAULT => -95
-	},
-	{#State 303
-		DEFAULT => -96
-	},
-	{#State 304
-		ACTIONS => {
-			'IF' => 57,
-			'CALL' => 18,
-			'NEXT' => 53,
-			"\$" => 17,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'DEFAULT' => 60,
-			'GET' => 22,
-			'WHILE' => 59,
-			'UNLESS' => 27,
-			'DEBUG' => 66,
-			'TRY' => 28,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'INSERT' => 68,
-			"\${" => 33,
-			'NUMBER' => 1,
-			'FILTER' => 6,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'CLEAR' => 39,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'SET' => 208,
-			"{" => 45,
-			'NOT' => 43,
-			"\"" => 11,
-			'THROW' => 10,
-			'LAST' => 9,
-			"[" => 16,
-			'LITERAL' => 51,
-			'REF' => 15,
-			'BLOCK' => 210,
-			'PROCESS' => 48,
-			"(" => 14
-		},
-		GOTOS => {
-			'expr' => 209,
-			'loop' => 63,
-			'atomexpr' => 73,
-			'directive' => 211,
-			'filter' => 50,
-			'item' => 72,
-			'try' => 30,
-			'lterm' => 47,
-			'node' => 46,
-			'assign' => 69,
-			'setlist' => 13,
-			'term' => 55,
-			'sterm' => 54,
-			'ident' => 104,
-			'condition' => 31,
-			'perl' => 61,
-			'wrapper' => 40,
-			'atomdir' => 36,
-			'switch' => 3,
-			'mdir' => 325
-		}
-	},
-	{#State 305
-		ACTIONS => {
-			'END' => 326
-		}
-	},
-	{#State 306
-		ACTIONS => {
-			";" => 327
-		}
-	},
-	{#State 307
 		ACTIONS => {
 			'END' => 328
 		}
 	},
-	{#State 308
+	{#State 301
 		ACTIONS => {
-			'NOT' => 43,
-			"{" => 45,
-			"\"" => 11,
-			"[" => 16,
-			'LITERAL' => 109,
-			"(" => 14,
-			'REF' => 15,
-			"\$" => 17,
-			'NUMBER' => 1,
-			"\${" => 33,
-			'IDENT' => 24
-		},
-		GOTOS => {
-			'node' => 46,
-			'lterm' => 47,
-			'item' => 72,
-			'expr' => 329,
-			'ident' => 108,
-			'term' => 55,
-			'sterm' => 54
+			'END' => 329
 		}
 	},
+	{#State 302
+		ACTIONS => {
+			'COMMA' => 253,
+			'LITERAL' => 249,
+			"\$" => 48,
+			"\"" => 47,
+			'NUMBER' => 23,
+			"\${" => 21,
+			"{" => 62,
+			"[" => 41,
+			"(" => 61,
+			'REF' => 17,
+			'IDENT' => 13,
+			'NOT' => 12
+		},
+		DEFAULT => -62,
+		GOTOS => {
+			'lterm' => 42,
+			'item' => 250,
+			'expr' => 248,
+			'param' => 251,
+			'term' => 15,
+			'sterm' => 36,
+			'node' => 57,
+			'ident' => 252
+		}
+	},
+	{#State 303
+		ACTIONS => {
+			"(" => 61,
+			"{" => 62,
+			"[" => 41,
+			"\${" => 21,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'REF' => 17,
+			'COMMA' => 253,
+			'LITERAL' => 249,
+			'NUMBER' => 23,
+			"\"" => 47,
+			"\$" => 48
+		},
+		DEFAULT => -63,
+		GOTOS => {
+			'ident' => 252,
+			'node' => 57,
+			'sterm' => 36,
+			'term' => 15,
+			'item' => 250,
+			'param' => 251,
+			'expr' => 248,
+			'lterm' => 42
+		}
+	},
+	{#State 304
+		ACTIONS => {
+			"\"" => 330
+		}
+	},
+	{#State 305
+		DEFAULT => -88
+	},
+	{#State 306
+		ACTIONS => {
+			'END' => 331
+		}
+	},
+	{#State 307
+		DEFAULT => -79
+	},
+	{#State 308
+		DEFAULT => -77
+	},
 	{#State 309
-		DEFAULT => -67
+		DEFAULT => -82
 	},
 	{#State 310
 		ACTIONS => {
-			"[" => 16,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			'LAST' => 9,
-			'THROW' => 10,
-			"\"" => 11,
-			'FILTER' => 6,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			";" => -18,
-			'NUMBER' => 1,
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'RAWPERL' => 20,
-			'CALL' => 18,
-			"\$" => 17,
-			'LITERAL' => 51,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			'NOT' => 43,
-			"{" => 45,
-			'CLEAR' => 39,
-			'META' => 38,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'SET' => 37,
-			"\${" => 33,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'DEBUG' => 66,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'TEXT' => 56,
-			'IF' => 57,
-			'NEXT' => 53
+			'CMPOP' => 148,
+			'CAT' => 147,
+			"+" => 150,
+			'BINOP' => 145,
+			"/" => 144,
+			'DIV' => 146,
+			'AND' => 149,
+			'MOD' => 141,
+			'OR' => 143,
+			"?" => 142
 		},
-		DEFAULT => -3,
-		GOTOS => {
-			'chunk' => 58,
-			'defblockname' => 19,
-			'term' => 55,
-			'sterm' => 54,
-			'statement' => 21,
-			'perl' => 61,
-			'loop' => 63,
-			'rawperl' => 26,
-			'view' => 65,
-			'block' => 330,
-			'assign' => 69,
-			'macro' => 70,
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30,
-			'use' => 32,
-			'condition' => 31,
-			'capture' => 2,
-			'ident' => 34,
-			'anonblock' => 35,
-			'atomdir' => 36,
-			'switch' => 3,
-			'defblock' => 7,
-			'chunks' => 8,
-			'wrapper' => 40,
-			'expr' => 44,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'directive' => 52,
-			'filter' => 50
-		}
+		DEFAULT => -143
 	},
 	{#State 311
 		ACTIONS => {
-			";" => 331,
-			'DOT' => 177
+			'END' => 332
 		}
 	},
 	{#State 312
 		ACTIONS => {
-			"\$" => 17,
-			'CALL' => 18,
-			'RAWPERL' => 20,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			";" => -18,
-			'NUMBER' => 1,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'FILTER' => 6,
-			'LAST' => 9,
-			'THROW' => 10,
-			"\"" => 11,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			"[" => 16,
-			'NEXT' => 53,
-			'TEXT' => 56,
-			'IF' => 57,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'DEBUG' => 66,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			"\${" => 33,
-			'SET' => 37,
-			'CLEAR' => 39,
-			'META' => 38,
-			'WRAPPER' => 41,
-			'RETURN' => 42,
-			"{" => 45,
-			'NOT' => 43,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			'LITERAL' => 51
+			'USE' => 59,
+			'WHILE' => 60,
+			"(" => 61,
+			"{" => 62,
+			'FILTER' => 68,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			'THROW' => 38,
+			'STOP' => 39,
+			"[" => 41,
+			'IF' => 34,
+			'SET' => 52,
+			'META' => 53,
+			'NEXT' => 49,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'WRAPPER' => 19,
+			"\${" => 21,
+			'CLEAR' => 20,
+			'RETURN' => 22,
+			'LAST' => 14,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'FOR' => 30,
+			'NUMBER' => 23,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'GET' => 27,
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'TEXT' => 7,
+			'CALL' => 8,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			";" => -18
 		},
 		DEFAULT => -3,
 		GOTOS => {
-			'statement' => 21,
-			'perl' => 61,
-			'defblockname' => 19,
-			'chunk' => 58,
-			'sterm' => 54,
-			'term' => 55,
+			'atomdir' => 6,
+			'directive' => 51,
+			'defblockname' => 50,
+			'statement' => 11,
+			'loop' => 45,
+			'try' => 5,
+			'view' => 40,
+			'lterm' => 42,
+			'block' => 333,
+			'atomexpr' => 35,
+			'setlist' => 37,
+			'rawperl' => 3,
+			'sterm' => 36,
 			'macro' => 70,
-			'assign' => 69,
-			'block' => 332,
-			'atomexpr' => 73,
-			'try' => 30,
-			'item' => 72,
-			'loop' => 63,
-			'view' => 65,
-			'rawperl' => 26,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'switch' => 3,
-			'chunks' => 8,
-			'defblock' => 7,
-			'wrapper' => 40,
-			'use' => 32,
-			'condition' => 31,
-			'capture' => 2,
-			'ident' => 34,
-			'node' => 46,
-			'lterm' => 47,
-			'setlist' => 13,
-			'directive' => 52,
-			'filter' => 50,
-			'expr' => 44
+			'anonblock' => 28,
+			'filter' => 69,
+			'use' => 72,
+			'chunk' => 71,
+			'item' => 29,
+			'condition' => 33,
+			'perl' => 73,
+			'ident' => 24,
+			'assign' => 18,
+			'expr' => 58,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'capture' => 55,
+			'wrapper' => 56,
+			'node' => 57,
+			'term' => 15
 		}
 	},
 	{#State 313
 		ACTIONS => {
-			";" => 333
+			";" => 334
 		}
 	},
 	{#State 314
-		DEFAULT => -65
+		ACTIONS => {
+			";" => 335,
+			'DOT' => 178
+		}
 	},
 	{#State 315
 		ACTIONS => {
-			'CMPOP' => 143,
-			'BINOP' => 139,
-			'AND' => 138,
-			"/" => 136,
-			"+" => 142,
-			'MOD' => 137,
-			'CAT' => 145,
-			"?" => 141,
-			'OR' => 140,
-			'DIV' => 144
+			'STOP' => 39,
+			'THROW' => 38,
+			"[" => 41,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			'IF' => 34,
+			'NEXT' => 49,
+			'SET' => 52,
+			'META' => 53,
+			'PERL' => 46,
+			"\$" => 48,
+			"\"" => 47,
+			'WHILE' => 60,
+			'USE' => 59,
+			"{" => 62,
+			"(" => 61,
+			'FILTER' => 68,
+			'TRY' => 67,
+			'INSERT' => 66,
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'MACRO' => 10,
+			'UNLESS' => 9,
+			'CALL' => 8,
+			'TEXT' => 7,
+			";" => -18,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'RETURN' => 22,
+			'WRAPPER' => 19,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'LAST' => 14,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'FOR' => 30,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'NUMBER' => 23,
+			'GET' => 27
 		},
-		DEFAULT => -144
+		DEFAULT => -3,
+		GOTOS => {
+			'lterm' => 42,
+			'view' => 40,
+			'try' => 5,
+			'sterm' => 36,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'atomexpr' => 35,
+			'block' => 336,
+			'statement' => 11,
+			'defblockname' => 50,
+			'directive' => 51,
+			'atomdir' => 6,
+			'loop' => 45,
+			'chunks' => 63,
+			'switch' => 64,
+			'defblock' => 65,
+			'expr' => 58,
+			'assign' => 18,
+			'term' => 15,
+			'node' => 57,
+			'wrapper' => 56,
+			'capture' => 55,
+			'condition' => 33,
+			'perl' => 73,
+			'chunk' => 71,
+			'item' => 29,
+			'use' => 72,
+			'filter' => 69,
+			'anonblock' => 28,
+			'macro' => 70,
+			'ident' => 24
+		}
 	},
 	{#State 316
-		DEFAULT => -88
+		DEFAULT => -67
 	},
 	{#State 317
-		ACTIONS => {
-			'END' => 334
-		}
+		DEFAULT => -80
 	},
 	{#State 318
 		ACTIONS => {
-			'END' => 335
-		}
+			'AND' => 149,
+			'MOD' => 141,
+			"?" => 142,
+			'OR' => 143,
+			'CAT' => 147,
+			'CMPOP' => 148,
+			"+" => 150,
+			"/" => 144,
+			'BINOP' => 145,
+			'DIV' => 146
+		},
+		DEFAULT => -154
 	},
 	{#State 319
 		ACTIONS => {
-			'IDENT' => 24,
-			'DEFAULT' => 337,
-			"[" => 16,
-			'LITERAL' => 109,
-			'REF' => 15,
-			"{" => 45,
-			"\"" => 11,
-			"\${" => 33,
-			'NUMBER' => 1,
-			";" => 338,
-			"\$" => 17
-		},
-		GOTOS => {
-			'lterm' => 47,
-			'node' => 46,
-			'sterm' => 54,
-			'ident' => 108,
-			'term' => 336,
-			'item' => 72
+			'CAT' => 147,
+			'MOD' => 141,
+			'BINOP' => 145,
+			'AND' => 149,
+			"/" => 144,
+			'CMPOP' => 148,
+			";" => 337,
+			"+" => 150,
+			"?" => 142,
+			'OR' => 143,
+			'DIV' => 146
 		}
 	},
 	{#State 320
-		ACTIONS => {
-			'END' => 339
-		}
+		DEFAULT => -46
 	},
 	{#State 321
 		ACTIONS => {
-			'END' => 340
+			'TRY' => 67,
+			'INSERT' => 66,
+			'FILTER' => 68,
+			'WHILE' => 60,
+			'USE' => 59,
+			"{" => 62,
+			"(" => 61,
+			'PERL' => 46,
+			"\$" => 48,
+			"\"" => 47,
+			'NEXT' => 49,
+			'SET' => 52,
+			'META' => 53,
+			'IF' => 34,
+			'STOP' => 39,
+			'THROW' => 38,
+			"[" => 41,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			'SWITCH' => 26,
+			'VIEW' => 25,
+			'NUMBER' => 23,
+			'GET' => 27,
+			'FOR' => 30,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LAST' => 14,
+			'REF' => 17,
+			'DEBUG' => 16,
+			"\${" => 21,
+			'RETURN' => 22,
+			'CLEAR' => 20,
+			'WRAPPER' => 19,
+			";" => -18,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'CALL' => 8,
+			'TEXT' => 7,
+			'DEFAULT' => 2,
+			'PROCESS' => 4
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'term' => 15,
+			'node' => 57,
+			'wrapper' => 56,
+			'capture' => 55,
+			'expr' => 58,
+			'assign' => 18,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'ident' => 24,
+			'condition' => 33,
+			'perl' => 73,
+			'filter' => 69,
+			'anonblock' => 28,
+			'macro' => 70,
+			'chunk' => 71,
+			'item' => 29,
+			'use' => 72,
+			'atomexpr' => 35,
+			'sterm' => 36,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'block' => 338,
+			'lterm' => 42,
+			'view' => 40,
+			'try' => 5,
+			'loop' => 45,
+			'statement' => 11,
+			'atomdir' => 6,
+			'defblockname' => 50,
+			'directive' => 51
 		}
 	},
 	{#State 322
-		ACTIONS => {
-			"/" => 136,
-			"+" => 142,
-			'MOD' => 137,
-			'CMPOP' => 143,
-			'BINOP' => 139,
-			'AND' => 138,
-			'OR' => 140,
-			'DIV' => 144,
-			'CAT' => 145,
-			"?" => 141
-		},
-		DEFAULT => -155
+		DEFAULT => -93
 	},
 	{#State 323
-		DEFAULT => -102
+		DEFAULT => -90
 	},
 	{#State 324
-		DEFAULT => -57
+		DEFAULT => -75
 	},
 	{#State 325
-		DEFAULT => -91
+		ACTIONS => {
+			";" => 339
+		}
 	},
 	{#State 326
-		DEFAULT => -94
+		ACTIONS => {
+			'FOR' => 30,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'NUMBER' => 23,
+			'SWITCH' => 26,
+			'VIEW' => 25,
+			'GET' => 27,
+			'WRAPPER' => 19,
+			"\${" => 21,
+			'RETURN' => 22,
+			'CLEAR' => 20,
+			'IDENT' => 13,
+			'NOT' => 12,
+			'LAST' => 14,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'TEXT' => 7,
+			'CALL' => 8,
+			'MACRO' => 10,
+			'UNLESS' => 9,
+			";" => -18,
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'FILTER' => 68,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'USE' => 59,
+			'WHILE' => 60,
+			"(" => 61,
+			"{" => 62,
+			'NEXT' => 49,
+			'SET' => 52,
+			'META' => 53,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48,
+			'THROW' => 38,
+			'STOP' => 39,
+			"[" => 41,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			'IF' => 34
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'atomdir' => 6,
+			'directive' => 51,
+			'defblockname' => 50,
+			'statement' => 11,
+			'loop' => 45,
+			'try' => 5,
+			'view' => 40,
+			'lterm' => 42,
+			'block' => 340,
+			'atomexpr' => 35,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'sterm' => 36,
+			'macro' => 70,
+			'anonblock' => 28,
+			'filter' => 69,
+			'use' => 72,
+			'chunk' => 71,
+			'item' => 29,
+			'condition' => 33,
+			'perl' => 73,
+			'ident' => 24,
+			'assign' => 18,
+			'expr' => 58,
+			'switch' => 64,
+			'defblock' => 65,
+			'chunks' => 63,
+			'capture' => 55,
+			'wrapper' => 56,
+			'node' => 57,
+			'term' => 15
+		}
 	},
 	{#State 327
 		ACTIONS => {
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'FILTER' => 6,
-			";" => -18,
-			'NUMBER' => 1,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			"[" => 16,
-			'LAST' => 9,
-			"\"" => 11,
-			'THROW' => 10,
-			'RAWPERL' => 20,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			"\$" => 17,
-			'CALL' => 18,
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'SET' => 37,
-			'CLEAR' => 39,
-			'META' => 38,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			"\${" => 33,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			'LITERAL' => 51,
-			'NOT' => 43,
-			"{" => 45,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'NEXT' => 53,
-			'TEXT' => 56,
-			'IF' => 57,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'DEBUG' => 66
-		},
-		DEFAULT => -3,
-		GOTOS => {
-			'use' => 32,
-			'condition' => 31,
-			'capture' => 2,
-			'ident' => 34,
-			'anonblock' => 35,
-			'atomdir' => 36,
-			'switch' => 3,
-			'defblock' => 7,
-			'chunks' => 8,
-			'wrapper' => 40,
-			'expr' => 44,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'directive' => 52,
-			'filter' => 50,
-			'chunk' => 58,
-			'defblockname' => 19,
-			'sterm' => 54,
-			'term' => 55,
-			'statement' => 21,
-			'perl' => 61,
-			'loop' => 63,
-			'rawperl' => 26,
-			'view' => 65,
-			'assign' => 69,
-			'macro' => 70,
-			'block' => 341,
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30
+			";" => 341
 		}
 	},
 	{#State 328
-		DEFAULT => -46
+		DEFAULT => -51
 	},
 	{#State 329
-		ACTIONS => {
-			'OR' => 140,
-			"+" => 142,
-			"/" => 136,
-			'BINOP' => 139,
-			'CAT' => 145,
-			'CMPOP' => 143,
-			'MOD' => 137,
-			";" => 342,
-			'AND' => 138,
-			"?" => 141,
-			'DIV' => 144
-		}
+		DEFAULT => -57
 	},
 	{#State 330
-		DEFAULT => -71
+		DEFAULT => -101
 	},
 	{#State 331
+		DEFAULT => -44
+	},
+	{#State 332
+		DEFAULT => -60
+	},
+	{#State 333
+		DEFAULT => -71
+	},
+	{#State 334
 		ACTIONS => {
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'DEBUG' => 66,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			'NEXT' => 53,
-			'IF' => 57,
-			'TEXT' => 56,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			"{" => 45,
-			'NOT' => 43,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			'LITERAL' => 51,
-			"\${" => 33,
-			'SET' => 37,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'META' => 38,
-			'CLEAR' => 39,
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'MACRO' => 25,
-			"\$" => 17,
-			'CALL' => 18,
-			'RAWPERL' => 20,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'GET' => 22,
-			'THROW' => 10,
-			"\"" => 11,
-			'LAST' => 9,
-			'REF' => 15,
-			'USE' => 12,
-			"(" => 14,
-			"[" => 16,
-			'NUMBER' => 1,
+			"[" => 41,
+			'THROW' => 38,
+			'STOP' => 39,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			'IF' => 34,
+			'NEXT' => 49,
+			'META' => 53,
+			'SET' => 52,
+			"\"" => 47,
+			"\$" => 48,
+			'PERL' => 46,
+			"(" => 61,
+			"{" => 62,
+			'USE' => 59,
+			'WHILE' => 60,
+			'FILTER' => 68,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'CALL' => 8,
+			'TEXT' => 7,
+			'UNLESS' => 9,
+			'MACRO' => 10,
 			";" => -18,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'FILTER' => 6
+			'WRAPPER' => 19,
+			'RETURN' => 22,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'LAST' => 14,
+			'FOR' => 30,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'GET' => 27,
+			'NUMBER' => 23,
+			'VIEW' => 25,
+			'SWITCH' => 26
 		},
 		DEFAULT => -3,
 		GOTOS => {
-			'loop' => 63,
-			'rawperl' => 26,
-			'view' => 65,
-			'block' => 343,
+			'node' => 57,
+			'term' => 15,
+			'capture' => 55,
+			'wrapper' => 56,
+			'assign' => 18,
+			'expr' => 58,
+			'defblock' => 65,
+			'switch' => 64,
+			'chunks' => 63,
+			'ident' => 24,
+			'condition' => 33,
+			'perl' => 73,
+			'anonblock' => 28,
 			'macro' => 70,
-			'assign' => 69,
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30,
-			'chunk' => 58,
-			'defblockname' => 19,
-			'term' => 55,
-			'sterm' => 54,
-			'statement' => 21,
-			'perl' => 61,
-			'expr' => 44,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'directive' => 52,
-			'filter' => 50,
-			'use' => 32,
-			'condition' => 31,
-			'capture' => 2,
-			'ident' => 34,
-			'anonblock' => 35,
-			'atomdir' => 36,
-			'switch' => 3,
-			'defblock' => 7,
-			'chunks' => 8,
-			'wrapper' => 40
+			'filter' => 69,
+			'use' => 72,
+			'chunk' => 71,
+			'item' => 29,
+			'atomexpr' => 35,
+			'setlist' => 37,
+			'rawperl' => 3,
+			'sterm' => 36,
+			'block' => 342,
+			'lterm' => 42,
+			'try' => 5,
+			'view' => 40,
+			'loop' => 45,
+			'statement' => 11,
+			'atomdir' => 6,
+			'directive' => 51,
+			'defblockname' => 50
 		}
 	},
-	{#State 332
+	{#State 335
 		ACTIONS => {
-			'FINAL' => 279,
-			'CATCH' => 280
+			'FOR' => 30,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'NUMBER' => 23,
+			'GET' => 27,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'RETURN' => 22,
+			'WRAPPER' => 19,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LAST' => 14,
+			'REF' => 17,
+			'DEBUG' => 16,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'CALL' => 8,
+			'TEXT' => 7,
+			";" => -18,
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'FILTER' => 68,
+			'TRY' => 67,
+			'INSERT' => 66,
+			'USE' => 59,
+			'WHILE' => 60,
+			"{" => 62,
+			"(" => 61,
+			'NEXT' => 49,
+			'SET' => 52,
+			'META' => 53,
+			'PERL' => 46,
+			"\$" => 48,
+			"\"" => 47,
+			'STOP' => 39,
+			'THROW' => 38,
+			"[" => 41,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			'IF' => 34
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'perl' => 73,
+			'condition' => 33,
+			'chunk' => 71,
+			'item' => 29,
+			'use' => 72,
+			'filter' => 69,
+			'anonblock' => 28,
+			'macro' => 70,
+			'ident' => 24,
+			'defblock' => 65,
+			'switch' => 64,
+			'chunks' => 63,
+			'expr' => 58,
+			'assign' => 18,
+			'term' => 15,
+			'node' => 57,
+			'wrapper' => 56,
+			'capture' => 55,
+			'statement' => 11,
+			'defblockname' => 50,
+			'directive' => 51,
+			'atomdir' => 6,
+			'loop' => 45,
+			'lterm' => 42,
+			'view' => 40,
+			'try' => 5,
+			'sterm' => 36,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'atomexpr' => 35,
+			'block' => 343
+		}
+	},
+	{#State 336
+		ACTIONS => {
+			'CATCH' => 285,
+			'FINAL' => 284
 		},
 		DEFAULT => -72,
 		GOTOS => {
 			'final' => 344
 		}
 	},
-	{#State 333
+	{#State 337
 		ACTIONS => {
-			'UNLESS' => 27,
-			'TRY' => 28,
-			'MACRO' => 25,
-			'RAWPERL' => 20,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'GET' => 22,
-			"\$" => 17,
-			'CALL' => 18,
-			'REF' => 15,
-			'USE' => 12,
-			"(" => 14,
-			"[" => 16,
-			'THROW' => 10,
-			"\"" => 11,
-			'LAST' => 9,
-			'PERL' => 4,
-			'INCLUDE' => 5,
-			'FILTER' => 6,
-			'NUMBER' => 1,
+			'WRAPPER' => 19,
+			"\${" => 21,
+			'RETURN' => 22,
+			'CLEAR' => 20,
+			'NOT' => 12,
+			'IDENT' => 13,
+			'LAST' => 14,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'FOR' => 30,
+			'BLOCK' => 32,
+			'LITERAL' => 31,
+			'NUMBER' => 23,
+			'SWITCH' => 26,
+			'VIEW' => 25,
+			'GET' => 27,
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'CALL' => 8,
+			'TEXT' => 7,
+			'UNLESS' => 9,
+			'MACRO' => 10,
 			";" => -18,
-			'VIEW' => 67,
-			'INSERT' => 68,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'DEBUG' => 66,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'NEXT' => 53,
-			'IF' => 57,
-			'TEXT' => 56,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			'LITERAL' => 51,
-			'NOT' => 43,
-			"{" => 45,
-			'SET' => 37,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'META' => 38,
-			'CLEAR' => 39,
-			"\${" => 33
+			'WHILE' => 60,
+			'USE' => 59,
+			"(" => 61,
+			"{" => 62,
+			'FILTER' => 68,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'THROW' => 38,
+			'STOP' => 39,
+			"[" => 41,
+			'RAWPERL' => 44,
+			'INCLUDE' => 43,
+			'IF' => 34,
+			'NEXT' => 49,
+			'SET' => 52,
+			'META' => 53,
+			'PERL' => 46,
+			"\"" => 47,
+			"\$" => 48
 		},
 		DEFAULT => -3,
 		GOTOS => {
-			'expr' => 44,
-			'setlist' => 13,
-			'lterm' => 47,
-			'node' => 46,
-			'filter' => 50,
-			'directive' => 52,
-			'condition' => 31,
-			'use' => 32,
-			'ident' => 34,
-			'capture' => 2,
-			'switch' => 3,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'wrapper' => 40,
-			'chunks' => 8,
-			'defblock' => 7,
-			'loop' => 63,
-			'view' => 65,
-			'rawperl' => 26,
+			'defblock' => 65,
+			'switch' => 64,
+			'chunks' => 63,
+			'assign' => 18,
+			'expr' => 58,
+			'wrapper' => 56,
+			'capture' => 55,
+			'node' => 57,
+			'term' => 15,
+			'use' => 72,
+			'chunk' => 71,
+			'item' => 29,
 			'macro' => 70,
+			'anonblock' => 28,
+			'filter' => 69,
+			'perl' => 73,
+			'condition' => 33,
+			'ident' => 24,
+			'try' => 5,
+			'view' => 40,
+			'lterm' => 42,
 			'block' => 345,
-			'assign' => 69,
-			'try' => 30,
-			'item' => 72,
-			'atomexpr' => 73,
-			'sterm' => 54,
-			'term' => 55,
-			'defblockname' => 19,
-			'chunk' => 58,
-			'statement' => 21,
-			'perl' => 61
-		}
-	},
-	{#State 334
-		DEFAULT => -44
-	},
-	{#State 335
-		DEFAULT => -60
-	},
-	{#State 336
-		ACTIONS => {
-			";" => 346
-		}
-	},
-	{#State 337
-		ACTIONS => {
-			";" => 347
+			'setlist' => 37,
+			'rawperl' => 3,
+			'sterm' => 36,
+			'atomexpr' => 35,
+			'directive' => 51,
+			'defblockname' => 50,
+			'atomdir' => 6,
+			'statement' => 11,
+			'loop' => 45
 		}
 	},
 	{#State 338
+		DEFAULT => -49
+	},
+	{#State 339
 		ACTIONS => {
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'IF' => 57,
-			'TEXT' => 56,
-			'NEXT' => 53,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'DEBUG' => 66,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'CLEAR' => 39,
-			'META' => 38,
-			'SET' => 37,
-			"\${" => 33,
-			'LITERAL' => 51,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			'NOT' => 43,
-			"{" => 45,
-			'IDENT' => 24,
-			'FOR' => 23,
-			'GET' => 22,
-			'RAWPERL' => 20,
-			'CALL' => 18,
-			"\$" => 17,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'MACRO' => 25,
-			'FILTER' => 6,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'NUMBER' => 1,
+			'META' => 53,
+			'SET' => 52,
+			'NEXT' => 49,
+			"\$" => 48,
+			"\"" => 47,
+			'PERL' => 46,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			"[" => 41,
+			'STOP' => 39,
+			'THROW' => 38,
+			'IF' => 34,
+			'FILTER' => 68,
+			'TRY' => 67,
+			'INSERT' => 66,
+			"{" => 62,
+			"(" => 61,
+			'USE' => 59,
+			'WHILE' => 60,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			'TEXT' => 7,
+			'CALL' => 8,
 			";" => -18,
-			"[" => 16,
-			'REF' => 15,
-			"(" => 14,
-			'USE' => 12,
-			"\"" => 11,
-			'THROW' => 10,
-			'LAST' => 9
+			'PROCESS' => 4,
+			'DEFAULT' => 2,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'FOR' => 30,
+			'GET' => 27,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'NUMBER' => 23,
+			'RETURN' => 22,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'WRAPPER' => 19,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'LAST' => 14,
+			'NOT' => 12,
+			'IDENT' => 13
 		},
 		DEFAULT => -3,
 		GOTOS => {
-			'expr' => 44,
-			'directive' => 52,
-			'filter' => 50,
-			'node' => 46,
-			'lterm' => 47,
-			'setlist' => 13,
-			'capture' => 2,
-			'ident' => 34,
-			'use' => 32,
-			'condition' => 31,
-			'defblock' => 7,
-			'chunks' => 8,
-			'wrapper' => 40,
-			'anonblock' => 35,
-			'atomdir' => 36,
-			'switch' => 3,
-			'rawperl' => 26,
-			'view' => 65,
-			'loop' => 63,
-			'atomexpr' => 73,
-			'try' => 30,
-			'item' => 72,
+			'statement' => 11,
+			'directive' => 51,
+			'defblockname' => 50,
+			'atomdir' => 6,
+			'loop' => 45,
+			'lterm' => 42,
+			'try' => 5,
+			'view' => 40,
+			'setlist' => 37,
+			'rawperl' => 3,
+			'sterm' => 36,
+			'atomexpr' => 35,
+			'block' => 346,
+			'condition' => 33,
+			'perl' => 73,
+			'use' => 72,
+			'item' => 29,
+			'chunk' => 71,
 			'macro' => 70,
-			'block' => 348,
-			'assign' => 69,
-			'chunk' => 58,
-			'defblockname' => 19,
-			'sterm' => 54,
-			'term' => 55,
-			'perl' => 61,
-			'statement' => 21
+			'anonblock' => 28,
+			'filter' => 69,
+			'ident' => 24,
+			'chunks' => 63,
+			'defblock' => 65,
+			'switch' => 64,
+			'assign' => 18,
+			'expr' => 58,
+			'node' => 57,
+			'term' => 15,
+			'capture' => 55,
+			'wrapper' => 56
 		}
 	},
-	{#State 339
-		DEFAULT => -51
-	},
 	{#State 340
-		DEFAULT => -75
+		DEFAULT => -54
 	},
 	{#State 341
-		DEFAULT => -49
+		ACTIONS => {
+			'IDENT' => 13,
+			'NOT' => 12,
+			'DEBUG' => 16,
+			'REF' => 17,
+			'LAST' => 14,
+			'WRAPPER' => 19,
+			'RETURN' => 22,
+			'CLEAR' => 20,
+			"\${" => 21,
+			'GET' => 27,
+			'NUMBER' => 23,
+			'VIEW' => 25,
+			'SWITCH' => 26,
+			'FOR' => 30,
+			'LITERAL' => 31,
+			'BLOCK' => 32,
+			'DEFAULT' => 2,
+			'PROCESS' => 4,
+			";" => -18,
+			'TEXT' => 7,
+			'CALL' => 8,
+			'UNLESS' => 9,
+			'MACRO' => 10,
+			"(" => 61,
+			"{" => 62,
+			'WHILE' => 60,
+			'USE' => 59,
+			'INSERT' => 66,
+			'TRY' => 67,
+			'FILTER' => 68,
+			'IF' => 34,
+			"[" => 41,
+			'THROW' => 38,
+			'STOP' => 39,
+			'INCLUDE' => 43,
+			'RAWPERL' => 44,
+			"\"" => 47,
+			"\$" => 48,
+			'PERL' => 46,
+			'NEXT' => 49,
+			'META' => 53,
+			'SET' => 52
+		},
+		DEFAULT => -3,
+		GOTOS => {
+			'chunks' => 63,
+			'switch' => 64,
+			'defblock' => 65,
+			'assign' => 18,
+			'expr' => 58,
+			'node' => 57,
+			'term' => 15,
+			'wrapper' => 56,
+			'capture' => 55,
+			'condition' => 33,
+			'perl' => 73,
+			'use' => 72,
+			'item' => 29,
+			'chunk' => 71,
+			'macro' => 70,
+			'anonblock' => 28,
+			'filter' => 69,
+			'ident' => 24,
+			'lterm' => 42,
+			'try' => 5,
+			'view' => 40,
+			'rawperl' => 3,
+			'setlist' => 37,
+			'sterm' => 36,
+			'atomexpr' => 35,
+			'block' => 347,
+			'statement' => 11,
+			'directive' => 51,
+			'defblockname' => 50,
+			'atomdir' => 6,
+			'loop' => 45
+		}
 	},
 	{#State 342
 		ACTIONS => {
-			"\${" => 33,
-			'SET' => 37,
-			'CLEAR' => 39,
-			'META' => 38,
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			"{" => 45,
-			'NOT' => 43,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			'LITERAL' => 51,
-			'NEXT' => 53,
-			'TEXT' => 56,
-			'IF' => 57,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'DEBUG' => 66,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			";" => -18,
-			'NUMBER' => 1,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'FILTER' => 6,
-			'LAST' => 9,
-			'THROW' => 10,
-			"\"" => 11,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			"[" => 16,
-			"\$" => 17,
-			'CALL' => 18,
-			'RAWPERL' => 20,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27
+			'CATCH' => 285,
+			'FINAL' => 284
 		},
-		DEFAULT => -3,
+		DEFAULT => -72,
 		GOTOS => {
-			'directive' => 52,
-			'filter' => 50,
-			'lterm' => 47,
-			'node' => 46,
-			'setlist' => 13,
-			'expr' => 44,
-			'defblock' => 7,
-			'chunks' => 8,
-			'wrapper' => 40,
-			'anonblock' => 35,
-			'atomdir' => 36,
-			'switch' => 3,
-			'capture' => 2,
-			'ident' => 34,
-			'use' => 32,
-			'condition' => 31,
-			'atomexpr' => 73,
-			'try' => 30,
-			'item' => 72,
-			'assign' => 69,
-			'block' => 349,
-			'macro' => 70,
-			'rawperl' => 26,
-			'view' => 65,
-			'loop' => 63,
-			'perl' => 61,
-			'statement' => 21,
-			'chunk' => 58,
-			'defblockname' => 19,
-			'sterm' => 54,
-			'term' => 55
+			'final' => 348
 		}
 	},
 	{#State 343
 		ACTIONS => {
-			'CATCH' => 280,
-			'FINAL' => 279
+			'FINAL' => 284,
+			'CATCH' => 285
 		},
 		DEFAULT => -72,
 		GOTOS => {
-			'final' => 350
+			'final' => 349
 		}
 	},
 	{#State 344
@@ -5073,209 +5161,36 @@ $STATES = [
 	},
 	{#State 345
 		ACTIONS => {
-			'CATCH' => 280,
-			'FINAL' => 279
+			'ELSE' => 292,
+			'ELSIF' => 290
 		},
-		DEFAULT => -72,
+		DEFAULT => -50,
 		GOTOS => {
-			'final' => 351
+			'else' => 350
 		}
 	},
 	{#State 346
 		ACTIONS => {
-			'SET' => 37,
-			'CLEAR' => 39,
-			'META' => 38,
-			'WRAPPER' => 41,
-			'RETURN' => 42,
-			"\${" => 33,
-			'PROCESS' => 48,
-			'BLOCK' => 49,
-			'LITERAL' => 51,
-			"{" => 45,
-			'NOT' => 43,
-			'WHILE' => 59,
-			'DEFAULT' => 60,
-			'NEXT' => 53,
-			'TEXT' => 56,
-			'IF' => 57,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'SWITCH' => 62,
-			'STOP' => 64,
-			'DEBUG' => 66,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'FILTER' => 6,
-			";" => -18,
-			'NUMBER' => 1,
-			"(" => 14,
-			'USE' => 12,
-			'REF' => 15,
-			"[" => 16,
-			'LAST' => 9,
-			'THROW' => 10,
-			"\"" => 11,
-			'RAWPERL' => 20,
-			'GET' => 22,
-			'FOR' => 23,
-			'IDENT' => 24,
-			"\$" => 17,
-			'CALL' => 18,
-			'MACRO' => 25,
-			'TRY' => 28,
-			'UNLESS' => 27
-		},
-		DEFAULT => -3,
-		GOTOS => {
-			'rawperl' => 26,
-			'view' => 65,
-			'loop' => 63,
-			'try' => 30,
-			'item' => 72,
-			'atomexpr' => 73,
-			'macro' => 70,
-			'assign' => 69,
-			'block' => 352,
-			'term' => 55,
-			'sterm' => 54,
-			'chunk' => 58,
-			'defblockname' => 19,
-			'perl' => 61,
-			'statement' => 21,
-			'expr' => 44,
-			'filter' => 50,
-			'directive' => 52,
-			'setlist' => 13,
-			'node' => 46,
-			'lterm' => 47,
-			'ident' => 34,
-			'capture' => 2,
-			'condition' => 31,
-			'use' => 32,
-			'wrapper' => 40,
-			'defblock' => 7,
-			'chunks' => 8,
-			'switch' => 3,
-			'anonblock' => 35,
-			'atomdir' => 36
-		}
-	},
-	{#State 347
-		ACTIONS => {
-			'RETURN' => 42,
-			'WRAPPER' => 41,
-			'CLEAR' => 39,
-			'META' => 38,
-			'SET' => 37,
-			"\${" => 33,
-			'LITERAL' => 51,
-			'BLOCK' => 49,
-			'PROCESS' => 48,
-			"{" => 45,
-			'NOT' => 43,
-			'DEFAULT' => 60,
-			'WHILE' => 59,
-			'IF' => 57,
-			'TEXT' => 56,
-			'NEXT' => 53,
-			'INSERT' => 68,
-			'VIEW' => 67,
-			'DEBUG' => 66,
-			'STOP' => 64,
-			'SWITCH' => 62,
-			'FILTER' => 6,
-			'INCLUDE' => 5,
-			'PERL' => 4,
-			'NUMBER' => 1,
-			";" => -18,
-			"[" => 16,
-			'REF' => 15,
-			"(" => 14,
-			'USE' => 12,
-			"\"" => 11,
-			'THROW' => 10,
-			'LAST' => 9,
-			'FOR' => 23,
-			'IDENT' => 24,
-			'GET' => 22,
-			'RAWPERL' => 20,
-			'CALL' => 18,
-			"\$" => 17,
-			'TRY' => 28,
-			'UNLESS' => 27,
-			'MACRO' => 25
-		},
-		DEFAULT => -3,
-		GOTOS => {
-			'defblockname' => 19,
-			'chunk' => 58,
-			'sterm' => 54,
-			'term' => 55,
-			'perl' => 61,
-			'statement' => 21,
-			'view' => 65,
-			'rawperl' => 26,
-			'loop' => 63,
-			'atomexpr' => 73,
-			'item' => 72,
-			'try' => 30,
-			'block' => 353,
-			'assign' => 69,
-			'macro' => 70,
-			'capture' => 2,
-			'ident' => 34,
-			'use' => 32,
-			'condition' => 31,
-			'chunks' => 8,
-			'defblock' => 7,
-			'wrapper' => 40,
-			'atomdir' => 36,
-			'anonblock' => 35,
-			'switch' => 3,
-			'expr' => 44,
-			'directive' => 52,
-			'filter' => 50,
-			'node' => 46,
-			'lterm' => 47,
-			'setlist' => 13
-		}
-	},
-	{#State 348
-		DEFAULT => -54
-	},
-	{#State 349
-		ACTIONS => {
-			'ELSE' => 306,
-			'ELSIF' => 308
-		},
-		DEFAULT => -50,
-		GOTOS => {
-			'else' => 354
-		}
-	},
-	{#State 350
-		DEFAULT => -68
-	},
-	{#State 351
-		DEFAULT => -69
-	},
-	{#State 352
-		ACTIONS => {
-			'CASE' => 319
+			'CASE' => 299
 		},
 		DEFAULT => -55,
 		GOTOS => {
-			'case' => 355
+			'case' => 351
 		}
 	},
-	{#State 353
+	{#State 347
 		DEFAULT => -53
 	},
-	{#State 354
+	{#State 348
+		DEFAULT => -69
+	},
+	{#State 349
+		DEFAULT => -68
+	},
+	{#State 350
 		DEFAULT => -48
 	},
-	{#State 355
+	{#State 351
 		DEFAULT => -52
 	}
 ];
@@ -5795,87 +5710,87 @@ sub
 { $factory->capture(@_[1, 3])         }
 	],
 	[#Rule 90
-		 'capture', 4,
-sub
-#line 262 "Parser.yp"
-{ $factory->capture(@_[2, 4])         }
-	],
-	[#Rule 91
 		 'macro', 6,
 sub
-#line 266 "Parser.yp"
+#line 265 "Parser.yp"
 { $factory->macro(@_[2, 6, 4])        }
 	],
-	[#Rule 92
+	[#Rule 91
 		 'macro', 3,
 sub
-#line 267 "Parser.yp"
+#line 266 "Parser.yp"
 { $factory->macro(@_[2, 3])           }
 	],
-	[#Rule 93
+	[#Rule 92
 		 'mdir', 1, undef
 	],
-	[#Rule 94
+	[#Rule 93
 		 'mdir', 4,
 sub
-#line 271 "Parser.yp"
+#line 270 "Parser.yp"
 { $_[3]                               }
+	],
+	[#Rule 94
+		 'margs', 2,
+sub
+#line 273 "Parser.yp"
+{ push(@{$_[1]}, $_[2]); $_[1]        }
 	],
 	[#Rule 95
 		 'margs', 2,
 sub
 #line 274 "Parser.yp"
-{ push(@{$_[1]}, $_[2]); $_[1]        }
-	],
-	[#Rule 96
-		 'margs', 2,
-sub
-#line 275 "Parser.yp"
 { $_[1]                               }
 	],
-	[#Rule 97
+	[#Rule 96
 		 'margs', 1,
 sub
-#line 276 "Parser.yp"
+#line 275 "Parser.yp"
 { [ $_[1] ]                           }
 	],
-	[#Rule 98
+	[#Rule 97
 		 'metadata', 2,
 sub
-#line 279 "Parser.yp"
+#line 278 "Parser.yp"
 { push(@{$_[1]}, @{$_[2]}); $_[1]     }
 	],
-	[#Rule 99
+	[#Rule 98
 		 'metadata', 2, undef
 	],
-	[#Rule 100
+	[#Rule 99
 		 'metadata', 1, undef
 	],
-	[#Rule 101
+	[#Rule 100
 		 'meta', 3,
 sub
-#line 284 "Parser.yp"
+#line 283 "Parser.yp"
 { for ($_[3]) { s/^'//; s/'$//; 
                                                        s/\\'/'/g  }; 
                                          [ @_[1,3] ] }
 	],
-	[#Rule 102
+	[#Rule 101
 		 'meta', 5,
 sub
-#line 287 "Parser.yp"
+#line 286 "Parser.yp"
 { [ @_[1,4] ] }
 	],
-	[#Rule 103
+	[#Rule 102
 		 'meta', 3,
 sub
-#line 288 "Parser.yp"
+#line 287 "Parser.yp"
 { [ @_[1,3] ] }
+	],
+	[#Rule 103
+		 'term', 1, undef
 	],
 	[#Rule 104
 		 'term', 1, undef
 	],
 	[#Rule 105
-		 'term', 1, undef
+		 'lterm', 3,
+sub
+#line 299 "Parser.yp"
+{ "[ $_[2] ]"                         }
 	],
 	[#Rule 106
 		 'lterm', 3,
@@ -5884,85 +5799,85 @@ sub
 { "[ $_[2] ]"                         }
 	],
 	[#Rule 107
-		 'lterm', 3,
-sub
-#line 301 "Parser.yp"
-{ "[ $_[2] ]"                         }
-	],
-	[#Rule 108
 		 'lterm', 2,
 sub
-#line 302 "Parser.yp"
+#line 301 "Parser.yp"
 { "[ ]"                               }
 	],
-	[#Rule 109
+	[#Rule 108
 		 'lterm', 3,
 sub
-#line 303 "Parser.yp"
+#line 302 "Parser.yp"
 { "{ $_[2]  }"                        }
 	],
-	[#Rule 110
+	[#Rule 109
 		 'sterm', 1,
 sub
-#line 306 "Parser.yp"
+#line 305 "Parser.yp"
 { $factory->ident($_[1])              }
 	],
-	[#Rule 111
+	[#Rule 110
 		 'sterm', 2,
 sub
-#line 307 "Parser.yp"
+#line 306 "Parser.yp"
 { $factory->identref($_[2])           }
 	],
-	[#Rule 112
+	[#Rule 111
 		 'sterm', 3,
 sub
-#line 308 "Parser.yp"
+#line 307 "Parser.yp"
 { $factory->quoted($_[2])             }
+	],
+	[#Rule 112
+		 'sterm', 1, undef
 	],
 	[#Rule 113
 		 'sterm', 1, undef
 	],
 	[#Rule 114
-		 'sterm', 1, undef
-	],
-	[#Rule 115
 		 'list', 2,
 sub
-#line 313 "Parser.yp"
+#line 312 "Parser.yp"
 { "$_[1], $_[2]"                      }
 	],
-	[#Rule 116
+	[#Rule 115
 		 'list', 2, undef
 	],
-	[#Rule 117
+	[#Rule 116
 		 'list', 1, undef
 	],
-	[#Rule 118
+	[#Rule 117
 		 'range', 3,
 sub
-#line 318 "Parser.yp"
+#line 317 "Parser.yp"
 { $_[1] . '..' . $_[3]                }
 	],
-	[#Rule 119
+	[#Rule 118
 		 'hash', 1, undef
 	],
-	[#Rule 120
+	[#Rule 119
 		 'hash', 0,
 sub
-#line 323 "Parser.yp"
+#line 322 "Parser.yp"
 { "" }
 	],
-	[#Rule 121
+	[#Rule 120
 		 'params', 2,
 sub
-#line 326 "Parser.yp"
+#line 325 "Parser.yp"
 { "$_[1], $_[2]"                      }
 	],
-	[#Rule 122
+	[#Rule 121
 		 'params', 2, undef
 	],
-	[#Rule 123
+	[#Rule 122
 		 'params', 1, undef
+	],
+	[#Rule 123
+		 'param', 3,
+sub
+#line 330 "Parser.yp"
+{ "$_[1] => $_[3]"                    }
 	],
 	[#Rule 124
 		 'param', 3,
@@ -5971,59 +5886,59 @@ sub
 { "$_[1] => $_[3]"                    }
 	],
 	[#Rule 125
-		 'param', 3,
+		 'ident', 3,
 sub
-#line 332 "Parser.yp"
-{ "$_[1] => $_[3]"                    }
+#line 334 "Parser.yp"
+{ push(@{$_[1]}, @{$_[3]}); $_[1]     }
 	],
 	[#Rule 126
 		 'ident', 3,
 sub
 #line 335 "Parser.yp"
-{ push(@{$_[1]}, @{$_[3]}); $_[1]     }
-	],
-	[#Rule 127
-		 'ident', 3,
-sub
-#line 336 "Parser.yp"
 { push(@{$_[1]}, 
                                            map {($_, 0)} split(/\./, $_[3]));
                                       $_[1];                              }
 	],
-	[#Rule 128
+	[#Rule 127
 		 'ident', 1, undef
 	],
-	[#Rule 129
+	[#Rule 128
 		 'node', 1,
 sub
-#line 342 "Parser.yp"
+#line 341 "Parser.yp"
 { [ $_[1], 0 ]                        }
 	],
-	[#Rule 130
+	[#Rule 129
 		 'node', 4,
 sub
-#line 343 "Parser.yp"
+#line 342 "Parser.yp"
 { [ $_[1], $factory->args($_[3]) ]    }
 	],
-	[#Rule 131
+	[#Rule 130
 		 'item', 1,
 sub
-#line 346 "Parser.yp"
+#line 345 "Parser.yp"
 { "'$_[1]'"                           }
 	],
-	[#Rule 132
+	[#Rule 131
 		 'item', 3,
 sub
-#line 347 "Parser.yp"
+#line 346 "Parser.yp"
 { $_[2]                               }
 	],
-	[#Rule 133
+	[#Rule 132
 		 'item', 2,
 sub
-#line 348 "Parser.yp"
+#line 347 "Parser.yp"
 { $_[0]->{ V1DOLLAR }
                                        ? "'$_[2]'" 
                                        : $factory->ident(["'$_[2]'", 0])  }
+	],
+	[#Rule 133
+		 'expr', 3,
+sub
+#line 352 "Parser.yp"
+{ "$_[1] $_[2] $_[3]"                 }
 	],
 	[#Rule 134
 		 'expr', 3,
@@ -6041,200 +5956,197 @@ sub
 		 'expr', 3,
 sub
 #line 355 "Parser.yp"
-{ "$_[1] $_[2] $_[3]"                 }
+{ "int($_[1] / $_[3])"                }
 	],
 	[#Rule 137
 		 'expr', 3,
 sub
 #line 356 "Parser.yp"
-{ "int($_[1] / $_[3])"                }
+{ "$_[1] % $_[3]"                     }
 	],
 	[#Rule 138
 		 'expr', 3,
 sub
 #line 357 "Parser.yp"
-{ "$_[1] % $_[3]"                     }
+{ "$_[1] $CMPOP{ $_[2] } $_[3]"       }
 	],
 	[#Rule 139
 		 'expr', 3,
 sub
 #line 358 "Parser.yp"
-{ "$_[1] $CMPOP{ $_[2] } $_[3]"       }
+{ "$_[1]  . $_[3]"                    }
 	],
 	[#Rule 140
 		 'expr', 3,
 sub
 #line 359 "Parser.yp"
-{ "$_[1]  . $_[3]"                    }
+{ "$_[1] && $_[3]"                    }
 	],
 	[#Rule 141
 		 'expr', 3,
 sub
 #line 360 "Parser.yp"
-{ "$_[1] && $_[3]"                    }
-	],
-	[#Rule 142
-		 'expr', 3,
-sub
-#line 361 "Parser.yp"
 { "$_[1] || $_[3]"                    }
 	],
-	[#Rule 143
+	[#Rule 142
 		 'expr', 2,
 sub
-#line 362 "Parser.yp"
+#line 361 "Parser.yp"
 { "! $_[2]"                           }
 	],
-	[#Rule 144
+	[#Rule 143
 		 'expr', 5,
 sub
-#line 363 "Parser.yp"
+#line 362 "Parser.yp"
 { "$_[1] ? $_[3] : $_[5]"             }
+	],
+	[#Rule 144
+		 'expr', 3,
+sub
+#line 363 "Parser.yp"
+{ $factory->assign(@{$_[2]})          }
 	],
 	[#Rule 145
 		 'expr', 3,
 sub
 #line 364 "Parser.yp"
-{ $factory->assign(@{$_[2]})          }
-	],
-	[#Rule 146
-		 'expr', 3,
-sub
-#line 365 "Parser.yp"
 { "($_[2])"                           }
 	],
-	[#Rule 147
+	[#Rule 146
 		 'expr', 1, undef
 	],
-	[#Rule 148
+	[#Rule 147
 		 'setlist', 2,
 sub
-#line 369 "Parser.yp"
+#line 368 "Parser.yp"
 { push(@{$_[1]}, @{$_[2]}); $_[1]     }
 	],
-	[#Rule 149
+	[#Rule 148
 		 'setlist', 2, undef
 	],
-	[#Rule 150
+	[#Rule 149
 		 'setlist', 1, undef
+	],
+	[#Rule 150
+		 'assign', 3,
+sub
+#line 374 "Parser.yp"
+{ [ $_[1], $_[3] ]                    }
 	],
 	[#Rule 151
 		 'assign', 3,
 sub
 #line 375 "Parser.yp"
-{ [ $_[1], $_[3] ]                    }
+{ [ @_[1,3] ]                         }
 	],
 	[#Rule 152
-		 'assign', 3,
+		 'args', 2,
 sub
-#line 376 "Parser.yp"
-{ [ @_[1,3] ]                         }
+#line 382 "Parser.yp"
+{ push(@{$_[1]}, $_[2]); $_[1]        }
 	],
 	[#Rule 153
 		 'args', 2,
 sub
 #line 383 "Parser.yp"
-{ push(@{$_[1]}, $_[2]); $_[1]        }
-	],
-	[#Rule 154
-		 'args', 2,
-sub
-#line 384 "Parser.yp"
 { push(@{$_[1]->[0]}, $_[2]); $_[1]   }
 	],
-	[#Rule 155
+	[#Rule 154
 		 'args', 4,
 sub
-#line 385 "Parser.yp"
+#line 384 "Parser.yp"
 { push(@{$_[1]->[0]}, "'', " . 
                                       $factory->assign(@_[2,4])); $_[1]  }
 	],
-	[#Rule 156
+	[#Rule 155
 		 'args', 2,
 sub
-#line 387 "Parser.yp"
+#line 386 "Parser.yp"
 { $_[1]                               }
 	],
-	[#Rule 157
+	[#Rule 156
 		 'args', 0,
 sub
-#line 388 "Parser.yp"
+#line 387 "Parser.yp"
 { [ [ ] ]                             }
 	],
-	[#Rule 158
+	[#Rule 157
 		 'lnameargs', 3,
 sub
-#line 398 "Parser.yp"
+#line 397 "Parser.yp"
 { push(@{$_[3]}, $_[1]); $_[3]        }
 	],
-	[#Rule 159
+	[#Rule 158
 		 'lnameargs', 1, undef
 	],
-	[#Rule 160
+	[#Rule 159
 		 'lvalue', 1, undef
 	],
-	[#Rule 161
+	[#Rule 160
 		 'lvalue', 3,
 sub
-#line 403 "Parser.yp"
+#line 402 "Parser.yp"
 { $factory->quoted($_[2])             }
 	],
-	[#Rule 162
+	[#Rule 161
 		 'lvalue', 1, undef
 	],
-	[#Rule 163
+	[#Rule 162
 		 'nameargs', 3,
 sub
-#line 407 "Parser.yp"
+#line 406 "Parser.yp"
 { [ [$factory->ident($_[2])], $_[3] ]   }
 	],
-	[#Rule 164
+	[#Rule 163
 		 'nameargs', 2,
 sub
-#line 408 "Parser.yp"
+#line 407 "Parser.yp"
 { [ @_[1,2] ] }
 	],
-	[#Rule 165
+	[#Rule 164
 		 'nameargs', 4,
 sub
-#line 409 "Parser.yp"
+#line 408 "Parser.yp"
 { [ @_[1,3] ] }
 	],
-	[#Rule 166
+	[#Rule 165
 		 'names', 3,
 sub
-#line 412 "Parser.yp"
+#line 411 "Parser.yp"
 { push(@{$_[1]}, $_[3]); $_[1] }
 	],
-	[#Rule 167
+	[#Rule 166
 		 'names', 1,
 sub
-#line 413 "Parser.yp"
+#line 412 "Parser.yp"
 { [ $_[1] ]                    }
 	],
-	[#Rule 168
+	[#Rule 167
 		 'name', 3,
 sub
-#line 416 "Parser.yp"
+#line 415 "Parser.yp"
 { $factory->quoted($_[2])  }
 	],
-	[#Rule 169
+	[#Rule 168
 		 'name', 1,
 sub
-#line 417 "Parser.yp"
+#line 416 "Parser.yp"
 { "'$_[1]'" }
 	],
-	[#Rule 170
+	[#Rule 169
 		 'name', 1, undef
 	],
-	[#Rule 171
+	[#Rule 170
 		 'filename', 3,
 sub
-#line 421 "Parser.yp"
+#line 420 "Parser.yp"
 { "$_[1].$_[3]" }
 	],
-	[#Rule 172
+	[#Rule 171
 		 'filename', 1, undef
+	],
+	[#Rule 172
+		 'filepart', 1, undef
 	],
 	[#Rule 173
 		 'filepart', 1, undef
@@ -6243,37 +6155,34 @@ sub
 		 'filepart', 1, undef
 	],
 	[#Rule 175
-		 'filepart', 1, undef
-	],
-	[#Rule 176
 		 'quoted', 2,
 sub
-#line 435 "Parser.yp"
+#line 434 "Parser.yp"
 { push(@{$_[1]}, $_[2]) 
                                           if defined $_[2]; $_[1]         }
 	],
-	[#Rule 177
+	[#Rule 176
 		 'quoted', 0,
 sub
-#line 437 "Parser.yp"
+#line 436 "Parser.yp"
 { [ ]                                 }
+	],
+	[#Rule 177
+		 'quotable', 1,
+sub
+#line 439 "Parser.yp"
+{ $factory->ident($_[1])              }
 	],
 	[#Rule 178
 		 'quotable', 1,
 sub
 #line 440 "Parser.yp"
-{ $factory->ident($_[1])              }
+{ $factory->text($_[1])               }
 	],
 	[#Rule 179
 		 'quotable', 1,
 sub
 #line 441 "Parser.yp"
-{ $factory->text($_[1])               }
-	],
-	[#Rule 180
-		 'quotable', 1,
-sub
-#line 442 "Parser.yp"
 { undef                               }
 	]
 ];

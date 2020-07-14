@@ -1,5 +1,10 @@
 Revision history for Alien-Gearman
 
+2.0      Tue Jul 07 2020
+         - Migrate to alienfile
+         - Fix Checklib 
+         - Add META.*
+
 0.01004  Sun Feb 21 2010
          - Include new gearman version 0.12
 

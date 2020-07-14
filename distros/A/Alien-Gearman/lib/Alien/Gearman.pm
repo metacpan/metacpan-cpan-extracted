@@ -2,12 +2,13 @@ package Alien::Gearman;
 
 use strict;
 use warnings;
+use base qw( Alien::Base );
 
-our $VERSION = '0.01004';
+our $VERSION = '1.1';
 
 =head1 NAME
 
-Alien::Gearman - Wrapper for installing libgearman v0.11
+Alien::Gearman - Wrapper for installing libgearman v0.12
 
 =head1 DESCRIPTION
 
@@ -20,9 +21,13 @@ you're interested.
 
 =head1 AUTHOR
 
+Thibault Duponchelle E<lt>thibault.duponchelle@gmail.comE<gt>
+
 Johannes Plunien E<lt>plu@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
+
+Copyright 2009 by Thibault Duponchelle
 
 Copyright 2009 by Johannes Plunien
 
@@ -43,7 +48,7 @@ it under the same terms as Perl itself.
 
 =head1 REPOSITORY
 
-L<http://github.com/plu/alien-gearman/>
+L<https://github.com/thibaultduponchelle/Alien-Gearman>
 
 =cut
 

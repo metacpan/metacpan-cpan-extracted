@@ -1,0 +1,93 @@
+{
+   "abstract" : "Find or build Gearman",
+   "author" : [
+      "Thibault Duponchelle <thibault.duponchelle@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.4702, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Gearman",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.25",
+            "Alien::Libevent" : "0",
+            "Alien::libuuid" : "0",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "Env::ShellWords" : "0.01",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.25",
+            "Alien::Build::Plugin::Build::SearchDep" : "0.35",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "Alien::Build" : "0.25",
+            "Alien::Libevent" : "0",
+            "Alien::libuuid" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/thibaultduponchelle/Alien-Gearman/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Alien-Gearman",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/thibaultduponchelle/Alien-Gearman.git"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "1.1",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.26",
+      "requires" : {
+         "share" : {
+            "Alien::Libevent" : "0",
+            "Alien::libuuid" : "0",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "Env::ShellWords" : "0.01",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "Mojo::DOM58" : "1.00",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

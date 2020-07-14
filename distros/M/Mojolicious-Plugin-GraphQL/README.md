@@ -150,11 +150,38 @@ Register renderer in [Mojolicious](https://metacpan.org/pod/Mojolicious) applica
 Exportable is the function `promise_code`, which returns a hash-ref
 suitable for passing as the 8th argument to ["execute" in GraphQL::Execution](https://metacpan.org/pod/GraphQL::Execution#execute).
 
+# SUBSCRIPTIONS
+
+To use subscriptions within your web app, just insert this JavaScript:
+
+    <script src="//unpkg.com/subscriptions-transport-ws@0.9.16/browser/client.js"></script>
+    # ...
+    const subscriptionsClient = new window.SubscriptionsTransportWs.SubscriptionClient(websocket_uri, {
+      reconnect: true
+    });
+    subscriptionsClient.request({
+      query: "subscription s($c: [String!]) {subscribe(channels: $c) {channel username dateTime message}}",
+      variables: { c: channel },
+    }).subscribe({
+      next(payload) {
+        var msg = payload.data.subscribe;
+        console.log(msg.username + ' said', msg.message);
+      },
+      error: console.error,
+    });
+
+Note the use of parameterised queries, where you only need to change
+the `variables` parameter. The above is adapted from the sample app,
+[https://github.com/graphql-perl/sample-mojolicious](https://github.com/graphql-perl/sample-mojolicious).
+
 # SEE ALSO
 
 [GraphQL](https://metacpan.org/pod/GraphQL)
 
 [GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert)
+
+[https://github.com/apollographql/subscriptions-transport-ws#client-browser](https://github.com/apollographql/subscriptions-transport-ws#client-browser)
+\- Apollo documentation
 
 # AUTHOR
 

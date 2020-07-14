@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.184';
+our $VERSION = '1.185';
 
 =encoding utf8
 
@@ -500,6 +500,10 @@ L<Quiq::Ipc> - Interprozesskommunikation
 
 =item *
 
+L<Quiq::JQuery> - Basisfunktionalität zu jQuery
+
+=item *
+
 L<Quiq::JQuery::Accordion> - Erzeuge HTML einer jQuery UI Accodion Reiterleiste
 
 =item *
@@ -620,11 +624,23 @@ L<Quiq::Perl> - Erweiterte und abgesicherte Perl-Operationen
 
 =item *
 
+L<Quiq::PlotlyJs> - Basisfunktionalität zu Plotly.js
+
+=item *
+
 L<Quiq::PlotlyJs::Reference> - Erzeuge Plotly.js Reference Manual
 
 =item *
 
 L<Quiq::PlotlyJs::TimeSeries> - Erzeuge Zeitreihen-Plot auf Basis von Plotly.js
+
+=item *
+
+L<Quiq::PlotlyJs::TimeSeries::DiagramGroup> - Erzeuge Zeitreihen-Plots auf Basis von Plotly.js
+
+=item *
+
+L<Quiq::PlotlyJs::TimeSeries::Parameter> - Ein zu plottender Parameter
 
 =item *
 
@@ -858,7 +874,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.184
+1.185
 
 =head1 AUTHOR
 

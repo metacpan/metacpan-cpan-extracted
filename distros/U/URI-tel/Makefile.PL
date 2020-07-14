@@ -12,10 +12,15 @@ my %WriteMakefileArgs = (
     ABSTRACT            => 'Implementation of rfc3966 for tel URI',
     INSTALLDIRS         => ($] < 5.011 ? 'perl' : 'site'),
     PREREQ_PM           => {
-        'Test::More' 	=> 0,
     	'overload'		=> 0,
     	'overloading'	=> 0,
+    	'parent'		=> 0,
+    	'strict'		=> 0,
         'URI' 			=> 0
+    },
+    TEST_REQUIRES =>
+    {
+        'Test::More' 	=> 0,
     },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 5.6.0,
@@ -29,9 +34,9 @@ my %WriteMakefileArgs = (
                 web         => 'https://github.com/jackdeguest/URI-tel',
                 type        => 'git',
             },
-        #    bugtracker => {
-        #        web         => undef,
-        #    },
+            bugtracker => {
+                web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=URI-tel',
+            },
         },
     })),
 );

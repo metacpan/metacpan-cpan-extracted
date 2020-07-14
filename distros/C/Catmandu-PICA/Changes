@@ -1,5 +1,8 @@
 Changelog for Catmandu-PICA
 
+1.03 2020-07-14T10:48:48Z
+ - Fix Unicode bug, require PICA::Data 1.12
+
 1.02  2020-04-20 13:42:30 CEST
  - add test for option pluck on multiple fields
  - fix undefined keys

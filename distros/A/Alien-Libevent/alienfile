@@ -7,7 +7,7 @@ plugin 'PkgConfig' => 'libevent';
 # installing it.
 share {
 
-  start_url 'http://libevent.org/';
+  start_url 'https://libevent.org/';
   plugin 'Download' => (
     filter => qr/^libevent-.*-stable\.tar\.gz$/,
     version => qr/([0-9\.]+)/,

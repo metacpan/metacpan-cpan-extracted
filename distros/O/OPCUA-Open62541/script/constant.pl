@@ -115,7 +115,8 @@ sub parse_prefix {
 	my $value = $typedef ? "" : " $num";
 	print $pmf "$prefix $str$value\n";
 	print $podf "=item ${prefix}_${str}\n\n";
-	print_xsfunc($xsf, $typedef, $prefix, $str) if $typedef;
+	print_xsfunc($xsf, $typedef, $prefix, $str, $type eq "define")
+	    if $typedef;
 	push @allstr, $str;
 	$prevnum = $num;
     }
@@ -266,7 +267,8 @@ EOPODFOOTER
 
 ########################################################################
 sub print_xsfunc {
-    my ($xsf, $typedef, $prefix, $str) = @_;
+    my ($xsf, $typedef, $prefix, $str, $ifdef) = @_;
+    print $xsf "#ifdef UA_${prefix}_${str}\n\n" if $ifdef;
     print $xsf <<"EOXSFUNC";
 ${typedef}
 ${prefix}_${str}()
@@ -276,4 +278,5 @@ ${prefix}_${str}()
 	RETVAL
 
 EOXSFUNC
+    print $xsf "#endif\n" if $ifdef;
 }

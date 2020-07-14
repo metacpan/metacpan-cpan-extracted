@@ -3,14 +3,13 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: mb
-version: 0.03
+version: 0.05
 abstract: run Perl script written in MBCS
 author:
   - ina <ina@cpan.org>
 license: perl
 generated_by: pmake.bat
 requires:
-  Carp: 0
   Cwd: 0
   ExtUtils::MakeMaker: 5.4302
   File::Basename: 2.6

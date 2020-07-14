@@ -2,6 +2,10 @@ acmeman
 Changes
 lib/App/Acmeman.pm
 lib/App/Acmeman/Apache/Layout.pm
+lib/App/Acmeman/Apache/Layout/debian.pm
+lib/App/Acmeman/Apache/Layout/rh.pm
+lib/App/Acmeman/Apache/Layout/slackware.pm
+lib/App/Acmeman/Apache/Layout/suse.pm
 lib/App/Acmeman/Config.pm
 lib/App/Acmeman/Domain.pm
 lib/App/Acmeman/Log.pm

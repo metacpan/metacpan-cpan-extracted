@@ -3,7 +3,7 @@ package CHI::Cascade;
 use strict;
 use warnings;
 
-our $VERSION = 0.300_003;
+our $VERSION = 0.300_004;
 
 use Carp;
 
@@ -355,7 +355,10 @@ sub value_ref_if_recomputed {
     return $ret || CHI::Cascade::Value->new;
 }
 
-sub stash { exists $_[0]->{stash} && $_[0]->{stash} || die "The stash method from outside run method!" }
+sub stash {
+    warn "The Cascade::stash method is deprecated! Please use the Cascade::Rule::stash method for this!\n";
+    exists $_[0]->{stash} && $_[0]->{stash} || die "The stash method from outside run method!"
+}
 
 sub run {
     my ( $self, $target, %opts ) = @_;
@@ -375,8 +378,7 @@ sub run {
     $opts{actual_term} ||= $self->find($target)->{actual_term};
     $self->{stats}{run}++;
 
-
-    # FIXME to delete in future. Now it's depricated
+    # FIXME to delete in future. Now it's deprecated
     $self->{stash} = $run_instance->{stash};
 
     $view_dependencies = ! $self->target_is_actual( $target, $opts{actual_term} )
@@ -434,7 +436,7 @@ sub _run {
         return $from_cache->state( $ret->state )
           if ( $terminated || $from_cache->is_value );
 
-        return $self->_run( 1, $target )
+        return $self->_run( 1, $target, $run_instance )
           if ! $only_from_cache;
     }
 

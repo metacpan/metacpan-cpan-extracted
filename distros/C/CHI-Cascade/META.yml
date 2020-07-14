@@ -30,4 +30,4 @@ requires:
   perl: 5.01
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.300003
+version: 0.300004

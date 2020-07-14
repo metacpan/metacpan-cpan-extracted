@@ -32,15 +32,21 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0",
             "URI" : "0",
             "overload" : "0",
             "overloading" : "0",
-            "perl" : "5.006000"
+            "parent" : "0",
+            "perl" : "5.006000",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.7",
+   "version" : "v0.800.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

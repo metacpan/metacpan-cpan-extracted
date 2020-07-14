@@ -13,6 +13,7 @@ use Quiq::FileHandle;
 use Quiq::Epoch;
 use Quiq::Html::Producer;
 use Quiq::Html::Page;
+use Quiq::JQuery;
 use Quiq::Path;
 
 # -----------------------------------------------------------------------------
@@ -61,7 +62,6 @@ sub test_unitTest: Test(1) {
     my $plt = Quiq::PlotlyJs::TimeSeries->new(
         title => 'Windspeed',
         x => \@x,
-        xTickFormat => '%Y-%m-%d %H:%M',
         y => \@y,
         yTitle => 'm/s',
     );
@@ -74,7 +74,7 @@ sub test_unitTest: Test(1) {
     my $html = Quiq::Html::Page->html($h,
         title => 'Plotly.js example',
         load => [
-            js => 'https://code.jquery.com/jquery-3.4.1.min.js',
+            js => Quiq::JQuery->cdnUrl,
             js => $plt->cdnUrl,
         ],
         body => $plt->html($h),

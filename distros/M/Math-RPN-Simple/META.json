@@ -4,7 +4,7 @@
       "Michał Wróblewski <debos@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -50,6 +50,6 @@
          "web" : "https://gitlab.com/DeBos/Math-RPN-Simple"
       }
    },
-   "version" : "v1.1.11",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v1.1.14",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.184';
+our $VERSION = '1.185';
 
 use Encode::Guess ();
 use Encode ();
@@ -672,6 +672,70 @@ sub quote {
 
 # -----------------------------------------------------------------------------
 
+=head2 Zeilenfortsetzungen
+
+=head3 joinLines() - Füge Zeilen mit Zeilenfortsetzungszeichen zusammen
+
+=head4 Synopsis
+
+  $newText = $class->joinLines($char,$text);
+
+=head4 Arguments
+
+=over 4
+
+=item $char
+
+Zeilenfortsetzungszeichen
+
+=item $text
+
+Text mit Zeilenfortsetzungszeichen
+
+=back
+
+=head4 Description
+
+Vereinige alle Zeilen in $text, die auf das Zeilenfortsetzungszeichen
+$char enden, mit der Folgezeile zusammen und liefere das Resultat
+zurück. Whitespace am Anfang der Folgezeile wird entfernt.
+
+Wird das Zeilenfortsetzungszeichen verdoppelt, bleibt es stehen
+und die Zeilen werden nicht zusammengefasst.
+
+B<Anmerkung:> Der Backslash (\) ist als Fortsetzungszeichen nicht
+so gut geeignet, da er von Perl interpretiert wird und
+in Zeichenketten mit doppelten Anführungsstrichen verdoppelt
+werden muss.
+
+=head4 Example
+
+Verwende die Tilde (~) als Fortsetzungszeichen:
+
+  Quiq::String->joinLines('~',"Dies ist ~\nein Text");
+  ==>
+  "Dies ist ein Text"
+
+Das Fortsetzungszeichen kann literal am Ende einer Zeile stehen,
+wenn es verdoppelt wird:
+
+  Quiq::String->joinLines('~',"Dies ist ~~\nein Text");
+  ==>
+  "Dies ist ~\nein Text"
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub joinLines {
+    my ($class,$char,$text) = @_;
+    $text =~ s/(?<!\Q$char\E)\Q$char\E\n\s*//g; # Zeilen zusammenfassen
+    $text =~ s/\Q$char$char\E\n/$char\n/g; # verdoppeltes Fortsetzungszeichen
+    return $text;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Umbruch
 
 =head3 wrap() - Umbreche Fließtext
@@ -783,7 +847,7 @@ sub wrap {
 
 =head1 VERSION
 
-1.184
+1.185
 
 =head1 AUTHOR
 

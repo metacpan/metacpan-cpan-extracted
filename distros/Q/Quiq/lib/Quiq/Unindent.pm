@@ -4,7 +4,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.184';
+our $VERSION = '1.185';
+
+use Quiq::String;
 
 # -----------------------------------------------------------------------------
 
@@ -64,6 +66,24 @@ String-Literalen und "Here Documents" entfernt werden kann.
   $str = $class->hereDoc(<<'EOT');
       <Text>
   EOT
+  
+  $str = $class->hereDoc($char,<<'EOT');
+      <Text>
+  EOT
+
+=head4 Arguments
+
+=over 4
+
+=item $char (optional)
+
+Fortsetzungszeichen. Siehe Quiq::String->joinLines().
+
+=item $text
+
+Eingerückter Text.
+
+=back
 
 =head4 Description
 
@@ -147,6 +167,7 @@ d.h. Sub-Einrückungen und Leerzeilen bleiben erhalten.
 
 sub hereDoc {
     my $class = shift;
+    my $char = @_ == 2? shift: undef;
     my $str = shift // return '';
 
     # Wir brauchen uns nur mit dem String befassen, wenn das erste
@@ -172,6 +193,9 @@ sub hereDoc {
             $str =~ s/^$ind//gm;
         }
     }
+    if (defined $char) {
+        $str = Quiq::String->joinLines($char,$str);
+    }
 
     return $str;
 }
@@ -185,6 +209,24 @@ sub hereDoc {
   $str = $class->string('
       <Text>
   ');
+  
+  $str = $class->string($char,'
+      <Text>
+  ');
+
+=head4 Arguments
+
+=over 4
+
+=item $char (optional)
+
+Fortsetzungszeichen. Siehe Quiq::String->joinLines().
+
+=item $text
+
+Eingerückter Text.
+
+=back
 
 =head4 Description
 
@@ -256,12 +298,13 @@ Varianten
 
 sub string {
     my $class = shift;
+    my $char = @_ == 2? shift: undef;
     my $str = shift // return '';
 
     $str =~ s/^\n//;
     $str =~ s/ +$//;
 
-    return $class->hereDoc($str);
+    return $class->hereDoc($char,$str);
 }
 
 # -----------------------------------------------------------------------------
@@ -271,6 +314,21 @@ sub string {
 =head4 Synopsis
 
   $strOut = $class->trim($strIn);
+  $strOut = $class->trim($char,$strIn);
+
+=head4 Arguments
+
+=over 4
+
+=item $char (optional)
+
+Fortsetzungszeichen. Siehe Quiq::String->joinLines().
+
+=item $strIn
+
+Eingerückter Text.
+
+=back
 
 =head4 Description
 
@@ -362,12 +420,13 @@ Aufruf mit eingerücktem String-Literal, das I<intern> behandelt wird:
 
 sub trim {
     my $class = shift;
+    my $char = @_ == 2? shift: undef;
     my $str = shift // return '';
 
     $str =~ s/^\s*\n//;
     $str =~ s/\s+$//;
 
-    return $class->hereDoc($str);
+    return $class->hereDoc($char,$str);
 }
 
 # -----------------------------------------------------------------------------
@@ -377,6 +436,21 @@ sub trim {
 =head4 Synopsis
 
   $strOut = $class->trimNl($strIn);
+  $strOut = $class->trimNl($char,$strIn);
+
+=head4 Arguments
+
+=over 4
+
+=item $char (optional)
+
+Fortsetzungszeichen. Siehe Quiq::String->joinLines().
+
+=item $strIn
+
+Eingerückter Text.
+
+=back
 
 =head4 Description
 
@@ -389,9 +463,10 @@ angehängt, sofern der Sting nicht leer ist.
 
 sub trimNl {
     my $class = shift;
+    my $char = @_ == 2? shift: undef;
     my $str = shift // return '';
 
-    $str = $class->trim($str);
+    $str = $class->trim($char,$str);
     if ($str ne '') {
         $str .= "\n";
     }
@@ -403,7 +478,7 @@ sub trimNl {
 
 =head1 VERSION
 
-1.184
+1.185
 
 =head1 AUTHOR
 

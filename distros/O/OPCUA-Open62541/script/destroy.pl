@@ -29,6 +29,7 @@ my @types = qw(
     VariableAttributes
     VariableTypeAttributes
     ViewAttributes
+    WriteValue
 );
 
 open(my $tf, '>', "Open62541-typedef.xsh")

@@ -121,6 +121,7 @@ lib/Quiq/ImagePool/Directory.pm
 lib/Quiq/ImagePool/Sequence.pm
 lib/Quiq/Ipc.pm
 lib/Quiq/JavaScript.pm
+lib/Quiq/JQuery.pm
 lib/Quiq/JQuery/Accordion.pm
 lib/Quiq/JQuery/ContextMenu.pm
 lib/Quiq/JQuery/ContextMenu/Ajax.pm
@@ -150,8 +151,11 @@ lib/Quiq/Parallel.pm
 lib/Quiq/Parameters.pm
 lib/Quiq/Path.pm
 lib/Quiq/Perl.pm
+lib/Quiq/PlotlyJs.pm
 lib/Quiq/PlotlyJs/Reference.pm
 lib/Quiq/PlotlyJs/TimeSeries.pm
+lib/Quiq/PlotlyJs/TimeSeries/DiagramGroup.pm
+lib/Quiq/PlotlyJs/TimeSeries/Parameter.pm
 lib/Quiq/Pod/Generator.pm
 lib/Quiq/PostgreSql/Catalog.pm
 lib/Quiq/PostgreSql/CopyFormat.pm
@@ -332,6 +336,7 @@ t/bin/Quiq/ImagePool/Directory.t
 t/bin/Quiq/ImagePool/Sequence.t
 t/bin/Quiq/Ipc.t
 t/bin/Quiq/JavaScript.t
+t/bin/Quiq/JQuery.t
 t/bin/Quiq/JQuery/Accordion.t
 t/bin/Quiq/JQuery/ContextMenu.t
 t/bin/Quiq/JQuery/ContextMenu/Ajax.t
@@ -361,8 +366,11 @@ t/bin/Quiq/Parallel.t
 t/bin/Quiq/Parameters.t
 t/bin/Quiq/Path.t
 t/bin/Quiq/Perl.t
+t/bin/Quiq/PlotlyJs.t
 t/bin/Quiq/PlotlyJs/Reference.t
 t/bin/Quiq/PlotlyJs/TimeSeries.t
+t/bin/Quiq/PlotlyJs/TimeSeries/DiagramGroup.t
+t/bin/Quiq/PlotlyJs/TimeSeries/Parameter.t
 t/bin/Quiq/Pod/Generator.t
 t/bin/Quiq/PostgreSql/Catalog.t
 t/bin/Quiq/PostgreSql/CopyFormat.t

@@ -24,7 +24,7 @@ use Text::ParseWords;
 use App::Acmeman::Log qw(:all :sysexits);
 use feature 'state';
 
-our $VERSION = '3.03';
+our $VERSION = '3.05';
 
 my $progdescr = "manages ACME certificates";
 
@@ -159,6 +159,7 @@ sub prep_dir {
     my $dir = dirname($name);
     if (! -d $dir) {
 	debug(3, "creating directory $dir");
+	return if $self->dry_run_option;
 	my @created = make_path("$dir", { error => \my $err } );
 	if (@$err) {
 	    for my $diag (@$err) {
@@ -333,7 +334,8 @@ sub renew {
 	local $ENV{ACMEMAN_ALT_NAMES} =
 	    join(' ', map { ($_->alt) } @renewed);
 	if ($self->cf->is_set(qw(core postrenew))) {
-	    foreach my $cmd ($self->cf->get(qw(core postrenew))) {
+	    foreach my $cmd (grep { defined($_) }
+			          $self->cf->get(qw(core postrenew))) {
 		$self->runcmd($cmd);
 	    }
         } else {
@@ -586,7 +588,7 @@ sub register_domain_certificate {
                        .+?
                        ^-+END\s+CERTIFICATE-+$)
                        (.+)/msx) {
-	    $cert = $1;
+	    $cert = $1."\n";
 	    ($chain = $2) =~ s/^\s+//s;
 	} else {
 	    $cert = $chain; # FIXME: not sure if that's right

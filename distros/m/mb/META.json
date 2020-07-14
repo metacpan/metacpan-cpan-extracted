@@ -1,6 +1,6 @@
 {
     "name" : "mb",
-    "version" : "0.03",
+    "version" : "0.05",
     "abstract" : "run Perl script written in MBCS",
     "author" : [
         "ina <ina@cpan.org>"
@@ -26,7 +26,6 @@
     "prereqs" : {
         "build" : {
             "requires" : {
-                "Carp" : "0",
                 "Cwd" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
@@ -43,7 +42,6 @@
         },
         "configure" : {
             "requires" : {
-                "Carp" : "0",
                 "Cwd" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",
@@ -60,7 +58,6 @@
         },
         "runtime" : {
             "requires" : {
-                "Carp" : "0",
                 "Cwd" : "0",
                 "ExtUtils::MakeMaker" : "5.4302",
                 "File::Basename" : "2.6",

@@ -19,10 +19,8 @@ sub new {
     my $server_root;
     GetOptionsFromArray(\@_,
 			'server-root=s' => \$server_root);
-    my $self = bless { _layout => new App::Acmeman::Apache::Layout(@_) }, $class;
-    unless ($server_root) {
-	$server_root = Apache::Defaults->new->server_root;
-    }
+    my $layout = detect App::Acmeman::Apache::Layout(@_);
+    my $self = bless { _layout => $layout }, $class;
     $self->server_root($server_root) if $server_root;
     return $self;
 }
@@ -68,7 +66,8 @@ sub examine_http_config {
     foreach my $sect ($app->section(-name => "macro")) {
 	if ($sect->value =~ m{^(?ix)letsencryptssl
                                     \s+
-                                    (.+)}) {
+                                    (.+)}
+	    && ! $self->is_set(qw(files apache))) {
 	    $self->set(qw(files apache argument), $1);
 	    map {
 		if ($_->name =~ m{^(?ix)
@@ -95,8 +94,10 @@ sub examine_http_config {
     }
     
     foreach my $sect ($app->section(-name => "virtualhost")) {
-	 my ($server_name) = (map { $self->dequote($_->value) }
-			      $sect->directive('servername'));
+	 my ($server_name) = (map {
+				  (my $s = $self->dequote($_->value)) =~ s{^https?://}{};
+				  $s
+			      } $sect->directive('servername'));
 	 my @server_aliases = map { quotewords('\s+', 0,
 					       $self->dequote($_->value)) }
 	                      $sect->directive('serveralias');
@@ -132,7 +133,7 @@ sub server_root {
 	croak "too many arguments" if $@;
 	$self->{_server_root} = $v;
     }
-    return $self->{_server_root};
+    return $self->{_server_root} || $self->layout->apache->server_root;
 }
 
 sub mkpath {
@@ -176,7 +177,9 @@ sub setup {
 		return 0;
 	    }
 	}
-	
+
+	$self->layout->pre_setup;
+
 	open(my $fd, '>', $filename)
 	    or croak "can't open \"$filename\" for writing: $!";
 	print $fd <<EOT;
@@ -215,17 +218,47 @@ sub setup {
 EOT
 ;
 	close $fd;
+	error("created file \"$filename\"", prefix => 'note');
 	
-	if (exists($self->{_post_setup})) {
-	    &{$self->{_post_setup}}($filename);
-	}
+	$self->layout->post_setup($filename);
     }
 
-    error("created file \"$filename\"", prefix => 'note');
-    error("please, enable mod_macro and make sure your Apache configuration includes this file",
-	  prefix => 'note');
+    my $pfx = "please,";
+    unless ($self->is_letsencryptssl_defined) {
+	error("please, make sure your Apache configuration includes this file",
+	      prefix => 'note');
+	$pfx = "and";
+    }
     
+    unless ($self->layout->apache_modules('macro')) {
+	error("$pfx enable mod_macro",
+	      prefix => 'note');
+    }
     return 1;
+}
+
+# Check if LetsEncryptSSL macro is defined
+sub is_letsencryptssl_defined {
+    my ($self) = @_;
+    my $app = new Apache::Config::Preproc(
+	$self->layout->config_file,
+	-expand => [ 'compact',
+		     { 'include' => [ server_root => $self->server_root ] },
+		     { 'macro' => [
+			   'keep' => [ qw(LetsEncryptChallenge
+                                          LetsEncryptReference
+                                          LetsEncryptSSL)
+			   ]
+		       ]
+		     }
+	]);
+    if ($app) {
+	return grep { $_->value =~ m{^(?i)letsencryptssl\s+} }
+	   $app->section(-name => "macro");
+    } else {
+	debug(1, $Apache::Admin::Config::ERROR);
+	return undef
+    }
 }
 
 1;

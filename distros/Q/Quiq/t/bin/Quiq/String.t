@@ -348,6 +348,18 @@ sub test_quote : Test(2) {
 
 # -----------------------------------------------------------------------------
 
+sub test_joinLines : Test(2) {
+    my $self = shift;
+
+    my $text = Quiq::String->joinLines('~',"Dies ist ~\nein Text");
+    $self->is($text,'Dies ist ein Text');
+
+    $text = Quiq::String->joinLines('~',"Dies ist ~~\nein Text");
+    $self->is($text,"Dies ist ~\nein Text");
+}
+
+# -----------------------------------------------------------------------------
+
 sub test_wrap : Test(4) {
     my $self = shift;
 

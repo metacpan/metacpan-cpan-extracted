@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.184';
+our $VERSION = '1.185';
 
 use Cwd ();
 use Quiq::System;
@@ -177,7 +177,7 @@ sub homeDir {
 
 # -----------------------------------------------------------------------------
 
-=head3 mtime() - Zeitpunkt der letzten Programmänderung
+=head3 mtime() - Zeitpunkt der letzten Änderung am Programm
 
 =head4 Synopsis
 
@@ -262,7 +262,7 @@ sub user {
 
 =head1 VERSION
 
-1.184
+1.185
 
 =head1 AUTHOR
 

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.184';
+our $VERSION = '1.185';
 
 use Quiq::Object;
 use Time::HiRes ();
@@ -953,9 +953,9 @@ sub asTable {
     if ($msg) {
         $str .= $msg;
     }
-    #if ($info || $msg) {
-    #    $str .= "\n";
-    #}
+    if ($info || $msg) {
+        $str .= "\n";
+    }
 
     return $str;
 }
@@ -1069,7 +1069,7 @@ sub reverse {
 
 =head1 VERSION
 
-1.184
+1.185
 
 =head1 AUTHOR
 

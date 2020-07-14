@@ -1,12 +1,13 @@
 package PICA::Schema;
 use v5.14.1;
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(field_identifier check_value);
 
 use Scalar::Util qw(reftype);
+use Storable qw(dclone);
 use PICA::Schema::Error;
 
 sub new {
@@ -194,6 +195,19 @@ sub TO_JSON {
     return {map {$_ => $self->{$_}} keys %$self};
 }
 
+sub abbreviated {
+    my ($self) = @_;
+    my $abbr = dclone($self->TO_JSON);
+    for (values %{$abbr->{fields} // {}}) {
+        delete $_->{tag};
+        delete $_->{occurrence};
+        for (values %{$_->{subfields} // {}}) {
+            delete $_->{code};
+        }
+    }
+    return $abbr;
+}
+
 1;
 __END__
 
@@ -283,6 +297,10 @@ Don't check subfields at all.
 
 Check whether a PICA field confirms to the schema. Use same options as method
 C<check>. Returns a L<PICA::Schema::Error> on schema violation.
+
+=head2 abbreviated
+
+Return an abbreviated data structure of the schema without inferable fields such as C<tag>, C<occurrence> and C<code>.
 
 =head1 FUNCTIONS
 

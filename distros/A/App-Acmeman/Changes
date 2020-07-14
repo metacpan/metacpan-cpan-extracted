@@ -1,3 +1,15 @@
+3.05 2020-06-14
+	
+	- Fix manifest
+
+3.04 2020-06-14
+
+	- Rewrite Apache configuration layout support.
+	- Improve Apache setup procedure.
+	- Make sure the generated cert.pem file is terminated with a
+	newline.
+	- Accept ServerName value with the scheme prefix.
+
 3.03 2019-12-23
 
 	- The following environment variables are set when running

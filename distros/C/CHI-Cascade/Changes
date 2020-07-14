@@ -1,5 +1,11 @@
 Revision history for perl module CHI::Cascade
 
+0.3.4 (0.300004) 2020-07-13
+    - The 'stash' bug in previous release (v0.3.3) was not fixed. It was fixed here i hope...
+    - Added the warning when called the Cascade::stash method (deprecated)
+    - Fixed misprint 'depricated' to 'deprecated' in docs
+    - Added a 'die' in Cascade::Rule::stash method if 'stash' or 'run_instance' are not defined (normally this should not happen)
+
 0.3.3 (0.300003)
     - fixed bug of stash (undefined) when rule method was used (a rarely bug)
 

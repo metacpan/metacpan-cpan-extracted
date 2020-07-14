@@ -1,6 +1,10 @@
 Revision history for Alien-Libevent
 
-2.3      Tue Jul 08 2020
+
+2.4      Tue Jul 14 2020
+         - Use https url so that Alien adds SSL modules to prereqs
+
+2.3      Wed Jul 08 2020
          - Fix pkg-config for client modules
 
 2.2      Tue Jul 07 2020

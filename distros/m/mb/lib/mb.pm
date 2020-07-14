@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.03';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 # internal use
@@ -20,7 +20,6 @@ $mb::last_s_passed = 0; # last s/// status (1 if s/// passed)
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 } use warnings; local $^W=1;
-use Carp ();
 use Symbol ();
 
 # set OSNAME
@@ -198,13 +197,28 @@ END
     exit($? >> 8);
 }
 
+#---------------------------------------------------------------------
+# confess() for MBCS encoding
+sub confess {
+    my $i = 0;
+    my @confess = ();
+    while (my($package,$filename,$line,$subroutine) = caller($i)) {
+        push @confess, "[$i] $filename($line) $package::$subroutine\n";
+        $i++;
+    }
+    print STDERR CORE::reverse @confess;
+    print STDERR "\n";
+    print STDERR @_;
+    die "\n";
+}
+
 ######################################################################
 # subroutines for MBCS application programmers
 ######################################################################
 
 #---------------------------------------------------------------------
 # chop() for MBCS encoding
-sub mb::chop (@) {
+sub mb::chop {
     my $chop = '';
     for (@_ ? @_ : $_) {
         if (my @x = /\G${mb::x}/g) {
@@ -217,7 +231,7 @@ sub mb::chop (@) {
 
 #---------------------------------------------------------------------
 # chr() for MBCS encoding
-sub mb::chr (;$) {
+sub mb::chr {
     local $_ = shift if @_;
     my @octet = ();
     CORE::do {
@@ -229,7 +243,7 @@ sub mb::chr (;$) {
 
 #---------------------------------------------------------------------
 # do FILE for MBCS encoding
-sub mb::do ($) {
+sub mb::do {
     my($file) = @_;
     for my $prefix (@INC) {
         my $prefix_file = "$prefix/$file";
@@ -242,20 +256,20 @@ sub mb::do ($) {
                 (-M $prefix_file_oo <= -M $prefix_file) or
                 (-M $prefix_file_oo <= -M __FILE__)
             ) {
-                mb::_open_r(my $fh, $prefix_file) or Carp::confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
+                mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
                 local $_ = CORE::do { local $/; <$fh> };
                 close $fh;
 
                 # poor file locking
                 local $SIG{__DIE__} = sub { rmdir("$prefix_file.lock"); };
                 if (mkdir("$prefix_file.lock", 0755)) {
-                    mb::_open_w(my $fh, ">$prefix_file_oo") or Carp::confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
+                    mb::_open_w(my $fh, ">$prefix_file_oo") or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
                     print {$fh} mb::parse();
                     close $fh;
                     rmdir("$prefix_file.lock");
                 }
                 else {
-                    Carp::confess "$0(@{[__LINE__]}): cant't mkdir: $prefix_file.lock\n";
+                    confess "$0(@{[__LINE__]}): cant't mkdir: $prefix_file.lock\n";
                 }
             }
             $INC{$file} = $prefix_file_oo;
@@ -269,12 +283,12 @@ CORE::do "$prefix_file_oo";
 END
         }
     }
-    Carp::confess "Can't find $file in \@INC";
+    confess "Can't find $file in \@INC";
 }
 
 #---------------------------------------------------------------------
 # DOS-like glob() for MBCS encoding
-sub mb::dosglob (;$) {
+sub mb::dosglob {
     my $expr = @_ ? $_[0] : $_;
     my @glob = ();
 
@@ -317,7 +331,7 @@ sub mb::dosglob (;$) {
 
 #---------------------------------------------------------------------
 # eval STRING for MBCS encoding
-sub mb::eval (;$) {
+sub mb::eval {
     local $_ = shift if @_;
 
     # run as Perl script
@@ -328,7 +342,7 @@ sub mb::eval (;$) {
 # getc() for MBCS encoding
 sub mb::getc (;*@) {
     my $fh = @_ ? Symbol::qualify_to_ref(shift @_,caller()) : \*STDIN;
-    Carp::confess 'Too many arguments for mb::getc' if @_ and not wantarray;
+    confess 'Too many arguments for mb::getc' if @_ and not wantarray;
     my $getc = CORE::getc $fh;
     if ($script_encoding =~ /\A (?: sjis ) \z/xms) {
         if ($getc =~ /\A [\x81-\x9F\xE0-\xFC] \z/xms) {
@@ -373,7 +387,7 @@ sub mb::getc (;*@) {
 
 #---------------------------------------------------------------------
 # index() for MBCS encoding
-sub mb::index ($$;$) {
+sub mb::index {
     my $index = 0;
     if (@_ == 3) {
         $index = mb::index_byte($_[0], $_[1], CORE::length(mb::substr($_[0], 0, $_[2])));
@@ -391,7 +405,7 @@ sub mb::index ($$;$) {
 
 #---------------------------------------------------------------------
 # JPerl like index() for MBCS encoding
-sub mb::index_byte ($$;$) {
+sub mb::index_byte {
     my($str,$substr,$position) = @_;
     $position ||= 0;
     my $pos = 0;
@@ -413,7 +427,7 @@ sub mb::index_byte ($$;$) {
 
 #---------------------------------------------------------------------
 # universal lc() for MBCS encoding
-sub mb::lc (;$) {
+sub mb::lc {
     local $_ = shift if @_;
     #                          A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z
     return join '', map { {qw( A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z )}->{$_}||$_ } /\G${mb::x}/g;
@@ -422,7 +436,7 @@ sub mb::lc (;$) {
 
 #---------------------------------------------------------------------
 # universal lcfirst() for MBCS encoding
-sub mb::lcfirst (;$) {
+sub mb::lcfirst {
     local $_ = shift if @_;
     if (/\A(${mb::x})(.*)\z/s) {
         return mb::lc($1) . $2;
@@ -434,14 +448,14 @@ sub mb::lcfirst (;$) {
 
 #---------------------------------------------------------------------
 # length() for MBCS encoding
-sub mb::length (;$) {
+sub mb::length {
     local $_ = shift if @_;
     return scalar(() = /\G${mb::x}/g);
 }
 
 #---------------------------------------------------------------------
 # ord() for MBCS encoding
-sub mb::ord (;$) {
+sub mb::ord {
     local $_ = shift if @_;
     my $ord = 0;
     if (/\A(${mb::x})/) {
@@ -454,13 +468,13 @@ sub mb::ord (;$) {
 
 #---------------------------------------------------------------------
 # require for MBCS encoding
-sub mb::require (;$) {
+sub mb::require {
     local $_ = shift if @_;
 
     # require perl version
     if (/^[0-9]/) {
         if ($] < $_) {
-            Carp::confess "Perl $_ required--this is only version $], stopped";
+            confess "Perl $_ required--this is only version $], stopped";
         }
         else {
             return 1;
@@ -471,7 +485,7 @@ sub mb::require (;$) {
     else {
         if (exists $INC{$_}) {
             return 1 if $INC{$_};
-            Carp::confess "Compilation failed in require";
+            confess "Compilation failed in require";
         }
 
         # find expr in @INC
@@ -486,20 +500,20 @@ sub mb::require (;$) {
                     (-M $prefix_file_oo <= -M $prefix_file) or
                     (-M $prefix_file_oo <= -M __FILE__)
                 ) {
-                    mb::_open_r(my $fh, $prefix_file) or Carp::confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
+                    mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
                     local $_ = CORE::do { local $/; <$fh> };
                     close $fh;
 
                     # poor file locking
                     local $SIG{__DIE__} = sub { rmdir("$prefix_file.lock"); };
                     if (mkdir("$prefix_file.lock", 0755)) {
-                        mb::_open_w(my $fh, ">$prefix_file_oo") or Carp::confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
+                        mb::_open_w(my $fh, ">$prefix_file_oo") or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
                         print {$fh} mb::parse();
                         close $fh;
                         rmdir("$prefix_file.lock");
                     }
                     else {
-                        Carp::confess "$0(@{[__LINE__]}): cant't mkdir: $prefix_file.lock\n";
+                        confess "$0(@{[__LINE__]}): cant't mkdir: $prefix_file.lock\n";
                     }
                 }
                 $INC{$_} = $prefix_file_oo;
@@ -515,24 +529,24 @@ END
                 # return result
                 if ($@) {
                     $INC{$_} = undef;
-                    Carp::confess $@;
+                    confess $@;
                 }
                 elsif (not $result) {
                     delete $INC{$_};
-                    Carp::confess "$_ did not return true value";
+                    confess "$_ did not return true value";
                 }
                 else {
                     return $result;
                 }
             }
         }
-        Carp::confess "Can't find $_ in \@INC";
+        confess "Can't find $_ in \@INC";
     }
 }
 
 #---------------------------------------------------------------------
 # reverse() for MBCS encoding
-sub mb::reverse (@) {
+sub mb::reverse {
     if (wantarray) {
         return CORE::reverse @_;
     }
@@ -543,7 +557,7 @@ sub mb::reverse (@) {
 
 #---------------------------------------------------------------------
 # rindex() for MBCS encoding
-sub mb::rindex ($$;$) {
+sub mb::rindex {
     my $rindex = 0;
     if (@_ == 3) {
         $rindex = mb::rindex_byte($_[0], $_[1], CORE::length(mb::substr($_[0], 0, $_[2])));
@@ -561,7 +575,7 @@ sub mb::rindex ($$;$) {
 
 #---------------------------------------------------------------------
 # JPerl like rindex() for MBCS encoding
-sub mb::rindex_byte ($$;$) {
+sub mb::rindex_byte {
     my($str,$substr,$position) = @_;
     $position ||= CORE::length($str) - 1;
     my $pos = 0;
@@ -582,13 +596,13 @@ sub mb::rindex_byte ($$;$) {
 
 #---------------------------------------------------------------------
 # set OSNAME
-sub mb::set_OSNAME ($) {
+sub mb::set_OSNAME {
     $OSNAME = $_[0];
 }
 
 #---------------------------------------------------------------------
 # set script encoding name and more
-sub mb::set_script_encoding ($) {
+sub mb::set_script_encoding {
     $script_encoding = $_[0];
 
     # over US-ASCII
@@ -692,8 +706,8 @@ sub mb::set_script_encoding ($) {
 # substr() for MBCS encoding
 BEGIN {
     CORE::eval sprintf <<'END', ($] >= 5.014) ? ':lvalue' : '';
-#                      VV------------------------AAAAAAA
-sub mb::substr ($$;$$) %s {
+#              VV--------------------------------AAAAAAA
+sub mb::substr %s {
     my @x = $_[0] =~ /\G${mb::x}/g;
 
     # If the substring is beyond either end of the string, substr() returns the undefined
@@ -744,7 +758,7 @@ END
 
 #---------------------------------------------------------------------
 # tr/// and y/// for MBCS encoding
-sub mb::tr ($$$;$) {
+sub mb::tr {
     my @x           = $_[0] =~ /\G${mb::x}/g;
     my @search      = $_[1] =~ /\G${mb::x}/g;
     my @replacement = $_[2] =~ /\G${mb::x}/g;
@@ -898,7 +912,7 @@ sub mb::tr ($$$;$) {
 
 #---------------------------------------------------------------------
 # universal uc() for MBCS encoding
-sub mb::uc (;$) {
+sub mb::uc {
     local $_ = shift if @_;
     #                          a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z
     return join '', map { {qw( a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z )}->{$_}||$_ } /\G${mb::x}/g;
@@ -907,7 +921,7 @@ sub mb::uc (;$) {
 
 #---------------------------------------------------------------------
 # universal ucfirst() for MBCS encoding
-sub mb::ucfirst (;$) {
+sub mb::ucfirst {
     local $_ = shift if @_;
     if (/\A(${mb::x})(.*)\z/s) {
         return mb::uc($1) . $2;
@@ -1025,7 +1039,7 @@ sub mb::_MATCH {
                 return CORE::substr($&, CORE::length($1));
             }
             else {
-                Carp::confess 'Use of "$&", $MATCH, and ${^MATCH} need to /( capture all )/ in regexp';
+                confess 'Use of "$&", $MATCH, and ${^MATCH} need to /( capture all )/ in regexp';
             }
         }
         else {
@@ -1033,7 +1047,7 @@ sub mb::_MATCH {
                 return $1;
             }
             else {
-                Carp::confess 'Use of "$&", $MATCH, and ${^MATCH} need to /( capture all )/ in regexp';
+                confess 'Use of "$&", $MATCH, and ${^MATCH} need to /( capture all )/ in regexp';
             }
         }
     }
@@ -1054,7 +1068,7 @@ sub mb::_PREMATCH {
                 return CORE::substr($&, 0, -CORE::length($1));
             }
             else {
-                Carp::confess 'Use of "$`", $PREMATCH, and ${^PREMATCH} need to /( capture all )/ in regexp';
+                confess 'Use of "$`", $PREMATCH, and ${^PREMATCH} need to /( capture all )/ in regexp';
             }
         }
     }
@@ -1345,7 +1359,7 @@ sub mb::_split {
 # filetest -B for MSWin32
 sub mb::_B (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -B (mb::_B)' if @_ and not wantarray;
+    confess 'Too many arguments for -B (mb::_B)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-B _,@_) : -B _;
     }
@@ -1367,7 +1381,7 @@ sub mb::_B (;*@) {
 # filetest -C for MSWin32
 sub mb::_C (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -C (mb::_C)' if @_ and not wantarray;
+    confess 'Too many arguments for -C (mb::_C)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-C _,@_) : -C _;
     }
@@ -1389,7 +1403,7 @@ sub mb::_C (;*@) {
 # filetest -M for MSWin32
 sub mb::_M (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -M (mb::_M)' if @_ and not wantarray;
+    confess 'Too many arguments for -M (mb::_M)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-M _,@_) : -M _;
     }
@@ -1411,7 +1425,7 @@ sub mb::_M (;*@) {
 # filetest -T for MSWin32
 sub mb::_T (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -T (mb::_T)' if @_ and not wantarray;
+    confess 'Too many arguments for -T (mb::_T)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-T _,@_) : -T _;
     }
@@ -1431,7 +1445,7 @@ sub mb::_T (;*@) {
 
 #---------------------------------------------------------------------
 # chdir() for MSWin32
-sub mb::_chdir (;$) {
+sub mb::_chdir {
 
     # works on MSWin32 only
     if (($OSNAME !~ /MSWin32/) or ($script_encoding !~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
@@ -1446,7 +1460,7 @@ sub mb::_chdir (;$) {
             return 0;
         }
         else {
-            Carp::confess "mb::_chdir: Can't chdir '$_[0]'\n";
+            confess "mb::_chdir: Can't chdir '$_[0]'\n";
         }
     }
     elsif (($script_encoding =~ /\A (?: gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms) and ($_[0] =~ /\A ${mb::x}* [\x81-\xFE][\x5C] \z/xms)) {
@@ -1454,7 +1468,7 @@ sub mb::_chdir (;$) {
             return 0;
         }
         else {
-            Carp::confess "mb::_chdir: Can't chdir '$_[0]'\n";
+            confess "mb::_chdir: Can't chdir '$_[0]'\n";
         }
     }
     else {
@@ -1466,7 +1480,7 @@ sub mb::_chdir (;$) {
 # filetest -d for MSWin32
 sub mb::_d (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -d (mb::_d)' if @_ and not wantarray;
+    confess 'Too many arguments for -d (mb::_d)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-d _,@_) : -d _;
     }
@@ -1485,7 +1499,7 @@ sub mb::_d (;*@) {
 # filetest -e for MSWin32
 sub mb::_e (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -e (mb::_e)' if @_ and not wantarray;
+    confess 'Too many arguments for -e (mb::_e)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-e _,@_) : -e _;
     }
@@ -1507,7 +1521,7 @@ sub mb::_e (;*@) {
 # filetest -f for MSWin32
 sub mb::_f (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -f (mb::_f)' if @_ and not wantarray;
+    confess 'Too many arguments for -f (mb::_f)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-f _,@_) : -f _;
     }
@@ -1530,7 +1544,7 @@ sub mb::_f (;*@) {
 sub mb::_lstat (;*) {
     local $_ = shift if @_;
     if ($_ eq '_') {
-        Carp::confess qq{lstat doesn't support '_'\n};
+        confess qq{lstat doesn't support '_'\n};
     }
     elsif (defined fileno(my $fh = Symbol::qualify_to_ref $_)) {
         return CORE::stat $fh; # not CORE::lstat
@@ -1574,7 +1588,7 @@ sub mb::_opendir (*$) {
 # filetest -r for MSWin32
 sub mb::_r (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -r (mb::_r)' if @_ and not wantarray;
+    confess 'Too many arguments for -r (mb::_r)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-r _,@_) : -r _;
     }
@@ -1596,7 +1610,7 @@ sub mb::_r (;*@) {
 # filetest -s for MSWin32
 sub mb::_s (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -s (mb::_s)' if @_ and not wantarray;
+    confess 'Too many arguments for -s (mb::_s)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-s _,@_) : -s _;
     }
@@ -1639,7 +1653,7 @@ sub mb::_stat (;*) {
 
 #---------------------------------------------------------------------
 # unlink() for MSWin32
-sub mb::_unlink (@) {
+sub mb::_unlink {
 
     # works on MSWin32 only
     if (($OSNAME !~ /MSWin32/) or ($script_encoding !~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
@@ -1662,7 +1676,7 @@ sub mb::_unlink (@) {
 # filetest -w for MSWin32
 sub mb::_w (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -w (mb::_w)' if @_ and not wantarray;
+    confess 'Too many arguments for -w (mb::_w)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-w _,@_) : -w _;
     }
@@ -1684,7 +1698,7 @@ sub mb::_w (;*@) {
 # filetest -x for MSWin32
 sub mb::_x (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -x (mb::_x)' if @_ and not wantarray;
+    confess 'Too many arguments for -x (mb::_x)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-x _,@_) : -x _;
     }
@@ -1706,7 +1720,7 @@ sub mb::_x (;*@) {
 # filetest -z for MSWin32
 sub mb::_z (;*@) {
     local $_ = shift if @_;
-    Carp::confess 'Too many arguments for -z (mb::_z)' if @_ and not wantarray;
+    confess 'Too many arguments for -z (mb::_z)' if @_ and not wantarray;
     if ($_ eq '_') {
         return wantarray ? (-z _,@_) : -z _;
     }
@@ -3574,7 +3588,7 @@ sub parse_re_codepoint_class {
         # this limitation makes it easier to change the script encoding
         elsif ($classmate =~ /\G (-) /xmsgc) {
             if ($^W) {
-                Carp::carp <<END;
+                confess <<END;
 [$parsed...] in regular expression
 
 range specification by '-' in codepoint class of regular expression supports US-ASCII only.
@@ -4153,7 +4167,7 @@ sub codepoint_tr {
         # this limitation makes it easier to change the script encoding
         elsif ($searchlist =~ /\G (-) /xmsgc) {
             if ($^W) {
-                Carp::carp <<END;
+                confess <<END;
 "$searchlist" in tr///
 
 range specification by '-' in tr/// is not supported.

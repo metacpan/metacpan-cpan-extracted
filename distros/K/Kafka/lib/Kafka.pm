@@ -5,11 +5,11 @@ package Kafka;
 
 =head1 NAME
 
-Kafka - Apache Kafka interface for Perl.
+Kafka - Apache Kafka low-level synchronous API, which does not use Zookeeper.
 
 =head1 VERSION
 
-This documentation refers to C<Kafka> package version 1.07 .
+This documentation refers to C<Kafka> package version 1.08 .
 
 =cut
 
@@ -21,7 +21,7 @@ use warnings;
 
 
 
-our $VERSION = '1.07';
+our $VERSION = 'v1.08';
 
 use Exporter qw(
     import
@@ -905,7 +905,7 @@ const our $ERROR_PARTITION_DOES_NOT_MATCH       => -1013;
 
 =item C<$ERROR_NOT_BINARY_STRING>
 
--1014 - Not binary string
+-1014 - Unicode data is not allowed
 
 =cut
 const our $ERROR_NOT_BINARY_STRING              => -1014;
@@ -1337,7 +1337,7 @@ our %ERROR = (
     $ERROR_REQUEST_OR_RESPONSE                      => q{Bad request or response element},
     $ERROR_TOPIC_DOES_NOT_MATCH                     => q{Topic does not match the requested},
     $ERROR_PARTITION_DOES_NOT_MATCH                 => q{Partition does not match the requested},
-    $ERROR_NOT_BINARY_STRING                        => q{Not binary string},
+    $ERROR_NOT_BINARY_STRING                        => q{Unicode data is not allowed},
     $ERROR_COMPRESSION                              => q{Compression error},
     $ERROR_RESPONSEMESSAGE_NOT_RECEIVED             => q{'ResponseMessage' not received},
     $ERROR_INCOMPATIBLE_HOST_IP_VERSION             => q{'Incompatible host name and IP version'},

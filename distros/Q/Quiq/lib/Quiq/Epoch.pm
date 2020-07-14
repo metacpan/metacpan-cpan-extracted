@@ -5,11 +5,12 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.184';
+our $VERSION = '1.185';
 
 use Time::HiRes ();
 use Time::Local ();
 use Quiq::Duration;
+use Time::Zone ();
 use POSIX ();
 
 # -----------------------------------------------------------------------------
@@ -280,6 +281,40 @@ sub plus {
 
 # -----------------------------------------------------------------------------
 
+=head3 tzOffset() - Zeit-Offset der lokalen Zeitzone
+
+=head4 Synopsis
+
+  $s = $this->tzOffset;
+
+=head4 Returns
+
+Anzahl Sekunden (Integer)
+
+=head4 Description
+
+Ermittele den Offset der lokalen Zeitzone gegenüber UTC in Sekunden
+und liefere diesen zurück.
+
+=head4 Example
+
+  Quiq::Epoch->tzOffset;
+  ==>
+  7200
+
+(in Zeitzone MESZ)
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub tzOffset {
+    my $this = shift;
+    return Time::Zone::tz_local_offset;
+}
+
+# -----------------------------------------------------------------------------
+
 =head2 Externe Repräsentation
 
 =head3 epoch() - Liefere Epoch-Wert
@@ -295,7 +330,7 @@ Liefere den Epoch-Wert des Zeitpunkts.
 =head4 Example
 
   Quiq::Epoch->new->epoch;
-  =>
+  ==>
   1464342621.73231
 
 =cut
@@ -325,10 +360,10 @@ erhöht werden.
 =head4 Example
 
   Quiq::Epoch->new(1559466751)->localtime;
-  =>
+  ==>
   (31,12,11,2,6,2019) # 2019-06-02 11:12:31
-  
-  (in Zeitzone MESZ)
+
+(in Zeitzone MESZ)
 
 =cut
 
@@ -473,7 +508,7 @@ sub asIso {
 
 =head1 VERSION
 
-1.184
+1.185
 
 =head1 AUTHOR
 

@@ -2,9 +2,9 @@
 
                             Template Toolkit
 
-                              Version 3.008
+                              Version 3.009
 
-                             January 2020
+                                July 2020
 
         Copyright (C) 1996-2020 Andy Wardley.  All Rights Reserved
 
@@ -45,6 +45,8 @@ other offline document systems.
 WHAT'S NEW?
 -----------
 
+Version 3.009 revert "Allow SET to have FILTER used in it"
+
 Version 3.008 fixes some testing issue with CGI and taint issues.
 
 Version 3.007 fixes a cpanm issue.
@@ -58,7 +60,7 @@ Version 3.003 fixes some compatibility issues with several Plugins.
 
 Version 3.002 is a maintenance release fixing a warning during install.
 
-Version 3.001 drops officialy Perl 5.6 support.
+Version 3.001 officially drops Perl 5.6 support.
 
 Version 3.000 provides several performance improvements.
 

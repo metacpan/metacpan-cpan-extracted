@@ -4,13 +4,13 @@
       "Sergey Poznyakoff <gray@gnu.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "App-Acmeman",
    "no_index" : {
@@ -19,46 +19,89 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::Config::Preproc" : "1.04",
+            "Apache::Defaults" : "1.02",
+            "Config::Parser" : "1.03",
+            "Crypt::Format" : "0.06",
+            "Crypt::OpenSSL::PKCS10" : "0.16",
+            "Crypt::OpenSSL::RSA" : "0.28",
+            "Crypt::OpenSSL::X509" : "1.804",
+            "Crypt::RSA::Parse" : "0.043",
+            "Data::Dumper" : "0",
+            "DateTime::Format::Strptime" : "1.42",
+            "File::BackupCopy" : "1",
+            "File::Basename" : "2.84",
+            "File::Path" : "2.08",
+            "Getopt::Long" : "2.34",
+            "LWP::Protocol::https" : "6.04",
+            "LWP::UserAgent" : "6.05",
+            "Net::ACME2" : "0.33",
+            "Pod::Man" : "2.25",
+            "Pod::Usage" : "1.51",
+            "Socket" : "0",
+            "Sys::Hostname" : "1.16",
+            "Test::NoWarnings" : "0",
+            "Text::ParseWords" : "3.27",
+            "perl" : "5.016001"
+         }
+      }
+   },
    "provides" : {
       "App::Acmeman" : {
          "file" : "lib/App/Acmeman.pm",
-         "version" : "3.03"
+         "version" : "3.05"
       },
       "App::Acmeman::Apache::Layout" : {
-         "file" : "lib/App/Acmeman/Apache/Layout.pm",
-         "version" : 0
+         "file" : "lib/App/Acmeman/Apache/Layout.pm"
+      },
+      "App::Acmeman::Apache::Layout::debian" : {
+         "file" : "lib/App/Acmeman/Apache/Layout/debian.pm"
+      },
+      "App::Acmeman::Apache::Layout::rh" : {
+         "file" : "lib/App/Acmeman/Apache/Layout/rh.pm"
+      },
+      "App::Acmeman::Apache::Layout::slackware" : {
+         "file" : "lib/App/Acmeman/Apache/Layout/slackware.pm"
+      },
+      "App::Acmeman::Apache::Layout::suse" : {
+         "file" : "lib/App/Acmeman/Apache/Layout/suse.pm"
       },
       "App::Acmeman::Config" : {
-         "file" : "lib/App/Acmeman/Config.pm",
-         "version" : 0
+         "file" : "lib/App/Acmeman/Config.pm"
       },
       "App::Acmeman::Domain" : {
-         "file" : "lib/App/Acmeman/Domain.pm",
-         "version" : "1.00"
+         "file" : "lib/App/Acmeman/Domain.pm"
       },
       "App::Acmeman::Log" : {
-         "file" : "lib/App/Acmeman/Log.pm",
-         "version" : 0
+         "file" : "lib/App/Acmeman/Log.pm"
       },
       "App::Acmeman::Source" : {
-         "file" : "lib/App/Acmeman/Source.pm",
-         "version" : 0
+         "file" : "lib/App/Acmeman/Source.pm"
       },
       "App::Acmeman::Source::Apache" : {
-         "file" : "lib/App/Acmeman/Source/Apache.pm",
-         "version" : 0
+         "file" : "lib/App/Acmeman/Source/Apache.pm"
       },
       "App::Acmeman::Source::Default" : {
-         "file" : "lib/App/Acmeman/Source/Default.pm",
-         "version" : 0
+         "file" : "lib/App/Acmeman/Source/Default.pm"
       },
       "App::Acmeman::Source::File" : {
-         "file" : "lib/App/Acmeman/Source/File.pm",
-         "version" : 0
+         "file" : "lib/App/Acmeman/Source/File.pm"
       },
       "App::Acmeman::Source::Null" : {
-         "file" : "lib/App/Acmeman/Source/Null.pm",
-         "version" : 0
+         "file" : "lib/App/Acmeman/Source/Null.pm"
       }
    },
    "release_status" : "stable",
@@ -69,5 +112,5 @@
          "web" : "http://git.gnu.org.ua/cgit/acmeman.git/"
       }
    },
-   "version" : "3.03"
+   "version" : "3.05"
 }

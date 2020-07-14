@@ -1,7 +1,9 @@
 package App::wget::retry;
 
-our $DATE = '2019-03-28'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-07-13'; # DATE
+our $DIST = 'App-wget-retry'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Wget wrapper to retry harder
@@ -18,7 +20,7 @@ App::wget::retry - Wget wrapper to retry harder
 
 =head1 VERSION
 
-This document describes version 0.001 of App::wget::retry (from Perl distribution App-wget-retry), released on 2019-03-28.
+This document describes version 0.003 of App::wget::retry (from Perl distribution App-wget-retry), released on 2020-07-13.
 
 =head1 SYNOPSIS
 
@@ -46,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
