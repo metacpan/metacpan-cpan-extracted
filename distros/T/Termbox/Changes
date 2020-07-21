@@ -1,5 +1,13 @@
 Revision history for Perl extension Termbox
 
+0.11 2020-07-16T21:53:10Z
+
+	- New on-screen movement example: eg/draw_box.pl
+	- New mouse interaction event examples:
+		* eg/mouse_input.pl
+		* eg/paint.pl
+	- Switch to https://github.com/termbox/termbox fork for libtermbox
+
 0.10 2020-07-11T04:41:46Z
 
     - Let's see which headless smoker will fail first.

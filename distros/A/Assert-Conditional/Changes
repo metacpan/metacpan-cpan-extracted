@@ -4,8 +4,7 @@ Revision history for Assert-Conditional
          Initial alpha release
 
 0.002    7 June 2015 22:35 MDT 
-         MONGOLIAN VOWEL SEPARATOR is no longer whitespace in Unicode,
-         so removed from test.
+         MONGOLIAN VOWEL SEPARATOR is no longer whitespace in Unicode, so removed from test.
 
 0.003    30 June 2015 06:31 MDT
          Bump perl requirement to v5.12
@@ -35,11 +34,19 @@ Revision history for Assert-Conditional
          Unhid assert_unblessed_ref swallowed up by stray pod.
 
 0.007    Mon May 21 19:13:58 CDT 2018
-         Add missing Hash::Util version requirement for old perls to get hashref_unlock imported
+         Add missing Hash::Util version requirement for old perls to get hashref_unlock imported.
 
 0.008    Tue May 22 11:51:37 CDT 2018
          Rewrite hash_unlocked missing till 5.16 as !hash_locked
          Add omitted etc/generate-exporter-pod to MANIFEST
 
 0.009    Tue Aug 21 06:29:56 MDT 2018
-         Delay slow calls to uca_sort till you really need them, credit Larry Leszczynski
+         Delay slow calls to uca_sort till you really need them, credit Larry Leszczynski.
+
+0.010    Sun Jul 19 13:52:00 MDT 2020
+         Fix coredump in perl 5.12 by replacing UNITCHECK in Assert::Conditional::Util with normal execution at botton.
+         Make perls below 5.18 work again by setting Hash::Util prereq in Makefile.PL to 0 because it's in the core only, never cpan.
+         Only provide assert_locked and assert_unlocked if core Hash::Util v0.15 is there (starting perl v5.17).
+         Bump version req of parent class Exporter::ConditionalSubs to v1.11.1 so we don't break Devel::Cover.
+         Normalize Export sub attribute tracing so either $Exporter::Verbose=1 or env ASSERT_CONDITIONAL_DEBUG=1 work for both Assert::Conditional{,::Utils}.
+         Mentioned $Exporter::Verbose support.

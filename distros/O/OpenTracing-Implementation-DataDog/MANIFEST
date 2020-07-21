@@ -39,5 +39,6 @@ t/OpenTracing/Implementation/DataDog/Tracer/01_can_all_ok.t
 t/OpenTracing/Implementation/DataDog/Tracer/09_build_context.t
 t/OpenTracing/Implementation/DataDog/Tracer/09_build_span.t
 t/OpenTracing/Implementation/DataDog/Tracer/11_extract_context.t
+t/OpenTracing/Implementation/DataDog/Tracer/12_inject_context.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

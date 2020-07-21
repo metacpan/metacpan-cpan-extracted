@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.08
+    version 0.09
 
 SYNOPSIS
 
@@ -118,6 +118,12 @@ METHODS
     Sends an XML document to the Broadworks remote over the socket. Convert
     the passed string to the correct character set.
 
+  receive
+
+    Receive an XML response from the Broadworks remote over the socket.
+    Decode the received string and pass to the Broadworks::OCIP::Response
+    constructor.
+
   send_command_xml
 
     Builds an XML command document from the command passed and the
@@ -149,7 +155,7 @@ AUTHOR
 
 COPYRIGHT
 
-    Copyright 2014 Recentric Solutions Limited. All rights reserved.
+    Copyright 2014-2020 Recentric Solutions Limited. All rights reserved.
 
 AUTHOR
 
@@ -157,7 +163,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2018 by Nigel Metheringham.
+    This software is copyright (c) 2020 by Nigel Metheringham.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

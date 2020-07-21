@@ -72,6 +72,10 @@ lib/Sidef/Types/Null/Null.pm
 lib/Sidef/Types/Null/Null.pod
 lib/Sidef/Types/Number/Complex.pm
 lib/Sidef/Types/Number/Complex.pod
+lib/Sidef/Types/Number/Gauss.pm
+lib/Sidef/Types/Number/Gauss.pod
+lib/Sidef/Types/Number/Mod.pm
+lib/Sidef/Types/Number/Mod.pod
 lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Range/Range.pm
@@ -750,6 +754,7 @@ scripts/Tests/function_composition.sf
 scripts/Tests/functional_modules.sf
 scripts/Tests/functional_style.sf
 scripts/Tests/gather_take.sf
+scripts/Tests/gaussian_integers.sf
 scripts/Tests/gcd.sf
 scripts/Tests/get_value_cyclic_references.sf
 scripts/Tests/getopt.sf
@@ -829,6 +834,7 @@ scripts/Tests/metaprogramming_method_definition.sf
 scripts/Tests/method_aliases.sf
 scripts/Tests/method_expressions.sf
 scripts/Tests/miller_rabin_primality_test.sf
+scripts/Tests/mod_class.sf
 scripts/Tests/Module/Bar.sm
 scripts/Tests/Module/Fact.sm
 scripts/Tests/Module/Fib.sm
@@ -875,7 +881,8 @@ scripts/Tests/one-dimensional_cellular_automata_2.sf
 scripts/Tests/open.sf
 scripts/Tests/pair_namedparam_force_ops.sf
 scripts/Tests/pairs_test.sf
-scripts/Tests/palindrome_recursive.sf
+scripts/Tests/palindrome_detection_recursive.sf
+scripts/Tests/palindromic_numbers.sf
 scripts/Tests/pascal_matrix_generation.sf
 scripts/Tests/pcg.sf
 scripts/Tests/perfect_root_power.sf

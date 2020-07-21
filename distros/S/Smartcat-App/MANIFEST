@@ -24,6 +24,7 @@ lib/Smartcat/App/ProjectApi.pm
 lib/Smartcat/App/Utils.pm
 script/smartcat-cli
 t/Config.t
+t/Utils.t
 t/author-pod-syntax.t
 t/basic.t
 t/data/test.config

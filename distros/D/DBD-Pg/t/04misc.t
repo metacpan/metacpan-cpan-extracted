@@ -5,11 +5,11 @@
 use 5.008001;
 use strict;
 use warnings;
+use lib 'blib/lib', 'blib/arch', 't';
 use Test::More;
 use Data::Dumper;
 use DBI;
 use DBD::Pg qw/:pg_types :pg_limits/;
-use lib 't','.';
 require 'dbdpg_test_setup.pl';
 select(($|=1,select(STDERR),$|=1)[1]);
 
@@ -18,7 +18,9 @@ my $dbh = connect_database();
 if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 95;
+plan tests => 109;
+
+my $superuser = is_super();
 
 isnt ($dbh, undef, 'Connect to database for miscellaneous tests');
 
@@ -28,6 +30,18 @@ eval {
     $num = DBD::Pg->parse_trace_flag('NONE');
 };
 is ($@, q{}, $t);
+
+$t = q{Driver handle is obtainable directly from DBD::Pg};
+my $drh = DBD::Pg->driver;
+is (ref $drh, 'DBI::dr', $t);
+
+$t = q{Method 'private_attribute_info' is available without a database handle and returns an empty hashref};
+my $result = $drh->private_attribute_info();
+is_deeply ($result, {}, $t);
+
+$t = q{Internal method 'CLONE' returns undef};
+$result = DBD::Pg->CLONE();
+is ($result, undef, $t);
 
 $t = 'Constant PG_MIN_SMALLINT returns expected value of -32768';
 my $sth = $dbh->prepare('SELECT ?::smallint');
@@ -108,7 +122,7 @@ is ( $sth->fetch->[0], 2147483647, $t);
 $t = 'Constant PG_MIN_BIGSERIAL is set to 1';
 is (PG_MIN_BIGSERIAL, 1, $t);
 
-$t = 'Constant PG_MIN_BIGINT returns expected value of 9223372036854775807 (same as PG_MAX_BIGINT)';
+$t = 'Constant PG_MAX_BIGSERIAL returns expected value of 9223372036854775807 (same as PG_MAX_BIGINT)';
 $sth->execute(PG_MAX_BIGSERIAL);
 is ( $sth->fetch->[0], '9223372036854775807', $t);
 
@@ -139,6 +153,10 @@ $t=q{Database handle method 'server_trace_flags' returns 0x03000100 for 'SQL|pgl
 $num = $dbh->parse_trace_flags('SQL|pglibpq|pgstart');
 is ($num, 0x03000100, $t);
 
+$t = q{Method 'server_trace_flags' is available without a database handle};
+$num = DBD::Pg->parse_trace_flags('SQL|pglibpq|pgstart');
+is ($num, 0x03000100, $t);
+
 my $flagexp = 24;
 $sth = $dbh->prepare('SELECT 1');
 for my $flag (qw/pglibpq pgstart pgend pgprefix pglogin pgquote/) {
@@ -160,6 +178,10 @@ for my $flag (qw/pglibpq pgstart pgend pgprefix pglogin pgquote/) {
     $num = $sth->parse_trace_flag($flag);
     is ($num, $hex, $t);
 }
+
+$t = q{Database handle method "server_trace_flag" returns all-but-pgprefix for flag 'DBD'};
+$num = $dbh->parse_trace_flag('DBD');
+is ($num, 0x7FFFFF00 - 0x08000000, $t);
 
 SKIP: {
 
@@ -228,6 +250,28 @@ $BC$
 
 }
 
+## Some funkier connection attempts
+SKIP: {
+
+    eval { require Test::Output; };
+    skip ('Test::Output is needed for some connection tests', 2) if $@;
+
+    $t=q{Connect with 'dbd_verbose' attrib sets debug output on};
+    my ($testdsn,$testuser,$helpconnect,$su,$uid,$testdir,$pg_ctl,$initdb,$error,$version)
+        = get_test_settings();
+    $testdsn =~ s/^dbi/DBI/i;
+    my $ldbh;
+    Test::Output::stderr_like( sub { $ldbh = DBI->connect($testdsn, $testuser, $ENV{DBI_PASS},
+                                                          {RaiseError => 1, dbd_verbose => 1}); $ldbh->do('select 1');
+                                 }, qr/dbd_db_STORE/, $t);
+    ## DBI is way too sticky with tracing stuff, so we need to turn it off here
+    $ldbh->trace(0);
+
+    $t=q{Connect with no attributes at all works};
+    $ldbh = DBI->connect($testdsn, $testuser, $ENV{DBI_PASS});
+    ok (ref $ldbh, $t);
+}
+
 SKIP: {
 
     eval {
@@ -235,7 +279,7 @@ SKIP: {
     };
     $@ and skip ('Must have File::Temp to complete trace flag testing', 9);
 
-    my ($fh,$filename) = File::Temp::tempfile('dbdpg_test_XXXXXX', SUFFIX => 'tst', UNLINK => 1);
+    my ($fh,$filename) = File::Temp::tempfile('dbdpg_test_XXXXXX', SUFFIX => '.tst', UNLINK => 1);
     my ($flag, $info, $expected, $SQL);
 
     $t=q{Trace flag 'SQL' works as expected};
@@ -442,6 +486,43 @@ my $port = $dbh->{pg_port};
 @sources = DBI->data_sources('Pg',"port=$port");
 isnt ($sources[0], undef, $t);
 
+$t='The "data_sources" method works when DBI_DSN is not set';
+{
+    local $ENV{DBI_DSN};
+    eval {
+        @sources = DBI->data_sources('Pg');
+    };
+    is ($@, q{}, $t);
+}
+
+$t='The "data_sources" method works when DBI_USER is not set or not set';
+{
+    local $ENV{DBI_USER} = 'alice';
+    eval {
+        @sources = DBI->data_sources('Pg');
+    };
+    is ($@, q{}, $t);
+    local $ENV{DBI_USER};
+    eval {
+        @sources = DBI->data_sources('Pg');
+    };
+    is ($@, q{}, $t);
+}
+
+$t='The "data_sources" method works when DBI_PASS is set or not set';
+{
+    local $ENV{DBI_PASS} = 'foo';
+    eval {
+        @sources = DBI->data_sources('Pg');
+    };
+    is ($@, q{}, $t);
+    local $ENV{DBI_PASS};
+    eval {
+        @sources = DBI->data_sources('Pg');
+    };
+    is ($@, q{}, $t);
+}
+
 SKIP: {
 
     $t=q{The "data_sources" method returns information when 'dbi:Pg' is uppercased};
@@ -528,8 +609,8 @@ else {
 
 # PostgreSQL 8.1 fails with "ERROR:  stack depth limit exceeded"
 # with the default value of 2048
-my $newdepth = $^O =~ /Win32/ ? 3000 : 4096;
-$dbh->do("set max_stack_depth = $newdepth");
+my $newdepth = $^O =~ /Win32/ ? 3000 : 7600;
+$superuser and $dbh->do("set max_stack_depth = $newdepth");
 ## Check for problems with insane number of placeholders
 for my $ph (1..13) {
     my $total = 2**$ph;
@@ -557,10 +638,21 @@ $sth->bind_param(2, undef, $stt[1]); ## 1 aka SQL_CHAR
 $sth->execute(2, '0301');
 
 my $SQL = 'SELECT char4 FROM tt';
-my $result = $dbh->selectall_arrayref($SQL)->[0][0];
+$result = $dbh->selectall_arrayref($SQL)->[0][0];
 
 $t = q{Using bind_param with type 1 yields a correct bpchar value};
 is( $result, '0301', $t);
+
+$dbh->{AutoCommit} = 1;
+$t = q{Cloned database handle inherits the changed AutoCommit value};
+my $clone = $dbh->clone();
+is ($clone->{AutoCommit}, 1, $t);
+
+$t = q{Cloned database handle is separate from its parent};
+$dbh->{AutoCommit} = 0;
+is ($clone->{AutoCommit}, 1, $t);
+
+
 
 cleanup_database($dbh,'test');
 $dbh->disconnect();

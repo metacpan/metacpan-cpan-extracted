@@ -8,7 +8,6 @@ use warnings;
 use Test::More;
 use Test::Deep;
 use Test::FailWarnings;
-
 use Promise::XS;
 
 # should not warn because catch() silences
@@ -18,6 +17,29 @@ use Promise::XS;
     my $p = $d->promise()->catch( sub { } );
 
     $d->reject("nonono");
+}
+
+{
+    my @w;
+    local $SIG{'__WARN__'} = sub { push @w, @_ };
+
+    {
+        my $d = Promise::XS::deferred();
+
+        $d->reject("nonono");
+
+        $d->clear_unhandled_rejection();
+    }
+
+    is_deeply(\@w, [], 'no warning after clear_unhandled_rejection()');
+
+    {
+        my $d = Promise::XS::deferred();
+
+        $d->reject("nonono");
+    }
+
+    cmp_deeply(\@w, [ re( qr<nono> ) ], 'warning normally');
 }
 
 # should warn because finally() rejects
@@ -146,7 +168,7 @@ use Promise::XS;
     {
         my $d = Promise::XS::deferred();
 
-        # The finally() does not create a separate result.
+        # The finally() creates a separate result.
 
         my $p = $d->promise()->finally( sub { } );
         $d->reject("nonono");
@@ -159,27 +181,7 @@ use Promise::XS;
     ) or diag explain \@w;
 }
 
-{
-    my @w;
-    local $SIG{'__WARN__'} = sub { push @w, @_ };
-
-    {
-        my $d = Promise::XS::deferred();
-
-        # The finally() does not create a separate result.
-        my $p = $d->promise()->finally( sub { } );
-
-        $d->reject("nonono");
-    }
-
-    cmp_deeply(
-        \@w,
-        [ re( qr<nonono> ) ],
-        'rejection with finally but no catch triggers 1 warning',
-    ) or diag explain \@w;
-}
-
-# should not warn because finally() doesn't get its own result
+# should warn because finally() gets its own result
 {
     my @w;
     local $SIG{'__WARN__'} = sub { push @w, @_ };
@@ -198,8 +200,52 @@ use Promise::XS;
 
     cmp_deeply(
         \@w,
-        [ ],
-        'rejected finally is uncaught, but rejection is caught elsewhere',
+        [ re( qr<nonono> ) ],
+        'rejected finally is uncaught, but rejection is caught later',
+    );
+}
+
+# var p = Promise.reject(789); var p2 = p.catch( () => {} ); p.finally( () => {} )
+{
+    my @w;
+
+    {
+        local $SIG{'__WARN__'} = sub { push @w, @_ };
+
+        my $p = Promise::XS::rejected(789);
+
+        my $p2 = $p->catch( sub { } );
+
+        $p->finally( sub { } );
+    }
+
+    cmp_deeply(
+        \@w,
+        [ re( qr<789> ) ],
+        'rejected finally (not SV-ified) is uncaught - triggers warning',
+    );
+}
+
+# var p = Promise.reject(789); var p2 = p.catch( () => {} ); p.finally( () => {} )
+{
+    my @w;
+
+    {
+        local $SIG{'__WARN__'} = sub { push @w, @_ };
+
+        my $p = Promise::XS::rejected(789);
+
+        my $p2 = $p->catch( sub { } );
+
+        my $p3 = $p->finally( sub { } );
+
+        1;
+    }
+
+    cmp_deeply(
+        \@w,
+        [ re( qr<789> ) ],
+        'rejected finally is SV-ified but uncaught - triggers warning',
     );
 }
 

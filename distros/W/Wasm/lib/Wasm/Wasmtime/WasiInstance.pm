@@ -9,7 +9,7 @@ use Wasm::Wasmtime::Trap;
 use Wasm::Wasmtime::WasiConfig;
 
 # ABSTRACT: WASI instance class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasi_instance_';
@@ -29,8 +29,7 @@ $ffi->attach( new => ['wasm_store_t', 'string', 'wasi_config_t', 'opaque*'] => '
   {
     if($trap)
     {
-      my $message = Wasm::Wasmtime::Trap->new($trap)->message;
-      Carp::croak($message);
+      die Wasm::Wasmtime::Trap->new($trap);
     }
     Carp::croak("failed to create wasi instance");
   }
@@ -55,7 +54,7 @@ Wasm::Wasmtime::WasiInstance - WASI instance class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -79,7 +78,7 @@ To configure if and how the WASI accesses program argument, environment, standar
 and file system directories, see L<Wasm::Wasmtime::WasiConfig>.
 
 For a complete example of using WASI from WebAssembly, see the synopsis for
-L<Wasm::WebAssembly::Linker>.
+L<Wasm::Wasmtime::Linker>.
 
 =head1 CONSTRUCTOR
 

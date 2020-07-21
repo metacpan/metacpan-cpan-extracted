@@ -2,6 +2,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
+LICENSE
 t/0_module.t
 t/1_lookup.t
 t/2_lookupv6.t

@@ -1,6 +1,12 @@
-ChangeLog
-MANIFEST
-Makefile.PL
-META.yml
-Schedule.pm
-t/01.t
+MANIFEST           # This file
+ChangeLog          # Changes
+README
+Makefile.PL        # Makefile generator
+META.yml           # Meta-information
+LICENSE
+Schedule.pm        # Main module
+t/test-lib.pl	   # Helpful testing functions
+t/01.t             # Test case 01
+t/01-example1      # Test input
+t/01-example1.html # Test expected output
+META.json                                Module JSON meta-data (added by MakeMaker)

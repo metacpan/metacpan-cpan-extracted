@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.69';
+our $VERSION = '2.70';
 
 use parent 'Specio::Exporter';
 
@@ -84,7 +84,7 @@ Log::Dispatch::Types - Types used for parameter checking in Log::Dispatch
 
 =head1 VERSION
 
-version 2.69
+version 2.70
 
 =head1 DESCRIPTION
 
@@ -108,7 +108,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

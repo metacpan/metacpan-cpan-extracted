@@ -5,7 +5,7 @@ use Sisimai::Message;
 
 my $PackageName = 'Sisimai::Message';
 my $MethodNames = {
-    'class'  => ['new', 'make', 'load', 'parse', 'divideup', 'makemap'],
+    'class'  => ['new', 'load', 'parse', 'divideup', 'makemap'],
     'object' => ['from', 'header', 'ds', 'rfc822'],
 };
 my $SampleEmail = './set-of-emails/mailbox/mbox-0';
@@ -21,7 +21,6 @@ MAKE_TEST: {
     my $callbackto = sub {
         my $argvs = shift;
         my $catch = { 
-            'type' => $argvs->{'datasrc'},
             'x-mailer' => '',
             'return-path' => '',
         };
@@ -87,7 +86,6 @@ MAKE_TEST: {
     }
 
     isa_ok $p->catch, 'HASH';
-    is $p->catch->{'type'}, 'email';
     ok defined $p->catch->{'x-mailer'};
     ok defined $p->catch->{'return-path'};
     ok defined $p->catch->{'from'};

@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2019 by Dominique Dumont.
+# This software is Copyright (c) 2005-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.138;
+package Config::Model 2.139;
 
 use strict ;
 use warnings;
@@ -1676,7 +1676,7 @@ sub get_element_description {
 
     if (@default_info) {
         $ret .= "\n\n=over 4\n\n";
-        map { $ret .= "=item $_->[0] value :\n\n$_->[1]\n\n"; } @default_info;
+        for ( @default_info) { $ret .= "=item $_->[0] value :\n\n$_->[1]\n\n"; }
         $ret .= "=back\n\n";
     }
 
@@ -1862,7 +1862,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.138
+version 2.139
 
 =head1 SYNOPSIS
 
@@ -2926,13 +2926,13 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2019 by Dominique Dumont.
+This software is Copyright (c) 2005-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 
   The GNU Lesser General Public License, Version 2.1, February 1999
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -2942,30 +2942,6 @@ The following websites have more information about this module, and may be of he
 in addition to those websites please use your favorite search engine to discover more resources.
 
 =over 4
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Config-Model>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Config-Model>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Config-Model>
 
 =item *
 

@@ -5,19 +5,18 @@ use strict;
 
 use Tcl::pTk;
 
-use Test;
+use Test::More;
 
 
 my $TOP = MainWindow->new;
 
 # This will skip if Tile widgets not available
 unless ($Tcl::pTk::_Tile_available) {
-    print "1..0 # Skipped: Tile unavailable\n";
     $TOP->destroy;
-    exit;
+    plan skip_all => 'Tile unavailable';
 }
 
-plan test => 1;
+plan tests => 6;
 
 my $msg = $TOP->ttkLabel( -text => 
         "Ttk is the new Tk themed widget set. One of the widgets it includes is a tree widget, which can be configured to display multiple columns of informational data without displaying the tree itself. This is a simple way to build a listbox that has multiple columns. Clicking on the heading for a column will sort the data by that column. You can also change the width of the columns by dragging the boundary between them.",
@@ -63,15 +62,15 @@ foreach my $col (qw/ country capital currency /){
         $tree->column($col, -width, $len+10);
 }
 
-
+my @IDs;
 while(@data){
         my $country  = shift @data;
         my $capital  = shift @data;
         my $currency = shift @data;
         
-        $tree->insert('', 'end', -values => [$country, $capital, $currency]);
+        push @IDs, $tree->insert('', 'end', -values => [$country, $capital, $currency]);
         
-        # Auto-set length of field basd on data init
+        # Auto-set length of field based on data init
         my %rowLookup; # Hash for quick lookup
         @rowLookup{qw/ country capital currency /} = ($country, $capital, $currency);
         foreach my $col (qw/ country capital currency /){
@@ -85,13 +84,46 @@ while(@data){
                      
 }
 
-$TOP->after(1000, sub{ $TOP->destroy }) unless (@ARGV); # Persist if any args supplied, for debugging
+# New tests added in response to
+# https://github.com/chrstphrchvz/perl-tcl-ptk/issues/7
 
+is(scalar(@IDs), 15, 'Obtain IDs for each inserted item');
 
- MainLoop;
- 
-ok(1);
- 
+# Test bbox command
+# make sure last item is invisible
+$tree->see($IDs[0]);
+$TOP->update;
+is($tree->bbox($IDs[14]), undef,
+    'bbox command should return undef for invisible item');
+# now make sure last item is visible
+$tree->see($IDs[14]);
+$TOP->update;
+my $tree_bbox = [$tree->bbox($IDs[14])];
+is(scalar(@$tree_bbox), 4,
+    'bbox command should return list for visible item');
+
+# Test selection command
+my $set_selected_IDs = [$IDs[10], @IDs[13..14]];
+$tree->selection('set', $set_selected_IDs);
+my $get_selected_IDs = [$tree->selection()];
+is_deeply($get_selected_IDs, $set_selected_IDs,
+    'selection command should return selected items as Perl list (not Tcl list)');
+
+# Test item -values command
+my $get_values = [$tree->item($IDs[14], '-values')];
+is_deeply($get_values, ['United States', 'Washington, D.C.', 'USD'],
+    'item -values command should return values of item as Perl list (not Tcl list)');
+
+# Test tag command
+my $set_tagged_IDs = [@IDs[5..6], $IDs[8], $IDs[11]];
+$tree->tag('add', 'Europe', $set_tagged_IDs);
+my $get_tagged_IDs = [$tree->tag('has', 'Europe')];
+is_deeply($get_tagged_IDs, $set_tagged_IDs,
+    'tag has command should return tagged items as Perl list (not Tcl list)');
+
+$TOP->idletasks;
+(@ARGV) ? MainLoop : $TOP->destroy; # Persist if any args supplied, for debugging
+
 ## Code to do the sorting of the tree contents when clicked on
 sub SortBy{
         my ($tree, $col, $direction) = @_;

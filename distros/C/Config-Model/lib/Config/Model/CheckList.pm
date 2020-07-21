@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2019 by Dominique Dumont.
+# This software is Copyright (c) 2005-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::CheckList 2.138;
+package Config::Model::CheckList 2.139;
 
 use Mouse;
 use 5.010;
@@ -512,6 +512,17 @@ sub get_help {
     return;
 }
 
+sub get_info {
+    my $self = shift;
+
+    my @items = ('type: check_list');
+    if ( defined $self->refer_to ) {
+        push @items, "refer_to: " . $self->refer_to;
+    }
+    push @items, "ordered: " . ( $self->ordered ? 'yes' : 'no' );
+    return @items;
+}
+
 sub clear {
     my $self = shift;
     # also triggers notify changes
@@ -808,7 +819,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.138
+version 2.139
 
 =head1 SYNOPSIS
 
@@ -1118,6 +1129,11 @@ Parameters: C<(choice_value)>
 
 Return the help string on this choice value
 
+=head2 get_info
+
+Returns a list of information related to the check list. See
+L<Config::Model::Value/get_info> for more details.
+
 =head2 clear
 
 Reset the check list (can also be called as C<clear_values>)
@@ -1355,7 +1371,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2019 by Dominique Dumont.
+This software is Copyright (c) 2005-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

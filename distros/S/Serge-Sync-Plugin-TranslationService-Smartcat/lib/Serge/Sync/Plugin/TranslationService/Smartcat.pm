@@ -9,7 +9,7 @@ use File::Basename;
 use File::Spec::Functions qw(rel2abs);
 use Serge::Util qw(subst_macros);
 
-our $VERSION = "0.0.3";
+our $VERSION = "0.0.5";
 
 sub name {
     return
@@ -23,6 +23,7 @@ sub init {
 
     $self->merge_schema(
         {
+            base_url   => 'STRING',
             project_id => 'STRING',
             token_id   => 'STRING',
             token      => 'STRING',
@@ -82,6 +83,7 @@ sub validate_data {
     }
 
 
+    $self->{data}->{base_url}   = subst_macros( $self->{data}->{base_url} );
     $self->{data}->{project_id} = subst_macros( $self->{data}->{project_id} );
     $self->{data}->{token_id}   = subst_macros( $self->{data}->{token_id} );
     $self->{data}->{token}      = subst_macros( $self->{data}->{token} );
@@ -127,13 +129,16 @@ sub run_smartcat_cli {
 
     my $command = $action . ' --project-id=' . $self->{data}->{project_id};
 
+    $command .= " --base-url=" . $self->{data}->{base_url}
+      if defined $self->{data}->{base_url};
     $command .= " --token-id=" . $self->{data}->{token_id}
       if defined $self->{data}->{token_id};
     $command .= " --token=" . $self->{data}->{token}
       if defined $self->{data}->{token};
     $command .=
       " --project-workdir=" . $self->{data}->{project_translation_files_path};
-    $command .= " --log=" . $self->{data}->{log_file};
+    $command .= " --log=" . $self->{data}->{log_file}
+      if defined $self->{data}->{log_file};
 
     if ( $self->{data}->{language_file_tree} ) {
         $command .= " --language-file-tree";
@@ -186,6 +191,7 @@ sub pull_ts {
     my $pull_settings = $self->{data}->{pull};
     $options .= ' --complete-documents' if $pull_settings->{complete_documents};
     $options .= ' --complete-projects'  if $pull_settings->{complete_projects};
+    $options .= ' --skip-missing';
 
     return $self->run_smartcat_cli( 'pull' . $options, $langs );
 }
@@ -199,6 +205,7 @@ sub push_ts {
       ' --disassemble-algorithm-name="'
       . $push_settings->{disassemble_algorithm_name} . '"'
       if $push_settings->{disassemble_algorithm_name};
+    $options .= ' --delete-not-existing';
 
     return $self->run_smartcat_cli( 'push' . $options, $langs );
 }
@@ -211,131 +218,17 @@ __END__
 
 =head1 NAME
 
-Serge::Sync::Plugin::TranslationService::Smartcat - L<Smartcat translation server|http://smartcat.io/> .po synchronization plugin.
+Serge::Sync::Plugin::TranslationService::Smartcat - L<Smartcat translation server|http://smartcat.ai> .po synchronization plugin.
 
 =head1 INSTALLATION
 
   > cpanm Serge::Sync::Plugin::TranslationService::Smartcat
 
-or
-
-  > cpanm https://github.com/ta2-1/smartcat-serge-sync-plugin/tarball/master
-
-
 =head1 DESCRIPTION
 
-Serge::Sync::Plugin::TranslationService::Smartcat is a syncronization plugin which allows to build an integration between L<Serge|https://serge.io/> (Free, Open Source Solution for Continous Localization) and L<Smartcat|http://smartcat.io/>.
+Serge::Sync::Plugin::TranslationService::Smartcat is a syncronization plugin which allows to build an integration between L<Serge|https://serge.io> (Free, Open Source Solution for Continous Localization) and L<Smartcat|http://smartcat.ai/>.
 
-=head1 DESCRIPTION OF CONFIG PARAMETERS
-
-    sync
-    {
-        ts
-        {
-            plugin                      Smartcat
-
-            data
-            {
-                /*
-                    (STRING) Unique Smartcat project id
-                */
-                project_id              12345678-1234-1234-1234-123456789012
-
-                /*
-                    (STRING) [OPTIONAL] Account Id
-                    from https://smartcat.ai/ApiAccess/Credentials
-
-                    Default is read from `smartcat-cli` application config
-                */
-                token_id                12345678-1234-1234-1234-123456789012
-
-                /*
-                    (STRING) [OPTIONAL] API key
-                    from https://smartcat.ai/ApiAccess/Credentials
-
-                    Default is read from `smartcat-cli` application config
-                */
-                token                   1_1234567890123456789012345
-
-                # push-ts parameters
-                push {
-                    /*
-                        (STRING) [OPTIONAL]
-                        Default is Serge.io PO
-                    */
-                    disassemble_algorithm_name       Serge.io PO
-                }
-
-                # pull-ts parameters
-                pull {
-                    /*
-                        (BOOLEAN) [OPTIONAL] If 'complete_projects'
-                        is set to a true value, the whole project will not
-                        be pulled from Smartcat if its status doesn't
-                        equal 'complete'
-                        Default is NO
-                    */
-                    complete_projects                NO
-
-                    /*
-                        (BOOLEAN) [OPTIONAL] If 'complete_documents'
-                        is set to a true value, the document will not be
-                        pulled from Smartcat if its status doesn't
-                        equal 'complete'
-                        Default is NO
-                    */
-                    complete_documents               NO
-                }
-
-                /*
-                    (STRING) [OPTIONAL]
-                    Default is read from `smartcat-cli` application config
-                */
-                log_file                             /path/to/log/file
-
-                /*
-                    (STRING) [OPTIONAL]
-                    Default is ".po"
-                */
-                filetype                             .po
-
-                /*
-                    (BOOLEAN) [OPTIONAL] If 'language_file_tree' is set
-                    to a true value (EXPERIMENTAL MODE), same '.po' files from
-                    direfferent language directories will be added to Smartcat as
-                    leafs of the only tree document
-                    Default is NO
-                */
-                language_file_tree                   NO
-
-                /*
-                    (BOOLEAN) [OPTIONAL]
-                    Default is NO
-                */
-                debug                                YES
-            }
-        }
-
-        # other sync parameters
-        # ...
-    }
-
-=head1 MINIMAL CONFIG SAMPLE
-
-    sync
-    {
-        ts
-        {
-            plugin                      Smartcat
-
-            data
-            {
-                # token and token_id should be set via 'smartcat-cli' config file
-
-                project_id              12345678-1234-1234-1234-123456789012
-            }
-        }
-    }
+For more details visit <GitHub|https://github.com/smartcatai/smartcat-serge-sync-plugin>.
 
 =head1 AUTHOR
 

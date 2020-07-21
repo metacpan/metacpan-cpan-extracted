@@ -4,7 +4,7 @@ use warnings;
 
 use Test::More;
 
-use_ok('MIDI::Simple::Drummer::Rock');
+use_ok 'MIDI::Simple::Drummer::Rock';
 
 my $d = new_ok 'MIDI::Simple::Drummer::Rock';
 

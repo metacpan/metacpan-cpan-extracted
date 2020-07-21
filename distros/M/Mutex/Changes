@@ -1,6 +1,11 @@
 
 Revision history for Perl module Mutex.
 
+1.006 Thu Jul 16 11:00:00 EST 2020
+
+  * Improved IPC performance on Linux.
+  * Bumped minimal Perl version to 5.8.1.
+
 1.005 Tue Nov 21 15:30:00 EST 2017
 
   * Improved wantarray support in Mutex synchronize.

@@ -93,19 +93,19 @@ $NewQuery => 0
 <td valign="top" align="center">
 <form action="<%$RT::WebPath%>/Search/Calendar.html?<%$QueryString%>" method="post">
 
-<select name="Month">
+<select name="Month" class="selectpicker">
 % for (0..11) {
 <option value="<%$_%>" <% $_ == $Month ? 'selected' : ''%> ><%$rtdate->GetMonth($_)%></option>
 % }
 </select>
 % my $year = (localtime)[5] + 1900;
-<select name="Year">
+<select name="Year" class="selectpicker">
 % for ( ($year-5) .. ($year+5)) {
 <option value="<%$_%>" <% $_ == $Year ? 'selected' : ''%>><%$_%></option>
 % }
 </select>
 
-<input type="submit" value="<% loc('Submit') %>" class="button" />
+<input type="submit" value="<% loc('Submit') %>" class="button btn btn-primary" />
 
 </form>
 </td>

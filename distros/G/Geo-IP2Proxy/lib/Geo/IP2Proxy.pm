@@ -1,18 +1,24 @@
-# Copyright (C) 2002-2020 IP2Location.com
-# All Rights Reserved
+#MIT License
 #
-# This library is free software: you can redistribute it and/or
-# modify it under the terms of the GNU Lesser General Public
-# License as published by the Free Software Foundation, either
-# version 3 of the License, or (at your option) any later version.
+#Copyright (c) 2020 IP2Location.com
 #
-# This library is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# Lesser General Public License for more details.
+#Permission is hereby granted, free of charge, to any person obtaining a copy
+#of this software and associated documentation files (the "Software"), to deal
+#in the Software without restriction, including without limitation the rights
+#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#copies of the Software, and to permit persons to whom the Software is
+#furnished to do so, subject to the following conditions:
 #
-# You should have received a copy of the GNU Lesser General Public
-# License along with this library; If not, see <http://www.gnu.org/licenses/>.
+#The above copyright notice and this permission notice shall be included in all
+#copies or substantial portions of the Software.
+#
+#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#SOFTWARE.
 
 package Geo::IP2Proxy;
 
@@ -20,7 +26,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '3.00';
+$VERSION = '3.10';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -1048,7 +1054,7 @@ This pure Perl module uses a file based IP2Proxy .BIN database available at L<IP
 =head1 SYNOPSIS
 
 	use Geo::IP2Proxy;
-	my $obj = Geo::IP2Proxy->open("IP2PROXY-IP-PROXYTYPE-COUNTRY-REGION-CITY-ISP-DOMAIN-USAGETYPE-ASN-LASTSEEN.BIN");
+	my $obj = Geo::IP2Proxy->open("IP2PROXY-IP-PROXYTYPE-COUNTRY-REGION-CITY-ISP-DOMAIN-USAGETYPE-ASN-LASTSEEN-THREAT-RESIDENTIAL.BIN");
 
 	my $packageversion = $obj->getPackageVersion();
 	my $dbversion = $obj->getDatabaseVersion();
@@ -1206,12 +1212,12 @@ L<IP2Proxy Product|https://www.ip2location.com/database/ip2proxy>
 
 =head1 VERSION
 
-3.00
+3.10
 
 =head1 AUTHOR
 
 Copyright (c) 2020 IP2Location.com
 
-All rights reserved. This package is free software; It is licensed under the GPL.
+All rights reserved. This package is free software. It is licensed under the MIT. See the LICENSE file for full license information.
 
 =cut

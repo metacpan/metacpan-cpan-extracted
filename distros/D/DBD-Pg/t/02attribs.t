@@ -5,11 +5,11 @@
 use 5.008001;
 use strict;
 use warnings;
+use lib 'blib/lib', 'blib/arch', 't';
 use Data::Dumper;
 use Test::More;
 use DBI     ':sql_types';
 use DBD::Pg qw/ :pg_types :async /;
-use lib 't','.';
 require 'dbdpg_test_setup.pl';
 select(($|=1,select(STDERR),$|=1)[1]);
 
@@ -1003,6 +1003,7 @@ $dbh->pg_cancel();
 is ($sth->{pg_async_status}, -1, $t);
 $t=q{Database handle attribute "pg_async_status" returns a -1 after a cancel};
 is ($dbh->{pg_async_status}, -1, $t);
+sleep 2;
 
 #
 # Test of the handle attribute "Active"

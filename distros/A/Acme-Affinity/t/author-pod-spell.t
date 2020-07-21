@@ -22,6 +22,6 @@ Acme
 Affinity
 Boggs
 Gene
-foo
 gene
 lib
+themself

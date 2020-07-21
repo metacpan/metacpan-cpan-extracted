@@ -48,12 +48,12 @@
 <%INIT>
 my $request_path = $HTML::Mason::Commands::r->path_info;
 
-if ( $request_path =~ qr{^/Search/} ) {
+if ( $request_path =~ qr{^/Search/} && (!$DECODED_ARGS->{Class} || $DECODED_ARGS->{Class} eq 'RT::Tickets') ) {
     if ( $request_path =~ qr{^/Search/JSGantt.html} && $DECODED_ARGS->{Ticket} ) {
         PageMenu->child( 'gantt' => title => loc('Gantt Chart'), path => '/Search/JSGantt.html?Ticket=' . $DECODED_ARGS->{Ticket} );
     }
     elsif ( $request_path !~ qr{^/Search/Simple.html$} || $DECODED_ARGS->{q} ) {
-        my $current_search = $session{"CurrentSearchHash"} || {};
+        my $current_search = $session{"CurrentSearchHash-RT::Tickets"} || $session{"CurrentSearchHash"} || {};
         my $query = $DECODED_ARGS->{'Query'} || $current_search->{'Query'};
         if ( $query ) {
             PageMenu->child( 'gantt' => title => loc('Gantt Chart'), path => '/Search/JSGantt.html?Query=' . $query );

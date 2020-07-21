@@ -13,10 +13,13 @@ use 5.020;
 use autodie;
 use warnings;
 
+use lib 't/lib';
+
 use File::Spec;
 use IO::File;
 use IPC::Cmd qw(can_run);
 use Test::More;
+use Test::PGP qw(gpg_is_gpg1);
 
 # Check that GnuPG is available.  If so, load the module and set the plan.
 BEGIN {
@@ -34,9 +37,16 @@ my $passphrase = 'testing';
 
 # Create the objects to use for tests, one without munging enabled and one
 # with.
-my $home   = File::Spec->catdir('t', 'data', 'gnupg2');
-my $signer = PGP::Sign->new({ home => $home });
-my $munged = PGP::Sign->new({ home => $home, munge => 1 });
+my ($home, $signer, $munged);
+if (gpg_is_gpg1()) {
+    $home   = File::Spec->catdir('t', 'data', 'gnupg1');
+    $signer = PGP::Sign->new({ home => $home, style => 'GPG1' });
+    $munged = PGP::Sign->new({ home => $home, munge => 1, style => 'GPG1' });
+} else {
+    $home   = File::Spec->catdir('t', 'data', 'gnupg2');
+    $signer = PGP::Sign->new({ home => $home });
+    $munged = PGP::Sign->new({ home => $home, munge => 1 });
+}
 
 # Sign a message consisting solely of whitespace and verify it.
 my $signature = $signer->sign($keyid, $passphrase, q{       });
@@ -57,7 +67,7 @@ $signature = $munged->sign($keyid, $passphrase, \@message);
 is(
     $keyid,
     $signer->verify($signature, "foo\n  bar\nbaz"),
-    'Munging works when separated from newline'
+    'Munging works when separated from newline',
 );
 
 # Open and load a more comprehensive data file.

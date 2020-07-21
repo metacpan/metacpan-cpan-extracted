@@ -10,9 +10,11 @@ The LM-Solve homepage is:
 
 http://www.shlomifish.org/lm-solve/
 
-Its version control repository is:
+Its version control repositories are:
 
-http://svn.berlios.de/svnroot/repos/quad-pres/lm-solve/
+* https://github.com/shlomif/lm-solve-source
+* https://github.com/shlomif/lm-solve-layouts
+* https://github.com/shlomif/lm-solve-site
 
 LM-Solve was written by Shlomi Fish ( http://www.shlomifish.org/ ).
 

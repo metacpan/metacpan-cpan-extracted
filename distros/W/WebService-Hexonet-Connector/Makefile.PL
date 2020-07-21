@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
@@ -9,7 +9,7 @@ WriteMakefile(
     VERSION_FROM => 'lib/WebService/Hexonet/Connector.pm',
     PREREQ_PM    => {
         'LWP::Protocol::https' => 6.07,
-        'LWP::UserAgent'       => 6.43,
+        'LWP::UserAgent'       => 6.46,
         'Time::Local'          => 0,
         'MIME::Base64'         => 0,
         'Data::Dumper'         => 0,
@@ -34,7 +34,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/WebService/Hexonet/Connector.pm',
     AUTHOR           => 'hexonet <middleware@hexonet.net>',
     LICENSE          => 'mit',
-    MIN_PERL_VERSION => '5.026000'
+    MIN_PERL_VERSION => '5.030000'
 );
 
 1;

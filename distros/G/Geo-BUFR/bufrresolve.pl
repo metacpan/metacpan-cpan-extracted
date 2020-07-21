@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# (C) Copyright 2010-2019 MET Norway
+# (C) Copyright 2010-2020 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,8 +33,8 @@ use constant DEFAULT_TABLE_FORMAT => 'BUFRDC';
 use constant DEFAULT_TABLE_PATH_BUFRDC => '/usr/local/lib/bufrtables';
 use constant DEFAULT_TABLE_PATH_ECCODES => '/usr/local/share/eccodes/definitions/bufr/tables';
 # Ought to be your most up-to-date B table
-use constant DEFAULT_TABLE_BUFRDC => 'B0000000000000029000';
-use constant DEFAULT_TABLE_ECCODES => '0/wmo/29';
+use constant DEFAULT_TABLE_BUFRDC => 'B0000000000000033000';
+use constant DEFAULT_TABLE_ECCODES => '0/wmo/33';
 
 # Parse command line options
 my %option = ();
@@ -238,19 +238,10 @@ for different BUFR tables. However, as soon as a new BUFR descriptor
 is introduced in a BUFR table, it is extremely rare that the
 descriptor is redefined in later versions. So for convenience,
 bufrresolve.pl uses a default table (adding option C<--verbose 1> will
-tell you which table, unless you use C<--bufrtable> to set the table
-explicitely). If this is the wrong table for your purpose (most common
-case will be if the descriptor was added in a higher version than that
-of the default table), you definitely should use C<--bufrtable> with
-the appropriate table.
-
-=head1 NOTE ON --VERBOSE
-
-n > 1 in C<--verbose n> does not provide any more output than n=1, so
-demanding an argument to C<--verbose> looks funny. But if not, sooner
-or later someone would type C<bufrresolve.pl 307080 --verbose 1> which
-by Perl would be interpreted as if the arguments were C<307080 000001
---verbose>, which probably is not what you intended.
+show you the tables used). If this is the wrong table for your purpose
+(most common case will be if the descriptor was added in a higher
+version than that of the default table), you should definitely use
+C<--bufrtable> with the appropriate table.
 
 =head1 AUTHOR
 
@@ -258,6 +249,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2019 MET Norway
+Copyright (C) 2010-2020 MET Norway
 
 =cut

@@ -11,7 +11,7 @@ use Bible::OBML::HTML;
 use Bible::Reference 1.02;
 use Clone 'clone';
 
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 has bible    => 'Protestant';
 has acronyms => 1;
@@ -32,13 +32,13 @@ sub new {
 
 sub read_file {
     my ( $self, $filename ) = @_;
-    open( my $file, '<:encoding(utf8)', $filename ) or croak "Unable to read file $filename; $!";
+    open( my $file, '<', $filename ) or croak "Unable to read file $filename; $!";
     return join( '', <$file> );
 }
 
 sub write_file {
     my ( $self, $filename, $content ) = @_;
-    open( my $file, '>:encoding(utf8)', $filename ) or croak "Unable to write file $filename; $!";
+    open( my $file, '>', $filename ) or croak "Unable to write file $filename; $!";
     print $file $content;
     return;
 }
@@ -76,14 +76,14 @@ sub parse {
     ( my $reference_base = ( $content =~ s/~([^~]+)~//ms ) ? $1 : '' ) =~ s/^\s+|\s+$//g;
 
     # warn on any obvious errors
-    $self->throw('Missing reference base marker') unless ($reference_base);
-    $self->throw('Multiple reference base markers') if ( $content =~ /~[^~]+~/ms );
+    croak('Missing reference base marker') unless ($reference_base);
+    croak('Multiple reference base markers') if ( $content =~ /~[^~]+~/ms );
 
     # split out book and chapter; check book name for validity
     my $book = $reference_base;
     my $chapter = 1;
     $chapter = $1 if ( $book =~ s/\s*(\d+)\s*$// );
-    $self->throw(qq{Book "$book" unknown; must use canonical book name})
+    croak(qq{Book "$book" unknown; must use canonical book name})
         unless ( grep { $_ eq $book } $self->_reference->books );
 
     # code to recursively for a given block or sub-block
@@ -175,14 +175,14 @@ sub parse {
 
         # check for a header and store for later if exists
         if ( $block =~ /\=\s*([^=]+?)\s*\=/ ) {
-            $self->throw('Multiple back-to-back headers found') if ($header_text);
+            croak('Multiple back-to-back headers found') if ($header_text);
             $header_text = [ $parse_block->($1) ];
             next;
         }
 
         # find the verse number
         my $verse_number = $1 if ( $block =~ s/\|\s*(\d+)\s*\|\s*// );
-        $self->throw('Failed to find verse number') unless ($verse_number);
+        croak('Failed to find verse number') unless ($verse_number);
 
         # parse the block into a verse data structure
         my $verse = {
@@ -290,7 +290,7 @@ sub render {
     for my $verse (@$data) {
         unless ($content) {
             my $chapter = $verse->{reference}{book} . ' ' . $verse->{reference}{chapter};
-            $self->throw('Appears to be multiple chapters in data; must be single chapter only')
+            croak('Appears to be multiple chapters in data; must be single chapter only')
                 if ( $chapters{$chapter}++ );
             $content .= "~ $chapter ~\n\n";
         }
@@ -311,7 +311,13 @@ sub render {
     $content =~ s/\s+\}/\}/g;
     $content =~ s/\[\s+/\[/g;
     $content =~ s/\s+\]/\]/g;
-    $content =~ s/(?<=\^)\s+(?=[\,\;\.\-\!\?]+\s)//g;
+    $content =~ s/\(\s+/\(/g;
+    $content =~ s/\s+\)/\)/g;
+
+    $content =~ s/(\s*(?:\[[^\]]*\]|\{[^\}]*\}))\s*([\,\;\.\!\?]+)/$2$1/g;
+    $content =~ s/\s+(?=[\,\;\.\!\?]+)//g;
+    $content =~ s/\s+(?=[\-]+\s)//g;
+
     $content =~ s/\s+$/\n/msg;
     $content .= "\n";
 
@@ -473,7 +479,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-OBML.svg)](https://travis-ci.org/gryphonshafer/Bible-OBML)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-OBML/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-OBML)

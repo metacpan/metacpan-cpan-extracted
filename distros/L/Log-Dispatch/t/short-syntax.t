@@ -4,7 +4,8 @@ use warnings;
 use Test::Fatal;
 use Test::More;
 
-use lib qw( t/lib );
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
 
 use File::Temp qw( tempdir );
 use Log::Dispatch::TestUtil qw( cmp_deeply );

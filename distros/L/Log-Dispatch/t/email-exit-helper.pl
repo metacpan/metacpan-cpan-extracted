@@ -1,8 +1,6 @@
 use strict;
 use warnings;
 
-use lib './lib', '../lib';
-
 use Log::Dispatch::Email::MailSend;
 
 Mail::Mailer->import( sendmail => 't/sendmail' );

@@ -12,7 +12,7 @@ use constant is_table => 1;
 use constant kind => 'table';
 
 # ABSTRACT: Wasmtime table class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasm_table_';
@@ -59,18 +59,20 @@ Wasm::Wasmtime::Table - Wasmtime table class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
  use Wasm::Wasmtime;
  
+ my $store = Wasm::Wasmtime::Store->new;
  my $instance = Wasm::Wasmtime::Instance->new(
-   Wasm::Wasmtime::Module->new(wat => q{
+   Wasm::Wasmtime::Module->new($store, wat => q{
      (module
        (table (export "table") 1 funcref)
      )
    }),
+   $store,
  );
  
  my $table = $instance->exports->table;

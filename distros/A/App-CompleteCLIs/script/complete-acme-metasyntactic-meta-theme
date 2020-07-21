@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-18'; # DATE
+our $DATE = '2020-04-19'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.144'; # VERSION
+our $VERSION = '0.145'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ complete-acme-metasyntactic-meta-theme - Complete from list of available themes
 
 =head1 VERSION
 
-This document describes version 0.144 of complete-acme-metasyntactic-meta-theme (from Perl distribution App-CompleteCLIs), released on 2020-04-18.
+This document describes version 0.145 of complete-acme-metasyntactic-meta-theme (from Perl distribution App-CompleteCLIs), released on 2020-04-19.
 
 =head1 SYNOPSIS
 

@@ -40,14 +40,18 @@ use Log::Log4perl qw(:easy);
 use Log::Any qw($log);
 use Log::Any::Adapter;
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.3';
 
 sub init {
     my $self = shift;
 
+    my $base_url = undef;
+    $base_url = $self->{config}->base_url if ($self->{config}->base_url && $self->{config}->base_url ne '');
+
     $self->{api} = Smartcat::Client::ApiClient->new(
         username => $self->{config}->username,
-        password => $self->{config}->password
+        password => $self->{config}->password,
+        base_url => $base_url,
     );
 
     my $log_level = "INFO";
@@ -156,10 +160,6 @@ Smartcat::App is a simple application which use Smartcat Integration API to sync
 =head1 AUTHOR
 
 Taras Semenenko E<lt>taras.semenenko@gmail.comE<gt>
-
-=head1 COPYRIGHT
-
-Copyright 2018- Taras Semenenko
 
 =head1 LICENSE
 

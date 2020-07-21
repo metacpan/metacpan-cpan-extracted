@@ -3,7 +3,7 @@ $Date => undef
 $Object => undef
 $DateTypes => undef
 </%args>
-<div class="tooltip">
+<div class="day">
 <small>
 
 % if ($IsReminder and RTx::Calendar::LocalDate($Object->DueObj->Unix) eq $today) {

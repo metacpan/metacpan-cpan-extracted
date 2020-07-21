@@ -1054,9 +1054,33 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   }
 }
 
-# SPVM Functions
+# get_length
 {
-  # to_elems(
+  {
+    my $spvm_values = SPVM::new_byte_array([1, $BYTE_MAX, $BYTE_MIN]);
+    my $length = $spvm_values->get_length;
+    is($length, 3);
+  }
+  {
+    my $spvm_values = SPVM::new_short_array([1, $SHORT_MAX, $SHORT_MIN]);
+    my $length = $spvm_values->get_length;
+    is($length, 3);
+  }
+  {
+    my $spvm_values = SPVM::new_int_array([1, $INT_MAX, $INT_MIN]);
+    my $length = $spvm_values->get_length;
+    is($length, 3);
+  }
+  {
+    my $spvm_values = SPVM::new_long_array([1, $LONG_MAX, $LONG_MIN]);
+    my $length = $spvm_values->get_length;
+    is($length, 3);
+  }
+}
+
+# to_elems
+{
+  # to_elems
   {
     {
       my $spvm_values = SPVM::new_byte_array([1, $BYTE_MAX, $BYTE_MIN]);
@@ -1079,7 +1103,10 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
       is_deeply($values, [1, $LONG_MAX, $LONG_MIN]);
     }
   }
+}
 
+# to_bin
+{
   # to_bin 0 length
   {
     {
@@ -1175,39 +1202,69 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
       ok(TestCase::ExchangeAPI->spvm_new_byte_array_bin($spvm_values));
     }
     {
-      my $binary = pack('c3', 97, 98, $BYTE_MAX);
+      my $binary = pack('c*', 97, 98, $BYTE_MAX);
       my $spvm_values = SPVM::new_byte_array_from_bin($binary);
       ok(TestCase::ExchangeAPI->spvm_new_byte_array_binary_pack($spvm_values));
     }
     {
-      my $binary = pack('c3', 97, 98, $BYTE_MAX);
+      my $binary = pack('c*', 97, 98, $BYTE_MAX);
       my $spvm_values = SPVM::new_byte_array_from_bin($binary);
       ok(TestCase::ExchangeAPI->spvm_new_byte_array_binary_pack($spvm_values));
     }
     {
-      my $binary = pack('s3', 97, 98, $SHORT_MAX);
+      my $binary = pack('s*', 97, 98, $SHORT_MAX);
       my $spvm_values = SPVM::new_short_array_from_bin($binary);
       ok(TestCase::ExchangeAPI->spvm_new_short_array_binary_pack($spvm_values));
     }
     {
-      my $binary = pack('l3', 97, 98, $INT_MAX);
+      my $binary = pack('l*', 97, 98, $INT_MAX);
       my $spvm_values = SPVM::new_int_array_from_bin($binary);
       ok(TestCase::ExchangeAPI->spvm_new_int_array_binary_pack($spvm_values));
     }
     {
-      my $binary = pack('q3', 97, 98, $LONG_MAX);
+      my $binary = pack('q*', 97, 98, $LONG_MAX);
       my $spvm_values = SPVM::new_long_array_from_bin($binary);
       ok(TestCase::ExchangeAPI->spvm_new_long_array_binary_pack($spvm_values));
     }
     {
-      my $binary = pack('f3', 97, 98, $FLOAT_PRECICE);
+      my $binary = pack('f*', 97, 98, $FLOAT_PRECICE);
       my $spvm_values = SPVM::new_float_array_from_bin($binary);
       ok(TestCase::ExchangeAPI->spvm_new_float_array_binary_pack($spvm_values));
     }
     {
-      my $binary = pack('d3', 97, 98, $DOUBLE_PRECICE);
+      my $binary = pack('d*', 97, 98, $DOUBLE_PRECICE);
       my $spvm_values = SPVM::new_double_array_from_bin($binary);
       ok(TestCase::ExchangeAPI->spvm_new_double_array_binary_pack($spvm_values));
+    }
+  }
+  
+  # middle size array
+  {
+    my $length = 1_000_000;
+    {
+      my $binary = pack('l*', 1 .. $length);
+      my $spvm_values = SPVM::new_int_array_from_bin($binary);
+      is($spvm_values->get_length, $length);
+    }
+    {
+      my $binary = pack('q*', 1 .. $length);
+      my $spvm_values = SPVM::new_long_array_from_bin($binary);
+      is($spvm_values->get_length, $length);
+    }
+    {
+      my $binary = pack('f*', 1 .. $length);
+      my $spvm_values = SPVM::new_float_array_from_bin($binary);
+      is($spvm_values->get_length, $length);
+    }
+    {
+      my $binary = pack('d*', 1 .. $length);
+      my $spvm_values = SPVM::new_double_array_from_bin($binary);
+      is($spvm_values->get_length, $length);
+    }
+    {
+      my $binary = pack('f*', 1 .. $length);
+      my $spvm_values = SPVM::new_float_array_from_bin($binary);
+      is($spvm_values->get_length, $length);
     }
   }
 }

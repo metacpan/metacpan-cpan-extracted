@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 =head1 NAME
 
@@ -10,7 +10,7 @@ RT-Extension-MandatoryOnTransition - Require core fields and ticket custom field
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2, 4.4
+Works with RT 4.0, 4.2, 4.4, 5.0
 
 See below for some restrictions on RT 4.0.
 
@@ -94,7 +94,7 @@ value is validated against the configured whitelist or blacklist.
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -108,7 +108,7 @@ or add C<RT::Extension::MandatoryOnTransition> to your existing C<@Plugins> line
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -149,7 +149,7 @@ Category selection before resolving tickets in every other queue.
     );
 
 The transition syntax is similar to that found in RT's Lifecycles.  See
-C<perldoc /opt/rt4/etc/RT_Config.pm>.
+C<perldoc /opt/rt5/etc/RT_Config.pm>.
 
 =head2 Requiring role values
 
@@ -965,7 +965,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2012-2018 by Best Pracical Solutions, LLC.
+This software is Copyright (c) 2012-2020 by Best Pracical Solutions, LLC.
 
 This is free software, licensed under:
 

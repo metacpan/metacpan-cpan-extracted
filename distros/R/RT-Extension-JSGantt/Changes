@@ -1,3 +1,10 @@
+1.06 2020-07-17
+ - Show "Gantt Chart" menu for ticket searches only
+ - Fix query stored in session for RT 5
+
+1.05 2020-07-17
+ - Update for RT 5.0
+
 1.04 2016-04-08
  - Hide link to Gantt chart on simple search page when there's no query
  - Fix Gantt chart page from throwing error when there's no search results

@@ -1,5 +1,5 @@
 package MIDI::Simple::Drummer::Euclidean;
-$MIDI::Simple::Drummer::Euclidean::VERSION = '0.0805';
+$MIDI::Simple::Drummer::Euclidean::VERSION = '0.0808';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -10,7 +10,6 @@ sub new {
     $self->SUPER::new(
         -onsets => 4,
         -patch  => 25,
-        -tr808  => 0,
         -rhythm => undef,
         -pad    => 'kick',
         @_
@@ -97,7 +96,7 @@ MIDI::Simple::Drummer::Euclidean
 
 =head1 VERSION
 
-version 0.0805
+version 0.0808
 
 =head1 DESCRIPTION
 

@@ -7,12 +7,13 @@ on 'configure' => sub {
 requires 'IPC::Run';
 
 on 'test' => sub {
-    requires 'Devel::Cover';
-    requires 'Test::MinimumVersion';
-    requires 'Test::Perl::Critic';
-    requires 'Test::Pod';
-    requires 'Test::Pod::Coverage';
-    requires 'Test::Spelling';
-    requires 'Test::Strict';
-    requires 'Test::Synopsis';
+    suggests 'Devel::Cover';
+    suggests 'Perl::Critic::Freenode';
+    suggests 'Test::MinimumVersion';
+    suggests 'Test::Perl::Critic';
+    suggests 'Test::Pod';
+    suggests 'Test::Pod::Coverage';
+    suggests 'Test::Spelling';
+    suggests 'Test::Strict';
+    suggests 'Test::Synopsis';
 };

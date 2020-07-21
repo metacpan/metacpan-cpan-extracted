@@ -9,8 +9,8 @@ use Socket;
 
 my $rc = 0;
 
-$rc = socket(SOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp'));
-ok($rc, q{socket(SOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp'))});
+eval { $rc = socket(SOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp')); };
+ok($@, q{socket(SOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp'))});
 if ($rc) {
     local $_ = fileno(SOCKET);
     close(SOCKET);

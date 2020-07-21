@@ -138,6 +138,41 @@ dies_ok(
 	'algorithm none throws exception'
 );
 
+subtest '->access_token_ttl' => sub {
+
+	subtest 'Int' => sub {
+
+		my $Defaults = Test::Defaults->new(
+			access_token_ttl => 999,
+		);
+
+		is $Defaults->access_token_ttl, 999, 'attribute is numeric';
+		is $Defaults->get_access_token_ttl(), 999, '->get_access_token_ttl() returned default numeric TTL';
+
+	};
+
+	subtest 'CodeRef' => sub {
+
+		my $Defaults = Test::Defaults->new(
+			access_token_ttl => sub {
+				my ( %args ) = @_;
+
+				return {
+					Test => 12345,
+				}->{ $args{client_id} // '' } // 42;
+			},
+		);
+
+		is ref( $Defaults->access_token_ttl ), 'CODE', 'attribute is code ref';
+		is $Defaults->get_access_token_ttl(), 42, '->get_access_token_ttl() returned our default TTL';
+		is $Defaults->get_access_token_ttl( client_id => 'Test' ), 12345,
+			'->get_access_token_ttl() returned our custom TTL';
+
+	};
+
+
+};
+
 like( $@,qr/'none' is not supported/,'with expected error' );
 
 done_testing();

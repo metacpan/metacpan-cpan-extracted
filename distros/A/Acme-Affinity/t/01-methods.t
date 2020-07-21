@@ -6,9 +6,7 @@ use Test::More;
 
 use_ok 'Acme::Affinity';
 
-my $affinity = eval { Acme::Affinity->new };
-isa_ok $affinity, 'Acme::Affinity';
-ok !$@, 'created with no arguments';
+my $affinity = new_ok 'Acme::Affinity';
 
 my $questions = [
     { 'how messy are you' => [ 'very messy', 'average', 'very organized' ] },
@@ -30,20 +28,20 @@ my $you = [
     [ 'yes',            'no',      'somewhat important' ],
 ];
 
-$affinity = Acme::Affinity->new(
+$affinity = new_ok 'Acme::Affinity' => [
     questions  => $questions,
     importance => $importance,
     me         => $me,
     you        => $you,
-);
+];
 
 is_deeply $affinity->questions, $questions, 'questions';
 is_deeply $affinity->importance, $importance, 'importance';
 is_deeply $affinity->me, $me, 'me';
 is_deeply $affinity->you, $you, 'you';
 
-my $score = $affinity->score();
-is sprintf( '%.2f', $score ), 94.41, 'score';
+my $score = $affinity->score;
+is sprintf( '%.2f', $score ), '94.41', 'score';
 
 $me = [
     [ 'very organized', 'very organized', 'very important' ],
@@ -54,14 +52,14 @@ $you = [
     [ 'no',             'no',             'very important' ],
 ];
 
-$affinity = Acme::Affinity->new(
+$affinity = new_ok 'Acme::Affinity' => [
     questions  => $questions,
     importance => $importance,
     me         => $me,
     you        => $you,
-);
+];
 
-$score = $affinity->score();
+$score = $affinity->score;
 is $score, 100, 'score';
 
 $me = [
@@ -73,14 +71,14 @@ $you = [
     [ 'yes',        'yes',        'very important' ],
 ];
 
-$affinity = Acme::Affinity->new(
+$affinity = new_ok 'Acme::Affinity' => [
     questions  => $questions,
     importance => $importance,
     me         => $me,
     you        => $you,
-);
+];
 
-$score = $affinity->score();
+$score = $affinity->score;
 is $score, 0, 'score';
 
 done_testing();

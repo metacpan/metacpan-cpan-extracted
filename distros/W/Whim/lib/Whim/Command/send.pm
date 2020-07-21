@@ -7,11 +7,18 @@ no warnings qw(experimental::signatures);
 use Whim::Mention;
 use Try::Tiny;
 
+use Mojo::Util qw(getopt);
+
 has description => 'Send webmentions';
 has usage       => sub { shift->extract_usage };
 
 sub run {
-    my ( $self, $source, $target ) = @_;
+    my ( $self, @args ) = @_;
+
+    my $limit_to_content = 0;
+    getopt( \@args, 'c|content' => sub { $limit_to_content = 1 }, );
+
+    my ( $source, $target ) = @args;
 
     $source = check_argument( source => $source );
 
@@ -21,7 +28,7 @@ sub run {
         return $self->_send_one_wm( $source, $target );
     }
     else {
-        return $self->_send_many_wms($source);
+        return $self->_send_many_wms( $source, $limit_to_content );
     }
 }
 
@@ -39,11 +46,12 @@ sub _send_one_wm ( $self, $source, $target ) {
     }
 }
 
-sub _send_many_wms ( $self, $source ) {
+sub _send_many_wms ( $self, $source, $limit_to_content ) {
 
     my @wms;
     try {
-        @wms = Whim::Mention->new_from_source($source);
+        @wms = Whim::Mention->new_from_source( $source,
+            limit_to_content => $limit_to_content, );
     }
     catch {
         chomp;
@@ -51,7 +59,11 @@ sub _send_many_wms ( $self, $source ) {
     };
 
     my $success_count = 0;
+    if (@wms) {
+        say "Attempting to send webmentions to...";
+    }
     for my $wm (@wms) {
+        say $wm->target;
         if ( $wm->send ) {
             $success_count++;
         }
@@ -88,7 +100,19 @@ Whim::Command::send - Send command
 
 =head1 SYNOPSIS
 
-  Usage: whim send [source-url] [target-url]
+  Usage: whim send [OPTIONS] [source-url] [target-url]
+
+  Examples:
+    whim send https://example.com/source https://example.com/target
+    whim send https://example.com/source
+    whim send --content https://example.com/source
+
+  Options:
+    -c, --content                        When run in one-argument mode,
+                                         send webmentions only to targets
+                                         within the page's first h-entry
+                                         with a content property
+
 
   Run with two arguments to send a single webmention with the given
   source and target URLs.
@@ -102,8 +126,7 @@ This command sends webmentions, as described above. It prints a short
 description of what it did to standard output.
 
 If called with one argument, it will attempt to load the content from
-the given source URL, locate an C<h-entry> microformat with an
-C<e-content> property, and then try to send webmentions to all linked
+the given source URL, and then try to send webmentions to all linked
 URLs found within.
 
 =head1 SEE ALSO

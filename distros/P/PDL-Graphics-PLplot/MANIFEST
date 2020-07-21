@@ -36,7 +36,6 @@ t/x25.pl
 t/x26.pl
 t/x27.pl
 t/x28.pl
-t/x29.pl
 t/x30.pl
 t/x31.pl
 t/x33.pl
@@ -67,13 +66,15 @@ t/x25c.c
 t/x26c.c
 t/x27c.c
 t/x28c.c
-t/x29c.c
 t/x30c.c
 t/x31c.c
 t/not_covered/x32c.c
 t/x33c.c
 t/not_covered/x34c.c
 t/plcdemos.h
+t/not_covered/x14.pl
+t/not_covered/x29.pl
+t/not_covered/x29c.c
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 GENERATED/PDL/Graphics/PLplot.pm         mod=PDL::Graphics::PLplot pd=plplot.pd (added by pdlpp_mkgen)

@@ -1,3 +1,12 @@
+0.04 2020-07-16T15:29:43+02:00
+ - Fix Makefile.PL, which fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2015-09-23T00:05:11+02:00
  - Improve LICENSE AND COPYRIGHT section in doc.
  - Move author tests to xt/ directory.

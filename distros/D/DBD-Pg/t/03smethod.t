@@ -9,10 +9,10 @@
 use 5.008001;
 use strict;
 use warnings;
+use lib 'blib/lib', 'blib/arch', 't';
 use POSIX qw(:signal_h);
 use Test::More;
 use DBI ':sql_types';
-use lib 't','.';
 require 'dbdpg_test_setup.pl';
 select(($|=1,select(STDERR),$|=1)[1]);
 
@@ -21,11 +21,13 @@ my $dbh = connect_database();
 if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 136;
+plan tests => 146;
 
 isnt ($dbh, undef, 'Connect to database for statement handle method testing');
 
 my ($SQL, $sth, $sth2, $result, @results, $expected, $rows, $t);
+
+my ($schema,$schema2,$schema3) = ('dbd_pg_testschema', 'dbd_pg_testschema2', 'dbd_pg_testschema3');
 
 #
 # Test of the prepare flags
@@ -585,7 +587,7 @@ is ($result, '42703', $t);
 
 SKIP: {
     if ($DBI::VERSION < 1.54) {
-        skip ('DBI must be at least version 1.54 to test private_attribute_info', 2);
+        skip ('DBI must be at least version 1.54 to test $sth->private_attribute_info', 2);
     }
 
 
@@ -768,7 +770,7 @@ is_deeply ($sth->pg_canonical_names, [
 ], $t);
 
 #
-# Test of the statement handle methods "pg_canonical_ids"
+# Test of the statement handle method "pg_canonical_ids"
 #
 
 $t=q{Statement handle method "pg_canonical_ids" returns correct length};
@@ -800,7 +802,7 @@ $sth->finish;
         a
         abcdefghijklmnopqrstuvwxyz
     );
-    $SQL = join(q{ UNION ALL }, ('SELECT ?,?') x @strings) . q{ ORDER BY 1};
+    $SQL = join(q{ UNION ALL }, ('SELECT ?::text,?::text') x @strings) . q{ ORDER BY 1};
     $sth = $dbh->prepare($SQL);
     my $i = 0;
     $sth->execute(map { $i++, $_ } @strings);
@@ -808,6 +810,96 @@ $sth->finish;
         is(length($row->[1]), length(shift(@strings)), 'Perl length() of returned string');
     }
     $sth->finish;
+}
+
+#
+# Test of the statement handle method "last_insert_id"
+#
+
+SKIP: {
+
+    if ($DBI::VERSION < 1.642) {
+        skip ('DBI must be at least version 1.642 to test $sth->last_insert_id', 10);
+    }
+
+    $t='Statement handle method "last_insert_id" fails when no arguments are given';
+    $dbh->rollback();
+    $sth = $dbh->prepare('SELECT 1');
+    eval {
+        $sth->last_insert_id(undef,undef,undef,undef);
+    };
+    like ($@, qr{last_insert_id.*least}, $t);
+
+    $t='Statement handle method "last_insert_id" fails when given a non-existent sequence';
+    eval {
+        $sth->last_insert_id(undef,undef,undef,undef,{sequence=>'dbd_pg_nonexistentsequence_test'});
+    };
+    is ($dbh->state, '42P01', $t);
+
+    $t='Statement handle method "last_insert_id" fails when given a non-existent table';
+    $dbh->rollback();
+    $sth = $dbh->prepare('SELECT 1');
+    eval {
+        $sth->last_insert_id(undef,undef,'dbd_pg_nonexistenttable_test',undef);
+    };
+    like ($@, qr{not find}, $t);
+
+    $t='Statement handle method "last_insert_id" fails when given an arrayref as last argument';
+    $dbh->rollback();
+    $sth = $dbh->prepare('SELECT 1');
+    eval {
+        $sth->last_insert_id(undef,undef,'dbd_pg_nonexistenttable_test',undef,[]);
+    };
+    like ($@, qr{last_insert_id.*hashref}, $t);
+
+    $t='Statement handle method "last_insert_id" works when given an empty sequence argument';
+    $dbh->rollback();
+    $sth = $dbh->prepare('SELECT 1');
+    eval {
+        $sth->last_insert_id(undef,undef,'dbd_pg_test',undef,{sequence=>''});
+    };
+    is ($@, q{}, $t);
+
+    $t='Statement handle method "last_insert_id" fails when given a table with no primary key';
+    $dbh->rollback();
+    $sth = $dbh->prepare('CREATE TEMP TABLE dbd_pg_test_temp(a int)');
+    $sth->execute();
+    eval {
+        $sth->last_insert_id(undef,undef,'dbd_pg_test_temp',undef);
+    };
+    like ($@, qr{last_insert_id}, $t);
+
+    my $parent = 'dbd_pg_test_parent';
+    my $kid = 'dbd_pg_test_inherit';
+    $dbh->do(q{SET client_min_messages = 'ERROR'});
+    $dbh->do("CREATE TABLE $schema.$parent(id SERIAL primary key)");
+    $dbh->do("CREATE TABLE $schema.$kid (foo text) INHERITS ($parent)");
+    $sth = $dbh->prepare("INSERT INTO $parent DEFAULT VALUES");
+    $sth->execute();
+
+    $t='Statement handle method "last_insert_id" works for a normal table';
+    $result = '';
+    eval {
+        $result = $sth->last_insert_id(undef,undef,$parent,undef);
+    };
+    is ($@, q{}, $t);
+
+    $t='Statement handle method "last_insert_id" returns correct value for a normal table';
+    is ($result, 1, $t);
+
+    $sth = $dbh->prepare("INSERT INTO $kid DEFAULT VALUES");
+    $sth->execute();
+
+    $t='Statement handle method "last_insert_id" works for an inherited table';
+    $result = '';
+    eval {
+        $result = $sth->last_insert_id(undef,undef,$kid,undef);
+    };
+    is ($@, q{}, $t);
+
+    $t='Statement handle method "last_insert_id" returns correct value for an inheriteda table';
+    is ($result, 2, $t);
+
 }
 
 

@@ -11,11 +11,13 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized );
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 
-use Socket qw( PF_UNIX PF_UNSPEC SOCK_STREAM );
+use IO::Handle ();
+use Socket qw( AF_UNIX );
+use Errno ();
 
 my $is_winenv;
 
@@ -30,9 +32,7 @@ BEGIN {
 ###############################################################################
 
 sub destroy_pipes {
-
     my ($obj, @params) = @_;
-
     local ($!,$?); local $SIG{__DIE__};
 
     for my $p (@params) {
@@ -55,9 +55,7 @@ sub destroy_pipes {
 }
 
 sub destroy_socks {
-
     my ($obj, @params) = @_;
-
     local ($!,$?,$@); local $SIG{__DIE__};
 
     for my $p (@params) {
@@ -88,57 +86,74 @@ sub destroy_socks {
 }
 
 sub pipe_pair {
-
     my ($obj, $r_sock, $w_sock, $i) = @_;
-
     local $!;
 
     if (defined $i) {
         # remove tainted'ness
         ($i) = $i =~ /(.*)/;
-
-        pipe($obj->{$r_sock}[$i], $obj->{$w_sock}[$i])
-            or die "pipe: $!\n";
-
-        # IO::Handle->autoflush not available in older Perl.
-        select(( select($obj->{$w_sock}[$i]), $| = 1 )[0]);
+        pipe($obj->{$r_sock}[$i], $obj->{$w_sock}[$i]) or die "pipe: $!\n";
+        $obj->{$w_sock}[$i]->autoflush(1);
     }
     else {
-        pipe($obj->{$r_sock}, $obj->{$w_sock})
-            or die "pipe: $!\n";
-
-        select(( select($obj->{$w_sock}), $| = 1 )[0]); # Ditto.
+        pipe($obj->{$r_sock}, $obj->{$w_sock}) or die "pipe: $!\n";
+        $obj->{$w_sock}->autoflush(1);
     }
 
     return;
 }
 
 sub sock_pair {
-
     my ($obj, $r_sock, $w_sock, $i) = @_;
-
-    local $!;
+    local ($!, $@);
 
     if (defined $i) {
         # remove tainted'ness
         ($i) = $i =~ /(.*)/;
 
-        socketpair( $obj->{$r_sock}[$i], $obj->{$w_sock}[$i],
-            PF_UNIX, SOCK_STREAM, PF_UNSPEC ) or die "socketpair: $!\n";
+        if ($^O eq 'linux' && eval q{ Socket::SOCK_SEQPACKET() }) {
+            socketpair( $obj->{$r_sock}[$i], $obj->{$w_sock}[$i],
+                AF_UNIX, Socket::SOCK_SEQPACKET(), 0 ) or do {
+                    socketpair( $obj->{$r_sock}[$i], $obj->{$w_sock}[$i],
+                        AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
+                };
+        }
+        else {
+            socketpair( $obj->{$r_sock}[$i], $obj->{$w_sock}[$i],
+                AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
+        }
 
-        # IO::Handle->autoflush not available in older Perl.
-        select(( select($obj->{$w_sock}[$i]), $| = 1 )[0]);
-        select(( select($obj->{$r_sock}[$i]), $| = 1 )[0]);
+        $obj->{$r_sock}[$i]->autoflush(1);
+        $obj->{$w_sock}[$i]->autoflush(1);
     }
     else {
-        socketpair( $obj->{$r_sock}, $obj->{$w_sock},
-            PF_UNIX, SOCK_STREAM, PF_UNSPEC ) or die "socketpair: $!\n";
+        if ($^O eq 'linux' && eval q{ Socket::SOCK_SEQPACKET() }) {
+            socketpair( $obj->{$r_sock}, $obj->{$w_sock},
+                AF_UNIX, Socket::SOCK_SEQPACKET(), 0 ) or do {
+                    socketpair( $obj->{$r_sock}, $obj->{$w_sock},
+                        AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
+                };
+        }
+        else {
+            socketpair( $obj->{$r_sock}, $obj->{$w_sock},
+                AF_UNIX, Socket::SOCK_STREAM(), 0 ) or die "socketpair: $!\n";
+        }
 
-        select(( select($obj->{$w_sock}), $| = 1 )[0]); # Ditto.
-        select(( select($obj->{$r_sock}), $| = 1 )[0]);
+        $obj->{$r_sock}->autoflush(1);
+        $obj->{$w_sock}->autoflush(1);
     }
 
     return;
+}
+
+sub _sysread {
+    ( @_ == 3
+        ? CORE::sysread($_[0], $_[1], $_[2])
+        : CORE::sysread($_[0], $_[1], $_[2], $_[3])
+    )
+    or do {
+        goto \&_sysread if ($! == Errno::EINTR());
+    };
 }
 
 1;
@@ -157,7 +172,7 @@ Mutex::Util - Utility functions for Mutex
 
 =head1 VERSION
 
-This document describes Mutex::Util version 1.005
+This document describes Mutex::Util version 1.006
 
 =head1 SYNOPSIS
 

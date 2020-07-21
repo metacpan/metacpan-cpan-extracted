@@ -1,5 +1,5 @@
 package ExtUtils::HasCompiler;
-$ExtUtils::HasCompiler::VERSION = '0.021';
+$ExtUtils::HasCompiler::VERSION = '0.022';
 use strict;
 use warnings;
 
@@ -104,7 +104,7 @@ sub can_compile_loadable_object {
 			my $lib = '-l' . ($libperl =~ /lib([^.]+)\./)[0];
 			push @extra, "$abs_basename.def", $lib, $perllibs;
 		}
-		elsif ($^O eq 'cygwin') {
+		elsif ($^O =~ /^(cygwin|msys)$/) {
 			push @extra, catfile($incdir, $config->get('useshrplib') ? 'libperl.dll.a' : 'libperl.a');
 		}
 		elsif ($^O eq 'aix') {
@@ -222,7 +222,7 @@ ExtUtils::HasCompiler - Check for the presence of a compiler
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

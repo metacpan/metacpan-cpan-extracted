@@ -93,7 +93,7 @@ After saving your configuration changes please restart the Apache webserver.
 #### Step 3: Using this setup
 
 ```perl
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector;
@@ -120,7 +120,7 @@ When having the debug mode activated `WebService::Hexonet::Connector::Logger` wi
 Of course it could be of interest for integrators to look for a way of getting this replaced by a custom mechanism like forwarding things to a 3rd-party software, logging into file or whatever.
 
 ```perl
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector;
@@ -142,7 +142,7 @@ Please have an eye on our [HEXONET Backend API documentation](https://github.com
 #### Session based API Communication
 
 ```perl
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector;
@@ -193,7 +193,7 @@ if ($response->isSuccess()) {
 #### Sessionless API Communication
 
 ```perl
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector;
@@ -232,7 +232,7 @@ Using the below is supported to improve using commands. It will automatically be
 This of course works for all commands and all such parameters.
 
 ```perl
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector;

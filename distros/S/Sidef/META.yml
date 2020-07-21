@@ -17,7 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '3.95'
+    version: '3.96'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -92,6 +92,10 @@ provides:
     file: lib/Sidef/Types/Null/Null.pm
   Sidef::Types::Number::Complex:
     file: lib/Sidef/Types/Number/Complex.pm
+  Sidef::Types::Number::Gauss:
+    file: lib/Sidef/Types/Number/Gauss.pm
+  Sidef::Types::Number::Mod:
+    file: lib/Sidef/Types/Number/Mod.pm
   Sidef::Types::Number::Number:
     file: lib/Sidef/Types/Number/Number.pm
   Sidef::Types::Range::Range:
@@ -139,7 +143,7 @@ requires:
   Math::GMPz: '0.39'
   Math::MPC: '0'
   Math::MPFR: '3.36'
-  Math::Prime::Util::GMP: '0.44'
+  Math::Prime::Util::GMP: '0.52'
   Memoize: '0'
   Scalar::Util: '0'
   Socket: '0'
@@ -154,5 +158,5 @@ resources:
   homepage: https://github.com/trizen/sidef
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
-version: '3.95'
+version: '3.96'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

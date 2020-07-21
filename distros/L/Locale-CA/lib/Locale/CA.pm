@@ -10,11 +10,11 @@ Locale::CA - two letter codes for province identification in Canada and vice ver
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -22,7 +22,8 @@ our $VERSION = '0.03';
 
     my $u = Locale::CA->new();
 
-    # Returns the French names of the provinces if $LANG starts with 'fr'
+    # Returns the French names of the provinces if $LANG starts with 'fr' or
+    #	the lang parameter is set to 'fr'
     my $province = $u->{code2province}{$code};
     my $code  = $u->{province2code}{$province};
 
@@ -43,10 +44,25 @@ sub new {
 
 	return unless(defined($class));
 
-	my $self = {};
+	my %params;
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(scalar(@_) % 2 == 0) {
+		%params = @_;
+	} else {
+		$params{'lang'} = shift;
+	}
 
+	my $self = {};
 	my $data;
-	if(defined($ENV{'LANG'}) && ($ENV{'LANG'} =~ /^fr/)) {
+	my $lang = $params{'lang'};
+	if(defined($lang)) {
+		if(($lang eq 'fr') || ($lang eq 'en')) {
+			$data = Data::Section::Simple::get_data_section("provinces_$lang");
+		} else {
+			die "lang can only be one of 'en' or 'fr', given $lang";
+		}
+	} elsif(defined($ENV{'LANG'}) && ($ENV{'LANG'} =~ /^fr/)) {
 		$data = Data::Section::Simple::get_data_section('provinces_fr');
 	} else {
 		$data = Data::Section::Simple::get_data_section('provinces_en');

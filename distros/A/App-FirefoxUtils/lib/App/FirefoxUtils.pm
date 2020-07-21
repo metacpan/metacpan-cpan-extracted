@@ -1,9 +1,9 @@
 package App::FirefoxUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-07-19'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -158,7 +158,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.013 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2020-06-13.
+This document describes version 0.014 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2020-07-19.
 
 =head1 SYNOPSIS
 
@@ -554,7 +554,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Firefo
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-ManUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-FirefoxUtils>.
 
 =head1 BUGS
 
@@ -583,7 +583,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

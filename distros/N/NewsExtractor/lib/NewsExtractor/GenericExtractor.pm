@@ -185,7 +185,8 @@ sub journalist {
             qr<\A〔新網記者 ( \p{Letter}+ (?:報導|特稿))〕\b>x,
             qr<\A（芋傳媒記者(\p{Letter}+)報導）\b>x,
             qr<\b文\s*／\s*(\p{Letter}+)\s*（中央社編譯）\n>x,
-            qr<\A 香港中通社[0-9]+月[0-9]+日電（記者\s(\p{Letter}+)）>x
+            qr<\A 香港中通社[0-9]+月[0-9]+日電（記者\s(\p{Letter}+)）>x,
+            qr<\A \( (記者\p{Letter}+報導) \)>x,
         );
 
         for my $pat (@patterns) {

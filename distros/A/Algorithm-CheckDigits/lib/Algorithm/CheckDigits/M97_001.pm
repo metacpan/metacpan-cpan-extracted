@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use integer;
 
-use version; our $VERSION = 'v1.3.2';
+use version; our $VERSION = 'v1.3.3';
 
 our @ISA = qw(Algorithm::CheckDigits);
 
@@ -20,7 +20,7 @@ sub new {
 
 sub is_valid {
 	my ($self,$number) = @_;
-	if ($number =~ /^(\d{7})?(\d\d)$/i) {
+	if ($number =~ /^(?:BE)?(\d{7,8})?(\d\d)$/i) {
 		return $2 eq $self->_compute_checkdigit($1);
 	}
 	return ''
@@ -28,7 +28,7 @@ sub is_valid {
 
 sub complete {
 	my ($self,$number) = @_;
-	if ($number =~ /^(\d{7})$/i) {
+	if ($number =~ /^(?:BE)?(\d{7,8})$/i) {
 		return $number . $self->_compute_checkdigit($1);
 	}
 	return '';
@@ -36,7 +36,7 @@ sub complete {
 
 sub basenumber {
 	my ($self,$number) = @_;
-	if ($number =~ /^(\d{7})(\d\d)$/i) {
+	if ($number =~ /^(?:BE)?(\d{7,8})(\d\d)$/i) {
 		return $1 if ($2 eq $self->_compute_checkdigit($1));
 	}
 	return '';
@@ -44,7 +44,7 @@ sub basenumber {
 
 sub checkdigit {
 	my ($self,$number) = @_;
-	if ($number =~ /^(\d{7})(\d\d)$/i) {
+	if ($number =~ /^(?:BE)?(\d{7,8})(\d\d)$/i) {
 		return $2 if (uc($2) eq $self->_compute_checkdigit($1));
 	}
 	return '';
@@ -54,7 +54,7 @@ sub _compute_checkdigit {
 	my $self   = shift;
 	my $number = shift;
 
-	if ($number =~ /^\d{7}$/i) {
+	if ($number =~ /^\d{7,8}$/i) {
 		return sprintf("%2.2d",97 - ($number % 97));
 	}
 	return -1;
@@ -110,8 +110,10 @@ The checksum is difference of the remainder from step 1 to 97.
 
 =item is_valid($number)
 
-Returns true only if C<$number> consists solely of numbers and the last digit
+Returns true if C<$number> consists solely of numbers and the last digit
 is a valid check digit according to the algorithm given above.
+
+A leading 'BE' before the numbers will be ignored.
 
 Returns false otherwise,
 
@@ -123,10 +125,16 @@ of C<$number>.
 Returns the complete number with check digit or '' if C<$number>
 does not consist solely of digits and spaces.
 
+A leading 'BE' before the digits is ignored for the computation
+and retained for the result.
+
 =item basenumber($number)
 
 Returns the basenumber of C<$number> if C<$number> has a valid check
 digit.
+
+A leading 'BE' before the digits will be ignored
+and not returned with the result.
 
 Return '' otherwise.
 
@@ -151,6 +159,7 @@ Mathias Weidner, C<< <mamawe@cpan.org> >>
 
 L<perl>,
 L<CheckDigits>,
-F<www.pruefziffernberechnung.de>.
+L<http://www.pruefziffernberechnung.de>.
+L<https://en.wikipedia.org/wiki/VAT_identification_number>
 
 =cut

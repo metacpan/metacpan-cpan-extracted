@@ -1,7 +1,7 @@
 package Sah::Schemas::Examples;
 
-our $DATE = '2016-12-09'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2020-05-27'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 1;
 # ABSTRACT: Various example Sah schemas
@@ -18,7 +18,7 @@ Sah::Schemas::Examples - Various example Sah schemas
 
 =head1 VERSION
 
-This document describes version 0.005 of Sah::Schemas::Examples (from Perl distribution Sah-Schemas-Examples), released on 2016-12-09.
+This document describes version 0.006 of Sah::Schemas::Examples (from Perl distribution Sah-Schemas-Examples), released on 2020-05-27.
 
 =head1 HOMEPAGE
 
@@ -48,7 +48,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

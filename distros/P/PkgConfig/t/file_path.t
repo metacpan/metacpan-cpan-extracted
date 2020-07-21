@@ -28,7 +28,7 @@ subtest 'real file' => sub {
     plan tests => 3;
     my $pkg = PkgConfig->find( 'rubbish', file_path => File::Spec->catfile($dir, "libfoo.pc") );
     isa_ok $pkg, 'PkgConfig';
-    
+
     is join(' ', $pkg->get_cflags),  '-I/opt/stuff/include -DFOO=1', 'cflags';
     is join(' ', $pkg->get_ldflags), '-L/opt/stuff/lib -lfoo',       'ldflags';
 };

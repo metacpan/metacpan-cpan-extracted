@@ -4,7 +4,7 @@ author:
   - 'Tom Christiansen <tchrist@perl.com>'
 build_requires:
   Carp::Always: '0'
-  Hash::Util: '0.12'
+  Hash::Util: '0'
   IO::File: '0'
   IO::Handle: '0'
   Moose: '0'
@@ -34,7 +34,7 @@ requires:
   Cwd: '0'
   Env: '0'
   Exporter: '5.57'
-  Exporter::ConditionalSubs: '1.01'
+  Exporter::ConditionalSubs: v1.11.1
   File::Basename: '0'
   File::Spec: '0'
   POSIX: '0'
@@ -46,5 +46,5 @@ requires:
   namespace::clean: '0'
   parent: '0'
   perl: '5.012'
-version: 0.009
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: v0.010
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

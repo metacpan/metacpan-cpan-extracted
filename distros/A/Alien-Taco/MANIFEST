@@ -1,5 +1,6 @@
 bin/taco-perl
 Build.PL
+Changes
 COPYING
 lib/Alien/Taco.pm
 lib/Alien/Taco/Object.pm

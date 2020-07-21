@@ -1,3 +1,14 @@
+1.032 2020-07-17
+
+  cme improvements:
+    * cme warnings are now shown with log4perl in blue
+      (the shown color depends on Log4Perl configuration)
+
+  Doc improvements:
+    * improve update command doc (Thanks Ross Vandegrift)
+    * add contributor section in cme doc
+    * run command: fix typos in synopsis comments
+
 1.031 2020-01-12
 
   Bug fix:

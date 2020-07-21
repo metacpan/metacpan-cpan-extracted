@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v4.25.7"
+         "version" : "v4.25.8"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -380,6 +380,9 @@
       "Sisimai::Rhost" : {
          "file" : "lib/Sisimai/Rhost.pm"
       },
+      "Sisimai::Rhost::Cox" : {
+         "file" : "lib/Sisimai/Rhost/Cox.pm"
+      },
       "Sisimai::Rhost::ExchangeOnline" : {
          "file" : "lib/Sisimai/Rhost/ExchangeOnline.pm"
       },
@@ -397,6 +400,9 @@
       },
       "Sisimai::Rhost::KDDI" : {
          "file" : "lib/Sisimai/Rhost/KDDI.pm"
+      },
+      "Sisimai::Rhost::Spectrum" : {
+         "file" : "lib/Sisimai/Rhost/Spectrum.pm"
       },
       "Sisimai::Rhost::TencentQQ" : {
          "file" : "lib/Sisimai/Rhost/TencentQQ.pm"
@@ -423,15 +429,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/sisimai/p5-Sisimai/issues"
+         "web" : "https://github.com/sisimai/p5-sisimai/issues"
       },
       "homepage" : "https://libsisimai.org/",
       "repository" : {
-         "url" : "git://github.com/sisimai/p5-Sisimai.git",
-         "web" : "https://github.com/sisimai/p5-Sisimai"
+         "url" : "git://github.com/sisimai/p5-sisimai.git",
+         "web" : "https://github.com/sisimai/p5-sisimai"
       }
    },
-   "version" : "v4.25.7",
+   "version" : "v4.25.8",
    "x_contributors" : [
       "0xcdcdcdcd <0xcdcdcdcd@gmail.com>",
       "Adrian Yee <adrian@gt.net>",

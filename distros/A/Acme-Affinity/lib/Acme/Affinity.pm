@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Compute the affinity between two people
 
-our $VERSION = '0.0109';
+our $VERSION = '0.0111';
 
 use Moo;
 use strictures 2;
@@ -13,9 +13,10 @@ use Math::BigRat;
 
 
 has questions => (
-    is      => 'ro',
-    isa     => sub { die 'Not an ArrayRef' unless ref($_[0]) eq 'ARRAY' },
-    default => sub { [] },
+    is       => 'ro',
+    isa      => sub { die 'Not an ArrayRef' unless ref($_[0]) eq 'ARRAY' },
+    default  => sub { [] },
+    required => 1,
 );
 
 
@@ -31,20 +32,23 @@ has importance => (
             'mandatory'          => 250,
         }
     },
+    required => 1,
 );
 
 
 has me => (
-    is      => 'ro',
-    isa     => sub { die 'Not an ArrayRef' unless ref($_[0]) eq 'ARRAY' },
-    default => sub { [] },
+    is       => 'ro',
+    isa      => sub { die 'Not an ArrayRef' unless ref($_[0]) eq 'ARRAY' },
+    default  => sub { [] },
+    required => 1,
 );
 
 
 has you => (
-    is      => 'ro',
-    isa     => sub { die 'Not an ArrayRef' unless ref($_[0]) eq 'ARRAY' },
-    default => sub { [] },
+    is       => 'ro',
+    isa      => sub { die 'Not an ArrayRef' unless ref($_[0]) eq 'ARRAY' },
+    default  => sub { [] },
+    required => 1,
 );
 
 
@@ -100,17 +104,18 @@ Acme::Affinity - Compute the affinity between two people
 
 =head1 VERSION
 
-version 0.0109
+version 0.0111
 
 =head1 SYNOPSIS
 
   use Acme::Affinity;
 
-  my %arguments = ( questions => [], importance => {}, me => [], you => [] );
+  # Please see the documentation for the contents of these values
+  my %arguments = (questions => [], importance => {}, me => [], you => []);
 
   my $affinity = Acme::Affinity->new(%arguments);
 
-  my $score = $affinity->score();
+  my $score = $affinity->score;
 
 =head1 DESCRIPTION
 
@@ -122,29 +127,35 @@ importance.
 
 =head2 questions
 
-A list of hash references with question keys and answer array references.
+This is a list of hash references with question keys and answer array
+references.
 
 Example:
 
-  [ { 'how messy are you' => [ 'very messy', 'average', 'very organized' ] },
-    { 'do you like to be the center of attention' => [ 'yes', 'no' ] }, ]
+  [
+    { 'how messy are you' => [ 'very messy', 'average', 'very organized' ] },
+    { 'do you like to be the center of attention' => [ 'yes', 'no' ] },
+  ]
 
 =head2 importance
 
-A hash reference with importance level keys and weight values.
+This is a hash reference with importance level keys and weight values.
 
 Default:
 
-  irrelevant         => 0
-  a little important => 1
-  somewhat important => 10
-  very important     => 50
-  mandatory          => 250
+  {
+    'irrelevant'         => 0,
+    'a little important' => 1,
+    'somewhat important' => 10,
+    'very important'     => 50,
+    'mandatory'          => 250,
+  }
 
 =head2 me
 
-An array reference triple of question responses, desired responses and
-importance levels of person A for each of the given B<questions>.
+This is an array reference triple of question responses, desired
+responses and importance levels of person A for each of the given
+B<questions>.
 
 Example:
 
@@ -152,10 +163,18 @@ Example:
   [ [ 'very organized',  'very organized',  'very important' ],
     [ 'no',              'no',              'a little important' ], ]
 
+So person A ("me") considers him or herself to be "very organized",
+desires a "very organized" person, and this is "very important" to
+them.
+
+Person A also does not need to be the "center of attention", desires
+the same type of person, but this is only "a little important."
+
 =head2 you
 
-An array reference triple of question responses, desired responses and
-importance levels of person B for each of the given B<questions>.
+This is an array reference triple of question responses, desired
+responses and importance levels of person B for each of the given
+B<questions>.
 
 Example:
 
@@ -163,17 +182,29 @@ Example:
   [ [ 'very organized',  'average',  'a little important' ],
     [ 'yes',             'no',       'somewhat important' ], ]
 
+Person B considers him or herself to be "very organized", but only
+desires someone who is "average", and this is only "a little
+important" to them.
+
+Person B likes to be the "center of attention", desires someone who
+does not, and this is "somewhat important."
+
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
-  my $affinity = Acme::Affinity->new(%arguments);
+  my $affinity = Acme::Affinity->new(
+    questions  => \@questions,
+    importance => \%importance,
+    me         => \@me,
+    you        => \@you,
+  );
 
 Create a new C<Acme::Affinity> object.
 
-=head2 score()
+=head2 score
 
-  my $score = $affinity->score();
+  my $score = $affinity->score;
 
 Compute the affinity score for the two given people.
 

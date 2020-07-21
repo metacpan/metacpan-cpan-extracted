@@ -10,12 +10,12 @@ is(
   Wasm::Wasmtime::Module->new(wat2wasm('(module)')),
   object {
     call ['isa', 'Wasm::Wasmtime::Module'] => T();
-    call store => object {
-      call ['isa', 'Wasm::Wasmtime::Store'] => T();
+    call engine => object {
+      call ['isa', 'Wasm::Wasmtime::Engine'] => T();
     };
     call to_string => "(module)\n";
   },
-  'autocreate store',
+  'autocreate engine',
 );
 
 is(
@@ -28,19 +28,19 @@ is(
   Wasm::Wasmtime::Module->new(Wasm::Wasmtime::Store->new, wat2wasm('(module)')),
   object {
     call ['isa', 'Wasm::Wasmtime::Module'] => T();
-    call store => object {
-      call ['isa', 'Wasm::Wasmtime::Store'] => T();
+    call engine => object {
+      call ['isa', 'Wasm::Wasmtime::Engine'] => T();
     };
   },
-  'explicit store',
+  'explicit engine',
 );
 
 is(
   Wasm::Wasmtime::Module->new(wat => '(module)'),
   object {
     call ['isa', 'Wasm::Wasmtime::Module'] => T();
-    call store => object {
-      call ['isa', 'Wasm::Wasmtime::Store'] => T();
+    call engine => object {
+      call ['isa', 'Wasm::Wasmtime::Engine'] => T();
     };
   },
   'wat key',
@@ -50,8 +50,8 @@ is(
   Wasm::Wasmtime::Module->new(wasm => wat2wasm('(module)')),
   object {
     call ['isa', 'Wasm::Wasmtime::Module'] => T();
-    call store => object {
-      call ['isa', 'Wasm::Wasmtime::Store'] => T();
+    call engine => object {
+      call ['isa', 'Wasm::Wasmtime::Engine'] => T();
     };
   },
   'wasm key',
@@ -61,8 +61,8 @@ is(
   Wasm::Wasmtime::Module->new(file => 'examples/wasmtime/gcd.wat'),
   object {
     call ['isa', 'Wasm::Wasmtime::Module'] => T();
-    call store => object {
-      call ['isa', 'Wasm::Wasmtime::Store'] => T();
+    call engine => object {
+      call ['isa', 'Wasm::Wasmtime::Engine'] => T();
     };
     call to_string => join("\n",
                         '(module',
@@ -218,6 +218,48 @@ is(
   },
   'exports',
 );
+
+# test deprecation warnings on store method
+{
+  my $module = Wasm::Wasmtime::Module->new(wat => '(module)');
+  my @warnings;
+
+  isa_ok do {
+    local $SIG{__WARN__} = sub {
+      push @warnings, @_;
+    };
+    $module->store;
+  }, 'Wasm::Wasmtime::Store';
+
+  note '$module->store';
+  note "warning:$_" for @warnings;
+
+  is
+    \@warnings,
+    bag {
+      item match qr/The store method for the Wasm::Wasmtime::Module class is deprecated and will be removed in a future version of Wasm::Wasmtime/;
+      etc;
+    },
+    'deprecation warning',
+  ;
+
+  no warnings 'deprecated';
+  @warnings = ();
+  $module->store;
+
+  note 'no warnings \'deprecated\'; $module->store';
+  note "warning:$_" for @warnings;
+
+  is
+    \@warnings,
+    array {
+      all_items !match qr/The store method for the Wasm::Wasmtime::Module class is deprecated and will be removed in a future version of Wasm::Wasmtime/;
+      etc;
+    },
+    'can turn off deprecation warning',
+  ;
+
+}
 
 wasm_module_ok '(module)';
 

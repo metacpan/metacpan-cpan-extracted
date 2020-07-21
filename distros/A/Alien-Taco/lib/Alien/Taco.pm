@@ -41,7 +41,7 @@ use Alien::Taco::Transport;
 
 use strict;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 METHODS
 
@@ -266,6 +266,24 @@ sub _get_attribute {
     });
 }
 
+=item get_class_attribute('Class::Name', 'attribute_name')
+
+Request the value of a static attribute of a class.
+
+=cut
+
+sub get_class_attribute {
+    my $self = shift;
+    my $class = shift;
+    my $name = shift;
+
+    return $self->_interact({
+        action => 'get_class_attribute',
+        class => $class,
+        name => $name,
+    });
+}
+
 =item get_value('variable_name')
 
 Request the value of the given variable.
@@ -315,6 +333,26 @@ sub _set_attribute {
     $self->_interact({
         action => 'set_attribute',
         number => $number,
+        name => $name,
+        value => $value,
+    });
+}
+
+=item set_class_attribute('Class::Name', 'attribute_name', $value)
+
+Set the value of a static attribute of a class.
+
+=cut
+
+sub set_class_attribute {
+    my $self = shift;
+    my $class = shift;
+    my $name = shift;
+    my $value = shift;
+
+    $self->_interact({
+        action => 'set_class_attribute',
+        class => $class,
         name => $name,
         value => $value,
     });

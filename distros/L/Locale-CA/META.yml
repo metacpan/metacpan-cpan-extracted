@@ -23,5 +23,5 @@ requires:
   perl: '5.006002'
 resources:
   repository: git://github.com/nigelhorne/Locale-CA.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

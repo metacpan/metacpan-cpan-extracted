@@ -42,6 +42,7 @@ Gregory
 Grohmann
 Handle
 Jackson
+Joelle
 Johann
 Jonathan
 Karen
@@ -57,6 +58,7 @@ MailSend
 MailSender
 MailSendmail
 Manfredi
+Maslak
 Mengué
 Michael
 Millar
@@ -118,6 +120,7 @@ goschwald
 haarg
 hartzell
 ident
+jmaslak
 jorol
 kb
 kern

@@ -1,4 +1,4 @@
-                              PGP::Sign 1.00
+                              PGP::Sign 1.01
                (create and verify detached PGP signatures)
                 Maintained by Russ Allbery <rra@cpan.org>
 
@@ -78,6 +78,7 @@ TESTING
   present:
 
   * Devel::Cover
+  * Perl::Critic::Freenode
   * Test::MinimumVersion
   * Test::Perl::Critic
   * Test::Pod

@@ -30,6 +30,7 @@ lib/AsposeSlidesCloud/Object/DocumentProperty.pm
 lib/AsposeSlidesCloud/Object/DocumentReplaceResult.pm
 lib/AsposeSlidesCloud/Object/Effect.pm
 lib/AsposeSlidesCloud/Object/EffectFormat.pm
+lib/AsposeSlidesCloud/Object/EntityExists.pm
 lib/AsposeSlidesCloud/Object/Error.pm
 lib/AsposeSlidesCloud/Object/ErrorDetails.pm
 lib/AsposeSlidesCloud/Object/ExportFormat.pm
@@ -159,7 +160,6 @@ lib/AsposeSlidesCloud/SlidesApi.pm
 LICENSE
 MakeFile.pl
 MANIFEST			This list of files
-prove.pl
 README.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

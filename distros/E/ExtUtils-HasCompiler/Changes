@@ -1,5 +1,8 @@
 Revision history for ExtUtils-HasCompiler
 
+0.022     2020-07-20 22:05:15+02:00 Europe/Amsterdam
+          - Adds support for MSYS2
+
 0.021     2017-06-26 14:37:05+02:00 Europe/Amsterdam
           Released 0.020 as 0.021
 

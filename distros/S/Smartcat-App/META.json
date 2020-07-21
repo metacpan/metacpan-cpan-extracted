@@ -50,6 +50,7 @@
             "File::Find" : "0",
             "File::HomeDir" : "0",
             "File::Spec::Functions" : "0",
+            "HTTP::Message" : "6.11",
             "IO::Uncompress::Unzip" : "0",
             "JSON" : "0",
             "List::Util" : "0",
@@ -57,6 +58,7 @@
             "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::Log4perl" : "0",
             "Log::Log4perl" : "0",
+            "Smartcat::Client" : "v0.0.2",
             "Smartcat::Client::AccountApi" : "0",
             "Smartcat::Client::DocumentApi" : "0",
             "Smartcat::Client::DocumentExportApi" : "0",
@@ -85,16 +87,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ta2-1/smartcat-app-perl/issues"
+         "web" : "https://github.com/smartcatai/smartcat-app-perl/issues"
       },
-      "homepage" : "https://github.com/ta2-1/smartcat-app-perl",
+      "homepage" : "https://github.com/smartcatai/smartcat-app-perl",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ta2-1/smartcat-app-perl.git",
-         "web" : "https://github.com/ta2-1/smartcat-app-perl"
+         "url" : "https://github.com/smartcatai/smartcat-app-perl.git",
+         "web" : "https://github.com/smartcatai/smartcat-app-perl"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.0.3",
    "x_generated_by_perl" : "v5.20.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.04",
    "x_static_install" : 1

@@ -16,9 +16,12 @@ use 5.020;
 use autodie;
 use warnings;
 
+use lib 't/lib';
+
 use File::Spec;
 use IPC::Cmd qw(can_run);
 use Test::More;
+use Test::PGP qw(gpg_is_gpg1);
 
 # Check that GnuPG is available.  If so, load the module and set the plan.
 BEGIN {
@@ -37,7 +40,12 @@ local $ENV{LC_ALL} = 'fr_FR';
 
 # Locate our test data directory for later use.
 my $data = 't/data';
-$PGP::Sign::PGPPATH = File::Spec->catdir($data, 'gnupg2');
+if (gpg_is_gpg1()) {
+    $PGP::Sign::PGPSTYLE = 'GPG1';
+    $PGP::Sign::PGPPATH  = File::Spec->catdir($data, 'gnupg1');
+} else {
+    $PGP::Sign::PGPPATH = File::Spec->catdir($data, 'gnupg2');
+}
 
 # Open and load our data file.  This is the sample data that we'll be signing
 # and checking signatures against.

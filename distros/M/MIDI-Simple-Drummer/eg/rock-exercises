@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-Duration);
+use MIDI::Simple::Drummer::Rock;
+
+my $d = MIDI::Simple::Drummer::Rock->new(
+    -bpm    => shift || 100,
+    -volume => shift || 100,
+    -file   => shift || "$0.mid",
+);
+
+for my $n (1 .. 8) {
+    $d->beat(-name => '2.' . $n) for 1 .. 2;
+}
+
+$d->write();

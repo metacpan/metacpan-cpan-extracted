@@ -63,6 +63,7 @@ librhash/torrent.h
 librhash/tth.c
 librhash/tth.h
 librhash/ustd.h
+librhash/util.c
 librhash/util.h
 librhash/whirlpool.c
 librhash/whirlpool.h

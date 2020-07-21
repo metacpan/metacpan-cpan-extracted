@@ -1,5 +1,17 @@
 Revision history for Bible::OBML::Gateway
 
+1.10      2020-07-20 10:04:37-07:00 America/Los_Angeles
+        - Fix to handle UTF-8 on save() and load() operations
+
+1.09      2020-07-17 17:00:09-07:00 America/Los_Angeles
+        - Significant parsing improvements
+
+1.08      2020-07-16 13:02:30-07:00 America/Los_Angeles
+        - Additional parsing improvements
+
+1.07      2020-07-15 17:59:11-07:00 America/Los_Angeles
+        - Update parsing to match Gateway site
+
 1.06      2020-07-10 12:25:04-07:00 America/Los_Angeles
         - Fix to remove extraneous markup during parsing
 

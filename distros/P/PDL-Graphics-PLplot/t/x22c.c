@@ -90,7 +90,7 @@ circulation( void )
     plenv( xmin, xmax, ymin, ymax, 0, 0 );
     pllab( "(x)", "(y)", "#frPLplot Example 22 - circulation" );
     plcol0( 2 );
-    plvect( (PLFLT_MATRIX) u, (PLFLT_MATRIX) v, nx, ny, 0.0, pltr2, (void *) &cgrid2 );
+    plvect( (const PLFLT * const *) u, (const PLFLT * const *) v, nx, ny, 0.0, pltr2, (void *) &cgrid2 );
     plcol0( 1 );
 
     plFree2dGrid( cgrid2.xg, nx, ny );
@@ -160,7 +160,7 @@ constriction( int astyle )
     sprintf( title, "#frPLplot Example 22 - constriction (arrow style %d)", astyle );
     pllab( "(x)", "(y)", title );
     plcol0( 2 );
-    plvect( (PLFLT_MATRIX) u, (PLFLT_MATRIX) v, nx, ny, -1.0, pltr2, (void *) &cgrid2 );
+    plvect( (const PLFLT * const *) u, (const PLFLT * const *) v, nx, ny, -1.0, pltr2, (void *) &cgrid2 );
     plcol0( 1 );
 
     plFree2dGrid( cgrid2.xg, nx, ny );
@@ -248,10 +248,10 @@ constriction2( void )
     plenv( xmin, xmax, ymin, ymax, 0, 0 );
     pllab( "(x)", "(y)", "#frPLplot Example 22 - constriction with plstransform" );
     plcol0( 2 );
-    plshades( (PLFLT_MATRIX) u, nx, ny, NULL,
+    plshades( (const PLFLT * const *) u, nx, ny, NULL,
         xmin + dx / 2, xmax - dx / 2, ymin + dy / 2, ymax - dy / 2,
         clev, nc, 0.0, 1, 1.0, plfill, 0, NULL, NULL );
-    plvect( (PLFLT_MATRIX) u, (PLFLT_MATRIX) v, nx, ny,
+    plvect( (const PLFLT * const *) u, (const PLFLT * const *) v, nx, ny,
         -1.0, pltr2, (void *) &cgrid2 );
     // Plot edges using plpath (which accounts for coordinate transformation) rather than plline
     plpath( nseg, xmin, ymax, xmax, ymax );
@@ -328,7 +328,7 @@ potential( void )
     // Also put in smoothing term at small distances.
     //
 
-    rmax = (PLFLT) nr;
+    rmax = (double) nr;
 
     eps = 2.;
 
@@ -346,10 +346,10 @@ potential( void )
 
     for ( i = 0; i < nr; i++ )
     {
-        r = 0.5 + (PLFLT) i;
+        r = 0.5 + (double) i;
         for ( j = 0; j < ntheta; j++ )
         {
-            theta           = 2. * M_PI / ( ntheta - 1 ) * ( 0.5 + (PLFLT) j );
+            theta           = 2. * M_PI / ( ntheta - 1 ) * ( 0.5 + (double) j );
             x               = r * cos( theta );
             y               = r * sin( theta );
             cgrid2.xg[i][j] = x;
@@ -373,26 +373,26 @@ potential( void )
     plenv( xmin, xmax, ymin, ymax, 0, 0 );
     pllab( "(x)", "(y)", "#frPLplot Example 22 - potential gradient vector plot" );
     // Plot contours of the potential
-    dz = ( zmax - zmin ) / (PLFLT) nlevel;
+    dz = ( zmax - zmin ) / (double) nlevel;
     for ( i = 0; i < nlevel; i++ )
     {
-        clevel[i] = zmin + ( (PLFLT) i + 0.5 ) * dz;
+        clevel[i] = zmin + ( (double) i + 0.5 ) * dz;
     }
     plcol0( 3 );
     pllsty( 2 );
-    plcont( (PLFLT_MATRIX) z, nr, ntheta, 1, nr, 1, ntheta, clevel, nlevel, pltr2, (void *) &cgrid2 );
+    plcont( (const PLFLT * const *) z, nr, ntheta, 1, nr, 1, ntheta, clevel, nlevel, pltr2, (void *) &cgrid2 );
     pllsty( 1 );
     plcol0( 1 );
 
     // Plot the vectors of the gradient of the potential
     plcol0( 2 );
-    plvect( (PLFLT_MATRIX) u, (PLFLT_MATRIX) v, nr, ntheta, 25.0, pltr2, (void *) &cgrid2 );
+    plvect( (const PLFLT * const *) u, (const PLFLT * const *) v, nr, ntheta, 25.0, pltr2, (void *) &cgrid2 );
     plcol0( 1 );
 
     // Plot the perimeter of the cylinder
     for ( i = 0; i < nper; i++ )
     {
-        theta = ( 2. * M_PI / ( nper - 1 ) ) * (PLFLT) i;
+        theta = ( 2. * M_PI / ( nper - 1 ) ) * (double) i;
         px[i] = rmax * cos( theta );
         py[i] = rmax * sin( theta );
     }
@@ -406,7 +406,7 @@ potential( void )
 }
 
 int
-main( int argc, char *argv[] )
+main( int argc, const char *argv[] )
 {
     PLINT narr, fill;
 

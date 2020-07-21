@@ -260,19 +260,23 @@ Aliases: I<abbreviations>
 
 =cut
 
-=head2 accumulate
+=head2 acc
 
-Array.accumulate() -> I<Obj>
+Array.acc() -> I<Obj>
 
 Return the
+
+Aliases: I<accumulate>
 
 =cut
 
-=head2 accumulate_by
+=head2 acc_by
 
-Array.accumulate_by() -> I<Obj>
+Array.acc_by() -> I<Obj>
 
 Return the
+
+Aliases: I<accumulate_by>
 
 =cut
 
@@ -670,6 +674,16 @@ Return the
 
 =cut
 
+=head2 diffs
+
+Array.diffs() -> I<Obj>
+
+Return the
+
+Aliases: I<differences>, I<nth_differences>
+
+=cut
+
 =head2 dig
 
 Array.dig() -> I<Obj>
@@ -683,6 +697,8 @@ Return the
 Array.digits2num() -> I<Obj>
 
 Return the
+
+Aliases: I<from_digits>
 
 =cut
 

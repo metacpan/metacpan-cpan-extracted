@@ -35,7 +35,7 @@ t/public/images/comment.png
 t/source/edith.jpg
 t/source/many_wms.html
 t/source/many_wms_minus_one.html
-t/source/no_content.html
+t/source/no_entry.html
 t/templates/facepile.html.ep
 t/templates/mention_list.html.ep
 t/templates/responses.html.ep

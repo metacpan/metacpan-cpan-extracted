@@ -86,6 +86,7 @@ use constant {
         '中華日報',
         '中華新聞雲',
         '中視新聞',
+        '日經中文網',
     ],
 
     CATEGORY_NAMES => [

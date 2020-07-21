@@ -2,47 +2,67 @@
 
 =head1 NAME
 
-File::AddInc - FindBin(+ use lib) alike for *.pm modulino (instead of *.pl)
+File::AddInc - a reliable shorthand of C<use lib dirname($FindBin::Bin)> for Modulino
 
 =head1 SYNOPSIS
 
-In file F<MyApp/Deep/Runnable/Module.pm>:
+Assume you have a Modulino at F<$DIR/lib/MyApp.pm>,
+and you want to use F<$DIR/lib/MyApp/Util.pm> from it. Then:
 
     #!/usr/bin/env perl
-    package MyApp::Deep::Runnable::Module;
+    package MyApp;
 
-    # use MyApp::Util; # This may fail because @INC can be wrong in many ways.
-
-    # So, use this to modify @INC.
+    # This manipulates @INC for you!
     use File::AddInc;
 
-    # Then perl can find MyApp/Util.pm correctly.
+    # So perl can find MyApp/Util.pm from the same module tree correctly.
     use MyApp::Util;
 
     ...
 
 
-Suppose you have a module like above
-and want to make it runnable and symlink it from your F<~/bin>
-(Yes, I'm sane;-).
-In the module, you want to use some other module (F<MyApp/Util.pm>)
-in the same library tree.
-File::AddInc will locate your lib directory and modify @INC for you.
-
+You can use C<File::AddInc> to add F<$DIR/lib> to C<@INC>.
 
 =head1 DESCRIPTION
 
-File::AddInc is a C<@INC> tuner for
-L<Modulino|http://www.drdobbs.com/scripts-as-modules/184416165>.
+File::AddInc manipulates C<@INC> for Modulino (a module which is also runnable as a command). If you don't know much about the usefulness of Modulino, See these fine articles
+L<[1]|http://www.drdobbs.com/scripts-as-modules/184416165> L<[2]|https://perlmaven.com/modulino-both-script-and-module>.
 
-=for comment
-# L<Runnable Module|MOP4Import::intro_runnable_module> (or
+Unfortunately, there is an annoying complexity to write Modulino: C<@INC> manipulation.
+Generally, it is responsible for top-level scripts (F<*.pl>, F<*.psgi>)
+to manipulate C<@INC> to be able to load all modules correctly.
+But in programming with Modulino, the Modulino itself is the top-level.
+To run such Modulino, you must give C<-Mlib> to perl like below:
 
-It does similar task of L<FindBin> + L<lib>, but for Modules (F<*.pm>)
-instead of standalone scripts (F<*.pl>).
+   perl -Mlib=$PWD ModX.pm ...
 
-Conceptually, this module locates root of F<lib> directory
-through following steps.
+Above is disappointingly long, especially for Perl newbies.
+Instead, imagine if it can be called as a command file like F<./ModX.pm>, like the following:
+
+  ./ModX.pm ...
+
+With the above, they can use shell's filename completion and can run
+it less than a second. To achieve above, you usually need to add
+following C<BEGIN {}> block to every Modulinos. (Note. You may want to
+name your Modulino like C<ModX::SomeCategory::SomeFunc>):
+
+  package ModX;
+  ...
+  BEGIN {
+    my ($pack) = __PACKAGE__;
+    my $libdir = $FindBin::RealBin;
+    my $depth = (split "::", $pack) - 1;
+    $libdir = dirname($libdir) while --$depth >= 0;
+    require lib;
+    lib->import($libdir);
+  }
+
+With File::AddInc, you can replace the above block with one line:
+
+  use File::AddInc;
+
+Conceptually, this module locates the root of F<lib> directory
+through the following steps.
 
 =over 4
 
@@ -62,10 +82,149 @@ Trim C<__PACKAGE__> part from it.
 
 Then adds it to C<@INC>.
 
+Also, File::AddInc can be used to find the library's root directory reliably.
+FindBin is enough to manipulate C<@INC> but not work well to locate
+something other than C<use>-ed Perl modules.
+For example, assume you have a Modulino F<$DIR/lib/ModY.pm>,
+and it uses some assets under F<$DIR/assets>.
+You may write C<ModY> with C<FindBin> like following:
+
+  package ModY;
+  ...
+  use lib (my $app_dir = dirname(FindBin::RealBin));
+
+  our $assets_dir = "$app_dir/assets";
+
+
+Unfortunately, the above code doesn't work as expected, because
+FindBin relies on C<$0> and varies what top-level program uses this C<ModY>.
+In such a case, we should use C<__FILE__> instead of C<$0>.
+
+  package ModY;
+  ...
+  use lib (my $app_dir = dirname(File::Spec->rel2abs(__FILE__)));
+
+  our $assets_dir = "$app_dir/assets";
+
+Unfortunately again, this won't work if F<ModY.pm> is symlinked to somewhere.
+With File::AddInc, you can rewrite it and can handle symlinks correctly:
+
+
+  package ModY;
+  ...
+  use File::AddInc;
+  my $app_dir = dirname(File::AddInc->libdir);
+
+  our $assets_dir = "$app_dir/assets";
+
+=head1 SUB-PRAGMAS
+
+If you give some arguments to this module, it will treat them as I<subpragma>s.
+This module invokes corresponding class methods for each subpragmas
+as the specified order. You can specify any number of subpragmas.
+If you give no subpragmas, a subpragma C<-file_inc> is assumed.
+There are three forms of subpragmas in this module. That is
+C<-PRAGMA>, C<< [PRAGMA => @ARGS] >> and C<< qw($var) >>.
+
+For example, following code:
+
+  use File::AddInc -file_inc
+   , [libdir_var => qw($libdir)]
+   , qw($libdir2);
+
+is a shorthand of below:
+
+  BEGIN {
+    require File::AddInc;
+
+    my $opts = File::AddInc->Opts->new(caller => [caller]);
+
+    File::AddInc->declare_file_inc($opts);
+
+    File::AddInc->declare_libdir_var($opts, qw($libdir));
+
+    File::AddInc->declare_libdir_var($opts, qw($libdir2));
+  }
+
+=head2 C<-file_inc>
+
+This finds libdir from caller and add it to C<@INC> by L</add_inc_if_necessary>.
+This is the default behavior of this module. In other words,
+
+  use File::AddInc;
+
+is a shorthand form of below:
+
+  use File::AddInc -file_inc;
+
+=head2 C<-local_lib>
+
+This also adds F<$DIR/local/lib/perl5> to C<@INC> (assumes your module is under F<$DIR/lib>). This subpragma is now implemented in L</these_libdirs> subpragma.
+In other words,
+
+  use File::AddInc -local_lib;
+
+is a shorthand form of below:
+
+  use File::AddInc [these_libdirs => '', [dirname => "local/lib/perl5"]];
+
+=head2 C<< qw($var) >>
+X<$var>
+
+This finds libdir from caller and set it to given scalar variable.
+This subpragma is now implemented in L</libdir_var> subpragma.
+In other words,
+
+  use File::AddInc qw($foo);
+
+is a shorthand form of below:
+
+  use File::AddInc [libdir_var => qw($foo)];
+
+
+=head2 C<< [libdir_var => qw($libdir)] >>
+X<libdir_var>
+
+This finds libdir from caller and set it to given scalar variable.
+
+  use File::AddInc [libdir_var => qw($foo)];
+
+is an equivalent of the folloing:
+
+  use File::AddInc ();
+  our $foo; BEGIN { $foo = File::AddInc->libdir };
+
+
+=head2 C<< [these_libdirs => @dirSpec] >>
+X<these_libdirs>
+
+This finds libdir from caller, generate a list of directories from given C<@dirSpec> and prepend them to C<@INC> by L</add_inc_if_necessary>.
+
+For example, following code:
+
+  use File::AddInc [these_libdirs => 'etc', '', [dirname => "local/lib/perl5"]];
+
+adds C<$libdir/etc>, C<$libdir> and C<dirname($libdir)."/local/lib/perl5")> to C<@INC>.
+
+Each item of C<@dirSpec> can be one of following two forms:
+
+
+=over 4
+
+=item * STRING
+
+In this case, C<$libdir."/STRING"> will be added.
+
+=item * [dirname => STRING]
+X<these_libdirs/dirname>
+
+In this case, C<dirname($libdir)."/STRING"> will be added.
+
+=back
 
 =head1 CLASS METHODS
 
-=head2 C<libdir($PACKNAME, $FILEPATH)>
+=head2 C<< ->libdir($PACKNAME, $FILEPATH) >>
 X<libdir>
 
 Trims C<$PACKNAME> portion from C<$FILEPATH>.
@@ -78,6 +237,38 @@ When arguments are omitted, results from L<caller()|perlfunc/caller> is used.
 
   my $libdir = File::AddInc->libdir;
 
+=head2 C<< ->add_inc_if_necessary(@libdir) >>
+X<add_inc_if_necessary>
+
+This method prepends C<@libdir> to C<@INC> unless it is already listed in there.
+Note: this comparison is done through exact match.
+
+=head1 MISC
+
+=head2 How to inherit and extend
+
+You can inherit this module to implement custom C<@INC> modifier.
+For example, you can write your own exporter to invoke
+C<declare_these_libdirs> to give traditional pragma usage like following:
+
+  use MyExporter 'etc', '', 'perl5';
+
+Such F<MyExporter.pm> could be written like folloing:
+
+  package MyExporter;
+  use strict;
+  use warnings;
+  use parent qw/File::AddInc/;
+  
+  sub import {
+    my ($pack, @args) = @_;
+  
+    my $opts = $pack->Opts->new(caller => [caller]);
+  
+    $pack->declare_these_libdirs($opts, @args);
+  }
+  
+  1;
 
 =head2 Note for MOP4Import users
 
@@ -95,8 +286,8 @@ Then you can use C<-file_inc> pragma like following:
 
 =head1 CAVEATS
 
-Since this module compares C<__FILE__> with C<__PACKAGE__> in case
-sensitive manner, it may not work well with modules which relies case
+Since this module compares C<__FILE__> with C<__PACKAGE__> in a case
+sensitive manner, it may not work well with modules which rely on case
 insensitive filesystems.
 
 =head1 SEE ALSO

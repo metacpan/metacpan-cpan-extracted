@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: mb
-version: 0.05
+version: 0.06
 abstract: run Perl script written in MBCS
 author:
   - ina <ina@cpan.org>

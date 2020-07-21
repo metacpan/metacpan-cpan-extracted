@@ -1139,30 +1139,14 @@ package Sidef::Types::Array::Array {
         Sidef::Types::Number::Number::all_composite(@$self);
     }
 
-    sub digits2num {    # Algorithm from "Modern Computer Arithmetic" by Richard P. Brent and Paul Zimmermann
+    sub digits2num {
         my ($self, $base) = @_;
-
         state $ten = Sidef::Types::Number::Number->_set_uint(10);
         $base //= $ten;
-
-        my @L = @$self;
-        my ($B, $k) = ($base, scalar(@L));
-
-        while ($k > 1) {
-
-            my @T;
-            for (0 .. ($k >> 1) - 1) {
-                CORE::push(@T, $L[2 * $_]->add($B->mul($L[2 * $_ + 1])));
-            }
-
-            CORE::push(@T, $L[-1]) if ($k & 1);
-            @L = @T;
-            $B = $B->mul($B);
-            $k = ($k >> 1) + ($k & 1);
-        }
-
-        $L[0] // Sidef::Types::Number::Number::ZERO;
+        Sidef::Types::Number::Number::digits2num($base, $self);
     }
+
+    *from_digits = \&digits2num;
 
     sub cfrac2num {
         my ($self) = @_;
@@ -2266,6 +2250,8 @@ package Sidef::Types::Array::Array {
         bless \@acc, ref($self);
     }
 
+    *acc_by = \&accumulate_by;
+
     sub accumulate {
         my ($self, $block) = @_;
 
@@ -2287,6 +2273,30 @@ package Sidef::Types::Array::Array {
 
         bless \@acc, ref($self);
     }
+
+    *acc = \&accumulate;
+
+    sub differences {
+        my ($self, $n) = @_;
+
+        if (defined($n)) {
+            $n = CORE::int($n);
+        }
+        else {
+            $n = 1;
+        }
+
+        state $block = Sidef::Types::Block::Block->new(code => sub { $_[1]->sub($_[0]) });
+
+        foreach my $i (1 .. $n) {
+            $self = $self->map_cons(2, $block);
+        }
+
+        $self;
+    }
+
+    *diffs           = \&differences;
+    *nth_differences = \&differences;
 
     sub reduce {
         my ($self, $obj, $initial) = @_;

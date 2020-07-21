@@ -1,0 +1,21 @@
+<%INIT>
+my $errors_ref = RT::Extension::MandatoryOnTransition->CheckMandatoryFields(
+    ARGSRef => $ARGSRef,
+    Ticket  => $TicketObj,
+    To      => $ARGSRef->{'Status'},
+);
+
+if (@$errors_ref) {
+    RT->Logger->debug("Preventing update because of missing mandatory fields");
+    $$SkipProcessing = 1;
+    push @$ActionsRef, @$errors_ref;
+}
+
+</%INIT>
+
+<%ARGS>
+$ARGSRef
+$TicketObj
+$ActionsRef
+$SkipProcessing
+</%ARGS>

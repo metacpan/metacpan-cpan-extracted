@@ -1,5 +1,8 @@
 Revision history for With-Roles
 
+0.001002 - 2020-07-14
+  - fix warnings being emitted when using with::roles at compile time
+
 0.001001 - 2020-06-14
   - fix MRO of generated classes not matching original class
   - minor documentation adjustments

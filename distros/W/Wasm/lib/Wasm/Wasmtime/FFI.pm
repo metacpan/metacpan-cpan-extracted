@@ -12,16 +12,18 @@ use Devel::GlobalDestruction ();
 use base qw( Exporter );
 
 # ABSTRACT: Private class for Wasm::Wasmtime
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy );
 
 sub _lib
 {
-  my $lib = find_lib lib => 'wasmtime';
+  my $lib = find_lib lib => 'wasmtime', symbol => ['wasmtime_func_as_funcref'];
   return $lib if $lib;
-  return find_lib lib => 'wasmtime', alien => 'Alien::wasmtime';
+  $lib = find_lib lib => 'wasmtime', alien => 'Alien::wasmtime', symbol => ['wasmtime_func_as_funcref'];
+  return $lib if $lib;
+  die 'unable to find wasmtime 0.19.0 or better';
 }
 
 our $ffi_prefix = 'wasm_';
@@ -261,7 +263,7 @@ Wasm::Wasmtime::FFI - Private class for Wasm::Wasmtime
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 

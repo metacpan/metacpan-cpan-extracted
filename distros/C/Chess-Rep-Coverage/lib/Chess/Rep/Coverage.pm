@@ -10,14 +10,14 @@ use parent 'Chess::Rep';
 
 use constant SIZE => 7;
 
-our $VERSION = '0.1102';
+our $VERSION = '0.1103';
 
 
 sub coverage {
     my $self = shift;
 
     # Get the state of the board
-    my $fen = $self->get_fen();
+    my $fen = $self->get_fen;
 
     # Bucket of piece coverages to return
     my $cover = {};
@@ -212,7 +212,7 @@ sub board {
     my %args = @_;
 
     # Compute coverage if has not been done yet.
-    $self->coverage() unless $self->_cover();
+    $self->coverage unless $self->_cover;
 
     # Start rendering the board.
     my $board = _ascii_board('header');
@@ -228,24 +228,24 @@ sub board {
             $board .= _ascii_board('new_cell');
 
             # Inspect the coverage at the column and row position.
-            if ($self->_cover()->{$col . $row}) {
-                if (exists $self->_cover()->{$col . $row}->{is_protected_by} and
-                    exists $self->_cover()->{$col . $row}->{is_threatened_by}
+            if ($self->_cover->{$col . $row}) {
+                if (exists $self->_cover->{$col . $row}->{is_protected_by} and
+                    exists $self->_cover->{$col . $row}->{is_threatened_by}
                 ) {
                     # Show threat and protection status.
-                    my $protects = $self->_cover()->{$col . $row}->{is_protected_by};
-                    my $threats  = $self->_cover()->{$col . $row}->{is_threatened_by};
+                    my $protects = $self->_cover->{$col . $row}->{is_protected_by};
+                    my $threats  = $self->_cover->{$col . $row}->{is_threatened_by};
                     $board .= @$protects . '/' . @$threats;
-#                    $board .= $self->_cover()->{$col . $row}->{occupant};
+#                    $board .= $self->_cover->{$col . $row}->{occupant};
                 }
-                elsif (exists $self->_cover()->{$col . $row}->{white_can_move_here} and
-                       exists $self->_cover()->{$col . $row}->{black_can_move_here}
+                elsif (exists $self->_cover->{$col . $row}->{white_can_move_here} and
+                       exists $self->_cover->{$col . $row}->{black_can_move_here}
                 ) {
                     # Show player movement status.
-                    my $whites = $self->_cover()->{$col . $row}->{white_can_move_here};
-                    my $blacks = $self->_cover()->{$col . $row}->{black_can_move_here};
+                    my $whites = $self->_cover->{$col . $row}->{white_can_move_here};
+                    my $blacks = $self->_cover->{$col . $row}->{black_can_move_here};
                     $board .= @$whites . ':' . @$blacks;
-#                    $board .= $self->_cover()->{$col . $row}->{occupant};
+#                    $board .= $self->_cover->{$col . $row}->{occupant};
                 }
             }
             else {
@@ -427,18 +427,18 @@ Chess::Rep::Coverage - Expose chess ply potential energy
 
 =head1 VERSION
 
-version 0.1102
+version 0.1103
 
 =head1 SYNOPSIS
 
   use Chess::Rep::Coverage;
 
-  my $g = Chess::Rep::Coverage->new();
-  print $g->board();
+  my $g = Chess::Rep::Coverage->new;
+  print $g->board;
 
   $g->set_from_fen('8/8/8/3pr3/4P3/8/8/8 w ---- - 0 1');
-  $g->coverage(); # Recalculate board status
-  print $g->board();
+  $g->coverage; # Recalculate board status
+  print $g->board;
 
 =head1 DESCRIPTION
 
@@ -448,13 +448,13 @@ or protection status.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
 Return a new C<Chess::Coverage> object.
 
-=head2 coverage()
+=head2 coverage
 
-  $c = $g->coverage();
+  $c = $g->coverage;
 
 Set the B<cover> attribute and return a data structure, keyed on board position,
 showing:
@@ -470,9 +470,9 @@ showing:
   white_can_move_here => List of white piece positions that can move to this position
   black_can_move_here => List of black piece positions that can move to this position
 
-=head2 board()
+=head2 board
 
-  print $g->board();
+  print $g->board;
 
 Return an ASCII board layout with threats, protections and move statuses.
 
@@ -505,7 +505,7 @@ white pawn at E4; 2) the white pawn at E4 can capture the pawn at D5 but cannot
 move; 3) the black rook at E5 protects the black pawn at D5, can capture the
 white pawn at E4 and can move to F5 through H5 or E6 through E8.
 
-=head2 move_probability()
+=head2 move_probability
 
   @piece_moves = move_probability(%arguments);
 
@@ -525,7 +525,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

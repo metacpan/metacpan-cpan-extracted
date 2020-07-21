@@ -2,7 +2,6 @@ Changes
 etc/chart_callback.patch
 etc/subscription_callbacks.patch
 etc/tabs_privileged_callback.patch
-etc/tabs_privileged_callback_44.patch
 html/Callbacks/RT-Extension-ExcelFeed/Dashboards/Subscription.html/MassageSubscriptionFields
 html/Callbacks/RT-Extension-ExcelFeed/Dashboards/Subscription.html/SubscriptionFields
 html/Callbacks/RT-Extension-ExcelFeed/Dashboards/Subscription.html/SubscriptionFormEnd

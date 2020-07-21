@@ -27,13 +27,13 @@ no_index:
 provides:
   Termbox:
     file: lib/Termbox.pm
-    version: '0.10'
+    version: '0.11'
   Termbox::Cell:
     file: lib/Termbox/Cell.pm
-    version: '0.10'
+    version: '0.11'
   Termbox::Event:
     file: lib/Termbox/Event.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   FFI::Platypus: '0'
   FFI::Platypus::Lang::CPP: '0'
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/sanko/Termbox.pm/issues
   homepage: https://github.com/sanko/Termbox.pm
   repository: git://github.com/sanko/Termbox.pm.git
-version: '0.10'
+version: '0.11'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

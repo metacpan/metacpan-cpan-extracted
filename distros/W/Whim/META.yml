@@ -1,5 +1,5 @@
 ---
-abstract: 'A webmention multitool'
+abstract: 'A L<Webmention|https://jmac.org/webmention/> multitool'
 author:
   - 'Jason McIntosh <jmac@jmac.org>'
 build_requires: {}
@@ -25,7 +25,7 @@ no_index:
 provides:
   Whim:
     file: lib/Whim.pm
-    version: v1.2020.7.12.0
+    version: v1.2020.7.19.1
   Whim::Command::listen:
     file: lib/Whim/Command/listen.pm
   Whim::Command::query:
@@ -69,9 +69,10 @@ resources:
   bugtracker: https://github.com/jmacdotorg/whim/issues
   homepage: https://github.com/jmacdotorg/whim
   repository: git://github.com/jmacdotorg/whim.git
-version: 1.2020.07.12.0
+version: 1.2020.07.19.1
 x_authority: cpan:JMAC
 x_contributors:
   - 'Brian Wisti <brianwisti@pobox.com>'
+  - 'Yanick Champoux <yanick@babyl.ca>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

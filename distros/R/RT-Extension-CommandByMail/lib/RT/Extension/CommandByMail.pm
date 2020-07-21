@@ -11,7 +11,7 @@ our @LINK_ATTRIBUTES    = qw(MemberOf Parents Members Children
             HasMember RefersTo ReferredToBy DependsOn DependedOnBy);
 our @WATCHER_ATTRIBUTES = qw(Requestor Cc AdminCc);
 
-our $VERSION = '3.00';
+our $VERSION = '3.01';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ RT::Extension::CommandByMail - Change ticket metadata via email
 
 =head1 RT VERSION
 
-Works with RT 4.0, 4.2, 4.4
+Works with RT 4.0, 4.2, 4.4, 5.0
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ C<$CommandByMailErrorOnUnknown> under "Configuration" for more information.
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -979,7 +979,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014 by Best Practical Solutions
+This software is Copyright (c) 2014-2020 by Best Practical Solutions
 
 This is free software, licensed under:
 

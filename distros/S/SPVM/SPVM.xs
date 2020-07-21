@@ -111,6 +111,22 @@ DESTROY(...)
 MODULE = SPVM::Builder		PACKAGE = SPVM::Builder
 
 SV*
+create_compiler(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+
+  SPVM_COMPILER* compiler = SPVM_COMPILER_new();
+  size_t iv_compiler = PTR2IV(compiler);
+  SV* sviv_compiler = sv_2mortal(newSViv(iv_compiler));
+  SV* sv_compiler = sv_2mortal(newRV_inc(sviv_compiler));
+  (void)hv_store(hv_self, "compiler", strlen("compiler"), SvREFCNT_inc(sv_compiler), 0);
+}
+
+SV*
 compile_spvm(...)
   PPCODE:
 {
@@ -122,20 +138,10 @@ compile_spvm(...)
   SV* sv_line = ST(3);
   
   HV* hv_self = (HV*)SvRV(sv_self);
-  
-  SPVM_COMPILER* compiler;
+
   SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
   SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
-  if (SvOK(sv_compiler)) {
-    compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
-  }
-  else {
-    compiler = SPVM_COMPILER_new();
-    size_t iv_compiler = PTR2IV(compiler);
-    SV* sviv_compiler = sv_2mortal(newSViv(iv_compiler));
-    SV* sv_compiler = sv_2mortal(newRV_inc(sviv_compiler));
-    (void)hv_store(hv_self, "compiler", strlen("compiler"), SvREFCNT_inc(sv_compiler), 0);
-  }
+  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   
   // Name
   const char* name = SvPV_nolen(sv_name);
@@ -180,17 +186,6 @@ compile_spvm(...)
   }
   else {
     sv_compile_success = sv_2mortal(newSViv(1));
-  }
-  
-  if (compiler->error_count == 0) {
-    // Create env
-    SPVM_ENV* env = SPVM_API_create_env(compiler);
-    
-    // Set ENV
-    size_t iv_env = PTR2IV(env);
-    SV* sviv_env = sv_2mortal(newSViv(iv_env));
-    SV* sv_env = sv_2mortal(newRV_inc(sviv_env));
-    (void)hv_store(hv_self, "env", strlen("env"), SvREFCNT_inc(sv_env), 0);
   }
   
   XPUSHs(sv_compile_success);
@@ -397,18 +392,29 @@ get_module_file(...)
 }
 
 SV*
-call_begin_blocks(...)
+_init(...)
   PPCODE:
 {
   (void)RETVAL;
   
   SV* sv_self = ST(0);
   HV* hv_self = (HV*)SvRV(sv_self);
+
+  SV** sv_compiler_ptr = hv_fetch(hv_self, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  SPVM_COMPILER* compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  // Create env
+  SPVM_ENV* env = SPVM_API_create_env(compiler);
+  if (env == NULL) {
+    croak("Can't create SPVM env");
+  }
   
-  // Env
-  SV** sv_env_ptr = hv_fetch(hv_self, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  // Set ENV
+  size_t iv_env = PTR2IV(env);
+  SV* sviv_env = sv_2mortal(newSViv(iv_env));
+  SV* sv_env = sv_2mortal(newRV_inc(sviv_env));
+  (void)hv_store(hv_self, "env", strlen("env"), SvREFCNT_inc(sv_env), 0);
   
   SPVM_API_call_begin_blocks(env);
 }
@@ -435,51 +441,6 @@ DESTROY(...)
 MODULE = SPVM::Builder::CC		PACKAGE = SPVM::Builder::CC
 
 SV*
-bind_sub_native(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_self = ST(0);
-  HV* hv_self = (HV*)SvRV(sv_self);
-  SV* sv_package_name = ST(1);
-  SV* sv_sub_name = ST(2);
-  SV* sv_native_address = ST(3);
-
-  // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
-  SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
-  HV* hv_build = (HV*)SvRV(sv_build);
-  SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  // Runtime
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
-
-  // Package name
-  const char* package_name = SvPV_nolen(sv_package_name);
-
-  // Subroutine name
-  const char* sub_name = SvPV_nolen(sv_sub_name);
-  
-  // Native address
-  void* native_address = INT2PTR(void*, SvIV(sv_native_address));
-  
-  // Basic type
-  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
-  
-  // Package name
-  SPVM_PACKAGE* package = basic_type->package;
-  
-  // Set native address to subroutine
-  SPVM_SUB* sub = SPVM_API_sub(env, package, sub_name);
-  sub->native_address = native_address;
-  
-  XSRETURN(0);
-}
-
-SV*
 build_package_csource_precompile(...)
   PPCODE:
 {
@@ -489,29 +450,20 @@ build_package_csource_precompile(...)
   const char* package_name = SvPV_nolen(sv_package_name);
   
   // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
-  SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
-  HV* hv_build = (HV*)SvRV(sv_build);
-  SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
-  
-  // Runtime
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
-  
-  // Basic type
-  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
-  
-  // Package name
-  SPVM_PACKAGE* package = basic_type->package;
+  SV** sv_builder_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
+  SV* sv_builder = sv_builder_ptr ? *sv_builder_ptr : &PL_sv_undef;
+  HV* hv_builder = (HV*)SvRV(sv_builder);
 
-  int32_t package_id = package->id;
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_builder, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
   
   // String buffer for csource
   SPVM_STRING_BUFFER* string_buffer = SPVM_STRING_BUFFER_new(0);
-  
+
   // Build package csource
-  SPVM_CSOURCE_BUILDER_PRECOMPILE_build_package_csource(env, string_buffer, package_name);
+  SPVM_CSOURCE_BUILDER_PRECOMPILE_build_package_csource(compiler, string_buffer, package_name);
   
   SV* sv_package_csource = sv_2mortal(newSVpv(string_buffer->buffer + 1, string_buffer->length - 1));
   
@@ -535,17 +487,16 @@ bind_sub_precompile(...)
   
   void* sub_precompile_address = INT2PTR(void*, SvIV(sv_precompile_address));
   
-  // Env
-  SV** sv_build_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
-  SV* sv_build = sv_build_ptr ? *sv_build_ptr : &PL_sv_undef;
-  HV* hv_build = (HV*)SvRV(sv_build);
-  SV** sv_env_ptr = hv_fetch(hv_build, "env", strlen("env"), 0);
-  SV* sv_env = sv_env_ptr ? *sv_env_ptr : &PL_sv_undef;
-  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  // Builder
+  SV** sv_builder_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
+  SV* sv_builder = sv_builder_ptr ? *sv_builder_ptr : &PL_sv_undef;
+  HV* hv_builder = (HV*)SvRV(sv_builder);
   
-  // Runtime
-  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
-
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_builder, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+  
   // Package name
   const char* package_name = SvPV_nolen(sv_package_name);
 
@@ -553,13 +504,57 @@ bind_sub_precompile(...)
   const char* sub_name = SvPV_nolen(sv_sub_name);
   
   // Basic type
-  SPVM_BASIC_TYPE* basic_type = SPVM_API_basic_type(env, package_name);
+  SPVM_BASIC_TYPE* basic_type = SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
   
   // Package name
   SPVM_PACKAGE* package = basic_type->package;
 
-  SPVM_SUB* sub = SPVM_API_sub(env, package, sub_name);
+  SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
   sub->precompile_address = sub_precompile_address;
+  
+  XSRETURN(0);
+}
+
+SV*
+bind_sub_native(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_self = ST(0);
+  HV* hv_self = (HV*)SvRV(sv_self);
+  SV* sv_package_name = ST(1);
+  SV* sv_sub_name = ST(2);
+  SV* sv_native_address = ST(3);
+
+  // Env
+  SV** sv_builder_ptr = hv_fetch(hv_self, "builder", strlen("builder"), 0);
+  SV* sv_builder = sv_builder_ptr ? *sv_builder_ptr : &PL_sv_undef;
+  HV* hv_builder = (HV*)SvRV(sv_builder);
+  
+  SPVM_COMPILER* compiler;
+  SV** sv_compiler_ptr = hv_fetch(hv_builder, "compiler", strlen("compiler"), 0);
+  SV* sv_compiler = sv_compiler_ptr ? *sv_compiler_ptr : &PL_sv_undef;
+  compiler = INT2PTR(SPVM_COMPILER*, SvIV(SvRV(sv_compiler)));
+
+  // Package name
+  const char* package_name = SvPV_nolen(sv_package_name);
+
+  // Subroutine name
+  const char* sub_name = SvPV_nolen(sv_sub_name);
+  
+  // Native address
+  void* native_address = INT2PTR(void*, SvIV(sv_native_address));
+  
+  // Basic type
+  SPVM_BASIC_TYPE* basic_type = (SPVM_BASIC_TYPE*)SPVM_HASH_fetch(compiler->basic_type_symtable, package_name, strlen(package_name));
+  
+  // Package name
+  SPVM_PACKAGE* package = basic_type->package;
+  
+  // Set native address to subroutine
+  SPVM_SUB* sub = SPVM_HASH_fetch(package->sub_symtable, sub_name, strlen(sub_name));
+  sub->native_address = native_address;
   
   XSRETURN(0);
 }
@@ -769,13 +764,10 @@ new_int_array(...)
     env->inc_ref_count(env, array);
     
     int32_t* elems = env->get_elems_int(env, array);
-    {
-      int32_t i;
-      for (i = 0; i < length; i++) {
-        SV** sv_value_ptr = av_fetch(av_elems, i, 0);
-        SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
-        elems[i] = (int32_t)SvIV(sv_value);
-      }
+    for (int32_t i = 0; i < length; i++) {
+      SV** sv_value_ptr = av_fetch(av_elems, i, 0);
+      SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+      elems[i] = (int32_t)SvIV(sv_value);
     }
     
     // New sv array
@@ -3400,6 +3392,38 @@ to_bin(...)
   }
   
   XPUSHs(sv_bin);
+  XSRETURN(1);
+}
+
+SV*
+get_length(...)
+  PPCODE:
+{
+  (void)RETVAL;
+  
+  SV* sv_env = ST(0);
+  SV* sv_array = ST(1);
+  
+  // Env
+  SPVM_ENV* env = INT2PTR(SPVM_ENV*, SvIV(SvRV(sv_env)));
+  
+  // Runtime
+  SPVM_COMPILER* compiler = (SPVM_COMPILER*)env->compiler;
+
+  // Array must be SPVM::BlessedObject::Array or SPVM::BlessedObject::Array
+  if (!(SvROK(sv_array) && sv_derived_from(sv_array, "SPVM::BlessedObject::Array"))) {
+    croak("Array must be SPVM::BlessedObject::Array object at %s line %d\n", MFILE, __LINE__);
+  }
+  
+  // Get object
+  SPVM_OBJECT* array = SPVM_XS_UTIL_get_object(sv_array);
+  
+  int32_t length = env->length(env, array);
+
+
+  SV* sv_length = sv_2mortal(newSViv(length));
+  
+  XPUSHs(sv_length);
   XSRETURN(1);
 }
 

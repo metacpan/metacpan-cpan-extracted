@@ -85,7 +85,7 @@ checkdigits - check or generate check digits
 
 =head1 VERSION
 
-This document describes checkdigits v1.3.2
+This document describes checkdigits v1.3.3
 
 =head1 SYNOPSIS
 

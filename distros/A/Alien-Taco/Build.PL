@@ -16,6 +16,9 @@ my $class = Module::Build->subclass(
         sub ACTION_tipython {
             shift->run_taco_tests(<ti-python/*.t>);
         }
+        sub ACTION_tijava {
+            shift->run_taco_tests(<ti-java/*.t>);
+        }
         sub run_taco_tests {
             my $self = shift;
             $self->depends_on('code');
@@ -34,7 +37,7 @@ my $build = $class->new(
     module_name => 'Alien::Taco',
     dist_abstract => 'Taco Perl module',
     dist_author => 'Graham Bell <graham.s.bell@gmail.com>',
-    license => 'gpl',
+    license => 'gpl3',
     requires => {
         'JSON' => 0,
     },

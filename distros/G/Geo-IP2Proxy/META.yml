@@ -1,7 +1,6 @@
 # http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Geo-IP2Proxy
-version:      3.00
+version:      3.10
 version_from: lib/Geo/IP2Proxy.pm
 installdirs:  site
 requires:

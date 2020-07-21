@@ -57,8 +57,6 @@ void SPVM_API_call_begin_blocks(SPVM_ENV* env);
 int32_t SPVM_API_is_type(SPVM_ENV* env, SPVM_OBJECT* object, int32_t basic_type_id, int32_t type_dimension);
 int32_t SPVM_API_has_callback(SPVM_ENV* env, SPVM_OBJECT* object, int32_t callback_basic_type_id);
 
-int32_t SPVM_API_call_entry_point_sub(SPVM_ENV* env, const char* package_name, int32_t argc, const char *argv[]);
-
 SPVM_SUB* SPVM_API_sub(SPVM_ENV* env, SPVM_PACKAGE* package, const char* sub_name);
 
 SPVM_BASIC_TYPE* SPVM_API_basic_type(SPVM_ENV* env,  const char* basic_type_name);
@@ -165,7 +163,7 @@ void SPVM_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object);
 int32_t SPVM_API_ref_count(SPVM_ENV* env, SPVM_OBJECT* object);
 
 // Weak refernece
-void SPVM_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address);
+int32_t SPVM_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address);
 void SPVM_API_unweaken(SPVM_ENV* env, SPVM_OBJECT** object_address);
 int32_t SPVM_API_isweak(SPVM_ENV* env, SPVM_OBJECT** object_address);
 
@@ -175,7 +173,7 @@ int32_t SPVM_API_memory_blocks_count(SPVM_ENV* env);
 
 // Scope
 int32_t SPVM_API_enter_scope(SPVM_ENV* env);
-void SPVM_API_push_mortal(SPVM_ENV* env, SPVM_OBJECT* object);
+int32_t SPVM_API_push_mortal(SPVM_ENV* env, SPVM_OBJECT* object);
 void SPVM_API_leave_scope(SPVM_ENV* env, int32_t original_mortal_stack_top);
 
 // Call subroutine

@@ -1,17 +1,20 @@
 /* Tooltips */
-table.rtxcalendar .tooltip {
+table.rtxcalendar .day {
     position: relative;
     z-index: 1;
 }
-table.rtxcalendar .tooltip:hover {
+
+
+
+table.rtxcalendar .day:hover {
     z-index: 5;
     color:#000;
 }
-table.rtxcalendar .tooltip span.tip {
+table.rtxcalendar .day span.tip {
     display: none;
     text-align: left;
 }
-table.rtxcalendar div.tooltip:hover span.tip{
+table.rtxcalendar div.day:hover span.tip{
     display: block;
     position: absolute;
     top:12px; left:24px; width:350px;

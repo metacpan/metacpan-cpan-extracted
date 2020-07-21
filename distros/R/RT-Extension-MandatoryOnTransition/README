@@ -3,7 +3,7 @@ NAME
     custom fields on status transitions
 
 RT VERSION
-    Works with RT 4.0, 4.2, 4.4
+    Works with RT 4.0, 4.2, 4.4, 5.0
 
     See below for some restrictions on RT 4.0.
 
@@ -68,7 +68,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::MandatoryOnTransition');
@@ -81,7 +81,7 @@ INSTALLATION
         @Plugins line.
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
@@ -119,7 +119,7 @@ CONFIGURATION
         );
 
     The transition syntax is similar to that found in RT's Lifecycles. See
-    perldoc /opt/rt4/etc/RT_Config.pm.
+    perldoc /opt/rt5/etc/RT_Config.pm.
 
   Requiring role values
     You can require any core or custom role on a RT::Ticket object, below is
@@ -308,7 +308,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-MandatoryOnTransition>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2012-2018 by Best Pracical Solutions,
+    This software is Copyright (c) 2012-2020 by Best Pracical Solutions,
     LLC.
 
     This is free software, licensed under:

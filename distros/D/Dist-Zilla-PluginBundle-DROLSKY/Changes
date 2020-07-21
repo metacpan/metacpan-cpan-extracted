@@ -1,3 +1,10 @@
+1.09     2020-07-20
+
+- Update generated perltidyrc to work around changes in recent Perl::Tidy
+  versions that interact badly with
+  https://github.com/houseabsolute/perl-code-tidyall/issues/84.
+
+
 1.08     2020-05-03
 
 - Require PromptIfStale 0.056. That version skips all local plugins when

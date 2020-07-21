@@ -2,6 +2,15 @@ CHANGE LOG
 ==========
 
 
+2020-07-16 - v0.42.1
+--------------------
+
+### Changed
+  - Use new `inject_contect_into_&` and `extract_contect_from_*` methods
+
+### Added
+  - implementation for `inject_context_into_hash_reference`
+
 
 2020-07-01 - v0.41.2
 --------------------

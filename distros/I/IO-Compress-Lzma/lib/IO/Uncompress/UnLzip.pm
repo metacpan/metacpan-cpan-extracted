@@ -4,15 +4,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common 2.094 qw(:Status createSelfTiedObject);
+use IO::Compress::Base::Common 2.095 qw(:Status createSelfTiedObject);
 
-use IO::Uncompress::Base 2.094 ;
-use IO::Uncompress::Adapter::UnLzip 2.094 ;
+use IO::Uncompress::Base 2.095 ;
+use IO::Uncompress::Adapter::UnLzip 2.095 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnLzipError);
 
-$VERSION = '2.094';
+$VERSION = '2.095';
 $UnLzipError = '';
 
 @ISA    = qw( IO::Uncompress::Base Exporter );
@@ -908,7 +908,7 @@ C<InputLength> option in the constructor.
 
 =head1 Importing
 
-No symbolic constants are required by this IO::Uncompress::UnLzip at present.
+No symbolic constants are required by IO::Uncompress::UnLzip at present.
 
 =over 5
 
@@ -925,7 +925,7 @@ Same as doing this
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/IO-Compress-Lzma/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress-Lzma>.
 

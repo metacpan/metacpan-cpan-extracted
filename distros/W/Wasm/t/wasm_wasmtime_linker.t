@@ -16,18 +16,19 @@ my $instance = wasm_instance_ok( [], q{
       local.get 0
       local.get 1
       i64.sub)
-    (memory (export "frooble") 2 3)
+    (memory (export "memory") 2 3)
   )
 });
 
 my $module = $instance->module;
-my $store  = $module->store;
+my $store  = wasm_store();
 my $wasi   = Wasm::Wasmtime::WasiInstance->new(
   $store, "wasi_snapshot_preview1",
 );
 
 my $instance2 = Wasm::Wasmtime::Instance->new(
   Wasm::Wasmtime::Module->new($store, wat => '(module)' ),
+  $store,
 );
 
 my $module2 = Wasm::Wasmtime::Module->new($store, wat => '(module)' );
@@ -48,6 +49,11 @@ is(
     };
     call store => object {
       call [ isa => 'Wasm::Wasmtime::Store' ] => T();
+    };
+
+    call [ get_default => 'foo' ] => object {
+      call [ isa => 'Wasm::Wasmtime::Func' ] => T();
+      call call  => undef;
     };
   },
   'basics'

@@ -117,7 +117,9 @@ constant(name=Nullch)
     PG_PATH                    = 602
     PG_PATHARRAY               = 1019
     PG_PG_ATTRIBUTE            = 75
+    PG_PG_ATTRIBUTEARRAY       = 270
     PG_PG_CLASS                = 83
+    PG_PG_CLASSARRAY           = 273
     PG_PG_DDL_COMMAND          = 32
     PG_PG_DEPENDENCIES         = 3402
     PG_PG_LSN                  = 3220
@@ -126,9 +128,11 @@ constant(name=Nullch)
     PG_PG_NDISTINCT            = 3361
     PG_PG_NODE_TREE            = 194
     PG_PG_PROC                 = 81
+    PG_PG_PROCARRAY            = 272
     PG_PG_SNAPSHOT             = 5038
     PG_PG_SNAPSHOTARRAY        = 5039
     PG_PG_TYPE                 = 71
+    PG_PG_TYPEARRAY            = 210
     PG_POINT                   = 600
     PG_POINTARRAY              = 1017
     PG_POLYGON                 = 604
@@ -519,6 +523,15 @@ pg_lo_lseek(dbh, fd, offset, whence)
         const int ret = pg_db_lo_lseek(dbh, fd, offset, whence);
         ST(0) = (ret >= 0) ? sv_2mortal(newSViv(ret)) : &PL_sv_undef;
 
+void
+pg_lo_lseek64(dbh, fd, offset, whence)
+    SV * dbh
+    int fd
+    unsigned int offset
+    int whence
+    CODE:
+        const unsigned int ret = pg_db_lo_lseek64(dbh, fd, offset, whence);
+        ST(0) = (ret >= 0) ? sv_2mortal(newSVuv(ret)) : &PL_sv_undef;
 
 void
 pg_lo_tell(dbh, fd)
@@ -528,6 +541,13 @@ pg_lo_tell(dbh, fd)
         const int ret = pg_db_lo_tell(dbh, fd);
         ST(0) = (ret >= 0) ? sv_2mortal(newSViv(ret)) : &PL_sv_undef;
 
+void
+pg_lo_tell64(dbh, fd)
+    SV * dbh
+    int fd
+    CODE:
+        const unsigned int ret = pg_db_lo_tell64(dbh, fd);
+        ST(0) = (ret >= 0) ? sv_2mortal(newSVuv(ret)) : &PL_sv_undef;
 
 void
 pg_lo_truncate(dbh, fd, len)
@@ -538,6 +558,14 @@ pg_lo_truncate(dbh, fd, len)
         const int ret = pg_db_lo_truncate(dbh, fd, len);
         ST(0) = (ret >= 0) ? sv_2mortal(newSViv(ret)) : &PL_sv_undef;
 
+void
+pg_lo_truncate64(dbh, fd, len)
+    SV * dbh
+    int fd
+    unsigned int len
+    CODE:
+        const int ret = pg_db_lo_truncate64(dbh, fd, len);
+        ST(0) = (ret >= 0) ? sv_2mortal(newSViv(ret)) : &PL_sv_undef;
 
 void
 pg_lo_close(dbh, fd)

@@ -5,16 +5,16 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.094 ;
+use IO::Compress::Base 2.095 ;
 
-use IO::Compress::Base::Common  2.094 qw(isaScalar createSelfTiedObject);
-use IO::Compress::Adapter::LZO  2.094 ;
+use IO::Compress::Base::Common  2.095 qw(isaScalar createSelfTiedObject);
+use IO::Compress::Adapter::LZO  2.095 ;
 use Compress::LZO qw(crc32 adler32 LZO_VERSION);
-use IO::Compress::Lzop::Constants  2.094 ;
+use IO::Compress::Lzop::Constants  2.095 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzopError);
 
-$VERSION = '2.094';
+$VERSION = '2.095';
 $LzopError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
@@ -856,7 +856,7 @@ See the L</"Constructor Options"> section for more details.
 
 =head1 Importing
 
-No symbolic constants are required by this IO::Compress::Lzop at present.
+No symbolic constants are required by IO::Compress::Lzop at present.
 
 =over 5
 
@@ -873,7 +873,7 @@ Same as doing this
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/IO-Compress-Lzop/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress-Lzop>.
 

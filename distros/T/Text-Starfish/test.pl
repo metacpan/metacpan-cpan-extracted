@@ -136,6 +136,10 @@ starfish_cmd( @sfishArgs1 );
 comparefiles('text-replace.out-expected', 'text-replace.out');
 chdir '..' or die;
 
+$testnum = '23-methods'; &prep_dir_cd($testnum);
+require "../../testfiles/$testnum/test.pl";
+chdir '..' or die;
+
 &testcase(6, 'out');
 &testcase(8);
 &testcase(9, 'out');

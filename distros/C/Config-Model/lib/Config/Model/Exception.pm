@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2019 by Dominique Dumont.
+# This software is Copyright (c) 2005-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Exception 2.138;
+package Config::Model::Exception 2.139;
 
 use warnings;
 use strict;
@@ -19,7 +19,6 @@ use Carp;
 @Carp::CARP_NOT=qw/Config::Model::Exception Config::Model::Exception::Any/;
 
 our $trace = 0;
-
 
 use Carp qw/longmess shortmess croak/;
 
@@ -99,19 +98,19 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::Any 2.138;
+package Config::Model::Exception::Any 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception';
 
-package Config::Model::Exception::ModelDeclaration 2.138;
+package Config::Model::Exception::ModelDeclaration 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::Fatal';
 
 sub _desc {'configuration model declaration error' }
 
-package Config::Model::Exception::User 2.138;
+package Config::Model::Exception::User 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::Any';
@@ -119,14 +118,14 @@ sub _desc {'user error' }
 
 
 ## old classes below
-package Config::Model::Exception::Syntax 2.138;
+package Config::Model::Exception::Syntax 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::Any';
 
 sub _desc { 'syntax error' }
 
-has [qw/parsed_file parsed_line/] => (is => 'rw', isa => 'Str');
+has [qw/parsed_file parsed_line/] => (is => 'rw');
 
 sub full_message {
     my $self = shift;
@@ -140,7 +139,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::LoadData 2.138;
+package Config::Model::Exception::LoadData 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -166,7 +165,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::Model 2.138;
+package Config::Model::Exception::Model 2.139;
 
 use Carp;
 use Mouse;
@@ -201,7 +200,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::Load 2.138;
+package Config::Model::Exception::Load 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -230,7 +229,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::UnavailableElement 2.138;
+package Config::Model::Exception::UnavailableElement 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -261,7 +260,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::AncestorClass 2.138;
+package Config::Model::Exception::AncestorClass 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -269,7 +268,7 @@ extends 'Config::Model::Exception::User';
 sub _desc { 'unknown ancestor class'}
 
 
-package Config::Model::Exception::ObsoleteElement 2.138;
+package Config::Model::Exception::ObsoleteElement 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -294,7 +293,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::UnknownElement 2.138;
+package Config::Model::Exception::UnknownElement 2.139;
 
 use Carp;
 
@@ -371,14 +370,14 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::WarpError 2.138;
+package Config::Model::Exception::WarpError 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
 
 sub _desc { 'warp error'}
 
-package Config::Model::Exception::Fatal 2.138;
+package Config::Model::Exception::Fatal 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::Any';
@@ -386,7 +385,7 @@ extends 'Config::Model::Exception::Any';
 sub _desc { 'fatal error' }
 
 
-package Config::Model::Exception::UnknownId 2.138;
+package Config::Model::Exception::UnknownId 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -420,7 +419,7 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::WrongValue 2.138;
+package Config::Model::Exception::WrongValue 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -428,7 +427,7 @@ extends 'Config::Model::Exception::User';
 sub _desc { 'wrong value'};
 
 
-package Config::Model::Exception::WrongType 2.138;
+package Config::Model::Exception::WrongType 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
@@ -462,14 +461,14 @@ sub full_message {
     return $msg;
 }
 
-package Config::Model::Exception::ConfigFile 2.138;
+package Config::Model::Exception::ConfigFile 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::User';
 
 sub _desc { 'error in configuration file' }
 
-package Config::Model::Exception::ConfigFile::Missing 2.138;
+package Config::Model::Exception::ConfigFile::Missing 2.139;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -488,14 +487,14 @@ sub full_message {
     return "Error: cannot find configuration file " . $self->file . "\n";
 }
 
-package Config::Model::Exception::Formula 2.138;
+package Config::Model::Exception::Formula 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::Model';
 
 sub _desc { 'error in computation formula of the configuration model'}
 
-package Config::Model::Exception::Internal 2.138;
+package Config::Model::Exception::Internal 2.139;
 
 use Mouse;
 extends 'Config::Model::Exception::Fatal';
@@ -518,7 +517,7 @@ Config::Model::Exception - Exception mechanism for configuration model
 
 =head1 VERSION
 
-version 2.138
+version 2.139
 
 =head1 SYNOPSIS
 
@@ -576,7 +575,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2019 by Dominique Dumont.
+This software is Copyright (c) 2005-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

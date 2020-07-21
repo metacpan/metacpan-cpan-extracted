@@ -84,7 +84,7 @@ BEGIN {
 with 'Log::LogMethods';
 with 'Data::Result::Moo';
 }
-our $VERSION='1.021';
+our $VERSION='1.022';
 
 sub BUILD {
   my ($self)=@_;

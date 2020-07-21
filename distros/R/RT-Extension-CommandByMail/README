@@ -2,7 +2,7 @@ NAME
     RT::Extension::CommandByMail - Change ticket metadata via email
 
 RT VERSION
-    Works with RT 4.0, 4.2, 4.4
+    Works with RT 4.0, 4.2, 4.4, 5.0
 
 SYNOPSIS
         (Send email with content that looks like the following.)
@@ -29,7 +29,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::CommandByMail');
@@ -242,7 +242,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-CommandByMail>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014 by Best Practical Solutions
+    This software is Copyright (c) 2014-2020 by Best Practical Solutions
 
     This is free software, licensed under:
 

@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok( 'Assert::Conditional' ) || print "Bail out!\n";
+    use_ok("Assert::Conditional") || print "Bail out!\n";
 }
 
-diag( "Testing Assert::Conditional $Assert::Conditional::VERSION, Perl $], $^X" );
+diag sprintf "Testing Assert::Conditional %s using perl v%vd in %s", Assert::Conditional->VERSION, $^V, $^X;

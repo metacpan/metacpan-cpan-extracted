@@ -1,6 +1,6 @@
 package Geo::BUFR;
 
-# Copyright (C) 2010-2019 MET Norway
+# Copyright (C) 2010-2020 MET Norway
 #
 # This module is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
@@ -94,7 +94,7 @@ use Time::Local qw(timegm);
 
 require DynaLoader;
 our @ISA = qw(DynaLoader);
-our $VERSION = '1.37';
+our $VERSION = '1.38';
 
 # This loads BUFR.so, the compiled version of BUFR.xs, which
 # contains bitstream2dec, bitstream2ascii, dec2bitstream,
@@ -135,8 +135,15 @@ our $Strict_checking = 0; # Ignore recoverable errors in BUFR format
                           # $Strict_checking to 1: Issue warning
                           # (carp) but continue decoding, or to 2:
                           # Croak instead of carp
+
+# The next 2 operators are separated for readability. Public interface should
+# provide only set_show_all_operators() to set both of these (to the same value)
 our $Show_all_operators = 0; # = 0: show just the most informative C operators in dumpsection4
                              # = 1: show all operators (as far as possible)
+our $Show_replication = 0; # = 0: don't include replication descriptors (F=1) in dumpsection4
+                           # = 1: include replication descriptors(F=1) in dumpsection4,
+                           #  with X in FXY replaced with actual number X' of replicated descriptors.
+                           #  X' is replaced by 0 if X' > 99
 
 our %BUFR_table;
 # Keys: PATH      -> full path to the chosen directory of BUFR tables
@@ -341,16 +348,23 @@ sub set_strict_checking {
     return 1;
 }
 
-## Show all (or only the really important) operators when calling dumpsection4
+## Show replication descriptors (with X in FXY replaced by actual
+## number of descriptors replicated, adjusted to 0 if > 99) and all
+## data description operators when calling dumpsection4
 sub set_show_all_operators {
     my $self = shift;
     my $n = shift;
-    $Show_all_operators = defined $n ? $n : 1; # Default in BUFR.pm is 0
+    $Show_all_operators = defined $n ? $n : 1; # Default is 1
+    $Show_replication = $Show_all_operators;
     Geo::BUFR->_spew(2, "Show_all_operators set to %d", $Show_all_operators);
     return 1;
 }
 
 ## Accessor methods for BUFR sec0-3 ##
+sub get_bufr_length {
+    my $self = shift;
+    return defined $self->{BUFR_LENGTH} ? $self->{BUFR_LENGTH} : undef;
+}
 sub set_bufr_edition {
     my ($self, $bufr_edition) = @_;
     _croak "BUFR edition number not provided in set_bufr_edition"
@@ -2249,14 +2263,17 @@ sub dumpsection4 {
     my $C_table = $self->{C_TABLE} || '';
     my $idx = 0;
     my $line_no = 0;    # Precede each line with a line number, except
-                        # for operator descriptors with no data value in
-                        # section 4
+                        # for replication descriptors and for operator
+                        # descriptors with no data value in section 4
   ID:
     foreach my $id (@{$descriptors}) {
         my $value = defined $data->[$idx] ? $data->[$idx] : 'missing';
         $idx++;
         my $f = substr($id, 0, 1);
-        if ($f == 2) {
+        if ($f == 1) {
+            $txt .= sprintf "        %6d\n", $id;
+            next ID;
+        } elsif ($f == 2) {
             if ($id =~ /^205/) {    # Character information operator
                 $txt .= sprintf "%6d  %06d  %${width}.${width}s  %s\n",
                     ++$line_no, $id, $value, "CHARACTER INFORMATION";
@@ -2587,10 +2604,19 @@ sub _expand_descriptors {
                     . "replication descriptor $descriptor (or there is "
                     . "a problem in nesting of replication)" if $di+$x+1 > @_;
                 my @r = ();
-                push @r, @_[($di+1)..($di+$x)] while --$y;
-                # Recursively expand replicated descriptors $y-1 times
-                # (last replication will be taken care of by main loop)
-                push @expanded, _expand_descriptors($D_table, @r) if @r;
+                push @r, @_[($di+1)..($di+$x)] for (1..$y);
+                # Recursively expand replicated descriptors $y times
+                my @s = ();
+                @s = _expand_descriptors($D_table, @r) if @r;
+                if ($Show_replication) {
+                    # Adjust x since replicated descriptors might have been expanded
+                    # Unfortunately _spew is not available here to report the x>99 -> x=0 hack
+                    my $z =  @s/$y > 99 ? 0 : @s/$y;
+                    substr($_[$di], 1, 2) = sprintf "%02d", $z;
+                    push @expanded, $_[$di];
+                }
+                push @expanded, @s if @s;
+                $di += $x;
             } else {
                 # Delayed replication. Next descriptor ought to be the
                 # delayed descriptor replication (and data repetition)
@@ -2882,14 +2908,19 @@ sub _decode_bitstream {
             my $y = substr($id,3,3)+0;
 
             if ($f == 1) {
-                # Delayed replication
+                if ($Show_replication) {
+                    push @{$subset_desc[$isub]}, $id;
+                    push @{$subset_data[$isub]}, '';
+                    $self->_spew(4, "X=0 in $id for F=1, might have been > 99 in expansion") 
+                        if $Spew && $x == 0;
+                }                   
+                next D_LOOP if $y > 0; # Nothing more to do for normal replication
+
                 if ($x == 0) {
                     _complain("Nonsensical replication of zero descriptors ($id)");
                     $idesc++;
                     next D_LOOP;
                 }
-                _croak "$id _expand_descriptors() did not do its job"
-                    if $y > 0;
 
                 $_ = $desc[$idesc+1];
                 _croak "$id Erroneous replication factor"
@@ -3247,14 +3278,21 @@ sub _decompress_bitstream {
         my $y = substr($id,3,3)+0;
 
         if ($f == 1) {
-            # Delayed replication
+            if ($Show_replication) {
+                push @desc_exp, $id;
+                foreach my $isub (1..$nsubsets) {
+                    push @{$subset_data[$isub]}, '';
+                }
+                $self->_spew(4, "X=0 in $id for F=1, might have been > 99 in expansion") 
+                    if $Spew && $x == 0;
+            }
+            next D_LOOP if $y > 0; # Nothing more to do for normal replication
+
             if ($x == 0) {
                 _complain("Nonsensical replication of zero descriptors ($id)");
                 $idesc++;
                 next D_LOOP;
             }
-            _croak "$id _expand_descriptors() did not do its job"
-                if $y > 0;
 
             $_ = $desc[$idesc+1];
             _croak "$id Erroneous replication factor"
@@ -5509,18 +5547,18 @@ sub _apply_operator_descriptor {
             my $xx = substr($next_id,1,2);
             my $yy = substr($next_id,3,3);
             _complain("Descriptor $next_id following Signify data width"
-                  . "  operator $_ is not a local descriptor")
+                  . "  operator $id is not a local descriptor")
                 if ($xx < 48 && $yy < 192);
         }
         if (exists $self->{B_TABLE}->{$next_id}
             and (split /\0/, $self->{B_TABLE}->{$next_id})[-1] == $y) {
-            $self->_spew(4, "Found $next_id with data width $y, ignoring $_") if $Spew;
+            $self->_spew(4, "Found $next_id with data width $y, ignoring $id") if $Spew;
             $flow = 'next';
         } else {
             _croak "Cannot encode descriptor $next_id (following $id), not found in table B"
                 if $self->{CODING} eq 'ENCODE';
             $self->_spew(4, "$_: Did not find $next_id in table B."
-                         . " Skipping $_ and $next_id.") if $Spew;
+                         . " Skipping $id and $next_id.") if $Spew;
             $pos += $y;  # Skip next $y bits in bitstream if decoding
             $flow = 'skip';
         }
@@ -6096,12 +6134,13 @@ Enable/disable strict checking of BUFR format for recoverable errors
 Confer L</STRICT CHECKING> for details of what is being checked if
 strict checking is enabled.
 
-Show all BUFR table C operators (data description operators) when
-calling dumpsection4:
+Show all BUFR table C operators (data description operators, F=2) as well
+as all replication descriptors (F=1) when calling dumpsection4:
 
   Geo::BUFR->set_show_all_operators($n);
- - $n=1 (or not provided): Show all operators
- - $n=0: Show only the really informative ones (default in Geo::BUFR)
+ - $n=1 (or not provided): Show replication descriptors and all operators
+ - $n=0: Show no replication descriptors and only the really informative
+         data description operators (default in Geo::BUFR)
 
 C<set_show_all_operators(1)> cannot be combined with C<dumpsections>
 with bitmap option set (which is the default).
@@ -6206,6 +6245,7 @@ Accessor methods for section 0-3:
 
 where E<lt>variableE<gt> is one of
 
+  bufr_length (get only)
   bufr_edition
   master_table
   subcentre
@@ -6631,7 +6671,7 @@ L<https://wiki.met.no/bufr.pm/start>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2019 MET Norway
+Copyright (C) 2010-2020 MET Norway
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

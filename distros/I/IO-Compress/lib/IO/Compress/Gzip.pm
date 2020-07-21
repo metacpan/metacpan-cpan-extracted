@@ -8,12 +8,12 @@ use bytes;
 
 require Exporter ;
 
-use IO::Compress::RawDeflate 2.094 () ; 
-use IO::Compress::Adapter::Deflate 2.094 ;
+use IO::Compress::RawDeflate 2.095 () ; 
+use IO::Compress::Adapter::Deflate 2.095 ;
 
-use IO::Compress::Base::Common  2.094 qw(:Status );
-use IO::Compress::Gzip::Constants 2.094 ;
-use IO::Compress::Zlib::Extra 2.094 ;
+use IO::Compress::Base::Common  2.095 qw(:Status );
+use IO::Compress::Gzip::Constants 2.095 ;
+use IO::Compress::Zlib::Extra 2.095 ;
 
 BEGIN
 {
@@ -25,7 +25,7 @@ BEGIN
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, %DEFLATE_CONSTANTS, $GzipError);
 
-$VERSION = '2.094';
+$VERSION = '2.095';
 $GzipError = '' ;
 
 @ISA    = qw(IO::Compress::RawDeflate Exporter);
@@ -1226,7 +1226,7 @@ See L<IO::Compress::FAQ|IO::Compress::FAQ/"Compressed files and Net::FTP">
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/IO-Copress/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Copress>.
 

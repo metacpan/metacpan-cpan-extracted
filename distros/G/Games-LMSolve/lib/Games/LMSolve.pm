@@ -1,5 +1,5 @@
 package Games::LMSolve;
-$Games::LMSolve::VERSION = '0.14.0';
+$Games::LMSolve::VERSION = '0.14.1';
 use strict;
 use warnings;
 
@@ -99,7 +99,7 @@ sub main
         'man'      => \$man
     ) or pod2usage(2);
 
-    pod2usage(1) if $help;
+    pod2usage(1)                                 if $help;
     pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
 
     if ( !exists( $self->{'games_solvers'}->{$variant} ) )
@@ -125,13 +125,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Games::LMSolve - base class for LM-Solve solvers factories
 
 =head1 VERSION
 
-version 0.14.0
+version 0.14.1
 
 =head1 SYNOPSIS
 
@@ -256,36 +258,9 @@ Copyright 2002 Shlomi Fish, all rights reserved.
 
 This program is released under the following license: MIT X11.
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2007 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/lm-solve-source/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Games::LMSolve
 
 =head2 Websites
 
@@ -304,35 +279,11 @@ L<https://metacpan.org/release/Games-LMSolve>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Games-LMSolve>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-LMSolve>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Games-LMSolve>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Games-LMSolve>
 
 =item *
 
@@ -383,5 +334,26 @@ from your repository :)
 L<https://github.com/shlomif/lm-solve-source>
 
   git clone git://github.com/shlomif/lm-solve-source.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/lm-solve-source/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2007 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

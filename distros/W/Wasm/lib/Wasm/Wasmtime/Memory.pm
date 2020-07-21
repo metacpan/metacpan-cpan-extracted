@@ -12,7 +12,7 @@ use constant is_memory => 1;
 use constant kind => 'memory';
 
 # ABSTRACT: Wasmtime memory class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasm_memory_';
@@ -88,7 +88,7 @@ Wasm::Wasmtime::Memory - Wasmtime memory class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 

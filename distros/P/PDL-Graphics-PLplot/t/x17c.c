@@ -26,13 +26,13 @@ static char  errmsg[160];
 //--------------------------------------------------------------------------
 
 int
-main( int argc, char *argv[] )
+main( int argc, const char *argv[] )
 {
     PLINT           id1, n, autoy, acc, nsteps = 1000;
     PLFLT           y1, y2, y3, y4, ymin, ymax, xlab, ylab;
     PLFLT           t, tmin, tmax, tjump, dt, noise;
     PLINT           colbox, collab, colline[4], styline[4];
-    PLCHAR_VECTOR   legline[4];
+    const char      *legline[4];
 #ifdef PL_HAVE_NANOSLEEP
     struct timespec ts;
 #endif
@@ -148,7 +148,7 @@ main( int argc, char *argv[] )
         }
 # endif
 #endif
-        t     = (PLFLT) n * dt;
+        t     = (double) n * dt;
         noise = plrandd() - 0.5;
         y1    = y1 + noise;
         y2    = sin( t * M_PI / 18. );

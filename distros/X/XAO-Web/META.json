@@ -4,13 +4,13 @@
       "Andrew Maltsev, https://ejelta.com/xao/"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "artistic_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "XAO-Web",
    "no_index" : {
@@ -72,6 +72,5 @@
          "web" : "https://github.com/amaltsev/XAO-Web"
       }
    },
-   "version" : "1.80",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.81"
 }

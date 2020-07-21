@@ -2,21 +2,31 @@ use alienfile;
 
 plugin 'PkgConfig' => 'libgearman';
 
+configure {
+  requires "Alien::Boost";
+};
+
 share {
 
   plugin 'Build::SearchDep' => (
-    aliens => [qw( Alien::libuuid Alien::Libevent )],
+    aliens => [qw( Alien::libuuid Alien::OpenSSL Alien::gperf Alien::Libevent Alien::curl Alien::Boost )],
   );
 
-  start_url 'https://launchpad.net/gearmand/+milestone/0.12';
+  start_url 'https://github.com/gearman/gearmand/releases';
   plugin 'Download' => (
     filter => qr/^gearmand-.*\.tar\.gz$/,
     version => qr/([0-9\.]+)/,
   );
 
   plugin 'Extract';
-  
-  plugin 'Build::Autoconf';
 
+  require Alien::Boost;
+  my $BOOSTDIR = Alien::Boost->dist_dir();
+
+  build [
+    "./configure --prefix=%{.install.prefix} --disable-shared --with-boost=$BOOSTDIR",
+    '%{make} LIBS=-lstdc++',
+    '%{make} install',
+  ];
 };
 

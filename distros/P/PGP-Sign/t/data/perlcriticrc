@@ -64,6 +64,12 @@ allow = unless
 # of $@ even if destructors run at exit from the eval block.
 [-ErrorHandling::RequireCheckingReturnValueOfEval]
 
+# This conflicts with Subroutines::ProhibitExplicitReturnUndef and
+# Subroutines::RequireFinalReturn, and I prefer the brevity of the simple
+# return statement.  I don't think the empty list versus undef behavior is
+# that confusing.
+[-Freenode::EmptyReturn]
+
 # The default of 9 is too small and forces weird code contortions.
 [InputOutput::RequireBriefOpen]
 lines = 25

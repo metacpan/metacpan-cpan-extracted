@@ -4,7 +4,7 @@ use strict;
 use DateTime;
 use DateTime::Set;
 
-our $VERSION = "1.01";
+our $VERSION = "1.03";
 
 RT->AddStyleSheets('calendar.css');
 
@@ -115,9 +115,18 @@ RTx::Calendar - Calendar for RT due dates
 
 This RT extension provides a calendar view for your tickets and your
 reminders so you see when is your next due ticket. You can find it in
-the menu Search->Calendar.
+ticket search sub navigation menu.
 
-There's a portlet to put on your home page (see Prefs/MyRT.html)
+Date fields in the search results are displayed/used in the calendar,
+for example if you have a ticket with a due date, it won't be displayed on
+that date unless the Due field is included in the search result format.
+
+There's a portlet to put on your home page (see Prefs/MyRT.html), see the
+CONFIGURATION section below for details on adding it.
+
+=head1 RT VERSION
+
+Works with RT 4.2, 4.4, 5.0
 
 =head1 INSTALLATION
 
@@ -131,21 +140,21 @@ There's a portlet to put on your home page (see Prefs/MyRT.html)
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item patch RT
 
-If you are using RT 4.2 or greater, add this line:
+Apply for versions prior to 4.4.2:
+
+    patch -p1 -d /path/to/rt < etc/tabs_privileged_callback.patch
+
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+
+Add this line:
 
     Plugin('RTx::Calendar');
 
-For RT 4.0, add this line:
-
-    Set(@Plugins, qw(RTx::Calendar));
-
-or add C<RTx::Calendar> to your existing C<@Plugins> line.
-
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -175,7 +184,7 @@ mouse over a date in F<etc/RT_SiteConfig.pm>:
 
 =head1 USAGE
 
-A small help section is available in /Prefs/Calendar.html
+A small help section is available in /Search/Calendar.html
 
 =head1 AUTHOR
 
@@ -195,7 +204,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2010-2014 by Best Practical Solutions
+This software is Copyright (c) 2010-2020 by Best Practical Solutions
 
 Copyright 2007-2009 by Nicolas Chuche
 

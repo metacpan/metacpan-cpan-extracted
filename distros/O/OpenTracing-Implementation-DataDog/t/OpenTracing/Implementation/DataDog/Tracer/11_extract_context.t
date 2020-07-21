@@ -20,8 +20,7 @@ subtest 'No default_context or callback' => sub {
     lives_ok {
         $test_span_context = $test_tracer
             ->extract_context(
-                'CARRIER_FORMAT',
-                bless( { foo => 0, bar => [ 1, 2 ] }, 'MyStub::Carrier' )
+                bless( { foo => 0, bar => [ 1, 2 ] }, 'HTTP::Headers' )
             )
         #
         # XXX: this needs a FORMAT and a carrier
@@ -34,9 +33,3 @@ subtest 'No default_context or callback' => sub {
 
 
 done_testing( );
-
-
-
-package MyStub::Carrier;
-
-sub foo { ... }

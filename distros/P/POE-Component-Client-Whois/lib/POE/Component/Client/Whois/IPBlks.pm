@@ -1,5 +1,5 @@
 package POE::Component::Client::Whois::IPBlks;
-$POE::Component::Client::Whois::IPBlks::VERSION = '1.36';
+$POE::Component::Client::Whois::IPBlks::VERSION = '1.38';
 #ABSTRACT: Determine which whois server is responsible for a network address.
 
 use strict;
@@ -255,7 +255,7 @@ POE::Component::Client::Whois::IPBlks - Determine which whois server is responsi
 
 =head1 VERSION
 
-version 1.36
+version 1.38
 
 =head1 SYNOPSIS
 
@@ -302,7 +302,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

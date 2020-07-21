@@ -1,3 +1,18 @@
+# [2.10.0](https://github.com/hexonet/perl-sdk/compare/v2.9.2...v2.10.0) (2020-07-16)
+
+
+### Bug Fixes
+
+* **make:** bump package versions ([81b77cd](https://github.com/hexonet/perl-sdk/commit/81b77cdb81cefdca0b7a59c7e7c64026568210cc))
+* **test:** fixes umlaut encoding issue (by vscode) ([f29aa5d](https://github.com/hexonet/perl-sdk/commit/f29aa5ddb625c1f2df5ecabc14b031c028be67e7))
+* **travis:** add deps installations ([6a4e241](https://github.com/hexonet/perl-sdk/commit/6a4e241fc782c53d706ef47d584c9fe08c248439))
+* **travis:** review release stage config, activate perltidy check ([864a6ce](https://github.com/hexonet/perl-sdk/commit/864a6cee2402f5698d7b5b15bd772e07640397b9))
+
+
+### Features
+
+* **perl-5.030:** review perl versions (and travis vm) ([7a41409](https://github.com/hexonet/perl-sdk/commit/7a41409af856dd4b48a1104cd603657173fd201b))
+
 ## [2.9.2](https://github.com/hexonet/perl-sdk/compare/v2.9.1...v2.9.2) (2020-06-22)
 
 

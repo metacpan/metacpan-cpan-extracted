@@ -128,6 +128,11 @@ sub display_stats ($@) {
         TOTAL_ITEMS => scalar(@tags),
     }) if $args->{'header.path'} || defined $args->{'header.template'};
 
+    my $taglen=0;
+    foreach my $tag (@tags) {
+        $taglen=length $tag if length $tag > $taglen;
+    }
+
     foreach my $tag (@tags) {
         my $d=$stats->{$tag};
 
@@ -144,7 +149,8 @@ sub display_stats ($@) {
         }) if $args->{'path'} || defined $args->{'template'};
 
         if($args->{'dprint'} || $args->{'eprint'}) {
-            my $str="BENCHMARK($tag): COUNT=$d->{'count'} AVERAGE=$d->{'average'} MEDIAN=$d->{'median'} TOTAL=$d->{'total'} CACHEABLE=$d->{'cacheable'} CACHE_FLAG=$d->{'cache_flag'}";
+            my $str=sprintf('BENCHMARK(%*s): COUNT=%6u TOTAL=%7.3f AVERAGE=%7.3f MEDIAN=%7.3f CACHEABLE=%s CACHE_FLAG=%s',
+                    $taglen, $tag, $d->{'count'}, $d->{'total'}, $d->{'average'}, $d->{'median'}, $d->{'cacheable'}, $d->{'cache_flag'});
             dprint $str if $args->{'dprint'};
             eprint $str if $args->{'eprint'};
         }

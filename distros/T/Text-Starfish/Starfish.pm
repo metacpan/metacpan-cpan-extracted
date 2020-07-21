@@ -7,11 +7,15 @@
 # command "perldoc Starfish.pm".
 
 package Text::Starfish;
+use vars qw($NAME $ABSTRACT $VERSION);
+$NAME     = 'Text::Starfish';
+$ABSTRACT = 'Perl-based System for Preprocessing and Text-Embedded Programming';
+$VERSION  = '1.37';
+
 use strict;
 use POSIX;
 use Carp;
 use Cwd qw(cwd);
-
 use Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS); # Exporter vars
 
@@ -27,12 +31,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS); # Exporter vars
 @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 @EXPORT = @{ $EXPORT_TAGS{'all'} };
 
-# updated here and in META.yml
-use vars qw($NAME $ABSTRACT $VERSION);
-$NAME     = 'Starfish';
-$ABSTRACT = 'Perl-based System for Preprocessing and Text-Embedded Programming';
-$VERSION  = '1.36';
-
+# Used in starfishing Makefiles
 use vars qw(@DirGenerateIfNeeded);
 
 # non-exported package globals
@@ -71,7 +70,7 @@ sub new($@) {
     $self->{hook}            = [ @{ $::Star->{hook} } ];
   }
 
-  $self->setStyle() unless $copyhooks;
+  $self->set_style() unless $copyhooks;
 
   return $self;
 }
@@ -142,7 +141,7 @@ sub process_files {
   while (@args) {
     $self->{INFILE} = shift @args;
     ++$FileCount;
-    $self->setStyle();
+    $self->set_style();
     $self->{data} = getfile $self->{INFILE};
 
     # *123* we need to forbid defining an outfile externally as well as
@@ -790,7 +789,7 @@ sub setGlobStyle {
     my $self = shift;
     my $s = shift;
     $self->{STYLE} = $s;
-    $self->setStyle($s);
+    $self->set_style($s);
 }
 
 sub clearStyle {
@@ -801,31 +800,35 @@ sub clearStyle {
   $self->{hook} = [];
 }
 
-# List of fields typically set in setStyle:
+sub setStyle { return &set_style }
+
+# List of fields typically set in set_style:
 # $self->{Style}           = string, style
 # $self->{CodePreparation} = scalar
 # $self->{LineComment}     = string, line comment
 # $self->{OutDelimiters}   = [] eg: "//" "+\n" "//" "-\n"
 # $self->{IgnoreOuter}     = 1 or ''
 # $self->{hook}            = [], list of hooks
-sub setStyle {
+sub set_style {
   my $self = shift;
+  if (ref($self) ne 'Text::Starfish') { unshift @_, $self; $self = $::Star; }
+
   if ($#_ == -1) {
     if (defined $self->{STYLE} && $self->{STYLE} ne '')
-    { $self->setStyle($self->{STYLE}) }
+    { $self->set_style($self->{STYLE}) }
     else {
       my $f = $self->{INFILE};
 
-      if ($f =~ /\.(html\.sfish|sf)$/i) { $self->setStyle('.html.sfish') }
+      if ($f =~ /\.(html\.sfish|sf)$/i) { $self->set_style('html.sfish') }
       else {
 	$f =~ s/\.s(tar)?fish$//;
-	if    ($f =~ /\.html?/i)        { $self->setStyle('html') }
-	elsif ($f =~ /\.(?:la)?tex$/i)  { $self->setStyle('tex') }
-	elsif ($f =~ /\.java$/i)        { $self->setStyle('java') }
-	elsif ($f =~ /^[Mm]akefile/)    { $self->setStyle('makefile') }
-	elsif ($f =~ /\.ps$/i)          { $self->setStyle('ps') }
-	elsif ($f =~ /\.py$/i)          { $self->setStyle('python') }
-	else { $self->setStyle('perl') }
+	if    ($f =~ /\.html?/i)        { $self->set_style('html') }
+	elsif ($f =~ /\.(?:la)?tex$/i)  { $self->set_style('tex') }
+	elsif ($f =~ /\.java$/i)        { $self->set_style('java') }
+	elsif ($f =~ /^[Mm]akefile/)    { $self->set_style('makefile') }
+	elsif ($f =~ /\.ps$/i)          { $self->set_style('ps') }
+	elsif ($f =~ /\.py$/i)          { $self->set_style('python') }
+	else { $self->set_style('perl') }
       }
     }
     return;
@@ -841,9 +844,9 @@ sub setStyle {
   $self->{'IgnoreOuter'} = '';
   $self->{OutDelimiters} = [ "#", "+\n", "#", "-" ];
   $self->{hook}= [
-      {begin => '#<?', end => '!>', f => \&evaluate },
-      {begin => '<?',  end => '!>', f => \&evaluate },
-      {begin => '<?starfish', end => '?>', f => \&evaluate }
+      {ht=>'be', begin => '#<?', end => '!>', f => \&evaluate },
+      {ht=>'be', begin => '<?',  end => '!>', f => \&evaluate },
+      {ht=>'be', begin => '<?starfish', end => '?>', f => \&evaluate }
     ];
     $self->{CodePreparation} = 's/\\n(?:#|%|\/\/+)/\\n/g';
 
@@ -875,20 +878,20 @@ sub setStyle {
       # change OutDelimiters ?
       # $self->{OutDelimiters} = [ "%", "+\n", "%", "-\n" ];
       $self->{OutDelimiters} = [ "%", "+\n", "\n%", "-\n" ];
-      $self->{hook}=[{begin => '%<?', end => "!>\n", f => \&evaluate },
+      $self->{hook}=[{ht=>'be', begin => '%<?', end => "!>\n", f => \&evaluate },
 		     # change to this one?
-		     #{begin => '%<?', end => "!>", f => \&evaluate },
-		     {begin => '<?', end => "!>\n", f => \&evaluate },
-		     {begin => '<?', end => "!>", f => \&evaluate }];
+		     #{ht=>'be', begin => '%<?', end => "!>", f => \&evaluate },
+		     {ht=>'be', begin => '<?', end => "!>\n", f => \&evaluate },
+		     {ht=>'be', begin => '<?', end => "!>", f => \&evaluate }];
 
       $self->{CodePreparation} = 's/^[ \t]*%//mg';
     }
-    elsif ($s eq '.html.sfish') {
+    elsif ($s eq 'html.sfish') {
       undef $self->{LineComment};
       $self->{OutDelimiters} = [ "<!-- +", " -->", "<!-- -", " -->" ];
       $self->{hook}=[
-        {begin => '<!--<?', end => '!>-->', f => \&evaluate },
-        {begin=>'<?starfish ', end=>'?>', f=>\&evaluate },
+        {ht=>'be', begin=>'<!--<?', end => '!>-->', f => \&evaluate },
+        {ht=>'be', begin=>'<?starfish ', end=>'?>', f=>\&evaluate },
         {begin=>qr/<\?sf\s/, end=>qr/!>/, f=>\&evaluate },
       ];
       $self->addHook(qr/^#.*\n/m, 'comment');
@@ -898,21 +901,22 @@ sub setStyle {
       undef $self->{LineComment}; # Changes
       $self->{OutDelimiters} = [ "<!-- +", " -->", "<!-- -", " -->" ];
       $self->{hook}=[
-	{ begin => '<!--<?', end => '!>-->', f => \&evaluate },
-	{ begin=>'<?starfish ', end=>'?>', f=>\&evaluate } ];
+	{ht=>'be', begin => '<!--<?', end => '!>-->', f => \&evaluate },
+	{ht=>'be', begin=>'<?starfish ', end=>'?>', f=>\&evaluate } ];
       $self->{CodePreparation} = '';
     }
     elsif ($s eq 'ps') {
       $self->{LineComment} = '%';
       $self->{OutDelimiters} = [ "% ", "+\n", "% ", "-" ];      
       $self->{hook}=[
-         {begin => '<?', end => '!>', f => \&evaluate }];
+         {ht=>'be', begin => '<?', end => '!>', f => \&evaluate }];
       $self->{CodePreparation} = 's/\\n%/\\n/g';
     }
-    else { _croak("setStyle:unknown style:$s") }
+    else { _croak("set_style:unknown style:$s") }
     $self->{Style} = $s;
 }
 
+# to be deprecated?  Used only to make it available in name space
 sub sfish_add_tag($$)     { $::Star->add_tag(@_) }
 sub sfish_ignore_outer    { $::Star->ignore_outer(@_) }
 
@@ -1055,7 +1059,7 @@ sub rmAllHooks {
     $self->{hook} = [];
 }
 
-sub resetHooks { my $self = shift; $self->rmAllHooks(); $self->setStyle(); }
+sub resetHooks { my $self = shift; $self->rmAllHooks(); $self->set_style(); }
 
 sub add_final {
   my $self = shift;
@@ -1312,7 +1316,7 @@ __END__
 
 =head1 NAME
 
-Text::Starfish.pm and starfish - A Perl-based System for Preprocessing and
+Text::Starfish.pm and starfish - Perl-based System for Preprocessing and
       Text-Embedded Programming
 
 
@@ -1322,8 +1326,7 @@ B<starfish> S<[ B<-o=>I<outputfile> ]> S<[ B<-e=>I<initialcode> ]>
         S<[ B<-replace> ]> S<[ B<-mode=>I<mode> ]> S<I<files>...>
 
 where I<files> usually contain some Perl code, delimited by C<E<lt>?> and
-C<!E<gt>>.  Use function C<echo> or variable C<$O> to produce output to be
-inserted into the file.
+C<!E<gt>>.  Use function C<echo> to produce output to be inserted into the file.
 
 =head1 DESCRIPTION
 
@@ -1349,26 +1352,33 @@ module.  The options for the script are described in subsection
 
 =head2 A simple example
 
-A simple example, after running C<starfish> on a file containing:
+Let us have a plain file named C<example.txt> with the following content:
 
-     <? $O= "Hello world!" !>
+     <? echo "Hello world!" !>
 
-we get the following output:
+In the command line, run the command:
 
-     <? $O= "Hello world!" !>#+
+     starfish example.txt
+
+If we open the file C<example.txt>, the content will be:
+
+     <? echo "Hello world!" !>#+
      Hello world!#-
 
-The output will not change after running the script several times.
-The same effect is achieved with:
+The same effect would be obtained with the code C<$O = "Hello world!">.
+This way of updating the file is called the "update" mode of Starfish and it
+is the default mode.  The "replace" mode can be used, but then we should
+have a different output file, as in the following command:
 
-     <? echo "Hello world! !>
+  starfish -replace -o=example-out.txt example.txt
 
-The function echo simply appends its parameters to the special
-variable $O.
+and the content of the file C<example-out.txt> would now be:
 
-Some parameters can be changed, and they vary according to style,
-which depends on file extension.  These parameters are described
-in the description of the C<setStyle> method.
+  Hello world!
+
+The module parameters can be changed, and their default values vary according
+to the text style.  THese parameters are described in the description of the
+C<set_style> method.
 
 =head2 HTML Examples
 
@@ -1454,11 +1464,11 @@ Starfish object currently processing the text.
 
 Generating text with a variable replacement:
 
-  <?echo "
-  When we split the probability reserved for unseen characters equally
-  among the remaining $UnseenNum characters, we obtain the final estimated
-  probabilities:
-  "!>
+  %<?echo "
+  % When we split the probability reserved for unseen characters equally
+  % among the remaining $UnseenNum characters, we obtain the final estimated
+  % probabilities:
+  %"!>
 
 =head3 Example from a TeX file
 
@@ -1645,7 +1655,7 @@ questionable decision.
 If defined, it should be an array of CODE references, which are applied as
 functions on the final output before writing it out.  These are used as final
 routines, typically to add or remove some of the first lines or finals lines.
-Each functionj takes input as a parameter and returns it after processing.
+Each function takes input as a parameter and returns it after processing.
 The variable should accessed using the method C<add_final>.
 
 =head2 $Star->{INFILE}
@@ -1704,6 +1714,12 @@ C<-copyhooks> Copies hooks from the Star object (C<$::Star>).  This
     C<-copyhooks> copies the fields: C<Style>, C<CodePreparation>,
     C<LineComment>, C<IgnoreOuter>, and per-component copies
     the array C<hook>.
+
+=head2 $o->add_final($func_ref)
+
+Adds the function referred to by C<$func_ref> to the list of functions to be
+executed on the output at the end of processing.  See also the parameter
+C<$Star-E<gt>{Final}>.
 
 =head2 $o->add_tag($tag, $action)
 
@@ -1846,10 +1862,15 @@ later.  A typical usage could be as follows:
     $Star->rmAllHooks();
     $Star->addHook('<?starfish ','?>', 'default');
 
-=head2 $o->setStyle($s)
+=head2 $o->setStyle($s) -- deprecated, shoud use C<set_style>
 
-Sets a particular style of the source file.  Currently implemented
-options are: html, java, makefile, perl, ps, python, and tex (same as latex,
+Deprecated method.  The method or function C<set_style> should be used.
+
+=head2 set_style method or function
+
+Sets a particular style of the source file.  If used as function, the object
+C<$::Star> is used as the "self" object.  Currently implemented options are:
+html, java, makefile, perl, ps, python, and tex (same as latex, 
 TeX).  If the parameter $s is not given, the stile given in 
 C<$o->{STYLE}> will be used if defined, otherwise it will be guessed from
 the file name in C<$o->{INFILE}>.  If it cannot be correctly guessed, it
@@ -2085,13 +2106,13 @@ it. `C<putfile> I<filename>' will only touch the file.
 =head1 STYLES
 
 There is a set of predefined styles for different input files:
-HTML (html), HTML templating style (.html.sfish), TeX (tex), Java
+HTML (html), HTML templating style (html.sfish), TeX (tex), Java
 (java), Makefile (makefile), PostScript (ps), Python (python), and
 Perl (perl).
 
 =head2 HTML Style (html)
 
-=head2 HTML Templating Style (.html.sfish)
+=head2 HTML Templating Style (html.sfish)
 
 This style is similar to the HTML style, but it is supposed to be run
 in the replace mode towards a target .html file, so it allows for more
@@ -2152,8 +2173,8 @@ on small-memory machines and with huge files.
 =head1 THANKS
 
 I'd like to thank Steve Yeago, Tony Cox, Tony Abou-Assaleh for
-comments, and Charles Ikeson for suggesting the include function and
-other comments.
+comments, Charles Ikeson for suggesting the include function and
+other comments, and Mohammad S Anwar for corrections in Perl packaging.
 
 =head1 AUTHORS
 
@@ -2224,4 +2245,3 @@ interface.
 =back
 
 =cut
-# $Id: $

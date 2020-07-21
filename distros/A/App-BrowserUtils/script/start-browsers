@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-07-19'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ start-browsers - Start browsers
 
 =head1 VERSION
 
-This document describes version 0.008 of start-browsers (from Perl distribution App-BrowserUtils), released on 2020-06-13.
+This document describes version 0.009 of start-browsers (from Perl distribution App-BrowserUtils), released on 2020-07-19.
 
 =head1 SYNOPSIS
 
@@ -54,8 +54,7 @@ Usage:
      [--nostart-opera] [--nostart-vivaldi] [--opera-cmd-json=s]
      [--opera-cmd=s] [--page-result[=program]] [-q] [--quiet] [--quiet-arg]
      [--start-chrome] [--start-firefox] [--start-opera] [--start-vivaldi]
-     [--trace] [--verbose] [--view-result[=program]] [--vivaldi-cmd-json=s]
-     [--vivaldi-cmd=s]
+     [--trace] [--verbose] [--vivaldi-cmd-json=s] [--vivaldi-cmd=s]
 
 =head1 DESCRIPTION
 
@@ -231,10 +230,6 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
-
-=item B<--view-result>
-
-View output using a viewer.
 
 =back
 

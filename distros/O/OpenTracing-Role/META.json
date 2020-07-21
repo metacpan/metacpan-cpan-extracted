@@ -45,7 +45,8 @@
             "Time::HiRes" : "0",
             "Try::Tiny" : "0",
             "Types::Common::Numeric" : "0",
-            "Types::Standard" : "0"
+            "Types::Standard" : "0",
+            "Types::TypeTiny" : "0"
          }
       },
       "test" : {
@@ -61,6 +62,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.83.0",
+   "version" : "v0.84.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

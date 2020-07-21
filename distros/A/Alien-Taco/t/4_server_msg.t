@@ -4,7 +4,7 @@
 
 use strict;
 
-use Test::More tests => 19;
+use Test::More tests => 21;
 
 BEGIN {use_ok('Alien::Taco::Server');}
 
@@ -119,6 +119,16 @@ is_deeply($s->get_attribute({
     },
     'get_attribute');
 
+is_deeply($s->get_class_attribute({
+        class => 'TestObject',
+        name => '$static_attr',
+    }),
+    {
+        action => 'result',
+        result => 112233,
+    },
+    'get_class_attribute');
+
 is_deeply($s->get_value({
         name => '$main::variable',
     }),
@@ -145,6 +155,12 @@ $s->set_attribute({
     });
 is($o->{'k'}, 'newval', 'set_attribute');
 
+$s->set_class_attribute({
+        class => 'TestObject',
+        name => '$static_attr',
+        value => 332211,
+    });
+is($TestObject::static_attr, 332211, 'set_class_attribute');
 
 $s->set_value({
         name => '$main::variable',
@@ -162,7 +178,13 @@ sub test_func {
 
 package TestObject;
 
-$TestObject::context = 'not set yet';
+our $context;
+our $static_attr;
+
+BEGIN {
+    $context = 'not set yet';
+    $static_attr = 112233;
+}
 
 sub new {
     my $class = shift;

@@ -116,6 +116,7 @@ lib/Mojolicious/Plugin/EPRenderer.pm
 lib/Mojolicious/Plugin/HeaderCondition.pm
 lib/Mojolicious/Plugin/JSONConfig.pm
 lib/Mojolicious/Plugin/Mount.pm
+lib/Mojolicious/Plugin/NotYAMLConfig.pm
 lib/Mojolicious/Plugin/TagHelpers.pm
 lib/Mojolicious/Plugins.pm
 lib/Mojolicious/Renderer.pm
@@ -353,6 +354,11 @@ t/mojolicious/upload_lite_app.t
 t/mojolicious/upload_stream_lite_app.t
 t/mojolicious/validation_lite_app.t
 t/mojolicious/websocket_lite_app.t
+t/mojolicious/yaml_config_lite_app.t
+t/mojolicious/yaml_config_lite_app.yaml
+t/mojolicious/yaml_config_lite_app.yml
+t/mojolicious/yaml_config_lite_app_abs.development.yml
+t/mojolicious/yaml_config_lite_app_abs.yml
 t/pod.t
 t/pod_coverage.t
 t/test/mojo.t

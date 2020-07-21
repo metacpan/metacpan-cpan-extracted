@@ -197,3 +197,6 @@ in a lot of places.
 2.27 2020-05-26 15:56:27 rurban
    - fix various null derefs (RT #132711, reported by Petr Pisar)
    - 5.6 does not work for some time, disallow
+
+2.28 2020-07-18 08:05:11 rurban
+   - re-upload with unexpired gpg key. no changes.

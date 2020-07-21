@@ -5,7 +5,7 @@ use 5.006;
 
 package HTTP::BrowserDetect;
 
-our $VERSION = '3.29';
+our $VERSION = '3.30';
 
 use vars qw(@ALL_TESTS);
 
@@ -1827,9 +1827,10 @@ sub _init_version {
         # specific approaches and go straight to the generic ones.
     }
     elsif ( $browser_tests->{edge} ) {
-        ( $major, $minor, $beta ) = $ua =~ m{Edge/(\d+)\.(\d+)\.?(\d+)?}i;
         ( $major, $minor, $beta )
-            = $ua =~ m{(?:Edg|EdgA|EdgiOS)/(\d+)\.(\d+)\.?(\d+)\.?(\d+)?}i
+            = $ua =~ m{Edge/(\d+)(?:\.(\d+))?([\.\d]+)?}i;
+        ( $major, $minor, $beta )
+            = $ua =~ m{(?:Edg|EdgA|EdgiOS)/(\d+)(?:\.(\d+))?([\.\d]+)?}i
             unless defined $major;
     }
     elsif ( $browser_tests->{safari} ) {
@@ -2984,7 +2985,7 @@ HTTP::BrowserDetect - Determine Web browser, version, and platform from an HTTP 
 
 =head1 VERSION
 
-version 3.29
+version 3.30
 
 =head1 SYNOPSIS
 

@@ -5,17 +5,16 @@ package Modern::Open;
 #
 # http://search.cpan.org/dist/Modern-Open/
 #
-# Copyright (c) 2014, 2015, 2018, 2019 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2014, 2015, 2018, 2019, 2020 INABA Hitoshi <ina@cpan.org>
 ######################################################################
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 $VERSION = $VERSION;
 
 use 5.00503;
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 
-use Symbol;
 use Fcntl;
 
 sub Modern::Open::confess (@) {
@@ -28,13 +27,14 @@ sub Modern::Open::confess (@) {
     print STDERR CORE::reverse @confess;
     print STDERR "\n";
     print STDERR @_;
+    die "\n";
 }
 
-sub Modern::Open::open(*$;$) {
+sub Modern::Open::open (*$;$) {
     my $handle;
 
     if (defined $_[0]) {
-        $handle = Symbol::qualify_to_ref($_[0], caller());
+        Modern::Open::confess "Bare handle no longer supported";
     }
     else {
         $handle = $_[0] = \do { local *_ };
@@ -99,11 +99,11 @@ sub Modern::Open::open(*$;$) {
     }
 }
 
-sub Modern::Open::opendir(*$) {
+sub Modern::Open::opendir (*$) {
     my $handle;
 
     if (defined $_[0]) {
-        $handle = Symbol::qualify_to_ref($_[0], caller());
+        Modern::Open::confess "Bare handle no longer supported";
     }
     else {
         $handle = $_[0] = \do { local *_ };
@@ -118,11 +118,11 @@ sub Modern::Open::opendir(*$) {
     }
 }
 
-sub Modern::Open::sysopen(*$$;$) {
+sub Modern::Open::sysopen (*$$;$) {
     my $handle;
 
     if (defined $_[0]) {
-        $handle = Symbol::qualify_to_ref($_[0], caller());
+        Modern::Open::confess "Bare handle no longer supported";
     }
     else {
         $handle = $_[0] = \do { local *_ };
@@ -154,18 +154,18 @@ sub Modern::Open::sysopen(*$$;$) {
     }
 }
 
-sub Modern::Open::pipe(**) {
+sub Modern::Open::pipe (**) {
     my($handle0,$handle1);
 
     if (defined $_[0]) {
-        $handle0 = Symbol::qualify_to_ref($_[0], caller());
+        Modern::Open::confess "Bare handle no longer supported";
     }
     else {
         $handle0 = $_[0] = \do { local *_ };
     }
 
     if (defined $_[1]) {
-        $handle1 = Symbol::qualify_to_ref($_[1], caller());
+        Modern::Open::confess "Bare handle no longer supported";
     }
     else {
         $handle1 = $_[1] = \do { local *_ };
@@ -180,11 +180,11 @@ sub Modern::Open::pipe(**) {
     }
 }
 
-sub Modern::Open::socket(*$$$) {
+sub Modern::Open::socket (*$$$) {
     my $handle;
 
     if (defined $_[0]) {
-        $handle = Symbol::qualify_to_ref($_[0], caller());
+        Modern::Open::confess "Bare handle no longer supported";
     }
     else {
         $handle = $_[0] = \do { local *_ };
@@ -194,18 +194,18 @@ sub Modern::Open::socket(*$$$) {
     return CORE::socket($handle,$_[1],$_[2],$_[3]);
 }
 
-sub Modern::Open::accept(**) {
+sub Modern::Open::accept (**) {
     my($handle0,$handle1);
 
     if (defined $_[0]) {
-        $handle0 = Symbol::qualify_to_ref($_[0], caller());
+        Modern::Open::confess "Bare handle no longer supported";
     }
     else {
         $handle0 = $_[0] = \do { local *_ };
     }
 
     if (defined $_[1]) {
-        $handle1 = Symbol::qualify_to_ref($_[1], caller());
+        Modern::Open::confess "Bare handle no longer supported";
     }
 
     my $return = CORE::accept($handle0,$handle1);
@@ -271,6 +271,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 =head1 SEE ALSO
 
 =over 4
+
+=item * L<announcing-perl-7|https://www.perl.com/article/announcing-perl-7/> - Announcing Perl 7 Jun 24, 2020 by brian d foy
 
 =item * L<open|http://perldoc.perl.org/functions/open.html> - Perl Programming Documentation
 

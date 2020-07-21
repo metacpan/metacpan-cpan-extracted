@@ -29,7 +29,7 @@ sub callback_func
 
 print "Instantiating module...\n";
 my $instance = Wasm::Wasmtime::Instance->new(
-  $module, [\&callback_func],
+  $module, $store, [\&callback_func],
 );
 
 print "Extracting export...\n";

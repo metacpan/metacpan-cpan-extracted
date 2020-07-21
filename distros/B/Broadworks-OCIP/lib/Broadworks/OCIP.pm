@@ -8,7 +8,7 @@ use utf8;
 use feature 'unicode_strings';
 use namespace::autoclean;
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Broadworks::OCIP::Response;
@@ -21,7 +21,7 @@ use Encode;
 use IO::Select;
 use IO::Socket::INET;
 use Moose;
-use Method::Signatures;
+use Function::Parameters;
 use MooseX::StrictConstructor;
 use XML::Writer;
 
@@ -248,7 +248,7 @@ around 'BUILDARGS' => sub {
         if ( not( ref( $_[0] ) ) ) {
 
             # single non reference argument - we treat this as a config filename
-            my $fn = shift;
+            my $fn      = shift;
             my $confset = Config::Any->load_files( { files => [$fn], use_ext => 1 } );
             unless ($confset) {
                 Broadworks::OCIP::Throwable->throw(
@@ -299,6 +299,8 @@ method send ($string) {
 }
 
 # ----------------------------------------------------------------------
+
+
 method receive ($expected,$die_on_error) {
 
     my $bytes = '';
@@ -456,7 +458,7 @@ Broadworks::OCIP - API for communication with Broadworks OCI-P Interface
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =for test_synopsis 1;
 __END__
@@ -572,6 +574,11 @@ in its place.  This means dumping the object will not reveal the password.
 Sends an XML document to the Broadworks remote over the socket. Convert the
 passed string to the correct character set.
 
+=head3 receive
+
+Receive an XML response from the Broadworks remote over the socket. Decode the
+received string and pass to the L<Broadworks::OCIP::Response> constructor.
+
 =head3 send_command_xml
 
 Builds an XML command document from the command passed and the parameters
@@ -603,7 +610,7 @@ Nigel Metheringham <Nigel.Metheringham@redcentricplc.com>
 
 =head1 COPYRIGHT
 
-Copyright 2014 Recentric Solutions Limited. All rights reserved.
+Copyright 2014-2020 Recentric Solutions Limited. All rights reserved.
 
 =head1 AUTHOR
 
@@ -611,7 +618,7 @@ Nigel Metheringham <nigelm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Nigel Metheringham.
+This software is copyright (c) 2020 by Nigel Metheringham.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

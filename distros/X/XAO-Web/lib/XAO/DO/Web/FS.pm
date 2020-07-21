@@ -1059,6 +1059,8 @@ sub form_fields {
 1;
 __END__
 
+=back
+
 =head1 METHODS
 
 No publicly available methods except overriden display().

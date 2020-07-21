@@ -31,7 +31,7 @@
 #
 # SPDX-License-Identifier: MIT
 
-use 5.008;
+use 5.010;
 use strict;
 use warnings;
 
@@ -48,7 +48,7 @@ my @BAD_STRINGS = qw(rra@stanford.edu RRA_MAINTAINER_TESTS);
 
 # File or directory names to always skip.
 my %SKIP = map { $_ => 1 } qw(
-  .git Changes _build blib cover_db debian obsolete-strings.t
+  .git Changes _build blib changelog cover_db obsolete-strings.t
 );
 
 # Only run this test during automated testing, since failure doesn't indicate

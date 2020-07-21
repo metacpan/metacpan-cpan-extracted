@@ -17,11 +17,12 @@ use URI::Escape;
 use Encode qw(decode_utf8);
 use Readonly;
 use DateTime::Format::ISO8601;
+use JSON;
 
 use Web::Microformats2::Parser;
 use Web::Mention::Author;
 
-our $VERSION = '0.712';
+our $VERSION = '0.720';
 
 Readonly my @VALID_RSVP_TYPES => qw(yes no maybe interested);
 
@@ -99,7 +100,7 @@ has 'rsvp_type' => (
 );
 
 has 'author' => (
-    isa => Maybe[InstanceOf['Web::Mention::Author']],
+    isa => InstanceOf['Web::Mention::Author'],
     is => 'lazy',
     clearer => '_clear_author',
 );
@@ -304,7 +305,7 @@ sub _build_author {
         );
     }
     else {
-        return;
+        return Web::Mention::Author->new;
     }
 }
 
@@ -559,6 +560,16 @@ sub _title_element_content {
     }
 }
 
+sub as_json {
+    my $self = shift;
+    return JSON->new->convert_blessed->encode( $self );
+}
+
+sub new_from_json {
+    my ($class, $json) = @_;
+    return $class->FROM_JSON( JSON->new->decode( $json ) );
+}
+
 # Called by the JSON module during JSON encoding.
 # Contrary to the (required) name, returns an unblessed reference, not JSON.
 # See https://metacpan.org/pod/JSON#OBJECT-SERIALISATION
@@ -571,12 +582,14 @@ sub TO_JSON {
         time_received => $self->time_received->epoch,
     };
 
-    if ( $self->is_tested ) {
-    	$return_ref->{ is_tested } = $self->is_tested;
-    	$return_ref->{ is_verified } = $self->is_verified;
-	    $return_ref->{ type } = $self->type;
+   if ( $self->is_tested ) {
+        foreach (qw(
+            is_tested is_verified type content source_html title content
+            rsvp_type
+        )) {
+            $return_ref->{$_} = $self->$_;
+        }
     	$return_ref->{ time_verified } = $self->time_verified->epoch;
-    	$return_ref->{ content } = $self->content;
     	$return_ref->{ source_html } = $self->source_html;
 	    if ( $self->source_mf2_document ) {
     	    $return_ref->{ mf2_document_json } =
@@ -585,6 +598,9 @@ sub TO_JSON {
     	else {
 	        $return_ref->{ mf2_document_json } = undef;
     	}
+        foreach (qw( name url photo ) ) {
+            $return_ref->{ author }->{ $_ } = $self->author->$_;
+        }
     }
 
     return $return_ref;
@@ -601,6 +617,11 @@ sub FROM_JSON {
     	    $data_ref->{ $_ } =
     	        DateTime->from_epoch( epoch => $data_ref->{ $_ } );
     	}
+    }
+
+    if ( $data_ref->{ author } ) {
+        $data_ref->{ author } =
+            Web::Mention::Author->new( $data_ref->{ author } );
     }
 
     my $webmention = $class->new( $data_ref );
@@ -755,6 +776,12 @@ Note that (as with all this class's constructors) this method won't
 proceed to actually send the generated webmentions; that step remains
 yours to take. (See L<"send">.)
 
+=head3 new_from_json
+
+ $wm = Web::Mention->new_from_json( $json );
+
+Returns a new webmention based on the JSON output of L<"as_json">.
+
 =head3 new_from_request
 
  $wm = Web::Mention->new_from_request( $request_object );
@@ -770,23 +797,6 @@ example.
 
 Throws an exception if the given argument doesn't meet this requirement,
 or if it does but does not define both required HTTP parameters.
-
-=head3 FROM_JSON
-
- use JSON;
-
- $wm = Web::Mention->FROM_JSON(
-    JSON::decode_json( $serialized_webmention )
- );
-
-Converts an unblessed hash reference resulting from an earlier
-serialization (via L<JSON>) into a fully fledged Web::Mention object.
-See L<"SERIALIZATION">.
-
-The all-caps spelling comes from a perhaps-misguided attempt to pair
-well with the TO_JSON method that L<JSON> requires. As such, this method
-may end up deprecated in favor of a less convoluted approach in future
-releases of this module.
 
 =head3 content_truncation_marker
 
@@ -808,13 +818,24 @@ Defaults to 280.
 
 =head2 Object Methods
 
+=head3 as_json
+
+ $json = $wm->as_json;
+
+Returns a JSON representation of the webmention.
+
+See L<"SERIALIZATION">, below, for more information.
+
 =head3 author
 
  $author = $wm->author;
 
-A Web::Mention::Author object representing the author of this
-webmention's source document, if we're able to determine it. If not,
-this returns undef.
+A L<Web::Mention::Author> object representing the author of this
+webmention's source document. You can get information about the author through
+its C<name>, C<url>, and C<photo> methods.
+
+If the webmention's author is unknown or unset, then this method returns a
+L<Web::Mention::Author> object with all its fields set to C<undef>.
 
 =head3 content
 
@@ -1066,17 +1087,19 @@ See also L<"is_verified">.
 
 =head1 SERIALIZATION
 
-To serialize a Web::Mention object into JSON, enable L<the JSON module's
-"convert_blessed" feature|JSON/"convert_blessed">, and then use one of
-that module's JSON-encoding functions on this object. This will result
-in a JSON string containing all the pertinent information about the
-webmention, including its verification status, any content and metadata
-fetched from the target, and so on.
+To serialize a Web::Mention object, use L<"as_json">, which returns a
+JSON string that you can store in any way you wish. You can later
+"inflate" it into a Web::Mention object through the L<"new_from_json">
+class method.
 
-To unserialize a Web::Mention object serialized in this way, first
-decode it into an unblessed hash reference via L<JSON>, and then pass
-that as the single argument to L<the FROM_JSON class
-method|"FROM_JSON">.
+Note that a verified webmention might serialize to a significantly
+larger JSON string than an unverified one: it might include a complete
+copy of the source document, its parsed microformats (if any), author
+information, and various other metadata. Unverified webmentions, on the
+other hand, will likely contain little data other that their source and
+target URLs.
+
+This is all normal; verified webmentions just have more luggage.
 
 =head1 NOTES AND BUGS
 

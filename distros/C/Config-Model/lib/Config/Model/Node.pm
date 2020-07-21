@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2019 by Dominique Dumont.
+# This software is Copyright (c) 2005-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.138;
+package Config::Model::Node 2.139;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -438,6 +438,7 @@ sub has_element {
     my %args = ( @_ > 1 ) ? @_ : ( name => shift );
     my $name = $args{name};
     my $type = $args{type};
+    my $autoadd = $args{autoadd} // 1;
 
     if ( not defined $name ) {
         Config::Model::Exception::Internal->throw(
@@ -446,7 +447,7 @@ sub has_element {
         );
     }
 
-    $self->accept_element($name);
+    $self->accept_element($name) if $autoadd;
     return 0 unless defined $self->{model}{element}{$name};
     return 1 unless defined $type;
     return $self->{model}{element}{$name}{type} eq $type ? 1 : 0;
@@ -654,6 +655,7 @@ sub fetch_element {
 
     my $check         = $self->_check_check( $args{check} );
     my $accept_hidden = $args{accept_hidden} || 0;
+    my $autoadd       = $args{autoadd} // 1;
 
     $self->init();
 
@@ -663,7 +665,7 @@ sub fetch_element {
     if ( not defined $self->{element}{$element_name} ) {
 
         # We also need to check if element name is matched by any of 'accept' parameters
-        $self->accept_element($element_name);
+        $self->accept_element($element_name) if $autoadd;
         $self->create_element( name => $element_name, check => $check ) or return;
     }
 
@@ -1134,6 +1136,19 @@ sub get_help {
     return defined $help ? $help : '';
 }
 
+sub get_info {
+    my $self = shift;
+
+    my @items = ( 'type: ' . $self->get_type, 'class name: ' . $self->config_class_name, );
+
+    my @rexp = $self->accept_regexp;
+    if (@rexp) {
+        push @items, 'accept: /^' . join( '$/, /^', @rexp ) . '$/';
+    }
+
+    return @items;
+}
+
 sub tree_searcher {
     my $self = shift;
 
@@ -1234,7 +1249,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.138
+version 2.139
 
 =head1 SYNOPSIS
 
@@ -1604,11 +1619,14 @@ L<Config::Model::AnyThing>
 
 =head2 has_element
 
-Parameters: C<< ( name => element_name, [ type => searched_type ] ) >>
+Arguments: C<< ( name => element_name, [ type => searched_type ],  [ autoadd => 1 ] ) >>
 
-Returns 1 if the class model has the element declared or if the element
-name is matched by the optional C<accept> parameter. If C<type> is specified, the
-element name must also match the type.
+Returns 1 if the class model has the element declared.
+
+Returns 1 as well if C<autoadd> is 1 (i.e. by default) and the element
+name is matched by the optional C<accept> model parameter.
+
+If C<type> is specified, the element name must also match the type.
 
 =head2 find_element
 
@@ -1769,12 +1787,21 @@ Reset a property of an element according to the original model.
 
 =head2 fetch_element
 
-Parameters: C<< ( name => .. , [ check => ..] ) >>
+Arguments: C<< ( name => .. , [ check => ..], [ autoadd => 1 ] ) >>
 
-Fetch and returns an element from a node.
+Fetch and returns an element from a node if the class model has the
+element declared.
 
-check can be set to yes, no or skip. When check is C<no> or C<skip>, can return C<undef> when the
+Also fetch and returns an element from a node if C<autoadd> is 1
+(i.e. by default) and the element name is matched by the optional
+C<accept> model parameter.
+
+C<check> can be set to C<yes>, C<no> or C<skip>.
+When C<check> is C<no> or C<skip>, this method returns C<undef> when the
 element is unknown, or 0 if the element is not available (hidden).
+
+By default, "accepted" elements are automatically created. Set
+C<autoadd> to 0 when this behavior is not wanted.
 
 =head2 fetch_element_value
 
@@ -1966,6 +1993,11 @@ C<description> of the element.
 
 Returns an empty string if no description was found.
 
+=head2 get_info
+
+Returns a list of information related to the node. See
+L<Config::Model::Value/get_info> for more details.
+
 =head2 tree_searcher
 
 Parameters: C<< ( type => ... ) >>
@@ -2013,7 +2045,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2019 by Dominique Dumont.
+This software is Copyright (c) 2005-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

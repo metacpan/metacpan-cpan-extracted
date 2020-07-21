@@ -5,9 +5,10 @@ use strict;
 use warnings;
 no warnings 'once';
 
+use Term::ANSIColor qw(:constants);
 use Module::Install::Base;
 use base 'Module::Install::Base';
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 
 use FindBin;
 use File::Glob     ();
@@ -73,6 +74,22 @@ sub RTx {
     # Set a baseline minimum version
     unless ( $extra_args->{deprecated_rt} ) {
         $self->requires_rt('4.0.0');
+    }
+
+    my $package = $name;
+    $package =~ s/-/::/g;
+    if ( $RT::CORED_PLUGINS{$package} ) {
+        my ($base_version) = $RT::VERSION =~ /(\d+\.\d+\.\d+)/;
+        die RED, <<"EOT";
+
+**** Error: Your installed version of RT ($RT::VERSION) already
+            contains this extension in core, so you don't need to
+            install it.
+
+            Check https://docs.bestpractical.com/rt/$base_version/RT_Config.html
+            to configure it.
+
+EOT
     }
 
     # Installation locations
@@ -222,7 +239,7 @@ sub requires_rt {
     my @sorted = sort RT::Handle::cmp_version $version,$RT::VERSION;
 
     if ($sorted[-1] eq $version) {
-        die <<"EOT";
+        die RED, <<"EOT";
 
 **** Error: This extension requires RT $version. Your installed version
             of RT ($RT::VERSION) is too old.
@@ -248,12 +265,12 @@ sub requires_rt_plugin {
         unshift @INC, $path;
     } else {
         my $name = $self->name;
-        warn <<"EOT";
+        my $msg = <<"EOT";
 
 **** Warning: $name requires that the $plugin plugin be installed and
               enabled; it does not appear to be installed.
-
 EOT
+        warn RED, $msg, RESET, "\n";
     }
     $self->requires(@_);
 }
@@ -263,9 +280,8 @@ sub rt_too_new {
     my $name = $self->name;
     $msg ||= <<EOT;
 
-**** Error: Your installed version of RT (%s) is too new; this extension
-            only works with versions older than %s.
-
+**** Warning: Your installed version of RT (%s) is too new; this extension
+              has not been tested on your version of RT and may not work as expected.
 EOT
     $self->add_metadata("x_rt_too_new", $version) if $self->is_admin;
 
@@ -273,7 +289,7 @@ EOT
     my @sorted = sort RT::Handle::cmp_version $version,$RT::VERSION;
 
     if ($sorted[0] eq $version) {
-        die sprintf($msg,$RT::VERSION,$version);
+        warn RED, sprintf($msg,$RT::VERSION), RESET, "\n";
     }
 }
 

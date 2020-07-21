@@ -1,3 +1,8 @@
+0.007   2020-04-19  Released-By: PERLANCAR; Urgency: low
+
+	- [ux] Tweak --profiles to support comma-separated values.
+
+
 0.006   2020-04-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Now by default dump history from all profiles instead of trying

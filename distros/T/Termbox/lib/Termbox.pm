@@ -2,7 +2,7 @@ package Termbox {
     use 5.020;
     use strictures 2;
     use warnings;
-    our $VERSION = "0.10";
+    our $VERSION = "0.11";
     #
     use File::ShareDir qw[dist_dir];
     use File::Spec::Functions qw[catdir canonpath];

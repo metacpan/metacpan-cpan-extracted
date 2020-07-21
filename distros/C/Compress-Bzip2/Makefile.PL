@@ -72,8 +72,8 @@ WriteMakefile(
     {"recommends" =>
      {
        'Compress::Zlib'       => '1.19',
-       'IO::Compress::Bzip2'  => '2.060',
-       'Compress::Raw::Bzip2' => '2.060',
+       'IO::Compress::Bzip2'  => '2.094',
+       'Compress::Raw::Bzip2' => '2.094',
      },
      resources =>
      {

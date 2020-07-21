@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.29'
+version: '3.30'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -605,7 +605,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.29
+          tag: v3.30
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

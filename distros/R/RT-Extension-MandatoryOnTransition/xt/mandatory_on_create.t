@@ -66,6 +66,7 @@ diag "Test mandatory fields on create";
                           fields => { Status => 'resolved',
                                       "Object-RT::Ticket--CustomField-$id-Values" => 'foo',
                                       'TimeWorked' => '10', },
+                          button => 'SubmitTicket',
                         }, 'Submit with resolved status');
 
     $m->content_contains("Ticket 1 created in queue &#39;General&#39;");
@@ -147,6 +148,7 @@ diag "Test mandatory fields on create with content";
                           fields => { Status => 'resolved',
                                       'TimeWorked' => '10',
                                       'Content' => 'This is a message' },
+                          button => 'SubmitTicket',
                         }, 'Submit with resolved status');
 
     $m->content_contains("Ticket 3 created in queue &#39;Content&#39;");

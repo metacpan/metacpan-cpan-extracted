@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.031';
+$App::Cme::Command::run::VERSION = '1.032';
 use strict;
 use warnings;
 use 5.10.1;
@@ -252,7 +252,7 @@ sub execute {
 }
 
 package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.031';
+$App::Cme::Run::Var::VERSION = '1.032';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
@@ -279,12 +279,12 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.031
+version 1.032
 
 =head1 SYNOPSIS
 
  $ cat ~/.cme/scripts/remove-mia
- doc: remove mia from Uploders. Require mia parameter
+ doc: remove mia from Uploaders. Require mia parameter
  # declare app to configure
  app: dpkg
  # specify one or more instructions
@@ -308,7 +308,7 @@ version 1.031
 
  # show the script documentation
  $ cme run remove-mia -doc
- remove mia from Uploders. require mia parameter
+ remove mia from Uploaders. require mia parameter
 
  # list scripts
  $ cme run -list

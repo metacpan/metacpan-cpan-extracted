@@ -1,0 +1,59 @@
+Revision history for Perl extension Compress-Zstd
+
+0.201 2020-07-19T10:29:56Z
+
+0.20 2019-09-29T10:25:55Z
+    - zstd 1.4.3
+
+0.19 2019-08-12T08:33:36Z
+    - zstd 1.4.2
+
+0.18 2019-04-29T08:45:05Z
+    - zstd 1.4.0
+
+0.17 2019-03-31T12:24:15Z
+    - Added experimental context and dictionary interfaces
+
+0.16 2019-02-23T07:28:15Z
+    - zstd 1.3.8
+
+0.15 2018-10-24T16:56:29Z
+    - zstd 1.3.7
+
+0.14 2018-07-14T12:40:09Z
+    - zstd 1.3.5
+
+0.13 2018-04-01T03:50:50Z
+    - zstd 1.3.4
+
+0.12 2018-03-19T17:28:58Z
+    - zstd 1.3.3
+
+0.11 2017-10-28T09:58:01Z
+    - zstd 1.3.2
+
+0.10 2017-09-30T07:13:12Z
+    - Add streaming interfaces
+
+0.06 2017-09-24T12:23:22Z
+    - zstd 1.3.1
+    - Support >= Perl 5.26.0 (@INC problem)
+    - Support *BSD
+
+0.05 2017-03-18T08:02:21Z
+    - zstd 1.1.4
+
+0.04 2017-03-11T09:32:56Z
+    - zstd 1.1.3
+    - Implement compress_mt (uses ZSTDMT_compressCCtx)
+
+0.03 2016-12-28T08:25:29Z
+    - zstd 1.1.2
+
+0.02 2016-09-29T11:30:58Z
+    - zstd 1.1.0
+
+0.01 2016-09-03T08:07:51Z
+
+    - original version
+

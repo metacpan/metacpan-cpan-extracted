@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 $VERSION = $VERSION;
 
 # internal use
@@ -245,9 +245,8 @@ sub mb::chr {
 # do FILE for MBCS encoding
 sub mb::do {
     my($file) = @_;
-    for my $prefix (@INC) {
-        my $prefix_file = "$prefix/$file";
-        if (mb::_f($prefix_file)) {
+    for my $prefix_file ($file, map { "$_/$file" } @INC) {
+        if (-f $prefix_file) {
 
             # poor "make"
             (my $prefix_file_oo = $prefix_file) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
@@ -489,9 +488,9 @@ sub mb::require {
         }
 
         # find expr in @INC
-        for my $prefix (@INC) {
-            my $prefix_file = "$prefix/$_";
-            if (mb::_f($prefix_file)) {
+        my $file = $_;
+        for my $prefix_file ($file, map { "$_/$file" } @INC) {
+            if (-f $prefix_file) {
 
                 # poor "make"
                 (my $prefix_file_oo = $prefix_file) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
@@ -2661,8 +2660,8 @@ sub parse_expr {
         }
         my $regexp = '';
 
-        # split /^/   --> mb::split qr/^/m
-        # split /.../ --> mb::split qr/.../
+        # split /^/   --> mb::_split qr/^/m
+        # split /.../ --> mb::_split qr/.../
         if (m{\G ( [/] )  }xmsgc) {
             $parsed .= "qr";
             $regexp = parse_re_endswith('m',$1);                                                   # split /.../
@@ -2693,8 +2692,8 @@ sub parse_expr {
             }
         }
 
-        # split m/^/   --> mb::split qr/^/m
-        # split m/.../ --> mb::split qr/.../
+        # split m/^/   --> mb::_split qr/^/m
+        # split m/.../ --> mb::_split qr/.../
         elsif (/\G ( m | qr ) \b /xmsgc) {
             $parsed .= "qr";
 
@@ -4442,7 +4441,7 @@ To install this software without make, type the following:
              https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP
   ------------------------------------------------------------------------------
   gb18030
-             1st       2nd
+             1st       2nd       3rd       4th
              81..FE    30..39    81..FE    30..39
              81..FE    00..FF
              00..7F

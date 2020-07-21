@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2019 by Dominique Dumont.
+# This software is Copyright (c) 2005-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.138;
+package Config::Model::Value 2.139;
 
 use 5.10.1;
 
@@ -730,6 +730,48 @@ sub get_choice {
     return @{ $self->{choice} || [] };
 }
 
+sub get_info {
+    my $self = shift;
+
+    my $type       = $self->value_type;
+    my @choice     = $type eq 'enum' ? $self->get_choice : ();
+    my $choice_str = @choice ? ' (' . join( ',', @choice ) . ')' : '';
+
+    my @items = ( 'type: ' . $self->value_type . $choice_str, );
+
+    my $std = $self->fetch(qw/mode standard check no/);
+
+    if ( defined $self->upstream_default ) {
+        push @items, "upstream_default value: " . $self->upstream_default;
+    }
+    elsif ( defined $std ) {
+        push @items, "default value: $std";
+    }
+    elsif ( defined $self->refer_to ) {
+        push @items, "reference to: " . $self->refer_to;
+    }
+    elsif ( defined $self->computed_refer_to ) {
+        push @items, "computed reference to: " . $self->computed_refer_to;
+    }
+
+    my $m = $self->mandatory;
+    push @items, "is mandatory: " . ( $m ? 'yes' : 'no' ) if defined $m;
+
+    foreach my $what (qw/min max warn grammar/) {
+        my $v = $self->$what();
+        push @items, "$what value: $v" if defined $v;
+    }
+
+    foreach my $what (qw/warn_if_match warn_unless_match/) {
+        my $v = $self->$what();
+        foreach my $k ( keys %$v ) {
+            push @items, "$what value: $k";
+        }
+    }
+
+    return @items ;
+}
+
 sub get_help {
     my $self = shift;
 
@@ -1215,8 +1257,8 @@ sub show_warnings {
             $warn_h{$w} = 1;
             my $w_msg = "Warning in '" . $self->location_short . "': $w\nOffending value: $w_str";
             if ($old_warn->{$w}) {
-                # user has already seen the warning, let's use info level (required by tests)
-                $user_logger->info($w_msg);
+                # user has already seen the warning, let's use debug level (required by tests)
+                $user_logger->debug($w_msg);
             }
             else {
                 if ($::_use_log4perl_to_warn) {
@@ -1947,7 +1989,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.138
+version 2.139
 
 =head1 SYNOPSIS
 
@@ -2570,6 +2612,16 @@ value or undef.
 
 Without parameter returns a hash ref that contains all the help strings.
 
+=head2 get_info
+
+Returns a list of information related to the value, like value type,
+default value. This should be used to provide some debug information
+to the user.
+
+For instance, C<$val->get-info> may return:
+
+ [ 'type: string', 'mandatory: yes' ]
+
 =head2 error_msg
 
 Returns the error messages of this object (if any)
@@ -3031,7 +3083,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2019 by Dominique Dumont.
+This software is Copyright (c) 2005-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

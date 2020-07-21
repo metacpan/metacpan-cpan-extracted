@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     "script/complete-acme-metasyntactic-meta-theme",
     "script/complete-acme-metasyntactic-meta-theme-and-category",
     "script/complete-array-elem",
+    "script/complete-chrome-profile-name",
     "script/complete-country-code",
     "script/complete-currency-code",
     "script/complete-cwalitee-indicator",
@@ -71,6 +72,7 @@ my %WriteMakefileArgs = (
   "NAME" => "App::CompleteCLIs",
   "PREREQ_PM" => {
     "Complete::Acme::MetaSyntactic" => "0.002",
+    "Complete::Chrome" => 0,
     "Complete::Country" => 0,
     "Complete::Currency" => 0,
     "Complete::Cwalitee" => 0,
@@ -122,7 +124,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.144",
+  "VERSION" => "0.145",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -131,6 +133,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Complete::Acme::MetaSyntactic" => "0.002",
+  "Complete::Chrome" => 0,
   "Complete::Country" => 0,
   "Complete::Currency" => 0,
   "Complete::Cwalitee" => 0,

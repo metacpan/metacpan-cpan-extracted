@@ -1,5 +1,5 @@
 package Game::Battleship::Grid;
-$Game::Battleship::Grid::VERSION = '0.0601';
+$Game::Battleship::Grid::VERSION = '0.0602';
 our $AUTHORITY = 'cpan:GENE';
 
 use Carp;
@@ -39,7 +39,8 @@ sub BUILD {
             # Set the craft orientation and tail coordinates.
             ($orient, $x1, $y1) = _tail_coordinates(
                 $x0, $y0,
-                $craft->points - 1
+                $craft->points - 1,
+                $craft->orient
             );
         }
         else {
@@ -52,7 +53,8 @@ sub BUILD {
                 # Set the craft orientation and tail coordinates.
                 ($orient, $x1, $y1) = _tail_coordinates(
                     $x0, $y0,
-                    $craft->points - 1
+                    $craft->points - 1,
+                    $craft->orient
                 );
 
                 # If the craft is not placed off the grid and it does
@@ -108,10 +110,11 @@ sub BUILD {
 sub _tail_coordinates {
     # Get the coordinates of the end of the segment based on a given
     # span.
-    my ($x0, $y0, $span) = @_;
+    my ($x0, $y0, $span, $orient) = @_;
 
     # Set orientation to 0 (vertical) or 1 (horizontal).
-    my $orient = int rand 2;
+    $orient = int rand 2
+        unless defined $orient;
 
     my ($x1, $y1) = ($x0, $y0);
 
@@ -224,7 +227,7 @@ Game::Battleship::Grid
 
 =head1 VERSION
 
-version 0.0601
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -240,13 +243,9 @@ A C<Game::Battleship::Grid> object represents a Battleship playing
 surface complete with fleet position references and line intersection
 collision detection.
 
-=head1 NAME
-
-Game::Battleship::Grid - A Battleship grid class
-
 =head1 PUBLIC METHODS
 
-=head2 B<new> %ARGUMENTS
+=head2 new
 
 =over 4
 
@@ -269,15 +268,13 @@ If not provided, the standard ten by ten playing surface is used.
 
 =back
 
-=head2 B<BUILD>
-
-Setup
+=for Pod::Coverage BUILD
 
 =head1 PRIVATE FUNCTIONS
 
 =over 4
 
-=item B<_tail_coordinates> @COORDINATES, $SPAN
+=item _tail_coordinates
 
   ($orientation, $x1, $y1) = _tail_coordinates($x0, $y0, $span);
 
@@ -285,7 +282,7 @@ Return a vector for the craft.  That is, hand back the vertical or
 horizontal line segment orientation and the tail coordinates based on
 the head coordinates and the length of the segment (i.e. the craft).
 
-=item B<_segment_intersection> @COORDINATES
+=item _segment_intersection
 
   $intersect = _segment_intersection(
       p_x0, p_y0,  p_x1, p_y1,
@@ -317,15 +314,7 @@ L<Game::Battleship::Craft>
 
 Segment intersection:
 
-C<http://www.meca.ucl.ac.be/~wu/FSA2716/Exercise1.htm>
-
-=head1 AUTHOR
-
-Gene Boggs E<lt>gene@cpan.orgE<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-See L<Game::Battleship>.
+L<http://www.meca.ucl.ac.be/~wu/FSA2716/Exercise1.htm>
 
 =head1 AUTHOR
 
@@ -333,7 +322,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

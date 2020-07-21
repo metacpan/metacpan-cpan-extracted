@@ -1,5 +1,8 @@
 Revision history for RT-Extension-MergeUsers
 
+1.06 2020-07-17
+ - Add RT 5 support
+
 1.05 2020-02-05
  - Fix the logic of "skipping duplicated records" in users collections
 

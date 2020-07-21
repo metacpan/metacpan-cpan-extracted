@@ -1,0 +1,9 @@
+Build.PL
+buildext/Alien/DBD/SQLite/BundledExtensions.pm
+lib/DBD/SQLite/BundledExtensions.pm
+MANIFEST			This list of files
+META.json
+META.yml
+source/sqlite-src-3150200.zip
+t/01-load-all.t
+Changes

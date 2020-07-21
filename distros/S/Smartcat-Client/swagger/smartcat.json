@@ -1,0 +1,4341 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "v1",
+    "title": "Smartcat Integration API"
+  },
+  "host": "smartcat.ai",
+  "schemes": [
+    "https"
+  ],
+  "paths": {
+    "/api/integration/v1/account": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Receiving the account details",
+        "operationId": "Account_GetAccountInfo",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "$ref": "#/definitions/AccountModel"
+            }
+          },
+          "404": {
+            "description": "Returns if no account plugged into the integration API has been found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/account/mtengines": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Receiving MT engines available for the account",
+        "operationId": "Account_GetMTEnginesForAccount",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MTEngineModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/account/myTeam/{userId}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "Account_GetMyTeamMemberById",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MyTeamMemberModel"
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "Account_RemoveUserFromMyTeam",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/account/myTeam": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "Account_GetMyTeamMemberByExternalId",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MyTeamMemberModel"
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "Account_AddInhouseTranslator",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/InhouseTranslatorCreationModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/MyTeamMemberModel"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/account/lsp/services": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "Account_GetLSPServices",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "sourceLanguage",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "targetLanguage",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LspServiceModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/account/searchMyTeam": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "Account_SearchMyTeam",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "requestModel",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MyTeamSearchRequestModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/MyTeamMemberModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/callback": {
+      "get": {
+        "tags": [
+          "Callback"
+        ],
+        "summary": "Reading configurations of notifications reception of the account",
+        "operationId": "Callback_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if notification settings have been successfully read",
+            "schema": {
+              "$ref": "#/definitions/CallbackPropertyModel"
+            }
+          },
+          "404": {
+            "description": "Returns if notification settings have not been configured"
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "Callback"
+        ],
+        "operationId": "Callback_Update",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "callbackProperty",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CallbackPropertyModel"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "Callback"
+        ],
+        "summary": "Resetting the configuration of notifications reception",
+        "operationId": "Callback_Delete",
+        "consumes": [],
+        "produces": [],
+        "responses": {
+          "204": {
+            "description": "Returns if notifications configuration has been reset"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/callback/lastErrors": {
+      "get": {
+        "tags": [
+          "Callback"
+        ],
+        "summary": "Reading the recent sending errors",
+        "operationId": "Callback_GetLastErrors",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Limit on the number of returned errors (no more than 100)",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if recent errors have been successfully received",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CallbackErrorModel"
+              }
+            }
+          },
+          "400": {
+            "description": "Returns if a limit exceeding the acceptable bounds is specified"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/client/create": {
+      "post": {
+        "tags": [
+          "Client"
+        ],
+        "summary": "Create a new client with the specified name and return their ID.\r\n            Simply return the ID if a client with that name already exists",
+        "operationId": "Client_CreateClient",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "body",
+            "description": "client's name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/client/{clientId}/set": {
+      "put": {
+        "tags": [
+          "Client"
+        ],
+        "operationId": "Client_SetClientNetRate",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "netRateId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ClientModel"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/client/{clientId}": {
+      "get": {
+        "tags": [
+          "Client"
+        ],
+        "operationId": "Client_GetClient",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ClientModel"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/directory": {
+      "get": {
+        "tags": [
+          "Directories"
+        ],
+        "operationId": "Directories_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "language",
+              "vendor",
+              "domain",
+              "client",
+              "group",
+              "projectStatus",
+              "documentStatus",
+              "netRate",
+              "currency",
+              "freelancerServiceType",
+              "specialization",
+              "specializationKnowledgeLevel",
+              "lspServiceType"
+            ]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/DirectoryModel"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/directory/formats": {
+      "get": {
+        "tags": [
+          "Directories"
+        ],
+        "summary": "Receive parsing formats supported by the account",
+        "operationId": "Directories_GetSupportedFormatsForAccount",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/FileFormatModel"
+              }
+            }
+          },
+          "404": {
+            "description": "Returns if no account plugged into the integration API has been found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Receive the document details",
+        "description": "Document ID can have the form  int1 or int1_int2, <br />\r\n            with int1 being the document ID and int2 being the document's target language ID.<br />",
+        "operationId": "Document_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "description": "Document ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "$ref": "#/definitions/DocumentModel"
+            }
+          },
+          "404": {
+            "description": "Returns if no such document ID exists \r\n            or the document's language ID is incorrect"
+          },
+          "403": {
+            "description": "Returns if the document does not belong to the account"
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Delete one or several documents",
+        "description": "Document ID can have the form  int1 or int1_int2, <br />\r\n            where int1 is the document ID and int2 is the target language ID of the document, <br />\r\n            Example request: ?documentIds=61331_25'ampersand'documentIds=61332_9.<br />",
+        "operationId": "Document_Delete",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "documentIds",
+            "in": "query",
+            "description": "Array of document IDs",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if documents have been deleted"
+          },
+          "400": {
+            "description": "Returns if the indicated array of document IDs is empty"
+          },
+          "403": {
+            "description": "Returned if:<br />\r\n            - at least one document does not belong to the account\r\n            - the project has been forwarded to the vendor and deleting documents in the forwarded projects is forbidden for this vendor"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/translate/status": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Receive the status of adding document translation",
+        "description": "Document ID can have the form  int1 or int1_int2, <br />\r\n            with int1 being the document ID and int2 being the document's target language ID.<br />",
+        "operationId": "Document_GetTranslationStatus",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "description": "Document ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "enum": [
+                "inProgress",
+                "faulted",
+                "completed"
+              ],
+              "type": "string"
+            }
+          },
+          "403": {
+            "description": "Returns if at least one document does not belong to the account"
+          },
+          "404": {
+            "description": "Returns if no such document ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/translate/result": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "Document_GetTranslationsImportResult",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Object"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/statistics": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "Document_GetStatistics",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "onlyExactMatches",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/DocumentStatisticsModel"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/assignFreelancers": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Split the document into equal segments according to the number of words and assign each freelancer to one segment",
+        "description": "Document ID can have the form  int1 or int1_int2, <br />\r\n            with int1 being the document ID and int2 being the document's target language ID.<br />",
+        "operationId": "Document_AssignFreelancersToDocument",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "description": "Document ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stageNumber",
+            "in": "query",
+            "description": "Workflow stage number",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "freelancerUserIds",
+            "in": "body",
+            "description": "Assignee IDs",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if document translation has been successfully assigned to the freelancer"
+          },
+          "403": {
+            "description": "Returns if the document does not belong to the account"
+          },
+          "400": {
+            "description": "Returned if:<br />\r\n            - the document has not been parsed or contains zero words\r\n            - no such workflow stage number has been found in the project\r\n            - the stage of the document has already been assigned to someone\r\n            - one of the indicated freelancer IDs has not been found in CAT"
+          },
+          "404": {
+            "description": "Returns if no such document ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/assign": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "Document_AssignExecutives",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "stageNumber",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AssignExecutivesRequestModel"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/assignFromMyTeam": {
+      "post": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "Document_AssignMyTeamExecutives",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "requestModel",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AssignMyTeamExecutivesRequestModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "format": "int32",
+              "type": "integer"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/update": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "description": "Accepts a multipart query containing a model in JSON format (Content-Type=application/json) and one or several files (Content-Type=application/octet-stream). Swagger UI does not support mapping and execution of such queries. The parameters section contains the model description, but no parameters corresponding to the files. To send the query, use third-party utilities like cURL.",
+        "operationId": "Document_Update",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "updateDocumentModel",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UploadDocumentPropertiesModel"
+            }
+          },
+          {
+            "name": "file",
+            "in": "body",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "disassembleAlgorithmName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "presetDisassembleAlgorithm",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DocumentModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/rename": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "Rename the assigned document",
+        "description": "Document ID can have the form  int1 or int1_int2, <br />\r\n            with int1 being the document ID and int2 being the document's target language ID.<br />",
+        "operationId": "Document_Rename",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "description": "Document ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "New name",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if the document has been successfully renamed"
+          },
+          "403": {
+            "description": "Returns if at least one document does not belong to the account"
+          },
+          "404": {
+            "description": "Returns if no such document ID exists"
+          },
+          "409": {
+            "description": "Returns if a document with that name already exists in the project"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/translate": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "Document_Translate",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "translationFile",
+            "in": "formData",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "overwrite",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "confirmTranslation",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/translateWithXliff": {
+      "put": {
+        "tags": [
+          "Document"
+        ],
+        "summary": "",
+        "description": "The endpoint is available only for the re-import of the modified XLIFF files exported via POST /api/integration/v1/document/export. The request body can contain only one XLIFF file per request.",
+        "operationId": "Document_TranslateWithXliff",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "documentId",
+            "in": "query",
+            "description": "ID of the document to update",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "confirmTranslation",
+            "in": "query",
+            "description": "Confirm updated segments",
+            "required": true,
+            "type": "boolean"
+          },
+          {
+            "name": "overwriteUpdatedSegments",
+            "in": "query",
+            "description": "Overwrite the segments that have been updated since the last export of the XLIFF file",
+            "required": true,
+            "type": "boolean"
+          },
+          {
+            "name": "translationFile",
+            "in": "formData",
+            "description": "XLIFF file with updated segments",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Returned upon successful completion"
+          },
+          "403": {
+            "description": "Returns if the document does not belong to the account"
+          },
+          "404": {
+            "description": "Returns if no such document ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/getAuthUrl": {
+      "get": {
+        "tags": [
+          "Document"
+        ],
+        "operationId": "Document_GetAuthUrl",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "documentId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/export/{taskId}": {
+      "get": {
+        "tags": [
+          "DocumentExport"
+        ],
+        "summary": "Download the results of export",
+        "operationId": "DocumentExport_DownloadExportResult",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "description": "Export task ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "204": {
+            "description": "Returns if the task is not yet ready"
+          },
+          "404": {
+            "description": "Returns if no such task ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/document/export": {
+      "post": {
+        "tags": [
+          "DocumentExport"
+        ],
+        "operationId": "DocumentExport_RequestExport",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "documentIds",
+            "in": "query",
+            "required": true,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "target",
+              "xliff"
+            ]
+          },
+          {
+            "name": "stageNumber",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ExportDocumentTaskModel"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/glossaries": {
+      "get": {
+        "tags": [
+          "Glossary"
+        ],
+        "operationId": "Glossary_GetGlossaries",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/GlossaryModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/invoice/job": {
+      "post": {
+        "tags": [
+          "Invoice"
+        ],
+        "operationId": "Invoice_ImportJob",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ImportJobModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/placeholders": {
+      "get": {
+        "tags": [
+          "PlaceholderFormatApi"
+        ],
+        "operationId": "PlaceholderFormatApi_GetPlaceholderFormats",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PlaceholderFormatModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "put": {
+        "tags": [
+          "PlaceholderFormatApi"
+        ],
+        "operationId": "PlaceholderFormatApi_UpdatePlaceholderFormats",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "formats",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PlaceholderFormatModel"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/placeholders/validate": {
+      "get": {
+        "tags": [
+          "PlaceholderFormatApi"
+        ],
+        "operationId": "PlaceholderFormatApi_ValidatePlaceholderFormat",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/{projectId}": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "Receive the project model",
+        "operationId": "Project_Get",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "Project ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "$ref": "#/definitions/ProjectModel"
+            }
+          },
+          "400": {
+            "description": "Returns if the specified project ID has an invalid format"
+          },
+          "403": {
+            "description": "Returns if the project does not belong to the account"
+          },
+          "404": {
+            "description": "Returns if no such project ID exists"
+          }
+        },
+        "deprecated": false
+      },
+      "put": {
+        "tags": [
+          "Project"
+        ],
+        "operationId": "Project_UpdateProject",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "model",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ProjectChangesModel"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "Delete the project",
+        "operationId": "Project_Delete",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "Project ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if the project has been successfully deleted"
+          },
+          "400": {
+            "description": "Returns if the specified project ID has an invalid format"
+          },
+          "403": {
+            "description": "Returns if the project does not belong to the account"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/list": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "operationId": "Project_GetAll",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "createdByUserId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "projectName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "externalTag",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "clientIds",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ProjectModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/{projectId}/statistics": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "(This method is obsolete. Newer version can be found here:  /api/integrationv2/project/{projectId}/statistics)\r\n            Receive statistics",
+        "operationId": "Project_GetProjectStatisticsObsolete",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "Project ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "onlyExactMatches",
+            "in": "query",
+            "description": "100 or more matches requirement",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/ProjectStatisticsObsoleteModel"
+              }
+            }
+          },
+          "403": {
+            "description": "Returns if the project does not belong to the account"
+          },
+          "404": {
+            "description": "Returns if no such project ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v2/project/{projectId}/statistics": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "Receive statistics",
+        "operationId": "Project_GetProjectStatistics",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "Project ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "onlyExactMatches",
+            "in": "query",
+            "description": "100 or more matches requirement",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ProjectStatisticsModel"
+              }
+            }
+          },
+          "202": {
+            "description": "Returns if statistics are currently being built",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ProjectStatisticsModel"
+              }
+            }
+          },
+          "403": {
+            "description": "Returns if the project does not belong to the account"
+          },
+          "404": {
+            "description": "Returns if no such project ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/{projectId}/completedWorkStatistics": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "Receiving statistics for the completed parts of the project",
+        "operationId": "Project_GetCompletedWorkStatistics",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ExecutiveStatisticsModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/{projectId}/translationmemories": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "Receiving a list of the TMs plugged into the project",
+        "operationId": "Project_GetProjectTranslationMemories",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "Project ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if the project's collection of TM IDs is empty",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ProjectTranslationMemoryModel"
+              }
+            }
+          },
+          "404": {
+            "description": "Returns if no project with the indicated ID has been found"
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "operationId": "Project_SetTranslationMemoriesForWholeProject",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "tmModels",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TranslationMemoryForProjectModel"
+              }
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "enum": [
+                "continue",
+                "switchingProtocols",
+                "oK",
+                "created",
+                "accepted",
+                "nonAuthoritativeInformation",
+                "noContent",
+                "resetContent",
+                "partialContent",
+                "multipleChoices",
+                "ambiguous",
+                "movedPermanently",
+                "moved",
+                "found",
+                "redirect",
+                "seeOther",
+                "redirectMethod",
+                "notModified",
+                "useProxy",
+                "unused",
+                "temporaryRedirect",
+                "redirectKeepVerb",
+                "badRequest",
+                "unauthorized",
+                "paymentRequired",
+                "forbidden",
+                "notFound",
+                "methodNotAllowed",
+                "notAcceptable",
+                "proxyAuthenticationRequired",
+                "requestTimeout",
+                "conflict",
+                "gone",
+                "lengthRequired",
+                "preconditionFailed",
+                "requestEntityTooLarge",
+                "requestUriTooLong",
+                "unsupportedMediaType",
+                "requestedRangeNotSatisfiable",
+                "expectationFailed",
+                "upgradeRequired",
+                "internalServerError",
+                "notImplemented",
+                "badGateway",
+                "serviceUnavailable",
+                "gatewayTimeout",
+                "httpVersionNotSupported"
+              ],
+              "type": "string"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/{projectId}/glossaries": {
+      "get": {
+        "tags": [
+          "Project"
+        ],
+        "operationId": "Project_GetGlossaries",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/GlossaryModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "put": {
+        "tags": [
+          "Project"
+        ],
+        "operationId": "Project_SetGlossaries",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "glossaryIds",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/cancel": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "Cancel the project",
+        "operationId": "Project_CancelProject",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "description": "Project ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if the project has been cancelled"
+          },
+          "403": {
+            "description": "Returns if the project does not belong to the account"
+          },
+          "404": {
+            "description": "Returns if no such project ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/restore": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "Restore the project",
+        "operationId": "Project_RestoreProject",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "description": "Project ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if the project has been restored"
+          },
+          "403": {
+            "description": "Returns if the project does not belong to the account"
+          },
+          "404": {
+            "description": "Returns if no such project ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/complete": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "operationId": "Project_CompleteProject",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/create": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "description": "Accepts a multipart query containing a model in JSON format (Content-Type=application/json) and one or several files (Content-Type=application/octet-stream). Swagger UI does not support mapping and execution of such queries. The parameters section contains the model description, but no parameters corresponding to the files. To send the query, use third-party utilities like cURL.",
+        "operationId": "Project_CreateProject",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "project",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateProjectModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ProjectModel"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/document": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "description": "Accepts a multipart query containing a model in JSON format (Content-Type=application/json) and one or several files (Content-Type=application/octet-stream). Swagger UI does not support mapping and execution of such queries. The parameters section contains the model description, but no parameters corresponding to the files. To send the query, use third-party utilities like cURL.",
+        "operationId": "Project_AddDocument",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "documentModel",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CreateDocumentPropertyModel"
+              }
+            }
+          },
+          {
+            "name": "file",
+            "in": "body",
+            "required": true,
+            "type": "file"
+          },
+          {
+            "name": "disassembleAlgorithmName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "externalId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "metaInfo",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "targetLanguages",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "presetDisassembleAlgorithm",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DocumentModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/language": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "summary": "Add a new target language to the project",
+        "operationId": "Project_AddLanguage",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "description": "Project ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "targetLanguage",
+            "in": "query",
+            "description": "Target language",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if a new target language has been added to the project"
+          },
+          "400": {
+            "description": "Returns if a target language matching the document's source language has been specified"
+          },
+          "403": {
+            "description": "Returns if the project does not belong to the account"
+          },
+          "404": {
+            "description": "Returns if no such project ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/{projectId}/translationmemories/bylanguages": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "operationId": "Project_SetProjectTranslationMemoriesByLanguages",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "tmForLanguagesModels",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TranslationMemoriesForLanguageModel"
+              }
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "enum": [
+                "continue",
+                "switchingProtocols",
+                "oK",
+                "created",
+                "accepted",
+                "nonAuthoritativeInformation",
+                "noContent",
+                "resetContent",
+                "partialContent",
+                "multipleChoices",
+                "ambiguous",
+                "movedPermanently",
+                "moved",
+                "found",
+                "redirect",
+                "seeOther",
+                "redirectMethod",
+                "notModified",
+                "useProxy",
+                "unused",
+                "temporaryRedirect",
+                "redirectKeepVerb",
+                "badRequest",
+                "unauthorized",
+                "paymentRequired",
+                "forbidden",
+                "notFound",
+                "methodNotAllowed",
+                "notAcceptable",
+                "proxyAuthenticationRequired",
+                "requestTimeout",
+                "conflict",
+                "gone",
+                "lengthRequired",
+                "preconditionFailed",
+                "requestEntityTooLarge",
+                "requestUriTooLong",
+                "unsupportedMediaType",
+                "requestedRangeNotSatisfiable",
+                "expectationFailed",
+                "upgradeRequired",
+                "internalServerError",
+                "notImplemented",
+                "badGateway",
+                "serviceUnavailable",
+                "gatewayTimeout",
+                "httpVersionNotSupported"
+              ],
+              "type": "string"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/project/{projectId}/statistics/build": {
+      "post": {
+        "tags": [
+          "Project"
+        ],
+        "operationId": "Project_BuildStatistics",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "onlyExactMatches",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "enum": [
+                "continue",
+                "switchingProtocols",
+                "oK",
+                "created",
+                "accepted",
+                "nonAuthoritativeInformation",
+                "noContent",
+                "resetContent",
+                "partialContent",
+                "multipleChoices",
+                "ambiguous",
+                "movedPermanently",
+                "moved",
+                "found",
+                "redirect",
+                "seeOther",
+                "redirectMethod",
+                "notModified",
+                "useProxy",
+                "unused",
+                "temporaryRedirect",
+                "redirectKeepVerb",
+                "badRequest",
+                "unauthorized",
+                "paymentRequired",
+                "forbidden",
+                "notFound",
+                "methodNotAllowed",
+                "notAcceptable",
+                "proxyAuthenticationRequired",
+                "requestTimeout",
+                "conflict",
+                "gone",
+                "lengthRequired",
+                "preconditionFailed",
+                "requestEntityTooLarge",
+                "requestUriTooLong",
+                "unsupportedMediaType",
+                "requestedRangeNotSatisfiable",
+                "expectationFailed",
+                "upgradeRequired",
+                "internalServerError",
+                "notImplemented",
+                "badGateway",
+                "serviceUnavailable",
+                "gatewayTimeout",
+                "httpVersionNotSupported"
+              ],
+              "type": "string"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/translationmemory/{tmId}": {
+      "get": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "summary": "Receiving TM details",
+        "operationId": "TranslationMemories_GetMetaInfo",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "tmId",
+            "in": "path",
+            "description": "TM ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "$ref": "#/definitions/TranslationMemoryModel"
+            }
+          },
+          "403": {
+            "description": "Returns if the account has no access to the TM with the requested ID"
+          },
+          "404": {
+            "description": "Returns if no TM with the indicated ID exists"
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "summary": "TMX import to TM",
+        "operationId": "TranslationMemories_Import",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "tmId",
+            "in": "path",
+            "description": "TM ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "replaceAllContent",
+            "in": "query",
+            "description": "Requirement to replace the contents of the TM completely",
+            "required": true,
+            "type": "boolean"
+          },
+          {
+            "name": "tmxFile",
+            "in": "formData",
+            "description": "Uploaded TMX file",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if the TMX file has been successfully imported"
+          },
+          "400": {
+            "description": "Returns if the imported file is not a TMX format file"
+          },
+          "403": {
+            "description": "Returns if the account cannot access the TM with the indicated ID"
+          },
+          "404": {
+            "description": "Returns if no TM with the indicated ID exists"
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "summary": "Delete the TM",
+        "operationId": "TranslationMemories_RemoveTranslationMemory",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "tmId",
+            "in": "path",
+            "description": "TM ID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if the TM has been successfully deleted"
+          },
+          "400": {
+            "description": "Returns if the project's translation data is committed to the TM"
+          },
+          "404": {
+            "description": "Returns if no TM with the indicated ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/translationmemory": {
+      "get": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "operationId": "TranslationMemories_GetTranslationMemoriesBatch",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "lastProcessedId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "batchSize",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sourceLanguage",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "targetLanguage",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "clientId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "searchName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TranslationMemoryModel"
+              }
+            }
+          }
+        },
+        "deprecated": false
+      },
+      "post": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "operationId": "TranslationMemories_CreateEmptyTM",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "model",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CreateTranslationMemoryModel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/translationmemory/task": {
+      "get": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "summary": "Receive a collection of TMX import tasks",
+        "operationId": "TranslationMemories_GetPendingTasks",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns if the request has succeeded",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TMImportTaskModel"
+              }
+            }
+          },
+          "404": {
+            "description": "Returns if no unprocessed tasks for TMX import has been found in the account"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/translationmemory/{tmId}/file": {
+      "get": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "operationId": "TranslationMemories_ExportFile",
+        "consumes": [],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "tmId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exportMode",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "tmxDefault",
+              "tmxWithTrados2009PlusCompatibility",
+              "tmxWithTrados2007Compatibility",
+              "excel"
+            ]
+          },
+          {
+            "name": "withTags",
+            "in": "query",
+            "required": true,
+            "type": "boolean"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Object"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/translationmemory/matches": {
+      "post": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "operationId": "TranslationMemories_GetTMTranslations",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "name": "request",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TMMatchesRequest"
+            }
+          },
+          {
+            "name": "tmId",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/SegmentWithMatchesModel"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/translationmemory/{tmId}/targets": {
+      "put": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "summary": "Set an array of target languages required by the TM",
+        "operationId": "TranslationMemories_SetTMTargetLanguages",
+        "consumes": [
+          "application/json",
+          "text/json"
+        ],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "tmId",
+            "in": "path",
+            "description": "TM ID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "targetLanguages",
+            "in": "body",
+            "description": "Array of the required target languages",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if the request has succeeded"
+          },
+          "400": {
+            "description": "Returned if:<br />\r\n            - no target languages have been specified\r\n            - target languages are repeated\r\n            - target languages contain the source language\r\n            - target language cannot be deleted\r\n            - target languages cannot be updated with the indicated parameters"
+          },
+          "403": {
+            "description": "Returns if the account cannot access the TM with the indicated ID"
+          },
+          "404": {
+            "description": "Returns if no TM with the indicated ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/api/integration/v1/translationmemory/task/{taskId}": {
+      "delete": {
+        "tags": [
+          "TranslationMemories"
+        ],
+        "summary": "Remove a given import task",
+        "operationId": "TranslationMemories_RemoveSpecificImportTask",
+        "consumes": [],
+        "produces": [],
+        "parameters": [
+          {
+            "name": "taskId",
+            "in": "path",
+            "description": "ID of the task for import to the TM",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Returns if the import task has been successfully removed"
+          },
+          "403": {
+            "description": "Returns if the account has no access to the import task with the indicated ID"
+          },
+          "404": {
+            "description": "Returns if no task for import to the TM with the indicated ID exists"
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "definitions": {
+    "AccountModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "isPersonal": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "MTEngineModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "MyTeamMemberModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ServiceModel"
+          }
+        }
+      }
+    },
+    "ServiceModel": {
+      "type": "object",
+      "properties": {
+        "serviceType": {
+          "enum": [
+            "translation",
+            "editing",
+            "proofreading",
+            "postediting",
+            "pageProof",
+            "glossaryCreation",
+            "simultaneousTranslation",
+            "consecutiveTranslation",
+            "mediaTranslation",
+            "expertReview",
+            "projectManagement",
+            "translationMemoryCreation",
+            "copywriting",
+            "training",
+            "transcription"
+          ],
+          "type": "string"
+        },
+        "sourceLanguage": {
+          "type": "string"
+        },
+        "targetLanguage": {
+          "type": "string"
+        },
+        "pricePerUnit": {
+          "format": "double",
+          "type": "number"
+        },
+        "currency": {
+          "enum": [
+            "uSD",
+            "eUR",
+            "rUB",
+            "tRY",
+            "jPY",
+            "sGD",
+            "mYR",
+            "hKD"
+          ],
+          "type": "string"
+        },
+        "specializations": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "education",
+              "productsAndCatalogs",
+              "documentsAndCertificates",
+              "marketing",
+              "correspondence",
+              "software",
+              "fiction",
+              "scienceAndPatents",
+              "contractsAndReports",
+              "gaming",
+              "manuals",
+              "website",
+              "annualReport",
+              "corporateAndSocialResponsibility",
+              "technicalAndEngineering",
+              "cryptocurrencies",
+              "agriculture",
+              "artsAndCulture",
+              "aviationAndSpace",
+              "biology",
+              "cartography",
+              "chemistry",
+              "cosmetics",
+              "construction",
+              "architecture",
+              "economics",
+              "accounting",
+              "bankingAndInvestment",
+              "insurance",
+              "energy",
+              "thermalPowerEngineering",
+              "mechanicalEngineering",
+              "finance",
+              "general",
+              "geography",
+              "geology",
+              "mining",
+              "history",
+              "linguistics",
+              "philosophy",
+              "psychology",
+              "sociology",
+              "industry",
+              "industrialAutomation",
+              "electricalEngineering",
+              "iT",
+              "eRP",
+              "law",
+              "hR",
+              "mathematics",
+              "medicine",
+              "medicalEquipment",
+              "pharmaceutics",
+              "veterinaryMedicine",
+              "oilAndGas",
+              "physics",
+              "politicsAndSociety",
+              "realEstate",
+              "recreation",
+              "fashion",
+              "luxuryItems",
+              "tourismAndTravel",
+              "religion",
+              "socialScience",
+              "sport",
+              "transport",
+              "automotiveBusiness",
+              "foodAndDrinks",
+              "biotechnology",
+              "business",
+              "lifeSciences"
+            ],
+            "type": "string"
+          }
+        }
+      }
+    },
+    "InhouseTranslatorCreationModel": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ServiceModel"
+          }
+        }
+      }
+    },
+    "LspServiceModel": {
+      "type": "object",
+      "properties": {
+        "sourceLanguage": {
+          "type": "string"
+        },
+        "targetLanguage": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "pricePerUnit": {
+          "format": "double",
+          "type": "number"
+        },
+        "pricePerUnitCurrency": {
+          "enum": [
+            "uSD",
+            "eUR",
+            "rUB",
+            "tRY",
+            "jPY",
+            "sGD",
+            "mYR",
+            "hKD"
+          ],
+          "type": "string"
+        },
+        "serviceTypes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "translation",
+              "editing",
+              "proofreading",
+              "postediting",
+              "pageProof",
+              "notarialAssurance",
+              "glossaryCreation",
+              "apostille",
+              "simultaneousTranslation",
+              "consecutiveTranslation",
+              "mediaTranslation",
+              "expertReview",
+              "projectManagement",
+              "translationMemoryCreation",
+              "copywriting",
+              "training",
+              "transcription"
+            ],
+            "type": "string"
+          }
+        },
+        "specializations": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "education",
+              "productsAndCatalogs",
+              "documentsAndCertificates",
+              "marketing",
+              "correspondence",
+              "software",
+              "fiction",
+              "scienceAndPatents",
+              "contractsAndReports",
+              "gaming",
+              "manuals",
+              "website",
+              "annualReport",
+              "corporateAndSocialResponsibility",
+              "technicalAndEngineering",
+              "cryptocurrencies",
+              "agriculture",
+              "artsAndCulture",
+              "aviationAndSpace",
+              "biology",
+              "cartography",
+              "chemistry",
+              "cosmetics",
+              "construction",
+              "architecture",
+              "economics",
+              "accounting",
+              "bankingAndInvestment",
+              "insurance",
+              "energy",
+              "thermalPowerEngineering",
+              "mechanicalEngineering",
+              "finance",
+              "general",
+              "geography",
+              "geology",
+              "mining",
+              "history",
+              "linguistics",
+              "philosophy",
+              "psychology",
+              "sociology",
+              "industry",
+              "industrialAutomation",
+              "electricalEngineering",
+              "iT",
+              "eRP",
+              "law",
+              "hR",
+              "mathematics",
+              "medicine",
+              "medicalEquipment",
+              "pharmaceutics",
+              "veterinaryMedicine",
+              "oilAndGas",
+              "physics",
+              "politicsAndSociety",
+              "realEstate",
+              "recreation",
+              "fashion",
+              "luxuryItems",
+              "tourismAndTravel",
+              "religion",
+              "socialScience",
+              "sport",
+              "transport",
+              "automotiveBusiness",
+              "foodAndDrinks",
+              "biotechnology",
+              "business",
+              "lifeSciences"
+            ],
+            "type": "string"
+          }
+        }
+      }
+    },
+    "MyTeamSearchRequestModel": {
+      "type": "object",
+      "properties": {
+        "skip": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "limit": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "serviceType": {
+          "enum": [
+            "translation",
+            "editing",
+            "proofreading",
+            "postediting",
+            "pageProof",
+            "glossaryCreation",
+            "simultaneousTranslation",
+            "consecutiveTranslation",
+            "mediaTranslation",
+            "expertReview",
+            "projectManagement",
+            "translationMemoryCreation",
+            "copywriting",
+            "training",
+            "transcription"
+          ],
+          "type": "string"
+        },
+        "sourceLanguage": {
+          "type": "string"
+        },
+        "targetLanguage": {
+          "type": "string"
+        },
+        "onlyNativeSpeakers": {
+          "type": "boolean"
+        },
+        "allDialects": {
+          "type": "boolean"
+        },
+        "minRate": {
+          "format": "double",
+          "type": "number"
+        },
+        "maxRate": {
+          "format": "double",
+          "type": "number"
+        },
+        "rateRangeCurrency": {
+          "enum": [
+            "uSD",
+            "eUR",
+            "rUB",
+            "tRY",
+            "jPY",
+            "sGD",
+            "mYR",
+            "hKD"
+          ],
+          "type": "string"
+        },
+        "specializations": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "education",
+              "productsAndCatalogs",
+              "documentsAndCertificates",
+              "marketing",
+              "correspondence",
+              "software",
+              "fiction",
+              "scienceAndPatents",
+              "contractsAndReports",
+              "gaming",
+              "manuals",
+              "website",
+              "annualReport",
+              "corporateAndSocialResponsibility",
+              "technicalAndEngineering",
+              "cryptocurrencies",
+              "agriculture",
+              "artsAndCulture",
+              "aviationAndSpace",
+              "biology",
+              "cartography",
+              "chemistry",
+              "cosmetics",
+              "construction",
+              "architecture",
+              "economics",
+              "accounting",
+              "bankingAndInvestment",
+              "insurance",
+              "energy",
+              "thermalPowerEngineering",
+              "mechanicalEngineering",
+              "finance",
+              "general",
+              "geography",
+              "geology",
+              "mining",
+              "history",
+              "linguistics",
+              "philosophy",
+              "psychology",
+              "sociology",
+              "industry",
+              "industrialAutomation",
+              "electricalEngineering",
+              "iT",
+              "eRP",
+              "law",
+              "hR",
+              "mathematics",
+              "medicine",
+              "medicalEquipment",
+              "pharmaceutics",
+              "veterinaryMedicine",
+              "oilAndGas",
+              "physics",
+              "politicsAndSociety",
+              "realEstate",
+              "recreation",
+              "fashion",
+              "luxuryItems",
+              "tourismAndTravel",
+              "religion",
+              "socialScience",
+              "sport",
+              "transport",
+              "automotiveBusiness",
+              "foodAndDrinks",
+              "biotechnology",
+              "business",
+              "lifeSciences"
+            ],
+            "type": "string"
+          }
+        },
+        "specializationKnowledgeLevel": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "tested",
+              "certified",
+              "coursePassed"
+            ],
+            "type": "string"
+          }
+        },
+        "searchString": {
+          "type": "string"
+        },
+        "daytime": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CallbackPropertyModel": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "additionalHeaders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AdditionalHeaderModel"
+          }
+        }
+      }
+    },
+    "AdditionalHeaderModel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "CallbackErrorModel": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "code": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "content": {
+          "type": "string"
+        },
+        "sourceIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ClientModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "netRate": {
+          "$ref": "#/definitions/NetRateModel"
+        }
+      }
+    },
+    "NetRateModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "newWordsRate": {
+          "format": "double",
+          "type": "number"
+        },
+        "repetitionsRate": {
+          "format": "double",
+          "type": "number"
+        },
+        "tmMatchRates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TMRangeRateModel"
+          }
+        }
+      }
+    },
+    "TMRangeRateModel": {
+      "type": "object",
+      "properties": {
+        "fromQuality": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "toQuality": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "value": {
+          "format": "double",
+          "type": "number"
+        }
+      }
+    },
+    "DirectoryModel": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "language",
+            "vendor",
+            "domain",
+            "client",
+            "group",
+            "projectStatus",
+            "documentStatus",
+            "netRate",
+            "currency",
+            "freelancerServiceType",
+            "specialization",
+            "specializationKnowledgeLevel",
+            "lspServiceType"
+          ],
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DirectoryItemModel"
+          }
+        }
+      }
+    },
+    "DirectoryItemModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "FileFormatModel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "ocr": {
+          "type": "boolean"
+        },
+        "mime-type": {
+          "type": "string"
+        },
+        "disassembleAlgorithmName": {
+          "type": "string"
+        }
+      }
+    },
+    "DocumentTargetId": {
+      "type": "object",
+      "properties": {
+        "DocumentId": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        },
+        "LanguageId": {
+          "format": "int32",
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "DocumentModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "creationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "deadline": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "sourceLanguage": {
+          "type": "string"
+        },
+        "documentDisassemblingStatus": {
+          "enum": [
+            "inProgress",
+            "error",
+            "success"
+          ],
+          "type": "string"
+        },
+        "targetLanguage": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "created",
+            "inProgress",
+            "completed",
+            "updated",
+            "targetUpdated"
+          ],
+          "type": "string"
+        },
+        "wordsCount": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "statusModificationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "pretranslateCompleted": {
+          "type": "boolean"
+        },
+        "workflowStages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DocumentWorkflowStageModel"
+          }
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "metaInfo": {
+          "type": "string"
+        },
+        "placeholdersAreEnabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "DocumentWorkflowStageModel": {
+      "type": "object",
+      "properties": {
+        "progress": {
+          "format": "double",
+          "type": "number"
+        },
+        "wordsTranslated": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "unassignedWordsCount": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "notAssigned",
+            "assigned",
+            "inProgress",
+            "completed"
+          ],
+          "type": "string"
+        },
+        "executives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AssignedExecutiveModel"
+          }
+        }
+      }
+    },
+    "AssignedExecutiveModel": {
+      "type": "object",
+      "properties": {
+        "assignedWordsCount": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "progress": {
+          "format": "double",
+          "type": "number"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "Object": {
+      "type": "object",
+      "properties": {}
+    },
+    "DocumentStatisticsModel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "statistics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StatisticsRowModel"
+          }
+        }
+      }
+    },
+    "StatisticsRowModel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "enum": [
+            "perfect",
+            "crossFileRepeated",
+            "total",
+            "repetitions",
+            "newWords",
+            "match_50_74",
+            "match_75_84",
+            "match_85_94",
+            "match_95_99",
+            "match_100",
+            "contextMatch_101",
+            "contextMatch_102"
+          ],
+          "type": "string"
+        },
+        "words": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "percent": {
+          "format": "double",
+          "type": "number"
+        },
+        "segments": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "pages": {
+          "format": "double",
+          "type": "number"
+        },
+        "charsWithoutSpaces": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "charsWithSpaces": {
+          "format": "int64",
+          "type": "integer"
+        },
+        "effectiveWordsForBilling": {
+          "format": "double",
+          "type": "number"
+        }
+      }
+    },
+    "AssignExecutivesRequestModel": {
+      "type": "object",
+      "properties": {
+        "executives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Executive"
+          }
+        },
+        "minWordsCountForExecutive": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "assignmentMode": {
+          "enum": [
+            "distributeAmongAll",
+            "rocket",
+            "inviteOnly"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "Executive": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "wordsCount": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "AssignMyTeamExecutivesRequestModel": {
+      "type": "object",
+      "properties": {
+        "documentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stageNumber": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "ModelWithFiles[UploadDocumentPropertiesModel]": {
+      "type": "object",
+      "properties": {
+        "Value": {
+          "$ref": "#/definitions/UploadDocumentPropertiesModel"
+        },
+        "Files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UploadedFile"
+          }
+        }
+      }
+    },
+    "UploadDocumentPropertiesModel": {
+      "type": "object",
+      "properties": {
+        "bilingualFileImportSetings": {
+          "$ref": "#/definitions/BilingualFileImportSetingsModel"
+        },
+        "enablePlaceholders": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UploadedFile": {
+      "type": "object",
+      "properties": {
+        "FullName": {
+          "type": "string",
+          "readOnly": true
+        },
+        "Name": {
+          "type": "string",
+          "readOnly": true
+        },
+        "Extension": {
+          "type": "string",
+          "readOnly": true
+        },
+        "MediaType": {
+          "type": "string",
+          "readOnly": true
+        },
+        "FileSize": {
+          "format": "int64",
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    },
+    "BilingualFileImportSetingsModel": {
+      "type": "object",
+      "properties": {
+        "targetSubstitutionMode": {
+          "enum": [
+            "all",
+            "none"
+          ],
+          "type": "string"
+        },
+        "lockMode": {
+          "enum": [
+            "none",
+            "byStates",
+            "confirmed"
+          ],
+          "type": "string"
+        },
+        "confirmMode": {
+          "enum": [
+            "none",
+            "byStates",
+            "atFirstStage",
+            "atLastStage"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "ExportDocumentTaskModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "documentIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "GlossaryModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "units": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "unitsPending": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "ImportJobModel": {
+      "type": "object",
+      "properties": {
+        "freelancerId": {
+          "type": "string"
+        },
+        "serviceType": {
+          "type": "string"
+        },
+        "jobDescription": {
+          "type": "string"
+        },
+        "unitsType": {
+          "type": "string"
+        },
+        "unitsAmount": {
+          "format": "double",
+          "type": "number"
+        },
+        "pricePerUnit": {
+          "format": "double",
+          "type": "number"
+        },
+        "currency": {
+          "enum": [
+            "uSD",
+            "eUR",
+            "rUB",
+            "tRY",
+            "jPY",
+            "sGD",
+            "mYR",
+            "hKD"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "CreateInvoiceModel": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "jobIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "CancelInvoiceModel": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "invoiceId": {
+          "type": "string"
+        }
+      }
+    },
+    "PlaceholderFormatModel": {
+      "type": "object",
+      "properties": {
+        "regex": {
+          "type": "string"
+        }
+      }
+    },
+    "ProjectModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "deadline": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "creationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "createdByUserId": {
+          "type": "string"
+        },
+        "modificationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "sourceLanguage": {
+          "type": "string"
+        },
+        "targetLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "status": {
+          "enum": [
+            "created",
+            "inProgress",
+            "completed",
+            "rejected",
+            "canceled"
+          ],
+          "type": "string"
+        },
+        "statusModificationDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "domainId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "vendorAccountId": {
+          "type": "string"
+        },
+        "workflowStages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProjectWorkflowStageModel"
+          }
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DocumentModel"
+          }
+        },
+        "externalTag": {
+          "type": "string"
+        }
+      }
+    },
+    "ProjectWorkflowStageModel": {
+      "type": "object",
+      "properties": {
+        "progress": {
+          "format": "double",
+          "type": "number"
+        },
+        "stageType": {
+          "enum": [
+            "translation",
+            "editing",
+            "proofreading",
+            "postediting"
+          ],
+          "type": "string"
+        }
+      }
+    },
+    "ProjectChangesModel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "deadline": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "domainId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "vendorAccountId": {
+          "type": "string"
+        },
+        "externalTag": {
+          "type": "string"
+        }
+      }
+    },
+    "ProjectStatisticsObsoleteModel": {
+      "type": "object",
+      "properties": {
+        "statistics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StatisticsRowModel"
+          }
+        }
+      }
+    },
+    "ProjectStatisticsModel": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string"
+        },
+        "statistics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StatisticsRowModel"
+          }
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DocumentStatisticsModel"
+          }
+        }
+      }
+    },
+    "ExecutiveStatisticsModel": {
+      "type": "object",
+      "properties": {
+        "executive": {
+          "$ref": "#/definitions/ExecutiveModel"
+        },
+        "stageType": {
+          "type": "string"
+        },
+        "stageNumber": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "targetLanguage": {
+          "type": "string"
+        },
+        "total": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StatisticsRowModel"
+          }
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DocumentStatisticsModel"
+          }
+        }
+      }
+    },
+    "ExecutiveModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "ProjectTranslationMemoryModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "matchThreshold": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "targetLanguageId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "isWritable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "TranslationMemoryForProjectModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "matchThreshold": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "isWritable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ModelWithFiles[CreateProjectModel]": {
+      "type": "object",
+      "properties": {
+        "Value": {
+          "$ref": "#/definitions/CreateProjectModel"
+        },
+        "Files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UploadedFile"
+          }
+        }
+      }
+    },
+    "CreateProjectModel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "deadline": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "sourceLanguage": {
+          "type": "string"
+        },
+        "targetLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "domainId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "vendorAccountId": {
+          "type": "string"
+        },
+        "assignToVendor": {
+          "type": "boolean"
+        },
+        "useMT": {
+          "type": "boolean"
+        },
+        "pretranslate": {
+          "type": "boolean"
+        },
+        "translationMemoryName": {
+          "type": "string"
+        },
+        "useTranslationMemory": {
+          "type": "boolean"
+        },
+        "autoPropagateRepetitions": {
+          "type": "boolean"
+        },
+        "documentProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CreateDocumentPropertyModel"
+          }
+        },
+        "workflowStages": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "translation",
+              "editing",
+              "proofreading",
+              "postediting"
+            ],
+            "type": "string"
+          }
+        },
+        "isForTesting": {
+          "type": "boolean"
+        },
+        "externalTag": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateDocumentPropertyModel": {
+      "type": "object",
+      "properties": {
+        "externalId": {
+          "type": "string"
+        },
+        "metaInfo": {
+          "type": "string"
+        },
+        "disassembleAlgorithmName": {
+          "type": "string"
+        },
+        "presetDisassembleAlgorithm": {
+          "type": "string"
+        },
+        "bilingualFileImportSetings": {
+          "$ref": "#/definitions/BilingualFileImportSetingsModel"
+        },
+        "targetLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enablePlaceholders": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ModelWithFiles[IReadOnlyList[CreateDocumentPropertyModel]]": {
+      "type": "object",
+      "properties": {
+        "Value": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CreateDocumentPropertyModel"
+          }
+        },
+        "Files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UploadedFile"
+          }
+        }
+      }
+    },
+    "TranslationMemoriesForLanguageModel": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string"
+        },
+        "translationMemories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TranslationMemoryForProjectModel"
+          }
+        }
+      }
+    },
+    "TranslationMemoryModel": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "accountId": {
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "sourceLanguage": {
+          "type": "string"
+        },
+        "targetLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "createdDate": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "isAutomaticallyCreated": {
+          "type": "boolean"
+        },
+        "unitCountByLanguageId": {
+          "type": "object",
+          "additionalProperties": {
+            "format": "int32",
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "CreateTranslationMemoryModel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "sourceLanguage": {
+          "type": "string"
+        },
+        "targetLanguages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "clientId": {
+          "type": "string"
+        }
+      }
+    },
+    "TMImportTaskModel": {
+      "type": "object",
+      "properties": {
+        "accountId": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "translationMemoryId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "insertedUnitCount": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "TMMatchesRequest": {
+      "type": "object",
+      "properties": {
+        "sourceLanguage": {
+          "type": "string"
+        },
+        "targetLanguage": {
+          "type": "string"
+        },
+        "segmentModel": {
+          "$ref": "#/definitions/SegmentModel"
+        },
+        "matchThreshold": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "SegmentModel": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "prevContext": {
+          "type": "string"
+        },
+        "nextContext": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SegmentTagModel"
+          }
+        }
+      }
+    },
+    "SegmentTagModel": {
+      "type": "object",
+      "properties": {
+        "tagNumber": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "tagType": {
+          "type": "string"
+        },
+        "position": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "isVirtual": {
+          "type": "boolean"
+        },
+        "isInvisible": {
+          "type": "boolean"
+        }
+      }
+    },
+    "SegmentWithMatchesModel": {
+      "type": "object",
+      "properties": {
+        "sourceText": {
+          "type": "string"
+        },
+        "targetText": {
+          "type": "string"
+        },
+        "segmentMatch": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TagsFromUnit"
+          }
+        }
+      }
+    },
+    "TagsFromUnit": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "order": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Use case",
+    "url": "http://www.smartcat.ai/api/docs/"
+  }
+}

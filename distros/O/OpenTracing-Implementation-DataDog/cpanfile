@@ -1,8 +1,9 @@
-requires        "OpenTracing::Role", '>= v0.82.0';
+requires        "OpenTracing::Role", '>= v0.84.0';
 requires        "OpenTracing::Implementation", '0.03';
 
 requires        "Carp";
 requires        "Exporter";
+requires        "Hash::Merge";
 requires        "HTTP::Request";
 requires        "HTTP::Response::Maker";
 requires        "JSON::MaybeXS";

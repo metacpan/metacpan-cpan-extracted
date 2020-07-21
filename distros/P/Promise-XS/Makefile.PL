@@ -14,7 +14,7 @@ WriteMakefile(
     ),
     LIBS              => [''], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
-    INC               => '-I.', # e.g., '-I. -I/usr/include/other'
+    INC               => '-Wall -I.', # e.g., '-I. -I/usr/include/other'
     LICENSE           => "perl_5",
 
     META_MERGE => {

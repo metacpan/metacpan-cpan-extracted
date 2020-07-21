@@ -53,7 +53,7 @@ sub hello
   print "hello world!\n";
 }
 
-my $instance = Wasm::Wasmtime::Instance->new( $module, [\&hello] );
+my $instance = Wasm::Wasmtime::Instance->new( $module, $store, [\&hello] );
 
 # call a WebAssembly function that calls back into Perl space
 $instance->exports->call_hello;

@@ -26,7 +26,7 @@ no_index:
 provides:
   Sisimai:
     file: lib/Sisimai.pm
-    version: v4.25.7
+    version: v4.25.8
   Sisimai::ARF:
     file: lib/Sisimai/ARF.pm
   Sisimai::Address:
@@ -239,6 +239,8 @@ provides:
     file: lib/Sisimai/Reason/VirusDetected.pm
   Sisimai::Rhost:
     file: lib/Sisimai/Rhost.pm
+  Sisimai::Rhost::Cox:
+    file: lib/Sisimai/Rhost/Cox.pm
   Sisimai::Rhost::ExchangeOnline:
     file: lib/Sisimai/Rhost/ExchangeOnline.pm
   Sisimai::Rhost::FrancePTT:
@@ -251,6 +253,8 @@ provides:
     file: lib/Sisimai/Rhost/IUA.pm
   Sisimai::Rhost::KDDI:
     file: lib/Sisimai/Rhost/KDDI.pm
+  Sisimai::Rhost::Spectrum:
+    file: lib/Sisimai/Rhost/Spectrum.pm
   Sisimai::Rhost::TencentQQ:
     file: lib/Sisimai/Rhost/TencentQQ.pm
   Sisimai::SMTP:
@@ -273,10 +277,10 @@ requires:
   Time::Piece: '1.29'
   perl: '5.010001'
 resources:
-  bugtracker: https://github.com/sisimai/p5-Sisimai/issues
+  bugtracker: https://github.com/sisimai/p5-sisimai/issues
   homepage: https://libsisimai.org/
-  repository: git://github.com/sisimai/p5-Sisimai.git
-version: v4.25.7
+  repository: git://github.com/sisimai/p5-sisimai.git
+version: v4.25.8
 x_contributors:
   - '0xcdcdcdcd <0xcdcdcdcd@gmail.com>'
   - 'Adrian Yee <adrian@gt.net>'

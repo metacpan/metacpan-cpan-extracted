@@ -1,3 +1,8 @@
+0.42 2020-07-15
+ - Make rt_too_new warn instead to not block installation
+ - Notify user if the extension is already cored
+ - Stand out warnings/errors by using red color
+
 0.41 2020-04-16
  - Search /opt/rt5 for RT.pm
 

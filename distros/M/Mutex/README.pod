@@ -6,7 +6,7 @@ Mutex - Various locking implementations supporting processes and threads
 
 =head1 VERSION
 
-This document describes Mutex version 1.005
+This document describes Mutex version 1.006
 
 =head1 SYNOPSIS
 
@@ -153,7 +153,7 @@ if the timeout is reached, and a true value otherwise. The default is
 
 =head1 REQUIREMENTS
 
-Perl 5.8.0 or later.
+Perl 5.8.1 or later.
 
 =head1 AUTHOR
 
@@ -161,7 +161,7 @@ Mario E. Roy, S<E<lt>marioeroy AT gmail DOT comE<gt>>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Mario E. Roy
+Copyright (C) 2017-2020 by Mario E. Roy
 
 Mutex is released under the same license as Perl.
 

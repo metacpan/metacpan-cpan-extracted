@@ -38,7 +38,7 @@ foreach my $plplot_test_script (@scripts) {
   (my $c_code = $plplot_test_script) =~ s/\.pl/c\.c/;
 
   # Compile C version
-  my $cmd_line = "$plversion->{'C_COMPILE'} $c_code -o $tmpdir/a.out -lm $plversion->{'C_COMPILE_SUFFIX'}";
+  my $cmd_line = "$plversion->{'C_COMPILE'} $c_code -O -o $tmpdir/a.out -lm $plversion->{'C_COMPILE_SUFFIX'}";
   $cmd_line = "LD_RUN_PATH=\"$plversion->{'PLPLOT_LIB'}\" $cmd_line" if $^O !~ /MSWin32/i;
   system $cmd_line;
   ok ((($? == 0) && -s "$tmpdir/a.out"), "$c_code compiled successfully");

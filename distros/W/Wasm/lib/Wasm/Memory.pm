@@ -9,7 +9,7 @@ use base qw( Exporter );
 our @EXPORT_OK = qw( wasm_caller_memory );
 
 # ABSTRACT: Interface to WebAssembly Memory
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 sub wasm_caller_memory
@@ -64,7 +64,7 @@ Wasm::Memory - Interface to WebAssembly Memory
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 

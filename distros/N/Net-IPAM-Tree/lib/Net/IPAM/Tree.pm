@@ -1,6 +1,6 @@
 package Net::IPAM::Tree;
 
-our $VERSION = '1.10';
+our $VERSION = '1.12';
 
 use 5.10.0;
 use strict;
@@ -141,9 +141,10 @@ sub insert {
 
 =head2 contains($thing)
 
-Returns true if the given $thing (L<Net::IPAM::IP> or L<Net::IPAM::Block>) is contained
-in any block of the tree. Just returns true or false and not the matching prefix,
-this is much faster than a full L</"lookup"> for the longest-prefix-match.
+Returns the outermost block if the given $thing (L<Net::IPAM::IP> or L<Net::IPAM::Block>)
+is contained in the tree or undef.
+
+This is much faster than a full L</"lookup"> for the longest-prefix-match.
 
 This can be used for fast ACL lookups.
 

@@ -1,5 +1,26 @@
 Revision history for Wasm},
 
+0.17      2020-07-20 10:27:52 -0600
+  - Require Wasmtime 0.19.0 (via Alien::wasmtime 0.12 if necessary) (gh#73, gh#82)
+  - The store method on Wasm::Wasmtime::Module is deprecated and will be
+    removed from a future version of Wasm::Wasmtime (gh#73, gh#83)
+  - Creating a Wasm::Wasmtime::Instance instance without a
+    Wasm::Wasmtime::Store object is now deprecated and will be removed
+    from a future version of Wasm::Wasmtime (gh#73, gh#83)
+  - Wasm::Wasmtime::Trap objects are thrown directly via die instead of
+    being converted into Perl string exceptions.  (gh#73, gh#85)
+  - Wasm::Wasmtime::Trap stringifies to its message for easy to read
+    diagnostics. (gh#73, gh#85)
+  - Added exit_status method on Wasm::Wasmtime::Trap class (gh#72, gh#73, gh#85)
+
+0.16      2020-07-18 06:07:45 -0600
+  - Instance constructor may return a more useful error message on failure (gh#73, gh#79)
+  - Added get_default method for Wasm::Wasmtime::Linker (gh#73, gh#79)
+
+0.15      2020-07-18 04:18:31 -0600
+  - Compatability with wasmtime 0.19.0 (gh#75, gh#77)
+  - Remove workaround for wasmtime 0.16.0 (gh#78)
+
 0.14      2020-06-07 21:03:13 -0600
   - Require minimum Perl 5.8.4.  This was already the case in practice
     since 0.11 when Wasm::Hook was merged, as it uses autodie (gh#69)

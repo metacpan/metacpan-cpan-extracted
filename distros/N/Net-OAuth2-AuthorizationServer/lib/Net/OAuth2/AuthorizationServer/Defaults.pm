@@ -35,7 +35,7 @@ has 'jwt_encoding' => (
 
 has 'access_token_ttl' => (
     is       => 'ro',
-    isa      => Int,
+    isa      => Maybe[Int|CodeRef],
     required => 0,
     default  => sub { 3600 },
 );
@@ -185,7 +185,10 @@ sub _store_access_token {
         = @args{
         qw/ client_id auth_code access_token refresh_token expires_in scopes old_refresh_token / };
 
-    $expires_in //= $self->access_token_ttl;
+	$expires_in //= $self->get_access_token_ttl(
+		scopes => $scope,
+		client_id => $c_id,
+	);
 
     return 1 if $self->jwt_secret;
 
@@ -325,6 +328,14 @@ sub _revoke_access_token {
     delete( $self->access_tokens->{ $access_token } );
 }
 
+sub get_access_token_ttl {
+	my ( $self, %args ) = @_;
+
+	return ref $self->access_token_ttl eq 'CODE'
+		? $self->access_token_ttl->( %args )
+		: $self->access_token_ttl;
+}
+
 sub token {
     my ( $self, %args ) = @_;
 
@@ -338,7 +349,11 @@ sub token {
 		croak "Invalid type for ->token ($type)";
 	}
 
-    my $ttl = $type eq 'auth' ? $self->auth_code_ttl : $self->access_token_ttl;
+	my $ttl = $type eq 'auth' ? $self->auth_code_ttl : $self->get_access_token_ttl(
+		scopes => $scopes,
+		client_id => $client_id,
+	);
+
     undef( $ttl ) if $type eq 'refresh';
     my $code;
 

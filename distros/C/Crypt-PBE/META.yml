@@ -1,0 +1,32 @@
+---
+abstract: 'Perl extension for PKCS #5 Password-Based Encryption Algorithms'
+author:
+  - 'Giuseppe Di Terlizzi <gdt@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-PBE
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::CBC: '0'
+  Crypt::DES: '0'
+  Crypt::OpenSSL::AES: '0'
+  Digest::MD2: '0'
+  Digest::MD5: '0'
+  Digest::SHA: '0'
+  perl: '5.008'
+resources:
+  repository: git://github.com/giterlizzi/perl-Crypt-PBE
+version: '0.101'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,9 @@
+v0.32.0 2020-07-18T07:23:04+0800
+  - Add a site-specific extractor for www.digitimes.com.tw
+  - Add a site-specific extractor for www.hkcna.hk
+  - Add a site-specific extractor for www.cw.com.tw
+  - Handle the English version of www.hkcnews.com
+
 v0.31.0 2020-07-14T08:57:12+0800
   - Add a site-specific extractor for newtalk.tw
   - Add a site-specific extractor for talk.ltn.com.tw

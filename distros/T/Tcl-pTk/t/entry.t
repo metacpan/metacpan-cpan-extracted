@@ -34,16 +34,9 @@ ok(ref($scalarRef), 'SCALAR', "textvariable is scalar ref");
 # Make sure DoOneEvent call works
 DoOneEvent(DONT_WAIT);
 
-my $tclversion = $TOP->tclVersion;
-
-if( $tclversion > 8.4){
-        # Make sure timeofday works
-        my $t = Tcl::pTk::timeofday;
-
-        ok(1, 1, "timeofday check");
-}
-else{
-        skip("timeofday check for Tcl version 8.4");
-}
+# Make sure timeofday works
+my $t = Tcl::pTk::timeofday;
+print "# timeofday: $t\n";
+ok(1, 1, "timeofday check");
 
 MainLoop;

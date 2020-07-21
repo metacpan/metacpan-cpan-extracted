@@ -10,7 +10,7 @@ Smartcat::App::Config tests
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Exception;
 use Test::Fatal;
 use Test::MockModule;
@@ -42,6 +42,7 @@ ok( $config->log eq '__log__', "'log' attribute set properly" );
 $config->{username} = '__token_id__changed__';
 $config->{password} = '__token__changed__';
 $config->{log}      = '__log__changed__';
+$config->{base_url} = '__base_url__changed__';
 $config->save;
 
 $config = Smartcat::App::Config->load;
@@ -55,6 +56,10 @@ ok(
     "'password' attribute saved properly"
 );
 ok( $config->log eq '__log__changed__', "'log' attribute saved properly" );
+ok(
+    $config->base_url eq '__base_url__changed__',
+    "'base_url' attribute saved properly"
+);
 
 move( $test_config_path . ".bak", $test_config_path );
 

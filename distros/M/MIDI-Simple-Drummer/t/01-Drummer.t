@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN { use_ok('MIDI::Simple::Drummer') }
+use_ok 'MIDI::Simple::Drummer';
 
 my $d = new_ok 'MIDI::Simple::Drummer';
 
@@ -128,9 +128,9 @@ $x = $d->option_strike('Cowbell', 'Tambourine');
 like $x, qr/n5[46]/, 'option_strike options';
 
 # Test the metronome.
-$d = eval { MIDI::Simple::Drummer->new };
+$d = new_ok 'MIDI::Simple::Drummer';
 $d->metronome;
-$d = eval { MIDI::Simple::Drummer->new(-signature => '3/4') };
+$d = new_ok 'MIDI::Simple::Drummer' => [ -signature => '3/4' ];
 $x = $d->beats;
 is $x, 3, 'get beats';
 $x = $d->divisions;
@@ -140,7 +140,7 @@ $x = grep { $_->[0] eq 'note' } @{$d->score->{Score}};
 ok $x == $d->beats * $d->phrases, 'metronome';
 
 # Test the machinations.
-$d = eval { MIDI::Simple::Drummer->new };
+$d = new_ok 'MIDI::Simple::Drummer';
 $d->count_in;
 $x = grep { $_->[0] eq 'note' } @{$d->score->{Score}};
 ok $x == $d->beats, 'count_in';
@@ -208,7 +208,7 @@ $x = $d->write($f2);
 ok $x eq $f2 && -e $x, 'named write';
 
 # TODO sync_tracks() tests with score notes instead.
-$d = eval { MIDI::Simple::Drummer->new };
+$d = new_ok 'MIDI::Simple::Drummer';
 $d->patterns(b1 => \&b1);
 $d->patterns(b2 => \&b2);
 $d->sync_tracks(

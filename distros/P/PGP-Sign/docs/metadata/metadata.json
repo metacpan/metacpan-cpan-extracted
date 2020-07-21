@@ -1,6 +1,6 @@
 {
     "name": "PGP::Sign",
-    "version": "1.00",
+    "version": "1.01",
     "synopsis": "create and verify detached PGP signatures",
     "maintainer": "Russ Allbery <rra@cpan.org>",
     "copyrights": [
@@ -27,6 +27,11 @@
         "status": {
             "workflow": "build",
         },
+    },
+    "quote": {
+        "author": "William Shakespeare",
+        "work": "Hamlet",
+        "broken": true,
     },
     "distribution": {
         "section": "perl",

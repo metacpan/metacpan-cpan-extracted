@@ -9,8 +9,8 @@ use Fcntl;
 
 my $rc = 0;
 
-$rc = sysopen(FILE,$0,O_RDONLY);
-ok($rc, q{sysopen(FILE,$0,O_RDONLY)});
+eval { $rc = sysopen(FILE,$0,O_RDONLY); };
+ok($@, q{sysopen(FILE,$0,O_RDONLY)});
 if ($rc) {
     local $_ = fileno(FILE);
     close(FILE);

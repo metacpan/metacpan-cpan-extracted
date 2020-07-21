@@ -14,6 +14,7 @@ t/00use.t
 t/01trycatch.t
 t/02tryfinally.t
 t/03trycatchfinally.t
+t/04catch-types.t
 t/10snail.t
 t/11loop.t
 t/12return.t

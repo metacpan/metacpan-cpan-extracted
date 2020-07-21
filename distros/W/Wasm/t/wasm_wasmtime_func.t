@@ -211,11 +211,47 @@ is(
     'create functon with an exception',
   );
 
+  my $error;
+
   is(
-    dies { $f->call },
-    match qr/it dies/,
+    $error = dies { $f->call },
+    object {
+      call message => match qr/^it dies/;
+    },
     'it died',
   );
+
+  note $error;
+
+}
+
+{
+  my $store = Wasm::Wasmtime::Store->new;
+  my $f = Wasm::Wasmtime::Func->new(
+    $store,
+    Wasm::Wasmtime::FuncType->new([],[]),
+    sub { die Wasm::Wasmtime::Trap->new($store, "it dies\0") },
+  );
+
+  is(
+    $f,
+    object {
+      call [ isa => 'Wasm::Wasmtime::Func' ] => T();
+    },
+    'create functon with an exception',
+  );
+
+  my $error;
+
+  is(
+    $error = dies { $f->call },
+    object {
+      call message => 'it dies';
+    },
+    'it died',
+  );
+
+  note $error;
 
 }
 

@@ -9,9 +9,8 @@ if ( $Has_Query ) {
 
     my $current_search_menu;
     if ( $Path =~ m{^/Ticket} ) {
-        $current_search_menu = $search->child( current_search => title => loc('Current Search') );
-        $current_search_menu->path("/Search/Results.html$Search_Args") if $Has_Query;
-    } else {
+        $current_search_menu = $search->child('current_search');
+    } elsif ( $Path =~ m{^/Search/} && ( !$DECODED_ARGS->{Class} || $DECODED_ARGS->{Class} eq 'RT::Tickets' ) ) {
         $current_search_menu = PageMenu();
     }
 

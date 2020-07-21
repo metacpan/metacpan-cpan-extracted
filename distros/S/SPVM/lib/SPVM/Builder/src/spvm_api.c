@@ -6,49 +6,30 @@
 #include <stddef.h>
 #include <inttypes.h>
 
+#include "spvm_list.h"
+#include "spvm_hash.h"
+
+#include "spvm_compiler.h"
+#include "spvm_op.h"
+
+#include "spvm_opcode_array.h"
+#include "spvm_opcode.h"
+#include "spvm_package.h"
+#include "spvm_basic_type.h"
+#include "spvm_package_var.h"
+#include "spvm_field.h"
+#include "spvm_sub.h"
+#include "spvm_type.h"
+#include "spvm_my.h"
+#include "spvm_constant.h"
+#include "spvm_weaken_backref.h"
+#include "spvm_switch_info.h"
+#include "spvm_case_info.h"
+#include "spvm_limit.h"
+
 #include "spvm_api.h"
 #include "spvm_object.h"
 #include "spvm_native.h"
-
-#include "spvm_list.h"
-#include "spvm_hash.h"
-#include "spvm_opcode.h"
-#include "spvm_package.h"
-#include "spvm_basic_type.h"
-#include "spvm_type.h"
-#include "spvm_sub.h"
-#include "spvm_limit.h"
-#include "spvm_compiler.h"
-#include "spvm_type.h"
-#include "spvm_package.h"
-#include "spvm_type.h"
-#include "spvm_op.h"
-#include "spvm_hash.h"
-#include "spvm_list.h"
-#include "spvm_util_allocator.h"
-#include "spvm_compiler_allocator.h"
-#include "spvm_yacc_util.h"
-#include "spvm_list.h"
-#include "spvm_opcode_array.h"
-#include "spvm_sub.h"
-#include "spvm_field.h"
-#include "spvm_package_var.h"
-#include "spvm_native.h"
-#include "spvm_opcode.h"
-#include "spvm_basic_type.h"
-#include "spvm_use.h"
-#include "spvm_op_checker.h"
-#include "spvm_opcode_builder.h"
-#include "spvm_object.h"
-#include "spvm_constant.h"
-#include "spvm_my.h"
-#include "spvm_string_buffer.h"
-#include "spvm_my.h"
-#include "spvm_weaken_backref.h"
-#include "spvm_constant.h"
-#include "spvm_switch_info.h"
-#include "spvm_case_info.h"
-
 
 
 
@@ -235,12 +216,28 @@ SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
   };
   
   int32_t env_length = 255;
-  SPVM_ENV* env = SPVM_API_safe_malloc_zero(sizeof(void*) * env_length);
-  memcpy(&env[0], &env_init[0], sizeof(void*) * env_length);
+  SPVM_ENV* env = calloc(sizeof(void*), env_length);
+  if (env == NULL) {
+    return NULL;
+  }
+  memcpy(&env[0], env_init, sizeof(void*) * env_length);
 
   // Mortal stack
-  env->native_mortal_stack_capacity = (void*)(intptr_t)1;
-  env->native_mortal_stack = (void*)SPVM_API_alloc_memory_block_zero(env, sizeof(SPVM_OBJECT*) * (intptr_t)env->native_mortal_stack_capacity);
+  int32_t native_mortal_stack_capacity = 1;
+  void* native_mortal_stack = SPVM_API_alloc_memory_block_zero(env, sizeof(SPVM_OBJECT*) * native_mortal_stack_capacity);
+  if (native_mortal_stack == NULL) {
+    return NULL;
+  }
+
+  // Initialize Package Variables
+  void* package_vars_heap = SPVM_API_alloc_memory_block_zero(env, sizeof(SPVM_VALUE) * ((int64_t)compiler->package_vars->length + 1));
+  if (package_vars_heap == NULL) {
+    return NULL;
+  }
+  
+  env->native_mortal_stack_capacity = (void*)(intptr_t)native_mortal_stack_capacity;
+  env->native_mortal_stack = native_mortal_stack;
+  env->package_vars_heap = package_vars_heap;
 
   // Adjust alignment SPVM_VALUE
   int32_t object_header_byte_size = sizeof(SPVM_OBJECT);
@@ -251,9 +248,6 @@ SPVM_ENV* SPVM_API_create_env(SPVM_COMPILER* compiler) {
   
   // Object header byte size
   env->object_header_byte_size = (void*)(intptr_t)object_header_byte_size;
-
-  // Initialize Package Variables
-  env->package_vars_heap = SPVM_API_safe_malloc_zero(sizeof(SPVM_VALUE) * (compiler->package_vars->length + 1));
   
   return env;
 }
@@ -291,15 +285,15 @@ SPVM_ENV* SPVM_API_new_env(SPVM_ENV* env) {
 }
 
 void SPVM_API_free_env(SPVM_ENV* env) {
-  // Free mortal stack
-  SPVM_API_free_memory_block(env, env->native_mortal_stack);
-  
   // Free exception
   SPVM_API_set_exception(env, NULL);
 
   // Free package variables heap
-  free(env->package_vars_heap);
+  SPVM_API_free_memory_block(env, env->package_vars_heap);
   
+  // Free mortal stack
+  SPVM_API_free_memory_block(env, env->native_mortal_stack);
+
   free(env);
 }
 
@@ -484,6 +478,12 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
     int32_t total_vars_byte_size = numeric_vars_byte_size + address_vars_byte_size;
     
     call_stack = SPVM_API_alloc_memory_block_zero(env, total_vars_byte_size + 1);
+    if (call_stack == NULL) {
+      void* exception = env->new_string_raw(env, "Can't alloc call stack memory");
+      env->set_exception(env, exception);
+      exception_flag = 1;
+      return exception_flag;
+    }
 
     int32_t call_stack_offset = 0;
     
@@ -2426,9 +2426,15 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         int32_t basic_type_id = opcode->operand1;
         
         void* object = env->new_object_raw(env, basic_type_id);
-        
-        // Push object
-        SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+        if (object == NULL) {
+          void* exception = env->new_string_raw(env, "Can't allocate memory for object");
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
+        else {
+          // Push object
+          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+        }
         
         break;
       }
@@ -2436,7 +2442,14 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         int32_t length = int_vars[opcode->operand1];
         if (length >= 0) {
           void* object = env->new_byte_array_raw(env, length);
-          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          if (object == NULL) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for byte array");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          }
         }
         else {
           void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0");
@@ -2452,9 +2465,15 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         
         if (length >= 0) {
           void* object = env->new_short_array_raw(env, length);
-          
-          // Set array
-          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          if (object == NULL) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for short array");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            // Set array
+            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          }
         }
         else {
           void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0");
@@ -2470,9 +2489,15 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         
         if (length >= 0) {
           void* object = env->new_int_array_raw(env, length);
-          
-          // Set array
-          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          if (object == NULL) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for int array");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            // Set array
+            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          }
         }
         else {
           void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0");
@@ -2487,7 +2512,14 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         int32_t length = int_vars[opcode->operand1];
         if (length >= 0) {
           void* object = env->new_long_array_raw(env, length);
-          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          if (object == NULL) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for long array");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          }
         }
         else {
           void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0");
@@ -2501,7 +2533,14 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         int32_t length = int_vars[opcode->operand1];
         if (length >= 0) {
           void* object = env->new_float_array_raw(env, length);
-          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          if (object == NULL) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for float array");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          }
         }
         else {
           void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0");
@@ -2515,7 +2554,14 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         int32_t length = int_vars[opcode->operand1];
         if (length >= 0) {
           void* object = env->new_double_array_raw(env, length);
-          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          if (object == NULL) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for double array");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          }
         }
         else {
           void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0");
@@ -2530,7 +2576,14 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         int32_t length = int_vars[opcode->operand2];
         if (length >= 0) {
           void* object = env->new_object_array_raw(env, basic_type_id, length);
-          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          if (object == NULL) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for object array");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          }
         }
         else {
           void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0");
@@ -2546,7 +2599,14 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         
         if (length >= 0) {
           void* object = env->new_muldim_array_raw(env, basic_type_id, element_dimension, length);
-          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          if (object == NULL) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for multi dimention array");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          }
         }
         else {
           void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0");
@@ -2558,14 +2618,18 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
       case SPVM_OPCODE_C_ID_NEW_MULNUM_ARRAY: {
         int32_t basic_type_id = opcode->operand1;
         
-        // length
         int32_t length = int_vars[opcode->operand2];
         
         if (length >= 0) {
           void* object = env->new_mulnum_array_raw(env, basic_type_id, length);
-          
-          // Set object
-          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          if (object == NULL) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for muti numeric array");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
+          else {
+            SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0], object);
+          }
         }
         else {
           void* exception = env->new_string_raw(env, "Array length must be more than or equal to 0");
@@ -2580,10 +2644,14 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         const char* string_value = constant->value.oval;
         
         void* string = env->new_string_len_raw(env, string_value, constant->string_length);
-        
-        // Set string
-        SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0] , string);
-
+        if (string == NULL) {
+          void* exception = env->new_string_raw(env, "Can't allocate memory for string");
+          env->set_exception(env, exception);
+          exception_flag = 1;
+        }
+        else {
+          SPVM_API_OBJECT_ASSIGN((void**)&object_vars[opcode->operand0] , string);
+        }
         break;
       }
       case SPVM_OPCODE_C_ID_ARRAY_LENGTH:
@@ -3685,7 +3753,12 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
         }
         else {
           void** get_field_object_address = (void**)((intptr_t)object + object_header_byte_size + field_offset);
-          env->weaken(env, get_field_object_address);
+          int32_t status = env->weaken(env, get_field_object_address);
+          if (status != 0) {
+            void* exception = env->new_string_raw(env, "Can't allocate memory for weaken back reference");
+            env->set_exception(env, exception);
+            exception_flag = 1;
+          }
         }
         break;
       }
@@ -4145,53 +4218,6 @@ int32_t SPVM_API_call_sub_vm(SPVM_ENV* env, int32_t sub_id, SPVM_VALUE* stack) {
   return exception_flag;
 }
 
-int32_t SPVM_API_call_entry_point_sub(SPVM_ENV* env, const char* package_name, int32_t argc, const char *argv[]) {
-  
-  SPVM_COMPILER* compiler = env->compiler;
-  
-  // Package
-  int32_t sub_id = SPVM_API_get_sub_id(env, package_name, "main", "int(string[])");
-  
-  if (sub_id < 0) {
-    fprintf(stderr, "Can't find entry point package %s\n", package_name);
-    exit(EXIT_FAILURE);
-  }
-  
-  // Enter scope
-  int32_t scope_id = env->enter_scope(env);
-  
-  // new byte[][args_length] object
-  int32_t arg_type_basic_id = env->get_basic_type_id(env, "byte");
-  void* cmd_args_obj = env->new_muldim_array(env, arg_type_basic_id, 1, argc);
-  
-  // Set command line arguments
-  for (int32_t arg_index = 0; arg_index < argc; arg_index++) {
-    void* cmd_arg_obj = env->new_string_len(env, argv[arg_index], strlen(argv[arg_index]));
-    env->set_elem_object(env, cmd_args_obj, arg_index, cmd_arg_obj);
-  }
-  
-  SPVM_VALUE stack[255];
-  stack[0].oval = cmd_args_obj;
-  
-  // Run
-  int32_t exception_flag = env->call_sub(env, sub_id, stack);
-  
-  int32_t status_code;
-  if (exception_flag) {
-    SPVM_API_print(env, env->exception_object);
-    printf("\n");
-    status_code = 255;
-  }
-  else {
-    status_code = stack[0].ival;
-  }
-  
-  // Leave scope
-  env->leave_scope(env, scope_id);
-  
-  return status_code;
-}
-
 int32_t SPVM_API_is_type(SPVM_ENV* env, SPVM_OBJECT* object, int32_t basic_type_id, int32_t type_dimension) {
   
   // Object must be not null
@@ -4264,7 +4290,7 @@ int32_t SPVM_API_enter_scope(SPVM_ENV* env) {
   return mortal_stack_top;
 }
 
-void SPVM_API_push_mortal(SPVM_ENV* env, SPVM_OBJECT* object) {
+int32_t SPVM_API_push_mortal(SPVM_ENV* env, SPVM_OBJECT* object) {
   (void)env;
 
   SPVM_COMPILER* compiler = env->compiler;
@@ -4274,6 +4300,9 @@ void SPVM_API_push_mortal(SPVM_ENV* env, SPVM_OBJECT* object) {
     if (env->native_mortal_stack_top >= env->native_mortal_stack_capacity) {
       int32_t new_mortal_stack_capacity = (intptr_t)env->native_mortal_stack_capacity * 2;
       SPVM_OBJECT** new_mortal_stack = SPVM_API_alloc_memory_block_zero(env, sizeof(void*) * new_mortal_stack_capacity);
+      if (new_mortal_stack == NULL) {
+        return 1;
+      }
       memcpy(new_mortal_stack, env->native_mortal_stack, sizeof(void*) * (intptr_t)env->native_mortal_stack_capacity);
       env->native_mortal_stack_capacity = (void*)(intptr_t)new_mortal_stack_capacity;
       SPVM_API_free_memory_block(env, env->native_mortal_stack);
@@ -4285,6 +4314,8 @@ void SPVM_API_push_mortal(SPVM_ENV* env, SPVM_OBJECT* object) {
     
     object->ref_count++;
   }
+  
+  return 0;
 }
 
 SPVM_OBJECT* SPVM_API_type_name_raw(SPVM_ENV* env, SPVM_OBJECT* object) {
@@ -4305,7 +4336,7 @@ SPVM_OBJECT* SPVM_API_type_name_raw(SPVM_ENV* env, SPVM_OBJECT* object) {
   // Basic type
   length += strlen(basic_type_name);
   
-  // []
+  //[]
   length += type_dimension * 2;
   
   void* type_name_barray = env->new_byte_array_raw(env, length);
@@ -4497,7 +4528,7 @@ int32_t SPVM_API_isweak(SPVM_ENV* env, SPVM_OBJECT** object_address) {
   return isweak;
 }
 
-void SPVM_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
+int32_t SPVM_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
   (void)env;
   
   assert(object_address);
@@ -4505,11 +4536,11 @@ void SPVM_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
   SPVM_COMPILER* compiler = env->compiler;
   
   if (*object_address == NULL) {
-    return;
+    return 0;
   }
   
   if (SPVM_API_isweak(env, object_address)) {
-    return;
+    return 0;
   }
   
   SPVM_OBJECT* object = *object_address;
@@ -4519,7 +4550,7 @@ void SPVM_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
     // If reference count is 1, the object is freeed without weaken
     SPVM_API_dec_ref_count(env, *object_address);
     *object_address = NULL;
-    return;
+    return 0;
   }
   else {
     object->ref_count--;
@@ -4528,6 +4559,9 @@ void SPVM_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
   // Create weaken_backref_head
   if (object->weaken_backref_head == NULL) {
     SPVM_WEAKEN_BACKREF* new_weaken_backref = SPVM_API_alloc_memory_block_zero(env, sizeof(SPVM_WEAKEN_BACKREF));
+    if (new_weaken_backref == NULL) {
+      return 1;
+    }
     new_weaken_backref->object_address = object_address;
     object->weaken_backref_head = new_weaken_backref;
   }
@@ -4536,6 +4570,9 @@ void SPVM_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
     SPVM_WEAKEN_BACKREF* weaken_backref_next = object->weaken_backref_head;
 
     SPVM_WEAKEN_BACKREF* new_weaken_backref = SPVM_API_alloc_memory_block_zero(env, sizeof(SPVM_WEAKEN_BACKREF));
+    if (new_weaken_backref) {
+      return 1;
+    }
     new_weaken_backref->object_address = object_address;
     
     while (weaken_backref_next->next != NULL){
@@ -4547,6 +4584,8 @@ void SPVM_API_weaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
   // Weaken is implemented by tag pointer.
   // If pointer most right bit is 1, object is weaken.
   *object_address = (SPVM_OBJECT*)((intptr_t)*object_address | 1);
+  
+  return 0;
 }
 
 void SPVM_API_unweaken(SPVM_ENV* env, SPVM_OBJECT** object_address) {
@@ -4778,10 +4817,13 @@ SPVM_OBJECT* SPVM_API_new_byte_array_raw(SPVM_ENV* env, int32_t length) {
   // Create object
   SPVM_COMPILER* compiler = env->compiler;
 
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(int8_t) * (length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(int8_t) * ((int64_t)length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
 
   object->type_dimension = 1;
   object->basic_type_id = SPVM_BASIC_TYPE_C_ID_BYTE;
@@ -4795,10 +4837,13 @@ SPVM_OBJECT* SPVM_API_new_short_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_COMPILER* compiler = env->compiler;
 
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(int16_t) * (length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(int16_t) * ((int64_t)length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
   
   object->type_dimension = 1;
   object->basic_type_id = SPVM_BASIC_TYPE_C_ID_SHORT;
@@ -4815,10 +4860,13 @@ SPVM_OBJECT* SPVM_API_new_int_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_COMPILER* compiler = env->compiler;
   
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(int32_t) * (length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(int32_t) * ((int64_t)length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
   
   object->type_dimension = 1;
   object->basic_type_id = SPVM_BASIC_TYPE_C_ID_INT;
@@ -4839,10 +4887,13 @@ SPVM_OBJECT* SPVM_API_new_long_array_raw(SPVM_ENV* env, int32_t length) {
     return NULL;
   }
   
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(int64_t) * (length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(int64_t) * ((int64_t)length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
   
   object->type_dimension = 1;
   object->basic_type_id = SPVM_BASIC_TYPE_C_ID_LONG;
@@ -4859,10 +4910,13 @@ SPVM_OBJECT* SPVM_API_new_float_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_COMPILER* compiler = env->compiler;
 
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(float) * (length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(float) * ((int64_t)length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
   
   object->type_dimension = 1;
   object->basic_type_id = SPVM_BASIC_TYPE_C_ID_FLOAT;
@@ -4879,10 +4933,13 @@ SPVM_OBJECT* SPVM_API_new_double_array_raw(SPVM_ENV* env, int32_t length) {
   (void)env;
   SPVM_COMPILER* compiler = env->compiler;
   
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(double) * (length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(double) * ((int64_t)length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
   
   object->type_dimension = 1;
   object->basic_type_id = SPVM_BASIC_TYPE_C_ID_DOUBLE;
@@ -4900,10 +4957,13 @@ SPVM_OBJECT* SPVM_API_new_object_array_raw(SPVM_ENV* env, int32_t basic_type_id,
   
   SPVM_COMPILER* compiler = env->compiler;
 
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(void*) * (length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(void*) * ((int64_t)length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
 
   for (int32_t index = 0; index < length; index++) {
     SPVM_OBJECT* get_field_object = ((SPVM_OBJECT**)((intptr_t)object + env->object_header_byte_size))[index];
@@ -4927,10 +4987,13 @@ SPVM_OBJECT* SPVM_API_new_muldim_array_raw(SPVM_ENV* env, int32_t basic_type_id,
   
   SPVM_COMPILER* compiler = env->compiler;
   
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(void*) * (length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(void*) * ((int64_t)length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
   
   object->basic_type_id = basic_type_id;
   object->type_dimension = element_dimension + 1;
@@ -4981,10 +5044,13 @@ SPVM_OBJECT* SPVM_API_new_mulnum_array_raw(SPVM_ENV* env, int32_t basic_type_id,
     assert(0);
   }
 
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + unit_size * fields_length * (length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + unit_size * fields_length * ((int64_t)length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
 
   object->basic_type_id = basic_type->id;
   object->type_dimension = 1;
@@ -5018,10 +5084,13 @@ SPVM_OBJECT* SPVM_API_new_object_raw(SPVM_ENV* env, int32_t basic_type_id) {
   // Alloc body length + 1
   int32_t fields_length = package->fields->length;
 
-  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * (fields_length + 1);
+  int64_t alloc_byte_size = (intptr_t)env->object_header_byte_size + sizeof(SPVM_VALUE) * ((int64_t)fields_length + 1);
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
   
   object->basic_type_id = basic_type->id;
   object->type_dimension = 0;
@@ -5061,6 +5130,9 @@ SPVM_OBJECT* SPVM_API_new_pointer_raw(SPVM_ENV* env, int32_t basic_type_id, void
   
   // Create object
   SPVM_OBJECT* object = SPVM_API_alloc_memory_block_zero(env, alloc_byte_size);
+  if (!object) {
+    return NULL;
+  }
   
   *(void**)((intptr_t)object + (intptr_t)env->object_header_byte_size) = pointer;
 
@@ -5213,10 +5285,7 @@ void SPVM_API_dec_ref_count(SPVM_ENV* env, SPVM_OBJECT* object) {
           fprintf(stderr, "(in cleanup) %s\n", exception_str);
         }
         
-        if (object->ref_count < 1) {
-          printf("Invalid reference count in DESTROY()\n");
-          exit(EXIT_FAILURE);
-        }
+        assert(object->ref_count > 0);
       }
       
       // Free object fields
@@ -5711,45 +5780,37 @@ void SPVM_API_set_field_object(SPVM_ENV* env, SPVM_OBJECT* object, int32_t field
 
 void* SPVM_API_alloc_memory_block_zero(SPVM_ENV* env, int64_t byte_size) {
   
-  void* block = SPVM_API_safe_malloc_zero(byte_size);
-  env->memory_blocks_count++;
+  assert(byte_size > 0);
+
+  if ((uint64_t)byte_size > (uint64_t)SIZE_MAX) {
+    return NULL;
+  }
   
-#ifdef SPVM_DEBUG_OBJECT_COUNT
-  fprintf(stderr, "[ALLOC_MEMORY] %d\n", runtime->memory_blocks_count);
+  void* block = calloc(1, (size_t)byte_size);
+  
+  if (block) {
+    env->memory_blocks_count++;
+  
+#ifdef SPVM_DEBUG_ALLOC_MEMORY_COUNT
+  fprintf(stderr, "[ALLOC_MEMORY %p %d]\n", block, (int32_t)env->memory_blocks_count);
 #endif
-  
+  }
+  else {
+    
+  }
+
   return block;
 }
 
 void SPVM_API_free_memory_block(SPVM_ENV* env, void* block) {
 
   if (block) {
-    free(block);
     env->memory_blocks_count--;
-    
-#ifdef SPVM_DEBUG_OBJECT_COUNT
-    fprintf(stderr, "[FREE_MEMORY] %d\n", runtime->memory_blocks_count);
+#ifdef SPVM_DEBUG_ALLOC_MEMORY_COUNT
+    fprintf(stderr, "[FREE_MEMORY %p %d]\n", block, (int32_t)env->memory_blocks_count);
 #endif
+    free(block);
   }
-}
-
-void* SPVM_API_safe_malloc_zero(int64_t byte_size) {
-  
-  assert(byte_size > 0);
-  
-  if ((uint64_t)byte_size > SIZE_MAX) {
-    fprintf(stderr, "Failed to allocate memory. Specified memroy size is too big\n");
-    exit(EXIT_FAILURE);
-  }
-  
-  void* block = calloc(1, (size_t)byte_size);
-  
-  if (block == NULL) {
-    fprintf(stderr, "Failed to allocate memory. calloc function return NULL\n");
-    exit(EXIT_FAILURE);
-  }
-  
-  return block;
 }
 
 int8_t SPVM_API_get_package_var_byte(SPVM_ENV* env, int32_t packagke_var_id) {

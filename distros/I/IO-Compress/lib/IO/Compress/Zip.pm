@@ -4,30 +4,30 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.094 qw(:Status );
-use IO::Compress::RawDeflate 2.094 ();
-use IO::Compress::Adapter::Deflate 2.094 ;
-use IO::Compress::Adapter::Identity 2.094 ;
-use IO::Compress::Zlib::Extra 2.094 ;
-use IO::Compress::Zip::Constants 2.094 ;
+use IO::Compress::Base::Common  2.095 qw(:Status );
+use IO::Compress::RawDeflate 2.095 ();
+use IO::Compress::Adapter::Deflate 2.095 ;
+use IO::Compress::Adapter::Identity 2.095 ;
+use IO::Compress::Zlib::Extra 2.095 ;
+use IO::Compress::Zip::Constants 2.095 ;
 
 use File::Spec();
 use Config;
 
-use Compress::Raw::Zlib  2.094 (); 
+use Compress::Raw::Zlib  2.095 (); 
 
 BEGIN
 {
     eval { require IO::Compress::Adapter::Bzip2 ; 
-           import  IO::Compress::Adapter::Bzip2 2.094 ; 
+           import  IO::Compress::Adapter::Bzip2 2.095 ; 
            require IO::Compress::Bzip2 ; 
-           import  IO::Compress::Bzip2 2.094 ; 
+           import  IO::Compress::Bzip2 2.095 ; 
          } ;
          
     eval { require IO::Compress::Adapter::Lzma ; 
-           import  IO::Compress::Adapter::Lzma 2.094 ; 
+           import  IO::Compress::Adapter::Lzma 2.095 ; 
            require IO::Compress::Lzma ; 
-           import  IO::Compress::Lzma 2.094 ; 
+           import  IO::Compress::Lzma 2.095 ; 
          } ;
 }
 
@@ -36,7 +36,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, %DEFLATE_CONSTANTS, $ZipError);
 
-$VERSION = '2.094';
+$VERSION = '2.095';
 $ZipError = '';
 
 @ISA = qw(IO::Compress::RawDeflate Exporter);
@@ -2050,7 +2050,7 @@ See L<IO::Compress::FAQ|IO::Compress::FAQ/"Compressed files and Net::FTP">
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/IO-Compress/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress>.
 

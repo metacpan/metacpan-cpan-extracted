@@ -1,3 +1,12 @@
+NAME
+
+    POE::Component::Client::Whois - A one shot non-blocking RFC 812 WHOIS
+    query.
+
+VERSION
+
+    version 1.38
+
 SYNOPSIS
 
        use strict;
@@ -83,4 +92,15 @@ KUDOS
 SEE ALSO
 
     RFC 812 http://www.faqs.org/rfcs/rfc812.html.
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2020 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -56,6 +56,8 @@ package Sidef::Deparse::Perl {
                   Sidef::DataTypes::Regex::Regex          Sidef::Types::Regex::Regex
                   Sidef::DataTypes::String::String        Sidef::Types::String::String
                   Sidef::DataTypes::Number::Number        Sidef::Types::Number::Number
+                  Sidef::DataTypes::Number::Mod           Sidef::Types::Number::Mod
+                  Sidef::DataTypes::Number::Gauss         Sidef::Types::Number::Gauss
                   Sidef::DataTypes::Number::Complex       Sidef::Types::Number::Complex
                   Sidef::DataTypes::Range::Range          Sidef::Types::Range::Range
                   Sidef::DataTypes::Range::RangeNumber    Sidef::Types::Range::RangeNumber
@@ -1195,11 +1197,8 @@ HEADER
 
                 $code =
                     'Sidef::Types::Block::Block::_iterate(sub { '
-                  . 'my ($item) = @_; '
-                  . 'local @_ = '
-                  . ($multi ? '@{('      : '') . '$item'
-                  . ($multi ? ')->to_a}' : '')
-                  . "; $vars; $code }, $expr)"
+                  . ($multi ? 'local @_ = @{$_[0]->to_a};' : '')
+                  . "$vars; $code }, $expr)"
                   . (@loops ? ' // last' : '');
             }
         }
@@ -1439,10 +1438,12 @@ HEADER
                   and die "[ERROR] Incorrect number of arguments for $obj->{act}\() at"
                   . " $obj->{file} line $obj->{line} (expected 1 or 2 arguments)\n";
 
+                my $msg = $args[1] // 'undef';
+
                 # Generate code
                 $code =
                     qq~do{my \$a$refaddr = do{$args[0]}; ~
-                  . qq~\$a$refaddr or CORE::die((do{$args[1]} // "$obj->{act}(\$a$refaddr)") . " failed ~
+                  . qq~\$a$refaddr or CORE::die((do{$msg} // "$obj->{act}(\$a$refaddr)") . " failed ~
                   . qq~at \Q$obj->{file}\E line $obj->{line}\\n")}~;
             }
             elsif ($obj->{act} eq 'assert_eq' or $obj->{act} eq 'assert_ne') {

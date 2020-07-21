@@ -1,3 +1,10 @@
+0.74 2020-07-16
+- Fix placement of plschr to change CHARSIZE.  Had been a bug introduced in 0.73 which rendered CHARSIZE
+  inoperative in a call to $pl->text
+- Addition of plsfam call during initialization (in $pl->new).  Fix required by newer plplots.
+- Updated library tests to plplot version 5.11.0.  I know this is still well downlevel, but I don't have time
+  to do a full update--Sorry!  Doug Hunt
+
 0.73 2019-12-28
 - use $^X not "perl" - thanks @eserte
 - get deps right - thanks @eserte

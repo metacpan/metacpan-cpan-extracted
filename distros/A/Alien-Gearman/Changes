@@ -1,6 +1,18 @@
 Revision history for Alien-Gearman
 
-2.0      Tue Jul 07 2020
+2.2      Sun Jul 19 2020
+         - Configure require Alien::Boost
+
+2.1      Fri Jul 17 2020
+         - Use Alien::Boost
+
+2.0      Thu Jul 16 2020
+         - Install latest libgearman
+
+1.1      Wed Jul 15 2020
+         - start_url with https so SSL modules are added
+
+1.0      Tue Jul 07 2020
          - Migrate to alienfile
          - Fix Checklib 
          - Add META.*

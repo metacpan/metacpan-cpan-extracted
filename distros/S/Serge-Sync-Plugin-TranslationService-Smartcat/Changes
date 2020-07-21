@@ -1,5 +1,16 @@
 Revision history for Serge-Sync-Plugin-TranslationService-Smartcat
 
+0.0.5  2020-07-20 22:50:44 UTC
+        - Set up dependency Smartcat::App => 0.0.3
+
+0.0.4  2020-07-20 20:04:38 UTC
+        - Added `base_url` parameter to allow
+          overriding the base API URL.
+        - Changed `pull-ts` behaviour: do not create
+          new files in a `ts` directory.
+        - Changed `push-ts` behaviour: delete documents in a Smartcat
+          project if files are missing in a local directory.
+
 0.0.3  2019-01-15 00:24:34 UTC
 
 		- Allow to set project_translation_files_path for plugin in Serge config file

@@ -16,7 +16,7 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.13.0');
+    use version; our $VERSION = qv('3.14.0');
 
     use DBI ();
     use DynaLoader ();
@@ -64,23 +64,24 @@ use 5.008001;
             PG_MACADDR8ARRAY PG_MACADDRARRAY PG_MONEY PG_MONEYARRAY PG_NAME
             PG_NAMEARRAY PG_NUMERIC PG_NUMERICARRAY PG_NUMRANGE PG_NUMRANGEARRAY
             PG_OID PG_OIDARRAY PG_OIDVECTOR PG_OIDVECTORARRAY PG_PATH
-            PG_PATHARRAY PG_PG_ATTRIBUTE PG_PG_CLASS PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES
-            PG_PG_LSN PG_PG_LSNARRAY PG_PG_MCV_LIST PG_PG_NDISTINCT PG_PG_NODE_TREE
-            PG_PG_PROC PG_PG_SNAPSHOT PG_PG_SNAPSHOTARRAY PG_PG_TYPE PG_POINT
-            PG_POINTARRAY PG_POLYGON PG_POLYGONARRAY PG_RECORD PG_RECORDARRAY
-            PG_REFCURSOR PG_REFCURSORARRAY PG_REGCLASS PG_REGCLASSARRAY PG_REGCOLLATION
-            PG_REGCOLLATIONARRAY PG_REGCONFIG PG_REGCONFIGARRAY PG_REGDICTIONARY PG_REGDICTIONARYARRAY
-            PG_REGNAMESPACE PG_REGNAMESPACEARRAY PG_REGOPER PG_REGOPERARRAY PG_REGOPERATOR
-            PG_REGOPERATORARRAY PG_REGPROC PG_REGPROCARRAY PG_REGPROCEDURE PG_REGPROCEDUREARRAY
-            PG_REGROLE PG_REGROLEARRAY PG_REGTYPE PG_REGTYPEARRAY PG_TABLE_AM_HANDLER
-            PG_TEXT PG_TEXTARRAY PG_TID PG_TIDARRAY PG_TIME
-            PG_TIMEARRAY PG_TIMESTAMP PG_TIMESTAMPARRAY PG_TIMESTAMPTZ PG_TIMESTAMPTZARRAY
-            PG_TIMETZ PG_TIMETZARRAY PG_TRIGGER PG_TSM_HANDLER PG_TSQUERY
-            PG_TSQUERYARRAY PG_TSRANGE PG_TSRANGEARRAY PG_TSTZRANGE PG_TSTZRANGEARRAY
-            PG_TSVECTOR PG_TSVECTORARRAY PG_TXID_SNAPSHOT PG_TXID_SNAPSHOTARRAY PG_UNKNOWN
-            PG_UUID PG_UUIDARRAY PG_VARBIT PG_VARBITARRAY PG_VARCHAR
-            PG_VARCHARARRAY PG_VOID PG_XID PG_XID8 PG_XID8ARRAY
-            PG_XIDARRAY PG_XML PG_XMLARRAY
+            PG_PATHARRAY PG_PG_ATTRIBUTE PG_PG_ATTRIBUTEARRAY PG_PG_CLASS PG_PG_CLASSARRAY
+            PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES PG_PG_LSN PG_PG_LSNARRAY PG_PG_MCV_LIST
+            PG_PG_NDISTINCT PG_PG_NODE_TREE PG_PG_PROC PG_PG_PROCARRAY PG_PG_SNAPSHOT
+            PG_PG_SNAPSHOTARRAY PG_PG_TYPE PG_PG_TYPEARRAY PG_POINT PG_POINTARRAY
+            PG_POLYGON PG_POLYGONARRAY PG_RECORD PG_RECORDARRAY PG_REFCURSOR
+            PG_REFCURSORARRAY PG_REGCLASS PG_REGCLASSARRAY PG_REGCOLLATION PG_REGCOLLATIONARRAY
+            PG_REGCONFIG PG_REGCONFIGARRAY PG_REGDICTIONARY PG_REGDICTIONARYARRAY PG_REGNAMESPACE
+            PG_REGNAMESPACEARRAY PG_REGOPER PG_REGOPERARRAY PG_REGOPERATOR PG_REGOPERATORARRAY
+            PG_REGPROC PG_REGPROCARRAY PG_REGPROCEDURE PG_REGPROCEDUREARRAY PG_REGROLE
+            PG_REGROLEARRAY PG_REGTYPE PG_REGTYPEARRAY PG_TABLE_AM_HANDLER PG_TEXT
+            PG_TEXTARRAY PG_TID PG_TIDARRAY PG_TIME PG_TIMEARRAY
+            PG_TIMESTAMP PG_TIMESTAMPARRAY PG_TIMESTAMPTZ PG_TIMESTAMPTZARRAY PG_TIMETZ
+            PG_TIMETZARRAY PG_TRIGGER PG_TSM_HANDLER PG_TSQUERY PG_TSQUERYARRAY
+            PG_TSRANGE PG_TSRANGEARRAY PG_TSTZRANGE PG_TSTZRANGEARRAY PG_TSVECTOR
+            PG_TSVECTORARRAY PG_TXID_SNAPSHOT PG_TXID_SNAPSHOTARRAY PG_UNKNOWN PG_UUID
+            PG_UUIDARRAY PG_VARBIT PG_VARBITARRAY PG_VARCHAR PG_VARCHARARRAY
+            PG_VOID PG_XID PG_XID8 PG_XID8ARRAY PG_XIDARRAY
+            PG_XML PG_XMLARRAY
         )],
     );
 
@@ -118,17 +119,15 @@ use 5.008001;
         return DBI::parse_trace_flags($class, $flags);
     }
 
+    ## Both CLONE and driver are required by DBI, see perldoc DBI::DBD
+
     sub CLONE {
         $drh = undef;
         return;
     }
 
-    ## Deprecated
-    sub _pg_use_catalog { ## no critic (ProhibitUnusedPrivateSubroutines)
-        return 'pg_catalog.';
-    }
-
     my $methods_are_installed = 0;
+
     sub driver {
 
         return $drh if defined $drh;
@@ -146,6 +145,7 @@ use 5.008001;
             'Attribution' => "DBD::Pg $VERSION by Greg Sabino Mullane and others",
         });
 
+        # uncoverable branch false
         if (!$methods_are_installed) {
             DBD::Pg::db->install_method('pg_cancel');
             DBD::Pg::db->install_method('pg_endcopy');
@@ -178,8 +178,11 @@ use 5.008001;
             DBD::Pg::db->install_method('pg_lo_write');
             DBD::Pg::db->install_method('pg_lo_read');
             DBD::Pg::db->install_method('pg_lo_lseek');
+            DBD::Pg::db->install_method('pg_lo_lseek64');
             DBD::Pg::db->install_method('pg_lo_tell');
+            DBD::Pg::db->install_method('pg_lo_tell64');
             DBD::Pg::db->install_method('pg_lo_truncate');
+            DBD::Pg::db->install_method('pg_lo_truncate64');
             DBD::Pg::db->install_method('pg_lo_close');
             DBD::Pg::db->install_method('pg_lo_unlink');
             DBD::Pg::db->install_method('pg_lo_import');
@@ -221,7 +224,7 @@ use 5.008001;
         $dbh->{AutoCommit}=1;
         my $SQL = 'SELECT pg_catalog.quote_ident(datname) FROM pg_catalog.pg_database ORDER BY 1';
         my $sth = $dbh->prepare($SQL);
-        $sth->execute() or die $DBI::errstr;
+        $sth->execute();
         $conninfo and $conninfo = ";$conninfo";
         my @sources = map { "dbi:Pg:dbname=$_->[0]$conninfo" } @{$sth->fetchall_arrayref()};
         $dbh->disconnect;
@@ -245,7 +248,7 @@ use 5.008001;
             $name = $1;
         }
 
-         $user = defined($user) ? $user : defined $ENV{DBI_USER} ? $ENV{DBI_USER} : '';
+        $user = defined($user) ? $user : defined $ENV{DBI_USER} ? $ENV{DBI_USER} : '';
         $pass = defined($pass) ? $pass : defined $ENV{DBI_PASS} ? $ENV{DBI_PASS} : '';
 
         my ($dbh) = DBI::_new_dbh($drh, {
@@ -298,7 +301,7 @@ use 5.008001;
             'Statement' => $statement,
         });
 
-        DBD::Pg::st::_prepare($sth, $statement, @attribs) || 0;
+        DBD::Pg::st::_prepare($sth, $statement, @attribs);
 
         return $sth;
     }
@@ -407,7 +410,7 @@ use 5.008001;
                 $count = $isth->execute($table);
                 if ($count < 1) {
                     $isth->finish();
-                    $dbh->set_err(1, qq{No1 suitable column found for last_insert_id of table "$table"\n});
+                    $dbh->set_err(1, qq{No suitable column found for last_insert_id of table "$table"\n});
                     return undef;
                 }
                 my $parent = $isth->fetch->[0];
@@ -419,7 +422,7 @@ use 5.008001;
                 }
                 if (!@def) {
                     $sth->finish();
-                    $dbh->set_err(1, qq{No1 suitable column found for last_insert_id of table "$table"\n});
+                    $dbh->set_err(1, qq{No suitable column found for last_insert_id of table "$table"\n});
                     return undef;
                 }
                 ## Fall through with inherited information
@@ -428,7 +431,7 @@ use 5.008001;
             if (@def > 1) {
                 my @pri = grep { $_->[0] } @def;
                 if (1 != @pri) {
-                    $dbh->set_err(1, qq{No2 suitable column found for last_insert_id of table "$table"\n});
+                    $dbh->set_err(1, qq{No suitable column found for last_insert_id of table "$table"\n});
                     return undef;
                 }
                 @def = @pri;
@@ -447,22 +450,21 @@ use 5.008001;
 
     sub ping {
         my $dbh = shift;
-        local $SIG{__WARN__} = sub { } if $dbh->FETCH('PrintError');
+        local $SIG{__WARN__} if $dbh->FETCH('PrintError');
         my $ret = DBD::Pg::db::_ping($dbh);
         return $ret < 1 ? 0 : $ret;
     }
 
     sub pg_ping {
         my $dbh = shift;
-        local $SIG{__WARN__} = sub { } if $dbh->FETCH('PrintError');
+        local $SIG{__WARN__} if $dbh->FETCH('PrintError');
         return DBD::Pg::db::_ping($dbh);
     }
 
     sub pg_type_info {
         my($dbh,$pg_type) = @_;
-        local $SIG{__WARN__} = sub { } if $dbh->FETCH('PrintError');
-        my $ret = DBD::Pg::db::_pg_type_info($pg_type);
-        return $ret;
+        local $SIG{__WARN__} if $dbh->FETCH('PrintError');
+        return DBD::Pg::db::_pg_type_info($pg_type);
     }
 
     # Column expected in statement handle returned.
@@ -536,7 +538,7 @@ use 5.008001;
             ORDER BY "TABLE_SCHEM", "TABLE_NAME", "ORDINAL_POSITION"
             !;
 
-        my $data = $dbh->selectall_arrayref($col_info_sql) or return undef;
+        my $data = $dbh->selectall_arrayref($col_info_sql);
 
         # To turn the data back into a statement handle, we need 
         # to fetch the data as an array of arrays, and also have a
@@ -607,12 +609,11 @@ use 5.008001;
         # Since we've processed the data in Perl, we have to jump through a hoop
         # To turn it back into a statement handle
         #
-        return _prepare_from_data
-            (
+        return _prepare_from_data(
              'column_info',
              $data,
              [ sort { $col_map{$a} <=> $col_map{$b} } keys %col_map],
-             );
+        );
     }
 
     sub _prepare_from_data {
@@ -742,7 +743,7 @@ use 5.008001;
         };
 
         my $sth = $dbh->prepare($stats_sql);
-        $sth->execute(@exe_args, 0+!!$unique_only) or return undef;
+        $sth->execute(@exe_args, 0+!!$unique_only);
         return $sth;
     }
 
@@ -751,8 +752,17 @@ use 5.008001;
         my $dbh = shift;
         my (undef, $schema, $table, $attr) = @_;
 
+        my @cols = (qw(TABLE_CAT TABLE_SCHEM TABLE_NAME
+                       COLUMN_NAME KEY_SEQ PK_NAME DATA_TYPE
+                       pg_tablespace_name pg_tablespace_location
+                       pg_schema pg_table pg_column
+                       )
+            );
+
         ## Catalog is ignored, but table is mandatory
-        return undef unless defined $table and length $table;
+        if (! defined $table or ! length $table) {
+            return _prepare_from_data('primary_key_info', [], \@cols);
+        }
 
         my $whereclause = 'AND c.relname = ' . $dbh->quote($table);
 
@@ -786,10 +796,12 @@ use 5.008001;
             $pri_key_sql =~ s/t.spclocation/pg_catalog.pg_tablespace_location(t.oid)/;
         }
 
-        my $sth = $dbh->prepare($pri_key_sql) or return undef;
+        my $sth = $dbh->prepare($pri_key_sql);
         $sth->execute();
         my $info = $sth->fetchall_arrayref()->[0];
-        return undef if ! defined $info;
+        if (! defined $info) {
+            return _prepare_from_data('primary_key_info', [], \@cols);
+        }
 
         # Get the attribute information
         my $indkey = join ',', split /\s+/, $info->[4];
@@ -801,7 +813,7 @@ use 5.008001;
             AND a.atttypid = t.oid
             AND attnum IN ($indkey);
         };
-        $sth = $dbh->prepare($sql) or return undef;
+        $sth = $dbh->prepare($sql);
         $sth->execute();
         my $attribinfo = $sth->fetchall_hashref('attnum');
 
@@ -863,18 +875,14 @@ use 5.008001;
             $pkinfo = [$info];
         }
 
-        my @cols = (qw(TABLE_CAT TABLE_SCHEM TABLE_NAME COLUMN_NAME
-                                     KEY_SEQ PK_NAME DATA_TYPE));
-        push @cols, 'pg_tablespace_name', 'pg_tablespace_location';
-        push @cols, 'pg_schema', 'pg_table', 'pg_column';
-
         return _prepare_from_data('primary_key_info', $pkinfo, \@cols);
 
     }
 
     sub primary_key {
         my $sth = primary_key_info(@_[0..3], {pg_onerow => 2});
-        return defined $sth ? @{$sth->fetchall_arrayref()->[0][3]} : ();
+        my $result = $sth->fetchall_arrayref();
+        return defined $result->[0] ? @{$result->[0][3]} : ();
     }
 
 
@@ -889,8 +897,23 @@ use 5.008001;
         my $fschema = $_[4] || '';
         my $ftable = $_[5] || '';
 
+        my @cols = (qw(
+            UK_TABLE_CAT UK_TABLE_SCHEM UK_TABLE_NAME UK_COLUMN_NAME
+            FK_TABLE_CAT FK_TABLE_SCHEM FK_TABLE_NAME FK_COLUMN_NAME
+            ORDINAL_POSITION UPDATE_RULE DELETE_RULE FK_NAME UK_NAME
+            DEFERABILITY UNIQUE_OR_PRIMARY UK_DATA_TYPE FK_DATA_TYPE
+        ));
+
+        if ($dbh->{FetchHashKeyName} eq 'NAME_lc') {
+            for my $col (@cols) {
+                $col = lc $col;
+            }
+        }
+
         ## Must have at least one named table
-        return undef if !length($ptable) and !length($ftable);
+        if (!length($ptable) and !length($ftable)) {
+            return _prepare_from_data('foreign_key_info', [], \@cols);
+        }
 
         ## If only the primary table is given, we return only those columns
         ## that are used as foreign keys, even if that means that we return
@@ -1001,24 +1024,9 @@ use 5.008001;
         };
         my $fkinfo = $dbh->selectall_arrayref($SQL);
 
-        return undef unless $fkinfo && @{$fkinfo};
-
-        my @cols = (qw(
-            UK_TABLE_CAT UK_TABLE_SCHEM UK_TABLE_NAME UK_COLUMN_NAME
-            FK_TABLE_CAT FK_TABLE_SCHEM FK_TABLE_NAME FK_COLUMN_NAME
-            ORDINAL_POSITION UPDATE_RULE DELETE_RULE FK_NAME UK_NAME
-            DEFERABILITY UNIQUE_OR_PRIMARY UK_DATA_TYPE FK_DATA_TYPE
-        ));
-
-        if ($dbh->{FetchHashKeyName} eq 'NAME_lc') {
-            for my $col (@cols) {
-                $col = lc $col;
-            }
-        }
-
         return _prepare_from_data('foreign_key_info', $fkinfo, \@cols);
 
-    }
+    } ## end of foreign_key_info
 
 
     sub table_info {
@@ -1110,10 +1118,8 @@ use 5.008001;
             $extracols = q{,n.nspname AS pg_schema, c.relname AS pg_table};
             my @search = (q|c.relkind IN ('r', 'p', 'v', 'm', 'f')|, # No sequences, etc. for now
                           q|NOT (pg_catalog.quote_ident(n.nspname) ~ '^pg_(toast_)?temp_' AND NOT pg_catalog.has_schema_privilege(n.nspname, 'USAGE'))|);   # No others' temp objects
-            my $showtablespace = ', pg_catalog.quote_ident(t.spcname) AS "pg_tablespace_name", pg_catalog.quote_ident(t.spclocation) AS "pg_tablespace_location"';
-            if ($dbh->{private_dbdpg}{version} >= 90200) {
-                $showtablespace = ', pg_catalog.quote_ident(t.spcname) AS "pg_tablespace_name", pg_catalog.quote_ident(pg_catalog.pg_tablespace_location(t.oid)) AS "pg_tablespace_location"';
-            }
+            my $showtablespace = sprintf q{pg_catalog.quote_ident(%s) AS "pg_tablespace_location"},
+                $dbh->{private_dbdpg}{version} < 90200 ? 't.spclocation' : 'pg_catalog.pg_tablespace_location(t.oid)';
 
             ## If the schema or table has an underscore or a %, use a LIKE comparison
             if (defined $schema and length $schema) {
@@ -1153,7 +1159,9 @@ use 5.008001;
                                   END
                             ELSE 'UNKNOWN'
                          END AS "TABLE_TYPE"
-                     , d.description AS "REMARKS" $showtablespace $extracols
+                     , d.description AS "REMARKS"
+                     , pg_catalog.quote_ident(t.spcname) AS "pg_tablespace_name"
+                     , $showtablespace $extracols
                   FROM pg_catalog.pg_class AS c
                   LEFT JOIN pg_catalog.pg_description AS d
                        ON (c.oid = d.objoid AND c.tableoid = d.classoid AND d.objsubid = 0)
@@ -1171,7 +1179,7 @@ use 5.008001;
                 $tbl_sql = qq{SELECT * FROM ($tbl_sql) ti WHERE "TABLE_TYPE" IN ($type_restrict)};
             }
         }
-        my $sth = $dbh->prepare( $tbl_sql ) or return undef;
+        my $sth = $dbh->prepare($tbl_sql);
         $sth->execute();
 
         return $sth;
@@ -1180,8 +1188,8 @@ use 5.008001;
     sub tables {
             my ($dbh, @args) = @_;
             my $attr = $args[4];
-            my $sth = $dbh->table_info(@args) or return;
-            my $tablelist = $sth->fetchall_arrayref() or return;
+            my $sth = $dbh->table_info(@args);
+            my $tablelist = $sth->fetchall_arrayref();
             my @tables = map { (! (ref $attr eq 'HASH' and $attr->{pg_noprefix})) ?
                         "$_->[1].$_->[2]" : $_->[2] } @$tablelist;
             return @tables;
@@ -1233,19 +1241,18 @@ use 5.008001;
         my $size = shift;
 
 
-        if ((defined $size) and ($size > 0)) {
+        if ($size > 0) {
             return $size;
-        } elsif ($mod > 0xffff) {
+        }
+        elsif ($mod > 0xffff) {
             my $prec = ($mod & 0xffff) - 4;
             $mod >>= 16;
             my $dig = $mod;
             return "$prec,$dig";
-        } elsif ($mod >= 4) {
+        }
+        elsif ($mod >= 4) {
             return $mod - 4;
-        } # else {
-            # $rtn = $mod;
-            # $rtn = undef;
-        # }
+        }
 
         return;
     }
@@ -1562,12 +1569,12 @@ use 5.008001;
          elsif ($ans eq 'READONLY') {
              my $SQL = q{SELECT CASE WHEN setting = 'on' THEN 'Y' ELSE 'N' END FROM pg_settings WHERE name = 'transaction_read_only'};
              my $info = $dbh->selectall_arrayref($SQL);
-             return defined $info->[0] ? $info->[0][0] : 'N';
+             return $info->[0][0];
          }
          elsif ($ans eq 'DEFAULTTXN') {
              my $SQL = q{SELECT CASE WHEN setting = 'read committed' THEN 2 ELSE 8 END FROM pg_settings WHERE name = 'default_transaction_isolation'};
              my $info = $dbh->selectall_arrayref($SQL);
-             return defined $info->[0] ? $info->[0][0] : 2;
+             return $info->[0][0];
          }
 
          return $ans;
@@ -1688,7 +1695,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.13.0 of the DBD::Pg module
+This documents version 3.14.0 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -2077,6 +2084,12 @@ Changes the current read or write location on the large object
 C<$obj_id>. Currently C<$whence> can only be 0 (which is L_SET). Returns the current
 location and C<undef> upon failure. This function cannot be used if AutoCommit is enabled.
 
+=item pg_lo_lseek64
+
+  $loc = $dbh->pg_lo_lseek64($lobj_fd, $offset, $whence);
+
+Same as pg_lo_lseek, but can handle much larger offsets and returned values. Requires Postgres 9.3 or greater.
+
 =item pg_lo_tell
 
   $loc = $dbh->pg_lo_tell($lobj_fd);
@@ -2084,12 +2097,24 @@ location and C<undef> upon failure. This function cannot be used if AutoCommit i
 Returns the current read or write location on the large object C<$lobj_fd> and C<undef> upon failure.
 This function cannot be used if AutoCommit is enabled.
 
+=item pg_lo_tell64
+
+  $loc = $dbh->pg_lo_tell64($lobj_fd);
+
+Same as pg_lo_tell, but can return much larger values. Requires Postgres 9.3 or greater.
+
 =item pg_lo_truncate
 
   $loc = $dbh->pg_lo_truncate($lobj_fd, $len);
 
 Truncates the given large object to the new size. Returns C<undef> on failure, and 0 on success.
 This function cannot be used if AutoCommit is enabled.
+
+=item pg_lo_truncate64
+
+  $loc = $dbh->pg_lo_truncate64($lobj_fd, $len);
+
+Same as pg_lo_truncate, but can handle much larger lengths. Requires Postgres 9.3 or greater.
 
 =item pg_lo_close
 
@@ -2760,7 +2785,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.13.0'>. It returns 0 (false) if the connection is not valid, 
+B<'DBD::Pg ping test v3.14.0'>. It returns 0 (false) if the connection is not valid, 
 otherwise it returns a positive number (true). The value returned indicates the 
 current state:
 
@@ -3455,20 +3480,21 @@ The current list of Postgres data types exported is:
  PG_LSEGARRAY PG_MACADDR PG_MACADDR8 PG_MACADDR8ARRAY PG_MACADDRARRAY PG_MONEY
  PG_MONEYARRAY PG_NAME PG_NAMEARRAY PG_NUMERIC PG_NUMERICARRAY PG_NUMRANGE
  PG_NUMRANGEARRAY PG_OID PG_OIDARRAY PG_OIDVECTOR PG_OIDVECTORARRAY PG_PATH
- PG_PATHARRAY PG_PG_ATTRIBUTE PG_PG_CLASS PG_PG_DDL_COMMAND PG_PG_DEPENDENCIES PG_PG_LSN
- PG_PG_LSNARRAY PG_PG_MCV_LIST PG_PG_NDISTINCT PG_PG_NODE_TREE PG_PG_PROC PG_PG_SNAPSHOT
- PG_PG_SNAPSHOTARRAY PG_PG_TYPE PG_POINT PG_POINTARRAY PG_POLYGON PG_POLYGONARRAY
- PG_RECORD PG_RECORDARRAY PG_REFCURSOR PG_REFCURSORARRAY PG_REGCLASS PG_REGCLASSARRAY
- PG_REGCOLLATION PG_REGCOLLATIONARRAY PG_REGCONFIG PG_REGCONFIGARRAY PG_REGDICTIONARY PG_REGDICTIONARYARRAY
- PG_REGNAMESPACE PG_REGNAMESPACEARRAY PG_REGOPER PG_REGOPERARRAY PG_REGOPERATOR PG_REGOPERATORARRAY
- PG_REGPROC PG_REGPROCARRAY PG_REGPROCEDURE PG_REGPROCEDUREARRAY PG_REGROLE PG_REGROLEARRAY
- PG_REGTYPE PG_REGTYPEARRAY PG_TABLE_AM_HANDLER PG_TEXT PG_TEXTARRAY PG_TID
- PG_TIDARRAY PG_TIME PG_TIMEARRAY PG_TIMESTAMP PG_TIMESTAMPARRAY PG_TIMESTAMPTZ
- PG_TIMESTAMPTZARRAY PG_TIMETZ PG_TIMETZARRAY PG_TRIGGER PG_TSM_HANDLER PG_TSQUERY
- PG_TSQUERYARRAY PG_TSRANGE PG_TSRANGEARRAY PG_TSTZRANGE PG_TSTZRANGEARRAY PG_TSVECTOR
- PG_TSVECTORARRAY PG_TXID_SNAPSHOT PG_TXID_SNAPSHOTARRAY PG_UNKNOWN PG_UUID PG_UUIDARRAY
- PG_VARBIT PG_VARBITARRAY PG_VARCHAR PG_VARCHARARRAY PG_VOID PG_XID
- PG_XID8 PG_XID8ARRAY PG_XIDARRAY PG_XML PG_XMLARRAY
+ PG_PATHARRAY PG_PG_ATTRIBUTE PG_PG_ATTRIBUTEARRAY PG_PG_CLASS PG_PG_CLASSARRAY PG_PG_DDL_COMMAND
+ PG_PG_DEPENDENCIES PG_PG_LSN PG_PG_LSNARRAY PG_PG_MCV_LIST PG_PG_NDISTINCT PG_PG_NODE_TREE
+ PG_PG_PROC PG_PG_PROCARRAY PG_PG_SNAPSHOT PG_PG_SNAPSHOTARRAY PG_PG_TYPE PG_PG_TYPEARRAY
+ PG_POINT PG_POINTARRAY PG_POLYGON PG_POLYGONARRAY PG_RECORD PG_RECORDARRAY
+ PG_REFCURSOR PG_REFCURSORARRAY PG_REGCLASS PG_REGCLASSARRAY PG_REGCOLLATION PG_REGCOLLATIONARRAY
+ PG_REGCONFIG PG_REGCONFIGARRAY PG_REGDICTIONARY PG_REGDICTIONARYARRAY PG_REGNAMESPACE PG_REGNAMESPACEARRAY
+ PG_REGOPER PG_REGOPERARRAY PG_REGOPERATOR PG_REGOPERATORARRAY PG_REGPROC PG_REGPROCARRAY
+ PG_REGPROCEDURE PG_REGPROCEDUREARRAY PG_REGROLE PG_REGROLEARRAY PG_REGTYPE PG_REGTYPEARRAY
+ PG_TABLE_AM_HANDLER PG_TEXT PG_TEXTARRAY PG_TID PG_TIDARRAY PG_TIME
+ PG_TIMEARRAY PG_TIMESTAMP PG_TIMESTAMPARRAY PG_TIMESTAMPTZ PG_TIMESTAMPTZARRAY PG_TIMETZ
+ PG_TIMETZARRAY PG_TRIGGER PG_TSM_HANDLER PG_TSQUERY PG_TSQUERYARRAY PG_TSRANGE
+ PG_TSRANGEARRAY PG_TSTZRANGE PG_TSTZRANGEARRAY PG_TSVECTOR PG_TSVECTORARRAY PG_TXID_SNAPSHOT
+ PG_TXID_SNAPSHOTARRAY PG_UNKNOWN PG_UUID PG_UUIDARRAY PG_VARBIT PG_VARBITARRAY
+ PG_VARCHAR PG_VARCHARARRAY PG_VOID PG_XID PG_XID8 PG_XID8ARRAY
+ PG_XIDARRAY PG_XML PG_XMLARRAY
 
 Data types are "sticky," in that once a data type is set to a certain placeholder,
 it will remain for that placeholder, unless it is explicitly set to something
@@ -3761,6 +3787,14 @@ simple reference.
 Note that this method is quite slow because it need additional information from
 server for every column that is simple reference. Consider to use L</pg_canonical_ids>
 instead.
+
+=head3 B<last_insert_id>
+
+  $rv = $sth->last_insert_id(undef, $schema, $table, undef);
+  $rv = $sth->last_insert_id(undef, $schema, $table, undef, {sequence => $seqname});
+
+This is simply an alternative way to return the same information as
+C<< $dbh->last_insert_id >>.
 
 =head2 Statement Handle Attributes
 

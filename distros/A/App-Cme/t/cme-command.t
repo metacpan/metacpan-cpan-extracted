@@ -9,6 +9,7 @@ use Encode;
 
 use Path::Tiny;
 use Probe::Perl;
+use Term::ANSIColor 2.01 qw(colorstrip);
 
 use Test::More;
 use Test::File::Contents;
@@ -146,7 +147,7 @@ subtest "modification with verbose option" => sub {
     my @test_cmd = (qw/modify popcon -verbose -root-dir/, $wr_dir->stringify, qq/PARTICIPATE=yes/);
     my $ok = test_app( 'App::Cme' => \@test_cmd );
     is ($ok->exit_code, 0, 'no error detected' ) or diag("Failed command @test_cmd");
-    is($ok->stderr.'', qq!command 'PARTICIPATE=yes': Setting leaf 'PARTICIPATE' boolean to 'yes'.\n!,
+    is(colorstrip($ok->stderr), qq!command 'PARTICIPATE=yes': Setting leaf 'PARTICIPATE' boolean to 'yes'.\n!,
        'check log content' );
 };
 
@@ -260,7 +261,7 @@ foreach my $test ( @script_tests) {
 
         file_contents_like $conf_file->stringify, $test->{test},
             "updated MY_HOSTID with script" ,{ encoding => 'UTF-8' };
-        is($ok->stderr.'', $test->{stderr} || '', 'run "'.$test->{label}.'" stderr content' );
+        is(colorstrip($ok->stderr), $test->{stderr} || '', 'run "'.$test->{label}.'" stderr content' );
         is($ok->stdout.'', $test->{stdout} || '', 'run "'.$test->{label}.'": stdout content' );
     };
 }

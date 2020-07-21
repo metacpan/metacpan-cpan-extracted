@@ -5,14 +5,14 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.094 ;
+use IO::Compress::Base 2.095 ;
 
-use IO::Compress::Base::Common  2.094 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Lzip 2.094 ;
+use IO::Compress::Base::Common  2.095 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Lzip 2.095 ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $LzipError);
 
-$VERSION = '2.094';
+$VERSION = '2.095';
 $LzipError = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -763,7 +763,7 @@ See the L</"Constructor Options"> section for more details.
 
 =head1 Importing
 
-No symbolic constants are required by this IO::Compress::Lzip at present.
+No symbolic constants are required by IO::Compress::Lzip at present.
 
 =over 5
 
@@ -780,7 +780,7 @@ Same as doing this
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/IO-Compress-Lzma/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress-Lzma>.
 

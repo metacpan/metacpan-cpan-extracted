@@ -23,5 +23,4 @@ ALL: {
 	@p = $u->all_province_names();
 
 	ok(scalar(@p) == 12);
-
 }

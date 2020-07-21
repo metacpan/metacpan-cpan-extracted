@@ -380,7 +380,7 @@ subtest(
 subtest(
     'Log::Dispatch single callback',
     sub {
-        my $reverse = sub { my %p = @_; return reverse $p{message}; };
+        my $reverse  = sub { my %p = @_; return reverse $p{message}; };
         my $dispatch = Log::Dispatch->new( callbacks => $reverse );
 
         my $string;

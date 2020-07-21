@@ -18,6 +18,16 @@ use vars qw/ $ALIGN $BRAKES $LIGHTS $OIL $SOBER $TRANS $WIPERS /;
 use vars qw/ $COLOR $FONT_STYLE $POINT_SIZE $DEMO_FILE %DEMO_DESCRIPTION /;
 
 
+# Enable system DPI awareness for sharper UI on Windows
+# https://www.perlmonks.org/?node_id=11101747
+if ($^O eq 'MSWin32') {
+    require Win32::API;
+    # See https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setprocessdpiaware
+    my $SetProcessDPIAware = Win32::API::More->new('User32', 'BOOL SetProcessDPIAware()');
+    $SetProcessDPIAware->Call() or warn 'Failed to set process DPI awareness';
+}
+
+
 $MW = MainWindow->new;
 $MW->configure(-menu => my $menubar = $MW->Menu);
 
@@ -69,13 +79,32 @@ my $imageRefresh = $MW->Photo('imageRefresh', -format => 'GIF',
     2tICU0gXBQA7'
     );
 
-my $imageNew = $MW->Photo('imageNew', -format => 'GIF',
-            -data => '    R0lGODlhHgAOALMPALMAANyIiOu7u8dEROaqqvru7sxVVeGZmbgREfXd3b0iItZ3
+# Try using darkmode-friendly PNG "NEW", otherwise fallback to GIF "NEW"
+my $imageNew;
+eval {
+    $imageNew = $MW->Photo('imageNew', -format => 'PNG', -data => q{
+    iVBORw0KGgoAAAANSUhEUgAAAB4AAAAOCAYAAAA45qw5AAACMElEQVR4AeVTAwxd
+    QRCc2tZHGtQ2w9q2bdsOa9u2bUW1bdt2Z372JZe6DapJLqtb3h7+T8yKi5j4CsYD
+    EUQXxETclT7kWOlH2VV+tFkdQHPSwksSISF+BauCqL0qgOcMWgGfgEkaMsHxqUBk
+    3plE/sOnh/qDPAPJH/CKFBivGHWzFwBRnHhlqbu1Mh6CoFNnC/JshQ9p4YC2lrKt
+    DCAV+THiVejyhMjAbrNSrroiEfKR9g7ZfCgOog8QfnUQV62wAk68ndQ9ZbyoWO1H
+    Y6eDY1LCQL6a9ApOp9Hi1T0+gQq2JKMlky/oTKQliKWxEZvyG575kpW4pl1aZnQK
+    CLOVt45Lkp8uXp2SL8KO6uitNTZLdpK6s+I/eZbhpmsmWeOGOVQNKYLITzpKPAO3
+    tY7LSNZ7ccSLxX9y3uuOxRkg3dKESMoCHvL+GRVCutXsB3guLgDCeXOv4iWWkvwG
+    BaS+PmlpK6SI9ApI2oC2UtrwZQEkhkH+NtolVlQXJl1I+QltuU3XEc721bIRFpa8
+    IA5iqTo6vNNWmkNBLQbPeXwF2g17Q94nTQAfY3YzeY+WSu8MDzQ2kpELUhSGJUHE
+    0zeR3rY1L+Xl5G/re+jbiK6KhThwwInsts1fbMUUcpZszKeVtggZEiGdZDe5AtHh
+    7vL4CGiRvvKPS8FAvq9Nr4ZkFadR2y6kggu1z4vlyIbBp6BugQ8JLEg4bTkD9eMZ
+    QZ8hpJ3VvTtuvbWrY/ElvP/9R+Aj3603+iE3fkEAAAAASUVORK5CYII=},
+    );
+};
+$imageNew = $MW->Photo('imageNew', -format => 'GIF', -data => q{
+    R0lGODlhHgAOALMPALMAANyIiOu7u8dEROaqqvru7sxVVeGZmbgREfXd3b0iItZ3
     d8IzM9FmZvDMzP///yH5BAEAAA8ALAAAAAAeAA4AAASa8MlJq7046827WVOCHEkw
     nANhUgJlEBIABJIwL3K+4IcUALCHjfbItYZDSgJgkBiYPmBMAUAkkLPKs/BAyLgM
     wAQwOAAY2ByCaw4QAFQSoDEePJ6DmU1xInYZTw5nOEFFdgVUelkVDTIMd3AKFGQ1
-    MgI2AwEmQW8APZ0gdRONAks5nhIFVVxdAAkUAS2pAVwFl7ITB4UqHb0XEQA7'
-    );
+    MgI2AwEmQW8APZ0gdRONAks5nhIFVVxdAAkUAS2pAVwFl7ITB4UqHb0XEQA7},
+) if ($@);
 
 # The code below creates the main window, consisting of a menu bar
 # and a text widget that explains how to use the program, plus lists

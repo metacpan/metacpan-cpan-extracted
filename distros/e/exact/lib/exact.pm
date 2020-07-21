@@ -7,8 +7,9 @@ use warnings;
 use namespace::autoclean;
 use Try::Tiny;
 use Sub::Util 'set_subname';
+use Import::Into;
 
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.13'; # VERSION
 
 use feature    ();
 use utf8       ();
@@ -72,6 +73,7 @@ sub import {
     unless ( grep { $_ eq 'noutf8' } @functions ) {
         utf8->import;
         binmode( $_, ':utf8' ) for ( *STDIN, *STDERR, *STDOUT );
+        'open'->import::into( $caller, ':std', ':utf8' );
     }
 
     mro::set_mro( $caller, 'c3' ) unless ( grep { $_ eq 'noc3' } @functions );
@@ -210,7 +212,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.12
+version 1.13
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact.svg)](https://travis-ci.org/gryphonshafer/exact)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact/badge.png)](https://coveralls.io/r/gryphonshafer/exact)
@@ -501,7 +503,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gryphon Shafer.
+This software is copyright (c) 2020 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

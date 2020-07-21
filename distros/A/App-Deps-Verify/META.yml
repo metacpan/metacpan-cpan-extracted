@@ -1,5 +1,5 @@
 ---
-abstract: 'An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.)'
+abstract: 'app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.)'
 author:
   - 'Shlomi Fish <shlomif@cpan.org>'
 build_requires:
@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,21 +20,25 @@ name: App-Deps-Verify
 provides:
   App::Deps::Verify:
     file: lib/App/Deps/Verify.pm
-    version: v0.10.1
+    version: v0.12.0
   App::Deps::Verify::App::VerifyDeps:
     file: lib/App/Deps/Verify/App/VerifyDeps.pm
-    version: v0.10.1
+    version: v0.12.0
   App::Deps::Verify::App::VerifyDeps::Command::plinst:
     file: lib/App/Deps/Verify/App/VerifyDeps/Command/plinst.pm
-    version: v0.10.1
+    version: v0.12.0
   App::Deps::Verify::App::VerifyDeps::Command::plupdatetask:
     file: lib/App/Deps/Verify/App/VerifyDeps/Command/plupdatetask.pm
-    version: v0.10.1
+    version: v0.12.0
+  App::Deps::Verify::App::VerifyDeps::Command::py3list:
+    file: lib/App/Deps/Verify/App/VerifyDeps/Command/py3list.pm
+    version: v0.12.0
   App::Deps::Verify::App::VerifyDeps::Command::verify:
     file: lib/App/Deps/Verify/App/VerifyDeps/Command/verify.pm
-    version: v0.10.1
+    version: v0.12.0
 requires:
   App::Cmd::Setup: '0'
+  Data::Dumper: '0'
   File::Which: '0'
   Moo: '0'
   Path::Tiny: '0'
@@ -47,10 +51,10 @@ resources:
   bugtracker: https://github.com/shlomif/app-deps-verify/issues
   homepage: http://metacpan.org/release/App-Deps-Verify
   repository: https://github.com/shlomif/perl-App-Deps-Verify.git
-version: 0.10.1
+version: 0.12.0
 x_Dist_Zilla:
   perl:
-    version: '5.030002'
+    version: '5.032000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -59,15 +63,15 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@Filter/TestMoreDoneTesting'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Filter/AutoPrereqs'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
@@ -80,27 +84,27 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Filter/GatherDir'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/License'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/ManifestSkip'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/MetaYAML'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/PruneCruft'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/Readme'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
       config:
@@ -111,7 +115,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/ShareDir'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Filter/CheckChangesHasContent'
@@ -119,19 +123,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/ConfirmRelease'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/Manifest'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Filter/MetaConfig'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -140,7 +144,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.014'
+              version: '6.015'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -148,33 +152,33 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000036'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@Filter/MetaProvides::Package'
       version: '2.004003'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@Filter/MetaResources'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::ModuleBuild
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Filter/ModuleBuild'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Filter/PkgVersion'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Filter/PodCoverageTests'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -230,7 +234,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/TestRelease'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -344,7 +348,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/UploadToCPAN'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -360,52 +364,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.014'
+      version: '6.015'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.014'
+      version: '6.015'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.014'
-x_generated_by_perl: v5.30.2
+    version: '6.015'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

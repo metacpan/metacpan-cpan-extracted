@@ -3,7 +3,7 @@
 
 package Tcl::pTk::Menu::Item;
 
-our ($VERSION) = ('1.07');
+our ($VERSION) = ('1.08');
 
 require Tcl::pTk::Menu;
 

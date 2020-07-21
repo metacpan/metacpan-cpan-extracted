@@ -13,7 +13,7 @@ use Ref::Util qw( is_ref is_blessed_ref is_plain_coderef is_plain_scalarref );
 use Carp ();
 
 # ABSTRACT: Wasmtime instance class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasm_instance_';
@@ -60,10 +60,20 @@ sub _cast_import
   Carp::croak("Non-extern object as import");
 }
 
-$ffi->attach( new => ['wasm_store_t','wasm_module_t','opaque[]','opaque*'] => 'wasm_instance_t' => sub {
+$ffi->attach( [ wasmtime_instance_new => 'new' ] => ['wasm_store_t','wasm_module_t','opaque[]','size_t','opaque*','opaque*'] => 'wasmtime_error_t' => sub {
   my $xsub = shift;
   my $class = shift;
   my $module = shift;
+  my $store = is_blessed_ref($_[0]) && $_[0]->isa('Wasm::Wasmtime::Store')
+    ? shift
+    : do {
+      if(warnings::enabled("deprecated"))
+      {
+        Carp::carp('Creating a Wasm::Wasmtime::Instance instance without a Wasm::Wasmtime::Store object is deprecated and will be removed in a future version of Wasm::Wasmtime');
+      }
+      no warnings 'deprecated';
+      $module->store;
+    };
 
   my $ptr;
   my @keep;
@@ -85,7 +95,6 @@ $ffi->attach( new => ['wasm_store_t','wasm_module_t','opaque[]','opaque*'] => 'w
     Carp::confess("imports is not an array reference") unless ref($imports) eq 'ARRAY';
     my @imports = @$imports;
     my $trap;
-    my $store = $module->store;
 
     {
       my @mi = @{ $module->imports };
@@ -97,21 +106,26 @@ $ffi->attach( new => ['wasm_store_t','wasm_module_t','opaque[]','opaque*'] => 'w
       @imports = map { _cast_import($_, shift @mi, $store, \@keep) } @imports;
     }
 
-    my $self = $xsub->($store, $module, \@imports, \$trap);
-    if($self)
+    my $ptr;
+    if(my $error = $xsub->($store, $module, \@imports, scalar(@imports), \$ptr, \$trap))
     {
-      $self->{module} = $module;
-      $self->{keep}   = \@keep;
-      return $self;
+      Carp::croak("error creating module: " . $error->message);
     }
     else
     {
-     if($trap)
-     {
+      if($trap)
+      {
         $trap = Wasm::Wasmtime::Trap->new($trap);
-        Carp::croak($trap->message);
+        die $trap;
       }
-      Carp::croak("error creating Wasm::Wasmtime::Instance ");
+      else
+      {
+        return bless {
+          ptr    => $ptr,
+          module => $module,
+          keep   => \@keep,
+        }, $class;
+      }
     }
   }
 
@@ -149,14 +163,15 @@ Wasm::Wasmtime::Instance - Wasmtime instance class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
  use Wasm::Wasmtime;
  
- my $module = Wasm::Wasmtime::Module->new(wat => '(module)');
- my $instance = Wasm::Wasmtime::Instance->new($module, []);
+ my $store = Wasm::Wasmtime::Store->new;
+ my $module = Wasm::Wasmtime::Module->new($store, wat => '(module)');
+ my $instance = Wasm::Wasmtime::Instance->new($module, $store, []);
 
 =head1 DESCRIPTION
 
@@ -170,8 +185,20 @@ This class represents an instance of a WebAssembly module L<Wasm::Wasmtime::Modu
 =head2 new
 
  my $instance = Wasm::Wasmtime::Instance->new(
+   $module,    # Wasm::Wasmtime::Module
+   $store      # Wasm::Wasmtime::Store
+ );
+ my $instance = Wasm::Wasmtime::Instance->new(
+   $module,    # Wasm::Wasmtime::Module
+   $store,     # Wasm::Wasmtime::Store
+   \@imports,  # array reference of Wasm::Wasmtime::Extern
+ );
+ 
+ # deprecated usage: without $store
+ my $instance = Wasm::Wasmtime::Instance->new(
    $module     # Wasm::Wasmtime::Module
  );
+ # deprecated usage: without $store
  my $instance = Wasm::Wasmtime::Instance->new(
    $module,    # Wasm::Wasmtime::Module
    \@imports,  # array reference of Wasm::Wasmtime::Extern
@@ -199,6 +226,12 @@ For a memory import, a memory object will be created.  You won't be able to
 access it from Perl space, but at least it won't die.
 
 =back
+
+[B<Deprecated>: Will be removed in a future version of L<Wasm::Wasmtime>]
+
+You can create an L<Wasm::Wasmtime::Instance> instance without a
+L<Wasm::Wasmtime::Store> object, but this usage is deprecated, and will
+be removed from a future version of L<Wasm::Wasmtime>.
 
 =head1 METHODS
 

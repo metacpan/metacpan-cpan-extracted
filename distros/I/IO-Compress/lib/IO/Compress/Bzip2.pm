@@ -5,16 +5,16 @@ use warnings;
 use bytes;
 require Exporter ;
 
-use IO::Compress::Base 2.094 ;
+use IO::Compress::Base 2.095 ;
 
-use IO::Compress::Base::Common  2.094 qw();
-use IO::Compress::Adapter::Bzip2 2.094 ;
+use IO::Compress::Base::Common  2.095 qw();
+use IO::Compress::Adapter::Bzip2 2.095 ;
 
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $Bzip2Error);
 
-$VERSION = '2.094';
+$VERSION = '2.095';
 $Bzip2Error = '';
 
 @ISA    = qw(IO::Compress::Base Exporter);
@@ -51,7 +51,7 @@ sub getExtraParams
 {
     my $self = shift ;
 
-    use IO::Compress::Base::Common  2.094 qw(:Parse);
+    use IO::Compress::Base::Common  2.095 qw(:Parse);
     
     return (  
             'blocksize100k' => [IO::Compress::Base::Common::Parse_unsigned,  1],
@@ -765,7 +765,7 @@ See the L</"Constructor Options"> section for more details.
 
 =head1 Importing
 
-No symbolic constants are required by this IO::Compress::Bzip2 at present.
+No symbolic constants are required by IO::Compress::Bzip2 at present.
 
 =over 5
 
@@ -790,7 +790,7 @@ See L<IO::Compress::FAQ|IO::Compress::FAQ/"Compressed files and Net::FTP">
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/IO-Compress/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress>.
 

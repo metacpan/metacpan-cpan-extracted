@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 
-use Test::More tests => 36;
+use Test::More tests => 37;
 use Config;
 
 my $perl = $Config{perlpath};
@@ -13,6 +13,10 @@ is($output, $expected, 'testing bufrread.pl -c on temp edition 4 message');
 $output = `$perl ./bufrread.pl --filter t/filter --param t/param t/3xBUFRSYNOP-com.bufr --tablepath t/bt`;
 $expected = read_file('t/3xBUFRSYNOP-com_filtered.txt');
 is($output, $expected, 'testing bufrread.pl -f -p on compressed synop message');
+
+$output = `$perl ./bufrread.pl --data_only --filter t/filter2 --param t/param2 t/3xBUFRSYNOP-com.bufr --tablepath t/bt`;
+$expected = read_file('t/3xBUFRSYNOP-com_filtered.txt2');
+is($output, $expected, 'testing bufrread.pl -f -p -o on filter with several required descriptors');
 
 $output = `$perl ./bufrread.pl --bitmap t/substituted.bufr --tablepath t/bt`;
 $expected = read_file('t/substituted.txt_bitmap');

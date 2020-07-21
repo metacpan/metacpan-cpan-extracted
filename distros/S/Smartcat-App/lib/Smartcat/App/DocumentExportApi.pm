@@ -11,7 +11,7 @@ use Smartcat::Client::DocumentExportApi;
 
 use Smartcat::App::Constants qw(
   EXPORT_ZIP_FILES_COUNT
-  TOTAL_ITERATION_COUNT
+  MAX_ITERATION_WAIT_TIMEOUT
   ITERATION_WAIT_TIMEOUT
 );
 use Smartcat::App::Utils;
@@ -69,7 +69,7 @@ sub export_files {
 
         #die $task->id;
         $log->info( sprintf( "Processing task '%s'...", $task->id ) );
-        while ( $counter < TOTAL_ITERATION_COUNT ) {
+        while ( 1 ) {
             $log->info("Downloading exported files...");
             $response = eval {
                 $api->document_export_download_export_result(
@@ -87,20 +87,20 @@ sub export_files {
             last if $response->code != 204;
             $log->info("Export is not ready...");
             $counter++;
-            sleep ITERATION_WAIT_TIMEOUT * $counter;
+            my $timeout = ITERATION_WAIT_TIMEOUT * $counter;
+            sleep($timeout < MAX_ITERATION_WAIT_TIMEOUT ? $timeout : MAX_ITERATION_WAIT_TIMEOUT);
         }
         die $log->error(
-            sprintf( "Cannot download exported files: %s",
+            sprintf( "Cannot download exported files: %s. Export task is failed.",
                 join( ', ', @{ $task->document_ids } ) )
-        ) if $counter == TOTAL_ITERATION_COUNT;
+        ) if $response->code == 422;
+
         if ($single_file_export) {
             my $doc  = $docs{ @{ $task->document_ids }[0] };
             my $name = $doc->name;
             $log->info("Processing document '$name'...");
-            my $filename = prepare_file_name( $name, $doc->target_language,
-                $rundata->{filetype} );
-            my $filepath = catfile( $rundata->{project_workdir},
-                $doc->target_language, $filename );
+            my $filepath = get_file_path( $rundata->{project_workdir},
+                $doc->target_language, $name, $rundata->{filetype} );
             save_file( $filepath, $response->content );
             $log->info("Saved to '$filepath'.");
         }
@@ -121,23 +121,24 @@ sub _save_exported_files_from_zip {
     $log->info("Processing zipped exported file...");
     do {
         my $name = $u->getHeaderInfo()->{Name};
-        die $log->error(
-"Cannot parse '$name' (filetype='$rundata->{filetype}') to get filename and target_language"
-        ) unless $name =~ m/(.*)\((.*)\)$rundata->{filetype}$/;
-        $log->info("Processing member '$name'...");
-        my $target_language = $2;
-        my $filename =
-          prepare_file_name( $1, $target_language, $rundata->{filetype} );
-        my $filepath =
-          catfile( $rundata->{project_workdir}, $target_language, $filename );
-
-        #print Dumper $self;
-        open( my $fh, '>', $filepath )
-          or die $log->error("Could not open file '$filepath' $!");
-        binmode($fh);
-        print $fh $_ while <$u>;
-        close $fh;
-        $log->info("Saved to '$filepath'.");
+        if ($name =~ m/$rundata->{filetype}$/) {
+            die $log->error(
+    "Cannot parse '$name' (filetype='$rundata->{filetype}') to get filename and target_language"
+            ) unless $name =~ m/(.*)\((.*)\)$rundata->{filetype}$/;
+            $log->info("Processing member '$name'...");
+            my $target_language = $2;
+            my $filepath =
+                get_file_path($rundata->{project_workdir}, $target_language, $1, $rundata->{filetype});
+            #print Dumper $self;
+            open( my $fh, '>', $filepath )
+              or die $log->error("Could not open file '$filepath' $!");
+            binmode($fh);
+            print $fh $_ while <$u>;
+            close $fh;
+            $log->info("Saved to '$filepath'.");
+        } else {
+            $log->info("Skipping member '$name'...");
+        }
     } while ( ( $status = $u->nextStream() ) > 0 );
     die $log->error("Error processing downloaded content of $task->id: $!")
       if $status < 0;

@@ -3,7 +3,7 @@
 use strict ;
 require 5.006 ;
 
-$::VERSION = '2.094' ;
+$::VERSION = '2.095' ;
 
 use lib '.';
 use private::MakeUtil;
@@ -27,10 +27,7 @@ WriteMakefile(
 	    : (PREREQ_PM   => { 'Compress::Raw::Bzip2' => $::VERSION,
 		                    'Compress::Raw::Zlib'  => $::VERSION,
 		                    'Scalar::Util'  => 0,
-                            'Getopt::Long'  => 2.27,
                             'Encode'        => 0,
-                            'charnames'     => 0,
-                            'Term::ReadLine'=> 0,
 		                    $] >= 5.005 && $] < 5.006
                                 ? ('File::BSDGlob' => 0)
                                 : () }

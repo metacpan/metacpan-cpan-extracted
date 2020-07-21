@@ -1,11 +1,14 @@
+.github/dependabot.yml
 .github/workflows/build.yaml
 .gitignore
 Build.PL
 Changes
 cpanfile
 docs/metadata/blurb
+docs/metadata/debian/summary
 docs/metadata/description
 docs/metadata/metadata.json
+docs/metadata/quote
 docs/metadata/README
 docs/metadata/requirements
 docs/metadata/test/suffix
@@ -16,6 +19,7 @@ MANIFEST.SKIP
 README
 README.md
 t/api/basic.t
+t/api/errors.t
 t/api/gpg1.t
 t/api/whitespace.t
 t/data/gnupg1/pubring.gpg
@@ -39,6 +43,7 @@ t/docs/spdx-license.t
 t/docs/synopsis.t
 t/legacy/basic.t
 t/legacy/locale.t
+t/lib/Test/PGP.pm
 t/lib/Test/RRA.pm
 t/lib/Test/RRA/Config.pm
 t/style/coverage.t

@@ -5,9 +5,13 @@ use warnings;
 use 5.008004;
 use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Store;
+use overload
+  '""' => sub { shift->message . "\n" },
+  bool => sub { 1 },
+  fallback => 1;
 
 # ABSTRACT: Wasmtime trap class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasm_trap_';
@@ -43,6 +47,15 @@ $ffi->attach( message => ['wasm_trap_t', 'wasm_byte_vec_t*'] => sub {
   $ret;
 });
 
+
+$ffi->attach( [ wasmtime_trap_exit_status => 'exit_status' ] => ['wasm_trap_t', 'int*'] => 'bool' => sub {
+  my($xsub, $self) = @_;
+  my $status;
+  $xsub->($self, \$status)
+    ? $status
+    : undef;
+});
+
 _generate_destroy();
 
 1;
@@ -59,7 +72,7 @@ Wasm::Wasmtime::Trap - Wasmtime trap class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -98,6 +111,13 @@ Create a trap instance.  C<$message> MUST be null terminated.
  my $message = $trap->message;
 
 Returns the trap message as a string.
+
+=head2 exit_status
+
+ my $status = $trap->exit_status;
+
+If the trap was triggered by an C<exit> call, this will return the exist status code.
+If it wasn't triggered by an C<exit> call it will return C<undef>.
 
 =head1 SEE ALSO
 

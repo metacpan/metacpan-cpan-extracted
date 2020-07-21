@@ -28,14 +28,14 @@ else {
   if($^O eq 'MSWin32' && $Config{myuname} =~ /strawberry-perl/) {
     if(eval q{ require 5.020 }) {
       push @scripts, 'script/pkg-config';
-    
+
       print "\n\n";
       print "!!! Note that script will be installed as pkg-config  !!!\n";
       print "!!! in addition to ppkg-config since you are using    !!!\n";
       print "!!! Strawberry Perl 5.20 or better.  This is probably !!!\n";
       print "!!! What you want                                     !!!\n";
       print "\n\n";
-      
+
       if($Config{myuname} =~ /strawberry-perl 5\.20\.0\.1/)
       {
         print "\n\n";
@@ -45,7 +45,7 @@ else {
         print "!!! patching them.  See README.win32 for details.     !!!\n";
         print "\n\n";
       }
-      
+
     } else {
       print "\n\n";
       print "!!! You may want to consider installing the script as !!!\n";
@@ -97,7 +97,7 @@ WriteMakefile(
             },
         },
     },
-    
+
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'PkgConfig-*' },
 );

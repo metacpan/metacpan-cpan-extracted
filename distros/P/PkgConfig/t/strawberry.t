@@ -26,11 +26,11 @@ my @pcfiles = do {
   my $inc = "$dir/../../include";
   @PkgConfig::DEFAULT_EXCLUDE_LFLAGS = ("-L$lib");
   @PkgConfig::DEFAULT_EXCLUDE_CFLAGS = ("-I$inc");
-  
+
   note "dir  = $dir";
   note "lib  = $lib";
   note "inc  = $inc";
-  
+
   my $dh;
   opendir $dh, $dir;
   my @list = map { s/\.pc$//; $_ } grep !/^\./, grep /\.pc$/, readdir $dh;
@@ -52,7 +52,7 @@ subtest 'pcfiles excluded' => sub {
       is $pkg->errmsg, undef, 'no error';
 
       my $ok1 = 1;
-      
+
       foreach my $cflag ($pkg->get_cflags)
       {
         if($cflag =~ /^-I(.*)$/)
@@ -69,11 +69,11 @@ subtest 'pcfiles excluded' => sub {
           }
         }
       }
-      
+
       ok $ok1, "headers excluded correctly";
-      
+
       my $ok2 = 1;
-      
+
       foreach my $ldflag ($pkg->get_ldflags)
       {
         if($ldflag =~ /^-L(.*)$/)
@@ -90,7 +90,7 @@ subtest 'pcfiles excluded' => sub {
           }
         }
       }
-      
+
       ok $ok2, "lib excluded correctly";
     };
   }
@@ -102,19 +102,19 @@ note "lib";
 note sprintf("  %20s %s", $_->[0], $_->[1]) for @good_libs;
 
 subtest 'pcfiles included' => sub {
-  my @pcfiles = qw( 
+  my @pcfiles = qw(
     freetype2 libexslt libpng libpng16 libxml-2.0 libxslt plplotd-c++ plplotd
   );
   plan tests => int @pcfiles;
-  
+
   foreach my $pcfile (@pcfiles)
   {
     subtest $pcfile => sub {
 
       my $pkg = PkgConfig->find($pcfile);
-      
+
       my $ok1 = 0;
-      
+
       foreach my $flag ($pkg->get_cflags)
       {
         if($flag =~ m{^-I(.*)$})
@@ -124,7 +124,7 @@ subtest 'pcfiles included' => sub {
           note $dir;
         }
       }
-      
+
       ok $ok1, "good directory included";
 
     };

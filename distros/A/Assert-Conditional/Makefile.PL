@@ -16,7 +16,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         "Carp::Always"             =>  0,
-        "Hash::Util"               =>  0.12,    # core but gosh it's version dependent
+        "Hash::Util"               =>  0,       # core but doesn't work for us till v0.015 in perl v5.17.10
         "IO::File"                 =>  0,       # core
         "IO::Handle"               =>  0,       # core
         "Moose"                    =>  0,       # alas to need this to test
@@ -34,7 +34,7 @@ WriteMakefile(
         "Cwd"                        =>  0,     # core
         "Env"                        =>  0,     # core
         "Exporter"                   =>  5.57,  # core
-        "Exporter::ConditionalSubs"  =>  1.01,
+        "Exporter::ConditionalSubs"  =>  "1.11.1",
         "File::Basename"             =>  0,     # core
         "File::Spec"                 =>  0,     # core
         "namespace::autoclean"       =>  0,

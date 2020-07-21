@@ -13,17 +13,22 @@ use 5.020;
 use autodie;
 use warnings;
 
+use lib 't/lib';
+
 use File::Spec;
 use IO::File;
 use IPC::Cmd qw(can_run);
 use Test::More;
+use Test::PGP qw(gpg_is_gpg1);
 
 # Check that GnuPG is available.  If so, load the module and set the plan.
 BEGIN {
     if (!can_run('gpg')) {
         plan skip_all => 'gpg binary not available';
+    } elsif (gpg_is_gpg1()) {
+        plan skip_all => 'gpg binary is GnuPG v1';
     } else {
-        plan tests => 10;
+        plan tests => 7;
         use_ok('PGP::Sign');
     }
 }
@@ -55,7 +60,7 @@ my %nonsense = (foo => 'bar');
 is(
     q{},
     $signer->verify($signature, @data, \%nonsense),
-    'Signature does not verify with added hashref'
+    'Signature does not verify with added hashref',
 );
 
 # Test taking code from a code ref and then verifiying the signature.
@@ -73,7 +78,7 @@ my $scalar_data = join(q{}, @data);
 is(
     'testing',
     $signer->verify($signature, \$scalar_data),
-    'RSAv4 sig from scalar ref'
+    'RSAv4 sig from scalar ref',
 );
 
 # Check a version 3 RSA signature using a glob as the data source.
@@ -84,24 +89,3 @@ $signature = join(q{}, @raw_signature[2 .. 11]);
 open(*DATA, '<', "$data/message");
 is('testing', $signer->verify($signature, *DATA), 'RSAv3 sig from a glob');
 close(*DATA);
-
-# Test some error cases.  First, a bad style argument to the constructor.
-undef $@;
-$signer = eval { PGP::Sign->new({ style => 'foo' }) };
-like(
-    $@,
-    qr{^Unknown [ ] OpenPGP [ ] backend [ ] style [ ] foo}xms,
-    'Bad style argument'
-);
-
-# A path to a nonexistent binary.
-$signer = PGP::Sign->new({ path => '/nonexistent/binary' });
-undef $@;
-$signature = eval { $signer->sign($keyid, $passphrase, @data) };
-ok($@, 'Bad path to GnuPG binary');
-
-# Verification of a completely invalid signature.
-$signer = PGP::Sign->new();
-undef $@;
-eval { $signer->verify('adfasdfasdf', @data) };
-like($@, qr{Execution [ ] of [ ] gpg [ ] failed}xms, 'Invalid signature');

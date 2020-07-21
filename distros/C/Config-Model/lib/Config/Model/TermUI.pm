@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2019 by Dominique Dumont.
+# This software is Copyright (c) 2005-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TermUI 2.138;
+package Config::Model::TermUI 2.139;
 
 use Carp;
 use utf8;      # so literals and identifiers can be in UTF-8
@@ -55,14 +55,11 @@ my $ll_completion_sub = sub {
     return @ret;
 };
 
-# BUG: autocompletion does not really on a hash element with an index
+# BUG: autocompletion does not really work on a hash element with an index
 # containing white space (i.e. something like std_id:"abc def",
 
 my $cd_completion_sub = sub {
     my ( $self, $text, $line, $start ) = @_;
-
-    #print "text '$text' line '$line' start $start\n";
-    #print "  cd comp param is ",join('+',@_),"\n";
 
     # we know that text begins with 'cd '
     my $cmd = $line;
@@ -107,16 +104,66 @@ my $cd_completion_sub = sub {
     # filter possible choices according to input
     my @ret = grep { /^$text/ } @choice ;
 
-    #print "->choice +",join('+',@ret),"+ text:'$text'<-\n";
+    return @ret;
+};
+
+my $path_completion_sub = sub {
+    my ( $self, $text, $line, $start, $node_only ) = @_;
+
+    # we know that text begins with a command
+    my $cmd = $line;
+    $cmd =~ s/^\w+\s+//;
+
+    my $new_item;
+    while ( not defined $new_item ) {
+        # grab in tolerant mode
+        # print "Grabbing $cmd\n";
+        eval {
+            $new_item = $self->{current_node}->grab( step => $cmd, type => 'node', mode => 'strict', autoadd => 0 );
+        };
+        chop $cmd;
+    }
+
+    #print "Grab got ",$new_item->location,"\n";
+
+    my @choice;
+    my $new_type = $new_item->get_type;
+
+    my @children = $node_only ? $new_item->get_element_name( cargo_type => 'node' )
+        : $new_item->get_element_name();
+    # say "Children: @children";
+    foreach my $elt_name (@children) {
+        if ( $new_item->element_type($elt_name) =~ /^(hash|list)$/ ) {
+            push @choice, "$elt_name:" unless $node_only;
+            foreach my $idx ( $new_item->fetch_element($elt_name)->fetch_all_indexes ) {
+                # my ($idx) = ($raw_idx =~ /([^\n]{1,40})/ );
+                # $idx .= '...' unless $raw_idx eq $idx ;
+                push @choice, "$elt_name:" . ($idx =~ /[^\w._-]/ ? qq("$idx") : $idx );
+            }
+        }
+        else {
+            push @choice, $elt_name;
+        }
+    }
+
+    # filter possible choices according to input
+    my @ret = grep { /^$text/ } @choice ;
 
     return @ret;
+};
+
+# like path completion, but allow only completion on a node
+my $node_completion_sub = sub {
+    return $path_completion_sub->(@_, 1);
 };
 
 my %completion_dispatch = (
     cd     => $cd_completion_sub,
     desc   => $completion_sub,
     ll     => $ll_completion_sub,
-    ls     => $completion_sub,
+    ls     => $path_completion_sub,
+    tree   => $node_completion_sub,
+    info   => $path_completion_sub,
     check  => $completion_sub,
     fix    => $fix_completion_sub,
     clear  => $completion_sub,
@@ -128,14 +175,17 @@ my %completion_dispatch = (
 sub completion {
     my ( $self, $text, $line, $start ) = @_;
 
-    #print " comp param is +$text+$line+$start+\n";
     my $space_idx = index $line, ' ';
     my ( $main, $cmd ) = split m/\s+/, $line, 2;    # /;
             #warn " comp main cmd is '$main' (space_idx $space_idx)\n";
 
     if ( $space_idx > 0 and defined $completion_dispatch{$main} ) {
         my $i = $self->{current_node}->instance;
-        return $completion_dispatch{$main}->( $self, $text, $line, $start );
+        # say "Input: ['$text', '$line', $start], ";
+
+        my @choices = $completion_dispatch{$main}->( $self, $text, $line, $start );
+        # say "Choices: ['", join("', '",@choices),"']";
+        return @choices;
     }
     elsif ( not $cmd ) {
         return grep { /^$text/ } $self->simple_ui_commands() ;
@@ -157,7 +207,7 @@ sub new {
 
     $self->{current_node} = $self->{root};
 
-    my $term = new Term::ReadLine $self->{title};
+    my $term = Term::ReadLine->new( $self->{title} );
 
     my $sub_ref = sub { $self->completion(@_); };
 
@@ -238,7 +288,7 @@ Config::Model::TermUI - Interactive command line interface for cme
 
 =head1 VERSION
 
-version 2.138
+version 2.139
 
 =head1 SYNOPSIS
 
@@ -411,7 +461,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2019 by Dominique Dumont.
+This software is Copyright (c) 2005-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -228,6 +228,7 @@ sub _remove {
 #
 # block is a Net::IPAM::Block or a subclass
 #
+# returns the outermost containing block
 
 sub _contains {
   my ( $node, $block ) = @_;
@@ -244,7 +245,7 @@ sub _contains {
 
     # child at idx may be equal to item
     if ( $block->cmp( $node->{childs}[$idx]->{block} ) == 0 ) {
-      return 1;
+      return $block;
     }
   }
 
@@ -252,7 +253,7 @@ sub _contains {
   return if $idx == 0;
 
   # child before idx may contain the item
-  return 1 if $node->{childs}[ $idx - 1 ]{block}->contains($block);
+  return $node->{childs}[ $idx - 1 ]{block} if $node->{childs}[ $idx - 1 ]{block}->contains($block);
 
   return;
 }
@@ -264,6 +265,8 @@ sub _contains {
 #
 # block is a Net::IPAM::Block or a subclass
 #
+# returns the lpm block
+
 sub _lookup {
   my ( $node, $block ) = @_;
   #
@@ -298,7 +301,8 @@ sub _lookup {
     }
   }
 
-  return;
+  # return this block as longest-prefix-match
+  return $node->{block};
 }
 
 =head1 AUTHOR

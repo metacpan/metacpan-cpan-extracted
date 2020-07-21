@@ -60,15 +60,15 @@
    "provides" : {
       "Termbox" : {
          "file" : "lib/Termbox.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Termbox::Cell" : {
          "file" : "lib/Termbox/Cell.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "Termbox::Event" : {
          "file" : "lib/Termbox/Event.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/sanko/Termbox.pm"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_authority" : "cpan:SANKO",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 0

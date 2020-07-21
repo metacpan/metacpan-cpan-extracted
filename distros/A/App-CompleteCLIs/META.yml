@@ -18,6 +18,7 @@ meta-spec:
 name: App-CompleteCLIs
 requires:
   Complete::Acme::MetaSyntactic: '0.002'
+  Complete::Chrome: '0'
   Complete::Country: '0'
   Complete::Currency: '0'
   Complete::Cwalitee: '0'
@@ -67,7 +68,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteCLIs
   homepage: https://metacpan.org/release/App-CompleteCLIs
   repository: git://github.com/perlancar/perl-App-CompleteCLIs.git
-version: '0.144'
+version: '0.145'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -87,6 +88,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript complete-array-elem'
+      version: '0.422'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript complete-chrome-profile-name'
       version: '0.422'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript

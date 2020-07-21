@@ -2,11 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN { use_ok('Game::Battleship') }
+use_ok 'Game::Battleship';
 
-my $obj = eval { Game::Battleship->new };
-print "$@\n" if $@;
-isa_ok $obj, 'Game::Battleship', 'with no arguments';
+my $obj = new_ok 'Game::Battleship';
 
 $obj = Game::Battleship->new;
 $obj->add_player('gene');

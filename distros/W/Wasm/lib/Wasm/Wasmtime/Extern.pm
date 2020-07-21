@@ -11,7 +11,7 @@ require Wasm::Wasmtime::Table;
 require Wasm::Wasmtime::Memory;
 
 # ABSTRACT: Wasmtime extern class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasm_extern_';
@@ -68,14 +68,15 @@ Wasm::Wasmtime::Extern - Wasmtime extern class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
  use Wasm::Wasmtime;
  
+ my $store = Wasm::Wasmtime::Store->new;
  my $instance = Wasm::Wasmtime::Instance->new(
-   Wasm::Wasmtime::Module->new(wat => q{
+   Wasm::Wasmtime::Module->new($store, wat => q{
      (module
        (func (export "foo") (param i32 i32) (result i32)
          local.get 0
@@ -84,6 +85,7 @@ version 0.14
        (memory (export "bar") 2 3)
      )
    }),
+   $store,
  );
  
  my $foo = $instance->exports->foo;

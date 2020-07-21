@@ -108,12 +108,14 @@ sub list {
         RFC3834.pm
         RFC5322.pm
         Rhost.pm
+            Rhost/Cox.pm
             Rhost/ExchangeOnline.pm
             Rhost/FrancePTT.pm
             Rhost/GoDaddy.pm
             Rhost/GoogleApps.pm
             Rhost/IUA.pm
             Rhost/KDDI.pm
+            Rhost/Spectrum.pm
             Rhost/TencentQQ.pm
         SMTP.pm
             SMTP/Error.pm

@@ -8,17 +8,9 @@ our @ISA = qw( Exporter );
 
 use Carp qw( croak );
 
-#pod =head1 NAME
-#pod
-#pod Exporter::ConditionalSubs - Conditionally export subroutines
-#pod
-#pod =head1 VERSION
-#pod
-#pod Version 1.01
-#pod
-#pod =cut
-
-our $VERSION = '1.01';
+# ABSTRACT: Conditionally export subroutines
+use version;
+our $VERSION = 'v1.11.1'; # VERSION
 
 #pod =head1 SYNOPSIS
 #pod
@@ -237,97 +229,18 @@ sub import
 #pod
 #pod L<B::Generate>
 #pod
-#pod =head1 AUTHOR
-#pod
-#pod Larry Leszczynski, C<< <larryl at cpan.org> >>
-#pod
-#pod =head1 BUGS
-#pod
-#pod Please report any bugs or feature requests at:
-#pod L<https://github.com/GrantStreetGroup/Exporter-ConditionalSubs>
-#pod
-#pod =head1 SUPPORT
-#pod
-#pod You can find documentation for this module with the perldoc command.
-#pod
-#pod     perldoc Exporter::ConditionalSubs
-#pod
-#pod You can also look for information at:
-#pod
-#pod =over 4
-#pod
-#pod =item * GitHub
-#pod
-#pod L<https://github.com/GrantStreetGroup/Exporter-ConditionalSubs>
-#pod
-#pod =item * MetaCPAN
-#pod
-#pod L<https://metacpan.org/pod/Exporter::ConditionalSubs>
-#pod
-#pod =item * AnnoCPAN, Annotated CPAN documentation
-#pod
-#pod L<http://annocpan.org/dist/Exporter-ConditionalSubs>
-#pod
-#pod =item * CPAN Ratings
-#pod
-#pod L<http://cpanratings.perl.org/d/Exporter-ConditionalSubs>
-#pod
-#pod =back
-#pod
-#pod =head1 AUTHOR
-#pod
-#pod Larry Leszczynski, C<< <larryl at cpan.org> >>
-#pod
 #pod =head1 ACKNOWLEDGEMENTS
 #pod
 #pod Thanks to Grant Street Group L<http://www.grantstreet.com> for funding
 #pod development of this code.
 #pod
 #pod Thanks to Tom Christiansen (C<< <tchrist@perl.com> >>) for help with the
-#pod symbol table hackery.
+#pod symbol table hackery
+#pod and Larry Leszczynski, C<< <larryl at cpan.org> >> for writing most of
+#pod the code.
 #pod
 #pod Thanks to Zefram (C<< <zefram@fysh.org> >>) for the pointer to his
 #pod L<Debug::Show> hackery.
-#pod
-#pod =head1 LICENSE AND COPYRIGHT
-#pod
-#pod Copyright 2015 Grant Street Group
-#pod
-#pod This program is free software; you can redistribute it and/or modify it
-#pod under the terms of the the Artistic License (2.0). You may obtain a
-#pod copy of the full license at:
-#pod
-#pod L<http://www.perlfoundation.org/artistic_license_2_0>
-#pod
-#pod Any use, modification, and distribution of the Standard or Modified
-#pod Versions is governed by this Artistic License. By using, modifying or
-#pod distributing the Package, you accept this license. Do not use, modify,
-#pod or distribute the Package, if you do not accept this license.
-#pod
-#pod If your Modified Version has been derived from a Modified Version made
-#pod by someone other than you, you are nevertheless required to ensure that
-#pod your Modified Version complies with the requirements of this license.
-#pod
-#pod This license does not grant you the right to use any trademark, service
-#pod mark, tradename, or logo of the Copyright Holder.
-#pod
-#pod This license includes the non-exclusive, worldwide, free-of-charge
-#pod patent license to make, have made, use, offer to sell, sell, import and
-#pod otherwise transfer the Package with respect to any patent claims
-#pod licensable by the Copyright Holder that are necessarily infringed by the
-#pod Package. If you institute patent litigation (including a cross-claim or
-#pod counterclaim) against any party alleging that the Package constitutes
-#pod direct or contributory patent infringement, then this Artistic License
-#pod to you shall terminate on the date that such litigation is filed.
-#pod
-#pod Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-#pod AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-#pod THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-#pod PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-#pod YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-#pod CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-#pod CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-#pod EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pod
 #pod =cut
 
@@ -341,11 +254,11 @@ __END__
 
 =head1 NAME
 
-Exporter::ConditionalSubs
+Exporter::ConditionalSubs - Conditionally export subroutines
 
 =head1 VERSION
 
-version v1.11.0
+version v1.11.1
 
 =head1 SYNOPSIS
 
@@ -389,14 +302,6 @@ Then, specify an C<-if> or C<-unless> condition when C<use>ing that module:
 This is a subclass of L<Exporter> and works just like it, with the
 addition of support for the C<-if> and C<-unless> import arguments.
 
-=head1 NAME
-
-Exporter::ConditionalSubs - Conditionally export subroutines
-
-=head1 VERSION
-
-Version 1.01
-
 =head1 SUBROUTINES
 
 =head2 import
@@ -434,97 +339,18 @@ L<B::CallChecker>
 
 L<B::Generate>
 
-=head1 AUTHOR
-
-Larry Leszczynski, C<< <larryl at cpan.org> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests at:
-L<https://github.com/GrantStreetGroup/Exporter-ConditionalSubs>
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Exporter::ConditionalSubs
-
-You can also look for information at:
-
-=over 4
-
-=item * GitHub
-
-L<https://github.com/GrantStreetGroup/Exporter-ConditionalSubs>
-
-=item * MetaCPAN
-
-L<https://metacpan.org/pod/Exporter::ConditionalSubs>
-
-=item * AnnoCPAN, Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Exporter-ConditionalSubs>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Exporter-ConditionalSubs>
-
-=back
-
-=head1 AUTHOR
-
-Larry Leszczynski, C<< <larryl at cpan.org> >>
-
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to Grant Street Group L<http://www.grantstreet.com> for funding
 development of this code.
 
 Thanks to Tom Christiansen (C<< <tchrist@perl.com> >>) for help with the
-symbol table hackery.
+symbol table hackery
+and Larry Leszczynski, C<< <larryl at cpan.org> >> for writing most of
+the code.
 
 Thanks to Zefram (C<< <zefram@fysh.org> >>) for the pointer to his
 L<Debug::Show> hackery.
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright 2015 Grant Street Group
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
-
-L<http://www.perlfoundation.org/artistic_license_2_0>
-
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
-
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
-
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
-
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
-
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =head1 AUTHOR
 

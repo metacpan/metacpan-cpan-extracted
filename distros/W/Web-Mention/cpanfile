@@ -2,6 +2,7 @@ requires "DateTime";
 requires "DateTime::Format::ISO8601";
 requires "Encode";
 requires "HTTP::Link";
+requires "JSON";
 requires "LWP";
 requires "LWP::Protocol::https";
 requires "Mojo::DOM58";
@@ -26,6 +27,5 @@ on 'test' => sub {
     requires "Test::LWP::UserAgent";
     requires "Test::Warn";
 
-    requires "JSON";
     requires "Path::Class::Dir";
 };

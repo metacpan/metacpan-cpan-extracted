@@ -1,8 +1,9 @@
 package Game::Battleship;
 our $AUTHORITY = 'cpan:GENE';
+
 # ABSTRACT: "You sunk my battleship!"
 
-our $VERSION = '0.0601';
+our $VERSION = '0.0602';
 
 use Carp;
 use Game::Battleship::Player;
@@ -155,7 +156,7 @@ Game::Battleship - "You sunk my battleship!"
 
 =head1 VERSION
 
-version 0.0601
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -163,8 +164,8 @@ version 0.0601
   my $g = Game::Battleship->new;
   $g->add_player('Aaron');
   $g->add_player('Tabi');
-  my $winner = $g->play();
-  print $winner->name(), " wins!\n";
+  my $winner = $g->play;
+  print $winner->name, " wins!\n";
 
 =head1 DESCRIPTION
 
@@ -177,24 +178,20 @@ Everything is an object with default but mutable attributes.  This way
 games can have two or more players each with a single fleet of custom
 vessels.
 
-A game can be played with the handy C<play()> method or for finer
+A game can be played with the handy C<play> method, or for finer
 control, use individual methods of the C<Game::Battleship::*>
-modules.  See the distribution test script for working code examples.
-
-=head1 NAME
-
-Game::Battleship - "You sunk my battleship!"
+modules.
 
 =head1 METHODS
 
-=head2 B<new()>
+=head2 new
 
   $g = Game::Battleship->new;
   $g = Game::Battleship->new( players => [$player1, $player2] );
 
 Construct a new C<Game::Battleship> object.
 
-=head2 B<add_player()>
+=head2 add_player
 
   $g->add_player;
   $g->add_player($name);
@@ -221,7 +218,7 @@ with that number, a warning is emitted and the player is not added.
 See L<Game::Battleship::Player> for details on the default and custom
 settings.
 
-=head2 B<player()>
+=head2 player
 
   $player_obj = $g->player($name);
   $player_obj = $g->player($number);
@@ -231,7 +228,7 @@ Return the C<Game::Battle::Player> object that matches the given
 name, key or number (where the key is C</player_\d+/> and the number
 is just the numeric part of the key).
 
-=head2 B<play()>
+=head2 play
 
   $winner = $g->play;
 
@@ -250,11 +247,11 @@ Enhance weaponry and sensing.
 
 =head1 SEE ALSO
 
-* The code in the C<t/> directory.
+F<t/01-methods.t>
 
-* L<Game::Battleship::Craft>, L<Game::Battleship::Grid>, L<Game::Battleship::Player>
+L<Game::Battleship::Craft>, L<Game::Battleship::Grid>, L<Game::Battleship::Player>
 
-* L<http://en.wikipedia.org/wiki/Battleship_%28game%29>
+L<http://en.wikipedia.org/wiki/Battleship_%28game%29>
 
 =head1 AUTHOR
 
@@ -262,7 +259,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

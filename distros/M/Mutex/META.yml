@@ -5,10 +5,10 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.88'
-  perl: '5.008'
+  perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.008'
+  perl: '5.008001'
 dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 6.55_02, CPAN::Meta::Converter version 2.150001'
 license: perl
@@ -23,22 +23,24 @@ no_index:
 provides:
   Mutex:
     file: lib/Mutex.pm
-    version: '1.005'
+    version: '1.006'
   Mutex::Channel:
     file: lib/Mutex/Channel.pm
-    version: '1.005'
+    version: '1.006'
   Mutex::Flock:
     file: lib/Mutex/Flock.pm
-    version: '1.005'
+    version: '1.006'
   Mutex::Util:
     file: lib/Mutex/Util.pm
-    version: '1.005'
+    version: '1.006'
 requires:
   Carp: '0'
+  Errno: '0'
   Fcntl: '0'
+  IO::Handle: '0'
   Socket: '0'
   base: '0'
-  perl: '5.008'
+  perl: '5.008001'
   strict: '0'
   warnings: '0'
 resources:
@@ -46,4 +48,4 @@ resources:
   homepage: https://github.com/marioroy/mutex-perl
   license: http://dev.perl.org/licenses/
   repository: https://github.com/marioroy/mutex-perl.git
-version: '1.005'
+version: '1.006'

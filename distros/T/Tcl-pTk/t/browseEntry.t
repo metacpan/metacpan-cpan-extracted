@@ -20,17 +20,12 @@ $be->insert('end',qw(one two three four));
 
 $be->pack(-side => 'top', -fill => 'x', -expand => 1);
 
-$top->after(1000,sub{$top->destroy});
-
+$top->idletasks;
 ok(1, 1, "BrowseEntry Widget Creation");
    
 my @choice2 = $be->get( qw/0 end/);
 ok(@choice2, 4, "get returns list context");
 
-MainLoop;
+(@ARGV) ? MainLoop : $top->destroy;
 
-print "Option = $option\n" if (defined($option));
-
-
-
-
+print "# Option = $option\n" if (defined($option));

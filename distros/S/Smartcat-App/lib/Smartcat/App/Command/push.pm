@@ -11,7 +11,7 @@ use File::Find qw(find);
 use List::Util qw(first);
 
 use Smartcat::App::Constants qw(
-  TOTAL_ITERATION_COUNT
+  MAX_ITERATION_WAIT_TIMEOUT
   ITERATION_WAIT_TIMEOUT
   DOCUMENT_DISASSEMBLING_SUCCESS_STATUS
 );
@@ -28,6 +28,9 @@ sub opt_spec {
     push @opts,
       [ 'disassemble-algorithm-name:s' =>
           'Optional disassemble file algorithm' ],
+      [ 'preset-disassemble-algorithm:s' =>
+          'Optional disassemble algorithm preset' ],
+      [ 'delete-not-existing' => 'Delete not existing documents' ],
       $self->project_id_opt_spec,
       $self->project_workdir_opt_spec,
       $self->file_params_opt_spec,
@@ -47,6 +50,11 @@ sub validate_args {
     $self->app->{rundata}->{disassemble_algorithm_name} =
       $opt->{disassemble_algorithm_name}
       if defined $opt->{disassemble_algorithm_name};
+    $self->app->{rundata}->{preset_disassemble_algorithm} =
+      $opt->{preset_disassemble_algorithm}
+      if defined $opt->{preset_disassemble_algorithm};
+    $self->app->{rundata}->{delete_not_existing} =
+      defined $opt->{delete_not_existing} ? $opt->{delete_not_existing} : 0;
 }
 
 sub execute {
@@ -63,6 +71,7 @@ sub execute {
     );
 
     my $project = $app->project_api->get_project;
+    $app->project_api->update_project_external_tag( $project->name, "source:Serge" ) if ($#{ $project->documents } >= 0);
     my %documents;
     for ( @{ $project->documents } ) {
         my $key =
@@ -95,31 +104,38 @@ sub execute {
     my %stats;
     $stats{$_}++ for ( keys %documents, keys %ts_files );
 
-    my ( @upload, @obsolete, @update );
+    my ( @upload, @obsolete, @update, @skip );
     push @{
-        defined $documents{$_}
-        ? ( $stats{$_} > 1 ? \@update : \@obsolete )
-        : \@upload
+        !$self->_check_if_files_are_empty( $ts_files{$_} )
+        ? defined $documents{$_} ? \@update : \@upload
+        : defined $documents{$_} ? \@obsolete : \@skip
       },
       $_
       for ( keys %stats );
 
     $log->info(
         sprintf(
-"State:\n  Upload [%d]\n    %s\n  Update [%d]\n    %s\n  Obsolete [%d]\n    %s\n",
+"State:\n  Upload [%d]\n    %s\n  Update [%d]\n    %s\n  Obsolete [%d]\n    %s\n  Skip [%d]\n    %s\n",
             scalar @upload,
             join( ', ', map { "'$_'" } @upload ),
             scalar @update,
             join( ', ', map { "'$_'" } @update ),
             scalar @obsolete,
-            join( ', ', map { "'$_'" } @obsolete )
+            join( ', ', map { "'$_'" } @obsolete ),
+            scalar @skip,
+            join( ', ', map { "'$_'" } @skip )
         )
     );
 
     $self->upload( $project, $ts_files{$_} ) for @upload;
     $self->update( $project, $documents{$_}, $ts_files{$_} ) for @update;
 
-    #todo: obsolete
+    if ($rundata->{delete_not_existing}) {
+        my @document_ids;
+        push( @document_ids, map { $_->id } @{ $documents{$_} } ) for @obsolete;
+
+        $self->delete( \@document_ids) if @document_ids;
+    }
 
     $log->info(
         sprintf(
@@ -128,6 +144,12 @@ sub execute {
             $rundata->{project_workdir}
         )
     );
+}
+
+sub delete {
+    my ( $self, $document_ids ) = @_;
+
+    $self->app->document_api->delete_documents($document_ids);
 }
 
 sub update {
@@ -180,6 +202,18 @@ sub update {
     }
 }
 
+sub _check_if_files_are_empty {
+    my ($self, $filepaths) = @_;
+
+    my $rundata = $self->app->{rundata};
+
+    if ($rundata->{filetype} eq ".po") {
+        return are_po_files_empty($filepaths);
+    }
+
+    return 0;
+}
+
 sub _upload_tree_document {
     my ( $self, $ts_files, $target_languages ) = @_;
 
@@ -192,7 +226,7 @@ sub _upload_tree_document {
     $log->info( "Created documents ids:\n  "
           . join( ', ', map { $_->id } @$documents ) );
 
-    self->_update_tree_document( $ts_files, $documents );
+    $self->_update_tree_document( $ts_files, $documents );
 }
 
 sub _update_tree_document {
@@ -204,7 +238,7 @@ sub _update_tree_document {
         my $lang    = get_language_from_ts_filepath($_);
         my $doc     = first { $_->target_language eq $lang } @$documents;
         my $counter = 0;
-        while ( $counter < TOTAL_ITERATION_COUNT ) {
+        while ( $counter < MAX_ITERATION_WAIT_TIMEOUT ) {
             my $d = $document_api->get_document( $doc->id );
             last
               if $d->document_disassembling_status eq
@@ -219,7 +253,7 @@ sub _update_tree_document {
             sleep ITERATION_WAIT_TIMEOUT * 5 * $counter;
         }
         die $log->error( sprintf( "Cannot update document %s.", $doc->id ) )
-          if $counter == TOTAL_ITERATION_COUNT;
+          if $counter == MAX_ITERATION_WAIT_TIMEOUT;
         $document_api->update_document( $_, $doc->id );
     }
 }

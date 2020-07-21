@@ -1,5 +1,5 @@
 package MIDI::Simple::Drummer::Rock;
-$MIDI::Simple::Drummer::Rock::VERSION = '0.0805';
+$MIDI::Simple::Drummer::Rock::VERSION = '0.0808';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -18,9 +18,7 @@ use constant TOM5   => 'Low Floor Tom';
 sub new {
     my $self = shift;
     $self->SUPER::new(
-        -patch => 1, # Standard
-        -power => 0,
-        -room  => 0,
+        -patch => 1,
         @_
     );
 }
@@ -291,16 +289,12 @@ MIDI::Simple::Drummer::Rock
 
 =head1 VERSION
 
-version 0.0805
+version 0.0808
 
 =head1 DESCRIPTION
 
 This package contains a collection of common rock patterns, loaded by
 L<MIDI::Simple::Drummer>.
-
-The constructor can be provided with a specific patch number (default 1
-"Standard Kit") or the arguments C<-power =E<gt> 1> or C<-room =E<gt> 1> to use
-the alternate rock kits.
 
 =head1 TO DO
 

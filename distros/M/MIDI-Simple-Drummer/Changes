@@ -1,5 +1,19 @@
 Revision history for MIDI-Simple-Drummer
 
+0.0808 2020-07-15 01:23:32
+    - Remove leftover references to "alternate kits."
+
+0.0807 2020-07-14 22:47:13
+    - Do not include the slideshow POD.
+    - Add missing changes to the previous release (below).
+
+0.0806 2020-07-14 22:30:53
+    - Clean up test code a bit.
+    - Remove references to "alternate kits" that didn't work.
+    - Add the eg/rock-exercises program.
+    - Rename eg/test to eg/five because it's in 5/4 time.
+    - Include the Back In Black transcription in the distro.
+
 0.0805 2020-06-09 16:29:49
     - Fix child module POD.
 

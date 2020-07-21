@@ -1,9 +1,9 @@
 package App::BrowserUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-07-19'; # DATE
 our $DIST = 'App-BrowserUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -19,7 +19,9 @@ $SPEC{':package'} = {
 
 our %browsers = (
     firefox => {
-        browser_fname_pat => qr/\A(Web Content|WebExtensions|firefox-bin)\z/,
+        # in some OS like linux the binary is firefox-bin, while in some other
+        # like FreeBSD, it's firefox.
+        browser_fname_pat => qr/\A(Web Content|WebExtensions|firefox-bin|firefox)\z/,
     },
     chrome => {
         browser_fname_pat => qr/\A(chrome)\z/,
@@ -553,7 +555,7 @@ App::BrowserUtils - Utilities related to browsers, particularly modern GUI ones
 
 =head1 VERSION
 
-This document describes version 0.008 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-06-13.
+This document describes version 0.009 of App::BrowserUtils (from Perl distribution App-BrowserUtils), released on 2020-07-19.
 
 =head1 SYNOPSIS
 

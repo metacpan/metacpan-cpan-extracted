@@ -7,7 +7,7 @@ use warnings;
 use utf8;
 use namespace::autoclean;
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -54,7 +54,7 @@ Broadworks::OCIP::Throwable - Exception throwing for Broadworks::OCIP
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =for test_synopsis 1;
 __END__
@@ -101,7 +101,7 @@ Nigel Metheringham <Nigel.Metheringham@redcentricplc.com>
 
 =head1 COPYRIGHT
 
-Copyright 2014 Recentric Solutions Limited. All rights reserved.
+Copyright 2014-2020 Recentric Solutions Limited. All rights reserved.
 
 =head1 AUTHOR
 
@@ -109,7 +109,7 @@ Nigel Metheringham <nigelm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Nigel Metheringham.
+This software is copyright (c) 2020 by Nigel Metheringham.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

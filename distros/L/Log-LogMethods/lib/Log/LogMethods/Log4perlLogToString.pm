@@ -81,7 +81,6 @@ sub LoggerToFh {
   my $layout = Log::Log4perl::Layout::PatternLayout->new($format);
   my $appender=Log::Log4perl::Appender->new(
    'Log::Dispatch::Handle',
-    min_level=>'info',
     handle=>$fh
   );
 

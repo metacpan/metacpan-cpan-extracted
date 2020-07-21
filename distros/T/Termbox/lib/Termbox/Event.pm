@@ -2,7 +2,7 @@ package Termbox::Event {
     use 5.020;
     use strictures 2;
     use warnings;
-    our $VERSION = "0.10";
+    our $VERSION = "0.11";
     #
     use FFI::Platypus::Record;
     record_layout_1(

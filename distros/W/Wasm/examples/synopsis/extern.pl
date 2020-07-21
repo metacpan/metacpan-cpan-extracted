@@ -2,8 +2,9 @@ use strict;
 use warnings;
 use Wasm::Wasmtime;
 
+my $store = Wasm::Wasmtime::Store->new;
 my $instance = Wasm::Wasmtime::Instance->new(
-  Wasm::Wasmtime::Module->new(wat => q{
+  Wasm::Wasmtime::Module->new($store, wat => q{
     (module
       (func (export "foo") (param i32 i32) (result i32)
         local.get 0
@@ -12,6 +13,7 @@ my $instance = Wasm::Wasmtime::Instance->new(
       (memory (export "bar") 2 3)
     )
   }),
+  $store,
 );
 
 my $foo = $instance->exports->foo;

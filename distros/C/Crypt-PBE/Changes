@@ -1,0 +1,7 @@
+0.101 2020/07/15
+    - Added missing Crypt::OpenSSL::AES module prerequisite in Makefile.PL
+    - Improved pkcs5-tool command
+
+0.100 2020/07/15
+    - initial release
+

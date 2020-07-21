@@ -11,3 +11,8 @@
  - added licecne perl5
 1.006
  - All packages now: Log::Log4perl->wrapper_register(__PACKAGE__);
+1.007
+ - Fixed Log::LogMethods::Log4perlLogToString ( removed min loggnig level )
+ - Fixed the order displacement between DEBUG and TRACE
+ - Fixed Dancer2 loader issue
+ - Added Unit test for order validation

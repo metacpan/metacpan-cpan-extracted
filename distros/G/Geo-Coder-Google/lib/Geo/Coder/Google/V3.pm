@@ -2,7 +2,7 @@ package Geo::Coder::Google::V3;
 
 use strict;
 use warnings;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Carp;
 use JSON;
@@ -23,12 +23,14 @@ sub new {
     my $channel     = delete $param{channel}  || undef;
     my $client      = delete $param{client}   || '';
     my $key         = delete $param{key}      || '';
+    my $apikey      = delete $param{apikey}   || '';
     my $components  = delete $param{components};
    
     bless { 
         ua => $ua, host => $host, language => $language, 
         region => $region, oe => $oe, channel => $channel,
-        client => $client, key => $key, components => $components,
+        client => $client, key => $key, apikey => $apikey,
+        components => $components,
     }, $class;
 }
 
@@ -93,6 +95,10 @@ sub geocode {
         # signature must be last parameter in query string or you get 403's
         $url = $uri->as_string;
         $url .= '&signature='.$signature if $signature;
+    } elsif ($self->{apikey}) {
+        $query_parameters{key} = $self->{apikey};
+        $uri->query_form(%query_parameters);
+        $url = $uri->as_string;
     }
 
     my $res = $self->{ua}->get($url);
@@ -219,7 +225,7 @@ variables GMAP_CLIENT and GMAP_KEY before running 02_v3_live.t
   @location = $geocoder->geocode(location => $location);
 
 Queries I<$location> to Google Maps geocoding API and returns hash
-reference returned back from API server. When you cann the method in
+reference returned back from API server. When you call the method in
 an array context, it returns all the candidates got back, while it
 returns the 1st one in a scalar context.
 

@@ -3,7 +3,7 @@ NAME
     user
 
 RT VERSION
-    Works with RT 4.0, 4.2 and 4.4.
+    Works with RT 4.0, 4.2, 4.4, 5.0.
 
 DESCRIPTION
     This RT extension adds a "Merge Users" box to the User Administration
@@ -26,7 +26,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::MergeUsers');
@@ -38,7 +38,7 @@ INSTALLATION
         or add RT::Extension::MergeUsers to your existing @Plugins line.
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 

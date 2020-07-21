@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model
 #
-# This software is Copyright (c) 2005-2019 by Dominique Dumont.
+# This software is Copyright (c) 2005-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SimpleUI 2.138;
+package Config::Model::SimpleUI 2.139;
 
 use Carp;
 use 5.010;
@@ -18,7 +18,7 @@ use Encode qw(decode_utf8);
 use Regexp::Common qw/delimited/;
 
 my $syntax = '
-cd <elt> cd <elt:key>, cd - , cd !
+cd <elt>, cd <elt:key>, cd - , cd !
    -> jump into node
 set elt=value, elt:key=value
    -> set a value
@@ -30,12 +30,20 @@ delete elt
    -> like reset, delete a value (set to undef)
 display elt elt:key
    -> display a value
-ls -> show elements of current node (args: filter pattern)
+ls -> show content of object (args: path and/or filter pattern)
+   ls -> show elements of current node
+   ls foo* -> shows element matching foo.*
+   ls \'foo*\' -> shows elements of node stored in "foo*"
+   ls aHash -> shows keys of Hash
+   ls \'aHash:"*"\'  -> shows elements of node stored in key "*" of "aHash" hash
 ll [-nz] [-v] [ element | pattern ]
    -> show elements of current node and their value
      (options: -nz → hides empty value, -v → verbose)
      (args: element name or filter pattern)
-tree -> show configuration tree from current node
+info -> show detailed information on object or current node
+  (args: optional path to object)
+tree -> show configuration tree from an object or current node
+  (args: optional path to object)
 help -> show available command
 desc[ription] -> show class desc of current node
 desc <element>   -> show desc of element from current node
@@ -82,7 +90,7 @@ my $ll_sub = sub {
 
     my @desc_opt = qw/check no/;
 
-    my %opt = map { /^-(\w+)/; $1 => 1 } grep { /^-/ } @raw_args;
+    my %opt = map { /^-(\w+)/ ? ($1 => 1) : () } @raw_args;
     push @desc_opt, hide_empty => 1 if $opt{nz} ;
     push @desc_opt, verbose    => 1 if $opt{v} ;
 
@@ -146,19 +154,35 @@ my %run_dispatch = (
         say "Nothing to display" unless @_;
         return $self->{current_node}->grab_value(@_);
     },
+    info => sub {
+        my $self = shift;
+        my $cnode = $self->{current_node};
+        my $target = @_ ? $cnode->grab(steps => [@_]) : $cnode;
+        return join("\n", $target->get_info );
+    },
     ls => sub {
         my $self = shift;
-        my $pattern = shift || '*';
+        my $target = $self->{current_node};
+        my $pattern = '*';
+        for (@_) {
+            if (/\*/ and not /^["']/) {
+                $pattern = $_;
+                last;
+            }
+            $target = $target->grab(steps => $_);
+        }
         $pattern =~ s/\*/.*/g;
 
         my $i    = $self->{current_node}->instance;
-        my @res  = grep {/^$pattern$/} $self->{current_node}->get_element_name;
+        my @res  = $target->can('children') ? grep {/^$pattern$/} $target->children : ();
         return join( ' ', @res );
     },
     tree => sub {
         my $self = shift;
         my $i    = $self->{current_node}->instance;
-        my @res  = $self->{current_node}->dump_tree( full_dump => 1 );
+        my $cnode = $self->{current_node};
+        my $target = @_ ? $cnode->grab(steps => [@_]) : $cnode;
+        my @res  = $target->dump_tree( mode => 'user' );
         return join( ' ', @res );
     },
     delete => sub {
@@ -339,7 +363,7 @@ Config::Model::SimpleUI - Simple interface for Config::Model
 
 =head1 VERSION
 
-version 2.138
+version 2.139
 
 =head1 SYNOPSIS
 
@@ -471,18 +495,25 @@ Delete a list or hash element
 
 Display a value
 
-=item ls [ pattern ]
+=item ls [path] [ pattern ]
 
-Show elements of current node. Can be used with a shell pattern.
+Show elements of current node or of a node pointed by path. Elements
+can be filtered with a shell pattern. See inline help for more details.
 
 =item ll [-nz] [-v] [ pattern ... ]
 
 Describe elements of current node. Can be used with shell patterns or element names.
 Skip empty element with C<-nz> option. Display more information with C<-v> option
 
-=item tree
+=item tree [path]
 
-Show configuration tree from current node.
+Show configuration tree from current node or of a node pointed by path.
+
+=item info [path]
+
+Show debug information on current node or on the element pointed by
+path. The debug information may show model parametersm default or computed
+values.
 
 =item help
 
@@ -564,7 +595,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2005-2019 by Dominique Dumont.
+This software is Copyright (c) 2005-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

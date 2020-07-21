@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use 5.008004;
 use Wasm::Wasmtime::FFI;
+use Wasm::Wasmtime::Engine;
 use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::Module::Exports;
 use Wasm::Wasmtime::Module::Imports;
@@ -12,7 +13,7 @@ use Wasm::Wasmtime::ExportType;
 use Carp ();
 
 # ABSTRACT: Wasmtime module class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasm_module_';
@@ -63,12 +64,12 @@ sub _args
 }
 
 
-$ffi->attach( [ wasmtime_module_new => 'new' ] => ['wasm_store_t', 'wasm_byte_vec_t*', 'opaque*'] => 'wasmtime_error_t' => sub {
+$ffi->attach( [ wasmtime_module_new => 'new' ] => ['wasm_engine_t', 'wasm_byte_vec_t*', 'opaque*'] => 'wasmtime_error_t' => sub {
   my $xsub = shift;
   my $class = shift;
   my($store, $wasm, $data) = _args(@_);
   my $ptr;
-  if(my $error = $xsub->($store, $$wasm, \$ptr))
+  if(my $error = $xsub->($store->engine, $$wasm, \$ptr))
   {
     Carp::croak("error creating module: " . $error->message);
   }
@@ -112,7 +113,18 @@ $ffi->attach( [ imports => '_imports' ] => [ 'wasm_module_t', 'wasm_importtype_v
 });
 
 
-sub store { shift->{store} }
+sub engine { shift->{store}->engine }
+
+
+sub store
+{
+  my($self) = @_;
+  if(warnings::enabled("deprecated"))
+  {
+    Carp::carp('The store method for the Wasm::Wasmtime::Module class is deprecated and will be removed in a future version of Wasm::Wasmtime');
+  }
+  $self->{store};
+}
 
 
 sub to_string
@@ -144,7 +156,7 @@ Wasm::Wasmtime::Module - Wasmtime module class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -231,9 +243,17 @@ Returns a L<Wasm::Wasmtime::Module::Exports> object that can be used to query th
 
 Returns a list of L<Wasm::Wasmtime::ImportType> objects for the objects imported by the WebAssembly module.
 
+=head2 engine
+
+ my $engine = $module->engine;
+
+Returns the L<Wasm::Wasmtime::Engine> object used by this module.
+
 =head2 store
 
  my $store = $module->store;
+
+[B<Deprecated>: Will be removed in a future version of L<Wasm::Wasmtime>]
 
 Returns the L<Wasm::Wasmtime::Store> object used by this module.
 

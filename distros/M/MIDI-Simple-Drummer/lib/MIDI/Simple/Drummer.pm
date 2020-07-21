@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: An algorithmic MIDI drummer
 
-our $VERSION = '0.0805';
+our $VERSION = '0.0808';
 
 use strict;
 use warnings;
@@ -62,9 +62,6 @@ sub new { # Is there a drummer in the house?
         -pan        => 64,
         -pan_width  => 0,
         -patch      => 0,
-        -power      => 0,
-        -room       => 0,
-        -brushes    => 0,
         -reverb     => 20,
         -chorus     => 0,
         # Rhythm
@@ -139,24 +136,6 @@ sub _setup { # Where's my roadies, Man?
     $self->reverb;
     $self->chorus;
     $self->pan_width;
-
-    # Use the requested kit.
-    if ($self->{-room}) {
-        $self->patch(9);
-    }
-    elsif ($self->{-power}) {
-        $self->patch(17);
-    }
-    elsif ($self->{-brushes}) {
-        $self->patch(41);
-    }
-    if ($self->{-tr808}) {
-        $self->patch(26);
-    }
-    else {
-        # Set to the assigned -patch.
-        $self->patch;
-    }
 
     return $self;
 }
@@ -584,7 +563,7 @@ MIDI::Simple::Drummer - An algorithmic MIDI drummer
 
 =head1 VERSION
 
-version 0.0805
+version 0.0808
 
 =head1 SYNOPSIS
 
@@ -676,9 +655,7 @@ Source, Luke."  Also, check out the included style sub-classes, the F<eg/*>
 files (and the F<*.mid> files they produce).
 
 The default drum kit is the B<exciting> General MIDI Kit.  Fortunately, you can
-import the F<.mid> file into your DAW and reassign better patches.  Using the
-C<-patch> parameter, you can change drum kits (to brushes or TR-808 for
-instance) and also have various extended MIDI voices available.
+import the F<.mid> file into your DAW and reassign better patches.
 
 =head1 METHODS
 
@@ -694,9 +671,6 @@ Return a new C<MIDI::Simple::Drummer> instance with these default arguments:
   -pan        = 64   # 0L .. 64M .. 127R
   -pan_width  = 0    # 0 .. 64 from center
   -patch      = 0    # Drum kit patch number
-  -power      = 0    # A rock kit
-  -room       = 0    # "
-  -brushes    = 0    # A jazz kit
   -reverb     = 20   # Effect 0-127
   -chorus     = 0    # "
   # Rhythm metrics:

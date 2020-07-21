@@ -1,4 +1,5 @@
 CHANGES
+etc/tabs_privileged_callback.patch
 html/Callbacks/RTx-Calendar/Elements/Tabs/Privileged
 html/Elements/CalendarEvent
 html/Elements/MyCalendar

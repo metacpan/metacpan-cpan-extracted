@@ -32,7 +32,10 @@ sub handle_file {
                       . $file->basename
                       . ' test yet.';
 
-        TODO: { ok( $author && $author->name eq 'John Doe' ) }
+        TODO: {
+            no warnings; # Even though this is TODO, it still throws warns...
+            ok( $author && $author->name eq 'John Doe' );
+        }
     }
     else {
         ok( $author && $author->name eq 'John Doe' );

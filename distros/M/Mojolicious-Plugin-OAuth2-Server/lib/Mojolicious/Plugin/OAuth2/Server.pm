@@ -11,7 +11,7 @@ Authorization Server / Resource Server with Mojolicious
 
 =head1 VERSION
 
-0.46
+0.47
 
 =head1 SYNOPSIS
 
@@ -101,7 +101,7 @@ use Mojo::Util qw/ b64_decode url_unescape /;
 use Net::OAuth2::AuthorizationServer;
 use Carp qw/ croak /;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 my ( $AuthCodeGrant,$PasswordGrant,$ImplicitGrant,$ClientCredentialsGrant,$Grant,$JWTCallback );
 
@@ -361,6 +361,13 @@ sub _authorization_request {
 sub _maybe_generate_access_token {
   my ( $self,$mojo_url,$client,$scope,$state,$is_helper,$user_id ) = @_;
 
+	my $access_token_ttl = $Grant->can('get_access_token_ttl')
+		? $Grant->get_access_token_ttl(
+			scopes => $scope,
+			client_id => $client,
+		)
+		: $Grant->access_token_ttl;
+
   my $access_token  = $Grant->token(
     client_id  => $client,
     scopes     => $scope,
@@ -372,7 +379,7 @@ sub _maybe_generate_access_token {
   $Grant->store_access_token(
     client_id         => $client,
     access_token      => $access_token,
-    expires_in        => $Grant->access_token_ttl,
+    expires_in        => $access_token_ttl,
     scopes            => $scope,
     mojo_controller   => $self,
   );
@@ -382,7 +389,7 @@ sub _maybe_generate_access_token {
   my $params = Mojo::Parameters->new(
      access_token => $access_token,
      token_type   => 'bearer',
-     expires_in   => $Grant->access_token_ttl,
+     expires_in   => $access_token_ttl,
      ( $state
        ? ( state => $state )
        : (),
@@ -426,7 +433,13 @@ sub _access_token_request {
 
     $self->app->log->debug( "OAuth2::Server: Generating access token for @{[ ref $client ? $client->{client} : $client ]}" );
 
-    my $expires_in    = $Grant->access_token_ttl;
+	my $access_token_ttl = $Grant->can('get_access_token_ttl')
+		? $Grant->get_access_token_ttl(
+			scopes => $scope,
+			client_id => $client_id,
+		)
+		: $Grant->access_token_ttl;
+
     my $access_token  = $Grant->token(
       client_id => $client,
       scopes    => $scope,
@@ -447,7 +460,7 @@ sub _access_token_request {
       client_id         => $client,
       ( $grant_type ne 'password' ? ( auth_code => $auth_code ) : () ),
       access_token      => $access_token,
-      expires_in        => $expires_in,
+      expires_in        => $access_token_ttl,
       scopes            => $scope,
       ( $grant_type eq 'client_credentials'
         ? ()
@@ -475,7 +488,7 @@ sub _access_token_request {
 
       access_token  => $access_token,
       token_type    => 'Bearer',
-      expires_in    => $expires_in,
+      expires_in    => $access_token_ttl,
       ( $grant_type eq 'client_credentials'
         ? ()
         : ( refresh_token => $refresh_token ),

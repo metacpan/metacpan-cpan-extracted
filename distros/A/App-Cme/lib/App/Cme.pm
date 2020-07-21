@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package App::Cme ;
-$App::Cme::VERSION = '1.031';
+$App::Cme::VERSION = '1.032';
 use strict;
 use warnings;
 use 5.10.1;
@@ -33,7 +33,7 @@ App::Cme - Configuration data checker or editor based on Config::Model
 
 =head1 VERSION
 
-version 1.031
+version 1.032
 
 =head1 AUTHOR
 
@@ -57,22 +57,6 @@ The following websites have more information about this module, and may be of he
 in addition to those websites please use your favorite search engine to discover more resources.
 
 =over 4
-
-=item *
-
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/App-Cme>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/App-Cme>
 
 =item *
 

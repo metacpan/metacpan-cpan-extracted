@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.69';
+our $VERSION = '2.70';
 
 use Carp ();
 use Log::Dispatch::Types;
@@ -306,7 +306,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 =head1 VERSION
 
-version 2.69
+version 2.70
 
 =head1 SYNOPSIS
 
@@ -710,7 +710,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 
@@ -718,7 +718,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Anirvan Chatterjee Carsten Grohmann Doug Bell Graham Knop Ollis Gregory Oschwald hartzell Johann Rolschewski Jonathan Swartz Karen Etheridge Kerin Millar Kivanc Yazan Konrad Bucheli Michael Schout Olaf Alders Olivier Mengué Rohan Carly Ross Attrill Salvador Fandiño Sergey Leschenko Slaven Rezic Steve Bertrand Whitney Jackson
+=for stopwords Anirvan Chatterjee Carsten Grohmann Doug Bell Graham Knop Ollis Gregory Oschwald hartzell Joelle Maslak Johann Rolschewski Jonathan Swartz Karen Etheridge Kerin Millar Kivanc Yazan Konrad Bucheli Michael Schout Olaf Alders Olivier Mengué Rohan Carly Ross Attrill Salvador Fandiño Sergey Leschenko Slaven Rezic Steve Bertrand Whitney Jackson
 
 =over 4
 
@@ -749,6 +749,10 @@ Gregory Oschwald <goschwald@maxmind.com>
 =item *
 
 hartzell <hartzell@alerce.com>
+
+=item *
+
+Joelle Maslak <jmaslak@antelope.net>
 
 =item *
 
@@ -818,7 +822,7 @@ Whitney Jackson <whitney.jackson@baml.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

@@ -61,7 +61,7 @@
          "web" : "https://github.com/haarg/With-Roles"
       }
    },
-   "version" : "0.001001",
+   "version" : "0.001002",
    "x_authority" : "cpan:HAARG",
    "x_breaks" : {},
    "x_serialization_backend" : "JSON::PP version 4.04"

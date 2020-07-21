@@ -55,6 +55,8 @@ set of regression tests, may be considered stable.
 not a list.
 - Unhandled rejections are reported via `warn()`. (See below
 for details.)
+- Undefined or empty rejection values trigger a warning.
+This provides the same value as Perl’s own warning on `die(undef)`.
 - The [Promises/A+ test suite](https://github.com/promises-aplus/promises-tests) avoids testing the case where an “executor”
 function’s resolve callback itself receives another promise, e.g.:
 

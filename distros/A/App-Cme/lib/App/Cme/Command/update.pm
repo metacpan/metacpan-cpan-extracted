@@ -10,7 +10,7 @@
 # ABSTRACT: Update the configuration of an application
 
 package App::Cme::Command::update ;
-$App::Cme::Command::update::VERSION = '1.031';
+$App::Cme::Command::update::VERSION = '1.032';
 use strict;
 use warnings;
 use 5.10.1;
@@ -91,21 +91,44 @@ App::Cme::Command::update - Update the configuration of an application
 
 =head1 VERSION
 
-version 1.031
+version 1.032
 
 =head1 SYNOPSIS
 
-   cme update dpkg-copyright
+   cme update <application>
+   # example: cme update dpkg-copyright
 
 =head1 DESCRIPTION
 
-Update a configuration file. The update is done scanning external resource. For instance,
-the update of dpkg-copyright is done by scanning the headers of source files. (Actually, only
-dpkg-copyright model currently supports updates)
+Update a configuration file. The update is done scanning external
+resource.
 
-Example:
+For instance, C<cme update dpkg-copyright> command can be used to
+update a specific Debian package file (C<debian/copyright>). This is
+done by scanning the headers of source files.
 
-   cme update dpkg-copyright
+Currently, only dpkg-copyright application currently supports updates.
+
+The configuration data (i.e. the content of C<debian/copyright> in
+this example) is mapped to a tree structure inside L<cme>. You can:
+
+=over 4
+
+=item *
+
+view this structure in YAML format by running C<cme dump dpkg-copyright>
+
+=item *
+
+view this structure in Config::Model's format (aka C<cml>) by running
+C<cme dump -format cml dpkg-copyright>. This format is documented in
+L<Config::Model::Loader>.
+
+=item *
+
+get a graphical view with C<cme edit dpkg-copyright>.
+
+=back
 
 =head1 Common options
 

@@ -386,7 +386,37 @@ Number.μ() -> I<Obj>
 
 Return the
 
-Aliases: I<mobius>, I<möbius>, I<moebius>
+Aliases: I<mu>, I<mobius>, I<möbius>, I<moebius>
+
+=cut
+
+=head2 Π
+
+Number.Π() -> I<Obj>
+
+Return the
+
+Aliases: I<prod>
+
+=cut
+
+=head2 π
+
+Number.π() -> I<Obj>
+
+Return the
+
+Aliases: I<pi>
+
+=cut
+
+=head2 Σ
+
+Number.Σ() -> I<Obj>
+
+Return the
+
+Aliases: I<sum>
 
 =cut
 
@@ -400,13 +430,23 @@ Aliases: I<sigma>
 
 =cut
 
-=head2 ϕ
+=head2 τ
 
-Number.ϕ() -> I<Obj>
+Number.τ() -> I<Obj>
 
 Return the
 
-Aliases: I<totient>, I<euler_phi>, I<eulerphi>, I<euler_totient>
+Aliases: I<tau>
+
+=cut
+
+=head2 φ
+
+Number.φ() -> I<Obj>
+
+Return the
+
+Aliases: I<phi>
 
 =cut
 
@@ -1001,6 +1041,22 @@ This function finds a value C<k> such that f(k) <= 0 and f(k+1) > 0. Returns C<n
 
 =cut
 
+=head2 bsearch_max
+
+Number.bsearch_max() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 bsearch_min
+
+Number.bsearch_min() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 bsearch_solve
 
 Number.bsearch_solve() -> I<Obj>
@@ -1021,6 +1077,16 @@ Aliases: I<first>
 
 =cut
 
+=head2 cadd
+
+Number.cadd() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_add>
+
+=cut
+
 =head2 catalan
 
     n.catalan
@@ -1037,6 +1103,16 @@ If two arguments are provided, it returns the C<C(n,k)> entry in Catalan's trian
     n.cbrt
 
 Cube root of C<n>.
+
+=cut
+
+=head2 cdiv
+
+Number.cdiv() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_div>
 
 =cut
 
@@ -1116,6 +1192,26 @@ Example:
 
 =cut
 
+=head2 cinv
+
+Number.cinv() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_inv>
+
+=cut
+
+=head2 cinvmod
+
+Number.cinvmod() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_invmod>
+
+=cut
+
 =head2 circular_permutations
 
 Number.circular_permutations() -> I<Obj>
@@ -1137,6 +1233,26 @@ Return the
 Number.clearbit() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 cmod
+
+Number.cmod() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_mod>
+
+=cut
+
+=head2 cmul
+
+Number.cmul() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_mul>
 
 =cut
 
@@ -1167,6 +1283,22 @@ Return the
 =head2 complex
 
 Number.complex() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 complex_cmp
+
+Number.complex_cmp() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 complex_ipow
+
+Number.complex_ipow() -> I<Obj>
 
 Return the
 
@@ -1250,6 +1382,26 @@ Return the
 
 =cut
 
+=head2 cpow
+
+Number.cpow() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_pow>
+
+=cut
+
+=head2 cpowmod
+
+Number.cpowmod() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_powmod>
+
+=cut
+
 =head2 csc
 
 Number.csc() -> I<Obj>
@@ -1263,6 +1415,16 @@ Return the
 Number.csch() -> I<Obj>
 
 Return the
+
+=cut
+
+=head2 csub
+
+Number.csub() -> I<Obj>
+
+Return the
+
+Aliases: I<complex_sub>
 
 =cut
 
@@ -1348,6 +1510,16 @@ Return the
 
 =cut
 
+=head2 digits2num
+
+Number.digits2num() -> I<Obj>
+
+Return the
+
+Aliases: I<from_digits>
+
+=cut
+
 =head2 digits_sum
 
 Number.digits_sum() -> I<Obj>
@@ -1355,6 +1527,14 @@ Number.digits_sum() -> I<Obj>
 Return the
 
 Aliases: I<sum_digits>, I<sumdigits>
+
+=cut
+
+=head2 dirichlet_hyperbola
+
+Number.dirichlet_hyperbola() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -1544,7 +1724,7 @@ Number.expmod() -> I<Obj>
 
 Return the
 
-Aliases: I<modpow>, I<powmod>
+Aliases: I<powmod>
 
 =cut
 
@@ -1956,8 +2136,6 @@ Number.invmod() -> I<Obj>
 
 Return the
 
-Aliases: I<modinv>
-
 =cut
 
 =head2 ipolygonal_root
@@ -2045,6 +2223,14 @@ Return the
 =head2 is_aks_prime
 
 Number.is_aks_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_almost_prime
+
+Number.is_almost_prime() -> I<Obj>
 
 Return the
 
@@ -2189,6 +2375,14 @@ Return the
 =head2 is_fundamental
 
 Number.is_fundamental() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_gaussian_prime
+
+Number.is_gaussian_prime() -> I<Obj>
 
 Return the
 
@@ -2505,6 +2699,22 @@ Return the
 =head2 is_real
 
 Number.is_real() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_rough
+
+Number.is_rough() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_safe_prime
+
+Number.is_safe_prime() -> I<Obj>
 
 Return the
 
@@ -3078,6 +3288,14 @@ Return the
 
 =cut
 
+=head2 next_palindrome
+
+Number.next_palindrome() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 next_pow
 
 Number.next_pow() -> I<Obj>
@@ -3101,6 +3319,14 @@ Aliases: I<next_power2>
 =head2 next_prime
 
 Number.next_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 next_twin_prime
+
+Number.next_twin_prime() -> I<Obj>
 
 Return the
 
@@ -3224,19 +3450,13 @@ Return the
 
 =cut
 
-=head2 phi
+=head2 pi_k
 
-Number.phi() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 pi
-
-Number.pi() -> I<Obj>
+Number.pi_k() -> I<Obj>
 
 Return the
+
+Aliases: I<k_prime_count>, I<almost_primepi>, I<almost_prime_count>
 
 =cut
 
@@ -3305,6 +3525,16 @@ Number.popcount() -> I<Obj>
 Return the
 
 Aliases: I<hammingweight>
+
+=cut
+
+=head2 power_count
+
+Number.power_count() -> I<Obj>
+
+Return the
+
+Aliases: I<perfect_power_count>
 
 =cut
 
@@ -3548,14 +3778,6 @@ Return the
 
 =cut
 
-=head2 prod
-
-Number.prod() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 psi
 
 Number.psi() -> I<Obj>
@@ -3674,6 +3896,14 @@ Return the
 
 =cut
 
+=head2 random_safe_prime
+
+Number.random_safe_prime() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 random_string
 
 Number.random_string() -> I<Obj>
@@ -3747,6 +3977,14 @@ Return the
 =head2 root
 
 Number.root() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 rough_count
+
+Number.rough_count() -> I<Obj>
 
 Return the
 
@@ -3870,6 +4108,14 @@ Return the
 
 =cut
 
+=head2 smooth_count
+
+Number.smooth_count() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 solve_pell
 
 Number.solve_pell() -> I<Obj>
@@ -3971,14 +4217,6 @@ Return the
 =head2 squarefree_sigma
 
 Number.squarefree_sigma() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 squarefree_sigma0
-
-Number.squarefree_sigma0() -> I<Obj>
 
 Return the
 
@@ -4102,14 +4340,6 @@ Return the
 
 =cut
 
-=head2 sum
-
-Number.sum() -> I<Obj>
-
-Return the
-
-=cut
-
 =head2 superfactorial
 
 Number.superfactorial() -> I<Obj>
@@ -4137,14 +4367,6 @@ Return the
 =head2 tanh
 
 Number.tanh() -> I<Obj>
-
-Return the
-
-=cut
-
-=head2 tau
-
-Number.tau() -> I<Obj>
 
 Return the
 
@@ -4188,6 +4410,16 @@ Aliases: I<to_str>
 
 =cut
 
+=head2 totient
+
+Number.totient() -> I<Obj>
+
+Return the
+
+Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
+
+=cut
+
 =head2 trial_factor
 
 Number.trial_factor() -> I<Obj>
@@ -4226,6 +4458,14 @@ Aliases: I<unitary_divisors>
 
 =cut
 
+=head2 uphi
+
+Number.uphi() -> I<Obj>
+
+Return the
+
+=cut
+
 =head2 usigma
 
 Number.usigma() -> I<Obj>
@@ -4239,6 +4479,8 @@ Return the
 Number.usigma0() -> I<Obj>
 
 Return the
+
+Aliases: I<squarefree_sigma0>
 
 =cut
 

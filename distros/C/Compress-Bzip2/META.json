@@ -4,7 +4,7 @@
       "Rob Janes <arjay@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 8.3508, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.38, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,9 +32,9 @@
       },
       "runtime" : {
          "recommends" : {
-            "Compress::Raw::Bzip2" : "2.060",
+            "Compress::Raw::Bzip2" : "2.094",
             "Compress::Zlib" : "1.19",
-            "IO::Compress::Bzip2" : "2.060"
+            "IO::Compress::Bzip2" : "2.094"
          },
          "requires" : {
             "Carp" : "0",
@@ -57,6 +57,6 @@
          "url" : "https://github.com/rurban/Compress-Bzip2"
       }
    },
-   "version" : "2.27",
-   "x_serialization_backend" : "JSON::PP version 2.97001_04"
+   "version" : "2.28",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

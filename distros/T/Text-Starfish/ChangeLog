@@ -1,5 +1,14 @@
 Revision history for Perl extension Text::Starfish.
 
+1.37 18 Jul 2020
+ - documentation improvements
+ - renaming setStyle to set_style and making it method/function
+ - adding hook types (ht) more systematically
+ - changing style id .html.sfish to html.sfish
+ - added 23-methods test
+ - corrected the LICENSE field in Makefile.PL and removed META.yml since
+   it is automatically generated; thanks to pull request from Mohammad S Anwar
+
 1.36 9 Jul 2020
  - documentation improvements
  - added test 22-hooks in order to more thoroughly test hooks

@@ -1,5 +1,5 @@
 package MIDI::Simple::Drummer::Rudiments;
-$MIDI::Simple::Drummer::Rudiments::VERSION = '0.0805';
+$MIDI::Simple::Drummer::Rudiments::VERSION = '0.0808';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -962,7 +962,7 @@ MIDI::Simple::Drummer::Rudiments
 
 =head1 VERSION
 
-version 0.0805
+version 0.0808
 
 =head1 SYNOPSIS
 

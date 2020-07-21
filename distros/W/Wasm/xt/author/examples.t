@@ -13,6 +13,7 @@ foreach my $example (map { bsd_glob "examples/$_/*.pl" } qw( synopsis wasmtime w
   script_runs $example, { stdout => \$out, stderr => \$err };
   note "[out]\n$out" if $out ne '';
   note "[err]\n$err" if $err ne '';
+  unlike $err, qr/deprecated/, "no deprecation warnings ($example)";
 }
 
 done_testing;

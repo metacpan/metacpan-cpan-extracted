@@ -12,6 +12,7 @@ script/complete-acme-metasyntactic-meta-category
 script/complete-acme-metasyntactic-meta-theme
 script/complete-acme-metasyntactic-meta-theme-and-category
 script/complete-array-elem
+script/complete-chrome-profile-name
 script/complete-country-code
 script/complete-currency-code
 script/complete-cwalitee-indicator

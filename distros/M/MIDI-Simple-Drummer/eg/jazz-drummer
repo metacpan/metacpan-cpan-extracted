@@ -7,7 +7,6 @@ my $d = MIDI::Simple::Drummer::Jazz->new(
     -bpm     => shift || 111,
     -volume  => shift || 121,
     -phrases => shift || 4,
-    -brushes => 1,
     -file    => "$0.mid",
     -signature => '3/4',
 );

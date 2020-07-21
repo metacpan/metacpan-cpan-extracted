@@ -58,7 +58,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.56';
+our $VERSION  = '8.57';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -123,7 +123,8 @@ sub dispatch {
 
   # Routes
   $plugins->emit_hook(before_routes => $c);
-  $c->helpers->reply->not_found unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code;
+  $c->helpers->reply->not_found
+    unless $tx->res->code || $self->routes->dispatch($c) || $tx->res->code || $c->stash->{'mojo.rendered'};
 }
 
 sub handler {
@@ -941,7 +942,7 @@ Daniel Mantovani
 
 Danijel Tasov
 
-Dagfinn Ilmari Mannsåker
+Dagfinn Ilmari Manns�ker
 
 Danny Thomas
 

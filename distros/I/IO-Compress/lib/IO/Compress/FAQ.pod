@@ -658,7 +658,7 @@ file.
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs//issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=>.
 

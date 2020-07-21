@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ExcelFeed;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ inline HTML reports.
 
 =head1 RT VERSION
 
-Works with RT 4.2, 4.4
+Works with RT 4.2.10+, 4.4, 5.0
 
 =head1 INSTALLATION
 
@@ -35,13 +35,13 @@ May need root permissions
 
 =item patch RT
 
-The following patches are also needed. Note the versions and only apply
-the patches needed for your version.
+The following patches are also needed for RT prior to 4.4.2. Note the
+versions and only apply the patches needed for your version.
 
 Only run these the first time you install this module. If upgrading, install
 any patches that were not previously applied.
 
-Apply for both 4.2 and 4.4.0. Not needed for 4.4.1 or later:
+Apply for both 4.2 and 4.4.0. Not needed for 4.4.1:
 
     patch -p1 -d /path/to/rt < etc/subscription_callbacks.patch
 
@@ -49,21 +49,17 @@ Apply for 4.2 and 4.4.0. Not needed for 4.2.13 or later, or 4.4.1.
 
     patch -p1 -d /path/to/rt < etc/chart_callback.patch
 
-Apply for 4.2:
+Apply for 4.2, 4.4.0 and 4.4.1:
 
     patch -p1 -d /path/to/rt < etc/tabs_privileged_callback.patch
 
-Apply for 4.4:
-
-    patch -p1 -d /path/to/rt < etc/tabs_privileged_callback_44.patch
-
-=item Add this line to F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Add this line to F</opt/rt5/etc/RT_SiteConfig.pm>
 
     Plugin('RT::Extension::ExcelFeed');
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -85,7 +81,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2015-2018 by Best Practical Solutions, LLC
+This software is Copyright (c) 2015-2020 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

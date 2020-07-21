@@ -5,15 +5,15 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.094 qw(:Status );
-use IO::Compress::Zlib::Constants 2.094 ;
+use IO::Compress::Base::Common  2.095 qw(:Status );
+use IO::Compress::Zlib::Constants 2.095 ;
 
-use IO::Uncompress::RawInflate  2.094 ;
+use IO::Uncompress::RawInflate  2.095 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $InflateError);
 
-$VERSION = '2.094';
+$VERSION = '2.095';
 $InflateError = '';
 
 @ISA    = qw(IO::Uncompress::RawInflate Exporter);
@@ -936,7 +936,7 @@ C<InputLength> option in the constructor.
 
 =head1 Importing
 
-No symbolic constants are required by this IO::Uncompress::Inflate at present.
+No symbolic constants are required by IO::Uncompress::Inflate at present.
 
 =over 5
 
@@ -957,7 +957,7 @@ See L<IO::Compress::FAQ|IO::Compress::FAQ/"Compressed files and Net::FTP">
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/IO-Compress/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress>.
 

@@ -10,6 +10,7 @@ my $valid_source = 'file://' . "$FindBin::Bin/sources/valid.html";
 my $escaped_source = 'file://' . "$FindBin::Bin/sources/escaped.html";
 my $invalid_source = 'file://' . "$FindBin::Bin/sources/invalid.html";
 my $nonexistent_source = 'file://' . "$FindBin::Bin/sources/nothing-here.html";
+my $authored_source = 'file://' . "$FindBin::Bin/authorship_test_cases/h-entry_with_p-author_h-card.html";
 
 my $target = "http://example.com/webmention-target";
 
@@ -72,6 +73,24 @@ is ( scalar @webmentions, 2, "Extracted correct number of outgoing webmentions f
 is ( $webmentions[0]->source, $source, "Source looks good.");
 is ( $webmentions[0]->target, $target, "First target looks good.");
 is ( $webmentions[1]->target, 'http://example.com/some-other-target', "Second target looks good.");
+
+my $authored_wm = Web::Mention->new(
+    source => $authored_source,
+    target => $target,
+);
+
+ok ($authored_wm->author, 'Authored webmention has an author object.');
+is ($authored_wm->author->name, 'John Doe',
+    'Authored webmention has correct author name.'
+);
+
+is ($valid_wm->author->name, undef,
+    'Webmention with no author info has no author name.'
+);
+
+is ($nonexistent_wm->author->name, undef,
+    'Webmention with no source document has no author name.'
+);
 
 done_testing();
 

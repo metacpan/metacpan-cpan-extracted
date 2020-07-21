@@ -19,6 +19,7 @@ name: App-DumpFirefoxHistory
 requires:
   DBD::SQLite: '0'
   DBI: '0'
+  Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
@@ -40,7 +41,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DumpFirefoxHistory
   homepage: https://metacpan.org/release/App-DumpFirefoxHistory
   repository: git://github.com/perlancar/perl-App-DumpFirefoxHistory.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

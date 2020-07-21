@@ -52,7 +52,7 @@ my %tests= (
     },
     cannot_reject_and_resolve => sub {
         my $d= deferred;
-        $d->reject;
+        $d->reject(1);
         eval { $d->resolve; fail; };
         expect_reject($d->promise);
     },
@@ -67,17 +67,17 @@ my %tests= (
     },
     rejected_state_must_not_change => sub {
         my $d= deferred;
-        $d->reject;
+        $d->reject(1);
         eval { $d->resolve; fail; };
         expect_reject($d->promise);
     },
     rejected_immediately => sub {
-        expect_reject(rejected());
+        expect_reject(rejected(0));
     },
     rejected_delayed => sub {
         my $d= deferred;
         delayed(0.1, sub {
-            $d->reject;
+            $d->reject(0);
         });
         expect_reject($d->promise);
     },
@@ -95,10 +95,10 @@ my %tests= (
         expect_reject(resolved->then({}));
     },
     reject_with_garbage => sub {
-        expect_reject(rejected->catch(5));
+        expect_reject(rejected(1)->catch(5));
     },
     reject_with_named_function => sub {
-        expect_reject(rejected->catch("main::fail"));
+        expect_reject(rejected(1)->catch("main::fail"));
     },
     finally_with_garbage => sub {
         expect_reject(resolved->finally(123));
@@ -341,7 +341,7 @@ my %tests= (
             $d
         })->catch(sub {
             is_deeply($_[0], 5);
-            is_deeply($_[1], 6);
+            is_deeply($_[1], 6) or diag explain [@_];
         });
     },
     can_handle_crazy_thenable => sub {

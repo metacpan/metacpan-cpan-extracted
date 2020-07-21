@@ -1,3 +1,4 @@
+use lib '.';
 use inc::Module::Install;
 
 RTx 'RT-Extension-ExcelFeed';
@@ -6,8 +7,8 @@ readme_from 'lib/RT/Extension/ExcelFeed.pm';
 license  'gplv2';
 
 requires 'Excel::Writer::XLSX';
-requires_rt '4.2.0';
-rt_too_new '4.6.0';
+requires_rt '4.2.10';
+rt_too_new '5.2.0';
 
 sign;
 WriteAll;

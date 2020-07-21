@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-Tree
 
+1.12    Thu, 16 Jul 2020 18:41:09 +0200
+        - minor change in contains(), return s now the outermost block and not just true
+
+1.11    Thu, 16 Jul 2020 18:41:09 +0200
+        - bugfix: in lookup()
+
 1.10    Fri, 22 May 2020 00:23:43 +0200
         - remove dependency for namespace::clean
 

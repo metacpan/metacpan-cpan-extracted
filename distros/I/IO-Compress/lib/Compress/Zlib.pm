@@ -7,17 +7,17 @@ use Carp ;
 use IO::Handle ;
 use Scalar::Util qw(dualvar);
 
-use IO::Compress::Base::Common 2.094 ;
-use Compress::Raw::Zlib 2.094 ;
-use IO::Compress::Gzip 2.094 ;
-use IO::Uncompress::Gunzip 2.094 ;
+use IO::Compress::Base::Common 2.095 ;
+use Compress::Raw::Zlib 2.095 ;
+use IO::Compress::Gzip 2.095 ;
+use IO::Uncompress::Gunzip 2.095 ;
 
 use strict ;
 use warnings ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, @EXPORT_OK, %EXPORT_TAGS);
 
-$VERSION = '2.094';
+$VERSION = '2.095';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
@@ -461,7 +461,7 @@ sub inflate
 
 package Compress::Zlib ;
 
-use IO::Compress::Gzip::Constants 2.094 ;
+use IO::Compress::Gzip::Constants 2.095 ;
 
 sub memGzip($)
 {
@@ -1469,7 +1469,7 @@ of I<Compress::Zlib>.
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/IO-Compress/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=IO-Compress>.
 

@@ -97,6 +97,8 @@ sub clipboard_show ($%) {
 1;
 __END__
 
+=back
+
 =head1 EXPORTS
 
 Nothing.

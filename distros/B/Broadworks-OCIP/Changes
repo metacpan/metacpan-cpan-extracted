@@ -1,3 +1,10 @@
+0.09      2020-07-20 19:31:31+01:00 Europe/London
+    - Updated packaging and distribution info
+    - Added travis CI config
+    - Switch Method::Signatures for Function::Parameters
+    - Remove the Redcentric role which is MooseX::App specific and
+      should never have been originally packaged.
+
 0.08      2018-06-25 17:03:25+01:00 Europe/London
     - Updated for more recent dependancies
 

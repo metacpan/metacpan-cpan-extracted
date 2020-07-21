@@ -12,6 +12,7 @@ my @files = (
     'lib/App/Deps/Verify/App/VerifyDeps.pm',
     'lib/App/Deps/Verify/App/VerifyDeps/Command/plinst.pm',
     'lib/App/Deps/Verify/App/VerifyDeps/Command/plupdatetask.pm',
+    'lib/App/Deps/Verify/App/VerifyDeps/Command/py3list.pm',
     'lib/App/Deps/Verify/App/VerifyDeps/Command/verify.pm',
     't/00-compile.t'
 );

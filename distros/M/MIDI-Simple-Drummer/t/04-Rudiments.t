@@ -4,7 +4,7 @@ use warnings;
 
 use Test::More;
 
-BEGIN { use_ok('MIDI::Simple::Drummer::Rudiments') }
+use_ok 'MIDI::Simple::Drummer::Rudiments';
 
 my $d = new_ok 'MIDI::Simple::Drummer::Rudiments' => [
     -bpm => 60,

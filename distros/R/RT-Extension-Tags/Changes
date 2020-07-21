@@ -1,5 +1,10 @@
 Revision history for RT-Extension-Tags
 
+0.05 2020-07-17
+
+ - Put "make initdb" after enabling the plugin in doc
+ - Make it work with RT 5.0
+
 0.04 2017-02-20
 
  - Update tag input elements to be consistent with usage in RT 4.2, 4.4

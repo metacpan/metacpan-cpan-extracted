@@ -10,14 +10,10 @@ use constant RhostClass => {
     qr/(?:aspmx|gmail-smtp-in)[.]l[.]google[.]com\z/  => 'GoogleApps',
     qr/[.]email[.]ua\z/                               => 'IUA',
     qr/[.](?:ezweb[.]ne[.]jp|au[.]com)\z/             => 'KDDI',
+    qr/charter[.]net/                                 => 'Spectrum',
+    qr/cox[.]net/                                     => 'Cox',
     qr/mx[0-9]+[.]qq[.]com\z/                         => 'TencentQQ',
 };
-
-sub list {
-    # Retrun the list of remote hosts Sisimai support
-    # @return   [Array] Remote host list
-    return [keys %{ RhostClass() }];
-}
 
 sub match {
     # The value of "rhost" is listed in RhostClass or not
@@ -41,12 +37,13 @@ sub match {
 sub get {
     # Detect the bounce reason from certain remote hosts
     # @param    [Sisimai::Data] argvs   Parsed email object
+    # @param    [String]        proxy   The alternative of the "rhost"
     # @return   [String]                The value of bounce reason
     my $class = shift;
-    my $argvs = shift // return undef;
-    return undef unless ref $argvs eq 'Sisimai::Data';
+    my $argvs = shift || return undef;
+    my $proxy = shift || undef;
 
-    my $remotehost = lc $argvs->rhost;
+    my $remotehost = $proxy || lc $argvs->rhost;
     my $rhostclass = '';
 
     for my $e ( keys %{ RhostClass() } ) {
@@ -83,11 +80,6 @@ is listed in the results of Sisimai::Rhost->list() method.
 This class is called only Sisimai::Data class.
 
 =head1 CLASS METHODS
-
-=head2 C<B<list()>>
-
-Return the list of remote hosts which is supported by Sisimai for detecting the
-reason of bounce from major email services.
 
 =head2 C<B<match(I<remote host>)>>
 

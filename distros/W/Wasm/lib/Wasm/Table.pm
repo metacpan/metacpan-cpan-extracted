@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Interface to WebAssembly Tables
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Wasm::Table - Interface to WebAssembly Tables
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 DESCRIPTION
 

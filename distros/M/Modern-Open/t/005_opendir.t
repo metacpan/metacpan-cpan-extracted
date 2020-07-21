@@ -8,8 +8,8 @@ use Modern::Open;
 
 my $rc = 0;
 
-$rc = opendir(DIR,'.');
-ok($rc, q{opendir(DIR,'.')});
+eval { $rc = opendir(DIR,'.'); };
+ok($@, q{opendir(DIR,'.')});
 if ($rc) {
     local $_ = fileno(DIR);
     closedir(DIR);

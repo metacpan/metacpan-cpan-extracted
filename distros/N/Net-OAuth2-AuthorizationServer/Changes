@@ -1,6 +1,9 @@
 Revision history for Net-OAuth2-AuthorizationServer
 
-0.24     2020-05-06
+0.26     2020-07-20
+        - Allow access_token_ttl to be passed as callback
+
+0.25     2020-05-06
         - Add "FURTHER READING" section to Manual
 
         - Audit code from "OAuth 2.0 Security Best Current Practice" draft

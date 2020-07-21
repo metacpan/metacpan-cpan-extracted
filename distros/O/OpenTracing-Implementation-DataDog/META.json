@@ -36,6 +36,7 @@
             "Exporter" : "0",
             "HTTP::Request" : "0",
             "HTTP::Response::Maker" : "0",
+            "Hash::Merge" : "0",
             "JSON::MaybeXS" : "0",
             "LWP::UserAgent" : "0",
             "Moo" : "0",
@@ -44,7 +45,7 @@
             "MooX::Enumeration" : "0",
             "MooX::HandlesVia" : "0",
             "OpenTracing::Implementation" : "0.03",
-            "OpenTracing::Role" : "v0.82.0",
+            "OpenTracing::Role" : "v0.84.0",
             "PerlX::Maybe" : "0",
             "Ref::Util" : "0",
             "Sub::Trigger::Lock" : "0",
@@ -70,6 +71,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.41.2",
+   "version" : "v0.42.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

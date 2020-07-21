@@ -1,3 +1,10 @@
+0.009   2020-07-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Search for 'firefox' in addition to 'firefox-bin' for firefox
+	  processes, because in some OS like FreeBSD the binary is firefox
+	  not firefox-bin (GH#1).
+
+
 0.008   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Make %argopt_{firefox,chrome,opera,vivaldi}_cmd available.

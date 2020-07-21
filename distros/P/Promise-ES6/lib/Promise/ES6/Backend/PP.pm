@@ -74,6 +74,20 @@ sub new {
     };
 
     my $rejecter = sub {
+        if (!defined $_[0]) {
+            my $msg;
+
+            if (@_) {
+                $msg = "$class: Uninitialized rejection value given";
+            }
+            else {
+                $msg = "$class: No rejection value given";
+            }
+
+            require Carp;
+            Carp::carp($msg);
+        }
+
         $$value_sr = $_[0];
         bless $value_sr, _REJECTION_CLASS();
 
@@ -304,7 +318,9 @@ sub _settle_now {
 }
 
 sub DESTROY {
-    return if $$ != $_[0][_PID_IDX];
+
+    # The PID should always be there, but this accommodates mocks.
+    return unless $_[0][_PID_IDX] && $$ == $_[0][_PID_IDX];
 
     if ( $_[0][_DETECT_LEAK_IDX] && ${^GLOBAL_PHASE} && ${^GLOBAL_PHASE} eq 'DESTRUCT' ) {
         warn( ( '=' x 70 ) . "\n" . 'XXXXXX - ' . ref( $_[0] ) . " survived until global destruction; memory leak likely!\n" . ( "=" x 70 ) . "\n" );

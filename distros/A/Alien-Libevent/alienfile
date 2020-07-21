@@ -7,6 +7,10 @@ plugin 'PkgConfig' => 'libevent';
 # installing it.
 share {
 
+  plugin 'Build::SearchDep' => (
+    aliens => [qw( Alien::OpenSSL )],
+  );
+
   start_url 'https://libevent.org/';
   plugin 'Download' => (
     filter => qr/^libevent-.*-stable\.tar\.gz$/,

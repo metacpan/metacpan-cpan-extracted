@@ -69,7 +69,7 @@ sub mclist {
                 
                 $tree->insert('', 'end', -values => [$country, $capital, $currency]);
                 
-                # Auto-set length of field basd on data init
+                # Auto-set length of field based on data init
                 my %rowLookup; # Hash for quick lookup
                 @rowLookup{qw/ country capital currency /} = ($country, $capital, $currency);
                 foreach my $col (qw/ country capital currency /){

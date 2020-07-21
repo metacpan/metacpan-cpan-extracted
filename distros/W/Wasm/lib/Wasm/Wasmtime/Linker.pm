@@ -8,12 +8,13 @@ use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::Extern;
 use Wasm::Wasmtime::Instance;
 use Wasm::Wasmtime::WasiInstance;
+use Wasm::Wasmtime::Func;
 use Wasm::Wasmtime::Trap;
 use Ref::Util qw( is_blessed_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime linker class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasmtime_linker_';
@@ -86,17 +87,32 @@ $ffi->attach( instantiate => ['wasmtime_linker_t','wasm_module_t','opaque*','opa
   if($trap)
   {
     $trap = Wasm::Wasmtime::Trap->new($trap);
-    Carp::croak($trap->message);
+    die $trap;
   }
   elsif($ptr)
   {
     return Wasm::Wasmtime::Instance->new(
-      $module, $ptr,
+      $module, $self->store, $ptr,
     );
   }
   else
   {
     Carp::croak("unknown instantiate error");
+  }
+});
+
+
+$ffi->attach( get_default => ['wasmtime_linker_t','wasm_byte_vec_t*','opaque*'] => 'wasmtime_error_t' => sub {
+  my($xsub, $self, $name) = @_;
+  my $vname = Wasm::Wasmtime::ByteVec->new($name);
+  my $ptr;
+  if(my $error = $xsub->($self, $vname, \$ptr))
+  {
+    Carp::croak($error->message);
+  }
+  else
+  {
+    return $ptr ? Wasm::Wasmtime::Func->new($ptr, $self) : undef;
   }
 });
 
@@ -119,7 +135,7 @@ Wasm::Wasmtime::Linker - Wasmtime linker class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -260,6 +276,12 @@ Define WebAssembly instance.
  );
 
 Instantiate the module using the linker.  Returns the new L<Wasm::Wasmtime::Instance> object.
+
+=head2 get_default
+
+ my $func = $linker->get_default($name);
+
+Acquires the "default export" of the named module in this linker.  Returns a L<Wasm::Wasmtime::Func>.
 
 =head2 store
 

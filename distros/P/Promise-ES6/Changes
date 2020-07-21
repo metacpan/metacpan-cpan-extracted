@@ -1,5 +1,8 @@
 Revision history for Perl module Promise::ES6
 
+0.23 Wed 15 July 2020
+- Undefined or missing rejection values now trigger a warning.
+
 0.22 Sun 19 Apr 2020
 - BUG FIX: finally() within a callback no longer produces
   action-at-a-distance bugs from reuse of package variables.

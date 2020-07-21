@@ -1,6 +1,6 @@
 package WebService::Hexonet::Connector;
 
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector::APIClient;
@@ -12,7 +12,7 @@ use WebService::Hexonet::Connector::ResponseTemplate;
 use WebService::Hexonet::Connector::ResponseTemplateManager;
 use WebService::Hexonet::Connector::SocketConfig;
 
-use version 0.9917; our $VERSION = version->declare('v2.9.2');
+use version 0.9917; our $VERSION = version->declare('v2.10.0');
 
 1;
 

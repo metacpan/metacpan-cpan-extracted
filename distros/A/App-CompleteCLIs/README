@@ -2,8 +2,8 @@ NAME
     App::CompleteCLIs - CLI wrappers for complete_*() functions
 
 VERSION
-    This document describes version 0.144 of App::CompleteCLIs (from Perl
-    distribution App-CompleteCLIs), released on 2020-04-18.
+    This document describes version 0.145 of App::CompleteCLIs (from Perl
+    distribution App-CompleteCLIs), released on 2020-04-19.
 
 SYNOPSIS
 DESCRIPTION
@@ -18,6 +18,8 @@ DESCRIPTION
     *   complete-acme-metasyntactic-meta-theme-and-category
 
     *   complete-array-elem
+
+    *   complete-chrome-profile-name
 
     *   complete-country-code
 

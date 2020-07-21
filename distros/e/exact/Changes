@@ -1,5 +1,8 @@
 Revision history for exact
 
+1.13      2020-07-17 20:16:34-07:00 America/Los_Angeles
+        - Fix for "use open" not being exported
+
 1.12      2019-11-05 09:17:12-08:00 America/Los_Angeles
         - Fix for Carp methods not being exported properly
 

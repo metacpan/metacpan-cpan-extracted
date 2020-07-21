@@ -39,6 +39,7 @@ t/3xBUFRSYNOP-com.bufr
 t/3xBUFRSYNOP-com.bufr_altered
 t/3xBUFRSYNOP-com.txt
 t/3xBUFRSYNOP-com_filtered.txt
+t/3xBUFRSYNOP-com_filtered.txt2
 t/associated.bufr
 t/associated.txt
 t/BUFRBUFR.bufr
@@ -62,6 +63,7 @@ t/extract.bufr3
 t/extract.txt1
 t/extract.txt2
 t/filter
+t/filter2
 t/firstorderstat.bufr
 t/firstorderstat.txt
 t/firstorderstat.txt_all
@@ -101,6 +103,7 @@ t/multiple_qc_vary.txt
 t/multiple_qc_vary.txt_bitmap
 t/noexpand.txt
 t/param
+t/param2
 t/retained.bufr
 t/retained.txt
 t/set_filter.bufr

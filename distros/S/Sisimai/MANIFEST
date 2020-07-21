@@ -120,12 +120,14 @@ lib/Sisimai/Reason/UserUnknown.pm
 lib/Sisimai/Reason/Vacation.pm
 lib/Sisimai/Reason/VirusDetected.pm
 lib/Sisimai/Rhost.pm
+lib/Sisimai/Rhost/Cox.pm
 lib/Sisimai/Rhost/ExchangeOnline.pm
 lib/Sisimai/Rhost/FrancePTT.pm
 lib/Sisimai/Rhost/GoDaddy.pm
 lib/Sisimai/Rhost/GoogleApps.pm
 lib/Sisimai/Rhost/IUA.pm
 lib/Sisimai/Rhost/KDDI.pm
+lib/Sisimai/Rhost/Spectrum.pm
 lib/Sisimai/Rhost/TencentQQ.pm
 lib/Sisimai/SMTP.pm
 lib/Sisimai/SMTP/Error.pm
@@ -600,6 +602,7 @@ set-of-emails/maildir/bsd/rfc3834-01.eml
 set-of-emails/maildir/bsd/rfc3834-02.eml
 set-of-emails/maildir/bsd/rfc3834-03.eml
 set-of-emails/maildir/bsd/rfc3834-04.eml
+set-of-emails/maildir/bsd/rhost-cox-01.eml
 set-of-emails/maildir/bsd/rhost-exchange-online-01.eml
 set-of-emails/maildir/bsd/rhost-exchange-online-02.eml
 set-of-emails/maildir/bsd/rhost-exchange-online-03.eml
@@ -620,6 +623,7 @@ set-of-emails/maildir/bsd/rhost-google-apps-02.eml
 set-of-emails/maildir/bsd/rhost-iua-01.eml
 set-of-emails/maildir/bsd/rhost-kddi-01.eml
 set-of-emails/maildir/bsd/rhost-kddi-02.eml
+set-of-emails/maildir/bsd/rhost-spectrum-01.eml
 set-of-emails/maildir/bsd/rhost-tencentqq-01.eml
 set-of-emails/maildir/bsd/rhost-tencentqq-02.eml
 set-of-emails/maildir/bsd/rhost-tencentqq-03.eml
@@ -827,6 +831,8 @@ t/304-rhost-franceptt.t
 t/305-rhost-kddi.t
 t/306-rhost-tencentqq.t
 t/307-rhost-iua.t
+t/308-rhost-spectrum.t
+t/309-rhost-cox.t
 t/400-callback-base64.t
 t/500-data.t
 t/501-data-json.t

@@ -65,7 +65,7 @@ sub display ($@) {
 1;
 __END__
 
-=over
+=back
 
 =head1 EXPORTS
 

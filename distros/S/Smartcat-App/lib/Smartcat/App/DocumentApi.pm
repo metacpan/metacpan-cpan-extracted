@@ -49,6 +49,9 @@ sub update_document {
     $args{disassemble_algorithm_name} =
       $self->{rundata}->{disassemble_algorithm_name}
       if defined $self->{rundata}->{disassemble_algorithm_name};
+    $args{preset_disassemble_algorithm} =
+      $self->{rundata}->{preset_disassemble_algorithm}
+      if defined $self->{rundata}->{preset_disassemble_algorithm};
 
     my $document = eval { $self->{api}->document_update(%args) };
     die $log->error(

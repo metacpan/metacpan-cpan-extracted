@@ -19,8 +19,9 @@ sub print_wasm_string
   print cstring($ptr + $memory->data);
 }
 
+my $store = Wasm::Wasmtime::Store->new;
 my $instance = Wasm::Wasmtime::Instance->new(
-  Wasm::Wasmtime::Module->new(wat => q{
+  Wasm::Wasmtime::Module->new($store, wat => q{
     (module
       (import "" "print_wasm_string" (func $print_wasm_string (param i32)))
       (func (export "run")
@@ -31,6 +32,7 @@ my $instance = Wasm::Wasmtime::Instance->new(
       (data (i32.const 0) "Hello, world!\n\00")
     )
   }),
+  $store,
   [\&print_wasm_string],
 );
 

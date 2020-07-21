@@ -59,5 +59,7 @@ t/Tracer/10_get_scope_manager.t
 t/Tracer/11_get_active_span.t
 t/Tracer/12_start_span.t
 t/Tracer/13_start_active_span.t
+t/Tracer/14_extract_context.t
+t/Tracer/14_inject_context.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

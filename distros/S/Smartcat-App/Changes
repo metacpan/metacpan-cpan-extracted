@@ -1,4 +1,26 @@
 Revision history for Smartcat-App
 
+0.0.3  2020-07-20 22:40:42 UTC
+        - Set up version of Smartcat::Client => 0.0.2
+
+0.0.2  2020-07-20 17:05:58 UTC
+        - Added `base_url` parameter to allow
+          overriding the base API URL.
+        - Changed config directory name.
+          It requires to set up the config again.
+        - Skip uploading of empty .po files since
+          Smarcat doesn't support empty files.
+        - Added `file_type` parameter to process
+          different file types separatelly.
+        - Added `skip_missing` parameter to `pull` command
+          not to create missing files in a local directory.
+        - Added `delete_not_existing` to `push` command
+          to delete documents in Smarcat if they don't exist
+          in a local directory.
+        - Added `preset_disassemble_algorithm` parameter
+          to set a custom preset for XML disassemble algorithm.
+        - Set external tag `source:Serge` for all projects
+          before pushing them to Smartcat.
+
 0.0.1  2018-10-04 20:56:41 UTC
         - Initial release

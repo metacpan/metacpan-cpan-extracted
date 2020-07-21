@@ -1,6 +1,10 @@
 Change history for MySQL::Workbench::DBIC
 =========================================
 
+1.20 2020-07-17 11:59:00
+
+  * Create classes for views
+
 1.19 2020-06-01 16:46:00
 
   * Bugfixes for remove_table_prefix

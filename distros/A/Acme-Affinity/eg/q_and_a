@@ -73,40 +73,24 @@ my $questions = [
       a => ['say I love you', 'meet the in-laws'] },
 ];
 
-my $you = [
-    ['parents', 'parents', 'mandatory'],
-    ['jokes', 'jokes', 'mandatory'],
-    ['here', 'here', 'mandatory'],
-    ['reviews', 'reviews', 'mandatory'],
-    ['yes', 'yes', 'mandatory'],
-    ['staying home', 'staying home', 'mandatory'],
-    ['here', 'here', 'mandatory'],
-    ['nice', 'nice', 'mandatory'],
-    ['hiking', 'hiking', 'mandatory'],
-    ['stripper', 'stripper', 'mandatory'],
-    ['desert', 'desert', 'mandatory'],
-    ['vodka', 'vodka', 'mandatory'],
-    ['french', 'french', 'mandatory'],
-    ['sky dive', 'sky dive', 'mandatory'],
-    ['lettuce, tomato, onion', 'lettuce, tomato, onion', 'mandatory'],
-    ['Black Sabbath', 'Black Sabbath', 'mandatory'],
-    ['guitar', 'guitar', 'mandatory'],
-    ['mom', 'mom', 'mandatory'],
-    ['say I love you', 'say I love you', 'mandatory'],
-    ['say I love you', 'say I love you', 'mandatory'],
-];
+# Set you to a purposfully strict set of answers
+my $you = [ map { [ $_->{a}[0], $_->{a}[0], 'mandatory' ] } sort { $a->{i} <=> $b->{i} } @$questions ];
 
-my %answers = (); # Bucket for the indexed answers
+my %answers = (); # Bucket for the indexed "me" answers
 
 my $affinity = Acme::Affinity->new;
 
 my @importance = sort { $affinity->importance->{$a} <=> $affinity->importance->{$b} } keys %{ $affinity->importance };
 
+my $i = 0;
+
 for my $question (shuffle @$questions) {
+    $i++;
+
     my @answer = ();
 
     my $tc = Term::Choose->new({
-        prompt       => $question->{q},
+        prompt       => "$i. $question->{q}",
         clear_screen => 1,
     });
     my $choice = $tc->choose($question->{a});

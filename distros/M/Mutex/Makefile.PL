@@ -1,7 +1,7 @@
 
 # Module makefile for Mutex (using ExtUtils::MakeMaker)
 
-use 5.008;
+use 5.008001;
 use strict;
 use warnings;
 
@@ -11,17 +11,19 @@ WriteMakefile(
    ABSTRACT => 'Various locking implementations supporting processes and threads',
    AUTHOR   => 'Mario E. Roy <marioeroy AT gmail DOT com>',
    NAME     => 'Mutex',
-   VERSION  => '1.005',
+   VERSION  => '1.006',
 
    NO_META  => 1,
 
    PREREQ_PM => {
-      'base'     => 0,
-      'strict'   => 0,
-      'warnings' => 0,
-      'Carp'     => 0,
-      'Fcntl'    => 0,
-      'Socket'   => 0
+      'base'       => 0,
+      'strict'     => 0,
+      'warnings'   => 0,
+      'Carp'       => 0,
+      'Errno'      => 0,
+      'Fcntl'      => 0,
+      'IO::Handle' => 0,
+      'Socket'     => 0
    },
 
    ((!eval { ExtUtils::MakeMaker->VERSION(6.25) } ) ?
@@ -45,25 +47,25 @@ WriteMakefile(
          'provides' => {
             'Mutex' => {
                'file'    => 'lib/Mutex.pm',
-               'version' => '1.005'
+               'version' => '1.006'
             },
             'Mutex::Channel' => {
                'file'    => 'lib/Mutex/Channel.pm',
-               'version' => '1.005'
+               'version' => '1.006'
             },
             'Mutex::Flock' => {
                'file'    => 'lib/Mutex/Flock.pm',
-               'version' => '1.005'
+               'version' => '1.006'
             },
             'Mutex::Util' => {
                'file'    => 'lib/Mutex/Util.pm',
-               'version' => '1.005'
+               'version' => '1.006'
             }
          }
       } ) : () ),
 
    (( eval { ExtUtils::MakeMaker->VERSION(6.48) } ) ?
-      ( MIN_PERL_VERSION => 5.008 ) : () ),
+      ( MIN_PERL_VERSION => 5.008001 ) : () ),
 
    INSTALLDIRS => ( ($] < 5.011) ? 'perl' : 'site' )
 );

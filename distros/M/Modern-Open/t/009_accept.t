@@ -9,9 +9,8 @@ use Socket;
 
 my $rc = 0;
 
-
-$rc = socket(PROTOSOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp'));
-ok($rc, q{socket(PROTOSOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp'))});
+eval { $rc = socket(PROTOSOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp')); };
+ok($@, q{socket(PROTOSOCKET,PF_INET,SOCK_STREAM,getprotobyname('tcp'))});
 
 if ($^O =~ /cygwin/) {
     for (2..6) {
@@ -26,8 +25,8 @@ elsif (not CORE::accept(SOCKET,PROTOSOCKET)) {
     exit;
 }
 
-$rc = accept(SOCKET,PROTOSOCKET);
-ok($rc, q{accept(SOCKET,PROTOSOCKET)});
+eval { $rc = accept(SOCKET,PROTOSOCKET); };
+ok($@, q{accept(SOCKET,PROTOSOCKET)});
 if ($rc) {
     close(SOCKET);
 }

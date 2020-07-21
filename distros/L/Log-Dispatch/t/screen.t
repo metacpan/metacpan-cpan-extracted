@@ -2,8 +2,6 @@ use strict;
 use warnings;
 use utf8;
 
-use lib 't/lib';
-
 use Test::More 0.88;
 
 use Test::Needs {

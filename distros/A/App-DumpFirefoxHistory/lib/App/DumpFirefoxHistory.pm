@@ -1,8 +1,8 @@
 package App::DumpFirefoxHistory;
 
-our $DATE = '2020-04-18'; # DATE
+our $DATE = '2020-04-19'; # DATE
 our $DIST = 'App-DumpFirefoxHistory'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,7 +23,7 @@ $SPEC{dump_firefox_history} = {
         },
         profiles => {
             summary => 'Select profile(s) to dump',
-            schema => ['array*', of=>'firefox::profile_name*'],
+            schema => ['array*', of=>'firefox::profile_name*', 'x.perl.coerce_rules'=>['From_str::comma_sep']],
             description => <<'_',
 
 You can choose to dump history for only some profiles. By default, if this
@@ -91,7 +91,7 @@ sub dump_firefox_history {
 
         local $CWD = $profile_dir;
 
-        my $history_path = "$profile_dir/places.sqlite";
+        my $history_path = "places.sqlite";
         unless (-f $history_path) {
             log_error "Cannot find history database file '%s' for profile %s, profile skipped", $history_path, $profile;
             next PROFILE;
@@ -161,7 +161,7 @@ App::DumpFirefoxHistory - Dump Firefox history
 
 =head1 VERSION
 
-This document describes version 0.006 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2020-04-18.
+This document describes version 0.007 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2020-04-19.
 
 =head1 SYNOPSIS
 

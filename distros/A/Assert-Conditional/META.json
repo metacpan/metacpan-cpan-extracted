@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Assert-Conditional",
    "no_index" : {
@@ -23,7 +23,7 @@
       "build" : {
          "requires" : {
             "Carp::Always" : "0",
-            "Hash::Util" : "0.12",
+            "Hash::Util" : "0",
             "IO::File" : "0",
             "IO::Handle" : "0",
             "Moose" : "0",
@@ -48,7 +48,7 @@
             "Cwd" : "0",
             "Env" : "0",
             "Exporter" : "5.57",
-            "Exporter::ConditionalSubs" : "1.01",
+            "Exporter::ConditionalSubs" : "v1.11.1",
             "File::Basename" : "0",
             "File::Spec" : "0",
             "POSIX" : "0",
@@ -64,6 +64,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.009,
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.010",
+   "x_serialization_backend" : "JSON::PP version 4.00"
 }

@@ -1,5 +1,5 @@
 package WebService::Hexonet::Connector::Test;
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ use Test::More;
 use Test::Exception;
 use Test::RequiresInternet ( 'api.ispapi.net' => 443 );
 
-use version 0.9917; our $VERSION = version->declare('v2.9.2');
+use version 0.9917; our $VERSION = version->declare('v2.10.0');
 
 # T1-4: test import modules
 use_ok('Config');
@@ -34,8 +34,8 @@ Readonly my @EXPECTED_COL_KEYS2 => qw(COUNT CURRENTPAGE FIRST LAST LIMIT NEXTPAG
 # - T7
 my $col = WebService::Hexonet::Connector::Column->new( 'DOMAIN', ( 'mydomain1.com', 'mydomain2.com', 'mydomain3.com' ) );
 my $cls = blessed($col);
-is( $cls, 'WebService::Hexonet::Connector::Column', 'COLUMN: Instance type check' );
-is( $col->getKey(), 'DOMAIN', 'COLUMN: Column Name check' );
+is( $cls,           'WebService::Hexonet::Connector::Column', 'COLUMN: Instance type check' );
+is( $col->getKey(), 'DOMAIN',                                 'COLUMN: Column Name check' );
 
 # ---- Module "Record" ---- #
 # - T9
@@ -56,7 +56,7 @@ is( $rec->getDataByKey('KEYNOTEXISTING'), undef,                                
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 $cls = blessed($rtm);
 is( $cls, 'WebService::Hexonet::Connector::ResponseTemplateManager', 'RTM: Instance type check' );
-$rtm->addTemplate( 'OK', $rtm->generateTemplate( '200', 'Command completed successfully' ) );
+$rtm->addTemplate( 'OK',     $rtm->generateTemplate( '200', 'Command completed successfully' ) );
 $rtm->addTemplate( 'listP0', "[RESPONSE]\r\nPROPERTY[TOTAL][0]=2701\r\nPROPERTY[FIRST][0]=0\r\nPROPERTY[DOMAIN][0]=0-60motorcycletimes.com\r\nPROPERTY[DOMAIN][1]=0-be-s01-0.com\r\nPROPERTY[COUNT][0]=2\r\nPROPERTY[LAST][0]=1\r\nPROPERTY[LIMIT][0]=2\r\nDESCRIPTION=Command completed successfully\r\nCODE=200\r\nQUEUETIME=0\r\nRUNTIME=0.023\r\nEOF\r\n" );
 
 # T12 ~> serialize method #1
@@ -100,18 +100,18 @@ is( %{$d}, 0, 'SocketConfig: Check initial POST data' );
 # ---- Module "ResponseTemplate" ---- #
 # invalid API response test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new("[RESPONSE]\r\ncode=200\r\nqueuetime=0\r\nEOF\r\n");
-is( $tpl->getCode(), $TMP_ERR_423, 'ResponseTemplate: Check response code of template `invalid`' );
+is( $tpl->getCode(),        $TMP_ERR_423,                            'ResponseTemplate: Check response code of template `invalid`' );
 is( $tpl->getDescription(), 'Invalid API response. Contact Support', 'ResponseTemplate: Check response description of template `invalid`' );
 
 # - T17 ~> constructor test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new(q{});
-is( $tpl->getCode(), $TMP_ERR_423, 'ResponseTemplate: Check response code of template `empty` #1' );
+is( $tpl->getCode(),        $TMP_ERR_423,                                                              'ResponseTemplate: Check response code of template `empty` #1' );
 is( $tpl->getDescription(), 'Empty API response. Probably unreachable API end point {CONNECTION_URL}', 'ResponseTemplate: Check response description of template `empty` #1' );
 
 # - T19 ~> getHash method test
 $tpl = WebService::Hexonet::Connector::ResponseTemplate->new();
 $h   = $tpl->getHash();
-is( $h->{CODE}, $TMP_ERR_423, 'ResponseTemplate: Check response code of template `empty` #2' );
+is( $h->{CODE},        $TMP_ERR_423,                                                              'ResponseTemplate: Check response code of template `empty` #2' );
 is( $h->{DESCRIPTION}, 'Empty API response. Probably unreachable API end point {CONNECTION_URL}', 'ResponseTemplate: Check response description of template `empty` #2' );
 
 # - T21 ~> getQueuetime method test
@@ -135,7 +135,7 @@ is( $tpl->isPending(), 1, 'ResponseTemplate: Check response pending value' );
 # ---- Module "ResponseTemplateManager" ---- #
 # - T25 ~> getTemplate method test
 $tpl = $rtm->getTemplate('IwontExist');
-is( $tpl->getCode(), $ERR_500, 'RTM: Check response case for template not found [code]' );
+is( $tpl->getCode(),        $ERR_500,                      'RTM: Check response case for template not found [code]' );
 is( $tpl->getDescription(), 'Response Template not found', 'RTM: Check response case for template not found [description]' );
 
 # - T32 ~> getTemplates method test
@@ -174,7 +174,7 @@ $r = WebService::Hexonet::Connector::Response->new( q{}, { COMMAND => 'QueryDoma
 my $expected = "COMMAND = QueryDomainOptions\nDOMAIN0 = example.com\nDOMAIN1 = example.net\n";
 is( $r->getCommandPlain(), $expected, 'R: Check getCommandPlain result.' );
 
-$r = WebService::Hexonet::Connector::Response->new( q{}, { COMMAND => 'CheckAuthentication', SUBUSER => 'test.user', PASSWORD => 'test.passw0rd' } );
+$r        = WebService::Hexonet::Connector::Response->new( q{}, { COMMAND => 'CheckAuthentication', SUBUSER => 'test.user', PASSWORD => 'test.passw0rd' } );
 $expected = "COMMAND = CheckAuthentication\nPASSWORD = ***\nSUBUSER = test.user\n";
 is( $r->getCommandPlain(), $expected, 'R: Check getCommandPlain result.' );
 
@@ -191,8 +191,8 @@ $tpl = $rtm->getTemplate('OK');
 $r   = WebService::Hexonet::Connector::Response->new( $tpl->getPlain() );
 is( $r->getFirstRecordIndex(), undef, 'R: Check first record index #1.' );
 
-$tpl = $rtm->getTemplate('OK');
-$h   = $tpl->getHash();
+$tpl           = $rtm->getTemplate('OK');
+$h             = $tpl->getHash();
 $h->{PROPERTY} = { DOMAIN => [ 'mydomain1.com', 'mydomain2.com' ] };
 $plain         = WebService::Hexonet::Connector::ResponseParser::serialize($h);
 $r             = WebService::Hexonet::Connector::Response->new($plain);
@@ -305,7 +305,7 @@ is( $r->hasPreviousPage(), 0, 'R: Check result of hasPreviousPage check. #2' );
 $tpl = $rtm->getTemplate('OK');
 $r   = WebService::Hexonet::Connector::Response->new( $tpl->getPlain() );
 is( $r->getLastRecordIndex(), undef, 'R: Check result for last record index. #1' );
-$h = $tpl->getHash();
+$h             = $tpl->getHash();
 $h->{PROPERTY} = { DOMAIN => [ 'mydomain1.com', 'mydomain2.com' ] };
 $plain         = WebService::Hexonet::Connector::ResponseParser::serialize($h);
 $r             = WebService::Hexonet::Connector::Response->new($plain);
@@ -429,7 +429,7 @@ $cl->setURL($WebService::Hexonet::Connector::APIClient::ISPAPI_CONNECTION_URL);
 
 # - T72 ~> setOTP method test
 $cl->setOTP('12345678');
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_otp'     => '12345678',
@@ -437,7 +437,7 @@ $validate = {
 };
 is_deeply( $d, $validate, 'AC : Check if setOTP method is working. #1' );
 $cl->setOTP(q{});
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_command' => 'COMMAND=StatusAccount'
@@ -446,7 +446,7 @@ is_deeply( $d, $validate, 'AC: Check if setOTP method is working. #2' );
 
 # - T75 ~> setSession method test
 $cl->setSession('12345678');
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_session' => '12345678',
@@ -459,7 +459,7 @@ $cl->setSession('12345678');
 $d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 is_deeply( $d, $validate, 'AC: Check if setSession method is working. #2' );
 $cl->setSession(q{});
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_command' => 'COMMAND=StatusAccount'
@@ -472,7 +472,7 @@ $cl->setSession('12345678');
 $cl->saveSession($sessionobj);
 my $cl2 = WebService::Hexonet::Connector::APIClient->new();
 $cl2->reuseSession($sessionobj);
-$d = $cl2->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl2->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_session' => '12345678',
@@ -483,7 +483,7 @@ $cl->setSession(q{});
 
 # - T78 ~> setRemoteIPAddress method test
 $cl->setRemoteIPAddress('10.10.10.10');
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'     => '54cd',
     's_remoteaddr' => '10.10.10.10',
@@ -491,7 +491,7 @@ $validate = {
 };
 is_deeply( $d, $validate, 'AC: Check if setRemoteIPAddress is working. #1' );
 $cl->setRemoteIPAddress(q{});
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_command' => 'COMMAND=StatusAccount'
@@ -500,7 +500,7 @@ is_deeply( $d, $validate, 'AC: Check if setRemoteIPAddress is working. #2' );
 
 # - T80 ~> setCredentials method test
 $cl->setCredentials( 'myaccountid', 'mypassword' );
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_login'   => 'myaccountid',
@@ -509,7 +509,7 @@ $validate = {
 };
 is_deeply( $d, $validate, 'AC: Check if setCredentials is working. #1' );
 $cl->setCredentials( q{}, q{} );
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_command' => 'COMMAND=StatusAccount'
@@ -518,7 +518,7 @@ is_deeply( $d, $validate, 'AC: Check if setCredentials is working. #2' );
 
 # - T82 ~> setRoleCredentials method test
 $cl->setRoleCredentials( 'myaccountid', 'myroleid', 'mypassword' );
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_login'   => 'myaccountid!myroleid',
@@ -527,7 +527,7 @@ $validate = {
 };
 is_deeply( $d, $validate, 'AC: Check if setRoleCredentials is working. #1' );
 $cl->setRoleCredentials( q{}, q{}, q{} );
-$d = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
+$d        = $cl->getPOSTData( { COMMAND => 'StatusAccount' } );
 $validate = {
     's_entity'  => '54cd',
     's_command' => 'COMMAND=StatusAccount'
@@ -540,8 +540,8 @@ $cl->setCredentials( 'test.user', 'test.passw0rd' );
 $cl->setRemoteIPAddress('1.2.3.4');
 $r   = $cl->login();
 $cls = blessed($r);
-is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if login method is working. #1' );
-is( $r->isSuccess(), 1, 'AC: Check if login method is working. #2' );
+is( $cls,            'WebService::Hexonet::Connector::Response', 'AC: Check if login method is working. #1' );
+is( $r->isSuccess(), 1,                                          'AC: Check if login method is working. #2' );
 $rec = $r->getRecord(0);
 isnt( $rec, undef, 'AC: Check if login method is working. #3' );
 is( $rec->getDataByKey('SESSION'), $r->getHash()->{PROPERTY}->{SESSION}[ 0 ], 'AC: Check if login method is working. #4' );
@@ -556,8 +556,8 @@ is( $rec->getDataByKey('SESSION'), $r->getHash()->{PROPERTY}->{SESSION}[ 0 ], 'A
 $cl->setCredentials( 'test.user', 'WRONGPASSWORD' );
 $r   = $cl->login();
 $cls = blessed($r);
-is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if login method is working. #9' );
-is( $r->isError(), 1,, 'AC: Check if login method is working. #10' );
+is( $cls,          'WebService::Hexonet::Connector::Response', 'AC: Check if login method is working. #9' );
+is( $r->isError(), 1,,                                         'AC: Check if login method is working. #10' );
 $url = $cl->getURL();
 $cl->setURL('http://noapiaccesshere.1api.net/api/call.cgi');
 $r   = $cl->login();
@@ -569,10 +569,10 @@ $cl->setURL($url);
 
 # - T98 ~> loginExtended method test
 $cl->setCredentials( 'test.user', 'test.passw0rd' );
-$r = $cl->loginExtended( { TIMEOUT => 60 } );
+$r   = $cl->loginExtended( { TIMEOUT => 60 } );
 $cls = blessed($r);
-is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if loginExtended method is working. #1' );
-is( $r->isSuccess(), 1, 'AC: Check if loginExtended method is working. #2' );
+is( $cls,            'WebService::Hexonet::Connector::Response', 'AC: Check if loginExtended method is working. #1' );
+is( $r->isSuccess(), 1,                                          'AC: Check if loginExtended method is working. #2' );
 $rec = $r->getRecord(0);
 isnt( $rec, undef, 'AC: Check if loginExtended method is working. #3' );
 is( $rec->getDataByKey('SESSION'), $r->getHash()->{PROPERTY}->{SESSION}[ 0 ], 'AC: Check if loginExtended method is working. #4' );
@@ -580,14 +580,14 @@ is( $rec->getDataByKey('SESSION'), $r->getHash()->{PROPERTY}->{SESSION}[ 0 ], 'A
 # - T100 ~> logout method test
 $r   = $cl->logout();
 $cls = blessed($r);
-is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if logout method is working. #1' );
-is( $r->isSuccess(), 1, 'AC: Check if loginExtended method is working. #2' );
+is( $cls,            'WebService::Hexonet::Connector::Response', 'AC: Check if logout method is working. #1' );
+is( $r->isSuccess(), 1,                                          'AC: Check if loginExtended method is working. #2' );
 $cl->enableDebugMode();
 $cl->setSession('SESSIONWONTEXIST');
 $r   = $cl->logout();
 $cls = blessed($r);
-is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if logout method is working. #3' );
-is( $r->isError(), 1, 'AC: Check if loginExtended method is working. #4' );
+is( $cls,          'WebService::Hexonet::Connector::Response', 'AC: Check if logout method is working. #3' );
+is( $r->isError(), 1,                                          'AC: Check if loginExtended method is working. #4' );
 
 # ~> requestNextResponsePage method test
 $cl->setCredentials( 'test.user', 'test.passw0rd' );
@@ -612,8 +612,8 @@ is( $nr->getLastRecordIndex(),   $LAST_REC_IDX, 'AC: Check if requestNextRespons
 
 $cl->disableDebugMode();
 $cmd = { COMMAND => 'QueryDomainList', LIMIT => 2 };
-$r = WebService::Hexonet::Connector::Response->new( $tpl->getPlain(), $cmd );
-$nr = $cl->requestNextResponsePage($r);
+$r   = WebService::Hexonet::Connector::Response->new( $tpl->getPlain(), $cmd );
+$nr  = $cl->requestNextResponsePage($r);
 is( $r->isSuccess(),             1,             'AC: Check if requestNextResponsePage is working. #11' );
 is( $nr->isSuccess(),            1,             'AC: Check if requestNextResponsePage is working. #12' );
 is( $r->getRecordsLimitation(),  2,             'AC: Check if requestNextResponsePage is working. #13' );
@@ -631,17 +631,17 @@ isnt( scalar @{$nr}, 0, 'AC: Check if requestAllResponsePages is working. #1' );
 
 # ~> setUserView method test
 $cl->setUserView('hexotestman.com');
-$r = $cl->request( { COMMAND => 'GetUserIndex' } );
+$r   = $cl->request( { COMMAND => 'GetUserIndex' } );
 $cls = blessed($r);
-is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if setUserView method is working. #1' );
-is( $r->isSuccess(), 1, 'AC: Check if setUserView method is working. #2' );
+is( $cls,            'WebService::Hexonet::Connector::Response', 'AC: Check if setUserView method is working. #1' );
+is( $r->isSuccess(), 1,                                          'AC: Check if setUserView method is working. #2' );
 
 # ~> resetUserView method test
 $cl->resetUserView();
-$r = $cl->request( { COMMAND => 'GetUserIndex' } );
+$r   = $cl->request( { COMMAND => 'GetUserIndex' } );
 $cls = blessed($r);
-is( $cls, 'WebService::Hexonet::Connector::Response', 'AC: Check if resetUserView method is working. #1' );
-is( $r->isSuccess(), 1, 'AC: Check if resetUserView method is working. #2' );
+is( $cls,            'WebService::Hexonet::Connector::Response', 'AC: Check if resetUserView method is working. #1' );
+is( $r->isSuccess(), 1,                                          'AC: Check if resetUserView method is working. #2' );
 
 # ~> request method test
 # check flattening
@@ -683,14 +683,14 @@ $uaexpected = "WHMCS ($os; $arch; rv:7.7.0) perl-sdk/$rv perl/$Config{version}";
 $cls        = blessed( $cl->setUserAgent( 'WHMCS', '7.7.0' ) );
 $ua         = $cl->getUserAgent();
 is( $cls, 'WebService::Hexonet::Connector::APIClient', 'AC: Check if setUserAgent method is working. #1' );
-is( $ua, $uaexpected, 'AC: Check if setUserAgent method is working. #2' );
+is( $ua,  $uaexpected,                                 'AC: Check if setUserAgent method is working. #2' );
 
 $uaexpected = "WHMCS ($os; $arch; rv:7.7.0) reg/2.6.2 ssl/7.2.2 dc/8.2.2 perl-sdk/$rv perl/$Config{version}";
 my $mods = [ 'reg/2.6.2', 'ssl/7.2.2', 'dc/8.2.2' ];
 $cls = blessed( $cl->setUserAgent( 'WHMCS', '7.7.0', $mods ) );
-$ua = $cl->getUserAgent();
+$ua  = $cl->getUserAgent();
 is( $cls, 'WebService::Hexonet::Connector::APIClient', 'AC: Check if setUserAgent method is working. #3' );
-is( $ua, $uaexpected, 'AC: Check if setUserAgent method is working. #4' );
+is( $ua,  $uaexpected,                                 'AC: Check if setUserAgent method is working. #4' );
 
 done_testing();
 

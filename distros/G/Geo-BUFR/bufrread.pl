@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# (C) Copyright 2010-2019 MET Norway
+# (C) Copyright 2010-2020 MET Norway
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,15 +33,16 @@ use constant DEFAULT_TABLE_FORMAT => 'BUFRDC';
 use constant DEFAULT_TABLE_PATH_BUFRDC => '/usr/local/lib/bufrtables';
 use constant DEFAULT_TABLE_PATH_ECCODES => '/usr/local/share/eccodes/definitions/bufr/tables';
 # Ought to be your most up-to-date code table(s)
-use constant DEFAULT_CTABLE_BUFRDC => 'C0000000000000029000';
-use constant DEFAULT_CTABLE_ECCODES => '0/wmo/29';
+use constant DEFAULT_CTABLE_BUFRDC => 'C0000000000000033000';
+use constant DEFAULT_CTABLE_ECCODES => '0/wmo/33';
 
 # Parse command line options
 my %option = ();
 GetOptions(
            \%option,
            'ahl=s',        # Decode BUFR messages with AHL matching <ahl_regexp> only
-           'all_operators',# Show all operator descriptors when printing section 4
+           'all_operators',# Show replication descriptors and all operator descriptors
+                           # when printing section 4
            'bitmap',       # Display bit-mapped values on same line
            'codetables',   # Use code and flag tables to resolve values
            'data_only',    # Print section 4 (data section) only
@@ -122,7 +123,7 @@ if ($option{param}) {
 }
 
 # Arrays over filter criteria, used if option --filter is set
-my @fid;      # Filter descriptors, .e.g. $fid[1] = [ 001001, 001002 ]
+my @fid;      # Filter descriptors, e.g. $fid[1] = [ 001001, 001002 ]
 my @fiv;      # Filter values, e.g. $fiv[1] = [ [ 3, 895 ], [ 6 252 ] ]
 my @num_desc; # Number of filter descriptors for each criterion, e.g. $num_desc[1] = 2
 my @num_val;  # Number of filter value lines for each criterion, e.g. $num_val[1] = 2
@@ -330,6 +331,7 @@ sub filter_on_ahl {
 
 # Read in contents of $filter_file into variables @fid, @fiv,
 # @num_desc, @num_val and $num_criteria, which are defined above.
+# Note that index 0 of the arrays is not used.
 sub read_filter_file {
     my $filter_file = shift;
 
@@ -373,7 +375,7 @@ sub filter_observation {
         unless ref($bufr) eq 'Geo::BUFR';
     my ($data, $descriptors) = @_;
 
-    my $num_ordinary_criteria = @fid - $num_required_criteria;
+    my $num_ordinary_criteria = $#fid - $num_required_criteria;
     my $num_success_req_criteria = 0; # Number of required criteria successfully fulfilled
     my $num_success_ord_criteria = 0; # Number of ordinary criteria successfully fulfilled
 
@@ -431,6 +433,8 @@ sub filter_observation {
                                             and ($num_ordinary_criteria == 0
                                                  or $num_success_ord_criteria > 0)) {
                                             return 0; # Don't filter this observation
+                                        } else {
+                                            next DESC;
                                         }
                                     } else {
                                         $num_success_ord_criteria++;
@@ -498,7 +502,8 @@ examples of use.
 
    --ahl <ahl_regexp>
                    Decode BUFR messages with AHL matching <ahl_regexp> only
-   --all_operators Show all operator descriptors when printing section 4
+   --all_operators Show replication descriptors and all operator descriptors
+                   when printing section 4
    --bitmap        Display bit-mapped values on same line
    --codetables    Use code and flag tables to resolve values when unit
                    is [CODE TABLE] or [FLAG TABLE]
@@ -550,9 +555,9 @@ a BUFR descriptor (6 digits).  Rest of line will be ignored.
 bufrread.pl will display values for these descriptors only.
 
 Using C<--filter> will decode only those observations that meet one of
-the criteria in <filter file> (and all of those criteria marked
-D!). Comments (starting with #) are ignored. An example of a filter
-file is
+the criteria in <filter file> marked D: and all of those criteria
+marked D!:. Comments (starting with #) are ignored. An example of a
+filter file is
 
   D: 001001
   1
@@ -596,6 +601,6 @@ Pål Sannes E<lt>pal.sannes@met.noE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2019 MET Norway
+Copyright (C) 2010-2020 MET Norway
 
 =cut

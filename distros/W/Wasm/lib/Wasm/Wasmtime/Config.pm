@@ -6,7 +6,7 @@ use 5.008004;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Global configuration for Wasm::Wasmtime::Engine
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasm_config_';
@@ -51,23 +51,11 @@ foreach my $prop (qw(
 outer:
 foreach my $prop (qw( static_memory_maximum_size static_memory_guard_size dynamic_memory_guard_size ))
 {
-  foreach my $suffix ('_set', '')
-  {
-    # not sure why, but this didn't make it into 0.16.0 :/
-    # https://github.com/bytecodealliance/wasmtime/pull/1662
-    my $f = eval { $ffi->function( "wasmtime_config_${prop}${suffix}" => [ 'wasm_config_t', 'uint64' ] => 'void' => sub {
-      my($xsub, $self, $value) = @_;
-      $xsub->($self, $value);
-      $self;
-    }) };
-    if($f)
-    {
-      $f->attach($prop);
-      next outer;
-    }
-  }
-
-  Carp::croak("unable to find either wasmtime_config_${prop} or wasmtime_config_${prop}_set");
+  $ffi->attach( [ "wasmtime_config_${prop}_set" => $prop ] => [ 'wasm_config_t', 'uint64' ] => 'void' => sub {
+    my($xsub, $self, $value) = @_;
+    $xsub->($self, $value);
+    $self;
+  });
 }
 
 
@@ -164,7 +152,7 @@ Wasm::Wasmtime::Config - Global configuration for Wasm::Wasmtime::Engine
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 

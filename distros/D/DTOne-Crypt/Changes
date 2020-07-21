@@ -1,0 +1,16 @@
+Revision history for DTOne-Crypt
+
+0.01
+        - Initial release
+
+0.02
+        - Increase scrypt() iteration count to 2**15
+
+0.03
+        - Fix documentation
+
+0.04
+        - Enforce master key length and format requirements
+
+0.05  2020-07-20 23:53:27 PST
+        - Improve test coverage

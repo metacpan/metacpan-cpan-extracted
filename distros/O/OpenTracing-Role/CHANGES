@@ -1,6 +1,13 @@
 CHANGE LOG
 ==========
 
+2020-07-08 - v0.84.0
+--------------------
+
+### Changed
+    - use TypeTiny based dispatching for `extract_context` and `inject_context`
+    
+
 2020-07-08 - v0.83.0
 --------------------
 

@@ -1,6 +1,6 @@
 package Tcl::pTk::Tile;
 
-our ($VERSION) = ('1.07');
+our ($VERSION) = ('1.08');
 
 use strict;
 use warnings;
@@ -182,12 +182,27 @@ sub _setupMapping {
 	}
 }
 
-###### Special cases to get ttkTreeview children method to work ###
-### If this isn't here, the inherited Tcl::pTk::Widget::children will get called, which is not what we 
-### want
-sub Tcl::pTk::ttkTreeview::children{
-        my $self = shift;
-        $self->call($self->path, "children", @_);
+###### Special cases to get ttkTreeview methods to work ###
+
+# Avoid using Tcl::pTk::Widget::children
+sub Tcl::pTk::ttkTreeview::children {
+    my $self = shift;
+    $self->call($self->path, 'children', @_);
+}
+
+# Ensure Perl list (not Tcl list) is returned
+# https://github.com/chrstphrchvz/perl-tcl-ptk/issues/7
+sub Tcl::pTk::ttkTreeview::selection {
+    my $self = shift;
+    $self->call($self->path, 'selection', @_);
+}
+sub Tcl::pTk::ttkTreeview::item {
+    my $self = shift;
+    $self->call($self->path, 'item', @_);
+}
+sub Tcl::pTk::ttkTreeview::tag {
+    my $self = shift;
+    $self->call($self->path, 'tag', @_);
 }
 
 1;

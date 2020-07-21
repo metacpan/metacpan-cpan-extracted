@@ -20,7 +20,7 @@ package
 package PkgConfig;
 
 #First two digits are Perl version, second two are pkg-config version
-our $VERSION = '0.23026';
+our $VERSION = '0.24026';
 
 $VERSION =~ /([0-9]{2})$/;
 my $compat_version = $1;
@@ -46,7 +46,7 @@ BEGIN {
         use Log::Fu 0.25 { level => "warn" };
         1;
     };
-    
+
     if(!$ret) {
         my $log_base = sub {
             my (@args) = @_;
@@ -56,7 +56,7 @@ BEGIN {
         *log_debug = *log_debugf = sub { return unless $UseDebugging; goto &$log_base };
         *log_err = *log_errf = *log_warn = *log_warnf = *log_info = *log_infof =
             $log_base;
-        
+
     }
 }
 
@@ -162,12 +162,12 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
                 "/usr/share/pkgconfig",
             );
 
-            push @DEFAULT_EXCLUDE_LFLAGS, map { ("-L$_", "-R$_") } 
+            push @DEFAULT_EXCLUDE_LFLAGS, map { ("-L$_", "-R$_") }
                 "/usr/local/lib/$arch",
                 "/usr/lib/$arch";
 
         } else {
-        
+
             @DEFAULT_SEARCH_PATH = (
                 "/usr/local/lib/pkgconfig",
                 "/usr/local/lib/pkgconfig/$arch",
@@ -177,7 +177,7 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
                 "/usr/share/pkgconfig",
             );
         }
-        
+
     } else {
 
         @DEFAULT_SEARCH_PATH = (
@@ -188,7 +188,7 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
         );
 
     }
-    
+
 } elsif($^O eq 'linux' && -r "/etc/redhat-release") {
 
     if(-d "/usr/lib64/pkgconfig") {
@@ -220,17 +220,16 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
           /usr/lib/pkgconfig/ /usr/share/pkgconfig/
         !;
     }
-  
+
 
 } elsif($^O eq 'freebsd') {
 
-    # TODO: FreeBSD 10's version of pkg-config does not
+    # TODO: FreeBSD 10-12's version of pkg-config does not
     # support PKG_CONFIG_DEBUG_SPEW so I can't verify
-    # the path there, but this is what it is for
-    # FreeBSD 9
+    # the path there.
     @DEFAULT_SEARCH_PATH = qw(
         /usr/local/libdata/pkgconfig
-        /usr/local/lib/pkgconfig
+        /usr/libdata/pkgconfig
     );
 
 } elsif($^O eq 'netbsd') {
@@ -263,7 +262,7 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
     #    better to have something that is useful rather than
     #    worry about if it is exactly the same as other
     #    platforms.
-    # 3. It is a little brittle in that Strawberry might 
+    # 3. It is a little brittle in that Strawberry might
     #    one day change its layouts.  If it has and you are
     #    reading this, please send a pull request or simply
     #    let me know -plicease
@@ -286,33 +285,33 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
             @DEFAULT_SEARCH_PATH = $path;
         }
     }
-    
+
     my @reg_paths;
-    
+
     eval q{
         package
             PkgConfig::WinReg;
-        
+
         use Win32API::Registry 0.21 qw( :ALL );
-        
+
         foreach my $top (HKEY_LOCAL_MACHINE, HKEY_CURRENT_USER) {
             my $key;
             RegOpenKeyEx( $top, "Software\\\\pkgconfig\\\\PKG_CONFIG_PATH", 0, KEY_READ, $key) || next;
             my $nlen = 1024;
             my $pos = 0;
             my $name = '';
-            
+
             while(RegEnumValue($key, $pos++, $name, $nlen, [], [], [], [])) {
                 my $type;
                 my $data;
                 RegQueryValueEx($key, $name, [], $type, $data, []);
                 push @reg_paths, $data;
             }
-            
+
             RegCloseKey( $key );
         }
     };
-    
+
     unless($@) {
         unshift @DEFAULT_SEARCH_PATH, @reg_paths;
     }
@@ -335,7 +334,7 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
             "-I/mingw/lib/pkgconfig/../../include",
         );
     }
-    
+
     # See caveats above for Strawberry and PAR::Packer
     require Config;
     if(not $ENV{PAR_0} and $Config::Config{myuname} =~ /strawberry-perl/)
@@ -394,18 +393,18 @@ sub GuessPaths {
     local $ENV{LD_LIBRARY_PATH} = "";
     local $ENV{C_INCLUDE_PATH} = "";
     local $ENV{LD_RUN_PATH} = "";
-    
+
     my $ld = $ENV{LD} || 'ld';
     my $ld_output = qx(ld -verbose);
     my @defl_search_dirs = ($ld_output =~ m/$LD_OUTPUT_RE/g);
-    
+
     @DEFAULT_EXCLUDE_LFLAGS = ();
     foreach my $path (@defl_search_dirs) {
         push @DEFAULT_EXCLUDE_LFLAGS, (map { "$_".$path }
-            (qw(-R -L -rpath= -rpath-link= -rpath -rpath-link))); 
+            (qw(-R -L -rpath= -rpath-link= -rpath -rpath-link)));
     }
     log_debug("Determined exclude LDFLAGS", @DEFAULT_EXCLUDE_LFLAGS);
-    
+
     #now get the include paths:
     my @cpp_output = qx(cpp --verbose 2>&1 < /dev/null);
     @cpp_output = map  { chomp $_; $_ } @cpp_output;
@@ -440,12 +439,12 @@ struct(
 
      # whether to also spit out static dependencies
      'static' => '$',
-     
+
      # whether we replace references to -L and friends with -Wl,-rpath, etc.
      'rpath' => '$',
-     
+
      # build rpath-search,
-     
+
      # no recursion. set if we just want a version, or to see if the
      # package exists.
      'no_recurse' => '$',
@@ -476,19 +475,19 @@ struct(
      'pkg_url', => '$',
      'pkg_description' => '$',
      'errmsg'   => '$',
-     
+
      # classes used for storing persistent data
      'varclass' => '$',
      'udefclass' => '$',
      'filevars' => '*%',
      'uservars' => '*%',
-     
+
      # options for printing variables
      'print_variables' => '$',
      'print_variable' => '$',
      'print_values' => '$',
      'defined_variables' => '*%',
-     
+
      # for creating PkgConfig objects with identical
      # settings
      'original' => '$',
@@ -528,7 +527,7 @@ sub _quote_cvt($)  {
 sub assign_var {
     my ($self,$field,$value) = @_;
     no strict 'refs';
-    
+
     # if the user has provided a definition, use that.
     if(exists ${$self->udefclass."::"}{$field}) {
         log_debug("Prefix already defined by user");
@@ -536,7 +535,7 @@ sub assign_var {
     }
     my $evalstr = sprintf('$%s = PkgConfig::_quote_cvt(%s)',
                     $self->_get_pc_varname($field), $value);
-    
+
     log_debug("EVAL", $evalstr);
     do {
         no warnings 'uninitialized';
@@ -551,9 +550,9 @@ sub prepare_vars {
     my $self = shift;
     my $varclass = $self->varclass;
     no strict 'refs';
-    
+
     %{$varclass . "::"} = ();
-    
+
     while (my ($name,$glob) = each %{$self->udefclass."::"}) {
         my $ref = *$glob{SCALAR};
         next unless defined $ref;
@@ -573,9 +572,9 @@ sub find {
         ['exclude_ldflags', \@DEFAULT_EXCLUDE_LFLAGS],
         ['exclude_cflags', \@DEFAULT_EXCLUDE_CFLAGS]
     );
-    
+
     my %original = %options;
-    
+
     foreach (@uspecs) {
         my ($basekey,$default) = @$_;
         my $list = [ @{$options{$basekey} ||= [] } ];
@@ -588,32 +587,32 @@ sub find {
         $options{$basekey} = $list;
         #print "$basekey: " . Dumper($list);
     }
-    
+
     $VarClassSerial++;
     $options{varclass} = sprintf("PkgConfig::Vars::SERIAL_%d", $VarClassSerial);
     $options{udefclass} = sprintf("PkgConfig::UDefs::SERIAL_%d", $VarClassSerial);
     $options{original} = \%original;
-    
-    
+
+
     my $udefs = delete $options{VARS} || {};
-    
+
     while (my ($k,$v) = each %$udefs) {
         no strict 'refs';
         my $vname = join('::', $options{udefclass}, $k);
         ${$vname} = $v;
     }
-    
+
     my $o = $cls->new(%options);
-    
+
     my @libraries;
     if(ref $library eq 'ARRAY') {
         @libraries = @$library;
     } else {
         @libraries = ($library);
     }
-    
+
     if($options{file_path}) {
-    
+
         if(-r $options{file_path}) {
             $o->recursion(1);
             $o->parse_pcfile($options{file_path});
@@ -621,27 +620,27 @@ sub find {
         } else {
             $o->errmsg("No such file $options{file_path}\n");
         }
-    
+
     } else {
-    
+
         foreach my $lib (@libraries) {
             $o->recursion(0);
             my($op,$ver);
             ($lib,$op,$ver) = ($1,$2,PkgConfig::Version->new($3))
                 if $lib =~ /^(.*)\s+(!=|=|>=|<=|>|<)\s+(.*)$/;
             $o->find_pcfile($lib);
-            
+
             if(!$o->errmsg && defined $op) {
                 $op = '==' if $op eq '=';
                 unless(eval qq{ PkgConfig::Version->new(\$o->pkg_version) $op \$ver })
                 {
-                    $o->errmsg("Requested '$lib $op $ver' but version of $lib is " . 
+                    $o->errmsg("Requested '$lib $op $ver' but version of $lib is " .
                         ($o->pkg_version ? $o->pkg_version : '') . "\n");
                 }
             }
         }
     }
-    
+
     $o;
 }
 
@@ -653,25 +652,25 @@ sub find {
 sub append_ldflags {
     my ($self,@flags) = @_;
     my @ld_flags = _split_flags(@flags);
-    
+
     foreach my $ldflag (@ld_flags) {
         next unless $ldflag =~ /^-Wl/;
 
         my (@wlflags) = split(/,/, $ldflag);
         shift @wlflags; #first is -Wl,
         filter_omit(\@wlflags, $self->exclude_ldflags);
-        
+
         if(!@wlflags) {
             $ldflag = "";
             next;
         }
-        
+
         $ldflag = join(",", '-Wl', @wlflags);
     }
-    
+
     @ld_flags = grep $_, @ld_flags;
     return unless @ld_flags;
-    
+
     push @{($self->libs_deplist->{$self->recursion} ||=[])},
         @ld_flags;
 }
@@ -733,87 +732,87 @@ sub parse_line {
 
     $line =~ s/#[^#]+$//g; # strip comments
     return unless $line;
-    
+
     my ($tok) = ($line =~ /([=:])/);
-    
+
     my ($field,$value) = split(/[=:]/, $line, 2);
     return unless defined $value;
-    
+
     if($tok eq '=') {
         $self->defined_variables->{$field} = $value;
     }
-    
+
     #strip trailing/leading whitespace:
     $field =~ s/(^\s+)|(\s+)$//msg;
-    
+
     #remove trailing/leading whitespace from value
     $value =~ s/(^\s+)|(\s+$)//msg;
 
     log_debugf("Field %s, Value %s", $field, $value);
-    
+
     $field = lc($field);
-    
+
     #perl variables can't have '.' in them:
     $field =~ s/\./DOT/g;
-    
+
     #remove quotes from field names
     $field =~ s/['"]//g;
-    
+
 
     # pkg-config escapes a '$' with a '$$'. This won't go in perl:
     $value =~ s/[^\\]\$\$/\\\$/g;
     $value =~ s/([@%&])/\$1/g;
-    
-    
+
+
     # append our pseudo-package for persistence.
     my $varclass = $self->varclass;
     $value =~ s/(\$\{[^}]+\})/lc($1)/ge;
-    
+
     $value =~ s/\$\{/\$\{$varclass\::/g;
-    
+
     # preserve quoted space
     $value = join ' ', map { s/(["'])/\\$1/g; "'$_'" } shellwords $value
       if $value =~ /[\\"']/;
-    
+
     #quote the value string, unless quoted already
     $value = "\"$value\"";
-    
+
     #get existent variables from our hash:
-    
-    
+
+
     #$value =~ s/'/"/g; #allow for interpolation
     $self->assign_var($field, $value);
-    
+
 }
 
 sub parse_pcfile {
     my ($self,$pcfile,$wantversion) = @_;
     #log_warn("Requesting $pcfile");
     open my $fh, "<", $pcfile or die "$pcfile: $!";
-    
+
     $self->prepare_vars();
-    
+
     my @lines = (<$fh>);
     close($fh);
-    
+
     my $text = join("", @lines);
     $text =~ s,\\[\r\n],,g;
     @lines = split(/[\r\n]/, $text);
-    
+
     my @eval_strings;
-    
+
     #Fold lines:
-    
+
     my $pcfiledir = dirname $pcfile;
     $pcfiledir =~ s{\\}{/}g;
 
     foreach my $line ("pcfiledir=$pcfiledir", @lines) {
         $self->parse_line($line, \@eval_strings);
     }
-    
+
     #now that we have eval strings, evaluate them all within the same
     #lexical scope:
-    
+
 
     $self->append_cflags(  $self->_pc_var('cflags') );
     if($self->static) {
@@ -838,7 +837,7 @@ sub parse_pcfile {
         $self->pkg_version( $self->_pc_var('version') );
         $self->pkg_url( $self->_pc_var('url') );
         $self->pkg_description( $self->_pc_var('description') );
-        $self->pkg_exists(1);        
+        $self->pkg_exists(1);
     }
 
     unless ($self->no_recurse) {
@@ -1123,22 +1122,22 @@ GetOptions(
     'print-errors' => \my $PrintErrors,
     'errors-to-stdout' => \my $ErrToStdOut,
     'short-errors'     => \my $ShortErrors,
-    
+
     'define-variable=s', => \my %UserVariables,
-    
+
     'print-variables' => \my $PrintVariables,
     'print-values'  => \my $PrintValues,
     'variable=s',   => \my $OutputVariableValue,
-    
+
     'modversion'    => \my $PrintVersion,
     'version',      => \my $PrintAPIversion,
     'real-version' => \my $PrintRealVersion,
-    
+
     'debug'         => \my $Debug,
     'with-path=s',    => \my @ExtraPaths,
     'env-only',     => \my $EnvOnly,
     'guess-paths',  => \my $GuessPaths,
-    
+
     'h|help|?'      => \my $WantHelp
 ) or pod2usage(@POD_USAGE_OPTIONS);
 
@@ -1225,7 +1224,7 @@ $pc_options{VARS} = \%UserVariables;
 if($ListAll) {
     my $o = PkgConfig->find([], %pc_options);
     my @list = $o->get_list();
-    
+
     # can't use List::Util::max as it wasn't core until Perl 5.8
     my $max_length = 0;
     foreach my $length (map { length $_->[0] } @list) {
@@ -1233,7 +1232,7 @@ if($ListAll) {
     }
 
     printf "%-${max_length}s %s\n", $_->[0], $_->[1] for @list;
-    exit(0); 
+    exit(0);
 }
 
 my @FINDLIBS = @ARGV or die "Must specify at least one library";
@@ -1678,7 +1677,7 @@ ensure that upgrades of PkgConfig do the same.
 
 =head2 CAVEATS
 
-On Strawberry Perl C<ppkg-config> acts like Strawberry is the system.  
+On Strawberry Perl C<ppkg-config> acts like Strawberry is the system.
 This means that
 
 =over 4
@@ -1689,12 +1688,12 @@ The .pc files that are bundled with Strawberry are searched by default.
 
 =item
 
-The Strawberry include and lib directories are used to compute the 
+The Strawberry include and lib directories are used to compute the
 exclusion lists.
 
 =back
 
-As of Strawberry 5.20.0.1 PkgConfig is bundled with Strawberry and 
+As of Strawberry 5.20.0.1 PkgConfig is bundled with Strawberry and
 C<pkg-config> is installed by default (in addition to C<ppkg-config>,
 though the C<ppkg-config> alias is NOT bundled with Strawberry itself).
 

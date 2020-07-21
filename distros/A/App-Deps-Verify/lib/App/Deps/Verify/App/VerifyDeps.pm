@@ -1,5 +1,5 @@
 package App::Deps::Verify::App::VerifyDeps;
-$App::Deps::Verify::App::VerifyDeps::VERSION = '0.10.1';
+$App::Deps::Verify::App::VerifyDeps::VERSION = '0.12.0';
 use strict;
 use warnings;
 use autodie;
@@ -16,7 +16,7 @@ __END__
 
 =head1 VERSION
 
-version 0.10.1
+version 0.12.0
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

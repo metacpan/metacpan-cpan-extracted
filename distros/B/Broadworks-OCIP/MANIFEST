@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-README.pod
 dist.ini
 lib/Broadworks/OCIP.pm
 lib/Broadworks/OCIP/Deprecated.pm
@@ -15,7 +14,6 @@ lib/Broadworks/OCIP/Methods.pm
 lib/Broadworks/OCIP/Methods.pod
 lib/Broadworks/OCIP/Response.pm
 lib/Broadworks/OCIP/Throwable.pm
-lib/Redcentric/Roles/OCIP.pm
 ocip_html/OCISchemaAS.xsd.html
 ocip_html/OCISchemaASDeprecatedSpecialExceptions.xsd.html
 ocip_html/OCISchemaBASE.xsd.html

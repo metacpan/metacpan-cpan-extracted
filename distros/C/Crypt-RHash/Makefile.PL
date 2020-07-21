@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 use File::Copy;
 
 my $libs  = '';
+my $def   = '';
 my $inc   = '';
 my $obj   = '';
 my $clean = '';
@@ -69,6 +70,7 @@ if($rh_type eq 'builtin') {
 	my @c_files = copy_c_files($rh_builtin_dir);
 	$clean = join(' ', @c_files);
 	$obj = join(' ', map { s/\.c$/\$(OBJ_EXT)/; $_ } @c_files) . ' ';
+	$def = '-DRHASH_XVERSION=0' # QuickFix
 }
 
 # make setting optional MakeMaker parameters more readable
@@ -81,7 +83,7 @@ sub OPTIONAL {
 # the contents of the Makefile that is written
 WriteMakefile(
     NAME         => 'Crypt::Rhash',
-    ABSTRACT     => 'Library for computing hash sums and magnet links',
+    ABSTRACT     => 'Library for computing message digests and magnet links',
     AUTHOR       => 'Aleksey Kravchenko',
     VERSION_FROM => 'Rhash.pm', # finds $VERSION
     OPTIONAL( '6.31',
@@ -102,8 +104,8 @@ WriteMakefile(
     ),
 
     LIBS         => [ $libs ],
-    DEFINE       => '',       # e.g., '-DHAVE_SOMETHING'
-    INC          => $inc,     # e.g., '-I/usr/include/other'
+    DEFINE       => $def,
+    INC          => $inc,
     OBJECT       => $obj . 'Rhash$(OBJ_EXT)',
     clean        => {
         FILES => $clean,

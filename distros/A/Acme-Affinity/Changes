@@ -1,5 +1,14 @@
 Revision history for Acme-Affinity
 
+0.0111 2020-07-14 16:40:37
+    - Fix documentation grammar.
+
+0.0110 2020-07-14 14:16:28
+    - Improve documentation.
+    - Make all the attributes required.
+    - Clean up test a bit.
+    - Use an algorithm instead of hardcoded "you" answers in the eg/q_and_a program.
+
 0.0109 2020-03-22 00:08:27
     - Improved the eg/q_and_a program.
 

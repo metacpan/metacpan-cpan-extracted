@@ -5,6 +5,7 @@ lib/Ogg/Vorbis/Header/PurePerl.pm
 README
 t/01-require.t
 t/02-basic.t
+t/04-files.t
 t/test.ogg
 examples/ogginfo.pl
 LICENSE.GPL

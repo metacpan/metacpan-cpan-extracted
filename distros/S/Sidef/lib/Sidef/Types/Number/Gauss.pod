@@ -1,0 +1,469 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Sidef::Types::Number::Gauss
+
+=head1 DESCRIPTION
+
+This class implements ...
+
+=head1 SYNOPSIS
+
+var obj = Gauss(...)
+
+
+=head1 INHERITS
+
+Inherits methods from:
+
+       * Sidef::Types::Number::Number
+
+=head1 METHODS
+
+=head2 !=
+
+I<Obj> B<!=> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<ne>
+
+=cut
+
+=head2 %
+
+I<Obj> B<%> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mod>
+
+=cut
+
+=head2 &
+
+I<Obj> B<&> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<and>
+
+=cut
+
+=head2 *
+
+I<Obj> B<*> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<mul>
+
+=cut
+
+=head2 **
+
+I<Obj> B<**> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<pow>
+
+=cut
+
+=head2 +
+
+I<Obj> B<+> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<add>
+
+=cut
+
+=head2 ++
+
+I<Obj> B<++> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<inc>
+
+=cut
+
+=head2 -
+
+I<Obj> B<-> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<sub>
+
+=cut
+
+=head2 --
+
+I<Obj> B<--> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<dec>
+
+=cut
+
+=head2 /
+
+I<Obj> B</> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<÷>, I<div>
+
+=cut
+
+=head2 <
+
+I<Obj> B<E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lt>
+
+=cut
+
+=head2 <<
+
+I<Obj> B<E<lt>E<lt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<lsft>, I<shift_left>
+
+=cut
+
+=head2 <=>
+
+I<Obj> B<E<lt>=E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<cmp>
+
+=cut
+
+=head2 ==
+
+I<Obj> B<==> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<eq>
+
+=cut
+
+=head2 >
+
+I<Obj> B<E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<gt>
+
+=cut
+
+=head2 >>
+
+I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<rsft>, I<shift_right>
+
+=cut
+
+=head2 ^
+
+I<Obj> B<^> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<xor>
+
+=cut
+
+=head2 |
+
+I<Obj> B<|> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<or>
+
+=cut
+
+=head2 ≤
+
+I<Obj> B<≤> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<lt>=>, I<le>
+
+=cut
+
+=head2 ≥
+
+I<Obj> B<≥> I<Obj> -> I<Obj>
+
+Return the
+
+Aliases: I<E<gt>=>, I<ge>
+
+=cut
+
+=head2 abs
+
+Gauss.abs() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 ceil
+
+Gauss.ceil() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 conj
+
+Gauss.conj() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 dump
+
+Gauss.dump() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 float
+
+Gauss.float() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 floor
+
+Gauss.floor() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gcd
+
+Gauss.gcd() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 gcd_norm
+
+Gauss.gcd_norm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 iabs
+
+Gauss.iabs() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 im
+
+Gauss.im() -> I<Obj>
+
+Return the
+
+Aliases: I<imag>
+
+=cut
+
+=head2 inv
+
+Gauss.inv() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 invmod
+
+Gauss.invmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_coprime
+
+Gauss.is_coprime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_imag
+
+Gauss.is_imag() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_mone
+
+Gauss.is_mone() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_one
+
+Gauss.is_one() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_prime
+
+Gauss.is_prime() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_real
+
+Gauss.is_real() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 is_zero
+
+Gauss.is_zero() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 neg
+
+Gauss.neg() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 new
+
+Gauss.new() -> I<Obj>
+
+Return the
+
+Aliases: I<call>
+
+=cut
+
+=head2 norm
+
+Gauss.norm() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 powmod
+
+Gauss.powmod() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 re
+
+Gauss.re() -> I<Obj>
+
+Return the
+
+Aliases: I<real>
+
+=cut
+
+=head2 reals
+
+Gauss.reals() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 round
+
+Gauss.round() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 sgn
+
+Gauss.sgn() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_c
+
+Gauss.to_c() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_n
+
+Gauss.to_n() -> I<Obj>
+
+Return the
+
+=cut
+
+=head2 to_s
+
+Gauss.to_s() -> I<Obj>
+
+Return the
+
+=cut

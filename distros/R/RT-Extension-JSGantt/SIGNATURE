@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,48 +12,42 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 707fcd39c2d66531c8850b62a299681f90656be7 Changes
-SHA1 1dab6a3835b9e8191a6312b284f71f2fb9503839 MANIFEST
-SHA1 643ea07f64fb7c2bcd6bc714305013407794bca4 META.yml
-SHA1 79f0e90a44d85be8eb46740322f649db36c46c18 Makefile.PL
-SHA1 ec1faf9efcb198bf63adab4bfce64f33422d3f35 README
-SHA1 baed5dd8d2144a63b487291e0e665b0905b1303d html/Callbacks/JSGantt/Elements/Header/Head
-SHA1 57f0f30d468c81e60d428aee49067eedb8948697 html/Callbacks/JSGantt/Elements/Tabs/Privileged
-SHA1 591eb7ff71c379c9f7781a34a08f79b04ba85951 html/Callbacks/JSGantt/Search/Elements/ResultViews/AfterTools
-SHA1 213bb9ea4ea7643f79d2fda5f75ae13b9fa6972d html/Callbacks/JSGantt/Ticket/Elements/ShowSummary/LinksExtra
-SHA1 d990ab77d8edc6b5dc516a43b9eeaa59496ce647 html/NoAuth/js/jsgantt.js
-SHA1 ef001f44428251e732707f1ea4ae41e78b6a15f9 html/Search/JSGantt.html
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 3e43ac0f1912c7d202dc102f6c31ad96fbf3a044 inc/Module/Install/Include.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 2e6d9ed3ead010223a770841a5944e7ae5d1dc7a inc/Module/Install/RTx.pm
-SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 101dee5d09fc4f3cee4f866782c08409e85b7ec4 inc/YAML/Tiny.pm
-SHA1 e4d5419141f9a00a76f9a35502ca996ee98998d7 lib/RT/Extension/JSGantt.pm
-SHA1 94f9aefae3553aa2bd88b13fe174f6f8634daac9 static/css/jsgantt.css
+SHA256 816631feb41fed23830a8da767ccc936383eed40a427c6c96817d08d36107243 Changes
+SHA256 15feb2d4956f816e82545f6c985d4833b5ef83a680d31ec82a7ed5c39db9e05e MANIFEST
+SHA256 b848ab0f03c8dd7568a002689317e9fee6f8d234f36de1acc4c8499f2df51318 META.yml
+SHA256 1236aa7737c375e1945c700b9951cf819bf7bd2e9e06d8b0a39814f97c530310 Makefile.PL
+SHA256 7ad1fc4de542110bfab1a71d17831a348228ee4651376eb137f18d46c746b160 README
+SHA256 3884b140146a08daeb79efd19a829d1e81e2231c9e387705ad5886a5c151ae99 html/Callbacks/JSGantt/Elements/Header/Head
+SHA256 811405c8a0c7fa582a08121a023b561f536dc06fbb12203a2f80ab808f1d8904 html/Callbacks/JSGantt/Elements/Tabs/Privileged
+SHA256 a130d129af0f8b273b0bcc6b252b22878a87578fcba5527e6a1678655e74fa59 html/Callbacks/JSGantt/Search/Elements/ResultViews/AfterTools
+SHA256 82910c27dbccea495960e9fa0c8f8a737629758a0b42ac797896d8dd51b690a6 html/Callbacks/JSGantt/Ticket/Elements/ShowSummary/LinksExtra
+SHA256 3bf31da46c9b37fc20147ec5a6f571336fa4c5a8001fa34fafdd3830ec363485 html/NoAuth/js/jsgantt.js
+SHA256 407da85e5a7aa62f6b3c4acd6210f0af2536bd066912c7576fd3d1ddb266ea04 html/Search/JSGantt.html
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 2c89fa442659e76a8ee28643923c3a928c39ed013ad08fe67049d1df7d4c9fd6 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 85f3047c2a8fa75fbad2d9a58f4a0a63d5c4dbe9f01dcf8ce7c381d7aa037e99 lib/RT/Extension/JSGantt.pm
+SHA256 69e2a41a1841f087b9516d243bdb6385e4af70b71e32956978db818b083b7de4 static/css/jsgantt.css
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQIcBAEBAgAGBQJXB/YUAAoJEBzhxDIRelfSbHsP/0DDN89ivHnL07mDquaQNlnx
-wvN8eA+5F1ZHXDG+hSVo6JY6Dyv9SUCWrnM9+pXj62ZGxcTwQew/11uX4HP84eGv
-q36sg5xbKwYd/dsXtPqYeuoIvs9iX9Ud+acEm+Gmoiu3iM3mbpPorURjwprS2SY+
-OOhi2IX+6T1EaAc8RFDivt7Pag/9rx1CuzNwGQn1VmnF7rnpVnN5UjZ/l9mPNO4x
-vQhQxE5Bj5cQd1DWDN4i3whVTkpoRS5wCMq6TnHW7QoHtcdyLToJLtPtJPTOeEUX
-1bumdHfb3lVJHwzjGucAgE7JTwTfpTpR9LwLbSr/pJsb+JvkUHES8sfg3eKbBwN7
-r3SZ3su8J5lY6atyEePCONekMfgoOscN7NE1W0UMyMRe7McUnj/dZZofQlKl6xhy
-f+0fKBI3uEbS1g1O5HxdwGO1oMuacGZKQYUZyQr2UqG3nOITXdSJ41evKpaiGWCl
-3LZqi482iOtaayIhvKISIiq9GgGSXsv4MztAVK9jO4sYPzGVz9V72+DbBsJdsncN
-s1fsKuduxPjdnIrQSTUYbYO8FHDR7JeTzIVFtL7SvVvnRhv+ON0vlG6ZrCMjFrVt
-rVKxuDcDIcO3eEB3Z58+zzIDzoWmPyRbBZ0p+ezEQIYpvE1iJivIU9vEsTat9Uz0
-ZuQvCfh0EZ+FY7RdgxHn
-=YaBg
+iQEzBAEBCAAdFiEExJs3Lyv4ShkBFmAnDfCig/6sgLIFAl8SYkAACgkQDfCig/6s
+gLLstQf8CRBQt8MikjPbfOdmdHb0uFukytV4LCoTy0+6ldSVLVfYZ+k7bqI1qU4S
+MRRrOK3KzYQerqfj7xsjNmNmP0Nq4JgbhYpMJmayulVJYhhPhycbfz0bpEDqSZq9
+sugCIp1qTl8HsGWKqPN2BEGkTnDhrkn5d3vfVMRXlSJqsWfR/jIW7Ehu2LyY1ytm
+ED/w6fP88T1C08GTNR2lpl/EZ0K9cca3/ni1yGLF+jZVDWXgg187gOlq52WMbret
+o8SImj+MZqiL4iC3Hnz5gCkIkibovot6ebcx1TMOhEKl5q2Dj7JjVDl79r4tLyEv
+2nguigSKNJp6+htLXNz+L+gMT6wiOQ==
+=hdTC
 -----END PGP SIGNATURE-----

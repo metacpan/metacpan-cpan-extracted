@@ -19,7 +19,7 @@
 # Modules and declarations
 ##############################################################################
 
-package PGP::Sign 1.00;
+package PGP::Sign 1.01;
 
 use 5.020;
 use autodie;
@@ -45,7 +45,7 @@ my %SIGN_FLAGS = (
           --detach-sign --armor
           --quiet --textmode --batch --no-tty --pinentry-mode=loopback
           --no-greeting --no-permission-warning
-          )
+          ),
     ],
     GPG1 => [
         qw(
@@ -53,7 +53,7 @@ my %SIGN_FLAGS = (
           --quiet --textmode --batch --no-tty --no-use-agent
           --no-greeting --no-permission-warning
           --force-v3-sigs --allow-weak-digest-algos
-          )
+          ),
     ],
 );
 my %VERIFY_FLAGS = (
@@ -65,7 +65,7 @@ my %VERIFY_FLAGS = (
           --no-auto-key-retrieve --no-auto-check-trustdb
           --allow-weak-digest-algos
           --disable-dirmngr
-          )
+          ),
     ],
     GPG1 => [
         qw(
@@ -74,7 +74,7 @@ my %VERIFY_FLAGS = (
           --no-greeting --no-permission-warning
           --no-auto-key-retrieve --no-auto-check-trustdb
           --allow-weak-digest-algos
-          )
+          ),
     ],
 );
 
@@ -464,7 +464,7 @@ sub pgp_sign {
             path   => $PGPS,
             style  => $PGPSTYLE,
             tmpdir => $TMPDIR,
-        }
+        },
     );
 
     # Do the work, capturing any errors.
@@ -475,7 +475,9 @@ sub pgp_sign {
     }
 
     # Return the results, including a dummy version if desired.
+    ## no critic (Freenode::Wantarray)
     return wantarray ? ($signature, 'GnuPG') : $signature;
+    ## use critic
 }
 
 # Check a detached signature for given data.
@@ -498,7 +500,7 @@ sub pgp_verify {
             path   => $PGPV,
             style  => $PGPSTYLE,
             tmpdir => $TMPDIR,
-        }
+        },
     );
 
     # Do the work, capturing any errors.
@@ -519,10 +521,12 @@ sub pgp_verify {
 #
 # Returns: A list of GnuPG output and error messages in list context
 #          The block of GnuPG output and error message in scalar context
+## no critic (Freenode::Wantarray)
 sub pgp_error {
     my @error_lines = map { "$_\n" } @ERROR;
     return wantarray ? @error_lines : join(q{}, @error_lines);
 }
+## use critic
 
 ##############################################################################
 # Module return value and documentation

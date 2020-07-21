@@ -9,6 +9,7 @@ use JSON qw();
 use Data::Dumper;
 use Carp qw(croak);
 use namespace::clean;
+use AnyEvent;
 use Ref::Util qw(is_plain_arrayref);
 
 BEGIN { 
@@ -468,6 +469,7 @@ Example:
 sub AUTOLOAD {
   my ($self,@args)=@_;
 
+  AnyEvent->now_update;
   my $method=$AUTOLOAD;
   $method=~ s/^.*:://s;
   return if $method eq 'DESTROY';

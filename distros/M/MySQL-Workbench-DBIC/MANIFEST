@@ -48,6 +48,7 @@ t/36_main_template.t
 t/37_write_files.t
 t/38_schema_parent.t
 t/39_remove_prefix.t
+t/40_views.t
 t/DBIC_Schema.pm
 t/MySQL/Workbench/DBIC/Table.pm
 t/Role.pm
@@ -68,3 +69,4 @@ t/more_comments.mwb
 t/test-lc-uppercase.mwb
 t/test.mwb
 t/uppercase.mwb
+t/view.mwb

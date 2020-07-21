@@ -5,6 +5,7 @@ package Smartcat::App::ProjectApi;
 
 use Smartcat::Client::ProjectApi;
 use Smartcat::Client::Object::CreateDocumentPropertyModel;
+use Smartcat::Client::Object::ProjectChangesModel;
 use Smartcat::App::Utils;
 
 use Carp;
@@ -35,7 +36,7 @@ sub get_project {
         $self->{api}
           ->project_get( project_id => $self->{rundata}->{project_id} );
     };
-    die $log->error(
+    carp $log->error(
         sprintf(
             "Failed to get project '%s'.\nError:\n%s",
             $self->{rundata}->{project_id},
@@ -44,6 +45,36 @@ sub get_project {
     ) unless $project;
 
     return $project;
+}
+
+sub update_project_external_tag {
+    my ($self, $name, $external_tag) = @_;
+
+    my %args = (name => $name);
+    $args{externalTag} = $external_tag if defined $external_tag;
+
+    my $project =
+      Smartcat::Client::Object::ProjectChangesModel->new(%args);
+
+    %args = (
+        project_id => $self->{rundata}->{project_id},
+        model => $project);
+
+    $log->info("Updating project '$self->{rundata}->{project_id}' with '$external_tag' external tag...");
+    eval {
+        $self->{api}->project_update_project( %args );
+    };
+
+    carp $log->error(
+        sprintf(
+            "Failed to update project '%s' with external_tag '%s'.\nError:\n%s",
+            $self->{rundata}->{project_id},
+            $external_tag,
+            format_error_message($@)
+        )
+    ) if $@;
+
+    return;
 }
 
 sub get_all_projects {
@@ -81,6 +112,9 @@ sub upload_file {
     $args{disassemble_algorithm_name} =
       $self->{rundata}->{disassemble_algorithm_name}
       if defined $self->{rundata}->{disassemble_algorithm_name};
+    $args{preset_disassemble_algorithm} =
+      $self->{rundata}->{preset_disassemble_algorithm}
+      if defined $self->{rundata}->{preset_disassemble_algorithm};
 
     my $documents = eval { $self->{api}->project_add_document(%args) };
     unless ($documents) {

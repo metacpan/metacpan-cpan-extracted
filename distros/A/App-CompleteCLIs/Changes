@@ -1,3 +1,8 @@
+0.145   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: complete-chrome-profile-name.
+
+
 0.144   2020-04-18  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: complete-firefox-profile-name.

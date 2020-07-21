@@ -976,7 +976,7 @@ sub test_expand {
         '<$TEST/f$>'    => '\'&quot;!@#$%^&amp;*()_-=[]\\&lt;&gt;? ',
         '<$TEST/q$>'    => '\'%22!@%23$%25^%26*()_-%3d[]\\%3c%3e%3f%20',
         '<$TEST/u$>'    => '\'%22!@%23$%25^%26*()_-%3d[]\\%3c%3e%3f%20',
-        '<$TEST/j$>'    => '\\\'\\"!@#$%^&*()_-=[]\\\\<>? ',
+        '<$TEST/j$>'    => '\\u0027\\"!@#$%^&*()_-=[]\\\\<>? ',
     );
     foreach my $template (keys %ttt) {
         my $got=$page->expand(template => $template,

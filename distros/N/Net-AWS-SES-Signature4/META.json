@@ -1,0 +1,52 @@
+{
+   "abstract" : "Perl extension that implements Amazon Simple Email Service (Amazon SES) API requests that are signed using Signature Version 4 processes",
+   "author" : [
+      "Partha Pratim Sarkar <partha@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-AWS-SES-Signature4",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AWS::Signature4" : "0",
+            "Carp" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "HTTP::Headers" : "0",
+            "HTTP::Request::Common" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "MIME::Entity" : "0",
+            "Net::AWS::SES::Response" : "0",
+            "Time::Piece" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

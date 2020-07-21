@@ -48,6 +48,7 @@ Subset 1
     10  004006               24  SECOND [SECOND]
     11  005001         12.07028  LATITUDE (HIGH ACCURACY) [DEGREE]
     12  006001       -157.35901  LONGITUDE (HIGH ACCURACY) [DEGREE]
+        102004
     13  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
     14  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
     15  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
@@ -63,6 +64,7 @@ Subset 1
     25  033003                0  QUALITY INFORMATION [CODE TABLE]
                                     data not suspect
     26  010040                1  NUMBER OF RETRIEVED LAYERS [NUMERIC]
+        108000
     27  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
         201131                   CHANGE DATA WIDTH
         202129                   CHANGE SCALE
@@ -74,6 +76,7 @@ Subset 1
     31  010002          missing  HEIGHT [M]
         224000                   FIRST ORDER STATISTICS FOLLOW
         236000                   DEFINE DATA PRESENT BIT MAP
+        101000
     32  031001                4  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
     33  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
     34  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
@@ -85,6 +88,7 @@ Subset 1
                                     presat error standard deviations
     39  008023                9  FIRST ORDER STATISTICS [CODE TABLE]
                                     best estimate of standard deviation (n-1)
+        101000
     40  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
         224255                   FIRST ORDER STATISTICAL VALUES MARKER OPERATOR
     41  015020       0.00053092  INTEGRATED 03 DENSITY [KG/M**2]
@@ -108,6 +112,7 @@ Subset 2
     10  004006               24  SECOND [SECOND]
     11  005001         12.10918  LATITUDE (HIGH ACCURACY) [DEGREE]
     12  006001       -157.13652  LONGITUDE (HIGH ACCURACY) [DEGREE]
+        102004
     13  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
     14  028001          missing  LONGITUDE (HIGH ACCURACY) [DEGREE]
     15  027001          missing  LATITUDE (HIGH ACCURACY) [DEGREE]
@@ -123,6 +128,7 @@ Subset 2
     25  033003                3  QUALITY INFORMATION [CODE TABLE]
                                     data considered unfit for use
     26  010040                1  NUMBER OF RETRIEVED LAYERS [NUMERIC]
+        108000
     27  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
         201131                   CHANGE DATA WIDTH
         202129                   CHANGE SCALE
@@ -134,6 +140,7 @@ Subset 2
     31  010002          missing  HEIGHT [M]
         224000                   FIRST ORDER STATISTICS FOLLOW
         236000                   DEFINE DATA PRESENT BIT MAP
+        101000
     32  031001                4  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
     33  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
     34  031031                1  DATA PRESENT INDICATOR [FLAG TABLE]
@@ -145,6 +152,7 @@ Subset 2
                                     presat error standard deviations
     39  008023                9  FIRST ORDER STATISTICS [CODE TABLE]
                                     best estimate of standard deviation (n-1)
+        101000
     40  031001                1  DELAYED DESCRIPTOR REPLICATION FACTOR [NUMERIC]
         224255                   FIRST ORDER STATISTICAL VALUES MARKER OPERATOR
     41  015020       0.00049234  INTEGRATED 03 DENSITY [KG/M**2]

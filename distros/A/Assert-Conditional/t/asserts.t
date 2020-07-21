@@ -27,6 +27,7 @@ use IO::Handle;
 use Hash::Util qw(lock_keys unlock_keys);
 
 use Assert::Conditional qw(:all -if 1);
+use Assert::Conditional::Utils qw(:list);
 
 my($junk, @junk) ;
 
@@ -349,19 +350,6 @@ my @good_tests = (
     q{assert_minmax_keys(%primary_color, @primary_colors, @all_colors)},
     q{assert_minmax_keys($primary_color_ref, @primary_colors, @all_colors)},
 
-    q{assert_locked(%locked_hash)},
-    q{assert_locked($locked_hashref)},
-    q{assert_locked($hash_of_hashes{LOCKED})},
-    q{assert_locked($hashref_of_hashes->{LOCKED})},
-    q{assert_locked($$ref_of_hashref_of_hashes->{LOCKED})},
-
-    q{assert_unlocked(%unlocked_hash)},
-    q{assert_unlocked($unlocked_hashref)},
-    q{assert_unlocked($$ref_of_hashref_of_hashes)},
-    q{assert_unlocked($hash_of_hashes{UNLOCKED})},
-    q{assert_unlocked($hashref_of_hashes->{UNLOCKED})},
-    q{assert_unlocked($$ref_of_hashref_of_hashes->{UNLOCKED})},
-
     q{assert_anyref( \"string" )},
     q{assert_anyref( \0 )},
     q{assert_anyref( \$0 )},
@@ -567,6 +555,49 @@ my @good_tests = (
 
 
 );
+
+my $hu_version = Hash::Util->VERSION;
+
+my %is_exported = map { $_ => 1 } (
+    @Assert::Conditional::EXPORT,
+    @Assert::Conditional::EXPORT_OK,
+);
+
+cmp_ok scalar keys %is_exported, ">", 50, "we exported at least 50 functions";
+
+my @lock_assertions = qw(assert_locked assert_unlocked);
+my $lock_tests = commify_and @lock_assertions;
+
+if ($hu_version < 0.15) {
+    diag "Omitting tests for $lock_tests because Hash::Util version is only v$hu_version but we need v0.15";
+
+    for my $subname (@lock_assertions) { 
+        is($is_exported{$subname}, undef, "$subname is not exported under $hu_version");
+    }
+}
+else {
+    diag "Including assert tests for $lock_tests because Hash::Util version is v$hu_version and we need only v0.15";
+
+    for my $subname (@lock_assertions) { 
+        is $is_exported{$subname}, 1, "$subname is exported under $hu_version";
+    }
+
+    push @good_tests, (
+        q{assert_locked(%locked_hash)},
+        q{assert_locked($locked_hashref)},
+        q{assert_locked($hash_of_hashes{LOCKED})},
+        q{assert_locked($hashref_of_hashes->{LOCKED})},
+        q{assert_locked($$ref_of_hashref_of_hashes->{LOCKED})},
+
+        q{assert_unlocked(%unlocked_hash)},
+        q{assert_unlocked($unlocked_hashref)},
+        q{assert_unlocked($$ref_of_hashref_of_hashes)},
+        q{assert_unlocked($hash_of_hashes{UNLOCKED})},
+        q{assert_unlocked($hashref_of_hashes->{UNLOCKED})},
+        q{assert_unlocked($$ref_of_hashref_of_hashes->{UNLOCKED})},
+    );
+
+} 
 
 my @bad_tests = (
     q{assert(1)},
@@ -1239,8 +1270,11 @@ for my $good (@good_tests) {
 
 for my $bad (@bad_tests) {
     local $@;
-    # these might not compile, so don't check eval result
-    my $code = eval "sub { $bad }";  
+    # These might not compile, so don't check eval result.
+    # Have a default way to die though because otherwise
+    #   Use of uninitialized value in subroutine entry at t/asserts.t ....
+    # coming out of Test2::Tools::Exception line 15
+    my $code = eval "sub { $bad }" || sub { die "whatever" };
     local $ENV{PATH} = "/bin:/usr/bin" if $bad =~ /system/;
     ok(dies { &$code }, "dies ok: $bad")
         || diag "assertion unexpectedly lived: $bad";

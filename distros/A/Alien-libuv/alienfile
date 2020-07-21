@@ -13,11 +13,13 @@ plugin 'PkgConfig' => (
 );
 
 share {
+    my $run_upstream_tests = ($ENV{AUTOMATED_TESTING} || $ENV{RELEASE_TESTING}) ? 1 : 0;
+
     # note on apple weirdisms: https://github.com/joyent/libuv/issues/1200
     meta->prop->{env}->{LIBTOOLIZE} = 'libtoolize' if $^O eq 'darwin';
 
     plugin Download => (
-        url     => 'https://dist.libuv.org/dist/v1.34.2',
+        url     => 'https://dist.libuv.org/dist/v1.38.1',
         version => qr/^libuv-v([0-9\.]+)\.tar\.gz$/,
     );
 
@@ -34,7 +36,7 @@ share {
             '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true',
             '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
             '-DCMAKE_MAKE_PROGRAM:PATH=%{make}',
-            '-DBUILD_TESTING=OFF',
+            '-DBUILD_TESTING=' . ($run_upstream_tests ? 'ON' : 'OFF'),
         );
 
         meta->before_hook(build => sub {
@@ -94,6 +96,8 @@ share {
                 Path::Tiny->new($build->install_prop->{prefix})->child('lib/pkgconfig/libuv.pc')->spew($pc);
             },
         ];
+
+        test(['ctest -C Debug --output-on-failure']) if $run_upstream_tests;
     }
     else {
         requires 'Alien::Autotools';
@@ -103,14 +107,10 @@ share {
             'sh autogen.sh',
             '%{configure}',
             '%{make}',
-            #'%{make} check',
             '%{make} install',
         ];
 
-        test [
-            '%{make} check',
-            #'%{make} install',
-        ];
+        test(['%{make} check']) if $run_upstream_tests;
     }
 
     plugin 'Gather::IsolateDynamic' => ();

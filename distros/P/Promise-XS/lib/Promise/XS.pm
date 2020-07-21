@@ -53,8 +53,7 @@ subset of that from L<Promises>, is retained.
 
 =head1 STATUS
 
-Breaking changes in this interface are unlikely; however, the implementation
-is relatively untested since the fork. Your mileage may vary.
+This module is stable, well-tested, and suitable for production use.
 
 =head1 DIFFERENCES FROM ECMASCRIPT PROMISES
 
@@ -103,6 +102,19 @@ values.
 
 =head1 DIFFERENCES FROM L<Promises> ET AL.
 
+=head2 Empty or uninitialized rejection values
+
+Promise rejections fulfill the same role in asynchronous code that exceptions
+do in synchronous code. Perl helpfully warns (under the C<warnings> pragma,
+anyhow) when you C<die(undef)> since an uninitialized value isn’t useful as
+an error report and likely indicates a problem.
+
+Promise::XS mimics this behavior by warning if a rejection value list lacks
+a defined value. This can happen if the value list is either empty or
+contains exclusively uninitialized values.
+
+=head2 C<finally()>
+
 This module implements ECMAScript’s C<finally()> interface, which differs
 from that in some other Perl promise implementations.
 
@@ -112,23 +124,24 @@ Given the following …
 
 =over
 
-=item * C<$callback> is given no arguments.
+=item * C<$callback> receives I<no> arguments.
 
 =item * If C<$callback> returns anything but a single, rejected promise,
 C<$new> has the same status as C<$p>.
 
-=item * If C<$callback> throws or returns a single, rejected promise,
-C<$new> is rejected with C<$callback>’s exception.
+=item * If C<$callback> throws, or if it returns a single, rejected promise,
+C<$new> is rejected with the relevant value(s).
 
 =back
 
 =head1 EVENT LOOPS
 
-By default this library uses no event loop. This is a perfectly usable
+By default this library uses no event loop. This is a generally usable
 configuration; however, it’ll be a bit different from how promises usually
 work in evented contexts (e.g., JavaScript) because callbacks will execute
 immediately rather than at the end of the event loop as the Promises/A+
-specification requires.
+specification requires. Following this pattern facilitates use of recursive
+promises without exceeding call stack limits.
 
 To achieve full Promises/A+ compliance it’s necessary to integrate with
 an event loop interface. This library supports three such interfaces:
@@ -154,9 +167,6 @@ Note that all three of the above are event loop B<interfaces>. They
 aren’t event loops themselves, but abstractions over various event loops.
 See each one’s documentation for details about supported event loops.
 
-B<REMINDER:> There’s no reason why promises I<need> an event loop; it
-just satisfies the Promises/A+ convention.
-
 =head1 MEMORY LEAK DETECTION
 
 Any promise created while C<$Promise::XS::DETECT_MEMORY_LEAKS> is truthy
@@ -174,8 +184,7 @@ mid-flight controls like cancellation.
 
 =over
 
-=item * C<all()> and C<race()> should be implemented in XS,
-as should C<resolved()> and C<rejected()>.
+=item * C<all()> and C<race()> should ideally be implemented in XS.
 
 =back
 
@@ -221,89 +230,18 @@ sub use_event {
     }
 }
 
-sub resolved {
-    return deferred()->resolve(@_)->promise();
-}
-
-sub rejected {
-    return deferred()->reject(@_)->promise();
-}
-
 #----------------------------------------------------------------------
 # Aggregator functions
-
-# Lifted from AnyEvent::XSPromises
 sub all {
-    my $remaining= 0+@_;
-    my @values;
-    my $failed= 0;
-    my $then_what= deferred();
-    my $pending= 1;
-    my $i= 0;
+    return Promise::XS::Promise->all(@_);
+}
 
-    my $reject_now = sub {
-        if (!$failed++) {
-            $pending= 0;
-            $then_what->reject(@_);
-        }
-    };
-
-    for my $p (@_) {
-        my $i = $i++;
-
-        $p->then(
-            sub {
-                $values[$i]= \@_;
-                if ((--$remaining) == 0) {
-                    $pending= 0;
-                    $then_what->resolve(@values);
-                }
-            },
-            $reject_now,
-        );
-    }
-    if (!$remaining && $pending) {
-        $then_what->resolve(@values);
-    }
-    return $then_what->promise;
+sub race {
+    return Promise::XS::Promise->race(@_);
 }
 
 # Compatibility with other promise interfaces.
 *collect = *all;
-
-# Lifted from Promise::ES6
-sub race {
-
-    my $deferred = deferred();
-
-    my $is_done;
-
-    my $on_resolve_cr = sub {
-        return if $is_done;
-        $is_done = 1;
-
-        $deferred->resolve(@_);
-
-        # Proactively eliminate references:
-        undef $deferred;
-    };
-
-    my $on_reject_cr = sub {
-        return if $is_done;
-        $is_done = 1;
-
-        $deferred->reject(@_);
-
-        # Proactively eliminate references:
-        undef $deferred;
-    };
-
-    for my $given_promise (@_) {
-        $given_promise->then($on_resolve_cr, $on_reject_cr);
-    }
-
-    return $deferred->promise();
-}
 
 #----------------------------------------------------------------------
 

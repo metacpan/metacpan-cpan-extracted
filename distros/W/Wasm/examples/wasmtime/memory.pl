@@ -5,9 +5,9 @@ use Path::Tiny qw( path );
 use Wasm::Wasmtime;
 use PeekPoke::FFI qw( peek poke );
 
-
-my $module = Wasm::Wasmtime::Module->new( file => path(__FILE__)->parent->child('memory.wat') );
-my $instance = Wasm::Wasmtime::Instance->new($module);
+my $wasm_store = Wasm::Wasmtime::Store->new;
+my $module = Wasm::Wasmtime::Module->new( $wasm_store, file => path(__FILE__)->parent->child('memory.wat') );
+my $instance = Wasm::Wasmtime::Instance->new($module, $wasm_store);
 
 my $memory = $instance->exports->memory;
 my $size   = $instance->exports->size;

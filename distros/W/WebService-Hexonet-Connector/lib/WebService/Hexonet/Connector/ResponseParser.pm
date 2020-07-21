@@ -1,10 +1,10 @@
 package WebService::Hexonet::Connector::ResponseParser;
 
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 
-use version 0.9917; our $VERSION = version->declare('v2.9.2');
+use version 0.9917; our $VERSION = version->declare('v2.10.0');
 
 
 sub parse {

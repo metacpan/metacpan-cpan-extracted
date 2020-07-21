@@ -1,5 +1,14 @@
 Revision history for Web::Mention
 
+0.720 2020-07-19T17:19:09Z
+
+    - Improved methods for translating webmentions to and from JSON,
+    including new `as_json` and `new_from_json` methods. Removing
+    documentation for old and annoying serialization expectations.
+    
+    - The `author` method now always returns an object. (Its fields will
+    be present but empty if a webmention's author is unknown or unset.)
+
 0.712 2020-07-04T20:17:21Z
 
     - Explicitly setting the internal user agent object's User-Agent

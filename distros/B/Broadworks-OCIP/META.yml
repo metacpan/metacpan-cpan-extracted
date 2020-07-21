@@ -26,34 +26,30 @@ no_index:
 provides:
   Broadworks::OCIP:
     file: lib/Broadworks/OCIP.pm
-    version: '0.08'
+    version: '0.09'
   Broadworks::OCIP::Deprecated:
     file: lib/Broadworks/OCIP/Deprecated.pm
-    version: '0.08'
+    version: '0.09'
   Broadworks::OCIP::Methods:
     file: lib/Broadworks/OCIP/Methods.pm
-    version: '0.08'
+    version: '0.09'
   Broadworks::OCIP::Response:
     file: lib/Broadworks/OCIP/Response.pm
-    version: '0.08'
+    version: '0.09'
   Broadworks::OCIP::Throwable:
     file: lib/Broadworks/OCIP/Throwable.pm
-    version: '0.08'
-  Redcentric::Roles::OCIP:
-    file: lib/Redcentric/Roles/OCIP.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Config::Any: '0'
   Data::UUID: '0'
   Digest::MD5: '0'
   Digest::SHA1: '0'
   Encode: '0'
+  Function::Parameters: '0'
   IO::Select: '0'
   IO::Socket::INET: '0'
-  Method::Signatures: '0'
   Moose: '0'
   Moose::Role: '0'
-  MooseX::App::Role: '0'
   MooseX::StrictConstructor: '0'
   Throwable::Error: '0'
   Try::Tiny: '0'
@@ -65,10 +61,13 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: '0.08'
+resources:
+  homepage: https://github.com/nigelm/broadworks-ocip
+  repository: https://github.com/nigelm/https://github.com/nigelm/broadworks-ocip.git.git
+version: '0.09'
 x_Dist_Zilla:
   perl:
-    version: '5.028000'
+    version: '5.030000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneFiles
@@ -103,10 +102,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.27.0
           repo_root: .
       name: '@Git/Check'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -121,12 +120,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.27.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -134,16 +133,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.08'
+          tag: '0.09'
           tag_format: '%v'
           tag_message: '%v'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.27.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -152,10 +151,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.27.0
           repo_root: .
       name: '@Git/Push'
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -170,7 +169,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::NextVersion
       config:
@@ -179,15 +178,15 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^(\d+.\d+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.27.0
           repo_root: .
       name: Git::NextVersion
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.27.0
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -199,13 +198,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.17.1
+          git_version: 2.27.0
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.034'
+      version: '0.035'
     -
       class: Dist::Zilla::Plugin::Git::CommitBuild
       config:
@@ -217,10 +216,10 @@ x_Dist_Zilla:
           release_branch: cpan
           release_message: 'Build results of %h (on %b)'
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.17.1
+          git_version: 2.27.0
           repo_root: .
       name: Git::CommitBuild
-      version: '2.045'
+      version: '2.046'
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: Test::Perl::Critic
@@ -236,7 +235,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurPkgVersion
       name: OurPkgVersion
-      version: '0.12'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::Test::Kwalitee
       config:
@@ -342,42 +341,6 @@ x_Dist_Zilla:
       name: Authority
       version: '1.009'
     -
-      class: Dist::Zilla::Plugin::PruneCruft
-      name: '@Starter/PruneCruft'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::ManifestSkip
-      name: '@Starter/ManifestSkip'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::MetaConfig
-      name: '@Starter/MetaConfig'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::MetaProvides::Package
-      config:
-        Dist::Zilla::Plugin::MetaProvides::Package:
-          finder_objects:
-            -
-              class: Dist::Zilla::Plugin::FinderCode
-              name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.012'
-          include_underscores: 0
-        Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
-        Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
-          version: '0.006'
-      name: '@Starter/MetaProvides::Package'
-      version: '2.004003'
-    -
-      class: Dist::Zilla::Plugin::MetaNoIndex
-      name: '@Starter/MetaNoIndex'
-      version: '6.012'
-    -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Starter/MetaYAML'
       version: '6.012'
@@ -396,14 +359,6 @@ x_Dist_Zilla:
           version: '0.006'
       name: '@Starter/ReadmeAnyFromPod'
       version: '0.163250'
-    -
-      class: Dist::Zilla::Plugin::ExecDir
-      name: '@Starter/ExecDir'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::ShareDir
-      name: '@Starter/ShareDir'
-      version: '6.012'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Starter/PodSyntaxTests'
@@ -442,8 +397,12 @@ x_Dist_Zilla:
       name: '@Starter/Manifest'
       version: '6.012'
     -
-      class: Dist::Zilla::Plugin::TestRelease
-      name: '@Starter/TestRelease'
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Starter/PruneCruft'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Starter/ManifestSkip'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::RunExtraTests
@@ -453,8 +412,52 @@ x_Dist_Zilla:
       name: '@Starter/RunExtraTests'
       version: '0.029'
     -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Starter/TestRelease'
+      version: '6.012'
+    -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Starter/ConfirmRelease'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Starter/UploadToCPAN'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Starter/MetaConfig'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: '@Starter/MetaNoIndex'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.012'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000036'
+          version: '0.006'
+      name: '@Starter/MetaProvides::Package'
+      version: '2.004003'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Starter/ShareDir'
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Starter/ExecDir'
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
@@ -468,9 +471,9 @@ x_Dist_Zilla:
       name: Meta::Contributors
       version: '0.003'
     -
-      class: Dist::Zilla::Plugin::FakeRelease
-      name: FakeRelease
-      version: '6.012'
+      class: Dist::Zilla::Plugin::GitHubREADME::Badge
+      name: GitHubREADME::Badge
+      version: '0.29'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
@@ -525,5 +528,5 @@ x_contributors:
   - 'Nigel Metheringham <nigel@dotdot.it>'
   - 'Nigel Metheringham <nigel.metheringham@notifications.redcentricplc.com>'
   - 'Nigel Metheringham <nigel.metheringham@redcentricplc.com>'
-x_generated_by_perl: v5.28.0
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

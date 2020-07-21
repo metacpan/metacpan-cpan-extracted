@@ -27,6 +27,8 @@
 #define RESULT_IS_RESOLVED(result) (result->state == XSPR_RESULT_RESOLVED)
 #define RESULT_IS_REJECTED(result) (result->state == XSPR_RESULT_REJECTED)
 
+#define UNUSED(x) (void)(x)
+
 typedef struct xspr_callback_s xspr_callback_t;
 typedef struct xspr_promise_s xspr_promise_t;
 typedef struct xspr_result_s xspr_result_t;
@@ -126,6 +128,7 @@ void xspr_promise_incref(pTHX_ xspr_promise_t* promise);
 void xspr_promise_decref(pTHX_ xspr_promise_t* promise);
 
 xspr_result_t* xspr_result_new(pTHX_ xspr_result_state_t state, unsigned count);
+xspr_result_t* pxs_result_clone(pTHX_ xspr_result_t* old);
 xspr_result_t* xspr_result_from_error(pTHX_ const char *error);
 void xspr_result_incref(pTHX_ xspr_result_t* result);
 void xspr_result_decref(pTHX_ xspr_result_t* result);
@@ -184,6 +187,12 @@ void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* orig
         if (callback->type == XSPR_CALLBACK_FINALLY) {
             callback_fn = callback->finally.on_finally;
             next_promise = callback->finally.next;
+
+            /* A finally() “catches” its parent promise, even as it
+               rethrows any failure from it. */
+            if (callback_fn && SvOK(callback_fn)) {
+                origin->finished.result->rejection_should_warn = false;
+            }
         } else {
             next_promise = callback->perl.next;
 
@@ -216,7 +225,20 @@ void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* orig
                 );
             }
 
-            if (next_promise != NULL) {
+            if (next_promise == NULL) {
+                if (callback->type == XSPR_CALLBACK_FINALLY && RESULT_IS_RESOLVED(callback_result) && RESULT_IS_REJECTED(origin->finished.result)) {
+
+                    /* This handles the case where finally() is called in
+                       void context and the parent promise rejects. In this
+                       case we need an unhandled-rejection warning right
+                       away since, given the absence of a next_promise,
+                       by definition we have an unhandled rejection.
+                    */
+                    xspr_result_decref(aTHX_ callback_result);
+                    callback_result = pxs_result_clone( aTHX_ origin->finished.result );
+                }
+            }
+            else {
                 bool finish_promise = true;
 
                 if (callback_result->count > 0 && callback_result->state == XSPR_RESULT_RESOLVED) {
@@ -259,15 +281,33 @@ void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* orig
 
                 if (finish_promise) {
                     xspr_result_t* final_result;
+                    bool final_result_needs_decref = false;;
 
                     if ((callback->type == XSPR_CALLBACK_FINALLY) && RESULT_IS_RESOLVED(callback_result)) {
                         final_result = origin->finished.result;
+
+                        if (RESULT_IS_REJECTED(final_result)) {
+
+                            // If finally()’s callback succeeds, it takes
+                            // on the resolution status of the “parent”
+                            // promise. If that promise rejected, then,
+                            // the finally’s promise also rejects. Notably,
+                            // the finally’s promise should STILL trigger
+                            // an unhandled-rejection warning, even if the
+                            // parent’s rejection is eventually handled.
+                            final_result = pxs_result_clone(aTHX_ final_result);
+                            final_result_needs_decref = true;
+                        }
                     }
                     else {
                         final_result = callback_result;
                     }
 
                     xspr_promise_finish(aTHX_ next_promise, final_result);
+
+                    if (final_result_needs_decref) {
+                        xspr_result_decref(aTHX_ final_result);
+                    }
                 }
             }
 
@@ -458,7 +498,6 @@ xspr_result_t* xspr_invoke_perl(pTHX_ SV* perl_fn, SV** inputs, unsigned input_c
 {
     dSP;
     unsigned count, i;
-    SV* error;
     xspr_result_t* result;
 
     if (!SvROK(perl_fn)) {
@@ -589,6 +628,18 @@ xspr_result_t* xspr_result_new(pTHX_ xspr_result_state_t state, unsigned count)
     return result;
 }
 
+xspr_result_t* pxs_result_clone(pTHX_ xspr_result_t* old)
+{
+    xspr_result_t* new = xspr_result_new(aTHX_ old->state, old->count);
+
+    unsigned i;
+    for (i=0; i<old->count; i++) {
+        new->results[i] = SvREFCNT_inc( old->results[i] );
+    }
+
+    return new;
+}
+
 xspr_result_t* xspr_result_from_error(pTHX_ const char *error)
 {
     xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_REJECTED, 1);
@@ -680,10 +731,16 @@ xspr_callback_t* xspr_callback_new_finally_chain(pTHX_ xspr_result_t* original_r
     xspr_callback_t* callback;
     Newxz(callback, 1, xspr_callback_t);
     callback->type = XSPR_CALLBACK_FINALLY_CHAIN;
+
+    /*
     callback->finally_chain.original_result = original_result;
-    callback->finally_chain.chain_promise = next_promise;
     xspr_result_incref(aTHX_ original_result);
+    */
+    callback->finally_chain.original_result = pxs_result_clone(aTHX_ original_result);
+
+    callback->finally_chain.chain_promise = next_promise;
     xspr_promise_incref(aTHX_ next_promise);
+
     return callback;
 }
 
@@ -824,6 +881,72 @@ static inline void _warn_on_destroy_if_needed(pTHX_ xspr_promise_t* promise, SV*
     }
 }
 
+static inline void _warn_weird_reject_if_needed( pTHX_ SV* self_sv, const char* funcname, I32 my_items ) {
+
+    char *pkgname = NULL;
+
+    HV *stash = (self_sv == NULL) ? NULL : SvSTASH( SvRV(self_sv) );
+
+    if (stash != NULL) {
+        pkgname = HvNAME(stash);
+    }
+
+    if (pkgname == NULL) pkgname = DEFERRED_CLASS;
+
+    if (my_items == 0) {
+        warn( "%s: Empty call to %s()", pkgname, funcname );
+    }
+    else {
+        warn( "%s: %s() called with only uninitialized values (%d)", pkgname, funcname, my_items);
+    }
+}
+
+static inline void _resolve_promise(pTHX_ xspr_promise_t* promise_p, SV** args, I32 argslen) {
+    xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_RESOLVED, argslen);
+
+    unsigned i;
+    for (i = 0; i < argslen; i++) {
+        result->results[i] = newSVsv(args[i]);
+    }
+
+    xspr_promise_finish(aTHX_ promise_p, result);
+    xspr_result_decref(aTHX_ result);
+}
+
+static inline void _reject_promise(pTHX_ SV* self_sv, xspr_promise_t* promise_p, SV** args, I32 argslen) {
+    xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_REJECTED, argslen);
+
+    bool has_defined = false;
+
+    unsigned i;
+    for (i = 0; i < argslen; i++) {
+        result->results[i] = newSVsv(args[i]);
+
+        if (!has_defined && SvOK(result->results[i])) {
+            has_defined = true;
+        }
+    }
+
+    if (!has_defined) {
+        const char* funcname = (self_sv == NULL) ? "rejected" : "reject";
+
+        _warn_weird_reject_if_needed( aTHX_ self_sv, funcname, argslen );
+    }
+
+    xspr_promise_finish(aTHX_ promise_p, result);
+    xspr_result_decref(aTHX_ result);
+}
+
+SV* _promise_to_sv(pTHX_ xspr_promise_t* promise_p) {
+    dMY_CXT;
+
+    PROMISE_CLASS_TYPE* promise_ptr;
+    Newxz(promise_ptr, 1, PROMISE_CLASS_TYPE);
+    promise_ptr->promise = promise_p;
+
+    return _ptr_to_svrv(aTHX_ promise_ptr, MY_CXT.pxs_promise_stash);
+}
+
 //----------------------------------------------------------------------
 
 MODULE = Promise::XS     PACKAGE = Promise::XS
@@ -907,20 +1030,27 @@ CLONE(...)
 
 #endif /* USE_ITHREADS && defined(sv_dup_inc) */
 
-#SV *
-#resolved(...)
-#    CODE:
-#        xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_RESOLVED, items);
-#        unsigned i;
-#        for (i = 0; i < items; i++) {
-#            result->results[i] = newSVsv(ST(i));
-#        }
-#
-#        xspr_promise_t* promise = create_promise(aTHX);
-#        xspr_promise_finish(aTHX_ promise, result);
-#        xspr_result_decref(aTHX_ result);
-#    OUTPUT:
-#        RETVAL
+SV *
+resolved(...)
+    CODE:
+        xspr_promise_t* promise_p = create_promise(aTHX);
+
+        _resolve_promise(aTHX_ promise_p, &(ST(0)), items);
+
+        RETVAL = _promise_to_sv(aTHX_ promise_p);
+    OUTPUT:
+        RETVAL
+
+SV *
+rejected(...)
+    CODE:
+        xspr_promise_t* promise_p = create_promise(aTHX);
+
+        _reject_promise(aTHX_ NULL, promise_p, &(ST(0)), items);
+
+        RETVAL = _promise_to_sv(aTHX_ promise_p);
+    OUTPUT:
+        RETVAL
 
 #----------------------------------------------------------------------
 
@@ -967,9 +1097,11 @@ ___set_deferral_generic(SV* cr, ...)
             SvREFCNT_inc(MY_CXT.deferral_arg);
         }
 
+# We don’t care if there are args or not.
 void
 ___flush(...)
     CODE:
+        UNUSED(items);
         xspr_queue_flush(aTHX);
 
 void
@@ -984,16 +1116,11 @@ ___set_conversion_helper(helper)
 SV*
 promise(SV* self_sv)
     CODE:
-        dMY_CXT;
-
         DEFERRED_CLASS_TYPE* self = _get_deferred_from_sv(aTHX_ self_sv);
 
-        PROMISE_CLASS_TYPE* promise_ptr;
-        Newxz(promise_ptr, 1, PROMISE_CLASS_TYPE);
-        promise_ptr->promise = self->promise;
-        xspr_promise_incref(aTHX_ promise_ptr->promise);
+        xspr_promise_incref(aTHX_ self->promise);
 
-        RETVAL = _ptr_to_svrv(aTHX_ promise_ptr, MY_CXT.pxs_promise_stash);
+        RETVAL = _promise_to_sv(aTHX_ self->promise);
     OUTPUT:
         RETVAL
 
@@ -1006,14 +1133,7 @@ resolve(SV *self_sv, ...)
             croak("Cannot resolve deferred: not pending");
         }
 
-        xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_RESOLVED, items-1);
-        unsigned i;
-        for (i = 0; i < items-1; i++) {
-            result->results[i] = newSVsv(ST(1+i));
-        }
-
-        xspr_promise_finish(aTHX_ self->promise, result);
-        xspr_result_decref(aTHX_ result);
+        _resolve_promise(aTHX_ self->promise, &(ST(1)), items - 1);
 
         if (GIMME_V == G_VOID) {
             RETVAL = NULL;
@@ -1034,14 +1154,7 @@ reject(SV *self_sv, ...)
             croak("Cannot reject deferred: not pending");
         }
 
-        xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_REJECTED, items-1);
-        unsigned i;
-        for (i = 0; i < items-1; i++) {
-            result->results[i] = newSVsv(ST(1+i));
-        }
-
-        xspr_promise_finish(aTHX_ self->promise, result);
-        xspr_result_decref(aTHX_ result);
+        _reject_promise(aTHX_ self_sv, self->promise, &(ST(1)), items - 1);
 
         if (GIMME_V == G_VOID) {
             RETVAL = NULL;
@@ -1066,7 +1179,10 @@ SV*
 clear_unhandled_rejection(SV *self_sv)
     CODE:
         DEFERRED_CLASS_TYPE* self = _get_deferred_from_sv(aTHX_ self_sv);
-        // self->promise->unhandled_rejection = NULL;
+
+        if (self->promise->state == XSPR_STATE_FINISHED) {
+            self->promise->finished.result->rejection_should_warn = false;
+        }
 
         if (GIMME_V == G_VOID) {
             RETVAL = NULL;

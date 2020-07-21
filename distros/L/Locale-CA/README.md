@@ -10,7 +10,7 @@ Locale::CA - two letter codes for province identification in Canada and vice ver
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -18,7 +18,8 @@ Version 0.03
 
     my $u = Locale::CA->new();
 
-    # Returns the French names of the provinces if $LANG starts with 'fr'
+    # Returns the French names of the provinces if $LANG starts with 'fr' or
+    #   the lang parameter is set to 'fr'
     my $province = $u->{code2province}{$code};
     my $code  = $u->{province2code}{$province};
 

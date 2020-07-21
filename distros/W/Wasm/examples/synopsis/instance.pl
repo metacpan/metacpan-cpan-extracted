@@ -2,5 +2,6 @@ use strict;
 use warnings;
 use Wasm::Wasmtime;
 
-my $module = Wasm::Wasmtime::Module->new(wat => '(module)');
-my $instance = Wasm::Wasmtime::Instance->new($module, []);
+my $store = Wasm::Wasmtime::Store->new;
+my $module = Wasm::Wasmtime::Module->new($store, wat => '(module)');
+my $instance = Wasm::Wasmtime::Instance->new($module, $store, []);

@@ -112,6 +112,10 @@ language to already be installed in the search path:
 
     ./Build tipython
 
+=item Java
+
+    ./Build tijava
+
 =back
 
 =back

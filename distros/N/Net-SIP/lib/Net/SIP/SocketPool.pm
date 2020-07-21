@@ -497,7 +497,7 @@ sub _handle_read_tcp_co {
     }
     $hdrpos += 4; # after header
     my %clen = map { $_ => 1 } 
-	substr($fo->{rbuf},0,$hdrpos) =~m{\nContent-length:\s*(\d+)\s*\n}ig;
+	substr($fo->{rbuf},0,$hdrpos) =~m{\n(?:l|Content-length):\s*(\d+)\s*\n}ig;
     if (!%clen) {
 	return $self->_del_socket($fo,
 	    "drop invalid SIP packet from %s: missing content-length",
@@ -689,10 +689,10 @@ sub _tls_connect {
     if (!$xxfd) {
 	$DEBUG && DEBUG(40,"upgrade to SSL client");
 	IO::Socket::SSL->start_SSL($fo->{fd},
-	    %{$self->{tls}{c}},
-	    SSL_startHandshake => 0,
 	    SSL_verifycn_name => $fo->{peer}{host},
 	    SSL_hostname => $fo->{peer}{host},
+	    %{$self->{tls}{c}},
+	    SSL_startHandshake => 0,
 	) or die "upgrade to SSL socket failed: $SSL_ERROR";
     }
 
@@ -721,6 +721,7 @@ sub _tls_connect {
 	# permanent error
 	_del_socket($self, $fo,
 	    "SSL connect failed: $SSL_ERROR");
+	invoke_callback($callback,"SSL connect failed: $SSL_ERROR");
     }
 }
 

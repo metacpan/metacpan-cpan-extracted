@@ -1,8 +1,10 @@
-# (c) 2003-2016 Vlado Keselj http://web.cs.dal.ca/~vlado
+# Calendar::Schedule - Manage calendar schedules
+# (c) 2002-2020 Vlado Keselj http://web.cs.dal.ca/~vlado vlado@dnlp.ca
+#               and contributing authors
 #
-# $Id: Schedule.pm 239 2016-02-19 15:37:48Z vlado $
-# <? read_starfish_conf(); !>
- 
+# Some parts are updated with Starfish during development, such as the version
+# number: <? read_starfish_conf !>
+
 package Calendar::Schedule;
 use strict;
 require Exporter;
@@ -15,10 +17,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw( parse_time ) ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw(new);
 
-#<?echo "our \$VERSION = '$Meta->{version}';"!>
-#+
-our $VERSION = '1.07';
-#-
+#<?echo "our \$VERSION = '$Meta->{version}';"!>#+
+our $VERSION = '1.13';#-
 
 use vars qw($Version $Revision);
 $Version = $VERSION;
@@ -26,14 +26,13 @@ $Version = $VERSION;
 
 # non-exported package globals
 use vars qw( $REweekday3 $REmonth3 $RE1st );
-
 $RE1st = qr/first|second|third|fourth|fifth|last|1st|2nd|3rd|4th|5th/;
 $REweekday3 = qr/Mon|Tue|Wed|Thu|Fri|Sat|Sun/;
 $REmonth3 = qr/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/;
 
 =head1 NAME
 
-Calendar::Schedule - for managing calendar schedules
+Calendar::Schedule - manage calendar schedules
 
 =head1 SYNOPSIS
 
@@ -47,13 +46,13 @@ Calendar::Schedule - for managing calendar schedules
     # reading entries from a file
     $TTable->add_entries_from("$ENV{'HOME'}/.calendar");
 
-    # producing entries in HTML tables
+    # producing entries in HTML tables, one table per week
     $TTable->set_first_week('now');
     print "<p>\n" . $TTable->generate_table();
     print "<p>\n" . $TTable->generate_table();
     print "<p>\n" . $TTable->generate_table();
 
-    # etc.  See EXAMPLES section
+    # for more examples, see EXAMPLES section
 
 The file .calendar may look like this:
 
@@ -77,10 +76,26 @@ The file .calendar may look like this:
 
 =head1 DESCRIPTION
 
-Description ...
+The module is created with a purpose to provide functionality for handling a
+personal calendar schedule in a transparent and simple way.  The calendar
+data is assumed to be kept in a plain file in a format easy to edit and
+understand.  It was inspired by the C<calendar> program on older Unix-like
+systems, which used C<~/.calendar> file to produce entries for each day
+and send them in the morning by email.
 
-Attempted to match the internal data representation with the iCalendar
-standard (RFC2445).  Examples of the iCalendar fields: DTSTART, DTEND, SUMMARY,
+Inspired by the C<~/.calendar> file, the format for recording scheduled
+events is very simple, mostly contained in one line of text.
+
+The module currently supports generation of HTML weekly tables with visual
+representation of scheduled events.  The generated table is generated in
+a simple HTML table, with a use of C<colspan> and C<rolspan> attributes to
+represent overlapping events in parallel in the table.
+
+=head2 Planned Future Work
+
+In the development of the recording format for the event, there is an attempt
+to model the data representation of the iCalendar standard (RFC2445).
+Examples of the iCalendar fields are: DTSTART, DTEND, SUMMARY,
 RRULE (e.g. RRULE:FREQ=WEEKLY, RRULE:FREQ=WEEKLY;INTERVAL=2 for
 biweekly, RRULE:FREQ=WEEKLY;UNTIL=20040408 ) etc.
 More examples:
@@ -1248,6 +1263,14 @@ sub is_week_in_month {
     return 0;
 }
 
+=pod
+
+=head2 weekday_to_digits
+
+For example, changes all words "SUNDAY", "Sunday", "SUN", or "Sun" to "00", etc.
+
+=cut
+
 sub weekday_to_digits {
     local $_ = shift;
     s/\b(?:SUN?(?:DAY)?|Sun(?:day)?)\b/00/g;
@@ -1386,34 +1409,36 @@ __END__
 =head1 THANKS
 
 I would like to thank Stefan Goebel for his report and detailed
-analysis of a bug and suggestions, and Mike Vasiljevs for his
-suggestions and patches for ISO8601 format.
+analysis of a bug and suggestions, Mike Vasiljevs for his
+suggestions and patches for ISO8601 format, and Mohammad S Anwar for
+correction regarding missing license field.
 
 =head1 AUTHOR
 
-Copyright 2003-2016 Vlado Keselj, vlado@dnlp.ca, http://web.cs.dal.ca/~vlado
+Copyright 2002-2020 Vlado Keselj, vlado@dnlp.ca, http://web.cs.dal.ca/~vlado
 
 This script is provided "as is" without expressed or implied warranty.
-This is free software; you can redistribute it and/or modify it under
+This is free software; you can redistribute it, modify it, or both under
 the same terms as Perl itself.
 
 The latest version can be found at
-F<http://web.cs.dal.ca/~vlado/srcperl/Calendar-Schedule/>.
+L<http://web.cs.dal.ca/~vlado/srcperl/Calendar-Schedule/>.
 
 =head1 SEE ALSO
 
-There are at least one and probably many Perl modules for different types of calendar,
-and likely many more in other programming languages.  The reason for creation of this one
-is that no existing ones included some particular features needed.  This should be
-re-examined.  Below is one module included:
+There are some Perl modules for different types of calendar, and
+likely may more in other programming languages.  I could not find any
+existing calendars including the particular features that I needed, so
+this module was created.  Below are some modules with similar
+functionality:
 
 =over 4
 
 =item [HTML::CalendarMonthSimple] - Perl Module for Generating HTML Calendars
 
-The module is written as a simplifed version of HTML::CalendarMonth.  The intention for this,
-Calendar::Schedule module, is not to tie it essentially for HTML.  The events specification is
-described in a simple textual format.
+The module is written as a simplifed version of HTML::CalendarMonth.
+The intention for this, Calendar::Schedule module, is not to tie it essentially
+for HTML.  The events specification is described in a simple textual format.
 
 =item [HTML::CalendarMonth] - Generate and manipulate HTML calendar months
 

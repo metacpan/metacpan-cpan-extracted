@@ -7,6 +7,8 @@ XAO::Templates - templates caching and retrieving module
 Templates retriever. Uses persistent cache to store once retrieved
 templates.
 
+=over
+
 =cut
 
 ###############################################################################
@@ -177,6 +179,8 @@ sub list (%) {
 ###############################################################################
 1;
 __END__
+
+=back
 
 =head1 AUTHOR
 

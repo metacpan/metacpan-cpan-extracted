@@ -39,5 +39,6 @@ requires:
   Try::Tiny: '0'
   Types::Common::Numeric: '0'
   Types::Standard: '0'
-version: v0.83.0
+  Types::TypeTiny: '0'
+version: v0.84.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

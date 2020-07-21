@@ -7,6 +7,9 @@ Set( %MandatoryOnTransition,
          '* -> resolved' => ['TimeWorked',]
      }
     );
+Set( %PriorityAsString,
+    Default => { Low => 0, Medium => 50, High => 100 },
+);
 CONFIG
     ;
 
@@ -76,10 +79,15 @@ diag "Modify ticket through Basics without permanently altering %CORE_FOR_UPDATE
     $m->goto_ticket($t0->id);
     $m->follow_link_ok( { text => 'Basics' }, 'Get Modify.html of ticket' );
     $m->submit_form_ok( { form_name => 'TicketModify',
-                          fields => { Priority => 1, },
+                          fields => { Priority => 50, },
                           button => 'SubmitTicket', },
                         'Modify any ticket 0 metadata except status, queue, or TimeWorked', );
-    $m->content_contains('Priority changed from &#40;no value&#41; to &#39;1&#39;');
+    if ( RT->Config->Get('EnablePriorityAsString') ) {
+        $m->text_contains("Priority changed from 'Low' to 'Medium'");
+    }
+    else {
+        $m->text_contains("Priority changed from (no value) to '50'");
+    }
 
     $m->goto_ticket($t1->id);
     $m->follow_link_ok( { text => 'Resolve' }, 'Try to resolve ticket');
@@ -110,10 +118,15 @@ diag "Modify ticket through Jumbo without permanently altering %CORE_FOR_UPDATE"
     $m->goto_ticket($t0->id);
     $m->follow_link_ok( { text => 'Jumbo' }, 'Get ModifyAll.html of ticket' );
     $m->submit_form_ok( { form_name => 'TicketModifyAll',
-                          fields => { Priority => 1, },
+                          fields => { Priority => 50, },
                           button => 'SubmitTicket', },
                         'Modify any ticket 0 metadata except status, queue, or TimeWorked', );
-    $m->content_contains('Priority changed from &#40;no value&#41; to &#39;1&#39;');
+    if ( RT->Config->Get('EnablePriorityAsString') ) {
+        $m->text_contains("Priority changed from 'Low' to 'Medium'");
+    }
+    else {
+        $m->text_contains("Priority changed from (no value) to '50'");
+    }
 
     $m->goto_ticket($t1->id);
     $m->follow_link_ok( { text => 'Resolve' }, 'Try to resolve ticket');

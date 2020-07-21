@@ -1,5 +1,8 @@
 Revision history for ExtUtils-PL2Bat
 
+0.003     2020-07-16 19:20:11+02:00 Europe/Amsterdam
+          Add pl2bat.pl
+
 0.002     2019-04-28 11:47:56+01:00 Europe/London
           Repair PL2BAT ~ remove `echo off`; use `%COMSPEC% /d/c ...`; fix ERRORLEVEL use
           Improve process exit operation

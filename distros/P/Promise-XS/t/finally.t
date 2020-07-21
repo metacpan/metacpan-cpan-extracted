@@ -18,7 +18,7 @@ my $p = $def->promise();
 my ($args, $wantarray);
 
 my $finally = $p->finally( sub {
-    $args = \@_;
+    $args = [@_];
     $wantarray = wantarray;
 } );
 
@@ -44,7 +44,7 @@ is_deeply( $got, [234, 567], 'args to then() after a finally()' );
 
     is_deeply(
         \@got => [ [234, 567] ],
-        'finally() callback receives regular return',
+        'finally() callback - normal return is ignored',
     );
 }
 
@@ -76,7 +76,7 @@ is_deeply( $got, [234, 567], 'args to then() after a finally()' );
 
     is_deeply(
         \@got => [ [234, 567] ],
-        'finally() callback receives resolved promise',
+        'finally() callback returns a resolved promise',
     );
 }
 
@@ -92,7 +92,7 @@ is_deeply( $got, [234, 567], 'args to then() after a finally()' );
 
     is_deeply(
         \@got => [ undef, [666, 666] ],
-        'finally() callback receives rejected promise',
+        'finally() callback returns a rejected promise',
     );
 }
 
@@ -113,7 +113,7 @@ is_deeply( $got, [234, 567], 'args to then() after a finally()' );
 
     is_deeply(
         \@got => [ [234, 567] ],
-        'finally() callback receives rejected promise plus junk',
+        'finally() callback returns rejected promise plus junk',
     ) or diag explain \@got;
 
     cmp_bag(
@@ -126,7 +126,7 @@ is_deeply( $got, [234, 567], 'args to then() after a finally()' );
             ),
         ],
         'warnings for unhandled rejection and junk return',
-    );
+    ) or diag explain \@w;
 }
 
 done_testing;

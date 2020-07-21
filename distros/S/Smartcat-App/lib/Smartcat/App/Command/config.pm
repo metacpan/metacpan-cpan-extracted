@@ -14,6 +14,7 @@ sub validate_args {
 
     $app->{config}->{username} = $opt->{token_id} if defined $opt->{token_id};
     $app->{config}->{password} = $opt->{token}    if defined $opt->{token};
+    $app->{config}->{base_url} = $opt->{base_url} if defined $opt->{base_url};
 
     if ( defined $opt->{log} ) {
         $self->usage_error(

@@ -1,0 +1,10 @@
+0.003 Jul 20, 2020
+* Should now be working on strawberry perl
+
+0.002 Jul 19, 2020
+* Move build-only module to outside lib/
+* Declare configure_requires for File::ShareDir properly, so that we can look up the DBD::SQLite sharedir
+* Add Changes file
+
+0.001 Dec 29, 2016
+* Initial release

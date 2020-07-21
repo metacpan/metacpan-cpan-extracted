@@ -3,6 +3,7 @@
 
 use strict;
 use warnings;
+use lib 'blib/lib', 'blib/arch'; ## no critic
 use Data::Dumper;
 use DBI;
 use Cwd;
@@ -18,6 +19,11 @@ if (exists $ENV{TEST_OUTPUT}) {
     Test::More->builder->failure_output($testfh);
     Test::More->builder->todo_output($testfh);
 }
+
+my @views =
+    (
+     'dbd_pg_view',
+     );
 
 my @matviews =
     (
@@ -512,6 +518,7 @@ version: $version
             print {$cfh} "\n\n## DBD::Pg testing parameters\n";
             print {$cfh} "port=$testport\n";
             print {$cfh} "max_connections=11\n";
+            print {$cfh} "log_statement = 'all'\n";
             print {$cfh} "log_min_duration_statement = 0\n";
             print {$cfh} "log_line_prefix = '%m [%p] '\n";
             print {$cfh} "log_filename = 'postgres%Y-%m-%d.log'\n";
@@ -677,6 +684,10 @@ version: $version
         ## non-ASCII parts of the tests assume UTF8
         $dbh->do('SET client_encoding = utf8');
         $dbh->{pg_enable_utf8} = -1;
+        ## Always want this on for consistent testing
+        if ($dbh->{pg_server_version} >= 80200) {
+            $dbh->do('SET array_nulls = ON');
+        }
     }
 
     if ($arg->{quickreturn}) {
@@ -892,6 +903,12 @@ sub cleanup_database {
         my $schema = ($name =~ s/(.+)\.(.+)/$2/) ? $1 : $S;
         next if ! relation_exists($dbh,$schema,$name);
         $dbh->do("DROP MATERIALIZED VIEW $schema.$name");
+    }
+
+    for my $name (@views) {
+        my $schema = ($name =~ s/(.+)\.(.+)/$2/) ? $1 : $S;
+        next if ! relation_exists($dbh,$schema,$name);
+        $dbh->do("DROP VIEW $schema.$name");
     }
 
     for my $name (@operators) {

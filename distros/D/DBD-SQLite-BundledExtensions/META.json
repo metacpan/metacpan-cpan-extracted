@@ -1,0 +1,47 @@
+{
+   "abstract" : "Provide a series of C extensions for DBD::SQLite and some helper functions to load them",
+   "author" : [
+      "Ryan Voots E<lt>simcop2387@simcop2387.infoE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBD-SQLite-BundledExtensions",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0.005",
+            "Archive::Zip" : "0",
+            "DBD::SQLite" : "0",
+            "File::ShareDir" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.005",
+            "DBD::SQLite" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBD::SQLite::BundledExtensions" : {
+         "file" : "lib/DBD/SQLite/BundledExtensions.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

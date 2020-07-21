@@ -1,5 +1,10 @@
 Revision history for Games-Battleship
 
+0.0602 2020-07-15 15:01:58
+    - Clean-up POD and improve documentation.
+    - Add a orient attribute to craft objects to specify the orientation.
+    - Fix the Dist::Zilla dist.ini.
+
 0.0601 2015-10-18
     - Utilize additional Moo features.
 

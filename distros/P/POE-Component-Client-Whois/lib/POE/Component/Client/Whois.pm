@@ -1,5 +1,5 @@
 package POE::Component::Client::Whois;
-$POE::Component::Client::Whois::VERSION = '1.36';
+$POE::Component::Client::Whois::VERSION = '1.38';
 #ABSTRACT: A one shot non-blocking RFC 812 WHOIS query.
 
 use strict;
@@ -86,6 +86,7 @@ sub whois {
 sub _start {
     my ( $kernel, $self ) = @_[ KERNEL, OBJECT ];
     $self->{_dot_com} = ( POE::Component::Client::Whois::TLDList->new()->tld('.com') )[0];
+    $self->{_dot_org} = ( POE::Component::Client::Whois::TLDList->new()->tld('.org') )[0];
     $self->{session_id} = $_[SESSION]->ID();
     $kernel->yield('_connect');
     undef;
@@ -217,7 +218,8 @@ sub _sock_input {
         return if $host eq $self->{request}->{host};
         $self->{_referral} = $authority;
     }
-    if ( $self->{request}->{host} eq $self->{_dot_com}
+    if ( ( $self->{request}->{host} eq $self->{_dot_com} or
+           $self->{request}->{host} eq $self->{_dot_org} )
         and my ($other) = $line =~ /Whois Server:\s+(.*)\s*$/i )
     {
         $self->{_referral} = $other;
@@ -245,7 +247,7 @@ POE::Component::Client::Whois - A one shot non-blocking RFC 812 WHOIS query.
 
 =head1 VERSION
 
-version 1.36
+version 1.38
 
 =head1 SYNOPSIS
 
@@ -333,7 +335,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Chris Williams.
+This software is copyright (c) 2020 by Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

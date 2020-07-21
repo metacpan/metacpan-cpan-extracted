@@ -1,0 +1,6 @@
+Compress::Stream::Zstd::Compressor T_PTROBJ
+Compress::Stream::Zstd::Decompressor T_PTROBJ
+Compress::Stream::Zstd::CompressionContext T_PTROBJ
+Compress::Stream::Zstd::DecompressionContext T_PTROBJ
+Compress::Stream::Zstd::CompressionDictionary T_PTROBJ
+Compress::Stream::Zstd::DecompressionDictionary T_PTROBJ

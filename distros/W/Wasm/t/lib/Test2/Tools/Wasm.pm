@@ -7,7 +7,7 @@ use Ref::Util qw( is_plain_arrayref );
 use Test2::API qw( context );
 use base qw( Exporter );
 
-our @EXPORT = qw( wasm_module_ok wasm_instance_ok wasm_func_ok );
+our @EXPORT = qw( wasm_store wasm_module_ok wasm_instance_ok wasm_func_ok );
 
 sub _module
 {
@@ -19,12 +19,7 @@ sub _module
   my $ctx = context();
 
   local $@ = '';
-  my $store = eval {
-    my $config = Wasm::Wasmtime::Config->new;
-    $config->wasm_multi_value(1);
-    my $engine = Wasm::Wasmtime::Engine->new($config);
-    Wasm::Wasmtime::Store->new($engine);
-  };
+  my $store = eval { wasm_store() };
   return $ctx->fail_and_release($name, "error creating store object", "$@") if $@;
 
   my $module = eval { Wasm::Wasmtime::Module->new($store, wat => $wat) };
@@ -46,7 +41,7 @@ sub _instance
 
   my $ctx = context();
 
-  my $instance = eval { Wasm::Wasmtime::Instance->new($module, $imports) };
+  my $instance = eval { Wasm::Wasmtime::Instance->new($module, wasm_store(), $imports) };
   return $ctx->fail_and_release($name, "error creating instance", "$@") if $@;
 
   $ctx->release;
@@ -121,6 +116,18 @@ sub wasm_func_ok ($$;$)
   $ctx->pass_and_release($name);
 
   return $extern;
+}
+
+my $store;
+
+sub wasm_store
+{
+  $store ||= do {
+    my $config = Wasm::Wasmtime::Config->new;
+    $config->wasm_multi_value(1);
+    my $engine = Wasm::Wasmtime::Engine->new($config);
+    Wasm::Wasmtime::Store->new($engine);
+  };
 }
 
 1;

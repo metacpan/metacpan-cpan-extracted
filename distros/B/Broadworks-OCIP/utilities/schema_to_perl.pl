@@ -178,7 +178,7 @@ sub generate_code_header {
     $fh->print("use warnings;\n");
     $fh->print("use utf8;\n");
     $fh->print("use namespace::autoclean;\n");
-    $fh->print("use Method::Signatures;\n");
+    $fh->print("use Function::Parameters;\n");
 
     if ($deprecated) {
         $fh->print("use Moose::Role;\n");
@@ -354,7 +354,7 @@ sub complex_type_parser {
             my $base = $base_elt->att('base');
             my $i;
             given ($base) {
-                when ('core:OCIRequest') { $i = 'Q'; parse_request_info( $name, $t, $base_elt ); }
+                when ('core:OCIRequest')      { $i = 'Q'; parse_request_info( $name, $t, $base_elt ); }
                 when ('core:OCIDataResponse') { $i = 'D' }
                 when ('core:OCIResponse')     { $i = 'R' }
                 default                       { $i = '?' }
@@ -410,7 +410,7 @@ foreach my $set (qw[Methods Deprecated]) {
     my $code = IO::File->new( $set . '.pm',  'w' ) || die "Cannot open code $set - $!";
     my $pod  = IO::File->new( $set . '.pod', 'w' ) || die "Cannot open pod $set - $!";
     generate_code_header( $code, $set, ( $set eq 'Deprecated' ) ? 1 : 0 );
-    generate_pod_header( $pod, $set, ( $set eq 'Deprecated' ) ? 1 : 0 );
+    generate_pod_header( $pod, $set, ( $set eq 'Deprecated' )   ? 1 : 0 );
     foreach my $class ( @{ $thisset->{classlist} } ) {
         $code->printf("##\n## $class\n##\n");
         $pod->printf("\n=head2 $class\n\n");
@@ -423,7 +423,7 @@ foreach my $set (qw[Methods Deprecated]) {
 
     # generate trailers and close files
     generate_code_trailer( $code, $set, ( $set eq 'Deprecated' ) ? 1 : 0 );
-    generate_pod_trailer( $pod, $set, ( $set eq 'Deprecated' ) ? 1 : 0 );
+    generate_pod_trailer( $pod, $set, ( $set eq 'Deprecated' )   ? 1 : 0 );
     $code->close;
     $pod->close;
 }

@@ -35,7 +35,7 @@ cme - Check or edit configuration data with Config::Model
 
 =head1 VERSION
 
-version 1.031
+version 1.032
 
 =head1 SYNOPSIS
 
@@ -417,11 +417,16 @@ Blogs about this project: L<https://ddumont.wordpress.com/category/perl/configmo
 
 =back
 
+=head1 CONTRIBUTORS
+
+In alphabetical order:
+
+ Ross Vandegrift
+
 =head1 FEEDBACKS
 
 Feedback from users are highly desired. If you find this module useful, please
-share your use cases, success stories with the author or with the config-model-
-users mailing list.
+share your use cases, success stories with the author.
 
 =head1 SEE ALSO
 

@@ -1,7 +1,23 @@
---- #YAML:1.0
-name: Calendar::Schedule
-abstract: Perl-based Calendar Schedule Manager
-version: 1.07
-authored_by:
-  - Vlado Keselj http://web.cs.dal.ca/~vlado
+---
+abstract: 'manage calendar schedules'
+author:
+  - 'Vlado Keselj web.cs.dal.ca/~vlado'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
 license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Calendar-Schedule
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: https://github.com/vkeselj/calendar-schedule.git
+version: '1.13'

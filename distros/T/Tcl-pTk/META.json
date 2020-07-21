@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Interface to Tcl/Tk with Perl/Tk compatible syntax",
    "author" : [
       "unknown"
    ],
@@ -60,6 +60,6 @@
       },
       "x_MailingList" : "mailto:tcltk@perl.org"
    },
-   "version" : "1.07",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

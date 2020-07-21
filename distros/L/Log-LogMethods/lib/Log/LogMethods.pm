@@ -15,28 +15,30 @@ use Moo::Role;
 use Carp qw(croak);
 use namespace::clean;
 
-our $VERSION='1.006';
+our $VERSION='1.007';
 
 # used as a place holder for extended format data
 our $CURRENT_CB;
 BEGIN { 
-  Log::Log4perl::Logger::create_custom_level(qw( ALWAYS FATAL)); 
-  Log::Log4perl::Logger::create_custom_level(qw(LOCAL_DEBUG TRACE)); 
+
+  # disable logging
+  #local $SIG{__WARN__}=sub { };
+
+  # always should be before off
+  Log::Log4perl::Logger::create_custom_level(qw( ALWAYS OFF)); 
 }
 
 sub LOOK_BACK_DEPTH { 3; }
 
 our %LEVEL_MAP=(
-  DEBUG=>$LOCAL_DEBUG,
-  DEFAULT_DEBUG=>$DEBUG,
-  TRACE=>$TRACE,
-  INFO=>$INFO,
-  WARN=>$WARN,
-  ERROR=>$ERROR,
-  #ALWAYS=>$ALWAYS,
+  OFF=>$OFF,
   ALWAYS=>$ALWAYS,
   FATAL=>$FATAL,
-  OFF=>$OFF
+  ERROR=>$ERROR,
+  WARN=>$WARN,
+  INFO=>$INFO,
+  DEBUG=>$DEBUG,
+  TRACE=>$TRACE,
 );
 
 =pod
@@ -430,13 +432,13 @@ sub MODIFY_CODE_ATTRIBUTES {
   $trace->{sub}="${self}::$name";
   my ($type,$level)=split /_/,$attr;
   return $attr unless exists $LEVEL_MAP{$level} and $type=~ m/^(?:BENCHMARK|RESULT)$/s;
-  croak "Cannot add benchmarking to ${self}::$name"  if __PACKAGE__->can($name);
+  croak "Cannot add $attr to ${self}::$name"  if __PACKAGE__->can($name);
 
   my $lc=lc($type);
   my $method="_attribute_${lc}_common";
-  $self->$method($trace,$level,$code);
+  my $ref=$self->$method($trace,$level,$code);
 
-  return $self->SUPER::MODIFY_CODE_ATTRIBUTES(@_) if $self->can('SUPER::MODIFY_CODE_ATTRIBUTES');;
+  #return $self->SUPER::MODIFY_CODE_ATTRIBUTES($self,$ref,$attr) if $self->can('SUPER::MODIFY_CODE_ATTRIBUTES');
   return ();
 }
 
@@ -487,6 +489,7 @@ sub _attribute_result_common {
   my $eval="*$method=\$ref";
   eval $eval;
   croak $@ if $@;
+  return $ref;
 }
 
 =item * $self->_attribute_benchmark_common( $stack,$level,$code);
@@ -546,6 +549,7 @@ sub _attribute_benchmark_common {
   my $eval="*$method=\$ref";
   eval $eval;
   croak $@ if $@;
+  return $ref;
 }
 
 =item * $self->log_to_log4perl($level,$stack,@args)

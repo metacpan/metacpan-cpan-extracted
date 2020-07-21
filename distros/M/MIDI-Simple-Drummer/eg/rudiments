@@ -13,15 +13,17 @@ $d->count_in;
 
 $d->snare('Electric Snare');
 
-# 2 paradiddle_diddles, 2 single_paradiddles
-$d->beat( -name => 19 );
-$d->beat( -name => 19 );
-$d->beat( -name => 16 );
-$d->beat( -name => 16 );
+# 2 paradiddle_diddles
+#$d->beat( -name => 19 );
+#$d->beat( -name => 19 );
+# 2 single_paradiddles
+#$d->beat( -name => 16 );
+#$d->beat( -name => 16 );
 
 # All patterns
-#for my $n (keys %{ $d->_default_patterns }) {
-#    $d->beat(-name => $n);
-#}
+for my $n ( sort { $a <=> $b } keys %{ $d->_default_patterns } ) {
+    $d->beat( -name => $n );
+    $d->rest( $d->HALF );
+}
 
 $d->write("$0.mid");

@@ -46,6 +46,7 @@
 20-simple_html: simple test for html style
 21-make:	Makefile test
 22-hooks:	Experiments with hooks
+23-methods:	Testing add_final; plan to test more methods
 
 NEEDS RENAMING AND DOC UPDATES:
 6 - using -o option, very similar to 10-tex (6.in 6.out) TeX style

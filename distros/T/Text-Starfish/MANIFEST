@@ -63,6 +63,10 @@ testfiles/22-hooks/Makefile
 testfiles/22-hooks/text.in
 testfiles/22-hooks/text.out
 testfiles/22-hooks/text-replace.out
+testfiles/23-methods/Makefile
+testfiles/23-methods/test1.in
+testfiles/23-methods/test1.out
+testfiles/23-methods/test.pl
 testfiles/14.out
 testfiles/15.java
 testfiles/15.out

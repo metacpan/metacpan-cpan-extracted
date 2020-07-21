@@ -20,7 +20,7 @@ use overload
   ;
 
 # ABSTRACT: Wasmtime function class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasm_func_';
@@ -58,7 +58,9 @@ $ffi->attach( [ wasmtime_func_new => 'new' ] => ['wasm_store_t', 'wasm_functype_
       };
       if(my $error = $@)
       {
-        my $trap = Wasm::Wasmtime::Trap->new($store, "$error\0");
+        my $trap = is_blessed_ref $error && $error->isa('Wasm::Wasmtime::Trap')
+          ? $error
+          : Wasm::Wasmtime::Trap->new($store, "$error\0");
         delete $caller->{ptr};
         shift @Wasm::Wasmtime::Caller::callers;
         return delete $trap->{ptr};
@@ -106,11 +108,7 @@ $ffi->attach( call => ['wasm_func_t', 'wasm_val_vec_t', 'wasm_val_vec_t'] => 'wa
 
   my $trap = $xsub->($self, $args, $results);
 
-  if($trap)
-  {
-    my $message = $trap->message;
-    Carp::croak("trap in wasm function call: $message");
-  }
+  die $trap if $trap;
   return unless defined $results;
   my @results = $results->to_perl;
   wantarray ? @results : $results[0]; ## no critic (Freenode::Wantarray)
@@ -170,14 +168,15 @@ Wasm::Wasmtime::Func - Wasmtime function class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
  # Call a wasm function from Perl
  use Wasm::Wasmtime;
  
- my $module = Wasm::Wasmtime::Module->new( wat => q{
+ my $store = Wasm::Wasmtime::Store->new;
+ my $module = Wasm::Wasmtime::Module->new( $store, wat => q{
    (module
     (func (export "add") (param i32 i32) (result i32)
       local.get 0
@@ -186,7 +185,7 @@ version 0.14
    )
  });
  
- my $instance = Wasm::Wasmtime::Instance->new($module);
+ my $instance = Wasm::Wasmtime::Instance->new($module, $store);
  my $add = $instance->exports->add;
  print $add->call(1,2), "\n";  # 3
 
@@ -207,7 +206,7 @@ version 0.14
    sub { print "hello world!\n" },
  );
  
- my $instance = Wasm::Wasmtime::Instance->new($module, [$hello]);
+ my $instance = Wasm::Wasmtime::Instance->new($module, $store, [$hello]);
  $instance->exports->run->call(); # hello world!
 
 =head1 DESCRIPTION

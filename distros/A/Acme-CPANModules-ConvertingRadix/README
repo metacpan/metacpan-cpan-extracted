@@ -1,0 +1,73 @@
+NAME
+    Acme::CPANModules::ConvertingRadix - Convert the radix (base) of a
+    number from one to another
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::ConvertingRadix (from Perl distribution
+    Acme-CPANModules-ConvertingRadix), released on 2020-04-09.
+
+DESCRIPTION
+    Convert the radix (base) of a number from one to another.
+
+INCLUDED MODULES
+    *   Math::Numseq::RadixConversion
+
+        The list of dependencies seem too much for a simple task: from
+        Module::Pluggable to File::HomeDir, Module::Util, and so on. This is
+        because the module is part of the distribution of a large family of
+        Math::Numseq::* modules.
+
+    *   Number::AnyBase
+
+        Has one non-core dependency: Class::Accessor::Faster.
+
+    *   Math::NumberBase
+
+        No non-core dependency. The OO interface annoys me slightly.
+
+FAQ
+  What are ways to use this module?
+    Aside from reading it, you can install all the listed modules using
+    cpanmodules:
+
+        % cpanmodules ls-entries ConvertingRadix | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=ConvertingRadix -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    This module also helps lcpan produce a more meaningful result for "lcpan
+    related-mods" when it comes to finding related modules for the modules
+    listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-ConvertingRadix>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-ConvertingRadix>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Conv
+    ertingRadix>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

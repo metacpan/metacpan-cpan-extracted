@@ -8,7 +8,7 @@ use exact::class;
 use Template;
 use Bible::OBML;
 
-our $VERSION = '1.12'; # VERSION
+our $VERSION = '1.14'; # VERSION
 
 has obml => sub { Bible::OBML->new };
 
@@ -171,7 +171,7 @@ has template => q{
 
 sub from_file {
     my ( $self, $file, $skip_smartify ) = @_;
-    $self->throw('Data provided is not a filename') unless ( -f $file );
+    croak('Data provided is not a filename') unless ( -f $file );
 
     my $obml = $self->obml->read_file($file);
     $obml = $self->obml->smartify($obml) unless ($skip_smartify);
@@ -180,7 +180,7 @@ sub from_file {
 
 sub from_data {
     my ( $self, $data, $skip_smartify ) = @_;
-    $self->throw('Data provided is not an arrayref') unless ( ref($data) eq 'ARRAY' );
+    croak('Data provided is not an arrayref') unless ( ref($data) eq 'ARRAY' );
 
     $data = $self->obml->parse( $self->obml->smartify( $self->obml->render($data) ) )
         unless ($skip_smartify);
@@ -190,7 +190,7 @@ sub from_data {
 
 sub from_obml {
     my ( $self, $obml, $skip_smartify ) = @_;
-    $self->throw('Data provided is not a string') if ( ref($obml) );
+    croak('Data provided is not a string') if ( ref($obml) );
 
     $obml = $self->obml->smartify($obml) unless ($skip_smartify);
     return $self->_html( $self->obml->parse($obml) );
@@ -225,7 +225,7 @@ Bible::OBML::HTML - Render OBML as HTML
 
 =head1 VERSION
 
-version 1.12
+version 1.14
 
 =for test_synopsis my( $obml, $filename, $data, $skip_smartify );
 

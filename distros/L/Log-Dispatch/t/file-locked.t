@@ -45,8 +45,8 @@ sub _run_children {
     my %exit_status;
     try {
         local $SIG{ALRM}
-            = sub { die 'Waited 10 seconds for children to exit' };
-        alarm 10;
+            = sub { die 'Waited 30 seconds for children to exit' };
+        alarm 30;
 
         while ( keys %pids ) {
             my $pid = waitpid( -1, WNOHANG );

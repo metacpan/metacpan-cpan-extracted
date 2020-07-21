@@ -13,19 +13,19 @@ use 5.020;
 use autodie;
 use warnings;
 
+use lib 't/lib';
+
 use File::Spec;
 use IO::File;
 use IPC::Cmd qw(can_run);
 use Test::More;
+use Test::PGP qw(gpg_is_gpg1);
 
 # Check that GnuPG is available.  If so, load the module and set the plan.
 BEGIN {
     if (!can_run('gpg')) {
         plan skip_all => 'gpg binary not available';
-    } elsif (!can_run('gpg1')) {
-        plan skip_all => 'gpg1 binary not available';
     } else {
-        plan tests => 43;
         use_ok('PGP::Sign');
     }
 }
@@ -43,12 +43,28 @@ close($fh);
 my $keyid      = 'testing';
 my $passphrase = 'testing';
 
+# There are three possibilities: gpg is GnuPG v1, gpg is GnuPG v2 and v1 is
+# not available, or gpg is GnuPG v2 and gpg1 is GnuPG v1.  We ideally want to
+# test both styles, but we'll take what we can get.
+my @styles;
+if (gpg_is_gpg1()) {
+    @styles = qw(GPG1);
+} elsif (!can_run('gpg1')) {
+    @styles = qw(GPG);
+} else {
+    @styles = qw(GPG GPG1);
+}
+
 # Run all the tests twice, once with GnuPG v2 and then with GnuPG v1.
-for my $style ('GPG', 'GPG1') {
+for my $style (@styles) {
     note("Testing PGPSTYLE $style");
     local $PGP::Sign::PGPSTYLE = $style;
     my $pgpdir = ($style eq 'GPG') ? 'gnupg2' : 'gnupg1';
     local $PGP::Sign::PGPPATH = File::Spec->catdir($data, $pgpdir);
+    if ($style eq 'GPG1' && gpg_is_gpg1()) {
+        $PGP::Sign::PGPS = 'gpg';
+        $PGP::Sign::PGPV = 'gpg';
+    }
 
     # Generate a signature.
     my ($signature, $version) = pgp_sign($keyid, $passphrase, @data);
@@ -105,12 +121,15 @@ for my $style ('GPG', 'GPG1') {
     like(
         $errors[-1],
         qr{^ Execution [ ] of [ ] gpg.? [ ] failed}xms,
-        'Invalid signature'
+        'Invalid signature',
     );
     like(
         $errors,
         qr{\n Execution [ ] of [ ] gpg.? [ ] failed}xms,
-        'Errors contain newlines'
+        'Errors contain newlines',
     );
     is($errors, join(q{}, @errors), 'Two presentations of errors match');
 }
+
+# Report the end of testing.
+done_testing(21 * scalar(@styles) + 1);

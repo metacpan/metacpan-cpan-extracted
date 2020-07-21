@@ -8,8 +8,8 @@ use Modern::Open;
 
 my $rc = 0;
 
-$rc = pipe(README,WRITEME);
-ok($rc, q{pipe(README,WRITEME)});
+eval { $rc = pipe(README,WRITEME); };
+ok($@, q{pipe(README,WRITEME)});
 if ($rc) {
     local $_ = fileno(README);
     close(README);

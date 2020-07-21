@@ -25,7 +25,7 @@ use Wasm::Wasmtime::WasiConfig;
 use Wasm::Wasmtime::WasiInstance;
 
 # ABSTRACT: Perl interface to Wasmtime
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 1;
@@ -42,7 +42,7 @@ Wasm::Wasmtime - Perl interface to Wasmtime
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ version 0.14
    print "hello world!\n";
  }
  
- my $instance = Wasm::Wasmtime::Instance->new( $module, [\&hello] );
+ my $instance = Wasm::Wasmtime::Instance->new( $module, $store, [\&hello] );
  
  # call a WebAssembly function that calls back into Perl space
  $instance->exports->call_hello;

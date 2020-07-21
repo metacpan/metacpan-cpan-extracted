@@ -1,6 +1,6 @@
 package WebService::Hexonet::Connector::Response;
 
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 use WebService::Hexonet::Connector::Column;
@@ -11,7 +11,7 @@ use List::MoreUtils qw(first_index);
 use Readonly;
 Readonly my $INDEX_NOT_FOUND => -1;
 
-use version 0.9917; our $VERSION = version->declare('v2.9.2');
+use version 0.9917; our $VERSION = version->declare('v2.10.0');
 
 
 sub new {
@@ -74,7 +74,7 @@ sub new {
 
 sub addColumn {
     my ( $self, $key, @data ) = @_;
-    push @{ $self->{columns} }, WebService::Hexonet::Connector::Column->new( $key, @data );
+    push @{ $self->{columns} },    WebService::Hexonet::Connector::Column->new( $key, @data );
     push @{ $self->{columnkeys} }, $key;
     return $self;
 }

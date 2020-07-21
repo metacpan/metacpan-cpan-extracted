@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "JSON" => 0,
     "List::Util" => 0,
     "Moo" => "1.003001",
-    "MySQL::Workbench::Parser" => "1.08"
+    "MySQL::Workbench::Parser" => "1.10"
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Pod::Coverage::TrustPod" => 0,
     "Test::LongString" => "0.16"
   },
-  "VERSION" => "1.19",
+  "VERSION" => "1.20",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,7 +52,7 @@ my %FallbackPrereqs = (
   "JSON" => 0,
   "List::Util" => 0,
   "Moo" => "1.003001",
-  "MySQL::Workbench::Parser" => "1.08",
+  "MySQL::Workbench::Parser" => "1.10",
   "Pod::Coverage::TrustPod" => 0,
   "Test::LongString" => "0.16"
 );

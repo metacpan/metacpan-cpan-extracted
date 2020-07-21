@@ -1,5 +1,13 @@
 Summary of Changes to Tcl::pTk
 
+Release 1.08:  2020-07-17
+
+ * Improved support for ttk::treeview `item`, `selection`, and `tag` commands
+   as ttkTreeview methods: these now return Perl lists rather than string
+   representations of Tcl lists. See https://git.io/JJZ7C
+ * Emulate timeofday() with Time::HiRes::time()
+   instead of Tcl 8.5+ [clock microseconds]
+
 Release 1.07:  2020-03-13
 
  * Allow '.' in Cascade labels (RT #125058)

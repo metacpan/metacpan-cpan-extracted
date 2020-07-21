@@ -9,6 +9,8 @@ use_ok ("Web::Mention");
 my $source = 'file://' . "$FindBin::Bin/sources/content_property.html";
 my $target = "http://example.com/webmention-target";
 
+# Test serialization using JSON methods manually
+{
 my $wm = Web::Mention->new(
     source => $source,
     target => $target,
@@ -24,11 +26,43 @@ my $serialized_wm = $json->encode($wm);
 my $unserialized_wm = Web::Mention->FROM_JSON( $json->decode($serialized_wm) );
 
 is ($unserialized_wm->source, $source,
-    'Unserialized webmention remembers its source.',
+    'Manually unserialized webmention remembers its source.',
 );
 
 ok ($unserialized_wm->is_tested,
-    'Unserialized webmention remembers its is_tested status.',
+    'Manually unserialized webmention remembers its is_tested status.',
 );
+}
+
+# Test serialization using the library's own JSON methods
+{
+my $wm = Web::Mention->new(
+    source => $source,
+    target => $target,
+);
+my $serialized_wm = $wm->as_json;
+my $unserialized_wm = Web::Mention->new_from_json( $serialized_wm );
+
+is ($unserialized_wm->source, $source,
+    'Unserialized, untested webmention remembers its source.',
+);
+ok (not($unserialized_wm->is_tested),
+    'Unserialized, untested webmention remembers its is_tested status.',
+);
+
+$wm->verify;
+
+$serialized_wm = $wm->as_json;
+$unserialized_wm = Web::Mention->new_from_json( $serialized_wm );
+
+is ($unserialized_wm->source, $source,
+    'Unserialized, verified webmention remembers its source.',
+);
+
+ok ($unserialized_wm->is_tested,
+    'Unserialized, verified webmention remembers its is_tested status.',
+);
+
+}
 
 done_testing();

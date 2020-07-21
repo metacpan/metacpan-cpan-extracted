@@ -3,7 +3,7 @@
 
 #include "plcdemos.h"
 
-static PLCHAR_VECTOR text[] =
+static const char *text[] =
 {
     "Maurice",
     "Geoffrey",
@@ -19,7 +19,7 @@ static PLCHAR_VECTOR text[] =
 //--------------------------------------------------------------------------
 
 int
-main( int argc, char *argv[] )
+main( int argc, const char *argv[] )
 {
     int          i, j, dthet, theta0, theta1, theta;
     PLFLT        just, dx, dy;

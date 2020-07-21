@@ -46,10 +46,12 @@ static OP *newPADxVOP(I32 type, PADOFFSET padix, I32 flags, U32 private)
 #  define newLOGOP_CUSTOM(flags, first, other)  newLOGOP(OP_CUSTOM, flags, first, other)
 #  define newSVOP_CUSTOM(flags, sv)             newSVOP(OP_CUSTOM, flags, sv)
 #  define newUNOP_CUSTOM(flags, first)          newUNOP(OP_CUSTOM, flags, first)
+#  define newBINOP_CUSTOM(flags, first, last)  newBINOP(OP_CUSTOM, flags, first, last)
 #else
 #  define newLOGOP_CUSTOM(flags, first, other)  S_newLOGOP_CUSTOM(aTHX_ flags, first, other)
 #  define newSVOP_CUSTOM(flags, sv)             S_newSVOP_CUSTOM(aTHX_ flags, sv)
 #  define newUNOP_CUSTOM(flags, first)          S_newUNOP_CUSTOM(aTHX_ flags, first)
+#  define newBINOP_CUSTOM(flags, first, last)  S_newBINOP_CUSTOM(aTHX_ flags, first, last)
 
 static OP *S_newLOGOP_CUSTOM(pTHX_ U32 flags, OP *first, OP *other)
 {
@@ -106,4 +108,17 @@ static OP *S_newUNOP_CUSTOM(pTHX_ U32 flags, OP *first)
   return (OP *)unop;
 }
 
+static OP *S_newBINOP_CUSTOM(pTHX_ U32 flags, OP *first, OP *last)
+{
+  BINOP *binop;
+  NewOp(1101, binop, 1, BINOP);
+  binop->op_type = (OPCODE)OP_CUSTOM;
+  binop->op_ppaddr = NULL; /* Because caller only overrides it anyway */
+  binop->op_first = first;
+  first->op_sibling = last;
+  binop->op_last = last;
+  binop->op_flags = (U8)(flags | OPf_KIDS);
+  binop->op_private = (U8)(2 | (flags >> 8));
+  return (OP *)binop;
+}
 #endif

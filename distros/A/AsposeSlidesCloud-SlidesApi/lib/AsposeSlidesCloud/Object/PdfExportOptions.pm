@@ -297,6 +297,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'access_permissions' => {
+    	datatype => 'string',
+    	base_name => 'AccessPermissions',
+    	description => 'Access permissions that should be granted when the document is opened with user access.  Default is AccessPermissions.None.             ',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -318,7 +325,8 @@ __PACKAGE__->swagger_types( {
     'comments_area_color' => 'string',
     'show_comments_by_no_author' => 'boolean',
     'image_transparent_color' => 'string',
-    'apply_image_transparent' => 'boolean'
+    'apply_image_transparent' => 'boolean',
+    'access_permissions' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -340,7 +348,8 @@ __PACKAGE__->attribute_map( {
     'comments_area_color' => 'CommentsAreaColor',
     'show_comments_by_no_author' => 'ShowCommentsByNoAuthor',
     'image_transparent_color' => 'ImageTransparentColor',
-    'apply_image_transparent' => 'ApplyImageTransparent'
+    'apply_image_transparent' => 'ApplyImageTransparent',
+    'access_permissions' => 'AccessPermissions'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

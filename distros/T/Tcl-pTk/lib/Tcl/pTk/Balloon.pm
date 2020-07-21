@@ -16,7 +16,7 @@
 #  Modified for use in Tcl::pTk
 package Tcl::pTk::Balloon;
 
-our ($VERSION) = ('1.07');
+our ($VERSION) = ('1.08');
 
 use Tcl::pTk;
 use Carp;

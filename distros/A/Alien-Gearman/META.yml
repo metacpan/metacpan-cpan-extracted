@@ -1,10 +1,14 @@
 ---
-abstract: 'Find or build Gearman'
+abstract: 'Find or build libgearman'
 author:
   - 'Thibault Duponchelle <thibault.duponchelle@gmail.com>'
 build_requires:
+  Alien::Boost: '0'
   Alien::Build::MM: '0.25'
   Alien::Libevent: '0'
+  Alien::OpenSSL: '0'
+  Alien::curl: '0'
+  Alien::gperf: '0'
   Alien::libuuid: '0'
   Archive::Tar: '0'
   Config: '0'
@@ -17,6 +21,7 @@ build_requires:
   URI: '0'
   URI::Escape: '0'
 configure_requires:
+  Alien::Boost: '0'
   Alien::Build: '1.19'
   Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Build::SearchDep: '0.35'
@@ -43,12 +48,16 @@ resources:
   homepage: https://metacpan.org/release/Alien-Gearman
   license: http://dev.perl.org/licenses/
   repository: https://github.com/thibaultduponchelle/Alien-Gearman.git
-version: '1.1'
+version: '2.2'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.26'
   requires:
     share:
+      Alien::Boost: '0'
       Alien::Libevent: '0'
+      Alien::OpenSSL: '0'
+      Alien::curl: '0'
+      Alien::gperf: '0'
       Alien::libuuid: '0'
       Archive::Tar: '0'
       Config: '0'

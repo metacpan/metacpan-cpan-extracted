@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean -also => ['_exp'];
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Dist::Zilla::Plugin::PodWeaver;
 use List::Util qw( first );
@@ -62,9 +62,9 @@ sub configure {
         [ 'Generic' => 'DESCRIPTION' ],
         [ 'Generic' => 'OVERVIEW' ],
         [ 'Collect' => 'ATTRIBUTES' => { command => 'attr' } ],
-        [ 'Collect' => 'METHODS' => { command => 'method' } ],
-        [ 'Collect' => 'FUNCTIONS' => { command => 'func' } ],
-        [ 'Collect' => 'TYPES' => { command => 'type' } ],
+        [ 'Collect' => 'METHODS'    => { command => 'method' } ],
+        [ 'Collect' => 'FUNCTIONS'  => { command => 'func' } ],
+        [ 'Collect' => 'TYPES'      => { command => 'type' } ],
         'Leftovers',
         [ 'Region' => 'postlude' ],
         [ $self->_support_section ],
@@ -322,7 +322,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =head1 SYNOPSIS
 

@@ -48,10 +48,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/dsully/perl-ogg-vorbis-header-pureperl.git",
-         "web" : "https://github.com/dsully/perl-ogg-vorbis-header-pureperl"
+         "url" : "https://github.com/davorg/perl-ogg-vorbis-header-pureperl.git",
+         "web" : "https://github.com/davorg/perl-ogg-vorbis-header-pureperl"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

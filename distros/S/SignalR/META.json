@@ -1,0 +1,46 @@
+{
+   "abstract" : "Perl SignalR Implementations",
+   "author" : [
+      "James Wright <jwright@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.028",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "SignalR",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.028"
+         }
+      }
+   },
+   "provides" : {
+      "SignalR" : {
+         "file" : "lib/SignalR.pm",
+         "version" : "0.001"
+      },
+      "SignalR::Client" : {
+         "file" : "lib/SignalR/Client.pm",
+         "version" : "0.001"
+      },
+      "SignalR::Hub" : {
+         "file" : "lib/SignalR/Hub.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

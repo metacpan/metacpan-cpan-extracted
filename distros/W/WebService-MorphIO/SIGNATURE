@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,40 +12,40 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 4dd207f520be53c75c9d02cb6082704098eab237 Changes
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
-SHA1 fefc5f0c3f892c507c4a5e210030eb1fc28c9679 MANIFEST
-SHA1 2f7bc529adf8ae9e29f7fccc0af8a0b67abccebd META.yml
-SHA1 ff637f85fdfdcd2c7d312e2c9e81da4a07bc6889 Makefile.PL
-SHA1 4269ace18a522d05ed342ce4ac3c836bcb53e828 MorphIO.pm
-SHA1 4967884306ce642b8e0ababeb49bfed8074237ec README
-SHA1 9717e4f5a95d618672b48b4fae4988735a599bd3 examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 0e073ac5aa9d5f9ddf59e6098dbb34a19e71ba19 t/WebService-MorphIO/01-use.t
-SHA1 98340c4075cd50071e25cd67a7b4d80b26919404 t/WebService-MorphIO/02-version.t
-SHA1 a87fcc5c3b3e2bd55638337077a8431a3cb6833f t/WebService-MorphIO/03-new.t
-SHA1 56d572fc02b3e8428f23ed395cee174bcfe89652 xt/WebService-MorphIO/01-pod_coverage.t
-SHA1 4e64a8048bc47440af87dac869aa9bd509525e5e xt/WebService-MorphIO/02-pod.t
+SHA256 6605efd4cb9f494013c5dbb1ca9561fa08fdd88fe7865569b4e2cf2ba2b2dfa2 Changes
+SHA256 73c54c20df0c1eb887cbbc99b6dea34fcb6714e5cebc0bbbcd3a571560f1ec80 LICENSE
+SHA256 2af8dac3143a574056bef8b6148185c6b388661559deb4d8dfce38c781114e52 MANIFEST
+SHA256 3fd805ecee5fad53f4bb5b33cc29e1accfb09d019ff6d26c9048e99b036edf95 META.yml
+SHA256 8cb3da78692b6e38533b094b8c458ea4d1d249bd7071c431a511312f7f2cc198 Makefile.PL
+SHA256 6d45b60700e29bf1cb6a76999e6bb76859235c732182ec712f810b1f58b860c1 MorphIO.pm
+SHA256 9a6cffb314e6969b0a7ca4bab28067daa2ba8daa05c845481994b886f96fe84b README
+SHA256 9902a701c8ccfe43d2616083d505e7dbbe751d6630624e5cabdc0db84138ee90 examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 316d215b284fc7d24dbad58caf42a30814e5114305a4a51b1c68f679ebe84de5 t/WebService-MorphIO/01-use.t
+SHA256 4d549bcb3a45bef94d840fe2abc264d89ea786c8cba5217bda92dcbe36ebfc4e t/WebService-MorphIO/02-version.t
+SHA256 73e091b3a2965c3870ce443a8380d8165f9347be3155b2768b7b670025fa6881 t/WebService-MorphIO/03-new.t
+SHA256 f260324ba1dbb83b09296fab92726b0192cddfc21fed3e82ad7756dabe1ceeb8 xt/WebService-MorphIO/01-pod_coverage.t
+SHA256 0d2c078e815a1dcc21c79f618b7b4ebf0bb4b84fa175f70462057ad0141fd84b xt/WebService-MorphIO/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWAdCZAAoJEJe+XXKaIuTlcU0H/1IOl+t9MjwMn67NcsU4y2bx
-746fU9Qgx1cq1brh36pyxoTXrQ4ntaWvdEybLexIPalbQC/RaeJYMwv/Prwmajph
-HZZ9oIkmh7QR/XItmzT7H0QKvqQNYkgFsRbw/RSaQcy3+VxSKaFXp+UkRdETVHCp
-KWXae3lmkapwn/x/n0bCyYxjR20h/lOhjgUJYiW+DOJgSkkF/ciaV9XOGQ7hT7l5
-8oJXGdriNknGLRQkXAWceT3cr9qCiVVp0Y1pijzn1UsZCn2mT3OrgNim1mkbnFLj
-dg0c4JqA8ktK6WJ+LCszEYADBQ08DZU32OFNMg4JnYr55UPrUhayTdxVaYpDMIY=
-=Qkbq
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl8QVkgACgkQKyiOZjWe
+rHZkJgf+PWqFtIqwyXBtrluzCAlsLJUhOU8p+iRdMMqORT44ATHiENor4EOzYjPn
+l9LsFJdYBK5UmAzuFUI6Lk+n10x7su9spGEPaY/tguUB8FdmV9UVFaxusT/1kmPb
+QZw0uOFcfDI6f1z2e32TxDiNSv8myZUc4g0Iyf/kX9iirbcw0tYyvI3XM4aGlNFd
+K5eiAiP23tdhn9f32xaMZOT54s7/yjYNuMZT4OobKsoRAjVP7iyRmLHb2ldUFIn0
+X/Cf1ReKCtEABBaZNeCgpOXzGCvKvlr1KwVKafYJxWNL/eyt98l6GE/9Xd0j6OY0
+mlYul/gHs8ysW6P1WW0Qe615aGYfiA==
+=dxEP
 -----END PGP SIGNATURE-----

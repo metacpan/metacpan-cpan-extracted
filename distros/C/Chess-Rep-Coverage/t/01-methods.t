@@ -3,15 +3,13 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN { use_ok('Chess::Rep::Coverage') }
+use_ok 'Chess::Rep::Coverage';
 
-my $g = eval { Chess::Rep::Coverage->new() };
-print $@ if $@;
-isa_ok $g, 'Chess::Rep::Coverage';
+my $g = new_ok 'Chess::Rep::Coverage';
 
-my $fen = Chess::Rep::FEN_STANDARD; # Default starting position
+my $fen = Chess::Rep::FEN_STANDARD(); # Default starting position
 diag($fen);
-my $c = $g->coverage();
+my $c = $g->coverage;
 isa_ok $c, 'HASH';
 is $c->{H8}{occupant}, 'r', 'H8 occupant';
 is $c->{H8}{piece}, 16, 'H8 piece';
@@ -27,7 +25,7 @@ ok $c->{H8}{protects}[0] == 103 || $c->{H8}{protects}[0] == 118, 'H8 protects';
 $fen = '8/8/8/3pr3/4P3/8/8/8 w ---- - 0 1'; # 3 pieces, w/b pawn mutual threat, black rook threat
 diag($fen);
 $g->set_from_fen($fen);
-$c = $g->coverage();
+$c = $g->coverage;
 ok $c->{D5}{move}[0] == 51 || $c->{D5}{move}[0] == 52, 'D5 move';
 ok $c->{D5}{threatens}[0] == 52, 'D5 threatens';
 ok $c->{D5}{is_protected_by}[0] == 68, 'D5 is_protected_by';
@@ -61,7 +59,7 @@ my $w = q{     A     B     C     D     E     F     G     H
 1 |     |     |     |     |     |     |     |     |
   +-----+-----+-----+-----+-----+-----+-----+-----+
 };
-my $b = $g->board();
+my $b = $g->board;
 is $b, $w, 'board';
 #use Data::Dumper;warn Data::Dumper->new([$c])->Indent(1)->Terse(1)->Sortkeys(1)->Dump;
 
@@ -80,7 +78,7 @@ is $b, $w, 'board';
 $fen = '8/8/3p4/4k3/8/8/8/8 w ---- - 0 1'; # Black pawn & king - king protects but pawn doesn't
 diag($fen);
 $g->set_from_fen($fen);
-$c = $g->coverage();
+$c = $g->coverage;
 
 $w = q{     A     B     C     D     E     F     G     H
   +-----+-----+-----+-----+-----+-----+-----+-----+
@@ -101,7 +99,7 @@ $w = q{     A     B     C     D     E     F     G     H
 1 |     |     |     |     |     |     |     |     |
   +-----+-----+-----+-----+-----+-----+-----+-----+
 };
-$b = $g->board();
+$b = $g->board;
 is $b, $w, 'board';
 
 done_testing();

@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use WebService::MorphIO;
+
      my $obj = WebService::MorphIO->new(%parameters);
      $obj->csv('output.csv');
      $obj->sqlite('output.sqlite');
@@ -57,11 +58,9 @@ ERRORS
              Cannot get '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Temp qw(tempfile);
      use Perl6::Slurp qw(slurp);
      use WebService::MorphIO;
@@ -100,17 +99,18 @@ DEPENDENCIES
     URI::Escape.
 
 REPOSITORY
-    <https://github.com/tupinek/WebService-MorphIO>
+    <https://github.com/michal-josef-spacek/WebService-MorphIO>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

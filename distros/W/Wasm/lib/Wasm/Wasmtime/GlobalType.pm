@@ -12,7 +12,7 @@ use constant is_globaltype => 1;
 use constant kind => 'globaltype';
 
 # ABSTRACT: Wasmtime global type class
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 $ffi_prefix = 'wasm_globaltype_';
@@ -98,7 +98,7 @@ Wasm::Wasmtime::GlobalType - Wasmtime global type class
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 

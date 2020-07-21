@@ -586,6 +586,8 @@ sub select_time_range ($%) {
 1;
 __END__
 
+=back
+
 =head1 EXPORTS
 
 Nothing.

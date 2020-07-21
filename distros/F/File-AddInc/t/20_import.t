@@ -54,6 +54,23 @@ describe "use File::AddInc", sub {
       };
     };
   }
+
+  {
+    my $testDesc = "$testName/3.d";
+    my $testDir = File::Spec->rel2abs($testDesc);
+    my $targetFile = "lib/Foo.pm";
+
+    describe "case $testDesc/$targetFile", sub {
+
+      my $exe = File::Spec->catfile($testDir, $targetFile);
+
+      it "should use local/lib/perl5 too", sub {
+
+        expect([qx($^X -I$FindBin::Bin/../lib $exe)])
+          ->to_be(["OK\n"]);
+      };
+    };
+  }
 };
 
 done_testing();

@@ -1,0 +1,6 @@
+Revision history for Perl extension Net::AWS::SES::Signature4.
+
+0.01  Sat Jul 18 09:14:05 2020
+	- original version; created by h2xs 1.23 with options
+		-AX -n Net::AWS::SES::Signature4
+

@@ -7,12 +7,12 @@ use warnings;
 use utf8;
 use feature 'unicode_strings';
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Broadworks::OCIP::Throwable;
 use Moose;
-use Method::Signatures;
+use Function::Parameters;
 use MooseX::StrictConstructor;
 use Try::Tiny;
 use XML::Fast;
@@ -149,6 +149,8 @@ method _build_tables () {
 method table ($table_name) { return ( @{ $self->tables->{$table_name} || [] } ); }
 
 # ------------------------------------------------------------------------
+
+
 method BUILD ($args) {
 
     # check this object is valid and the right type
@@ -161,6 +163,8 @@ method BUILD ($args) {
 }
 
 # ------------------------------------------------------------------------
+
+
 method list ($key) {
     my $val = $self->payload->{$key};
     return () unless ( defined($val) );
@@ -186,7 +190,7 @@ Broadworks::OCIP::Response - A Broadworks OCI-P Response Message
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =for test_synopsis 1;
 __END__
@@ -251,13 +255,21 @@ Each table is an array of rows, each of which is a hash.
 
 Returns the content of a single named table, as a list
 
+=head3 BUILD
+
+Build the object - throw an error if this is an unexpected type.
+
+=head3 list
+
+Return a result from the payload as a list (empty if not defined).
+
 =head1 AUTHOR
 
 Nigel Metheringham <Nigel.Metheringham@redcentricplc.com>
 
 =head1 COPYRIGHT
 
-Copyright 2014 Recentric Solutions Limited. All rights reserved.
+Copyright 2014-2020 Recentric Solutions Limited. All rights reserved.
 
 =head1 AUTHOR
 
@@ -265,7 +277,7 @@ Nigel Metheringham <nigelm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Nigel Metheringham.
+This software is copyright (c) 2020 by Nigel Metheringham.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

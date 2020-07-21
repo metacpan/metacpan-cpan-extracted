@@ -1,0 +1,36 @@
+use alienfile;
+
+# If the probe fails to find an already installed libevent, the
+# "share" block contains instructions for downloading and
+# installing it.
+#
+probe [ 
+  'test -f /usr/include/boost/version.hpp',
+];
+
+share {
+
+  start_url 'https://www.boost.org/users/download/';
+  plugin 'Download' => (
+    filter => qr/^boost_.*\.tar\.gz$/,
+    version => qr/([0-9_]+)/,
+  );
+
+  plugin 'Extract';
+
+  build [
+    './bootstrap.sh',
+    './b2 install --prefix=%{.install.prefix} link=static',
+  ];
+
+  gather sub {
+    my($build) =@_;
+    my $prefix = $build->runtime_prop->{prefix};
+    $build->runtime_prop->{cflags}        = "-I$prefix/include";
+    $build->runtime_prop->{cflags_static} = "-I$prefix/include";
+    $build->runtime_prop->{libs}          = "-L$prefix/lib -lboost";
+    $build->runtime_prop->{libs_static}   = "-L$prefix/lib -lboost";
+  };
+  
+};
+

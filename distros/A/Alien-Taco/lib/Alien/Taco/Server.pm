@@ -40,7 +40,7 @@ use Alien::Taco::Util qw/filter_struct/;
 
 use strict;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 SUBROUTINES
 
@@ -390,6 +390,25 @@ sub get_attribute {
     return _make_result($object->{$name});
 }
 
+=item get_class_attribute($message)
+
+Attempt the read a variable from the given class's package.
+The attribute name should begin with the appropriate sigil
+(C<$> / C<@> / C<%>).
+
+=cut
+
+sub get_class_attribute {
+    my $self = shift;
+    my $message = shift;
+
+    my $name = $message->{'name'};
+
+    # Construct full name from sigil + class + '::' + attribute.
+    return $self->_get_attr_or_value(
+        substr($name, 0, 1) . $message->{'class'} . '::' . substr($name, 1));
+}
+
 =item get_value($message)
 
 Try to read the given variable.  The variable name should begin
@@ -401,7 +420,16 @@ sub get_value {
     my $self = shift;
     my $message = shift;
 
-    my $name = $message->{'name'};
+    return $self->_get_attr_or_value($message->{'name'});
+}
+
+# _get_attr_or_value($name)
+#
+# Internal method to get a value based on its sigil.
+
+sub _get_attr_or_value {
+    my $self = shift;
+    my $name = shift;
 
     no strict 'refs';
     if ($name =~ s/^\$//) {
@@ -465,6 +493,28 @@ sub set_attribute {
     return $null_result;
 }
 
+=item set_class_attribute($message)
+
+Attempt to set a variable in the given class's package.
+The attribute name should begin with the appropriate sigil
+(C<$> / C<@> / C<%>).
+
+=cut
+
+sub set_class_attribute {
+    my $self = shift;
+    my $message = shift;
+
+    my $name = $message->{'name'};
+
+    # Construct full name from sigil + class + '::' + attribute.
+    $self->_set_attr_or_value(
+        substr($name, 0, 1) . $message->{'class'} . '::' . substr($name, 1),
+        $message->{'value'});
+
+    return $null_result;
+}
+
 =item set_value($message)
 
 Assign to the given variable.  The variable name should begin
@@ -476,8 +526,19 @@ sub set_value {
     my $self = shift;
     my $message = shift;
 
-    my $name = $message->{'name'};
-    my $value = $message->{'value'};
+    $self->_set_attr_or_value($message->{'name'}, $message->{'value'});
+
+    return $null_result;
+}
+
+# _set_attr_or_value($name, $value)
+#
+# Internal method to set a value based on its sigil.
+
+sub _set_attr_or_value {
+    my $self = shift;
+    my $name = shift;
+    my $value = shift;
 
     no strict 'refs';
     if ($name =~ s/^\$//) {
@@ -492,8 +553,6 @@ sub set_value {
     else {
         die 'unknown sigil';
     }
-
-    return $null_result;
 }
 
 1;

@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.10 2020-07-16 00:00:00
+  - remove use Symbol
+  - ends support for bare handles
+  - created by INABA Hitoshi
+
 0.09 2019-07-14 00:00:00
   - fix Extra Issues: has_meta_json
   - fix Extra Issues: proper_libs

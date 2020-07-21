@@ -7,13 +7,9 @@ my $name   = 'Schedule.pm';
 WriteMakefile (
    'NAME'       => $module,
    'VERSION_FROM' => $name, # finds $VERSION
-   'dist' => { COMPRESS=>"gzip",
-               SUFFIX=>"gz",
-               PREOP=>('starfish README; '.
-                       "cp -f README $dir-\$(VERSION); "
-                      ),
-             },
-   'clean' => {FILES => "tmp* testfiles/tmp1 Calendar *~ t/tmp1"},
+   'dist' => { COMPRESS=>"gzip", SUFFIX=>"gz" },
+   'clean' => {FILES => "tmp* Calendar *~"},
+   'LICENSE' => 'perl',
    'PREREQ_PM' => {
 		   # Foo::Ey => '1.00',
 		  },
@@ -22,12 +18,19 @@ WriteMakefile (
     (ABSTRACT_FROM => $name, # retrieve abstract from module
      AUTHOR     => 'Vlado Keselj web.cs.dal.ca/~vlado') : 
     ()
-    ),
-   );
+   ),
+   (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+     'meta-spec' => { version => 2} ,
+     resources => {
+       repository => {
+         type => 'git',
+	 url => 'https://github.com/vkeselj/calendar-schedule.git',
+         web => 'https://github.com/vkeselj/calendar-schedule',
+	 }}}):() ));
 
 open(M, ">>Makefile") or die;
 
-if ( -f 'priv.make' ) { print M getfile('priv.make') }
+if ( -f 'priv.make' ) { print M &getfile('priv.make') }
 
 close(M);
 

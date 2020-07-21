@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN { use_ok('MIDI::Simple::Drummer::Jazz') }
+use_ok 'MIDI::Simple::Drummer::Jazz';
 
 my $d = new_ok 'MIDI::Simple::Drummer::Jazz';
 

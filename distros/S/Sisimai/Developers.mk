@@ -1,4 +1,4 @@
-# p5-Sisimai/Developers.mk
+# p5-sisimai/Developers.mk
 #  ____                 _                                       _    
 # |  _ \  _____   _____| | ___  _ __   ___ _ __ ___   _ __ ___ | | __
 # | | | |/ _ \ \ / / _ \ |/ _ \| '_ \ / _ \ '__/ __| | '_ ` _ \| |/ /
@@ -129,7 +129,7 @@ parser-log:
 	done
 
 reason-coverage:
-	@ for v in `ls -1 $(MAILCLASSDIR) | sort | tr '[A-Z]' '[a-z]' | sed -e 's|.pm||g' -e 's|^|bite-email-|g'`; do \
+	@ for v in `ls -1 $(MAILCLASSDIR) | sort | tr '[A-Z]' '[a-z]' | sed -e 's|.pm||g' -e 's|^|lhost-|g'`; do \
 		for e in `echo $(REASON_TABLE) | tr '[A-Z]' '[a-z]'`; do \
 			printf "%d," `grep $$e xt/*-$$v.t t/*-$$v.t | wc -l`; \
 		done; \

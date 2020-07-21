@@ -39,6 +39,7 @@ WriteMakefile(
 	clean			=> { FILES => 'Asm-X86-*' },
 	LICENSE			=> 'perl_5',
 	SIGN			=> '1',
+	MIN_PERL_VERSION	=> '5.006',	# just because of 'Exporter'
 
 	# When setting 'vendor', the module cannot be installed in local Perl
 	#  installations.

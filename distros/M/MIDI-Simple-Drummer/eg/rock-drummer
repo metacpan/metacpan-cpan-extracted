@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-Duration);
 use MIDI::Simple::Drummer::Rock;
 
 # "Is there a drummer in the house?"
@@ -40,7 +41,7 @@ for my $p (1 .. $d->phrases) {
 # Add and play a custom ending fill.
 $d->patterns('end fill' => \&fin);
 $d->fill(-name => 'end');
-#fin($d); # <- Perfectly reasonable but use the API:
+#fin($d); # <- Perfectly reasonable but use the API
 
 # Write out the MIDI file.
 $d->write;

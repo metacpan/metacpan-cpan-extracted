@@ -1,3 +1,6 @@
+3.01 2020-07-17
+ - Updated documentation for RT 5.0
+
 3.00 2016-09-09
  - Change default behavior for unknown commands: Unknown commands no longer
    generate an unknown command email. There will be a warning in the logs

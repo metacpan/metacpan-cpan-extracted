@@ -6,12 +6,13 @@
 
 package Assert::Conditional;
 
-our $VERSION = 0.009;
-
 use v5.12;
 use utf8;
 use strict;
 use warnings;
+
+use version 0.77;
+our $VERSION = version->declare("0.010");
 
 use parent "Exporter::ConditionalSubs";  # inherits from Exporter
 
@@ -29,10 +30,6 @@ use Scalar::Util qw{
     refaddr
     reftype
 };
-
-# Perl 5.12.1 has only "hash_locked", not the 
-# rest like "hash_unlocked" or "hashref_unlocked", etc.
-use Hash::Util qw{hash_locked};
 
 use Unicode::Normalize qw{
     NFC    checkNFC
@@ -339,16 +336,21 @@ sub Assert : ATTR(CODE,BEGIN)
     my($subname, $tagref) = (*{$symbol}{NAME}, $data);
     $subname =~ /^assert_/
         || panic "$subname is not an assertion";
+
     my $his_export_ok = $package . "::EXPORT_OK";
     push @$his_export_ok, $subname;
-    $Assert_Debug && print STDERR "Assert: adding $subname to \@$his_export_ok\n";
+
+    my $debugging = $Exporter::Verbose || $Assert_Debug;
+
+    carp "Adding $subname to EXPORT_OK in $package at ",__FILE__," line ",__LINE__ if $debugging;
+
     if (defined($tagref) && !ref($tagref)) {
         $tagref = [ $tagref ];
     }
     my $his_export_tags = $package . "::EXPORT_TAGS";
     for my $tag (@$tagref, qw(all asserts)) {
-        $Assert_Debug && print STDERR "Assert: adding $subname to \$$his_export_tags\{$tag} arrayref\n";
         push @{ $his_export_tags->{$tag} }, $subname;
+        carp "Adding $subname to EXPORT_TAG :$tag in $package at ",__FILE__," line ",__LINE__ if $debugging;
     }
 }
 
@@ -1249,21 +1251,60 @@ sub assert_hashref_keys_allowed_and_required($$$)
     assert_minmax_keys($hashref, $required, $allowed);
 }
 
-sub assert_locked( \[%$] @ )
-    :Assert( qw[hash] )
-{
-    my($hashref) = @_;
-    _promote_to_hashref($hashref);
-    hash_locked(%$hashref)    || botch "hash is locked";
-}
 
-sub assert_unlocked( \[%$] @ )
-    :Assert( qw[hash] )
-{
-    my($hashref) = @_;
-    _promote_to_hashref($hashref);
-   # no *_unlocked predicates till 5.16
-   !hash_locked(%$hashref)    || botch "hash is not locked";
+# From perl5180delta, you couldn't actually get any use of
+# the predicates to check whether a hash or hashref was
+# locked because even though they were exported those
+# function did not exist before.!
+##
+## * Hash::Util has been upgraded to 0.15.
+##
+##   "hash_unlocked" and "hashref_unlocked" now returns true if the hash
+##   is unlocked, instead of always returning false [perl #112126].
+##
+##   "hash_unlocked", "hashref_unlocked", "lock_hash_recurse" and
+##   "unlock_hash_recurse" are now exportable [perl #112126].
+##
+##   Two new functions, "hash_locked" and "hashref_locked", have been
+##   added. Oddly enough, these two functions were already exported,
+##   even though they did not exist [perl #112126].
+
+BEGIN {
+    use Hash::Util qw{hash_locked};
+
+    my $want_version = 0.15;
+    my $have_version = Hash::Util->VERSION;
+    my $huv          = "v$have_version of Hash::Util and we need";
+    my $compiling    = "compiling assert_lock and assert_unlocked because your perl $^V has";
+    my $debugging    = $Exporter::Verbose || $Assert_Debug;
+
+    if ($have_version < $want_version) {
+        carp "Not $compiling only $huv v$want_version at ", __FILE__, " line ", __LINE__ if $debugging;
+    } else {
+        carp   "\u$compiling $huv only v$want_version at ", __FILE__, " line ", __LINE__ if $debugging;
+
+        confess "compilation eval blew up: $@" unless eval <<'END_OF_LOCK_STUFF';
+
+            sub assert_locked( \[%$] @ )
+                :Assert( qw[hash] )
+            {
+                my($hashref) = @_;
+                _promote_to_hashref($hashref);
+                hash_locked(%$hashref)    || botch "hash is locked";
+            }
+
+            sub assert_unlocked( \[%$] @ )
+                :Assert( qw[hash] )
+            {
+                my($hashref) = @_;
+                _promote_to_hashref($hashref);
+               !hash_locked(%$hashref)    || botch "hash is not locked";
+            }
+
+            1;
+
+END_OF_LOCK_STUFF
+    }
 }
 
 sub assert_anyref($)
@@ -3259,9 +3300,11 @@ actually use this if you circumvent prototype checking:
 =item assert_locked(I<HASH> | I<HASHREF>)
 
 =for comment
-This is a workaround to create a "blank" line so that the code sample is distinct.
+This is a workaround to create a "blank" line.
 
 Z<>
+
+B<WARNING>: Only available under version 0.15 and greater of L<Hash::Util,> first found in perl v5.17.
 
     assert_locked(%hash);
     assert_locked($hashref);
@@ -3278,9 +3321,11 @@ variable holding a hashref, must have locked keys.
 =item assert_unlocked(I<HASH> | I<HASHREF>)
 
 =for comment
-This is a workaround to create a "blank" line so that the code sample is distinct.
+This is a workaround to create a "blank" line.
 
 Z<>
+
+B<WARNING>: Only available under version 0.15 and greater of L<Hash::Util>, first found in perl v5.17.
 
     assert_unlocked(%hash);
     assert_unlocked($hashref);
@@ -4162,7 +4207,10 @@ module as an executable program instead of requiring it. Sneaky, I know.
 
 =head2 ASSERT_CONDITIONAL_DEBUG
 
-This adds some debugging used when for debugging the assertions themselves.
+This adds some debugging used when for debugging the assertions themselves,
+and in their import/export handling; These are also triggered by
+C<$Exporter::Verbose>.
+
 Currently this is used only in the attribute handlers that register exports
 during compile time.
 
@@ -4302,21 +4350,31 @@ blows up with an internal error about a symbol going missing.
        - Fixed botch() to identify the most distant stack frame not the nearest for the name of the failed assertion.
        - Improved the reporting of some assertion failures.
 
-0.006    Mon May 21 07:45:43 CDT 2018
+ 0.006   Mon May 21 07:45:43 CDT 2018
        - Use hash_{,un}locked not hashref_{,un}locked to support pre-5.16 perls.
        - Unhid assert_unblessed_ref swallowed up by stray pod.
 
-0.007    Mon May 21 19:13:58 CDT 2018
+ 0.007   Mon May 21 19:13:58 CDT 2018
        - Add missing Hash::Util version requirement for old perls to get hashref_unlock imported.
 
-0.008    Tue May 22 11:51:37 CDT 2018
+ 0.008   Tue May 22 11:51:37 CDT 2018
        - Rewrite hash_unlocked missing till 5.16 as !hash_locked
        - Add omitted etc/generate-exporter-pod to MANIFEST
 
+ 0.009   Tue Aug 21 06:29:56 MDT 2018
+       - Delay slow calls to uca_sort till you really need them, credit Larry Leszczynski.
+
+ 0.010   Sun Jul 19 13:52:00 MDT 2020
+       - Fix coredump in perl 5.12 by replacing UNITCHECK in Assert::Conditional::Util with normal execution at botton.
+       - Make perls below 5.18 work again by setting Hash::Util prereq in Makefile.PL to 0 because it's in the core only, never cpan.
+       - Only provide assert_locked and assert_unlocked if core Hash::Util v0.15 is there (starting perl v5.17).
+       - Bump version req of parent class Exporter::ConditionalSubs to v1.11.1 so we don't break Devel::Cover.
+       - Normalize Export sub attribute tracing so either $Exporter::Verbose=1 or env ASSERT_CONDITIONAL_DEBUG=1 work for both Assert::Conditional{,::Utils}.
+       - Mentioned $Exporter::Verbose support.
 
 =head1 AUTHOR
 
-Tom Christiansen C<< <tchrist@perl.com> >>
+Tom Christiansen C<< <tchrist53147@gmail.com> >>
 
 Thanks to Larry Leszczynski at Grant Street Group for making this module
 possible.  Without it, my programs would be much slower, since before I

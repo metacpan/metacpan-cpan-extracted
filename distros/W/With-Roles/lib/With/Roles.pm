@@ -2,7 +2,7 @@ package With::Roles;
 use strict;
 use warnings;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001002';
 $VERSION =~ tr/_//d;
 
 use Carp qw(croak);
@@ -50,6 +50,7 @@ sub _gen {
   {
     local $@;
     no strict 'refs';
+    no warnings 'once';
     local *{"${pack}::${_}"}
       for qw(with extends requires has around after before);
 

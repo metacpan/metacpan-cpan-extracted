@@ -4,7 +4,7 @@ module_maker="ModuleBuildTiny"
 static_install = "auto"
 license="artistic_2"
 authority="cpan:SANKO"
-requires_external_bin=["python');`cd ./termbox/;python ./waf configure --prefix=../share/;python ./waf;python ./waf install;cd ../`;\n('1"]
+requires_external_bin=["make');`cd termbox;make;make install prefix='../share';`;\n('1"]
 
 [release]
 hook=[

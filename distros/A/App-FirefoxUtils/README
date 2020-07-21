@@ -2,8 +2,8 @@ NAME
     App::FirefoxUtils - Utilities related to Firefox
 
 VERSION
-    This document describes version 0.013 of App::FirefoxUtils (from Perl
-    distribution App-FirefoxUtils), released on 2020-06-13.
+    This document describes version 0.014 of App::FirefoxUtils (from Perl
+    distribution App-FirefoxUtils), released on 2020-07-19.
 
 SYNOPSIS
 DESCRIPTION
@@ -313,7 +313,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/perlancar/perl-App-ManUtils>.
+    <https://github.com/perlancar/perl-App-FirefoxUtils>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -338,7 +338,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2020, 2019, 2016 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,17 +1,23 @@
 package OpenTracing::Role::Tracer;
 
-our $VERSION = 'v0.83.0';
+our $VERSION = 'v0.84.0';
 
-use Moo::Role;
 use syntax qw/maybe/;
 
+use Moo::Role;
+use MooX::HandlesVia;
+
 use Carp;
+use List::Util qw/first/;
 use OpenTracing::Types qw/ScopeManager Span SpanContext is_Span is_SpanContext/;
 use Ref::Util qw/is_plain_hashref/;
 use Role::Declare -lax;
 use Try::Tiny;
 use Types::Common::Numeric qw/PositiveOrZeroNum/;
-use Types::Standard qw/Maybe HashRef Object Str ArrayRef/;
+use Types::Standard qw/ArrayRef CodeRef Dict HashRef InstanceOf Maybe Object Str Undef/;
+use Types::TypeTiny qw/TypeTiny/;
+
+our @CARP_NOT;
 
 has scope_manager => (
     is              => 'ro',
@@ -106,17 +112,141 @@ sub start_span {
     return $span
 }
 
-use constant Carrier => Object | HashRef | ArrayRef;
-
-instance_method extract_context(
-    Carrier                     $carrier,
-) :ReturnMaybe(SpanContext) {}
 
 
-instance_method inject_context(
-    Carrier                     $carrier,
+sub extract_context {
+    my $self = shift;
+    my $carrier = shift;
+    my $context = shift;
+    
+    my $context_formatter =
+        $self->_first_context_formatter_for_carrier( $carrier );
+    
+    my $formatter = $context_formatter->{extractor};
+    return $self->$formatter( $carrier );
+}
+
+
+
+sub inject_context {
+    my $self = shift;
+    my $carrier = shift;
+    my $context = shift;
+    
+    my $context_formatter =
+        $self->_first_context_formatter_for_carrier( $carrier );
+    
+    $context //= $self->get_active_context();
+    return $carrier unless defined $context;
+    my $formatter = $context_formatter->{injector};
+    return $self->$formatter( $carrier, $context );
+}
+
+
+
+# XXX this is not a OpenTracing API method
+#
+sub get_active_context {
+    my $self = shift;
+    
+    my $active_span = $self->get_active_span
+        or return;
+    
+    return $active_span->get_context
+}
+
+
+
+use constant ContextFormatter => Dict[
+    type      => TypeTiny,
+    injector  => CodeRef,
+    extractor => CodeRef,
+];
+
+
+
+has context_formatters => (
+    is          => 'rw',
+    isa         => ArrayRef[ContextFormatter],
+    handles_via => 'Array',
+    handles     => {
+        register_context_formatter  => 'unshift',
+        known_context_formatters    => 'elements',
+    },
+    default     => \&_default_context_formatters,
+);
+
+sub _default_context_formatters {
+    [
+        {
+            type      => Undef,
+            injector  => sub {undef                                          },
+            extractor => sub {undef                                          },
+        },
+        {
+            type      => ArrayRef,
+            injector  => sub {shift->inject_context_into_array_reference(@_) },
+            extractor => sub {shift->extract_context_from_array_reference(@_)},
+        },
+        {
+            type      => HashRef,
+            injector  => sub {shift->inject_context_into_hash_reference(@_)  },
+            extractor => sub {shift->extract_context_from_hash_reference(@_) },
+        },
+        {
+            type      => InstanceOf['HTTP::Headers'],
+            injector  => sub {shift->inject_context_into_http_headers(@_)    },
+            extractor => sub {shift->extract_context_from_http_headers(@_)   },
+        },
+    ]
+}
+
+sub _first_context_formatter_for_carrier {
+    my $self = shift;
+    my $carrier = shift;
+    
+    my $context_formatter = first { $_->{type}->check($carrier) }
+        $self->known_context_formatters;
+    
+    my $type = ref($carrier) || 'Scalar';
+    croak "Unsupported carrier format [$type]"
+        unless defined $context_formatter;
+    
+    return $context_formatter
+}
+
+
+
+instance_method extract_context_from_array_reference(
+    ArrayRef                    $carrier,
+) :ReturnMaybe(SpanContext) {};
+
+instance_method extract_context_from_hash_reference(
+    HashRef                     $carrier,
+) :ReturnMaybe(SpanContext) {};
+
+instance_method extract_context_from_http_headers(
+    Object                      $carrier,
+) :ReturnMaybe(SpanContext) {
+    ( InstanceOf['HTTP::Headers'] )->assert_valid( $carrier )
+};
+
+instance_method inject_context_into_array_reference(
+    ArrayRef                    $carrier,
     Maybe[ SpanContext ]        $span_context = undef,
-) :Return(Carrier) {}
+) :Return(ArrayRef) {};
+
+instance_method inject_context_into_hash_reference(
+    HashRef                     $carrier,
+    Maybe[ SpanContext ]        $span_context = undef,
+) :Return(HashRef) {};
+
+instance_method inject_context_into_http_headers(
+    Object                      $carrier,
+    Maybe[ SpanContext ]        $span_context = undef,
+) :Return(InstanceOf['HTTP::Headers']) {
+    ( InstanceOf['HTTP::Headers'] )->assert_valid( $carrier )
+};
 
 
 instance_method build_span (

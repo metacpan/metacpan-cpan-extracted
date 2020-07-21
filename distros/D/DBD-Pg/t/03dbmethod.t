@@ -2,9 +2,10 @@
 
 ## Test of the database handle methods
 ## The following methods are *not* (explicitly) tested here:
-## "take_imp_data"  "pg_server_trace"  "pg_server_untrace"  "pg_type_info"
+## "take_imp_data"  "pg_server_trace"  "pg_server_untrace"
 ## "data_sources" (see 04misc.t)
 ## "disconnect" (see 01connect.t)
+
 ## "pg_savepoint"  "pg_release"  "pg_rollback_to" (see 20savepoints.t)
 ## "pg_getline"  "pg_endcopy"  "pg_getcopydata"  "pg_getcopydata_async" (see 07copy.t)
 ## "pg_putline"  "pg_putcopydata"  "pg_putcopydata_async (see 07copy.t)
@@ -13,11 +14,11 @@
 use 5.008001;
 use strict;
 use warnings;
+use lib 'blib/lib', 'blib/arch', 't';
 use Data::Dumper;
 use Test::More;
 use DBI     ':sql_types';
 use DBD::Pg ':pg_types';
-use lib 't','.';
 require 'dbdpg_test_setup.pl';
 select(($|=1,select(STDERR),$|=1)[1]);
 
@@ -25,7 +26,9 @@ my $dbh = connect_database();
 if (! $dbh) {
     plan skip_all => 'Connection to database failed, cannot continue testing';
 }
-plan tests => 600;
+plan tests => 646;
+
+my $superuser = is_super();
 
 isnt ($dbh, undef, 'Connect to database for database handle method testing');
 
@@ -81,6 +84,12 @@ eval {
 };
 is ($dbh->state, '42P01', $t);
 
+$t='DB handle method "last_insert_id" fails when called in a failed transaction';
+eval {
+    $dbh->last_insert_id(undef,'someschema','dbd_pg_nonexistenttable_test',undef);
+};
+is ($dbh->state, '25P02', $t);
+
 $t='DB handle method "last_insert_id" fails when given a non-existent table';
 $dbh->rollback();
 eval {
@@ -111,9 +120,11 @@ eval {
 like ($@, qr{last_insert_id}, $t);
 
 my $parent = 'dbd_pg_test_parent';
+my $parent2 = 'dbd_pg_test_parent2';
 my $kid = 'dbd_pg_test_inherit';
 $dbh->do("CREATE TABLE $schema.$parent(id SERIAL primary key)");
-$dbh->do("CREATE TABLE $schema.$kid (foo text) INHERITS ($parent)");
+$dbh->do("CREATE TABLE $schema.$parent2(id2 SERIAL primary key)");
+$dbh->do("CREATE TABLE $schema.$kid (foo text) INHERITS ($parent,$parent2)");
 $dbh->do("INSERT INTO $parent DEFAULT VALUES");
 
 $t='DB handle method "last_insert_id" works for a normal table';
@@ -135,9 +146,20 @@ eval {
 };
 is ($@, q{}, $t);
 
-$t='DB handle method "last_insert_id" returns correct value for an inheriteda table';
+$t='DB handle method "last_insert_id" returns correct value for an inherited table';
 is ($result, 2, $t);
 
+$t='DB handle method "last_insert_id" returns expected error for an inherited table with no PK';
+
+my $parent3 = 'dbd_pg_test_parent3';
+my $kid3 = 'dbd_pg_test_inherit3';
+$dbh->do("CREATE TABLE $schema.$parent3 (id INTEGER)");
+$dbh->do("CREATE TABLE $schema.$kid3 (foo text) INHERITS ($parent3)");
+$dbh->do("INSERT INTO $parent3 DEFAULT VALUES");
+eval {
+    $result = $dbh->last_insert_id(undef,undef,$kid3,undef);
+};
+like ($@, qr/No suitable column/, $t);
 
 $SQL = 'CREATE TEMP TABLE foobar AS SELECT * FROM pg_class LIMIT 3';
 
@@ -617,13 +639,19 @@ is ($dbh->get_info(25), 'N', $t);
 
 $t='DB handle method "table_info" works when called with empty arguments';
 $sth = $dbh->table_info('', '', 'dbd_pg_test', '');
-my $number = $sth->rows();
-ok ($number, $t);
+is ($sth->fetch->[2], 'dbd_pg_test', $t);
 
 $t='DB handle method "table_info" works when called with \'%\' arguments';
 $sth = $dbh->table_info('%', '%', 'dbd_pg_test', '%');
-$number = $sth->rows();
-ok ($number, $t);
+is ($sth->fetch->[2], 'dbd_pg_test', $t);
+
+$t=q{DB handle method "table_info" works when called with a non-regex-containing schema};
+$sth = $dbh->table_info( '', 'dbdpgtest', '', '');
+is ($sth->rows(), 0, $t);
+
+$t=q{DB handle method "table_info" works when called with a non-regex-containing table};
+$sth = $dbh->table_info( '', '', 'dbdpgtest', '');
+is ($sth->rows(), 0, $t);
 
 $t=q{DB handle method "table_info" works when called with a 'TABLE' last argument};
 $sth = $dbh->table_info( '', $schema, '', q{'TABLE'});
@@ -664,7 +692,7 @@ $t=q{DB handle method "table_info" returns one row when given a 'TABLE,VIEW' typ
 $sth = $dbh->table_info(undef,$schema,undef,'TABLE,VIEW');
 is ($sth->rows, 1, $t);
 
-$dbh->do('CREATE VIEW testview AS SELECT sum(reltuples) AS tonsoftups FROM pg_class');
+$dbh->do('CREATE VIEW dbd_pg_view AS SELECT sum(reltuples) AS tonsoftups FROM pg_class');
 
 $t=q{DB handle method "table_info" returns no rows when given a 'VIEW' type argument for the test schema};
 $sth = $dbh->table_info(undef,$schema,undef,'VIEW');
@@ -680,8 +708,8 @@ is ($sth->rows, 2, $t);
 
 $t=q{DB handle method "table_info" returns more rows when given a 'TABLE,VIEW,SYSTEM TABLE,SYSTEM VIEW' type argument};
 $sth = $dbh->table_info(undef,undef,undef,'TABLE,VIEW,SYSTEM TABLE,SYSTEM VIEW');
-## Should be at least 100 system tables and views
-cmp_ok ($sth->rows(), '>', 100, $t);
+## Should be at least 90 system tables and views
+cmp_ok ($sth->rows(), '>', 90, $t);
 
 $dbh->do('CREATE TEMP TABLE dbd_pg_local_temp (i INT)');
 
@@ -713,7 +741,7 @@ SKIP: {
     $sth = $dbh->table_info(undef,$schema,undef,'MATERIALIZED VIEW');
     is ($sth->rows(), 0, $t);
 
-    $dbh->do("CREATE MATERIALIZED VIEW $schema.testmatview AS SELECT 123 WITH NO DATA");
+    $dbh->do("CREATE MATERIALIZED VIEW $schema.dbd_pg_matview AS SELECT 123 WITH NO DATA");
 
     $t=q{DB handle method "table_info" returns one 'MATERIALIZED VIEW' rows for test schema};
     $sth = $dbh->table_info(undef,$schema,undef,'MATERIALIZED VIEW');
@@ -730,6 +758,9 @@ SKIP: {
     if ($pgversion < 90100) {
         skip ('Cannot test table_info for foreign tables unless database is 9.1 or higher', 3);
     }
+
+    ## We can check for finer-grained access in more recent versions, but this is good enough:
+    $superuser or skip ('Cannot test foreign tables unless a superuser', 3);
 
     $sth = $dbh->table_info(undef,undef,undef,'FOREIGN TABLE');
     my $total_ftables = $sth->rows();
@@ -854,6 +885,104 @@ $sth = $dbh->column_info('','','dbd_pg_test','CaseTest');
 $result = $sth->fetchall_arrayref({})->[0];
 is ($result->{COLUMN_NAME}, q{"CaseTest"}, $t);
 
+$t=q{DB handle method "column_info" works when schema argument is undef};
+$sth = $dbh->column_info('',undef,'dbd_pg_test','CaseTest');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{TABLE_SCHEM}, 'dbd_pg_testschema', $t);
+
+$t=q{DB handle method "column_info" works when schema argument is empty};
+$sth = $dbh->column_info('','','dbd_pg_test','CaseTest');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{TABLE_SCHEM}, 'dbd_pg_testschema', $t);
+
+$t=q{DB handle method "column_info" returns undef when schema argument has no match};
+$sth = $dbh->column_info('','badschema','dbd_pg_test','CaseTest');
+is ($sth->fetch, undef, $t);
+
+$t=q{DB handle method "column_info" returns undef schema argument has non-matching regex};
+$sth = $dbh->column_info('','badschema%','dbd_pg_test','CaseTest');
+is ($sth->fetch, undef, $t);
+
+$t=q{DB handle method "column_info" works when schema argument matches exactly};
+$sth = $dbh->column_info('',$schema,'dbd_pg_test','CaseTest');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{pg_schema}, $schema, $t);
+
+$t=q{DB handle method "column_info" works when schema argument matches via regex};
+$sth = $dbh->column_info('','dbd%','dbd_pg_test','CaseTest');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{pg_schema}, $schema, $t);
+
+$t=q{DB handle method "column_info" works when table argument is undef};
+$sth = $dbh->column_info('','',undef,'CaseTest');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{COLUMN_SIZE}, 1, $t);
+
+$t=q{DB handle method "column_info" works when table argument is empty};
+$sth = $dbh->column_info('','','','CaseTest');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{IS_NULLABLE}, 'YES', $t);
+
+$t=q{DB handle method "column_info" returns undef when table argument has no match};
+$sth = $dbh->column_info('','','badtable','CaseTest');
+is ($sth->fetch, undef, $t);
+
+$t=q{DB handle method "column_info" returns undef when table argument has non-matching regex};
+$sth = $dbh->column_info('','','badtable%','CaseTest');
+is ($sth->fetch, undef, $t);
+
+$t=q{DB handle method "column_info" works when table argument matches exactly};
+$sth = $dbh->column_info('','','dbd_pg_test','CaseTest');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{NULLABLE}, 1, $t);
+
+$t=q{DB handle method "column_info" works when table argument has no underscore or percent};
+my $table = 'dbdpgtest';
+$dbh->do(qq{CREATE TABLE $schema.$table("id with a space" INT)});
+$sth = $dbh->column_info('',undef,$table,'id with a space');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{pg_column}, 'id with a space', $t);
+
+$t=q{DB handle method "column_info" works when column argument is undef};
+$sth = $dbh->column_info('',undef,$table,'id with a space');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{DATA_TYPE}, 4, $t);
+
+$t=q{DB handle method "column_info" works when column argument is empty};
+$sth = $dbh->column_info('',undef,$table,'id with a space');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{TYPE_NAME}, 'integer', $t);
+
+$t=q{DB handle method "column_info" returns undef when column argument has no match};
+$sth = $dbh->column_info('','',$table, 'idfoobar');
+is ($sth->fetch, undef, $t);
+
+$t=q{DB handle method "column_info" returns undef when column argument has non-matching regex};
+$sth = $dbh->column_info('','',$table, 'idfoo%');
+is ($sth->fetch, undef, $t);
+
+$t=q{DB handle method "column_info" works when column argument is empty};
+$sth = $dbh->column_info('','',$table, '');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{IS_NULLABLE}, 'YES', $t);
+
+$t=q{DB handle method "column_info" works when column argument matches exactly};
+$sth = $dbh->column_info('','',$table,'id with a space');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{pg_schema}, $schema, $t);
+
+$t=q{DB handle method "column_info" works when column argument matches via regex};
+$sth = $dbh->column_info('','',$table,'id % a space');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{pg_table}, $table, $t);
+
+$t=q{DB handle method "column_info" works when column argument matches via regex and no explicit table};
+$sth = $dbh->column_info('','','','id % a space');
+$result = $sth->fetchall_arrayref({})->[0];
+is ($result->{pg_type}, 'integer', $t);
+
+$dbh->do(qq{DROP TABLE $schema.$table});
+
 SKIP: {
 
     if ($pgversion < 80300) {
@@ -885,9 +1014,27 @@ SKIP: {
 # Test of the "primary_key_info" database handle method
 #
 
+$t=q{DB handle method "primary_key_info" returns undef when table argument is undef};
+$sth = $dbh->primary_key_info('',undef,undef);
+is ($sth->fetch, undef, $t);
+
+$t=q{DB handle method "primary_key_info" returns undef when table argument is empty};
+$sth = $dbh->primary_key_info('','','');
+is ($sth->fetch, undef, $t);
+
+$t=q{DB handle method "primary_key_info" works when schema argument is undef};
+$sth = $dbh->primary_key_info('',undef,'dbd_pg_test');
+$result = $sth->fetch;
+ok (defined $result->[0], $t);
+
+$t=q{DB handle method "primary_key_info" works when schema argument is empty};
+$sth = $dbh->primary_key_info('','','dbd_pg_test');
+$result = $sth->fetch;
+ok (defined $result->[0], $t);
+
 # Check required minimum fields
 $t='DB handle method "primary_key_info" returns required fields';
-$sth = $dbh->primary_key_info('','','dbd_pg_test');
+$sth = $dbh->primary_key_info('',$schema,'dbd_pg_test');
 $result = $sth->fetchall_arrayref({});
 @required = (qw(TABLE_CAT TABLE_SCHEM TABLE_NAME COLUMN_NAME KEY_SEQ PK_NAME DATA_TYPE));
 undef %missing;
@@ -907,6 +1054,30 @@ is ($r->{PK_NAME},     'dbd_pg_test_pkey', 'DB handle method "primary_key_info" 
 is ($r->{DATA_TYPE},   'int4',             'DB handle method "primary_key_info" returns proper DATA_TYPE');
 is ($r->{KEY_SEQ},     1,                  'DB handle method "primary_key_info" returns proper KEY_SEQ');
 
+$t='DB handle method "primary_key_info" works when pg_onerow attribute set to 1';
+$sth = $dbh->primary_key_info('',$schema,'dbd_pg_test', {pg_onerow => 1});
+$result = $sth->fetchall_arrayref({});
+is ($result->[0]{KEY_SEQ}, 1, $t);
+
+$t='DB handle method "primary_key_info" works when pg_onerow attribute set to 2';
+$sth = $dbh->primary_key_info('',$schema,'dbd_pg_test', {pg_onerow => 2});
+$result = $sth->fetchall_arrayref({});
+is_deeply ($result->[0]{KEY_SEQ}, ['1'], $t);
+
+$t='DB handle method "primary_key_info" works when pg_onerow attribute set to 1 (multi-pk)';
+$table = 'dbd_pg_test_combo_pk';
+$dbh->do("CREATE TABLE $schema.$table(a INTEGER, b INTEGER, CONSTRAINT combo PRIMARY KEY (a,b))");
+$sth = $dbh->primary_key_info('',$schema,$table, {pg_onerow => 1});
+$result = $sth->fetchall_arrayref({});
+is ($result->[0]{KEY_SEQ}, '1, 2', $t);
+
+$t='DB handle method "primary_key_info" works when pg_onerow attribute set to 2 (multi-pk)';
+$sth = $dbh->primary_key_info('',$schema,$table, {pg_onerow => 2});
+$result = $sth->fetchall_arrayref({});
+is_deeply ($result->[0]{KEY_SEQ}, ['1','2'], $t);
+
+$dbh->do("DROP TABLE $schema.$table");
+
 #
 # Test of the "primary_key" database handle method
 #
@@ -925,21 +1096,19 @@ is_deeply (\@results, $expected, $t);
 # Test of the "statistics_info" database handle method
 #
 
-$t='DB handle method "statistics_info" returns undef: no table';
+$t='DB handle method "statistics_info" returns undef when table argument is undef';
 $sth = $dbh->statistics_info(undef,undef,undef,undef,undef);
 is ($sth, undef, $t);
 
-$t='DB handle method "statistics_info" returns undef: empty table';
+$t='DB handle method "statistics_info" returns undef when table argument is empty';
 $sth = $dbh->statistics_info(undef,undef,'',undef,undef);
 is ($sth, undef, $t);
 
-## Invalid table
-$t='DB handle method "statistics_info" returns no rows: bad table';
-$sth = $dbh->statistics_info(undef,undef,'dbd_pg_test9',undef,undef);
+$t='DB handle method "statistics_info" returns no rows when table argument is invalid';
+$sth = $dbh->statistics_info(undef,'','dbd_pg_test9',undef,undef);
 $result = $sth->fetchall_arrayref;
 $expected = [];
 is_deeply ($result, $expected, $t);
-
 
 my $with_oids = $pgversion < 120000 ? 'WITH OIDS' : '';
 my $with_include = $pgversion >= 110000;
@@ -1098,10 +1267,13 @@ $dbh->do("DROP TABLE $table1");
 # Test of the "foreign_key_info" database handle method
 #
 
-## Neither pktable nor fktable specified
-$t='DB handle method "foreign_key_info" returns undef: no pk / no fk';
+$t='DB handle method "foreign_key_info" returns no rows when pk and fk are undef';
 $sth = $dbh->foreign_key_info(undef,undef,undef,undef,undef,undef);
-is ($sth, undef, $t);
+is ($sth->fetch, undef, $t);
+
+$t='DB handle method "foreign_key_info" returns no rows when pk and fk are empty';
+$sth = $dbh->foreign_key_info(undef,undef,'',undef,undef,'');
+is ($sth->fetch, undef, $t);
 
 # Drop any tables that may exist
 my $fktables = join ',' => map { "'dbd_pg_test$_'" } (1..3);
@@ -1113,19 +1285,19 @@ $SQL = "SELECT n.nspname||'.'||r.relname FROM pg_catalog.pg_class r, pg_catalog.
     }
 }
 ## Invalid primary table
-$t='DB handle method "foreign_key_info" returns undef: bad pk / no fk';
+$t='DB handle method "foreign_key_info" returns no rows: bad pk / no fk';
 $sth = $dbh->foreign_key_info(undef,undef,'dbd_pg_test9',undef,undef,undef);
-is ($sth, undef, $t);
+is ($sth->fetch, undef, $t);
 
 ## Invalid foreign table
-$t='DB handle method "foreign_key_info" returns undef: no pk / bad fk';
+$t='DB handle method "foreign_key_info" returns no rows: no pk / bad fk';
 $sth = $dbh->foreign_key_info(undef,undef,undef,undef,undef,'dbd_pg_test9');
-is ($sth, undef, $t);
+is ($sth->fetch, undef, $t);
 
 ## Both primary and foreign are invalid
-$t='DB handle method "foreign_key_info" returns undef: bad fk / bad fk';
+$t='DB handle method "foreign_key_info" returns no rows: bad fk / bad fk';
 $sth = $dbh->foreign_key_info(undef,undef,'dbd_pg_test9',undef,undef,'dbd_pg_test9');
-is ($sth, undef, $t);
+is ($sth->fetch, undef, $t);
 
 ## Create a pk table
 
@@ -1148,9 +1320,9 @@ for my $s ($schema3, $schema2) {
 $dbh->{pg_expand_array} = 0;
 
 ## Good primary with no foreign keys
-$t='DB handle method "foreign_key_info" returns undef: good pk (but unreferenced)';
+$t='DB handle method "foreign_key_info" returns no rows: good pk (but unreferenced)';
 $sth = $dbh->foreign_key_info(undef,undef,$table1,undef,undef,undef);
-is ($sth, undef, $t);
+is ($sth->fetch, undef, $t);
 
 ## Create a simple foreign key table
 for my $s ($schema3, $schema2) {
@@ -1161,19 +1333,19 @@ for my $s ($schema3, $schema2) {
 }
 
 ## Bad primary with good foreign
-$t='DB handle method "foreign_key_info" returns undef: bad pk / good fk';
+$t='DB handle method "foreign_key_info" returns no rows: bad pk / good fk';
 $sth = $dbh->foreign_key_info(undef,undef,'dbd_pg_test9',undef,undef,$table2);
-is ($sth, undef, $t);
+is ($sth->fetch, undef, $t);
 
 ## Good primary, good foreign, bad schemas
-$t='DB handle method "foreign_key_info" returns undef: good pk / good fk / bad pk schema';
+$t='DB handle method "foreign_key_info" returns no rows: good pk / good fk / bad pk schema';
 my $testschema = 'dbd_pg_test_badschema11';
 $sth = $dbh->foreign_key_info(undef,$testschema,$table1,undef,undef,$table2);
-is ($sth, undef, $t);
+is ($sth->fetch, undef, $t);
 
-$t='DB handle method "foreign_key_info" returns undef: good pk / good fk / bad fk schema';
+$t='DB handle method "foreign_key_info" returns no rows: good pk / good fk / bad fk schema';
 $sth = $dbh->foreign_key_info(undef,undef,$table1,undef,$testschema,$table2);
-is ($sth, undef, $t);
+is ($sth->fetch, undef, $t);
 
 ## Good primary
 $sth = $dbh->foreign_key_info(undef,undef,$table1,undef,undef,undef);
@@ -1410,13 +1582,22 @@ $dbh->do("DROP SCHEMA $schema2");
 $dbh->do("DROP SCHEMA $schema3");
 
 $dbh->do("SET search_path = $schema");
+
 #
 # Test of the "tables" database handle method
 #
 
+$t='DB handle method "tables" returns empty list when no matching rows';
+@results = $dbh->tables('', '', 'dbd_nosuch_table', '');
+is_deeply (\@results, [], $t);
+
 $t='DB handle method "tables" works';
 @results = $dbh->tables('', '', 'dbd_pg_test', '');
-like ($results[0], qr/dbd_pg_test/, $t);
+is ($results[0], 'dbd_pg_testschema.dbd_pg_test', $t);
+
+$t='DB handle method "tables" works with a "pg_foobar" attribute';
+@results = $dbh->tables('', '', 'dbd_pg_test', '', {pg_foobar => 1});
+is ($results[0], 'dbd_pg_testschema.dbd_pg_test', $t);
 
 $t='DB handle method "tables" works with a "pg_noprefix" attribute';
 @results = $dbh->tables('', '', 'dbd_pg_test', '', {pg_noprefix => 1});
@@ -1730,6 +1911,16 @@ $result = $dbh->pg_lo_lseek($handle, 0, 0);
 is ($result, 0, $t);
 isnt ($object, -1, $t);
 
+SKIP: {
+    if ($pgversion < 90300 or $pglibversion < 90300) {
+        skip 'Cannot test 64-bit version of largeobject functions unless Postgres is 9.3 or higher', 2;
+    }
+    $t='DB handle method "pg_lo_lseek64" works when writing';
+    $result = $dbh->pg_lo_lseek64($handle, 0, 0);
+    is ($result, 0, $t);
+    isnt ($object, -1, $t);
+}
+
 $t='DB handle method "pg_lo_write" works';
 my $buf = 'tangelo mulberry passionfruit raspberry plantain' x 500;
 $result = $dbh->pg_lo_write($handle, $buf, length($buf));
@@ -1750,9 +1941,27 @@ $t='DB handle method "pg_lo_lseek" works when reading';
 $result = $dbh->pg_lo_lseek($handle, 11, 0);
 is ($result, 11, $t);
 
+SKIP: {
+    if ($pgversion < 90300 or $pglibversion < 90300) {
+        skip 'Cannot test 64-bit version of largeobject functions unless Postgres is 9.3 or higher', 1;
+    }
+    $t='DB handle method "pg_lo_lseek64" works when reading';
+    $result = $dbh->pg_lo_lseek($handle, 11, 0);
+    is ($result, 11, $t);
+}
+
 $t='DB handle method "pg_lo_tell" works';
 $result = $dbh->pg_lo_tell($handle);
 is ($result, 11, $t);
+
+SKIP: {
+    if ($pgversion < 90300 or $pglibversion < 90300) {
+        skip 'Cannot test 64-bit version of largeobject functions unless Postgres is 9.3 or higher', 1;
+    }
+    $t='DB handle method "pg_lo_tell64" works';
+    $result = $dbh->pg_lo_tell64($handle);
+    is ($result, 11, $t);
+}
 
 $t='DB handle method "pg_lo_read" reads back the same data that was written';
 $dbh->pg_lo_lseek($handle, 0, 0);
@@ -1769,7 +1978,9 @@ $dbh->commit;
 
 SKIP: {
 
-    $pgversion < 80300 and skip ('Server version 8.3 or greater needed for pg_lo_truncate tests', 2);
+    if ($pglibversion < 80300 or $pgversion < 80300) {
+        skip ('Postgres version 8.3 or greater needed for pg_lo_truncate tests', 4);
+    }
 
     $t='DB handle method "pg_lo_truncate" fails if opened in read mode only';
     $handle = $dbh->pg_lo_open($object, $R);
@@ -1779,7 +1990,7 @@ SKIP: {
 
     $t='DB handle method "pg_lo_truncate" works if opened in read/write mode';
     $handle = $dbh->pg_lo_open($object, $W);
-    $result = $dbh->pg_lo_truncate($handle, 4);
+    $result = $dbh->pg_lo_truncate($handle, 44);
     is ($result, 0, $t);
 
     $t='DB handle method "pg_lo_truncate" truncates to expected size';
@@ -1788,7 +1999,21 @@ SKIP: {
     while ($dbh->pg_lo_read($handle, $data, 100)) {
         $buf2 .= $data;
     }
-    is (length($buf2), 4, $t);
+    is (length($buf2), 44, $t);
+
+  SKIP: {
+        if ($pgversion < 90300 or $pglibversion < 90300) {
+            skip 'Cannot test 64-bit version of largeobject functions unless Postgres is 9.3 or higher', 1;
+        }
+        $t='DB handle method "pg_lo_truncate64" truncates to expected size';
+        $dbh->pg_lo_lseek($handle, 0, 0);
+        $result = $dbh->pg_lo_truncate64($handle, 22);
+        ($buf2,$data) = ('','');
+        while ($dbh->pg_lo_read($handle, $data, 100)) {
+            $buf2 .= $data;
+        }
+        is (length($buf2), 22, $t);
+    }
 }
 
 $t='DB handle method "pg_lo_unlink" works';
@@ -1802,17 +2027,14 @@ $dbh->rollback();
 
 SKIP: {
 
-    my $super = is_super();
-
-    $super or skip ('Cannot run largeobject tests unless run as Postgres superuser', 38);
-
+    $superuser or skip ('Cannot run largeobject tests unless run as Postgres superuser', 40);
 
   SKIP: {
 
         eval {
             require File::Temp;
         };
-        $@ and skip ('Must have File::Temp to test pg_lo_import* and pg_lo_export', 8);
+        $@ and skip ('Must have File::Temp to test pg_lo_import* and pg_lo_export', 13);
 
         $t='DB handle method "pg_lo_import" works';
         my ($fh,$filename) = File::Temp::tmpnam();
@@ -1924,6 +2146,17 @@ SKIP: {
     };
     like ($@, qr{pg_lo_lseek when AutoCommit is on}, $t);
 
+  SKIP: {
+        if ($pgversion < 90300 or $pglibversion < 90300) {
+            skip 'Cannot test 64-bit version of largeobject functions unless Postgres is 9.3 or higher', 1;
+        }
+        $t='DB handle method "pg_lo_lseek64" fails with AutoCommit on';
+        eval {
+            $dbh->pg_lo_lseek64($handle, 0, 0);
+        };
+        like ($@, qr{pg_lo_lseek64 when AutoCommit is on}, $t);
+    }
+
     $t='DB handle method "pg_lo_write" fails with AutoCommit on';
     $buf = 'tangelo mulberry passionfruit raspberry plantain' x 500;
     eval {
@@ -1943,6 +2176,17 @@ SKIP: {
     };
     like ($@, qr{pg_lo_tell when AutoCommit is on}, $t);
 
+  SKIP: {
+        if ($pgversion < 90300 or $pglibversion < 90300) {
+            skip 'Cannot test 64-bit version of largeobject functions unless Postgres is 9.3 or higher', 1;
+        }
+        $t='DB handle method "pg_lo_tell64" fails with AutoCommit on';
+        eval {
+            $dbh->pg_lo_tell64($handle);
+        };
+        like ($@, qr{pg_lo_tell64 when AutoCommit is on}, $t);
+    }
+
     $t='DB handle method "pg_lo_unlink" fails with AutoCommit on';
     eval {
         $dbh->pg_lo_unlink($object);
@@ -1955,7 +2199,7 @@ SKIP: {
         eval {
             require File::Temp;
         };
-        $@ and skip ('Must have File::Temp to test pg_lo_import and pg_lo_export', 5);
+        $@ and skip ('Must have File::Temp to test pg_lo_import and pg_lo_export', 17);
 
         $t='DB handle method "pg_lo_import" works (AutoCommit on)';
         my ($fh,$filename) = File::Temp::tmpnam();
@@ -2182,65 +2426,92 @@ $dbh2->disconnect();
 
 my $mtvar; ## This is an implicit test of getcopydata: please leave this var undefined
 
-for my $type (qw/ ping pg_ping /) {
+SKIP: {
 
-    $t=qq{DB handle method "$type" returns 1 on an idle connection};
-    $dbh->commit();
-    is ($dbh->$type(), 1, $t);
+    if ($pgversion < 80300) {
+        skip ('Cannot test pg_ping via COPY on pre-8.3 servers', 20);
+    }
 
-    $t=qq{DB handle method "$type" returns 2 when in COPY IN state};
-    $dbh->do('COPY dbd_pg_test(id,pname) TO STDOUT');
-    $dbh->pg_getcopydata($mtvar);
-    is ($dbh->$type(), 2, $t);
-    ## the ping messes up the copy state, so all we can do is rollback
-    $dbh->rollback();
+    for my $type (qw/ ping pg_ping /) {
 
-    $t=qq{DB handle method "$type" returns 2 when in COPY IN state};
-    $dbh->do('COPY dbd_pg_test(id,pname) FROM STDIN');
-    $dbh->pg_putcopydata("123\tfoobar\n");
-    is ($dbh->$type(), 2, $t);
-    $dbh->rollback();
+        $t=qq{DB handle method "$type" returns 1 on an idle connection};
+        $dbh->commit();
+        is ($dbh->$type(), 1, $t);
 
-    $t=qq{DB handle method "$type" returns 3 for a good connection inside a transaction};
-    $dbh->do('SELECT 123');
-    is ($dbh->$type(), 3, $t);
+        $dbh->{PrintError} = 1;
+        $t=qq{DB handle method "$type" returns 1 on an idle connection (PrintError on)};
+        $dbh->commit();
+        is ($dbh->$type(), 1, $t);
+        $dbh->{PrintError} = 0;
 
-    $t=qq{DB handle method "$type" returns a 4 when inside a failed transaction};
-    eval {
-        $dbh->do('DBD::Pg creating an invalid command for testing');
-    };
-    is ($dbh->$type(), 4, $t);
-    $dbh->rollback();
+        $t=qq{DB handle method "$type" returns 2 when in COPY IN state};
+        $dbh->do('COPY dbd_pg_test(id,pname) TO STDOUT');
+        $dbh->pg_getcopydata($mtvar);
+        is ($dbh->$type(), 2, $t);
+        ## the ping messes up the copy state, so all we can do is rollback
+        $dbh->rollback();
 
-    my $val = $type eq 'ping' ? 0 : -1;
-    $t=qq{DB handle method "type" fails (returns $val) on a disconnected handle};
-    $dbh->disconnect();
-    is ($dbh->$type(), $val, $t);
+        $t=qq{DB handle method "$type" returns 2 when in COPY IN state};
+        $dbh->do('COPY dbd_pg_test(id,pname) FROM STDIN');
+        $dbh->pg_putcopydata("123\tfoobar\n");
+        is ($dbh->$type(), 2, $t);
+        $dbh->rollback();
 
-    $t='Able to reconnect to the database after disconnect';
-    $dbh = connect_database({nosetup => 1});
-    isnt ($dbh, undef, $t);
+        $t=qq{DB handle method "$type" returns 3 for a good connection inside a transaction};
+        $dbh->do('SELECT 123');
+        is ($dbh->$type(), 3, $t);
 
-  SKIP: {
+        $t=qq{DB handle method "$type" returns a 4 when inside a failed transaction};
+        eval {
+            $dbh->do('DBD::Pg creating an invalid command for testing');
+        };
+        is ($dbh->$type(), 4, $t);
+        $dbh->rollback();
+
+        my $val = $type eq 'ping' ? 0 : -1;
+        $t=qq{DB handle method "type" fails (returns $val) on a disconnected handle};
+        $dbh->disconnect();
+        is ($dbh->$type(), $val, $t);
+
+        $t='Able to reconnect to the database after disconnect';
+        $dbh = connect_database({nosetup => 1});
+        isnt ($dbh, undef, $t);
+
+      SKIP: {
 
         skip 'Cannot safely reopen sockets on Win32', 2 if $^O =~ /Win32/;
 
-    $val = $type eq 'ping' ? 0 : -3;
-    $t=qq{DB handle method "$type" returns $val after a lost network connection (outside transaction)};
-    socket_fail($dbh);
-    is ($dbh->$type(), $val, $t);
+        $val = $type eq 'ping' ? 0 : -3;
+        $t=qq{DB handle method "$type" returns $val after a lost network connection (outside transaction)};
+        socket_fail($dbh);
+        is ($dbh->$type(), $val, $t);
 
-    ## Reconnect, and try the same thing but inside a transaction
-    $val = $type eq 'ping' ? 0 : -3;
-    $t=qq{DB handle method "$type" returns $val after a lost network connection (inside transaction)};
-    $dbh = connect_database({nosetup => 1});
-    $dbh->do(q{SELECT 'DBD::Pg testing'});
-    socket_fail($dbh);
-    is ($dbh->$type(), $val, $t);
+        ## Reconnect, and try the same thing but inside a transaction
+        $val = $type eq 'ping' ? 0 : -3;
+        $t=qq{DB handle method "$type" returns $val after a lost network connection (inside transaction)};
+        $dbh = connect_database({nosetup => 1});
+        $dbh->do(q{SELECT 'DBD::Pg testing'});
+        socket_fail($dbh);
+        is ($dbh->$type(), $val, $t);
 
-    $type eq 'ping' and $dbh = connect_database({nosetup => 1});
-  }
+        $type eq 'ping' and $dbh = connect_database({nosetup => 1});
+    }
+    }
+
 }
+
+#
+# Test of the "pg_type_info" database handle method
+#
+
+$t=q{DB handle method "pg_type_info" returns 23 for type 4};
+is ($dbh->pg_type_info(23), 4, $t);
+
+$dbh->{PrintError} = 1;
+$t=q{DB handle method "pg_type_info" returns 12 for type 123 (PrintError on)};
+is ($dbh->pg_type_info(123), 12, $t);
+$dbh->{PrintError} = 0;
+
 
 exit;
 
@@ -2252,4 +2523,3 @@ sub socket_fail {
     close DBH_PG_FH or die "Could not close socket: $!";
     return;
 }
-

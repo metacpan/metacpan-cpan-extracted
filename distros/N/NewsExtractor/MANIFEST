@@ -45,8 +45,10 @@ lib/NewsExtractor/SiteSpecificExtractor/talk_ltn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/turnnewsapp_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_allnews_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_bcc_com_tw.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_digitimes_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_epochtimes_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_fountmedia_io.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_hkcna_hk.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_hkcnews_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_idn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_ksnews_com_tw.pm

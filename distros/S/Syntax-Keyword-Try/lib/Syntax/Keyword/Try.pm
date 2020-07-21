@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.14;
+package Syntax::Keyword::Try 0.15;
 
 use v5.14;
 use warnings;
@@ -100,14 +100,14 @@ Or
       STATEMENTS...
    }
 
-I<Experimental; since version 0.12.>
+I<Experimental; since version 0.14.>
 
 A C<catch> statement provides a block of code to the preceding C<try>
 statement that will be invoked in the case that the main block of code throws
 an exception. The C<catch> block can inspect the raised exception by looking
 in C<$@> in the usual way. Optionally, a new lexical variable can be
 introduced to store the exception in. This new form is experimental and is
-likely to change in a future version, as part of the wider attempt to
+likely to be expanded on in a future version, as part of the wider attempt to
 introduce typed dispatch. Using it will provoke an C<experimental> category
 warning on supporting perl versions.
 
@@ -124,6 +124,54 @@ usual effect.
 
 If a C<catch> statement is not given, then any exceptions raised by the C<try>
 block are raised to the caller in the usual way.
+
+=head2 catch (Typed)
+
+   ...
+   catch ($var isa Class) { ... }
+
+   ...
+   catch ($var =~ m/^Regexp match/) { ... }
+
+I<Experimental; since version 0.15.>
+
+Optionally, multiple catch statements can be provided, where each block is
+given a guarding condition, to control whether or not it will catch particular
+exception values. Two kinds of condition are supported:
+
+=over 4
+
+=item *
+
+   catch ($var isa Class)
+
+The block is invoked only if the caught exception is a blessed object, and
+derives from the given package name.
+
+On Perl version 5.32 onwards, this condition test is implemented using the
+same op type that the core C<$var isa Class> syntax is provided by and works
+in exactly the same way.
+
+On older perl versions it is emulated by a compatibility function. Currently
+this function does not respect a C<< ->isa >> method overload on the exception
+instance. Usually this should not be a problem, as exception class types
+rarely provide such a method.
+
+=item *
+
+   catch ($var =~ m/regexp/)
+
+The block is invoked only if the caught exception is a string that matches
+the given regexp.
+
+=back
+
+When an exception is caught, each condition is tested in the order they are
+written in, until a matching case is found. If such a case is found the
+corresponding block is invoked, and no further condition is tested. If no
+contional block matched and there is a default (unconditional) block at the
+end then that is invoked instead. If no such block exists, then the exception
+is propagated up to the calling scope.
 
 =head2 finally
 
@@ -290,38 +338,15 @@ The L<TryCatch> module does not allow a C<try> block not followed by C<catch>.
 
 =head2 Typed C<catch>
 
-Like L<Try> and L<Try::Tiny>, this module makes no attempt to perform any kind
-of typed dispatch to distinguish kinds of exception caught by C<catch> blocks.
+L<Try> and L<Try::Tiny> make no attempt to perform any kind of typed dispatch
+to distinguish kinds of exception caught by C<catch> blocks.
 
 L<TryCatch> and L<Syntax::Feature::Try> both attempt to provide a kind of
 typed dispatch where different classes of exception are caught by different
 blocks of code, or propagated up entirely to callers.
 
-This is likely to be the next experimental development on this module, in
-ongoing preparation for a time when it can be moved into core perl syntax.
-While at first I was heistant to implement this as a special-case in
-C<try/catch> syntax, my other work thinking about the codenamed "dumbmatch"
-syntax feature leads me to thinking that actually typed dispatch of C<catch>
-blocks is sufficiently different from value dispatch in a more general case
-(such as "dumbmatch"). Exception dispatch in perl needs to handle both C<isa>
-and string regexp testing at the same site.
-
-My latest thinking on this front may involve some syntax looking simplar to a
-C<sub> with a signature that declares a single parameter, such as:
-
-   try {
-      ...
-   }
-   catch ($e isa Some::Exception::Class) { ... },
-         ($e =~ m/^An error message /)   { ... }
-
-Or maybe the C<catch> keyword would be repeated per line:
-
-   try {
-      ...
-   }
-   catch ($e isa Some::Exception::Class) { ... }
-   catch ($e =~ m/^An error message /)   { ... }
+This module provides such an ability, via the currently-experimental
+C<catch (VAR cond...)> syntax.
 
 The design thoughts continue on the RT ticket
 L<https://rt.cpan.org/Ticket/Display.html?id=123918>.

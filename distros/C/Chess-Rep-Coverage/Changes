@@ -1,5 +1,10 @@
 Revision history for Chess-Rep-Coverage
 
+0.1103 2020-07-15 21:27:11
+    - Remove annoying empty parens on method call syntax.
+    - Clean up test slightly.
+    - Improve the Dist::Zilla dist.ini directives.
+
 0.1102 2019-05-04
     - Fixed examples/move-probability.
     - Update documentation slightly.

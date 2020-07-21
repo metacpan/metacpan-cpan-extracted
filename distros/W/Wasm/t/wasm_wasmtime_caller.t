@@ -29,7 +29,7 @@ is(wasmtime_caller(), U());
     },
   );
 
-  my $instance = Wasm::Wasmtime::Instance->new($module, [$hello]);
+  my $instance = Wasm::Wasmtime::Instance->new($module, $store, [$hello]);
   $instance->exports->run->call(); # hello world!
 
   isa_ok $caller, 'Wasm::Wasmtime::Caller';

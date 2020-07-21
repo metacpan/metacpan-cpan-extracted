@@ -1,5 +1,10 @@
 Revision history for Perl extension CheckDigits.
 
+v1.3.3 Di 14. Jul 19:20:56 CEST 2020
+	- reworked lib/Algorithm/CheckDigits.pm, allow 10-digit numbers,
+	  allow prepending of 'BE' before the digits
+	- fix Bug #132950
+
 v1.3.2 Mo 16. Mai 15:02:03 CEST 2016
 	- fix version strings
 

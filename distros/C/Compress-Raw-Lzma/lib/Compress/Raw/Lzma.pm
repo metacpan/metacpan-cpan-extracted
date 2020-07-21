@@ -12,7 +12,7 @@ use Carp ;
 use bytes ;
 our ($VERSION, $XS_VERSION, @ISA, @EXPORT, $AUTOLOAD);
 
-$VERSION = '2.094';
+$VERSION = '2.095';
 $XS_VERSION = $VERSION; 
 $VERSION = eval $VERSION;
 
@@ -1679,7 +1679,7 @@ TODO - more here
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/Compress-Raw-Lzma/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Compress-Raw-Lzma>.
 

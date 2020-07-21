@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-OAuth2-Server
 
+0.47     2020-07-20
+        - Add t/170_expiry_ttl_callback.t for Net::OAuth2::AuthorizationServer v0.26 changes
+
 0.46     2020-06-18
         - Return scope list from access token request, as per RFC6749 (GH #22)
 

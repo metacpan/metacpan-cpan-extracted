@@ -13,8 +13,7 @@ my @files = (
     'lib/Broadworks/OCIP/Methods.pm',
     'lib/Broadworks/OCIP/Methods.pod',
     'lib/Broadworks/OCIP/Response.pm',
-    'lib/Broadworks/OCIP/Throwable.pm',
-    'lib/Redcentric/Roles/OCIP.pm'
+    'lib/Broadworks/OCIP/Throwable.pm'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

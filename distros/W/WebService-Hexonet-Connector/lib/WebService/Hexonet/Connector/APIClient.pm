@@ -1,6 +1,6 @@
 package WebService::Hexonet::Connector::APIClient;
 
-use 5.026_000;
+use 5.030;
 use strict;
 use warnings;
 use utf8;
@@ -20,7 +20,7 @@ Readonly my $IDX4                         => 4;                                 
 Readonly our $ISPAPI_CONNECTION_URL       => 'https://api.ispapi.net/api/call.cgi';    # Default Connection Setup URL
 Readonly our $ISPAPI_CONNECTION_URL_PROXY => 'http://127.0.0.1/api/call.cgi';          # High Speed Connection Setup URL
 
-use version 0.9917; our $VERSION = version->declare('v2.9.2');
+use version 0.9917; our $VERSION = version->declare('v2.10.0');
 
 my $rtm = WebService::Hexonet::Connector::ResponseTemplateManager->getInstance();
 
@@ -298,7 +298,7 @@ sub loginExtended {
 
 sub logout {
     my $self = shift;
-    my $rr = $self->request( { COMMAND => 'EndSession' } );
+    my $rr   = $self->request( { COMMAND => 'EndSession' } );
     if ( $rr->isSuccess() ) {
         $self->setSession(q{});
     }
@@ -505,7 +505,7 @@ WebService::Hexonet::Connector::APIClient - Library to communicate with the insa
 This module helps to integrate the communication with the HEXONET Backend System.
 To be used in the way:
 
-    use 5.014_004;
+    use 5.030;
     use strict;
     use warnings;
     use WebService::Hexonet::Connector;

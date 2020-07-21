@@ -36,6 +36,10 @@
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
+#if HAVE_PERL_VERSION(5,32,0)
+#  define HAVE_OP_ISA
+#endif
+
 #if HAVE_PERL_VERSION(5,26,0)
 #  define HAVE_OP_SIBPARENT
 #endif
@@ -413,9 +417,42 @@ static OP *MY_newENTERTRYCATCHOP(pTHX_ OP *try, OP *catch)
   return ret;
 }
 
+#ifndef HAVE_OP_ISA
+static XOP xop_isa;
+
+/* Totally stolen from perl 5.32.0's pp.c */
+static bool sv_isa_sv(SV *sv, SV *class)
+{
+  if(!SvROK(sv) || !SvOBJECT(SvRV(sv)))
+    return FALSE;
+
+  /* TODO: ->isa invocation */
+
+#if HAVE_PERL_VERSION(5,16,0)
+  return sv_derived_from_sv(sv, class, 0);
+#else
+  return sv_derived_from(sv, SvPV_nolen(class));
+#endif
+}
+
+static OP *pp_isa(pTHX)
+{
+  dSP;
+
+  SV *left, *right;
+
+  right = POPs;
+  left  = TOPs;
+
+  SETs(boolSV(sv_isa_sv(left, right)));
+  RETURN;
+}
+#endif
+
 static int try_keyword(pTHX_ OP **op)
 {
   OP *try = NULL, *catch = NULL;
+  AV *condcatch = NULL;
   CV *finally = NULL;
   OP *ret = NULL;
   bool is_value = FALSE;
@@ -440,23 +477,19 @@ static int try_keyword(pTHX_ OP **op)
   try = parse_scoped_block(0);
   lex_read_space(0);
 
-  if(lex_consume("catch")) {
-    PADOFFSET catchvar = 0;
-    I32 save_ix = block_start(TRUE);
+  while(lex_consume("catch")) {
+    OP *assignop = NULL, *condop = NULL;
+    OP *body;
+    I32 save_ix;
+
+    if(catch)
+      croak("Already have a default catch {} block");
+
+    save_ix = block_start(TRUE);
     lex_read_space(0);
 
-    if(lex_consume("my")) {
-      Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED),
-        "'catch my VAR' syntax is deprecated and will be removed a later version");
-
-      lex_read_space(0);
-      catchvar = parse_lexvar();
-
-      lex_read_space(0);
-
-      intro_my();
-    }
-    else if(lex_consume("(")) {
+    if(lex_consume("(")) {
+      PADOFFSET catchvar = 0;
 #ifdef WARN_EXPERIMENTAL
       Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
         "'catch (VAR)' syntax is experimental and may be changed or removed without notice");
@@ -464,7 +497,42 @@ static int try_keyword(pTHX_ OP **op)
       lex_read_space(0);
       catchvar = parse_lexvar();
 
+      /* $var = $@ */
+      assignop = newBINOP(OP_SASSIGN, 0,
+        newGVOP(OP_GVSV, 0, PL_errgv), newPADxVOP(OP_PADSV, catchvar, 0, 0));
+
       lex_read_space(0);
+      if(lex_consume("isa")) {
+        OP *type = parse_termexpr(0);
+#ifdef HAVE_OP_ISA
+        condop = newBINOP(OP_ISA, 0,
+          newPADxVOP(OP_PADSV, catchvar, 0, 0), type);
+#else
+        /* Allow a bareword on RHS of `isa` */
+        if(type->op_type == OP_CONST)
+          type->op_private &= ~(OPpCONST_BARE|OPpCONST_STRICT);
+
+        condop = newBINOP_CUSTOM(0,
+          newPADxVOP(OP_PADSV, catchvar, 0, 0), type);
+        condop->op_ppaddr = &pp_isa;
+#endif
+      }
+      else if(lex_consume("=~")) {
+        OP *regexp = parse_termexpr(0);
+
+        if(regexp->op_type != OP_MATCH || cPMOPx(regexp)->op_first)
+          croak("Expected a regexp match");
+#if HAVE_PERL_VERSION(5,22,0)
+        /* Perl 5.22+ uses op_targ on OP_MATCH directly */
+        regexp->op_targ = catchvar;
+#else
+        /* Older perls need a stacked OP_PADSV op */
+        cPMOPx(regexp)->op_first = newPADxVOP(OP_PADSV, catchvar, 0, 0);
+        regexp->op_flags |= OPf_KIDS|OPf_STACKED;
+#endif
+        condop = regexp;
+      }
+
       if(!lex_consume(")"))
         croak("Expected close paren for catch (VAR)");
 
@@ -473,19 +541,43 @@ static int try_keyword(pTHX_ OP **op)
       intro_my();
     }
 
-    catch = block_end(save_ix, parse_block(0));
+    body = block_end(save_ix, parse_block(0));
     lex_read_space(0);
 
-    if(catchvar) {
-      OP *errsv_op = newGVOP(OP_GVSV, 0, PL_errgv);
-      OP *catchvar_op = newOP(OP_PADSV, 0);
-      catchvar_op->op_targ = catchvar;
+    if(condop) {
+      if(!condcatch)
+        condcatch = newAV();
 
-      catch = op_prepend_elem(OP_LINESEQ,
-        /* $var = $@ */
-        newBINOP(OP_SASSIGN, 0, errsv_op, catchvar_op),
-        catch);
+      av_push(condcatch, (SV *)op_append_elem(OP_LINESEQ, assignop, condop));
+      av_push(condcatch, (SV *)body);
+      /* catch remains NULL for now */
     }
+    else if(assignop) {
+      catch = op_prepend_elem(OP_LINESEQ,
+        assignop,
+        body);
+    }
+    else
+      catch = body;
+  }
+
+  if(condcatch) {
+    I32 i;
+
+    if(!catch)
+      /* A default fallthrough */
+      /*   die $@ */
+      catch = newLISTOP(OP_DIE, 0,
+        newOP(OP_PUSHMARK, 0), newGVOP(OP_GVSV, 0, PL_errgv));
+
+    for(i = AvFILL(condcatch)-1; i >= 0; i -= 2) {
+      OP *body   = (OP *)av_pop(condcatch),
+         *condop = (OP *)av_pop(condcatch);
+
+      catch = newCONDOP(0, condop, op_scope(body), catch);
+    }
+
+    SvREFCNT_dec(condcatch);
   }
 
   if(lex_consume("finally")) {
@@ -573,5 +665,12 @@ BOOT:
     "arrange for a CV to be invoked at scope exit");
   XopENTRY_set(&xop_pushfinally, xop_class, OA_SVOP);
   Perl_custom_op_register(aTHX_ &pp_pushfinally, &xop_pushfinally);
+#ifndef HAVE_OP_ISA
+  XopENTRY_set(&xop_isa, xop_name, "isa");
+  XopENTRY_set(&xop_isa, xop_desc,
+    "check if a value is an object of the given class");
+  XopENTRY_set(&xop_isa, xop_class, OA_BINOP);
+  Perl_custom_op_register(aTHX_ &pp_isa, &xop_isa);
+#endif
 
   wrap_keyword_plugin(&my_keyword_plugin, &next_keyword_plugin);

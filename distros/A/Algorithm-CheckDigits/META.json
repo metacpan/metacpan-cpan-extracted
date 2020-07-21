@@ -4,7 +4,7 @@
       "Mathias Weidner <mamawe@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -36,179 +36,179 @@
    "provides" : {
       "Algorithm::CheckDigits" : {
          "file" : "lib/Algorithm/CheckDigits.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M07_001" : {
          "file" : "lib/Algorithm/CheckDigits/M07_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M09_001" : {
          "file" : "lib/Algorithm/CheckDigits/M09_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_001" : {
          "file" : "lib/Algorithm/CheckDigits/M10_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_002" : {
          "file" : "lib/Algorithm/CheckDigits/M10_002.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_003" : {
          "file" : "lib/Algorithm/CheckDigits/M10_003.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_004" : {
          "file" : "lib/Algorithm/CheckDigits/M10_004.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_005" : {
          "file" : "lib/Algorithm/CheckDigits/M10_005.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_006" : {
          "file" : "lib/Algorithm/CheckDigits/M10_006.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_008" : {
          "file" : "lib/Algorithm/CheckDigits/M10_008.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_009" : {
          "file" : "lib/Algorithm/CheckDigits/M10_009.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_010" : {
          "file" : "lib/Algorithm/CheckDigits/M10_010.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M10_011" : {
          "file" : "lib/Algorithm/CheckDigits/M10_011.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_001" : {
          "file" : "lib/Algorithm/CheckDigits/M11_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_002" : {
          "file" : "lib/Algorithm/CheckDigits/M11_002.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_003" : {
          "file" : "lib/Algorithm/CheckDigits/M11_003.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_004" : {
          "file" : "lib/Algorithm/CheckDigits/M11_004.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_006" : {
          "file" : "lib/Algorithm/CheckDigits/M11_006.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_007" : {
          "file" : "lib/Algorithm/CheckDigits/M11_007.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_008" : {
          "file" : "lib/Algorithm/CheckDigits/M11_008.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_009" : {
          "file" : "lib/Algorithm/CheckDigits/M11_009.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_010" : {
          "file" : "lib/Algorithm/CheckDigits/M11_010.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_011" : {
          "file" : "lib/Algorithm/CheckDigits/M11_011.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_012" : {
          "file" : "lib/Algorithm/CheckDigits/M11_012.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_013" : {
          "file" : "lib/Algorithm/CheckDigits/M11_013.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_015" : {
          "file" : "lib/Algorithm/CheckDigits/M11_015.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_016" : {
          "file" : "lib/Algorithm/CheckDigits/M11_016.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M11_017" : {
          "file" : "lib/Algorithm/CheckDigits/M11_017.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M16_001" : {
          "file" : "lib/Algorithm/CheckDigits/M16_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M23_001" : {
          "file" : "lib/Algorithm/CheckDigits/M23_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M23_002" : {
          "file" : "lib/Algorithm/CheckDigits/M23_002.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M43_001" : {
          "file" : "lib/Algorithm/CheckDigits/M43_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M89_001" : {
          "file" : "lib/Algorithm/CheckDigits/M89_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M97_001" : {
          "file" : "lib/Algorithm/CheckDigits/M97_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::M97_002" : {
          "file" : "lib/Algorithm/CheckDigits/M97_002.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::MBase_001" : {
          "file" : "lib/Algorithm/CheckDigits/MBase_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::MBase_002" : {
          "file" : "lib/Algorithm/CheckDigits/MBase_002.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::MBase_003" : {
          "file" : "lib/Algorithm/CheckDigits/MBase_003.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::MXX_001" : {
          "file" : "lib/Algorithm/CheckDigits/MXX_001.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::MXX_002" : {
          "file" : "lib/Algorithm/CheckDigits/MXX_002.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::MXX_003" : {
          "file" : "lib/Algorithm/CheckDigits/MXX_003.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::MXX_004" : {
          "file" : "lib/Algorithm/CheckDigits/MXX_004.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::MXX_005" : {
          "file" : "lib/Algorithm/CheckDigits/MXX_005.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       },
       "Algorithm::CheckDigits::MXX_006" : {
          "file" : "lib/Algorithm/CheckDigits/MXX_006.pm",
-         "version" : "v1.3.2"
+         "version" : "v1.3.3"
       }
    },
    "release_status" : "stable",
@@ -217,5 +217,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v1.3.2"
+   "version" : "v1.3.3",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

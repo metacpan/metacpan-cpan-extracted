@@ -1,3 +1,9 @@
+0.014   2020-07-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump App::BrowserUtils to 0.009 (updated firefox's process name
+	  pattern).
+
+
 0.013   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add utilities: start-firefox, restart-firefox,

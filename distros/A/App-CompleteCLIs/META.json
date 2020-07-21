@@ -30,6 +30,7 @@
       "runtime" : {
          "requires" : {
             "Complete::Acme::MetaSyntactic" : "0.002",
+            "Complete::Chrome" : "0",
             "Complete::Country" : "0",
             "Complete::Currency" : "0",
             "Complete::Cwalitee" : "0",
@@ -98,7 +99,7 @@
          "web" : "https://github.com/perlancar/perl-App-CompleteCLIs"
       }
    },
-   "version" : "0.144",
+   "version" : "0.145",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -122,6 +123,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript complete-array-elem",
+            "version" : "0.422"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript complete-chrome-profile-name",
             "version" : "0.422"
          },
          {

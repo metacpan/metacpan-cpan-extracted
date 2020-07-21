@@ -23,12 +23,13 @@ meta-spec:
   version: '1.4'
 name: Bible-OBML-Gateway
 requires:
-  Bible::OBML: '0'
-  Bible::Reference: '1.02'
+  Bible::OBML: '1.14'
+  Bible::Reference: '1.04'
   Mojo::DOM: '0'
   Mojo::File: '0'
   Mojo::URL: '0'
   Mojo::UserAgent: '0'
+  Mojo::Util: '0'
   exact: '0'
   exact::class: '0'
   perl: '5.016'
@@ -36,7 +37,7 @@ resources:
   bugtracker: https://github.com/gryphonshafer/Bible-OBML-Gateway/issues
   homepage: https://github.com/gryphonshafer/Bible-OBML-Gateway
   repository: https://github.com/gryphonshafer/Bible-OBML-Gateway.git
-version: '1.06'
+version: '1.10'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

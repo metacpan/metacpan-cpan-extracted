@@ -21,7 +21,6 @@ my @files = (
     'lib/MIDI/Simple/Drummer/Rock.pm',
     'lib/MIDI/Simple/Drummer/Rudiments.pm',
     't/00-compile.t',
-    't/00-load.t',
     't/01-Drummer.t',
     't/02-Rock.t',
     't/03-Jazz.t',

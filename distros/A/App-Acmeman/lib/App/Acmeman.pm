@@ -24,7 +24,7 @@ use Text::ParseWords;
 use App::Acmeman::Log qw(:all :sysexits);
 use feature 'state';
 
-our $VERSION = '3.05';
+our $VERSION = '3.06';
 
 my $progdescr = "manages ACME certificates";
 
@@ -557,7 +557,13 @@ sub register_domain_certificate {
 	    sleep 1
 	}
 	if ($ret ne 'valid') {
-	    error("$domain: can't renew certificate: authorization: $ret");
+	    my $text = "authorization $ret";
+	    if (my ($ch) = grep { $_->type() eq 'http-01' } $authz->challenges()) {
+		if (my $err = $ch->error()) {
+		    $text .= ': ' . $err->to_string;
+		}
+	    }
+	    error("$domain: can't renew certificate: $text");
 	    return 0;
 	}
     }

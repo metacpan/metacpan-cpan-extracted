@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/bestpractical/rt-extension-extractcustomfieldvalues
-version: '3.14'
-x_module_install_rtx_version: '0.37'
+version: '3.15'
+x_module_install_rtx_version: '0.42'
 x_requires_rt: 4.0.0
-x_rt_too_new: 4.6.0
+x_rt_too_new: 5.2.0

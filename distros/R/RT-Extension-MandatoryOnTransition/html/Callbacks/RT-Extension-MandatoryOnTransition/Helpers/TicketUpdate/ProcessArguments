@@ -1,0 +1,22 @@
+<%INIT>
+my $errors_ref = RT::Extension::MandatoryOnTransition->CheckMandatoryFields(
+    ARGSRef => $ARGSRef,
+    Ticket  => $Ticket,
+    To      => $ARGSRef->{'Status'},
+);
+
+if (@$errors_ref) {
+    RT->Logger->debug("Preventing update because of missing mandatory fields");
+    push @$Actions, @$errors_ref;
+    $r->content_type('application/json; charset=utf-8');
+    $m->out( JSON( { actions => \@$Actions } ) );
+    $m->abort;
+}
+
+</%INIT>
+
+<%ARGS>
+$Ticket
+$ARGSRef
+$Actions
+</%ARGS>

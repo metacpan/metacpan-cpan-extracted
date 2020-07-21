@@ -134,6 +134,12 @@ Note that (as with all this class's constructors) this method won't
 proceed to actually send the generated webmentions; that step remains
 yours to take. (See ["send"](#send).)
 
+### new\_from\_json
+
+    $wm = Web::Mention->new_from_json( $json );
+
+Returns a new webmention based on the JSON output of ["as\_json"](#as_json).
+
 ### new\_from\_request
 
     $wm = Web::Mention->new_from_request( $request_object );
@@ -149,23 +155,6 @@ example.
 
 Throws an exception if the given argument doesn't meet this requirement,
 or if it does but does not define both required HTTP parameters.
-
-### FROM\_JSON
-
-    use JSON;
-
-    $wm = Web::Mention->FROM_JSON(
-       JSON::decode_json( $serialized_webmention )
-    );
-
-Converts an unblessed hash reference resulting from an earlier
-serialization (via [JSON](https://metacpan.org/pod/JSON)) into a fully fledged Web::Mention object.
-See ["SERIALIZATION"](#serialization).
-
-The all-caps spelling comes from a perhaps-misguided attempt to pair
-well with the TO\_JSON method that [JSON](https://metacpan.org/pod/JSON) requires. As such, this method
-may end up deprecated in favor of a less convoluted approach in future
-releases of this module.
 
 ### content\_truncation\_marker
 
@@ -187,13 +176,24 @@ Defaults to 280.
 
 ## Object Methods
 
+### as\_json
+
+    $json = $wm->as_json;
+
+Returns a JSON representation of the webmention.
+
+See ["SERIALIZATION"](#serialization), below, for more information.
+
 ### author
 
     $author = $wm->author;
 
-A Web::Mention::Author object representing the author of this
-webmention's source document, if we're able to determine it. If not,
-this returns undef.
+A [Web::Mention::Author](https://metacpan.org/pod/Web::Mention::Author) object representing the author of this
+webmention's source document. You can get information about the author through
+its `name`, `url`, and `photo` methods.
+
+If the webmention's author is unknown or unset, then this method returns a
+[Web::Mention::Author](https://metacpan.org/pod/Web::Mention::Author) object with all its fields set to `undef`.
 
 ### content
 
@@ -409,17 +409,19 @@ See also ["is\_verified"](#is_verified).
 
 # SERIALIZATION
 
-To serialize a Web::Mention object into JSON, enable [the JSON module's
-"convert\_blessed" feature](https://metacpan.org/pod/JSON#convert_blessed), and then use one of
-that module's JSON-encoding functions on this object. This will result
-in a JSON string containing all the pertinent information about the
-webmention, including its verification status, any content and metadata
-fetched from the target, and so on.
+To serialize a Web::Mention object, use ["as\_json"](#as_json), which returns a
+JSON string that you can store in any way you wish. You can later
+"inflate" it into a Web::Mention object through the ["new\_from\_json"](#new_from_json)
+class method.
 
-To unserialize a Web::Mention object serialized in this way, first
-decode it into an unblessed hash reference via [JSON](https://metacpan.org/pod/JSON), and then pass
-that as the single argument to [the FROM\_JSON class
-method](#from_json).
+Note that a verified webmention might serialize to a significantly
+larger JSON string than an unverified one: it might include a complete
+copy of the source document, its parsed microformats (if any), author
+information, and various other metadata. Unverified webmentions, on the
+other hand, will likely contain little data other that their source and
+target URLs.
+
+This is all normal; verified webmentions just have more luggage.
 
 # NOTES AND BUGS
 

@@ -631,7 +631,6 @@ sub delete_notes_slide {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param string $password Document password. (optional)
@@ -647,11 +646,6 @@ sub delete_notes_slide {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -701,11 +695,6 @@ sub delete_notes_slide_paragraph {
       croak("Missing the required parameter 'slide_index' when calling delete_notes_slide_paragraph");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_notes_slide_paragraph");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_notes_slide_paragraph");
@@ -717,7 +706,7 @@ sub delete_notes_slide_paragraph {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs/{paragraphIndex}';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -761,13 +750,6 @@ sub delete_notes_slide_paragraph {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -803,7 +785,6 @@ sub delete_notes_slide_paragraph {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param string $paragraphs The indices of the shapes to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
@@ -819,11 +800,6 @@ sub delete_notes_slide_paragraph {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -873,18 +849,13 @@ sub delete_notes_slide_paragraphs {
       croak("Missing the required parameter 'slide_index' when calling delete_notes_slide_paragraphs");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_notes_slide_paragraphs");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_notes_slide_paragraphs");
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -933,13 +904,6 @@ sub delete_notes_slide_paragraphs {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -968,7 +932,6 @@ sub delete_notes_slide_paragraphs {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param int $portion_index Portion index. (required)
@@ -985,11 +948,6 @@ sub delete_notes_slide_paragraphs {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -1044,11 +1002,6 @@ sub delete_notes_slide_portion {
       croak("Missing the required parameter 'slide_index' when calling delete_notes_slide_portion");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_notes_slide_portion");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_notes_slide_portion");
@@ -1065,7 +1018,7 @@ sub delete_notes_slide_portion {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -1105,13 +1058,6 @@ sub delete_notes_slide_portion {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -1158,7 +1104,6 @@ sub delete_notes_slide_portion {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param string $portions The indices of the shapes to be deleted; delete all by default. (optional)
@@ -1175,11 +1120,6 @@ sub delete_notes_slide_portion {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -1234,11 +1174,6 @@ sub delete_notes_slide_portions {
       croak("Missing the required parameter 'slide_index' when calling delete_notes_slide_portions");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_notes_slide_portions");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_notes_slide_portions");
@@ -1250,7 +1185,7 @@ sub delete_notes_slide_portions {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -1299,13 +1234,6 @@ sub delete_notes_slide_portions {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -1341,7 +1269,6 @@ sub delete_notes_slide_portions {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -1356,11 +1283,6 @@ sub delete_notes_slide_portions {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -1405,18 +1327,13 @@ sub delete_notes_slide_shape {
       croak("Missing the required parameter 'slide_index' when calling delete_notes_slide_shape");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_notes_slide_shape");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_notes_slide_shape");
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -1460,13 +1377,6 @@ sub delete_notes_slide_shape {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -1495,7 +1405,6 @@ sub delete_notes_slide_shape {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param string $shapes The indices of the shapes to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -1510,11 +1419,6 @@ sub delete_notes_slide_shape {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shapes' => {
@@ -1559,13 +1463,8 @@ sub delete_notes_slide_shapes {
       croak("Missing the required parameter 'slide_index' when calling delete_notes_slide_shapes");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_notes_slide_shapes");
-    }
-
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -1613,13 +1512,6 @@ sub delete_notes_slide_shapes {
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
     my $_body_data;
     # authentication setting, if any
     my $auth_settings = [qw(JWT )];
@@ -1642,7 +1534,6 @@ sub delete_notes_slide_shapes {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param string $password Document password. (optional)
@@ -1658,11 +1549,6 @@ sub delete_notes_slide_shapes {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -1712,11 +1598,6 @@ sub delete_paragraph {
       croak("Missing the required parameter 'slide_index' when calling delete_paragraph");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_paragraph");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_paragraph");
@@ -1728,7 +1609,7 @@ sub delete_paragraph {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -1772,13 +1653,6 @@ sub delete_paragraph {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -1814,7 +1688,6 @@ sub delete_paragraph {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param string $paragraphs The indices of the shapes to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
@@ -1830,11 +1703,6 @@ sub delete_paragraph {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -1884,18 +1752,13 @@ sub delete_paragraphs {
       croak("Missing the required parameter 'slide_index' when calling delete_paragraphs");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_paragraphs");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_paragraphs");
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -1944,13 +1807,6 @@ sub delete_paragraphs {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -1979,7 +1835,6 @@ sub delete_paragraphs {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param int $portion_index Portion index. (required)
@@ -1996,11 +1851,6 @@ sub delete_paragraphs {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -2055,11 +1905,6 @@ sub delete_portion {
       croak("Missing the required parameter 'slide_index' when calling delete_portion");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_portion");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_portion");
@@ -2076,7 +1921,7 @@ sub delete_portion {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -2116,13 +1961,6 @@ sub delete_portion {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -2169,7 +2007,6 @@ sub delete_portion {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param string $portions The indices of the shapes to be deleted; delete all by default. (optional)
@@ -2186,11 +2023,6 @@ sub delete_portion {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -2245,11 +2077,6 @@ sub delete_portions {
       croak("Missing the required parameter 'slide_index' when calling delete_portions");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_portions");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling delete_portions");
@@ -2261,7 +2088,7 @@ sub delete_portions {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
 
     my $_method = 'DELETE';
     my $query_params = {};
@@ -2306,13 +2133,6 @@ sub delete_portions {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -3250,7 +3070,6 @@ sub delete_slide_by_index {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -3265,11 +3084,6 @@ sub delete_slide_by_index {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -3314,14 +3128,285 @@ sub delete_slide_shape {
       croak("Missing the required parameter 'slide_index' when calling delete_slide_shape");
     }
 
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_slide_shape");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Shapes', $response);
+    return $_response_object;
+}
+
+#
+# delete_slide_shapes
+#
+# Remove a range of shapes.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $shapes The indices of the shapes to be deleted; delete all by default. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shapes' => {
+        data_type => 'string',
+        description => 'The indices of the shapes to be deleted; delete all by default.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_shapes' } = { 
+    	summary => 'Remove a range of shapes.',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub delete_slide_shapes {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_slide_shapes");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_slide_shapes");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'shapes'} && defined $args{'shapes'}) {
+        $query_params->{'shapes'} = $self->{api_client}->to_query_value($args{'shapes'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Shapes', $response);
+    return $_response_object;
+}
+
+#
+# delete_slide_subshape
+#
+# Remove a shape (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_slide_subshape' } = { 
+    	summary => 'Remove a shape (for smart art and group shapes).',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub delete_slide_subshape {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_slide_subshape");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_slide_subshape");
+    }
+
     # verify the required parameter 'path' is set
     unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_slide_shape");
+      croak("Missing the required parameter 'path' when calling delete_slide_subshape");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling delete_slide_shape");
+      croak("Missing the required parameter 'shape_index' when calling delete_slide_subshape");
     }
 
     # parse inputs
@@ -3398,13 +3483,13 @@ sub delete_slide_shape {
 }
 
 #
-# delete_slide_shapes
+# delete_slide_subshapes
 #
-# Remove a range of shapes.
+# Remove a range of shapes (for smart art and group shapes).
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
+# @param string $path Shape path. (required)
 # @param string $shapes The indices of the shapes to be deleted; delete all by default. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -3423,7 +3508,7 @@ sub delete_slide_shape {
     },
     'path' => {
         data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
+        description => 'Shape path.',
         required => '1',
     },
     'shapes' => {
@@ -3447,30 +3532,30 @@ sub delete_slide_shape {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'delete_slide_shapes' } = { 
-    	summary => 'Remove a range of shapes.',
+    __PACKAGE__->method_documentation->{ 'delete_slide_subshapes' } = { 
+    	summary => 'Remove a range of shapes (for smart art and group shapes).',
         params => $params,
         returns => 'Shapes',
         };
 }
 # @return Shapes
 #
-sub delete_slide_shapes {
+sub delete_slide_subshapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
     unless (exists $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling delete_slide_shapes");
+      croak("Missing the required parameter 'name' when calling delete_slide_subshapes");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling delete_slide_shapes");
+      croak("Missing the required parameter 'slide_index' when calling delete_slide_subshapes");
     }
 
     # verify the required parameter 'path' is set
     unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling delete_slide_shapes");
+      croak("Missing the required parameter 'path' when calling delete_slide_subshapes");
     }
 
     # parse inputs
@@ -3988,6 +4073,716 @@ sub delete_slides_slide_background {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('SlideBackground', $response);
+    return $_response_object;
+}
+
+#
+# delete_subshape_paragraph
+#
+# Remove a paragraph (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_subshape_paragraph' } = { 
+    	summary => 'Remove a paragraph (for smart art and group shapes).',
+        params => $params,
+        returns => 'Paragraphs',
+        };
+}
+# @return Paragraphs
+#
+sub delete_subshape_paragraph {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_subshape_paragraph");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_subshape_paragraph");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling delete_subshape_paragraph");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_subshape_paragraph");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling delete_subshape_paragraph");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraphs', $response);
+    return $_response_object;
+}
+
+#
+# delete_subshape_paragraphs
+#
+# Remove a range of paragraphs (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $paragraphs The indices of the shapes to be deleted; delete all by default. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraphs' => {
+        data_type => 'string',
+        description => 'The indices of the shapes to be deleted; delete all by default.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_subshape_paragraphs' } = { 
+    	summary => 'Remove a range of paragraphs (for smart art and group shapes).',
+        params => $params,
+        returns => 'Paragraphs',
+        };
+}
+# @return Paragraphs
+#
+sub delete_subshape_paragraphs {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_subshape_paragraphs");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_subshape_paragraphs");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling delete_subshape_paragraphs");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_subshape_paragraphs");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'paragraphs'} && defined $args{'paragraphs'}) {
+        $query_params->{'paragraphs'} = $self->{api_client}->to_query_value($args{'paragraphs'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraphs', $response);
+    return $_response_object;
+}
+
+#
+# delete_subshape_portion
+#
+# Remove a portion (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_subshape_portion' } = { 
+    	summary => 'Remove a portion (for smart art and group shapes).',
+        params => $params,
+        returns => 'Portions',
+        };
+}
+# @return Portions
+#
+sub delete_subshape_portion {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_subshape_portion");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_subshape_portion");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling delete_subshape_portion");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_subshape_portion");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling delete_subshape_portion");
+    }
+
+    # verify the required parameter 'portion_index' is set
+    unless (exists $args{'portion_index'}) {
+      croak("Missing the required parameter 'portion_index' when calling delete_subshape_portion");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'portion_index'}) {
+        my $_base_variable = "{" . "portionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portions', $response);
+    return $_response_object;
+}
+
+#
+# delete_subshape_portions
+#
+# Remove a range of portions (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $portions The indices of the shapes to be deleted; delete all by default. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portions' => {
+        data_type => 'string',
+        description => 'The indices of the shapes to be deleted; delete all by default.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'delete_subshape_portions' } = { 
+    	summary => 'Remove a range of portions (for smart art and group shapes).',
+        params => $params,
+        returns => 'Portions',
+        };
+}
+# @return Portions
+#
+sub delete_subshape_portions {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling delete_subshape_portions");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling delete_subshape_portions");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling delete_subshape_portions");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling delete_subshape_portions");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling delete_subshape_portions");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
+
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'portions'} && defined $args{'portions'}) {
+        $query_params->{'portions'} = $self->{api_client}->to_query_value($args{'portions'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portions', $response);
     return $_response_object;
 }
 
@@ -4851,14 +5646,12 @@ sub get_notes_slide {
 }
 
 #
-# get_notes_slide_shape
+# get_notes_slide_exists
 #
-# Read slide shape info.
+# Get info whether a notes slide exists.
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
-# @param int $shape_index Shape index. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -4874,9 +5667,123 @@ sub get_notes_slide {
         description => 'Slide index.',
         required => '1',
     },
-    'path' => {
+    'password' => {
         data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_notes_slide_exists' } = { 
+    	summary => 'Get info whether a notes slide exists.',
+        params => $params,
+        returns => 'EntityExists',
+        };
+}
+# @return EntityExists
+#
+sub get_notes_slide_exists {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_notes_slide_exists");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_notes_slide_exists");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/exist';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('EntityExists', $response);
+    return $_response_object;
+}
+
+#
+# get_notes_slide_shape
+#
+# Read slide shape info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
         required => '1',
     },
     'shape_index' => {
@@ -4921,18 +5828,13 @@ sub get_notes_slide_shape {
       croak("Missing the required parameter 'slide_index' when calling get_notes_slide_shape");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_notes_slide_shape");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_notes_slide_shape");
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -4976,13 +5878,6 @@ sub get_notes_slide_shape {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -5011,7 +5906,6 @@ sub get_notes_slide_shape {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param string $password Document password. (optional)
@@ -5027,11 +5921,6 @@ sub get_notes_slide_shape {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -5081,11 +5970,6 @@ sub get_notes_slide_shape_paragraph {
       croak("Missing the required parameter 'slide_index' when calling get_notes_slide_shape_paragraph");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_notes_slide_shape_paragraph");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_notes_slide_shape_paragraph");
@@ -5097,7 +5981,7 @@ sub get_notes_slide_shape_paragraph {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs/{paragraphIndex}';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -5141,13 +6025,6 @@ sub get_notes_slide_shape_paragraph {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -5183,7 +6060,6 @@ sub get_notes_slide_shape_paragraph {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -5198,11 +6074,6 @@ sub get_notes_slide_shape_paragraph {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -5247,18 +6118,13 @@ sub get_notes_slide_shape_paragraphs {
       croak("Missing the required parameter 'slide_index' when calling get_notes_slide_shape_paragraphs");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_notes_slide_shape_paragraphs");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_notes_slide_shape_paragraphs");
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -5302,13 +6168,6 @@ sub get_notes_slide_shape_paragraphs {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -5337,7 +6196,6 @@ sub get_notes_slide_shape_paragraphs {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param int $portion_index Portion index. (required)
@@ -5354,11 +6212,6 @@ sub get_notes_slide_shape_paragraphs {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -5413,11 +6266,6 @@ sub get_notes_slide_shape_portion {
       croak("Missing the required parameter 'slide_index' when calling get_notes_slide_shape_portion");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_notes_slide_shape_portion");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_notes_slide_shape_portion");
@@ -5434,7 +6282,7 @@ sub get_notes_slide_shape_portion {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -5474,13 +6322,6 @@ sub get_notes_slide_shape_portion {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -5527,7 +6368,6 @@ sub get_notes_slide_shape_portion {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param string $password Document password. (optional)
@@ -5543,11 +6383,6 @@ sub get_notes_slide_shape_portion {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -5597,11 +6432,6 @@ sub get_notes_slide_shape_portions {
       croak("Missing the required parameter 'slide_index' when calling get_notes_slide_shape_portions");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_notes_slide_shape_portions");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_notes_slide_shape_portions");
@@ -5613,7 +6443,7 @@ sub get_notes_slide_shape_portions {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -5653,13 +6483,6 @@ sub get_notes_slide_shape_portions {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -5699,7 +6522,6 @@ sub get_notes_slide_shape_portions {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -5713,11 +6535,6 @@ sub get_notes_slide_shape_portions {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'password' => {
@@ -5757,13 +6574,8 @@ sub get_notes_slide_shapes {
       croak("Missing the required parameter 'slide_index' when calling get_notes_slide_shapes");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_notes_slide_shapes");
-    }
-
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -5803,13 +6615,6 @@ sub get_notes_slide_shapes {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -6004,7 +6809,6 @@ sub get_notes_slide_with_format {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param int $portion_index Portion index. (required)
@@ -6021,11 +6825,6 @@ sub get_notes_slide_with_format {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -6080,11 +6879,6 @@ sub get_paragraph_portion {
       croak("Missing the required parameter 'slide_index' when calling get_paragraph_portion");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_paragraph_portion");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_paragraph_portion");
@@ -6101,7 +6895,7 @@ sub get_paragraph_portion {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -6141,13 +6935,6 @@ sub get_paragraph_portion {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -6194,7 +6981,6 @@ sub get_paragraph_portion {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param string $password Document password. (optional)
@@ -6210,11 +6996,6 @@ sub get_paragraph_portion {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -6264,11 +7045,6 @@ sub get_paragraph_portions {
       croak("Missing the required parameter 'slide_index' when calling get_paragraph_portions");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_paragraph_portions");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling get_paragraph_portions");
@@ -6280,7 +7056,7 @@ sub get_paragraph_portions {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
 
     my $_method = 'GET';
     my $query_params = {};
@@ -6320,13 +7096,6 @@ sub get_paragraph_portions {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -6500,7 +7269,6 @@ sub get_slide_animation {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -6515,11 +7283,6 @@ sub get_slide_animation {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -6564,14 +7327,564 @@ sub get_slide_shape {
       croak("Missing the required parameter 'slide_index' when calling get_slide_shape");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_slide_shape");
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_slide_shape");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ShapeBase', $response);
+    return $_response_object;
+}
+
+#
+# get_slide_shape_paragraph
+#
+# Read shape paragraph info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_shape_paragraph' } = { 
+    	summary => 'Read shape paragraph info.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub get_slide_shape_paragraph {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_slide_shape_paragraph");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_slide_shape_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling get_slide_shape");
+      croak("Missing the required parameter 'shape_index' when calling get_slide_shape_paragraph");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling get_slide_shape_paragraph");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraph', $response);
+    return $_response_object;
+}
+
+#
+# get_slide_shape_paragraphs
+#
+# Read shape paragraphs info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_shape_paragraphs' } = { 
+    	summary => 'Read shape paragraphs info.',
+        params => $params,
+        returns => 'Paragraphs',
+        };
+}
+# @return Paragraphs
+#
+sub get_slide_shape_paragraphs {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_slide_shape_paragraphs");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_slide_shape_paragraphs");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_slide_shape_paragraphs");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraphs', $response);
+    return $_response_object;
+}
+
+#
+# get_slide_shapes
+#
+# Read slide shapes info.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_shapes' } = { 
+    	summary => 'Read slide shapes info.',
+        params => $params,
+        returns => 'Shapes',
+        };
+}
+# @return Shapes
+#
+sub get_slide_shapes {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_slide_shapes");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_slide_shapes");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Shapes', $response);
+    return $_response_object;
+}
+
+#
+# get_slide_subshape
+#
+# Read slide shape info (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_slide_subshape' } = { 
+    	summary => 'Read slide shape info (for smart art and group shapes).',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub get_slide_subshape {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_slide_subshape");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_slide_subshape");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling get_slide_subshape");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_slide_subshape");
     }
 
     # parse inputs
@@ -6648,13 +7961,13 @@ sub get_slide_shape {
 }
 
 #
-# get_slide_shape_paragraph
+# get_slide_subshape_paragraph
 #
-# Read shape paragraph info.
+# Read shape paragraph info (for smart art and group shapes).
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
+# @param string $path Shape path. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param string $password Document password. (optional)
@@ -6674,7 +7987,7 @@ sub get_slide_shape {
     },
     'path' => {
         data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
+        description => 'Shape path.',
         required => '1',
     },
     'shape_index' => {
@@ -6703,40 +8016,40 @@ sub get_slide_shape {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_shape_paragraph' } = { 
-    	summary => 'Read shape paragraph info.',
+    __PACKAGE__->method_documentation->{ 'get_slide_subshape_paragraph' } = { 
+    	summary => 'Read shape paragraph info (for smart art and group shapes).',
         params => $params,
         returns => 'Paragraph',
         };
 }
 # @return Paragraph
 #
-sub get_slide_shape_paragraph {
+sub get_slide_subshape_paragraph {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
     unless (exists $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling get_slide_shape_paragraph");
+      croak("Missing the required parameter 'name' when calling get_slide_subshape_paragraph");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling get_slide_shape_paragraph");
+      croak("Missing the required parameter 'slide_index' when calling get_slide_subshape_paragraph");
     }
 
     # verify the required parameter 'path' is set
     unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_slide_shape_paragraph");
+      croak("Missing the required parameter 'path' when calling get_slide_subshape_paragraph");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling get_slide_shape_paragraph");
+      croak("Missing the required parameter 'shape_index' when calling get_slide_subshape_paragraph");
     }
 
     # verify the required parameter 'paragraph_index' is set
     unless (exists $args{'paragraph_index'}) {
-      croak("Missing the required parameter 'paragraph_index' when calling get_slide_shape_paragraph");
+      croak("Missing the required parameter 'paragraph_index' when calling get_slide_subshape_paragraph");
     }
 
     # parse inputs
@@ -6820,13 +8133,13 @@ sub get_slide_shape_paragraph {
 }
 
 #
-# get_slide_shape_paragraphs
+# get_slide_subshape_paragraphs
 #
-# Read shape paragraphs info.
+# Read shape paragraphs info (for smart art and group shapes).
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
+# @param string $path Shape path. (required)
 # @param int $shape_index Shape index. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -6845,7 +8158,7 @@ sub get_slide_shape_paragraph {
     },
     'path' => {
         data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
+        description => 'Shape path.',
         required => '1',
     },
     'shape_index' => {
@@ -6869,35 +8182,35 @@ sub get_slide_shape_paragraph {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_shape_paragraphs' } = { 
-    	summary => 'Read shape paragraphs info.',
+    __PACKAGE__->method_documentation->{ 'get_slide_subshape_paragraphs' } = { 
+    	summary => 'Read shape paragraphs info (for smart art and group shapes).',
         params => $params,
         returns => 'Paragraphs',
         };
 }
 # @return Paragraphs
 #
-sub get_slide_shape_paragraphs {
+sub get_slide_subshape_paragraphs {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
     unless (exists $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling get_slide_shape_paragraphs");
+      croak("Missing the required parameter 'name' when calling get_slide_subshape_paragraphs");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling get_slide_shape_paragraphs");
+      croak("Missing the required parameter 'slide_index' when calling get_slide_subshape_paragraphs");
     }
 
     # verify the required parameter 'path' is set
     unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_slide_shape_paragraphs");
+      croak("Missing the required parameter 'path' when calling get_slide_subshape_paragraphs");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling get_slide_shape_paragraphs");
+      croak("Missing the required parameter 'shape_index' when calling get_slide_subshape_paragraphs");
     }
 
     # parse inputs
@@ -6974,7 +8287,7 @@ sub get_slide_shape_paragraphs {
 }
 
 #
-# get_slide_shapes
+# get_slide_subshapes
 #
 # Read slide shapes info.
 # 
@@ -7017,7 +8330,7 @@ sub get_slide_shape_paragraphs {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'get_slide_shapes' } = { 
+    __PACKAGE__->method_documentation->{ 'get_slide_subshapes' } = { 
     	summary => 'Read slide shapes info.',
         params => $params,
         returns => 'Shapes',
@@ -7025,22 +8338,22 @@ sub get_slide_shape_paragraphs {
 }
 # @return Shapes
 #
-sub get_slide_shapes {
+sub get_slide_subshapes {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
     unless (exists $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling get_slide_shapes");
+      croak("Missing the required parameter 'name' when calling get_slide_subshapes");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling get_slide_shapes");
+      croak("Missing the required parameter 'slide_index' when calling get_slide_subshapes");
     }
 
     # verify the required parameter 'path' is set
     unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling get_slide_shapes");
+      croak("Missing the required parameter 'path' when calling get_slide_subshapes");
     }
 
     # parse inputs
@@ -9469,6 +10782,368 @@ sub get_slides_view_properties {
 }
 
 #
+# get_subshape_paragraph_portion
+#
+# Read paragraph portion info (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_subshape_paragraph_portion' } = { 
+    	summary => 'Read paragraph portion info (for smart art and group shapes).',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub get_subshape_paragraph_portion {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_subshape_paragraph_portion");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_subshape_paragraph_portion");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling get_subshape_paragraph_portion");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_subshape_paragraph_portion");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling get_subshape_paragraph_portion");
+    }
+
+    # verify the required parameter 'portion_index' is set
+    unless (exists $args{'portion_index'}) {
+      croak("Missing the required parameter 'portion_index' when calling get_subshape_paragraph_portion");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'portion_index'}) {
+        my $_base_variable = "{" . "portionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portion', $response);
+    return $_response_object;
+}
+
+#
+# get_subshape_paragraph_portions
+#
+# Read paragraph portions info (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'get_subshape_paragraph_portions' } = { 
+    	summary => 'Read paragraph portions info (for smart art and group shapes).',
+        params => $params,
+        returns => 'Portions',
+        };
+}
+# @return Portions
+#
+sub get_subshape_paragraph_portions {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling get_subshape_paragraph_portions");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling get_subshape_paragraph_portions");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling get_subshape_paragraph_portions");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling get_subshape_paragraph_portions");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling get_subshape_paragraph_portions");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portions', $response);
+    return $_response_object;
+}
+
+#
 # move_file
 #
 # Move file
@@ -9777,7 +11452,6 @@ sub object_exists {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param Paragraph $dto Paragraph DTO. (optional)
 # @param string $password Document password. (optional)
@@ -9794,11 +11468,6 @@ sub object_exists {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -9853,14 +11522,674 @@ sub post_add_new_paragraph {
       croak("Missing the required parameter 'slide_index' when calling post_add_new_paragraph");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling post_add_new_paragraph");
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling post_add_new_paragraph");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraph', $response);
+    return $_response_object;
+}
+
+#
+# post_add_new_portion
+#
+# Creates new portion.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Portion $dto Portion DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param int $position Position of the new portion in the list. Default is at the end of the list. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new portion in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_portion' } = { 
+    	summary => 'Creates new portion.',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub post_add_new_portion {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_add_new_portion");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_add_new_portion");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling post_add_new_paragraph");
+      croak("Missing the required parameter 'shape_index' when calling post_add_new_portion");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling post_add_new_portion");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portion', $response);
+    return $_response_object;
+}
+
+#
+# post_add_new_shape
+#
+# Create new shape.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param ShapeBase $dto Shape DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'shape_to_clone' => {
+        data_type => 'int',
+        description => 'Optional index for clone shape instead of adding a new one.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new shape in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_shape' } = { 
+    	summary => 'Create new shape.',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub post_add_new_shape {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_add_new_shape");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_add_new_shape");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'shape_to_clone'} && defined $args{'shape_to_clone'}) {
+        $query_params->{'shapeToClone'} = $self->{api_client}->to_query_value($args{'shape_to_clone'});
+    }
+
+    # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ShapeBase', $response);
+    return $_response_object;
+}
+
+#
+# post_add_new_subshape
+#
+# Create new shape (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param ShapeBase $dto Shape DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'shape_to_clone' => {
+        data_type => 'int',
+        description => 'Optional index for clone shape instead of adding a new one.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new shape in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_subshape' } = { 
+    	summary => 'Create new shape (for smart art and group shapes).',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub post_add_new_subshape {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_add_new_subshape");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_add_new_subshape");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling post_add_new_subshape");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'shape_to_clone'} && defined $args{'shape_to_clone'}) {
+        $query_params->{'shapeToClone'} = $self->{api_client}->to_query_value($args{'shape_to_clone'});
+    }
+
+    # query params
+    if (exists $args{'position'} && defined $args{'position'}) {
+        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ShapeBase', $response);
+    return $_response_object;
+}
+
+#
+# post_add_new_subshape_paragraph
+#
+# Creates new paragraph (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param Paragraph $dto Paragraph DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+# @param int $position Position of the new paragraph in the list. Default is at the end of the list. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    'position' => {
+        data_type => 'int',
+        description => 'Position of the new paragraph in the list. Default is at the end of the list.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_add_new_subshape_paragraph' } = { 
+    	summary => 'Creates new paragraph (for smart art and group shapes).',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub post_add_new_subshape_paragraph {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_add_new_subshape_paragraph");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_add_new_subshape_paragraph");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling post_add_new_subshape_paragraph");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling post_add_new_subshape_paragraph");
     }
 
     # parse inputs
@@ -9947,13 +12276,13 @@ sub post_add_new_paragraph {
 }
 
 #
-# post_add_new_portion
+# post_add_new_subshape_portion
 #
-# Creates new portion.
+# Creates new portion (for smart art and group shapes).
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
+# @param string $path Shape path. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param Portion $dto Portion DTO. (optional)
@@ -9975,7 +12304,7 @@ sub post_add_new_paragraph {
     },
     'path' => {
         data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
+        description => 'Shape path.',
         required => '1',
     },
     'shape_index' => {
@@ -10014,40 +12343,40 @@ sub post_add_new_paragraph {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'post_add_new_portion' } = { 
-    	summary => 'Creates new portion.',
+    __PACKAGE__->method_documentation->{ 'post_add_new_subshape_portion' } = { 
+    	summary => 'Creates new portion (for smart art and group shapes).',
         params => $params,
         returns => 'Portion',
         };
 }
 # @return Portion
 #
-sub post_add_new_portion {
+sub post_add_new_subshape_portion {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
     unless (exists $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling post_add_new_portion");
+      croak("Missing the required parameter 'name' when calling post_add_new_subshape_portion");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling post_add_new_portion");
+      croak("Missing the required parameter 'slide_index' when calling post_add_new_subshape_portion");
     }
 
     # verify the required parameter 'path' is set
     unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling post_add_new_portion");
+      croak("Missing the required parameter 'path' when calling post_add_new_subshape_portion");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling post_add_new_portion");
+      croak("Missing the required parameter 'shape_index' when calling post_add_new_subshape_portion");
     }
 
     # verify the required parameter 'paragraph_index' is set
     unless (exists $args{'paragraph_index'}) {
-      croak("Missing the required parameter 'paragraph_index' when calling post_add_new_portion");
+      croak("Missing the required parameter 'paragraph_index' when calling post_add_new_subshape_portion");
     }
 
     # parse inputs
@@ -10137,175 +12466,6 @@ sub post_add_new_portion {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('Portion', $response);
-    return $_response_object;
-}
-
-#
-# post_add_new_shape
-#
-# Create new shape.
-# 
-# @param string $name Document name. (required)
-# @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
-# @param ShapeBase $dto Shape DTO. (optional)
-# @param string $password Document password. (optional)
-# @param string $folder Document folder. (optional)
-# @param string $storage Document storage. (optional)
-# @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
-# @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
-{
-    my $params = {
-    'name' => {
-        data_type => 'string',
-        description => 'Document name.',
-        required => '1',
-    },
-    'slide_index' => {
-        data_type => 'int',
-        description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
-        required => '1',
-    },
-    'dto' => {
-        data_type => 'ShapeBase',
-        description => 'Shape DTO.',
-        required => '0',
-    },
-    'password' => {
-        data_type => 'string',
-        description => 'Document password.',
-        required => '0',
-    },
-    'folder' => {
-        data_type => 'string',
-        description => 'Document folder.',
-        required => '0',
-    },
-    'storage' => {
-        data_type => 'string',
-        description => 'Document storage.',
-        required => '0',
-    },
-    'shape_to_clone' => {
-        data_type => 'int',
-        description => 'Optional index for clone shape instead of adding a new one.',
-        required => '0',
-    },
-    'position' => {
-        data_type => 'int',
-        description => 'Position of the new shape in the list. Default is at the end of the list.',
-        required => '0',
-    },
-    };
-    __PACKAGE__->method_documentation->{ 'post_add_new_shape' } = { 
-    	summary => 'Create new shape.',
-        params => $params,
-        returns => 'ShapeBase',
-        };
-}
-# @return ShapeBase
-#
-sub post_add_new_shape {
-    my ($self, %args) = @_;
-
-    # verify the required parameter 'name' is set
-    unless (exists $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling post_add_new_shape");
-    }
-
-    # verify the required parameter 'slide_index' is set
-    unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling post_add_new_shape");
-    }
-
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling post_add_new_shape");
-    }
-
-    # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}';
-
-    my $_method = 'POST';
-    my $query_params = {};
-    my $header_params = {};
-    my $form_params = {};
-
-    # 'Accept' and 'Content-Type' header
-    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
-    if ($_header_accept) {
-        $header_params->{'Accept'} = $_header_accept;
-    }
-    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
-
-    # query params
-    if (exists $args{'password'} && defined $args{'password'}) {
-        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
-    }
-
-    # query params
-    if (exists $args{'folder'} && defined $args{'folder'}) {
-        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
-    }
-
-    # query params
-    if (exists $args{'storage'} && defined $args{'storage'}) {
-        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
-    }
-
-    # query params
-    if (exists $args{'shape_to_clone'} && defined $args{'shape_to_clone'}) {
-        $query_params->{'shapeToClone'} = $self->{api_client}->to_query_value($args{'shape_to_clone'});
-    }
-
-    # query params
-    if (exists $args{'position'} && defined $args{'position'}) {
-        $query_params->{'position'} = $self->{api_client}->to_query_value($args{'position'});
-    }
-
-    # path params
-    if ( exists $args{'name'}) {
-        my $_base_variable = "{" . "name" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'slide_index'}) {
-        my $_base_variable = "{" . "slideIndex" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    my $_body_data;
-    # body params
-    if ( exists $args{'dto'}) {
-        $_body_data = $args{'dto'};
-    }
-
-    # authentication setting, if any
-    my $auth_settings = [qw(JWT )];
-
-    # make the API Call
-    my $response = $self->{api_client}->call_api($_resource_path, $_method,
-                                           $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
-    if (!$response) {
-        return;
-    }
-    my $_response_object = $self->{api_client}->deserialize('ShapeBase', $response);
     return $_response_object;
 }
 
@@ -10847,6 +13007,95 @@ sub post_get_notes_slide {
 }
 
 #
+# post_get_notes_slide_exists
+#
+# Get info whether a notes slide exists.
+# 
+# @param int $slide_index Slide index. (required)
+# @param File $document Document data. (optional)
+# @param string $password Document password. (optional)
+{
+    my $params = {
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'document' => {
+        data_type => 'File',
+        description => 'Document data.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_get_notes_slide_exists' } = { 
+    	summary => 'Get info whether a notes slide exists.',
+        params => $params,
+        returns => 'EntityExists',
+        };
+}
+# @return EntityExists
+#
+sub post_get_notes_slide_exists {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_get_notes_slide_exists");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/slides/{slideIndex}/notesSlide/exist';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/octet-stream');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'document'}) {
+        $_body_data = $args{'document'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('EntityExists', $response);
+    return $_response_object;
+}
+
+#
 # post_get_notes_slide_with_format
 #
 # Convert notes slide to the specified image format.
@@ -10993,7 +13242,6 @@ sub post_get_notes_slide_with_format {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param Paragraph $dto Paragraph DTO. (optional)
 # @param string $password Document password. (optional)
@@ -11010,11 +13258,6 @@ sub post_get_notes_slide_with_format {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -11069,18 +13312,13 @@ sub post_notes_slide_add_new_paragraph {
       croak("Missing the required parameter 'slide_index' when calling post_notes_slide_add_new_paragraph");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling post_notes_slide_add_new_paragraph");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling post_notes_slide_add_new_paragraph");
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -11129,13 +13367,6 @@ sub post_notes_slide_add_new_paragraph {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -11169,7 +13400,6 @@ sub post_notes_slide_add_new_paragraph {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param Portion $dto Portion DTO. (optional)
@@ -11187,11 +13417,6 @@ sub post_notes_slide_add_new_paragraph {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -11251,11 +13476,6 @@ sub post_notes_slide_add_new_portion {
       croak("Missing the required parameter 'slide_index' when calling post_notes_slide_add_new_portion");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling post_notes_slide_add_new_portion");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling post_notes_slide_add_new_portion");
@@ -11267,7 +13487,7 @@ sub post_notes_slide_add_new_portion {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -11316,13 +13536,6 @@ sub post_notes_slide_add_new_portion {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -11363,7 +13576,6 @@ sub post_notes_slide_add_new_portion {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param ShapeBase $dto Shape DTO. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -11380,11 +13592,6 @@ sub post_notes_slide_add_new_portion {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'dto' => {
@@ -11439,13 +13646,8 @@ sub post_notes_slide_add_new_shape {
       croak("Missing the required parameter 'slide_index' when calling post_notes_slide_add_new_shape");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling post_notes_slide_add_new_shape");
-    }
-
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -11498,13 +13700,6 @@ sub post_notes_slide_add_new_shape {
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
     my $_body_data;
     # body params
     if ( exists $args{'dto'}) {
@@ -11532,7 +13727,6 @@ sub post_notes_slide_add_new_shape {
 # 
 # @param string $name Presentation name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
 # @param IShapeExportOptions $options export options (optional)
@@ -11553,11 +13747,6 @@ sub post_notes_slide_add_new_shape {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -11632,11 +13821,6 @@ sub post_notes_slide_shape_save_as {
       croak("Missing the required parameter 'slide_index' when calling post_notes_slide_shape_save_as");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling post_notes_slide_shape_save_as");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling post_notes_slide_shape_save_as");
@@ -11648,7 +13832,7 @@ sub post_notes_slide_shape_save_as {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/{format}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/{format}';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -11708,13 +13892,6 @@ sub post_notes_slide_shape_save_as {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -11870,7 +14047,6 @@ sub post_presentation_merge {
 # 
 # @param string $name Presentation name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
 # @param IShapeExportOptions $options export options (optional)
@@ -11891,11 +14067,6 @@ sub post_presentation_merge {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -11970,11 +14141,6 @@ sub post_shape_save_as {
       croak("Missing the required parameter 'slide_index' when calling post_shape_save_as");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling post_shape_save_as");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling post_shape_save_as");
@@ -11986,7 +14152,7 @@ sub post_shape_save_as {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/{format}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/{format}';
 
     my $_method = 'POST';
     my $query_params = {};
@@ -12046,13 +14212,6 @@ sub post_shape_save_as {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -14643,6 +16802,233 @@ sub post_slides_split {
 }
 
 #
+# post_subshape_save_as
+#
+# Render shape to specified picture format (for smart art and group shapes).
+# 
+# @param string $name Presentation name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param IShapeExportOptions $options export options (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Presentation name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'IShapeExportOptions',
+        description => 'export options',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'post_subshape_save_as' } = { 
+    	summary => 'Render shape to specified picture format (for smart art and group shapes).',
+        params => $params,
+        returns => 'File',
+        };
+}
+# @return File
+#
+sub post_subshape_save_as {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling post_subshape_save_as");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling post_subshape_save_as");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling post_subshape_save_as");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling post_subshape_save_as");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling post_subshape_save_as");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/{format}';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('multipart/form-data');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
+        $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
+    }
+
+    # query params
+    if (exists $args{'scale_y'} && defined $args{'scale_y'}) {
+        $query_params->{'scaleY'} = $self->{api_client}->to_query_value($args{'scale_y'});
+    }
+
+    # query params
+    if (exists $args{'bounds'} && defined $args{'bounds'}) {
+        $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'options'}) {
+        $_body_data = $args{'options'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('File', $response);
+    return $_response_object;
+}
+
+#
 # put_layout_slide
 #
 # Update a layoutSlide.
@@ -14778,7 +17164,6 @@ sub put_layout_slide {
 # 
 # @param string $name Presentation name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
 # @param string $out_path Output path. (required)
@@ -14800,11 +17185,6 @@ sub put_layout_slide {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -14884,11 +17264,6 @@ sub put_notes_slide_shape_save_as {
       croak("Missing the required parameter 'slide_index' when calling put_notes_slide_shape_save_as");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling put_notes_slide_shape_save_as");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling put_notes_slide_shape_save_as");
@@ -14905,7 +17280,7 @@ sub put_notes_slide_shape_save_as {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/{format}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/{format}';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -14970,13 +17345,6 @@ sub put_notes_slide_shape_save_as {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -15128,7 +17496,6 @@ sub put_presentation_merge {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param int $portion_index Portion index. (required)
@@ -15146,11 +17513,6 @@ sub put_presentation_merge {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -15210,11 +17572,6 @@ sub put_set_paragraph_portion_properties {
       croak("Missing the required parameter 'slide_index' when calling put_set_paragraph_portion_properties");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling put_set_paragraph_portion_properties");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling put_set_paragraph_portion_properties");
@@ -15228,6 +17585,365 @@ sub put_set_paragraph_portion_properties {
     # verify the required parameter 'portion_index' is set
     unless (exists $args{'portion_index'}) {
       croak("Missing the required parameter 'portion_index' when calling put_set_paragraph_portion_properties");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'portion_index'}) {
+        my $_base_variable = "{" . "portionIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'portion_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Portion', $response);
+    return $_response_object;
+}
+
+#
+# put_set_paragraph_properties
+#
+# Update paragraph properties.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param Paragraph $dto Paragraph DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Paragraph',
+        description => 'Paragraph DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_set_paragraph_properties' } = { 
+    	summary => 'Update paragraph properties.',
+        params => $params,
+        returns => 'Paragraph',
+        };
+}
+# @return Paragraph
+#
+sub put_set_paragraph_properties {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_set_paragraph_properties");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_set_paragraph_properties");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling put_set_paragraph_properties");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling put_set_paragraph_properties");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/paragraphs/{paragraphIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'paragraph_index'}) {
+        my $_base_variable = "{" . "paragraphIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'paragraph_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('Paragraph', $response);
+    return $_response_object;
+}
+
+#
+# put_set_subshape_paragraph_portion_properties
+#
+# Update portion properties (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param int $paragraph_index Paragraph index. (required)
+# @param int $portion_index Portion index. (required)
+# @param Portion $dto Portion DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'paragraph_index' => {
+        data_type => 'int',
+        description => 'Paragraph index.',
+        required => '1',
+    },
+    'portion_index' => {
+        data_type => 'int',
+        description => 'Portion index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'Portion',
+        description => 'Portion DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_set_subshape_paragraph_portion_properties' } = { 
+    	summary => 'Update portion properties (for smart art and group shapes).',
+        params => $params,
+        returns => 'Portion',
+        };
+}
+# @return Portion
+#
+sub put_set_subshape_paragraph_portion_properties {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_set_subshape_paragraph_portion_properties");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_set_subshape_paragraph_portion_properties");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling put_set_subshape_paragraph_portion_properties");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling put_set_subshape_paragraph_portion_properties");
+    }
+
+    # verify the required parameter 'paragraph_index' is set
+    unless (exists $args{'paragraph_index'}) {
+      croak("Missing the required parameter 'paragraph_index' when calling put_set_subshape_paragraph_portion_properties");
+    }
+
+    # verify the required parameter 'portion_index' is set
+    unless (exists $args{'portion_index'}) {
+      croak("Missing the required parameter 'portion_index' when calling put_set_subshape_paragraph_portion_properties");
     }
 
     # parse inputs
@@ -15323,13 +18039,13 @@ sub put_set_paragraph_portion_properties {
 }
 
 #
-# put_set_paragraph_properties
+# put_set_subshape_paragraph_properties
 #
-# Update paragraph properties.
+# Update paragraph properties (for smart art and group shapes).
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
+# @param string $path Shape path. (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param Paragraph $dto Paragraph DTO. (optional)
@@ -15350,7 +18066,7 @@ sub put_set_paragraph_portion_properties {
     },
     'path' => {
         data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
+        description => 'Shape path.',
         required => '1',
     },
     'shape_index' => {
@@ -15384,40 +18100,40 @@ sub put_set_paragraph_portion_properties {
         required => '0',
     },
     };
-    __PACKAGE__->method_documentation->{ 'put_set_paragraph_properties' } = { 
-    	summary => 'Update paragraph properties.',
+    __PACKAGE__->method_documentation->{ 'put_set_subshape_paragraph_properties' } = { 
+    	summary => 'Update paragraph properties (for smart art and group shapes).',
         params => $params,
         returns => 'Paragraph',
         };
 }
 # @return Paragraph
 #
-sub put_set_paragraph_properties {
+sub put_set_subshape_paragraph_properties {
     my ($self, %args) = @_;
 
     # verify the required parameter 'name' is set
     unless (exists $args{'name'}) {
-      croak("Missing the required parameter 'name' when calling put_set_paragraph_properties");
+      croak("Missing the required parameter 'name' when calling put_set_subshape_paragraph_properties");
     }
 
     # verify the required parameter 'slide_index' is set
     unless (exists $args{'slide_index'}) {
-      croak("Missing the required parameter 'slide_index' when calling put_set_paragraph_properties");
+      croak("Missing the required parameter 'slide_index' when calling put_set_subshape_paragraph_properties");
     }
 
     # verify the required parameter 'path' is set
     unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling put_set_paragraph_properties");
+      croak("Missing the required parameter 'path' when calling put_set_subshape_paragraph_properties");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling put_set_paragraph_properties");
+      croak("Missing the required parameter 'shape_index' when calling put_set_subshape_paragraph_properties");
     }
 
     # verify the required parameter 'paragraph_index' is set
     unless (exists $args{'paragraph_index'}) {
-      croak("Missing the required parameter 'paragraph_index' when calling put_set_paragraph_properties");
+      croak("Missing the required parameter 'paragraph_index' when calling put_set_subshape_paragraph_properties");
     }
 
     # parse inputs
@@ -15512,7 +18228,6 @@ sub put_set_paragraph_properties {
 # 
 # @param string $name Presentation name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Index of shape starting from 1 (required)
 # @param string $format Export picture format. (required)
 # @param string $out_path Output path. (required)
@@ -15534,11 +18249,6 @@ sub put_set_paragraph_properties {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -15618,11 +18328,6 @@ sub put_shape_save_as {
       croak("Missing the required parameter 'slide_index' when calling put_shape_save_as");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling put_shape_save_as");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling put_shape_save_as");
@@ -15639,7 +18344,7 @@ sub put_shape_save_as {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/{format}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}/{format}';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -15704,13 +18409,6 @@ sub put_shape_save_as {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -16384,7 +19082,6 @@ sub put_slide_save_as {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param ShapeBase $dto Shape DTO. (optional)
 # @param string $password Document password. (optional)
@@ -16400,11 +19097,6 @@ sub put_slide_save_as {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -16454,14 +19146,167 @@ sub put_slide_shape_info {
       croak("Missing the required parameter 'slide_index' when calling put_slide_shape_info");
     }
 
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling put_slide_shape_info");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{shapeIndex}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'dto'}) {
+        $_body_data = $args{'dto'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ShapeBase', $response);
+    return $_response_object;
+}
+
+#
+# put_slide_subshape_info
+#
+# Update shape properties (for smart art and group shapes).
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path. (required)
+# @param int $shape_index Shape index. (required)
+# @param ShapeBase $dto Shape DTO. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Document folder. (optional)
+# @param string $storage Document storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path.',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Shape index.',
+        required => '1',
+    },
+    'dto' => {
+        data_type => 'ShapeBase',
+        description => 'Shape DTO.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Document folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Document storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_slide_subshape_info' } = { 
+    	summary => 'Update shape properties (for smart art and group shapes).',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub put_slide_subshape_info {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_slide_subshape_info");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_slide_subshape_info");
+    }
+
     # verify the required parameter 'path' is set
     unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling put_slide_shape_info");
+      croak("Missing the required parameter 'path' when calling put_slide_subshape_info");
     }
 
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
-      croak("Missing the required parameter 'shape_index' when calling put_slide_shape_info");
+      croak("Missing the required parameter 'shape_index' when calling put_slide_subshape_info");
     }
 
     # parse inputs
@@ -17694,6 +20539,245 @@ sub put_slides_view_properties {
 }
 
 #
+# put_subshape_save_as
+#
+# Render shape to specified picture format.
+# 
+# @param string $name Presentation name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $path Shape path (for smart art and group shapes). (required)
+# @param int $shape_index Index of shape starting from 1 (required)
+# @param string $format Export picture format. (required)
+# @param string $out_path Output path. (required)
+# @param IShapeExportOptions $options export options (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+# @param double $scale_x X scale ratio. (optional, default to 0.0)
+# @param double $scale_y Y scale ratio. (optional, default to 0.0)
+# @param string $bounds Shape thumbnail bounds type. (optional, default to 1)
+# @param string $fonts_folder Fonts folder. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Presentation name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'path' => {
+        data_type => 'string',
+        description => 'Shape path (for smart art and group shapes).',
+        required => '1',
+    },
+    'shape_index' => {
+        data_type => 'int',
+        description => 'Index of shape starting from 1',
+        required => '1',
+    },
+    'format' => {
+        data_type => 'string',
+        description => 'Export picture format.',
+        required => '1',
+    },
+    'out_path' => {
+        data_type => 'string',
+        description => 'Output path.',
+        required => '1',
+    },
+    'options' => {
+        data_type => 'IShapeExportOptions',
+        description => 'export options',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    'scale_x' => {
+        data_type => 'double',
+        description => 'X scale ratio.',
+        required => '0',
+    },
+    'scale_y' => {
+        data_type => 'double',
+        description => 'Y scale ratio.',
+        required => '0',
+    },
+    'bounds' => {
+        data_type => 'string',
+        description => 'Shape thumbnail bounds type.',
+        required => '0',
+    },
+    'fonts_folder' => {
+        data_type => 'string',
+        description => 'Fonts folder.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'put_subshape_save_as' } = { 
+    	summary => 'Render shape to specified picture format.',
+        params => $params,
+        returns => undef,
+        };
+}
+# @return void
+#
+sub put_subshape_save_as {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling put_subshape_save_as");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling put_subshape_save_as");
+    }
+
+    # verify the required parameter 'path' is set
+    unless (exists $args{'path'}) {
+      croak("Missing the required parameter 'path' when calling put_subshape_save_as");
+    }
+
+    # verify the required parameter 'shape_index' is set
+    unless (exists $args{'shape_index'}) {
+      croak("Missing the required parameter 'shape_index' when calling put_subshape_save_as");
+    }
+
+    # verify the required parameter 'format' is set
+    unless (exists $args{'format'}) {
+      croak("Missing the required parameter 'format' when calling put_subshape_save_as");
+    }
+
+    # verify the required parameter 'out_path' is set
+    unless (exists $args{'out_path'}) {
+      croak("Missing the required parameter 'out_path' when calling put_subshape_save_as");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/{path}/{shapeIndex}/{format}';
+
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if (exists $args{'out_path'} && defined $args{'out_path'}) {
+        $query_params->{'outPath'} = $self->{api_client}->to_query_value($args{'out_path'});
+    }
+
+    # query params
+    if (exists $args{'password'} && defined $args{'password'}) {
+        $query_params->{'password'} = $self->{api_client}->to_query_value($args{'password'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # query params
+    if (exists $args{'scale_x'} && defined $args{'scale_x'}) {
+        $query_params->{'scaleX'} = $self->{api_client}->to_query_value($args{'scale_x'});
+    }
+
+    # query params
+    if (exists $args{'scale_y'} && defined $args{'scale_y'}) {
+        $query_params->{'scaleY'} = $self->{api_client}->to_query_value($args{'scale_y'});
+    }
+
+    # query params
+    if (exists $args{'bounds'} && defined $args{'bounds'}) {
+        $query_params->{'bounds'} = $self->{api_client}->to_query_value($args{'bounds'});
+    }
+
+    # query params
+    if (exists $args{'fonts_folder'} && defined $args{'fonts_folder'}) {
+        $query_params->{'fontsFolder'} = $self->{api_client}->to_query_value($args{'fonts_folder'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'path'}) {
+        my $_base_variable = "{" . "path" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'shape_index'}) {
+        my $_base_variable = "{" . "shapeIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'format'}) {
+        my $_base_variable = "{" . "format" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'format'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    # body params
+    if ( exists $args{'options'}) {
+        $_body_data = $args{'options'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw(JWT )];
+
+    # make the API Call
+    $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    return;
+}
+
+#
 # put_update_notes_slide
 #
 # Update notes slide properties.
@@ -17829,7 +20913,6 @@ sub put_update_notes_slide {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param ShapeBase $dto Shape DTO. (optional)
 # @param string $password Document password. (optional)
@@ -17845,11 +20928,6 @@ sub put_update_notes_slide {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -17899,18 +20977,13 @@ sub put_update_notes_slide_shape {
       croak("Missing the required parameter 'slide_index' when calling put_update_notes_slide_shape");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling put_update_notes_slide_shape");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling put_update_notes_slide_shape");
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -17954,13 +21027,6 @@ sub put_update_notes_slide_shape {
     }
 
     # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
     if ( exists $args{'shape_index'}) {
         my $_base_variable = "{" . "shapeIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'shape_index'});
@@ -17994,7 +21060,6 @@ sub put_update_notes_slide_shape {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param Paragraph $dto Paragraph DTO. (optional)
@@ -18011,11 +21076,6 @@ sub put_update_notes_slide_shape {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -18070,11 +21130,6 @@ sub put_update_notes_slide_shape_paragraph {
       croak("Missing the required parameter 'slide_index' when calling put_update_notes_slide_shape_paragraph");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling put_update_notes_slide_shape_paragraph");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling put_update_notes_slide_shape_paragraph");
@@ -18086,7 +21141,7 @@ sub put_update_notes_slide_shape_paragraph {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs/{paragraphIndex}';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -18126,13 +21181,6 @@ sub put_update_notes_slide_shape_paragraph {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 
@@ -18177,7 +21225,6 @@ sub put_update_notes_slide_shape_paragraph {
 # 
 # @param string $name Document name. (required)
 # @param int $slide_index Slide index. (required)
-# @param string $path Shape path (for smart art and group shapes). (required)
 # @param int $shape_index Shape index. (required)
 # @param int $paragraph_index Paragraph index. (required)
 # @param int $portion_index Portion index. (required)
@@ -18195,11 +21242,6 @@ sub put_update_notes_slide_shape_paragraph {
     'slide_index' => {
         data_type => 'int',
         description => 'Slide index.',
-        required => '1',
-    },
-    'path' => {
-        data_type => 'string',
-        description => 'Shape path (for smart art and group shapes).',
         required => '1',
     },
     'shape_index' => {
@@ -18259,11 +21301,6 @@ sub put_update_notes_slide_shape_portion {
       croak("Missing the required parameter 'slide_index' when calling put_update_notes_slide_shape_portion");
     }
 
-    # verify the required parameter 'path' is set
-    unless (exists $args{'path'}) {
-      croak("Missing the required parameter 'path' when calling put_update_notes_slide_shape_portion");
-    }
-
     # verify the required parameter 'shape_index' is set
     unless (exists $args{'shape_index'}) {
       croak("Missing the required parameter 'shape_index' when calling put_update_notes_slide_shape_portion");
@@ -18280,7 +21317,7 @@ sub put_update_notes_slide_shape_portion {
     }
 
     # parse inputs
-    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{path}/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/notesSlide/shapes/{shapeIndex}/paragraphs/{paragraphIndex}/portions/{portionIndex}';
 
     my $_method = 'PUT';
     my $query_params = {};
@@ -18320,13 +21357,6 @@ sub put_update_notes_slide_shape_portion {
     if ( exists $args{'slide_index'}) {
         my $_base_variable = "{" . "slideIndex" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
-        $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
-    # path params
-    if ( exists $args{'path'}) {
-        my $_base_variable = "{" . "path" . "}";
-        my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
 

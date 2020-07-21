@@ -1,0 +1,13 @@
+Calendar::Schedule version 1.08
+===============================
+<? $Star->add_final(sub {
+  my $version = '1.09'; my $y=2020;
+  local $_=shift; s/^(.* version )(\d+\.\d+)/$1$version/s;
+  s/^(Copyright \d\d\d\d-)(\d\d\d\d)( Vlado Keselj)/$1$y$3/m;
+  return $_; }) !>
+
+This example of a beginning of a README file for a Perl module.
+
+...
+
+Copyright 2003-2019 Vlado Keselj http://web.cs.dal.ca/~vlado

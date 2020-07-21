@@ -1,3 +1,4 @@
+use lib '.';
 use inc::Module::Install;
 
 RTx('RTx-Calendar');
@@ -5,7 +6,7 @@ RTx('RTx-Calendar');
 requires 'DateTime';
 requires 'DateTime::Set';
 
-requires_rt '4.0.9';
+requires_rt '4.2.0';
 
 sign();
 WriteAll();

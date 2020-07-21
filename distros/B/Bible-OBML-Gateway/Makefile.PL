@@ -17,12 +17,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Bible::OBML::Gateway",
   "PREREQ_PM" => {
-    "Bible::OBML" => 0,
-    "Bible::Reference" => "1.02",
+    "Bible::OBML" => "1.14",
+    "Bible::Reference" => "1.04",
     "Mojo::DOM" => 0,
     "Mojo::File" => 0,
     "Mojo::URL" => 0,
     "Mojo::UserAgent" => 0,
+    "Mojo::Util" => 0,
     "exact" => 0,
     "exact::class" => 0
   },
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.06",
+  "VERSION" => "1.10",
   "test" => {
     "TESTS" => "t/*.t t/Bible/OBML/*.t"
   }
@@ -44,8 +45,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bible::OBML" => 0,
-  "Bible::Reference" => "1.02",
+  "Bible::OBML" => "1.14",
+  "Bible::Reference" => "1.04",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
@@ -53,6 +54,7 @@ my %FallbackPrereqs = (
   "Mojo::File" => 0,
   "Mojo::URL" => 0,
   "Mojo::UserAgent" => 0,
+  "Mojo::Util" => 0,
   "Test::More" => 0,
   "Test::Most" => 0,
   "constant" => 0,

@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-Duration);
 use MIDI::Simple::Drummer;
 
 # Define our basic kit so we can do binary math with it.

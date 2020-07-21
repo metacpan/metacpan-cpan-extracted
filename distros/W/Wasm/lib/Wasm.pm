@@ -7,7 +7,7 @@ use Ref::Util qw( is_plain_arrayref );
 use Carp ();
 
 # ABSTRACT: Write Perl extensions using Wasm
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 our %WASM;
@@ -342,7 +342,7 @@ Wasm - Write Perl extensions using Wasm
 
 =head1 VERSION
 
-version 0.14
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -476,7 +476,7 @@ WebAssembly inside your Perl source file.
 =head2 %Wasm::WASM
 
 This hash maps the Wasm module names to the files from which the Wasm
-was loaded. It is roughly analogous to the C<@INC> array in Perl.
+was loaded. It is roughly analogous to the C<%INC> hash in Perl.
 
 =head1 CAVEATS
 
@@ -491,7 +491,7 @@ The default way of handling out-of-bounds memory errors is to allocate
 large C<PROT_NONE> pages at startup.  While these pages do not consume
 many resources in practice (at least in the way that they are used by
 Wasmtime), they can cause out-of-memory errors on Linux systems with
-virtual memory limits (C<ulimi -v> in the C<bash> shell).  Similar
+virtual memory limits (C<ulimit -v> in the C<bash> shell).  Similar
 techniques are common in other modern programming languages, and this is
 more a limitation of the Linux kernel than anything else.  Setting the
 limits on the virtual memory address size probably doesn't do what you

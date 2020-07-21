@@ -1,7 +1,5 @@
 package App::Deps::Verify;
-$App::Deps::Verify::VERSION = '0.10.1';
-# ABSTRACT: An app and API to verify the presence of dependencies (Perl 5 modules, python3 modules, executables, etc.)
-
+$App::Deps::Verify::VERSION = '0.12.0';
 use strict;
 use warnings;
 use autodie;
@@ -38,6 +36,20 @@ sub list_perl5_modules_in_yamls
     return $self->list_perl5_modules(
         {
             inputs => $self->_load_yamls($args),
+        }
+    );
+}
+
+sub list_python3_modules_in_yamls
+{
+    my ( $self, $args ) = @_;
+
+    return $self->list_missing_python3_modules(
+        {
+            inputs => [
+                map { $_->{required}->{py3_modules} }
+                    @{ $self->_load_yamls($args) }
+            ],
         }
     );
 }
@@ -133,26 +145,45 @@ sub _find_perl5_modules
     return;
 }
 
-sub _find_python3_modules
+sub list_missing_python3_modules
 {
     my ( $self, $args ) = @_;
-    my @not_found;
+    my %not_found;
     foreach my $mods ( @{ $args->{inputs} } )
     {
-        my @required_modules = keys %$mods;
+        use Data::Dumper;
 
+        # die Dumper($mods);
+        my @required_modules = keys %{$mods};
+
+    REQUIRED:
         foreach my $module (@required_modules)
         {
             if ( $module !~ m#\A[a-zA-Z0-9_\.]+\z# )
             {
                 die "invalid python3 module id - $module !";
             }
+            if ( exists $not_found{$module} )
+            {
+                next REQUIRED;
+            }
             if ( system( 'python3', '-c', "import $module" ) != 0 )
             {
-                push @not_found, $module;
+                $not_found{$module} = 0;
             }
         }
     }
+    return { missing_python3_modules =>
+            [ map { +{ module => $_, }, } sort keys(%not_found) ] };
+}
+
+sub _find_python3_modules
+{
+    my ( $self, $args ) = @_;
+    my @not_found =
+        map { $_->{module} }
+        @{ $self->list_missing_python3_modules($args)->{missing_python3_modules}
+        };
     if (@not_found)
     {
         print "The following python3 modules could not be found:\n\n";
@@ -357,7 +388,7 @@ App::Deps::Verify - app and API to verify the presence of dependencies (Perl 5 
 
 =head1 VERSION
 
-version 0.10.1
+version 0.12.0
 
 =head1 SYNOPSIS
 
@@ -411,6 +442,16 @@ Added in version 0.2.0.
 =head2 $obj->list_perl5_modules_in_yamls({filenames => [@FILENAMES]})
 
 Added in version 0.2.0.
+
+=head2 $obj->list_python3_modules_in_yamls({filenames => [@FILENAMES]})
+
+Added in version 0.12.0.
+
+=head2 $obj->list_missing_python3_modules({inputs => [\%hash1, \%hash2, ...]})
+
+List the python3 modules dependencies.
+
+Added in version 0.12.0
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

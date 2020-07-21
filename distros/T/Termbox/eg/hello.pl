@@ -2,8 +2,8 @@
 use strictures 2;
 use Termbox qw[:all];
 use experimental 'signatures';
-use Data::Dump;
-#
+
+# Based on http://electronictoofree.blogspot.com/2018/03/text-based-user-interface-termbox.html
 
 my @chars = split //, 'hello, world!';
 my $code  = tb_init();

@@ -9,7 +9,6 @@ my $d = MIDI::Simple::Drummer::Euclidean->new(
     -bpm    => 70,
     -onsets => 4,
     -beats  => 6,
-    -tr808  => 1,
 );
 
 $d->sync_tracks(

@@ -1,5 +1,18 @@
                       User-Visible PGP::Sign Changes
 
+PGP::Sign 1.01 (2020-07-18)
+
+    Fix test suite to pass on systems where gpg is GnuPG v1.  This is
+    apparently still common among many CPAN tester machines, and thus
+    probably other systems in the wild.  This does not change the module's
+    default behavior; systems using GnuPG v1 still need to pass an
+    explicit style => 'GPG1' argument to the PGP::Sign constructor.
+
+    Update to rra-c-util 8.3:
+
+    * Fix style issues caught by Perl::Critic::Freenode.
+    * Ignore debian/changelog when checking for obsolete strings.
+
 PGP::Sign 1.00 (2020-06-27)
 
     Drop support for all PGP implementations other than GnuPG.  I haven't

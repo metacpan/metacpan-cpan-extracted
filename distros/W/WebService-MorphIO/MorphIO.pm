@@ -1,10 +1,8 @@
 package WebService::MorphIO;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Encode qw(encode_utf8);
 use Error::Pure qw(err);
@@ -13,8 +11,7 @@ use LWP::Simple qw(get);
 use URI;
 use URI::Escape qw(uri_escape);
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -103,6 +100,7 @@ WebService::MorphIO - Perl class to communication with morph.io.
 =head1 SYNOPSIS
 
  use WebService::MorphIO;
+
  my $obj = WebService::MorphIO->new(%parameters);
  $obj->csv('output.csv');
  $obj->sqlite('output.sqlite');
@@ -171,11 +169,9 @@ Constructor.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use File::Temp qw(tempfile);
  use Perl6::Slurp qw(slurp);
  use WebService::MorphIO;
@@ -221,21 +217,22 @@ L<URI::Escape>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/WebService-MorphIO>
+L<https://github.com/michal-josef-spacek/WebService-MorphIO>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

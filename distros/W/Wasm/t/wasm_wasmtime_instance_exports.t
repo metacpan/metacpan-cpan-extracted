@@ -1,11 +1,13 @@
 use 5.008004;
 use Test2::V0 -no_srand => 1;
+use Wasm::Wasmtime::Store;
 use Wasm::Wasmtime::Instance;
 use Wasm::Wasmtime::Instance::Exports;
 use YAML qw( Dump );
 
 {
-  my $module = Wasm::Wasmtime::Module->new(wat => q{
+  my $store = Wasm::Wasmtime::Store->new;
+  my $module = Wasm::Wasmtime::Module->new($store, wat => q{
     (module
       (func (export "add") (param i32 i32) (result i32)
         local.get 0
@@ -13,7 +15,7 @@ use YAML qw( Dump );
         i32.add)
     )
   });
-  my $instance = Wasm::Wasmtime::Instance->new($module, []);
+  my $instance = Wasm::Wasmtime::Instance->new($module, $store, []);
   my $exports = Wasm::Wasmtime::Instance::Exports->new($instance);
   is(
     $exports,

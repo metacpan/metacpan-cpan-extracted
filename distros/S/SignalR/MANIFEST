@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+lib/SignalR.pm
+lib/SignalR/Client.pm
+lib/SignalR/Hub.pm

@@ -47,6 +47,57 @@
 %# END BPS TAGGED BLOCK }}}
 <br />
 <&| /Widgets/TitleBox, title => loc('Merge user') &>
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
+  <div class="form-row">
+    <div class="col-12">
+      <p class="error"><% $result||'' %></p>
+    </div>
+  </div>
+
+% my ($EffectiveId) = $UserObj->Attributes->Named("EffectiveId");
+% my @MergedUsers = @{$UserObj->GetMergedUsers->Content};
+% if ($EffectiveId) {
+<div class="form-row">
+  <div class="col-auto label">
+    This user has been merged with <a href="Modify.html?id=<% $EffectiveId->Content %>">
+% my $real = RT::User->new($session{'CurrentUser'});
+% $real->Load($EffectiveId->Content);
+<% $real->NameAndEmail %></a>
+  </div>
+  <div class="col-auto">
+    <input class="form-control btn btn-primary" type="submit" name="Unmerge" value="Unmerge" />
+  </div>
+</div>
+% } elsif (@MergedUsers) {
+  <div class="form-row">
+    <div class="label text-left">
+      The following users have been merged into this user:
+    </div>
+  </div>
+%   foreach my $user_id (@MergedUsers) {
+%       my $user = RT::User->new($session{'CurrentUser'});
+%       $user->LoadOriginal(Id => $user_id);
+<div class="form-row">
+  <div class="col-4 text-left">
+    <% $user->NameAndEmail %>
+  </div>
+  <div class="col-4 value">
+    <input class="form-control btn btn-primary" type="submit" name="Unmerge<%$user_id%>" value="Unmerge">
+  </div>
+</div>
+%   }
+% } else {
+<div class="form-row">
+  <div class="label col-auto text-left">
+    Merge this user into:
+  </div>
+  <div class="value col-auto">
+    <input class="form-control" name="MergeUser" data-autocomplete="Users" data-autocomplete-return="Name" value="" />
+  </div>
+</div>
+% }
+% }
+% else {
 <p class="error"><% $result||'' %></p>
 % my ($EffectiveId) = $UserObj->Attributes->Named("EffectiveId");
 % my @MergedUsers = @{$UserObj->GetMergedUsers->Content};
@@ -64,6 +115,7 @@ The following users have been merged into this user:<br>
 %   }
 % } else {
 Merge this user into: <input name="MergeUser" data-autocomplete="Users" data-autocomplete-return="Name" value="" />
+% }
 % }
 </&>
 <%init>

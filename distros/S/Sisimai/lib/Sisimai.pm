@@ -2,7 +2,7 @@ package Sisimai;
 use feature ':5.10';
 use strict;
 use warnings;
-use version; our $VERSION = version->declare('v4.25.7'); our $PATCHLV = 0;
+use version; our $VERSION = version->declare('v4.25.8'); our $PATCHLV = 0;
 
 sub version { return substr($VERSION->stringify, 1).($PATCHLV > 0 ? 'p'.$PATCHLV : '') }
 sub sysname { 'bouncehammer' }
@@ -172,6 +172,7 @@ messages like following.
             print $e->deliverystatus;       # 5.1.1
             print $e->replycode;            # 550
             print $e->reason;               # userunknown
+            print $e->origin;               # /var/spool/bounce/2022-2222.eml
 
             my $h = $e->damn;               # Convert to HASH reference
             my $j = $e->dump('json');       # Convert to JSON string
@@ -305,13 +306,13 @@ C<version> method returns the version number of Sisimai.
 
 =head1 REPOSITORY
 
-L<https://github.com/sisimai/p5-Sisimai> - Sisimai on GitHub
+L<https://github.com/sisimai/p5-sisimai> - Sisimai on GitHub
 
 =head1 WEB SITE
 
 L<https://libsisimai.org/> - A successor to bounceHammer, Library to parse error mails.
 
-L<https://github.com/sisimai/rb-Sisimai> - Ruby version of Sisimai
+L<https://github.com/sisimai/rb-sisimai> - Ruby version of Sisimai
 
 =head1 AUTHOR
 
@@ -319,7 +320,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2019 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2020 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

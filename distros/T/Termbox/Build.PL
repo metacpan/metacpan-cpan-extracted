@@ -10,7 +10,7 @@ use Module::Build::Tiny 0.035;
 
 use Devel::CheckBin;
 
-check_bin('python');`cd ./termbox/;python ./waf configure --prefix=../share/;python ./waf;python ./waf install;cd ../`;
+check_bin('make');`cd termbox;make;make install prefix='../share';`;
 ('1');
 
 Build_PL();

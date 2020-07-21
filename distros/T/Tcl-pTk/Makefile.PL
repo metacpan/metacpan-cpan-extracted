@@ -110,6 +110,7 @@ EOS
 
 my %makeArgs = (
     NAME => "Tcl::pTk",
+    ABSTRACT_FROM => 'lib/Tcl/pTk.pm',
     VERSION_FROM => 'lib/Tcl/pTk.pm',
     LICENSE => 'perl_5',
     MIN_PERL_VERSION => '5.008',

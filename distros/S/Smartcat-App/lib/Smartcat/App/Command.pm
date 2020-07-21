@@ -13,6 +13,7 @@ sub opt_spec {
         [ 'token-id:s' => 'Smartcat account id' ],
         [ 'token:s'    => 'API token' ],
         [ 'log:s'      => 'Log file path' ],
+        [ 'base-url:s' => 'Base Smartcat URL' ],
         [ 'debug'      => 'Debug mode' ]
     );
 }
@@ -77,6 +78,11 @@ sub validate_args {
         $app->{config}->{username} = $opt->{token_id};
         $app->{config}->{password} = $opt->{token};
     }
+
+    if ( defined $opt->{base_url} ) {
+        $app->{config}->{base_url} = $opt->{base_url};
+    }
+
     if ( defined $opt->{log} ) {
         $self->usage_error(
 "directory of 'log', which is set to '$opt->{log}', does not point to a valid directory"

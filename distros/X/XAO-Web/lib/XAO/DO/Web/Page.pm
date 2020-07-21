@@ -560,6 +560,7 @@ sub textout ($%);
 sub benchmark_enabled ($);
 sub benchmark_enter ($$;$$$);
 sub benchmark_leave ($$;$$);
+sub benchmark_reset ($);
 sub benchmark_start ($;$);
 sub benchmark_stats ($;$);
 sub benchmark_stop ($);
@@ -2061,6 +2062,19 @@ sub benchmark_leave ($$;$$) {
     # Resetting for the next run
     #
     $rundata->{'started'}=undef;
+}
+
+###############################################################################
+
+=item benchmark_reset()
+
+Clear all benchmarking statistics accumulated so far.
+
+=cut
+
+sub benchmark_reset ($) {
+    my $self=shift;
+    %{$self->_benchmark_hash()}=();
 }
 
 ###############################################################################

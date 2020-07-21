@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 52 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 53 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CompleteCLIs.pm'
@@ -17,6 +17,7 @@ my @scripts = (
     'script/complete-acme-metasyntactic-meta-theme',
     'script/complete-acme-metasyntactic-meta-theme-and-category',
     'script/complete-array-elem',
+    'script/complete-chrome-profile-name',
     'script/complete-country-code',
     'script/complete-currency-code',
     'script/complete-cwalitee-indicator',

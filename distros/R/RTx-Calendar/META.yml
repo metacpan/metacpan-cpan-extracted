@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,15 +16,16 @@ meta-spec:
 name: RTx-Calendar
 no_index:
   directory:
+    - etc
     - html
     - inc
     - static
 requires:
   DateTime: 0
   DateTime::Set: 0
-  perl: 5.8.3
+  perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-version: '1.01'
-x_module_install_rtx_version: '0.37'
-x_requires_rt: 4.0.9
+version: '1.03'
+x_module_install_rtx_version: '0.42'
+x_requires_rt: 4.2.0

@@ -18,5 +18,5 @@ sub say_hello
 }
 
 ## And with all that we can instantiate our module and call the export!
-my $instance = Wasm::Wasmtime::Instance->new($module, [\&say_hello]);
+my $instance = Wasm::Wasmtime::Instance->new($module, $store, [\&say_hello]);
 $instance->exports->run->();

@@ -24,7 +24,7 @@ use DynaLoader;
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.73'
+$VERSION = '0.74'
 };
 
 =head1 NAME
@@ -1035,6 +1035,7 @@ sub cc2t { [map {hex} split ' ', shift] }
 
    CHARSIZE   => sub { my $self = shift;
                        $self->{CHARSIZE} = $_[0];
+                       plschr (0, $self->{CHARSIZE}) unless ($self->{ISNEW}); # do not call plsch from the 'new' routine.
                      },
 
    COLOR =>
@@ -1594,11 +1595,14 @@ sub new {
 
 
   # apply options
+  $self->{ISNEW} = 1;
   $self->setparm(%opts);
+  $self->{ISNEW} = 0;
 
   # Do initial setup
   plspage (0, 0, @{$self->{PAGESIZE}}, 0, 0) if (defined($self->{PAGESIZE}));
   plssub (@{$self->{SUBPAGES}});
+  plsfam (0, -1, -1); # fix for plplot 5.11.0
   plfontld (1); # extented symbol pages
   plscmap0n (16);   # set up color map 0 to 16 colors.  Is this needed?
   plscmap1n (128);  # set map 1 to 128 colors (should work for devices with 256 colors)

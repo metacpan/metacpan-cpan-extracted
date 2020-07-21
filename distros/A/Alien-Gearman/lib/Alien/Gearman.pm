@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '1.1';
+our $VERSION = '2.2';
 
 =head1 NAME
 
-Alien::Gearman - Wrapper for installing libgearman v0.12
+Alien::Gearman - Wrapper for installing libgearman
 
 =head1 DESCRIPTION
 

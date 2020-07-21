@@ -118,6 +118,8 @@ Example:
 
 =head1 SUPPORTED CONFIGURATION VALUES
 
+=over
+
 =item default_search_args
 
 The value of this configuration value is a reference to a hash.
@@ -126,6 +128,8 @@ corresponding value is a reference to a hash containing the
 default arguments for searching on the specified of data.
 These default arguments are added unless they are specified by
 input arguments.
+
+=back
 
 =head1 METHODS
 

@@ -1,5 +1,8 @@
 Revision history for Alien-Libevent
 
+2.5      Thu Jul 16 2020
+         - Search dep Alien::OpenSSL
+         - Put README.pod in the MANIFEST.SKIP
 
 2.4      Tue Jul 14 2020
          - Use https url so that Alien adds SSL modules to prereqs

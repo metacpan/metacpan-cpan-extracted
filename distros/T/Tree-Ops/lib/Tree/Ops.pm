@@ -5,11 +5,11 @@
 #-------------------------------------------------------------------------------
 # podDocumentation
 package Tree::Ops;
-our $VERSION = 20200709;
+our $VERSION = 20200720;
 require v5.26;
 use warnings FATAL => qw(all);
 use strict;
-use Carp qw(confess cluck);
+use Carp;
 use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 use feature qw(current_sub say);
@@ -30,7 +30,7 @@ sub new(;$$)                                                                    
    );
  }
 
-sub activeScope($)                                                              #P Locate the active scope in a tree.
+sub activeScope($)                                                              # Locate the active scope in a tree.
  {my ($tree) = @_;                                                              # Tree
   my $active;                                                                   # Latest active child
   for(my $l = $tree; $l; $l = $l->lastChild) {$active = $l}                     # Skip down edge of parse tree to deepest active child.
@@ -65,6 +65,15 @@ sub single($;$$)                                                                
   $tree->close;                                                                 # Close scope immediately
  }
 
+sub include($$)                                                                 # Include the specified tree in the currently open scope.
+ {my ($tree, $include) = @_;                                                    # Tree being built, tree to include
+  my $parent = activeScope $tree;                                               # Active parent
+  my $n = new $include->key, $include->value;                                   # New intermediate child
+     $n->children = $include->children;                                         # Include children
+     $n->parent   = $parent;                                                    # Parent new node
+  $parent->putLast($n)                                                          # Include node
+ }
+
 sub fromLetters($)                                                              # Create a tree from a string of letters - useful for testing.
  {my ($letters) = @_;                                                           # String of letters and ( ).
   my $t = new(my $s = 'a');
@@ -96,7 +105,7 @@ sub indexOfChildInParent($)                                                     
   return undef unless my $parent = $child->parent;                              # Parent
   my $c = $parent->children;                                                    # Siblings
   for(keys @$c) {return $_ if $$c[$_] == $child}                                # Locate child and return index
-  confess 'Child not found in parent'
+  undef                                                                         # Root has no index
  }
 
 sub next($)                                                                     # Get the next sibling following the specified child.
@@ -120,6 +129,23 @@ sub firstMost($)                                                                
   my $f;
   for(my $p = $parent; $p; $p = $p->first) {$f = $p}                            # Go first most
   $f
+ }
+
+sub nextMost($)                                                                 # Return the next child with no children, i.e. the next leaf of the tree, else return B<undef> if there is no such child.
+ {my ($child) = @_;                                                             # Current leaf
+  return firstMost $child if $child->children->@*;                              # First most child if we are not starting on a child with no children - i.e. on a leaf.
+  my   $p = $child;                                                             # Traverse upwards and then right
+  $p = $p->parent while $p->isLast;                                             # Traverse upwards
+  return undef unless $p = $p->next;                                            # Traverse right else we are at the root
+  firstMost $p                                                                  # First most child
+ }
+
+sub prevMost($)                                                                 # Return the previous child with no children, i.e. the previous leaf of the tree, else return B<undef> if there is no such child.
+ {my ($child) = @_;                                                             # Current leaf
+  my   $p = $child;                                                             # Traverse upwards and then left
+  $p = $p->parent while $p->isFirst;                                            # Traverse upwards
+  return undef unless $p = $p->prev;                                            # Traverse left else we are at the root
+  lastMost $p                                                                   # Last most child
  }
 
 sub lastMost($)                                                                 # Return the last most descendant child in the tree starting at this parent or else return B<undef> if this parent has no children.
@@ -232,7 +258,8 @@ sub stepEndBack                                                                 
 
 sub cut($)                                                                      # Cut out a child and all its content and children, return it ready for reinsertion else where.
  {my ($child) = @_;                                                             # Child
-  splice $child->parent->children->@*, indexOfChildInParent($child), 1;          # Remove child
+  return $child unless my $parent = $child->parent;                             # The whole tree
+  splice $parent->children->@*, indexOfChildInParent($child), 1;                # Remove child
   $child
  }
 
@@ -241,7 +268,7 @@ sub dup($)                                                                      
 
   sub                                                                           # Duplicate a child
    {my ($old)  = @_;                                                            # Existing child
-    my $new    = new $old->key;                                                # New child
+    my $new    = new $old->key;                                                 # New child
     push $new->children->@*, __SUB__->($_) for $old->children->@*;              # Duplicate children of child
     $new
    }->($parent)                                                                 # Start duplication at parent
@@ -258,25 +285,25 @@ sub unwrap($)                                                                   
  }
 
 sub wrap($$)                                                                    # Wrap the specified child with a new parent and return the new parent.
- {my ($child, $key) = @_;                                                      # Child to wrap, user data for new wrapping parent
+ {my ($child, $key) = @_;                                                       # Child to wrap, user data for new wrapping parent
   return undef unless defined(my $i = indexOfChildInParent $child);             # Locate child within existing parent
   my $parent     = $child->parent;                                              # Existing parent
-  my $new        = new $key;                                                   # Create new parent
+  my $new        = new $key;                                                    # Create new parent
   $new->parent   = $parent;                                                     # Parent new parent
   $new->children = [$child];                                                    # Set children for new parent
   splice $parent->children->@*, $i, 1, $new;                                    # Place new parent in existing parent
   $child->parent = $new                                                         # Reparent child to new parent
  }
 
-sub merge($)                                                                    # Merge the children of the specified parent with those of the surrounding parents if the L<user> data of those parents L<smartmatch> that of the specified parent. Merged parents are unwrapped. Returns the specified parent regardless. From a proposal made by Micaela Monroe.
+sub merge($)                                                                    # Merge the children of the specified parent with those of the surrounding parents if the L[key] data of those parents L<smartmatch> that of the specified parent. Merged parents are unwrapped. Returns the specified parent regardless. From a proposal made by Micaela Monroe.
  {my ($parent) = @_;                                                            # Merging parent
   while(my $p = $parent->prev)                                                  # Preceding siblings of a parent
-   {last unless $p->key ~~ $parent->key;                                      # Preceding parents that carry the same data
+   {last unless $p->key ~~ $parent->key;                                        # Preceding parents that carry the same data
     putFirst $parent, cut $p;                                                   # Place merged parent first under merging parent
     unwrap $p;                                                                  # Unwrapped merged parent
    }
   while(my $p = $parent->next)                                                  # Following siblings of a parent
-   {last unless $p->key ~~ $parent->key;                                      # Following parents that carry the same data
+   {last unless $p->key ~~ $parent->key;                                        # Following parents that carry the same data
     putLast $parent, cut $p;                                                    # Place merged parent last under merging parent
     unwrap $p;                                                                  # Unwrap merged parent
    }
@@ -285,13 +312,13 @@ sub merge($)                                                                    
 
 sub split($)                                                                    # Make the specified parent a grandparent of each of its children by interposing a copy of the specified parent between the specified parent and each of its children. Return the specified parent.
  {my ($parent) = @_;                                                            # Parent to make into a grand parent
-  wrap $_, $parent->key for $parent->children->@*;                             # Grandparent each child
+  wrap $_, $parent->key for $parent->children->@*;                              # Grandparent each child
   $parent
  }
 
 #D1 Traverse                                                                    # Traverse a tree.
 
-sub by($;$)                                                                     # Traverse a tree in order to process each child with the specified sub and return an array of the results of processing each child. If no sub sub is specified, the children are returned in tree order.
+sub by($;$)                                                                     # Traverse a tree in post-order to process each child with the specified sub and return an array of the results of processing each child. If no sub sub is specified, the children are returned in tree order.
  {my ($tree, $sub) = @_;                                                        # Tree, optional sub to process each child
              $sub //= sub{@_};                                                  # Default sub
 
@@ -305,7 +332,7 @@ sub by($;$)                                                                     
   @r
  }
 
-sub select($$)                                                                  # Select matching children in a tree. A child can be selected via named value, array of values, a hash of values, a regular expression or a sub reference.
+sub select($$)                                                                  # Select matching children in a tree in post-order. A child can be selected via named value, array of values, a hash of values, a regular expression or a sub reference.
  {my ($tree, $select) = @_;                                                     # Tree, method to select a child
   my $ref = ref $select;                                                        # Selector type
   my $sel =                                                                     # Selection method
@@ -325,20 +352,63 @@ sub select($$)                                                                  
   @s
  }
 
-sub siblingsBefore($)                                                           # Return a list of siblings before the specified child.
- {my ($child) = @_;                                                             # Child
-  my $i = indexOfChildInParent $child;                                          # Our position
-  my $parent = $child->parent;                                                  # Parent
-  my @c = $parent->children->@*;                                                # Children
-  @c[0..$i-1]
+#D1 Partitions                                                                  # Various partitions of the tree
+
+sub leaves($)                                                                   # The set of all children without further children, i.e. each leaf of the tree.
+ {my ($tree) = @_;                                                              # Tree
+  my @leaves;                                                                   # Leaves
+  sub                                                                           # Traverse
+   {my ($child) = @_;                                                           # Child
+    if (my @c = $child->children->@*)                                           # Children of child
+     {__SUB__->($_) for @c;                                                     # Process children of child
+     }
+    else
+     {push @leaves, $child;                                                     # Save leaf
+     }
+   }->($tree);                                                                  # Start at root of tree
+
+  @leaves
  }
 
-sub siblingsAfter($)                                                            # Return a list of siblings after the specified child.
- {my ($child) = @_;                                                             # Child
-  my $i = indexOfChildInParent $child;                                          # Our position
-  my $parent = $child->parent;                                                  # Parent
-  my @c = $parent->children->@*;                                                # Children
-  @c[$i+1, $#c]
+sub parentsOrdered($$$)                                                         #P The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in the specified order.
+ {my ($tree, $preorder, $reverse) = @_;                                         # Tree, pre-order if true else post-order, reversed if true
+  my @parents;                                                                  # Parents
+  sub                                                                           # Traverse
+   {my ($child) = @_;                                                           # Child
+    if (my @c = $child->children->@*)                                           # Children of child
+     {@c = reverse @c if $reverse;                                              # Reverse if requested
+      push @parents, $child if $preorder;                                       # Pre-order
+       __SUB__->($_) for @c;                                                    # Process children of child
+      push @parents, $child unless $preorder;                                   # Post-order
+     }
+   }->($tree);                                                                  # Start at root of tree
+
+  @parents
+ }
+
+sub parentsPreOrder($)                                                          # The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in normal pre-order.
+ {my ($tree) = @_;                                                              # Tree
+  parentsOrdered($tree, 1, 0);
+ }
+
+sub parentsPostOrder($)                                                         # The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in normal post-order.
+ {my ($tree) = @_;                                                              # Tree
+  parentsOrdered($tree, 0, 0);
+ }
+
+sub parentsReversePreOrder($)                                                   # The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in reverse pre-order.
+ {my ($tree) = @_;                                                              # Tree
+  parentsOrdered($tree, 1, 1);
+ }
+
+sub parentsReversePostOrder($)                                                  # The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in reverse post-order.
+ {my ($tree) = @_;                                                              # Tree
+  &parentsOrdered($tree, 0, 1);
+ }
+
+sub parents($)                                                                  # The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in normal post-order.
+ {my ($tree) = @_;                                                              # Tree
+  &parentsPostOrder(@_);
  }
 
 #D1 Order                                                                       # Check the order and relative position of children in a tree.
@@ -357,7 +427,7 @@ sub below($$)                                                                   
   above($second, $first) ? $first : undef
  }
 
-sub after($$)                                                                   # Return the first child if it occurs strictly after the second child in the tree or else B<undef> if the first child is L<above>, L<below> or L<before> the second child.
+sub after($$)                                                                   # Return the first child if it occurs strictly after the second child in the tree or else B<undef> if the first child is L[above], L[below] or L[before] the second child.
  {my ($first, $second) = @_;                                                    # First child, second child
   my @f = context $first;                                                       # Context of first child
   my @s = context $second;                                                      # Context of second child
@@ -366,12 +436,50 @@ sub after($$)                                                                   
   indexOfChildInParent($f[-1]) > indexOfChildInParent($s[-1]) ? $first : undef  # First child relative to second child at first common ancestor
  }
 
-sub before($$)                                                                  # Return the first child if it occurs strictly before the second child in the tree or else B<undef> if the first child is L<above>, L<below> or L<after> the second child.
+sub before($$)                                                                  # Return the first child if it occurs strictly before the second child in the tree or else B<undef> if the first child is L[above], L[below] or L[after] the second child.
  {my ($first, $second) = @_;                                                    # First child, second child
   after($second, $first)  ? $first : undef
  }
 
 #D1 Paths                                                                       # Find paths between nodes
+
+sub siblingsBefore($)                                                           # Return a list of siblings before the specified child.
+ {my ($child) = @_;                                                             # Child
+  return () unless my $parent = $child->parent;                                 # Parent
+  my @c = $parent->children->@*;                                                # Children
+  my $i = indexOfChildInParent $child;                                          # Our position
+  @c[0..$i-1]
+ }
+
+sub siblingsAfter($)                                                            # Return a list of siblings after the specified child.
+ {my ($child) = @_;                                                             # Child
+  return () unless my $parent = $child->parent;                                 # Parent
+  my @c = $parent->children->@*;                                                # Children
+  my $i = indexOfChildInParent $child;                                          # Our position
+  @c[$i+1..$#c]
+ }
+
+sub siblingsStrictlyBetween($$)                                                 # Return a list of the siblings strictly between two children of the same parent else return B<undef>.
+ {my ($start, $finish) = @_;                                                    # Start child, finish child
+  return () unless my $parent = $start->parent;                                 # Parent
+  confess "Must be siblings" unless $parent == $finish->parent;                 # Check both children have the same parent
+  my @c = $parent->children->@*;                                                # All siblings
+  shift @c while @c and $c[0]  != $start;                                       # Remove all siblings up to the start child
+  pop   @c while @c and $c[-1] != $finish;                                      # Remove all siblings after the finish child
+  shift @c; pop @c if @c;                                                       # Remove first and last child to make range strictly between
+  @c                                                                            # Siblings strictly between start and finish
+ }
+
+sub lineage($$)                                                                 # Return the path from the specified child to the specified ancestor else return B<undef> if the child is not a descendant of the ancestor.
+ {my ($child, $ancestor) = @_;                                                  # Child, ancestor
+  my @p;                                                                        # Path
+  for(my $p = $child; $p; $p = $p->parent)                                      # Go up
+   {push @p, $p;                                                                # Record path
+    last if $p == $ancestor                                                     # Stop if we encounter the specified ancestor
+   }
+  return @p if !@p or $p[-1] == $ancestor;                                      # Found the ancestor
+  undef                                                                         # No such ancestor
+ }
 
 sub nextPreOrderPath($)                                                         # Return a list of children visited between the specified child and the next child in pre-order.
  {my ($start) = @_;                                                             # The child at the start of the path
@@ -583,7 +691,7 @@ END
 Tree operations.
 
 
-Version 20200708.
+Version 20200720.
 
 
 The following sections describe the methods in each functional area of this
@@ -606,12 +714,13 @@ Create a new child optionally recording the specified key or value.
 B<Example:>
 
 
-
+  
     my $a = Tree::Ops::new 'a', 'A';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     for(1..2)
      {$a->open  ('b', "B$_");
       $a->single('c', "C$_");
+      ok $a->activeScope->key eq 'b';
       $a->close;
      }
     $a->single  ('d', 'D');
@@ -626,16 +735,16 @@ B<Example:>
     d    D
     e    E
   END
-
+  
     is_deeply [map{$_->value} $a->by], [qw(C1 B1 C2 B2 D E A)];
-
+  
     is_deeply $a->lastMost->prev->prev->first->key,           'c';
     is_deeply $a->first->next->last->parent->first->value,    'C2';
-
+  
     is_deeply [map{$_->value} $a->select('b')],               [qw(B1 B2)];
     is_deeply [map{$_->value} $a->select(qr(b|c))],           [qw(B1 C1 B2 C2)];
     is_deeply [map{$_->value} $a->select(sub{$_[0] eq 'd'})], [qw(D)];
-
+  
     $a->first->next->stepEnd->stepEnd->first->next->stepBack;
     is_deeply $a->print, <<END;
   Key      Value
@@ -647,12 +756,66 @@ B<Example:>
         c  C2
       e    E
   END
-
+  
 
 This is a static method and so should either be imported or invoked as:
 
   Tree::Ops::new
 
+
+=head2 activeScope($tree)
+
+Locate the active scope in a tree.
+
+     Parameter  Description
+  1  $tree      Tree
+
+B<Example:>
+
+
+    my $a = Tree::Ops::new 'a', 'A';
+    for(1..2)
+     {$a->open  ('b', "B$_");
+      $a->single('c', "C$_");
+  
+      ok $a->activeScope->key eq 'b';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+      $a->close;
+     }
+    $a->single  ('d', 'D');
+    $a->single  ('e', 'E');
+    is_deeply $a->print, <<END;
+  Key    Value
+  a      A
+    b    B1
+      c  C1
+    b    B2
+      c  C2
+    d    D
+    e    E
+  END
+  
+    is_deeply [map{$_->value} $a->by], [qw(C1 B1 C2 B2 D E A)];
+  
+    is_deeply $a->lastMost->prev->prev->first->key,           'c';
+    is_deeply $a->first->next->last->parent->first->value,    'C2';
+  
+    is_deeply [map{$_->value} $a->select('b')],               [qw(B1 B2)];
+    is_deeply [map{$_->value} $a->select(qr(b|c))],           [qw(B1 C1 B2 C2)];
+    is_deeply [map{$_->value} $a->select(sub{$_[0] eq 'd'})], [qw(D)];
+  
+    $a->first->next->stepEnd->stepEnd->first->next->stepBack;
+    is_deeply $a->print, <<END;
+  Key      Value
+  a        A
+    b      B1
+      c    C1
+    b      B2
+      d    D
+        c  C2
+      e    E
+  END
+  
 
 =head2 open($tree, $key, $value)
 
@@ -668,10 +831,11 @@ B<Example:>
 
     my $a = Tree::Ops::new 'a', 'A';
     for(1..2)
-
+  
      {$a->open  ('b', "B$_");  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
       $a->single('c', "C$_");
+      ok $a->activeScope->key eq 'b';
       $a->close;
      }
     $a->single  ('d', 'D');
@@ -686,16 +850,16 @@ B<Example:>
     d    D
     e    E
   END
-
+  
     is_deeply [map{$_->value} $a->by], [qw(C1 B1 C2 B2 D E A)];
-
+  
     is_deeply $a->lastMost->prev->prev->first->key,           'c';
     is_deeply $a->first->next->last->parent->first->value,    'C2';
-
+  
     is_deeply [map{$_->value} $a->select('b')],               [qw(B1 B2)];
     is_deeply [map{$_->value} $a->select(qr(b|c))],           [qw(B1 C1 B2 C2)];
     is_deeply [map{$_->value} $a->select(sub{$_[0] eq 'd'})], [qw(D)];
-
+  
     $a->first->next->stepEnd->stepEnd->first->next->stepBack;
     is_deeply $a->print, <<END;
   Key      Value
@@ -707,7 +871,7 @@ B<Example:>
         c  C2
       e    E
   END
-
+  
 
 =head2 close($tree)
 
@@ -723,7 +887,8 @@ B<Example:>
     for(1..2)
      {$a->open  ('b', "B$_");
       $a->single('c', "C$_");
-
+      ok $a->activeScope->key eq 'b';
+  
       $a->close;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
      }
@@ -739,16 +904,16 @@ B<Example:>
     d    D
     e    E
   END
-
+  
     is_deeply [map{$_->value} $a->by], [qw(C1 B1 C2 B2 D E A)];
-
+  
     is_deeply $a->lastMost->prev->prev->first->key,           'c';
     is_deeply $a->first->next->last->parent->first->value,    'C2';
-
+  
     is_deeply [map{$_->value} $a->select('b')],               [qw(B1 B2)];
     is_deeply [map{$_->value} $a->select(qr(b|c))],           [qw(B1 C1 B2 C2)];
     is_deeply [map{$_->value} $a->select(sub{$_[0] eq 'd'})], [qw(D)];
-
+  
     $a->first->next->stepEnd->stepEnd->first->next->stepBack;
     is_deeply $a->print, <<END;
   Key      Value
@@ -760,7 +925,7 @@ B<Example:>
         c  C2
       e    E
   END
-
+  
 
 =head2 single($tree, $key, $value)
 
@@ -777,15 +942,16 @@ B<Example:>
     my $a = Tree::Ops::new 'a', 'A';
     for(1..2)
      {$a->open  ('b', "B$_");
-
+  
       $a->single('c', "C$_");  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+      ok $a->activeScope->key eq 'b';
       $a->close;
      }
-
+  
     $a->single  ('d', 'D');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     $a->single  ('e', 'E');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->print, <<END;
@@ -798,16 +964,16 @@ B<Example:>
     d    D
     e    E
   END
-
+  
     is_deeply [map{$_->value} $a->by], [qw(C1 B1 C2 B2 D E A)];
-
+  
     is_deeply $a->lastMost->prev->prev->first->key,           'c';
     is_deeply $a->first->next->last->parent->first->value,    'C2';
-
+  
     is_deeply [map{$_->value} $a->select('b')],               [qw(B1 B2)];
     is_deeply [map{$_->value} $a->select(qr(b|c))],           [qw(B1 C1 B2 C2)];
     is_deeply [map{$_->value} $a->select(sub{$_[0] eq 'd'})], [qw(D)];
-
+  
     $a->first->next->stepEnd->stepEnd->first->next->stepBack;
     is_deeply $a->print, <<END;
   Key      Value
@@ -819,7 +985,37 @@ B<Example:>
         c  C2
       e    E
   END
+  
 
+=head2 include($tree, $include)
+
+Include the specified tree in the currently open scope.
+
+     Parameter  Description
+  1  $tree      Tree being built
+  2  $include   Tree to include
+
+B<Example:>
+
+
+  
+    my $i = fromLetters('B(CD)');
+    my $a = Tree::Ops::new 'a';
+       $a->open ('b');
+  
+       $a->include($i->first);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+       $a->close;
+  
+    is_deeply $a->print, <<END;
+  Key      Value
+  a
+    b
+      B
+        C
+        D
+  END
+  
 
 =head2 fromLetters($letters)
 
@@ -831,10 +1027,10 @@ Create a tree from a string of letters - useful for testing.
 B<Example:>
 
 
-
+  
     my $a = fromLetters(q(bc(d)e));  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     is_deeply $a->print, <<END;
   Key    Value
   a
@@ -843,7 +1039,7 @@ B<Example:>
       d
     e
   END
-
+  
 
 =head1 Navigation
 
@@ -862,13 +1058,13 @@ B<Example:>
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j) = @l{'a'..'j'};
     is_deeply $c->parent,   $b;
-
+  
     is_deeply $a->first,    $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->last,     $d;
     is_deeply $e->next,     $f;
     is_deeply $f->prev,     $e;
-
+  
 
 =head2 last($parent)
 
@@ -884,12 +1080,12 @@ B<Example:>
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j) = @l{'a'..'j'};
     is_deeply $c->parent,   $b;
     is_deeply $a->first,    $b;
-
+  
     is_deeply $a->last,     $d;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $e->next,     $f;
     is_deeply $f->prev,     $e;
-
+  
 
 =head2 next($child)
 
@@ -906,11 +1102,11 @@ B<Example:>
     is_deeply $c->parent,   $b;
     is_deeply $a->first,    $b;
     is_deeply $a->last,     $d;
-
+  
     is_deeply $e->next,     $f;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $f->prev,     $e;
-
+  
 
 =head2 prev($child)
 
@@ -928,10 +1124,10 @@ B<Example:>
     is_deeply $a->first,    $b;
     is_deeply $a->last,     $d;
     is_deeply $e->next,     $f;
-
+  
     is_deeply $f->prev,     $e;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
 
 =head2 firstMost($parent)
 
@@ -959,15 +1155,247 @@ B<Example:>
         i
           j
   END
-
+  
     is_deeply $a->xml,
      '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+  
+    ok  $a->firstMost == $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
+
+=head2 nextMost($child)
+
+Return the next child with no children, i.e. the next leaf of the tree, else return B<undef> if there is no such child.
+
+     Parameter  Description
+  1  $child     Current leaf
+
+B<Example:>
 
 
-    is_deeply $a->firstMost->brackets, 'c';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+    my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
+    is_deeply $a->print, <<END;
+  Key        Value
+  a
+    b
+      c
+    y
+      x
+    d
+      e
+      f
+      g
+      h
+        i
+          j
+  END
+  
+    is_deeply $a->xml,
+     '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+  
+    ok  $a->nextMost  == $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    is_deeply $a-> lastMost->brackets, 'j';
+  
+    ok  $b->nextMost  == $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
+  
+    ok  $c->nextMost  == $x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $y->nextMost  == $x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $x->nextMost  == $e;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $d->nextMost  == $e;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $e->nextMost  == $f;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $f->nextMost  == $g;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $g->nextMost  == $j;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $h->nextMost  == $j;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $i->nextMost  == $j;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok !$j->nextMost;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+
+=head2 prevMost($child)
+
+Return the previous child with no children, i.e. the previous leaf of the tree, else return B<undef> if there is no such child.
+
+     Parameter  Description
+  1  $child     Current leaf
+
+B<Example:>
+
+
+    my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
+    is_deeply $a->print, <<END;
+  Key        Value
+  a
+    b
+      c
+    y
+      x
+    d
+      e
+      f
+      g
+      h
+        i
+          j
+  END
+  
+    is_deeply $a->xml,
+     '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+  
+    ok !$a->prevMost;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $j->prevMost  == $g;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $i->prevMost  == $g;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $h->prevMost  == $g;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $g->prevMost  == $f;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $f->prevMost  == $e;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $e->prevMost  == $x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $d->prevMost  == $x;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $x->prevMost  == $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $y->prevMost  == $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok !$c->prevMost;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok !$b->prevMost;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok !$a->prevMost;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
 
 =head2 lastMost($parent)
 
@@ -995,15 +1423,53 @@ B<Example:>
         i
           j
   END
-
+  
     is_deeply $a->xml,
      '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+  
+    ok  $a->lastMost  == $j;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    is_deeply $a->firstMost->brackets, 'c';
-
-    is_deeply $a-> lastMost->brackets, 'j';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
 
 =head2 mostRecentCommonAncestor($first, $second)
 
@@ -1018,7 +1484,7 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c(d(e))f(g(h)i)j)k')->by;
     my ($a, $b, $e, $h, $k) = @l{qw(a b e h k)};
-
+  
     is_deeply $a->print, <<END;
   Key        Value
   a
@@ -1033,14 +1499,14 @@ B<Example:>
       j
     k
   END
-
-
+  
+  
     ok $e->mostRecentCommonAncestor($h) == $b;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok $e->mostRecentCommonAncestor($k) == $a;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
 
 =head1 Location
 
@@ -1058,27 +1524,27 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)y(x)z(st)d(efgh(i(j))))')->by;
     my ($a, $x, $y, $z) = @l{qw(a x y z)};
-
-
+  
+  
     is_deeply [map {$_->key} $x->context], [qw(x y a)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     is_deeply join(' ', $a->by(sub{$_[0]->key})), "c b x y s t z e f g j i h d a";
     is_deeply join(' ', map{$_->key} $a->by),     "c b x y s t z e f g j i h d a";
-
+  
     $z->cut;
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
+  
     $y->unwrap;
     is_deeply $a->brackets, 'a(b(c)xd(efgh(i(j))))';
-
+  
     $y = $x->wrap('y');
     is_deeply $y->brackets, 'y(x)';
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
+  
     $y->putNext($y->dup);
     is_deeply $a->brackets, 'a(b(c)y(x)y(x)d(efgh(i(j))))';
-
+  
 
 =head2 isFirst($child)
 
@@ -1092,20 +1558,20 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j) = @l{'a'..'j'};
-
+  
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
     is_deeply $b->singleChildOfParent, $c;
-
+  
     is_deeply $e->isFirst, $e;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok !$f->isFirst;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     ok !$g->isLast;
     is_deeply $h->isLast, $h;
     ok  $j->empty;
     ok !$i->empty;
-
+  
 
 =head2 isLast($child)
 
@@ -1119,20 +1585,20 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j) = @l{'a'..'j'};
-
+  
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
     is_deeply $b->singleChildOfParent, $c;
     is_deeply $e->isFirst, $e;
     ok !$f->isFirst;
-
+  
     ok !$g->isLast;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     is_deeply $h->isLast, $h;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     ok  $j->empty;
     ok !$i->empty;
-
+  
 
 =head2 singleChildOfParent($parent)
 
@@ -1146,9 +1612,9 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j) = @l{'a'..'j'};
-
+  
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
     is_deeply $b->singleChildOfParent, $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $e->isFirst, $e;
@@ -1157,7 +1623,7 @@ B<Example:>
     is_deeply $h->isLast, $h;
     ok  $j->empty;
     ok !$i->empty;
-
+  
 
 =head2 empty($parent)
 
@@ -1171,20 +1637,20 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j) = @l{'a'..'j'};
-
+  
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
     is_deeply $b->singleChildOfParent, $c;
     is_deeply $e->isFirst, $e;
     ok !$f->isFirst;
     ok !$g->isLast;
     is_deeply $h->isLast, $h;
-
+  
     ok  $j->empty;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok !$i->empty;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
 
 =head1 Put
 
@@ -1203,24 +1669,24 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(e)')->by;
     my ($a, $b, $d) = @l{qw(a b d)};
-
+  
     my $z = $b->putNext(new 'z');
     is_deeply $z->brackets, 'z';
     is_deeply $a->brackets, 'a(b(c)zd(e))';
-
+  
     my $y = $d->putPrev(new 'y');
     is_deeply $y->brackets, 'y';
     is_deeply $a->brackets, 'a(b(c)zyd(e))';
-
+  
     $z->putLast(new 't');
     is_deeply $z->brackets, 'z(t)';
     is_deeply $a->brackets, 'a(b(c)z(t)yd(e))';
-
-
+  
+  
     $z->putFirst(new 's');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)z(st)yd(e))';
-
+  
 
 =head2 putLast($parent, $child)
 
@@ -1235,24 +1701,24 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(e)')->by;
     my ($a, $b, $d) = @l{qw(a b d)};
-
+  
     my $z = $b->putNext(new 'z');
     is_deeply $z->brackets, 'z';
     is_deeply $a->brackets, 'a(b(c)zd(e))';
-
+  
     my $y = $d->putPrev(new 'y');
     is_deeply $y->brackets, 'y';
     is_deeply $a->brackets, 'a(b(c)zyd(e))';
-
-
+  
+  
     $z->putLast(new 't');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $z->brackets, 'z(t)';
     is_deeply $a->brackets, 'a(b(c)z(t)yd(e))';
-
+  
     $z->putFirst(new 's');
     is_deeply $a->brackets, 'a(b(c)z(st)yd(e))';
-
+  
 
 =head2 putNext($child, $new)
 
@@ -1267,24 +1733,24 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(e)')->by;
     my ($a, $b, $d) = @l{qw(a b d)};
-
-
+  
+  
     my $z = $b->putNext(new 'z');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $z->brackets, 'z';
     is_deeply $a->brackets, 'a(b(c)zd(e))';
-
+  
     my $y = $d->putPrev(new 'y');
     is_deeply $y->brackets, 'y';
     is_deeply $a->brackets, 'a(b(c)zyd(e))';
-
+  
     $z->putLast(new 't');
     is_deeply $z->brackets, 'z(t)';
     is_deeply $a->brackets, 'a(b(c)z(t)yd(e))';
-
+  
     $z->putFirst(new 's');
     is_deeply $a->brackets, 'a(b(c)z(st)yd(e))';
-
+  
 
 =head2 putPrev($child, $new)
 
@@ -1299,24 +1765,24 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(e)')->by;
     my ($a, $b, $d) = @l{qw(a b d)};
-
+  
     my $z = $b->putNext(new 'z');
     is_deeply $z->brackets, 'z';
     is_deeply $a->brackets, 'a(b(c)zd(e))';
-
-
+  
+  
     my $y = $d->putPrev(new 'y');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $y->brackets, 'y';
     is_deeply $a->brackets, 'a(b(c)zyd(e))';
-
+  
     $z->putLast(new 't');
     is_deeply $z->brackets, 'z(t)';
     is_deeply $a->brackets, 'a(b(c)z(t)yd(e))';
-
+  
     $z->putFirst(new 's');
     is_deeply $a->brackets, 'a(b(c)z(st)yd(e))';
-
+  
 
 =head1 Steps
 
@@ -1334,29 +1800,29 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $b, $d) = @l{qw(a b d)};
-
+  
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
-
+  
+  
     $d->step;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)ed(fgh(i(j))))';
-
-
+  
+  
     $d->stepBack;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
-
+  
+  
     $b->stepEnd;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(cd(efgh(i(j)))))';
-
-
+  
+  
     $b->stepEndBack;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
 
 =head2 stepEnd($parent)
 
@@ -1370,25 +1836,25 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $b, $d) = @l{qw(a b d)};
-
+  
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
     $d->step;
     is_deeply $a->brackets, 'a(b(c)ed(fgh(i(j))))';
-
+  
     $d->stepBack;
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
-
+  
+  
     $b->stepEnd;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(cd(efgh(i(j)))))';
-
-
+  
+  
     $b->stepEndBack;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
 
 =head2 stepBack()
 
@@ -1400,23 +1866,23 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $b, $d) = @l{qw(a b d)};
-
+  
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
     $d->step;
     is_deeply $a->brackets, 'a(b(c)ed(fgh(i(j))))';
-
-
+  
+  
     $d->stepBack;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
     $b->stepEnd;
     is_deeply $a->brackets, 'a(b(cd(efgh(i(j)))))';
-
+  
     $b->stepEndBack;
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
 
 =head2 stepEndBack()
 
@@ -1428,23 +1894,23 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $b, $d) = @l{qw(a b d)};
-
+  
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
     $d->step;
     is_deeply $a->brackets, 'a(b(c)ed(fgh(i(j))))';
-
+  
     $d->stepBack;
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
     $b->stepEnd;
     is_deeply $a->brackets, 'a(b(cd(efgh(i(j)))))';
-
-
+  
+  
     $b->stepEndBack;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
 
 =head1 Edit
 
@@ -1462,27 +1928,27 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)y(x)z(st)d(efgh(i(j))))')->by;
     my ($a, $x, $y, $z) = @l{qw(a x y z)};
-
+  
     is_deeply [map {$_->key} $x->context], [qw(x y a)];
-
+  
     is_deeply join(' ', $a->by(sub{$_[0]->key})), "c b x y s t z e f g j i h d a";
     is_deeply join(' ', map{$_->key} $a->by),     "c b x y s t z e f g j i h d a";
-
-
+  
+  
     $z->cut;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
+  
     $y->unwrap;
     is_deeply $a->brackets, 'a(b(c)xd(efgh(i(j))))';
-
+  
     $y = $x->wrap('y');
     is_deeply $y->brackets, 'y(x)';
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
+  
     $y->putNext($y->dup);
     is_deeply $a->brackets, 'a(b(c)y(x)y(x)d(efgh(i(j))))';
-
+  
 
 =head2 dup($parent)
 
@@ -1496,27 +1962,27 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)y(x)z(st)d(efgh(i(j))))')->by;
     my ($a, $x, $y, $z) = @l{qw(a x y z)};
-
+  
     is_deeply [map {$_->key} $x->context], [qw(x y a)];
-
+  
     is_deeply join(' ', $a->by(sub{$_[0]->key})), "c b x y s t z e f g j i h d a";
     is_deeply join(' ', map{$_->key} $a->by),     "c b x y s t z e f g j i h d a";
-
+  
     $z->cut;
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
+  
     $y->unwrap;
     is_deeply $a->brackets, 'a(b(c)xd(efgh(i(j))))';
-
+  
     $y = $x->wrap('y');
     is_deeply $y->brackets, 'y(x)';
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
-
+  
+  
     $y->putNext($y->dup);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)y(x)y(x)d(efgh(i(j))))';
-
+  
 
 =head2 unwrap($child)
 
@@ -1530,27 +1996,27 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)y(x)z(st)d(efgh(i(j))))')->by;
     my ($a, $x, $y, $z) = @l{qw(a x y z)};
-
+  
     is_deeply [map {$_->key} $x->context], [qw(x y a)];
-
+  
     is_deeply join(' ', $a->by(sub{$_[0]->key})), "c b x y s t z e f g j i h d a";
     is_deeply join(' ', map{$_->key} $a->by),     "c b x y s t z e f g j i h d a";
-
+  
     $z->cut;
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
-
+  
+  
     $y->unwrap;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)xd(efgh(i(j))))';
-
+  
     $y = $x->wrap('y');
     is_deeply $y->brackets, 'y(x)';
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
+  
     $y->putNext($y->dup);
     is_deeply $a->brackets, 'a(b(c)y(x)y(x)d(efgh(i(j))))';
-
+  
 
 =head2 wrap($child, $key)
 
@@ -1565,33 +2031,33 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)y(x)z(st)d(efgh(i(j))))')->by;
     my ($a, $x, $y, $z) = @l{qw(a x y z)};
-
+  
     is_deeply [map {$_->key} $x->context], [qw(x y a)];
-
+  
     is_deeply join(' ', $a->by(sub{$_[0]->key})), "c b x y s t z e f g j i h d a";
     is_deeply join(' ', map{$_->key} $a->by),     "c b x y s t z e f g j i h d a";
-
+  
     $z->cut;
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
-
+  
+  
     $y->unwrap;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $a->brackets, 'a(b(c)xd(efgh(i(j))))';
-
-
+  
+  
     $y = $x->wrap('y');  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $y->brackets, 'y(x)';
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
+  
     $y->putNext($y->dup);
     is_deeply $a->brackets, 'a(b(c)y(x)y(x)d(efgh(i(j))))';
-
+  
 
 =head2 merge($parent)
 
-Merge the children of the specified parent with those of the surrounding parents if the L<user|https://en.wikipedia.org/wiki/User_(computing)> data of those parents L<smartmatch> that of the specified parent. Merged parents are unwrapped. Returns the specified parent regardless. From a proposal made by Micaela Monroe.
+Merge the children of the specified parent with those of the surrounding parents if the L[key] data of those parents L<smartmatch|https://perldoc.perl.org/perlop.html#Smartmatch-Operator> that of the specified parent. Merged parents are unwrapped. Returns the specified parent regardless. From a proposal made by Micaela Monroe.
 
      Parameter  Description
   1  $parent    Merging parent
@@ -1601,21 +2067,21 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $d) = @l{qw(a d)};
-
+  
     $d->split;
     is_deeply $d->brackets,       'd(d(e)d(f)d(g)d(h(i(j))))';
     is_deeply $a->brackets, 'a(b(c)d(d(e)d(f)d(g)d(h(i(j)))))';
-
-
+  
+  
     $d->first->merge;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $d->brackets,       'd(d(efgh(i(j))))';
     is_deeply $a->brackets, 'a(b(c)d(d(efgh(i(j)))))';
-
+  
     $d->first->unwrap;
     is_deeply $d->brackets,       'd(efgh(i(j)))';
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
 
 =head2 split($parent)
 
@@ -1629,21 +2095,21 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c)d(efgh(i(j)))')->by;
     my ($a, $d) = @l{qw(a d)};
-
-
+  
+  
     $d->split;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     is_deeply $d->brackets,       'd(d(e)d(f)d(g)d(h(i(j))))';
     is_deeply $a->brackets, 'a(b(c)d(d(e)d(f)d(g)d(h(i(j)))))';
-
+  
     $d->first->merge;
     is_deeply $d->brackets,       'd(d(efgh(i(j))))';
     is_deeply $a->brackets, 'a(b(c)d(d(efgh(i(j)))))';
-
+  
     $d->first->unwrap;
     is_deeply $d->brackets,       'd(efgh(i(j)))';
     is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
-
+  
 
 =head1 Traverse
 
@@ -1651,7 +2117,7 @@ Traverse a tree.
 
 =head2 by($tree, $sub)
 
-Traverse a tree in order to process each child with the specified sub and return an array of the results of processing each child. If no sub sub is specified, the children are returned in tree order.
+Traverse a tree in post-order to process each child with the specified sub and return an array of the results of processing each child. If no sub sub is specified, the children are returned in tree order.
 
      Parameter  Description
   1  $tree      Tree
@@ -1660,37 +2126,37 @@ Traverse a tree in order to process each child with the specified sub and return
 B<Example:>
 
 
-
+  
     my %l = map{$_->key=>$_} fromLetters('b(c)y(x)z(st)d(efgh(i(j))))')->by;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
     my ($a, $x, $y, $z) = @l{qw(a x y z)};
-
+  
     is_deeply [map {$_->key} $x->context], [qw(x y a)];
-
-
+  
+  
     is_deeply join(' ', $a->by(sub{$_[0]->key})), "c b x y s t z e f g j i h d a";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     is_deeply join(' ', map{$_->key} $a->by),     "c b x y s t z e f g j i h d a";  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     $z->cut;
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
+  
     $y->unwrap;
     is_deeply $a->brackets, 'a(b(c)xd(efgh(i(j))))';
-
+  
     $y = $x->wrap('y');
     is_deeply $y->brackets, 'y(x)';
     is_deeply $a->brackets, 'a(b(c)y(x)d(efgh(i(j))))';
-
+  
     $y->putNext($y->dup);
     is_deeply $a->brackets, 'a(b(c)y(x)y(x)d(efgh(i(j))))';
-
+  
 
 =head2 select($tree, $select)
 
-Select matching children in a tree. A child can be selected via named value, array of values, a hash of values, a regular expression or a sub reference.
+Select matching children in a tree in post-order. A child can be selected via named value, array of values, a hash of values, a regular expression or a sub reference.
 
      Parameter  Description
   1  $tree      Tree
@@ -1703,6 +2169,7 @@ B<Example:>
     for(1..2)
      {$a->open  ('b', "B$_");
       $a->single('c', "C$_");
+      ok $a->activeScope->key eq 'b';
       $a->close;
      }
     $a->single  ('d', 'D');
@@ -1717,22 +2184,22 @@ B<Example:>
     d    D
     e    E
   END
-
+  
     is_deeply [map{$_->value} $a->by], [qw(C1 B1 C2 B2 D E A)];
-
+  
     is_deeply $a->lastMost->prev->prev->first->key,           'c';
     is_deeply $a->first->next->last->parent->first->value,    'C2';
-
-
+  
+  
     is_deeply [map{$_->value} $a->select('b')],               [qw(B1 B2)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     is_deeply [map{$_->value} $a->select(qr(b|c))],           [qw(B1 C1 B2 C2)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     is_deeply [map{$_->value} $a->select(sub{$_[0] eq 'd'})], [qw(D)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     $a->first->next->stepEnd->stepEnd->first->next->stepBack;
     is_deeply $a->print, <<END;
   Key      Value
@@ -1744,45 +2211,467 @@ B<Example:>
         c  C2
       e    E
   END
+  
 
+=head1 Partitions
 
-=head2 siblingsBefore($child)
+Various partitions of the tree
 
-Return a list of siblings before the specified child.
+=head2 leaves($tree)
+
+The set of all children without further children, i.e. each leaf of the tree.
 
      Parameter  Description
-  1  $child     Child
+  1  $tree      Tree
 
 B<Example:>
 
 
-    my ($c, $d, $e, $f, $g, $b, $a) = fromLetters('b(cdefg)')->by;
+    my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
+    is_deeply $a->print, <<END;
+  Key        Value
+  a
+    b
+      c
+    y
+      x
+    d
+      e
+      f
+      g
+      h
+        i
+          j
+  END
+  
+    is_deeply $a->xml,
+     '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    ok eval qq(\$$_->key eq '$_') for 'a'..'g';
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
 
-    is_deeply [map {$_->key} $e->siblingsBefore], ["c", "d"];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+=head2 parentsPreOrder($tree)
 
-    is_deeply [map {$_->key} $e->siblingsAfter ], ["f", "g"];
-
-
-=head2 siblingsAfter($child)
-
-Return a list of siblings after the specified child.
+The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in normal pre-order.
 
      Parameter  Description
-  1  $child     Child
+  1  $tree      Tree
 
 B<Example:>
 
 
-    my ($c, $d, $e, $f, $g, $b, $a) = fromLetters('b(cdefg)')->by;
+    my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
+    is_deeply $a->print, <<END;
+  Key        Value
+  a
+    b
+      c
+    y
+      x
+    d
+      e
+      f
+      g
+      h
+        i
+          j
+  END
+  
+    is_deeply $a->xml,
+     '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+  
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-    ok eval qq(\$$_->key eq '$_') for 'a'..'g';
-    is_deeply [map {$_->key} $e->siblingsBefore], ["c", "d"];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
 
-    is_deeply [map {$_->key} $e->siblingsAfter ], ["f", "g"];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+=head2 parentsPostOrder($tree)
+
+The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in normal post-order.
+
+     Parameter  Description
+  1  $tree      Tree
+
+B<Example:>
 
 
+    my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
+    is_deeply $a->print, <<END;
+  Key        Value
+  a
+    b
+      c
+    y
+      x
+    d
+      e
+      f
+      g
+      h
+        i
+          j
+  END
+  
+    is_deeply $a->xml,
+     '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+  
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    is_deeply [$a->parents],            [$a->parentsPostOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
+
+=head2 parentsReversePreOrder($tree)
+
+The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in reverse pre-order.
+
+     Parameter  Description
+  1  $tree      Tree
+
+B<Example:>
+
+
+    my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
+    is_deeply $a->print, <<END;
+  Key        Value
+  a
+    b
+      c
+    y
+      x
+    d
+      e
+      f
+      g
+      h
+        i
+          j
+  END
+  
+    is_deeply $a->xml,
+     '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
+
+=head2 parentsReversePostOrder($tree)
+
+The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in reverse post-order.
+
+     Parameter  Description
+  1  $tree      Tree
+
+B<Example:>
+
+
+    my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
+    is_deeply $a->print, <<END;
+  Key        Value
+  a
+    b
+      c
+    y
+      x
+    d
+      e
+      f
+      g
+      h
+        i
+          j
+  END
+  
+    is_deeply $a->xml,
+     '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+  
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
+
+=head2 parents($tree)
+
+The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in normal post-order.
+
+     Parameter  Description
+  1  $tree      Tree
+
+B<Example:>
+
+
+    my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
+    is_deeply $a->print, <<END;
+  Key        Value
+  a
+    b
+      c
+    y
+      x
+    d
+      e
+      f
+      g
+      h
+        i
+          j
+  END
+  
+    is_deeply $a->xml,
+     '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+  
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    is_deeply [$a->parents],            [$a->parentsPostOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+  
+    ok !$j->parents;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
 
 =head1 Order
 
@@ -1801,7 +2690,7 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c(d(efgh(i(j)k)l)m)n')->by;
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k, $l, $m, $n) = @l{'a'..'n'};
-
+  
     is_deeply $a->print, <<END;
   Key            Value
   a
@@ -1819,23 +2708,26 @@ B<Example:>
         m
       n
   END
-
-
+  
+  
     ok  $c->above($j)  == $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok !$m->above($j);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok  $i->below($b)  == $i;
     ok !$i->below($n);
-
+  
     ok  $n->after($e)  == $n;
     ok !$k->after($c);
-
+  
     ok  $c->before($n) == $c;
     ok !$c->before($m);
-
+  
+    is_deeply [map{$_->key} $j->lineage($d)], [qw(j i h d)];
+    ok !$d->lineage($m);
+  
 
 =head2 below($first, $second)
 
@@ -1850,7 +2742,7 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c(d(efgh(i(j)k)l)m)n')->by;
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k, $l, $m, $n) = @l{'a'..'n'};
-
+  
     is_deeply $a->print, <<END;
   Key            Value
   a
@@ -1868,27 +2760,30 @@ B<Example:>
         m
       n
   END
-
+  
     ok  $c->above($j)  == $c;
     ok !$m->above($j);
-
-
+  
+  
     ok  $i->below($b)  == $i;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok !$i->below($n);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok  $n->after($e)  == $n;
     ok !$k->after($c);
-
+  
     ok  $c->before($n) == $c;
     ok !$c->before($m);
-
+  
+    is_deeply [map{$_->key} $j->lineage($d)], [qw(j i h d)];
+    ok !$d->lineage($m);
+  
 
 =head2 after($first, $second)
 
-Return the first child if it occurs strictly after the second child in the tree or else B<undef> if the first child is L<above>, L<below> or L<before> the second child.
+Return the first child if it occurs strictly after the second child in the tree or else B<undef> if the first child is L<above|/"above($first, $second)">, L<below|/"below($first, $second)"> or L<before|/"before($first, $second)"> the second child.
 
      Parameter  Description
   1  $first     First child
@@ -1899,7 +2794,7 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c(d(efgh(i(j)k)l)m)n')->by;
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k, $l, $m, $n) = @l{'a'..'n'};
-
+  
     is_deeply $a->print, <<END;
   Key            Value
   a
@@ -1917,27 +2812,30 @@ B<Example:>
         m
       n
   END
-
+  
     ok  $c->above($j)  == $c;
     ok !$m->above($j);
-
+  
     ok  $i->below($b)  == $i;
     ok !$i->below($n);
-
-
+  
+  
     ok  $n->after($e)  == $n;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok !$k->after($c);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok  $c->before($n) == $c;
     ok !$c->before($m);
-
+  
+    is_deeply [map{$_->key} $j->lineage($d)], [qw(j i h d)];
+    ok !$d->lineage($m);
+  
 
 =head2 before($first, $second)
 
-Return the first child if it occurs strictly before the second child in the tree or else B<undef> if the first child is L<above>, L<below> or L<after> the second child.
+Return the first child if it occurs strictly before the second child in the tree or else B<undef> if the first child is L<above|/"above($first, $second)">, L<below|/"below($first, $second)"> or L<after|/"after($first, $second)"> the second child.
 
      Parameter  Description
   1  $first     First child
@@ -1948,7 +2846,7 @@ B<Example:>
 
     my %l = map{$_->key=>$_} fromLetters('b(c(d(efgh(i(j)k)l)m)n')->by;
     my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k, $l, $m, $n) = @l{'a'..'n'};
-
+  
     is_deeply $a->print, <<END;
   Key            Value
   a
@@ -1966,27 +2864,193 @@ B<Example:>
         m
       n
   END
-
+  
     ok  $c->above($j)  == $c;
     ok !$m->above($j);
-
+  
     ok  $i->below($b)  == $i;
     ok !$i->below($n);
-
+  
     ok  $n->after($e)  == $n;
     ok !$k->after($c);
-
-
+  
+  
     ok  $c->before($n) == $c;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
     ok !$c->before($m);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
-
+  
+    is_deeply [map{$_->key} $j->lineage($d)], [qw(j i h d)];
+    ok !$d->lineage($m);
+  
 
 =head1 Paths
 
 Find paths between nodes
+
+=head2 siblingsBefore($child)
+
+Return a list of siblings before the specified child.
+
+     Parameter  Description
+  1  $child     Child
+
+B<Example:>
+
+
+    my $a = fromLetters('b(cde(f)ghi)j');
+    my ($c, $d, $f, $e, $g, $h, $i, $b, $j) = $a->by;
+  # ok eval qq(\$$_->key eq '$_') for 'a'..'j';
+    is_deeply $a->print, <<END;
+  Key      Value
+  a
+    b
+      c
+      d
+      e
+        f
+      g
+      h
+      i
+    j
+  END
+  
+    is_deeply [$d->siblingsStrictlyBetween($h)], [$e, $g];
+    is_deeply [$d->siblingsAfter],               [$e, $g, $h, $i];
+  
+    is_deeply [$g->siblingsBefore],              [$c, $d, $e];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    eval {$e->siblingsStrictlyBetween($f)};
+    ok $@ =~ m(Must be siblings);
+  
+
+=head2 siblingsAfter($child)
+
+Return a list of siblings after the specified child.
+
+     Parameter  Description
+  1  $child     Child
+
+B<Example:>
+
+
+    my $a = fromLetters('b(cde(f)ghi)j');
+    my ($c, $d, $f, $e, $g, $h, $i, $b, $j) = $a->by;
+  # ok eval qq(\$$_->key eq '$_') for 'a'..'j';
+    is_deeply $a->print, <<END;
+  Key      Value
+  a
+    b
+      c
+      d
+      e
+        f
+      g
+      h
+      i
+    j
+  END
+  
+    is_deeply [$d->siblingsStrictlyBetween($h)], [$e, $g];
+  
+    is_deeply [$d->siblingsAfter],               [$e, $g, $h, $i];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    is_deeply [$g->siblingsBefore],              [$c, $d, $e];
+    eval {$e->siblingsStrictlyBetween($f)};
+    ok $@ =~ m(Must be siblings);
+  
+
+=head2 siblingsStrictlyBetween($start, $finish)
+
+Return a list of the siblings strictly between two children of the same parent else return B<undef>.
+
+     Parameter  Description
+  1  $start     Start child
+  2  $finish    Finish child
+
+B<Example:>
+
+
+    my $a = fromLetters('b(cde(f)ghi)j');
+    my ($c, $d, $f, $e, $g, $h, $i, $b, $j) = $a->by;
+  # ok eval qq(\$$_->key eq '$_') for 'a'..'j';
+    is_deeply $a->print, <<END;
+  Key      Value
+  a
+    b
+      c
+      d
+      e
+        f
+      g
+      h
+      i
+    j
+  END
+  
+  
+    is_deeply [$d->siblingsStrictlyBetween($h)], [$e, $g];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    is_deeply [$d->siblingsAfter],               [$e, $g, $h, $i];
+    is_deeply [$g->siblingsBefore],              [$c, $d, $e];
+  
+    eval {$e->siblingsStrictlyBetween($f)};  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+    ok $@ =~ m(Must be siblings);
+  
+
+=head2 lineage($child, $ancestor)
+
+Return the path from the specified child to the specified ancestor else return B<undef> if the child is not a descendant of the ancestor.
+
+     Parameter  Description
+  1  $child     Child
+  2  $ancestor  Ancestor
+
+B<Example:>
+
+
+    my %l = map{$_->key=>$_} fromLetters('b(c(d(efgh(i(j)k)l)m)n')->by;
+    my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k, $l, $m, $n) = @l{'a'..'n'};
+  
+    is_deeply $a->print, <<END;
+  Key            Value
+  a
+    b
+      c
+        d
+          e
+          f
+          g
+          h
+            i
+              j
+            k
+          l
+        m
+      n
+  END
+  
+    ok  $c->above($j)  == $c;
+    ok !$m->above($j);
+  
+    ok  $i->below($b)  == $i;
+    ok !$i->below($n);
+  
+    ok  $n->after($e)  == $n;
+    ok !$k->after($c);
+  
+    ok  $c->before($n) == $c;
+    ok !$c->before($m);
+  
+  
+    is_deeply [map{$_->key} $j->lineage($d)], [qw(j i h d)];  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
+    ok !$d->lineage($m);  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
+
+  
 
 =head2 nextPreOrderPath($start)
 
@@ -1999,15 +3063,15 @@ B<Example:>
 
 
     my @p = [my $a = fromLetters('b(c(d(e(fg)hi(j(kl)m)n)op)q)r')];
-
+  
     for(1..99)
-
+  
      {my @n = $p[-1][-1]->nextPreOrderPath;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
       last unless @n;
       push @p, [@n];
      }
-
+  
     is_deeply $a->print, <<END;
   Key            Value
   a
@@ -2029,7 +3093,7 @@ B<Example:>
       q
     r
   END
-
+  
     my @pre = map{[map{$_->key} @$_]} @p;
     is_deeply scalar(@pre), scalar(['a'..'r']->@*);
     is_deeply [@pre],
@@ -2051,7 +3115,7 @@ B<Example:>
       ["p"],
       ["c", "q"],
       ["b", "r"]];
-
+  
 
 =head2 nextPostOrderPath($start)
 
@@ -2066,14 +3130,14 @@ B<Example:>
     my @n = my $a = fromLetters('b(c(d(e(fg)hi(j(kl)m)n)op)q)r');
     my @p;
     for(1..99)
-
+  
      {@n = $n[-1]->nextPostOrderPath;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
       last unless @n;
       push @p, [@n];
       last if $n[-1] == $a;
      }
-
+  
     is_deeply $a->print, <<END;
   Key            Value
   a
@@ -2095,7 +3159,7 @@ B<Example:>
       q
     r
   END
-
+  
     my @post = map{[map{$_->key} @$_]} @p;
     is_deeply scalar(@post), scalar(['a'..'r']->@*);
     is_deeply [@post],
@@ -2117,7 +3181,7 @@ B<Example:>
     ["b"],
     ["r"],
     ["a"]];
-
+  
 
 =head2 prevPostOrderPath($start)
 
@@ -2130,15 +3194,15 @@ B<Example:>
 
 
     my @p = [my $a = fromLetters('b(c(d(e(fg)hi(j(kl)m)n)op)q)r')];
-
+  
     for(1..99)
-
+  
      {my @n = $p[-1][-1]->prevPostOrderPath;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
       last unless @n;
       push @p, [@n];
      }
-
+  
     is_deeply $a->print, <<END;
   Key            Value
   a
@@ -2160,7 +3224,7 @@ B<Example:>
       q
     r
   END
-
+  
     my @post = map{[map{$_->key} @$_]} @p;
     is_deeply scalar(@post), scalar(['a'..'r']->@*);
     is_deeply [@post],
@@ -2182,7 +3246,7 @@ B<Example:>
       ["e"],
       ["g"],
       ["f"]];
-
+  
 
 =head2 prevPreOrderPath($start)
 
@@ -2197,14 +3261,14 @@ B<Example:>
     my @n = my $a = fromLetters('b(c(d(e(fg)hi(j(kl)m)n)op)q)r');
     my @p;
     for(1..99)
-
+  
      {@n = $n[-1]->prevPreOrderPath;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
       last unless @n;
       push @p, [@n];
       last if $n[-1] == $a;
      }
-
+  
     is_deeply $a->print, <<END;
   Key            Value
   a
@@ -2226,7 +3290,7 @@ B<Example:>
       q
     r
   END
-
+  
     my @pre = map{[map{$_->key} @$_]} @p;
     is_deeply scalar(@pre), scalar(['a'..'r']->@*);
     is_deeply [@pre],
@@ -2248,7 +3312,7 @@ B<Example:>
       ["c"],
       ["b"],
       ["a"]];
-
+  
 
 =head1 Print
 
@@ -2267,8 +3331,8 @@ B<Example:>
 
     my ($c, $b, $d, $a) = fromLetters('b(c)d')->by;
     my sub test(@) {join ' ', map{join '', $_->key} @_}
-
-
+  
+  
     is_deeply $a->printPreOrder, <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   Key    Value
@@ -2277,12 +3341,12 @@ B<Example:>
       c
     d
   END
-
+  
     is_deeply test($a->nextPreOrderPath), 'b';
     is_deeply test($b->nextPreOrderPath), 'c';
     is_deeply test($c->nextPreOrderPath), 'b d';
     is_deeply test($d->nextPreOrderPath), '';
-
+  
     is_deeply $a->printPostOrder, <<END;
   Key    Value
       c
@@ -2290,12 +3354,12 @@ B<Example:>
     d
   a
   END
-
+  
     is_deeply test($a->nextPostOrderPath), 'b c';
     is_deeply test($c->nextPostOrderPath), 'b';
     is_deeply test($b->nextPostOrderPath), 'd';
     is_deeply test($d->nextPostOrderPath), 'a';
-
+  
     is_deeply $a->printReversePreOrder, <<END;
   Key    Value
   a
@@ -2307,7 +3371,7 @@ B<Example:>
     is_deeply test($d->prevPreOrderPath), 'b c';
     is_deeply test($c->prevPreOrderPath), 'b';
     is_deeply test($b->prevPreOrderPath), 'a';
-
+  
     is_deeply $a->printReversePostOrder, <<END;
   Key    Value
     d
@@ -2315,12 +3379,12 @@ B<Example:>
     b
   a
   END
-
+  
     is_deeply test($a->prevPostOrderPath), 'd';
     is_deeply test($d->prevPostOrderPath), 'b';
     is_deeply test($b->prevPostOrderPath), 'c';
     is_deeply test($c->prevPostOrderPath), '';
-
+  
 
 =head2 printPostOrder($tree, $print)
 
@@ -2335,7 +3399,7 @@ B<Example:>
 
     my ($c, $b, $d, $a) = fromLetters('b(c)d')->by;
     my sub test(@) {join ' ', map{join '', $_->key} @_}
-
+  
     is_deeply $a->printPreOrder, <<END;
   Key    Value
   a
@@ -2343,13 +3407,13 @@ B<Example:>
       c
     d
   END
-
+  
     is_deeply test($a->nextPreOrderPath), 'b';
     is_deeply test($b->nextPreOrderPath), 'c';
     is_deeply test($c->nextPreOrderPath), 'b d';
     is_deeply test($d->nextPreOrderPath), '';
-
-
+  
+  
     is_deeply $a->printPostOrder, <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   Key    Value
@@ -2358,12 +3422,12 @@ B<Example:>
     d
   a
   END
-
+  
     is_deeply test($a->nextPostOrderPath), 'b c';
     is_deeply test($c->nextPostOrderPath), 'b';
     is_deeply test($b->nextPostOrderPath), 'd';
     is_deeply test($d->nextPostOrderPath), 'a';
-
+  
     is_deeply $a->printReversePreOrder, <<END;
   Key    Value
   a
@@ -2375,7 +3439,7 @@ B<Example:>
     is_deeply test($d->prevPreOrderPath), 'b c';
     is_deeply test($c->prevPreOrderPath), 'b';
     is_deeply test($b->prevPreOrderPath), 'a';
-
+  
     is_deeply $a->printReversePostOrder, <<END;
   Key    Value
     d
@@ -2383,12 +3447,12 @@ B<Example:>
     b
   a
   END
-
+  
     is_deeply test($a->prevPostOrderPath), 'd';
     is_deeply test($d->prevPostOrderPath), 'b';
     is_deeply test($b->prevPostOrderPath), 'c';
     is_deeply test($c->prevPostOrderPath), '';
-
+  
 
 =head2 printReversePreOrder($tree, $print)
 
@@ -2403,7 +3467,7 @@ B<Example:>
 
     my ($c, $b, $d, $a) = fromLetters('b(c)d')->by;
     my sub test(@) {join ' ', map{join '', $_->key} @_}
-
+  
     is_deeply $a->printPreOrder, <<END;
   Key    Value
   a
@@ -2411,12 +3475,12 @@ B<Example:>
       c
     d
   END
-
+  
     is_deeply test($a->nextPreOrderPath), 'b';
     is_deeply test($b->nextPreOrderPath), 'c';
     is_deeply test($c->nextPreOrderPath), 'b d';
     is_deeply test($d->nextPreOrderPath), '';
-
+  
     is_deeply $a->printPostOrder, <<END;
   Key    Value
       c
@@ -2424,13 +3488,13 @@ B<Example:>
     d
   a
   END
-
+  
     is_deeply test($a->nextPostOrderPath), 'b c';
     is_deeply test($c->nextPostOrderPath), 'b';
     is_deeply test($b->nextPostOrderPath), 'd';
     is_deeply test($d->nextPostOrderPath), 'a';
-
-
+  
+  
     is_deeply $a->printReversePreOrder, <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   Key    Value
@@ -2443,7 +3507,7 @@ B<Example:>
     is_deeply test($d->prevPreOrderPath), 'b c';
     is_deeply test($c->prevPreOrderPath), 'b';
     is_deeply test($b->prevPreOrderPath), 'a';
-
+  
     is_deeply $a->printReversePostOrder, <<END;
   Key    Value
     d
@@ -2451,12 +3515,12 @@ B<Example:>
     b
   a
   END
-
+  
     is_deeply test($a->prevPostOrderPath), 'd';
     is_deeply test($d->prevPostOrderPath), 'b';
     is_deeply test($b->prevPostOrderPath), 'c';
     is_deeply test($c->prevPostOrderPath), '';
-
+  
 
 =head2 printReversePostOrder($tree, $print)
 
@@ -2471,7 +3535,7 @@ B<Example:>
 
     my ($c, $b, $d, $a) = fromLetters('b(c)d')->by;
     my sub test(@) {join ' ', map{join '', $_->key} @_}
-
+  
     is_deeply $a->printPreOrder, <<END;
   Key    Value
   a
@@ -2479,12 +3543,12 @@ B<Example:>
       c
     d
   END
-
+  
     is_deeply test($a->nextPreOrderPath), 'b';
     is_deeply test($b->nextPreOrderPath), 'c';
     is_deeply test($c->nextPreOrderPath), 'b d';
     is_deeply test($d->nextPreOrderPath), '';
-
+  
     is_deeply $a->printPostOrder, <<END;
   Key    Value
       c
@@ -2492,12 +3556,12 @@ B<Example:>
     d
   a
   END
-
+  
     is_deeply test($a->nextPostOrderPath), 'b c';
     is_deeply test($c->nextPostOrderPath), 'b';
     is_deeply test($b->nextPostOrderPath), 'd';
     is_deeply test($d->nextPostOrderPath), 'a';
-
+  
     is_deeply $a->printReversePreOrder, <<END;
   Key    Value
   a
@@ -2509,8 +3573,8 @@ B<Example:>
     is_deeply test($d->prevPreOrderPath), 'b c';
     is_deeply test($c->prevPreOrderPath), 'b';
     is_deeply test($b->prevPreOrderPath), 'a';
-
-
+  
+  
     is_deeply $a->printReversePostOrder, <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   Key    Value
@@ -2519,12 +3583,12 @@ B<Example:>
     b
   a
   END
-
+  
     is_deeply test($a->prevPostOrderPath), 'd';
     is_deeply test($d->prevPostOrderPath), 'b';
     is_deeply test($b->prevPostOrderPath), 'c';
     is_deeply test($c->prevPostOrderPath), '';
-
+  
 
 =head2 print($tree, $print)
 
@@ -2538,7 +3602,7 @@ B<Example:>
 
 
     my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
-
+  
     is_deeply $a->print, <<END;  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
   Key        Value
@@ -2555,13 +3619,51 @@ B<Example:>
         i
           j
   END
-
+  
     is_deeply $a->xml,
      '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
-
-    is_deeply $a->firstMost->brackets, 'c';
-    is_deeply $a-> lastMost->brackets, 'j';
-
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
 
 =head2 brackets($tree, $print, $separator)
 
@@ -2591,17 +3693,51 @@ B<Example:>
         i
           j
   END
-
+  
     is_deeply $a->xml,
      '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
-
-
-    is_deeply $a->firstMost->brackets, 'c';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-
-    is_deeply $a-> lastMost->brackets, 'j';  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
-
-
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
 
 =head2 xml($tree, $print)
 
@@ -2630,15 +3766,53 @@ B<Example:>
         i
           j
   END
-
-
+  
+  
     is_deeply $a->xml,  # 𝗘𝘅𝗮𝗺𝗽𝗹𝗲
 
      '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
-
-    is_deeply $a->firstMost->brackets, 'c';
-    is_deeply $a-> lastMost->brackets, 'j';
-
+  
+    my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+  
+    is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+    is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+    is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+    is_deeply [$a->parents],            [$a->parentsPostOrder];
+  
+    is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+    is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+  
+    ok !$j->parents;
+  
+    ok  $a->lastMost  == $j;
+    ok !$a->prevMost;
+    ok  $j->prevMost  == $g;
+    ok  $i->prevMost  == $g;
+    ok  $h->prevMost  == $g;
+    ok  $g->prevMost  == $f;
+    ok  $f->prevMost  == $e;
+    ok  $e->prevMost  == $x;
+    ok  $d->prevMost  == $x;
+    ok  $x->prevMost  == $c;
+    ok  $y->prevMost  == $c;
+    ok !$c->prevMost;
+    ok !$b->prevMost;
+    ok !$a->prevMost;
+  
+    ok  $a->firstMost == $c;
+    ok  $a->nextMost  == $c;
+    ok  $b->nextMost  == $c;
+    ok  $c->nextMost  == $x;
+    ok  $y->nextMost  == $x;
+    ok  $x->nextMost  == $e;
+    ok  $d->nextMost  == $e;
+    ok  $e->nextMost  == $f;
+    ok  $f->nextMost  == $g;
+    ok  $g->nextMost  == $j;
+    ok  $h->nextMost  == $j;
+    ok  $i->nextMost  == $j;
+    ok !$j->nextMost;
+  
 
 =head1 Data Structures
 
@@ -2658,7 +3832,7 @@ Child in the tree.
 
 B<children> - Children of this child.
 
-B<key> - Key for this child - any thing that can be compared with the L<smartmatch> operator.
+B<key> - Key for this child - any thing that can be compared with the L<smartmatch|https://perldoc.perl.org/perlop.html#Smartmatch-Operator> operator.
 
 B<lastChild> - Last active child chain - enables us to find the currently open scope from the start if the tree.
 
@@ -2669,13 +3843,6 @@ B<value> - Value for this child.
 
 
 =head1 Private Methods
-
-=head2 activeScope($tree)
-
-Locate the active scope in a tree.
-
-     Parameter  Description
-  1  $tree      Tree
 
 =head2 setParentOfChild($child, $parent)
 
@@ -2691,6 +3858,15 @@ Get the index of a child within the specified parent.
 
      Parameter  Description
   1  $child     Child
+
+=head2 parentsOrdered($tree, $preorder, $reverse)
+
+The set of all parents in the tree, i.e. each non leaf of the tree, i.e  the interior of the tree in the specified order.
+
+     Parameter  Description
+  1  $tree      Tree
+  2  $preorder  Pre-order if true else post-order
+  3  $reverse   Reversed if true
 
 =head2 printTree($tree, $print, $preorder, $reverse)
 
@@ -2710,15 +3886,15 @@ String representation as a horizontal tree.
 
 2 L<activeScope|/activeScope> - Locate the active scope in a tree.
 
-3 L<after|/after> - Return the first child if it occurs strictly after the second child in the tree or else B<undef> if the first child is L<above>, L<below> or L<before> the second child.
+3 L<after|/after> - Return the first child if it occurs strictly after the second child in the tree or else B<undef> if the first child is L<above|/"above($first, $second)">, L<below|/"below($first, $second)"> or L<before|/"before($first, $second)"> the second child.
 
-4 L<before|/before> - Return the first child if it occurs strictly before the second child in the tree or else B<undef> if the first child is L<above>, L<below> or L<after> the second child.
+4 L<before|/before> - Return the first child if it occurs strictly before the second child in the tree or else B<undef> if the first child is L<above|/"above($first, $second)">, L<below|/"below($first, $second)"> or L<after|/"after($first, $second)"> the second child.
 
 5 L<below|/below> - Return the first child if it is below the second child else return B<undef>.
 
 6 L<brackets|/brackets> - Bracketed string representation of a tree.
 
-7 L<by|/by> - Traverse a tree in order to process each child with the specified sub and return an array of the results of processing each child.
+7 L<by|/by> - Traverse a tree in post-order to process each child with the specified sub and return an array of the results of processing each child.
 
 8 L<close|/close> - Close the current scope returning to the previous scope.
 
@@ -2736,83 +3912,107 @@ String representation as a horizontal tree.
 
 15 L<fromLetters|/fromLetters> - Create a tree from a string of letters - useful for testing.
 
-16 L<indexOfChildInParent|/indexOfChildInParent> - Get the index of a child within the specified parent.
+16 L<include|/include> - Include the specified tree in the currently open scope.
 
-17 L<isFirst|/isFirst> - Return the specified child if that child is first under its parent, else return B<undef>.
+17 L<indexOfChildInParent|/indexOfChildInParent> - Get the index of a child within the specified parent.
 
-18 L<isLast|/isLast> - Return the specified child if that child is last under its parent, else return B<undef>.
+18 L<isFirst|/isFirst> - Return the specified child if that child is first under its parent, else return B<undef>.
 
-19 L<last|/last> - Get the last child under the specified parent.
+19 L<isLast|/isLast> - Return the specified child if that child is last under its parent, else return B<undef>.
 
-20 L<lastMost|/lastMost> - Return the last most descendant child in the tree starting at this parent or else return B<undef> if this parent has no children.
+20 L<last|/last> - Get the last child under the specified parent.
 
-21 L<merge|/merge> - Merge the children of the specified parent with those of the surrounding parents if the L<user|https://en.wikipedia.org/wiki/User_(computing)> data of those parents L<smartmatch> that of the specified parent.
+21 L<lastMost|/lastMost> - Return the last most descendant child in the tree starting at this parent or else return B<undef> if this parent has no children.
 
-22 L<mostRecentCommonAncestor|/mostRecentCommonAncestor> - Find the most recent common ancestor of the specified children.
+22 L<leaves|/leaves> - The set of all children without further children, i.
 
-23 L<new|/new> - Create a new child optionally recording the specified key or value.
+23 L<lineage|/lineage> - Return the path from the specified child to the specified ancestor else return B<undef> if the child is not a descendant of the ancestor.
 
-24 L<next|/next> - Get the next sibling following the specified child.
+24 L<merge|/merge> - Merge the children of the specified parent with those of the surrounding parents if the L[key] data of those parents L<smartmatch|https://perldoc.perl.org/perlop.html#Smartmatch-Operator> that of the specified parent.
 
-25 L<nextPostOrderPath|/nextPostOrderPath> - Return a list of children visited between the specified child and the next child in post-order.
+25 L<mostRecentCommonAncestor|/mostRecentCommonAncestor> - Find the most recent common ancestor of the specified children.
 
-26 L<nextPreOrderPath|/nextPreOrderPath> - Return a list of children visited between the specified child and the next child in pre-order.
+26 L<new|/new> - Create a new child optionally recording the specified key or value.
 
-27 L<open|/open> - Add a child and make it the currently active scope into which new children will be added.
+27 L<next|/next> - Get the next sibling following the specified child.
 
-28 L<prev|/prev> - Get the previous sibling of the specified child.
+28 L<nextMost|/nextMost> - Return the next child with no children, i.
 
-29 L<prevPostOrderPath|/prevPostOrderPath> - Return a list of children visited between the specified child and the previous child in post-order.
+29 L<nextPostOrderPath|/nextPostOrderPath> - Return a list of children visited between the specified child and the next child in post-order.
 
-30 L<prevPreOrderPath|/prevPreOrderPath> - Return a list of children visited between the specified child and the previous child in pre-order.
+30 L<nextPreOrderPath|/nextPreOrderPath> - Return a list of children visited between the specified child and the next child in pre-order.
 
-31 L<print|/print> - Print tree in normal pre-order.
+31 L<open|/open> - Add a child and make it the currently active scope into which new children will be added.
 
-32 L<printPostOrder|/printPostOrder> - Print tree in normal post-order.
+32 L<parents|/parents> - The set of all parents in the tree, i.
 
-33 L<printPreOrder|/printPreOrder> - Print tree in normal pre-order.
+33 L<parentsOrdered|/parentsOrdered> - The set of all parents in the tree, i.
 
-34 L<printReversePostOrder|/printReversePostOrder> - Print tree in reverse post-order
+34 L<parentsPostOrder|/parentsPostOrder> - The set of all parents in the tree, i.
 
-35 L<printReversePreOrder|/printReversePreOrder> - Print tree in reverse pre-order
+35 L<parentsPreOrder|/parentsPreOrder> - The set of all parents in the tree, i.
 
-36 L<printTree|/printTree> - String representation as a horizontal tree.
+36 L<parentsReversePostOrder|/parentsReversePostOrder> - The set of all parents in the tree, i.
 
-37 L<putFirst|/putFirst> - Place a new child first under the specified parent and return the child.
+37 L<parentsReversePreOrder|/parentsReversePreOrder> - The set of all parents in the tree, i.
 
-38 L<putLast|/putLast> - Place a new child last under the specified parent and return the child.
+38 L<prev|/prev> - Get the previous sibling of the specified child.
 
-39 L<putNext|/putNext> - Place a new child after the specified child.
+39 L<prevMost|/prevMost> - Return the previous child with no children, i.
 
-40 L<putPrev|/putPrev> - Place a new child before the specified child.
+40 L<prevPostOrderPath|/prevPostOrderPath> - Return a list of children visited between the specified child and the previous child in post-order.
 
-41 L<select|/select> - Select matching children in a tree.
+41 L<prevPreOrderPath|/prevPreOrderPath> - Return a list of children visited between the specified child and the previous child in pre-order.
 
-42 L<setParentOfChild|/setParentOfChild> - Set the parent of a child and return the child.
+42 L<print|/print> - Print tree in normal pre-order.
 
-43 L<siblingsAfter|/siblingsAfter> - Return a list of siblings after the specified child.
+43 L<printPostOrder|/printPostOrder> - Print tree in normal post-order.
 
-44 L<siblingsBefore|/siblingsBefore> - Return a list of siblings before the specified child.
+44 L<printPreOrder|/printPreOrder> - Print tree in normal pre-order.
 
-45 L<single|/single> - Add one child in the current scope.
+45 L<printReversePostOrder|/printReversePostOrder> - Print tree in reverse post-order
 
-46 L<singleChildOfParent|/singleChildOfParent> - Return the only child of this parent if the parent has an only child, else B<undef>
+46 L<printReversePreOrder|/printReversePreOrder> - Print tree in reverse pre-order
 
-47 L<split|/split> - Make the specified parent a grandparent of each of its children by interposing a copy of the specified parent between the specified parent and each of its children.
+47 L<printTree|/printTree> - String representation as a horizontal tree.
 
-48 L<step|/step> - Make the first child of the specified parent the parents previous sibling and return the parent.
+48 L<putFirst|/putFirst> - Place a new child first under the specified parent and return the child.
 
-49 L<stepBack|/stepBack> - Make the previous sibling of the specified parent the parents first child and return the parent.
+49 L<putLast|/putLast> - Place a new child last under the specified parent and return the child.
 
-50 L<stepEnd|/stepEnd> - Make the next sibling of the specified parent the parents last child and return the parent.
+50 L<putNext|/putNext> - Place a new child after the specified child.
 
-51 L<stepEndBack|/stepEndBack> - Make the last child of the specified parent the parents next sibling and return the parent.
+51 L<putPrev|/putPrev> - Place a new child before the specified child.
 
-52 L<unwrap|/unwrap> - Unwrap the specified child and return that child.
+52 L<select|/select> - Select matching children in a tree in post-order.
 
-53 L<wrap|/wrap> - Wrap the specified child with a new parent and return the new parent.
+53 L<setParentOfChild|/setParentOfChild> - Set the parent of a child and return the child.
 
-54 L<xml|/xml> - Print a tree as as xml.
+54 L<siblingsAfter|/siblingsAfter> - Return a list of siblings after the specified child.
+
+55 L<siblingsBefore|/siblingsBefore> - Return a list of siblings before the specified child.
+
+56 L<siblingsStrictlyBetween|/siblingsStrictlyBetween> - Return a list of the siblings strictly between two children of the same parent else return B<undef>.
+
+57 L<single|/single> - Add one child in the current scope.
+
+58 L<singleChildOfParent|/singleChildOfParent> - Return the only child of this parent if the parent has an only child, else B<undef>
+
+59 L<split|/split> - Make the specified parent a grandparent of each of its children by interposing a copy of the specified parent between the specified parent and each of its children.
+
+60 L<step|/step> - Make the first child of the specified parent the parents previous sibling and return the parent.
+
+61 L<stepBack|/stepBack> - Make the previous sibling of the specified parent the parents first child and return the parent.
+
+62 L<stepEnd|/stepEnd> - Make the next sibling of the specified parent the parents last child and return the parent.
+
+63 L<stepEndBack|/stepEndBack> - Make the last child of the specified parent the parents next sibling and return the parent.
+
+64 L<unwrap|/unwrap> - Unwrap the specified child and return that child.
+
+65 L<wrap|/wrap> - Wrap the specified child with a new parent and return the new parent.
+
+66 L<xml|/xml> - Print a tree as as xml.
 
 =head1 Installation
 
@@ -2860,7 +4060,7 @@ use warnings FATAL=>qw(all);
 use strict;
 require v5.26;
 use Time::HiRes qw(time);
-use Test::More tests => 133;
+use Test::More tests => 185;
 
 my $startTime = time();
 my $localTest = ((caller(1))[0]//'Tree::Ops') eq "Tree::Ops";                   # Local testing mode
@@ -2869,11 +4069,12 @@ makeDieConfess;
 
 #goto latestTest;
 
-if (1) {                                                                        #Tnew #Topen #Tsingle #Tclose #Tselect
+if (1) {                                                                        #Tnew #Topen #Tsingle #Tclose #Tselect #TactiveScope
   my $a = Tree::Ops::new 'a', 'A';
   for(1..2)
    {$a->open  ('b', "B$_");
     $a->single('c', "C$_");
+    ok $a->activeScope->key eq 'b';
     $a->close;
    }
   $a->single  ('d', 'D');
@@ -3024,7 +4225,32 @@ if (1) {                                                                        
   is_deeply $a->brackets, 'a(b(c)y(x)y(x)d(efgh(i(j))))';
  }
 
-if (1) {                                                                        #Tbrackets #TfirstMost #TlastMost #Tprint #Txml
+if (1) {                                                                        #TsiblingsStrictlyBetween #TsiblingsBefore #TsiblingsAfter
+  my $a = fromLetters('b(cde(f)ghi)j');
+  my ($c, $d, $f, $e, $g, $h, $i, $b, $j) = $a->by;
+# ok eval qq(\$$_->key eq '$_') for 'a'..'j';
+  is_deeply $a->print, <<END;
+Key      Value
+a
+  b
+    c
+    d
+    e
+      f
+    g
+    h
+    i
+  j
+END
+
+  is_deeply [$d->siblingsStrictlyBetween($h)], [$e, $g];
+  is_deeply [$d->siblingsAfter],               [$e, $g, $h, $i];
+  is_deeply [$g->siblingsBefore],              [$c, $d, $e];
+  eval {$e->siblingsStrictlyBetween($f)};
+  ok $@ =~ m(Must be siblings);
+ }
+
+if (1) {                                                                        #Tbrackets #TfirstMost #TlastMost #TnextMost #TprevMost #Tprint #Txml #Tleaves #Tparents #TparentsPreOrder #TparentsPostOrder #TparentsReversePreOrder #TparentsReversePostOrder
   my $a = fromLetters('b(c)y(x)d(efgh(i(j)))');
   is_deeply $a->print, <<END;
 Key        Value
@@ -3045,8 +4271,84 @@ END
   is_deeply $a->xml,
    '<a><b><c/></b><y><x/></y><d><e/><f/><g/><h><i><j/></i></h></d></a>';
 
-  is_deeply $a->firstMost->brackets, 'c';
-  is_deeply $a-> lastMost->brackets, 'j';
+  my ($c, $b, $x, $y, $e, $f, $g, $j, $i, $h, $d) = $a->by;
+
+  is_deeply [$c, $x, $e, $f, $g, $j], [$a->leaves];
+  is_deeply [$a, $b, $y, $d, $h, $i], [$a->parentsPreOrder];
+  is_deeply [$b, $y, $i, $h, $d, $a], [$a->parentsPostOrder];
+  is_deeply [$a->parents],            [$a->parentsPostOrder];
+
+  is_deeply [$a, $d, $h, $i, $y, $b], [$a->parentsReversePreOrder];
+  is_deeply [$i, $h, $d, $y, $b, $a], [$a->parentsReversePostOrder];
+
+  ok !$j->parents;
+
+  ok  $a->lastMost  == $j;
+  ok !$a->prevMost;
+  ok  $j->prevMost  == $g;
+  ok  $i->prevMost  == $g;
+  ok  $h->prevMost  == $g;
+  ok  $g->prevMost  == $f;
+  ok  $f->prevMost  == $e;
+  ok  $e->prevMost  == $x;
+  ok  $d->prevMost  == $x;
+  ok  $x->prevMost  == $c;
+  ok  $y->prevMost  == $c;
+  ok !$c->prevMost;
+  ok !$b->prevMost;
+  ok !$a->prevMost;
+
+  ok  $a->firstMost == $c;
+  ok  $a->nextMost  == $c;
+  ok  $b->nextMost  == $c;
+  ok  $c->nextMost  == $x;
+  ok  $y->nextMost  == $x;
+  ok  $x->nextMost  == $e;
+  ok  $d->nextMost  == $e;
+  ok  $e->nextMost  == $f;
+  ok  $f->nextMost  == $g;
+  ok  $g->nextMost  == $j;
+  ok  $h->nextMost  == $j;
+  ok  $i->nextMost  == $j;
+  ok !$j->nextMost;
+ }
+
+if (1) {
+  my $a = fromLetters('bc(d(e))f(g(h))');
+  is_deeply $a->print, <<END;
+Key      Value
+a
+  b
+  c
+    d
+      e
+  f
+    g
+      h
+END
+
+  my ($b, $e, $d, $c, $h, $g, $f) = $a->by;
+
+  is_deeply [$b, $e, $h], [$a->leaves];
+  is_deeply $g->key, 'g';
+
+  ok  $a->nextMost == $b;
+  ok  $b->nextMost == $e;
+  ok  $c->nextMost == $e;
+  ok  $d->nextMost == $e;
+  ok  $e->nextMost == $h;
+  ok  $f->nextMost == $h;
+  ok  $g->nextMost == $h;
+  ok !$h->nextMost;
+
+  ok !$a->prevMost;
+  ok !$b->prevMost;
+  ok  $c->prevMost == $b;
+  ok  $d->prevMost == $b;
+  ok  $e->prevMost == $b;
+  ok  $f->prevMost == $e;
+  ok  $g->prevMost == $e;
+  ok  $h->prevMost == $e
  }
 
 if (1) {                                                                        #Tstep #TstepBack #TstepEnd #TstepEndBack
@@ -3068,7 +4370,7 @@ if (1) {                                                                        
   is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
  }
 
-if (1) {                                                                        #Tabove #Tbelow #Tbefore #Tafter
+if (1) {                                                                        #Tabove #Tbelow #Tbefore #Tafter #Tlineage
   my %l = map{$_->key=>$_} fromLetters('b(c(d(efgh(i(j)k)l)m)n')->by;
   my ($a, $b, $c, $d, $e, $f, $g, $h, $i, $j, $k, $l, $m, $n) = @l{'a'..'n'};
 
@@ -3101,6 +4403,9 @@ END
 
   ok  $c->before($n) == $c;
   ok !$c->before($m);
+
+  is_deeply [map{$_->key} $j->lineage($d)], [qw(j i h d)];
+  ok !$d->lineage($m);
  }
 
 if (1) {                                                                        #TmostRecentCommonAncestor
@@ -3141,14 +4446,6 @@ if (1) {                                                                        
   $d->first->unwrap;
   is_deeply $d->brackets,       'd(efgh(i(j)))';
   is_deeply $a->brackets, 'a(b(c)d(efgh(i(j))))';
- }
-
-if (1) {                                                                        #TsiblingsBefore #TsiblingsAfter
-  my ($c, $d, $e, $f, $g, $b, $a) = fromLetters('b(cdefg)')->by;
-
-  ok eval qq(\$$_->key eq '$_') for 'a'..'g';
-  is_deeply [map {$_->key} $e->siblingsBefore], ["c", "d"];
-  is_deeply [map {$_->key} $e->siblingsAfter ], ["f", "g"];
  }
 
 if (1) {                                                                        #TnextPreOrderPath
@@ -3425,6 +4722,24 @@ END
   is_deeply test($d->prevPostOrderPath), 'b';
   is_deeply test($b->prevPostOrderPath), 'c';
   is_deeply test($c->prevPostOrderPath), '';
+ }
+
+if (1) {                                                                        #Tinclude
+
+  my $i = fromLetters('B(CD)');
+  my $a = Tree::Ops::new 'a';
+     $a->open ('b');
+     $a->include($i->first);
+     $a->close;
+
+  is_deeply $a->print, <<END;
+Key      Value
+a
+  b
+    B
+      C
+      D
+END
  }
 
 done_testing;

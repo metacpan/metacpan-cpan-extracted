@@ -70,7 +70,8 @@ sub _uniq                            ;
 
 #################################################################
 
-our $VERSION = 0.001_000;
+use version 0.77;
+our $VERSION = version->declare("0.010");
 
 our %EXPORT_TAGS;
 
@@ -121,14 +122,16 @@ sub Export : ATTR(BEGIN)
         $tagref = [ $tagref ];
     }
 
+    my $debugging = $Exporter::Verbose || $Assert_Debug;
+
     my    $his_export_ok = $package . "::EXPORT_OK";
     push @$his_export_ok, $exportee;
-    carp "Adding $exportee to EXPORT_OK in $package" if $Exporter::Verbose;
+    carp "Adding $exportee to EXPORT_OK in $package at ",__FILE__," line ",__LINE__ if $debugging;
 
     if ($tagref) {
         my $his_export_tags = $package . "::EXPORT_TAGS";
         for my $tag (@$tagref, qw(all)) {
-            carp "Adding $exportee to EXPORT_TAG :$tag in $package" if $Exporter::Verbose;
+            carp "Adding $exportee to EXPORT_TAG :$tag in $package at ",__FILE__," line ",__LINE__ if $debugging;
             push @{ $his_export_tags->{$tag} }, $exportee;
         }
     }
@@ -184,8 +187,8 @@ sub _init_public_vars() {
     Acme::Plural->import();
 }
 
-BEGIN     { _init_envariables() }
-UNITCHECK { _init_public_vars() }
+# Now run that function right now, before the rest of the function:
+BEGIN { _init_envariables() }
 
 sub botch($)
     :Export( qw[botch] )
@@ -768,6 +771,8 @@ BEGIN {
     tie our %PLURAL    => "Acme::Plural::pl_simple";
     tie our %N_PLURAL  => "Acme::Plural::pl_count";
 }
+
+_init_public_vars();
 
 1;
 

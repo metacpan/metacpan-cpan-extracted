@@ -1,5 +1,8 @@
 Revision history for PkgConfig
 
+0.24026 2020-07-19 06:17:28 -0600
+  - Fixed path on FreeBSD to use te modern defaults (gh#49, tomhukins++)
+
 0.23026 2018-10-15 05:31:23 -0400
   - Fixed only used once warning (gh#45, gh#46 Ari Jolma++)
 

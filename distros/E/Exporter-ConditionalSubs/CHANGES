@@ -1,6 +1,11 @@
 Changelog for Exporter-ConditionalSubs
 
-v1.11.0 2020-07-09T15:41:47
+v1.11.1 2020-07-17T15:51:55
+ - Update README (Andrew Hewus Fresh)
+ - Remove more generated POD sections (Andrew Hewus Fresh)
+ - Switch to Pod::Weaver for VERSION and NAME (Andrew Hewus Fresh)
+
+v1.11.0 2020-07-09T15:41:39
  - Update README (Andrew Hewus Fresh)
  - SM-2590  Documentation (Larry Leszczynski)
  - SM-2590  Clean up requires (Larry Leszczynski)

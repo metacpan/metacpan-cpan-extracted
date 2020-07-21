@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Code::TidyAll::Config::INI::Reader 0.44;
 use List::Util 1.45 qw( uniqstr );
@@ -209,6 +209,11 @@ my $perltidyrc = <<'EOF';
 --no-outdent-long-comments
 --iterations=2
 -wbb="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="
+# This appears to be needed with recent Perl::Tidy versions and
+# Code::TidyAll. Otherwise it somehow turns UTF-8 POD text into
+# ISO-8859-1. Setting this to utf8 doesn't work. This is almost certainly
+# because of https://github.com/houseabsolute/perl-code-tidyall/issues/84
+--character-encoding=none
 EOF
 
 sub _perltidyrc {$perltidyrc}
@@ -306,7 +311,7 @@ Dist::Zilla::Plugin::DROLSKY::TidyAll - Creates default tidyall.ini, perltidyrc,
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for Pod::Coverage .*
 

@@ -70,6 +70,8 @@ package Sidef::Parser {
                      | Bag\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Set::Bag') })
                      | Str(?:ing)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::String::String') })
                      | Num(?:ber)?+\b                 (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Number') })
+                     | Mod\b                          (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Mod') })
+                     | Gauss\b                        (?{ state $x = bless({}, 'Sidef::DataTypes::Number::Gauss') })
                      | Inf\b                          (?{ state $x = Sidef::Types::Number::Number->inf })
                      | NaN\b                          (?{ state $x = Sidef::Types::Number::Number->nan })
                      | Infi\b                         (?{ state $x = Sidef::Types::Number::Complex->new(0, Sidef::Types::Number::Number->inf) })
@@ -202,6 +204,8 @@ package Sidef::Parser {
                   Bag
                   Str String
                   Num Number
+                  Mod
+                  Gauss
                   Range
                   RangeStr RangeString
                   RangeNum RangeNumber
@@ -1957,7 +1961,7 @@ package Sidef::Parser {
                   $self->get_init_vars(code      => $opt{code},
                                        with_vals => 0);
 
-                $self->backtrack_whitespace();
+                $self->backtrack_whitespace(code => $opt{code});
 
                 @{$var_names}
                   || $self->fatal_error(

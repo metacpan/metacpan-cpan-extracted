@@ -10,7 +10,7 @@
 #ABSTRACT: Common methods for App::Cme
 
 package App::Cme::Common;
-$App::Cme::Common::VERSION = '1.031';
+$App::Cme::Common::VERSION = '1.032';
 use strict;
 use warnings;
 use 5.10.1;
@@ -24,6 +24,8 @@ use Path::Tiny;
 use Encode qw(decode_utf8);
 
 my @store;
+
+$::_use_log4perl_to_warn = 1;
 
 sub cme_global_options {
   my ( $class, $app ) = @_;
@@ -258,7 +260,7 @@ App::Cme::Common - Common methods for App::Cme
 
 =head1 VERSION
 
-version 1.031
+version 1.032
 
 =head1 SYNOPSIS
 

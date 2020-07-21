@@ -4,7 +4,7 @@
 
 use strict;
 
-use Test::More tests => 12;
+use Test::More tests => 14;
 
 BEGIN {use_ok('Alien::Taco');}
 BEGIN {use_ok('Alien::Taco::Object');}
@@ -78,6 +78,15 @@ is_deeply($t->msg(), {
     },
     'get_attribute');
 
+$t->get_class_attribute('Class::Name', 'att_name');
+
+is_deeply($t->msg(), {
+        action => 'get_class_attribute',
+        class => 'Class::Name',
+        name => 'att_name',
+    },
+    'get_class_attribute');
+
 $t->get_value('var_name');
 
 is_deeply($t->msg(), {
@@ -105,6 +114,16 @@ is_deeply($t->msg(), {
         value => 999,
     },
     'set_attribute');
+
+$t->set_class_attribute('Class::Name', 'att_name', 2468);
+
+is_deeply($t->msg(), {
+        action => 'set_class_attribute',
+        class => 'Class::Name',
+        name => 'att_name',
+        value => 2468,
+    },
+    'set_class_attribute');
 
 $t->set_value('var_name', '!');
 

@@ -390,14 +390,14 @@ struct SPVM_env {
   void (*inc_ref_count)(SPVM_ENV* env, void* object);
   void (*dec_ref_count)(SPVM_ENV* env, void* object);
   int32_t (*enter_scope)(SPVM_ENV* env);
-  void (*push_mortal)(SPVM_ENV* env, void* object);
+  int32_t (*push_mortal)(SPVM_ENV* env, void* object);
   void (*leave_scope)(SPVM_ENV* env, int32_t scope_id);
   int32_t (*remove_mortal)(SPVM_ENV* env, int32_t scope_id, void* remove_object);
   int32_t (*is_type)(SPVM_ENV* env, void* object, int32_t basic_type_id, int32_t type_dimension);
   int32_t (*has_callback)(SPVM_ENV* env, void* object, int32_t callback_basic_type_id);
   int32_t (*get_object_basic_type_id)(SPVM_ENV* env, void* object);
   int32_t (*get_object_type_dimension)(SPVM_ENV* env, void* object);
-  void (*weaken)(SPVM_ENV* env, void** object_address);
+  int32_t (*weaken)(SPVM_ENV* env, void** object_address);
   int32_t (*isweak)(SPVM_ENV* env, void** object);
   void (*unweaken)(SPVM_ENV* env, void** object_address);
   void* (*alloc_memory_block_zero)(SPVM_ENV* env, int64_t byte_size);

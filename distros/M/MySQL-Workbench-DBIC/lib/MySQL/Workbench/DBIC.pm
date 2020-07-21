@@ -14,7 +14,7 @@ use MySQL::Workbench::Parser;
 
 # ABSTRACT: create DBIC scheme for MySQL workbench .mwb files
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 has output_path              => ( is => 'ro', required => 1, default => sub { '.' } );
 has file                     => ( is => 'ro', required => 1 );
@@ -114,6 +114,11 @@ sub create_schema{
         push @files, $self->_class_template( $table, $relations{$table->name}, $custom_code );
     }
 
+    for my $view ( @{ $parser->views || [] } ) {
+        my $custom_code = $self->_custom_code_table( $view );
+        push @files, $self->_view_template( $view, $custom_code );
+    }
+
     push @files, @scheme;
 
     $self->_write_files( @files );
@@ -191,26 +196,13 @@ sub _write_files{
 sub _has_many_template{
     my ($self, $to, $rels) = @_;
 
-    my $to_class = $to;
-    my $name     = $to;
+    my $name                 = $to;
+    my ($to_class, $package) = $self->_create_class_and_package_name( $to );
 
     if ( defined $self->remove_table_prefix ) {
         my $prefix = $self->remove_table_prefix;
-        $to_class  =~ s{\A\Q$prefix\E}{};
         $name      =~ s{\A\Q$prefix\E}{};
     }
-
-    if ( $self->uppercase ) {
-        $to_class = join '', map{ ucfirst $_ }split /[_-]/, $to;
-    }
-
-    my $package = join '::', (
-       ( $self->namespace ? $self->namespace : () ),
-       $self->schema_name,
-       ( length $self->result_namespace ? $self->result_namespace : () ),
-       'Result',
-       $to_class,
-    );
 
     my %has_many_rels;
     my $counter = 1;
@@ -239,26 +231,13 @@ __PACKAGE__->has_many($temp_field => '$package',
 sub _belongs_to_template{
     my ($self, $from, $rels) = @_;
 
-    my $from_class = $from;
-    my $name = $from;
+    my $name                   = $from;
+    my ($from_class, $package) = $self->_create_class_and_package_name( $from );
 
     if ( defined $self->remove_table_prefix ) {
         my $prefix  = $self->remove_table_prefix;
-        $from_class =~ s{\A\Q$prefix\E}{};
         $name       =~ s{\A\Q$prefix\E}{};
     }
-
-    if ( $self->uppercase ) {
-        $from_class = join '', map{ ucfirst $_ }split /[_-]/, $from;
-    }
-
-    my $package = join '::', (
-       ( $self->namespace ? $self->namespace : () ),
-       $self->schema_name,
-       ( length $self->result_namespace ? $self->result_namespace : () ),
-       'Result',
-       $from_class,
-    );
 
     my %belongs_to_rels;
     my $counter = 1;
@@ -284,11 +263,10 @@ __PACKAGE__->belongs_to($temp_field => '$package',
     return $string;
 }
 
-sub _class_template{
-    my ($self, $table, $relations, $custom_code) = @_;
+sub _create_class_and_package_name {
+    my ($self, $name) = @_;
 
-    my $name    = $table->name;
-    my $class   = $name;
+    my $class = $name;
 
     if ( defined $self->remove_table_prefix ) {
         my $prefix = $self->remove_table_prefix;
@@ -306,6 +284,15 @@ sub _class_template{
        'Result',
        $class,
     );
+
+    return ($class, $package);
+}
+
+sub _class_template{
+    my ($self, $table, $relations, $custom_code) = @_;
+
+    my $name              = $table->name;
+    my ($class, $package) = $self->_create_class_and_package_name( $name );
 
     my ($has_many, $belongs_to) = ('','');
 
@@ -402,6 +389,93 @@ $custom_code
     return $package, $template;
 }
 
+sub _view_template{
+    my ($self, $view, $custom_code) = @_;
+
+    my $name              = $view->name;
+    my ($class, $package) = $self->_create_class_and_package_name( $name );
+
+    my $comment = $view->comment // '{}';
+    utf8::upgrade( $comment );
+
+    my $data;
+    my $view_comment_perl = '';
+    eval {
+        $data = JSON->new->decode( $comment );
+    };
+
+    if ( !ref $data || 'HASH' ne ref $data ) {
+        $data               = {};
+        $view_comment_perl = $comment if $comment;
+    }
+    elsif ( $data->{comment} ) {
+        $view_comment_perl = $data->{comment};
+    }
+
+    if ( $view_comment_perl ) {
+        $view_comment_perl = sprintf "\n\n=head1 DESCRIPTION\n\n%s\n\n=cut", $view_comment_perl;
+    }
+
+    my @core_components = $self->inherit_from_core ? () : qw(PK::Auto Core);
+    my $components      = join( ' ', @core_components, @{ $data->{components} || [] } );
+    my $load_components = $components ? "__PACKAGE__->load_components( qw/$components/ );" : '';
+
+    my @columns = map{ $_->name }@{ $view->columns };
+    my $column_string = '';
+
+    if ( !$self->column_details ) {
+        $column_string = "qw/\n" . join "\n", map{ "    " . $_ }@columns, "    /";
+    }
+    else {
+        my @columns = @{ $view->columns };
+
+        for my $column ( @columns ) {
+            $column_string .= $self->_column_details( $view, $column, {}, $data );
+        }
+    }
+
+    my $version       = $self->version;
+    my $inherit_from  = $self->inherit_from_core ? '::Core' : '';
+    my $use_utf8      = $self->utf8 ? "\nuse utf8;" : '';
+    my $definition    = $view->definition;
+    my $classes       = join ', ', map {
+        my ($class, $package) = $self->_create_class_and_package_name( $_ );
+        qq~"$package"~
+    } @{ $view->tables || [] };
+
+    my $template = qq~package $package;
+
+# ABSTRACT: Result class for $name$view_comment_perl
+
+use strict;
+use warnings;$use_utf8
+use base qw(DBIx::Class$inherit_from);
+
+our \$VERSION = $version;
+
+$load_components
+__PACKAGE__->table_class('DBIx::Class::ResultSource::View');
+__PACKAGE__->table( '$name' );
+
+__PACKAGE__->result_source_instance->view_definition(
+    "$definition"
+);
+
+__PACKAGE__->add_columns(
+$column_string
+);
+
+# ---
+# Put your own code below this comment
+# ---
+$custom_code
+# ---
+
+1;~;
+
+    return $package, $template;
+}
+
 sub _column_details {
     my ($self, $table, $column, $foreign_keys, $data) = @_;
 
@@ -429,8 +503,10 @@ sub _column_details {
         push @options, "is_numeric         => 1,";
     }
 
-    push @options, "retrieve_on_insert => 1," if first{ $name eq $_ }@{ $table->primary_key };
-    push @options, "is_foreign_key     => 1," if $foreign_keys->{$name};
+    if ( $table->isa('MySQL::Workbench::Parser::Table') ) {
+        push @options, "retrieve_on_insert => 1," if first{ $name eq $_ }@{ $table->primary_key };
+        push @options, "is_foreign_key     => 1," if $foreign_keys->{$name};
+    }
 
     my %flags = %{ $column->flags };
     if ( %flags ) {
@@ -705,7 +781,7 @@ MySQL::Workbench::DBIC - create DBIC scheme for MySQL workbench .mwb files
 
 =head1 VERSION
 
-version 1.19
+version 1.20
 
 =head1 SYNOPSIS
 

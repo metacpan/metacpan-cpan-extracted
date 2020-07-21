@@ -13,7 +13,7 @@ if ( $^O eq 'MSWin32' ) {
 }
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Find or build Gearman",
+  "ABSTRACT" => "Find or build libgearman",
   "AUTHOR" => "Thibault Duponchelle <thibault.duponchelle\@gmail.com>",
   "VERSION_FROM" => "lib/Alien/Gearman.pm",
   "CONFIGURE_REQUIRES" => {

@@ -1,0 +1,28 @@
+
+Message 1  
+
+Subset 1
+
+     1  001001               11  WMO BLOCK NUMBER [NUMERIC]
+     2  001002              538  WMO STATION NUMBER [NUMERIC]
+     3  004002                6  MONTH [MONTH]
+     4  004003                3  DAY [DAY]
+     5  004004                6  HOUR [HOUR]
+     6  012101           288.75  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+     7  020003                1  PRESENT WEATHER (SEE NOTE 1) [CODE TABLE]
+     8  011001               80  WIND DIRECTION [DEGREE TRUE]
+     9  011002              1.0  WIND SPEED [M/S]
+    10  013033              1.3  EVAPORATION/EVAPOTRANSPIRATION [KG/M**2]
+
+Subset 2
+
+     1  001001               11  WMO BLOCK NUMBER [NUMERIC]
+     2  001002              520  WMO STATION NUMBER [NUMERIC]
+     3  004002                5  MONTH [MONTH]
+     4  004003               30  DAY [DAY]
+     5  004004               18  HOUR [HOUR]
+     6  012101           294.65  TEMPERATURE/DRY-BULB TEMPERATURE [K]
+     7  020003                2  PRESENT WEATHER (SEE NOTE 1) [CODE TABLE]
+     8  011001                0  WIND DIRECTION [DEGREE TRUE]
+     9  011002              1.0  WIND SPEED [M/S]
+    10  013033          missing  EVAPORATION/EVAPOTRANSPIRATION [KG/M**2]

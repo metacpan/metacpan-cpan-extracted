@@ -1,5 +1,5 @@
 package Game::Battleship::Craft;
-$Game::Battleship::Craft::VERSION = '0.0601';
+$Game::Battleship::Craft::VERSION = '0.0602';
 our $AUTHORITY = 'cpan:GENE';
 
 use Carp;
@@ -21,6 +21,11 @@ has position => (
     isa => ArrayRef[Num],
 );
 
+has orient => (
+    is  => 'ro',
+    isa => Int,
+);
+
 has points => (
     is  => 'ro',
     isa => Int,
@@ -34,6 +39,7 @@ has hits => (
 sub BUILD {
     my $self = shift;
     # Default the id to the upper-cased first char of name.
+    # XXX This is brittle!
     unless ( $self->id ) {
         $self->{id} = ucfirst substr( $self->{name}, 0, 1 );
     }
@@ -61,7 +67,7 @@ Game::Battleship::Craft
 
 =head1 VERSION
 
-version 0.0601
+version 0.0602
 
 =head1 SYNOPSIS
 
@@ -77,13 +83,9 @@ version 0.0601
 
 A C<Game::Battleship::Craft> object represents the profile of a Battleship craft.
 
-=head1 NAME
-
-Game::Battleship::Craft - A Battleship craft class
-
 =head1 PUBLIC METHODS
 
-=head2 B<new> %ARGUMENTS
+=head2 new
 
 =over 4
 
@@ -101,27 +103,31 @@ indicated by "lower-casing" this mark on a player grid.
 
 A required attribute provided to give the craft a name.
 
-=item * points => $NUMBER
+=item * points => $INTEGER
 
-An attribute used to define the line segment span on the playing grid.
+The number of total points that a craft is worth.
 
 =item * position => [$X, $Y]
 
 The position of the craft bow ("nose") on the grid.
 
-The craft is assumed to have a horizontal or vertical alignment.
+=item * orient => $BOOLEAN
 
-=item * hits => $NUMBER
+The vertical or horizontal orientation of the craft.
+
+Set this to C<0> for vertical and C<1> for horizontal.
+
+If not defined, the craft is randomly oriented on creation.
+
+=item * hits => $INTEGER
 
 Computed
 
 =back
 
-=head2 B<BUILD>
+=for Pod::Coverage BUILD
 
-Setup
-
-=head2 B<hit()>
+=head2 hit
 
   $points_remaining = $craft->hit;
 
@@ -140,7 +146,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

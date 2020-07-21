@@ -45,7 +45,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.31.0"
+         "version" : "v0.32.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -146,11 +146,17 @@
       "NewsExtractor::SiteSpecificExtractor::www_bcc_com_tw" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_bcc_com_tw.pm"
       },
+      "NewsExtractor::SiteSpecificExtractor::www_digitimes_com_tw" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_digitimes_com_tw.pm"
+      },
       "NewsExtractor::SiteSpecificExtractor::www_epochtimes_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_epochtimes_com.pm"
       },
       "NewsExtractor::SiteSpecificExtractor::www_fountmedia_io" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_fountmedia_io.pm"
+      },
+      "NewsExtractor::SiteSpecificExtractor::www_hkcna_hk" : {
+         "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_hkcna_hk.pm"
       },
       "NewsExtractor::SiteSpecificExtractor::www_hkcnews_com" : {
          "file" : "lib/NewsExtractor/SiteSpecificExtractor/www_hkcnews_com.pm"
@@ -205,7 +211,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.31.0",
+   "version" : "v0.32.0",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

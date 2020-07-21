@@ -13,6 +13,7 @@ requires            "Time::HiRes";
 requires            "Try::Tiny";
 requires            "Types::Common::Numeric";
 requires            "Types::Standard";
+requires            "Types::TypeTiny";
 
 on 'test' => sub {
     requires            "Test::Deep", '>= 1.130';

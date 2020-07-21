@@ -1,5 +1,5 @@
 package MIDI::Simple::Drummer::Jazz;
-$MIDI::Simple::Drummer::Jazz::VERSION = '0.0805';
+$MIDI::Simple::Drummer::Jazz::VERSION = '0.0808';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -8,8 +8,7 @@ use parent 'MIDI::Simple::Drummer';
 sub new {
     my $self = shift;
     $self->SUPER::new(
-        -patch   => 33, # Jazz
-        -brushes => 0,
+        -patch => 33,
         @_
     );
 }
@@ -143,7 +142,7 @@ MIDI::Simple::Drummer::Jazz
 
 =head1 VERSION
 
-version 0.0805
+version 0.0808
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ Log::Dispatch - Dispatches messages to one or more outputs
 
 # VERSION
 
-version 2.69
+version 2.70
 
 # SYNOPSIS
 
@@ -225,8 +225,8 @@ croak.
 
 # OUTPUT CLASSES
 
-An output class - e.g. [Log::Dispatch::File](https://metacpan.org/pod/Log::Dispatch::File) or
-[Log::Dispatch::Screen](https://metacpan.org/pod/Log::Dispatch::Screen) - implements a particular way
+An output class - e.g. [Log::Dispatch::File](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AFile) or
+[Log::Dispatch::Screen](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AScreen) - implements a particular way
 of dispatching logs. Many output classes come with this distribution,
 and others are available separately on CPAN.
 
@@ -298,11 +298,11 @@ This module was designed to be easy to subclass. If you want to handle
 messaging in a way not implemented in this package, you should be able to add
 this with minimal effort. It is generally as simple as subclassing
 Log::Dispatch::Output and overriding the `new` and `log_message`
-methods. See the [Log::Dispatch::Output](https://metacpan.org/pod/Log::Dispatch::Output) docs for more details.
+methods. See the [Log::Dispatch::Output](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AOutput) docs for more details.
 
 If you would like to create your own subclass for sending email then
-it is even simpler. Simply subclass [Log::Dispatch::Email](https://metacpan.org/pod/Log::Dispatch::Email) and
-override the `send_email` method. See the [Log::Dispatch::Email](https://metacpan.org/pod/Log::Dispatch::Email)
+it is even simpler. Simply subclass [Log::Dispatch::Email](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AEmail) and
+override the `send_email` method. See the [Log::Dispatch::Email](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AEmail)
 docs for more details.
 
 The logging levels that Log::Dispatch uses are borrowed from the standard
@@ -357,12 +357,12 @@ Log::Dispatch does. Originally written by Raphael Manfredi.
 
 # SEE ALSO
 
-[Log::Dispatch::ApacheLog](https://metacpan.org/pod/Log::Dispatch::ApacheLog), [Log::Dispatch::Email](https://metacpan.org/pod/Log::Dispatch::Email),
-[Log::Dispatch::Email::MailSend](https://metacpan.org/pod/Log::Dispatch::Email::MailSend), [Log::Dispatch::Email::MailSender](https://metacpan.org/pod/Log::Dispatch::Email::MailSender),
-[Log::Dispatch::Email::MailSendmail](https://metacpan.org/pod/Log::Dispatch::Email::MailSendmail), [Log::Dispatch::Email::MIMELite](https://metacpan.org/pod/Log::Dispatch::Email::MIMELite),
-[Log::Dispatch::File](https://metacpan.org/pod/Log::Dispatch::File), [Log::Dispatch::File::Locked](https://metacpan.org/pod/Log::Dispatch::File::Locked),
-[Log::Dispatch::Handle](https://metacpan.org/pod/Log::Dispatch::Handle), [Log::Dispatch::Output](https://metacpan.org/pod/Log::Dispatch::Output), [Log::Dispatch::Screen](https://metacpan.org/pod/Log::Dispatch::Screen),
-[Log::Dispatch::Syslog](https://metacpan.org/pod/Log::Dispatch::Syslog)
+[Log::Dispatch::ApacheLog](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AApacheLog), [Log::Dispatch::Email](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AEmail),
+[Log::Dispatch::Email::MailSend](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AEmail%3A%3AMailSend), [Log::Dispatch::Email::MailSender](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AEmail%3A%3AMailSender),
+[Log::Dispatch::Email::MailSendmail](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AEmail%3A%3AMailSendmail), [Log::Dispatch::Email::MIMELite](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AEmail%3A%3AMIMELite),
+[Log::Dispatch::File](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AFile), [Log::Dispatch::File::Locked](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AFile%3A%3ALocked),
+[Log::Dispatch::Handle](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AHandle), [Log::Dispatch::Output](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AOutput), [Log::Dispatch::Screen](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3AScreen),
+[Log::Dispatch::Syslog](https://metacpan.org/pod/Log%3A%3ADispatch%3A%3ASyslog)
 
 # SUPPORT
 
@@ -389,7 +389,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
@@ -404,6 +404,7 @@ Dave Rolsky <autarch@urth.org>
 - Graham Ollis <plicease@cpan.org>
 - Gregory Oschwald <goschwald@maxmind.com>
 - hartzell <hartzell@alerce.com>
+- Joelle Maslak <jmaslak@antelope.net>
 - Johann Rolschewski <jorol@cpan.org>
 - Jonathan Swartz <swartz@pobox.com>
 - Karen Etheridge <ether@cpan.org>
@@ -423,7 +424,7 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Dave Rolsky.
+This software is Copyright (c) 2020 by Dave Rolsky.
 
 This is free software, licensed under:
 

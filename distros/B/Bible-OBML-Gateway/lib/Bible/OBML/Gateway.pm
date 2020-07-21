@@ -6,13 +6,14 @@ use 5.016;
 use exact;
 use exact::class;
 use Mojo::DOM;
-use Mojo::File;
+use Mojo::Util qw( encode decode );
+use Mojo::File 'path';
 use Mojo::URL;
 use Mojo::UserAgent;
-use Bible::OBML;
-use Bible::Reference 1.02;
+use Bible::OBML 1.14;
+use Bible::Reference 1.04;
 
-our $VERSION = '1.06'; # VERSION
+our $VERSION = '1.10'; # VERSION
 
 has ua  => sub { return Mojo::UserAgent->new };
 has url => sub { return Mojo::URL->new('https://www.biblegateway.com/passage/') };
@@ -45,7 +46,7 @@ sub get {
 
     my $result = $self->ua->get($url)->result;
     croak(qq{Failed to get "$book_chapter" via "$url"})
-        unless ( $result and $result->code == 200 and $result->dom->at('h1.bcv') );
+        unless ( $result and $result->code == 200 and $result->dom->at('div.dropdown-display-text') );
 
     return $self->_parse( $result->body, $result->dom );
 }
@@ -56,14 +57,13 @@ sub _parse {
     $self->_body($body);
     $self->_dom( $dom // Mojo::DOM->new($body) );
 
-    ( my $book_chapter = $self->_dom->at('h1.bcv')->text ) =~ s/:.+$//;
+    ( my $book_chapter = $self->_dom->at('div.dropdown-display-text')->text ) =~ s/:.+$//;
 
     my $passage = Mojo::DOM->new(
-        $self->_dom->at('div.passage-bible div.passage-content div:first-child')->to_string
+        $self->_dom->at('div.passage-text div.passage-content div:first-child')->to_string
     )->at('div');
 
     delete $passage->root->attr->{'class'};
-    $passage->at('h1')->remove;
     $passage->descendant_nodes->grep( sub { $_->type eq 'comment' } )->each( sub { $_->remove } );
 
     $passage->descendant_nodes->grep( sub { $_->tag and $_->tag eq 'i' } )->each( sub {
@@ -108,15 +108,15 @@ sub _parse {
     } );
 
     $passage->descendant_nodes->grep( sub {
-        $_->tag and $_->tag eq 'span' and $_->attr('class') and $_->attr('class') eq 'chapternum'
+        $_->tag and $_->tag eq 'span' and $_->attr('class') and $_->attr('class') =~ /\bchapternum\b/
     } )->each( sub {
-        $_->replace('|1|');
+        $_->replace('|1| ');
     } );
 
     $passage->descendant_nodes->grep( sub {
-        $_->tag and $_->tag eq 'sup' and $_->attr('class') and $_->attr('class') eq 'versenum'
+        $_->tag and $_->tag eq 'sup' and $_->attr('class') and $_->attr('class') =~ /\bversenum\b/
     } )->each( sub {
-        $_->replace( '|' . ( ( $_->content =~ /(\d+)/ ) ? $1 : '?' ) . '|' );
+        $_->replace( '|' . ( ( $_->content =~ /(\d+)/ ) ? $1 : '?' ) . '| ' );
     } );
 
     $passage->descendant_nodes->grep( sub { $_->tag and $_->tag eq 'p' } )->each( sub {
@@ -151,23 +151,33 @@ sub _parse {
         $_->replace( '_' . $_->content );
     } );
 
-    my $obml = '~' . $book_chapter . "~\n\n" . $passage->content;
+    my $obml = '~ ' . $book_chapter . " ~\n\n" . $passage->content;
 
-    $obml =~ s/^[ ]*_{2,}/ ' ' x 6 /msge;
-    $obml =~ s/^[ ]*_/ ' ' x 4 /msge;
-    $obml =~ s/(\{[^\}]+\})(\s*)(\[[^\]]+\])/$3$2$1/g;
-    $obml =~ s/\[\*(\|\d+\|)/$1*/g;
-    $obml =~ s/((?:(?:\[[^\]]+\])|\s|(?:\{[^\}]+\}))+)\*\]/*$1/g;
-    $obml =~ s/\[\*/*/g;
-    $obml =~ s/\*\]/*/g;
-    $obml =~ s/=[^=\n]+=\n+(=[^=\n]+=)/$1/msg;
-    $obml =~ s/<span.*?>(.*?)<\/span>/$1/msg;
-    $obml =~ s/(\*[^\*\{\[]+)(\s*\{[^\}]*\}\s*|\s*\[[^\]]*\]\s*)/$1*$2*/msg;
-    $obml =~ s|<[^>]*>||msg;
-
-    utf8::decode($obml);
     $obml = $self->_obml_lib->desmartify($obml);
-    utf8::encode($obml);
+
+    $obml =~ s/<span.*?>(.*?)<\/span>/$1/sg; # rm <span> tags but keep content
+    $obml =~ s|<[^>]*>||sg;                  # rm all remaining HTML
+
+    $obml =~ s/\|1\|(.*?\|1\|)/$1/s; # rm dup verse # if chapter # fails override (ex: John 8)
+
+    $obml =~ s/[ \t]+/ /g;             # turn all whitespace ranges into single spaces
+    $obml =~ s/[ ]*\r?[ ]*\n[ ]*/\n/g; # rm spacing around line breaks and fix line breaks
+    $obml =~ s/\n{3,}/\n\n/g;          # rm extra blank lines
+    $obml =~ s/(?:^\s+|\s+$)//g;       # rm initial or postscript blank lines
+
+    $obml =~ s/^_{2,}/ ' ' x 6 /mge; # set double-indent (ex: Heb 1)
+    $obml =~ s/^_/     ' ' x 4 /mge; # set double-indent (ex: Heb 1)
+
+    $obml =~ s/(\{[^\}]+\})(\s*)(\[[^\]]+\])/$3$2$1/g; # reorder crossrefs before footnotes
+
+    # move footnotes, spaces, and crossrefs in front of woj end to after the woj end
+    $obml =~ s/((?:(?:\[[^\]]+\])|\s|(?:\{[^\}]+\}))+)\*\]/*$1/g;
+
+    $obml =~ s/\[\*/*/g; # set woj start
+    $obml =~ s/\*\]/*/g; # set woj end
+
+    $obml =~ s/([\*^])(\|\d+\|)(\s*)/$2$3$1/g; # fix markings left of verse number (ex: John 8)
+    $obml =~ s/=[^=\n]+=\n+(=[^=\n]+=)/$1/mg;  # rm preceeding duplicate header lines
 
     $self->data( $self->_obml_lib->parse($obml) );
     $self->obml( $self->_obml_lib->render( $self->data ) );
@@ -185,14 +195,14 @@ sub save {
     my ( $self, $filename ) = @_;
     croak('No filename provided to save to') unless ($filename);
     croak('No result to return HTML for') unless ( $self->_body );
-    Mojo::File->new($filename)->spurt( $self->_body );
+    path($filename)->spurt( $self->_body );
     return $self;
 }
 
 sub load {
     my ( $self, $filename ) = @_;
     croak('No filename provided to save to') unless ($filename);
-    $self->_parse( Mojo::File->new($filename)->slurp );
+    $self->_parse( decode( 'UTF-8', path($filename)->slurp ) );
     return $self;
 }
 
@@ -210,7 +220,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 1.06
+version 1.10
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway.svg)](https://travis-ci.org/gryphonshafer/Bible-OBML-Gateway)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bible-OBML-Gateway/badge.png)](https://coveralls.io/r/gryphonshafer/Bible-OBML-Gateway)

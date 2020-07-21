@@ -5,10 +5,10 @@
 use 5.008001;
 use strict;
 use warnings;
+use lib 'blib/lib', 'blib/arch', 't';
 use Test::More;
 use DBI     ':sql_types';
 use DBD::Pg ':pg_types';
-use lib 't','.';
 require 'dbdpg_test_setup.pl';
 select(($|=1,select(STDERR),$|=1)[1]);
 
@@ -131,9 +131,9 @@ sub test_outputs {
     my $E = $pgversion >= 80100 ? q{E} : q{};
     my $expected = qq{${E}'abc\123\\\\\\\\def\\\\000ghi'};
     is ($result, $expected, $t);
-    is ($dbh->quote($string, SQL_BLOB), $expected);
-    is ($dbh->quote($string, SQL_BINARY), $expected);
-    is ($dbh->quote($string, SQL_VARBINARY), $expected);
-    is ($dbh->quote($string, SQL_LONGVARBINARY), $expected);
+    is ($dbh->quote($string, SQL_BLOB), $expected, "$t (SQL_BLOB)");
+    is ($dbh->quote($string, SQL_BINARY), $expected, "$t (SQL_BINARY)");
+    is ($dbh->quote($string, SQL_VARBINARY), $expected, "$t (SQL_VARBINARY)");
+    is ($dbh->quote($string, SQL_LONGVARBINARY), $expected, "$t (SQL_LONGVARBINARY)");
     return;
 }

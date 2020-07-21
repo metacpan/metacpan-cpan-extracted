@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   XAO::Base: '1.23'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
 license: artistic
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,5 +45,4 @@ requires:
   perl: '5.010001'
 resources:
   repository: git://github.com/amaltsev/XAO-Web.git
-version: '1.80'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '1.81'

@@ -1,4 +1,9 @@
 Revision history for Perl extension Geo::BUFR.
+1.38 2020-07-15
+- Include replication descriptors in output for option --all_operators
+  in bufrread.pl (or more generally for set_show_all_operators())
+- New accessor method get_bufr_length()
+- Default tables for utility programs changed to master table version 33
 1.37 2019-02-16
 - Allow for ecCodes table format (BUFRDC is still default)
 - Allow for BUFR edition 0 and 1
