@@ -33,7 +33,6 @@
       "runtime" : {
          "requires" : {
             "Class::Method::Modifiers" : "0",
-            "Data::Alias" : "0",
             "Devel::StrictMode" : "0",
             "Function::Parameters" : "2.001003",
             "Import::Into" : "0",
@@ -52,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.05,
+   "version" : 0.06,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

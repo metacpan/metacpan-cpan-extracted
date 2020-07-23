@@ -1,5 +1,5 @@
 package QuadPres::Base;
-$QuadPres::Base::VERSION = '0.28.3';
+$QuadPres::Base::VERSION = '0.30.0';
 use 5.016;
 use strict;
 use warnings;
@@ -55,7 +55,7 @@ QuadPres::Base - base class
 
 =head1 VERSION
 
-version 0.28.3
+version 0.30.0
 
 =head1 SYNOPSIS
 

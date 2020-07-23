@@ -1,7 +1,7 @@
 package Acme::CPANModules::PERLANCAR::Weird;
 
-our $DATE = '2019-01-09'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2020-07-21'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 our $LIST = {
     summary => 'Weird modules',
@@ -40,11 +40,9 @@ Acme::CPANModules::PERLANCAR::Weird - Weird modules
 
 =head1 VERSION
 
-This document describes version 0.005 of Acme::CPANModules::PERLANCAR::Weird (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2019-01-09.
+This document describes version 0.006 of Acme::CPANModules::PERLANCAR::Weird (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2020-07-21.
 
 =head1 DESCRIPTION
-
-Weird modules.
 
 List of modules I find weird (non-pejoratively speaking) in one way or another,
 e.g. peculiar API, name.
@@ -61,6 +59,23 @@ intuitive to me compared to C<join()>.
 
 
 =back
+
+=head1 FAQ
+
+=head2 What are ways to use this module?
+
+Aside from reading it, you can install all the listed modules using
+L<cpanmodules>:
+
+    % cpanmodules ls-entries PERLANCAR::Weird | cpanm -n
+
+or L<Acme::CM::Get>:
+
+    % perl -MAcme::CM::Get=PERLANCAR::Weird -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+This module also helps L<lcpan> produce a more meaningful result for C<lcpan
+related-mods> when it comes to finding related modules for the modules listed
+in this Acme::CPANModules module.
 
 =head1 HOMEPAGE
 
@@ -90,7 +105,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

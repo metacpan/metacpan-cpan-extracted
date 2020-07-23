@@ -8,10 +8,10 @@ use Mojo::Util 'decode';
 
 use constant DEBUG => $ENV{MOJO_MIGRATIONS_DEBUG} || 0;
 
-our $VERSION = '3.003';
+our $VERSION = '3.004';
 
 has name => 'migrations';
-has 'sqlite';
+has sqlite => undef, weak => 1;
 
 sub active { $_[0]->_active($_[0]->sqlite->db) }
 
@@ -118,7 +118,7 @@ sub _active {
 
   $db->query(
     'create table if not exists mojo_migrations (
-       name    text unique not null,
+       name    text not null primary key,
        version integer not null check (version >= 0)
      )'
   ) if !$results or $results->sth->err;
@@ -183,7 +183,8 @@ Name for this set of migrations, defaults to C<migrations>.
   my $sql     = $migrations->sqlite;
   $migrations = $migrations->sqlite(Mojo::SQLite->new);
 
-L<Mojo::SQLite> object these migrations belong to.
+L<Mojo::SQLite> object these migrations belong to. Note that this attribute is
+weakened.
 
 =head1 METHODS
 

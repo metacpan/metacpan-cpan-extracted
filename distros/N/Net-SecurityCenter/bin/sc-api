@@ -2,8 +2,10 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Net::SecurityCenter;
+use Net::SecurityCenter::Utils qw(trim dumper);
 
 use Getopt::Long qw( :config gnu_compat );
 use Pod::Usage;
@@ -13,9 +15,7 @@ use JSON;
 use Carp;
 use English qw( -no_match_vars );
 
-use Data::Dumper;
-
-our $VERSION = '0.205';
+our $VERSION = '0.206';
 
 sub slurp {
 
@@ -38,11 +38,11 @@ sub config_parse_line {
 
     my ($value) = @_;
 
-    return 1 if ( $value =~ /^(yes|true)$/s );
-    return 0 if ( $value =~ /^(no|false)$/s );
+    return 1 if ( $value =~ m/^(yes|true)$/s );
+    return 0 if ( $value =~ m/^(no|false)$/s );
 
     if ( $value =~ /\,/ ) {
-        return map { trim($_) } split( /,/, $value );
+        return map { trim($_) } split /,/, $value;
     }
 
     return $value;
@@ -56,20 +56,20 @@ sub config_parser {
     my $section     = '_';    # Root section
     my $config_data = {};
 
-    foreach my $line ( split( /\n/, $config_string ) ) {
+    foreach my $line ( split /\n/, $config_string ) {
 
         chomp($line);
 
         # skip comments and empty lines
-        next if ( $line =~ /^\s*(#|;)/ );
-        next if ( $line =~ /^\s*$/ );
+        next if ( $line =~ m/^\s*([#;])/ );
+        next if ( $line =~ m/^\s*$/ );
 
-        if ( $line =~ /^\[(.*)\]\s*$/ ) {
+        if ( $line =~ m/^\[(.*)\]\s*$/ ) {
             $section = trim($1);
             next;
         }
 
-        if ( $line =~ /^([^=]+?)\s*=\s*(.*?)\s*$/ ) {
+        if ( $line =~ m/^([^=]+?)\s*=\s*(.*?)\s*$/ ) {
 
             my ( $field, $raw_value ) = ( $1, $2 );
             my $parsed_value = [ config_parse_line($raw_value) ];
@@ -88,16 +88,6 @@ sub config_parser {
     }
 
     return $config_data;
-
-}
-
-sub trim {
-
-    my $string = shift;
-    return $string unless ($string);
-
-    $string =~ s/^\s+|\s+$//g;
-    return $string;
 
 }
 
@@ -168,13 +158,7 @@ sub table {
     for my $row ( @{$rows} ) {
 
         if ( $output_format eq 'table' ) {
-            $table .= sprintf(
-                $format,
-                map {
-                    if   ($_) {$_}
-                    else      {''}
-                } @{$row}
-            );
+            $table .= sprintf( $format, map { $_ || '' } @{$row} );
         } else {
             $table .= sprintf( $format, map { trim($_) } @{$row} );
         }
@@ -196,7 +180,7 @@ my @options = (
 
     'help|h',
     'man',
-    'version',
+    'version|v',
     'verbose',
 
     'hostname=s',
@@ -210,9 +194,11 @@ my @options = (
     'csv',
     'tsv',
     'yaml',
+    'dumper'
+
 );
 
-my @output_formats = qw/json table csv tsv yaml/;
+my @output_formats = qw/json table csv tsv yaml dumper/;
 
 my $options = {};
 my $params  = {};
@@ -220,13 +206,30 @@ my $results = {};
 
 GetOptions( $options, @options ) or pod2usage( -verbose => 0 );
 
-my $api    = $ARGV[0] || undef;
-my $method = $ARGV[1] || undef;
-
-$api    =~ s/-/_/g if ($api);
-$method =~ s/-/_/g if ($method);
-
 pod2usage(1) if ( $options->{'help'} );
+
+if ( $options->{'version'} ) {
+
+    require IO::Socket::SSL;
+    my $io_socket_ssl = ($IO::Socket::SSL::VERSION) ? $IO::Socket::SSL::VERSION : 'n/a';
+
+    require LWP::UserAgent;
+    my $lwp_useragent = ($LWP::UserAgent::VERSION) ? $LWP::UserAgent::VERSION : 'n/a';
+
+    print "
+sc-api v$VERSION
+
+CORE
+  Perl                ($PERL_VERSION, $OSNAME)
+  Net::SecurityCenter ($Net::SecurityCenter::VERSION)
+  LWP::UserAgent      ($lwp_useragent)
+  IO::Socket::SSL     ($io_socket_ssl)
+
+";
+
+    exit(0);
+
+}
 
 if ( $options->{'config'} ) {
 
@@ -263,11 +266,15 @@ if ( $options->{'format'} ) {
 
 $options->{'format'} ||= 'json';
 
-$options->{'format'} = 'yaml'  if ( $options->{'yaml'} );
-$options->{'format'} = 'table' if ( $options->{'table'} );
-$options->{'format'} = 'json'  if ( $options->{'json'} );
-$options->{'format'} = 'csv'   if ( $options->{'csv'} );
-$options->{'format'} = 'tsv'   if ( $options->{'tsv'} );
+foreach (@output_formats) {
+    $options->{'format'} = $_ if ( $options->{$_} );
+}
+
+my $api    = $ARGV[0] || undef;
+my $method = $ARGV[1] || undef;
+
+$api    =~ s/-/_/g if ($api);
+$method =~ s/-/_/g if ($method);
 
 pod2usage( -verbose => 0 ) if ( !$api || !$method );
 
@@ -302,13 +309,8 @@ if ( $options->{'verbose'} ) {
 
     $sc_options->{'logger'} = Net::SecurityCenter::LoggerSimple->new;
 
-    {
-        local $Data::Dumper::Indent = 0;
-        local $Data::Dumper::Terse  = 1;
-
-        $sc_options->{'logger'}->debug("INPUT - Call $api -> $method");
-        $sc_options->{'logger'}->debug( "INPUT - Params: " . Dumper($params) );
-    }
+    $sc_options->{'logger'}->debug("INPUT - Call $api -> $method");
+    $sc_options->{'logger'}->debug( "INPUT - Params: " . dumper($params) );
 
 }
 
@@ -345,7 +347,7 @@ if ( ref $results eq 'ARRAY' || ref $results eq 'HASH' ) {
     }
 
     if ( $options->{'format'} eq 'dumper' ) {
-        print Dumper($results);
+        print dumper($results);
         exit(0);
     }
 
@@ -415,35 +417,31 @@ exit(0);
 
 package Net::SecurityCenter::LoggerSimple;
 
-use Test::More;
-
 sub new {
     my $class = shift;
     return bless {}, $class;
 }
 
-sub info {
-    my ( $self, $message ) = @_;
-    print STDERR "INFO - $message\n";
+sub _log {
+    my ( $self, $level, $message ) = @_;
+    print STDERR "[$$] $level - $message\n";
     return;
+}
+
+sub info {
+    return shift->_log( 'INFO', shift );
 }
 
 sub debug {
-    my ( $self, $message ) = @_;
-    print STDERR "DEBUG - $message\n";
-    return;
+    return shift->_log( 'DEBUG', shift );
 }
 
 sub warning {
-    my ( $self, $message ) = @_;
-    print STDERR "WARNING - $message\n";
-    return;
+    return shift->_log( 'WARNING', shift );
 }
 
 sub error {
-    my ( $self, $message ) = @_;
-    print STDERR "ERROR - $message\n";
-    return;
+    return shift->_log( 'ERROR', shift );
 }
 
 __END__
@@ -461,6 +459,7 @@ sc-api - Tenable.sc (SecurityCenter) API command line interface
 
         analysis
         credential
+        device_info
         feed
         file
         plugin
@@ -471,6 +470,7 @@ sc-api - Tenable.sc (SecurityCenter) API command line interface
         scan
         scan-result
         scanner
+        status
         system
         user
         zone
@@ -511,8 +511,6 @@ sc-api - Tenable.sc (SecurityCenter) API command line interface
 
             sc-api policy get id=1
 
-        
-
 =head1 DESCRIPTION
 
 C<sc-api> Tenable.sc (SecurityCenter) API command line interface.
@@ -521,72 +519,71 @@ C<sc-api> Tenable.sc (SecurityCenter) API command line interface.
 
 =head2 analysis
 
-See L<Net::SecurityCenter::Analysis> class.
+See L<Net::SecurityCenter::API::Analysis> class.
 
 =head2 credential
 
-See L<Net::SecurityCenter::Analysis> class.
+See L<Net::SecurityCenter::API::Analysis> class.
+
+=head2 device_info
+
+See L<Net::SecurityCenter::API::DeviceInfo> class.
 
 =head2 feed
 
-See L<Net::SecurityCenter::Feed> class.
+See L<Net::SecurityCenter::API::Feed> class.
 
 =head2 file
 
-See L<Net::SecurityCenter::File> class.
+See L<Net::SecurityCenter::API::File> class.
 
 =head2 plugin
 
-See L<Net::SecurityCenter::Plugin> class.
+See L<Net::SecurityCenter::API::Plugin> class.
 
 =head2 plugin-family
 
-See L<Net::SecurityCenter::PluginFamily> class.
+See L<Net::SecurityCenter::API::PluginFamily> class.
 
 =head2 policy
 
-See L<Net::SecurityCenter::Policy> class.
+See L<Net::SecurityCenter::API::Policy> class.
 
 =head2 report
 
-See L<Net::SecurityCenter::Report> class.
+See L<Net::SecurityCenter::API::Report> class.
 
 =head2 repository
 
-See L<Net::SecurityCenter::Repository> class.
+See L<Net::SecurityCenter::API::Repository> class.
 
 =head2 scan
 
-See L<Net::SecurityCenter::Scan> class.
+See L<Net::SecurityCenter::API::Scan> class.
 
 =head2 scan-result
 
-See L<Net::SecurityCenter::ScanResult> class.
+See L<Net::SecurityCenter::API::ScanResult> class.
 
 =head2 scanner
 
-See L<Net::SecurityCenter::Scanner> class.
+See L<Net::SecurityCenter::API::Scanner> class.
+
+=head2 status
+
+See L<Net::SecurityCenter::API::Scanner> class.
 
 =head2 system
 
-See L<Net::SecurityCenter::System> class.
+See L<Net::SecurityCenter::API::System> class.
 
 =head2 user
 
-See L<Net::SecurityCenter::User> class.
+See L<Net::SecurityCenter::API::User> class.
 
 =head2 zone
 
-See L<Net::SecurityCenter::Zone> class.
-
-
-=head1 OPTIONS
-
-=head2 --help
-
-=head2 --man
-
-=head2 --version
+See L<Net::SecurityCenter::API::Zone> class.
 
 =head1 OUTPUT FORMATS
 
@@ -607,7 +604,7 @@ L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2018-2019 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
+Copyright © 2018-2020 L<Giuseppe Di Terlizzi|https://metacpan.org/author/gdt>
 
 You may use and distribute this module according to the same terms
 that Perl is distributed under.

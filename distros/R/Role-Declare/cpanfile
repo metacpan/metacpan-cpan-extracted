@@ -1,5 +1,4 @@
 requires        'Class::Method::Modifiers';
-requires        'Data::Alias';
 requires        'Devel::StrictMode';
 requires        'Function::Parameters', '>= 2.001003';
 requires        'Import::Into';

@@ -1,12 +1,11 @@
 package Koha::Contrib::ARK::Writer;
-$Koha::Contrib::ARK::Writer::VERSION = '1.0.3';
 # ABSTRACT: Write biblio records into Koha Catalog
+$Koha::Contrib::ARK::Writer::VERSION = '1.0.5';
 use Moose;
-
-with 'MooseX::RW::Writer';
-
 use Modern::Perl;
 use C4::Biblio;
+
+with 'MooseX::RW::Writer';
 
 
 has ark => ( is => 'rw', isa => 'Koha::Contrib::ARK' );
@@ -41,7 +40,7 @@ Koha::Contrib::ARK::Writer - Write biblio records into Koha Catalog
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.5
 
 =head1 ATTRIBUTES
 
@@ -55,7 +54,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Demians.
+This software is Copyright (c) 2020 by Fréderic Demians.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
 package QuadPres::Url;
-$QuadPres::Url::VERSION = '0.28.3';
+$QuadPres::Url::VERSION = '0.30.0';
 use 5.016;
 use strict;
 use warnings;
@@ -171,7 +171,7 @@ __END__
 
 =head1 VERSION
 
-version 0.28.3
+version 0.30.0
 
 =head1 SYNOPSIS
 

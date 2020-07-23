@@ -1,0 +1,24 @@
+{
+    "type": "regular",
+    "response": [
+        {
+            "id": "27063",
+            "name": "HP-UX PHSS_36869 : HP System Management Homepage (SMH) for HP-UX, XSS (HPSBMA02274 SSRT071445 rev.3)",
+            "description": "s700_800 11.11 HP System Management Homepage A.2.2.6.2 : \n\nPotential security vulnerabilities have been identified with HP System\nManagement Homepage (SMH) for HP-UX. These vulnerabilities could by\nexploited remotely to allow cross site scripting (XSS)."
+        },
+        {
+            "id": "27064",
+            "name": "HP-UX PHSS_36870 : HP System Management Homepage (SMH) for HP-UX, XSS (HPSBMA02274 SSRT071445 rev.3)",
+            "description": "s700_800 11.23 HP System Management Homepage A.2.2.6.2 : \n\nPotential security vulnerabilities have been identified with HP System\nManagement Homepage (SMH) for HP-UX. These vulnerabilities could by\nexploited remotely to allow cross site scripting (XSS)."
+        },
+        {
+            "id": "27065",
+            "name": "HP-UX PHSS_36871  :  HP System Management Homepage (SMH) for HP-UX, XSS (HPSBMA02274 SSRT071445 rev.3)",
+            "description": "s700_800 11.31 HP System Management Homepage A.2.2.6.2 : \n\nPotential security vulnerabilities have been identified with HP System\nManagement Homepage (SMH) for HP-UX. These vulnerabilities could by\nexploited remotely to allow cross site scripting (XSS)."
+        }
+    ],
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1411997624
+}

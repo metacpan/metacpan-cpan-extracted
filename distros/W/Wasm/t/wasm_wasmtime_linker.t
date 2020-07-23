@@ -55,6 +55,23 @@ is(
       call [ isa => 'Wasm::Wasmtime::Func' ] => T();
       call call  => undef;
     };
+
+    call sub {
+      my $linker = shift;
+      my $instance3 = $linker->instantiate($module, $store);
+      $linker->define_instance("yy", $instance3);
+      1;
+    } => T();
+
+    call [ get_one_by_name => 'yy', 'add' ] => object {
+      call [ isa => 'Wasm::Wasmtime::Func' ] => T();
+      call [ call => 1, 2 ] => 3;
+    };
+
+    call sub {
+      my $linker = shift;
+      dies { $linker->get_one_by_name('zz','add') };
+    } => match qr/./;
   },
   'basics'
 );

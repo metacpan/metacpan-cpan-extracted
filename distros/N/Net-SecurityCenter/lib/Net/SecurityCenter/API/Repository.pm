@@ -9,7 +9,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.205';
+our $VERSION = '0.206';
 
 my $common_template = {
 
@@ -51,7 +51,7 @@ sub list {
     my $raw          = delete( $params->{'raw'} );
     my $repositories = $self->client->get( '/repository', $params );
 
-    return if ( !$repositories );
+    return               if ( !$repositories );
     return $repositories if ($raw);
     return sc_normalize_array($repositories);
 
@@ -74,7 +74,7 @@ sub get {
     my $repository_id = delete( $params->{'id'} );
     my $repository    = $self->client->get( "/repository/$repository_id", $params );
 
-    return if ( !$repository );
+    return             if ( !$repository );
     return $repository if ($raw);
     return sc_normalize_hash($repository);
 
@@ -176,19 +176,128 @@ Create a new instance of B<Net::SecurityCenter::API::Repository> using L<Net::Se
 
 =head1 METHODS
 
-=head2 list ( [ $fields ] )
+=head2 list
 
 Get the list of repositories.
 
-=head2 get ( $repository_id [, $fields ] )
+Params:
 
-Get the repository associated with C<repository_id>.
+=over 4
 
-=head2 get_device_info ( $repository_id, $ip_address [, $params ] )
+=item * C<type> : Repository type ('all', 'local', 'remote', 'offline')
 
-=head2 get_ip_info ( $ip_address [, $params ])
+=item * C<fields> : List of fields
 
-B<NOTE>: This method has been DEPRECATED as of SecurityCenter 5.7.0.
+=back
+
+
+=head2 get
+
+Get the repository associated with C<id>.
+
+Params:
+
+=over 4
+
+=item * C<id> : Repository ID
+
+=item * C<fields> : List of fields
+
+=back
+
+
+=head2 get_device_info
+
+Gets the device information for the Repository associated with C<id>
+
+Params:
+
+=over 4
+
+=item * C<id> : Repository ID
+
+=item * C<uuid> : Device UUID
+
+=item * C<ip> : IP Address
+
+=item * C<dns_name> : DNS Name
+
+=item * C<fields> : List of fields
+
+=back
+
+
+Allowed Fields:
+
+=over 4
+
+=item * C<ip> *
+
+=item * C<uuid> *
+
+=item * C<repositoryID> *
+
+=item * C<repositories>
+
+=item * C<repository>
+
+=item * C<score>
+
+=item * C<total>
+
+=item * C<severityInfo>
+
+=item * C<severityLow>
+
+=item * C<severityMedium>
+
+=item * C<severityHigh>
+
+=item * C<severityCritical>
+
+=item * C<macAddress>
+
+=item * C<policyName>
+
+=item * C<pluginSet>
+
+=item * C<netbiosName>
+
+=item * C<dnsName>
+
+=item * C<osCPE>
+
+=item * C<biosGUID>
+
+=item * C<tpmID>
+
+=item * C<mcafeeGUID>
+
+=item * C<lastAuthRun>
+
+=item * C<lastUnauthRun>
+
+=item * C<severityAll>
+
+=item * C<os>
+
+=item * C<hasPassive>
+
+=item * C<hasCompliance>
+
+=item * C<lastScan>
+
+=item * C<links>
+
+=back
+
+(*) always comes back
+
+
+=head2 get_ip_info
+
+B<NOTE>: This method has been DEPRECATED as of SecurityCenter 5.7.0
+(see C<get_device_info> method or L<Net::SecurityCenter::API::DeviceInfo>).
 
 
 =head1 SUPPORT
@@ -220,7 +329,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2019 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

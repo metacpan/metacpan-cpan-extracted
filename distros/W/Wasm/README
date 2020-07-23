@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.17
+    version 0.18
 
 SYNOPSIS
 
@@ -53,9 +53,10 @@ DESCRIPTION
     WebAssembly (see Wasm::Func for details). WebAssembly global variables
     can be imported into Perl using tied scalars (see Wasm::Global for
     details). WebAssembly linear memory can be queried and manipulated by
-    Perl (see Wasm::Memory for details). WebAssembly can optionally be
-    loaded directly by Perl without writing any Perl wrappers at all (see
-    Wasm::Hook for details).
+    Perl (see Wasm::Memory for details). Perl can throw or catch traps into
+    or out of WebAssembly (see Wasm::Trap for details). WebAssembly can
+    optionally be loaded directly by Perl without writing any Perl wrappers
+    at all (see Wasm::Hook for details).
 
     The example above shows WebAssembly Text (WAT) inlined into the Perl
     code for readability. In most cases you will want to compile your
@@ -183,6 +184,10 @@ SEE ALSO
     Wasm::Memory
 
       Interface to WebAssembly memory from Perl.
+
+    Wasm::Trap
+
+      Interface to WebAssembly traps.
 
     plasm
 

@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/ProcUtils/kill
-# and generated automatically using Perinci::CmdLine::Gen version 0.491
+# and generated automatically using Perinci::CmdLine::Gen version 0.496
 
-our $DATE = '2019-09-11'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-07-21'; # DATE
 our $DIST = 'App-ProcUtils'; # DIST
-our $VERSION = '0.037'; # VERSION
+our $VERSION = '0.038'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,13 +40,18 @@ proc-kill - Kill processes that match criteria
 
 =head1 VERSION
 
-This document describes version 0.037 of proc-kill (from Perl distribution App-ProcUtils), released on 2019-09-11.
+This document describes version 0.038 of proc-kill (from Perl distribution App-ProcUtils), released on 2020-07-21.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % proc-kill [options] [cmdline_match]
+ % proc-kill [--and=s] [--cmdline-not-match=s] [--code-json=s] [--code=s]
+     [--debug] [--dry-run] [--exec-match=s] [--exec-not-match=s]
+     [--format=name] [--json] [--log-level=level] [--logic=s]
+     [--(no)naked-res] [--or=s] [--page-result[=program]] [--pid=s+]
+     [--pids-json=s] [--quiet] [--signal=s] [--trace] [--uid=s+]
+     [--uids-json=s] [--verbose] [cmdline_match]
 
 =head1 OPTIONS
 
@@ -189,6 +195,10 @@ you want to pipe the result for more post-processing. In this case you can use
     [1,2,3]
 
 
+=item B<--page-result>
+
+Filter output through a pager.
+
 =back
 
 =head2 Other options
@@ -198,6 +208,10 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--dry-run>
 
 Run in simulation mode (also via DRY_RUN=1).
+
+Default value:
+
+ ""
 
 =item B<--help>, B<-h>, B<-?>
 
@@ -265,7 +279,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

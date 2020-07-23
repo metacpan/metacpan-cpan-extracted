@@ -1,5 +1,5 @@
 package QuadPres::WriteContents;
-$QuadPres::WriteContents::VERSION = '0.28.3';
+$QuadPres::WriteContents::VERSION = '0.30.0';
 use 5.016;
 use strict;
 use warnings;
@@ -165,7 +165,7 @@ QuadPres::WriteContents - write the contents.
 
 =head1 VERSION
 
-version 0.28.3
+version 0.30.0
 
 =head1 SYNOPSIS
 

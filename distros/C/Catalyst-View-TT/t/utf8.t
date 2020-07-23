@@ -1,8 +1,7 @@
 use utf8;
 use warnings;
 use strict;
-use Test::More;
-use Encode 2.21 'decode_utf8';
+use Test::More 0.88;
 use File::Spec;
 
 {
@@ -36,7 +35,7 @@ use Catalyst::Test 'MyApp';
 if(MyApp->can('encoding') and MyApp->can('clear_encoding') ) {
   ok my $res = request '/root/♥';
   is $res->code, 200, 'OK';
-  is decode_utf8($res->content), "<p>This heart literal ♥</p><p>This is heart var ♥♥♥</p>\n", 'correct body';
+  is $res->decoded_content, "<p>This heart literal ♥</p><p>This is heart var ♥♥♥</p>\n", 'correct body';
   is $res->content_charset, 'UTF-8';
 } else {
   ok 1, 'Skipping the UTF8 Tests for older installed catalyst';

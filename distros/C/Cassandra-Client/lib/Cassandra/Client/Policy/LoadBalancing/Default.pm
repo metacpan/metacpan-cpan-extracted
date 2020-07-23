@@ -1,6 +1,6 @@
 package Cassandra::Client::Policy::LoadBalancing::Default;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::Policy::LoadBalancing::Default::VERSION = '0.16';
+$Cassandra::Client::Policy::LoadBalancing::Default::VERSION = '0.17';
 use 5.010;
 use strict;
 use warnings;
@@ -122,7 +122,7 @@ Cassandra::Client::Policy::LoadBalancing::Default
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 AUTHOR
 
@@ -130,7 +130,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Tom van der Woerdt.
+This software is copyright (c) 2020 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Mojolicious::Plugin::Cron:
     file: lib/Mojolicious/Plugin/Cron.pm
-    version: '0.029'
+    version: '0.031'
 requires:
   Algorithm::Cron: '0.10'
   Mojolicious: '7.82'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/dmanto/Mojolicious-Plugin-Cron/issues
   homepage: https://github.com/dmanto/Mojolicious-Plugin-Cron
   repository: git://github.com/dmanto/Mojolicious-Plugin-Cron.git
-version: '0.029'
+version: '0.031'
 x_contributors:
   - 'Daniel Mantovani <daniel@MBP-daniel.local>'
   - 'Daniel Mantovani <daniel@gmail.com>'

@@ -1,4 +1,4 @@
 author = "Daniel Mantovani <dmanto@cpan.org>"
 license = "Perl_5"
 name = "Mojolicious-Plugin-Cron"
-badges = ['travis', 'appveyor']
+badges = ['github-actions/linux','github-actions/windows','github-actions/macos']

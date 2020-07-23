@@ -1,0 +1,250 @@
+digraph "machine"{
+	rankdir=LR;
+	{ "@Part: sda" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">LSI Logical Volume</TD> </TR><TR><TD >/dev/sda<BR/>Label: msdos<BR/>Size: 1.82 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 2.00 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="lightgrey">
+						/dev/sda2<BR/>Size: 1.33 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="3" BGCOLOR="yellow">
+						/dev/sda3<BR/>Size: 500 GiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1.00 MiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.001075:pink;0.730355:pink;0.268570:green;0.000001";
+	]; }
+	{ "@Part: sdb" [
+		label=<<TABLE BORDER="0" CELLPADDING="0" CELLSPACING="0">
+				<TR> <TD COLSPAN="2">LSI Logical Volume</TD> </TR><TR><TD >/dev/sdb<BR/>Label: gpt<BR/>Size: 1.82 TiB</TD>    <TD BGCOLOR="lightgrey">
+				<TABLE >
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 1007 kiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="1" BGCOLOR="yellow">
+						/dev/sdb1<BR/>EFI<BR/>Size: 476 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 547 MiB
+						</TD>
+					</TR>
+					<TR>
+						<TD PORT="2" BGCOLOR="yellow">
+						/dev/sdb2<BR/>pv<BR/>Size: 1.00 TiB
+						</TD>
+					</TR>
+					<TR>
+						<TD bgcolor="green">
+						Free<BR/>Size: 837 GiB
+						</TD>
+					</TR>
+				</TABLE>
+				</TD> </TR><TR> <TD COLSPAN="2"> </TD> </TR>
+			</TABLE>
+		>;
+		// Style node
+		color=white;
+		fillcolor=lightgrey;
+		shape="rectangle";
+		style=striped;
+		fillcolor="green;0.000001:pink;0.000250:green;0.000287:pink;0.550031:green;0.449432";
+	]; }
+	subgraph "cluster_vgchu" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_vgchu@PV" {
+			color=white;
+			fillcolor=white;
+			{ "LVM@vgchu@PV@sdb2" [
+				label="PV: /dev/sdb2\nSize: 1024 GiB\nFree: 999 GiB\nUsed: 25.0 GiB";
+				style=striped;fillcolor="pink;0.024414.2:green"
+			]; }
+			label="vgchu's PVs";
+		}
+		subgraph "cluster_vgchu@LV" {
+			color=white;
+			fillcolor=white;
+			{ "dm-1" [
+				label="LV: root\nSize: 20.0 GiB";
+				fillcolor="yellow"
+			]; }
+			{ "dm-0" [
+				label="LV: swap\nSize: 5.00 GiB";
+				fillcolor="yellow"
+			]; }
+			label="vgchu's LVs";
+		}
+		label="LVM: vgchu\nSize: 1024 GiB\nFree: 999 GiB";
+		style=striped;fillcolor="pink;0.024414.2:green"
+	}
+	subgraph "cluster_vgchuold" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=lightgrey,fillcolor=lightgrey,shape=rectangle];
+		subgraph "cluster_vgchuold@PV" {
+			color=white;
+			fillcolor=white;
+			{ "LVM@vgchuold@PV@sda3" [
+				label="PV: /dev/sda3\nSize: 500 GiB\nFree: 40.0 GiB\nUsed: 460 GiB";
+				style=striped;fillcolor="pink;0.920007.2:green"
+			]; }
+			label="vgchuold's PVs";
+		}
+		subgraph "cluster_vgchuold@LV" {
+			color=white;
+			fillcolor=white;
+			{ "dm-5" [
+				label="LV: home\nSize: 150 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-2" [
+				label="LV: root+debian\nSize: 20.0 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-3" [
+				label="LV: root+ubuntu\nSize: 8.00 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-6" [
+				label="LV: scratch\nSize: 150 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-7" [
+				label="LV: swap\nSize: 32.0 GiB";
+				fillcolor="lightgrey"
+			]; }
+			{ "dm-4" [
+				label="LV: usr+local\nSize: 100 GiB";
+				fillcolor="lightgrey"
+			]; }
+			label="vgchuold's LVs";
+		}
+		label="LVM: vgchuold\nSize: 500 GiB\nFree: 40.0 GiB";
+		style=striped;fillcolor="pink;0.920007.2:green"
+	}
+	subgraph "cluster_@LSISASIrcu@0" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@LSISASIrcu@0@dev@LSISASIrcu@0:0 (0)" [
+			label="Disk missing\n1: enc/slot: none\nMissing (MIS)\nSize: 0 B";
+			fillcolor=red
+		]; }
+		{ "@LSISASIrcu@0@dev@LSISASIrcu@0:0 (1)" [
+			label="Disk missing\n1: enc/slot: none\nMissing (MIS)\nSize: 0 B";
+			fillcolor=red
+		]; }
+		{ "@LSISASIrcu@0@dev@LSISASIrcu@1:0" [
+			label="ATA      ST2000DM001-1ER1 Z4Z1VA17\n0: enc/slot: 1:0\nOptimal (OPT)\nSize: 1.82 TiB";
+			fillcolor=yellow
+		]; }
+		{ "@LSISASIrcu@0@dev@LSISASIrcu@1:2" [
+			label="ATA      ST2000DM001-9YN1 Z1E1RVPX\n0: enc/slot: 1:2\nOptimal (OPT)\nSize: 1.82 TiB";
+			fillcolor=yellow
+		]; }
+		subgraph "cluster_1@@state" {
+			{ "1" [
+				label="/dev/sdb\nRAID1\nSize: 1.82 TiB";
+				fillcolor="yellow"
+			]; }
+			label="state: Degraded (DGD)";
+			shape=oval
+			fillcolor=orange
+		}
+		subgraph "cluster_2@@state" {
+			{ "2" [
+				label="/dev/sda\nRAID1\nSize: 1.82 TiB";
+				fillcolor="yellow"
+			]; }
+			label="state: Degraded (DGD)";
+			shape=oval
+			fillcolor=orange
+		}
+		label="SAS2308_1";
+	}
+	subgraph "cluster_@FS" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		{ "@FS@SWAP" [
+			label="SWAP\nDevice: /dev/vgchu/swap\nswap\nSize: 5.00 GiB\nFree: 5.00 GiB\nUsed: 0 B";
+			style=striped;fillcolor="green"
+		]; }
+		{ "@FS@/" [
+			label="/\nDevice: /dev/vgchu/root\next4\nSize: 19.6 GiB\nFree: 16.3 GiB\nUsed: 2.21 GiB";
+			style=striped;fillcolor="pink;0.165143.2:green"
+		]; }
+		{ "@FS@/boot/efi" [
+			label="/boot/efi\nDevice: /dev/sdb1\nvfat\nSize: 475 MiB\nFree: 470 MiB\nUsed: 5.10 MiB";
+			style=striped;fillcolor="pink;0.010731.2:green"
+		]; }
+		label="Mounted FS and swap";
+	}
+	subgraph "cluster_@libvirt" {
+		style=filled;
+		color=lightgrey;
+		fillcolor=lightgrey;
+		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
+		label="Libvirt Virtual Machines";
+	}
+	// Links from LVM VG: vgchu
+	"LVM@vgchu@PV@sdb2" -> "dm-1"
+	"LVM@vgchu@PV@sdb2" -> "dm-0"
+	// Links from LVM VG: vgchuold
+	"LVM@vgchuold@PV@sda3" -> "dm-2"
+	"LVM@vgchuold@PV@sda3" -> "dm-3"
+	"LVM@vgchuold@PV@sda3" -> "dm-4"
+	"LVM@vgchuold@PV@sda3" -> "dm-5"
+	"LVM@vgchuold@PV@sda3" -> "dm-6"
+	"LVM@vgchuold@PV@sda3" -> "dm-7"
+	// Links from MegaCli: Controller 0
+	"@LSISASIrcu@0@dev@LSISASIrcu@0:0 (0)" -> "1"
+	"@LSISASIrcu@0@dev@LSISASIrcu@0:0 (1)" -> "2"
+	"@LSISASIrcu@0@dev@LSISASIrcu@1:0" -> "2"
+	"@LSISASIrcu@0@dev@LSISASIrcu@1:2" -> "1"
+	// Links for @Part: sda
+	"2" -> "@Part: sda"
+	// Links for @Part: sdb
+	"1" -> "@Part: sdb"
+	// Links for LVM@vgchu@PV@sdb2
+	"@Part: sdb":"2" -> "LVM@vgchu@PV@sdb2"
+	// Links for LVM@vgchuold@PV@sda3
+	"@Part: sda":"3" -> "LVM@vgchuold@PV@sda3"
+	// Links for @FS@SWAP
+	"dm-0" -> "@FS@SWAP"
+	// Links for @FS@/
+	"dm-1" -> "@FS@/"
+	// Links for @FS@/boot/efi
+	"@Part: sdb":"1" -> "@FS@/boot/efi"
+}

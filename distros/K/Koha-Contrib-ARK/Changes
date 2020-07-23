@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::ARK
 
+1.0.5
+
+  - Fix when encountering broken biblio record
+
 1.0.0
 
   - New script: koha-ark

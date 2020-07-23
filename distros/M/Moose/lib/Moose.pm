@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Moose; # git description: 2.2011-13-g073534e39
-our $VERSION = '2.2012';
+package Moose; # git description: 2.2012-11-g02c978bf9
+our $VERSION = '2.2013';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use 5.008003;
@@ -298,7 +298,7 @@ Moose - A postmodern object system for Perl 5
 
 =head1 VERSION
 
-version 2.2012
+version 2.2013
 
 =head1 SYNOPSIS
 
@@ -855,8 +855,7 @@ metaclass:
 
 This is very similar to the attribute traits feature. When you do
 this, your class's C<meta> object will have the specified traits
-applied to it. See L<Metaclass and Trait Name Resolution> for more
-details.
+applied to it.
 
 =head2 Metaclass and Trait Name Resolution
 

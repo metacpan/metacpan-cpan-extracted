@@ -113,11 +113,11 @@ digraph "machine"{
 		fillcolor=lightgrey;
 		node [style=filled,color=white,fillcolor=lightgrey,shape=rectangle];
 		{ "@LSISASIrcu@0@dev@LSISASIrcu@1:0" [
-			label="SEAGATE  ST33000650SS     Z293EBGJ\n0: enc/slot: 1:0\nOptimal (OPT)\nSize: 2.73 TiB\nSize: 2.73 TiB";
+			label="SEAGATE  ST33000650SS     Z293EBGJ\n0: enc/slot: 1:0\nOptimal (OPT)\nSize: 2.73 TiB";
 			fillcolor=yellow
 		]; }
 		{ "@LSISASIrcu@0@dev@LSISASIrcu@1:3" [
-			label="SEAGATE  ST33000650SS     Z2933SXF\n1: enc/slot: 1:3\nOptimal (OPT)\nSize: 2.73 TiB\nSize: 2.73 TiB";
+			label="SEAGATE  ST33000650SS     Z2933SXF\n1: enc/slot: 1:3\nOptimal (OPT)\nSize: 2.73 TiB";
 			fillcolor=yellow
 		]; }
 		subgraph "cluster_1@@state" {

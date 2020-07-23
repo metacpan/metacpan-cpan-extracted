@@ -1,0 +1,513 @@
+{
+    "type": "regular",
+    "response": [
+        {
+            "id": "0",
+            "name": "Accept Risk",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "1",
+            "name": "Activity Log",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "true"
+        },
+        {
+            "id": "2",
+            "name": "Apply All Risk",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "3",
+            "name": "Convert Compliance",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "4",
+            "name": "Convert Name DB",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "5",
+            "name": "Convert Repositories",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "6",
+            "name": "Custom Plugin Upload",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "7",
+            "name": "DB Locks",
+            "category": "common",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "8",
+            "name": "Dev Migration",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "9",
+            "name": "Evaluate ARC",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "10",
+            "name": "Evaluate ARC Policy Statement Status",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "11",
+            "name": "Evaluate AR Sync Status",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "12",
+            "name": "Evaluate Blackout Window Status",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "13",
+            "name": "Evaluate Dashboard Component Status",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "14",
+            "name": "Evaluate Dashboard Element",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "15",
+            "name": "Evaluate Matrix Cluster",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "16",
+            "name": "Evaluate Query Status",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "17",
+            "name": "Evaluate Report Status",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "18",
+            "name": "Evaluate Scan Status",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "19",
+            "name": "Expire Accepted Risk",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "20",
+            "name": "Export",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "21",
+            "name": "Feed Update",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "22",
+            "name": "Flush Vulns",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "23",
+            "name": "IDS Correlations",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "24",
+            "name": "IDS Signatures",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "25",
+            "name": "Import",
+            "category": "common",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "26",
+            "name": "Import ARC",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "27",
+            "name": "Import Dashboard",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "28",
+            "name": "Import Mobile",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "29",
+            "name": "Import Report",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "30",
+            "name": "Industrial Plugin Update",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "31",
+            "name": "Industrial Plugin Update Testing",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "32",
+            "name": "Industrial Results",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "33",
+            "name": "Job Activity",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "34",
+            "name": "Job Daemon",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "35",
+            "name": "LCE Plugin Update",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "36",
+            "name": "LCE Status",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "37",
+            "name": "Licensing",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "38",
+            "name": "Mark Assets Prepared",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "39",
+            "name": "Migrate User Files",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "40",
+            "name": "Migration",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "41",
+            "name": "Mobile Scan",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "42",
+            "name": "Nightly Cleanup",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "43",
+            "name": "NNM Results",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "44",
+            "name": "Parse Nessus",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "45",
+            "name": "Passive Plugin Update",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "46",
+            "name": "Passive Plugin Update Testing",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "47",
+            "name": "Password Convert",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "48",
+            "name": "Patch",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "49",
+            "name": "Performance Log",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "50",
+            "name": "Plugin Update",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "51",
+            "name": "Plugin Update Testing",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "52",
+            "name": "Prepare Assets",
+            "category": "common",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "53",
+            "name": "Publishing",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "54",
+            "name": "Recast Risk",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "55",
+            "name": "Remote Client Tools",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "56",
+            "name": "Reporting",
+            "category": "common",
+            "sizeWarning": "true",
+            "enabled": "false"
+        },
+        {
+            "id": "57",
+            "name": "Resolve Host Names",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "58",
+            "name": "Run Alert",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "59",
+            "name": "Save Policy",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "60",
+            "name": "Scan",
+            "category": "common",
+            "sizeWarning": "true",
+            "enabled": "false"
+        },
+        {
+            "id": "61",
+            "name": "Scanner Status",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "62",
+            "name": "Session",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "63",
+            "name": "Simple Activity",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "64",
+            "name": "Synchronize Agent Results",
+            "category": "common",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "65",
+            "name": "Synchronize Repository",
+            "category": "common",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "66",
+            "name": "Take Repository Snapshots",
+            "category": "uncommon",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "67",
+            "name": "Update DNS Assets",
+            "category": "common",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "68",
+            "name": "Update LCE Silos",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "69",
+            "name": "Update LCE Types",
+            "category": "rare",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "70",
+            "name": "Update LDAP Assets",
+            "category": "common",
+            "sizeWarning": "false",
+            "enabled": "false"
+        },
+        {
+            "id": "71",
+            "name": "Disk I/O Errors",
+            "category": "common",
+            "sizeWarning": "false",
+            "enabled": "false"
+        }
+    ],
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1551190238
+}

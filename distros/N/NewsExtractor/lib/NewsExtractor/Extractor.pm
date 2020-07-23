@@ -77,6 +77,7 @@ use constant {
         'stars.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
         'money.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
         'house.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
+        'opinion.udn.com' => 'NewsExtractor::SiteSpecificExtractor::UDN',
         'www.taipeitimes.com' => 'NewsExtractor::SiteSpecificExtractor::www_taipeitimes_com',
         'www.ettoday.net' => 'NewsExtractor::SiteSpecificExtractor::ETtoday',
         'star.ettoday.net' => 'NewsExtractor::SiteSpecificExtractor::ETtoday',

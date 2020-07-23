@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,16 +31,13 @@ requires:
   Getopt::Long: '0'
   IPC::System::Simple: '0'
   JSON: '0'
-  LWP::Protocol::https: '0'
-  LWP::UserAgent: '0'
   List::MoreUtils: '0'
-  Mojo::DOM: '0'
   Pod::Usage: '0'
   Term::ANSIScreen: '0'
-  Term::Choose: '1.710'
-  Term::Choose::LineFold: '1.710'
-  Term::Choose::Util: '0.117'
-  Term::Form: '0.527'
+  Term::Choose: '1.711'
+  Term::Choose::LineFold: '1.711'
+  Term::Choose::Util: '0.121'
+  Term::Form: '0.528'
   constant: '0'
   if: '0'
   parent: '0'
@@ -50,5 +47,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-YTDL.git
-version: '0.318'
+version: '0.401'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

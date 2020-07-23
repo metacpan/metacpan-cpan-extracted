@@ -1,0 +1,37 @@
+{
+   "error_code" : 0,
+   "error_msg" : "",
+   "response" : {
+      "LCEPluginSubscriptionStatus" : "Unconfigured",
+      "activeIPs" : "0",
+      "feedUpdates" : {
+         "stale" : "true",
+         "updateTime" : "1400514960"
+      },
+      "jobd" : "Running",
+      "licenseStatus" : "Valid",
+      "licensedIPs" : "1000",
+      "noLCEs" : "true",
+      "noReps" : "true",
+      "passivePluginSubscriptionStatus" : null,
+      "pluginSubscriptionStatus" : "Unconfigured",
+      "pluginUpdates" : {
+         "active" : {
+            "pluginCurrentSet" : "201307080915",
+            "stale" : "true",
+            "updateTime" : "1373297148"
+         },
+         "lce" : {
+            "stale" : "true",
+            "updateTime" : "0"
+         },
+         "passive" : {
+            "stale" : "true",
+            "updateTime" : "1373297113"
+         }
+      }
+   },
+   "timestamp" : 1405023348,
+   "type" : "regular",
+   "warnings" : []
+}

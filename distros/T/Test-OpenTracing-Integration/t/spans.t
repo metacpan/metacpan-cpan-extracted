@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::Most;
 use Test::Deep qw/true false/;
+use Test::Time::HiRes;
 use List::Util qw/uniq/;
 use Carp qw/croak/;
 
@@ -44,10 +45,12 @@ use OpenTracing::Implementation::Test;
     my $scope = $tracer->start_active_span('time_test');
     sleep 2;
     $scope->close();
+
     $tracer->cmp_easy(
-        [ { duration => num(2, 1), has_finished => true } ],
+        [ { duration => 2, has_finished => true } ],
         'duration of a finished span'
     );
+
 }
 
 {

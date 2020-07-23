@@ -1,61 +1,25 @@
 Revision History for WWW-FetchStory
 ===================================
 
-v0.2004 2019-02-19
+v0.2201 2020-07-23
 ------------------
 
-* 2019-02-19 05:33:19 +1100
+* 2020-07-23 09:57:10 +1000
+  added AO3 relationship parsing
+
+v0.22 2020-07-23
+----------------
+
+* 2020-07-23 09:36:27 +1000
+  fixed bug with AO3 story-parsing
+* 2020-05-16 14:36:56 +1000
   version bump
-* 2019-02-19 05:32:23 +1100
-  fixing some AO3 parsing
-
-v0.2003 2019-02-18
-------------------
-
-* 2019-02-18 17:44:52 +1100
-  version bump
-* 2019-02-18 17:44:14 +1100
-  Merge branch 'develop'
-* 2019-01-13 13:18:50 +1100
-  stuff for debugging LJ
-* 2018-06-14 15:12:01 +0100
-  Auto generate META.json using plugin [MetaJSON] as recommended by CPANTS.
-
-v0.2002 2018-06-14
-------------------
-
-* 2018-06-14 19:55:22 +1000
-  version bump
-* 2018-06-14 19:55:01 +1000
-  fixing author-parse on AO3
-
-v0.2001 2018-06-14
-------------------
-
-* 2018-06-14 15:56:12 +1000
-  version bump
-* 2018-06-14 15:43:21 +1000
-  fixed AO3 category parsing
-* 2018-06-14 14:16:13 +1000
-  tweaked summary-parsing
-* 2018-06-14 14:14:06 +1000
-  fixed title-parsing
-* 2018-06-14 13:47:25 +1000
-  fixing universe-parsing
-* 2018-01-23 20:18:30 +1100
-  Changed "fetched" to "fetch_date" to clarify.
-* 2018-01-02 20:10:29 +1100
-  a bit of tweaking
-* 2018-01-02 20:04:29 +1100
-  version bump
-* 2018-01-02 20:03:33 +1100
-  fixing SSHG Giftfest bug
-* 2017-01-07 10:57:30 +1100
-  added Git::Push
-* 2016-07-24 17:39:33 +1000
-  fix of fix
-* 2016-07-24 17:31:08 +1000
-  fixing some Fanfiction.net parsing
+* 2020-05-16 14:35:01 +1000
+  option for meta only
+* 2020-05-06 17:32:19 +1000
+  tweaking for Marvel
+* 2019-04-04 01:53:33 +1100
+  fixed bug with AO3 parsing of download URL
 
 ===================================
 End of changes in the last 365 days

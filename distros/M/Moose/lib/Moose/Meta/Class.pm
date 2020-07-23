@@ -1,5 +1,5 @@
 package Moose::Meta::Class;
-our $VERSION = '2.2012';
+our $VERSION = '2.2013';
 
 use strict;
 use warnings;
@@ -814,7 +814,7 @@ Moose::Meta::Class - The Moose metaclass
 
 =head1 VERSION
 
-version 2.2012
+version 2.2013
 
 =head1 DESCRIPTION
 

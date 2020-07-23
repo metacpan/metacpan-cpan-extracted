@@ -1,5 +1,5 @@
 package Class::MOP::Attribute;
-our $VERSION = '2.2012';
+our $VERSION = '2.2013';
 
 use strict;
 use warnings;
@@ -510,7 +510,7 @@ Class::MOP::Attribute - Attribute Meta Object
 
 =head1 VERSION
 
-version 2.2012
+version 2.2013
 
 =head1 SYNOPSIS
 
@@ -1004,9 +1004,9 @@ attribute.
 
 =item B<< $attr->install_accessors >>
 
-This method generates and installs code the attributes various
-accessors. It is typically called from the L<Class::MOP::Class>
-C<add_attribute> method.
+This method generates and installs code for the attribute's accessors.
+It is typically called from the L<Class::MOP::Class> C<add_attribute>
+method.
 
 =item B<< $attr->remove_accessors >>
 

@@ -37,7 +37,7 @@ use utf8;
 use Log::Any qw($log);
 use Carp;
 
-use constant VERSION => '20.6';
+use constant VERSION => '20.7';
 
 =head1 Name
 
@@ -57,7 +57,7 @@ default: 180
 
 String. custom UserAgent header
 
-default: Swagger-Codegen/20.6/perl
+default: Swagger-Codegen/20.7/perl
 
 =item api_key: (optional)
 
@@ -116,7 +116,7 @@ sub new {
 
 	# class/static variables
 	$p{http_timeout} //= 180;
-	$p{http_user_agent} //= 'Swagger-Codegen/20.6/perl';
+	$p{http_user_agent} //= 'Swagger-Codegen/20.7/perl';
 
 	# authentication setting
 	$p{api_key} //= {};
@@ -131,7 +131,8 @@ sub new {
 	$p{access_token} //= '';
 
 	# base_url
-        $p{base_url} //= 'https://api.aspose.cloud/v3.0';
+    $p{base_url} //= 'https://api.aspose.cloud';
+	$p{api_version} //= 'v3.0';
 
 	return bless \%p => $self;
 }
@@ -143,8 +144,8 @@ sub get_tokens {
 	my $tokens = {};
 	$tokens->{username} = $self->{username} if $self->{username};
 	$tokens->{password} = $self->{password} if $self->{password};
-	$tokens->{app_sid} = $self->{app_sid} if $self->{app_sid};
-	$tokens->{app_key} = $self->{app_key} if $self->{app_key};
+	#$tokens->{app_sid} = $self->{app_sid} if $self->{app_sid};
+	#$tokens->{app_key} = $self->{app_key} if $self->{app_key};
 	$tokens->{access_token} = $self->{access_token} if $self->{access_token};
 	
 	foreach my $token_name (keys %{ $self->{api_key} }) {

@@ -13,7 +13,7 @@ Moose::Manual::Delta - Important Changes in Moose
 
 =head1 VERSION
 
-version 2.2012
+version 2.2013
 
 =head1 DESCRIPTION
 

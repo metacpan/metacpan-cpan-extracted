@@ -169,6 +169,14 @@ METHODS
 
       Queue to put job in, defaults to default.
 
+    sequence
+
+        sequence => 'host:mojolicious.org'
+
+      Sequence this job belongs to. The previous job from the sequence will
+      be automatically added as a parent to continue the sequence. Note
+      that this option is EXPERIMENTAL and might change without warning!
+
  fail_job
 
       my $bool = $backend->fail_job($job_id, $retries);
@@ -240,6 +248,13 @@ METHODS
 
       List only jobs in these queues.
 
+    sequences
+
+        sequences => ['host:localhost', 'host:mojolicious.org']
+
+      List only jobs from these sequences. Note that this option is
+      EXPERIMENTAL and might change without warning!
+
     states
 
         states => ['inactive', 'active']
@@ -296,6 +311,12 @@ METHODS
 
       Job id.
 
+    next
+
+        next => 10024
+
+      Next job in sequence.
+
     notes
 
         notes => {foo => 'bar', baz => [1, 2, 3]}
@@ -307,6 +328,12 @@ METHODS
         parents => ['10023', '10024', '10025']
 
       Jobs this job depends on.
+
+    previous
+
+        previous => 10022
+
+      Previous job in sequence.
 
     priority
 
@@ -337,6 +364,12 @@ METHODS
         retries => 3
 
       Number of times job has been retried.
+
+    sequence
+
+        sequence => 'host:mojolicious.org'
+
+      Sequence name.
 
     started
 

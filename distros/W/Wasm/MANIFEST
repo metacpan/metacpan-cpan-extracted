@@ -60,6 +60,7 @@ examples/synopsis/store.pl
 examples/synopsis/table.pl
 examples/synopsis/tabletype.pl
 examples/synopsis/trap.pl
+examples/synopsis/trap2.pl
 examples/synopsis/valtype.pl
 examples/synopsis/wasiconfig.pl
 examples/synopsis/wasiinstance.pl
@@ -93,6 +94,7 @@ lib/Wasm/Global.pm
 lib/Wasm/Hook.pm
 lib/Wasm/Memory.pm
 lib/Wasm/Table.pm
+lib/Wasm/Trap.pm
 lib/Wasm/Wasmtime.pm
 lib/Wasm/Wasmtime/Caller.pm
 lib/Wasm/Wasmtime/Config.pm
@@ -133,6 +135,7 @@ t/wasm_func.t
 t/wasm_global.t
 t/wasm_hook.t
 t/wasm_memory.t
+t/wasm_trap.t
 t/wasm_wasmtime.t
 t/wasm_wasmtime_bytevec.t
 t/wasm_wasmtime_caller.t

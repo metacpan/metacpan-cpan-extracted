@@ -1,5 +1,8 @@
 Revision history for Win32-TestServerManager
 
+0.06 2020/07/22
+  - add cpanfile to MANIFEST
+
 0.05 2020/03/01
   - use 127.0.0.1 to test
   - drop File::Slurp dependency

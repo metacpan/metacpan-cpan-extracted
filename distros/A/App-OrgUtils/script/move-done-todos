@@ -1,5 +1,10 @@
 #!perl
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-07-21'; # DATE
+our $DIST = 'App-OrgUtils'; # DIST
+our $VERSION = '0.479'; # VERSION
+
 use 5.010001;
 use strict;
 use warnings;
@@ -11,7 +16,7 @@ use Perinci::CmdLine::Any;
 our %SPEC;
 
 sub _move_item {
-    my ($item, $done_doc) = @_;
+    my ($item, $done_doc, $args, $ref_num_moved) = @_;
 
     my @parents;
     my $parent = $item;
@@ -19,6 +24,35 @@ sub _move_item {
         unshift @parents, $parent;
     }
     shift @parents; # skip root document
+
+  FILTER:
+    {
+        last unless defined($args->{include_pat}) ||
+            defined($args->{exclude_pat});
+        my $include = 0;
+        for my $parent (@parents) {
+            my $title = $parent->title->as_string;
+            if (defined($args->{include_pat}) &&
+                    $title =~ /$args->{include_pat}/) {
+                $include = 1;
+            }
+            if (defined($args->{exclude_pat}) &&
+                    $title =~ /$args->{exclude_pat}/) {
+                log_info "Todo item '%s' is under headline '%s' (matches exclude_pat %s), skipped",
+                    $item->title->as_string,
+                    $title,
+                    $args->{exclude_pat};
+                return;
+            }
+        }
+
+        unless ($include) {
+            log_info "Todo item '%s' is not under any headlines which match include_pat %s",
+                $item->title->as_string,
+                $args->{include_pat};
+            return;
+        }
+    }
 
     # recreate the structure in $done_doc
     my $done_parent = $done_doc;
@@ -64,7 +98,9 @@ sub _move_item {
     for my $el (@{ $item->parent->children }) {
         $i++;
         if (refaddr($el) eq refaddr($item)) {
+            log_info "Moving todo item '%s' from undone to done doc", $item->title->as_string;
             splice(@{ $item->parent->children }, $i, 1);
+            ${ $ref_num_moved }++;
             last;
         }
     }
@@ -117,6 +153,17 @@ _
             schema => 'str*', # XXX filename
             pos => 1,
         },
+        include_pat => {
+            summary => 'Only include todo items under this headline pattern',
+            schema => 're*',
+        },
+        exclude_pat => {
+            summary => 'Exclude todo items under this headline pattern',
+            schema => 're*',
+        },
+    },
+    features => {
+        dry_run => 1,
     },
 };
 sub move_done_todos {
@@ -133,25 +180,41 @@ sub move_done_todos {
         $orgp->parse_file($args{done_file}) :
         Org::Document->new(from_string => '');
 
+    my $num_moved = 0;
     $undone_doc->walk(
         sub {
             my $el = shift;
             return unless $el->isa("Org::Element::Headline") &&
                 $el->is_todo && $el->is_done;
             log_info("Found done todo: %s", $el->title->as_string);
-            _move_item($el, $done_doc);
+            _move_item($el, $done_doc,  \%args, \$num_moved);
         });
 
-    Path::Tiny->new($args{undone_file})->spew_utf8($undone_doc->as_string);
+    log_info "Number of items moved: %d", $num_moved;
+
+    if ($args{-dry_run}) {
+        log_info "[DRY] Saving %s", $args{undone_file};
+    } else {
+        Path::Tiny->new($args{undone_file})->spew_utf8($undone_doc->as_string);
+    }
+
     if (defined $args{done_file}) {
-        Path::Tiny->new($args{done_file})->spew_utf8($done_doc->as_string);
-        return [200, "OK"];
+        if ($args{-dry_run}) {
+            log_info "[DRY] Saving %s", $args{done_file};
+            return [304, "OK"];
+        } else {
+            Path::Tiny->new($args{done_file})->spew_utf8($done_doc->as_string);
+            return [200, "OK"];
+        }
     } else {
         return [200, "OK", $done_doc->as_string, {"cmdline.skip_format"=>1}];
     }
 }
 
-Perinci::CmdLine::Any->new(url => '/main/move_done_todos')->run;
+Perinci::CmdLine::Any->new(
+    url => '/main/move_done_todos',
+    log => 1,
+)->run;
 
 # ABSTRACT: Move done todos from one Org file to another
 # PODNAME: move-done-todos
@@ -168,15 +231,17 @@ move-done-todos - Move done todos from one Org file to another
 
 =head1 VERSION
 
-This document describes version 0.477 of move-done-todos (from Perl distribution App-OrgUtils), released on 2020-04-27.
+This document describes version 0.479 of move-done-todos (from Perl distribution App-OrgUtils), released on 2020-07-21.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % move-done-todos [--config-path=path | -c] [--config-profile=profile |
-     -P] [--format=name] [--json] [--(no)naked-res] [--no-config | -C]
-     [--no-env] [--page-result[=program]] <undone_file> [done_file]
+     -P] [--debug] [--dry-run] [--exclude-pat=s] [--format=name]
+     [--include-pat=s] [--json] [--log-level=level] [--(no)naked-res]
+     [--no-config | -C] [--no-env] [--page-result[=program]] [--quiet]
+     [--trace] [--verbose] <undone_file> [done_file]
 
 =head1 DESCRIPTION
 
@@ -222,6 +287,14 @@ C<*> marks required options.
 
 Will print to stdout if unspecified.
 
+=item B<--exclude-pat>=I<s>
+
+Exclude todo items under this headline pattern.
+
+=item B<--include-pat>=I<s>
+
+Only include todo items under this headline pattern.
+
 =item B<--undone-file>=I<s>*
 
 =back
@@ -251,6 +324,32 @@ Do not use any configuration file.
 =item B<--no-env>
 
 Do not read environment for default options.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 
@@ -300,6 +399,14 @@ Filter output through a pager.
 =head2 Other options
 
 =over
+
+=item B<--dry-run>
+
+Run in simulation mode (also via DRY_RUN=1).
+
+Default value:
+
+ ""
 
 =item B<--help>, B<-h>, B<-?>
 
@@ -364,7 +471,10 @@ Finally, you can filter a section by environment variable using the filter C<env
 List of available configuration parameters:
 
  done_file (see --done-file)
+ exclude_pat (see --exclude-pat)
  format (see --format)
+ include_pat (see --include-pat)
+ log_level (see --log-level)
  naked_res (see --naked-res)
  undone_file (see --undone-file)
 

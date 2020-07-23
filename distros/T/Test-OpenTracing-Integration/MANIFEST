@@ -14,6 +14,7 @@ Makefile.PL
 MANIFEST
 README.md
 t/00_use_ok.t
+t/context_propagation.t
 t/spans.t
 t/Implementation/Test/Scope/01_can_all_ok.t
 t/Implementation/Test/ScopeManager/01_can_all_ok.t

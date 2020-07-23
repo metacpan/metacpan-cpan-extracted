@@ -26,6 +26,13 @@ Some people use Postfix as MTA.  Postfix can be installed as replacement
 for Sendmail: is provides a program with the same name and options.  So,
 this module supports postfix as well.
 
+B<WARNING:> When you do bulk email sending with local delivery via
+Postfix, you can probably better use the SMTP backend to connect
+to postfix.  The C<sendmail> command delivers to C<maildrop>.  From
+C<maildrop>, the C<pickupd> will only sequentially insert messages
+into C<cleanup>.  That process can take considerable elapse time.
+Directly inserting via C<smtpd> will parallellize the cleanup process.
+
 Extends L<"DESCRIPTION" in Mail::Transport::Send|Mail::Transport::Send/"DESCRIPTION">.
  
 =head1 METHODS
@@ -257,12 +264,12 @@ found in the message itself about the destination.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Transport distribution version 3.004,
-built on May 03, 2019. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Mail-Transport distribution version 3.005,
+built on July 22, 2020. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 2001-2019 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2001-2020 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

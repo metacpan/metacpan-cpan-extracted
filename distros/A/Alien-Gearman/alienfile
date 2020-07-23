@@ -23,6 +23,9 @@ share {
   require Alien::Boost;
   my $BOOSTDIR = Alien::Boost->dist_dir();
 
+  $ENV{CFLAGS} .= " -fpermissive";
+  $ENV{CXXFLAGS} .= " -fpermissive";
+
   build [
     "./configure --prefix=%{.install.prefix} --disable-shared --with-boost=$BOOSTDIR",
     '%{make} LIBS=-lstdc++',

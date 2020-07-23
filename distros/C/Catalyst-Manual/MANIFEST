@@ -13,6 +13,7 @@ lib/Catalyst/Manual/Deployment/FastCGI.pod
 lib/Catalyst/Manual/Deployment/IIS/FastCGI.pod
 lib/Catalyst/Manual/Deployment/lighttpd/FastCGI.pod
 lib/Catalyst/Manual/Deployment/nginx/FastCGI.pod
+lib/Catalyst/Manual/Deployment/NGINXUnit/PSGI.pod
 lib/Catalyst/Manual/Deployment/SharedHosting.pod
 lib/Catalyst/Manual/DevelopmentProcess.pod
 lib/Catalyst/Manual/ExtendingCatalyst.pod

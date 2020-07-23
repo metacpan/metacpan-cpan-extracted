@@ -8,7 +8,6 @@ lib/App/YTDL/ExtractData.pm
 lib/App/YTDL/GetData.pm
 lib/App/YTDL/Helper.pm
 lib/App/YTDL/History.pm
-lib/App/YTDL/LWPUserAgent.pm
 lib/App/YTDL/Options.pm
 lib/App/YTDL/Video_Info.pm
 LICENSE

@@ -11,7 +11,7 @@ use Mojo::DOM;
 use Types::Standard qw(Str Maybe);
 use NewsExtractor::Types qw(is_NewspaperName);
 
-use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace html2text );
+use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace html2text parse_dateline_ymdhms );
 use Importer 'NewsExtractor::Constants' => qw( %RE );
 
 with 'NewsExtractor::Role::ContentTextExtractor';
@@ -62,7 +62,7 @@ sub dateline {
     elsif ($guess = $dom->at("time[itemprop=datePublished][datetime], h1 time[datetime], .func_time time[pubdate], span.time > time.post-published")) {
         $dateline = $guess->attr('datetime');
     }
-    elsif ($guess = $dom->at(".reporter time, span.time, span.viewtime, header.article-desc time, .timeBox .updatetime span, .caption div.label-date, .contents_page span.date, .main-content span.date, .newsin_date, .news .date, .author .date, ul.info > li.date > span:nth-child(2), #newsHeadline span.datetime, article p.date, .post-meta > .icon-clock > span, .article_info_content span.info_time, .content time.page-date, .c_time, .newsContent p.time, .story_bady_info_author span:nth-child(1), div.title > div.time, div.article-meta div.article-date, address.authorInfor time, .entry-meta .date a, .author-links .posts-date, .top_title span.post_time, .node-inner > .submitted > span")) {
+    elsif ($guess = $dom->at(".reporter time, span.viewtime, header.article-desc time, .timeBox .updatetime span, .caption div.label-date, .contents_page span.date, .main-content span.date, .newsin_date, .news .date, .author .date, ul.info > li.date > span:nth-child(2), #newsHeadline span.datetime, article p.date, .post-meta > .icon-clock > span, .article_info_content span.info_time, .content time.page-date, .c_time, .newsContent p.time, div.title > div.time, div.article-meta div.article-date, address.authorInfor time, .entry-meta .date a, .author-links .posts-date, .top_title span.post_time, .node-inner > .submitted > span")) {
         $dateline = $guess->text;
     }
     elsif ($guess = $dom->at("div#articles cite")) {
@@ -105,6 +105,13 @@ sub dateline {
     elsif ($guess = $dom->at('#details_block .left .date, .article_header > .author > span:last-child')) {
         $dateline = normalize_whitespace $guess->text;
     }
+    elsif ($guess = $dom->at(
+        join(','
+             , '.timebox > .publishtime'  # howlife.cna.com.tw
+             , 'div.newsInfo > span.time' # n.yam.com
+        ))) {
+        $dateline = parse_dateline_ymdhms($guess->all_text, '+08:00');
+    }
 
     if ($dateline) {
         $dateline = normalize_whitespace($dateline);
@@ -133,12 +140,6 @@ sub journalist {
         $ret = $guess->attr('content');
     } elsif ( $guess = $dom->at('.bt_xmic span[itemprop=author], div.tdb_single_author a.tdb-author-name, div.field-item a[href^=/author/], div.content_reporter a[itemprop=author], span[itemprop=author] a, div.author div.intro a div.name, div.article-author > h5 > a, div.article-meta > div.article-author > a, div.authorInfo li.authorName > a, .article .writer > p, .info_author, .news-info dd[itemprop=author], .content_reporter a, .top_title span.reporter_name, .post-heading time span, header .article-meta .article-author,  .article_header > .author > span:first-child, .mid-news > .m-left-side > .maintype-wapper > .subtype-sort, .newsCon > .newsInfo > span:first-child, .newsdetail_content > .title > h4 > a[href^="/news/searchresult/news?search_text="], .m-from-author > .m-from-author__name, .post-author-name a[itemprop*=author], a.post-author-avatar .post-author-name > b, div#news_content div.author') ) {
         $ret = $guess->text;
-    } elsif ($guess = $dom->at('.story_bady_info_author')) {
-        if ($guess->find('a')->size() == 0) {
-            $ret = $guess->text;
-        } else {
-            $ret = $guess->find('a')->map(sub { normalize_whitespace( $_->text ) })->join(', ') . "";
-        }
     } elsif ($guess = $dom->at('span.f12_15a_g2')) {
         ($ret) = $guess->text =~ m{／記者 (.+?)／};
     } elsif ($guess = $dom->at('div#yt_container_placeholder + p')) {

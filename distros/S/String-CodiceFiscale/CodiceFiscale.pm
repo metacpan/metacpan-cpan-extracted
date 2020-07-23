@@ -1,13 +1,14 @@
 package String::CodiceFiscale;
 
-$String::CodiceFiscale::VERSION = '0.01';
+$String::CodiceFiscale::VERSION = '0.02';
 
 use strict;
-no utf8;
+use utf8;
 no locale;
 use base qw(Class::Data::Inheritable);
 use Time::Piece;
 use Carp;
+use POSIX;
 
 our %CRC = (
     A   =>  [0, 1],     B   =>  [1, 0],     C   =>  [2, 5],     
@@ -265,12 +266,12 @@ sub year {
     }
     if (not defined $self->{year} and defined $self->{year_c}) {
         my $year = $self->_xnums($self->{year_c});
-        my $cy = (localtime(time))[5] % 100;    # this is making a guess
-        if ($year > $cy) {
-            $self->{year} = sprintf "19%02d", $year;
-        } else {
-            $self->{year} = sprintf "20%02d", $year;
-        }
+        my $this_year = (localtime(time))[5] + 1900;
+        my $twodigits_year = $this_year % 100;    # this is making a guess
+        my $century = floor($this_year/100);
+        $self->{year} = sprintf "%d%02d",
+                            $century - ($year > $twodigits_year ? 1 : 0),
+                            $year;
     }
     return $self->{year};
 }
@@ -288,7 +289,7 @@ sub year_c {
         $self->{year} = undef;
     }
     if (not defined $self->{year_c} and defined $self->{year}) {
-        $self->{year_c} = $self->{year} % 100;
+        $self->{year_c} = sprintf("%02d", $self->{year} % 100);
     }
     return $self->{year_c};
 }
@@ -366,6 +367,7 @@ sub day_c {
                                     and defined $self->{sex}) {
         $self->{day_c} = $self->{day};
         $self->{day_c} += 40 if $self->{sex} eq 'F';
+        $self->{day_c} = sprintf("%02d", $self->{day_c});
     }
     return $self->{day_c};
 }
@@ -392,7 +394,7 @@ sub bp {
     my $self = shift;
     my ($bp) = @_;
     if (defined $bp) {
-        unless ($bp =~ /^[A-Z]\d\d\d$/) { # we could improve this
+        unless ($bp =~ /^[A-Z]\d\d\d$/) { # to improve further?
             $self->error('Invalid birthplace code');
             return;
         }
@@ -413,7 +415,7 @@ sub bp_c {
     if (defined $bpcx) {
         my $bpc = $bpcx;
         substr($bpc, 1) = $self->_xnums(substr($bpc, 1));
-        unless ($bpc =~ /^[A-Z]\d\d\d$/) { # we could improve this
+        unless ($bpc =~ /^[A-Z]\d\d\d$/) { # to improve further?
             $self->error('Invalid birthplace code');
             return;
         }
@@ -441,8 +443,8 @@ sub bd_c {
 }
 
 sub cf {
-    my $self = shift;
-    return $self->_crc(1);
+    my ($self, $dupe) = (@_);
+    return $self->_crc(1, $dupe);
 }
 
 sub crc {
@@ -461,21 +463,27 @@ sub cf_nocrc {
         }
         $cf .= $t;
     }
-    my $nums = substr($cf, 6, 2) . substr($cf, 9, 2) . substr($cf, 12, 3);
-    unless ($self->_xnums($nums)) {
-        $self->error('Invalid special characters');
-        return;
-    }
+    
     return $cf;
 }
 
 sub _crc {
     my $self = shift;
-    my ($cf_out) = @_;
+    my ($cf_out, $dupe) = @_;
     my $cf = $self->cf_nocrc;
     unless ($cf) {
         $self->error("Cannot produce a Codice Fiscale: missing data");
         return;
+    }
+    if ($dupe) {
+        $dupe %= 128;
+        my @bitmap = split('', sprintf("%07b", _bmaker($dupe)));
+        my ($tcf, $i) = ($cf, 0);
+        while ($cf =~ /(\d)/g) {
+            substr($tcf, pos($cf) - 1, 1, $XNUMS[$1]) if $bitmap[$i];
+            $i++
+        }
+        $cf = $tcf;
     }
     my $count = 0;
     for (my $i = 0; $i <= 14; $i++) {
@@ -484,6 +492,7 @@ sub _crc {
     $count %= 26;
     return ($cf_out ? $cf : '') . chr(65 + $count);
 }
+
 
 sub parse {
     my $proto = shift;
@@ -543,7 +552,7 @@ my $tr_xnums = eval "sub {\$_[0] =~ tr/$XNUMS/0123456789/}";
 sub _xnums {
     my $self = shift;
     my ($nums) = @_;
-    return unless $nums =~ /^\d*[$XNUMS]*$/o;
+    return unless $nums =~ /^[\d$XNUMS]+$/o;
     $tr_xnums->($nums);
     return $nums;
 }
@@ -621,9 +630,46 @@ sub _n_re {
 }
 
 sub _fix_name {
-    $_[1] =~ tr/àÀèéÈÉìÌòÒùÙ/AAEEEEIIOOUU/;
+    $_[1] =~ tr/Ã Ã€Ã¨Ã©ÃˆÃ‰Ã¬ÃŒÃ²Ã’Ã¹Ã™/AAEEEEIIOOUU/;
     $_[1] =~ tr/a-zA-Z//cd;
 }
+
+sub _bmaker {
+    my ($value, $bit_length, $bits2use, $root, $c) = @_;
+    unless (defined $c) {
+        my $cc = 0;
+        $c = \$cc;
+    }
+    $bits2use ||= 1;
+    $root = 1 unless defined $root;
+    $bit_length ||= 7;
+
+    my $b = 0; my $sum = 0;
+
+    while ($root) {  # the root function increases the number of encoded chars
+        $sum = _bmaker($value, $bit_length, $bits2use, 0, $c);
+        return $sum if $$c == $value;
+        $bits2use++;
+        croak("Something went terribly wrong") if $bits2use > $bit_length;
+    }
+    
+    while ($b <= ($bit_length - $bits2use)) { #we recursively move the 
+                                              #encoded chars to the left
+        if ($bits2use > 1) {
+            $sum = _bmaker($value, $bit_length - 1 - $b, $bits2use - 1, 0, $c);
+        } else {
+            $$c++;
+        }
+            #when we reach the desired value, we sum the "bits" in a number
+            #to be used as a binary bitmap for which chars to substitute
+        return 2 ** ($b+1) * $sum + 2 ** $b if $$c == $value;
+        $b++;
+    }
+    
+    return $sum;
+}
+
+
 
 {
 
@@ -668,8 +714,9 @@ String::CodiceFiscale - convert personal data into italian Codice Fiscale
     print "We have an error: " . String::CodiceFiscale->error;
  }
  
- print "This " . ($obj->sex eq 'M' ? 'guy' : 'chick') . 
-    " was born on " . $obj->date . " (unless he's more than 100)\n"; 
+ print "This person identifies as " . 
+    ($obj->sex eq 'M' ? 'male' : 'female') . 
+    " and was born on " . $obj->date . " (unless he's more than 100)\n"; 
 
  for (qw(Wallace Wall Weeler Awalala)) {
      print "$_\t could be his surname\n" if $obj->sn_match($_);
@@ -705,7 +752,12 @@ with the respective value. See below for possible methods.
 
 Creates a new object from parsing the given STRING as a Codice Fiscale.
 It won't return a valid object if the given Codice Fiscale won't pass
-some validation checks.
+some validation checks. Please note that this method will try
+to handle gently and accept Codice Fiscale which contain special
+characters in the normally numeric fields (birth year and day, last
+three digits of the codice catastale code) while the set methods below
+will only accept numeric values in the same fields.
+
 
 =item validate(CF)
 
@@ -775,11 +827,19 @@ No lookup of city names is provided yet.
 
 =over 4
 
-=item cf
+=item cf([DUPLICATE_NUMBER])
 
 Try to give you a valid codice fiscale. It will return a false value
 if some data is missing.
 Note how the generated codice fiscale has no warranty to be unique.
+By passing a DUPLICATE_NUMBER as an optional parameter,
+the library will try to generate a Codice Fiscale using special
+characters to avoid collisions. "0" will return the default
+Codice Fiscale. From 1 onward the library will substitute special
+characters to create unique codes. Please note that while the algorithm
+to determine the default Codice Fiscale for the first 7 duplicates
+is easily understood, after the 8th duplicate it's just guesswork
+on my part. 
 
 =item crc
 
@@ -827,7 +887,7 @@ Giulio Motta, E<lt>giulienk@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003 by Giulio Motta
+Copyright 2003-2020 by Giulio Motta
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

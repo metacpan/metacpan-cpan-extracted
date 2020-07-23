@@ -73,4 +73,5 @@ t/live-extract-1.t
 t/type-NewspaperName.t
 t/type-Text.t
 t/util-normalize-whitespace.t
+t/util-parse-dateline-ymdhms.t
 t/util-u.t

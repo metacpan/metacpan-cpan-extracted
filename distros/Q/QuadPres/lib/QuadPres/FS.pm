@@ -1,5 +1,5 @@
 package QuadPres::FS;
-$QuadPres::FS::VERSION = '0.28.3';
+$QuadPres::FS::VERSION = '0.30.0';
 use 5.016;
 use strict;
 use warnings;
@@ -112,7 +112,7 @@ QuadPres::FS - filesystem utils
 
 =head1 VERSION
 
-version 0.28.3
+version 0.30.0
 
 =head1 SYNOPSIS
 

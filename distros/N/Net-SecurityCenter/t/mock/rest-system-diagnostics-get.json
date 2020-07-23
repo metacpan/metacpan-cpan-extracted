@@ -1,0 +1,18 @@
+{
+    "type": "regular",
+    "response": {
+        "statusJava": "true",
+        "statusRPM": "true",
+        "statusDisk": "true",
+        "statusThresholdDisk": "5%",
+        "statusLastChecked": "1425532201",
+        "diagnosticsGenerated": 1425563166,
+        "diagnosticsGenerateState": "-1",
+        "touchDebuggingEnabled": false,
+        "migrationFailure": false
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1425571142
+}

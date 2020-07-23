@@ -1,0 +1,67 @@
+{
+    "type": "regular",
+    "response": {
+        "id": "86",
+        "resultsSyncID": "-1",
+        "jobID": "180641",
+        "name": "test scan",
+        "description": "",
+        "details": "BNS",
+        "status": "Paused",
+        "importStatus": "No Results",
+        "importStart": "-1",
+        "importFinish": "-1",
+        "diagnosticAvailable": "false",
+        "downloadAvailable": "false",
+        "downloadFormat": "v2",
+        "dataFormat": "IPv4",
+        "resultType": "active",
+        "resultSource": "internal",
+        "running": "true",
+        "errorDetails": "",
+        "importErrorDetails": "",
+        "totalIPs": "256",
+        "scannedIPs": "0",
+        "startTime": "1554407208",
+        "finishTime": "-1",
+        "createdTime": "1554407202",
+        "scanDuration": "794",
+        "importDuration": "-1",
+        "completedIPs": "0",
+        "completedChecks": "0",
+        "totalChecks": "25600",
+        "canUse": "true",
+        "canManage": "true",
+        "initiator": {
+            "id": "1",
+            "username": "test user",
+            "firstname": "",
+            "lastname": ""
+        },
+        "owner": {
+            "id": "1",
+            "username": "test user",
+            "firstname": "",
+            "lastname": ""
+        },
+        "scan": {
+            "id": "18",
+            "name": "test scan",
+            "description": ""
+        },
+        "repository": {
+            "id": "516",
+            "name": "repo1",
+            "description": ""
+        },
+        "ownerGroup": {
+            "id": "0",
+            "name": "Full Access",
+            "description": "Full Access group"
+        }
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1406917515
+}

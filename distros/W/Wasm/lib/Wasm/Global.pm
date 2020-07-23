@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Interface to WebAssembly Memory
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Wasm::Global - Interface to WebAssembly Memory
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,10 @@ Import globals from Perl into WebAssembly
  print Bar::get_foo(), "\n";   # 0
 
 =head1 DESCRIPTION
+
+B<WARNING>: WebAssembly and Wasmtime are a moving target and the
+interface for these modules is under active development.  Use with
+caution.
 
 This documents the interface to global variables for L<Wasm>.
 Each global variable exported from WebAssembly is automatically

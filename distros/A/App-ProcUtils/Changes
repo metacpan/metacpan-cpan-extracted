@@ -1,3 +1,9 @@
+0.038   2020-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace String::Truncate with lighter (no non-core dep) module
+	  String::Elide::Tiny.
+
+
 0.037   2019-09-11  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] proc-exists: Fix returning result.

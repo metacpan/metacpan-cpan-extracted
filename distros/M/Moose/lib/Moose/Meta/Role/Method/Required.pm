@@ -1,5 +1,5 @@
 package Moose::Meta::Role::Method::Required;
-our $VERSION = '2.2012';
+our $VERSION = '2.2013';
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ Moose::Meta::Role::Method::Required - A Moose metaclass for required methods in 
 
 =head1 VERSION
 
-version 2.2012
+version 2.2013
 
 =head1 DESCRIPTION
 

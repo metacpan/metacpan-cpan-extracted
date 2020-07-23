@@ -3,8 +3,8 @@ package Catalyst::Helper::View::TTSite;
 use strict;
 use File::Spec;
 
-our $VERSION = '0.44';
-$VERSION = eval $VERSION;
+our $VERSION = '0.45';
+$VERSION =~ tr/_//d;
 
 sub mk_compclass {
     my ( $self, $helper, @args ) = @_;

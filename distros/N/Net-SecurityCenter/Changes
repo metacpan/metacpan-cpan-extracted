@@ -1,5 +1,18 @@
 Revision history for Net::SecurityCenter
 
+0.206 2020/07/22
+    - Refactoring "Net::SecurityCenter" class
+    - Added "Net::SecurityCenter::API::Status" class
+    - Added "Net::SecurityCenter::API::DeviceInfo" class (added in Tenable.sc 5.12)
+    - Added "Net::SecurityCenter::API::System->debug" method (added in Tenable.sc 5.10)
+    - Deprecated "Net::SecurityCenter::API::System->get_status" method
+    - Deprecated "Net::SecurityCenter::API::System->get_info" method
+    - Improved "Net::SecurityCenter::API::ScanResult->list" method (added "start_time" and "end_time" params)
+    - Fixed unhexpected behavior in "Net::SecurityCenter::API::ScanResult->list" method for "start_date" and "end_date" params
+    - Improved sc-api command
+    - Improved documentations
+    - Added more tests
+
 0.205 2020/01/31
     - Added new Net::SecurityCenter::API::ScanResult methods
         - import
@@ -13,9 +26,9 @@ Revision history for Net::SecurityCenter
 0.203 2019/10/29
     - Added initial support for Tenable.sc 5.12
     - Added "Net::SecurityCenter::API::Scanner::health" method
-    - Renamed "Net::SecurityCenter::API::Scanner::get_status" method to "Net::SecurityCenter::API::Scanner::status"
-    - Renamed "Net::SecurityCenter::API::ScanResult::get_status" method to "Net::SecurityCenter::API::ScanResult::status"
-    - Renamed "Net::SecurityCenter::API::ScanResult::get_progress" method to "Net::SecurityCenter::API::ScanResult::progress"
+    - Renamed "Net::SecurityCenter::API::Scanner->get_status" method to "Net::SecurityCenter::API::Scanner->status"
+    - Renamed "Net::SecurityCenter::API::ScanResult->get_status" method to "Net::SecurityCenter::API::ScanResult->status"
+    - Renamed "Net::SecurityCenter::API::ScanResult->get_progress" method to "Net::SecurityCenter::API::ScanResult->progress"
 
 0.202 2019/09/10
     - Added "download" method for Analysis API

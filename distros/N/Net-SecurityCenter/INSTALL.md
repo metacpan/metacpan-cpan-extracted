@@ -47,7 +47,7 @@ You can also look for information at:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2018-2019 Giuseppe Di Terlizzi
+Copyright (C) 2018-2020 Giuseppe Di Terlizzi
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

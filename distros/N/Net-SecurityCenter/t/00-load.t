@@ -20,6 +20,7 @@ require_ok('Net::SecurityCenter::API::Repository');
 require_ok('Net::SecurityCenter::API::Scan');
 require_ok('Net::SecurityCenter::API::ScanResult');
 require_ok('Net::SecurityCenter::API::Scanner');
+require_ok('Net::SecurityCenter::API::Status');
 require_ok('Net::SecurityCenter::API::System');
 require_ok('Net::SecurityCenter::API::User');
 require_ok('Net::SecurityCenter::API::Zone');

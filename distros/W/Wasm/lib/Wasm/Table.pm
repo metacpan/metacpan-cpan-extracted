@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Interface to WebAssembly Tables
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 1;
@@ -22,9 +22,13 @@ Wasm::Table - Interface to WebAssembly Tables
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 DESCRIPTION
+
+B<WARNING>: WebAssembly and Wasmtime are a moving target and the
+interface for these modules is under active development.  Use with
+caution.
 
 L<Wasm> doesn't yet provide an interface to WebAssembly Tables,
 but one day this is where its interface will be documented.

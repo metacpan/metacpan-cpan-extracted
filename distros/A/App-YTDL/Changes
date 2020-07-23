@@ -1,6 +1,18 @@
 Revision history for App-YTDL
 
 
+0.401   2020-07-22
+        - Code refactoring.
+        - New format for sticky and history files.
+        - Bugfix in history sort.
+        - Info output modification.
+
+0.400   2020-07-21
+        - Use 'youtube-dl' the fetch video info.
+        - Bugfix: restore chosen file format after an error.
+        - Bugfix in add_uploaders_to_history
+        - Bugfix for the 'Search' entry in the list menu.
+
 0.318   2020-03-31
         - Update option 'filename format info'.
 

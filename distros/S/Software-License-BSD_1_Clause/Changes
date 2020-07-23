@@ -1,3 +1,7 @@
+0.004     2020-07-22 06:59:07+02:00 Europe/Warsaw
+  - OSI has now approved the license, which means ->meta_name will now return
+    'open_source' instead of 'unrestricted'
+
 0.003     2019-11-19 05:28:29+01:00 Europe/Warsaw
   - A certain individual on #perl@freenode has told me that excluding dist.ini
     is a bad idea

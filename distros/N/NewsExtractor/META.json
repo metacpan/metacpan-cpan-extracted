@@ -45,7 +45,7 @@
    "provides" : {
       "NewsExtractor" : {
          "file" : "lib/NewsExtractor.pm",
-         "version" : "v0.32.0"
+         "version" : "v0.33.0"
       },
       "NewsExtractor::Article" : {
          "file" : "lib/NewsExtractor/Article.pm"
@@ -211,7 +211,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.32.0",
+   "version" : "v0.33.0",
    "x_serialization_backend" : "JSON::PP version 2.97001",
    "x_spdx_expression" : "CC0-1.0",
    "x_static_install" : "1"

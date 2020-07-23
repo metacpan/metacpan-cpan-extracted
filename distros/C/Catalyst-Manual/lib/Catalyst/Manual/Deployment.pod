@@ -68,6 +68,11 @@ Catalyst can be deployed with any PSGI-compliant handler. See L<Catalyst::PSGI>
 for more information; a list of possible deployment servers are shown
 below:
 
+=head3 NGINX Unit
+
+L<NGINX Unit|https://unit.nginx.org> is a lightweight, dynamically configurable
+web app server that supports running PSGI-capable apps.
+
 =head3 Starman
 
 L<Starman> is a high-performance Perl server implementation, which is designed

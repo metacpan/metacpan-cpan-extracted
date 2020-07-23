@@ -330,6 +330,7 @@
         hv_stores(the_hv, "CURLM_RECURSIVE_API_CALL", newSViv(CURLM_RECURSIVE_API_CALL));
         hv_stores(the_hv, "CURLM_UNKNOWN_OPTION", newSViv(CURLM_UNKNOWN_OPTION));
         hv_stores(the_hv, "CURLM_WAKEUP_FAILURE", newSViv(CURLM_WAKEUP_FAILURE));
+        hv_stores(the_hv, "CURLOPTTYPE_BLOB", newSViv(CURLOPTTYPE_BLOB));
         hv_stores(the_hv, "CURLOPTTYPE_FUNCTIONPOINT", newSViv(CURLOPTTYPE_FUNCTIONPOINT));
         hv_stores(the_hv, "CURLOPTTYPE_LONG", newSViv(CURLOPTTYPE_LONG));
         hv_stores(the_hv, "CURLOPTTYPE_OBJECTPOINT", newSViv(CURLOPTTYPE_OBJECTPOINT));
@@ -439,6 +440,7 @@
         hv_stores(the_hv, "CURLOPT_IOCTLFUNCTION", newSViv(CURLOPT_IOCTLFUNCTION));
         hv_stores(the_hv, "CURLOPT_IPRESOLVE", newSViv(CURLOPT_IPRESOLVE));
         hv_stores(the_hv, "CURLOPT_ISSUERCERT", newSViv(CURLOPT_ISSUERCERT));
+        hv_stores(the_hv, "CURLOPT_ISSUERCERT_BLOB", newSViv(CURLOPT_ISSUERCERT_BLOB));
         hv_stores(the_hv, "CURLOPT_KEEP_SENDING_ON_ERROR", newSViv(CURLOPT_KEEP_SENDING_ON_ERROR));
         hv_stores(the_hv, "CURLOPT_KEYPASSWD", newSViv(CURLOPT_KEYPASSWD));
         hv_stores(the_hv, "CURLOPT_KRB4LEVEL", newSViv(CURLOPT_KRB4LEVEL));
@@ -499,13 +501,17 @@
         hv_stores(the_hv, "CURLOPT_PROXY_CAINFO", newSViv(CURLOPT_PROXY_CAINFO));
         hv_stores(the_hv, "CURLOPT_PROXY_CAPATH", newSViv(CURLOPT_PROXY_CAPATH));
         hv_stores(the_hv, "CURLOPT_PROXY_CRLFILE", newSViv(CURLOPT_PROXY_CRLFILE));
+        hv_stores(the_hv, "CURLOPT_PROXY_ISSUERCERT", newSViv(CURLOPT_PROXY_ISSUERCERT));
+        hv_stores(the_hv, "CURLOPT_PROXY_ISSUERCERT_BLOB", newSViv(CURLOPT_PROXY_ISSUERCERT_BLOB));
         hv_stores(the_hv, "CURLOPT_PROXY_KEYPASSWD", newSViv(CURLOPT_PROXY_KEYPASSWD));
         hv_stores(the_hv, "CURLOPT_PROXY_PINNEDPUBLICKEY", newSViv(CURLOPT_PROXY_PINNEDPUBLICKEY));
         hv_stores(the_hv, "CURLOPT_PROXY_SERVICE_NAME", newSViv(CURLOPT_PROXY_SERVICE_NAME));
         hv_stores(the_hv, "CURLOPT_PROXY_SSLCERT", newSViv(CURLOPT_PROXY_SSLCERT));
         hv_stores(the_hv, "CURLOPT_PROXY_SSLCERTTYPE", newSViv(CURLOPT_PROXY_SSLCERTTYPE));
+        hv_stores(the_hv, "CURLOPT_PROXY_SSLCERT_BLOB", newSViv(CURLOPT_PROXY_SSLCERT_BLOB));
         hv_stores(the_hv, "CURLOPT_PROXY_SSLKEY", newSViv(CURLOPT_PROXY_SSLKEY));
         hv_stores(the_hv, "CURLOPT_PROXY_SSLKEYTYPE", newSViv(CURLOPT_PROXY_SSLKEYTYPE));
+        hv_stores(the_hv, "CURLOPT_PROXY_SSLKEY_BLOB", newSViv(CURLOPT_PROXY_SSLKEY_BLOB));
         hv_stores(the_hv, "CURLOPT_PROXY_SSLVERSION", newSViv(CURLOPT_PROXY_SSLVERSION));
         hv_stores(the_hv, "CURLOPT_PROXY_SSL_CIPHER_LIST", newSViv(CURLOPT_PROXY_SSL_CIPHER_LIST));
         hv_stores(the_hv, "CURLOPT_PROXY_SSL_OPTIONS", newSViv(CURLOPT_PROXY_SSL_OPTIONS));
@@ -560,11 +566,13 @@
         hv_stores(the_hv, "CURLOPT_SSLCERT", newSViv(CURLOPT_SSLCERT));
         hv_stores(the_hv, "CURLOPT_SSLCERTPASSWD", newSViv(CURLOPT_SSLCERTPASSWD));
         hv_stores(the_hv, "CURLOPT_SSLCERTTYPE", newSViv(CURLOPT_SSLCERTTYPE));
+        hv_stores(the_hv, "CURLOPT_SSLCERT_BLOB", newSViv(CURLOPT_SSLCERT_BLOB));
         hv_stores(the_hv, "CURLOPT_SSLENGINE", newSViv(CURLOPT_SSLENGINE));
         hv_stores(the_hv, "CURLOPT_SSLENGINE_DEFAULT", newSViv(CURLOPT_SSLENGINE_DEFAULT));
         hv_stores(the_hv, "CURLOPT_SSLKEY", newSViv(CURLOPT_SSLKEY));
         hv_stores(the_hv, "CURLOPT_SSLKEYPASSWD", newSViv(CURLOPT_SSLKEYPASSWD));
         hv_stores(the_hv, "CURLOPT_SSLKEYTYPE", newSViv(CURLOPT_SSLKEYTYPE));
+        hv_stores(the_hv, "CURLOPT_SSLKEY_BLOB", newSViv(CURLOPT_SSLKEY_BLOB));
         hv_stores(the_hv, "CURLOPT_SSLVERSION", newSViv(CURLOPT_SSLVERSION));
         hv_stores(the_hv, "CURLOPT_SSL_CIPHER_LIST", newSViv(CURLOPT_SSL_CIPHER_LIST));
         hv_stores(the_hv, "CURLOPT_SSL_CTX_DATA", newSViv(CURLOPT_SSL_CTX_DATA));
@@ -709,6 +717,7 @@
         hv_stores(the_hv, "CURLSSLBACKEND_SECURETRANSPORT", newSViv(CURLSSLBACKEND_SECURETRANSPORT));
         hv_stores(the_hv, "CURLSSLBACKEND_WOLFSSL", newSViv(CURLSSLBACKEND_WOLFSSL));
         hv_stores(the_hv, "CURLSSLOPT_ALLOW_BEAST", newSViv(CURLSSLOPT_ALLOW_BEAST));
+        hv_stores(the_hv, "CURLSSLOPT_NATIVE_CA", newSViv(CURLSSLOPT_NATIVE_CA));
         hv_stores(the_hv, "CURLSSLOPT_NO_PARTIALCHAIN", newSViv(CURLSSLOPT_NO_PARTIALCHAIN));
         hv_stores(the_hv, "CURLSSLOPT_NO_REVOKE", newSViv(CURLSSLOPT_NO_REVOKE));
         hv_stores(the_hv, "CURLSSLOPT_REVOKE_BEST_EFFORT", newSViv(CURLSSLOPT_REVOKE_BEST_EFFORT));

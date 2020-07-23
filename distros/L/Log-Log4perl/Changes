@@ -2,6 +2,12 @@
  Revision history for Log::Log4perl
 ##################################################
 
+1.50 2020-07-22
+   *    (ms) Fix for slow unlinking on Windows test - thanks @zhiyuan-lin
+   *    (ms) [rt.cpan.org #121346] Gabor Kanizsai reported a regression
+             with empty messages logged via syswrite(). Fixed with test
+             case.
+
 1.49 (2017/02/20)
    *    (ms) Adapted to perl 5.24 which balks at syswrite/utf8:
           https://github.com/mschilli/log4perl/issues/78

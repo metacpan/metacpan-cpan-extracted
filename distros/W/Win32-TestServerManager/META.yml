@@ -23,5 +23,5 @@ requires:
   Win32::Process: '0'
 resources:
   repository: https://github.com/charsbar/Win32-TestServerManager
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

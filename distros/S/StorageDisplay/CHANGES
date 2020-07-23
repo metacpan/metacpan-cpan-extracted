@@ -1,10 +1,40 @@
 ==================================================
-Changes from 2019-04-05 00:00:00 +0000 to present.
+Changes from 2019-07-22 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 1.0.4 at 2020-04-04 20:03:26 +0000
+version 1.0.5 at 2020-07-21 15:31:59 +0000
 ------------------------------------------
+
+  Change: 16310bf7b26a770e17e445493338f061b38a7dcf
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-07-21 17:28:21 +0000
+
+    v1.0.5 
+
+  Change: 456c3bccd94bb2a63abe3cbe5701a3cad9d088ca
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-07-21 17:24:52 +0000
+
+    Handle missing raid devices for LSI controler 
+
+  Change: 704e670b1f053a97e6e90b4ae84d9b88a37234f2
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-07-21 17:23:13 +0000
+
+    Avoid duplicate size info on RAID disks 
+
+  Change: db8ab15df00c31f5392feaedde5e02b835cded8c
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 22:05:17 +0000
+
+    dzil: try to make ChangelogFromGit working 
+
+  Change: 8ed06369e622684d955b955fcefac9dbcd86b5f5
+  Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>
+  Date : 2020-04-04 22:04:05 +0000
+
+    v1.0.4 
 
   Change: 24d34635366d83c6842f3cfce401fa75c9db5fd5
   Author: Vincent Danjean <Vincent.Danjean@ens-lyon.org>

@@ -1,0 +1,357 @@
+{
+    "type": "regular",
+    "response": [
+        {
+            "id": "9",
+            "name": "AIX Local Security Checks"
+        },
+        {
+            "id": "1000022",
+            "name": "Abuse"
+        },
+        {
+            "id": "54",
+            "name": "Amazon Linux Local Security Checks"
+        },
+        {
+            "id": "35",
+            "name": "Backdoors"
+        },
+        {
+            "id": "1000001",
+            "name": "Backdoors"
+        },
+        {
+            "id": "49",
+            "name": "Brute force attacks"
+        },
+        {
+            "id": "1000002",
+            "name": "CGI"
+        },
+        {
+            "id": "6",
+            "name": "CGI abuses"
+        },
+        {
+            "id": "26",
+            "name": "CGI abuses  :  XSS"
+        },
+        {
+            "id": "33",
+            "name": "CISCO"
+        },
+        {
+            "id": "18",
+            "name": "CentOS Local Security Checks"
+        },
+        {
+            "id": "1000031",
+            "name": "Cloud Services"
+        },
+        {
+            "id": "37",
+            "name": "DNS"
+        },
+        {
+            "id": "1000004",
+            "name": "DNS Servers"
+        },
+        {
+            "id": "1000024",
+            "name": "Data Leakage"
+        },
+        {
+            "id": "1000003",
+            "name": "Database"
+        },
+        {
+            "id": "31",
+            "name": "Databases"
+        },
+        {
+            "id": "3",
+            "name": "Debian Local Security Checks"
+        },
+        {
+            "id": "25",
+            "name": "Default Unix Accounts"
+        },
+        {
+            "id": "22",
+            "name": "Denial of Service"
+        },
+        {
+            "id": "19",
+            "name": "FTP"
+        },
+        {
+            "id": "1000027",
+            "name": "FTP Clients"
+        },
+        {
+            "id": "1000006",
+            "name": "FTP Servers"
+        },
+        {
+            "id": "5",
+            "name": "Fedora Local Security Checks"
+        },
+        {
+            "id": "1000005",
+            "name": "Finger"
+        },
+        {
+            "id": "44",
+            "name": "Finger abuses"
+        },
+        {
+            "id": "34",
+            "name": "Firewalls"
+        },
+        {
+            "id": "13",
+            "name": "FreeBSD Local Security Checks"
+        },
+        {
+            "id": "40",
+            "name": "Gain a shell remotely"
+        },
+        {
+            "id": "27",
+            "name": "Gain root remotely"
+        },
+        {
+            "id": "30",
+            "name": "General"
+        },
+        {
+            "id": "1000007",
+            "name": "Generic"
+        },
+        {
+            "id": "7",
+            "name": "Gentoo Local Security Checks"
+        },
+        {
+            "id": "2",
+            "name": "HP-UX Local Security Checks"
+        },
+        {
+            "id": "1000008",
+            "name": "IMAP Servers"
+        },
+        {
+            "id": "1000010",
+            "name": "IRC Clients"
+        },
+        {
+            "id": "1000026",
+            "name": "IRC Servers"
+        },
+        {
+            "id": "1000009",
+            "name": "Internet Messengers"
+        },
+        {
+            "id": "1000028",
+            "name": "Internet Services"
+        },
+        {
+            "id": "50",
+            "name": "Junos Local Security Checks"
+        },
+        {
+            "id": "21",
+            "name": "MacOS X Local Security Checks"
+        },
+        {
+            "id": "1000030",
+            "name": "Malware"
+        },
+        {
+            "id": "16",
+            "name": "Mandrake Local Security Checks"
+        },
+        {
+            "id": "47",
+            "name": "Mandriva Local Security Checks"
+        },
+        {
+            "id": "23",
+            "name": "Misc."
+        },
+        {
+            "id": "52",
+            "name": "Mobile Devices"
+        },
+        {
+            "id": "1000029",
+            "name": "Mobile Devices"
+        },
+        {
+            "id": "0",
+            "name": "N\/A"
+        },
+        {
+            "id": "46",
+            "name": "NIS"
+        },
+        {
+            "id": "43",
+            "name": "Netware"
+        },
+        {
+            "id": "1000011",
+            "name": "Operating System Detection"
+        },
+        {
+            "id": "53",
+            "name": "Oracle Linux Local Security Checks"
+        },
+        {
+            "id": "1000013",
+            "name": "POP Server"
+        },
+        {
+            "id": "55",
+            "name": "Palo Alto Local Security Checks"
+        },
+        {
+            "id": "32",
+            "name": "Peer-To-Peer File Sharing"
+        },
+        {
+            "id": "1000012",
+            "name": "Peer-To-Peer File Sharing"
+        },
+        {
+            "id": "1000023",
+            "name": "Policy"
+        },
+        {
+            "id": "39",
+            "name": "Policy Compliance"
+        },
+        {
+            "id": "42",
+            "name": "Port scanners"
+        },
+        {
+            "id": "28",
+            "name": "RPC"
+        },
+        {
+            "id": "1000014",
+            "name": "RPC"
+        },
+        {
+            "id": "1",
+            "name": "Red Hat Local Security Checks"
+        },
+        {
+            "id": "17",
+            "name": "Remote file access"
+        },
+        {
+            "id": "36",
+            "name": "SCADA"
+        },
+        {
+            "id": "1000025",
+            "name": "SCADA"
+        },
+        {
+            "id": "1000016",
+            "name": "SMTP Clients"
+        },
+        {
+            "id": "1000017",
+            "name": "SMTP Servers"
+        },
+        {
+            "id": "12",
+            "name": "SMTP problems"
+        },
+        {
+            "id": "45",
+            "name": "SNMP"
+        },
+        {
+            "id": "1000018",
+            "name": "SNMP Traps"
+        },
+        {
+            "id": "1000019",
+            "name": "SSH"
+        },
+        {
+            "id": "1000015",
+            "name": "Samba"
+        },
+        {
+            "id": "51",
+            "name": "Scientific Linux Local Security Checks"
+        },
+        {
+            "id": "24",
+            "name": "Service detection"
+        },
+        {
+            "id": "41",
+            "name": "Settings"
+        },
+        {
+            "id": "15",
+            "name": "Slackware Local Security Checks"
+        },
+        {
+            "id": "4",
+            "name": "Solaris Local Security Checks"
+        },
+        {
+            "id": "8",
+            "name": "SuSE Local Security Checks"
+        },
+        {
+            "id": "14",
+            "name": "Ubuntu Local Security Checks"
+        },
+        {
+            "id": "38",
+            "name": "Useless services"
+        },
+        {
+            "id": "48",
+            "name": "VMware ESX Local Security Checks"
+        },
+        {
+            "id": "1000020",
+            "name": "Web Clients"
+        },
+        {
+            "id": "11",
+            "name": "Web Servers"
+        },
+        {
+            "id": "1000021",
+            "name": "Web Servers"
+        },
+        {
+            "id": "20",
+            "name": "Windows"
+        },
+        {
+            "id": "10",
+            "name": "Windows  :  Microsoft Bulletins"
+        },
+        {
+            "id": "29",
+            "name": "Windows  :  User management"
+        }
+    ],
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1408728112
+}

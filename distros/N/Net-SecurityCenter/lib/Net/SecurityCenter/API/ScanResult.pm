@@ -11,7 +11,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.205';
+our $VERSION = '0.206';
 
 my $common_template = {
 
@@ -84,12 +84,20 @@ sub list {
         filter     => $common_template->{'filter'},
         raw        => {},
         start_date => {
-            allow => qr/^\d+$/,
-            remap => 'startDate'
+            filter => \&sc_filter_datetime_to_epoch,
+            remap  => 'startTime',
         },
         end_date => {
+            filter => \&sc_filter_datetime_to_epoch,
+            remap  => 'endTime',
+        },
+        start_time => {
             allow => qr/^\d+$/,
-            remap => 'endDate'
+            remap => 'startTime'
+        },
+        end_time => {
+            allow => qr/^\d+$/,
+            remap => 'endTime'
         }
     };
 
@@ -275,15 +283,15 @@ sub import {
     };
 
     my $tmpl = {
-        filename => {},
+        filename      => {},
         dhcp_tracking => {
             remap  => 'dhcpTracking',
             filter => \&sc_filter_int_to_bool,
             allow  => qr/\d/,
         },
         classify_mitigated_age => { remap => 'classifyMitigatedAge' },
-        scan_vhost => {
-            remap => 'scanningVirtualHosts',
+        scan_vhost             => {
+            remap  => 'scanningVirtualHosts',
             filter => \&sc_filter_int_to_bool,
             allow  => qr/\d/,
         },
@@ -300,7 +308,7 @@ sub import {
 
     $params->{'filename'} = $sc_filename;
 
-    $self->client->post("/scanResult/import", $params);
+    $self->client->post( "/scanResult/import", $params );
     return 1;
 
 }
@@ -414,15 +422,115 @@ Params:
 
 Get list of scans results (completed, running, etc.).
 
+
+    my $scans = $sc->list(
+        start_date => '2020-01-01',
+        end_date => '2020-02-01',
+        fields => 'id,name,description,startTime,finishTime',
+    );
+
+
+    # Using Time::Piece
+
+    use Time::Piece;
+    use Time::Seconds;
+
+    my $t = Time::Piece->new;
+    $t -= ONE_DAY; # Yesterday
+
+    my $scans = $sc->list(
+        start_date => $t,
+    );
+
+
 Params:
 
 =over 4
 
 =item * C<fields> : List of fields
 
+=item * C<start_date> : Start date of scan in ISO 8601 format (YYYY-MM-DD, YYYY-MM-DD HH:MM:SS or YYYY-MM-DDTHH:MM:SS) or L<Time::Piece> object
+
+=item * C<end_date> : End date of scan (see C<start_date>)
+
+=item * C<start_time> : Start date in epoch
+
+=item * C<end_date> : End date in epoch 
+
 =item * C<filter> : Filter (C<usable>, C<manageable>, C<running> or C<completed>)
 
 =back
+
+Allowed Fields:
+
+=over 4
+
+=item * C<id> *
+
+=item * C<name> **
+
+=item * C<description> **
+
+=item * C<status> **
+
+=item * C<initiator>
+
+=item * C<owner>
+
+=item * C<ownerGroup>
+
+=item * C<repository>
+
+=item * C<scan>
+
+=item * C<job>
+
+=item * C<details>
+
+=item * C<importStatus>
+
+=item * C<importStart>
+
+=item * C<importFinish>
+
+=item * C<importDuration>
+
+=item * C<downloadAvailable>
+
+=item * C<downloadFormat>
+
+=item * C<dataFormat>
+
+=item * C<resultType>
+
+=item * C<resultSource>
+
+=item * C<running>
+
+=item * C<errorDetails>
+
+=item * C<importErrorDetails>
+
+=item * C<totalIPs>
+
+=item * C<scannedIPs>
+
+=item * C<startTime>
+
+=item * C<finishTime>
+
+=item * C<scanDuration>
+
+=item * C<completedIPs>
+
+=item * C<completedChecks>
+
+=item * C<totalChecks>
+
+=back
+
+(*) always comes back
+(**) comes back if fields list not specified
 
 
 =head2 list_running
@@ -461,7 +569,7 @@ Params:
 
 =item * C<id> : Scan result ID
 
-=item * C<fields> : Fields
+=item * C<fields> : Fields (see C<list>)
 
 =back
 
@@ -635,7 +743,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2019 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

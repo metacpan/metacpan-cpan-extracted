@@ -1,0 +1,54 @@
+{
+    "type": "regular",
+    "response": {
+        "id": "5",
+        "name": "My Active Scanner",
+        "description": "",
+        "ip": "192.168.1.1",
+        "port": "443",
+        "useProxy": "false",
+        "enabled": "true",
+        "verifyHost": "true",
+        "managePlugins": "false",
+        "authType": "password",
+        "cert": null,
+        "username": "nonadmin",
+        "password": "SET",
+        "version": null,
+        "webVersion": null,
+        "admin": "false",
+        "msp": "false",
+        "numScans": "0",
+        "numHosts": "0",
+        "numSessions": "0",
+        "numTCPSessions": "0",
+        "loadAvg": "0.0",
+        "uptime": -1,
+        "status": "8192",
+        "pluginSet": null,
+        "loadedPluginSet": null,
+        "serverUUID": null,
+        "createdTime": "1402435586",
+        "modifiedTime": "1402435586",
+        "accessKey": "",
+        "secretKey": "",
+        "zones": [
+            {
+                "id": "1",
+                "name": "Big Zone",
+                "description": ""
+            }
+        ],
+        "nessusManagerOrgs": [
+            {
+                "id": "1",
+                "name": "Big Org",
+                "description": ""
+            }
+        ]
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1402435871
+}

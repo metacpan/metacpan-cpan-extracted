@@ -4,7 +4,7 @@ use strict;
 use 5.010000;
 use utf8;
 
-our $VERSION = '0.318';
+our $VERSION = '0.401';
 
 use Encode                qw( encode decode );
 use File::Path            qw( make_path );
@@ -20,10 +20,10 @@ use Term::Choose     qw( choose );
 use Term::Form       qw();
 
 use App::YTDL::Arguments  qw( from_arguments_to_choices );
-use App::YTDL::Download   qw( download_youtube );
+use App::YTDL::Download   qw( download );
 use App::YTDL::Helper     qw( uni_capture );
 use App::YTDL::History    qw( add_uploaders_to_history read_history_files choose_videos_from_saved_uploaders edit_sticky_file );
-use App::YTDL::Video_Info qw( gather_video_infos );
+use App::YTDL::Video_Info qw( print_video_infos );
 use App::YTDL::Options    qw( read_config_file set_options get_defaults );
 
 binmode STDIN,  ':encoding(utf-8)';
@@ -133,23 +133,23 @@ if ( ! @ids ) {
     print up( 1 ), cldown;
 }
 
+my $data = {};
+
 if ( @ids ) {
-    my $data = from_arguments_to_choices( $set, $opt, @ids );
-    gather_video_infos( $set, $opt, $data );
-    download_youtube( $set, $opt, $data, 0 );
+    my $chosen_videos = from_arguments_to_choices( $set, $opt, $data, @ids );
+    print_video_infos( $set, $opt, $data, $chosen_videos );
+    download( $set, $opt, $data, $chosen_videos, 0 );
     add_uploaders_to_history( $set, $opt, $data ) if $opt->{max_size_history};
 }
 elsif ( ! @ids && ( %{$set->{history}} || %{$set->{sticky}} ) ) {
     my $old_idx = 0;
 
     MENU: while ( 1 ) {
-        #my @list_size = ( '  ALL', '  50' );
-        #my $list_size_regexp = join '|', map { quotemeta } @list_size;
-        my ( $uploader, $sticky ) = ( '- Uploader', '  Sticky' );
+        my ( $uploader, $sticky ) = ( '- Uploaders', '  Edit Sticky' );
         my $menu = [ undef, $uploader, $sticky ];
         # Choose
         my $idx = choose(
-            $menu,                                  # , $list_size[$set->{small_list_size}
+            $menu,
             { prompt => 'Choose:', layout => 3, undef => '  QUIT', clear_screen => 1, index => 1, default => $old_idx }
         );
         if ( ! defined $idx || ! defined $menu->[$idx] ) {
@@ -163,20 +163,15 @@ elsif ( ! @ids && ( %{$set->{history}} || %{$set->{sticky}} ) ) {
         #    $old_idx = $idx;
         #}
         if ( $menu->[$idx] eq $uploader ) {
-            my @chosen_ids = choose_videos_from_saved_uploaders( $set, $opt );
-            next if ! @chosen_ids;
-            my $data = from_arguments_to_choices( $set, $opt, @chosen_ids );
-            gather_video_infos( $set, $opt, $data );
-            download_youtube( $set, $opt, $data, 1 );
+            my @chosen_uploaders = choose_videos_from_saved_uploaders( $set, $opt );
+            next if ! @chosen_uploaders;
+            my $chosen_videos = from_arguments_to_choices( $set, $opt, $data, @chosen_uploaders );
+            print_video_infos( $set, $opt, $data, $chosen_videos );
+            download( $set, $opt, $data, $chosen_videos, 1 );
         }
         elsif ( $menu->[$idx] eq $sticky ) {
            edit_sticky_file( $set, $opt );
         }
-        #if ( $menu->[$idx] =~ /^$list_size_regexp\z/ ) {
-        #    $set->{small_list_size}++;
-        #    $set->{small_list_size} = 0 if $set->{small_list_size} > $#list_size;
-        #    next MENU;
-        #}
     }
 }
 
@@ -186,7 +181,7 @@ if ( ! @ids ) {
 }
 
 
-if ( @{$set->{error_get_download_infos}} ) { ##
+if ( @{$set->{error_get_download_infos}} ) {
     say "\nError fetching download infos:";
     for my $video_id ( @{$set->{error_get_download_infos}} ) {
         say '  ' . $video_id;
@@ -207,7 +202,7 @@ getvideo - Download YouTube and other videos.
 
 =head1 VERSION
 
-Version 0.318
+Version 0.401
 
 =cut
 
@@ -346,8 +341,6 @@ sticky gets also a new timestamp.
 When added to the uploader-history an uploader gets the current timestamp. If the I<size history> limit is reached, the
 uploader with the oldest timestamp is removed first.
 
-The supported extractors are YouTube and Vimeo.
-
 =head3 History sort
 
 Sort the history
@@ -358,28 +351,15 @@ Sort the history
 
 =head2 Uploader video list
 
-=head3 List type
+=head3 Additional information
 
-- all standard (list all uploader/playlist videos in the menu).
-
-- all fast (list all uploader/playlist videos in the menu).
-
-- latest (list only the latest videos in the menu - Vimeo: 48, YouTube: 50).
-
-If I<all fast> or I<latest fast> is chosen, the download of the required data for the list-menu takes less time since
-the data required for the video downloads is fetched later only for the chosen videos.
-
-With I<all fast> or I<latest fast> enabled a progress info is shown.
-
-Supported extractors:
-
-- Vimeo (no view-count available).
-
-- YouTube (the upload-date is relative to now).
+For the first [value of I<additional information>] uploader video list entries is downloaded and shown additional
+information. The uploader video list is ordered is adopted from the output returned by C<--dump-single-json> from
+C<youtube-dl>.
 
 =head3 Sort order
 
-Sort the videos in the list-menu by
+Sort the first  [value of I<additional information>] videos in the list-menu by
 
 - upload date (fallback title);
 
@@ -393,9 +373,19 @@ Fallback is used, if the chosen entry is not available.
 
 =head3 Show view count
 
+Show the view count in the first [value of I<additional information>] uploader video list entries
+
 - if sorted by view count
 
 - always
+
+=head3 Show video id
+
+Show the video id in the entries of the video list.
+
+- no
+
+- yes
 
 =head2 Info output
 

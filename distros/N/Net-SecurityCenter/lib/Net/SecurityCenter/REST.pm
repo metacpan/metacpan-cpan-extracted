@@ -4,16 +4,15 @@ use warnings;
 use strict;
 
 use Carp;
-use Data::Dumper;
 use English qw( -no_match_vars );
 use HTTP::Cookies;
 use JSON;
 use LWP::UserAgent;
 
 use Net::SecurityCenter::Error;
-use Net::SecurityCenter::Utils qw(:all);
+use Net::SecurityCenter::Utils qw(trim dumper);
 
-our $VERSION = '0.205';
+our $VERSION = '0.206';
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR
@@ -79,32 +78,6 @@ sub _agent {
     ( my $agent = $class ) =~ s{::}{-}g;
 
     return "$agent/" . $class->VERSION;
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub _dumper {
-
-    my (@data) = @_;
-
-    local $Data::Dumper::Terse  = 1;
-    local $Data::Dumper::Indent = 0;
-
-    return Dumper(@data);
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub _trim {
-
-    my ($string) = @_;
-
-    return if ( !$string );
-
-    $string =~ s/^\s+|\s+$//g;
-    return $string;
 
 }
 
@@ -182,7 +155,7 @@ sub request {
     $method = uc($method);
     $path =~ s{^/}{};
 
-    if ( $method !~ m/(GET|POST|PUT|DELETE|PATCH)/ ) {
+    if ( $method !~ m/(?:GET|POST|PUT|DELETE|PATCH)/ ) {
         carp( $method, ' is an unsupported request method' );
         croak( 'Usage: ' . __PACKAGE__ . '->request(GET|POST|PUT|DELETE|PATCH, $PATH, [\%PARAMS])' );
     }
@@ -200,7 +173,7 @@ sub request {
 
         # Don't log credential
         if ( $path !~ /token/ ) {
-            $self->logger( 'info', "Params: " . _dumper($params) );
+            $self->logger( 'info', "Params: " . dumper($params) );
         }
 
     }
@@ -273,7 +246,7 @@ sub request {
 
             } elsif ( $result->{'error_msg'} ) {
 
-                my $error_msg = _trim( $result->{'error_msg'} );
+                my $error_msg = trim( $result->{'error_msg'} );
 
                 if ( $self->{'logger'} ) {
                     $self->logger( 'error', $error_msg );
@@ -291,7 +264,7 @@ sub request {
 
     if ( $is_json && exists( $result->{'error_msg'} ) ) {
 
-        my $error_msg = _trim( $result->{'error_msg'} );
+        my $error_msg = trim( $result->{'error_msg'} );
 
         if ( $self->{'logger'} ) {
             $self->logger( 'error', $error_msg );
@@ -320,7 +293,7 @@ sub upload {
     my ( $self, $file ) = @_;
 
     ( @_ == 2 )
-        or croak( 'Usage: ' . __PACKAGE__ . 'upload( $FILE )' );
+        or croak( 'Usage: ' . __PACKAGE__ . '->upload( $FILE )' );
 
     return $self->request( 'POST', '/file/upload', { 'file' => $file } );
 
@@ -406,6 +379,8 @@ sub DESTROY {
     if ( $self->{'token'} ) {
         $self->logout();
     }
+
+    return;
 
 }
 
@@ -526,7 +501,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2019 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 Revision history for MooX-ShortHas
 
+1.202040  2020-07-22 02:04:26+02:00 Europe/Berlin
+    - allow two or more roles using MooX-ShortHas to be consumed together
+
 1.190320  2019-02-01 22:09:00+01:00 Europe/Berlin
     - add Mus to the SEE ALSO section
 

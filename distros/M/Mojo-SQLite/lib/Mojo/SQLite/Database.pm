@@ -3,14 +3,12 @@ use Mojo::Base -base;
 
 use Carp qw(croak shortmess);
 use DBI 'SQL_VARCHAR';
-use Mojo::IOLoop;
 use Mojo::JSON 'to_json';
 use Mojo::SQLite::Results;
 use Mojo::SQLite::Transaction;
 use Mojo::Util 'monkey_patch';
-use Scalar::Util 'weaken';
 
-our $VERSION = '3.003';
+our $VERSION = '3.004';
 
 our @CARP_NOT = qw(Mojo::SQLite::Migrations);
 
@@ -36,9 +34,7 @@ sub DESTROY {
 
 sub begin {
   my ($self, $behavior) = @_;
-  my $tx = Mojo::SQLite::Transaction->new(db => $self, behavior => $behavior);
-  weaken $tx->{db};
-  return $tx;
+  return Mojo::SQLite::Transaction->new(db => $self, behavior => $behavior);
 }
 
 sub disconnect {
@@ -85,6 +81,7 @@ sub query {
 
   # Still blocking, but call the callback on the next tick
   $error = $dbh->err ? $dbh->errstr : $errored ? ($error || 'Error running SQLite query') : undef;
+  require Mojo::IOLoop;
   Mojo::IOLoop->next_tick(sub { $self->$cb($error, $results) });
   return $self;
 }
@@ -105,8 +102,10 @@ sub _bind_params {
         $sth->bind_param($i+1, $param->{value}, $param->{type});
       } elsif (exists $param->{json}) {
         $sth->bind_param($i+1, to_json($param->{json}), SQL_VARCHAR);
+      } elsif (exists $param->{-json}) {
+        $sth->bind_param($i+1, to_json($param->{-json}), SQL_VARCHAR);
       } else {
-        croak qq{Unknown parameter hashref (no "type"/"value" or "json")};
+        croak qq{Unknown parameter hashref (no "type"/"value", "json" or "-json")};
       }
     } else {
       $sth->bind_param($i+1, $param);
@@ -190,8 +189,8 @@ L<Mojo::SQLite::Transaction/"commit"> has been called before it is destroyed.
 
 A transaction locking behavior of C<deferred>, C<immediate>, or C<exclusive>
 may optionally be passed; the default in L<DBD::SQLite> is currently
-C<immediate>. See L<DBD::SQLite/"Transaction and Database Locking"> for more
-details.
+C<immediate>. See L<DBD::SQLite/"Transaction and Database Locking"> and
+L<https://sqlite.org/lang_transaction.html> for more details.
 
 =head2 delete
 
@@ -278,10 +277,11 @@ Hash reference arguments containing C<type> and C<value> elements will use the
 specified bind type for the parameter, using types from L<DBI/"DBI Constants">;
 see L<DBD::SQLite/"Blobs"> and the subsequent section for more information.
 
-Hash reference arguments containing a value named C<json> will be encoded to
-L<JSON text|http://sqlite.org/json1.html> with L<Mojo::JSON/"to_json">. To
-accomplish the reverse, you can use the method L<Mojo::SQLite::Results/"expand">
-to decode JSON text fields to Perl values with L<Mojo::JSON/"from_json">.
+Hash reference arguments containing a value named C<json> or C<-json> will be
+encoded to L<JSON text|http://sqlite.org/json1.html> with
+L<Mojo::JSON/"to_json">. To accomplish the reverse, you can use the method
+L<Mojo::SQLite::Results/"expand"> to decode JSON text fields to Perl values
+with L<Mojo::JSON/"from_json">.
 
   # "I ♥ SQLite!"
   $db->query('select ? as foo', {json => {bar => 'I ♥ SQLite!'}})

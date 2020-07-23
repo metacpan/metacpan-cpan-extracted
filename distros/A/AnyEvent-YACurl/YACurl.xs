@@ -474,6 +474,16 @@ CURLcode setopt_sv_or_croak(pTHX_ AnyEvent__YACurl__Response *request, CURLoptio
             break;
         }
 
+        /* blobs */
+#include "curlopt-blob.inc"
+        {
+            struct curl_blob blob;
+            blob.data = SvPV(parameter, blob.len);
+            blob.flags = CURL_BLOB_COPY;
+            result = curl_easy_setopt(request->easy, option, &blob);
+            break;
+        }
+
         /* File handles */
         case CURLOPT_STDERR:
         {

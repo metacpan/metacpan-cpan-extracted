@@ -1,12 +1,10 @@
 package Koha::Contrib::ARK::Check;
-$Koha::Contrib::ARK::Check::VERSION = '1.0.3';
 # ABSTRACT: Check Koha ARK field
+$Koha::Contrib::ARK::Check::VERSION = '1.0.5';
 use Moose;
-
-with 'Koha::Contrib::ARK::Action';
-
 use Modern::Perl;
 
+with 'Koha::Contrib::ARK::Action';
 
 
 sub action {
@@ -51,9 +49,7 @@ sub action {
             }
         }
     }
-    unless ($found) {
-        $self->ark->what_append('not_found');
-    }
+    $self->ark->what_append('not_found')  unless $found;
 }
 
 
@@ -72,7 +68,7 @@ Koha::Contrib::ARK::Check - Check Koha ARK field
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.5
 
 =head1 AUTHOR
 
@@ -80,7 +76,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Demians.
+This software is Copyright (c) 2020 by Fréderic Demians.
 
 This is free software, licensed under:
 

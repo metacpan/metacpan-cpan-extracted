@@ -1,0 +1,57 @@
+{
+    "type": "regular",
+    "response": {
+        "id": "37",
+        "name": "ag repo1",
+        "description": "Copied",
+        "type": "Local",
+        "dataFormat": "IPv4",
+        "remoteID": null,
+        "remoteIP": null,
+        "running": "false",
+        "downloadFormat": "v2",
+        "lastSyncTime": "0",
+        "createdTime": "1422396357",
+        "modifiedTime": "1422396357",
+        "organizations": [
+            {
+                "id": "8",
+                "groupAssign": "fullAccess",
+                "name": "Org",
+                "description": "Testing for Policies with New Schema"
+            }
+        ],
+        "typeFields": {
+            "lastVulnUpdate": 1423718403,
+            "vulnCount": 0,
+            "nessusSchedule": {
+                "type": "never",
+                "start": "",
+                "repeatRule": ""
+            },
+            "correlation": [],
+            "ipRange": "192.168.0.0\/24",
+            "ipCount": "0",
+            "runningNessus": "false",
+            "lastGenerateNessusTime": "0",
+            "trendingDays": "0",
+            "trendWithRaw": "true"
+        },
+        "luminFields": {
+            "firstSyncTime": "1573594357",
+            "lastSyncSuccess": "1573594357",
+            "lastSyncFailure": "-1",
+            "details": "details for LuminFields",
+            "enabled": "true",
+            "repository": {
+                "id": "37",
+                "name": "ag repo1",
+                "description": "Copied"
+            }
+        }
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1423767366
+}

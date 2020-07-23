@@ -1,0 +1,39 @@
+{
+    "type": "regular",
+    "response": [
+        {
+            "id": "12",
+            "name": "Scanner 1",
+            "description": "Copied from QA",
+            "status": "1"
+        },
+        {
+            "id": "14",
+            "name": "Scanner using Safe Scan Range",
+            "description": "",
+            "status": "16"
+        },
+        {
+            "id": "15",
+            "name": "mp zone 1 scanner",
+            "description": "Copied from QA",
+            "status": "1"
+        },
+        {
+            "id": "16",
+            "name": "NessusTest",
+            "description": "Copied From QA",
+            "status": "32"
+        },
+        {
+            "id": "17",
+            "name": "sc",
+            "description": "",
+            "status": "2"
+        }
+    ],
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1426878501
+}

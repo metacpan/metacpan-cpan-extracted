@@ -1,0 +1,14 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    List::Util: 0
+    Minion: '10.10'
+    Mojolicious: '7.29'
+    Mojo::SQLite: '3.000'
+    Sys::Hostname: 0
+    Time::HiRes: 0
+  suggests:
+    Mojo::JSON::MaybeXS: 0
+test:
+  requires:
+    Test::More: '0.96'

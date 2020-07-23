@@ -1,4 +1,7 @@
-Revision history for Net-Checkpoint-Management-v1: 0.001005
+Revision history for Net-Checkpoint-Management-v1: 0.001006
+
+0.001006  2020-07-21 10:19:37+02:00 Europe/Vienna
+    - add group methods
 
 0.001005  2020-04-23 19:39:32+02:00 Europe/Vienna
     - improve exceptions for responses which contain the error message in a

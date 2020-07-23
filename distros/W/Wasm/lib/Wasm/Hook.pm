@@ -10,7 +10,7 @@ use Path::Tiny qw( path );
 use Scalar::Util qw( refaddr );
 
 # ABSTRACT: Automatically load WebAssembly modules without a Perl wrapper
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 sub _hook
@@ -67,7 +67,7 @@ Wasm::Hook - Automatically load WebAssembly modules without a Perl wrapper
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -76,6 +76,10 @@ version 0.17
  no Wasm::Hook; # turns off automatic wasm / wat loading
 
 =head1 DESCRIPTION
+
+B<WARNING>: WebAssembly and Wasmtime are a moving target and the
+interface for these modules is under active development.  Use with
+caution.
 
 This module installs an C<@INC> hook that automatically loads WebAssembly (Wasm)
 files so that they can be used like a Perl module, without:

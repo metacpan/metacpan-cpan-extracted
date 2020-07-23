@@ -1,0 +1,105 @@
+{
+    "type": "regular",
+    "response": {
+        "usable": [
+            {
+                "id": "1",
+                "creatorID": "1",
+                "ownerID": "1",
+                "reportDefinitionID": "-1",
+                "jobID": "1614",
+                "name": "Test Scan",
+                "description": "This report identifies installed software across a series of hosts, utilizing Nessus plugin 22869, Software Enumeration (SSH). This plugin lists the software installed on the remote host by calling the appropriate command (rpm -qa on RPM-based Linux distributions, qpkg, dpkg, etc.).\nThis report is comprised of a Table of Contents for each identified host. The Identified Hosts Table lists the hosts by IP Address, NetBIOS Name, and DNS Name, and is followed by a detailed look at each host individually.\n\nThis area provides some host details in a header with IP Address, DNS Name, NetBIOS Name, and Last Scan Date, and is followed by the host Operating System and a list of installed software, and version (if available).",
+                "type": "pdf",
+                "status": "Completed",
+                "running": "false",
+                "errorDetails": "Error removing components.\nError removing component #6.\nError deleting Data Source #10.\nError retrieving owner of Query.\nUser #1 not found.\n",
+                "totalSteps": "8",
+                "completedSteps": "4",
+                "startTime": "1403298387",
+                "finishTime": "1403299387",
+                "ownerGID": "0",
+                "displayType": "pdf",
+                "pubSites": [
+                    {
+                        "id": "2",
+                        "name": "test",
+                        "description": "desc"
+                    }
+                ],
+                "txLogs": [],
+                "canUse": "true",
+                "canManage": "true",
+                "creator": {
+                    "id": "1",
+                    "username": "head",
+                    "firstname": "test",
+                    "lastname": "User"
+                },
+                "owner": {
+                    "id": "1",
+                    "username": "head",
+                    "firstname": "test",
+                    "lastname": "User"
+                },
+                "ownerGroup": {
+                    "id": "0",
+                    "name": "Full Access",
+                    "description": "Full Access group"
+                }
+            }
+        ],
+        "manageable": [
+            {
+                "id": "1",
+                "creatorID": "1",
+                "ownerID": "1",
+                "reportDefinitionID": "-1",
+                "jobID": "1614",
+                "name": "Test Scan",
+                "description": "This report identifies installed software across a series of hosts, utilizing Nessus plugin 22869, Software Enumeration (SSH). This plugin lists the software installed on the remote host by calling the appropriate command (rpm -qa on RPM-based Linux distributions, qpkg, dpkg, etc.).\nThis report is comprised of a Table of Contents for each identified host. The Identified Hosts Table lists the hosts by IP Address, NetBIOS Name, and DNS Name, and is followed by a detailed look at each host individually.\n\nThis area provides some host details in a header with IP Address, DNS Name, NetBIOS Name, and Last Scan Date, and is followed by the host Operating System and a list of installed software, and version (if available).",
+                "type": "pdf",
+                "status": "Completed",
+                "running": "false",
+                "errorDetails": "Error removing components.\nError removing component #6.\nError deleting Data Source #10.\nError retrieving owner of Query.\nUser #1 not found.\n",
+                "totalSteps": "8",
+                "completedSteps": "4",
+                "startTime": "1403298387",
+                "finishTime": "1403299387",
+                "ownerGID": "0",
+                "displayType": "pdf",
+                "pubSites": [
+                    {
+                        "id": "2",
+                        "name": "test",
+                        "description": "desc"
+                    }
+                ],
+                "txLogs": [],
+                "canUse": "true",
+                "canManage": "true",
+                "creator": {
+                    "id": "1",
+                    "username": "head",
+                    "firstname": "test",
+                    "lastname": "User"
+                },
+                "owner": {
+                    "id": "1",
+                    "username": "head",
+                    "firstname": "test",
+                    "lastname": "User"
+                },
+                "ownerGroup": {
+                    "id": "0",
+                    "name": "Full Access",
+                    "description": "Full Access group"
+                }
+            }
+        ]
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1404919744
+}

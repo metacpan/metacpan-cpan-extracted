@@ -1,0 +1,287 @@
+{
+    "type": "regular",
+    "response": [
+        {
+            "id": "1",
+            "generateXCCDFResults": "false",
+            "context": "",
+            "policyTemplateID": "1",
+            "policyProfileName": "",
+            "name": "test",
+            "description": "desc",
+            "tags": "",
+            "createdTime": "1406148027",
+            "modifiedTime": "1406148027",
+            "status": "0",
+            "auditFiles": [],
+            "preferences": {
+                "preference1": "value1",
+                "preference2": "value2"
+            },
+            "families": [
+                {
+                    "id": "9",
+                    "name": "AIX Local Security Checks",
+                    "count": "11164"
+                },
+                {
+                    "id": "54",
+                    "name": "Amazon Linux Local Security Checks",
+                    "count": "502"
+                },
+                {
+                    "id": "35",
+                    "name": "Backdoors",
+                    "count": "102"
+                },
+                {
+                    "id": "18",
+                    "name": "CentOS Local Security Checks",
+                    "count": "1890"
+                },
+                {
+                    "id": "6",
+                    "name": "CGI abuses",
+                    "count": "3235"
+                },
+                {
+                    "id": "26",
+                    "name": "CGI abuses  :  XSS",
+                    "count": "600"
+                },
+                {
+                    "id": "33",
+                    "name": "CISCO",
+                    "count": "576"
+                },
+                {
+                    "id": "31",
+                    "name": "Databases",
+                    "count": "372"
+                },
+                {
+                    "id": "3",
+                    "name": "Debian Local Security Checks",
+                    "count": "3179"
+                },
+                {
+                    "id": "25",
+                    "name": "Default Unix Accounts",
+                    "count": "101"
+                },
+                {
+                    "id": "22",
+                    "name": "Denial of Service",
+                    "count": "107"
+                },
+                {
+                    "id": "37",
+                    "name": "DNS",
+                    "count": "110"
+                },
+                {
+                    "id": "57",
+                    "name": "F5 Networks Local Security Checks",
+                    "count": "154"
+                },
+                {
+                    "id": "5",
+                    "name": "Fedora Local Security Checks",
+                    "count": "8067"
+                },
+                {
+                    "id": "34",
+                    "name": "Firewalls",
+                    "count": "139"
+                },
+                {
+                    "id": "13",
+                    "name": "FreeBSD Local Security Checks",
+                    "count": "2616"
+                },
+                {
+                    "id": "19",
+                    "name": "FTP",
+                    "count": "244"
+                },
+                {
+                    "id": "40",
+                    "name": "Gain a shell remotely",
+                    "count": "274"
+                },
+                {
+                    "id": "30",
+                    "name": "General",
+                    "count": "198"
+                },
+                {
+                    "id": "7",
+                    "name": "Gentoo Local Security Checks",
+                    "count": "2071"
+                },
+                {
+                    "id": "2",
+                    "name": "HP-UX Local Security Checks",
+                    "count": "1974"
+                },
+                {
+                    "id": "56",
+                    "name": "Huawei Local Security Checks",
+                    "count": "14"
+                },
+                {
+                    "id": "50",
+                    "name": "Junos Local Security Checks",
+                    "count": "107"
+                },
+                {
+                    "id": "21",
+                    "name": "MacOS X Local Security Checks",
+                    "count": "717"
+                },
+                {
+                    "id": "47",
+                    "name": "Mandriva Local Security Checks",
+                    "count": "2970"
+                },
+                {
+                    "id": "23",
+                    "name": "Misc.",
+                    "count": "972"
+                },
+                {
+                    "id": "52",
+                    "name": "Mobile Devices",
+                    "count": "43"
+                },
+                {
+                    "id": "43",
+                    "name": "Netware",
+                    "count": "14"
+                },
+                {
+                    "id": "53",
+                    "name": "Oracle Linux Local Security Checks",
+                    "count": "1912"
+                },
+                {
+                    "id": "55",
+                    "name": "Palo Alto Local Security Checks",
+                    "count": "20"
+                },
+                {
+                    "id": "32",
+                    "name": "Peer-To-Peer File Sharing",
+                    "count": "72"
+                },
+                {
+                    "id": "39",
+                    "name": "Policy Compliance",
+                    "count": "38"
+                },
+                {
+                    "id": "42",
+                    "name": "Port scanners",
+                    "count": "8"
+                },
+                {
+                    "id": "1",
+                    "name": "Red Hat Local Security Checks",
+                    "count": "3424"
+                },
+                {
+                    "id": "28",
+                    "name": "RPC",
+                    "count": "36"
+                },
+                {
+                    "id": "36",
+                    "name": "SCADA",
+                    "count": "198"
+                },
+                {
+                    "id": "51",
+                    "name": "Scientific Linux Local Security Checks",
+                    "count": "1760"
+                },
+                {
+                    "id": "24",
+                    "name": "Service detection",
+                    "count": "408"
+                },
+                {
+                    "id": "41",
+                    "name": "Settings",
+                    "count": "66"
+                },
+                {
+                    "id": "15",
+                    "name": "Slackware Local Security Checks",
+                    "count": "757"
+                },
+                {
+                    "id": "12",
+                    "name": "SMTP problems",
+                    "count": "135"
+                },
+                {
+                    "id": "45",
+                    "name": "SNMP",
+                    "count": "33"
+                },
+                {
+                    "id": "4",
+                    "name": "Solaris Local Security Checks",
+                    "count": "3798"
+                },
+                {
+                    "id": "8",
+                    "name": "SuSE Local Security Checks",
+                    "count": "7355"
+                },
+                {
+                    "id": "14",
+                    "name": "Ubuntu Local Security Checks",
+                    "count": "2767"
+                },
+                {
+                    "id": "48",
+                    "name": "VMware ESX Local Security Checks",
+                    "count": "94"
+                },
+                {
+                    "id": "11",
+                    "name": "Web Servers",
+                    "count": "876"
+                },
+                {
+                    "id": "20",
+                    "name": "Windows",
+                    "count": "3113"
+                },
+                {
+                    "id": "10",
+                    "name": "Windows  :  Microsoft Bulletins",
+                    "count": "986"
+                },
+                {
+                    "id": "29",
+                    "name": "Windows  :  User management",
+                    "count": "28"
+                }
+            ],
+            "creator": {
+                "id": "1",
+                "username": "head",
+                "firstname": "test",
+                "lastname": "User"
+            },
+            "canUse": "true",
+            "canManage": "false"
+        }
+    ],
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1406223313
+}

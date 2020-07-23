@@ -1,11 +1,11 @@
 #!/bin/sh -e
 
-libdir="/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-src/lib"
+libdir="/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-src/lib"
 if [ -d "$libdir/.libs" ]; then
     libdir="$libdir/.libs"
 fi
 
-export CGO_CFLAGS="-I/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-src/lib/includes -I/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-src/lib/includes"
+export CGO_CFLAGS="-I/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-src/lib/includes -I/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-src/lib/includes"
 export CGO_LDFLAGS="-L$libdir"
 export LD_LIBRARY_PATH="$libdir"
 export GODEBUG=cgocheck=0

@@ -1,4 +1,4 @@
-# Copyright (c) 2019 Tomasz Konojacki
+# Copyright (c) 2020 Tomasz Konojacki
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -10,14 +10,14 @@ package Software::License::BSD_1_Clause;
 use strict;
 use warnings;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use parent 'Software::License';
 
 sub name { 'The 1-Clause BSD License' }
 sub url  { 'https://spdx.org/licenses/BSD-1-Clause.html' }
 
-sub meta_name  { 'unrestricted' }
+sub meta_name  { 'open_source' }
 sub spdx_expression  { 'BSD-1-Clause' }
 
 1;
@@ -32,7 +32,7 @@ Software::License::BSD_1_Clause - The 1-Clause BSD License
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SEE ALSO
 
@@ -46,6 +46,10 @@ L<Software::License>
 
 L<https://spdx.org/licenses/BSD-1-Clause.html>
 
+=item *
+
+L<https://opensource.org/licenses/BSD-1-Clause>
+
 =back
 
 =head1 AUTHOR
@@ -54,7 +58,7 @@ Tomasz Konojacki <me@xenu.pl>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019 Tomasz Konojacki
+Copyright (c) 2020 Tomasz Konojacki
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

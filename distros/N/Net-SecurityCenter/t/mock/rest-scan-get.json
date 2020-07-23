@@ -1,43 +1,43 @@
 {
-	"type" : "regular",
-	"response" : {
-		"usable" : [
-			{
-				"id" : "2",
-				"name" : "test",
-				"description" : null
-			},
-			{
-				"id" : "3",
-				"name" : "test2",
-				"description" : null
-			},
-			{
-				"id" : "4",
-				"name" : "POSTtest",
-				"description" : "This is a test for POST"
-			}
-		],
-		"manageable" : [
-			{
-				"id" : "2",
-				"name" : "test",
-				"description" : null
-			},
-			{
-				"id" : "3",
-				"name" : "test2",
-                "description" : null
+    "type": "regular",
+    "response": {
+        "usable": [
+            {
+                "id": "2",
+                "name": "test",
+                "description": null
             },
-			{
-				"id" : "4",
-				"name" : "POSTtest",
-				"description" : "This is a test for POST"
-			}
-		]
-	},
-	"error_code" : 0,
-	"error_msg" : "",
-	"warnings" : [],
-	"timestamp" : 1406828340
+            {
+                "id": "3",
+                "name": "test2",
+                "description": null
+            },
+            {
+                "id": "4",
+                "name": "POSTtest",
+                "description": "This is a test for POST"
+            }
+        ],
+        "manageable": [
+            {
+                "id": "2",
+                "name": "test",
+                "description": null
+            },
+            {
+                "id": "3",
+                "name": "test2",
+                "description": null
+            },
+            {
+                "id": "4",
+                "name": "POSTtest",
+                "description": "This is a test for POST"
+            }
+        ]
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1406828340
 }

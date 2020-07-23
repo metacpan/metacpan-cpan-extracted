@@ -1,7 +1,9 @@
 package App::ProcUtils;
 
-our $DATE = '2019-09-11'; # DATE
-our $VERSION = '0.037'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-07-21'; # DATE
+our $DIST = 'App-ProcUtils'; # DIST
+our $VERSION = '0.038'; # VERSION
 
 use 5.010001;
 use strict;
@@ -162,7 +164,7 @@ sub table {
 
 sub _kill_or_list {
     require Proc::ProcessTable;
-    require String::Truncate;
+    require String::Elide::Tiny;
 
     my $which = shift;
     my %args = @_;
@@ -235,7 +237,7 @@ sub _kill_or_list {
         if ($which eq 'kill') {
             if ($args{-dry_run}) {
                 log_info "[DRY-RUN] Sending %s signal to PID %d (%s) ...",
-                    $args{signal}, $proc_entry->{pid}, String::Truncate::elide($cmdline, 40, {truncate=>'middle'});
+                    $args{signal}, $proc_entry->{pid}, elide($cmdline, 40, {truncate=>'middle'});
             } else {
                 kill $args{signal} => $proc_entry->{pid};
             }
@@ -328,7 +330,7 @@ App::ProcUtils - Command line utilities related to processes
 
 =head1 VERSION
 
-This document describes version 0.037 of App::ProcUtils (from Perl distribution App-ProcUtils), released on 2019-09-11.
+This document describes version 0.038 of App::ProcUtils (from Perl distribution App-ProcUtils), released on 2020-07-21.
 
 =head1 SYNOPSIS
 
@@ -387,6 +389,7 @@ process matches.
 
 =item * B<uids> => I<array[unix::local_uid]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -441,6 +444,7 @@ process matches.
 
 =item * B<uids> => I<array[unix::local_uid]>
 
+
 =back
 
 Special arguments:
@@ -449,7 +453,7 @@ Special arguments:
 
 =item * B<-dry_run> => I<bool>
 
-Pass -dry_run=>1 to enable simulation mode.
+Pass -dry_run=E<gt>1 to enable simulation mode.
 
 =back
 
@@ -503,6 +507,7 @@ Return detailed records instead of just PIDs.
 =item * B<pids> => I<array[unix::pid]>
 
 =item * B<uids> => I<array[unix::local_uid]>
+
 
 =back
 
@@ -594,7 +599,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

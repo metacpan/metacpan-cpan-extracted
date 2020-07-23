@@ -273,9 +273,9 @@ DESCRIPTION
     using other views, such as Catalyst::View::Email::Template.
 
   TEMPLATE PROFILING
-    See "TIMER" property of the config method.
+    See ""TIMER"" property of the "config" method.
 
-  METHODS
+METHODS
   new
     The constructor for the TT view. Sets up the template provider, and
     reads the application config.

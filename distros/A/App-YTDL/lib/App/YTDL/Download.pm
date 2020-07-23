@@ -6,7 +6,7 @@ use strict;
 use 5.010000;
 
 use Exporter qw( import );
-our @EXPORT_OK = qw( download_youtube );
+our @EXPORT_OK = qw( download );
 
 use Term::ANSIScreen qw( :cursor :screen );
 use Term::Choose     qw( choose );
@@ -17,10 +17,11 @@ END { print SHOW_CURSOR }
 
 
 sub _choose_fmt {
-    my ( $data, $ex, $video_id, $title ) = @_;
-    my $fmt_to_info = $data->{$ex}{$video_id}{fmt_to_info};
+    my ( $data, $ex, $up, $id, $title ) = @_;
+    my $fmt_to_info = $data->{$ex}{$up}{$id}{fmt_to_info};
     my ( @choices, @format_ids );
-    if ( $ex eq 'youtube' ) {
+    if ( ( keys %$fmt_to_info )[0] =~ /^\s*\d/ ) {
+        no warnings 'numeric';
         for my $fmt ( sort { $a <=> $b } keys %$fmt_to_info ) {
             if ( $fmt_to_info->{$fmt}{format} =~ /^\Q$fmt\E\s*-\s*(.+)\z/ ) {
                 push @choices, sprintf '%3s - %s %s', $fmt, $1, $fmt_to_info->{$fmt}{ext};
@@ -37,6 +38,9 @@ sub _choose_fmt {
             push @format_ids, $fmt;
         }
     }
+    my @named_qualities = qw(best worst bestvideo worstvideo bestaudio worstaudio);
+    push @choices, @named_qualities;
+    push @format_ids, @named_qualities;
     my @fmt_str;
 
     while ( 1 ) {
@@ -80,8 +84,12 @@ sub _choose_fmt {
     }
 }
 
-sub download_youtube {
-    my ( $set, $opt, $data, $from_list ) = @_;
+
+sub download {
+    my ( $set, $opt, $data, $chosen, $from_list ) = @_;
+    if ( ! defined $chosen || ! keys %$chosen ) {
+        return;
+    }
     my $qty;
     if ( $opt->{quality} =~ /^\s*(\d+) or less$/ ) {
         $qty = '<=';
@@ -96,82 +104,100 @@ sub download_youtube {
     else {
         $qty = $opt->{quality};
     }
-    my $nr = 0;
     my $total = 0;
     for my $ex ( keys %$data ) {
-        $total += keys %{$data->{$ex}};
+        for my $up ( keys %{$data->{$ex}} ) {
+            $total += @{$chosen->{$ex}{$up}};
+        }
     }
     print up( 2 ) if $total == 0;
     print HIDE_CURSOR;
 
-    EX: for my $ex ( sort keys %$data ) {
-        my @sorted_video_ids = sort { $data->{$ex}{$a}{count} <=> $data->{$ex}{$b}{count} } keys %{$data->{$ex}};
-        my $ask_fmt_for_each_video = 0;
-        if ( $qty eq 'manually' && @sorted_video_ids > 1 ) {
-            my ( $yes, $no ) = (  '- YES', '- NO' );
-            my $prompt = 'Keep format choices for all videos?';
-            # Choose
-            my $choice = choose(
-                [ undef, $yes, $no ],
-                { prompt => $prompt, undef => 'EXIT', layout => 3 }
-            );
-            if ( ! defined $choice ) {
-                exit;
-            }
-            elsif ( $choice eq $no ) {
-                $ask_fmt_for_each_video = 1;
-            }
-            else {
-                $ask_fmt_for_each_video = 0;
-            }
-        }
-        my $fmt_str;
-        my $count = {};
+    EXTRACTOR_KEY: for my $ex ( sort keys %$data ) {
 
-        VIDEO: for my $video_id ( @sorted_video_ids ) {
-            my @cmd = @{$set->{youtube_dl}};
-            #push @cmd, '--skip-download';
-            if ( $qty eq 'manually' ) {
-                if ( $ask_fmt_for_each_video || ! $fmt_str ) {
-                    my $count_of_total = $data->{$ex}{$video_id}{count} . '/' . $total;
-                    my $title;
-                    if ( $ask_fmt_for_each_video ) {
-                        $title = "\n" . $count_of_total . ' "' . $data->{$ex}{$video_id}{title} . '"';
-                    }
-                    $fmt_str = _choose_fmt( $data, $ex, $video_id, $title );
-                    if ( ! defined $fmt_str ) {
-                        print $count_of_total . ' skipped' . "\n";
-                        next VIDEO;
-                    }
+        UPLOADER_ID: for my $up ( sort keys %{$data->{$ex}} ) {
+            if ( ! @{$chosen->{$ex}{$up}} ) {
+                next;
+            }
+            my @sorted_ids = sort { $data->{$ex}{$up}{$a}{count} <=> $data->{$ex}{$up}{$b}{count} } @{$chosen->{$ex}{$up}};
+            my $ask_fmt_for_each_video = 0;
+            if ( $qty eq 'manually' && @sorted_ids > 1 ) {
+                my ( $yes, $no ) = (  '- YES', '- NO' );
+                my $prompt = 'Keep format choices for all videos?';
+                # Choose
+                my $choice = choose(
+                    [ undef, $yes, $no ],
+                    { prompt => $prompt, undef => 'EXIT', layout => 3 }
+                );
+                if ( ! defined $choice ) {
+                    print locate 1, 1;
+                    print cldown;
+                    exit;
                 }
-                push @cmd, '-f', $fmt_str;
-            }
-            elsif ( $qty eq 'best' ) { #
-                # no format required, because 'best' is default
-            }
-            else {
-                push @cmd, '-f', "bestvideo[height$qty]+bestaudio/best[height$qty]";
-            }
-            my $output = $opt->{video_dir};
-            $output .= '/%(extractor)s' if $opt->{use_extractor_dir};
-            $output .= '/%(uploader)s'  if $opt->{use_uploader_dir} == 1 || $opt->{use_uploader_dir} == 2 && $data->{$ex}{$video_id}{from_list};
-               if ( $opt->{filename_format} == 0 ) { $output .= '/%(title)s.%(ext)s'; }
-            elsif ( $opt->{filename_format} == 1 ) { $output .= '/%(title)s_%(height)s.%(ext)s'; }
-            elsif ( $opt->{filename_format} == 2 ) { $output .= '/%(title)s_%(format_id)s.%(ext)s'; }
-            elsif ( $opt->{filename_format} == 3 ) { $output .= '/%(title)s_%(format_id)s_%(height)s.%(ext)s'; }
-            else                                   { $output .= '/%(title)s_%(format)s.%(ext)s'; }
-            push @cmd, '-o', $output;
-            push @cmd, '--', $data->{$ex}{$video_id}{webpage_url};
-            print $data->{$ex}{$video_id}{count} . '/' . $total . ' ';
-            my $exit_value = uni_system( @cmd );
-            if ( $exit_value != 0 ) {
-                $count->{$video_id}++;
-                if ( $count->{$video_id} > $opt->{retries} ) {
-                    next VIDEO;
+                elsif ( $choice eq $no ) {
+                    $ask_fmt_for_each_video = 1;
                 }
-                sleep $count->{$video_id};
-                $fmt_str = undef;
-                redo VIDEO;
+                else {
+                    $ask_fmt_for_each_video = 0;
+                }
+            }
+            my $fmt_str;
+            my $count = {};
+            my $backup_fmt_str;
+
+            VIDEO_ID: for my $id ( @sorted_ids ) {
+                my @cmd = @{$set->{youtube_dl}};
+                #push @cmd, '--skip-download';
+                if ( $qty eq 'manually' ) {
+                    if ( $ask_fmt_for_each_video || ! $fmt_str ) {
+                        my $count_of_total = $data->{$ex}{$up}{$id}{count} . '/' . $total;
+                        my $title = "\n" . $count_of_total . ' "' . $data->{$ex}{$up}{$id}{title} . '"';
+                        $fmt_str = _choose_fmt( $data, $ex, $up, $id, $title );
+                        if ( ! defined $fmt_str ) {
+                            print $count_of_total . ' skipped' . "\n";
+                            next VIDEO_ID;
+                        }
+                    }
+                    push @cmd, '-f', $fmt_str;
+                }
+                elsif ( $qty eq 'best' ) { #
+                    # no format required, because 'best' is default
+                }
+                else {
+                    push @cmd, '-f', "bestvideo[height$qty]+bestaudio/best[height$qty]";
+                }
+                my $output = $opt->{video_dir};
+                $output .= '/%(extractor)s' if $opt->{use_extractor_dir};
+                $output .= '/%(uploader)s'  if $opt->{use_uploader_dir} == 1 || $opt->{use_uploader_dir} == 2 && $data->{$ex}{$up}{$id}{from_list};
+                if ( $opt->{filename_format} == 0 ) { $output .= '/%(title)s.%(ext)s'; }
+                elsif ( $opt->{filename_format} == 1 ) { $output .= '/%(title)s_%(height)s.%(ext)s'; }
+                elsif ( $opt->{filename_format} == 2 ) { $output .= '/%(title)s_%(format_id)s.%(ext)s'; }
+                elsif ( $opt->{filename_format} == 3 ) { $output .= '/%(title)s_%(format_id)s_%(height)s.%(ext)s'; }
+                else                                   { $output .= '/%(title)s_%(format)s.%(ext)s'; }
+
+                push @cmd, '-o', $output;
+                push @cmd, '--', $data->{$ex}{$up}{$id}{webpage_url};
+                print $data->{$ex}{$up}{$id}{count} . '/' . $total . ' ';
+                my $exit_value = uni_system( @cmd );
+                if ( $exit_value != 0 ) {
+                    $count->{$id}++;
+                    if ( $count->{$id} > $opt->{retries} ) {
+                        next VIDEO_ID;
+                    }
+                    sleep $count->{$id};
+                    $backup_fmt_str = $fmt_str;
+                    $fmt_str = undef;
+                    redo VIDEO_ID;
+                }
+                if ( $backup_fmt_str ) {
+                    $fmt_str = $backup_fmt_str;
+                    $backup_fmt_str = undef;
+                }
+            }
+            if ( $opt->{entries_with_info} == 0 ) {
+                for my $id ( @sorted_ids ) {
+                    delete $data->{$ex}{$up}{$id}; #
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 package Cassandra::Client;
 our $AUTHORITY = 'cpan:TVDW';
-$Cassandra::Client::VERSION = '0.16';
+$Cassandra::Client::VERSION = '0.17';
 # ABSTRACT: Perl library for accessing Cassandra using its binary network protocol
 
 use 5.010;
@@ -203,6 +203,7 @@ sub _execute {
 
     my $attribs_clone= clone($attribs);
     $attribs_clone->{consistency} ||= $self->{options}{default_consistency};
+    $attribs_clone->{idempotent}  ||= $self->{options}{default_idempotency};
 
     $self->_command("execute_prepared", $callback, [ \$query, clone($params), $attribs_clone ]);
     return;
@@ -213,6 +214,7 @@ sub _batch {
 
     my $attribs_clone= clone($attribs);
     $attribs_clone->{consistency} ||= $self->{options}{default_consistency};
+    $attribs_clone->{idempotent}  ||= $self->{options}{default_idempotency};
 
     $self->_command("execute_batch", $callback, [ clone($queries), $attribs_clone ]);
     return;
@@ -321,16 +323,18 @@ sub _command_failed {
 
     if (is_ref($error)) {
         my $retry_decision;
+        my $statement = $command eq 'execute_prepared' ? {idempotent => $args->[2]->{idempotent}} : {};
+
         if ($error->do_retry) {
             $retry_decision= Cassandra::Client::Policy::Retry::retry;
         } elsif ($error->is_request_error) {
-            $retry_decision= $self->{retry_policy}->on_request_error(undef, undef, $error, ($command_info->{retries}||0));
+            $retry_decision= $self->{retry_policy}->on_request_error($statement, undef, $error, ($command_info->{retries}||0));
         } elsif ($error->isa('Cassandra::Client::Error::WriteTimeoutException')) {
-            $retry_decision= $self->{retry_policy}->on_write_timeout(undef, $error->cl, $error->write_type, $error->blockfor, $error->received, ($command_info->{retries}||0));
+            $retry_decision= $self->{retry_policy}->on_write_timeout($statement, $error->cl, $error->write_type, $error->blockfor, $error->received, ($command_info->{retries}||0));
         } elsif ($error->isa('Cassandra::Client::Error::ReadTimeoutException')) {
-            $retry_decision= $self->{retry_policy}->on_read_timeout(undef, $error->cl, $error->blockfor, $error->received, $error->data_retrieved, ($command_info->{retries}||0));
+            $retry_decision= $self->{retry_policy}->on_read_timeout($statement, $error->cl, $error->blockfor, $error->received, $error->data_retrieved, ($command_info->{retries}||0));
         } elsif ($error->isa('Cassandra::Client::Error::UnavailableException')) {
-            $retry_decision= $self->{retry_policy}->on_unavailable(undef, $error->cl, $error->required, $error->alive, ($command_info->{retries}||0));
+            $retry_decision= $self->{retry_policy}->on_unavailable($statement, $error->cl, $error->required, $error->alive, ($command_info->{retries}||0));
         } else {
             $retry_decision= Cassandra::Client::Policy::Retry::rethrow;
         }
@@ -550,7 +554,7 @@ Cassandra::Client - Perl library for accessing Cassandra using its binary networ
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 DESCRIPTION
 
@@ -612,6 +616,10 @@ Compression method to use. Defaults to the best available version, based on serv
 
 Default consistency level to use. Defaults to C<one>. Can be overridden on a query basis as well, by passing a C<consistency> attribute.
 
+=item default_idempotency
+
+Default value of the C<idempotent> query attribute that indicates if a write query may be retried without harm. It defaults to false.
+
 =item max_page_size
 
 Default max page size to pass to the server. This defaults to C<5000>. Note that large values can cause trouble on Cassandra. Can be overridden by passing C<page_size> in query attributes.
@@ -660,6 +668,8 @@ For queries that have large amounts of result rows and end up spanning multiple 
         { new_column => 2, id => 5 },
         { consistency => "quorum" },
     );
+
+The C<idempotent> attribute indicates that the query is idempotent and may be retried without harm.
 
 =item $client->each_page($query, $bound_parameters, $attributes, $page_callback)
 
@@ -786,7 +796,7 @@ Tom van der Woerdt <tvdw@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Tom van der Woerdt.
+This software is copyright (c) 2020 by Tom van der Woerdt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

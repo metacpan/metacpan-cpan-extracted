@@ -43,17 +43,57 @@
 #define HOOK_BEFORE_PRINT	0x0004
 
 #ifdef __THW_370__
-#define CH_TAB		'\005'
-#define CH_NL		'\025'
-#define CH_CR		'\015'
-#define CH_SPACE	'\100'
+/* EBCDIC on os390 z/OS: IS_EBCDIC reads better than __THW_370__ */
+#define IS_EBCDIC
+#endif
+
+#define CH_TAB		'\t'
+#define CH_NL		'\n'
+#define CH_CR		'\r'
+#define CH_SPACE	' '
+#define CH_QUO		'"'
+
+#ifdef IS_EBCDIC
 #define CH_DEL		'\007'
+static unsigned char ec, ebcdic2ascii[256] = {
+    0x00, 0x01, 0x02, 0x03, 0x9c, 0x09, 0x86, 0x7f,
+    0x97, 0x8d, 0x8e, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+    0x10, 0x11, 0x12, 0x13, 0x9d, 0x0a, 0x08, 0x87,
+    0x18, 0x19, 0x92, 0x8f, 0x1c, 0x1d, 0x1e, 0x1f,
+    0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x17, 0x1b,
+    0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x05, 0x06, 0x07,
+    0x90, 0x91, 0x16, 0x93, 0x94, 0x95, 0x96, 0x04,
+    0x98, 0x99, 0x9a, 0x9b, 0x14, 0x15, 0x9e, 0x1a,
+    0x20, 0xa0, 0xe2, 0xe4, 0xe0, 0xe1, 0xe3, 0xe5,
+    0xe7, 0xf1, 0xa2, 0x2e, 0x3c, 0x28, 0x2b, 0x7c,
+    0x26, 0xe9, 0xea, 0xeb, 0xe8, 0xed, 0xee, 0xef,
+    0xec, 0xdf, 0x21, 0x24, 0x2a, 0x29, 0x3b, 0x5e,
+    0x2d, 0x2f, 0xc2, 0xc4, 0xc0, 0xc1, 0xc3, 0xc5,
+    0xc7, 0xd1, 0xa6, 0x2c, 0x25, 0x5f, 0x3e, 0x3f,
+    0xf8, 0xc9, 0xca, 0xcb, 0xc8, 0xcd, 0xce, 0xcf,
+    0xcc, 0x60, 0x3a, 0x23, 0x40, 0x27, 0x3d, 0x22,
+    0xd8, 0x61, 0x62, 0x63, 0x64, 0x65, 0x66, 0x67,
+    0x68, 0x69, 0xab, 0xbb, 0xf0, 0xfd, 0xfe, 0xb1,
+    0xb0, 0x6a, 0x6b, 0x6c, 0x6d, 0x6e, 0x6f, 0x70,
+    0x71, 0x72, 0xaa, 0xba, 0xe6, 0xb8, 0xc6, 0xa4,
+    0xb5, 0x7e, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
+    0x79, 0x7a, 0xa1, 0xbf, 0xd0, 0x5b, 0xde, 0xae,
+    0xac, 0xa3, 0xa5, 0xb7, 0xa9, 0xa7, 0xb6, 0xbc,
+    0xbd, 0xbe, 0xdd, 0xa8, 0xaf, 0x5d, 0xb4, 0xd7,
+    0x7b, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47,
+    /*          v this 0xa0 really should be 0xad. Needed for UTF = binary */
+    0x48, 0x49, 0xa0, 0xf4, 0xf6, 0xf2, 0xf3, 0xf5,
+    0x7d, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f, 0x50,
+    0x51, 0x52, 0xb9, 0xfb, 0xfc, 0xf9, 0xfa, 0xff,
+    0x5c, 0xf7, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58,
+    0x59, 0x5a, 0xb2, 0xd4, 0xd6, 0xd2, 0xd3, 0xd5,
+    0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37,
+    0x38, 0x39, 0xb3, 0xdb, 0xdc, 0xd9, 0xda, 0x9f
+    };
+#define is_csv_binary(ch) ((((ec = ebcdic2ascii[ch]) < 0x20 || ec >= 0x7f) && ch != CH_TAB) || ch == EOF)
 #else
-#define CH_TAB		'\011'
-#define CH_NL		'\012'
-#define CH_CR		'\015'
-#define CH_SPACE	'\040'
 #define CH_DEL		'\177'
+#define is_csv_binary(ch) ((ch < CH_SPACE || ch >= CH_DEL) && ch != CH_TAB)
 #endif
 #define CH_EOLX		1215
 #define CH_EOL		*csv->eol
@@ -283,16 +323,16 @@ static SV *m_getline, *m_print;
     (csv->used += csv->sep_len - 1)					&&\
     (c = CH_SEPX))))
 #if MAINT_DEBUG > 1
-static byte _is_SEPX (unsigned int *c, csv_t *csv, int line) {
-    unsigned int b = __is_SEPX (*c);
+static byte _is_SEPX (unsigned int c, csv_t *csv, int line) {
+    unsigned int b = __is_SEPX (c);
     (void)fprintf (stderr, "# %4d - is_SEPX:\t%d (%d)\n", line, b, csv->sep_len);
     if (csv->sep_len)
 	(void)fprintf (stderr,
 	    "# len: %d, siz: %d, usd: %d, c: %03x, *sep: %03x\n",
-	    csv->sep_len, csv->size, csv->used, *c, CH_SEP);
+	    csv->sep_len, csv->size, csv->used, c, CH_SEP);
     return b;
     } /* _is_SEPX */
-#define is_SEP(c)  _is_SEPX (&c, csv, __LINE__)
+#define is_SEP(c)  _is_SEPX (c, csv, __LINE__)
 #else
 #define is_SEP(c) __is_SEPX (c)
 #endif
@@ -303,17 +343,17 @@ static byte _is_SEPX (unsigned int *c, csv_t *csv, int line) {
     (csv->used += csv->quo_len - 1)					&&\
     (c = CH_QUOTEX))))
 #if MAINT_DEBUG > 1
-static byte _is_QUOTEX (unsigned int *c, csv_t *csv, int line) {
-    unsigned int b = __is_QUOTEX (*c);
+static byte _is_QUOTEX (unsigned int c, csv_t *csv, int line) {
+    unsigned int b = __is_QUOTEX (c);
     (void)fprintf (stderr, "# %4d - is_QUOTEX:\t%d (%d)\n", line, b, csv->quo_len);
 
     if (csv->quo_len)
 	(void)fprintf (stderr,
 	    "# len: %d, siz: %d, usd: %d, c: %03x, *quo: %03x\n",
-	    csv->quo_len, csv->size, csv->used, *c, CH_QUOTE);
+	    csv->quo_len, csv->size, csv->used, c, CH_QUOTE);
     return b;
     } /* _is_QUOTEX */
-#define is_QUOTE(c)  _is_QUOTEX (&c, csv, __LINE__)
+#define is_QUOTE(c)  _is_QUOTEX (c, csv, __LINE__)
 #else
 #define is_QUOTE(c) __is_QUOTEX (c)
 #endif
@@ -707,6 +747,7 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
     csv->size = 0;
     csv->used = 0;
 
+    /* This is EBCDIC-safe, as it is used after translation */
     csv->first_safe_char = csv->quote_space ? 0x21 : 0x20;
 
     if (csv->is_bound) {
@@ -821,9 +862,6 @@ static int cx_was_quoted (pTHX_ AV *mf, int idx) {
     SV **x = av_fetch (mf, idx, FALSE);
     return (x && SvIOK (*x) && SvIV (*x) & CSV_FLAGS_QUO ? 1 : 0);
     } /* was_quoted */
-
-/* Should be extended for EBCDIC ? */
-#define is_csv_binary(ch) ((ch < CH_SPACE || ch >= CH_DEL) && ch != CH_TAB)
 
 #define _formula(csv,sv,len,f) cx_formula (aTHX_ csv, sv, len, f)
 static char *cx_formula (pTHX_ csv_t *csv, SV *sv, STRLEN *len, int f) {
@@ -968,14 +1006,26 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
 		    char	*ptr2;
 		    STRLEN	 l;
 
+#if MAINT_DEBUG > 4
+		    (void)fprintf (stderr, "# Combine:\n");
+		    sv_dump (sv);
+#endif
 		    for (ptr2 = ptr, l = len; l; ++ptr2, --l) {
 			byte c = *ptr2;
+#ifdef IS_EBCDIC
+			byte x = ebcdic2ascii[c];
+#if MAINT_DEBUG > 4
+			(void)fprintf (stderr, " %02x", x);
+#endif
+#else
+			byte x = c;
+#endif
 
 			if ((CH_QUOTE          && c == CH_QUOTE)          ||
 			    (CH_SEP            && c == CH_SEP)            ||
 			    (csv->escape_char  && c == csv->escape_char)  ||
-			    (csv->quote_binary ? (c >= 0x7f && c <= 0xa0) ||
-						  c < csv->first_safe_char
+			    (csv->quote_binary ? (x >= 0x7f && x <= 0xa0) ||
+						  x < csv->first_safe_char
 					       :  c == CH_NL || c == CH_CR ||
 						 (csv->quote_space && (
 						  c == CH_SPACE || c == CH_TAB)))) {
@@ -983,6 +1033,9 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
 			    break;
 			    }
 			}
+#if defined(IS_EBCDIC) && MAINT_DEBUG > 4
+		    (void)fprintf (stderr, "\n");
+#endif
 		    quoteMe = (l > 0);
 		    }
 		}
@@ -1302,6 +1355,10 @@ static int cx_Parse (pTHX_ csv_t *csv, SV *src, AV *fields, AV *fflags) {
 	if (spl < 39) str_parsed[spl] = c;
 #endif
 restart:
+#if MAINT_DEBUG > 9
+	(void)fprintf (stderr, "# at restart: %d/%d/%03x pos %d = 0x%02x\n",
+	    waitingForField ? 1 : 0, sv ? 1 : 0, f, spl, c);
+#endif
 	if (is_SEP (c)) {
 #if MAINT_DEBUG > 1
 	    (void)fprintf (stderr, "# %d/%d/%03x pos %d = SEP %s\t'%s'\n",
@@ -1678,6 +1735,13 @@ EOLX:
 		     *                     ^
 		     */
 		    c = EOF;
+
+#if MAINT_DEBUG > 9
+		    (void)fprintf (stderr, "# (%d) ... CR EOF 0x%x\n",
+			seenSomething, c);
+#endif
+		    unless (seenSomething)
+			break;
 		    goto restart;
 		    }
 
@@ -1769,6 +1833,9 @@ EOLX:
 		 !memcmp (csv->bptr + csv->used, csv->eol + 1, csv->eol_len - 1) &&
 		 (csv->used += csv->eol_len - 1)) {
 		c = CH_EOLX;
+#if MAINT_DEBUG > 5
+		(void)fprintf (stderr, "# -> EOLX (0x%x)\n", c);
+#endif
 		goto EOLX;
 		}
 
@@ -1776,6 +1843,9 @@ EOLX:
 		if (csv->allow_whitespace && is_whitespace (c)) {
 		    do {
 			c = CSV_GET;
+#if MAINT_DEBUG > 5
+			(void)fprintf (stderr, "# WS next got (0x%x)\n", c);
+#endif
 			} while (is_whitespace (c));
 		    if (c == EOF)
 			break;
@@ -1785,6 +1855,12 @@ EOLX:
 		goto restart;
 		}
 
+#if MAINT_DEBUG > 5
+	    (void)fprintf (stderr, "# %sc 0x%x is%s binary %s utf8\n",
+		f & CSV_FLAGS_QUO ? "quoted " : "", c,
+		is_csv_binary (c) ? "" : " not",
+		csv->utf8 ? "is" : "not");
+#endif
 	    if (f & CSV_FLAGS_QUO) {
 		if (is_csv_binary (c)) {
 		    f |= CSV_FLAGS_BIN;

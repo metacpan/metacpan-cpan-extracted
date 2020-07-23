@@ -20,7 +20,6 @@ no_index:
     - inc
 requires:
   Class::Method::Modifiers: '0'
-  Data::Alias: '0'
   Devel::StrictMode: '0'
   Function::Parameters: '2.001003'
   Import::Into: '0'
@@ -30,5 +29,5 @@ requires:
   Types::Interface: '0.002'
   namespace::clean: '0'
   perl: '5.014'
-version: 0.05
+version: 0.06
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

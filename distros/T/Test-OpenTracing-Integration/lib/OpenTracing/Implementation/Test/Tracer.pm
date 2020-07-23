@@ -1,6 +1,6 @@
 package OpenTracing::Implementation::Test::Tracer;
 
-our $VERSION = 'v0.101.2';
+our $VERSION = 'v0.102.0';
 
 use Moo;
 
@@ -11,14 +11,20 @@ use aliased 'OpenTracing::Implementation::Test::ScopeManager';
 use aliased 'OpenTracing::Implementation::Test::Span';
 use aliased 'OpenTracing::Implementation::Test::SpanContext';
 
-use Carp;
+use Carp qw/croak/;
 use PerlX::Maybe qw/maybe/;
+use Scalar::Util qw/blessed/;
 use Test::Builder;
 use Test::Deep qw/superbagof superhashof cmp_details deep_diag/;
 use Tree;
 use Types::Standard qw/Str/;
 
 use namespace::clean;
+
+use constant {
+    HASH_CARRIER_KEY => 'opentracing_context',
+    PREFIX_HTTP      => 'OpenTracing-',
+};
 
 has '+scope_manager' => (
     required => 0,
@@ -104,9 +110,121 @@ sub to_struct {
     return $data
 }
 
-sub extract_context { return }
+sub extract_context_from_hash_reference {
+    my ($self, $carrier) = @_;
 
-sub inject_context { return }
+    my $context = $carrier->{ (HASH_CARRIER_KEY) };
+    return $self->_maybe_build_context(%$context);
+}
+
+sub inject_context_into_hash_reference  {
+    my ($self, $carrier, $context) = @_;
+
+    $carrier->{ (HASH_CARRIER_KEY) } = {
+        span_id       => $context->span_id,
+        trace_id      => $context->trace_id,
+        level         => $context->level,
+        context_item  => $context->context_item,
+        baggage_items => { $context->get_baggage_items() },
+    };
+    return $carrier;
+}
+
+sub extract_context_from_array_reference {
+    my ($self, $carrier) = @_;
+    return $self->extract_context_from_hash_reference({@$carrier});
+}
+
+sub inject_context_into_array_reference {
+    my ($self, $carrier, $context) = @_;
+
+    my %hash_carrier;
+    $self->inject_context_into_hash_reference(\%hash_carrier, $context);
+    push @$carrier, %hash_carrier;
+
+    return $carrier;
+}
+
+sub extract_context_from_http_headers {
+    my ($self, $carrier) = @_;
+
+    my $trace_id     = $carrier->header(PREFIX_HTTP . 'Trace-Id');
+    my $span_id      = $carrier->header(PREFIX_HTTP . 'Span-Id');
+    my $level        = $carrier->header(PREFIX_HTTP . 'Level');
+    my $context_item = $carrier->header(PREFIX_HTTP . 'ContextItem');
+
+    my %baggage = map { _decode_baggage_header($_) }
+        $carrier->header( PREFIX_HTTP . 'Baggage' );
+
+    return $self->_maybe_build_context(
+        trace_id      => $trace_id,
+        span_id       => $span_id,
+        level         => $level,
+        context_item  => $context_item,
+        baggage_items => \%baggage,
+    );
+}
+
+sub inject_context_into_http_headers  {
+    my ($self, $carrier, $context) = @_;
+    
+    $carrier->header(
+        PREFIX_HTTP . 'Span-Id'     => $context->span_id,
+        PREFIX_HTTP . 'Trace-Id'    => $context->trace_id,
+        PREFIX_HTTP . 'Level'       => $context->level,
+        PREFIX_HTTP . 'ContextItem' => $context->context_item,
+    );
+
+    my %baggage = $context->get_baggage_items();
+    while (my ($name, $val) = each %baggage) {
+        my $header_field = PREFIX_HTTP . 'Baggage';
+        my $header_value = _encode_baggage_header($name, $val);
+        $carrier->push_header($header_field => $header_value);
+    }
+
+    return $carrier;
+}
+
+sub _encode_baggage_header {
+    my ($name, $val) = @_;
+
+    foreach ($name, $val) {
+        s/\\/\\\\/g;
+        s/=/\\=/g;
+    }
+    return "$name=$val";
+}
+
+sub _decode_baggage_header {
+    my ($header_value) = @_;
+    
+    my ($name, $val) = split /(?: \\ \\ )* [^\\] \K = /x, $header_value, 2;
+    foreach ($name, $val) {
+        s/\\\\/\\/g;
+        s/\\=/=/g;
+    }
+    return ($name, $val);
+}
+
+
+sub _maybe_build_context {
+    my ($self, %args) = @_;
+    my $trace_id      = delete $args{trace_id};
+    my $span_id       = delete $args{span_id};
+    my $baggage_items = delete $args{baggage_items} // {};
+    return unless defined $trace_id and defined $span_id;
+
+    my %context_args = (
+        maybe level        => $args{level},
+        maybe context_item => $args{context_item},
+    );
+    my $context = $self->build_context(%context_args)
+                       ->with_trace_id($trace_id)
+                       ->with_span_id($span_id)
+                       ->with_baggage_items(%$baggage_items);
+    return $context;
+}
+
 
 sub build_span {
     my ($self, %opts) = @_;

@@ -1,5 +1,5 @@
 package QuadPres;
-$QuadPres::VERSION = '0.28.3';
+$QuadPres::VERSION = '0.30.0';
 use 5.016;
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use utf8;
 
 use parent 'QuadPres::Base';
 
-use IO::All qw/ io /;
+use Path::Tiny qw/ path /;
 use Data::Dumper  ();
 use QuadPres::Url ();
 use Carp          ();
@@ -145,11 +145,11 @@ sub get_document_base_text
 
     if ( -f $filename )
     {
-        return scalar( io->file($filename)->slurp );
+        return scalar( path($filename)->slurp_raw );
     }
     elsif ( ( -d $filename ) && ( -f $index_fn ) )
     {
-        return scalar( io->file($index_fn)->slurp );
+        return scalar( path($index_fn)->slurp_raw );
     }
     else
     {
@@ -784,46 +784,52 @@ sub render
     return;
 }
 
-sub traverse_tree
+sub ref_traverse_tree
 {
     my $self     = shift;
     my $callback = shift;
 
     my $contents = $self->contents;
 
-    my $traverse_helper;
-    $traverse_helper = sub {
-        my $path_ref = shift;
-        my $coords   = shift;
-        my $branch   = shift;
+    (
+        sub {
+            my ( $path_ref, $coords, $branch ) = @_;
 
-        $callback->(
-            'path'   => $path_ref,
-            'branch' => $branch,
-            'coords' => $coords,
-        );
+            $callback->(
+                +{
+                    'path'   => $path_ref,
+                    'branch' => $branch,
+                    'coords' => $coords,
+                }
+            );
 
-        if ( exists( $branch->{'subs'} ) )
-        {
-            # Let's traverse all the directories
-            my $new_coord = 0;
-            foreach my $sub_branch ( @{ $branch->{'subs'} } )
+            if ( exists( $branch->{'subs'} ) )
             {
-                $traverse_helper->(
-                    [ @$path_ref, $sub_branch->{'url'} ],
-                    [ @$coords, $new_coord ], $sub_branch,
-                );
-            }
-            continue
-            {
-                $new_coord++;
+                # Let's traverse all the directories
+                my $new_coord = 0;
+                foreach my $sub_branch ( @{ $branch->{'subs'} } )
+                {
+                    __SUB__->(
+                        [ @$path_ref, $sub_branch->{'url'} ],
+                        [ @$coords, $new_coord ], $sub_branch,
+                    );
+                }
+                continue
+                {
+                    $new_coord++;
+                }
             }
         }
-    };
-
-    $traverse_helper->( [], [], $contents );
+    )->( [], [], $contents );
 
     return;
+}
+
+sub traverse_tree
+{
+    my ( $self, $cb ) = @_;
+
+    return $self->ref_traverse_tree( sub { return $cb->( %{ shift() } ); } );
 }
 
 sub get_breadcrumbs_trail
@@ -868,7 +874,7 @@ QuadPres - a presentation / slides manager.
 
 =head1 VERSION
 
-version 0.28.3
+version 0.30.0
 
 =head1 SYNOPSIS
 
@@ -1007,6 +1013,12 @@ TBD.
 =head2 traverse_tree
 
 TBD.
+
+=head2 ref_traverse_tree
+
+TBD.
+
+Added in version 0.30.0.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

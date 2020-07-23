@@ -81,6 +81,10 @@ Macros
 
     
     The length of :macro:`NGHTTP2_CLIENT_MAGIC`.
+.. macro:: NGHTTP2_DEFAULT_MAX_SETTINGS
+
+    
+    The default max number of settings per SETTINGS frame
 .. macro:: NGHTTP2_INITIAL_MAX_CONCURRENT_STREAMS
 
     

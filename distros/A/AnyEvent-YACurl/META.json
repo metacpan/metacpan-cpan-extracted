@@ -4,13 +4,13 @@
       "Tom van der Woerdt <tvdw@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "AnyEvent-YACurl",
    "no_index" : {
@@ -21,6 +21,11 @@
    },
    "prereqs" : {
       "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
@@ -39,6 +44,6 @@
          "web" : "https://github.com/TvdW/perl-AnyEvent-YACurl"
       }
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 4.00"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

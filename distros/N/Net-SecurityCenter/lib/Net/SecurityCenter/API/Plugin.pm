@@ -12,7 +12,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.205';
+our $VERSION = '0.206';
 
 my $common_template = {
 
@@ -71,22 +71,22 @@ sub list {
         },
         filter_field => {
             allow => [
-                'copyright',          'description',      'exploitAvailable', 'family',
-                'id',                 'name',             'patchPubDate',     'patchModDate',
-                'pluginPubDate',      'pluginModDate',    'sourceFile',       'type',
-                'version',            'vulnPubDate',      'xrefs',            'xrefs:<string>',
-                'xrefs:ALAS',         'xrefs:APPLE-SA',   'xrefs:AUSCERT',    'xrefs:BID',
-                'xrefs:CERT',         'xrefs:CERT-CC',    'xrefs:CERT-FI',    'xrefs:CERTA',
-                'xrefs:CISCO-BUG-ID', 'xrefs:CISCO-SA',   'xrefs:CISCO-SR',   'xrefs:CLSA',
-                'xrefs:CONECTIVA',    'xrefs:CVE',        'xrefs:CWE',        'xrefs:DSA',
-                'xrefs:EDB-ID',       'xrefs:FEDORA',     'xrefs:FLSA',       'xrefs:FreeBSD',
-                'xrefs:GLSA',         'xrefs:HP',         'xrefs:HPSB',       'xrefs:IAVA',
-                'xrefs:IAVB',         'xrefs:IAVT',       'xrefs:ICS-ALERT',  'xrefs:ICSA',
-                'xrefs:MDKSA',        'xrefs:MDVSA',      'xrefs:MGASA',      'xrefs:MSFT',
-                'xrefs:MSVR',         'xrefs:NSFOCUS',    'xrefs:NessusID',   'xrefs:OSVDB',
-                'xrefs:OWASP',        'xrefs:OpenPKG-SA', 'xrefs:RHSA',       'xrefs:SSA',
-                'xrefs:Secunia',      'xrefs:SuSE',       'xrefs:TLSA',       'xrefs:TSLSA',
-                'xrefs:USN',          'xrefs:VMSA',       'xrefs:zone-h'
+                'copyright',        'description',     'exploitAvailable', 'family',
+                'id',               'name',            'patchPubDate',     'patchModDate',
+                'pluginPubDate',    'pluginModDate',   'sourceFile',       'type',
+                'version',          'vulnPubDate',     'xrefs',            'xrefs:ALAS',
+                'xrefs:APPLE-SA',   'xrefs:AUSCERT',   'xrefs:BID',        'xrefs:CERT',
+                'xrefs:CERT-CC',    'xrefs:CERT-FI',   'xrefs:CERTA',      'xrefs:CISCO-BUG-ID',
+                'xrefs:CISCO-SA',   'xrefs:CISCO-SR',  'xrefs:CLSA',       'xrefs:CONECTIVA',
+                'xrefs:CVE',        'xrefs:CWE',       'xrefs:DSA',        'xrefs:EDB-ID',
+                'xrefs:FEDORA',     'xrefs:FLSA',      'xrefs:FreeBSD',    'xrefs:GLSA',
+                'xrefs:HP',         'xrefs:HPSB',      'xrefs:IAVA',       'xrefs:IAVB',
+                'xrefs:IAVT',       'xrefs:ICS-ALERT', 'xrefs:ICSA',       'xrefs:MDKSA',
+                'xrefs:MDVSA',      'xrefs:MGASA',     'xrefs:MSFT',       'xrefs:MSVR',
+                'xrefs:NSFOCUS',    'xrefs:NessusID',  'xrefs:OSVDB',      'xrefs:OWASP',
+                'xrefs:OpenPKG-SA', 'xrefs:RHSA',      'xrefs:SSA',        'xrefs:Secunia',
+                'xrefs:SuSE',       'xrefs:TLSA',      'xrefs:TSLSA',      'xrefs:USN',
+                'xrefs:VMSA',       'xrefs:zone-h'
             ],
             remap => 'filterField',
         },
@@ -118,7 +118,7 @@ sub list {
     my $raw     = delete( $params->{'raw'} );
     my $plugins = $self->client->get( '/plugin', $params );
 
-    return if ( !$plugins );
+    return          if ( !$plugins );
     return $plugins if ($raw);
 
     return sc_normalize_array($plugins);
@@ -142,7 +142,7 @@ sub get {
     my $plugin_id = delete( $params->{'id'} );
     my $plugin    = $self->client->get( "/plugin/$plugin_id", $params );
 
-    return if ( !$plugin );
+    return         if ( !$plugin );
     return $plugin if ($raw);
 
     return sc_normalize_hash($plugin);
@@ -304,7 +304,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2019 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

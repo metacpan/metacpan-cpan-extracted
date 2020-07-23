@@ -10,6 +10,7 @@ lib/Role/Declare/StrictWith.pm
 t/lax-mode.t
 t/role-declare.t
 t/shorthands.t
+xt/changelog.t
 xt/kwalitee.t
 xt/manifest.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

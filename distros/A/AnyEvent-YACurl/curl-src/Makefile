@@ -324,27 +324,27 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-ACLOCAL = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing aclocal-1.16
+ACLOCAL = ${SHELL} /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing aclocal-1.16
 AMTAR = $${TAR-tar}
 AM_DEFAULT_VERBOSITY = 0
-AR = /bin/ar
+AR = /usr/bin/ar
 AR_FLAGS = cr
 AS = as
-AUTOCONF = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing autoconf
-AUTOHEADER = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing autoheader
-AUTOMAKE = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing automake-1.16
+AUTOCONF = ${SHELL} /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing autoconf
+AUTOHEADER = ${SHELL} /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing autoheader
+AUTOMAKE = ${SHELL} /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing automake-1.16
 AWK = gawk
 BLANK_AT_MAKETIME = 
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -Werror-implicit-function-declaration -O2 -Wno-system-headers
 CFLAG_CURL_SYMBOL_HIDING = -fvisibility=hidden
-CONFIGURE_OPTIONS = " '--with-zlib' '--with-nghttp2=/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib' '--with-brotli=/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib' '--enable-ares=/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib' '--disable-shared' '--enable-static' '--prefix=/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib' '--with-pic' '--disable-threaded-resolver' '--disable-pthreads'"
+CONFIGURE_OPTIONS = " '--with-zlib' '--with-nghttp2=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib' '--with-brotli=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib' '--enable-ares=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib' '--disable-shared' '--enable-static' '--prefix=/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib' '--with-pic' '--disable-threaded-resolver' '--disable-pthreads'"
 CPP = gcc -E
-CPPFLAGS = -isystem /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/include -isystem /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/include -isystem /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/include
+CPPFLAGS = -isystem /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/include -isystem /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/include -isystem /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/include
 CPPFLAG_CURL_STATICLIB = -DCURL_STATICLIB
-CURLVERSION = 7.70.0
-CURL_CA_BUNDLE = "/etc/pki/tls/certs/ca-bundle.crt"
+CURLVERSION = 7.71.1
+CURL_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
 CURL_CFLAG_EXTRAS = 
 CURL_DISABLE_DICT = 
 CURL_DISABLE_FILE = 
@@ -381,26 +381,27 @@ ENABLE_SHARED = no
 ENABLE_STATIC = yes
 EXEEXT = 
 FGREP = /bin/grep -F
-FISH_FUNCTIONS_DIR = /usr/share/fish/vendor_completions.d
+FISH_FUNCTIONS_DIR = ${prefix}/share/fish/vendor_completions.d
 GCOV = 
 GREP = /bin/grep
 HAVE_BROTLI = 1
 HAVE_GNUTLS_SRP = 
 HAVE_LDAP_SSL = 1
 HAVE_LIBZ = 1
-HAVE_OPENSSL_SRP = 
+HAVE_OPENSSL_SRP = 1
 HAVE_PROTO_BSDSOCKET_H = 
 IDN_ENABLED = 
-INSTALL = /bin/install -c
+INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 IPV6_ENABLED = 1
 LCOV = 
-LD = /bin/ld -m elf_x86_64
-LDFLAGS = -L/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/lib -L/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/lib -L/usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/lib
+LD = /usr/bin/ld -m elf_x86_64
+LDFLAGS = -L/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/libbrotli-lib/lib -L/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/nghttp2-lib/lib -L/home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/c-ares-lib/lib
 LIBCURL_LIBS = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lbrotlidec -lbrotlidec -lz
+LIBCURL_NO_SHARED = -lcares -lnghttp2 -lssl -lcrypto -lssl -lcrypto -lbrotlidec -lbrotlidec -lz 
 LIBMETALINK_CPPFLAGS = 
 LIBMETALINK_LDFLAGS = 
 LIBMETALINK_LIBS = 
@@ -412,13 +413,13 @@ LN_S = ln -s
 LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 MAINT = #
-MAKEINFO = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing makeinfo
+MAKEINFO = ${SHELL} /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/missing makeinfo
 MANIFEST_TOOL = :
 MANOPT = -man
 MKDIR_P = /bin/mkdir -p
-NM = /bin/nm -B
+NM = /usr/bin/nm -B
 NMEDIT = 
-NROFF = /bin/gnroff
+NROFF = /usr/bin/nroff
 NSS_LIBS = 
 OBJDUMP = objdump
 OBJEXT = o
@@ -432,22 +433,22 @@ PACKAGE_TARNAME = curl
 PACKAGE_URL = 
 PACKAGE_VERSION = -
 PATH_SEPARATOR = :
-PERL = /bin/perl
+PERL = /usr/bin/perl
 PKGADD_NAME = curl - a client that groks URLs
 PKGADD_PKG = HAXXcurl
 PKGADD_VENDOR = curl.haxx.se
-PKGCONFIG = /bin/pkg-config
+PKGCONFIG = /usr/bin/pkg-config
 RANDOM_FILE = /dev/urandom
 RANLIB = ranlib
 REQUIRE_LIB_DEPS = yes
 SED = /bin/sed
 SET_MAKE = 
-SHELL = /bin/sh
+SHELL = /bin/bash
 SSL_BACKENDS = OpenSSL
 SSL_ENABLED = 1
-SSL_LIBS = -lssl -lcrypto  
+SSL_LIBS = -lssl -lcrypto
 STRIP = strip
-SUPPORT_FEATURES = SSL IPv6 UnixSockets libz brotli AsynchDNS NTLM NTLM_WB HTTP2 HTTPS-proxy
+SUPPORT_FEATURES = SSL IPv6 UnixSockets libz brotli AsynchDNS NTLM NTLM_WB TLS-SRP HTTP2 HTTPS-proxy
 SUPPORT_PROTOCOLS = DICT FILE FTP FTPS GOPHER HTTP HTTPS IMAP IMAPS POP3 POP3S RTSP SMB SMBS SMTP SMTPS TELNET TFTP
 USE_ARES = 1
 USE_BEARSSL = 
@@ -473,13 +474,13 @@ USE_WINDOWS_SSPI =
 USE_WOLFSSH = 
 USE_WOLFSSL = 
 VERSION = -
-VERSIONNUM = 074600
+VERSIONNUM = 074701
 ZLIB_LIBS = -lz
 ZSH_FUNCTIONS_DIR = ${prefix}/share/zsh/site-functions
-abs_builddir = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
-abs_srcdir = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
-abs_top_builddir = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
-abs_top_srcdir = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
+abs_builddir = /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
+abs_srcdir = /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
+abs_top_builddir = /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
+abs_top_srcdir = /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src
 ac_ct_AR = 
 ac_ct_CC = gcc
 ac_ct_DUMPBIN = 
@@ -508,7 +509,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/install-sh
+install_sh = ${SHELL} /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-src/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 libext = a
@@ -518,7 +519,7 @@ mandir = ${datarootdir}/man
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 pdfdir = ${docdir}
-prefix = /usr/local/git_tree/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib
+prefix = /home/tom/code/perl-AnyEvent-YACurl/AnyEvent-YACurl/curl-lib
 program_transform_name = s,x,x,
 psdir = ${docdir}
 runstatedir = ${localstatedir}/run
@@ -545,6 +546,9 @@ CMAKE_DIST = \
  CMake/FindLibSSH2.cmake                        \
  CMake/FindMbedTLS.cmake                        \
  CMake/FindNGHTTP2.cmake                        \
+ CMake/FindNGHTTP3.cmake                        \
+ CMake/FindNGTCP2.cmake                         \
+ CMake/FindQUICHE.cmake                         \
  CMake/FindWolfSSL.cmake                        \
  CMake/Macros.cmake                             \
  CMake/OtherTests.cmake                         \
@@ -696,17 +700,17 @@ LIB_VAUTH_CFILES = vauth/cleartext.c vauth/cram.c vauth/digest.c             \
   vauth/vauth.c
 
 LIB_VAUTH_HFILES = vauth/digest.h vauth/ntlm.h vauth/vauth.h
-LIB_VTLS_CFILES = vtls/bearssl.c vtls/gskit.c vtls/gtls.c vtls/mbedtls.c \
-  vtls/mbedtls_threadlock.c vtls/mesalink.c vtls/nss.c vtls/openssl.c    \
-  vtls/schannel.c vtls/schannel_verify.c vtls/sectransp.c vtls/vtls.c    \
-  vtls/wolfssl.c
+LIB_VTLS_CFILES = vtls/bearssl.c vtls/gskit.c vtls/gtls.c vtls/keylog.c  \
+  vtls/mbedtls.c vtls/mbedtls_threadlock.c vtls/mesalink.c vtls/nss.c    \
+  vtls/openssl.c vtls/schannel.c vtls/schannel_verify.c vtls/sectransp.c \
+  vtls/vtls.c vtls/wolfssl.c
 
-LIB_VTLS_HFILES = vtls/bearssl.h vtls/gskit.h vtls/gtls.h vtls/mbedtls.h \
-  vtls/mbedtls_threadlock.h vtls/mesalink.h vtls/nssg.h vtls/openssl.h   \
-  vtls/schannel.h vtls/sectransp.h vtls/vtls.h vtls/wolfssl.h
+LIB_VTLS_HFILES = vtls/bearssl.h vtls/gskit.h vtls/gtls.h vtls/keylog.h      \
+  vtls/mbedtls.h vtls/mbedtls_threadlock.h vtls/mesalink.h vtls/nssg.h       \
+  vtls/openssl.h vtls/schannel.h vtls/sectransp.h vtls/vtls.h vtls/wolfssl.h
 
-LIB_VQUIC_CFILES = vquic/ngtcp2.c vquic/quiche.c
-LIB_VQUIC_HFILES = vquic/ngtcp2.h vquic/quiche.h
+LIB_VQUIC_CFILES = vquic/ngtcp2.c vquic/quiche.c vquic/vquic.c
+LIB_VQUIC_HFILES = vquic/ngtcp2.h vquic/quiche.h vquic/vquic.h
 LIB_VSSH_CFILES = vssh/libssh.c vssh/libssh2.c vssh/wolfssh.c
 LIB_VSSH_HFILES = vssh/ssh.h
 LIB_CFILES = altsvc.c amigaos.c asyn-ares.c asyn-thread.c base64.c            \
@@ -725,7 +729,7 @@ LIB_CFILES = altsvc.c amigaos.c asyn-ares.c asyn-thread.c base64.c            \
   sendf.c setopt.c sha256.c share.c slist.c smb.c smtp.c socketpair.c socks.c \
   socks_gssapi.c socks_sspi.c speedcheck.c splay.c strcase.c strdup.c         \
   strerror.c strtok.c strtoofft.c system_win32.c telnet.c tftp.c timeval.c    \
-  transfer.c urlapi.c version.c warnless.c wildcard.c x509asn1.c
+  transfer.c urlapi.c version.c warnless.c wildcard.c x509asn1.c dynbuf.c
 
 LIB_HFILES = altsvc.h amigaos.h arpa_telnet.h asyn.h conncache.h connect.h    \
   content_encoding.h cookie.h curl_addrinfo.h curl_base64.h curl_ctype.h      \
@@ -744,7 +748,7 @@ LIB_HFILES = altsvc.h amigaos.h arpa_telnet.h asyn.h conncache.h connect.h    \
   smb.h smtp.h sockaddr.h socketpair.h socks.h speedcheck.h splay.h strcase.h \
   strdup.h strerror.h strtok.h strtoofft.h system_win32.h telnet.h tftp.h     \
   timeval.h transfer.h urlapi-int.h urldata.h warnless.h wildcard.h           \
-  x509asn1.h
+  x509asn1.h dynbuf.h
 
 LIB_RCFILES = libcurl.rc
 CSOURCES = $(LIB_CFILES) $(LIB_VAUTH_CFILES) $(LIB_VTLS_CFILES) \
@@ -760,14 +764,16 @@ CURLX_CFILES = \
   ../lib/strtoofft.c \
   ../lib/nonblock.c \
   ../lib/warnless.c \
-  ../lib/curl_ctype.c
+  ../lib/curl_ctype.c \
+  ../lib/curl_multibyte.c
 
 CURLX_HFILES = \
   ../lib/curl_setup.h \
   ../lib/strtoofft.h \
   ../lib/nonblock.h \
   ../lib/warnless.h \
-  ../lib/curl_ctype.h
+  ../lib/curl_ctype.h \
+  ../lib/curl_multibyte.h
 
 CURL_CFILES = \
   slist_wc.c \

@@ -307,6 +307,8 @@ int main() {
       !CU_add_test(pSuite, "session_flooding", test_nghttp2_session_flooding) ||
       !CU_add_test(pSuite, "session_change_stream_priority",
                    test_nghttp2_session_change_stream_priority) ||
+      !CU_add_test(pSuite, "session_create_idle_stream",
+                   test_nghttp2_session_create_idle_stream) ||
       !CU_add_test(pSuite, "session_repeated_priority_change",
                    test_nghttp2_session_repeated_priority_change) ||
       !CU_add_test(pSuite, "session_repeated_priority_submission",
@@ -315,6 +317,8 @@ int main() {
                    test_nghttp2_session_set_local_window_size) ||
       !CU_add_test(pSuite, "session_cancel_from_before_frame_send",
                    test_nghttp2_session_cancel_from_before_frame_send) ||
+      !CU_add_test(pSuite, "session_too_many_settings",
+                   test_nghttp2_session_too_many_settings) ||
       !CU_add_test(pSuite, "session_removed_closed_stream",
                    test_nghttp2_session_removed_closed_stream) ||
       !CU_add_test(pSuite, "session_pause_data",

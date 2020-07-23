@@ -1,5 +1,5 @@
 package WWW::FetchStory::Fetcher;
-$WWW::FetchStory::Fetcher::VERSION = '0.2004';
+$WWW::FetchStory::Fetcher::VERSION = '0.2201';
 use strict;
 use warnings;
 =head1 NAME
@@ -8,7 +8,7 @@ WWW::FetchStory::Fetcher - fetching module for WWW::FetchStory
 
 =head1 VERSION
 
-version 0.2004
+version 0.2201
 
 =head1 DESCRIPTION
 
@@ -269,60 +269,63 @@ sub fetch {
     $story_info{basename} = $basename;
     my @storyfiles = ();
 
-    if ($args{epub} and exists $story_info{epub_url} and $story_info{epub_url})
+    if (!$args{meta_only})
     {
-	my %epub_info = $self->get_epub(base=>$basename,
-	    url=>$story_info{epub_url},
-	    meta=>\%story_info);
-	$story_info{storyfiles} = [$epub_info{filename}];
+        if ($args{epub} and exists $story_info{epub_url} and $story_info{epub_url})
+        {
+            my %epub_info = $self->get_epub(base=>$basename,
+                url=>$story_info{epub_url},
+                meta=>\%story_info);
+            $story_info{storyfiles} = [$epub_info{filename}];
 
-	$self->derive_values(info=>\%story_info);
-	warn Dump(\%story_info) if ($self->{verbose} > 1);
-    }
-    else
-    {
-	my @ch_urls = @{$story_info{chapters}};
-	my $one_chapter = (@ch_urls == 1);
-	my $first_chapter_is_toc =
+            $self->derive_values(info=>\%story_info);
+            warn Dump(\%story_info) if ($self->{verbose} > 1);
+        }
+        else
+        {
+            my @ch_urls = @{$story_info{chapters}};
+            my $one_chapter = (@ch_urls == 1);
+            my $first_chapter_is_toc =
             $story_info{toc_first} || $self->{first_is_toc};
-        delete $story_info{toc_first};
-	my @ch_titles = ();
-	my @ch_wc = ();
-	my $count = (($one_chapter or $first_chapter_is_toc) ? 0 : 1);
-	foreach (my $i = 0; $i < @ch_urls; $i++)
-	{
-	    my $ch_title = sprintf("%s (%d)", $story_info{title}, $i+1);
-	    my %ch_info = $self->get_chapter(base=>$basename,
-		count=>$count,
-		url=>$ch_urls[$i],
-		title=>$ch_title);
-	    push @storyfiles, $ch_info{filename};
-	    push @ch_titles, $ch_info{title};
-	    push @ch_wc, $ch_info{wordcount};
-	    $story_info{wordcount} += $ch_info{wordcount};
-	    $count++;
-	    sleep 1; # try not to overload the archive
-	}
-	$self->derive_values(info=>\%story_info);
+            delete $story_info{toc_first};
+            my @ch_titles = ();
+            my @ch_wc = ();
+            my $count = (($one_chapter or $first_chapter_is_toc) ? 0 : 1);
+            foreach (my $i = 0; $i < @ch_urls; $i++)
+            {
+                my $ch_title = sprintf("%s (%d)", $story_info{title}, $i+1);
+                my %ch_info = $self->get_chapter(base=>$basename,
+                    count=>$count,
+                    url=>$ch_urls[$i],
+                    title=>$ch_title);
+                push @storyfiles, $ch_info{filename};
+                push @ch_titles, $ch_info{title};
+                push @ch_wc, $ch_info{wordcount};
+                $story_info{wordcount} += $ch_info{wordcount};
+                $count++;
+                sleep 1; # try not to overload the archive
+            }
+            $self->derive_values(info=>\%story_info);
 
-	warn Dump(\%story_info) if ($self->{verbose} > 1);
+            warn Dump(\%story_info) if ($self->{verbose} > 1);
 
-	$story_info{storyfiles} = \@storyfiles;
-	$story_info{chapter_titles} = \@ch_titles;
-	$story_info{chapter_wc} = \@ch_wc;
-	if ($args{toc} and !$args{epub}) # build a table-of-contents
-	{
-	    my $toc = $self->build_toc(info=>\%story_info);
-	    unshift @{$story_info{storyfiles}}, $toc;
-	    unshift @{$story_info{chapter_titles}}, "Table of Contents";
-	}
-	if ($args{epub})
-	{
-	    my $epub_file = $self->build_epub(info=>\%story_info);
-	    # if we have built an EPUB file, then the storyfiles
-	    # are now just one EPUB file.
-	    $story_info{storyfiles} = [$epub_file];
-	}
+            $story_info{storyfiles} = \@storyfiles;
+            $story_info{chapter_titles} = \@ch_titles;
+            $story_info{chapter_wc} = \@ch_wc;
+            if ($args{toc} and !$args{epub}) # build a table-of-contents
+            {
+                my $toc = $self->build_toc(info=>\%story_info);
+                unshift @{$story_info{storyfiles}}, $toc;
+                unshift @{$story_info{chapter_titles}}, "Table of Contents";
+            }
+            if ($args{epub})
+            {
+                my $epub_file = $self->build_epub(info=>\%story_info);
+                # if we have built an EPUB file, then the storyfiles
+                # are now just one EPUB file.
+                $story_info{storyfiles} = [$epub_file];
+            }
+        }
     }
     if ($args{yaml})
     {

@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::OpenTracing::Interface: v0.23.0
+  Test::Time::HiRes: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
@@ -24,10 +25,10 @@ requires:
   OpenTracing::GlobalTracer: '0.04'
   OpenTracing::Implementation::Interface::Bootstrap: '0'
   OpenTracing::Implementation::NoOp: '0'
-  OpenTracing::Role: v0.82.0
+  OpenTracing::Role: v0.84.0
   Tree: '0'
   Types::Standard: '0'
   aliased: '0'
   namespace::clean: '0'
-version: v0.101.2
+version: v0.102.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,9 @@
 Revision history for Wasm},
 
+0.18      2020-07-21 17:26:23 -0600
+  - Added get_one_by_name method to Wasm::Wasmtime::Linker class (gh#73, gh#87)
+  - Added Wasm::Trap class (gh#86, gh#89)
+
 0.17      2020-07-20 10:27:52 -0600
   - Require Wasmtime 0.19.0 (via Alien::wasmtime 0.12 if necessary) (gh#73, gh#82)
   - The store method on Wasm::Wasmtime::Module is deprecated and will be

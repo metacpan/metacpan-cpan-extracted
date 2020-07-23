@@ -11,7 +11,7 @@ use overload
   fallback => 1;
 
 # ABSTRACT: Wasmtime trap class
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 $ffi_prefix = 'wasm_trap_';
@@ -72,7 +72,7 @@ Wasm::Wasmtime::Trap - Wasmtime trap class
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

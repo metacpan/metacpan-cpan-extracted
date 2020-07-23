@@ -9,7 +9,7 @@ use parent 'Net::SecurityCenter::API';
 
 use Net::SecurityCenter::Utils qw(:all);
 
-our $VERSION = '0.205';
+our $VERSION = '0.206';
 
 #-------------------------------------------------------------------------------
 # METHODS
@@ -39,7 +39,7 @@ sub status {
 
     my $feed = $self->client->get($feed_path);
 
-    return if ( !$feed );
+    return       if ( !$feed );
     return $feed if ($raw);
     return sc_normalize_hash($feed);
 
@@ -250,7 +250,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2019 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

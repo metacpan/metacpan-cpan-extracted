@@ -1,4 +1,4 @@
-# Copyrights 2001-2019 by [Mark Overmeer].
+# Copyrights 2001-2020 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package Mail::Transport::SMTP;
 use vars '$VERSION';
-$VERSION = '3.004';
+$VERSION = '3.005';
 
 use base 'Mail::Transport::Send';
 
@@ -99,17 +99,11 @@ sub trySend($@)
               return (0, $server->code, $server->message,"To $_",$server->quit);
         }
 
-        $server->data;
-        $server->datasend($_) for @headers;
         my $bodydata = $message->body->file;
 
-        if(ref $bodydata eq 'GLOB') {
-            $server->datasend($_) while <$bodydata>;
-        }
-        else {
-            while(my $l = $bodydata->getline) { $server->datasend($l) }
-        }
-
+        $server->data;
+        $server->datasend(\@headers);
+        $server->datasend( [ ref $bodydata eq 'GLOB' ? <$bodydata> : $bodydata->getlines ] );
         $server->dataend
             or return (0, $server->code, $server->message,'DATA',$server->quit);
 
@@ -136,12 +130,11 @@ sub trySend($@)
           return 0;
     }
 
-    $server->data;
-    $server->datasend($_) for @headers;
     my $bodydata = $message->body->file;
 
-    if(ref $bodydata eq 'GLOB') { $server->datasend($_) while <$bodydata> }
-    else    { while(my $l = $bodydata->getline) { $server->datasend($l) } }
+    $server->data;
+    $server->datasend(\@headers);
+    $server->datasend( [ ref $bodydata eq 'GLOB' ? <$bodydata> : $bodydata->getlines ] );
 
     $server->quit, return 0
         unless $server->dataend;

@@ -1,0 +1,32 @@
+{
+    "type": "regular",
+    "response": {
+        "id": "5",
+        "name": "Test Zone #1",
+        "description": "",
+        "ipList": "192.168.0.0\/24",
+        "createdTime": "1426871916",
+        "modifiedTime": "1426881426",
+        "scanners": [
+            {
+                "id": "2",
+                "name": "Nessus 172.168.0.1:8834",
+                "description": "",
+                "status": "4"
+            }
+        ],
+        "organizations": [
+            {
+                "id": "38",
+                "name": "Test Org",
+                "description": ""
+            }
+        ],
+        "activeScanners": 0,
+        "totalScanners": 1
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1426882592
+}

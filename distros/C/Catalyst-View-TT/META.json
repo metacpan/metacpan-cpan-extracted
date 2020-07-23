@@ -4,13 +4,13 @@
       "Sebastian Riedel <sri@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Catalyst-View-TT",
    "no_index" : {
@@ -45,7 +45,7 @@
       "test" : {
          "requires" : {
             "File::Spec" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0.88"
          }
       }
    },
@@ -63,6 +63,6 @@
       "x_IRC" : "irc://irc.perl.org/#catalyst",
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst"
    },
-   "version" : "0.44",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.45",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,3 +1,15 @@
+0.479   2020-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- move-done-todos: Add --dry-run, --include-pat, --exclude-pat, and
+	  some logging statements.
+
+
+0.478   2020-04-29  Released-By: PERLANCAR; Urgency: low
+
+	- Tweak Rinci metadata: replace deprecated
+	  x.schema.{,element_}entity with more specific schema.
+
+
 0.477   2020-04-27  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

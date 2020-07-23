@@ -56,6 +56,7 @@ my %WriteMakefileArgs = (
     "lib/Wasm/Hook.pm"                      => "\$(INST_LIB)/Wasm/Hook.pm",
     "lib/Wasm/Memory.pm"                    => "\$(INST_LIB)/Wasm/Memory.pm",
     "lib/Wasm/Table.pm"                     => "\$(INST_LIB)/Wasm/Table.pm",
+    "lib/Wasm/Trap.pm"                      => "\$(INST_LIB)/Wasm/Trap.pm",
     "lib/Wasm/Wasmtime.pm"                  => "\$(INST_LIB)/Wasm/Wasmtime.pm",
     "lib/Wasm/Wasmtime/Caller.pm"           => "\$(INST_LIB)/Wasm/Wasmtime/Caller.pm",
     "lib/Wasm/Wasmtime/Config.pm"           => "\$(INST_LIB)/Wasm/Wasmtime/Config.pm",
@@ -108,7 +109,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"     => "0.000060",
     "YAML"          => 0
   },
-  "VERSION" => "0.17",
+  "VERSION" => "0.18",
   "test"    => {
     "TESTS" => "t/*.t"
   }

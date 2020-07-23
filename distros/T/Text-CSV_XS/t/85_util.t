@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 
+my $ebcdic = ord ("A") == 0xC1;
 my $pu;
 BEGIN {
     $pu = $ENV{PERL_UNICODE};
@@ -104,7 +105,8 @@ foreach my $sep (",", ";") {
 	}
     }
 
-my $sep_ok = [ "\t", "|", ",", ";", "##", "\xe2\x81\xa3" ];
+my $sep_utf = byte_utf8a_to_utf8n ("\xe2\x81\xa3"); # U+2063 INVISIBLE SEPARATOR
+my $sep_ok = [ "\t", "|", ",", ";", "##", $sep_utf ];
 unless ($pu) {
     foreach my $sep (@$sep_ok) {
 	my $data = "bAr,foo\n1,2\n3,4,5\n";
@@ -245,11 +247,13 @@ for ([ undef, "_bar" ], [ "lc", "_bar" ], [ "uc", "_BAR" ], [ "none", "_bAr" ],
     }
 
 my $fnm = "_85hdr.csv"; END { unlink $fnm; }
-foreach my $irs ("\n", "\xaa") {
+
+my $a_ring = chr (utf8::unicode_to_native (0xe5));
+foreach my $irs ("\n", chr (utf8::unicode_to_native (0xaa))) {
     local $/ = $irs;
     foreach my $eol ("\n", "\r\n", "\r") {
 	my $str = join $eol =>
-	    qq{zoo,b\x{00e5}r},
+	    qq{zoo,b${a_ring}r},
 	    qq{1,"1 \x{20ac} each"},
 	    "";
 	for (   [ "none"       => ""			],
@@ -268,16 +272,30 @@ foreach my $irs ("\n", "\xaa") {
 		[ "UTF-8"      => "\x{feff}"		],
 		) {
 	    my ($enc, $bom) = @$_;
-	    my $has_enc = 0;
+	    my ($enx, $box, $has_enc) = ($enc, $bom, 0);
+	    $enc eq "UTF-8" || $enc eq "none" or
+		$box = eval { Encode::encode ($enc, chr (0xfeff)) };
+	    $enc eq "none" and $enx = "utf-8";
+
+	    # On os390, Encode only supports the following EBCDIC
+	    #  cp37, cp500, cp875, cp1026, cp1047, and posix-bc
+	    # utf-ebcdic is not in the list
 	    eval {
 		no warnings "utf8";
 		open my $fh, ">", $fnm;
 		binmode $fh;
-		print $fh $bom;
-		print $fh Encode::encode ($enc eq "none" ? "utf-8" : $enc, $str);
+		if (defined $box) {
+		    print $fh byte_utf8a_to_utf8n ($box);
+		    print $fh Encode::encode ($enx, $str);
+		    $has_enc = 1;
+		    }
+		else {
+		    print $fh Encode::encode ("utf-8", $str);
+		    }
+
 		close $fh;
-		$has_enc = 1;
 		};
+	    #$ebcdic and $has_enc = 0; # TODO
 
 	    $csv = Text::CSV_XS->new ({ binary => 1, auto_diag => 9 });
 
@@ -289,19 +307,20 @@ foreach my $irs ("\n", "\xaa") {
 		ok (1, "$fnm opened for enc $enc");
 		ok ($csv->header ($fh), "headers with BOM for $enc");
 		$enc =~ m/^utf/ and is ($csv->{ENCODING}, uc $enc, "Encoding inquirable");
-		is (($csv->column_names)[1], "b\x{00e5}r", "column name was decoded");
+
+		is (($csv->column_names)[1], "b${a_ring}r", "column name was decoded");
 		ok (my $row = $csv->getline_hr ($fh), "getline_hr");
-		is ($row->{"b\x{00e5}r"}, "1 \x{20ac} each", "Returned in Unicode");
+		is ($row->{"b${a_ring}r"}, "1 \x{20ac} each", "Returned in Unicode");
 		close $fh;
 
 		my $aoh;
 		ok ($aoh = csv (in => $fnm, bom => 1), "csv (bom => 1)");
 		is_deeply ($aoh,
-		    [{ zoo => 1, "b\x{00e5}r" => "1 \x{20ac} each" }], "Returned data");
+		    [{ zoo => 1, "b${a_ring}r" => "1 \x{20ac} each" }], "Returned data bom = 1");
 
 		ok ($aoh = csv (in => $fnm, encoding => "auto"), "csv (encoding => auto)");
 		is_deeply ($aoh,
-		    [{ zoo => 1, "b\x{00e5}r" => "1 \x{20ac} each" }], "Returned data");
+		    [{ zoo => 1, "b${a_ring}r" => "1 \x{20ac} each" }], "Returned data auto");
 		}
 
 	    SKIP: {
@@ -311,14 +330,14 @@ foreach my $irs ("\n", "\xaa") {
 		$enc eq "none" or binmode $fh, ":encoding($enc)";
 		ok (1, "$fnm opened for enc $enc");
 		ok ($csv->header ($fh), "headers with BOM for $enc");
-		is (($csv->column_names)[1], "b\x{00e5}r", "column name was decoded");
+		is (($csv->column_names)[1], "b${a_ring}r", "column name was decoded");
 		ok (my $row = $csv->getline_hr ($fh), "getline_hr");
-		is ($row->{"b\x{00e5}r"}, "1 \x{20ac} each", "Returned in Unicode");
+		is ($row->{"b${a_ring}r"}, "1 \x{20ac} each", "Returned in Unicode");
 		close $fh;
 
 		ok (my $aoh = csv (in => $fnm, bom => 1), "csv (bom => 1)");
 		is_deeply ($aoh,
-		    [{ zoo => 1, "b\x{00e5}r" => "1 \x{20ac} each" }], "Returned data");
+		    [{ zoo => 1, "b${a_ring}r" => "1 \x{20ac} each" }], "Returned data");
 		}
 
 	    unlink $fnm;

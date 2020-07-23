@@ -2,8 +2,8 @@ package Catalyst::Helper::View::TT;
 
 use strict;
 
-our $VERSION = '0.44';
-$VERSION = eval $VERSION;
+our $VERSION = '0.45';
+$VERSION =~ tr/_//d;
 
 =head1 NAME
 

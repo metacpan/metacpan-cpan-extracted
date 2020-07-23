@@ -8,7 +8,7 @@ use Algorithm::Cron;
 
 use Carp 'croak';
 
-our $VERSION = "0.029";
+our $VERSION = "0.031";
 use constant CRON_DIR => 'mojo_cron_';
 my $crondir;
 
@@ -100,17 +100,17 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
 
 =head1 SYNOPSIS
 
-  # Execute some job every 5 minutes, from 9 to 5
+  # Execute some job every 5 minutes, from 9 to 5 (4:55 actually)
 
   # Mojolicious::Lite
 
-  plugin Cron => ( '*/5 9-17 * * *' => sub {
+  plugin Cron => ( '*/5 9-16 * * *' => sub {
       # do someting non-blocking but useful
   });
 
   # Mojolicious
 
-  $self->plugin(Cron => '*/5 9-17 * * *' => sub {
+  $self->plugin(Cron => '*/5 9-16 * * *' => sub {
       # same here
   });
 
@@ -119,13 +119,13 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
   plugin Cron => (
   sched1 => {
     base    => 'utc', # not needed for local time
-    crontab => '*/10 15 * * *', # at every 10th minute past hour 15
+    crontab => '*/10 15 * * *', # at every 10th minute past hour 15 (3:00 pm to 3:50 pm)
     code    => sub {
       # job 1 here
     }
   },
   sched2 => {
-    crontab => '*/15 15 * * *', # at every 15th minute past hour 15
+    crontab => '*/15 15 * * *', # at every 15th minute past hour 15 (3:00 pm to 3:45 pm)
     code    => sub {
       # job 2 here
     }

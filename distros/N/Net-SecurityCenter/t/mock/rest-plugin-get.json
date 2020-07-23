@@ -1,0 +1,19 @@
+{
+    "type": "regular",
+    "response": [
+        {
+            "id": "15000",
+            "name": "Debian DSA-163-1 : mhonarc - XSS",
+            "description": "Jason Molenda and Hiromitsu Takagi foundways to exploit cross site\nscripting bugs in mhonarc, a mail to HTML converter. When processing\nmaliciously crafted mails of type text\/html mhonarc does not\ndeactivate all scripting parts properly. This is fixed in upstream\nversion 2.5.3.\n\nIf you are worried about security, it is recommended that you disable\nsupport of text\/html messages in your mail archives. There is no\nguarantee that the mhtxthtml.pl library is robust enough to eliminate\nall possible exploits that can occur with HTML data.\n\nTo exclude HTML data, you can use the MIMEEXCS resource. For example :\n\n    <MIMEExcs> text\/html text\/x-html <\/MIMEExcs>\n\nThe type 'text\/x-html' is probably not used any more, but is good to\ninclude it, just-in-case.\n\nIf you are concerned that this could block out the entire contents of\nsome messages, then you could do the following instead :\n\n    <MIMEFilters> text\/html; m2h_text_plain::filter; mhtxtplain.pl\n    text\/x-html; m2h_text_plain::filter; mhtxtplain.pl <\/MIMEFilters>\n\nThis treats the HTML as text\/plain.\n\nThe above problems have been fixed in version 2.5.2-1.1 for the\ncurrent stable distribution (woody), in version 2.4.4-1.1 for the old\nstable distribution (potato) and in version 2.5.11-1 for the unstable\ndistribution (sid)."
+        },
+        {
+            "id": "15004",
+            "name": "Debian DSA-167-1 : kdelibs - XSS",
+            "description": "A cross site scripting problem has been discovered in Konqueror, a\nfamous browser for KDE and other programs using KHTML. The KDE team\nreportsthat Konqueror's cross site scripting protection fails to\ninitialize the domains on sub-(i)frames correctly. As a result,\nJavaScript is able to access any foreign subframe which is defined in\nthe HTML source. Users of Konqueror and other KDE software that uses\nthe KHTML rendering engine may become victim of a cookie stealing and\nother cross site scripting attacks."
+        }
+    ],
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1411668488
+}

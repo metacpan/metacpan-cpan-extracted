@@ -1,24 +1,29 @@
-0.005   2019-01-09 (PERLANCAR)
+0.006   2020-07-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Avoided: Add String::Truncate.
+
+
+0.005   2019-01-09  Released-By: PERLANCAR
 
 	- Split non-PERLANCAR-specific lists to their own dists, remove the
 	  PERLANCAR:: part from name.
 
 
-0.004   2019-01-06 (PERLANCAR)
+0.004   2019-01-06  Released-By: PERLANCAR
 
 	- Add Package::MoreUtil to list of retired modules.
 
 
-0.003   2018-09-20 (PERLANCAR)
+0.003   2018-09-20  Released-By: PERLANCAR
 
 	- Mention get_user_tempdir() from File::Util::Tempdir.
 
 
-0.002   2018-06-11 (PERLANCAR)
+0.002   2018-06-11  Released-By: PERLANCAR
 
 	- Add list: PERLANCAR::Task::AliasingModuleName.
 
 
-0.001   2017-01-09 (PERLANCAR)
+0.001   2017-01-09  Released-By: PERLANCAR
 
         - First release. Converted from Acme::CPANLists::PERLANCAR.

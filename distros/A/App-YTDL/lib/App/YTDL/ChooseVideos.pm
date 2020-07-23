@@ -11,7 +11,7 @@ our @EXPORT_OK = qw( choose_videos set_sort_videolist );
 use Encode qw( decode );
 
 use Encode::Locale  qw();
-use List::MoreUtils qw( any none );
+use List::MoreUtils qw( any none minmax firstidx );
 use Term::Choose    qw( choose );
 use Term::Form      qw();
 
@@ -22,47 +22,49 @@ sub _my_sort {
                 ? ( $h_ref->{$a}{$sort_item}, $h_ref->{$b}{$sort_item} )
                 : ( $h_ref->{$b}{$sort_item}, $h_ref->{$a}{$sort_item} );
     if ( $sort_item eq 'view_count_raw' || $sort_item eq 'date_sort' ) {
-       $s[0] <=> $s[1] || $h_ref->{$a}{title} cmp $h_ref->{$b}{title};
+          ( $s[0] // 0 )      <=> ( $s[1] // 0 )
+       || $h_ref->{$a}{title} cmp $h_ref->{$b}{title};
     }
     else {
-       $s[0] cmp $s[1] || $h_ref->{$a}{title} cmp $h_ref->{$b}{title};
+          ( $s[0] // '' )     cmp ( $s[1] // '' )
+       || $h_ref->{$a}{title} cmp $h_ref->{$b}{title};
    }
 }
 
 
 sub choose_videos {
-    my ( $set, $opt, $data, $tmp, $ex, $prompt ) = @_;
-    my $length_view_count  = 0;
-    my $length_video_id    = 0;
-    my $length_upload_date = 0;
-    my $has_date_sort      = 0;
-    my $has_view_count     = 0;
-    my $has_duration       = 0;
-    for my $video_id ( keys %{$tmp->{$ex}} ) {
-        $has_duration++                                                  if defined $tmp->{$ex}{$video_id}{duration} && $tmp->{$ex}{$video_id}{duration} ne '-:--:--';
-        $has_date_sort++                                                 if defined $tmp->{$ex}{$video_id}{date_sort};
-        $has_view_count++                                                if defined $tmp->{$ex}{$video_id}{view_count};
-        $length_video_id    = length $video_id                           if                                                length $video_id                           > $length_video_id;
-        $length_view_count  = length $tmp->{$ex}{$video_id}{view_count}  if defined $tmp->{$ex}{$video_id}{view_count}  && length $tmp->{$ex}{$video_id}{view_count}  > $length_view_count;
-        $length_upload_date = length $tmp->{$ex}{$video_id}{upload_date} if defined $tmp->{$ex}{$video_id}{upload_date} && length $tmp->{$ex}{$video_id}{upload_date} > $length_upload_date;
+    my ( $set, $opt, $data, $ex, $up, $ids, $prompt ) = @_;
+    my $view_count_w  = 0;
+    my $id_w          = 0;
+    my $upload_date_w = 0;
+    my $duration_w    = 7;
+    my $has_date_sort   = 0;
+    my $has_view_count  = 0;
+    my $has_duration    = 0;
+    my $has_upload_date = 0;
+    my $dummy;
+    for my $id ( keys %{$data->{$ex}{$up}} ) {
+        $has_duration++    if defined $data->{$ex}{$up}{$id}{duration} && $data->{$ex}{$up}{$id}{duration} ne '-:--:--';
+        $has_date_sort++   if defined $data->{$ex}{$up}{$id}{date_sort};
+        $has_view_count++  if defined $data->{$ex}{$up}{$id}{view_count};
+        $has_upload_date++ if defined $data->{$ex}{$up}{$id}{upload_date} && $data->{$ex}{$up}{$id}{upload_date} ne '';
+        ( $dummy, $id_w )    = minmax( length $id, $id_w );
+        ( $dummy, $view_count_w )  = minmax( length( $data->{$ex}{$up}{$id}{view_count}  // '' ), $view_count_w );
+        ( $dummy, $upload_date_w ) = minmax( length( $data->{$ex}{$up}{$id}{upload_date} // '' ), $upload_date_w );
     }
-    if ( $length_upload_date && $length_upload_date < 10 ) {
-        $length_upload_date = 10;
+    if ( $upload_date_w && $upload_date_w < 10 ) {
+        $upload_date_w = 10;
     }
     my $regexp;
-    my $back   = sprintf "%*s", $length_video_id, '   BACK';
-    my $filter = sprintf "%*s", $length_video_id, ' FILTER';
-    my $sort   = sprintf "%*s", $length_video_id, '   SORT';
-    my $enter  = sprintf "%*s", $length_video_id, '  ENTER';
-    my %chosen_video_ids;
-    my @last_chosen_video_ids = ();
+    my $back   = 'BACK';
+    my $filter = 'FILTER';
+    my $sort   = 'SORT';
+    my $enter  = 'ENTER';
+    my $add_info = $has_view_count + $has_duration + $has_upload_date;
+    my $chosen_ids = {};
+    my @last_chosen_ids = ();
 
     FILTER: while ( 1 ) {
-        my @pre  = ( length $regexp ? ( undef, $enter ) : ( undef, $filter, $sort, $enter ) );
-        my @videos;
-        my @tmp_video_ids;
-        my $index = $#pre;
-        my $mark = [];
         my $sort_item  = $opt->{list_sort_item};
         my $sort_order = $set->{list_sort_order};
         if ( $sort_item eq 'view_count_raw' && ! $has_view_count ) {
@@ -72,7 +74,7 @@ sub choose_videos {
             $sort_item = 'upload_date';
         }
         if ( $sort_item eq 'upload_date' ) {
-            if ( ! $length_upload_date ) {
+            if ( ! $upload_date_w ) {
                 $sort_item = 'title';
                 $sort_order = 'Asc';
             }
@@ -81,10 +83,22 @@ sub choose_videos {
                 $sort_order = $sort_order eq 'Asc' ? 'Desc' : 'Asc';
             }
         }
-        my @video_ids = sort { _my_sort( $sort_item, $sort_order, $tmp->{$ex}, $a, $b ) }  keys %{$tmp->{$ex}};
+        my @pre  = (
+            length $regexp ?
+                ( undef, $enter )
+              : ( undef, $filter, $add_info ? $sort : (), $enter )
+        );
+        my $index = $#pre;
+        my $mark = [];
+        my @tmp_ids = @$ids;
+        my @tmp_ids_fmt =
+            sort { _my_sort( $sort_item, $sort_order, $data->{$ex}{$up}, $a, $b ) }
+            splice( @tmp_ids, 0, $opt->{entries_with_info} );
+        my @str_videos;
+        my @avail_ids;
 
-        VIDEO_ID: for my $video_id ( @video_ids ) {
-            my $title = $tmp->{$ex}{$video_id}{title};
+        VIDEO_ID: for my $id ( @tmp_ids_fmt, @tmp_ids ) {
+            my $title = $data->{$ex}{$up}{$id}{title};
             $title =~ s/\s+/ /g;
             $title =~ s/^\s+|\s+\z//g;
             if ( length $regexp ) {
@@ -96,23 +110,27 @@ sub choose_videos {
                     next VIDEO_ID if $title !~ /$regexp/i;
                 }
             }
-            $tmp->{$ex}{$video_id}{from_list} = 1;
-            if ( $ex eq 'youtube' ) {
-                $tmp->{$ex}{$video_id}{extractor} = 'youtube';
+            $data->{$ex}{$up}{$id}{from_list} = 1;
+            my $line = '';
+            $line .= sprintf "%*s | ", $id_w, $id if $opt->{show_video_id};
+            if ( $opt->{entries_with_info} ) {
+                $line .= sprintf "%*s  ",  $duration_w,   $data->{$ex}{$up}{$id}{duration}    // '' if $has_duration;
+                $line .= sprintf "%*s  ", $upload_date_w, $data->{$ex}{$up}{$id}{upload_date} // '' if $has_upload_date;
+                $line .= sprintf "%*s  ", $view_count_w,  $data->{$ex}{$up}{$id}{view_count}  // '' if $has_view_count && ( $opt->{list_sort_item} eq 'view_count_raw' || $opt->{show_view_count} );
             }
-            my $line = sprintf "%*s |", $length_video_id, $video_id;
-            $line .= sprintf " %7s", $tmp->{$ex}{$video_id}{duration}                          if $has_duration;
-            $line .= sprintf "  %*s", $length_upload_date, $tmp->{$ex}{$video_id}{upload_date} if $length_upload_date;
-            if ( ( $opt->{list_sort_item} eq 'view_count_raw' || $opt->{show_view_count} ) && $has_view_count ) {
-                $line .= sprintf "  %*s", $length_view_count, $tmp->{$ex}{$video_id}{view_count};
+            else {
+                if ( $has_view_count + $has_duration + $has_upload_date ) {
+                    $prompt .= '_';
+                    # it was never meant to get here
+                }
             }
-            $line .= sprintf "  %s", $title;
-            push @videos, $line;
-            push @tmp_video_ids, $video_id;
+            $line .= sprintf "%s", $title;
+            push @str_videos, $line;
+            push @avail_ids, $id;
             $index++;
-            push @$mark, $index if any { $video_id eq $_ } keys %chosen_video_ids;
+            push @$mark, $index if any { $id eq $_ } keys %$chosen_ids;
         }
-        my $menu = [ @pre, @videos ];
+        my $menu = [ @pre, @str_videos ];
         # Choose
         my @idx = choose(
             $menu,
@@ -121,28 +139,24 @@ sub choose_videos {
         );
         if ( ! defined $idx[0] || ! defined $menu->[$idx[0]] ) {
             if ( length $regexp ) {
-                delete @{$data->{$ex}}{ @last_chosen_video_ids };
                 $regexp = '';
                 next FILTER;
             }
-            delete @{$data->{$ex}}{ keys %chosen_video_ids };
             return;
         }
         my $choice = $menu->[$idx[0]];
         if ( $choice eq $filter ) {
             shift @idx;
-            @last_chosen_video_ids = ();
+            @last_chosen_ids = ();
             for my $i ( @idx ) {
-                my $video_id = $tmp_video_ids[$i - @pre];
-                $data->{$ex}{$video_id} = $tmp->{$ex}{$video_id};
-                $chosen_video_ids{$video_id}++;
-                push @last_chosen_video_ids, $video_id;
+                my $id = $avail_ids[$i - @pre];
+                $chosen_ids->{$id}++;
+                push @last_chosen_ids, $id;
             }
             for my $m ( @$mark ) {
                 if ( none { $m == $_ } @idx ) {
-                    my $video_id = $tmp_video_ids[$m - @pre];
-                    delete $chosen_video_ids{$video_id};
-                    delete $data->{$ex}{$video_id};
+                    my $id = $avail_ids[$m - @pre];
+                    delete $chosen_ids->{$id};
                 }
             }
             my $trs = Term::Form->new();
@@ -150,24 +164,23 @@ sub choose_videos {
             next FILTER;
         }
         elsif ( $choice eq $sort ) {
-            set_sort_videolist( $opt );
+            set_sort_videolist( $set, $opt );
+            next FILTER;
         }
         else {
             if ( $choice eq $enter ) {
                 shift @idx;
             }
-            @last_chosen_video_ids = ();
+            @last_chosen_ids = ();
             for my $i ( @idx ) {
-                my $video_id = $tmp_video_ids[$i - @pre];
-                $data->{$ex}{$video_id} = $tmp->{$ex}{$video_id};
-                $chosen_video_ids{$video_id}++;
-                push @last_chosen_video_ids, $video_id;
+                my $id = $avail_ids[$i - @pre];
+                $chosen_ids->{$id}++;
+                push @last_chosen_ids, $id;
             }
             for my $m ( @$mark ) {
                 if ( none { $m == $_ } @idx ) {
-                    my $video_id = $tmp_video_ids[$m - @pre];
-                    delete $chosen_video_ids{$video_id};
-                    delete $data->{$ex}{$video_id};
+                    my $id = $avail_ids[$m - @pre];
+                    delete $chosen_ids->{$id};
                 }
             }
             if ( length $regexp ) {
@@ -175,7 +188,11 @@ sub choose_videos {
                 next FILTER;
             }
             else {
-                return;
+                my $chosen = [
+                    sort { ( firstidx { $_ eq $a } @avail_ids ) <=> ( firstidx { $_ eq $b } @avail_ids ) }
+                    keys %$chosen_ids
+                ];
+                return $chosen;
             }
         }
     }

@@ -1,12 +1,10 @@
 package Koha::Contrib::ARK::Clear;
 # ABSTRACT: Clear Koha ARK field
-$Koha::Contrib::ARK::Clear::VERSION = '1.0.3';
+$Koha::Contrib::ARK::Clear::VERSION = '1.0.5';
 use Moose;
-
-with 'Koha::Contrib::ARK::Action';
-
 use Modern::Perl;
 
+with 'Koha::Contrib::ARK::Action';
 
 
 sub action {
@@ -18,7 +16,9 @@ sub action {
     my $ka = $ark->c->{ark}->{koha}->{ark};
     my ($tag, $letter) = ($ka->{tag}, $ka->{letter});
 
-    $self->ark->what_append('clear');
+    my $more = $ka->{tag};
+    $more .= '$' . $ka->{letter} if $ka->{letter};
+    $self->ark->what_append('clear', $more);
     if ( $letter ) {
         for my $field ( $record->field($tag) ) {
             my @subf = grep {
@@ -52,7 +52,7 @@ Koha::Contrib::ARK::Clear - Clear Koha ARK field
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.5
 
 =head1 AUTHOR
 
@@ -60,7 +60,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Demians.
+This software is Copyright (c) 2020 by Fréderic Demians.
 
 This is free software, licensed under:
 

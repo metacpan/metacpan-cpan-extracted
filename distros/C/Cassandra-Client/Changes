@@ -1,5 +1,9 @@
 Revision history for Cassandra-Client
 
+0.17    2020/07/21
+
+      * Added idempotency awareness to allow for write retries
+
 0.16    2019/02/08
 
       * Fix issue in the requirements list

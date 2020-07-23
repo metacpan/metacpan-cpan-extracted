@@ -1,25 +1,21 @@
 package Koha::Contrib::ARK;
-$Koha::Contrib::ARK::VERSION = '1.0.3';
 # ABSTRACT: ARK Management
+$Koha::Contrib::ARK::VERSION = '1.0.5';
 use Moose;
-
 use Modern::Perl;
 use JSON;
 use DateTime;
 use Try::Tiny;
-use Log::Dispatch;
-use Log::Dispatch::Screen;
-use Log::Dispatch::File;
-use C4::Context;
 use Koha::Contrib::ARK::Reader;
 use Koha::Contrib::ARK::Writer;
 use Koha::Contrib::ARK::Update;
 use Koha::Contrib::ARK::Clear;
 use Koha::Contrib::ARK::Check;
 use Term::ProgressBar;
+use C4::Context;
 
 
-# Action id / message
+# Action/error id/message
 my $raw_actions = <<EOS;
 found_right_field      ARK found in the right field
 found_wrong_field      ARK found in the wrong field
@@ -44,8 +40,6 @@ my $what = { map {
     { $1 => { id => $1, msg => $2 } }
 } split /\n/, $raw_actions };
 
-$Koha::Contrib::ARK::what = $what;
-
 
 has c => ( is => 'rw', isa => 'HashRef' );
 
@@ -65,15 +59,17 @@ has cmd => (
 
 has doit => ( is => 'rw', isa => 'Bool', default => 0 );
 
+
 has verbose => ( is => 'rw', isa => 'Bool', default => 0 );
+
 
 has debug => ( is => 'rw', isa => 'Bool', default => 0 );
 
 
 has field_query => ( is => 'rw', isa => 'Str' );
 
-has reader => (is => 'rw');
-has writer => (is => 'rw');
+has reader => (is => 'rw', isa => 'Koha::Contrib::ARK::Reader' );
+has writer => (is => 'rw', isa => 'Koha::Contrib::ARK::Writer' );
 has action => (is => 'rw', isa => 'Koha::Contrib::ARK::Action' );
 
 
@@ -81,6 +77,7 @@ has explain => (
     is => 'rw',
     isa => 'HashRef',
 );
+
 
 has current => (
     is => 'rw',
@@ -91,7 +88,7 @@ has current => (
 sub set_current {
     my ($self, $biblionumber, $record) = @_;
     my $current = { biblionumber => $biblionumber };
-    $current->{ record } = tojson($record) if $self->debug;
+    $current->{ record } = tojson($record) if $record && $self->debug;
     $self->current($current);
 }
     
@@ -170,6 +167,7 @@ sub BUILD {
         $self->error('err_pref_var_letter', "koha.$name.letter")
             if $field->{tag} !~ /^00[0-9]$/ && ! $field->{letter};
     }
+    $self->explain->{ark_conf} = $c;
 
     my $id = $a->{koha}->{ark};
     my $field_query =
@@ -258,13 +256,14 @@ sub run {
         $progress = Term::ProgressBar->new({ count => $self->reader->total })
             if $self->verbose;
         my $next_update = 0;
-        while ( my $br = $self->reader->read() ) {
-            my ($biblionumber, $record) = @$br;
-            $self->action->action($biblionumber, $record);
-            if ( $self->cmd ne 'check' ) {
-                $self->writer->write($biblionumber, $record);
+        while ( my ($biblionumber, $record) = $self->reader->read() ) {
+            if ( $record ) {
+                $self->action->action($biblionumber, $record);
+                if ( $self->cmd ne 'check' ) {
+                    $self->writer->write($biblionumber, $record);
+                }
+                push @{$self->explain->{result}->{records}}, $self->current;
             }
-            push @{$self->explain->{result}->{records}}, $self->current;
             my $count = $self->reader->count;
             next unless $progress;
             $next_update = $progress->update($count) if $count >= $next_update;
@@ -289,7 +288,7 @@ Koha::Contrib::ARK - ARK Management
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.5
 
 =head1 ATTRIBUTES
 
@@ -310,7 +309,24 @@ Operate in verbose mode
 
 In debug mode, there is more info produces. By default, false.
 
+=head2 explain
+
+A HASH containing the full explanation of the pending processing
+
+=head2 current
+
+What happens on the current biblio record?
+
 =head1 METHODS
+
+=head2 set_current($biblionumber, $record)
+
+Set the current biblio record. Called by the biblio records reader.
+
+=head2 error($id, $more)
+
+Set an error code $id to the L<explain> processing status. $more can contain
+more information.
 
 =head2 build_ark($biblionumber, $record)
 
@@ -322,7 +338,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Demians.
+This software is Copyright (c) 2020 by Fréderic Demians.
 
 This is free software, licensed under:
 

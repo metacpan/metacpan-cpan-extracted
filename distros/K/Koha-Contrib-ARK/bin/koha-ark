@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 package Main;
-$Main::VERSION = '1.0.3';
+$Main::VERSION = '1.0.5';
 # PODNAME: koha-ark
 # ABSTRACT: Manage ARK identifiers in a Koha Catalog
 
@@ -51,7 +51,7 @@ koha-ark - Manage ARK identifiers in a Koha Catalog
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.5
 
 =head1 DESCRIPTION
 
@@ -245,7 +245,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Demians.
+This software is Copyright (c) 2020 by Fréderic Demians.
 
 This is free software, licensed under:
 

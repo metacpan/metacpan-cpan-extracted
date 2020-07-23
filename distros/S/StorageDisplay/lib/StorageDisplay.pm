@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay;
 # ABSTRACT: Collect and display storages on linux machines
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 
 1;
 
@@ -3969,15 +3969,50 @@ sub dotLinks {
 1;
 
 ##################################################################
-package StorageDisplay::RAID::LSI::SASIrcu::RawDevice;
+package StorageDisplay::RAID::LSI::SASIrcu::MissingRawDevice;
 
 use Moose;
 use namespace::sweep;
 extends 'StorageDisplay::RAID::RawDevice';
 
-with (
-    'StorageDisplay::Role::Style::WithSize',
+#with (
+#    'StorageDisplay::Role::Style::WithSize',
+#    );
+
+has 'volume' => (
+    is       => 'rw',
+    isa      => 'StorageDisplay::RAID::RaidDevice',
+    required => 0,
+    predicate => 'has_volume',
     );
+
+has 'phyid' => (
+    is       => 'rw',
+    isa      => 'Num',
+    required => 0,
+    predicate => 'has_phyid',
+    );
+
+around 'dotLabel' => sub {
+    my $orig  = shift;
+    my $self = shift;
+    my @ret = $self->$orig(@_);
+    if ($self->has_phyid) {
+        $ret[1] = $self->phyid.": enc/slot: ".$self->slot;
+    } else {
+        $ret[1] = "enc/slot: ".$self->slot;
+    }
+    return @ret;
+};
+
+1;
+
+##################################################################
+package StorageDisplay::RAID::LSI::SASIrcu::RawDevice;
+
+use Moose;
+use namespace::sweep;
+extends 'StorageDisplay::RAID::RawDevice';
 
 has 'volume' => (
     is       => 'rw',
@@ -4013,6 +4048,8 @@ package StorageDisplay::RAID::LSI::SASIrcu;
 use Moose;
 use namespace::sweep;
 extends 'StorageDisplay::RAID';
+
+my $missing_count=0;
 
 has 'controller' => (
     is    => 'ro',
@@ -4070,20 +4107,36 @@ sub BUILD {
     my $st = $args->{st};
 
     my $cid = $self->controller;
+    my $cur_missing_count = $missing_count;
     foreach my $dev (sort { $a->{'enclosure'} <=> $b->{'enclosure'}
                             or $a->{'slot'} <=> $b->{'slot'}
                      }
                      @{$args->{'devices'}}) {
-        my $id=$dev->{'enclosure'}.":".$dev->{'slot'};
-        my $devpath = 'LSISASIrcu@'.$id;
-        my $d = StorageDisplay::RAID::LSI::SASIrcu::RawDevice->new(
-            $self, $st, $devpath, $dev,
-            'raiddevice' => $id,
-            'state' => $dev->{'state'},
-            'model' => join(' ', $dev->{'manufacturer'}, $dev->{'model-number'}, $dev->{'serial-no'}),
-            'size' => $dev->{'size'},
-            'slot' => $id,
-            );
+        my ($id,$d);
+        if ($dev->{'state'} =~ /MIS/) {
+            # disk missing
+            $id = $dev->{'enclosure'}.":".$dev->{'slot'}." (".($missing_count++).")";
+            my $devpath = 'LSISASIrcu@'.$id;
+            $d = StorageDisplay::RAID::LSI::SASIrcu::MissingRawDevice->new(
+                $self, $st, $devpath, $dev,
+                'raiddevice' => $id,
+                'state' => $dev->{'state'},
+                'model' => 'Disk missing',
+                'size' => 0,
+                'slot' => 'none',
+                );
+        } else {
+            $id=$dev->{'enclosure'}.":".$dev->{'slot'};
+            my $devpath = 'LSISASIrcu@'.$id;
+            $d = StorageDisplay::RAID::LSI::SASIrcu::RawDevice->new(
+                $self, $st, $devpath, $dev,
+                'raiddevice' => $id,
+                'state' => $dev->{'state'},
+                'model' => join(' ', $dev->{'manufacturer'}, $dev->{'model-number'}, $dev->{'serial-no'}),
+                'size' => $dev->{'size'},
+                'slot' => $id,
+                );
+        }
         $self->_add_device($d);
         $self->addChild($d);
         $self->_add_named_raw_device($id, $d);
@@ -4105,6 +4158,9 @@ sub BUILD {
         foreach my $phyid (keys %{$dev->{'PHY'} // {}}) {
             my $phy = $dev->{'PHY'}->{$phyid};
             my $id = $phy->{'enclosure'}.":".$phy->{'slot'};
+            if ($id eq '0:0') {
+                $id .= ' ('.($cur_missing_count++).')';
+            }
             my $rdsk = $self->raw_device($id);
             $rdsk->volume($raid_device);
             $rdsk->phyid($phyid);
@@ -4565,7 +4621,7 @@ StorageDisplay - Collect and display storages on linux machines
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 Replay commands
 

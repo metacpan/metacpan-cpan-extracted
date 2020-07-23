@@ -1,5 +1,5 @@
 package QuadPres::VimIface;
-$QuadPres::VimIface::VERSION = '0.28.3';
+$QuadPres::VimIface::VERSION = '0.30.0';
 use 5.016;
 use strict;
 use warnings;
@@ -64,7 +64,7 @@ QuadPres::VimIface - Vim syntax highlighting interface.
 
 =head1 VERSION
 
-version 0.28.3
+version 0.30.0
 
 =head1 SYNOPSIS
 

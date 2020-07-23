@@ -5,6 +5,7 @@ use warnings;
 use Test::More;
 
 use HTTP::Daemon;
+
 use Net::SecurityCenter;
 
 $| = 1;    # autoflush
@@ -32,7 +33,8 @@ sub dispatch {
         $c->send_file("t/mock/$mock.json");
 
     } else {
-        $c->send_404();
+        $c->send_basic_header(404);
+        $c->print("Content-Type: application/json");
     }
 
 }
@@ -117,29 +119,148 @@ sub _test {
 
     ok( $sc->login( 'secman', 'password' ), 'Login into SecurityCenter' );
 
+    is( $sc->error, undef, 'Check errors' );
+
     subtest(
-        'System API' => sub {
+        'REST' => sub {
+            my $client = $sc->client;
+            ok( $client->request( 'get', '/system' ), 'Request GET' );
+            ok( $client->get('/system'),              'Request GET (helper)' );
+        }
+    );
 
-            my $system_info = $sc->system->get_info;
+    subtest(
+        'Status API' => sub {
 
-            ok( $system_info->{'version'},       'SecurityCenter version' );
-            ok( $system_info->{'buildID'},       'SecurityCenter build' );
+            my $system_info = $sc->status->status;
+
             ok( $system_info->{'licenseStatus'}, 'SecurityCenter license' );
 
         }
     );
 
-    ok( $sc->scan->list, 'Scan API: Get list of Active Scan' );
+    subtest(
+        'System API' => sub {
+
+            my $system_info = $sc->system->info;
+
+            ok( $system_info->{'version'},       'SecurityCenter version' );
+            ok( $system_info->{'buildID'},       'SecurityCenter build' );
+            ok( $system_info->{'licenseStatus'}, 'SecurityCenter license' );
+
+            ok( $sc->system->get_diagnostics_info, 'Get diagnostics info' );
+
+            ok( $sc->system->debug, 'Get debug info' );
+            ok( $sc->system->debug( id       => 60 ),       'Get debug info (id=60)' );
+            ok( $sc->system->debug( category => 'common' ), 'Get debug info (category=common)' );
+
+        }
+    );
 
     subtest(
         'Scan API' => sub {
 
+            ok( $sc->scan->list, 'Get list of Active Scan' );
+
             my $scan = $sc->scan->get( id => 4 );
 
-            ok( $scan, 'Scan API: Get Active Scan' );
+            ok( $scan, 'Get Active Scan' );
             cmp_ok( $scan->{'id'},                '==', 4,       'Get Scan ID' );
             cmp_ok( $scan->{'policy'}->{'id'},    '==', 1000002, 'Get Scan Policy ID' );
             cmp_ok( $sc->scan->launch( id => 2 ), '==', 3,       'Launch Scan ID' );
+
+        }
+    );
+
+    subtest(
+        'Scan Result API' => sub {
+
+            ok( $sc->scan_result->list, 'Get the list of scans' );
+
+            ok( $sc->scan_result->get( id => 11 ), 'Get Scan Result' );
+
+            cmp_ok( $sc->scan_result->status( id => 11 ),   'eq', 'completed', 'Get Scan Result status' );
+            cmp_ok( $sc->scan_result->progress( id => 11 ), '==', 100,         'Get Scan Result progress' );
+
+            ok( $sc->scan_result->pause( id => 86 ),  'Pause scan' );
+            ok( $sc->scan_result->resume( id => 86 ), 'Resume scan' );
+            ok( $sc->scan_result->stop( id => 86 ),   'Stop scan' );
+        }
+    );
+
+    subtest(
+        'Plugin API' => sub {
+
+            my $plugin = $sc->plugin->get( id => 0 );
+
+            ok( $plugin, 'Get Plugin' );
+            cmp_ok( $plugin->{'id'},   '==', 0,           'Get Plugin ID' );
+            cmp_ok( $plugin->{'name'}, 'eq', 'Open Port', 'Get Plugin Name' );
+
+            ok( $sc->plugin->list, 'Get Plugin List' );
+
+        }
+    );
+
+    subtest(
+        'Plugin Family API' => sub {
+
+            my $plugin_family = $sc->plugin_family->get( id => 1000030 );
+
+            ok( $plugin_family, 'Get Plugin Family' );
+            cmp_ok( $plugin_family->{'id'},   '==', 1000030,   'Get Plugin Family ID' );
+            cmp_ok( $plugin_family->{'name'}, 'eq', 'Malware', 'Get Plugin Family Name' );
+            cmp_ok( $plugin_family->{'type'}, 'eq', 'passive', 'Get Plugin Family Type' );
+
+            ok( $sc->plugin_family->list,                    'Get List' );
+            ok( $sc->plugin_family->list_plugins( id => 2 ), 'Get Plugins List' );
+
+        }
+    );
+
+    subtest(
+        'Policy API' => sub {
+
+            ok( $sc->policy->list, 'Get List' );
+
+            ok( $sc->policy->get( id => 1, raw => 1 ), 'Get Policy ID=1' );    #TODO REMOVE RAW
+
+        }
+    );
+
+    subtest(
+        'Scanner API' => sub {
+
+            ok( $sc->scanner->list,              'Get List' );
+            ok( $sc->scanner->get( id => 5 ),    'Get Scanner' );
+            ok( $sc->scanner->health( id => 5 ), 'Get Scanner Health' );
+            cmp_ok( $sc->scanner->status( id => 5 ), 'eq', 'Updating Status', 'Get scanner status' );
+        }
+    );
+
+    subtest(
+        'Zone API' => sub {
+
+            ok( $sc->zone->list,           'Get list of Scan Zone' );
+            ok( $sc->zone->get( id => 5 ), 'Get Scan Zone detail' );
+
+        }
+    );
+
+    subtest(
+        'Repository API' => sub {
+
+            ok( $sc->repository->list,            'Get list of Repository' );
+            ok( $sc->repository->get( id => 37 ), 'Get Repository detail' );
+
+        }
+    );
+
+    subtest(
+        'Report API' => sub {
+
+            ok( $sc->report->list,           'Get list of Report' );
+            ok( $sc->report->get( id => 1 ), 'Get Report detail' );
 
         }
     );
@@ -163,22 +284,22 @@ sub new {
 
 sub info {
     my $self = shift;
-    Test::More::note(@_);
+    Test::More::note( '[info] ', @_ );
 }
 
 sub debug {
     my $self = shift;
-    Test::More::note(@_);
+    Test::More::note( '[debug] ', @_ );
 }
 
 sub warning {
     my $self = shift;
-    Test::More::note(@_);
+    Test::More::note( '[warning] ', @_ );
 }
 
 sub error {
     my $self = shift;
-    Test::More::note(@_);
+    Test::More::note( '[error] ', @_ );
 }
 
 1;

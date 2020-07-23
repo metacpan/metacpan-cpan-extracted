@@ -1,0 +1,157 @@
+{
+    "type": "regular",
+    "response": {
+        "usable": [
+            {
+                "id": "1",
+                "name": "test",
+                "description": "desc",
+                "status": "0"
+            },
+            {
+                "id": "2",
+                "name": "test2",
+                "description": "desc",
+                "status": "0"
+            },
+            {
+                "id": "3",
+                "name": "test3",
+                "description": "desc",
+                "status": "0"
+            },
+            {
+                "id": "4",
+                "name": "test4",
+                "description": "test desc",
+                "status": "0"
+            },
+            {
+                "id": "1000001",
+                "name": "nesus upload - ibm credentials",
+                "description": "",
+                "status": "0"
+            },
+            {
+                "id": "1000002",
+                "name": "nesus upload - ibm credentials - uploaded one",
+                "description": "Nessus Policy exported from Tenable.sc",
+                "status": "0"
+            },
+            {
+                "id": "1000003",
+                "name": "IBM iSeries Credentials Name",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000004",
+                "name": "Nessus Upload 2",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000005",
+                "name": "Nessus Upload 3",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000016",
+                "name": "Tom Test",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "100001",
+                "name": "Nessus Upload 4",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000018",
+                "name": "Tom Test 2",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000019",
+                "name": "DOCtest",
+                "description": "desc",
+                "status": "0"
+            },
+            {
+                "id": "1000020",
+                "name": "test5",
+                "description": "test desc",
+                "status": "0"
+            }
+        ],
+        "manageable": [
+            {
+                "id": "1000001",
+                "name": "nesus upload - ibm credentials",
+                "description": "",
+                "status": "0"
+            },
+            {
+                "id": "1000002",
+                "name": "nesus upload - ibm credentials - uploaded one",
+                "description": "Nessus Policy exported from Tenable.sc",
+                "status": "0"
+            },
+            {
+                "id": "1000003",
+                "name": "IBM iSeries Credentials Name",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000004",
+                "name": "Nessus Upload 2",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000005",
+                "name": "Nessus Upload 3",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000016",
+                "name": "Tom Test",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "100001",
+                "name": "Nessus Upload 4",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000018",
+                "name": "Tom Test 2",
+                "description": "Imported Nessus Policy",
+                "status": "0"
+            },
+            {
+                "id": "1000019",
+                "name": "DOCtest",
+                "description": "desc",
+                "status": "0"
+            },
+            {
+                "id": "1000020",
+                "name": "test5",
+                "description": "test desc",
+                "status": "0"
+            }
+        ]
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1406233675
+}

@@ -1,0 +1,14 @@
+{
+    "type": "regular",
+    "response": {
+        "id": "1000030",
+        "name": "Malware",
+        "type": "passive",
+        "plugins": [],
+        "count": 0
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1408728549
+}

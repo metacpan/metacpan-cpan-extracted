@@ -6,7 +6,7 @@ use 5.008004;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Global configuration for Wasm::Wasmtime::Engine
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 $ffi_prefix = 'wasm_config_';
@@ -152,7 +152,7 @@ Wasm::Wasmtime::Config - Global configuration for Wasm::Wasmtime::Engine
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

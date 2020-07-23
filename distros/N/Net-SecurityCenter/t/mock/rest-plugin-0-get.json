@@ -1,0 +1,123 @@
+{
+    "type": "regular",
+    "response": {
+        "id": "0",
+        "name": "Open Port",
+        "description": "",
+        "type": "active",
+        "copyright": "",
+        "version": "",
+        "sourceFile": "",
+        "dependencies": "",
+        "requiredPorts": "",
+        "requiredUDPPorts": "",
+        "cpe": "",
+        "srcPort": null,
+        "dstPort": null,
+        "protocol": "",
+        "riskFactor": "",
+        "solution": "",
+        "seeAlso": "",
+        "synopsis": "",
+        "checkType": "",
+        "exploitEase": "",
+        "exploitAvailable": "",
+        "exploitFrameworks": "",
+        "cvssVector": "",
+        "cvssVectorBF": "0",
+        "baseScore": null,
+        "temporalScore": null,
+        "cvssV3Vector": "",
+        "cvssV3VectorBF": "0",
+        "cvssV3BaseScore": null,
+        "cvssV3TemporalScore": null,
+        "vprScore": "6.1",
+        "vprContext": [
+            {
+                "id": "age_of_vuln",
+                "name": "Vulnerability Age",
+                "value": "730 days +",
+                "type": "string"
+            },
+            {
+                "id": "cvssV3_impactScore",
+                "name": "CvssV3 Impact Score",
+                "value": 5.5,
+                "type": "number"
+            },
+            {
+                "id": "exploit_code_maturity",
+                "name": "Exploit Code Maturity",
+                "value": "PoC",
+                "type": "string"
+            },
+            {
+                "id": "generated_at",
+                "name": "Generated At",
+                "value": 1551695021993,
+                "type": "number"
+            },
+            {
+                "id": "predicted_impactScore",
+                "name": "Predicted Impact Score",
+                "value": true,
+                "type": "boolean"
+            },
+            {
+                "id": "product_coverage",
+                "name": "Product Coverage",
+                "value": "Low",
+                "type": "string"
+            },
+            {
+                "id": "threat_model_type",
+                "name": "Threat Model Type",
+                "value": "non_early_life",
+                "type": "string"
+            },
+            {
+                "id": "threat_model_version",
+                "name": "Threat Model Version",
+                "value": "v0",
+                "type": "string"
+            },
+            {
+                "id": "threat_intensity_last_28",
+                "name": "Threat Intensity Last 28",
+                "value": "Very Low",
+                "type": "string"
+            },
+            {
+                "id": "threat_recency",
+                "name": "Threat Recency",
+                "value": "No recorded events",
+                "type": "string"
+            },
+            {
+                "id": "threat_sources_last_28",
+                "name": "Threat Sources Last 28",
+                "value": "No recorded events",
+                "type": "string"
+            }
+        ],
+        "stigSeverity": null,
+        "pluginPubDate": "-1",
+        "pluginModDate": "-1",
+        "patchPubDate": "-1",
+        "patchModDate": "-1",
+        "vulnPubDate": "-1",
+        "modifiedTime": "1400516102",
+        "md5": "",
+        "xrefs": "",
+        "source": "",
+        "family": {
+            "id": "42",
+            "name": "Port scanners",
+            "type": "active"
+        }
+    },
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1408727888
+}

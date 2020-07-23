@@ -1,0 +1,34 @@
+{
+    "type": "regular",
+    "response": [
+        {
+            "id": "37",
+            "name": "ag repo1",
+            "description": "Copied from QA"
+        },
+        {
+            "id": "38",
+            "name": "jm ipv4",
+            "description": "copied from QA"
+        },
+        {
+            "id": "39",
+            "name": "ipv6 rep",
+            "description": "Copied from QA (name changed)"
+        },
+        {
+            "id": "43",
+            "name": "Test Local mobile Repository",
+            "description": "DevForm test of mobile repository post"
+        },
+        {
+            "id": "44",
+            "name": "Test w\/pluginPrefs",
+            "description": ""
+        }
+    ],
+    "error_code": 0,
+    "error_msg": "",
+    "warnings": [],
+    "timestamp": 1423767348
+}

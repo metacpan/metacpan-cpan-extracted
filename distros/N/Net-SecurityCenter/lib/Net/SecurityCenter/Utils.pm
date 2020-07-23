@@ -6,20 +6,28 @@ use strict;
 use Carp;
 use Params::Check qw(allow);
 use Time::Piece;
+use Data::Dumper ();
 use Exporter qw(import);
 
-our $VERSION = '0.205';
+our $VERSION = '0.206';
 
 our @EXPORT_OK = qw(
     sc_check_params
     sc_decode_scanner_status
     sc_filter_array_to_string
     sc_filter_int_to_bool
+    sc_filter_datetime_to_epoch
     sc_merge
     sc_normalize_hash
     sc_normalize_array
     sc_method_usage
     sc_schedule
+
+    decamelize
+    dumper
+    trim
+    deprecated
+    cpe_decode
 );
 
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -50,14 +58,80 @@ our $NESSUS_SCANNER_STATUS = {
 };
 
 #-------------------------------------------------------------------------------
-# FUNCTIONS
+# COMMON UTILS
+#-------------------------------------------------------------------------------
+
+sub decamelize {
+    return join( '_', map {lc} grep {length} split /([A-Z]{1}[^A-Z]*)/, shift );
+}
+
+#-------------------------------------------------------------------------------
+
+sub dumper {
+    return Data::Dumper->new( [@_] )->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
+}
+
+#-------------------------------------------------------------------------------
+
+sub trim {
+
+    my ($string) = @_;
+
+    return if ( !$string );
+
+    $string =~ s/^\s+|\s+$//g;
+    return $string;
+
+}
+
+#-------------------------------------------------------------------------------
+
+sub deprecated {
+    local $Carp::CarpLevel = 1;
+    carp @_;
+}
+
+#-------------------------------------------------------------------------------
+
+sub cpe_decode {
+
+    my ($cpe) = @_;
+
+    $cpe =~ s/cpe:\///;
+
+    my (
+        $part,     $vendor,     $product,   $version,   $update, $edition,
+        $language, $sw_edition, $target_sw, $target_hw, $other
+    );
+
+    ( $part, $vendor, $product, $version, $update, $edition, $language ) = split( /:/, $cpe );
+
+    ( $sw_edition, $target_sw, $target_hw, $other ) = split( /~/, $language ) if ($language);
+
+    return {
+        'part'       => $part,
+        'vendor'     => $vendor,
+        'product'    => $product,
+        'version'    => $version,
+        'update'     => $update,
+        'edition'    => $edition,
+        'language'   => $language,
+        'sw_edition' => $sw_edition,
+        'target_sw'  => $target_sw,
+        'target_hw'  => $target_hw,
+        'other'      => $other
+    };
+
+}
+
+#-------------------------------------------------------------------------------
+# COMMON CLASS UTILS
 #-------------------------------------------------------------------------------
 
 sub sc_schedule {
 
     my (%args) = @_;
-    use Data::Dumper;
-    print Dumper( \%args );
+
     my $tmpl = {
         type => {
             allow    => [ 'dependent', 'ical', 'never', 'rollover', 'template', 'now' ],
@@ -94,6 +168,8 @@ sub sc_schedule {
     return $params;
 
 }
+
+#-------------------------------------------------------------------------------
 
 sub sc_method_usage {
 
@@ -270,6 +346,7 @@ sub sc_normalize_hash {
         createdTime
         finishTime
         importFinish
+        importStart
         lastSyncTime
         lastTrendUpdate
         lastVulnUpdate
@@ -278,6 +355,9 @@ sub sc_normalize_hash {
         updateTime
         diagnosticsGenerated
         statusLastChecked
+        lastScan
+        lastUnauthRun
+        lastAuthRun
     );
 
     my @seconds_fields = qw(
@@ -375,6 +455,33 @@ sub sc_filter_int_to_bool {
     return ( $_[0] == 1 ) ? \1 : \0;
 }
 
+sub sc_filter_datetime_to_epoch {
+
+    my ($date) = @_;
+
+    if ( ref $date eq 'Time::Piece' ) {
+        return $date->epoch;
+    }
+
+    if ( $date =~ /^\d{4}-\d{2}-\d{2}$/ ) {
+        my $t = Time::Piece->strptime( $date, '%Y-%m-%d' );
+        return $t->epoch;
+    }
+
+    if ( $date =~ /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/ ) {
+        my $t = Time::Piece->strptime( $date, '%Y-%m-%d %H:%M:%S' );
+        return $t->epoch;
+    }
+
+    if ( $date =~ /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ ) {
+        my $t = Time::Piece->strptime( $date, '%Y-%m-%dT%H:%M:%S' );
+        return $t->epoch;
+    }
+
+    return $date;
+
+}
+
 #-------------------------------------------------------------------------------
 
 1;
@@ -437,7 +544,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2019 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

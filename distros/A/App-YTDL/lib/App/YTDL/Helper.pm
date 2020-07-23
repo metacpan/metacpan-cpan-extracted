@@ -8,10 +8,10 @@ use 5.010000;
 use Exporter qw( import );
 our @EXPORT_OK = qw( sec_to_time write_json read_json uni_capture uni_system HIDE_CURSOR SHOW_CURSOR );
 
-use Fcntl              qw( LOCK_EX LOCK_SH SEEK_END );
+use Fcntl qw( LOCK_EX LOCK_SH SEEK_END );
 
-use IPC::System::Simple    qw( capture system EXIT_ANY );
-use JSON                   qw();
+use IPC::System::Simple qw( capture system EXIT_ANY );
+use JSON                qw();
 
 use if $^O eq 'MSWin32', 'Win32::ShellQuote';
 

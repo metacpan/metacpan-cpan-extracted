@@ -4,7 +4,7 @@
       "Dan Book <dbook@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -39,7 +39,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "0",
-            "Minion" : "10.03",
+            "Minion" : "10.10",
             "Mojo::SQLite" : "3.000",
             "Mojolicious" : "7.29",
             "Sys::Hostname" : "0",
@@ -64,7 +64,7 @@
    "provides" : {
       "Minion::Backend::SQLite" : {
          "file" : "lib/Minion/Backend/SQLite.pm",
-         "version" : "v5.0.1"
+         "version" : "v5.0.2"
       }
    },
    "release_status" : "stable",
@@ -80,7 +80,7 @@
       },
       "x_IRC" : "irc://irc.freenode.net/#mojo"
    },
-   "version" : "v5.0.1",
+   "version" : "v5.0.2",
    "x_contributors" : [
       "Dan Book <grinnz@grinnz.com>",
       "yrjustice <43676784+yrjustice@users.noreply.github.com>"

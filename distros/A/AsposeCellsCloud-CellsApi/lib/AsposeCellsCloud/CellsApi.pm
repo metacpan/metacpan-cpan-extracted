@@ -38,7 +38,7 @@ use AsposeCellsCloud::ApiClient;
 
 use base "Class::Data::Inheritable";
 
-my  $VERSION = '20.6';
+my  $VERSION = '20.7';
 
 __PACKAGE__->mk_classdata('method_documentation' => {});
 
@@ -54,16 +54,7 @@ sub new {
 
     my $access_token  =  $api_client->o_auth_post('grant_type' => "client_credentials", 'client_id' => $api_client->{config}->{app_sid}, 'client_secret' =>$api_client->{config}->{app_key})->access_token;
     $api_client->{config}->{access_token} = $access_token;
-    my $base_url =  $api_client->{config}->{base_url};
-    
-    if( substr( $base_url,length($base_url)-1,1) eq '/'){
-         $base_url =  $base_url . $api_client->{config}->{api_version};
-    }else{
-         $base_url =  $base_url . '/'.$api_client->{config}->{api_version};
-    }
-    
-    $api_client->{config}->{base_url} =  $base_url;
-    
+
     bless { api_client => $api_client }, $class;
 
 }
@@ -6235,12 +6226,11 @@ sub cells_delete_worksheet_columns {
         my $_base_value = $self->{api_client}->to_path_value($args{'column_index'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
     }
-
+    
     $self->{api_client}->check_access_token();
     my $_body_data;
     # authentication setting, if any
     my $auth_settings = [qw()];
-
     # make the API Call
     my $response = $self->{api_client}->call_api($_resource_path, $_method,
                                            $query_params, $form_params,

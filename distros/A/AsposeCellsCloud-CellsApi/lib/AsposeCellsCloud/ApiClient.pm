@@ -152,7 +152,7 @@ sub o_auth_post {
     # make the API Call
     my $response = $self->call_api($_resource_path, $_method,
                                            $query_params, $form_params,
-                                           $header_params, $_body_data, $auth_settings);
+                                           $header_params, $_body_data, $auth_settings, 'get_token');
     if (!$response) {
         return;
     }
@@ -169,10 +169,7 @@ sub check_access_token {
             return;
         }
     }
-    my $url = $self->{config}->{base_url};
-    $self->{config}->{base_url} ='https://api.aspose.cloud';
     my $access_token  =  $self->o_auth_post('grant_type' => "client_credentials", 'client_id' => $self->{config}->{app_sid}, 'client_secret' =>$self->{config}->{app_key})->access_token;
-    $self->{config}->{base_url}  = $url ;
     $self->{config}->{access_token} = $access_token;
 }
 
@@ -185,24 +182,25 @@ sub check_access_token {
 # @return mixed
 sub call_api {
     my $self = shift;
-    my ($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $auth_settings) = @_;
+    my ($resource_path, $method, $query_params, $post_params, $header_params, $body_data, $auth_settings,$get_token) = @_;
   
     # update parameters based on authentication settings
-    $self->update_params_for_auth($header_params, $query_params, $auth_settings); 
+    $self->update_params_for_auth($header_params, $query_params, $auth_settings ); 
   
   
-    my $_url = $self->{config}{base_url} . $resource_path;
-  
+    my $_url = $self->{config}{base_url}."/" .$self->{config}{api_version} . $resource_path;
+    if($get_token){
+        $_url = $self->{config}{base_url} . $resource_path;
+    }
+
     # build query 
     if (%$query_params) {
         $_url = ($_url . '?' . eval { URI::Query->new($query_params)->stringify });
     }
-  
-  
+
     # body data
     $body_data = to_json($body_data->to_hash) if defined $body_data && $body_data->can('to_hash'); # model to json string
     my $_body_data = %$post_params ? $post_params : $body_data;
-  
     # Make the HTTP request
     my $_request;
     if ($method eq 'POST') {
@@ -210,37 +208,62 @@ sub call_api {
         $header_params->{'Content-Type'} = lc $header_params->{'Content-Type'} eq 'multipart/form' ? 
             'form-data' : $header_params->{'Content-Type'};
         
-        $_request = POST($_url, %$header_params, Content => $_body_data);
-  
+        # $_request = POST($_url, %$header_params, Content => $_body_data);
+        if($_body_data){
+            $_request = POST($_url, %$header_params, Content => $_body_data);
+        }
+        else{
+            $_request = POST($_url, %$header_params);
+        }
     }
     elsif ($method eq 'PUT') {
         # multipart
         $header_params->{'Content-Type'}  = lc $header_params->{'Content-Type'} eq 'multipart/form' ? 
             'form-data' : $header_params->{'Content-Type'};
   
-        $_request = PUT($_url, %$header_params, Content => $_body_data);
-  
+        # $_request = PUT($_url, %$header_params, Content => $_body_data);
+        if($_body_data){
+            $_request = PUT($_url, %$header_params, Content => $_body_data);
+        }
+        else{
+            $_request = PUT($_url, %$header_params);
+        }
     }
     elsif ($method eq 'GET') {
         my $headers = HTTP::Headers->new(%$header_params);
-        $_request = GET($_url, %$header_params, Content => $_body_data);
+        if($_body_data){
+            $_request = GET($_url, %$header_params, Content => $_body_data);
+        }
+        else{
+           $_request = GET($_url, %$header_params);
+        }
+        
     }
     elsif ($method eq 'HEAD') {
         my $headers = HTTP::Headers->new(%$header_params);
         $_request = HEAD($_url,%$header_params); 
     }
     elsif ($method eq 'DELETE') { #TODO support form data
+    
         my $headers = HTTP::Headers->new(%$header_params);
-        $_request = DELETE($_url, %$headers, Content => $_body_data);
+        if($_body_data){
+            $_request = DELETE($_url, %$headers, Content => $_body_data);
+        }
+        else{
+            $_request = DELETE($_url, %$headers);
+        }
     }
     elsif ($method eq 'PATCH') { #TODO
     }
     else {
     }
-   
+    #proxy####################################################################
+    #$self->{ua}=LWP::UserAgent->new(ssl_opts => { verify_hostname => 0 },);
+    #$self->{ua}->proxy(['https'], "http://127.0.0.1:8888"); 
+    #printf $self->{ua}->ssl_opts;############################################
     $self->{ua}->timeout($self->{http_timeout} || $self->{config}{http_timeout});
     $self->{ua}->agent($self->{http_user_agent} || $self->{config}{http_user_agent});
-    
+
     $log->debugf("REQUEST: %s", $_request->as_string);
     my $_response = $self->{ua}->request($_request);
     $log->debugf("RESPONSE: %s", $_response->as_string);
@@ -248,7 +271,6 @@ sub call_api {
     unless ($_response->is_success) {
         croak(sprintf "API Exception(%s): %s\n%s", $_response->code, $_response->message, $_response->content);
     }
-       
     return $_response->content;
   
 }

@@ -25,7 +25,8 @@ sub test_includepath : Local {
     }
     if ( $c->request->param('addpath') ){
         my $additionalpath = Path::Class::dir($c->config->{root}, $c->request->param('addpath'));
-        my $view = 'TestApp::View::TT::' . ($c->request->param('view') || $c->config->{default_view});
+        my $p_view = $c->request->param('view');
+        my $view = 'TestApp::View::' . ($p_view ? "TT::$p_view" : $c->config->{default_view});
         no strict "refs";
         push @{$view . '::include_path'}, "$additionalpath";
         use strict;
@@ -65,7 +66,8 @@ sub end : Private {
     return 1 if $c->response->status =~ /^3\d\d$/;
     return 1 if $c->response->body;
 
-    my $view = 'View::TT::' . ($c->request->param('view') || $c->config->{default_view});
+    my $p_view = $c->request->param('view');
+    my $view = 'View::' . ($p_view ? "TT::$p_view" : $c->config->{default_view});
     $c->forward($view);
 }
 

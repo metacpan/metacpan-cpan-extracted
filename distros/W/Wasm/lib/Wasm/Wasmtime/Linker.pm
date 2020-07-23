@@ -14,7 +14,7 @@ use Ref::Util qw( is_blessed_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime linker class
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 $ffi_prefix = 'wasmtime_linker_';
@@ -102,6 +102,24 @@ $ffi->attach( instantiate => ['wasmtime_linker_t','wasm_module_t','opaque*','opa
 });
 
 
+$ffi->attach( get_one_by_name => ['wasmtime_linker_t','wasm_byte_vec_t*','wasm_byte_vec_t*','opaque*'] => 'wasmtime_error_t' => sub {
+  my($xsub, $self, $module, $name) = @_;
+  my $vmodule = Wasm::Wasmtime::ByteVec->new($module);
+  my $vname = Wasm::Wasmtime::ByteVec->new($name);
+  my $ptr;
+  if(my $error = $xsub->($self, $vmodule, $vname, \$ptr))
+  {
+    Carp::croak($error->message);
+  }
+  else
+  {
+    $ptr
+      ? $ffi->cast('opaque','wasm_extern_t',$ptr)
+      : undef;
+  }
+});
+
+
 $ffi->attach( get_default => ['wasmtime_linker_t','wasm_byte_vec_t*','opaque*'] => 'wasmtime_error_t' => sub {
   my($xsub, $self, $name) = @_;
   my $vname = Wasm::Wasmtime::ByteVec->new($name);
@@ -135,7 +153,7 @@ Wasm::Wasmtime::Linker - Wasmtime linker class
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -276,6 +294,13 @@ Define WebAssembly instance.
  );
 
 Instantiate the module using the linker.  Returns the new L<Wasm::Wasmtime::Instance> object.
+
+=head2 get_one_by_name
+
+ my $extern = $linker->get_one_by_name($module,$name);
+
+Returns the L<Wasm::Wasmtime::Extern> for the given C<$module> and C<$name>.
+C<undef> is returned if there is no such extern with that C<$name>.
 
 =head2 get_default
 

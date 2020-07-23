@@ -9,7 +9,7 @@ use base qw( Exporter );
 our @EXPORT_OK = qw( wasm_caller_memory );
 
 # ABSTRACT: Interface to WebAssembly Memory
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 sub wasm_caller_memory
@@ -64,7 +64,7 @@ Wasm::Memory - Interface to WebAssembly Memory
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -135,6 +135,10 @@ Use WebAssembly memory from Perl in callback from WebAssembly:
  run();
 
 =head1 DESCRIPTION
+
+B<WARNING>: WebAssembly and Wasmtime are a moving target and the
+interface for these modules is under active development.  Use with
+caution.
 
 This class represents a region of memory exported from a WebAssembly
 module.  A L<Wasm::Memory> instance is automatically imported into

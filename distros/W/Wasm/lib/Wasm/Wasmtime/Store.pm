@@ -7,7 +7,7 @@ use Wasm::Wasmtime::FFI;
 use Wasm::Wasmtime::Engine;
 
 # ABSTRACT: Wasmtime store class
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 $ffi_prefix = 'wasm_store_';
@@ -41,7 +41,7 @@ Wasm::Wasmtime::Store - Wasmtime store class
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

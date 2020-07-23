@@ -2,7 +2,7 @@ package MooX::ShortHas;
 
 use strictures 2;
 
-our $VERSION = '1.190320'; # VERSION
+our $VERSION = '1.202040'; # VERSION
 
 # ABSTRACT: shortcuts for common Moo has attribute configurations
 
@@ -20,7 +20,8 @@ our $VERSION = '1.190320'; # VERSION
 #
 
 
-use Moo::_Utils;
+use Moo 2.003006 ();
+use Moo::_Utils qw(_install_tracked);
 
 sub _modified_has {
     my ( $has, $mod, $name, @args ) = @_;
@@ -35,7 +36,7 @@ sub import {
         map { $_ => [ is => $_ => required => 1 ] } qw( ro rwp rw )
     );
     for my $mod ( keys %mods ) {
-        _install_coderef $caller. "::$mod" => sub {
+        _install_tracked $caller => $mod => sub {
             _modified_has $has, $mods{$mod}, @_;
         };
     }
@@ -53,7 +54,7 @@ MooX::ShortHas - shortcuts for common Moo has attribute configurations
 
 =head1 VERSION
 
-version 1.190320
+version 1.202040
 
 =head1 SYNOPSIS
 
@@ -137,7 +138,7 @@ L<Mus> - Mu but with slightly more typing and strict constructors
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
@@ -160,11 +161,25 @@ L<https://github.com/wchristian/MooX-ShortHas>
 
 Christian Walde <walde.christian@gmail.com>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords mst - Matt S. Trout (cpan:MSTROUT)
+=for stopwords Graham Knop Zakariyya Mughal mst - Matt S. Trout (cpan:MSTROUT)
+
+=over 4
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Zakariyya Mughal <zaki.mughal@gmail.com>
+
+=item *
 
 mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

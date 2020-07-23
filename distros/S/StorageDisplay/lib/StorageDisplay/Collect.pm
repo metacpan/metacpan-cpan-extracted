@@ -12,7 +12,7 @@ use warnings;
 package StorageDisplay::Collect;
 # ABSTRACT: modules required to collect data. No dependencies (but perl itself)
 
-our $VERSION = '1.0.4'; # VERSION
+our $VERSION = '1.0.5'; # VERSION
 
 
 use Storable;
@@ -1600,7 +1600,7 @@ StorageDisplay::Collect - modules required to collect data. No dependencies (but
 
 =head1 VERSION
 
-version 1.0.4
+version 1.0.5
 
 Main class, allows one to register collectors and run them (through the collect method)
 

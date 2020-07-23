@@ -170,6 +170,11 @@ Enums
         (``-536``) 
         When a local endpoint expects to receive SETTINGS frame, it
         receives an other type of frame.
+    .. macro:: NGHTTP2_ERR_TOO_MANY_SETTINGS
+
+        (``-537``) 
+        When a local endpoint receives too many settings entries
+        in a single SETTINGS frame.
     .. macro:: NGHTTP2_ERR_FATAL
 
         (``-900``) 

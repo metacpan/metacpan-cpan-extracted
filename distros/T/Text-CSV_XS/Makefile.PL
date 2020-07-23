@@ -4,6 +4,15 @@
 
 require 5.006001; # <- also see postamble at the bottom for META.yml
 use strict;
+use charnames ":full";
+
+if ($ENV{PERLBREW_HOME} and $ENV{PERLBREW_HOME} eq "/home/njh/.perlbrew") {
+     warn "Your smokers have been blocked because of consistent failures that\n";
+     warn " are all caused by the smoking setup and not by module errors.  If\n";
+     warn " you have fixed that all, please inform the authors, so this block\n";
+     warn " can be lifted again.\n";
+     exit 0;
+     }
 
 use ExtUtils::MakeMaker;
 
@@ -26,6 +35,8 @@ my %wm = (
 			 cover_db
 			 valgrind.log
 			 pod2htmd.tmp
+			 MYMETA.json
+			 MYMETA.yml
 			 )
 		      },
 
@@ -71,8 +82,13 @@ my $rv = WriteMakefile (%wm);
 
 package MY;
 
-sub postamble
-{
+sub postamble {
+    if ($^O eq "os390") { # Re-write test files
+	if (open my $fh, ">:encoding(utf-8)", "files/utf8.csv") {
+	    print $fh qq{"\N{LATIN CAPITAL LETTER O WITH STROKE}l/Vin",0\n};
+	    close $fh;
+	    }
+	}
     my $make_sep = $^O eq "VMS" ? "," : "";
     my $valgrind = join " ", qw(
 	PERL_DESTRUCT_LEVEL=2 PERL_DL_NONLAZY=1

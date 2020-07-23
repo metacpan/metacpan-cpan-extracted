@@ -4,7 +4,7 @@
       "Tom van der Woerdt <tvdw@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -62,6 +62,7 @@
             "Data::Dumper" : "0",
             "Devel::Cycle" : "0",
             "File::Basename" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
             "lib" : "0"
          }
@@ -75,9 +76,8 @@
          "web" : "https://github.com/tvdw/perl-dbd-cassandra"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_authority" : "cpan:TVDW",
-   "x_generated_by_perl" : "v5.16.3",
-   "x_serialization_backend" : "JSON::XS version 4.0"
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

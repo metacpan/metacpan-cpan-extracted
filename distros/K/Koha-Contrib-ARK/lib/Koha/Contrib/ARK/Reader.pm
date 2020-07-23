@@ -1,15 +1,14 @@
 package Koha::Contrib::ARK::Reader;
-$Koha::Contrib::ARK::Reader::VERSION = '1.0.3';
 # ABSTRACT: Read Koha biblio records with/without ARK
+$Koha::Contrib::ARK::Reader::VERSION = '1.0.5';
 use Moose;
-
-with 'MooseX::RW::Reader';
-
 use Moose::Util::TypeConstraints;
 use Modern::Perl;
 use C4::Context;
 use C4::Biblio;
 use MARC::Moose::Record;
+
+with 'MooseX::RW::Reader';
 
 
 has ark => ( is => 'rw', isa => 'Koha::Contrib::ARK' );
@@ -25,6 +24,7 @@ has select => (
     isa => 'BiblioSelect',
     default => 'All',
 );
+
 
 has total => ( is => 'rw', isa => 'Int', default => 0 );
 
@@ -65,15 +65,9 @@ sub read {
     
     $self->ark->set_current( $biblionumber, $record );
 
-    return [$biblionumber, $record];
+    return ($biblionumber, $record);
 }
 
-
-sub percentage {
-    my $self = shift;
-    my $p = ($self->count * 100) / $self->total;
-    return sprintf("%.2f", $p);
-}
 
 1;
 
@@ -89,7 +83,7 @@ Koha::Contrib::ARK::Reader - Read Koha biblio records with/without ARK
 
 =head1 VERSION
 
-version 1.0.3
+version 1.0.5
 
 =head1 ATTRIBUTES
 
@@ -111,7 +105,7 @@ Frédéric Demians <f.demians@tamil.fr>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Fréderic Demians.
+This software is Copyright (c) 2020 by Fréderic Demians.
 
 This is free software, licensed under:
 

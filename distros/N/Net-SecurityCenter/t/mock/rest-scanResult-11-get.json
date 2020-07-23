@@ -1,0 +1,131 @@
+{
+    "type" : "regular",
+    "response" : {
+        "id" : "11",
+        "name" : "Weekly Scan",
+        "description" : "",
+        "details" : "Policy 'Basic 1'",
+        "status" : "Completed",
+        "importStatus" : "Error",
+        "importStart" : "1424815361",
+        "importFinish" : "-1",
+        "importDuration" : -1,
+        "downloadAvailable" : "false",
+        "downloadFormat" : "v2",
+        "dataFormat" : "IPv4",
+        "resultType" : "active",
+        "resultSource" : "internal",
+        "running" : "false",
+        "errorDetails" : "",
+        "importErrorDetails" : "Scan import error (code #139).",
+        "totalIPs" : "200",
+        "scannedIPs" : "200",
+        "startTime" : "1424815208",
+        "finishTime" : "1424815360",
+        "scanDuration" : 152,
+        "completedIPs" : "200",
+        "completedChecks" : "10600",
+        "totalChecks" : "10600",
+        "progress" : {
+            "completedIPs" : "200",
+            "completedChecks" : "10600",
+            "totalChecks" : "10600",
+            "checksPerHost" : "53",
+            "totalIPs" : "200",
+            "runState" : "Stopped",
+            "scanningIPs" : "",
+            "scanningSize" : 0,
+            "scannedIPs" : "192.168.0.0",
+            "scannedSize" : 29,
+            "awaitingDownloadIPs" : "",
+            "awaitingDownloadSize" : 0,
+            "distributedSize" : 200,
+            "status" : "Completed",
+            "deadHostSize" : 171,
+            "deadHostIPs" : "192.168.0.0",
+            "scanners" : [
+                {
+                    "id" : "12",
+                    "loadAvg" : "0.0",
+                    "chunkCompleted" : "120",
+                    "completedChecks" : "6360",
+                    "chunks" : [
+                        {
+                            "id" : "1",
+                            "name" : "fc136656-2ddd-58ab-bccc-78ad4c125567-130064/Chunk 1.",
+                            "ips" : "192.168.0.0",
+                            "size" : "1",
+                            "completedHosts" : "0",
+                            "completedChecks" : "1",
+                            "scanningIPs" : "192.168.0.0",
+                            "canningSize" : "1",
+                            "scannedIPs" : "",
+                            "scannedSize" : "0",
+                            "status" : "Running",
+                            "startTime" : "1455735612",
+                            "endTime" : "1455736826",
+                            "deadHostIPs" : "",
+                            "deadHostSize" : 0
+                        }
+                    ],
+                    "scannedSize" : 11,
+                    "scannedIPs" : "192.168.0.0",
+                    "scanningSize" : 0,
+                    "scanningIPs" : "",
+                    "awaitingDownloadSize" : 0,
+                    "awaitingDownloadIPs" : "",
+                    "deadHostSize" : 109,
+                    "deadHostIPs" : "192.168.0.0",
+                    "distributedSize" : 120
+                },
+                {
+                    "id" : "15",
+                    "loadAvg" : "0.0",
+                    "chunkCompleted" : "80",
+                    "completedChecks" : "4240",
+                    "chunks" : [],
+                    "scannedSize" : 18,
+                    "scannedIPs" : "192.168.0.0",
+                    "scanningSize" : 0,
+                    "scanningIPs" : "",
+                    "awaitingDownloadSize" : 0,
+                    "awaitingDownloadIPs" : "",
+                    "deadHostSize" : 62,
+                    "deadHostIPs" : "192.168.0.0",
+                    "distributedSize" : 80
+                }
+            ]
+        },
+        "initiator" : {
+            "id" : "1",
+            "username" : "head",
+            "firstname" : "Security Manager",
+            "lastname" : ""
+        },
+        "owner" : {
+            "id" : "1",
+            "username" : "head",
+            "firstname" : "Security Manager",
+            "lastname" : ""
+        },
+            "ownerGroup" : {
+            "id" : "0",
+            "name" : "Full Access",
+            "description" : "Full Access group"
+        },
+            "scan" : {
+            "id" : -1,
+            "name" : "",
+            "description" : ""
+        },
+        "repository" : {
+            "id" : "38",
+            "name" : "jm ipv4",
+            "description" : "copied from 97"
+        }
+    },
+    "error_code" : 0,
+    "error_msg" : "",
+    "warnings" : [],
+    "timestamp" : 1426878968
+}

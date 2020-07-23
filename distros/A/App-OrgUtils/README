@@ -2,8 +2,8 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    This document describes version 0.477 of App::OrgUtils (from Perl
-    distribution App-OrgUtils), released on 2020-04-27.
+    This document describes version 0.479 of App::OrgUtils (from Perl
+    distribution App-OrgUtils), released on 2020-07-21.
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org
@@ -83,7 +83,7 @@ FUNCTIONS
 
     *   level => *posint* (default: 1)
 
-    *   sort_args => *hash*
+    *   sort_args => *array[str]*
 
         Arguments to pass to the Sort::Sub::* routine.
 

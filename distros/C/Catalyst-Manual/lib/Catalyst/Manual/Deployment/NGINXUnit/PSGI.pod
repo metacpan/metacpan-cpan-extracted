@@ -1,0 +1,69 @@
+=head1 NAME
+
+Catalyst::Manual::Deployment::NGINXUnit::PSGI - Deploying Catalyst with NGINX Unit
+
+=head1 NGINX Unit
+
+Catalyst runs under L<NGINX Unit|https://unit.nginx.org> using PSGI.
+
+=head2 Configuration
+
+To configure a Catalyst app in NGINX Unit, upload a JSON configuration
+snippet via Unit's config API, available at an IP socket or a Unix domain
+socket (depending on Unit's L<startup settings|
+https://unit.nginx.org/installation/#installation-startup>):
+
+    # curl -X PUT --data-binary @config.json --unix-socket \
+       /path/to/control.unit.sock http://localhost/config
+
+A minimal L<configuration|https://unit.nginx.org/configuration/#perl>
+includes a listener and an application entity:
+
+    {
+        "listeners": {
+            "127.0.0.1:8080": {
+                "pass": "applications/catalyst_app"
+            }
+        },
+
+        "applications": {
+            "catalyst_app": {
+                "type": "perl",
+                "script": "/path/to/apps/myapp/myapp.psgi",
+                "user": "catalyst_user",
+                "group": "catalyst_group"
+            }
+        }
+    }
+
+The C<script> should point to your app's C<.psgi> file; C<user> and
+C<group> should have appropriate access rights.
+
+After a successful reconfiguration, you can manage your Catalyst
+app via the same L<config API|
+https://unit.nginx.org/configuration/#applications>.
+
+=over
+
+Note: make sure the app's C<.psgi> file includes the C<lib/>
+directory:
+
+    use lib 'lib';
+    use myapp;
+
+=back
+
+=head1 MORE INFO
+
+For more information on NGINX Unit, visit: L<http://unit.nginx.org>
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

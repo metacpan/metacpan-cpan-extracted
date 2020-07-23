@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Moose::Role;
-our $VERSION = '2.2012';
+our $VERSION = '2.2013';
 
 use Scalar::Util ();
 use Carp ();
@@ -180,7 +180,7 @@ Moose::Role - The Moose Role
 
 =head1 VERSION
 
-version 2.2012
+version 2.2013
 
 =head1 SYNOPSIS
 

@@ -1,21 +1,21 @@
-[![Build Status](https://travis-ci.org/dmanto/Mojolicious-Plugin-Cron.svg?branch=master)](https://travis-ci.org/dmanto/Mojolicious-Plugin-Cron) [![Build Status](https://img.shields.io/appveyor/ci/dmanto/Mojolicious-Plugin-Cron/master.svg?logo=appveyor)](https://ci.appveyor.com/project/dmanto/Mojolicious-Plugin-Cron/branch/master)
+[![Actions Status](https://github.com/dmanto/Mojolicious-Plugin-Cron/workflows/linux/badge.svg)](https://github.com/dmanto/Mojolicious-Plugin-Cron/actions) [![Actions Status](https://github.com/dmanto/Mojolicious-Plugin-Cron/workflows/windows/badge.svg)](https://github.com/dmanto/Mojolicious-Plugin-Cron/actions) [![Actions Status](https://github.com/dmanto/Mojolicious-Plugin-Cron/workflows/macos/badge.svg)](https://github.com/dmanto/Mojolicious-Plugin-Cron/actions)
 # NAME
 
 Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::Lite projects
 
 # SYNOPSIS
 
-    # Execute some job every 5 minutes, from 9 to 5
+    # Execute some job every 5 minutes, from 9 to 5 (4:55 actually)
 
     # Mojolicious::Lite
 
-    plugin Cron => ( '*/5 9-17 * * *' => sub {
+    plugin Cron => ( '*/5 9-16 * * *' => sub {
         # do someting non-blocking but useful
     });
 
     # Mojolicious
 
-    $self->plugin(Cron => '*/5 9-17 * * *' => sub {
+    $self->plugin(Cron => '*/5 9-16 * * *' => sub {
         # same here
     });
 
@@ -24,13 +24,13 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
     plugin Cron => (
     sched1 => {
       base    => 'utc', # not needed for local time
-      crontab => '*/10 15 * * *', # at every 10th minute past hour 15
+      crontab => '*/10 15 * * *', # at every 10th minute past hour 15 (3:00 pm to 3:50 pm)
       code    => sub {
         # job 1 here
       }
     },
     sched2 => {
-      crontab => '*/15 15 * * *', # at every 15th minute past hour 15
+      crontab => '*/15 15 * * *', # at every 15th minute past hour 15 (3:00 pm to 3:45 pm)
       code    => sub {
         # job 2 here
       }
@@ -38,13 +38,13 @@ Mojolicious::Plugin::Cron - a Cron-like helper for Mojolicious and Mojolicious::
 
 # DESCRIPTION
 
-[Mojolicious::Plugin::Cron](https://metacpan.org/pod/Mojolicious::Plugin::Cron) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin that allows to schedule tasks
+[Mojolicious::Plugin::Cron](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ACron) is a [Mojolicious](https://metacpan.org/pod/Mojolicious) plugin that allows to schedule tasks
  directly from inside a Mojolicious application.
 
 The plugin mimics \*nix "crontab" format to schedule tasks (see [cron](https://en.wikipedia.org/wiki/Cron)) .
 
 As an extension to regular cron, seconds are supported in the form of a sixth space
-separated field (For more information on cron syntax please see [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron)).
+separated field (For more information on cron syntax please see [Algorithm::Cron](https://metacpan.org/pod/Algorithm%3A%3ACron)).
 
 The plugin can help in development and testing phases, as it is very easy to configure and
 doesn't require a schedule utility with proper permissions at operating system level.
@@ -61,7 +61,7 @@ scheduling periodic tasks.
 When using preforked servers (as applications running with hypnotoad), some coordination
 is needed so jobs are not executed several times.
 
-[Mojolicious::Plugin::Cron](https://metacpan.org/pod/Mojolicious::Plugin::Cron) uses standard Fcntl functions for that coordination, to assure
+[Mojolicious::Plugin::Cron](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ACron) uses standard Fcntl functions for that coordination, to assure
 a platform-independent behavior.
 
 Please take a look in the examples section, for a simple Mojo Application that you can
@@ -102,7 +102,7 @@ Each crontab line consists of a hash with the following keys:
     field is not specified.
 
     For more information on base, crontab and other time related keys,
-     please refer to [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron) Constructor Attributes. 
+     please refer to [Algorithm::Cron](https://metacpan.org/pod/Algorithm%3A%3ACron) Constructor Attributes. 
 
 - code => sub {...}
 
@@ -113,8 +113,8 @@ Each crontab line consists of a hash with the following keys:
 
 # METHODS
 
-[Mojolicious::Plugin::Cron](https://metacpan.org/pod/Mojolicious::Plugin::Cron) inherits all methods from
-[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious::Plugin) and implements the following new ones.
+[Mojolicious::Plugin::Cron](https://metacpan.org/pod/Mojolicious%3A%3APlugin%3A%3ACron) inherits all methods from
+[Mojolicious::Plugin](https://metacpan.org/pod/Mojolicious%3A%3APlugin) and implements the following new ones.
 
 ## register
 
@@ -140,4 +140,4 @@ the terms of the Artistic License version 2.0.
 
 # SEE ALSO
 
-[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious::Guides), [Mojolicious::Plugins](https://metacpan.org/pod/Mojolicious::Plugins), [Algorithm::Cron](https://metacpan.org/pod/Algorithm::Cron)
+[Mojolicious](https://metacpan.org/pod/Mojolicious), [Mojolicious::Guides](https://metacpan.org/pod/Mojolicious%3A%3AGuides), [Mojolicious::Plugins](https://metacpan.org/pod/Mojolicious%3A%3APlugins), [Algorithm::Cron](https://metacpan.org/pod/Algorithm%3A%3ACron)

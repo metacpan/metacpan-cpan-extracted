@@ -9,7 +9,7 @@ use Data::Dumper ();
 use FFI::C::Util qw( c_to_perl );
 
 # ABSTRACT: Test2 plugin for WebAssembly extensions
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 sub get_virtual_memory_limit
@@ -97,7 +97,7 @@ Test2::Plugin::Wasm - Test2 plugin for WebAssembly extensions
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 

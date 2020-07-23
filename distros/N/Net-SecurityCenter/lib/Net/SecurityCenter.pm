@@ -3,26 +3,15 @@ package Net::SecurityCenter;
 use warnings;
 use strict;
 
+use Net::SecurityCenter::Utils qw(decamelize);
+
 use Net::SecurityCenter::REST;
 use Net::SecurityCenter::Error;
 
-require Net::SecurityCenter::API::Analysis;
-require Net::SecurityCenter::API::Credential;
-require Net::SecurityCenter::API::Feed;
-require Net::SecurityCenter::API::File;
-require Net::SecurityCenter::API::Plugin;
-require Net::SecurityCenter::API::PluginFamily;
-require Net::SecurityCenter::API::Policy;
-require Net::SecurityCenter::API::Report;
-require Net::SecurityCenter::API::Repository;
-require Net::SecurityCenter::API::Scan;
-require Net::SecurityCenter::API::ScanResult;
-require Net::SecurityCenter::API::Scanner;
-require Net::SecurityCenter::API::System;
-require Net::SecurityCenter::API::User;
-require Net::SecurityCenter::API::Zone;
+our $VERSION = '0.206';
 
-our $VERSION = '0.205';
+my @apis = qw/Analysis Credential DeviceInfo Feed File Plugin PluginFamily Policy Report
+    Repository Scan ScanResult Scanner Status System User Zone/;
 
 #-------------------------------------------------------------------------------
 # CONSTRUCTOR
@@ -42,21 +31,11 @@ sub new {
 
     bless $self, $class;
 
-    $self->{'analysis'}      = Net::SecurityCenter::API::Analysis->new($client);
-    $self->{'credential'}    = Net::SecurityCenter::API::Credential->new($client);
-    $self->{'feed'}          = Net::SecurityCenter::API::Feed->new($client);
-    $self->{'file'}          = Net::SecurityCenter::API::File->new($client);
-    $self->{'plugin'}        = Net::SecurityCenter::API::Plugin->new($client);
-    $self->{'plugin_family'} = Net::SecurityCenter::API::PluginFamily->new($client);
-    $self->{'policy'}        = Net::SecurityCenter::API::Policy->new($client);
-    $self->{'report'}        = Net::SecurityCenter::API::Report->new($client);
-    $self->{'repository'}    = Net::SecurityCenter::API::Repository->new($client);
-    $self->{'scan'}          = Net::SecurityCenter::API::Scan->new($client);
-    $self->{'scan_result'}   = Net::SecurityCenter::API::ScanResult->new($client);
-    $self->{'scanner'}       = Net::SecurityCenter::API::Scanner->new($client);
-    $self->{'system'}        = Net::SecurityCenter::API::System->new($client);
-    $self->{'user'}          = Net::SecurityCenter::API::User->new($client);
-    $self->{'zone'}          = Net::SecurityCenter::API::Zone->new($client);
+    foreach (@apis) {
+        my $api_module = "Net::SecurityCenter::API::$_";
+        eval "require $api_module";    ## no critic
+        $self->{ decamelize $_ } = $api_module->new($client);
+    }
 
     return $self;
 
@@ -115,136 +94,17 @@ sub logout {
 # HELPER METHODS
 #-------------------------------------------------------------------------------
 
-sub analysis {
+foreach (@apis) {
 
-    my ($self) = @_;
-    return $self->{'analysis'};
+    my $helper = decamelize $_;
 
-}
+    my $sub = sub {
+        my ($self) = @_;
+        return $self->{$helper};
+    };
 
-#-------------------------------------------------------------------------------
-
-sub credential {
-
-    my ($self) = @_;
-    return $self->{'credential'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub feed {
-
-    my ($self) = @_;
-    return $self->{'feed'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub file {
-
-    my ($self) = @_;
-    return $self->{'file'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub plugin {
-
-    my ($self) = @_;
-    return $self->{'plugin'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub plugin_family {
-
-    my ($self) = @_;
-    return $self->{'plugin_family'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub policy {
-
-    my ($self) = @_;
-    return $self->{'policy'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub report {
-
-    my ($self) = @_;
-    return $self->{'report'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub repository {
-
-    my ($self) = @_;
-    return $self->{'repository'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub scan {
-
-    my ($self) = @_;
-    return $self->{'scan'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub scan_result {
-
-    my ($self) = @_;
-    return $self->{'scan_result'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub scanner {
-
-    my ($self) = @_;
-    return $self->{'scanner'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub system {
-
-    my ($self) = @_;
-    return $self->{'system'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub user {
-
-    my ($self) = @_;
-    return $self->{'user'};
-
-}
-
-#-------------------------------------------------------------------------------
-
-sub zone {
-
-    my ($self) = @_;
-    return $self->{'zone'};
+    no strict 'refs';    ## no critic
+    *{$helper} = $sub;
 
 }
 
@@ -373,6 +233,10 @@ Return L<Net::SecurityCenter::API::ScanResult> instance.
 
 Return L<Net::SecurityCenter::API::Scanner> instance.
 
+=head2 status
+
+Return L<Net::SecurityCenter::API::Status> instance.
+
 =head2 system
 
 Return L<Net::SecurityCenter::API::System> instance.
@@ -415,7 +279,7 @@ L<https://github.com/giterlizzi/perl-Net-SecurityCenter>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2018-2019 by Giuseppe Di Terlizzi.
+This software is copyright (c) 2018-2020 by Giuseppe Di Terlizzi.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

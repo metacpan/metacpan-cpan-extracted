@@ -5,9 +5,10 @@ use warnings;
 use 5.008004;
 use Ref::Util qw( is_plain_arrayref );
 use Carp ();
+use Wasm::Trap;
 
 # ABSTRACT: Write Perl extensions using Wasm
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
 our %WASM;
@@ -16,6 +17,25 @@ my %inst;
 my %pp;
 my $wasi;
 my @keep;
+
+sub _linker
+{
+  require Wasm::Wasmtime;
+  $linker ||= do {
+    my $linker = Wasm::Wasmtime::Linker->new(
+      Wasm::Wasmtime::Store->new(
+        Wasm::Wasmtime::Engine->new(
+          Wasm::Wasmtime::Config
+            ->new
+            ->wasm_multi_value(1)
+            ->cache_config_default,
+        ),
+      ),
+    );
+    $linker->allow_shadowing(0);
+    $linker;
+  };
+}
 
 sub import
 {
@@ -118,21 +138,7 @@ sub import
     }
   }
 
-  require Wasm::Wasmtime;
-  $linker ||= do {
-    my $linker = Wasm::Wasmtime::Linker->new(
-      Wasm::Wasmtime::Store->new(
-        Wasm::Wasmtime::Engine->new(
-          Wasm::Wasmtime::Config
-            ->new
-            ->wasm_multi_value(1)
-            ->cache_config_default,
-        ),
-      ),
-    );
-    $linker->allow_shadowing(0);
-    $linker;
-  };
+  _linker();
 
   if(@global)
   {
@@ -181,15 +187,6 @@ sub import
             ->preopen_dir("/", "/"),
         )
       );
-      $linker->allow_shadowing(1);
-      my $proc_exit = Wasm::Wasmtime::Func->new(
-        $linker->store,
-        ['i32'], [],
-        sub { _wasi_proc_exit($_[0]) },
-      );
-      push @keep, $proc_exit;
-      $linker->define($module, "proc_exit", $proc_exit);
-      $linker->allow_shadowing(0);
       $WASM{$module} = __FILE__;  # Maybe Wasi::Snapshot::Preview1 etc.
       next;
     }
@@ -318,16 +315,6 @@ sub import
   }
 }
 
-# nothing non-standard here right now,
-# but one day we migh want to be able
-# to intercept this and exit out of
-# Wasm, but not out of Perl.
-sub _wasi_proc_exit
-{
-  my($value) = @_;
-  exit($value);
-}
-
 1;
 
 __END__
@@ -342,7 +329,7 @@ Wasm - Write Perl extensions using Wasm
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -392,9 +379,10 @@ can easily be imported and exported between Perl and WebAssembly
 (see L<Wasm::Func> for details).  WebAssembly global variables can be
 imported into Perl using tied scalars (see L<Wasm::Global> for details).
 WebAssembly linear memory can be queried and manipulated by Perl
-(see L<Wasm::Memory> for details).  WebAssembly can optionally be loaded
-directly by Perl without writing any Perl wrappers at all (see L<Wasm::Hook>
-for details).
+(see L<Wasm::Memory> for details).  Perl can throw or catch traps into
+or out of WebAssembly (see L<Wasm::Trap> for details).  WebAssembly can
+optionally be loaded directly by Perl without writing any Perl wrappers
+at all (see L<Wasm::Hook> for details).
 
 The example above shows WebAssembly Text (WAT) inlined into the
 Perl code for readability. In most cases you will want to compile your
@@ -525,6 +513,10 @@ WebAssembly.
 =item L<Wasm::Memory>
 
 Interface to WebAssembly memory from Perl.
+
+=item L<Wasm::Trap>
+
+Interface to WebAssembly traps.
 
 =item L<plasm>
 

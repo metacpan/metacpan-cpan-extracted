@@ -9,12 +9,12 @@ use Exporter qw( import );
 our @EXPORT_OK = qw( read_config_file set_options get_defaults );
 
 use Encode;
-use File::HomeDir         qw();
 use File::Spec::Functions qw( catfile curdir );
 use File::Temp            qw();
 use FindBin               qw( $RealBin $RealScript );
 use Pod::Usage            qw( pod2usage );
 
+use File::HomeDir      qw();
 use Term::Choose       qw( choose );
 use Term::Choose::Util qw( choose_a_directory choose_a_file choose_a_number settings_menu insert_sep );
 use Term::Form         qw();
@@ -70,20 +70,19 @@ sub _show_info {
 }
 
 
-
 sub get_defaults {
     return {
+        entries_with_info            => 0,
         filename_format              => 3,
+        list_sort_item               => 'upload_date',
         max_info_width               => 120,
         max_size_history             => 50,
         no_height_ok                 => 1,
         no_warnings                  => 0,
-        list_sort_item               => 'upload_date',
-        list_type_vimeo              => 2,
-        list_type_youtube            => 2,
         prefer_free_formats          => 1,
         quality                      => ' 720 or less',
         retries                      => 7,
+        show_video_id                => 0,
         show_view_count              => 0,
         sort_history_by_timestamp    => 1,
         timeout                      => 60,
@@ -141,9 +140,10 @@ sub _groups {
             [ 'sort_history_by_timestamp', "- History sort" ],
         ],
         group_list_menu => [
-            [ '_submenu_type_listmenu',  "- List type"       ],
+            [ 'entries_with_info',       "- Additional info"   ],
             [ 'list_sort_item',          "- Sort order"      ],
             [ 'show_view_count',         "- Show view count" ],
+            [ 'show_video_id',           "- Show video id"   ],
         ],
         group_yt_dl_config_file => [
             [ 'yt_dl_config_location',        "- set yt-dl config location"   ],
@@ -265,7 +265,7 @@ sub set_options {
             }
             elsif ( $key eq "use_extractor_dir" ) {
                 my $prompt = 'Use extractor directories';
-                my $list = [ qw( no yes ) ];
+                my $list = [ 'no', 'yes' ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
             elsif ( $key eq "use_uploader_dir" ) {
@@ -318,10 +318,7 @@ sub set_options {
             }
             elsif ( $key eq "no_height_ok" ) {
                 my $prompt = 'Download videos with unkown height';
-                my $list = [
-                    'no',
-                    'yes'
-                ];
+                my $list = [ 'no', 'yes' ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
             elsif ( $key eq "retries" ) {
@@ -338,18 +335,12 @@ sub set_options {
             }
             elsif ( $key eq "no_warnings" ) {
                 my $prompt = 'Disable youtube-dl warnings';
-                my $list = [
-                    'no',
-                    'yes'
-                ];
+                my $list = [ 'no', 'yes' ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
             elsif ( $key eq "prefer_free_formats" ) {
                 my $prompt = 'Prefer free formats';
-                my $list = [
-                    'no',
-                    'yes'
-                ];
+                my $list = [ 'no', 'yes' ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
             elsif ( $key eq "max_size_history" ) {
@@ -360,30 +351,28 @@ sub set_options {
             }
             elsif ( $key eq "sort_history_by_timestamp" ) {
                 my $prompt = 'Sort history by';
-                my $list = [
-                    'by name',
-                    'by timestamp'
-                ];
+                my $list = [ 'by name', 'by timestamp' ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
-            elsif ( $key eq "_submenu_type_listmenu" ) {
-                my $sub_menu = [
-                    [ 'list_type_vimeo',   "- vimeo",   [ 'all standard', 'all fast', 'latest fast' ] ],
-                    [ 'list_type_youtube', "- youtube", [ 'all standard', 'all fast', 'latest fast' ] ],
-                ];
-                my $current = { map { $_->[0] => $opt->{$_->[0]} } @$sub_menu };
-                my $prompt = 'Uploader/Playlist video list type';
-                _opt_settings_menu( $set, $opt, $sub_menu, $current, $prompt );
+            elsif ( $key eq "entries_with_info" ) {
+                my $digits = 4;
+                my $sep_w = 1;
+                my $w = $digits + int( ( $digits - 1 ) / 3 ) * $sep_w;
+                my $info = sprintf "Number of entries with additional information\nNow: %${w}s", insert_sep( $opt->{$key} );
+                my $name = 'New: ';
+                _opt_number_range( $set, $opt, $key, $name, $info, $digits );
             }
             elsif ( $key eq "list_sort_item" ) {
                 set_sort_videolist( $set, $opt );
             }
             elsif ( $key eq "show_view_count" ) {
-                my $prompt = 'Show view count in list-menus';
-                my $list = [
-                    'if sorted by "view count"',
-                    'always',
-                ];
+                my $prompt = 'Show the view-count in list-menus';
+                my $list = [ 'if sorted by "view count"', 'always' ];
+                _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
+            }
+            elsif ( $key eq "show_video_id" ) {
+                my $prompt = 'Show the video-id in list-menus';
+                my $list = [ 'no', 'yes' ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
             elsif ( $key eq "max_info_width" ) {
@@ -407,10 +396,7 @@ sub set_options {
             }
             elsif ( $key eq "_reset_yt_dl_config_location" ) {
                 my $prompt = 'Reset the youtube-dl config location to default';
-                my $list = [
-                    'no',
-                    'yes'
-                ];
+                my $list = [ 'no', 'yes' ];
                 $opt->{_reset_yt_dl_config_location} = 0;
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
                 if ( $opt->{_reset_yt_dl_config_location} ) {
@@ -420,10 +406,7 @@ sub set_options {
             }
             elsif ( $key eq "yt_dl_ignore_config" ) {
                 my $prompt = 'Ignore youtube-dl config file';
-                my $list = [
-                    'no',
-                    'yes'
-                ];
+                my $list = [ 'no', 'yes' ];
                 _opt_choose_from_list_idx( $set, $opt, $key, $prompt, $list );
             }
             else { die $key }
