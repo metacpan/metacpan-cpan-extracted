@@ -1,0 +1,13 @@
+cpanfile
+CHANGES
+Makefile.PL
+MANIFEST
+README.md
+LICENSE.md
+lib/DBIx/OpenTracing.pm
+lib/DBIx/OpenTracing.pod
+t/sqlite.t
+t/mysql.t
+t/lib/Test/DBIx/OpenTracing.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

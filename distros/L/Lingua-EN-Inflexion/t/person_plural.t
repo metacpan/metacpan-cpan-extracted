@@ -26,7 +26,28 @@ is noun('you')->plural(1),   "we"    => 'you -1-> we';
 is noun('you')->plural(2),   "you"   => 'you -2-> you';
 is noun('you')->plural(3),   "they"  => 'you -3-> they';
 
-# Accusative pronouns...
+is noun('one')->plural,      "some"  => 'one ---> some';
+is noun('one')->plural(1),   "we"    => 'one -1-> we';
+is noun('one')->plural(2),   "you"   => 'one -2-> you';
+is noun('one')->plural(3),   "some"  => 'one -3-> some';
+
+
+my %plural_of = (
+    'this'       => 'these',
+    'that'       => 'those',
+    'who'        => 'who',
+    'whoever'    => 'whoever',
+    'whosoever'  => 'whosoever',
+);
+for my $pronoun (keys %plural_of) {
+    is noun($pronoun)->plural,      $plural_of{$pronoun}   => "$pronoun ---> $plural_of{$pronoun}";
+    is noun($pronoun)->plural(1),   $plural_of{$pronoun}   => "$pronoun -1-> $plural_of{$pronoun}";
+    is noun($pronoun)->plural(2),   $plural_of{$pronoun}   => "$pronoun -2-> $plural_of{$pronoun}";
+    is noun($pronoun)->plural(3),   $plural_of{$pronoun}   => "$pronoun -3-> $plural_of{$pronoun}";
+}
+
+
+# Objective pronouns...
 
 for my $pronoun (qw< me us >) {
     is noun($pronoun)->plural,      "us"     => "$pronoun ---> us";
@@ -63,6 +84,28 @@ is noun('of it')->plural(1),   "of us"    => 'of it -1-> of us';
 is noun('of it')->plural(2),   "of you"   => 'of it -2-> of you';
 is noun('of it')->plural(3),   "of them"  => 'of it -3-> of them';
 
+is noun('of one')->plural,      "of some"  => 'of one ---> of some';
+is noun('of one')->plural(1),   "of us"    => 'of one -1-> of us';
+is noun('of one')->plural(2),   "of you"   => 'of one -2-> of you';
+is noun('of one')->plural(3),   "of some"  => 'of one -3-> of some';
+
+%plural_of = (
+    'this'       => 'these',
+    'that'       => 'those',
+    'whom'        => 'whom',
+    'whomever'    => 'whomever',
+    'whomsoever'  => 'whomsoever',
+);
+for my $pronoun (keys %plural_of) {
+    is noun("$pronoun")->plural,      "$plural_of{$pronoun}"    => "$pronoun ---> $plural_of{$pronoun}";
+    is noun("$pronoun")->plural(1),   "$plural_of{$pronoun}"    => "$pronoun -1-> $plural_of{$pronoun}";
+    is noun("$pronoun")->plural(2),   "$plural_of{$pronoun}"    => "$pronoun -2-> $plural_of{$pronoun}";
+    is noun("$pronoun")->plural(3),   "$plural_of{$pronoun}"    => "$pronoun -3-> $plural_of{$pronoun}";
+    is noun("to $pronoun")->plural,      "to $plural_of{$pronoun}"    => "to $pronoun ---> to $plural_of{$pronoun}";
+    is noun("to $pronoun")->plural(1),   "to $plural_of{$pronoun}"    => "to $pronoun -1-> to $plural_of{$pronoun}";
+    is noun("to $pronoun")->plural(2),   "to $plural_of{$pronoun}"    => "to $pronoun -2-> to $plural_of{$pronoun}";
+    is noun("to $pronoun")->plural(3),   "to $plural_of{$pronoun}"    => "to $pronoun -3-> to $plural_of{$pronoun}";
+}
 
 # Possessive pronouns...
 
@@ -78,7 +121,7 @@ for my $pronoun (qw< mine ours >) {
     is noun('upon ' . $pronoun)->plural(3),   "upon theirs"  => "upon $pronoun -3-> upon theirs";
 }
 
-for my $pronoun (qw< its hers his theirs >) {
+for my $pronoun (qw< its hers his theirs one's  >) {
     is noun($pronoun)->plural,      "theirs"  => "$pronoun ---> theirs";
     is noun($pronoun)->plural(1),   "ours"    => "$pronoun -1-> ours";
     is noun($pronoun)->plural(2),   "yours"   => "$pronoun -2-> yours";
@@ -99,6 +142,49 @@ is noun('within yours')->plural,      "within yours"   => 'within yours ---> wit
 is noun('within yours')->plural(1),   "within ours"    => 'within yours -1-> within ours';
 is noun('within yours')->plural(2),   "within yours"   => 'within yours -2-> within yours';
 is noun('within yours')->plural(3),   "within theirs"  => 'within yours -3-> within theirs';
+
+%plural_of = (
+    'whose'        => 'whose',
+    'whosever'     => 'whosever',
+    'whosesoever'  => 'whosesoever',
+);
+for my $pronoun (keys %plural_of) {
+    is noun($pronoun)->plural,      $plural_of{$pronoun}   => "$pronoun ---> $plural_of{$pronoun}";
+    is noun($pronoun)->plural(1),   $plural_of{$pronoun}   => "$pronoun -1-> $plural_of{$pronoun}";
+    is noun($pronoun)->plural(2),   $plural_of{$pronoun}   => "$pronoun -2-> $plural_of{$pronoun}";
+    is noun($pronoun)->plural(3),   $plural_of{$pronoun}   => "$pronoun -3-> $plural_of{$pronoun}";
+}
+
+
+# Reflexive pronouns...
+
+for my $pronoun (qw< myself ourselves >) {
+    is noun($pronoun)->plural,      "ourselves"    => "$pronoun ---> ourselves";
+    is noun($pronoun)->plural(1),   "ourselves"    => "$pronoun -1-> ourselves";
+    is noun($pronoun)->plural(2),   "yourselves"   => "$pronoun -2-> yourselves";
+    is noun($pronoun)->plural(3),   "themselves"   => "$pronoun -3-> themselves";
+}
+
+for my $pronoun (qw< yourself yourselves >) {
+    is noun($pronoun)->plural,      "yourselves"   => "$pronoun ---> yourselves";
+    is noun($pronoun)->plural(1),   "ourselves"    => "$pronoun -1-> ourselves";
+    is noun($pronoun)->plural(2),   "yourselves"   => "$pronoun -2-> yourselves";
+    is noun($pronoun)->plural(3),   "themselves"   => "$pronoun -3-> themselves";
+}
+
+for my $pronoun (qw< itself herself himself themself themselves >) {
+    is noun($pronoun)->plural,      "themselves" => "$pronoun ---> themselves";
+    is noun($pronoun)->plural(1),   "ourselves"  => "$pronoun -1-> ourselves";
+    is noun($pronoun)->plural(2),   "yourselves" => "$pronoun -2-> yourselves";
+    is noun($pronoun)->plural(3),   "themselves" => "$pronoun -3-> theirselves";
+}
+
+for my $pronoun (qw< oneself oneselves  >) {
+    is noun($pronoun)->plural,      "oneselves"  => "$pronoun ---> oneselves";
+    is noun($pronoun)->plural(1),   "ourselves"  => "$pronoun -1-> ourselves";
+    is noun($pronoun)->plural(2),   "yourselves" => "$pronoun -2-> yourselves";
+    is noun($pronoun)->plural(3),   "oneselves"  => "$pronoun -3-> oneselves";
+}
 
 
 # Verbs, especially "to be"...

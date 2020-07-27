@@ -14,6 +14,8 @@ use Bio::MUST::Core::Utils qw(secure_outfile);
 use aliased 'Bio::MUST::Core::Ali';
 
 
+my @bad_seqs;
+
 my $purity_filter = sub {
     my $seq = shift;
 
@@ -21,7 +23,10 @@ my $purity_filter = sub {
     # TODO: refactor in module
     (my $pure_seq = $seq->seq) =~ s/$NONPUREDNA//xmsg;
     my $purity = 1.0 * length($pure_seq) / $seq->seq_len;
-    return if $purity < $ARGV_min_purity;
+    if ($purity < $ARGV_min_purity) {
+        push @bad_seqs, $seq;
+        return;
+    }
 
     # store allowed seqs (optonally unwrapped)
     # TODO: refactor in module
@@ -46,12 +51,18 @@ for my $infile (@ARGV_infiles) {
     );
 }
 
+if ($ARGV_filter_out) {
+
+    ### Storing filtered seqs in: $ARGV_filter_out
+    my $ali = Ali->new( seqs => \@bad_seqs, guessing => 0 );
+    $ali->store_fasta($ARGV_filter_out);
+}
 
 __END__
 
 =head1 USAGE
 
-qual-filter-fas.pl <infiles> --min[-purity]=<n> [optional arguments]
+    inst-qual-filter.pl <infiles> --out=<suffix> [optional arguments]
 
 =head1 REQUIRED ARGUMENTS
 
@@ -77,6 +88,14 @@ Suffix to append to infile basenames for deriving outfile names.
 =head1 OPTIONAL ARGUMENTS
 
 =over
+
+=item --filter-out=<file>
+
+Path to FASTA outfile collecting unpure sequences that have been filtered out
+[default: none].
+
+=for Euclid:
+    file.type: writable
 
 =item --min[-purity]=<n>
 

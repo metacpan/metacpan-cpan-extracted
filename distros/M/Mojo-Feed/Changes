@@ -1,5 +1,11 @@
 Revision history for Perl extension Mojo-Feed
 
+0.20 2020-07-23T15:09:18Z
+
+    - Added *entries* attribute as an alias for *items*
+    - Fix for cases where whitespace in an entry tag was mistaken for content (EdJ)
+    -
+
 0.19 2020-06-16T12:03:17Z
 
     - Made is_valid and feed_type attributes of Mojo::Feed

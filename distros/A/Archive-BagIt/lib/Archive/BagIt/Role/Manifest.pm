@@ -85,7 +85,7 @@ Archive::BagIt::Role::Manifest
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 NAME
 
@@ -93,7 +93,7 @@ Archive::BagIt::Role::Manifest
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 AVAILABILITY
 

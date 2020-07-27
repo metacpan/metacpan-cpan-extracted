@@ -3,6 +3,7 @@ package Text::Amuse::Document;
 use strict;
 use warnings;
 use Text::Amuse::Element;
+use File::Spec;
 use constant {
     IMAJOR => 1,
     IEQUAL => 0,
@@ -25,7 +26,7 @@ accessible via the L<Text::Amuse> class.
 
 =over 4
 
-=item new(file => $filename)
+=item new(file => $filename, include_paths => \@paths )
 
 =cut
 
@@ -40,6 +41,8 @@ sub new {
                 _list_element_pile => [],
                 _list_parsing_output => [],
                 _bidi_document => 0,
+                include_paths => [],
+                included_files => [],
                };
     if (@_ % 2 == 0) {
         %args = @_;
@@ -55,8 +58,42 @@ sub new {
     } else {
         die "Wrong argument! $args{file} doesn't exist!\n"
     }
+    if ($args{include_paths}) {
+        my @includes;
+        if (ref($args{include_paths}) eq 'ARRAY') {
+            push @includes, @{$args{include_paths}};
+        }
+        else {
+            push @includes, $args{include_paths};
+        }
+        $self->{include_paths} = [ grep { length($_) && -d $_  } @includes ];
+    }
     $self->{debug} = 1 if $args{debug};
     bless $self, $class;
+}
+
+
+=item include_paths
+
+The return the list of directories where the included files need to be searched.
+
+=item included_files
+
+The return the list of files actually included.
+
+=cut
+
+sub include_paths {
+    return @{ shift->{include_paths} };
+}
+
+sub included_files {
+    return @{ shift->{included_files} };
+}
+
+sub _add_to_included_files {
+    my ($self, @files) = @_;
+    push @{shift->{included_files}}, @files;
 }
 
 sub _list_index_map {
@@ -337,9 +374,73 @@ sub _parse_body_and_directives {
 sub _split_body_and_directives {
     my $self = shift;
     my ($directives, $body, $dir_array) = $self->_parse_body_and_directives;
+
+    if (my @include_paths = $self->include_paths) {
+        # rescan the body and do the inclusion
+        my @full_body;
+      LINE:
+        foreach my $l (@$body) {
+            if ($l =~ m/^#include\s+(.+?)\s*$/) {
+                if (my $lines = $self->_resolve_include($1, \@include_paths)) {
+                    push @full_body, @$lines;
+                    next LINE;
+                }
+            }
+            push @full_body, $l;
+        }
+        $body = \@full_body;
+    }
     $self->{raw_body}   = $body;
     $self->{raw_header} = $directives;
     $self->{directives_array} = $dir_array;
+}
+
+sub _resolve_include {
+    my ($self, $filename, $include_paths) = @_;
+    my ($volume, $directories, $file) = File::Spec->splitpath($filename);
+    my @dirs = grep { length $_ } File::Spec->splitdir($directories);
+    # if hidden files or traversals are passed, bail out.
+    if (grep { /^\./ } @dirs, $file) {
+        warn "Directory traversal or hidden file found in included $filename!";
+        return;
+    }
+    # if we have slash (unix) or backslash (windows), it's not good
+    if (grep { /[\/\\]/ } @dirs, $file) {
+        warn "Invalid file or directory name (slashes?) found in included $filename!";
+        return;
+    }
+    # just in case
+    return unless $file;
+
+    # the base directory are set by the object, not by the user, so
+    # they are considered safe.
+    my @out;
+
+  INCLUDEFILE:
+    foreach my $base (@$include_paths) {
+        my $final = File::Spec->catfile($base, @dirs, $file);
+        if (-e $final && -T $final) {
+            open (my $fh, "<:encoding(UTF-8)", $final) or die "Couldn't open $final! $!\n";
+            while (my $line = <$fh>) {
+                $line =~ s/\r\n/\n/gs;
+                $line =~ s/\r/\n/gs;
+                # TAB
+                $line =~ s/\t/    /g;
+                # trailing
+                $line =~ s/ +$//mg;
+                push @out, $line;
+            }
+            close $fh;
+            $self->_add_to_included_files($final);
+            last INCLUDEFILE;
+        }
+    }
+    if (@out) {
+        return \@out;
+    }
+    else {
+        return;
+    }
 }
 
 =item raw_header

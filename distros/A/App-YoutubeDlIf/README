@@ -3,8 +3,8 @@ NAME
     selection/filtering
 
 VERSION
-    This document describes version 0.002 of App::YoutubeDlIf (from Perl
-    distribution App-YoutubeDlIf), released on 2020-04-12.
+    This document describes version 0.003 of App::YoutubeDlIf (from Perl
+    distribution App-YoutubeDlIf), released on 2020-04-19.
 
 DESCRIPTION
 FUNCTIONS
@@ -45,6 +45,42 @@ FUNCTIONS
 
         When a video ID is found then it is assumed to be already downloaded
         in the past and will not be downloaded again.
+
+    *   log_file => *str* (default: "/home/s1/notes/download-logs.org")
+
+        File that contains list of download filenames.
+
+    *   urls_or_ids* => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  youtube_dl_if_not_yet
+    Usage:
+
+     youtube_dl_if_not_yet(%args) -> [status, msg, payload, meta]
+
+    Download videos using youtube-dl if not already downloaded.
+
+    This is a shortcut for:
+
+     % youtube-dl-if --if-not-yet ...
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   if_duration_not_longer_than => *str*
+
+    *   if_duration_not_shorter_than => *str*
 
     *   log_file => *str* (default: "/home/s1/notes/download-logs.org")
 

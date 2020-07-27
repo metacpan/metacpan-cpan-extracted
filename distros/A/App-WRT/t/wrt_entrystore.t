@@ -194,9 +194,11 @@ my $es = App::WRT::EntryStore->new('archives');
   ) or diag(join ', ', @children_basenames);
 
   my (@sub_entries) = $es->get_sub_entries('icon_test');
-  ok(
-    scalar @sub_entries == 2,
-    'expected 2 sub-entries for icon_test'
+  my (@expected_sub_entries) = ('dir', 'textfile');
+  is_deeply(
+    \@sub_entries,
+    \@expected_sub_entries,
+    'expected 2 alphabetically sorted sub-entries for icon_test'
   ) or diag(join ', ', @sub_entries);
 
 # checking whether entries are directories, flatfiles, etc.

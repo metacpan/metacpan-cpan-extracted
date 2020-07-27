@@ -1,0 +1,1 @@
+this file should be missing from a manifest so that it becomes invalid

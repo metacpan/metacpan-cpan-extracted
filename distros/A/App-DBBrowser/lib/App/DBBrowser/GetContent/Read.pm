@@ -168,15 +168,6 @@ sub from_copy_and_paste {
 }
 
 
-sub __parse_settings {
-    my ( $sf, $i ) = @_;
-    if    ( $i == 0 ) { return '(Text::CSV - sep[' . $sf->{o}{csv}{sep_char}    . '])' }
-    elsif ( $i == 1 ) { return '(split - sep['     . $sf->{o}{split}{field_sep} . '])' }
-    elsif ( $i == 2 ) { return '(Template)'                                            }
-    elsif ( $i == 3 ) { return '(Spreadsheet::Read)'                                   }
-}
-
-
 sub from_file {
     my ( $sf, $sql ) = @_;
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
@@ -202,7 +193,6 @@ sub from_file {
             push @files_fs, catfile( $dir_fs, $file );
         }
         my @files = map { '  ' . decode( 'locale_fs', basename $_ ) } @files_fs;
-        my $parse_mode_idx = $sf->{o}{insert}{parse_mode_input_file};
         $sf->{i}{gc}{old_file_idx} //= 1;
 
         FILE: while ( 1 ) {

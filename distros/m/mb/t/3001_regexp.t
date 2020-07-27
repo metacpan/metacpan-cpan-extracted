@@ -9,9 +9,6 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
-use vars qw($MSWin32_MBCS);
-$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
-
 @test = (
     sub { 'A' =~ /A/; }, # test no 1
     sub { CORE::eval(<<'END'); }, # test no 2
@@ -81,7 +78,7 @@ END
 'AB!C' =~ /(\W)/
 END
     sub { eval mb::parse(<<'END'); }, # test no 24
-'AB!C' !~ /(\W)/; $1 eq '!';
+my $not_void = 'AB!C' !~ /(\W)/; $1 eq '!';
 END
     sub { eval mb::parse(<<'END'); }, # test no 25
 'AB C' =~ /(.)\b(.)/; (($1 eq 'B') and ($2 eq ' '));

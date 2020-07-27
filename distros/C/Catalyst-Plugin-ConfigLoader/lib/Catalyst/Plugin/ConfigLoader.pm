@@ -8,7 +8,7 @@ use MRO::Compat;
 use Data::Visitor::Callback;
 use Catalyst::Utils ();
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 =head1 NAME
 
@@ -26,21 +26,21 @@ Catalyst::Plugin::ConfigLoader - Load config files of various types
     # you can specify a file if you'd like
     __PACKAGE__->config( 'Plugin::ConfigLoader' => { file => 'config.yaml' } );
 
-  In the file, assuming it's in YAML format:
+In the file, assuming it's in YAML format:
 
     foo: bar
 
-  Accessible through the context object, or the class itself
+Accessible through the context object, or the class itself
 
-   $c->config->{foo}    # bar
-   MyApp->config->{foo} # bar
+    $c->config->{foo}    # bar
+    MyApp->config->{foo} # bar
 
 =head1 DESCRIPTION
 
 This module will attempt to load find and load a configuration
 file of various types. Currently it supports YAML, JSON, XML,
 INI and Perl formats. Special configuration for a particular driver format can
-be stored in C<MyApp-E<gt>config-E<gt>{ 'Plugin::ConfigLoader' }-E<gt>{ driver }>.
+be stored in C<< MyApp->config->{ 'Plugin::ConfigLoader' }->{ driver } >>.
 For example, to pass arguments to L<Config::General>, use the following:
 
     __PACKAGE__->config( 'Plugin::ConfigLoader' => {
@@ -52,9 +52,9 @@ For example, to pass arguments to L<Config::General>, use the following:
 See L<Config::Any>'s C<driver_args> parameter for more information.
 
 To support the distinction between development and production environments,
-this module will also attemp to load a local config (e.g. myapp_local.yaml)
+this module will also attemp to load a local config (e.g. F<myapp_local.yaml>)
 which will override any duplicate settings.  See
-L<get_config_local_suffix|/get_config_local_suffix>
+L</get_config_local_suffix>
 for details on how this is configured.
 
 =head1 METHODS
@@ -125,7 +125,7 @@ sub load_config {
 
 This method determines the potential file paths to be used for config loading.
 It returns an array of paths (up to the filename less the extension) to pass to
-L<Config::Any|Config::Any> for loading.
+L<Config::Any> for loading.
 
 =cut
 
@@ -162,9 +162,9 @@ The order of preference is specified as:
 
 =item * C<$ENV{ CATALYST_CONFIG }>
 
-=item * C<$c-E<gt>config-E<gt>{ 'Plugin::ConfigLoader' }-E<gt>{ file }>
+=item * C<< $c->config->{ 'Plugin::ConfigLoader' }->{ file } >>
 
-=item * C<$c-E<gt>path_to( $application_prefix )>
+=item * C<< $c->path_to( $application_prefix ) >>
 
 =back
 
@@ -206,7 +206,7 @@ be specified in the following order of preference:
 
 =item * C<$ENV{ CATALYST_CONFIG_LOCAL_SUFFIX }>
 
-=item * C<$c-E<gt>config-E<gt>{ 'Plugin::ConfigLoader' }-E<gt>{ config_local_suffix }>
+=item * C<< $c->config->{ 'Plugin::ConfigLoader' }->{ config_local_suffix } >>
 
 =back
 
@@ -214,8 +214,8 @@ The first one of these values found replaces the default of C<local> in the
 name of the local config file to be loaded.
 
 For example, if C< $ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }> is set to C<testing>,
-ConfigLoader will try and load C<myapp_testing.conf> instead of
-C<myapp_local.conf>.
+ConfigLoader will try and load F<myapp_testing.conf> instead of
+F<myapp_local.conf>.
 
 =cut
 
@@ -255,9 +255,9 @@ This method is called after the config file is loaded. It can be
 used to implement tuning of config values that can only be done
 at runtime. If you need to do this to properly configure any
 plugins, it's important to load ConfigLoader before them.
-ConfigLoader provides a default finalize_config method which
-walks through the loaded config hash and calls the C<config_substitutions>
-sub on any string.
+ConfigLoader provides a default C<finalize_config> method which
+walks through the loaded config hash and calls the
+L<config_substitutions|/config_substitutions( $value )> method on any string.
 
 =cut
 
@@ -292,7 +292,7 @@ C<__DATA__> as a config value, for example)
 
 The parameter list is split on comma (C<,>). You can override this method to
 do your own string munging, or you can define your own macros in
-C<MyApp-E<gt>config-E<gt>{ 'Plugin::ConfigLoader' }-E<gt>{ substitutions }>.
+C<< MyApp->config->{ 'Plugin::ConfigLoader' }->{ substitutions } >>.
 Example:
 
     MyApp->config->{ 'Plugin::ConfigLoader' }->{ substitutions } = {
@@ -330,7 +330,7 @@ sub config_substitutions {
 
 =head1 AUTHOR
 
-Brian Cassidy E<lt>bricas@cpan.orgE<gt>
+Brian Cassidy <bricas@cpan.org>
 
 =head1 CONTRIBUTORS
 
@@ -339,9 +339,9 @@ development of this module:
 
 =over 4
 
-=item * Joel Bernstein E<lt>rataxis@cpan.orgE<gt> - Rewrite to use L<Config::Any>
+=item * Joel Bernstein <rataxis@cpan.org> - Rewrite to use L<Config::Any>
 
-=item * David Kamholz E<lt>dkamholz@cpan.orgE<gt> - L<Data::Visitor> integration
+=item * David Kamholz <dkamholz@cpan.org> - L<Data::Visitor> integration
 
 =item * Stuart Watt - Addition of ENV macro.
 

@@ -26,7 +26,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '8.30';
+$VERSION = '8.40';
 require Exporter;
 @ISA = qw(Exporter);
 
@@ -142,6 +142,15 @@ sub open {
 	$obj = bless {filehandle => $handle}, $class;
 	$obj->initialize();
 	return $obj;
+}
+
+sub close {
+  my ($class) = @_;
+  if (CORE::close($class->{filehandle})) {
+  	return 0;
+  } else {
+  	return 1;
+  }
 }
 
 sub initialize {
@@ -1308,6 +1317,7 @@ Geo::IP2Location - Lookup of country, region, city, latitude, longitude, ZIP cod
 	($cos, $col, $reg, $cit, $lat, $lon, $zip, $tmz, $isp, $dom, $ns, $idd, $area, $wcode, $wname, $mcc, $mnc, $brand, $elevation, $usagetype) = $obj->get_all("20.11.187.239");
 	($cos, $col, $reg, $cit, $lat, $lon, $zip, $tmz, $isp, $dom, $ns, $idd, $area, $wcode, $wname, $mcc, $mnc, $brand, $elevation, $usagetype) = $obj->get_all("2001:1000:0000:0000:0000:0000:0000:0000");
 
+	$obj->close();
 
 =head1 DESCRIPTION
 
@@ -1449,7 +1459,7 @@ L<IP2Location Product Page|https://www.ip2location.com>
 
 =head1 VERSION
 
-8.30
+8.40
 
 =head1 AUTHOR
 

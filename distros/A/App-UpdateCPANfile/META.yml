@@ -1,0 +1,60 @@
+---
+abstract: 'cpanfile updater'
+author:
+  - 'This library is free software; you can redistribute it and/or modify'
+build_requires:
+  Cwd: '0'
+  File::Copy::Recursive: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Path::Class: '0'
+  Test2::V0: '0'
+  Test::WWW::Stub: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-UpdateCPANfile
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::UpdateCPANfile:
+    file: lib/App/UpdateCPANfile.pm
+    version: '0.03'
+  App::UpdateCPANfile::CPANfileSnapshotParser:
+    file: lib/App/UpdateCPANfile/CPANfileSnapshotParser.pm
+  App::UpdateCPANfile::PackageDetails:
+    file: lib/App/UpdateCPANfile/PackageDetails.pm
+requires:
+  CPAN::DistnameInfo: '0'
+  CPAN::PackageDetails: '0'
+  Carton: '0'
+  Getopt::Long: '0'
+  IO::String: '0'
+  LWP::UserAgent: '0'
+  Module::CPANfile: '0'
+  Module::CPANfile::Writer: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hitode909/App-UpdateCPANfile/issues
+  homepage: https://github.com/hitode909/App-UpdateCPANfile
+  repository: git://github.com/hitode909/App-UpdateCPANfile.git
+version: '0.03'
+x_authority: cpan:HITODE
+x_contributors:
+  - 'hitode909 <hitode909@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

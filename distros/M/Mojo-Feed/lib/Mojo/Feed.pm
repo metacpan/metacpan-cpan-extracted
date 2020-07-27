@@ -17,7 +17,7 @@ use overload
   '""'     => sub { shift->to_string },
   fallback => 1;
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
 has charset => 'UTF-8';
 
@@ -56,11 +56,13 @@ has dom => sub {
   return Mojo::DOM->new($self->text);
 };
 
+has root => sub { shift->dom->children->first };
+
 has feed_type => sub {
-  my $top     = shift->dom->children->first;
+  my $top     = shift->root;
   my $tag     = $top->tag;
   my $version = $top->attr('version');
-  my $ns      = $top->attr('namespace');
+  my $ns      = $top->namespace;
   return
       ($tag =~ /feed/i)
     ? ($version)
@@ -71,13 +73,25 @@ has feed_type => sub {
     :                    'unknown';
 };
 
+has namespaces => sub {
+  my $top = shift->root;
+  my $namespaces = { atom => $top->namespace };  # only Atom feeds declare a namespace?
+  my $attrs = $top->attr;
+  for my $at (keys %$attrs) {
+    if ($at =~ /xmlns\:(\w+)/) { # extra namespace declaration
+      $namespaces->{$1} = $attrs->{$at};
+    }
+  }
+  return $namespaces;
+};
+
 my %generic = (
   description => ['description', 'tagline', 'subtitle'],
   published   => [
-    'published', 'pubDate', 'dc\:date', 'created',
+    'published', 'pubDate', 'dc|date', 'created',
     'issued',    'updated', 'modified'
   ],
-  author   => ['author', 'dc\:creator', 'webMaster'],
+  author   => ['author', 'dc|creator', 'webMaster', 'copyright'],
   title    => ['title'],
   subtitle => ['subtitle', 'tagline'],
   link     => ['link:not([rel])', 'link[rel=alternate]'],
@@ -87,7 +101,7 @@ foreach my $k (keys %generic) {
   has $k => sub {
     my $self = shift;
     for my $generic (@{$generic{$k}}) {
-      if (my $p = $self->dom->at("channel > $generic, feed > $generic")) {
+      if (my $p = $self->dom->at("channel > $generic, feed > $generic", %{$self->namespaces})) {
         if ($k eq 'author' && $p->at('name')) {
           return trim $p->at('name')->text;
         }
@@ -107,6 +121,9 @@ has items => sub {
   $self->dom->find('item, entry')
     ->map(sub { Mojo::Feed::Item->new(dom => $_, feed => $self) });
 };
+
+# alias
+sub entries { shift->items() };
 
 has is_valid => sub {
   shift->dom->children->first->tag =~ /^(feed|rss|rdf|rdf:rdf)$/i;
@@ -285,7 +302,7 @@ The original decoded string of the feed.
 
 =head2 dom
 
-The parsed feed as <Mojo::DOM> object.
+The parsed feed as L<Mojo::DOM> object.
 
 =head2 source
 
@@ -307,6 +324,10 @@ Web page URL associated with the feed
 =head2  items
 
 L<Mojo::Collection> of L<Mojo::Feed::Item> objects representing feed news items
+
+=head2  entries
+
+Alias name for C<items>.
 
 =head2  subtitle
 

@@ -6,7 +6,7 @@ use base qw(Exporter);
 
 our @EXPORT = qw|ListWindows AdjustWindow|;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub ListWindows($)
 {
@@ -136,6 +136,8 @@ want to add some of your own checks/validations for safety/functionality.
 1.01 - Initial Release
 
 1.02 - Fixed this POD document
+
+1.03 - More documentation fixes
 
 =head1 Author
 

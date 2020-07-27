@@ -5,7 +5,7 @@ use warnings;
 use base qw(Exporter);
 our @EXPORT = qw(basic);
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 # get basic debugging information
 sub basic {
@@ -33,7 +33,7 @@ Devel::ebug::Plugin::Basic
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 AUTHOR
 

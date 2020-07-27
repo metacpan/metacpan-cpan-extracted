@@ -1,3 +1,8 @@
+0.003   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Merge youtube-dl-if-not-yet to our dist.
+
+
 0.002   2020-04-12  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Remove dependency of --log-file to --if-not-yet for now

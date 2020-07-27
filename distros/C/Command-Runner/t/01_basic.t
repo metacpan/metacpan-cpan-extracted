@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use Command::Runner;
+use Config;
 
 my $windows = $^O eq 'MSWin32';
 
@@ -17,6 +18,7 @@ subtest code => sub {
     is @stderr, 3;
     is $stdout[2], "2";
     is $stderr[2], "1";
+    ok !$res->{timeout};
 };
 
 subtest code_rediret => sub {
@@ -30,6 +32,7 @@ subtest code_rediret => sub {
     is $res->{result}, 3;
     is @stdout, 6;
     is @stderr, 0;
+    ok !$res->{timeout};
 };
 
 subtest array => sub {
@@ -42,6 +45,7 @@ subtest array => sub {
     is $res->{result} >> 8, 3;
     is $stdout, "2";
     is $stderr, "1";
+    ok !$res->{timeout};
 };
 
 subtest array_redirect => sub {
@@ -55,6 +59,7 @@ subtest array_redirect => sub {
     is $res->{result} >> 8, 3;
     is $stdout, "12";
     is $stderr, "";
+    ok !$res->{timeout};
 };
 
 subtest string => sub {
@@ -67,6 +72,7 @@ subtest string => sub {
     is $res->{result} >> 8, 3;
     is $stdout, "2";
     is $stderr, "1 at -e line 1.";
+    ok !$res->{timeout};
 };
 
 subtest string_redirect => sub {
@@ -79,6 +85,12 @@ subtest string_redirect => sub {
     is $res->{result} >> 8, 3;
     is $stdout, "1 at -e line 1.2";
     is $stderr, "";
+    ok !$res->{timeout};
+};
+
+my %SIGNAL = do {
+    my @sig = split /\s+/, $Config{sig_name} || "";
+    map { ($_, $sig[$_]) } 0...$#sig;
 };
 
 subtest timeout => sub {
@@ -92,6 +104,26 @@ subtest timeout => sub {
         # windows has garbage: Terminating on signal SIGBREAK(21)
     } else {
         is $res->{stderr}, "1\n";
+    }
+    if ($^O eq 'linux' || $^O eq 'darwin') {
+        is $SIGNAL{ $res->{result} & 127 }, "TERM";
+    }
+};
+
+subtest force_timeout => sub {
+    my $res = Command::Runner->new
+        ->command([$^X, "-e", '$|++; $SIG{TERM} = "IGNORE"; warn "1\n"; print "2\n"; sleep 10'])
+        ->timeout(0.5)
+        ->run;
+    ok $res->{timeout};
+    is $res->{stdout}, "2\n";
+    if ($windows) {
+        # windows has garbage: Terminating on signal SIGBREAK(21)
+    } else {
+        is $res->{stderr}, "1\n";
+    }
+    if ($^O eq 'linux' || $^O eq 'darwin') {
+        is $SIGNAL{ $res->{result} & 127 }, "KILL";
     }
 };
 

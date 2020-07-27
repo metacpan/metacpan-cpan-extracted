@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::NonWatcherRecipients;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -55,7 +55,7 @@ in your database.
 If you are upgrading this module, check for upgrading instructions
 in case changes need to be made to your database.
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -191,7 +191,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2013-2016 by Best Practical Solutions, LLC
+This software is Copyright (c) 2013-2020 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

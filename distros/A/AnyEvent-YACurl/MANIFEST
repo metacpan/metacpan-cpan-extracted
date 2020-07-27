@@ -4,6 +4,7 @@ Makefile.PL
 README
 YACurl.xs
 constants.inc
+curlopt-blob.inc
 curlopt-long.inc
 curlopt-off-t.inc
 curlopt-slist.inc

@@ -3,19 +3,32 @@ use warnings;
 
 use FindBin qw/$Bin/;
 use File::Spec;
+use File::Find ();
+use ExtUtils::MakeMaker ();
+
 use File::Find::Rule;
 use Module::Info;
 
 use Test::More;
 
 my %versions;
-for my $pm_file ( File::Find::Rule->file->name( qr/\.pm$/ )->in(File::Spec->catdir($Bin, '..', '..', 'lib') ) ) {
-    my $mod = Module::Info->new_from_file($pm_file);
+File::Find::find({
+    no_chdir => 1,
+    wanted => sub {
+        return
+            if -d;
+        return
+            if !/\.pm\z/;
 
-    ( my $stripped_file = $pm_file ) =~ s{.*lib/}{};
+        my $version = MM->parse_version($_);
+        $version = undef
+            if $version && $version eq 'undef';
 
-    $versions{$stripped_file} = $mod->version;
-}
+        ( my $stripped_file = $_ ) =~ s{.*lib/}{};
+
+        $versions{$stripped_file} = $version;
+    },
+}, File::Spec->catdir($Bin, '..', '..', 'lib'));
 
 my $ver = delete $versions{'Catalyst/Devel.pm'};
 ok $ver;

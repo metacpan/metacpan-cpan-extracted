@@ -44,7 +44,7 @@
    "provides" : {
       "File::Symlink::Relative" : {
          "file" : "lib/File/Symlink/Relative.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -62,6 +62,6 @@
          "web" : "https://github.com/trwyant/perl-File-Symlink-Relative"
       }
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

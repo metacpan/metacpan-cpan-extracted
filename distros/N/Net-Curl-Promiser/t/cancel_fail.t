@@ -5,6 +5,7 @@ use warnings;
 
 use Test::More;
 use Test::Deep;
+use Test::FailWarnings;
 
 use Net::Curl::Easy qw(:constants);
 
@@ -39,7 +40,7 @@ my $promiser = Net::Curl::Promiser::Select->new();
     is_deeply( \@list, [], 'promise remains pending' ) or diag explain \@list;
 }
 
-for my $fail_ar ( [], [undef], [0], ['haha'] ) {
+for my $fail_ar ( [0], ['haha'] ) {
     # diag "fail: " . (explain $fail_ar)[0];
 
     my @list;

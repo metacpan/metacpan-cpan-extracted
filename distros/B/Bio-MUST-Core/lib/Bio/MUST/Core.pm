@@ -3,9 +3,10 @@ package Bio::MUST::Core;
 # CONTRIBUTOR: Catherine COLSON <ccolson@doct.uliege.be>
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::VERSION = '0.201060';
+$Bio::MUST::Core::VERSION = '0.202070';
 use strict;
 use warnings;
 
@@ -39,7 +40,7 @@ Bio::MUST::Core - Core classes and utilities for Bio::MUST
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 DESCRIPTION
 
@@ -64,7 +65,7 @@ Denis BAURAIN <denis.baurain@uliege.be>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Catherine COLSON Arnaud DI FRANCO Raphael LEONARD Loic MEUNIER Mick VAN VLIERBERGHE
+=for stopwords Catherine COLSON Arnaud DI FRANCO Raphael LEONARD Valerian LUPO Loic MEUNIER Mick VAN VLIERBERGHE
 
 =over 4
 
@@ -79,6 +80,10 @@ Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 =item *
 
 Raphael LEONARD <rleonard@doct.uliege.be>
+
+=item *
+
+Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 =item *
 

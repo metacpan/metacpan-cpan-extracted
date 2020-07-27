@@ -1,3 +1,9 @@
+0.004   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow customizing chrome dir to support chrome-based browser e.g.
+	  vivaldi.
+
+
 0.003   2020-04-19  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Derp, returned aoa instead of array when detail=>0.

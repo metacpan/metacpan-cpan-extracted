@@ -1,7 +1,11 @@
 Revision history for Variable-Eject
 
-# TODO: integrate PPI parser to allow calls without brackets
+# TODO: implement using keywords API
+# TODO (obsolete): integrate PPI parser to allow calls without brackets
 # TODO: allow to eject by using method
+
+0.03    2020-06-15
+        * Fix for Devel::Declare > 0.006019
 
 0.02    2009-11-20
         * Fix warning "Ambiguous use of ${...}"

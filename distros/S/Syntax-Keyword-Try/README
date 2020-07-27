@@ -4,19 +4,34 @@ NAME
 
 SYNOPSIS
 
-     use Syntax::Keyword::Try;
+       use Syntax::Keyword::Try;
     
-     sub foo
-     {
-        try {
-           attempt_a_thing();
-           return "success";
-        }
-        catch {
-           warn "It failed - $@";
-           return "failure";
-        }
-     }
+       sub foo
+       {
+          try {
+             attempt_a_thing();
+             return "success";
+          }
+          catch {
+             warn "It failed - $@";
+             return "failure";
+          }
+       }
+
+    Or, to use the experimental syntax:
+
+       use Syntax::Keyword::Try qw( try :experimental )
+    
+       sub foo {
+          try {
+             attempt_a_thing();
+             return "success";
+          }
+          catch ($e) {
+             warn "It failed - $e";
+             return "failure";
+          }
+       }
 
 DESCRIPTION
 
@@ -29,6 +44,27 @@ DESCRIPTION
     module also serves to contain a number of code examples for how to
     implement parser plugins and manipulate optrees to provide new syntax
     and behaviours for perl code.
+
+Experimental Features
+
+    Some of the features of this module are currently marked as
+    experimental. They will provoke warnings in the experimental category,
+    unless silenced.
+
+    You can silence this with no warnings 'experimental' but then that will
+    silence every experimental warning, which may hide others
+    unintentionally. For a more fine-grained approach you can instead use
+    the import line for this module to only silence this module's warnings
+    selectively:
+
+       use Syntax::Keyword::Try qw( try :experimental(var) );
+    
+       use Syntax::Keyword::Try qw( try :experimental(typed) );
+    
+       use Syntax::Keyword::Try qw( try :experimental );  # all of the above
+
+    Don't forget to import the main try symbol itself, to activate the
+    syntax.
 
 KEYWORDS
 
@@ -93,7 +129,8 @@ KEYWORDS
     can be introduced to store the exception in. This new form is
     experimental and is likely to be expanded on in a future version, as
     part of the wider attempt to introduce typed dispatch. Using it will
-    provoke an experimental category warning on supporting perl versions.
+    provoke an experimental category warning on supporting perl versions,
+    unless silenced by importing the :experimental(var) tag (see above).
 
     Presence of this catch statement causes any exception thrown by the
     preceding try block to be non-fatal to the surrounding code. If the
@@ -122,7 +159,11 @@ KEYWORDS
 
     Optionally, multiple catch statements can be provided, where each block
     is given a guarding condition, to control whether or not it will catch
-    particular exception values. Two kinds of condition are supported:
+    particular exception values. Use of this syntax will provoke an
+    experimental category warning on supporting perl versions, unless
+    silenced by importing the :experimental(typed) tag (see above).
+
+    Two kinds of condition are supported:
 
       * 
 

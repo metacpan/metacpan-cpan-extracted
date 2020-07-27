@@ -60,7 +60,7 @@ Archive::BagIt::Plugin::Manifest::MD5 - The md5 plugin (default)
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 NAME
 
@@ -68,7 +68,7 @@ Archive::BagIt::Plugin::Manifest::MD5 - The md5 plugin (default)
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 AVAILABILITY
 

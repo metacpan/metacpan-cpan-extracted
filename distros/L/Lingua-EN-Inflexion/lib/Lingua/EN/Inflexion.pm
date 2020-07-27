@@ -2,7 +2,7 @@ package Lingua::EN::Inflexion;
 use 5.010; use warnings;
 use Carp;
 
-our $VERSION = '0.001008';
+our $VERSION = '0.002000';
 
 # Import noun, verb, and adj classes...
 use Lingua::EN::Inflexion::Term;
@@ -211,7 +211,7 @@ Lingua::EN::Inflexion - Inflect English nouns, verbs, adjectives, and articles
 
 =head1 VERSION
 
-This document describes Lingua::EN::Inflexion version 0.001008
+This document describes Lingua::EN::Inflexion version 0.002000
 
 
 =head1 SYNOPSIS
@@ -478,7 +478,7 @@ the regex and string coercions described earlier, collectively means
 that there are significant differences between:
 
     $word1 =~ noun($word2)         # $word1 matches any inflexion of $word2
-    $word1 ~~ noun($word1)         # (ditto)
+    $word1 ~~ noun($word2)         # (ditto)
 
     noun($word1) =~ $word2         # $word1 matches $word2 exactly
 
@@ -628,8 +628,9 @@ Words that cannot be interpreted as numbers are treated as zero:
 
 =head2 The C<< verb() >> constructor and associated methods
 
-The C<verb()> subroutine takes a single argument: a string containing
-a simple verb. It returns an inflexion object representing that verb.
+The C<verb()> subroutine takes a single argument: a string containing a
+simple verb in the present tense (singular or plural). It returns an
+inflexion object representing that verb.
 
     my $verb_obj = verb($string);
 
@@ -1070,40 +1071,6 @@ most recent preceding C<< <#:...> >> markup.
 This command has no options.
 
 
-=head2 Converting lists of words to phrases
-
-When creating a list of words, commas are used between adjacent items,
-except if the items contain commas, in which case semicolons are used.
-But if there are less than three items, the commas/semicolons are omitted
-entirely. The final item also has a conjunction (usually "and" or "or")
-before it. And although it's often misleading , some people prefer to
-omit the comma before that final conjunction, even when there are more
-than two items.
-
-That's complicated enough to warrant its own subroutine: C<wordlist()>.
-This subroutine expects a list of words, possibly with one or more hash
-references containing options. It returns a string that joins the list
-together in the normal English usage. For example:
-
-    print "You chose ", wordlist(@selected_items), "\n";
-    # You chose barley soup, roast beef, and Yorkshire pudding
-
-    print "You chose ", wordlist(@selected_items, {final_sep=>""}), "\n";
-    # You chose barley soup, roast beef and Yorkshire pudding
-
-    print "Please chose ", wordlist(@side_orders, {conj=>"or"}), "\n";
-    # Please chose salad, vegetables, or ice-cream
-
-The available options are:
-
-    Option named    Specifies                Default value
-
-    conj            Final conjunction        "and"
-    sep             Inter-item separator     "," or ";"
-    final_sep       Final separator          value of 'sep' option
-
-
-
 =head3 Long-form markup notation
 
 Every command in the C<inflect()> markup language is a single
@@ -1139,6 +1106,39 @@ then removes the lowercase letters from the options:
 and finally converts what's left to lowercase:
 
     say inflect "<#a n w    :$count> <N   c        :$target> <V   :were> found";
+
+
+=head2 Converting lists of words to phrases
+
+When creating a list of words, commas are used between adjacent items,
+except if the items contain commas, in which case semicolons are used.
+But if there are less than three items, the commas/semicolons are omitted
+entirely. The final item also has a conjunction (usually "and" or "or")
+before it. And although it's often misleading , some people prefer to
+omit the comma before that final conjunction, even when there are more
+than two items.
+
+That's complicated enough to warrant its own subroutine: C<wordlist()>.
+This subroutine expects a list of words, possibly with one or more hash
+references containing options. It returns a string that joins the list
+together in the normal English usage. For example:
+
+    print "You chose ", wordlist(@selected_items), "\n";
+    # You chose barley soup, roast beef, and Yorkshire pudding
+
+    print "You chose ", wordlist(@selected_items, {final_sep=>""}), "\n";
+    # You chose barley soup, roast beef and Yorkshire pudding
+
+    print "Please choose ", wordlist(@side_orders, {conj=>"or"}), "\n";
+    # Please choose salad, vegetables, or ice-cream
+
+The available options are:
+
+    Option named    Specifies                Default value
+
+    conj            Final conjunction        "and"
+    sep             Inter-item separator     "," or ";"
+    final_sep       Final separator          value of 'sep' option
 
 
 =head1 CONVERTING FROM LINGUA::EN::INFLECT
@@ -1223,7 +1223,7 @@ No, the module will never inflect "octopus" to "octopodes".
 
 For a thorough, erudite, and eminently satisfying explanation of why
 it's only ever been "octopuses", I can sincerely recommend:
-L<http://www.heracliteanriver.com/?p=240>
+L<http://web.archive.org/web/20170112234148/http://www.heracliteanriver.com/?p=240>
 
 
 =head2 "viri" and "virii"
@@ -1237,7 +1237,7 @@ Nevertheless, this module will do the right thing when asked to inflect
 the right thing would be to beat them to death with a stick).
 
 
-=head2 Singular "they", "them", "their", "theirs", and "themself"
+=head2 Singular "they", "them", "their", and "theirs"
 
 ...were good enough for Auden, Austen, Byron, Carroll, Caxton, Chaucer,
 Defoe, Dickens, Eliot, Fitzgerald, Gaskell, Kipling, Orwell, Ruskin,
@@ -1256,7 +1256,28 @@ usages.
 
 So if someone wants to complain about this module supporting--and
 even favouring--the usage, I<they> are most welcome to write I<their>
-own module I<themself>.
+own module as best suits I<them>.
+
+
+=head2 Singular "themself"
+
+Despite the fact that "themself" has been in use for nearly 500 years,
+and actually predates "themselves", the word is not considered
+acceptable in modern English, and certainly not as a singular form.
+
+Eventually it may garner the same general acceptance as singular "they",
+"them", and "their"...but not yet. Although one may encounter such
+gender-nonspecific constructions as:
+
+V<    >"Anyone might find B<themself> contemplating their own mortality."
+
+the correct formulation is still:
+
+V<    >"Anyone might find B<themselves> contemplating their own mortality."
+
+The module does recognize "themself" as a reflexive pronoun, but
+converts it to the currently accepted form ("themselves") for both
+singular and plural inflexions.
 
 
 =head2 "inflexion"
@@ -1403,7 +1424,7 @@ so the C<-men> specification is shorthand for:
     foramen       =>  foramens  |  foramina
     lumen         =>  lumens    |  lumina
     numen         =>  numens    |  numina
-    stamen        =>  stamen    |  stamina
+    stamen        =>  stamens   |  stamina
     # etc.
 
 but not for:

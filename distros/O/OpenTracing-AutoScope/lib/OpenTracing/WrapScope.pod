@@ -69,8 +69,9 @@ The following tags will be automatically added to each span:
 
 =back
 
-Additionally, if a wrapped subroutine dies, an additional C<error> tag,
-containing the error message (C<$@>) will be added to the span.
+Additionally, if a wrapped subroutine dies, an additional C<error> tag
+(set to a true value) and C<message> tag, containing (C<$@>) will be
+added to the span.
 
 =head2 -file
 

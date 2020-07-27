@@ -7,7 +7,8 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::MockObject: '0'
   Test::Most: '0'
-  Test::OpenTracing::Integration: v0.101.2
+  Test::OpenTracing::Integration: v0.102.0
+  Test::WWW::Mechanize::CGIApp: '0'
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
@@ -22,10 +23,11 @@ no_index:
     - t
     - inc
 requires:
-  HTTP::Request: '0'
-  OpenTracing::Constants::CarrierFormat: '0'
+  HTTP::Headers: '0'
+  HTTP::Status: '0'
   OpenTracing::GlobalTracer: '0'
   OpenTracing::Implementation: '0'
+  Syntax::Feature::Maybe: '0'
   Time::HiRes: '0'
-version: v0.100.0
+version: v0.102.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

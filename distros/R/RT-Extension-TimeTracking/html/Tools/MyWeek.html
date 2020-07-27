@@ -24,45 +24,56 @@ jQuery( function() {
 
 </script>
 <style type="text/css">
-input#Date {
-    width: 177px;
+table.ticket-list.collection-as-table.table td {
+    vertical-align: middle;
 }
+
 .week-links a {
     text-decoration: underline;
 }
-.week-links td:last-child{
-    text-align: right;
+
+div.day_entry {
+    margin-top: 2em;
 }
 </style>
 <div class="time_tracking">
 
 <form>
 % if ( $DefaultTimeUnits ) {
-<input type="hidden" value="<% $DefaultTimeUnits %>" name="DefaultTimeUnits" />
+  <input type="hidden" value="<% $DefaultTimeUnits %>" name="DefaultTimeUnits" />
 % }
-<table>
 % if ( $session{CurrentUser}->HasRight( Object => $RT::System, Right => 'AdminTimesheets' )) {
-<div>
-<tr><td class="label">
-<input type="hidden" name="User" value="<% $User || '' %>" />
-<&|/l&>Go to user</&>:</td>
-<td class="value"><input type="text" name="UserString" value="" data-autocomplete="Users" data-autocomplete-return="Name" data-autocomplete-privileged=1 id="autocomplete-User" /></td>
-</tr>
-</div>
+  <input type="hidden" name="User" value="<% $User || '' %>" />
+  <div class="form-row">
+    <div class="col-3 label">
+      <&|/l&>Go to user</&>:
+    </div>
+    <div class="col-auto value">
+      <input class="form-control" type="text" name="UserString" value="" data-autocomplete="Users" data-autocomplete-return="Name" data-autocomplete-privileged=1 id="autocomplete-User" />
+    </div>
+  </div>
 % }
-<tr><td class="label">
-<&|/l&>Week of (pick any day in week)</&>:</td>
-<td class="value"><& /Elements/SelectDate, ShowTime => 0, Name => 'Date', Default => $date->Date(Format=>'ISO', Timezone => 'user') &></td></tr>
-<tr class="week-links">
-    <td><a href='#' id='previous-week'>&lt;&lt; Previous Week</a></td>
-    <td><a href='#' id='next-week'>Next Week &gt;&gt;</a></td>
-</tr>
-</table>
+  <div class="form-row">
+    <div class="col-3 label">
+      <&|/l&>Week of (pick any day in week)</&>:
+    </div>
+    <div class="col-auto value">
+      <& /Elements/SelectDate, ShowTime => 0, Name => 'Date', Default => $date->Date(Format=>'ISO', Timezone => 'user') &>
+    </div>
+  </div>
+  <div class="week-links form-row">
+    <div class="col-6">
+      <a href='#' id='previous-week'>&lt;&lt; Previous Week</a>
+    </div>
+    <div class="col-6 text-right">
+      <a href='#' id='next-week'>Next Week &gt;&gt;</a>
+    </div>
+  </div>
 </form>
 
 % for my $day ( sort keys %week_worked ) {
 <div class="day_entry">
-<h2><% $week_worked{$day}{date}->RFC2822(Time => 0, Timezone => 'user') %></h2>
+<h4><% $week_worked{$day}{date}->RFC2822(Time => 0, Timezone => 'user') %></h4>
 
 % if ( %{$week_worked{$day}{tickets}} ) {
 <form method="POST">
@@ -70,7 +81,7 @@ input#Date {
 % if ( $user->id != $session{CurrentUser}->id ) {
 <input type="hidden" value="<% $session{CurrentUser}->id %>" name="Object-RT::Transaction--CustomField-<% $actor_cf->id %>-Values" />
 % }
-<table class="ticket-list collection-as-table">
+<table class="ticket-list collection-as-table table">
 <tr class="collection-as-table">
 <th class="collection-as-table"><&|/l&>id</&></th>
 <th class="collection-as-table"><&|/l&>Subject</&></th>
@@ -113,7 +124,7 @@ input#Date {
 % } # end for my $day
 </table>
 <div class="submit_day_time_button">
-<input type="submit" class="button" value="Save <% $week_worked{$day}{week_name} %> Updates">
+<input type="submit" class="button btn btn-primary form-control" value="Save <% $week_worked{$day}{week_name} %> Updates">
 </div>
 </form>
 <div class="time_worked_day">
@@ -126,14 +137,23 @@ input#Date {
 % if ( $user->id != $session{CurrentUser}->id ) {
     <input type="hidden" value="<% $session{CurrentUser}->id %>" name="Object-RT::Transaction--CustomField-<% $actor_cf->id %>-Values" />
 % }
-    <&|/l&>Add ticket</&>: <input name="id" type="text" size="8" data-autocomplete="Tickets" />
-    <&|/l&>Time Worked</&>:
-    <& /Elements/EditTimeValue,
-        Name    => "UpdateTimeWorked",
-        Default => '',
-        InUnits => $DefaultTimeUnits || 'minutes',
-    &>
-    <input type="submit" class="button" value="<% loc('Add') %>">
+  <div class="form-row">
+    <div class="col-auto label">
+      <&|/l&>Add ticket</&>:
+    </div>
+    <div class="col-auto">
+      <input class="form-control" name="id" type="text" size="8" data-autocomplete="Tickets" />
+    </div>
+    <div class="col-auto">
+      <input name="UpdateTimeWorked" type="text" size="5" class="form-control" />
+    </div>
+    <div class="col-auto">
+      <& /Elements/SelectTimeUnits, Name => 'UpdateTimeWorked-TimeUnits', Default => $DefaultTimeUnits || 'minutes' &>
+    </div>
+    <div class="col-auto">
+      <input type="submit" class="button btn btn-primary form-control" value="<% loc('Add') %>">
+    </div>
+  </div>
 </form>
 </div></div>
 % }

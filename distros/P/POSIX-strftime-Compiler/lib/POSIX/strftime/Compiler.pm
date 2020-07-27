@@ -8,7 +8,7 @@ use Time::Local qw//;
 use POSIX qw//;
 use base qw/Exporter/;
 
-our $VERSION = "0.42";
+our $VERSION = "0.43";
 our @EXPORT_OK = qw/strftime/;
 
 use constant {
@@ -341,11 +341,11 @@ sub compile {
         }~;
     }
     my $code = q~sub {
+        ~ . $sprintf_code . q~
+        ~ . $need9char_code . q~
         if ( @_ != 9  && @_ != 6 ) {
             Carp::croak 'Usage: strftime(sec, min, hour, mday, mon, year, wday = -1, yday = -1, isdst = -1)';
         }
-        ~ . $sprintf_code . q~
-        ~ . $need9char_code . q~
         POSIX::strftime(q!~ . $posix_fmt . q~!,@_);
     }~;
     my $sub = eval $code; ## no critic

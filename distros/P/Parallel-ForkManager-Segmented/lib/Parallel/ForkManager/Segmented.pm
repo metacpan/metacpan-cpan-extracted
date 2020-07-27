@@ -1,10 +1,9 @@
 package Parallel::ForkManager::Segmented;
-$Parallel::ForkManager::Segmented::VERSION = '0.2.0';
+$Parallel::ForkManager::Segmented::VERSION = '0.4.0';
 use strict;
 use warnings;
 use 5.014;
 
-use List::MoreUtils qw/ natatime /;
 use Parallel::ForkManager ();
 
 sub new
@@ -29,11 +28,16 @@ sub run
 {
     my ( $self, $args ) = @_;
 
-    my $WITH_PM  = !$args->{disable_fork};
-    my $items    = $args->{items};
-    my $cb       = $args->{process_item};
-    my $batch_cb = $args->{process_batch};
+    my $WITH_PM   = !$args->{disable_fork};
+    my $items     = $args->{items};
+    my $stream_cb = $args->{stream_cb};
+    my $cb        = $args->{process_item};
+    my $batch_cb  = $args->{process_batch};
 
+    if ( $stream_cb && $items )
+    {
+        die "Do not specify both stream_cb and items!";
+    }
     if ( $batch_cb && $cb )
     {
         die "Do not specify both process_item and process_batch!";
@@ -50,9 +54,20 @@ sub run
 
     # Return prematurely on empty input to avoid calling $ch with undef()
     # at least once.
-    if ( not @$items )
+    if ($items)
     {
-        return;
+        if ( not @$items )
+        {
+            return;
+        }
+        $stream_cb = sub {
+            my ($args) = @_;
+            my $size = $args->{size};
+
+            return +{ items =>
+                    scalar( @$items ? [ splice @$items, 0, $size ] : undef() ),
+            };
+        };
     }
 
     my $pm;
@@ -61,10 +76,12 @@ sub run
     {
         $pm = Parallel::ForkManager->new($nproc);
     }
-    $batch_cb->( [ shift @$items ] );
-    my $it = natatime $batch_size, @$items;
+    my $batch = $stream_cb->( { size => 1 } )->{items};
+    return if not defined $batch;
+    $batch_cb->($batch);
 ITEMS:
-    while ( my @batch = $it->() )
+    while (
+        defined( $batch = $stream_cb->( { size => $batch_size } )->{items} ) )
     {
         if ($WITH_PM)
         {
@@ -75,7 +92,7 @@ ITEMS:
                 next ITEMS;
             }
         }
-        $batch_cb->( \@batch );
+        $batch_cb->($batch);
         if ($WITH_PM)
         {
             $pm->finish;    # Terminates the child process
@@ -94,6 +111,8 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Parallel::ForkManager::Segmented - use Parallel::ForkManager on batches /
@@ -101,7 +120,7 @@ segments of items.
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -204,6 +223,30 @@ A reference to a subroutine that accepts one item and processes it.
 
 A reference to the array of items.
 
+=item * stream_cb
+
+A reference to a callback for returning new batches of items (cannot
+be specified along with 'items'.)
+
+Accepts a hash ref with the key 'size' specifying an integer of the maximal
+item count.
+
+Returns a hash ref with the key 'items' pointing to an array reference of
+items or undef() upon end-of-stream.
+
+E.g:
+
+        $stream_cb = sub {
+            my ($args) = @_;
+            my $size = $args->{size};
+
+            return +{ items =>
+                    scalar( @$items ? [ splice @$items, 0, $size ] : undef() ),
+            };
+        };
+
+Added at version 0.4.0.
+
 =item * nproc
 
 The number of child processes to use.
@@ -262,36 +305,9 @@ Example:
 
 =back
 
-=head1 AUTHOR
-
-Shlomi Fish <shlomif@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2018 by Shlomi Fish.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/parallel-forkmanager-segmented/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
-
-=head2 Perldoc
-
-You can find documentation for this module with the perldoc command.
-
-  perldoc Parallel::ForkManager::Segmented
 
 =head2 Websites
 
@@ -310,35 +326,11 @@ L<https://metacpan.org/release/Parallel-ForkManager-Segmented>
 
 =item *
 
-Search CPAN
-
-The default CPAN search engine, useful to view POD in HTML format.
-
-L<http://search.cpan.org/dist/Parallel-ForkManager-Segmented>
-
-=item *
-
 RT: CPAN's Bug Tracker
 
 The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
 
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Parallel-ForkManager-Segmented>
-
-=item *
-
-AnnoCPAN
-
-The AnnoCPAN is a website that allows community annotations of Perl module documentation.
-
-L<http://annocpan.org/dist/Parallel-ForkManager-Segmented>
-
-=item *
-
-CPAN Ratings
-
-The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
-
-L<http://cpanratings.perl.org/d/Parallel-ForkManager-Segmented>
 
 =item *
 
@@ -389,5 +381,26 @@ from your repository :)
 L<https://github.com/shlomif/perl-Parallel-ForkManager-Segmented>
 
   git clone https://github.com/shlomif/perl-Parallel-ForkManager-Segmented.git
+
+=head1 AUTHOR
+
+Shlomi Fish <shlomif@cpan.org>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/shlomif/parallel-forkmanager-segmented/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2018 by Shlomi Fish.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
 
 =cut

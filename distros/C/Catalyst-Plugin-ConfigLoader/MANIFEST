@@ -1,19 +1,9 @@
-.gitignore
 Changes
-inc/Module/Install.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/Catalyst/Plugin/ConfigLoader.pm
 lib/Catalyst/Plugin/ConfigLoader/Manual.pod
+maint/Makefile.PL.include
 Makefile.PL
 MANIFEST			This list of files
-META.yml
-README
 t/01-use.t
 t/10-live_auto.t
 t/20-mock_load.t
@@ -22,8 +12,6 @@ t/22-suffix_env.t
 t/23-path_env.t
 t/24-mock-shortappname.t
 t/25-setting-config-file.t
-t/98-pod_coverage.t
-t/99-pod.t
 t/lib/TestApp.pm
 t/lib/TestApp/Controller/Config.pm
 t/lib/TestApp/Controller/Root.pm
@@ -52,3 +40,9 @@ t/lib/TestApp4/Controller/Root.pm
 t/lib/TestApp4/testapp.pl
 t/mockapp/mockapp.pl
 t/mockapp/mockapp_local.pl
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

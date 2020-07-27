@@ -1,4 +1,19 @@
-Revision history for Perl module DateTime::HiRes
+0.04     2020-07-26
 
-0.01 Mon Sep  8 21:32:32 HST 2003 
-    - initial release
+- Fix license. The 0.02 release unintentionally switched it to Artistic
+  2.0. Reported by Kent Fredric. GH #1.
+
+
+0.03     2020-07-25
+
+- Switch to GitHub issues.
+
+
+0.02     2020-07-25
+
+- Fixed a test that was failing because of changes in DateTime::Locale.
+
+
+0.01 2003-09-08
+
+- Initial release.

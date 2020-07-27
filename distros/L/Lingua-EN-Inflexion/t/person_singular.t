@@ -105,6 +105,52 @@ is noun('after Theirs')->singular(2),   "after Yours"  => 'after Theirs -2-> aft
 is noun('after THEIRS')->singular(3),   "after ITS"    => 'after THEIRS -3-> after ITS';
 
 
+# Reflexive pronouns...
+
+for my $pronoun (qw< myself ourselves >) {
+    is noun($pronoun)->singular,      "myself"   => "$pronoun ---> myself";
+    is noun($pronoun)->singular(1),   "myself"   => "$pronoun -1-> myself";
+    is noun($pronoun)->singular(2),   "yourself" => "$pronoun -2-> yourself";
+    is noun($pronoun)->singular(3),   "itself"   => "$pronoun -3-> itself";
+}
+
+for my $pronoun (qw< yourself yourselves >) {
+    is noun($pronoun)->singular,      "yourself" => "$pronoun ---> yourself";
+    is noun($pronoun)->singular(1),   "myself"   => "$pronoun -1-> myself";
+    is noun($pronoun)->singular(2),   "yourself" => "$pronoun -2-> yourself";
+    is noun($pronoun)->singular(3),   "itself"   => "$pronoun -3-> itself";
+}
+
+    is noun("herself")->singular,      "herself"  => "herself ---> herself";
+    is noun("herself")->singular(1),   "myself"   => "herself -1-> myself";
+    is noun("herself")->singular(2),   "yourself" => "herself -2-> yourself";
+    is noun("herself")->singular(3),   "herself"  => "herself -3-> herself";
+
+    is noun("himself")->singular,      "himself"  => "himself ---> himself";
+    is noun("himself")->singular(1),   "myself"   => "himself -1-> myself";
+    is noun("himself")->singular(2),   "yourself" => "himself -2-> yourself";
+    is noun("himself")->singular(3),   "himself"  => "himself -3-> himtself";
+
+    is noun("itself")->singular,      "itself"   => "itself ---> itself";
+    is noun("itself")->singular(1),   "myself"   => "itself -1-> myself";
+    is noun("itself")->singular(2),   "yourself" => "itself -2-> yourself";
+    is noun("itself")->singular(3),   "itself"   => "itself -3-> itself";
+
+for my $pronoun (qw< themself themselves  >) {
+    is noun($pronoun)->singular,      "themselves" => "$pronoun ---> themselves";
+    is noun($pronoun)->singular(1),   "myself"     => "$pronoun -1-> myself";
+    is noun($pronoun)->singular(2),   "yourself"   => "$pronoun -2-> yourself";
+    is noun($pronoun)->singular(3),   "themselves" => "$pronoun -3-> themselves";
+}
+
+for my $pronoun (qw< oneself oneselves  >) {
+    is noun($pronoun)->singular,      "oneself"  => "$pronoun ---> oneself";
+    is noun($pronoun)->singular(1),   "myself"   => "$pronoun -1-> myself";
+    is noun($pronoun)->singular(2),   "yourself" => "$pronoun -2-> yourself";
+    is noun($pronoun)->singular(3),   "oneself"  => "$pronoun -3-> oneself";
+}
+
+
 # Verbs, especially "to be"...
 
 is verb('am')->singular,       "am"    => 'am ---> am';

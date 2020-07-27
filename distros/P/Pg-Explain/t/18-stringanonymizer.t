@@ -10,9 +10,9 @@ my $anonymizer;
 lives_ok( sub { $anonymizer = Pg::Explain::StringAnonymizer->new() }, 'Base object creation' );
 isa_ok( $anonymizer, 'Pg::Explain::StringAnonymizer' );
 
-lives_ok( sub { $anonymizer->add( 'depesz' ) },          'Adding string' );
+lives_ok( sub { $anonymizer->add( 'depesz' ) }, 'Adding string' );
 lives_ok( sub { $anonymizer->add( 'yyy', 'xxx', 'c' ) }, 'Adding strings' );
-lives_ok( sub { $anonymizer->add( [ qw( a b c ) ] ) },   'Adding strings as arrayref' );
+lives_ok( sub { $anonymizer->add( [ qw( a b c ) ] ) }, 'Adding strings as arrayref' );
 
 my @expected_keys = sort qw( depesz yyy xxx a b c );
 my @existing_keys = sort keys %{ $anonymizer->{ 'strings' } };

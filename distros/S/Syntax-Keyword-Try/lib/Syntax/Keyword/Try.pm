@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.15;
+package Syntax::Keyword::Try 0.16;
 
 use v5.14;
 use warnings;
@@ -19,19 +19,34 @@ C<Syntax::Keyword::Try> - a C<try/catch/finally> syntax for perl
 
 =head1 SYNOPSIS
 
- use Syntax::Keyword::Try;
+   use Syntax::Keyword::Try;
 
- sub foo
- {
-    try {
-       attempt_a_thing();
-       return "success";
-    }
-    catch {
-       warn "It failed - $@";
-       return "failure";
-    }
- }
+   sub foo
+   {
+      try {
+         attempt_a_thing();
+         return "success";
+      }
+      catch {
+         warn "It failed - $@";
+         return "failure";
+      }
+   }
+
+Or, to use the experimental syntax:
+
+   use Syntax::Keyword::Try qw( try :experimental )
+
+   sub foo {
+      try {
+         attempt_a_thing();
+         return "success";
+      }
+      catch ($e) {
+         warn "It failed - $e";
+         return "failure";
+      }
+   }
 
 =head1 DESCRIPTION
 
@@ -44,6 +59,24 @@ As well as providing a handy syntax for this useful behaviour, this module
 also serves to contain a number of code examples for how to implement parser
 plugins and manipulate optrees to provide new syntax and behaviours for perl
 code.
+
+=head1 Experimental Features
+
+Some of the features of this module are currently marked as experimental. They
+will provoke warnings in the C<experimental> category, unless silenced.
+
+You can silence this with C<no warnings 'experimental'> but then that will
+silence every experimental warning, which may hide others unintentionally. For
+a more fine-grained approach you can instead use the import line for this
+module to only silence this module's warnings selectively:
+
+   use Syntax::Keyword::Try qw( try :experimental(var) );
+
+   use Syntax::Keyword::Try qw( try :experimental(typed) );
+
+   use Syntax::Keyword::Try qw( try :experimental );  # all of the above
+
+Don't forget to import the main C<try> symbol itself, to activate the syntax.
 
 =cut
 
@@ -109,7 +142,8 @@ in C<$@> in the usual way. Optionally, a new lexical variable can be
 introduced to store the exception in. This new form is experimental and is
 likely to be expanded on in a future version, as part of the wider attempt to
 introduce typed dispatch. Using it will provoke an C<experimental> category
-warning on supporting perl versions.
+warning on supporting perl versions, unless silenced by importing the
+C<:experimental(var)> tag (see above).
 
 Presence of this C<catch> statement causes any exception thrown by the
 preceding C<try> block to be non-fatal to the surrounding code. If the
@@ -137,7 +171,11 @@ I<Experimental; since version 0.15.>
 
 Optionally, multiple catch statements can be provided, where each block is
 given a guarding condition, to control whether or not it will catch particular
-exception values. Two kinds of condition are supported:
+exception values. Use of this syntax will provoke an C<experimental> category
+warning on supporting perl versions, unless silenced by importing the
+C<:experimental(typed)> tag (see above).
+
+Two kinds of condition are supported:
 
 =over 4
 
@@ -361,6 +399,8 @@ sub import
    $class->import_into( $caller, @_ );
 }
 
+my @EXPERIMENTAL = qw( var typed );
+
 sub import_into
 {
    my $class = shift;
@@ -371,6 +411,14 @@ sub import_into
    my %syms = map { $_ => 1 } @syms;
    $^H{"Syntax::Keyword::Try/try"}++ if delete $syms{try};
    $^H{"Syntax::Keyword::Try/try_value"}++ if delete $syms{try_value};
+
+   foreach ( @EXPERIMENTAL ) {
+      $^H{"Syntax::Keyword::Try/experimental($_)"}++ if delete $syms{":experimental($_)"};
+   }
+
+   if( delete $syms{":experimental"} ) {
+      $^H{"Syntax::Keyword::Try/experimental($_)"}++ for @EXPERIMENTAL;
+   }
 
    # Ignore requests for these, as they come automatically with `try`
    delete @syms{qw( catch finally )};

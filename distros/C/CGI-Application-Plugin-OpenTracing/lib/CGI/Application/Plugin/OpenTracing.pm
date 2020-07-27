@@ -3,13 +3,15 @@ package CGI::Application::Plugin::OpenTracing;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.100.0';
+our $VERSION = 'v0.102.0';
+
+use syntax 'maybe';
 
 use OpenTracing::Implementation;
 use OpenTracing::GlobalTracer;
-use OpenTracing::Constants::CarrierFormat qw/:ALL/;
 
-use HTTP::Request;
+use HTTP::Headers;
+use HTTP::Status;
 use Time::HiRes qw( gettimeofday );
 
 
@@ -41,10 +43,7 @@ sub init {
     my $tracer = _init_opentracing_implementation($cgi_app);
     $cgi_app->{__PLUGINS}{OPENTRACING}{TRACER} = $tracer;
     
-    my $http_headers = HTTP::Request->new; # not implemented yet
-    my $context = $tracer->extract_context(
-        OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS, $http_headers
-    );
+    my $context = $tracer->extract_context(_cgi_get_http_headers($cgi_app));
     
     $cgi_app->{__PLUGINS}{OPENTRACING}{SCOPE}{CGI_REQUEST} =
         $tracer->start_active_span( 'cgi_request', child_of => $context );
@@ -123,8 +122,9 @@ sub teardown {
     $cgi_app->{__PLUGINS}{OPENTRACING}{SCOPE}{CGI_TEARDOWN}->close
         if $cgi_app->{__PLUGINS}{OPENTRACING}{SCOPE}{CGI_TEARDOWN};
     
+    my %http_status_tags = _get_http_status_tags($cgi_app);
     $cgi_app->{__PLUGINS}{OPENTRACING}{SCOPE}{CGI_REQUEST}
-        ->get_span->add_tags('http.status_code' => "200",);
+        ->get_span->add_tags(%http_status_tags);
     $cgi_app->{__PLUGINS}{OPENTRACING}{SCOPE}{CGI_REQUEST}->close;
     
     return
@@ -182,13 +182,18 @@ sub _cgi_get_http_method {
 }
 
 
+sub _cgi_get_http_headers { # TODO: extract headers from CGI request
+    my $cgi_app = shift;
+    return HTTP::Headers->new();
+}
+
 
 sub _cgi_get_http_url {
     my $cgi_app = shift;
     
     my $query = $cgi_app->query();
     
-    return $query->url();
+    return $query->url(-path => 1, -query => 1);
 }
 
 
@@ -198,6 +203,10 @@ sub get_opentracing_global_tracer {
 }
 
 
+sub _param_formatter {
+    my ($self, $param, $vals) = @_;
+    return join ',', @$vals;
+}
 
 sub _get_request_tags {
     my $cgi_app = shift;
@@ -205,9 +214,17 @@ sub _get_request_tags {
     my %tags = (
         'component'        => 'CGI::Application',
         'http.method'      => _cgi_get_http_method($cgi_app),
-        'http.status_code' => '000',
         'http.url'         => _cgi_get_http_url($cgi_app),
     );
+
+    my $format = $cgi_app->can('opentracing_format_query_params')
+        // \&_param_formatter;
+
+    my %params = $cgi_app->query->Vars();
+    while (my ($name, $value) = each %params) {
+        $tags{"http.query.$name"} = $cgi_app->$format($name, [ split /\0/, $value ]);
+    }
+
     return %tags
 }
 
@@ -220,6 +237,27 @@ sub _get_runmode_tags {
     );
     return %tags
 }
+
+sub _get_http_status_tags {
+    my $cgi_app = shift;
+    
+    my %headers = $cgi_app->header_props();
+    my $status = $headers{-status} or return (
+        'http.status_code'    => '200',
+    );
+    my $status_code = [ $status =~ /^\s*(\d{3})/ ]->[0];
+    my $status_mess = [ $status =~ /^\s*\d{3}\s*(.+)\s*$/ ]->[0];
+    
+    $status_mess = HTTP::Status::status_message($status_code)
+        unless defined $status_mess;
+    
+    my %tags = (
+        maybe 'http.status_code'    => $status_code,
+        maybe 'http.status_message' => $status_mess,
+    );
+    return %tags
+}
+
 
 sub _get_bootstrap_options {
     my $cgi_app = shift;

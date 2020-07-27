@@ -1,2 +1,6 @@
+0.002		2020-07-27	T. R. Wyant
+    Disable signatures in File::Symlink::Relative because it uses
+    old-style prototypes.
+
 0.001		2020-04-02	T. R. Wyant
     Initial production release

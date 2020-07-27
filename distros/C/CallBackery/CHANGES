@@ -1,3 +1,16 @@
+0.34.1 2020-07-27 09:28:23 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - if popup windows have not set maxWidth/maxHeight, set according the
+   appliaction Root
+
+0.34.0 2020-07-26 12:55:39 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - the AbstractTable module now contains an action generator called
+   makeExportAction which places an export button into the action row
+   of a table of your choice ... note that this addition also requires you to add the
+   modules Text::CSV and Excel::Writer::XLSX to your dependencies.
+   Contribution by @maettu
+
 0.33.6 2020-06-16 10:48:34 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - properly translate placeholder and tooltip even in reConf case

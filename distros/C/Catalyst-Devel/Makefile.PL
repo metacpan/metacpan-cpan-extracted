@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use lib '.';
+use lib 'inc';
 use inc::Module::Install 0.91;
 use Module::Install::AuthorRequires;
 use Module::Install::AuthorTests;
@@ -38,8 +39,7 @@ if (!$Module::Install::AUTHOR && $^O ne 'MSWin32') {
 requires 'Module::Install' => '1.02';
 
 author_requires 'IPC::Run3';
-author_requires 'Module::Info';
-author_requires 'File::Find::Rule';
+author_requires 'Proc::Background';
 author_requires 'Test::Pod';
 author_requires 'Test::Pod::Coverage';
 
@@ -54,9 +54,9 @@ if (!$ENV{CATALYST_DEVEL_NO_510_CHECK}) {
     use Symbol 'gensym';
     use IPC::Open3;
     use File::Spec;
-    open NULL, '>', File::Spec->devnull;
+    open my $null, '>', File::Spec->devnull;
     my $err = gensym;
-    my $pid = open3(gensym, '&>NULL', $err, "$^X -It/lib -MUnknownError -e 1");
+    my $pid = open3(gensym, $null, $err, qq{"$^X" -It/lib -MUnknownError -e 1});
 
     my $unknown_error = 0;
 

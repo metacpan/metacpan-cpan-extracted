@@ -16,7 +16,7 @@ package App::WRT;
 # without overthinking a bunch of hair-splitting decisions and categories,
 # but whatever.  I'll try to follow it, roughly.
 
-use version; our $VERSION = version->declare("v7.1.0");
+use version; our $VERSION = version->declare("v7.1.2");
 
 use strict;
 use warnings;
@@ -1261,10 +1261,11 @@ sub feed_print_json {
     my ($entry_file, $entry_url) = $self->root_locations($entry);
 
     $feed->add_item(
-      id            => $entry_url,
-      title         => $self->get_title($entry),
-      content_html  => $content,
-      date_modified => rfc_3339_date(get_mtime($entry_file)),
+      id             => $entry_url,
+      title          => $self->get_title($entry),
+      content_html   => $content,
+      date_modified  => rfc_3339_date(get_mtime($entry_file)),
+      date_published => rfc_3339_date(get_mtime($entry_file)),
     );
   }
 

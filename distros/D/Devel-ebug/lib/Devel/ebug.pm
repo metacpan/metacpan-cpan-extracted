@@ -16,7 +16,7 @@ use FindBin qw($Bin);  ## no critic (Freenode::DiscouragedModules)
 use base qw(Class::Accessor::Chained::Fast);
 
 # ABSTRACT: A simple, extensible Perl debugger
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 __PACKAGE__->mk_accessors(qw(
     backend
@@ -69,8 +69,7 @@ sub attach {
             PeerAddr   => "localhost",
             PeerPort   => $port,
             Proto      => 'tcp',
-            Reuse      => 1,
-            ReuserAddr => 1,
+            ReuseAddr => 1,
         );
         last if $socket;
         sleep 1;
@@ -142,7 +141,7 @@ Devel::ebug - A simple, extensible Perl debugger
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 SYNOPSIS
 

@@ -9,9 +9,6 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
-use vars qw($MSWin32_MBCS);
-$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
-
 @test = (
     sub { $_=<<'END1'; mb::parse() eq <<'END2'; }, # test no 1
 __END__
@@ -1378,7 +1375,6 @@ A
 
 END1
 <<~A
-
 A
 
 END2
@@ -1406,7 +1402,6 @@ A
 
 END1
 <<~"A"
-
 A
 
 END2
@@ -1416,7 +1411,6 @@ A
 
 END1
 <<~`A`
-
 A
 
 END2
@@ -1435,7 +1429,6 @@ A
 
 END1
 <<~	"A"
-
 A
 
 END2
@@ -1445,7 +1438,6 @@ A
 
 END1
 <<~	`A`
-
 A
 
 END2
@@ -1464,7 +1456,6 @@ A
 
 END1
 <<~ "A"
-
 A
 
 END2
@@ -1474,7 +1465,6 @@ A
 
 END1
 <<~ `A`
-
 A
 
 END2
@@ -1484,7 +1474,6 @@ A
 
 END1
 <<A
-
 A
 
 END2
@@ -1512,7 +1501,6 @@ A
 
 END1
 <<"A"
-
 A
 
 END2
@@ -1522,7 +1510,6 @@ A
 
 END1
 <<`A`
-
 A
 
 END2
@@ -1541,7 +1528,6 @@ A
 
 END1
 <<	"A"
-
 A
 
 END2
@@ -1551,7 +1537,6 @@ A
 
 END1
 <<	`A`
-
 A
 
 END2
@@ -1570,7 +1555,6 @@ A
 
 END1
 << "A"
-
 A
 
 END2
@@ -1580,7 +1564,6 @@ A
 
 END1
 << `A`
-
 A
 
 END2

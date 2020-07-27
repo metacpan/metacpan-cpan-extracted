@@ -1,0 +1,106 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+DBIx::OpenTracing - automatically create OpenTracing spans around DBI queries
+
+=head1 VERSION
+
+v0.0.2
+
+=head1 SYNOPSIS
+
+    use DBI;
+    use DBIx::OpenTracing;
+    
+    # use DBI as usual
+    my $dbh = DBI->connect(...);
+    $dbh->do(...);
+
+    DBIx::OpenTracing->disable();
+    $dbh->do($secret_query);
+    DBIx::OpenTracing->enable();
+
+    sub process_secrets {
+        DBIx::OpenTracing->suspend();
+        ...
+    }
+
+=head1 DESCRIPTION
+
+This module overrides L<DBI> methods to create spans around all queries.
+It will also try to extract information like the query SQL and the number
+of rows returned. L<OpenTracing::GlobalTracer> is used to accomplish this,
+so make sure you set your tracer there.
+
+Spans created by this module will be named after the L<DBI> method they
+wrap and prefixed with "dbi_", a call to C<$dbh->execute()> would produce
+a span called "dbi_execute". Note that the span method name may differ
+from the one used in your code, since many methods are simply wrappers
+around others. The following tags will be added to each span (if possible)
+in accordance with
+L<OpenTracing conventions|https://opentracing.io/specification/conventions/>:
+
+=over 4
+
+=item * db.type - always set to "sql"
+
+=item * db.instance - the database name
+
+=item * db.user - the user associated with the handle (not always available)
+
+=item * db.statement - the query SQL
+
+=item * db.rows - the number of rows affected (not always available)
+
+=item * error - will be set to true if the query failed
+
+=back
+
+=head1 METHODS
+
+=head2 disable
+
+You can call C<< DBIx::OpenTracing->disable >> to turn off all of this modules
+functionality. It can be re-enabled later with L<enable>.
+
+=head2 enable
+
+Enable the module features again after being disabled. It's safe to call
+this multiple times.
+
+=head2 disable_temporarily
+
+Disable the module until the end of current scope.
+
+=head2 enable_temporarily
+
+Enable the module until the end of current scope.
+
+=head2 suspend
+
+Similarly to L<disable_temporarily>, will disable the module until
+the end of current scope. However, until that scope is over,
+calls to L<enable> and L<enable_temprarily> will be ignored.
+Use this if you want to make sure absolutely nothing is traced within
+the scope, regardless of what any called functions are doing.
+
+=head1 AUTHOR
+ 
+Szymon Nieznański <snieznanski@perceptyx.com>
+ 
+=head1 LICENSE
+ 
+'DBIx::OpenTracing' is Copyright (C) 2020, Perceptyx Inc
+ 
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0.
+ 
+This package is distributed in the hope that it will be useful, but it is
+provided "as is" and without any express or implied warranties.
+ 
+For details, see the full text of the license in the file LICENSE.
+
+=cut

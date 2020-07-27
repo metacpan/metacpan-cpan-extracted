@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AnyEvent::MQTT;
-$AnyEvent::MQTT::VERSION = '1.172121';
+$AnyEvent::MQTT::VERSION = '1.202052';
 # ABSTRACT: AnyEvent module for an MQTT client
 
 
@@ -138,7 +138,7 @@ sub next_message_id {
   my $self = shift;
   my $res = $self->{message_id};
   $self->{message_id}++;
-  $self->{message_id} %= 65536;
+  $self->{message_id} = 1 if $self->{message_id} >= 65536;
   $res;
 }
 
@@ -287,6 +287,18 @@ sub _confirm_subscription {
   foreach my $cv (@{$rec->{cv}}) {
     $cv->send($qos);
   }
+
+  # publish any matching queued QoS messages
+  if (!$self->{clean_session} && $qos && $self->{_qos_msg_cache}) {
+    my $cache = $self->{_qos_msg_cache};
+    my $ts = Net::MQTT::TopicStore->new($topic);
+    for my $i (grep { $ts->values($cache->[$_]->topic) } reverse(0..$#$cache)) {
+      my $msg = delete $cache->[$i];
+      print STDERR "Processing cached message for topic '", $msg->topic, "' with subscription to topic '$topic'\n" if DEBUG;
+      $self->_process_publish($self->{handle}, $msg);
+    }
+    delete $self->{_qos_msg_cache} unless @$cache;
+  }
   delete $rec->{cv};
 }
 
@@ -414,6 +426,8 @@ sub connect {
                           on_connect => subname('on_connect_cb' => sub {
                             my ($handle, $host, $port, $retry) = @_;
                             print STDERR "TCP handshake complete\n" if DEBUG;
+                            # call user-defined on_connect function.
+                            $weak_self->{on_connect}->($handle, $retry) if $weak_self->{on_connect};
                             my $msg =
                               Net::MQTT::Message->new(
                                 message_type => MQTT_CONNECT,
@@ -447,7 +461,13 @@ sub connect {
 sub _reconnect {
   my $self = shift;
   print STDERR "reconnecting:\n" if DEBUG;
-  $self->{clean_session} = 0;
+
+  # must resubscribe everything
+  if ($self->{clean_session}) {
+    $self->{_sub_topics} = Net::MQTT::TopicStore->new();
+    $self->{_sub_reconnect} = delete $self->{_sub} || {};
+  }
+
   $self->connect(@_);
 }
 
@@ -499,6 +519,15 @@ sub _process_connack {
                       $weak_self->_write_now;
                       1;
                     });
+
+  # handle reconnect
+  while (my ($topic, $rec) = each %{$self->{_sub_reconnect}}) {
+    print STDERR "Resubscribing to '$topic':\n" if DEBUG;
+    for my $cb (values %{$rec->{cb}}) {
+      $self->subscribe(topic => $topic, callback => $cb, qos => $rec->{qos});
+    }
+  }
+  delete $self->{_sub_reconnect};
   return
 }
 
@@ -553,6 +582,14 @@ sub _publish_locally {
 sub _process_publish {
   my ($self, $handle, $msg, $error) = @_;
   my $qos = $msg->qos;
+
+  # assuming this was intended for a subscription not yet restored
+  if ($qos && !$self->{clean_session} && !@{$self->{_sub_topics}->values($msg->topic)}) {
+    print STDERR "Caching message for '", $msg->topic, "'\n" if DEBUG;
+    push(@{$self->{_qos_msg_cache}}, $msg);
+    return;
+  }
+
   if ($qos == MQTT_QOS_EXACTLY_ONCE) {
     my $mid = $msg->message_id;
     $self->{messages}->{$mid} = $msg;
@@ -656,7 +693,7 @@ AnyEvent::MQTT - AnyEvent module for an MQTT client
 
 =head1 VERSION
 
-version 1.172121
+version 1.202052
 
 =head1 SYNOPSIS
 
@@ -743,8 +780,7 @@ Set message for will message.  Default is the empty message.
 
 =item C<clean_session>
 
-Set clean session flag for connect message.  Default is 1 but
-it is set to 0 when reconnecting after an error.
+Set clean session flag for connect message.  Default is 1.
 
 =item C<client_id>
 

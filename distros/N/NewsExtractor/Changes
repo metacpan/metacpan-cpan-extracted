@@ -1,3 +1,8 @@
+v0.34.0 2020-07-26T22:57:38+0800
+  - Add a site-specific extractor for www.nownews.com
+  - Add a site-specific extractor for www.mdnkids.com
+  - Add a site-specific extractor for www.ustv.com.tw
+
 v0.33.0 2020-07-22T06:44:18+0800
   - Improve the extraction of dateline and journalist for opinion.udn.com
   - Start parsing dateline string and refromat them as ISO8601

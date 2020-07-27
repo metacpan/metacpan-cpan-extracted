@@ -1,0 +1,6 @@
+2017-11-02 13:59:17,971 - INFO - Verifying checksum for file /Users/cadams/Projects/bagit-conformance-suite/v1.0/warning/same-filename-listed-twice-with-the-same-hash/manifest-sha256.txt
+2017-11-02 13:59:17,972 - INFO - Verifying checksum for file /Users/cadams/Projects/bagit-conformance-suite/v1.0/warning/same-filename-listed-twice-with-the-same-hash/bag-info.txt
+2017-11-02 13:59:17,972 - INFO - Verifying checksum for file /Users/cadams/Projects/bagit-conformance-suite/v1.0/warning/same-filename-listed-twice-with-the-same-hash/manifest-sha512.txt
+2017-11-02 13:59:17,972 - INFO - Verifying checksum for file /Users/cadams/Projects/bagit-conformance-suite/v1.0/warning/same-filename-listed-twice-with-the-same-hash/bagit.txt
+2017-11-02 13:59:17,972 - INFO - Verifying checksum for file /Users/cadams/Projects/bagit-conformance-suite/v1.0/warning/same-filename-listed-twice-with-the-same-hash/data/README
+2017-11-02 13:59:17,972 - INFO - . is valid

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,34 +12,38 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
-SHA1 69160cf570348048b47af3c3848daa1958f8941c MANIFEST
-SHA1 9e05e74515a7a55401c4fc50628e689ae989919e META.yml
-SHA1 665c3f955962f862aaf84cb11b42d62c69240d87 Makefile.PL
-SHA1 51aa19d4d13d539633ea473f91da5c6f35c0d580 README
-SHA1 a26490aa2cc8bdd63d1c0bece6c1614e81a91bd6 html/Callbacks/RTx-RemoteLinks/Elements/AddLinks/ExtraLinkInstructions
-SHA1 7d03544c573b5ced111c3047b11cc28c303f0097 html/Callbacks/RTx-RemoteLinks/Elements/EditLinks/ExtraLinkInstructions
-SHA1 dc13ce0dbb488a5de81c3f6519ee31acda17397a inc/Module/Install.pm
-SHA1 91c20cbda8ca41b4e8f9e0390faff635c2ebe839 inc/Module/Install/Base.pm
-SHA1 eaf50ccbacecb797f0527deb0221c8264f6c8bd8 inc/Module/Install/Can.pm
-SHA1 363c8931cc183444907684b71d6a379e4fc8edcb inc/Module/Install/Fetch.pm
-SHA1 0c70de66cdd063352766d49db176e5f710f75fe7 inc/Module/Install/Include.pm
-SHA1 26ae1c0f5f352037b560414f216d7e3ac682f936 inc/Module/Install/Makefile.pm
-SHA1 ff97eb025b44c343d026c2a56a73d50c65319e95 inc/Module/Install/Metadata.pm
-SHA1 3b092ed8ce4fa9ed6667f681b54f4a624695e508 inc/Module/Install/RTx.pm
-SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 4c5ce519d404e242418f51dfe761287469e18e3a inc/Module/Install/Win32.pm
-SHA1 47a52cf8719a283c0efa2edab0088b5d67e0f23a inc/Module/Install/WriteAll.pm
-SHA1 4e09b598c2626e08cec2bed5e981492fa9e90967 inc/YAML/Tiny.pm
-SHA1 034d0f3a7401dae4be3eee279258181f51a4ad81 inc/unicore/Name.pm
-SHA1 b43b283d5753c1cdcf7e3197a49827087cb1e571 lib/RT/URI/remote_rt.pm
-SHA1 01fc7d81f9525591e80319e8405d9226c7780e1e lib/RTx/RemoteLinks.pm
+SHA256 1747ed64f7781b1cbd393cf5173090a6ffd294fa236f54fea2080bab32dae0d6 Changes
+SHA256 0a35eaa1df27666407c6399172f509815ac95a95dd5e45b3d10bd3703710a4b1 MANIFEST
+SHA256 40e96c1d0146d7f8085583d09327adff3be499a359cc218c301fb93104bc3775 META.yml
+SHA256 d2e22f613ba2093429258a73617038f81ed66815a598925976cf1e3d15c73e27 Makefile.PL
+SHA256 580dd988e8d5e380feda1ca332040f21a848aef87fc9e755926257dd09271afe README
+SHA256 99dcda5e87670c76a519dacbc8c960581178e436a3bb35059d08552f6fd8fae2 html/Callbacks/RTx-RemoteLinks/Elements/AddLinks/ExtraLinkInstructions
+SHA256 0a60e4ebe5709a503387f206093dfa085b8ef8628f619c4518a7074dd7ace0dd html/Callbacks/RTx-RemoteLinks/Elements/EditLinks/ExtraLinkInstructions
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 2c89fa442659e76a8ee28643923c3a928c39ed013ad08fe67049d1df7d4c9fd6 inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 2ac69f95fd110a4f1b5a55e4fd0f7a2b93a32e284496d2005ad729754df0ea61 lib/RT/URI/remote_rt.pm
+SHA256 6c90b5ff4e5dade4ddc80955f4e2c555bf127b0e7678d50450e6fa6e198bea76 lib/RTx/RemoteLinks.pm
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAlOzO/0ACgkQMflWJZZAbqBOZgCgp467CsFml2QB1+7++tjUXtu1
-+5wAn18P85jDxErg17EJoweoeUjMzANT
-=W+gt
+iQEzBAEBCAAdFiEExJs3Lyv4ShkBFmAnDfCig/6sgLIFAl8fNCMACgkQDfCig/6s
+gLLG5wf/W3cHePCvelw3HKwvIxutnVLwfJX4cUC74yzSmjfRrZuCWNN4fCLXAr6m
+fnxbOuhppTe41jxoLw2mz5V1F31BZSssmItd6Jvg7PLspka7Mk+w5yeUOr4VpteE
+9qSxdZeXs4kPGG0lEitMWuYdnW+RkkJfH1AfC7Jn6NMeQmlOaMSDHwIt3BqMRglh
+IP1zc8Ssc9aXe/gyZItKor46aJDNGb1amOSkj6U5LNVPPQ8kL6jxIG2655evW0Pj
+Hsh1EdDiU30DI9ASlJNW+FqLTOLh8tV8xX7yN8KeBpf41hZrx46VffGrGE3BBghj
+Ghcpfl6GkP4recpIvYsq32fFE7Bmfw==
+=dTre
 -----END PGP SIGNATURE-----

@@ -10,7 +10,7 @@ use Smart::Comments;
 use Try::Tiny;
 
 use Bio::MUST::Core;
-use Bio::MUST::Core::Utils qw(change_suffix secure_outfile);
+use Bio::MUST::Core::Utils qw(:filenames secure_outfile);
 use aliased 'Bio::MUST::Core::IdList';
 use aliased 'Bio::MUST::Core::IdMapper';
 use aliased 'Bio::MUST::Core::Taxonomy';
@@ -95,14 +95,26 @@ for my $infile (@ARGV_infiles) {
         $opts{  collapse} =  $ARGV_collapse if $ARGV_collapse;
         $tax->attach_taxa_to_entities($tree, \%opts);
 
+        my $scheme;
+        if ($ARGV_colorize) {
+            ### Coloring tree using: $ARGV_colorize
+            $scheme = $tax->load_color_scheme($ARGV_colorize);
+        }
+
         # FigTree output
         if ($ARGV_figtree) {
-            $tree->collapse_subtrees if $ARGV_collapse;
-            if ($ARGV_colorize) {
-                ### Coloring tree using: $ARGV_colorize
-                my $scheme = $tax->load_color_scheme($ARGV_colorize);
-                $scheme->attach_colors_to_entities($tree);
-            }
+            $scheme->attach_colors_to_entities($tree) if $ARGV_colorize;
+              $tree->collapse_subtrees                if $ARGV_collapse;
+        }
+
+        # iTOL output
+        if ($ARGV_itol) {
+            my $itol_outfile  = change_suffix($infile, '.txt');
+            my $color_file    = insert_suffix($itol_outfile, '-color');
+            my $label_file    = insert_suffix($itol_outfile, '-label');
+            my $collapse_file = insert_suffix($itol_outfile, '-collapse');
+            $scheme->store_itol_colors($tree, $color_file)            if $ARGV_colorize;
+              $tree->store_itol_collapse($label_file, $collapse_file) if $ARGV_collapse;
         }
 
         # TRE or ARB output
@@ -162,7 +174,7 @@ format-tree.pl - Format trees for printing
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 USAGE
 
@@ -298,6 +310,10 @@ When specified, this option also generates companion NBS files.
 =item --figtree
 
 Output tree in FigTree enhanced NEXUS format [default: no].
+
+=item --itol
+
+Output tree metadata for upload and vizualisation in iTOL [default: no].
 
 =item --version
 

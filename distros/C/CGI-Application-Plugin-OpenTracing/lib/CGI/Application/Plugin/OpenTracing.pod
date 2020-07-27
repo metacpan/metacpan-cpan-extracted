@@ -125,8 +125,24 @@ the default L<OpenTracing::Implementation::NoOp> which ... does nothing.
 
 Traces will get lost, when the rootspan is not closed properly.
 
+=head2 Multi-valued query parameters
 
+Query parameters will be automatically added to the C<cgi_request> span
+as tags with a C<http.query.> prefix. Since span tags cannot contain
+references, query parameters appearing multiple times will be concatenated
+with a comma.
 
+You can use a different format by defining an C<opentracing_format_query_params>
+method in your CGI Application. If present, this method will be called whenever
+a query parameter is assigned to a tag, with the parameter name and all values
+as an array reference (even if the parameter only has a single value) as arguments.
+
+For example, to encode values as JSON:
+
+  sub opentracing_format_query_params {
+      my ($self, $name, $values_ref) = @_;
+      return JSON::encode($values_ref);
+  }
 
 
 

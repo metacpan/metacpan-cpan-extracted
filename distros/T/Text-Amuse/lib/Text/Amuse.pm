@@ -13,11 +13,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 1.51
+Version 1.63
 
 =cut
 
-our $VERSION = '1.51';
+our $VERSION = '1.63';
 
 
 =head1 SYNOPSIS
@@ -54,7 +54,7 @@ Typical usage which should illustrate all the public methods
 
 =over 4
 
-=item new (file => $file)
+=item new (file => $file, partial => \@parts, include_paths => \@paths)
 
 Create a new Text::Amuse object. You should pass the named parameter
 C<file>, pointing to a muse file to process. Please note that you
@@ -65,6 +65,9 @@ Optionally, accept a C<partial> option pointing to an arrayref of
 integers, meaning that only those chunks will be needed.
 
 The beamer output doesn't take C<partial> in account.
+
+Optionally, accept a C<include_paths> argument, with an arrayref of
+directories to search for included files.
 
 =cut
 
@@ -98,6 +101,7 @@ sub new {
 
     $self->{_document_obj} =
       Text::Amuse::Document->new(file => $self->{file},
+                                 include_paths => $opts{include_paths},
                                  debug => $self->{debug});
     bless $self, $class;
 }
@@ -121,11 +125,30 @@ Accessor to the file passed in the constructor (read-only)
 Return an hashref where the keys are the chunk indexes and the values
 are true, undef otherwise.
 
+=item include_paths
+
+Return a list of directory to look into for included files
+
+=item included_files
+
+Return the list of files included
+
 =cut
 
 sub document {
     return shift->{_document_obj};
 }
+
+sub include_paths {
+    return shift->document->include_paths;
+}
+
+sub included_files {
+    my $self = shift;
+    $self->document->raw_body; # call it to get it populated
+    return $self->document->included_files;
+}
+
 
 sub partials {
     my $self = shift;

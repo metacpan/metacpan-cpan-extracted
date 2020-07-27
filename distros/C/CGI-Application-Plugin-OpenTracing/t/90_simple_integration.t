@@ -1,18 +1,12 @@
 use Test::Most ;
 use Test::MockObject;
 use Test::OpenTracing::Integration;
+use Test::WWW::Mechanize::CGIApp;
 
-my $mocked_query = mock_query(
-    request_method      => 'PATCH',
-    url                 => 'https://test.tst/test.cgi?foo=bar',
-);
+my $mech = Test::WWW::Mechanize::CGIApp->new;
+$mech->app('MyTest::CGI::Application');
 
-my $cgi_app = MyTest::CGI::Application->new(
-    query => $mocked_query
-);
-
-
-$cgi_app->run;
+$mech->get('https://test.tst/test.cgi?foo=bar;abc=1;abc=2');
 
 global_tracer_cmp_easy(
     [
@@ -22,12 +16,15 @@ global_tracer_cmp_easy(
             baggage_items       => { bar => 2, foo => 1 },
             context_item        => "this is bootstrapped span_context",
             tags                => {
-                'component'         => "CGI::Application",
-                'http.method'       => "PATCH",
-                'http.status_code'  => "200",
-                'http.url'          => "https://test.tst/test.cgi?foo=bar",
-                'run_method'        => "some_method_start",
-                'run_mode'          => "start",
+                'component'           => "CGI::Application",
+                'http.method'         => "GET",
+                'http.status_code'    => "418",
+                'http.status_message' => "I'm a teapot",
+                'http.url'            => "https://test.tst/test.cgi?foo=bar;abc=1;abc=2",
+                'run_method'          => "some_method_start",
+                'run_mode'            => "start",
+                'http.query.foo'      => "bar",
+                'http.query.abc'      => "1;2",
             },
         },
         {
@@ -62,23 +59,6 @@ done_testing();
 
 
 
-
-
-sub mock_query {
-    my %mock_methods = @_;
-    
-    my $mock_obj = Test::MockObject->new();
-    $mock_obj->set_always( $_ => $mock_methods{$_} )
-        foreach keys %mock_methods;
-    
-    $mock_obj->mock( param  => sub { } );
-    $mock_obj->mock( header => sub { } );
-    
-    return $mock_obj
-}
-
-
-
 package MyTest::CGI::Application;
 
 use base 'CGI::Application';
@@ -97,6 +77,10 @@ sub opentracing_baggage_items {
     bar => 2
 }
 
+sub opentracing_format_query_params {
+   return join ';', @{ $_[2] };
+}
+
 sub run_modes {
     start    => 'some_method_start',
     run_this => 'this_method_name',
@@ -104,9 +88,13 @@ sub run_modes {
 }
 
 sub some_method_start {
+    my $self = shift;
+    
     my $scope = $TRACER->start_active_span('we_have_work_to_do');
     
     $scope->get_span->add_tag( message => "Hello World" );
+    
+    $self->header_add( -status => '418' );
     
     $scope->close;
     

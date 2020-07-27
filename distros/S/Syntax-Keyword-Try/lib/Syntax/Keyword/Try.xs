@@ -421,7 +421,7 @@ static OP *MY_newENTERTRYCATCHOP(pTHX_ OP *try, OP *catch)
 static XOP xop_isa;
 
 /* Totally stolen from perl 5.32.0's pp.c */
-static bool sv_isa_sv(SV *sv, SV *class)
+static bool sv_isa_sv(SV *sv, SV *namesv)
 {
   if(!SvROK(sv) || !SvOBJECT(SvRV(sv)))
     return FALSE;
@@ -429,9 +429,9 @@ static bool sv_isa_sv(SV *sv, SV *class)
   /* TODO: ->isa invocation */
 
 #if HAVE_PERL_VERSION(5,16,0)
-  return sv_derived_from_sv(sv, class, 0);
+  return sv_derived_from_sv(sv, namesv, 0);
 #else
-  return sv_derived_from(sv, SvPV_nolen(class));
+  return sv_derived_from(sv, SvPV_nolen(namesv));
 #endif
 }
 
@@ -490,9 +490,14 @@ static int try_keyword(pTHX_ OP **op)
 
     if(lex_consume("(")) {
       PADOFFSET catchvar = 0;
+      bool warned = FALSE;
+
 #ifdef WARN_EXPERIMENTAL
-      Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-        "'catch (VAR)' syntax is experimental and may be changed or removed without notice");
+      if(!hints || !hv_fetchs(hints, "Syntax::Keyword::Try/experimental(var)", 0)) {
+        warned = true;
+        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+          "'catch (VAR)' syntax is experimental and may be changed or removed without notice");
+      }
 #endif
       lex_read_space(0);
       catchvar = parse_lexvar();
@@ -532,6 +537,15 @@ static int try_keyword(pTHX_ OP **op)
 #endif
         condop = regexp;
       }
+
+#ifdef WARN_EXPERIMENTAL
+      if(condop && !warned &&
+        (!hints || !hv_fetchs(hints, "Syntax::Keyword::Try/experimental(typed)", 0))) {
+        warned = true;
+        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+          "typed catch syntax is experimental and may be changed or removed without notice");
+      }
+#endif
 
       if(!lex_consume(")"))
         croak("Expected close paren for catch (VAR)");

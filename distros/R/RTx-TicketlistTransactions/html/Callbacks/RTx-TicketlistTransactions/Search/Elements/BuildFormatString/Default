@@ -1,6 +1,7 @@
 <%args>
 $Fields
+$ARGSRef
 </%args>
 <%init>
-push @$Fields, 'LastTransactionContent';
+push @$Fields, 'LastTransactionContent' if !$ARGSRef->{Class} || $ARGSRef->{Class} eq 'RT::Tickets';
 </%init>

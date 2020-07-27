@@ -1,5 +1,12 @@
 Revision history for Text-Hspell
 
+0.4.1       2020-07-24
+    - Correct some spelling errors in the documentation,
+    and add "thanks" and attributions.
+
+0.4.0       2020-07-23
+    - Add the try_to_correct_word() method.
+
 0.2.5       2020-05-05
     - Change ["-lhspell", "-lz"] to ["-lhspell -lz"] to try fixing CPAN testers
     failures on Debian/Ubuntu/etc.

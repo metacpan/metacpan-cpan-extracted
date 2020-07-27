@@ -3,7 +3,7 @@ package Chrome::Util::Profile;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-04-19'; # DATE
 our $DIST = 'Chrome-Util-Profile'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,14 +39,15 @@ sub list_chrome_profiles {
 
     my %args = @_;
 
-    my $gc_dir     = "$ENV{HOME}/.config/google-chrome";
-    unless (-d $gc_dir) {
-        return [412, "Cannot find google chrome directory $gc_dir"];
+    my $chrome_dir     = $args{_chrome_dir} //
+        "$ENV{HOME}/.config/google-chrome";
+    unless (-d $chrome_dir) {
+        return [412, "Cannot find chrome directory $chrome_dir"];
     }
 
     my @rows;
     my $resmeta = {};
-    local $CWD = $gc_dir;
+    local $CWD = $chrome_dir;
   DIR:
     for my $dir (glob "*") {
         next unless -d $dir;
@@ -60,7 +61,7 @@ sub list_chrome_profiles {
             next DIR;
         };
         push @rows, {
-            path => "$gc_dir/$dir",
+            path => "$chrome_dir/$dir",
             dir  => $dir,
             name => $profile_name,
         };
@@ -89,7 +90,7 @@ Chrome::Util::Profile - List available Google Chrome profiles
 
 =head1 VERSION
 
-This document describes version 0.003 of Chrome::Util::Profile (from Perl distribution Chrome-Util-Profile), released on 2020-04-19.
+This document describes version 0.004 of Chrome::Util::Profile (from Perl distribution Chrome-Util-Profile), released on 2020-04-19.
 
 =head1 SYNOPSIS
 

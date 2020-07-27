@@ -1,5 +1,14 @@
 Revision history for Devel-ebug},
 
+0.63      2020-07-27 13:15:16 -0600
+  - Fixed intermittent testing failure relating to Expect (gh#20)
+
+0.62_01   2020-07-21 03:43:36 -0600
+  - Diagnostic release
+
+0.61_01   2020-07-16 09:50:27 -0600
+  - Diagnostic release
+
 0.60      2020-05-04 15:05:27 -0600
   - New maintainer.
   - Fixed compatability with YAML 1.30 (gh#19, gh#22)

@@ -1,0 +1,189 @@
+NAME
+    Mom - Moo objects minimally
+
+SYNOPSIS
+    This:
+
+      use Mom;
+
+    Is (roughly) a shortcut for:
+
+      use Moo;
+      use Scalar::Util qw( blessed );
+      use Carp qw( carp croak confess );
+      use namespace::autoclean;
+
+    But Mom takes care of a lot more. This:
+
+      use Mom q{
+        foo
+        bar   :rw :type(Int)
+        baz   :required
+      };
+
+    Is (roughly) a shortcut for:
+
+      use Moo;
+      use Scalar::Util qw( blessed );
+      use Carp qw( carp croak confess );
+      use Types::Standard qw();
+      use namespace::autoclean;
+  
+      has foo => ( is => "ro" );
+      has bar => ( is => "rw", isa => Types::Standard::Int );
+      has foo => ( is => "ro", required => 1 );
+
+    Tokens which don't start with a colon are created as attributes in your
+    package. Tokens starting with a colon are flags that affect either the
+    preceeding attribute or the package as a whole.
+
+DESCRIPTION
+    This documentation assumes familiarity with Moo.
+
+  Motivation
+    The documentation for MooX::ShortHas says instead of this:
+
+      use Moo;
+  
+      has hro => is => ro => required => 1;
+      has hlazy => is => lazy => builder => sub { 2 };
+      has hrwp => is => rwp => required => 1;
+      has hrw => is => rw => required => 1;
+
+    You can now write this:
+
+      use Moo;
+      use MooX::ShortHas;
+  
+      ro "hro";
+      lazy hlazy => sub { 2 };
+      rwp "hrwp";
+      rw "hrw";
+
+    I thought I could go even shorter.
+
+      use Mom q{
+        hro   :required
+        hlazy :lazy     :default(2)
+        hrwp  :required :rwp
+        hrw   :required :rw
+      };
+
+    Is it a lot shorter? No, but that's mostly because MooX::ShortHas makes it
+    very concise to write required attributes, and uses that in the
+    demonstration but less concise for optional attributes. If we make the
+    attributes optional, it becomes shorter.
+
+      use Mom q{ hro hlazy :lazy :default(2) hrwp :rwp hrw :rw };
+
+IMPORT
+    All of Mom's magic happens in the import statement.
+
+  Flags Affecting Attributes
+    `:rw`
+        Like `is => "rw"` in Moo.
+
+    `:ro`
+        Like `is => "ro"` in Moo, though this is already the default.
+
+    `:rwp`
+        Like `is => "rwp"` in Moo
+
+    `:bare`
+        Like `is => "bare"` in Moo
+
+    `:lazy`
+        Like `lazy => 1` in Moo.
+
+    `:required`
+        Like `required => 1` in Moo.
+
+    `:clearer`
+        Like `clearer => 1` in Moo.
+
+    `:clearer(methodname)`
+        Like `clearer => "methodname"` in Moo.
+
+    `:builder`
+        Like `builder => 1` in Moo.
+
+    `:builder(methodname)`
+        Like `builder => "methodname"` in Moo.
+
+    `:trigger`
+        Like `trigger => 1` in Moo.
+
+    `:trigger(methodname)`
+        Like `trigger => "methodname"` in Moo.
+
+    `:isa(Class::Name)`
+        Like `isa => InstanceOf[Class::Name]` in Moo/Types::Standard.
+
+    `:does(Role::Name)`
+        Like `isa => ConsumerOf[Role::Name]` in Moo/Types::Standard.
+
+    `:type(TypeName)`
+        Like `isa => TypeName` in Moo/Types::Standard.
+
+    `:enum(list,of,strings)`
+        Like `isa => Enum["list","of","strings"]` in Moo/Types::Standard.
+
+    `:default(value)`
+        Like `default => "value"` in Moo.
+
+        For simple (string/numeric) defaults. Doesn't accept coderefs.
+
+    `:handles(list,of,methods)`
+        Like `handles => ["list","of","methods"]` in Moo.
+
+        Currently no support for a hashref of delegations.
+
+  Flags Affecting Package
+    `:role`
+        Creates a Moo::Role instead of a Moo class.
+
+    `:extends(Class::Name)`
+        Like `extends "Class::Name"` in Moo.
+
+    `:with(Role::Name)`
+        Like `with "Role::Name"` in Moo.
+
+    `:requires(list,of,methods)`
+        Like `requires ("list", "of", "methods");` in Moo::Role.
+
+    `:std`
+        Like `use Types::Standard qw( -types -is -assert )`
+
+    `:common`
+        Like:
+
+          use Types::Common::Numeric qw( -types -is -assert );
+          use Types::Common::String qw( -types -is -assert );
+
+    `:path`
+        Like:
+
+          use Types::Path::Tiny qw( -types -is -assert );
+          use Path::Tiny qw( path );
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Mom>.
+
+SEE ALSO
+    Moo, Types::Standard.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2020 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

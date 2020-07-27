@@ -5,8 +5,6 @@ use warnings;
 
 use Test::More;
 
-use constant HAVE_WARN_EXPERIMENTAL => $] >= 5.018;
-
 use Syntax::Keyword::Try;
 
 # try success
@@ -98,7 +96,7 @@ use Syntax::Keyword::Try;
 
 # catch into new lexical
 {
-   no if HAVE_WARN_EXPERIMENTAL, warnings => 'experimental';
+   use Syntax::Keyword::Try ':experimental(var)';
 
    try {
       die "caught\n";

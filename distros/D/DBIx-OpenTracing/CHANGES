@@ -1,0 +1,11 @@
+v0.0.3 2020-07-27
+
+* Fix tests in environments where MySQL is not available
+
+v0.0.2 2020-07-24
+
+* Added proper license information
+
+v0.0.1 2020-07-24
+
+* Initial release

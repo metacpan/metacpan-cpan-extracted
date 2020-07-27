@@ -1,0 +1,67 @@
+{
+   "abstract" : "Run AnyEvent::RabbitMQ inside AnyEvent::Fork(::RPC)",
+   "author" : [
+      "William Cox <mydimension@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AnyEvent-RabbitMQ-Fork",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::Fork" : "0",
+            "AnyEvent::Fork::RPC" : "0",
+            "AnyEvent::RabbitMQ" : "1.18",
+            "Carp" : "0",
+            "File::ShareDir" : "0",
+            "Guard" : "0",
+            "Moo" : "0",
+            "Net::AMQP" : "0",
+            "Scalar::Util" : "0",
+            "Types::Standard" : "0",
+            "constant" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.6.1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "IO::Socket::INET" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mydimension/AnyEvent-RabbitMQ-Fork/issues"
+      },
+      "homepage" : "https://github.com/mydimension/AnyEvent-RabbitMQ-Fork",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mydimension/AnyEvent-RabbitMQ-Fork.git",
+         "web" : "https://github.com/mydimension/AnyEvent-RabbitMQ-Fork"
+      }
+   },
+   "version" : "0.6",
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.02",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -349,8 +349,10 @@ sub fire_event {
         return 0;
     });
 
-    # we need another run_javascript after firing an event, but we don't 100% know why
-    $self->inspector->resolve_locator('//body')->get_inner_html;
+    # regardless of what javascript will be executed because of fire_event,
+    # at least make sure to wait until we have a page to work with.
+    Gtk3::main_iteration
+        while $self->inspector->is_loading or not $self->inspector->get_html_source;
 
     return $result;
 }

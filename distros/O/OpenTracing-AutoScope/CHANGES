@@ -2,6 +2,20 @@ CHANGE LOG
 ==========
 
 
+2020-07-24 - v0.104.0
+---------------------
+
+### Changed
+  - `error` tag is now a boolean, error message moved to `message` tag
+
+
+2020-07-23 - v0.103.0
+---------------------
+
+### Added
+  - `generate_wrap_config` now supports a `complexity` filter
+
+
 2020-07-10 - v0.102.0
 ---------------------
 

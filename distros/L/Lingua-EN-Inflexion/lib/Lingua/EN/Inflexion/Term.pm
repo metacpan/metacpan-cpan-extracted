@@ -2,6 +2,7 @@ package Lingua::EN::Inflexion::Term;
 
 use 5.010; use warnings; use Carp;
 no if $] >= 5.018, warnings => "experimental::smartmatch";
+use strict;
 
 use Hash::Util 'fieldhash';
 
@@ -124,79 +125,226 @@ sub is_noun { 1 }
 my %noun_inflexion_of = (
   # CASE    TERM                            0TH      1ST     2ND     3RD
     nominative => {
-            i       => { singular => [qw<   I        I       you     it       >],
-                         plural   => [qw<   we       we      you     they     >],
-                    },
-            you     => { singular => [qw<   you      I       you     it       >],
-                         plural   => [qw<   you      we      you     they     >],
-                    },
-            she     => { singular => [qw<   she      I       you     she      >],
-                         plural   => [qw<   they     we      you     they     >],
-                    },
-            he      => { singular => [qw<   he       I       you     he       >],
-                         plural   => [qw<   they     we      you     they     >],
-                    },
-            it      => { singular => [qw<   it       I       you     it       >],
-                         plural   => [qw<   they     we      you     they     >],
-                    },
-            we      => { singular => [qw<   I        I       you     it       >],
-                         plural   => [qw<   we       we      you     they     >],
-                    },
-            they    => { singular => [qw<   it       I       you     it       >],
-                         plural   => [qw<   they     we      you     they     >],
-                    },
+            i          => { number => 'singular', person => 1,
+                            singular => [qw<   I        I       you     it       >],
+                            plural   => [qw<   we       we      you     they     >],
+                       },
+            you        => { number => 'singular', person => 2,
+                            singular => [qw<   you      I       you     it       >],
+                            plural   => [qw<   you      we      you     they     >],
+                       },
+            she        => { number => 'singular', person => 3,
+                            singular => [qw<   she      I       you     she      >],
+                            plural   => [qw<   they     we      you     they     >],
+                       },
+            he         => { number => 'singular', person => 3,
+                            singular => [qw<   he       I       you     he       >],
+                            plural   => [qw<   they     we      you     they     >],
+                       },
+            it         => { number => 'singular', person => 3,
+                            singular => [qw<   it       I       you     it       >],
+                            plural   => [qw<   they     we      you     they     >],
+                       },
+            we         => { number => 'plural', person => 1,
+                            singular => [qw<   I        I       you     it       >],
+                            plural   => [qw<   we       we      you     they     >],
+                       },
+            they       => { number => 'plural', person => 3,
+                            singular => [qw<   it       I       you     it       >],
+                            plural   => [qw<   they     we      you     they     >],
+                       },
+            one        => { number => 'singular', person => 3,
+                            singular => [qw<   one      I       you     one      >],
+                            plural   => [qw<   some     we      you     some     >],
+                       },
+            this       => { number => 'singular', person => 3,
+                            singular => [qw<   this     this    this    this     >],
+                            plural   => [qw<   these    these   these   these    >],
+                       },
+            that       => { number => 'singular', person => 3,
+                            singular => [qw<   that     that    that    that     >],
+                            plural   => [qw<   those    those   those   those    >],
+                       },
+            these      => { number => 'plural', person => 3,
+                            singular => [qw<   this     this    this    this     >],
+                            plural   => [qw<   these    these   these   these    >],
+                       },
+            those      => { number => 'plural', person => 3,
+                            singular => [qw<   that     that    that    that     >],
+                            plural   => [qw<   those    those   those   those    >],
+                       },
+            who        => { number => 'singular', person => 3,
+                            singular => [qw<   who      who     who     who      >],
+                            plural   => [qw<   who      who     who     who      >],
+                       },
+            whoever    => { number => 'singular', person => 3,
+                            singular => [qw<   whoever  whoever whoever whoever  >],
+                            plural   => [qw<   whoever  whoever whoever whoever  >],
+                       },
+            whosoever  => { number => 'singular', person => 3,
+                            singular => [qw<   whosoever whosoever whosoever whosoever  >],
+                            plural   => [qw<   whosoever whosoever whosoever whosoever  >],
+                       },
         },
-    accusative => {
-            me      => { singular => [qw<   me       me      you     it       >],
-                         plural   => [qw<   us       us      you     them     >],
-                    },
-            you     => { singular => [qw<   you      me      you     it       >],
-                         plural   => [qw<   you      us      you     them     >],
-                    },
-            her     => { singular => [qw<   her      me      you     her      >],
-                         plural   => [qw<   them     us      you     them     >],
-                    },
-            him     => { singular => [qw<   him      me      you     him      >],
-                         plural   => [qw<   them     us      you     them     >],
-                    },
-            it      => { singular => [qw<   it       I       you     it       >],
-                         plural   => [qw<   them     us      you     them     >],
-                    },
-            us      => { singular => [qw<   me       me      you     it       >],
-                         plural   => [qw<   us       us      you     them     >],
-                    },
-            them    => { singular => [qw<   it       me      you     it       >],
-                         plural   => [qw<   them     us      you     them     >],
-                    },
+    objective => {
+            me         => { number => 'singular', person => 1,
+                            singular => [qw<   me       me      you     it       >],
+                            plural   => [qw<   us       us      you     them     >],
+                       },
+            you        => { number => 'singular', person => 2,
+                            singular => [qw<   you      me      you     it       >],
+                            plural   => [qw<   you      us      you     them     >],
+                       },
+            her        => { number => 'singular', person => 3,
+                            singular => [qw<   her      me      you     her      >],
+                            plural   => [qw<   them     us      you     them     >],
+                       },
+            him        => { number => 'singular', person => 3,
+                            singular => [qw<   him      me      you     him      >],
+                            plural   => [qw<   them     us      you     them     >],
+                       },
+            it         => { number => 'singular', person => 3,
+                            singular => [qw<   it       me      you     it       >],
+                            plural   => [qw<   them     us      you     them     >],
+                       },
+            one        => { number => 'singular', person => 3,
+                            singular => [qw<   one      me      you     one      >],
+                            plural   => [qw<   some     us      you     some     >],
+                       },
+            us         => { number => 'plural', person => 1,
+                            singular => [qw<   me       me      you     it       >],
+                            plural   => [qw<   us       us      you     them     >],
+                       },
+            them       => { number => 'plural', person => 3,
+                            singular => [qw<   it       me      you     it       >],
+                            plural   => [qw<   them     us      you     them     >],
+                       },
+            this       => { number => 'singular', person => 3,
+                            singular => [qw<   this     this    this    this     >],
+                            plural   => [qw<   these    these   these   these    >],
+                       },
+            that       => { number => 'singular', person => 3,
+                            singular => [qw<   that     that    that    that     >],
+                            plural   => [qw<   those    those   those   those    >],
+                       },
+            these      => { number => 'plural', person => 3,
+                            singular => [qw<   this     this    this    this     >],
+                            plural   => [qw<   these    these   these   these    >],
+                       },
+            those      => { number => 'plural', person => 3,
+                            singular => [qw<   that     that    that    that     >],
+                            plural   => [qw<   those    those   those   those    >],
+                       },
+            whom       => { number => 'singular', person => 3,
+                            singular => [qw<   whom     whom    whom    whom     >],
+                            plural   => [qw<   whom     whom    whom    whom     >],
+                       },
+            whomever   => { number => 'singular', person => 3,
+                            singular => [qw<   whomever  whomever whomever whomever  >],
+                            plural   => [qw<   whomever  whomever whomever whomever  >],
+                       },
+            whomsoever => { number => 'singular', person => 3,
+                            singular => [qw<   whomsoever whomsoever whomsoever whomsoever  >],
+                            plural   => [qw<   whomsoever whomsoever whomsoever whomsoever  >],
+                       },
         },
     possessive => {
-            mine    => { singular => [qw<   mine     mine    yours   its      >],
-                         plural   => [qw<   ours     ours    yours   theirs   >],
-                    },
-            yours   => { singular => [qw<   yours    mine    yours   its      >],
-                         plural   => [qw<   yours    ours    yours   theirs   >],
-                    },
-            hers    => { singular => [qw<   hers     mine    yours   hers     >],
-                         plural   => [qw<   theirs   ours    yours   theirs   >],
-                    },
-            his     => { singular => [qw<   his      mine    yours   his      >],
-                         plural   => [qw<   theirs   ours    yours   theirs   >],
-                    },
-            its     => { singular => [qw<   its      mine    yours   its      >],
-                         plural   => [qw<   theirs   ours    yours   theirs   >],
-                    },
-            ours    => { singular => [qw<   mine     mine    yours   its      >],
-                         plural   => [qw<   ours     ours    yours   theirs   >],
-                    },
-            theirs  => { singular => [qw<   its      mine    yours   its      >],
-                         plural   => [qw<   theirs   ours    yours   theirs   >],
-                    },
+            mine       => { number => 'singular', person => 1,
+                            singular => [qw<   mine     mine    yours   its      >],
+                            plural   => [qw<   ours     ours    yours   theirs   >],
+                       },
+            yours      => { number => 'singular', person => 2,
+                            singular => [qw<   yours    mine    yours   its      >],
+                            plural   => [qw<   yours    ours    yours   theirs   >],
+                       },
+            hers       => { number => 'singular', person => 3,
+                            singular => [qw<   hers     mine    yours   hers     >],
+                            plural   => [qw<   theirs   ours    yours   theirs   >],
+                       },
+            his        => { number => 'singular', person => 3,
+                            singular => [qw<   his      mine    yours   his      >],
+                            plural   => [qw<   theirs   ours    yours   theirs   >],
+                       },
+            its        => { number => 'singular', person => 3,
+                            singular => [qw<   its      mine    yours   its      >],
+                            plural   => [qw<   theirs   ours    yours   theirs   >],
+                       },
+            "one's"    => { number => 'singular', person => 3,
+                            singular => [qw<   one's    mine    yours   one's    >],
+                            plural   => [qw<   theirs   ours    yours   theirs   >],
+                       },
+            ours       => { number => 'plural', person => 1,
+                            singular => [qw<   mine     mine    yours   its      >],
+                            plural   => [qw<   ours     ours    yours   theirs   >],
+                       },
+            theirs     => { number => 'plural', person => 3,
+                            singular => [qw<   its      mine    yours   its      >],
+                            plural   => [qw<   theirs   ours    yours   theirs   >],
+                       },
+            whose      => { number => 'singular', person => 3,
+                            singular => [qw<   whose    whose   whose   whose    >],
+                            plural   => [qw<   whose    whose   whose   whose    >],
+                       },
+            whosever   => { number => 'singular', person => 3,
+                            singular => [qw<   whosever whosever whosever whosever >],
+                            plural   => [qw<   whosever whosever whosever whosever >],
+                       },
+            whosesoever=> { number => 'singular', person => 3,
+                            singular => [qw<   whosesoever whosesoever whosesoever whosesoever >],
+                            plural   => [qw<   whosesoever whosesoever whosesoever whosesoever >],
+                       },
+        },
+    reflexive  => {
+            myself     => { number => 'singular', person => 1,
+                            singular => [qw<   myself     myself     yourself    itself      >],
+                            plural   => [qw<   ourselves  ourselves  yourselves  themselves  >],
+                       },
+            yourself   => { number => 'singular', person => 2,
+                            singular => [qw<   yourself   myself     yourself    itself      >],
+                            plural   => [qw<   yourselves ourselves  yourselves  themselves  >],
+                       },
+            herself    => { number => 'singular', person => 3,
+                            singular => [qw<   herself    myself     yourself    herself     >],
+                            plural   => [qw<   themselves ourselves  yourselves  themselves  >],
+                       },
+            himself    => { number => 'singular', person => 3,
+                            singular => [qw<   himself    myself     yourself    himself     >],
+                            plural   => [qw<   themselves ourselves  yourselves  themselves  >],
+                       },
+            themself   => { number => 'singular', person => 3,
+                            singular => [qw<   themselves myself     yourself    themselves  >],
+                            plural   => [qw<   themselves ourselves  yourselves  themselves  >],
+                       },
+            itself     => { number => 'singular', person => 3,
+                            singular => [qw<   itself     myself     yourself    itself      >],
+                            plural   => [qw<   themselves ourselves  yourselves  themselves  >],
+                       },
+            oneself    => { number => 'singular', person => 3,
+                            singular => [qw<   oneself    myself     yourself    oneself     >],
+                            plural   => [qw<   oneselves  ourselves  yourselves  oneselves   >],
+                       },
+            ourselves  => { number => 'plural', person => 1,
+                            singular => [qw<   myself     myself     yourself    itself      >],
+                            plural   => [qw<   ourselves  ourselves  yourselves  themselves  >],
+                       },
+            yourselves => { number => 'plural', person => 2,
+                            singular => [qw<   yourself   myself     yourself    itself      >],
+                            plural   => [qw<   yourselves ourselves  yourselves  themselves  >],
+                       },
+            themselves => { number => 'plural', person => 3,
+                            singular => [qw<   themselves myself     yourself    themselves  >],
+                            plural   => [qw<   themselves ourselves  yourselves  themselves  >],
+                       },
+            oneselves  => { number => 'plural', person => 3,
+                            singular => [qw<   oneself    myself     yourself    oneself     >],
+                            plural   => [qw<   oneselves  ourselves  yourselves  oneselves   >],
+                       },
         },
 );
 
 my $PREP_PAT = qr{ about   | above   | across  | after  | among   | around   | athwart
                  | at      | before  | behind  | below  | beneath | besides?
-                 | between | betwixt | beyond  | but    | by      | during 
+                 | between | betwixt | beyond  | but    | by      | during
                  | except  | for     | from    | into   | in      | near     | off
                  | of      | onto    | on      | out    | over    | since    | till
                  | to      | under   | until   | unto   | upon    | within   | without | with
@@ -208,24 +356,25 @@ sub singular {
 
     my $term = $term_of{$self};
 
-    # Prepositions imply accusative or possessive (or dative)...
+    # Prepositions imply objective or possessive...
     my $preposition = $term =~ s{ \A ( \s* $PREP_PAT \s+ ) }{}xi ? $1 : q{};
-    if ($preposition) {
-        return $preposition
-            . $encase->( $term,
-                    $noun_inflexion_of{accusative}{lc $term}{singular}[$person]
-                 // $noun_inflexion_of{possessive}{lc $term}{singular}[$person]
-                 // $noun_inflexion_of{nominative}{lc $term}{singular}[$person]
-                 // Lingua::EN::Inflexion::Nouns::convert_to_singular( $term, $person )
-            );
-    }
 
-    return $encase->( $term,
-                $noun_inflexion_of{nominative}{lc $term}{singular}[$person]
-             // $noun_inflexion_of{accusative}{lc $term}{singular}[$person]
-             // $noun_inflexion_of{possessive}{lc $term}{singular}[$person]
-             // Lingua::EN::Inflexion::Nouns::convert_to_singular( $term, $person )
-           );
+    return
+        $preposition ?   $preposition
+                       . $encase->( $term,
+                               $noun_inflexion_of{objective }{lc $term}{singular}[$person]
+                            // $noun_inflexion_of{possessive}{lc $term}{singular}[$person]
+                            // $noun_inflexion_of{reflexive }{lc $term}{singular}[$person]
+                            // $noun_inflexion_of{nominative}{lc $term}{singular}[$person]
+                            // Lingua::EN::Inflexion::Nouns::convert_to_singular( $term, $person )
+                         )
+                     :   $encase->( $term,
+                               $noun_inflexion_of{nominative}{lc $term}{singular}[$person]
+                            // $noun_inflexion_of{objective }{lc $term}{singular}[$person]
+                            // $noun_inflexion_of{possessive}{lc $term}{singular}[$person]
+                            // $noun_inflexion_of{reflexive }{lc $term}{singular}[$person]
+                            // Lingua::EN::Inflexion::Nouns::convert_to_singular( $term, $person )
+                         );
 }
 
 
@@ -235,29 +384,25 @@ sub plural {
 
     my $term = $term_of{$self};
 
-    # Prepositions imply accusative or possessive (or dative)...
+    # Prepositions imply objective or possessive (or dative)...
     my $preposition = $term =~ s{ \A ( \s* $PREP_PAT \s+ ) }{}xi ? $1 : q{};
-    if ($preposition) {
-        return $preposition
-            . $encase->( $term,
-                    $noun_inflexion_of{accusative}{lc $term}{plural}[$person]
-                 // $noun_inflexion_of{possessive}{lc $term}{plural}[$person]
-                 // $noun_inflexion_of{nominative}{lc $term}{plural}[$person]
-                 // Lingua::EN::Inflexion::Nouns::convert_to_modern_plural( $term, $person )
-            );
-    }
 
-    return $encase->( $term,
-                $noun_inflexion_of{nominative}{lc $term}{plural}[$person]
-             // $noun_inflexion_of{accusative}{lc $term}{plural}[$person]
-             // $noun_inflexion_of{possessive}{lc $term}{plural}[$person]
-             // Lingua::EN::Inflexion::Nouns::convert_to_modern_plural( $term, $person )
-           );
-    return $preposition
-         . $encase->( $term,
-           $noun_inflexion_of{lc $term}{plural}[$person]
-        // Lingua::EN::Inflexion::Nouns::convert_to_modern_plural( $term, $person)
-    );
+    return
+          $preposition ?   $preposition
+                         . $encase->( $term,
+                                $noun_inflexion_of{objective }{lc $term}{plural}[$person]
+                             // $noun_inflexion_of{possessive}{lc $term}{plural}[$person]
+                             // $noun_inflexion_of{reflexive }{lc $term}{plural}[$person]
+                             // $noun_inflexion_of{nominative}{lc $term}{plural}[$person]
+                             // Lingua::EN::Inflexion::Nouns::convert_to_modern_plural($term,$person)
+                           )
+                       :   $encase->( $term,
+                                $noun_inflexion_of{nominative}{lc $term}{plural}[$person]
+                             // $noun_inflexion_of{objective }{lc $term}{plural}[$person]
+                             // $noun_inflexion_of{possessive}{lc $term}{plural}[$person]
+                             // $noun_inflexion_of{reflexive }{lc $term}{plural}[$person]
+                             // Lingua::EN::Inflexion::Nouns::convert_to_modern_plural($term,$person)
+                           );
 }
 
 
@@ -380,8 +525,8 @@ sub new {
 
     # Special case of "them" (because "it" -> "they" and "it -> "them" are ambiguous)...
     $term_of{$new_object}
-        = $term_of{$orig_object} eq 'them' ? $term_of{$orig_object}
-        :                                    $orig_object->singular;
+         = $term_of{$orig_object} eq 'them' ? $term_of{$orig_object}
+         :                                    $orig_object->singular;
 
     # Otherwise...
 
@@ -398,10 +543,10 @@ sub plural {
     my $term = $term_of{$self};
 
     return $encase->(
-        $term,
-           $noun_inflexion_of{lc $term}{plural}[$person]
-        // Lingua::EN::Inflexion::Nouns::convert_to_classical_plural($term, $person)
-    );
+                $term,
+                $noun_inflexion_of{lc $term}{plural}[$person]
+                // Lingua::EN::Inflexion::Nouns::convert_to_classical_plural($term, $person)
+           );
 }
 
 package Lingua::EN::Inflexion::Verb;
@@ -473,22 +618,26 @@ sub is_verb { 1 }
 sub singular {
     my $self   = shift;
     my $person = shift // 0;
+    my $term = $term_of{$self};
+
+    # Find the right inflexion...
+    my $inflexion;
 
     # "To be" is special...
     if ($self =~ m{ \A (?: is | am | are ) \Z }x) {
-        return $person == 0                         ? $term_of{$self}
+        return $person == 0                         ? $term
              : $person == 2 || !$self->is_singular  ? 'are'
              : $person == 1                         ? 'am'
              :                                        'is'
     }
 
     # Third person uses the "notional" singular inflexion...
-    if ($person == 3 || $person == 0) {
+    elsif ($person == 3 || $person == 0) {
         # Is it a known inflexion???
-        my $inflexion = Lingua::EN::Inflexion::Verbs::convert_to_singular( $term_of{$self} );
+        my $known = Lingua::EN::Inflexion::Verbs::convert_to_singular( $term );
 
         # Return with case-following...
-        return $encase->( $term_of{$self}, $inflexion eq '_' ? $term_of{$self} : $inflexion );
+        return $encase->( $term, $known eq '_' ? $term : $known );
     }
 
     # First and second person always use the uninflected (i.e. "notional "plural" form)...
@@ -499,12 +648,13 @@ sub singular {
 
 sub plural {
     my ($self) = @_;
+    my $term = $term_of{$self};
 
     # Is it a known inflexion???
-    my $inflexion = Lingua::EN::Inflexion::Verbs::convert_to_plural( $term_of{$self} );
+    my $known = Lingua::EN::Inflexion::Verbs::convert_to_plural( $term );
 
     # Return with case-following...
-    return $encase->( $term_of{$self}, $inflexion eq '_' ? $term_of{$self} : $inflexion );
+    return $encase->( $term, $known eq '_' ? $term : $known );
 }
 
 sub past {
@@ -668,6 +818,7 @@ sub singular {
     my $term = $term_of{$self};
 
     # Is it a composite possessive form???
+    my $singular;
     if ($term =~ m{ \A (.*) 's? \Z }ixms) {
         $singular = Lingua::EN::Inflexion::Noun->new($1)->singular . q{'s};
     }

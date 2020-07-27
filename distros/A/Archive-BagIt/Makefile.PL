@@ -34,7 +34,6 @@ my %WriteMakefileArgs = (
     "String::CRC32" => 0,
     "Sub::Quote" => 0,
     "Time::HiRes" => 0,
-    "diagnostics" => 0,
     "namespace::autoclean" => 0,
     "open" => 0,
     "parent" => 0,
@@ -56,7 +55,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.058",
+  "VERSION" => "0.059",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -91,7 +90,6 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Test::Warnings" => 0,
   "Time::HiRes" => 0,
-  "diagnostics" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,
   "open" => 0,

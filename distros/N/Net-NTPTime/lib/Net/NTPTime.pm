@@ -5,7 +5,7 @@ use base qw(Exporter);
 
 our @EXPORT = qw(get_ntp_time get_unix_time);
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub get_ntp_time
 {
@@ -63,6 +63,8 @@ You may include a specific NTP server to ping, or a default server will be used.
 1.01 - Bug fix (changed "require Socket" to "use Socket")
 
 1.02 - Fixed this POD document
+
+1.03 - More documentation fixes
 
 =head1 Author
 

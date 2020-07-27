@@ -26,6 +26,7 @@ our @IGNORE =
 
 =head1 SYNOPSIS
 
+  use lib '.';
   use inc::Module::Install;
 
   name 'MyApp';

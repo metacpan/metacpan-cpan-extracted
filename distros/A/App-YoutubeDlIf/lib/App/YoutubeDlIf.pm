@@ -1,9 +1,9 @@
 package App::YoutubeDlIf;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-12'; # DATE
+our $DATE = '2020-04-19'; # DATE
 our $DIST = 'App-YoutubeDlIf'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -15,6 +15,75 @@ use Regexp::Pattern::YouTube;
 use YouTube::Util;
 
 our %SPEC;
+
+our %args_common = (
+    urls_or_ids => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'url_or_id',
+        schema => ['array*', of=>'str*', min_len=>1],
+        req => 1,
+        pos => 0,
+        greedy => 1,
+    },
+    log_file => {
+        summary => 'File that contains list of download filenames',
+        schema => 'str*', # XXX filename
+        default => do {
+            my $path;
+            my @paths = (
+                "$ENV{HOME}/notes/download-logs.org",
+                "$ENV{HOME}/download-logs.org",
+            );
+            for my $p (@paths) {
+                if (-f $p) {
+                    $path = $p; last;
+                }
+            }
+            die "Cannot find download log file, please specify using ".
+                "--log-file or put the log file in one of: ".
+                (join ", ", @paths) unless $path;
+            $path;
+        },
+    },
+    if_duration_not_shorter_than => {
+        #schema => 'duration*', # XXX duration coercer parses 01:00 as 1 hour 0 minutes instead of 1 minute 0 seconds
+        schema => 'str*',
+        tags => ['category:filtering'],
+    },
+    if_duration_not_longer_than => {
+        #schema => 'duration*',
+        schema => 'str*',
+        tags => ['category:filtering'],
+    },
+);
+
+our %arg_if_not_yet = (
+    if_not_yet => {
+        summary => 'If set, only download videos that are not yet downloaded',
+        schema => 'bool',
+        description => <<'_',
+
+When set to true, youtube-dl-if will first extract downloaded video ID's from
+filenames or URL's or video ID's listed in a text file (specified via
+`--log-file`), e.g.:
+
+    35682594        Table Tennis Shots- If Were Not Filmed, Nobody Would Believe [HD]-dUjxqFbWzQo.mp4       date:[2019-12-29 ]
+
+or:
+
+    https://www.youtube.com/embed/U9v2S49sHeQ?rel=0
+
+or:
+
+    U9v2S49sHeQ
+
+When a video ID is found then it is assumed to be already downloaded in the past
+and will not be downloaded again.
+
+_
+        tags => ['category:filtering'],
+    },
+);
 
 sub _search_id_in_log_file {
     my ($id, $path) = @_;
@@ -55,69 +124,8 @@ This is a wrapper for **youtube-dl**.
 
 _
     args => {
-        urls_or_ids => {
-            'x.name.is_plural' => 1,
-            'x.name.singular' => 'url_or_id',
-            schema => ['array*', of=>'str*', min_len=>1],
-            req => 1,
-            pos => 0,
-            greedy => 1,
-        },
-        log_file => {
-            summary => 'File that contains list of download filenames',
-            schema => 'str*', # XXX filename
-            default => do {
-                my $path;
-                my @paths = (
-                    "$ENV{HOME}/notes/download-logs.org",
-                    "$ENV{HOME}/download-logs.org",
-                );
-                for my $p (@paths) {
-                    if (-f $p) {
-                        $path = $p; last;
-                    }
-                }
-                die "Cannot find download log file, please specify using ".
-                    "--log-file or put the log file in one of: ".
-                    (join ", ", @paths) unless $path;
-                $path;
-            },
-        },
-        if_not_yet => {
-            summary => 'If set, only download videos that are not yet downloaded',
-            schema => 'bool',
-            description => <<'_',
-
-When set to true, youtube-dl-if will first extract downloaded video ID's from
-filenames or URL's or video ID's listed in a text file (specified via
-`--log-file`), e.g.:
-
-    35682594        Table Tennis Shots- If Were Not Filmed, Nobody Would Believe [HD]-dUjxqFbWzQo.mp4       date:[2019-12-29 ]
-
-or:
-
-    https://www.youtube.com/embed/U9v2S49sHeQ?rel=0
-
-or:
-
-    U9v2S49sHeQ
-
-When a video ID is found then it is assumed to be already downloaded in the past
-and will not be downloaded again.
-
-_
-            tags => ['category:filtering'],
-        },
-        if_duration_not_shorter_than => {
-            #schema => 'duration*', # XXX duration coercer parses 01:00 as 1 hour 0 minutes instead of 1 minute 0 seconds
-            schema => 'str*',
-            tags => ['category:filtering'],
-        },
-        if_duration_not_longer_than => {
-            #schema => 'duration*',
-            schema => 'str*',
-            tags => ['category:filtering'],
-        },
+        %args_common,
+        %arg_if_not_yet,
     },
     args_rels => {
         #dep_any => [log_file => ['if_not_yet']], # XXX currently will fail if if_not_yet not specified because of the log_file's default
@@ -174,6 +182,30 @@ sub youtube_dl_if {
     [200];
 }
 
+$SPEC{youtube_dl_if_not_yet} = {
+    v => 1.1,
+    summary => 'Download videos using youtube-dl if not already downloaded',
+    description => <<'_',
+
+This is a shortcut for:
+
+    % youtube-dl-if --if-not-yet ...
+
+_
+    args => {
+        %args_common,
+    },
+    args_rels => {
+    },
+    deps => {
+        prog => 'youtube-dl',
+    },
+};
+sub youtube_dl_if_not_yet {
+    my %args = @_;
+    youtube_dl_if(if_not_yet=>1, %args);
+}
+
 1;
 # ABSTRACT: Download videos using youtube-dl with extra selection/filtering
 
@@ -189,7 +221,7 @@ App::YoutubeDlIf - Download videos using youtube-dl with extra selection/filteri
 
 =head1 VERSION
 
-This document describes version 0.002 of App::YoutubeDlIf (from Perl distribution App-YoutubeDlIf), released on 2020-04-12.
+This document describes version 0.003 of App::YoutubeDlIf (from Perl distribution App-YoutubeDlIf), released on 2020-04-19.
 
 =head1 DESCRIPTION
 
@@ -236,6 +268,50 @@ or:
 
 When a video ID is found then it is assumed to be already downloaded in the past
 and will not be downloaded again.
+
+=item * B<log_file> => I<str> (default: "/home/s1/notes/download-logs.org")
+
+File that contains list of download filenames.
+
+=item * B<urls_or_ids>* => I<array[str]>
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 youtube_dl_if_not_yet
+
+Usage:
+
+ youtube_dl_if_not_yet(%args) -> [status, msg, payload, meta]
+
+Download videos using youtube-dl if not already downloaded.
+
+This is a shortcut for:
+
+ % youtube-dl-if --if-not-yet ...
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<if_duration_not_longer_than> => I<str>
+
+=item * B<if_duration_not_shorter_than> => I<str>
 
 =item * B<log_file> => I<str> (default: "/home/s1/notes/download-logs.org")
 

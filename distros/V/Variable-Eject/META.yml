@@ -3,26 +3,26 @@ abstract: 'Eject variables from hash to current namespace'
 author:
   - 'Mons Anderson <mons@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  Test::If: '0'
-  Test::More: '0'
-  lib::abs: '0.9'
+  ExtUtils::MakeMaker: 0
+  Test::If: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+  lib::abs: 0.9
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Variable-Eject
 no_index:
   directory:
     - t
     - inc
 requires:
-  Devel::Declare: '0.005011'
-  Lexical::Alias: '0.04'
-  uni::perl: '0.03'
-version: '0.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  Devel::Declare: 0.005011
+  Lexical::Alias: 0.04
+  uni::perl: 0.03
+version: 0.04

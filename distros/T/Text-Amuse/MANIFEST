@@ -36,6 +36,9 @@ t/header-defined.t
 t/headers.t
 t/hyphenation.t
 t/images.t
+t/include/pippo.muse
+t/include/pippo.txt
+t/includes.t
 t/inline-elements.t
 t/inline-markup.t
 t/internal-linking.t

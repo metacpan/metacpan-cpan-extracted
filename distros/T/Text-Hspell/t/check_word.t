@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
-use Text::Hspell v0.2.3;
+use Text::Hspell v0.4.0;
 
 {
 
@@ -21,6 +21,19 @@ use Text::Hspell v0.2.3;
     # TEST
     ok(
         scalar( !( $obj->check_word("םץףללללללללללללללל") ) ),
-        "word is a mispelling"
+        "word is a misspelling",
+    );
+    if (0)
+    {
+        diag( join ",", @{ $obj->try_to_correct_word("שולת") } );
+    }
+
+    # TEST
+    is_deeply(
+        [
+            grep { $_ eq "שולט" } @{ $obj->try_to_correct_word("שולת") }
+        ],
+        ["שולט"],
+        "spelling suggestion is ok"
     );
 }

@@ -1,0 +1,105 @@
+#!perl
+use 5.008001;
+use strict;
+use warnings;
+use App::UpdateCPANfile;
+
+use Getopt::Long qw(:config posix_default no_ignore_case pass_through);
+
+my @first_arguments;
+while (defined $ARGV[0] && $ARGV[0] =~ /^[^-]/) {
+    push @first_arguments, shift @ARGV;
+}
+
+GetOptions(
+    \my %options, qw{
+    limit=n
+    filter=s
+    ignore-filter=s
+});
+
+my @rest_arguments = @ARGV;
+
+my ($command, $cpanfile, $cpanfile_snapshot) = (@first_arguments, @rest_arguments);
+
+my $app = App::UpdateCPANfile->new($cpanfile, $cpanfile_snapshot, \%options);
+
+my $method = {
+    pin => 'pin_dependencies',
+    update => 'update_dependencies',
+}->{$command // ''};
+
+if ($method) {
+    $app->$method;
+    exit 0;
+} else {
+    warn <<'HELP';
+Usage
+Pin Dependencies:    update-cpanfile pin $PATH_TO_CPANFILE$PATH_TO_CPANFILE_SNAPSHOT
+Update Dependencies: update-cpanfile update$PATH_TO_CPANFILE
+HELP
+    exit 1;
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+update-cpanfile - cpanfile updater
+
+=head1 SYNOPSIS
+
+update-cpanfile has two sub commands.
+
+    $ update-cpanfile pin
+    $ update-cpanfile update
+
+=head1 PIN
+
+Pin command aligns the package versions in cpanfile to versions in cpanfile.snapshot.
+This operation has no side effects for your project's execution environment, so it is useful to pin the versions before update packages.
+
+    $ update-cpanfile pin $PATH_TO_CPANFILE $PATH_TO_CPANFILE_SNAPSHOT
+
+=head1 UPDATE
+
+    $ update-cpanfile update $PATH_TO_CPANFILE
+
+Update command updates the package versions in cpanfile to latest versions in 02packages.txt.
+With this command, you can make your dependant libraries latest.
+You may run this command from CI, and create Pull Request when there are some diffs.
+
+Update policy is below.
+
+=over 4
+
+=item * The item is listed in cpanfile.
+
+=item * The item is not a core module.
+
+=item * The item is not a perl.
+
+=back
+
+=head1 TARGET PROJECT
+
+By default, update-cpanfile updates cpanfile in current diretory.
+To execute for other project in directory, you can specify path of cpanfile and cpanfile.snapshot.
+
+    $ update-cpanfile pin <path_to_cpanfile> <path_to_cpanfile.snapshot>
+    $ update-cpanfile update <path_to_cpanfile>
+
+=head1 OPTIONS
+
+=over 4
+
+=item * --limit=n
+
+=item * --filter=FILTER
+
+=item * --ignore-filter=FILTER
+
+=back
+

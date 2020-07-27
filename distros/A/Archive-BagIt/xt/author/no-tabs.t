@@ -25,6 +25,7 @@ my @files = (
     't/dotbagit.t',
     't/fast.t',
     't/manifest.t',
+    't/parallel.t',
     't/payload_files.t',
     't/pod-coverage.t',
     't/pod.t',

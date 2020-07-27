@@ -3,32 +3,14 @@ package Net::Curl::Promiser::LoopBase;
 use strict;
 use warnings;
 
-=encoding utf-8
-
 =head1 NAME
 
-Net::Curl::Promiser::LoopBase - base class for event-loop-based implementations
+Net::Curl::Promiser::LoopBase - Base class for event-loop-based implementations
 
-=head1 INVALID METHODS
+=head1 DESCRIPTION
 
-The following methods from L<Net::Curl::Promiser> are unneeded in instances
-of this class and thus produce an exception if called:
-
-=over
-
-=item C<process()>
-
-=item C<time_out()>
-
-=item C<get_timeout()>
-
-=back
-
-=head1 TODO
-
-This is a rather hacky way accomplish this. Refactor it to be more-better.
-
-Also incorporate the copy-pasted timeout logic from subclasses.
+This subclass of L<Net::Curl::Promiser> provides abstract behaviors for
+event loops. It doesn’t change the interface.
 
 =cut
 
@@ -36,43 +18,39 @@ Also incorporate the copy-pasted timeout logic from subclasses.
 
 use parent qw( Net::Curl::Promiser );
 
-use Net::Curl ();
+use Net::Curl::Multi ();
 
 #----------------------------------------------------------------------
 
-*_process_in_loop = __PACKAGE__->can('SUPER::process');
-*_time_out_in_loop = __PACKAGE__->can('SUPER::time_out');
+sub new {
+    my $self = shift()->SUPER::new(@_);
 
-# 7.66 is observed not to have this problem;
-# assumedly newer libcurls won’t regress.
-use constant _MINIMUM_LIBCURL_TO_WARN_ABOUT_EXTRA_STOP_POLL => 7.52;
+    my ($backend, $multi) = @{$self}{'backend', 'multi'};
 
-sub process { die 'Unneeded method: ' . (caller 0)[3] };
-sub get_timeout { die 'Unneeded method: ' . (caller 0)[3] };
-sub time_out { die 'Unneeded method: ' . (caller 0)[3] };
+    $multi->setopt(
+        Net::Curl::Multi::CURLMOPT_TIMERDATA(),
+        $backend,
+    );
+
+    $multi->setopt(
+        Net::Curl::Multi::CURLMOPT_TIMERFUNCTION(),
+        $backend->can('_CB_TIMER'),
+    );
+
+    return $self;
+}
+
+sub _SETOPT_FORBIDDEN {
+    my ($self_or_class) = @_;
+
+    return (
+        $self_or_class->SUPER::_SETOPT_FORBIDDEN(),
+        qw( TIMERFUNCTION  TIMERDATA ),
+    );
+}
 
 sub _GET_FD_ACTION {
     return +{ @{ $_[1] } };
-}
-
-sub _handle_extra_stop_poll {
-    my ($self, $fd) = @_;
-
-    if (Net::Curl::Promiser::_DEBUG) {
-        my $version = Net::Curl::LIBCURL_VERSION();
-
-        if ( $version =~ m<\A([0-9]+\.[0-9]+)> ) {
-            if ($1 >= _MINIMUM_LIBCURL_TO_WARN_ABOUT_EXTRA_STOP_POLL) {
-                my $ref = ref $self;
-                warn "$ref: Unexpected “extra” FD stop (libcurl $version): [$fd]";
-            }
-        }
-        else {
-            warn "Unparseable LIBCURL_VERSION: [$version]";
-        }
-    }
-
-    return;
 }
 
 1;

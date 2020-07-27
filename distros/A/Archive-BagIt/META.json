@@ -73,7 +73,6 @@
             "String::CRC32" : "0",
             "Sub::Quote" : "0",
             "Time::HiRes" : "0",
-            "diagnostics" : "0",
             "namespace::autoclean" : "0",
             "open" : "0",
             "parent" : "0",
@@ -113,7 +112,7 @@
          "web" : "https://github.com/Archive-BagIt"
       }
    },
-   "version" : "0.058",
+   "version" : "0.059",
    "x_contributors" : [
       "Andreas Romeyke <art1@andreas-romeyke.de>",
       "Michiel Beijen <michiel.beijen@gmail.com>",

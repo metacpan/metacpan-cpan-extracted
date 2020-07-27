@@ -216,7 +216,7 @@ sub set {
     my $col_sep = ' ';
     $sql->{set_args} = [];
     $sql->{set_stmt} = "SET";
-    my @bu;
+    my @bu_col;
     my @pre = ( undef, $sf->{i}{ok} );
 
     COL: while ( 1 ) {
@@ -227,8 +227,8 @@ sub set {
             { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $quote_col ) {
-            if ( @bu ) {
-                ( $sql->{set_stmt}, $sql->{set_args}, $col_sep ) = @{pop @bu};
+            if ( @bu_col ) {
+                ( $sql->{set_stmt}, $sql->{set_args}, $col_sep ) = @{pop @bu_col};
                 next COL;
             }
             return;
@@ -239,14 +239,14 @@ sub set {
             }
             return 1;
         }
-        push @bu, [ $sql->{set_stmt}, [@{$sql->{set_args}}], $col_sep ];
+        push @bu_col, [ $sql->{set_stmt}, [@{$sql->{set_args}}], $col_sep ];
         $sql->{set_stmt} .= $col_sep . $quote_col;
 
         OPERATOR: while ( 1 ) {
             my $bu_op = [ $sql->{set_stmt}, [@{$sql->{set_args}}] ];
             my ( $op, $is_complex_value ) = $so->choose_and_add_operator( $sql, $clause, $quote_col );
             if ( ! defined $op ) {
-                ( $sql->{set_stmt}, $sql->{set_args}, $col_sep ) = @{pop @bu};
+                ( $sql->{set_stmt}, $sql->{set_args}, $col_sep ) = @{pop @bu_col};
                 next COL;
             }
 
@@ -325,7 +325,7 @@ sub where {
             push @bu_col, [ $sql->{where_stmt}, [@{$sql->{where_args}}], $AND_OR, $unclosed, $count ];
             $sql->{where_stmt} .= " )";
             $unclosed--;
-            next WHERE;
+            next COL;
         }
         if ( $count > 0 && $sql->{where_stmt} !~ /\(\z/ ) { #
             $ax->print_sql( $sql );
@@ -438,7 +438,7 @@ sub having {
     $sql->{having_stmt} = "HAVING";
     my $unclosed = 0;
     my $count = 0;
-    my @bu;
+    my @bu_col;
 
     COL: while ( 1 ) {
         my @choices = (
@@ -455,8 +455,8 @@ sub having {
             { %{$sf->{i}{lyt_h}} }
         );
         if ( ! defined $aggr ) {
-            if ( @bu ) {
-                ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu};
+            if ( @bu_col ) {
+                ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu_col};
                 next COL;
             }
             return;
@@ -472,7 +472,7 @@ sub having {
             return 1;
         }
         if ( $aggr eq ')' ) {
-            push @bu, [ $sql->{having_stmt}, [@{$sql->{having_args}}], $AND_OR, $unclosed, $count ];
+            push @bu_col, [ $sql->{having_stmt}, [@{$sql->{having_args}}], $AND_OR, $unclosed, $count ];
             $sql->{having_stmt} .= ")";
             $unclosed--;
             next COL;
@@ -490,17 +490,17 @@ sub having {
             $AND_OR = ' ' . $AND_OR;
         }
         if ( $aggr eq '(' ) {
-            push @bu, [ $sql->{having_stmt}, [@{$sql->{having_args}}], $AND_OR, $unclosed, $count ];
+            push @bu_col, [ $sql->{having_stmt}, [@{$sql->{having_args}}], $AND_OR, $unclosed, $count ];
             $sql->{having_stmt} .= $AND_OR . " (";
             $AND_OR = '';
             $unclosed++;
             next COL;
         }
-        push @bu, [ $sql->{having_stmt}, [@{$sql->{having_args}}], $AND_OR, $unclosed, $count ];
+        push @bu_col, [ $sql->{having_stmt}, [@{$sql->{having_args}}], $AND_OR, $unclosed, $count ];
         $sql->{having_stmt} .= $AND_OR;
         my $quote_aggr = $so->build_having_col( $sql, $aggr );
         if ( ! defined $quote_aggr ) {
-            ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu};
+            ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu_col};
             next COL;
         }
 
@@ -508,7 +508,7 @@ sub having {
             my $bu_op = [ $sql->{having_stmt}, [@{$sql->{having_args}}] ];
             my ( $op, $is_complex_value ) = $so->choose_and_add_operator( $sql, $clause, $quote_aggr );
             if ( ! defined $op ) {
-                ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu};
+                ( $sql->{having_stmt}, $sql->{having_args}, $AND_OR, $unclosed, $count ) = @{pop @bu_col};
                 next COL;
             }
 

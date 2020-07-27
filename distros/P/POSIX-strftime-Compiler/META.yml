@@ -5,9 +5,9 @@ author:
 build_requires:
   Test::More: '0.98'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   POSIX::strftime::Compiler:
     file: lib/POSIX/strftime/Compiler.pm
-    version: '0.42'
+    version: '0.43'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -37,7 +37,9 @@ resources:
   bugtracker: https://github.com/kazeburo/POSIX-strftime-Compiler/issues
   homepage: https://github.com/kazeburo/POSIX-strftime-Compiler
   repository: git://github.com/kazeburo/POSIX-strftime-Compiler.git
-version: '0.42'
+version: '0.43'
 x_contributors:
   - 'Piotr Roszatycki <piotr.roszatycki@gmail.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  - 'Slaven Rezic <slaven.rezic@idealo.de>'
+  - 'Tom Bloor <tbsliver@shadow.cat>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

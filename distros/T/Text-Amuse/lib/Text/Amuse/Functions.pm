@@ -116,19 +116,23 @@ Same as above, but returns the L<Text::Amuse> document instead.
 =cut
 
 sub muse_to_html {
-    return _format_on_the_fly(html => shift);
+    return _format_on_the_fly(html => @_);
 }
 
 sub muse_to_tex {
-    return _format_on_the_fly(ltx => shift);
+    return _format_on_the_fly(ltx => @_);
 }
 
 sub muse_to_object {
-    return _format_on_the_fly(obj => shift);
+    return _format_on_the_fly(obj => @_);
 }
 
 sub _format_on_the_fly {
-    my ($format, $text) = @_;
+    my ($format, $text, $opts) = @_;
+    my %opt;
+    if ($opts and ref($opts) eq 'HASH') {
+        %opt = %$opts;
+    }
     my $fh = File::Temp->new(SUFFIX => '.muse');
     binmode $fh, ':encoding(utf-8)';
     if (ref $text) {
@@ -139,7 +143,7 @@ sub _format_on_the_fly {
     }
     # flush the file and close it
     close $fh;
-    my $doc = Text::Amuse->new(file => $fh->filename);
+    my $doc = Text::Amuse->new(%opt, file => $fh->filename);
     if ($format eq 'ltx') {
         return $doc->as_latex;
     }

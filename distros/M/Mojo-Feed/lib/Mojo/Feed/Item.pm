@@ -25,37 +25,29 @@ has feed => undef, weak => 1;
 has summary => sub { shift->description };
 
 my %selector = (
-  content => ['content', 'content\:encoded', 'xhtml\:body', 'description'],
+  content => ['content', 'content|encoded', 'xhtml|body', 'description'],
   description => ['description', 'summary'],
   published   => [
-    'published', 'pubDate', 'dc\:date', 'created',
+    'published', 'pubDate', 'dc|date', 'created',
     'issued',    'updated', 'modified'
   ],
-  author => ['author', 'dc\:creator'],
+  author => ['author > name', '|author', 'atom|author', 'dc|creator'],
   id     => ['id',     'guid', 'link'],
   title => ['title'],
   link  => ['link'],
   guid  => ['guid'],
 );
 
-sub _at {
-  my ($self, $selector) = @_;
-  return $self->dom->find($selector)->first(sub {
-    my $tag = $_->tag;
-    $tag =~ s/:/\\:/;
-    return $tag eq $selector;
-  });
-}
-
 foreach my $k (keys %selector) {
   has $k => sub {
     my $self = shift;
     for my $selector (@{$selector{$k}}) {
-      if (my $p = $self->_at($selector)) {
+      if (my $p = $self->dom->at($selector, %{$self->feed->namespaces})) {
         if ($k eq 'author' && $p->at('name')) {
           return trim $p->at('name')->text;
         }
-        my $text = trim ($p->text || $p->content || '');
+        my ($text) = grep $_, map trim($_), grep $_, $p->text, $p->content;
+        $text ||= '';
         if ($k eq 'published') {
           return str2time($text);
         }

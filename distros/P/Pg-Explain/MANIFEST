@@ -317,6 +317,7 @@ t/55-planning-time.d/old-xml.plan
 t/55-planning-time.d/old-yaml.expect
 t/55-planning-time.d/old-yaml.plan
 t/55-planning-time.t
+t/56-anonymize-query.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

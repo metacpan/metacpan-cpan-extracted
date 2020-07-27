@@ -7,7 +7,7 @@ use Devel::ebug::Console;
 
 # PODNAME: ebug
 # ABSTRACT: A simple, extensible console Perl debugger
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 my $backend;
 if ($ARGV[0] eq '--backend') {
@@ -30,7 +30,7 @@ ebug - A simple, extensible console Perl debugger
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 SYNOPSIS
 

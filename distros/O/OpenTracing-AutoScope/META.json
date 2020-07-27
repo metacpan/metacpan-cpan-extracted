@@ -37,6 +37,7 @@
             "OpenTracing::GlobalTracer" : "0",
             "OpenTracing::Implementation::NoOp" : "0",
             "PPI" : "0",
+            "Perl::Critic::Utils::McCabe" : "0",
             "PerlX::Maybe" : "0",
             "Scope::Context" : "0",
             "Sub::Info" : "0",
@@ -51,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.102.0",
+   "version" : "v0.104.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

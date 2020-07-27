@@ -1,12 +1,17 @@
 This file documents the revision history for Perl extension Catalyst-Devel.
 
+1.41 2020-07-27 03:00:00
+        - avoid SHILY tar headers
+        - fix warnings in Makefile.PL
+        - clean up author prereqs
+        - add perl version prereq metadata
+
 1.40 2020-02-27 17:00:00
         - Note: There may be some additional fixes not listed below.  Its been
           a while since this has been released and I noted several commits in
           git.  Did my best to list but apologies if I missed your patch.
         - Use absolute path for do $file in t/generated_app.t
         - Add . to @INC in Makefile.PL
-        - Catalyst::Restarter::Forking: clear watcher in child process
         - Typo fixes. RT#87103
         - Catalyst::Restarter::Forking: clear watcher in child process.
           RT#119830

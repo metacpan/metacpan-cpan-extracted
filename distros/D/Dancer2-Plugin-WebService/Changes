@@ -1,3 +1,19 @@
+4.3.5  2020-07-27
+
+  - Clean up code
+
+4.3.4  2020-07-26
+
+  - Rename method PosteData to PostData
+
+4.3.3  2020-07-25
+
+  - Remove debug code
+
+4.3.2  2020-07-24
+
+  - Change the identification code if a route is Protected
+
 4.3.1  2019-12-10
 
   - reply halts the route

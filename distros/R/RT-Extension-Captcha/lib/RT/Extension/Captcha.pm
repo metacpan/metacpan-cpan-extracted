@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '1.20';
+our $VERSION = '1.21';
 
 use GD::SecurityImage;
 
@@ -30,7 +30,7 @@ create) and on replies/comments (updates).
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 Add this line:
 
@@ -38,7 +38,7 @@ Add this line:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -98,7 +98,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2014 by Best Practical Solutions
+This software is Copyright (c) 2014-2020 by Best Practical Solutions
 
 This is free software, licensed under:
 

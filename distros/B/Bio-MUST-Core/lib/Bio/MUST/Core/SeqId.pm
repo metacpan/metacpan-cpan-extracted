@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.201060';
+$Bio::MUST::Core::SeqId::VERSION = '0.202070';
 use Moose;
 use namespace::autoclean;
 
@@ -200,8 +200,8 @@ const my @GENERA  => qw(
     A-2
     acetamiprid-degrading
     Activation-tagging
-    Adeno-associated
     Adeno-Associated
+    Adeno-associated
     Aids-associated
     alk-system
     Altai-like
@@ -228,6 +228,7 @@ const my @GENERA  => qw(
     ASFV-like
     Avian-like
     Avon-Heathcote
+    Aydin-like
     B-lymphotropic
     Bacteroides-like
     Banna-like
@@ -451,6 +452,7 @@ const my @GENERA  => qw(
     HCV/GBV-B
     Hedyotis-Oldenlandia
     Helper-independent
+    Hemibarbus-Squalidus
     HERV-H/env59
     HERV-H/env60
     HERV-H/env62
@@ -480,6 +482,7 @@ const my @GENERA  => qw(
     iodate-reducing
     iodide-accumulating
     iodide-oxidizing
+    IRE/CTVM19-associated
     iron-reducing
     Isosphaera-like
     Issyk-Kul
@@ -540,6 +543,7 @@ const my @GENERA  => qw(
     mini-Tn5*7-lux
     Mini-Tn7
     Mint-like
+    Mirim-like
     MLV-like
     MLV-related
     MMTV-luciferase
@@ -668,6 +672,7 @@ const my @GENERA  => qw(
     Red-bellied
     Red-capped
     Red-crowned
+    Red-eared
     Red-faced
     Red-fronted
     Red-handed
@@ -777,8 +782,8 @@ const my @GENERA  => qw(
     sulfide-oxidizing
     sulfite-reducing
     sulfo-oxidizing
-    Sulfur-oxidizing
     sulfur-oxidizing
+    Sulfur-oxidizing
     Sunn-hemp
     Synechococcus-like
     Synechocystis-like
@@ -793,6 +798,7 @@ const my @GENERA  => qw(
     Tetracycline-inducible
     Theileria-related
     Theilers-like
+    thiocyanate-degrading
     thiosulfate-disproportionating
     thiosulfate-reducing
     Thrips-associated
@@ -835,6 +841,7 @@ const my @GENERA  => qw(
     Vittaforma-like
     WA-like
     wall-less
+    Weivirus-like
     White-eye
     White-headed
     white-rot
@@ -1637,7 +1644,6 @@ const my @SPECIES => qw(
     C100_CLW
     C151_oct11_cons
     C18_CLW
-    C1BS16_pA
     C39_CLW
     C47_CLW
     C49_CLW
@@ -5121,6 +5127,20 @@ const my @SPECIES => qw(
     PGPVO_Pi4
     Ph1_Loihi
     Ph2_Loihi
+    phage_Deep-GF0-KM16-C193
+    phage_Deep1-GF2-KM23-C739
+    phage_MedDCM-OCT-S28-C10
+    phage_MedDCM-OCT-S28-C3
+    phage_MedDCM-OCT-S30-C28
+    phage_MedDCM-OCT-S31-C1
+    phage_MedDCM-OCT-S35-C6
+    phage_MedDCM-OCT-S37-C6
+    phage_MedDCM-OCT-S38-C3
+    phage_MedDCM-OCT-S39-C11
+    phage_MedDCM-OCT-S42-C7
+    phage_MedDCM-OCT-S45-C18
+    phage_MedDCM-OCT-S45-C4
+    phage_MedDCM-OCT-S46-C10
     pHC_pUC_ori
     PI_GH1.1.B5
     PI_GH2.1.C2
@@ -5334,15 +5354,79 @@ const my @SPECIES => qw(
     PREDICT_PicornaV-2
     PREDICT_PicornaV-3
     PREDICT_PicornaV-4
+    PREDICT_PMV-10
+    PREDICT_PMV-100
+    PREDICT_PMV-101
+    PREDICT_PMV-102
+    PREDICT_PMV-103
+    PREDICT_PMV-104
+    PREDICT_PMV-105
+    PREDICT_PMV-106
+    PREDICT_PMV-107
+    PREDICT_PMV-108
+    PREDICT_PMV-109
     PREDICT_PMV-11
+    PREDICT_PMV-110
+    PREDICT_PMV-113
+    PREDICT_PMV-114
+    PREDICT_PMV-115
+    PREDICT_PMV-116
+    PREDICT_PMV-117
+    PREDICT_PMV-118
+    PREDICT_PMV-119
     PREDICT_PMV-12
+    PREDICT_PMV-120
+    PREDICT_PMV-121
+    PREDICT_PMV-122
+    PREDICT_PMV-124
+    PREDICT_PMV-125
+    PREDICT_PMV-126
+    PREDICT_PMV-127
+    PREDICT_PMV-128
     PREDICT_PMV-13
+    PREDICT_PMV-131
+    PREDICT_PMV-132
+    PREDICT_PMV-133
+    PREDICT_PMV-137
+    PREDICT_PMV-138
+    PREDICT_PMV-139
     PREDICT_PMV-14
+    PREDICT_PMV-140
+    PREDICT_PMV-141
+    PREDICT_PMV-142
+    PREDICT_PMV-143
+    PREDICT_PMV-144
+    PREDICT_PMV-145
+    PREDICT_PMV-146
+    PREDICT_PMV-147
+    PREDICT_PMV-148
+    PREDICT_PMV-149
     PREDICT_PMV-15
+    PREDICT_PMV-150
+    PREDICT_PMV-151
+    PREDICT_PMV-152
+    PREDICT_PMV-153
+    PREDICT_PMV-155
+    PREDICT_PMV-156
+    PREDICT_PMV-159
     PREDICT_PMV-16
+    PREDICT_PMV-160
+    PREDICT_PMV-161
+    PREDICT_PMV-163
+    PREDICT_PMV-167
+    PREDICT_PMV-168
+    PREDICT_PMV-169
     PREDICT_PMV-17
+    PREDICT_PMV-170
+    PREDICT_PMV-171
+    PREDICT_PMV-172
+    PREDICT_PMV-173
+    PREDICT_PMV-174
+    PREDICT_PMV-175
+    PREDICT_PMV-176
     PREDICT_PMV-18
     PREDICT_PMV-19
+    PREDICT_PMV-2
     PREDICT_PMV-20
     PREDICT_PMV-21
     PREDICT_PMV-22
@@ -5353,6 +5437,7 @@ const my @SPECIES => qw(
     PREDICT_PMV-27
     PREDICT_PMV-28
     PREDICT_PMV-29
+    PREDICT_PMV-3
     PREDICT_PMV-30
     PREDICT_PMV-31
     PREDICT_PMV-32
@@ -5363,6 +5448,7 @@ const my @SPECIES => qw(
     PREDICT_PMV-37
     PREDICT_PMV-38
     PREDICT_PMV-39
+    PREDICT_PMV-4
     PREDICT_PMV-40
     PREDICT_PMV-41
     PREDICT_PMV-42
@@ -5373,6 +5459,7 @@ const my @SPECIES => qw(
     PREDICT_PMV-47
     PREDICT_PMV-48
     PREDICT_PMV-49
+    PREDICT_PMV-5
     PREDICT_PMV-50
     PREDICT_PMV-51
     PREDICT_PMV-52
@@ -5383,6 +5470,7 @@ const my @SPECIES => qw(
     PREDICT_PMV-57
     PREDICT_PMV-58
     PREDICT_PMV-59
+    PREDICT_PMV-6
     PREDICT_PMV-60
     PREDICT_PMV-62
     PREDICT_PMV-63
@@ -5399,6 +5487,23 @@ const my @SPECIES => qw(
     PREDICT_PMV-74
     PREDICT_PMV-75
     PREDICT_PMV-76
+    PREDICT_PMV-77
+    PREDICT_PMV-78
+    PREDICT_PMV-79
+    PREDICT_PMV-80
+    PREDICT_PMV-81
+    PREDICT_PMV-82
+    PREDICT_PMV-83
+    PREDICT_PMV-85
+    PREDICT_PMV-86
+    PREDICT_PMV-91
+    PREDICT_PMV-92
+    PREDICT_PMV-93
+    PREDICT_PMV-94
+    PREDICT_PMV-95
+    PREDICT_PMV-97
+    PREDICT_PMV-98
+    PREDICT_PMV-99
     PREDICT_PyV-14
     PREDICT_PyV-15
     PREDICT_PyV-22
@@ -5613,6 +5718,7 @@ const my @SPECIES => qw(
     SB_Bact3
     SBN1_DGR
     SBOS_U
+    SC_4_H6H8_2017
     Schreyahn_AOB_Sali_Kultur_19
     Schreyahn_AOB_Sali_Kultur_8
     Schreyahn_AOB_SSU_Aster_6
@@ -6356,7 +6462,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 SYNOPSIS
 

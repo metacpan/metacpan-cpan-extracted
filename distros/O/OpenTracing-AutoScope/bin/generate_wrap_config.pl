@@ -10,6 +10,7 @@ use IO::File;
 use List::MoreUtils qw/notall/;
 use List::Util qw/uniq/;
 use PPI;
+use Perl::Critic::Utils::McCabe qw/calculate_mccabe_of_sub/;
 use Pod::Usage qw/pod2usage/;
 use YAML::XS;
 
@@ -50,6 +51,35 @@ sub run {
     return 0;
 }
 
+sub _generate_filters {
+    my ($filter_specs) = @_;
+    return if not $filter_specs;
+
+    state $GENERATORS = {
+        exclude_private => sub {
+            return sub {
+                my ($sub) = @_;
+                return $sub->name !~ /(?:\A|::)_\w+\z/;
+            };
+        },
+        complexity => sub {
+            my ($threshold) = @_;
+            croak 'No arguments for complexity filter' if not $threshold;
+            return sub {
+                my ($sub) = @_;
+                return calculate_mccabe_of_sub($sub) >= $threshold;
+            };
+        },
+    };
+
+    my @filters;
+    foreach (@$filter_specs) {
+        my ($filter, $arg) = split /=/;
+        my $generator = $GENERATORS->{$filter} or croak "No such filter: $_";
+        push @filters, $generator->($arg);
+    }
+    return \@filters;
+}
 
 sub examine_files {
     my %args         = @_;
@@ -57,27 +87,18 @@ sub examine_files {
     my $files_ignore = $args{ignore} // [];
     my $subs_include = $args{include} // [];
     my $subs_exclude = $args{exclude} // [];
-    my $filters      = $args{filters} // [];
+    my $filters      = _generate_filters($args{filters});
 
     my @files = map { glob } @$files_base;
     my %file_ignored = map { $_ => undef } map { glob } @$files_ignore;
     my %sub_excluded = map { $_ => undef } @$subs_exclude;
 
-    state $FILTERS = {
-        exclude_private => sub {
-            my $sub = (split /'|::/, $_[0])[-1];
-            return index($sub, '_') != 0;
-        },
-    };
-
-    my @subs    = @$subs_include;
-    my @filters = map { $FILTERS->{$_} or croak "No such filter: $_" } @$filters;
+    my @subs = @$subs_include;
     foreach my $file (@files) {
         next if exists $file_ignored{$file};
 
-        foreach my $sub (list_subs($file)) {
+        foreach my $sub (list_subs($file, $filters)) {
             next if exists $sub_excluded{$sub};
-            next if notall { $_->($sub) } @filters;
             push @subs, $sub;
         }
     }
@@ -85,7 +106,7 @@ sub examine_files {
 }
 
 sub list_subs {
-    my ($filename) = @_;
+    my ($filename, $filters) = @_;
 
     my $doc  = PPI::Document->new($filename);
     my $subs = $doc->find('PPI::Statement::Sub');
@@ -93,6 +114,8 @@ sub list_subs {
 
     my @subs;
     foreach my $sub (@$subs) {
+        next if notall { $_->($sub) } @$filters;
+
         if ($sub->name =~ /'|::/) { # qualified
             push @subs, $sub->name;
         }
@@ -128,6 +151,7 @@ generate_wrap_config.pl - generate input for OpenTracing::WrapScope
 =head1 SYNOPSIS
 
   generate_wrap_config.pl --out wrapscope.conf --file 'lib/*.pm'
+  generate_wrap_config.pl --file 'bin/*.pl' --filter complexity=5
 
 =head1 OPTIONS
 
@@ -152,10 +176,24 @@ Can be specified multiple times.
 A subroutine name to remove from the results.
 Can be specified multiple times.
 
-=head2 --filter $filter_name
+=head2 --filter $filter_name[=$filter_argument]
 
-A filter to apply. Currently, the only supported filter is B<exclude_private>,
-which removes all subroutines starting with an underscore.
+A filter to apply. Currently supported filters:
+
+=over 4
+
+=item * exclude_private
+
+Removes all subroutines starting with an underscore.
+
+=item * complexity=INT
+
+Narrows down the results to subroutines with a 
+L<cyclomatic complexity score|https://en.wikipedia.org/wiki/Cyclomatic_complexity>
+greater than or equal than the argument. The argument is required.
+
+=back
+
 Can be specified multiple times.
 
 =head2 --out $filename

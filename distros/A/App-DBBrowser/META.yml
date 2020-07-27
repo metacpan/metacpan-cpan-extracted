@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,9 +36,9 @@ requires:
   Scalar::Util: '0'
   Spreadsheet::Read: '0'
   String::Unescape: '0'
-  Term::Choose: '1.710'
-  Term::Choose::Util: '0.117'
-  Term::Form: '0.527'
+  Term::Choose: '1.711'
+  Term::Choose::Util: '0.121'
+  Term::Form: '0.528'
   Term::TablePrint: '0.122'
   Text::CSV: '0'
   bytes: '0'
@@ -48,5 +48,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/kuerbis/App-DBBrowser.git
-version: '2.251'
+version: '2.252'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

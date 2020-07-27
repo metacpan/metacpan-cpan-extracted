@@ -10,7 +10,7 @@ mb::set_script_encoding('sjis');
 use vars qw(@test);
 
 use vars qw($MSWin32_MBCS);
-$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+$MSWin32_MBCS = 0; # ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
 
 BEGIN {
     $SIG{__WARN__} = sub {
@@ -25,7 +25,7 @@ BEGIN {
     sub { mb::eval(q{ mkdir "5002.777.A", 0777;                         }) },
     sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ mkdir "5002.777.ソ",0777;                         }) },
     sub { mb::eval(q{ open FILE,">5002.A";  print FILE "A"; close FILE; }) },
-    sub {1}, # sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ open FILE,">5002.ソ"; print FILE "A"; close FILE; }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ open FILE,">5002.ソ"; print FILE "A"; close FILE; }) },
     sub {1},
     sub {1},
     sub {1},
@@ -57,7 +57,7 @@ BEGIN {
 # 31
     sub { CORE::eval(q{ @_ = lstat "5002.A";  scalar(@_) == 13 }) },
     sub { mb::eval(  q{ @_ = lstat "5002.A";  scalar(@_) == 13 }) },
-    sub {1}, # sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(  q{ @_ = lstat "5002.ソ"; scalar(@_) == 13 }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(  q{ @_ = lstat "5002.ソ"; scalar(@_) == 13 }) },
     sub { my @a = lstat "8007.A"; my @b = mb::_lstat "8007.A"; "@a" eq "@b" },
     sub { return 'SKIP' if $] >= 5.008; CORE::eval(q{ -e "5002.A";  @_ = eval q{ lstat _ }; scalar(@_) == 13 }) },
     sub { return 'SKIP' if $] <  5.008; CORE::eval(q{ -e "5002.A";  @_ = eval q{ lstat _ }; scalar(@_) == 0  }) },
@@ -69,7 +69,7 @@ BEGIN {
     sub { mb::eval(q{ rmdir "5002.777.A";  }) },
     sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ rmdir "5002.777.ソ"; }) },
     sub { mb::eval(q{ unlink "5002.A";     }) },
-    sub {1}, # sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ unlink "5002.ソ";    }) },
+    sub { return 'SKIP' unless $MSWin32_MBCS; mb::eval(q{ unlink "5002.ソ";    }) },
     sub {1},
     sub {1},
     sub {1},

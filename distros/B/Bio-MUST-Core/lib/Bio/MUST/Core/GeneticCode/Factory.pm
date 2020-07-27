@@ -1,6 +1,6 @@
 package Bio::MUST::Core::GeneticCode::Factory;
 # ABSTRACT: Genetic code factory based on NCBI gc.prt file
-$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.201060';
+$Bio::MUST::Core::GeneticCode::Factory::VERSION = '0.202070';
 use Moose;
 use namespace::autoclean;
 
@@ -196,6 +196,9 @@ sub _get_gcprt_content {
 --  Base 1-3 of each codon have been added as comments to facilitate
 --    readability at the suggestion of Peter Rice, EMBL
 --  Later additions by Taxonomy Group staff at NCBI
+--
+--  Version 4.6
+--     Renamed genetic code 24 to Rhabdopleuridae Mitochondrial
 --
 --  Version 4.5
 --     Added Cephalodiscidae mitochondrial genetic code 33
@@ -454,7 +457,7 @@ Genetic-code-table ::= {
   -- Base3  TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG
  } ,
  {
-  name "Pterobranchia Mitochondrial" ,
+  name "Rhabdopleuridae Mitochondrial" ,
   id 24 ,
   ncbieaa  "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG",
   sncbieaa "---M------**-------M---------------M---------------M------------"
@@ -561,7 +564,7 @@ Bio::MUST::Core::GeneticCode::Factory - Genetic code factory based on NCBI gc.pr
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 SYNOPSIS
 

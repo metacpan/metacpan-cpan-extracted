@@ -1,6 +1,11 @@
 package CallBackery::GuiPlugin::AbstractTable;
 use Carp qw(carp croak);
 use CallBackery::Translate qw(trm);
+use CallBackery::Exception qw(mkerror);
+use Text::CSV;
+use Excel::Writer::XLSX;
+use Mojo::JSON qw(true false);
+use POSIX qw(strftime);
 
 =head1 NAME
 
@@ -109,6 +114,84 @@ return the number of rows matching the given formData
 
 sub getTableRowCount {
     return 0;
+}
+
+=head2 makeExportAction(type => 'XLSX', filename => 'export-"now"', label => 'Export')
+
+Create export button.
+The default type is XLSX, also available is CSV.
+
+=cut
+
+sub makeExportAction {
+    my $self = shift;
+    my %args = @_;
+    my $type = $args{type} // 'XLSX';
+    my $label = $args{label} // trm("Export %1", $type);
+    my $filename = $args{filename}
+        // strftime('export-%Y-%m-%d-%H-%M-%S.',localtime(time)).lc($type);
+
+    return  {
+        label            => $label,
+        action           => 'download',
+        addToContextMenu => true,
+        key              => 'export_csv',
+        actionHandler    => sub {
+            my $self = shift;
+            my $args = shift;
+            my $data = $self->getTableData({
+                formData => $args,
+                firstRow => 0,
+                lastRow => $self->getTableRowCount($args)
+            });
+            my @titles = map {$_->{key}} @{$self->tableCfg};
+
+            if ($type eq 'CSV') {
+                my $csv = Text::CSV->new;
+                $csv->combine(@titles);
+                my $csv_str = $csv->string . "\n";
+                for my $record (@$data) {
+                    $csv->combine(map {$record->{$_}} @titles);
+                    $csv_str .= $csv->string . "\n";
+                }
+                my $asset = Mojo::Asset::Memory->new;
+                $asset->add_chunk($csv_str);
+                return {
+                    asset    => $asset,
+                    type     => 'text/csv',
+                    filename => $filename,
+                }
+            }
+            elsif ($type eq 'XLSX') {
+                open my $xh, '>', \my $xlsx or die "failed to open xlsx fh: $!";
+                my $workbook  = Excel::Writer::XLSX->new($xh);
+                my $worksheet = $workbook->add_worksheet();
+
+                my $col = 0;
+                map {$worksheet->write(0, $col, $_); $col++} @titles;
+
+                my $row = 2;
+                for my $record (@$data) {
+                    $col = 0;
+                    map {$worksheet->write($row, $col, $record->{$_}); $col++} @titles;
+                    $row++;
+                }
+
+                $workbook->close();
+                my $asset = Mojo::Asset::Memory->new;
+                $asset->add_chunk($xlsx);
+                return {
+                    asset    => $asset,
+                    type     => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    filename => $filename,
+                }
+
+            }
+            else {
+                die mkerror(9999, "unknown export type $type");
+            }
+        }
+    };
 }
 
 1;

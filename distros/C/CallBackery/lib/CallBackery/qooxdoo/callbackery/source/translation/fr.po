@@ -57,7 +57,7 @@ msgstr ""
 
 #: callbackery/ui/Popup.js:39 callbackery/ui/MsgBox.js:66
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 #: callbackery/ui/MsgBox.js:67
 msgid "Apply"

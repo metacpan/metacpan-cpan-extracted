@@ -15,17 +15,6 @@ bin/wrt-version
 Build.PL
 Changes
 COPYING
-doc/archives/css/wrt.css
-doc/archives/index
-doc/public/all/index.html
-doc/public/feed
-doc/public/feed.json
-doc/public/feed.xml
-doc/public/home/index.html
-doc/public/index.html
-doc/public/index/index.html
-doc/templates/default
-doc/wrt.json
 example/blog/archives/1952/2/13
 example/blog/archives/2012
 example/blog/archives/2013/1/index

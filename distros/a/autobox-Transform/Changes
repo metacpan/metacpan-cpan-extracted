@@ -1,5 +1,12 @@
 # Revision history for Perl module autobox::Transform
 
+1.035 2020-07-27T15:00:22Z
+
+  * Fixed #7: removed dependency on "true", thanks TBSliver/Tom Bloor
+  * Fixed #6: improved pod, thanks manwar/Mohammad S Anwar
+  * POD polish
+
+
 1.034 2019-06-19T20:22:58Z
 
   * Documentation improvements to go with new "reject", "reject_by",

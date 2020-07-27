@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/YoutubeDlIf.pm
 script/youtube-dl-if
+script/youtube-dl-if-not-yet
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

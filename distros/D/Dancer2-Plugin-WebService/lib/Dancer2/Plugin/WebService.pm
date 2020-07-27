@@ -2,19 +2,19 @@
 # Multiple input/output formats : JSON , XML , YAML, PERL , HUMAN
 #
 # George Bouras , george.mpouras@yandex.com
-# Joan Ntzougani, gravitalsun@hotmail.com
+# Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.3.1';
+our	$VERSION = '4.3.5';
 use	strict;
 use	warnings;
 use Encode;
 use	Dancer2::Plugin;
 use	Storable;
-use	Data::Dumper;     $Data::Dumper::Sortkeys=0;     $Data::Dumper::Indent=2;     $Data::Dumper::Purity=1; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Trailingcomma=0;
-use YAML::Syck;       $YAML::Syck::ImplicitTyping=1; $YAML::Syck::Headless=0;     $YAML::Syck::ImplicitUnicode=0;
-use	XML::Hash::XS;    $XML::Hash::XS::root='Data';   $XML::Hash::XS::canonical=0; $XML::Hash::XS::indent=2; $XML::Hash::XS::utf8=1; $XML::Hash::XS::encoding='utf8'; $XML::Hash::XS::xml_decl=0; $XML::Hash::XS::doc=0;
-use Cpanel::JSON::XS; my $JSON=Cpanel::JSON::XS->new;$JSON->canonical(0); $JSON->pretty(0); $JSON->indent(1); $JSON->space_before(1); $JSON->space_after(1); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_tags(1); $JSON->allow_nonref(0); $JSON->allow_unknown(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1); $JSON->max_depth(1024); $JSON->utf8(0);
+use	XML::Hash::XS; $XML::Hash::XS::utf8=1;  $XML::Hash::XS::encoding='utf8'; $XML::Hash::XS::root='Data'; $XML::Hash::XS::canonical=0; $XML::Hash::XS::indent=2; $XML::Hash::XS::xml_decl=0; $XML::Hash::XS::doc=0;
+use	Data::Dumper;  $Data::Dumper::Terse=1;  $Data::Dumper::Trailingcomma=0;  $Data::Dumper::Deepcopy=1; $Data::Dumper::Indent=2; $Data::Dumper::Purity=1; $Data::Dumper::Sortkeys=0;
+use YAML::Syck;    $YAML::Syck::Headless=0; $YAML::Syck::ImplicitTyping=1;   $YAML::Syck::ImplicitUnicode=0;
+use Cpanel::JSON::XS; my $JSON=Cpanel::JSON::XS->new; $JSON->space_before(1);$JSON->canonical(0);  $JSON->allow_tags(1);  $JSON->allow_unknown(0); $JSON->pretty(0); $JSON->indent(1); $JSON->space_after(1); $JSON->max_size(0); $JSON->relaxed(0); $JSON->shrink(0); $JSON->allow_nonref(0); $JSON->allow_blessed(1); $JSON->convert_blessed(1); $JSON->max_depth(1024); $JSON->utf8(0);
 
 if ($^O=~/(?i)MSWin/) {warn "Operating system is not supported\n"; exit 1}
 
@@ -32,7 +32,7 @@ has auth_command    => (is=>'rw', lazy=>1, default=> '');
 has auth_config     => (is=>'rw', lazy=>1, default=> sub{ {} });
 has data            => (is=>'rw', lazy=>1, default=> sub{ {} });	# user posted data as hash
 has Session_timeout => (is=>'ro', lazy=>0, from_config=>'Session idle timeout',default=> sub{ 3600 }, isa => sub {unless ( $_[0]=~/^\d+$/ ) {warn "Session idle timeout \"$_[0]\" It is not a number\n"; exit 1}} );
-has rules           => (is=>'ro', lazy=>0, from_config=>'Allowed hosts',       default=> sub{ ['127.0.*', '192.168.*', '10.*', '172.16.*'] });
+has rules           => (is=>'ro', lazy=>0, from_config=>'Allowed hosts',       default=> sub{ ['127.0.*', '192.168.*', '172.16.*'] });
 has rules_compiled  => (is=>'ro', lazy=>0, default=> sub {my $array = [@{$_[0]->rules}]; for (@{$array}) { s/([^?*]+)/\Q$1\E/g; s|\?|.|g; s|\*+|.*?|g; $_ = qr/^$_$/i } $array});
 has dir_session     => (is=>'ro', lazy=>0, default=> sub {my $dir = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $dir=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $dir; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$dir\" because $!\n"; exit 1} } $dir} );
 has rm              => (is=>'ro', lazy=>0, default=> sub{for (split /:/,$ENV{PATH}) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
@@ -87,7 +87,7 @@ unless (-d $module_dir) {warn "Sorry could not find the Dancer2::Plugin::WebServ
 
 			if ((exists $method->{'Use sudo'}) && ($method->{'Use sudo'}=~/(?i)[y1t]/)) {
 			my $sudo = undef;
-			for (split /:/,$ENV{PATH}) { if ((-f "$_/sudo") && -x ("$_/sudo")) { $sudo="$_/sudo"; last } }
+			foreach ('/bin', '/usr/bin', '/usr/sbin', '/sbin') { if ((-f "$_/sudo") && -x ("$_/sudo")) { $sudo="$_/sudo"; last } }
 			unless (defined $sudo) {warn "Could not found sudo command\n"; exit 1}
 			$plg->auth_command( "$sudo \Q$method->{Command}\E" )
 			}
@@ -105,14 +105,13 @@ unless (-d $module_dir) {warn "Sorry could not find the Dancer2::Plugin::WebServ
 delete $plg->config->{'Authentication methods'};
 
 	# Check for an active auth method if there are protected routes
-	# Check if the Groups is an array
 	foreach (keys %{$plg->config->{Routes}}) {
 
-		if ( $plg->config->{Routes}->{$_}->{Protected} ) {
+		if ((exists $plg->config->{Routes}->{$_}->{Protected}) && ($plg->config->{Routes}->{$_}->{Protected}=~/(?i)[y1t]/)) {
+		$plg->config->{Routes}->{$_}->{Protected} = 1;
 
 			if ($plg->auth_method eq '') {
-			warn "While there is at least one protected route ( $_ ) there is not any active authorization method\n";
-			exit 1
+			warn "While there is at least one protected route ( $_ ) there is not any active authorization method\n"; exit 1
 			}
 			else {
 
@@ -124,14 +123,11 @@ delete $plg->config->{'Authentication methods'};
 				}
 			}
 		}
+		else {
+		$plg->config->{Routes}->{$_}->{Protected} = 0
+		}
 	}
 
-print "\nApplication             : $app->{name}\n";
-print "Version                 :\n";
-print "  - Application         : ",(exists $app->{config}->{version} ? $app->{config}->{version} : '1.0.0')."\n";
-print "  - WebService          : $Dancer2::Plugin::WebService::VERSION\n";
-print "  - Dancer2             : $Dancer2::VERSION\n";
-print "  - Perl                : $^V\n";
 print 'Run as user             : ', (getpwuid($>))[0]    ,"\n";
 print 'Start time              : ', scalar localtime $^T ,"\n";
 print "Module auth dir scripts : $module_dir\n";
@@ -140,8 +136,9 @@ print "Authorization method    : ", $plg->auth_method ,"\n";
 print "Session directory       : ", $plg->dir_session ,"\n";
 print "Session idle timeout    : ", $plg->Session_timeout ," sec\n";
 print "Main PID                : $$\n";
-
-
+print "version WebService      : $VERSION\n";
+print "version Dancer2         : $Dancer2::VERSION\n";
+print "version Perl            : $^V\n";
 
 
 # Restore the valid sessions, and delete the expired
@@ -235,7 +232,7 @@ closedir __SESSIONDIR;
 		if ($app->request->body) { 
 
 			eval  {
-			if    ($plg->Format->{from} eq 'json')	{ $plg->data(Cpanel::JSON::XS::decode_json   Encode::encode('UTF-8',$app->request->body)) }
+			if    ($plg->Format->{from} eq 'json')	{ $plg->data(Cpanel::JSON::XS::decode_json  Encode::encode('UTF-8',$app->request->body)) }
 			elsif ($plg->Format->{from} eq 'xml')	{ $plg->data(XML::Hash::XS::xml2hash $app->request->body) }
 			elsif ($plg->Format->{from} eq 'yaml')	{ $plg->data(YAML::Syck::Load        $app->request->body) }
 			elsif ($plg->Format->{from} eq 'perl')	{ $plg->data(eval                    $app->request->body) }
@@ -600,13 +597,13 @@ $plg->dsl->halt( $plg->reply_text )
 
 
 
-#  Returns a list/hash of all or the selected keys
+#  Return a list/hash of all or the selected posted keys
 #
-#	           PosteData();              # all                posted keys/values
-#	my %DATA = PosteData('k1', 'k2');    # hash with selected posted keys/values
-#   my @DATA = PosteData('k1', 'k2');    # list with selected posted keys/values
+#	           PostData();              # all                posted keys/values
+#	my %DATA = PostData('k1', 'k2');    # hash with selected posted keys/values
+#   my @DATA = PostData('k1', 'k2');    # list with selected posted keys/values
 #
-sub PosteData :PluginKeyword
+sub PostData :PluginKeyword
 {
 my $plg=shift;
 
@@ -771,7 +768,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.3.1
+version 4.3.5
 
 =head1 SYNOPSIS
 
@@ -800,11 +797,11 @@ The replies through this module have the extra key B<error> . At success B<error
   use     Dancer2;
   use     Dancer2::Plugin::WebService;
 
-  post '/AllKeys'  => sub { reply   PosteData            };
-  post '/SomeKeys' => sub { reply   PosteData('k1','k2') };
+  post '/AllKeys'  => sub { reply   PostData            };
+  post '/SomeKeys' => sub { reply   PostData('k1','k2') };
   get  '/data1'    => sub { reply  'k1'=>'v1','k2'=>'v2' };
   get  '/data2'    => sub { reply {'k1'=>'v1','k2'=>'v2'}};
-  any  '/data3'    => sub { my %H = PosteData('k1', 'k2');
+  any  '/data3'    => sub { my %H = PostData('k1', 'k2');
                       reply 'foo'=> $H{k1}, 'boo'=>$H{k2}
                       };
   get  '/error'             => sub { reply 'k1', 'v1', 'error', 'oups' };
@@ -860,7 +857,7 @@ I<from> default is the I<config.yml> property
 
 Your routes can be either B<public> or B<protected>
 
-B<public> are the routes that anyone can use without B<login> , Τhey do not support sessions / persistent data, but you can post and access data using the method B<PosteData>
+B<public> are the routes that anyone can use without B<login> , Τhey do not support sessions / persistent data, but you can access the posted data using the method B<PostData>
 
 B<protected> are the routes that you must provide a token, returned by the login route.
 At B<protected> routes you can  I<read>, I<write>, I<delete> persistent data using the  methods B<session_get> , B<session_set> , B<session_del>
@@ -971,15 +968,15 @@ This should be the last route's statement
   reply( { k1 => 'v1', ... } ) anything you want
   reply   'k1'                 The specific key and its value of the posted data 
 
-=head2 PosteData
+=head2 PostData
 
 I<public method>
 
-Get the data posted by the user
+Get the posted data
 
-             PosteData               Everything posted
-  my %hash = PosteData('k2','k4');   Only some keys  of a hash
-  my @list = PosteData('k2','k4');   Only some items of a list
+             PostData               Everything posted
+  my %hash = PostData('k2','k4');   Only some keys  of a hash
+  my @list = PostData('k2','k4');   Only some items of a list
 
 The posted data can be anything; hashes, lists, scalars
 
@@ -1075,7 +1072,6 @@ Please read the AUTHENTICATION_SCRIPTS for the details
 
 A sample I<config.yml> is the following. 
 
-  version                 : 3.0.0
   environment             : development
   plugins                 :
     WebService            :
@@ -1195,7 +1191,7 @@ George Bouras <george.mpouras@yandex.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by George Bouras.
+This software is copyright (c) 2020 by George Bouras.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

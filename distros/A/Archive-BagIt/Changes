@@ -1,6 +1,199 @@
 ==================================================
-Changes from 2019-06-30 00:00:00 +0000 to present.
+Changes from 2019-07-28 00:00:00 +0000 to present.
 ==================================================
+
+------------------------------------------
+version 0.059 at 2020-07-27 09:10:04 +0000
+------------------------------------------
+
+  Change: d33d7ae773f132e55c4f5c4684a2d1a1f3d9f936
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 11:06:53 +0000
+
+    - add POD for METHOD 
+
+  Change: 93db69d1f439ad53c2b841f466dd5f9e3cb0ac3a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 11:06:31 +0000
+
+    - minor, fix warning in synopsis 
+
+  Change: fefede8be7fd31202c8b1d1c157a5cd74f1ae904
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 10:29:42 +0000
+
+    - removed testdata from conformance tests, because it makes problems
+    in CPAN/KWALITEE with MAC specific filename 
+
+  Change: 1e1e4445a8afa7c63c976cfcd542e4ef6fdbb040
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 10:21:10 +0000
+
+    - skip test if IO::AIO does not exist during testing 
+
+  Change: a4b85111ca8b01a481af57a3bad8a6ec7c739772
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 10:20:39 +0000
+
+    - separated tests for parallel to t/parallel.t - enhanced testsuite
+    for conformance checks 
+
+  Change: e2cd0c00da94e355f561558d528a0956080f0417
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 10:19:31 +0000
+
+    - extracted payload filepath conformity check to
+    check_payload_filepath_conformity() 
+
+  Change: 834e9378a7efbafdcd45674be41e615242205f8e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 21:31:22 +0000
+
+    Released 0.059-TRIAL 
+
+  Change: 4e2f0a98d99ca9b5af6d794635da134e9fc0c73a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 21:01:54 +0000
+
+    - fixed warning-testcase 
+
+  Change: c5d07496a54290f941b3a10e0e732eaa9fc81f39
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 20:19:22 +0000
+
+    - fixed coderef call - fixed missed expected digests 
+
+  Change: 5ceb81032e21cac7d75761fde15e5ebeded72a6e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 20:18:02 +0000
+
+    - fixed conformance suite, missedd bag-info in v1.0/valid/basicBag 
+
+  Change: 3ddd591bb928b1b2c8ec75a8c5aca4f1aec36ca3
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 18:36:50 +0000
+
+    - rewritten, with new base-class 'Archive::BagIt::Base' 
+
+  Change: 2fdf4ff09126770af8131bd23d660040437d3530
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 18:36:50 +0000
+
+    - changed _verify_XXX_manifests() to use new calc_digests(). This
+    allows an easier definition of derived classes. - revert subs-in-subs
+    using sub-references. This allows (again) the use of older Perl
+    versions. 
+
+  Change: 2e727cdf94fa821fc79976bd11c988ced919a58d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 18:31:21 +0000
+
+    - normalized to '_digest' property 
+
+  Change: e570098787fc7a320857384d28974f69892b32d8
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 18:20:09 +0000
+
+    - improved testsuite to check against bagit_conformance_suite 
+
+  Change: 6f51cf9f36590d0d5703f1b4ac372eb7ca904951
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 18:19:40 +0000
+
+    - removed subdir from bagit_conformance_suite because multiple
+    problems with bag 
+
+  Change: 76a5b033d6197b15759b5f12529bd851c053f959
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 18:18:22 +0000
+
+    - renamed conformance-suite subdir to reflect real error in bag 
+
+  Change: a4f839ecde9cb40bb322093af056d085668d40bc
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 17:55:18 +0000
+
+    - added POD about conformance - improved _build_bag_version(),
+
+    - more specific regex
+
+    - added BOM detection - fixed bug in _verify_XXX_manifests() for
+    missed files - added escape-checks in _verify_XXX_manifests() 
+
+  Change: 27898f9aa597da55eaec2064b31a64868170bf55
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 16:40:21 +0000
+
+    - added error message if encoding line does not exist - added error
+    message if version line does not exist 
+
+  Change: cfde30213680e830e26ef46581c4919732590eff
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 16:24:08 +0000
+
+    - test if fetch.txt exist and report a unsupported exception 
+
+  Change: 76eb966bfa46908a634bad786e3dde9e38ec644d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 16:02:06 +0000
+
+    - added 'bag_encoding' - improved builders for 'bag_encoding' and
+    'bag_version' - added 'errors' - improved error messages 
+
+  Change: 1070ccb307db3544adcca5c00f3806805264c22a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 16:00:58 +0000
+
+    - refactored conformance tests 
+
+  Change: 3dc2ac5cf1a7f14c0e72acbf550d9b02b6545a98
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 16:00:34 +0000
+
+    - moved conformance suite outside of t/ to avoid clashes 
+
+  Change: 5bc6e1ec29438a9abeaf0c06cae04cabaaa9aa3a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 14:04:27 +0000
+
+    - added v1.0 conformance bag tests 
+
+  Change: 2a7f1b7b368989ef24248ccc58539345a32a8193
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 14:04:04 +0000
+
+    - errorhandling if version string incorrect - improved readability in
+    reporting in _verify_XXX_manifests() - clarified error message in
+    verify_bag() 
+
+  Change: 6899fee24ccb2888d213050039868128c39f8069
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 12:20:56 +0000
+
+    - add bagit conformance testsuite of library of congress 
+
+  Change: 1d41a951e5027ef8c2385ef7e01f46562fdd4f78
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-24 10:55:24 +0000
+
+    - validate() reports all files with wrong fixity via 'die' instead
+    'print' - added testcase to check this behaviour 
+
+  Change: fe32b4b1f30d1d6b87c827bd8e12d23545afa660
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-08 18:03:53 +0000
+
+    - marked DotBagIt as deprecated 
+
+------------------------------------------
+version 0.058 at 2020-06-29 13:43:45 +0000
+------------------------------------------
+
+  Change: aad278b1607c77521d5a1151d03ff4d98d417532
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-06-29 15:43:45 +0000
+
+    Released 0.058 
 
 ------------------------------------------
 version 0.057 at 2020-06-29 13:33:47 +0000
@@ -730,5 +923,5 @@ version 0.055 at 2020-04-15 09:44:51 +0000
     Adding a plugin structure 
 
 ================================================
-Plus 9 releases after 2019-06-30 00:00:00 +0000.
+Plus 9 releases after 2019-07-28 00:00:00 +0000.
 ================================================

@@ -1,0 +1,75 @@
+NAME
+    Acme::CPANModules::SExpression - Working with S-expression in Perl
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::SExpression
+    (from Perl distribution Acme-CPANModules-SExpression), released on
+    2020-04-10.
+
+DESCRIPTION
+    Working with S-expression in Perl.
+
+    Parsing
+
+    <pm::Data::SExpression>
+
+    <pm::SExpression::Decode::Marpa>
+
+    <pm::SExpression::Decode::Regexp>
+
+    Dumping
+
+    Data::Dumper::LispLike
+
+    Data::Dump::SExpression
+
+INCLUDED MODULES
+    *   Data::Dumper::LispLike
+
+    *   Data::Dump::SExpression
+
+FAQ
+  What are ways to use this module?
+    Aside from reading it, you can install all the listed modules using
+    cpanmodules:
+
+        % cpanmodules ls-entries SExpression | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=SExpression -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    This module also helps lcpan produce a more meaningful result for "lcpan
+    related-mods" when it comes to finding related modules for the modules
+    listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-SExpression>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-SExpression>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-SExp
+    ression>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

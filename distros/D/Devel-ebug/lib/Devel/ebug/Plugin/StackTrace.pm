@@ -6,7 +6,7 @@ use Scalar::Util qw(blessed);
 use base qw(Exporter);
 our @EXPORT = qw(stack_trace stack_trace_human stack_trace_human_args);
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 # return the stack trace
 sub stack_trace {
@@ -91,7 +91,7 @@ Devel::ebug::Plugin::StackTrace
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 AUTHOR
 

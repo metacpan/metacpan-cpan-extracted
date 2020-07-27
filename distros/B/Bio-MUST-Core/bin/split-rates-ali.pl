@@ -76,7 +76,7 @@ split-rates-ali.pl - Split ALI files into subsets of sites based on evolutionary
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 USAGE
 

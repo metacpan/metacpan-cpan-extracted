@@ -1,0 +1,3 @@
+9717845c1babdef11da92c40901e67bf *bag-info.txt
+9e5ad981e0d29adc278f6a294b8c2aca *bagit.txt
+abd579975ec7f694887e10af6e44ff72 *manifest-md5.txt

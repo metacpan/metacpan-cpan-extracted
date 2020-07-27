@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 sub register_commands {
   return (
@@ -142,7 +142,7 @@ Devel::ebug::Backend::Plugin::ActionPoints
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 AUTHOR
 

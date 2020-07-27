@@ -1,5 +1,9 @@
 Revision history for Perl extension Geo::IP2Location.
 
+8.40  Fri July 24 16:00:00 2020
+      Nineteenth release under the Geo::IP2Location
+      Added close() function to close file handle
+
 8.30  Fri July 17 16:00:00 2020
       Eighteenth release under the Geo::IP2Location
       Fixed MIT license in description

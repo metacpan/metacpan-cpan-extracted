@@ -104,3 +104,17 @@ Revision history for Lingua-EN-Inflexion
 
     * Fixed inflexion of 'backcast' and other '*cast' variants.
       (Thanks, Jeff!)
+
+
+0.002000  Sun Jul 26 22:06:39 2020
+
+    * Added (non-)inflexions for 'who', 'whom', 'whose', 'what', etc.
+
+    * Doc tweaks
+
+    * Added inflexion of reflexive pronouns
+
+    * Documented OED-consistent handling of 'themself'
+
+    * Repositioned errant level-3 heading
+      (Thank-you, Lady Aleena!)

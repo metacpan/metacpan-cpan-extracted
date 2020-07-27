@@ -37,6 +37,21 @@ int texthspell_check_word_internal(SV * obj, char * word) {
     return ret;
 }
 
+AV * texthspell_trycorrect_internal(SV * obj, char * word) {
+    AV * av = newAV();
+    struct corlist cl;
+    corlist_init(&cl);
+    hspell_trycorrect(q(obj), word, &cl);
+    int n = corlist_n(&cl);
+    for (int i = 0; i < n ; ++i)
+    {
+        const char *const str = corlist_str(&cl, i);
+        av_push(av, newSVpvn(str, strlen(str)));
+    }
+    corlist_free(&cl);
+    return (AV *)sv_2mortal((SV *)av);
+}
+
 MODULE = Text::Hspell  PACKAGE = Text::Hspell PREFIX = texthspell_
 
 PROTOTYPES: DISABLE
@@ -47,6 +62,11 @@ texthspell_proto_new ()
 
 int
 texthspell_check_word_internal (obj, s)
+	SV *	obj
+    char *  s
+
+AV *
+texthspell_trycorrect_internal (obj, s)
 	SV *	obj
     char *  s
 

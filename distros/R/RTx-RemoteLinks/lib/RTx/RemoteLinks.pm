@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RTx::RemoteLinks;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use List::Util 'first';
 
@@ -89,7 +89,7 @@ sub CanonicalizeAlias {
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -105,7 +105,7 @@ Configure your remote RT instances per L</CONFIGURATION> above.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -127,7 +127,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2013-2014 by Best Practical Solutions, LLC
+This software is Copyright (c) 2013-2020 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

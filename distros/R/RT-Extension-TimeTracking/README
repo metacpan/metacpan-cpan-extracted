@@ -2,7 +2,7 @@ NAME
     RT-Extension-TimeTracking - Time Tracking Extension
 
 RT VERSION
-    Works with RT 4.2, 4.4
+    Works with RT 5.0. Check 0.1* versions if you are using RT 4.
 
 INSTALLATION
     perl Makefile.PL
@@ -19,18 +19,13 @@ INSTALLATION
         If you are upgrading this module, check for upgrading instructions
         in case changes need to be made to your database.
 
-    patch RT
-        Only run this the first time you install this module.
-
-            patch -p1 -d /path/to/rt < etc/0001-handle-txn-cfs-on-ticket-creation-and-updates-with-U.patch
-
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::TimeTracking');
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
@@ -164,7 +159,7 @@ BUGS
     ing>.
 
 COPYRIGHT
-    This extension is Copyright (C) 2013-2018 Best Practical Solutions, LLC.
+    This extension is Copyright (C) 2013-2020 Best Practical Solutions, LLC.
 
     This is free software, licensed under:
 

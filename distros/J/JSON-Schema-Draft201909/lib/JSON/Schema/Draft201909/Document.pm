@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use feature 'current_sub';
@@ -52,6 +52,13 @@ has resource_index => (
   init_arg => undef,
   lazy => 1,
   default => sub { {} },
+);
+
+# for internal use only
+has serialized_schema => (
+  is => 'rw',
+  isa => Str,
+  init_arg => undef,
 );
 
 before _add_resources => sub {
@@ -151,7 +158,7 @@ JSON::Schema::Draft201909::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -171,8 +178,6 @@ This class represents one JSON Schema document, to be used by L<JSON::Schema::Dr
 =head1 ATTRIBUTES
 
 =head2 schema
-
-=head2 data
 
 The actual raw data representing the schema.
 
@@ -197,10 +202,12 @@ externally (you should use the public accessors in L<JSON::Schema::Draft201909> 
 
 =head2 contains
 
+Check if L</"schema"> contains a value that can be identified with the given JSON Pointer.
 See L<Mojo::JSON::Pointer/contains>.
 
 =head2 get
 
+Extract value from L</"schema"> identified by the given JSON Pointer.
 See L<Mojo::JSON::Pointer/get>.
 
 =head1 SUPPORT

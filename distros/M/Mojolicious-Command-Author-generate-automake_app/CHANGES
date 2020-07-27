@@ -1,3 +1,8 @@
+0.7.0 2020-07-27 10:08:06 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - improve makefile organisation
+ - qooxdoo script is now called index.js
+
 0.6.1 2020-06-03 10:03:20 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - keep translation files sorted to reduce diff size

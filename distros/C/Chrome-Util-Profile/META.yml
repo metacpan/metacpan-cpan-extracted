@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Chrome-Util-Profile
   homepage: https://metacpan.org/release/Chrome-Util-Profile
   repository: git://github.com/perlancar/perl-Chrome-Util-Profile.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

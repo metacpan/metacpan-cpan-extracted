@@ -13,7 +13,6 @@ inc/Module/Install/RTx.pm
 inc/Module/Install/RTx/Runtime.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/unicore/Name.pm
 inc/YAML/Tiny.pm
 lib/RTx/TicketlistTransactions.pm
 Makefile.PL

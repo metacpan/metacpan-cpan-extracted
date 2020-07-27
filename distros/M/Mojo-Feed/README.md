@@ -42,7 +42,7 @@ The original decoded string of the feed.
 
 ## dom
 
-The parsed feed as <Mojo::DOM> object.
+The parsed feed as [Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM) object.
 
 ## source
 
@@ -64,6 +64,10 @@ Web page URL associated with the feed
 ## items
 
 [Mojo::Collection](https://metacpan.org/pod/Mojo%3A%3ACollection) of [Mojo::Feed::Item](https://metacpan.org/pod/Mojo%3A%3AFeed%3A%3AItem) objects representing feed news items
+
+## entries
+
+Alias name for `items`.
 
 ## subtitle
 

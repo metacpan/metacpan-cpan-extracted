@@ -1,1 +1,64 @@
-String::Util
+1.31  2020-07-27 10:28:07 PDT
+
+	- Deprecate randcrypt() as it's not secure in 2020
+
+	- Add file_get_contents()
+
+	- Make trim() unicode friendly
+
+1.30  2020-07-23 14:29:05 PDT
+
+	- Ownership transferred to Scott Baker
+
+	- Removed undocumented function: spacepad()
+
+	- Added a new sanitize() function
+
+	- Deprecated some older functions: crunch(), fullchomp(), define(), and cellfill()
+
+1.24  2014-12-31
+
+	- Cleaned up POD formatting.
+
+	- Changed file to using Unixish style newlines. I hadn't realized until
+	now that it was using Windowish newline. How embarrasing.
+
+	- Added some features to ords().
+
+1.23
+
+	- Fixed error in META.yml.
+
+1.22
+
+	- Fix in documentation for randpost().
+
+	- Clarified documentation for hascontent() and nocontent().
+
+1.21  2012-07-18
+
+	- Fixed error in POD. Tightened up code for repet.
+
+1.20  2012-07-14
+
+	- Properly listing prerequisites.
+
+1.01  2010-11-07
+
+	- Decided it was time to upload five years worth of changes.
+
+0.11  2005-12-22
+
+	- This is a non-backwards compatible version.
+
+	- urldecode, urlencode were removed entirely. All of the subs that used
+	to modify values in place were changed so that they do not do so
+	anymore, except for fullchomp.
+
+	- See
+	http://www.xray.mpe.mpg.de/mailing-lists/modules/2005-12/msg00112.html
+	for why these changes were made.
+
+0.10  2005-12-01
+
+	- Initial release

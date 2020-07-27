@@ -32,11 +32,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 1.00
+Version 1.02
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 =head1 SYNOPSIS
 
@@ -432,17 +432,25 @@ sub get_struct {
 Used to remove all individual values from the explain, while still retaining
 all values that are needed to see what's wrong.
 
+If there are any arguments, these are treated as strings, anonymized using
+anonymizer used for plan, and are returned in the same order.
+
+This is mainly useful to anonymize queries.
+
 =cut
 
 sub anonymize {
-    my $self = shift;
+    my $self       = shift;
+    my @extra_args = @_;
 
     my $anonymizer = Pg::Explain::StringAnonymizer->new();
     $self->top_node->anonymize_gathering( $anonymizer );
     $anonymizer->finalize();
     $self->top_node->anonymize_substitute( $anonymizer );
 
-    return;
+    return if 0 == scalar @extra_args;
+
+    return map { $anonymizer->anonymize_text( $_ ) } @extra_args;
 }
 
 =head1 AUTHOR

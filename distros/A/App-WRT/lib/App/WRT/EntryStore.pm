@@ -418,7 +418,7 @@ sub get_sub_entries {
   # index gets special treatment as the text body of an entry, rather
   # than as a sub-entry:
   my @subs = grep { m/$SUBENTRY_EXPR/ } $self->children_basenames($entry);
-  return grep { ! $SUBENTRY_IGNORE{$_} } @subs;
+  return sort grep { ! $SUBENTRY_IGNORE{$_} } @subs;
 
   # return grep { ! $SUBENTRY_IGNORE{$_} }
   #        grep { m/$SUBENTRY_EXPR/ }

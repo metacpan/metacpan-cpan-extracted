@@ -12,6 +12,8 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Class::Accessor::Chained
   Devel::StackTrace
+  Expect
+  Expect::Simple
   ExtUtils::MakeMaker
   File::Which
   FindBin

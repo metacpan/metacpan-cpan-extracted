@@ -6,6 +6,13 @@ use lib "$FindBin::Bin/lib";
 
 use Test::More tests => 5;
 
+BEGIN {
+    # Remove all relevant env variables to avoid accidental fail
+    foreach my $name ( grep { m{^(CATALYST)} } keys %ENV ) {
+        delete $ENV{ $name };
+    }
+}
+
 use Catalyst::Test 'TestApp';
 
 {

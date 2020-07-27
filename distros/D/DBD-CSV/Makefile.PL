@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-# Copyright (c) 2009-2018 H.Merijn Brand
+# Copyright (c) 2009-2020 H.Merijn Brand
 
 require 5.008001;
 
@@ -161,5 +161,15 @@ sub postamble {
 	'	-@cpants_lint.pl $(DISTVNAME).tgz',
 	'	-@rm -f Debian_CPANTS.txt',
 	'',
+	'doc docs:		doc/DBD-CSV.md doc/DBD-CSV.html doc/DBD-CSV.man',
+	'	-@rm -f pod2html.tmp',
+	'doc/DBD-CSV.md:		lib/DBD/CSV.pm',
+	'	pod2markdown  < $? > $@',
+	'doc/DBD-CSV.html:		lib/DBD/CSV.pm',
+	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
+	'doc/DBD-CSV.3:		lib/DBD/CSV.pm',
+	'	pod2man       < $? > $@',
+	'doc/DBD-CSV.man:	doc/DBD-CSV.3',
+	'	nroff -mandoc < $? > $@',
 	$min_vsn;
     } # postamble

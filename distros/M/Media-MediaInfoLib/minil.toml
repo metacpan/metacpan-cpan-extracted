@@ -1,0 +1,9 @@
+name = "Media-MediaInfoLib"
+license = "perl_5"
+module_maker = "ModuleBuild"
+badges = ['github-actions/test', 'metacpan']
+static_install = "auto"
+[build]
+build_class = "builder::MyBuilder"
+[no_index]
+directory = ['t', 'xt', 'inc', 'share', 'eg', 'examples', 'author', 'builder', 'ext']

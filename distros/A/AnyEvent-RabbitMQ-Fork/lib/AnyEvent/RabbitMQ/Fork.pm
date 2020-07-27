@@ -1,5 +1,5 @@
 package AnyEvent::RabbitMQ::Fork;
-$AnyEvent::RabbitMQ::Fork::VERSION = '0.5';
+$AnyEvent::RabbitMQ::Fork::VERSION = '0.6';
 # ABSTRACT: Run AnyEvent::RabbitMQ inside AnyEvent::Fork(::RPC)
 
 =head1 NAME
@@ -137,9 +137,9 @@ sub _build_rpc {
         $self->worker_function,
         async      => 1,
         serialiser => $AnyEvent::Fork::RPC::STORABLE_SERIALISER,
-        on_event   => sub { $wself->_on_event(@_) },
-        on_error   => sub { $wself->_on_error(@_) },
-        on_destroy => sub { $wself->_on_destroy(@_) },
+        on_event   => sub { $wself && $wself->_on_event(@_) },
+        on_error   => sub { $wself && $wself->_on_error(@_) },
+        on_destroy => sub { $wself && $wself->_on_destroy(@_) },
         init       => $self->init_function,
         # TODO look into
         #done => '',
@@ -214,7 +214,7 @@ before verbose => sub {
 
 =item load_xml_spec([$amqp_spec_xml_path])
 
-Declare and load the AMQP Specification you wish to use. The default id to use
+Declare and load the AMQP Specification you wish to use. The default is to use
 version 0.9.1 with RabbitMQ specific extensions.
 
 B<Returns: $self>

@@ -56,13 +56,15 @@ sub new {
 sub finish {
     $_[0]->{'finished'} ||= do {
         my $pid = $_[0]->{'pid'};
-        diag "FINISHING SERVER: PID $pid";
+        diag "FINISHING SERVER: PID $pid (from PID $$)";
 
         syswrite $_[0]->{'end_fh'}, 'x';
 
         waitpid $pid, 0;
 
-        diag "REAPED SERVER: PID $pid";
+        diag "REAPED SERVER: PID $pid (from PID $$)";
+
+        1;
     };
 
     return;
@@ -93,49 +95,74 @@ use autodie;
 
 use Test::More;
 
+my $DIAG = 0;
+
+sub _time_out_readable {
+    my ($socket, $timeout) = @_;
+
+    my $rin = q<>;
+    vec( $rin, fileno($socket), 1 ) = 1;
+
+    my $got = select my $rout = $rin, undef, undef, $timeout;
+
+    if ($got < 0) {
+        warn "select(): $!";
+        $got = 0;
+    }
+
+    return $got;
+}
+
 # A blocking, non-forking server.
 # Written this way to achieve maximum simplicity.
 sub run {
     my ($socket, $end_fh) = @_;
 
-    my $rin = q<>;
-    vec( $rin, fileno($socket), 1 ) = 1;
+    $SIG{'PIPE'} = 'IGNORE';
 
+  ACCEPT:
     while (!-s $end_fh) {
-        my $got = select my $rout = $rin, undef, undef, 0.1;
+        next if !_time_out_readable($socket, 0.1);
 
-        if ($got < 0) {
-            warn "select(): $!";
-        }
-
-        next if $got <= 0;
-
-        # print STDERR "Server ($$) accepting connection …\n";
+        _DIAG("Accepting connection …");
         accept( my $cln, $socket );
-        # print STDERR "Server ($$) received connection\n";
+        _DIAG("Received connection; reading …");
 
         my $buf = q<>;
         while (-1 == index($buf, "\x0d\x0a\x0d\x0a")) {
-            sysread( $cln, $buf, 512, length $buf );
+            sysread( $cln, $buf, 512, length $buf ) or do {
+                _DIAG("Connection closed prematurely.");
+                next ACCEPT;
+            };
         }
 
-        # print STDERR "Server ($$) received headers\n";
+        _DIAG("Received headers");
 
         $buf =~ m<GET \s+ (\S+)>x or die "Bad request: $buf";
         my $uri_path = $1;
 
-        syswrite $cln, $MyServer::HEAD_START;
-        syswrite $cln, "X-URI: $uri_path$MyServer::CRLF";
-        syswrite $cln, $MyServer::CRLF;
+        _DIAG("URI: $uri_path");
 
-        syswrite $cln, ( $uri_path eq '/biggie' ? $MyServer::BIGGIE : $uri_path );
+        diag "connection failed: $@" if !eval {
+            syswrite $cln, $MyServer::HEAD_START;
+            syswrite $cln, "X-URI: $uri_path$MyServer::CRLF";
+            syswrite $cln, $MyServer::CRLF;
 
-        # print STDERR "Server ($$) wrote response for $uri_path\n";
+            syswrite $cln, ( $uri_path eq '/biggie' ? $MyServer::BIGGIE : $uri_path );
 
-        # Proper TCP shutdown.
-        shutdown $cln, 0;
-        1 while sysread $cln, my $throwaway, 65536;
+            # Proper TCP shutdown.
+            shutdown $cln, 0;
+            1 while sysread $cln, my $throwaway, 65536;
+
+            1;
+        };
     }
 
-    print STDERR "Server ($$) received request to shut down\n";
+    diag "Server ($$) received request to shut down";
 }
+
+sub _DIAG {
+    diag "Server (PID $$): " . shift() if $DIAG;
+}
+
+1;

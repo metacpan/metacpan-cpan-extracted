@@ -27,15 +27,9 @@ See F</examples> for comparisons.
 
 use parent 'Net::Curl::Promiser';
 
-use Net::Curl::Multi ();
+use Net::Curl::Promiser::Backend::Select;
 
 #----------------------------------------------------------------------
-
-=head1 C<process( $READ_MASK, $WRITE_MASK )>
-
-Instances of this class should pass the read and write bitmasks
-to the C<process()> method that otherwise would be passed to Perl’s
-C<select()> built-in.
 
 =head1 METHODS
 
@@ -51,9 +45,7 @@ need to copy them again before calling C<select()>.
 =cut
 
 sub get_vecs {
-    my ($self) = @_;
-
-    return @{$self}{'rin', 'win', 'ein'};
+    return shift()->{'backend'}->get_vecs();
 }
 
 #----------------------------------------------------------------------
@@ -66,89 +58,86 @@ count of such. Useful to check for exception events.
 =cut
 
 sub get_fds {
-    return keys %{ $_[0]{'rfds'} };
+    return shift()->{'backend'}->get_fds();
 }
 
 #----------------------------------------------------------------------
 
-=head2 @fds = I<OBJ>->get_timeout();
+=head1 C<process( $READ_MASK, $WRITE_MASK )>
 
-Translates the base class’s implementation of this method to seconds
-(since that’s what C<select()> expects).
+Tell the underlying L<Net::Curl::Multi> object which socket events have
+happened. $READ_MASK and $WRITE_MASK are as “left” by Perl’s
+C<select()> built-in.
+
+If, in fact, no events have happened, then this calls
+C<socket_action(CURL_SOCKET_TIMEOUT)> on the
+L<Net::Curl::Multi> object (similar to C<time_out()>).
+
+Finally, this reaps whatever pending HTTP responses may be ready and
+resolves or rejects the corresponding Promise objects.
+
+Returns I<OBJ>.
+
+=cut
+
+sub process {
+    my ($self, @fd_action_args) = @_;
+
+    $self->{'backend'}->process( $self->{'multi'}, \@fd_action_args );
+
+    return $self;
+}
+
+#----------------------------------------------------------------------
+
+=head2 $is_active = I<OBJ>->time_out();
+
+Tell the underlying L<Net::Curl::Multi> object that a timeout happened,
+and reap whatever pending HTTP responses may be ready.
+
+Calls C<socket_action(CURL_SOCKET_TIMEOUT)> on the
+underlying L<Net::Curl::Multi> object. The return is the same as
+that operation returns.
+
+Since C<process()> can also do the work of this function, a call to this
+function is just an optimization.
+
+This should only be called from event loop logic.
+
+=cut
+
+sub time_out {
+    my ($self) = @_;
+
+    return $self->{'backend'}->time_out( $self->{'multi'} );
+}
+
+#----------------------------------------------------------------------
+
+=head2 $num = I<OBJ>->get_timeout()
+
+Like libcurl’s L<curl_multi_timeout(3)>, but sometimes returns different
+values depending on the needs of I<OBJ>.
+
+(NB: This value is in I<milliseconds>.)
+
+This should only be called (if it’s called at all) from event loop logic.
 
 =cut
 
 sub get_timeout {
-    return $_[0]->SUPER::get_timeout() / 1000;
+    my ($self) = @_;
+
+    my $timeout = $self->{'backend'}->get_timeout( $self->{'multi'} );
+
+    return( ($timeout == -1) ? $timeout : $timeout / 1000 );
 }
 
 #----------------------------------------------------------------------
 
 sub _INIT {
-    my ($self) = @_;
-
-    $_ = q<> for @{$self}{ qw( rin win ein ) };
-
-    $_ = {} for @{$self}{ qw( rfds wfds ) };
-
-    return;
+    return Net::Curl::Promiser::Backend::Select->new();
 }
 
-sub _GET_FD_ACTION {
-    my ($self, $args_ar) = @_;
-
-    my %fd_action;
-
-    $fd_action{$_} = Net::Curl::Multi::CURL_CSELECT_IN() for keys %{ $self->{'rfds'} };
-    $fd_action{$_} += Net::Curl::Multi::CURL_CSELECT_OUT() for keys %{ $self->{'wfds'} };
-
-    return \%fd_action;
-}
-
-sub _SET_POLL_IN {
-    my ($self, $fd) = @_;
-    $self->{'rfds'}{$fd} = $self->{'fds'}{$fd} = delete $self->{'wfds'}{$fd};
-
-    vec( $self->{'rin'}, $fd, 1 ) = 1;
-    vec( $self->{'win'}, $fd, 1 ) = 0;
-    vec( $self->{'ein'}, $fd, 1 ) = 1;
-
-    return;
-}
-
-sub _SET_POLL_OUT {
-    my ($self, $fd) = @_;
-    $self->{'wfds'}{$fd} = $self->{'fds'}{$fd} = delete $self->{'rfds'}{$fd};
-
-    vec( $self->{'rin'}, $fd, 1 ) = 0;
-    vec( $self->{'win'}, $fd, 1 ) = 1;
-    vec( $self->{'ein'}, $fd, 1 ) = 1;
-
-    return;
-}
-
-sub _SET_POLL_INOUT {
-    my ($self, $fd) = @_;
-    $self->{'rfds'}{$fd} = $self->{'wfds'}{$fd} = $self->{'fds'}{$fd} = undef;
-
-    vec( $self->{'rin'}, $fd, 1 ) = 1;
-    vec( $self->{'win'}, $fd, 1 ) = 1;
-    vec( $self->{'ein'}, $fd, 1 ) = 1;
-
-    return;
-}
-
-sub _STOP_POLL {
-    my ($self, $fd) = @_;
-    delete $self->{'rfds'}{$fd};
-    delete $self->{'wfds'}{$fd};
-    delete $self->{'fds'}{$fd};
-
-    vec( $self->{'rin'}, $fd, 1 ) = 0;
-    vec( $self->{'win'}, $fd, 1 ) = 0;
-    vec( $self->{'ein'}, $fd, 1 ) = 0;
-
-    return;
-}
 
 1;

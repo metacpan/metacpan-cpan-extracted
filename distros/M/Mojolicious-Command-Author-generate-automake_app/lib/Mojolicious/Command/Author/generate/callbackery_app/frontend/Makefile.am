@@ -21,6 +21,9 @@ source-watch: node_modules
 
 build: ../public/.built
 
+dist-hook:
+	$(PERL) -i -p -e 's/#VERSION#/$(PACKAGE_VERSION)/g;s/#YEAR#/$(YEAR)/g;s/#DATE#/$(DATE)/g;' $(distdir)/../public/$(QX_CLASS)/*.js
+
 clean: node_modules
 	$(NPX) qx clean
 

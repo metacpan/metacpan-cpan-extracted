@@ -47,7 +47,7 @@ my @exp_codes = (
     'Trematode Mitochondrial',
     'Scenedesmus obliquus Mitochondrial',
     'Thraustochytrium Mitochondrial',
-    'Pterobranchia Mitochondrial',
+    'Rhabdopleuridae Mitochondrial',
     'Candidate Division SR1 and Gracilibacteria',
     'Pachysolen tannophilus Nuclear',
     'Blastocrithidia Nuclear',

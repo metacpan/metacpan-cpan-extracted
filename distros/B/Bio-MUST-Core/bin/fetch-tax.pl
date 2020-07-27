@@ -83,13 +83,14 @@ my %fetch_from = (
     gi      => sub { map { $tax->get_taxid_from_seq_id(   $_) }
                      map { $_ =~ $PKEYONLY ? 'gi|' . $_ : $_  } @_ },
             # we let ..._from_seq_id doing the GI number parsing
-    taxid   => sub { @_ },
+    taxid   => sub {                                            @_ },
 );
 
 for my $infile (@ARGV_infiles) {
 
     ### Processing: $infile
     my $list = IdList->$method($infile, $args);
+    my $comment_n = $list->count_comments;
 
     # fetch and clean up list items
     # Note: using apply instead of map for satisfying Perl::Critic
@@ -159,6 +160,7 @@ for my $infile (@ARGV_infiles) {
     # output assembled taxonomy lines
     my $outfile = change_suffix($infile, $suffix);
     open my $out, '>', $outfile;
+    say {$out} '#' for $comment_n;
     @rows = sort { $a->[0] cmp $b->[0] } @rows if $sort;
     say {$out} join $sep, @{$_} for @rows;
 }
@@ -173,7 +175,7 @@ fetch-tax.pl - Fetch information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 USAGE
 
@@ -316,7 +318,8 @@ highest levels in the hierarchy (i.e., 3 to 5).
 
 IDM output switch [default: no]. When specified, the output can be used as an
 IDM file listing the base MUST id => NCBI taxon id pairs. This option
-overrides all other output switches except the next one.
+overrides all other output switches except the next one. Such IDM files are
+also compatible with C<42>'s C<yaml-generator.pl>.
 
 =item --legacy-nom=<level|file.fra>
 

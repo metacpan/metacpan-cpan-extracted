@@ -1,0 +1,5 @@
+Revision history for WWW::WebKit2
+
+0.11 Mon Mar 23 15:27:00 CET 2020
+
+Changing drag and drop to use javascript rather than simulated mouse controls.

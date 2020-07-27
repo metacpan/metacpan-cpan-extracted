@@ -73,9 +73,9 @@ my @valid_ids = (
 
     # viruses
     [ 'HIV-1 M:C_505006@210038491',     # Note the unusual names of viruses
-        'Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226',
-        'Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C',
-       ('Viruses; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226') x 3,
+        'Viruses; Riboviria; Pararnavirae; Artverviricota; Revtraviricetes; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226',
+        'Viruses; Riboviria; Pararnavirae; Artverviricota; Revtraviricetes; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C',
+       ('Viruses; Riboviria; Pararnavirae; Artverviricota; Revtraviricetes; Ortervirales; Retroviridae; Orthoretrovirinae; Lentivirus; Human immunodeficiency virus 1; HIV-1 group M; HIV-1 M:C; HIV-1 M:C U2226') x 3,
         q{'HIV-1 M:C U2226'},
         q{'HIV-1 M:C U2226 [210038491]'} ],
 
@@ -166,7 +166,7 @@ my @valid_ids = (
         q{'Ulnaria acus [123456]'} ],
     [ 'Oscillatoriales cyanobacterium_627090@ABCDEF',
         'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; unclassified Cyanobacteria; [Leptolyngbya] sp. JSC-1',
-        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; Oscillatoriophycideae; Oscillatoriales; unclassified Oscillatoriales; unclassified Oscillatoriales (miscellaneous); Oscillatoriales cyanobacterium',
+        'cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; Oscillatoriophycideae; Oscillatoriales; unclassified Oscillatoriales; Oscillatoriales cyanobacterium',
        ('cellular organisms; Bacteria; Terrabacteria group; Cyanobacteria/Melainabacteria group; Cyanobacteria; unclassified Cyanobacteria; [Leptolyngbya] sp. JSC-1') x 3,
         q{'[Leptolyngbya] sp. JSC-1'},
         q{'[Leptolyngbya] sp. JSC-1 [ABCDEF]'} ],
@@ -1003,6 +1003,36 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 228b22 a0522d b22222 ffd700 );
      }
 }
 
+{
+    my $infile  = file('test', 'PBP3.tre');
+    my $tree = Bio::MUST::Core::Tree->load($infile);
+    my $color_file = file('test', 'PBP3_color4_itol.txt');
+    my $label_file = file('test', 'PBP3_label4_itol.txt');
+    my $collapse_file = file('test', 'PBP3_collapse4_itol.txt');
+    my $outfile1 = file('test', 'my_PBP3_color4_itol.txt');
+    my $outfile2 = file('test', 'my_PBP3_label4_itol.txt');
+    my $outfile3 = file('test', 'my_PBP3_collapse4_itol.txt');
+
+    $tax->attach_taxonomies_to_terminals($tree);
+    $tax->attach_taxonomies_to_internals($tree);
+
+    $tax->attach_taxa_to_entities($tree, {     name => 'phylum',
+                                               collapse => 'phylum' } );
+    $outfile1->remove;
+    $outfile2->remove;
+    $outfile3->remove;
+
+    my $scheme = $tax->load_color_scheme(file('test', 'bacteria.cls'));
+    $scheme->store_itol_colors($tree, $outfile1->stringify);    # for S::C
+    compare_ok($outfile1, $color_file,
+        "wrote expected iTOL color file: $color_file");
+
+    $tree->store_itol_collapse($outfile2->stringify, $outfile3->stringify);
+    compare_ok($outfile2, $label_file,                          # for S::C
+        "wrote expected iTOL label file: $label_file");
+    compare_ok($outfile3, $collapse_file,
+        "wrote expected iTOL collapse file: $collapse_file");
+}
 
 # {
 #     use Bio::Phylo::Treedrawer;

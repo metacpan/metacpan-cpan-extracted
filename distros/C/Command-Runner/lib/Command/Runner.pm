@@ -6,6 +6,7 @@ use Capture::Tiny ();
 use Command::Runner::Format ();
 use Command::Runner::LineBuffer;
 use Command::Runner::Quote ();
+use Command::Runner::Timeout;
 use Config ();
 use IO::Select;
 use POSIX ();
@@ -13,7 +14,7 @@ use Time::HiRes ();
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.102';
+our $VERSION = '0.103';
 our $TICK = 0.02;
 
 sub new {
@@ -128,9 +129,9 @@ sub _system_win32 {
         $pid = system 1, $command;
     }
 
-    my $timeout_at = $self->{timeout} ? Time::HiRes::time() + $self->{timeout} : undef;
+    my $timeout = $self->{timeout} ? Command::Runner::Timeout->new($self->{timeout}, 1) : undef;
     my $INT; local $SIG{INT} = sub { $INT++ };
-    my ($result, $timeout);
+    my $result;
     while (1) {
         if ($INT) {
             kill INT => $pid;
@@ -145,17 +146,13 @@ sub _system_win32 {
             $result = $?;
             last;
         } else {
-            if ($timeout_at) {
-                my $now = Time::HiRes::time();
-                if ($timeout_at <= $now) {
-                    $timeout = 1;
-                    kill TERM => $pid;
-                }
+            if ($timeout and my $signal = $timeout->signal) {
+                kill $signal => $pid;
             }
             Time::HiRes::sleep($TICK);
         }
     }
-    return { pid => $pid, result => $result, timeout => $timeout };
+    return { pid => $pid, result => $result, timeout => $timeout && $timeout->signaled };
 }
 
 sub _exec {
@@ -196,8 +193,7 @@ sub _exec {
     my $signal_pid = $Config::Config{d_setpgrp} ? -$pid : $pid;
 
     my $INT; local $SIG{INT} = sub { $INT++ };
-    my $timeout;
-    my $timeout_at = $self->{timeout} ? Time::HiRes::time() + $self->{timeout} : undef;
+    my $timeout = $self->{timeout} ? Command::Runner::Timeout->new($self->{timeout}, 1) : undef;
     my $select = IO::Select->new(grep $_, $stdout_read, $stderr_read);
 
     while ($select->count) {
@@ -205,14 +201,9 @@ sub _exec {
             kill INT => $signal_pid;
             $INT = 0;
         }
-        if ($timeout_at and !$timeout) {
-            my $now = Time::HiRes::time();
-            if ($now > $timeout_at) {
-                $timeout++;
-                kill TERM => $signal_pid;
-            }
+        if ($timeout and my $signal = $timeout->signal) {
+            kill $signal => $signal_pid;
         }
-
         for my $ready ($select->can_read($TICK)) {
             my $type = $ready == $stdout_read ? "stdout" : "stderr";
             my $len = sysread $ready, my $buf, 64*1024;
@@ -240,7 +231,7 @@ sub _exec {
     my $res = {
         pid => $pid,
         result => $?,
-        timeout => $timeout,
+        timeout => $timeout && $timeout->signaled,
         stdout => $self->{_buffer}{stdout} ? $self->{_buffer}{stdout}->raw : "",
         stderr => $self->{_buffer}{stderr} ? $self->{_buffer}{stderr}->raw : "",
     };

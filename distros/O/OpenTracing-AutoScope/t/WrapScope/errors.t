@@ -19,7 +19,7 @@ throws_ok { error() } $re_error, 'error reported outside';
 global_tracer_cmp_easy(
     [
         { operation_name => 'main::success' },
-        { operation_name => 'main::error', tags => superhashof({ error => re($re_error) }) },
+        { operation_name => 'main::error', tags => superhashof({ error => 1, message => re($re_error) }) },
     ],
     'error saved into a tag'
 );

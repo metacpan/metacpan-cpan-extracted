@@ -1,0 +1,7 @@
+<node xmlns:doc="http://www.freedesktop.org/dbus/1.0/doc.dtd" name="/">
+    <interface name="at.atikon.WebExtensionIf">
+        <method name="get_title">
+            <arg name="title" type="s" direction="out"/>
+        </method>
+    </interface>
+</node>

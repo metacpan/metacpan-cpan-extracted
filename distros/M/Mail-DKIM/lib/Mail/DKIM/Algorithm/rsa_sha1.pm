@@ -1,7 +1,7 @@
 package Mail::DKIM::Algorithm::rsa_sha1;
 use strict;
 use warnings;
-our $VERSION = '1.20200708'; # VERSION
+our $VERSION = '1.20200724'; # VERSION
 # ABSTRACT: rsa sha1 algorithm class
 
 # Copyright 2005-2006 Messiah College. All rights reserved.
@@ -66,7 +66,7 @@ Mail::DKIM::Algorithm::rsa_sha1 - rsa sha1 algorithm class
 
 =head1 VERSION
 
-version 1.20200708
+version 1.20200724
 
 =head1 AUTHORS
 

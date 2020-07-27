@@ -1,6 +1,6 @@
 package Devel::ebug::Console;
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 use strict;
 use warnings;
@@ -205,7 +205,7 @@ Devel::ebug::Console
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 SYNOPSIS
 

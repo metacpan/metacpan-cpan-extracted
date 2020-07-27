@@ -54,7 +54,8 @@ expect("", "main(corpus/calc.pl#5):\nmy \$e = add(\$q, \$w);", 'step again');
 expect("n", "main(corpus/calc.pl#6):\n\$e++;", 'next');
 expect("r", qq{main(corpus/calc.pl#9):\nprint "\$e\\n";}, 'run');
 expect("r", qq{}, 'run to end');
-expect("r", qq{Program finished. Enter 'restart' or 'q'}, 'run to end');
+expect_send('r');
+expect_like(qr{Program finished\. Enter 'restart' or 'q'}, 'run to end');
 expect_quit();
 exit;
 

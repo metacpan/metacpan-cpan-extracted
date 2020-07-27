@@ -94,7 +94,7 @@ __END__
 
 =head1 USAGE
 
-    inst-abbr-ids.pl <infiles> [optional arguments]
+    inst-abbr-ids.pl <infiles> --id-regex=<str> [optional arguments]
 
 =head1 REQUIRED ARGUMENTS
 

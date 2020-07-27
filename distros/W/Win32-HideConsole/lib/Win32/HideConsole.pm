@@ -9,7 +9,7 @@ use constant SW_SHOWNORMAL => 1;
 
 our @EXPORT = qw(hide_console);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub hide_console
 {
@@ -63,6 +63,8 @@ Place this command near the beginning of your code (right after the "use" direct
 1.00 - Initial Release
 
 1.01 - Fixed this POD document
+
+1.02 - More documentation fixes
 
 =head1 Author
 

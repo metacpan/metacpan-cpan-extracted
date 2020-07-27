@@ -1,0 +1,1 @@
+https://en.wikipedia.org - %HomeDrive%\Windows\System32\setx.exe

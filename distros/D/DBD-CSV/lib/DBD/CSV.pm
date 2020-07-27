@@ -15,6 +15,14 @@ require DynaLoader;
 require DBD::File;
 require IO::File;
 
+our @f_SHORT = qw( file dir dir_search ext lock lockfile schema encoding );
+our @c_SHORT = qw( class eof
+	eol sep_char quote_char escape_char binary decode_utf8 auto_diag
+	diag_verbose blank_is_undef empty_is_undef allow_whitespace
+	allow_loose_quotes allow_loose_escapes allow_unquoted_escape
+	always_quote quote_empty quote_space escape_null quote_binary
+	keep_meta_info callbacks );
+
 package DBD::CSV;
 
 use strict;
@@ -23,7 +31,7 @@ use vars qw( @ISA $VERSION $ATTRIBUTION $drh $err $errstr $sqlstate );
 
 @ISA =   qw( DBD::File );
 
-$VERSION     = "0.54";
+$VERSION     = "0.55";
 $ATTRIBUTION = "DBD::CSV $DBD::CSV::VERSION by H.Merijn Brand";
 
 $err      = 0;		# holds error code   for DBI::err
@@ -68,6 +76,20 @@ our $data_sources_attr = undef;
 
 sub connect {
     my ($drh, $dbname, $user, $auth, $attr) = @_;
+    if ($attr && ref $attr eq "HASH") {
+	# Top-level aliasses
+	foreach my $key (grep { exists $attr->{$_} } @f_SHORT) {
+	    my $f_key = "f_$key";
+	    exists $attr->{$f_key} and next;
+	    $attr->{$f_key} = delete $attr->{$key};
+	    }
+	foreach my $key (grep { exists $attr->{$_} } @c_SHORT) {
+	    my $c_key = "csv_$key";
+	    exists $attr->{$c_key} and next;
+	    $attr->{$c_key} = delete $attr->{$key};
+	    }
+	}
+
     my $dbh = $drh->DBD::File::dr::connect ($dbname, $user, $auth, $attr);
     $dbh and $dbh->{Active} = 1;
     $dbh;
@@ -94,32 +116,15 @@ sub init_valid_attributes {
     my $dbh = shift;
 
     # Straight from Text::CSV_XS.pm
-    my @xs_attr = qw(
-	eol
-	sep_char
-	quote_char
-	escape_char
-	binary
-	decode_utf8
-	auto_diag
-	diag_verbose
-	blank_is_undef
-	empty_is_undef
-	allow_whitespace
-	allow_loose_quotes
-	allow_loose_escapes
-	allow_unquoted_escape
-	always_quote
-	quote_empty
-	quote_space
-	escape_null
-	quote_binary
-	keep_meta_info
-	verbatim
-	types
-	callbacks
-	);
+    my @xs_attr = @c_SHORT;
     @csv_xs_attr{@xs_attr} = ();
+    # Dynamically add "new" attributes - available in Text::CSV_XS-1.20
+    if (my @ka = eval { Text::CSV_XS->known_attributes }) {
+	for (grep { m/^[a-su-z]/ && !exists $csv_xs_attr{$_} } @ka) {
+	    push @xs_attr => $_;
+	    $csv_xs_attr{$_} = undef;
+	    }
+	};
 
     $dbh->{csv_xs_valid_attrs} = [ @xs_attr ];
 
@@ -191,6 +196,31 @@ use Carp;
 
 our @ISA = qw( DBD::File::Table );
 
+my %compat_map;
+
+{   my %class_mapped;
+
+    sub _register_compat_map {
+	my $class = shift;
+
+	my $x = 0;
+	if (!%compat_map) {
+	    $compat_map{$_} = "f_$_"   for @f_SHORT;
+	    $compat_map{$_} = "csv_$_" for @c_SHORT;
+	    $x++;
+	    }
+	if ($class and !$class_mapped{$class}++ and
+		my @ka = eval { $class->known_attributes }) {
+	    # exclude types
+	    $compat_map{$_} = "csv_$_" for grep m/^[a-su-z]/ => @ka;
+	    $x++;
+	    }
+	if ($x) {
+	    __PACKAGE__->register_compat_map (\%compat_map);
+	    }
+	} # _register_compat_map
+    }
+
 #sub DESTROY {
 #    my $self = shift or return;
 #
@@ -201,6 +231,9 @@ sub bootstrap_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
     $meta->{csv_class} ||= $dbh->{csv_class} || "Text::CSV_XS";
     $meta->{csv_eol}   ||= $dbh->{csv_eol}   || "\r\n";
+
+    _register_compat_map ($meta->{csv_class});
+
     exists $meta->{csv_skip_first_row} or
 	$meta->{csv_skip_first_row} = $dbh->{csv_skip_first_row};
     exists $meta->{csv_bom} or
@@ -210,6 +243,8 @@ sub bootstrap_table_meta {
 
 sub init_table_meta {
     my ($self, $dbh, $meta, $table) = @_;
+
+    _register_compat_map ($meta->{csv_class});
 
     $self->SUPER::init_table_meta ($dbh, $table, $meta);
 
@@ -246,13 +281,10 @@ sub init_table_meta {
 	}
     } # init_table_meta
 
-my %compat_map = map { $_ => "csv_$_" }
-    qw( class eof  eol quote_char sep_char escape_char );
-
-__PACKAGE__->register_compat_map (\%compat_map);
-
 sub table_meta_attr_changed {
     my ($class, $meta, $attr, $value) = @_;
+
+    _register_compat_map ($meta->{csv_class});
 
     (my $csv_attr = $attr) =~ s/^csv_//;
     if (exists $csv_xs_attr{$csv_attr}) {
@@ -1007,7 +1039,7 @@ hash ref with the following attributes:
 
 =item o
 
-All valid attributes to the CSV parsing module. Any of the can optionally
+All valid attributes to the CSV parsing module. Any of them can optionally
 be prefixed with C<csv_>.
 
 =item o
@@ -1018,6 +1050,18 @@ All attributes valid to DBD::File
 
 If you pass it C<f_file> or its alias C<file>, C<f_ext> has no effect, but
 C<f_dir> and C<f_encoding> still have.
+
+  csv_tables => {
+      syspwd => {                   # Table name
+          csv_sep_char => ":",      # Text::CSV_XS
+          quote_char   => undef,    # Text::CSV_XS
+          escape_char  => undef,    # Text::CSV_XS
+          f_dir        => "/etc",   # DBD::File
+          f_file       => "passwd", # DBD::File
+          col_names    =>           # DBD::File
+            [qw( login password uid gid realname directory shell )],
+          },
+      },
 
 =item csv_*
 X<csv_*>
@@ -1293,7 +1337,7 @@ Previous maintainer was Jeff Zucker
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2018 by H.Merijn Brand
+Copyright (C) 2009-2020 by H.Merijn Brand
 Copyright (C) 2004-2009 by Jeff Zucker
 Copyright (C) 1998-2004 by Jochen Wiedmann
 

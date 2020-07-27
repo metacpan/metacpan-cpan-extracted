@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Bytes::Random::Secure" : "0",
+            "HTTP::Headers" : "0",
             "Moo" : "0",
             "OpenTracing::GlobalTracer" : "0.04",
             "OpenTracing::Implementation::Interface::Bootstrap" : "0",
@@ -52,6 +53,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.102.0",
+   "version" : "v0.102.1",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

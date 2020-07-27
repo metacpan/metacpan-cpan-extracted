@@ -2,11 +2,14 @@ ChangeLog
 MANIFEST
 Makefile.PL
 CONTRIBUTING.md
+cpanfile
 README
 lib/Bundle/DBD/CSV.pm
 lib/DBD/CSV.pm
 lib/DBD/CSV/TypeInfo.pm
 lib/DBD/CSV/GetInfo.pm
+files/fruit.csv
+files/tools.csv
 t/10_base.t
 t/11_dsnlist.t
 t/20_createdrop.t

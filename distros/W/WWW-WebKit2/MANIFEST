@@ -1,3 +1,4 @@
+Changes
 lib/WWW/WebKit2.pm
 lib/WWW/WebKit2/Cookies.pm
 lib/WWW/WebKit2/Events.pm
@@ -6,7 +7,9 @@ lib/WWW/WebKit2/KeyboardInput.pm
 lib/WWW/WebKit2/Locator.pm
 lib/WWW/WebKit2/LocatorCSS.pm
 lib/WWW/WebKit2/MouseInput.pm
+lib/WWW/WebKit2/MouseInput/DragAndDropSimulator.pm
 lib/WWW/WebKit2/Navigator.pm
+lib/WWW/WebKit2/Proxy.pm
 lib/WWW/WebKit2/Settings.pm
 LICENSE
 Makefile.PL
@@ -19,6 +22,7 @@ t/events.t
 t/inspector.t
 t/keyboard.t
 t/locator.t
+t/logging.t
 t/mouse.t
 t/navigator.t
 t/test/attribute.html

@@ -5,7 +5,7 @@ BEGIN {
     # Windows can't change timezone inside Perl script
     if (($ENV{TZ}||'') ne 'GMT') {
         $ENV{TZ} = 'GMT';
-        exec $^X, (map { "-I\"$_\"" } @INC), $0;
+        exec $^X (map { "-I\"$_\"" } @INC), $0;
     };
 }
 

@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 
 use Test::More;
+use Test::Deep;
 use Test::Mojo;
 use Mojo::URL;
 use Mojo::File qw(path);

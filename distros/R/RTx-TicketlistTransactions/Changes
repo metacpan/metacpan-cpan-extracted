@@ -1,5 +1,8 @@
 Revision history for perl module RTx::TicketlistTransactions
 
+1.01 2020-07-27
+ - Add RT 5 support
+
 1.00 2016-06-19
  - Packaging updates
 

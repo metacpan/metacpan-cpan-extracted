@@ -2684,26 +2684,35 @@
 # Pronouns in the nominative...
 # (note: the order is important here!)
 
-        I     => we
-        you   => you
-        it    => they
-        she   => they
-        he    => they
-        they  => they
-        this  => these
-        that  => those
-        one   => some
+        I          => we
+        you        => you
+        it         => they
+        she        => they
+        he         => they
+        they       => they
+        this       => these
+        that       => those
+        one        => some
+        who        => who
+        whoever    => whoever
+        whosoever  => whosoever
+        what       => what
+        whatever   => whatever
+        whatsoever => whatsoever
 
 
-# Pronouns in the accusative...
+# Pronouns in the objective...
 # (note: the order is important here!)
 
-        me    => us
-        you   => you
-        it    => them
-        her   => them
-        him   => them
-        them  => them
+        me         => us
+        you        => you
+        it         => them
+        her        => them
+        him        => them
+        them       => them
+        whom       => whom
+        whomever   => whomever
+        whomsoever => whomsoever
 
 # Pronouns in the reflexive...
 # (note: the order is important here!)
@@ -2725,7 +2734,9 @@
         hers    => theirs
         his     => theirs
         theirs  => theirs
-
+        whose      => whose
+        whosever    => whosever
+        whosesoever  => whosesoever
 
 
 # Standard patterns of inflection for other nouns (in increasing order of generality)...

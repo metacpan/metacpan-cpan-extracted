@@ -1,8 +1,9 @@
+use lib '.';
 use inc::Module::Install;
 
 RTx 'RT-Extension-TimeTracking';
 repository('https://github.com/bestpractical/rt-extension-timetracking');
-requires_rt '4.2.0';
+requires_rt '5.0.0';
 
 my ($lp) = ($INC{'RT.pm'} =~ /^(.*)[\\\/]/);
 my $lib_path = join( ' ', "$RT::LocalPath/lib", $lp );

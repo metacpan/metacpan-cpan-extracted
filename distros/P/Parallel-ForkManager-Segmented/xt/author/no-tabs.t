@@ -11,6 +11,7 @@ my @files = (
     't/00-compile.t',
     't/avoid-callback-on-empty-input.t',
     't/system-test--process-batch.t',
+    't/system-test--stream-cb.t',
     't/system-test-1.t'
 );
 

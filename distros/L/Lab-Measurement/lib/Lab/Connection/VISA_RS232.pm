@@ -1,6 +1,6 @@
 package Lab::Connection::VISA_RS232;
 #ABSTRACT: RS232-type connection which uses NI VISA (L<Lab::VISA>) as backend
-$Lab::Connection::VISA_RS232::VERSION = '3.710';
+$Lab::Connection::VISA_RS232::VERSION = '3.720';
 use v5.20;
 
 use strict;
@@ -174,7 +174,7 @@ Lab::Connection::VISA_RS232 - RS232-type connection which uses NI VISA (L<Lab::V
 
 =head1 VERSION
 
-version 3.710
+version 3.720
 
 =head1 SYNOPSIS
 

@@ -20,15 +20,17 @@ no_index:
     - t
 requires:
   Config::Grammar: '1.13'
+  Excel::Writer::XLSX: '0'
   JSON::Validator: '0'
   Locale::PO: '0.27'
   Mojolicious: '8.26'
   Mojolicious::Plugin::Qooxdoo: v1.0.8
+  Text::CSV: '0'
   YAML::XS: '0'
   perl: '5.022000'
 resources:
   bugtracker: https://github.com/oetiker/callbackery/issues
   license: http://opensource.org/licenses/GPL-3.0
   repository: https://github.com/oetiker/callbackery
-version: v0.33.6
+version: v0.34.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

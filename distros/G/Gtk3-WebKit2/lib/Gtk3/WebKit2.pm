@@ -1,6 +1,6 @@
 package Gtk3::WebKit2;
 {
-  $Gtk3::WebKit2::VERSION = '0.011';
+  $Gtk3::WebKit2::VERSION = '0.012';
 }
 
 =head1 NAME
@@ -433,6 +433,12 @@ If you are trying to install this on a "headless" server, then you will need a
 framebuffer display to take the place of the X server.
 
 The xvfb-run command can do this for you.
+
+=head2 Other
+
+You will need to have GTK3 and Webkit2 installed to use this.
+A key package you will need is webkit2-gtk-devel.
+
 
 =head1 BUGS
 

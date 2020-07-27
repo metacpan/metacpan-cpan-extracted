@@ -1,5 +1,5 @@
 package Archive::BagIt;
-our $VERSION = '0.058'; # VERSION
+our $VERSION = '0.059'; # VERSION
 use strict;
 use warnings;
 use utf8;
@@ -386,7 +386,7 @@ Archive::BagIt
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 SYNOPSIS
 
@@ -415,7 +415,7 @@ Archive::BagIt
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 WARNING
 

@@ -1,6 +1,8 @@
-Release 1.00	2009-08-24
-	- Initial Release
-Release 1.01	2020-06-25
-	- Added Windows 10 Support
+Release 1.03	2020-07-26
+	- More documentation fixes
 Release 1.02	2020-06-25
 	- Fixed POD docs
+Release 1.01	2020-06-25
+	- Added Windows 10 Support
+Release 1.00	2009-08-24
+	- Initial Release

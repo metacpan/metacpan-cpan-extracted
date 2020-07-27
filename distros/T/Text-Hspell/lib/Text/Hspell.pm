@@ -1,5 +1,5 @@
 package Text::Hspell;
-$Text::Hspell::VERSION = '0.2.5';
+$Text::Hspell::VERSION = '0.4.1';
 use 5.014;
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use vars qw(@ISA);
 
 bootstrap Text::Hspell $VERSION;
 
-use Encode qw/ encode /;
+use Encode qw/ decode encode /;
 
 sub new
 {
@@ -23,6 +23,17 @@ sub check_word
 {
     my ( $self, $s ) = @_;
     return $self->check_word_internal( encode( 'iso8859-8', $s ) );
+}
+
+sub try_to_correct_word
+{
+    my ( $self, $s ) = @_;
+    my $ret = $self->trycorrect_internal( encode( 'iso8859-8', $s ) );
+    foreach my $r (@$ret)
+    {
+        $r = decode( 'iso8859-8', $r );
+    }
+    return $ret;
 }
 
 1;
@@ -39,7 +50,7 @@ Text::Hspell - wrapper for the hspell (= Hebrew speller) library
 
 =head1 VERSION
 
-version 0.2.5
+version 0.4.1
 
 =head1 SYNOPSIS
 
@@ -66,11 +77,22 @@ Create a new speller object instance.
 Returns true if the word is spelled right and false if it is an unknown
 word.
 
+=head2 my $array_ref = $speller->try_to_correct_word($word)
+
+Returns an array reference of strings with spell correction suggestions
+for $word .
+
+(Added in version 0.4.0 .)
+
 =head2 $speller->proto_new()
 
 For internal use.
 
 =head2 $speller->check_word_internal()
+
+For internal use.
+
+=head2 $speller->trycorrect_internal()
 
 For internal use.
 
@@ -80,7 +102,7 @@ Copyright 2019 by Shlomi Fish.
 
 This program is distributed under the MIT / Expat License:
 L<http://www.opensource.org/licenses/mit-license.php> .
-Note that it depends on libhspell which is curently under the
+Note that it depends on libhspell which is currently under the
 L<https://en.wikipedia.org/wiki/Affero_General_Public_License>
 v3.
 
@@ -113,7 +135,13 @@ and HspellPy ( L<https://pypi.org/project/HspellPy/> ) from PyPI
 (by L<https://github.com/eranroz/> ), so thanks to them.
 The dependency on these packages was removed in version 0.2.0.
 
-We still make use of libhspell ( L<http://hspell.ivrix.org.il/> ).
+We still make use of libhspell ( L<http://hspell.ivrix.org.il/> )
+by wrapping its C API.
+
+Thanks to the authors of hspell and libhspell:
+Nadav Har’El ( L<http://nadav.harel.org.il/> ),
+Dan Kenigsberg ( L<http://www.cs.technion.ac.il/~danken/> )
+and possibly others.
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-us">
+<title>First Weblog</title>
+<link href="http://localhost/weblog/"/>
+<description>This is a test weblog.</description>
+<rights>Copyright 2004</rights>
+<updated>2004-05-29T23:39:57-08:00</updated>
+<author>Melody</author>
+
+<entry>
+<title>Entry Three</title>
+<summary>Hello again!...</summary>
+<content type="xhtml">
+     <p>Hello!</p>
+</content>
+<link href="http://localhost/weblog/2004/05/entry_three.html"/>
+<author>Melody</author>
+<id>http://localhost/weblog/2004/05/entry_three.html</id>
+<category term="Travel"/>
+<category term="Sports"/>
+<published>2004-05-29T23:39:45-08:00</published>
+</entry>
+
+<entry>
+<title>Entry Two</title>
+<summary>Hello!...</summary>
+<content type="xhtml">
+     <p>Hello!</p>
+</content>
+<link href="http://localhost/weblog/2004/05/entry_two.html"/>
+<author>Melody</author>
+<id>http://localhost/weblog/2004/05/entry_two.html</id>
+<category term="Travel"/>
+<published>2004-05-29T23:39:25-08:00</published>
+</entry>
+
+<entry>
+<title>Test</title>
+<summary>This is a test. Why don&apos;t you come down to our place for a coffee and a chat?...</summary>
+<content type="xhtml"><![CDATA[<p>This is a test.</p>
+
+<p>Why don't you come down to our place for a coffee and a <strong>chat</strong>?</p>]]></content>
+<link href="http://localhost/weblog/2004/05/test.html"/>
+<id>http://localhost/weblog/2004/05/test.html</id>
+<category term="Sports"/>
+<published>2004-05-08T23:03:28-08:00</published>
+</entry>
+
+</feed>

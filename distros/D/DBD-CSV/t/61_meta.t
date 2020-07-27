@@ -124,6 +124,70 @@ note ("File name - with col_names");
 
 unlink $fn;
 
+note ("Attribute prefixes");
+$fn = "test.csv";
+foreach my $x (0, 1) {
+    my ($fpfx, $cpfx) = $x ? ("f_", "csv_") : ("", "");
+    my $dbh = DBI->connect ("dbi:CSV:", undef, undef, {
+	"${fpfx}schema"		=> undef,	# schema / f_schema
+	"${fpfx}dir"		=> "files",	# .. f_dir
+	"${fpfx}ext"		=> ".csv/r",	# .. f_ext
+
+	"${cpfx}eol"		=> "\n",	# eol / csv_eol
+	"${cpfx}always_quote"	=> 1,		# .. csv_always_quote
+	"${cpfx}sep_char"	=> ";",		# .. csv_sep_char
+
+	RaiseError		=> 1,
+	PrintError		=> 1,
+	}) or die "$DBI::errstr\n" || $DBI::errstr;
+
+    my $ffn = "files/$fn";
+    unlink $ffn;
+    $dbh->{csv_tables}{tst} = {
+	"${fpfx}file"		=> $fn,		# file / f_file
+	col_names		=> [qw( c_tst s_tst )],
+	};
+
+    is_deeply (
+	[ sort $dbh->tables (undef, undef, undef, undef) ],
+	[qw( fruit tools )],		"Tables");
+    is_deeply (
+	[ sort keys %{$dbh->{csv_tables}} ],
+	[qw( fruit tools tst )],	"Mixed tables");
+
+    $dbh->{csv_tables}{fruit}{sep_char} = ",";	# should work
+
+    is_deeply ($dbh->selectall_arrayref ("select * from tools order by c_tool"),
+	[ [ 1, "Hammer"		],
+	  [ 2, "Screwdriver"	],
+	  [ 3, "Drill"		],
+	  [ 4, "Saw"		],
+	  [ 5, "Router"		],
+	  [ 6, "Hobbyknife"	],
+	  ], "Sorted tools");
+    is_deeply ($dbh->selectall_arrayref ("select * from fruit order by c_fruit"),
+	[ [ 1, "Apple"		],
+	  [ 2, "Blueberry"	],
+	  [ 3, "Orange"		],
+	  [ 4, "Melon"		],
+	  ], "Sorted fruit");
+
+    # TODO: Ideally, insert should create the file if empty or non-existent
+    # and insert "c_tst";"s_tst" as header line
+    open my $fh, ">", $ffn; close $fh;
+
+    $dbh->do ("insert into tst values (42, 'Test')");			# "42";"Test"
+    $dbh->do ("update tst set s_tst = 'Done' where c_tst = 42");	# "42";"Done"
+
+    $dbh->disconnect;
+
+    open  $fh, "<", $ffn or die "$ffn: $!\n";
+    my @dta = <$fh>;
+    close $fh;
+    is ($dta[-1], qq{"42";"Done"\n}, "Table tst written to $fn");
+    unlink $ffn;
+    }
+
 done_testing ();
 
 __END__

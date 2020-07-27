@@ -1,4 +1,3 @@
-
 =head1 NAME 
 
 Catalyst::Plugin::ConfigLoader::Manual - Guide to using the ConfigLoader plugin
@@ -6,7 +5,7 @@ Catalyst::Plugin::ConfigLoader::Manual - Guide to using the ConfigLoader plugin
 =head1 BASIC USAGE
 
     package MyApp;
-    
+
     use Catalyst qw( ConfigLoader ... );
 
 =head1 ENVIRONMENT VARIABLES
@@ -58,10 +57,10 @@ Catalyst::Plugin::ConfigLoader::Manual - Guide to using the ConfigLoader plugin
 =head3 Example Config
 
     name=TestApp
-    
+
     [Controller::Foo]
     foo=bar
-    
+
     [Model::Baz]
     qux=xyzzy
 
@@ -125,25 +124,24 @@ Catalyst::Plugin::ConfigLoader::Manual - Guide to using the ConfigLoader plugin
 
 =head3 Example Config
 
- <config>
+    <config>
         <name>MyApp::CMS</name>
         <paths>
-          <upload_dir>/var/www/docs/myapp-cms/uploads</upload_dir>
+            <upload_dir>/var/www/docs/myapp-cms/uploads</upload_dir>
         </paths>
         <model name="DB">
-          <connect_info>dbi:mysql:cmsdb</connect_info>
-          <connect_info>user</connect_info>
-          <connect_info>password</connect_info>
+            <connect_info>dbi:mysql:cmsdb</connect_info>
+            <connect_info>user</connect_info>
+            <connect_info>password</connect_info>
         </model>
         <component name="View::TT">
-          <INCLUDE_PATH>__path_to(root,templates)__</INCLUDE_PATH>
-          <ENCODING>UTF-8</ENCODING>
-          <TRIM>1</TRIM>
-          <PRE_CHOMP>2</PRE_CHOMP>
-          <POST_CHOMP>2</POST_CHOMP>
+            <INCLUDE_PATH>__path_to(root,templates)__</INCLUDE_PATH>
+            <ENCODING>UTF-8</ENCODING>
+            <TRIM>1</TRIM>
+            <PRE_CHOMP>2</PRE_CHOMP>
+            <POST_CHOMP>2</POST_CHOMP>
         </component>
-
- </config>
+    </config>
 
 Note that the name attribute for the C<model> tag should be the relative
 namespace of the Catalyst model, not the absolute one.  That is for
@@ -175,12 +173,12 @@ C<MyApp::Model::Something> the C<name> attribute should be C<Something>.
 =head2 Configuring a Catalyst::Model::DBIC::Schema model from a YAML config
 
     Model::MyModel:
-      schema_class: MyApp::MySchema
-      connect_info:
-        - dbi:SQLite:myapp.db
-        - ''
-        - ''
-        - AutoCommit: 1 
+        schema_class: MyApp::MySchema
+        connect_info:
+            - dbi:SQLite:myapp.db
+            - ''
+            - ''
+            - AutoCommit: 1
 
 =head2 Converting your existing config to Config::General format
 
@@ -205,16 +203,16 @@ should add the following config information to MyApp.pm:
 
 When ConfigLoader reads configurations, it starts by reading the configuration
 file for C<myapp> with one of the supported extensions as listed
-L<above|/Config Formats>.
+L<above|/CONFIG FORMATS>.
 
-For example, A L<Config::General> config file is C<myapp.conf>.
+For example, A L<Config::General> config file is F<myapp.conf>.
 
 If a configuration file called C<myapp_local> exists with one of the supported
 file extensions, it will also be read, and values from that file will
 override values from the main config file.
 
 A L<Config::General> local configuration file would be called
-C<myapp_local.conf>.
+F<myapp_local.conf>.
 
 The C<local> suffix can be changed.  See
 L<Catalyst::Plugin::ConfigLoader/get_config_local_suffix> for the details of
@@ -223,17 +221,16 @@ how.
 This is useful because it allows different people or environments to have
 different configuration files.  A project with three developers,
 I<Tom>, I<Dick>, and I<Harry> as well as a production environment can have
-a C<myapp_tom.conf>, a C<myapp_dick.conf>, a C<myapp_harry.conf>, and a
-C<myapp_production.conf>.
+a F<myapp_tom.conf>, a F<myapp_dick.conf>, a F<myapp_harry.conf>, and a
+F<myapp_production.conf>.
 
 Each developer, and the web server, would set the environment variable
 to load their proper configuration file.  All of the configurations can
 be stored properly in source control.
 
-If there is no C<myapp_local.ext> (where .ext is a supported extension), and
+If there is no F<myapp_local.ext> (where C<.ext> is a supported extension), and
 the individual configuration files contain something required to start the
 application, such as the Model's data source definition, the applicaton won't
 start unless the environment variable is set properly.
 
 =cut
-

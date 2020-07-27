@@ -1,5 +1,16 @@
 Revision history for this software.
 
+0.08  2020-07-28 00:00:00
+  - supports also mb::getc, not only mb::getc()
+  - created by INABA Hitoshi
+
+0.07  2020-07-25 00:00:00
+  - add cluck() subroutine
+  - fix qq-like here document (remove unnecessary \n)
+  - supports $mb::PERL as $^X($EXECUTABLE_NAME) for execute MBCS Perl script
+  - supports $mb::ORIG_PROGRAM_NAME as original $0($PROGRAM_NAME) before transpile
+  - created by INABA Hitoshi
+
 0.06  2020-07-16 00:00:00
   - supports absolute path of mb::do()
   - supports absolute path of mb::require()

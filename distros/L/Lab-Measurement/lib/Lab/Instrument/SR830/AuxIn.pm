@@ -1,6 +1,6 @@
 package Lab::Instrument::SR830::AuxIn;
 #ABSTRACT: Aux Inputs of the Stanford Research SR830 Lock-In Amplifier
-$Lab::Instrument::SR830::AuxIn::VERSION = '3.710';
+$Lab::Instrument::SR830::AuxIn::VERSION = '3.720';
 use v5.20;
 
 
@@ -71,7 +71,7 @@ Lab::Instrument::SR830::AuxIn - Aux Inputs of the Stanford Research SR830 Lock-I
 
 =head1 VERSION
 
-version 3.710
+version 3.720
 
 =head1 SYNOPSIS
 

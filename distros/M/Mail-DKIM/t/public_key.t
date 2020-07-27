@@ -25,7 +25,7 @@ my $pubkey = Mail::DKIM::PublicKey->fetch(
 ok( $pubkey, "public key exists" );
 
 #
-# this public key is "NODATA"
+# this public key does not exist
 #
 $pubkey = Mail::DKIM::PublicKey->fetch(
     Protocol => "dns",
@@ -33,7 +33,7 @@ $pubkey = Mail::DKIM::PublicKey->fetch(
     Domain   => "test.authmilter.org",
 );
 ok( !$pubkey,         "public key should not exist" );
-ok( $@ =~ /^NODATA$/, "reason given is NODATA" );
+ok( $@ eq 'NODATA' || $@ eq 'NXDOMAIN', "reason given is NODATA or NXDOMAIN" );
 
 SKIP:
 {

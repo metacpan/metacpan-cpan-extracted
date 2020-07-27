@@ -1,0 +1,4 @@
+Bagging-Date: 2020-07-24
+Bag-Software-Agent: Archive::BagIt <https://metacpan.org/pod/Archive::BagIt>
+Payload-Oxum: 6.1
+Bag-Size: 6 B

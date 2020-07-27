@@ -31,7 +31,9 @@ plan tests => $ClientTest::TEST_COUNT;
     $_ = q<> for my ($rout, $wout, $eout);
 
     while ($promiser->handles()) {
-        if ( my $timeout = $promiser->get_timeout() ) {
+        my $timeout = $promiser->get_timeout();
+
+        if ($timeout && $timeout != -1) {
             ($rout, $wout, $eout) = $promiser->get_vecs();
 
             my $got = select $rout, $wout, $eout, $timeout;

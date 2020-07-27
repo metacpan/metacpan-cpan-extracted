@@ -15,7 +15,7 @@ name: NewsExtractor
 provides:
   NewsExtractor:
     file: lib/NewsExtractor.pm
-    version: v0.33.0
+    version: v0.34.0
   NewsExtractor::Article:
     file: lib/NewsExtractor/Article.pm
   NewsExtractor::CSSExtractor:
@@ -96,6 +96,10 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_idn_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_ksnews_com_tw:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_ksnews_com_tw.pm
+  NewsExtractor::SiteSpecificExtractor::www_mdnkids_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_mdnkids_com.pm
+  NewsExtractor::SiteSpecificExtractor::www_nownews_com:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_nownews_com.pm
   NewsExtractor::SiteSpecificExtractor::www_ntdtv_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_ntdtv_com.pm
   NewsExtractor::SiteSpecificExtractor::www_peopo_org:
@@ -116,6 +120,8 @@ provides:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_twreporter_org.pm
   NewsExtractor::SiteSpecificExtractor::www_upmedia_mg:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_upmedia_mg.pm
+  NewsExtractor::SiteSpecificExtractor::www_ustv_com_tw:
+    file: lib/NewsExtractor/SiteSpecificExtractor/www_ustv_com_tw.pm
   NewsExtractor::SiteSpecificExtractor::www_xinhuanet_com:
     file: lib/NewsExtractor/SiteSpecificExtractor/www_xinhuanet_com.pm
   NewsExtractor::TXExtractor:
@@ -138,7 +144,7 @@ requires:
   Type::Tiny: '0'
   Types::URI: '0'
   YAML: '0'
-version: v0.33.0
+version: v0.34.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: CC0-1.0
 x_static_install: '1'

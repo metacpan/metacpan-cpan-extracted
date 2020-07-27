@@ -1,6 +1,6 @@
 package Test::OpenTracing::Integration;
 
-our $VERSION = 'v0.102.0';
+our $VERSION = 'v0.102.1';
 
 use strict;
 use warnings;

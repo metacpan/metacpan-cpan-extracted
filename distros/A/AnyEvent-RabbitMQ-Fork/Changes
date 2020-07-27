@@ -1,5 +1,13 @@
 Revision history for AnyEvent-RabbitMQ-Fork
 
+0.6       2020-07-26 14:02:30-04:00 America/New_York
+    - fix operator typo in _generate_callback
+    - redundant code cleanup
+    - simplify logic in _generate_callback
+    - make ::Channel->delegate private
+    - safer rpc callbacks with weakened self
+    - update test suite from AnyEent::RabbitMQ with mods to get it working again
+
 0.5       2014-12-28 17:38:10-05:00 America/New_York
     - update test suite to align with AnyEvent::RabbitMQ
     - support bind_exchange & unbind_exchange methods

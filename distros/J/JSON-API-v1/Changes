@@ -1,0 +1,9 @@
+Revision history for JSON-API-v1
+
+0.002     2020-07-24 14:44:46Z
+
+    * Fix CPAN testers dependency errors
+
+0.001     2020-07-23 16:10:28Z
+
+    * Initial release

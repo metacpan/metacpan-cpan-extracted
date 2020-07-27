@@ -5,9 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Syntax::Keyword::Try;
-use constant HAVE_WARN_EXPERIMENTAL => $] >= 5.018;
-no if HAVE_WARN_EXPERIMENTAL, warnings => 'experimental';
+use Syntax::Keyword::Try qw( try :experimental );
 
 sub func
 {

@@ -3,8 +3,8 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: mb
-version: 0.06
-abstract: run Perl script written in MBCS
+version: 0.08
+abstract: run Perl script in MBCS encoding (not only CJK ;-)
 author:
   - ina <ina@cpan.org>
 license: perl

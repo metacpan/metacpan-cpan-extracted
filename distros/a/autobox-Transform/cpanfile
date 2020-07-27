@@ -2,7 +2,6 @@ requires 'perl', '5.008001';
 
 requires 'autobox';
 requires 'autobox::Core';
-requires 'true';
 requires 'Carp';
 requires 'parent';
 requires 'Sort::Maker';

@@ -9,8 +9,14 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
-use vars qw($MSWin32_MBCS);
-$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+BEGIN {
+    $SIG{__WARN__} = sub {
+        local($_) = @_;
+        /\A\(\)\+ matches null string many times in regex; marked by / ? return :
+        /\A\(\)\* matches null string many times in regex; marked by / ? return :
+        warn $_[0];
+    };
+}
 
 @test = (
 

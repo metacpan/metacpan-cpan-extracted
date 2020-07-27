@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.201060';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.202070';
 use Moose;
 use namespace::autoclean;
 
@@ -351,21 +351,29 @@ sub _build_dupes_for {
 
 # Note: taken from nodes.dmp as follows (then manually re-ordered)
 # cut -f3 -d'|' nodes.dmp | sort | uniq
-# last updated on Oct-1-2017
+# last updated on Jul-25-2020
 const my @LEVELS => (
     'skip',                     # default collapsing level
     'top',                      # useful to preserve 'cellular organisms'
     'superkingdom', 'kingdom', 'subkingdom',
     'superphylum', 'phylum', 'subphylum',
     'superclass', 'class', 'subclass', 'infraclass',
-    'cohort',
+    'cohort', 'subcohort',
     'superorder', 'order', 'suborder', 'infraorder', 'parvorder',
     'superfamily', 'family', 'subfamily',
     'tribe', 'subtribe',
     'genus', 'subgenus',
+    'section', 'subsection',
+    'series',
     'species group', 'species subgroup', 'species', 'subspecies',
-    'varietas', 'forma',
-    'no rank',
+
+    'subvariety', 'varietas',   # relative order of all these terms is unclear
+    'forma', 'forma specialis',
+    'isolate', 'strain',
+    'pathogroup', 'serogroup', 'serotype',
+    'biotype', 'genotype',
+
+    'clade', 'no rank',         # both terms can appear anywhere in a lineage
 );
 
 sub _build_rank_for {
@@ -721,7 +729,7 @@ sub get_taxid_from_taxonomy {               ## no critic (RequireArgUnpacking)
             if @taxonomy;
     }
 
-    return;
+    return undef;                   ## no critic (ProhibitExplicitReturnUndef)
 }
 
 
@@ -744,7 +752,7 @@ sub _taxonomy_from_seq_id_ {
     # ... to ensure that no (undef) list is returned by our additional methods
     # Note: our policy is thus unlike get_taxonomy and get_taxid_from_name
     @taxonomy = () unless $taxonomy[0];
-    carp '[BMC] Warning: cannot fetch tax for ' . $seq_id->full_id
+    carp '[BMC] Warning: cannot fetch tax for ' . ( $seq_id->full_id || q{''} )
         . '; ignoring it!' unless @taxonomy;
 
     # examine context for returning plain array or ArrayRef
@@ -1744,7 +1752,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 SYNOPSIS
 

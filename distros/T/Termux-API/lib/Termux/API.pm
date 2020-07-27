@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use JSON;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub new {
 	return bless( {
@@ -179,6 +179,22 @@ sub wifi_scan {
 	$_[0]->command('termux-wifi-scaninfo');
 }
 
+sub audio_info {
+	$_[0]->command('termux-audio-info');
+}
+
+sub elf_cleaner {
+	my ($self, @files) = @_;
+	$self->command(sprintf 'termux-elf-cleaner %s', join ' ', @files);
+}
+
+sub speech_to_text {
+ 	$_[0]->command(sprintf(
+		'termux-speech-to-text %s',
+		$_[1] ? '-p' : ''
+	));
+}
+
 1;
 
 __END__
@@ -189,7 +205,7 @@ Termux::API - Termux::API wrapper
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -519,6 +535,24 @@ Toggle Wi-Fi on or off
 Retrieves last wifi scan information.
 
 	$termux->wifi_scan
+
+=head2 audio_info
+
+Get information about audio capabilities.
+
+	$termux->audio_info
+
+=head2 elf_cleaner
+
+Utility for Android ELF files to remove unused parts that the linker warns about.
+
+	$termux->elf_cleaner(@files)
+
+=head2 speech_to_text
+
+Converts speech to text, sending partial matches to stdout.
+
+	$termux->speech_to_text($show_progress)
 
 =head1 AUTHOR
 

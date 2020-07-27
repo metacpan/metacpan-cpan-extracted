@@ -76,7 +76,7 @@ __END__
 
 =head1 USAGE
 
-    tax-filter-fas.pl --filter=<file> --taxdir=<dir> <infiles>
+    inst-tax-filter.pl <infiles> --filter=<file> --taxdir=<dir>
         [optional arguments]
 
 =head1 REQUIRED ARGUMENTS

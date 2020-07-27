@@ -6,7 +6,7 @@ use base qw(Exporter);
 
 our @EXPORT = qw(get_default_browser);
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 sub get_default_browser
 {
@@ -121,6 +121,8 @@ Internet Explorer on failure.
 1.01 - Added Windows 10 support (hopefully)
 
 1.02 - Fixed this POD document
+
+1.03 - More documentation fixes
 
 =head1 Author
 

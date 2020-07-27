@@ -1,0 +1,1 @@
+This bag has the same file listed twice with two different hash values. Implementations must return an error in this case.

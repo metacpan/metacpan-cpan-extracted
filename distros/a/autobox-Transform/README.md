@@ -7,7 +7,7 @@ autobox::Transform - Autobox methods to transform Arrays and Hashes
 [autobox](https://metacpan.org/pod/autobox) provides the ability to call methods on native types,
 e.g. strings, arrays, and hashes as if they were objects.
 
-[autobox::Core](https://metacpan.org/pod/autobox::Core) provides the basic methods for Perl core functions
+[autobox::Core](https://metacpan.org/pod/autobox%3A%3ACore) provides the basic methods for Perl core functions
 like `uc`, `map`, and `grep`.
 
 This module, `autobox::Transform`, provides higher level and more
@@ -64,17 +64,17 @@ particular when the values are hashrefs or objects.
     # Turn paired items into a hash
     @titles_books->to_hash;
 
-## Arrays with hashrefs/objects
+## Arrays where the items are hashrefs/objects
 
     # $books and $authors below are arrayrefs with either objects or
     # hashrefs (the call syntax is the same). These have methods/hash
-    # keys like C<$book->genre()>, C<$book->{is_sold_out}>,
+    # keys like C<$book->genre()>, C<$book->{is_in_stock}>,
     # C<$book->is_in_library($library)>, etc.
 
     $books->map_by("genre");
     $books->map_by([ price_with_tax => $tax_pct ]);
 
-    $books->filter_by("is_sold_out");
+    $books->filter_by("is_in_stock");
     $books->filter_by([ is_in_library => $library ]);
     $books->filter_by([ price_with_tax => $rate ], sub { $_ > 56.00 });
     $books->filter_by("price", sub { $_ > 56.00 });
@@ -82,7 +82,7 @@ particular when the values are hashrefs or objects.
     $books->filter_by("author", qr/corey/i);
 
     # grep_by is an alias for filter_by
-    $books->grep_by("is_sold_out");
+    $books->grep_by("is_in_stock");
 
     # reject_by: the inverse of filter_by
     $books->reject_by("is_sold_out");
@@ -164,8 +164,8 @@ particular when the values are hashrefs or objects.
     $genre_count->filter_each(sub { $_ > 5 });
 
     # filter out each pair
-    # Genres with no more than five books
-    $genre_count->reject_each(sub { $_ > 5 });
+    # Genres with more than five books
+    $genre_count->reject_each(sub { $_ <= 5 });
 
 
     # Return reference, even in list context, e.g. in a parameter list
@@ -234,28 +234,6 @@ and the rest of the items are the arguments to the method.
     $books->map_by([ price_with_discount => 5.0 ])
     # becomes $_->price_with_discount(5.0)
 
-### Deprecated syntax
-
-There is an older syntax for calling methods with arguments. It was
-abandoned to open up more powerful ways to use grep/filter type
-methods. Here it is for reference, in case you run into existing code.
-
-    $array->filter_by($accessor, $args, $subref)
-    $books->filter_by("price_with_discount", [ 5.0 ], sub { $_ < 15.0 })
-
-Call the method $accessor on each object using the arguments in the
-$args arrayref like so:
-
-    $object->$accessor(@$args)
-
-_This style is deprecated_, and planned for removal in version 2.000,
-so if you have code with the old call style, please:
-
-- Replace your existing code with the new style as soon as possible. The
-change is trivial and the code easily found by grep/ack.
-- If need be, pin your version to < 2.000 in your cpanfile, dist.ini or
-whatever you use to avoid upgrading modules to incompatible versions.
-
 ## Filter predicates
 
 There are several methods that filter items,
@@ -321,7 +299,7 @@ something that's often difficult to discern at a glance)
 - Provide order options for how one value should be compared with the others:
     - how to compare (`cmp` or `<=>`)
     - which direction to sort (`asc`ending or `desc`ending)
-    - which value to compare, using a regex or subref, e.g. by uc($\_)
+    - which value to compare, using a regex or subref, e.g. by `uc($_)`
 - In case of a tie, provide another comparison
 
     # If the name is the same, compare age (oldest first)
@@ -430,7 +408,7 @@ When the first comparison is a tie, the subsequent ones are used.
 
 Almost all of the methods are context sensitive, i.e. they return a
 list in list context and an arrayref in scalar context, just like
-[autobox::Core](https://metacpan.org/pod/autobox::Core).
+[autobox::Core](https://metacpan.org/pod/autobox%3A%3ACore).
 
 **Beware**: _you might be in list context when you need an arrayref._
 
@@ -485,7 +463,7 @@ in the @array.
 
 ### filter and grep
 
-[autobox::Core](https://metacpan.org/pod/autobox::Core)'s `grep` method takes a subref, just like this
+[autobox::Core](https://metacpan.org/pod/autobox%3A%3ACore)'s `grep` method takes a subref, just like this
 method. `filter` also supports the other predicate types, like
 string, regex, etc.
 
@@ -503,7 +481,7 @@ values in the `@array`.
 Examples:
 
     my @apples     = $fruit->reject("apple");
-    my @any_apple  = $fruit->reject( qr/apple/i );
+    my @no_apples  = $fruit->reject( qr/apple/i );
     my @publishers = $authors->reject(
         sub { $_->publisher->name =~ /Orbit/ },
     );
@@ -621,7 +599,7 @@ on. Example:
     # ->books returns an arrayref of Book objects with a ->title
     $authors->map_by("books")->flat->map_by("title")
 
-Note: This is different from [autobox::Core](https://metacpan.org/pod/autobox::Core)'s `->flatten`,
+Note: This is different from [autobox::Core](https://metacpan.org/pod/autobox%3A%3ACore)'s `->flatten`,
 which reurns a list rather than an array and therefore can't be used
 in this way.
 
@@ -754,7 +732,7 @@ values in the result `@array`.
 is a string.
 
 Call the $`accessor` on each object in the list, or get the hash key
-value on each hashref in the list. Return list of items wich have a
+value on each hashref in the list. Return list of items which have a
 unique set of return values. The order is preserved. On duplicates,
 keep the first occurrence.
 
@@ -1023,7 +1001,7 @@ Useful if you need to continue calling `@array` methods on it.
 
 ## Raison d'etre
 
-[autobox::Core](https://metacpan.org/pod/autobox::Core) is awesome, for a variety of reasons.
+[autobox::Core](https://metacpan.org/pod/autobox%3A%3ACore) is awesome, for a variety of reasons.
 
 - It cuts down on dereferencing punctuation clutter, both by using
 methods on references and by using ->elements to deref arrayrefs.
@@ -1033,7 +1011,7 @@ executed.
 to move the cursor around a lot just to fix dereferencing, order of
 operations etc.
 
-On top of this, [autobox::Transform](https://metacpan.org/pod/autobox::Transform) provides a few higher level
+On top of this, [autobox::Transform](https://metacpan.org/pod/autobox%3A%3ATransform) provides a few higher level
 methods for mapping, filtering and sorting common cases which are easier
 to read and write.
 
@@ -1075,16 +1053,16 @@ Perl equivalent.
 
 
     ### filter_by - method call: $books are Book objects
-    my $sold_out_books = [ grep { $_->is_sold_out } @$books ];
-    my $sold_out_books = $books->filter_by("is_sold_out");
-    my $sold_out_books = $books->grep_by("is_sold_out");
+    my $sold_out_books = [ grep { $_->is_in_stock } @$books ];
+    my $sold_out_books = $books->filter_by("is_in_stock");
+    my $sold_out_books = $books->grep_by("is_in_stock");
 
     my $books_in_library = [ grep { $_->is_in_library($library) } @$books ];
     my $books_in_library = $books->filter_by([ is_in_library => $library ]);
 
-    ### filter_by - hash key: $books are book hashrefs
-    my $sold_out_books = [ grep { $_->{is_sold_out} } @$books ];
-    my $sold_out_books = $books->filter_by("is_sold_out");
+    ### reject_by - hash key: $books are book hashrefs
+    my $sold_out_books = [ grep { ! $_->{is_in_stock} } @$books ];
+    my $sold_out_books = $books->reject_by("is_in_stock");
 
 
 
@@ -1098,8 +1076,8 @@ Perl equivalent.
 
 
     #### flat - $author->books returns an arrayref of Books
-    my $author_books = [ map { @{$_->books} } @$authors ]
-    my $author_books = $authors->map_by("books")->flat
+    my $author_books = [ map { @{$_->books} } @$authors ];
+    my $author_books = $authors->map_by("books")->flat;
 
 # DEVELOPMENT
 

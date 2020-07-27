@@ -47,7 +47,7 @@ Archive::BagIt::Role::Algorithm - A role that defines the interface to a hashing
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 NAME
 
@@ -55,7 +55,7 @@ Archive::BagIt::Role::Algorithm - A role that defines the interface to a hashing
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 AVAILABILITY
 

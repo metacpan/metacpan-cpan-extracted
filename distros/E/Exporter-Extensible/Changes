@@ -1,3 +1,6 @@
+0.07 - 2020-07-26:
+  - Add support for perl 5.10 and 5.8 (and earlier?)
+
 0.06 - 2019-04-06:
   - Maintain weak reference to Scope object
   - Fix module version declaration to something metacpan likes

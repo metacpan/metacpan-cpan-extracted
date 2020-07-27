@@ -104,6 +104,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Ref::Util" => "0.100",
     "Safe::Isa" => 0,
+    "Storable" => 0,
     "Syntax::Keyword::Try" => "0.11",
     "Types::Standard" => "1.010002",
     "constant" => 0,
@@ -118,7 +119,6 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Module::Metadata" => 0,
     "Scalar::Util" => 0,
-    "Storable" => 0,
     "Test::Deep" => 0,
     "Test::Deep::UnorderedPairs" => 0,
     "Test::Fatal" => 0,
@@ -130,7 +130,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.009",
+  "VERSION" => "0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

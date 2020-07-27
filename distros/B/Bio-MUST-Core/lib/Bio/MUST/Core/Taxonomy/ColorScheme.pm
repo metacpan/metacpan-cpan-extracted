@@ -1,6 +1,7 @@
 package Bio::MUST::Core::Taxonomy::ColorScheme;
 # ABSTRACT: Helper class providing color scheme for taxonomic annotations
-$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.201060';
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
+$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.202070';
 use Moose;
 use namespace::autoclean;
 
@@ -173,6 +174,32 @@ sub attach_colors_to_entities {
 }
 
 
+sub store_itol_colors {
+    my $self    = shift;
+    my $tree    = shift;
+    my $outfile = shift;
+    my $key     = shift // 'taxonomy';
+
+    open my $out, '>', $outfile;
+    say {$out} join "\n", 'TREE_COLORS', 'SEPARATOR COMMA', 'DATA';
+    ### Output iTOL color: $outfile
+
+    for my $node ( @{ $tree->tree->get_entities } ){
+        my $color = $self->hex( $node->get_generic($key), q{#} );
+        my @descendants = map { $_->get_name } @{ $node->get_terminals };
+        my $node_name
+            = @descendants > 1 ? $descendants[0] . '|' . $descendants[-1]
+            :                    $descendants[0]
+        ;
+        my $type = 'normal',
+        my $size = 1;
+
+        say {$out} join q{,}, $node_name, 'clade', $color, $type, $size;
+    }
+
+    return;
+}
+
 # class methods
 
 
@@ -245,7 +272,7 @@ Bio::MUST::Core::Taxonomy::ColorScheme - Helper class providing color scheme for
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 SYNOPSIS
 
@@ -259,6 +286,8 @@ version 0.201060
 
 =head2 attach_color_to_entities
 
+=head2 store_itol_colors
+
 =head2 spectrum
 
 =head2 load
@@ -268,6 +297,12 @@ version 0.201060
 =head1 AUTHOR
 
 Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Valerian LUPO
+
+Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

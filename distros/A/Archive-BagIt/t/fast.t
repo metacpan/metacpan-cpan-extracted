@@ -1,5 +1,4 @@
 BEGIN { chdir 't' if -d 't' }
-
 use warnings;
 use utf8;
 use open ':std', ':encoding(utf8)';
@@ -10,9 +9,12 @@ use strict;
 use lib '../lib';
 
 use File::Spec;
-use Data::Printer;
 use File::Path;
 use File::Copy;
+
+plan skip_all => "IO::AIO required for testing Archive::BagIt::Fast"
+    unless eval "use IO::AIO; 1";
+
 
 my $Class     = 'Archive::BagIt::Fast';
 my $ClassBase = 'Archive::BagIt::Base';
@@ -47,13 +49,18 @@ my $DST_BAG   = File::Spec->catdir( @ROOT, 'dst_bag' );
     copy( $SRC_FILES . "/thréê", $DST_BAG );
 
     note "making bag $DST_BAG";
-    my $bag = $Class->make_bag($DST_BAG);
-
+    my $bag;
+    my $warning =
+        Test::Warnings::warning { $bag = $Class->make_bag($DST_BAG) };
+    like(
+        $warning,
+        qr/no payload path/,
+        'Got expected warning from make_bag()',
+    ) or diag 'got unexpected warnings:', explain($warning);
     ok( $bag, "Object created" );
     isa_ok( $bag, $Class );
     my $result = $bag->verify_bag();
     ok( $result, "Bag verifies" );
-
     rmtree($DST_BAG);
 }
 
@@ -76,17 +83,13 @@ my $DST_BAG   = File::Spec->catdir( @ROOT, 'dst_bag' );
         qr/no payload path/,
         'Got expected warning from make_bag()',
     ) or diag 'got unexpected warnings:', explain($warning);
-
     ok( $bag, "Object created" );
     isa_ok( $bag, $ClassBase );
-
     $bag = $Class->new($DST_BAG);
     ok( $bag, "Object created" );
     isa_ok( $bag, $Class );
-
     my $result = $bag->verify_bag;
     ok( $result, "Bag verifies" );
-
     rmtree($DST_BAG);
 }
 

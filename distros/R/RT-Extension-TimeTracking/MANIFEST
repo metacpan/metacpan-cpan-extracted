@@ -2,7 +2,6 @@ Changes
 doc/images/timetracking_basics.png
 doc/images/timetracking_my_week.png
 doc/images/timetracking_my_week_admin.png
-etc/0001-handle-txn-cfs-on-ticket-creation-and-updates-with-U.patch
 etc/initialdata
 html/Callbacks/RT-Extension-TimeTracking/Elements/ShowCustomFields/MassageCustomFields
 html/Callbacks/RT-Extension-TimeTracking/Elements/ShowCustomFields/ShowComponentName
@@ -26,7 +25,6 @@ inc/Module/Install/RTx/Runtime.pm
 inc/Module/Install/Substitute.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-inc/unicore/Name.pm
 inc/YAML/Tiny.pm
 lib/RT/Extension/TimeTracking.pm
 lib/RT/Extension/TimeTracking/Test.pm

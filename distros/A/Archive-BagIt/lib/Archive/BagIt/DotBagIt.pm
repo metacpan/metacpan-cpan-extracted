@@ -3,13 +3,17 @@ use warnings;
 
 package Archive::BagIt::DotBagIt;
 
-our $VERSION = '0.058'; # VERSION
+our $VERSION = '0.059'; # VERSION
 
 use Sub::Quote;
 use Moo;
 
 extends "Archive::BagIt::Base";
 
+
+before BUILDARGS => sub {
+    warn "The module Archive::BagIt::DotBagIt is marked as deprecated and will be erased in next releases!";
+};
 
 has 'metadata_path' => (
     is=> 'ro',
@@ -48,7 +52,7 @@ Archive::BagIt::DotBagIt
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 NAME
 
@@ -56,11 +60,11 @@ Archive::BagIt::DotBagIt
 
 =head1 VERSION
 
-version 0.058
+version 0.059
 
 =head1 NAME
 
-Archive::BagIt::DotBagIt - The inside-out version of BagIt
+Archive::BagIt::DotBagIt - The inside-out version of BagIt, this package is deprecated and will be erased in next releases
 
 =head1 AVAILABILITY
 

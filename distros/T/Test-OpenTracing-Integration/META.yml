@@ -21,6 +21,7 @@ no_index:
     - inc
 requires:
   Bytes::Random::Secure: '0'
+  HTTP::Headers: '0'
   Moo: '0'
   OpenTracing::GlobalTracer: '0.04'
   OpenTracing::Implementation::Interface::Bootstrap: '0'
@@ -30,5 +31,5 @@ requires:
   Types::Standard: '0'
   aliased: '0'
   namespace::clean: '0'
-version: v0.102.0
+version: v0.102.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

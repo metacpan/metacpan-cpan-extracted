@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.008-13-g8fa1a6c
+package JSON::Schema::Draft201909; # git description: v0.009-19-g01a37b7
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use feature 'fc';
@@ -18,6 +18,7 @@ use Mojo::JSON::Pointer;
 use Mojo::URL;
 use Safe::Isa;
 use Path::Tiny;
+use Storable 'dclone';
 use File::ShareDir 'dist_dir';
 use Moo;
 use MooX::TypeTiny 0.002002;
@@ -80,8 +81,11 @@ sub BUILD {
 
 sub add_schema {
   my $self = shift;
+  die 'insufficient arguments' if @_ < 1;
 
-  my $uri = $_[0]->$_isa('Mojo::URL') ? shift : !ref $_[0] ? Mojo::URL->new(shift) : Mojo::URL->new;
+  my $uri = !is_ref($_[0]) ? Mojo::URL->new(shift)
+    : $_[0]->$_isa('Mojo::URL') ? shift : Mojo::URL->new;
+
   croak 'cannot add a schema with a uri with a fragment' if defined $uri->fragment;
 
   if (not @_) {
@@ -95,9 +99,14 @@ sub add_schema {
     : JSON::Schema::Draft201909::Document->new(schema => shift, $uri ? (canonical_uri => $uri) : ());
 
   if (not grep $_->{document} == $document, $self->_resource_values) {
-    my $schema_content = $self->_json_decoder->encode($document->schema);
-    if (my $existing_doc = first { $self->_json_decoder->encode($_->schema) eq $schema_content }
-        uniqint map $_->{document}, $self->_resource_values) {
+    my $schema_content = $document->serialized_schema
+      // $document->serialized_schema($self->_json_decoder->encode($document->schema));
+
+    if (my $existing_doc = first {
+          my $existing_content = $_->serialized_schema
+            // $_->serialized_schema($self->_json_decoder->encode($_->schema));
+          $existing_content eq $schema_content
+        } uniqint map $_->{document}, $self->_resource_values) {
       # we already have this schema content in another document object.
       $document = $existing_doc;
     }
@@ -117,6 +126,8 @@ sub add_schema {
 
 sub evaluate_json_string {
   my ($self, $json_data, $schema) = @_;
+  die 'insufficient arguments' if @_ < 3;
+
   my $data;
   try {
     $data = $self->_json_decoder->decode($json_data)
@@ -140,6 +151,7 @@ sub evaluate_json_string {
 
 sub evaluate {
   my ($self, $data, $schema_reference) = @_;
+  die 'insufficient arguments' if @_ < 3;
 
   my $base_uri = Mojo::URL->new;  # TODO: will be set by a global attribute
 
@@ -157,7 +169,7 @@ sub evaluate {
   try {
     my ($schema, $canonical_uri);
 
-    if (not ref $schema_reference or $schema_reference->$_isa('Mojo::URL')) {
+    if (not is_ref($schema_reference) or $schema_reference->$_isa('Mojo::URL')) {
       # TODO: resolve $uri against base_uri
       ($schema, $canonical_uri) = $self->_fetch_schema_from_uri($schema_reference);
     }
@@ -188,6 +200,15 @@ sub evaluate {
     result => $result,
     errors => $state->{errors},
   );
+}
+
+sub get {
+  my ($self, $uri) = @_;
+  die 'insufficient arguments' if @_ < 2;
+
+  my ($subschema, $canonical_uri) = $self->_fetch_schema_from_uri($uri);
+  $subschema = dclone($subschema) if is_ref($subschema);
+  return !defined $subschema ? () : wantarray ? ($subschema, $canonical_uri) : $subschema;
 }
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
@@ -418,7 +439,7 @@ sub _eval_keyword_multipleOf {
 
   my $quotient = $data / $schema->{multipleOf};
   return 1 if int($quotient) == $quotient;
-  return E($state, 'value is not a multiple of %d', $schema->{multipleOf});
+  return E($state, 'value is not a multiple of %g', $schema->{multipleOf});
 }
 
 sub _eval_keyword_maximum {
@@ -428,7 +449,7 @@ sub _eval_keyword_maximum {
   assert_keyword_type($state, $schema, 'number');
 
   return 1 if $data <= $schema->{maximum};
-  return E($state, 'value is larger than %d', $schema->{maximum});
+  return E($state, 'value is larger than %g', $schema->{maximum});
 }
 
 sub _eval_keyword_exclusiveMaximum {
@@ -438,7 +459,7 @@ sub _eval_keyword_exclusiveMaximum {
   assert_keyword_type($state, $schema, 'number');
 
   return 1 if $data < $schema->{exclusiveMaximum};
-  return E($state, 'value is equal to or larger than %d', $schema->{exclusiveMaximum});
+  return E($state, 'value is equal to or larger than %g', $schema->{exclusiveMaximum});
 }
 
 sub _eval_keyword_minimum {
@@ -448,7 +469,7 @@ sub _eval_keyword_minimum {
   assert_keyword_type($state, $schema, 'number');
 
   return 1 if $data >= $schema->{minimum};
-  return E($state, 'value is smaller than %d', $schema->{minimum});
+  return E($state, 'value is smaller than %g', $schema->{minimum});
 }
 
 sub _eval_keyword_exclusiveMinimum {
@@ -458,7 +479,7 @@ sub _eval_keyword_exclusiveMinimum {
   assert_keyword_type($state, $schema, 'number');
 
   return 1 if $data > $schema->{exclusiveMinimum};
-  return E($state, 'value is equal to or smaller than %d', $schema->{exclusiveMinimum});
+  return E($state, 'value is equal to or smaller than %g', $schema->{exclusiveMinimum});
 }
 
 sub _eval_keyword_maxLength {
@@ -506,7 +527,7 @@ sub _eval_keyword_maxItems {
   abort($state, 'maxItems value is not a non-negative integer') if $schema->{maxItems} < 0;
 
   return 1 if @$data <= $schema->{maxItems};
-  return E($state, 'more than %d items', $schema->{maxItems});
+  return E($state, 'more than %d item%s', $schema->{maxItems}, $schema->{maxItems} > 1 ? 's' : '');
 }
 
 sub _eval_keyword_minItems {
@@ -517,7 +538,7 @@ sub _eval_keyword_minItems {
   abort($state, 'minItems value is not a non-negative integer') if $schema->{minItems} < 0;
 
   return 1 if @$data >= $schema->{minItems};
-  return E($state, 'fewer than %d items', $schema->{minItems});
+  return E($state, 'fewer than %d item%s', $schema->{minItems}, $schema->{minItems} > 1 ? 's' : '');
 }
 
 sub _eval_keyword_uniqueItems {
@@ -540,7 +561,8 @@ sub _eval_keyword_maxProperties {
     if $schema->{maxProperties} < 0;
 
   return 1 if keys %$data <= $schema->{maxProperties};
-  return E($state, 'more than %d properties', $schema->{maxProperties});
+  return E($state, 'more than %d propert%s', $schema->{maxProperties},
+    $schema->{maxProperties} > 1 ? 'ies' : 'y');
 }
 
 sub _eval_keyword_minProperties {
@@ -552,7 +574,8 @@ sub _eval_keyword_minProperties {
     if $schema->{minProperties} < 0;
 
   return 1 if keys %$data >= $schema->{minProperties};
-  return E($state, 'fewer than %d properties', $schema->{minProperties});
+  return E($state, 'fewer than %d propert%s', $schema->{minProperties},
+    $schema->{minProperties} > 1 ? 'ies' : 'y');
 }
 
 sub _eval_keyword_required {
@@ -565,7 +588,7 @@ sub _eval_keyword_required {
 
   my @missing = grep !exists $data->{$_}, @{$schema->{required}};
   return 1 if not @missing;
-  return E($state, 'missing propert'.(@missing > 1 ? 'ies' : 'y').': '.join(', ', @missing));
+  return E($state, 'missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', @missing));
 }
 
 sub _eval_keyword_dependentRequired {
@@ -585,7 +608,7 @@ sub _eval_keyword_dependentRequired {
     keys %{$schema->{dependentRequired}};
 
   return 1 if not @missing;
-  return E($state, 'missing propert'.(@missing > 1 ? 'ies' : 'y').': '.join(', ', sort @missing));
+  return E($state, 'missing propert%s: %s', @missing > 1 ? 'ies' : 'y', join(', ', sort @missing));
 }
 
 sub _eval_keyword_allOf {
@@ -605,7 +628,7 @@ sub _eval_keyword_allOf {
 
   return 1 if @invalid == 0;
   my $pl = @invalid > 1;
-  return E($state, 'subschema'.($pl?'s ':' ').join(', ', @invalid).($pl?' are':' is').' not valid');
+  return E($state, 'subschema%s %s %s not valid', $pl?'s':'', join(', ', @invalid), $pl?'are':'is');
 }
 
 sub _eval_keyword_anyOf {
@@ -986,9 +1009,18 @@ has _format_validations => (
       ipv4 => { type => 'string', sub => $is_ipv4 },
       ipv6 => { type => 'string', sub => sub {
         ($_[0] =~ /^(?:[[:xdigit:]]{0,4}:){0,7}[[:xdigit:]]{0,4}$/
-          || $_[0] =~ /^(?:[[:xdigit:]]{0,4}:){0,4}:?((?:[0-9]{1,3}\.){3}[0-9]{1,3})$/
+          || $_[0] =~ /^(?:[[:xdigit:]]{0,4}:){1,6}((?:[0-9]{1,3}\.){3}[0-9]{1,3})$/
               && $is_ipv4->($1))
-          && (()= ($_[0] =~ /::/g)) < 2;
+          && $_[0] !~ /:::/
+          && $_[0] !~ /^:[^:]/
+          && $_[0] !~ /[^:]:$/
+          && do {
+            my $double_colons = ()= ($_[0] =~ /::/g);
+            my $colon_components = grep length, split(/:+/, $_[0], -1);
+            $double_colons < 2 && ($double_colons > 0
+              || ($colon_components == 8 && !defined $1)
+              || ($colon_components == 7 && defined $1))
+          };
       } },
       uri => { type => 'string', sub => sub {
         my $uri = Mojo::URL->new($_[0]);
@@ -1020,7 +1052,7 @@ sub _eval_keyword_format {
   assert_keyword_type($state, $schema, 'string');
 
   if ($self->validate_formats and my $spec = $self->_get_format_validation($schema->{format})) {
-    return E($state, 'not a %s', $schema->{format})
+    return E($state, 'not a%s %s', $schema->{format} =~ /^[aeio]/ ? 'n' : '', $schema->{format})
       if $self->_is_type($spec->{type}, $data) and not $spec->{sub}->($data);
   }
 
@@ -1251,7 +1283,7 @@ sub _get_or_load_resource {
 sub _fetch_schema_from_uri {
   my ($self, $uri) = @_;
 
-  $uri = Mojo::URL->new($uri) if not ref $uri;
+  $uri = Mojo::URL->new($uri) if not is_ref($uri);
   my $fragment = $uri->fragment // '';
 
   my ($subschema, $canonical_uri);
@@ -1340,7 +1372,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -1387,7 +1419,8 @@ to false.
 =head2 format_validations
 
 An optional hashref that allows overriding the validation method for formats, or adding new ones.
-Existing formats must be specified in the form of C<< { $format_name => $format_sub } >>, where
+Overrides to existing formats (see L</Format Validation>)
+must be specified in the form of C<< { $format_name => $format_sub } >>, where
 the format sub is a coderef that takes one argument and returns a boolean result. New formats must
 be specified in the form of C<< { $format_name => { type => $type, sub => $format_sub } } >>,
 where the type indicates which of the core JSON Schema types (null, object, array, boolean, string,
@@ -1464,16 +1497,26 @@ The result is a L<JSON::Schema::Draft201909::Result> object, which can also be u
   $js->add_schema($schema);
   $js->add_schema($document);
 
-Introduces the (unblessed, nested Perl data structure) or L<JSON::Schema::Draft201909::Document>
+Introduces the (unblessed, nested) Perl data structure or L<JSON::Schema::Draft201909::Document>
 object, representing a JSON Schema, to the implementation, registering it under the indicated URI if
 provided (and if not, C<''> will be used if no other identifier can be found within).
 
 You B<MUST> call C<add_schema> for any external resources that a schema may reference via C<$ref>
-before calling L</evaluate>, other than the standard metaschemas which are pre-loaded.
+before calling L</evaluate>, other than the standard metaschemas which are loaded from a local cache
+as needed.
+
+=head2 get
+
+  my $schema = $js->get($uri);
+  my ($schema, $canonical_uri) = $js->get($uri);
+
+Fetches the Perl data structure representing the JSON Schema at the indicated URI. When called in
+list context, the canonical URI of that location is also returned, as a L<Mojo::URL>. Returns
+C<undef> if the schema with that URI has not been loaded (or cached).
 
 =head1 LIMITATIONS
 
-=head2 TYPES
+=head2 Types
 
 Perl is a more loosely-typed language than JSON. This module delves into a value's internal
 representation in an attempt to derive the true "intended" type of the value. However, if a value is
@@ -1486,7 +1529,7 @@ option.
 
 For more information, see L<Cpanel::JSON::XS/MAPPING>.
 
-=head2 FORMAT VALIDATION
+=head2 Format Validation
 
 By default, formats are treated only as annotations, not assertions. When L</validate_format> is
 true, strings are also checked against the format as specified in the schema. At present the
@@ -1575,7 +1618,7 @@ C<date-time>, C<date>, and C<time> require L<Time::Moment>
 
 =item *
 
-C<email> and C<idn-email> require L<Email::Address::XS>
+C<email> and C<idn-email> require L<Email::Address::XS> version 1.01
 
 =item *
 
@@ -1587,7 +1630,7 @@ C<idn-hostname> requires L<Net::IDN::Encode>
 
 =back
 
-=head2 SPECIFICATION COMPLIANCE
+=head2 Specification Compliance
 
 Until version 1.000 is released, this implementation is not fully specification-compliant.
 
@@ -1627,7 +1670,7 @@ The C<pattern> and C<patternProperties> keywords, and the C<regex> format valida
 evaluate regular expressions from the schema.
 No effort is taken (at this time) to sanitize the regular expressions for embedded code or
 potentially pathological constructs that may pose a security risk, either via denial of service
-or by allowing exposure to the internals of your application. B<DO NOT RUN SCHEMAS FROM UNTRUSTED
+or by allowing exposure to the internals of your application. B<DO NOT USE SCHEMAS FROM UNTRUSTED
 SOURCES.>
 
 =head1 SEE ALSO
@@ -1640,7 +1683,11 @@ L<https://json-schema.org/>
 
 =item *
 
-L<RFC8259|https://tools.ietf.org/html/rfc8259>
+L<RFC8259: The JavaScript Object Notation (JSON) Data Interchange Format|https://tools.ietf.org/html/rfc8259>
+
+=item *
+
+L<RFC3986: Uniform Resource Identifier (URI): Generic Syntax|https://tools.ietf.org/html/rfc3986>
 
 =item *
 

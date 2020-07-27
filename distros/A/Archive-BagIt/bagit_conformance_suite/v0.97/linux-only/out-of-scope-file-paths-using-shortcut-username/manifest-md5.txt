@@ -1,0 +1,3 @@
+751e32179ec8acd71081654527f2e771  data/bare-filename
+86e8261ae9e8397a3f57046923943a44  data/text-file.txt
+3e6ffc4a8a1f38a7094e15d2356d7252  ~root/foo

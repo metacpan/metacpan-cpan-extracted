@@ -52,6 +52,8 @@ lib/NewsExtractor/SiteSpecificExtractor/www_hkcna_hk.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_hkcnews_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_idn_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_ksnews_com_tw.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_mdnkids_com.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_nownews_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_ntdtv_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_peopo_org.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_rti_org_tw.pm
@@ -62,6 +64,7 @@ lib/NewsExtractor/SiteSpecificExtractor/www_thestandnews_com.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_ttv_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_twreporter_org.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_upmedia_mg.pm
+lib/NewsExtractor/SiteSpecificExtractor/www_ustv_com_tw.pm
 lib/NewsExtractor/SiteSpecificExtractor/www_xinhuanet_com.pm
 lib/NewsExtractor/TXExtractor.pm
 lib/NewsExtractor/TextUtil.pm

@@ -6,6 +6,7 @@ use Capture::Tiny qw(capture);
 use Test::More;
 use lib 'lib';
 use FindBin qw($Bin $RealBin);
+use File::Slurper qw(read_text);
 use lib "$Bin/../../Gtk3-WebKit2/lib";
 use URI;
 
@@ -121,5 +122,9 @@ $webkit->open("$Bin/test/console_error.html");
 #see: https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload$
 is($webkit->get_confirmation, "It should be Dialogue not dialog.", 'The dialogue box returned the custom message on unload');
 
+# test get_html_source
+$webkit->open("$Bin/test/load.html");
+
+is($webkit->get_html_source, read_text("$Bin/test/load.html"), 'got html source');
 
 done_testing;

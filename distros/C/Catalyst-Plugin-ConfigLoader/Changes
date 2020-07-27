@@ -1,5 +1,13 @@
 Revision history for Perl extension Catalyst::Plugin::ConfigLoader.
 
+0.35 - 2020-07-26
+   - Removed use of Module::Install, fixing installing without . in @INC
+   - Moved pod tests to be only run for authors
+   - Fix tests when run with CATALYST_CONFIG environment variable set
+   - Minor Pod cleanups
+   - Remove Path::Class test dependency
+   - Metadata updates and cleanups
+
 0.34  Wed Apr 16 2014
    - Repackage without non-standard tarball headers.
 

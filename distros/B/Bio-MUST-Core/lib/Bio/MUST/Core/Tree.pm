@@ -1,6 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
-$Bio::MUST::Core::Tree::VERSION = '0.201060';
+# CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
+$Bio::MUST::Core::Tree::VERSION = '0.202070';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -220,6 +221,74 @@ sub collapse_subtrees {
     return;
 }
 
+
+sub store_itol_collapse {
+    my $self          = shift;
+    my $label_file    = shift;
+    my $collapse_file = shift;
+
+    open my $l_out, '>', $label_file;
+    say {$l_out} join "\n", 'LABELS', 'SEPARATOR COMMA', 'DATA';
+    ### Output iTOL node label: $label_file
+    open my $c_out, '>', $collapse_file;
+    say {$c_out} join "\n", 'COLLAPSE', 'DATA';
+    ### Output iTOL collapse: $collapse_file
+
+    # "balanced"-order tree traversal
+    my $collapsed;      # will be defined when within a collapsed subtree
+    $self->tree->visit_depth_first(
+
+       # collapse subtrees with identical attributes
+        -pre_daughter => sub {
+            my $node = shift;
+            return if $node->is_terminal;
+
+            # do not further collapse children of a collapsed subtree
+            # to facilitate interactive uncollapsing (e.g., in FigTree)
+            return if $collapsed;
+
+            # collect children attributes
+            my @attrs;
+            for (my $i = 0; my $child = $node->get_child($i); $i++) {
+                push @attrs, $child->get_generic('taxon_collapse');
+            }
+
+            # collapse subtree if all attributes are defined and identical
+            return if List::AllUtils::any { not defined $_ } @attrs;
+            return if uniq(@attrs) > 1;
+
+            my $taxon    = $node->get_generic('taxon');
+            my $collapse = $node->get_generic('taxon_collapse');
+            my @descendants = map { $_->get_name } @{ $node->get_terminals };
+            my $node_name
+                = @descendants > 1 ? $descendants[0] . '|' . $descendants[-1]
+                : $descendants[0]
+            ;
+
+            # writing outfiles
+            say {$l_out} join q{,}, $node_name, $taxon if $taxon;
+            say {$c_out} $node_name if $collapse;
+
+            # set "within a collapsed subtree" status
+            $collapsed = $node->get_id;
+
+            return;
+        },
+
+        -post_daughter => sub {
+            my $node = shift;
+            return if $node->is_terminal;
+
+            # unset "within a collapsed subtree" status (when leaving subtree)
+            $collapsed = undef
+                if defined $collapsed && $collapsed eq $node->get_id;
+
+            return;
+        },
+    );
+
+    return;
+}
 
 # TREE-MATCHING METHODS
 
@@ -472,7 +541,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 SYNOPSIS
 
@@ -500,6 +569,8 @@ version 0.201060
 
 =head2 collapse_subtrees
 
+=head2 store_itol_collapse
+
 =head2 match_branch_lengths
 
 =head2 load
@@ -517,6 +588,12 @@ version 0.201060
 =head1 AUTHOR
 
 Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Valerian LUPO
+
+Valerian LUPO <valerian.lupo@doct.uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

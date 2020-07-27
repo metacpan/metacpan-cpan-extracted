@@ -1,5 +1,8 @@
 Revision history for Command-Runner
 
+0.103  2020-07-24 19:51:51 JST
+    - Send KILL signal if child process is not terminated by TERM signal (#6)
+
 0.102  2019-08-06 20:29:53 EEST
     - Add env option (#5)
 

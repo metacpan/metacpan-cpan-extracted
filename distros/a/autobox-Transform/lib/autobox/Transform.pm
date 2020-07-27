@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use parent qw/autobox/;
 
-our $VERSION = "1.034";
+our $VERSION = "1.035";
 
 =head1 NAME
 
@@ -76,17 +76,17 @@ particular when the values are hashrefs or objects.
     @titles_books->to_hash;
 
 
-=head2 Arrays with hashrefs/objects
+=head2 Arrays where the items are hashrefs/objects
 
     # $books and $authors below are arrayrefs with either objects or
     # hashrefs (the call syntax is the same). These have methods/hash
-    # keys like C<$book->genre()>, C<$book->{is_sold_out}>,
+    # keys like C<$book->genre()>, C<$book->{is_in_stock}>,
     # C<$book->is_in_library($library)>, etc.
 
     $books->map_by("genre");
     $books->map_by([ price_with_tax => $tax_pct ]);
 
-    $books->filter_by("is_sold_out");
+    $books->filter_by("is_in_stock");
     $books->filter_by([ is_in_library => $library ]);
     $books->filter_by([ price_with_tax => $rate ], sub { $_ > 56.00 });
     $books->filter_by("price", sub { $_ > 56.00 });
@@ -94,7 +94,7 @@ particular when the values are hashrefs or objects.
     $books->filter_by("author", qr/corey/i);
 
     # grep_by is an alias for filter_by
-    $books->grep_by("is_sold_out");
+    $books->grep_by("is_in_stock");
 
     # reject_by: the inverse of filter_by
     $books->reject_by("is_sold_out");
@@ -177,8 +177,8 @@ particular when the values are hashrefs or objects.
     $genre_count->filter_each(sub { $_ > 5 });
 
     # filter out each pair
-    # Genres with no more than five books
-    $genre_count->reject_each(sub { $_ > 5 });
+    # Genres with more than five books
+    $genre_count->reject_each(sub { $_ <= 5 });
 
 
     # Return reference, even in list context, e.g. in a parameter list
@@ -211,7 +211,6 @@ particular when the values are hashrefs or objects.
 
 
 
-use true;
 use Carp;
 
 sub import {
@@ -343,36 +342,6 @@ and the rest of the items are the arguments to the method.
     $books->map_by([ price_with_discount => 5.0 ])
     # becomes $_->price_with_discount(5.0)
 
-=head3 Deprecated syntax
-
-There is an older syntax for calling methods with arguments. It was
-abandoned to open up more powerful ways to use grep/filter type
-methods. Here it is for reference, in case you run into existing code.
-
-    $array->filter_by($accessor, $args, $subref)
-    $books->filter_by("price_with_discount", [ 5.0 ], sub { $_ < 15.0 })
-
-Call the method $accessor on each object using the arguments in the
-$args arrayref like so:
-
-    $object->$accessor(@$args)
-
-I<This style is deprecated>, and planned for removal in version 2.000,
-so if you have code with the old call style, please:
-
-=over 4
-
-=item
-
-Replace your existing code with the new style as soon as possible. The
-change is trivial and the code easily found by grep/ack.
-
-=item
-
-If need be, pin your version to < 2.000 in your cpanfile, dist.ini or
-whatever you use to avoid upgrading modules to incompatible versions.
-
-=back
 
 
 =head2 Filter predicates
@@ -466,7 +435,7 @@ which direction to sort (C<asc>ending or C<desc>ending)
 
 =item *
 
-which value to compare, using a regex or subref, e.g. by uc($_)
+which value to compare, using a regex or subref, e.g. by C<uc($_)>
 
 =back
 
@@ -734,7 +703,7 @@ values in the C<@array>.
 Examples:
 
     my @apples     = $fruit->reject("apple");
-    my @any_apple  = $fruit->reject( qr/apple/i );
+    my @no_apples  = $fruit->reject( qr/apple/i );
     my @publishers = $authors->reject(
         sub { $_->publisher->name =~ /Orbit/ },
     );
@@ -1375,7 +1344,7 @@ C<$accessor> is either a string, or an arrayref where the first item
 is a string.
 
 Call the $C<accessor> on each object in the list, or get the hash key
-value on each hashref in the list. Return list of items wich have a
+value on each hashref in the list. Return list of items which have a
 unique set of return values. The order is preserved. On duplicates,
 keep the first occurrence.
 
@@ -2083,16 +2052,16 @@ Perl equivalent.
 
 
     ### filter_by - method call: $books are Book objects
-    my $sold_out_books = [ grep { $_->is_sold_out } @$books ];
-    my $sold_out_books = $books->filter_by("is_sold_out");
-    my $sold_out_books = $books->grep_by("is_sold_out");
+    my $sold_out_books = [ grep { $_->is_in_stock } @$books ];
+    my $sold_out_books = $books->filter_by("is_in_stock");
+    my $sold_out_books = $books->grep_by("is_in_stock");
 
     my $books_in_library = [ grep { $_->is_in_library($library) } @$books ];
     my $books_in_library = $books->filter_by([ is_in_library => $library ]);
 
-    ### filter_by - hash key: $books are book hashrefs
-    my $sold_out_books = [ grep { $_->{is_sold_out} } @$books ];
-    my $sold_out_books = $books->filter_by("is_sold_out");
+    ### reject_by - hash key: $books are book hashrefs
+    my $sold_out_books = [ grep { ! $_->{is_in_stock} } @$books ];
+    my $sold_out_books = $books->reject_by("is_in_stock");
 
 
 
@@ -2106,8 +2075,8 @@ Perl equivalent.
 
 
     #### flat - $author->books returns an arrayref of Books
-    my $author_books = [ map { @{$_->books} } @$authors ]
-    my $author_books = $authors->map_by("books")->flat
+    my $author_books = [ map { @{$_->books} } @$authors ];
+    my $author_books = $authors->map_by("books")->flat;
 
 
 
@@ -2139,3 +2108,5 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
+
+1;

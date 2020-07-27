@@ -43,7 +43,7 @@ map-gis-ali.pl - Build a GI-to-taxid id mapper from GI numbers in ALI files
 
 =head1 VERSION
 
-version 0.201060
+version 0.202070
 
 =head1 USAGE
 

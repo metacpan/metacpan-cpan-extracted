@@ -18,6 +18,8 @@ WriteMakefile(
     'Locale::PO' => '0.27',
     'JSON::Validator' => 0,
     'YAML::XS' => 0,
+    'Text::CSV' => 0,
+    'Excel::Writer::XLSX' => 0,
   },
   BUILD_REQUIRES => {
     'CPAN::Uploader' => 0

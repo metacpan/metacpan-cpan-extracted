@@ -1,0 +1,1 @@
+https://en.wikipedia.org - \\?\UNC\server\Windows\System32\setx.exe

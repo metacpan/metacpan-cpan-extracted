@@ -1,0 +1,6 @@
+51ea2d933f8db9d28284ec2fd9adf4f7  data/bag-info.txt
+9e5ad981e0d29adc278f6a294b8c2aca  data/bagit.txt
+c9dca95b4b6c69ebc246adbb31a9c5ee  data/manifest-md5.txt
+5c7edcef3fb8a12b8b822643e0333655  data/tagmanifest-md5.txt
+751e32179ec8acd71081654527f2e771  data/data/bare-filename
+86e8261ae9e8397a3f57046923943a44  data/data/text-file.txt

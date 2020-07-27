@@ -1,5 +1,22 @@
 Revision history for perl module Text::Amuse
 
+1.63 2020-07-26
+
+ - Fix include-related test on Windows
+
+1.62 2020-07-26
+
+ - Fix tests on Windows
+
+1.61 2020-07-26
+
+ - Fix missing documentation for included_files in Document class
+   Thanks to Slaven Rezić for the report.
+
+1.60 2020-07-26
+
+ - EXPERIMENTAL feature: support file inclusion via #include filename
+
 1.51 2020-04-02
 
  - EXPERIMENTAL: refine the (new) table style keeping the

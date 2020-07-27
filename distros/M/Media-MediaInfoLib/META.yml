@@ -1,0 +1,41 @@
+---
+abstract: 'Perl interface to the MediaInfoLib'
+author:
+  - 'Jiro Nishiguchi <jiro@cpan.org>'
+build_requires:
+  ExtUtils::ParseXS: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4005'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Media-MediaInfoLib
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+    - ext
+provides:
+  Media::MediaInfoLib:
+    file: lib/Media/MediaInfoLib.pm
+    version: '0.01'
+requires:
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/spiritloose/Media-MediaInfoLib/issues
+  homepage: https://github.com/spiritloose/Media-MediaInfoLib
+  repository: git://github.com/spiritloose/Media-MediaInfoLib.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

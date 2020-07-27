@@ -1,0 +1,59 @@
+{
+   "abstract" : "automatically create OpenTracing spans around DBI queries",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-OpenTracing",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "OpenTracing::GlobalTracer" : "0",
+            "OpenTracing::Implementation" : "0",
+            "Scope::Context" : "0",
+            "Syntax::Feature::Maybe" : "0",
+            "perl" : "5.014",
+            "syntax" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "DBD::SQLite" : "0",
+            "DBD::mysql" : "0",
+            "Test::mysqld" : "0"
+         },
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::OpenTracing::Integration" : "v0.102.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.3",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

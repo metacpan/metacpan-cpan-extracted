@@ -2,7 +2,7 @@ NAME
     Chrome::Util::Profile - List available Google Chrome profiles
 
 VERSION
-    This document describes version 0.003 of Chrome::Util::Profile (from
+    This document describes version 0.004 of Chrome::Util::Profile (from
     Perl distribution Chrome-Util-Profile), released on 2020-04-19.
 
 SYNOPSIS

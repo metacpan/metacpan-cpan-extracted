@@ -36,14 +36,18 @@ with 'WWW::WebKit2::MouseInput';
 with 'WWW::WebKit2::KeyboardInput';
 with 'WWW::WebKit2::Events';
 with 'WWW::WebKit2::Navigator';
+with 'WWW::WebKit2::Proxy';
 with 'WWW::WebKit2::Inspector';
 with 'WWW::WebKit2::Settings';
 
 use lib 'lib';
+use DateTime;
 use Gtk3;
 use Gtk3::WebKit2;
 use Gtk3::JavaScriptCore;
 use Glib qw(TRUE FALSE);
+use File::Path qw(make_path);
+use File::Slurper qw(write_text);
 use Time::HiRes qw(time usleep);
 use X11::Xlib;
 use Carp qw(carp croak);
@@ -51,7 +55,7 @@ use XSLoader;
 use English '-no_match_vars';
 use POSIX qw<F_SETFD F_GETFD FD_CLOEXEC>;
 
-our $VERSION = '0.1';
+our $VERSION = '0.11';
 
 use constant DOM_TYPE_ELEMENT => 1;
 use constant ORDERED_NODE_SNAPSHOT_TYPE => 7;
@@ -247,6 +251,18 @@ has events => (
     },
 );
 
+has 'logging' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default =>  0,
+);
+
+has 'log_path' => (
+    is    => 'ro',
+    isa   => 'Str',
+    default => '/tmp/webkit2_log/',
+);
+
 =head2 METHODS
 
 =head3 init
@@ -334,6 +350,8 @@ sub init_webkit {
     $self->process_events;
 
     $self->enable_developer_extras;
+
+    $self->set_proxy($self->proxy_uri, $self->proxy_ignored_hosts) if $self->proxy_uri;
 
     return $self;
 }
@@ -443,6 +461,36 @@ sub setup_xvfb {
     return;
 }
 
+sub enable_logging {
+    my ($self) = @_;
+
+    return $self->logging(1);
+}
+
+sub disable_logging {
+    my ($self) = @_;
+
+    return $self->logging(0);
+}
+
+sub write_log {
+    my ($self, $text) = @_;
+
+    return unless $self->logging;
+
+    make_path($self->log_path) unless -d $self->log_path;
+    my $file = join('/', $self->log_path, DateTime->now . '.txt');
+    write_text($file, $text);
+
+    return $file;
+}
+
+sub log_html_source {
+    my ($self) = @_;
+
+    return $self->write_log($self->get_html_source);
+}
+
 sub uninit {
     my ($self) = @_;
 
@@ -476,7 +524,7 @@ https://github.com/jscarty/WWW-WebKit2
 =head1 AUTHOR
 
 Jason Shaun Carty <jc@atikon.com>,
-Philipp Voglhofer <pv@atikon.com>,$
+Philipp Voglhofer <pv@atikon.com>,
 Philipp A. Lehner <pl@atikon.com>
 
 =head1 COPYRIGHT AND LICENSE

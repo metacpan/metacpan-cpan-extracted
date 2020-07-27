@@ -32,49 +32,29 @@ my $cf_name = 'Object-RT::Transaction--CustomField-'
 my $today = RT::Date->new($session{CurrentUser});
 $today->SetToNow();
 
-# Escape : so id declaration is parsed properly
-my $cf_style = $cf_name;
-$cf_style =~ s/:/\\:/g;
-
 </%init>
-<style type="text/css">
-input#<% $cf_style %> {
-    width: 85px;
-}
-</style>
-<tr>
-  <td class="label"><&|/l&>Add to time</&><br /><&|/l&>worked:</&></td>
-  <td class="value">
+<div class="add-time form-row">
+  <div class="col-3 label input"><&|/l&>Add to time</&> <&|/l&>worked:</&></div>
+  <div class="col-auto value">
     <form action="<% RT->Config->Get("WebPath") %>/Ticket/Display.html" method="POST">
       <input type="hidden" name="id" value="<% $TicketObj->id %>">
-      <& /Elements/SelectDate, Name => "$cf_name", current => 0, ShowTime => 0, Default => $today->Date( Timezone => 'user') &>
-      <& /Elements/EditTimeValue,
-          Name    => "UpdateTimeWorked",
-          Default => $ARGS{UpdateTimeWorked} || '',
-          InUnits => $ARGS{'UpdateTimeWorked-TimeUnits'} || 'minutes',
-      &>
-      <input type="submit" value="<% loc('Add') %>">
+      <div class="form-row">
+        <div class="col-auto">
+          <& /Elements/SelectDate, Name => "$cf_name", current => 0, ShowTime => 0, Default => $today->Date( Timezone => 'user') &>
+        </div>
+        <div class="col-auto">
+          <input name="UpdateTimeWorked" type="text" value="<% $ARGS{UpdateTimeWorked} || '' %>" size="5" class="form-control" />
+        </div>
+        <div class="col-auto">
+          <& /Elements/SelectTimeUnits, Name => 'UpdateTimeWorked-TimeUnits', Default => $ARGS{'UpdateTimeWorked-TimeUnits'} || 'minutes' &>
+        </div>
+        <div class="col-auto">
+          <input type="submit" class="btn btn-primary form-control" value="<% loc('Add') %>">
+        </div>
+      </div>
     </form>
-  </td>
-</tr>
-
-% # Render if less than RT 4.4.0, (which includes per user time)
-% if ( RT::Handle::cmp_version($RT::VERSION,'4.4.0') < 0 && $TicketObj->TimeWorked ) {
-<tr class="time worked">
-    <td class="label"><&|/l&>Worked</&>:</td>
-    <td>
-    <table>
-% for my $user ( keys %$time_worked ) {
-    <tr>
-% # add "value" class for $user label is to make the font the same size as value
-    <td class="value"><% $user %>:</td>
-    <td class="value"><& /Ticket/Elements/ShowTime, minutes => $time_worked->{$user} &></td>
-    </tr>
-% }
-    </table>
-    </td>
-</tr>
-% }
+  </div>
+</div>
 
 <%args>
 $TicketObj

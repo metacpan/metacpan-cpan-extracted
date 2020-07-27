@@ -3,7 +3,7 @@ package Devel::ebug::Backend::Plugin::Filenames;
 use strict;
 use warnings;
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 sub register_commands {
     return ( filenames   => { sub => \&filenames } );
@@ -34,7 +34,7 @@ Devel::ebug::Backend::Plugin::Filenames
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 AUTHOR
 

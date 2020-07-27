@@ -10,12 +10,14 @@ mb::set_script_encoding('sjis');
 use vars qw(@test);
 
 use vars qw($MSWin32_MBCS);
-$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
+$MSWin32_MBCS = 0; # ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
 
-END {
-    closedir(DIR1);
-    closedir(DIR2);
-    closedir(DIR3);
+BEGIN {
+    $SIG{__WARN__} = sub {
+        local($_) = @_;
+        /\Aclosedir\(\) attempted on invalid dirhandle [A-Za-z0-9_]+ at / ? return :
+        warn $_[0];
+    };
 }
 
 @test = (
@@ -23,15 +25,21 @@ END {
     sub { not CORE::eval(<<'END') },
         opendir(DIR1,"5003.NOTEXIST.A");
 END
+    sub { not CORE::eval(<<'END') },
+        closedir(DIR1);
+END
     sub { not mb::eval(<<'END') },
         opendir(DIR2,"5003.NOTEXIST.A");
+END
+    sub { not mb::eval(<<'END') },
+        closedir(DIR2);
 END
     sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(<<'END') },
         opendir(DIR3,"5003.NOTEXIST.ƒ\");
 END
-    sub {1},
-    sub {1},
-    sub {1},
+    sub { return 'SKIP' unless $MSWin32_MBCS; not mb::eval(<<'END') },
+        closedir(DIR3);
+END
     sub {1},
     sub {1},
     sub {1},

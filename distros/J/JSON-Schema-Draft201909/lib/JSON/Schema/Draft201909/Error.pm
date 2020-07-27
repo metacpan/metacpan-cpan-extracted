@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Moo;
@@ -55,7 +55,7 @@ JSON::Schema::Draft201909::Error - Contains a single error from a JSON Schema ev
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 
@@ -90,9 +90,9 @@ specification (L<RFC 6901|https://tools.ietf.org/html/rfc6901>).
 
 The canonical URI or URI reference of the location in the schema where the error occurred; not
 defined, if there is no base URI for the schema and no C<$ref> was followed. Note that this is not
-actually an absolute (fragmentless) URI in most cases, as the indicated error will occur at a path
+a fragmentless URI in most cases, as the indicated error will occur at a path
 below the position where the most recent identifier had been declared in the schema. Further, if the
-schema never declared an absolute base URI, this URI won't contain a scheme either.
+schema never declared an absolute base URI (containing a scheme), this URI won't be absolute either.
 
 =head2 error
 

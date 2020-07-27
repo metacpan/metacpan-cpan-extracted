@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-12'; # DATE
+our $DATE = '2020-04-19'; # DATE
 our $DIST = 'App-YoutubeDlIf'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 # FRAGMENT id=shcompgen-hint command=_youtube-dl
 
 use 5.010001;
@@ -36,7 +36,7 @@ youtube-dl-if - Download videos using youtube-dl with extra selection/filtering
 
 =head1 VERSION
 
-This document describes version 0.002 of youtube-dl-if (from Perl distribution App-YoutubeDlIf), released on 2020-04-12.
+This document describes version 0.003 of youtube-dl-if (from Perl distribution App-YoutubeDlIf), released on 2020-04-19.
 
 =head1 SYNOPSIS
 

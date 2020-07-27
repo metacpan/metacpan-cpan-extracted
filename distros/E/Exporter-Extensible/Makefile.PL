@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.012000;
+use 5.000000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,20 +14,19 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Exporter-Extensible",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.012000",
+  "MIN_PERL_VERSION" => "5.000000",
   "NAME" => "Exporter::Extensible",
   "PREREQ_PM" => {
     "B" => 0,
     "Carp" => 0,
     "Scalar::Util" => 0,
-    "mro" => 0,
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +38,6 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
-  "mro" => 0,
   "strict" => 0,
   "warnings" => 0
 );
@@ -53,5 +51,19 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+if ($] < 5.012) {
+    $WriteMakefileArgs{PREREQ_PM} = {
+        %{ $WriteMakefileArgs{PREREQ_PM} },
+        "B::Hooks::EndOfScope" => "0.24",
+    };
+}
+
+if ($] < 5.009005) {
+    $WriteMakefileArgs{PREREQ_PM} = {
+        %{ $WriteMakefileArgs{PREREQ_PM} },
+        "MRO::Compat" => "0",
+    };
+}
 
 WriteMakefile(%WriteMakefileArgs);

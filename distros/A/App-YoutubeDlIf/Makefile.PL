@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-YoutubeDlIf",
   "EXE_FILES" => [
-    "script/youtube-dl-if"
+    "script/youtube-dl-if",
+    "script/youtube-dl-if-not-yet"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
@@ -38,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

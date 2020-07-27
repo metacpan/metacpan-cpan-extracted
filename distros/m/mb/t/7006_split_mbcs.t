@@ -9,9 +9,6 @@ use mb;
 mb::set_script_encoding('sjis');
 use vars qw(@test);
 
-use vars qw($MSWin32_MBCS);
-$MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|950|951|20932|54936)\Z/);
-
 @test = (
 
 # 1 returning the resulting list value in list context
@@ -298,7 +295,7 @@ $MSWin32_MBCS = ($^O =~ /MSWin32/) and (qx{chcp} =~ m/[^0123456789](932|936|949|
     sub {mb::eval q<1>},
 
 # 231 but if the PATTERN contains parentheses, then the substring matched by each pair of parentheses is included in the resulting list, interspersed with the fields that are ordinarily returned
-    sub {mb::eval q< @_=split(qr/([-,])/,'‚P-‚P‚O,‚Q‚O'); "@_" eq "‚P - ‚P‚O , ‚Q‚O" >},
+    sub {local $^W=0; mb::eval q< @_=split(qr/([-,])/,'‚P-‚P‚O,‚Q‚O'); "@_" eq "‚P - ‚P‚O , ‚Q‚O" >},
     sub {mb::eval q< @_=split(qr/([|C])/,'‚P|‚P‚OC‚Q‚O'); "@_" eq "‚P | ‚P‚O C ‚Q‚O" >},
     sub {mb::eval q<1>},
     sub {mb::eval q<1>},

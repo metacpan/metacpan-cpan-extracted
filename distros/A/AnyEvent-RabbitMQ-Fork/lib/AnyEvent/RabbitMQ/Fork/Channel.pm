@@ -1,5 +1,5 @@
 package AnyEvent::RabbitMQ::Fork::Channel;
-$AnyEvent::RabbitMQ::Fork::Channel::VERSION = '0.5';
+$AnyEvent::RabbitMQ::Fork::Channel::VERSION = '0.6';
 =head1 NAME
 
 AnyEvent::RabbitMQ::Fork::Channel - Facade over L<AnyEvent::RabbitMQ::Channel>
@@ -54,7 +54,7 @@ has connection => (
     is       => 'ro',
     isa      => Object,
     weak_ref => 1,
-    handles  => { delegate => '_delegate' }
+    handles  => ['_delegate']
 );
 
 =head1 METHODS
@@ -93,7 +93,7 @@ foreach my $method (@methods) {
     no strict 'refs';
     *$method = sub {
         my $self = shift;
-        $self->delegate($method => $self->id, @_);
+        $self->_delegate($method => $self->id, @_);
         return $self;
     };
 }

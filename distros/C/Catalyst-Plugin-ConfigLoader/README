@@ -12,14 +12,14 @@ SYNOPSIS
         # you can specify a file if you'd like
         __PACKAGE__->config( 'Plugin::ConfigLoader' => { file => 'config.yaml' } );
 
-      In the file, assuming it's in YAML format:
+    In the file, assuming it's in YAML format:
 
         foo: bar
 
-      Accessible through the context object, or the class itself
+    Accessible through the context object, or the class itself
 
-       $c->config->{foo}    # bar
-       MyApp->config->{foo} # bar
+        $c->config->{foo}    # bar
+        MyApp->config->{foo} # bar
 
 DESCRIPTION
     This module will attempt to load find and load a configuration file of
@@ -39,7 +39,7 @@ DESCRIPTION
     To support the distinction between development and production
     environments, this module will also attemp to load a local config (e.g.
     myapp_local.yaml) which will override any duplicate settings. See
-    get_config_local_suffix for details on how this is configured.
+    "get_config_local_suffix" for details on how this is configured.
 
 METHODS
   setup( )
@@ -90,16 +90,16 @@ METHODS
     the name of the local config file to be loaded.
 
     For example, if $ENV{ MYAPP_CONFIG_LOCAL_SUFFIX } is set to "testing",
-    ConfigLoader will try and load "myapp_testing.conf" instead of
-    "myapp_local.conf".
+    ConfigLoader will try and load myapp_testing.conf instead of
+    myapp_local.conf.
 
   finalize_config
     This method is called after the config file is loaded. It can be used to
     implement tuning of config values that can only be done at runtime. If
     you need to do this to properly configure any plugins, it's important to
     load ConfigLoader before them. ConfigLoader provides a default
-    finalize_config method which walks through the loaded config hash and
-    calls the "config_substitutions" sub on any string.
+    "finalize_config" method which walks through the loaded config hash and
+    calls the config_substitutions method on any string.
 
   config_substitutions( $value )
     This method substitutes macros found with calls to a function. There are

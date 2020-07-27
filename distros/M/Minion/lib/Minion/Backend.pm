@@ -168,6 +168,13 @@ attempt, defaults to C<1>.
 
 Delay job for this many seconds (from now), defaults to C<0>.
 
+=item expire
+
+  expire => 300
+
+Job is valid for this many seconds (from now) before it expires. Note that this option is B<EXPERIMENTAL> and might
+change without warning!
+
 =item notes
 
   notes => {foo => 'bar', baz => [1, 2, 3]}
@@ -192,13 +199,6 @@ Job priority, defaults to C<0>. Jobs with a higher priority get performed first.
   queue => 'important'
 
 Queue to put job in, defaults to C<default>.
-
-=item sequence
-
-  sequence => 'host:mojolicious.org'
-
-Sequence this job belongs to. The previous job from the sequence will be automatically added as a parent to continue the
-sequence. Note that this option is B<EXPERIMENTAL> and might change without warning
 
 =back
 
@@ -285,12 +285,6 @@ List only jobs with one of these notes. Note that this option is B<EXPERIMENTAL>
 
 List only jobs in these queues.
 
-=item sequences
-
-  sequences => ['host:localhost', 'host:mojolicious.org']
-
-List only jobs from these sequences. Note that this option is B<EXPERIMENTAL> and might change without warning!
-
 =item states
 
   states => ['inactive', 'active']
@@ -339,6 +333,12 @@ Epoch time job was created.
 
 Epoch time job was delayed to.
 
+=item expires
+
+  expires => 784111777
+
+Epoch time job is valid until before it expires.
+
 =item finished
 
   finished => 784111777
@@ -351,12 +351,6 @@ Epoch time job was finished.
 
 Job id.
 
-=item next
-
-  next => 10024
-
-Next job in sequence.
-
 =item notes
 
   notes => {foo => 'bar', baz => [1, 2, 3]}
@@ -368,12 +362,6 @@ Hash reference with arbitrary metadata for this job.
   parents => ['10023', '10024', '10025']
 
 Jobs this job depends on.
-
-=item previous
-
-  previous => 10022
-
-Previous job in sequence.
 
 =item priority
 
@@ -404,12 +392,6 @@ Epoch time job has been retried.
   retries => 3
 
 Number of times job has been retried.
-
-=item sequence
-
-  sequence => 'host:mojolicious.org'
-
-Sequence name.
 
 =item started
 
@@ -681,6 +663,13 @@ Number of times performing this job will be attempted.
   delay => 10
 
 Delay job for this many seconds (from now), defaults to C<0>.
+
+=item expire
+
+  expire => 300
+
+Job is valid for this many seconds (from now) before it expires. Note that this option is B<EXPERIMENTAL> and might
+change without warning!
 
 =item parents
 

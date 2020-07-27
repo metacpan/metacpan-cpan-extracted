@@ -1,3 +1,14 @@
+0.202070  2020-07-26 00:24:07+02:00 Europe/Rome
+    - Additions
+      - binaries: added support for iTOL coloring and collapsing to format-tree.pl
+      - binaries: new script upload2itol.pl
+      - binaries: new scripts inst-abbr-ids.pl, inst-qual-filter.pl and inst-tax-filter.pl
+      - ColorScheme: added method store_itol_colors
+      - Tree: added method store_itol_collapse
+    - Fixes
+      - Taxonomy: fixed bug when trying to recover unknown lineages (visible in fetch-tax.pl)
+      - Taxonomy: updated NCBI Taxonomy ranks
+
 0.201060  2020-04-15 12:27:22+02:00 Europe/Brussels
     - Additions
       - binaries: added two options (--column and --separator) and --item-type 'lineage' to fetch-tax.pl
@@ -6,7 +17,7 @@
     - Changes
       - IdList: improved method load to use any column (from a flat table) as ids
       - Taxonomy: revamped handling of ambiguous NCBI names (none is overlooked anymore)
-      
+
 0.200510  2020-02-21 00:18:30+01:00 Europe/Brussels
     - Changes
       - Taxonomy: improved method eq_tax to optionally return both got and exp labels

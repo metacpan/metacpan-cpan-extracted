@@ -2,7 +2,7 @@
 
 # PODNAME: ebug_client
 # ABSTRACT: Debugger server for remote debugging Perl script
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 
 #use lib::findbin '../lib'; # dev-only
@@ -56,7 +56,7 @@ ebug_client - Debugger server for remote debugging Perl script
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 SYNOPSIS
 

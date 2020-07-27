@@ -1,328 +1,234 @@
 #!/usr/bin/perl -w
 use strict;
-BEGIN { if($ENV{'IDOCSDEV'}){system '/usr/bin/clear'} }
+use warnings;
 use String::Util ':all';
-use Test::Toolbox;
+use Test::More;
 
-# debug tools
-# use Debug::ShowStuff ':all';
-# use Debug::ShowStuff::ShowVar;
-# use Test::Toolbox::Idocs;
+# general purpose variable
+my $val;
 
-# plan tests
-rtplan 37, autodie=>$ENV{'IDOCSDEV'}, xverbose=>$ENV{'IDOCSDEV'};
-my $n0 = 'String::Util';
+#------------------------------------------------------------------------------
+# crunch
+#
+
+# basic crunching
+ok(collapse("  Starflower \n\n\t  Miko     ") eq 'Starflower Miko', 'Basic collapse');
+# collapse on undef returns undef
+ok(!defined collapse(undef), 'collapse undef should return undef');
+
+#
+# crunch
+#------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-##= hascontent
+# hascontent
 #
-if (1) { ##i
-	my ($n1, $val);
-	$n1 = "$n0 - hascontent";
-	
-	# undef is false
-	rtbool "$n1 - undef is false", hascontent(undef), 0;
-	
-	# empty string is false
-	rtbool "$n1 - empty string is false", hascontent(''), 0;
-	
-	# space only is false
-	$val = "   \t   \n\n  \r   \n\n\r     ";
-	rtbool "$n1 - space only is false", hascontent($val), 0;
-	
-	# 0 string is true
-	$val = '0';
-	rtbool "$n1 - 0 string is true", hascontent($val), 1;
-	
-	# non-space is true
-	$val = ' x ';
-	rtbool "$n1 - non-space is true", hascontent($val), 1;
-}
+is(hascontent(undef), 0, "hascontent undef");
+
+ok(!hascontent('')                               , "hascontent ''");
+ok(!hascontent("   \t   \n\n  \r   \n\n\r     ") , "hascontent whitespace string");
+ok(hascontent("0")                               , "hascontent zero");
+ok(hascontent(" x ")                             , "hascontent string with x");
+
+ok(nocontent("")     , "nocontent ''");
+ok(nocontent(" ")    , "nocontent space");
+ok(nocontent(undef)  , "nocontent undef");
+ok(!nocontent('a')   , "nocontent char");
+ok(!nocontent(' b ') , "nocontent char with spaces");
+ok(!nocontent('word'), "nocontent word");
+
 #
 # hascontent
 #------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-##= collapse
+# trim
 #
-if (1) { ##i
-	my ($n1, $val);
-	$n1 = "$n0 - collapse";
-	
-	# basic
-	$val = "  Starflower \n\n\t  Miko     ";
-	$val = collapse($val);
-	rtcomp "$n1 - basic", $val, 'Starflower Miko';
-	
-	# undef returns undef
-	rtcomp "$n1 - undef returns undef", collapse(undef), undef;
-}
-#
-# collapse
-#------------------------------------------------------------------------------
 
+# basic trimming
+is(trim(undef)                 , ""         , 'trim undef');
+is(trim("   Perl    ")         , "Perl"     , 'trim spaces');
+is(trim("\t\tPerl\t\t")        , "Perl"     , 'trim tabs');
+is(trim("\n\n\nPerl")          , "Perl"     , 'trim \n');
+is(trim("\n\n\t\nPerl   \t\n") , "Perl"     , 'trim all three');
 
+is(ltrim("\n\n\t\nPerl   ")    , "Perl   "  , 'ltrim');
+is(rtrim("\n\tPerl   ")        , "\n\tPerl" , 'rtrim');
 
-#------------------------------------------------------------------------------
-##= trim
-#
-if (1) { ##i
-	my ($n1, $val);
-	$n1 = "$n0 - trim";
-	
-	# basic
-	$val = '  steve   fred     ';
-	$val = trim($val);
-	rtcomp "$n1 - basic", $val, 'steve   fred';
-	
-	# undef returns undef
-	rtcomp "$n1 - undef returns undef", trim(undef), undef;
-}
 #
 # trim
 #------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-##= no_space
+# no_space
 #
-if (1) { ##i
-	my ($n1, $val);
-	$n1 = "$n0 - nospace";
-	
-	# basic
-	$val = '  steve   fred     ';
-	$val = nospace($val);
-	rtcomp "$n1 - basic", $val, 'stevefred';
-	
-	# undef returns undef
-	rtcomp "$n1 - undef returns undef", nospace(undef), undef;
-}
+
+is(nospace("  ok \n fine     "), 'okfine', 'nospace with whitespace');
+is(nospace("Perl")             , 'Perl'  , 'nospace no whitespace');
+is(nospace(undef)              , undef   , 'nospace undef');
+
 #
 # no_space
 #------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-##= htmlesc
+# startswith
+$val = "Quick brown fox";
+
+ok(startswith("Quick brown fox", 'Q')     , "Startswidth char");
+ok(startswith("Quick brown fox", 'Quick') , "Startswidth word");
+ok(!startswith("Quick brown fox", 'z')    , "Does NOT start with char");
+ok(!startswith("Quick brown fox", 'Qqq')  , "Does NOT start with string");
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+# endswith
+$val = "Quick brown fox";
+
+ok(endswith($val, 'x')    , "Endswidth char");
+ok(endswith($val, 'fox')  , "Endswidth word");
+ok(endswith($val, ' fox') , "Endswidth space word");
+ok(!endswith($val, 'foq') , "Does not end width string");
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+# contains
+$val = "Quick brown fox";
+ok(contains($val, 'brown') , "Contains word");
+ok(contains($val, 'uick')  , "Contains word 2");
+ok(contains($val, 'n f')   , "Contains word with space");
+ok(!contains($val, 'bri')  , "Does not contains word");
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+# htmlesc
 #
-if (1) {
-	my ($n1, $val);
-	$n1 = "$n0 - htmlesc";
-	
-	# basic
-	$val = '<>"&';
-	$val = htmlesc($val);
-	rtcomp "$n1 - basic", $val, '&lt;&gt;&quot;&amp;';
-	
-	# undef returns empty string
-	rtcomp "$n1 - undef returns empty string", htmlesc(undef), '';
-}
+
+# basic operation of htmlesc
+is(htmlesc('<>"&') , '&lt;&gt;&quot;&amp;' , 'htmlesc special chars');
+is(htmlesc(undef)  , ''                    , 'htmlesc undef');
+
 #
 # htmlesc
 #------------------------------------------------------------------------------
 
 
-
 #------------------------------------------------------------------------------
-##= cellfill
+# cellfill
 #
-if (1) {
-	my ($n1, $val);
-	$n1 = "$n0 - cellfill";
-	
-	# space-only string
-	$val = '  ';
-	$val = cellfill($val);
-	rtcomp "$n1 space-only string", $val, '&nbsp;';
-	
-	# undef
-	$val = undef;
-	$val = cellfill($val);
-	rtcomp "$n1 space-only string", $val, '&nbsp;';
-	
-	# string with content
-	$val = 'x';
-	$val = cellfill($val);
-	rtcomp "$n1 space-only string", $val, 'x';
-}
+
+# space-only string
+#is(cellfill('  '), '&nbsp;', 'cellfill spaces');
+# undef string
+#is(cellfill(undef), '&nbsp;', 'cellfill undef');
+# string with content
+#is(cellfill('x'), 'x', 'cellfill undef');
+
 #
 # cellfill
 #------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-##= eqq
+# eq_undef, neundef
 #
-if (1) {
-	my $n1 = "$n0- eqq";
-	
-	# defined, same
-	rtbool "$n1 defined, same", eqq('a', 'a'), 1;
-	
-	# undef, same
-	rtbool "$n1 undef, same", eqq(undef, undef), 1;
-	
-	# defined, different
-	rtbool "$n1 defined, different", eqq('a', 'b'), 0;
-	
-	# one defined, other undef
-	rtbool "$n1 one defined, other undef", eqq('a', undef), 0;
-}
+ok(equndef('a'   , 'a')     , 'equndef same');
+ok(equndef(undef , undef)   , 'equndef undef');
+ok(!equndef('a'  , 'b')     , 'equndef diff');
+ok(!equndef('a'  , undef)   , 'equndef a and undef');
+
+ok(!neundef('a'   , 'a')     , 'nequndef same');
+ok(!neundef(undef , undef)   , 'nequndef undef');
+ok(neundef('a'    , 'b')     , 'nequndef diff');
+ok(neundef('a'    , undef)   , 'nequndef a and undef');
+
 #
-# eqq
+# eq_undef, neundef
 #------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-##= neqq
+# define
 #
-if (1) {
-	my $n1 = "$n0- neqq";
-	
-	# defined, same
-	rtbool "$n1 defined, same", neqq('a', 'a'), 0;
-	
-	# undef, same
-	rtbool "$n1 undef, same", neqq(undef, undef), 0;
-	
-	# defined, different
-	rtbool "$n1 defined, different", neqq('a', 'b'), 1;
-	
-	# one defined, other undef
-	rtbool "$n1 one defined, other undef", neqq('a', undef), 1;
-}
-#
-# eqq
-#------------------------------------------------------------------------------
 
+# define an undef
+#is(define(undef), '', 'define undef');
+# define an already defined value
+#is(define('x'), 'x', 'define string');
 
-
-#------------------------------------------------------------------------------
-##= define
-#
-if (1) {
-	my $n1 = "$n0 - define";
-	
-	# undef
-	rtcomp "$n1 - undef", define(undef), '';
-	
-	# defined value
-	rtcomp "$n1 - defined value", define('whatever'), 'whatever';
-}
 #
 # define
 #------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-##= unquote
+# unquote
 #
-if (1) {
-	my $n1 = "$n0 - unquote";
-	
-	# single quotes
-	rtcomp "$n1 - single quotes", unquote("'fred'"), 'fred';
-	
-	# double quotes
-	rtcomp "$n1 - double quotes", unquote('"fred"'), 'fred';
-	
-	# no quotes
-	rtcomp "$n1 - no quotes", unquote('fred'), 'fred';
-	
-	# mixed quotes
-	rtcomp "$n1 - mixed quotes", unquote(q|"fred'|), q|"fred'|;
-	
-	# undef
-	rtcomp "$n1 - undef", unquote(undef), undef;
-}
+
+# single quotes
+is(unquote("'Starflower'")     , 'Starflower'      , 'unquote single quotes');
+# double quotes
+is(unquote('"Starflower"')     , 'Starflower'      , 'unquote double quotes');
+# no quotes
+is(unquote('Starflower')       , 'Starflower'      , 'unquote no quotes');
+# Quote in middle
+is(unquote("Don't lets start") , "Don't lets start", 'unquote with quote in middle');
+
 #
 # unquote
 #------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-##= jsquote
+# jsquote
 #
-if (1) {
-	my ($n1, $val, $got, $should);
-	$n1 = "$n0 - jsquote";
-	
-	# basic
-	$val = qq|'yeah\n</script>'|;
-	$got = jsquote($val);
-	$should = q|'\'yeah\n<' + '/script>\''|;
-	rtcomp "$n1 - basic", $got, $should;
-}
+
+is(jsquote("'yeah\n</script>'"), q|'\'yeah\n<' + '/script>\''|, 'jsquote');
+
 #
 # jsquote
 #------------------------------------------------------------------------------
 
 
 #------------------------------------------------------------------------------
-##= fullchomp
+# fullchomp
 #
-if (1) {
-	my ($n1, $val, $got, $should);
-	$n1 = 'fullchomp';
-	
-	# void context
-	$val = qq|Starflower\n\r\r\r\n|;
-	fullchomp($val);
-	$should = 'Starflower';
-	rtcomp "$n1 - void context", $val, $should;
-	
-	# scalar context
-	$val = qq|Starflower\n\r\r\r\n|;
-	$got = fullchomp($val);
-	$should = 'Starflower';
-	rtcomp "$n1 - scalar context", $got, $should;
-	
-	# undef
-	$val = undef;
-	$got = fullchomp($val);
-	$should = undef;
-	rtcomp "$n1 - undef", $got, $should;
-}
+
+# scalar context
+#is(fullchomp("Starflower\n\r\r\r\n"), 'Starflower', 'fullchomp');
+
 #
 # fullchomp
 #------------------------------------------------------------------------------
 
+is(sanitize("http://www.google.com/"), 'http_www_google_com', 'Sanitize URL');
+is(sanitize("foo_bar()")             , 'foo_bar'            , 'Sanitize function name');
+is(sanitize("/path/to/file.txt")     , 'path_to_file_txt'   , 'Sanitize path');
 
 #------------------------------------------------------------------------------
-##= randword
+# randword
+# Not sure how to test this besides making sure it actually runs.
 #
-if (1) {
-	my ($n1, $val);
-	$n1 = "$n0 - randword";
-	
-	# get random word
-	$val = randword(20);
-	
-	# check word
-	rtdef "$n1 - defined", $val, 1;
-	rtcomp "$n1 - length", length($val), 20;
-}
+
+$val = randword(20);
+ok(defined($val) && (length($val) == 20), 'randword');
+
 #
 # randword
 #------------------------------------------------------------------------------
 
+# file_get_contents()
+$val    = file_get_contents(__FILE__);
+my @arr = file_get_contents(__FILE__, 1);
 
+ok(length($val) > 100, "file_get_contents string");
+ok(@arr > 10         , "file_get_contents array");
 
-#------------------------------------------------------------------------------
-# done
-# The following code is purely for a home grown testing system. It has no
-# purpose outside of my own system. -Miko
-#
-if ($ENV{'IDOCSDEV'}) {
-	require FileHandle;
-	FileHandle->new('> /tmp/test-done.txt') or
-		die "unable to open check file: $!";
-	print "[done]\n";
-}
-#
-# done
-#------------------------------------------------------------------------------
-
+done_testing();

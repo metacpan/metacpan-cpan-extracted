@@ -55,10 +55,22 @@ use parent 'Net::Curl::Promiser';
 sub _INIT {
     my ($self, $args_ar) = @_;
 
-    $self->{'_epoll'} = $args_ar->[0];
+    return My::Curl::Epoll::Backend->new($args_ar->[0]);
+}
+
+#----------------------------------------------------------------------
+
+package My::Curl::Epoll::Backend;
+
+use parent 'Net::Curl::Promiser::Backend';
+
+sub new {
+    my $self = shift()->SUPER::new();
+
+    $self->{'_epoll'} = shift();
     $self->{'_fds'} = {};
 
-    return;
+    return $self;
 }
 
 sub _GET_FD_ACTION {
@@ -95,23 +107,23 @@ sub _set_epoll {
     return;
 }
 
-sub _SET_POLL_IN {
+sub SET_POLL_IN {
     my ($self, $fd) = @_;
 
     return $self->_set_epoll( $fd, 'IN' );
 }
 
-sub _SET_POLL_OUT {
+sub SET_POLL_OUT {
     my ($self, $fd) = @_;
     return $self->_set_epoll( $fd, 'OUT' );
 }
 
-sub _SET_POLL_INOUT {
+sub SET_POLL_INOUT {
     my ($self, $fd) = @_;
     return $self->_set_epoll( $fd, 'IN', 'OUT' );
 }
 
-sub _STOP_POLL {
+sub STOP_POLL {
     my ($self, $fd) = @_;
     if ( delete $self->{'_fds'}{$fd} ) {
         $self->{'_epoll'}->delete( $fd );

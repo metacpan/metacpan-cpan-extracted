@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Devel::StackTrace;
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 sub register_commands {
     return ( stack_trace => { sub => \&stack_trace } );
@@ -37,7 +37,7 @@ Devel::ebug::Backend::Plugin::StackTrace
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use warnings;
 
 # PODNAME: ebug_client
 # ABSTRACT: Debugger client for remote debugging Perl script
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.63'; # VERSION
 
 __END__
 
@@ -20,7 +20,7 @@ ebug_client - Debugger client for remote debugging Perl script
 
 =head1 VERSION
 
-version 0.60
+version 0.63
 
 =head1 SYNOPSIS
 

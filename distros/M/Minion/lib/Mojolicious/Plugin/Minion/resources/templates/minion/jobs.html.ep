@@ -3,35 +3,25 @@
 % my $related = begin
   % my $job = shift;
 
-  % my ($previous, $next, $parents, $children, $id) = @{$job}{qw(previous next parents children worker)};
+  % my ($parents, $children, $id) = @{$job}{qw(parents children worker)};
   % if (@$parents || @$children || $id) {
     <div class="dropdown">
-      <button type="button"
-        class="btn btn-sm btn-outline-secondary dropdown-toggle"
-        id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
-        aria-expanded="false">
+      <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuButton"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Related
       </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        % if ($previous) {
-          % my $url = url_for('minion_jobs')->query(id => $previous);
-          <a class="dropdown-item" href="<%= $url %>"><i class="far fa-arrow-alt-circle-left"></i> Previous</a>
-        % }
-        % if ($next) {
-          % my $url = url_for('minion_jobs')->query(id => $next);
-          <a class="dropdown-item" href="<%= $url %>"><i class="far fa-arrow-alt-circle-right"></i> Next</a>
-        % }
         % if (@$parents) {
           % my $url = url_for('minion_jobs')->query(id => $parents);
-          <a class="dropdown-item" href="<%= $url %>"><i class="far fa-arrow-alt-circle-up"></i> Parents</a>
+          <a class="dropdown-item" href="<%= $url %>"><i class="far fa-arrow-alt-circle-left"></i> Parents</a>
         % }
         % if (@$children) {
           % my $url = url_for('minion_jobs')->query(id => $children);
-          <a class="dropdown-item" href="<%= $url %>"><i class="far fa-arrow-alt-circle-down"></i> Children</a>
+          <a class="dropdown-item" href="<%= $url %>"><i class="far fa-arrow-alt-circle-right"></i> Children</a>
         % }
         % if ($id) {
           % my $url = url_for('minion_workers')->query(id => $id);
-          <a class="dropdown-item" href="<%= $url %>"><i class="far fa-flushed"></i> Worker</a>
+          <a class="dropdown-item" href="<%= $url %>"><i class="fas fa-hard-hat"></i> Worker</a>
         % }
       </div>
     </div>
@@ -44,21 +34,17 @@
   <div class="d-flex justify-content-between">
     <div>
       <div class="btn-group" role="group">
-        <button class="btn btn-outline-secondary" name="do" value="retry"
-          type="submit">
+        <button class="btn btn-outline-secondary" name="do" value="retry" type="submit">
           <i class="fas fa-redo" aria-hidden="true"></i> Retry
         </button>
-        <button class="btn btn-outline-secondary" name="do" value="stop"
-          type="submit">
+        <button class="btn btn-outline-secondary" name="do" value="stop" type="submit">
           <i class="fas fa-ban" aria-hidden="true"></i> Stop
         </button>
-        <button class="btn btn-outline-secondary" name="do" value="remove"
-          type="submit">
+        <button class="btn btn-outline-secondary" name="do" value="remove" type="submit">
           <i class="fas fa-times" aria-hidden="true"></i> Remove
         </button>
-        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-          id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true"
-          aria-expanded="false">
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenu2"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-traffic-light"></i> Signal
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
@@ -68,12 +54,10 @@
           <button class="dropdown-item" name="do" value="sig_term" type="submit">
             TERM
           </button>
-          <button class="dropdown-item" name="do" value="sig_usr1"
-            type="submit">
+          <button class="dropdown-item" name="do" value="sig_usr1" type="submit">
             USR1
           </button>
-          <button class="dropdown-item" name="do" value="sig_usr2"
-            type="submit">
+          <button class="dropdown-item" name="do" value="sig_usr2" type="submit">
             USR2
           </button>
         </div>
@@ -103,81 +87,81 @@
             <th></th>
           </tr>
         </thead>
-        % my $i = 0;
-        % for my $job (@$jobs) {
-          % $i++;
-          % my $base = url_with->query({offset => 0});
-          <tbody>
-            <tr>
-              <td>
-                <input type="checkbox" name="id" value="<%= $job->{id} %>">
-              </td>
-              <td>
-                <a href="<%= url_for->query({id => $job->{id}}) %>">
-                  <%= $job->{id} %>
-                </a>
-              </td>
-              <td>
-                <a href="<%= $base->clone->query({task => $job->{task}}) %>">
-                  <%= $job->{task} %>
-                </a>
-              </td>
-              <td>
-                <a href="<%= $base->clone->query({queue => $job->{queue}}) %>">
-                  <%= $job->{queue} %>
-                </a>
-              </td>
-              <td class="from-now"><%= $job->{created} %></td>
-              <td><%= $related->($job) %></td>
-              <td class="accordion-toggle collapsed" data-toggle="collapse"
-                data-target="#job<%= $i %>">
-                % if ($job->{state} eq 'active') {
-                  <span class="badge badge-primary">active</span>
+        % if (@$jobs) {
+          % my $i = 0;
+          % for my $job (@$jobs) {
+            % $i++;
+            % my $base = url_with->query({offset => 0});
+            <tbody>
+              <tr>
+                <td>
+                  <input type="checkbox" name="id" value="<%= $job->{id} %>">
+                </td>
+                <td>
+                  <a href="<%= url_for->query({id => $job->{id}}) %>">
+                    <%= $job->{id} %>
+                  </a>
+                </td>
+                <td>
+                  <a href="<%= $base->clone->query({task => $job->{task}}) %>">
+                    <%= $job->{task} %>
+                  </a>
+                </td>
+                <td>
+                  <a href="<%= $base->clone->query({queue => $job->{queue}}) %>">
+                    <%= $job->{queue} %>
+                  </a>
+                </td>
+                <td class="from-now"><%= $job->{created} %></td>
+                <td><%= $related->($job) %></td>
+                <td class="accordion-toggle collapsed" data-toggle="collapse" data-target="#job<%= $i %>">
+                  % if ($job->{state} eq 'active') {
+                    <span class="badge badge-primary">active</span>
+                  % }
+                  % elsif ($job->{state} eq 'failed') {
+                    <span class="badge badge-danger">failed</span>
+                  % }
+                  % elsif ($job->{state} eq 'finished') {
+                    <span class="badge badge-success">finished</span>
+                  % }
+                  % else {
+                    <span class="badge badge-secondary">inactive</span>
+                  % }
+                </td>
+                % if (grep { $job->{state} eq $_ } qw(active finished failed)) {
+                  % my $end = $job->{state} eq 'active' ? 'time' : 'finished';
+                  % my $runtime = $job->{$end} - $job->{started};
+                  <td class="accordion-toggle collapsed duration" data-toggle="collapse" data-target="#job<%= $i %>">
+                    <%= $runtime %>
+                  </td>
                 % }
-                % elsif ($job->{state} eq 'failed') {
-                  <span class="badge badge-danger">failed</span>
-                % }
-                % elsif ($job->{state} eq 'finished') {
-                  <span class="badge badge-success">finished</span>
+                % elsif ($job->{delayed} > $job->{time}) {
+                  <td class="accordion-toggle collapsed" data-toggle="collapse" data-target="#job<%= $i %>">
+                    <div class="d-inline duration">
+                      <%= $job->{delayed} - $job->{time} %>
+                    </div>
+                    delay
+                  </td>
                 % }
                 % else {
-                  <span class="badge badge-secondary">inactive</span>
+                  <td class="accordion-toggle collapsed" data-toggle="collapse" data-target="#job<%= $i %>">waiting</td>
                 % }
-              </td>
-              % if (grep { $job->{state} eq $_ } qw(active finished failed)) {
-                % my $end = $job->{state} eq 'active' ? 'time' : 'finished';
-                % my $runtime = $job->{$end} - $job->{started};
-                <td class="accordion-toggle collapsed duration"
-                  data-toggle="collapse" data-target="#job<%= $i %>">
-                  <%= $runtime %>
+                <td class="accordion-toggle collapsed expand" data-toggle="collapse" data-target="#job<%= $i %>">
+                  <span class="fas fa-lg expand-icon"></span>
                 </td>
-              % }
-              % elsif ($job->{delayed} > $job->{time}) {
-                <td class="accordion-toggle collapsed" data-toggle="collapse"
-                  data-target="#job<%= $i %>">
-                  <div class="d-inline duration">
-                    <%= $job->{delayed} - $job->{time} %>
+              </tr>
+              <tr>
+                <td colspan="9" class="hiddenRow">
+                  <div class="collapse" id="job<%= $i %>">
+                    <pre class="border rounded"><%= dumper Minion::_datetime $job %></pre>
                   </div>
-                  delay
                 </td>
-              % }
-              % else {
-                <td class="accordion-toggle collapsed" data-toggle="collapse"
-                  data-target="#job<%= $i %>">waiting</td>
-              % }
-              <td class="accordion-toggle collapsed expand"
-                data-toggle="collapse" data-target="#job<%= $i %>">
-                <span class="fas fa-lg expand-icon"></span>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="9" class="hiddenRow">
-                <div class="collapse" id="job<%= $i %>">
-                  <pre class="border rounded"><%= dumper Minion::_datetime $job %></pre>
-                </div>
-              </td>
-            </tr>
-          </tbody>
+              </tr>
+            </tbody>
+          % }
+        % }
+        % else {
+          <tr><td colspan="9"><p class="text-center"><i class="fas fa-info-circle"></i> No jobs found</p></td></tr>
         % }
       </table>
     </div>

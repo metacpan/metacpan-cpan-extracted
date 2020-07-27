@@ -1,5 +1,8 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 
+1.20200724 2020-07-24 UTC
+  * Fix test for change in live dns response
+
 1.20200708 2020-07-08 UTC
   * Safer internal use of eval
 

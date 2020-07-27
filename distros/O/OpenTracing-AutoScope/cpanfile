@@ -6,6 +6,7 @@ requires            'Sub::Info';
 requires            'PerlX::Maybe';
 requires            'YAML::XS';
 requires            'PPI';
+requires            'Perl::Critic::Utils::McCabe';
 
 requires            'Scope::Context';
 

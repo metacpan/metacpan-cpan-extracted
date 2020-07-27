@@ -1,16 +1,38 @@
 ---
-abstract: 'String::Util -- String processing utilities'
+abstract: 'String processing utility functions'
 author:
-    - "Miko O'Sullivan <miko@idocs.com>"
-generated_by: home grown
+  - 'Scott Baker <scott@perturb.org>'
+  - "Miko O'Sullivan <miko@idocs.com>"
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
 name: String-Util
-provides:
-    String::Util:
-        file: lib/String/Util.pm
-        version: 1.26
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-    Number::Misc: 1.2
-    Test::Toolbox: 0.2
-    perl: 5.003
-version: 1.26
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/scottchiefbaker/String-Util/issues
+  homepage: https://github.com/scottchiefbaker/String-Util
+  repository: https://github.com/scottchiefbaker/String-Util.git
+version: '1.31'
+x_contributors:
+  - 'Dan Book <grinnz@gmail.com>'
+  - 'Scott Baker <scott.baker@directlink.coop>'
+x_generated_by_perl: v5.24.4
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

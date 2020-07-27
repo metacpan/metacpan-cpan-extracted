@@ -1,7 +1,7 @@
 package mb;
 ######################################################################
 #
-# mb - run Perl script written in MBCS
+# mb - run Perl script in MBCS encoding (not only CJK ;-)
 #
 # https://metacpan.org/release/mb
 #
@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.06';
+$VERSION = '0.08';
 $VERSION = $VERSION;
 
 # internal use
@@ -47,6 +47,9 @@ my $escapee_in_qq_like = join('', map {"\\$_"} grep( ! /[A-Za-z0-9_]/, map { COR
 
 # as less escapes as possible to avoid over-escaping
 my $escapee_in_q__like = '\\' . "\x5C";
+
+# generic linebreak
+my $R = '(?>\\r\\n|\\r|\\n)';
 
 # check running perl interpreter
 if ($^X =~ /jperl/i) {
@@ -88,6 +91,14 @@ sub import {
     else {
         set_script_encoding(detect_system_encoding());
     }
+
+    # $^X($EXECUTABLE_NAME) for execute MBCS Perl script
+    $mb::PERL = qq{$^X @{[__FILE__]}};
+    $mb::PERL = $mb::PERL; # to avoid: Name "mb::PERL" used only once: possible typo at ...
+
+    # original $0($PROGRAM_NAME) before transpile
+    ($mb::ORIG_PROGRAM_NAME = $0) =~ s/\.oo(\.[^.]+)\z/$1/;
+    $mb::ORIG_PROGRAM_NAME = $mb::ORIG_PROGRAM_NAME; # to avoid: Name "mb::ORIG_PROGRAM_NAME" used only once: possible typo at ...
 }
 
 #---------------------------------------------------------------------
@@ -154,7 +165,7 @@ END
         # poor file locking
         local $SIG{__DIE__} = sub { rmdir("$ARGV[0].lock"); };
         if (mkdir("$ARGV[0].lock", 0755)) {
-            mb::_open_w($fh, ">$script_oo") or die "$0(@{[__LINE__]}): cant't open file: $script_oo\n";
+            mb::_open_w(my $fh, ">$script_oo") or die "$0(@{[__LINE__]}): cant't open file: $script_oo\n";
             print {$fh} mb::parse();
             close $fh;
             rmdir("$ARGV[0].lock");
@@ -195,6 +206,20 @@ END
     $| = 1;
     system($^X, "-I$module_path", "-M$module_name=$mb::VERSION,$script_encoding", map { / / ? "$quote$_$quote" : $_ } $script_oo, @ARGV[1..$#ARGV]);
     exit($? >> 8);
+}
+
+#---------------------------------------------------------------------
+# cluck() for MBCS encoding
+sub cluck {
+    my $i = 0;
+    my @cluck = ();
+    while (my($package,$filename,$line,$subroutine) = caller($i)) {
+        push @cluck, "[$i] $filename($line) $package::$subroutine\n";
+        $i++;
+    }
+    print STDERR CORE::reverse @cluck;
+    print STDERR "\n";
+    print STDERR @_;
 }
 
 #---------------------------------------------------------------------
@@ -339,8 +364,8 @@ sub mb::eval {
 
 #---------------------------------------------------------------------
 # getc() for MBCS encoding
-sub mb::getc (;*@) {
-    my $fh = @_ ? Symbol::qualify_to_ref(shift @_,caller()) : \*STDIN;
+sub mb::getc {
+    my $fh = @_ ? shift(@_) : \*STDIN;
     confess 'Too many arguments for mb::getc' if @_ and not wantarray;
     my $getc = CORE::getc $fh;
     if ($script_encoding =~ /\A (?: sjis ) \z/xms) {
@@ -1891,7 +1916,6 @@ sub parse {
 # parse expression in script
 sub parse_expr {
     my $parsed = '';
-    my $R = '(?>\\r\\n|\\r|\\n)';
 
     # __END__ or __DATA__
     if (/\G ^ ( (?: __END__ | __DATA__ ) $R .* ) \z/xmsgc) {
@@ -1904,8 +1928,7 @@ sub parse_expr {
     }
 
     # \r\n, \r, \n
-    elsif (/\G ( $R ) /xmsgc) {
-        $parsed .= $1;
+    elsif (/\G (?= $R ) /xmsgc) {
         while (my $here_document_delimiter = shift @here_document_delimiter) {
             my($delimiter, $quote_type) = @{$here_document_delimiter};
             if ($quote_type eq 'qq') {
@@ -2754,6 +2777,26 @@ sub parse_expr {
         $parsed .= $1;
         $term = 1;
     }
+
+    # mb::getc() --> mb::getc()
+    elsif (/\G ( mb::getc (?: \s* \( )+ \s* \) ) /xmsgc) {
+        $parsed .= $1;
+        $term = 1;
+    }
+
+    # mb::getc($fh) --> mb::getc($fh)
+    elsif (/\G ( mb::getc (?: \s* \( )+ \s* \$ ) /xmsgc) {
+        $parsed .= $1;
+        $term = 1;
+    }
+
+    # mb::getc(FILE) --> mb::getc(\*FILE)
+    elsif (/\G ( mb::getc (?: \s* \( )+ \s* ) /xmsgc) {
+        $parsed .= $1;
+        $parsed .= '\\*';
+        $term = 1;
+    }
+
     elsif (/\G ( (?: CORE:: | mb:: )? (?: chop | chr | getc | index | lc | lcfirst | length | ord | reverse | rindex | substr | uc | ucfirst ) ) \b /xmsgc) {
         $parsed .= $1;
         $term = 1;
@@ -2895,7 +2938,7 @@ sub parse_heredocument_as_q_endswith {
     my($endswith) = @_;
     my $parsed = '';
     while (1) {
-        if (/\G ($endswith) /xmsgc) {
+        if (/\G ( $R $endswith ) /xmsgc) {
             $parsed .= $1;
             last;
         }
@@ -2923,9 +2966,8 @@ sub parse_heredocument_as_qq_endswith {
     my $parsed = '';
     my $nest_escape = 0;
     while (1) {
-        if (/\G ($endswith) /xmsgc) {
+        if (/\G ( $R $endswith ) /xmsgc) {
             $parsed .= ('>)]}' x $nest_escape);
-            $parsed .= "\n" if CORE::length($1) >= 2; # here document
             $parsed .= $1;
             last;
         }
@@ -3587,7 +3629,7 @@ sub parse_re_codepoint_class {
         # this limitation makes it easier to change the script encoding
         elsif ($classmate =~ /\G (-) /xmsgc) {
             if ($^W) {
-                confess <<END;
+                cluck <<END;
 [$parsed...] in regular expression
 
 range specification by '-' in codepoint class of regular expression supports US-ASCII only.
@@ -4166,7 +4208,7 @@ sub codepoint_tr {
         # this limitation makes it easier to change the script encoding
         elsif ($searchlist =~ /\G (-) /xmsgc) {
             if ($^W) {
-                confess <<END;
+                cluck <<END;
 "$searchlist" in tr///
 
 range specification by '-' in tr/// is not supported.
@@ -4277,7 +4319,7 @@ __END__
 
 =head1 NAME
 
-mb - run Perl script written in MBCS
+mb - run Perl script in MBCS encoding (not only CJK ;-)
 
 =head1 SYNOPSIS
 
@@ -4319,7 +4361,7 @@ mb - run Perl script written in MBCS
   supported perl versions:
     perl version 5.005_03 to newest perl
 
-=head1 INSTALLATION BY MAKE (for UNIX-like system)
+=head1 INSTALLATION BY MAKE
 
 To install this software by make, type the following:
 
@@ -4337,12 +4379,12 @@ To install this software without make, type the following:
 
 =head1 DESCRIPTION
 
-  This software is a source code filter, transpiler-modulino.
+  This software is a source code filter, a transpiler-modulino.
 
   Perl is said to have been able to handle Unicode since version 5.8. However,
   unlike JPerl, "Easy jobs easy" has been lost. (but we have got it again :-D)
 
-  In Shift_JIS and similar encodings(Big5, Big5HKSCS, GB18030, GBK, Sjis, UHC)
+  In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, UHC)
   have any DAMEMOJI at second octet in double-byte codepoint. DAMEMOJI are
   metacharacters. Which octets are DAMEMOJI depends on whether the enclosing
   delimiter is single quote or double quote. This software escapes DAMEMOJI in
@@ -4358,7 +4400,7 @@ To install this software without make, type the following:
 
   This software ...
   * supports MBCS literals in Perl scripts
-  * supports Big5, Big5HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, and UTF-8
+  * supports Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, and UTF-8
   * does not use the UTF8 flag to avoid MOJIBAKE
   * escapes DAMEMOJI in scripts
   * handles raw encoding to support GAIJI
@@ -4422,38 +4464,38 @@ To install this software without make, type the following:
   follows.
 
   ------------------------------------------------------------------------------
-  big5
+  big5 (Big5)
              1st       2nd
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/Big5
   ------------------------------------------------------------------------------
-  big5hkscs
+  big5hkscs (Big5-HKSCS)
              1st       2nd
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/Hong_Kong_Supplementary_Character_Set
   ------------------------------------------------------------------------------
-  eucjp
+  eucjp (EUC-JP)
              1st       2nd
              A1..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP
   ------------------------------------------------------------------------------
-  gb18030
+  gb18030 (GB18030)
              1st       2nd       3rd       4th
              81..FE    30..39    81..FE    30..39
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/GB_18030
   ------------------------------------------------------------------------------
-  gbk
+  gbk (GBK)
              1st       2nd
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/GBK_(character_encoding)
   ------------------------------------------------------------------------------
-  sjis
+  sjis (Shift_JIS-like encodings)
              1st       2nd
              81..9F    00..FF
              E0..FC    00..FF
@@ -4461,13 +4503,13 @@ To install this software without make, type the following:
              00..7F
              https://en.wikipedia.org/wiki/Shift_JIS
   ------------------------------------------------------------------------------
-  uhc
+  uhc (UHC)
              1st       2nd
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/Unified_Hangul_Code
   ------------------------------------------------------------------------------
-  utf8
+  utf8 (UTF-8)
              1st       2nd       3rd       4th
              E1..EC    80..BF    80..BF
              C2..DF    80..BF
@@ -4543,6 +4585,30 @@ To install this software without make, type the following:
   mb::rindex_byte         as codepoint    as octet        useful, JPerl like
   ------------------------------------------------------------------------------------------
 
+=head1 MBCS special variables provided by this software
+
+  This software provides the following two special variables for convenience.
+
+=over 2
+
+=item * $mb::PERL
+
+  system(qq{ $^X perl_script.pl });              # had been write this...
+  
+                                                 # on mb.pm modulino
+  system(qq{ $^X       SBCS_perl_script.pl });   # for SBCS script
+  system(qq{ $mb::PERL MBCS_perl_script.pl });   # for MBCS script
+
+=item * $mb::ORIG_PROGRAM_NAME
+
+  if ($0 =~ /-x64\.pl\z/) { ... }                # had been write this...
+  
+                                                 # on mb.pm modulino
+  if ($0 =~ /-x64\.pl\z/) { ... }                # means program name translated by mb.pm modulino (are you right?)
+  if ($mb::ORIG_PROGRAM_NAME =~ /-x64\.pl\z/) { ... }  # means original program name not translated by mb.pm modulino
+
+=back
+
 =head1 Porting from script in bare Perl4, bare Perl5, and bare Perl7
 
   -----------------------------------------------------------------
@@ -4574,11 +4640,13 @@ To install this software without make, type the following:
   -----------------------------------------------------------------
   chop                      mb::chop
   index                     mb::index_byte
-  no Your::MBCS::Module;    no mb::mode Your::MBCS::Module; *1
+  no Your::MBCS::Module;    no mb::PERL Your::MBCS::Module; *1
+  no Your::SBCS::Module;    no          Your::SBCS::Module;
   rindex                    mb::rindex_byte
-  use Your::MBCS::Module;   use mb::mode Your::MBCS::Module; *1
+  use Your::MBCS::Module;   use mb::PERL Your::MBCS::Module; *1
+  use Your::SBCS::Module;   use          Your::SBCS::Module;
   -----------------------------------------------------------------
-  *1 mb::mode module comes later
+  *1 mb::PERL module comes later
 
 =head1 Porting from script with utf8 pragma
 
@@ -4593,16 +4661,18 @@ To install this software without make, type the following:
   lc                        ---
   lcfirst                   ---
   length                    mb::length
-  no Your::MBCS::Module;    no mb::mode Your::MBCS::Module; *2
+  no Your::MBCS::Module;    no mb::PERL Your::MBCS::Module; *2
+  no Your::SBCS::Module;    no          Your::SBCS::Module;
   ord                       mb::ord
   reverse                   mb::reverse
   rindex                    mb::rindex
   substr                    mb::substr
   uc                        ---
   ucfirst                   ---
-  use Your::MBCS::Module;   use mb::mode Your::MBCS::Module; *2
+  use Your::MBCS::Module;   use mb::PERL Your::MBCS::Module; *2
+  use Your::SBCS::Module;   use          Your::SBCS::Module;
   -----------------------------------------------------------------
-  *2 mb::mode module comes later, and module must be without utf8 pragma.
+  *2 mb::PERL module comes later, and module must be without utf8 pragma.
 
 =head1 What are DAMEMOJI
 
@@ -4703,6 +4773,10 @@ To install this software without make, type the following:
   ucfirst                                    mb::ucfirst
   index                                      index
   rindex                                     rindex
+  mb::getc                                   mb::getc
+  mb::getc()                                 mb::getc()
+  mb::getc(FILE)                             mb::getc(\*FILE)
+  mb::getc($fh)                              mb::getc($fh)
   'MBCS-quotee'                              'OO-quotee'
   "MBCS-quotee"                              "OO-quotee"
   `MBCS-quotee`                              `OO-quotee`
@@ -4943,21 +5017,21 @@ To install this software without make, type the following:
   qr'[[:^upper:]]'                           qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   qr'[[:^word:]]'                            qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x5A\x5F\x61-\x7A])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
   qr'[[:^xdigit:]]'                          qr{\G${mb::_anchor}@{[qr'(?:(?=(?:(?![\x30-\x39\x41-\x46\x61-\x66])(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F]))))(?^:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_m_passed()]}}
-  qr/./                                      qr{\G${mb::_anchor}@{[qr/(?:@{mb::_dot})/ ]}@{[mb::_m_passed()]}}
-  qr/\B/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_B})/ ]}@{[mb::_m_passed()]}}
-  qr/\D/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_D})/ ]}@{[mb::_m_passed()]}}
-  qr/\H/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_H})/ ]}@{[mb::_m_passed()]}}
-  qr/\N/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_N})/ ]}@{[mb::_m_passed()]}}
-  qr/\R/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_R})/ ]}@{[mb::_m_passed()]}}
-  qr/\S/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_S})/ ]}@{[mb::_m_passed()]}}
-  qr/\V/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_V})/ ]}@{[mb::_m_passed()]}}
-  qr/\W/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_W})/ ]}@{[mb::_m_passed()]}}
-  qr/\b/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_b})/ ]}@{[mb::_m_passed()]}}
-  qr/\d/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_d})/ ]}@{[mb::_m_passed()]}}
-  qr/\h/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_h})/ ]}@{[mb::_m_passed()]}}
-  qr/\s/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_s})/ ]}@{[mb::_m_passed()]}}
-  qr/\v/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_v})/ ]}@{[mb::_m_passed()]}}
-  qr/\w/                                     qr{\G${mb::_anchor}@{[qr/(?:@{mb::_w})/ ]}@{[mb::_m_passed()]}}
+  qr/./                                      qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_dot]})/ ]}@{[mb::_m_passed()]}}
+  qr/\B/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_B]})/ ]}@{[mb::_m_passed()]}}
+  qr/\D/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_D]})/ ]}@{[mb::_m_passed()]}}
+  qr/\H/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_H]})/ ]}@{[mb::_m_passed()]}}
+  qr/\N/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_N]})/ ]}@{[mb::_m_passed()]}}
+  qr/\R/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_R]})/ ]}@{[mb::_m_passed()]}}
+  qr/\S/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_S]})/ ]}@{[mb::_m_passed()]}}
+  qr/\V/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_V]})/ ]}@{[mb::_m_passed()]}}
+  qr/\W/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_W]})/ ]}@{[mb::_m_passed()]}}
+  qr/\b/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_b]})/ ]}@{[mb::_m_passed()]}}
+  qr/\d/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_d]})/ ]}@{[mb::_m_passed()]}}
+  qr/\h/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_h]})/ ]}@{[mb::_m_passed()]}}
+  qr/\s/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_s]})/ ]}@{[mb::_m_passed()]}}
+  qr/\v/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_v]})/ ]}@{[mb::_m_passed()]}}
+  qr/\w/                                     qr{\G${mb::_anchor}@{[qr/(?:@{[@mb::_w]})/ ]}@{[mb::_m_passed()]}}
   qr/[\b]/                                   qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[\\b])]}/ ]}@{[mb::_m_passed()]}}
   qr/[[:alnum:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:alnum:]])]}/ ]}@{[mb::_m_passed()]}}
   qr/[[:alpha:]]/                            qr{\G${mb::_anchor}@{[qr/@{[mb::_cc(qq[[:alpha:]])]}/ ]}@{[mb::_m_passed()]}}
@@ -5374,6 +5448,88 @@ This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
+=head1 ACKNOWLEDGEMENTS
+
+This software was made referring to software and the document that the
+following hackers or persons had made. 
+I am thankful to all persons.
+
+ Rick Yamashita, Shift_JIS
+ https://shino.tumblr.com/post/116166805/%E5%B1%B1%E4%B8%8B%E8%89%AF%E8%94%B5%E3%81%A8%E7%94%B3%E3%81%97%E3%81%BE%E3%81%99-%E7%A7%81%E3%81%AF1981%E5%B9%B4%E5%BD%93%E6%99%82us%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%82%BD%E3%83%95%E3%83%88%E3%81%A7%E3%82%B7%E3%83%95%E3%83%88jis%E3%81%AE%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%82%92%E6%8B%85%E5%BD%93
+ http://www.wdic.org/w/WDIC/%E3%82%B7%E3%83%95%E3%83%88JIS
+
+ Larry Wall, Perl
+ http://www.perl.org/
+
+ Kazumasa Utashiro, jcode.pl
+ https://metacpan.org/author/UTASHIRO
+ ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
+
+ Jeffrey E. F. Friedl, Mastering Regular Expressions
+ http://regex.info/
+
+ SADAHIRO Tomoyuki, The right way of using Shift_JIS
+ http://nomenclator.la.coocan.jp/perl/shiftjis.htm
+ https://metacpan.org/author/SADAHIRO
+
+ Yukihiro "Matz" Matsumoto, YAPC::Asia2006 Ruby on Perl(s)
+ https://archive.org/details/YAPCAsia2006TokyoRubyonPerls
+
+ jscripter, For jperl users
+ http://text.world.coocan.jp/jperl.html
+
+ Bruce., Unicode in Perl
+ http://www.rakunet.org/tsnet/TSabc/18/546.html
+
+ Hiroaki Izumi, Shouldn't use Perl5.8 / Perl5.10 on the Windows
+ https://sites.google.com/site/hiroa63iz/perlwin
+
+ Yuki Kimoto, Is it true that you shouldn't use Perl on Windows?
+ https://philosophy.perlzemi.com/blog/20200122080040.html
+
+ chaichanPaPa, Matching Shift_JIS file name
+ http://chaipa.hateblo.jp/entry/20080802/1217660826
+
+ SUZUKI Norio, Jperl
+ http://www.dennougedougakkai-ndd.org/alte/3tte/jperl-5.005_03@ap522/homepage2.nifty.com..kipp..perl..jperl..index.html
+
+ WATANABE Hirofumi, Jperl
+ https://www.cpan.org/src/5.0/jperl/
+ https://metacpan.org/author/WATANABE
+ ftp://ftp.oreilly.co.jp/pcjp98/watanabe/jperlconf.ppt
+
+ Chuck Houpt, Michiko Nozu, MacJPerl
+ https://habilis.net/macjperl/index.j.html
+
+ Kenichi Ishigaki, Pod-PerldocJp, Welcome to modern Perl world
+ https://metacpan.org/release/Pod-PerldocJp
+ http://gihyo.jp/dev/serial/01/modern-perl/0031
+ http://gihyo.jp/dev/serial/01/modern-perl/0032
+ http://gihyo.jp/dev/serial/01/modern-perl/0033
+
+ Fuji, Goro (gfx), Perl Hackers Hub No.16
+ http://gihyo.jp/dev/serial/01/perl-hackers-hub/001602
+
+ Dan Kogai, Encode module
+ https://metacpan.org/release/Encode
+ https://archive.org/details/YAPCAsia2006TokyoPerl58andUnicodeMythsFactsandChanges
+ http://yapc.g.hatena.ne.jp/jkondo/
+
+ Takahashi Masatuyo, JPerl Wiki
+ https://jperl.fandom.com/ja/wiki/JPerl_Wiki
+
+ Juerd, Perl Unicode Advice
+ https://juerd.nl/site.plp/perluniadvice
+
+ daily dayflower, 2008-06-25 perluniadvice
+ https://dayflower.hatenablog.com/entry/20080625/1214374293
+
+ Unicode issues in Perl
+ https://www.i-programmer.info/programming/other-languages/1973-unicode-issues-in-perl.html
+
+ Jesse Vincent, Compatibility is a virtue
+ https://www.nntp.perl.org/group/perl.perl5.porters/2010/05/msg159825.html
+
 =head1 SEE ALSO
 
  perlunicode, Encode, open, utf8, bytes, Arabic, Big5, Big5HKSCS, CP932::R2,
@@ -5642,88 +5798,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
  Recent Perl packages by "INABA Hitoshi"
  http://code.activestate.com/ppm/author:INABA-Hitoshi/
-
-=head1 ACKNOWLEDGEMENTS
-
-This software was made referring to software and the document that the
-following hackers or persons had made. 
-I am thankful to all persons.
-
- Rick Yamashita, Shift_JIS
- https://shino.tumblr.com/post/116166805/%E5%B1%B1%E4%B8%8B%E8%89%AF%E8%94%B5%E3%81%A8%E7%94%B3%E3%81%97%E3%81%BE%E3%81%99-%E7%A7%81%E3%81%AF1981%E5%B9%B4%E5%BD%93%E6%99%82us%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%82%BD%E3%83%95%E3%83%88%E3%81%A7%E3%82%B7%E3%83%95%E3%83%88jis%E3%81%AE%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%82%92%E6%8B%85%E5%BD%93
- http://www.wdic.org/w/WDIC/%E3%82%B7%E3%83%95%E3%83%88JIS
-
- Larry Wall, Perl
- http://www.perl.org/
-
- Kazumasa Utashiro, jcode.pl
- https://metacpan.org/author/UTASHIRO
- ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
-
- Jeffrey E. F. Friedl, Mastering Regular Expressions
- http://regex.info/
-
- SADAHIRO Tomoyuki, The right way of using Shift_JIS
- http://nomenclator.la.coocan.jp/perl/shiftjis.htm
- https://metacpan.org/author/SADAHIRO
-
- Yukihiro "Matz" Matsumoto, YAPC::Asia2006 Ruby on Perl(s)
- https://archive.org/details/YAPCAsia2006TokyoRubyonPerls
-
- jscripter, For jperl users
- http://text.world.coocan.jp/jperl.html
-
- Bruce., Unicode in Perl
- http://www.rakunet.org/tsnet/TSabc/18/546.html
-
- Hiroaki Izumi, Shouldn't use Perl5.8 / Perl5.10 on the Windows
- https://sites.google.com/site/hiroa63iz/perlwin
-
- Yuki Kimoto, Is it true that you shouldn't use Perl on Windows?
- https://philosophy.perlzemi.com/blog/20200122080040.html
-
- chaichanPaPa, Matching Shift_JIS file name
- http://chaipa.hateblo.jp/entry/20080802/1217660826
-
- SUZUKI Norio, Jperl
- http://www.dennougedougakkai-ndd.org/alte/3tte/jperl-5.005_03@ap522/homepage2.nifty.com..kipp..perl..jperl..index.html
-
- WATANABE Hirofumi, Jperl
- https://www.cpan.org/src/5.0/jperl/
- https://metacpan.org/author/WATANABE
- ftp://ftp.oreilly.co.jp/pcjp98/watanabe/jperlconf.ppt
-
- Chuck Houpt, Michiko Nozu, MacJPerl
- https://habilis.net/macjperl/index.j.html
-
- Kenichi Ishigaki, Pod-PerldocJp, Welcome to modern Perl world
- https://metacpan.org/release/Pod-PerldocJp
- http://gihyo.jp/dev/serial/01/modern-perl/0031
- http://gihyo.jp/dev/serial/01/modern-perl/0032
- http://gihyo.jp/dev/serial/01/modern-perl/0033
-
- Fuji, Goro (gfx), Perl Hackers Hub No.16
- http://gihyo.jp/dev/serial/01/perl-hackers-hub/001602
-
- Dan Kogai, Encode module
- https://metacpan.org/release/Encode
- https://archive.org/details/YAPCAsia2006TokyoPerl58andUnicodeMythsFactsandChanges
- http://yapc.g.hatena.ne.jp/jkondo/
-
- Takahashi Masatuyo, JPerl Wiki
- https://jperl.fandom.com/ja/wiki/JPerl_Wiki
-
- Juerd, Perl Unicode Advice
- https://juerd.nl/site.plp/perluniadvice
-
- daily dayflower, 2008-06-25 perluniadvice
- https://dayflower.hatenablog.com/entry/20080625/1214374293
-
- Unicode issues in Perl
- https://www.i-programmer.info/programming/other-languages/1973-unicode-issues-in-perl.html
-
- Jesse Vincent, Compatibility is a virtue
- https://www.nntp.perl.org/group/perl.perl5.porters/2010/05/msg159825.html
 
  Tokyo-pm archive
  https://mail.pm.org/pipermail/tokyo-pm/

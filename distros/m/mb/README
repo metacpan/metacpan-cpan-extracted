@@ -1,6 +1,6 @@
 NAME
 
-  mb - run Perl script written in MBCS
+  mb - run Perl script in MBCS encoding (not only CJK ;-)
 
 SYNOPSIS
 
@@ -16,8 +16,16 @@ SYNOPSIS
 
 DESCRIPTION
 
-  mb.pm is a transpiler that to translate multibyte script to US-ASCII script
-  and run it.
+  This software is a source code filter, a transpiler-modulino.
+
+  Perl is said to have been able to handle Unicode since version 5.8. However,
+  unlike JPerl, "Easy jobs easy" has been lost. (but we have got it again :-D)
+
+  In Shift_JIS and similar encodings(Big5, Big5-HKSCS, GB18030, GBK, Sjis, UHC)
+  have any DAMEMOJI at second octet in double-byte codepoint. DAMEMOJI are
+  metacharacters. Which octets are DAMEMOJI depends on whether the enclosing
+  delimiter is single quote or double quote. This software escapes DAMEMOJI in
+  your script, generate a new script and run it.
 
   What is better than Sjis software ?
   1) implemented by single file

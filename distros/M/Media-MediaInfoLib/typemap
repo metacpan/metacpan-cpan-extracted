@@ -1,0 +1,33 @@
+TYPEMAP
+
+Media::MediaInfoLib*    O_OBJECT
+MediaInfoLib::stream_t  T_IV
+MediaInfoLib::info_t    T_IV
+ZenLib::Ztring          T_ZENLIB_ZTRING
+
+INPUT
+O_OBJECT
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG)) {
+        $var = ($type) SvIV((SV*) SvRV($arg));
+    } else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+T_ZENLIB_ZTRING
+    do {
+        STRLEN _zenlib_ztring_len;
+        const char * _zenlib_ztring_char = SvPV($arg, _zenlib_ztring_len);
+        $var = ZenLib::Ztring(_zenlib_ztring_char, _zenlib_ztring_len);
+    } while (0);
+
+OUTPUT
+O_OBJECT
+    sv_setref_pv($arg, CLASS, (void *) $var);
+
+T_ZENLIB_ZTRING
+    do {
+        std::string _zenlib_ztring_utf8 = $var.To_UTF8();
+        sv_setpvn($arg, _zenlib_ztring_utf8.c_str(), _zenlib_ztring_utf8.length());
+        SvUTF8_on($arg);
+    } while (0);

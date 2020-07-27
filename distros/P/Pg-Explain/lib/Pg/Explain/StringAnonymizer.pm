@@ -26,11 +26,11 @@ Pg::Explain::StringAnonymizer - Class to anonymize sets of strings
 
 =head1 VERSION
 
-Version 1.00
+Version 1.02
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 =head1 SYNOPSIS
 
@@ -126,6 +126,9 @@ sub finalize {
 
     $self->_stringify();
 
+    my @keys_sorted = sort { length( $b ) <=> length( $a ) } keys %{ $self->{ 'strings' } };
+    $self->{ 'keys_re' } = join '|', map { qr{\Q$_\E} } @keys_sorted;
+
     return;
 }
 
@@ -142,6 +145,20 @@ sub anonymized {
     croak( "Cannot run ->anonymized() before finalization.\n" ) unless $self->{ 'is_finalized' };
     my $input = shift;
     return $self->{ 'strings' }->{ $input };
+}
+
+=head2 anonymize_text
+
+Anonymize given text using loaded dictionary of substiturions.
+
+=cut
+
+sub anonymize_text {
+    my $self = shift;
+    my $text = shift;
+    my $re   = $self->{ 'keys_re' };
+    $text =~ s{(\b|\s)($re)(\b|\s)}{ $1 . $self->{'strings'}->{$2} . $3 }mge;
+    return $text;
 }
 
 =head2 anonymization_dictionary

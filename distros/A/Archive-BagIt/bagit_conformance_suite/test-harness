@@ -1,0 +1,133 @@
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+Run compliance tests for a BagIt command-line tool
+
+This requires a tool which behaves like a standard Unix tool and returns 0 for
+success and 1 for failures. This tool will check stderr and report its contents
+for the warning test bags.
+
+Example usage:
+
+    %(prog)s -- bagit.py --validate --quiet
+
+"""
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import argparse
+import logging
+import os
+import platform
+import subprocess
+import sys
+
+BASE_DIR = os.path.dirname(__file__)
+
+SYSTEM = platform.system().lower()
+
+DEFAULT_ENCODING = sys.stdout.encoding
+if DEFAULT_ENCODING != 'UTF-8':
+    print('Default encoding is %s: use with caution, UTF-8 is recommended', file=sys.stderr)
+
+
+def run_version_suite(test_program_argv, version_dir):
+    spec_version = os.path.basename(version_dir)
+
+    for test_category in os.listdir(version_dir):
+        test_subsuite_directory = os.path.join(version_dir, test_category)
+        if not os.path.isdir(test_subsuite_directory):
+            continue
+
+        if test_category.endswith('-only') and not test_category.startswith(SYSTEM):
+            logging.info('Skipping %s tests as we are running on %s', test_category, SYSTEM)
+            continue
+
+        logging.info('Running version %s %s tests', spec_version, test_category)
+
+        for test_bag in os.listdir(test_subsuite_directory):
+            if not os.path.isdir(os.path.join(test_subsuite_directory, test_bag)):
+                continue
+
+            proc = subprocess.Popen(test_program_argv + [test_bag],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    cwd=test_subsuite_directory)
+            rc = proc.wait()
+            stdout, stderr = proc.communicate()
+
+            # We'll select the log level based on whether we expected an error:
+            log_f = logging.info
+            dump_stderr = False
+            if test_category == 'valid':
+                if rc != 0:
+                    log_f = logging.error
+                    dump_stderr = True
+            elif test_category == 'invalid':
+                if rc == 0:
+                    log_f = logging.error
+            elif test_category == 'warning':
+                if rc == 0 and not stderr:
+                    log_f = logging.warning
+
+            log_f('Expected %s test %s: rc=%d, stdout=%d bytes, stderr=%d bytes',
+                  test_category, test_bag, rc, len(stdout), len(stderr))
+
+            log_captured_output(logging.info, 'stdout', stdout)
+            log_captured_output(log_f if dump_stderr else logging.info, 'stderr', stderr)
+
+
+def log_captured_output(logger, stream_name, output):
+    output = output.decode(DEFAULT_ENCODING).strip()
+    if output:
+        logger('%s:\n\t%%s' % stream_name, output.replace('\n', '\n\t'))
+
+
+def configure_logging(verbosity=0):
+    if verbosity > 1:
+        desired_level = logging.DEBUG
+    elif verbosity > 0:
+        desired_level = logging.INFO
+    else:
+        desired_level = logging.WARNING
+
+    try:
+        import coloredlogs
+        coloredlogs.install(level=desired_level, reconfigure=True)
+        return
+    except ImportError:
+        pass
+
+    if verbosity:
+        stdout_handler = logging.StreamHandler(stream=sys.stdout)
+        stdout_handler.setLevel(desired_level)
+        logging.getLogger().addHandler(stdout_handler)
+    else:
+        logging.basicConfig(level=logging.WARNING, stream=sys.stderr)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__.strip(),
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--verbosity', '-v', action='count', default=0)
+    parser.add_argument('test_program', metavar='TEST_PROGRAM', help='Path to an executable')
+    parser.add_argument('test_program_arguments', nargs='*',
+                        help='Arguments for the test executable - e.g. --validate for bagit.py.'
+                             ' Note that on many shells you may need to follow the common'
+                             ' convention of placing -- before the start of arguments which are'
+                             ' intended for the test executable rather than this program.')
+    args = parser.parse_args()
+
+    configure_logging(args.verbosity)
+
+    test_prog = [args.test_program]
+    test_prog.extend(args.test_program_arguments)
+
+    for i in os.listdir(os.path.normpath(BASE_DIR)):
+        if not os.path.isdir(i):
+            continue
+        if not i.startswith('v'):
+            continue
+
+        version_dir = os.path.join(BASE_DIR, i)
+
+        run_version_suite(test_prog, version_dir)

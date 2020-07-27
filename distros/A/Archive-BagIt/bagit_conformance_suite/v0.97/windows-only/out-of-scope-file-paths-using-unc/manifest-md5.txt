@@ -1,0 +1,3 @@
+751e32179ec8acd71081654527f2e771  data/bare-filename
+86e8261ae9e8397a3f57046923943a44  data/text-file.txt
+c9a6121252634aa4d4628982de929bbb  \\?\UNC\server\Windows\System32\setx.exe

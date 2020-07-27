@@ -1,6 +1,6 @@
 package Lab::Instrument::Keithley2000;
 #ABSTRACT: Keithley 2000 digital multimeter
-$Lab::Instrument::Keithley2000::VERSION = '3.710';
+$Lab::Instrument::Keithley2000::VERSION = '3.720';
 use v5.20;
 
 use strict;
@@ -756,7 +756,7 @@ Lab::Instrument::Keithley2000 - Keithley 2000 digital multimeter
 
 =head1 VERSION
 
-version 3.710
+version 3.720
 
 =head1 SYNOPSIS
 

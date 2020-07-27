@@ -51,6 +51,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Deep" : "1.127",
             "Test::More" : "0.98"
          }
       }
@@ -58,7 +59,7 @@
    "provides" : {
       "Mojo::Feed" : {
          "file" : "lib/Mojo/Feed.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Mojo::Feed::Item" : {
          "file" : "lib/Mojo/Feed/Item.pm"
@@ -71,7 +72,7 @@
       },
       "Mojolicious::Plugin::FeedReader" : {
          "file" : "lib/Mojolicious/Plugin/FeedReader.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -85,9 +86,10 @@
          "web" : "https://github.com/dotandimet/Mojo-Feed"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_authority" : "cpan:DOTAN",
    "x_contributors" : [
+      "Ed J <mohawk2@users.noreply.github.com>",
       "Mario Domgoergen <mdom@taz.de>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.02",

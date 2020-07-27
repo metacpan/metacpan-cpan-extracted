@@ -124,6 +124,14 @@ my @cases = (
             TopLvl2::_top_2_private
         /],
     },
+    {
+        name     => 'complexity filter',
+        args     => [ files => [ '*.pm' ], filters => ['complexity=3'] ],
+        expected => [qw/
+            TopLvl1::top_1_stuff
+            TopLvl2::top_2_stuff
+        /],
+    },
 );
 
 subtest direct => sub {

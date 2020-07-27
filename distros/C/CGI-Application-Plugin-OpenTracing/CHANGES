@@ -1,6 +1,18 @@
 CHANGE LOG
 ==========
 
+2020-07-24 - v0.102.0
+---------------------
+
+http status (set by `header_props` or `headers_add`) are now set as tags
+
+
+2020-06-26 - v0.101.0
+---------------------
+
+Query parameters are now added to 'cgi_request' span as tags
+
+
 2020-06-26 - v0.100.0
 ---------------------
 

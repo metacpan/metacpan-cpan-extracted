@@ -1,0 +1,27 @@
+-l=78
+-i=4
+-ci=4
+-se
+-b
+-bar
+-boc
+-vt=0
+-vtc=0
+-cti=0
+-pt=1
+-bt=1
+-sbt=1
+-bbt=1
+-nolq
+-npro
+-nsfs
+--blank-lines-before-packages=0
+--opening-hash-brace-right
+--no-outdent-long-comments
+--iterations=2
+-wbb="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="
+# This appears to be needed with recent Perl::Tidy versions and
+# Code::TidyAll. Otherwise it somehow turns UTF-8 POD text into
+# ISO-8859-1. Setting this to utf8 doesn't work. This is almost certainly
+# because of https://github.com/houseabsolute/perl-code-tidyall/issues/84
+--character-encoding=none

@@ -6,7 +6,6 @@ build_requires:
   File::Spec: '0'
   Module::Metadata: '0'
   Scalar::Util: '0'
-  Storable: '0'
   Test::Deep: '0'
   Test::Deep::UnorderedPairs: '0'
   Test::Fatal: '0'
@@ -45,16 +44,16 @@ no_index:
 provides:
   JSON::Schema::Draft201909:
     file: lib/JSON/Schema/Draft201909.pm
-    version: '0.009'
+    version: '0.010'
   JSON::Schema::Draft201909::Document:
     file: lib/JSON/Schema/Draft201909/Document.pm
-    version: '0.009'
+    version: '0.010'
   JSON::Schema::Draft201909::Error:
     file: lib/JSON/Schema/Draft201909/Error.pm
-    version: '0.009'
+    version: '0.010'
   JSON::Schema::Draft201909::Result:
     file: lib/JSON/Schema/Draft201909/Result.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Carp: '0'
   File::ShareDir: '0'
@@ -70,6 +69,7 @@ requires:
   Path::Tiny: '0'
   Ref::Util: '0.100'
   Safe::Isa: '0'
+  Storable: '0'
   Syntax::Keyword::Try: '0.11'
   Types::Standard: '1.010002'
   constant: '0'
@@ -84,7 +84,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Draft201909/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Draft201909
   repository: https://github.com/karenetheridge/JSON-Schema-Draft201909.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -620,7 +620,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20200620'
+          Module::CoreList: '5.20200717'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -783,7 +783,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.009
+          tag: v0.010
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

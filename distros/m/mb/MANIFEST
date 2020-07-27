@@ -103,4 +103,5 @@ t/7003_split_use_mb.t
 t/7004_mb_split_sbcs.t
 t/7005_mb_split_mbcs.t
 t/7006_split_mbcs.t
+t/8001_specialvar.t
 t/9001_podtest.t

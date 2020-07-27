@@ -45,6 +45,9 @@ use NewsExtractor::SiteSpecificExtractor::news_cctv_com;
 use NewsExtractor::SiteSpecificExtractor::focustaiwan_tw;
 use NewsExtractor::SiteSpecificExtractor::newtalk_tw;
 use NewsExtractor::SiteSpecificExtractor::www_digitimes_com_tw;
+use NewsExtractor::SiteSpecificExtractor::www_ustv_com_tw;
+use NewsExtractor::SiteSpecificExtractor::www_mdnkids_com;
+use NewsExtractor::SiteSpecificExtractor::www_nownews_com;
 use NewsExtractor::SiteSpecificExtractor::UDN;
 use NewsExtractor::SiteSpecificExtractor::ETtoday;
 use NewsExtractor::SiteSpecificExtractor::ChinaTimes;
@@ -62,6 +65,7 @@ has extractor => (
 
 use constant {
     SiteSpecificExtractorByHost => {
+        'www.ustv.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_ustv_com_tw',
         'www.epochtimes.com' => 'NewsExtractor::SiteSpecificExtractor::www_epochtimes_com',
         'www.hkcnews.com' => 'NewsExtractor::SiteSpecificExtractor::www_hkcnews_com',
         'www.thestandnews.com' => 'NewsExtractor::SiteSpecificExtractor::www_thestandnews_com',
@@ -109,6 +113,8 @@ use constant {
         'focustaiwan.tw' => 'NewsExtractor::SiteSpecificExtractor::focustaiwan_tw',
         'newtalk.tw' => 'NewsExtractor::SiteSpecificExtractor::newtalk_tw',
         'www.digitimes.com.tw' => 'NewsExtractor::SiteSpecificExtractor::www_digitimes_com_tw',
+        'www.mdnkids.com' => 'NewsExtractor::SiteSpecificExtractor::www_mdnkids_com',
+        'www.nownews.com' => 'NewsExtractor::SiteSpecificExtractor::www_nownews_com',
     },
     CSSRuleSetByHost => {
         'www.cw.com.tw' => {
@@ -128,12 +134,6 @@ use constant {
             dateline   => '.authors time.article-content__time',
             journalist => '.authors span.article-content__author',
             content_text => 'div.article-content__paragraph section.article-content__editor',
-        },
-        'www.nownews.com' => {
-            headline   => 'h1.entry-title',
-            dateline   => 'span.td-post-date:nth-child(2) > time:nth-child(1)',
-            journalist => '.td-post-author-name',
-            content_text => '.td-post-content > span[itemprop=articleBody]',
         },
         'www.enewstw.com' =>  {
             headline     => 'td.blog_title > strong',

@@ -1,5 +1,5 @@
 package AnyEvent::RabbitMQ::Fork::Worker;
-$AnyEvent::RabbitMQ::Fork::Worker::VERSION = '0.5';
+$AnyEvent::RabbitMQ::Fork::Worker::VERSION = '0.6';
 =head1 NAME
 
 AnyEvent::RabbitMQ::Fork::Worker - Fork side magic
@@ -65,24 +65,21 @@ sub run {
         }
     }
 
+    my @error;
     if (defined $ch_id and my $ch = $self->channels->{ $ch_id }) {
         $ch->$method(@args ? @args : %args);
-
-        $done->();
     } elsif (defined $ch_id and $ch_id == 0) {
         if ($method eq 'DEMOLISH') {
             $self->clear_connection;
         } else {
             $self->connection->$method(@args ? @args : %args);
         }
-
-        $done->();
     } else {
         $ch_id ||= '<undef>';
-        $done->("Unknown channel: '$ch_id'");
+        push @error, "Unknown channel: '$ch_id'";
     }
 
-    return;
+    return $done->(@error);
 }
 
 my %cb_hooks = (
@@ -121,10 +118,12 @@ sub _cb_hooks {
 sub _generate_callback {
     my ($self, $method, $event, $sig) = @_;
 
-    my $should_clear_connection = (
-        $sig->[-1] eq 'AnyEvent::RabbitMQ' and ($method eq 'close'
-            or ($method eq 'connect' and $event eq 'on_close'))
-    ) ? 1 : 0;
+    my $is_conn = $sig->[-1] eq 'AnyEvent::RabbitMQ::Fork';
+
+    my $should_clear_connection
+      = ($is_conn and ($method eq 'close' or ($method eq 'connect' and $event eq 'on_close')));
+
+    my $open_channel_success = ($method eq 'open_channel' and $event eq 'on_success');
 
     my $guard = guard {
         # inform parent process that this callback is no longer needed
@@ -138,11 +137,14 @@ sub _generate_callback {
 
         $wself->clear_connection if $should_clear_connection;
 
-        if ((my $isa = blessed $_[0] || q{}) =~ /^AnyEvent::RabbitMQ/) {
+        my $blessed = blessed($_[0]) || 'UNIVERSAL';
+        if ($blessed->isa('AnyEvent::RabbitMQ') or $blessed->isa('AnyEvent::RabbitMQ::Channel')) {
             # we put our sentry value in place later
             my $obj = shift;
+            # this is our signal back to the parent as to what kind of object it was
+            unshift @_, \[$blessed, ($obj->isa('AnyEvent::RabbitMQ::Channel') ? $obj->id : ())];
 
-            if ($method eq 'open_channel' and $event eq 'on_success') {
+            if ($open_channel_success) {
                 my $id = $obj->id;
                 $obj->{"_$wself\_guard"} ||= guard {
                     # channel was GC'd by AE::RMQ
@@ -153,23 +155,16 @@ sub _generate_callback {
                 AE::postpone { _cb_hooks($obj) };
             }
 
-            if ($isa eq 'AnyEvent::RabbitMQ') {
+            if ($obj->isa('AnyEvent::RabbitMQ')) {
                 # replace with our own handling
-                $obj->{_handle}
-                  ->on_drain(sub { AnyEvent::Fork::RPC::event('cdw') });
+                $obj->{_handle}->on_drain(sub { AnyEvent::Fork::RPC::event('cdw') });
             }
-
-            # this is our signal back to the parent as to what kind of object
-            # it was
-            unshift @_,
-              \[$isa, ($isa eq 'AnyEvent::RabbitMQ::Channel' ? $obj->id : ())];
         }
 
-        # these values don't pass muster with Storable
+            # these values don't pass muster with Storable
         delete local @{ $_[0] }{ 'fh', 'on_error', 'on_drain' }
-          if $method eq 'connect'
-          and $event = 'on_failure'
-          and blessed $_[0];
+            #if $blessed->isa('AnyEvent::Handle');
+            if $method eq 'connect' and $event eq 'on_failure' and $blessed->isa('AnyEvent::Handle');
 
         # tell the parent to run the users callback known by $sig
         AnyEvent::Fork::RPC::event(cb => $sig, @_);

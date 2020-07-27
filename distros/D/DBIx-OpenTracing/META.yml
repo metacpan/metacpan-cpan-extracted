@@ -1,0 +1,31 @@
+---
+abstract: 'automatically create OpenTracing spans around DBI queries'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0'
+  Test::OpenTracing::Integration: v0.102.1
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-OpenTracing
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '0'
+  OpenTracing::GlobalTracer: '0'
+  OpenTracing::Implementation: '0'
+  Scope::Context: '0'
+  Syntax::Feature::Maybe: '0'
+  perl: '5.014'
+  syntax: '0'
+version: v0.0.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
