@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content';
 use strict;
 use warnings;
 
-our $VERSION = '3.018'; # VERSION
-my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
+our $VERSION = '3.019'; # VERSION
+my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -970,15 +970,26 @@ Alternate to -left, -center, and -right. C<$placement> is 'left' (default),
 
 Other options available to C<text>, such as underlining, can be used here.
 
-The width used is B<returned>.
+The width used (in points) is B<returned>.
 
 =back
+
+B<Please note> that C<textlabel()> was not designed to interoperate with other
+text operations. It is a standalone operation, and does I<not> leave a "next 
+write" position (or any other setting) for another C<text> mode operation. A 
+following write will likely be at C<(0,0)>, and not at the expected location.
+
+C<textlabel()> is intended as an "all in one" convenience function for single 
+lines of text, such as a label on some
+graphics, and not as part of putting down multiple pieces of text. It I<is>
+possible to figure out the position of a following write (either C<textlabel>
+or C<text>) by adding the returned width to the original position's I<x> value
+(assuming left-justified positioning).
 
 =cut
 
 sub textlabel {
     my ($self, $x,$y, $font, $size, $text, %opts) = @_;
-    # removed: $wht was in parameter list after %opts, but is not an input
     my $wht;
 
     my %trans_opts = ( -translate => [$x,$y] );

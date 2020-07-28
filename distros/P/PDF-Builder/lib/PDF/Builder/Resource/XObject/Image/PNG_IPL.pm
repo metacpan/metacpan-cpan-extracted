@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.018'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.019'; # VERSION
+my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -451,18 +451,20 @@ sub new {
 	    # leftover self->stream.
 	    my $clearstream = $self->{' stream'}; # s/b uncompressed, unfiltered
             delete $self->{' nofilt'};
-	    delete $self->{' stream'}; # will reduce size 50% when Alpha removed
+	    #delete $self->{' stream'}; # will reduce size 50% when Alpha removed
+	    $dict->{' stream'} = '';
+	    $self->{' stream'} = '';
 	    # TBD: the following pixel-by-pixel manipulation is SLOW as
 	    #   molasses, but I haven't found anything faster. pack(unpack(..))
 	    #   is about 3x slower, and self->stream .= doesn't work (corrupts).
 	    #   have requested that it be built into libpng.a.
 	    foreach my $n (0 .. $h*$w-1) {
-	       # consolidate remaining 1 sample into self->stream
-		vec($self->{' stream'}, $n, $bpc) = vec($clearstream, $n*2,   $bpc);
 	       # pull out Alpha from pixel into separate Mask area
-		vec($dict->{' stream'}, $n, $bpc) = vec($clearstream, $n*2+1, $bpc);
+		   vec($dict->{' stream'}, $n, $bpc) = vec($clearstream, $n*2+1, $bpc);
+	       # consolidate remaining 1 sample into self->stream
+		   vec($self->{' stream'}, $n, $bpc) = vec($clearstream, $n*2,   $bpc);
 	    }
-        }
+    }
 	# compress all but short streams
 	if (length($self->{' stream'}) > 32) {
 	    $self->{' stream'} = Compress::Zlib::compress($self->{' stream'});
@@ -523,7 +525,9 @@ sub new {
 	    # delete leftover self->stream.
 	    my $clearstream = $self->{' stream'}; # s/b uncompressed, unfiltered
 	    delete $self->{' nofilt'};
-	    delete $self->{' stream'}; # will reduce size 25% when Alpha removed
+	    #delete $self->{' stream'}; # will reduce size 25% when Alpha removed
+	    $dict->{' stream'} = '';
+	    $self->{' stream'} = '';
 	    # TBD: the following pixel-by-pixel manipulation is SLOW as
 	    #   molasses, but I haven't found anything faster. pack(unpack(..))
 	    #   is about 3x slower, and self->stream .= doesn't work (corrupts).

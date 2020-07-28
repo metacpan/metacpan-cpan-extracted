@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.036-2-gd15b94c
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Dist::Zilla::Plugin::DynamicPrereqs; # git description: v0.037-6-gfad5320
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Specify dynamic (user-side) prerequisites for your distribution
 # KEYWORDS: plugin distribution metadata MYMETA prerequisites Makefile.PL dynamic
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 use Moose;
 with
@@ -409,7 +409,7 @@ Dist::Zilla::Plugin::DynamicPrereqs - Specify dynamic (user-side) prerequisites 
 
 =head1 VERSION
 
-version 0.037
+version 0.038
 
 =head1 SYNOPSIS
 
@@ -529,7 +529,7 @@ statement, and the C<-raw>/C<-body> lines are contained as the body of the block
 
     [DynamicPrereqs]
     -condition = "$]" > '5.020'
-    -body = requires('1.003000')
+    -body = requires('Role::Tiny', '1.003000')
 
 results in the F<Makefile.PL> snippet (note that whitespace is not added, in
 case this affects the parsing:
@@ -628,11 +628,11 @@ C<requires($module [, $version ])> - alias for C<runtime_requires>. Added in 0.0
 
 =item *
 
-C<build_requires($module [, $version ])> - adds the module to runtime prereqs (as a shorthand for editing the hashes in F<Makefile.PL> directly). Added in 0.016.
+C<build_requires($module [, $version ])> - adds the module to build prereqs (as a shorthand for editing the hashes in F<Makefile.PL> directly). Added in 0.016.
 
 =item *
 
-C<test_requires($module [, $version ])> - adds the module to runtime prereqs (as a shorthand for editing the hashes in F<Makefile.PL> directly). Added in 0.016.
+C<test_requires($module [, $version ])> - adds the module to test prereqs (as a shorthand for editing the hashes in F<Makefile.PL> directly). Added in 0.016.
 
 =item *
 
@@ -731,27 +731,17 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
 
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 CONTRIBUTORS
+=head1 CONTRIBUTOR
 
 =for stopwords Graham Ollis
 
-=over 4
-
-=item *
-
-Graham Ollis <perl@wdlabs.com>
-
-=item *
-
 Graham Ollis <plicease@cpan.org>
-
-=back
 
 =head1 COPYRIGHT AND LICENCE
 

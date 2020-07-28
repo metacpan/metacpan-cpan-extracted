@@ -1,0 +1,30 @@
+Converting from PDF::API2 to PDF::Builder
+
+If you have been running PDF-creation code under PDF::API2, and wish to give
+PDF::Builder a try, for the most part it should be quite compatible. It is a 
+superset of PDF::API2 functionality, but there could be some "gotchas" if your
+code made use of certain obsolete things.
+
+For most code, simply changing all occurences of "PDF::API2" to "PDF::Builder"
+in the code should be sufficient to start running under PDF::Builder. If you
+get errors reported by Perl, check the following two files:
+
+* INFO/DEPRECATED is a list of DEPRECATED method names, etc. that have been
+  removed or changed, or will be in the future. We give at least 2 years' 
+  notice of such items, as well as how to change your code to avoid problems.
+  Whether or not you have used PDF::API2, you should periodically check in
+  with this file to see if there are any upcoming changes you need to prepare
+  for.
+
+* INFO/KNOWN_INCOMPAT is a list of known incompatibilities between PDF::API2
+  and PDF::Builder. Most are minor differences in behavior introduced as bugs
+  were fixed over time. A few times, code was changed to match the 
+  documentation (such as order of arguments). We try hard to avoid changing 
+  existing code behavior, but sometimes it's just not possible, particularly 
+  if the old behavior was actually in error!
+
+Note that PDF::Builder is *NOT* a layer over PDF::API2 (i.e., does not
+require that PDF::API2 be installed). It is a totally independent installation.
+It is quite possible to install *BOTH* at the same time; they will not 
+interfere with each other's operation. This allows PDF::API2 users to avoid
+going offline while testing a switchover to PDF::Builder.

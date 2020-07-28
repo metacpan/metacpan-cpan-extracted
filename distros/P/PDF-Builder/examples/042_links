@@ -1,0 +1,232 @@
+#  Note: this is not an exhaustive list, just something to orient you.
+use strict;
+use warnings;
+use PDF::Builder;
+
+# program settings
+my $border = 1;  # line width of click rectangle, 0 for none
+my $b_red   = 0; # click rectangle border color (here medium green)
+my $b_green = 0.5;
+my $b_blue  = 0;
+my $font_size = 20; # 20pt text
+my $local_movie = ""; # a local movie file such as .avi
+
+my $PDFname = $0;
+   $PDFname =~ s/\..*$//;  # remove any existing extension
+   $PDFname .= '.pdf';     # add new extension
+
+my $pdf = PDF::Builder->new(-compress => 'none');
+my $page = $pdf->page();
+my $text = $page->text();
+my $font = $pdf->corefont('Times-Roman');
+$text->font($font, $font_size);
+
+my $x = 100;
+my $y = 700;
+$text->translate($x, $y);
+$text->text("Page 1. Go to a web page in a browser.");
+
+# ---------- go to a URL in a browser
+$x = 100;
+$y = 600;
+
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor('blue');
+$text->text("here");
+my $target_width = $text->advancewidth("here");
+
+my $annotation = $page->annotation();
+$annotation->url("https://www.google.com",
+	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                         # clickable area
+		 -border => [0, 0, $border],    # show border
+		 -color => [$b_red, $b_green, $b_blue], # border color
+		);
+
+# restore color and do rest of line
+$text->fillcolor('black');
+$text->text(" to go to Google.");
+
+# ---------- go to a specific location in a browser
+$x = 100;
+$y = 500;
+
+$text->translate($x, $y);
+$text->text("Go to ");
+$x += $text->advancewidth("Go to ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor('blue');
+$text->text("a specific point");
+$target_width = $text->advancewidth("a specific point");
+
+$annotation = $page->annotation();
+$annotation->url("https://www.catskilltech.com/forum/index.html#c5",
+	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                         # clickable area
+		 -border => [0, 0, $border],    # show border
+		 -color => [$b_red, $b_green, $b_blue], # border color
+		);
+
+# restore color and do rest of line
+$text->fillcolor('black');
+$text->text(" on a website.");
+
+# ---------- go to a page within THIS document
+$page = $pdf->page();  # page 2
+$text = $page->text();
+$text->font($font, $font_size);
+
+$x = 100;
+$y = 700;
+$text->translate($x, $y);
+$text->text("Page 2. Go to a point in this document (on Page 1).");
+
+$x = 100;
+$y = 600;
+
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor('blue');
+$text->text("here");
+$target_width = $text->advancewidth("here");
+
+$annotation = $page->annotation();
+my $tgt_page = $pdf->openpage(1);  # target page 1
+$annotation->link($tgt_page,
+	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                         # clickable area
+		 -border => [0, 0, $border],    # show border
+		 -color => [$b_red, $b_green, $b_blue], # border color
+		);
+
+# restore color and do rest of line
+$text->fillcolor('black');
+$text->text(" to go to Page 1.");
+
+# ---------- go to a page in ANOTHER document
+$page = $pdf->page();  # page 3
+$text = $page->text();
+$text->font($font, $font_size);
+
+$x = 100;
+$y = 700;
+$text->translate($x, $y);
+$text->text("Page 3. Go to a point in another PDF document (on Page 1).");
+
+$x = 100;
+$y = 600;
+
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor('blue');
+$text->text("here");
+$target_width = $text->advancewidth("here");
+
+$annotation = $page->annotation();
+$annotation->pdf_file("resources/HarfBuzz_example.pdf",
+                 1, # page number
+	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                         # clickable area
+		 -border => [0, 0, $border],    # show border
+		 -color => [$b_red, $b_green, $b_blue], # border color
+		);
+
+# restore color and do rest of line
+$text->fillcolor('black');
+$text->text(" to go to Page 1 of another PDF document.");
+
+# ---------- launch (default OS action) another file
+$page = $pdf->page();  # page 4
+$text = $page->text();
+$text->font($font, $font_size);
+
+$x = 100;
+$y = 700;
+$text->translate($x, $y);
+$text->text("Page 4. Launch (usually a \"default\" action) a file.");
+# on Windows, default for .txt is usually to open it in Notepad,
+#             default for .html is usually to open it in a browser
+
+$x = 100;
+$y = 600;
+
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor('blue');
+$text->text("here");
+$target_width = $text->advancewidth("here");
+
+$annotation = $page->annotation();
+$annotation->file("resources/sample.txt",
+	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                         # clickable area
+		 -border => [0, 0, $border],    # show border
+		 -color => [$b_red, $b_green, $b_blue], # border color
+		);
+
+# restore color and do rest of line
+$text->fillcolor('black');
+$text->text(" to \"launch\" a .txt file.");
+
+# ----------------------
+$x = 100;
+$y = 500;
+
+$text->translate($x, $y);
+
+# x,y should be at LL corner of full text (on baseline)
+$text->fillcolor('purple');
+my $line_of_text = "Whole line is link with fancy border";
+$text->text($line_of_text);
+$target_width = $text->advancewidth($line_of_text);
+
+$annotation = $page->annotation();
+$annotation->file("resources/sample.txt",
+	         -rect => [$x-4, $y-7, $x+5+$target_width, $y-7+6+$font_size],
+		                         # clickable area
+		 -border => [0, 0, 3, [5,5]],    # show border (thick, dashed)
+		 -color => [1, 1, 0],            # yellow border color
+		);
+
+# restore color 
+$text->fillcolor('black');
+
+# ----------------------
+if ($local_movie ne '' && -r $local_movie) {
+  $x = 100;
+  $y = 400;
+
+  $text->translate($x, $y);
+  $text->text("Double-click in box to play your movie...");
+
+  my $movie_title = $local_movie;
+  $movie_title =~ s#^.*/##;
+  $movie_title =~ s#\.[^.]+$##;
+
+  $annotation->movie($local_movie, 'Movie',
+      -rect => [100,150, 400,300], # both click rectangle AND display area
+      -text => $movie_title,  # not sure where this is supposed to go!
+      -border => [0, 0, 2, [1,1]],
+      -color => [0, 1, 0]  # dashed bright green border
+    );
+}
+ 
+# ----------------------
+# ->text: done in 040_annotation
+# ->file_attachment: done in 041_annot_fileattach
+# ----------------------
+$pdf->saveas($PDFname);

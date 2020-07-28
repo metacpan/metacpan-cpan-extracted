@@ -2,7 +2,7 @@ package DBIx::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use Carp;
 use List::Util qw/first/;
@@ -10,6 +10,8 @@ use File::Temp qw/tempdir/;
 use Module::Pluggable search_path => 'DBIx::QuickDB::Driver', max_depth => 4, require => 0;
 
 my %CACHE;
+
+END { local $?; %CACHE = () }
 
 sub import {
     my $class = shift;
@@ -71,11 +73,10 @@ sub build_db {
     $inst->bootstrap if $spec->{bootstrap};
     $inst->start     if $spec->{autostart};
 
-    # load_sql => {
-    #   postgresql => [db => $file, $db => $file],
-    # }
     if (my $sql = $spec->{load_sql}) {
         $sql = $sql->{$driver->name} if ref($sql) eq 'HASH';
+        $sql = [$sql] unless ref($sql) eq 'ARRAY';
+
         for (my $i = 0; $i < @$sql; $i += 2) {
             my ($db, $file) = @{$sql}[$i, $i + 1];
             $inst->load_sql($db => $file);
@@ -88,7 +89,6 @@ sub build_db {
 sub check_driver {
     my $class = shift;
     my ($d, $spec) = @_;
-    confess "oops" unless $d;
 
     $d = "DBIx::QuickDB::Driver::$d" unless $d =~ s/^\+// || $d =~ m/^DBIx::QuickDB::Driver::/;
 
@@ -101,7 +101,7 @@ sub check_driver {
         ($v, $why) = $d->viable($spec);
     }
     else {
-        ($v, $why) = (0, $d, "Could not load $d");
+        ($v, $why) = (0, "Could not load $d: $@");
     }
 
     return ($v, $d, $why);
@@ -319,7 +319,7 @@ F<https://github.com/exodist/DBIx-QuickDB/>.
 
 =head1 COPYRIGHT
 
-Copyright 2018 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

@@ -4,7 +4,7 @@
       "Chad Granum <exodist@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -30,6 +30,8 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Digest::SHA" : "0",
+            "Fcntl" : "0",
             "File::Path" : "0",
             "File::Temp" : "0",
             "IPC::Cmd" : "0",
@@ -45,6 +47,11 @@
             "parent" : "0",
             "perl" : "5.008001"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0.20"
+         }
       }
    },
    "release_status" : "stable",
@@ -57,8 +64,9 @@
          "url" : "https://github.com/exodist/DBIx-QuickDB/"
       }
    },
-   "version" : "0.000010",
-   "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.08"
+   "version" : "0.000011",
+   "x_generated_by_perl" : "v5.30.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

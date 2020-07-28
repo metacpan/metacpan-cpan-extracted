@@ -2,7 +2,7 @@ package PICA::Path;
 use v5.14.1;
 use utf8;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);

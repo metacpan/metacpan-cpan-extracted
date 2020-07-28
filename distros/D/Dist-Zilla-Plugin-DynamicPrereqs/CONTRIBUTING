@@ -75,7 +75,9 @@ Once installed, here are some dzil commands you might try:
 You can learn more about Dist::Zilla at http://dzil.org/.
 
 The code for this distribution is hosted at GitHub. The repository is:
+
 https://github.com/karenetheridge/Dist-Zilla-Plugin-DynamicPrereqs
+
 You can submit code changes by forking the repository, pushing your code
 changes to your clone, and then submitting a pull request. Please include a
 suitable end-user-oriented entry in the Changes file describing your change.
@@ -107,4 +109,4 @@ request to the .mailmap file to contain the correct mapping.
 
 
 This file was generated via Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.014
-from a template file originating in Dist-Zilla-PluginBundle-Author-ETHER-0.151.
+from a template file originating in Dist-Zilla-PluginBundle-Author-ETHER-0.158.

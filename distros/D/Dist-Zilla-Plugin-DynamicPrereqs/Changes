@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-DynamicPrereqs
 
+0.038     2020-07-28 03:12:31Z
+          - minor doc fixes
+
 0.037     2020-02-15 18:57:05Z
           - update a test to use a local module to test has_module(), to
             reduce possible sources of errors (RT#131684)

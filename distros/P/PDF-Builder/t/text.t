@@ -15,17 +15,17 @@ $text->font($font, 12);
 $text->text('Test Text');
 
 my $width = $text->advancewidth('Test Text');
-is($width, '49.956', 'Advance Width Check'); # was 50.016
+is($width, '50.016', 'Advance Width Check');
 
 $text->charspace(2);
 is($text->charspace(), 2, 'Charspace is set');
 $width = $text->advancewidth('Test Text');
-is($width, '65.956', 'Advance width check with charspace added'); # was 66.016
+is($width, '66.016', 'Advance width check with charspace added');
 
 $text->wordspace(4);
 is($text->wordspace(), 4, 'Wordspace is set');
 $width = $text->advancewidth('Test Text');
-is($width, '69.956', 'Advance width check with wordspace added'); # was 70.016
+is($width, '70.016', 'Advance width check with wordspace added');
 
 # Check for death if text() is called without font()
 $text = $page->text();

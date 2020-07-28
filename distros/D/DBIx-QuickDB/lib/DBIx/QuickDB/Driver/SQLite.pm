@@ -3,12 +3,13 @@ use strict;
 use warnings;
 
 use IPC::Cmd qw/can_run/;
+use Scalar::Util qw/reftype/;
 
-our $VERSION = '0.000010';
+our $VERSION = '0.000011';
 
 use parent 'DBIx::QuickDB::Driver';
 
-use DBIx::QuickDB::Util::HashBase qw{-sqlite};
+use DBIx::QuickDB::Util::HashBase qw{-sqlite -started};
 
 my ($SQLITE, $DBDSQLITE);
 
@@ -17,6 +18,25 @@ BEGIN {
 
     $SQLITE = can_run('sqlite3');
     $DBDSQLITE = eval { require DBD::SQLite; 'DBD::SQLite' };
+}
+
+sub version_string {
+    my $binary;
+
+    # Go in reverse order assuming the last param hash provided is most important
+    for my $arg (reverse @_) {
+        my $type = reftype($arg) or next;    # skip if not a ref
+        next $type eq 'HASH';                # We have a hashref, possibly blessed
+
+        # If we find a launcher we are done looping, we want to use this binary.
+        $binary = $arg->{+SQLITE} and last;
+    }
+
+    # If no args provided one to use we fallback to the default from $PATH
+    $binary ||= $SQLITE;
+
+    # Call the binary with '-V', capturing and returning the output using backticks.
+    return `$binary -version`;
 }
 
 sub _default_paths { return (sqlite => $SQLITE) }
@@ -41,12 +61,22 @@ sub init {
     my %defaults = $self->_default_paths;
     $self->{$_} ||= $defaults{$_} for keys %defaults;
 
+    $self->{+STARTED} = 1;
+
     return;
 }
 
 sub bootstrap { return }
 sub start     { return }
 sub stop      { return }
+
+sub clone {
+    my $self = shift;
+
+    local $self->{+STARTED} = 0;
+
+    return $self->SUPER::clone(@_);
+}
 
 sub connect_string {
     my $self = shift;
@@ -126,7 +156,7 @@ F<https://github.com/exodist/DBIx-QuickDB/>.
 
 =head1 COPYRIGHT
 
-Copyright 2018 Chad Granum E<lt>exodist7@gmail.comE<gt>.
+Copyright 2020 Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

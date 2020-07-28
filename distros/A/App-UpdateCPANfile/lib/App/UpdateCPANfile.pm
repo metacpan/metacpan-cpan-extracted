@@ -9,7 +9,7 @@ use App::UpdateCPANfile::PackageDetails;
 use CPAN::DistnameInfo;
 use Module::CoreList;
 
-our $VERSION = "0.03";
+our $VERSION = "0.05";
 
 sub new {
     my ($class, $path, $snapshot_path, $options) = @_;
@@ -53,68 +53,80 @@ sub package_details {
 sub pin_dependencies {
     my ($self) = @_;
     my $changeset = $self->create_pin_dependencies_changeset;
-    my $writer = $self->writer;
-    for my $change (@$changeset) {
-        $writer->add_prereq(@$change);
-    }
-    $writer->save($self->path);
+    $self->_save_changes_to_file($changeset);
 }
 
 sub update_dependencies {
     my ($self) = @_;
     my $changeset = $self->create_update_dependencies_changeset;
     my $writer = $self->writer;
-    for my $change (@$changeset) {
-        $writer->add_prereq(@$change);
-    }
-    $writer->save($self->path);
+    $self->_save_changes_to_file($changeset);
 }
 
 sub create_pin_dependencies_changeset {
     my ($self) = @_;
 
-    my $prereqs = $self->parser->prereqs->as_string_hash;
     my $distributions = App::UpdateCPANfile::CPANfileSnapshotParser->scan_deps($self->snapshot_path);
 
+    my $prereqs = $self->parser->prereqs;
     my $added_dependencies = [];
 
-    for my $phase (sort keys %$prereqs) {
-        for my $module (sort keys %{$prereqs->{$phase}->{requires}}) {
-            next if $self->_should_skip($module);
-            my $version = $prereqs->{$phase}->{$module};
-
-            my $dep = $self->_find_dep($distributions, $module);
-            my $dep_version = defined $dep && $dep->version_for($module);
-            if (defined $dep && defined $dep_version && (! defined $version || $version ne $dep_version) && ($dep_version ne 'undef')) {
-                push @$added_dependencies, [ $module, $dep_version];
-            }
+    my $all_phases = {};
+    for my $phase ($prereqs->phases) {
+        for my $type ($prereqs->types_in($phase)) {
+            $all_phases->{$type}++;
         }
     }
+
+    # If arguments are omitted, it defaults to "runtime", "build" and "test" for phases and "requires" and "recommends" for types.
+    my $requirements = $prereqs->merged_requirements([$self->parser->prereqs->phases], [keys %$all_phases]);
+
+    for my $module (sort $requirements->required_modules) {
+        next if $self->_is_perl($module);
+        my $required_version = $requirements->requirements_for_module($module);
+        my $installed_module = $self->_find_installed_module($distributions, $module);
+        my $installed_version = defined $installed_module && $installed_module->version_for($module);
+        next if $self->_is_core_module($module, $installed_version);
+        if (defined $installed_module && defined $installed_version && (! defined $required_version || $required_version ne "== $installed_version") && ($installed_version ne 'undef')) {
+            push @$added_dependencies, [ $module, "== $installed_version"];
+        }
+
+    }
+
     return $self->_apply_filter($added_dependencies);
 }
 
 sub create_update_dependencies_changeset {
     my ($self) = @_;
 
-    my $prereqs = $self->parser->prereqs->as_string_hash;
+    my $prereqs = $self->parser->prereqs;
+
+    my $all_phases = {};
+    for my $phase ($prereqs->phases) {
+        for my $type ($prereqs->types_in($phase)) {
+            $all_phases->{$type}++;
+        }
+    }
+
+    # If arguments are omitted, it defaults to "runtime", "build" and "test" for phases and "requires" and "recommends" for types.
+    my $requirements = $prereqs->merged_requirements([$self->parser->prereqs->phases], [keys %$all_phases]);
 
     my $added_dependencies = [];
 
-    for my $phase (sort keys %$prereqs) {
-        for my $module (sort keys %{$prereqs->{$phase}->{requires}}) {
-            next if $self->_should_skip($module);
-            my $version = $prereqs->{$phase}->{$module};
+    for my $module (sort $requirements->required_modules) {
+        my $required_version = $requirements->requirements_for_module($module);
+        next if $self->_is_perl($module, $required_version);
 
-            my $latest_version = $self->package_details->latest_version_for_package($module);
-            if (defined $latest_version && (! defined $version || $version ne $latest_version)) {
-                push @$added_dependencies, [ $module, $latest_version];
-            }
+        my $latest_version = $self->package_details->latest_version_for_package($module);
+        next if $self->_is_core_module($module, $latest_version);
+        if (defined $latest_version && (! defined $required_version || $required_version ne "== $latest_version")) {
+            push @$added_dependencies, [ $module, "== $latest_version"];
         }
     }
     return $self->_apply_filter($added_dependencies);
 }
 
-sub _find_dep {
+sub _find_installed_module {
     my ($self, $distributions, $module) = @_;;
     for my $dist (@$distributions) {
         return $dist if $dist->provides_module($module);
@@ -122,10 +134,18 @@ sub _find_dep {
     return undef;
 }
 
-sub _should_skip {
-    my ($self, $module) = @_;
-    return 1 if $module eq 'perl';
-    return Module::CoreList::is_core($module);
+sub _is_perl {
+    my ($self, $module, $installed_version) = @_;
+    return $module eq 'perl';
+}
+
+sub _is_core_module {
+    my ($self, $module, $target_version) = @_;
+    return unless defined $target_version;
+
+    my $core_version = Module::CoreList::find_version($])->{$module};
+    return unless defined $core_version;
+    return $core_version eq $target_version;
 }
 
 sub _apply_filter {
@@ -143,6 +163,18 @@ sub _apply_filter {
     return $changeset;
 }
 
+sub _save_changes_to_file {
+    my ($self, $changeset) = @_;
+    my $writer = $self->writer;
+
+    for my $change (@$changeset) {
+        $writer->add_prereq(@$change);
+        $writer->add_prereq(@$change, relationship => 'suggests');
+        $writer->add_prereq(@$change, relationship => 'recommends');
+        # Don't touch conflicts
+    }
+    $writer->save($self->path);
+}
 
 1;
 __END__

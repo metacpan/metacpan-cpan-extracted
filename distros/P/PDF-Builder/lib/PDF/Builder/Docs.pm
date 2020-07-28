@@ -3,7 +3,7 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.018'; # VERSION
+our $VERSION = '3.019'; # VERSION
 my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
@@ -1838,16 +1838,12 @@ might not be too difficult, but for other scripts that involve extensive
 modification of the raw characters, it may be quite difficult to split 
 I<words>, but you still may be able to split at inter-word spaces.
 
-=head3 Not yet supported by Shaper
-
 A useful, but not exhaustive, set of functions are allowed by C<textHS()> use.
-B<Not yet> supported are top-to-bottom and bottom-to-top directions (e.g., for
-Far Eastern languages in traditional orientation), explicit script names and 
-direction for HarfBuzz::Shaper, discretionary ligatures, and manual selection 
-of glyphs (e.g., swashes and alternate forms). If you have a need for any of 
-these, please open a support ticket in PDF::Builder (and/or HarfBuzz::Shaper), 
-with supporting examples of what it's supposed to do. If it seems to be widely
-useful, we'll see what might be done.
+Support includes direction setting (top-to-bottom and bottom-to-top directions,
+e.g., for Far Eastern languages in traditional orientation), and explicit 
+script names and language (depending on what support HarfBuzz itself gives).
+B<Not yet> supported are features such as discretionary ligatures and manual 
+selection of glyphs (e.g., swashes and alternate forms). 
 
 Currently, C<textHS()> can only handle a single text string. We are looking at
 how fitting to a line length (splitting up an array) could be done, as well as 

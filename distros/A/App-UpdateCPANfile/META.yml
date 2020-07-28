@@ -8,6 +8,7 @@ build_requires:
   File::Spec::Functions: '0'
   File::Temp: '0'
   FindBin: '0'
+  Module::CoreList: '5.20200717'
   Path::Class: '0'
   Test2::V0: '0'
   Test::WWW::Stub: '0'
@@ -33,13 +34,14 @@ no_index:
 provides:
   App::UpdateCPANfile:
     file: lib/App/UpdateCPANfile.pm
-    version: '0.03'
+    version: '0.05'
   App::UpdateCPANfile::CPANfileSnapshotParser:
     file: lib/App/UpdateCPANfile/CPANfileSnapshotParser.pm
   App::UpdateCPANfile::PackageDetails:
     file: lib/App/UpdateCPANfile/PackageDetails.pm
 requires:
   CPAN::DistnameInfo: '0'
+  CPAN::Meta::Prereqs: '2.150010'
   CPAN::PackageDetails: '0'
   Carton: '0'
   Getopt::Long: '0'
@@ -52,7 +54,7 @@ resources:
   bugtracker: https://github.com/hitode909/App-UpdateCPANfile/issues
   homepage: https://github.com/hitode909/App-UpdateCPANfile
   repository: git://github.com/hitode909/App-UpdateCPANfile.git
-version: '0.03'
+version: '0.05'
 x_authority: cpan:HITODE
 x_contributors:
   - 'hitode909 <hitode909@gmail.com>'

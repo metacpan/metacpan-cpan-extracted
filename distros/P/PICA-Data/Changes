@@ -1,5 +1,10 @@
 Revision history for PICA::Data
 
+1.14 2020-07-28T08:42:47Z
+    - picadata: allow to repeat --path
+    - picadata: don't emit records by default
+    - PICA Plain parser also supports ƒ as subfield indicator (#67)
+
 1.13 2020-07-14T13:06:18Z
     - Add method to abbreviate schemas (-B in picadata)
     - picadata: remove shorthand -f (#73)

@@ -4,7 +4,7 @@ use v5.14.1;
 use PICA::Data;
 use PICA::Schema;
 use PICA::Schema::Builder;
-use Getopt::Long;
+use Getopt::Long qw(:config bundling);
 use Pod::Usage;
 use JSON::PP;
 use List::Util 'sum';
@@ -15,6 +15,7 @@ if (my ($i) = grep {$ARGV[$_] =~ /^-(\d+)$/} (0 .. @ARGV - 1)) {
 }
 
 my $abbrev = grep {$_ eq '-B'} @ARGV;
+my @pathes;
 
 GetOptions(
     'from|f=s'   => \(my $from),
@@ -23,10 +24,10 @@ GetOptions(
     'build|B|b'  => \(my $build),
     'unknown|u!' => \(my $report_unknown),
     'count|c'    => \(my $count),
-    'path|p=s'   => \(my $path),
+    'path|p=s'   => \@pathes,
     "n|number:i" => \$number,
-    'C'          => \(my $color),
-    'M'          => \(my $nocolor),
+    'color|C'    => \(my $color),
+    'mono|M'     => \(my $nocolor),
     'help|?'     => \(my $help)
 ) or pod2usage(2);
 pod2usage(-verbose => 99, -sections => "SYNOPSIS|OPTIONS|DESCRIPTION")
@@ -47,28 +48,24 @@ my %types = (
 );
 
 my $input = '-';
-if (!defined $path) {
+if (!@pathes) {
     my $pattern = '[012.][0-9.][0-9.][A-Z@.](\$[^|]+)?';
-    my @pathes;
     while (@ARGV && $ARGV[0] =~ /^$pattern(\s*\|\s*($pattern)?)*$/) {
         push @pathes, shift @ARGV;
     }
-    $path = join '|', @pathes;
 }
 
-my @pathes;
-my $sfpath;
-if (defined $path) {
+my $sfpath = 0;
+if (@pathes) {
     @pathes = map {
         my $p = eval {PICA::Path->new($_)};
         $p || die "invalid pica path: $_\n";
-    } grep {$_ ne ""} split /\s*\|\s*/, $path;
-
-    $sfpath = sum map {length $_->subfields > 0} @pathes;
-    die
-        "path expressions must either all select fields or select subfields!\n"
-        if $sfpath && $sfpath ne @pathes;
+    } grep {$_ ne ""} map {split /\s*\|\s*/, $_} @pathes;
 }
+
+$sfpath = sum map {length $_->subfields > 0} @pathes;
+die "path expressions must either all select fields or select subfields!\n"
+    if $sfpath and $sfpath ne @pathes;
 
 $input = shift @ARGV if @ARGV;
 
@@ -77,49 +74,34 @@ $from = $1 if !$from && $input =~ /\.([a-z]+)$/ && $types{lc $1};
 $from = 'plain' unless $from;
 pod2usage("unknown serialization type: $from") unless $types{lc $from};
 
-$to = $from unless $to or $count;
-pod2usage("unknown serialization type: $to") unless !$to or $types{lc $to};
-
-if ($sfpath) {
-    $to    = undef;
-    $count = undef;
-}
-
-my $builder;
-if ($build) {
-    $builder = PICA::Schema::Builder->new;
-    $to      = undef;
-}
-
-$input = *STDIN if $input eq '-';
-my $parser = "PICA::Parser::${types{$from}}"->new($input, bless => 1);
-
-my %options;
-$options{color}
-    = {tag => 'blue', occurrence => 'blue', code => 'red', value => 'green',}
-    if !$nocolor && ($color || -t *STDOUT);
-
-binmode *STDOUT, ':encoding(UTF-8)';
-
-my $writer;
-if ($to) {
-    $writer = "PICA::Writer::${types{$to}}"->new(%options);
-}
-
-my %schema_options = (ignore_unknown => !$report_unknown);
-
-my $stats = {records => 0, holdings => 0, items => 0, fields => 0};
-
-my $invalid = 0;
 if ($schema) {
     my $fh = IO::File->new($schema);
     $schema = PICA::Schema->new(decode_json(join "\n", <$fh>));
 }
 
+$to = $from unless ($to or $count or $schema or $build or $sfpath);
+pod2usage("unknown serialization type: $to") unless !$to or $types{lc $to};
+
+$build = PICA::Schema::Builder->new if $build;
+
+$input = *STDIN if $input eq '-';
+my $parser = "PICA::Parser::${types{$from}}"->new($input, bless => 1);
+
+my $writer;
+$color
+    = !$nocolor && ($color || -t *STDOUT)
+    ? {tag => 'blue', occurrence => 'blue', code => 'red', value => 'green'}
+    : undef;
+binmode *STDOUT, ':encoding(UTF-8)';
+$writer = "PICA::Writer::${types{$to}}"->new(color => $color) if $to;
+
+my %schema_options = (ignore_unknown => !$report_unknown);
+my $stats          = {records => 0, holdings => 0, items => 0, fields => 0};
+my $invalid        = 0;
+
 while (my $record = $parser->next) {
     if ($sfpath) {
         say $_ for map {@{$record->match($_, split => 1) // []}} @pathes;
-        next;
     }
 
     $record = $record->fields(@pathes) if @pathes;
@@ -136,7 +118,7 @@ while (my $record = $parser->next) {
             $invalid++;
         }
     }
-    $builder->add($record) if $builder;
+    $build->add($record) if $build;
 
     if ($count) {
         $stats->{holdings} += @{$record->holdings};
@@ -156,9 +138,9 @@ if ($count) {
         qw(records invalid holdings items fields);
 }
 
-if ($builder) {
+if ($build) {
     my $JSON = JSON::PP->new->indent->space_after->canonical->convert_blessed;
-    my $schema = $builder->schema;
+    my $schema = $build->schema;
     print $JSON->encode($abbrev ? $schema->abbreviated : $schema);
 }
 
@@ -176,10 +158,10 @@ picadata [--from TYPE] [--schema FILE] [--to TYPE] {OPTIONS} [FILE]
 
 Parse, validate and/or serialize PICA+ data from the command line, e.g.:
 
-  picadata pica.xml -s schema.json   # validate against Avram schema
   picadata pica.dat -t xml           # convert binary to XML
   picadata -c -f plain < pica.plain  # parse and count records
   picadata -p 003@ pica.xml -t       # extract field 003@
+  picadata pica.xml -s schema.json   # validate against Avram schema
 
 =head1 OPTIONS
 
@@ -203,9 +185,8 @@ Stop parsing after C<n> records. Can be abbreviated as C<-1>, C<-2>...
 
 =head2 --path, -p
 
-Limit the record to fields specified by a simple PICA Path expression. Multiple
-expressions can be separated by or C<|>. Expressions must either all reference
-fields or all reference subfields, the latter to emit subfield values.
+Select fields or subfield values specified by PICA Path expressions. Multiple
+expressions can be separated by C<|> or by repeating the option. 
 
 =head2 --schema, -s
 
@@ -220,11 +201,11 @@ Report unknown fields and subfields on validation (disabled by default).
 
 Build an Avram schema from records. Option C<-B> abbreviates the schema.
 
-=head2 -C
+=head2 --color, -C
 
 Colorize output. Only supported for PICA plain and PICA plus format.
 
-=head2 -M
+=head2 --mono, -M
 
 Monochrome (don't colorize output).
 

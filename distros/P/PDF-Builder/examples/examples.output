@@ -213,6 +213,14 @@ to see when the resulting PDFs are displayed.
    variety of icons. if you click on an openable icon, you will be
    prompted to save your changes when you exit.
 
+042_links
+  042_links.pdf
+   1 page with links to browser webpages (with and without target)
+   1 page with link to previous page (within document)
+   1 page with link to page 1 of another PDF document
+   1 page with "launch" (edit a text file), also with fancy border
+         a movie is available if defined
+
 050_pagelabels
   050_pagelabels.pdf
    26 pages with a variety of thumbnail labels in Reader. your reader should

@@ -1,5 +1,5 @@
 package ETL::Yertl::FormatStream;
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 # ABSTRACT: Read/write I/O stream with Yertl formatters
 
 #pod =head1 SYNOPSIS
@@ -41,6 +41,7 @@ use ETL::Yertl;
 use base 'IO::Async::Stream';
 use ETL::Yertl::Format;
 use Carp qw( croak );
+use Fcntl;
 
 sub configure {
     my ( $self, %args ) = @_;
@@ -58,6 +59,11 @@ sub configure {
     if ( $self->read_handle ) {
         $self->can_event( "on_doc" )
             or croak "Expected either an on_doc callback or to be able to ->on_doc";
+    }
+
+    if ( $args{autoflush} && $args{write_handle} ) {
+        my $flags = fcntl( $args{write_handle}, F_GETFL, 0 );
+        fcntl( $args{write_handle}, F_SETFL, $flags | O_NONBLOCK );
     }
 
     $self->SUPER::configure( %args );
@@ -90,7 +96,7 @@ ETL::Yertl::FormatStream - Read/write I/O stream with Yertl formatters
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 SYNOPSIS
 

@@ -15,6 +15,7 @@ INFO/Changes_2017
 INFO/Changes_2018
 INFO/Changes_2019
 INFO/Changes-ver_2
+INFO/CONVERSION
 INFO/DEPRECATED
 INFO/KNOWN_INCOMP
 INFO/LICENSE
@@ -56,6 +57,7 @@ examples/031_color_hsv
 examples/032_separation
 examples/040_annotation
 examples/041_annot_fileattach
+examples/042_links
 examples/050_pagelabels
 examples/055_outlines
 examples/060_transparency

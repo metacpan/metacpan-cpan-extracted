@@ -12,8 +12,8 @@ example usage, etc.
 
 Alternatively, you can obtain the full source files from
 https://github.com/PhilterPaper/Perl-PDF-Builder, where the ticket list (bugs,
-enhancement requests, etc.) is also kept. Unlike the CPAN version, this will
-have to be manually installed (copy files).
+enhancement requests, etc.) is also kept. Unlike the installable CPAN version, 
+this will have to be manually installed (copy files).
 
 Note that there are several "optional" libraries (Perl modules) used to extend
 and improve PDF::Builder. The installation process will not attempt to install 
@@ -23,8 +23,12 @@ whether or not you want to manually install any of them.
 
 REQUIREMENTS ======================================================
 
-Perl 5.18 or higher (it will likely run on somewhat earlier versions, but 
-  the CPAN installer may refuse to install it).
+Perl 5.20 or higher. It will likely run on somewhat earlier versions, but 
+  the CPAN installer may refuse to install it. The reason this version was
+  chosen was so that LTS (Long Term Support) versions of Perl going back about
+  6 years are officially supported (by PDF::Builder), and older versions are 
+  not supported. The intent is to not waste time and effort trying to fix bugs
+  which are an artifact of old Perl releases.
 
 Libraries used, available from CPAN --
 
@@ -38,13 +42,14 @@ Libraries used, available from CPAN --
   Graphics::TIFF (recommended if using TIFF image functions)
   Image::PNG::Libpng (recommended for enhanced PNG image function processing)
   HarfBuzz::Shaper (recommended for Latin script ligatures and kerning, as
-                    well as for any complex script such as Arabic or Khmer)
+                    well as for any complex script such as Arabic, Indic
+                    scripts, or Khmer)
 
 Other than an installer for standard CPAN packages (such as 'cpan' on
 Strawberry Perl for Windows), no other tools or manually-installed prereqs
 are needed (worst case, you can unpack the .tar.gz file and copy files into
-place yourself!). Currently there are no compiles and links done during the
-install process, only copying of .pm Perl module files.
+place yourself!). Currently there are no compiles and links (Perl extensions)
+done during the install process, only copying of .pm Perl module files.
 
 ===================================================================
 
@@ -65,6 +70,7 @@ See INFO/KNOWN_INCOMP file for known incompatibilities with PDF::API2.
 See INFO/Changes* files for older change logs.
 See INFO/PATENTS file for information on patents.
 See INFO/LICENSE file for the license.
+See INFO/CONVERSION file for how to convert from PDF::API2 to PDF::Builder
 
 INFO/old/ also has some build and test tool files that are not currently used.
 

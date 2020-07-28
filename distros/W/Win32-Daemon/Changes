@@ -1,5 +1,9 @@
 Revision history for Perl extension Win32-Daemon
 
+20200728  2020-07-28
+    - dwControlsAccepted wasn't being initialized properly on Windows 10
+      (#14, #16)
+
 20190315  2019-03-16
     - fix and simplify constant exporting (#13)
 

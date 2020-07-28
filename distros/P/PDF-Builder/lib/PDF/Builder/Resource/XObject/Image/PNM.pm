@@ -9,8 +9,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.018'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.019'; # VERSION
+my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
 
 use IO::File;
 use PDF::Builder::Util;
@@ -152,6 +152,8 @@ sub read_pnm {
             }
         } else {
             read($inf, $self->{' stream'}, $info->{'width'}*$info->{'height'});
+            # part of file was already read into $buf but not otherwise used
+            $self->{' stream'} = $buf . $self->{' stream'};
         }
         $cs = 'DeviceGray';
     } elsif ($info->{'type'} == 6) {

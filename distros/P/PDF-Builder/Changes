@@ -2,6 +2,71 @@ See also INFO/Changes-ver_2 for changes released for PDF::API2, and
 incorporated into PDF::Builder.
 See also INFO/Changes_2019 for earlier version 3 release logs.
 
+3.019     2020-07-27   
+
+    lib/PDF/Builder/Content/Text.pm  Per [CTS 31], expand documentation of
+      textlabel() call to emphasize that it is a standalone call, and doesn't
+      play nicely with other text-output calls (such as not leaving a current
+      position for the next write). It is intended for one-off labels, etc.
+
+    lib/PDF/Builder/Content.pm, examples/HarfBuzz.pl, 
+      examples/resources/HarfBuzz_example.pdf
+     Support TTB (top to bottom) and BTT (bottom to top) vertical text in 
+      textHS(), now that HarfBuzz::Shaper supports these modes. Requires 
+      HarfBuzz::Shaper 0.23 or higher for TTB and BTT support, 0.21 for just 
+      LTR and RTL support. The "example" PDF is provided in case you don't
+      yet have HarfBuzz::Shaper installed, and want to see what it does. TTB is
+      recommended for both normally RTL (bidirectional) and LTR languages. 
+      Vertical writing is most often used with East Asian languages.
+
+    .perl-version, Makefile.PL, README
+     New minimum Perl version 5.20, which is already 6 years old, so we don't
+      waste a lot of time chasing down bugs due to ancient Perl versions.
+      PDF::Builder will likely work with older Perl versions, but your installer
+      (e.g., cpan or cpanm) might refuse to install it.
+
+    examples/042_links, examples/README, examples/examples_output, 
+      tools/3_examples.pl, lib/PDF/Builder/Annotation.pm, MANIFEST
+     Improved documentation of annotation-based links: PDF links and targets.
+
+    lib/PDF/Builder/Content.pm, lib/PDF/Builder/Resource/XObject/Image/PNM.pm
+     image() and form_image() calls default x,y to 0,0, so can call without
+      lower left corner x,y. PNM processing [RT 132844] fix routine forgetting 
+      where it is in the PNM file and failing to read part of it. Note that
+      132844 is still open, as PNM handling has not yet been thoroughly checked.
+
+    lib/PDF/Builder/Resource/XObject/Image/PNG-PNG_IPL.pm ref PR #25 for 
+      PDF::API2. Some have reported that apparently there can be some cases 
+      where the deletion of some streams may cause errors in the vec() calls. 
+      This may be dependent on the Perl version, use of nonstandard flags 
+      (such as -e), or other unusual usage.
+
+    lib/PDF/Builder/Resource/Font/CoreFont/courier-courierbold-courieroblique-
+      courierboldoblique-helvetica-helveticabold-helveticaoblique-
+      helveticaboldoblique-timesroman-timesbold-timesitalic-timesbolditalic-
+      symbol-zapfdingbats.pm, t/text.t
+     In 3.018, the Core Font metrics (in particular, the 'wx' character widths) 
+      were changed to use the values in the TTF files actually used (at least, 
+      on Windows systems). Per [CTS 27] et al., I received complaints about 
+      3.018 not using the exact Adobe font metrics for Core Fonts as before. I 
+      have gone back to using the canonical Adobe metrics, even though (for 
+      core fonts) this is likely to result in a small mismatch between the 
+      indicated glyph width and the actual glyph displayed. In most cases it's 
+      just one glyph grid unit wider (e.g., 667 instead of 666), which should 
+      have no visible effect in any real document. However, there were a 
+      handful of (rather esoteric) glyphs where the difference was 
+      considerable. I compared the claimed widths for both Adobe metrics and 
+      the TTF metrics, and picked one or the other, or even devised a new 
+      width. These are documented in the .pm files under 'wx' (widths).
+
+      Note that these are only the base 14 core fonts. The 15 Windows fonts 
+      were not changed, as there is no Adobe AFM standard for them.
+
+    INFO/CONVERSION, MANIFEST, README add conversion info for going from
+      PDF::API2 to PDF::Builder.
+
+    INFO/RoadMap minor updates
+
 3.018     2020-04-24 
 
     lib/PDF/Builder/Content.pm-Page.pm

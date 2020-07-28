@@ -1,7 +1,7 @@
 package PICA::Parser::Base;
 use v5.14.1;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use Carp qw(croak);
 use Scalar::Util qw(reftype);
@@ -11,15 +11,11 @@ sub _new {
     my $class = shift;
     my (%options) = @_ % 2 ? (fh => @_) : @_;
 
-    bless(
-        {
-            bless  => !!$options{bless},
-            strict => !!$options{strict},
-            fh     => defined $options{fh} ? $options{fh} : \*STDIN
-        },
-        $class
-        ),
-        ;
+    bless {
+        bless  => !!$options{bless},
+        strict => !!$options{strict},
+        fh     => defined $options{fh} ? $options{fh} : \*STDIN
+    }, $class;
 }
 
 sub new {

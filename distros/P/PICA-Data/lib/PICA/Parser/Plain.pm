@@ -1,16 +1,15 @@
 package PICA::Parser::Plain;
 use v5.14.1;
+use utf8;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use charnames ':full';
 use Carp qw(carp croak);
 
 use parent 'PICA::Parser::Base';
 
-sub SUBFIELD_INDICATOR {'$'}
-sub END_OF_FIELD       {"\N{LINE FEED}"}
-sub END_OF_RECORD      {"\N{LINE FEED}"}
+sub END_OF_FIELD {"\N{LINE FEED}"}
 
 sub _next_record {
     my ($self) = @_;
@@ -46,7 +45,11 @@ sub _next_record {
             }
         }
 
-        # data is byte sequence, no character sequence!
+        if (!$self->{strict} && $data =~ /^ƒ/) {
+            $data =~ s/\$/\$\$/g;
+            $data =~ s/ƒ/\$/g;
+        }
+
         my @subfields = split /\$(\$+|.)/, $data;
         shift @subfields;
         push @subfields, '' if @subfields % 2;   # last subfield without value
@@ -82,6 +85,8 @@ sub _next_record {
 1;
 __END__
 
+=encoding UTF-8
+
 =head1 NAME
 
 PICA::Parser::Plain - Plain PICA format parser
@@ -89,6 +94,9 @@ PICA::Parser::Plain - Plain PICA format parser
 =head1 DESCRIPTION
 
 See L<PICA::Parser::Base> for synopsis and configuration.
+
+In addition to the C<$> this parser also allows C<ƒ> as subfield indicator,
+unless option C<strict> is enabled.
 
 The counterpart of this module is L<PICA::Writer::Plain>.
 

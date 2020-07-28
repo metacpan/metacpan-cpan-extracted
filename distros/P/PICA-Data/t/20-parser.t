@@ -77,6 +77,10 @@ $record = pica_parser(xml => $xml)->next;
 is_deeply $record->{record}, [['003@', '', '0', '1234€']],
     'xml with namespace';
 
+$record = pica_parser(plain => \"003@ ƒ0123\n123A/01 ƒx1ƒy\$2")->next;
+is_deeply $record->{record}, [['003@', '', '0', '123'],[qw(123A 01 x 1 y $2)]],
+    'plain parser supports U+0192 as subfield indicator';
+
 note 'error handling';
 {
     my $plus

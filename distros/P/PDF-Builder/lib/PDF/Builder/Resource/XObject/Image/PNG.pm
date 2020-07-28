@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.018'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.019'; # VERSION
+my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -298,15 +298,17 @@ sub new {
             my $bpp = ceil($bpc*2 / 8);
             my $clearstream = unprocess($bpc, $bpp, 2, $w,$h, $scanline, \$self->{' stream'});
             delete $self->{' nofilt'};
-            delete $self->{' stream'};
+	    #delete $self->{' stream'};
+	    $dict->{' stream'} = '';
+	    $self->{' stream'} = '';
 	    # dict->stream is the outer dict if -notrans, and the Alpha data
 	    #   moved to it is simply unused
 	    # dict->stream is the inner dict (created if !-notrans), and the
 	    #   Alpha data moved to it becomes the SMask
 	    # rebuild self->stream from the gray data in clearstream
             foreach my $n (0 .. $h*$w-1) {
-                vec($self->{' stream'}, $n, $bpc) = vec($clearstream, $n*2, $bpc);
                 vec($dict->{' stream'}, $n, $bpc) = vec($clearstream, $n*2+1, $bpc);
+                vec($self->{' stream'}, $n, $bpc) = vec($clearstream, $n*2, $bpc);
             }
         }
     } elsif ($cs == 6) {  # RGB+alpha 8 bps (16 not supported here)
@@ -342,7 +344,9 @@ sub new {
 	    # unpacked, uncompressed, unfiltered image data
             my $clearstream = unprocess($bpc, $bpp, 4, $w,$h, $scanline, \$self->{' stream'});
             delete $self->{' nofilt'};
-            delete $self->{' stream'};
+	    #delete $self->{' stream'};
+	    $dict->{' stream'} = '';
+	    $self->{' stream'} = '';
 	    # as with cs=4, create SMask of Alpha entry for each pixel. this
 	    # time, separating Alpha from RGB triplet and put in dict->stream
 	    # dict->stream is the outer dict if -notrans, and the Alpha data

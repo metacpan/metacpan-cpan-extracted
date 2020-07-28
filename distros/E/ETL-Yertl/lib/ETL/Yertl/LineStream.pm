@@ -1,5 +1,5 @@
 package ETL::Yertl::LineStream;
-our $VERSION = '0.043';
+our $VERSION = '0.044';
 # ABSTRACT: Read/write I/O streams in lines
 
 #pod =head1 SYNOPSIS
@@ -38,6 +38,16 @@ our $VERSION = '0.043';
 
 use ETL::Yertl;
 use base 'IO::Async::Stream';
+use Fcntl;
+
+sub configure {
+    my ( $self, %args ) = @_;
+    if ( $args{autoflush} && $args{write_handle} ) {
+        my $flags = fcntl( $args{write_handle}, F_GETFL, 0 );
+        fcntl( $args{write_handle}, F_SETFL, $flags | O_NONBLOCK );
+    }
+    $self->SUPER::configure( %args );
+}
 
 sub on_read {
     my ( $self, $buffref, $eof ) = @_;
@@ -67,7 +77,7 @@ ETL::Yertl::LineStream - Read/write I/O streams in lines
 
 =head1 VERSION
 
-version 0.043
+version 0.044
 
 =head1 SYNOPSIS
 

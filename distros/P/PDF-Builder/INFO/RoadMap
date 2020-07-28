@@ -30,7 +30,8 @@ These are things that should be in the base PDF::Builder product, as everyone
 will need them (or, it would be cleaner to have it in the base rather than as
 an add-on separate module).
 
-A. Proper TTF/OTF support (RT 113700), especially ligature replacement and
+A. ## DONE ## release 3.018
+   Proper TTF/OTF support (RT 113700), especially ligature replacement and
    complex script alphabets using GSUB and GPOS information. I've been looking
    at Pango and directly using HarfBuzz, but both look to be a lot of work.
 
@@ -149,6 +150,12 @@ M. Add decorative rectangular box effects around sections of text. With or
    the text written over it in the usual manner. Content clipping might also
    be supported.
 
+I. Extend HarfBuzz::Shaper use (see A.) to flow paragraphs and sections (fill)
+   to match capability of existing text-fill calls. Architect so as to extend
+   easily to full paragraph shaping and "pouring" text into arbitrary columns,
+   with balancing. Justification to avoid ragged-left or -right needs to be
+   handled carefully for connected glyphs (e.g., Arabic, Indic, cursive Latin).
+
 =============================================================================
 II. Items to add to a separate area (new module or sub-module)
 
@@ -225,5 +232,9 @@ G. Prepress production markup: convenience functions to place a watermark or
    temporarily draw page bounding boxes, temporarily draw object limit boxes,
    color dots/bars for color printing alignment, instructions to the (human)
    printer.
+
+   Page background color or pattern should extend to the full size of the page
+   and not end when content ends part way down the page. Remind users that 
+   most printers will not print all the way to the edge.
 
 =============================================================================

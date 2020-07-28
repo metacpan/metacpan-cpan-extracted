@@ -10,7 +10,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.151',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.158',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -139,13 +139,13 @@ do { my $x = {
                                            'Dist::Zilla::Plugin::NextRelease' => '5.033',
                                            'Dist::Zilla::Plugin::PodCoverageTests' => '5.040',
                                            'Dist::Zilla::Plugin::PodSyntaxTests' => '5.040',
-                                           'Dist::Zilla::Plugin::PodWeaver' => '4.005',
+                                           'Dist::Zilla::Plugin::PodWeaver' => '4.008',
                                            'Dist::Zilla::Plugin::Prereqs' => '0',
                                            'Dist::Zilla::Plugin::Prereqs::AuthorDeps' => '0.006',
                                            'Dist::Zilla::Plugin::PromptIfStale' => '0',
                                            'Dist::Zilla::Plugin::Readme' => '0',
                                            'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0.142180',
-                                           'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.004',
+                                           'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.006',
                                            'Dist::Zilla::Plugin::Run::AfterBuild' => '0.041',
                                            'Dist::Zilla::Plugin::Run::AfterRelease' => '0.038',
                                            'Dist::Zilla::Plugin::RunExtraTests' => '0.024',

@@ -26,6 +26,32 @@ subtest use_it => sub {
         [{test_val => 'foo', test_id => 1}],
         "Got the inserted row"
     );
+
+    $db->stop;
+    my $clone = $db->clone;
+    my $dbh2 = $clone->connect;
+    my $sth2 = $dbh2->prepare('UPDATE quick_test SET test_val = ? WHERE test_id = ?');
+    $sth2->execute('bar', 1);
+
+    $sth2 = $dbh2->prepare('SELECT * FROM quick_test WHERE test_val = ?');
+    $sth2->execute('bar');
+    $all = $sth2->fetchall_arrayref({});
+    is(
+        $all,
+        [{test_val => 'bar', test_id => 1}],
+        "Cloned db was changed"
+    );
+
+    $db->start;
+    $dbh = $db->connect;
+    $sth = $dbh->prepare('SELECT * FROM quick_test WHERE test_id = ?');
+    $sth->execute(1);
+    $all = $sth->fetchall_arrayref({});
+    is(
+        $all,
+        [{test_val => 'foo', test_id => 1}],
+        "Original DB not changed"
+    );
 };
 
 subtest cleanup => sub {

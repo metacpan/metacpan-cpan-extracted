@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Font::CoreFont::zapfdingbats;
 use strict;
 use warnings;
 
-our $VERSION = '3.018'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.019'; # VERSION
+my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -16,9 +16,9 @@ sub data { return {
     'fontname' => 'ZapfDingbats',
     'type' => 'Type1',
     'apiname' => 'Zapf',
-    'ascender' => '806',
-    'capheight' => '705',
-    'descender' => '-198',
+    'ascender' => '806',                         # not defined by Adobe metrics
+    'capheight' => '705',                        # not defined by Adobe metrics
+    'descender' => '-198',                       # not defined by Adobe metrics
     'iscore' => '1',
     'isfixedpitch' => '0',
     'issymbol' => '1',
@@ -26,9 +26,9 @@ sub data { return {
     'missingwidth' => '278',
     'stdhw' => '28',
     'stdvw' => '90',
-    'underlineposition' => '-205',
-    'underlinethickness' => '123',
-    'xheight' => '705',
+    'underlineposition' => '-100',               # originally -205
+    'underlinethickness' => '50',                # originally 123
+    'xheight' => '705',                          # not defined by Adobe metrics
     'firstchar' => '32',
     'lastchar' => '255',
     'char' => [ # DEF. ENCODING GLYPH TABLE
@@ -289,7 +289,7 @@ sub data { return {
         'a191',                                  # C+0xFE # U+0xF0FE
         '.notdef',                               # C+0xFF # U+0x0000
     ], # DEF. ENCODING GLYPH TABLE
-    'fontbbox' => [ 0, -143, 981, 820 ],
+    'fontbbox' => [ -1, -143, 981, 820 ],        # min x was 0
     'wx' => { # HORIZ. WIDTH TABLE
         'space'              => 278,
         'a1'                 => 974,

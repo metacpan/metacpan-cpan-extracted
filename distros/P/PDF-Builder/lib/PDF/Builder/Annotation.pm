@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.018'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.019'; # VERSION
+my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 
@@ -26,6 +26,8 @@ click. Not all features provided here may be available on all PDF Readers.
 =item $annotation = PDF::Builder::Annotation->new()
 
 Returns an annotation object (called from $page->annotation()).
+
+It is normally I<not> necessary to explicitly call this method (see examples).
 
 =cut
 
@@ -68,6 +70,9 @@ sub new {
 Defines the annotation as a launch-page with page C<$page> (within I<this>
 document) and options %options (-rect, -border, -color, I<fit>: see 
 descriptions below).
+
+B<Note> that C<$page> is I<not> a simple page number, but is a page structure
+such as C<$pdf-E<gt>openpage(page_number)>. 
 
 =cut
 

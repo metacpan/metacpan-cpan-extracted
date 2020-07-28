@@ -17,7 +17,7 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 use warnings;
 
-our $VERSION = '3.018'; # VERSION
+our $VERSION = '3.019'; # VERSION
 my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Dict;

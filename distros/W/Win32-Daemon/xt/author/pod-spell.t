@@ -17,6 +17,8 @@ Daemon
 Dave
 David
 Dubois
+Håkon
+Hægland
 Jan
 Konojacki
 Mengué
@@ -33,6 +35,7 @@ daveroth
 dolmen
 dsteinbrunner
 github
+hakon
 jand
 lib
 me

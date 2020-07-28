@@ -66223,3 +66223,13 @@ P/PH/PHATWARES/Win32-HideConsole-1.02.tar.gz
 P/PH/PHATWARES/Win32-WindowGeometry-1.03.tar.gz
 J/JC/JCARTY/WWW-WebKit2-0.11.tar.gz
 P/PI/PINGAN/YANG-0.02.tar.gz
+N/NE/NEILB/Acme-Playpen-2.10.tar.gz
+H/HI/HITODE/App-UpdateCPANfile-0.05.tar.gz
+E/EX/EXODIST/DBIx-QuickDB-0.000011.tar.gz
+E/ET/ETHER/Dist-Zilla-Plugin-DynamicPrereqs-0.038.tar.gz
+P/PR/PREACTION/ETL-Yertl-0.044.tar.gz
+P/PM/PMPERRY/PDF-Builder-3.019.tar.gz
+V/VO/VOJ/PICA-Data-1.14.tar.gz
+P/PE/PERLANCAR/Vivaldi-Util-Profile-0.001.tar.gz
+X/XE/XENU/Win32-Daemon-20200728.tar.gz
+N/NE/NEILB/Acme-Playpen-2.09.tar.gz

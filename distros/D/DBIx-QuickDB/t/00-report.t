@@ -60,10 +60,27 @@ print STDERR "\n";
 }
 
 {
-    my @mods = qw {
-        Test2::API Test2::V0 Importer Module::Pluggable Carp Scalar::Util
-        Time::HiRes parent File::Path File::Temp IPC::Cmd POSIX DBD::mysql
-        DBD::Pg DBI DBD::SQLite
+    my @mods = qw{
+        Capture::Tiny
+        Carp
+        DBD::Pg
+        DBD::SQLite
+        DBD::mysql
+        DBI
+        Digest::SHA
+        Fcntl
+        File::Path
+        File::Temp
+        IPC::Cmd
+        Importer
+        Module::Pluggable
+        POSIX
+        Scalar::Util
+        Test2
+        Test2::API
+        Test2::V0
+        Time::HiRes
+        parent
     };
 
     my @rows;

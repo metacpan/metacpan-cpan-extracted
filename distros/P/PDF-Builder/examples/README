@@ -126,6 +126,9 @@ BarCode.pl       Demonstrate the bar code library, 1 page (11 one-dimensional
                  small files are attached in six different ways (mostly a 
                  variety of icons and their coloring).
 
+ 042_links       demonstrate some links from PDF text to other places in a 
+                 document, to other PDFs, and to HTML files in browsers.
+
  050_pagelabels  all 26 pages show "Page Index=n" (0..25). The reader's 
                  thumbnail display is labeled with the appropriate Roman
                  Numerals, etc., and is NOT on the page itself. Note that each

@@ -1,4 +1,4 @@
-package Acme::Playpen::utilities;
+package Acme::Playpen::Utilities;
 
 use strict;
 use warnings;

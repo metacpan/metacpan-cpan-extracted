@@ -6,7 +6,7 @@ use Test2::API qw/intercept/;
 imported_ok qw/get_db_or_skipall get_db skipall_unless_can_db/;
 
 subtest skipall_unless_can_db => sub {
-    my $events = intercept { skipall_unless_can_db(driver => 'Fake DB') };
+    my $events = intercept { skipall_unless_can_db(drivers => ['Fake DB1', 'Fake DB2']) };
     my ($plan) = @$events;
     like($plan->facet_data->{plan}, {max => FDNE(), details => 'no db driver is viable', skip => 1}, "Would have skipped");
 
@@ -21,7 +21,7 @@ subtest get_db => sub {
 };
 
 subtest get_db_or_skipall => sub {
-    my $events = intercept { get_db_or_skipall foo => {driver => 'Fake DB'} };
+    my $events = intercept { get_db_or_skipall foo => {drivers => ['Fake DB1', 'Fake DB2']} };
     my ($plan) = @$events;
     like($plan->facet_data->{plan}, {max => FDNE(), details => 'no db driver is viable', skip => 1}, "Would have skipped");
 

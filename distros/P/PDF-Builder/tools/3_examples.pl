@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.018'; # VERSION
+our $VERSION = '3.019'; # VERSION
 my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 # dependent on optional packages:
@@ -80,7 +80,10 @@ my (@example_list, @example_results);
   push @example_results, "create examples/040_annotation.pdf, showing some text annotations.\n If you interact with the page, you will be asked if you want to save it\n when leaving (no need to do so).\n";
 
   push @example_list, "041_annot_fileattach";
-  push @example_results, "create examples/040_annot_fileattach.pdf, showing some attached file\n annotations. Depending on your OS, Reader, and permission settings,\n you may not be allowed to open some files, or have to select a reader.\n";
+  push @example_results, "create examples/041_annot_fileattach.pdf, showing some attached file\n annotations. Depending on your OS, Reader, and permission settings,\n you may not be allowed to open some files, or have to select a reader.\n";
+
+  push @example_list, "042_links";
+  push @example_results, "create examples/042_links.pdf, showing some examples of linking from \na PDF to other pages, other PDFs, and even other things such as browser pages.\n";
 
   push @example_list, "050_pagelabels";
   push @example_results, "create examples/050_pagelabels.pdf, showing a number of pages, each with its\n own page label in different formats. You will see them when you drag the\n vertical scroll thumb and you see a thumbnail of each page,\n each with its own label.\n";
