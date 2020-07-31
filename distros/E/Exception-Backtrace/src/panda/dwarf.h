@@ -14,12 +14,13 @@ namespace panda { namespace backtrace {
 
 namespace dwarf {
 
+const constexpr std::size_t max_inline = 10;
+
 struct HighLow {
     Dwarf_Addr high;
     Dwarf_Addr low;
 };
 
-enum class Match { yes, no, unknown };
 enum class Scan  { found, not_found, dead_end };
 
 struct DieHolder;
@@ -35,6 +36,7 @@ struct FunctionDetails {
     DieSP name_die = nullptr;
     std::uint64_t line_no = 0;
     panda::string source;
+    std::uint32_t mask = 0;
 };
 
 struct DieRC: panda::Refcnt {
@@ -51,36 +53,20 @@ struct DieRC: panda::Refcnt {
     DieRC(Dwarf_Die die_, Dwarf_Debug debug_, DieSP parent_);
     ~DieRC();
 
-    Dwarf_Die resolve_ref(Dwarf_Die source, Dwarf_Half attribute) noexcept;
-    DieSP discover(Dwarf_Die target) noexcept;
-    DieSP discover(Dwarf_Off target_offset, DieHolder& node) noexcept;
+    panda::optional<HighLow> get_addr() noexcept;
+    Scan contains(std::uint64_t offset) noexcept;
+    DieSP resolve_ref(DieSP source, Dwarf_Half attribute) noexcept;
+    DieSP discover(DieSP target) noexcept;
+    DieSP discover(Dwarf_Off target_offset, DieSP node) noexcept;
     FQN gather_fqn() noexcept;
     DieSP refine_location(std::uint64_t offset) noexcept;
     FunctionDetails refine_fn(LookupResult& lr) noexcept;
-    void refine_fn_ao(Dwarf_Die abstract_origin, FunctionDetails& details) noexcept;
-    void refine_fn_name(Dwarf_Die it, FunctionDetails& details) noexcept;
-    void refine_fn_line(Dwarf_Die die, std::uint64_t offset, FunctionDetails& details) noexcept;
-    void refine_fn_line_fallback(Dwarf_Die it, FunctionDetails& details) noexcept;
-    void refine_fn_source(Dwarf_Die it, FunctionDetails& details, CU& cu) noexcept;
-    void refine_fn_spec(Dwarf_Die specification, FunctionDetails& details) noexcept;
-};
-
-struct DieHolder {
-    Dwarf_Die die;
-    Dwarf_Debug debug;
-    DieHolder *parent;
-    DieSP owner;
-
-    DieHolder(DieSP owner);
-    DieHolder(Dwarf_Die die_, Dwarf_Debug debug_, DieHolder* parent);
-    DieHolder(const DieHolder&) = delete;
-    DieHolder(DieHolder&&) = delete;
-
-    DieSP detach();
-
-    panda::optional<HighLow> get_addr() noexcept;
-    Match contains(std::uint64_t offset) noexcept;
-    ~DieHolder();
+    void refine_fn_ao(DieSP abstract_origin, FunctionDetails& details) noexcept;
+    void refine_fn_name(DieSP it, FunctionDetails& details) noexcept;
+    void refine_fn_line(DieSP die, std::uint64_t offset, FunctionDetails& details) noexcept;
+    void refine_fn_line_fallback(DieSP it, FunctionDetails& details) noexcept;
+    void refine_fn_source(DieSP it, FunctionDetails& details, CU& cu) noexcept;
+    void refine_fn_spec(DieSP specification, FunctionDetails& details) noexcept;
 };
 
 struct LookupResult {
@@ -120,8 +106,7 @@ struct CU: panda::Refcnt {
     ~CU();
 
     LookupResult resolve(std::uint64_t offset) noexcept;
-    Scan resolve(std::uint64_t offset, DieHolder& die, LookupResult& lr) noexcept;
-    Scan examine(std::uint64_t offset, DieHolder& die, LookupResult& lr) noexcept;
+    void resolve(std::uint64_t offset, DieSP& root, LookupResult& lr) noexcept;
 
     string get_source(size_t index) noexcept;
 };

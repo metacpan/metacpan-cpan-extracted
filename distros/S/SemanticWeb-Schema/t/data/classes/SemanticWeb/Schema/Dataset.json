@@ -1,15 +1,15 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_DatasetClass",
       "owl:equivalentClass" : [
-         "void:Dataset",
          "dcmitype:Dataset",
-         "dcat:Dataset"
+         "dcat:Dataset",
+         "void:Dataset"
       ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A body of structured information describing some topic(s) of interest.",
       "rdfs:label" : "Dataset",
-      "rdfs:subClassOf" : "schema:CreativeWork"
+      "rdfs:subClassOf" : "schema:CreativeWork",
+      "schema:source" : "schemadotorgsources:source_DatasetClass"
    },
    "properties" : {
       "schema:catalog" : {
@@ -52,40 +52,39 @@
          "schema:rangeIncludes" : "schema:DataCatalog"
       },
       "schema:issn" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
          "owl:equivalentProperty" : "bibo:issn",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication.",
          "rdfs:label" : "issn",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:WebSite",
             "schema:Blog",
             "schema:CreativeWorkSeries",
-            "schema:Dataset"
+            "schema:Dataset",
+            "schema:WebSite"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "schemadotorgsources:source_bibex"
       },
       "schema:measurementTechnique" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1425",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A technique or technology used in a <a class=\"localLink\" href=\"http://schema.org/Dataset\">Dataset</a> (or <a class=\"localLink\" href=\"http://schema.org/DataDownload\">DataDownload</a>, <a class=\"localLink\" href=\"http://schema.org/DataCatalog\">DataCatalog</a>),\ncorresponding to the method used for measuring the corresponding variable(s) (described using <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a>). This is oriented towards scientific and scholarly dataset publication but may have broader applicability; it is not intended as a full representation of measurement, but rather as a high level summary for dataset discovery.<br/><br/>\n\nFor example, if <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> is: molecule concentration, <a class=\"localLink\" href=\"http://schema.org/measurementTechnique\">measurementTechnique</a> could be: \"mass spectrometry\" or \"nmr spectroscopy\" or \"colorimetry\" or \"immunofluorescence\".<br/><br/>\n\nIf the <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> is \"depression rating\", the <a class=\"localLink\" href=\"http://schema.org/measurementTechnique\">measurementTechnique</a> could be \"Zung Scale\" or \"HAM-D\" or \"Beck Depression Inventory\".<br/><br/>\n\nIf there are several <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> properties recorded for some given data object, use a <a class=\"localLink\" href=\"http://schema.org/PropertyValue\">PropertyValue</a> for each <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> and attach the corresponding <a class=\"localLink\" href=\"http://schema.org/measurementTechnique\">measurementTechnique</a>.",
          "rdfs:label" : "measurementTechnique",
          "schema:category" : "issue-1425",
          "schema:domainIncludes" : [
+            "schema:PropertyValue",
             "schema:DataCatalog",
             "schema:Dataset",
-            "schema:PropertyValue",
             "schema:DataDownload"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
             "schema:Text",
             "schema:URL"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1425"
       },
       "schema:variableMeasured" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1083",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The variableMeasured property can indicate (repeated as necessary) the  variables that are measured in some dataset, either described as text or as pairs of identifier and description using PropertyValue.",
          "rdfs:label" : "variableMeasured",
@@ -93,8 +92,20 @@
          "schema:domainIncludes" : "schema:Dataset",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:Text"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1083"
+      },
+      "schema:variablesMeasured" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Originally named <a class=\"localLink\" href=\"http://schema.org/variablesMeasured\">variablesMeasured</a>, The <a class=\"localLink\" href=\"http://schema.org/variableMeasured\">variableMeasured</a> property can indicate (repeated as necessary) the  variables that are measured in some dataset, either described as text or as pairs of identifier and description using PropertyValue.",
+         "rdfs:label" : "variablesMeasured",
+         "schema:domainIncludes" : "schema:Dataset",
+         "schema:isPartOf" : "http:attic.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:PropertyValue",
+            "schema:Text"
          ]
       }
    }

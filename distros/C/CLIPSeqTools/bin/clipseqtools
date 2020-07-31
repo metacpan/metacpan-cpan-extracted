@@ -2,7 +2,7 @@
 
 
 package clipseqtools;
-$clipseqtools::VERSION = '0.1.9';
+$clipseqtools::VERSION = '0.1.10';
 
 ##############################################
 # Import external libraries

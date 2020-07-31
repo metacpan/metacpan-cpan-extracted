@@ -1,6 +1,6 @@
 package Net::IPAM::IP;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 
 use 5.10.0;
 use strict;
@@ -28,6 +28,12 @@ Net::IPAM::IP - A library for reading, formatting, sorting and converting IP-add
   say $ip1;    # 1.2.3.4
   say $ip2;    # fe80::1
   say $ip3;    # fe80::2
+
+  $ip3 = $ip2->decr // die 'underflow,';
+
+  say $ip1;    # 1.2.3.4
+  say $ip2;    # fe80::1
+  say $ip3;    # fe80::0
 
   say $ip1->cmp($ip2);    # -1
 
@@ -320,6 +326,25 @@ sub incr {
 
   # sort of cloning
   $_[0]->new_from_bytes($n_plus1);
+}
+
+=head2 decr
+
+Returns the previous IP address, returns undef on underflow.
+
+  $prev_ip = Net::IPAM::IP->new('fe80::1')->decr // die 'overflow,';
+  say $prev_ip;   # fe80::
+
+=cut
+
+sub decr {
+  my $n_minus1 = Net::IPAM::Util::decr_n( $_[0]->bytes );
+
+  # underflow?
+  return unless defined $n_minus1;
+
+  # sort of cloning
+  $_[0]->new_from_bytes($n_minus1);
 }
 
 =head2 expand

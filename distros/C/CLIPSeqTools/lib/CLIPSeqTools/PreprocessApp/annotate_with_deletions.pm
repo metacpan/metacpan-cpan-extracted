@@ -44,7 +44,7 @@ Add a column named deletion that will be NOT NULL if the alignment has a deletio
 =cut
 
 package CLIPSeqTools::PreprocessApp::annotate_with_deletions;
-$CLIPSeqTools::PreprocessApp::annotate_with_deletions::VERSION = '0.1.9';
+$CLIPSeqTools::PreprocessApp::annotate_with_deletions::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

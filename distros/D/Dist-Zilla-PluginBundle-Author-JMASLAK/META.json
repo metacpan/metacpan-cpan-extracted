@@ -4,7 +4,7 @@
       "Joelle Maslak <jmaslak@antelope.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,6 +23,7 @@
       "develop" : {
          "requires" : {
             "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
             "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
@@ -64,7 +65,7 @@
             "Dist::Zilla::Plugin::ShareDir" : "0",
             "Dist::Zilla::Plugin::Test::ChangesHasContent" : "0",
             "Dist::Zilla::Plugin::Test::EOL" : "0",
-            "Dist::Zilla::Plugin::Test::Kwalitee::Extra" : "0",
+            "Dist::Zilla::Plugin::Test::Kwalitee" : "0",
             "Dist::Zilla::Plugin::Test::NoTabs" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
@@ -96,7 +97,7 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::JMASLAK" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/JMASLAK.pm",
-         "version" : "1.182070"
+         "version" : "1.202110"
       }
    },
    "release_status" : "stable",
@@ -110,10 +111,12 @@
          "web" : "https://github.com/jmaslak/Dist-Zilla-PluginBundle-Author-JMASLAK"
       }
    },
-   "version" : "1.182070",
+   "version" : "1.202110",
    "x_contributor_covenant" : {
       "version" : 0.02
    },
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -14,8 +14,6 @@ requires 'Locale::Maketext::Simple';
 requires 'Module::CoreList', '2.32';
 requires 'Module::Pluggable';
 requires 'Params::Check';
-requires 'Pod::Find';
-requires 'Pod::Simple';
 requires 'POSIX';
 requires 'Text::Wrap';
 requires 'version', '0.77';
@@ -31,4 +29,5 @@ on 'develop' => sub {
     requires 'Dist::Zilla::Plugin::CopyFilesFromBuild';
     requires 'Dist::Zilla::Plugin::LicenseFromModule';
     requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
+    requires 'Pod::Coverage::TrustPod';
 };

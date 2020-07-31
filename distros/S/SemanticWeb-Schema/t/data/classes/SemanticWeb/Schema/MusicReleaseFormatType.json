@@ -1,10 +1,10 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:MBZ",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "Format of this release (the type of recording media used, ie. compact disc, digital media, LP, etc.).",
       "rdfs:label" : "MusicReleaseFormatType",
-      "rdfs:subClassOf" : "schema:Enumeration"
+      "rdfs:subClassOf" : "schema:Enumeration",
+      "schema:source" : "schemadotorgsources:MBZ"
    },
    "properties" : {}
 }

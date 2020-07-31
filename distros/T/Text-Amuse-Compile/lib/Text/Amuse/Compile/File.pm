@@ -76,6 +76,10 @@ When set to true, the tex output will obey bcor and twoside/oneside.
 
 An hashref with the options to pass to the templates.
 
+=item include_paths
+
+Include paths arrayref.
+
 =item webfonts
 
 The L<Text::Amuse::Compile::Webfonts> object (or undef).
@@ -171,6 +175,7 @@ has coverpage_only_if_toc => (is => 'ro', isa => Bool, default => sub { 0 });
 has fonts => (is => 'ro', required => 1, isa => InstanceOf['Text::Amuse::Compile::Fonts::Selected']);
 has epub_embed_fonts => (is => 'ro', isa => Bool, default => sub { 1 });
 has indexes => (is => 'rwp', isa => Maybe[ArrayRef]);
+has include_paths => (is => 'ro', isa => ArrayRef, default => sub { [] });
 
 sub _build_file_header {
     my $self = shift;
@@ -203,7 +208,9 @@ sub _build_document {
     else {
         %args = (file => $self->muse_file);
     }
-    return Text::Amuse->new(%args);
+    return Text::Amuse->new(%args,
+                            include_paths => $self->include_paths,
+                           );
 }
 
 sub _build_tex_options {
@@ -1167,7 +1174,15 @@ Calls C<log_info>, remove the lock and dies.
 
 =back
 
+=head1 INTERNAL CONSTANTS
+
+=head2 DEBUG
+
+Set from AMW_DEBUG environment.
+
 =cut
+
+
 
 sub log_info {
     my ($self, @info) = @_;

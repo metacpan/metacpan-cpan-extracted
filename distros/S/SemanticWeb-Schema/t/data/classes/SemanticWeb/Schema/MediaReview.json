@@ -1,23 +1,23 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2450",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "(editorial work in progress, this definition is incomplete and unreviewed)\n    A <a class=\"localLink\" href=\"http://schema.org/MediaReview\">MediaReview</a> is a more specialized form of Review dedicated to the evaluation of media content online, typically in the context of fact-checking and misinformation.\n    For more general reviews of media in the broader sense, use <a class=\"localLink\" href=\"http://schema.org/UserReview\">UserReview</a>, <a class=\"localLink\" href=\"http://schema.org/CriticReview\">CriticReview</a> or other <a class=\"localLink\" href=\"http://schema.org/Review\">Review</a> types.",
       "rdfs:label" : "MediaReview",
       "rdfs:subClassOf" : "schema:Review",
       "schema:category" : "issue-2450",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2450"
    },
    "properties" : {
       "schema:mediaAuthenticityCategory" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2450",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates a MediaManipulationRatingEnumeration classification of a media object (in the context of how it was published or shared).",
          "rdfs:label" : "mediaAuthenticityCategory",
          "schema:category" : "issue-2450",
          "schema:domainIncludes" : "schema:MediaReview",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:MediaManipulationRatingEnumeration"
+         "schema:rangeIncludes" : "schema:MediaManipulationRatingEnumeration",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2450"
       }
    }
 }

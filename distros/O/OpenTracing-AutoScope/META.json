@@ -47,11 +47,11 @@
       "test" : {
          "requires" : {
             "Test::Most" : "0",
-            "Test::OpenTracing::Integration" : "v0.101.2"
+            "Test::OpenTracing::Integration" : "v0.102.1"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v0.104.0",
+   "version" : "v0.105.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

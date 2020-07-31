@@ -25,6 +25,7 @@ my @types = qw(
     DataTypeAttributes
     ObjectAttributes
     ObjectTypeAttributes
+    ReadValueId
     ReferenceTypeAttributes
     VariableAttributes
     VariableTypeAttributes

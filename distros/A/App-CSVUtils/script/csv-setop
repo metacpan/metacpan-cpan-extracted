@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-29'; # DATE
+our $DATE = '2020-07-30'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,13 +38,18 @@ csv-setop - Set operation against several CSV files
 
 =head1 VERSION
 
-This document describes version 0.029 of csv-setop (from Perl distribution App-CSVUtils), released on 2020-05-29.
+This document describes version 0.030 of csv-setop (from Perl distribution App-CSVUtils), released on 2020-07-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % csv-setop [--compare-fields=s] [--diff] [--format=name] [--header] [-i] [--ignore-case] [--intersect] [--json] [--(no)naked-res] [--no-header] [--no-ignore-case] [--no-tsv] [--noheader] [--noignore-case] [--notsv] [--op=s] [--page-result[=program]] [--result-fields=s] [--symdiff] [--tsv] [--union] [--view-result[=program]] <filenames> ...
+ % csv-setop [--compare-fields=s] [--diff] [--escape-char=s]
+     [--format=name] [--header] [-i] [--ignore-case] [--intersect] [--json]
+     [--(no)naked-res] [--no-header] [--no-ignore-case] [--no-tsv]
+     [--noheader] [--noignore-case] [--notsv] [--op=s]
+     [--page-result[=program]] [--quote-char=s] [--result-fields=s]
+     [--sep-char=s] [--symdiff] [--tsv] [--union] <filenames> ...
 
 =head1 DESCRIPTION
 
@@ -100,9 +105,9 @@ example C<--union --compare-fields a,b file1.csv file2.csv>:
  4,5,6
  7,8,9
 
-Each field specified in C<--compare-fields> can be specified using C<F1:F2:...>
-format to refer to different field names or indexes in each file, for example if
-C<file3.csv> is:
+Each field specified in C<--compare-fields> can be specified using
+C<F1:OTHER1,F2:OTHER2,...> format to refer to different field names or indexes in
+each file, for example if C<file3.csv> is:
 
  # file3.csv
  Ei,Si,Bi
@@ -134,6 +139,13 @@ C<*> marks required options.
 Shortcut for --op=diff.
 
 See C<--op>.
+
+=item B<--escape-char>=I<s>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to `\\` (backslash). Overrides `--tsv` option.
+
 
 =item B<--filename>=I<s@>*, B<-f>
 
@@ -175,7 +187,21 @@ Valid values:
 
  ["intersect","union","diff","symdiff"]
 
+=item B<--quote-char>=I<s>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to `"` (double quote). Overrides `--tsv` option.
+
+
 =item B<--result-fields>=I<s>
+
+=item B<--sep-char>=I<s>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to `,` (comma). Overrides `--tsv` option.
+
 
 =item B<--symdiff*>
 
@@ -186,6 +212,10 @@ See C<--op>.
 =item B<--tsv>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by `--sep-char`, `--quote-char`, `--escape-char` options. If one of
+those options is specified, then `--tsv` will be ignored.
+
 
 =item B<--union*>
 
@@ -235,10 +265,6 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
-
-=item B<--view-result>
-
-View output using a viewer.
 
 =back
 

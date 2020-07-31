@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use OPCUA::Open62541;
 
-use Test::More tests => 24;
+use Test::More tests => 29;
 use Test::Deep;
 use Test::Exception;
 use Test::LeakTrace;
@@ -60,3 +60,12 @@ ok(my $maxsessiontimeout = $config->getMaxSessionTimeout(),
     "max session timeout get");
 no_leaks_ok { $config->getMaxSessionTimeout() } "max session timeout leak";
 is($maxsessiontimeout, 30000, "max session timeout");
+
+lives_ok { $config->setMaxSecureChannels(23) }
+    "custom max secure channels";
+no_leaks_ok { $config->setMaxSecureChannels(23) }
+    "custom max secure channels leak";
+
+ok(my $maxsecurechannels = $config->getMaxSecureChannels(), "max secure channels get");
+no_leaks_ok { $config->getMaxSecureChannels() } "max secure channels leak";
+is($maxsecurechannels, 23, "max secure channels");

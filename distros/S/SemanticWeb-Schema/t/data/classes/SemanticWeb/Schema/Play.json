@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1816",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A play is a form of literature, usually consisting of dialogue between characters, intended for theatrical performance rather than just reading. Note the peformance of a Play would be a <a class=\"localLink\" href=\"http://schema.org/TheaterEvent\">TheaterEvent</a> - the <em>Play</em> being the <a class=\"localLink\" href=\"http://schema.org/workPerformed\">workPerformed</a>.",
       "rdfs:label" : "Play",
       "rdfs:subClassOf" : "schema:CreativeWork",
       "schema:category" : "issue-1816",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1816"
    },
    "properties" : {}
 }

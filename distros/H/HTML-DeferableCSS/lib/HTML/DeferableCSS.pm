@@ -20,7 +20,7 @@ use Types::Standard qw/ Bool CodeRef HashRef Maybe Tuple /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.4.2';
 
 
 
@@ -344,7 +344,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 =head1 VERSION
 
-version v0.4.1
+version v0.4.2
 
 =head1 SYNOPSIS
 

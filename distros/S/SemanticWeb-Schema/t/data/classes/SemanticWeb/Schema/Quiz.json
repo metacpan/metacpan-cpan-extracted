@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "Quiz: A test of knowledge, skills and abilities.",
+      "rdfs:label" : "Quiz",
+      "rdfs:subClassOf" : "schema:LearningResource",
+      "schema:category" : "issue-2611",
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2611"
+   },
+   "properties" : {}
+}

@@ -13,12 +13,14 @@ use_ok('RT::Extension::AutomaticAssignment::Chooser::ActiveTickets');
 use_ok('RT::Extension::AutomaticAssignment::Chooser::Random');
 use_ok('RT::Extension::AutomaticAssignment::Chooser::RoundRobin');
 use_ok('RT::Extension::AutomaticAssignment::Chooser::TimeLeft');
+use_ok('RT::Extension::AutomaticAssignment::Chooser::UserDefined');
 
 use_ok('RT::Extension::AutomaticAssignment::Filter');
 use_ok('RT::Extension::AutomaticAssignment::Filter::ExcludedDates');
 use_ok('RT::Extension::AutomaticAssignment::Filter::MemberOfGroup');
 use_ok('RT::Extension::AutomaticAssignment::Filter::MemberOfRole');
 use_ok('RT::Extension::AutomaticAssignment::Filter::WorkSchedule');
+use_ok('RT::Extension::AutomaticAssignment::Filter::UserDefined');
 
 use_ok('RT::CustomFieldValues::ServiceBusinessHours');
 

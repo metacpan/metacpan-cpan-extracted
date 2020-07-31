@@ -3,7 +3,7 @@
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The status of an Action.",
       "rdfs:label" : "ActionStatusType",
-      "rdfs:subClassOf" : "schema:Enumeration"
+      "rdfs:subClassOf" : "schema:StatusEnumeration"
    },
    "properties" : {}
 }

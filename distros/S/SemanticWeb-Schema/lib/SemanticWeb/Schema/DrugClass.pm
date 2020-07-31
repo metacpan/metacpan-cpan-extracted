@@ -6,7 +6,7 @@ package SemanticWeb::Schema::DrugClass;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::MedicalEnumeration /;
+extends qw/ SemanticWeb::Schema::MedicalEntity /;
 
 
 use MooX::JSON_LD 'DrugClass';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has drug => (
@@ -42,7 +42,7 @@ SemanticWeb::Schema::DrugClass - A class of medical drugs, e
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -70,7 +70,7 @@ A predicate for the L</drug> attribute.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::MedicalEnumeration>
+L<SemanticWeb::Schema::MedicalEntity>
 
 =head1 SOURCE
 

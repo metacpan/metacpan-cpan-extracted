@@ -15,7 +15,7 @@ use List::Util qw/ first /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.2';
 
 
 sub exe {
@@ -40,7 +40,7 @@ Alien::TidyHTML5 - Download and install HTML Tidy
 
 =head1 VERSION
 
-version v0.3.1
+version v0.3.2
 
 =head1 DESCRIPTION
 
@@ -104,7 +104,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018,2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

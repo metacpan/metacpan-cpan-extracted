@@ -1,10 +1,10 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A food service, like breakfast, lunch, or dinner.",
       "rdfs:label" : "FoodService",
-      "rdfs:subClassOf" : "schema:Service"
+      "rdfs:subClassOf" : "schema:Service",
+      "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
    },
    "properties" : {}
 }

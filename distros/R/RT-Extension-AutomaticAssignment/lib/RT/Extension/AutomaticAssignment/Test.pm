@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+use lib qw(/Users/sunnavy/bps/git/rt/local/lib /Users/sunnavy/bps/git/rt/lib);
 
 package RT::Extension::AutomaticAssignment::Test;
 
@@ -57,7 +57,7 @@ Set(%ServiceBusinessHours, (
     },
     'Weekend' => {
         6 => { Name => 'Saturday',  Start => '08:00', End => '18:00' },
-        7 => { Name => 'Sunday',    Start => '08:00', End => '18:00' },
+        0 => { Name => 'Sunday',    Start => '08:00', End => '18:00' },
         holidays => \@Holidays,
     },
 ));

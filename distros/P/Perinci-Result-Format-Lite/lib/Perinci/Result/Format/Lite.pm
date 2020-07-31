@@ -1,7 +1,7 @@
 package Perinci::Result::Format::Lite;
 
-our $DATE = '2020-05-30'; # DATE
-our $VERSION = '0.276'; # VERSION
+our $DATE = '2020-07-30'; # DATE
+our $VERSION = '0.277'; # VERSION
 
 use 5.010001;
 #IFUNBUILT
@@ -428,7 +428,7 @@ sub format {
         } else {
             require Data::Check::Structure;
             my $data = $res->[2];
-            my $max = 5;
+            my $max = 1000;
             if (!ref($data)) {
                 $data //= "";
                 $data .= "\n" unless !length($data) || $data =~ /\n\z/;
@@ -533,7 +533,7 @@ Perinci::Result::Format::Lite - Format enveloped result
 
 =head1 VERSION
 
-This document describes version 0.276 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2020-05-30.
+This document describes version 0.277 of Perinci::Result::Format::Lite (from Perl distribution Perinci-Result-Format-Lite), released on 2020-07-30.
 
 =head1 SYNOPSIS
 

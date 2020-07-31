@@ -1,5 +1,10 @@
 Revision history for Test-TempDir
 
+0.11   2020-07-28 18:47:57Z
+  - bump prereq on File::Temp to 0.2308 in order to change the default for
+    EXLOCK on *bsd systems
+  - all usage of File::NFSLock removed due to security risk
+
 0.10   2015-05-16 03:52:31Z
   - mark this distribution as deprecated in metadata
 

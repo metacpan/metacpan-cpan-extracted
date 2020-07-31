@@ -1,5 +1,11 @@
 Revision history for Net-IPAM-Block
 
+1.17    Wed, 29 Jul 2020 21:55:25 +0200
+        * better, much faster find_free_cidrs algorithm
+
+1.16    Fri, 22 May 2020 18:36:52 +0200
+        * tweak 32bit perl, sic
+
 1.15    Mon, 18 May 2020 21:25:55 +0200
         * bump requirements
 

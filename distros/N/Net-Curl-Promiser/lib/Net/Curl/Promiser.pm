@@ -3,7 +3,7 @@ package Net::Curl::Promiser;
 use strict;
 use warnings;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =encoding utf-8
 
@@ -18,8 +18,8 @@ timers, etc. This module does all of that for you and puts a Promise
 interface on top of it, so asynchronous I/O becomes almost as simple as
 synchronous I/O.
 
-L<Net::Curl::Promiser> itself is a base class; you’ll need to provide
-a subclass that works with whatever event interface you use.
+L<Net::Curl::Promiser> itself is a base class; you’ll need to use
+a subclass that works with your chosen event interface.
 
 This distribution provides the following usable subclasses:
 

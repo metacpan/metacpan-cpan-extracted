@@ -12,9 +12,9 @@
          "rdfs:label" : "acceptsReservations",
          "schema:domainIncludes" : "schema:FoodEstablishment",
          "schema:rangeIncludes" : [
-            "schema:Text",
+            "schema:URL",
             "schema:Boolean",
-            "schema:URL"
+            "schema:Text"
          ]
       },
       "schema:hasMenu" : {
@@ -34,9 +34,9 @@
          "rdfs:label" : "menu",
          "schema:domainIncludes" : "schema:FoodEstablishment",
          "schema:rangeIncludes" : [
+            "schema:URL",
             "schema:Menu",
-            "schema:Text",
-            "schema:URL"
+            "schema:Text"
          ],
          "schema:supersededBy" : "schema:hasMenu"
       },
@@ -48,7 +48,6 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:starRating" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An official rating for a lodging business or food establishment, e.g. from national associations or standards bodies. Use the author property to indicate the rating organization, e.g. as an Organization with name such as (e.g. HOTREC, DEHOGA, WHR, or Hotelstars).",
          "rdfs:label" : "starRating",
@@ -56,7 +55,8 @@
             "schema:FoodEstablishment",
             "schema:LodgingBusiness"
          ],
-         "schema:rangeIncludes" : "schema:Rating"
+         "schema:rangeIncludes" : "schema:Rating",
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       }
    }
 }

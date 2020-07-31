@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1448",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A picture or diagram made with a pencil, pen, or crayon rather than paint.",
       "rdfs:label" : "Drawing",
       "rdfs:subClassOf" : "schema:CreativeWork",
       "schema:category" : "issue-1448",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1448"
    },
    "properties" : {}
 }

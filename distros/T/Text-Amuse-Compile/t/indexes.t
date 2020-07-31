@@ -2,7 +2,7 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 16;
 use Text::Amuse::Compile;
 use Text::Amuse::Compile::File;
 use Text::Amuse::Compile::Indexer;
@@ -126,4 +126,22 @@ my $c = Text::Amuse::Compile->new(
     my $tex = $workingdir->child('short.tex');
     my $pattern = "\\index[imena]{Try}\\emph{em}  \\index[imena]{Prova}Prova~prova  \\index[imena]{Try}\\emph{em}";
     like $tex->slurp_utf8, qr/\Q$pattern\E/;
+}
+
+
+foreach my $f (qw/index-me-3/) {
+    my $src = path(qw/t testfile/, "$f.muse");
+    my $file = $workingdir->child("$f.muse");
+    $file->spew_utf8($src->slurp_utf8);
+    $c->compile("$file");
+    my $tex = $workingdir->child("$f.tex");
+    my $tex_body;
+    if ($tex->slurp_utf8 =~ m/STARTHERE(.*)ENDHERE/s) {
+        $tex_body = $1;
+    }
+    else {
+        die "Failure reading $f.tex";
+    }
+    eq_or_diff([ split(/\r?\n/, $tex_body) ],
+               [ split(/\r?\n/, path(qw/t testfile/, "$f.expected")->slurp_utf8) ]);
 }

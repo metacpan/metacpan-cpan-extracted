@@ -1,4 +1,4 @@
-/* this file was auto-generated at 2020-06-27 10:28:11 */
+/* this file was auto-generated at 2020-07-30 00:59:33 */
 
 #include <stdio.h> /* NULL */
 #include "include/eav/auto_tld.h"
@@ -39,7 +39,7 @@ const tld_t tld_list[] = {
     { "agency", 7, TLD_TYPE_GENERIC },
     { "ai", 3, TLD_TYPE_COUNTRY_CODE },
     { "aig", 4, TLD_TYPE_GENERIC },
-    { "aigo", 5, TLD_TYPE_GENERIC },
+    { "aigo", 5, TLD_TYPE_NOT_ASSIGNED },
     { "airbus", 7, TLD_TYPE_GENERIC },
     { "airforce", 9, TLD_TYPE_GENERIC },
     { "airtel", 7, TLD_TYPE_GENERIC },
@@ -1069,7 +1069,7 @@ const tld_t tld_list[] = {
     { "rich", 5, TLD_TYPE_GENERIC },
     { "richardli", 10, TLD_TYPE_GENERIC },
     { "ricoh", 6, TLD_TYPE_GENERIC },
-    { "rightathome", 12, TLD_TYPE_GENERIC },
+    { "rightathome", 12, TLD_TYPE_NOT_ASSIGNED },
     { "ril", 4, TLD_TYPE_GENERIC },
     { "rio", 4, TLD_TYPE_GENERIC },
     { "rip", 4, TLD_TYPE_GENERIC },
@@ -1224,7 +1224,7 @@ const tld_t tld_list[] = {
     { "sx", 3, TLD_TYPE_COUNTRY_CODE },
     { "sy", 3, TLD_TYPE_COUNTRY_CODE },
     { "sydney", 7, TLD_TYPE_GENERIC },
-    { "symantec", 9, TLD_TYPE_GENERIC },
+    { "symantec", 9, TLD_TYPE_NOT_ASSIGNED },
     { "systems", 8, TLD_TYPE_GENERIC },
     { "sz", 3, TLD_TYPE_COUNTRY_CODE },
     { "tab", 4, TLD_TYPE_GENERIC },

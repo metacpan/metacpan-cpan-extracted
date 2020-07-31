@@ -1,43 +1,43 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An apartment (in American English) or flat (in British English) is a self-contained housing unit (a type of residential real estate) that occupies only part of a building (Source: Wikipedia, the free encyclopedia, see <a href=\"http://en.wikipedia.org/wiki/Apartment\">http://en.wikipedia.org/wiki/Apartment</a>).",
       "rdfs:label" : "Apartment",
-      "rdfs:subClassOf" : "schema:Accommodation"
+      "rdfs:subClassOf" : "schema:Accommodation",
+      "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
    },
    "properties" : {
       "schema:numberOfRooms" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:Apartment",
-            "schema:House",
+            "schema:LodgingBusiness",
             "schema:FloorPlan",
             "schema:Suite",
             "schema:SingleFamilyResidence",
-            "schema:LodgingBusiness"
+            "schema:House",
+            "schema:Accommodation",
+            "schema:Apartment"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
             "schema:Number"
-         ]
+         ],
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       },
       "schema:occupancy" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The allowed total occupancy for the accommodation in persons (including infants etc). For individual accommodations, this is not necessarily the legal maximum but defines the permitted usage as per the contractual agreement (e.g. a double room used by a single person).\nTypical unit code(s): C62 for person",
          "rdfs:label" : "occupancy",
          "schema:domainIncludes" : [
-            "schema:HotelRoom",
-            "schema:Suite",
             "schema:SingleFamilyResidence",
+            "schema:Suite",
+            "schema:HotelRoom",
             "schema:Apartment"
          ],
-         "schema:rangeIncludes" : "schema:QuantitativeValue"
+         "schema:rangeIncludes" : "schema:QuantitativeValue",
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       }
    }
 }

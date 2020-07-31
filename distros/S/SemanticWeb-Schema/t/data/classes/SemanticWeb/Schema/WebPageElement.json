@@ -7,7 +7,6 @@
    },
    "properties" : {
       "schema:cssSelector" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1389",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A CSS selector, e.g. of a <a class=\"localLink\" href=\"http://schema.org/SpeakableSpecification\">SpeakableSpecification</a> or <a class=\"localLink\" href=\"http://schema.org/WebPageElement\">WebPageElement</a>. In the latter case, multiple matches within a page can constitute a single conceptual \"Web page element\".",
          "rdfs:label" : "cssSelector",
@@ -16,10 +15,10 @@
             "schema:SpeakableSpecification",
             "schema:WebPageElement"
          ],
-         "schema:rangeIncludes" : "schema:CssSelectorType"
+         "schema:rangeIncludes" : "schema:CssSelectorType",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1389"
       },
       "schema:xpath" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1389",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An XPath, e.g. of a <a class=\"localLink\" href=\"http://schema.org/SpeakableSpecification\">SpeakableSpecification</a> or <a class=\"localLink\" href=\"http://schema.org/WebPageElement\">WebPageElement</a>. In the latter case, multiple matches within a page can constitute a single conceptual \"Web page element\".",
          "rdfs:label" : "xpath",
@@ -28,7 +27,8 @@
             "schema:SpeakableSpecification",
             "schema:WebPageElement"
          ],
-         "schema:rangeIncludes" : "schema:XPathType"
+         "schema:rangeIncludes" : "schema:XPathType",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1389"
       }
    }
 }

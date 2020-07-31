@@ -40,19 +40,16 @@ foreach my $use_subdir ( 1, 0 ) {
 
     isa_ok( $path, "Path::Class::Dir" );
 
-    ok( $subdir->contains($path), "preferred path used" );
+    ok( $subdir->contains($path), "preferred path used" )
+        or diag "got subdir $subdir, selected path $path";
 
     ok( -d $path, "created" );
-
-    isa_ok( $lock, "File::NFSLock", "lock" );
 
     my ( $fallback_path, $fallback_lock ) = $f->create_and_lock_fallback($f->base_path);
 
     isa_ok( $fallback_path, "Path::Class::Dir" );
 
     isnt( $fallback_path, $path, "fallback path is different" );
-
-    isa_ok( $fallback_lock, "File::NFSLock" );
 
     {
         $f->lock(0);
@@ -72,19 +69,8 @@ foreach my $use_subdir ( 1, 0 ) {
 
     isa_ok( $dir->dir, "Path::Class::Dir" );
 
-    ok( $subdir->contains( $dir->dir ), "created in the right place" );
-
-    isa_ok( $dir->lock, "File::NFSLock" );
-
-    SKIP: {
-        my $lockfile = $dir->lock->{lock_file} or skip "no lockfile", 2;
-
-        ok( -f $lockfile, "lockfile exists" );
-
-        $dir->empty;
-
-        ok( -f $lockfile, "lockfile exists after ->empty" );
-    }
+    ok( $subdir->contains( $dir->dir ), "created in the right place" )
+        or diag "got subdir $subdir, selected dir $dir";
 
     rmdir $fallback_path;
 

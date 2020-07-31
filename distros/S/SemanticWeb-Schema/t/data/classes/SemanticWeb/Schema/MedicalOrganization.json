@@ -7,27 +7,27 @@
    },
    "properties" : {
       "schema:healthPlanNetworkId" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Name or unique ID of network. (Networks are often reused across different insurance plans).",
          "rdfs:label" : "healthPlanNetworkId",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:HealthPlanNetwork",
-            "schema:MedicalOrganization"
+            "schema:MedicalOrganization",
+            "schema:HealthPlanNetwork"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:isAcceptingNewPatients" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Whether the provider is accepting new patients.",
          "rdfs:label" : "isAcceptingNewPatients",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : "schema:MedicalOrganization",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Boolean"
+         "schema:rangeIncludes" : "schema:Boolean",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:medicalSpecialty" : {
          "rdf:type" : "rdf:Property",
@@ -35,9 +35,9 @@
          "rdfs:label" : "medicalSpecialty",
          "schema:domainIncludes" : [
             "schema:Hospital",
-            "schema:Physician",
+            "schema:MedicalOrganization",
             "schema:MedicalClinic",
-            "schema:MedicalOrganization"
+            "schema:Physician"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalSpecialty"

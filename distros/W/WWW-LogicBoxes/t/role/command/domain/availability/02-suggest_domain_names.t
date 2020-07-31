@@ -235,6 +235,8 @@ sub inspect_domain_availabilities {
         if( !$args{related} ) {
             my @keywords = split( ' ', $args{phrase} );
 
+            push @keywords, 'auto' if( grep { $_ eq 'car' } @keywords );
+
             ok( grep { $domain_availability->sld =~ m/$_/ } @keywords, 'Keyword appears in exact match' );
         }
     }

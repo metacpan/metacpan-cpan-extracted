@@ -6,22 +6,22 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.095 ();
+use IO::Compress::Base::Common  2.096 ();
 
-use IO::Uncompress::Adapter::Inflate  2.095 ();
+use IO::Uncompress::Adapter::Inflate  2.096 ();
 
 
-use IO::Uncompress::Base  2.095 ;
-use IO::Uncompress::Gunzip  2.095 ;
-use IO::Uncompress::Inflate  2.095 ;
-use IO::Uncompress::RawInflate  2.095 ;
-use IO::Uncompress::Unzip  2.095 ;
+use IO::Uncompress::Base  2.096 ;
+use IO::Uncompress::Gunzip  2.096 ;
+use IO::Uncompress::Inflate  2.096 ;
+use IO::Uncompress::RawInflate  2.096 ;
+use IO::Uncompress::Unzip  2.096 ;
 
 require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $AnyInflateError);
 
-$VERSION = '2.095';
+$VERSION = '2.096';
 $AnyInflateError = '';
 
 @ISA = qw(IO::Uncompress::Base Exporter);
@@ -48,7 +48,7 @@ sub anyinflate
 
 sub getExtraParams
 {
-    use IO::Compress::Base::Common  2.095 qw(:Parse);
+    use IO::Compress::Base::Common  2.096 qw(:Parse);
     return ( 'rawinflate' => [Parse_boolean,  0] ) ;
 }
 

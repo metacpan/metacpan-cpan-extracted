@@ -1,0 +1,12 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "UKNonprofitType: Non-profit organization type originating from the United Kingdom.",
+      "rdfs:label" : "UKNonprofitType",
+      "rdfs:subClassOf" : "schema:NonprofitType",
+      "schema:category" : "issue-2543",
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2543"
+   },
+   "properties" : {}
+}

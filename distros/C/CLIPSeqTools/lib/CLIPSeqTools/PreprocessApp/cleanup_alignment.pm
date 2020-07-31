@@ -29,7 +29,7 @@ copy number - the number of collapsed alignments.
 =cut
 
 package CLIPSeqTools::PreprocessApp::cleanup_alignment;
-$CLIPSeqTools::PreprocessApp::cleanup_alignment::VERSION = '0.1.9';
+$CLIPSeqTools::PreprocessApp::cleanup_alignment::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

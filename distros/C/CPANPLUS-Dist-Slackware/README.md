@@ -44,7 +44,7 @@ git clone https://github.com/voegelas/CPANPLUS-Dist-Slackware.git
 
 ## LICENSE AND COPYRIGHT
 
-Copyright 2012-2018 Andreas Vögele
+Copyright 2012-2020 Andreas Vögele
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

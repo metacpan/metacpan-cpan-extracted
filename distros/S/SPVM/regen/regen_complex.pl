@@ -13,16 +13,37 @@ for my $type (@types) {
   
   my $package_name = "SPVM::Complex_2$prefix";
   
-  my $package_content = "# $package_name is created by regen/regen_complex.pl\n";
-  $package_content .= "package $package_name : mulnum_t {\n";
-    $package_content .= <<"EOS";
+  my $spvm_module_content = "# $package_name is created by regen/regen_complex.pl\n";
+  $spvm_module_content .= "package $package_name : mulnum_t {\n";
+    $spvm_module_content .= <<"EOS";
   has x : $type;
   has y : $type;
 EOS
-  $package_content .= "}\n";
+  $spvm_module_content .= "}\n";
   
-  my $module_file = "lib/SPVM/Complex_2$prefix.spvm";
-  open my $module_fh, '>', $module_file
-    or die "Can't open $module_file: $!";
-  print $module_fh $package_content;
+  my $spvm_module_file = "lib/SPVM/Complex_2$prefix.spvm";
+  open my $spvm_module_fh, '>', $spvm_module_file
+    or die "Can't open $spvm_module_file: $!";
+  print $spvm_module_fh $spvm_module_content;
+
+  my $perl_module_content = <<EOS;
+=head1 NAME
+
+$package_name - Complex $type multi numeric type
+
+=head1 SYNOPSYS
+
+  my \$z : $package_name;
+  \$z->{x} = 1;
+  \$z->{y} = 2;
+  
+=head1 DESCRIPTION
+
+$package_name is Complex $type multi numeric type.
+EOS
+
+  my $perl_module_file = "lib/SPVM/Complex_2$prefix.pm";
+  open my $perl_module_fh, '>', $perl_module_file
+    or die "Can't open $perl_module_file: $!";
+  print $perl_module_fh $perl_module_content;
 }

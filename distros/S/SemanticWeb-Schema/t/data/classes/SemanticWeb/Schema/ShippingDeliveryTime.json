@@ -1,53 +1,53 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "ShippingDeliveryTime provides various pieces of information about delivery times for shipping.",
       "rdfs:label" : "ShippingDeliveryTime",
       "rdfs:subClassOf" : "schema:StructuredValue",
       "schema:category" : "issue-2506",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
    },
    "properties" : {
       "schema:businessDays" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Days of the week when the merchant typically operates, indicated via opening hours markup.",
          "rdfs:label" : "businessDays",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : "schema:ShippingDeliveryTime",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:OpeningHoursSpecification"
+         "schema:rangeIncludes" : "schema:OpeningHoursSpecification",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:cutoffTime" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Order cutoff time allows merchants to describe the time after which they will no longer process orders received on that day. For orders processed after cutoff time, one day gets added to the delivery time estimate. This property is expected to be most typically used via the <a class=\"localLink\" href=\"http://schema.org/ShippingRateSettings\">ShippingRateSettings</a> publication pattern. The time is indicated using the time notation from the ISO-8601 DateTime format, e.g.\n      14:45:15Z would represent a daily cutoff at 14:45h UTC.",
+         "rdfs:comment" : "Order cutoff time allows merchants to describe the time after which they will no longer process orders received on that day. For orders processed after cutoff time, one day gets added to the delivery time estimate. This property is expected to be most typically used via the <a class=\"localLink\" href=\"http://schema.org/ShippingRateSettings\">ShippingRateSettings</a> publication pattern. The time is indicated using the ISO-8601 Time format, e.g. \"23:30:00-05:00\" would represent 6:30 pm Eastern Standard Time (EST) which is 5 hours behind Coordinated Universal Time (UTC).",
          "rdfs:label" : "cutoffTime",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : "schema:ShippingDeliveryTime",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Time",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:handlingTime" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The typical delay between the receipt of the order and the goods either leaving the warehouse or being prepared for pickup, in case the delivery method is on site pickup. Typical properties: minValue, maxValue, unitCode (d for DAY).  This is by common convention assumed to mean business days (if a unitCode is used, coded as \"d\"), i.e. only counting days when the business normally operates.",
          "rdfs:label" : "handlingTime",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : "schema:ShippingDeliveryTime",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:QuantitativeValue"
+         "schema:rangeIncludes" : "schema:QuantitativeValue",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:transitTime" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The typical delay the order has been sent for delivery and the goods reach the final customer. Typical properties: minValue, maxValue, unitCode (d for DAY).",
          "rdfs:label" : "transitTime",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : "schema:ShippingDeliveryTime",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:QuantitativeValue"
+         "schema:rangeIncludes" : "schema:QuantitativeValue",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       }
    }
 }

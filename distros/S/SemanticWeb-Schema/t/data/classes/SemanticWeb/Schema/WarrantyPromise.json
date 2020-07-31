@@ -1,27 +1,27 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A structured value representing the duration and scope of services that will be provided to a customer free of charge in case of a defect or malfunction of a product.",
       "rdfs:label" : "WarrantyPromise",
-      "rdfs:subClassOf" : "schema:StructuredValue"
+      "rdfs:subClassOf" : "schema:StructuredValue",
+      "schema:source" : "schemadotorgsources:source_GoodRelationsClass"
    },
    "properties" : {
       "schema:durationOfWarranty" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The duration of the warranty promise. Common unitCode values are ANN for year, MON for months, or DAY for days.",
          "rdfs:label" : "durationOfWarranty",
          "schema:domainIncludes" : "schema:WarrantyPromise",
-         "schema:rangeIncludes" : "schema:QuantitativeValue"
+         "schema:rangeIncludes" : "schema:QuantitativeValue",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:warrantyScope" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The scope of the warranty promise.",
          "rdfs:label" : "warrantyScope",
          "schema:domainIncludes" : "schema:WarrantyPromise",
-         "schema:rangeIncludes" : "schema:WarrantyScope"
+         "schema:rangeIncludes" : "schema:WarrantyScope",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       }
    }
 }

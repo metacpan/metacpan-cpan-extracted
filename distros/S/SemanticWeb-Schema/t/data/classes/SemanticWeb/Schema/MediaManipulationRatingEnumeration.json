@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2450",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "(editorial work in progress, this definition is incomplete and unreviewed) MediaManipulationRatingEnumeration classifies a number of ways in which a media item (video, image, audio) can be manipulated, taking into account the context within which they are published or presented.",
       "rdfs:label" : "MediaManipulationRatingEnumeration",
       "rdfs:subClassOf" : "schema:Enumeration",
       "schema:category" : "issue-2450",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2450"
    },
    "properties" : {}
 }

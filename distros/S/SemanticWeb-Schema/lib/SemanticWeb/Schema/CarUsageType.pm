@@ -6,7 +6,7 @@ package SemanticWeb::Schema::CarUsageType;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::QualitativeValue /;
+extends qw/ SemanticWeb::Schema::Enumeration /;
 
 
 use MooX::JSON_LD 'CarUsageType';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::CarUsageType - A value indicating a special usage of a car
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ driving school, or as a taxi.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::QualitativeValue>
+L<SemanticWeb::Schema::Enumeration>
 
 =head1 SOURCE
 

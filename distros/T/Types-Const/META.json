@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "Const::Fast",
       "constants",
@@ -70,7 +70,8 @@
             "Types::TypeTiny" : "0",
             "namespace::autoclean" : "0.28",
             "perl" : "v5.10.0",
-            "version" : "0.77"
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -91,7 +92,7 @@
    "provides" : {
       "Types::Const" : {
          "file" : "lib/Types/Const.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       }
    },
    "release_status" : "stable",
@@ -106,12 +107,13 @@
          "web" : "https://github.com/robrwo/Types-Const"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

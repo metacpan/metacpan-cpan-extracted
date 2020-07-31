@@ -1,3 +1,9 @@
+1.00  2020-07-28
+    - Add RT 5 Support(RT 4 users need to use 0.* versions)
+
+0.04  2020-07-27
+    - Add user-defined choosers and filters
+
 0.03  2016-09-09
     - remove "from initial collection" debug log
 

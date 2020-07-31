@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Canary::Stability: '0'
+  ExtUtils::MakeMaker: '6.6'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Superluminal
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '7.18'
+  common::sense: '3.75'
+version: 0.01
+x_preqreqs:
+  runtime:
+    recommends:
+      Coro: 6

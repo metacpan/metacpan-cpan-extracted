@@ -1,7 +1,7 @@
 package Calendar::Indonesia::Holiday;
 
-our $DATE = '2019-11-19'; # DATE
-our $VERSION = '0.324'; # VERSION
+our $DATE = '2020-07-30'; # DATE
+our $VERSION = '0.325'; # VERSION
 
 use 5.010001;
 use strict;
@@ -800,6 +800,8 @@ my %year_holidays;
 }
 
 # decreed aug 28, 2019
+# revised mar 9, 2020
+# revised may 20, 2020
 #
 # ref:
 # - https://www.kominfo.go.id/content/detail/20922/inilah-jadwal-libur-nasional-dan-cuti-bersama-tahun-2020/0/berita
@@ -808,7 +810,19 @@ my %year_holidays;
 #   Manusia dan Kebudayaan (PMK), Puan Maharani, di Gedung Kemenko PMK, Jakarta,
 #   Selasa (28/8/2019) pagi, telah menyepakati tahun 2020 akan memiliki 16 Hari
 #   Libur Nasional dan 4 hari Cuti Bersama."
+# - https://tirto.id/revisi-cuti-bersama-2020-dan-daftar-hari-libur-tahun-ini-sesuai-skb-eDRB
+#   "Rapat telah merumuskan untuk menambah hari libur tahun 2020, yang semula
+#   telah ditetapkan 20 hari, menjadi 24 hari. Yang tadi sudah ditetapkan
+#   bersama oleh Menag, Menaker, dan Menpan RB," kata Muhadjir, Senin
+#   (9/3/2020), usai rapat koordinasi di kantor Kemenko PMK, Jakarta.
+# - https://travel.tempo.co/read/1345498/ini-daftar-revisi-hari-libur-nasional-dan-cuti-bersama-tahun-2020/full&view=ok
+#   "Surat keputusan bersama itu ditandatangani oleh Menteri Agama Fachrul Razi,
+#   Menteri Ketenagakerjaan Ida Fauziyah, dan Menteri Pendayagunaan Aparatur
+#   Negara dan Reformasi Birokrasi Tjahjo Kumolo pada Rabu, 20 Mei 2020."
+
 {
+    my $hijra2020;
+    my $mawlid2020;
     my $eidulf2020;
     $year_holidays{2020} = [
         # - new year
@@ -819,21 +833,26 @@ my %year_holidays;
         # - labor day
         _h_vesakha   ({_expand_dm("07-05")}, {hyear=>2564}),
         _h_ascension ({_expand_dm("21-05")}),
-        ($eidulf2020 =
-        _h_eidulf    ({_expand_dm("24-05")}, {hyear=>1441, day=>1})),
-        _h_eidulf    ({_expand_dm("25-05")}, {hyear=>1441, day=>2}),
+        _h_eidulf    ({_expand_dm("24-05")}, {hyear=>1441, day=>1}),
+        ($eidulf2020 = _h_eidulf({_expand_dm("25-05")}, {hyear=>1441, day=>2})),
         # - pancasila day
-        _h_eidula    ({_expand_dm("31-07")}, {hyear=>1441}),
+        ($hijra2020 = _h_eidula ({_expand_dm("31-07")}, {hyear=>1441})),
         # - independence day
         _h_hijra     ({_expand_dm("20-08")}, {hyear=>1442}),
-        _h_mawlid    ({_expand_dm("29-10")}, {hyear=>1442}),
+        ($mawlid2020 = _h_mawlid({_expand_dm("29-10")}, {hyear=>1442})),
         # - christmas
-
-        _jointlv     ({_expand_dm("22-05")}, {holiday=>$eidulf2020}),
-        _jointlv     ({_expand_dm("26-05")}, {holiday=>$eidulf2020}),
-        _jointlv     ({_expand_dm("27-05")}, {holiday=>$eidulf2020}),
-        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
     ];
+
+    push @{ $year_holidays{2020} }, (
+        _jointlv     ({_expand_dm("21-08")}, {holiday=>$hijra2020}),
+        _jointlv     ({_expand_dm("28-08")}, {holiday=>$mawlid2020}),
+        _jointlv     ({_expand_dm("30-08")}, {holiday=>$mawlid2020}),
+        _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
+        _jointlv     ({_expand_dm("28-12")}, {holiday=>$eidulf2020}),
+        _jointlv     ({_expand_dm("29-12")}, {holiday=>$eidulf2020}),
+        _jointlv     ({_expand_dm("30-12")}, {holiday=>$eidulf2020}),
+        _jointlv     ({_expand_dm("31-12")}, {holiday=>$eidulf2020}),
+    );
 }
 
 
@@ -1160,7 +1179,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.324 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2019-11-19.
+This document describes version 0.325 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2020-07-30.
 
 =head1 SYNOPSIS
 
@@ -1283,6 +1302,7 @@ or a DateTime object, is accepted.
 
 If set to 1, Saturday is a working day.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1341,6 +1361,7 @@ or a DateTime object, is accepted.
 =item * B<work_saturdays> => I<bool> (default: 0)
 
 If set to 1, Saturday is a working day.
+
 
 =back
 
@@ -1578,6 +1599,10 @@ Only return records where the 'dow' field is less than specified value.
 
 Only return records where the 'dow' field is greater than specified value.
 
+=item * B<exclude_fields> => I<array[str]>
+
+Select fields to return.
+
 =item * B<fields> => I<array[str]>
 
 Select fields to return.
@@ -1715,7 +1740,7 @@ Only return records where the 'tags' field equals specified value.
 
 =item * B<tags.has> => I<array[str]>
 
-Only return records where the 'tags' field is an array/list which contains specified value.
+Only return records where the 'tags' field is an arrayE<sol>list which contains specified value.
 
 =item * B<tags.is> => I<array>
 
@@ -1727,11 +1752,11 @@ Only return records where the 'tags' field does not equal specified value.
 
 =item * B<tags.lacks> => I<array[str]>
 
-Only return records where the 'tags' field is an array/list which does not contain specified value.
+Only return records where the 'tags' field is an arrayE<sol>list which does not contain specified value.
 
 =item * B<with_field_names> => I<bool>
 
-Return field names in each record (as hash/associative array).
+Return field names in each record (as hashE<sol>associative array).
 
 When enabled, function will return each record as hash/associative array
 (field name => value pairs). Otherwise, function will return each record
@@ -1773,6 +1798,7 @@ Only return records where the 'year' field is less than specified value.
 
 Only return records where the 'year' field is greater than specified value.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -1794,6 +1820,8 @@ Usage:
 
  list_id_workdays(%args) -> [status, msg, payload, meta]
 
+.
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -1807,6 +1835,7 @@ Arguments ('*' denotes required arguments):
 =item * B<start_date> => I<str>
 
 =item * B<year> => I<int>
+
 
 =back
 
@@ -1873,7 +1902,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

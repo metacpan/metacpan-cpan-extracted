@@ -1,22 +1,22 @@
 <&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 1, class_name => 'MemberOfGroup', &>
-<p>This filter selects eligible owners by their group membership. Only members of the following group will be automatically assigned tickets.</p>
+<p><&|/l&>This filter selects eligible owners by their group membership. Only members of the following group will be automatically assigned tickets.</&></p>
 
 % if ($groups->Count) {
-<table>
-<tr>
-<td class="label"><label for="<% $prefix %>_group">Group:</label></td>
-<td class="value">
-<select id="<% $prefix %>_group" name="<% $prefix %>_group">
-<option value="">-</option>
-% while (my $group = $groups->Next) {
-<option <% ($config->{group}||0) == $group->Id ? "selected" : "" %> value="<% $group->Id %>"><% $group->Name %></option>
-% }
-</select>
-</td>
-</tr>
-</table>
+<div class="form-row">
+  <div class="col-3 label">
+    <&|/l&>Group</&>:
+  </div>
+  <div class="col-9 value">
+    <select id="<% $prefix %>_group" name="<% $prefix %>_group" class="form-control selectpicker">
+      <option value="">-</option>
+%   while (my $group = $groups->Next) {
+      <option <% ($config->{group}||0) == $group->Id ? "selected" : "" %> value="<% $group->Id %>"><% $group->Name %></option>
+%   }
+    </select>
+  </div>
+</div>
 % } else {
-<p>No groups found.</p>
+<p><&|/l&>No groups found.</&></p>
 % }
 </&>
 <%INIT>

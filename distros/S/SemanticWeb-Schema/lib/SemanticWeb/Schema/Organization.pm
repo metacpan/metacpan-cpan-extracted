@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has actionable_feedback_policy => (
@@ -282,6 +282,14 @@ has has_pos => (
 
 
 
+has has_product_return_policy => (
+    is        => 'rw',
+    predicate => '_has_has_product_return_policy',
+    json_ld   => 'hasProductReturnPolicy',
+);
+
+
+
 has interaction_statistic => (
     is        => 'rw',
     predicate => '_has_interaction_statistic',
@@ -538,7 +546,7 @@ SemanticWeb::Schema::Organization - An organization such as a school
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -1173,6 +1181,24 @@ A has_pos should be one of the following types:
 =head2 C<_has_has_pos>
 
 A predicate for the L</has_pos> attribute.
+
+=head2 C<has_product_return_policy>
+
+C<hasProductReturnPolicy>
+
+Indicates a ProductReturnPolicy that may be applicable.
+
+A has_product_return_policy should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::ProductReturnPolicy']>
+
+=back
+
+=head2 C<_has_has_product_return_policy>
+
+A predicate for the L</has_product_return_policy> attribute.
 
 =head2 C<interaction_statistic>
 

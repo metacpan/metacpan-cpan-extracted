@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 requires qw/ log_stats /;
 
-our $VERSION = 'v0.7.1';
+our $VERSION = 'v0.7.2';
 
 
 sub statsd_client {
@@ -99,7 +99,7 @@ Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.7.1
+version v0.7.2
 
 =head1 SYNOPSIS
 

@@ -1,21 +1,21 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A created collection of Creative Works or other artefacts.",
+      "rdfs:comment" : "A collection of items e.g. creative works or products.",
       "rdfs:label" : "Collection",
       "rdfs:subClassOf" : "schema:CreativeWork",
       "schema:isPartOf" : "http:bib.schema.org"
    },
    "properties" : {
       "schema:collectionSize" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1759",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of items in the <a class=\"localLink\" href=\"http://schema.org/Collection\">Collection</a>.",
          "rdfs:label" : "collectionSize",
          "schema:category" : "issue-1759",
          "schema:domainIncludes" : "schema:Collection",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Integer"
+         "schema:rangeIncludes" : "schema:Integer",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1759"
       }
    }
 }

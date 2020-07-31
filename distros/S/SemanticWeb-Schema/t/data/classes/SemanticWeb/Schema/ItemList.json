@@ -12,9 +12,9 @@
          "rdfs:label" : "itemListElement",
          "schema:domainIncludes" : "schema:ItemList",
          "schema:rangeIncludes" : [
+            "schema:Text",
             "schema:Thing",
-            "schema:ListItem",
-            "schema:Text"
+            "schema:ListItem"
          ]
       },
       "schema:itemListOrder" : {

@@ -48,7 +48,7 @@ distribution.
 =cut
 
 package CLIPSeqTools::App::reads_long_gaps_size_distribution;
-$CLIPSeqTools::App::reads_long_gaps_size_distribution::VERSION = '0.1.9';
+$CLIPSeqTools::App::reads_long_gaps_size_distribution::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

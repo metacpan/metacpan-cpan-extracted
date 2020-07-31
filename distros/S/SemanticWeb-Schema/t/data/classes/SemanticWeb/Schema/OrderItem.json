@@ -42,13 +42,13 @@
          "rdfs:comment" : "The item ordered.",
          "rdfs:label" : "orderedItem",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:OrderItem"
+            "schema:OrderItem",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:Service",
+            "schema:Product",
             "schema:OrderItem",
-            "schema:Product"
+            "schema:Service"
          ]
       }
    }

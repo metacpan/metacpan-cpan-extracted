@@ -3,6 +3,7 @@ cpanfile
 lib/OpenTracing/Implementation/Interface/Bootstrap.pm
 lib/OpenTracing/Implementation/Interface/Bootstrap.pod
 lib/OpenTracing/Implementation.pm
+lib/OpenTracing/Implementation.pod
 LICENSE.md
 Makefile.PL
 MANIFEST

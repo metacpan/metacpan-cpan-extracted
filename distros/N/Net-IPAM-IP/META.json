@@ -4,13 +4,13 @@
       "Karl Gaissmaier <karl.gaissmaier(at)uni-ulm.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Net-IPAM-IP",
    "prereqs" : {
@@ -36,13 +36,13 @@
    "provides" : {
       "Net::IPAM::IP" : {
          "file" : "lib/Net/IPAM/IP.pm",
-         "version" : "1.23"
+         "version" : "1.24"
       },
       "Net::IPAM::Util" : {
          "file" : "lib/Net/IPAM/Util.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "1.23",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.24",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

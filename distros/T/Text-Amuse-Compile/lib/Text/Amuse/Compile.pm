@@ -32,11 +32,11 @@ Text::Amuse::Compile - Compiler for Text::Amuse
 
 =head1 VERSION
 
-Version 1.46
+Version 1.50
 
 =cut
 
-our $VERSION = '1.46';
+our $VERSION = '1.50';
 
 =head1 SYNOPSIS
 
@@ -176,6 +176,10 @@ When compiling a virtual file (a collection) the option is ignored,
 because L<Text::Amuse::Compile::Merged> C<wants_toc> always returns
 true.
 
+=item include_paths
+
+Arrayref of absolute paths to look into for included files.
+
 =item extra
 
 In the constructor arguments, a shallow copy will be stored in
@@ -233,6 +237,18 @@ has webfonts  => (is => 'lazy', isa => Maybe[Object]);
 has fontspec => (is => 'ro');
 has fonts => (is => 'lazy', isa => InstanceOf['Text::Amuse::Compile::Fonts::Selected']);
 has epub_embed_fonts => (is => 'ro', isa => Bool, default => sub { 1 });
+
+has include_paths => (is => 'ro',
+                      default => sub { return [] },
+                      isa => sub {
+                          die "include_paths must be an arrayref" unless ref($_[0]) eq 'ARRAY';
+                          foreach my $path (@{$_[0]}) {
+                              die "include_paths must be defined" unless defined $path;
+                              die "include_paths $path is empty" unless length($path);
+                              die "include_paths $path must be absolute" unless File::Spec->file_name_is_absolute($path);
+                              die "include_paths $path must exist" unless -d $path;
+                          }
+                      });
 
 sub _build_fonts {
     my $self = shift;
@@ -584,7 +600,9 @@ sub _compile_virtual_file {
     my $name =   delete($virtual{name})   || 'virtual';
     $self->logger->("Working on virtual file in " . getcwd(). "\n");
     my @filelist = map { Text::Amuse::Compile::FileName->new($_) } @$files;
-    my $doc = Text::Amuse::Compile::Merged->new(files => \@filelist, %virtual);
+    my $doc = Text::Amuse::Compile::Merged->new(files => \@filelist,
+                                                include_paths => [ @{$self->include_paths} ],
+                                                %virtual);
     my $muse = Text::Amuse::Compile::File->new(
                                                name => $name,
                                                suffix => $suffix,
@@ -598,6 +616,7 @@ sub _compile_virtual_file {
                                                webfonts => $self->webfonts,
                                                fonts => $self->fonts,
                                                epub_embed_fonts => $self->epub_embed_fonts,
+                                               include_paths => [ @{$self->include_paths} ],
                                               );
     $self->_muse_compile($muse);
 }
@@ -628,6 +647,7 @@ sub _compile_file {
                 luatex => $self->luatex,
                 fileobj => $fileobj,
                 coverpage_only_if_toc => $self->coverpage_only_if_toc,
+                include_paths => [ @{$self->include_paths} ],
                );
 
     my $muse = Text::Amuse::Compile::File->new(%args);
@@ -835,6 +855,12 @@ format), luatexbase, luaotfload.
 
 The luatex option could give better microtypography results but is
 slower (x4) and requires more memory (x2).
+
+=head1 INTERNAL CONSTANTS
+
+=head2 DEBUG
+
+Set from AMW_DEBUG environment.
 
 =head1 AUTHOR
 

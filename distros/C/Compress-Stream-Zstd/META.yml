@@ -28,7 +28,7 @@ no_index:
 provides:
   Compress::Stream::Zstd:
     file: lib/Compress/Stream/Zstd.pm
-    version: '0.201'
+    version: '0.202'
   Compress::Stream::Zstd::CompressionContext:
     file: lib/Compress/Stream/Zstd/CompressionContext.pm
   Compress::Stream::Zstd::CompressionDictionary:
@@ -48,10 +48,11 @@ resources:
   bugtracker: https://github.com/pmqs/Compress-Stream-Zstd/issues
   homepage: https://github.com/pmqs/Compress-Stream-Zstd
   repository: git://github.com/pmqs/Compress-Stream-Zstd.git
-version: '0.201'
+version: '0.202'
 x_contributors:
   - 'Jiro Nishiguchi <jiro@cpan.org>'
   - 'Jiro Nishiguchi <spiritloose@users.noreply.github.com>'
+  - 'Paul Marquess <pmqs@outlook.com>'
   - 'pmqs <pmqs@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

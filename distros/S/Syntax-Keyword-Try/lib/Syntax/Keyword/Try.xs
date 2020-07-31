@@ -421,7 +421,8 @@ static OP *MY_newENTERTRYCATCHOP(pTHX_ OP *try, OP *catch)
 static XOP xop_isa;
 
 /* Totally stolen from perl 5.32.0's pp.c */
-static bool sv_isa_sv(SV *sv, SV *namesv)
+#define sv_isa_sv(sv, namesv)  S_sv_isa_sv(aTHX_ sv, namesv)
+static bool S_sv_isa_sv(pTHX_ SV *sv, SV *namesv)
 {
   if(!SvROK(sv) || !SvOBJECT(SvRV(sv)))
     return FALSE;
@@ -502,9 +503,9 @@ static int try_keyword(pTHX_ OP **op)
       lex_read_space(0);
       catchvar = parse_lexvar();
 
-      /* $var = $@ */
+      /* my $var = $@ */
       assignop = newBINOP(OP_SASSIGN, 0,
-        newGVOP(OP_GVSV, 0, PL_errgv), newPADxVOP(OP_PADSV, catchvar, 0, 0));
+        newGVOP(OP_GVSV, 0, PL_errgv), newPADxVOP(OP_PADSV, catchvar, OPf_MOD, OPpLVAL_INTRO));
 
       lex_read_space(0);
       if(lex_consume("isa")) {

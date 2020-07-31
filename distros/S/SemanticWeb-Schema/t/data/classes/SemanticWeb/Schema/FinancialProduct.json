@@ -1,25 +1,24 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:FIBO",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A product provided to consumers and businesses by financial institutions such as banks, insurance companies, brokerage firms, consumer finance companies, and investment companies which comprise the financial services industry.",
       "rdfs:label" : "FinancialProduct",
-      "rdfs:subClassOf" : "schema:Service"
+      "rdfs:subClassOf" : "schema:Service",
+      "schema:source" : "schemadotorgsources:FIBO"
    },
    "properties" : {
       "schema:annualPercentageRate" : {
-         "dc:source" : "schemadotorgsources:FIBO",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The annual rate that is charged for borrowing (or made by investing), expressed as a single percentage number that represents the actual yearly cost of funds over the term of a loan. This includes any fees or additional costs associated with the transaction.",
          "rdfs:label" : "annualPercentageRate",
          "schema:domainIncludes" : "schema:FinancialProduct",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
-         ]
+            "schema:Number",
+            "schema:QuantitativeValue"
+         ],
+         "schema:source" : "schemadotorgsources:FIBO"
       },
       "schema:feesAndCommissionsSpecification" : {
-         "dc:source" : "schemadotorgsources:FIBO",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Description of fees, commissions, and other terms applied either to a class of financial product, or by a financial service organization.",
          "rdfs:label" : "feesAndCommissionsSpecification",
@@ -28,12 +27,12 @@
             "schema:FinancialService"
          ],
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
-         ]
+            "schema:URL",
+            "schema:Text"
+         ],
+         "schema:source" : "schemadotorgsources:FIBO"
       },
       "schema:interestRate" : {
-         "dc:source" : "schemadotorgsources:FIBO",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The interest rate, charged or paid, applicable to the financial product. Note: This is different from the calculated annualPercentageRate.",
          "rdfs:label" : "interestRate",
@@ -41,7 +40,8 @@
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
             "schema:Number"
-         ]
+         ],
+         "schema:source" : "schemadotorgsources:FIBO"
       }
    }
 }

@@ -1,7 +1,7 @@
 ---
 abstract: 'Latex driver'
 author:
-  - 'Andrew Ford <a.ford@ford-mason.co.uk>'
+  - 'Chris Travers <chris.travers@gmail.com>  (current maintainer)'
 build_requires:
   ExtUtils::MakeMaker: 6.59
   Test::More: '0.88'
@@ -36,4 +36,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Template-Toolkit-Latex/LaTeX-Driver.git
-version: 1.0.0
+version: 1.1.1

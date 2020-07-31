@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware;
 use strict;
 use warnings;
 
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 
 use base qw(CPANPLUS::Dist::Base);
 
@@ -720,7 +720,7 @@ CPANPLUS::Dist::Slackware - Install Perl distributions on Slackware Linux
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware version 1.027.
+This document describes CPANPLUS::Dist::Slackware version 1.028.
 
 =head1 SYNOPSIS
 
@@ -1040,10 +1040,10 @@ The lowest supported Module::Build version is 0.36.
 
 The required modules Cwd, ExtUtils::Packlist, File::Find, File::Spec,
 File::Temp, IO::Compress::Gzip, IPC:Cmd, Locale::Maketext::Simple,
-Module::CoreList 2.32, Params::Check, Pod::Find, Pod::Simple, POSIX,
-Text::Wrap and version 0.77 are distributed with Perl 5.12.3 and above.
+Module::CoreList 2.32, Params::Check, POSIX, Text::Wrap and version 0.77 are
+distributed with Perl 5.12.3 and above.
 
-If available, the module Parse::CPAN::Meta is used.
+If available, the modules Parse::CPAN::Meta, Pod::Find and Pod::Simple are used.
 
 =head1 INCOMPATIBILITIES
 
@@ -1071,7 +1071,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2018 Andreas Voegele
+Copyright 2012-2020 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

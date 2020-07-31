@@ -1,9 +1,9 @@
 package Perinci::CmdLine::Gen;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-01'; # DATE
+our $DATE = '2020-07-31'; # DATE
 our $DIST = 'Perinci-CmdLine-Gen'; # DIST
-our $VERSION = '0.496'; # VERSION
+our $VERSION = '0.497'; # VERSION
 
 use 5.010001;
 use strict;
@@ -303,6 +303,16 @@ _
         copt_help_getopt => {
             schema => 'str*',
         },
+        copt_naked_res_enable => {
+            schema => 'bool*',
+            default => 1,
+        },
+        copt_naked_res_getopt => {
+            schema => 'str*',
+        },
+        copt_naked_res_default => {
+            schema => 'bool*',
+        },
     },
 };
 sub gen_pericmd_script {
@@ -316,8 +326,9 @@ sub gen_pericmd_script {
     $args{prefer_lite} //= 1;
     $args{ssl_verify_hostname} //= 1;
     $args{pod} //= 1;
-    $args{copt_version_enable} //= 1;
-    $args{copt_help_enable}    //= 1;
+    $args{copt_version_enable}    //= 1;
+    $args{copt_help_enable}       //= 1;
+    $args{copt_naked_res_enable}  //= 1;
 
     my $output_file = $args{output_file};
 
@@ -439,6 +450,7 @@ sub gen_pericmd_script {
             (pack_deps => $args{pack_deps}) x !!(defined $args{pack_deps}),
             (validate_args => $args{validate_args}) x !!(defined $args{validate_args}),
             (pod => $args{pod}) x !!(defined $args{pod}),
+            # XXX copt_* not yet observed
         );
         return $res if $res->[0] != 200;
         $code = $res->[2];
@@ -520,6 +532,11 @@ sub gen_pericmd_script {
             (!$args{copt_help_enable} ? "delete \$cmdline->{common_opts}{help};\n\n" :
                  defined($args{copt_help_getopt}) ? "\$cmdline->{common_opts}{help}{getopt} = ".dump($args{copt_help_getopt}).";\n\n" : ""),
 
+            (!$args{copt_naked_res_enable} ? "delete \$cmdline->{common_opts}{naked_res};\n\n" : (
+                (defined($args{copt_naked_res_getopt})  ? "\$cmdline->{common_opts}{naked_res}{getopt}  = ".dump($args{copt_naked_res_getopt}).";\n\n" : ""),
+                (defined($args{copt_naked_res_default}) ? "\$cmdline->{common_opts}{naked_res}{default} = ".dump($args{copt_naked_res_default}).";\n\n" : ""),
+            )),
+
             "\$cmdline->run;\n",
             "\n",
         );
@@ -594,7 +611,7 @@ Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.496 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2020-04-01.
+This document describes version 0.497 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2020-07-31.
 
 =head1 FUNCTIONS
 
@@ -646,6 +663,12 @@ Will be passed to Perinci::CmdLine constructor.
 =item * B<copt_help_enable> => I<bool> (default: 1)
 
 =item * B<copt_help_getopt> => I<str>
+
+=item * B<copt_naked_res_default> => I<bool>
+
+=item * B<copt_naked_res_enable> => I<bool> (default: 1)
+
+=item * B<copt_naked_res_getopt> => I<str>
 
 =item * B<copt_version_enable> => I<bool> (default: 1)
 
@@ -866,6 +889,12 @@ Will be passed to Perinci::CmdLine constructor.
 =item * B<copt_help_enable> => I<bool> (default: 1)
 
 =item * B<copt_help_getopt> => I<str>
+
+=item * B<copt_naked_res_default> => I<bool>
+
+=item * B<copt_naked_res_enable> => I<bool> (default: 1)
+
+=item * B<copt_naked_res_getopt> => I<str>
 
 =item * B<copt_version_enable> => I<bool> (default: 1)
 

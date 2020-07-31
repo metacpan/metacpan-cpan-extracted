@@ -11,7 +11,7 @@ use Const::Fast ();
 use Keyword::Simple 0.04;
 use Text::Balanced ();
 
-our $VERSION = 'v0.2.6';
+our $VERSION = 'v0.2.7';
 
 
 sub import {
@@ -90,7 +90,7 @@ PerlX::Let - Syntactic sugar for lexical state constants
 
 =head1 VERSION
 
-version v0.2.6
+version v0.2.7
 
 =head1 SYNOPSIS
 
@@ -198,7 +198,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Robert Rothenberg.
+This software is Copyright (c) 2019-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

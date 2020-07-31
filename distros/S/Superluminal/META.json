@@ -1,0 +1,50 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Superluminal",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Canary::Stability" : "0",
+            "ExtUtils::MakeMaker" : "6.6"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.18",
+            "common::sense" : "3.75"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.01,
+   "x_preqreqs" : {
+      "runtime" : {
+         "recommends" : {
+            "Coro" : 6
+         }
+      }
+   }
+}

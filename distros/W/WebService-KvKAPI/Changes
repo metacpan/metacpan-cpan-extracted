@@ -1,5 +1,9 @@
 Revision history for Webservice-KvKAPI
 
+0.009     2020-07-28 12:41:12Z
+
+    * Add rsin search support to CLI client
+
 0.008     2020-05-22 20:33:10Z
 
     * Automaticly fix kvk and branch number syntax. Easier when using

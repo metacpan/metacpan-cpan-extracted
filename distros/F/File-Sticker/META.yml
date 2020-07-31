@@ -1,0 +1,51 @@
+---
+abstract: 'Read, Write file meta-data'
+author:
+  - 'Kathryn Andersen <perlkat@katspace.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Sticker
+requires:
+  Carp: '0'
+  DBI: '0'
+  File::Basename: '0'
+  File::ExtAttr: '0'
+  File::LibMagic: '0'
+  File::Spec: '0'
+  Getopt::ArgvFile: '0'
+  Getopt::Long: '0'
+  Hash::Merge: '0'
+  Image::ExifTool: '0'
+  MP3::Tag: '0'
+  Module::Pluggable: '0'
+  POSIX: '0'
+  Path::Tiny: '0'
+  Pod::Usage: '0'
+  Search::Query: '0'
+  String::CamelCase: '0'
+  YAML::Any: '0'
+  common::sense: '0'
+  parent: '0'
+resources:
+  homepage: https://github.com/rubykat/File-Sticker
+  repository: https://github.com/rubykat/File-Sticker.git
+version: '0.9301'
+x_generated_by_perl: v5.30.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

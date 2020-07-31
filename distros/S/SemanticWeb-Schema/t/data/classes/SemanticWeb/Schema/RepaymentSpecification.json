@@ -1,22 +1,18 @@
 {
    "class" : {
-      "dc:source" : [
-         "https://github.com/schemaorg/schemaorg/issues/1253",
-         "schemadotorgsources:FIBO"
-      ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A structured value representing repayment.",
       "rdfs:label" : "RepaymentSpecification",
       "rdfs:subClassOf" : "schema:StructuredValue",
       "schema:category" : "issue-1253",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : [
+         "https://github.com/schemaorg/schemaorg/issues/1253",
+         "schemadotorgsources:FIBO"
+      ]
    },
    "properties" : {
       "schema:downPayment" : {
-         "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "a type of payment made in cash during the onset of the purchase of an expensive good/service. The payment typically represents only a percentage of the full purchase price.",
          "rdfs:label" : "downPayment",
@@ -24,61 +20,65 @@
          "schema:domainIncludes" : "schema:RepaymentSpecification",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:Number"
+            "schema:Number",
+            "schema:MonetaryAmount"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ]
       },
       "schema:earlyPrepaymentPenalty" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount to be paid as a penalty in the event of early payment of the loan.",
          "rdfs:label" : "earlyPrepaymentPenalty",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : "schema:RepaymentSpecification",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:MonetaryAmount"
-      },
-      "schema:loanPaymentAmount" : {
-         "dc:source" : [
+         "schema:rangeIncludes" : "schema:MonetaryAmount",
+         "schema:source" : [
             "schemadotorgsources:FIBO",
             "https://github.com/schemaorg/schemaorg/issues/1253"
-         ],
+         ]
+      },
+      "schema:loanPaymentAmount" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money to pay in a single payment.",
          "rdfs:label" : "loanPaymentAmount",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : "schema:RepaymentSpecification",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:MonetaryAmount"
+         "schema:rangeIncludes" : "schema:MonetaryAmount",
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
+         ]
       },
       "schema:loanPaymentFrequency" : {
-         "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Frequency of payments due, i.e. number of months between payments. This is defined as a frequency, i.e. the reciprocal of a period of time.",
          "rdfs:label" : "loanPaymentFrequency",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : "schema:RepaymentSpecification",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Number"
-      },
-      "schema:numberOfLoanPayments" : {
-         "dc:source" : [
+         "schema:rangeIncludes" : "schema:Number",
+         "schema:source" : [
             "schemadotorgsources:FIBO",
             "https://github.com/schemaorg/schemaorg/issues/1253"
-         ],
+         ]
+      },
+      "schema:numberOfLoanPayments" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of payments contractually required at origination to repay the loan. For monthly paying loans this is the number of months from the contractual first payment date to the maturity date.",
          "rdfs:label" : "numberOfLoanPayments",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : "schema:RepaymentSpecification",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Number"
+         "schema:rangeIncludes" : "schema:Number",
+         "schema:source" : [
+            "schemadotorgsources:FIBO",
+            "https://github.com/schemaorg/schemaorg/issues/1253"
+         ]
       }
    }
 }

@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.029 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2020-05-29.
+    This document describes version 0.030 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2020-07-30.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -77,6 +77,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -93,10 +100,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -143,6 +165,13 @@ FUNCTIONS
 
         Put the new field before specified field.
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   eval* => *str|code*
 
         Perl code to do munging.
@@ -167,10 +196,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -194,6 +238,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -210,10 +261,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     *   with_data_rows => *bool*
 
@@ -271,6 +337,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filenames* => *array[filename]*
 
         Input CSV files.
@@ -287,10 +360,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -314,6 +402,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -330,14 +425,29 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
     *   row_number => *int* (default: 2)
 
         Row number (e.g. 2 for first data row).
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
 
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -361,6 +471,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   fields* => *array[str]*
 
         Field names.
@@ -381,10 +498,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -408,6 +540,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -428,10 +567,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -467,6 +621,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   eval* => *str|code*
 
         Perl code.
@@ -491,10 +652,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -543,6 +719,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   eval* => *str|code*
 
         Perl code.
@@ -567,10 +750,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -594,6 +792,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -610,10 +815,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -637,6 +857,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -653,10 +880,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -711,6 +953,13 @@ FUNCTIONS
 
         Do not output rows, just report the number of rows filled.
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   fill_fields* => *str*
 
     *   header => *bool* (default: 1)
@@ -727,6 +976,18 @@ FUNCTIONS
 
     *   lookup_fields* => *str*
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   source* => *filename*
 
         CSV file to lookup values from.
@@ -739,6 +1000,9 @@ FUNCTIONS
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -788,6 +1052,13 @@ FUNCTIONS
 
         Whether to make sure each string ends with newline.
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   eval* => *str|code*
 
         Perl code.
@@ -812,10 +1083,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -846,6 +1132,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   eval* => *str|code*
 
         Perl code to do munging.
@@ -870,10 +1163,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -904,6 +1212,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -920,10 +1235,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     *   with => *str* (default: " ")
 
@@ -949,6 +1279,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   field_pat => *re*
 
         Field regex pattern to select.
@@ -973,10 +1310,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -1000,6 +1352,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -1016,15 +1375,30 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
     *   row_spec* => *str*
 
         Row number (e.g. 2 for first data row), range (2-7), or
         comma-separated list of such (2-7,10,20-23).
 
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -1097,8 +1471,8 @@ FUNCTIONS
      7,8,9
 
     Each field specified in "--compare-fields" can be specified using
-    "F1:F2:..." format to refer to different field names or indexes in each
-    file, for example if "file3.csv" is:
+    "F1:OTHER1,F2:OTHER2,..." format to refer to different field names or
+    indexes in each file, for example if "file3.csv" is:
 
      # file3.csv
      Ei,Si,Bi
@@ -1122,6 +1496,13 @@ FUNCTIONS
 
     *   compare_fields => *str*
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filenames* => *array[filename]*
 
         Input CSV files.
@@ -1144,12 +1525,27 @@ FUNCTIONS
 
         Set operation to perform.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
     *   result_fields => *str*
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
 
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -1190,6 +1586,13 @@ FUNCTIONS
 
     *   ci => *bool*
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   example => *str*
 
         A comma-separated list of field names.
@@ -1210,12 +1613,27 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
     *   reverse => *bool*
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
 
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -1345,6 +1763,13 @@ FUNCTIONS
 
     *   ci => *bool*
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -1376,7 +1801,19 @@ FUNCTIONS
 
         The code will receive the row as the argument.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
     *   reverse => *bool*
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
 
     *   sortsub_args => *hash*
 
@@ -1386,6 +1823,9 @@ FUNCTIONS
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -1419,6 +1859,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -1437,10 +1884,25 @@ FUNCTIONS
 
     *   lines => *uint* (default: 1000)
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     Returns an enveloped result (an array).
 
@@ -1464,6 +1926,13 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   escape_char => *str*
+
+        Specify character to escape value in field, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
     *   filename* => *filename*
 
         Input CSV file.
@@ -1480,10 +1949,25 @@ FUNCTIONS
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
 
+    *   quote_char => *str*
+
+        Specify field quote character, will be passed to Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character, will be passed to Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
         CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
 
     *   with_data_rows => *bool*
 
@@ -1533,14 +2017,6 @@ SEE ALSO
     App::LTSVUtils
 
     App::SerializeUtils
-
-    setop.
-
-    csvgrep.
-
-    csv-split.
-
-    csv-select-row.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

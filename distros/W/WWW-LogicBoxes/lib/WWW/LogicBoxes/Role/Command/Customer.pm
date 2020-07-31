@@ -15,7 +15,7 @@ use Carp;
 
 requires 'submit';
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: Customer API Calls
 
 sub create_customer {

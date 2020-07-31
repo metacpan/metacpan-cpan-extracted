@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:FundInfoCollab",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An enterprise (potentially individual but typically collaborative), planned to achieve a particular aim.\nUse properties from <a class=\"localLink\" href=\"http://schema.org/Organization\">Organization</a>, <a class=\"localLink\" href=\"http://schema.org/subOrganization\">subOrganization</a>/<a class=\"localLink\" href=\"http://schema.org/parentOrganization\">parentOrganization</a> to indicate project sub-structures.",
       "rdfs:label" : "Project",
       "rdfs:subClassOf" : "schema:Organization",
       "schema:category" : "issue-383",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "schemadotorgsources2:FundInfoCollab"
    },
    "properties" : {}
 }

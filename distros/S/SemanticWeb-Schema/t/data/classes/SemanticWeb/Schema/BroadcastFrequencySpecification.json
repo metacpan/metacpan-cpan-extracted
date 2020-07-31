@@ -1,27 +1,26 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The frequency in MHz and the modulation used for a particular BroadcastService.",
       "rdfs:label" : "BroadcastFrequencySpecification",
       "rdfs:subClassOf" : "schema:Intangible",
-      "schema:category" : "issue-1004"
+      "schema:category" : "issue-1004",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1004"
    },
    "properties" : {
       "schema:broadcastFrequencyValue" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The frequency in MHz for a particular broadcast.",
          "rdfs:label" : "broadcastFrequencyValue",
          "schema:category" : "issue-1004",
          "schema:domainIncludes" : "schema:BroadcastFrequencySpecification",
          "schema:rangeIncludes" : [
-            "schema:QuantitativeValue",
-            "schema:Number"
-         ]
+            "schema:Number",
+            "schema:QuantitativeValue"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1004"
       },
       "schema:broadcastSignalModulation" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2111",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The modulation (e.g. FM, AM, etc) used by a particular broadcast service",
          "rdfs:label" : "broadcastSignalModulation",
@@ -31,17 +30,18 @@
          "schema:rangeIncludes" : [
             "schema:Text",
             "schema:QualitativeValue"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2111"
       },
       "schema:broadcastSubChannel" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2111",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The subchannel used for the broadcast.",
          "rdfs:label" : "broadcastSubChannel",
          "schema:category" : "issue-2111",
          "schema:domainIncludes" : "schema:BroadcastFrequencySpecification",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2111"
       }
    }
 }

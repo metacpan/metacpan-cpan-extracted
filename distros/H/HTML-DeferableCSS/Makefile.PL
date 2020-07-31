@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "HTML::DeferableCSS",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Devel::StrictMode" => 0,
     "File::ShareDir" => "1.112",
     "List::Util" => "1.45",
@@ -34,6 +35,7 @@ my %WriteMakefileArgs = (
     "Types::Common::String" => 0,
     "Types::Path::Tiny" => 0,
     "Types::Standard" => 0,
+    "constant" => 0,
     "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
@@ -43,9 +45,11 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => 0,
     "Test::Deep" => "0.111",
     "Test::More" => 0,
-    "Test::Most" => 0
+    "Test::Most" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "v0.4.1",
+  "VERSION" => "v0.4.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +57,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Cwd" => 0,
   "Devel::StrictMode" => 0,
   "File::ShareDir" => "1.112",
@@ -70,7 +75,10 @@ my %FallbackPrereqs = (
   "Types::Common::String" => 0,
   "Types::Path::Tiny" => 0,
   "Types::Standard" => 0,
-  "namespace::autoclean" => 0
+  "constant" => 0,
+  "namespace::autoclean" => 0,
+  "strict" => 0,
+  "warnings" => 0
 );
 
 

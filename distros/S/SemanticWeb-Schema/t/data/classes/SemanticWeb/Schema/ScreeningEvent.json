@@ -7,22 +7,22 @@
    },
    "properties" : {
       "schema:subtitleLanguage" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2110",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Languages in which subtitles/captions are available, in <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard format</a>.",
          "rdfs:label" : "subtitleLanguage",
          "schema:category" : "issue-2110",
          "schema:domainIncludes" : [
             "schema:BroadcastEvent",
+            "schema:ScreeningEvent",
             "schema:TVEpisode",
-            "schema:Movie",
-            "schema:ScreeningEvent"
+            "schema:Movie"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Language"
-         ]
+            "schema:Language",
+            "schema:Text"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2110"
       },
       "schema:videoFormat" : {
          "rdf:type" : "rdf:Property",

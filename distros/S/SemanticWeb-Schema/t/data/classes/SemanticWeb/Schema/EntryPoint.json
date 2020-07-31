@@ -1,10 +1,10 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_ActionCollabClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An entry point, within some Web-based protocol.",
       "rdfs:label" : "EntryPoint",
-      "rdfs:subClassOf" : "schema:Intangible"
+      "rdfs:subClassOf" : "schema:Intangible",
+      "schema:source" : "schemadotorgsources:source_ActionCollabClass"
    },
    "properties" : {
       "schema:actionApplication" : {

@@ -57,6 +57,11 @@ t/header.t
 t/headings.t
 t/html-title.t
 t/html.t
+t/includes.t
+t/includes/file.conf
+t/includes/file.muse
+t/includes/main-2.muse
+t/includes/main.muse
 t/indexes.t
 t/langs.t
 t/leaks.t
@@ -124,6 +129,8 @@ t/testfile/html-title.muse
 t/testfile/index-me-1.expected
 t/testfile/index-me-1.muse
 t/testfile/index-me-2.muse
+t/testfile/index-me-3.expected
+t/testfile/index-me-3.muse
 t/testfile/index-me.muse
 t/testfile/invalid.muse
 t/testfile/options-2.muse

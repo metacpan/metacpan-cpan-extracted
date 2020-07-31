@@ -1,63 +1,62 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A program offered by an institution which determines the learning progress to achieve an outcome, usually a credential like a degree or certificate. This would define a discrete set of opportunities (e.g., job, courses) that together constitute a program with a clear start, end, set of requirements, and transition to a new occupational opportunity (e.g., a job), or sometimes a higher educational opportunity (e.g., an advanced degree).",
       "rdfs:label" : "EducationalOccupationalProgram",
       "rdfs:subClassOf" : "schema:Intangible",
       "schema:category" : "issue-2289",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
    },
    "properties" : {
       "schema:applicationDeadline" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date at which the program stops collecting applications for the next enrollment cycle.",
          "rdfs:label" : "applicationDeadline",
          "schema:category" : "issue-2419",
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Date"
+         "schema:rangeIncludes" : "schema:Date",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2419"
       },
       "schema:applicationStartDate" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date at which the program begins collecting applications for the next enrollment cycle.",
          "rdfs:label" : "applicationStartDate",
          "schema:category" : "issue-2419",
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Date"
+         "schema:rangeIncludes" : "schema:Date",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2419"
       },
       "schema:dayOfWeek" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The day of the week for which these opening hours are valid.",
          "rdfs:label" : "dayOfWeek",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:OpeningHoursSpecification"
+            "schema:OpeningHoursSpecification",
+            "schema:EducationalOccupationalProgram"
          ],
-         "schema:rangeIncludes" : "schema:DayOfWeek"
+         "schema:rangeIncludes" : "schema:DayOfWeek",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:educationalCredentialAwarded" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A description of the qualification, award, certificate, diploma or other educational credential awarded as a consequence of successful completion of this course or program.",
          "rdfs:label" : "educationalCredentialAwarded",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:EducationalOccupationalProgram",
-            "schema:Course"
+            "schema:Course",
+            "schema:EducationalOccupationalProgram"
          ],
          "schema:rangeIncludes" : [
             "schema:EducationalOccupationalCredential",
-            "schema:Text",
-            "schema:URL"
-         ]
+            "schema:URL",
+            "schema:Text"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
       },
       "schema:educationalProgramMode" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Similar to courseMode, The medium or means of delivery of the program as a whole. The value may either be a text label (e.g. \"online\", \"onsite\" or \"blended\"; \"synchronous\" or \"asynchronous\"; \"full-time\" or \"part-time\") or a URL reference to a term from a controlled vocabulary (e.g. https://ceds.ed.gov/element/001311#Asynchronous ).",
          "rdfs:label" : "educationalProgramMode",
@@ -65,32 +64,32 @@
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
-         ]
+            "schema:Text",
+            "schema:URL"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2419"
       },
       "schema:endDate" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2486",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The end date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeries",
-            "schema:Role",
+            "schema:Event",
             "schema:DatedMoneySpecification",
-            "schema:Schedule",
-            "schema:EducationalOccupationalProgram",
             "schema:CreativeWorkSeason",
-            "schema:Event"
+            "schema:Schedule",
+            "schema:Role",
+            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
             "schema:Date"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2486"
       },
       "schema:financialAidEligible" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2418",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A financial aid type or program which students may use to pay for tuition or fees associated with the program.",
          "rdfs:label" : "financialAidEligible",
@@ -100,64 +99,64 @@
          "schema:rangeIncludes" : [
             "schema:Text",
             "schema:DefinedTerm"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2418"
       },
       "schema:maximumEnrollment" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The maximum number of students who may be enrolled in the program.",
          "rdfs:label" : "maximumEnrollment",
          "schema:category" : "issue-2419",
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Integer"
+         "schema:rangeIncludes" : "schema:Integer",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2419"
       },
       "schema:numberOfCredits" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of credits or units awarded by a Course or required to complete an EducationalOccupationalProgram.",
          "rdfs:label" : "numberOfCredits",
          "schema:category" : "issue-2419",
          "schema:domainIncludes" : [
-            "schema:Course",
-            "schema:EducationalOccupationalProgram"
+            "schema:EducationalOccupationalProgram",
+            "schema:Course"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:StructuredValue",
-            "schema:Integer"
-         ]
+            "schema:Integer",
+            "schema:StructuredValue"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2419"
       },
       "schema:occupationalCategory" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/2289",
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/2192",
-            "https://github.com/schemaorg/schemaorg/issues/2460"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category describing the job, preferably using a term from a taxonomy such as <a href=\"http://www.onetcenter.org/taxonomy.html\">BLS O*NET-SOC</a>, <a href=\"https://www.ilo.org/public/english/bureau/stat/isco/isco08/\">ISCO-08</a> or similar, with the property repeated for each applicable value. Ideally the taxonomy should be identified, and both the textual label and formal code for the category should be provided.<br/><br/>\n\nNote: for historical reasons, any textual label and formal code provided as a literal may be assumed to be from O*NET-SOC.",
          "rdfs:label" : "occupationalCategory",
          "schema:category" : [
-            "issue-1698",
-            "issue-2460",
             "issue-2192",
-            "issue-2289"
+            "issue-2289",
+            "issue-1698",
+            "issue-2460"
          ],
          "schema:domainIncludes" : [
             "schema:WorkBasedProgram",
             "schema:EducationalOccupationalProgram",
-            "schema:Occupation",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:Occupation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:CategoryCode"
+            "schema:CategoryCode",
+            "schema:Text"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2460",
+            "https://github.com/schemaorg/schemaorg/issues/2289",
+            "https://github.com/schemaorg/schemaorg/issues/2192",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ]
       },
       "schema:occupationalCredentialAwarded" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A description of the qualification, award, certificate, diploma or other occupational credential awarded as a consequence of successful completion of this course or program.",
          "rdfs:label" : "occupationalCredentialAwarded",
@@ -171,32 +170,32 @@
             "schema:URL",
             "schema:Text",
             "schema:EducationalOccupationalCredential"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
       },
       "schema:offers" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use <a class=\"localLink\" href=\"http://schema.org/businessFunction\">businessFunction</a> to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a <a class=\"localLink\" href=\"http://schema.org/Demand\">Demand</a>. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer.",
          "rdfs:label" : "offers",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Product",
             "schema:MenuItem",
-            "schema:Service",
-            "schema:Trip",
-            "schema:Event",
-            "schema:AggregateOffer",
+            "schema:CreativeWork",
             "schema:EducationalOccupationalProgram",
-            "schema:CreativeWork"
+            "schema:Trip",
+            "schema:Product",
+            "schema:AggregateOffer",
+            "schema:Service",
+            "schema:Event"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
             "schema:Offer",
             "schema:Demand"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
       },
       "schema:programPrerequisites" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Prerequisites for enrolling in the program.",
          "rdfs:label" : "programPrerequisites",
@@ -204,14 +203,14 @@
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Course",
             "schema:AlignmentObject",
-            "schema:Text",
-            "schema:EducationalOccupationalCredential"
-         ]
+            "schema:Course",
+            "schema:EducationalOccupationalCredential",
+            "schema:Text"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
       },
       "schema:programType" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2460",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The type of educational or occupational program. For example, classroom, internship, alternance, etc..",
          "rdfs:label" : "programType",
@@ -219,121 +218,121 @@
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:DefinedTerm",
-            "schema:Text"
-         ]
+            "schema:Text",
+            "schema:DefinedTerm"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2460"
       },
       "schema:provider" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Reservation",
-            "schema:Service",
-            "schema:Trip",
             "schema:Invoice",
+            "schema:Service",
+            "schema:Reservation",
+            "schema:Trip",
             "schema:EducationalOccupationalProgram",
             "schema:CreativeWork",
             "schema:ParcelDelivery"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
-         ]
+            "schema:Person",
+            "schema:Organization"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
       },
       "schema:salaryUponCompletion" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The expected salary upon completing the training.",
          "rdfs:label" : "salaryUponCompletion",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:MonetaryAmountDistribution"
+         "schema:rangeIncludes" : "schema:MonetaryAmountDistribution",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
       },
       "schema:startDate" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2486",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "startDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
+            "schema:Role",
+            "schema:Schedule",
             "schema:CreativeWorkSeries",
             "schema:DatedMoneySpecification",
             "schema:EducationalOccupationalProgram",
-            "schema:CreativeWorkSeason",
             "schema:Event",
-            "schema:Role",
-            "schema:Schedule"
+            "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
-         ]
+            "schema:DateTime",
+            "schema:Date"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2486"
       },
       "schema:termDuration" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of time in a term as defined by the institution. A term is a length of time where students take one or more classes. Semesters and quarters are common units for term.",
          "rdfs:label" : "termDuration",
          "schema:category" : "issue-2419",
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Duration"
+         "schema:rangeIncludes" : "schema:Duration",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2419"
       },
       "schema:termsPerYear" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of times terms of study are offered per year. Semesters and quarters are common units for term. For example, if the student can only take 2 semesters for the program in one year, then termsPerYear should be 2.",
          "rdfs:label" : "termsPerYear",
          "schema:category" : "issue-2419",
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Number"
+         "schema:rangeIncludes" : "schema:Number",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2419"
       },
       "schema:timeOfDay" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The time of day the program normally runs. For example, \"evenings\".",
          "rdfs:label" : "timeOfDay",
          "schema:category" : "issue-2419",
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2419"
       },
       "schema:timeToComplete" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The expected length of time to complete the program if attending full-time.",
          "rdfs:label" : "timeToComplete",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Duration"
+         "schema:rangeIncludes" : "schema:Duration",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
       },
       "schema:trainingSalary" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/2460",
-            "https://github.com/schemaorg/schemaorg/issues/2289"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The estimated salary earned while in the program.",
          "rdfs:label" : "trainingSalary",
          "schema:category" : [
-            "issue-2289",
-            "issue-2460"
+            "issue-2460",
+            "issue-2289"
          ],
          "schema:domainIncludes" : [
-            "schema:WorkBasedProgram",
-            "schema:EducationalOccupationalProgram"
+            "schema:EducationalOccupationalProgram",
+            "schema:WorkBasedProgram"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:MonetaryAmountDistribution"
+         "schema:rangeIncludes" : "schema:MonetaryAmountDistribution",
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2289",
+            "https://github.com/schemaorg/schemaorg/issues/2460"
+         ]
       },
       "schema:typicalCreditsPerTerm" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2419",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of credits or units a full-time student would be expected to take in 1 term however 'term' is defined by the institution.",
          "rdfs:label" : "typicalCreditsPerTerm",
@@ -341,9 +340,10 @@
          "schema:domainIncludes" : "schema:EducationalOccupationalProgram",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:StructuredValue"
-         ]
+            "schema:StructuredValue",
+            "schema:Integer"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2419"
       }
    }
 }

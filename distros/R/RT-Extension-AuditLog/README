@@ -1,0 +1,55 @@
+NAME
+    RT-Extension-AuditLog - Log all RT access requests with username
+
+DESCRIPTION
+    In some environments, there are auditing requirements regarding access
+    to the data in tickets. Modifications are already well preserved in the
+    transaction history of a ticket, but read access is not tracked by
+    native RT facilities.
+
+    There is the webserver log, but that does not include the user-name in
+    all cases.
+
+RT VERSION
+    Works with RT [What versions of RT is this known to work with?]
+
+    [Make sure to use requires_rt and rt_too_new in Makefile.PL]
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make install
+        May need root permissions
+
+    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+        Add this line:
+
+            Plugin('RT::Extension::AuditLog');
+
+    Clear your mason cache
+            rm -rf /opt/rt4/var/mason_data/obj
+
+    Restart your webserver
+
+CONFIGURATION
+    This module is configures by setting the following options in the RT
+    configuration file (RT_SiteConfig.pm or a new file under
+    RT_SiteConfig.d):
+
+        Set($AuditLogToFileNamed, 'audit.log');
+        Set($AuditLogToSyslog, 'Audit');        # "ident" parameter to Log::Dispatch::Syslog
+
+AUTHOR
+    Otmar Lendl <lendl@cert.at>
+
+    All bugs should be reported via email to
+        bug-RT-Extension-AuditLog@rt.cpan.org
+    or via the web at
+        http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-AuditLog
+LICENSE AND COPYRIGHT
+    This software is Copyright (c) 2020 by nic.at GmbH
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

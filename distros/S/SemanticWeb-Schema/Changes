@@ -1,5 +1,9 @@
 Revision history for SemanticWeb-Schema:
 
+v9.0.0    2020-07-30 18:34:04+01:00 Europe/London
+  [Enhancements]
+  - Updated classes to Version 9.0 of the schema.
+
 v8.0.0    2020-05-13 10:42:45+01:00 Europe/London
   [Enhancements]
   - Updated classes to Version 8.0 of the schema.

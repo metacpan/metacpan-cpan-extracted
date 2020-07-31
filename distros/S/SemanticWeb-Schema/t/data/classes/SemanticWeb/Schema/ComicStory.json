@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "The term \"story\" is any indivisible, re-printable\n    unit of a comic, including the interior stories, covers, and backmatter. Most\n    comics have at least two stories: a cover (ComicCoverArt) and an interior story.",
+      "rdfs:comment" : "The term \"story\" is any indivisible, re-printable\n        unit of a comic, including the interior stories, covers, and backmatter. Most\n        comics have at least two stories: a cover (ComicCoverArt) and an interior story.",
       "rdfs:label" : "ComicStory",
       "rdfs:subClassOf" : "schema:CreativeWork",
       "schema:category" : "Comics",
@@ -10,13 +10,13 @@
    "properties" : {
       "schema:artist" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The primary artist for a work\n    in a medium other than pencils or digital line art--for example, if the\n    primary artwork is done in watercolors or digital paints.",
+         "rdfs:comment" : "The primary artist for a work\n        in a medium other than pencils or digital line art--for example, if the\n        primary artwork is done in watercolors or digital paints.",
          "rdfs:label" : "artist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
             "schema:ComicStory",
-            "schema:VisualArtwork"
+            "schema:VisualArtwork",
+            "schema:ComicIssue"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -27,9 +27,9 @@
          "rdfs:label" : "colorist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
+            "schema:VisualArtwork",
             "schema:ComicStory",
-            "schema:VisualArtwork"
+            "schema:ComicIssue"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -40,8 +40,8 @@
          "rdfs:label" : "inker",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
             "schema:VisualArtwork",
+            "schema:ComicIssue",
             "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",

@@ -11,7 +11,7 @@ use WWW::LogicBoxes::Types qw( Bool DateTime IRTPFOAStatus IRTPStatus Int Str );
 
 use DateTime;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: Detailed Information About An In Progress IRTP Verification
 
 has 'is_transfer_locked' => (

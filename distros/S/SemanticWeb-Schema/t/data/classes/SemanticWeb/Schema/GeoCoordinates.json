@@ -11,41 +11,41 @@
          "rdfs:comment" : "Physical address of the item.",
          "rdfs:label" : "address",
          "schema:domainIncludes" : [
-            "schema:GeoCoordinates",
-            "schema:Person",
-            "schema:Organization",
             "schema:Place",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:Organization",
+            "schema:GeoCoordinates",
+            "schema:Person"
          ],
          "schema:rangeIncludes" : [
-            "schema:PostalAddress",
-            "schema:Text"
+            "schema:Text",
+            "schema:PostalAddress"
          ]
       },
       "schema:addressCountry" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The country. For example, USA. You can also provide the two-letter <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1\">ISO 3166-1 alpha-2 country code</a>.",
          "rdfs:label" : "addressCountry",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
-            "schema:GeoCoordinates",
-            "schema:DefinedRegion",
             "schema:GeoShape",
+            "schema:DefinedRegion",
+            "schema:GeoCoordinates",
             "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : [
             "schema:Country",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:elevation" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The elevation of a location (<a href=\"https://en.wikipedia.org/wiki/World_Geodetic_System\">WGS 84</a>). Values may be of the form 'NUMBER UNIT<em>OF</em>MEASUREMENT' (e.g., '1,000 m', '3,200 ft') while numbers alone should be assumed to be a value in meters.",
          "rdfs:label" : "elevation",
          "schema:domainIncludes" : [
-            "schema:GeoCoordinates",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:GeoCoordinates"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -70,8 +70,8 @@
          "rdfs:comment" : "The longitude of a location. For example <code>-122.08585</code> (<a href=\"https://en.wikipedia.org/wiki/World_Geodetic_System\">WGS 84</a>).",
          "rdfs:label" : "longitude",
          "schema:domainIncludes" : [
-            "schema:Place",
-            "schema:GeoCoordinates"
+            "schema:GeoCoordinates",
+            "schema:Place"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
@@ -79,18 +79,18 @@
          ]
       },
       "schema:postalCode" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The postal code. For example, 94043.",
          "rdfs:label" : "postalCode",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
-            "schema:DefinedRegion",
-            "schema:PostalAddress",
             "schema:GeoShape",
-            "schema:GeoCoordinates"
+            "schema:PostalAddress",
+            "schema:GeoCoordinates",
+            "schema:DefinedRegion"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       }
    }
 }

@@ -4,7 +4,7 @@ PerlX::Let - Syntactic sugar for lexical state constants
 
 # VERSION
 
-version v0.2.6
+version v0.2.7
 
 # SYNOPSIS
 
@@ -124,7 +124,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Robert Rothenberg.
+This software is Copyright (c) 2019-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

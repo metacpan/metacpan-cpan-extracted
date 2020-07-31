@@ -1,98 +1,98 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:MBZ",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A musical composition.",
       "rdfs:label" : "MusicComposition",
-      "rdfs:subClassOf" : "schema:CreativeWork"
+      "rdfs:subClassOf" : "schema:CreativeWork",
+      "schema:source" : "schemadotorgsources:MBZ"
    },
    "properties" : {
       "schema:composer" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The person or organization who wrote a composition, or who is the composer of a work performed at some event.",
          "rdfs:label" : "composer",
          "schema:domainIncludes" : [
-            "schema:Event",
-            "schema:MusicComposition"
+            "schema:MusicComposition",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",
             "schema:Person"
-         ]
+         ],
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:firstPerformance" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date and place the work was first performed.",
          "rdfs:label" : "firstPerformance",
          "schema:domainIncludes" : "schema:MusicComposition",
-         "schema:rangeIncludes" : "schema:Event"
+         "schema:rangeIncludes" : "schema:Event",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:includedComposition" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Smaller compositions included in this work (e.g. a movement in a symphony).",
          "rdfs:label" : "includedComposition",
          "schema:domainIncludes" : "schema:MusicComposition",
-         "schema:rangeIncludes" : "schema:MusicComposition"
+         "schema:rangeIncludes" : "schema:MusicComposition",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:iswcCode" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Musical Work Code for the composition.",
          "rdfs:label" : "iswcCode",
          "schema:domainIncludes" : "schema:MusicComposition",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:lyricist" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The person who wrote the words.",
          "rdfs:label" : "lyricist",
          "schema:domainIncludes" : "schema:MusicComposition",
-         "schema:rangeIncludes" : "schema:Person"
+         "schema:rangeIncludes" : "schema:Person",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:lyrics" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The words in the song.",
          "rdfs:label" : "lyrics",
          "schema:domainIncludes" : "schema:MusicComposition",
-         "schema:rangeIncludes" : "schema:CreativeWork"
+         "schema:rangeIncludes" : "schema:CreativeWork",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:musicArrangement" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An arrangement derived from the composition.",
          "rdfs:label" : "musicArrangement",
          "schema:domainIncludes" : "schema:MusicComposition",
-         "schema:rangeIncludes" : "schema:MusicComposition"
+         "schema:rangeIncludes" : "schema:MusicComposition",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:musicCompositionForm" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The type of composition (e.g. overture, sonata, symphony, etc.).",
          "rdfs:label" : "musicCompositionForm",
          "schema:domainIncludes" : "schema:MusicComposition",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:musicalKey" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The key, mode, or scale this composition uses.",
          "rdfs:label" : "musicalKey",
          "schema:domainIncludes" : "schema:MusicComposition",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:recordedAs" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An audio recording of the work.",
          "rdfs:label" : "recordedAs",
          "schema:domainIncludes" : "schema:MusicComposition",
          "schema:inverseOf" : "schema:recordingOf",
-         "schema:rangeIncludes" : "schema:MusicRecording"
+         "schema:rangeIncludes" : "schema:MusicRecording",
+         "schema:source" : "schemadotorgsources:MBZ"
       }
    }
 }

@@ -1,5 +1,9 @@
 Revision history for Parallel-ForkManager-Segmented
 
+0.6.0       2020-07-30
+    - Add DESCRIPTION and SEE ALso to the POD.
+    - Use a better example in the SYNOPSIS.
+
 0.4.0       2020-07-27
     - Add the stream_cb option.
     - Convert weaver.ini to @SHLOMIF

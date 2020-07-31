@@ -26,40 +26,40 @@
          "rdfs:comment" : "An entity that arranges for an exchange between a buyer and a seller.  In most cases a broker never acquires or releases ownership of a product or service involved in an exchange.  If it is not clear whether an entity is a broker, seller, or buyer, the latter two terms are preferred.",
          "rdfs:label" : "broker",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Service",
             "schema:Reservation",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Service",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:category" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1741",
-            "https://github.com/schemaorg/schemaorg/issues/2490"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:Invoice",
-            "schema:Product",
             "schema:Recommendation",
-            "schema:ActionAccessSpecification",
             "schema:Offer",
+            "schema:Invoice",
+            "schema:PhysicalActivity",
             "schema:SpecialAnnouncement",
-            "schema:Service"
+            "schema:Service",
+            "schema:Product",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Thing",
             "schema:PhysicalActivityCategory",
-            "schema:Text"
+            "schema:Thing",
+            "schema:Text",
+            "schema:URL"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2490",
+            "https://github.com/schemaorg/schemaorg/issues/1741"
          ]
       },
       "schema:confirmationNumber" : {
@@ -68,8 +68,8 @@
          "rdfs:label" : "confirmationNumber",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -125,8 +125,8 @@
          "rdfs:comment" : "The name of the credit card or other method of payment for the order.",
          "rdfs:label" : "paymentMethod",
          "schema:domainIncludes" : [
-            "schema:Order",
-            "schema:Invoice"
+            "schema:Invoice",
+            "schema:Order"
          ],
          "schema:rangeIncludes" : "schema:PaymentMethod"
       },
@@ -135,8 +135,8 @@
          "rdfs:comment" : "An identifier for the method of payment used (e.g. the last 4 digits of the credit card).",
          "rdfs:label" : "paymentMethodId",
          "schema:domainIncludes" : [
-            "schema:Invoice",
-            "schema:Order"
+            "schema:Order",
+            "schema:Invoice"
          ],
          "schema:rangeIncludes" : "schema:Text"
       },
@@ -146,29 +146,29 @@
          "rdfs:label" : "paymentStatus",
          "schema:domainIncludes" : "schema:Invoice",
          "schema:rangeIncludes" : [
-            "schema:PaymentStatusType",
-            "schema:Text"
+            "schema:Text",
+            "schema:PaymentStatusType"
          ]
       },
       "schema:provider" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The service provider, service operator, or service performer; the goods producer. Another party (a seller) may offer those services or goods on behalf of the provider. A provider may also serve as the seller.",
          "rdfs:label" : "provider",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Reservation",
-            "schema:Service",
-            "schema:Trip",
             "schema:Invoice",
+            "schema:Service",
+            "schema:Reservation",
+            "schema:Trip",
             "schema:EducationalOccupationalProgram",
             "schema:CreativeWork",
             "schema:ParcelDelivery"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
-         ]
+            "schema:Person",
+            "schema:Organization"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
       },
       "schema:referencesOrder" : {
          "rdf:type" : "rdf:Property",
@@ -190,8 +190,8 @@
          "rdfs:label" : "totalPaymentDue",
          "schema:domainIncludes" : "schema:Invoice",
          "schema:rangeIncludes" : [
-            "schema:MonetaryAmount",
-            "schema:PriceSpecification"
+            "schema:PriceSpecification",
+            "schema:MonetaryAmount"
          ]
       }
    }

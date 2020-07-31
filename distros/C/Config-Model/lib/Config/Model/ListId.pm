@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ListId 2.139;
+package Config::Model::ListId 2.140;
 
 use 5.10.1;
 use Mouse;
@@ -462,7 +462,11 @@ sub remove {
     ) unless $idx =~ /^\d+$/;
 
     $self->delete_data_mode( index => $idx );
-    $self->notify_change(note => "removed idx $idx");
+    my $note = "removed idx $idx";
+    if ( $self->{cargo}{type} eq 'leaf' ) {
+        $note .= ' ("' . $self->fetch_summary($idx) . '")';
+    }
+    $self->notify_change(note => $note);
     splice @{ $self->{data} }, $idx, 1;
 }
 
@@ -546,7 +550,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.139
+version 2.140
 
 =head1 SYNOPSIS
 

@@ -18,7 +18,7 @@ use DateTime;
 use Carp;
 use Mozilla::PublicSuffix qw( public_suffix );
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: LogicBoxes Domain Representation
 
 has id => (

@@ -1,9 +1,9 @@
 package App::CSVUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-29'; # DATE
+our $DATE = '2020-07-30'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,7 +53,13 @@ sub _instantiate_parser {
     my $args = shift;
 
     my %tcsv_opts = (binary=>1);
-    if ($args->{tsv}) {
+    if (defined $args->{sep_char} ||
+            defined $args->{quote_char} ||
+            defined $args->{escape_char}) {
+        $tcsv_opts{sep_char}    = $args->{sep_char}    if defined $args->{sep_char};
+        $tcsv_opts{quote_char}  = $args->{quote_char}  if defined $args->{quote_char};
+        $tcsv_opts{escape_char} = $args->{escape_char} if defined $args->{escape_char};
+    } elsif ($args->{tsv}) {
         $tcsv_opts{sep_char}    = "\t";
         $tcsv_opts{quote_char}  = undef;
         $tcsv_opts{escape_char} = undef;
@@ -155,6 +161,39 @@ _
     tsv => {
         summary => "Inform that input file is in TSV (tab-separated) format instead of CSV",
         schema => 'bool*',
+        description => <<'_',
+
+Overriden by `--sep-char`, `--quote-char`, `--escape-char` options. If one of
+those options is specified, then `--tsv` will be ignored.
+
+_
+    },
+    sep_char => {
+        summary => 'Specify field separator character, will be passed to Text::CSV_XS',
+        schema => ['str*', len=>1],
+        description => <<'_',
+
+Defaults to `,` (comma). Overrides `--tsv` option.
+
+_
+    },
+    quote_char => {
+        summary => 'Specify field quote character, will be passed to Text::CSV_XS',
+        schema => ['str*', len=>1],
+        description => <<'_',
+
+Defaults to `"` (double quote). Overrides `--tsv` option.
+
+_
+    },
+    escape_char => {
+        summary => 'Specify character to escape value in field, will be passed to Text::CSV_XS',
+        schema => ['str*', len=>1],
+        description => <<'_',
+
+Defaults to `\\` (backslash). Overrides `--tsv` option.
+
+_
     },
 );
 
@@ -462,7 +501,7 @@ sub csvutil {
     my $i = 0;
     my $header_row_count = 0;
     my $data_row_count = 0;
-    my $fields;
+    my $fields = [];
     my %field_idxs;
 
     my $code;
@@ -1699,9 +1738,9 @@ example `--union --compare-fields a,b file1.csv file2.csv`:
     4,5,6
     7,8,9
 
-Each field specified in `--compare-fields` can be specified using `F1:F2:...`
-format to refer to different field names or indexes in each file, for example if
-`file3.csv` is:
+Each field specified in `--compare-fields` can be specified using
+`F1:OTHER1,F2:OTHER2,...` format to refer to different field names or indexes in
+each file, for example if `file3.csv` is:
 
     # file3.csv
     Ei,Si,Bi
@@ -2220,7 +2259,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.029 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2020-05-29.
+This document describes version 0.030 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2020-07-30.
 
 =head1 DESCRIPTION
 
@@ -2304,6 +2343,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -2320,9 +2365,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -2376,6 +2436,12 @@ Put the new field at specific position (1 means as first field).
 
 Put the new field before specified field.
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<eval>* => I<str|code>
 
 Perl code to do munging.
@@ -2400,9 +2466,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -2434,6 +2515,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -2450,9 +2537,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 =item * B<with_data_rows> => I<bool>
 
@@ -2518,6 +2620,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filenames>* => I<array[filename]>
 
 Input CSV files.
@@ -2534,9 +2642,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -2568,6 +2691,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -2584,13 +2713,28 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
 =item * B<row_number> => I<int> (default: 2)
 
 Row number (e.g. 2 for first data row).
 
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -2622,6 +2766,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<fields>* => I<array[str]>
 
 Field names.
@@ -2642,9 +2792,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -2676,6 +2841,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -2696,9 +2867,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -2746,6 +2932,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<eval>* => I<str|code>
 
 Perl code.
@@ -2770,9 +2962,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -2832,6 +3039,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<eval>* => I<str|code>
 
 Perl code.
@@ -2856,9 +3069,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -2890,6 +3118,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -2906,9 +3140,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -2940,6 +3189,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -2956,9 +3211,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3020,6 +3290,12 @@ Arguments ('*' denotes required arguments):
 
 Do not output rows, just report the number of rows filled.
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<fill_fields>* => I<str>
 
 =item * B<header> => I<bool> (default: 1)
@@ -3036,6 +3312,18 @@ and so on.
 
 =item * B<lookup_fields>* => I<str>
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<source>* => I<filename>
 
 CSV file to lookup values from.
@@ -3047,6 +3335,9 @@ CSV file to fill fields of.
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3106,6 +3397,12 @@ Arguments ('*' denotes required arguments):
 
 Whether to make sure each string ends with newline.
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<eval>* => I<str|code>
 
 Perl code.
@@ -3130,9 +3427,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3170,6 +3482,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<eval>* => I<str|code>
 
 Perl code to do munging.
@@ -3194,9 +3512,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3234,6 +3567,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -3250,9 +3589,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 =item * B<with> => I<str> (default: " ")
 
@@ -3286,6 +3640,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<field_pat> => I<re>
 
 Field regex pattern to select.
@@ -3310,9 +3670,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3344,6 +3719,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -3360,13 +3741,28 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
 =item * B<row_spec>* => I<str>
 
 Row number (e.g. 2 for first data row), range (2-7), or comma-separated list of such (2-7,10,20-23).
 
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3444,9 +3840,9 @@ example C<--union --compare-fields a,b file1.csv file2.csv>:
  4,5,6
  7,8,9
 
-Each field specified in C<--compare-fields> can be specified using C<F1:F2:...>
-format to refer to different field names or indexes in each file, for example if
-C<file3.csv> is:
+Each field specified in C<--compare-fields> can be specified using
+C<F1:OTHER1,F2:OTHER2,...> format to refer to different field names or indexes in
+each file, for example if C<file3.csv> is:
 
  # file3.csv
  Ei,Si,Bi
@@ -3471,6 +3867,12 @@ Arguments ('*' denotes required arguments):
 
 =item * B<compare_fields> => I<str>
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filenames>* => I<array[filename]>
 
 Input CSV files.
@@ -3493,11 +3895,26 @@ and so on.
 
 Set operation to perform.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
 =item * B<result_fields> => I<str>
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
 
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3546,6 +3963,12 @@ Arguments ('*' denotes required arguments):
 
 =item * B<ci> => I<bool>
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<example> => I<str>
 
 A comma-separated list of field names.
@@ -3566,11 +3989,26 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
 =item * B<reverse> => I<bool>
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
 
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3705,6 +4143,12 @@ be compared against.
 
 =item * B<ci> => I<bool>
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -3736,7 +4180,19 @@ sort against.
 
 The code will receive the row as the argument.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
 =item * B<reverse> => I<bool>
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
 
 =item * B<sortsub_args> => I<hash>
 
@@ -3745,6 +4201,9 @@ Arguments to pass to Sort::Sub routine.
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3786,6 +4245,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -3804,9 +4269,24 @@ and so on.
 
 =item * B<lines> => I<uint> (default: 1000)
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 
 =back
@@ -3838,6 +4318,12 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
 =item * B<filename>* => I<filename>
 
 Input CSV file.
@@ -3854,9 +4340,24 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<quote_char> => I<str>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
 
 =item * B<with_data_rows> => I<bool>
 
@@ -3917,15 +4418,6 @@ L<App::TSVUtils>
 L<App::LTSVUtils>
 
 L<App::SerializeUtils>
-
-
-L<setop>.
-
-L<csvgrep>.
-
-L<csv-split>.
-
-L<csv-select-row>.
 
 =head1 AUTHOR
 

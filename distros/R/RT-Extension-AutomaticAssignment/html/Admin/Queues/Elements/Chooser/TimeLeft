@@ -1,5 +1,5 @@
 <&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 0, class_name => 'TimeLeft' &>
-<p>This chooser selects the user with the least total amount of Time Left on their tickets in the given queue. If a particular ticket does not have Time Left, then that ticket's Time Estimated minus its Time Worked is used instead.</p> 
+<p><&|/l&>This chooser selects the user with the least total amount of Time Left on their tickets in the given queue. If a particular ticket does not have Time Left, then that ticket's Time Estimated minus its Time Worked is used instead.</&></p>
 </&>
 <%ARGS>
 $prefix

@@ -1,8 +1,11 @@
-use ExtUtils::MakeMaker;
+use strict;
+use warnings;
 use Config;
+use ExtUtils::MakeMaker;
+
 require 5.008008;
 
-$do_complex_h = 0; # Let the Makefile.PL decide whether to support the double _Complex and
+my $do_complex_h = 0; # Let the Makefile.PL decide whether to support the double _Complex and
                    # long double _Complex data types.
 #$do_complex_h = 1; # Force inclusion of the double _Complex, long double _Complex and __float128 _Complex data types
 #$do_complex_h = -1;# Force exclusion of the double _Complex, long double _Complex and __float128 _Complex data types
@@ -22,8 +25,8 @@ unless ($do_complex_h) {
   $do_complex_h = $@ ? -1 : 1;
 }
 
-$use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
-$use_long_double = 0;# Let perl decide whether to include 'long double' support
+my $use_64_bit_int = 0; # Let perl decide whether to include 64-bit 'long long' support
+my $use_long_double = 0;# Let perl decide whether to include 'long double' support
 
 #$use_64_bit_int = -1; # Force exclusion of 64-bit 'long long' support
 #$use_long_double = -1;# Force exclusion of 'long double' support
@@ -56,7 +59,7 @@ else {
   }
 }
 
-$have_float128 = 0;
+my $have_float128 = 0;
 for(@ARGV) {
   $have_float128 = 1 if $_ eq 'F128=1';
 }

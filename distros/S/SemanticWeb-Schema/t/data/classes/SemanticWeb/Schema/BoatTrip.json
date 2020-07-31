@@ -1,0 +1,33 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A trip on a commercial ferry line.",
+      "rdfs:label" : "BoatTrip",
+      "rdfs:subClassOf" : "schema:Trip",
+      "schema:category" : "issue-1755",
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1755"
+   },
+   "properties" : {
+      "schema:arrivalBoatTerminal" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The terminal or port from which the boat arrives.",
+         "rdfs:label" : "arrivalBoatTerminal",
+         "schema:category" : "issue-1755",
+         "schema:domainIncludes" : "schema:BoatTrip",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:BoatTerminal",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1755"
+      },
+      "schema:departureBoatTerminal" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "The terminal or port from which the boat departs.",
+         "rdfs:label" : "departureBoatTerminal",
+         "schema:category" : "issue-1755",
+         "schema:domainIncludes" : "schema:BoatTrip",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:BoatTerminal",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1755"
+      }
+   }
+}

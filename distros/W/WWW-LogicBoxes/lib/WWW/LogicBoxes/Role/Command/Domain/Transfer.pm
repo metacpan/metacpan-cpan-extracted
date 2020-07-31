@@ -15,7 +15,7 @@ use Carp;
 
 requires 'submit', 'get_domain_by_id';
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: Domain Transfer API Calls
 
 sub is_domain_transferable {

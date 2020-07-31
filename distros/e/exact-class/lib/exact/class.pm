@@ -5,8 +5,9 @@ use 5.014;
 use exact;
 use Role::Tiny ();
 use Scalar::Util ();
+use Class::Method::Modifiers ();
 
-our $VERSION = '1.08'; # VERSION
+our $VERSION = '1.09'; # VERSION
 
 my ( $store, $roles );
 
@@ -22,6 +23,12 @@ sub import {
     }
 
     $store->{$caller} = {};
+
+    eval qq{
+        package $caller {
+            use Class::Method::Modifiers;
+        };
+    };
 
     for ( qw( has class_has with ) ) {
         exact->monkey_patch( $caller, $_, \&$_ ) unless ( defined &{ $caller . '::' . $_ } );
@@ -233,7 +240,7 @@ exact::class - Simple class interface extension for exact
 
 =head1 VERSION
 
-version 1.08
+version 1.09
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/exact-class.svg)](https://travis-ci.org/gryphonshafer/exact-class)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/exact-class/badge.png)](https://coveralls.io/r/gryphonshafer/exact-class)
@@ -315,6 +322,11 @@ replace:
 ...with:
 
     use exact -class, 'Mojolicious';
+
+=head2 Class::Method::Modifiers
+
+Note that Class::Method::Modifiers is injected into the namespace to provide
+support for: C<before>, C<around>, and C<after>.
 
 =head1 FUNCTIONS
 

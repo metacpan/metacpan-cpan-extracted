@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A sequential publication of comic stories under a\n    unifying title, for example \"The Amazing Spider-Man\" or \"Groo the\n    Wanderer\".",
+      "rdfs:comment" : "A sequential publication of comic stories under a\n        unifying title, for example \"The Amazing Spider-Man\" or \"Groo the\n        Wanderer\".",
       "rdfs:label" : "ComicSeries",
       "rdfs:subClassOf" : "schema:Periodical",
       "schema:category" : "Comics",

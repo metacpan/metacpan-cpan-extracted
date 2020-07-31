@@ -7,7 +7,6 @@
    },
    "properties" : {
       "schema:menuAddOn" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1541",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Additional menu item(s) such as a side dish of salad or side order of fries that can be added to this menu item. Additionally it can be a menu section containing allowed add-on menu items for this menu item.",
          "rdfs:label" : "menuAddOn",
@@ -16,39 +15,40 @@
          "schema:rangeIncludes" : [
             "schema:MenuItem",
             "schema:MenuSection"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1541"
       },
       "schema:nutrition" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Nutrition information about the recipe or menu item.",
          "rdfs:label" : "nutrition",
          "schema:domainIncludes" : [
-            "schema:Recipe",
-            "schema:MenuItem"
+            "schema:MenuItem",
+            "schema:Recipe"
          ],
          "schema:rangeIncludes" : "schema:NutritionInformation"
       },
       "schema:offers" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2289",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An offer to provide this item&#x2014;for example, an offer to sell a product, rent the DVD of a movie, perform a service, or give away tickets to an event. Use <a class=\"localLink\" href=\"http://schema.org/businessFunction\">businessFunction</a> to indicate the kind of transaction offered, i.e. sell, lease, etc. This property can also be used to describe a <a class=\"localLink\" href=\"http://schema.org/Demand\">Demand</a>. While this property is listed as expected on a number of common types, it can be used in others. In that case, using a second type, such as Product or a subtype of Product, can clarify the nature of the offer.",
          "rdfs:label" : "offers",
          "schema:category" : "issue-2289",
          "schema:domainIncludes" : [
-            "schema:Product",
             "schema:MenuItem",
-            "schema:Service",
-            "schema:Trip",
-            "schema:Event",
-            "schema:AggregateOffer",
+            "schema:CreativeWork",
             "schema:EducationalOccupationalProgram",
-            "schema:CreativeWork"
+            "schema:Trip",
+            "schema:Product",
+            "schema:AggregateOffer",
+            "schema:Service",
+            "schema:Event"
          ],
          "schema:inverseOf" : "schema:itemOffered",
          "schema:rangeIncludes" : [
             "schema:Offer",
             "schema:Demand"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2289"
       },
       "schema:suitableForDiet" : {
          "rdf:type" : "rdf:Property",

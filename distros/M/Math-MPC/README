@@ -11,7 +11,7 @@ GNU Lesser General Public License (GNU Lesser GPL).
 
 Because this module wraps the MPC functions, it requires that the
 MPC library (version 0.8.0 or later), the GMP library (version 4.3.2
-or later) and the MPFR library (version 2.4.2 or later) have been
+or later) and the MPFR library (version 3.0.0 or later) have been
 installed.
 
 For the GMP library see:

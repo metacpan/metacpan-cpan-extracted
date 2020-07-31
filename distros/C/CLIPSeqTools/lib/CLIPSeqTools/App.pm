@@ -21,7 +21,7 @@ Nmer enrichment within the CLIP-Seq reads.
 
 
 package CLIPSeqTools::App;
-$CLIPSeqTools::App::VERSION = '0.1.9';
+$CLIPSeqTools::App::VERSION = '0.1.10';
 
 # Make it an App and load plugins
 use MooseX::App qw(Config Color BashCompletion Man);

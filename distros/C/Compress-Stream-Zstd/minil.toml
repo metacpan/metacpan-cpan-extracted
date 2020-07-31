@@ -1,7 +1,7 @@
 name = "Compress-Stream-Zstd"
 license = "bsd"
 module_maker = "ModuleBuild"
-badges = ['github-actions/Linux build', 'github-actions/MacOS build', 'travis']
+badges = ['github-actions/Linux build', 'github-actions/MacOS build', 'github-actions/Windows build', 'travis']
 [build]
 build_class = "builder::MyBuilder"
 [no_index]

@@ -1,14 +1,12 @@
 <div data-prefix="<% $prefix %>" class="sortable-box">
+<&|/Widgets/TitleBox, title => $class->Description, titleright_raw => $title_right &>
 <input type="hidden" class="hidden" name="<% $prefix %>" value="1" />
 <input type="hidden" class="hidden" name="<% $prefix %>_ClassName" value="<% $class_name %>" />
-<h3><% $class->Description %>
-% if ($allow_remove) {
-<a href="#" class="remove"><img src="<% RT->Config->Get('WebPath') %>/static/images/remove.png"></a>
-% }
-</h3>
 <div class="inner">
 <% $m->content | n %>
 </div>
+
+</&>
 </div>
 <%INIT>
 my $class;
@@ -24,7 +22,14 @@ unless ($class->require) {
     $m->abort;
 }
 
-my $allow_remove = $is_filter;
+my $title_right
+    = $is_filter
+    ? ( '<a href="#" class="remove"><span class="fas fa-times icon-bordered fa-2x" alt="'
+        . loc('Delete')
+        . '" data-original-title="'
+        . loc('Delete')
+        . '" data-toggle="tooltip" data-placement="top"></span></a>' )
+    : '';
 </%INIT>
 <%ARGS>
 $is_filter

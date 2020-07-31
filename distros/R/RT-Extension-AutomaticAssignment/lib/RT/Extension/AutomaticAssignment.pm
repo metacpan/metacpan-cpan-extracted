@@ -2,9 +2,7 @@ package RT::Extension::AutomaticAssignment;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
-
-RT->AddJavaScript('jquery.ui.sortable.js');
+our $VERSION = '1.00';
 
 RT->AddStyleSheets("automatic-assignment.css");
 RT->AddJavaScript("automatic-assignment.js");
@@ -221,7 +219,8 @@ RT-Extension-AutomaticAssignment - automatically assign tickets based on rules
 
 =head1 INSTALLATION
 
-RT-Extension-AutomaticAssignment requires version RT 4.2.0 or later.
+RT-Extension-AutomaticAssignment 1.* versions require RT 5.0 or later.
+Use 0.* versions if you are still using RT 4.
 
 =over
 
@@ -233,7 +232,17 @@ RT-Extension-AutomaticAssignment requires version RT 4.2.0 or later.
 
 This step may require root permissions.
 
-=item Edit your /opt/rt4/etc/RT_SiteConfig.pm
+=item C<make initdb>
+
+Only run this the first time you install this module.
+
+If you run this twice, you may end up with duplicate data
+in your database.
+
+If you are upgrading this module, check for upgrading instructions
+in case changes need to be made to your database.
+
+=item Edit your /opt/rt5/etc/RT_SiteConfig.pm
 
 Add this line:
 
@@ -246,7 +255,7 @@ filter, which exposes the RT's SLA business hours as custom field values:
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -312,7 +321,7 @@ or via the web at
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2016 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2016-2020 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

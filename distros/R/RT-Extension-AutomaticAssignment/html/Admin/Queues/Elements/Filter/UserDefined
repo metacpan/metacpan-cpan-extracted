@@ -1,0 +1,9 @@
+<&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 1, class_name => 'UserDefined', &>
+<p><&|/l&>This filter selects eligible owners based on the provided Perl code. The code is evaluated for each <tt>$User</tt>. The code should return 1 to include that user, or 0 to exclude. The variable <tt>@Users</tt> contains the list of all potential owners and <tt>$Ticket</tt> is the ticket which is being assigned.</&></p>
+<textarea cols=80 rows=7 id="<% $prefix %>_code" name="<% $prefix %>_code" class="form-control"><% $config->{code} %></textarea>
+</&>
+<%ARGS>
+$prefix
+$config
+$queue
+</%ARGS>

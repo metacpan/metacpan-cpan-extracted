@@ -48,7 +48,7 @@ Measure the percent of genome that is covered by the reads of a library.
 
 
 package CLIPSeqTools::App::genome_coverage;
-$CLIPSeqTools::App::genome_coverage::VERSION = '0.1.9';
+$CLIPSeqTools::App::genome_coverage::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

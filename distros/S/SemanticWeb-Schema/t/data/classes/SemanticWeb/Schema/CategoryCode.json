@@ -1,16 +1,15 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/894",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A Category Code.",
       "rdfs:label" : "CategoryCode",
       "rdfs:subClassOf" : "schema:DefinedTerm",
       "schema:category" : "issue-894",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/894"
    },
    "properties" : {
       "schema:codeValue" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/894",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A short textual code that uniquely identifies the value.",
          "rdfs:label" : "codeValue",
@@ -21,10 +20,10 @@
             "schema:MedicalCode"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/894"
       },
       "schema:inCodeSet" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/894",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A <a class=\"localLink\" href=\"http://schema.org/CategoryCodeSet\">CategoryCodeSet</a> that contains this category code.",
          "rdfs:label" : "inCodeSet",
@@ -33,9 +32,10 @@
          "schema:domainIncludes" : "schema:CategoryCode",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:CategoryCodeSet"
-         ]
+            "schema:CategoryCodeSet",
+            "schema:URL"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/894"
       }
    }
 }

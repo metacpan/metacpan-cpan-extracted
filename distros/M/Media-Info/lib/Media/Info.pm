@@ -1,9 +1,9 @@
 package Media::Info;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-02'; # DATE
+our $DATE = '2020-07-29'; # DATE
 our $DIST = 'Media-Info'; # DIST
-our $VERSION = '0.132'; # VERSION
+our $VERSION = '0.133'; # VERSION
 
 use 5.010001;
 use strict;
@@ -99,16 +99,28 @@ sub get_media_info {
             $res->[2]{backend} = $backend;
             $res->[2]{type_from_name} = _type_from_name($args{media});
 
+            # mtime, ctime, filesize
+            my @st = stat $args{media};
+            $res->[2]{mtime} = $st[9];
+            $res->[2]{ctime} = $st[10];
+            $res->[2]{filesize} = $st[7];
+
             # video_longest_side, video_shortest_side, video_orientation (if not set by backend)
             if ($res->[2]{video_height} && $res->[2]{video_width}) {
                 if ($res->[2]{video_height} > $res->[2]{video_width}) {
                     $res->[2]{video_longest_side}  = $res->[2]{video_height};
                     $res->[2]{video_shortest_side} = $res->[2]{video_width};
-                    $res->[2]{video_orientation} = 'portrait' unless $res->[2]{video_orientation};
+                    unless ($res->[2]{video_orientation}) {
+                        my $rotate = $res->[2]{rotate} // '';
+                        $res->[2]{video_orientation} = $rotate eq '90' || $rotate eq '270' ? 'landscape' : 'portrait';
+                    }
                 } else {
                     $res->[2]{video_longest_side}  = $res->[2]{video_width};
                     $res->[2]{video_shortest_side} = $res->[2]{video_height};
-                    $res->[2]{video_orientation} = 'landscape' unless $res->[2]{video_orientation};
+                    unless ($res->[2]{video_orientation}) {
+                        my $rotate = $res->[2]{rotate} // '';
+                        $res->[2]{video_orientation} = $rotate eq '90' || $rotate eq '270' ? 'portrait' : 'landscape';
+                    }
                 }
             }
         }
@@ -137,7 +149,7 @@ Media::Info - Return information on media file/URL
 
 =head1 VERSION
 
-This document describes version 0.132 of Media::Info (from Perl distribution Media-Info), released on 2020-06-02.
+This document describes version 0.133 of Media::Info (from Perl distribution Media-Info), released on 2020-07-29.
 
 =head1 SYNOPSIS
 

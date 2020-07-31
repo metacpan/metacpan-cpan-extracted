@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has delivery_time => (
@@ -90,7 +90,7 @@ SemanticWeb::Schema::OfferShippingDetails - OfferShippingDetails represents info
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -128,9 +128,7 @@ A predicate for the L</delivery_time> attribute.
 
 C<doesNotShip>
 
-=for html <p>Indicates, as part of an <a class="localLink"
-href="http://schema.org/OfferShippingDetails">OfferShippingDetails</a>,
-when shipping to a particular <a class="localLink"
+=for html <p>Indicates when shipping to a particular <a class="localLink"
 href="http://schema.org/shippingDestination">shippingDestination</a> is not
 available.<p>
 

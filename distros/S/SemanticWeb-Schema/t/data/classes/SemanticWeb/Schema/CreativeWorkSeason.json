@@ -11,17 +11,17 @@
          "rdfs:comment" : "An actor, e.g. in tv, radio, movie, video games etc., or in an event. Actors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "actor",
          "schema:domainIncludes" : [
-            "schema:Clip",
-            "schema:VideoObject",
-            "schema:CreativeWorkSeason",
-            "schema:Event",
-            "schema:Movie",
             "schema:Episode",
             "schema:RadioSeries",
-            "schema:VideoGameSeries",
-            "schema:TVSeries",
+            "schema:Movie",
             "schema:VideoGame",
-            "schema:MovieSeries"
+            "schema:CreativeWorkSeason",
+            "schema:MovieSeries",
+            "schema:TVSeries",
+            "schema:VideoGameSeries",
+            "schema:Clip",
+            "schema:Event",
+            "schema:VideoObject"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
@@ -30,39 +30,39 @@
          "rdfs:comment" : "A director of e.g. tv, radio, movie, video gaming etc. content, or of an event. Directors can be associated with individual items or with a series, episode, clip.",
          "rdfs:label" : "director",
          "schema:domainIncludes" : [
+            "schema:VideoObject",
+            "schema:TVSeries",
+            "schema:VideoGame",
+            "schema:Clip",
+            "schema:Movie",
             "schema:Episode",
             "schema:VideoGameSeries",
-            "schema:MovieSeries",
-            "schema:TVSeries",
-            "schema:RadioSeries",
             "schema:CreativeWorkSeason",
-            "schema:Movie",
-            "schema:VideoObject",
-            "schema:Clip",
-            "schema:VideoGame",
+            "schema:MovieSeries",
+            "schema:RadioSeries",
             "schema:Event"
          ],
          "schema:rangeIncludes" : "schema:Person"
       },
       "schema:endDate" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2486",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The end date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeries",
-            "schema:Role",
+            "schema:Event",
             "schema:DatedMoneySpecification",
-            "schema:Schedule",
-            "schema:EducationalOccupationalProgram",
             "schema:CreativeWorkSeason",
-            "schema:Event"
+            "schema:Schedule",
+            "schema:Role",
+            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
             "schema:Date"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2486"
       },
       "schema:episode" : {
          "rdf:type" : "rdf:Property",
@@ -71,9 +71,9 @@
          "rdfs:subPropertyOf" : "schema:hasPart",
          "schema:domainIncludes" : [
             "schema:CreativeWorkSeason",
-            "schema:TVSeries",
+            "schema:RadioSeries",
             "schema:VideoGameSeries",
-            "schema:RadioSeries"
+            "schema:TVSeries"
          ],
          "schema:rangeIncludes" : "schema:Episode"
       },
@@ -82,10 +82,10 @@
          "rdfs:comment" : "An episode of a TV/radio series or season.",
          "rdfs:label" : "episodes",
          "schema:domainIncludes" : [
+            "schema:RadioSeries",
             "schema:CreativeWorkSeason",
-            "schema:TVSeries",
             "schema:VideoGameSeries",
-            "schema:RadioSeries"
+            "schema:TVSeries"
          ],
          "schema:rangeIncludes" : "schema:Episode",
          "schema:supersededBy" : "schema:episode"
@@ -95,10 +95,10 @@
          "rdfs:comment" : "The number of episodes in this season or series.",
          "rdfs:label" : "numberOfEpisodes",
          "schema:domainIncludes" : [
-            "schema:TVSeries",
-            "schema:CreativeWorkSeason",
+            "schema:RadioSeries",
             "schema:VideoGameSeries",
-            "schema:RadioSeries"
+            "schema:TVSeries",
+            "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : "schema:Integer"
       },
@@ -108,8 +108,8 @@
          "rdfs:label" : "partOfSeries",
          "rdfs:subPropertyOf" : "schema:isPartOf",
          "schema:domainIncludes" : [
-            "schema:Clip",
             "schema:Episode",
+            "schema:Clip",
             "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : "schema:CreativeWorkSeries"
@@ -119,14 +119,14 @@
          "rdfs:comment" : "The production company or studio responsible for the item e.g. series, video game, episode etc.",
          "rdfs:label" : "productionCompany",
          "schema:domainIncludes" : [
-            "schema:RadioSeries",
-            "schema:MovieSeries",
-            "schema:VideoGameSeries",
-            "schema:TVSeries",
-            "schema:Episode",
             "schema:Movie",
             "schema:CreativeWorkSeason",
-            "schema:MediaObject"
+            "schema:VideoGameSeries",
+            "schema:MovieSeries",
+            "schema:RadioSeries",
+            "schema:TVSeries",
+            "schema:MediaObject",
+            "schema:Episode"
          ],
          "schema:rangeIncludes" : "schema:Organization"
       },
@@ -142,38 +142,38 @@
          ]
       },
       "schema:startDate" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2486",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "startDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
+            "schema:Role",
+            "schema:Schedule",
             "schema:CreativeWorkSeries",
             "schema:DatedMoneySpecification",
             "schema:EducationalOccupationalProgram",
-            "schema:CreativeWorkSeason",
             "schema:Event",
-            "schema:Role",
-            "schema:Schedule"
+            "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
-         ]
+            "schema:DateTime",
+            "schema:Date"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2486"
       },
       "schema:trailer" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The trailer of a movie or tv/radio series, season, episode, etc.",
          "rdfs:label" : "trailer",
          "schema:domainIncludes" : [
-            "schema:VideoGameSeries",
-            "schema:VideoGame",
-            "schema:Movie",
             "schema:MovieSeries",
+            "schema:VideoGameSeries",
+            "schema:RadioSeries",
             "schema:Episode",
             "schema:CreativeWorkSeason",
-            "schema:RadioSeries",
-            "schema:TVSeries"
+            "schema:TVSeries",
+            "schema:VideoGame",
+            "schema:Movie"
          ],
          "schema:rangeIncludes" : "schema:VideoObject"
       }

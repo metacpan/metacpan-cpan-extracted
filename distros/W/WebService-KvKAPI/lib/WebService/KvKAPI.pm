@@ -6,7 +6,7 @@ use Moo;
 # This code has an EUPL license. Please see the LICENSE file in this repo for
 # more information.
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Carp;
 use OpenAPI::Client 0.17;
@@ -164,7 +164,7 @@ WebService::KvKAPI - Query the Dutch Chamber of Commerence (KvK) API
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

@@ -66,6 +66,7 @@ print STDERR "\n";
         DBD::Pg
         DBD::SQLite
         DBD::mysql
+        DBD::MariaDB
         DBI
         Digest::SHA
         Fcntl

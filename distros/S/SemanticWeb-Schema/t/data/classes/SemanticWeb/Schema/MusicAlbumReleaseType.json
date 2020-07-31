@@ -1,10 +1,10 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:MBZ",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The kind of release which this album is: single, EP or album.",
       "rdfs:label" : "MusicAlbumReleaseType",
-      "rdfs:subClassOf" : "schema:Enumeration"
+      "rdfs:subClassOf" : "schema:Enumeration",
+      "schema:source" : "schemadotorgsources:MBZ"
    },
    "properties" : {}
 }

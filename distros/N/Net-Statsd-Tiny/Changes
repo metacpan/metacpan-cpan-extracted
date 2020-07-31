@@ -1,5 +1,12 @@
 Revision history for Net-Statsd-Tiny
 
+v0.3.6    2020-07-31 14:47:58+01:00 Europe/London
+  [Documentation]
+  - Update copyright year.
+
+  [Toolchain]
+  - Add core modules in the prerequisites.
+
 v0.3.5    2019-12-21 10:21:06+00:00 Europe/London
   [Documentation]
   - Fixed typo, thanks @mrdvt92.

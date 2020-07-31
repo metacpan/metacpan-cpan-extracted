@@ -6,7 +6,7 @@ package SemanticWeb::Schema::LegalForceStatus;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::Enumeration /;
+extends qw/ SemanticWeb::Schema::StatusEnumeration /;
 
 
 use MooX::JSON_LD 'LegalForceStatus';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 
@@ -34,7 +34,7 @@ SemanticWeb::Schema::LegalForceStatus - A list of possible statuses for the lega
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ A list of possible statuses for the legal force of a legislation.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::Enumeration>
+L<SemanticWeb::Schema::StatusEnumeration>
 
 =head1 SOURCE
 

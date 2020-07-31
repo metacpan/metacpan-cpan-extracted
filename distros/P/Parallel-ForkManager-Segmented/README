@@ -1,5 +1,5 @@
 This archive contains the distribution Parallel-ForkManager-Segmented,
-version 0.4.0:
+version 0.6.0:
 
   use Parallel::ForkManager on batches / segments of items.
 

@@ -1,16 +1,16 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::CopyFilesFromRelease; # git description: v0.005-14-gf4b6e90
+package Dist::Zilla::Plugin::CopyFilesFromRelease; # git description: v0.006-14-g6b0a6f6
 # ABSTRACT: Copy files from a release (for SCM inclusion, etc.)
 # KEYWORDS: plugin copy files repository distribution release
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Moose;
 with qw/ Dist::Zilla::Role::AfterRelease /;
 
-use File::Copy ();
-use Path::Tiny;
+use Path::Tiny 0.070;
+use namespace::autoclean;
 
 sub mvp_multivalue_args { qw{ filename match } }
 
@@ -30,6 +30,7 @@ around dump_config => sub {
 
     $config->{+__PACKAGE__} = {
         map { $_ => [ $self->$_ ] } qw(filename match),
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -37,30 +38,29 @@ around dump_config => sub {
 
 sub after_release {
     my $self = shift;
-    my $built_in = $self->zilla->ensure_built;
+
+    my $build_dir = $self->zilla->built_in;
     my $root = $self->zilla->root;
 
     my $file_match = join '|', map quotemeta, $self->filename;
     $file_match = join '|', '^(?:' . $file_match . ')$', $self->match;
     $file_match = qr/$file_match/;
 
-    my $iterator = path($built_in)->iterator({ recurse => 1 });
+    my $iterator = path($build_dir)->iterator({ recurse => 1 });
     while (my $file = $iterator->()) {
         next if -d $file;
 
-        my $rel_path = $file->relative($built_in);
+        my $rel_path = $file->relative($build_dir);
         next
             unless $rel_path =~ $file_match;
         my $dest = path($root, $rel_path);
-        File::Copy::copy("$file", "$dest")
+        $file->copy($dest)
             or $self->log_fatal("Unable to copy $file to $dest: $!");
         $self->log("Copied $file to $dest");
     }
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
-1;
 
 __END__
 
@@ -68,13 +68,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords SCM
+
 =head1 NAME
 
 Dist::Zilla::Plugin::CopyFilesFromRelease - Copy files from a release (for SCM inclusion, etc.)
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -87,7 +89,7 @@ In your dist.ini:
 =head1 DESCRIPTION
 
 This plugin will automatically copy the files that you specify in
-dist.ini from the build directory into the distribution directoory.
+dist.ini from the build directory into the distribution directory.
 This is so you can commit them to version control.
 
 =head1 SEE ALSO
@@ -100,17 +102,40 @@ L<Dist::Zilla::Plugin::CopyFilesFromBuild> - The basis for this module
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CopyFilesFromRelease>
+(or L<bug-Dist-Zilla-Plugin-CopyFilesFromRelease@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-CopyFilesFromRelease@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+
 =head1 AUTHOR
 
 Graham Knop <haarg@haarg.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge
+=for stopwords Karen Etheridge Jonas B. Nielsen
+
+=over 4
+
+=item *
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=item *
+
+Jonas B. Nielsen <jonasbn@users.noreply.github.com>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2013 by Graham Knop.
 

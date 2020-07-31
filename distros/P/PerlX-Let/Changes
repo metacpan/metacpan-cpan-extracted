@@ -1,5 +1,12 @@
 Revision history for PerlX-Let:
 
+v0.2.7    2020-07-31 15:06:15+01:00 Europe/London
+  [Documentation]
+  - Updated copyright year.
+
+  [Toolchain]
+  - Add core modules to prerequisites.
+
 v0.2.6    2019-11-10 14:08:43+00:00 Europe/London
   [Documentation]
   - Updated abstract to make use of state constants explicit.

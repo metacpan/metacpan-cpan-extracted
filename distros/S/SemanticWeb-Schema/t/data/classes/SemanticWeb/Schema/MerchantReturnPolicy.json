@@ -1,73 +1,73 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2288",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A MerchantReturnPolicy provides information about product return policies associated with an <a class=\"localLink\" href=\"http://schema.org/Organization\">Organization</a> or <a class=\"localLink\" href=\"http://schema.org/Product\">Product</a>.",
       "rdfs:label" : "MerchantReturnPolicy",
       "rdfs:subClassOf" : "schema:Intangible",
       "schema:category" : "issue-2288",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2288"
    },
    "properties" : {
       "schema:inStoreReturnsOffered" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2288",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Are in-store returns offered?",
          "rdfs:label" : "inStoreReturnsOffered",
          "schema:category" : "issue-2288",
          "schema:domainIncludes" : "schema:MerchantReturnPolicy",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Boolean"
+         "schema:rangeIncludes" : "schema:Boolean",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2288"
       },
       "schema:merchantReturnDays" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2288",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The merchantReturnDays property indicates the number of days (from purchase) within which relevant merchant return policy is applicable.",
          "rdfs:label" : "merchantReturnDays",
          "schema:category" : "issue-2288",
          "schema:domainIncludes" : "schema:MerchantReturnPolicy",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Integer"
+         "schema:rangeIncludes" : "schema:Integer",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2288"
       },
       "schema:merchantReturnLink" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2288",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates a Web page or service by URL, for product return.",
          "rdfs:label" : "merchantReturnLink",
          "schema:category" : "issue-2288",
          "schema:domainIncludes" : "schema:MerchantReturnPolicy",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:URL"
+         "schema:rangeIncludes" : "schema:URL",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2288"
       },
       "schema:refundType" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2288",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A refundType, from an enumerated list.",
          "rdfs:label" : "refundType",
          "schema:category" : "issue-2288",
          "schema:domainIncludes" : "schema:MerchantReturnPolicy",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:RefundTypeEnumeration"
+         "schema:rangeIncludes" : "schema:RefundTypeEnumeration",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2288"
       },
       "schema:returnFees" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2288",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates (via enumerated options) the return fees policy for a MerchantReturnPolicy",
          "rdfs:label" : "returnFees",
          "schema:category" : "issue-2288",
          "schema:domainIncludes" : "schema:MerchantReturnPolicy",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:ReturnFeesEnumeration"
+         "schema:rangeIncludes" : "schema:ReturnFeesEnumeration",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2288"
       },
       "schema:returnPolicyCategory" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2288",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A returnPolicyCategory expresses at most one of several enumerated kinds of return.",
          "rdfs:label" : "returnPolicyCategory",
          "schema:category" : "issue-2288",
          "schema:domainIncludes" : "schema:MerchantReturnPolicy",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:MerchantReturnEnumeration"
+         "schema:rangeIncludes" : "schema:MerchantReturnEnumeration",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2288"
       }
    }
 }

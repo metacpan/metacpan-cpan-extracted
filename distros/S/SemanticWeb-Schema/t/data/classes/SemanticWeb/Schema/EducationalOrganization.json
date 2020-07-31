@@ -4,8 +4,8 @@
       "rdfs:comment" : "An educational organization.",
       "rdfs:label" : "EducationalOrganization",
       "rdfs:subClassOf" : [
-         "schema:CivicStructure",
-         "schema:Organization"
+         "schema:Organization",
+         "schema:CivicStructure"
       ]
    },
    "properties" : {
@@ -14,8 +14,8 @@
          "rdfs:comment" : "Alumni of an organization.",
          "rdfs:label" : "alumni",
          "schema:domainIncludes" : [
-            "schema:Organization",
-            "schema:EducationalOrganization"
+            "schema:EducationalOrganization",
+            "schema:Organization"
          ],
          "schema:inverseOf" : "schema:alumniOf",
          "schema:rangeIncludes" : "schema:Person"

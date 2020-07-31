@@ -32,7 +32,9 @@ do { my $x = {
                                       'IPC::Run3' => '0',
                                       'XSLoader' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.6.0'
+                                      'perl' => 'v5.6.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {

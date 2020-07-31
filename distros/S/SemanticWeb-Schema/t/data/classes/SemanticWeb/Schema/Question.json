@@ -1,10 +1,10 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_QAStackExchange",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A specific question - e.g. from a user seeking answers online, or collected in a Frequently Asked Questions (FAQ) document.",
       "rdfs:label" : "Question",
-      "rdfs:subClassOf" : "schema:CreativeWork"
+      "rdfs:subClassOf" : "schema:CreativeWork",
+      "schema:source" : "schemadotorgsources:source_QAStackExchange"
    },
    "properties" : {
       "schema:acceptedAnswer" : {
@@ -50,8 +50,8 @@
          "rdfs:comment" : "The number of upvotes this question, answer or comment has received from the community.",
          "rdfs:label" : "upvoteCount",
          "schema:domainIncludes" : [
-            "schema:Question",
-            "schema:Comment"
+            "schema:Comment",
+            "schema:Question"
          ],
          "schema:rangeIncludes" : "schema:Integer"
       }

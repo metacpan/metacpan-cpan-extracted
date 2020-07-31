@@ -1,5 +1,10 @@
 Revision history for App-gimpgitbuild
 
+0.26.1   2020-07-28
+    - Avoid recommending against a meson build when the mode is "non-build"
+    (e.g "clean" mode).
+        - It is irrelevant to it.
+
 0.26.0   2020-06-22
     - Refactoring and cleanups.
 

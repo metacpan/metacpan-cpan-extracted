@@ -1,12 +1,14 @@
 use File::Temp;
-use Test::Most tests => 3;
+use Test::Most tests => 4;
 use Test::OpenTracing::Integration;
 use OpenTracing::Implementation qw/Test/;
 
 use OpenTracing::WrapScope;
 
-sub foo      { }
-sub Bar::foo { }
+sub foo        { }
+sub Bar::foo   { }
+sub secret     { }
+sub non_secret { }
 
 my $sample_unqualified = _make_tmp_file(<<'EOF');
 foo
@@ -34,6 +36,22 @@ global_tracer_cmp_easy([
     { operation_name => 'Bar::foo' },
 ], 'spans created');
 
+
+reset_spans();
+
+my $sample_commented = _make_tmp_file(<<'EOF');
+#main::secret
+main::non_secret # this is fine
+EOF
+
+OpenTracing::WrapScope::wrap_from_file($sample_commented->filename);
+
+secret();
+non_secret();
+
+global_tracer_cmp_deeply([
+    superhashof({ operation_name => 'main::non_secret' }),
+], 'commented sub is not touched');
 
 sub _make_tmp_file {
     my ($content) = @_;

@@ -1,24 +1,24 @@
 <&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 1, class_name => 'MemberOfRole' &>
-<p>This filter selects eligible owners by their role membership. Only members of the following role, either on the queue or on the ticket itself, will be automatically assigned tickets.</p>
+<p><&|/l&>This filter selects eligible owners by their role membership. Only members of the following role, either on the queue or on the ticket itself, will be automatically assigned tickets.</&></p>
 
-<table>
-<tr>
-<td class="label"><label for="<% $prefix %>_role">Role:</label></td>
-<td class="value">
-<select id="<% $prefix %>_role" name="<% $prefix %>_role">
-<option value="">-</option>
-% for my $role (qw/AdminCc Cc Requestor/) {
-<option <% ($config->{role}||'') eq $role ? "selected" : "" %> value="<% $role %>"><% $role %></option>
-% }
+<div class="form-row">
+  <div class="col-3 label">
+    <&|/l&>Role</&>:
+  </div>
+  <div class="col-9 value">
+    <select id="<% $prefix %>_role" name="<% $prefix %>_role" class="selectpicker form-control">
+      <option value="">-</option>
+%   for my $role (qw/AdminCc Cc Requestor/) {
+      <option <% ($config->{role}||'') eq $role ? "selected" : "" %> value="<% $role %>"><% $role %></option>
+%   }
 % if ($custom_roles) {
-% while (my $role = $custom_roles->Next) {
-<option <% ($config->{role}||0) eq $role->Id ? "selected" : "" %> value="<% $role->Id %>"><% $role->Name %></option>
+%   while (my $role = $custom_roles->Next) {
+      <option <% ($config->{role}||0) eq $role->Id ? "selected" : "" %> value="<% $role->Id %>"><% $role->Name %></option>
+%   }
 % }
-% }
-</select>
-</td>
-</tr>
-</table>
+    </select>
+  </div>
+</div>
 </&>
 
 <%INIT>

@@ -4,7 +4,7 @@ HTML::DeferableCSS - Simplify management of stylesheets in your HTML
 
 # VERSION
 
-version v0.4.1
+version v0.4.2
 
 # SYNOPSIS
 

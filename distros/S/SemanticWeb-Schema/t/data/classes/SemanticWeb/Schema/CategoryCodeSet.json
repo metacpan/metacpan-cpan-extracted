@@ -1,16 +1,15 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/894",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A set of Category Code values.",
       "rdfs:label" : "CategoryCodeSet",
       "rdfs:subClassOf" : "schema:DefinedTermSet",
       "schema:category" : "issue-894",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/894"
    },
    "properties" : {
       "schema:hasCategoryCode" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/894",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A Category code contained in this code set.",
          "rdfs:label" : "hasCategoryCode",
@@ -18,7 +17,8 @@
          "schema:category" : "issue-894",
          "schema:domainIncludes" : "schema:CategoryCodeSet",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:CategoryCode"
+         "schema:rangeIncludes" : "schema:CategoryCode",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/894"
       }
    }
 }

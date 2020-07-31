@@ -4,7 +4,7 @@ use warnings;
 use Moo;
 
 use utf8;
-use open ':std', ':encoding(utf8)';
+use open ':std', ':encoding(UTF-8)';
 use Encode qw(decode);
 use File::Find;
 use File::Spec;
@@ -15,216 +15,14 @@ use Carp;
 use List::Util qw(uniq);
 use POSIX qw(strftime);
 
-our $VERSION = '0.059'; # VERSION
+our $VERSION = '0.063'; # VERSION
+
+# ABSTRACT: The common base for Archive::BagIt. This is the module for experts. ;)
 
 use Sub::Quote;
 
 my $DEBUG=0;
 
-
-has 'parallel' => ( # used for parallel verify, only usefull if bagits with many files expected!
-    is        => 'rw',
-    predicate => 'has_parallel',
-    default   => undef,
-);
-
-
-has 'bag_path' => (
-    is => 'rw',
-);
-
-has 'bag_path_arr' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_bag_path_arr',
-);
-
-has 'metadata_path' => (
-    is=> 'ro',
-    lazy => 1,
-    builder => '_build_metadata_path',
-);
-
-sub _build_metadata_path {
-    my ($self) = @_;
-    return $self->bag_path;
-}
-
-
-has 'metadata_path_arr' => (
-    is =>'ro',
-    lazy => 1,
-    builder => '_build_metadata_path_arr',
-);
-
-has 'rel_metadata_path' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_rel_metadata_path',
-);
-
-has 'payload_path' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_payload_path',
-);
-
-sub _build_payload_path {
-    my ($self) = @_;
-    return $self->bag_path."/data";
-}
-
-has 'payload_path_arr' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_payload_path_arr',
-);
-
-has 'rel_payload_path' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_rel_payload_path',
-);
-
-has 'checksum_algos' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_checksum_algos',
-);
-
-has 'bag_version' => (
-    is       => 'ro',
-    lazy     => 1,
-    builder  => '_build_bag_version',
-);
-
-has 'bag_encoding' => (
-    is      => 'ro',
-    lazy    => 1,
-    builder => '_build_bag_encoding',
-);
-
-has 'bag_info' => (
-    is      => 'rw',
-    lazy    => 1,
-    builder => '_build_bag_info',
-);
-
-has 'errors' => (
-    is      => 'rw',
-    lazy    => 1,
-    builder => sub { my $self = shift; return [];},
-);
-
-# bag_info_by_key()
-sub bag_info_by_key {
-    my ($self, $searchkey) = @_;
-    my $info = $self->bag_info();
-    if (defined $searchkey) {
-        foreach my $entry (@{$info}) {
-            if (exists $entry->{$searchkey}) {
-                return $entry->{$searchkey};
-            }
-        }
-    }
-    return;
-}
-
-
-sub _replace_bag_info_by_first_match {
-    my ($self, $searchkey, $newvalue) = @_;
-    my $info = $self->bag_info();
-    if (defined $searchkey) {
-        if ($searchkey =~ m/:/) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
-        my $size = scalar( @{$info});
-        for (my $idx=0; $idx< $size; $idx++) {
-            my %entry = %{ $info->[$idx] };
-            my ($key, $value) = each %entry;
-            if ((defined $key) && ($key eq $searchkey)) {
-                $info->[$idx] = {$searchkey => $newvalue};
-                return $idx;
-            }
-        }
-    }
-    return;
-}
-
-sub _add_or_replace_bag_info {
-    my ($self, $searchkey, $newvalue) = @_;
-    if (defined $searchkey) {
-        if ($searchkey =~ m/:/) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
-        if (defined $self->{bag_info}) {
-            my $idx = $self->_replace_bag_info_by_first_match( $searchkey, $newvalue);
-            if (defined $idx) { return $idx;}
-        }
-        push @{$self->{bag_info}}, {$searchkey => $newvalue};
-        return -1;
-    }
-}
-
-
-has 'forced_fixity_algorithm' => (
-    is   => 'ro',
-    lazy => 1,
-    builder  => '_build_forced_fixity_algorithm',
-);
-
-has 'bag_checksum' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_bag_checksum',
-);
-
-has 'manifest_files' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_manifest_files',
-);
-
-has 'tagmanifest_files' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_tagmanifest_files',
-);
-
-has 'manifest_entries' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_manifest_entries',
-);
-
-has 'tagmanifest_entries' => (
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_tagmanifest_entries',
-);
-
-has 'payload_files' => ( # relatively to bagit base
-    is => 'ro',
-    lazy => 1,
-    builder => '_build_payload_files',
-);
-
-has 'non_payload_files' => (
-    is=>'ro',
-    lazy => 1,
-    builder => '_build_non_payload_files',
-);
-
-has 'plugins' => (
-    is=>'rw',
-    #isa=>'HashRef',
-);
-
-has 'manifests' => (
-    is=>'rw',
-    #isa=>'HashRef',
-);
-
-has 'algos' => (
-    is=>'rw',
-    #isa=>'HashRef',
-);
 
 
 around 'BUILDARGS' , sub {
@@ -237,10 +35,413 @@ around 'BUILDARGS' , sub {
     }
 };
 
+
 sub BUILD {
     my ($self, $args) = @_;
     return $self->load_plugins(("Archive::BagIt::Plugin::Manifest::MD5", "Archive::BagIt::Plugin::Manifest::SHA512"));
 }
+
+###############################################
+
+
+has 'parallel' => ( # used for parallel verify, only usefull if bagits with many files expected!
+    is        => 'rw',
+    predicate => 'has_parallel',
+    default   => undef,
+);
+
+###############################################
+
+
+has 'bag_path' => (
+    is => 'rw',
+);
+
+###############################################
+
+has 'bag_path_arr' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_bag_path_arr',
+);
+
+###############################################
+
+
+has 'metadata_path' => (
+    is=> 'ro',
+    lazy => 1,
+    builder => '_build_metadata_path',
+);
+
+sub _build_metadata_path {
+    my ($self) = @_;
+    return $self->bag_path;
+}
+
+###############################################
+
+has 'metadata_path_arr' => (
+    is =>'ro',
+    lazy => 1,
+    builder => '_build_metadata_path_arr',
+);
+
+
+###############################################
+
+has 'rel_metadata_path' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_rel_metadata_path',
+);
+
+###############################################
+
+
+has 'payload_path' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_payload_path',
+);
+
+sub _build_payload_path {
+    my ($self) = @_;
+    return $self->bag_path."/data";
+}
+
+###############################################
+
+has 'payload_path_arr' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_payload_path_arr',
+);
+
+###############################################
+
+has 'rel_payload_path' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_rel_payload_path',
+);
+
+###############################################
+
+
+has 'checksum_algos' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_checksum_algos',
+);
+
+###############################################
+
+
+has 'bag_version' => (
+    is       => 'ro',
+    lazy     => 1,
+    builder  => '_build_bag_version',
+);
+
+###############################################
+
+
+has 'bag_encoding' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_bag_encoding',
+);
+
+###############################################
+
+
+has 'bag_info' => (
+    is        => 'rw',
+    lazy      => 1,
+    builder   => '_build_bag_info',
+    predicate => 1
+);
+
+###############################################
+
+
+has 'errors' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => sub { my $self = shift; return [];},
+);
+
+###############################################
+
+
+has 'digest_callback' => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => sub {
+        my $sub = sub {
+            my ($digestobj, $filename) = @_;
+            open(my $fh, "<:raw", "$filename") or croak ("Cannot open $filename, $!");
+            binmode($fh);
+            my $digest = $digestobj->get_hash_string($fh);
+            close $fh || croak("could not close file '$filename', $!");
+            return $digest;
+        };
+        return $sub;
+    }
+);
+
+###############################################
+
+
+sub get_baginfo_values_by_key {
+    my ($self, $searchkey) = @_;
+    my $info = $self->bag_info();
+    my @values;
+    if (defined $searchkey) {
+        my $lc_flag = $self->is_baginfo_key_reserved( $searchkey );
+        foreach my $entry (@{ $info }) {
+            my ($key, $value) = %{ $entry };
+            if ( __case_aware_compare_for_baginfo( $key, $searchkey, $lc_flag) ) {
+                push @values, $value;
+            }
+        }
+    }
+    return @values if (scalar(@values) > 0);
+    return;
+}
+
+###############################################
+
+
+sub is_baginfo_key_reserved_as_uniq {
+    my ($self, $searchkey) = @_;
+    return $searchkey =~ m/(Bagging-Date)|(Bag-Size)|(Payload-Oxum)|(Bag-Group-Identifier)|(Bag-Count)/i;
+}
+
+###############################################
+
+
+sub is_baginfo_key_reserved {
+    my ($self, $searchkey) = @_;
+    my @reserved = qw(
+        Source-Organization
+        Organisation-Adress
+        Contact-Name
+        Contact-Phone
+        Contact-Email
+        External-Description
+        Bagging-Date
+        External-Identifier
+        Bag-Size
+        Payload-Oxum
+        Bag-Group-Identifier
+        Bag-Count
+        Internal-Sender-Identifier
+        Internal-Sender-Description
+    );
+    return List::Util::any { (lc $searchkey) eq (lc $_) } @reserved;
+}
+
+###############################################
+
+sub __case_aware_compare_for_baginfo {
+    my ($internal_key, $search_key, $lc_flag) = @_;
+    return (defined $internal_key) && (
+        ( $lc_flag && ((lc $internal_key) eq (lc $search_key)) ) # for reserved keys use caseinsensitive search
+            ||
+            ( (!$lc_flag) && ($internal_key eq $search_key) ) # for other keys sensitive search
+    )
+}
+
+###############################################
+
+sub _find_baginfo_idx {
+    my ($self, $searchkey) = @_;
+    if (defined $searchkey) {
+        if ($searchkey =~ m/:/) {croak "key should not contain a colon! (searchkey='$searchkey')";}
+        my $info = $self->bag_info();
+        my $size = scalar(@{$info});
+        my $lc_flag = $self->is_baginfo_key_reserved($searchkey);
+        for (my $idx = 0; $idx < $size; $idx++) {
+            my %entry = %{$info->[$idx]};
+            my ($key, $value) = %entry;
+            if (__case_aware_compare_for_baginfo($key, $searchkey, $lc_flag)) {
+                return $idx;
+            }
+        }
+    }
+    return;
+}
+###############################################
+
+
+sub verify_baginfo {
+    my ($self) = @_;
+    my %keys;
+    my $info = $self->bag_info();
+    my $ret = 1;
+    if (defined $info) {
+        foreach my $entry (@{$self->bag_info()}) {
+            my ($key, $value) = %{$entry};
+            if ($self->is_baginfo_key_reserved($key)) {
+                $keys{ lc $key }++;
+            }
+            else {
+                $keys{ $key }++
+            }
+        }
+        foreach my $key (keys %keys) {
+            if ($self->is_baginfo_key_reserved_as_uniq($key)) {
+                if ($keys{$key} > 1) {
+                    push @{$self->{errors}}, "Baginfo key '$key' exists $keys{$key}, but should be uniq!";
+                    $ret = undef;
+                }
+            }
+        }
+    }
+    return $ret;
+}
+
+###############################################
+
+
+sub delete_baginfo_by_key {
+    my ($self, $searchkey) = @_;
+    my $idx = $self->_find_baginfo_idx($searchkey);
+    if (defined $idx) {
+        delete $self->{bag_info}[$idx];
+    }
+}
+
+###############################################
+
+
+sub exists_baginfo_key {
+    my ($self, $searchkey) =@_;
+    return (defined  $self->_find_baginfo_idx($searchkey));
+}
+
+###############################################
+
+sub _replace_baginfo_by_first_match {
+    my ($self, $searchkey, $newvalue) = @_;
+    my $idx = $self->_find_baginfo_idx( $searchkey);
+    if (defined $idx) {
+        $self->{bag_info}[$idx] = {$searchkey => $newvalue};
+        return $idx;
+    }
+    return;
+}
+
+###############################################
+
+
+sub append_baginfo_by_key {
+    my ($self, $searchkey, $newvalue) = @_;
+    if (defined $searchkey) {
+        if ($searchkey =~ m/:/) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
+        if ($self->is_baginfo_key_reserved_as_uniq($searchkey)) {
+            if (defined $self->get_baginfo_values_by_key($searchkey)) {
+                # hmm, search key is mrked as uniq and still exists
+                return;
+            }
+        }
+        push @{$self->{bag_info}}, {$searchkey => $newvalue};
+    }
+    return 1;
+}
+
+###############################################
+
+
+sub add_or_replace_baginfo_by_key {
+    my ($self, $searchkey, $newvalue) = @_;
+    if (defined $searchkey) {
+        if ($searchkey =~ m/:/) { croak "key should not contain a colon! (searchkey='$searchkey')"; }
+        if (defined $self->{bag_info}) {
+            my $idx = $self->_replace_baginfo_by_first_match( $searchkey, $newvalue);
+            if (defined $idx) { return $idx;}
+        }
+        $self->append_baginfo_by_key( $searchkey, $newvalue );
+        return -1;
+    }
+}
+
+###############################################
+
+
+has 'forced_fixity_algorithm' => (
+    is   => 'ro',
+    lazy => 1,
+    builder  => '_build_forced_fixity_algorithm',
+);
+
+###############################################
+
+
+has 'manifest_files' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_manifest_files',
+);
+
+###############################################
+
+
+has 'tagmanifest_files' => (
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_tagmanifest_files',
+);
+
+###############################################
+
+
+has 'payload_files' => ( # relatively to bagit base
+    is => 'ro',
+    lazy => 1,
+    builder => '_build_payload_files',
+);
+
+###############################################
+
+
+has 'non_payload_files' => (
+    is=>'ro',
+    lazy => 1,
+    builder => '_build_non_payload_files',
+);
+
+###############################################
+
+
+has 'plugins' => (
+    is=>'rw',
+    #isa=>'HashRef',
+);
+
+###############################################
+
+
+
+has 'manifests' => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => '_build_manifests'
+    #isa=>'HashRef',
+);
+
+###############################################
+
+
+
+has 'algos' => (
+    is=>'rw',
+    #isa=>'HashRef',
+);
+
+###############################################
 
 sub _build_bag_path_arr {
     my ($self) = @_;
@@ -278,20 +479,11 @@ sub _build_checksum_algos {
     return $checksums;
 }
 
-sub _build_bag_checksum {
-  my($self) =@_;
-  my $bagit = $self->{'bag_path'};
-  open(my $SRCFILE, "<:raw",  $bagit."/manifest-md5.txt");
-  my $srchex=Digest::MD5->new->addfile($SRCFILE)->hexdigest;
-  close($SRCFILE);
-  return $srchex;
-}
-
 sub _build_manifest_files {
   my($self) = @_;
   my @manifest_files;
   foreach my $algo (@{$self->checksum_algos}) {
-    my $manifest_file = $self->metadata_path."/manifest-$algo.txt";
+    my $manifest_file = File::Spec->catfile($self->metadata_path, "manifest-$algo.txt");
     if (-f $manifest_file) {
       push @manifest_files, $manifest_file;
     }
@@ -303,7 +495,7 @@ sub _build_tagmanifest_files {
   my ($self) = @_;
   my @tagmanifest_files;
   foreach my $algo (@{$self->checksum_algos}) {
-    my $tagmanifest_file = $self->metadata_path."/tagmanifest-$algo.txt";
+    my $tagmanifest_file = File::Spec->catfile($self->metadata_path,"tagmanifest-$algo.txt");
     if (-f $tagmanifest_file) {
       push @tagmanifest_files, $tagmanifest_file;
     }
@@ -311,55 +503,13 @@ sub _build_tagmanifest_files {
   return \@tagmanifest_files;
 }
 
-sub __build_xxxmanifest_entries {
-  my ($self, $xxmanifestfiles) = @_;
-  my @xxmanifests = @{$xxmanifestfiles};
-  my $xxmanifest_entries = {};
-  my $bag_path=$self->bag_path();
-  foreach my $xxmanifest_file (@xxmanifests) {
-    die("Cannot open $xxmanifest_file: $!") unless (open(my $XXMANIFEST,"<:encoding(utf8)", $xxmanifest_file));
-    my $algo = $xxmanifest_file;
-    $algo =~ s#//#/#g; # to fix problems with double path-separators
-    $algo =~ s#^($bag_path/).bagit/#$1#; # FIXME: only for dotbagit-variant, if dotbagit will be outdated, this should be removed
-    $algo =~ s#^$bag_path/##;
-    $algo =~ s#tag(manifest-[a-z0-9]+\.txt)#$1#;
-    $algo =~ s#.*manifest-([a-z0-9]+)\.txt$#$1#;
-    if ($algo =~ m#/#) {
-        die "wrong replacement of path $xxmanifest_file to determine algorithm '$algo' correctly, please contact author";
-    }
-    while (my $line = <$XXMANIFEST>) {
-      chomp($line);
-      my($digest,$file) = split(/\s+/, $line, 2);
-      next unless ((defined $digest) && (defined $file)); # empty lines!
-      $xxmanifest_entries->{$algo}->{$file} = $digest;
-    }
-    close($XXMANIFEST);
-  }
-  return $xxmanifest_entries;
-}
-
-sub _build_tagmanifest_entries {
-  my ($self) = @_;
-  my @tm_files = $self->tagmanifest_files();
-  my $entries = $self->__build_xxxmanifest_entries(@tm_files);
-  return $entries;
-}
-
-sub _build_manifest_entries {
-  my ($self) = @_;
-  my @m_files = $self->manifest_files();
-  my $entries = $self->__build_xxxmanifest_entries(@m_files);
-  return $entries;
-}
-
 sub _build_payload_files{
   my($self) = @_;
   my $payload_dir = $self->payload_path;
-  my $payload_reldir = $self->rel_payload_path;
   my @payload=();
   File::Find::find( sub{
-    $File::Find::name = decode ('utf8', $File::Find::name);
-    $_ = decode ('utf8', $_);
+    $File::Find::name = decode ('UTF-8', $File::Find::name);
+    $_ = decode ('UTF-8', $_);
     if (-f $_) {
         my $rel_path=File::Spec->catdir($self->rel_payload_path,File::Spec->abs2rel($File::Find::name, $payload_dir));
         push(@payload,$rel_path);
@@ -373,6 +523,7 @@ sub _build_payload_files{
     }
     #print "name: ".$File::Find::name."\n";
   }, $payload_dir);
+  @payload = sort @ payload;
   return wantarray ? @payload : \@payload;
 
 }
@@ -380,8 +531,8 @@ sub _build_payload_files{
 sub __build_read_bagit_txt {
     my($self) = @_;
     my $bagit = $self->metadata_path;
-    my $file = join("/", $bagit, "bagit.txt");
-    open(my $BAGIT, "<", $file) or die("Cannot read '$file': $!");
+    my $file = File::Spec->catfile($bagit, "bagit.txt");
+    open(my $BAGIT, "<:encoding(UTF-8)", $file) or croak("Cannot read '$file': $!");
     my $version_string = <$BAGIT>;
     my $encoding_string = <$BAGIT>;
     close($BAGIT);
@@ -398,21 +549,21 @@ sub __build_read_bagit_txt {
 sub _build_bag_version {
     my($self) = @_;
     my ($version_string, $encoding_string, $file) = $self->__build_read_bagit_txt();
-    die "Version line missed in '$file" unless defined $version_string;
+    croak "Version line missed in '$file" unless defined $version_string;
     if ($version_string =~ /^BagIt-Version: ([01]\.[0-9]+)$/) {
         return $1
     } else {
         $version_string =~ s/\r/<CR>/;
         $version_string =~ s/^\N{U+FEFF}/<BOM>/;
-        die "Version string '$version_string' of '$file' is incorrect";
+        croak "Version string '$version_string' of '$file' is incorrect";
     };
 }
 
 sub _build_bag_encoding {
     my($self) = @_;
     my ($version_string, $encoding_string, $file) = $self->__build_read_bagit_txt();
-    die "Encoding line missed in '$file" unless defined $encoding_string;
-    die "Encoding '$encoding_string' of '$file' not supported by current Archive::BagIt module!" unless ($encoding_string !~ m/^UTF-8$/);
+    croak "Encoding line missed in '$file" unless defined $encoding_string;
+    croak "Encoding '$encoding_string' of '$file' not supported by current Archive::BagIt module!" unless ($encoding_string !~ m/^UTF-8$/);
     return $encoding_string;
 }
 
@@ -483,26 +634,27 @@ sub _parse_bag_info { # parses a bag-info textblob
 sub _build_bag_info {
     my ($self) = @_;
     my $bagit = $self->metadata_path;
-    my $file = join("/", $bagit, "bag-info.txt");
-    open(my $BAGINFO, "<", $file) or die("Cannot read $file: $!");
-    my @lines;
-    foreach my $line (<$BAGINFO>) {
-        push @lines, $line;
+    my $file = File::Spec->catfile($bagit, "bag-info.txt");
+    if (-e $file) {
+        open(my $BAGINFO, "<:encoding(UTF-8)", $file) or croak("Cannot read $file: $!");
+        my @lines;
+        foreach my $line (<$BAGINFO>) {
+            push @lines, $line;
+        }
+        close($BAGINFO);
+        my $lines = join("", @lines);
+        return $self->_parse_bag_info($lines);
     }
-    close($BAGINFO);
-    my $lines = join("", @lines);
-    return $self->_parse_bag_info ($lines);
-
+    # bag-info.txt is optional
+    return;
 }
 
 sub _build_non_payload_files {
   my($self) = @_;
-
   my @non_payload = ();
-
   File::Find::find( sub{
-    $File::Find::name = decode('utf8', $File::Find::name);
-    $_=decode ('utf8', $_);
+    $File::Find::name = decode('UTF-8', $File::Find::name);
+    $_=decode ('UTF-8', $_);
     if (-f $_) {
         my $rel_path=File::Spec->catdir($self->rel_metadata_path,File::Spec->abs2rel($File::Find::name, $self->metadata_path));
         #print "pushing ".$rel_path." payload_dir: $payload_dir \n";
@@ -517,7 +669,7 @@ sub _build_non_payload_files {
     }
     #print "name: ".$File::Find::name."\n";
   }, $self->metadata_path);
-
+  @non_payload = sort @non_payload;
   return wantarray ? @non_payload : \@non_payload;
 
 }
@@ -532,6 +684,8 @@ sub _build_forced_fixity_algorithm {
     }
 }
 
+###############################################
+
 
 sub load_plugins {
     my ($self, @plugins) = @_;
@@ -542,195 +696,31 @@ sub load_plugins {
 
     return if @plugins == 0;
     foreach my $plugin (@plugins) {
-        load_class ($plugin) or die ("Can't load $plugin");
+        load_class ($plugin) or croak ("Can't load $plugin");
         $plugin->new({bagit => $self});
     }
 
     return 1;
 }
 
-sub __calc_digest {
-    my ($digestobj, $filename) = @_;
-    open(my $fh, '<', $filename) || die("Can't open '$filename', $!");
-    binmode($fh);
-    my $digest = $digestobj->get_hash_string($fh);
-    close $fh || die("could not close file '$filename', $!");
-    return $digest;
-}
+###############################################
 
-# calc digest
-# expects digestobj, expected_ref, array_ref of filenames
-# returns arrayref of hashes where each entry has
-# $tmp->{calculated_digest} = $digest;
-# $tmp->{expected_digest} = $expected_digest;
-# $tmp->{filename} = $filename;
-sub calc_digests {
-    my ($self, $bagit, $digestobj, $filenames_ref) = @_;
-    my @digest_hashes;
-    # check if we could use parallel
-    my $is_parallelizeable;
-    if (($self->has_parallel()) && (defined $self->parallel)) {
-        my $err;
-        ($is_parallelizeable, $err) = Class::Load::try_load_class("Parallel::Iterator");
-        if (!$is_parallelizeable) {
-            warn "Class 'Parallel::Iterator' could not be loaded…, $err\n";
-            $self->{parallel} = undef;
-        }
-    }
-    if ($is_parallelizeable) {
-        my $class = Class::Load::load_class("Parallel::Iterator");
-        $class->import( qw(iterate_as_array));
-        @digest_hashes = iterate_as_array(
-            sub {
-                my ($idx, $localname) = @_;
-                my $fullname = $bagit ."/". $localname;
-                my $tmp;
-                $tmp->{calculated_digest} = __calc_digest($digestobj, $fullname);
-                $tmp->{local_name} = $localname;
-                $tmp->{full_name} = $fullname;
-                $tmp;
-            }, $filenames_ref);
-    }
-    else { # fallback to serial processing
-        @digest_hashes = map {
-            my $localname = $_;
-            my $fullname = $bagit ."/". $localname;
-            my $tmp;
-            $tmp->{calculated_digest} = __calc_digest($digestobj, $fullname);
-            $tmp->{local_name} = $localname;
-            $tmp->{full_name} = $fullname;
-            $tmp;
-        } @{$filenames_ref};
-    }
-    return \@digest_hashes;
-}
 
-sub check_payload_filepath_conformity{
-    my $local_name = shift;
-    # HINT: there is no guarantuee *not* to escape!
-    return
-    ($local_name =~ m/^~/) # Unix Home
-        || ($local_name =~ m#\./#) # Unix, parent dir escape
-        || ($local_name =~ m#^[A-Z]:[\\/]#) # Windows Drive
-        || ($local_name =~ m#^/#) # Unix absolute path
-        || ($local_name =~ m#^$#) # Unix Env
-        || ($local_name =~ m#^\\#) # Windows absolute path
-        || ($local_name =~ m#^%[^%]*%#) # Windows ENV
-        || ($local_name =~ m#^\*#) # Artifact of md5sum-Tool, where ' *' is allowed to separate checksum and file in fixity line
-    ;
-}
-
-sub _verify_XXX_manifests {
-    my ($self, $xxprefix, $xxmanifest_entries, $files, $return_all_errors) =@_;
-    # Read the manifest file
-    my @payload = @{ $files };
-    my @invalid_messages;
-    my $bagit = $self->bag_path;
-    my $version = $self->bag_version();
-    my $subref_invalid_report_or_die = sub {
-        my $message = shift;
-        if (defined $return_all_errors) {
-            push @invalid_messages, $message;
-        } else {
-            die($message);
-        }
-        return;
-    };
-    foreach my $local_name (@payload) {
-        # local_name is relative to bagit base
-        unless (-r $bagit."/".$local_name) {
-            &$subref_invalid_report_or_die(
-                "cannot read $local_name (bag-path:$bagit)",
-            );
-        }
-    }
-    # Evaluate each file against the manifest
-    foreach my $alg (keys %{$xxmanifest_entries}) {
-        my $manifest_alg = $self->manifests->{$alg};
-        next unless (defined $manifest_alg); # FIXME_ errormessage?
-        my $digestobj = $manifest_alg->algorithm();
-        my $local_xxfilename = "${xxprefix}-${alg}.txt";
-        my $xxfilename = "${bagit}$local_xxfilename";
-
-        # first check if each file from payload exists in manifest_entries for given alg
-        foreach my $local_name (@payload) {
-            # local_name is relative to bagit base
-            unless (exists $xxmanifest_entries->{$alg}->{$local_name}) { # localname as value should exist!
-                &$subref_invalid_report_or_die(
-                    "file '$local_name' found, which is not in '$local_xxfilename' (bag-path:'$bagit')!",
-                );
-            }
-        }
-        # second check if each file from manifest_entries for given alg exists in payload
-        foreach my $local_name (keys %{$xxmanifest_entries->{$alg}}) {
-            if ( # to avoid escapes via manifest-files
-                check_payload_filepath_conformity( $local_name )
-            ) {
-                &$subref_invalid_report_or_die("file '$local_name' not allowed in '$local_xxfilename' (bag-path:'$bagit'")
-            }
-            else {
-                unless (List::Util::any {$_ eq $local_name} @payload) {
-                    &$subref_invalid_report_or_die(
-                        "file '$local_name' NOT found, but expected via '$local_xxfilename' (bag-path:'$bagit')!"
-                    );
-                }
-            }
-        }
-        # all preconditions full filled, now calc all digests
-        my $digest_hashes_ref = $self->calc_digests($bagit, $digestobj, \@payload);
-        # compare digests
-        if (defined $digest_hashes_ref && (ref $digest_hashes_ref eq 'ARRAY')) {
-            foreach my $digest_entry (@{$digest_hashes_ref}) {
-                $digest_entry->{expected_digest} = $xxmanifest_entries->{$alg}->{
-                    $digest_entry->{local_name}
-                };
-                if ($digest_entry->{calculated_digest} ne $digest_entry->{expected_digest}) {
-                    &$subref_invalid_report_or_die(
-                        sprintf("file '%s' invalid, digest (%s) calculated=%s, but expected=%s in file '%s'",
-                            $digest_entry->{local_name},
-                            $alg,
-                            $digest_entry->{calculated_digest},
-                            $digest_entry->{expected_digest},
-                            $xxfilename
-                        )
-                    );
-                }
-            }
-        }
-    }
-    if($return_all_errors && (scalar @invalid_messages > 0)) {
-        push @{ $self->{errors} },
-            join("\n\t",
-                "bag verify for bagit version '$version' failed with invalid files:",
-                sort @invalid_messages
-            );
-        return;
-    }
+sub load {
+    my ($self) = @_;
+    # call trigger
+    $self->bag_path;
+    $self->bag_version;
+    $self->bag_encoding;
+    $self->bag_info;
+    $self->payload_path;
+    $self->manifest_files;
+    $self->checksum_algos;
+    $self->tagmanifest_files;
     return 1;
 }
 
-sub _verify_manifests {
-    my ($self, $alg, $return_all_errors) = @_;
-    return $self->_verify_XXX_manifests(
-        "manifest",
-        $self->manifest_entries(),
-        $self->payload_files(),
-        $return_all_errors
-    );
-}
-
-sub _verify_tagmanifests {
-    my ($self, $alg, $return_all_errors) = @_;
-    # filter tagmanifest-files
-    my @non_payload_files = grep { $_ !~ m/tagmanifest-[a-z0-9]+\.txt/} @{ $self->non_payload_files };
-    return $self->_verify_XXX_manifests(
-        "tagmanifest",
-        $self->tagmanifest_entries(),
-        \@non_payload_files,
-        $return_all_errors
-    );
-}
-
+###############################################
 
 
 sub verify_bag {
@@ -740,37 +730,42 @@ sub verify_bag {
     my $bagit = $self->bag_path;
     my $version = $self->bag_version(); # to call trigger
     my $encoding = $self->bag_encoding(); # to call trigger
-    my $baginfo = $self->bag_info(); #to call trigger
+    my $baginfo = $self->verify_baginfo(); #to call trigger
     my $forced_fixity_alg = $self->forced_fixity_algorithm()->name();
-    my $fetch_file = $self->metadata_path."/fetch.txt";
-    my $manifest_file = $self->metadata_path."/manifest-$forced_fixity_alg.txt"; # FIXME: use plugin instead
+    my $fetch_file = File::Spec->catfile($self->metadata_path, "fetch.txt");
+    my $manifest_file = File::Spec->catfile($self->metadata_path, "manifest-$forced_fixity_alg.txt");
     my $payload_dir   = $self->payload_path;
     my $return_all_errors = $opts->{return_all_errors};
 
-
     if (-f $fetch_file) {
-        die("Fetching via file '$fetch_file' is not supported by current Archive::BagIt implementation")
+        croak("Fetching via file '$fetch_file' is not supported by current Archive::BagIt implementation")
     }
-    die("Manifest '$manifest_file' is not a regular file or does not exist for given bagit version '$version'") unless -f ($manifest_file);
-    die("Payload-directory '$payload_dir' is not a directory or does not exist") unless -d ($payload_dir);
+    croak("Manifest '$manifest_file' is not a regular file or does not exist for given bagit version '$version'") unless -f ($manifest_file);
+    croak("Payload-directory '$payload_dir' is not a directory or does not exist") unless -d ($payload_dir);
 
     unless ($version > .95) {
-        die ("Bag Version $version is unsupported");
+        croak ("Bag Version $version is unsupported");
     }
 
     # check forced fixity
 
-    my $ret_manifests = $self->_verify_manifests($forced_fixity_alg, $return_all_errors);
-    my $ret_tagmanifests = $self->_verify_tagmanifests($forced_fixity_alg, $return_all_errors);
-    if ($ret_manifests && $ret_tagmanifests) {
-        return 1;
-    } else {
-        die join("\n", @{ $self->errors });
+    my @errors;
+    foreach my $algorithm ( keys %{ $self->manifests }) {
+        my $res = $self->manifests->{$algorithm}->verify_manifest($self->payload_files, $return_all_errors);
+        if ((defined $res) && ($res ne "1")) { push @errors, $res; }
+    }
+    foreach my $algorithm ( keys %{ $self->manifests }) {
+        my $res = $self->manifests->{$algorithm}->verify_tagmanifest($self->non_payload_files, $return_all_errors);
+        if ((defined $res) && ($res ne "1")) { push @errors, $res; }
+    }
+    push @{$self->{errors}}, @errors;
+    my $err = $self->errors();
+    my @err =  @{ $err };
+    if (scalar( @err ) > 0) {
+        croak join("\n","bag verify for bagit version '$version' failed with invalid files.", @err);
     }
     return 1;
 }
-
-
 
 
 sub calc_payload_oxum {
@@ -779,7 +774,7 @@ sub calc_payload_oxum {
     my $octets=0;
     my $streamcount = scalar @payload;
     foreach my $local_name (@payload) {# local_name is relative to bagit base
-        my $file = $self->bag_path()."/$local_name";
+        my $file = File::Spec->catfile($self->bag_path(), $local_name);
         my $sb = stat($file);
         $octets += $sb->size;
     }
@@ -797,28 +792,32 @@ sub calc_bagsize {
     else { return sprintf "%0.2f TB", $octets/(1024*1024*1024*1024); }
 }
 
+
 sub create_bagit {
     my($self) = @_;
     my $metadata_path = $self->metadata_path();
-    open(my $BAGIT, ">", "$metadata_path/bagit.txt") or die("Can't open $metadata_path/bagit.txt for writing: $!");
+    my $bagit_path = File::Spec->catfile( $metadata_path, "bagit.txt");
+    open(my $BAGIT, ">:encoding(UTF-8)", $bagit_path) or croak("Can't open $bagit_path for writing: $!");
     print($BAGIT "BagIt-Version: 1.0\nTag-File-Character-Encoding: UTF-8");
     close($BAGIT);
     return 1;
 }
 
+
 sub create_baginfo {
     my($self) = @_; # because bag-info.txt allows multiple key-value-entries, hash is replaced
-    $self->_add_or_replace_bag_info('Bagging-Date', POSIX::strftime("%F", gmtime(time)));
-    $self->_add_or_replace_bag_info('Bag-Software-Agent', 'Archive::BagIt <https://metacpan.org/pod/Archive::BagIt>');
+    $self->add_or_replace_baginfo_by_key('Bagging-Date', POSIX::strftime("%Y-%m-%d", gmtime(time)));
+    $self->add_or_replace_baginfo_by_key('Bag-Software-Agent', 'Archive::BagIt <https://metacpan.org/pod/Archive::BagIt>');
     my ($octets, $streams) = $self->calc_payload_oxum();
-    $self->_add_or_replace_bag_info('Payload-Oxum', "$octets.$streams");
-    $self->_add_or_replace_bag_info('Bag-Size', $self->calc_bagsize());
+    $self->add_or_replace_baginfo_by_key('Payload-Oxum', "$octets.$streams");
+    $self->add_or_replace_baginfo_by_key('Bag-Size', $self->calc_bagsize());
     # The RFC does not allow reordering:
     my $metadata_path = $self->metadata_path();
-    open(my $BAGINFO, ">", "$metadata_path/bag-info.txt") or die("Can't open $metadata_path/bag-info.txt for writing: $!");
+    my $bag_info_path = File::Spec->catfile( $metadata_path, "bag-info.txt");
+    open(my $BAGINFO, ">:encoding(UTF-8)", $bag_info_path) or croak("Can't open $bag_info_path for writing: $!");
     foreach my $entry (@{ $self->bag_info() }) {
         my %tmp = %{ $entry };
-        my ($key, $value) = each %tmp;
+        my ($key, $value) = %tmp;
         if ($key =~ m/:/) { carp "key should not contain a colon! (searchkey='$key')"; }
         print($BAGINFO "$key: $value\n");
     }
@@ -849,9 +848,9 @@ sub store {
 sub init_metadata {
     my ($class, $bag_path) = @_;
     $bag_path =~ s#/$##; # replace trailing slash
-    unless ( -d $bag_path) { die ( "source bag directory '$bag_path' doesn't exist"); }
+    unless ( -d $bag_path) { croak ( "source bag directory '$bag_path' doesn't exist"); }
     my $self = $class->new(bag_path=>$bag_path);
-    warn "no payload path" if ! -d $self->payload_path;
+    carp "no payload path" if ! -d $self->payload_path;
     unless ( -d $self->payload_path) {
         rename ($bag_path, $bag_path.".tmp");
         mkdir  ($bag_path);
@@ -875,12 +874,11 @@ sub init_metadata {
 }
 
 
-
 sub make_bag {
   my ($class, $bag_path) = @_;
   my $isa = ref $class;
   if ($isa eq "Archive::BagIt::Base") { # not a class, but an object!
-    die "make_bag() only a class subroutine, not useable with objects. Try store() instead!\n";
+    croak "make_bag() only a class subroutine, not useable with objects. Try store() instead!\n";
   }
   my $self = $class->init_metadata($bag_path);
   return $self;
@@ -899,16 +897,20 @@ __END__
 
 =head1 NAME
 
-Archive::BagIt::Base
+Archive::BagIt::Base - The common base for Archive::BagIt. This is the module for experts. ;)
 
 =head1 VERSION
 
-version 0.059
+version 0.063
 
 =head1 SYNOPSIS
 
 This modules will hopefully help with the basic commands needed to create
 and verify a bag. This part supports BagIt 1.0 according to RFC 8493 ([https://tools.ietf.org/html/rfc8493](https://tools.ietf.org/html/rfc8493)).
+
+You only need to know the following methods first:
+
+=head2 read a BagIt
 
     use Archive::BagIt::Base;
 
@@ -916,9 +918,14 @@ and verify a bag. This part supports BagIt 1.0 according to RFC 8493 ([https://t
     my $bag_dir = "/path/to/bag";
     my $bag = Archive::BagIt::Base->new($bag_dir);
 
+=head2 construct a BagIt around a payload
 
-    #construct bag in an existing directory
+    use Archive::BagIt::Base;
     my $bag2 = Archive::BagIt::Base->make_bag($bag_dir);
+
+=head2 verify a BagIt-dir
+
+    use Archive::BagIt::Base;
 
     # Validate a BagIt archive against its manifest
     my $bag3 = Archive::BagIt::Base->new($bag_dir);
@@ -928,13 +935,23 @@ and verify a bag. This part supports BagIt 1.0 according to RFC 8493 ([https://t
     my $bag4 = Archive::BagIt::Base->new($bag_dir);
     my $is_valid2 = $bag4->verify_bag( {report_all_errors => 1} );
 
+=head2 read a BagIt-dir, change something, store
+
+Because all methods operate lazy, you should ensure to parse parts of the bag *BEFORE* you modify it.
+Otherwise it will be overwritten!
+
+    use Archive::BagIt::Base;
+    my $bag5 = Archive::BagIt::Base->new($bag_dir); # lazy, nothing happened
+    $bag5->load(); # this updates the object representation by parsing the given $bag_dir
+    $bag5->store(); # this writes the bag new
+
 =head1 NAME
 
-Archive::BagIt::Base
+Archive::BagIt::Base - The common base for Archive::BagIt. This is the module for experts. ;)
 
 =head1 VERSION
 
-version 0.059
+version 0.063
 
 =head1 NAME
 
@@ -1001,11 +1018,7 @@ See L<https://datatracker.ietf.org/doc/rfc8493/?include_text=1> for details.
 
 =over
 
-=item Add support for non-Unix based filesystems
-
 =item enhanced testsuite
-
-=item improved plugin mechanism
 
 =item reduce complexity
 
@@ -1013,9 +1026,52 @@ See L<https://datatracker.ietf.org/doc/rfc8493/?include_text=1> for details.
 
 =item add code to easily update outdated Bags to v1.0
 
-=item add more ecamples in documentation
-
 =back
+
+=head1 FAQ
+
+=head2 How to access the manifest-entries directly?
+
+Try this:
+
+   foreach my $algorithm ( keys %{ $self->manifests }) {
+       my $entries_ref = $self->manifests->{$algorithm}->manifest_entries();
+       # $entries_ref returns a hashref of form:
+       # $entries_ref->{$algorithm}->{$file} = $digest;
+   }
+
+Similar for tagmanifests
+
+=head2 How fast is C<Archive::BagIt::Fast>?
+
+It depends. On my system with SSD and a 38MB bag with 48 payload files the results for C<verify_bag()> are:
+
+                  Rate BaseParallel FastParallel         Base         Fast
+   BaseParallel 2.46/s           --          -2%         -52%         -57%
+   FastParallel 2.52/s           2%           --         -51%         -56%
+   Base         5.10/s         107%         102%           --         -10%
+   Fast         5.69/s         131%         125%          11%           --
+
+On network filesystem (CIFS, 1GB) with same Bag:
+
+                  Rate FastParallel         Fast BaseParallel         Base
+   FastParallel 1.97/s           --         -10%         -15%         -20%
+   Fast         2.20/s          12%           --          -6%         -11%
+   BaseParallel 2.33/s          18%           6%           --          -6%
+   Base         2.48/s          26%          13%           6%           --
+
+But you should measure which variant is best for you. In general the default C<Archive::BagIt::Base> is fast enough.
+
+=head2 How to update an old bag of version v0.97 to v1.0?
+
+You could try this:
+
+   use Archive::BagIt::Base;
+   my $bag=Archive::BagIt::Base->new( $my_old_bag_filepath );
+   $bag->load();
+   $bag->store();
+
+=head1 METHODS
 
 =head2 Constructor
 
@@ -1049,17 +1105,145 @@ The arguments are:
 
 =back
 
+The bag object will use $bag_dir, BUT an existing $bag_dir is not read. If you use C<store()> an existing bag will be overwritten!
+
+See C<load()> if you want to parse/modify an existing bag.
+
+=head2 has_parallel()
+
+to check if parallelization is possible.
+
+=head2 bag_path([$new_value])
+
+Getter/setter for bag path
+
+=head2 metadata_path()
+
+Getter for metadata path
+
+=head2 payload_path()
+
+Getter for payload path
+
+=head2 checksum_algos()
+
+Getter for registered Checksums
+
+=head2 bag_version()
+
+Getter for bag version
+
+=head2 bag_encoding()
+
+Getter for bag encoding.
+
+HINT: the current version of Archive::BagIt::Base only supports UTF-8, but the method could return other values depending on given Bags.
+
+=head2 bag_info([$new_value])
+
+Getter/Setter for bag info. Expects/returns an array of HashRefs implementing simple key-value pairs.
+
+HINT: RFC8493 does not allow *reordering* of entries!
+
+=head2 errors()
+
+Getter to return collected errors after a C<verify_bag()> call with Option C<report_all_errors>
+
+=head2 digest_callback()
+
+This method could be reimplemented by derived classes to handle fixity checks in own way. The
+getter returns an anonymous function with following interface:
+
+   my $digest = $self->digest_callback;
+   &$digest( $digestobject, $filename);
+
+This anonymous function MUST use the C<get_hash_string()> function of the C<Archive::BagIt::Role::Algorithm> role,
+which is implemented by each C<Archive::BagIt::Plugin::Algorithm::XXXX> module.
+
+See C<Archive::BagIt::Fast> for details.
+
+=head2 get_baginfo_values_by_key($searchkey)
+
+Returns all values which match $searchkey, undef otherwise
+
+=head2 is_baginfo_key_reserved_as_uniq($searchkey)
+
+returns true if key is reserved and should be uniq
+
+=head2 is_baginfo_key_reserved( $searchkey )
+
+returns true if key is reserved
+
+=head2 verify_baginfo()
+
+checks baginfo-keys, returns true if all fine, otherwise returns undef and the message is pushed to C<errors()>.
+
+=head2 delete_baginfo_by_key( $searchkey )
+
+deletes an entry of given $searchkey if exists
+
+=head2 exists_baginfo_key( $searchkey )
+
+returns true if a given $searchkey exists
+
+=head2 append_baginfo_by_key($searchkey, $newvalue)
+
+Appends a key value pair to bag_info.
+
+HINT: check return code if append was successful, because some keys needs to be uniq.
+
+=head2 add_or_replace_baginfo_by_key($searchkey, $newvalue)
+
+It replaces the first entry with $newvalue if $searchkey exists, otherwise it appends.
+
+=head2 forced_fixity_algorithm()
+
+Getter to return the forced fixity algorithm depending on BagIt version
+
+=head2 manifest_files()
+
+Getter to find all manifest-files
+
+=head2 tagmanifest_files()
+
+Getter to find all tagmanifest-files
+
+=head2 payload_files()
+
+Getter to find all payload-files
+
+=head2 non_payload_files()
+
+Getter to find all non payload-files
+
+=head2 plugins()
+
+Getter/setter to algorithm plugins
+
+=head2 manifests()
+
+Getter/Setter to all manifests (objects)
+
+=head2 algos()
+
+Getter/Setter to all registered Algorithms
+
 =head2 load_plugins
 
 As default SHA512 and MD5 will be loaded and therefore used. If you want to create a bag only with one or a specific
 checksum-algorithm, you could use this method to (re-)register it. It expects list of strings with namespace of type:
 Archive::BagIt::Plugin::Algorithm::XXX where XXX is your chosen fixity algorithm.
 
-=head2 verify_bag
+=head2 load()
 
-An interface to verify a bag.
+Triggers loading of an existing bag
 
-You might also want to check Archive::BagIt::Fast to see a more direct way of accessing files (and thus faster).
+=head2 verify_bag($opts)
+
+A method to verify a bag deeply. If C<$opts> is set with C<{return_all_errors}> all fixity errors are reported.
+The default ist to croak with error message if any error is detected.
+
+HINT: You might also want to check Archive::BagIt::Fast to see a more direct way of accessing files (and thus faster).
 
 =head2 calc_payload_oxum()
 
@@ -1069,17 +1253,28 @@ returns an array with octets and streamcount of payload-dir
 
 returns a string with human readable size of paylod
 
-=head2 store
+=head2 create_bagit()
 
-store a bagit-obj if bagit directory-structure was already constructed,
+creates a bagit.txt file
 
-=head2 init_metadata
+=head2 create_baginfo()
+
+creates a bag-info.txt file
+
+Hint: the entries 'Bagging-Date', 'Bag-Software-Agent', 'Payload-Oxum' and 'Bag-Size' will be automagically set,
+existing values in internal bag-info representation will be overwritten!
+
+=head2 store()
+
+store a bagit-obj if bagit directory-structure was already constructed.
+
+=head2 init_metadata()
 
 A constructor that will just create the metadata directory
 
 This won't make a bag, but it will create the conditions to do that eventually
 
-=head2 make_bag
+=head2 make_bag( $bag_path )
 
 A constructor that will make and return a bag from a directory,
 
@@ -1092,11 +1287,6 @@ The latest version of this module is available from the Comprehensive Perl
 Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
 site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
-=head1 SOURCE
-
-The development version is on github at L<https://github.com/Archive-BagIt>
-and may be cloned from L<git://github.com/Archive-BagIt.git>
-
 =head1 BUGS AND LIMITATIONS
 
 You can make new bug reports, and view existing ones, through the
@@ -1108,7 +1298,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -1119,7 +1309,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

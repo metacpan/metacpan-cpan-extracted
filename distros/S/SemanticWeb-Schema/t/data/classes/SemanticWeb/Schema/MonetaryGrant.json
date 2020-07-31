@@ -1,29 +1,25 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:FundInfoCollab",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A monetary grant.",
       "rdfs:label" : "MonetaryGrant",
       "rdfs:subClassOf" : "schema:Grant",
       "schema:category" : "issue-383",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "schemadotorgsources2:FundInfoCollab"
    },
    "properties" : {
       "schema:amount" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "https://github.com/schemaorg/schemaorg/issues/1698"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of money.",
          "rdfs:label" : "amount",
          "schema:category" : [
-            "issue-1253",
-            "issue-1698"
+            "issue-1698",
+            "issue-1253"
          ],
          "schema:domainIncludes" : [
-            "schema:MoneyTransfer",
             "schema:DatedMoneySpecification",
+            "schema:MoneyTransfer",
             "schema:MonetaryGrant",
             "schema:LoanOrCredit",
             "schema:InvestmentOrDeposit"
@@ -31,6 +27,10 @@
          "schema:rangeIncludes" : [
             "schema:MonetaryAmount",
             "schema:Number"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ]
       },
       "schema:funder" : {
@@ -39,11 +39,11 @@
          "rdfs:label" : "funder",
          "rdfs:subPropertyOf" : "schema:sponsor",
          "schema:domainIncludes" : [
-            "schema:Person",
-            "schema:MonetaryGrant",
+            "schema:CreativeWork",
             "schema:Organization",
-            "schema:Event",
-            "schema:CreativeWork"
+            "schema:MonetaryGrant",
+            "schema:Person",
+            "schema:Event"
          ],
          "schema:rangeIncludes" : [
             "schema:Organization",

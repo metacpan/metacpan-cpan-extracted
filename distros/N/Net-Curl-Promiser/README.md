@@ -9,8 +9,8 @@ timers, etc. This module does all of that for you and puts a Promise
 interface on top of it, so asynchronous I/O becomes almost as simple as
 synchronous I/O.
 
-[Net::Curl::Promiser](https://metacpan.org/pod/Net::Curl::Promiser) itself is a base class; you’ll need to provide
-a subclass that works with whatever event interface you use.
+[Net::Curl::Promiser](https://metacpan.org/pod/Net::Curl::Promiser) itself is a base class; you’ll need to use
+a subclass that works with your chosen event interface.
 
 This distribution provides the following usable subclasses:
 

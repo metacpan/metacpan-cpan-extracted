@@ -3,14 +3,24 @@ NAME
     rules
 
 INSTALLATION
-    RT-Extension-AutomaticAssignment requires version RT 4.2.0 or later.
+    RT-Extension-AutomaticAssignment 1.* versions require RT 5.0 or later.
+    Use 0.* versions if you are still using RT 4.
 
     perl Makefile.PL
     make
     make install
         This step may require root permissions.
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    make initdb
+        Only run this the first time you install this module.
+
+        If you run this twice, you may end up with duplicate data in your
+        database.
+
+        If you are upgrading this module, check for upgrading instructions
+        in case changes need to be made to your database.
+
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin( "RT::Extension::AutomaticAssignment" );
@@ -22,7 +32,7 @@ INSTALLATION
             Set( @CustomFieldValuesSources, "RT::CustomFieldValues::ServiceBusinessHours" );
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
     Create scrips
@@ -83,7 +93,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-AutomaticAssignment>.
 
 COPYRIGHT
-    This extension is Copyright (C) 2016 Best Practical Solutions, LLC.
+    This extension is Copyright (C) 2016-2020 Best Practical Solutions, LLC.
 
     This is free software, licensed under:
 

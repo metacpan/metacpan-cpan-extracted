@@ -18,13 +18,13 @@
          "rdfs:comment" : "A member of an Organization or a ProgramMembership. Organizations can be members of organizations; ProgramMembership is typically for individuals.",
          "rdfs:label" : "member",
          "schema:domainIncludes" : [
-            "schema:ProgramMembership",
-            "schema:Organization"
+            "schema:Organization",
+            "schema:ProgramMembership"
          ],
          "schema:inverseOf" : "schema:memberOf",
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:members" : {
@@ -49,7 +49,6 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:membershipPointsEarned" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2085",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of membership points earned by the member. If necessary, the unitText can be used to express the units the points are issued in. (e.g. stars, miles, etc.)",
          "rdfs:label" : "membershipPointsEarned",
@@ -59,7 +58,8 @@
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
             "schema:Number"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2085"
       },
       "schema:programName" : {
          "rdf:type" : "rdf:Property",

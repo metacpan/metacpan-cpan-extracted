@@ -43,6 +43,7 @@ jQuery(function () {
                     filterContainer.removeClass('adding');
                     addFilterSelect.val('').attr('disabled', false);
                     addFilterButton.attr('disabled', false);
+                    jQuery('.selectpicker').selectpicker('refresh');
                 },
                 error: function (xhr, reason) {
                     alert(reason);

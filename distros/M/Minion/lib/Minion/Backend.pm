@@ -5,6 +5,13 @@ use Carp qw(croak);
 
 has minion => undef, weak => 1;
 
+sub auto_retry_job {
+  my ($self, $id, $retries, $attempts) = @_;
+  return 1 if $attempts <= 1;
+  my $delay = $self->minion->backoff->($retries);
+  return $self->retry_job($id, $retries, {attempts => $attempts > 1 ? $attempts - 1 : 1, delay => $delay});
+}
+
 sub broadcast         { croak 'Method "broadcast" not implemented by subclass' }
 sub dequeue           { croak 'Method "dequeue" not implemented by subclass' }
 sub enqueue           { croak 'Method "enqueue" not implemented by subclass' }
@@ -78,6 +85,13 @@ L<Minion> object this backend belongs to. Note that this attribute is weakened.
 =head1 METHODS
 
 L<Minion::Backend> inherits all methods from L<Mojo::Base> and implements the following new ones.
+
+=head2 auto_retry_job
+
+  my $bool = $backend->auto_retry_job($job_id, $retries, $attempts);
+
+Automatically L</"retry"> job with L<Minion/"backoff"> if there are attempts left, used to implement backends like
+L<Minion::Backend::Pg>.
 
 =head2 broadcast
 
@@ -174,6 +188,13 @@ Delay job for this many seconds (from now), defaults to C<0>.
 
 Job is valid for this many seconds (from now) before it expires. Note that this option is B<EXPERIMENTAL> and might
 change without warning!
+
+=item lax
+
+  lax => 1
+
+Existing jobs this job depends on may also have transitioned to the C<failed> state to allow for it to be processed,
+defaults to C<false>. Note that this option is B<EXPERIMENTAL> and might change without warning!
 
 =item notes
 
@@ -277,7 +298,7 @@ List only jobs with these ids.
 
   notes => ['foo', 'bar']
 
-List only jobs with one of these notes. Note that this option is B<EXPERIMENTAL> and might change without warning!
+List only jobs with one of these notes.
 
 =item queues
 
@@ -350,6 +371,12 @@ Epoch time job was finished.
   id => 10025
 
 Job id.
+
+=item lax
+
+  lax => 0
+
+Existing jobs this job depends on may also have failed to allow for it to be processed.
 
 =item notes
 
@@ -671,6 +698,13 @@ Delay job for this many seconds (from now), defaults to C<0>.
 Job is valid for this many seconds (from now) before it expires. Note that this option is B<EXPERIMENTAL> and might
 change without warning!
 
+=item lax
+
+  lax => 1
+
+Existing jobs this job depends on may also have transitioned to the C<failed> state to allow for it to be processed,
+defaults to C<false>. Note that this option is B<EXPERIMENTAL> and might change without warning!
+
 =item parents
 
   parents => [$id1, $id2, $id3]
@@ -778,6 +812,6 @@ Unregister worker. Meant to be overloaded in a subclass.
 
 =head1 SEE ALSO
 
-L<Minion>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+L<Minion>, L<https://minion.pm>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

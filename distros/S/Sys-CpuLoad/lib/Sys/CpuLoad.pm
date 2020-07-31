@@ -21,7 +21,7 @@ use XSLoader;
 our @EXPORT    = qw();
 our @EXPORT_OK = qw(load getloadavg proc_loadavg uptime);
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 XSLoader::load 'Sys::CpuLoad', $VERSION;
 
@@ -104,7 +104,7 @@ Sys::CpuLoad - retrieve system load averages
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 

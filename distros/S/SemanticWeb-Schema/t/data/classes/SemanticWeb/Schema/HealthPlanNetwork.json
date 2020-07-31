@@ -1,49 +1,49 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A US-style health insurance plan network.",
       "rdfs:label" : "HealthPlanNetwork",
       "rdfs:subClassOf" : "schema:Intangible",
       "schema:category" : "issue-1062",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
    },
    "properties" : {
       "schema:healthPlanCostSharing" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Whether The costs to the patient for services under this network or formulary.",
          "rdfs:label" : "healthPlanCostSharing",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:HealthPlanNetwork",
-            "schema:HealthPlanFormulary"
+            "schema:HealthPlanFormulary",
+            "schema:HealthPlanNetwork"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Boolean"
+         "schema:rangeIncludes" : "schema:Boolean",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:healthPlanNetworkId" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Name or unique ID of network. (Networks are often reused across different insurance plans).",
          "rdfs:label" : "healthPlanNetworkId",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:HealthPlanNetwork",
-            "schema:MedicalOrganization"
+            "schema:MedicalOrganization",
+            "schema:HealthPlanNetwork"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:healthPlanNetworkTier" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The tier(s) for this network.",
          "rdfs:label" : "healthPlanNetworkTier",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : "schema:HealthPlanNetwork",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       }
    }
 }

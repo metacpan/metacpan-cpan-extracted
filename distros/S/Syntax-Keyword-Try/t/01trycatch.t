@@ -106,4 +106,21 @@ use Syntax::Keyword::Try;
    }
 }
 
+# catch into lexical does not retain
+{
+   use Syntax::Keyword::Try ':experimental(var)';
+
+   my $destroyed;
+   sub Canary::DESTROY { $destroyed++ }
+
+   try {
+      die bless [], "Canary";
+   }
+   catch ( $e ) {
+      # don't touch $e
+   }
+
+   ok( $destroyed, 'catch ($var) does not retain value' );
+}
+
 done_testing;

@@ -113,24 +113,10 @@ KEYWORDS
           STATEMENTS...
        }
 
-    Or
-
-       ...
-       catch ($var) {
-          STATEMENTS...
-       }
-
-    Experimental; since version 0.14.
-
     A catch statement provides a block of code to the preceding try
     statement that will be invoked in the case that the main block of code
     throws an exception. The catch block can inspect the raised exception
-    by looking in $@ in the usual way. Optionally, a new lexical variable
-    can be introduced to store the exception in. This new form is
-    experimental and is likely to be expanded on in a future version, as
-    part of the wider attempt to introduce typed dispatch. Using it will
-    provoke an experimental category warning on supporting perl versions,
-    unless silenced by importing the :experimental(var) tag (see above).
+    by looking in $@ in the usual way.
 
     Presence of this catch statement causes any exception thrown by the
     preceding try block to be non-fatal to the surrounding code. If the
@@ -146,6 +132,22 @@ KEYWORDS
 
     If a catch statement is not given, then any exceptions raised by the
     try block are raised to the caller in the usual way.
+
+ catch (Var)
+
+       ...
+       catch ($var) {
+          STATEMENTS...
+       }
+
+    Experimental; since version 0.14.
+
+    Optionally, a new lexical variable can be introduced to store the
+    exception in. This new form is experimental and is likely to be
+    expanded on in a future version, as part of the wider attempt to
+    introduce typed dispatch. Using it will provoke an experimental
+    category warning on supporting perl versions, unless silenced by
+    importing the :experimental(var) tag (see above).
 
  catch (Typed)
 

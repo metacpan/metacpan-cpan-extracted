@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has in_store_returns_offered => (
@@ -82,7 +82,7 @@ SemanticWeb::Schema::MerchantReturnPolicy - A MerchantReturnPolicy provides info
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 

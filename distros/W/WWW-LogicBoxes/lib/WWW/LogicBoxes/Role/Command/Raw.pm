@@ -18,7 +18,7 @@ use Carp;
 
 requires 'username', 'password', 'api_key', '_base_uri', 'response_type';
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: Construct Methods For Making Raw LogicBoxes Requests
 
 use Readonly;

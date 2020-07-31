@@ -2,8 +2,8 @@ NAME
     Media::Info - Return information on media file/URL
 
 VERSION
-    This document describes version 0.132 of Media::Info (from Perl
-    distribution Media-Info), released on 2020-06-02.
+    This document describes version 0.133 of Media::Info (from Perl
+    distribution Media-Info), released on 2020-07-29.
 
 SYNOPSIS
      use Media::Info qw(get_media_info);

@@ -12,7 +12,7 @@ use WWW::LogicBoxes::Types qw( Bool DomainName DomainNames Int InvoiceOption );
 use Carp;
 use Mozilla::PublicSuffix qw( public_suffix );
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: Abstract Base Class for Domain Registration/Transfer Requests
 
 has name => (

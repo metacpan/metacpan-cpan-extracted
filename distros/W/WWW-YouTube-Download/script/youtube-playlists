@@ -137,7 +137,7 @@ youtube-playlists.pl - Find a YouTube video URLs from playlist(s)
 
 =head1 VERSION
 
-version 0.62
+version 0.63
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ xaicron <xaicron {@} cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2019 by Yuji Shimada.
+This software is copyright (c) 2013 by Yuji Shimada.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.064';
+our $VERSION = '1.065';
 # ABSTRACT: The Best Web Framework Deserves the Best CMS
 
 #pod =encoding utf8
@@ -234,7 +234,7 @@ Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.064
+version 1.065
 
 =head1 SYNOPSIS
 
@@ -427,7 +427,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Boris Däppen Ed J Erik Johansen Mohammad S Anwar Pavel Serikov Rajesh Mallah William Lindley Wojtek Bażant
+=for stopwords Boris Däppen Ed J Erik Johansen Josh Rabinowitz Mohammad S Anwar Pavel Serikov Rajesh Mallah William Lindley Wojtek Bażant
 
 =over 4
 
@@ -442,6 +442,10 @@ Ed J <mohawk2@users.noreply.github.com>
 =item *
 
 Erik Johansen <uniejo@users.noreply.github.com>
+
+=item *
+
+Josh Rabinowitz <joshr@joshr.com>
 
 =item *
 

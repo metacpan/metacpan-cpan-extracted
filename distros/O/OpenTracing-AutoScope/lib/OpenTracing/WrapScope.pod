@@ -82,6 +82,9 @@ regardless of where L<OpenTracing::WrapScope> is used.
 The effect is the same as using the subroutine names directly.
 Multiple files can be specified at once.
 
+Comments are supported, any line starting with C<#> will be skipped,
+trailing comments beginning with C<#> will be ignored.
+
 Suppose you have a file called C<wrapscope.conf> with the following contents:
 
   Foo::bar

@@ -1,6 +1,24 @@
 Revision history for MoopsX-UsingMoose
 
-0.0102 2017-11-28 21:02:05 UTC
+0.0103 2020-07-29 10:45:05 UTC
+ [Documentation]
+ - Added STATUS section.
+
+ [Stats & Dependency Changes]
+ - 2 files changed, 7 insertions(+), 2 deletions(-)
+ - (dev req) ~ Dist::Zilla 6.010 --> 6.015
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.008 --> 0.009
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent 0.008 --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.041 --> 2.046
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.030 --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::PromptIfStale 0.054 --> 0.057
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests 0.028 --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile 2.057 --> 2.058
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version 1.05 --> 1.09
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0319 --> 0.0325
+
+0.0102 2017-11-28T21:02:05Z UTC
  [Other]
  - Rebuilt with current tooling.
 

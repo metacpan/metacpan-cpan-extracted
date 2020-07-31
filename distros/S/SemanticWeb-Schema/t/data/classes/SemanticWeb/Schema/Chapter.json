@@ -8,52 +8,52 @@
    },
    "properties" : {
       "schema:pageEnd" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
          "owl:equivalentProperty" : "bibo:pageEnd",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The page on which the work ends; for example \"138\" or \"xvi\".",
          "rdfs:label" : "pageEnd",
          "schema:domainIncludes" : [
+            "schema:Chapter",
             "schema:Article",
-            "schema:PublicationIssue",
             "schema:PublicationVolume",
-            "schema:Chapter"
+            "schema:PublicationIssue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
-         ]
+            "schema:Text",
+            "schema:Integer"
+         ],
+         "schema:source" : "schemadotorgsources:source_bibex"
       },
       "schema:pageStart" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
          "owl:equivalentProperty" : "bibo:pageStart",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The page on which the work starts; for example \"135\" or \"xiii\".",
          "rdfs:label" : "pageStart",
          "schema:domainIncludes" : [
-            "schema:Chapter",
+            "schema:Article",
             "schema:PublicationVolume",
-            "schema:PublicationIssue",
-            "schema:Article"
+            "schema:Chapter",
+            "schema:PublicationIssue"
          ],
          "schema:rangeIncludes" : [
-            "schema:Integer",
-            "schema:Text"
-         ]
+            "schema:Text",
+            "schema:Integer"
+         ],
+         "schema:source" : "schemadotorgsources:source_bibex"
       },
       "schema:pagination" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
          "owl:equivalentProperty" : "bibo:pages",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Any description of pages that is not separated into pageStart and pageEnd; for example, \"1-6, 9, 55\" or \"10-12, 46-49\".",
          "rdfs:label" : "pagination",
          "schema:domainIncludes" : [
-            "schema:Article",
             "schema:Chapter",
+            "schema:Article",
             "schema:PublicationVolume",
             "schema:PublicationIssue"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "schemadotorgsources:source_bibex"
       }
    }
 }

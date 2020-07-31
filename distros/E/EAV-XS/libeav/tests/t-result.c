@@ -55,6 +55,7 @@ main (int argc, char *argv[])
 
     while ((read = getline (&line, &len, fh)) != EOF) {
         line[read-1] = '\0';
+        if (read >= 2 && line[read-2] == '\r') line[read-2] = '\0';
 
         if (line[0] == '#') /* skip comments */
             continue;

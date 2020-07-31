@@ -1,15 +1,15 @@
 {
    "class" : {
-      "dc:source" : [
-         "https://github.com/schemaorg/schemaorg/issues/1253",
-         "schemadotorgsources:FIBO"
-      ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A company or fund that gathers capital from a number of investors to create a pool of money that is then re-invested into stocks, bonds and other assets.",
       "rdfs:label" : "InvestmentFund",
       "rdfs:subClassOf" : "schema:InvestmentOrDeposit",
       "schema:category" : "issue-1253",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : [
+         "schemadotorgsources:FIBO",
+         "https://github.com/schemaorg/schemaorg/issues/1253"
+      ]
    },
    "properties" : {}
 }

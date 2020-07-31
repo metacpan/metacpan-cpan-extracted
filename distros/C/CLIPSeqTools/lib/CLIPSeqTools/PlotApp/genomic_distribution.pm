@@ -25,7 +25,7 @@ Create plots for script genomic_distribution.
 =cut
 
 package CLIPSeqTools::PlotApp::genomic_distribution;
-$CLIPSeqTools::PlotApp::genomic_distribution::VERSION = '0.1.9';
+$CLIPSeqTools::PlotApp::genomic_distribution::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

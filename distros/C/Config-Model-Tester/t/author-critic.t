@@ -2,7 +2,7 @@
 #
 # This file is part of Config-Model-Tester
 #
-# This software is Copyright (c) 2013-2019 by Dominique Dumont.
+# This software is Copyright (c) 2013-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #

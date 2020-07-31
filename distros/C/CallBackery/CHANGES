@@ -1,3 +1,7 @@
+0.34.2 2020-07-31 13:49:05 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - translate on selectbox content reconfiguration
+
 0.34.1 2020-07-27 09:28:23 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - if popup windows have not set maxWidth/maxHeight, set according the

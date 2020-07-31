@@ -1,80 +1,80 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:MBZ",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A MusicRelease is a specific release of a music album.",
       "rdfs:label" : "MusicRelease",
-      "rdfs:subClassOf" : "schema:MusicPlaylist"
+      "rdfs:subClassOf" : "schema:MusicPlaylist",
+      "schema:source" : "schemadotorgsources:MBZ"
    },
    "properties" : {
       "schema:catalogNumber" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The catalog number for the release.",
          "rdfs:label" : "catalogNumber",
          "schema:domainIncludes" : "schema:MusicRelease",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:creditedTo" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The group the release is credited to if different than the byArtist. For example, Red and Blue is credited to \"Stefani Germanotta Band\", but by Lady Gaga.",
          "rdfs:label" : "creditedTo",
          "schema:domainIncludes" : "schema:MusicRelease",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
-         ]
+            "schema:Organization",
+            "schema:Person"
+         ],
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:duration" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1457",
-            "https://github.com/schemaorg/schemaorg/issues/1698"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The duration of the item (movie, audio recording, event, etc.) in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>.",
          "rdfs:label" : "duration",
          "schema:category" : [
-            "issue-1457",
-            "issue-1698"
+            "issue-1698",
+            "issue-1457"
          ],
          "schema:domainIncludes" : [
-            "schema:Movie",
-            "schema:Schedule",
-            "schema:Event",
-            "schema:QuantitativeValueDistribution",
             "schema:Audiobook",
+            "schema:Schedule",
             "schema:MusicRelease",
-            "schema:MediaObject",
-            "schema:MusicRecording"
+            "schema:QuantitativeValueDistribution",
+            "schema:MusicRecording",
+            "schema:Movie",
+            "schema:Event",
+            "schema:MediaObject"
          ],
-         "schema:rangeIncludes" : "schema:Duration"
+         "schema:rangeIncludes" : "schema:Duration",
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1698",
+            "https://github.com/schemaorg/schemaorg/issues/1457"
+         ]
       },
       "schema:musicReleaseFormat" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Format of this release (the type of recording media used, ie. compact disc, digital media, LP, etc.).",
          "rdfs:label" : "musicReleaseFormat",
          "schema:domainIncludes" : "schema:MusicRelease",
-         "schema:rangeIncludes" : "schema:MusicReleaseFormatType"
+         "schema:rangeIncludes" : "schema:MusicReleaseFormatType",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:recordLabel" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "owl:equivalentProperty" : "mo:label",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The label that issued the release.",
          "rdfs:label" : "recordLabel",
          "schema:domainIncludes" : "schema:MusicRelease",
-         "schema:rangeIncludes" : "schema:Organization"
+         "schema:rangeIncludes" : "schema:Organization",
+         "schema:source" : "schemadotorgsources:MBZ"
       },
       "schema:releaseOf" : {
-         "dc:source" : "schemadotorgsources:MBZ",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The album this is a release of.",
          "rdfs:label" : "releaseOf",
          "schema:domainIncludes" : "schema:MusicRelease",
          "schema:inverseOf" : "schema:albumRelease",
-         "schema:rangeIncludes" : "schema:MusicAlbum"
+         "schema:rangeIncludes" : "schema:MusicAlbum",
+         "schema:source" : "schemadotorgsources:MBZ"
       }
    }
 }

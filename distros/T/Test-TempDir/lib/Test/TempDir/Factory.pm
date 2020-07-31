@@ -1,7 +1,7 @@
 package Test::TempDir::Factory;
 # ABSTRACT: A factory for creating L<Test::TempDir::Handle> objects
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Moose;
 use Carp qw(croak carp);
@@ -149,11 +149,8 @@ sub try_lock {
 
     return 1 if !$self->lock;
 
-    require File::NFSLock;
-    File::NFSLock->new({
-        file => $path->stringify . ".lock", # FIXME $path->file ? make sure it's not zapped by empty
-        %{ $self->lock_opts },
-    });
+    # no more File::NFSLock
+    return 1;
 }
 
 sub make_subdir {
@@ -209,7 +206,7 @@ Test::TempDir::Factory - A factory for creating L<Test::TempDir::Handle> objects
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -226,26 +223,24 @@ version 0.10
 =head1 DESCRIPTION
 
 This class creates L<Test::TempDir::Handle> objects with the right C<dir>
-parameter, taking care of obtaining locks, creating directories, and handling
+parameter, creating directories, and handling
 fallback logic.
 
 =head1 ATTRIBUTES
 
 =head2 C<lock>
 
-Whether or not to enable locking.
-
-Defaults to true.
+No longer used.
 
 =head2 C<lock_opts>
 
-A hash reference to pass to L<File::NFSLock>.
+No longer used.
 
 Defaults to C<NONBLOCKING>
 
 =head2 C<lock_attempts>
 
-How many times to try to create and lock a directory.
+No longer used.
 
 Defaults to 2.
 
@@ -291,11 +286,22 @@ logger.
 
 Create a L<Test::TempDir::Handle> object with a proper C<dir> attribute.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Test-TempDir>
+(or L<bug-Test-TempDir@rt.cpan.org|mailto:bug-Test-TempDir@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://lists.perl.org/list/perl-qa.html>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#perl> on C<irc.perl.org>|irc://irc.perl.org/#perl-qa>.
+
 =head1 AUTHOR
 
 יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2006 by יובל קוג'מן (Yuval Kogman).
 

@@ -1,9 +1,9 @@
 use strict;
 use warnings;
-package Test::TempDir; # git description: v0.09-5-gd190d22
+package Test::TempDir; # git description: v0.10-11-g629f4d3
 # ABSTRACT: (DEPRECATED) Temporary files support for testing
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use File::Temp ();
 
@@ -58,7 +58,7 @@ Test::TempDir - (DEPRECATED) Temporary files support for testing
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 DEPRECATION NOTICE
 
@@ -156,16 +156,20 @@ L<Path::Class>
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Test-TempDir>
+(or L<bug-Test-TempDir@rt.cpan.org|mailto:bug-Test-TempDir@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://lists.perl.org/list/perl-qa.html>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#perl> on C<irc.perl.org>|irc://irc.perl.org/#perl-qa>.
+
 =head1 AUTHOR
 
 יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2006 by יובל קוג'מן (Yuval Kogman).
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =head1 CONTRIBUTORS
 
@@ -182,5 +186,12 @@ Karen Etheridge <ether@cpan.org>
 Florian Ragwitz <rafl@debian.org>
 
 =back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2006 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

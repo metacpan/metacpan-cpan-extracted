@@ -7,17 +7,17 @@
    },
    "properties" : {
       "schema:accommodationFloorPlan" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A floorplan of some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>.",
          "rdfs:label" : "accommodationFloorPlan",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:Residence"
+            "schema:Residence",
+            "schema:Accommodation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:FloorPlan"
+         "schema:rangeIncludes" : "schema:FloorPlan",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       }
    }
 }

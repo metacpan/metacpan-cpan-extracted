@@ -4,9 +4,9 @@
       "rdfs:comment" : "A sub-grouping of steps in the instructions for how to achieve a result (e.g. steps for making a pie crust within a pie recipe).",
       "rdfs:label" : "HowToSection",
       "rdfs:subClassOf" : [
-         "schema:ItemList",
          "schema:ListItem",
-         "schema:CreativeWork"
+         "schema:CreativeWork",
+         "schema:ItemList"
       ]
    },
    "properties" : {
@@ -19,9 +19,9 @@
             "schema:HowTo"
          ],
          "schema:rangeIncludes" : [
-            "schema:ItemList",
             "schema:CreativeWork",
-            "schema:Text"
+            "schema:Text",
+            "schema:ItemList"
          ],
          "schema:supersededBy" : "schema:step"
       }

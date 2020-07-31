@@ -13,9 +13,9 @@
          "rdfs:comment" : "An active ingredient, typically chemical compounds and/or biologic substances.",
          "rdfs:label" : "activeIngredient",
          "schema:domainIncludes" : [
+            "schema:DietarySupplement",
             "schema:Substance",
             "schema:Drug",
-            "schema:DietarySupplement",
             "schema:DrugStrength"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
@@ -26,10 +26,10 @@
          "rdfs:comment" : "Recommended intake of this supplement for a given population as defined by a specific recommending authority.",
          "rdfs:label" : "maximumIntake",
          "schema:domainIncludes" : [
-            "schema:Substance",
             "schema:DrugStrength",
-            "schema:DietarySupplement",
-            "schema:Drug"
+            "schema:Substance",
+            "schema:Drug",
+            "schema:DietarySupplement"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MaximumDoseSchedule"

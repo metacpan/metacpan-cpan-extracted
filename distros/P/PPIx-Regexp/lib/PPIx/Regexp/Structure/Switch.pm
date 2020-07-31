@@ -36,7 +36,7 @@ use base qw{ PPIx::Regexp::Structure };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.072';
+our $VERSION = '0.073';
 
 sub __PPIX_LEXER__finalize {
     my ( $self, $lexer ) = @_;

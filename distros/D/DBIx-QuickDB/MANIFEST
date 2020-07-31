@@ -21,11 +21,13 @@ lib/Test2/Tools/QuickDB.pm
 perltidyrc
 t/00-report.t
 t/Drivers/ANY.t
+t/Drivers/MariaDB.t
 t/Drivers/MySQL.t
 t/Drivers/PostgreSQL.t
 t/Drivers/SQLite.t
 t/HashBase.t
 t/Pool/Pool.pm
+t/Pool/mariadb.t
 t/Pool/mysql.t
 t/Pool/postgresql.t
 t/Pool/sqlite.t

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has is_variant_of => (
@@ -58,7 +58,7 @@ SemanticWeb::Schema::ProductModel - A datasheet or vendor specification of a pro
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -71,13 +71,27 @@ prototypical description).
 
 C<isVariantOf>
 
-A pointer to a base product from which this product is a variant. It is
-safe to infer that the variant inherits all product features from the base
-model, unless defined locally. This is not transitive.
+=for html <p>Indicates the kind of product that this is a variant of. In the case of
+<a class="localLink"
+href="http://schema.org/ProductModel">ProductModel</a>, this is a pointer
+(from a ProductModel) to a base product from which this product is a
+variant. It is safe to infer that the variant inherits all product features
+from the base model, unless defined locally. This is not transitive. In the
+case of a <a class="localLink"
+href="http://schema.org/ProductGroup">ProductGroup</a>, the group
+description also serves as a template, representing a set of Products that
+vary on explicitly defined, specific dimensions only (so it defines both a
+set of variants, as well as which values distinguish amongst those
+variants). When used with <a class="localLink"
+href="http://schema.org/ProductGroup">ProductGroup</a>, this property can
+apply to any <a class="localLink"
+href="http://schema.org/Product">Product</a> included in the group.<p>
 
 A is_variant_of should be one of the following types:
 
 =over
+
+=item C<InstanceOf['SemanticWeb::Schema::ProductGroup']>
 
 =item C<InstanceOf['SemanticWeb::Schema::ProductModel']>
 

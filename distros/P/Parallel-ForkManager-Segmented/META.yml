@@ -21,7 +21,7 @@ name: Parallel-ForkManager-Segmented
 provides:
   Parallel::ForkManager::Segmented:
     file: lib/Parallel/ForkManager/Segmented.pm
-    version: v0.4.0
+    version: v0.6.0
 requires:
   Parallel::ForkManager: '0'
   perl: '5.014'
@@ -31,7 +31,7 @@ resources:
   bugtracker: https://github.com/shlomif/parallel-forkmanager-segmented/issues
   homepage: http://metacpan.org/release/Parallel-ForkManager-Segmented
   repository: https://github.com/shlomif/perl-Parallel-ForkManager-Segmented.git
-version: 0.4.0
+version: 0.6.0
 x_Dist_Zilla:
   perl:
     version: '5.032000'

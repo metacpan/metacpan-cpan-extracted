@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has catalog => (
@@ -82,6 +82,14 @@ has variable_measured => (
 
 
 
+has variables_measured => (
+    is        => 'rw',
+    predicate => '_has_variables_measured',
+    json_ld   => 'variablesMeasured',
+);
+
+
+
 
 
 1;
@@ -98,7 +106,7 @@ SemanticWeb::Schema::Dataset - A body of structured information describing some 
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -279,6 +287,32 @@ A variable_measured should be one of the following types:
 =head2 C<_has_variable_measured>
 
 A predicate for the L</variable_measured> attribute.
+
+=head2 C<variables_measured>
+
+C<variablesMeasured>
+
+=for html <p>Originally named <a class="localLink"
+href="http://schema.org/variablesMeasured">variablesMeasured</a>, The <a
+class="localLink"
+href="http://schema.org/variableMeasured">variableMeasured</a> property can
+indicate (repeated as necessary) the variables that are measured in some
+dataset, either described as text or as pairs of identifier and description
+using PropertyValue.<p>
+
+A variables_measured should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::PropertyValue']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_variables_measured>
+
+A predicate for the L</variables_measured> attribute.
 
 =head1 SEE ALSO
 

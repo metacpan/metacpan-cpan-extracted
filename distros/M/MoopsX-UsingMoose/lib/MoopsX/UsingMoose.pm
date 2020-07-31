@@ -6,7 +6,7 @@ package MoopsX::UsingMoose;
 
 # ABSTRACT: A Moops that uses Moose
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0102';
+our $VERSION = '0.0103';
 
 use base 'Moops';
 
@@ -39,8 +39,8 @@ MoopsX::UsingMoose - A Moops that uses Moose
 <p>
 <img src="https://img.shields.io/badge/perl-5.14+-blue.svg" alt="Requires Perl 5.14+" />
 <a href="https://travis-ci.org/Csson/p5-MoopsX-UsingMoose"><img src="https://api.travis-ci.org/Csson/p5-MoopsX-UsingMoose.svg?branch=master" alt="Travis status" /></a>
-<a href="http://cpants.cpanauthors.org/release/CSSON/MoopsX-UsingMoose-0.0102"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/MoopsX-UsingMoose/0.0102" alt="Distribution kwalitee" /></a>
-<a href="http://matrix.cpantesters.org/?dist=MoopsX-UsingMoose%200.0102"><img src="http://badgedepot.code301.com/badge/cpantesters/MoopsX-UsingMoose/0.0102" alt="CPAN Testers result" /></a>
+<a href="http://cpants.cpanauthors.org/release/CSSON/MoopsX-UsingMoose-0.0103"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/MoopsX-UsingMoose/0.0103" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=MoopsX-UsingMoose%200.0103"><img src="http://badgedepot.code301.com/badge/cpantesters/MoopsX-UsingMoose/0.0103" alt="CPAN Testers result" /></a>
 <img src="https://img.shields.io/badge/coverage-97.4%-yellow.svg" alt="coverage 97.4%" />
 </p>
 
@@ -48,7 +48,7 @@ MoopsX::UsingMoose - A Moops that uses Moose
 
 =head1 VERSION
 
-Version 0.0102, released 2017-11-28.
+Version 0.0103, released 2020-07-29.
 
 =head1 SYNOPSIS
 
@@ -59,6 +59,10 @@ Version 0.0102, released 2017-11-28.
         # A Moose based class
 
     }
+
+=head1 STATUS
+
+Do note the inherent L<issues|Moops/"STATUS"> with using L<Moops>.
 
 =head1 DESCRIPTION
 

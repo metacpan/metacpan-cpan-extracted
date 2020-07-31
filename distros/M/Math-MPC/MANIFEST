@@ -29,6 +29,7 @@ t/Rmpc_set_NV.t
 t/mpc_swap.t
 t/mpc_trig.t
 t/new_in_1.1.0.t
+t/new_in_1.1.1.t
 t/NOK_and_POK.t
 t/out_str1.t
 t/out_str2.t

@@ -2,11 +2,12 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000014';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
 use Scalar::Util qw/reftype/;
+use Carp qw/confess/;
 
 use parent 'DBIx::QuickDB::Driver';
 
@@ -15,17 +16,22 @@ use DBIx::QuickDB::Util::HashBase qw{
 
     -mysqld -mysql
 
+    -dbd_driver
+    -mysqld_provider
+
     -config
 };
 
-my ($MYSQLD, $MYSQL, $DBDMYSQL);
+my ($MYSQLD, $MYSQL, $DBDMYSQL, $DBDMARIA);
 
 BEGIN {
     local $@;
 
-    $MYSQLD   = can_run('mysqld');
-    $MYSQL    = can_run('mysql');
-    $DBDMYSQL = eval { require DBD::mysql; 'DBD::mysql' };
+    $MYSQLD = can_run('mysqld');
+    $MYSQL  = can_run('mysql');
+
+    $DBDMYSQL = eval { require DBD::mysql;   'DBD::mysql' };
+    $DBDMARIA = eval { require DBD::MariaDB; 'DBD::MariaDB' };
 }
 
 sub version_string {
@@ -34,7 +40,7 @@ sub version_string {
     # Go in reverse order assuming the last param hash provided is most important
     for my $arg (reverse @_) {
         my $type = reftype($arg) or next;    # skip if not a ref
-        next $type eq 'HASH';                # We have a hashref, possibly blessed
+        next unless $type eq 'HASH';         # We have a hashref, possibly blessed
 
         # If we find a launcher we are done looping, we want to use this binary.
         $binary = $arg->{+MYSQLD} and last;
@@ -80,6 +86,8 @@ sub _default_config {
     my $pid_file = $self->pid_file;
     my $socket   = $self->socket;
 
+    my $provider = $self->{+MYSQLD_PROVIDER};
+
     return (
         client => {
             'socket' => $socket,
@@ -95,29 +103,38 @@ sub _default_config {
             'socket'   => $socket,
             'tmpdir'   => $temp_dir,
 
-            'character-set-server'    => 'utf8',
-            'collation-server'        => 'utf8_unicode_ci',
-            'default-storage-engine'  => 'InnoDB',
-            'innodb_buffer_pool_size' => '20M',
-            'key_buffer_size'         => '20M',
-            'max_connections'         => '100',
-            'server-id'               => '1',
-            'skip-grant-tables'       => '',
-            'skip-external-locking'   => '',
-            'skip-networking'         => '',
-            'skip_name_resolve'       => '1',
-            'max_allowed_packet'      => '1M',
-            'max_binlog_size'         => '20M',
-            'myisam_sort_buffer_size' => '8M',
-            'net_buffer_length'       => '8K',
-            'query_cache_limit'       => '1M',
-            'query_cache_size'        => '20M',
-            'read_buffer_size'        => '256K',
-            'read_rnd_buffer_size'    => '512K',
-            'sort_buffer_size'        => '512K',
-            'table_open_cache'        => '64',
-            'thread_cache_size'       => '8',
-            'thread_stack'            => '192K',
+            'default_storage_engine'         => 'InnoDB',
+            'innodb_buffer_pool_size'        => '20M',
+            'key_buffer_size'                => '20M',
+            'max_connections'                => '100',
+            'server-id'                      => '1',
+            'skip_grant_tables'              => '1',
+            'skip_external_locking'          => '',
+            'skip_networking'                => '1',
+            'skip_name_resolve'              => '1',
+            'max_allowed_packet'             => '1M',
+            'max_binlog_size'                => '20M',
+            'myisam_sort_buffer_size'        => '8M',
+            'net_buffer_length'              => '8K',
+            'read_buffer_size'               => '256K',
+            'read_rnd_buffer_size'           => '512K',
+            'sort_buffer_size'               => '512K',
+            'table_open_cache'               => '64',
+            'thread_cache_size'              => '8',
+            'thread_stack'                   => '192K',
+            'innodb_io_capacity'             => '2000',
+            'innodb_max_dirty_pages_pct'     => '0',
+            'innodb_max_dirty_pages_pct_lwm' => '0',
+
+            $provider eq 'percona'
+            ? (
+                'character_set_server' => 'UTF8MB4',
+              )
+            : (
+                'character_set_server' => 'UTF8MB4',
+                'query_cache_limit'    => '1M',
+                'query_cache_size'     => '20M',
+            ),
         },
 
         mysql => {
@@ -135,7 +152,8 @@ sub viable {
 
     my @bad;
 
-    push @bad => "'DBD::mysql' module could not be loaded, needed for everything" unless $DBDMYSQL;
+    push @bad => "Could not load either 'DBD::mysql' or 'DBD::MariaDB', needed for everything"
+        unless $DBDMYSQL || $DBDMARIA;
 
     if ($spec->{bootstrap}) {
         push @bad => "'mysqld' command is missing, needed for bootstrap" unless $check{mysqld} && -x $check{mysqld};
@@ -155,6 +173,33 @@ sub viable {
 sub init {
     my $self = shift;
     $self->SUPER::init();
+
+    # Percona is the more restrictive, so fallback to mariadb behavior for
+    # now. Add patches for more variants if needed.
+    unless ($self->{+MYSQLD_PROVIDER}) {
+        if ($self->version_string =~ m/(mariadb|percona)/i) {
+            $self->{+MYSQLD_PROVIDER} = lc($1);
+        }
+        else {
+            my $binary = $self->{+MYSQLD} || $MYSQLD;
+            my $help = `$binary --help --verbose`;
+
+            if ($help =~ m/(mariadb|percona)/i) {
+                $self->{+MYSQLD_PROVIDER} = lc($1);
+            }
+            elsif ($help =~ m/--bootstrap/) {
+                $self->{+MYSQLD_PROVIDER} = 'mariadb';
+            }
+            elsif ($help =~ m/--initialize/) {
+                $self->{+MYSQLD_PROVIDER} = 'percona';
+            }
+        }
+    }
+
+    confess "Could not determine mysqld provider (" . ($self->{+MYSQLD} || $MYSQLD)  . ") please specify mysqld_prover => mariadb|percona"
+        unless $self->{+MYSQLD_PROVIDER};
+
+    $self->{+DBD_DRIVER} //= $DBDMARIA || $DBDMYSQL;
 
     $self->{+DATA_DIR} = $self->{+DIR} . '/data';
     $self->{+TEMP_DIR} = $self->{+DIR} . '/temp';
@@ -187,14 +232,6 @@ sub init {
     }
 }
 
-sub clone {
-    my $self = shift;
-    my $clone = $self->SUPER::clone(@_);
-
-
-    return $clone;
-}
-
 sub clone_data {
     my $self = shift;
 
@@ -206,9 +243,11 @@ sub clone_data {
     return (
         $self->SUPER::clone_data(),
 
-        CONFIG() => $config,
-        MYSQLD() => $self->{+MYSQLD},
-        MYSQL()  => $self->{+MYSQL},
+        CONFIG()          => $config,
+        MYSQLD()          => $self->{+MYSQLD},
+        MYSQL()           => $self->{+MYSQL},
+        DBD_DRIVER()      => $self->{+DBD_DRIVER},
+        MYSQLD_PROVIDER() => $self->{+MYSQLD_PROVIDER},
     );
 }
 
@@ -261,12 +300,23 @@ sub bootstrap {
     print $init "CREATE DATABASE quickdb;\n";
     close($init);
 
-    # Bootstrap is much faster without InnoDB, we will turn InnoDB back on later, and things will use it.
-    $self->write_config(skip => qr/innodb/i, add => {'default-storage-engine' => 'MyISAM'});
-    $self->run_command([$self->start_command, '--bootstrap', '--innodb=off'], {stdin => $init_file});
+    my $provider = $self->{+MYSQLD_PROVIDER};
 
-    # Turn InnoDB back on
-    $self->write_config();
+    if ($provider eq 'percona') {
+        $self->write_config();
+        $self->run_command([$self->start_command, '--initialize']);
+
+        $self->start;
+        $self->load_sql("", $init_file);
+    }
+    else {
+        # Bootstrap is much faster without InnoDB, we will turn InnoDB back on later, and things will use it.
+        $self->write_config(skip => qr/innodb/i, add => {'default-storage-engine' => 'MyISAM'});
+        $self->run_command([$self->start_command, '--bootstrap', '--innodb=off'], {stdin => $init_file});
+
+        # Turn InnoDB back on
+        $self->write_config();
+    }
 
     return;
 }
@@ -287,7 +337,6 @@ sub load_sql {
         {stdin => $file},
     );
 }
-
 
 sub shell_command {
     my $self = shift;
@@ -311,8 +360,12 @@ sub connect_string {
 
     my $socket = $self->{+SOCKET};
 
-    require DBD::mysql;
-    return "dbi:mysql:dbname=$db_name;mysql_socket=$socket";
+    if ($self->{+DBD_DRIVER} eq 'DBD::MariaDB') {
+        return "dbi:MariaDB:dbname=$db_name;mariadb_socket=$socket";
+    }
+    else {
+        return "dbi:mysql:dbname=$db_name;mysql_socket=$socket";
+    }
 }
 
 1;
@@ -334,6 +387,19 @@ MySQL driver for L<DBIx::QuickDB>.
 =head1 SYNOPSIS
 
 See L<DBIx::QuickDB>.
+
+=head1 MYSQL SPECIFIC OPTIONS
+
+=over 4
+
+=item dbd_driver => $DRIVER
+
+Should be either L<DBD::mysql> or L<DBD::MariaDB>. If not specified then
+DBD::MariaDB is preferred with a fallback to DBD::MySQL.
+
+=item mysqld_provider => $PROVIDER
+
+Should be either 'mariadb' or 'percona'. Will auto-detect when possible.
 
 =head1 SOURCE
 

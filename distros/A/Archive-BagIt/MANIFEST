@@ -291,11 +291,11 @@ bagit_conformance_suite/v1.0/invalid/bagit-with-invalid-whitespace/manifest-sha2
 bagit_conformance_suite/v1.0/invalid/bagit-with-invalid-whitespace/manifest-sha512.txt
 bagit_conformance_suite/v1.0/invalid/bagit-with-invalid-whitespace/tagmanifest-sha256.txt
 bagit_conformance_suite/v1.0/invalid/bagit-with-invalid-whitespace/tagmanifest-sha512.txt
-bagit_conformance_suite/v1.0/invalid/missing-baginfo/bagit.txt
-bagit_conformance_suite/v1.0/invalid/missing-baginfo/data/hello.txt
-bagit_conformance_suite/v1.0/invalid/missing-baginfo/data/missingFromManifest.txt
-bagit_conformance_suite/v1.0/invalid/missing-baginfo/manifest-sha512.txt
-bagit_conformance_suite/v1.0/invalid/missing-baginfo/tagmanifest-sha512.txt
+bagit_conformance_suite/v1.0/invalid/missing-from-manifest/bagit.txt
+bagit_conformance_suite/v1.0/invalid/missing-from-manifest/data/hello.txt
+bagit_conformance_suite/v1.0/invalid/missing-from-manifest/data/missingFromManifest.txt
+bagit_conformance_suite/v1.0/invalid/missing-from-manifest/manifest-sha512.txt
+bagit_conformance_suite/v1.0/invalid/missing-from-manifest/tagmanifest-sha512.txt
 bagit_conformance_suite/v1.0/invalid/same-filename-listed-twice-with-different-hashes/bag-info.txt
 bagit_conformance_suite/v1.0/invalid/same-filename-listed-twice-with-different-hashes/bagit.txt
 bagit_conformance_suite/v1.0/invalid/same-filename-listed-twice-with-different-hashes/data/README
@@ -329,6 +329,7 @@ t/access_bag.t
 t/base.t
 t/dotbagit.t
 t/fast.t
+t/internal.t
 t/manifest.t
 t/parallel.t
 t/payload_files.t
@@ -357,6 +358,7 @@ t/src/src_bag_deep/manifest-md5.txt
 t/src/src_bag_deep/tagmanifest-md5.txt
 t/src/src_files/1
 t/src/src_files/2
+t/store_bag.t
 t/verify_bag.t
 xt/author/critic.t
 xt/author/eol.t

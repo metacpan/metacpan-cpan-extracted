@@ -1,11 +1,11 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A radio channel that uses AM.",
       "rdfs:label" : "AMRadioChannel",
       "rdfs:subClassOf" : "schema:RadioChannel",
-      "schema:category" : "issue-1004"
+      "schema:category" : "issue-1004",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1004"
    },
    "properties" : {}
 }

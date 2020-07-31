@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2348",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An <a class=\"localLink\" href=\"http://schema.org/OfferForPurchase\">OfferForPurchase</a> in Schema.org represents an <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a> to sell something, i.e. an <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a> whose\n  <a class=\"localLink\" href=\"http://schema.org/businessFunction\">businessFunction</a> is <a href=\"http://purl.org/goodrelations/v1#Sell.\">sell</a>. See <a href=\"https://en.wikipedia.org/wiki/GoodRelations\">Good Relations</a> for\n  background on the underlying concepts.",
       "rdfs:label" : "OfferForPurchase",
       "rdfs:subClassOf" : "schema:Offer",
       "schema:category" : "issue-2348",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2348"
    },
    "properties" : {}
 }

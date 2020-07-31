@@ -1,5 +1,5 @@
 package OpenTracing::WrapScope;
-our $VERSION = 'v0.104.0';
+our $VERSION = 'v0.105.0';
 use strict;
 use warnings;
 use warnings::register;
@@ -49,7 +49,7 @@ sub import {
     if ($use_env and $ENV{OPENTRACING_WRAPSCOPE_FILE}) {
         push @files, split ':', $ENV{OPENTRACING_WRAPSCOPE_FILE};
     }
-    push @subs, map { _load_sub_spec($_) } map { glob } @files;
+    push @subs, map { _load_sub_spec($_) } grep { -f } map { glob } @files;
 
     on_scope_end { install_wrapped(uniq @subs) };
 
@@ -129,6 +129,8 @@ sub _load_sub_spec {
 
     my @subs;
     while (<$fh_subs>) {
+        next if /^\s*#/;    # commented-out line
+        s/\s*#.*\Z//;       # trailing comment
         chomp;
         croak "Unqualified subroutine: $_" if !/'|::/;
         push @subs, $_;

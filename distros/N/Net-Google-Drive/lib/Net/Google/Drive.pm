@@ -5,8 +5,6 @@ use strict;
 use warnings;
 use utf8;
 
-use lib '/home/vrag/perl/googleoauth/lib';
-
 use LWP::UserAgent;
 use HTTP::Request;
 use JSON::XS;
@@ -17,9 +15,7 @@ use Carp qw/carp croak/;
 
 use Net::Google::OAuth;
 
-use Data::Printer;
-
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our $DOWNLOAD_BUFF_SIZE     = 1024;
 our $UPLOAD_BUFF_SIZE       = 256 * 1024;
@@ -138,7 +134,7 @@ sub uploadFile {
     }
 
     my $file_size = (stat $source_file)[7];
-    my $part_upload_uri = $self->__createEmptyFile($source_file, $file_size);
+    my $part_upload_uri = $self->__createEmptyFile($source_file, $file_size, $opt{-parents});
     open my $FH, "<$source_file" or croak "Can't open file: $source_file $!";
     binmode $FH;
 
@@ -265,12 +261,13 @@ sub shareFile {
 }
 
 sub __createEmptyFile {
-    my ($self, $source_file, $file_size)        = @_;
-    my $access_token                            = $self->__getAccessToken();
+    my ($self, $source_file, $file_size, $parents) = @_;
+    my $access_token                               = $self->__getAccessToken();
 
     my $body = {
         'name'  => basename($source_file),
     };
+    $body->{parents} = $parents if $parents;
     my $body_json = encode_json($body);
 
     my $uri = URI->new($UPLOAD_FILE_API_URL);
@@ -375,6 +372,8 @@ sub __getAccessToken {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 B<Net::Google::Drive> - simple Google drive API module
@@ -395,7 +394,7 @@ This module use to upload, download, share file on Google drive
 
     # Search file by name
     my $file_name = 'upload.doc';
-    my $files = $drive->searchFileByName( -filename => $file_name ) or croak "File '$file_name' not found";
+    my $files = $disk->searchFileByName( -filename => $file_name ) or croak "File '$file_name' not found";
     my $file_id = $files->[0]->{id};
     print "File id: $file_id\n";
 
@@ -465,6 +464,7 @@ Upload file from local system to google drive. Return file_info hashref if succe
     
     %opt:
         -source_file        => File on local system
+        -parents            => Optional arrayref of parent ids
     Return:
        {
             id         "1LVAr2PpqX9m314JyZ6YJ4v_KIzG0Gey2",

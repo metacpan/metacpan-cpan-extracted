@@ -1,5 +1,14 @@
 Revision history for the LaTeX::Driver module                -*- indented-text -*-
 
+1.1.1   2020-07-29
+   - Fix version number presented in the POD VERSION section
+   - Remove duplication in listed formats
+
+1.1.0   2020-07-29
+   - Fix RT #133061: typo in @PROCESSORS ('lulaatex')
+   - Add documentation of the supported processor/format combinations
+   - Add LuaLaTeX as a processor/format combination
+
 1.0.0   2020-05-21
    - Improve error reported when invoked external program is missing
    - Fix RT #127951: failing tests on some installations
@@ -32,7 +41,7 @@ Revision history for the LaTeX::Driver module                -*- indented-text -
 
 0.20  2014-04-09
     - Removed IPC::ShellCmd dependency since newer versions not on CPAN
-    - Fixed Win32 support 
+    - Fixed Win32 support
 
 0.20_03  2013-10-31
     - switched Makefile.PL to Module::Install

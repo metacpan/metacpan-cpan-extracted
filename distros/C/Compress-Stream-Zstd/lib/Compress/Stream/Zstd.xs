@@ -81,6 +81,7 @@ BOOT:
     HV* stash = gv_stashpv("Compress::Stream::Zstd", 1);
     newCONSTSUB(stash, "ZSTD_VERSION_NUMBER", newSViv(ZSTD_VERSION_NUMBER));
     newCONSTSUB(stash, "ZSTD_VERSION_STRING", newSVpvs(ZSTD_VERSION_STRING));
+    newCONSTSUB(stash, "ZSTD_MIN_CLEVEL", newSViv(ZSTD_minCLevel()));
     newCONSTSUB(stash, "ZSTD_MAX_CLEVEL", newSViv(ZSTD_maxCLevel()));
 }
 

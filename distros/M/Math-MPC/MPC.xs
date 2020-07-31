@@ -3752,6 +3752,69 @@ int _SvPOK(pTHX_ SV * in) {
   return 0;
 }
 
+SV * Rmpc_fma(pTHX_ mpc_t * a, mpc_t * b, mpc_t * c, mpc_t * d, SV * round) {
+     return newSViv(mpc_fma(*a, *b, *c, *d, (mpc_rnd_t)SvUV(round)));
+}
+
+SV * Rmpc_dot(pTHX_ mpc_t * rop, SV * avref_A, SV * avref_B, SV * len, SV * round) {
+#if defined(MPC_VERSION) && MPC_VERSION >= 65793 /* version 1.1.1 */
+     mpc_ptr *p_A, *p_B;
+     SV ** elem;
+     int ret, i;
+     unsigned long s = (unsigned long)SvUV(len);
+
+     if(s > av_len((AV*)SvRV(avref_A)) + 1 || s > av_len((AV*)SvRV(avref_B)) + 1)
+       croak("2nd last arg to Rmpc_dot is too large");
+
+     Newx(p_A, s, mpc_ptr);
+     if(p_A == NULL) croak("Unable to allocate memory for first pointer array in Rmpc_dot");
+
+     Newx(p_B, s, mpc_ptr);
+     if(p_B == NULL) croak("Unable to allocate memory for second pointer array in Rmpc_dot");
+
+     for(i = 0; i < s; ++i) {
+       elem = av_fetch((AV*)SvRV(avref_A), i, 0);
+       p_A[i] = *(INT2PTR(mpc_t *, SvIVX(SvRV(*elem))));
+       elem = av_fetch((AV*)SvRV(avref_B), i, 0);
+       p_B[i] = *(INT2PTR(mpc_t *, SvIVX(SvRV(*elem))));
+     }
+
+     ret = mpc_dot(*rop, p_A, p_B, s, (mpc_rnd_t)SvUV(round));
+
+     Safefree(p_A);
+     Safefree(p_B);
+     return newSViv(ret);
+#else
+    croak("The Rmpc_dot function requires mpc-1.1.1 or later");
+#endif
+}
+
+SV * Rmpc_sum(pTHX_ mpc_t * rop, SV * avref, SV * len, SV * round) {
+#if defined(MPC_VERSION) && MPC_VERSION >= 65793 /* version 1.1.1 */
+     mpc_ptr *p;
+     SV ** elem;
+     int ret, i;
+     unsigned long s = (unsigned long)SvUV(len);
+
+     if(s > av_len((AV*)SvRV(avref)) + 1)croak("2nd last arg to Rmpc_sum is greater than the size of the array");
+
+     Newx(p, s, mpc_ptr);
+     if(p == NULL) croak("Unable to allocate memory in Rmpc_sum");
+
+     for(i = 0; i < s; ++i) {
+        elem = av_fetch((AV*)SvRV(avref), i, 0);
+        p[i] = *(INT2PTR(mpc_t *, SvIVX(SvRV(*elem))));
+     }
+
+     ret = mpc_sum(*rop, p, s, (mpc_rnd_t)SvUV(round));
+
+     Safefree(p);
+     return newSViv(ret);
+#else
+    croak("The Rmpc_sum function requires mpc-1.1.1 or later");
+#endif
+}
+
 /* I think the CLONE function needs to come at the very end ... not sure */
 
 void CLONE(pTHX_ SV * x, ...) {
@@ -6359,6 +6422,38 @@ _SvPOK (in)
 	SV *	in
 CODE:
   RETVAL = _SvPOK (aTHX_ in);
+OUTPUT:  RETVAL
+
+SV *
+Rmpc_fma (a, b, c, d, round)
+	mpc_t *	a
+	mpc_t *	b
+	mpc_t *	c
+	mpc_t *	d
+	SV *	round
+CODE:
+  RETVAL = Rmpc_fma (aTHX_ a, b, c, d, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpc_dot (rop, avref_A, avref_B, len, round)
+	mpc_t *	rop
+	SV *	avref_A
+	SV *	avref_B
+	SV *	len
+	SV *	round
+CODE:
+  RETVAL = Rmpc_dot (aTHX_ rop, avref_A, avref_B, len, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpc_sum (rop, avref, len, round)
+	mpc_t *	rop
+	SV *	avref
+	SV *	len
+	SV *	round
+CODE:
+  RETVAL = Rmpc_sum (aTHX_ rop, avref, len, round);
 OUTPUT:  RETVAL
 
 void

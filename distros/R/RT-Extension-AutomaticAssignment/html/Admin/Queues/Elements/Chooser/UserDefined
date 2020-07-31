@@ -1,0 +1,9 @@
+<&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 0, class_name => 'UserDefined' &>
+<p><&|/l&>This chooser selects a user from the pool of eligible owners based on the provided Perl code. The variable <tt>@Users</tt> contains the list of eligible owners and <tt>$Ticket</tt> is the ticket which is being assigned. The code should return an <tt>RT::User</tt> object from the <tt>@Users</tt> array to choose that user as owner.</&></p>
+<textarea cols=80 rows=7 id="<% $prefix %>_code" name="<% $prefix %>_code" class="form-control"><% $config->{code} %></textarea>
+</&>
+<%ARGS>
+$prefix
+$config
+$queue
+</%ARGS>

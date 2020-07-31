@@ -18,7 +18,7 @@ Readonly my $DOMAIN_DETAIL_OPTIONS => [qw( All )];
 
 requires 'submit';
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: Domain API Calls
 
 sub get_domain_by_id {
@@ -481,6 +481,8 @@ Given a Integer L<domain|WWW::LogicBoxes::Domain> id, returns a matching L<WWW::
 
 B<NOTE> For domain transfers that are in progress a L<domain_transfer|WWW::LogicBoxes::DomainTransfer> record will be returned.
 
+B<FURTHER NOTE> LogicBoxes is a bit "hand wavey" with "Action Types" which is how this library knows if the domain you are retrieving is an in progress domain transfer or a domain.  Because of this, and the fact that they can be modified at any time, construction of domains defaults to an instance of L<WWW::LogicBoxes::Domain> unless LogicBoxes highlights this as a "AddTransferDomain."  This should just work, but be mindful if you see any unusual or unexpected errors.
+
 =head2 get_domain_by_name
 
     use WWW::LogicBoxes;
@@ -492,6 +494,8 @@ B<NOTE> For domain transfers that are in progress a L<domain_transfer|WWW::Logic
 Given a full L<domain|WWW::LogicBoxes::Domain> name, returns a matching L<WWW::LogicBoxes::Domain> from L<LogicBoxes|http://www.logicobxes.com>.  In the event of no matching L<domain|WWW::LogicBoxes::Domain>, returns undef,
 
 B<NOTE> For domain transfers that are in progress a L<domain_transfer|WWW::LogicBoxes::DomainTransfer> record will be returned.
+
+B<FURTHER NOTE> See the note above about Action Types
 
 =head2 update_domain_contacts
 

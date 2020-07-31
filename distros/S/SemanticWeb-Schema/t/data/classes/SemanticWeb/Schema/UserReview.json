@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1589",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A review created by an end-user (e.g. consumer, purchaser, attendee etc.), in contrast with <a class=\"localLink\" href=\"http://schema.org/CriticReview\">CriticReview</a>.",
       "rdfs:label" : "UserReview",
       "rdfs:subClassOf" : "schema:Review",
       "schema:category" : "issue-1589",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1589"
    },
    "properties" : {}
 }

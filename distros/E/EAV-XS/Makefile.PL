@@ -89,6 +89,11 @@ EOF
             $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= " CC=$Config{'ccname'}";
         }
     }
+    elsif ($^O eq "cygwin") {
+        $cfg->{'macro'}->{'LIBEAV_MAKEFILE'} = "-f Makefile.windows-gmake";
+        $cfg->{'macro'}->{'LIBEAV_OPTIONS'} .= ' RM="rm -f"';
+        $cfg->{'LD'} = "cc";
+    }
 
     return $cfg;
 }

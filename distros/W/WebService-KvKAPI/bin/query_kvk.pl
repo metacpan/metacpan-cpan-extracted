@@ -31,6 +31,7 @@ GetOptions(\%options, qw(
     city=s
     tradeName=s
     q=s
+    rsin=s
 ));
 
 if ($options{help}) {
@@ -82,7 +83,7 @@ query_kvk.pl - Query the Dutch Chamber of Commerce via the CLI
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

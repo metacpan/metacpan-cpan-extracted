@@ -7,19 +7,19 @@
    },
    "properties" : {
       "schema:issn" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
          "owl:equivalentProperty" : "bibo:issn",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication.",
          "rdfs:label" : "issn",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:WebSite",
             "schema:Blog",
             "schema:CreativeWorkSeries",
-            "schema:Dataset"
+            "schema:Dataset",
+            "schema:WebSite"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "schemadotorgsources:source_bibex"
       }
    }
 }

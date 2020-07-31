@@ -48,7 +48,7 @@ Output: Distribution of cluster size (cluster_size_distribution.tab). Distributi
 =cut
 
 package CLIPSeqTools::App::cluster_size_and_score_distribution;
-$CLIPSeqTools::App::cluster_size_and_score_distribution::VERSION = '0.1.9';
+$CLIPSeqTools::App::cluster_size_and_score_distribution::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

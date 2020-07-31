@@ -1,16 +1,15 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1423",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An application programming interface accessible over Web/Internet technologies.",
       "rdfs:label" : "WebAPI",
       "rdfs:subClassOf" : "schema:Service",
       "schema:category" : "issue-1423",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1423"
    },
    "properties" : {
       "schema:documentation" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1423",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Further documentation describing the Web API in more detail.",
          "rdfs:label" : "documentation",
@@ -20,7 +19,8 @@
          "schema:rangeIncludes" : [
             "schema:CreativeWork",
             "schema:URL"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1423"
       }
    }
 }

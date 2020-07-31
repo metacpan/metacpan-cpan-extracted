@@ -7,12 +7,19 @@ use Importer 'NewsExtractor::TextUtil' => qw(parse_dateline_ymdhms);
 
 sub dateline {
     my ($self) = @_;
-    return parse_dateline_ymdhms( $self->dom->at('td.newsbox_content_txt'), '+08:00' );
+    return parse_dateline_ymdhms( $self->dom->at('td.newsbox_content_txt')->all_text(), '+08:00' );
 }
 
 sub journalist {
     my ($self) = @_;
-    my ($x) = $self->content_text =~ m{\A(\S+)／\S+報導\n};
+    my $txt = $self->content_text;
+    my ($x) = $txt =~ m{\A(\S+)／\S+報導\n};
+    unless ($x) {
+        ($x) = $txt =~ m{\A\S*(文／\S+\s+圖／\S+)\n};
+    }
+    unless ($x) {
+        ($x) = $txt =~ m/ \A\S*(\S{3})\n /x;
+    }
     return $x;
 }
 

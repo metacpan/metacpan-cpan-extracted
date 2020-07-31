@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/373",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A single episode of a podcast series.",
       "rdfs:label" : "PodcastEpisode",
       "rdfs:subClassOf" : "schema:Episode",
       "schema:category" : "issue-373",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/373"
    },
    "properties" : {}
 }

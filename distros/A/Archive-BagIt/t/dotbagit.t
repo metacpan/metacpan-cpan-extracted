@@ -39,8 +39,6 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
   note "bag path:"; note explain $bag->bag_path;
   note "metadata path: "; note explain $bag->metadata_path;
   note "tagmanifest_files: "; note explain $bag->tagmanifest_files;
-  note "manifest_entries: ";note explain $bag->manifest_entries;
-  note "tagmanifest_entries: ";note explain $bag->tagmanifest_entries;
   note "payload files: "; note explain $bag->payload_files;
 
   my $result = $bag->verify_bag;

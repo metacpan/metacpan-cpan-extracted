@@ -4,6 +4,14 @@ use warnings;
 use Test::More;
 use Compress::Stream::Zstd;
 
+diag "\n";
+diag "Compress::Stream::Zstd Version $Compress::Stream::Zstd::VERSION\n";
+diag "ZSTD_VERSION_NUMBER            " . ZSTD_VERSION_NUMBER . "\n";
+diag "ZSTD_VERSION_STRING            " . ZSTD_VERSION_STRING . "\n";
+diag "ZSTD_MAX_CLEVEL                " . ZSTD_MAX_CLEVEL . "\n";
+diag "ZSTD_MIN_CLEVEL                " . ZSTD_MIN_CLEVEL . "\n";
+diag "\n";
+
 my $src = 'Hello, World!';
 ok my $compressed = compress($src, 42);
 isnt $src, $compressed;
@@ -22,6 +30,7 @@ decompress("1");
 is ZSTD_VERSION_NUMBER, 10403;
 is ZSTD_VERSION_STRING, '1.4.3';
 is ZSTD_MAX_CLEVEL, 22;
+is ZSTD_MIN_CLEVEL, -131072;
 
 {
     # Test an empty string

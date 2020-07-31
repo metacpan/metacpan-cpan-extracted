@@ -1,0 +1,38 @@
+
+
+
+
+
+
+\part{First Fifth}
+\index[names]{First}
+\index[names]{Fifth}
+
+\chapter{Second}
+\index[names]{Second}
+
+\section{Third}
+\index[names]{Third}
+
+
+\clearpage
+
+\subsection{Forth}
+\index[names]{Forth}
+
+\subsubsection{Fifth}
+\index[names]{Fifth}
+
+
+\clearpage
+
+\index[names]{First}
+\index[names]{Second}
+\index[names]{Third}
+\index[names]{Forth}
+\index[names]{Fifth}
+% First Second Third Forth Fifth
+
+Here we go
+
+

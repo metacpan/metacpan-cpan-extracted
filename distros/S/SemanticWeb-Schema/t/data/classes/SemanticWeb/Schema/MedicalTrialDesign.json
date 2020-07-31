@@ -1,14 +1,11 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_WikiDoc",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "Design models for medical trials. Enumerated type.",
       "rdfs:label" : "MedicalTrialDesign",
-      "rdfs:subClassOf" : [
-         "schema:Enumeration",
-         "schema:MedicalEnumeration"
-      ],
-      "schema:isPartOf" : "http:health-lifesci.schema.org"
+      "rdfs:subClassOf" : "schema:MedicalEnumeration",
+      "schema:isPartOf" : "http:health-lifesci.schema.org",
+      "schema:source" : "schemadotorgsources:source_WikiDoc"
    },
    "properties" : {}
 }

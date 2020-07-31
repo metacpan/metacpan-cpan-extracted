@@ -29,7 +29,6 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:broadcastFrequency" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The frequency used for over-the-air broadcasts. Numeric values or simple ranges e.g. 87-99. In addition a shortcut idiom is supported for frequences of AM and FM radio channels, e.g. \"87 FM\".",
          "rdfs:label" : "broadcastFrequency",
@@ -41,7 +40,8 @@
          "schema:rangeIncludes" : [
             "schema:BroadcastFrequencySpecification",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1004"
       },
       "schema:broadcastTimezone" : {
          "rdf:type" : "rdf:Property",
@@ -58,49 +58,49 @@
          "schema:rangeIncludes" : "schema:Organization"
       },
       "schema:callSign" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2109",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A <a href=\"https://en.wikipedia.org/wiki/Call_sign\">callsign</a>, as used in broadcasting and radio communications to identify people, radio and TV stations, or vehicles.",
          "rdfs:label" : "callSign",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:category" : "issue-2109",
          "schema:domainIncludes" : [
+            "schema:BroadcastService",
             "schema:Vehicle",
-            "schema:Person",
-            "schema:BroadcastService"
+            "schema:Person"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2109"
       },
       "schema:hasBroadcastChannel" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A broadcast channel of a broadcast service.",
          "rdfs:label" : "hasBroadcastChannel",
          "schema:category" : "issue-1004",
          "schema:domainIncludes" : "schema:BroadcastService",
          "schema:inverseOf" : "schema:providesBroadcastService",
-         "schema:rangeIncludes" : "schema:BroadcastChannel"
+         "schema:rangeIncludes" : "schema:BroadcastChannel",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1004"
       },
       "schema:inLanguage" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2382",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
          "rdfs:label" : "inLanguage",
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:LinkRole",
-            "schema:PronounceableText",
-            "schema:CommunicateAction",
-            "schema:BroadcastService",
-            "schema:WriteAction",
+            "schema:CreativeWork",
             "schema:Event",
-            "schema:CreativeWork"
+            "schema:WriteAction",
+            "schema:PronounceableText",
+            "schema:BroadcastService",
+            "schema:CommunicateAction",
+            "schema:LinkRole"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2382"
       },
       "schema:parentService" : {
          "rdf:type" : "rdf:Property",

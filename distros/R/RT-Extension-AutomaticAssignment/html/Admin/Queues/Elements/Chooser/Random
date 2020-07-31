@@ -1,5 +1,5 @@
 <&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 0, class_name => 'Random' &>
-<p>This chooser selects a random owner from the pool of eligible users.</p>
+<p><&|/l&>This chooser selects a random owner from the pool of eligible users.</&></p>
 </&>
 <%ARGS>
 $prefix

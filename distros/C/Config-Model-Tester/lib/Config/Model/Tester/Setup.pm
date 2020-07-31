@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model-Tester
 #
-# This software is Copyright (c) 2013-2019 by Dominique Dumont.
+# This software is Copyright (c) 2013-2020 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tester::Setup 4.005;
+package Config::Model::Tester::Setup 4.006;
 # ABSTRACT: Common test setup functions for Config::Model
 
 use warnings;
@@ -47,11 +47,14 @@ sub init_test {
     my $model = Config::Model->new( );
 
     if ($opts{log}) {
-        note("enabling logs");
+        note("enabling logs and disabling test logs");
         $model->initialize_log4perl;
     }
     else {
         Log::Log4perl->easy_init( $ERROR );
+        require Test::Log::Log4perl;
+        Test::Log::Log4perl->import;
+        Test::Log::Log4perl->ignore_priority("info");
     }
 
     ok( $model, "compiled" );
@@ -88,7 +91,7 @@ Config::Model::Tester::Setup - Common test setup functions for Config::Model
 
 =head1 VERSION
 
-version 4.005
+version 4.006
 
 =head1 SYNOPSIS
 
@@ -133,6 +136,8 @@ strack trace when dying.
 C<--log>: When set, L<Log::Log4perl> uses the config from file
 C<~/.log4config-model> or the default config provided by
 L<Config::Model>. By default, only Error level and above are shown.
+Note that log tests are disabled when this option is set, so you may see a lot of
+harmless Warning messages during tests (which depend on the tests to be run).
 Experimental.
 
 =back
@@ -182,7 +187,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2019 by Dominique Dumont.
+This software is Copyright (c) 2013-2020 by Dominique Dumont.
 
 This is free software, licensed under:
 

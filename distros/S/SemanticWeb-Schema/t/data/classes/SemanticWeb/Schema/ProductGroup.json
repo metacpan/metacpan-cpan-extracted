@@ -1,0 +1,47 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A ProductGroup represents a group of <a class=\"localLink\" href=\"http://schema.org/Product\">Product</a>s that vary only in certain well-described ways, such as by <a class=\"localLink\" href=\"http://schema.org/size\">size</a>, <a class=\"localLink\" href=\"http://schema.org/color\">color</a>, <a class=\"localLink\" href=\"http://schema.org/material\">material</a> etc.<br/><br/>\n\nWhile a ProductGroup itself is not directly offered for sale, the various varying products that it represents can be. The ProductGroup serves as a prototype or template, standing in for all of the products who have an <a class=\"localLink\" href=\"http://schema.org/isVariantOf\">isVariantOf</a> relationship to it. As such, properties (including additional types) can be applied to the ProductGroup to represent characteristics shared by each of the (possibly very many) variants. Properties that reference a ProductGroup are not included in this mechanism; neither are the following specific properties <a class=\"localLink\" href=\"http://schema.org/variesBy\">variesBy</a>, <a class=\"localLink\" href=\"http://schema.org/hasVariant\">hasVariant</a>, <a class=\"localLink\" href=\"http://schema.org/url\">url</a>.",
+      "rdfs:label" : "ProductGroup",
+      "rdfs:subClassOf" : "schema:Product",
+      "schema:category" : "issue-2597",
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2597"
+   },
+   "properties" : {
+      "schema:hasVariant" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates a <a class=\"localLink\" href=\"http://schema.org/Product\">Product</a> that is a member of this <a class=\"localLink\" href=\"http://schema.org/ProductGroup\">ProductGroup</a> (or <a class=\"localLink\" href=\"http://schema.org/ProductModel\">ProductModel</a>).",
+         "rdfs:label" : "hasVariant",
+         "schema:category" : "issue-1797",
+         "schema:domainIncludes" : "schema:ProductGroup",
+         "schema:inverseOf" : "schema:isVariantOf",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Product",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1797"
+      },
+      "schema:productGroupID" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates a textual identifier for a ProductGroup.",
+         "rdfs:label" : "productGroupID",
+         "schema:category" : "issue-1797",
+         "schema:domainIncludes" : "schema:ProductGroup",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1797"
+      },
+      "schema:variesBy" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Indicates the property or properties by which the variants in a <a class=\"localLink\" href=\"http://schema.org/ProductGroup\">ProductGroup</a> vary, e.g. their size, color etc. Schema.org properties can be referenced by their short name e.g. \"color\"; terms defined elsewhere can be referenced with their URIs.",
+         "rdfs:label" : "variesBy",
+         "schema:category" : "issue-1797",
+         "schema:domainIncludes" : "schema:ProductGroup",
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:DefinedTerm",
+            "schema:Text"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1797"
+      }
+   }
+}

@@ -54,7 +54,7 @@ each gene. The read copy number is not used in this analysis.
 =cut
 
 package CLIPSeqTools::App::distribution_on_genic_elements;
-$CLIPSeqTools::App::distribution_on_genic_elements::VERSION = '0.1.9';
+$CLIPSeqTools::App::distribution_on_genic_elements::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

@@ -33,13 +33,12 @@ no_index:
 requires:
   perl: '5.006'
   strict: '0'
-  vars: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/oalders/http-browserdetect/issues
   homepage: https://github.com/oalders/http-browserdetect
   repository: https://github.com/oalders/http-browserdetect.git
-version: '3.30'
+version: '3.31'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -605,7 +604,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.30
+          tag: v3.31
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -738,6 +737,7 @@ x_contributors:
   - 'gregor herrmann <gregor+github@comodo.priv.at>'
   - 'Gregory Oschwald <goschwald@maxmind.com>'
   - 'Hao Wu <hwu@intellisurvey.com>'
+  - 'James Raspass <jraspass@gmail.com>'
   - 'James Waters <james@jcwaters.co.uk>'
   - 'joatis <joatis3@gmail.com>'
   - 'Jon Jensen <jon@endpoint.com>'

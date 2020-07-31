@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.139;
+package Config::Model::Node 2.140;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -1249,7 +1249,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.139
+version 2.140
 
 =head1 SYNOPSIS
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has cash_back => (
@@ -42,6 +42,14 @@ has floor_limit => (
 
 
 
+has monthly_minimum_repayment_amount => (
+    is        => 'rw',
+    predicate => '_has_monthly_minimum_repayment_amount',
+    json_ld   => 'monthlyMinimumRepaymentAmount',
+);
+
+
+
 
 
 1;
@@ -58,7 +66,7 @@ SemanticWeb::Schema::PaymentCard - A payment method using a credit
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -125,6 +133,27 @@ A floor_limit should be one of the following types:
 =head2 C<_has_floor_limit>
 
 A predicate for the L</floor_limit> attribute.
+
+=head2 C<monthly_minimum_repayment_amount>
+
+C<monthlyMinimumRepaymentAmount>
+
+The minimum payment is the lowest amount of money that one is required to
+pay on a credit card statement each month.
+
+A monthly_minimum_repayment_amount should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MonetaryAmount']>
+
+=item C<Num>
+
+=back
+
+=head2 C<_has_monthly_minimum_repayment_amount>
+
+A predicate for the L</monthly_minimum_repayment_amount> attribute.
 
 =head1 SEE ALSO
 

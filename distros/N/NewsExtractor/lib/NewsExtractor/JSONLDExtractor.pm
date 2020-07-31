@@ -3,7 +3,7 @@ use Moo;
 extends 'NewsExtractor::TXExtractor';
 
 use Mojo::Transaction::HTTP;
-use Types::Standard qw(InstanceOf HashRef);
+use Types::Standard qw( InstanceOf HashRef ArrayRef );
 use Mojo::JSON qw(from_json);
 use Importer 'NewsExtractor::TextUtil' => qw(u);
 
@@ -21,7 +21,14 @@ has schema_ld => (
 sub _build_schema_ld {
     my ($self) = @_;
     my $el = $self->dom->at('script[type="application/ld+json"]') or return {};
-    return from_json( $el->text );
+    my $x = from_json( $el->text );
+    if (HashRef->check($x)) {
+        return $x;
+    }
+    if (ArrayRef->check($x)) {
+        return $x->[0];
+    }
+    return {};
 }
 
 sub journalist {

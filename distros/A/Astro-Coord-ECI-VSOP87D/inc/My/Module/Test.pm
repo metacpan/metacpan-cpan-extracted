@@ -11,7 +11,7 @@ use Carp;
 use Exporter qw{ import };
 use Test::More 0.88;	# Because of done_testing();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 our @EXPORT = qw{
     is_au_au
@@ -27,7 +27,7 @@ our @EXPORT = qw{
     use constant DEBUG => $ENV{VSOP87D_DEBUG};
 }
 
-sub is_au_au ($$$$) {
+sub is_au_au {
     my ( $got, $want, $dp, $title ) = @_;
     my $tplt = "%.${dp}f";
     @_ = (
@@ -38,12 +38,12 @@ sub is_au_au ($$$$) {
     goto &is;
 }
 
-sub is_km_au ($$$$) {
+sub is_km_au {
     splice @_, 0, 1, $_[0] / AU;
     goto &is_au_au;
 }
 
-sub is_rad_deg ($$$$) {
+sub is_rad_deg {
     my ( $got, $want, $dp, $title ) = @_;
     my $tplt = "%.${dp}f";
     @_ = (
@@ -215,7 +215,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2019 by Thomas R. Wyant, III
+Copyright (C) 2018-2020 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

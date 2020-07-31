@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter 'import';
 
-our $VERSION = "0.201";
+our $VERSION = "0.202";
 
 our @EXPORT = qw(
     compress
@@ -14,6 +14,7 @@ our @EXPORT = qw(
     ZSTD_VERSION_NUMBER
     ZSTD_VERSION_STRING
     ZSTD_MAX_CLEVEL
+    ZSTD_MIN_CLEVEL
 );
 
 use XSLoader;
@@ -27,6 +28,13 @@ __END__
 =head1 NAME
 
 Compress::Stream::Zstd - Perl interface to the Zstd (Zstandard) (de)compressor
+
+=head1 NOTE
+
+This module is a fork of L<Compress-Zstd|https://github.com/spiritloose/Compress-Zstd>.
+It contains a few changes to make streaming compression/uncompression more robust.
+The only reason for this fork is to allow the module to work with `IO-Compress-Zstd`.
+The hope is that the changes made here can be merged back upstream and this module can be retired.
 
 =head1 SYNOPSIS
 
@@ -70,6 +78,8 @@ On error (in case of corrupted data) undef is returned.
 =head2 ZSTD_VERSION_STRING
 
 =head2 ZSTD_MAX_CLEVEL
+
+=head2 ZSTD_MIN_CLEVEL
 
 =head1 SEE ALSO
 

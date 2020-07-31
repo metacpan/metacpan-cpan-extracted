@@ -1,8 +1,8 @@
 BEGIN { chdir 't' if -d 't' }
 use warnings;
 use utf8;
-use open ':std', ':encoding(utf8)';
-use Test::More 'no_plan';
+use open ':std', ':encoding(UTF-8)';
+use Test::More;
 use Test::Warnings;
 use strict;
 
@@ -92,5 +92,7 @@ my $DST_BAG   = File::Spec->catdir( @ROOT, 'dst_bag' );
     ok( $result, "Bag verifies" );
     rmtree($DST_BAG);
 }
+
+done_testing();
 
 __END__

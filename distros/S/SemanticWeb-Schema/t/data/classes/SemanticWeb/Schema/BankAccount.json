@@ -1,43 +1,39 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:FIBO",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A product or service offered by a bank whereby one may deposit, withdraw or transfer money and in some cases be paid interest.",
       "rdfs:label" : "BankAccount",
-      "rdfs:subClassOf" : "schema:FinancialProduct"
+      "rdfs:subClassOf" : "schema:FinancialProduct",
+      "schema:source" : "schemadotorgsources:FIBO"
    },
    "properties" : {
       "schema:accountMinimumInflow" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1253",
-            "schemadotorgsources:FIBO"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A minimum amount that has to be paid in every month.",
          "rdfs:label" : "accountMinimumInflow",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : "schema:BankAccount",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:MonetaryAmount"
-      },
-      "schema:accountOverdraftLimit" : {
-         "dc:source" : [
+         "schema:rangeIncludes" : "schema:MonetaryAmount",
+         "schema:source" : [
             "schemadotorgsources:FIBO",
             "https://github.com/schemaorg/schemaorg/issues/1253"
-         ],
+         ]
+      },
+      "schema:accountOverdraftLimit" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An overdraft is an extension of credit from a lending institution when an account reaches zero. An overdraft allows the individual to continue withdrawing money even if the account has no funds in it. Basically the bank allows people to borrow a set amount of money.",
          "rdfs:label" : "accountOverdraftLimit",
          "schema:category" : "issue-1253",
          "schema:domainIncludes" : "schema:BankAccount",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:MonetaryAmount"
+         "schema:rangeIncludes" : "schema:MonetaryAmount",
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
+         ]
       },
       "schema:bankAccountType" : {
-         "dc:source" : [
-            "schemadotorgsources:FIBO",
-            "https://github.com/schemaorg/schemaorg/issues/1253"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The type of a bank account.",
          "rdfs:label" : "bankAccountType",
@@ -45,8 +41,12 @@
          "schema:domainIncludes" : "schema:BankAccount",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
+            "schema:URL",
+            "schema:Text"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1253",
+            "schemadotorgsources:FIBO"
          ]
       }
    }

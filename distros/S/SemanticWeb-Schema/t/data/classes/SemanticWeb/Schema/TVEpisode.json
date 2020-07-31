@@ -11,10 +11,10 @@
          "rdfs:comment" : "The country of the principal offices of the production company or individual responsible for the movie or program.",
          "rdfs:label" : "countryOfOrigin",
          "schema:domainIncludes" : [
-            "schema:TVSeries",
             "schema:TVSeason",
-            "schema:TVEpisode",
-            "schema:Movie"
+            "schema:Movie",
+            "schema:TVSeries",
+            "schema:TVEpisode"
          ],
          "schema:rangeIncludes" : "schema:Country"
       },
@@ -24,47 +24,47 @@
          "rdfs:label" : "partOfTVSeries",
          "rdfs:subPropertyOf" : "schema:isPartOf",
          "schema:domainIncludes" : [
+            "schema:TVClip",
             "schema:TVSeason",
-            "schema:TVEpisode",
-            "schema:TVClip"
+            "schema:TVEpisode"
          ],
          "schema:rangeIncludes" : "schema:TVSeries",
          "schema:supersededBy" : "schema:partOfSeries"
       },
       "schema:subtitleLanguage" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2110",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Languages in which subtitles/captions are available, in <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard format</a>.",
          "rdfs:label" : "subtitleLanguage",
          "schema:category" : "issue-2110",
          "schema:domainIncludes" : [
             "schema:BroadcastEvent",
+            "schema:ScreeningEvent",
             "schema:TVEpisode",
-            "schema:Movie",
-            "schema:ScreeningEvent"
+            "schema:Movie"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Language"
-         ]
+            "schema:Language",
+            "schema:Text"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2110"
       },
       "schema:titleEIDR" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2469",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An <a href=\"https://eidr.org/\">EIDR</a> (Entertainment Identifier Registry) <a class=\"localLink\" href=\"http://schema.org/identifier\">identifier</a> representing at the most general/abstract level, a work of film or television.<br/><br/>\n\nFor example, the motion picture known as \"Ghostbusters\" has a titleEIDR of  \"10.5240/7EC7-228A-510A-053E-CBB8-J\". This title (or work) may have several variants, which EIDR calls \"edits\". See <a class=\"localLink\" href=\"http://schema.org/editEIDR\">editEIDR</a>.<br/><br/>\n\nSince schema.org types like <a class=\"localLink\" href=\"http://schema.org/Movie\">Movie</a> and <a class=\"localLink\" href=\"http://schema.org/TVEpisode\">TVEpisode</a> can be used for both works and their multiple expressions, it is possible to use <a class=\"localLink\" href=\"http://schema.org/titleEIDR\">titleEIDR</a> alone (for a general description), or alongside <a class=\"localLink\" href=\"http://schema.org/editEIDR\">editEIDR</a> for a more edit-specific description.",
          "rdfs:label" : "titleEIDR",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:category" : "issue-2469",
          "schema:domainIncludes" : [
-            "schema:TVEpisode",
-            "schema:Movie"
+            "schema:Movie",
+            "schema:TVEpisode"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
-         ]
+            "schema:Text",
+            "schema:URL"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2469"
       }
    }
 }

@@ -27,7 +27,9 @@ do { my $x = {
                                       'Const::Fast' => '0',
                                       'Keyword::Simple' => '0.04',
                                       'Text::Balanced' => '0',
-                                      'perl' => 'v5.12.0'
+                                      'perl' => 'v5.12.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {

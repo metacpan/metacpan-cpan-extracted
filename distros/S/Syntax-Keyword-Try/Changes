@@ -1,5 +1,14 @@
 Revision history for Syntax-Keyword-Try
 
+0.17    2020-07-31
+        [CHANGES]
+         * Ensure that `catch ($var)` does not retain exception value after
+           block exit
+         * Docs fixes for clarity on experimental status of `catch ($var)`
+
+        [BUGFIXES]
+         * Ensure sv_isa_sv is a macro for aTHX on threaded perls
+
 0.16    2020-07-23
         [CHANGES]
          * Provide the `:experimental` import tag as a nicer way to silence

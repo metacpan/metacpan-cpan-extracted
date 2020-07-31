@@ -2,7 +2,7 @@
 
 
 package clipseqtools::compare;
-$clipseqtools::compare::VERSION = '0.1.9';
+$clipseqtools::compare::VERSION = '0.1.10';
 
 ##############################################
 # Import external libraries

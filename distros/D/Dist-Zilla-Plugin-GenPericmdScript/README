@@ -2,9 +2,9 @@ NAME
     Dist::Zilla::Plugin::GenPericmdScript - Generate Perinci::CmdLine script
 
 VERSION
-    This document describes version 0.422 of
+    This document describes version 0.423 of
     Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution
-    Dist-Zilla-Plugin-GenPericmdScript), released on 2020-04-01.
+    Dist-Zilla-Plugin-GenPericmdScript), released on 2020-07-31.
 
 SYNOPSIS
     In dist.ini:
@@ -64,108 +64,139 @@ DESCRIPTION
      ...
 
 CONFIGURATION (SCRIPT SPECIFICATION)
-  url* => str
-    Riap URL. If the script does not contain subcommand, this should refer
-    to a function URL. If the script contains subcommands, this should
-    usually refer to a package URL.
+  allow_prereq
+    Boolean. Will be passed to Perinci::CmdLine::Gen backend.
 
-  subcommands => str
-    For creating a CLI script with subcommands. Value is a
-    whitespace-separated entries of subcommand specification. Each
-    subcommand specification must be in the form of
-    SUBCOMMAND_NAME=URL[:SUMMARY]. Example:
+  allow_unknown_opts
+    Boolean, default false. Will be passed to Perinci::CmdLine object
+    construction code.
 
-     delete=/My/App/delete_item add=/My/App/add_item refresh=/My/App/refresh_item:Refetch an item from source
-
-  subcommands_from_package_functions => bool
-    Will be passed to Perinci::CmdLine::Gen backend.
-
-  include_package_functions_match => re
-    Will be passed to Perinci::CmdLine::Gen backend.
-
-  exclude_package_functions_match => re
-    Will be passed to Perinci::CmdLine::Gen backend.
-
-  name => str
-    Name of script to create. Default will be taken from function (or
-    package) name, with "_" replaced to "-".
-
-  summary => str
-    Will be passed to Perinci::CmdLine::Gen backend (as "script_summary").
-
-  cmdline => str
-    Select module to use. Default is Perinci::CmdLine::Any, but you can set
-    this to "classic" (equals to Perinci::CmdLine::Classic), "any"
+  cmdline
+    String. Select module to use. Default is Perinci::CmdLine::Any, but you
+    can set this to "classic" (equals to Perinci::CmdLine::Classic), "any"
     (Perinci::CmdLine::Any), or "lite" (Perinci::CmdLine::Lite) or module
     name.
 
-  prefer_lite => bool (default: 1)
-    If set to 0 and you are using "Perinci::CmdLine::Any", "-prefer_lite"
-    option will be passed in the code.
+  code_after_end
+    String.
 
-  enable_log => bool
-    Will be passed to Perinci::CmdLine object construction code (as "log").
+  code_before_instantiate_cmdline
+    String.
 
-  default_log_level => str
-    If set, will add this code to the generated script:
+  config_dirs
+    Array of strings. Will be passed to Perinci::CmdLine object construction
+    code.
+
+  config_filename
+    String or array of strings. Will be passed to Perinci::CmdLine object
+    construction code.
+
+  copt_help_enable
+    Boolean, default true. Will be passed to Perinci::CmdLine::Gen backend.
+    Can be used to disable `--help` in generated CLI.
+
+  copt_help_getopt
+    String. Will be passed to Perinci::CmdLine::Gen backend. Can be used to
+    change `--help` in generated CLI to some other option name.
+
+  copt_version_enable
+    Boolean, default true. Will be passed to Perinci::CmdLine::Gen backend.
+    Can be used to disable `--version in generated CLI`.
+
+  copt_version_getopt
+    String. Will be passed to Perinci::CmdLine::Gen backend. Can be used to
+    change the `--version` in generated CLI to some other option name.
+
+  default_format
+    String. Passed to Perinci::CmdLine object construction code.
+
+  default_log_level
+    String. If set, will add this code to the generated script:
 
      BEGIN { no warnings; $main::Log_Level = "..." }
 
     This can be used if you want your script to be verbose by default, for
     example.
 
-  allow_unknown_opts => bool
-    Will be passed to Perinci::CmdLine object construction code.
+  enable_log
+    Boolean, default false. Will be passed to Perinci::CmdLine object
+    construction code (as "log").
 
-  pass_cmdline_object => bool
-    Will be passed to Perinci::CmdLine object construction code.
+  exclude_package_functions_match
+    Regex. Will be passed to Perinci::CmdLine::Gen backend.
 
-  extra_urls_for_version => str
+  extra_urls_for_version
     Comma-separated string, will be passed to Perinci::CmdLine object
     construction code (as array).
 
-  config_filename => str|array[str]
-    Will be passed to Perinci::CmdLine object construction code.
+  include_package_functions_match
+    Regex. Will be passed to Perinci::CmdLine::Gen backend.
 
-  config_dirs => array[str]
-    Will be passed to Perinci::CmdLine object construction code.
+  load_modules
+    Array of strings. Extra modules to load in the generated script.
 
-  ssl_verify_hostname => bool (default: 1)
-    If set to 0, will add this code to the generated script:
+  name
+    String. Name of script to create. Default will be taken from function
+    (or package) name, with "_" replaced to "-".
+
+  pass_cmdline_object
+    Boolean, default false. Will be passed to Perinci::CmdLine object
+    construction code.
+
+  per_arg_json
+    Boolean. Will be passed to Perinci::CmdLine::Gen backend.
+
+  per_arg_yaml
+    Boolean. Will be passed to Perinci::CmdLine::Gen backend.
+
+  prefer_lite
+    Boolean, default true. If set to 0 and you are using
+    "Perinci::CmdLine::Any", "-prefer_lite" option will be passed in the
+    code.
+
+  read_config
+    Boolean, default true. Will be passed to Perinci::CmdLine::Gen backend.
+    Can be used to prevent the generated CLI from reading from config files.
+
+  read_env
+    Bool, default true. Will be passed to Perinci::CmdLine::Gen backend. Can
+    be used to prevent the genreated CLI from reading from environment
+    variable.
+
+  skip_format
+    Boolean. Passed to Perinci::CmdLine object construction code.
+
+  ssl_verify_hostname
+    Boolean, default true. If set to 0, will add this code to the generated
+    script:
 
      $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
 
     This can be used if the Riap function URL is https and you don't want to
     verify.
 
-  load_modules => array[str]
-    Extra modules to load in the generated script.
+  subcommands
+    String. For creating a CLI script with subcommands. Value is a
+    whitespace-separated entries of subcommand specification. Each
+    subcommand specification must be in the form of
+    SUBCOMMAND_NAME=URL[:SUMMARY]. Example:
 
-  code_before_instantiate_cmdline => str
-  code_after_end => str
-  default_format => str
-    Passed to Perinci::CmdLine object construction code.
+     delete=/My/App/delete_item add=/My/App/add_item refresh=/My/App/refresh_item:Refetch an item from source
 
-  skip_format => bool
-    Passed to Perinci::CmdLine object construction code.
+  subcommands_from_package_functions
+    Boolean. Will be passed to Perinci::CmdLine::Gen backend.
 
-  use_utf8 => bool
-    Passed to Perinci::CmdLine object construction code.
+  summary
+    String. Will be passed to Perinci::CmdLine::Gen backend (as
+    "script_summary").
 
-  allow_prereq => bool
-    Will be passed to Perinci::CmdLine::Gen backend.
+  url
+    String, required. Riap URL. If the script does not contain subcommand,
+    this should refer to a function URL. If the script contains subcommands,
+    this should usually refer to a package URL.
 
-  per_arg_json => bool
-    Will be passed to Perinci::CmdLine::Gen backend.
-
-  per_arg_yaml => bool
-    Will be passed to Perinci::CmdLine::Gen backend.
-
-  read_config => bool
-    Will be passed to Perinci::CmdLine::Gen backend.
-
-  read_env => bool
-    Will be passed to Perinci::CmdLine::Gen backend.
+  use_utf8
+    Boolean. Passed to Perinci::CmdLine object construction code.
 
 CONFIGURATION (OTHER)
   inline_generate_completer => bool (default: 1)

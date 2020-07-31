@@ -1,5 +1,5 @@
 package App::gimpgitbuild::Command::build;
-$App::gimpgitbuild::Command::build::VERSION = '0.26.0';
+$App::gimpgitbuild::Command::build::VERSION = '0.26.1';
 use strict;
 use warnings;
 use autodie;
@@ -104,7 +104,7 @@ __END__
 
 =head1 VERSION
 
-version 0.26.0
+version 0.26.1
 
 =begin foo return (
         [ "output|o=s", "Output path" ],

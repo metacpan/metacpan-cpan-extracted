@@ -15,13 +15,21 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has aspect => (
     is        => 'rw',
     predicate => '_has_aspect',
     json_ld   => 'aspect',
+);
+
+
+
+has medical_audience => (
+    is        => 'rw',
+    predicate => '_has_medical_audience',
+    json_ld   => 'medicalAudience',
 );
 
 
@@ -42,7 +50,7 @@ SemanticWeb::Schema::MedicalWebPage - A web page that provides medical informati
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -67,6 +75,26 @@ A aspect should be one of the following types:
 =head2 C<_has_aspect>
 
 A predicate for the L</aspect> attribute.
+
+=head2 C<medical_audience>
+
+C<medicalAudience>
+
+Medical audience for page.
+
+A medical_audience should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::MedicalAudience']>
+
+=item C<InstanceOf['SemanticWeb::Schema::MedicalAudienceType']>
+
+=back
+
+=head2 C<_has_medical_audience>
+
+A predicate for the L</medical_audience> attribute.
 
 =head1 SEE ALSO
 

@@ -3,8 +3,8 @@ BEGIN { chdir 't' if -d 't' }
 
 use warnings;
 use utf8;
-use open ':std', ':encoding(utf8)';
-use Test::More tests => 19;
+use open ':std', ':encoding(UTF-8)';
+use Test::More tests => 26;
 use Test::Exception;
 use strict;
 
@@ -119,19 +119,31 @@ BAGINFO
     );
   is_deeply( $got, \@expected, "has all bag-info entries");
 }
-is ($bag->bag_info_by_key("Payload-Oxum"), "4.2", "bag_info_by_key, existing");
-is ($bag->bag_info_by_key("Bagging-Date"), "2013-04-09", "bag_info_by_key, existing2");
-is ($bag->bag_info_by_key("Bag-Software-Agent"), "bagit.py <http://github.com/edsu/bagit>", "bag_info_by_key, existing3");
-is ($bag->bag_info_by_key("NoKEY"), undef, "bag_info_by_key, not found");
-is ($bag->_replace_bag_info_by_first_match("NoKey", "test"), undef, "_replace_bag_info_by_first_match, not found");
-is ($bag->_add_or_replace_bag_info("Key", "Value"), -1, "add a new key-value");
-is ($bag->_replace_bag_info_by_first_match("Key", "0.0"), 3, "_replace_bag_info_by_first_match, index");
-is ($bag->bag_info_by_key("Key"), "0.0", "_replace_bag_info_by_first_match, check new value");
-is ($bag->bag_info_by_key("Payload-Oxum"), "4.2", "bag_info_by_key, existing");
-is ($bag->bag_info_by_key("Bagging-Date"), "2013-04-09", "bag_info_by_key, existing2");
-is ($bag->bag_info_by_key("Bag-Software-Agent"), "bagit.py <http://github.com/edsu/bagit>", "bag_info_by_key, existing3");
-throws_ok ( sub {$bag->_add_or_replace_bag_info("Foo:Bar", "Baz")}, qr/key should not contain a colon/, "_add_or_replace_bag_info, invalid key check");
-throws_ok ( sub {$bag->_replace_bag_info_by_first_match("Foo:Bar", "Baz")}, qr/key should not contain a colon/, "_replace_bag_info_by_first_match, invalid key check");
+is_deeply ($bag->get_baginfo_values_by_key("Payload-Oxum"), "4.2", "bag_info_by_key, existing");
+is_deeply ($bag->get_baginfo_values_by_key("Bagging-Date"), "2013-04-09", "bag_info_by_key, existing2");
+is_deeply ($bag->get_baginfo_values_by_key("Bag-Software-Agent"), "bagit.py <http://github.com/edsu/bagit>", "bag_info_by_key, existing3");
+is ($bag->get_baginfo_values_by_key("NoKEY"), undef, "bag_info_by_key, not found");
+is ($bag->_replace_baginfo_by_first_match("NoKey", "test"), undef, "_replace_bag_info_by_first_match, not found");
+is ($bag->add_or_replace_baginfo_by_key("Key", "Value"), -1, "add a new key-value");
+is ($bag->_replace_baginfo_by_first_match("Key", "0.0"), 3, "_replace_bag_info_by_first_match, index");
+is_deeply ($bag->get_baginfo_values_by_key("Key"), "0.0", "_replace_bag_info_by_first_match, check new value");
+is ($bag->add_or_replace_baginfo_by_key("key", "Noch ein Eintrag"), "-1", "add_or_replace key value");
+is_deeply ($bag->get_baginfo_values_by_key("key"), "Noch ein Eintrag", "bag_info_by_key, existing");
+is_deeply ($bag->get_baginfo_values_by_key("Payload-Oxum"), "4.2", "bag_info_by_key, existing");
+is_deeply ($bag->get_baginfo_values_by_key("Bagging-Date"), "2013-04-09", "bag_info_by_key, existing2");
+is_deeply ($bag->get_baginfo_values_by_key("Bag-Software-Agent"), "bagit.py <http://github.com/edsu/bagit>", "bag_info_by_key, existing3");
+is ($bag->append_baginfo_by_key("key", "Und ein weiterer Eintrag"), 1, "append_bag_info");
+is ($bag->get_baginfo_values_by_key("keY"), undef, "bag_info_by_key, check case sensitive");
+my @got = $bag->get_baginfo_values_by_key("key", );
+my @expected = ("Noch ein Eintrag", "Und ein weiterer Eintrag");
+is_deeply( \@got, \@expected, "append_bag_info, check if both entries exist");
+is ($bag->append_baginfo_by_key("payload-oxUm", "Völlig falsch"), undef, "append_bag_info of uniq value");
+my @got2 = $bag->get_baginfo_values_by_key("paylOAD-oxum", );
+my @expected2 = ("4.2");
+is_deeply( \@got2, \@expected2, "append_bag_info, check that value is not added");
+
+throws_ok ( sub {$bag->add_or_replace_baginfo_by_key("Foo:Bar", "Baz")}, qr/key should not contain a colon/, "_add_or_replace_bag_info, invalid key check");
+throws_ok ( sub {$bag->_replace_baginfo_by_first_match("Foo:Bar", "Baz")}, qr/key should not contain a colon/, "_replace_bag_info_by_first_match, invalid key check");
 
 
 #p( $bag );

@@ -4,8 +4,8 @@
       "rdfs:comment" : "Fitness-related activity designed for a specific health-related purpose, including defined exercise routines as well as activity prescribed by a clinician.",
       "rdfs:label" : "ExercisePlan",
       "rdfs:subClassOf" : [
-         "schema:PhysicalActivity",
-         "schema:CreativeWork"
+         "schema:CreativeWork",
+         "schema:PhysicalActivity"
       ],
       "schema:isPartOf" : "http:health-lifesci.schema.org"
    },
@@ -18,7 +18,7 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
             "schema:Duration",
-            "schema:QualitativeValue"
+            "schema:QuantitativeValue"
          ]
       },
       "schema:activityFrequency" : {
@@ -29,7 +29,7 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
             "schema:Text",
-            "schema:QualitativeValue"
+            "schema:QuantitativeValue"
          ]
       },
       "schema:additionalVariable" : {
@@ -58,8 +58,8 @@
          "schema:domainIncludes" : "schema:ExercisePlan",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
-            "schema:Text"
+            "schema:Text",
+            "schema:QuantitativeValue"
          ]
       },
       "schema:repetitions" : {
@@ -69,7 +69,7 @@
          "schema:domainIncludes" : "schema:ExercisePlan",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
+            "schema:QuantitativeValue",
             "schema:Number"
          ]
       },
@@ -81,7 +81,7 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
             "schema:Text",
-            "schema:QualitativeValue"
+            "schema:QuantitativeValue"
          ]
       },
       "schema:workload" : {
@@ -91,7 +91,7 @@
          "schema:domainIncludes" : "schema:ExercisePlan",
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:QualitativeValue",
+            "schema:QuantitativeValue",
             "schema:Energy"
          ]
       }

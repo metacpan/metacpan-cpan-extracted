@@ -1,3 +1,9 @@
+v0.35.0 2020-07-31T08:36:15+0800
+  - re-format the dateline extracted from www.thinkingtaiwan.com
+  - Handle a few special cases on chinatimes and ebc.
+  - Improve the extraction of www.5ch.com.tw
+  - Improve the recall of dateline and journalist on www.mdnkids.com
+
 v0.34.0 2020-07-26T22:57:38+0800
   - Add a site-specific extractor for www.nownews.com
   - Add a site-specific extractor for www.mdnkids.com

@@ -15,21 +15,13 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has free => (
     is        => 'rw',
     predicate => '_has_free',
     json_ld   => 'free',
-);
-
-
-
-has is_accessible_for_free => (
-    is        => 'rw',
-    predicate => '_has_is_accessible_for_free',
-    json_ld   => 'isAccessibleForFree',
 );
 
 
@@ -66,7 +58,7 @@ SemanticWeb::Schema::PublicationEvent - A PublicationEvent corresponds indiffere
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -91,24 +83,6 @@ A free should be one of the following types:
 =head2 C<_has_free>
 
 A predicate for the L</free> attribute.
-
-=head2 C<is_accessible_for_free>
-
-C<isAccessibleForFree>
-
-A flag to signal that the item, event, or place is accessible for free.
-
-A is_accessible_for_free should be one of the following types:
-
-=over
-
-=item C<Bool>
-
-=back
-
-=head2 C<_has_is_accessible_for_free>
-
-A predicate for the L</is_accessible_for_free> attribute.
 
 =head2 C<published_by>
 

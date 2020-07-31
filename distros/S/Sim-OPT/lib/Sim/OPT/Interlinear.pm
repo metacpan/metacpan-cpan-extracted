@@ -31,7 +31,7 @@ use Sim::OPT::Parcoord3d;
 
 our @ISA = qw( Exporter );
 our @EXPORT = qw( interlinear, interstart prepfactlev tellstepsize );
-$VERSION = '0.159';
+$VERSION = '0.161';
 $ABSTRACT = 'Interlinear is a program for building metamodels from incomplete, multivariate, discrete dataseries on the basis of nearest-neighbouring gradients weighted by distance.';
 
 #######################################################################
@@ -1742,7 +1742,7 @@ sub interlinear
 
   ########## AN EXAMPLE OF SETTINGS TO BE PUT IN A CONFIGURATION FILE FOLLOWS.
   $maxloops= 1000;
-  $sourcefile = "./sourcefile.csv";
+  $sourcefile = "./caravantrials.csv"; # Name of the source file. It is specified at launch, the value here specified is going to be overridden.
   $newfile = $sourcefile . "_meta.csv";
   $report = $newfile . "_report.txt";
   @mode = ( "wei" ); # #"wei" is weighted gradient linear interpolation of the nearest neighbours.
@@ -2124,7 +2124,6 @@ Here below is an example of multivatiate dataseries of 3 parameters assuming 3 l
 3,3,3,3
 
 
-Note that the parameter listings cannot be incomplete. Just the objective function entries can be.
 The program converts this format into the one preferred by Sim::OPTS, which is the following:
 
 
@@ -2145,6 +2144,23 @@ The program converts this format into the one preferred by Sim::OPTS, which is t
 1-3_2-2_3-2,0.670
 
 1-3_2-3_3-3
+
+
+(((Note that the parameter listings cannot be incomplete if Interlinear is to be involved without involving Sim::OPT. Just the objective function entries can be incomplete. The following series, for example, is a version of the series above, incomplete as regards the parameter listings:
+
+1-1_2-1_3-1,9.234
+
+1-1_2-2_3-2,4.500
+
+1-2_2-1_3-1,7.534
+
+1-2_2-2_3-2,0.000
+
+1-2_2-3_3-3,0.550
+
+1-3_2-2_3-2,0.670
+
+However, involving Sim::OPT is more complicated that utilizing Interlinear alone. How to do that is treated at the end of this document.)))
 
 
 After some computations, Interlinear will output a new dataseries with the missing values filled in.
@@ -2172,6 +2188,20 @@ perl ./Interlinear.pm . "./sourcefile.csv" "./confinterlinear.pl ";
 Or to begin with a dialogue question:
 ./Interlinear.pm interstart;
 .
+
+The minimal operations for utilizing a data series which is incomplete as regards the parameter listings are the following:
+
+1) copy the executable "opt" in the work folder;
+
+2) create a configuration file for Sim::OPT by modifying the "caravantrial.pl" file in the "examples" folder of this distribution (it is sufficient to modify the few values signalled by capital letters in the comments) and place it in the work folder;
+
+4) copy the .csv file in the work folder;
+
+5) launch Sim::OPT in the shell: << ./opt >>;
+
+6) when asked, specify the name (with relative path) of the Sim::OPT configuration file. For example:
+./filename.pl .
+
 
 =head2 EXPORT
 

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has accepted_payment_method => (
@@ -386,7 +386,7 @@ SemanticWeb::Schema::Offer - An offer to transfer some rights to an item or to p
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -887,8 +887,10 @@ A predicate for the L</gtin8> attribute.
 
 C<includesObject>
 
-This links to a node or nodes indicating the exact quantity of the products
-included in the offer.
+=for html <p>This links to a node or nodes indicating the exact quantity of the
+products included in an <a class="localLink"
+href="http://schema.org/Offer">Offer</a> or <a class="localLink"
+href="http://schema.org/ProductCollection">ProductCollection</a>.<p>
 
 A includes_object should be one of the following types:
 

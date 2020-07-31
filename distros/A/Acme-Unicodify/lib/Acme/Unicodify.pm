@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2015 J. Maslak
+# Copyright (C) 2015 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package Acme::Unicodify;
 # ABSTRACT: Convert ASCII text into look-somewhat-alike unicode
-$Acme::Unicodify::VERSION = '0.007';
+$Acme::Unicodify::VERSION = '1.202110';
 use utf8;
 use v5.22;
 
@@ -90,9 +90,9 @@ sub new {
 
 sub to_unicode {
     my $self = shift;
-    my $str = shift;
+    my $str  = shift;
 
-    if (!defined($str)) { return; }
+    if ( !defined($str) ) { return; }
 
     my @parts = split /\b{gcb}/, $str;
     my $out = '';
@@ -110,9 +110,9 @@ sub to_unicode {
 
 sub back_to_ascii {
     my $self = shift;
-    my $str = shift;
+    my $str  = shift;
 
-    if (!defined($str)) { return; }
+    if ( !defined($str) ) { return; }
 
     my @parts = split /\b{gcb}/, $str;
     my $out = '';
@@ -129,24 +129,24 @@ sub back_to_ascii {
 
 
 sub file_to_unicode {
-    if ($#_ != 2) { confess 'invalid call' }
-    my ($self, $in_fn, $out_fn) = @_;
+    if ( $#_ != 2 ) { confess 'invalid call' }
+    my ( $self, $in_fn, $out_fn ) = @_;
 
     my $txt = read_text($in_fn);
     $txt = $self->to_unicode($txt);
-    write_text($out_fn, $txt);
+    write_text( $out_fn, $txt );
 
     return;
 }
 
 
 sub file_back_to_ascii {
-    if ($#_ != 2) { confess 'invalid call' }
-    my ($self, $in_fn, $out_fn) = @_;
+    if ( $#_ != 2 ) { confess 'invalid call' }
+    my ( $self, $in_fn, $out_fn ) = @_;
 
     my $txt = read_text($in_fn);
     my $out = $self->back_to_ascii($txt);
-    write_text($out_fn, $out);
+    write_text( $out_fn, $out );
 
     return;
 }
@@ -157,9 +157,9 @@ sub _define_cache {
     $self->{_ASCII_CACHE} = {};
 
     my $i = 0;
-    foreach my $key (keys %_TRANSLATE) {
+    foreach my $key ( keys %_TRANSLATE ) {
         $i++;
-        $self->{_ASCII_CACHE}->{$self->to_unicode($key)} = $key;
+        $self->{_ASCII_CACHE}->{ $self->to_unicode($key) } = $key;
     }
     return;
 }
@@ -178,7 +178,7 @@ Acme::Unicodify - Convert ASCII text into look-somewhat-alike unicode
 
 =head1 VERSION
 
-version 0.007
+version 1.202110
 
 =head1 SYNOPSIS
 
@@ -249,11 +249,11 @@ case that no codepoints >127 are used).
 
 =head1 AUTHOR
 
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015,2016 by J. Maslak.
+This software is copyright (c) 2015,2016,2017,2020 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

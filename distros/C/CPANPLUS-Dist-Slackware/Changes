@@ -1,5 +1,9 @@
 Revision history for CPANPLUS-Dist-Slackware
 
+1.028  2020-07-29 10:10:22 CEST
+
+  - Pod::Find is now optional.
+
 1.027  2018-03-30 08:58:46 CEST
 
   - Remove some files from the distribution.

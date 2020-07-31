@@ -1,15 +1,11 @@
+#ABSTRACT: The role to load the sha512 plugin (default for v1.0)
+package Archive::BagIt::Plugin::Manifest::SHA512;
 use strict;
 use warnings;
-
-#ABSTRACT: The md5 plugin (default)
-package Archive::BagIt::Plugin::Manifest::SHA512;
-
-use Moo;
-with 'Archive::BagIt::Role::Manifest';
-
-
 use Digest::SHA;
 use Sub::Quote;
+use Moo;
+with 'Archive::BagIt::Role::Manifest';
 
 has '+plugin_name' => (
     is => 'ro',
@@ -56,30 +52,25 @@ __END__
 
 =head1 NAME
 
-Archive::BagIt::Plugin::Manifest::SHA512 - The md5 plugin (default)
+Archive::BagIt::Plugin::Manifest::SHA512 - The role to load the sha512 plugin (default for v1.0)
 
 =head1 VERSION
 
-version 0.059
+version 0.063
 
 =head1 NAME
 
-Archive::BagIt::Plugin::Manifest::SHA512 - The md5 plugin (default)
+Archive::BagIt::Plugin::Manifest::SHA512 - The role to load the sha512 plugin (default for v1.0)
 
 =head1 VERSION
 
-version 0.059
+version 0.063
 
 =head1 AVAILABILITY
 
 The latest version of this module is available from the Comprehensive Perl
 Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
 site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
-
-=head1 SOURCE
-
-The development version is on github at L<https://github.com/Archive-BagIt>
-and may be cloned from L<git://github.com/Archive-BagIt.git>
 
 =head1 BUGS AND LIMITATIONS
 
@@ -92,7 +83,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -103,7 +94,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ use Data::Validate::Email qw( is_email );
 use Data::Validate::IP qw( is_ipv4 is_ipv6 );
 use Data::Validate::URI qw( is_uri );
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: WWW::LogicBoxes Moose Type Library
 
 use MooseX::Types -declare => [qw(

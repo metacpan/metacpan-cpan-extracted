@@ -21,7 +21,7 @@ my $builder = Module::Build->new(
     'List::Util'      => '1.43',
     'Scalar::Util'    => '1.39',
     'Carp'            => '0',
-    'Net::IPAM::IP'   => '1.22',
+    'Net::IPAM::IP'   => '1.24',
   },
   add_to_cleanup => ['Net-IPAM-Block-*'],
 );

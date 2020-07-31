@@ -1,100 +1,99 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A US-style health insurance plan, including PPOs, EPOs, and HMOs.",
       "rdfs:label" : "HealthInsurancePlan",
       "rdfs:subClassOf" : "schema:Intangible",
       "schema:category" : "issue-1062",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
    },
    "properties" : {
       "schema:benefitsSummaryUrl" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The URL that goes directly to the summary of benefits and coverage for the specific standard plan or plan variation.",
          "rdfs:label" : "benefitsSummaryUrl",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : "schema:HealthInsurancePlan",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:URL"
+         "schema:rangeIncludes" : "schema:URL",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:contactPoint" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A contact point for a person or organization.",
          "rdfs:label" : "contactPoint",
          "schema:domainIncludes" : [
-            "schema:HealthInsurancePlan",
             "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:HealthInsurancePlan"
          ],
          "schema:rangeIncludes" : "schema:ContactPoint"
       },
       "schema:healthPlanDrugOption" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "TODO.",
          "rdfs:label" : "healthPlanDrugOption",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : "schema:HealthInsurancePlan",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:healthPlanDrugTier" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The tier(s) of drugs offered by this formulary or insurance plan.",
          "rdfs:label" : "healthPlanDrugTier",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : [
-            "schema:HealthPlanFormulary",
-            "schema:HealthInsurancePlan"
+            "schema:HealthInsurancePlan",
+            "schema:HealthPlanFormulary"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:healthPlanId" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The 14-character, HIOS-generated Plan ID number. (Plan IDs must be unique, even across different markets.)",
          "rdfs:label" : "healthPlanId",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : "schema:HealthInsurancePlan",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:healthPlanMarketingUrl" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The URL that goes directly to the plan brochure for the specific standard plan or plan variation.",
          "rdfs:label" : "healthPlanMarketingUrl",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : "schema:HealthInsurancePlan",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:URL"
+         "schema:rangeIncludes" : "schema:URL",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:includesHealthPlanFormulary" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Formularies covered by this plan.",
          "rdfs:label" : "includesHealthPlanFormulary",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : "schema:HealthInsurancePlan",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:HealthPlanFormulary"
+         "schema:rangeIncludes" : "schema:HealthPlanFormulary",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:includesHealthPlanNetwork" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Networks covered by this plan.",
          "rdfs:label" : "includesHealthPlanNetwork",
          "schema:category" : "issue-1062",
          "schema:domainIncludes" : "schema:HealthInsurancePlan",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:HealthPlanNetwork"
+         "schema:rangeIncludes" : "schema:HealthPlanNetwork",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       },
       "schema:usesHealthPlanIdStandard" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1062",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The standard for interpreting thePlan ID. The preferred is \"HIOS\". See the Centers for Medicare &amp; Medicaid Services for more details.",
          "rdfs:label" : "usesHealthPlanIdStandard",
@@ -102,9 +101,10 @@
          "schema:domainIncludes" : "schema:HealthInsurancePlan",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:URL"
-         ]
+            "schema:URL",
+            "schema:Text"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1062"
       }
    }
 }

@@ -34,7 +34,7 @@ no_index:
 provides:
   App::UpdateCPANfile:
     file: lib/App/UpdateCPANfile.pm
-    version: '0.05'
+    version: '0.06'
   App::UpdateCPANfile::CPANfileSnapshotParser:
     file: lib/App/UpdateCPANfile/CPANfileSnapshotParser.pm
   App::UpdateCPANfile::PackageDetails:
@@ -54,7 +54,7 @@ resources:
   bugtracker: https://github.com/hitode909/App-UpdateCPANfile/issues
   homepage: https://github.com/hitode909/App-UpdateCPANfile
   repository: git://github.com/hitode909/App-UpdateCPANfile.git
-version: '0.05'
+version: '0.06'
 x_authority: cpan:HITODE
 x_contributors:
   - 'hitode909 <hitode909@gmail.com>'

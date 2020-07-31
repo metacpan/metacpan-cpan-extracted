@@ -1,5 +1,9 @@
 Revision history for HTML-DeferableCSS:
 
+v0.4.2    2020-07-31 14:19:08+01:00 Europe/London
+  [Toolchain]
+  - Add core modules in the prerequisites.
+
 v0.4.1    2020-06-08 12:48:51+01:00 Europe/London
   [Documentation]
   - Added note when simple attribute was added.

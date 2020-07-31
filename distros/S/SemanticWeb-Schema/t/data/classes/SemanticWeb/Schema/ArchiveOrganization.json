@@ -1,16 +1,15 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1758",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An organization with archival holdings. An organization which keeps and preserves archival material and typically makes it accessible to the public.",
       "rdfs:label" : "ArchiveOrganization",
       "rdfs:subClassOf" : "schema:LocalBusiness",
       "schema:category" : "issue-1758",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1758"
    },
    "properties" : {
       "schema:archiveHeld" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1758",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Collection, <a href=\"https://en.wikipedia.org/wiki/Fonds\">fonds</a>, or item held, kept or maintained by an <a class=\"localLink\" href=\"http://schema.org/ArchiveOrganization\">ArchiveOrganization</a>.",
          "rdfs:label" : "archiveHeld",
@@ -18,7 +17,8 @@
          "schema:domainIncludes" : "schema:ArchiveOrganization",
          "schema:inverseOf" : "schema:holdingArchive",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:ArchiveComponent"
+         "schema:rangeIncludes" : "schema:ArchiveComponent",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1758"
       }
    }
 }

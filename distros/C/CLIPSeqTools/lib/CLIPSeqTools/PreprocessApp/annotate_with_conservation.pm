@@ -53,7 +53,7 @@ floating point number to integer by multiplying with 1000.
 =cut
 
 package CLIPSeqTools::PreprocessApp::annotate_with_conservation;
-$CLIPSeqTools::PreprocessApp::annotate_with_conservation::VERSION = '0.1.9';
+$CLIPSeqTools::PreprocessApp::annotate_with_conservation::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;
@@ -136,6 +136,10 @@ sub run {
 	foreach my $rname (@rnames) {
 		warn "Reading conservation data for $rname\n" if $self->verbose;
 		my $pdl = $self->plylop_pdl_for($rname, $rname_sizes{$rname});
+		if (!defined $pdl) {
+			warn "Could not find conservation file for $rname. Skipping.\n";
+			next;
+		}
 
 		warn "Annotating records for $rname\n" if $self->verbose;
 		$reads_collection->schema->txn_do( sub {
@@ -212,7 +216,11 @@ sub plylop_pdl_for {
 
 	my @files = glob $self->cons_dir . '/' . $rname . '.*';
 	die "More than one matching files for $rname" if @files > 1;
-	my $file = $files[0]; chomp $file;
+	my $file = $files[0];
+	if (!defined $file) {
+		return;
+	}
+	chomp $file;
 	open (my $H, "gzip -dc $file |");
 
 	my ($start, $step);

@@ -7,37 +7,37 @@
    },
    "properties" : {
       "schema:applicantLocationRequirements" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2083",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The location(s) applicants can apply from. This is usually used for telecommuting jobs where the applicant does not need to be in a physical office. Note: This should not be used for citizenship or work visa requirements.",
          "rdfs:label" : "applicantLocationRequirements",
          "schema:category" : "issue-2083",
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:AdministrativeArea"
+         "schema:rangeIncludes" : "schema:AdministrativeArea",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2083"
       },
       "schema:applicationContact" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2396",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Contact details for further information relevant to this job posting.",
          "rdfs:label" : "applicationContact",
          "schema:category" : "issue-2396",
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:ContactPoint"
+         "schema:rangeIncludes" : "schema:ContactPoint",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2396"
       },
       "schema:baseSalary" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The base salary of the job or of an employee in an EmployeeRole.",
          "rdfs:label" : "baseSalary",
          "schema:domainIncludes" : [
-            "schema:EmployeeRole",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:EmployeeRole"
          ],
          "schema:rangeIncludes" : [
+            "schema:MonetaryAmount",
             "schema:Number",
-            "schema:PriceSpecification",
-            "schema:MonetaryAmount"
+            "schema:PriceSpecification"
          ]
       },
       "schema:benefits" : {
@@ -49,10 +49,6 @@
          "schema:supersededBy" : "schema:jobBenefits"
       },
       "schema:datePosted" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/2490",
-            "https://github.com/schemaorg/schemaorg/issues/2521"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Publication date of an online listing.",
          "rdfs:label" : "datePosted",
@@ -61,21 +57,21 @@
             "issue-2521"
          ],
          "schema:domainIncludes" : [
-            "schema:SpecialAnnouncement",
-            "schema:RealEstateListing",
             "schema:CDCPMDRecord",
-            "schema:JobPosting"
+            "schema:RealEstateListing",
+            "schema:JobPosting",
+            "schema:SpecialAnnouncement"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2521",
+            "https://github.com/schemaorg/schemaorg/issues/2490"
          ]
       },
       "schema:educationRequirements" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/1779"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Educational background needed for the position or Occupation.",
          "rdfs:label" : "educationRequirements",
@@ -89,29 +85,33 @@
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:EducationalOccupationalCredential",
-            "schema:Text"
+            "schema:Text",
+            "schema:EducationalOccupationalCredential"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1779",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ]
       },
       "schema:eligibilityToWorkRequirement" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2384",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The legal requirements such as citizenship, visa and other documentation required for an applicant to this job.",
          "rdfs:label" : "eligibilityToWorkRequirement",
          "schema:category" : "issue-2384",
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2384"
       },
       "schema:employerOverview" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2396",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A description of the employer, career opportunities and work environment for this position.",
          "rdfs:label" : "employerOverview",
          "schema:category" : "issue-2396",
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2396"
       },
       "schema:employmentType" : {
          "rdf:type" : "rdf:Property",
@@ -121,33 +121,32 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:employmentUnit" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2296",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates the department, unit and/or facility where the employee reports and/or in which the job is to be performed.",
          "rdfs:label" : "employmentUnit",
          "schema:category" : "issue-2296",
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Organization"
+         "schema:rangeIncludes" : "schema:Organization",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2296"
       },
       "schema:estimatedSalary" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An estimated salary for a job posting or occupation, based on a variety of variables including, but not limited to industry, job title, and location. Estimated salaries  are often computed by outside organizations rather than the hiring organization, who may not have committed to the estimated value.",
          "rdfs:label" : "estimatedSalary",
          "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
-            "schema:JobPosting",
-            "schema:Occupation"
+            "schema:Occupation",
+            "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
             "schema:MonetaryAmountDistribution",
-            "schema:Number",
-            "schema:MonetaryAmount"
-         ]
+            "schema:MonetaryAmount",
+            "schema:Number"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1698"
       },
       "schema:experienceRequirements" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Description of skills and experience needed for the position or Occupation.",
          "rdfs:label" : "experienceRequirements",
@@ -156,7 +155,8 @@
             "schema:JobPosting",
             "schema:Occupation"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1698"
       },
       "schema:hiringOrganization" : {
          "rdf:type" : "rdf:Property",
@@ -198,14 +198,14 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:jobImmediateStart" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2244",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An indicator as to whether a position is available for an immediate start.",
          "rdfs:label" : "jobImmediateStart",
          "schema:category" : "issue-2244",
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Boolean"
+         "schema:rangeIncludes" : "schema:Boolean",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2244"
       },
       "schema:jobLocation" : {
          "rdf:type" : "rdf:Property",
@@ -215,17 +215,16 @@
          "schema:rangeIncludes" : "schema:Place"
       },
       "schema:jobLocationType" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1591",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A description of the job location (e.g TELECOMMUTE for telecommute jobs).",
          "rdfs:label" : "jobLocationType",
          "schema:category" : "issue-1591",
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1591"
       },
       "schema:jobStartDate" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2244",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date on which a successful applicant for this job would be expected to start work. Choose a specific date in the future or use the jobImmediateStart property to indicate the position is to be filled as soon as possible.",
          "rdfs:label" : "jobStartDate",
@@ -233,40 +232,40 @@
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Date"
-         ]
+            "schema:Date",
+            "schema:Text"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2244"
       },
       "schema:occupationalCategory" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/2289",
-            "https://github.com/schemaorg/schemaorg/issues/1698",
-            "https://github.com/schemaorg/schemaorg/issues/2192",
-            "https://github.com/schemaorg/schemaorg/issues/2460"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category describing the job, preferably using a term from a taxonomy such as <a href=\"http://www.onetcenter.org/taxonomy.html\">BLS O*NET-SOC</a>, <a href=\"https://www.ilo.org/public/english/bureau/stat/isco/isco08/\">ISCO-08</a> or similar, with the property repeated for each applicable value. Ideally the taxonomy should be identified, and both the textual label and formal code for the category should be provided.<br/><br/>\n\nNote: for historical reasons, any textual label and formal code provided as a literal may be assumed to be from O*NET-SOC.",
          "rdfs:label" : "occupationalCategory",
          "schema:category" : [
-            "issue-1698",
-            "issue-2460",
             "issue-2192",
-            "issue-2289"
+            "issue-2289",
+            "issue-1698",
+            "issue-2460"
          ],
          "schema:domainIncludes" : [
             "schema:WorkBasedProgram",
             "schema:EducationalOccupationalProgram",
-            "schema:Occupation",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:Occupation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:CategoryCode"
+            "schema:CategoryCode",
+            "schema:Text"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2460",
+            "https://github.com/schemaorg/schemaorg/issues/2289",
+            "https://github.com/schemaorg/schemaorg/issues/2192",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ]
       },
       "schema:physicalRequirement" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2384",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A description of the types of physical activity associated with the job. Defined terms such as those in O*net may be used, but note that there is no way to specify the level of ability as well as its nature when using a defined term.",
          "rdfs:label" : "physicalRequirement",
@@ -277,19 +276,16 @@
             "schema:URL",
             "schema:DefinedTerm",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2384"
       },
       "schema:qualifications" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1779",
-            "https://github.com/schemaorg/schemaorg/issues/1698"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Specific qualifications required for this role or Occupation.",
          "rdfs:label" : "qualifications",
          "schema:category" : [
-            "issue-1779",
-            "issue-1698"
+            "issue-1698",
+            "issue-1779"
          ],
          "schema:domainIncludes" : [
             "schema:Occupation",
@@ -299,28 +295,32 @@
          "schema:rangeIncludes" : [
             "schema:EducationalOccupationalCredential",
             "schema:Text"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1779",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ]
       },
       "schema:relevantOccupation" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The Occupation for the JobPosting.",
          "rdfs:label" : "relevantOccupation",
          "schema:category" : "issue-1698",
          "schema:domainIncludes" : "schema:JobPosting",
-         "schema:rangeIncludes" : "schema:Occupation"
+         "schema:rangeIncludes" : "schema:Occupation",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1698"
       },
       "schema:responsibilities" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1698",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Responsibilities associated with this role or Occupation.",
          "rdfs:label" : "responsibilities",
          "schema:category" : "issue-1698",
          "schema:domainIncludes" : [
-            "schema:Occupation",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:Occupation"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1698"
       },
       "schema:salaryCurrency" : {
          "rdf:type" : "rdf:Property",
@@ -333,7 +333,6 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:securityClearanceRequirement" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2384",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A description of any security clearance requirements of the job.",
          "rdfs:label" : "securityClearanceRequirement",
@@ -341,12 +340,12 @@
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
-         ]
+            "schema:Text",
+            "schema:URL"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2384"
       },
       "schema:sensoryRequirement" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2384",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A description of any sensory requirements and levels necessary to function on the job, including hearing and vision. Defined terms such as those in O*net may be used, but note that there is no way to specify the level of ability as well as its nature when using a defined term.",
          "rdfs:label" : "sensoryRequirement",
@@ -354,16 +353,13 @@
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
+            "schema:URL",
             "schema:DefinedTerm",
-            "schema:Text",
-            "schema:URL"
-         ]
+            "schema:Text"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2384"
       },
       "schema:skills" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/2322",
-            "https://github.com/schemaorg/schemaorg/issues/1698"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A statement of knowledge, skill, ability, task or any other assertion expressing a competency that is desired or required to fulfill this role or to work in this occupation.",
          "rdfs:label" : "skills",
@@ -372,12 +368,16 @@
             "issue-2322"
          ],
          "schema:domainIncludes" : [
-            "schema:Occupation",
-            "schema:JobPosting"
+            "schema:JobPosting",
+            "schema:Occupation"
          ],
          "schema:rangeIncludes" : [
-            "schema:DefinedTerm",
-            "schema:Text"
+            "schema:Text",
+            "schema:DefinedTerm"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2322",
+            "https://github.com/schemaorg/schemaorg/issues/1698"
          ]
       },
       "schema:specialCommitments" : {
@@ -395,33 +395,33 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:totalJobOpenings" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2329",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of positions open for this job posting. Use a positive integer. Do not use if the number of positions is unclear or not known.",
          "rdfs:label" : "totalJobOpenings",
          "schema:category" : "issue-2329",
          "schema:domainIncludes" : "schema:JobPosting",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Integer"
+         "schema:rangeIncludes" : "schema:Integer",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2329"
       },
       "schema:validThrough" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date after when the item is not valid. For example the end of an offer, salary period, or a period of opening hours.",
          "rdfs:label" : "validThrough",
          "schema:domainIncludes" : [
-            "schema:Demand",
+            "schema:Offer",
+            "schema:MonetaryAmount",
             "schema:OpeningHoursSpecification",
             "schema:PriceSpecification",
-            "schema:Offer",
             "schema:LocationFeatureSpecification",
-            "schema:MonetaryAmount",
+            "schema:Demand",
             "schema:JobPosting"
          ],
          "schema:rangeIncludes" : [
-            "schema:DateTime",
-            "schema:Date"
-         ]
+            "schema:Date",
+            "schema:DateTime"
+         ],
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:workHours" : {
          "rdf:type" : "rdf:Property",

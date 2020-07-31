@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008001;
+use 5.012000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,12 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "DBIx-QuickDB",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008001",
+  "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "DBIx::QuickDB",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Digest::SHA" => 0,
     "Fcntl" => 0,
+    "File::Copy::Recursive" => 0,
     "File::Path" => 0,
     "File::Temp" => 0,
     "IPC::Cmd" => 0,
@@ -37,7 +38,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Capture::Tiny" => "0.20"
   },
-  "VERSION" => "0.000011",
+  "VERSION" => "0.000014",
   "test" => {
     "TESTS" => "t/*.t t/Drivers/*.t t/Pool/*.t t/Tools/*.t"
   }
@@ -49,6 +50,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Digest::SHA" => 0,
   "Fcntl" => 0,
+  "File::Copy::Recursive" => 0,
   "File::Path" => 0,
   "File::Temp" => 0,
   "IPC::Cmd" => 0,

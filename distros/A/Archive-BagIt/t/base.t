@@ -3,7 +3,7 @@ BEGIN { chdir 't' if -d 't' }
 
 use warnings;
 use utf8;
-use open ':std', ':encoding(utf8)';
+use open ':std', ':encoding(UTF-8)';
 use Test::More 'no_plan';
 use Test::Warnings;
 use strict;
@@ -42,9 +42,6 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
   note ("bag path:", explain $bag->bag_path);
   note ("metadata path: ", explain $bag->metadata_path);
   note explain $bag->tagmanifest_files;
-  note explain $bag->manifest_entries;
-  note explain $bag->tagmanifest_entries;
-
   my $result = $bag->verify_bag;
   ok($result,     "Bag verifies");
 }
@@ -70,6 +67,8 @@ my $DST_BAG = File::Spec->catdir(@ROOT, 'dst_bag');
 
   ok ($bag,       "Object created");
   isa_ok ($bag,   $Class);
+  ok ($bag->load(), "Bag loaded");
+
   my $result = $bag->verify_bag();
   ok($result,     "Bag verifies");
 

@@ -2,7 +2,19 @@ CHANGE LOG
 ==========
 
 
+2020-01-15 - v0.31.0
+--------------------
+
+### Added
+    - convenience method `bootstrap_tracer`
+    - convenience method `bootstrap_default_tracer`
+
+### Updated
+    - Documentation about `OPENTRACING_IMPLEMENTATION` env-var
+
+
 2020-01-15 - v0.03
+------------------
 
 ### Changed
     - renamed internal required method to `bootstrap_tracer`

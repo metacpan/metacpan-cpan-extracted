@@ -14,7 +14,6 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:broadcastFrequency" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1004",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The frequency used for over-the-air broadcasts. Numeric values or simple ranges e.g. 87-99. In addition a shortcut idiom is supported for frequences of AM and FM radio channels, e.g. \"87 FM\".",
          "rdfs:label" : "broadcastFrequency",
@@ -26,7 +25,8 @@
          "schema:rangeIncludes" : [
             "schema:BroadcastFrequencySpecification",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1004"
       },
       "schema:broadcastServiceTier" : {
          "rdf:type" : "rdf:Property",
@@ -40,13 +40,13 @@
          "rdfs:comment" : "Genre of the creative work, broadcast channel or group.",
          "rdfs:label" : "genre",
          "schema:domainIncludes" : [
-            "schema:MusicGroup",
             "schema:CreativeWork",
+            "schema:MusicGroup",
             "schema:BroadcastChannel"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:inBroadcastLineup" : {

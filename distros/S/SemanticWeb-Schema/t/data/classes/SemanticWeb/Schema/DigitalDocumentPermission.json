@@ -12,10 +12,10 @@
          "rdfs:label" : "grantee",
          "schema:domainIncludes" : "schema:DigitalDocumentPermission",
          "schema:rangeIncludes" : [
-            "schema:Audience",
-            "schema:ContactPoint",
             "schema:Person",
-            "schema:Organization"
+            "schema:Audience",
+            "schema:Organization",
+            "schema:ContactPoint"
          ]
       },
       "schema:permissionType" : {

@@ -13,8 +13,8 @@
          "rdfs:comment" : "A possible complication and/or side effect of this therapy. If it is known that an adverse outcome is serious (resulting in death, disability, or permanent damage; requiring hospitalization; or is otherwise life-threatening or requires immediate medical attention), tag it as a seriouseAdverseOutcome instead.",
          "rdfs:label" : "adverseOutcome",
          "schema:domainIncludes" : [
-            "schema:MedicalDevice",
-            "schema:TherapeuticProcedure"
+            "schema:TherapeuticProcedure",
+            "schema:MedicalDevice"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:MedicalEntity"
@@ -35,9 +35,9 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
-            "schema:Patient",
             "schema:TherapeuticProcedure",
             "schema:MedicalCondition",
+            "schema:Patient",
             "schema:DrugClass"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",

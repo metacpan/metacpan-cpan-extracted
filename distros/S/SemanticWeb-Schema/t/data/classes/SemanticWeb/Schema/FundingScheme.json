@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:FundInfoCollab",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A FundingScheme combines organizational, project and policy aspects of grant-based funding\n    that sets guidelines, principles and mechanisms to support other kinds of projects and activities.\n    Funding is typically organized via <a class=\"localLink\" href=\"http://schema.org/Grant\">Grant</a> funding. Examples of funding schemes: Swiss Priority Programmes (SPPs); EU Framework 7 (FP7); Horizon 2020; the NIH-R01 Grant Program; Wellcome institutional strategic support fund. For large scale public sector funding, the management and administration of grant awards is often handled by other, dedicated, organizations - <a class=\"localLink\" href=\"http://schema.org/FundingAgency\">FundingAgency</a>s such as ERC, REA, ...",
       "rdfs:label" : "FundingScheme",
       "rdfs:subClassOf" : "schema:Organization",
       "schema:category" : "issue-383",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "schemadotorgsources2:FundInfoCollab"
    },
    "properties" : {}
 }

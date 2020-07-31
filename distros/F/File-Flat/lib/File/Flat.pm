@@ -1,4 +1,4 @@
-package File::Flat; # git description: fabfdb3
+package File::Flat; # git description: v1.05-6-g44d5bc8
 # ABSTRACT: Implements a flat filesystem
 
 # The File::Flat is a static class that provides a unified interface
@@ -17,7 +17,7 @@ use prefork    'File::Copy';
 use prefork    'File::Copy::Recursive';
 use prefork    'File::Remove';
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 # The main error string
 our $errstr  = '';
@@ -513,7 +513,8 @@ sub _andRemove {
 
 
 
-package File::Flat::Object; # git description: fabfdb3
+package File::Flat::Object; # git description: v1.05-6-g44d5bc8
+our $VERSION = '1.06';
 
 # Instantiatable version of File::Flat.
 # 
@@ -836,7 +837,7 @@ File::Flat - Implements a flat filesystem
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 DESCRIPTION
 
@@ -1089,6 +1090,8 @@ Returns true if the deletion (and pruning if requested) was a success, or
 C<undef> otherwise.
 
 =head2 prune $filename
+
+=for stopwords CVS
 
 For a file that has already been delete, C<prune> will work upwards,
 removing any empty directories it finds.

@@ -1,135 +1,134 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1741",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A set of requirements that a must be fulfilled in order to perform an Action.",
       "rdfs:label" : "ActionAccessSpecification",
       "rdfs:subClassOf" : "schema:Intangible",
-      "schema:category" : "issue-1741"
+      "schema:category" : "issue-1741",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1741"
    },
    "properties" : {
       "schema:availabilityEnds" : {
-         "dc:source" : [
-            "schemadotorgsources:source_GoodRelationsTerms",
-            "https://github.com/schemaorg/schemaorg/issues/1741"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The end of the availability of the product or service included in the offer.",
          "rdfs:label" : "availabilityEnds",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
             "schema:Demand",
+            "schema:ActionAccessSpecification",
             "schema:Offer"
          ],
          "schema:rangeIncludes" : [
             "schema:Date",
             "schema:Time",
             "schema:DateTime"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1741",
+            "schemadotorgsources:source_GoodRelationsTerms"
          ]
       },
       "schema:availabilityStarts" : {
-         "dc:source" : [
-            "schemadotorgsources:source_GoodRelationsTerms",
-            "https://github.com/schemaorg/schemaorg/issues/1741"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The beginning of the availability of the product or service included in the offer.",
          "rdfs:label" : "availabilityStarts",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
             "schema:ActionAccessSpecification",
-            "schema:Demand",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:Demand"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
             "schema:DateTime",
-            "schema:Time"
+            "schema:Time",
+            "schema:Date"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/1741",
+            "schemadotorgsources:source_GoodRelationsTerms"
          ]
       },
       "schema:category" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1741",
-            "https://github.com/schemaorg/schemaorg/issues/2490"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:Invoice",
-            "schema:Product",
             "schema:Recommendation",
-            "schema:ActionAccessSpecification",
             "schema:Offer",
+            "schema:Invoice",
+            "schema:PhysicalActivity",
             "schema:SpecialAnnouncement",
-            "schema:Service"
+            "schema:Service",
+            "schema:Product",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Thing",
             "schema:PhysicalActivityCategory",
-            "schema:Text"
+            "schema:Thing",
+            "schema:Text",
+            "schema:URL"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2490",
+            "https://github.com/schemaorg/schemaorg/issues/1741"
          ]
       },
       "schema:eligibleRegion" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1741",
-            "schemadotorgsources:source_GoodRelationsTerms"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is valid.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/ineligibleRegion\">ineligibleRegion</a>.",
          "rdfs:label" : "eligibleRegion",
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
+            "schema:Demand",
             "schema:Offer",
-            "schema:ActionAccessSpecification",
             "schema:DeliveryChargeSpecification",
-            "schema:Demand"
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
+            "schema:Text",
             "schema:GeoShape",
-            "schema:Text"
+            "schema:Place"
+         ],
+         "schema:source" : [
+            "schemadotorgsources:source_GoodRelationsTerms",
+            "https://github.com/schemaorg/schemaorg/issues/1741"
          ]
       },
       "schema:expectsAcceptanceOf" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1741",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An Offer which must be accepted before the user can perform the Action. For example, the user may need to buy a movie before being able to watch it.",
          "rdfs:label" : "expectsAcceptanceOf",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:ActionAccessSpecification",
             "schema:ConsumeAction",
-            "schema:MediaSubscription"
+            "schema:MediaSubscription",
+            "schema:ActionAccessSpecification"
          ],
-         "schema:rangeIncludes" : "schema:Offer"
+         "schema:rangeIncludes" : "schema:Offer",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1741"
       },
       "schema:ineligibleRegion" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2242",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is not valid, e.g. a region where the transaction is not allowed.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/eligibleRegion\">eligibleRegion</a>.",
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
-            "schema:Demand",
-            "schema:DeliveryChargeSpecification",
             "schema:ActionAccessSpecification",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:DeliveryChargeSpecification",
+            "schema:Demand"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
             "schema:Text",
             "schema:Place",
             "schema:GeoShape"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2242"
       },
       "schema:requiresSubscription" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1741",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates if use of the media require a subscription  (either paid or free). Allowed values are <code>true</code> or <code>false</code> (note that an earlier version had 'yes', 'no').",
          "rdfs:label" : "requiresSubscription",
@@ -139,9 +138,10 @@
             "schema:MediaObject"
          ],
          "schema:rangeIncludes" : [
-            "schema:MediaSubscription",
-            "schema:Boolean"
-         ]
+            "schema:Boolean",
+            "schema:MediaSubscription"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1741"
       }
    }
 }

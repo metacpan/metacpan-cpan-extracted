@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008001;
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 use Carp qw(croak);
 use URI ();
@@ -12,6 +12,7 @@ use LWP::UserAgent;
 use JSON::MaybeXS 'JSON';
 use HTML::Entities qw/decode_entities/;
 use HTTP::Request;
+use MIME::Type;
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -30,6 +31,7 @@ sub new {
 }
 
 for my $name (qw[video_id video_url title user fmt fmt_list suffix]) {
+    ## no critic (TestingAndDebugging::ProhibitNoStrict)
     no strict 'refs';
     *{"get_$name"} = sub {
         use strict 'refs';
@@ -152,10 +154,19 @@ sub prepare_download {
 
     return $self->{cache}{$video_id} if ref $self->{cache}{$video_id} eq 'HASH';
 
-    my $content       = $self->_get_content($video_id);
-    my $title         = $self->_fetch_title($content);
-    my $user          = $self->_fetch_user($content);
-    my $video_url_map = $self->_fetch_video_url_map($content);
+    my ($title, $user, $video_url_map);
+    my $content = $self->_get_content($video_id);
+    if ($self->_is_new($content)) {
+      my $args        = $self->_get_args($content);
+      my $player_resp = JSON()->new->decode($args->{player_response});
+      $video_url_map  = $self->_decode_player_response($player_resp);
+      $title          = decode_entities $player_resp->{videoDetails}{title};
+      $user           = decode_entities $player_resp->{videoDetails}{author};
+    } else {
+      $title         = $self->_fetch_title($content);
+      $user          = $self->_fetch_user($content);
+      $video_url_map = $self->_fetch_video_url_map($content);
+    }
 
     my $fmt_list = [];
     my $sorted = [
@@ -186,6 +197,34 @@ sub prepare_download {
     };
 }
 
+sub _mime_to_suffix {
+    (my $mime = shift) =~ s{^([^;]+);.*}{$1};
+    my $stype = MIME::Type->new(type => $mime)->subType;
+    return $stype eq 'webm' ? 'webm'
+         : $stype eq 'mp4'  ? 'mp4'
+         : $stype eq '3gp'  ? '3gp'
+         :                   'flv'
+    ;
+}
+
+sub _decode_player_response {
+  my ($self, $player_data) = @_;
+  # need to decode $player_data->{streamingData}{formats};
+  my $fmt_map = { map { $_->{mimeType} => join 'x', $_->{width}, $_->{height} } @{$player_data->{streamingData}{formats}} };
+  my $fmt_url_map = { map { $_->{mimeType} => $_->{url} } @{$player_data->{streamingData}{formats}} };
+  # more formats in $player_data->{streamingData}{adaptiveFormats};
+  return +{
+      map {
+          $_->{fmt} => $_,
+      } map +{
+          fmt        => $_,
+          resolution => $fmt_map->{$_},
+          url        => $fmt_url_map->{$_},
+          suffix     => _mime_to_suffix($_),
+      }, keys %$fmt_map
+  };
+}
+
 sub _fetch_title {
     my ($self, $content) = @_;
 
@@ -202,7 +241,7 @@ sub _fetch_user {
         return decode_entities($1);
     }else{
         return;
-    }	
+    }
 }
 
 sub _fetch_video_url_map {
@@ -264,6 +303,13 @@ sub _get_args {
     croak 'failed to extract JSON data' unless $data->{args};
 
     return $data->{args};
+}
+
+sub _is_new {
+    my ($self, $content) = @_;
+    my $args = $self->_get_args($content);
+    return 1 unless ($args->{fmt_list} and $args->{url_encoded_fmt_stream_map});
+    return 0;
 }
 
 sub _parse_fmt_map {
@@ -408,7 +454,7 @@ WWW::YouTube::Download - WWW::YouTube::Download - Very simple YouTube video down
 
 =head1 VERSION
 
-version 0.62
+version 0.63
 
 =head1 SYNOPSIS
 
@@ -586,6 +632,8 @@ Parses given URL and returns playlist ID.
 
 Parses given URL and returns YouTube username.
 
+=item B<get_video_id($video_id)>
+
 =item B<get_video_url($video_id)>
 
 =item B<get_title($video_id)>
@@ -620,7 +668,7 @@ xaicron <xaicron {@} cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 - 2019 by Yuji Shimada.
+This software is copyright (c) 2013 by Yuji Shimada.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

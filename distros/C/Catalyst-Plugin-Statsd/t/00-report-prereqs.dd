@@ -29,6 +29,7 @@ do { my $x = {
                       'requires' => {
                                       'Catalyst' => '5.90123',
                                       'Moose::Role' => '0',
+                                      'POSIX' => '0',
                                       'Plack::Middleware::Statsd' => '0',
                                       'Ref::Util' => '0',
                                       'namespace::autoclean' => '0',
@@ -52,7 +53,9 @@ do { my $x = {
                                    'Test::Log::Dispatch' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

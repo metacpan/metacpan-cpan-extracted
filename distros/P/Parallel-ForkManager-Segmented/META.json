@@ -58,7 +58,7 @@
    "provides" : {
       "Parallel::ForkManager::Segmented" : {
          "file" : "lib/Parallel/ForkManager/Segmented.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/shlomif/perl-Parallel-ForkManager-Segmented"
       }
    },
-   "version" : "0.4.0",
+   "version" : "0.6.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"

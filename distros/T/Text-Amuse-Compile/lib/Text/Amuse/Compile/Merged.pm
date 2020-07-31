@@ -49,11 +49,14 @@ The first file determine the main language of the whole document.
 Anyway, if it's a multilanguage text, hyphenation is supposed to
 switch properly.
 
+Optionally, C<include_paths> can be passed here.
+
 =cut
 
 sub new {
     my ($class, %args) = @_;
     my $files = delete $args{files};
+    my $include_paths = delete $args{include_paths};
     die "Missing files" unless $files && @$files;
     my @docs;
     my (%languages, %language_codes);
@@ -66,7 +69,9 @@ sub new {
         else {
             %args = (file => $file);
         }
-        my $doc = Text::Amuse->new(%args);
+        my $doc = Text::Amuse->new(%args,
+                                   include_paths => $include_paths || [],
+                                  );
         push @docs, $doc;
 
         my $current_lang_code = $doc->language_code;
@@ -104,6 +109,7 @@ sub new {
                 html_direction => $docs[0]->html_direction,
                 is_rtl => $docs[0]->is_rtl,
                 is_bidi => scalar(grep { $_->is_rtl || $_->is_bidi } @docs),
+                include_paths => $include_paths || [],
                };
     bless $self, $class;
 }
@@ -146,7 +152,15 @@ Return true if the first text is RTL.
 
 Return true if any of the text is RTL or bidirectional.
 
+=head2 include_paths
+
+Return the include paths set in the object.
+
 =cut
+
+sub include_paths {
+    return @{shift->{include_paths}}
+}
 
 sub language {
     return shift->{language};
@@ -205,6 +219,11 @@ Return a list of HTML fragments.
 
 Return a list of tokens for the minimal html template
 
+=head2 as_html
+
+As as as_splat_html but return a single string. This is invalid HTML
+and it should be used only for debugging.
+
 =cut
 
 sub _as_splat_html {
@@ -252,6 +271,10 @@ sub as_splat_html {
     return shift->_as_splat_html;
 }
 
+sub as_html {
+    return join("\n", shift->as_splat_html);
+}
+
 =head2 raw_html_toc
 
 Implements the C<raw_html_toc> from L<Text::Amuse>
@@ -290,7 +313,7 @@ sub raw_html_toc {
 
 =head2 attachments
 
-Implement the C<attachments> methods from C<Text::Amuse::Document>
+Implement the C<attachments> method from C<Text::Amuse::Document>
 
 =cut
 
@@ -303,6 +326,22 @@ sub attachments {
         }
     }
     return sort keys %out;
+}
+
+=head2 included_files
+
+Implement the C<included_files> method from C<Text::Amuse::Document>
+
+=cut
+
+
+sub included_files {
+    my $self = shift;
+    my @out;
+    foreach my $doc ($self->docs) {
+        push @out, $doc->included_files;
+    }
+    return @out;
 }
 
 =head2 as_latex

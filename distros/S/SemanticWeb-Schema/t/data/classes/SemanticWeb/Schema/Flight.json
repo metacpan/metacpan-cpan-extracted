@@ -12,8 +12,8 @@
          "rdfs:label" : "aircraft",
          "schema:domainIncludes" : "schema:Flight",
          "schema:rangeIncludes" : [
-            "schema:Vehicle",
-            "schema:Text"
+            "schema:Text",
+            "schema:Vehicle"
          ]
       },
       "schema:arrivalAirport" : {
@@ -52,8 +52,8 @@
          "rdfs:comment" : "'carrier' is an out-dated term indicating the 'provider' for parcel delivery and flights.",
          "rdfs:label" : "carrier",
          "schema:domainIncludes" : [
-            "schema:Flight",
-            "schema:ParcelDelivery"
+            "schema:ParcelDelivery",
+            "schema:Flight"
          ],
          "schema:rangeIncludes" : "schema:Organization",
          "schema:supersededBy" : "schema:provider"
@@ -85,8 +85,8 @@
          "rdfs:label" : "estimatedFlightDuration",
          "schema:domainIncludes" : "schema:Flight",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:Duration"
+            "schema:Duration",
+            "schema:Text"
          ]
       },
       "schema:flightDistance" : {
@@ -120,15 +120,15 @@
          "rdfs:label" : "seller",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
-            "schema:Flight",
-            "schema:Offer",
             "schema:BuyAction",
             "schema:Demand",
-            "schema:Order"
+            "schema:Offer",
+            "schema:Order",
+            "schema:Flight"
          ],
          "schema:rangeIncludes" : [
-            "schema:Organization",
-            "schema:Person"
+            "schema:Person",
+            "schema:Organization"
          ]
       },
       "schema:webCheckinTime" : {

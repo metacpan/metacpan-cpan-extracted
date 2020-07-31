@@ -33,9 +33,13 @@ do { my $x = {
                       'requires' => {
                                       'Alien::Base' => '0',
                                       'Alien::cmake3' => '0',
+                                      'File::Spec::Functions' => '0',
                                       'List::Util' => '0',
+                                      'base' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.8.0'
+                                      'perl' => 'v5.8.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {

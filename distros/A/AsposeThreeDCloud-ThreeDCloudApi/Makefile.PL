@@ -4,7 +4,7 @@ WriteMakefile
 (
   'NAME' => 'AsposeThreeDCloud::ThreeDCloudApi',
   'LICENSE' => 'MIT',
-  'VERSION' => '20.5.0',
+  'VERSION' => '20.7.1',
   'ABSTRACT' =>'Aspose.3D Cloud SDK',
   'AUTHOR' =>'Aspose.Cloud',
   'PREREQ_PM' => {

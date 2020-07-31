@@ -3,6 +3,7 @@ Set($AutomaticAssignmentFilters, [qw(
     MemberOfGroup
     MemberOfRole
     WorkSchedule
+    UserDefined
 )]) unless $AutomaticAssignmentFilters;
 
 Set($AutomaticAssignmentChoosers, [qw(
@@ -10,6 +11,7 @@ Set($AutomaticAssignmentChoosers, [qw(
     Random
     RoundRobin
     TimeLeft
+    UserDefined
 )]) unless $AutomaticAssignmentChoosers;
 
 1;

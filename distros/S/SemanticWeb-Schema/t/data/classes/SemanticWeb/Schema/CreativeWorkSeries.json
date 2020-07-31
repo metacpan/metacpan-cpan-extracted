@@ -10,59 +10,59 @@
    },
    "properties" : {
       "schema:endDate" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2486",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The end date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "endDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
-            "schema:CreativeWorkSeries",
-            "schema:Role",
+            "schema:Event",
             "schema:DatedMoneySpecification",
-            "schema:Schedule",
-            "schema:EducationalOccupationalProgram",
             "schema:CreativeWorkSeason",
-            "schema:Event"
+            "schema:Schedule",
+            "schema:Role",
+            "schema:EducationalOccupationalProgram",
+            "schema:CreativeWorkSeries"
          ],
          "schema:rangeIncludes" : [
             "schema:DateTime",
             "schema:Date"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2486"
       },
       "schema:issn" : {
-         "dc:source" : "schemadotorgsources:source_bibex",
          "owl:equivalentProperty" : "bibo:issn",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The International Standard Serial Number (ISSN) that identifies this serial publication. You can repeat this property to identify different formats of, or the linking ISSN (ISSN-L) for, this serial publication.",
          "rdfs:label" : "issn",
          "rdfs:subPropertyOf" : "schema:identifier",
          "schema:domainIncludes" : [
-            "schema:WebSite",
             "schema:Blog",
             "schema:CreativeWorkSeries",
-            "schema:Dataset"
+            "schema:Dataset",
+            "schema:WebSite"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "schemadotorgsources:source_bibex"
       },
       "schema:startDate" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2486",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The start date and time of the item (in <a href=\"http://en.wikipedia.org/wiki/ISO_8601\">ISO 8601 date format</a>).",
          "rdfs:label" : "startDate",
          "schema:category" : "issue-2486",
          "schema:domainIncludes" : [
+            "schema:Role",
+            "schema:Schedule",
             "schema:CreativeWorkSeries",
             "schema:DatedMoneySpecification",
             "schema:EducationalOccupationalProgram",
-            "schema:CreativeWorkSeason",
             "schema:Event",
-            "schema:Role",
-            "schema:Schedule"
+            "schema:CreativeWorkSeason"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
-         ]
+            "schema:DateTime",
+            "schema:Date"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2486"
       }
    }
 }

@@ -11,7 +11,7 @@ use base qw/ Class::Accessor::Fast /;
 
 use IO::Socket 1.18 ();
 
-our $VERSION = 'v0.3.5';
+our $VERSION = 'v0.3.6';
 
 
 __PACKAGE__->mk_ro_accessors(
@@ -161,7 +161,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.3.5
+version v0.3.6
 
 =head1 SYNOPSIS
 
@@ -379,7 +379,7 @@ Michael R. Davis <mrdvt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

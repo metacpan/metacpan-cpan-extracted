@@ -19,6 +19,7 @@ t/06_dbic.t
 t/07_caller.t
 t/08_named.t
 t/09_pg.t
+t/10_binds_mismatch.t
 t/lib/MyApp.pm
 t/lib/MyApp/Schema.pm
 t/lib/MyApp/Schema/Result/Foo.pm

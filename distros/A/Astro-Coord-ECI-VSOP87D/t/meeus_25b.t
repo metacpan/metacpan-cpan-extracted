@@ -29,27 +29,27 @@ use Time::Local qw{ timegm };
 	model_cutoff_definition	=> $sun->model_cutoff_definition(),
     );
 
-    is_rad_deg $L, 19.907_372, 5, 'Ex 25b Earth L';
+    is_rad_deg( $L, 19.907_372, 5, 'Ex 25b Earth L' );
     note 'The result differs from Meeus by 0.001 seconds of arc';
-    is_rad_deg $B, -0.000_179, 5, 'Ex 25b Earth B';
+    is_rad_deg( $B, -0.000_179, 5, 'Ex 25b Earth B' );
     note 'The result differs from Meeus by less than 0.001 seconds of arc';
-    is_au_au   $R, 0.997_607_75, 6, 'Ex 25b Earth R';
+    is_au_au( $R, 0.997_607_75, 6, 'Ex 25b Earth R' );
     note 'The result differs from Meeus by 3e-8 AU';
 
     $sun->dynamical( $time );
 
     my ( $geometric_long ) = $sun->geometric_longitude();
-    is_rad_deg $geometric_long, 199.907_347, 4,
-	'Ex 25b Sun geometric longitude';
+    is_rad_deg( $geometric_long, 199.907_347, 4,
+	'Ex 25b Sun geometric longitude' );
     note 'The result differs from Meeus by about .011 seconds of arc';
 
     my ( $ra, $dec, $rng ) = $sun->equatorial();
 
-    is_rad_deg $ra,  198.378179, 5, 'Ex 25b Sun RA';
+    is_rad_deg( $ra,  198.378179, 5, 'Ex 25b Sun RA' );
     note 'The result differs from Meeus by 0.001 seconds of right ascension';
-    is_rad_deg $dec,  -7.783872, 5, 'Ex 25b Sun Decl';
+    is_rad_deg( $dec,  -7.783872, 5, 'Ex 25b Sun Decl' );
     note 'The result differs from Meeus by 0.007 seconds of arc';
-    is_km_au   $rng, 0.997_607_75, 6, 'Ex 25b Sun Rng';
+    is_km_au( $rng, 0.997_607_75, 6, 'Ex 25b Sun Rng' );
     note 'The result differs from Meeus by 1e-7 AU';
 }
 

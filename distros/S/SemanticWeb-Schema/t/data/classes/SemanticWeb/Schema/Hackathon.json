@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2526",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A <a href=\"https://en.wikipedia.org/wiki/Hackathon\">hackathon</a> event.",
       "rdfs:label" : "Hackathon",
       "rdfs:subClassOf" : "schema:Event",
       "schema:category" : "issue-2526",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2526"
    },
    "properties" : {}
 }

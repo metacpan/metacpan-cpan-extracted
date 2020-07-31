@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.496
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-05-29'; # DATE
+our $DATE = '2020-07-30'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,13 +38,16 @@ dump-csv - Dump CSV as data structure (array of array/hash)
 
 =head1 VERSION
 
-This document describes version 0.029 of dump-csv (from Perl distribution App-CSVUtils), released on 2020-05-29.
+This document describes version 0.030 of dump-csv (from Perl distribution App-CSVUtils), released on 2020-07-30.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % dump-csv [-H] [--format=name] [--hash] [--header] [--json] [--(no)naked-res] [--no-header] [--no-tsv] [--noheader] [--notsv] [--page-result[=program]] [--tsv] [--view-result[=program]] <filename>
+ % dump-csv [-H] [--escape-char=s] [--format=name] [--hash] [--header]
+     [--json] [--(no)naked-res] [--no-header] [--no-tsv] [--noheader]
+     [--notsv] [--page-result[=program]] [--quote-char=s] [--sep-char=s]
+     [--tsv] <filename>
 
 =head1 OPTIONS
 
@@ -53,6 +56,13 @@ C<*> marks required options.
 =head2 Main options
 
 =over
+
+=item B<--escape-char>=I<s>
+
+Specify character to escape value in field, will be passed to Text::CSV_XS.
+
+Defaults to `\\` (backslash). Overrides `--tsv` option.
+
 
 =item B<--filename>=I<s>*, B<-f>
 
@@ -74,9 +84,27 @@ assumed to contain the first data row. Fields will be named `field1`, `field2`,
 and so on.
 
 
+=item B<--quote-char>=I<s>
+
+Specify field quote character, will be passed to Text::CSV_XS.
+
+Defaults to `"` (double quote). Overrides `--tsv` option.
+
+
+=item B<--sep-char>=I<s>
+
+Specify field separator character, will be passed to Text::CSV_XS.
+
+Defaults to `,` (comma). Overrides `--tsv` option.
+
+
 =item B<--tsv>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by `--sep-char`, `--quote-char`, `--escape-char` options. If one of
+those options is specified, then `--tsv` will be ignored.
+
 
 =back
 
@@ -120,10 +148,6 @@ you want to pipe the result for more post-processing. In this case you can use
 =item B<--page-result>
 
 Filter output through a pager.
-
-=item B<--view-result>
-
-View output using a viewer.
 
 =back
 

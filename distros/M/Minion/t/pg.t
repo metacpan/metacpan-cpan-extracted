@@ -28,9 +28,9 @@ subtest 'Nothing to repair' => sub {
 };
 
 subtest 'Migrate up and down' => sub {
-  is $minion->backend->pg->migrations->active, 22, 'active version is 22';
+  is $minion->backend->pg->migrations->active, 23, 'active version is 23';
   is $minion->backend->pg->migrations->migrate(0)->active, 0, 'active version is 0';
-  is $minion->backend->pg->migrations->migrate->active, 22, 'active version is 22';
+  is $minion->backend->pg->migrations->migrate->active, 23, 'active version is 23';
 };
 
 subtest 'Register and unregister' => sub {
@@ -283,7 +283,9 @@ subtest 'Exclusive lock' => sub {
   ok !$minion->unlock('foo'), 'not unlocked again';
   ok $minion->lock('foo', -3600), 'locked';
   ok $minion->lock('foo', 0),     'locked again';
-  ok $minion->lock('foo', 3600),  'locked again';
+  ok !$minion->is_locked('foo'), 'lock does not exist';
+  ok $minion->lock('foo', 3600), 'locked again';
+  ok $minion->is_locked('foo'), 'lock exists';
   ok !$minion->lock('foo', -3600), 'not locked again';
   ok !$minion->lock('foo', 3600),  'not locked again';
   ok $minion->unlock('foo'), 'unlocked';
@@ -293,8 +295,9 @@ subtest 'Exclusive lock' => sub {
 };
 
 subtest 'Shared lock' => sub {
-  ok $minion->lock('bar', 3600,  {limit => 3}), 'locked';
-  ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
+  ok $minion->lock('bar', 3600, {limit => 3}), 'locked';
+  ok $minion->lock('bar', 3600, {limit => 3}), 'locked again';
+  ok $minion->is_locked('bar'), 'lock exists';
   ok $minion->lock('bar', -3600, {limit => 3}), 'locked again';
   ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
   ok !$minion->lock('bar', 3600, {limit => 2}), 'not locked again';
@@ -304,7 +307,8 @@ subtest 'Shared lock' => sub {
   ok $minion->unlock('bar'), 'unlocked again';
   ok $minion->unlock('bar'), 'unlocked again';
   ok $minion->unlock('bar'), 'unlocked again';
-  ok !$minion->unlock('bar'), 'not unlocked again';
+  ok !$minion->unlock('bar'),    'not unlocked again';
+  ok !$minion->is_locked('bar'), 'lock does not exist';
   ok $minion->unlock('baz'), 'unlocked';
   ok !$minion->unlock('baz'), 'not unlocked again';
 };
@@ -901,34 +905,57 @@ subtest 'Multiple attempts while processing' => sub {
   is $minion->backoff->(4),  271,    'right result';
   is $minion->backoff->(5),  640,    'right result';
   is $minion->backoff->(25), 390640, 'right result';
-  my $id     = $minion->enqueue(exit => [] => {attempts => 2});
+
+  my $id     = $minion->enqueue(exit => [] => {attempts => 3});
   my $worker = $minion->worker->register;
   ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->retries, 0, 'job has not been retried';
-  $job->perform;
   my $info = $job->info;
-  is $info->{attempts}, 2,                                                       'job will be attempted twice';
+  is $info->{attempts}, 3,        'three attempts';
+  is $info->{state},    'active', 'right state';
+  $job->perform;
+  $info = $job->info;
+  is $info->{attempts}, 2,                                                       'two attempts';
   is $info->{state},    'inactive',                                              'right state';
   is $info->{result},   'Job terminated unexpectedly (exit code: 1, signal: 0)', 'right result';
   ok $info->{retried} < $job->info->{delayed}, 'delayed timestamp';
+
+  $minion->backend->pg->db->query('update minion_jobs set delayed = now() where id = ?', $id);
+  ok $job = $worker->dequeue(0), 'job dequeued';
+  is $job->id, $id, 'right id';
+  is $job->retries, 1, 'job has been retried';
+  $info = $job->info;
+  is $info->{attempts}, 2,        'two attempts';
+  is $info->{state},    'active', 'right state';
+  $job->perform;
+  $info = $job->info;
+  is $info->{attempts}, 1,          'one attempt';
+  is $info->{state},    'inactive', 'right state';
+
   $minion->backend->pg->db->query('update minion_jobs set delayed = now() where id = ?', $id);
   ok $job = $worker->register->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
-  is $job->retries, 1, 'job has been retried once';
+  is $job->retries, 2, 'two retries';
+  $info = $job->info;
+  is $info->{attempts}, 1,        'one attempt';
+  is $info->{state},    'active', 'right state';
   $job->perform;
   $info = $job->info;
-  is $info->{attempts}, 2,                                                       'job will be attempted twice';
+  is $info->{attempts}, 1,                                                       'one attempt';
   is $info->{state},    'failed',                                                'right state';
   is $info->{result},   'Job terminated unexpectedly (exit code: 1, signal: 0)', 'right result';
-  ok $job->retry({attempts => 3}), 'job retried';
+
+  ok $job->retry({attempts => 2}), 'job retried';
   ok $job = $worker->register->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   $job->perform;
-  $info = $job->info;
-  is $info->{attempts}, 3,                                                       'job will be attempted three times';
-  is $info->{state},    'failed',                                                'right state';
-  is $info->{result},   'Job terminated unexpectedly (exit code: 1, signal: 0)', 'right result';
+  is $job->info->{state}, 'inactive', 'right state';
+  $minion->backend->pg->db->query('update minion_jobs set delayed = now() where id = ?', $id);
+  ok $job = $worker->register->dequeue(0), 'job dequeued';
+  is $job->id, $id, 'right id';
+  $job->perform;
+  is $job->info->{state}, 'failed', 'right state';
   $worker->unregister;
 };
 
@@ -1083,6 +1110,67 @@ subtest 'Job dependencies' => sub {
   is $job->id, $id, 'right id';
   is_deeply $job->info->{parents}, [-1, -2], 'right parents';
   ok $job->finish, 'job finished';
+
+  my $id4     = $minion->enqueue('test');
+  my $id5     = $minion->enqueue('test');
+  my $id6     = $minion->enqueue(test => [] => {parents => [$id4, $id5]});
+  my $child   = $minion->job($id6);
+  my $parents = $child->parents;
+  is $parents->size, 2, 'two parents';
+  is $parents->[0]->id, $id4, 'first parent';
+  is $parents->[1]->id, $id5, 'second parent';
+  $_->remove for $parents->each;
+  is $child->parents->size, 0, 'no parents';
+  ok $child->remove, 'job removed';
+  $worker->unregister;
+};
+
+subtest 'Job dependencies (lax)' => sub {
+  my $worker = $minion->worker->register;
+  my $id     = $minion->enqueue('test');
+  my $id2    = $minion->enqueue('test');
+  my $id3    = $minion->enqueue(test => [] => {lax => 1, parents => [$id, $id2]});
+  ok my $job = $worker->dequeue(0), 'job dequeued';
+  is $job->id, $id, 'right id';
+  is_deeply $job->info->{children}, [$id3], 'right children';
+  is_deeply $job->info->{parents}, [], 'right parents';
+  ok my $job2 = $worker->dequeue(0), 'job dequeued';
+  is $job2->id, $id2, 'right id';
+  is_deeply $job2->info->{children}, [$id3], 'right children';
+  is_deeply $job2->info->{parents}, [], 'right parents';
+  ok !$worker->dequeue(0), 'parents are not ready yet';
+  ok $job->finish, 'job finished';
+  ok !$worker->dequeue(0), 'parents are not ready yet';
+  ok $job2->fail, 'job failed';
+  ok my $job3 = $worker->dequeue(0), 'job dequeued';
+  is $job3->id, $id3, 'right id';
+  is_deeply $job3->info->{children}, [], 'right children';
+  is_deeply $job3->info->{parents}, [$id, $id2], 'right parents';
+  ok $job3->finish, 'job finished';
+
+  my $id4 = $minion->enqueue('test');
+  my $id5 = $minion->enqueue(test => [] => {parents => [$id4]});
+  ok my $job4 = $worker->dequeue(0), 'job dequeued';
+  is $job4->id, $id4, 'right id';
+  ok !$worker->dequeue(0), 'parents are not ready yet';
+  ok $job4->fail, 'job finished';
+  ok !$worker->dequeue(0), 'parents are not ready yet';
+  ok $minion->job($id5)->retry({lax => 1}), 'job is now lax';
+  ok my $job5 = $worker->dequeue(0), 'job dequeued';
+  is $job5->id, $id5, 'right id';
+  is_deeply $job5->info->{children}, [], 'right children';
+  is_deeply $job5->info->{parents}, [$id4], 'right parents';
+  ok $job5->finish, 'job finished';
+  ok $job4->remove, 'job removed';
+
+  is $minion->jobs({ids => [$id5]})->next->{lax}, 1, 'lax';
+  ok $minion->job($id5)->retry, 'job is still lax';
+  is $minion->jobs({ids => [$id5]})->next->{lax}, 1, 'lax';
+  ok $minion->job($id5)->retry({lax => 0}), 'job is not lax anymore';
+  is $minion->jobs({ids => [$id5]})->next->{lax}, 0, 'not lax';
+  ok $minion->job($id5)->retry, 'job is still not lax';
+  is $minion->jobs({ids => [$id5]})->next->{lax}, 0, 'not lax';
+  ok $minion->job($id5)->remove, 'job removed';
   $worker->unregister;
 };
 

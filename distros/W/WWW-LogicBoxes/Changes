@@ -1,3 +1,7 @@
+v1.10.1 2020-07-30
+  - Thanks to a Pull Request from Eris Caffee, default to constructing
+    a WWW::LogicBoxes::Domain unless the actiontype is 'AddTransferDomain'
+
 v1.10.0 2019-05-20
   - Added support for resending of the RAA Verification email
 

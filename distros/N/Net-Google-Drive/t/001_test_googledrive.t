@@ -56,14 +56,15 @@ SKIP: {
     if (not $internet_connection) {
         skip "Skip tests: No internet connection";  
     }
-    my $test_download_file_id = testSearchFileByName($drive);
-    testSearchFileByNameContains($drive);
+    my $test_download_file_id = testSearchFileByName($drive, 'drive_file.t');
+    testSearchFileByNameContains($drive, 'Тестовый');
 
 #### Download file
     testDownloadFile($drive, $test_download_file_id);
 
 #### Upload file
-    my $upload_file_id = testUploadFile($drive);
+    my $upload_file_id = testUploadFile($drive, $TEST_UPLOAD_FILE);
+    testSearchFileByName($drive, basename($TEST_UPLOAD_FILE));
 #### Get metadata
     testGetFileMetadata($drive, $upload_file_id);
 #### Set permission
@@ -85,18 +86,19 @@ sub testInternetConnection {
 }
 
 sub testSearchFileByName{
-    my ($drive) = @_;
+    my ($drive, $name) = @_;
     my $files = $drive->searchFileByName(
-                            -filename   => 'drive_file.t',
+                            -filename   => $name,
                         );
-    is (scalar(@$files), 1, "Test searchFileByName");
+    my $success = scalar(@$files) >= 1;
+    ok ($success , "Test searchFileByName");
     return $files->[0]->{id};
 }
 
 sub testSearchFileByNameContains {
-    my ($drive) = @_;
+    my ($drive, $filename) = @_;
     my $files = $drive->searchFileByNameContains(
-                                -filename   => 'Тестовый',
+                                -filename   => $filename,
                             );
     is (scalar(@$files), 1, "Test searchFileByNameContains");
 }
@@ -122,10 +124,10 @@ sub testDeleteFile {
 }
 
 sub testUploadFile {
-    my ($drive) = @_;
+    my ($drive, $fname) = @_;
 
     my $res = $drive->uploadFile(
-                                    -source_file    => $TEST_UPLOAD_FILE,
+                                    -source_file    => $fname,
                                 );
     ok($res, 'Test upload file');
     my $file_id = $res->{id};

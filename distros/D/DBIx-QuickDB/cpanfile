@@ -4,6 +4,7 @@
 requires "Carp" => "0";
 requires "Digest::SHA" => "0";
 requires "Fcntl" => "0";
+requires "File::Copy::Recursive" => "0";
 requires "File::Path" => "0";
 requires "File::Temp" => "0";
 requires "IPC::Cmd" => "0";
@@ -17,7 +18,7 @@ requires "Test2::V0" => "0.000097";
 requires "Test::More" => "1.302120";
 requires "Time::HiRes" => "0";
 requires "parent" => "0";
-requires "perl" => "5.008001";
+requires "perl" => "5.012000";
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0.20";
@@ -28,6 +29,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "DBD::MariaDB" => "1.00";
   requires "DBD::Pg" => "v3.5.0";
   requires "DBD::SQLite" => "1.44";
   requires "DBD::mysql" => "4.00";

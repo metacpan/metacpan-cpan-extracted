@@ -1,3 +1,6 @@
+0.012		2020-07-28	T. R. Wyant
+    Remove prototypes from testing subroutines defined in t/*.t.
+
 0.011		2020-03-31	T. R. Wyant
     Normalize interpolation before feeding to PPI. This produces a
     more-easily-analyzed PPI parse.

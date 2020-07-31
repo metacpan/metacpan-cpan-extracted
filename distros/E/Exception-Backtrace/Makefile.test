@@ -15,10 +15,10 @@
 #     BUILD_REQUIRES => {  }
 #     C => [q[t/MyTest_xsgen.cc]]
 #     CC => q[c++]
-#     CCFLAGS => q[-D_REENTRANT -D_GNU_SOURCE -fwrapv -DDEBUGGING -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -Wall -Wextra -std=c++14 -o $@]
-#     CONFIGURE_REQUIRES => { XS::Framework=>q[v1.3.2], XS::Install=>q[v1.2.18], XS::libdwarf=>q[20200114.8], XS::libpanda=>q[v1.4.6], next::XS=>q[v1.0.7] }
+#     CCFLAGS => q[-fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -Wall -Wextra -std=c++14 -o $@]
+#     CONFIGURE_REQUIRES => { XS::Framework=>q[v1.3.2], XS::Install=>q[v1.2.18], XS::libdwarf=>q[20200114.8], XS::libpanda=>q[v1.4.7], next::XS=>q[v1.0.7] }
 #     DEFINE => q[]
-#     INC => q[-Isrc -I/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/next/XS.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/libpanda.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/libdwarf.x/i]
+#     INC => q[-Isrc -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/libdwarf.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/libpanda.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/next/XS.x/i]
 #     LD => q[$(CC)]
 #     LDDLFLAGS => q[]
 #     LDFROM => q[$(OBJECT) $(INST_ARCHLIB)/auto/Exception/Backtrace/Backtrace.so]
@@ -30,21 +30,21 @@
 #     OPTIMIZE => q[-g -O0]
 #     PM => { lib/Exception/Backtrace.pm=>q[$(INST_ARCHLIB)/Exception/Backtrace.pm], lib/Exception/Backtrace.pod=>q[$(INST_ARCHLIB)/Exception/Backtrace.pod], lib/Exception/Backtrace/BacktraceInfo.pm=>q[$(INST_ARCHLIB)/Exception/Backtrace/BacktraceInfo.pm], lib/Exception/Backtrace/BacktraceInfo.pod=>q[$(INST_ARCHLIB)/Exception/Backtrace/BacktraceInfo.pod], lib/Exception/Backtrace/DualTrace.pm=>q[$(INST_ARCHLIB)/Exception/Backtrace/DualTrace.pm], lib/Exception/Backtrace/DualTrace.pod=>q[$(INST_ARCHLIB)/Exception/Backtrace/DualTrace.pod], lib/Exception/Backtrace/Stackframe.pm=>q[$(INST_ARCHLIB)/Exception/Backtrace/Stackframe.pm], lib/Exception/Backtrace/Stackframe.pod=>q[$(INST_ARCHLIB)/Exception/Backtrace/Stackframe.pod] }
 #     PMLIBDIRS => [q[lib]]
-#     PREREQ_PM => { Test::Deep=>q[0], Test::More=>q[0], Test::Simple=>q[0.96], XS::Framework=>q[v1.3.2], XS::Install=>q[v1.2.18], XS::libdwarf=>q[20200114.8], XS::libpanda=>q[v1.4.6], next::XS=>q[v1.0.7] }
+#     PREREQ_PM => { Test::Deep=>q[0], Test::More=>q[0], Test::Simple=>q[0.96], XS::Framework=>q[v1.3.2], XS::Install=>q[v1.2.18], XS::libdwarf=>q[20200114.8], XS::libpanda=>q[v1.4.7], next::XS=>q[v1.0.7] }
 #     TEST_REQUIRES => { Test::Deep=>q[0], Test::More=>q[0], Test::Simple=>q[0.96] }
-#     TYPEMAPS => [q[/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap], q[/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap64], q[/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap], q[/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap], q[/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap64], q[/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap]]
+#     TYPEMAPS => [q[/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap], q[/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64], q[/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap], q[/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap], q[/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64], q[/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap]]
 #     VERSION => q[0.0.0]
 #     XS => { t/MyTest.xs=>q[t/MyTest_xsgen.cc] }
 #     XSOPT => q[-hiertype -C++ -hiertype -C++]
 #     clean => { FILES=>q[ $(O_FILES)] }
-#     postamble => { 1=>q[XSUBPPRUN = $(PERLRUN) -Ilib -MXS::Install::ParseXS -MXS::Framework::ParseXS $(XSUBPP)], 2=>q[t/MyTest_xsgen.cc : t/MyTest.xs  $(FIRST_MAKEFILE) 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) -csuffix _xsgen.cc $(XSUBPP_EXTRA_ARGS) t/MyTest.xs > t/MyTest.xsc 	$(MV) t/MyTest.xsc t/MyTest_xsgen.cc], 3=>q[sync_bin_deps: 	$(PERL) -MXS::Install::Util -e 'XS::Install::Util::cmd_sync_bin_deps()' MyTest XS::libpanda XS::libdwarf XS::Framework next::XS XS::Install], 4=>q[install :: sync_bin_deps], 5=>q[object : $(OBJECT)] }
+#     postamble => { 1=>q[XSUBPPRUN = $(PERLRUN) -Ilib -MXS::Install::ParseXS -MXS::Framework::ParseXS $(XSUBPP)], 2=>q[t/MyTest_xsgen.cc : t/MyTest.xs  $(FIRST_MAKEFILE) 	$(XSUBPPRUN) $(XSPROTOARG) $(XSUBPPARGS) -csuffix _xsgen.cc $(XSUBPP_EXTRA_ARGS) t/MyTest.xs > t/MyTest.xsc 	$(MV) t/MyTest.xsc t/MyTest_xsgen.cc], 3=>q[sync_bin_deps: 	$(PERL) -MXS::Install::Util -e 'XS::Install::Util::cmd_sync_bin_deps()' MyTest next::XS XS::libpanda XS::Framework XS::Install XS::libdwarf], 4=>q[install :: sync_bin_deps], 5=>q[object : $(OBJECT)] }
 
 # --- MakeMaker post_initialize section:
 
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/x86_64-linux-thread-multi/Config.pm).
+# These definitions are from config.sh (via /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/x86_64-linux/Config.pm).
 # They may have been overridden via Makefile.PL or on the command line.
 AR = ar
 CC = c++
@@ -61,10 +61,10 @@ LIBC = libc-2.30.so
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = linux
-OSVERS = 5.4.46_1
+OSVERS = 5.4.50_1
 RANLIB = :
-SITELIBEXP = /home/b/perl5/perlbrew/perls/5.32.0m/lib/site_perl/5.32.0
-SITEARCHEXP = /home/b/perl5/perlbrew/perls/5.32.0m/lib/site_perl/5.32.0/x86_64-linux-thread-multi
+SITELIBEXP = /home/b/perl5/perlbrew/perls/5.32.0g/lib/site_perl/5.32.0
+SITEARCHEXP = /home/b/perl5/perlbrew/perls/5.32.0g/lib/site_perl/5.32.0/x86_64-linux
 SO = so
 VENDORARCHEXP = 
 VENDORLIBEXP = 
@@ -96,30 +96,30 @@ MAN3SECTION = 3
 INSTALLDIRS = site
 DESTDIR = 
 PREFIX = $(SITEPREFIX)
-PERLPREFIX = /home/b/perl5/perlbrew/perls/5.32.0m
-SITEPREFIX = /home/b/perl5/perlbrew/perls/5.32.0m
+PERLPREFIX = /home/b/perl5/perlbrew/perls/5.32.0g
+SITEPREFIX = /home/b/perl5/perlbrew/perls/5.32.0g
 VENDORPREFIX = 
-INSTALLPRIVLIB = /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0
+INSTALLPRIVLIB = /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = /home/b/perl5/perlbrew/perls/5.32.0m/lib/site_perl/5.32.0
+INSTALLSITELIB = /home/b/perl5/perlbrew/perls/5.32.0g/lib/site_perl/5.32.0
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
 INSTALLVENDORLIB = 
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/x86_64-linux-thread-multi
+INSTALLARCHLIB = /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/x86_64-linux
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = /home/b/perl5/perlbrew/perls/5.32.0m/lib/site_perl/5.32.0/x86_64-linux-thread-multi
+INSTALLSITEARCH = /home/b/perl5/perlbrew/perls/5.32.0g/lib/site_perl/5.32.0/x86_64-linux
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
 INSTALLVENDORARCH = 
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
-INSTALLBIN = /home/b/perl5/perlbrew/perls/5.32.0m/bin
+INSTALLBIN = /home/b/perl5/perlbrew/perls/5.32.0g/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
-INSTALLSITEBIN = /home/b/perl5/perlbrew/perls/5.32.0m/bin
+INSTALLSITEBIN = /home/b/perl5/perlbrew/perls/5.32.0g/bin
 DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)
 INSTALLVENDORBIN = 
 DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)
-INSTALLSCRIPT = /home/b/perl5/perlbrew/perls/5.32.0m/bin
+INSTALLSCRIPT = /home/b/perl5/perlbrew/perls/5.32.0g/bin
 DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)
-INSTALLSITESCRIPT = /home/b/perl5/perlbrew/perls/5.32.0m/bin
+INSTALLSITESCRIPT = /home/b/perl5/perlbrew/perls/5.32.0g/bin
 DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)
 INSTALLVENDORSCRIPT = 
 DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)
@@ -135,18 +135,18 @@ INSTALLSITEMAN3DIR = $(INSTALLMAN3DIR)
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
 INSTALLVENDORMAN3DIR = 
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
-PERL_LIB = /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0
-PERL_ARCHLIB = /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/x86_64-linux-thread-multi
-PERL_ARCHLIBDEP = /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/x86_64-linux-thread-multi
+PERL_LIB = /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0
+PERL_ARCHLIB = /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/x86_64-linux
+PERL_ARCHLIBDEP = /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/x86_64-linux
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile.test
 MAKEFILE_OLD = Makefile.test.old
 MAKE_APERL_FILE = Makefile.test.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/x86_64-linux-thread-multi/CORE
-PERL_INCDEP = /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/x86_64-linux-thread-multi/CORE
-PERL = "/home/b/perl5/perlbrew/perls/5.32.0m/bin/perl"
-FULLPERL = "/home/b/perl5/perlbrew/perls/5.32.0m/bin/perl"
+PERL_INC = /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/x86_64-linux/CORE
+PERL_INCDEP = /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/x86_64-linux/CORE
+PERL = "/home/b/perl5/perlbrew/perls/5.32.0g/bin/perl"
+FULLPERL = "/home/b/perl5/perlbrew/perls/5.32.0g/bin/perl"
 ABSPERL = $(PERL)
 PERLRUN = $(PERL)
 FULLPERLRUN = $(FULLPERL)
@@ -159,7 +159,7 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /home/b/perl5/perlbrew/perls/5.32.0m/lib/site_perl/5.32.0/ExtUtils/MakeMaker.pm
+MAKEMAKER   = /home/b/perl5/perlbrew/perls/5.32.0g/lib/site_perl/5.32.0/ExtUtils/MakeMaker.pm
 MM_VERSION  = 7.46
 MM_REVISION = 74600
 
@@ -173,7 +173,7 @@ BASEEXT = MyTest
 PARENT_NAME = 
 DLBASE = $(BASEEXT)
 VERSION_FROM = 
-INC = -Isrc -I/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/next/XS.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/libpanda.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/libdwarf.x/i
+INC = -Isrc -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/libdwarf.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/libpanda.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/next/XS.x/i
 DEFINE = 
 OBJECT = t/MyTest_xsgen$(OBJ_EXT)
 LDFROM = $(OBJECT) $(INST_ARCHLIB)/auto/Exception/Backtrace/Backtrace.so
@@ -232,12 +232,12 @@ AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$$$ARGV[0], $$$$AR
 
 # --- MakeMaker tool_xsubpp section:
 
-XSUBPPDIR = /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/ExtUtils
+XSUBPPDIR = /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/ExtUtils
 XSUBPP = "$(XSUBPPDIR)$(DFSEP)xsubpp"
 XSUBPPRUN = $(PERLRUN) $(XSUBPP)
 XSPROTOARG = 
-XSUBPPDEPS = /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/ExtUtils/typemap /home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap /home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap64 /home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap /home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap /home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap64 /home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap /home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/ExtUtils$(DFSEP)xsubpp
-XSUBPPARGS = -hiertype -C++ -hiertype -C++ -typemap '/home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/ExtUtils/typemap' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap64' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap64' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/tm/typemap'
+XSUBPPDEPS = /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/ExtUtils/typemap /home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap /home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64 /home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap /home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap /home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64 /home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap /home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/ExtUtils$(DFSEP)xsubpp
+XSUBPPARGS = -hiertype -C++ -hiertype -C++ -typemap '/home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/ExtUtils/typemap' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/tm/typemap' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap64' -typemap '/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/tm/typemap'
 XSUBPP_EXTRA_ARGS =
 
 
@@ -305,7 +305,7 @@ DISTVNAME = MyTest-0.0.0
 
 # --- MakeMaker cflags section:
 
-CCFLAGS = -D_REENTRANT -D_GNU_SOURCE -fwrapv -DDEBUGGING -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -Wall -Wextra -std=c++14 -o $@
+CCFLAGS = -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_FORTIFY_SOURCE=2 -Wall -Wextra -std=c++14 -o $@
 OPTIMIZE = -g -O0
 PERLTYPE = 
 MPOLLUTE = 
@@ -334,7 +334,7 @@ PASTHRU = LIBPERL_A="$(LIBPERL_A)"\
 	OPTIMIZE="$(OPTIMIZE)"\
 	PREFIX="$(PREFIX)"\
 	PASTHRU_DEFINE=' $(PASTHRU_DEFINE)'\
-	PASTHRU_INC='-Isrc -I/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/next/XS.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/Framework.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/libpanda.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux-thread-multi/XS/libdwarf.x/i $(PASTHRU_INC)'
+	PASTHRU_INC='-Isrc -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/libdwarf.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/XS/Install.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/Framework.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/XS/libpanda.x/i -I/home/b/development/crazy-panda/core-dev/var/lib/x86_64-linux/next/XS.x/i $(PASTHRU_INC)'
 
 
 # --- MakeMaker special_targets section:
@@ -613,7 +613,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  XS::Framework: v1.3.2' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::Install: v1.2.18' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libdwarf: '\''20200114.8'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  XS::libpanda: v1.4.6' >> META_new.yml
+	$(NOECHO) $(ECHO) '  XS::libpanda: v1.4.7' >> META_new.yml
 	$(NOECHO) $(ECHO) '  next::XS: v1.0.7' >> META_new.yml
 	$(NOECHO) $(ECHO) 'dynamic_config: 1' >> META_new.yml
 	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
@@ -630,7 +630,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  XS::Framework: v1.3.2' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::Install: v1.2.18' >> META_new.yml
 	$(NOECHO) $(ECHO) '  XS::libdwarf: '\''20200114.8'\''' >> META_new.yml
-	$(NOECHO) $(ECHO) '  XS::libpanda: v1.4.6' >> META_new.yml
+	$(NOECHO) $(ECHO) '  XS::libpanda: v1.4.7' >> META_new.yml
 	$(NOECHO) $(ECHO) '  next::XS: v1.0.7' >> META_new.yml
 	$(NOECHO) $(ECHO) 'version: v0.0.0' >> META_new.yml
 	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.018'\''' >> META_new.yml
@@ -666,7 +666,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '            "XS::Framework" : "v1.3.2",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::Install" : "v1.2.18",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libdwarf" : "20200114.8",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "XS::libpanda" : "v1.4.6",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "XS::libpanda" : "v1.4.7",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "next::XS" : "v1.0.7"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
@@ -675,7 +675,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '            "XS::Framework" : "v1.3.2",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::Install" : "v1.2.18",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "XS::libdwarf" : "20200114.8",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "XS::libpanda" : "v1.4.6",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "XS::libpanda" : "v1.4.7",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "next::XS" : "v1.0.7"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
@@ -1033,8 +1033,8 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
-FULLPERL      = "/home/b/perl5/perlbrew/perls/5.32.0m/bin/perl"
-MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0/x86_64-linux-thread-multi" "-I/home/b/perl5/perlbrew/perls/5.32.0m/lib/5.32.0"
+FULLPERL      = "/home/b/perl5/perlbrew/perls/5.32.0g/bin/perl"
+MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0/x86_64-linux" "-I/home/b/perl5/perlbrew/perls/5.32.0g/lib/5.32.0"
 
 $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
@@ -1092,9 +1092,9 @@ ppd :
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::Framework" VERSION="v1.3.2" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::Install" VERSION="v1.2.18" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::libdwarf" VERSION="20200114.8" />' >> MyTest.ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::libpanda" VERSION="v1.4.6" />' >> MyTest.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="XS::libpanda" VERSION="v1.4.7" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="next::XS" VERSION="v1.0.7" />' >> MyTest.ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-thread-multi-5.32" />' >> MyTest.ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-5.32" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> MyTest.ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> MyTest.ppd
@@ -1138,7 +1138,7 @@ t/MyTest_xsgen.cc : t/MyTest.xs  $(FIRST_MAKEFILE)
 	$(MV) t/MyTest.xsc t/MyTest_xsgen.cc
 
 sync_bin_deps:
-	$(PERL) -MXS::Install::Util -e 'XS::Install::Util::cmd_sync_bin_deps()' MyTest XS::libpanda XS::libdwarf XS::Framework next::XS XS::Install
+	$(PERL) -MXS::Install::Util -e 'XS::Install::Util::cmd_sync_bin_deps()' MyTest next::XS XS::libpanda XS::Framework XS::Install XS::libdwarf
 
 install :: sync_bin_deps
 

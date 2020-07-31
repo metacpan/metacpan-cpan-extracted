@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.139;
+package Config::Model::AnyId 2.140;
 
 use 5.010;
 
@@ -624,7 +624,7 @@ sub check_follow_keys_from {
     return if $followed->exists($idx);
 
     push @$error,
-          "key '" . $self->shorten_idx($idx) . "' does not exists in '"
+          "key '" . $self->shorten_idx($idx) . "' does not exists in followed object '"
         . $followed->name
         . "'. Expected '"
         . join( "', '", $followed->fetch_all_indexes ) . "'";
@@ -840,6 +840,38 @@ sub fetch {
     return join(',', $self->fetch_all_values(@_) );
 }
 
+sub fetch_value {
+    my $self  = shift;
+    my %args  = @_ > 1 ? @_ : ( idx => shift );
+    return $self->_fetch_value(%args, sub => 'fetch');
+}
+
+sub fetch_summary {
+    my $self  = shift;
+    my %args  = @_ > 1 ? @_ : ( idx => shift );
+    return $self->_fetch_value(%args, sub => 'fetch_summary');
+}
+
+sub _fetch_value {
+    my $self  = shift;
+    my %args  = @_ ;
+    my $check = $self->_check_check( $args{check} );
+    my $sub = delete $args{sub};
+
+    if ( $self->{cargo}{type} eq 'leaf' ) {
+        return  $self->fetch_with_id($args{idx})->$sub( check => $check, mode => $args{mode} );
+    }
+    else {
+        Config::Model::Exception::WrongType->throw(
+            object        => $self,
+            function      => 'fetch_values',
+            got_type      => $self->{cargo}{type},
+            expected_type => 'leaf',
+            info          => "with index $args{idx}",
+        );
+    }
+}
+
 sub fetch_all_values {
     my $self  = shift;
     my %args  = @_ > 1 ? @_ : ( mode => shift );
@@ -848,12 +880,12 @@ sub fetch_all_values {
 
     my @keys = $self->fetch_all_indexes;
 
-    if ( $self->{cargo}{type} eq 'leaf' ) {
+        # verify content restrictions applied to List (e.g. no duplicate values)
         my $ok = $check eq 'no' ? 1 : $self->check_content();
 
         if ( $ok or $check eq 'no' ) {
             return grep { defined $_ }
-                map { $self->fetch_with_id($_)->fetch( check => $check, mode => $mode ); } @keys;
+                map { $self->fetch_value(idx => $_, check => $check, mode => $mode ); } @keys;
         }
         else {
             Config::Model::Exception::WrongValue->throw(
@@ -861,21 +893,6 @@ sub fetch_all_values {
                 object => $self
             );
         }
-
-    }
-    else {
-        my $info = "current keys are '" . join( "', '", @keys ) . "'.";
-        if ( $self->{cargo}{type} eq 'node' ) {
-            $info .= "config class is " . $self->fetch_with_id( $keys[0] )->config_class_name;
-        }
-        Config::Model::Exception::WrongType->throw(
-            object        => $self,
-            function      => 'fetch_all_values',
-            got_type      => $self->{cargo}{type},
-            expected_type => 'leaf',
-            info          => $info,
-        );
-    }
 }
 
 sub fetch_all_indexes {
@@ -1066,7 +1083,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.139
+version 2.140
 
 =head1 SYNOPSIS
 
@@ -1575,12 +1592,29 @@ copied from one node to another.
 
 Returns an array containing all elements held by the hash or list.
 
+=head2 fetch_value
+
+Parameters: C<< ( idx => ..., mode => ..., check => ...) >>
+
+Returns the value held by the C<idx> element of the hash or list. This
+method is only valid for hash or list containing leaves.
+
+See L<fetch_all_values> for C<mode> argument documentation and
+L<Config::Model::Value/fetch> for C<check> argument documentation.
+
+=head2 fetch_summary
+
+Arguments: C<< ( idx => ..., mode => ..., check => ...) >>
+
+Like L</fetch_value>, but returns a truncated value when the value is
+a string or uniline that is too long to be displayed.
+
 =head2 fetch_all_values
 
 Parameters: C<< ( mode => ..., check => ...) >>
 
 Returns an array containing all defined values held by the hash or
-list. (undefined values are simply discarded). This method is only 
+list. (undefined values are simply discarded). This method is only
 valid for hash or list containing leaves.
 
 With C<mode> parameter, this method returns either:
@@ -1604,6 +1638,8 @@ The value entered in preset mode or checked by default.
 The default value (defined by the configuration model)
 
 =back
+
+See L<Config::Model::Value/fetch> for C<check> argument documentation.
 
 =head2 fetch
 

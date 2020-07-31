@@ -1,0 +1,35 @@
+1.202110 - July 29, 2020
+  * Update to use newer dzil config
+  * Add author pledge
+
+0.008 - June 19, 2018
+  * Add contributor information and code of conduct
+  * Add additional tests
+  * Added additional tests
+
+0.007 - August 19, 2017
+  * Updated copyright information only
+
+0.006 - April 23, 2016
+  * Squashed some remaining bugs by rewriting the file library
+    functions to use File::Slurper instead of trying to set UTF8
+    encodings on the file handles.
+
+0.005 - April 23, 2016
+  * Changes made should have no impact on actual functionality, just the
+    ability to cleanly pass test suite
+  * [Test suite] "use utf8" wasn't properly using UTF8 to read heredocs
+    on Strawberry Perl (Windows).  Removed "use utf8"
+
+0.004 - April 10, 2016
+  * [Test suite] Replace File::Slurp with File::Slurper (more compatible
+    with UTF8)
+
+0.003 - July 11, 2015
+  * Make sure packages contained version number
+
+0.002 - June 28, 2015
+  * Correct minimum version of Perl required
+
+0.001 - June 28, 2015
+  * Initial Release

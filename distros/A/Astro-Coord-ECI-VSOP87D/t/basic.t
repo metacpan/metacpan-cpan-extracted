@@ -5,16 +5,21 @@ use warnings;
 
 use Test::More 0.88;
 
-my $body;
-
 require_ok 'Astro::Coord::ECI::VSOP87D'
     or BAIL_OUT $@;
 
-foreach my $name ( qw{ Sun Mercury Venus } ) {
+foreach my $name ( qw{
+	_Inferior _Superior
+	Sun Mercury Venus
+	Mars Jupiter Saturn Uranus Neptune
+    } ) {
     my $class = "Astro::Coord::ECI::VSOP87D::$name";
 
     require_ok $class
 	or BAIL_OUT $@;
+
+    $name =~ m/ \A _ /smx
+	and next;
 
     my $body = eval { $class->new() };
     isa_ok $body, $class

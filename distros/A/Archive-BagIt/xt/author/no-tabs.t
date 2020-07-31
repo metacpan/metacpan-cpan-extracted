@@ -24,6 +24,7 @@ my @files = (
     't/base.t',
     't/dotbagit.t',
     't/fast.t',
+    't/internal.t',
     't/manifest.t',
     't/parallel.t',
     't/payload_files.t',
@@ -52,6 +53,7 @@ my @files = (
     't/src/src_bag_deep/tagmanifest-md5.txt',
     't/src/src_files/1',
     't/src/src_files/2',
+    't/store_bag.t',
     't/verify_bag.t'
 );
 

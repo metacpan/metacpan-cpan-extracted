@@ -21,190 +21,190 @@ no_index:
 provides:
   PPIx::Regexp:
     file: lib/PPIx/Regexp.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Constant:
     file: lib/PPIx/Regexp/Constant.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Dumper:
     file: lib/PPIx/Regexp/Dumper.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Element:
     file: lib/PPIx/Regexp/Element.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Lexer:
     file: lib/PPIx/Regexp/Lexer.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Node:
     file: lib/PPIx/Regexp/Node.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Node::Range:
     file: lib/PPIx/Regexp/Node/Range.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Node::Unknown:
     file: lib/PPIx/Regexp/Node/Unknown.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::StringTokenizer:
     file: lib/PPIx/Regexp/StringTokenizer.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure:
     file: lib/PPIx/Regexp/Structure.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Assertion:
     file: lib/PPIx/Regexp/Structure/Assertion.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::BranchReset:
     file: lib/PPIx/Regexp/Structure/BranchReset.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Capture:
     file: lib/PPIx/Regexp/Structure/Capture.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::CharClass:
     file: lib/PPIx/Regexp/Structure/CharClass.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Code:
     file: lib/PPIx/Regexp/Structure/Code.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Main:
     file: lib/PPIx/Regexp/Structure/Main.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Modifier:
     file: lib/PPIx/Regexp/Structure/Modifier.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::NamedCapture:
     file: lib/PPIx/Regexp/Structure/NamedCapture.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Quantifier:
     file: lib/PPIx/Regexp/Structure/Quantifier.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::RegexSet:
     file: lib/PPIx/Regexp/Structure/RegexSet.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Regexp:
     file: lib/PPIx/Regexp/Structure/Regexp.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Replacement:
     file: lib/PPIx/Regexp/Structure/Replacement.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Subexpression:
     file: lib/PPIx/Regexp/Structure/Subexpression.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Switch:
     file: lib/PPIx/Regexp/Structure/Switch.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Structure::Unknown:
     file: lib/PPIx/Regexp/Structure/Unknown.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Support:
     file: lib/PPIx/Regexp/Support.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token:
     file: lib/PPIx/Regexp/Token.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Assertion:
     file: lib/PPIx/Regexp/Token/Assertion.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Backreference:
     file: lib/PPIx/Regexp/Token/Backreference.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Backtrack:
     file: lib/PPIx/Regexp/Token/Backtrack.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::CharClass:
     file: lib/PPIx/Regexp/Token/CharClass.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::CharClass::POSIX:
     file: lib/PPIx/Regexp/Token/CharClass/POSIX.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::CharClass::POSIX::Unknown:
     file: lib/PPIx/Regexp/Token/CharClass/POSIX/Unknown.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::CharClass::Simple:
     file: lib/PPIx/Regexp/Token/CharClass/Simple.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Code:
     file: lib/PPIx/Regexp/Token/Code.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Comment:
     file: lib/PPIx/Regexp/Token/Comment.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Condition:
     file: lib/PPIx/Regexp/Token/Condition.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Control:
     file: lib/PPIx/Regexp/Token/Control.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Delimiter:
     file: lib/PPIx/Regexp/Token/Delimiter.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Greediness:
     file: lib/PPIx/Regexp/Token/Greediness.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::GroupType:
     file: lib/PPIx/Regexp/Token/GroupType.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::GroupType::Assertion:
     file: lib/PPIx/Regexp/Token/GroupType/Assertion.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::GroupType::BranchReset:
     file: lib/PPIx/Regexp/Token/GroupType/BranchReset.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::GroupType::Code:
     file: lib/PPIx/Regexp/Token/GroupType/Code.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::GroupType::Modifier:
     file: lib/PPIx/Regexp/Token/GroupType/Modifier.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::GroupType::NamedCapture:
     file: lib/PPIx/Regexp/Token/GroupType/NamedCapture.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::GroupType::Subexpression:
     file: lib/PPIx/Regexp/Token/GroupType/Subexpression.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::GroupType::Switch:
     file: lib/PPIx/Regexp/Token/GroupType/Switch.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Interpolation:
     file: lib/PPIx/Regexp/Token/Interpolation.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Literal:
     file: lib/PPIx/Regexp/Token/Literal.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Modifier:
     file: lib/PPIx/Regexp/Token/Modifier.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::NoOp:
     file: lib/PPIx/Regexp/Token/NoOp.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Operator:
     file: lib/PPIx/Regexp/Token/Operator.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Quantifier:
     file: lib/PPIx/Regexp/Token/Quantifier.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Recursion:
     file: lib/PPIx/Regexp/Token/Recursion.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Reference:
     file: lib/PPIx/Regexp/Token/Reference.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Structure:
     file: lib/PPIx/Regexp/Token/Structure.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Unknown:
     file: lib/PPIx/Regexp/Token/Unknown.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Unmatched:
     file: lib/PPIx/Regexp/Token/Unmatched.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Token::Whitespace:
     file: lib/PPIx/Regexp/Token/Whitespace.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Tokenizer:
     file: lib/PPIx/Regexp/Tokenizer.pm
-    version: '0.072'
+    version: '0.073'
   PPIx::Regexp::Util:
     file: lib/PPIx/Regexp/Util.pm
-    version: '0.072'
+    version: '0.073'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -222,5 +222,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-PPIx-Regexp.git
-version: '0.072'
+version: '0.073'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

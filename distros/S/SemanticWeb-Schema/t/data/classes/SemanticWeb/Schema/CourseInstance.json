@@ -12,19 +12,19 @@
          "rdfs:label" : "courseMode",
          "schema:domainIncludes" : "schema:CourseInstance",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Text"
+            "schema:Text",
+            "schema:URL"
          ]
       },
       "schema:courseWorkload" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1909",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The amount of work expected of students taking the course, often provided as a figure per week or per month, and may be broken down by type. For example, \"2 hours of lectures, 1 hour of lab work and 3 hours of independent study per week\".",
          "rdfs:label" : "courseWorkload",
          "schema:category" : "issue-1909",
          "schema:domainIncludes" : "schema:CourseInstance",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1909"
       },
       "schema:instructor" : {
          "rdf:type" : "rdf:Property",

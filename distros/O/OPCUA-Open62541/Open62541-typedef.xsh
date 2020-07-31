@@ -17,6 +17,7 @@ typedef UA_ObjectAttributes *		OPCUA_Open62541_ObjectAttributes;
 typedef UA_ObjectTypeAttributes *		OPCUA_Open62541_ObjectTypeAttributes;
 typedef UA_QualifiedName *		OPCUA_Open62541_QualifiedName;
 typedef UA_ReadRequest *		OPCUA_Open62541_ReadRequest;
+typedef UA_ReadValueId *		OPCUA_Open62541_ReadValueId;
 typedef UA_ReferenceTypeAttributes *		OPCUA_Open62541_ReferenceTypeAttributes;
 typedef UA_String *		OPCUA_Open62541_String;
 typedef UA_UInt32 *		OPCUA_Open62541_UInt32;

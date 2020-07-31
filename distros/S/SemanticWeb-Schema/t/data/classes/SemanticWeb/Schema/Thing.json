@@ -43,9 +43,9 @@
          "rdfs:label" : "identifier",
          "schema:domainIncludes" : "schema:Thing",
          "schema:rangeIncludes" : [
+            "schema:PropertyValue",
             "schema:URL",
-            "schema:Text",
-            "schema:PropertyValue"
+            "schema:Text"
          ]
       },
       "schema:image" : {
@@ -65,8 +65,8 @@
          "schema:domainIncludes" : "schema:Thing",
          "schema:inverseOf" : "schema:mainEntity",
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:CreativeWork"
+            "schema:CreativeWork",
+            "schema:URL"
          ]
       },
       "schema:name" : {
@@ -93,7 +93,6 @@
          "schema:rangeIncludes" : "schema:URL"
       },
       "schema:subjectOf" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1670",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A CreativeWork or Event about this Thing.",
          "rdfs:label" : "subjectOf",
@@ -103,7 +102,8 @@
          "schema:rangeIncludes" : [
             "schema:Event",
             "schema:CreativeWork"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1670"
       },
       "schema:url" : {
          "rdf:type" : "rdf:Property",

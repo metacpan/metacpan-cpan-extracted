@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SearchElement 2.139;
+package Config::Model::SearchElement 2.140;
 
 use Log::Log4perl qw(get_logger :levels);
 use Carp;
@@ -328,7 +328,7 @@ Config::Model::SearchElement - Search an element in a configuration model
 
 =head1 VERSION
 
-version 2.139
+version 2.140
 
 =head1 SYNOPSIS
 

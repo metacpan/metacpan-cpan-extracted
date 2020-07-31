@@ -15,7 +15,9 @@ use Test::More 0.88;	# Because of done_testing();
 # I believe the expanded limit when using long doubles is because the
 # Fortran program that generated the comparison data only used double.
 # This only shows up when testing Mercury.
-use constant TEST_LIMIT	=> defined $Config{uselongdouble} ? 11e-10 : 5e-10;
+use constant TEST_LIMIT	=>
+    ( defined $Config{uselongdouble} || defined $Config{usequadmath} )
+    ? 11e-10 : 5e-10;
 
 my @name = (
     'Longitude, radians',

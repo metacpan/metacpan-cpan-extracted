@@ -1,7 +1,7 @@
 {
    "class" : {
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "Individual comic issues are serially published as\n    part of a larger series. For the sake of consistency, even one-shot issues\n    belong to a series comprised of a single issue. All comic issues can be\n    uniquely identified by: the combination of the name and volume number of the\n    series to which the issue belongs; the issue number; and the variant\n    description of the issue (if any).",
+      "rdfs:comment" : "Individual comic issues are serially published as\n        part of a larger series. For the sake of consistency, even one-shot issues\n        belong to a series comprised of a single issue. All comic issues can be\n        uniquely identified by: the combination of the name and volume number of the\n        series to which the issue belongs; the issue number; and the variant\n        description of the issue (if any).",
       "rdfs:label" : "ComicIssue",
       "rdfs:subClassOf" : "schema:PublicationIssue",
       "schema:category" : "Comics",
@@ -10,13 +10,13 @@
    "properties" : {
       "schema:artist" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "The primary artist for a work\n    in a medium other than pencils or digital line art--for example, if the\n    primary artwork is done in watercolors or digital paints.",
+         "rdfs:comment" : "The primary artist for a work\n        in a medium other than pencils or digital line art--for example, if the\n        primary artwork is done in watercolors or digital paints.",
          "rdfs:label" : "artist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
             "schema:ComicStory",
-            "schema:VisualArtwork"
+            "schema:VisualArtwork",
+            "schema:ComicIssue"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -27,9 +27,9 @@
          "rdfs:label" : "colorist",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
+            "schema:VisualArtwork",
             "schema:ComicStory",
-            "schema:VisualArtwork"
+            "schema:ComicIssue"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
          "schema:rangeIncludes" : "schema:Person"
@@ -40,8 +40,8 @@
          "rdfs:label" : "inker",
          "schema:category" : "Comics",
          "schema:domainIncludes" : [
-            "schema:ComicIssue",
             "schema:VisualArtwork",
+            "schema:ComicIssue",
             "schema:ComicStory"
          ],
          "schema:isPartOf" : "http:bib.schema.org",
@@ -75,7 +75,7 @@
       },
       "schema:variantCover" : {
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A description of the variant cover\n    for the issue, if the issue is a variant printing. For example, \"Bryan Hitch\n    Variant Cover\" or \"2nd Printing Variant\".",
+         "rdfs:comment" : "A description of the variant cover\n        for the issue, if the issue is a variant printing. For example, \"Bryan Hitch\n        Variant Cover\" or \"2nd Printing Variant\".",
          "rdfs:label" : "variantCover",
          "schema:category" : "Comics",
          "schema:domainIncludes" : "schema:ComicIssue",

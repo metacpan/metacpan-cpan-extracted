@@ -1,14 +1,13 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An accommodation is a place that can accommodate human beings, e.g. a hotel room, a camping pitch, or a meeting room. Many accommodations are for overnight stays, but this is not a mandatory requirement.\nFor more specific types of accommodations not defined in schema.org, one can use additionalType with external vocabularies.\n<br /><br />\nSee also the <a href=\"/docs/hotels.html\">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.",
       "rdfs:label" : "Accommodation",
-      "rdfs:subClassOf" : "schema:Place"
+      "rdfs:subClassOf" : "schema:Place",
+      "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
    },
    "properties" : {
       "schema:accommodationCategory" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Category of an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, following real estate conventions e.g. RESO (see <a href=\"https://ddwiki.reso.org/display/DDW17/PropertySubType+Field\">PropertySubType</a>, and <a href=\"https://ddwiki.reso.org/display/DDW17/PropertyType+Field\">PropertyType</a> fields  for suggested values).",
          "rdfs:label" : "accommodationCategory",
@@ -16,46 +15,46 @@
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : "schema:Accommodation",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       },
       "schema:accommodationFloorPlan" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A floorplan of some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>.",
          "rdfs:label" : "accommodationFloorPlan",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:Residence"
+            "schema:Residence",
+            "schema:Accommodation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:FloorPlan"
+         "schema:rangeIncludes" : "schema:FloorPlan",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       },
       "schema:amenityFeature" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "An amenity feature (e.g. a characteristic or service) of the Accommodation. This generic property does not make a statement about whether the feature is included in an offer for the main accommodation or available at extra costs.",
          "rdfs:label" : "amenityFeature",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
             "schema:Place",
             "schema:FloorPlan",
+            "schema:Accommodation",
             "schema:LodgingBusiness"
          ],
-         "schema:rangeIncludes" : "schema:LocationFeatureSpecification"
+         "schema:rangeIncludes" : "schema:LocationFeatureSpecification",
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       },
       "schema:floorLevel" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The floor level for an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a> in a multi-storey building. Since counting\n  systems <a href=\"https://en.wikipedia.org/wiki/Storey#Consecutive_number_floor_designations\">vary internationally</a>, the local system should be used where possible.",
          "rdfs:label" : "floorLevel",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : "schema:Accommodation",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       },
       "schema:floorSize" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The size of the accommodation, e.g. in square meter or squarefoot.\nTypical unit code(s): MTK for square meter, FTK for square foot, or YDK for square yard",
          "rdfs:label" : "floorSize",
@@ -63,40 +62,40 @@
             "schema:Accommodation",
             "schema:FloorPlan"
          ],
-         "schema:rangeIncludes" : "schema:QuantitativeValue"
+         "schema:rangeIncludes" : "schema:QuantitativeValue",
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       },
       "schema:leaseLength" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Length of the lease for some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, either particular to some <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a> or in some cases intrinsic to the property.",
          "rdfs:label" : "leaseLength",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:RealEstateListing",
-            "schema:Accommodation"
+            "schema:Accommodation",
+            "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Duration",
-            "schema:QuantitativeValue"
-         ]
+            "schema:QuantitativeValue",
+            "schema:Duration"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       },
       "schema:numberOfBathroomsTotal" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The total integer number of bathrooms in a some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, following real estate conventions as <a href=\"https://ddwiki.reso.org/display/DDW17/BathroomsTotalInteger+Field\">documented in RESO</a>: \"The simple sum of the number of bathrooms. For example for a property with two Full Bathrooms and one Half Bathroom, the Bathrooms Total Integer will be 3.\". See also <a class=\"localLink\" href=\"http://schema.org/numberOfRooms\">numberOfRooms</a>.",
          "rdfs:label" : "numberOfBathroomsTotal",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:FloorPlan"
+            "schema:FloorPlan",
+            "schema:Accommodation"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Integer"
+         "schema:rangeIncludes" : "schema:Integer",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       },
       "schema:numberOfBedrooms" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The total integer number of bedrooms in a some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, <a class=\"localLink\" href=\"http://schema.org/ApartmentComplex\">ApartmentComplex</a> or <a class=\"localLink\" href=\"http://schema.org/FloorPlan\">FloorPlan</a>.",
          "rdfs:label" : "numberOfBedrooms",
@@ -110,100 +109,101 @@
          "schema:rangeIncludes" : [
             "schema:Number",
             "schema:QuantitativeValue"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       },
       "schema:numberOfFullBathrooms" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Number of full bathrooms - The total number of full and Â¾ bathrooms in an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>. This corresponds to the <a href=\"https://ddwiki.reso.org/display/DDW17/BathroomsFull+Field\">BathroomsFull field in RESO</a>.",
          "rdfs:label" : "numberOfFullBathrooms",
-         "schema:category" : "issue-2373",
-         "schema:domainIncludes" : [
-            "schema:FloorPlan",
-            "schema:Accommodation"
-         ],
-         "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Number"
-      },
-      "schema:numberOfPartialBathrooms" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
-         "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "Number of partial bathrooms - The total number of half and Â¼ bathrooms in an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>. This corresponds to the <a href=\"https://ddwiki.reso.org/display/DDW17/BathroomsPartial+Field\">BathroomsPartial field in RESO</a>.",
-         "rdfs:label" : "numberOfPartialBathrooms",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
             "schema:Accommodation",
             "schema:FloorPlan"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Number"
+         "schema:rangeIncludes" : "schema:Number",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
+      },
+      "schema:numberOfPartialBathrooms" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Number of partial bathrooms - The total number of half and Â¼ bathrooms in an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>. This corresponds to the <a href=\"https://ddwiki.reso.org/display/DDW17/BathroomsPartial+Field\">BathroomsPartial field in RESO</a>.",
+         "rdfs:label" : "numberOfPartialBathrooms",
+         "schema:category" : "issue-2373",
+         "schema:domainIncludes" : [
+            "schema:FloorPlan",
+            "schema:Accommodation"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Number",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       },
       "schema:numberOfRooms" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The number of rooms (excluding bathrooms and closets) of the accommodation or lodging business.\nTypical unit code(s): ROM for room or C62 for no unit. The type of room can be put in the unitText property of the QuantitativeValue.",
          "rdfs:label" : "numberOfRooms",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:Apartment",
-            "schema:House",
+            "schema:LodgingBusiness",
             "schema:FloorPlan",
             "schema:Suite",
             "schema:SingleFamilyResidence",
-            "schema:LodgingBusiness"
+            "schema:House",
+            "schema:Accommodation",
+            "schema:Apartment"
          ],
          "schema:rangeIncludes" : [
             "schema:QuantitativeValue",
             "schema:Number"
-         ]
+         ],
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       },
       "schema:permittedUsage" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indications regarding the permitted usage of the accommodation.",
          "rdfs:label" : "permittedUsage",
          "schema:domainIncludes" : "schema:Accommodation",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       },
       "schema:petsAllowed" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates whether pets are allowed to enter the accommodation or lodging business. More detailed information can be put in a text value.",
          "rdfs:label" : "petsAllowed",
          "schema:domainIncludes" : [
-            "schema:Accommodation",
-            "schema:ApartmentComplex",
             "schema:FloorPlan",
+            "schema:ApartmentComplex",
+            "schema:Accommodation",
             "schema:LodgingBusiness"
          ],
          "schema:rangeIncludes" : [
             "schema:Boolean",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       },
       "schema:tourBookingPage" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A page providing information on how to book a tour of some <a class=\"localLink\" href=\"http://schema.org/Place\">Place</a>, such as an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a> or <a class=\"localLink\" href=\"http://schema.org/ApartmentComplex\">ApartmentComplex</a> in a real estate setting, as well as other kinds of tours as appropriate.",
          "rdfs:label" : "tourBookingPage",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:ApartmentComplex",
+            "schema:Place",
             "schema:Accommodation",
-            "schema:Place"
+            "schema:ApartmentComplex"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:URL"
+         "schema:rangeIncludes" : "schema:URL",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       },
       "schema:yearBuilt" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The year an <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a> was constructed. This corresponds to the <a href=\"https://ddwiki.reso.org/display/DDW17/YearBuilt+Field\">YearBuilt field in RESO</a>.",
          "rdfs:label" : "yearBuilt",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : "schema:Accommodation",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Number"
+         "schema:rangeIncludes" : "schema:Number",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       }
    }
 }

@@ -3,19 +3,6 @@
 # DESCRIPTION
 #   Driver module that encapsulates the details of formatting a LaTeX document
 #
-# AUTHOR
-#   Chris Travers <chris.travers@gmail.com>  (current maintainer)
-#
-# COPYRIGHT
-#   Copyright (C) 2020  Erik Huelsmann.
-#   Copyright (C) 2014  Chris Travers.
-#   Copyright (C) 2009-2013 Ford & Mason Ltd.
-#   Copyright (C) 2006-2007 Andrew Ford.
-#   Portions Copyright (C) 1996-2006 Andy Wardley.
-#
-#   This module is free software; you can redistribute it and/or
-#   modify it under the same terms as Perl itself.
-#
 
 package LaTeX::Driver;
 
@@ -40,7 +27,7 @@ use Capture::Tiny qw(capture);
 
 Readonly our $DEFAULT_MAXRUNS => 10;
 
-our $VERSION = "1.0.0";
+our $VERSION = "1.1.1";
 
 __PACKAGE__->mk_accessors( qw( basename basedir basepath options
                                source output tmpdir format timeout stderr
@@ -55,7 +42,7 @@ our $DEBUGPREFIX;
 
 # LaTeX executable paths set at installation time by the Makefile.PL
 
-our @PROCESSORS      = qw(xelatex lulaatex pdflatex latex);
+our @PROCESSORS      = qw(xelatex lualatex pdflatex latex);
 our @AUXILLARY_PROGS = qw(bibtex makeindex);
 our @POSTPROCESSORS  = qw(dvips dvipdfm ps2pdf pdf2ps);
 our @PROGRAM_NAMES   = (@PROCESSORS, @AUXILLARY_PROGS, @POSTPROCESSORS);
@@ -80,12 +67,13 @@ our %FORMATTERS  = (
     pdf        => [ 'xelatex' ],
     'pdf(pdflatex)' => [ 'pdflatex' ],
     'pdf(xelatex)'  => [ 'xelatex' ],
-    'ps(xelatex)'  => [ 'xelatex', 'pdf2ps' ],
+    'pdf(lualatex)'  => [ 'lualatex' ],
     'pdf(dvi)'      => [ 'latex', 'dvipdfm' ],
     'pdf(ps)'       => [ 'latex', 'dvips', 'ps2pdf' ],
     'ps(pdf)'       => [ 'pdflatex', 'pdf2ps' ],
     'ps(pdflatex)'       => [ 'pdflatex', 'pdf2ps' ],
     'ps(xelatex)'       => [ 'xelatex', 'pdf2ps' ],
+    'ps(lualatex)'       => [ 'lualatex', 'pdf2ps' ],
 );
 
 
@@ -843,7 +831,7 @@ LaTeX::Driver - Latex driver
 
 =head1 VERSION
 
-1.0.0
+1.1.1
 
 =head1 SYNOPSIS
 
@@ -916,6 +904,38 @@ Format).  The follow special values are also accepted: C<"pdf(ps)">
 C<"pdf(dvi)"> (generates PDF via dvi, using C<dvipdfm>).  If not
 specified then the format is determined from the name of the output
 document if specified, or defaults to PDF.
+
+The following list of formats is supported
+
+=over
+
+=item * dvi
+
+=item * ps
+
+=item * postscript
+
+=item * pdf
+
+=item * pdf(pdflatex)
+
+=item * pdf(xelatex)
+
+=item * pdf(lualatex)
+
+=item * pdf(dvi)
+
+=item * pdf(ps)
+
+=item * ps(pdf)
+
+=item * ps(pdflatex)
+
+=item * ps(xelatex)
+
+=item * ps(lualatex)
+
+=back
 
 =item C<tmpdir>
 
@@ -1384,14 +1404,15 @@ the web2c TeX distribution, TeX live, tetex, TeX on Windows, etc.
 
 =head1 AUTHOR
 
-Andrew Ford E<lt>a.ford@ford-mason.co.ukE<gt>
-
+   Chris Travers <chris.travers@gmail.com>  (current maintainer)
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2009-2011 Ford & Mason Ltd.  All Rights Reserved.
-
-Copyright (C) 2007 Andrew Ford.  All Rights Reserved.
+   Copyright (C) 2020  Erik Huelsmann.
+   Copyright (C) 2014  Chris Travers.
+   Copyright (C) 2009-2013 Ford & Mason Ltd.
+   Copyright (C) 2006-2007 Andrew Ford.
+   Portions Copyright (C) 1996-2006 Andy Wardley.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

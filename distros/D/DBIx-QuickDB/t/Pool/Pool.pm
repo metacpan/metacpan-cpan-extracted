@@ -25,6 +25,7 @@ can_ok(
 is(QDB_POOL()->library, __PACKAGE__, "Set the library");
 
 driver $driver => (
+    driver_args => { $caller->can('DBD_DRIVER') ? (dbd_driver => $caller->DBD_DRIVER) : () },
     build => sub {
         my $class = shift;
         my ($db) = @_;

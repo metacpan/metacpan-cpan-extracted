@@ -1,3 +1,15 @@
+1.09
+ - Cater for the possibility that _Float128 is an unknown type. (This is done in
+   math_mpc_include.h.)
+ - Prototype subroutines listed in 'use subs()'.
+ - Add Rmpc_fma (previously missed), Rmpc_sum and Rmpc_dot (both newly available) functions.
+ - Skip buggy BSD (long double) systems (see
+   http://www.cpantesters.org/cpan/report/c3334524-8930-11e9-9997-9db8de51d2a1)
+   in test 4 of t/Rmpc_set_NV.t.
+ - In t.out_str2.t, for tests 1-6, we need to cater for a change in mpfr_out_str
+   output with mpfr-4.2.0
+ - Small update to README - minimum required version of mpfr is now 3.0.0.
+
 1.08
  - Add new functions Rmpc_cmp_abs and Rmpc_rootofunity
  - Create MPC.pod

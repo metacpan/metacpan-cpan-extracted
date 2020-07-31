@@ -13,7 +13,7 @@ Role to enable plot as command line option
 
 
 package CLIPSeqTools::Role::Option::Plot;
-$CLIPSeqTools::Role::Option::Plot::VERSION = '0.1.9';
+$CLIPSeqTools::Role::Option::Plot::VERSION = '0.1.10';
 
 #######################################################################
 #######################   Load External modules   #####################

@@ -36,7 +36,7 @@
 
     use subs qw(MPC_VERSION MPC_VERSION_MAJOR MPC_VERSION_MINOR
                 MPC_VERSION_PATCHLEVEL MPC_VERSION_STRING
-                MPC_VERSION MPC_VERSION_NUM);
+                MPC_VERSION_NUM);
 
     use overload
     '+'    => \&overload_add,
@@ -107,7 +107,7 @@ Rmpc_set_f_fr Rmpc_set_q_fr Rmpc_set_z_fr Rmpc_set_fr_f Rmpc_set_fr_q Rmpc_set_f
 
 Rmpc_set_dc Rmpc_set_ldc Rmpc_set_NV Rmpc_set_NV_NV
 Rmpc_set_DC Rmpc_set_LDC Rmpc_set_F128C
-
+Rmpc_fma Rmpc_dot Rmpc_sum
 Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
@@ -126,10 +126,10 @@ Rmpc_set_nan Rmpc_swap
 Rmpc_mul_sj Rmpc_mul_ld Rmpc_mul_d Rmpc_div_sj Rmpc_sj_div Rmpc_div_ld Rmpc_ld_div Rmpc_div_d Rmpc_d_div
 );
 
-    our $VERSION = '1.08';
+    our $VERSION = '1.09';
     #$VERSION = eval $VERSION;
 
-    DynaLoader::bootstrap Math::MPC $VERSION;
+    Math::MPC->DynaLoader::bootstrap($VERSION);
 
     %Math::MPC::EXPORT_TAGS =(mpc => [qw(
 MPC_RNDNN MPC_RNDND MPC_RNDNU MPC_RNDNZ MPC_RNDDN MPC_RNDUN MPC_RNDZN MPC_RNDDD
@@ -171,7 +171,7 @@ Rmpc_set_f_fr Rmpc_set_q_fr Rmpc_set_z_fr Rmpc_set_fr_f Rmpc_set_fr_q Rmpc_set_f
 
 Rmpc_set_dc Rmpc_set_ldc Rmpc_set_NV Rmpc_set_NV_NV
 Rmpc_set_DC Rmpc_set_LDC Rmpc_set_F128C
-
+Rmpc_fma Rmpc_dot Rmpc_sum
 Rmpc_add Rmpc_add_ui Rmpc_add_fr
 Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
@@ -405,12 +405,12 @@ sub Rmpc_out_str {
     die "Wrong number of arguments supplied to Rmpc_out_str()";
 }
 
-sub MPC_VERSION {return _MPC_VERSION()}
-sub MPC_VERSION_MAJOR {return _MPC_VERSION_MAJOR()}
-sub MPC_VERSION_MINOR {return _MPC_VERSION_MINOR()}
-sub MPC_VERSION_PATCHLEVEL {return _MPC_VERSION_PATCHLEVEL()}
-sub MPC_VERSION_STRING {return _MPC_VERSION_STRING()}
-sub MPC_VERSION_NUM {return _MPC_VERSION_NUM(@_)}
+sub MPC_VERSION            () {return _MPC_VERSION()}
+sub MPC_VERSION_MAJOR      () {return _MPC_VERSION_MAJOR()}
+sub MPC_VERSION_MINOR      () {return _MPC_VERSION_MINOR()}
+sub MPC_VERSION_PATCHLEVEL () {return _MPC_VERSION_PATCHLEVEL()}
+sub MPC_VERSION_STRING     () {return _MPC_VERSION_STRING()}
+sub MPC_VERSION_NUM           {return _MPC_VERSION_NUM(@_)}
 
 1;
 

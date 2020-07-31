@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Curl::Promiser
 
+0.14 Tue 28 Jul 2020
+- BUG FIX: Fix leaks on curl 7.19 (CentOS 6).
+
 0.13 Sat 25 Jul 2020
 - BREAKING CHANGE: The subclass interface has changed, and the new
   interface is no longer documented. Only the event interfaces that the

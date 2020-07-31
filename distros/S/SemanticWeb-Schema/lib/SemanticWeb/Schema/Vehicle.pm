@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has acceleration_time => (
@@ -226,6 +226,14 @@ has steering_position => (
 
 
 
+has stupid_property => (
+    is        => 'rw',
+    predicate => '_has_stupid_property',
+    json_ld   => 'stupidProperty',
+);
+
+
+
 has tongue_weight => (
     is        => 'rw',
     predicate => '_has_tongue_weight',
@@ -346,7 +354,7 @@ SemanticWeb::Schema::Vehicle - A vehicle is a device that is designed or used to
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -928,6 +936,24 @@ A steering_position should be one of the following types:
 =head2 C<_has_steering_position>
 
 A predicate for the L</steering_position> attribute.
+
+=head2 C<stupid_property>
+
+C<stupidProperty>
+
+This is a StupidProperty! - for testing only
+
+A stupid_property should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=back
+
+=head2 C<_has_stupid_property>
+
+A predicate for the L</stupid_property> attribute.
 
 =head2 C<tongue_weight>
 

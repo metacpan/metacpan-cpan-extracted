@@ -2,7 +2,7 @@ NAME
     LaTeX::Driver - Latex driver
 
 VERSION
-    1.0.0
+    1.1.1
 
 SYNOPSIS
         use LaTeX::Driver;
@@ -62,6 +62,34 @@ SUBROUTINES/METHODS
             "ps2pdf"), "pdf(dvi)" (generates PDF via dvi, using "dvipdfm").
             If not specified then the format is determined from the name of
             the output document if specified, or defaults to PDF.
+
+            The following list of formats is supported
+
+            *   dvi
+
+            *   ps
+
+            *   postscript
+
+            *   pdf
+
+            *   pdf(pdflatex)
+
+            *   pdf(xelatex)
+
+            *   pdf(lualatex)
+
+            *   pdf(dvi)
+
+            *   pdf(ps)
+
+            *   ps(pdf)
+
+            *   ps(pdflatex)
+
+            *   ps(xelatex)
+
+            *   ps(lualatex)
 
         "tmpdir"
             Specifies whether the formatting should be done in a temporary
@@ -415,12 +443,14 @@ INTERNALS
     web2c TeX distribution, TeX live, tetex, TeX on Windows, etc.
 
 AUTHOR
-    Andrew Ford <a.ford@ford-mason.co.uk>
+       Chris Travers <chris.travers@gmail.com>  (current maintainer)
 
 LICENSE AND COPYRIGHT
-    Copyright (C) 2009-2011 Ford & Mason Ltd. All Rights Reserved.
-
-    Copyright (C) 2007 Andrew Ford. All Rights Reserved.
+       Copyright (C) 2020  Erik Huelsmann.
+       Copyright (C) 2014  Chris Travers.
+       Copyright (C) 2009-2013 Ford & Mason Ltd.
+       Copyright (C) 2006-2007 Andrew Ford.
+       Portions Copyright (C) 1996-2006 Andy Wardley.
 
     This module is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

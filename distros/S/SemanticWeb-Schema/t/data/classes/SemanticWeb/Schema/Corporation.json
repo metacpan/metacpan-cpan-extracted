@@ -1,10 +1,10 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_rNews",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "Organization: A business corporation.",
       "rdfs:label" : "Corporation",
-      "rdfs:subClassOf" : "schema:Organization"
+      "rdfs:subClassOf" : "schema:Organization",
+      "schema:source" : "schemadotorgsources:source_rNews"
    },
    "properties" : {
       "schema:tickerSymbol" : {

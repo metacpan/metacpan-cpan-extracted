@@ -12,6 +12,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::Exception: '0'
+  Test::File: '0'
   Test::More: '0'
   Test::Warnings: '0'
   lib: '0'
@@ -31,6 +32,40 @@ no_index:
     - corpus
     - examples
     - inc
+provides:
+  Archive::BagIt:
+    file: lib/Archive/BagIt.pm
+    version: '0.063'
+  Archive::BagIt::Base:
+    file: lib/Archive/BagIt/Base.pm
+    version: '0.063'
+  Archive::BagIt::DotBagIt:
+    file: lib/Archive/BagIt/DotBagIt.pm
+    version: '0.063'
+  Archive::BagIt::Fast:
+    file: lib/Archive/BagIt/Fast.pm
+    version: '0.063'
+  Archive::BagIt::Plugin::Algorithm::MD5:
+    file: lib/Archive/BagIt/Plugin/Algorithm/MD5.pm
+    version: '0.063'
+  Archive::BagIt::Plugin::Algorithm::SHA512:
+    file: lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm
+    version: '0.063'
+  Archive::BagIt::Plugin::Manifest::MD5:
+    file: lib/Archive/BagIt/Plugin/Manifest/MD5.pm
+    version: '0.063'
+  Archive::BagIt::Plugin::Manifest::SHA512:
+    file: lib/Archive/BagIt/Plugin/Manifest/SHA512.pm
+    version: '0.063'
+  Archive::BagIt::Role::Algorithm:
+    file: lib/Archive/BagIt/Role/Algorithm.pm
+    version: '0.063'
+  Archive::BagIt::Role::Manifest:
+    file: lib/Archive/BagIt/Role/Manifest.pm
+    version: '0.063'
+  Archive::BagIt::Role::Plugin:
+    file: lib/Archive/BagIt/Role/Plugin.pm
+    version: '0.063'
 recommends:
   Digest::SHA: '0'
   IO::AIO: '0'
@@ -55,14 +90,13 @@ requires:
   Time::HiRes: '0'
   namespace::autoclean: '0'
   open: '0'
-  parent: '0'
   perl: '5.010'
   strict: '0'
   utf8: '0'
   warnings: '0'
 resources:
-  repository: git://github.com/Archive-BagIt.git
-version: '0.059'
+  repository: https://art1pirat.spdns.org/art1/Archive-BagIt.git
+version: '0.063'
 x_contributors:
   - 'Andreas Romeyke <art1@andreas-romeyke.de>'
   - 'Michiel Beijen <michiel.beijen@gmail.com>'

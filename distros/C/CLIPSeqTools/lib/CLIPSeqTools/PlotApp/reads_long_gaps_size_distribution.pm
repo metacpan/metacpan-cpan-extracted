@@ -26,7 +26,7 @@ Create plots for script reads_long_gaps_size_distribution.
 =cut
 
 package CLIPSeqTools::PlotApp::reads_long_gaps_size_distribution;
-$CLIPSeqTools::PlotApp::reads_long_gaps_size_distribution::VERSION = '0.1.9';
+$CLIPSeqTools::PlotApp::reads_long_gaps_size_distribution::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

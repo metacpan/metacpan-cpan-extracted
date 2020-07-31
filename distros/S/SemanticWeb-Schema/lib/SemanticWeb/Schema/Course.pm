@@ -6,7 +6,7 @@ package SemanticWeb::Schema::Course;
 
 use Moo;
 
-extends qw/ SemanticWeb::Schema::CreativeWork /;
+extends qw/ SemanticWeb::Schema::CreativeWork SemanticWeb::Schema::LearningResource /;
 
 
 use MooX::JSON_LD 'Course';
@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has course_code => (
@@ -82,7 +82,7 @@ SemanticWeb::Schema::Course - A description of an educational course which may b
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -228,7 +228,7 @@ A predicate for the L</occupational_credential_awarded> attribute.
 
 =head1 SEE ALSO
 
-L<SemanticWeb::Schema::CreativeWork>
+L<SemanticWeb::Schema::LearningResource>
 
 =head1 SOURCE
 

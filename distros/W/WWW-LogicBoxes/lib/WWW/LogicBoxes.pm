@@ -13,7 +13,7 @@ use WWW::LogicBoxes::Types qw( Bool ResponseType Str URI );
 use Data::Util qw( is_hash_ref );
 use Carp;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: Interact with LogicBoxes reseller API
 
 use Readonly;
@@ -393,6 +393,8 @@ Special thanks to the following individuals who have offered commits, bug report
 =item Slaven Rezic
 
 =item David Foster
+
+=item Eris Caffee
 
 =back
 

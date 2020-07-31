@@ -9,7 +9,7 @@ use Carp   ();
 use Socket ();
 
 use Exporter 'import';
-our @EXPORT_OK = qw(incr_n inet_ntop_pp inet_pton_pp);
+our @EXPORT_OK = qw(incr_n decr_n inet_ntop_pp inet_pton_pp);
 
 =head1 NAME
 
@@ -21,6 +21,9 @@ Net::IPAM::Util - A selection of general utility subroutines for Net::IPAM
 
   $n = incr_n("\x0a\x00\x00\x01");                                 # 10.0.0.2
   $n = incr_n( pack( 'n8', 0x2001, 0xdb8, 0, 0, 0, 0, 0, 1 ) );    # 2001:db8::2
+
+  $n = decr_n("\x0a\x00\x00\x01");                                 # 10.0.0.0
+  $n = decr_n( pack( 'n8', 0x2001, 0xdb8, 0, 0, 0, 0, 0, 1 ) );    # 2001:db8::
 
   $n = inet_pton_pp( AF_INET6, '2001:db8::fe1' );
   say inet_ntop_pp( AF_INET, "\x0a\x00\x00\x01" );                 # 10.0.0.1
@@ -35,9 +38,6 @@ Increment a packed IPv4 or IPv6 address in network byte order. Returns undef on 
 
 This increment function is needed in L<Net::IPAM::IP> and L<Net::IPAM::Block> for transparent handling
 of IPv4 and IPv6 addresses and blocks.
-
-This is the only math operation needed for iterating over blocks, splitting blocks to CIDRs
-or aggregate IPs and blocks to CIDRs.
 
 No need for L<Math::BigInt>, this pure perl algorithm works for all uint_n in network byte order,
 where n is a multiple of 32: uint_32, uint_64, uint_96, uint_128, ...
@@ -68,6 +68,47 @@ sub incr_n {
 
   # incr this N
   $N[$i]++;
+
+  # pack again the individual 32 bit integers in network byte order to one byte string
+  return pack( 'N*', @N );
+}
+
+=head2 $address_minusminus = decr_n( $address )
+
+Decrement a packed IPv4 or IPv6 address in network byte order. Returns undef on underflow.
+
+This decrement function is needed in L<Net::IPAM::IP> and L<Net::IPAM::Block> for transparent handling
+of IPv4 and IPv6 addresses and blocks.
+
+No need for L<Math::BigInt>, this pure perl algorithm works for all uint_n in network byte order,
+where n is a multiple of 32: uint_32, uint_64, uint_96, uint_128, ...
+
+=cut
+
+sub decr_n {
+  my $n = shift // Carp::croak("missing argument");
+
+  # split in individual 32 bit unsigned ints in network byte order
+  my @N = unpack( 'N*', $n );
+
+  # start at least significant N
+  my $i = $#N;
+
+  # carry?
+  while ( $N[$i] == 0 ) {
+
+    # UNDERFLOW, it's already the most significant N
+    return if $i == 0;
+
+    # set this N to ffff_ffff: 0 - 1 = 0xffff_ffff + carry
+    $N[$i] = 0xffff_ffff;
+
+    # carry on to next more significant N
+    $i--;
+  }
+
+  # decr this N
+  $N[$i]--;
 
   # pack again the individual 32 bit integers in network byte order to one byte string
   return pack( 'N*', @N );

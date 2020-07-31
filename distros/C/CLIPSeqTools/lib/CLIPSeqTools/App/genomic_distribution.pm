@@ -44,7 +44,7 @@ such as genic, intergenic, repeats, exonic, intronic, etc.
 =cut
 
 package CLIPSeqTools::App::genomic_distribution;
-$CLIPSeqTools::App::genomic_distribution::VERSION = '0.1.9';
+$CLIPSeqTools::App::genomic_distribution::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

@@ -89,7 +89,7 @@ sub examine_files {
     my $subs_exclude = $args{exclude} // [];
     my $filters      = _generate_filters($args{filters});
 
-    my @files = map { glob } @$files_base;
+    my @files = grep { -f } map { glob } @$files_base;
     my %file_ignored = map { $_ => undef } map { glob } @$files_ignore;
     my %sub_excluded = map { $_ => undef } @$subs_exclude;
 

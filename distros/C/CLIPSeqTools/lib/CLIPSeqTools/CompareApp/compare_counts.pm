@@ -43,7 +43,7 @@ with value lower than val_thres in all tables are excluded.
 =cut
 
 package CLIPSeqTools::CompareApp::compare_counts;
-$CLIPSeqTools::CompareApp::compare_counts::VERSION = '0.1.9';
+$CLIPSeqTools::CompareApp::compare_counts::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

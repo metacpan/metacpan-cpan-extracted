@@ -6,9 +6,11 @@ html/Admin/Queues/Elements/Chooser/ActiveTickets
 html/Admin/Queues/Elements/Chooser/Random
 html/Admin/Queues/Elements/Chooser/RoundRobin
 html/Admin/Queues/Elements/Chooser/TimeLeft
+html/Admin/Queues/Elements/Chooser/UserDefined
 html/Admin/Queues/Elements/Filter/ExcludedDates
 html/Admin/Queues/Elements/Filter/MemberOfGroup
 html/Admin/Queues/Elements/Filter/MemberOfRole
+html/Admin/Queues/Elements/Filter/UserDefined
 html/Admin/Queues/Elements/Filter/WorkSchedule
 html/Admin/Queues/Elements/SortableBox
 html/Callbacks/AutomaticAssignment/Elements/Tabs/PrivilegedQueue
@@ -37,10 +39,12 @@ lib/RT/Extension/AutomaticAssignment/Chooser/ActiveTickets.pm
 lib/RT/Extension/AutomaticAssignment/Chooser/Random.pm
 lib/RT/Extension/AutomaticAssignment/Chooser/RoundRobin.pm
 lib/RT/Extension/AutomaticAssignment/Chooser/TimeLeft.pm
+lib/RT/Extension/AutomaticAssignment/Chooser/UserDefined.pm
 lib/RT/Extension/AutomaticAssignment/Filter.pm
 lib/RT/Extension/AutomaticAssignment/Filter/ExcludedDates.pm
 lib/RT/Extension/AutomaticAssignment/Filter/MemberOfGroup.pm
 lib/RT/Extension/AutomaticAssignment/Filter/MemberOfRole.pm
+lib/RT/Extension/AutomaticAssignment/Filter/UserDefined.pm
 lib/RT/Extension/AutomaticAssignment/Filter/WorkSchedule.pm
 lib/RT/Extension/AutomaticAssignment/Test.pm
 lib/RT/Extension/AutomaticAssignment/Test.pm.in
@@ -49,10 +53,9 @@ MANIFEST			This list of files
 META.yml
 README
 static/css/automatic-assignment.css
-static/images/remove.png
 static/js/automatic-assignment.js
-static/js/jquery.ui.sortable.js
 t/basic.t
 t/compile.t
 t/excluded-dates.t
 t/work-schedule.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

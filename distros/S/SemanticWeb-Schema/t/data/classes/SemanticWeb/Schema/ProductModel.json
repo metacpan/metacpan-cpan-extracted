@@ -1,35 +1,42 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A datasheet or vendor specification of a product (in the sense of a prototypical description).",
       "rdfs:label" : "ProductModel",
-      "rdfs:subClassOf" : "schema:Product"
+      "rdfs:subClassOf" : "schema:Product",
+      "schema:source" : "schemadotorgsources:source_GoodRelationsClass"
    },
    "properties" : {
       "schema:isVariantOf" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
-         "rdfs:comment" : "A pointer to a base product from which this product is a variant. It is safe to infer that the variant inherits all product features from the base model, unless defined locally. This is not transitive.",
+         "rdfs:comment" : "Indicates the kind of product that this is a variant of. In the case of <a class=\"localLink\" href=\"http://schema.org/ProductModel\">ProductModel</a>, this is a pointer (from a ProductModel) to a base product from which this product is a variant. It is safe to infer that the variant inherits all product features from the base model, unless defined locally. This is not transitive. In the case of a <a class=\"localLink\" href=\"http://schema.org/ProductGroup\">ProductGroup</a>, the group description also serves as a template, representing a set of Products that vary on explicitly defined, specific dimensions only (so it defines both a set of variants, as well as which values distinguish amongst those variants). When used with <a class=\"localLink\" href=\"http://schema.org/ProductGroup\">ProductGroup</a>, this property can apply to any <a class=\"localLink\" href=\"http://schema.org/Product\">Product</a> included in the group.",
          "rdfs:label" : "isVariantOf",
-         "schema:domainIncludes" : "schema:ProductModel",
-         "schema:rangeIncludes" : "schema:ProductModel"
+         "schema:domainIncludes" : [
+            "schema:ProductModel",
+            "schema:Product"
+         ],
+         "schema:inverseOf" : "schema:hasVariant",
+         "schema:rangeIncludes" : [
+            "schema:ProductGroup",
+            "schema:ProductModel"
+         ],
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:predecessorOf" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A pointer from a previous, often discontinued variant of the product to its newer variant.",
          "rdfs:label" : "predecessorOf",
          "schema:domainIncludes" : "schema:ProductModel",
-         "schema:rangeIncludes" : "schema:ProductModel"
+         "schema:rangeIncludes" : "schema:ProductModel",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:successorOf" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A pointer from a newer variant of a product  to its previous, often discontinued predecessor.",
          "rdfs:label" : "successorOf",
          "schema:domainIncludes" : "schema:ProductModel",
-         "schema:rangeIncludes" : "schema:ProductModel"
+         "schema:rangeIncludes" : "schema:ProductModel",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       }
    }
 }

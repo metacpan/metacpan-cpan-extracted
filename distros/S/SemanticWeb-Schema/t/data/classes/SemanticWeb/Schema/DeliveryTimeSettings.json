@@ -1,16 +1,15 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
       "rdf:type" : "rdfs:Class",
-      "rdfs:comment" : "A DeliveryTimeSettings represents re-usable pieces of shipping information, relating to timing. It is designed for publication on an URL that may be referenced via the <a class=\"localLink\" href=\"http://schema.org/shippingSettingsLink\">shippingSettingsLink</a> property of a <a class=\"localLink\" href=\"http://schema.org/OfferShippingSpecification\">OfferShippingSpecification</a>. Several occurrences can be published, distinguished (and identified/referenced) by their different values for <a class=\"localLink\" href=\"http://schema.org/shippingLabel\">shippingLabel</a>.",
+      "rdfs:comment" : "A DeliveryTimeSettings represents re-usable pieces of shipping information, relating to timing. It is designed for publication on an URL that may be referenced via the <a class=\"localLink\" href=\"http://schema.org/shippingSettingsLink\">shippingSettingsLink</a> property of a <a class=\"localLink\" href=\"http://schema.org/OfferShippingDetails\">OfferShippingDetails</a>. Several occurrences can be published, distinguished (and identified/referenced) by their different values for <a class=\"localLink\" href=\"http://schema.org/transitTimeLabel\">transitTimeLabel</a>.",
       "rdfs:label" : "DeliveryTimeSettings",
       "rdfs:subClassOf" : "schema:StructuredValue",
       "schema:category" : "issue-2506",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
    },
    "properties" : {
       "schema:deliveryTime" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The total delay between the receipt of the order and the goods reaching the final customer.",
          "rdfs:label" : "deliveryTime",
@@ -20,24 +19,37 @@
             "schema:OfferShippingDetails"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:ShippingDeliveryTime"
+         "schema:rangeIncludes" : "schema:ShippingDeliveryTime",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
+      },
+      "schema:isUnlabelledFallback" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "This can be marked 'true' to indicate that some published <a class=\"localLink\" href=\"http://schema.org/DeliveryTimeSettings\">DeliveryTimeSettings</a> or <a class=\"localLink\" href=\"http://schema.org/ShippingRateSettings\">ShippingRateSettings</a> are intended to apply to all <a class=\"localLink\" href=\"http://schema.org/OfferShippingDetails\">OfferShippingDetails</a> published by the same merchant, when referenced by a <a class=\"localLink\" href=\"http://schema.org/shippingSettingsLink\">shippingSettingsLink</a> in those settings. It is not meaningful to use a 'true' value for this property alongside a transitTimeLabel (for <a class=\"localLink\" href=\"http://schema.org/DeliveryTimeSettings\">DeliveryTimeSettings</a>) or shippingLabel (for <a class=\"localLink\" href=\"http://schema.org/ShippingRateSettings\">ShippingRateSettings</a>), since this property is for use with unlabelled settings.",
+         "rdfs:label" : "isUnlabelledFallback",
+         "schema:category" : "issue-2506",
+         "schema:domainIncludes" : [
+            "schema:ShippingRateSettings",
+            "schema:DeliveryTimeSettings"
+         ],
+         "schema:isPartOf" : "http:pending.schema.org",
+         "schema:rangeIncludes" : "schema:Boolean",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:shippingDestination" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "indicates (possibly multiple) shipping destinations. These can be defined in several ways e.g. postalCode ranges.",
          "rdfs:label" : "shippingDestination",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
-            "schema:ShippingRateSettings",
             "schema:DeliveryTimeSettings",
+            "schema:ShippingRateSettings",
             "schema:OfferShippingDetails"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:DefinedRegion"
+         "schema:rangeIncludes" : "schema:DefinedRegion",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:transitTimeLabel" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Label to match an <a class=\"localLink\" href=\"http://schema.org/OfferShippingDetails\">OfferShippingDetails</a> with a <a class=\"localLink\" href=\"http://schema.org/DeliveryTimeSettings\">DeliveryTimeSettings</a> (within the context of a <a class=\"localLink\" href=\"http://schema.org/shippingSettingsLink\">shippingSettingsLink</a> cross-reference).",
          "rdfs:label" : "transitTimeLabel",
@@ -47,7 +59,8 @@
             "schema:OfferShippingDetails"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       }
    }
 }

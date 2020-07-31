@@ -1,5 +1,12 @@
 Revision history for Alien-TidyHTML5
 
+v0.3.2    2020-07-31 14:40:53+01:00 Europe/London
+  [Toolchain]
+  - Add core modules in the prerequisites.
+
+  [Documentation]
+  - Updated copyright year.
+
 v0.3.1    2020-02-08 16:19:33+00:00 Europe/London
   [Other]
   - Added Alien::cmake3 as a requirement.

@@ -117,6 +117,12 @@ use constant {
         'www.nownews.com' => 'NewsExtractor::SiteSpecificExtractor::www_nownews_com',
     },
     CSSRuleSetByHost => {
+        'www.5ch.com.tw' => {
+            headline => 'h3.m-ti',
+            dateline => 'div.more-about div.date',
+            journalist => 'div.more-about div.reporter',
+            content_text => 'div.text-edit',
+        },
         'www.cw.com.tw' => {
             headline => 'div.article__head h1',
             dateline => 'div.article__detail > time',

@@ -4,7 +4,7 @@
 #
 
 package Crypt::EAMessage;
-$Crypt::EAMessage::VERSION = '1.190901';
+$Crypt::EAMessage::VERSION = '1.202120';
 use v5.22;
 
 # ABSTRACT: Simple-to-use Abstraction of Encrypted Authenticated Messages
@@ -232,7 +232,7 @@ Crypt::EAMessage - Simple-to-use Abstraction of Encrypted Authenticated Messages
 
 =head1 VERSION
 
-version 1.190901
+version 1.202120
 
 =head1 SYNOPSIS
 
@@ -417,7 +417,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Joelle Maslak.
+This software is copyright (c) 2019-2020 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

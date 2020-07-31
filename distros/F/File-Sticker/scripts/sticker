@@ -1,0 +1,542 @@
+#! /usr/bin/env perl
+
+=head1 NAME
+
+sticker - sticks tags onto files, populates a database with file meta-data
+
+=head1 VERSION
+
+version 0.9301
+
+=head1 SYNOPSIS
+
+    sticker --help | --manpage | --version | --settings { schema | all | I<name> }
+
+    sticker [--verbose] [--derive] --add I<string>=I<string> file [file ...]
+    sticker [--verbose] --delete I<string> file [file ...]
+    sticker [--verbose] --extract file [file ...]
+    sticker [--verbose] --from_file I<otherfile> file [file ...]
+
+    sticker --missing
+    sticker --overlooked file ...
+    sticker --removed file ...
+    sticker --update file ...
+
+    sticker --query query-string ...
+    sticker --file_info file ...
+    sticker --db_info file ...
+    sticker --tags
+
+=head1 DESCRIPTION
+
+This writes meta-data into files, reads meta-data from files,
+and populates a database with that information.
+It also deletes from and queries the database.
+
+=head1 OPTIONS
+
+=over
+
+=item --add I<string>=I<string>
+
+Set the given field in the given file(s).
+
+=item --db_info
+
+Show the information about the given file(s) from the database.
+
+=item --delete I<string>
+
+Delete the given field from the given file(s).
+
+=item --derive
+
+Derive the needed value of the given field from other information in the given file.
+At the moment, this only works for deriving a "title" field from the filename.
+
+=item --extract
+
+Extract metadata in other formats (e.g. EXIF data) from the file
+and save as extended attributes to the same file.
+
+=item --from_file I<filename>
+
+Extract metadata from this file and use it to set the metadata in the other file(s).
+
+=item --help
+
+Display short help and exit.
+
+=item --file_info
+
+Show the metadata information of the given file(s), from the files.
+This option is useful for when the file is not (yet) in the database,
+or has not yet been updated after a change.
+
+=item --manpage
+
+Display full documentation and exit.
+
+=item --missing
+
+Display files which are in the database but missing from the filesystem.
+
+=item --overlooked
+
+From the given files, show which ones have been overlooked (are not in the database).
+
+=item --query I<string>
+
+Query the database for the list of files matching the given tag(s).
+
+=item --quiet
+
+Make the output quiet (no output).
+
+=item --removed
+
+Tell the database that the given file(s) are to be removed from the database.
+(Can't use "delete" because that is used for deleting fields from files).
+This is used for either removing files that no longer exist (see "missing")
+or files which have been mistakenly added that you didn't mean to add.
+It is the latter situation which is why "missing" and "removed" are separate
+options.
+
+If you want to remove missing files in one line, use the following command:
+
+    sticker --removed $(sticker --missing)
+
+=item --settings I<type>
+
+=over
+
+=item schema
+
+Display the database schema and exit.
+
+=item all
+
+Display all the current settings and exit.
+
+=item I<name>
+
+Display the value for the given setting and exit.
+
+=back
+
+=item --tags
+
+Display the values of all the tags in the database and exit.
+
+=item --update
+
+Update the database with the metadata from the given file(s).
+
+=item --verbose
+
+Make the output verbose.
+
+=item --version
+
+Display the current version and exit.
+
+=back
+
+=head1 DATA DEFINITION
+
+The data which is considered significant needs to be defined before it can be
+used for fields in the database or for meta-data in the files.  Some fields are
+derived from file information from every file (they are read-only).
+Some fields are common for certain file types (such as song-titles in MP3 files),
+but are still read-write rather than just read only.
+Other fields are completely new, and need to be defined more fully.
+
+In addition, there are other data-definition options which are purely
+related to the structure of the database and how queries are handled.
+
+=over
+
+=item primary_table I<name>
+
+Name of the primary table in the database. This contains all the raw data,
+but there are other tables which will be derived from this, for convenience
+and ease of use.
+
+=item topdir I<directory>
+
+If the files you are using are all in the same directory tree,
+this option is for designating what is the top directory in that tree.
+This is used for deriving a number of values related to the file name.
+
+=item wanted_fields I<name>=I<type>
+
+Defines the non-derived fields you want. This includes filetype-specific
+fields which are standard for that filetype; you still need to define these.
+
+The I<name> is the name of the field.
+If the name matches a standard field for that filetype (such as "song"
+for MP3 files) then that specific meta-data is used. Otherwise a new
+field is created for that file.
+
+The I<type> is the type of the field. This can be one of the following:
+
+=over
+
+=item TEXT
+
+Just ordinary text.
+
+=item MULTI
+
+A multi-valued field. Used for things like tags, where you want to
+have multiple values that can be queried separately.
+
+=item NUMBER
+
+A number. Generally only important if you want to access the database
+with your favourite SQLite database tool and do something that you can
+only do with numbers, such as add them up, or order them numerically.
+
+=back
+
+=item field_order I<name>
+
+Defines the order of the fields in the primary database table.
+This is where you say which derived fields you want, as well as the
+non-derived fields you want.
+
+=item taggable_fields I<name>=I<prefix>
+
+Define which fields you want to be used as "tags".
+These may or may not be multi-value fields.
+If this option is used, then a new table (a view) will be created
+called I<primary_table>_info which will be used for queries
+instead of the primary table. It will contain a new field called
+"faceted_tags" which will contain a combination of all the taggable
+fields you define here. If I<prefix> is given, then the values
+from that field will be given that prefix when they are put into
+the "faceted_tags" field.
+If I<prefix> is empty, then either no prefix will be given,
+or, if I<tagprefix> is true, the prefix will be the field name.
+
+=item tagfield I<name>
+
+If you are not using multiple taggable fields, say which field you are
+designating as the "tag" field. This is the field which will be used
+for queries (see I<--query>). If this option is not used, the default
+value is "tags".
+
+=item tagprefix
+
+If this is true, then the values of tag fields will be given
+a prefix which is "I<fieldname>-", the name of that tag field.
+
+=back
+
+=head2 Derived Fields
+
+The following fields are read-only fields derived from the common file
+information:
+
+=over
+
+=item file
+
+The full name of the file.
+
+=item basename
+
+The base-name of the file including the extension.
+
+=item id_name
+
+The base-name of the file excluding the extension.
+
+=item ext
+
+The extension part of the file name.
+
+=item relpath
+
+The path of the file relative to the I<topdir> value.
+If no I<topdir> is given, this field is not derived.
+
+=item thumbnail
+
+The relative path of a thumbnail file. A thumbnail file is a .jpg or .png
+file which is in a ".thumbnails" directory below the given file, and
+has a base-name-without-extension which matches the given file.
+
+If no I<topdir> is given, this field is not derived.
+
+=item grouping
+
+The first three parts of the relative path of the directory file is in; useful
+for grouping together files which are in subdirectories.
+If no I<topdir> is given, this field is not derived.
+
+=item sectionI<N>
+
+The Nth section of the relative path of the directory the file is in.
+Useful if you have put the files into subdirectories with meaningful names.
+If no I<topdir> is given, this field is not derived.
+
+=item filesize
+
+The size of the file.
+
+=item filedate
+
+The modification time of the file.
+
+=back
+
+=cut
+use common::sense;
+use Getopt::Long;
+use Getopt::ArgvFile qw(argvFile);
+use Pod::Usage;
+use File::Basename;
+use File::Spec;
+use YAML::Any;
+use File::Sticker;
+
+#========================================================
+# Subroutines
+
+sub process_args () {
+    my $opts = {
+        tagprefix => 1,
+    };
+
+    # check the rc file
+    my $nameBuilder=sub
+    {
+        my $bn = basename($_[0], '');
+        [".${bn}rc", ".${bn}/config", ".config/${bn}/config"];
+    };
+    argvFile(
+        startupFilename=>$nameBuilder,
+        home=>1,
+        current=>1);
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($opts,
+	       'verbose+',
+	       'manpage',
+	       'manpage',
+	       'dbname=s',
+	       'topdir=s',
+               'primary_table|table=s',
+               'tagfield=s',
+	       'wanted_fields=s%',
+	       'field_order=s@',
+	       'taggable_fields=s%',
+               'tagprefix!',
+               'query|q',
+               'quiet',
+               'removed|rm',
+               'missing',
+               'overlooked',
+               'update',
+               'db_info|dinfo',
+               'file_info|finfo',
+               'tags',
+               'settings=s',
+               'derive!',
+               'extract!',
+               'from_file=s',
+	       'add=s%',
+	       'delete=s@',
+	      ) or pod2usage(2);
+
+    if ($opts->{manpage})
+    {
+	pod2usage({ -message => "$0 ",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+
+    if ($opts->{verbose} > 1)
+    {
+        print STDERR "========\n", Dump($opts), "========\n";
+    }
+    return $opts;
+} # process_args
+
+sub print_meta {
+    my $opts = shift;
+    my %args = @_;
+
+    my $sticker = $args{sticker};
+    my $filename = $args{filename};
+
+    say STDERR "== $filename ==";
+    my $meta = $sticker->read_meta($filename);
+    print STDERR Dump($meta);
+} # print_meta
+
+sub meta_from_file {
+    my $opts = shift;
+    my %args = @_;
+
+    my $sticker = $args{sticker};
+    my $filename = $args{filename};
+    my $from_file = $args{from_file};
+
+    my $meta = $sticker->read_meta($from_file);
+
+    $sticker->replace_all_meta(filename=>$filename,meta=>$meta);
+} # meta_from_file
+
+sub do_stuff {
+    my $opts = shift;
+    my $sticker = shift;
+
+    if ($opts->{query})
+    {
+        my $query_string = join(' ', @ARGV);
+        my $files = $sticker->query_by_tags($query_string);
+        say join("\n", @{$files});
+    }
+    if ($opts->{missing})
+    {
+        my $files = $sticker->missing_files();
+        say join("\n", @{$files});
+    }
+    if ($opts->{overlooked})
+    {
+        my $files = $sticker->overlooked_files(@ARGV);
+        say join("\n", @{$files});
+    }
+    if ($opts->{tags})
+    {
+        my $tags = $sticker->list_tags();
+        say join("\n", @{$tags});
+    }
+
+    if ($opts->{removed}
+            or $opts->{add}
+            or $opts->{delete}
+            or $opts->{extract}
+            or $opts->{from_file}
+            or $opts->{db_info}
+            or $opts->{file_info})
+    {
+        #
+        # This invocation is a per-file operation.
+        #
+        foreach my $file (@ARGV)
+        {
+            print STDERR "$file\n" if $opts->{verbose};
+
+            if ($opts->{removed})
+            {
+                $sticker->delete_file_from_db($file);
+            }
+            elsif ($opts->{add} or $opts->{delete})
+            {
+                if ($opts->{add})
+                {
+                    print STDERR Dump($opts->{add}) if $opts->{verbose} > 1;
+                    foreach my $fn (keys %{$opts->{add}})
+                    {
+                        $sticker->add_field_to_file(
+                            filename => $file,
+                            field => $fn,
+                            value => $opts->{add}->{$fn});
+                        if ($opts->{verbose})
+                        {
+                            print_meta($opts,sticker=>$sticker,filename=>$file);
+                        }
+                    }
+                }
+                if ($opts->{delete})
+                {
+                    foreach my $fn (@{$opts->{delete}})
+                    {
+                        $sticker->delete_field_from_file(
+                            filename => $file,
+                            field => $fn);
+                    }
+                }
+            }
+            elsif ($opts->{extract})
+            {
+                meta_from_file($opts,sticker=>$sticker,filename=>$file,from_file=>$file);
+                if ($opts->{verbose})
+                {
+                    print_meta($opts,sticker=>$sticker,filename=>$file);
+                }
+            }
+            elsif ($opts->{from_file})
+            {
+                meta_from_file($opts,sticker=>$sticker,filename=>$file,from_file=>$opts->{from_file});
+                if ($opts->{verbose})
+                {
+                    print_meta($opts,sticker=>$sticker,filename=>$file);
+                }
+            }
+            elsif ($opts->{db_info})
+            {
+                my $db_meta = $sticker->query_one_file($file);
+                say $file, ': ', Dump($db_meta) if $db_meta;
+            }
+            elsif ($opts->{file_info})
+            {
+                my $file_meta = $sticker->read_meta($file);
+                say "== $file ==";
+                print Dump($file_meta);
+            }
+        }
+    }
+
+    # if we are updating, do it after we have made any other changes
+    if ($opts->{update})
+    {
+        $sticker->update_db(@ARGV);
+    }
+
+} # do_stuff
+
+#========================================================
+# Main
+
+MAIN: {
+    my $opts = process_args();
+    my $sticker = File::Sticker->new(
+        dbname=>$opts->{dbname},
+        topdir=>$opts->{topdir},
+        wanted_fields=>$opts->{wanted_fields},
+        field_order=>$opts->{field_order},
+        taggable_fields=>$opts->{taggable_fields},
+        primary_table=>$opts->{primary_table},
+        derive=>$opts->{derive},
+        tagfield=>$opts->{tagfield},
+        tagprefix=>$opts->{tagprefix},
+        verbose=>$opts->{verbose},
+        quiet=>$opts->{quiet},
+    );
+    if ($opts->{settings})
+    {
+        if (exists $opts->{$opts->{settings}}
+                and defined $opts->{$opts->{settings}})
+        {
+            printf "%s: %s\n", $opts->{settings}, $opts->{$opts->{settings}};
+        }
+        elsif ($opts->{settings} eq 'schema')
+        {
+            my $cmd = sprintf("echo .schema | sqlite3 %s", $opts->{dbname});
+            system($cmd);
+        }
+        else
+        {
+            print "========\n", Dump($opts), "========\n";
+        }
+        exit;
+    }
+
+    do_stuff($opts,$sticker);
+}

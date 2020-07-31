@@ -14,6 +14,7 @@ t/00-compile.t
 t/avoid-callback-on-empty-input.t
 t/system-test--process-batch.t
 t/system-test--stream-cb.t
+t/system-test-1--without-arefs.t
 t/system-test-1.t
 weaver.ini
 xt/author/eol.t

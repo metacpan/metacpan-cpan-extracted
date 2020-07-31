@@ -1,14 +1,13 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "The price for the delivery of an offer using a particular delivery method.",
       "rdfs:label" : "DeliveryChargeSpecification",
-      "rdfs:subClassOf" : "schema:PriceSpecification"
+      "rdfs:subClassOf" : "schema:PriceSpecification",
+      "schema:source" : "schemadotorgsources:source_GoodRelationsClass"
    },
    "properties" : {
       "schema:appliesToDeliveryMethod" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The delivery method(s) to which the delivery charge or payment charge specification applies.",
          "rdfs:label" : "appliesToDeliveryMethod",
@@ -16,67 +15,68 @@
             "schema:PaymentChargeSpecification",
             "schema:DeliveryChargeSpecification"
          ],
-         "schema:rangeIncludes" : "schema:DeliveryMethod"
+         "schema:rangeIncludes" : "schema:DeliveryMethod",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:areaServed" : {
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The geographic area where a service or offered item is provided.",
          "rdfs:label" : "areaServed",
          "schema:domainIncludes" : [
-            "schema:ContactPoint",
+            "schema:Offer",
+            "schema:Organization",
             "schema:DeliveryChargeSpecification",
             "schema:Service",
-            "schema:Organization",
             "schema:Demand",
-            "schema:Offer"
+            "schema:ContactPoint"
          ],
          "schema:rangeIncludes" : [
             "schema:Text",
             "schema:AdministrativeArea",
-            "schema:Place",
-            "schema:GeoShape"
+            "schema:GeoShape",
+            "schema:Place"
          ]
       },
       "schema:eligibleRegion" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1741",
-            "schemadotorgsources:source_GoodRelationsTerms"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is valid.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/ineligibleRegion\">ineligibleRegion</a>.",
          "rdfs:label" : "eligibleRegion",
          "rdfs:subPropertyOf" : "schema:areaServed",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
+            "schema:Demand",
             "schema:Offer",
-            "schema:ActionAccessSpecification",
             "schema:DeliveryChargeSpecification",
-            "schema:Demand"
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:Place",
+            "schema:Text",
             "schema:GeoShape",
-            "schema:Text"
+            "schema:Place"
+         ],
+         "schema:source" : [
+            "schemadotorgsources:source_GoodRelationsTerms",
+            "https://github.com/schemaorg/schemaorg/issues/1741"
          ]
       },
       "schema:ineligibleRegion" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2242",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The ISO 3166-1 (ISO 3166-1 alpha-2) or ISO 3166-2 code, the place, or the GeoShape for the geo-political region(s) for which the offer or delivery charge specification is not valid, e.g. a region where the transaction is not allowed.<br/><br/>\n\nSee also <a class=\"localLink\" href=\"http://schema.org/eligibleRegion\">eligibleRegion</a>.",
          "rdfs:label" : "ineligibleRegion",
          "schema:category" : "issue-2242",
          "schema:domainIncludes" : [
-            "schema:Demand",
-            "schema:DeliveryChargeSpecification",
             "schema:ActionAccessSpecification",
-            "schema:Offer"
+            "schema:Offer",
+            "schema:DeliveryChargeSpecification",
+            "schema:Demand"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
             "schema:Text",
             "schema:Place",
             "schema:GeoShape"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2242"
       }
    }
 }

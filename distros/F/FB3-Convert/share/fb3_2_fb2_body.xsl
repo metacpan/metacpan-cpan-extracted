@@ -227,7 +227,10 @@
 	<xsl:template match="fb3b:br" mode="stanza"/>
 
 	<xsl:template match="fb3b:table">
-		<table><xsl:apply-templates/></table>
+		<table>
+			<xsl:if test="@id"><xsl:attribute name="id">u<xsl:value-of select="@id"/></xsl:attribute></xsl:if>
+			<xsl:apply-templates/>
+		</table>
 	</xsl:template>
 	<xsl:template match="fb3b:tr">
 		<tr><xsl:apply-templates/></tr>
@@ -237,6 +240,7 @@
 	</xsl:template>
 	<xsl:template match="fb3b:td">
 		<td>
+			<xsl:if test="@id"><xsl:attribute name="id">u<xsl:value-of select="@id"/></xsl:attribute></xsl:if>
 			<xsl:if test="@align"><xsl:attribute name="align"><xsl:value-of select="@align"/></xsl:attribute></xsl:if>
 			<xsl:if test="@colspan"><xsl:attribute name="colspan"><xsl:value-of select="@colspan"/></xsl:attribute></xsl:if>
 			<xsl:if test="@rowspan"><xsl:attribute name="rowspan"><xsl:value-of select="@rowspan"/></xsl:attribute></xsl:if>

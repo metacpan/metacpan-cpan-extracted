@@ -90,6 +90,9 @@ lib/SemanticWeb/Schema/Blog.pm
 lib/SemanticWeb/Schema/BlogPosting.pm
 lib/SemanticWeb/Schema/BloodTest.pm
 lib/SemanticWeb/Schema/BoardingPolicyType.pm
+lib/SemanticWeb/Schema/BoatReservation.pm
+lib/SemanticWeb/Schema/BoatTerminal.pm
+lib/SemanticWeb/Schema/BoatTrip.pm
 lib/SemanticWeb/Schema/BodyOfWater.pm
 lib/SemanticWeb/Schema/Bone.pm
 lib/SemanticWeb/Schema/Book.pm
@@ -394,6 +397,7 @@ lib/SemanticWeb/Schema/LakeBodyOfWater.pm
 lib/SemanticWeb/Schema/Landform.pm
 lib/SemanticWeb/Schema/LandmarksOrHistoricalBuildings.pm
 lib/SemanticWeb/Schema/Language.pm
+lib/SemanticWeb/Schema/LearningResource.pm
 lib/SemanticWeb/Schema/LeaveAction.pm
 lib/SemanticWeb/Schema/LegalForceStatus.pm
 lib/SemanticWeb/Schema/LegalService.pm
@@ -434,6 +438,7 @@ lib/SemanticWeb/Schema/MediaObject.pm
 lib/SemanticWeb/Schema/MediaReview.pm
 lib/SemanticWeb/Schema/MediaSubscription.pm
 lib/SemanticWeb/Schema/MedicalAudience.pm
+lib/SemanticWeb/Schema/MedicalAudienceType.pm
 lib/SemanticWeb/Schema/MedicalBusiness.pm
 lib/SemanticWeb/Schema/MedicalCause.pm
 lib/SemanticWeb/Schema/MedicalClinic.pm
@@ -520,6 +525,7 @@ lib/SemanticWeb/Schema/MusicStore.pm
 lib/SemanticWeb/Schema/MusicVenue.pm
 lib/SemanticWeb/Schema/MusicVideoObject.pm
 lib/SemanticWeb/Schema/NGO.pm
+lib/SemanticWeb/Schema/NLNonprofitType.pm
 lib/SemanticWeb/Schema/NailSalon.pm
 lib/SemanticWeb/Schema/Nerve.pm
 lib/SemanticWeb/Schema/NewsArticle.pm
@@ -611,6 +617,8 @@ lib/SemanticWeb/Schema/PresentationDigitalDocument.pm
 lib/SemanticWeb/Schema/PreventionIndication.pm
 lib/SemanticWeb/Schema/PriceSpecification.pm
 lib/SemanticWeb/Schema/Product.pm
+lib/SemanticWeb/Schema/ProductCollection.pm
+lib/SemanticWeb/Schema/ProductGroup.pm
 lib/SemanticWeb/Schema/ProductModel.pm
 lib/SemanticWeb/Schema/ProductReturnEnumeration.pm
 lib/SemanticWeb/Schema/ProductReturnPolicy.pm
@@ -633,6 +641,7 @@ lib/SemanticWeb/Schema/QuantitativeValue.pm
 lib/SemanticWeb/Schema/QuantitativeValueDistribution.pm
 lib/SemanticWeb/Schema/Quantity.pm
 lib/SemanticWeb/Schema/Question.pm
+lib/SemanticWeb/Schema/Quiz.pm
 lib/SemanticWeb/Schema/Quotation.pm
 lib/SemanticWeb/Schema/QuoteAction.pm
 lib/SemanticWeb/Schema/RVPark.pm
@@ -735,9 +744,11 @@ lib/SemanticWeb/Schema/SpreadsheetDigitalDocument.pm
 lib/SemanticWeb/Schema/StadiumOrArena.pm
 lib/SemanticWeb/Schema/State.pm
 lib/SemanticWeb/Schema/StatisticalPopulation.pm
+lib/SemanticWeb/Schema/StatusEnumeration.pm
 lib/SemanticWeb/Schema/SteeringPositionValue.pm
 lib/SemanticWeb/Schema/Store.pm
 lib/SemanticWeb/Schema/StructuredValue.pm
+lib/SemanticWeb/Schema/StupidType.pm
 lib/SemanticWeb/Schema/SubscribeAction.pm
 lib/SemanticWeb/Schema/Substance.pm
 lib/SemanticWeb/Schema/SubwayStation.pm
@@ -786,6 +797,8 @@ lib/SemanticWeb/Schema/TravelAgency.pm
 lib/SemanticWeb/Schema/TreatmentIndication.pm
 lib/SemanticWeb/Schema/Trip.pm
 lib/SemanticWeb/Schema/TypeAndQuantityNode.pm
+lib/SemanticWeb/Schema/UKNonprofitType.pm
+lib/SemanticWeb/Schema/USNonprofitType.pm
 lib/SemanticWeb/Schema/UnRegisterAction.pm
 lib/SemanticWeb/Schema/UnitPriceSpecification.pm
 lib/SemanticWeb/Schema/UpdateAction.pm
@@ -926,6 +939,9 @@ t/data/classes/SemanticWeb/Schema/Blog.json
 t/data/classes/SemanticWeb/Schema/BlogPosting.json
 t/data/classes/SemanticWeb/Schema/BloodTest.json
 t/data/classes/SemanticWeb/Schema/BoardingPolicyType.json
+t/data/classes/SemanticWeb/Schema/BoatReservation.json
+t/data/classes/SemanticWeb/Schema/BoatTerminal.json
+t/data/classes/SemanticWeb/Schema/BoatTrip.json
 t/data/classes/SemanticWeb/Schema/BodyOfWater.json
 t/data/classes/SemanticWeb/Schema/Bone.json
 t/data/classes/SemanticWeb/Schema/Book.json
@@ -1234,6 +1250,7 @@ t/data/classes/SemanticWeb/Schema/LakeBodyOfWater.json
 t/data/classes/SemanticWeb/Schema/Landform.json
 t/data/classes/SemanticWeb/Schema/LandmarksOrHistoricalBuildings.json
 t/data/classes/SemanticWeb/Schema/Language.json
+t/data/classes/SemanticWeb/Schema/LearningResource.json
 t/data/classes/SemanticWeb/Schema/LeaveAction.json
 t/data/classes/SemanticWeb/Schema/LegalForceStatus.json
 t/data/classes/SemanticWeb/Schema/LegalService.json
@@ -1274,6 +1291,7 @@ t/data/classes/SemanticWeb/Schema/MediaObject.json
 t/data/classes/SemanticWeb/Schema/MediaReview.json
 t/data/classes/SemanticWeb/Schema/MediaSubscription.json
 t/data/classes/SemanticWeb/Schema/MedicalAudience.json
+t/data/classes/SemanticWeb/Schema/MedicalAudienceType.json
 t/data/classes/SemanticWeb/Schema/MedicalBusiness.json
 t/data/classes/SemanticWeb/Schema/MedicalCause.json
 t/data/classes/SemanticWeb/Schema/MedicalClinic.json
@@ -1361,6 +1379,7 @@ t/data/classes/SemanticWeb/Schema/MusicStore.json
 t/data/classes/SemanticWeb/Schema/MusicVenue.json
 t/data/classes/SemanticWeb/Schema/MusicVideoObject.json
 t/data/classes/SemanticWeb/Schema/NGO.json
+t/data/classes/SemanticWeb/Schema/NLNonprofitType.json
 t/data/classes/SemanticWeb/Schema/NailSalon.json
 t/data/classes/SemanticWeb/Schema/Nerve.json
 t/data/classes/SemanticWeb/Schema/NewsArticle.json
@@ -1452,6 +1471,8 @@ t/data/classes/SemanticWeb/Schema/PresentationDigitalDocument.json
 t/data/classes/SemanticWeb/Schema/PreventionIndication.json
 t/data/classes/SemanticWeb/Schema/PriceSpecification.json
 t/data/classes/SemanticWeb/Schema/Product.json
+t/data/classes/SemanticWeb/Schema/ProductCollection.json
+t/data/classes/SemanticWeb/Schema/ProductGroup.json
 t/data/classes/SemanticWeb/Schema/ProductModel.json
 t/data/classes/SemanticWeb/Schema/ProductReturnEnumeration.json
 t/data/classes/SemanticWeb/Schema/ProductReturnPolicy.json
@@ -1475,6 +1496,7 @@ t/data/classes/SemanticWeb/Schema/QuantitativeValue.json
 t/data/classes/SemanticWeb/Schema/QuantitativeValueDistribution.json
 t/data/classes/SemanticWeb/Schema/Quantity.json
 t/data/classes/SemanticWeb/Schema/Question.json
+t/data/classes/SemanticWeb/Schema/Quiz.json
 t/data/classes/SemanticWeb/Schema/Quotation.json
 t/data/classes/SemanticWeb/Schema/QuoteAction.json
 t/data/classes/SemanticWeb/Schema/RVPark.json
@@ -1577,9 +1599,11 @@ t/data/classes/SemanticWeb/Schema/SpreadsheetDigitalDocument.json
 t/data/classes/SemanticWeb/Schema/StadiumOrArena.json
 t/data/classes/SemanticWeb/Schema/State.json
 t/data/classes/SemanticWeb/Schema/StatisticalPopulation.json
+t/data/classes/SemanticWeb/Schema/StatusEnumeration.json
 t/data/classes/SemanticWeb/Schema/SteeringPositionValue.json
 t/data/classes/SemanticWeb/Schema/Store.json
 t/data/classes/SemanticWeb/Schema/StructuredValue.json
+t/data/classes/SemanticWeb/Schema/StupidType.json
 t/data/classes/SemanticWeb/Schema/SubscribeAction.json
 t/data/classes/SemanticWeb/Schema/Substance.json
 t/data/classes/SemanticWeb/Schema/SubwayStation.json
@@ -1629,7 +1653,9 @@ t/data/classes/SemanticWeb/Schema/TravelAgency.json
 t/data/classes/SemanticWeb/Schema/TreatmentIndication.json
 t/data/classes/SemanticWeb/Schema/Trip.json
 t/data/classes/SemanticWeb/Schema/TypeAndQuantityNode.json
+t/data/classes/SemanticWeb/Schema/UKNonprofitType.json
 t/data/classes/SemanticWeb/Schema/URL.json
+t/data/classes/SemanticWeb/Schema/USNonprofitType.json
 t/data/classes/SemanticWeb/Schema/UnRegisterAction.json
 t/data/classes/SemanticWeb/Schema/UnitPriceSpecification.json
 t/data/classes/SemanticWeb/Schema/UpdateAction.json

@@ -6,7 +6,7 @@ package MoopsX::TraitFor::Parser::UsingMoose;
 
 # ABSTRACT: A Moops::Parser traits that sets 'using Moose'
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0102';
+our $VERSION = '0.0103';
 
 use Moo::Role;
 
@@ -28,7 +28,7 @@ MoopsX::TraitFor::Parser::UsingMoose - A Moops::Parser traits that sets 'using M
 
 =head1 VERSION
 
-Version 0.0102, released 2017-11-28.
+Version 0.0103, released 2020-07-29.
 
 =head1 SYNOPSIS
 

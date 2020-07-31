@@ -1,5 +1,9 @@
 Revision history for MooX-Const:
 
+v0.4.4    2020-07-31 14:44:28+01:00 Europe/London
+  [Toolchain]
+  - Add core modules in the prerequisites.
+
 v0.4.3    2020-01-10 12:08:40+00:00 Europe/London
   [Documentation]
   - Added a note about using with Moose and Mouse.

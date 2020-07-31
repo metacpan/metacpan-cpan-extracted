@@ -1,5 +1,5 @@
 <&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 0, class_name => 'RoundRobin' &>
-<p>This chooser selects the user for whom it has been the longest amount of time since they were last automatically assigned a ticket in the same queue. This effectively distributes the tickets evenly between the userbase in a round robin fashion, even if users enter and leave the pool.</p>
+<p><&|/l&>This chooser selects the user for whom it has been the longest amount of time since they were last automatically assigned a ticket in the same queue. This effectively distributes the tickets evenly between the userbase in a round robin fashion, even if users enter and leave the pool.</&></p>
 </&>
 <%ARGS>
 $prefix

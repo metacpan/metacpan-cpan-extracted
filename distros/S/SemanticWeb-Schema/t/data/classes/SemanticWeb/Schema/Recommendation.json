@@ -1,38 +1,38 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2405",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "<a class=\"localLink\" href=\"http://schema.org/Recommendation\">Recommendation</a> is a type of <a class=\"localLink\" href=\"http://schema.org/Review\">Review</a> that suggests or proposes something as the best option or best course of action. Recommendations may be for products or services, or other concrete things, as in the case of a ranked list or product guide. A <a class=\"localLink\" href=\"http://schema.org/Guide\">Guide</a> may list multiple recommendations for different categories. For example, in a <a class=\"localLink\" href=\"http://schema.org/Guide\">Guide</a> about which TVs to buy, the author may have several <a class=\"localLink\" href=\"http://schema.org/Recommendation\">Recommendation</a>s.",
       "rdfs:label" : "Recommendation",
       "rdfs:subClassOf" : "schema:Review",
       "schema:category" : "issue-2405",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2405"
    },
    "properties" : {
       "schema:category" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/1741",
-            "https://github.com/schemaorg/schemaorg/issues/2490"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A category for the item. Greater signs or slashes can be used to informally indicate a category hierarchy.",
          "rdfs:label" : "category",
          "schema:category" : "issue-1741",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:Invoice",
-            "schema:Product",
             "schema:Recommendation",
-            "schema:ActionAccessSpecification",
             "schema:Offer",
+            "schema:Invoice",
+            "schema:PhysicalActivity",
             "schema:SpecialAnnouncement",
-            "schema:Service"
+            "schema:Service",
+            "schema:Product",
+            "schema:ActionAccessSpecification"
          ],
          "schema:rangeIncludes" : [
-            "schema:URL",
-            "schema:Thing",
             "schema:PhysicalActivityCategory",
-            "schema:Text"
+            "schema:Thing",
+            "schema:Text",
+            "schema:URL"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2490",
+            "https://github.com/schemaorg/schemaorg/issues/1741"
          ]
       }
    }

@@ -1,0 +1,28 @@
+{
+   "class" : {
+      "rdf:type" : "rdfs:Class",
+      "rdfs:comment" : "A set of products (either <a class=\"localLink\" href=\"http://schema.org/ProductGroup\">ProductGroup</a>s or specific variants) that are listed together e.g. in an <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a>.",
+      "rdfs:label" : "ProductCollection",
+      "rdfs:subClassOf" : [
+         "schema:Collection",
+         "schema:Product"
+      ],
+      "schema:category" : "issue-2597",
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2597"
+   },
+   "properties" : {
+      "schema:includesObject" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "This links to a node or nodes indicating the exact quantity of the products included in  an <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a> or <a class=\"localLink\" href=\"http://schema.org/ProductCollection\">ProductCollection</a>.",
+         "rdfs:label" : "includesObject",
+         "schema:domainIncludes" : [
+            "schema:Demand",
+            "schema:Offer",
+            "schema:ProductCollection"
+         ],
+         "schema:rangeIncludes" : "schema:TypeAndQuantityNode",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
+      }
+   }
+}

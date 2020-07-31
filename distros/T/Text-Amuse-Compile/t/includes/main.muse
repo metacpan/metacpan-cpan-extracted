@@ -1,0 +1,12 @@
+#title Inclusions
+
+Here we go
+
+{{{
+#include includes/file.conf
+}}}
+
+#include includes/file.muse
+
+#include /etc/passwd
+

@@ -35,9 +35,9 @@
          "rdfs:comment" : "Specifying a drug or medicine used in a medication procedure",
          "rdfs:label" : "drug",
          "schema:domainIncludes" : [
-            "schema:Patient",
             "schema:TherapeuticProcedure",
             "schema:MedicalCondition",
+            "schema:Patient",
             "schema:DrugClass"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
@@ -48,8 +48,8 @@
          "rdfs:comment" : "The characteristics of associated patients, such as age, gender, race etc.",
          "rdfs:label" : "epidemiology",
          "schema:domainIncludes" : [
-            "schema:MedicalCondition",
-            "schema:PhysicalActivity"
+            "schema:PhysicalActivity",
+            "schema:MedicalCondition"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -75,8 +75,8 @@
          "rdfs:comment" : "Changes in the normal mechanical, physical, and biochemical functions that are associated with this activity or condition.",
          "rdfs:label" : "pathophysiology",
          "schema:domainIncludes" : [
-            "schema:PhysicalActivity",
-            "schema:MedicalCondition"
+            "schema:MedicalCondition",
+            "schema:PhysicalActivity"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text"
@@ -146,14 +146,14 @@
          "rdfs:label" : "status",
          "schema:domainIncludes" : [
             "schema:MedicalCondition",
-            "schema:MedicalProcedure",
-            "schema:MedicalStudy"
+            "schema:MedicalStudy",
+            "schema:MedicalProcedure"
          ],
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : [
-            "schema:MedicalStudyStatus",
             "schema:EventStatusType",
-            "schema:Text"
+            "schema:Text",
+            "schema:MedicalStudyStatus"
          ]
       },
       "schema:typicalTest" : {

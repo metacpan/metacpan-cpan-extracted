@@ -12,6 +12,7 @@ my @files = (
     't/avoid-callback-on-empty-input.t',
     't/system-test--process-batch.t',
     't/system-test--stream-cb.t',
+    't/system-test-1--without-arefs.t',
     't/system-test-1.t'
 );
 

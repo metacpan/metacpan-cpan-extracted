@@ -1,5 +1,5 @@
 <&| /Admin/Queues/Elements/SortableBox, prefix => $prefix, is_filter => 0, class_name => 'ActiveTickets' &>
-<p>This chooser selects the user with the fewest number of active tickets. If multiple users have the same number of tickets, then the ticket is assigned randomly to one of them.</p>
+<p><&|/l&>This chooser selects the user with the fewest number of active tickets. If multiple users have the same number of tickets, then the ticket is assigned randomly to one of them.</&></p>
 </&>
 <%ARGS>
 $prefix

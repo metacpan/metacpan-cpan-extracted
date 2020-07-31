@@ -1,76 +1,76 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A DefinedRegion is a geographic area defined by potentially arbitrary (rather than political, administrative or natural geographical) criteria. Properties are provided for defining a region by reference to sets of postal codes.<br/><br/>\n\nExamples: a delivery destination when shopping. Region where regional pricing is configured.<br/><br/>\n\nRequirement 1:\nCountry: US\nStates: \"NY\", \"CA\"<br/><br/>\n\nRequirement 2:\nCountry: US\nPostalCode Set: { [94000-94585], [97000, 97999], [13000, 13599]}\n{ [12345, 12345], [78945, 78945], }\nRegion = state, canton, prefecture, autonomous community...",
       "rdfs:label" : "DefinedRegion",
       "rdfs:subClassOf" : "schema:StructuredValue",
       "schema:category" : "issue-2506",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
    },
    "properties" : {
       "schema:addressCountry" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The country. For example, USA. You can also provide the two-letter <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1\">ISO 3166-1 alpha-2 country code</a>.",
          "rdfs:label" : "addressCountry",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
-            "schema:GeoCoordinates",
-            "schema:DefinedRegion",
             "schema:GeoShape",
+            "schema:DefinedRegion",
+            "schema:GeoCoordinates",
             "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : [
             "schema:Country",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:addressRegion" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The region in which the locality is, and which is in the country. For example, California or another appropriate first-level <a href=\"https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country\">Administrative division</a>",
          "rdfs:label" : "addressRegion",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
-            "schema:DefinedRegion",
-            "schema:PostalAddress"
+            "schema:PostalAddress",
+            "schema:DefinedRegion"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:postalCode" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The postal code. For example, 94043.",
          "rdfs:label" : "postalCode",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
-            "schema:DefinedRegion",
-            "schema:PostalAddress",
             "schema:GeoShape",
-            "schema:GeoCoordinates"
+            "schema:PostalAddress",
+            "schema:GeoCoordinates",
+            "schema:DefinedRegion"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:postalCodePrefix" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A defined range of postal codes indicated by a common textual prefix. Used for non-numeric systems such as UK.",
          "rdfs:label" : "postalCodePrefix",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : "schema:DefinedRegion",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:postalCodeRange" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "A defined range of postal codes.",
          "rdfs:label" : "postalCodeRange",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : "schema:DefinedRegion",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:PostalCodeRangeSpecification"
+         "schema:rangeIncludes" : "schema:PostalCodeRangeSpecification",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       }
    }
 }

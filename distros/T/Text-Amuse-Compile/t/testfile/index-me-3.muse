@@ -1,0 +1,33 @@
+#title Index
+#lang en
+
+STARTHERE
+
+<comment>
+INDEX names: *Index*
+First
+Second
+Third
+Forth
+Fifth
+</comment>
+
+* First Fifth
+
+** Second
+
+*** Third
+
+        * * * * *
+
+**** Forth
+
+***** Fifth
+
+        * * * * *
+
+; First Second Third Forth Fifth
+
+Here we go
+
+ENDHERE

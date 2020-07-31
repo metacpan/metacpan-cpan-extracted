@@ -1,7 +1,7 @@
 package Test::TempDir::Handle;
 # ABSTRACT: A handle for managing a temporary directory root
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Moose;
 use MooseX::Types::Path::Class qw(Dir);
@@ -13,13 +13,6 @@ has dir => (
     isa => Dir,
     is  => "ro",
     handles => [qw(file subdir rmtree)],
-);
-
-has lock => (
-    isa => "File::NFSLock",
-    is  => "ro",
-    predicate => "has_lock",
-    clearer   => "clear_lock",
 );
 
 has cleanup_policy => (
@@ -59,16 +52,7 @@ sub delete {
 }
 
 sub release_lock {
-    my $self = shift;
-
-    $self->clear_lock;
-
-    # FIXME always unlock? or allow people to keep the locks around by enrefing them?
-
-    #if ( $self->has_lock ) {
-    #    $self->lock->unlock;
-    #    $self->clear_lock;
-    #}
+    # no more File::NFSLock
 }
 
 sub DEMOLISH {
@@ -120,7 +104,7 @@ Test::TempDir::Handle - A handle for managing a temporary directory root
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -146,7 +130,7 @@ The L<Path::Class::Dir> that is being managed.
 
 =head2 C<lock>
 
-An optional lock object (L<File::NFSLock>). Just kept around for reference counting.
+No longer used.
 
 =head2 C<cleanup_policy>
 
@@ -175,11 +159,22 @@ Calls C<delete> if the C<cleanup_policy> dictates to do so.
 
 This is normally called automatically at destruction.
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Test-TempDir>
+(or L<bug-Test-TempDir@rt.cpan.org|mailto:bug-Test-TempDir@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://lists.perl.org/list/perl-qa.html>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#perl> on C<irc.perl.org>|irc://irc.perl.org/#perl-qa>.
+
 =head1 AUTHOR
 
 יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2006 by יובל קוג'מן (Yuval Kogman).
 

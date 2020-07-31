@@ -1,11 +1,11 @@
 {
    "class" : {
-      "dc:source" : "id:Thesis",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A thesis or dissertation document submitted in support of candidature for an academic degree or professional qualification.",
       "rdfs:label" : "Thesis",
       "rdfs:subClassOf" : "schema:CreativeWork",
-      "schema:isPartOf" : "http:bib.schema.org"
+      "schema:isPartOf" : "http:bib.schema.org",
+      "schema:source" : "id:Thesis"
    },
    "properties" : {
       "schema:inSupportOf" : {

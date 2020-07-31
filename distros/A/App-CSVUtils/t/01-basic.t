@@ -23,9 +23,19 @@ write_text("$dir/no-header-1.csv", "1,2,3\n4,5,6\n7,8,9\n");
 
 write_text("$dir/1.tsv", "f1\tf2\tf3\n1\t2\t3\n4\t5\t6\n7\t8\t9\n");
 
+write_text("$dir/sep_char-semicolon.csv", "f1;f2\n1;2\n3;4\n");
+
 write_text("$dir/sort-rows.csv", qq(f1,f2\n2,andy\n1,Andy\n10,Chuck\n));
 
 # XXX test with opt: --no-header
+
+subtest "common option: sep_char" => sub {
+    my $res;
+
+    $res = App::CSVUtils::csv_dump(filename=>"$dir/sep_char-semicolon.csv", sep_char=>";");
+    is_deeply($res, [200,"OK",[["f1","f2"],[1,2],[3,4]]])
+        or diag explain $res;
+};
 
 subtest csv_add_field => sub {
     my $res;

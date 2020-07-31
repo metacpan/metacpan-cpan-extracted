@@ -4,7 +4,7 @@ Alien::TidyHTML5 - Download and install HTML Tidy
 
 # VERSION
 
-version v0.3.1
+version v0.3.2
 
 # DESCRIPTION
 
@@ -57,7 +57,7 @@ Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2018,2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

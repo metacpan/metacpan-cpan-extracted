@@ -29,12 +29,15 @@ do { my $x = {
                                         'Types::Const' => 'v0.3.6'
                                       },
                       'requires' => {
+                                      'Carp' => '0',
                                       'Devel::StrictMode' => '0',
                                       'Moo' => '1.006000',
+                                      'Scalar::Util' => '0',
                                       'Types::Const' => 'v0.3.3',
                                       'Types::Standard' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.1'
+                                      'perl' => 'v5.10.1',
+                                      'utf8' => '0'
                                     }
                     },
        'test' => {
@@ -50,7 +53,9 @@ do { my $x = {
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'if' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

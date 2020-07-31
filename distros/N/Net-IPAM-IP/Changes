@@ -1,5 +1,8 @@
 Revision history for Net-IPAM-IP
 
+1.23    Wed, 29 Jul 2020 16:49:12 +0200
+        * implement decr for faster algo in find_free_cidrs in Net::IPAM::Block
+
 1.23    Sun, 14 Jun 2020 22:50:21 +0200
         * better KISS increment algorithm, even speeds up incr_n in most cases
 

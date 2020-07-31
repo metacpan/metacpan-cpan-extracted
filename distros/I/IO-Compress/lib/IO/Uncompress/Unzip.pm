@@ -9,14 +9,14 @@ use warnings;
 use bytes;
 
 use IO::File;
-use IO::Uncompress::RawInflate  2.095 ;
-use IO::Compress::Base::Common  2.095 qw(:Status );
-use IO::Uncompress::Adapter::Inflate  2.095 ;
-use IO::Uncompress::Adapter::Identity 2.095 ;
-use IO::Compress::Zlib::Extra 2.095 ;
-use IO::Compress::Zip::Constants 2.095 ;
+use IO::Uncompress::RawInflate  2.096 ;
+use IO::Compress::Base::Common  2.096 qw(:Status );
+use IO::Uncompress::Adapter::Inflate  2.096 ;
+use IO::Uncompress::Adapter::Identity 2.096 ;
+use IO::Compress::Zlib::Extra 2.096 ;
+use IO::Compress::Zip::Constants 2.096 ;
 
-use Compress::Raw::Zlib  2.095 () ;
+use Compress::Raw::Zlib  2.096 () ;
 
 BEGIN
 {
@@ -27,6 +27,10 @@ BEGIN
           import  IO::Uncompress::Adapter::Bunzip2 } ;
     eval{ require IO::Uncompress::Adapter::UnLzma ;
           import  IO::Uncompress::Adapter::UnLzma } ;
+    eval{ require IO::Uncompress::Adapter::UnXz ;
+          import  IO::Uncompress::Adapter::UnXz } ;
+    eval{ require IO::Uncompress::Adapter::UnZstd ;
+          import  IO::Uncompress::Adapter::UnZstd } ;
 }
 
 
@@ -34,7 +38,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $UnzipError, %headerLookup);
 
-$VERSION = '2.095';
+$VERSION = '2.096';
 $UnzipError = '';
 
 @ISA    = qw(IO::Uncompress::RawInflate Exporter);
@@ -51,6 +55,15 @@ Exporter::export_ok_tags('all');
         ZIP64_ARCHIVE_EXTRA_SIG,        \&skipArchiveExtra,
         ZIP64_DIGITAL_SIGNATURE_SIG,    \&skipDigitalSignature,
         );
+
+my %MethodNames = (
+        ZIP_CM_DEFLATE()    => 'Deflated',
+        ZIP_CM_BZIP2()      => 'Bzip2',
+        ZIP_CM_LZMA()       => 'Lzma',
+        ZIP_CM_STORE()      => 'Stored',
+        ZIP_CM_XZ()         => 'Xz',
+        ZIP_CM_ZSTD()       => 'Zstd',
+    );
 
 sub new
 {
@@ -670,6 +683,28 @@ sub _readZipHeader($)
 
         *$self->{Uncomp} = $obj;
     }
+    elsif ($compressedMethod == ZIP_CM_XZ)
+    {
+        return $self->HeaderError("Unsupported Compression format $compressedMethod")
+            if ! defined $IO::Uncompress::Adapter::UnXz::VERSION ;
+
+        *$self->{Type} = 'zip-xz';
+
+        my $obj = IO::Uncompress::Adapter::UnXz::mkUncompObject();
+
+        *$self->{Uncomp} = $obj;
+    }
+    elsif ($compressedMethod == ZIP_CM_ZSTD)
+    {
+        return $self->HeaderError("Unsupported Compression format $compressedMethod")
+            if ! defined $IO::Uncompress::Adapter::UnZstd::VERSION ;
+
+        *$self->{Type} = 'zip-zstd';
+
+        my $obj = IO::Uncompress::Adapter::UnZstd::mkUncompObject();
+
+        *$self->{Uncomp} = $obj;
+    }
     elsif ($compressedMethod == ZIP_CM_LZMA)
     {
         return $self->HeaderError("Unsupported Compression format $compressedMethod")
@@ -730,15 +765,7 @@ sub _readZipHeader($)
         'Stream'             => $streamingMode,
 
         'MethodID'           => $compressedMethod,
-        'MethodName'         => $compressedMethod == ZIP_CM_DEFLATE
-                                 ? "Deflated"
-                                 : $compressedMethod == ZIP_CM_BZIP2
-                                     ? "Bzip2"
-                                     : $compressedMethod == ZIP_CM_LZMA
-                                         ? "Lzma"
-                                         : $compressedMethod == ZIP_CM_STORE
-                                             ? "Stored"
-                                             : "Unknown" ,
+        'MethodName'         => $MethodNames{$compressedMethod} || 'Unknown',
 
 #        'TextFlag'      => $flag & GZIP_FLG_FTEXT ? 1 : 0,
 #        'HeaderCRCFlag' => $flag & GZIP_FLG_FHCRC ? 1 : 0,
@@ -1110,6 +1137,39 @@ This module provides a Perl interface that allows the reading of
 zlib files/buffers.
 
 For writing zip files/buffers, see the companion module IO::Compress::Zip.
+
+The primary purpose of this module is to provide I<streaming> read access to
+zip files and buffers.
+
+At present the following compression methods are supported by IO::Uncompress::Unzip
+
+=over 5
+
+=item Store (0)
+
+=item Deflate (8)
+
+=item Bzip2 (12)
+
+To read Bzip2 content, the module C<IO::Uncompress::Bunzip2> must
+be installed.
+
+=item Lzma (14)
+
+To read LZMA content, the module C<IO::Uncompress::UnLzma> must
+be installed.
+
+=item Xz (95)
+
+To read Xz content, the module C<IO::Uncompress::UnXz> must
+be installed.
+
+=item Zstandard (93)
+
+To read Zstandard content, the module C<IO::Uncompress::UnZstd> must
+be installed.
+
+=back
 
 =head1 Functional Interface
 

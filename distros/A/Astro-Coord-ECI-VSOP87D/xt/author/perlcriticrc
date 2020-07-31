@@ -33,6 +33,11 @@ severity	= harsh
 
 severity	= gentle
 
+[Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives]
+
+add_themes	= core
+severity	= stern
+
 [Perl::Critic::Policy::Subroutines::RequireArgUnpacking]
 
 short_subroutine_statements	= 3

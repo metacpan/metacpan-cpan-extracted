@@ -53,7 +53,7 @@ Adds a user defined column that will be NOT NULL if an alignment is contained wi
 =cut
 
 package CLIPSeqTools::PreprocessApp::annotate_with_file;
-$CLIPSeqTools::PreprocessApp::annotate_with_file::VERSION = '0.1.9';
+$CLIPSeqTools::PreprocessApp::annotate_with_file::VERSION = '0.1.10';
 
 # Make it an app command
 use MooseX::App::Command;

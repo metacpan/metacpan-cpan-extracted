@@ -1,19 +1,15 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2348",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A <a class=\"localLink\" href=\"http://schema.org/RealEstateListing\">RealEstateListing</a> is a listing that describes one or more real-estate <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a>s (whose <a class=\"localLink\" href=\"http://schema.org/businessFunction\">businessFunction</a> is typically to lease out, or to sell).\n  The <a class=\"localLink\" href=\"http://schema.org/RealEstateListing\">RealEstateListing</a> type itself represents the overall listing, as manifested in some <a class=\"localLink\" href=\"http://schema.org/WebPage\">WebPage</a>.",
       "rdfs:label" : "RealEstateListing",
       "rdfs:subClassOf" : "schema:WebPage",
       "schema:category" : "issue-2348",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2348"
    },
    "properties" : {
       "schema:datePosted" : {
-         "dc:source" : [
-            "https://github.com/schemaorg/schemaorg/issues/2490",
-            "https://github.com/schemaorg/schemaorg/issues/2521"
-         ],
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Publication date of an online listing.",
          "rdfs:label" : "datePosted",
@@ -22,32 +18,36 @@
             "issue-2521"
          ],
          "schema:domainIncludes" : [
-            "schema:SpecialAnnouncement",
-            "schema:RealEstateListing",
             "schema:CDCPMDRecord",
-            "schema:JobPosting"
+            "schema:RealEstateListing",
+            "schema:JobPosting",
+            "schema:SpecialAnnouncement"
          ],
          "schema:rangeIncludes" : [
-            "schema:Date",
-            "schema:DateTime"
+            "schema:DateTime",
+            "schema:Date"
+         ],
+         "schema:source" : [
+            "https://github.com/schemaorg/schemaorg/issues/2521",
+            "https://github.com/schemaorg/schemaorg/issues/2490"
          ]
       },
       "schema:leaseLength" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2373",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Length of the lease for some <a class=\"localLink\" href=\"http://schema.org/Accommodation\">Accommodation</a>, either particular to some <a class=\"localLink\" href=\"http://schema.org/Offer\">Offer</a> or in some cases intrinsic to the property.",
          "rdfs:label" : "leaseLength",
          "schema:category" : "issue-2373",
          "schema:domainIncludes" : [
-            "schema:Offer",
             "schema:RealEstateListing",
-            "schema:Accommodation"
+            "schema:Accommodation",
+            "schema:Offer"
          ],
          "schema:isPartOf" : "http:pending.schema.org",
          "schema:rangeIncludes" : [
-            "schema:Duration",
-            "schema:QuantitativeValue"
-         ]
+            "schema:QuantitativeValue",
+            "schema:Duration"
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2373"
       }
    }
 }

@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000014';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
@@ -193,12 +193,25 @@ sub bootstrap {
     $self->write_config;
     $self->start;
 
-    for my $try ( 1 .. 5 ) {
-        my $ok = eval { $self->run_command([$self->{+CREATEDB}, '-T', 'template0', '-E', 'UTF8', '-h', $dir, 'quickdb']); 1 };
-        my $err = $@;
+    for my $try (1 .. 10) {
+        my ($ok, $err);
+        {
+            local $@;
+            $ok = eval {
+                $self->catch_startup(sub {
+                    $self->run_command([$self->{+CREATEDB}, '-T', 'template0', '-E', 'UTF8', '-h', $dir, 'quickdb']);
+                });
+
+                1;
+            };
+            $err = $@;
+        }
+
         last if $ok;
+
         die $@ if $try == 5;
-        sleep 1;
+
+        sleep 0.5;
     }
 
     $self->stop unless $self->{+AUTOSTART};
@@ -211,26 +224,11 @@ sub connect {
     my ($db_name, %params) = @_;
 
     my $dbh;
-    my $start = time;
-    while (1) {
-        my $waited = time - $start;
-        die "Timeout waiting for server" if $waited > 10;
+    $self->catch_startup(sub {
+        $dbh = $self->SUPER::connect($db_name, %params);
+    });
 
-        my ($ok, $err);
-        {
-            local $@;
-            $ok = eval {
-                $dbh = $self->SUPER::connect($db_name, %params);
-                1;
-            };
-
-            $err = $@;
-        }
-
-        return $dbh if $ok;
-        die $err unless $err =~ m/the database system is starting up/;
-        sleep 0.01;
-    }
+    return $dbh;
 }
 
 sub connect_string {
@@ -250,13 +248,15 @@ sub load_sql {
 
     my $dir = $self->{+DIR};
 
-    $self->run_command([
-        $self->{+PSQL},
-        '-h' => $dir,
-        '-v' => 'ON_ERROR_STOP=1',
-        '-f' => $file,
-        $dbname,
-    ]);
+    $self->catch_startup(sub {
+        $self->run_command([
+            $self->{+PSQL},
+            '-h' => $dir,
+            '-v' => 'ON_ERROR_STOP=1',
+            '-f' => $file,
+            $dbname,
+        ]);
+    });
 }
 
 sub shell_command {
@@ -269,6 +269,34 @@ sub shell_command {
 sub start_command {
     my $self = shift;
     return ($self->{+POSTGRES}, '-D' => $self->{+DATA_DIR}, '-p' => $self->{+PORT});
+}
+
+sub catch_startup {
+    my $self = shift;
+    my ($code) = @_;
+
+    my $start = time;
+    while (1) {
+        my $waited = time - $start;
+        die "Timeout waiting for server" if $waited > 10;
+
+        my ($ok, $err, $out);
+        {
+            local $@;
+            $ok = eval {
+                $out = $code->($self);
+                1;
+            };
+
+            $err = $@;
+        }
+
+        return $out if $ok;
+
+        die $err unless $err =~ m/the database system is starting up/;
+
+        sleep 0.01;
+    }
 }
 
 1;

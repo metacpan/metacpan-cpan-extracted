@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.4.2    2020-07-31 14:35:48+01:00 Europe/London
+  [Toolchain]
+  - Add core modules in the prerequisites.
+
 v0.4.1    2020-03-11 12:19:20+00:00 Europe/London
   [Enhancements]
   - Simplify unexpected_content rule.

@@ -2,8 +2,8 @@ NAME
     Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 VERSION
-    This document describes version 0.496 of Perinci::CmdLine::Gen (from
-    Perl distribution Perinci-CmdLine-Gen), released on 2020-04-01.
+    This document describes version 0.497 of Perinci::CmdLine::Gen (from
+    Perl distribution Perinci-CmdLine-Gen), released on 2020-07-31.
 
 FUNCTIONS
   gen_pericmd_script
@@ -52,6 +52,12 @@ FUNCTIONS
     *   copt_help_enable => *bool* (default: 1)
 
     *   copt_help_getopt => *str*
+
+    *   copt_naked_res_default => *bool*
+
+    *   copt_naked_res_enable => *bool* (default: 1)
+
+    *   copt_naked_res_getopt => *str*
 
     *   copt_version_enable => *bool* (default: 1)
 
@@ -270,6 +276,12 @@ FUNCTIONS
     *   copt_help_enable => *bool* (default: 1)
 
     *   copt_help_getopt => *str*
+
+    *   copt_naked_res_default => *bool*
+
+    *   copt_naked_res_enable => *bool* (default: 1)
+
+    *   copt_naked_res_getopt => *str*
 
     *   copt_version_enable => *bool* (default: 1)
 

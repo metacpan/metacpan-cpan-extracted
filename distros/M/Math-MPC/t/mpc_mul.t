@@ -3,7 +3,7 @@ use strict;
 use Math::MPFR qw(:mpfr);
 use Math::MPC qw(:mpc);
 
-print "1..8\n";
+print "1..11\n";
 
 Rmpc_set_default_prec2(500, 500);
 Rmpfr_set_default_prec(500);
@@ -511,6 +511,29 @@ else {warn "8f: $root_im $pow_im\n"}
 if($ok eq 'abcdef') {print "ok 8\n"}
 else {print "not ok 8 $ok\n"}
 
+my $inex = Rmpc_fma($rop, Math::MPC->new(1, 2), Math::MPC->new(2, 3), Math::MPC->new(3, 4), MPC_RNDNN);
+
+if($inex == 0) { print "ok 9\n" }
+else {
+  warn "\n inex: $inex\n";
+  print "not ok 9\n";
+}
+
+RMPC_RE($mpfr1, $rop);
+
+if($mpfr1 == -1) { print "ok 10\n" }
+else {
+  warn "\n real: $mpfr1\n";
+  print "not ok 10\n";
+}
+
+RMPC_IM($mpfr1, $rop);
+
+if($mpfr1 == 11) { print "ok 11\n" }
+else {
+  warn "\n im: $mpfr1\n";
+  print "not ok 11\n";
+}
 
 
 

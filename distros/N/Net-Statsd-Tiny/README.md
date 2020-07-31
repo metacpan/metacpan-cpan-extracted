@@ -4,7 +4,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 # VERSION
 
-version v0.3.5
+version v0.3.6
 
 # SYNOPSIS
 
@@ -237,7 +237,7 @@ Michael R. Davis <mrdvt@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2019 by Robert Rothenberg.
+This software is Copyright (c) 2018-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

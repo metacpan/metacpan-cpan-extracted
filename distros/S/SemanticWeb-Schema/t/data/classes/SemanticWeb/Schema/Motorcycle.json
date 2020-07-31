@@ -1,11 +1,11 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:Automotive_Ontology_Working_Group",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A motorcycle or motorbike is a single-track, two-wheeled motor vehicle.",
       "rdfs:label" : "Motorcycle",
       "rdfs:subClassOf" : "schema:Vehicle",
-      "schema:isPartOf" : "http:auto.schema.org"
+      "schema:isPartOf" : "http:auto.schema.org",
+      "schema:source" : "schemadotorgsources:Automotive_Ontology_Working_Group"
    },
    "properties" : {}
 }

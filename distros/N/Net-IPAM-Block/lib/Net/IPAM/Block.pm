@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 use 5.10.0;
 use strict;
@@ -617,39 +617,90 @@ Returns all free cidrs within given block, minus the inner blocks.
 =cut
 
 sub find_free_cidrs {
-  my $outer = shift;
-  my @inner = @_;
+  my ( $outer, @inner ) = @_;
 
-  return $outer unless scalar @inner;
+  my @purged;
+
+  # purge inner blocks
+  foreach my $inner (@inner) {
+
+    # no free cidrs
+    if ( $inner->cmp($outer) == 0 or $inner->contains($outer) ) {
+      return wantarray ? () : [];
+    }
+    next if $outer->is_disjunct_with($inner);
+
+    push @purged, $inner;
+  }
+
+  # sort inner blocks
+  my @sorted = sort { $a->cmp($b) } @purged;
+
+  # purge equals and containments in inner blcoks
+  undef @purged;
+  my $i = 0;
+  while ( $i <= $#sorted ) {
+    push @purged, $sorted[$i];
+    my $j = $i + 1;
+    while ( $j <= $#sorted ) {
+
+      # purge equal
+      if ( $sorted[$i]->cmp( $sorted[$j] ) == 0 ) {
+        $j++;
+        next;
+      }
+
+      # purge containments
+      if ( $sorted[$i]->contains( $sorted[$j] ) ) {
+        $j++;
+        next;
+      }
+      last;
+    }
+    $i = $j;
+  }
 
   # collect free blocks
   my @free;
 
-  # start with outer block, split them to find free cidrs
-  my @candidates = ( $outer->to_cidrs );
+  my $cursor = $outer->base;
+  foreach my $inner (@purged) {
 
-  while (@candidates) {
-    my $this = shift @candidates;
+    if ( $cursor->cmp( $inner->base ) < 0 ) {
+      my $base_ip = $cursor;
+      my $last_ip = $inner->base->decr;
 
-    # mark it as free, if this block is disjunct with ALL inner blocks
-    if ( List::Util::all { $this->is_disjunct_with($_) } @inner ) {
-      push @free, $this;
+      # make new cidr block
+      my $cidr = bless( {}, ref $outer );
+      $cidr->{base} = $base_ip;
+      $cidr->{last} = $last_ip;
+      $cidr->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
+
+      push @free, $cidr;
+
+      $cursor = $inner->last->incr;
       next;
     }
 
-    # skip if this block is already contained in ANY inner block or equal with
-    if ( List::Util::any { $_->contains($this) || $_->cmp($this) == 0 } @inner ) {
-      next;
-    }
-
-    # still too big, split one bit (two halfs), maybe a smaller CIDR is free
-    push @candidates, $this->cidrsplit;
-
-    # limit cpu and memory
-    Carp::croak("too many CIDRs generated,") if @candidates > $MaxCIDRSplit;
+    $cursor = $inner->last->incr;
+    next;
   }
 
-  @free = sort { $a->cmp($b) } @free;
+  if ( $cursor->cmp( $outer->last ) < 0 ) {
+    my $base_ip = $cursor;
+    my $last_ip = $outer->last;
+
+    # make new cidr block
+    # watch out inheritende
+    my $cidr = bless( {}, ref $outer );
+    $cidr->{base} = $base_ip;
+    $cidr->{last} = $last_ip;
+    $cidr->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
+
+    push @free, $cidr;
+  }
+
+  @free = aggregate(@free);
 
   return wantarray ? @free : [@free];
 }
@@ -666,7 +717,7 @@ Returns the minimal number of CIDRs spanning the range of input blocks.
 
 # algo:
 # - make CIDRs from blocks
-# - sort he CIDRs
+# - sort the CIDRs
 # - remove duplicates
 # - remove subsets
 # - pack adjacent CIDRs together
@@ -794,3 +845,5 @@ the same terms as the Perl 5 programming language system itself.
 =cut
 
 1;    # End of Net::IPAM::Block
+
+# vim: ts=2 sw=2 sts=2 background=dark

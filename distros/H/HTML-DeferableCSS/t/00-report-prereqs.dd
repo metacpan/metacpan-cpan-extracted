@@ -27,6 +27,7 @@ do { my $x = {
                                         'Type::Tiny::XS' => '0'
                                       },
                       'requires' => {
+                                      'Carp' => '0',
                                       'Devel::StrictMode' => '0',
                                       'File::ShareDir' => '1.112',
                                       'List::Util' => '1.45',
@@ -37,6 +38,7 @@ do { my $x = {
                                       'Types::Common::String' => '0',
                                       'Types::Path::Tiny' => '0',
                                       'Types::Standard' => '0',
+                                      'constant' => '0',
                                       'namespace::autoclean' => '0',
                                       'perl' => 'v5.10.0'
                                     }
@@ -52,7 +54,9 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Test::Deep' => '0.111',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0'
+                                   'Test::Most' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

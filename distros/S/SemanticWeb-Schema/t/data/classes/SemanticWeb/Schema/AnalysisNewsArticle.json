@@ -1,15 +1,15 @@
 {
    "class" : {
-      "dc:source" : [
-         "https://github.com/schemaorg/schemaorg/issues/1525",
-         "schemadotorgsources2:TP"
-      ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An AnalysisNewsArticle is a <a class=\"localLink\" href=\"http://schema.org/NewsArticle\">NewsArticle</a> that, while based on factual reporting, incorporates the expertise of the author/producer, offering interpretations and conclusions.",
       "rdfs:label" : "AnalysisNewsArticle",
       "rdfs:subClassOf" : "schema:NewsArticle",
       "schema:category" : "issue-1525",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : [
+         "schemadotorgsources2:TP",
+         "https://github.com/schemaorg/schemaorg/issues/1525"
+      ]
    },
    "properties" : {}
 }

@@ -4,7 +4,7 @@
       "Robert Rothenberg <rrwo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "client",
       "StatsD",
@@ -45,7 +45,10 @@
          "requires" : {
             "Class::Accessor::Fast" : "0",
             "IO::Socket" : "1.18",
-            "perl" : "v5.10.1"
+            "base" : "0",
+            "perl" : "v5.10.1",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -75,7 +78,7 @@
    "provides" : {
       "Net::Statsd::Tiny" : {
          "file" : "lib/Net/Statsd/Tiny.pm",
-         "version" : "v0.3.5"
+         "version" : "v0.3.6"
       }
    },
    "release_status" : "stable",
@@ -89,12 +92,13 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Tiny"
       }
    },
-   "version" : "v0.3.5",
+   "version" : "v0.3.6",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Michael R. Davis <mrdvt@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

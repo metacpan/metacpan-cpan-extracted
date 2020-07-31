@@ -1,0 +1,45 @@
+%#
+%# 2020/07/23 Otmar Lendl <lendl@cert.ar>
+%#
+%# Licensed under 
+%#  The GNU General Public License, Version 2, June 1991
+%#
+%# Based on the feedback I received at
+%# https://forum.bestpractical.com/t/audit-log-for-user-read-activity/35137
+%#
+<%ARGS>
+$ARGSRef => undef
+</%ARGS>
+<%INIT>
+#use Data::Dumper;
+
+my $method = $r->method();
+my $q = $r->query();
+my @addinfo = ();
+
+if ($method eq 'POST') {        # we need to fetch parameters from body
+	$RT::Logger->warn(
+		"AuditLogDbg: we got parameters ". join(' ', $q->param)
+	);
+
+	if (defined($q->param('id'))) {
+		push(@addinfo, ('id:' . $q->param('id')));
+	}
+	if (defined($q->param('Action'))) {
+		push(@addinfo, ('Action:' . $q->param('Action')));
+	}
+}
+
+$RT::AuditLogger->info(
+	join(" ",
+		$session{'CurrentUser'}->Name,
+		$r->method(),
+		$r->query->env->{'REQUEST_URI'},
+#               $ARGS{'Title'},
+		@addinfo,
+		)
+#        '  "' . $ARGS{'Title'} . '"'
+#        ' ' . Dumper($r->query->env->{'REQUEST_URI'})
+);
+
+</%INIT>

@@ -38,7 +38,8 @@ do { my $x = {
                                       'Types::TypeTiny' => '0',
                                       'namespace::autoclean' => '0.28',
                                       'perl' => 'v5.10.0',
-                                      'version' => '0.77'
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {

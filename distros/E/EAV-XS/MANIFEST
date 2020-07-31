@@ -104,6 +104,7 @@ Makefile.PL
 MANIFEST			This list of files
 ppport.h
 README
+README.cygwin
 t/00-load.t
 t/01-basic.t
 t/02-ascii.t

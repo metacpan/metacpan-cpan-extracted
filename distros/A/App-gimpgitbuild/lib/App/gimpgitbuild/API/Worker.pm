@@ -1,5 +1,5 @@
 package App::gimpgitbuild::API::Worker;
-$App::gimpgitbuild::API::Worker::VERSION = '0.26.0';
+$App::gimpgitbuild::API::Worker::VERSION = '0.26.1';
 use strict;
 use warnings;
 use 5.014;
@@ -263,7 +263,8 @@ sub _run_the_mode_on_all_repositories
             on_failure           => sub {
                 my ($args) = @_;
                 my $Err = $args->{exception};
-                if ( !$BUILD_GIMP_USING_MESON )
+                if (   ( $worker->_mode() eq 'clean' )
+                    or ( !$BUILD_GIMP_USING_MESON ) )
                 {
                     die $Err;
                 }
@@ -297,7 +298,7 @@ App::gimpgitbuild::API::Worker - common API
 
 =head1 VERSION
 
-version 0.26.0
+version 0.26.1
 
 =head1 METHODS
 

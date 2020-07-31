@@ -3,7 +3,7 @@ package CPANPLUS::Dist::Slackware::Plugin::Net::Pcap;
 use strict;
 use warnings;
 
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 
 use CPANPLUS::Dist::Slackware::Util qw(catfile slurp spurt);
 
@@ -36,7 +36,7 @@ CPANPLUS::Dist::Slackware::Plugin::Net::Pcap - Patch Makefile.PL
 
 =head1 VERSION
 
-This document describes CPANPLUS::Dist::Slackware::Plugin::Net::Pcap version 1.027.
+This document describes CPANPLUS::Dist::Slackware::Plugin::Net::Pcap version 1.028.
 
 =head1 SYNOPSIS
 
@@ -93,7 +93,7 @@ through the web interface at L<http://rt.cpan.org/>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012-2018 Andreas Voegele
+Copyright 2012-2020 Andreas Voegele
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

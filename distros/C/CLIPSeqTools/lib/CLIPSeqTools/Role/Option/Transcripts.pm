@@ -16,7 +16,7 @@ Role to enable reading a GTF file with transcripts from the command line
 
 
 package CLIPSeqTools::Role::Option::Transcripts;
-$CLIPSeqTools::Role::Option::Transcripts::VERSION = '0.1.9';
+$CLIPSeqTools::Role::Option::Transcripts::VERSION = '0.1.10';
 
 #######################################################################
 #######################   Load External modules   #####################

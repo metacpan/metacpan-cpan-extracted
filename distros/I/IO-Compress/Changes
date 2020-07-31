@@ -1,6 +1,19 @@
 CHANGES
 -------
 
+  2.096 31 July 2020
+
+      * Add Zip support for Zstd
+        508258baeeec51ba49c3c07d2dda7c19e3194985
+
+      * Add support for Zip/Unzip with XZ compression
+        6d240d3b3514d627a751ec82fe71f2e236301e19
+        3c0046e8bc65ef467b9153722609654d3ccc5bbd
+
+  2.095 19 July 2020
+
+      * Add Support for Zstandard in AnyUncompress
+
   2.094 13 July 2020
 
       * bin/zipdetails version 2

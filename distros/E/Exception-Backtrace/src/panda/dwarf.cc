@@ -6,8 +6,7 @@
 #include <memory>
 #include <iostream> // for debug
 #include <cstring>
-
-
+#include <queue>
 #include <stdio.h>
 
 #ifdef _WIN32
@@ -16,6 +15,9 @@
 #else
 #define PANDA_PATH_MAX PATH_MAX
 #endif
+
+static const constexpr uint32_t MASK_AO = 1 << 0;
+static const constexpr uint32_t MASK_SPEC = 1 << 1;
 
 namespace panda { namespace backtrace {
 
@@ -112,8 +114,7 @@ bool DwarfInfo::load(file_guard_t&& guard_) noexcept {
         res = dwarf_siblingof_b(debug, nullptr, true, &cu_die, &error);
         if (res != DW_DLV_OK) { break; }
 
-        dwarf::DieHolder cu_die_holder(cu_die, debug, nullptr);
-        cu->cu_die = cu_die_holder.detach();
+        cu->cu_die = dwarf::DieSP(new dwarf::DieRC(cu_die, debug, nullptr));
         CUs.emplace_back(std::move(cu));
     }
     return !CUs.empty();
@@ -195,37 +196,35 @@ DieRC::~DieRC() {
     dwarf_dealloc(debug, die,DW_DLA_DIE);
 }
 
-Dwarf_Die DieRC::resolve_ref(Dwarf_Die source, Dwarf_Half attr) noexcept {
+DieSP DieRC::resolve_ref(DieSP source, Dwarf_Half attr) noexcept {
     Dwarf_Die r = nullptr;
     Dwarf_Attribute attr_val;
     Dwarf_Error error;
-    auto res = dwarf_attr(source, attr, &attr_val, &error);
+    auto res = dwarf_attr(source->die, attr, &attr_val, &error);
     if (res == DW_DLV_OK) {
         Dwarf_Off attr_offset = 0;
         res = dwarf_global_formref(attr_val,&attr_offset,&error);
         if (res == DW_DLV_OK) {
             res = dwarf_offdie_b(debug, attr_offset, true, &r, &error);
-            if (res == DW_DLV_OK) { return r; }
+            if (res == DW_DLV_OK) { return new DieRC(r, source->debug, source); }
         }
     }
     return nullptr;
 }
 
-DieSP DieRC::discover(Dwarf_Die target) noexcept {
+DieSP DieRC::discover(DieSP target) noexcept {
     auto p = parent;
     while (p->parent) { p = p->parent; }
 
-    DieHolder root(p);
     /* no need to scan CU-siblings */
     Dwarf_Die child_die = nullptr;
     Dwarf_Error error;
     auto res = dwarf_child(p->die, &child_die, &error);
 
-
     if(res == DW_DLV_OK) {
-        DieHolder child(child_die, debug, &root);
+        DieSP child = new DieRC(child_die, debug, p);
         Dwarf_Off off;
-        res = dwarf_dieoffset(target, &off, &error);
+        res = dwarf_dieoffset(target->die, &off, &error);
         assert(res == DW_DLV_OK);
         return discover(off, child);
     }
@@ -233,60 +232,106 @@ DieSP DieRC::discover(Dwarf_Die target) noexcept {
     std::abort();
 }
 
-template<typename CheckFN>
-DieSP traverse_sibling_or_child(DieHolder& node, CheckFN&& fn){
+using Queue = std::queue<DieSP>;
+
+void add_sibling_or_child(DieSP& node, Queue& queue) {
     Dwarf_Error error;
     Dwarf_Die child_die;
-    int res = dwarf_siblingof_b(node.debug, node.die, true, &child_die, &error);
+
+    int res = dwarf_siblingof_b(node->debug, node->die, true, &child_die, &error);
     if (res == DW_DLV_OK) {
-        DieHolder child(child_die, node.debug, node.parent);
-        auto found = fn(child);
-        if (found) { return found; }
+        DieSP child = new DieRC(child_die, node->debug, node->parent);
+        queue.push(child);
     }
 
-    // in-depth: check for child
-    res = dwarf_child(node.die, &child_die, &error);
+    res = dwarf_child(node->die, &child_die, &error);
     if (res == DW_DLV_OK) {
-        DieHolder child(child_die, node.debug, &node);
-        auto found = fn(child);
-        if (found) { return found; }
+        DieSP child = new DieRC(child_die, node->debug, node);
+        queue.push(child);
     }
-    return DieSP();
 }
 
-DieSP DieRC::discover(Dwarf_Off target_offset, DieHolder& node) noexcept {
+template <typename CheckFN>
+DieSP iterate(DieSP node, CheckFN&& fn) noexcept {
     Dwarf_Error error;
-    Dwarf_Off off;
+    Dwarf_Die child_die;
     int res;
 
-    res = dwarf_dieoffset(node.die, &off, &error);
-    assert(res == DW_DLV_OK);
-    if (off == target_offset) { return node.detach(); }
-    if (off > target_offset)  { return DieSP(); } /* do not lookup for fail branch */
+    auto create_child = [&](DieSP& parent) -> DieSP {
+        return new DieRC(child_die, node->debug, parent);
+    };
 
-    return traverse_sibling_or_child(node, [&](DieHolder& child){ return discover(target_offset, child);  });
+    while (node) {
+        bool try_next = true;
+        auto prev_node = node;
+        while (try_next) {
+            Scan scan = fn(node);
+            switch (scan) {
+                case Scan::found: return node;
+                case Scan::dead_end: try_next = false; node = prev_node; break;
+                case Scan::not_found: {
+                    int res = dwarf_siblingof_b(node->debug, node->die, true, &child_die, &error);
+                    if (res != DW_DLV_OK) { try_next = false; break; }
+                    prev_node = node;
+                    node = create_child(node->parent);
+                }
+            }
+        }
+
+        res = dwarf_child(node->die, &child_die, &error);
+        if (res != DW_DLV_OK) { node = DieSP(); break; }
+        node = create_child(node);
+    }
+    /* dead end */
+    return node;
+}
+
+DieSP DieRC::discover(Dwarf_Off target_offset, DieSP node) noexcept {
+    auto check = [&](DieSP& node) -> Scan {
+        Dwarf_Error error;
+        Dwarf_Off off;
+        int res;
+        res = dwarf_dieoffset(node->die, &off, &error);
+        assert(res == DW_DLV_OK);
+
+        if      (off == target_offset) { return Scan::found;     }
+        else if (off > target_offset)  { return Scan::dead_end;  }
+        else                           { return Scan::not_found; }
+    };
+
+    return iterate(node, check);
 }
 
 
-void DieRC::refine_fn_name(Dwarf_Die it, FunctionDetails& details) noexcept {
+void DieRC::refine_fn_name(DieSP it, FunctionDetails& details) noexcept {
     if (!details.name) {
         Dwarf_Error error;
         Dwarf_Attribute attr_name;
-        auto res = dwarf_attr(it, DW_AT_name, &attr_name, &error);
+        auto res = dwarf_attr(it->die, DW_AT_name, &attr_name, &error);
 
         if (res == DW_DLV_OK) {
-            iptr<DieRC> node = (it == die) ? iptr<DieRC>(this) : discover(it);
+            iptr<DieRC> node = (it->die == die) ? iptr<DieRC>(this) : discover(it);
             auto fqn = node->gather_fqn();
             details.name = fqn.full_name;
             details.name_die = fqn.source_die;
             return;
         }
 
-        auto die_spec = resolve_ref(it, DW_AT_specification);
-        if (die_spec) return refine_fn_spec(die_spec, details);
+        if (!(details.mask & MASK_SPEC)) {
+            auto die_spec = resolve_ref(it, DW_AT_specification);
+            if (die_spec) {
+                details.mask = details.mask | MASK_AO;
+                return refine_fn_spec(die_spec, details);
+            }
+        }
 
-        auto die_ao = resolve_ref(it, DW_AT_abstract_origin);
-        if (die_ao) return refine_fn_name(die_ao, details);
+        if (!(details.mask & MASK_AO)) {
+            auto die_ao = resolve_ref(it, DW_AT_abstract_origin);
+            if (die_ao) {
+                details.mask = details.mask | MASK_AO;
+                refine_fn_name(die_ao, details);
+            }
+        }
     }
 }
 
@@ -334,20 +379,20 @@ DieRC::FQN DieRC::gather_fqn() noexcept {
     return FQN{r, source_die};
 }
 
-void DieRC::refine_fn_line(Dwarf_Die die, std::uint64_t offset, FunctionDetails& details) noexcept {
+void DieRC::refine_fn_line(DieSP it, std::uint64_t offset, FunctionDetails& details) noexcept {
     /* currently it detects lines only in the current CU (compilation unit) */
     using LineContextHolder = std::unique_ptr<Dwarf_Line_Context, std::function<void(Dwarf_Line_Context *)>>;
 
     Dwarf_Error error;
     char* cu_name_raw;
-    auto res = dwarf_die_text(die, DW_AT_name, &cu_name_raw, &error);
+    auto res = dwarf_die_text(it->die, DW_AT_name, &cu_name_raw, &error);
     if (res != DW_DLV_OK) { return; }
     string cu_name(cu_name_raw);
 
     Dwarf_Unsigned line_version;
     Dwarf_Small table_type;
     Dwarf_Line_Context line_context;
-    res = dwarf_srclines_b(die, &line_version, &table_type,&line_context,&error);
+    res = dwarf_srclines_b(it->die, &line_version, &table_type,&line_context,&error);
     if (res != DW_DLV_OK) { return; }
     LineContextHolder line_context_guard(&line_context, [](auto it){ dwarf_srclines_dealloc_b(*it); });
 
@@ -417,12 +462,12 @@ void DieRC::refine_fn_line(Dwarf_Die die, std::uint64_t offset, FunctionDetails&
 }
 
 
-void DieRC::refine_fn_line_fallback(Dwarf_Die it, FunctionDetails& details) noexcept {
+void DieRC::refine_fn_line_fallback(DieSP it, FunctionDetails& details) noexcept {
     if (!details.line_no) {
         Dwarf_Error error;
 
         Dwarf_Attribute attr_line;
-        auto res = dwarf_attr(it, DW_AT_decl_line, &attr_line, &error);
+        auto res = dwarf_attr(it->die, DW_AT_decl_line, &attr_line, &error);
         if (res == DW_DLV_OK) {
             Dwarf_Unsigned line;
             res = dwarf_formudata(attr_line, &line, &error);
@@ -434,21 +479,21 @@ void DieRC::refine_fn_line_fallback(Dwarf_Die it, FunctionDetails& details) noex
 FunctionDetails DieRC::refine_fn(LookupResult& lr) noexcept {
     FunctionDetails r;
 
-    refine_fn_name(die, r);
-    refine_fn_line(lr.cu->die, lr.offset, r);
-    if (!r.line_no && r.name_die) refine_fn_line_fallback(r.name_die->die, r);
+    refine_fn_name(DieSP(this), r);
+    refine_fn_line(lr.cu, lr.offset, r);
+    if (!r.line_no && r.name_die) refine_fn_line_fallback(r.name_die, r);
 
-    if (r.name_die) refine_fn_source(r.name_die->die, r, *lr.root);
+    if (r.name_die) refine_fn_source(r.name_die, r, *lr.root);
     //printf("n = %s\n", r.name ? r.name.c_str() : "n/a");
 
     return r;
 }
 
-void DieRC::refine_fn_source(Dwarf_Die it, FunctionDetails& details, CU& cu) noexcept {
+void DieRC::refine_fn_source(DieSP it, FunctionDetails& details, CU& cu) noexcept {
     if (!details.source) {
         Dwarf_Error error;
         Dwarf_Attribute attr_file;
-        auto res = dwarf_attr(it, DW_AT_decl_file, &attr_file, &error);
+        auto res = dwarf_attr(it->die, DW_AT_decl_file, &attr_file, &error);
         if (res == DW_DLV_OK) {
             Dwarf_Unsigned file_index;
             res = dwarf_formudata(attr_file, &file_index, &error);
@@ -460,84 +505,53 @@ void DieRC::refine_fn_source(Dwarf_Die it, FunctionDetails& details, CU& cu) noe
 }
 
 
-void DieRC::refine_fn_ao(Dwarf_Die abstract_origin, FunctionDetails& details) noexcept {
+void DieRC::refine_fn_ao(DieSP abstract_origin, FunctionDetails& details) noexcept {
     refine_fn_name(abstract_origin, details);
-    if (!details.name) {
+    if (!details.name && !(details.mask & MASK_SPEC)) {
         auto die_spec = resolve_ref(abstract_origin, DW_AT_specification);
-        if (die_spec) { refine_fn_spec(die_spec, details); }
+        if (die_spec) {
+            details.mask = details.mask | MASK_SPEC;
+            refine_fn_spec(die_spec, details);
+        }
     }
 }
 
 
-void DieRC::refine_fn_spec(Dwarf_Die specification, FunctionDetails& details) noexcept {
+void DieRC::refine_fn_spec(DieSP specification, FunctionDetails& details) noexcept {
     refine_fn_name(specification, details);
     refine_fn_line_fallback(specification, details);
 }
 
-template<typename CheckFN>
-Scan traverse(DieHolder& die, CheckFN&& fn) noexcept {
-    //std::cout << "resolving die: " << (void*) die.die << "\n";
-
-    auto er = fn(die);
-    if (er == Scan::found) return er;
-
-    Dwarf_Die child_die = nullptr;
-    Dwarf_Error error;
-    int res;
-
-    // in-breadth: check for siblings
-    res = dwarf_siblingof_b(die.debug, die.die, true, &child_die, &error);
-    if (res == DW_DLV_OK) {
-        DieHolder child(child_die, die.debug, die.parent);
-        auto sr = traverse(child, fn);
-        if (sr == Scan::found) return sr;
-    } else if (res == DW_DLV_NO_ENTRY) {
-        /* ignore */
-    } else {
-        return Scan::dead_end;
-    }
-
-    // in-depth: check for child
-    if (er != Scan::dead_end) {
-        res = dwarf_child(die.die, &child_die, &error);
-        if(res == DW_DLV_OK) {
-            DieHolder child(child_die, die.debug, &die);
-            auto sr = traverse(child, fn);
-            if (sr == Scan::found) return sr;
-        }
-    }
-
-    return Scan::dead_end;
-}
-
 DieSP DieRC::refine_location(uint64_t offset) noexcept {
     DieCollection context{{DieSP(this)}};
-    DieHolder root(context.front());
+    DieSP root = context.front();
 
     Dwarf_Die child_die = nullptr;
     Dwarf_Error error;
     int res = dwarf_child(die, &child_die, &error);
     if (res == DW_DLV_OK) {
-        DieHolder child(child_die, debug, &root);
-        traverse(child, [&](DieHolder& node) mutable {
+        DieSP child(new DieRC(child_die, debug, root));
+        auto check = [&](DieSP& node) mutable {
             Dwarf_Error error;
             Dwarf_Half tag = 0;
 
-            res = dwarf_tag(node.die, &tag, &error);
+            res = dwarf_tag(node->die, &tag, &error);
             if (res != DW_DLV_OK) { return Scan::dead_end; }
 
-            if( tag == DW_TAG_subprogram ||
-                tag == DW_TAG_inlined_subroutine) {
-                switch(node.contains(offset)) {
-                    case Match::no:  return Scan::dead_end;
-                    case Match::yes: context.push_back(node.detach()); break;
-                    default: break;
+            if( tag == DW_TAG_subprogram || tag == DW_TAG_inlined_subroutine) {
+                switch(node->contains(offset)) {
+                    case Scan::dead_end: return Scan::dead_end;
+                    case Scan::found:    context.push_back(node); break;
+                    default:             break;
                 }
             }
             /* scan everything */
             return Scan::not_found;
-        });
+        };
+        iterate(child, check);
     }
+
+    while (context.size() > max_inline) context.pop_front();
 
     auto best = context.back();
     context.pop_back();
@@ -545,25 +559,7 @@ DieSP DieRC::refine_location(uint64_t offset) noexcept {
     return best;
 }
 
-DieHolder::DieHolder(DieSP owner_):die{owner_->die}, debug{owner_->debug}, parent{nullptr}, owner{owner_} {
-    assert(!owner || owner->die);
-}
-DieHolder::DieHolder(Dwarf_Die die_, Dwarf_Debug debug_, DieHolder* parent_): die{die_}, debug{debug_}, parent{parent_}{
-}
-
-DieHolder::~DieHolder() {
-    if (!owner) { dwarf_dealloc(debug, die,DW_DLA_DIE); }
-}
-
-DieSP DieHolder::detach(){
-    if (!owner) {
-        DieSP parent_ptr(parent ? parent->detach() : nullptr);
-        owner = DieSP(new DieRC(die, debug, parent_ptr));
-    }
-    return owner;
-}
-
-panda::optional<HighLow> DieHolder::get_addr() noexcept {
+panda::optional<HighLow> DieRC::get_addr() noexcept {
     Dwarf_Error error;
     Dwarf_Addr low = 0;
     Dwarf_Addr high = 0;
@@ -582,13 +578,14 @@ panda::optional<HighLow> DieHolder::get_addr() noexcept {
     return panda::optional<HighLow>();
 }
 
-Match DieHolder::contains(std::uint64_t offset) noexcept {
+
+Scan DieRC::contains(std::uint64_t offset) noexcept {
     auto addr = get_addr();
     if (addr) {
         if ((addr->high >= offset) || (addr->low < offset)) {
-            return Match::no;
+            return Scan::dead_end;
         } else {
-            return Match::yes;
+            return Scan::found;
         }
     } else {
         Dwarf_Error error;
@@ -613,22 +610,20 @@ Match DieHolder::contains(std::uint64_t offset) noexcept {
                             auto high = r.dwr_addr2 + baseaddr;
                             auto matches = (low <= offset) && (high > offset);
                             //std::cout << "l = " << low << ", h = " << high << ", attr = " << ranges_offset << ", o = " << offset << " " << (matches ? "Y" : "N") << "\n";
-                            if (matches) {return Match::yes; }
+                            if (matches) {return Scan::found; }
                             break;
                         }
                         default: break;
 
                         }
                     }
-                    if (ranges_count > 0) { return Match::no; }
+                    if (ranges_count > 0) { return Scan::dead_end; }
                 }
             }
         }
     }
-    return Match::unknown;
+    return Scan::not_found;
 }
-
-
 
 CU::CU(Dwarf_Debug debug_, int number_): debug{debug_}, number{number_} {
     std::memset(&signature, 0, sizeof(signature));
@@ -646,46 +641,43 @@ CU::~CU() {
 LookupResult CU::resolve(std::uint64_t offset) noexcept {
     assert(cu_die);
     LookupResult lr(*this);
-    DieHolder dh(cu_die);
-    resolve(offset, dh, lr);
+    resolve(offset, cu_die, lr);
     return lr;
 }
 
-Scan CU::resolve(std::uint64_t offset, DieHolder& die, LookupResult& lr) noexcept {
-    return traverse(die, [&](DieHolder& node){ return examine(offset, node, lr); });
-}
+void CU::resolve(std::uint64_t offset, DieSP &root, LookupResult& lr) noexcept {
+    auto check = [&](DieSP& node) -> Scan {
+        Dwarf_Error error;
+        Dwarf_Half tag = 0;
+        assert(node->die);
+        auto res = dwarf_tag(node->die, &tag, &error);
+        if (res != DW_DLV_OK) { return Scan::dead_end; }
 
-Scan CU::examine(std::uint64_t offset, DieHolder &die, LookupResult& lr) noexcept {
-    Dwarf_Error error;
-    Dwarf_Half tag = 0;
-    assert(die.die);
-    auto res = dwarf_tag(die.die, &tag, &error);
-    if (res != DW_DLV_OK) { return Scan::dead_end; }
-
-    if( tag == DW_TAG_subprogram ||
-        tag == DW_TAG_inlined_subroutine) {
-        switch (die.contains(offset)) {
-        case Match::yes: {
-            lr.subprogram = die.detach();
-            lr.offset = offset;
-            return Scan::found;
+        if( tag == DW_TAG_subprogram ||
+            tag == DW_TAG_inlined_subroutine) {
+            switch (node->contains(offset)) {
+            case Scan::found: {
+                lr.subprogram = node;
+                lr.offset = offset;
+                return Scan::found;
+            }
+            default: return Scan::not_found;
+            }
         }
-        default: return Scan::not_found;
+        else if(tag == DW_TAG_compile_unit) {
+            Scan scan = node->contains(offset);
+            switch (scan) {
+            case Scan::found: {
+                lr.cu = node;
+                return lr.is_complete() ? Scan::found : Scan::not_found;
+            }
+            default: return scan;
+            }
         }
-    }
-    else if(tag == DW_TAG_compile_unit) {
-        switch (die.contains(offset)) {
-        case Match::yes: {
-            lr.cu = die.detach();
-            return lr.is_complete() ? Scan::found : Scan::not_found;
-        }
-        case Match::unknown: return Scan::not_found;
-        case Match::no:      return Scan::dead_end;
-        }
-    }
-
-    /* keep scaning */
-    return Scan::not_found;
+        /* keep scaning */
+        return Scan::not_found;
+    };
+    iterate(root, check);
 }
 
 string CU::get_source(size_t index) noexcept {

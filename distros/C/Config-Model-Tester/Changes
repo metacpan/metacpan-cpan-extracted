@@ -1,3 +1,9 @@
+4.006 2020-07-29
+
+Bug fixes:
+  * Disable log test when --log option is used, otherwise debug logs
+    are not shown
+
 4.005 2019-12-09
 
   Bug fixes:

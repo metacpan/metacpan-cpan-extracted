@@ -5,7 +5,7 @@ use warnings;
 use IPC::Cmd qw/can_run/;
 use Scalar::Util qw/reftype/;
 
-our $VERSION = '0.000011';
+our $VERSION = '0.000014';
 
 use parent 'DBIx::QuickDB::Driver';
 
@@ -26,7 +26,7 @@ sub version_string {
     # Go in reverse order assuming the last param hash provided is most important
     for my $arg (reverse @_) {
         my $type = reftype($arg) or next;    # skip if not a ref
-        next $type eq 'HASH';                # We have a hashref, possibly blessed
+        next unless $type eq 'HASH';         # We have a hashref, possibly blessed
 
         # If we find a launcher we are done looping, we want to use this binary.
         $binary = $arg->{+SQLITE} and last;

@@ -7,24 +7,24 @@
    },
    "properties" : {
       "schema:inLanguage" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2382",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
          "rdfs:label" : "inLanguage",
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:LinkRole",
-            "schema:PronounceableText",
-            "schema:CommunicateAction",
-            "schema:BroadcastService",
-            "schema:WriteAction",
+            "schema:CreativeWork",
             "schema:Event",
-            "schema:CreativeWork"
+            "schema:WriteAction",
+            "schema:PronounceableText",
+            "schema:BroadcastService",
+            "schema:CommunicateAction",
+            "schema:LinkRole"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2382"
       },
       "schema:language" : {
          "rdf:type" : "rdf:Property",

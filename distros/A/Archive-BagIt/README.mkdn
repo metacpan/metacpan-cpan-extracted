@@ -4,7 +4,7 @@ Archive::BagIt
 
 # VERSION
 
-version 0.059
+version 0.063
 
 # SYNOPSIS
 
@@ -33,7 +33,7 @@ Archive::BagIt
 
 # VERSION
 
-version 0.059
+version 0.063
 
 # WARNING
 
@@ -157,11 +157,6 @@ The latest version of this module is available from the Comprehensive Perl
 Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
 site near you, or see [https://metacpan.org/module/Archive::BagIt/](https://metacpan.org/module/Archive::BagIt/).
 
-# SOURCE
-
-The development version is on github at [https://github.com/Archive-BagIt](https://github.com/Archive-BagIt)
-and may be cloned from [git://github.com/Archive-BagIt.git](git://github.com/Archive-BagIt.git)
-
 # BUGS AND LIMITATIONS
 
 You can make new bug reports, and view existing ones, through the
@@ -173,7 +168,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -184,7 +179,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

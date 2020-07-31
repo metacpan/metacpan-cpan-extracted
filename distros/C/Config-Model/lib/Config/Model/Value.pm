@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.139;
+package Config::Model::Value 2.140;
 
 use 5.10.1;
 
@@ -1780,6 +1780,14 @@ sub _fetch_no_check {
         :                                  $self->{default};
 }
 
+sub fetch_summary {
+    my $self = shift;
+    my $value = $self->fetch(@_) // '<undef>';
+    $value =~ s/\n/ /g;
+    $value = substr( $value, 0, 15 ) . '...' if length($value) > 15;
+    return $value;
+}
+
 sub fetch {
     my $self = shift;
 
@@ -1989,7 +1997,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.139
+version 2.140
 
 =head1 SYNOPSIS
 
@@ -2831,6 +2839,11 @@ C<undef> for mandatory values. Normally, trying to fetch an undefined
 mandatory value leads to an exception.
 
 =back
+
+=head2 fetch_summary
+
+Returns a truncated value when the value is a string or uniline that
+is too long to be displayed.
 
 =head2 user_value
 

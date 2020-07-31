@@ -7,7 +7,6 @@
    },
    "properties" : {
       "schema:jurisdiction" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2534",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates a legal jurisdiction, e.g. of some legislation, or where some government service is based.",
          "rdfs:label" : "jurisdiction",
@@ -20,7 +19,8 @@
          "schema:rangeIncludes" : [
             "schema:AdministrativeArea",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2534"
       },
       "schema:serviceOperator" : {
          "rdf:type" : "rdf:Property",

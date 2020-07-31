@@ -1,5 +1,8 @@
 Revision history for Perl extension Hash::Merge.
 
+0.302   2020-07-30
+    - Prevent object-based test from failing randomly on BSDs and MacOS
+
 0.301	2020-06-18
     - fix object-based interface memory leak (RT#132627) (Thanks to mithaldu)
 

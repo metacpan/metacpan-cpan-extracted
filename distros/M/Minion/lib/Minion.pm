@@ -20,7 +20,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.12';
+our $VERSION = '10.13';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -77,6 +77,8 @@ sub guard {
 }
 
 sub history { shift->backend->history }
+
+sub is_locked { !shift->lock(shift, 0) }
 
 sub job {
   my ($self, $id) = @_;
@@ -524,6 +526,13 @@ Delay job for this many seconds (from now), defaults to C<0>.
 Job is valid for this many seconds (from now) before it expires. Note that this option is B<EXPERIMENTAL> and might
 change without warning!
 
+=item lax
+
+  lax => 1
+
+Existing jobs this job depends on may also have transitioned to the C<failed> state to allow for it to be processed,
+defaults to C<false>. Note that this option is B<EXPERIMENTAL> and might change without warning!
+
 =item notes
 
   notes => {foo => 'bar', baz => [1, 2, 3]}
@@ -602,6 +611,12 @@ Hourly counts for processed jobs from the past day.
 
 =back
 
+=head2 is_locked
+
+  my $bool = $minion->is_locked('foo');
+
+Check if a lock with that name is currently active.
+
 =head2 job
 
   my $job = $minion->job($id);
@@ -653,7 +668,7 @@ List only jobs with these ids.
 
   notes => ['foo', 'bar']
 
-List only jobs with one of these notes. Note that this option is B<EXPERIMENTAL> and might change without warning!
+List only jobs with one of these notes.
 
 =item queues
 
@@ -726,6 +741,12 @@ Epoch time job was finished.
   id => 10025
 
 Job id.
+
+=item lax
+
+  lax => 0
+
+Existing jobs this job depends on may also have failed to allow for it to be processed.
 
 =item notes
 
@@ -835,10 +856,12 @@ also use L</"guard"> to release the lock automatically, even if the job failed.
     ...
   });
 
-An expiration time of C<0> can be used to check if a named lock already exists without creating one.
+An expiration time of C<0> can be used to check if a named lock could have been acquired without creating one.
 
-  # Check if the lock "foo" already exists
-  say 'Lock exists' unless $minion->lock('foo', 0);
+  # Check if the lock "foo" could have been acquired
+  say 'Lock could have been acquired' unless $minion->lock('foo', 0);
+
+Or to simply check if a named lock already exists you can also use L</"is_locked">.
 
 These options are currently available:
 
@@ -1256,6 +1279,6 @@ This program is free software, you can redistribute it and/or modify it under th
 
 =head1 SEE ALSO
 
-L<https://github.com/mojolicious/minion>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
+L<https://github.com/mojolicious/minion>, L<https://minion.pm>, L<Mojolicious::Guides>, L<https://mojolicious.org>.
 
 =cut

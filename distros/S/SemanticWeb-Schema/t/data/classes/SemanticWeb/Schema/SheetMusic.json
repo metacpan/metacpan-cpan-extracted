@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1448",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "Printed music, as opposed to performed or recorded music.",
       "rdfs:label" : "SheetMusic",
       "rdfs:subClassOf" : "schema:CreativeWork",
       "schema:category" : "issue-1448",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1448"
    },
    "properties" : {}
 }

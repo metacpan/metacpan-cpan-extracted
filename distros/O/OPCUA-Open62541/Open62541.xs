@@ -2496,6 +2496,16 @@ UA_Server_run_shutdown(server)
 
 INCLUDE: Open62541-server-read-write.xsh
 
+UA_DataValue
+UA_Server_read(server, item, timestamps)
+	OPCUA_Open62541_Server			server
+	OPCUA_Open62541_ReadValueId		item
+	UA_TimestampsToReturn			timestamps
+    CODE:
+	RETVAL = UA_Server_read(server->sv_server, item, timestamps);
+    OUTPUT:
+	RETVAL
+
 UA_StatusCode
 UA_Server_readDataType(server, nodeId, outDataType)
 	OPCUA_Open62541_Server		server
@@ -2943,6 +2953,23 @@ UA_ServerConfig_getBuildInfo(config)
 	UA_BuildInfo_copy(&config->svc_serverconfig->buildInfo, &RETVAL);
     OUTPUT:
 	RETVAL
+
+# Limits for SecureChannels
+
+UA_UInt16
+UA_ServerConfig_getMaxSecureChannels(config)
+	OPCUA_Open62541_ServerConfig		config
+    CODE:
+	RETVAL = config->svc_serverconfig->maxSecureChannels;
+    OUTPUT:
+	RETVAL
+
+void
+UA_ServerConfig_setMaxSecureChannels(config, maxSecureChannels);
+	OPCUA_Open62541_ServerConfig		config
+	UA_UInt16	maxSecureChannels
+    CODE:
+	config->svc_serverconfig->maxSecureChannels = maxSecureChannels;
 
 # Limits for Sessions
 

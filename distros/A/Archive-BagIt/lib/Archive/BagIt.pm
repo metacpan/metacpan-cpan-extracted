@@ -1,15 +1,15 @@
 package Archive::BagIt;
-our $VERSION = '0.059'; # VERSION
+our $VERSION = '0.063'; # VERSION
 use strict;
 use warnings;
 use utf8;
-use open ':std', ':utf8';
+use open ':std', ':encoding(UTF-8)';
 our @checksum_algos = qw(md5 sha1);
 our $DEBUG=0;
 use Encode qw(decode);
 use File::Find;
 use Data::Dumper;
-#use Data::Printer;
+
 
 sub new {
   my ($class,$bag_path) = @_;
@@ -37,7 +37,7 @@ sub _load_manifests {
 
   my @manifests = $self->manifest_files();
   foreach my $manifest_file (@manifests) {
-    die("Cannot open $manifest_file: $!") unless (open (my $MANIFEST,"<:encoding(utf8)", $manifest_file));
+    die("Cannot open $manifest_file: $!") unless (open (my $MANIFEST,"<:encoding(UTF-8)", $manifest_file));
     while (my $line = <$MANIFEST>) {
         chomp($line);
         my ($digest,$file);
@@ -61,7 +61,7 @@ sub _load_tagmanifests {
 
   my @tagmanifests = $self->tagmanifest_files();
   foreach my $tagmanifest_file (@tagmanifests) {
-    die("Cannot open $tagmanifest_file: $!") unless (open(my $TAGMANIFEST,"<:encoding(utf8)", $tagmanifest_file));
+    die("Cannot open $tagmanifest_file: $!") unless (open(my $TAGMANIFEST,"<:encoding(UTF-8)", $tagmanifest_file));
     while (my $line = <$TAGMANIFEST>) {
       chomp($line);
       my($digest,$file) = split(/\s+/, $line, 2);
@@ -93,7 +93,7 @@ sub make_bag {
 
 sub _write_bagit {
     my($self, $bagit) = @_;
-    open(my $BAGIT, ">", $bagit."/bagit.txt") or die("Can't open $bagit/bagit.txt for writing: $!");
+    open(my $BAGIT, ">:encoding(UTF-8)", $bagit."/bagit.txt") or die("Can't open $bagit/bagit.txt for writing: $!");
     print($BAGIT "BagIt-Version: 0.97\nTag-File-Character-Encoding: UTF-8");
     close($BAGIT);
     return 1;
@@ -104,8 +104,8 @@ sub _write_bagit {
 sub _write_baginfo {
     use POSIX;
     my($self, $bagit, %param) = @_;
-    open(my $BAGINFO, ">", $bagit."/bag-info.txt") or die("Can't open $bagit/bag-info.txt for writing: $!");
-    $param{'Bagging-Date'} = POSIX::strftime("%F", gmtime(time));
+    open(my $BAGINFO, ">:encoding(UTF-8)", $bagit."/bag-info.txt") or die("Can't open $bagit/bag-info.txt for writing: $!");
+    $param{'Bagging-Date'} = POSIX::strftime("%Y-%m-%d", gmtime(time));
     $param{'Bag-Software-Agent'} = 'Archive::BagIt <http://search.cpan.org/~rjeschmi/Archive-BagIt>';
     while(my($key, $value) = each(%param)) {
         print($BAGINFO "$key: $value\n");
@@ -121,13 +121,13 @@ sub _manifest_crc32 {
     my $data_dir = "$bagit/data";
 
     # Generate MD5 digests for all of the files under ./data
-    open(my $fh, ">:encoding(utf8)",$manifest_file) or die("Cannot create manifest-crc32.txt: $!\n");
+    open(my $fh, ">:encoding(UTF-8)",$manifest_file) or die("Cannot create manifest-crc32.txt: $!\n");
     find(
         sub {
-            $_=decode('utf8', $_);
-            my $file = decode('utf8', $File::Find::name);
+            $_=decode('UTF-8', $_);
+            my $file = decode('UTF-8', $File::Find::name);
             if (-f $_) {
-                open(my $DATA, "<:encoding(utf8)", $_) or die("Cannot read $_: $!");
+                open(my $DATA, "<:encoding(UTF-8)", $_) or die("Cannot read $_: $!");
                 my $digest = sprintf("%010d",crc32($DATA));
                 close($DATA);
                 my $filename = substr($file, length($bagit) + 1);
@@ -148,10 +148,10 @@ sub _manifest_md5 {
     my $data_dir = "$bagit/data";
     #print "creating manifest: $data_dir\n";
     # Generate MD5 digests for all of the files under ./data
-    open(my $md5_fh, ">:encoding(utf8)",$manifest_file) or die("Cannot create manifest-md5.txt: $!\n");
+    open(my $md5_fh, ">:encoding(UTF-8)",$manifest_file) or die("Cannot create manifest-md5.txt: $!\n");
     find(
         sub {
-            my $file = decode('utf8', $File::Find::name);
+            my $file = decode('UTF-8', $File::Find::name);
             if (-f $_) {
                 open(my $DATA, "<:raw", "$_") or die("Cannot read $_: $!");
                 my $digest = Digest::MD5->new->addfile($DATA)->hexdigest;
@@ -174,12 +174,12 @@ sub _tagmanifest_md5 {
 
   my $tagmanifest_file= "$bagit/tagmanifest-md5.txt";
 
-  open (my $md5_fh, ">:encoding(utf8)", $tagmanifest_file) or die ("Cannot create tagmanifest-md5.txt: $! \n");
+  open (my $md5_fh, ">:encoding(UTF-8)", $tagmanifest_file) or die ("Cannot create tagmanifest-md5.txt: $! \n");
 
   find (
     sub {
-      $_ = decode('utf8',$_);
-      my $file = decode('utf8',$File::Find::name);
+      $_ = decode('UTF-8',$_);
+      my $file = decode('UTF-8',$File::Find::name);
       if ($_=~m/^data$/) {
         $File::Find::prune=1;
       }
@@ -226,7 +226,7 @@ sub verify_bag {
     }
 
     # Compile a list of payload files
-    find(sub{ push(@payload, decode('utf8',$File::Find::name))  }, $payload_dir);
+    find(sub{ push(@payload, decode('UTF-8',$File::Find::name))  }, $payload_dir);
 
     # Evaluate each file against the manifest
     my $digestobj = Digest::MD5->new();
@@ -280,7 +280,7 @@ sub version {
     my($self) = @_;
     my $bagit = $self->{'bag_path'};
     my $file = join("/", $bagit, "bagit.txt");
-    open(my $BAGIT, "<", $file) or die("Cannot read $file: $!");
+    open(my $BAGIT, "<:encoding(UTF-8)", $file) or die("Cannot read $file: $!");
     my $version_string = <$BAGIT>;
     my $encoding_string = <$BAGIT>;
     close($BAGIT);
@@ -303,7 +303,7 @@ sub _payload_files{
   my @payload=();
   File::Find::find( sub{
 
-    push(@payload,decode('utf8',$File::Find::name));
+    push(@payload,decode('UTF-8',$File::Find::name));
     #print "name: ".$File::Find::name."\n";
   }, $payload_dir);
 
@@ -325,7 +325,7 @@ sub _non_payload_files {
 
   my @payload = ();
   File::Find::find( sub {
-    $File::Find::name = decode ('utf8', $File::Find::name);
+    $File::Find::name = decode ('UTF-8', $File::Find::name);
     if(-f $File::Find::name) {
       my ($relpath) = ($File::Find::name=~m!$self->{"bag_path"}/(.*$)!);
       push(@payload, $relpath);
@@ -386,7 +386,7 @@ Archive::BagIt
 
 =head1 VERSION
 
-version 0.059
+version 0.063
 
 =head1 SYNOPSIS
 
@@ -415,7 +415,7 @@ Archive::BagIt
 
 =head1 VERSION
 
-version 0.059
+version 0.063
 
 =head1 WARNING
 
@@ -554,11 +554,6 @@ The latest version of this module is available from the Comprehensive Perl
 Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
 site near you, or see L<https://metacpan.org/module/Archive::BagIt/>.
 
-=head1 SOURCE
-
-The development version is on github at L<https://github.com/Archive-BagIt>
-and may be cloned from L<git://github.com/Archive-BagIt.git>
-
 =head1 BUGS AND LIMITATIONS
 
 You can make new bug reports, and view existing ones, through the
@@ -570,7 +565,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -581,7 +576,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann.
+This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

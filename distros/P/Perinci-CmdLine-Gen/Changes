@@ -1,3 +1,8 @@
+0.497   2020-07-31  Released-By: PERLANCAR; Urgency: medium
+
+	- Add arguments: copt_naked_res_{default,enable,getopt}.
+
+
 0.496   2020-04-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: allow_unknown_opts (Perinci::CmdLine::Base 1.827).

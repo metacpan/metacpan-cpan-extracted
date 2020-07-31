@@ -153,6 +153,15 @@ UA_ReadRequest_DESTROY(readRequest)
 	DPRINTF("readRequest %p", readRequest);
 	UA_ReadRequest_delete(readRequest);
 
+MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::ReadValueId	PREFIX = UA_ReadValueId_
+
+void
+UA_ReadValueId_DESTROY(readValueId)
+	OPCUA_Open62541_ReadValueId	readValueId
+    CODE:
+	DPRINTF("readValueId %p", readValueId);
+	UA_ReadValueId_delete(readValueId);
+
 MODULE = OPCUA::Open62541	PACKAGE = OPCUA::Open62541::ReferenceTypeAttributes	PREFIX = UA_ReferenceTypeAttributes_
 
 void

@@ -12,7 +12,7 @@ use WWW::LogicBoxes::Types qw(EmailAddress Int Language PhoneNumber Str );
 
 use WWW::LogicBoxes::PhoneNumber;
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: LogicBoxes Customer
 
 has 'id' => (

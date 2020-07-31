@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:FundInfoCollab",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A FundingAgency is an organization that implements one or more <a class=\"localLink\" href=\"http://schema.org/FundingScheme\">FundingScheme</a>s and manages\n    the granting process (via <a class=\"localLink\" href=\"http://schema.org/Grant\">Grant</a>s, typically <a class=\"localLink\" href=\"http://schema.org/MonetaryGrant\">MonetaryGrant</a>s).\n    A funding agency is not always required for grant funding, e.g. philanthropic giving, corporate sponsorship etc.<br/><br/>\n\n<pre><code>Examples of funding agencies include ERC, REA, NIH, Bill and Melinda Gates Foundation...\n</code></pre>\n",
       "rdfs:label" : "FundingAgency",
       "rdfs:subClassOf" : "schema:Project",
       "schema:category" : "issue-383",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "schemadotorgsources2:FundInfoCollab"
    },
    "properties" : {}
 }

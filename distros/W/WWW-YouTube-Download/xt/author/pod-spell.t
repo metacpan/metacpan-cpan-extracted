@@ -32,8 +32,10 @@ Neil
 Olaf
 Paulo
 Poletti
+Roy
 Shimada
 Sibley
+Storey
 Syaltut
 TANIGUCHI
 Takaki
@@ -56,6 +58,7 @@ gregor
 grinnz
 herrmann
 isync
+kiwiroy
 ks
 lib
 mauricemengel

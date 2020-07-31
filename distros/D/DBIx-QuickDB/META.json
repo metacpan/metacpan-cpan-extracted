@@ -21,6 +21,7 @@
       },
       "develop" : {
          "requires" : {
+            "DBD::MariaDB" : "1.00",
             "DBD::Pg" : "v3.5.0",
             "DBD::SQLite" : "1.44",
             "DBD::mysql" : "4.00",
@@ -32,6 +33,7 @@
             "Carp" : "0",
             "Digest::SHA" : "0",
             "Fcntl" : "0",
+            "File::Copy::Recursive" : "0",
             "File::Path" : "0",
             "File::Temp" : "0",
             "IPC::Cmd" : "0",
@@ -45,7 +47,7 @@
             "Test::More" : "1.302120",
             "Time::HiRes" : "0",
             "parent" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.012000"
          }
       },
       "test" : {
@@ -64,7 +66,7 @@
          "url" : "https://github.com/exodist/DBIx-QuickDB/"
       }
    },
-   "version" : "0.000011",
+   "version" : "0.000014",
    "x_generated_by_perl" : "v5.30.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

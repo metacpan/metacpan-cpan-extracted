@@ -1,10 +1,412 @@
 ==================================================
-Changes from 2019-07-28 00:00:00 +0000 to present.
+Changes from 2019-08-01 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.059 at 2020-07-27 09:10:04 +0000
+version 0.063 at 2020-07-31 13:56:36 +0000
 ------------------------------------------
+
+  Change: ecec4b48092b62c56c9df73e393aaf0bf85bfbd6
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-31 14:25:31 +0000
+
+    - bugfix, handle UTF-8 correctly, see
+    https://perldoc.perl.org/Encode.html#UTF-8-vs.-utf8-vs.-UTF8 for an
+    explanation - add tests to handle utf8-filenames 
+
+  Change: be4e76c8be1b00751f05b1e7543c0e620c4abbb7
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-31 14:24:44 +0000
+
+    - bugfix, handle UTF-8 correctly, see
+    https://perldoc.perl.org/Encode.html#UTF-8-vs.-utf8-vs.-UTF8 for an
+    explanation 
+
+------------------------------------------
+version 0.062 at 2020-07-30 16:29:35 +0000
+------------------------------------------
+
+  Change: 83071e1ae61d50a28693a201e0b989c8f51c3cfe
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-30 18:29:35 +0000
+
+    Released 0.062 
+
+  Change: 55231d73bf9d2f47a0e6fdf9e75c4ba333fb4d63
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-30 18:23:39 +0000
+
+    - added testsuite to check deeply if a new bag is correctly written
+    to disk 
+
+  Change: cf0206c03087fd06ff18e2ab482c609c9a8856d2
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-30 18:22:26 +0000
+
+    - bugfix in create_baginfo() to write koorekt Bagging date 
+
+------------------------------------------
+version 0.061 at 2020-07-30 13:36:31 +0000
+------------------------------------------
+
+  Change: 8034ffe6c68a73a566a154f7907ea8f7dd89f38f
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-30 15:36:31 +0000
+
+    Released 0.061 
+
+  Change: f67bdf2f7865f1805ad1c5e1a613d720fdee822e
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-30 15:35:21 +0000
+
+    Merge branch 'dev' 
+
+  Change: c29b4f33df428397acd733d0fc5f55973746ba4c
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-30 15:32:26 +0000
+
+    - refactoring, clarified method names
+
+    - renamed delete_baginfo_value() to delete_baginfo_by_key()
+
+    - renamed append_baginfo_value() to append_baginfo_by_key()
+
+    - renamed add_or_replace_baginfo_value() to
+    add_or_replace_baginfo_by_key() - fixed POD 
+
+  Change: 820a09c8a80ffa224fba98fb3b8e9d0ddfe03f04
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-30 14:59:37 +0000
+
+    - refactoring, bag_info_by_key() renamed to
+    get_baginfo_values_by_key() - refactoring, updated POD - rewritten
+    all baginfo related functions to reflect reserved keywords and
+    reserved uniq keywords - added is_baginfo_key_reserved() - added
+    is_baginfo_key_reserved_as_uniq() - added verify_baginfo() - added
+    delete_baginfo_value() - added exists_baginfo_key() - added
+    append_baginfo_value() - renamed _add_or_replace_bag_info() to
+    add_or_replace_baginfo_value() - updated tests 
+
+  Change: b1b4941eba96cffa567514f7f3b0c08629376799
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-30 11:01:16 +0000
+
+    - fixed repos url - added Git::Tag again 
+
+  Change: 12a7d2349f5c062ba40e5c2177eb8cd88759b08f
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-30 10:26:30 +0000
+
+    - fixed abstract comment 
+
+  Change: bef77fba49b3c26f49ee5ae7cf26a4c31d6c581d
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 18:25:31 +0000
+
+    - rewritten __create_xxmanifest() to use calc_digests() in same way
+    as __verify_xxmanifest(), therefore Archive::BagIt::Fast benefits 
+
+  Change: 053dd78a1bdb749f6e5b5338a93d7e72551e941b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 17:15:34 +0000
+
+    - portability-fix, POSIX::strftime under MS Windows does not
+    unterstand '%F' 
+
+  Change: 080a02cec787e833088737740d9ecefeab628c3c
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 15:44:50 +0000
+
+    Released 0.061-TRIAL 
+
+  Change: 4ecaedb799d93b5ab72bdf3bdcd4f1f95b303602
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 15:43:48 +0000
+
+    Merge branch 'dev' 
+
+  Change: cb78000d9fda9301505c4e42af6b91daa38f09d4
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 15:33:17 +0000
+
+    - added FAQ section 
+
+  Change: 6caff8c0b27cd2bb447a004bddbdb176cc4e6177
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 15:33:17 +0000
+
+    Released 0.060 
+
+  Change: 5ff599cacd00008dc8680f74d5e97066c8f55cdd
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 15:00:33 +0000
+
+    - used iterate() instead iterate_as_array() from Parallel::Iterator,
+    because more tunable 
+
+  Change: 93ed3fdfef3ba473d7cf13e602c48dd0a72f267a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 14:59:09 +0000
+
+    - removed obsolete fixme-comment 
+
+  Change: 2e30f83b68de1bed761080117aa365aebf4ceacc
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 12:53:02 +0000
+
+    - added load() method to trigger a parse 
+
+  Change: 58fb73e473fa340a38c416f00f4e1cf82b175f7a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 12:52:23 +0000
+
+    - bugfix, if return_all_error is set, undefined expected digests
+    should be ignored because already handled by prechecks 
+
+  Change: eb82317e428eadb3c6203b42317e468551f61df9
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 11:59:52 +0000
+
+    - refactoring, use File::Spec->catdir() instead fielpath string
+    manipulation - added POD - fixed access mode for $self->errors() -
+    removed dead code for $self->bag_checksum() - bugfix in
+    _build_bag_info() if open fails 
+
+  Change: 8b98dedd65b434058b148fe8434fa50d86f40d17
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-29 11:57:35 +0000
+
+    - refactoring, use File::Spec->catdir() instead fielpath string
+    manipulation 
+
+  Change: e6c18e515707acc162b235995e5e1bce71cdebda
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 18:56:37 +0000
+
+    - refactoring, added digest_callback to Archive::BagIt::Base -
+    refactoring, fixed perlcritic warnings - refactoring, rewrite to
+    register digest_callbacks in Archive::BagIt::Base and
+    Archive::BagIt::Fast 
+
+  Change: f4a4b2fba8bf213a0c48ee2d337c9840d6a7c587
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 18:53:19 +0000
+
+    - refactoring, fixed perlcritic warnings 
+
+  Change: 927d18aaf6ee5be8855bd4249d82255020c719f6
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 18:03:23 +0000
+
+    - uses File::Spec->catdir 
+
+  Change: eb0ad63364510d5e08b8626563219745373a5484
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 17:51:14 +0000
+
+    - refactoring, minor cleanups 
+
+  Change: 0f589e761e73cacba053c52c8dae4584bfb96322
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 17:22:46 +0000
+
+    - indent code for _verify_XXX_manifests() 
+
+  Change: 71cfadbb285848acc46dbb63a28595275954e155
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 17:16:24 +0000
+
+    - fixed perlcritic warnings - refactoring, extracted
+    __fill_digest_hashref() - changed to use Carp - refactoring,
+    extracted __create_xxmnifest() to fullfill DRY 
+
+  Change: 600eedc8f02d85f665c1ac780bfda1350d914312
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 17:14:23 +0000
+
+    - fixed perlcritic warnings 
+
+  Change: a70eadde6b2d145795c106d20cf9dbaa6c914967
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 16:10:52 +0000
+
+    - portability-fix, POSIX::strftime under MS Windows does not
+    unterstand '%F' 
+
+------------------------------------------
+version 0.060 at 2020-07-28 13:16:24 +0000
+------------------------------------------
+
+  Change: 47395c80c880e32570fb4cdf9d87e5580a71be28
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 15:16:24 +0000
+
+    Released 0.060 
+
+  Change: fa322d35358ea931fcff2d5b73f05095430810b5
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 15:11:12 +0000
+
+    - minor 
+
+  Change: 7fda8cdd728d86b05001feb73a56920ef1a3839a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 14:52:50 +0000
+
+    - fixed tests, because tested methods moved to Role::Manifest 
+
+  Change: ae1696fd8891f39cb738a774504f6f9aa06f5dcf
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 14:49:27 +0000
+
+    - updated tests (regexes for error output) 
+
+  Change: 1a0bfae7d4eb3d36c8cc9119208888e5ab2ac59b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 14:48:57 +0000
+
+    - fixed error reporting - fixed create_tagmanifest() to use
+    normalized files 
+
+  Change: a4da38d670b060dfb7e442203636cea0b9d2b1e3
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 14:47:46 +0000
+
+    - fixed error reporting 
+
+  Change: b3285d50daac2d4733d19d1c26686e08f796ba26
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 14:10:46 +0000
+
+    - adapted regex to match normalized output in expected errors 
+
+  Change: 718a35f7ce2aa5f6fe6e1000ef12d50813b53ef2
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 14:09:56 +0000
+
+    - refactoring, moved manifest_file handling to Role/Manifest -
+    refactoring, moved calc_digests() to Role/Manifest - refactoring,
+    moved _verify_manifests() to verify_manifest() - refactoring, moved
+    _verify_tagmanifests() to verify_tagmanifest() - bugfix, write
+    *normalized* filenames in XXXmanifest.txt-files 
+
+  Change: ed00de862cf328400a644f74aeafeb3c0e28560f
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 14:04:45 +0000
+
+    - removed explain notes for XXXmanifest_entries 
+
+  Change: ece064031a8f03ef4710022029bc65f98437f551
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 14:04:07 +0000
+
+    - added done_testing() - removed explain notes for
+    XXXmanifest_entries 
+
+  Change: b041da07dcc5a3ce26ec4a4bfa64b905cf17ebbc
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 14:02:44 +0000
+
+    - bugfix for MS WINDOW systems, set default blksize, because 'stat'
+    returns empty string 
+
+  Change: 1783fb8941f53893a4d5c337184a6cdfec659990
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 10:57:45 +0000
+
+    - added more complex windows path 
+
+  Change: 4796637696ef041c6e21516ae18de368c565efbe
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-28 10:57:26 +0000
+
+    - fixed plan twice warning 
+
+  Change: f63049d63085c6dc5968b4a36ac09006ad0c71cc
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 19:23:28 +0000
+
+    Released 0.060-TRIAL 
+
+  Change: 2573a83e32c05c65cd2f6ce3fb56cd25bb4f48f5
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 17:01:36 +0000
+
+    - fixd tc count - fixed tests 
+
+  Change: d79a87542f6602ec4b6ed2b905e61d92054eb1a8
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 17:01:16 +0000
+
+    - fixed regexes 
+
+  Change: 3fd2ef57d4cf763a5ca56825456e0c1f653873a6
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 16:53:57 +0000
+
+    - addednew testsuite to test internal functions more in detail 
+
+  Change: 2266fa44e4172062d708d398c5eb1b6e77972bb9
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 16:53:22 +0000
+
+    - bag_info is optional - added fix to handle backslashes in Windows
+    file paths - added check_if_payload_filepath_violates() - added
+    normalize_payload_filepath() 
+
+  Change: 914d63826a4e0f3d8c68c6ee5a3a44138dfa9e14
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 16:51:10 +0000
+
+    - fixed whitespace in version string 
+
+  Change: e7a102c49e85608568cb68fe7b2dcf6d5940d501
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 16:50:36 +0000
+
+    - fixed some conformance tests 
+
+  Change: a61a738b8c55d3c295d0841b9445bceec3481311
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 16:50:06 +0000
+
+    - revert last rename 
+
+  Change: 03e8ec7ab66e33fd0b0a6f32d93da66843c4a78a
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 14:51:38 +0000
+
+    - improved POD 
+
+  Change: d7f5959c010296616cf52f5d65cbc4e4484de4d5
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 14:51:38 +0000
+
+    - fixed tc 
+
+  Change: ca4dbf33c5bccc97ba9f9add1d8a31a07f6dbad2
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 14:51:38 +0000
+
+    - to have more stable results, file list should be sorted if build
+    via File::Find 
+
+  Change: 6ae354d74ed8f1735c8fcaa472d041fc3767f9e6
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 14:51:38 +0000
+
+    - disabled Git::Tag because expects gpg - disabled Twitter because
+    not needed 
+
+------------------------------------------
+version 0.059 at 2020-07-27 09:10:32 +0000
+------------------------------------------
+
+  Change: 71ecf7dbcf359cc14ea611b6de168b6524a50af7
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-07-27 11:10:32 +0000
+
+    Released 0.059 
 
   Change: d33d7ae773f132e55c4f5c4684a2d1a1f3d9f936
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -923,5 +1325,5 @@ version 0.055 at 2020-04-15 09:44:51 +0000
     Adding a plugin structure 
 
 ================================================
-Plus 9 releases after 2019-07-28 00:00:00 +0000.
+Plus 9 releases after 2019-08-01 00:00:00 +0000.
 ================================================

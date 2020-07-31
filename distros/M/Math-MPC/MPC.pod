@@ -404,6 +404,21 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_sqr($rop, $op, $rnd);
     Set $rop to the square of $op, rounded in direction $rnd.
 
+   $si = Rmpc_fma ($rop, $op1, $op2, $op3, $rnd);
+    Set $rop to $op1 * $op2 + $op3, rounded according to $rnd, with
+    only one final rounding.
+
+   $si = Rmpc_dot ($rop, \@op1, \@op2, $ui, $rnd); # mpc-1.1.1 &
+                                                   # later only
+    Set $rop to the dot product of elements of @op1 by those of
+    @op2, whose common size is $ui (== scalar @op1), correctly
+    rounded in the direction $rnd.
+
+   $si = Rmpc_sum ($rop, \@op, $ui, $rnd); # mpc-1.1.1 &
+                                           # later only
+    Set $rop to the sum of the first $ui elements of @op,
+    correctly rounded in the direction $rnd.
+
    $si = Rmpc_sqrt($rop, $op, $rnd);
     Set $rop to the square root of the 2nd arg rounded in the
     direction $rnd. When the return value is 0, it means the result
@@ -691,7 +706,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
     Math::MPC object with *current default precision*, and using
     the *current default rounding mode*.
 
-    Be aware also, that the sign of zero may not always handled
+    Be aware also, that the sign of zero may not always be handled
     correctly by the overload subroutines. If it's important to you
     that the sign of zero be handled correctly, don't use the
     overloaded operators. (For multiplication, division, addition
@@ -851,7 +866,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2011, 2014, 2016, 2018 Sisyphus
+    Copyright 2006-2011, 2014, 2016, 2018, 2020 Sisyphus
 
 =head1 AUTHOR
 

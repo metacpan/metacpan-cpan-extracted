@@ -1,10 +1,10 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_ActionCollabClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A Property value specification.",
       "rdfs:label" : "PropertyValueSpecification",
-      "rdfs:subClassOf" : "schema:Intangible"
+      "rdfs:subClassOf" : "schema:Intangible",
+      "schema:source" : "schemadotorgsources:source_ActionCollabClass"
    },
    "properties" : {
       "schema:defaultValue" : {
@@ -13,35 +13,35 @@
          "rdfs:label" : "defaultValue",
          "schema:domainIncludes" : "schema:PropertyValueSpecification",
          "schema:rangeIncludes" : [
-            "schema:Thing",
-            "schema:Text"
+            "schema:Text",
+            "schema:Thing"
          ]
       },
       "schema:maxValue" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The upper value of some characteristic or property.",
          "rdfs:label" : "maxValue",
          "schema:domainIncludes" : [
-            "schema:MonetaryAmount",
+            "schema:PropertyValue",
             "schema:QuantitativeValue",
-            "schema:PropertyValueSpecification",
-            "schema:PropertyValue"
+            "schema:MonetaryAmount",
+            "schema:PropertyValueSpecification"
          ],
-         "schema:rangeIncludes" : "schema:Number"
+         "schema:rangeIncludes" : "schema:Number",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:minValue" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The lower value of some characteristic or property.",
          "rdfs:label" : "minValue",
          "schema:domainIncludes" : [
             "schema:PropertyValueSpecification",
-            "schema:QuantitativeValue",
             "schema:MonetaryAmount",
-            "schema:PropertyValue"
+            "schema:PropertyValue",
+            "schema:QuantitativeValue"
          ],
-         "schema:rangeIncludes" : "schema:Number"
+         "schema:rangeIncludes" : "schema:Number",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:multipleValues" : {
          "rdf:type" : "rdf:Property",

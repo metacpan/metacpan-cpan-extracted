@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
 
 use Test::More 0.88;
 use Test::EOL;
@@ -48,7 +48,6 @@ my @files = (
     't/author-mojibake.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
-    't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-test-version.t',
@@ -87,6 +86,7 @@ my @files = (
     't/release-kwalitee.t',
     't/release-meta-json.t',
     't/release-minimum-version.t',
+    't/release-pod-linkcheck.t',
     't/release-unused-vars.t',
     't/role/command/00-object.t',
     't/role/command/contact/00-object.t',

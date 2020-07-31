@@ -9,7 +9,7 @@ use App::UpdateCPANfile::PackageDetails;
 use CPAN::DistnameInfo;
 use Module::CoreList;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 sub new {
     my ($class, $path, $snapshot_path, $options) = @_;
@@ -54,6 +54,7 @@ sub pin_dependencies {
     my ($self) = @_;
     my $changeset = $self->create_pin_dependencies_changeset;
     $self->_save_changes_to_file($changeset);
+    return $changeset;
 }
 
 sub update_dependencies {
@@ -61,6 +62,7 @@ sub update_dependencies {
     my $changeset = $self->create_update_dependencies_changeset;
     my $writer = $self->writer;
     $self->_save_changes_to_file($changeset);
+    return $changeset;
 }
 
 sub create_pin_dependencies_changeset {

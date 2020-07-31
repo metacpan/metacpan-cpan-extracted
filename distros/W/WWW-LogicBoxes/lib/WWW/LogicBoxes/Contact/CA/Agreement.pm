@@ -9,7 +9,7 @@ use namespace::autoclean;
 
 use WWW::LogicBoxes::Types qw( Str );
 
-our $VERSION = '1.10.0'; # VERSION
+our $VERSION = '1.10.1'; # VERSION
 # ABSTRACT: CA Registrant Agreement
 
 has 'version' => (

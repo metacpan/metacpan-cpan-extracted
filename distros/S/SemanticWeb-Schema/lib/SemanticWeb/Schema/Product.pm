@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has additional_property => (
@@ -138,10 +138,26 @@ has has_merchant_return_policy => (
 
 
 
+has has_product_return_policy => (
+    is        => 'rw',
+    predicate => '_has_has_product_return_policy',
+    json_ld   => 'hasProductReturnPolicy',
+);
+
+
+
 has height => (
     is        => 'rw',
     predicate => '_has_height',
     json_ld   => 'height',
+);
+
+
+
+has in_product_group_with_id => (
+    is        => 'rw',
+    predicate => '_has_in_product_group_with_id',
+    json_ld   => 'inProductGroupWithID',
 );
 
 
@@ -174,6 +190,14 @@ has is_similar_to => (
     is        => 'rw',
     predicate => '_has_is_similar_to',
     json_ld   => 'isSimilarTo',
+);
+
+
+
+has is_variant_of => (
+    is        => 'rw',
+    predicate => '_has_is_variant_of',
+    json_ld   => 'isVariantOf',
 );
 
 
@@ -242,6 +266,14 @@ has offers => (
 
 
 
+has pattern => (
+    is        => 'rw',
+    predicate => '_has_pattern',
+    json_ld   => 'pattern',
+);
+
+
+
 has product_id => (
     is        => 'rw',
     predicate => '_has_product_id',
@@ -286,6 +318,14 @@ has reviews => (
     is        => 'rw',
     predicate => '_has_reviews',
     json_ld   => 'reviews',
+);
+
+
+
+has size => (
+    is        => 'rw',
+    predicate => '_has_size',
+    json_ld   => 'size',
 );
 
 
@@ -338,7 +378,7 @@ SemanticWeb::Schema::Product - Any offered product or service
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -650,6 +690,24 @@ A has_merchant_return_policy should be one of the following types:
 
 A predicate for the L</has_merchant_return_policy> attribute.
 
+=head2 C<has_product_return_policy>
+
+C<hasProductReturnPolicy>
+
+Indicates a ProductReturnPolicy that may be applicable.
+
+A has_product_return_policy should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::ProductReturnPolicy']>
+
+=back
+
+=head2 C<_has_has_product_return_policy>
+
+A predicate for the L</has_product_return_policy> attribute.
+
 =head2 C<height>
 
 The height of the item.
@@ -667,6 +725,28 @@ A height should be one of the following types:
 =head2 C<_has_height>
 
 A predicate for the L</height> attribute.
+
+=head2 C<in_product_group_with_id>
+
+C<inProductGroupWithID>
+
+=for html <p>Indicates the <a class="localLink"
+href="http://schema.org/productGroupID">productGroupID</a> for a <a
+class="localLink" href="http://schema.org/ProductGroup">ProductGroup</a>
+that this product <a class="localLink"
+href="http://schema.org/isVariantOf">isVariantOf</a>.<p>
+
+A in_product_group_with_id should be one of the following types:
+
+=over
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_in_product_group_with_id>
+
+A predicate for the L</in_product_group_with_id> attribute.
 
 =head2 C<is_accessory_or_spare_part_for>
 
@@ -745,6 +825,40 @@ A is_similar_to should be one of the following types:
 =head2 C<_has_is_similar_to>
 
 A predicate for the L</is_similar_to> attribute.
+
+=head2 C<is_variant_of>
+
+C<isVariantOf>
+
+=for html <p>Indicates the kind of product that this is a variant of. In the case of
+<a class="localLink"
+href="http://schema.org/ProductModel">ProductModel</a>, this is a pointer
+(from a ProductModel) to a base product from which this product is a
+variant. It is safe to infer that the variant inherits all product features
+from the base model, unless defined locally. This is not transitive. In the
+case of a <a class="localLink"
+href="http://schema.org/ProductGroup">ProductGroup</a>, the group
+description also serves as a template, representing a set of Products that
+vary on explicitly defined, specific dimensions only (so it defines both a
+set of variants, as well as which values distinguish amongst those
+variants). When used with <a class="localLink"
+href="http://schema.org/ProductGroup">ProductGroup</a>, this property can
+apply to any <a class="localLink"
+href="http://schema.org/Product">Product</a> included in the group.<p>
+
+A is_variant_of should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::ProductGroup']>
+
+=item C<InstanceOf['SemanticWeb::Schema::ProductModel']>
+
+=back
+
+=head2 C<_has_is_variant_of>
+
+A predicate for the L</is_variant_of> attribute.
 
 =head2 C<item_condition>
 
@@ -902,6 +1016,26 @@ A offers should be one of the following types:
 
 A predicate for the L</offers> attribute.
 
+=head2 C<pattern>
+
+A pattern that something has, for example 'polka dot', 'striped', 'Canadian
+flag'. Values are typically expressed as text, although links to controlled
+value schemes are also supported.
+
+A pattern should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_pattern>
+
+A predicate for the L</pattern> attribute.
+
 =head2 C<product_id>
 
 C<productID>
@@ -1007,6 +1141,31 @@ A reviews should be one of the following types:
 =head2 C<_has_reviews>
 
 A predicate for the L</reviews> attribute.
+
+=head2 C<size>
+
+A standardized size of a product or creative work, often simplifying richer
+information into a simple textual string, either through referring to named
+sizes or (in the case of product markup), by adopting conventional
+simplifications. Use of QuantitativeValue with a unitCode or unitText can
+add more structure; in other cases, the /width, /height, /depth and /weight
+properties may be more applicable.
+
+A size should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_size>
+
+A predicate for the L</size> attribute.
 
 =head2 C<sku>
 

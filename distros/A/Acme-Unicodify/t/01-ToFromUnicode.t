@@ -4,7 +4,7 @@
 use v5.22;
 
 #
-# Copyright (C) 2015 J. Maslak
+# Copyright (C) 2015 Joelle Maslak
 # All Rights Reserved - See License
 #
 

@@ -1,16 +1,15 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1828",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A <a class=\"localLink\" href=\"http://schema.org/Claim\">Claim</a> in Schema.org represents a specific, factually-oriented claim that could be the <a class=\"localLink\" href=\"http://schema.org/itemReviewed\">itemReviewed</a> in a <a class=\"localLink\" href=\"http://schema.org/ClaimReview\">ClaimReview</a>. The content of a claim can be summarized with the <a class=\"localLink\" href=\"http://schema.org/text\">text</a> property. Variations on well known claims can have their common identity indicated via <a class=\"localLink\" href=\"http://schema.org/sameAs\">sameAs</a> links, and summarized with a <a class=\"localLink\" href=\"http://schema.org/name\">name</a>. Ideally, a <a class=\"localLink\" href=\"http://schema.org/Claim\">Claim</a> description includes enough contextual information to minimize the risk of ambiguity or inclarity. In practice, many claims are better understood in the context in which they appear or the interpretations provided by claim reviews.<br/><br/>\n\nBeyond <a class=\"localLink\" href=\"http://schema.org/ClaimReview\">ClaimReview</a>, the Claim type can be associated with related creative works - for example a <a class=\"localLink\" href=\"http://schema.org/ScholaryArticle\">ScholaryArticle</a> or <a class=\"localLink\" href=\"http://schema.org/Question\">Question</a> might be <a class=\"localLink\" href=\"http://schema.org/about\">about</a> some <a class=\"localLink\" href=\"http://schema.org/Claim\">Claim</a>.<br/><br/>\n\nAt this time, Schema.org does not define any types of relationship between claims. This is a natural area for future exploration.",
       "rdfs:label" : "Claim",
       "rdfs:subClassOf" : "schema:CreativeWork",
       "schema:category" : "issue-1828",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1828"
    },
    "properties" : {
       "schema:appearance" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1828",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates an occurence of a <a class=\"localLink\" href=\"http://schema.org/Claim\">Claim</a> in some <a class=\"localLink\" href=\"http://schema.org/CreativeWork\">CreativeWork</a>.",
          "rdfs:label" : "appearance",
@@ -18,10 +17,10 @@
          "schema:category" : "issue-1828",
          "schema:domainIncludes" : "schema:Claim",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:CreativeWork"
+         "schema:rangeIncludes" : "schema:CreativeWork",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1828"
       },
       "schema:firstAppearance" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1828",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Indicates the first known occurence of a <a class=\"localLink\" href=\"http://schema.org/Claim\">Claim</a> in some <a class=\"localLink\" href=\"http://schema.org/CreativeWork\">CreativeWork</a>.",
          "rdfs:label" : "firstAppearance",
@@ -29,7 +28,8 @@
          "schema:category" : "issue-1828",
          "schema:domainIncludes" : "schema:Claim",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:CreativeWork"
+         "schema:rangeIncludes" : "schema:CreativeWork",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1828"
       }
    }
 }

@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has about => (
@@ -586,6 +586,14 @@ has offers => (
 
 
 
+has pattern => (
+    is        => 'rw',
+    predicate => '_has_pattern',
+    json_ld   => 'pattern',
+);
+
+
+
 has position => (
     is        => 'rw',
     predicate => '_has_position',
@@ -702,6 +710,14 @@ has sd_publisher => (
     is        => 'rw',
     predicate => '_has_sd_publisher',
     json_ld   => 'sdPublisher',
+);
+
+
+
+has size => (
+    is        => 'rw',
+    predicate => '_has_size',
+    json_ld   => 'size',
 );
 
 
@@ -866,7 +882,7 @@ SemanticWeb::Schema::CreativeWork - The most generic kind of creative work
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -2303,6 +2319,26 @@ A offers should be one of the following types:
 
 A predicate for the L</offers> attribute.
 
+=head2 C<pattern>
+
+A pattern that something has, for example 'polka dot', 'striped', 'Canadian
+flag'. Values are typically expressed as text, although links to controlled
+value schemes are also supported.
+
+A pattern should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_pattern>
+
+A predicate for the L</pattern> attribute.
+
 =head2 C<position>
 
 The position of an item in a series or sequence of items.
@@ -2604,6 +2640,31 @@ A sd_publisher should be one of the following types:
 =head2 C<_has_sd_publisher>
 
 A predicate for the L</sd_publisher> attribute.
+
+=head2 C<size>
+
+A standardized size of a product or creative work, often simplifying richer
+information into a simple textual string, either through referring to named
+sizes or (in the case of product markup), by adopting conventional
+simplifications. Use of QuantitativeValue with a unitCode or unitText can
+add more structure; in other cases, the /width, /height, /depth and /weight
+properties may be more applicable.
+
+A size should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::DefinedTerm']>
+
+=item C<InstanceOf['SemanticWeb::Schema::QuantitativeValue']>
+
+=item C<Str>
+
+=back
+
+=head2 C<_has_size>
+
+A predicate for the L</size> attribute.
 
 =head2 C<source_organization>
 

@@ -1,3 +1,9 @@
+0.277   2020-07-30  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Try harder to detect aos, etc; instead of just looking at at
+	  most 5 elements now look at at most 1000 (related: RT#133078).
+
+
 0.276   2020-05-30  Released-By: PERLANCAR; Urgency: medium
 
 	- [test] Adjust that now that Number::Format::BigFloat is downgraded to

@@ -19,7 +19,7 @@ use Types::Standard qw( Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.3';
+our $VERSION = 'v0.4.4';
 
 
 sub import {
@@ -120,7 +120,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.4.3
+version v0.4.4
 
 =head1 SYNOPSIS
 

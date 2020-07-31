@@ -1,0 +1,9 @@
+The list of required packages to install:
+  libidn2_0
+  libidn2-devel
+  perl-ExtUtils-PkgConfig
+  gcc-core
+  make
+
+On Windows x86_64:
+  libcrypt-devel

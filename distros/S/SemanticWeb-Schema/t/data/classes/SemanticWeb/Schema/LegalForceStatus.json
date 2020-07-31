@@ -1,16 +1,16 @@
 {
    "class" : {
       "core:exactMatch" : "ontology:InForce",
-      "dc:source" : [
-         "eli:index.html",
-         "https://github.com/schemaorg/schemaorg/issues/1156"
-      ],
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A list of possible statuses for the legal force of a legislation.",
       "rdfs:label" : "LegalForceStatus",
-      "rdfs:subClassOf" : "schema:Enumeration",
+      "rdfs:subClassOf" : "schema:StatusEnumeration",
       "schema:category" : "issue-1156",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : [
+         "https://github.com/schemaorg/schemaorg/issues/1156",
+         "eli:index.html"
+      ]
    },
    "properties" : {}
 }

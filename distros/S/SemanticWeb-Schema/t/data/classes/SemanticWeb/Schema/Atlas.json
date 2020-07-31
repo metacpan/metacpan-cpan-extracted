@@ -1,11 +1,11 @@
 {
    "class" : {
-      "dc:source" : "id:Atlas",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A collection or bound volume of maps, charts, plates or tables, physical or in media form illustrating any subject.",
       "rdfs:label" : "Atlas",
       "rdfs:subClassOf" : "schema:CreativeWork",
-      "schema:isPartOf" : "http:bib.schema.org"
+      "schema:isPartOf" : "http:bib.schema.org",
+      "schema:source" : "id:Atlas"
    },
    "properties" : {}
 }

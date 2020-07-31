@@ -1,30 +1,30 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An entity holding detailed information about the available bed types, e.g. the quantity of twin beds for a hotel room. For the single case of just one bed of a certain type, you can use bed directly with a text. See also <a class=\"localLink\" href=\"http://schema.org/BedType\">BedType</a> (under development).",
       "rdfs:label" : "BedDetails",
-      "rdfs:subClassOf" : "schema:Intangible"
+      "rdfs:subClassOf" : "schema:Intangible",
+      "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
    },
    "properties" : {
       "schema:numberOfBeds" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The quantity of the given bed type available in the HotelRoom, Suite, House, or Apartment.",
          "rdfs:label" : "numberOfBeds",
          "schema:domainIncludes" : "schema:BedDetails",
-         "schema:rangeIncludes" : "schema:Number"
+         "schema:rangeIncludes" : "schema:Number",
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       },
       "schema:typeOfBed" : {
-         "dc:source" : "schemadotorgsources2:STI_Accommodation_Ontology",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The type of bed to which the BedDetail refers, i.e. the type of bed available in the quantity indicated by quantity.",
          "rdfs:label" : "typeOfBed",
          "schema:domainIncludes" : "schema:BedDetails",
          "schema:rangeIncludes" : [
-            "schema:Text",
-            "schema:BedType"
-         ]
+            "schema:BedType",
+            "schema:Text"
+         ],
+         "schema:source" : "schemadotorgsources2:STI_Accommodation_Ontology"
       }
    }
 }

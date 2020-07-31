@@ -108,10 +108,20 @@ if($prec != 2098) {
 
   my $re_expected = (sqrt(3.0) ** 2) * -1.0;
 
+  #print "MPC: $real Perl: $re_expected\n";
+
   if($real == $re_expected) {print "ok 4\n"}
   else {
-    warn "\nexpected $re_expected, got $real\n";
-    print "not ok 4\n";
+    my $c = sqrt(3.0);
+    if(($c != 3.0 ** 0.5) || ($c ** 2 != $c * $c)) {
+      # Some BSD (long double) builds have crappy powl() implementation
+      warn "Skipping test 4 - this perl is bizarre\n";
+      print "ok 4\n";
+    }
+    else {
+      warn "\nexpected $re_expected, got $real\n";
+      print "not ok 4\n";
+    }
   }
 }
 else {

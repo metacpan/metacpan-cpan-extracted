@@ -15,7 +15,7 @@ use Ref::Util qw/ is_plain_hashref /;
 
 use namespace::autoclean;
 
-our $VERSION = 'v8.0.0';
+our $VERSION = 'v9.0.0';
 
 
 has by_day => (
@@ -38,6 +38,14 @@ has by_month_day => (
     is        => 'rw',
     predicate => '_has_by_month_day',
     json_ld   => 'byMonthDay',
+);
+
+
+
+has by_month_week => (
+    is        => 'rw',
+    predicate => '_has_by_month_week',
+    json_ld   => 'byMonthWeek',
 );
 
 
@@ -130,7 +138,7 @@ SemanticWeb::Schema::Schedule - A schedule defines a repeating time period used 
 
 =head1 VERSION
 
-version v8.0.0
+version v9.0.0
 
 =head1 DESCRIPTION
 
@@ -213,6 +221,27 @@ A by_month_day should be one of the following types:
 =head2 C<_has_by_month_day>
 
 A predicate for the L</by_month_day> attribute.
+
+=head2 C<by_month_week>
+
+C<byMonthWeek>
+
+Defines the week(s) of the month on which a recurring Event takes place.
+Specified as an Integer between 1-5. For clarity, byMonthWeek is best used
+in conjunction with byDay to indicate concepts like the first and third
+Mondays of a month.
+
+A by_month_week should be one of the following types:
+
+=over
+
+=item C<InstanceOf['SemanticWeb::Schema::Integer']>
+
+=back
+
+=head2 C<_has_by_month_week>
+
+A predicate for the L</by_month_week> attribute.
 
 =head2 C<duration>
 

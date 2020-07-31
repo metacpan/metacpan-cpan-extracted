@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-CopyFilesFromRelease
 
+0.007     2017-12-03 07:00:43Z
+    - minor updates to distribution packaging
+
 0.006     2015-06-16 01:26:52Z
     - now with unit tests! :)
     - sort data in dumped configs, for consistency between builds

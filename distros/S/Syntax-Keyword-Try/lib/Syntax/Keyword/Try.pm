@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.16;
+package Syntax::Keyword::Try 0.17;
 
 use v5.14;
 use warnings;
@@ -126,24 +126,10 @@ still propagate exceptions up to callers as normal.
       STATEMENTS...
    }
 
-Or
-
-   ...
-   catch ($var) {
-      STATEMENTS...
-   }
-
-I<Experimental; since version 0.14.>
-
 A C<catch> statement provides a block of code to the preceding C<try>
 statement that will be invoked in the case that the main block of code throws
 an exception. The C<catch> block can inspect the raised exception by looking
-in C<$@> in the usual way. Optionally, a new lexical variable can be
-introduced to store the exception in. This new form is experimental and is
-likely to be expanded on in a future version, as part of the wider attempt to
-introduce typed dispatch. Using it will provoke an C<experimental> category
-warning on supporting perl versions, unless silenced by importing the
-C<:experimental(var)> tag (see above).
+in C<$@> in the usual way. 
 
 Presence of this C<catch> statement causes any exception thrown by the
 preceding C<try> block to be non-fatal to the surrounding code. If the
@@ -158,6 +144,21 @@ usual effect.
 
 If a C<catch> statement is not given, then any exceptions raised by the C<try>
 block are raised to the caller in the usual way.
+
+=head2 catch (Var)
+
+   ...
+   catch ($var) {
+      STATEMENTS...
+   }
+
+I<Experimental; since version 0.14.>
+
+Optionally, a new lexical variable can be introduced to store the exception in.
+This new form is experimental and is likely to be expanded on in a future
+version, as part of the wider attempt to introduce typed dispatch. Using it
+will provoke an C<experimental> category warning on supporting perl versions,
+unless silenced by importing the C<:experimental(var)> tag (see above).
 
 =head2 catch (Typed)
 

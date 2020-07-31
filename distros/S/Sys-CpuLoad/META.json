@@ -5,7 +5,7 @@
       "Clinton Wong <clintdw@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "CPU",
       "load",
@@ -55,7 +55,9 @@
             "IPC::Run3" : "0",
             "XSLoader" : "0",
             "parent" : "0",
-            "perl" : "v5.6.0"
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -76,7 +78,7 @@
    "provides" : {
       "Sys::CpuLoad" : {
          "file" : "lib/Sys/CpuLoad.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       }
    },
    "release_status" : "stable",
@@ -91,7 +93,7 @@
          "web" : "https://github.com/robrwo/Sys-CpuLoad"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Slaven Rezi\u0107 <slaven@rezic.de>",

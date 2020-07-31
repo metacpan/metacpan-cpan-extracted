@@ -1,52 +1,52 @@
 {
    "class" : {
-      "dc:source" : "schemadotorgsources:source_GoodRelationsClass",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A structured value providing information about when a certain organization or person owned a certain product.",
       "rdfs:label" : "OwnershipInfo",
-      "rdfs:subClassOf" : "schema:StructuredValue"
+      "rdfs:subClassOf" : "schema:StructuredValue",
+      "schema:source" : "schemadotorgsources:source_GoodRelationsClass"
    },
    "properties" : {
       "schema:acquiredFrom" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The organization or person from which the product was acquired.",
          "rdfs:label" : "acquiredFrom",
          "schema:domainIncludes" : "schema:OwnershipInfo",
          "schema:rangeIncludes" : [
-            "schema:Person",
-            "schema:Organization"
-         ]
+            "schema:Organization",
+            "schema:Person"
+         ],
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:ownedFrom" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date and time of obtaining the product.",
          "rdfs:label" : "ownedFrom",
          "schema:domainIncludes" : "schema:OwnershipInfo",
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : "schema:DateTime",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:ownedThrough" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The date and time of giving up ownership on the product.",
          "rdfs:label" : "ownedThrough",
          "schema:domainIncludes" : "schema:OwnershipInfo",
-         "schema:rangeIncludes" : "schema:DateTime"
+         "schema:rangeIncludes" : "schema:DateTime",
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       },
       "schema:typeOfGood" : {
-         "dc:source" : "schemadotorgsources:source_GoodRelationsTerms",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The product that this structured value is referring to.",
          "rdfs:label" : "typeOfGood",
          "schema:domainIncludes" : [
-            "schema:OwnershipInfo",
-            "schema:TypeAndQuantityNode"
+            "schema:TypeAndQuantityNode",
+            "schema:OwnershipInfo"
          ],
          "schema:rangeIncludes" : [
             "schema:Service",
             "schema:Product"
-         ]
+         ],
+         "schema:source" : "schemadotorgsources:source_GoodRelationsTerms"
       }
    }
 }

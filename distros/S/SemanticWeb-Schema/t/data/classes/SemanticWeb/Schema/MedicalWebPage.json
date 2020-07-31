@@ -15,6 +15,17 @@
          "schema:isPartOf" : "http:health-lifesci.schema.org",
          "schema:rangeIncludes" : "schema:Text",
          "schema:supersededBy" : "schema:mainContentOfPage"
+      },
+      "schema:medicalAudience" : {
+         "rdf:type" : "rdf:Property",
+         "rdfs:comment" : "Medical audience for page.",
+         "rdfs:label" : "medicalAudience",
+         "schema:domainIncludes" : "schema:MedicalWebPage",
+         "schema:isPartOf" : "http:health-lifesci.schema.org",
+         "schema:rangeIncludes" : [
+            "schema:MedicalAudienceType",
+            "schema:MedicalAudience"
+         ]
       }
    }
 }

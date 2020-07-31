@@ -11,7 +11,7 @@ use Mojo::DOM;
 use Types::Standard qw(Str Maybe);
 use NewsExtractor::Types qw(is_NewspaperName);
 
-use Importer 'NewsExtractor::TextUtil'  => qw( normalize_whitespace html2text parse_dateline_ymdhms );
+use Importer 'NewsExtractor::TextUtil'  => qw( u normalize_whitespace html2text parse_dateline_ymdhms );
 use Importer 'NewsExtractor::Constants' => qw( %RE );
 
 with 'NewsExtractor::Role::ContentTextExtractor';
@@ -69,7 +69,7 @@ sub dateline {
         $guess->at("a")->remove;
         $dateline = $guess->text;
     }
-    elsif ($guess = $dom->at("article.ndArticle_leftColumn div.ndArticle_creat, ul.info li.date, .cpInfo .cp, .nsa3 .tt27, .fncnews-content > .info > span.small-gray-text")) {
+    elsif ($guess = $dom->at("article.ndArticle_leftColumn div.ndArticle_creat, ul.info li.date, .cpInfo .cp, .nsa3 .tt27")) {
         ($dateline) = $guess->text =~ m#([0-9]{4}[\-/][0-9]{2}[\-/][0-9]{2} [0-9]{2}:[0-9]{2})#;
     }
     elsif ($guess = $dom->at(".news-toolbar .news-toolbar__cell")) {
@@ -91,7 +91,14 @@ sub dateline {
         ($dateline) = $guess->text =~ m#([0-9]{4}-[0-9]{1,2}-[0-9]{1,2})#;
     }
     elsif ($guess = $dom->at("span.submitted-by")) {
-        ($dateline) = $guess->text =~ m#([0-9]{1,2}\s*月\s*[0-9]{1,2}(\s*日\s*)?,\s*[0-9]{4})#x;
+        # www.thinkingtaiwan.com
+        my ($month, $day, $year) = $guess->text =~ m/([0-9]+)/g;
+        $dateline = u(
+            sprintf(
+                '%04d-%02d-%02dT%02d:%02d:%02d%s',
+                $year, $month, $day, 23, 59, 59, '+08:00'
+            )
+        );
     }
     elsif ($guess = $dom->at('#story #news_author')) {
         ($dateline) = $guess->all_text =~ m{\A 【記者.+ 】\s* (.+) \z}x;

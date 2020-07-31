@@ -1,63 +1,63 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2108",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "Data type: PronounceableText.",
       "rdfs:label" : "PronounceableText",
       "rdfs:subClassOf" : "schema:Text",
       "schema:category" : "issue-2108",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2108"
    },
    "properties" : {
       "schema:inLanguage" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2382",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The language of the content or performance or used in an action. Please use one of the language codes from the <a href=\"http://tools.ietf.org/html/bcp47\">IETF BCP 47 standard</a>. See also <a class=\"localLink\" href=\"http://schema.org/availableLanguage\">availableLanguage</a>.",
          "rdfs:label" : "inLanguage",
          "schema:category" : "issue-2382",
          "schema:domainIncludes" : [
-            "schema:LinkRole",
-            "schema:PronounceableText",
-            "schema:CommunicateAction",
-            "schema:BroadcastService",
-            "schema:WriteAction",
+            "schema:CreativeWork",
             "schema:Event",
-            "schema:CreativeWork"
+            "schema:WriteAction",
+            "schema:PronounceableText",
+            "schema:BroadcastService",
+            "schema:CommunicateAction",
+            "schema:LinkRole"
          ],
          "schema:rangeIncludes" : [
             "schema:Language",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2382"
       },
       "schema:phoneticText" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2108",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Representation of a text <a class=\"localLink\" href=\"http://schema.org/textValue\">textValue</a> using the specified <a class=\"localLink\" href=\"http://schema.org/speechToTextMarkup\">speechToTextMarkup</a>. For example the city name of Houston in IPA: /ËhjuËstÉn/.",
          "rdfs:label" : "phoneticText",
          "schema:category" : "issue-2108",
          "schema:domainIncludes" : "schema:PronounceableText",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2108"
       },
       "schema:speechToTextMarkup" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2108",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Form of markup used. eg. <a href=\"https://www.w3.org/TR/speech-synthesis11\">SSML</a> or <a href=\"https://www.wikidata.org/wiki/Property:P898\">IPA</a>.",
          "rdfs:label" : "speechToTextMarkup",
          "schema:category" : "issue-2108",
          "schema:domainIncludes" : "schema:PronounceableText",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2108"
       },
       "schema:textValue" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2108",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "Text value being annotated.",
          "rdfs:label" : "textValue",
          "schema:category" : "issue-2108",
          "schema:domainIncludes" : "schema:PronounceableText",
          "schema:isPartOf" : "http:pending.schema.org",
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2108"
       }
    }
 }

@@ -3,8 +3,8 @@ BEGIN { chdir 't' if -d 't' }
 
 use warnings;
 use utf8;
-use open ':std', ':encoding(utf8)';
-use Test::More tests => 115;
+use open ':std', ':encoding(UTF-8)';
+use Test::More tests => 117;
 use Test::Exception;
 use strict;
 
@@ -97,14 +97,24 @@ foreach my $prefix (@prefix_manifestfiles) {
         # write_file("$bag_dir/data/payload2.txt", "PAYLOAD2" );
         write_file("$bag_dir/data/payload3.txt", "PAYLOAD3_MODIFIED3");
         _modify_bag("$bag_dir/tagmanifest-sha512.txt");
+        _modify_bag("$bag_dir/tagmanifest-md5.txt");
         my $bag_invalid1 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
         throws_ok(
             sub {
-                $bag_invalid1->verify_bag(
+                $bag_invalid1->verify_bag()
+            },
+            qr{file.*'data/payload1.txt'.* invalid, digest.*'}s,
+            "check if bag fails verification of broken fixity for payload (all errors)"
+        );
+ my $bag_invalid2 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
+
+        throws_ok(
+            sub {
+                $bag_invalid2->verify_bag(
                     { return_all_errors => 1 }
                 )
             },
-            qr{bag verify for bagit version '1.0' failed with invalid files.*file 'data/payload1.txt'.*file 'data/payload3.txt'.*file 'bagit.txt'}s,
+            qr{bag verify for bagit version '1.0' failed with invalid files.*file.*normalized='data/payload1.txt'.*file.*normalized='data/payload3.txt'.*file.*normalized='bag-info.txt'}s,
             "check if bag fails verification of broken fixity for payload (all errors)"
         );
     }
@@ -114,11 +124,11 @@ foreach my $prefix (@prefix_manifestfiles) {
     my @should_fail_bags_097 = (
         [ qw(../bagit_conformance_suite/v0.97/invalid/baginfo-missing-encoding), qr{Encoding line missed} ],
         [ qw(../bagit_conformance_suite/v0.97/invalid/bom-in-bagit.txt), qr{Version string '<BOM>BagIt-Version: 0\.97'.* is incorrect} ],
-        [ qw(../bagit_conformance_suite/v0.97/invalid/corrupt-data-file), qr{file 'data/bare-filename' invalid, digest \(md5\).*} ],
-        [ qw(../bagit_conformance_suite/v0.97/invalid/corrupt-tag-file), qr{file 'bag-info\.txt' invalid, digest \(md5\).*} ],
-        [ qw(../bagit_conformance_suite/v0.97/invalid/extra-file-in-bag), qr{file 'data/bar' found, which is not in 'manifest-md5\.txt'} ],
+        [ qw(../bagit_conformance_suite/v0.97/invalid/corrupt-data-file), qr{file '.*' \(normalized='data/bare-filename'\) invalid, digest \(md5\).*} ],
+        [ qw(../bagit_conformance_suite/v0.97/invalid/corrupt-tag-file), qr{file 'bag-info\.txt' \(normalized='.*'\) invalid, digest \(md5\).*} ],
+        [ qw(../bagit_conformance_suite/v0.97/invalid/extra-file-in-bag), qr{file '.*' \(normalized='data/bar'\) found, which is not in 'manifest-md5\.txt'} ],
         [ qw(../bagit_conformance_suite/v0.97/invalid/invalid-version-number), qr{Version string 'BagIt-Version: \.97'.* is incorrect} ],
-        [ qw(../bagit_conformance_suite/v0.97/invalid/missing-baginfo), qr{Cannot read.*bag-info\.txt} ],
+        [ qw(../bagit_conformance_suite/v0.97/invalid/missing-baginfo), qr{file 'bag-info\.txt' NOT found, but expected via 'tagmanifest-md5\.txt'} ],
         [ qw(../bagit_conformance_suite/v0.97/invalid/missing-bagit.txt), qr{Cannot read.*bagit\.txt} ],
         [ qw(../bagit_conformance_suite/v0.97/invalid/out-of-scope-file-paths-using-dot-notation-for-fetch), qr{Fetching via file .*fetch\.txt.*not supported} ],
         [ qw(../bagit_conformance_suite/v0.97/invalid/out-of-scope-file-paths-using-dot-notation), qr{file .*\./README\.md' not allowed in 'manifest-md5\.txt'} ],
@@ -139,14 +149,14 @@ foreach my $prefix (@prefix_manifestfiles) {
         #[qw(../bagit_conformance_suite/v0.97/warning/relative-path), "FOO"],
         #[qw(../bagit_conformance_suite/v0.97/warning/same-filename-listed-twice-with-different-normalization), "FOO"],
         #[qw(../bagit_conformance_suite/v0.97/warning/special-system-files), "FOO"],
-        [ qw(../bagit_conformance_suite/v0.97/warning/made-with-md5sum-tools), qr{file 'data/hello.txt' found, which is not in 'manifest-md5.txt'} ], # <-- it first checks files in data/ and later the fixity. Here the fixity for paylod not found!
+        [ qw(../bagit_conformance_suite/v0.97/warning/made-with-md5sum-tools), qr{file '.*' \(normalized='data/hello.txt'\) found, which is not in 'manifest-md5.txt'} ], # <-- it first checks files in data/ and later the fixity. Here the fixity for paylod not found!
         #[qw(../bagit_conformance_suite/v0.97/warning/same-filename-listed-twice-with-the-same-hash), "FOO"],
 
     );
     my @should_fail_bags_100 = (
         # FIXME: next testcase does not work because missing sha256-checks
         #[qw(../bagit_conformance_suite/v1.0/invalid/same-filename-listed-twice-with-different-hashes), "FOO"],
-        [qw(../bagit_conformance_suite/v1.0/invalid/missing-baginfo), qr{Cannot read.*bag-info\.txt}],
+        [qw(../bagit_conformance_suite/v1.0/invalid/missing-from-manifest), qr{file '.*' \(normalized='data/missingFromManifest\.txt'\) found, which is not in 'manifest-sha512\.txt'}],
         [qw(../bagit_conformance_suite/v1.0/invalid/bagit-with-invalid-whitespace), qr{Version string 'BagIt-Version : 1.0'.* is incorrect}],
     );
     my @should_pass_bags_100 = (
@@ -167,7 +177,7 @@ foreach my $prefix (@prefix_manifestfiles) {
         [qw(../bagit_conformance_suite/v0.97/valid/bag-with-space), "bagit_conformance_suite/v0.97/valid/bag-with-space"],
     );
     note "version 0.97 conformance tests";
-
+    
     foreach my $entry (@should_fail_bags_097) {
         my $bagdir = $entry->[0];
         my $descr = $bagdir; $descr =~ s|../bagit_conformance_suite/||;

@@ -7,21 +7,21 @@
    },
    "properties" : {
       "schema:addressCountry" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The country. For example, USA. You can also provide the two-letter <a href=\"http://en.wikipedia.org/wiki/ISO_3166-1\">ISO 3166-1 alpha-2 country code</a>.",
          "rdfs:label" : "addressCountry",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
-            "schema:GeoCoordinates",
-            "schema:DefinedRegion",
             "schema:GeoShape",
+            "schema:DefinedRegion",
+            "schema:GeoCoordinates",
             "schema:PostalAddress"
          ],
          "schema:rangeIncludes" : [
             "schema:Country",
             "schema:Text"
-         ]
+         ],
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:addressLocality" : {
          "rdf:type" : "rdf:Property",
@@ -31,16 +31,16 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:addressRegion" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The region in which the locality is, and which is in the country. For example, California or another appropriate first-level <a href=\"https://en.wikipedia.org/wiki/List_of_administrative_divisions_by_country\">Administrative division</a>",
          "rdfs:label" : "addressRegion",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
-            "schema:DefinedRegion",
-            "schema:PostalAddress"
+            "schema:PostalAddress",
+            "schema:DefinedRegion"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:postOfficeBoxNumber" : {
          "rdf:type" : "rdf:Property",
@@ -50,18 +50,18 @@
          "schema:rangeIncludes" : "schema:Text"
       },
       "schema:postalCode" : {
-         "dc:source" : "https://github.com/schemaorg/schemaorg/issues/2506",
          "rdf:type" : "rdf:Property",
          "rdfs:comment" : "The postal code. For example, 94043.",
          "rdfs:label" : "postalCode",
          "schema:category" : "issue-2506",
          "schema:domainIncludes" : [
-            "schema:DefinedRegion",
-            "schema:PostalAddress",
             "schema:GeoShape",
-            "schema:GeoCoordinates"
+            "schema:PostalAddress",
+            "schema:GeoCoordinates",
+            "schema:DefinedRegion"
          ],
-         "schema:rangeIncludes" : "schema:Text"
+         "schema:rangeIncludes" : "schema:Text",
+         "schema:source" : "https://github.com/schemaorg/schemaorg/issues/2506"
       },
       "schema:streetAddress" : {
          "rdf:type" : "rdf:Property",

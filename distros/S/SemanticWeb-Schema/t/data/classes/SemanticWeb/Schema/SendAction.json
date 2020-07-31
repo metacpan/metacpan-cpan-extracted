@@ -12,10 +12,10 @@
          "rdfs:label" : "deliveryMethod",
          "rdfs:subPropertyOf" : "schema:instrument",
          "schema:domainIncludes" : [
+            "schema:TrackAction",
             "schema:ReceiveAction",
             "schema:SendAction",
-            "schema:OrderAction",
-            "schema:TrackAction"
+            "schema:OrderAction"
          ],
          "schema:rangeIncludes" : "schema:DeliveryMethod"
       },
@@ -25,21 +25,21 @@
          "rdfs:label" : "recipient",
          "rdfs:subPropertyOf" : "schema:participant",
          "schema:domainIncludes" : [
+            "schema:DonateAction",
+            "schema:SendAction",
+            "schema:AuthorizeAction",
             "schema:ReturnAction",
             "schema:Message",
-            "schema:DonateAction",
-            "schema:AuthorizeAction",
-            "schema:GiveAction",
-            "schema:TipAction",
+            "schema:PayAction",
             "schema:CommunicateAction",
-            "schema:SendAction",
-            "schema:PayAction"
+            "schema:TipAction",
+            "schema:GiveAction"
          ],
          "schema:rangeIncludes" : [
-            "schema:ContactPoint",
             "schema:Audience",
+            "schema:Person",
             "schema:Organization",
-            "schema:Person"
+            "schema:ContactPoint"
          ]
       }
    }

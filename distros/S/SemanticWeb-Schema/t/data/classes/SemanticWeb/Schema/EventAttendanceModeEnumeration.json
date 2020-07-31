@@ -1,12 +1,12 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1842",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "An EventAttendanceModeEnumeration value is one of potentially several modes of organising an event, relating to whether it is online or offline.",
       "rdfs:label" : "EventAttendanceModeEnumeration",
       "rdfs:subClassOf" : "schema:Enumeration",
       "schema:category" : "issue-1842",
-      "schema:isPartOf" : "http:pending.schema.org"
+      "schema:isPartOf" : "http:pending.schema.org",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1842"
    },
    "properties" : {}
 }

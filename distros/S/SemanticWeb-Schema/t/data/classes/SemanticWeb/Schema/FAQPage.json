@@ -1,11 +1,11 @@
 {
    "class" : {
-      "dc:source" : "https://github.com/schemaorg/schemaorg/issues/1723",
       "rdf:type" : "rdfs:Class",
       "rdfs:comment" : "A <a class=\"localLink\" href=\"http://schema.org/FAQPage\">FAQPage</a> is a <a class=\"localLink\" href=\"http://schema.org/WebPage\">WebPage</a> presenting one or more \"<a href=\"https://en.wikipedia.org/wiki/FAQ\">Frequently asked questions</a>\" (see also <a class=\"localLink\" href=\"http://schema.org/QAPage\">QAPage</a>).",
       "rdfs:label" : "FAQPage",
       "rdfs:subClassOf" : "schema:WebPage",
-      "schema:category" : "issue-1723"
+      "schema:category" : "issue-1723",
+      "schema:source" : "https://github.com/schemaorg/schemaorg/issues/1723"
    },
    "properties" : {}
 }

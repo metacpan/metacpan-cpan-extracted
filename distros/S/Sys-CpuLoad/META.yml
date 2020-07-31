@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 keywords:
   - CPU
   - load
@@ -29,7 +29,7 @@ name: Sys-CpuLoad
 provides:
   Sys::CpuLoad:
     file: lib/Sys/CpuLoad.pm
-    version: '0.30'
+    version: '0.31'
 requires:
   Exporter: '0'
   File::Which: '0'
@@ -38,11 +38,13 @@ requires:
   XSLoader: '0'
   parent: '0'
   perl: v5.6.0
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Sys-CpuLoad/issues
   homepage: https://metacpan.org/release/Sys-CpuLoad
   repository: git://github.com/robrwo/Sys-CpuLoad.git
-version: '0.30'
+version: '0.31'
 x_authority: cpan:RRWO
 x_contributors:
   - 'Slaven Rezić <slaven@rezic.de>'

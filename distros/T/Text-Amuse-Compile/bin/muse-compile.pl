@@ -13,6 +13,7 @@ use Text::Amuse::Compile::Utils qw/append_file/;
 use Text::Amuse::Compile::TemplateOptions;
 use Text::Amuse::Compile::Templates;
 use Text::Amuse::Compile::Fonts;
+use Path::Tiny;
 use Encode;
 
 binmode STDOUT, ':encoding(UTF-8)';
@@ -43,6 +44,7 @@ GetOptions (\%options,
                version
                verbose
                coverpage-only-if-toc
+               include-path=s@
                purge
                help/) or die "Bad option passed!\n";
 
@@ -127,6 +129,10 @@ As above, but on Letter paper.
 
 The directory with the templates. Optional and somehow discouraged for
 normal usage.
+
+=item --include-path path/to/directory
+
+Repeatable. Directory where to look for included files.
 
 =item --fontspec fontspec.json
 
@@ -330,7 +336,9 @@ unless ($args{fontspec}) {
     $args{fontspec} = \@list;
 }
 
-
+if ($args{include_path}) {
+    $args{include_paths} = [ map { path($_)->absolute->stringify } @{delete $args{include_path}} ];
+}
 
 
 my $compiler = Text::Amuse::Compile->new(%args, cleanup => $cleanup);
