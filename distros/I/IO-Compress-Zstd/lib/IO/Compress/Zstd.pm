@@ -5,16 +5,16 @@ use warnings;
 require Exporter ;
 use bytes;
 
-use IO::Compress::Base 2.095 ;
+use IO::Compress::Base 2.096 ;
 
-use IO::Compress::Base::Common  2.095 qw(createSelfTiedObject);
-use IO::Compress::Adapter::Zstd 2.095 ;
+use IO::Compress::Base::Common  2.096 qw(createSelfTiedObject);
+use IO::Compress::Adapter::Zstd 2.096 ;
 use Compress::Stream::Zstd qw(ZSTD_MAX_CLEVEL);
 
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $ZstdError);
 
-$VERSION = '2.095';
+$VERSION = '2.096';
 $ZstdError = '';
 
 @ISA    = qw( IO::Compress::Base Exporter );
@@ -92,7 +92,7 @@ sub mkFinalTrailer
 #}
 
 our %PARAMS = (
-    'level' => [IO::Compress::Base::Common::Parse_unsigned,  ZSTD_MAX_CLEVEL],
+    'level' => [IO::Compress::Base::Common::Parse_unsigned,  3],
     );
 
 sub getExtraParams
@@ -526,7 +526,7 @@ Defines the compression level used.
 
 This gets passed to the ZSTD function ZSTD_initCStream.
 
-Default is ZSTD_MAX_CLEVEL
+Default is 3
 
 =item C<< Strict => 0|1 >>
 

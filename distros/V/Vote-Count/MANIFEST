@@ -23,6 +23,7 @@ lib/Vote/Count/Matrix.pm
 lib/Vote/Count/Method/CondorcetDropping.pm
 lib/Vote/Count/Method/CondorcetIRV.pm
 lib/Vote/Count/Method/CondorcetVsIRV.pm
+lib/Vote/Count/Method/MinMax.pm
 lib/Vote/Count/Method/STAR.pm
 lib/Vote/Count/Range.pod
 lib/Vote/Count/RankCount.pm
@@ -85,6 +86,7 @@ t/floor.t
 t/irv.t
 t/log.t
 t/matrix.t
+t/methodminmax.t
 t/rankcount.t
 t/readballots.t
 t/redact.t

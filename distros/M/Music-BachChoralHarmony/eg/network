@@ -9,6 +9,7 @@ use Music::BachChoralHarmony;
 
 my $id = shift || '000106b_';
 
+#my $bach = Music::BachChoralHarmony->new( data_file => 'share/jsbach_chorals_harmony.data', key_title => 'share/jsbach_BWV_keys_titles.txt' );
 my $bach = Music::BachChoralHarmony->new;
 my $progression = $bach->parse();
 

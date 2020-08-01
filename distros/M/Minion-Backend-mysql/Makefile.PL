@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Minion::Backend::mysql",
   "PREREQ_PM" => {
-    "Minion" => "10.04",
+    "Minion" => "10.13",
     "Mojo::mysql" => "1.04",
     "Mojolicious" => 0
   },
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::mysqld" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.20",
+  "VERSION" => "0.21",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +42,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Minion" => "10.04",
+  "Minion" => "10.13",
   "Mojo::mysql" => "1.04",
   "Mojolicious" => 0,
   "Test::More" => 0,

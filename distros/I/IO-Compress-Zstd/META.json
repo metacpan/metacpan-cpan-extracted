@@ -35,8 +35,8 @@
       "runtime" : {
          "requires" : {
             "Compress::Stream::Zstd" : "0",
-            "IO::Compress::Base" : "2.095",
-            "IO::Uncompress::Base" : "2.095"
+            "IO::Compress::Base" : "2.096",
+            "IO::Uncompress::Base" : "2.096"
          }
       }
    },
@@ -52,6 +52,6 @@
          "web" : "https://github.com/pmqs/IO-Compress-Zstd"
       }
    },
-   "version" : "2.095",
+   "version" : "2.096",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

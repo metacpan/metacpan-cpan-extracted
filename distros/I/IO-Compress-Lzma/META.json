@@ -34,9 +34,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Compress::Raw::Lzma" : "2.095",
-            "IO::Compress::Base" : "2.095",
-            "IO::Uncompress::Base" : "2.095"
+            "Compress::Raw::Lzma" : "2.096",
+            "IO::Compress::Base" : "2.096",
+            "IO::Uncompress::Base" : "2.096"
          }
       }
    },
@@ -52,6 +52,6 @@
          "web" : "https://github.com/pmqs/IO-Compress-Lzma"
       }
    },
-   "version" : "2.095",
+   "version" : "2.096",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

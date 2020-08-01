@@ -12,13 +12,13 @@ use Data::Printer;
 use Vote::Count;
 use Vote::Count::ReadBallots 'read_ballots';
 
-our $VERSION='1.05';
+our $VERSION='1.06';
 
 =head1 NAME
 
 Vote::Count::Start
 
-=head1 VERSION 1.05
+=head1 VERSION 1.06
 
 =cut
 
@@ -192,21 +192,8 @@ sub _do_matrix( $Election) {
 }
 
 sub _do_irv ( $Election, $floorset ) {
-  # my $IRV = Vote::Count->new(
-  #   'BallotSet' => $Election->BallotSet(),
-  #   'Active'    => $floorset
-  # );
   my $IRVResult = try { $Election->RunIRV() }
   catch { croak "RunIRV exploded" };
-#   if ( $IRVResult->{'winner'} ) {
-#     $Election->logt(
-#       'IRV (Eliminate All for Ties) Winner: ' . $IRVResult->{'winner'} );
-#     return $IRVResult->{'winner'};
-#   }
-#   else {
-#     $Election->logt( 'IRV Tie: ' . join( ', ', $IRVResult->{'tied'}->@* ) );
-#     return '';
-#   }
 }
 
 sub StartElection ( %ARGS ) {
@@ -216,13 +203,15 @@ sub StartElection ( %ARGS ) {
   $winners->{'plurality'} = _do_plurality($Election);
   $winners->{'approval'}  = _do_approval($Election);
   my $floorset = _dofloor( $Election, %ARGS );
-  $Election->Active($floorset);
+  $Election->SetActive($floorset);
   $winners->{'majority'}  = _do_majority($Election);
   $winners->{'borda'}     = _do_borda($Election);
   $winners->{'condorcet'} = _do_matrix($Election);
   $winners->{'irv'}       = _do_irv( $Election, $floorset );
   # todo generate a summary from the winners hash.
   $Election->{'startdata'} = $winners;
+  # Active gets modified from default, so reset to floorset
+  $Election->SetActive($floorset);
   return ($Election);
 }
 

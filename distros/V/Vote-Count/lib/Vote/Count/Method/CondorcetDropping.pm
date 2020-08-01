@@ -9,13 +9,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='1.05';
+our $VERSION='1.06';
 
 =head1 NAME
 
 Vote::Count::Method::CondorcetDropping
 
-=head1 VERSION 1.05
+=head1 VERSION 1.06
 
 =cut
 
@@ -49,7 +49,7 @@ Normally RunCondorcetDropping eliminates Condorcet Losers whenever they are disc
 =cut
 
 no warnings 'experimental';
-use List::Util qw( min max );
+# use List::Util qw( min max );
 # use YAML::XS;
 
 use Vote::Count::Matrix;

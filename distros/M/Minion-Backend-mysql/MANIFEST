@@ -12,6 +12,12 @@ lib/Minion/Backend/mysql.pm
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
+t/lib/MinionTest/AddTestTask.pm
+t/lib/MinionTest/BadTestTask.pm
+t/lib/MinionTest/EmptyTestTask.pm
+t/lib/MinionTest/FailTestTask.pm
+t/lib/MinionTest/NoResultTestTask.pm
+t/lib/MinionTest/SyntaxErrorTestTask.pm
 t/mysql.t
 weaver.ini
 xt/travis/mysql-strict.cnf

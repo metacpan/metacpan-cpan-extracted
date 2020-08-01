@@ -13,13 +13,13 @@ use Path::Tiny;
 # use Data::Dumper;
 #use Data::Printer;
 
-our $VERSION='1.05';
+our $VERSION='1.06';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 1.05
+=head1 VERSION 1.06
 
 =head1 Synopsis
 

@@ -12,10 +12,13 @@ t/102tied-zstd.t
 t/103newtied-zstd.t
 t/104destroy-zstd.t
 t/105oneshot-zstd.t
+t/105oneshot-zip-zstd.t
 t/106prime-zstd.t
 t/107multi-zstd.t
 t/108anyunc-zstd.t
 t/110encode-zstd.t
+t/files/lorem.txt
+t/files/winzip-et-zstd.zip
 t/meta-json.t
 t/meta-yaml.t
 t/999pod.t

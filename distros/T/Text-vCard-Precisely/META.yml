@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.4, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,13 +31,13 @@ no_index:
 provides:
   Text::vCard::Precisely:
     file: lib/Text/vCard/Precisely.pm
-    version: '0.20'
+    version: '0.23'
   Text::vCard::Precisely::Multiple:
     file: lib/Text/vCard/Precisely/Multiple.pm
-    version: '0.20'
+    version: '0.23'
   Text::vCard::Precisely::V3:
     file: lib/Text/vCard/Precisely/V3.pm
-    version: '0.20'
+    version: '0.23'
   Text::vCard::Precisely::V3::Node:
     file: lib/Text/vCard/Precisely/V3/Node.pm
   Text::vCard::Precisely::V3::Node::Address:
@@ -56,7 +56,7 @@ provides:
     file: lib/Text/vCard/Precisely/V3/Node/URL.pm
   Text::vCard::Precisely::V4:
     file: lib/Text/vCard/Precisely/V4.pm
-    version: '0.20'
+    version: '0.23'
   Text::vCard::Precisely::V4::Node:
     file: lib/Text/vCard/Precisely/V4/Node.pm
   Text::vCard::Precisely::V4::Node::Address:
@@ -93,11 +93,12 @@ resources:
   bugtracker: https://github.com/worthmine/Text-vCard-Precisely/issues
   homepage: https://github.com/worthmine/Text-vCard-Precisely
   repository: git://github.com/worthmine/Text-vCard-Precisely.git
-version: '0.20'
+version: '0.23'
 x_contributors:
   - 'Mohammad S Anwar <Mohammad.Anwar@yahoo.com>'
-  - 'Yuki Yoshida <worthmine@gmail.com>'
+  - 'Robin Mordasiewicz <robin@mordasiewicz.com>'
   - 'Yuki Yoshida <worthmine@users.noreply.github.com>'
   - 'worthmine <worthmine@cpan.org>'
+  - 'worthmine <worthmine@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

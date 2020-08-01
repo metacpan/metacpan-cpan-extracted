@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.095 qw(:Status);
+use IO::Compress::Base::Common  2.096 qw(:Status);
 use Compress::LZO ;
 
 our ($VERSION, @ISA);
-$VERSION = '2.095';
+$VERSION = '2.096';
 
 
 sub mkUncompObject

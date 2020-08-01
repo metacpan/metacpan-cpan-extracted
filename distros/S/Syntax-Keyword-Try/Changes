@@ -1,5 +1,9 @@
 Revision history for Syntax-Keyword-Try
 
+0.18    2020-08-01
+        [CHANGES]
+         * De-experiment the `catch ($var)` syntax
+
 0.17    2020-07-31
         [CHANGES]
          * Ensure that `catch ($var)` does not retain exception value after

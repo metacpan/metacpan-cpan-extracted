@@ -19,7 +19,7 @@ BEGIN
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
 
-    my $VERSION = '2.095';
+    my $VERSION = '2.096';
     my @NAMES = qw(
 			IO::Compress::Base
 			IO::Uncompress::Base

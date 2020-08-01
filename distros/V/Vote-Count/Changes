@@ -1,4 +1,6 @@
 Revision history for Vote::Count
+
+1.06  July  6, 2020 Fixed some instances of using Active instead of SetActive, broken pod links.
 1.05  July  6, 2020 Added Simple option to CondorcetVsIRV
 1.04  July  6, 2020 Excising ghosts files from dependency tree.
 1.03  July  5, 2020 Attempt to fix failure to install on Strawberry, 

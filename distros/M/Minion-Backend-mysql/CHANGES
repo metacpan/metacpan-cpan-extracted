@@ -1,5 +1,15 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.21      2020-07-31 22:55:46-05:00 America/Chicago
+
+  [Fixed]
+
+  - The mysql backend is now fully-compatible with Minion 10.13,
+    including:
+      - Listing jobs by notes
+      - Expiring jobs (experimental)
+      - Lax dependencies (experimental)
+
 0.20      2020-04-18 20:24:43-05:00 America/Chicago
 
   [Fixed]

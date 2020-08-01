@@ -40,6 +40,7 @@ t/104destroy-lzip.t
 t/105oneshot-lzma.t
 t/105oneshot-xz.t
 t/105oneshot-lzip.t
+t/105oneshot-zip-xz.t
 t/106prime-lzma.t
 t/106prime-xz.t
 t/106prime-lzip.t
@@ -54,7 +55,9 @@ t/110encode-xz.t
 t/110encode-lzip.t
 t/25interop-io-string.t
 t/999pod.t
-t/meta-json.t 
+t/files/lorem.txt
+t/files/winzip-eq-xz.zip
+t/meta-json.t
 t/meta-yaml.t
 t/Test/Builder.pm
 t/Test/More.pm

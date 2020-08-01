@@ -3,6 +3,8 @@ VERSION:3.0
 X-SOCIALPROFILE;TYPE=twitter:https://twitter.com/worthmine
 X-SOCIALPROFILE;TYPE=facebook;X-USERID=102074486543502;X-
  DISPLAYNAME=worthmine:https://www.facebook.com/worthmine
-X-SOCIALPROFILE;TYPE=LinkedIn:https://jp.linkedin.com/in/worthmine
 X-SOCIALPROFILE;TYPE=GitHub:https://github.com/worthmine
+X-SOCIALPROFILE;TYPE=YouTube:https://www.youtube.com/channel/UC-
+ qqmGV7CweS6RBwbRq0OLQ
+X-SOCIALPROFILE;TYPE=Twitch:https://www.twitch.tv/worthmine
 END:VCARD

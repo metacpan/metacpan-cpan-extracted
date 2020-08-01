@@ -8,34 +8,35 @@ extends 'Text::vCard::Precisely::V3::Node';
 
 my @order = qw( family given additional prefixes suffixes );
 
-has name => (is => 'ro', default => 'N', isa => 'Str' );
-has \@order => ( is => 'rw', isa => 'Str|Undef', default => undef );
+has name    => ( is => 'ro', default => 'N',         isa     => 'Str' );
+has \@order => ( is => 'rw', isa     => 'Str|Undef', default => undef );
 
 subtype 'Values' => as 'HashRef[Maybe[Str]]';
-coerce 'Values',
-    from 'ArrayRef[Maybe[Str]]',
-    via {
-        my @values = @$_; $values[4] ||= ''; my $hash = {};
-        map { $hash->{$order[$_]} = $values[$_] } 0..4;
-        return $hash;
-    },
-    from 'Str',
-    via {
-        my @values = split( /(?<!\\);/, $_ ); $values[4] ||= ''; my $hash = {};
-        map { $hash->{$order[$_]} = $values[$_] } 0..4;
-        return $hash;
-    };
+coerce 'Values', from 'ArrayRef[Maybe[Str]]', via {
+    my @values = @$_;
+    $values[4] ||= '';
+    my $hash = {};
+    map { $hash->{ $order[$_] } = $values[$_] } 0 .. 4;
+    return $hash;
+}, from 'Str', via {
+    my @values = split( /(?<!\\);/, $_ );
+    $values[4] ||= '';
+    my $hash = {};
+    map { $hash->{ $order[$_] } = $values[$_] } 0 .. 4;
+    return $hash;
+};
 has content => ( is => 'rw', isa => 'Values', coerce => 1 );
 
 override 'as_string' => sub {
     my ($self) = @_;
     my @lines;
-    push @lines, $self->name || croak "Empty name";
-    push @lines, 'LANGUAGE=' . $self->language if $self->language;
+    push @lines, $self->name() || croak "Empty name";
+    push @lines, 'LANGUAGE=' . $self->language() if $self->language();
 
-    my @values = map{ $self->_escape($_) } map{ $self->$_ or  $self->content && $self->content()->{$_} } @order;
+    my @values = map { $self->_escape($_) }
+        map { $self->$_ or $self->content() && $self->content()->{$_} } @order;
 
-    my $string = join(';', @lines ) . ':' . join( ';', @values );
+    my $string = join( ';', @lines ) . ':' . join( ';', @values );
     return $self->fold( $string, -force => 1 );
 };
 
@@ -52,7 +53,7 @@ sub surname {
 }
 
 sub given_name {
-    given(@_);
+    given (@_);
 }
 
 sub additional_name {

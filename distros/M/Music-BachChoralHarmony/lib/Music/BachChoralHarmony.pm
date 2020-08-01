@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Parse the UCI Bach choral harmony data set
 
-our $VERSION = '0.0403';
+our $VERSION = '0.0404';
 
 use Moo;
 use strictures 2;
@@ -343,7 +343,7 @@ Music::BachChoralHarmony - Parse the UCI Bach choral harmony data set
 
 =head1 VERSION
 
-version 0.0403
+version 0.0404
 
 =head1 SYNOPSIS
 
@@ -524,6 +524,9 @@ is a program written to extract the key signature.
 L<https://github.com/ology/Bach-Chorales/blob/master/chorales.zip>
 are the collected MIDI files and PDF transcriptions.
 
+L<https://en.wikipedia.org/wiki/Chorale_cantata_(Bach)>
+describes the context.
+
 =head1 THANK YOU
 
 Dan Book (L<DBOOK|https://metacpan.org/author/DBOOK>)
@@ -535,7 +538,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

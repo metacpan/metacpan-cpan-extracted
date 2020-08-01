@@ -1,6 +1,11 @@
 CHANGES
 -------
 
-  2.095 18 July 2020
+  2.096 31 July 2020
+
+      * set level default to 3. Matches zstd commandline
+        ab446b18f564c0e547619e740b2dce62899af7a7
+
+2.095 19 July 2020
 
       * First Release

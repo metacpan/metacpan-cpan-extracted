@@ -270,7 +270,8 @@ __END__
 #;
 
     open my $pod_fh, '>', $FindBin::Bin . '/../lib/Module/OTRS/CoreList.pod';
-print $pod_fh qq~
+print $pod_fh qq~# PODNAME: Module::OTRS::CoreList
+
 =head1 NAME
 
 Module::OTRS::CoreList - what modules shipped with versions of OTRS (>= 2.3.x)

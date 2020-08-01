@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.17;
+package Syntax::Keyword::Try 0.18;
 
 use v5.14;
 use warnings;
@@ -20,22 +20,6 @@ C<Syntax::Keyword::Try> - a C<try/catch/finally> syntax for perl
 =head1 SYNOPSIS
 
    use Syntax::Keyword::Try;
-
-   sub foo
-   {
-      try {
-         attempt_a_thing();
-         return "success";
-      }
-      catch {
-         warn "It failed - $@";
-         return "failure";
-      }
-   }
-
-Or, to use the experimental syntax:
-
-   use Syntax::Keyword::Try qw( try :experimental )
 
    sub foo {
       try {
@@ -69,8 +53,6 @@ You can silence this with C<no warnings 'experimental'> but then that will
 silence every experimental warning, which may hide others unintentionally. For
 a more fine-grained approach you can instead use the import line for this
 module to only silence this module's warnings selectively:
-
-   use Syntax::Keyword::Try qw( try :experimental(var) );
 
    use Syntax::Keyword::Try qw( try :experimental(typed) );
 
@@ -122,14 +104,22 @@ still propagate exceptions up to callers as normal.
 =head2 catch
 
    ...
+   catch ($var) {
+      STATEMENTS...
+   }
+
+or
+
+   ...
    catch {
       STATEMENTS...
    }
 
 A C<catch> statement provides a block of code to the preceding C<try>
 statement that will be invoked in the case that the main block of code throws
-an exception. The C<catch> block can inspect the raised exception by looking
-in C<$@> in the usual way. 
+an exception. Optionally a new lexical variable can be provided to store the
+exception in. If not provided, the C<catch> block can inspect the raised
+exception by looking in C<$@> instead.
 
 Presence of this C<catch> statement causes any exception thrown by the
 preceding C<try> block to be non-fatal to the surrounding code. If the
@@ -144,21 +134,6 @@ usual effect.
 
 If a C<catch> statement is not given, then any exceptions raised by the C<try>
 block are raised to the caller in the usual way.
-
-=head2 catch (Var)
-
-   ...
-   catch ($var) {
-      STATEMENTS...
-   }
-
-I<Experimental; since version 0.14.>
-
-Optionally, a new lexical variable can be introduced to store the exception in.
-This new form is experimental and is likely to be expanded on in a future
-version, as part of the wider attempt to introduce typed dispatch. Using it
-will provoke an C<experimental> category warning on supporting perl versions,
-unless silenced by importing the C<:experimental(var)> tag (see above).
 
 =head2 catch (Typed)
 
@@ -400,7 +375,7 @@ sub import
    $class->import_into( $caller, @_ );
 }
 
-my @EXPERIMENTAL = qw( var typed );
+my @EXPERIMENTAL = qw( typed );
 
 sub import_into
 {
@@ -412,6 +387,11 @@ sub import_into
    my %syms = map { $_ => 1 } @syms;
    $^H{"Syntax::Keyword::Try/try"}++ if delete $syms{try};
    $^H{"Syntax::Keyword::Try/try_value"}++ if delete $syms{try_value};
+
+   $^H{"Syntax::Keyword::Try/no_finally"}++ if delete $syms{no_finally};
+
+   # stablised experiments
+   delete $syms{":experimental($_)"} for qw( var );
 
    foreach ( @EXPERIMENTAL ) {
       $^H{"Syntax::Keyword::Try/experimental($_)"}++ if delete $syms{":experimental($_)"};

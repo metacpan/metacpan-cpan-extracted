@@ -17,14 +17,14 @@ use Storable 3.15 'dclone';
 
 no warnings 'experimental';
 
-our $VERSION='1.05';
+our $VERSION='1.06';
 
 =head1 NAME
 
 Vote::Count
 
 
-=head1 VERSION 1.05
+=head1 VERSION 1.06
 
 =cut
 
@@ -33,17 +33,21 @@ Vote::Count
 has 'BallotSet' => ( is => 'ro', isa => 'HashRef', required => 1 );
 
 has 'Active' => (
-  is      => 'rw',
+  is      => 'ro',
   isa     => 'HashRef',
   lazy    => 1,
-  builder => 'ResetActive',
+  builder => '_defaultactive',
 );
 
-sub ResetActive ( $self ) { return dclone $self->BallotSet()->{'choices'} }
+sub _defaultactive ( $self ) { return dclone $self->BallotSet()->{'choices'} }
 
 sub SetActive ( $self, $active ) {
   # Force deref
   $self->{'Active'} = dclone $active;
+}
+
+sub ResetActive ( $self ) { 
+  $self->{'Active'} = $self->_defaultactive();
 }
 
 # I was typing the equivalent too often. made a method.
@@ -170,6 +174,9 @@ __PACKAGE__->meta->make_immutable;
 
 Provides a Toolkit for implementing multiple voting systems, allowing a wide range of method options. This library allows the creation of election resolution methods matching a set of Election Rules that are written in an organization's governing rules, and not requiring the bylaws to specify the rules of the software that will be used for the election, especially important given that many of the other libraries available do not provide a bylaws compatible explanation of their process.
 
+
+=head1 Synopsis
+
   use 5.022; # Minimum Perl, or any later Perl.
   use feature qw /postderef signatures/;
 
@@ -189,7 +196,7 @@ Provides a Toolkit for implementing multiple voting systems, allowing a wide ran
   # ApprovalFloor which defaulted to 5%.
   my $ChoicesAfterFloor = $CondorcetElection->ApprovalFloor();
   # Apply the ChoicesAfterFloor to the Election.
-  $CondorcetElection->Active( $ChoicesAfterFloor );
+  $CondorcetElection->SetActive( $ChoicesAfterFloor );
   # Get Smith Set and the Election with it as the Active List.
   my $SmithSet = $CondorcetElection->Matrix()->SmithSet() ;
   $CondorcetElection->logt(
@@ -203,7 +210,6 @@ Provides a Toolkit for implementing multiple voting systems, allowing a wide ran
     'Active' => $ChoicesAfterFloor );
   # Get a RankCount Object for the
   my $Plurality = $IRVElection->TopCount();
-  # In case of ties RankCount objects return top as an array, log the result.
   my $PluralityWinner = $Plurality->Leader();
   $IRVElection->logv( "Plurality Results", $Plurality->RankTable);
   if ( $PluralityWinner->{'winner'}) {
@@ -460,9 +466,9 @@ When logging from your methods, use logt for events that produce a summary, use 
 
 =head3 Active Sets
 
-Active sets are typically represented as a Hash Reference where the keys represent the active choices and the value is true. The VoteCount Object contains an Active Set which can be Accessed or set via the ->Active() method. The ->GetActive and ->SetActive methods are preferred because they break the reference link between the object's copy and the external copy of the Active set.
+Active sets are typically represented as a Hash Reference where the keys represent the active choices and the value is true. The VoteCount Object contains an Active Set which can be Accessed via the ->Active() method which will return a reference to the Active Set (changing the reference will change the active set). The ->GetActive and ->SetActive do not preserve any reference links and should be preferred.
 
-Most Components will take an argument for $activeset or default to the current Active set of the Vote::Count object, which will default to the Choices defined in the BallotSet.
+Many Components will take an argument for $activeset or default to the current Active set of the Vote::Count object, which will default to the Choices defined in the BallotSet.
 
 
 =head1 Vote::Count Methods
@@ -543,7 +549,8 @@ Directory of Vote Counting Methods linking to the Vote::Count module for it.
 
 =item *
 
-L<Catalog|https://metacpan.org/pod/distribution/Vote-Count/Catalog.pod>
+L<Catalog|https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/Catalog.pod>
+
 
 
 =back
@@ -694,6 +701,13 @@ L<Vote::Count::Start|https://metacpan.org/pod/Vote::Count::Start>
 
 
 =back
+
+
+=head1 Support for Older Perl Versions
+
+Vote::Count will drop support for versions of Perl more than 2 years old for failing CPAN testing or CI testing. 
+
+Vote::Count uses Moose. When COR is stable, it is likely that a switch will be made from Moose to COR. At that time, the minimum supported Perl will be the current stable 7.x version.
 
 
 =head1 Call for Contributions

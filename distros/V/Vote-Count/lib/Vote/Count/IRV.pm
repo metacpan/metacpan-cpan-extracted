@@ -13,13 +13,13 @@ with 'Vote::Count::TieBreaker';
 
 use Storable 3.15 'dclone';
 
-our $VERSION='1.05';
+our $VERSION='1.06';
 
 =head1 NAME
 
 Vote::Count::IRV
 
-=head1 VERSION 1.05
+=head1 VERSION 1.06
 
 =cut
 
@@ -54,7 +54,7 @@ sub RunIRV ( $self, $active = undef, $tiebreaker = undef ) {
   # external $active should not be changed.
   if ( defined $active ) { $active = dclone $active }
   # Object's active is altered by IRV.
-  else { $active = $self->Active() }
+  else { $active = dclone $self->Active() }
   unless ( defined $tiebreaker ) {
     if ( defined $self->TieBreakMethod() ) {
       $tiebreaker = $self->TieBreakMethod();

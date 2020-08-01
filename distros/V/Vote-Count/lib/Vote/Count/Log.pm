@@ -11,13 +11,13 @@ no warnings 'experimental';
 use Path::Tiny 0.108;
 # use Data::Printer;
 
-our $VERSION='1.05';
+our $VERSION='1.06';
 
 =head1 NAME
 
 Vote::Count::Log
 
-=head1 VERSION 1.05
+=head1 VERSION 1.06
 
 =cut
 

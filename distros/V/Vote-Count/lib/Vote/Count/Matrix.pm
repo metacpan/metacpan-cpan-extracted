@@ -19,6 +19,7 @@ no warnings 'experimental';
 use List::Util qw( min max sum );
 use Vote::Count::TextTableTiny qw/generate_markdown_table/;
 use Sort::Hash;
+use Storable 3.15 'dclone';
 
 # use Try::Tiny;
 #use Data::Printer;
@@ -26,13 +27,13 @@ use Sort::Hash;
 
 use YAML::XS;
 
-our $VERSION='1.05';
+our $VERSION='1.06';
 
 =head1 NAME
 
 Vote::Count::Matrix
 
-=head1 VERSION 1.05
+=head1 VERSION 1.06
 
 =cut
 
@@ -59,7 +60,7 @@ has TieBreakMethod => (
 );
 
 sub _buildActive ( $self ) {
-  return $self->BallotSet->{'choices'};
+  return dclone $self->BallotSet->{'choices'};
 }
 
 sub _untie ( $I, $A, $B ) {
@@ -271,7 +272,7 @@ sub RankGreatestLoss ( $self, $active = undef ) {
 
 # reset active to choices
 sub ResetActive ( $self ) {
-  $self->{'Active'} = $self->BallotSet->{'choices'};
+  $self->{'Active'} = dclone $self->BallotSet->{'choices'};
 }
 
 sub _getsmithguessforchoice ( $h, $matrix ) {

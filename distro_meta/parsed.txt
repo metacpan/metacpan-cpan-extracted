@@ -66314,3 +66314,17 @@ R/RR/RRWO/Types-Const-v0.4.1.tar.gz
 W/WA/WATERKIP/WebService-KvKAPI-0.009.tar.gz
 D/DR/DRZIGMAN/WWW-LogicBoxes-1.10.1.tar.gz
 O/OA/OALDERS/WWW-YouTube-Download-0.63.tar.gz
+P/PE/PERLANCAR/App-DumpVivaldiHistory-0.001.tar.gz
+P/PM/PMQS/Bundle-Compress-Zlib-2.096.tar.gz
+P/PM/PMQS/Bundle-IO-Compress-Bzip2-2.096.tar.gz
+W/WO/WORTHMINE/Caller-Easy-0.03.tar.gz
+P/PM/PMQS/IO-Compress-Lzf-2.096.tar.gz
+P/PM/PMQS/IO-Compress-Lzma-2.096.tar.gz
+P/PM/PMQS/IO-Compress-Lzop-2.096.tar.gz
+P/PM/PMQS/IO-Compress-Zstd-2.096.tar.gz
+P/PR/PREACTION/Minion-Backend-mysql-0.21.tar.gz
+R/RE/RENEEB/Module-OTRS-CoreList-0.16.tar.gz
+G/GE/GENE/Music-BachChoralHarmony-0.0404.tar.gz
+P/PE/PEVANS/Syntax-Keyword-Try-0.18.tar.gz
+W/WO/WORTHMINE/Text-vCard-Precisely-0.23.tar.gz
+B/BR/BRAINBUZ/Vote-Count-1.06.tar.gz

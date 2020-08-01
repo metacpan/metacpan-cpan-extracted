@@ -1,13 +1,13 @@
 ---
 abstract: 'less stress to remind returned list from CORE::caller()'
 author:
-  - 'Yuki Yoshida <worthmine@gmail.com>'
+  - 'L<Yuki Yoshida(worthmine)|https://github.com/worthmine>'
 build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Caller::Easy:
     file: lib/Caller/Easy.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Moose: '0'
   perl: '5.014004'
@@ -34,6 +34,9 @@ resources:
   bugtracker: https://github.com/worthmine/Caller-Easy/issues
   homepage: https://github.com/worthmine/Caller-Easy
   repository: git://github.com/worthmine/Caller-Easy.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:WORTHMINE
+x_contributors:
+  - 'worthmine <worthmine@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

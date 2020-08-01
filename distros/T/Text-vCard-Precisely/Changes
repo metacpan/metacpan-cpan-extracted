@@ -1,5 +1,16 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.23 2020-08-01T05:25:01Z
+  - optimized the PODs for reading
+
+0.22 2020-08-01T02:03:50Z
+  - just fixed broken POD
+
+0.21 2020-08-01T01:34:02Z
+  - Added YouTube and Twitch as SocialProfile options
+  - replaced wrong regexps
+  - modified the PODs
+
 0.20 2020-02-10T21:37:42Z
   - accomplished to fix the test for Windows
   - remove Facebook::Graph from SYNOPSIS

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Module-OTRS-CoreList",
    "prereqs" : {
@@ -37,7 +37,7 @@
    "provides" : {
       "Module::OTRS::CoreList" : {
          "file" : "lib/Module/OTRS/CoreList.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -52,11 +52,11 @@
          "web" : "http://github.com/reneeb/Module-OTRS-CoreList"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_contributors" : [
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

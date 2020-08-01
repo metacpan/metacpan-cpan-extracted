@@ -1,6 +1,6 @@
 package Text::vCard::Precisely;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -8,14 +8,14 @@ use Moose::Util::TypeConstraints;
 extends 'Text::vCard::Precisely::V3';
 
 enum 'Version' => [qw( 3.0 4.0 )];
-has version => ( is => 'ro', isa => 'Version', default => '3.0', required => 1 );
+has version    => ( is => 'ro', isa => 'Version', default => '3.0', required => 1 );
 
 __PACKAGE__->meta->make_immutable;
 no Moose;
 
 sub BUILD {
     my $self = shift;
-    return Text::vCard::Precisely::V3->new(@_) unless $self->version eq '4.0';
+    return Text::vCard::Precisely::V3->new(@_) unless $self->version() eq '4.0';
 
     require Text::vCard::Precisely::V4;
     return Text::vCard::Precisely::V4->new(@_);
@@ -34,8 +34,9 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
 =head1 SYNOPSIS
 
  my $vc = Text::vCard::Precisely->new();
- # or now you can write like below if you want to use 4.0:
- #my $vc = Text::vCard::Precisely->new( version => '4.0' );
+ # Or now you can write like below if you want to use 4.0:
+ my $vc4 = Text::vCard::Precisely->new( version => '4.0' );
+ #or $vc4 = Text::vCard::Precisely::V4->new();
 
  $vc->n([ 'Gump', 'Forrest', , 'Mr', '' ]);
  $vc->fn( 'Forrest Gump' );
@@ -43,7 +44,7 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
  use GD;
  use MIME::Base64;
 
- my $img = GD->new( ... some param ... )->plot->png;
+ my $img = GD->new( ... some param ... )->plot()->png();
  my $base64 = MIME::Base64::encode($img);
 
  $vc->photo([
@@ -65,19 +66,20 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
     street    => 'Waters Edge',
     city      => 'Baytown',
     region    => 'LA',
-    post_code => '30314,
+    post_code => '30314',
     country   => 'United States of America',
  });
 
  $vc->url({ content => 'https://twitter.com/worthmine', types => ['twitter'] }); # for URL param
+
  print $vc->as_string();
 
 =head1 DESCRIPTION
 
 A vCard is a digital business card.
-vCard and L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata> provides an API for parsing vCards
+vCard and L<Text::vFile::asData|https://metacpan.org/pod/Text::vFile::asData> provides an API for parsing vCards
 
-This module is forked from L<Text::vCard|https://github.com/ranguard/text-vcard>
+This module is forked from L<Text::vCard|https://metacpan.org/pod/Text::vCard>
 because some reason below:
 
 =over
@@ -97,15 +99,15 @@ Android 4.4.x can't parse vCard4.0
 =back
 
 To handle an address book with several vCard entries in it, start with
-L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata> and then come back to this module.
+L<Text::vFile::asData|https://metacpan.org/pod/Text::vFile::asData> and then come back to this module.
 
-Note that the vCard RFC requires version() and full_name().  This module does not check or warn yet if these conditions have not been met
+Note that the vCard RFC requires C<VERSION> and C<FN>.  This module does not check or warn yet if these conditions have not been met
 
 =head1 Constructors
 
 =head2 load_hashref($HashRef)
 
-Accepts an HashRef that looks like below:
+Accepts a HashRef that looks like below:
 
  my $hashref = {
     N   => [ 'Gump', 'Forrest', '', 'Mr.', '' ],
@@ -154,7 +156,7 @@ Accepts a vCard string
 =head2 as_string()
 
 Returns the vCard as a string.
-You have to use Encode::encode_utf8() if your vCard is written in utf8
+You have to use C<Encode::encode_utf8()> if your vCard is written in utf8
 
 =head2 as_file($filename)
 
@@ -177,15 +179,16 @@ To specify revision information about the current vCard
 =head2 sort_string()
 
 To specify the family name, given name or organization text to be used for
-national-language-specific sorting of the FN, N and ORG.
+national-language-specific sorting of the C<FN>, C<N> and C<ORG>.
 
-B<This method is DEPRECATED in vCard4.0> Use SORT-AS param instead of it.
+B<This method is DEPRECATED in vCard4.0> Use C<SORT-AS> param instead of it.
 
 =head1 COMPLEX GETTERS/SETTERS
 
 They are based on Moose with coercion.
-So these methods accept not only ArrayRef[HashRef] but also ArrayRef[Str], single HashRef
-or single Str.
+So these methods accept not only ArrayRef[HashRef] but also ArrayRef[Str],
+single HashRef or single Str.
+
 Read source if you were confused
 
 =head2 n()
@@ -201,7 +204,9 @@ Accepts/returns an ArrayRef that looks like:
     { type => ['home'], content => '651-290-1111' },
  ]
 
-After version 0.18, B<content will not be validated as phone numbers> All I<Str> type is accepted.
+After version 0.18, B<content will not be validated as phone numbers> 
+All I<Str> type is accepted.
+
 So you have to validate phone numbers with your way.
 
 =head2 adr(), address()
@@ -250,8 +255,8 @@ or accept the string as URL like below
 
 =head2 photo(), logo()
 
-Accepts/returns an ArrayRef of URLs or Images: Even if they are raw image binary
- or text encoded in Base64, it does not matter
+Accepts/returns an ArrayRef of URLs or Images: 
+Even if they are raw image binary or text encoded in Base64, it does not matter
 
 B<Attention!> Mac OS X and iOS B<ignore> the description beeing URL
 
@@ -273,18 +278,6 @@ A person's entire name as they would like to see it displayed
 
 To specify the text corresponding to the nickname of the object the vCard represents
 
-=head2 lang()
-
-To specify the language(s) that may be used for contacting the entity associated with the vCard.
-
-It's the B<new method from 4.0>
-
-=head2 impp(), xml()
-
-I don't think they are so popular types, but here are the methods!
-
-They are the B<new method from 4.0>
-
 =head2 geo()
 
 To specify information related to the global positioning of the object the vCard represents
@@ -295,32 +288,14 @@ To specify a public key or authentication certificate associated with the object
 
 =head2 label()
 
-ToDo: because B<It's DEPRECATED from 4.0>
+ToDo: because B<It's DEPRECATED in vCard4.0>
 
 To specify the formatted text corresponding to delivery address of the object the vCard represents
 
 =head2 uid()
 
-To specify a value that represents a globally unique identifier corresponding to the individual
-or resource associated with the vCard
-
-=head2 fburl(), caladruri(), caluri()
-
-I don't think they are so popular types, but here are the methods!
-
-They are the B<new method from 4.0>
-
-=head2 kind()
-
-To specify the kind of object the vCard represents
-
-It's the B<new method from 4.0>
-
-=head2 member(), clientpidmap()
-
-I don't think they are so popular types, but here are the methods!
-
-It's the B<new method from 4.0>
+To specify a value that represents a globally unique identifier corresponding to 
+the individual or resource associated with the vCard
 
 =head2 tz(), timezone()
 
@@ -328,10 +303,12 @@ Both are same method with Alias
 
 To specify information related to the time zone of the object the vCard represents
 
-utc-offset format is NOT RECOMMENDED in vCard 4.0
+utc-offset format is NOT RECOMMENDED from vCard4.0
 
-TZ can be a URL, but there is no document in L<RFC2426|https://tools.ietf.org/html/rfc2426>
+C<TZ> can be a URL, but there is no document in
+ L<RFC2426|https://tools.ietf.org/html/rfc2426>
 or L<RFC6350|https://tools.ietf.org/html/rfc6350>
+
 So it just supports some text values
 
 =head2 bday(), birthday()
@@ -339,18 +316,6 @@ So it just supports some text values
 Both are same method with Alias
 
 To specify the birth date of the object the vCard represents
-
-=head2 anniversary()
-
-The date of marriage, or equivalent, of the object the vCard represents
-
-It's the B<new method from 4.0>
-
-=head2 gender()
-
-To specify the components of the sex and gender identity of the object the vCard represents
-
-It's the B<new method from 4.0>
 
 =head2 prodid()
 
@@ -364,30 +329,33 @@ To identify the source of directory information contained in the content type
 
 To specify a digital sound content information that annotates some aspect of the vCard
 
-This property is often used to specify the proper pronunciation of the name property value
- of the vCard
+This property is often used to specify the proper pronunciation of 
+the name property value of the vCard
 
 =head2 socialprofile()
 
-There is no documents about X-SOCIALPROFILE in RFC but it works in iOS and Mac OS X!
+There is no documents about C<X-SOCIALPROFILE> in RFC but it works in iOS and Mac OS X!
 
 I don't know well about in Android or Windows. Somebody please feedback me
 
 =head2 label()
 
-B<It's DEPRECATED from 4.0> You can use this method Just ONLY in vCard3.0
+B<It's DEPRECATED in vCard4.0> You can use this method Just ONLY in vCard3.0
 
-=head2 aroud UTF-8
+=head1 For operating files with multiple vCards
 
-If you want to send precisely the vCard with UTF-8 characters to the B<ALMOST> of smartphones, Use 3.0
+See L<Text::vCard::Precisely::Multiple|https://metacpan.org/pod/Text::vCard::Precisely::Multiple>
+
+=head1 aroud UTF-8
+
+If you want to send precisely the vCard with UTF-8 characters to the B<ALMOST>
+of smartphones, Use 3.0
 
 It seems to be TOO EARLY to use 4.0
 
-=head2 for under perl-5.12.5
+=head1 for under perl-5.12.5
 
 This module uses C<\P{ascii}> in regexp so You have to use 5.12.5 and later
-
-And this module uses Data::Validate::URI and it has bug on 5.8.x. so I can't support them
 
 =head1 SEE ALSO
 
@@ -407,7 +375,11 @@ L<RFC 6350|https://tools.ietf.org/html/rfc6350>
 
 =item
 
-L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata>
+L<Text::vCard::Precisely::Multiple|https://metacpan.org/pod/Text::vCard::Precisely::Multiple>
+
+=item
+
+L<Text::vFile::asData|https://metacpan.org/pod/Text::vFile::asData>
 
 =back
 

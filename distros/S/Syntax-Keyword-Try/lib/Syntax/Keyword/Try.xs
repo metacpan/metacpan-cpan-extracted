@@ -493,13 +493,6 @@ static int try_keyword(pTHX_ OP **op)
       PADOFFSET catchvar = 0;
       bool warned = FALSE;
 
-#ifdef WARN_EXPERIMENTAL
-      if(!hints || !hv_fetchs(hints, "Syntax::Keyword::Try/experimental(var)", 0)) {
-        warned = true;
-        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-          "'catch (VAR)' syntax is experimental and may be changed or removed without notice");
-      }
-#endif
       lex_read_space(0);
       catchvar = parse_lexvar();
 
@@ -595,7 +588,8 @@ static int try_keyword(pTHX_ OP **op)
     SvREFCNT_dec(condcatch);
   }
 
-  if(lex_consume("finally")) {
+  if(!hv_fetchs(hints, "Syntax::Keyword::Try/no_finally", 0) &&
+     lex_consume("finally")) {
     I32 floor_ix, save_ix;
     OP *body;
 

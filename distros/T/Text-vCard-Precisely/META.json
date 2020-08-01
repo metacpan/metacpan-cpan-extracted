@@ -4,7 +4,7 @@
       "L<Yuki Yoshida(worthmine)|https://github.com/worthmine>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.4",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -45,7 +45,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -75,15 +75,15 @@
    "provides" : {
       "Text::vCard::Precisely" : {
          "file" : "lib/Text/vCard/Precisely.pm",
-         "version" : "0.20"
+         "version" : "0.23"
       },
       "Text::vCard::Precisely::Multiple" : {
          "file" : "lib/Text/vCard/Precisely/Multiple.pm",
-         "version" : "0.20"
+         "version" : "0.23"
       },
       "Text::vCard::Precisely::V3" : {
          "file" : "lib/Text/vCard/Precisely/V3.pm",
-         "version" : "0.20"
+         "version" : "0.23"
       },
       "Text::vCard::Precisely::V3::Node" : {
          "file" : "lib/Text/vCard/Precisely/V3/Node.pm"
@@ -111,7 +111,7 @@
       },
       "Text::vCard::Precisely::V4" : {
          "file" : "lib/Text/vCard/Precisely/V4.pm",
-         "version" : "0.20"
+         "version" : "0.23"
       },
       "Text::vCard::Precisely::V4::Node" : {
          "file" : "lib/Text/vCard/Precisely/V4/Node.pm"
@@ -146,12 +146,13 @@
          "web" : "https://github.com/worthmine/Text-vCard-Precisely"
       }
    },
-   "version" : "0.20",
+   "version" : "0.23",
    "x_contributors" : [
       "Mohammad S Anwar <Mohammad.Anwar@yahoo.com>",
-      "Yuki Yoshida <worthmine@gmail.com>",
+      "Robin Mordasiewicz <robin@mordasiewicz.com>",
       "Yuki Yoshida <worthmine@users.noreply.github.com>",
-      "worthmine <worthmine@cpan.org>"
+      "worthmine <worthmine@cpan.org>",
+      "worthmine <worthmine@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27400_02",
    "x_static_install" : 1
