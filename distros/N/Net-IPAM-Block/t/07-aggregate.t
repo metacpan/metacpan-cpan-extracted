@@ -1,10 +1,10 @@
 #!perl -T
 
-use Test::More;
-use List::Util qw(shuffle);
-
+use 5.10.0;
 use strict;
 use warnings;
+use Test::More;
+use List::Util qw(shuffle);
 
 BEGIN { use_ok( 'Net::IPAM::Block', qw(aggregate) ) || print "Bail out!\n"; }
 
@@ -30,12 +30,7 @@ my @input = qw(
 my @expected = qw(
   10.0.0.0/32
   10.0.0.2/32
-  10.0.0.4/30
-  10.0.0.8/29
-  10.0.0.16/28
-  10.0.0.32/27
-  10.0.0.64/27
-  10.0.0.96/30
+  10.0.0.4-10.0.0.99
   fe80::/10
 );
 
@@ -44,9 +39,9 @@ foreach my $item (@input) {
   push @blocks, Net::IPAM::Block->new($item);
 }
 
-my @cidrs = aggregate( shuffle @blocks );
-@cidrs = map { $_->to_string } @cidrs;
-is_deeply( \@cidrs, \@expected, 'aggregate mixed' );
+my @aggregated = aggregate( shuffle @blocks );
+@aggregated = map { $_->to_string } @aggregated;
+is_deeply( \@aggregated, \@expected, 'aggregate mixed' );
 
 @input = qw(
   10.255.2.0
@@ -62,20 +57,18 @@ is_deeply( \@cidrs, \@expected, 'aggregate mixed' );
 );
 
 @expected = qw(
-  10.255.2.0/30
-  10.255.2.4/31
-  10.255.2.6/32
+  10.255.2.0-10.255.2.6
 );
 
 undef @blocks;
-undef @cidrs;
+undef @aggregated;
 foreach my $item (@input) {
   push @blocks, Net::IPAM::Block->new($item);
 }
 
-@cidrs = aggregate( shuffle @blocks );
-@cidrs = map { $_->to_string } @cidrs;
-is_deeply( \@cidrs, \@expected, 'aggregate adjacent v4' );
+@aggregated = aggregate( shuffle @blocks );
+@aggregated = map { $_->to_string } @aggregated;
+is_deeply( \@aggregated, \@expected, 'aggregate adjacent v4' );
 
 @input = qw(
   2001:db8::dead:beef
@@ -88,20 +81,18 @@ is_deeply( \@cidrs, \@expected, 'aggregate adjacent v4' );
 );
 
 @expected = qw(
-  2001:db8::dead:beee/127
-  2001:db8::dead:bef0/126
-  2001:db8::dead:bef4/128
+  2001:db8::dead:beee-2001:db8::dead:bef4
 );
 
 undef @blocks;
-undef @cidrs;
+undef @aggregated;
 foreach my $item (@input) {
   push @blocks, Net::IPAM::Block->new($item);
 }
 
-@cidrs = aggregate( shuffle @blocks );
-@cidrs = map { $_->to_string } @cidrs;
-is_deeply( \@cidrs, \@expected, 'aggregate adjacent v6' );
+@aggregated = aggregate( shuffle @blocks );
+@aggregated = map { $_->to_string } @aggregated;
+is_deeply( \@aggregated, \@expected, 'aggregate adjacent v6' );
 
 @input = qw(
   255.255.255.255
@@ -114,14 +105,14 @@ is_deeply( \@cidrs, \@expected, 'aggregate adjacent v6' );
 );
 
 undef @blocks;
-undef @cidrs;
+undef @aggregated;
 foreach my $item (@input) {
   push @blocks, Net::IPAM::Block->new($item);
 }
 
-@cidrs = aggregate( shuffle @blocks );
-@cidrs = map { $_->to_string } @cidrs;
-is_deeply( \@cidrs, \@expected, 'aggregate, overflow check' );
+@aggregated = aggregate( shuffle @blocks );
+@aggregated = map { $_->to_string } @aggregated;
+is_deeply( \@aggregated, \@expected, 'aggregate, overflow check' );
 
 @input = qw(
   0.0.0.0/0
@@ -148,14 +139,14 @@ is_deeply( \@cidrs, \@expected, 'aggregate, overflow check' );
 );
 
 undef @blocks;
-undef @cidrs;
+undef @aggregated;
 foreach my $item (@input) {
   push @blocks, Net::IPAM::Block->new($item);
 }
 
-@cidrs = aggregate( shuffle @blocks );
-@cidrs = map { $_->to_string } @cidrs;
-is_deeply( \@cidrs, \@expected, 'aggregate, 0.0.0.0/0 and ::/0 slurps all' );
+@aggregated = aggregate( shuffle @blocks );
+@aggregated = map { $_->to_string } @aggregated;
+is_deeply( \@aggregated, \@expected, 'aggregate, 0.0.0.0/0 and ::/0 slurps all' );
 
 @input = qw(
   10.0.0.0/17
@@ -167,14 +158,14 @@ is_deeply( \@cidrs, \@expected, 'aggregate, 0.0.0.0/0 and ::/0 slurps all' );
 );
 
 undef @blocks;
-undef @cidrs;
+undef @aggregated;
 foreach my $item (@input) {
   push @blocks, Net::IPAM::Block->new($item);
 }
 
-@cidrs = aggregate( shuffle @blocks );
-@cidrs = map { $_->to_string } @cidrs;
-is_deeply( \@cidrs, \@expected, 'aggregate, v4 reverse cidrsplit' );
+@aggregated = aggregate( shuffle @blocks );
+@aggregated = map { $_->to_string } @aggregated;
+is_deeply( \@aggregated, \@expected, 'aggregate, v4 shuffled' );
 
 @input = qw(
   2001:db8::/37
@@ -216,13 +207,13 @@ is_deeply( \@cidrs, \@expected, 'aggregate, v4 reverse cidrsplit' );
 );
 
 undef @blocks;
-undef @cidrs;
+undef @aggregated;
 foreach my $item (@input) {
   push @blocks, Net::IPAM::Block->new($item);
 }
 
-@cidrs = aggregate( shuffle @blocks );
-@cidrs = map { $_->to_string } @cidrs;
-is_deeply( \@cidrs, \@expected, 'aggregate, v6 reverse cidrsplit' );
+@aggregated = aggregate( shuffle @blocks );
+@aggregated = map { $_->to_string } @aggregated;
+is_deeply( \@aggregated, \@expected, 'aggregate, v6 shuffled' );
 
 done_testing();

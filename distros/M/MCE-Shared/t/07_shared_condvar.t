@@ -29,7 +29,10 @@ MCE::Shared->start() unless $INC{'IO/FDPass.pm'};
    ok( 1, "shared condvar, spawning an asynchronous process" );
 
    my $proc = MCE::Hobo->new( sub {
-      sleep(1); $cv->lock; $cv->signal; 1;
+      sleep(1) for 1..2;
+      $cv->lock;
+      $cv->signal;
+      1;
    });
 
    $cv->lock;
@@ -66,7 +69,8 @@ MCE::Shared->start() unless $INC{'IO/FDPass.pm'};
    push @procs, MCE::Hobo->new( sub { $cv->timedwait(20); 1 } );
    push @procs, MCE::Hobo->new( sub { $cv->wait; 1 } );
 
-   sleep(2); $cv->broadcast;
+   sleep(1) for 1..2;
+   $cv->broadcast;
 
    ok( $procs[0]->join, 'shared condvar, check broadcast to process1' );
    ok( $procs[1]->join, 'shared condvar, check broadcast to process2' );

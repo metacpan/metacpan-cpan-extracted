@@ -1,10 +1,19 @@
 #!perl -T
 
+use 5.10.0;
+use strict;
+use warnings;
+
 use Test::More;
 use List::Util qw(shuffle);
 
-use strict;
-use warnings;
+use Carp;
+{
+  no warnings 'redefine';
+
+  # suppress DEPRECATED warning
+  *Carp::carp = sub { };
+}
 
 BEGIN { use_ok('Net::IPAM::Block') || print "Bail out!\n"; }
 

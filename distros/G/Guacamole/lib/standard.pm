@@ -1,7 +1,7 @@
 package standard;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: Enforce Standard Perl syntax with Guacamole
-$standard::VERSION = '0.005';
+$standard::VERSION = '0.006';
 use strict;
 use warnings;
 use experimental qw< signatures >;
@@ -70,7 +70,7 @@ standard - Enforce Standard Perl syntax with Guacamole
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

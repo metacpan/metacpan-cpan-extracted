@@ -8,6 +8,8 @@ sub accepted_auth         { 'Basic' }
 sub required_parameters   { 'grant_type' }
 sub required_confidential { 'client_secret' }
 
+sub get_grant {}
+
 sub dispatch {
 	my ( $self, @class ) = ( shift, @_ );
 	return $self if $self->error;
@@ -16,4 +18,4 @@ sub dispatch {
 	$class ? $class->new( %$self ) : $self->with_error_unsupported_grant_type;
 }
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';

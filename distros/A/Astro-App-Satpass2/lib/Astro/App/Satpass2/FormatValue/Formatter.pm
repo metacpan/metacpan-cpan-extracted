@@ -8,7 +8,7 @@ use warnings;
 use Astro::App::Satpass2::FormatValue;
 use Astro::App::Satpass2::Utils qw{ has_method @CARP_NOT };
 
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 
 sub new {
     my ( $class, $info ) = @_;

@@ -69,9 +69,9 @@ SKIP: {
 
     my $tests = 3;
 
-    load_or_skip 'LWP::UserAgent', $tests;
-    load_or_skip 'LWP::Protocol', $tests;
-    load_or_skip 'URI', $tests;
+    load_or_skip( 'LWP::UserAgent', $tests );
+    load_or_skip( 'LWP::Protocol', $tests );
+    load_or_skip( 'URI', $tests );
 
     my $url = abs_path( 't/source.dat' );
     $url =~ s/ : /|/smx;

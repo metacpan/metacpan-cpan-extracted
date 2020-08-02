@@ -11,7 +11,7 @@ our @ISA = qw{ Exporter };
 use Astro::App::Satpass2::Utils qw{ load_package };
 use Test::More 0.88;
 
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 
 our @EXPORT_OK = qw{ setup geocode };
 our @EXPORT = @EXPORT_OK;
@@ -19,7 +19,7 @@ our @EXPORT = @EXPORT_OK;
 my $wrapper_class;
 my $wrapper_object;
 
-sub setup ($) {
+sub setup {
     ( $wrapper_class ) = @_;
 
     load_package( $wrapper_class )
@@ -50,7 +50,7 @@ sub setup ($) {
     goto &pass;
 }
 
-sub geocode ($;$) {
+sub geocode {
     my ( $loc, $tests ) = @_;
     defined $tests
 	or $tests = 1;

@@ -1,9 +1,9 @@
 #!perl -T
 
-use Test::More;
-
+use 5.10.0;
 use strict;
 use warnings;
+use Test::More;
 
 BEGIN { use_ok('Net::IPAM::Block') || print "Bail out!\n"; }
 

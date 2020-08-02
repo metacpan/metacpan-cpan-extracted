@@ -43,11 +43,11 @@ my $ranges = [
 ];
 
 foreach my $tt (@$cidrs) {
-  ok( Net::IPAM::Block->new($tt)->is_cidr, "is_cidr($tt)");
+  ok( Net::IPAM::Block->new($tt)->is_cidr, "is_cidr($tt)" );
 }
 
 foreach my $tt (@$ranges) {
-  ok( ! Net::IPAM::Block->new($tt)->is_cidr, "!is_cidr($tt)");
+  ok( !Net::IPAM::Block->new($tt)->is_cidr, "!is_cidr($tt)" );
 }
 
 done_testing();

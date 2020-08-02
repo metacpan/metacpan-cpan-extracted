@@ -1,0 +1,43 @@
+---
+abstract: "It's a test implement to B<ignore> the difference between C<E<lt>=E<gt>> and C<cmp> "
+author:
+  - 'L<Yuki Yoshida(worthmine)|https://github.com/worthmine>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Numeric-Whatever
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  String::Numeric::Whatever:
+    file: lib/String/Numeric/Whatever.pm
+    version: '0.03'
+requires:
+  Tie::Scalar: '0'
+  overload: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/worthmine/String-Numeric-Whatever/issues
+  homepage: https://github.com/worthmine/String-Numeric-Whatever
+  repository: git://github.com/worthmine/String-Numeric-Whatever.git
+version: '0.03'
+x_authority: cpan:WORTHMINE
+x_contributors:
+  - 'worthmine <worthmine@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

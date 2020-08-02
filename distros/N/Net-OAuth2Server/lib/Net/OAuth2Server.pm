@@ -2,7 +2,7 @@ use strict; use warnings;
 
 package Net::OAuth2Server;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 __END__
 
@@ -25,23 +25,23 @@ A server-side OAuth2 framework with the following aims:
 
 =over 2
 
-=item * Well designed for direct use as-is within a web application
+=item Well designed for direct use as-is within a web application:
 
 Application programmers should have a reasonable abstraction to build on
 so they can fill in the specifics of their application
 without having to reimplement significant parts of the protocol anyway.
 
-=item * Extensible enough as a framework to implement any OAuth2 extension
+=item Extensible enough as a framework to implement any OAuth2 extension:
 
 It should be possible to implement any OAuth2 extension
 such that it can easily be shipped as a CPAN module.
 
-=item * Independent from specific web frameworks
+=item Independent from specific web frameworks:
 
 It should not be necessary to reimplement OAuth2 as a plugin or extension
 for every single framework.
 
-=item * Frugal in dependencies and means of implementation
+=item Frugal in dependencies and means of implementation:
 
 OAuth2 is not deep or clever technology, it is glue.
 There is no need for anything deep or clever in an implementation of it.

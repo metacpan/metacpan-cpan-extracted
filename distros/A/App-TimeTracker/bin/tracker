@@ -23,7 +23,7 @@ tracker - run App::TimeTracker
 
 =head1 VERSION
 
-version 3.002
+version 3.003
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ version 3.002
 
 C<tracker> is the front end script to L<App::TimeTracker>. C<tracker>
 allows you to easily track and report the time you spend on various
-jobs, projects, tasks etc from the commandline.
+jobs, projects, tasks etc. from the command line.
 
 Custom commands or adaptations to your workflow can be implemented via
 an "interesting" set of L<Moose>-powered plugins. You can configure
@@ -48,7 +48,9 @@ about each plugin in C<App::TimeTracker::Command::PLUGIN-NAME>.
 
 =head2 Note about (missing) Plugins
 
-Up to version 2.028 a lot of plugins where included in the main distribution C<App-TimeTracker>. To make installation easier and faster, all non-core command plugins have been moved into distinct, standalone distribution.
+Up to version 2.028 a lot of plugins where included in the main distribution
+C<App-TimeTracker>. To make installation easier and faster, all non-core
+command plugins have been moved into distinct, standalone distributions.
 
 The following plugins are affected:
 
@@ -99,15 +101,35 @@ CPAN.pm is available on ancient Perls, and feels a bit ancient, too.
 
   cpan App::TimeTracker
 
-=head2 From a tarball or git checkout
+=head2 From a tarball
 
-To install L<App::TimeTracker> from a tarball or a git checkout, do the usual
-CPAN module install dance:
+To install L<App::TimeTracker> from a tarball, do the usual CPAN module
+install dance:
 
   ~/perl/App-TimeTracker$ perl Build.PL
   ~/perl/App-TimeTracker$ ./Build
   ~/perl/App-TimeTracker$ ./Build test
   ~/perl/App-TimeTracker$ ./Build install  # might require sudo
+
+=head2 From a git checkout
+
+Clone the repository if you have not already done so, and enter the
+C<App-TimeTracker> directory:
+
+  ~$ git clone git@github.com:domm/App-TimeTracker.git
+  ~$ cd App-TimeTracker
+
+C<App-TimeTracker> uses L<Dist::Zilla> to build, test and install the code,
+hence this must be installed first, e.g. with C<cpanm>:
+
+  ~/path/to/App-Tracker$ cpanm Dist::Zilla
+
+Now install the distribution's dependencies, test and install in the usual
+manner for C<Dist::Zilla> projects:
+
+  ~/path/to/App-Tracker$ dzil listdeps --missing | cpanm
+  ~/path/to/App-Tracker$ dzil test
+  ~/path/to/App-Tracker$ dzil install
 
 =head1 SETUP
 
@@ -117,7 +139,7 @@ file there.
 
 In the root directory of the project you want to track time for, do
 C<tracker init>. This will set up this directory for time-tracking.
-See below for more information on the config files and the mergin of
+See below for more information on the config files and the merging of
 config files.
 
 =head1 CONFIGURATION
@@ -130,7 +152,7 @@ F<~/.TimeTracker/tracker.json>.
 
 You can use this tree of config files to define general settings, per job
 settings and per project settings, while always reusing the configuration
-defined in the parent. I.e. the config settings sort of override the values
+defined in the parent. i.e. the config settings sort of override the values
 defined further up in the tree.
 
 Any time you call C<tracker>, we look up from your current directory until we
@@ -402,7 +424,7 @@ Thomas Klausner <domm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2019 by Thomas Klausner.
+This software is copyright (c) 2011 - 2020 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

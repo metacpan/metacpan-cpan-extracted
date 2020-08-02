@@ -1,6 +1,14 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.873 Sat Aug 01 16:00:00 EST 2020
+
+  * Resolved construction MCE::Shared->share hanging when specifying
+    a module that does not exist.
+
+  * Fixed typo in prior change log.
+    Replaced "completed" with "feature complete".
+
 1.872 Sun Jun 14 22:30:00 EST 2020
 
   * Added open to required dependencies.
@@ -12,7 +20,7 @@ Revision history for Perl module MCE::Shared.
   * Updated keys, pairs, and values in
     MCE::Shared::{ Array, Cache, Hash and Ordhash }.
 
-  * The MCE::Shared project is completed.
+  * The MCE::Shared project is feature complete.
 
 1.871 Wed May 13 05:30:00 EST 2020
 

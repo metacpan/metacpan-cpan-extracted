@@ -1,0 +1,280 @@
+#!perl
+
+our $DATE = '2020-08-02'; # DATE
+our $VERSION = '0.600'; # VERSION
+
+use strict;
+use warnings;
+use App::perlmv;
+
+my $pmv = App::perlmv->new;
+#$pmv->{ 'mode' } = 'move'; # the default
+$pmv->run;
+
+1;
+# ABSTRACT: Rename/move files using Perl code
+# PODNAME: perlmv
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+perlmv - Rename/move files using Perl code
+
+=head1 VERSION
+
+This document describes version 0.600 of perlmv (from Perl distribution App-perlmv), released on 2020-08-02.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ # Show help
+ perlmv -h
+
+ # Execute a single scriptlet
+ perlmv [options] <scriptlet> <file...>
+
+ # Execute code from command line
+ perlmv [options] -e <code> <file...>
+
+ # Execute multiple scriptlets/command-line codes
+ perlmv [options] [ -x <scriptlet> | -e <code> ]+ <file...>
+
+ # Create a new scriptlet
+ perlmv -e <code> -w <name>
+
+ # List available scriptlets
+ perlmv -l
+
+ # Show source code of a scriptlet
+ perlmv -s <name>
+
+ # Delete scriptlet
+ perlmv -d <name>
+
+=head2 Usage examples
+
+ $ ls -1
+ A.txt
+ B1
+ c2.txt
+ D3.pl
+ D4.pl
+
+Rename files with prewritten scriptlet (B<remove-common-prefix>) and show
+(B<-v>) each file as it is being renamed.
+
+ $ perlmv -v remove-common-prefix file1.jpg file2.zip files.txt
+ `file1.jpg` -> `1.jpg`
+ `file2.zip` -> `2.zip`
+ `files.txt` -> `s.txt`
+
+Specify script in command line (B<-e>) but do not actually move files (B<-d>,
+dry-run mode):
+
+ $ perlmv -de 's/\d+//g' *
+ DRYRUN: `B1` -> `B`
+ DRYRUN: `c2.txt` -> `c.txt`
+ DRYRUN: `D3.pl` -> `D.pl`
+ DRYRUN: `D4.pl` -> `D.pl.1`
+
+Really rename the files this time:
+
+ $ perlmv -e 's/\d+//g' *
+
+Execute multiple scriptlets and/or command-line code:
+
+ $ ls -1
+ a.txt
+ b.html
+ c.ini
+
+ $ perlmv -vx to-number-ext -e '"file$_"' *
+ `a.txt` -> `1.txt` -> `file1.txt`
+ `b.html` -> `2.html` -> `file2.html`
+ `c.ini` -> `3.ini` -> `file3.ini`
+
+Save Perl code as scriptlet (in ~/.perlmv/scriptlets/):
+
+ $ perlmv -e 's/\d+//g' -w remove-digits
+
+List all scriptlets (add B<-v> to also show their contents):
+
+ $ perlmv -l
+ lc
+ uc
+ remove-digits
+
+Show (B<-s>) source code of scriptlet:
+
+ $ perlmv -s remove-digits
+ s/\d+//g
+
+Remove (B<-D>) scriptlet:
+
+ $ perlmv -D remove-digits
+
+=head2 More examples
+
+From my real-world usage.
+
+Rename .flv partial files from my Firefox browser cache into ordered names
+(part01.flv, part02.flv, and so on):
+
+ $ ls --sort=t -r *01 | xargs perlmv -Tdx to-number-ext -e '"part$_.flv"'
+ DRYRUN: `15D9F85Ad01` -> `01` -> `part01.flv`
+ DRYRUN: `FF8EB240d01` -> `02` -> `part02.flv`
+ DRYRUN: `9031E9A8d01` -> `03` -> `part03.flv`
+ ...
+
+=head1 DESCRIPTION
+
+Perlmv lets you rename/move files using Perl code. All the Perl code needs to do
+is modify the filename in C<$_> (or just return a value) and perlmv will do the
+rest (actual renaming, recursive renaming, handling filename conflicts, dry-run
+mode, etc.).
+
+New filename will be taken from the new value of $_ (if it is modified) or the
+last expression. So '$_ = lc' and 'lc' are equivalent.
+
+The following variables are also available to the Perl code:
+
+=over 4
+
+=item * C<$FILES> (arrayref)
+
+The list of items to be processed. The Perl code is not supposed to modify this
+value.
+
+=item * C<$FILE> (string)
+
+The filename of item (without path). The Perl code is not supposed to modify
+this value.
+
+=item * C<$FILENUM> (int)
+
+The index of $FILES currently being processed (starting from 0). The Perl code
+is not supposed to modify this value.
+
+=item * C<$DIR> (string)
+
+The directory of item (absolute path). The Perl code is not supposed to modify
+this value.
+
+=item * C<$PARENT> (string)
+
+The name of parent (containing) directory of the item (without path). The Perl
+code is not supposed to modify this value.
+
+=back
+
+Perl code will first be run (eval-ed) once at the beginning for testing, with
+C<-TEST> as the filename in C<$_> (and C<$TESTING> will be set to true). Perl
+code is not run under strict/warnings. Perl code is run under
+C<App::perlmv::code> namespace.
+
+When using the L<App::perlmv> library, there is also the the so-called cleaning
+phase (in which Perl code will be run with $CLEANING set to true) that can be
+used for cleaning purposes in between runs. This is however irrelevant to
+B<perlmv> command as there is only a single run.
+
+Perl code can be specified directly from the command line (using B<-e>), or (in
+order of precedence from the highest) by name in C<~/.perlmv/scriptlets/NAME>,
+or in C</usr/share/perlmv/scriptlets/>, or in C<%scriptlets> in
+L<App::perlmv::scriptlets>, or in C<%scriptlets> in
+L<App::perlmv::scriptlets::std>, or in C<$SCRIPTLET> in
+L<App::perlmv::scriptlet::*> (for examples see
+L<App::perlmv::scriptlet::rename_common_prefix> and
+L<App::perlmv::scriptlet::rename_common_suffix>).
+
+=head1 BUGS/TODOS
+
+=over
+
+=item * Patches for Windows welcome.
+
+=item * Scriptlet should be able to receive arguments.
+
+=back
+
+=head1 OPTIONS
+
+ -c  (--compile) Only test compile code, do not run it on the arguments
+ -D <NAME> (--delete) Delete scriptlet
+ -d  (--dry-run) Dry-run (implies -v)
+ -e <CODE> (--execute) Specify Perl code to rename file (\$_). Can be specified
+     multiple times.
+ -f  (--files) Only process files, do not process directories
+ -h  (--help) Show this help
+ -l  (--list) list all scriptlets
+ -M <MODE> (--mode) Specify mode, default is 'rename' (or 'r'). Use 'copy' or
+     'c' to copy instead of rename, 'symlink' or 's' to create a symbolic link,
+     and 'link' or 'l' to create a (hard) link.
+ -o  (--overwrite) Overwrite (by default, ".1", ".2", and so on will be appended
+     to avoid overwriting existing files)
+ -p  (--parents) Create intermediate directories
+ -R  (--recursive) Recursive
+ -r  (--reverse) reverse order of processing (by default asciibetically)
+ -S  (--no-symlinks) Do not process symlinks
+ -s <NAME> (--show) Show source code for scriptlet
+ -T  (--no-sort) do not sort files (default is sort ascibetically)
+ -V  (--version) Print version and exit
+ -v  (--verbose) Verbose
+ -w <NAME> (--write) Write code specified in -e as scriptlet
+ -x <NAME> Execute a scriptlet. Can be specified multiple times. -x is optional
+     if there is only one scriptlet to execute, and scriptlet name is specified
+     as the first argument, and there is no -e specified.
+
+=head1 FAQ
+
+=head2 How is perlmv different from other similar solutions?
+
+Compared to L<rename> from L<File::Rename>, perlmv offers scriptlets, recursive
+mode, automatic renaming in case of conflicts. Instead of rename, you can also
+link, symlink, or copy.
+
+L<pmv> from L<File::PerlMove> also allows linking/symlinking instead of rename,
+but it does not have recursive mode or scriptlets.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-perlmv>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-perlmv>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<rename> from (L<File::Rename>
+
+L<pmv> from L<File::PerlMove>
+
+Other binaries in this distribution: L<perlrename>, L<perlcp>, L<perlln>,
+L<perlln_s>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

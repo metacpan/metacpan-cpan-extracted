@@ -1,11 +1,11 @@
 #!perl -T
 
-use Test::More;
-
+use 5.10.0;
 use strict;
 use warnings;
+use Test::More;
 
-BEGIN { use_ok( 'Net::IPAM::Block' ) || print "Bail out!\n"; }
+BEGIN { use_ok('Net::IPAM::Block') || print "Bail out!\n"; }
 
 my $must_fail = [
   { cidr => '10.0.0.1-10.0.0.6', test => 'IPv4 range, must fail' },
@@ -16,7 +16,7 @@ my $must_fail = [
 
 my @cidrs;
 foreach my $item (@$must_fail) {
-  ok(! Net::IPAM::Block->new( $item->{cidr} )->cidrsplit, $item->{test});
+  ok( !Net::IPAM::Block->new( $item->{cidr} )->cidrsplit, $item->{test} );
 }
 
 my $must_pass = [
@@ -71,14 +71,14 @@ my $must_pass = [
 
 foreach my $item (@$must_pass) {
   @cidrs = map { defined $_ ? $_->to_string : () } Net::IPAM::Block->new( $item->{cidr} )->cidrsplit;
-  is_deeply(\@cidrs, $item->{expect}, $item->{test});
+  is_deeply( \@cidrs, $item->{expect}, $item->{test} );
 }
 
 my $split = Net::IPAM::Block->new('fe80::/12')->cidrsplit;
 my $cidr1 = Net::IPAM::Block->new('fe80::/13');
 my $cidr2 = Net::IPAM::Block->new('fe88::/13');
 
-is_deeply($split, [$cidr1, $cidr2], 'wantarray');
+is_deeply( $split, [ $cidr1, $cidr2 ], 'wantarray' );
 
 done_testing();
 

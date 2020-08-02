@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use App::ZFSCurses;
+
+=head1 NAME
+
+zfscurses - create and run an App::ZFSCurses instance.
+
+=cut
+
+=head1 SYNOPSIS
+
+zfscurses is a script to create and run an App::ZFSCurses instance.
+
+=cut
+
+App::ZFSCurses->new->run();
+
+=head1 KEYSTROKES
+
+Use the following keystrokes to navigate around the UI.
+
+=over 4
+
+=item Up/Down
+
+Move the cursor up or down.
+
+=item Enter/Space
+
+Change focus around.
+
+=item Ctrl+q
+
+Quit the UI.
+
+=item F1
+
+When browsing a dataset properties, F1 will show a help message about the
+selected property. You must first select a property using Enter/Space.
+
+=back
+
+=cut
+
+=head1 AUTHOR
+
+Patrice Clement <monsieurp at cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2020 by Patrice Clement.
+
+This is free software, licensed under the (three-clause) clause BSD License.
+
+See the LICENSE file.
+
+=cut

@@ -1,7 +1,7 @@
 package Guacamole::Test;
 our $AUTHORITY = 'cpan:XSAWYERX';
 # ABSTRACT: What Guacamole uses to test itself
-$Guacamole::Test::VERSION = '0.005';
+$Guacamole::Test::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -86,7 +86,7 @@ Guacamole::Test - What Guacamole uses to test itself
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

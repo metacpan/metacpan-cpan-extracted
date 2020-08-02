@@ -13,4 +13,4 @@ sub get_grant {
 	$grant_maker->from_auth_code( $self, $self->params( $self->required_parameters ), @_ );
 }
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';

@@ -94,4 +94,5 @@ EOD
 # be saved as a .ics file to be successfully imported into the calendar
 # application.
 
-pass -chronological "${1:-today noon}" "${2:-+8}"
+# pass -chronological "${1:-today noon}" "${2:-+8}"
+pass -chronological -default "'today noon' +8" "$@"

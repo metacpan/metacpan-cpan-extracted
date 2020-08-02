@@ -15,66 +15,63 @@ use File::HomeDir;	# Mocked
 
 sub dump_tokens;
 sub new;
-sub set_positional (@);
-sub tokenize (@);
-sub tokenize_fail (@);
 
 use Astro::App::Satpass2;
 use Astro::App::Satpass2::Utils qw{ my_dist_config };
 
 new;
 
-tokenize 'foo', [ [ 'foo' ], {} ]
+tokenize( 'foo', [ [ 'foo' ], {} ] )
     or dump_tokens;
 
-tokenize 'foo  bar', [ [ qw{ foo bar } ], {} ]
+tokenize( 'foo  bar', [ [ qw{ foo bar } ], {} ] )
     or dump_tokens;
 
 =begin comment
 
-tokenize "foo\nbar", [ [ qw{ foo } ], {} ];
+tokenize( "foo\nbar", [ [ qw{ foo } ], {} ]; )
 
-tokenize undef, [ [ qw{ bar } ] ], 'tokenize remainder of source';
+tokenize( undef, [ [ qw{ bar } ] ], 'tokenize remainder of source'; )
 
-tokenize "foo\\\nbar", [ [ 'foobar' ], {} ];
+tokenize( "foo\\\nbar", [ [ 'foobar' ], {} ]; )
 
 =end comment
 
 =cut
 
-tokenize q{foo'bar'}, [ [ qw{ foobar } ], {} ]
+tokenize( q{foo'bar'}, [ [ qw{ foobar } ], {} ] )
     or dump_tokens;
 
-tokenize qq{foo'bar\nbaz'}, [ [ "foobar\nbaz" ], {} ]
+tokenize( qq{foo'bar\nbaz'}, [ [ "foobar\nbaz" ], {} ] )
     or dump_tokens;
 
 =begin comment
 
 # $'...' not understood by built-in tokenizer.
 
-tokenize q{foo$'bar'}, [ [ 'foobar' ], {} ]
+tokenize( q{foo$'bar'}, [ [ 'foobar' ], {} ] )
     or dump_tokens;
 
-tokenize qq{foo\$'bar\nbaz'}, [ [ "foobar\nbaz" ], {} ]
+tokenize( qq{foo\$'bar\nbaz'}, [ [ "foobar\nbaz" ], {} ] )
     or dump_tokens;
 
 =end comment
 
 =cut
 
-tokenize q{foo"bar"}, [ [ 'foobar' ], {} ]
+tokenize( q{foo"bar"}, [ [ 'foobar' ], {} ] )
     or dump_tokens;
 
-tokenize qq{foo"bar\nbaz"}, [ [ "foobar\nbaz" ], {} ]
+tokenize( qq{foo"bar\nbaz"}, [ [ "foobar\nbaz" ], {} ] )
     or dump_tokens;
 
-tokenize <<'EOD', [ [ "foobar\nbaz" ], {} ]
+tokenize( <<'EOD', [ [ "foobar\nbaz" ], {} ] )
 foo"bar
 baz"
 EOD
     or dump_tokens;
 
-tokenize <<'EOD', [ [ "foo bar\nbaz\n" ], {} ]
+tokenize( <<'EOD', [ [ "foo bar\nbaz\n" ], {} ] )
 <<END_OF_DATA
 foo bar
 baz
@@ -82,39 +79,39 @@ END_OF_DATA
 EOD
     or dump_tokens;
 
-tokenize q{foo"bar\\nbaz"}, [ [ "foobar\nbaz" ], {} ]
+tokenize( q{foo"bar\\nbaz"}, [ [ "foobar\nbaz" ], {} ] )
     or dump_tokens;
 
-tokenize q{foo#bar}, [ [ 'foo#bar' ], {} ]
+tokenize( q{foo#bar}, [ [ 'foo#bar' ], {} ] )
     or dump_tokens;
 
-tokenize q{foo # bar}, [ [ 'foo' ], {} ]
+tokenize( q{foo # bar}, [ [ 'foo' ], {} ] )
     or dump_tokens;
 
-tokenize q{# foo bar}, [ [], {} ]
+tokenize( q{# foo bar}, [ [], {} ] )
     or dump_tokens;
 
-tokenize q<foo{bar}>, [ [ 'foo{bar}' ], {} ]
+tokenize( q<foo{bar}>, [ [ 'foo{bar}' ], {} ] )
     or dump_tokens;
 
-tokenize q<foo{bar>, [ [ 'foo{bar' ], {} ]
+tokenize( q<foo{bar>, [ [ 'foo{bar' ], {} ] )
     or dump_tokens;
 
-tokenize q<foobar}>, [ [ 'foobar}' ], {} ]
+tokenize( q<foobar}>, [ [ 'foobar}' ], {} ] )
     or dump_tokens;
 
 =begin comment
 
 # brace expansion not supported.
 
-tokenize q<foo{bar,baz}>, [ [ qw{ foobar foobaz ], {} ]
+tokenize( q<foo{bar,baz}>, [ [ qw{ foobar foobaz ], {} ] )
     or dump_tokens;
 
-tokenize q<foo{bar,{baz,burfle}}>,
+tokenize( q<foo{bar,{baz,burfle}}>, )
     [ [ qw{ foobar foobaz fooburfle } ], {} ]
     or dump_tokens;
 
-tokenize q<foo{bar,x{baz,burfle}}>,
+tokenize( q<foo{bar,x{baz,burfle}}>, )
     [ [ qw{ foobar fooxbaz fooxburfle ], {} ]
     or dump_tokens;
 
@@ -122,16 +119,16 @@ tokenize q<foo{bar,x{baz,burfle}}>,
 
 =cut
 
-tokenize q{x~+}, [ [ 'x~+' ], {} ]
+tokenize( q{x~+}, [ [ 'x~+' ], {} ] )
     or dump_tokens;
 
-tokenize q{~+}, [ [ cwd() ], {} ]
+tokenize( q{~+}, [ [ cwd() ], {} ] )
     or dump_tokens;
 
-tokenize q{~+/foo}, [ [ cwd() . '/foo' ], {} ]
+tokenize( q{~+/foo}, [ [ cwd() . '/foo' ], {} ] )
     or dump_tokens;
 
-tokenize q{x~}, [ [ 'x~' ], {} ]
+tokenize( q{x~}, [ [ 'x~' ], {} ] )
     or dump_tokens;
 
 {
@@ -140,10 +137,10 @@ tokenize q{x~}, [ [ 'x~' ], {} ]
     my $home = '/home/menuhin';
     local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_HOME = $home;
 
-    tokenize q{~}, [ [ $home ], {} ]
+    tokenize( q{~}, [ [ $home ], {} ] )
 	or dump_tokens;
 
-    tokenize q{~/foo}, [ [ "$home/foo" ], {} ]
+    tokenize( q{~/foo}, [ [ "$home/foo" ], {} ] )
 	or dump_tokens;
 
 }
@@ -154,19 +151,19 @@ tokenize q{x~}, [ [ 'x~' ], {} ]
     };
     local $File::HomeDir::MOCK_FILE_HOMEDIR_USERS_HOME = $home;
 
-    tokenize q{~menuhin}, [ [ $home->{menuhin} ], {} ]
+    tokenize( q{~menuhin}, [ [ $home->{menuhin} ], {} ] )
 	or dump_tokens;
 
-    tokenize q{~menuhin/foo}, [ [ "$home->{menuhin}/foo" ], {} ]
+    tokenize( q{~menuhin/foo}, [ [ "$home->{menuhin}/foo" ], {} ] )
 	or dump_tokens;
 
-    tokenize { fail => 1 }, q{~pearlman},
+    tokenize( { fail => 1 }, q{~pearlman},
 	qr{ \A Unable \s to \s find \s home \s for \s pearlman }smx,
-	'Tokenize ~pearlman should fail';
+	'Tokenize ~pearlman should fail' );
 
-    tokenize { fail => 1 }, q{~pearlman/foo},
+    tokenize( { fail => 1 }, q{~pearlman/foo},
 	qr{ \A Unable \s to \s find \s home \s for \s pearlman }smx,
-	'Tokenize ~pearlman/foo should fail';
+	'Tokenize ~pearlman/foo should fail' );
 
 }
 
@@ -175,10 +172,10 @@ tokenize q{x~}, [ [ 'x~' ], {} ]
     my $cfg = '/home/menuhin/.local/perl/Astro-App-Satpass2';
     local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_DIST_CONFIG = $cfg;
 
-    tokenize q{~~}, [ [ $cfg ], {} ]
+    tokenize( q{~~}, [ [ $cfg ], {} ] )
 	or dump_tokens;
 
-    tokenize q{~~/foo}, [ [ "$cfg/foo" ], {} ]
+    tokenize( q{~~/foo}, [ [ "$cfg/foo" ], {} ] )
 	or dump_tokens;
 
 }
@@ -187,13 +184,13 @@ tokenize q{x~}, [ [ 'x~' ], {} ]
 
     local $File::HomeDir::MOCK_FILE_HOMEDIR_MY_DIST_CONFIG = undef;
 
-    tokenize { fail => 1 }, q{~~},
+    tokenize( { fail => 1 }, q{~~},
 	qr{ \A Unable \s to \s find \s ~~ }smx,
-	'Tokenize ~~ without dist dir should fail';
+	'Tokenize ~~ without dist dir should fail' );
 
-    tokenize { fail => 1 }, q{~~/foo},
+    tokenize( { fail => 1 }, q{~~/foo},
 	qr{ \A Unable \s to \s find \s ~~ }smx,
-	'Tokenize ~~/foo without dist dir should fail';
+	'Tokenize ~~/foo without dist dir should fail' );
 }
 
 local $ENV{foo} = 'bar';
@@ -202,30 +199,30 @@ local @ENV{ qw{ fooz yehudi } };
 delete $ENV{fooz};
 delete $ENV{yehudi};
 
-tokenize q{$foo}, [ [ 'bar' ], {} ]
+tokenize( q{$foo}, [ [ 'bar' ], {} ] )
     or dump_tokens;
 
-tokenize q{"$foo"}, [ [ 'bar' ], {} ]
+tokenize( q{"$foo"}, [ [ 'bar' ], {} ] )
     or dump_tokens;
 
-tokenize q{'$foo'}, [ [ '$foo' ], {} ]
+tokenize( q{'$foo'}, [ [ '$foo' ], {} ] )
     or dump_tokens;
 
-tokenize <<'EOD', [ [ "bar\n" ], {} ]
+tokenize( <<'EOD', [ [ "bar\n" ], {} ] )
 <<END_OF_DOCUMENT
 $foo
 END_OF_DOCUMENT
 EOD
     or dump_tokens;
 
-tokenize <<'EOD', [ [ "bar\n" ], {} ]
+tokenize( <<'EOD', [ [ "bar\n" ], {} ] )
 <<"END_OF_DOCUMENT"
 $foo
 END_OF_DOCUMENT
 EOD
     or dump_tokens;
 
-tokenize <<'EOD', [ [ "\$foo\n" ], {} ]
+tokenize( <<'EOD', [ [ "\$foo\n" ], {} ] )
 <<'END_OF_DOCUMENT'
 $foo
 END_OF_DOCUMENT
@@ -236,71 +233,71 @@ EOD
 
 # $'...' not supported
 
-tokenize q{$'$foo'}, [ [ '$foo' ], {} ]
+tokenize( q{$'$foo'}, [ [ '$foo' ], {} ] )
     or dump_tokens;
 
 =end comment
 
 =cut
 
-tokenize q<${foo}bar>, [ [ 'barbar' ], {} ]
+tokenize( q<${foo}bar>, [ [ 'barbar' ], {} ] )
     or dump_tokens;
 
 =begin comment
 
 # ${#..} not supported except on $@ and $*
 
-tokenize q<${#foo}>, [ [ '3' ], {} ]
+tokenize( q<${#foo}>, [ [ '3' ], {} ] )
     or dump_tokens;
 
 =end comment
 
 =cut
 
-tokenize q<${!foo}>, [ [ 'baz' ], {} ]
+tokenize( q<${!foo}>, [ [ 'baz' ], {} ] )
     or dump_tokens;
 
-tokenize q<$burfle>, [ [], {} ]
+tokenize( q<$burfle>, [ [], {} ] )
     or dump_tokens;
 
-set_positional qw{ one two three };
+set_positional( qw{ one two three } );
 
 =begin comment
 
 # Arrays not supported
 
-tokenize q<${plural[0]}>, [ [ 'zero' ], {} ]
+tokenize( q<${plural[0]}>, [ [ 'zero' ], {} ] )
     or dump_tokens;
 
-tokenize q<${plural[1]}>, [ [ 'one' ], {} ]
+tokenize( q<${plural[1]}>, [ [ 'one' ], {} ] )
     or dump_tokens;
 
-tokenize q<${plural[2]}>, [ [ 'two' ], {} ]
+tokenize( q<${plural[2]}>, [ [ 'two' ], {} ] )
     or dump_tokens;
 
-tokenize q<${#plural}>, [ [ '4' ], {} ]
+tokenize( q<${#plural}>, [ [ '4' ], {} ] )
     or dump_tokens;
 
-tokenize q<${#@}>, [ [ '3' ], {} ]
+tokenize( q<${#@}>, [ [ '3' ], {} ] )
     or dump_tokens;
 
-tokenize q<${#plural[*]}>, [
+tokenize( q<${#plural[*]}>, [ )
     { type => 'word', content => '3' } ]
     or dump_tokens;
 
-tokenize q<${#plural[0]}>, [
+tokenize( q<${#plural[0]}>, [ )
     { type => 'word', content => '4' } ]
     or dump_tokens;
 
-tokenize q<${#plural[1]}>, [
+tokenize( q<${#plural[1]}>, [ )
     { type => 'word', content => '3' } ]
     or dump_tokens;
 
-tokenize q<${#plural[2]}>, [
+tokenize( q<${#plural[2]}>, [ )
     { type => 'word', content => '3' } ]
     or dump_tokens;
 
-tokenize q<${#plural[3]}>, [
+tokenize( q<${#plural[3]}>, [ )
     { type => 'word', content => '0' } ]
     or dump_tokens;
 
@@ -308,94 +305,94 @@ tokenize q<${#plural[3]}>, [
 
 =cut
 
-tokenize q<$#>, [ [ '3' ], {} ]
+tokenize( q<$#>, [ [ '3' ], {} ] )
     or dump_tokens;
 
-tokenize q<$*>, [ [ qw{ one two three } ], {} ]
+tokenize( q<$*>, [ [ qw{ one two three } ], {} ] )
     or dump_tokens;
 
-tokenize q<$@>, [ [ qw{ one two three } ], {} ]
+tokenize( q<$@>, [ [ qw{ one two three } ], {} ] )
     or dump_tokens;
 
-tokenize q<'$*'>, [ [ '$*' ], {} ]
+tokenize( q<'$*'>, [ [ '$*' ], {} ] )
     or dump_tokens;
 
-tokenize q<'$@'>, [ [ '$@' ], {} ]
+tokenize( q<'$@'>, [ [ '$@' ], {} ] )
     or dump_tokens;
 
-tokenize q<"$*">, [ [ 'one two three' ], {} ]
+tokenize( q<"$*">, [ [ 'one two three' ], {} ] )
     or dump_tokens;
 
-tokenize q<"$@">, [ [ qw{ one two three } ], {} ]
+tokenize( q<"$@">, [ [ qw{ one two three } ], {} ] )
     or dump_tokens;
 
-tokenize q<"xx$@yy">, [ [ qw{ xxone two threeyy } ], {} ]
+tokenize( q<"xx$@yy">, [ [ qw{ xxone two threeyy } ], {} ] )
     or dump_tokens;
 
-set_positional 'o ne', 'two';
+set_positional( 'o ne', 'two' );
 
-tokenize q<xx$@yy>, [ [ qw{ xxo ne twoyy } ], {} ]
+tokenize( q<xx$@yy>, [ [ qw{ xxo ne twoyy } ], {} ] )
     or dump_tokens;
 
-tokenize q<"xx$@yy">, [ [ 'xxo ne', 'twoyy' ], {} ]
+tokenize( q<"xx$@yy">, [ [ 'xxo ne', 'twoyy' ], {} ] )
     or dump_tokens;
 
-tokenize q<xx$*yy>, [ [ qw{ xxo ne twoyy } ], {} ]
+tokenize( q<xx$*yy>, [ [ qw{ xxo ne twoyy } ], {} ] )
     or dump_tokens;
 
-tokenize q<"xx$*yy">, [ [ 'xxo ne twoyy' ], {} ]
+tokenize( q<"xx$*yy">, [ [ 'xxo ne twoyy' ], {} ] )
     or dump_tokens;
 
-tokenize q<${foo:-flurfle}>, [ [ 'bar' ], {} ]
+tokenize( q<${foo:-flurfle}>, [ [ 'bar' ], {} ] )
     or dump_tokens;
 
-tokenize q<${fooz:-flurfle}>, [ [ 'flurfle' ], {} ]
+tokenize( q<${fooz:-flurfle}>, [ [ 'flurfle' ], {} ] )
     or dump_tokens;
 
-tokenize q<${fooz}>, [ [], {} ]
+tokenize( q<${fooz}>, [ [], {} ] )
     or dump_tokens;
 
-tokenize q<${fooz:=flurfle}>, [ [ 'flurfle' ], {} ]
+tokenize( q<${fooz:=flurfle}>, [ [ 'flurfle' ], {} ] )
     or dump_tokens;
 
-tokenize q<$fooz>, [ [ 'flurfle' ], {} ]
+tokenize( q<$fooz>, [ [ 'flurfle' ], {} ] )
     or dump_tokens;
 
-tokenize q<${foo:?not foolish}>, [ [ 'bar' ], {} ]
+tokenize( q<${foo:?not foolish}>, [ [ 'bar' ], {} ] )
     or dump_tokens;
 
-tokenize_fail q<${yehudi:?not foolish}>, qr{\Qnot foolish}smx;
+tokenize_fail( q<${yehudi:?not foolish}>, qr{\Qnot foolish}smx );
 
-tokenize q<${foo:+foolish}>, [ [ 'foolish' ], {} ]
+tokenize( q<${foo:+foolish}>, [ [ 'foolish' ], {} ] )
     or dump_tokens;
 
-tokenize q<${yehudi:+foolish}>, [ [], {} ]
+tokenize( q<${yehudi:+foolish}>, [ [], {} ] )
     or dump_tokens;
 
-tokenize q<${foo:1}>, [ [ 'ar' ], {} ]
+tokenize( q<${foo:1}>, [ [ 'ar' ], {} ] )
     or dump_tokens;
 
-tokenize q<${foo:1:1}>, [ [ 'a' ], {} ]
+tokenize( q<${foo:1:1}>, [ [ 'a' ], {} ] )
     or dump_tokens;
 
-tokenize q<${foo: -1}>, [ [ 'r' ], {} ]
+tokenize( q<${foo: -1}>, [ [ 'r' ], {} ] )
     or dump_tokens;
 
 =begin comment
 
 # Arrays not supported except $@
 
-tokenize q<${plural[*]:1}>, [
+tokenize( q<${plural[*]:1}>, [ )
     { type => 'word', content => 'one' },
     { type => 'white_space', content => ' ' },
     { type => 'word', content => 'two' } ]
     or dump_tokens;
 
-tokenize q<${plural[*]:1:1}>, [
+tokenize( q<${plural[*]:1:1}>, [ )
     { type => 'word', content => 'one' } ]
     or dump_tokens;
 
-tokenize q<${plural[*]: -1}>, [
+tokenize( q<${plural[*]: -1}>, [ )
     { type => 'word', content => 'two' } ]
     or dump_tokens;
 
@@ -403,39 +400,39 @@ tokenize q<${plural[*]: -1}>, [
 
 =cut
 
-set_positional qw{ fee };
+set_positional( qw{ fee } );
 
-tokenize '${@:1:2}', [ [], {} ]
+tokenize( '${@:1:2}', [ [], {} ] )
     or dump_tokens;
 
-set_positional qw{ fee fie };
+set_positional( qw{ fee fie } );
 
-tokenize '${@:1:2}', [ [ 'fie' ], {} ]
+tokenize( '${@:1:2}', [ [ 'fie' ], {} ] )
     or dump_tokens;
 
-set_positional qw{ fee fie foe };
+set_positional( qw{ fee fie foe } );
 
-tokenize '${@:1:2}', [ [ qw{ fie foe } ], {} ]
+tokenize( '${@:1:2}', [ [ qw{ fie foe } ], {} ] )
     or dump_tokens;
 
-set_positional qw{ fee fie foe fum };
+set_positional( qw{ fee fie foe fum } );
 
-tokenize '${@:1:2}', [ [ qw{ fie foe } ], {} ]
+tokenize( '${@:1:2}', [ [ qw{ fie foe } ], {} ] )
     or dump_tokens;
 
-tokenize '$0', [ [ $0 ], {} ]
+tokenize( '$0', [ [ $0 ], {} ] )
     or dump_tokens;
 
-tokenize '$_', [ [ $^X ], {} ]
+tokenize( '$_', [ [ $^X ], {} ] )
     or dump_tokens;
 
-tokenize '$$', [ [ $$ ], {} ]
+tokenize( '$$', [ [ $$ ], {} ] )
     or dump_tokens;
 
-tokenize '"\u\LFEE FIE FOE\E FOO"', [ [ 'Fee fie foe FOO' ], {} ]
+tokenize( '"\u\LFEE FIE FOE\E FOO"', [ [ 'Fee fie foe FOO' ], {} ] )
     or dump_tokens;
 
-tokenize '"Fee \U$2\E foe \u$foo"', [ [ 'Fee FIE foe Bar' ], {} ]
+tokenize( '"Fee \U$2\E foe \u$foo"', [ [ 'Fee FIE foe Bar' ], {} ] )
     or dump_tokens;
 
 done_testing;
@@ -496,7 +493,7 @@ done_testing;
 	}
     }
 
-    sub set_positional (@) {
+    sub set_positional {
 	@positional = @_;
 	return;
     }
@@ -512,7 +509,7 @@ done_testing;
 	$escape_re = qr{ [$escape_re] }smx;
     }
 
-    sub tokenize (@) {	## no critic (RequireArgUnpacking)
+    sub tokenize {	## no critic (RequireArgUnpacking)
 	my @args = @_;
 	my $opt = HASH_REF eq ref $args[0] ? shift @args : {};
 	my ( $source, $tokens, $name ) = @args;
@@ -530,7 +527,7 @@ done_testing;
 	SKIP: {
 	    $tt or skip( 'Failed to instantiate application', 1 );
 	    if ( eval {
-		    @got = $tt->_tokenize( $opt, $source, \@positional );
+		    @got = $tt->__tokenize( $opt, $source, \@positional );
 		    1;
 		} ) {
 		if ( $opt->{fail} ) {
@@ -563,7 +560,7 @@ done_testing;
 	return;
     }
 
-    sub tokenize_fail (@) {	## no critic (RequireArgUnpacking)
+    sub tokenize_fail {	## no critic (RequireArgUnpacking)
 	my @args = @_;
 	my $opt = HASH_REF eq ref $args[0] ? shift @args : {};
 	my ( $source, $message, $name ) = @args;
@@ -576,7 +573,7 @@ done_testing;
 	SKIP: {
 	    $tt or skip( 'Failed to instantiate application', 1 );
 	    if ( eval {
-		    @got = $tt->_tokenize( $opt, $source, \@positional );
+		    @got = $tt->__tokenize( $opt, $source, \@positional );
 		    1;
 		} ) {
 		@_ = ( "$name succeeded unexpectedly" );

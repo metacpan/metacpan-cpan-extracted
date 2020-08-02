@@ -1,11 +1,11 @@
 NAME
-    IMDB::TitleID::SearchByTitle - Extract information from an IMDB title
-    page
+    IMDB::TitleID::SearchByTitle - Try to find IMDB title ID for a movie
+    title
 
 VERSION
-    This document describes version 0.001 of IMDB::TitleID::SearchByTitle
+    This document describes version 0.002 of IMDB::TitleID::SearchByTitle
     (from Perl distribution IMDB-TitleID-SearchByTitle), released on
-    2020-04-10.
+    2020-04-15.
 
 FUNCTIONS
   search_imdb_title_id_by_title
@@ -13,7 +13,7 @@ FUNCTIONS
 
      search_imdb_title_id_by_title(%args) -> [status, msg, payload, meta]
 
-    Extract information from an IMDB title page.
+    Try to find IMDB title ID for a movie title.
 
     This function is not exported.
 

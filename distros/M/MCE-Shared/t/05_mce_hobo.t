@@ -18,7 +18,7 @@ BEGIN {
 
    ok( 1, "spawning asynchronously" );
 
-   MCE::Hobo->create( sub { sleep 2; "$come_then_i_pray $_" } ) for 1..3;
+   MCE::Hobo->create( sub { sleep 1; sleep 1; "$come_then_i_pray $_" } ) for 1..3;
 
    %pids = map { $_ => undef } MCE::Hobo->list_pids;
    is ( scalar( keys %pids ), 3, 'check for unique pids' );
@@ -59,8 +59,8 @@ BEGIN {
 {
    my ( $cnt, @procs ); local $_;
 
-   for ( 1 .. 3 ) {
-      push @procs, MCE::Hobo->create( sub { sleep 1 for 1 .. 9; return 1 } );
+   for ( 1..3 ) {
+      push @procs, MCE::Hobo->create( sub { sleep 1 for 1..9; return 1 } );
    }
 
    $procs[0]->exit();
@@ -106,7 +106,7 @@ BEGIN {
 
    my @result; local $_;
 
-   MCE::Hobo->create(\&task, $_) for ( 1 .. 3 );
+   MCE::Hobo->create(\&task, $_) for ( 1..3 );
 
    my @hobos = MCE::Hobo->wait_all();
 

@@ -126,7 +126,7 @@ BEGIN {
    $cache->incrby("cnt", 5);
    is($cache->get("cnt"), 9, "fetch cnt");
 
-   sleep 3;
+   sleep(1) for 1..3;
    ok(!$cache->exists("foo"), "expired foo");
    ok(!$cache->get("car"),   "expired car");
 
@@ -136,7 +136,7 @@ BEGIN {
    $cache->incr("cnt");
    is($cache->get("cnt"), 1, "cnt inserted & incremented");
 
-   sleep 3;
+   sleep(1) for 1..3;
    is($cache->len(), 1, "len() after raising max age");
 }
 

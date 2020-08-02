@@ -16,7 +16,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.872';
+our $VERSION = '1.873';
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 ## no critic (TestingAndDebugging::ProhibitNoStrict)
@@ -143,7 +143,7 @@ sub STORE {
    # evict the least used key, inlined for performance
    if ( defined ${ $size } && @{ $keys } - ${ $gcnt } > ${ $size } ) {
       my $key = shift @{ $keys };
-      ${ $begi }++; delete $data->{ $key }; delete $indx->{ $key };
+      ${ $begi }++, delete($data->{ $key }), delete($indx->{ $key });
 
       MCE::Shared::Cache::_gckeys_head( $keys, $begi, $gcnt )
          if ( ${ $gcnt } && !defined $keys->[ 0 ] );
@@ -451,7 +451,7 @@ sub _inskey {
    # evict the least used key, inlined for performance
    if ( defined ${ $size } && @{ $keys } - ${ $gcnt } > ${ $size } ) {
       my $key = shift @{ $keys };
-      ${ $begi }++; delete $data->{ $key }; delete $indx->{ $key };
+      ${ $begi }++, delete($data->{ $key }), delete($indx->{ $key });
 
       MCE::Shared::Cache::_gckeys_head( $keys, $begi, $gcnt )
          if ( ${ $gcnt } && !defined $keys->[ 0 ] );
@@ -684,7 +684,7 @@ sub max_keys {
       # evict the least used keys
       while ( $count-- > 0 ) {
          my $key = shift @{ $keys };
-         ${ $begi }++; delete $data->{ $key }; delete $indx->{ $key };
+         ${ $begi }++, delete($data->{ $key }), delete($indx->{ $key });
 
          # safety to not overrun
          $self->purge if ( ${ $begi } > 1e9 );
@@ -902,7 +902,7 @@ MCE::Shared::Cache - A hybrid LRU-plain cache helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Cache version 1.872
+This document describes MCE::Shared::Cache version 1.873
 
 =head1 DESCRIPTION
 

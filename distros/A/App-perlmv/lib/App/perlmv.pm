@@ -1,11 +1,17 @@
+## no critic: ValuesAndExpressions::ProhibitCommaSeparatedStatements
+
 package App::perlmv;
 
-our $DATE = '2015-11-17'; # DATE
-our $VERSION = '0.50'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-02'; # DATE
+our $DIST = 'App-perlmv'; # DIST
+our $VERSION = '0.600'; # VERSION
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
+#use Log::ger;
+
 use Cwd qw(abs_path getcwd);
 #use Data::Dump qw(dump);
 use File::Copy;
@@ -13,7 +19,7 @@ use File::Find;
 use File::MoreUtil qw(l_abs_path);
 use File::Path qw(make_path);
 use File::Spec;
-use Getopt::Long qw(:config no_ignore_case bundling);
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 sub new {
     my ($class) = @_;
@@ -55,7 +61,41 @@ sub new {
 sub parse_opts {
     my $self = shift;
 
-    GetOptions(
+    GetOptionsWithCompletion(
+        sub {
+            my %args = @_;
+            my $word = $args{word};
+            my $type = $args{type};
+            my $seen_opts = $args{seen_opts};
+
+            if ($type eq 'arg') {
+                my $argpos = $args{argpos};
+                if ($argpos == 0 &&
+                        !exists($seen_opts->{'-x'}) && !exists($seen_opts->{'--execute'}) &&
+                        !exists($seen_opts->{'-e'}) && !exists($seen_opts->{'--eval'})) {
+                    require Complete::App::perlmv;
+                    return Complete::App::perlmv::complete_perlmv_scriptlet(word=>$word);
+                } else {
+                    require Complete::File;
+                    return Complete::File::complete_file(word=>$word);
+                }
+            } elsif ($type eq 'optval') {
+                my $opts = ref $args{opt} eq 'ARRAY' ? $args{opt} : [$args{opt}];
+                my @comps;
+                if (grep { $_ =~ /\A(-x|--execute|-D|--delete|-s|--show|-w|--write)\z/ } @$opts) {
+                    require Complete::App::perlmv;
+                    push @comps, Complete::App::perlmv::complete_perlmv_scriptlet(word=>$word);
+                }
+                if (grep { $_ eq '-M' || $_ eq '--mode' } @$opts) {
+                    require Complete::Util;
+                    push @comps, Complete::Util::complete_array_elem(word=>$word, array=>[qw/copy symlink link move rename/]);
+                }
+                require Complete::Util;
+                return Complete::Util::combine_answers(@comps);
+            }
+
+            undef;
+        },
         'c|check'         => \$self->{ 'check'         },
         'D|delete=s'      => \$self->{ 'delete'        },
         'd|dry-run'       => \$self->{ 'dry_run'       },
@@ -143,7 +183,7 @@ sub run {
     }
     # convert all scriptlet names into their code
     for (@{ $self->{'codes'} }) {
-        $_ = $self->load_scriptlet($$_) if ref($_);
+        $_ = $self->get_scriptlet_code($$_) if ref($_) eq 'SCALAR';
     }
 
     die "FATAL: Please specify some files in arguments\n"
@@ -222,12 +262,19 @@ USAGE
     exit 0;
 }
 
-sub load_scriptlet {
+sub get_scriptlet_code {
     my ( $self, $name ) = @_;
     $self->load_scriptlets();
     die "FATAL: Can't find scriptlet `$name`"
         unless $self->{'scriptlets'}{$name};
-    return $self->{'scriptlets'}{$name}{'code'};
+    if (defined(my $mod = $self->{'scriptlets'}{$name}{'module'})) {
+        (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+        require $mod_pm;
+        no strict 'refs';
+        ${"$mod\::SCRIPTLET"}->{code};
+    } else {
+        $self->{'scriptlets'}{$name}{'code'};
+    }
 }
 
 sub load_scriptlets {
@@ -238,6 +285,25 @@ sub load_scriptlets {
 sub find_scriptlets {
     my ($self) = @_;
     my $res    = {};
+
+    require File::Slurper;
+    require Module::List::Tiny;
+    {
+        my $mods = Module::List::Tiny::list_modules(
+            'App::perlmv::scriptlet::',
+            {list_modules=>1, recurse=>1, return_path=>1});
+        for my $mod (sort keys %$mods) {
+            my $name = $mod;
+            $name =~ s/\AApp::perlmv::scriptlet:://;
+            $name =~ s!::!/!g;
+            $name =~ s!_!-!g;
+            $res->{$name} = {
+                module => $mod,
+                code => File::Slurper::read_text($mods->{$mod}),
+                from => "App::perlmv::scriptlet::*",
+            };
+        }
+    }
 
     eval { require App::perlmv::scriptlets::std };
     if (%App::perlmv::scriptlets::std::scriptlets) {
@@ -281,7 +347,7 @@ sub find_scriptlets {
 
 sub valid_scriptlet_name {
     my ($self, $name) = @_;
-    $name =~ m/^[A-Za-z_][0-9A-Za-z_-]*$/;
+    $name =~ m!\A([A-Za-z0-9_][0-9A-Za-z_-]*/)*[A-Za-z0-9_][0-9A-Za-z_-]*\z!;
 }
 
 sub store_scriptlet {
@@ -329,8 +395,12 @@ sub run_code_for_cleaning {
     no warnings;
     local $_ = "-CLEAN";
     local $App::perlmv::code::CLEANING = 1;
-    eval "package App::perlmv::code; $code";
-    die "FATAL: Code doesn't run (cleaning): code=$code, errmsg=$@\n" if $@;
+    if (ref $code eq 'CODE') {
+        $code->();
+    } else {
+        eval "package App::perlmv::code; $code";
+        die "FATAL: Code doesn't run (cleaning): code=$code, errmsg=$@\n" if $@;
+    }
 }
 
 sub run_code {
@@ -340,9 +410,13 @@ sub run_code {
     my $orig_ = $_;
     local $App::perlmv::code::TESTING = 0;
     local $App::perlmv::code::COMPILING = 0;
-    # It does need a package declaration to run it in App::perlmv::code
-    my $res = eval "package App::perlmv::code; $code";
-    die "FATAL: Code doesn't compile: code=$code, errmsg=$@\n" if $@;
+    my $res;
+    if (ref $code eq 'CODE') {
+        $res = $code->();
+    } else {
+        $res = eval "package App::perlmv::code; $code";
+        die "FATAL: Code doesn't compile: code=$code, errmsg=$@\n" if $@;
+    }
     if (defined($res) && length($res) && $_ eq $orig_) { $_ = $res }
 }
 
@@ -390,15 +464,16 @@ sub process_items {
                 }
             }
         }
-        $self->process_item($code, $code_is_final, $item, $items);
+        $self->process_item($code, $code_is_final, $item, $items, $i-1);
     }
 }
 
 sub process_item {
-    my ($self, $code, $code_is_final, $item, $items) = @_;
+    my ($self, $code, $code_is_final, $item, $items, $item_num) = @_;
 
     local $App::perlmv::code::FILES =
         [map {ref($_) ? $_->{name_for_script} : $_} @$items];
+    local $App::perlmv::code::FILENUM = $item_num;
     local $_ = $item->{name_for_script};
 
     my $old = $item->{real_name};
@@ -530,7 +605,7 @@ sub rename {
     local $self->{'recursive'} = $self->{'recursive'};
     for (my $i=0; $i < @{ $self->{'codes'} }; $i++) {
         my $code = $self->{'codes'}[$i];
-        $self->compile_code($code) unless $self->{'compiled'};
+        $self->compile_code($code) unless $self->{'compiled'} || ref $code eq 'CODE';
         next if $self->{'check'};
         my $code_is_final = ($i == @{ $self->{'codes'} }-1);
         $self->{'recursive'} = 0 if $i;
@@ -556,7 +631,7 @@ App::perlmv - Rename files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.50 of App::perlmv (from Perl distribution App-perlmv), released on 2015-11-17.
+This document describes version 0.600 of App::perlmv (from Perl distribution App-perlmv), released on 2020-08-02.
 
 =for Pod::Coverage ^(.*)$
 
@@ -576,13 +651,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<App::RenameUtils>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

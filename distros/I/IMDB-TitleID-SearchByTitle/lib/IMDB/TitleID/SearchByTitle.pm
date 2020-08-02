@@ -1,9 +1,9 @@
 package IMDB::TitleID::SearchByTitle;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-10'; # DATE
+our $DATE = '2020-04-15'; # DATE
 our $DIST = 'IMDB-TitleID-SearchByTitle'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -17,7 +17,7 @@ our %SPEC;
 
 $SPEC{search_imdb_title_id_by_title} = {
     v => 1.1,
-    summary => 'Extract information from an IMDB title page',
+    summary => 'Try to find IMDB title ID for a movie title',
     args => {
         title => {
             schema => 'str*',
@@ -48,7 +48,7 @@ sub search_imdb_title_id_by_title {
 }
 
 1;
-# ABSTRACT: Extract information from an IMDB title page
+# ABSTRACT: Try to find IMDB title ID for a movie title
 
 __END__
 
@@ -58,11 +58,11 @@ __END__
 
 =head1 NAME
 
-IMDB::TitleID::SearchByTitle - Extract information from an IMDB title page
+IMDB::TitleID::SearchByTitle - Try to find IMDB title ID for a movie title
 
 =head1 VERSION
 
-This document describes version 0.001 of IMDB::TitleID::SearchByTitle (from Perl distribution IMDB-TitleID-SearchByTitle), released on 2020-04-10.
+This document describes version 0.002 of IMDB::TitleID::SearchByTitle (from Perl distribution IMDB-TitleID-SearchByTitle), released on 2020-04-15.
 
 =head1 FUNCTIONS
 
@@ -73,7 +73,7 @@ Usage:
 
  search_imdb_title_id_by_title(%args) -> [status, msg, payload, meta]
 
-Extract information from an IMDB title page.
+Try to find IMDB title ID for a movie title.
 
 This function is not exported.
 

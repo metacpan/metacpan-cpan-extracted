@@ -509,7 +509,7 @@ eval {
 
 SKIP: {
 
-    load_or_skip 'DateTime::Calendar::Christian', 1;
+    load_or_skip( 'DateTime::Calendar::Christian', 1 );
 
     eval {
 	require DateTime::TimeZone;

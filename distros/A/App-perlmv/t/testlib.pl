@@ -86,7 +86,7 @@ sub run_perlmv {
             elsif ($opts->{mode} eq 's') { $cmd = "perlln_s" }
             elsif ($opts->{mode} eq 'l') { $cmd = "perlln" }
         }
-        $cmd = "$Bin/../bin/$cmd";
+        $cmd = "$Bin/../script/$cmd";
         my @cmd = ($Perl, $cmd);
         for (keys %$opts) {
             my $v = $opts->{$_};
@@ -120,7 +120,7 @@ sub run_perlmv {
         for (keys %$opts) {
             my $v = $opts->{$_};
             if ($_ eq 'extra_opt') {
-                push @{ $pmv->{codes} }, $pmv->load_scriptlet($v);
+                push @{ $pmv->{codes} }, $pmv->get_scriptlet_code($v);
             } elsif ($_ eq 'extra_arg') {
                 # later, below
             } elsif ($_ eq 'reverse_order') {
@@ -133,7 +133,7 @@ sub run_perlmv {
                 $pmv->{$_} = $v;
             }
         }
-        local $pmv->{codes} = [map { ref($_) ? $pmv->load_scriptlet($$_) : $_ } @{ $pmv->{codes} }];
+        local $pmv->{codes} = [map { ref($_) eq 'SCALAR' ? $pmv->get_scriptlet_code($$_) : $_ } @{ $pmv->{codes} }];
         if ($opts->{compile}) {
             $pmv->compile_code($_) for @{$pmv->{codes}};
         } elsif ($opts->{write}) {

@@ -12,16 +12,16 @@ use My::Module::Test::App;
 
 require_ok 'Astro::App::Satpass2::ParseTime';
 
-klass 'Astro::App::Satpass2::ParseTime';
+klass( 'Astro::App::Satpass2::ParseTime' );
 
-call_m new => class => 'Astro::App::Satpass2::ParseTime::ISO8601',
-    INSTANTIATE, 'Instantiate';
+call_m( new => class => 'Astro::App::Satpass2::ParseTime::ISO8601',
+    INSTANTIATE, 'Instantiate' );
 
 my $now = time;
 
-call_m parse => "epoch $now", $now, qq<Parse of 'epoch $now' returns same>;
+call_m( parse => "epoch $now", $now, qq<Parse of 'epoch $now' returns same> );
 
-call_m parse => \$now, $now, qq<Parse of \\'$now' returns same>;
+call_m( parse => \$now, $now, qq<Parse of \\'$now' returns same> );
 
 done_testing;
 

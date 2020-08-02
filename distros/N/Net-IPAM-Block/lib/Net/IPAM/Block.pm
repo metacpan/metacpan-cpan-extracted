@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '1.17';
+our $VERSION = '2.00';
 
 use 5.10.0;
 use strict;
@@ -597,7 +597,96 @@ sub contains {
   Carp::croak 'wrong argument,';
 }
 
+=head2 diff
+
+  @diff = $outer->diff(@inner)
+
+Returns all blocks in outer block, minus the inner blocks.
+
+  my $outer = Net::IPAM::Block->new("192.168.2.0/24");
+  my @inner = (
+    Net::IPAM::Block->new("192.168.2.0/26"),
+    Net::IPAM::Block->new("192.168.2.240-192.168.2.249"),
+  );
+
+  my @diff = $outer->diff(@inner);
+
+  # diff: [192.168.2.64-192.168.2.239, 192.168.2.250-192.168.2.255]
+
+=cut
+
+sub diff {
+  my $outer = shift;
+
+  # sieve inner blocks
+  my @sieved;
+  foreach my $inner (@_) {
+
+    # skip disjunct blocks
+    next if $outer->is_disjunct_with($inner);
+
+    # nothing left, outer is equal to any inner
+    return wantarray ? () : [] if $inner->cmp($outer) == 0;
+
+    # nothing left, outer is contained in any inner
+    return wantarray ? () : [] if $inner->contains($outer);
+
+    push @sieved, $inner;
+  }
+
+  # sort remaining inner blocks
+  @sieved = sort { $a->cmp($b) } @sieved;
+
+  # sieve subsets from sorted blocks
+  @sieved = Net::IPAM::Block::Private::_sieve(@sieved);
+
+  # collect diff blocks
+  my @diff;
+
+  # inner diffs
+  my $cursor = $outer->base;
+  foreach my $inner (@sieved) {
+
+    if ( $cursor->cmp( $inner->base ) < 0 ) {
+      my $base_ip = $cursor;
+      my $last_ip = $inner->base->decr;
+
+      # make new block
+      my $block = bless( {}, ref $outer );
+      $block->{base} = $base_ip;
+      $block->{last} = $last_ip;
+      $block->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
+
+      push @diff, $block;
+
+      $cursor = $inner->last->incr;
+      next;
+    }
+
+    $cursor = $inner->last->incr;
+    next;
+  }
+
+  # last diff
+  if ( $cursor->cmp( $outer->last ) < 0 ) {
+    my $base_ip = $cursor;
+    my $last_ip = $outer->last;
+
+    # make new block
+    my $block = bless( {}, ref $outer );
+    $block->{base} = $base_ip;
+    $block->{last} = $last_ip;
+    $block->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
+
+    push @diff, $block;
+  }
+
+  return wantarray ? @diff : [@diff];
+}
+
 =head2 find_free_cidrs
+
+  DEPRECATED: find_free_cidrs() is deprecated in favor of diff(), maybe followed by to_cidrs()
 
   @free = $outer->find_free_cidrs(@inner)
 
@@ -617,6 +706,8 @@ Returns all free cidrs within given block, minus the inner blocks.
 =cut
 
 sub find_free_cidrs {
+  Carp::carp('DEPRECATED: find_free_cidrs() is deprecated in favor of diff(), maybe followed by to_cidrs()');
+
   my ( $outer, @inner ) = @_;
 
   my @purged;
@@ -670,13 +761,13 @@ sub find_free_cidrs {
       my $base_ip = $cursor;
       my $last_ip = $inner->base->decr;
 
-      # make new cidr block
-      my $cidr = bless( {}, ref $outer );
-      $cidr->{base} = $base_ip;
-      $cidr->{last} = $last_ip;
-      $cidr->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
+      # make new block
+      my $block = bless( {}, ref $outer );
+      $block->{base} = $base_ip;
+      $block->{last} = $last_ip;
+      $block->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
 
-      push @free, $cidr;
+      push @free, $block->to_cidrs;
 
       $cursor = $inner->last->incr;
       next;
@@ -692,15 +783,13 @@ sub find_free_cidrs {
 
     # make new cidr block
     # watch out inheritende
-    my $cidr = bless( {}, ref $outer );
-    $cidr->{base} = $base_ip;
-    $cidr->{last} = $last_ip;
-    $cidr->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
+    my $block = bless( {}, ref $outer );
+    $block->{base} = $base_ip;
+    $block->{last} = $last_ip;
+    $block->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $base_ip, $last_ip );
 
-    push @free, $cidr;
+    push @free, $block->to_cidrs;
   }
-
-  @free = aggregate(@free);
 
   return wantarray ? @free : [@free];
 }
@@ -709,75 +798,49 @@ sub find_free_cidrs {
 
 =head2 aggregate
 
-  @cidrs = aggregate(@blocks)
+  @agg = aggregate(@blocks)
 
-Returns the minimal number of CIDRs spanning the range of input blocks.
+Returns the minimal number of blocks spanning the range of input blocks.
+
+If CIDRs are required, use the following idiom:
+
+  @cidrs = map { $_->to_cidrs } aggregate(@blocks);
 
 =cut
 
-# algo:
-# - make CIDRs from blocks
-# - sort the CIDRs
-# - remove duplicates
-# - remove subsets
-# - pack adjacent CIDRs together
-# - make again CIDRs from the packed blocks
-# - return CIDRs
 sub aggregate {
+  my @result;
 
-  # make cidrs from blocks
-  my @cidrs;
-  foreach my $block (@_) {
-    push @cidrs, $block->to_cidrs;
-  }
+  # sort blocks => sieve subsets
+  my @sieved = Net::IPAM::Block::Private::_sieve( sort { $a->cmp($b) } @_ );
 
-  # sort them !!!
-  @cidrs = sort { $a->cmp($b) } @cidrs;
-
-  # pack adjacent blocks together
-  # 10.0.0.1-10.0.0.17, 10.0.0.18-10.0.0.255 => 10.0.0.1-10.0.0.255
-  # fe80::3-fe80::7, fe80::8-fe80::f         => fe80::3-fe80::f
-  #
-  my @packed;
   my $i = 0;
-  while ( $i <= $#cidrs ) {
-    my $this = $cidrs[$i];
-
+  while ( $i < @sieved ) {
+    my $this = $sieved[$i];
     my $j;
-    for ( $j = $i + 1 ; $j <= $#cidrs ; $j++ ) {
-      my $next = $cidrs[$j];
+    for ( $j = $i + 1 ; $j < @sieved ; $j++ ) {
 
-      # skip subsets and duplicates, @cidrs must be sorted !!!
-      next if $this->cmp($next) == 0;
-      next if $this->contains($next);
+      # can't agg different IP versions
+      last if $this->version != $sieved[$j]->version;
 
-      # can't pack different IP versions
-      last if $this->version != $next->version;
-
-      # if this.last++ == next.base, add ranges
-      # no overflow in incr possible, next range is still behind this range
-      if ( $this->{last}->incr->cmp( $next->{base} ) == 0 ) {
-        $this->{last} = $next->{last};
+      # if this.last++ >= next.base, add blocks
+      # no overflow in incr possible, next block is still behind this block
+      if ( $this->{last}->incr->cmp( $sieved[$j]->{base} ) >= 0 ) {
+        $this->{last} = $sieved[$j]->{last};
         next;
       }
+
       last;
     }
     $i = $j;
 
     # last has changed, calculate new mask, returns undef if no CIDR
-    $this->{mask} =
-      Net::IPAM::Block::Private::_get_mask_ip( $this->{base}, $this->{last} );
+    $this->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $this->{base}, $this->{last} );
 
-    push @packed, $this;
+    push @result, $this;
   }
 
-  # last step: expand packed blocks (maybe now again ranges) to real CIDRs
-  undef @cidrs;
-  foreach my $range (@packed) {
-    push @cidrs, $range->to_cidrs;
-  }
-
-  return wantarray ? @cidrs : [@cidrs];
+  return wantarray ? @result : [@result];
 }
 
 =head1 OPERATORS

@@ -1,9 +1,9 @@
 #!perl -T
 
-use Test::More;
-
+use 5.10.0;
 use strict;
 use warnings;
+use Test::More;
 
 BEGIN { use_ok('Net::IPAM::Block') || print "Bail out!\n"; }
 
@@ -46,8 +46,8 @@ foreach my $item (@$overlaps) {
 }
 
 my $not_overlaps = [
-  { a => "1.2.3.4",        b => "1.2.3.4",           name => "1.2.3.4 does NOT overlap with any 1.2.3.4" },
-  { a => "fe80::1",        b => "fe80::1",           name => "fe80::1 does NOT overlap with any fe80::1" },
+  { a => "1.2.3.4",          b => "1.2.3.4",           name => "1.2.3.4 does NOT overlap with any 1.2.3.4" },
+  { a => "fe80::1",          b => "fe80::1",           name => "fe80::1 does NOT overlap with any fe80::1" },
   { a => "0.0.0.0/0",        b => "1.2.3.4",           name => "0.0.0.0/0 does NOT overlap with any v4" },
   { a => "0.0.0.0/0",        b => "1.2.3.4",           name => "0.0.0.0/0 does NOT overlap with any v4" },
   { a => "0.0.0.0/0",        b => "0.0.0.0",           name => "0.0.0.0/0 does NOT overlap with 0.0.0.0" },

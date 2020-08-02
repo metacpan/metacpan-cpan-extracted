@@ -1,4 +1,9 @@
 Revision history for Net-OAuth2Server
 
+0.002 Sat 01 Aug 2020
+	- Correct matching of the required request body content type.
+	- Improved error handling and surfacing
+	  for bad request body content types and duplicate parameters.
+
 0.001 Sun 31 May 2020
 	- Initial release.

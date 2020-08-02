@@ -42,6 +42,11 @@ severity	= gentle
 
 severity	= stern
 
+[Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives]
+
+add_themes	= core
+severity	= stern
+
 [Perl::Critic::Policy::Subroutines::ProhibitUnusedPrivateSubroutines]
 
 severity	= stern

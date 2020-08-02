@@ -1,0 +1,177 @@
+{
+   "abstract" : "dynamically create plugins from a bundle",
+   "author" : [
+      "Sven Kirmess <sven.kirmess@kzone.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "freebsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-Code",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::AfterBuild" : "0",
+            "Dist::Zilla::Role::AfterRelease" : "0",
+            "Dist::Zilla::Role::BeforeArchive" : "0",
+            "Dist::Zilla::Role::BeforeBuild" : "0",
+            "Dist::Zilla::Role::BeforeRelease" : "0",
+            "Dist::Zilla::Role::BuildRunner" : "0",
+            "Dist::Zilla::Role::EncodingProvider" : "0",
+            "Dist::Zilla::Role::FileFinder" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Dist::Zilla::Role::FilePruner" : "0",
+            "Dist::Zilla::Role::InstallTool" : "0",
+            "Dist::Zilla::Role::LicenseProvider" : "0",
+            "Dist::Zilla::Role::MetaProvider" : "0",
+            "Dist::Zilla::Role::NameProvider" : "0",
+            "Dist::Zilla::Role::PrereqSource" : "0",
+            "Dist::Zilla::Role::ReleaseStatusProvider" : "0",
+            "Dist::Zilla::Role::Releaser" : "0",
+            "Dist::Zilla::Role::TestRunner" : "0",
+            "Dist::Zilla::Role::VersionProvider" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Moose" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
+            "Dist::Zilla::Role::PluginBundle" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Test::DZil" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88",
+            "Test::TempDir::Tiny" : "0",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::Code" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::AfterBuild" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/AfterBuild.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::AfterRelease" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/AfterRelease.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::BeforeArchive" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/BeforeArchive.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::BeforeBuild" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/BeforeBuild.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::BeforeRelease" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/BeforeRelease.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::BuildRunner" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/BuildRunner.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::EncodingProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/EncodingProvider.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::FileFinder" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/FileFinder.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::FileGatherer" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/FileGatherer.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::FileMunger" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/FileMunger.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::FilePruner" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/FilePruner.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::InstallTool" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/InstallTool.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::LicenseProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/LicenseProvider.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::MetaProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/MetaProvider.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::NameProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/NameProvider.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::PrereqSource" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/PrereqSource.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::ReleaseStatusProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/ReleaseStatusProvider.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::Releaser" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/Releaser.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::TestRunner" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/TestRunner.pm",
+         "version" : "0.001"
+      },
+      "Dist::Zilla::Plugin::Code::VersionProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Code/VersionProvider.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skirmess/Dist-Zilla-Plugin-Code/issues"
+      },
+      "homepage" : "https://github.com/skirmess/Dist-Zilla-Plugin-Code",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skirmess/Dist-Zilla-Plugin-Code.git",
+         "web" : "https://github.com/skirmess/Dist-Zilla-Plugin-Code"
+      }
+   },
+   "version" : "0.001",
+   "x_generated_by_perl" : "v5.24.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231",
+   "x_spdx_expression" : "BSD-2-Clause-FreeBSD"
+}
+

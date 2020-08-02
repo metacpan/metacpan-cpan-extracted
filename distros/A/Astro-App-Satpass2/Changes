@@ -1,3 +1,16 @@
+0.045		2020-08-02	T. R. Wyant
+    Remove prototypes from the testing subroutines defined in t/*.t and
+    inc/My/Module/Test/*.pm
+
+    Add -default to provide default values for positional arguments.
+    This works on any method that calls __arguments().
+
+    Add -am and -pm options to pass(). These select either morning or
+    evening passes respectively. The default is both if neither is
+    present. They can be negated, but it is an error to negate both.
+    Note that this is a filter -- all passes are computed, but only the
+    desired ones are displayed.
+
 0.044		2020-02-16	T. R. Wyant
     Replace time_gm() & time_local() with greg_time_*() from
     Astro::Coord::ECI::Utils. The latter always interpret the year as

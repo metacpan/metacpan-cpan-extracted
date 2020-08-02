@@ -1,10 +1,13 @@
 package App::perlmv::scriptlets::std;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-02'; # DATE
+our $DIST = 'App-perlmv'; # DIST
+our $VERSION = '0.600'; # VERSION
+
 use 5.010;
 use strict;
 use warnings;
-
-our $VERSION = '0.50'; # VERSION
 
 # ABSTRACT: A collection of perlmv scriptlets
 
@@ -29,36 +32,6 @@ $scriptlets{'pinyin'} = <<'EOT';
 ### Requires: Lingua::Han::Pinyin
 use Lingua::Han::PinYin;
 $h||=Lingua::Han::PinYin->new; $h->han2pinyin($_)
-EOT
-
-
-$scriptlets{'remove-common-prefix'} = <<'EOT';
-### Summary: Remove prefix that are common to all args, e.g. (file1, file2b) -> (1, 2b)
-if (!defined($COMMON_PREFIX) && !$TESTING) {
-    for ($i=0; $i<length($FILES->[0]); $i++) {
-        last if grep { substr($_, $i, 1) ne substr($FILES->[0], $i, 1) } @{$FILES}[1..@$FILES-1];
-    }
-    $COMMON_PREFIX = substr($FILES->[0], 0, $i);
-}
-s/^\Q$COMMON_PREFIX//;
-$_
-EOT
-
-
-$scriptlets{'remove-common-suffix'} = <<'EOT';
-### Summary: Remove suffix that are common to all args, while preserving extension, e.g. (1-radiolab.mp3, 2-radiolab.mp3) -> (1.mp3, 2.mp3)
-if (!defined($COMMON_SUFFIX) && !$TESTING) {
-    for (@$FILES) { $_ = reverse };
-    for ($i=0; $i<length($FILES->[0]); $i++) {
-        last if grep { substr($_, $i, 1) ne substr($FILES->[0], $i, 1) } @{$FILES}[1..@$FILES-1];
-    }
-    $COMMON_SUFFIX = reverse substr($FILES->[0], 0, $i);
-    for (@$FILES) { $_ = reverse };
-    # don't wipe extension, if exists
-    $EXT = $COMMON_SUFFIX =~ /.(\.\w+)$/ ? $1 : "";
-}
-s/\Q$COMMON_SUFFIX\E$/$EXT/;
-$_
 EOT
 
 
@@ -135,7 +108,7 @@ App::perlmv::scriptlets::std - A collection of perlmv scriptlets
 
 =head1 VERSION
 
-This document describes version 0.50 of App::perlmv::scriptlets::std (from Perl distribution App-perlmv), released on 2015-11-17.
+This document describes version 0.600 of App::perlmv::scriptlets::std (from Perl distribution App-perlmv), released on 2020-08-02.
 
 =head1 SCRIPTLETS
 
@@ -154,16 +127,6 @@ extension.
 
 Rename Chinese characters in filename into their pinyin. Requires
 L<Lingua::Han::Pinyin>.
-
-=head2 remove-common-prefix
-
-Remove prefix that are common to all args, e.g. (file1, file2b) -> (1,
-2b)
-
-=head2 remove-common-suffix
-
-Remove suffix that are common to all args, while preserving extension,
-e.g. (1-radiolab.mp3, 2-radiolab.mp3) -> (1.mp3, 2.mp3)
 
 =head2 remove-ext
 
@@ -230,7 +193,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

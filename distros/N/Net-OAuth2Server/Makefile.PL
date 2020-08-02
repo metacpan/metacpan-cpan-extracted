@@ -24,7 +24,7 @@ my %META = (
 	},
 );
 
-sub MY::postamble { <<'' }
+sub MY::postamble { -f 'META.yml' ? return : <<'' }
 create_distdir : MANIFEST
 MANIFEST :
 	( git ls-files ':!README.pod' . ; echo MANIFEST ) > MANIFEST

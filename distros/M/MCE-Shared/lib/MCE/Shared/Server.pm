@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.872';
+our $VERSION = '1.873';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -126,7 +126,8 @@ my $_tid = $INC{'threads.pm'} ? threads->tid() : 0;
 my $_oid = "$$.$_tid";
 
 sub _croak {
-   Carp::carp($_[0]); MCE::Signal::stop_and_exit('INT');
+   Carp::carp($_[0]);
+   MCE::Signal::stop_and_exit('INT');
 }
 sub CLONE {
    $_tid = threads->tid() if $INC{'threads.pm'};
@@ -168,8 +169,6 @@ sub _new {
       }
    }
 
-   my ($_id, $_len);
-
    my $_chn        = $_SVR->{_data_channels} + 1;
    my $_DAT_LOCK   = $_SVR->{'_mutex_'.$_chn};
    my $_DAT_W_SOCK = $_SVR->{_dat_w_sock}[0];
@@ -188,36 +187,32 @@ sub _new {
 
    local $\ = undef if (defined $\);
    local $/ = $LF if ($/ ne $LF);
-   local $MCE::Signal::SIG;
 
-   {
-      local $MCE::Signal::IPC = 1;
-      $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_DAT_LOCK->lock();
+   $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_DAT_LOCK->lock();
 
-      print({$_DAT_W_SOCK} SHR_M_NEW.$LF . $_chn.$LF),
-      print({$_DAU_W_SOCK} length($_buf).$LF, $_buf, length($_bu2).$LF, $_bu2,
-         (keys %_hndls ? 1 : 0).$LF);
+   print({$_DAT_W_SOCK} SHR_M_NEW.$LF . $_chn.$LF),
+   print({$_DAU_W_SOCK} length($_buf).$LF, $_buf, length($_bu2).$LF, $_bu2,
+      (keys %_hndls ? 1 : 0).$LF);
 
-      <$_DAU_W_SOCK>;
+   <$_DAU_W_SOCK>;
 
-      undef($_buf), undef($_bu2);
+   undef($_buf), undef($_bu2);
 
-      if (keys %_hndls) {
-         for my $_k (qw( _qw_sock _qr_sock _aw_sock _cw_sock )) {
-            if (exists $_hndls{ $_k }) {
-               IO::FDPass::send( fileno $_DAU_W_SOCK, fileno $_hndls{ $_k } );
-               <$_DAU_W_SOCK>;
-            }
+   if (keys %_hndls) {
+      for my $_k (qw( _qw_sock _qr_sock _aw_sock _cw_sock )) {
+         if (exists $_hndls{ $_k }) {
+            IO::FDPass::send( fileno $_DAU_W_SOCK, fileno $_hndls{ $_k } );
+            <$_DAU_W_SOCK>;
          }
       }
-
-      chomp($_id = <$_DAU_W_SOCK>), chomp($_len = <$_DAU_W_SOCK>);
-      read($_DAU_W_SOCK, $_buf, $_len) if $_len;
-
-      $_DAT_LOCK->unlock() if !$_is_MSWin32;
    }
 
-   CORE::kill($MCE::Signal::SIG, $$) if $MCE::Signal::SIG;
+   chomp(my $_id  = <$_DAU_W_SOCK>),
+   chomp(my $_len = <$_DAU_W_SOCK>);
+
+   read($_DAU_W_SOCK, $_buf, $_len) if $_len;
+
+   $_DAT_LOCK->unlock() if !$_is_MSWin32;
 
    $! = $_id, return '' unless $_len;
 
@@ -1932,7 +1927,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.872
+This document describes MCE::Shared::Server version 1.873
 
 =head1 DESCRIPTION
 

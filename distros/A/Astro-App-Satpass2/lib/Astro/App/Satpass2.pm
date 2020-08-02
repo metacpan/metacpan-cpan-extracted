@@ -75,7 +75,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -493,7 +493,7 @@ sub alias : Verb() {
 # 5.8.8.
 sub almanac : Verb( choose=s@ dump! horizon|rise|set! transit! twilight! quarter! ) {
     my ( $self, $opt, @args ) = __arguments( @_ );
-    _apply_boolean_default(
+    $self->_apply_boolean_default(
 	$opt, 0, qw{ horizon transit twilight quarter } );
 
     my $almanac_start = $self->__parse_time(
@@ -754,7 +754,7 @@ sub execute {
 	$self->{echo} and $self->whinge($self->get( 'prompt' ), $_);
 	m/ \A \s* [#] /smx and next;
 	my $stdout = $self->{frame}[-1]{stdout};
-	my ($args, $redirect) = $self->_tokenize(
+	my ($args, $redirect) = $self->__tokenize(
 	    { in => $in }, $_, $self->{frame}[-1]{args});
 	# NOTICE
 	#
@@ -893,7 +893,7 @@ sub flare : Verb( algorithm=s am! choose=s@ day! dump! pm! questionable|spare! q
 	$self->{formatter}->gmt() ? 0 :
 	$self->{formatter}->tz() || undef;
 
-    _apply_boolean_default(
+    $self->_apply_boolean_default(
 	$opt, 0, qw{ am day pm } );
 
 #	Decide which model to use.
@@ -1719,12 +1719,14 @@ sub magnitude_table : Verb( name! reload! ) {
 
 # Attributes must all be on one line to process correctly under Perl
 # 5.8.8.
-sub pass : Verb( choose=s@ appulse! brightest|magnitude! chronological! dump! events! horizon|rise|set! illumination! quiet! transit|maximum|culmination! )
+sub pass : Verb( choose=s@ am! appulse! brightest|magnitude! chronological! dump! events! horizon|rise|set! illumination! pm! quiet! transit|maximum|culmination! )
 {
     my ( $self, $opt, @args ) = __arguments( @_ );
 
-    _apply_boolean_default(
+    $self->_apply_boolean_default(
 	$opt, 0, qw{ horizon illumination transit appulse } );
+    $self->_apply_boolean_default( $opt, 0, qw{ am pm } );
+    $opt->{am} or $opt->{pm} or $opt->{am} = $opt->{pm} = 1;
     my $pass_start = $self->__parse_time (
 	shift @args, $self->_get_today_noon());
     my $pass_end = $self->__parse_time (shift @args || '+7');
@@ -1807,6 +1809,16 @@ sub pass : Verb( choose=s@ appulse! brightest|magnitude! chronological! dump! ev
 	};
     }
 
+    unless ( $opt->{am} && $opt->{pm} ) {
+	if ( $opt->{am} ) {
+	    @accumulate = map { $_->[0] } grep { $_->[1] < 43200 } map {
+		[ $_, _local_tod( $_->{time} ) ] } @accumulate;
+	} else {
+	    @accumulate = map { $_->[0] } grep { $_->[1] >= 43200 } map {
+		[ $_, _local_tod( $_->{time} ) ] } @accumulate;
+	}
+    }
+
     my $template;
 
     if ( $opt->{events} ) {
@@ -1820,6 +1832,12 @@ sub pass : Verb( choose=s@ appulse! brightest|magnitude! chronological! dump! ev
 
     return $self->__format_data(
 	$template => \@accumulate, $opt );
+}
+
+# Compute local time of day in seconds since midnight.
+sub _local_tod {
+    my @tl = localtime $_[0];
+    return ( $tl[2] * 60 + $tl[1] ) * 60 + $tl[0];
 }
 
 {
@@ -1975,7 +1993,7 @@ sub pwd : Verb() {
 	    $args[0], $self->_get_today_midnight() );
 	my $end = $self->__parse_time ($args[1] || '+30');
 
-	_apply_boolean_default( $opt, 0, map { "q$_" } 0 .. 3 );
+	$self->_apply_boolean_default( $opt, 0, map { "q$_" } 0 .. 3 );
 
 	my @sky = $self->__choose( $opt->{choose}, $self->{sky} )
 	    or $self->wail( 'No bodies selected' );
@@ -3381,16 +3399,21 @@ sub _aggregate {
 #	Nothing is returned.
 
 sub _apply_boolean_default {
-    my ( $opt, $invert, @keys ) = @_;
-    my $found = 0;
+    my ( $self, $opt, $invert, @keys ) = @_;
+    my $state = my $found = 0;
     foreach my $key ( @keys ) {
 	if ( exists $opt->{$key} ) {
+	    $found++;
 	    $invert
 		and $opt->{$key} = ( !  $opt->{$key} );
-	    $found |= ( $opt->{$key} ? 2 : 1 );
+	    $state |= ( $opt->{$key} ? 2 : 1 );
 	}
     }
-    my $default = $found < 2;
+    1 == $state			# Only negated options found
+	and @keys == $found	# All options in group were specified
+	and $self->wail( 'May not negate all of ' . join ', ', map {
+	    "-$_" } @keys );
+    my $default = $state < 2;
     foreach my $key ( @keys ) {
 	exists $opt->{$key}
 	    or $opt->{$key} = $default;
@@ -4532,7 +4555,7 @@ sub _rad2hms {
 #	the prompt as an argument. If $in is not a code reference, or if
 #	it returns undef, we wail() with the error message.  Otherwise
 #	we return the line read. I expect this to be used only by
-#	_tokenize().
+#	__tokenize().
 
 sub _read_continuation {
     my ( $self, $in, $error ) = @_;
@@ -4875,7 +4898,7 @@ EOD
     return wantarray ? @rslt : join ' ', @rslt;
 }
 
-#	($tokens, $redirect) = $self->_tokenize(
+#	($tokens, $redirect) = $self->__tokenize(
 #		{option => $value}, $buffer, [$arg0 ...]);
 #
 #	This method tokenizes the buffer. The options hash may be
@@ -4928,7 +4951,7 @@ EOD
 #	environment variable is interpolated in.
 #
 #	Most of the fancier forms of interpolation are suported. In the
-#	following, word is expanded by recursively calling _tokenize
+#	following, word is expanded by recursively calling __tokenize
 #	with options {single => 1, noredirect => 1}. But unlike bash, we
 #	make no distinction between unset or null. The ':' can be
 #	omitted before the '-', '=', '?' or '+', but it does not change
@@ -4997,7 +5020,7 @@ EOD
 	e	=> "\e",
     );
 
-    sub _tokenize {
+    sub __tokenize {
 	my ($self, @parms) = @_;
 	local $self->{_case_mod} = undef;
 	my $opt = HASH_REF eq ref $parms[0] ? shift @parms : {};
@@ -5168,7 +5191,7 @@ EOD
 		    # character through the tokenizer, since further
 		    # expansion is possible here.
 
-		    my $mod = _tokenize(
+		    my $mod = __tokenize(
 			$self,
 			{ single => 1, noredirect => 1, in => $in },
 			$rest, $args);
@@ -5387,7 +5410,7 @@ EOD
 			$rslt[-1]{token} .= $buffer;
 		    }
 		    if ( $quote ne q<'> ) {
-			$rslt[-1]{token} = _tokenize(
+			$rslt[-1]{token} = __tokenize(
 			    $self,
 			    { single => 1, noredirect => 1, in => $in },
 			    $rslt[-1]{token}, $args
@@ -5832,6 +5855,17 @@ option C<bar> and string option C<baz> in any of the following ways:
  $satpass2->foo( '-bar', -baz => 'burfle' );
  $satpass2->foo( '-bar', '-baz=burfle' );
  $satpass2->foo( { bar => 1, baz => 'burfle' } );
+
+In addition to the documented options (if any) any interactive method
+will accept option C<default>. This takes a string, which is parsed to
+provide defaults for positional arguments. If calling the method from
+code you can also specify an array reference and bypass the parsing.
+This option is probably only useful in L<source|/source> files. As an
+example, a source file that does a two-day almanac starting at noon of
+the current day (but allowing the user to override this by specifying
+arguments to C<source>) might contain
+
+ almanac -default "'today noon' +2" "$@"
 
 For ease of use with templating systems such as F<Template-Toolkit> most
 interactive methods flatten array references in their argument list. The
@@ -6769,6 +6803,8 @@ how to specify times.
 
 The following options are available:
 
+C<-am> selects morning passes (i.e. between midnight and noon).
+
 C<-appulse> selects appulses for display. It can be negated by
 specifying C<-noappulse>, though a more efficient way to not get
 appulses is to clear the sky.
@@ -6811,6 +6847,8 @@ C<-noillumination>.
 C<-magnitude> is a synonym for C<-brightest>. See the documentation to
 that option (above) for more information.
 
+C<-pm> selects evening passes (i.e. between noon and midnight).
+
 C<-quiet> suppresses any errors generated by running the orbital model.
 These are typically from obsolete data, and/or decayed satellites.
 Bodies that produce errors will not be included in the output.
@@ -6825,6 +6863,10 @@ The C<-appulse>, C<-horizon>, C<-illumination> and C<-transit> options
 specified, all are turned on by default. If only negated options are
 specified (e.g. -noappulse), unspecified options are asserted by
 default. Otherwise, unspecified options are considered to be negated.
+
+The C<-am> and C<-pm> select morning or evening passes for output. By
+default, both are selected. These can be negated: C<-noam> is equivalent
+to C<-pm>, and vice versa.
 
 B<Note well> that unlike the F<satpass> script, the output from this
 method does not normally include location. The location is included only

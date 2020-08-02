@@ -14,7 +14,7 @@ use Getopt::Long 2.33;
 use Scalar::Util 1.26 qw{ blessed looks_like_number };
 use Text::ParseWords ();
 
-our $VERSION = '0.044';
+our $VERSION = '0.045';
 
 our @CARP_NOT = qw{
     Astro::App::Satpass2
@@ -87,8 +87,11 @@ use constant SCALAR_REF	=> ref \1;
 	    has_method( $_, 'dereference' ) ?  $_->dereference() : $_
 	} @args;
 
-	HASH_REF eq ref $args[0]
-	    and return ( $self, @args );
+	if ( HASH_REF eq ref $args[0] ) {
+	    my $opt = shift @args;
+	    _apply_default( $self, $opt, \@args );
+	    return( $self, $opt, @args );
+	}
 
 	my @data = caller(1);
 	my $code = \&{$data[3]};
@@ -107,15 +110,41 @@ use constant SCALAR_REF	=> ref \1;
 	my $config =
 	    $self->__get_attr($code, 'Configure') || \@default_config;
 	my $go = Getopt::Long::Parser->new(config => $config);
-	if ( !  $go->getoptionsfromarray( \@args, \%opt, @$lgl) ) {
-	    $self->can( 'wail' )
-		and $self->wail($err);
-	    require Carp;
-	    Carp::croak( $err );
+	if ( !  $go->getoptionsfromarray(
+		\@args, \%opt, 'default=s', @$lgl) ) {
+	    __error_out( $self, wail => $err );
 	}
+
+	_apply_default( $self, \%opt, \@args );
 
 	return ( $self, \%opt, @args );
     }
+}
+
+sub _apply_default {
+    my ( $self, $opt, $args ) = @_;
+
+    my $dflt = delete $opt->{default}
+	or return;
+
+    if ( ARRAY_REF eq ref $dflt ) {
+	# Do nothing -- we already have what we want
+    } elsif ( ref $dflt ) {
+	__error_out( $self,
+	    wail => "Invalid default specification $dflt" );
+    } elsif ( my $code = $self->can( '__tokenize' ) ) {
+	( $dflt ) = $code->( $self, $dflt );
+    } else {
+	$dflt = [ Text::ParseWords::shellwords( $dflt ) ];
+    }
+
+    foreach my $inx ( 0 .. $#$dflt ) {
+	defined $args->[$inx]
+	    and '' ne $args->[$inx]
+	    or $args->[$inx] = $dflt->[$inx];
+    }
+
+    return;
 }
 
 sub back_end {
@@ -175,6 +204,45 @@ sub __date_manip_backend {
     Date::Manip->isa( 'Date::Manip::DM6' )
 	and return 6;
     return 5;
+}
+
+{
+    my %method_to_sub = (
+	whinge	=> 'carp',
+	wail	=> 'croak',
+	weep	=> 'confess',
+    );
+
+    # __error_out( $invocant, $method, @arg )
+    #
+    # $method must be 'carp', 'croak', or 'confess'.
+    #
+    # If the $invocant is a blessed reference having method $method,
+    # that method is called with @arg as arguments.
+    #
+    # Otherwise Carp is loaded, $method is mapped to the corresponding
+    # Carp subroutine, and that subroutine is called with @arg as
+    # arguments.
+    #
+    # If we have not thrown an exception as a result of all this, we
+    # just return.
+    sub __error_out {
+	my ( $obj, $method, @arg ) = @_;
+	$method_to_sub{$method}
+	    or $method = 'weep';
+	if ( blessed( $obj ) && $obj->can( $method )
+	) {
+	    $obj->$method( @arg );
+	} else {
+	    require Carp;
+	    if ( my $code = Carp->can( $method_to_sub{ $method } ) ) {
+		$code->( @arg );
+	    } else {
+		Carp::confess( @arg );
+	    }
+	}
+	return;
+    }
 }
 
 sub expand_tilde {
@@ -237,10 +305,9 @@ sub find_package_pod {
 
 sub _wail {
     my ( $invocant, @msg ) = @_;
-    ref $invocant
-	and $invocant->wail( @msg );
-    require Carp;
-    Carp::croak( @msg );
+    __error_out( $invocant, wail => @msg );
+    return;	# We should never get here, but Perl::Critic does not
+		# know this.
 }
 
 sub has_method {
@@ -285,7 +352,7 @@ sub _get_my_lib {
 	'DateTime::Calendar::Christian'	=> 0.06,
     );
 
-    my %valid_complaint = map { $_ => 1 } qw{ whinge wail weep };
+#    my %valid_complaint = map { $_ => 1 } qw{ whinge wail weep };
 
     sub load_package {
 #	my ( $module, @prefix ) = @_;
@@ -310,25 +377,16 @@ sub _get_my_lib {
 	    m/ \A [[:alpha:]]\w* (?: :: [[:alpha:]]\w* )* \z /smx
 		and next;
 
-	    my $msg = "Invalid package name '$_'";
-
-	    if ( $self ) {
-	        my $method = $opt->{complaint} || 'weep';
-		$valid_complaint{$method}
-		    or $method = 'weep';
-		$self->can( $method )
-		    and return $self->$method( $msg );
-	    }
-
-	    require Carp;
-	    Carp::confess(
-		"Programming error - $msg"
+	    __error_out( $self, $opt->{complaint} || 'weep',
+		"Invalid package name '$_'",
 	    );
 	}
 
 	my $key = join ' ', $module, @prefix;
 	exists $loaded{$key}
 	    and return $loaded{$key};
+
+	local $@ = undef;
 
 	push @prefix, '';
 	foreach my $pfx ( @prefix ) {
@@ -348,15 +406,7 @@ sub _get_my_lib {
 	}
 
 	if ( $opt->{fatal} ) {
-	    my $msg = "Can not load $module: $@";
-	    my $method = $opt->{fatal};
-	    $valid_complaint{$method}
-		or $method = 'wail';
-	    $self
-		and $self->can( $method )
-		and return $self->$method( $msg );
-	    require Carp;
-	    Carp::croak( $msg );
+	    __error_out( $self, $opt->{fatal}, "Can not load $module: $@" );
 	}
 
 	$loaded{$key} = undef;

@@ -10,10 +10,10 @@ use lib qw{ inc };
 use Test::More 0.88;	# Because of done_testing();
 use My::Module::Test::Geocode;
 
-setup	'Astro::App::Satpass2::Geocode::OSM';
+setup( 'Astro::App::Satpass2::Geocode::OSM' );
 
 SKIP: {
-    geocode '10 Downing St, London England', 1;
+    geocode( '10 Downing St, London England', 1 );
 }
 
 done_testing;

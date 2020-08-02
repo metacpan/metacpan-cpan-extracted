@@ -264,6 +264,37 @@ sub _get_mask_ip {
   return;
 }
 
+# input:  sorted blocks
+# output: remaining blocks after sieving dups and subsets
+sub _sieve (@) {
+  my @result;
+
+  my $i = 0;
+  while ( $i < @_ ) {
+
+    my $j;
+    for ( $j = $i + 1 ; $j < @_ ; $j++ ) {
+
+      # skip over dups
+      next if $_[$i]->cmp( $_[$j] ) == 0;
+
+      # skip over subsets
+      next if _contains_block( $_[$i], $_[$j] );
+
+      # stop skipping
+      last;
+    }
+
+    # keep $i
+    push @result, $_[$i];
+
+    # push $i forward to last $j
+    $i = $j;
+  }
+
+  return @result;
+}
+
 =head1 AUTHOR
 
 Karl Gaissmaier, C<< <karl.gaissmaier(at)uni-ulm.de> >>

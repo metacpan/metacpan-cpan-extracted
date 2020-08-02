@@ -55,23 +55,23 @@
    "provides" : {
       "Guacamole" : {
          "file" : "lib/Guacamole.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Guacamole::Deparse" : {
          "file" : "lib/Guacamole/Deparse.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Guacamole::Dumper" : {
          "file" : "lib/Guacamole/Dumper.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Guacamole::Test" : {
          "file" : "lib/Guacamole/Test.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "standard" : {
          "file" : "lib/standard.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/xsawyerx/guacamole"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_authority" : "cpan:XSAWYERX",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",

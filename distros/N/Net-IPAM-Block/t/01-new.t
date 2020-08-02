@@ -72,45 +72,37 @@ ok( $b->mask eq '255.255.0.0',     'mask' );
 ok( $b->hostmask eq '0.0.255.255', 'hostmask' );
 
 my $ips = [
-  [qw(1.2.3.4 1.2.3.4/32)],
-  [qw(::ffff:0.0.0.0 0.0.0.0/32)],
-  [qw(fe80::1 fe80::1/128)],
-  [qw(::cafe:affe ::cafe:affe/128)],
+  [qw(1.2.3.4 1.2.3.4/32)],  [qw(::ffff:0.0.0.0 0.0.0.0/32)],
+  [qw(fe80::1 fe80::1/128)], [qw(::cafe:affe ::cafe:affe/128)],
 ];
 
 foreach my $tt (@$ips) {
-	my $ip = Net::IPAM::IP->new($tt->[0]);
-  my $b = Net::IPAM::Block->new( $ip );
+  my $ip = Net::IPAM::IP->new( $tt->[0] );
+  my $b  = Net::IPAM::Block->new($ip);
+
   # overload '""'
   ok( $b eq $tt->[1], "new from IP('" . $tt->[0] . "') => " . $tt->[1] );
 }
 
 my $bl = [
-  [qw(0.0.0.0/8 24)],
-  [qw(10.0.0.0/13 19)],
-  [qw(10.0.0.2-10.0.0.7 3)],
-  [qw(::/0 128)],
-  [qw(2001:db8::/104 24)],
-  [qw(2001:db8::/32 96)],
+  [qw(0.0.0.0/8 24)],        [qw(10.0.0.0/13 19)],
+  [qw(10.0.0.2-10.0.0.7 3)], [qw(::/0 128)],
+  [qw(2001:db8::/104 24)],   [qw(2001:db8::/32 96)],
   [qw(2001:db8::affe-2001:db8::cafe 15)],
 ];
 
 foreach my $tt (@$bl) {
   my $b = Net::IPAM::Block->new( $tt->[0] );
-  ok( $b->bitlen == $tt->[1], "bitlen for $b == " . $tt->[1]);
+  ok( $b->bitlen == $tt->[1], "bitlen for $b == " . $tt->[1] );
 }
 
-my $bi = [
-  [ '10.0.0.2-10.0.0.7',             6 ],
-  [ '10.0.0.0/19',                   2**13 ],
-  [ '2001:db8::affe-2001:db8::cafe', 6913 ],
-];
+my $bi = [ [ '10.0.0.2-10.0.0.7', 6 ], [ '10.0.0.0/19', 2**13 ], [ '2001:db8::affe-2001:db8::cafe', 6913 ], ];
 
 foreach my $tt (@$bi) {
   my $b = Net::IPAM::Block->new( $tt->[0] );
-	my @ips;
-	push @ips, $_ while $_ = $b->iter;
-  ok( scalar @ips == $tt->[1], "num iterations for $b == " . $tt->[1]);
+  my @ips;
+  push @ips, $_ while $_ = $b->iter;
+  ok( scalar @ips == $tt->[1], "num iterations for $b == " . $tt->[1] );
 }
 
 done_testing();

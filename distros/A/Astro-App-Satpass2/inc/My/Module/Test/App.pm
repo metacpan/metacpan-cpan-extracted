@@ -68,11 +68,11 @@ use constant TRUE => sub {
     goto &ok;
 };
 
-sub application () {
+sub application {
     return $app;
 }
 
-sub check_access ($) {
+sub check_access {
     my ( $url ) = @_;
 
     eval {
@@ -103,7 +103,7 @@ sub check_datetime_timezone_local {
     };
 }
 
-sub klass ($) {
+sub klass {
     ( $app ) = @_;
     return;
 }
@@ -170,7 +170,7 @@ sub klass ($) {
     }
 }
 
-sub execute (@) {	## no critic (RequireArgUnpacking)
+sub execute {	## no critic (RequireArgUnpacking)
     splice @_, 0, 0, 'execute';
     goto &call_m;
 }
@@ -193,7 +193,7 @@ sub execute (@) {	## no critic (RequireArgUnpacking)
 
     # skip() actually jumps out via 'goto SKIP', but Perl::Critic does
     # not know this.
-    sub load_or_skip (@) {	## no critic (RequireFinalReturn)
+    sub load_or_skip {	## no critic (RequireFinalReturn)
 	my @arg = @_;
 	$go ||= Getopt::Long::Parser->new();
 	my %opt;
@@ -222,7 +222,7 @@ sub execute (@) {	## no critic (RequireArgUnpacking)
     }
 }
 
-sub call_m (@) {	## no critic (RequireArgUnpacking)
+sub call_m {	## no critic (RequireArgUnpacking)
     my ( $method, @args ) = @_;
     my ( $want, $title ) = splice @args, -2;
     my $got;
@@ -281,7 +281,7 @@ sub call_m (@) {	## no critic (RequireArgUnpacking)
 
     my %no_stat = map { $_ => 1 } qw{ dos MSWin32 os2 riscos VMS };
 
-    sub same_path ($$$) {
+    sub same_path {
 	my ( $got, $want, $name ) = @_;
 	$got = normalize_path( $got );
 	$want = normalize_path( $want );

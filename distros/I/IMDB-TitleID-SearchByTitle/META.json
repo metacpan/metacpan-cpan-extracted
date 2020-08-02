@@ -1,5 +1,5 @@
 {
-   "abstract" : "Extract information from an IMDB title page",
+   "abstract" : "Try to find IMDB title ID for a movie title",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-IMDB-TitleID-SearchByTitle"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

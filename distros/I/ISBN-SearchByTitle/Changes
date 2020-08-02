@@ -1,0 +1,9 @@
+0.002   2020-04-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Return amazon raw HTML as well as extracted metadata (now in
+	  func.amazon_meta).
+
+
+0.001   2020-04-15  Released-By: PERLANCAR
+
+        - First release.

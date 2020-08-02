@@ -1,0 +1,34 @@
+NAME
+    App::perlmv - Rename files using Perl code
+
+VERSION
+    This document describes version 0.600 of App::perlmv (from Perl
+    distribution App-perlmv), released on 2020-08-02.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-perlmv>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-perlmv>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::RenameUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015, 2014, 2013, 2012, 2011, 2010
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

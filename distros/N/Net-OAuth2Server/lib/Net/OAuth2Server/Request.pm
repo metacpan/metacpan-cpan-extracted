@@ -15,13 +15,15 @@ sub set_parameters        { 'scope' }
 
 use Object::Tiny::Lvalue qw( method headers parameters confidential scope error );
 
+my $ct_rx = qr[ \A application/x-www-form-urlencoded [ \t]* (?: ; | \z ) ]xi;
+
 my $loaded;
 sub from_psgi {
 	my ( $class, $env ) = ( shift, @_ );
 	my $body;
 	$body = do { $loaded ||= require Plack::Request; Plack::Request->new( $env )->content }
-		if 'application/x-www-form-urlencoded' eq ( $env->{'CONTENT_TYPE'} || '' )
-		and not grep $env->{'REQUEST_METHOD'} eq $_, qw( GET HEAD );
+		if ( $env->{'CONTENT_TYPE'} || '' ) =~ $ct_rx
+		and grep $env->{'REQUEST_METHOD'} eq $_, $class->request_body_methods;
 	$class->from(
 		$env->{'REQUEST_METHOD'},
 		$env->{'QUERY_STRING'},
@@ -46,9 +48,12 @@ sub from {
 
 	%$hdr = map { my $k = $_; y/-/_/; ( lc, $hdr->{ $k } ) } $hdr ? keys %$hdr : ();
 
-	undef $body
-		if ( not grep $meth eq $_, $class->request_body_methods )
-		or 'application/x-www-form-urlencoded' ne ( $hdr->{'content_type'} || '' );
+	if ( grep $meth eq $_, $class->request_body_methods ) {
+		return $class->new( method => $meth, headers => $hdr )->with_error_invalid_request( 'bad content type' )
+			if ( $hdr->{'content_type'} || '' ) !~ $ct_rx;
+	} else {
+		undef $body;
+	}
 
 	for ( $query, $body ) {
 		defined $_ ? y/+/ / : ( $_ = '' );
@@ -80,9 +85,8 @@ sub from {
 	}
 
 	if ( my @dupe = sort keys %dupe ) {
-		my $self = $class->new;
-		$self->with_error_invalid_request( "duplicate parameter: @dupe" );
-		return $self;
+		my $self = $class->new( method => $meth, headers => $hdr );
+		return $self->with_error_invalid_request( "duplicate parameter: @dupe" );
 	}
 
 	while ( my ( $k, $v ) = each %param ) { delete $param{ $k } if '' eq $v }
@@ -139,4 +143,4 @@ sub with_error_invalid_scope             { shift->with_error( invalid_scope     
 sub with_error_server_error              { shift->with_error( server_error              => @_ ) }
 sub with_error_temporarily_unavailable   { shift->with_error( temporarily_unavailable   => @_ ) }
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';

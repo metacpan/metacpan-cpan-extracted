@@ -15,4 +15,4 @@ sub get_grant {
 		or ( $self->error || $self->with_error_invalid_token, return );
 }
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
