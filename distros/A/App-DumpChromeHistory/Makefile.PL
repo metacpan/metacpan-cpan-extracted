@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::DumpChromeHistory",
   "PREREQ_PM" => {
-    "Chrome::Util::Profile" => 0,
+    "Chrome::Util::Profile" => "0.004",
     "DBD::SQLite" => 0,
     "DBI" => 0,
     "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Chrome::Util::Profile" => 0,
+  "Chrome::Util::Profile" => "0.004",
   "DBD::SQLite" => 0,
   "DBI" => 0,
   "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" => 0,

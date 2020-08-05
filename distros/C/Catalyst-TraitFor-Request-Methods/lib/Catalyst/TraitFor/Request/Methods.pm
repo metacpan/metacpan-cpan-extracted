@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 requires 'method';
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.2.3';
 
 
 foreach my $name (qw/ get head post put delete connect options trace patch /) {
@@ -39,7 +39,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 =head1 VERSION
 
-version v0.2.2
+version v0.2.3
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Robert Rothenberg.
+This software is Copyright (c) 2019-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

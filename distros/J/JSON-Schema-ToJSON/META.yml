@@ -36,5 +36,5 @@ resources:
   homepage: https://metacpan.org/module/JSON::Schema::ToJSON
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/json-schema-tojson
-version: '0.17'
+version: '0.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

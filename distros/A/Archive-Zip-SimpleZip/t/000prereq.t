@@ -19,7 +19,7 @@ BEGIN
         if eval { require Test::NoWarnings ;  import Test::NoWarnings; 1 };
 
 
-    my $VERSION = '2.093';
+    my $VERSION = '2.096';
     my @NAMES = qw(
             IO::Compress::Zip
             IO::Uncompress::Unzip
@@ -27,7 +27,7 @@ BEGIN
 
     my @OPT = qw(
             IO::Compress::Lzma
-            IO::Uncompress::UnLzma			
+            IO::Uncompress::UnLzma
 			);
 
     plan tests => 1 + @NAMES + @OPT + $extra ;
@@ -46,14 +46,14 @@ BEGIN
         eval " require $name " ;
         if ($@)
         {
-            ok 1, "$name not available" 
+            ok 1, "$name not available"
         }
-        else  
+        else
         {
             my $ver = eval("\$${name}::VERSION");
-            is $ver, $VERSION, "$name version should be $VERSION" 
+            is $ver, $VERSION, "$name version should be $VERSION"
                 or diag "$name version is $ver, need $VERSION" ;
-        }         
+        }
     }
 
 }
@@ -67,9 +67,11 @@ BEGIN
                     Archive::Zip::SimpleUnzip
                     IO::Compress::Base
                     IO::Compress::Zip
+                    IO::Compress::Bzip2
                     IO::Compress::Lzma
                     IO::Uncompress::Base
                     IO::Uncompress::Unzip
+                    IO::Uncompress::Bunzip2
                     IO::Uncompress::UnLzma
                     Compress::Raw::Zlib
                     Compress::Raw::Bzip2
@@ -85,7 +87,7 @@ BEGIN
                     ? $ver
                     : "Not Installed" ;
         push @results, [$module, $v] ;
-        $have{$module} ++ 
+        $have{$module} ++
             if $ver ;
     }
 

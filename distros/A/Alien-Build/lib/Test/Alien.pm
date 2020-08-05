@@ -2,7 +2,7 @@ package Test::Alien;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use Env qw( @PATH );
 use File::Which 1.10 qw( which );
 use Capture::Tiny qw( capture capture_merged );
@@ -18,7 +18,7 @@ use Config;
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '2.26'; # VERSION
+our $VERSION = '2.28'; # VERSION
 
 
 our @aliens;
@@ -654,7 +654,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 2.26
+version 2.28
 
 =head1 SYNOPSIS
 
@@ -1056,6 +1056,8 @@ Shoichi Kaji (SKAJI)
 Shawn Laffan (SLAFFAN)
 
 Paul Evans (leonerd, PEVANS)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

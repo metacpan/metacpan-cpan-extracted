@@ -1,5 +1,12 @@
 Revision history for Getopt-Alt
 
+0.5.4   2020-08-03
+        Updating for release of version 0.5.4
+        Updated date (Ivan Wills)
+        Adding the ability to add some dynamic pre and post help text (Ivan Wills)
+        Latest travis file (Ivan Wills)
+        Fixed situation where sub_command isn't a hashref (Ivan Wills)
+
 0.5.3   2019-03-13
         Updating for release of version 0.5.3
         Too much js programming forgetting my Perl (Ivan Wills)

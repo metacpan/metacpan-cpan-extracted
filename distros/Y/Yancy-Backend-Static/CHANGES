@@ -1,5 +1,17 @@
 Changelog for Yancy-Backend-Static
 
+0.013     2020-08-04 21:07:41-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed compatibility with Yancy v1.057 and later: These versions
+      removed the `id` stash field and replaced it with a field named
+      after the ID of the schema (so, in this case, `path`). Thanks
+      @tehmoth for reporting this issue! [Github #22]
+    - Fixed array fields failing validation if not explicitly an array.
+      This prevents needing to make a one-element array when there's
+      only one element.
+
 0.012     2019-11-24 14:46:18-06:00 America/Chicago
 
     [Added]

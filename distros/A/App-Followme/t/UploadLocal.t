@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
+use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -20,19 +21,20 @@ unshift(@INC, $lib);
 require App::Followme::UploadLocal;
 
 my $test_dir = catdir(@path, 'test');
-my $local_dir = catdir($test_dir, 'here');
-my $remote_dir = catdir($test_dir, 'there');
+my $local_dir = catdir(@path, 'test', 'here');
+my $remote_dir = catdir(@path, 'test', 'there');
 
 rmtree($test_dir);
 
-mkdir $test_dir;
+mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-mkdir $local_dir;
+mkdir $local_dir or die $!;
 chmod 0755, $local_dir;
-mkdir $remote_dir;
+mkdir $remote_dir or die $!;
 chmod 0755, $remote_dir;
 
-chdir $local_dir;
+chdir $local_dir or die $!;
+$local_dir = cwd();
 
 my %configuration = (
                      top_directory => $local_dir,

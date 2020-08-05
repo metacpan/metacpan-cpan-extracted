@@ -12,7 +12,7 @@ run_mode: phylogenomic
 # When not specified 'outsuffix' internally defaults to '-42'.
 # Use a bare 'out_suffix:' to reuse the ALI name and to preserve the original
 # file by appending a .bak extension to its name.
-out_suffix: -42-prot-tax
+out_suffix: -my-42-prot-tax
 
 
 # ===Orgs from where to select BLAST queries===
@@ -52,43 +52,43 @@ blast_args:
         -num_threads: 1
 
 
-# ===BRH mode for assessing orthology===
+# ===BRH switch for assessing orthology===
 # Two values are available: 'on' and 'off'.
 # If set to 'on', a candidate seq must be in BRH with all reference proteomes
 # to be considered as an orthologous seq. In contrast, all candidate seqs are
 # considered as orthologous seqs when this parameter is set to 'off'.
-# When not specified, 'ref_brh_mode' internally defaults to 'on'.
+# When not specified, 'ref_brh' internally defaults to 'on'.
 # To limit the number of candidate seqs, use the '-max_target_seqs' option of
 # the BLAST executable(s) at the 'homologues' step.
-ref_brh_mode: on
+ref_brh: on
 
 
 # ===Path to dir holding complete proteome BLAST databases===
-# Only required when setting 'ref_brh_mode' to 'on'.
+# Only required when setting 'ref_brh' to 'on'.
 ref_bank_dir: test/ref_banks
 
 # ===Basenames of complete proteome BLAST databases (keyed by org name)===
-# Only required when setting 'ref_brh_mode' to 'on'.
-# You can list as many databases as needed here.
-# Only those specified as 'ref_orgs' below will actually be used for BRH.
+# Only required when setting 'ref_brh' to 'on'.
+# You can list as many databases as needed here. Only those specified as
+# 'ref_orgs' below will actually be used for BRH.
 ref_org_mapper: 
     Camponotus floridanus: Camponotus_floridanus 
     Nasonia vitripennis: Nasonia_vitripennis 
     Tribolium castaneum: Tribolium_castaneum 
 
 # ===Orgs to be used for BRH checks===
-# Only required when setting 'ref_brh_mode' to 'on'.
+# Only required when setting 'ref_brh' to 'on'.
 # To be considered as an orthologue, a candidate seq must be in transitive BRH
-# for all listed orgs (and not for only one of them).
-# Listing more orgs thus increases the stringency of the BRH check. Note that
-# 'ref_orgs' may but DO NOT NEED to match 'query_orgs'.
+# for all listed orgs (and not for only one of them). Listing more orgs thus
+# increases the stringency of the BRH check. Note that 'ref_orgs' may but DO
+# NOT NEED to match 'query_orgs'.
 ref_orgs: 
     - Camponotus floridanus 
     - Nasonia vitripennis 
     - Tribolium castaneum 
 
 # ===Fraction of ref_orgs to really use when assessing orthology===
-# Only meaningful when setting 'ref_brh_mode' to 'on'.
+# Only meaningful when setting 'ref_brh' to 'on'.
 # This parameter introduces some flexibility when using reference proteomes.
 # If set to a fractional value (below 1), only the best proteomes will be
 # considered during BRHs. The best proteomes are those against which the
@@ -99,37 +99,45 @@ ref_orgs:
 ref_org_mul: 0.66
 
 # ===Bit score reduction allowed when including non-1st hits among best hits===
-# Only meaningful when setting 'ref_brh_mode' to 'on'.
+# Only meaningful when setting 'ref_brh' to 'on'.
 # This parameter applies when collecting best hits for queries to complete
 # proteomes, so that close in-paralogues can all be included in the set of
-# best hits. The allowed bit score reduction of any hit is expressed relatively
-# to the score of the previous hit. During BRH checks, only the very first hit
-# for the candidate seq is actually tested for inclusion in this set but for
-# all complete proteomes. By default at most 10 hits are considered. To change
-# this, use the '-max_target_seqs' option of the BLAST executable(s) at the
-# 'reference' step.
+# best hits. The allowed bit score reduction of any hit is expressed
+# relatively to the score of the previous hit. During BRH checks, only the
+# very first hit for the candidate seq is actually tested for inclusion in
+# this set but for all complete proteomes. By default at most 10 hits are
+# considered. To change this, use the '-max_target_seqs' option of the BLAST
+# executable(s) at the 'reference' step.
 # When not specified 'ref_score_mul' internally defaults to 1.0, which is the
 # strictest mode since only equally-best hits are retained.
 ref_score_mul: 0.99
 
 
 
-# ===Hit trimming switch===
+# ===Homologues trimming switch===
 # Two values are available: 'on' and 'off'.
 # If set to 'on', each candidate seq is first trimmed to the range covered by
 # the HSPs that retrieved it. This helps exonerate to splice genes correctly.
 # The details of this trimming step can be fine-tuned by editing the other
-# hit_* parameters of this configuration file.
-# When not specified, 'trimming_mode' internally defaults to 'on'.
-trimming_mode: off
+# trim_* parameters of this configuration file.
+# When not specified, 'trim_homologues' internally defaults to 'on'.
+trim_homologues: off
 
 
 
+# ===Orthologues merging switch===
+# Two values are available: 'on' and 'off'.
+# If set to 'on', each batch of orthologous seqs from the same org is first
+# fed to CAP3 in an attempt to merge some of them into contigs. Successfully
+# merged orthologous seqs are identified by a trailing +N tag where N is the
+# number of orthologous seqs removed in the merging process. The contig itself
+# is named after the longest orthologous seq composing it.
+# The details of this merging step can be fine-tuned by editing the other
+# merge_* parameters of this configuration file.
+# When not specified, 'merge_orthologues' internally defaults to 'off'.
+merge_orthologues: off
 
-# ===Action to perform when a preexisting lengthened seq is identified===
-# Currently, two values are available: 'remove' and 'keep'.
-# When not specified, 'ls_action' internally defaults to 'keep'.
-ls_action: keep
+
 
 
 # ===Engine to be used for aligning new seqs===
@@ -145,38 +153,54 @@ ls_action: keep
 aligner_mode: blast
 
 
-# ===Template selection mode for aligning new seqs===
+# ===Self-template selection switch for aligning new seqs===
 # Only meaningful when setting 'aligner_mode' to a value other than 'off'.
 # Two values are available: 'on' and 'off'.
 # If set to 'on', closest relatives belonging to the same org as the new seqs
 # will not be selected as templates, thus allowing the latter to align better.
-# When not specified, 'ali_patch_mode' internally defaults to 'off'.
-ali_patch_mode: off
+# When not specified, 'ali_skip_self' internally defaults to 'off'.
+ali_skip_self: off
 
 # ===Coverage improvement required to consider non-1st hits as templates===
 # Only meaningful when setting 'aligner_mode' to a value other than 'off'.
 # This parameter applies when collecting templates for aligning the new seqs.
 # Templates get considered as long as query coverage improves at least of this
 # value (relatively to the previous template). The exact effect of this
-# parameter depends on the 'aligner_mode' engine: 'exonerate' will try to use the
-# longest template for alignment while 'blast' will use each hit in turn (as a
-# fall-back with 'exoblast'). New seqs can thus be added more than once to the
-# ALI (with ids *.H1.N, *.H2.N etc).
+# parameter depends on the 'aligner_mode' engine: 'exonerate' will try to use
+# the longest template for alignment while 'blast' will use each hit in turn
+# (as a fall-back with 'exoblast'). New seqs can thus be added more than once
+# to the ALI (with ids *.H1.N, *.H2.N etc).
 # When not specified 'ali_cover_mul' internally defaults to 1.1., which means
 # that if the BLAST alignment with the second template is at least 110% of the
 # BLAST alignment with the first template, both templates are retained.
 ali_cover_mul: 1.1
 
+# ===Preservation switch for '#NEW#' tags from preexisting sequences===
+# Two values are available: 'on' and 'off'.
+# If set to 'on' (default), #NEW# tags will be preserved. Note that
+# preexisting new sequences are invisible to 42 (they cannot be used as
+# queries etc).
+ali_keep_old_new_tags: off
+
+# ===Action to perform when a preexisting lengthened seq is identified===
+# Currently, two values are available: 'remove' and 'keep'.
+# The option is quite self-explanatory. It is useful when one runs 42 multiple
+# times on the sames ALIs to repeatedly enrich the same orgs, assuming that
+# org banks are updated between runs.
+# When not specified, 'ali_keep_lengthened_seqs' internally defaults to
+# 'keep'.
+ali_keep_lengthened_seqs: on
+
 
 # ===Taxonomic report switch===
 # Two values are available: 'on' and 'off'.
-# If set to 'on', the lineage of new seqs is inferred by analyzing the taxonomy
-# of their ALI closest relatives and one '.tax-report' file is generated for
-# each ALI processed (see 'run_mode' above).
-# The details of this taxonomic analysis can be fine-tuned by editing the other
-# tax_* parameters of this configuration file.
-# When not specified, 'tax_reports' internally defaults to 'off'. Yet, the YAML
-# generator automatically sets it to 'on' if 'run_mode' is 'metagenomic'.
+# If set to 'on', the lineage of new seqs is inferred by analyzing the
+# taxonomy of their ALI closest relatives and one '.tax-report' file is
+# generated for each ALI processed (see 'run_mode' above).
+# The details of this taxonomic analysis can be fine-tuned by editing the
+# other tax_* parameters of this configuration file.
+# When not specified, 'tax_reports' internally defaults to 'off'. Yet, the
+# YAML generator automatically sets it to 'on' if 'run_mode' is 'metagenomic'.
 tax_reports: on
 
 # ===Path to dir holding NCBI Taxonomy database===
@@ -221,8 +245,8 @@ tax_min_score: 0
 
 # ===Bit score reduction allowed when inferring taxonomy of new seqs===
 # Only meaningful when enabling 'tax_reports' or specifying 'tax_filter'.
-# The allowed bit score reduction of any relative is expressed relatively
-# to the score of the FIRST relative (as in MEGAN algorithm).
+# The allowed bit score reduction of any relative is expressed relatively to
+# the score of the FIRST relative (as in MEGAN algorithm).
 # When not specified, 'tax_score_mul' internally defaults to 0.
 tax_score_mul: 0
 
@@ -255,19 +279,20 @@ orgs:
      
 
 #
-# This config file has been generated automatically on 15:54:26 10-Jan-2019.
-# We advise not to modify directly this file manually but rather to modify
-# the yaml-generator command instead for traceability and reproducibility.
+# This config file has been generated automatically on 17:31:03 31-Mar-2020.
+# We advise not to modify directly this file manually but rather to modify the
+# yaml-generator command instead for traceability and reproducibility.
 #
-#yaml-generator-42.pl --run_mode=phylogenomic --out_suffix=-42-prot-tax \
-#--queries=MSAs/queries.idl \
+#yaml-generator-42.pl --run_mode=phylogenomic --out_suffix=-my-42-prot-tax \
+#--queries test/MSAs/queries.idl \
 #--evalue=1e-05 --homologues_seg=yes --max_target_seqs=10000 --templates_seg=no \
-#--bank_dir candidates/proteomes/ --bank_suffix=.psq --bank_mapper=candidates/proteomes/prot-bank-mapper.idm \
-#--ref_brh_mode=on --ref_bank_dir ref_banks --ref_bank_suffix=.psq --ref_bank_mapper=ref_banks/ref-bank-mapper.idm \
+#--bank_dir test/candidates/proteomes/ --bank_suffix=.psq --bank_mapper test/candidates/proteomes/prot-bank-mapper.idm \
+#--ref_brh=on --ref_bank_dir test/ref_banks --ref_bank_suffix=.psq --ref_bank_mapper test/ref_banks/ref-bank-mapper.idm \
 #--ref_org_mul=0.66 --ref_score_mul=0.99 \
-#--trimming_mode=off \
-#--ls_action=keep --aligner_mode=blast --ali_patch_mode=off --ali_cover_mul=1.1 \
-#--tax_reports=on --tax_dir /media/vol1/databases/taxdump-TRIAL/ \
-#--best_hit \ 
-
+#--trim_homologues=off \
+#--merge_orthologues=off \
+#--aligner_mode=blast --ali_skip_self=off --ali_cover_mul=1.1 --ali_keep_old_new_tags=off --ali_keep_lengthened_seqs=on \
+#--tax_reports=on --tax_dir test/taxdump-mini/ \
+#--best_hit \
+#--tol_check=off
 

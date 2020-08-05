@@ -40,9 +40,10 @@ eval "use App::Followme::Web";
 my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
-mkdir $test_dir;
+mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-chdir $test_dir;
+
+chdir $test_dir or die $!;
 $test_dir = cwd();
 
 #----------------------------------------------------------------------
@@ -122,7 +123,7 @@ EOQ
 
     foreach my $dir (('', 'sub-one', 'sub-two')) {
         if ($dir ne '') {
-            mkdir $dir;
+            mkdir $dir or die $!;
             chmod 0755, $dir;
             push(@ok_folders, catfile($test_dir, $dir));
         }
@@ -187,7 +188,8 @@ do {
 </html>
 EOQ
 
-    chdir($test_dir);
+    chdir($test_dir) or die $!;
+    $test_dir = cwd();
 
     my $template = $code;
     $template =~ s/%%/Page \$count/g;

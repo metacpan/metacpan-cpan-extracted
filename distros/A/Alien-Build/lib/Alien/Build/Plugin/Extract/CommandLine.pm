@@ -2,6 +2,7 @@ package Alien::Build::Plugin::Extract::CommandLine;
 
 use strict;
 use warnings;
+use 5.008004;
 use Alien::Build::Plugin;
 use Path::Tiny ();
 use File::Which ();
@@ -10,7 +11,7 @@ use File::Temp qw( tempdir );
 use Capture::Tiny qw( capture_merged );
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '2.26'; # VERSION
+our $VERSION = '2.28'; # VERSION
 
 
 has '+format' => 'tar';
@@ -337,7 +338,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 2.26
+version 2.28
 
 =head1 SYNOPSIS
 
@@ -458,6 +459,8 @@ Shoichi Kaji (SKAJI)
 Shawn Laffan (SLAFFAN)
 
 Paul Evans (leonerd, PEVANS)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

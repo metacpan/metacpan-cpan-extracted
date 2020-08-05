@@ -28,7 +28,7 @@ $sub = CGI::Compile->compile('t/hello.cgi');
 
 is sub_name($sub), 'hello_2ecgi';
 
-like stash_name($sub), qr/^CGI::Compile::ROOT::[A-Za-z0-9_]*t\z/;
+like stash_name($sub), qr/^CGI::Compile::ROOT::[A-Za-z0-9_]*t_hello_2ecgi\z/;
 
 $sub = CGI::Compile->compile(\$cgi);
 

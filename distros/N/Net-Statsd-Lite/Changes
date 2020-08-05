@@ -1,5 +1,12 @@
 Revision history for Net-Statsd-Lite
 
+v0.4.10   2020-07-31 14:52:09+01:00 Europe/London
+  [Documentation]
+  - Update copyright year.
+
+  [Toolchain]
+  - Add core modules in the prerequisites.
+
 v0.4.9    2019-12-21 10:22:05+00:00 Europe/London
   [Documentation]
   - Fixed typo, thanks @mrdvt92.

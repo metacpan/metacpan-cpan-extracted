@@ -1,11 +1,11 @@
 
                            Archive-Zip-SimpleZip
 
-                               Version 0.035
+                               Version 0.036
 
-                              7 December 2019
+                              3 August 2020
 
-        Copyright (c) 2012-2019 Paul Marquess. All rights reserved.
+        Copyright (c) 2012-2020 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
            and/or modify it under the same terms as Perl itself.
 
@@ -23,8 +23,8 @@ PREREQUISITES
 Before you can build Archive-Zip-SimpleZip you need to have the following
 installed on your system:
 
-    * Perl 5.006 or better. 
-    * IO::Compress version 2.093 or better.
+    * Perl 5.006 or better.
+    * IO::Compress version 2.096 or better.
 
 BUILDING THE MODULE
 -------------------
@@ -46,14 +46,14 @@ To install Archive::Zip::SimpleZip, run the command below:
 SUPPORT
 -------
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 https://github.com/pmqs/Archive-Zip-SimpleZip/issues (preferred) or
 https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Zip-SimpleZip.
 
 FEEDBACK
 --------
 
-You can report a problem with Archive-Zip-SimpleZip to 
+You can report a problem with Archive-Zip-SimpleZip to
 
     https://github.com/pmqs/Archive-Zip-SimpleZip/issues
 
@@ -67,16 +67,16 @@ To help me help you, I need all of the following information:
     This includes:
 
      a. The *complete* output from running this
-     
+
             perl -V
-     
+
         Do not edit the output in any way.
         Note, I want you to run "perl -V" and NOT "perl -v".
-     
-        If your perl does not understand the "-V" option it is too
-        old. This module needs Perl version 5.006 or better.     
 
-     b. The version of Archive-Zip-SimpleZip you have. 
+        If your perl does not understand the "-V" option it is too
+        old. This module needs Perl version 5.006 or better.
+
+     b. The version of Archive-Zip-SimpleZip you have.
         If you have successfully installed Archive-Zip-SimpleZip, this one-liner
         will tell you:
 
@@ -98,6 +98,6 @@ To help me help you, I need all of the following information:
         [edit config.in, if necessary]
         perl Makefile.PL
         make
-        make test TEST_VERBOSE=1          
+        make test TEST_VERBOSE=1
 
 Paul Marquess <pmqs@cpan.org>

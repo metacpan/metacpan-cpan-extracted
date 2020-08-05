@@ -34,6 +34,8 @@
          "requires" : {
             "Curses" : "1.36",
             "Curses::UI" : "0.9609",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
             "perl" : "5.006"
          }
       },
@@ -59,7 +61,7 @@
          "web" : "https://gitlab.com/monsieurp/App-ZFSCurses"
       }
    },
-   "version" : "1.01",
+   "version" : "1.100",
    "x_licence" : [
       "bsd"
    ],

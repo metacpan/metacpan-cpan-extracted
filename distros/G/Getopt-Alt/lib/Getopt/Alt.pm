@@ -28,7 +28,7 @@ Moose::Exporter->setup_import_methods(
     as_is => [qw/get_options/],
 );
 
-our $VERSION = version->new('0.5.3');
+our $VERSION = version->new('0.5.4');
 our $EXIT    = 1;
 
 has options => (
@@ -68,6 +68,14 @@ has help_package => (
 has help_packages => (
     is      => 'rw',
     isa     => 'HashRef[Str]',
+);
+has help_pre => (
+    is      => 'rw',
+    isa     => 'CodeRef',
+);
+has help_post => (
+    is      => 'rw',
+    isa     => 'CodeRef',
 );
 has helper => (
     is      => 'rw',
@@ -468,7 +476,7 @@ sub process {
 sub complete {
     my ($self, $errors) = @_;
 
-    if ( $self->sub_command && !$self->cmd ) {
+    if ( $self->sub_command && ref $self->sub_command && !$self->cmd ) {
         my $cmd = shift @ARGV;
         my @sub_command = grep { $cmd ? /$cmd/ : 1 } sort keys %{ $self->sub_command };
         print join ' ', @sub_command;
@@ -577,7 +585,7 @@ sub _show_help {
     }
 
     require Tie::Handle::Scalar;
-    my $out = '';
+    my $out = $self->help_pre ? $self->help_pre() : '';
     tie *FH, 'Tie::Handle::Scalar', \$out;
     require Pod::Usage;
     Pod::Usage::pod2usage(
@@ -587,6 +595,7 @@ sub _show_help {
         -output  => \*FH,
         %input,
     );
+    $out .= $self->help_post ? $self->help_post->() : '';
     die Getopt::Alt::Exception->new( message => $out, help => 1 );
 }
 
@@ -600,7 +609,7 @@ Getopt::Alt - Command line option passing with with lots of features
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt version 0.5.3.
+This documentation refers to Getopt::Alt version 0.5.4.
 
 =head1 SYNOPSIS
 
@@ -905,7 +914,7 @@ file to get auto-completion.
     }
     complete -F _eg eg
 
-B<Note>: This is different from version 0.5.3 and earlier
+B<Note>: This is different from version 0.5.4 and earlier
 
 =head1 DIAGNOSTICS
 

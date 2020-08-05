@@ -1,5 +1,5 @@
 package PAUSE::Users::User;
-$PAUSE::Users::User::VERSION = '0.07';
+$PAUSE::Users::User::VERSION = '0.08';
 use 5.10.0;
 use Moo;
 

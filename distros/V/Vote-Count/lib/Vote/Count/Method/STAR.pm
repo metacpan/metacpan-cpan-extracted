@@ -8,13 +8,13 @@ use namespace::autoclean;
 use Moose;
 extends 'Vote::Count';
 
-our $VERSION='1.06';
+our $VERSION='1.07';
 
 =head1 NAME
 
 Vote::Count::Method::STAR
 
-=head1 VERSION 1.06
+=head1 VERSION 1.07
 
 =cut
 
@@ -75,8 +75,7 @@ no warnings 'experimental';
 
 use Carp;
 use List::Util qw( min max sum );
-use Data::Printer;
-use Data::Dumper;
+# use Data::Dumper;
 use Sort::Hash;
 
 # Similar needs will arise elsewhere. this method should be generalized
@@ -120,7 +119,7 @@ sub STAR ( $self, $active = undef ) {
   }
   elsif ( $countA < $countB ) {
     $self->logt("Automatic Runoff Winner: $B [ $B: $countB -- $A: $countA ]");
-    return $A;
+    return $B;
   }
   else {
     $self->logt("Automatic Runoff TIE: [ $A: $countA -- $B: $countB ]");

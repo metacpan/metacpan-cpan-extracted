@@ -1,6 +1,7 @@
 .appveyor.yml
 .gitignore
 .travis.yml
+.whitesource
 Call/Call.pm
 Call/Call.xs
 Call/Makefile.PL

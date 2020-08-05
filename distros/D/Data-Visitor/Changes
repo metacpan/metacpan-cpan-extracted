@@ -1,3 +1,9 @@
+Revision history for Data-Visitor
+
+0.31      2020-08-02 22:39:31Z
+    - updated distribution tooling (resolves RT#133059, a problem with the
+      compilation test when the installed perl has whitespace in its path)
+
 0.30  2013-06-24
     - doy/data-visitor should probably be the canonical repository at this
       point
@@ -16,115 +22,111 @@
     - better error message if Data::Alias isn't found
     - doc fixes
 
-0.27
+0.27    2010-02-03
     - Improve synopsis of Data::Visitor::Callback.
     - Remove the Test::MockObject dependency.
 
-0.26
+0.26    2009-09-03
 	- remove Any::Moose, one too many failures to subclass. When/if Mouse can be
 	  subclassed by Moose we can consider putting it back
 
-0.25
+0.25    2009-05-19
 	- Depend on Any::Moose 0.09, which pulls in Mouse 0.21, avoiding warnings
 	  related to compute_all_applicable_attributes (rafl)
 
-0.24
+0.24    2009-04-11
 	- use get_all_attributes instead of the deprecated
 	  compute_all_applicable_attributes (rafl)
-
-0.23
 	- Switch to Any::Moose
 
-0.22
+0.22    2008-12-19
 	- add a no warnings 'recursion', deep recursion is legitimate in most cases
 
-0.21
+0.21    2008-09-15
 	- Fix a bug in Data::Visitor::Callback WRT returning non reference values
 	  from callbacks (#38306).
 	- Refactor the visit_tied split
 	- Propagation of void context
 
-0.20
+0.20    2008-09-12
 	- Split visit_tied into methods per each reftype, to make it possible to
 	  return something that is an object but still doesn't get tied.
 
-0.19
+0.19    2008-08-26
 	- Support multiple arguments to visit()
 	- use BUILDARGS for argument processing
 	- remove Data::Alias dep for now, it breaks on windows & aix with 5.8.8
 
-0.18
+0.18    2008-07-21
 	- Weak reference support
 
-0.17
+0.17    2008-07-19
 	- More void context correctness fixes WRT tied values
 	- Overzealous seen value mappings made by Callback were removed
 
-0.16
+0.16    2008-07-19
 	- Fix passing of void context when visiting hashes/arrays (perf
 	  optimization to avoid unnecessary cloning)
 	- Added 'visit_seen' and a 'seen' callback for circular structures
 	- Class callbacks are now fired from least derived to most derived, not in
 	  hash key order
 
-0.15
+0.15    2008-01-15
 	- Fixed a compilation warning under 5.6.2
 	- Disabled consistent replacement of values when assigning to $_ under
 	  5.6.2 due to a limitation. 5.8 is required for that feature to work
 	  properly. Instead, a warning will be issued and the value will be
 	  revisited.
 
-0.14
+0.14    2008-01-13
 	- Refactored to use Tie::ToObject instead of a custom class
 	- Simple tracing added, enable by setting $DEBUG
 	- added the object_no_class callback
 	- no longer uses $string->can("isa") to figure out if that's a class
 
-0.13
+0.13    2008-01-08
 	- Add support for preserving tied()ness, and for visiting
 
-0.12
+0.12    2008-01-08
 	- _register_mapping was not called for each class callback result
 
-0.11
+0.11    2008-01-07
 	- Fix a bug where objects were mapped to undef when a class callback
 	  doesn't match
 
-0.10
+0.10    2007-12-25
 	- Fix buggy behavior for duplicate and circular values
 
-0.09
+0.09    2007-10-07
 	- add visit_hash_entry and visit_array_entry
 
-0.08
+0.08    2007-07-01
 	- add retain_magic and use it to keep blessedness of mapped objects that
 	  were forced into being visited by "regular" ref visitor methods
 
-0.07
+0.07    2007-05-20
 	- Refactor visit_ref
-
-0.06
 	- Removed build_requires, to try and eliminate some odd installation
 	  problems. This also fixes the Class::Accessor dep which was in the wrong
 	  slot anyway ;-)
 
-0.05
+0.05    2006-04-22
 	- Added support for using class names as callbacks in
 	  Data::Visitor::Callback
 	- Improved semantics of multiple instances of the same reference in a depe
 	  structure (will be mapped once, same mapped value used per each instance)
 
-0.04
+0.04    2006-04-02
 	- Specified that the Test::MockObject dep need 1.04
 
-0.03
+0.03    2006-03-22
 	- add Class::Accessor to requirements
 
-0.02
+0.02    2006-02-08
 	- Added GLOB recursion support
 	- Added support for circular references
 	_ Added aliasing to $_ to Data::Visitor::Callback
 	- Added ignore_return_values to Data::Visitor::Callback
 
-0.01
+0.01    2006-02-08
 	- Initial release

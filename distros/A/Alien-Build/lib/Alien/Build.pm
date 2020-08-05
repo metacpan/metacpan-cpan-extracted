@@ -2,7 +2,7 @@ package Alien::Build;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use Path::Tiny ();
 use Carp ();
 use File::chdir;
@@ -13,7 +13,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.26'; # VERSION
+our $VERSION = '2.28'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -1165,7 +1165,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.26
+version 2.28
 
 =head1 SYNOPSIS
 
@@ -2126,6 +2126,8 @@ Shoichi Kaji (SKAJI)
 Shawn Laffan (SLAFFAN)
 
 Paul Evans (leonerd, PEVANS)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

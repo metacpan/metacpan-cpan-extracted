@@ -1,7 +1,7 @@
 package Bio::MUST::Apps::Debrief42;
 # ABSTRACT: Main class for debrief-42 tool
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Apps::Debrief42::VERSION = '0.190820';
+$Bio::MUST::Apps::Debrief42::VERSION = '0.202160';
 use Moose;
 use namespace::autoclean;
 
@@ -65,7 +65,7 @@ Bio::MUST::Apps::Debrief42 - Main class for debrief-42 tool
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 SYNOPSIS
 

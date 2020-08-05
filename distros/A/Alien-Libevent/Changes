@@ -1,5 +1,12 @@
 Revision history for Alien-Libevent
 
+2.7      Wed Aug 05 2020
+         - No specific version for Test::Alien
+
+2.6      Tue Aug 04 2020
+         - Add XS tests
+         - Add -ldl to fix undefined symbol (does not appear in CPANTesters)
+
 2.5      Thu Jul 16 2020
          - Search dep Alien::OpenSSL
          - Put README.pod in the MANIFEST.SKIP

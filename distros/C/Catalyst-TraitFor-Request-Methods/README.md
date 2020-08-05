@@ -4,7 +4,7 @@ Catalyst::TraitFor::Request::Methods - Add enumerated methods for HTTP requests
 
 # VERSION
 
-version v0.2.2
+version v0.2.3
 
 # SYNOPSIS
 
@@ -110,7 +110,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Robert Rothenberg.
+This software is Copyright (c) 2019-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

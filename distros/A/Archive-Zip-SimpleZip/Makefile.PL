@@ -7,7 +7,7 @@ use lib '.';
 use private::MakeUtil;
 use ExtUtils::MakeMaker 5.16 ;
 
-my $ParentVersion = 2.093 ;
+my $ParentVersion = 2.096 ;
 
 # Check if IO::Compress::Lzna is installed.
 # If it is, add to PREREQ_PM.
@@ -31,7 +31,7 @@ WriteMakefile(
             'Perl::OSType'         => 0,
             %extra_prereq,
             } ,
-            
+
     ( $] >= 5.005
         ? (ABSTRACT => 'Read and Write Zip Archives',
            AUTHOR   => 'Paul Marquess <pmqs@cpan.org>')
@@ -87,4 +87,3 @@ WriteMakefile(
 ) ;
 
 # end of file Makefile.PL
-

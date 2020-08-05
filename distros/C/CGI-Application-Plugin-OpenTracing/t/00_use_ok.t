@@ -37,6 +37,10 @@ BEGIN {
                 name    => 'teardown',
                 coderef => code( \&is_coderef ),
             },
+            {
+                name    => 'error',
+                coderef => code( \&is_coderef ),
+            },
         ],
         "Installed expected callbacks, and these are coderefs!"
     );

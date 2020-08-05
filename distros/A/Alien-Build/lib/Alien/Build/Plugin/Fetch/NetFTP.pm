@@ -2,13 +2,14 @@ package Alien::Build::Plugin::Fetch::NetFTP;
 
 use strict;
 use warnings;
+use 5.008004;
 use Alien::Build::Plugin;
 use Carp ();
 use File::Temp ();
 use Path::Tiny qw( path );
 
 # ABSTRACT: Plugin for fetching files using Net::FTP
-our $VERSION = '2.26'; # VERSION
+our $VERSION = '2.28'; # VERSION
 
 
 has '+url' => '';
@@ -158,7 +159,7 @@ Alien::Build::Plugin::Fetch::NetFTP - Plugin for fetching files using Net::FTP
 
 =head1 VERSION
 
-version 2.26
+version 2.28
 
 =head1 SYNOPSIS
 
@@ -253,6 +254,8 @@ Shoichi Kaji (SKAJI)
 Shawn Laffan (SLAFFAN)
 
 Paul Evans (leonerd, PEVANS)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

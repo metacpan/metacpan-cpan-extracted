@@ -1,5 +1,9 @@
 Revision history for Perl extension HTTP-Entity-Parser
 
+0.24 2020-08-05T05:36:49Z
+
+   - encode recursively nested Arrayrefs and Hashrefs in JSON #13
+
 0.23 2020-07-10T02:45:46Z
 
     - Handle nested arrays #12

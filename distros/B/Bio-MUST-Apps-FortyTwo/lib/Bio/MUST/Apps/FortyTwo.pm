@@ -1,6 +1,7 @@
 package Bio::MUST::Apps::FortyTwo;
 # ABSTRACT: Main class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::VERSION = '0.190820';
+# CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
+$Bio::MUST::Apps::FortyTwo::VERSION = '0.202160';
 use Moose;
 use namespace::autoclean;
 
@@ -37,7 +38,7 @@ Bio::MUST::Apps::FortyTwo - Main class for forty-two tool
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 DESCRIPTION
 
@@ -54,6 +55,12 @@ For information can be found in the L<Manual|forty-two-manual>.
 =head1 AUTHOR
 
 Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mick VAN VLIERBERGHE
+
+Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

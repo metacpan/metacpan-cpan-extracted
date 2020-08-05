@@ -2,7 +2,7 @@ package Filter::tee ;
 
 require 5.006 ;
 require XSLoader;
-our $VERSION = "1.59" ;
+our $VERSION = "1.60" ;
 
 XSLoader::load('Filter::tee');
 1;

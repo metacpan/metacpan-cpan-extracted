@@ -2,7 +2,7 @@ package Filter::Util::Exec ;
 
 require 5.006 ;
 require XSLoader;
-our $VERSION = "1.59" ;
+our $VERSION = "1.60" ;
 
 XSLoader::load('Filter::Util::Exec');
 1 ;

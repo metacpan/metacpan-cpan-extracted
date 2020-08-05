@@ -3,8 +3,10 @@ package Types::Algebraic;
 use strict;
 use 5.022;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
+use List::Util qw(all);
+use List::MoreUtils qw(pairwise);
 use Keyword::Declare;
 use Moops;
 use PPR;
@@ -14,6 +16,29 @@ our $_RETURN_SENTINEL = \23;
 class ADT {
     has tag => (is => "ro", isa => Str);
     has values => (is => "ro", isa => ArrayRef);
+
+    sub _equality {
+        my ($type, $x, $y) = @_;
+
+        return 0 unless ref($x) && (ref($x) // '') eq (ref($y) // '');
+        return 0 unless $x->tag eq $y->tag;
+        return List::Util::all { $_ } List::MoreUtils::pairwise { $type eq '==' ? $a == $b : $a eq $b } @{$x->values}, @{$y->values};
+    }
+
+    sub _equality_num { return _equality('==', @_); }
+    sub _equality_str { return _equality('eq', @_); }
+
+    sub _stringify {
+        my $v = shift;
+        return $v->tag . "(" . join(", ", map { "$_" } @{ $v->values }) . ")";
+    }
+
+    use overload
+        '==' => sub { _equality('==', @_) },
+        '!=' => sub { ! _equality('==', @_) },
+        'eq' => sub { _equality('eq', @_) },
+        'ne' => sub { ! _equality('eq', @_) },
+        '""' => \&_stringify;
 }
 
 keytype ADTMatch is /
@@ -31,7 +56,7 @@ sub import {
 
     keyword match (ParenthesesList $v, '{', ADTMatch* @body, '}') {
         my $res = "{\n";
-        $res .= 'my @types_algebraic_match_result = '. $v . "->match(\n";
+        my $match_body = $v . "->match(\n";
         for my $case (@body) {
             my $tag = $case->{tag};
             my $idents = $case->{identifiers};
@@ -46,13 +71,22 @@ sub import {
             my $block = $case->{block};
 
             if ($tag) {
-                $res .= "[ '$tag', $count, sub { my ($args) = \@_; $block; return \$Types::Algebraic::_RETURN_SENTINEL; } ],\n";
+                $match_body .= "[ '$tag', $count, sub { my ($args) = \@_; $block; return \$Types::Algebraic::_RETURN_SENTINEL; } ],\n";
             } else {
-                $res .= "[ sub { $block; return \$Types::Algebraic::_RETURN_SENTINEL; } ],\n";
+                $match_body .= "[ sub { $block; return \$Types::Algebraic::_RETURN_SENTINEL; } ],\n";
             }
         }
-        $res .= ");\n";
-        $res .= 'if (@types_algebraic_match_result != 1 || $types_algebraic_match_result[0] != $Types::Algebraic::_RETURN_SENTINEL) { return @types_algebraic_match_result };' . "\n";
+        $match_body .= ");\n";
+
+        $res .= <<"EOF";
+    if (wantarray) {
+        my \@types_algebraic_match_result = $match_body;
+        if (\@types_algebraic_match_result != 1 || \$types_algebraic_match_result[0] != \$Types::Algebraic::_RETURN_SENTINEL) { return \@types_algebraic_match_result };
+    } else {
+        my \$types_algebraic_match_result = $match_body;
+        if (\$types_algebraic_match_result && \$types_algebraic_match_result != \$Types::Algebraic::_RETURN_SENTINEL) { return \$types_algebraic_match_result; }
+    }
+EOF
         $res .= "}\n";
         return $res;
     }

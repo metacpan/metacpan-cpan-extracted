@@ -307,8 +307,7 @@ are examples of variables. The following commands are supported in templates:
     is included if the expression in the enclosing command is true and the
     text after the "else" is included if the "if" command is false or the "for"
     command does not execute. You can also place an "elsif" command inside a block,
-    which includes the following text if its expression
-    is true.
+    which includes the following text if its expression is true.
 
 # TEMPLATES
 
@@ -361,11 +360,3 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 Bernie Simon <bernie.simon@gmail.com>
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 321:
-
-    You forgot a '=back' before '=head1'

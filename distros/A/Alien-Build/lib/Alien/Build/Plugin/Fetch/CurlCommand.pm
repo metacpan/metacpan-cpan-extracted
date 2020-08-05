@@ -2,7 +2,7 @@ package Alien::Build::Plugin::Fetch::CurlCommand;
 
 use strict;
 use warnings;
-use 5.008001;
+use 5.008004;
 use Alien::Build::Plugin;
 use File::Which qw( which );
 use Path::Tiny qw( path );
@@ -12,7 +12,7 @@ use List::Util 1.33 qw( any );
 use File::chdir;
 
 # ABSTRACT: Plugin for fetching files using curl
-our $VERSION = '2.26'; # VERSION
+our $VERSION = '2.28'; # VERSION
 
 
 sub curl_command
@@ -239,7 +239,7 @@ Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 2.26
+version 2.28
 
 =head1 SYNOPSIS
 
@@ -345,6 +345,8 @@ Shoichi Kaji (SKAJI)
 Shawn Laffan (SLAFFAN)
 
 Paul Evans (leonerd, PEVANS)
+
+Håkon Hægland (hakonhagland, HAKONH)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,6 +1,16 @@
 CHANGE LOG
 ==========
 
+2020-08-05 - v0.103.0
+
+Exceptions and error handling are now set at the right spans
+Allow bootstrapping with default tracer from env-var
+Processing of query-params and form-fields made possible
+Added form-fields as separate tags
+Be more relaxed when expected values can not be added as tags
+Removed query params from url
+
+
 2020-07-24 - v0.102.0
 ---------------------
 

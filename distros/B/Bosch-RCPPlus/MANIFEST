@@ -1,0 +1,11 @@
+lib/Bosch/RCPPlus.pm
+lib/Bosch/RCPPlus/Commands.pm
+lib/Bosch/RCPPlus/AuthError.pm
+lib/Bosch/RCPPlus/Response.pm
+lib/Bosch/RCPPlus/Utils.pm
+MANIFEST
+README.md
+LICENSE.md
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

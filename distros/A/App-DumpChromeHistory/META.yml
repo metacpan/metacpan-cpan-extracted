@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-DumpChromeHistory
 requires:
-  Chrome::Util::Profile: '0'
+  Chrome::Util::Profile: '0.004'
   DBD::SQLite: '0'
   DBI: '0'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DumpChromeHistory
   homepage: https://metacpan.org/release/App-DumpChromeHistory
   repository: git://github.com/perlancar/perl-App-DumpChromeHistory.git
-version: '0.004'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

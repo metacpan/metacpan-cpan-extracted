@@ -11,15 +11,14 @@ no warnings 'experimental';
 use List::Util qw( min max sum );
 use Path::Tiny;
 # use Data::Dumper;
-#use Data::Printer;
 
-our $VERSION='1.06';
+our $VERSION='1.07';
 
 =head1 NAME
 
 Vote::Count::TieBreaker
 
-=head1 VERSION 1.06
+=head1 VERSION 1.07
 
 =head1 Synopsis
 

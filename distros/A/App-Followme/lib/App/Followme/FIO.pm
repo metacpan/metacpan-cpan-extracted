@@ -22,7 +22,7 @@ our @EXPORT = qw(fio_filename_to_url fio_full_file_name fio_format_date
                  fio_same_file fio_set_date fio_split_filename
                  fio_to_file fio_visit fio_write_page);
 
-our $VERSION = "1.94";
+our $VERSION = "1.95";
 
 #----------------------------------------------------------------------
 # Convert filename to url
@@ -233,7 +233,7 @@ sub fio_read_page {
 }
 
 #----------------------------------------------------------------------
-# Cehck if two filenames are the same in an os independent way
+# Check if two filenames are the same in an os independent way
 
 sub fio_same_file {
     my ($filename1, $filename2) = @_;
@@ -337,6 +337,9 @@ sub fio_visit {
 sub fio_write_page {
     my ($filename, $page, $binmode) = @_;
 
+	my ($dir, $base) = fio_split_filename($filename);
+	die "Couldn't write $filename, no directory" unless -e $dir;
+	
     my $fd = IO::File->new($filename, 'w');
     die "Couldn't write $filename: $!" unless $fd;
 

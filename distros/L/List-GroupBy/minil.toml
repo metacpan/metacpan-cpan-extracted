@@ -1,0 +1,11 @@
+name = "List-GroupBy"
+authority="cpan:JLCOOPER"
+
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+
+authors = [
+    "Jason Cooper <JLCOOPER@cpan.org>",
+]
+
+no_github_issues = true

@@ -2,6 +2,26 @@ package App::ZFSCurses::WidgetFactory;
 
 use 5.10.1;
 
+=head1 NAME
+
+App::ZFSCurses::WidgetFactory - a factory to create widgets.
+
+=head1 METHODS
+
+=head1 VERSION
+
+Version 1.100.
+
+=cut
+
+our $VERSION = '1.100';
+
+=head2 new
+
+Create an instance of App::ZFSCurses::WidgetFactory.
+
+=cut
+
 sub new {
     my $class = shift;
 
@@ -33,6 +53,13 @@ sub new {
     return $this;
 }
 
+=head2 search_value
+
+Search a value in an array. Return the value index if found. Return -1 if not
+found.
+
+=cut
+
 sub search_value {
     my $self = shift;
     my ( $element, $array ) = @_;
@@ -45,6 +72,14 @@ sub search_value {
 
     return -1;
 }
+
+=head2 widget_selector
+
+Select the right widget to create. This method expects a property list as first
+argument. It will then check for its type, create the widget accordingly and
+return it.
+
+=cut
 
 sub widget_selector {
     my $self            = shift;
@@ -88,6 +123,14 @@ sub widget_selector {
     return $widget;
 }
 
+=head2 make_widget
+
+Make a widget depending on the property type. This method expects a property
+and, sometimes, the current value (selected in the UI). This method is called
+from the UI module when a user selects a property and wants to change it.
+
+=cut
+
 sub make_widget {
     my $self = shift;
     my ( $property, $current_value ) = @_;
@@ -103,11 +146,27 @@ sub make_widget {
     return $property_widget;
 }
 
+=head2 set_container
+
+Set the container that will contain the created widget.
+
+=cut
+
 sub set_container {
     my $self      = shift;
     my $container = shift;
     $self->{container} = $container;
 }
+
+=head2 fill_property_hash
+
+Read the DATA handle and fill the property hash. __DATA__ contains a list of
+key value pairs that represent a property and its possible values. Note: the
+ALNUM value means the property is alphanumerical and a textfield has to be
+created to be shown to the user. Otherwise, a radio button box is created with
+the possible values. See the widget_selector function.
+
+=cut
 
 sub fill_property_hash {
     my $self = shift;
@@ -126,7 +185,7 @@ sub fill_property_hash {
             };
         }
 
-        if ( $values eq 'TEXT' ) {
+        if ( $values eq 'ALNUM' ) {
             $self->{properties}->{$property} = \$values;
         }
         else {
@@ -135,10 +194,22 @@ sub fill_property_hash {
     }
 }
 
+=head2 properties
+
+Return the properties hash.
+
+=cut
+
 sub properties {
     my $self = shift;
     return $self->{properties};
 }
+
+=head2 is_property_ro
+
+Check whether a property is read only (cannot be changed).
+
+=cut
 
 sub is_property_ro {
     my $self     = shift;
@@ -158,6 +229,21 @@ sub is_property_ro {
 
     return $is_ro;
 }
+
+=head1 AUTHOR
+
+Patrice Clement <monsieurp at cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is copyright (c) 2020 by Patrice Clement.
+
+This is free software, licensed under the (three-clause) clause BSD License.
+
+See the LICENSE file.
+
+=cut
+
 
 1;
 
@@ -193,11 +279,11 @@ utf8only%on,off
 volmode%default,geom,dev,none
 vscan%off,on
 xattr%off,on
-snapshot_limit%TEXT
-filesystem_limit%TEXT
-quota%TEXT
-recordsize%TEXT
-refquota%TEXT
-refreservation%TEXT
-reservation%TEXT
-volsize%TEXT
+snapshot_limit%ALNUM
+filesystem_limit%ALNUM
+quota%ALNUM
+recordsize%ALNUM
+refquota%ALNUM
+refreservation%ALNUM
+reservation%ALNUM
+volsize%ALNUM

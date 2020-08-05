@@ -5,11 +5,7 @@ use warnings;
 
 use App::Wax;
 
-# XXX this declaration must be on a single line
-# https://metacpan.org/pod/version#How-to-declare()-a-dotted-decimal-version
-use version; our $VERSION = version->declare('v2.3.3');
-
-exit App::Wax->new({ app_version => $VERSION })->run(\@ARGV);
+exit App::Wax->new->run(\@ARGV);
 
 # FIXME reconcile the need for a) GitHub doc display and b) Pod::Usage
 # discoverability by duplicating wax.pod here :-(
@@ -67,16 +63,13 @@ Subsequent options are passed to the command verbatim, apart from URLs, which
 are converted to paths to the corresponding files. URL arguments can be
 excluded from the conversion process by supplying a separator token (default
 C<-->). Arguments after this are no longer processed by C<wax> and are passed
-through verbatim e.g.:
+through verbatim, e.g.:
 
     $ wax --cache cmd https://example.com/foo -- --referrer https://example.com
 
-Note that the C<--cache> and C<--mirror> options are mutually exclusive i.e.
+Note that the C<--cache> and C<--mirror> options are mutually exclusive, i.e.
 only one (or neither) should be supplied. Supplying both will cause C<wax> to
 terminate with an error.
-
-Note that option bundling is not currently supported e.g. C<wax --cache --verbose ...>
-can't be condensed to C<wax -cv ...>, and would need to be written as C<wax -c -v ...>.
 
 =head2 -c, --cache
 
@@ -88,7 +81,7 @@ If a local file no longer exists, the resource is re-downloaded.
 
 Note: by default, files are saved to the system's temp directory, which is
 typically cleared when the system restarts. To save files to another directory,
-use the C<-D> or C<--directory> option.
+use the C<--directory> or C<--default-directory> option.
 
 =head2 -d, --dir, --directory STRING
 
@@ -98,10 +91,10 @@ L<temp directory|https://en.wikipedia.org/wiki/Temporary_folder>.
 If the directory doesn't exist, it is created if its parent directory exists.
 Otherwise, an error is raised.
 
-=head2 -D
+=head2 -D, --default-directory
 
 Download files to C<$XDG_CACHE_HOME/wax> or C<$HOME/.cache/wax> rather than the
-system's temp directory. Can be overriden by C<-d>.
+system's temp directory. Can be overriden by C<--directory>.
 
 If the directory doesn't exist, it is created if its parent directory exists.
 Otherwise, an error is raised.
@@ -122,16 +115,16 @@ If a local file no longer exists, the resource is re-downloaded.
 =head2 -s, --separator STRING
 
 Override the default separator-token (C<-->) used to mark the end of waxable
-options e.g.:
+options, e.g.:
 
     $ wax --cache --separator :: cmd https://example.com/foo :: --referrer https://example.com
 
-Note: the separator token is removed from the list of options passed to the
+Note: the separator token is removed from the list of arguments passed to the
 command.
 
 =head2 -S, --no-separator
 
-Disable separator-token handling i.e. leave the default separator (C<-->) to be
+Disable separator-token handling, i.e. leave the default separator (C<-->) to be
 handled by the command.
 
 =head2 -t, --timeout INTEGER
@@ -148,7 +141,7 @@ Print diagnostic information to STDERR.
 
 =head2 -V, --version
 
-Print the version of wax.
+Print the version and exit.
 
 =head1 EXAMPLES
 
@@ -197,7 +190,7 @@ quoted in shells on Unix-like systems and quoted with embedded escapes in
 Windows C<cmd>/C<command.exe>-like shells.
 
 It's worth checking that a program actually needs waxing. Many command-line
-programs already support URLs e.g:
+programs already support URLs, e.g:
 
     $ eog https://upload.wikimedia.org/wikipedia/commons/4/4c/Eye_of_GNOME.png
     $ gedit https://projects.gnome.org/gedit/
@@ -208,7 +201,7 @@ etc.
 
 =head1 VERSION
 
-2.3.3
+2.4.1
 
 =head1 SEE ALSO
 

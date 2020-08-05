@@ -1,8 +1,8 @@
-package Sim::OPT::Modish;
+#package Sim::OPT::Modish;
 #NOTE: TO USE THE PROGRAM AS A SCRIPT, THE LINE ABOVE SHOULD BE ERASED OR TURNED INTO A COMMENT.
 #!/usr/bin/perl
 # Modish
-$VERSION = '0.289.';
+$VERSION = '0.291.';
 # Author: Gian Luca Brunetti, Politecnico di Milano - gianluca.brunetti@polimi.it.
 # The subroutine createconstrdbfile has been modified by ESRU (2018), University of Strathclyde, Glasgow to adapt it to the new ESP-r construction database format.
 # All rights reserved, 2015-20.
@@ -11,6 +11,9 @@ $VERSION = '0.289.';
 
 # In version 0.287: added the possibility to decouple the diffuse resolution from the direct resolution.
 # In version 0.289 (13.03.2020): added the ability to work with ESP-r versions more recent than 13.3.2. Last version tested: 13.3.8.
+# In version 0.291 (03.08.2020):
+#   1) added the ability to work with ESP-r versions 13.3.10;
+#   2) added the ability of being called for embedded, time-step based inquiries (by adding "embedded" at the end of the call).
 
 use v5.14;
 use Exporter;
@@ -339,7 +342,7 @@ sub getconffilenames
   my @zonedata;
 
   my ( $zonepath, $netpath, $ctlpath, $aimpath, $radpath, $imgpath,
-    $docpath, $dbspath, $hvacpath, $bsmpath, $matfile, $constfile, $long );
+    $docpath, $dbspath, $hvacpath, $bsmpath, $matfile, $constfile, $long, $groundrefl, $lat, $longdiff );
   my %paths;
 
   my $semaphore = "no";
@@ -349,12 +352,12 @@ sub getconffilenames
     my ($geofile, $constrfile, $shdfile, $zonenum_cfg );
     my @row = split(/\s+|,/, $line);
 
-    if ( ( "#" ~~ @row ) and ( "Site" ~~ @row ) and ( "exposure" ~~ @row ) and ( "ground" ~~ @row ) and ( "reflectivity" ~~ @row ) )
+    if ( ( $line =~ /#/ ) and ( $line =~ /ite/ ) and ( $line =~ /exposure/ ) and ( $line =~ /ground/ ) and ( $line =~ /reflectivity/ ) )
     {
       my @minis;
       foreach my $mini ( @row )
       {
-        unless ( $mini eq "" )
+        unless ( ( $mini eq "" ) or ( $mini eq " " ) or ( $mini eq "  " ) or ( $mini eq "   " ) or ( $mini eq "    " ) )
         {
           push( @minis, $mini );
         }
@@ -362,12 +365,12 @@ sub getconffilenames
       $groundrefl = $minis[1];
     }
 
-    if ( ( "#" ~~ @row ) and ( "Latitude" ~~ @row ) and ( "Longitude" ~~ @row ) )
+    if ( ( $line =~ /#/ ) and ( $line =~ /atitude/ ) and ( $line =~ /ongitude/ ) and ( $line =~ /iff/ ) )
     {
       my @minis;
       foreach my $mini ( @row )
       {
-        unless ( $mini eq "" )
+        unless ( ( $mini eq "" ) or ( $mini eq " " ) or ( $mini eq "  " ) or ( $mini eq "   " ) or ( $mini eq "    " ) )
         {
           push( @minis, $mini );
         }
@@ -659,6 +662,13 @@ YYY
   $cfgpath =~ s/\/$// ;
 
   $paths{cfgpath} = $cfgpath;
+
+  open( THIS, ">./this.txt" ) or die;
+  say THIS "GROUNDREFL: $groundrefl";
+  say THIS "\$paths{groundrefl}: $paths{groundrefl}";
+  say THIS "LAT: $lat";
+  say THIS "\$paths{lat}: $paths{lat}:";
+
 
   return ( $constrdbfile, $matdbfile, \@zonedata, \@lines, \%paths );
 }
@@ -2811,8 +2821,11 @@ solar source sun
                     }
                     $countpoint++;
                   }
-                  say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
-                  say "Diffuse irradiances: " . mean( @{ $surftestsdiff{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
+                  unless ( "embedded" ~~ @calcprocedures )
+                  {
+                    say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
+                    say "Diffuse irradiances: " . mean( @{ $surftestsdiff{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
+                  }
                   say REPORT "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
                   say REPORT "Diffuse irradiances: " . mean( @{ $surftestsdiff{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
                 }
@@ -3045,8 +3058,11 @@ solar source sun
                     }
                     $countpoint++;
                   }
-                  say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
-                  say "Total irradiances: " . mean( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
+                  unless ( "embedded" ~~ @calcprocedures )
+                  {
+                    say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
+                    say "Total irradiances: " . mean( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
+                  }
                   say REPORT "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
                   say REPORT "Total irradiances: " . mean( @{ $surftests{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
                 }
@@ -3275,9 +3291,11 @@ solar source sun
                     }
                     $countpoint++;
                   }
-                  say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
-                  say "Direct unreflected irradiances: " . mean ( @{ $surftestsdir{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
-
+                  unless ( "embedded" ~~ @calcprocedures )
+                  {
+                    say "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
+                    say "Direct unreflected irradiances: " . mean ( @{ $surftestsdir{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
+                  }
                   say REPORT "\nSurface $surfnum, zone $zonenum, month $monthnum, day $day, hour $hour, octree $radoctfile";
                   say REPORT "Direct unreflected irradiances: " . mean ( @{ $surftestsdir{$countrad+1}{$monthnum}{$surfnum}{$hour} } );
                 }
@@ -3633,7 +3651,7 @@ solar source sun
                 $irrs{ $zonenum }{ 4 }{ $monthnum }{ $surfnum }{ $hour }{ meandirirr } = $meanvaluesurf_dir4;
               }
 
-              if ( ( ( "noreflections" ~~ @calcprocedures ) or ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) ) and ( "alldiff" ~~ @calcprocedures ) ) )
+              if ( ( ( ( "noreflections" ~~ @calcprocedures ) or ( ( "composite" ~~ @calcprocedures ) and not( "groundreflections" ~~ @calcprocedures ) ) and ( "alldiff" ~~ @calcprocedures ) ) ) and not ( "embedded" ~~ @calcprocedures ) )
               {
                 print "obs black: " . mean( @{ $surftests{8}{$monthnum}{$surfnum}{$hour} } ) .
                 "; obs & ground black: " . mean( @{ $surftests{6}{$monthnum}{$surfnum}{$hour} } ) .
@@ -3643,7 +3661,7 @@ solar source sun
                 "; rel difference: $surftests{groundradnoshad}{$monthnum}{$surfnum}{$hour} .\nabs difference: $surftests{groundraddifference}{$monthnum}{$surfnum}{$hour}; shdf for ground $surftests{modrelation}{$monthnum}{$surfnum}{$hour}\n" ;
               }
 
-              if ( ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) and ( "alldiff" ~~ @calcprocedures ) ) and not( "plain" ~~ @calcprocedures ) )
+              if ( ( ( ( "composite" ~~ @calcprocedures ) and ( "groundreflections" ~~ @calcprocedures ) and ( "alldiff" ~~ @calcprocedures ) ) and not( "plain" ~~ @calcprocedures ) ) and not ( "embedded" ~~ @calcprocedures ) )
               {
                 print "obs black: " . mean( @{ $surftests{8}{$monthnum}{$surfnum}{$hour} } ) .
                 "; obs & ground black: " . mean( @{ $surftests{6}{$monthnum}{$surfnum}{$hour} } ) .
@@ -3651,24 +3669,24 @@ solar source sun
               }
 
 
-              if ( ( "composite" ~~ @calcprocedures ) and not( "plain" ~~ @calcprocedures ) )
+              if ( ( ( "composite" ~~ @calcprocedures ) and not( "plain" ~~ @calcprocedures ) ) and not ( "embedded" ~~ @calcprocedures ) )
               {
                 print "obs refl: $meanvaluesurf2; dir unrefl: $meanvaluesurf_dir2; diff: $meanvaluesurf_diff2 .
 obs black: $meanvaluesurf1; dir unrefl: $meanvaluesurf_dir1; diff: $meanvaluesurf_diff1\n" ;
               }
 
-              if ( "plain" ~~ @calcprocedures )
+              if ( ( "plain" ~~ @calcprocedures ) and not ( "embedded" ~~ @calcprocedures ) )
               {
                 print "obs refl: $meanvaluesurf2; obs black: $meanvaluesurf1\n" ;
               }
 
-              if ( "radical" ~~ @calcprocedures )
+              if ( ( "radical" ~~ @calcprocedures ) and not ( "embedded" ~~ @calcprocedures ) )
               {
                 print "model obs refl: $meanvaluesurf2; dir unrefl: $meanvaluesurf_dir2; diff: $meanvaluesurf_diff2 .
 no obs: $meanvaluesurf1; dir unrefl: $meanvaluesurf_dir1; diff: $meanvaluesurf_diff1\n" ;
               }
 
-              unless ( ( "noreflections" ~~ @calcprocedures ) or ( "plain" ~~ @calcprocedures ) )
+              unless ( ( "noreflections" ~~ @calcprocedures ) or ( "plain" ~~ @calcprocedures ) or ( "embedded" ~~ @calcprocedures ) )
               {
                 say "model 1 diff: $meanvaluesurf_diff1, model 1 tot: $meanvaluesurf1, model 1 dir: $meanvaluesurf_dir1. \nmodel 2 diff $meanvaluesurf_diff2, model 2 tot: $meanvaluesurf2, model 2 dir: $meanvaluesurf_dir2\n";
               }
@@ -3713,6 +3731,7 @@ sub createconstrdbfile
   open ( DBFILE, "$constrdbfile" ) or die;
   my @lines = <DBFILE>;
   close DBFILE;
+  my %exportconstr;
 
 #  my $topline; this is not used
   my $countline = 0;
@@ -3843,7 +3862,6 @@ if ( "oldconstrdb" ~~ @calcprocedures )
     my $cn = 0;
      my ( @materials, @newmaterials, @newcopy, @newbigcopy );
      my ( $newmatinssurf, $newmatextsurf );
-     my %exportconstr;
      foreach my $copyref ( @bigcopy )
      {
        my @constrlines = @$copyref;
@@ -3898,7 +3916,6 @@ if ( "oldconstrdb" ~~ @calcprocedures )
     # external material name.
     # Store the old and new material names, and form a hash relating new materials to the new constructions.
     my ( @materials, @newmaterials, @newcopy, @newbigcopy );
-    my %exportconstr;
     foreach my $copyref ( @bigcopy )
     {
       my @constrlines = @$copyref;
@@ -4796,7 +4813,6 @@ sub creatematdbfiles
   my @constrlines = <CONSTRDBFILE_F>;
   close CONSTRDBFILE_F;
 
-
   my @obs = uniq( map{ $_->[1] } @obsdata );
 
   my $count = 0;
@@ -4917,7 +4933,7 @@ sub creatematdbfiles
   }
 
 
-  if ( not( "radical" ~~ @calcprocedures ) )
+  if ( ( not ( "radical" ~~ @calcprocedures ) ) and ( not ( ( -e $matdbfile_f2 ) and ( "embedded" ~~ @calcprocedures ) ) ) )
   {
     open( my $MATDBFILE_F1, ">$matdbfile_f1" ) or die;
     foreach my $line ( @firstloop )
@@ -4936,9 +4952,7 @@ sub creatematdbfiles
   close $MATDBFILE_F2;
 
 
-
-
-  #if ( not( "noreflections" ~~ @calcprocedures ) )
+  unless ( ( -e $matdbfile_f6 ) and ( "embedded" ~~ @calcprocedures ) )
   {
     my ( @bag, @row, @firstloop, @secondloop );
     my $semaphore = "off";
@@ -5721,7 +5735,7 @@ sub getsolar
   }
 
 
-  $lat, $longdiff, $long, $localtime;
+
   open( NEWCLM, ">$clmavgs" ) or die;
   foreach my $m ( sort { $a <=> $b} ( keys %{ $t{avg}{dir} } ) )
   {
@@ -5816,6 +5830,12 @@ sub modish
   my @things = @_;
   my $modishdefpath;
   my %paths;
+
+  if ( $things[-1] =~ /embedded/ )
+  {
+    pop( @things );
+    push( @calcprocedures, "embedded" );
+  }
 
   my $launchfile = shift( @things );
 
@@ -6176,7 +6196,10 @@ sub modish
     my %datalist = %$datalistref;
     my @obsmaterials = @{ $obsmaterialsref };
 
-    createfictgeofile( $geofile, \@obsconstrset, $geofile_f, $geofile_f5, \%paths, \@calcprocedures, \@groups, $conffile, $conffile_f5 );
+    unless( ( ( -e $geofile_f ) or ( -e $geofile_f5 ) ) and ( "embedded" ~~ @calcprocedures ) )
+    {
+      createfictgeofile( $geofile, \@obsconstrset, $geofile_f, $geofile_f5, \%paths, \@calcprocedures, \@groups, $conffile, $conffile_f5 );
+    }
 
     if ( not( "radical" ~~ @calcprocedures ) )
     {
@@ -6229,8 +6252,13 @@ sub modish
       setroot( $conffile_f11, $path, $debug, \%paths );
     }
 
-    my ( $materialsref, $newmaterialsref, $matnumsref, $newmatnumsref, $exportconstrref ) =
-    createconstrdbfile( $constrdbfile, $constrdbfile_f, \@obsconstrset );
+    my ( $materialsref, $newmaterialsref, $matnumsref, $newmatnumsref, $exportconstrref );
+    unless ( ( -e $constrdbfile_f ) and ( "embedded" ~~ @calcprocedures ) )
+    {
+      ( $materialsref, $newmaterialsref, $matnumsref, $newmatnumsref, $exportconstrref ) =
+      createconstrdbfile( $constrdbfile, $constrdbfile_f, \@obsconstrset, \@calcprocedures );
+    }
+
 
     my ( $exportreflref, $obslayers_ref, $selectives_ref ) = creatematdbfiles( $matdbfile,
       $matdbfile_f1, $matdbfile_f2, $matdbfile_f6, \@calcprocedures, $constrdbfile_f, \@obsdata );

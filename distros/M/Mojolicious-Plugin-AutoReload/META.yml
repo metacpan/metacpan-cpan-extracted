@@ -28,7 +28,7 @@ no_index:
 provides:
   Mojolicious::Plugin::AutoReload:
     file: lib/Mojolicious/Plugin/AutoReload.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Mojolicious: '7'
   perl: '5.010'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://github.com/preaction/Mojolicious-Plugin-AutoReload/issues
   homepage: https://github.com/preaction/Mojolicious-Plugin-AutoReload
   repository: https://github.com/preaction/Mojolicious-Plugin-AutoReload.git
-version: '0.009'
+version: '0.010'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Robert DeRose <RobertDeRose@users.noreply.github.com>'

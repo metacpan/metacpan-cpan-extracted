@@ -40,7 +40,7 @@ resources:
   homepage: https://metacpan.org/release/Alien-Libevent
   license: http://dev.perl.org/licenses/
   repository: https://github.com/thibaultduponchelle/Alien-Libevent.git
-version: '2.5'
+version: '2.7'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.26'
   requires:

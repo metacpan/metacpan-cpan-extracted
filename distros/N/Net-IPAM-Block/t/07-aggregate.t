@@ -94,25 +94,7 @@ foreach my $item (@input) {
 @aggregated = map { $_->to_string } @aggregated;
 is_deeply( \@aggregated, \@expected, 'aggregate adjacent v6' );
 
-@input = qw(
-  255.255.255.255
-  ::
-);
-
-@expected = qw(
-  255.255.255.255/32
-  ::/128
-);
-
-undef @blocks;
-undef @aggregated;
-foreach my $item (@input) {
-  push @blocks, Net::IPAM::Block->new($item);
-}
-
-@aggregated = aggregate( shuffle @blocks );
-@aggregated = map { $_->to_string } @aggregated;
-is_deeply( \@aggregated, \@expected, 'aggregate, overflow check' );
+####
 
 @input = qw(
   0.0.0.0/0
@@ -215,5 +197,51 @@ foreach my $item (@input) {
 @aggregated = aggregate( shuffle @blocks );
 @aggregated = map { $_->to_string } @aggregated;
 is_deeply( \@aggregated, \@expected, 'aggregate, v6 shuffled' );
+
+###
+
+@input = qw(
+  255.255.255.0-255.255.255.200
+  255.255.255.150-255.255.255.255
+);
+
+@expected = qw(
+  255.255.255.0/24
+);
+
+@blocks = map { Net::IPAM::Block->new($_) } @input;
+@aggregated = map { $_->to_string } aggregate( @blocks );
+is_deeply( \@aggregated, \@expected, 'aggregate, v4 overflow check' );
+
+###
+
+@input = qw(
+  ffff::1-ffff::5
+  ffff::3-ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+);
+
+@expected = qw(
+  ffff::1-ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+);
+
+@blocks = map { Net::IPAM::Block->new($_) } @input;
+@aggregated = map { $_->to_string } aggregate( @blocks );
+is_deeply( \@aggregated, \@expected, 'aggregate, v6 overflow check' );
+
+####
+
+@input = qw(
+  255.255.255.255
+  ::
+);
+
+@expected = qw(
+  255.255.255.255/32
+  ::/128
+);
+
+@blocks = map { Net::IPAM::Block->new($_) } @input;
+@aggregated = map { $_->to_string } aggregate( @blocks );
+is_deeply( \@aggregated, \@expected, 'aggregate, overflow check' );
 
 done_testing();

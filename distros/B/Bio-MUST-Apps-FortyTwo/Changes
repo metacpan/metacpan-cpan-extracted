@@ -1,2 +1,19 @@
+0.202160  2020-08-03 20:10:23+02:00 Europe/Brussels
+    - Additions
+      - 42: Optional consolidation of redundant orthologues (through CAP3 contiging)
+      - 42: Support for basic multithreading (--threads command-line option)
+      - 1331: Added 'off' value for aligner_mode (e.g., to extract UTRs)
+    - Changes
+      - 42/1331: Improved warning/error messages (prefixed by [RUN] etc)
+      - 42/1331: Renamed some options in YAML file (ref_brh_mode => ref_brh, trimming_mode => trim_homologues, ali_patch_mode => ali_skip_self, ls_action => ali_keep_lengthened_seqs)
+      - 42: Inverted columns in yaml-generator.pl mapper (IDM) files for consistency with Bio::MUST::Core
+      - 42: Updated yaml-generator.pl to mirror option name changes
+      - 42: Enabled auto-detagging of preexisting #NEW# seqs (but see ali_keep_old_new_tags)
+      - 42: Improved robustness of orgs and query_orgs name checking in YAML file
+    - Fixes
+      - 42: Fixed bug leading to empty tax_reports in metagenomic mode
+      - 42: Fixed bug where preexisting #NEW# seqs causing a "Can't call method "stringify" on an undefined value"
+      - 42: Fixed bug where preexisting #NEW# seqs were removed due to wrongly detected redundancy
+
 0.190820  2019-03-23 18:19:55+01:00 Europe/Brussels
     - first release

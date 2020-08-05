@@ -4,12 +4,12 @@ package JSON::Schema::Draft201909::Error;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single error from a JSON Schema evaluation
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Moo;
 use MooX::TypeTiny;
-use Types::Standard 'Str';
+use Types::Standard qw(Str Undef);
 use namespace::clean;
 
 has [qw(
@@ -28,12 +28,18 @@ has absolute_keyword_location => (
   coerce => sub { "$_[0]" },
 );
 
+has keyword => (
+  is => 'ro',
+  isa => Str|Undef,
+  required => 1,
+);
+
 sub TO_JSON {
   my $self = shift;
   return +{
     instanceLocation => $self->instance_location,
     keywordLocation => $self->keyword_location,
-    !$self->absolute_keyword_location ? ()
+    !defined($self->absolute_keyword_location) ? ()
       : ( absoluteKeywordLocation => $self->absolute_keyword_location ),
     error => $self->error,  # TODO: allow localization
   };
@@ -55,7 +61,7 @@ JSON::Schema::Draft201909::Error - Contains a single error from a JSON Schema ev
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -75,6 +81,10 @@ An instance of this class holds one error from evaluating a JSON Schema with
 L<JSON::Schema::Draft201909>.
 
 =head1 ATTRIBUTES
+
+=head2 keyword
+
+The keyword that produced the error; might be C<undef>.
 
 =head2 instance_location
 

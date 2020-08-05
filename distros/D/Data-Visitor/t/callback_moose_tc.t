@@ -1,5 +1,3 @@
-#!perl
-
 # Bug report that initiated this debugging:
 # https://rt.cpan.org/Ticket/Display.html?id=81519
 

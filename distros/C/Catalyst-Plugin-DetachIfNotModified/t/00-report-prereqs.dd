@@ -31,6 +31,7 @@ do { my $x = {
                                       'Catalyst' => '5.90018',
                                       'HTTP::Headers' => '5.18',
                                       'HTTP::Status' => '0',
+                                      'List::Util' => '0',
                                       'Moose::Role' => '0',
                                       'Ref::Util' => '0',
                                       'namespace::autoclean' => '0'

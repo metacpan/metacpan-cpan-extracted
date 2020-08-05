@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Leel::OrgProcessor;
 # ABSTRACT: Internal class for leel tool
-$Bio::MUST::Apps::Leel::OrgProcessor::VERSION = '0.190820';
+$Bio::MUST::Apps::Leel::OrgProcessor::VERSION = '0.202160';
 use Moose;
 use namespace::autoclean;
 
@@ -77,7 +77,7 @@ sub _build_protein_seqs {
 
     my @seqs = $ali->filter_seqs( sub { $_->full_org eq $org } );
 
-    carp "Warning: no seq for org $org; skipping org!"
+    carp "[ORG] Warning: no seq for org $org; skipping org!"
         unless @seqs;
 
     return Temporary->new( seqs => \@seqs );
@@ -194,22 +194,24 @@ sub _build_transcript_seqs {
 
     # check that all transcripts were indeed recovered
     my $missing_n = $self->protein_seqs->count_seqs - @seqs;
-    carp "Warning: cannot find $missing_n transcript(s): skipping it (them)!"
-        if $missing_n;
+    carp "[ORG] Warning: cannot find $missing_n transcript(s):"
+        . ' skipping it (them)!' if $missing_n;
 
     return Ali->new( seqs => \@seqs );
 }
 
+
+# TODO: integrate directly into 42?
 
 sub _build_aligned_seqs {
     my $self = shift;
 
     ##### [ORG] Aligning transcripts...
 
-    my $aligned_seqs = Ali->new();
-
     my $ap = $self->ali_proc;
     my $rp = $ap->run_proc;
+
+    my $aligned_seqs = Ali->new();
 
     TRANSCRIPT:
     for my $transcript_seq ( $self->transcript_seqs->all_seqs ) {
@@ -252,12 +254,24 @@ sub BUILD {
     my $self = shift;
 
     my $ap = $self->ali_proc;
+    my $rp = $ap->run_proc;
+
+    # TODO1: allow starting from .tax_reports (possibly post-CAP3)
+    # TODO2: deal with CAP3-generated ALIs... (not easy at all, hence TODO1)
 
     ##### [ORG] proteins: display( $self->protein_seqs->all_long_ids )
     return unless $self->protein_seqs->all_long_ids;
 
     ##### [ORG] transcripts: display( map { $_->full_id } $self->transcript_seqs->all_seq_ids  )
     return unless $self->transcript_seqs->all_seq_ids;
+
+    # optionally add transcript_seqs as is (without alignment)
+    if ($rp->aligner_mode eq 'off') {
+        # TODO: handle reversed-complemented seqs
+        ##### [ORG] Adding raw seqs to file...
+        $ap->cds_ali->add_seq( $self->transcript_seqs->all_seqs );
+        return;
+    }
 
     ##### [ORG] aligned: display( map { $_->full_id } $self->aligned_seqs->all_seq_ids )
     return unless $self->aligned_seqs->all_seq_ids;
@@ -282,7 +296,7 @@ Bio::MUST::Apps::Leel::OrgProcessor - Internal class for leel tool
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 AUTHOR
 

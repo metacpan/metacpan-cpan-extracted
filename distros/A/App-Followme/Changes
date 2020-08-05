@@ -1,5 +1,10 @@
 Revision history for Perl extension App::Followme
 
+1.95 2020-08-04T15:32:22Z
+	- more changes to tests to make them portable
+	- redid style sheets, templates, and index.html file
+	- change functional test directory name from archive to essays 
+
 1.94 2020-05-11T14:05:39Z
 	- set permissions on directory when creating files for testing
 	- set file modify times instead of sleeping in tests

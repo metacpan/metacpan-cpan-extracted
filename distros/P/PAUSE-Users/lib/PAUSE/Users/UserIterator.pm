@@ -1,5 +1,5 @@
 package PAUSE::Users::UserIterator;
-$PAUSE::Users::UserIterator::VERSION = '0.07';
+$PAUSE::Users::UserIterator::VERSION = '0.08';
 use strict;
 use warnings;
 use 5.14.0;

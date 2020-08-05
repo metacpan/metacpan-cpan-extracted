@@ -603,19 +603,36 @@ typetiny_is_an_instance_of(pTHX_ HV* const stash, SV* const instance){
         }
         /* the instance has its own isa method */
         else {
-            SV* package;
-            int ok;
+            dSP;
+            CV *isacv = isGV(myisa) ? GvCV(myisa) : (CV *)myisa;
+            SV *retsv;
+            SV *package;
+            bool ret;
+
+            package = newSVpvn_share(HvNAME_get(stash), HvNAMELEN_get(stash), 0U);
+
+            PUTBACK;
 
             ENTER;
             SAVETMPS;
 
-            package = newSVpvn_share(HvNAME_get(stash), HvNAMELEN_get(stash), 0U);
-            ok = sv_true(mcall1s(instance, "isa", sv_2mortal(package)));
+            EXTEND(SP, 2);
+            PUSHMARK(SP);
+            PUSHs(instance);
+            PUSHs(package);
+            PUTBACK;
+
+            call_sv((SV *)isacv, G_SCALAR);
+
+            SPAGAIN;
+            retsv = POPs;
+            ret = SvTRUE(retsv);
+            PUTBACK;
 
             FREETMPS;
             LEAVE;
 
-            return ok;
+            return ret;
         }
     }
     return FALSE;

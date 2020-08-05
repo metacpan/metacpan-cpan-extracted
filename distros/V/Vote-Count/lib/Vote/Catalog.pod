@@ -2,7 +2,7 @@
 
 =pod
 
-=head1 VERSION 1.06
+=head1 VERSION 1.07
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ A catalog of common Vote Counting Systems and their implementation in Vote::Coun
 
 =head2 Borda Count
 
-Methods which assign scores to choices by their ranking. 
+And other Methods which assign scores to choices by their ranking. 
 
 =over
 
@@ -36,11 +36,6 @@ Nansen: I<needs example>
 =item *
 
 Baldwin: I<needs example>
-
-
-=item *
-
-Minet: I<needs example>
 
 
 =item *
@@ -73,7 +68,19 @@ SmithSet IRV: L<Vote::Count::Method::CondorcetIRV|https://metacpan.org/pod/Vote:
 =back
 
 
-=head2 Condorcet
+=head2 PairWise
+
+
+=head3 Non Condorcet Pairwise
+
+=over
+
+=item *
+
+MinMax (Opposition) L<Vote::Count::Method::MinMax|https://metacpan.org/pod/Vote::Count::Method::MinMax>
+
+
+=back
 
 
 =head3 Simple Condorcet
@@ -122,6 +129,11 @@ SSD: I<unimplemented>
 Kemmeny-Young: I<unimplemented>
 
 
+=item *
+
+MinMax (Winning Votes and Margin) L<Vote::Count::Method::MinMax|https://metacpan.org/pod/Vote::Count::Method::MinMax>
+
+
 =back
 
 
@@ -144,7 +156,7 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 =head2 CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019, 2020 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 
 =head1 LICENSE

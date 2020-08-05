@@ -12,4 +12,6 @@ use constant _DEFERRED_CR => undef;
 
 *_then = \&Promise::ES6::then;
 
+*_finally = \&Promise::ES6::finally;
+
 1;

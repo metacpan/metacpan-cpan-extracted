@@ -1,5 +1,16 @@
 Revision history for Perl extension App::Wax.
 
+2.4.1 - 2020-08-04
+
+    - portability: fix test failures on Strawberry Perl (thanks, Alexandr Ciornii)
+
+2.4.0 - 2020-08-03
+
+    - allow option bundling, e.g. `-c -D` can be written as `-cD`
+    - add --default-directory as an alias for -D
+    - allow the user agent to be defined via $WAX_USER_AGENT
+    - remove the separate module versioning
+
 2.3.3 - 2020-05-04
 
     - version bump to fix deletion of previous version from PAUSE
@@ -82,7 +93,7 @@ Revision history for Perl extension App::Wax.
 1.0.0 - 2015-02-03
 
     - breaking changes:
-        - the separator is now opt-in i.e. `--` is no longer the default separator
+        - the separator is now opt-in, i.e. `--` is no longer the default separator
             - as a result the -S/--no-separator option has been removed
         - -d/--debug is now -v/--verbose
         - -d is now short for --dir/--directory

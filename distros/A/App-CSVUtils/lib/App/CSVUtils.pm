@@ -1,9 +1,9 @@
 package App::CSVUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-30'; # DATE
+our $DATE = '2020-08-03'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,8 +34,9 @@ sub _get_field_idx {
 }
 
 sub _get_csv_row {
-    my ($csv, $row, $i, $has_header) = @_;
-    return "" if $i == 1 && !$has_header;
+    my ($csv, $row, $i, $outputs_header) = @_;
+    #use DD; print "  "; dd $row;
+    return "" if $i == 1 && !$outputs_header;
     my $status = $csv->combine(@$row)
         or die "Error in line $i: ".$csv->error_input."\n";
     $csv->string . "\n";
@@ -50,22 +51,28 @@ sub _instantiate_parser_default {
 sub _instantiate_parser {
     require Text::CSV_XS;
 
-    my $args = shift;
+    my ($args, $prefix) = @_;
+    $prefix //= '';
 
     my %tcsv_opts = (binary=>1);
-    if (defined $args->{sep_char} ||
-            defined $args->{quote_char} ||
-            defined $args->{escape_char}) {
-        $tcsv_opts{sep_char}    = $args->{sep_char}    if defined $args->{sep_char};
-        $tcsv_opts{quote_char}  = $args->{quote_char}  if defined $args->{quote_char};
-        $tcsv_opts{escape_char} = $args->{escape_char} if defined $args->{escape_char};
+    if (defined $args->{"${prefix}sep_char"} ||
+            defined $args->{"${prefix}quote_char"} ||
+            defined $args->{"${prefix}escape_char"}) {
+        $tcsv_opts{"sep_char"}    = $args->{"${prefix}sep_char"}    if defined $args->{"${prefix}sep_char"};
+        $tcsv_opts{"quote_char"}  = $args->{"${prefix}quote_char"}  if defined $args->{"${prefix}quote_char"};
+        $tcsv_opts{"escape_char"} = $args->{"${prefix}escape_char"} if defined $args->{"${prefix}escape_char"};
     } elsif ($args->{tsv}) {
-        $tcsv_opts{sep_char}    = "\t";
-        $tcsv_opts{quote_char}  = undef;
-        $tcsv_opts{escape_char} = undef;
+        $tcsv_opts{"sep_char"}    = "\t";
+        $tcsv_opts{"quote_char"}  = undef;
+        $tcsv_opts{"escape_char"} = undef;
     }
 
     Text::CSV_XS->new(\%tcsv_opts);
+}
+
+sub _instantiate_emitter {
+    my $args = shift;
+    _instantiate_parser($args, 'output_');
 }
 
 sub _complete_field_or_field_list {
@@ -101,14 +108,14 @@ sub _complete_field_or_field_list {
     return undef if $args->{filename} eq '-';
 
     # can the file be opened?
-    my $csv = _instantiate_parser(\%args);
+    my $csv_parser = _instantiate_parser(\%args);
     open my($fh), "<encoding(utf8)", $args->{filename} or do {
         #warn "csvutils: Cannot open file '$args->{filename}': $!\n";
         return [];
     };
 
     # can the header row be read?
-    my $row = $csv->getline($fh) or return [];
+    my $row = $csv_parser->getline($fh) or return [];
 
     if (defined $args->{header} && !$args->{header}) {
         $row = [map {"field$_"} 1 .. @$row];
@@ -145,7 +152,7 @@ sub _complete_sort_field_list {
 
 our %args_common = (
     header => {
-        summary => 'Whether CSV has a header row',
+        summary => 'Whether input CSV has a header row',
         schema => 'bool*',
         default => 1,
         description => <<'_',
@@ -157,6 +164,8 @@ assumed to contain the first data row. Fields will be named `field1`, `field2`,
 and so on.
 
 _
+        cmdline_aliases => {input_header=>{}},
+        tags => ['category:input'],
     },
     tsv => {
         summary => "Inform that input file is in TSV (tab-separated) format instead of CSV",
@@ -167,33 +176,106 @@ Overriden by `--sep-char`, `--quote-char`, `--escape-char` options. If one of
 those options is specified, then `--tsv` will be ignored.
 
 _
+        cmdline_aliases => {input_tsv=>{}},
+        tags => ['category:input'],
     },
     sep_char => {
-        summary => 'Specify field separator character, will be passed to Text::CSV_XS',
+        summary => 'Specify field separator character in input CSV, will be passed to Text::CSV_XS',
         schema => ['str*', len=>1],
         description => <<'_',
 
 Defaults to `,` (comma). Overrides `--tsv` option.
 
 _
+        tags => ['category:input'],
     },
     quote_char => {
-        summary => 'Specify field quote character, will be passed to Text::CSV_XS',
+        summary => 'Specify field quote character in input CSV, will be passed to Text::CSV_XS',
         schema => ['str*', len=>1],
         description => <<'_',
 
 Defaults to `"` (double quote). Overrides `--tsv` option.
 
 _
+        tags => ['category:input'],
     },
     escape_char => {
-        summary => 'Specify character to escape value in field, will be passed to Text::CSV_XS',
+        summary => 'Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS',
         schema => ['str*', len=>1],
         description => <<'_',
 
 Defaults to `\\` (backslash). Overrides `--tsv` option.
 
 _
+        tags => ['category:input'],
+    },
+);
+
+our %args_csv_output = (
+    output_header => {
+        summary => 'Whether output CSV should have a header row',
+        schema => 'bool*',
+        description => <<'_',
+
+By default, a header row will be output *if* input CSV has header row. Under
+`--output-header`, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+`--no-output-header`, header row will *not* be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+_
+        tags => ['category:output'],
+    },
+    output_tsv => {
+        summary => "Inform that output file is TSV (tab-separated) format instead of CSV",
+        schema => 'bool*',
+        description => <<'_',
+
+This is like `--tsv` option but for output instead of input.
+
+Overriden by `--output-sep-char`, `--output-quote-char`, `--output-escape-char`
+options. If one of those options is specified, then `--output-tsv` will be
+ignored.
+
+_
+        tags => ['category:output'],
+    },
+    output_sep_char => {
+        summary => 'Specify field separator character in output CSV, will be passed to Text::CSV_XS',
+        schema => ['str*', len=>1],
+        description => <<'_',
+
+This is like `--sep-char` option but for output instead of input.
+
+Defaults to `,` (comma). Overrides `--output-tsv` option.
+
+_
+        tags => ['category:output'],
+    },
+    output_quote_char => {
+        summary => 'Specify field quote character in output CSV, will be passed to Text::CSV_XS',
+        schema => ['str*', len=>1],
+        description => <<'_',
+
+This is like `--quote-char` option but for output instead of input.
+
+Defaults to `"` (double quote). Overrides `--output-tsv` option.
+
+_
+        tags => ['category:output'],
+    },
+    output_escape_char => {
+        summary => 'Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS',
+        schema => ['str*', len=>1],
+        description => <<'_',
+
+This is like `--escape-char` option but for output instead of input.
+
+Defaults to `\\` (backslash). Overrides `--output-tsv` option.
+
+_
+        tags => ['category:output'],
     },
 );
 
@@ -209,6 +291,7 @@ _
         req => 1,
         pos => 1,
         cmdline_aliases => {f=>{}},
+        tags => ['category:input'],
     },
 );
 
@@ -224,6 +307,7 @@ _
         req => 1,
         pos => 0,
         cmdline_aliases => {f=>{}},
+        tags => ['category:input'],
     },
 );
 
@@ -241,6 +325,15 @@ _
         pos => 0,
         slurpy => 1,
         cmdline_aliases => {f=>{}},
+        tags => ['category:input'],
+    },
+);
+
+our %argopt_field = (
+    field => {
+        summary => 'Field name',
+        schema => 'str*',
+        cmdline_aliases => { F=>{} },
     },
 );
 
@@ -413,6 +506,14 @@ our %arg_eval = (
     },
 );
 
+our %argopt_eval = (
+    eval => {
+        summary => 'Perl code to do munging',
+        schema => ['any*', of=>['str*', 'code*']],
+        cmdline_aliases => { e=>{} },
+    },
+);
+
 our %arg_hash = (
     hash => {
         summary => 'Provide row in $_ as hashref instead of arrayref',
@@ -458,6 +559,7 @@ $SPEC{csvutil} = {
                 #'concat', # not implemented in csvutil
                 'select-fields',
                 'dump',
+                'csv',
                 #'setop', # not implemented in csvutil
                 #'lookup-fields', # not implemented in csvutil
             ]],
@@ -466,16 +568,8 @@ $SPEC{csvutil} = {
             cmdline_aliases => {a=>{}},
         },
         %arg_filename_1,
-        eval => {
-            summary => 'Perl code to do munging',
-            schema => ['any*', of=>['str*', 'code*']],
-            cmdline_aliases => { e=>{} },
-        },
-        field => {
-            summary => 'Field name',
-            schema => 'str*',
-            cmdline_aliases => { F=>{} },
-        },
+        %argopt_eval,
+        %argopt_field,
     },
     args_rels => {
     },
@@ -485,9 +579,11 @@ sub csvutil {
 
     my $action = $args{action};
     my $has_header = $args{header} // 1;
+    my $outputs_header = $args{output_header} // $has_header;
     my $add_newline = $args{add_newline} // 1;
 
-    my $csv = _instantiate_parser(\%args);
+    my $csv_parser  = _instantiate_parser(\%args);
+    my $csv_emitter = _instantiate_emitter(\%args);
     my $fh;
     if ($args{filename} eq '-') {
         $fh = *STDIN;
@@ -518,7 +614,7 @@ sub csvutil {
     my $row0;
     my $code_getline = sub {
         if ($i == 0 && !$has_header) {
-            $row0 = $csv->getline($fh);
+            $row0 = $csv_parser->getline($fh);
             return unless $row0;
             return [map { "field$_" } 1..@$row0];
         } elsif ($i == 1 && !$has_header) {
@@ -526,12 +622,13 @@ sub csvutil {
             return $row0;
         }
         $data_row_count++;
-        $csv->getline($fh);
+        $csv_parser->getline($fh);
     };
 
     my $rows = [];
 
     while (my $row = $code_getline->()) {
+        #use DD; dd $row;
         $i++;
         if ($i == 1) {
             # header row
@@ -587,6 +684,7 @@ sub csvutil {
             } elsif ($action eq 'map') {
             } elsif ($action eq 'sort-rows') {
             } elsif ($action eq 'each-row') {
+            } elsif ($action eq 'csv') {
             }
         } # if i==1 (header row)
 
@@ -606,7 +704,7 @@ sub csvutil {
                     local $_ = $row->[$field_idx];
                     local $main::row = $row;
                     local $main::rownum = $i;
-                    local $main::csv = $csv;
+                    local $main::csv = $csv_parser;
                     local $main::field_idxs = \%field_idxs;
                     eval { $code->($_) };
                     die "Error while munging row ".
@@ -614,7 +712,7 @@ sub csvutil {
                     $row->[$field_idx] = $_;
                 }
             }
-            $res .= _get_csv_row($csv, $row, $i, $has_header);
+            $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
         } elsif ($action eq 'add-field') {
             if ($i == 1) {
                 if (defined $args{_at}) {
@@ -661,7 +759,7 @@ sub csvutil {
                     local $_;
                     local $main::row = $row;
                     local $main::rownum = $i;
-                    local $main::csv = $csv;
+                    local $main::csv = $csv_parser;
                     local $main::field_idxs = \%field_idxs;
                     eval { $_ = $code->() };
                     die "Error while adding field '$args{field}' for row #$i: $@\n"
@@ -669,7 +767,7 @@ sub csvutil {
                     splice @$row, $field_idx, 0, $_;
                 }
             }
-            $res .= _get_csv_row($csv, $row, $i, $has_header);
+            $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
         } elsif ($action eq 'delete-field') {
             if (!defined($field_idxs_array)) {
                 $field_idxs_array = [];
@@ -688,7 +786,7 @@ sub csvutil {
                     splice @$row, $_, 1;
                 }
             }
-            $res .= _get_csv_row($csv, $row, $i, $has_header);
+            $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
         } elsif ($action eq 'select-fields') {
             if (!defined($field_idxs_array)) {
                 $field_idxs_array = [];
@@ -706,7 +804,7 @@ sub csvutil {
                 }
             }
             $row = [map { $row->[$_] } @$field_idxs_array];
-            $res .= _get_csv_row($csv, $row, $i, $has_header);
+            $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
         } elsif ($action eq 'sort-fields') {
             unless ($i == 1) {
                 my @new_row;
@@ -715,34 +813,34 @@ sub csvutil {
                 }
                 $row = \@new_row;
             }
-            $res .= _get_csv_row($csv, $row, $i, $has_header);
+            $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
         } elsif ($action eq 'sum') {
             if ($i == 1) {
-                $res .= _get_csv_row($csv, $row, $i, $has_header);
+                $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
             } else {
                 require Scalar::Util;
                 for (0..$#{$row}) {
                     next unless Scalar::Util::looks_like_number($row->[$_]);
                     $summary_row[$_] += $row->[$_];
                 }
-                $res .= _get_csv_row($csv, $row, $i, $has_header)
+                $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header)
                     if $args{_with_data_rows};
             }
         } elsif ($action eq 'avg') {
             if ($i == 1) {
-                $res .= _get_csv_row($csv, $row, $i, $has_header);
+                $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
             } else {
                 require Scalar::Util;
                 for (0..$#{$row}) {
                     next unless Scalar::Util::looks_like_number($row->[$_]);
                     $summary_row[$_] += $row->[$_];
                 }
-                $res .= _get_csv_row($csv, $row, $i, $has_header)
+                $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header)
                     if $args{_with_data_rows};
             }
         } elsif ($action eq 'select-row') {
             if ($i == 1 || $row_spec_sub->($i)) {
-                $res .= _get_csv_row($csv, $row, $i, $has_header);
+                $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
             }
         } elsif ($action eq 'split') {
             next if $i == 1;
@@ -759,10 +857,10 @@ sub csvutil {
                     or die "Can't open '$split_filename': $!\n";
             }
             if ($split_lines == 0 && $has_header) {
-                $csv->print($split_fh, $fields);
+                $csv_emitter->print($split_fh, $fields);
                 print $split_fh "\n";
             }
-            $csv->print($split_fh, $row);
+            $csv_emitter->print($split_fh, $row);
             print $split_fh "\n";
             $split_lines++;
         } elsif ($action eq 'grep') {
@@ -773,11 +871,11 @@ sub csvutil {
                 local $_ = $args{hash} ? _array2hash($row, $fields) : $row;
                 local $main::row = $row;
                 local $main::rownum = $i;
-                local $main::csv = $csv;
+                local $main::csv = $csv_parser;
                 local $main::field_idxs = \%field_idxs;
                 $code->($row);
             }) {
-                $res .= _get_csv_row($csv, $row, $i, $has_header);
+                $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
             }
         } elsif ($action eq 'map' || $action eq 'each-row') {
             unless ($code) {
@@ -788,7 +886,7 @@ sub csvutil {
                     local $_ = $args{hash} ? _array2hash($row, $fields) : $row;
                     local $main::row = $row;
                     local $main::rownum = $i;
-                    local $main::csv = $csv;
+                    local $main::csv = $csv_parser;
                     local $main::field_idxs = \%field_idxs;
                     $code->($row);
                 } // '';
@@ -813,6 +911,8 @@ sub csvutil {
             } else {
                 push @$rows, $row;
             }
+        } elsif ($action eq 'csv') {
+            $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
         } else {
             return [400, "Unknown action '$action'"];
         }
@@ -846,16 +946,16 @@ sub csvutil {
     }
 
     if ($action eq 'sum') {
-        $res .= _get_csv_row($csv, \@summary_row,
+        $res .= _get_csv_row($csv_emitter, \@summary_row,
                              $args{_with_data_rows} ? $i+1 : 2,
-                             $has_header);
+                             $outputs_header);
     } elsif ($action eq 'avg') {
         if ($i > 2) {
             for (@summary_row) { $_ /= ($i-1) }
         }
-        $res .= _get_csv_row($csv, \@summary_row,
+        $res .= _get_csv_row($csv_emitter, \@summary_row,
                              $args{_with_data_rows} ? $i+1 : 2,
-                             $has_header);
+                             $outputs_header);
     }
 
     if ($action eq 'dump') {
@@ -952,11 +1052,11 @@ sub csvutil {
         }
 
         if ($has_header) {
-            $csv->combine(@$fields);
-            $res .= $csv->string . "\n";
+            $csv_emitter->combine(@$fields);
+            $res .= $csv_emitter->string . "\n";
         }
         for my $row (@$rows) {
-            $res .= _get_csv_row($csv, $row, $i, $has_header);
+            $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
         }
     }
 
@@ -981,6 +1081,7 @@ field), or `--at` (to put at specific position, 1 means as the first field).
 _
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         %arg_field_1_nocomp,
         %arg_eval_2,
@@ -1003,6 +1104,7 @@ _
     args_rels => {
         choose_one => [qw/after before at/],
     },
+    tags => ['outputs_csv'],
 };
 sub csv_add_field {
     my %args = @_;
@@ -1045,9 +1147,11 @@ $SPEC{csv_delete_field} = {
     summary => 'Delete one or more fields from CSV file',
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         %arg_fields_1,
     },
+    tags => ['outputs_csv'],
 };
 sub csv_delete_field {
     my %args = @_;
@@ -1068,10 +1172,12 @@ object. `$main::field_idxs` is also available for additional information.
 _
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         %arg_field_1,
         %arg_eval_2,
     },
+    tags => ['outputs_csv'],
 };
 sub csv_munge_field {
     my %args = @_;
@@ -1092,6 +1198,7 @@ newline (`--with-nothing`), replace with encoded representation
 _
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         with => {
             schema => 'str*',
@@ -1103,12 +1210,14 @@ _
             },
         },
     },
+    tags => ['outputs_csv'],
 };
 sub csv_replace_newline {
     my %args = @_;
     my $with = $args{with};
 
-    my $csv = _instantiate_parser(\%args);
+    my $csv_parser  = _instantiate_parser(\%args);
+    my $csv_emitter = _instantiate_emitter(\%args);
     my $fh;
     if ($args{filename} eq '-') {
         $fh = *STDIN;
@@ -1120,14 +1229,14 @@ sub csv_replace_newline {
 
     my $res = "";
     my $i = 0;
-    while (my $row = $csv->getline($fh)) {
+    while (my $row = $csv_parser->getline($fh)) {
         $i++;
         for my $col (@$row) {
             $col =~ s/[\015\012]+/$with/g;
         }
-        my $status = $csv->combine(@$row)
-            or die "Error in line $i: ".$csv->error_input;
-        $res .= $csv->string . "\n";
+        my $status = $csv_emitter->combine(@$row)
+            or die "Error in line $i: ".$csv_emitter->error_input;
+        $res .= $csv_emitter->string . "\n";
     }
 
     [200, "OK", $res, {"cmdline.skip_format"=>1}];
@@ -1219,6 +1328,7 @@ descending length of name):
 _
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         %args_sort_rows_short,
         %arg_hash,
@@ -1226,12 +1336,13 @@ _
     args_rels => {
         req_one => ['by_fields', 'by_code', 'by_sortsub'],
     },
+    tags => ['outputs_csv'],
 };
 sub csv_sort_rows {
     my %args = @_;
 
     my %csvutil_args = (
-        hash_subset(\%args, \%args_common),
+        hash_subset(\%args, \%args_common, \%args_csv_output),
         filename => $args{filename},
         action => 'sort-rows',
         sort_reverse => $args{reverse},
@@ -1270,15 +1381,17 @@ provides the ordering, e.g. `--example a,c,b`.
 _
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         %args_sort_fields_short,
     },
+    tags => ['outputs_csv'],
 };
 sub csv_sort_fields {
     my %args = @_;
 
     my %csvutil_args = (
-        hash_subset(\%args, \%args_common),
+        hash_subset(\%args, \%args_common, \%args_csv_output),
         filename => $args{filename},
         action => 'sort-fields',
         (sort_example => $args{example}) x !!defined($args{example}),
@@ -1294,9 +1407,11 @@ $SPEC{csv_sum} = {
     summary => 'Output a summary row which are arithmetic sums of data rows',
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         %arg_with_data_rows,
     },
+    tags => ['outputs_csv'],
 };
 sub csv_sum {
     my %args = @_;
@@ -1309,9 +1424,11 @@ $SPEC{csv_avg} = {
     summary => 'Output a summary row which are arithmetic averages of data rows',
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         %arg_with_data_rows,
     },
+    tags => ['outputs_csv'],
 };
 sub csv_avg {
     my %args = @_;
@@ -1324,6 +1441,7 @@ $SPEC{csv_select_row} = {
     summary => 'Only output specified row(s)',
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         row_spec => {
             schema => 'str*',
@@ -1336,6 +1454,7 @@ $SPEC{csv_select_row} = {
     links => [
         {url=>"prog:csv-split"},
     ],
+    tags => ['outputs_csv'],
 };
 sub csv_select_row {
     my %args = @_;
@@ -1361,6 +1480,7 @@ Interface is loosely based on the `split` Unix utility.
 _
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         lines => {
             schema => ['uint*', min=>1],
@@ -1376,6 +1496,7 @@ _
     links => [
         {url=>"prog:csv-select-row"},
     ],
+    tags => ['outputs_csv'],
 };
 sub csv_split {
     my %args = @_;
@@ -1401,6 +1522,7 @@ where Perl expression returns true will be included in the result.
 _
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         %arg_eval,
         %arg_hash,
@@ -1423,6 +1545,7 @@ _
     links => [
         {url=>'prog:csvgrep'},
     ],
+    tags => ['outputs_csv'],
 };
 sub csv_grep {
     my %args = @_;
@@ -1586,8 +1709,10 @@ will result in:
 _
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filenames_0,
     },
+    tags => ['outputs_csv'],
 };
 sub csv_concat {
     my %args = @_;
@@ -1596,7 +1721,7 @@ sub csv_concat {
     my @rows;
 
     for my $filename (@{ $args{filenames} }) {
-        my $csv = _instantiate_parser(\%args);
+        my $csv_parser  = _instantiate_parser(\%args);
         my $fh;
         if ($filename eq '-') {
             $fh = *STDIN;
@@ -1608,7 +1733,7 @@ sub csv_concat {
 
         my $i = 0;
         my $fields;
-        while (my $row = $csv->getline($fh)) {
+        while (my $row = $csv_parser->getline($fh)) {
             $i++;
             if ($i == 1) {
                 $fields = $row;
@@ -1630,21 +1755,21 @@ sub csv_concat {
 
     my $num_fields = keys %res_field_idxs;
     my $res = "";
-    my $csv = _instantiate_parser_default();
+    my $csv_emitter = _instantiate_emitter(\%args);
 
     # generate header
-    my $status = $csv->combine(
+    my $status = $csv_emitter->combine(
         sort { $res_field_idxs{$a} <=> $res_field_idxs{$b} }
             keys %res_field_idxs)
-        or die "Error in generating result header row: ".$csv->error_input;
-    $res .= $csv->string . "\n";
+        or die "Error in generating result header row: ".$csv_emitter->error_input;
+    $res .= $csv_emitter->string . "\n";
     for my $i (0..$#rows) {
         my $row = $rows[$i];
         $row->[$num_fields-1] = undef if @$row < $num_fields;
-        my $status = $csv->combine(@$row)
+        my $status = $csv_emitter->combine(@$row)
             or die "Error in generating data row #".($i+1).": ".
-            $csv->error_input;
-        $res .= $csv->string . "\n";
+            $csv_emitter->error_input;
+        $res .= $csv_emitter->string . "\n";
     }
     [200, "OK", $res, {"cmdline.skip_format"=>1}];
 }
@@ -1654,12 +1779,14 @@ $SPEC{csv_select_fields} = {
     summary => 'Only output selected field(s)',
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filename_0,
         %arg_fields_or_field_pat,
     },
     args_rels => {
         req_one => ['fields', 'field_pat'],
     },
+    tags => ['outputs_csv'],
 };
 sub csv_select_fields {
     my %args = @_;
@@ -1679,6 +1806,27 @@ $SPEC{csv_dump} = {
 sub csv_dump {
     my %args = @_;
     csvutil(%args, action=>'dump');
+}
+
+$SPEC{csv_csv} = {
+    v => 1.1,
+    summary => 'Convert CSV to CSV',
+    description => <<'_',
+
+Why convert CSV to CSV? When you want to change separator/quote/escape
+character, for one.
+
+_
+    args => {
+        %args_common,
+        %args_csv_output,
+        %arg_filename_0,
+        %arg_hash,
+    },
+};
+sub csv_csv {
+    my %args = @_;
+    csvutil(%args, action=>'csv');
 }
 
 $SPEC{csv_setop} = {
@@ -1760,6 +1908,7 @@ Finally you can print out certain fields using `--result-fields`.
 _
     args => {
         %args_common,
+        %args_csv_output,
         %arg_filenames_0,
         op => {
             summary => 'Set operation to perform',
@@ -1786,6 +1935,7 @@ _
     links => [
         {url=>'prog:setop'},
     ],
+    tags => ['outputs_csv'],
 };
 sub csv_setop {
     require Tie::IxHash;
@@ -2051,6 +2201,7 @@ client_email:email,client_phone:phone`. The result will be:
 _
     args => {
         %args_common,
+        %args_csv_output,
         target => {
             summary => 'CSV file to fill fields of',
             schema => 'filename*',
@@ -2081,6 +2232,7 @@ _
             cmdline_aliases => {c=>{}},
         },
     },
+    tags => ['outputs_csv'],
 };
 sub csv_lookup_fields {
     my %args = @_;
@@ -2259,7 +2411,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.030 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2020-07-30.
+This document describes version 0.031 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2020-08-03.
 
 =head1 DESCRIPTION
 
@@ -2274,6 +2426,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-concat>
 
 =item * L<csv-convert-to-hash>
+
+=item * L<csv-csv>
 
 =item * L<csv-delete-field>
 
@@ -2311,6 +2465,8 @@ This distribution contains the following CLI utilities:
 
 =item * L<csv-sum>
 
+=item * L<csv2csv>
+
 =item * L<csv2ltsv>
 
 =item * L<csv2td>
@@ -2345,7 +2501,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -2357,7 +2513,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -2367,13 +2523,13 @@ and so on.
 
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -2438,7 +2594,7 @@ Put the new field before specified field.
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -2458,7 +2614,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -2466,15 +2622,60 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -2517,7 +2718,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -2529,7 +2730,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -2537,15 +2738,60 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -2622,7 +2868,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -2634,7 +2880,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -2642,15 +2888,60 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -2693,7 +2984,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -2705,7 +2996,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -2715,7 +3006,7 @@ and so on.
 
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
@@ -2725,7 +3016,130 @@ Row number (e.g. 2 for first data row).
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 csv_csv
+
+Usage:
+
+ csv_csv(%args) -> [status, msg, payload, meta]
+
+Convert CSV to CSV.
+
+Why convert CSV to CSV? When you want to change separator/quote/escape
+character, for one.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+Use C<-> to read from stdin.
+
+=item * B<hash> => I<bool>
+
+Provide row in $_ as hashref instead of arrayref.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -2768,7 +3182,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -2784,7 +3198,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -2792,15 +3206,60 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -2843,7 +3302,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -2859,7 +3318,7 @@ Provide row in $_ as hashref instead of arrayref.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -2869,13 +3328,13 @@ and so on.
 
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -2934,7 +3393,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -2954,7 +3413,7 @@ Provide row in $_ as hashref instead of arrayref.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -2964,13 +3423,13 @@ and so on.
 
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3041,7 +3500,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3061,7 +3520,7 @@ Provide row in $_ as hashref instead of arrayref.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3069,15 +3528,60 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3120,7 +3624,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3132,7 +3636,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3142,13 +3646,13 @@ and so on.
 
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3191,7 +3695,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3203,7 +3707,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3213,13 +3717,13 @@ and so on.
 
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3292,7 +3796,7 @@ Do not output rows, just report the number of rows filled.
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3300,7 +3804,7 @@ Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3312,15 +3816,60 @@ and so on.
 
 =item * B<lookup_fields>* => I<str>
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3399,7 +3948,7 @@ Whether to make sure each string ends with newline.
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3419,7 +3968,7 @@ Provide row in $_ as hashref instead of arrayref.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3429,13 +3978,13 @@ and so on.
 
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3484,7 +4033,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3504,7 +4053,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3512,15 +4061,60 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3569,7 +4163,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3581,7 +4175,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3589,15 +4183,60 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3642,7 +4281,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3662,7 +4301,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3670,15 +4309,60 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3721,7 +4405,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3733,7 +4417,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3741,9 +4425,54 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
@@ -3753,7 +4482,7 @@ Row number (e.g. 2 for first data row), range (2-7), or comma-separated list of 
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3869,7 +4598,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3881,7 +4610,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3895,9 +4624,54 @@ and so on.
 
 Set operation to perform.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
@@ -3905,7 +4679,7 @@ Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -3965,7 +4739,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -3981,7 +4755,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -3989,9 +4763,54 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
@@ -3999,7 +4818,7 @@ Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -4145,7 +4964,7 @@ be compared against.
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -4161,7 +4980,7 @@ Provide row in $_ as hashref instead of arrayref.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -4180,9 +4999,54 @@ sort against.
 
 The code will receive the row as the argument.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
@@ -4190,7 +5054,7 @@ Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -4247,7 +5111,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -4259,7 +5123,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -4269,15 +5133,60 @@ and so on.
 
 =item * B<lines> => I<uint> (default: 1000)
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
@@ -4320,7 +5229,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<escape_char> => I<str>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
@@ -4332,7 +5241,7 @@ Use C<-> to read from stdin.
 
 =item * B<header> => I<bool> (default: 1)
 
-Whether CSV has a header row.
+Whether input CSV has a header row.
 
 By default (C<--header>), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -4340,15 +5249,60 @@ that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
 
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
 =item * B<quote_char> => I<str>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<sep_char> => I<str>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 

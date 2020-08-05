@@ -4,21 +4,17 @@ use 5.006;
 use strict;
 use warnings;
 
-use App::ZFSCurses::UI;
-
 =head1 NAME
 
 App::ZFSCurses - a curses UI to query and modify a ZFS dataset properties.
 
-The App::ZFSCurses module is the entry point of the program.
-
 =head1 VERSION
 
-Version 1.00
+Version 1.100.
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.100';
 
 =head1 SYNOPSIS
 
@@ -26,28 +22,29 @@ App::ZFSCurses is a curses UI to query and modify a ZFS dataset properties.
 
 =cut
 
-=head1 METHODS
+=head1 MODULES
 
-=head2 new
+App::ZFSCurses is composed of 4 modules, namely:
 
-Create an instance of App::ZFSCurses.
+=over 4
 
-=cut
+=item L<App::ZFSCurses::UI>
 
-sub new {
-    my $class = shift;
-    return bless {}, $class;
-}
+Draw the UI components.
 
-=head2 run
+=item L<App::ZFSCurses::Text>
 
-Create an instance of App::ZFSCurses::UI, draw the UI and run it.
+Return the text messages for various UI components.
 
-=cut
+=item L<App::ZFSCurses::Backend>
 
-sub run {
-    App::ZFSCurses::UI->new->draw_and_run();
-}
+Perform so-called backend operations i.e. running commands.
+
+=item L<App::ZFSCurses::WidgetFactory>
+
+Draw a certain kind of widget depending on the context.
+
+=back
 
 =head1 AUTHOR
 

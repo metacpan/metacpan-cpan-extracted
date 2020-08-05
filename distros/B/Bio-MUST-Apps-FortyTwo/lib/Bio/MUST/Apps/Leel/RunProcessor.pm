@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Leel::RunProcessor;
 # ABSTRACT: Internal class for leel tool
-$Bio::MUST::Apps::Leel::RunProcessor::VERSION = '0.190820';
+$Bio::MUST::Apps::Leel::RunProcessor::VERSION = '0.202160';
 use Moose;
 use namespace::autoclean;
 
@@ -19,6 +19,23 @@ has '+out_suffix' => (
 );
 
 
+# blast_args
+
+
+# trim_homologues
+
+# trim_max_shift
+
+# trim_extra_margin
+
+
+has 'aligner_mode' => (
+    is       => 'ro',
+    isa      => 'Str',
+    default  => 'exonerate',
+);
+
+
 has 'id_match_mode' => (
     is       => 'ro',
     isa      => 'Str',
@@ -31,6 +48,15 @@ has 'round_trip_mode' => (
     isa      => 'Str',
     default  => 'off',
 );
+
+
+# bank_dir
+
+# orgs
+
+# infiles
+
+# debug_mode
 
 
 sub BUILD {
@@ -61,7 +87,7 @@ Bio::MUST::Apps::Leel::RunProcessor - Internal class for leel tool
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 AUTHOR
 

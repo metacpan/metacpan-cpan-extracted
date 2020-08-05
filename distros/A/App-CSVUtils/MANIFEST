@@ -12,6 +12,7 @@ script/csv-add-field
 script/csv-avg
 script/csv-concat
 script/csv-convert-to-hash
+script/csv-csv
 script/csv-delete-field
 script/csv-dump
 script/csv-each-row
@@ -30,6 +31,7 @@ script/csv-sort-fields
 script/csv-sort-rows
 script/csv-split
 script/csv-sum
+script/csv2csv
 script/csv2ltsv
 script/csv2td
 script/csv2tsv

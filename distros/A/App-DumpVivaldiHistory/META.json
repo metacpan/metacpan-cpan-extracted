@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::DumpChromeHistory" : "0",
+            "App::DumpChromeHistory" : "0.005",
             "DBD::SQLite" : "0",
             "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" : "0",
             "Data::Sah::Compiler::perl::TH::array" : "0",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-App-DumpVivaldiHistory"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

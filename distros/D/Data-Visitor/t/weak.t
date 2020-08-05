@@ -1,11 +1,13 @@
-#!/usr/bin/perl
-
 use strict;
 use warnings;
 
 use Test::More;
 
-use Test::Requires 'Data::Alias';
+BEGIN {
+  plan skip_all => 'these tests require Data::Alias or fixes to use core aliasing' if "$]" >= '5.031002';
+}
+
+use Test::Needs 'Data::Alias';
 
 use Scalar::Util qw(isweak weaken);
 

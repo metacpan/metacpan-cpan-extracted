@@ -2,7 +2,7 @@ NAME
     App::CompleteCLIs - CLI wrappers for complete_*() functions
 
 VERSION
-    This document describes version 0.145 of App::CompleteCLIs (from Perl
+    This document describes version 0.146 of App::CompleteCLIs (from Perl
     distribution App-CompleteCLIs), released on 2020-04-19.
 
 SYNOPSIS
@@ -106,6 +106,8 @@ DESCRIPTION
     *   complete-uid
 
     *   complete-user
+
+    *   complete-vivaldi-profile-name
 
     *   complete-weaver-bundle
 

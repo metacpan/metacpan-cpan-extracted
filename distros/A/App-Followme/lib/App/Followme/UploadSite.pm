@@ -14,7 +14,7 @@ use File::Spec::Functions qw(abs2rel rel2abs splitdir catfile);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.94";
+our $VERSION = "1.95";
 
 use constant SEED => 96;
 

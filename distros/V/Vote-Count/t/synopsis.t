@@ -13,7 +13,6 @@ use 5.022;
 use Test2::V0;
 use Test2::Bundle::More;
 use Test::Exception;
-use Data::Printer;
 # use JSON::MaybeXS qw/encode_json/;
 # use YAML::XS;
 use feature qw /postderef signatures/;

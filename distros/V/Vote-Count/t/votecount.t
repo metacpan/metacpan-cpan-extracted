@@ -7,10 +7,10 @@ use Test2::V0;
 use Test2::Bundle::More;
 # use Test::Exception;
 use Test2::Tools::Exception qw/dies lives/;
-use Data::Printer;
 
 use Path::Tiny;
 use File::Temp;
+use Data::Dumper;
 
 use Vote::Count;
 use Vote::Count::ReadBallots 'read_ballots';
@@ -26,6 +26,13 @@ is( $VC1->VotesActive(), $VC1->VotesCast(),
 $VC1->SetActiveFromArrayRef(
   [qw( CHOCOLATE STRAWBERRY PISTACHIO ROCKYROAD)] );
 is( $VC1->VotesActive(), 3, 'with short activelist VotesActive is only 3' );
+
+$VC1->ResetActive();
+is_deeply( 
+  $VC1->GetActive(),
+  $VC1->BallotSet()->{'choices'},
+  'After resetting active the Active Set matches the BallotSet choices'  );
+is( $VC1->VotesActive(), 10, 'after reset VotesActive is 10' );
 
 $VC1->logt('A Terse Entry');
 $VC1->logv('A Verbose Entry');
@@ -51,20 +58,29 @@ ok( stat("$tmp/vc2\.brief"),
 
 isa_ok( $VC2->PairMatrix(), ['Vote::Count::Matrix'], 'Confirm Matrix' );
 
+is_deeply( [ $VC2->GetActiveList() ], 
+           [ $VC2->PairMatrix->GetActiveList() ],
+           'active lists are the same between main object and pairmatrix');
+
 $VC2->SetActive( { 'CHOCOLATE' => 1, 'CARAMEL' => 1, 'VANILLA' => 1 } );
 
-$VC2->UpdatePairMatrix();
+is_deeply( [ $VC2->GetActiveList() ], 
+           [ $VC2->PairMatrix->GetActiveList() ],
+           'after SetActive to main object, active lists are the same between main object and pairmatrix');
+
 is_deeply(
   $VC2->PairMatrix()->ScoreMatrix(),
   { 'CARAMEL' => 0, 'CHOCOLATE' => 1, 'VANILLA' => 2 },
-  'Updated Matrix only scores current choices'
+  'Matrix only scores current choices'
 );
 
-$VC2->UpdatePairMatrix( { 'CARAMEL' => 1, 'VANILLA' => 2 } );
-is_deeply(
-  $VC2->PairMatrix()->ScoreMatrix(),
-  { 'CARAMEL' => 0, 'VANILLA' => 1 },
-  'UpdatePairMatrix with an explicit active set'
-);
+# is_deeply needs the array as an arrayref
+is_deeply( [ $VC2->GetActiveList() ], 
+           [ qw/CARAMEL CHOCOLATE VANILLA/],
+           'GetActiveList returns list of active choices');
+
+$VC2->SetActiveFromArrayRef( [ 'CHOCOLATE', 'MINTCHIP' ]);
+is_deeply( $VC2->Active(), { 'CHOCOLATE' => 1, 'MINTCHIP' => 1},
+  'SetActiveFromArrayRef' );
 
 done_testing();

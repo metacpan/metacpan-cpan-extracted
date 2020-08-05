@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
     "script/csv-avg",
     "script/csv-concat",
     "script/csv-convert-to-hash",
+    "script/csv-csv",
     "script/csv-delete-field",
     "script/csv-dump",
     "script/csv-each-row",
@@ -36,6 +37,7 @@ my %WriteMakefileArgs = (
     "script/csv-sort-rows",
     "script/csv-split",
     "script/csv-sum",
+    "script/csv2csv",
     "script/csv2ltsv",
     "script/csv2td",
     "script/csv2tsv",
@@ -82,7 +84,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Needs" => 0
   },
-  "VERSION" => "0.030",
+  "VERSION" => "0.031",
   "test" => {
     "TESTS" => "t/*.t"
   }

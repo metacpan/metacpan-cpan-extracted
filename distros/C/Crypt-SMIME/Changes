@@ -1,5 +1,10 @@
 Revision history for Crypt::SMIME
 
+0.26    Mon Aug  3 15:40:04 JST 2020
+        - sign(), signonly(), encrypt(), check(), decrypt() no longer
+          truncate inputs on a NUL character, Patch by Brian Safford
+          (https://rt.cpan.org/Public/Bug/Display.html?id=133084)
+
 0.25    Thu Feb 22 18:34:02 JST 2018
         - Fix the test '03-chained-certs.t' which can fail depending
           on the used libcrypto, Reported by Thomas Eckardt.

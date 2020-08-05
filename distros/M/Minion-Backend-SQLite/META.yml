@@ -26,10 +26,10 @@ no_index:
 provides:
   Minion::Backend::SQLite:
     file: lib/Minion/Backend/SQLite.pm
-    version: v5.0.2
+    version: v5.0.3
 requires:
   List::Util: '0'
-  Minion: '10.10'
+  Minion: '10.13'
   Mojo::SQLite: '3.000'
   Mojolicious: '7.29'
   Sys::Hostname: '0'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Minion-Backend-SQLite/issues
   homepage: https://github.com/Grinnz/Minion-Backend-SQLite
   repository: https://github.com/Grinnz/Minion-Backend-SQLite.git
-version: v5.0.2
+version: v5.0.3
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
   - 'yrjustice <43676784+yrjustice@users.noreply.github.com>'

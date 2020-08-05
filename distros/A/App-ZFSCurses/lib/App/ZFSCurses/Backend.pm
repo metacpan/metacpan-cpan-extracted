@@ -10,6 +10,14 @@ App::ZFSCurses::Backend - Perform backend operations.
 
 =cut
 
+=head1 VERSION
+
+Version 1.100.
+
+=cut
+
+our $VERSION = '1.100';
+
 =head1 METHODS
 
 =head2 new
@@ -136,6 +144,11 @@ sub set_zfs_property {
 
     close ZFS_SET_PIPE;
 }
+
+
+=head1 SEE ALSO
+
+The L<FreeBSD documentation on ZFS|https://www.freebsd.org/doc/handbook/zfs.html>.
 
 =head1 AUTHOR
 

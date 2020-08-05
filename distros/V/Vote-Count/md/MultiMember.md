@@ -22,17 +22,15 @@ STV uses a Ranked Ballot.
 
 A quota based on the number of valid ballots is set, usually __1 + ( Ballots ÷ ( Number of Choices + 1 ) )__.
 
-The highest choice (plurality) that exceeds the quota is elected. The amount by which the choice exceeded the quota is the Surplus, this is redistributed to the next highest choice on the ballot. This is where the methods diverge, some older methods randomly picks ballots to redistribute, but all current methods split the ballots.
+The highest choice (plurality) that exceeds the quota is elected. The amount by which the choice exceeded the quota is the Surplus, this is redistributed to the next highest choice on the ballot. This is where the methods diverge, some older methods randomly picks ballots to redistribute, but all modern methods split the ballots.
 
-If no choice reaches the quota, the lowest choice is eliminated and their ballots are redistributed.
+If no choice reaches the quota, a choice is eliminated and their ballots are redistributed.
 
 The Vote::Count STV template also elects all remaining choices in the event that eliminating a choice would make it impossible to fill all of the seats.
 
 ## Vote Charging
 
-Vote Charging is mathematically equivalent to Surplus Transfer, but is simpler to explain. Each Vote is treated like a roll of pennies. When a choice reaches the STV quota, the votes are charged. In future iterations the ballots are weighted by their remaining value.
-
-
+Surplus Transfer methods can generally be explained in an alternate fashion as charging the ballots (as if they were a roll of small coins) for each choice they help elect. Restating STV in this fashion may make it easier to explain.
 
 ## Scoring
 
@@ -52,5 +50,4 @@ Scoring encounters the same weighting issues as Borda Count does.
 | STV: ERS97 | unimplemented |
 | STV: Scottish | unimplemented |
 | STV: Meek | unimplemented |
-| Vote Charging | unimplemented |
 | Scoring | unimplemented |

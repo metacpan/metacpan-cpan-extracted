@@ -1,0 +1,799 @@
+# PODNAME: FortyTwo::Manual
+# ABSTRACT: User Guide for Forty-Two
+# CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
+
+# perl -M'List::AllUtils qw(uniq)' -nle 'push @found, m/(C<.*?>)/g; END{ print join "\n", uniq @found }' Manual.pod
+
+# Feedback Forty-two (Nicolas MAGAIN)
+# 
+# [DONE] 1. Lorsque je copie/colle les commandes depuis le manuel de Forty-two vers le terminal ou un éditeur de texte, je dois remplacer manuellement tous les tirets. Les tirets du manuel apparaissent plus courts et font bugger les commandes.
+# 
+# [DONE] 2. Le manuel s'arrête à la génération du fichier yaml mais il serait utile de faire un paragraphe sur le lancement du script forty-two.pl en lui même avec --config, --verbosity etc. On l'obtient en faisant forty-two.pl --help mais un moins habitué aux scripts perl pourrait s'y perdre.
+# 
+# [DONE] 3. Dans cette partie du manuel:
+# query_orgs should be listed in a file (queries.txt) and spelled exactly as in your MSAs. This file will be processed by yaml‐generator‐42.pl to populate the config file. To easily draft a list of query_orgs, you can for example use the 10 to 20 most represented organisms across all you MSAs (prior to enrichment).
+# $grep‐h\>*.fasta|cut‐f1‐d'@'|sort|uniq‐c|sort‐rn|head‐n10
+# 22498 >Danio_rerio
+# 21071 >Homo_sapiens
+# 20722 >Mus_musculus
+# 18933 >Monodelphis_domestica
+# 18616 >Loxodonta_africana
+# 17762 >Latimeria_chalumnae
+# 17678 >Canis_familiaris
+# 17114 >Xenopus_tropicalis
+# 16665 >Anolis_carolinensis
+# 16611 >Sarcophilus_harrisii
+# 
+# Dans cette partie, il n'est pas clair si le > doit faire partie du nom de l'organisme ou pas, puisqu'il apparait dans l'exemple ci-dessus. Une personne non-avertie serait tentée de recopier les noms tels quels dans son fichier queries./txt
+# 
+# Comme c'est sans le '>' vous pourriez préciser, et ensuite par exemple rajouter la commande ci-dessous pour directement créer queries.txt
+# grep -h \>*.fasta | cut -f1 -d'@' | sort | uniq -c | sort -rn | head -n 10 | cut -f2 -d'>' > queries.txt
+# 
+# Si vous faites des lignes de code toutes faites comme ça, vous simplifierez la vie des débutants.
+# 
+# [DONE] 4a. Je trouve que la partie sur tax_filter n'est pas claire (sûrement destinée à des gens qui maîtrisent déjà ces concepts?). Je ne comprends pas bien à quoi cela sert.
+# 
+# [DONE] 4b. "but the generator only supports the plain tax_filter syntax shown in the first example." -> je trouve que cela n'est pas clair. Est-ce seulement la première des 4 lignes (+Poaceae) qui fonctionne par rapport aux trois autres examples, ou est-ce que les 4 lignes citées en exemple fonctionnent, par rapport à d'autres options plus complexes qui seraient disponibles dans tax_filter mais non-précisées ici?
+# 
+# [DONE] 4c. Un utilisateur qui n'a pas besoin de tax_filter ou qui ne comprend pas ce que c'est se demande, après lecture de ce paragraphe, ce qu'il doit faire concernant cette partie. Est-ce qu'il doit préparer quelque chose quand même, ou pourra-t-il laisser vide?
+# 
+# [DONE] 5. Je n'ai pas trouvé d'explications dans le manuel (ou je n'ai pas compris que les explications portaient sur cela) au sujet de ces 4 paramètres dans le wizzard
+# Set ref_brh_mode
+# Set reference banks suffix
+# Set trim_max_shift
+# Set candiate banks suffix
+# En fait, il y a plus d'explications dans le fichier yaml lui-même, mais puisqu'on ne l'a pas encore quand on lance le premier wizzard, il faudrait que les explications arrivent plus tôt, soit dans le manuel soit dans le wizzard
+# 
+# [DONE] 6. Si je prépare un fichier config localement pour ensuite l'uploader sur un cluster, si je veux indiquer le path vers le dossier qui contient les génomes de référence, ou vers les génomes à miner sur le cluster, je vais me retrouver avec un message d'erreur disant que le dossier n'existe pas (puisqu'il n'existe pas localement). Donc je suis obligé de mettre un faux path vers un dossier de mon ordinateur, puis aller rechanger dans le fichier yaml pour mettre le path vers le dossier (sur durandal par exemple). Peut-être qu'un "soft warning" indiquant "attention le dossier n'existe pas, etes vous sur?" pourrait suffire, plutot que de bloquer le processus avec un message d'erreur.
+
+__END__
+
+=pod
+
+=head1 NAME
+
+FortyTwo::Manual - User Guide for Forty-Two
+
+=head1 VERSION
+
+version 0.202160
+
+=encoding UTF-8
+
+=for todo TODO: try to include a description for CPAN (ABSTRACT does not work here)
+    TODO: devise a way to get correct internal links in .md doc
+
+=head1 Background
+
+=head2 Aim and features
+
+The aim of C<42> is to add (and optionally align) sequences to a preexisting
+multiple sequence alignment (MSA) while controlling for orthology relationships
+and potentially contaminating sequences.
+
+Sequences to add are either nucleotide transcripts resulting from transcriptome
+assembly or already translated protein sequences. In theory, one can also use
+genomic nucleotide sequences (because C<42> can splice introns), but this
+possibility has not been extensively tested so far.
+
+=for todo TODO: amend these paragraphs after publication...
+
+The working hypothesis of C<42> is that its orthology-controlling heuristics can
+enrich not only MSAs of single-copy genes but also more complicated MSAs
+including terminally duplicated genes (in-paralogues) and/or corresponding to
+multigenic families featuring different out-paralogues of different ages.
+Preliminary tests on a broadly sampled eukaryotic data set suggest that the
+orthology relationships enforced by C<42> are in good agreement with those
+inferred with I<OrthoFinder> software [Emms and Kelly (2015) I<Genome Biol>
+16:157]. To this end, it relies on complete proteomes of reference organisms.
+
+C<42> is also able to enrich MSAs resulting from the split of complex multigenic
+families after phylogenetic analysis. For this, it requires decoy files composed
+of representative sequences of unwanted out-paralogues. Such C<PARA> files have
+to be provided by the user.
+
+Regarding contamination, C<42> implements a dual system of taxonomic filters
+(based on I<NCBI Taxonomy>) allowing it to flag any new sequence for which the
+taxonomic affiliation is doubtful. Two main approaches are available: C<42>
+either checks that a new sequence is most similar to (an)other sequence(s) of
+the expected taxon already present in the MSA (= positive filter) or that a new
+sequence is more similar to a sequence in the MSA than to any sequence from a
+set of complete proteomes that do not include the expected taxon (= TOL check
+decoy). While the power of the first mechanism is dependent on the taxonomic
+breadth of each MSA, the second approach is more widely applicable.
+
+C<42> is exclusively setup through a structured text file (e.g., C<YAML>
+format). Archiving of this file allows a user to document all the configuration
+details for a given run.
+
+=for todo TODO: Example of a complete YAML config file
+
+C<42>'s verbosity is configured directly on the command line. C<42> can be very
+introspective if asked to be so. At the highest verbosity level, the numerous
+C<BLAST> reports are not deleted after the run and are thus available for manual
+inspection (e.g., for debugging purposes).
+
+=head2 Design principles
+
+In a single run, C<42> can process an arbitrary large number of MSAs (C<FASTA>
+files specified using shell jokers on the command line). Moreover, one can
+search for orthologous sequences in as many organisms as wanted.
+
+The configuration (C<config>) file has two main parts: one with the options that
+apply globally to the run and one that lists the organisms (C<orgs>) to search
+and their specific options, including the path (C<bank_dir>) to the
+corresponding sequence databases (C<banks> in C<42>'s parlance). The C<config>
+file includes a mechanism of default values (C<defaults>) that apply to all
+organisms except when otherwise specified in individual C<org> subsections
+(e.g., C<code>).
+
+When C<42> enriches a MSA, it processes each organism in turn following the
+order of C<org> subsections in the C<config> file. Several I<out-of-order>
+optimisations ensure that similar computations (e.g., C<BLAST> searches) are not
+repeated uselessly.
+
+=head1 Functional overview
+
+=for todo TODO: Include Mick's version of graphical overview
+
+=head2 Orthology-controlling heuristics
+
+Each run of C<42> must specify a set of candidate organisms C<orgs> that are
+going to be mined for orthologues, a set of reference organisms (C<ref_orgs>),
+for which the complete proteomes have to be available (C<ref_bank_dir>,
+C<ref_org_mapper>), and a set of query organisms (C<query_orgs>), which should
+be represented in most MSAs to be enriched. These two latter sets of organisms
+do not need to be identical but certainly can. They will apply to all organisms
+(C<orgs>) to be added to yield the new MSAs (C<out_suffix>).
+
+=head3 Collection of queries
+
+For each C<org>, C<42> extracts all sequences belonging to the C<query_orgs> in
+order to assemble a list of C<query_seqs>. Those are used to mine C<orgs> for
+homologs (candidate orthologues) and to generate a list of 'validating'
+orthologues out of C<ref_orgs>. If a MSA does not contain any sequence
+fulfilling the selection criteria, C<42> warns the user and falls back to
+selecting the longest sequence instead, which leads to a singleton
+C<query_seqs>.
+
+=head3 Preflight check of orthology relationships
+
+To ensure that it can accurately enrich MSAs in orthologous sequences, C<42>
+verifies that C<query_seqs> and C<ref_orgs> themselves satisfy its orthology
+criteria. This two-step process is carried out separately for each MSA.
+
+First, an average C<BLASTP> bit score is computed for each C<ref_org> based on
+the individual best hits of each C<query_seq> against the corresponding complete
+proteomes. C<query_seqs> without any hit in a given C<ref_org> are taken into
+account by contributing a value of zero to the average bit score for the
+C<ref_org>. How exactly first hits are considered best hits is explained in
+L<"Identification of best hits for queries">.
+
+C<ref_orgs> without any hit to C<query_seqs> are automatically discarded,
+whereas the remaining ones are ranked in descending order on the average bit
+score. Low-scoring C<ref_orgs> can be optionally discarded by specifying a value
+< 1.0 for the C<ref_org_mul> parameter of the C<config> file. For example,
+assuming the user lists 10 different C<ref_orgs> and set C<ref_org_mul> to 0.7,
+at most 7 C<ref_orgs> will be retained for assessing orthology relationships.
+This could be the result of the automatic removal of two C<ref_orgs> without any
+hit and of an additional low-scoring one to honor the C<ref_org_mul> setting.
+
+Second, the best hits for each C<ref_org> are C<BLAST>ed (C<BLASTP>) against the
+complete proteomes of other C<ref_orgs> to check that they indeed recover the
+same best hits as the C<query_seqs>. If any C<ref_org> fails with any of the
+other C<ref_orgs>, a message is issued to warn the user, but C<42> proceeds
+normally. More details about the logic behind this are available in
+L<"Identification of orthologues..."|"Identification of orthologues among
+homologues">. Otherwise, the preflight check is considered successful.
+
+=head3 Search for homologues using queries
+
+Each one of the C<query_seqs> is C<BLAST>ed in turn against each one of the
+C<banks> for the current C<org>. The exact C<BLAST> flavour is either C<TBLASTN>
+or C<BLASTP>, depending on the sequence type of C<org>'s C<banks>. Moreover,
+default options of this first C<BLAST> can be overridden by specifying key/value
+pairs in the subsection C<homologues> under the section C<blast_args> of the
+C<config> file (e.g., low-complexity filters, E-value threshold, maximum number
+of hits).
+
+The whole set of hits corresponding to all C<query_seqs> is consolidated into a
+single list of B<homologous> sequences. These sequences can be optionally
+trimmed to the segment really covered by the matching C<query_seqs>. This
+behaviour is especially useful when using (complete) genome assemblies for
+enrichment, but also to avoid non-core regions to perturb orthology assessment
+and improves the reliability of the intron splicing step. It is controlled by
+the C<trim_homologues> parameter of the C<config> file. The details of this
+trimming step can be fine-tuned by editing the other C<trim_*> parameters of the
+C<config> file. Briefly, C<trim_max_shift> corresponds to the maximum length
+allowed for an intron before breaking a homologous sequence into multiple
+(exon-bounded) subsequences, whereas C<trim_extra_margin> controls how many
+additional nucleotides are extracted at each homologue extremities.
+
+=head3 Identification of best hits for queries
+
+Each C<query_seq> is furthermore C<BLAST>ed (C<BLASTP>) against the complete
+proteome of each C<ref_org>. Again, C<BLAST> options can be overridden if needed
+(subsection C<references> under section C<blast_args>). For each C<query_seq>,
+the best hit in the C<ref_org> is recorded. However, when bit scores of
+subsequent hits are nearly equal to the bit score of the best hit, the
+corresponding sequences are interpreted as closely related in-paralogues and
+also added to the list of B<best hits>. This behaviour can be tweaked using the
+C<bitscore_mul> parameter of the C<config> file.
+
+As a consequence, several best hits can be recorded for a single
+C<query_seq>/C<ref_org> pair, either because several sequences are available for
+the C<query_org> (in-paralogues or out-paralogues in the case of a multigenic
+family) or because several sequences match a single C<query_seq> in the C<org>'s
+C<banks> (which should be co-orthologues then), or for both reasons. In
+contrast, if a C<ref_org> has no homologue for the current MSA, C<42> warns the
+user and drops it from the list of C<ref_orgs> considered by the
+orthology-controlling engine.
+
+=head3 Identification of orthologues among homologues
+
+To sort out orthologous sequences from paralogous sequences, each homologue in
+the current C<org> is C<BLAST>ed (C<BLASTX> or C<BLASTP>) against the complete
+proteome of each C<ref_org> (C<BLAST> options in subsection C<orthologues> under
+section C<blast_args>). And now, here's the heart of C<42>'s heuristics... To be
+considered as an orthologue, a homologue must satisfy the following criterion
+for every one of the (active) C<ref_orgs> without exception: its best hit in the
+corresponding complete proteome must be found in the original list of best hits
+assembled using the C<query_seqs>.
+
+It is important to note that C<42> does not care about which particular
+C<query_seq> (or C<query_seqs>) recovered the homologue in the C<org> nor about
+those that recovered the best hits in the complete proteomes of the C<ref_orgs>.
+The only thing that matters is that I<the loop is closed>. The set of homologues
+for which this condition holds then become the B<orthologues>. If the parameter
+C<ref_brh> of the C<config> file is set to C<off>, all homologues are
+automatically considered as orthologues (but see L<PARA files|"Optimized
+enrichment of multigenic families"> just below).
+
+=head3 Optimized enrichment of multigenic families
+
+For multigenic families split over multiple MSAs, one can also optionally
+assemble C<PARA> files. Such a file should contain sequences representative of
+the other sub-families of a multigenic family, so as to help C<42> to even
+better discriminate between orthologous and paralogous sequences. Sequences in
+C<PARA> files are in C<FASTA> format but do not need to be aligned. To be
+considered as an orthologue, a homologue must obtain a best hit C<BLAST> bit
+score that is higher when compared to the sequences of the MSA than those of the
+C<PARA> file.
+
+For example, let us say we have a family composed of 4 subfamilies (A-D). The
+initial orthologous group would include the 4 types of paralogues in a single
+MSA. Based on a phylogenetic analysis of this MSA, we could split this
+orthologous group into 4 distinct MSAs (A-D). If we consider the enrichment of
+subfamily A (C<famA.fasta>), then the sequences of the other subfamilies (B, C
+and D) should be used to build the C<PARA> file (C<famA.para>). Hence, any
+homologous sequence that would be more similar to a sequence in the C<PARA> file
+(say of type B) than to any sequence (of type A) in the MSA would then be
+rejected as paralogous.
+
+In some cases, C<PARA> files might be a replacement for the main heuristics of
+C<42>. Yet, both approaches can be used jointly for maximal accuracy.
+
+=head3 Consolidation of redundant orthologues
+
+When using (highly) redundant transcriptome assemblies for MSA enrichment, some
+genes can be represented by a series of very similar transcripts, either
+partially overlapping or containing minor sequencing errors. To deal with these
+situations, C<42> provides the parameter C<merge_orthologues> in the C<config>
+file, which is set to C<off> by default. When enabled (with C<on>), orthologues
+are first fed to C<CAP3> in an attempt to merge some of them into contigs.
+Successfully merged orthologues are identified by a trailing C<+N> tag where
+C<N> is the number of orthologous sequences removed in the merging process. The
+contig itself is named after the longest orthologous sequence composing it. The
+details of this merging step can be fine-tuned by editing the other C<merge_*>
+parameters in the C<config> file.
+
+=head2 Orthologue post-processing
+
+Once orthologues are identified, each one is C<BLAST>ed (C<BLASTX> or C<BLASTP>)
+against the MSA itself to recover its closest relatives (C<BLAST> options in
+subsection C<templates> under section C<blast_args>).
+
+=head3 Family affiliation and orthologue naming
+
+If the most closely related sequence in the MSA belongs to a given family (e.g.,
+C<mt->), the orthologue is affiliated to the same family, as did the original
+C<forty>. This allows enriching MSAs corresponding to multigenic families. Note
+that only the most closely related sequence can be used to infer the
+orthologue's family.
+
+The orthologue identifier is built using the C<org> name and the accession of
+the corresponding sequence in the C<org>'s C<banks>, which helps tracking down
+all the sequences added to a MSA by C<42> (e.g., for debugging purposes). This
+is thus different from the original C<forty>, in which most sequences were
+I<contigs> having lost all connection with the nucleotide sequences in the
+C<org>'s C<banks>.
+
+=head3 Contamination detection and handling
+
+=for todo check vocabulary (YAML generator option names)
+
+C<42> then seeks to determine whether the orthologue is a genuine orthologue or
+a xenologue contaminating the C<org>'s C<banks>. To this end, two main avenues
+are available: positive taxonomic filters and decoy proteomes sampled across the
+diversity of the Tree of Life (TOL). While both approaches are in principle
+combinable, C<42> currently implements them as exclusive options. Positive
+filters are enabled by adding C<tax_filter> parameters in the C<config> file,
+whereas decoy proteomes further require enabling the C<tol_check> option.
+
+To use positive filters, C<42> must infer the taxonomy of the orthologue by
+analysing the identifiers of the closest sequences in the MSA. How this is
+precisely carried out depends on several parameters in the C<config> file. For
+simplicity, the user can choose between two predefined modes to set these
+parameters in bulk: C<best-hit> and C<megan-like>.
+
+In C<best-hit> mode, only the most closely related preexisting sequence is used
+to infer the orthologue's taxonomy, whereas in <megan-like> mode, several
+sequences are considered and a Last-Common-Ancestor (LCA) inference is performed
+on them. The latter mode often yields more reliable taxonomic affiliations, but
+at the obvious expense of accuracy (i.e., only at the genus or family level
+instead of species level).
+
+If the inferred taxonomy for the orthologue satisfies the taxonomic filter, the
+orthologue is simply added to the MSA. Otherwise, it is tagged as a contaminant
+(C<c#>). When an orthologue is tagged as a contaminant, the binomial of the
+organism at the origin of the taxonomic affiliation (or a higher-ranking taxon
+in case of LCA inference) is further appended to its identifier (i.e.,
+C<...Genus_species>).
+
+Taxonomic filters are optional and require a local copy of the I<NCBI Taxonomy>
+database (C<tax_dir> parameter in the C<config> file). It can be installed using
+C<setup-taxdir.pl> (see L<"Installation..."|"Installation and dependencies">
+below).
+
+The logic behind decoy TOL proteomes is similar to the way C<PARA> files work
+but with a twist. To be considered as uncontaminated, an orthologue must obtain
+a best hit C<BLAST> bit score that is higher when compared to the sequences of
+the MSA than those of the decoy TOL proteomes. However, decoy proteomes from
+organisms taxonomically related to the one to which the orthologue belongs are
+expected to yield very good bit scores, maybe higher than any bit score from
+sequences already present in the MSA. To avoid rejecting a genuinely
+uncontaminated orthologue because of this possibility, C<42> skips all decoy
+hits that satisfy the taxonomic filter specified for the organism being added.
+
+Let us take an example. Imagine that our MSAs only contain sequences from
+Hymenopterans (e.g., wasps and ants). If we enable decoy TOL proteomes when
+adding some bees, contaminated orthologues corresponding to say, parasitic mites
+such as I<Varroa destructor>, will be correctly rejected because they match some
+tick protein included in Ixodes decoy proteome. However, genuine bee sequences
+would also be wrongly rejected because they match with the Apis decoy proteome.
+To avoid this, we will use a taxonomic filter to skip Hymenoptera (or even
+Hexapoda) hits in decoy proteomes.
+
+As one can see, both avenues rely on taxonomic filters. Choosing the right level
+of taxonomic filtration is no easy task and often requires a bit of testing. In
+short, the more distant potential contaminants are from organisms being added,
+the easier it is to find an adequate taxonomic filter (see
+L<"tax_filter"|"Taxonomic filters (tax_filter)"> below for details).
+
+=head3 Alignment and MSA integration
+
+To integrate the orthologue into the MSA, C<42> chooses the most appropriate
+B<template(s)> for alignment among the closest relatives. As for taxonomic
+inference, it considers each of them in turn and stops once the coverage of the
+orthologue cannot be significantly improved. This allows C<42> to select a
+slightly less related sequence as a template provided it aligns with a longer
+part of the orthologue. By how much exactly coverage has to be improved for a
+close sequence to be retained as a template can be fine-tuned with the
+C<coverage_mul> parameter of the C<config> file.
+
+Then comes the alignment itself. With nucleotide C<banks>, both C<BLAST> and
+C<exonerate> aligners are available, whereas only C<BLAST> can be used with
+protein C<banks>. The preferred aligner can be specified using the C<aligner>
+parameter of the C<config> file.
+
+The C<BLAST> aligner has been much improved with respect to the aligner of the
+original C<forty>. It extracts all the HSPs for the selected template(s) from
+the XML C<BLAST> report and uses them as guides for integrating the orthologue
+fragments into the MSA. Then, once all fragments have been integrated for all
+candidate organisms, it merges them into a single contiguous sequence per
+orthologue. When fragments overlap, the merger gives precedence to the fragments
+corresponding to the highest-scoring templates and HSPs.
+
+When the new C<exonerate> aligner is preferred, only the longest selected
+template is used. In most cases, the orthologue can be aligned as a single large
+fragment. If not, C<42> emits different types of warnings depending on the exact
+issue. In worst cases (e.g., C<exonerate> crashing), the orthologue cannot be
+integrated, often due to structural rearrangements between the orthologue and
+the template. To avoid discarding the orthologue in such cases, one can enable
+C<BLAST> as a fall-back for exonerate failures by setting the C<aligner>
+parameter to C<exoblast>.
+
+Aligned orthologues are integrated into the MSA all together at the end of the
+file but in the following arrangement: first by family, then by candidate
+organism and then by accession. Contaminants are interspersed with genuine
+orthologues but can be easily identified thanks to their tag (C<c#>).
+
+=head3 Redundancy detection and handling
+
+Independently of the aligner, C<42> never integrates twice the same sequence for
+a given organism, even if obtained from multiple orthologues. Further, it
+filters out subsequences included in sequences from the same organism that are
+either already present in the MSA or that are listed in the C<NON> counterpart
+of the MSA. C<NON> files are a bit like C<PARA> files (non-aligned sequences in
+C<FASTA> format) except that matches must be exact. Finally, when a newly added
+orthologue includes a sequence already present in the MSA for the same organism,
+the latter can be either kept or removed, depending on the value of the
+parameter C<ali_keep_lengthened_seqs> in the C<config> file.
+
+=head3 C<#NEW#> tags
+
+All newly added orthologues are tagged by a specific C<#NEW#> suffix. This tag
+helps C<42> to organize the post-processing of new sequences (e.g., fragment
+merging and redundancy detection) but is also useful for the end-user to
+identify which sequences have been added by C<42>. Therefore any preexisting
+C<#NEW#> tag is cleared when C<42> starts processing a MSA.
+
+While automatic untagging can be disabled via the parameter
+C<ali_keep_old_new_tags> in the C<config> file, one should note that such
+preexisting new sequences are basically invisible to C<42>. This means that they
+will not be chosen as queries for mining transcriptomes nor as templates for
+aligning additional new orthologues. Moreover they will not be considered for
+taxonomic analyses. That is why the recommended approach is to let this
+parameter set to its default value.
+
+=head1 Usage
+
+=head2 Installation and dependencies
+
+C<42> is written in I<Modern Perl> but relies on two external dependencies:
+I<NCBI-BLAST+> and I<Exonerate>. You should download and install the
+corresponding binaries the way you feel the most appropriate for your system.
+
+=over
+
+=item L<ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/>
+
+=item L<https://www.ebi.ac.uk/about/vertebrate-genomics/software/exonerate>
+(use classical v2.2.0 not newer v2.4.0)
+
+=back
+
+Most other dependencies can be handled automatically by using C<cpanm> in a
+I<Perlbrew> environment (L<https://perlbrew.pl/>). Below are a set of commands to
+setup such an environment on I<Ubuntu>.
+
+    # install development tools
+    $ sudo apt-get update
+    $ sudo apt-get install build-essential
+
+    # download the perlbrew installer...
+    $ wget -O - http://install.perlbrew.pl | bash
+
+    # initialize perlbrew
+    $ source ~/perl5/perlbrew/etc/bashrc
+    $ perlbrew init
+
+    # search for a recent stable version of the perl interpreter
+    $ perlbrew available
+    # install the last even version (e.g., 5.24.x, 5.26.x, 5.28.x)
+    # (this will take a while)
+    $ perlbrew install perl-5.26.2
+    # install cpanm (for Perl dependencies)
+    $ perlbrew install-cpanm
+
+    # enable the just-installed version
+    $ perlbrew list
+    $ perlbrew switch perl-5.26.2
+
+    # make perlbrew always available
+    # if using bash (be sure to use double >> to append)
+    $ echo "source ~/perl5/perlbrew/etc/bashrc" >> ~/.bashrc
+    # if using zsh  (only the destination file changes)
+    $ echo "source ~/perl5/perlbrew/etc/bashrc" >> ~/.zshrc
+
+Major C<42> dependencies are the C<Bio::MUST> series of modules. Install them as
+follows.
+
+    $ cpanm Bio::FastParsers
+    $ cpanm Bio::MUST::Core
+    $ cpanm Bio::MUST::Drivers
+
+Since C<Bio::MUST> modules rely on external bioinformatics programs and come
+with complex test suites, they sometimes raise errors during installation. If
+you encounter any such error, consider enabling C<--force> and/or C<--notest>
+options of C<cpanm>.
+
+    $ cpanm --force Bio::MUST::Drivers
+
+Install C<42> itself. All remaining dependencies can also be taken care of by
+C<cpanm>.
+
+    $ cpanm Bio::MUST::Apps::FortyTwo
+
+Finally install a local mirror of the I<NCBI Taxonomy>. It will be used by C<42>
+to taxonomically affiliate inferred orthologous sequences.
+
+    $ setup-taxdir.pl --taxdir=taxdump/
+
+=head2 Input and configuration files
+
+To help with the configuration of the numerous parameters of the software, we
+designed a C<config> file generator: C<yaml-generator-42.pl>. When run with the
+C<--wizard> option, it will guide you through the configuration by prompting for
+all required parameters (pressing C<ENTER> selects the default value). At the
+end of process, it will produce a YAML C<config> file named
+C<config-$out_suffix.yaml> and a file (C<build-$out_suffix.sh>) providing the
+command to reproduce the exact same configuration without using the wizard.
+
+=head3 MSAs (C<*.fasta>)
+
+C<42> native file format for MSAs is known as the C<ALI> format. It is very
+similar to the well-known C<FASTA> format except for a few differences: (1)
+sequences must appear on a single (long) line; (2) gaps are encoded as asterisk
+characters (C<*>) instead of dashes (C<->) and any whitespace is interpreted as
+missing character states; (3) sequence identifiers accept a single whitespace
+between genus and species (more on this just below); and (4) comment lines
+(starting with the hashtag character C<#>) are allowed. Although C<42> can read
+and write C<FASTA> files transparently, its C<ALI> roots sometimes play tricks
+to the user.
+
+This is especially true for sequence identifiers. Basically, each identifier has
+to hold the organism name (C<org>) followed by a separator (C<@>) and by a
+protein/gene accession number. The organism name is usually the binomial name.
+Genus and species must be separated by a whitespace (C< > if in C<ALI> format)
+or underscore character (C<_> if in C<FASTA> format). In addition, strain name
+and/or NCBI taxon id are also allowed after the species name but each preceded
+by an underscore character (C<_>). If both are used in the sequence identifier,
+the taxon id has to come last. Finally, all sequence identifiers must be unique
+within each MSA. See examples below:
+
+=for todo TODO: explain other formats and subtleties (e.g., families)
+
+    # Genus species@protacc
+    >Arabidopsis thaliana@AAL15244
+    # Genus species_taxonid@protacc
+    >Arabidopsis thaliana_3702@AAO44026
+    # Genus species_subspecies_taxonid@protacc
+    >Arabidopsis lyrata_lyrata_81972@EFH60692
+    # Genus species_taxonid@protacc
+    >Archaeoglobus fulgidus_2234@WP_048095550
+    # Genus species_strain_taxonid@protacc
+    >Archaeoglobus fulgidus_DSM4304_224325@AAB90113
+    # Genus species_strain_taxonid@protacc
+    >archaeon 13_1_20CM_2_54_9_1805008@OLE74253
+
+=head3 Reference organisms (C<ref_orgs>, C<ref_banks>)
+
+=for todo TODO: discuss inst-abbr-ids.pl
+
+The reference proteome set must be described in the C<config> file. Firstly,
+each of the reference proteomes must be in C<FASTA> format in order to be
+formatted as a C<BLAST> database with the C<makeblastdb> command.
+
+    $ for REFORG in *.faa; do makeblastdb -in $REFORG -dbtype prot \
+        -out `basename $REFORG .faa` -parse_seqids; done
+
+Then, C<yaml-generator-42.pl> will read a file describing the reference proteome
+set (C<ref_org_mapper.idm>). This file is composed of two columns separated by a
+tabulation character (C<\t>) with the first column being the organism name
+(C<ref_org>) and the second being the database basename (C<ref_bank>).
+
+If your banks are like this:
+
+    $ ls Arabidopsis_thaliana_3702_bank.*
+
+    Arabidopsis_thaliana_3702_bank.faa
+    Arabidopsis_thaliana_3702_bank.phr
+    Arabidopsis_thaliana_3702_bank.pin
+    Arabidopsis_thaliana_3702_bank.pog
+    Arabidopsis_thaliana_3702_bank.psd
+    Arabidopsis_thaliana_3702_bank.psi
+    Arabidopsis_thaliana_3702_bank.psq
+
+Then the C<ref_org_mapper> file should look like this:
+
+    Arabidopsis thaliana_3702    Arabidopsis_thaliana_3702_bank
+
+If you mainly work with microbes, you may want to name your banks after the NCBI
+GCA/GCF accessions of the corresponding genome assemblies. In this case, you can
+use C<fetch-tax.pl> to generate a suitable file from a list of such numbers:
+
+    $ head -n5 banks.idl
+
+    GCA_000008085.1
+    GCA_000011505.1
+    GCA_000012285.1
+    GCA_000014585.1
+    GCA_000019605.1
+
+    $ fetch-tax.pl --taxdir=taxdump/ --org-mapper --item-type=taxid banks.idl
+
+    $ head -n5 banks.org-idm
+    
+    Nanoarchaeum equitans_GCA_000008085.1        GCA_000008085.1
+    Staphylococcus aureus_GCA_000011505.1        GCA_000011505.1
+    Sulfolobus acidocaldarius_GCA_000012285.1    GCA_000012285.1
+    Synechococcus sp._GCA_000014585.1            GCA_000014585.1
+    Korarchaeum cryptofilum_GCA_000019605.1      GCA_000019605.1
+
+=head3 Query organisms (C<query_orgs>)
+
+C<query_orgs> should be listed in a file (C<queries.txt>) and spelled exactly as
+in your MSAs (excluding the C<FASTA>-specific `>` character preceding each
+sequence identifier). This file will be processed by C<yaml-generator-42.pl> to
+populate the C<config> file. To easily draft a list of C<query_orgs>, you can
+for example use the 10 to 20 most represented organisms across all your MSAs
+(prior to enrichment).
+
+    $ grep -h \> *.fasta | cut -f1 -d'@' | cut -c2- | sort | uniq -c | sort -rn | head -n10
+
+    22498 Danio_rerio
+    21071 Homo_sapiens
+    20722 Mus_musculus
+    18933 Monodelphis_domestica
+    18616 Loxodonta_africana
+    17762 Latimeria_chalumnae
+    17678 Canis_familiaris
+    17114 Xenopus_tropicalis
+    16665 Anolis_carolinensis
+    16611 Sarcophilus_harrisii
+
+B<Note:> Organism names must follow the same rules as above. This means that no
+underscore should appear between genus and species. C<42> emits a warning when
+suspecting you got it wrong. However, it cannot fix this for you. When working
+with native C<ALI> files, this issue does not crop up:
+
+    $ grep -h \> *.ali | cut -f1 -d'@' | cut -c2- | sort | uniq -c | sort -rn | head -n10
+
+    22498 Danio rerio
+    21071 Homo sapiens
+    ...
+
+=head3 Candidate organisms (C<orgs>, C<banks>)
+
+The candidate organisms set must be described in the C<config> file. Firstly,
+each of the candidate organism files must be in C<FASTA> format in order to
+produce a C<BLAST> database with the C<makeblastdb> command:
+
+    $ for ORG in *.fna; do makeblastdb -in $ORG -dbtype nucl \
+        -out `basename $ORG .fna` -parse_seqids; done
+
+Within each C<BLAST> database, sequence identifiers must be unique. C<42> will
+use the first run of non-whitespace characters as the accession. If this first
+chunk is composed of multiple parts separated by pipe characters (C<|>), only
+the last part is taken as the sequence accession (see L<"Orthologue
+naming..."|"Family affiliation and orthologue naming"> above).
+
+    sequence identifier                      accession
+
+    >seq37                                   seq37
+    >comp12_c0_seq1                          comp12_c0_seq1
+    >EH093040.1 Sl_SlB_01N04_T7 SLB ...      EH093040.1
+    >MMETSP0151_2-20130828|7_1 len=174       7_1
+    >gi|301500844|ref|YP_003795256.1| ...    YP_003795256.1
+
+Then, as for C<ref_orgs> above, you need to produce a C<bank_mapper.idm> file
+composed of two columns separated by a tabulation character (C<\t>) with the
+first column being the organism name (C<org>) and the second being the database
+basename (C<bank>).
+
+    Euglena gracilis    Euglena_bank
+
+B<Note:> Again, organism names must follow the same rules as above!
+
+=head3 Taxonomic filters (C<tax_filter>)
+
+B<Note:> this section deals with an advanced use of C<42>. It can be skipped if
+you do not plan to check added sequences for potential contaminations (see
+L<"Contamination detection..."|"Contamination detection and handling"> for
+theoretical background).
+
+C<Bio::MUST> modules provide quite sophisticated taxonomic filters. Hence, in
+C<tax_filter> syntax, wanted taxa are to be prefixed by a C<+> symbol, whereas
+unwanted taxa are to be prefixed by a C<-> symbol. Wanted and unwanted taxa are
+linked by logical ORs. Here are a few examples and their meaning:
+
+    [ +Poaceae ]                        # any grass
+    [ -eudicotyledons ]                 # anything but a dicotyledon flower
+    [ +Amphibia, +Amniota ]             # any amphibian or amniote
+    [ +Bacteria, -Cyanobacteria ]       # any non-cyanobacterial bacterium
+
+In principle, C<42> can also use such filters, but the generator currently
+supports only the plain C<tax_filter> syntax shown in the first example
+(C<+Poaceae>). Yet, it can assist you in finding the adequate taxa to specify
+based on the organisms you add.
+
+=for todo clarify the part about choose_tax_filter
+
+For this to work, you must define at which taxonomic level(s) you want to
+set the filter. When specifying several levels (C<--levels> option), the script
+will try to check for the next level in case one is missing. You can put as many
+levels as you want separated by a comma (C<,>, no whitespace character) when
+using the C<--wizard> option and by a whitespace character (C< >) as a command
+line argument. Another possibility is to choose manually from the NCBI lineage
+for those that fail (in this case use the C<--choose_tax_filter=1> argument). If
+you want to select manually for each candidate organisme set the argument
+C<--choose_tax_filter=2>.
+
+Alternatively, you can define a custom taxonomic filter for each organism by
+adding a third column to the C<bank_mapper.idm> file.
+
+=head2 Running C<42>
+
+=head3 Assisted configuration using the wizard
+
+Now that you are done preparing files, let's run the wizard!
+
+    $ yaml-generator-42.pl --wizard
+
+Using the C<--wizard> option enables an interactive mode where you will be asked
+to enter each parameter in the terminal.
+
+B<Note:> Pressing the C<ENTER> key selects the default value encoded in C<42>.
+
+Two C<run_mode> are available C<metagenomic> or C<phylogenomic>. The
+C<phylogenomic> mode is designed to enrich MSAs with orthologues for subsequent
+phylogenomic analysis. In contrast, the C<metagenomic> mode is designed to
+estimate the contamination level of transcriptomic data using reference
+ribosomal protein MSAs. The latter mode does not modify the MSAs but instead
+produces one taxonomic report per MSA listing the lineage of each identified
+orthologous sequence. When not specified, C<run_mode> internally defaults to
+C<phylogenomic>.
+
+=for todo TODO: explain how to debrief metagenomic mode for evaluating transcriptomes
+
+B<Note:> the C<phylogenomic> mode also produces taxonomic reports but deprived
+of taxonomic affiliations for the purpose of C<one-on-one.pl> (not currently
+distributed on I<CPAN>).
+
+The wizard does its best to assist you in building your C<config> file. In
+particular, it scans the directories you specify for relevant files. Hence, to
+identify the C<banks> and C<ref_banks> files, it looks for files ending with
+a specific suffix. These suffices can be provided using the C<bank_suffix> and
+C<ref_bank_suffix> options, respectively. If your banks are built from protein
+sequences, use C<.psq>; otherwise, for nucleotide sequences, use C<.nsq>.
+
+Because of this scanning behavior, it is better to prepare your files directly
+on the computer on which you plan to run C<42>. If you try to prepare your
+C<config> file locally (for subsequent upload on a remote computer), it is very
+likely that the wizard complains about some directories not being found.
+
+=head3 Command-line options
+
+Since the configuration (C<config>) file specifies all the details, running
+C<42> boils down to a simple command:
+
+    $ forty-two.pl --config=config.yaml *.fasta
+
+By default, C<42> is very terse. Yet it can be made quite verbose using the
+corresponding C<--verbosity> option. If you need all the debugging information,
+select level C<6>. In any case, it is useful to redirect the C<STDERR> stream to
+a log file for post-run analysis.
+
+    $ forty-two.pl --config=config.yaml --verbosity=3 *.fasta 2> 42.log
+
+C<42> supports multithreading by allowing parallel enrichment of multiple MSAs.
+This is controlled by the C<--threads> command line option. MSAs will be
+arranged in an internal queue and processed in parallel using the specified
+number of threads. As long as there remain more MSAs to enrich than that
+number, C<42> will makes efficient use of the CPU cores. Obviously, there is
+no speed gain in specifying more threads than MSAs to process.
+
+    $ forty-two.pl --config=config.yaml --threads=20 *.fasta
+
+Unfortunately, the current parallel implementation scheme leads to completely
+scrambled log files. There is thus no point to ask for a high verbosity level.
+
+=head1 AUTHOR
+
+Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mick VAN VLIERBERGHE
+
+Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by University of Liege / Unit of Eukaryotic Phylogenomics / Denis BAURAIN.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

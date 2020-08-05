@@ -44,16 +44,19 @@ no_index:
 provides:
   JSON::Schema::Draft201909:
     file: lib/JSON/Schema/Draft201909.pm
-    version: '0.010'
+    version: '0.011'
+  JSON::Schema::Draft201909::Annotation:
+    file: lib/JSON/Schema/Draft201909/Annotation.pm
+    version: '0.011'
   JSON::Schema::Draft201909::Document:
     file: lib/JSON/Schema/Draft201909/Document.pm
-    version: '0.010'
+    version: '0.011'
   JSON::Schema::Draft201909::Error:
     file: lib/JSON/Schema/Draft201909/Error.pm
-    version: '0.010'
+    version: '0.011'
   JSON::Schema::Draft201909::Result:
     file: lib/JSON/Schema/Draft201909/Result.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Carp: '0'
   File::ShareDir: '0'
@@ -84,7 +87,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Draft201909/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Draft201909
   repository: https://github.com/karenetheridge/JSON-Schema-Draft201909.git
-version: '0.010'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.032000'
@@ -711,7 +714,7 @@ x_Dist_Zilla:
             - ppport.h
           match: []
       name: '@Author::ETHER/copy generated files'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -752,7 +755,7 @@ x_Dist_Zilla:
             - Changes
           match: []
       name: '@Author::ETHER/@Git::VersionManager/CopyFilesFromRelease'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -783,7 +786,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.010
+          tag: v0.011
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

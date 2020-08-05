@@ -6,6 +6,20 @@ Home page:    <https://metacpan.org/release/Type-Tiny-XS>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Type-Tiny-XS>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.019	2020-08-05
+
+ [ Packaging ]
+ - Remove some cruft that was accidentally packaged.
+
+0.018	2020-08-05
+
+ [ Test Suite ]
+ - Tests for InstanceOf
+
+ [ Other ]
+ - Slight speed boost for InstanceOf in cases where the object being tested
+   overrides UNIVERSAL::isa.
+
 0.017	2020-04-28
 
  [ Bug Fixes ]

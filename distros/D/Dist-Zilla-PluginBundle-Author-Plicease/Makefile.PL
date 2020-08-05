@@ -71,8 +71,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Section"                           => 0,
     "Dist::Zilla"                             => "6.00",
-    "Dist::Zilla::App::Command::aliendeps"    => "0.01",
-    "Dist::Zilla::Plugin::Alien"              => "0.023",
     "Dist::Zilla::Plugin::AutoMetaResources"  => "1.20",
     "Dist::Zilla::Plugin::CopyFilesFromBuild" => "0.150250",
     "Dist::Zilla::Plugin::InsertExample"      => "0.04",
@@ -108,7 +106,7 @@ my %WriteMakefileArgs = (
     "Test::More"   => "0.98",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.51",
+  "VERSION" => "2.53",
   "test"    => {
     "TESTS" => "t/*.t"
   }

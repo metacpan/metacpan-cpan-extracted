@@ -35,6 +35,14 @@ App::ZFSCurses::UI - the UI drawing logic.
 
 =cut
 
+=head1 VERSION
+
+Version 1.100.
+
+=cut
+
+our $VERSION = '1.100';
+
 =head1 SYNOPSIS
 
 App::ZFSCurses::UI is the meat of the application and is in charge of drawing
@@ -175,7 +183,7 @@ sub show_help {
     return if !defined $selected;
     chomp $selected;
 
-    return if $selected =~ m/^PROPERTY/;
+    return if $selected =~ m/^(PROPERTY)/;
 
     my ( $property, undef, undef ) = split /\s+/, $selected;
     my $help_message = $text->help_messages()->{$property};
@@ -387,7 +395,7 @@ sub onpress_show_dataset_properties {
 
     chomp $selected;
 
-    return if $selected =~ m/^NAME/;
+    return if $selected =~ m/^(NAME|no datasets available)/;
 
     my ( $dataset, undef, undef, undef, undef ) = split /\s+/, $selected;
 
@@ -415,7 +423,7 @@ sub onpress_change_property {
 
     chomp $selected;
 
-    return if $selected =~ m/^PROPERTY/;
+    return if $selected =~ m/^(PROPERTY)/;
 
     my ( $property, $value, $source ) = split /\s+/, $selected;
 
@@ -465,6 +473,10 @@ sub onpress_back_to_properties_list {
     draw_main_listbox();
     draw_dataset_properties_screen($current_dataset);
 }
+
+=head1 SEE ALSO
+
+The L<Curses::UI> Perl module.
 
 =head1 AUTHOR
 

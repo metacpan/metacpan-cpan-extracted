@@ -1,3 +1,13 @@
+v5.0.3    2020-08-02 18:15:20 EDT
+  - Minion requirement bumped to 10.13.
+  - Removed experimental support for job sequences.
+  - Added EXPERIMENTAL expire option to enqueue method to support expiring jobs.
+  - Added EXPERIMENTAL lax option to enqueue method to support lax dependencies.
+  - Removed next and previous fields from list_jobs method.
+  - Added expires and lax fields to list_jobs method.
+  - Fixed a bug where manual retries would count towards the attempts limit for automatic retries.
+  - Optimized checking parent job state in job dequeue.
+
 v5.0.2    2020-07-23 00:30:45 EDT
   - Minion requirement bumped to 10.10.
   - Support removing stuck jobs in repair method.

@@ -25,10 +25,10 @@ optional_features: {}
 provides:
   Type::Tiny::XS:
     file: lib/Type/Tiny/XS.pm
-    version: '0.017'
+    version: '0.019'
   Type::Tiny::XS::Util:
     file: lib/Type/Tiny/XS/Util.pm
-    version: '0.017'
+    version: '0.019'
 requires:
   perl: '5.010001'
 resources:
@@ -37,7 +37,7 @@ resources:
   homepage: https://metacpan.org/release/Type-Tiny-XS
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-type-tiny-xs.git
-version: '0.017'
+version: '0.019'
 x_contributors:
   - 'Graham Knop (HAARG) <haarg@cpan.org>'
   - 'Tomasz Konojacki (XENU) <xenu@cpan.org>'

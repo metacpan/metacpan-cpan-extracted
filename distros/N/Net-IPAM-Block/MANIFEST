@@ -19,6 +19,8 @@ t/08-findfree.t
 t/09-relations.t
 t/10-errors.t
 t/11-subclassing.t
+t/12-diff.t
+t/13-overload.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

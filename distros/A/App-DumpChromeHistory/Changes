@@ -1,3 +1,9 @@
+0.005   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Accept and pass _chrome_dir so we can be used by chrome-based
+	  browsers, e.g. vivaldi.
+
+
 0.004   2020-04-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Like dump-firefox-history, now by default dumps all profiles

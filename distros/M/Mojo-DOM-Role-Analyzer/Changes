@@ -1,0 +1,35 @@
+Revision history for Mojo-DOM-Role-Analyzer
+
+0.008     2020-08-05 09:42:41-04:00 America/New_York
+
+- add min. Mojo::DOM version requirement
+
+0.007     2020-08-04 18:48:29-04:00 America/New_York
+
+- prune out unneeded module
+- first release to metacpan
+
+0.006     2020-08-04 18:43:29-04:00 America/New_York
+
+- add comparison test
+- doc tweaks
+
+0.005     2020-08-04 17:52:45-04:00 America/New_York
+
+- Misc. doc improvements
+
+0.004     2020-08-04 17:38:43-04:00 America/New_York
+
+- create comparison operator and make comparison method more flexible
+
+0.003     2020-08-04 14:05:26-04:00 America/New_York
+
+- doc tweaks and fixes
+
+0.002     2020-08-04 13:57:08-04:00 America/New_York
+
+- fix doc configuration
+
+0.001     2020-08-04 13:39:37-04:00 America/New_York
+
+- initial commit

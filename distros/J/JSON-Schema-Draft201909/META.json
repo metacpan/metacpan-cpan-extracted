@@ -211,19 +211,23 @@
    "provides" : {
       "JSON::Schema::Draft201909" : {
          "file" : "lib/JSON/Schema/Draft201909.pm",
-         "version" : "0.010"
+         "version" : "0.011"
+      },
+      "JSON::Schema::Draft201909::Annotation" : {
+         "file" : "lib/JSON/Schema/Draft201909/Annotation.pm",
+         "version" : "0.011"
       },
       "JSON::Schema::Draft201909::Document" : {
          "file" : "lib/JSON/Schema/Draft201909/Document.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "JSON::Schema::Draft201909::Error" : {
          "file" : "lib/JSON/Schema/Draft201909/Error.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "JSON::Schema::Draft201909::Result" : {
          "file" : "lib/JSON/Schema/Draft201909/Result.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -238,7 +242,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Draft201909"
       }
    },
-   "version" : "0.010",
+   "version" : "0.011",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"
@@ -1061,7 +1065,7 @@
                }
             },
             "name" : "@Author::ETHER/copy generated files",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -1117,7 +1121,7 @@
                }
             },
             "name" : "@Author::ETHER/@Git::VersionManager/CopyFilesFromRelease",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -1157,7 +1161,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.010",
+                  "tag" : "v0.011",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

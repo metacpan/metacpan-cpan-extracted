@@ -13,7 +13,7 @@ do { my $x = {
                                       'JSON::PP' => '0',
                                       'Text::Markdown' => '0',
                                       'YAML' => '0',
-                                      'Yancy' => '1.037',
+                                      'Yancy' => '1.057',
                                       'perl' => '5.014'
                                     }
                     },

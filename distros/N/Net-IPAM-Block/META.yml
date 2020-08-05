@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4229, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,7 +16,7 @@ name: Net-IPAM-Block
 provides:
   Net::IPAM::Block:
     file: lib/Net/IPAM/Block.pm
-    version: '2.00'
+    version: '2.03'
   Net::IPAM::Block::Private:
     file: lib/Net/IPAM/Block/Private.pm
 requires:
@@ -25,5 +25,5 @@ requires:
   Net::IPAM::IP: '1.24'
   Scalar::Util: '1.39'
   perl: v5.10.0
-version: '2.00'
+version: '2.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

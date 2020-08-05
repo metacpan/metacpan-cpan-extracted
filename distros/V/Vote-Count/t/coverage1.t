@@ -10,7 +10,6 @@ use Test::Exception;
 
 # Tests written to improve Devel::Cover stats.
 
-use Data::Printer;
 use Data::Dumper;
 
 use Path::Tiny;

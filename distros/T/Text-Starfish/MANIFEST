@@ -9,6 +9,7 @@ starfish.conf
 Starfish.pm
 starfish
 report.pdf
+t/01.t
 test.pl
 testfiles/README
 testfiles/02-simple_java.in

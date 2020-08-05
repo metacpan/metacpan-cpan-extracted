@@ -11,7 +11,7 @@ use Text::Markdown;
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.94";
+our $VERSION = "1.95";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -81,11 +81,15 @@ formatted data.
 
 All data are accessed through the build method.
 
+=over 4
+
 =item my %data = $obj->build($name, $filename);
 
 Build a variable's value. The first argument is the name of the variable. The
 second argument is the name of the file the metadata is being computed for. If
 it is undefined, the filename stored in the object is used.
+
+=back
 
 =head1 VARIABLES
 

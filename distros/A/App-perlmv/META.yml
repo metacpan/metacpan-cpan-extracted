@@ -45,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv
   homepage: https://metacpan.org/release/App-perlmv
   repository: git://github.com/perlancar/perl-App-perlmv.git
-version: '0.600'
+version: '0.601'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

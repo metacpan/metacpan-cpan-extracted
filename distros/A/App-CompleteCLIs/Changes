@@ -1,3 +1,8 @@
+0.146   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: complete-vivaldi-profile-name.
+
+
 0.145   2020-04-19  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: complete-chrome-profile-name.

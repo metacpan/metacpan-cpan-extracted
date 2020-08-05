@@ -3,7 +3,7 @@ package App::DumpVivaldiHistory;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-04-19'; # DATE
 our $DIST = 'App-DumpVivaldiHistory'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -68,7 +68,7 @@ App::DumpVivaldiHistory - Dump Vivaldi history
 
 =head1 VERSION
 
-This document describes version 0.001 of App::DumpVivaldiHistory (from Perl distribution App-DumpVivaldiHistory), released on 2020-04-19.
+This document describes version 0.002 of App::DumpVivaldiHistory (from Perl distribution App-DumpVivaldiHistory), released on 2020-04-19.
 
 =head1 SYNOPSIS
 

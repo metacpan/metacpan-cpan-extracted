@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Leel;
 # ABSTRACT: Main class for leel tool
-$Bio::MUST::Apps::Leel::VERSION = '0.190820';
+$Bio::MUST::Apps::Leel::VERSION = '0.202160';
 use Moose;
 use namespace::autoclean;
 
@@ -38,7 +38,7 @@ Bio::MUST::Apps::Leel - Main class for leel tool
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 SYNOPSIS
 

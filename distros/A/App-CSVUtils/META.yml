@@ -53,7 +53,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils
   homepage: https://metacpan.org/release/App-CSVUtils
   repository: git://github.com/perlancar/perl-App-CSVUtils.git
-version: '0.030'
+version: '0.031'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -61,99 +61,107 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-add-field'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-avg'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-concat'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-convert-to-hash'
-      version: '0.422'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv-csv'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-delete-field'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-dump'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-each-row'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-grep'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-list-field-names'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-info'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-lookup-fields'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-map'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-munge-field'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-replace-newline'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-select-fields'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-select-row'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-setop'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-sort'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-sort-rows'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-sort-fields'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-split'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv-sum'
-      version: '0.422'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv2csv'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv2td'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript dump-csv'
-      version: '0.422'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::InsertExecsList
       name: InsertExecsList

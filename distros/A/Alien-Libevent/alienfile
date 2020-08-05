@@ -17,6 +17,8 @@ share {
     version => qr/([0-9\.]+)/,
   );
 
+  $ENV{LIBS} = "-ldl";
+
   plugin 'Extract';
   
   plugin 'Build::Autoconf';

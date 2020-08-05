@@ -46,6 +46,12 @@ following keystrokes:
 - **F1** → when browsing a dataset properties, F1 will show a help message about the
   selected property. You must first select a property using Enter/Space.
 
+Mouse
+-----
+
+Mouse support is enabled. You can click on any UI component (textbox, list) as
+well as buttons.
+
 Screenshots
 -----------
 

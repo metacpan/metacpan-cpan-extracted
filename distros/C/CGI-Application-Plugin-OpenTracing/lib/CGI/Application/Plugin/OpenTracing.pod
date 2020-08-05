@@ -51,7 +51,7 @@ It will automatically create a new tracer, with a total of four spans:
 
 =item cgi_application
 
-This is the root span, wich will have a start time at the beginning of the cgi
+This is the root span, which will have a start time at the beginning of the cgi
 request, and last till the entire request will be finished.
 
 =back
@@ -112,6 +112,153 @@ and later per subroutine:
 Lastly, use L<OpenTracing::Wrap>, to automagically wrap scopes and traces around
 a list of mentioned (fully qualified) subroutine names.
 
+=head1 FORMATTING TAGS
+
+Query parameters and form-data fields will be added to the request span as tags.
+For example, given a request URL:
+
+    http://test-app.com/data?id=1&view=compact
+
+The following tags would be added to the request span:
+
+    'http.query.id'   => 1,
+    'http.query.view' => 'compact',
+
+However, if a parameter is repeated:
+
+    http://test-app.com/data?id=1&id=2&id=3&view=compact
+
+there would be multiple values for the C<http.query.id> tag.
+OpenTracing span tags need to be scalars. The plugin will always turn
+multiple values into a simple string. There are a few ways
+to customize this behaviour.
+
+By default, the parameter values are joined with the contents of
+C<$CGI::Application::Plugin::TAG_JOIN_CHAR>, which is a comma by default.
+Without any customization, the example above would yield the following tags:
+
+    'http.query.id'   => '1,2,3',
+    'http.query.view' => 'compact',
+
+Simple join is often not enough and there are parameters which should
+be skipped or obscured. The plugin allows to specify the formatting
+with the following callbacks:
+
+=over 4
+
+=item opentracing_process_tags_query_params
+
+Used to match and format URL query parameters (C<http.query.*> tags).
+
+=item opentracing_process_tags_form_fields
+
+Used to match and format form data fields (C<http.form.*> tags).
+
+=item opentracing_process_tags
+
+Used to match both query parameters and form data, when the specific
+callbacks fail to match (see L<Fallbacks and matching order>).
+
+=back
+
+Their expected return values all follow the same format of key-value pairs
+with an optional odd element at the end. For example:
+
+    sub opentracing_process_tags_query_params {
+        id           => sub { "[@_]" },
+        location     => 'REDACTED',
+        access_token => undef,
+        sub { join ';', @_ },
+    }
+
+Each key represents a parameter name to match. The values define how
+the parameter should be formatted. The last odd element is a fallback entry,
+used to format parameters not matched elsewhere.
+
+The values can be:
+
+=over 4
+
+=item undef - will cause the tag to be skipped altogether
+
+=item string - will be used as the tag value directly
+
+=item arrayref - will be joined with C<$CGI::Application::Plugin::TAG_JOIN_CHAR>
+
+=item coderef - will be called with all values as arguments, and the return value will be used
+
+=back
+
+B<Note>: values returned by a coderef specification will be treated as
+non-coderef formatters. For example, if a coderef formatter returns C<undef>,
+the parameter will be skipped, if it returns an arrayref, it will be joined, etc.
+It can't return another coderef.
+
+Given the following example:
+
+  http://test-app.com/data?id=1&id=2&id=3
+
+  Specification        | http.query.id
+  ---------------------+--------------
+                       | 1,2,3
+  id => undef          | 
+  id => 'XXX'          | XXX
+  id => [ 'X', 'Y' ]   | X,Y
+  id => sub { "[@_]" } | [1 2 3]
+  id => sub { \@_ }    | 1,2,3
+  id => sub { undef }  |
+  id => sub { 'XXX' }  | XXX
+
+=head2 Matching multiple parameters
+
+Sometimes, a single formatter fits multiple parameters:
+
+  sub opentracing_process_tags {
+      pwd      => undef,
+      password => undef,
+  }
+
+Instead of repeating pairs, it's possible to specify multiple names with
+an array reference:
+
+  sub opentracing_process_tags {
+      ['pwd', 'password'] => undef,
+  }
+
+Or match names with a regular expression:
+
+  sub opentracing_process_tags {
+      qr/\A(?:pwd|password)\z/ => undef,
+  }
+
+=head2 Fallbacks and matching order
+
+Whether it's a query parameter or a form field, their specific callback
+will be used first (if present) to check for named matches. If none
+match, the generic callback (L<opentracing_process_tags>) is checked.
+
+Fallback entries, when present, are used to format params which were not
+specifically matched by name. Note that when a generic callback is available,
+the fallback from either L<opentracing_process_tags_query_params> or
+L<opentracing_process_tags_form_fields> will be used B<after> checking 
+for generic named matches.
+
+Matching order for a query parameter:
+
+  opentracing_process_tags_query_params - named matches
+  opentracing_process_tags              - named matches
+  opentracing_process_tags_query_params - fallback
+  opentracing_process_tags              - fallback
+  join with $CGI::Application::Plugin::TAG_JOIN_CHAR
+
+Matching order for a form field:
+
+  opentracing_process_tags_form_fields - named matches
+  opentracing_process_tags             - named matches
+  opentracing_process_tags_form_fields - fallback
+  opentracing_process_tags             - fallback
+  join with $CGI::Application::Plugin::TAG_JOIN_CHAR
+
 =head1 CAVEATS
 
 Probably a few...
@@ -125,27 +272,6 @@ the default L<OpenTracing::Implementation::NoOp> which ... does nothing.
 
 Traces will get lost, when the rootspan is not closed properly.
 
-=head2 Multi-valued query parameters
-
-Query parameters will be automatically added to the C<cgi_request> span
-as tags with a C<http.query.> prefix. Since span tags cannot contain
-references, query parameters appearing multiple times will be concatenated
-with a comma.
-
-You can use a different format by defining an C<opentracing_format_query_params>
-method in your CGI Application. If present, this method will be called whenever
-a query parameter is assigned to a tag, with the parameter name and all values
-as an array reference (even if the parameter only has a single value) as arguments.
-
-For example, to encode values as JSON:
-
-  sub opentracing_format_query_params {
-      my ($self, $name, $values_ref) = @_;
-      return JSON::encode($values_ref);
-  }
-
-
-
 =head1 AUTHOR
 
 Theo van Hoesel <tvanhoesel@perceptyx.com>
@@ -154,7 +280,7 @@ Theo van Hoesel <tvanhoesel@perceptyx.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-'OpenTracing::Implementation::NoOp' is Copyright (C) 2019 .. 2020, Perceptyx Inc
+'CGI::Application::Plugin::OpenTracing' is Copyright (C) 2019 .. 2020, Perceptyx Inc
 
 This library is free software; you can redistribute it and/or modify it under
 the terms of the Artistic License 2.0.

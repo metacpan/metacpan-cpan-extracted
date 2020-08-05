@@ -2,7 +2,7 @@ requires "I18N::Langinfo" => "0";
 requires "JSON::PP" => "0";
 requires "Text::Markdown" => "0";
 requires "YAML" => "0";
-requires "Yancy" => "1.037";
+requires "Yancy" => "1.057";
 requires "perl" => "5.014";
 
 on 'test' => sub {

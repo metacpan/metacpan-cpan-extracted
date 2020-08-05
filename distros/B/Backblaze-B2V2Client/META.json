@@ -1,5 +1,5 @@
 {
-   "abstract" : "Client library for the Backblaze B2 Cloud Storage Service V2 API.  ",
+   "abstract" : "Client library for the Backblaze B2 Cloud Storage Service V2 API.",
    "author" : [
       "/ BUGS"
    ],
@@ -61,7 +61,7 @@
    "provides" : {
       "Backblaze::B2V2Client" : {
          "file" : "lib/Backblaze/B2V2Client.pm",
-         "version" : "1.2"
+         "version" : "1.3"
       }
    },
    "release_status" : "stable",
@@ -75,8 +75,9 @@
          "web" : "https://github.com/ericschernoff/Backblaze-B2V2Client"
       }
    },
-   "version" : "1.2",
+   "version" : "1.3",
    "x_contributors" : [
+      "Eric Chernoff <eric@laravel.weaverstreet.net>",
       "Eric Chernoff <eric@mail.weaverqueue.com>",
       "Eric Chernoff <eric@weaverstreet.net>",
       "Eric Chernoff <ericschernoff@gmail.com>",

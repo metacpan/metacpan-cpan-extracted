@@ -1,5 +1,5 @@
 package Module::Format::AsHTML;
-$Module::Format::AsHTML::VERSION = '0.0.1';
+$Module::Format::AsHTML::VERSION = '0.0.2';
 use strict;
 use warnings;
 
@@ -63,7 +63,7 @@ Module::Format::AsHTML - generate HTML links to metacpan module/dists pages.
 
 =head1 VERSION
 
-version 0.0.1
+version 0.0.2
 
 =head1 SYNOPSIS
 
@@ -88,6 +88,15 @@ As a variable to L<https://metacpan.org/release/Template-Toolkit> and then use i
 in templates:
 
     [% cpan.self_mod('m'=>"List::Util") %]
+
+=head1 SECURITY WARNING!
+
+This module does not validate or sanitize its input and so may be susceptible to
+HTML injection / XSS issues (see L<https://perl-begin.org/topics/security/code-markup-injection/> ).
+This is expected given its origin as utility code for generating static sites.
+
+Please do not use it with input from possibly malicious sources or without sanitising it.
+In the future, this issue may be fixed.
 
 =head1 METHODS
 

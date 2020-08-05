@@ -1,6 +1,12 @@
 CHANGES
 -------
 
+  0.036 3 August 2020
+
+        * 111const-deflate.t - fix number of tests
+          https://github.com/pmqs/Archive-Zip-SimpleZip/issues/13
+          303259e977dad9785cacfd798c3d3e19921f90f0
+
   0.035 7 December 2019
 
         * 000prereq.t - needs version 2.092 of dependencies
@@ -202,4 +208,3 @@ CHANGES
   0.001 26 April 2012
 
       * First Release
-

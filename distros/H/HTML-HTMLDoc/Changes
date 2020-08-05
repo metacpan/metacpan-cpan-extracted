@@ -1,5 +1,9 @@
 Revision history for Perl extension HTML-HTMLDoc
 
+0.17 2020-08-03T19:16:07Z
+
+    - Make all tests work with tests for new functions.
+
 0.16 2020-03-10T19:31:24Z
 
     - get_htmldoc_command() method to retrieve 'htmldoc' command equivalent to your options

@@ -1,5 +1,5 @@
 requires        'OpenTracing::GlobalTracer';
-requires        'OpenTracing::Implementation';
+requires        'OpenTracing::Implementation', 'v0.31.0';
 requires        'HTTP::Headers';
 requires        'HTTP::Status';
 requires        "Syntax::Feature::Maybe";

@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Leel::AliProcessor;
 # ABSTRACT: Internal class for leel tool
-$Bio::MUST::Apps::Leel::AliProcessor::VERSION = '0.190820';
+$Bio::MUST::Apps::Leel::AliProcessor::VERSION = '0.202160';
 use Moose;
 use namespace::autoclean;
 
@@ -94,7 +94,8 @@ sub _check_ali_by_translation {
 
     # check congruence between translated and original Alis
     unless (eq_deeply $got_ali, $exp_ali) {
-        carp 'Warning: round-trip check failed; writing -got and -exp files!';
+        carp '[ALI] Warning: round-trip check failed;'
+            . ' writing -got and -exp files!';
 
         $got_ali->store( secure_outfile($cds_ali->filename, '-got') );
         $exp_ali->store( secure_outfile($cds_ali->filename, '-exp') );
@@ -121,12 +122,14 @@ sub BUILD {
         OrgProcessor->new( ali_proc => $self, %{$org} );
     }
 
-    #### [ALI] Making delayed indels...
-    $self->integrator->make_indels;
+    unless ($rp eq 'off') {
+        #### [ALI] Making delayed indels...
+        $self->integrator->make_indels;
 
-    if ($rp->round_trip_mode eq 'on') {
-        #### [ALI] Retranslating nucleotide sequences...
-        $self->_check_ali_by_translation;
+        if ($rp->round_trip_mode eq 'on') {
+            #### [ALI] Retranslating nucleotide sequences...
+            $self->_check_ali_by_translation;
+        }
     }
 
     #### [ALI] Writing nucleotide file...
@@ -151,7 +154,7 @@ Bio::MUST::Apps::Leel::AliProcessor - Internal class for leel tool
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 AUTHOR
 

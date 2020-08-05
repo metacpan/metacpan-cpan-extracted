@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2020-08-02'; # DATE
-our $VERSION = '0.600'; # VERSION
+our $DATE = '2020-08-03'; # DATE
+our $VERSION = '0.601'; # VERSION
 
 use strict;
 use warnings;
@@ -27,7 +27,7 @@ perlmv - Rename/move files using Perl code
 
 =head1 VERSION
 
-This document describes version 0.600 of perlmv (from Perl distribution App-perlmv), released on 2020-08-02.
+This document describes version 0.601 of perlmv (from Perl distribution App-perlmv), released on 2020-08-03.
 
 =head1 SYNOPSIS
 
@@ -170,6 +170,14 @@ this value.
 
 The name of parent (containing) directory of the item (without path). The Perl
 code is not supposed to modify this value.
+
+=item * C<$ARGS> (hashref)
+
+This are arguments specified by user via the C<-a> (C<--arg> option), e.g. C<<
+-a foo=1 -a bar=2 >> will cause this variable to have the value of C<< {foo=>1,
+bar=>2} >>.
+
+The Perl code is not supposed to modify this value.
 
 =back
 

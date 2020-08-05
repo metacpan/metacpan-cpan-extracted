@@ -11,6 +11,7 @@ Makefile.PL
 README
 dist.ini
 lib/JSON/Schema/Draft201909.pm
+lib/JSON/Schema/Draft201909/Annotation.pm
 lib/JSON/Schema/Draft201909/Document.pm
 lib/JSON/Schema/Draft201909/Error.pm
 lib/JSON/Schema/Draft201909/Result.pm
@@ -45,6 +46,8 @@ t/additional-tests/not-an-id.json
 t/additional-tests/recursiveRef.json
 t/additional-tests/ref-and-id.json
 t/additional-tests/ref.json
+t/additional-tests/unevaluatedProperties.json
+t/annotations.t
 t/booleans.t
 t/cached-metaschemas.t
 t/document.t

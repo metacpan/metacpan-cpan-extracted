@@ -1,5 +1,5 @@
 package Yancy::Backend::Static;
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 # ABSTRACT: Build a Yancy site from static Markdown files
 
 #pod =head1 SYNOPSIS
@@ -9,11 +9,11 @@ our $VERSION = '0.012';
 #pod         backend => 'static:.',
 #pod         read_schema => 1,
 #pod     };
-#pod     get '/*id', {
+#pod     get '/*path', {
 #pod         controller => 'yancy',
 #pod         action => 'get',
 #pod         schema => 'pages',
-#pod         id => 'index', # Default to index page
+#pod         path => 'index', # Default to index page
 #pod         template => 'default', # default.html.ep below
 #pod     };
 #pod     app->start;
@@ -57,13 +57,13 @@ our $VERSION = '0.012';
 #pod         backend => 'static:.',
 #pod         read_schema => 1,
 #pod     };
-#pod     get '/*id', {
+#pod     get '/*path', {
 #pod         controller => 'yancy',
 #pod         action => 'get',
 #pod         schema => 'pages',
 #pod         template => 'default',
 #pod         layout => 'default',
-#pod         id => 'index',
+#pod         path => 'index',
 #pod     };
 #pod     app->start;
 #pod     __DATA__
@@ -185,7 +185,7 @@ use Yancy::Util qw( match order_by );
 use I18N::Langinfo qw( langinfo CODESET );
 use Encode qw( encode decode );
 
-has schema =>;
+has schema => sub { +{} };
 has path =>;
 has markdown_parser => sub { Text::Markdown->new };
 has encoding => sub { langinfo( CODESET ) };
@@ -198,7 +198,7 @@ sub new {
     return $class->SUPER::new( {
         %attrs,
         path => Mojo::File->new( $path ),
-        schema => $schema,
+        ( schema => $schema )x!!$schema,
     } );
 }
 
@@ -234,7 +234,19 @@ sub get {
         return undef;
     }
     $item->{path} = $self->_path_to_id( $path->to_rel( $self->path ) );
+    $self->_normalize_item( $schema, $item );
     return $item;
+}
+
+sub _normalize_item {
+    my ( $self, $schema_name, $item ) = @_;
+    return unless my $schema = $self->schema->{ $schema_name };
+    for my $prop_name ( keys %{ $item } ) {
+        next unless my $prop = $schema->{ properties }{ $prop_name };
+        if ( $prop->{type} eq 'array' && ref $item->{ $prop_name } ne 'ARRAY' ) {
+            $item->{ $prop_name } = [ $item->{ $prop_name } ];
+        }
+    }
 }
 
 sub list {
@@ -252,6 +264,7 @@ sub list {
             next;
         }
         $item->{path} = $self->_path_to_id( $path->to_rel( $self->path ) );
+        $self->_normalize_item( $schema, $item );
         next unless match( $params, $item );
         push @items, $item;
         $total++;
@@ -472,7 +485,7 @@ Yancy::Backend::Static - Build a Yancy site from static Markdown files
 
 =head1 VERSION
 
-version 0.012
+version 0.013
 
 =head1 SYNOPSIS
 
@@ -481,11 +494,11 @@ version 0.012
         backend => 'static:.',
         read_schema => 1,
     };
-    get '/*id', {
+    get '/*path', {
         controller => 'yancy',
         action => 'get',
         schema => 'pages',
-        id => 'index', # Default to index page
+        path => 'index', # Default to index page
         template => 'default', # default.html.ep below
     };
     app->start;
@@ -529,13 +542,13 @@ create a file called C<myapp.pl> with the following contents:
         backend => 'static:.',
         read_schema => 1,
     };
-    get '/*id', {
+    get '/*path', {
         controller => 'yancy',
         action => 'get',
         schema => 'pages',
         template => 'default',
         layout => 'default',
-        id => 'index',
+        path => 'index',
     };
     app->start;
     __DATA__

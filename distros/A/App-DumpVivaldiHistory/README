@@ -2,7 +2,7 @@ NAME
     App::DumpVivaldiHistory - Dump Vivaldi history
 
 VERSION
-    This document describes version 0.001 of App::DumpVivaldiHistory (from
+    This document describes version 0.002 of App::DumpVivaldiHistory (from
     Perl distribution App-DumpVivaldiHistory), released on 2020-04-19.
 
 SYNOPSIS

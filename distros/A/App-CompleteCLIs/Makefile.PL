@@ -62,6 +62,7 @@ my %WriteMakefileArgs = (
     "script/complete-tz-offset",
     "script/complete-uid",
     "script/complete-user",
+    "script/complete-vivaldi-profile-name",
     "script/complete-weaver-bundle",
     "script/complete-weaver-plugin",
     "script/complete-weaver-role",
@@ -100,6 +101,7 @@ my %WriteMakefileArgs = (
     "Complete::TZ" => "0.080",
     "Complete::Unix" => "0.07",
     "Complete::Util" => "0.608",
+    "Complete::Vivaldi" => 0,
     "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modprefix" => 0,
     "Data::Sah::Compiler::perl::TH::any" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
@@ -124,7 +126,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.145",
+  "VERSION" => "0.146",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -161,6 +163,7 @@ my %FallbackPrereqs = (
   "Complete::TZ" => "0.080",
   "Complete::Unix" => "0.07",
   "Complete::Util" => "0.608",
+  "Complete::Vivaldi" => 0,
   "Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_modprefix" => 0,
   "Data::Sah::Compiler::perl::TH::any" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,

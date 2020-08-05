@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
+use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -39,11 +40,16 @@ require App::Followme::CreateNews;
 my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
-mkdir $test_dir;
+mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-chdir $test_dir;
-my $archive_dir = catfile($test_dir, 'archive');
 
+my $archive_dir = catfile(@path, 'test', 'archive');
+mkdir($archive_dir) or die $!;
+chmod 0755, $archive_dir;
+
+chdir $test_dir or die $!;
+$test_dir = cwd();
+    
 my %configuration = (
                         base_directory => $test_dir,
                         template_directory => '.',
@@ -62,9 +68,8 @@ can_ok($idx, qw(new run)); # test 2
 # Write templates
 
 do {
-    mkdir($archive_dir);
-    chmod 0755, $archive_dir;
-    chdir($test_dir);
+    chdir($test_dir) or die $!;
+    $test_dir = cwd();
 
    my $page = <<'EOQ';
 <html>
@@ -154,7 +159,9 @@ EOQ
 # Create index files
 
 do {
-    chdir($test_dir);
+    chdir($test_dir) or die $!;
+    $test_dir = cwd();
+    
     my $idx = App::Followme::CreateNews->new(%configuration);
 
     my $archive_dir = catfile($test_dir, 'archive');

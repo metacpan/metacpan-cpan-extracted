@@ -2,27 +2,45 @@
 use warnings;
 use strict;
 
-use App::ZFSCurses;
+use App::ZFSCurses::UI;
+use Getopt::Long;
+use Pod::Usage;
 
 =head1 NAME
 
-zfscurses - create and run an App::ZFSCurses instance.
+zfscurses - frontend to run L<App::ZFSCurses::UI>.
 
 =cut
 
 =head1 SYNOPSIS
 
-zfscurses is a script to create and run an App::ZFSCurses instance.
+zfscurses [-hm]
+
+    -m|--man        display man page
+    -h|--help       also display man page
+
+zfscurses is a frontend to run L<App::ZFSCurses::UI>.
+
+L<App::ZFSCurses::UI> is a curses UI to query and modify a ZFS dataset properties.
 
 =cut
 
-App::ZFSCurses->new->run();
+my $opts = {};
+my @args = ( 'help|h', 'man|m' );
+
+GetOptions( $opts, @args );
+
+if ($opts->{man} or $opts->{help}) {
+    pod2usage(verbose => 2, exitval => -1);
+};
+
+App::ZFSCurses::UI->new->draw_and_run();
 
 =head1 KEYSTROKES
 
 Use the following keystrokes to navigate around the UI.
 
-=over 4
+=over 5
 
 =item Up/Down
 
@@ -30,7 +48,11 @@ Move the cursor up or down.
 
 =item Enter/Space
 
-Change focus around.
+Validate/confirm selection.
+
+=item Tab
+
+Move focus around.
 
 =item Ctrl+q
 
@@ -44,6 +66,17 @@ selected property. You must first select a property using Enter/Space.
 =back
 
 =cut
+
+=head1 MOUSE
+
+Mouse support is enabled. You can click on any UI component (textbox, list) as
+well as buttons.
+
+=head1 SEE ALSO
+
+L<App::ZFSCurses> to understand the guts of the application.
+
+L<App::ZFSCurses::UI> for the UI components.
 
 =head1 AUTHOR
 

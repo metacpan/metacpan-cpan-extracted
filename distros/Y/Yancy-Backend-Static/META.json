@@ -38,7 +38,7 @@
             "JSON::PP" : "0",
             "Text::Markdown" : "0",
             "YAML" : "0",
-            "Yancy" : "1.037",
+            "Yancy" : "1.057",
             "perl" : "5.014"
          }
       },
@@ -59,7 +59,7 @@
    "provides" : {
       "Yancy::Backend::Static" : {
          "file" : "lib/Yancy/Backend/Static.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
       },
       "x_IRC" : "irc://irc.freenode.org/#mojo-yancy"
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",

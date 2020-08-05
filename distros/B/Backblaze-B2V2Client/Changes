@@ -1,5 +1,10 @@
 Revision history for Perl extension Backblaze-B2V2Client
 
+1.3 2020-08-04T17:01:21Z
+
+    - Add support for uploading large files (>100MB) via b2_upload_large_file
+    - Add tests during installation.
+
 1.2 2020-06-24T04:44:05Z
 
     - Fix for respecting 'new_file_name' when using 'file_contents' in b2_upload_file()

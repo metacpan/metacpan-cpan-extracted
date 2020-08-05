@@ -10,7 +10,7 @@ use base qw(App::Followme::FileData);
 use App::Followme::FIO;
 use App::Followme::Web;
 
-our $VERSION = "1.94";
+our $VERSION = "1.95";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -110,8 +110,6 @@ efficiency, all the data are read from the file at once.
 
 This class whatever values are returned in metadata section in the header
 as well as the title and body extracted from the body section.
-
-=back
 
 =head1 CONFIGURATION
 

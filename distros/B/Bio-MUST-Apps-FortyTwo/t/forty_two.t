@@ -13,9 +13,14 @@ use Bio::MUST::Apps::FortyTwo;
 
 my $class = 'Bio::MUST::Apps::FortyTwo';
 
-check_forty('nuc-simple')   ;
-check_forty('prot-simple');
-check_forty('prot-tax');
+SKIP: {
+    skip q{Cannot test without NCBI-BLAST!}, 12 unless qx{which blastp};
+
+    check_forty('nuc-simple');
+    check_forty('prot-simple');
+    check_forty('prot-tax');
+}
+
 
 sub check_forty {
     my $variant = shift;
@@ -41,6 +46,7 @@ sub check_forty {
 
     # use ft as factory for run_proc object
     my $rp = $ft->run_proc;
+    # my $rp = $ft->run_proc( { threads => 2 } );
 
     compare_ok(
         file('test/MSAs/', "EOG700KXR-my-42-$variant.ali"),

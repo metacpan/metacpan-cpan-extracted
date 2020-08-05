@@ -1,18 +1,12 @@
-package Data::Visitor;
-BEGIN {
-  $Data::Visitor::AUTHORITY = 'cpan:NUFFIN';
-}
-{
-  $Data::Visitor::VERSION = '0.30';
-}
+package Data::Visitor; # git description: Data-Visitor-0.27-23-g8b10b8a
 use Moose;
 # ABSTRACT: Visitor style traversal of Perl data structures
 
+our $VERSION = '0.31';
 use Scalar::Util qw/blessed refaddr reftype weaken isweak/;
 use overload ();
 use Symbol ();
 
-use Class::Load 'load_optional_class';
 use Tie::ToObject;
 
 no warnings 'recursion';
@@ -22,7 +16,7 @@ use namespace::clean -except => 'meta';
 # the double not makes this no longer undef, so exempt from useless constant warnings in older perls
 use constant DEBUG => not not our $DEBUG || $ENV{DATA_VISITOR_DEBUG};
 
-use constant HAS_DATA_ALIAS => load_optional_class('Data::Alias');
+use constant HAS_DATA_ALIAS => eval { +require Data::Alias; 1 };
 
 has tied_as_objects => (
 	isa => "Bool",
@@ -415,6 +409,10 @@ sub retain_magic {
 
 	my $seen_hash = $self->{_seen};
 	if ( $seen_hash->{weak} ) {
+		#if ("$]" >= '5.022') {
+		#  TODO: Data::Alias does not work on recent perls, but there is built-in aliasing support now.
+		#  e.g. see what Var::Pairs 0.003004 did.
+		#}
 		if (HAS_DATA_ALIAS) {
 			my @weak_refs;
 			foreach my $value ( Data::Alias::deref($proto) ) {
@@ -457,13 +455,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Data::Visitor - Visitor style traversal of Perl data structures
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -515,15 +515,13 @@ structures, and all ref types (hashes, arrays, scalars, code, globs).
 L<Data::Visitor> is meant to be subclassed, but also ships with a callback
 driven subclass, L<Data::Visitor::Callback>.
 
-=encoding utf8
-
 =head1 METHODS
 
 =over 4
 
 =item visit $data
 
-This method takes any Perl value as it's only argument, and dispatches to the
+This method takes any Perl value as its only argument, and dispatches to the
 various other visiting methods using C<visit_no_rec_check>, based on the data's
 type.
 
@@ -532,7 +530,7 @@ called.
 
 =item visit_seen $data, $first_result
 
-When an already seen value is encountered again it's typically replaced with
+When an already seen value is encountered again, it is typically replaced with
 the result of the first visitation of that value. The value and the result of
 the first visitation are passed as arguments.
 
@@ -634,7 +632,7 @@ This object can be used as an C<fmap> of sorts - providing an ad-hoc functor
 interface for Perl data structures.
 
 In void context this functionality is ignored, but in any other context the
-default methods will all try to return a value of similar structure, with it's
+default methods will all try to return a value of similar structure, with its
 children also fmapped.
 
 =head1 SUBCLASSING
@@ -678,6 +676,11 @@ visit_tied_glob
 visit_tied_hash
 visit_tied_scalar
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Visitor>
+(or L<bug-Data-Visitor@rt.cpan.org|mailto:bug-Data-Visitor@rt.cpan.org>).
+
 =head1 AUTHORS
 
 =over 4
@@ -692,9 +695,37 @@ Marcel Grünauer <marcel@cpan.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 CONTRIBUTORS
 
-This software is copyright (c) 2013 by Yuval Kogman.
+=for stopwords Jesse Luehrs Florian Ragwitz Karen Etheridge David Steinbrunner Robin Smidsrød
+
+=over 4
+
+=item *
+
+Jesse Luehrs <doy@tozt.net>
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+David Steinbrunner <dsteinbrunner@pobox.com>
+
+=item *
+
+Robin Smidsrød <robin@smidsrod.no>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2020 by Yuval Kogman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

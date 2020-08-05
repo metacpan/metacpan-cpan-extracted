@@ -22,9 +22,9 @@ require App::Followme::ConfiguredObject;
 my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
-mkdir $test_dir;
+mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-chdir $test_dir;
+chdir $test_dir or die $!;
 $test_dir = cwd();
 
 #----------------------------------------------------------------------

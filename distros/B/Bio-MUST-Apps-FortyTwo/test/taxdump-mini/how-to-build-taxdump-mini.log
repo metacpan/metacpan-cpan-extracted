@@ -1,0 +1,9 @@
+# split elements of desired lineage(s)
+perl -nle 's/;\s/\n/xmsg; print' lineage.txt > lineage_elements.idl
+while read line; do grep -P "\t$line\t" ~/taxdump/names.dmp ; done < lineage_elements.idl > names.dmp
+# delete ambiguous taxa in names.dmp (if any keep only the correct taxon)
+grep -P "\troot\t" ~/taxdump/names.dmp >> names.dmp 
+for f in $(cut -f1 names.dmp); do grep -P "^$f\b" ~/taxdump/nodes.dmp  ; done > nodes.dmp
+for f in $(cut -f1 names.dmp); do grep -P "\b$f\b" ~/taxdump/merged.dmp  ; done > merged.dmp
+touch delnodes.dmp
+setup-taxdir.pl --taxdir=./ --update-cache

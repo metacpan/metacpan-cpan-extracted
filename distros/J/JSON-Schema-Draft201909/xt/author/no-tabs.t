@@ -8,6 +8,7 @@ use Test::NoTabs;
 
 my @files = (
     'lib/JSON/Schema/Draft201909.pm',
+    'lib/JSON/Schema/Draft201909/Annotation.pm',
     'lib/JSON/Schema/Draft201909/Document.pm',
     'lib/JSON/Schema/Draft201909/Error.pm',
     'lib/JSON/Schema/Draft201909/Result.pm',
@@ -30,6 +31,8 @@ my @files = (
     't/additional-tests/recursiveRef.json',
     't/additional-tests/ref-and-id.json',
     't/additional-tests/ref.json',
+    't/additional-tests/unevaluatedProperties.json',
+    't/annotations.t',
     't/booleans.t',
     't/cached-metaschemas.t',
     't/document.t',

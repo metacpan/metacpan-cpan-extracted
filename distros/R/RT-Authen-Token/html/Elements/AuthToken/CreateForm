@@ -6,6 +6,10 @@ $Description => ''
 <%INIT>
 # Don't require password for systems with some form of federated auth
 my %res = $session{'CurrentUser'}->CurrentUserRequireToSetPassword();
+my $require_password = 1;
+if ( RT->Config->Get('DisablePasswordForAuthToken') or not $res{'CanSet'} ) {
+   $require_password = 0;
+}
 </%INIT>
 <form class="authtoken-form" method="post" data-ajax-url="<% RT->Config->Get('WebPath') %>/Helpers/AuthToken/Create">
 % if ($Error) {
@@ -13,7 +17,7 @@ my %res = $session{'CurrentUser'}->CurrentUserRequireToSetPassword();
 % }
 <input type="hidden" name="Owner" value="<% $Owner %>">
 <table>
-% if ( $res{'CanSet'} ){
+% if ( $require_password ){
 <tr>
 <td class="label"><&|/l, $session{'CurrentUser'}->Name()&>[_1]'s current password</&>:</td>
 <td class="value"><input type="password" name="Password" size="16" autocomplete="off" /></td>

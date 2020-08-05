@@ -315,8 +315,9 @@ The "if" and "for" commands can contain an C<else>. The text before the "else"
 is included if the expression in the enclosing command is true and the
 text after the "else" is included if the "if" command is false or the "for"
 command does not execute. You can also place an "elsif" command inside a block,
-which includes the following text if its expression
-is true.
+which includes the following text if its expression is true.
+
+=back
 
 =head1 TEMPLATES
 

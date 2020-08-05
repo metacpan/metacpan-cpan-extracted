@@ -6,7 +6,7 @@ use Type::Tiny::XS ();
 package Type::Tiny::XS::Util;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.017';
+our $VERSION   = '0.019';
 
 1;
 

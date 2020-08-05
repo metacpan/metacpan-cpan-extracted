@@ -23,10 +23,10 @@ require App::Followme;
 
 my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
-mkdir $test_dir;
+mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-chdir $test_dir;
 
+chdir $test_dir or die $!;
 $test_dir = getcwd();
 
 #----------------------------------------------------------------------
@@ -52,7 +52,8 @@ do {
 do {
     my $app = App::Followme->new();
 
-    chdir($test_dir);
+    chdir($test_dir) or die $!;
+    $test_dir = cwd();
     my $config = 'followme.cfg';
     my @config_files_ok = (catfile($test_dir, $config));
 
@@ -60,9 +61,9 @@ do {
 
     my $directory;
     foreach my $dir (qw(one two three)) {
-        mkdir($dir);
+        mkdir($dir) or die $!;
         chmod 0755, $dir;
-        chdir ($dir);
+        chdir ($dir) or die $!;
         $directory = getcwd();
 
         $config = catfile($directory, 'followme.cfg');
@@ -80,9 +81,10 @@ do {
     $app->run($test_dir);
 
     my $count = 9;
-    chdir($test_dir);
+    chdir($test_dir) or die $!;
+    $test_dir = cwd();
     foreach my $dir (qw(one two three)) {
-        chdir ($dir);
+        chdir ($dir) or die $!;
 
         my $filename = rel2abs('sitemap.txt');
         ok(-e $filename, 'Ran create sitemap'); # test 4, 6, 8

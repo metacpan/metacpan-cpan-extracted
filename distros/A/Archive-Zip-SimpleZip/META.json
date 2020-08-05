@@ -4,13 +4,13 @@
       "Paul Marquess <pmqs@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Archive-Zip-SimpleZip",
    "no_index" : {
@@ -34,13 +34,12 @@
       },
       "runtime" : {
          "recommends" : {
-            "IO::Compress::Lzma" : "2.093",
-            "IO::Uncompress::UnLzma" : "2.093"
+            "IO::Compress::Lzma" : "2.096",
+            "IO::Uncompress::UnLzma" : "2.096"
          },
          "requires" : {
-            "IO::Compress::Base" : "2.093",
-            "IO::Compress::Lzma" : "2.093",
-            "IO::Uncompress::Base" : "2.093",
+            "IO::Compress::Base" : "2.096",
+            "IO::Uncompress::Base" : "2.096",
             "Perl::OSType" : "0"
          }
       }
@@ -57,6 +56,6 @@
          "web" : "https://github.com/pmqs/Archive-Zip-SimpleZip"
       }
    },
-   "version" : "0.035",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.036",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

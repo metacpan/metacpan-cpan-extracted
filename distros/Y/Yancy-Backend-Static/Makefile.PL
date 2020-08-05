@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
     "JSON::PP" => 0,
     "Text::Markdown" => 0,
     "YAML" => 0,
-    "Yancy" => "1.037"
+    "Yancy" => "1.057"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Mojo" => 0,
     "Test::More" => "1.001005"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.013",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %FallbackPrereqs = (
   "Test::More" => "1.001005",
   "Text::Markdown" => 0,
   "YAML" => 0,
-  "Yancy" => "1.037"
+  "Yancy" => "1.057"
 );
 
 

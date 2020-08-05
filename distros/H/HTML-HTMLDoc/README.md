@@ -10,20 +10,20 @@ HTML::HTMLDoc - Perl interface to the htmldoc program for producing PDF Files fr
 
     # generate from a string of HTML:
     $htmldoc->set_html_content(qq~<html><body>A PDF file</body></html>~);
-    
+
     # or generate from an HTML file:
-    $htmldoc->set_input_file($filename); 
+    $htmldoc->set_input_file($filename);
 
     # create the PDF
     my $pdf = $htmldoc->generate_pdf();
 
     # print the content of the PDF
     print $pdf->to_string();
-    
+
     # save to a file
     $pdf->to_file('foo.pdf');
 
-    # see the htmldoc command used to generate a PDF -- after using set_input_file() 
+    # see the htmldoc command used to generate a PDF -- after using set_input_file()
     # and all other desired configuration methods
     print $htmldoc->get_htmldoc_command();
 
@@ -33,9 +33,9 @@ This module provides an OO interface to the HTMLDOC program.  HTMLDOC is a comma
 line utility which creates PDF and PostScript files from HTML 3.2.  It is actively
 maintained and available via the package manager (apt, yum) of the major Linux distros.
 
-HTML 3.2 is very limited for web interfaces, but it can do a lot when preparing a 
+HTML 3.2 is very limited for web interfaces, but it can do a lot when preparing a
 document for printing.  The complete list of supported HTML tags is listed here:
-[https://www.msweet.org/htmldoc/htmldoc.html#HTMLREF](https://www.msweet.org/htmldoc/htmldoc.html#HTMLREF)  There are also several 
+[https://www.msweet.org/htmldoc/htmldoc.html#HTMLREF](https://www.msweet.org/htmldoc/htmldoc.html#HTMLREF)  There are also several
 HTMLDOC-specific comment options detailed here: [https://www.msweet.org/htmldoc/htmldoc.html#COMMENTS](https://www.msweet.org/htmldoc/htmldoc.html#COMMENTS)
 
 The HTMLDOC home page at [https://www.msweet.org/htmldoc](https://www.msweet.org/htmldoc) and includes complete
@@ -44,10 +44,10 @@ documentation for the program and a link to the GitHub repo.
 You will need to install HTMLDOC prior to installing this module, and it is
 recommended to experiment with the 'htmldoc' command prior to utilizing this module.
 
-All the config-setting modules return true for success or false for failure. You can 
+All the config-setting modules return true for success or false for failure. You can
 test if errors occurred by calling the error-method.
 
-Please use the get\_htmldoc\_command() method to retrieve an HTMLDOC command with your 
+Please use the get\_htmldoc\_command() method to retrieve an HTMLDOC command with your
 options for easy troubleshooting.  **If your HTML does not work with the HTMLDOC
 command, it will also not work with this module.**
 
@@ -150,21 +150,21 @@ Turns the title on.
 
 Turns the title off.
 
-## set\_right\_margin($margin, $messure)
+## set\_right\_margin($margin, $measure)
 
-Set the right margin. $margin is a INT, $messure one of 'in', 'cm' or 'mm'.
+Set the right margin. $margin is a INT, $measure one of 'in', 'cm' or 'mm'.
 
-## set\_left\_margin($margin, $messure)
+## set\_left\_margin($margin, $measure)
 
-Set the left margin. $margin is a INT, $messure one of 'in', 'cm' or 'mm'.
+Set the left margin. $margin is a INT, $measure one of 'in', 'cm' or 'mm'.
 
-## set\_bottom\_margin($margin, $messure)
+## set\_bottom\_margin($margin, $measure)
 
-Set the bottom margin. $margin is a INT, $messure one of 'in', 'cm' or 'mm'.
+Set the bottom margin. $margin is a INT, $measure one of 'in', 'cm' or 'mm'.
 
-## set\_top\_margin($margin, $messure)
+## set\_top\_margin($margin, $measure)
 
-Set the top margin. $margin is a INT, $messure one of 'in', 'cm' or 'mm'.
+Set the top margin. $margin is a INT, $measure one of 'in', 'cm' or 'mm'.
 
 ## set\_bodycolor($color)
 
@@ -205,7 +205,7 @@ Reads out a previous set logo-image. You will get the filename to the image.
 
 ## set\_letterhead($image)
 
-Sets the image to use as a letter for the document. $image is the path to the image in your filesystem. 
+Sets the image to use as a letter for the document. $image is the path to the image in your filesystem.
 The image should be 72DPI, and for portrait mode, 620-650 pixels wide and 72-90 pixels tall.
 The supported formats are BMP, GIF, JPEG, and PNG.
 
@@ -262,7 +262,7 @@ Specifies the initial page layout in the PDF viewer. The layout parameter can be
 - twoleft - Two columns are displayed with the first page on the left.
 - tworight - Two columns are displayed with the first page on the right.
 
-This option is only available when generating PDF files. 
+This option is only available when generating PDF files.
 
 ## set\_pagemode($mode)
 

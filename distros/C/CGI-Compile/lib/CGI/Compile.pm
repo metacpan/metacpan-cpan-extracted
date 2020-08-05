@@ -3,7 +3,7 @@ package CGI::Compile;
 use strict;
 use 5.008_001;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Cwd;
 use File::Basename;
@@ -168,8 +168,8 @@ sub _build_subname {
     my ($volume, $dirs, $file) = File::Spec::Functions::splitpath($path);
     my @dirs = File::Spec::Functions::splitdir($dirs);
 
-    my $package = join '_', grep { defined && length } $volume, @dirs;
     my $name    = $file;
+    my $package = join '_', grep { defined && length } $volume, @dirs, $name;
 
     # Escape everything into valid perl identifiers
     s/([^A-Za-z0-9_])/sprintf("_%2x", unpack("C", $1))/eg for $package, $name;

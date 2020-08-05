@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.51 {
+package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.53 {
 
   use 5.014;
   use Moose;
@@ -109,7 +109,7 @@ Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod
 
 =head1 VERSION
 
-version 2.51
+version 2.53
 
 =head1 SYNOPSIS
 

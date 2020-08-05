@@ -12,7 +12,7 @@ use File::Copy;
 use File::Path qw(remove_tree);
 use File::Spec::Functions qw(abs2rel splitdir catfile);
 
-our $VERSION = "1.94";
+our $VERSION = "1.95";
 
 #----------------------------------------------------------------------
 # Read the default parameter values

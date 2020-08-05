@@ -11,7 +11,7 @@ use Hash::Merge qw/ merge /;
 use Data::Fake qw/ Core Names Text Dates /;
 use JSON::Validator::Util qw/ schema_type /;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 has _validator  => sub {
 	$ENV{JSON_VALIDATOR_RECURSION_LIMIT} = shift->max_depth;
@@ -419,7 +419,7 @@ JSON::Schema::ToJSON - Generate example JSON structures from JSON Schema definit
 
 =head1 VERSION
 
-0.17
+0.18
 
 =head1 SYNOPSIS
 
@@ -529,10 +529,26 @@ combination.
 Note that the data generated is completely random, don't expect it to be the same
 across runs or calls. The data is also meaningless in terms of what it represents
 such that an object property of "name" that is a string will be generated as, for
-example, "kj02@#fjs01je#$42wfjs" - The JSON generated is so you have a representative
+example, "est sed asperiores" - The JSON generated is so you have a representative
 B<structure>, not representative B<data>. Set example keys in your schema and then
 set the C<example_key> in the constructor if you want this to be repeatable and/or
 more representative.
+
+L<Data::Fake> is used for some of the generated data, through use of fake_name,
+fake_past_datetime, fake_int, and fake_words
+
+To generate subsections of data, or for those schema that are large only generating
+small sections, you can combine with L<JSON::Validator> like so:
+
+	use JSON::Validator;
+	my $jv = JSON::Validator->new;
+	$jv->schema( 'petstore.json' );
+
+	my $generator = JSON::Schema::ToJSON->new;
+
+	my $response = $generator->json_schema_to_json(
+		schema => $jv->get( '/definitions/Pet' )
+	);
 
 =head1 LICENSE
 

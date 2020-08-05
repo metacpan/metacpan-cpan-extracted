@@ -4,13 +4,13 @@
       "Karl Gaissmaier <karl.gaissmaier(at)uni-ulm.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Net-IPAM-Block",
    "prereqs" : {
@@ -37,13 +37,13 @@
    "provides" : {
       "Net::IPAM::Block" : {
          "file" : "lib/Net/IPAM/Block.pm",
-         "version" : "2.00"
+         "version" : "2.03"
       },
       "Net::IPAM::Block::Private" : {
          "file" : "lib/Net/IPAM/Block/Private.pm"
       }
    },
    "release_status" : "stable",
-   "version" : "2.00",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "2.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

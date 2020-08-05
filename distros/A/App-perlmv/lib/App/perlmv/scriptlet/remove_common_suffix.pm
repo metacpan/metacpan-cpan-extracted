@@ -1,9 +1,9 @@
 package App::perlmv::scriptlet::remove_common_suffix;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-02'; # DATE
+our $DATE = '2020-08-03'; # DATE
 our $DIST = 'App-perlmv'; # DIST
-our $VERSION = '0.600'; # VERSION
+our $VERSION = '0.601'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,7 +48,7 @@ App::perlmv::scriptlet::remove_common_suffix
 
 =head1 VERSION
 
-This document describes version 0.600 of App::perlmv::scriptlet::remove_common_suffix (from Perl distribution App-perlmv), released on 2020-08-02.
+This document describes version 0.601 of App::perlmv::scriptlet::remove_common_suffix (from Perl distribution App-perlmv), released on 2020-08-03.
 
 =head1 HOMEPAGE
 

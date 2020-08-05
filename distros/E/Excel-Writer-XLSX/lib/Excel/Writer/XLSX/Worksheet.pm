@@ -30,7 +30,7 @@ use Excel::Writer::XLSX::Utility qw(xl_cell_to_rowcol
                                     quote_sheetname);
 
 our @ISA     = qw(Excel::Writer::XLSX::Package::XMLwriter);
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 
 ###############################################################################
@@ -2581,10 +2581,9 @@ sub write_array_formula {
     ( $row1, $row2 ) = ( $row2, $row1 ) if $row1 > $row2;
     ( $col1, $col2 ) = ( $col1, $col2 ) if $col1 > $col2;
 
-
-    # Check that row and col are valid and store max and min values
+    # Check that row and col are valid and store max and min values.
+    return -2 if $self->_check_dimensions( $row1, $col1 );
     return -2 if $self->_check_dimensions( $row2, $col2 );
-
 
     # Define array range
     my $range;
@@ -3174,8 +3173,9 @@ sub merge_range {
     ( $col_first, $col_last ) = ( $col_last, $col_first )
       if $col_first > $col_last;
 
-    # Check that column number is valid and store the max value
-    return if $self->_check_dimensions( $row_last, $col_last );
+    # Check that the data range is valid and store the max and min values.
+    return -2 if $self->_check_dimensions( $row_first, $col_first );
+    return -2 if $self->_check_dimensions( $row_last, $col_last );
 
     # Store the merge range.
     push @{ $self->{_merge} }, [ $row_first, $col_first, $row_last, $col_last ];
@@ -3245,8 +3245,9 @@ sub merge_range_type {
     ( $col_first, $col_last ) = ( $col_last, $col_first )
       if $col_first > $col_last;
 
-    # Check that column number is valid and store the max value
-    return if $self->_check_dimensions( $row_last, $col_last );
+    # Check that the data range is valid and store the max and min values.
+    return -2 if $self->_check_dimensions( $row_first, $col_first );
+    return -2 if $self->_check_dimensions( $row_last, $col_last );
 
     # Store the merge range.
     push @{ $self->{_merge} }, [ $row_first, $col_first, $row_last, $col_last ];
@@ -5981,7 +5982,7 @@ sub insert_shape {
         # if the stencil is modified.
         my $insert = { %{$shape} };
 
-       # For connectors change x/y coords based on location of connected shapes.
+       # For connectors change x/y co-ords based on location of connected shapes.
         $self->_auto_locate_connectors( $insert );
 
         # Bless the copy into this class, so AUTOLOADED _get, _set methods
@@ -5993,7 +5994,7 @@ sub insert_shape {
     }
     else {
 
-       # For connectors change x/y coords based on location of connected shapes.
+       # For connectors change x/y co-ords based on location of connected shapes.
         $self->_auto_locate_connectors( $shape );
 
         # Insert a link to the shape on the list of shapes. Connection to

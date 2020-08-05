@@ -9,15 +9,14 @@ no warnings 'experimental';
 use List::Util qw( min max sum);
 use Vote::Count::TextTableTiny qw/generate_markdown_table/;
 use Sort::Hash;
-# use Data::Printer;
 
-our $VERSION='1.06';
+our $VERSION='1.07';
 
 =head1 NAME
 
 Vote::Count::RankCount
 
-=head1 VERSION 1.06
+=head1 VERSION 1.07
 
 =cut
 

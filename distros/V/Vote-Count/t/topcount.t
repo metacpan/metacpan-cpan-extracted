@@ -8,7 +8,6 @@ use Test2::V0;
 use Test2::Bundle::More;
 use Test::Exception;
 use Try::Tiny;
-use Data::Printer;
 
 use Path::Tiny;
 

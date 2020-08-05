@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::AutoReload;
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 # ABSTRACT: Automatically reload open browser windows when your application changes
 
 #pod =head1 SYNOPSIS
@@ -137,7 +137,7 @@ sub register {
         my ( $c ) = @_;
         if ( $app->mode eq 'development' && !$c->stash( 'plugin.auto_reload.disable' ) ) {
             $c->stash( 'plugin.auto_reload.disable' => 1 );
-            my $auto_reload_end_point = $c->url_for( 'auto_reload' );
+            my $auto_reload_end_point = $c->url_for( 'auto_reload' )->path->leading_slash(1);
             my $mechanism = $ENV{PLACK_ENV} ? 'poll' : 'websocket';
             return unindent trim( <<"ENDHTML" );
                 <style>
@@ -369,7 +369,7 @@ Mojolicious::Plugin::AutoReload - Automatically reload open browser windows when
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

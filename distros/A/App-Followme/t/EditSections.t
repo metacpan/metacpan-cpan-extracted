@@ -1,3 +1,7 @@
+#!/usr/bin/env perl
+use strict;
+
+use Cwd;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
@@ -35,11 +39,15 @@ require App::Followme::EditSections;
 my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
-mkdir $test_dir;
+mkdir $test_dir  or die $!;
 chmod 0755, $test_dir;
-mkdir catfile($test_dir, "sub");
-chmod 0755, catfile($test_dir, "sub");
-chdir $test_dir;
+
+my $sub_dir = catfile(@path, "test", "sub"); 
+mkdir $sub_dir or die $!;
+chmod 0755, $sub_dir;
+
+chdir $test_dir or die $!;
+$test_dir = cwd();
 
 my %configuration = (
                     remove_comments => 0,

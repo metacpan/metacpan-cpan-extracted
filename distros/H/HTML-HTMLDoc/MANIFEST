@@ -12,6 +12,4 @@ lib/HTML/HTMLDoc.pm
 lib/HTML/HTMLDoc/PDF.pm
 minil.toml
 t/00_compile.t
-test.pl
-test_htmldoc.PL
 testdata/testimage.gif

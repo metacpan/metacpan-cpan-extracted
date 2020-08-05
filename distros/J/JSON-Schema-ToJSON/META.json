@@ -65,6 +65,6 @@
          "url" : "https://github.com/Humanstate/json-schema-tojson"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

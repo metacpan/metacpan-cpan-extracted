@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-ToJSON
 
+0.18  2020-08-04
+        - Tweak docs to demonstrate faking larger schemas (#7)
+
 0.17  2020-03-02
         - Bring up to date with recent JSON::Validator changes (#6)
 

@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::Roles::OrgProcable;
 # ABSTRACT: Attributes and methods common to OrgProcessor objects
-$Bio::MUST::Apps::Roles::OrgProcable::VERSION = '0.190820';
+$Bio::MUST::Apps::Roles::OrgProcable::VERSION = '0.202160';
 use Moose::Role;
 
 use autodie;
@@ -89,7 +89,7 @@ sub _fetch_and_trim_hits {                  ## no critic (RequireArgUnpacking)
 
     # compute seq chunks to extract from all hits (default behavior)
     my @entries;
-    if ($rp->trimming_mode eq 'on') {
+    if ($rp->trim_homologues eq 'on') {
 
         # tie might help making app completely deterministic
         tie my %chunks_for, 'Tie::IxHash';
@@ -171,8 +171,8 @@ sub _fetch_and_trim_hits {                  ## no critic (RequireArgUnpacking)
     }
 
     # rename hits to fill in tax-reports (only for 42)
-    # this is only needed when trimming_mode is on (default behavior)
-    if (defined $strand_for && $rp->trimming_mode eq 'on') {
+    # this is only needed when trim_homologues is on (default behavior)
+    if (defined $strand_for && $rp->trim_homologues eq 'on') {
         my %count_for;
         my $ea = each_array(@entries, @hits);
         while (my ($entry, $hit) = $ea->() ) {
@@ -212,7 +212,7 @@ Bio::MUST::Apps::Roles::OrgProcable - Attributes and methods common to OrgProces
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 SYNOPSIS
 

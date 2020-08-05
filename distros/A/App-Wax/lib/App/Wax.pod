@@ -24,20 +24,6 @@ B<Type>: Str, rw, default: "wax".
 
 The application name used in L<debug|"debug"> and L<error|"log"> messages.
 
-=head2 app_version
-
-B<Type>: Str, ro.
-
-The application version displayed in the output of the C<--version> option e.g.:
-
-    $ wax --version # v1.2.3 (App::Wax v3.0.0)
-
-The version is passed as a constructor argument by the command e.g.:
-
-    App::Wax->new({ app_version: 'v1.2.3' })
-
-If not supplied, it defaults to the module version.
-
 =head2 cache
 
 B<Type>: Bool, rw, default: false.
@@ -118,7 +104,7 @@ If set to true, diagnostic messages are printed to STDERR.
 
 B<Signature>: [ $url: Str, $url_index: Int ] -> $content_type: Str
 
-Returns the value of the HTTP C<Content-Type> header for the supplied URL e.g. C<text/html>.
+Returns the value of the HTTP C<Content-Type> header for the supplied URL, e.g. C<text/html>.
 
 =head2 debug
 
@@ -214,7 +200,7 @@ None by default.
 
 =head1 VERSION
 
-3.1.1
+2.4.1
 
 =head1 SEE ALSO
 

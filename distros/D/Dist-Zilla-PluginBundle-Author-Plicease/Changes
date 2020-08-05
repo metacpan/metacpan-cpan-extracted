@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.53      2020-08-03 14:14:36 -0600
+  - Remove [Alien] and Dist::Zilla::App::Command::aliendeps as prereqs.
+
+2.52      2020-08-03 04:41:23 -0600
+  - Add additional diagnostics to diag.t
+
 2.51      2020-07-05 07:11:23 -0600
   - Fixed typo in generated Makefile.PL
 

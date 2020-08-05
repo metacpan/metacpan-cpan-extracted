@@ -41,7 +41,10 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Moose' => '0',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0'
+                                   'Test::Most' => '0',
+                                   'lib' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  }
      };

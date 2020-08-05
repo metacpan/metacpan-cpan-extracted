@@ -1,3 +1,16 @@
+0.031   2020-08-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: csv-csv (csv2csv).
+
+	- Add CSV output options --output-{sep,quote,escape}-char for CLIs
+	  that output CSV, e.g. csv-sort, csv-grep, csv-sum, csv-split,
+	  csv-csv, etc.
+
+        [cli csv-info]
+
+        - [ux] Now defaults to producing naked result (RT#133078).
+
+
 0.030   2020-07-30  Released-By: PERLANCAR; Urgency: medium
 
 	- Add common options: --sep-char, --quote-char, --escape-char

@@ -10,16 +10,16 @@ use IO::File;
 use Carp;
 use Scalar::Util ();
 
-use IO::Compress::Base::Common  2.093 qw(:Status);
-use IO::Compress::Zip::Constants 2.093 ;
-use IO::Uncompress::Unzip 2.093 ;
+use IO::Compress::Base::Common  2.096 qw(:Status);
+use IO::Compress::Zip::Constants 2.096 ;
+use IO::Uncompress::Unzip 2.096 ;
 
 
 require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, $SimpleUnzipError);
 
-$VERSION = '0.035';
+$VERSION = '0.036';
 $SimpleUnzipError = '';
 
 @ISA    = qw(IO::Uncompress::Unzip Exporter);
@@ -160,7 +160,7 @@ sub resetter
     *$inner->{ZipData}{CompressedLen} = $member->{CompressedLength};
     *$inner->{ZipData}{UnCompressedLen} = $member->{UncompressedLength};
     *$inner->{CompressedInputLengthRemaining} =
-            *$inner->{CompressedInputLength} = $member->{CompressedLength};    
+            *$inner->{CompressedInputLength} = $member->{CompressedLength};
 }
 
 sub _readLocalHeader
@@ -742,7 +742,7 @@ sub STORABLE_thaw
         $name =~ s#/+#/#g ;
 
         # Drop any ".." and "." paths
-        # Us of ".." is unsafe
+        # Use of ".." is unsafe
         my @paths = split '/', $name ;
         my @have =  grep { ! m#^\.(\.)?$# } @paths ;
 
@@ -765,7 +765,7 @@ sub STORABLE_thaw
         return join '/', _canonicalPath($self->{Info}{Name});
     }
 
-    sub extract # to file 
+    sub extract # to file
     {
         my $self = shift;
         my $out  = shift;
@@ -796,11 +796,11 @@ sub STORABLE_thaw
             if (! -d $path)
             {
                 my $error ;
-                File::Path::mkpath($path, {error => \$error}) 
+                File::Path::mkpath($path, {error => \$error})
                     or return _setError("Cannot create path '$path': $error");
             }
         }
-               
+
         # TODO - symlink
 
         if ($self->isFile())
@@ -811,7 +811,7 @@ sub STORABLE_thaw
             #$fh->binmode(); # not available in 5.8.0
 
             my $data;
-            print $fh $data 
+            print $fh $data
                 while $handle->read($data);
             $handle->close();
             $fh->close();
@@ -820,13 +820,13 @@ sub STORABLE_thaw
         # TODO - set timestamps etc...
 
         return 1 ;
-    } 
+    }
 
     sub _setError
     {
         $Archive::Zip::SimpleUnzip::SimpleUnzipError = $_[0] ;
         return 0;
-    }       
+    }
 }
 
 
@@ -1109,7 +1109,7 @@ Returns C<undef> if the member does not exist.
 =item $buffer = $z->extract($member [, $outfile])
 
 Uncompresses the data stored in $member and writes it to the filesystem.
-By default the filename used is the member name. 
+By default the filename used is the member name.
 If the optional parameter $outfile is specified, the payload is written to that file instead.
 
 
@@ -1186,7 +1186,7 @@ Returns the uncompressed content.
 =item $buffer = $z->extract($outfile])
 
 Uncompresses the data stored in the current member and writes to the filesystem.
-By default the filename used is the member name. 
+By default the filename used is the member name.
 If the optional parameter $outfile is specified, the payload is written to that file instead.
 
 =item $fh = $m->open()
@@ -1195,12 +1195,12 @@ Returns a filehandle that can be used to read the uncompressed content.
 
 =item $bool = $m->isDirectory()
 
-Returns true is the member is a directory.
+Returns true if the member is a directory.
 Otherwise returns false.
 
 =item $bool = $m->isFile()
 
-Returns true is the member is standard file.
+Returns true if the member is standard file.
 Otherwise returns false.
 
 =back
@@ -1357,7 +1357,7 @@ The following features are not currently supported.
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/Archive-Zip-SimpleZip/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Zip-SimpleZip>.
 

@@ -1,4 +1,25 @@
 Revision history for App-ZFSCurses
 
-1.01    Add back missing App/ZFSCurses.pm file.
-1.00    First release.
+1.100
+  - Document mouse settings.
+  - UI.pm: return if no dataset has been found in the list.
+
+1.04
+  - Documentation.
+  - Remove use lib in zfscurses (left over from testing).
+
+1.03
+  - More documentation.
+  - Run the UI straight from the zfscurses script.
+  - zfscurses handles a few options: -h and -m (they both show a man page).
+  - ZFSCurses.pm contains only documentation now (no code).
+
+1.02    
+  - Document WidgetFactory.pm.
+  - Add a VERSION variable to each module.
+
+1.01
+  - Add back missing App/ZFSCurses.pm file.
+
+1.00
+  - First release.

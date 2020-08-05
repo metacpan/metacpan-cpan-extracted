@@ -2,7 +2,7 @@ package RT::Authen::Token;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 RT::System->AddRight(Staff => ManageAuthTokens => 'Manage authentication tokens');
 
@@ -112,6 +112,14 @@ Apache configuration to allow RT to access the Authorization header.
 
 =back
 
+=head1 CONFIGURATION
+
+If you have a mix of local and external authentication you can disable
+requiring a password to create tokens with the following line
+in RT_SiteConfig.pm :
+
+    Set($DisablePasswordForAuthToken, 1);
+
 =head1 AUTHOR
 
 Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
@@ -128,7 +136,7 @@ or via the web at
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2017 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2017-2020 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 

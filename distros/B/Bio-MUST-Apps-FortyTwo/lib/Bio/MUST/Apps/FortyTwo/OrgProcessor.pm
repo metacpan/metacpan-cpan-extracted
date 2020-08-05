@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::OrgProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::OrgProcessor::VERSION = '0.190820';
+$Bio::MUST::Apps::FortyTwo::OrgProcessor::VERSION = '0.202160';
 use Moose;
 use namespace::autoclean;
 
@@ -25,9 +25,17 @@ use aliased 'Bio::MUST::Core::IdList';
 use aliased 'Bio::MUST::Core::Seq';
 use aliased 'Bio::MUST::Core::SeqId';
 use aliased 'Bio::MUST::Core::SeqMask';
+use aliased 'Bio::MUST::Drivers::Cap3';
 use aliased 'Bio::MUST::Apps::Debrief42::TaxReport::NewSeq';
 
 with 'Bio::MUST::Apps::Roles::OrgProcable';
+
+
+# org
+
+# banks
+
+# code
 
 
 has 'ali_proc' => (
@@ -70,17 +78,17 @@ has 'aligned_seqs' => (
 );
 
 
-has '_para_scores' => (
+has '_' . $_ . '_para_scores' => (
     traits   => ['Hash'],
     is       => 'ro',
     isa      => 'HashRef[Num]',
     init_arg => undef,
     lazy     => 1,
-    builder  => '_build_para_scores',
+    builder  => '_build_' . $_ . '_scores',
     handles  => {
-        para_score_for => 'get',
+        $_ . '_score_for' => 'get',
     },
-);
+) for qw(para tol);
 
 
 has '_count_for' => (
@@ -153,7 +161,7 @@ sub _build_orthologous_seqs {
     my $ap = $self->ali_proc;
     my $rp = $ap->run_proc;
 
-    if ($rp->ref_brh_mode eq 'off') {
+    if ($rp->ref_brh eq 'off') {
         ##### [ORG] Skipping orthology assessment!
         return $self->homologous_seqs;
     }
@@ -194,6 +202,12 @@ sub _build_orthologous_seqs {
     );
     my $seqs = $orthologues->filtered_ali( $self->homologous_seqs );
 
+    # optionally merge orthologues before aligning
+    if ($rp->merge_orthologues eq 'on') {
+        ##### [ORG] pre-merge orthologues: display( map { $_->full_id } $seqs->all_seq_ids )
+        $self->_compress_seqs($seqs);
+    }
+
     # build BLAST query file from orthologous seqs
     return Temporary->new( seqs => $seqs );
 }
@@ -221,13 +235,13 @@ sub _build_para_scores {
 
     my %para_score_for;
     while (my $hsp = $parser->next_query) {
-        my $candidate = $orthologous_seqs->long_id_for( $hsp->query_id );
-        my $hit = $blastdb->long_id_for( $hsp->hit_id );
+        my $transcript_acc = $orthologous_seqs->long_id_for( $hsp->query_id );
+        my $hit_id = $blastdb->long_id_for( $hsp->hit_id );
         my $score = $hsp->bit_score;
-        ######## [DEBUG] candidate: $candidate
-        ######## [DEBUG] hit: $hit
+        ######## [DEBUG] orthologue: $transcript_acc
+        ######## [DEBUG] PARA hit: $hit_id
         ######## [DEBUG] score: $score
-        $para_score_for{$candidate} = $score;
+        $para_score_for{$transcript_acc} = $score;
     }
     $parser->remove unless $rp->debug_mode;
 
@@ -235,12 +249,66 @@ sub _build_para_scores {
 }
 
 
+sub _build_tol_scores {
+    my $self = shift;
+
+    my $ap = $self->ali_proc;
+    my $rp = $ap->run_proc;
+
+    # ignore if no tol_check in use
+    my $blastdb = $rp->tol_blastdb;
+    return unless $blastdb;
+
+    my $args = $rp->blast_args_for('templates') // {};
+    $args->{-outfmt} = 5;
+    $args->{-max_target_seqs} = 250;
+
+    my $orthologous_seqs = $self->orthologous_seqs;
+    $args->{-query_gencode} = $self->code           # if BLASTX
+        if $orthologous_seqs->type eq 'nucl' && $blastdb->type eq 'prot';
+    my $parser = $blastdb->blast($orthologous_seqs, $args);
+    ##### [ORG] XML BLASTX (or BLASTP/N): 'TOL ' . $parser->filename
+
+    # abort if no hit
+    my $bo = $parser->blast_output;
+    return unless $bo;
+
+    my %tol_score_for;
+
+    ORTHOLOGUE:
+    for my $orthologue ($bo->all_iterations) {
+        next ORTHOLOGUE unless $orthologue->count_hits;
+        # Note: this should never happen...
+
+        my $query_def = $orthologue->query_def;
+        my $transcript_acc = $orthologous_seqs->long_id_for($query_def);
+        ######## [DEBUG] orthologue: $transcript_acc
+
+        TOL_HIT:
+        for my $hit ($orthologue->all_hits) {
+
+            # check taxonomy of hit: skip SELF-like hits
+            my $hit_id = SeqId->new( full_id => $hit->id );
+            ######## [DEBUG] TOL hit: $hit_id->full_id
+            next TOL_HIT if $self->is_allowed($hit_id);
+
+            # fetch score for first non-SELF-like hit
+            my $score = $hit->get_hsp(0)->bit_score;
+            ######## [DEBUG] score: $score
+            $tol_score_for{$transcript_acc} = $score;
+            next ORTHOLOGUE;
+        }
+    }
+    $parser->remove unless $rp->debug_mode;
+
+    return \%tol_score_for;
+}
+
+
 sub _build_aligned_seqs {               ## no critic (ProhibitExcessComplexity)
     my $self = shift;
 
     ##### [ORG] Aligning orthologues...
-
-    my $aligned_seqs = Ali->new();
 
     my $ap = $self->ali_proc;
     my $rp = $ap->run_proc;
@@ -256,9 +324,11 @@ sub _build_aligned_seqs {               ## no critic (ProhibitExcessComplexity)
     my $parser = $blastdb->blast($orthologous_seqs, $args);
     ##### [ORG] XML BLASTX (or BLASTP/N): $parser->filename
 
+    my $aligned_seqs = Ali->new();
+
     # abort if no hit
     my $bo = $parser->blast_output;
-    return Ali->new() unless $bo;
+    return $aligned_seqs unless $bo;
 
     ORTHOLOGUE:
     for my $orthologue ($bo->all_iterations) {
@@ -316,9 +386,9 @@ sub _build_aligned_seqs {               ## no critic (ProhibitExcessComplexity)
             );
 
             # optionally skip template if from same org as the orthologue
-            if ($rp->ali_patch_mode eq 'on') {
+            if ($rp->ali_skip_self eq 'on') {
                 if ($template_id->full_org eq $transcript_seq->full_org) {
-                    ###### [ORG] skipped same-org template due to patch_mode
+                    ###### [ORG] skipped same-org template due to ali_skip_self
                     next TEMPLATE;
                 }
             }
@@ -461,6 +531,66 @@ sub _build_aligned_seqs {               ## no critic (ProhibitExcessComplexity)
 ## use critic
 
 
+sub _compress_seqs {
+    my $self = shift;
+    my $ali  = shift;
+
+    my $rp = $self->ali_proc->run_proc;
+
+    # first fetch all seqs...
+    # ... then clear existing seqs
+    my @seqs2cap = $ali->all_seqs;
+    $ali->_set_seqs( [] );
+
+    # proceed only if at least one seq
+    return unless @seqs2cap;
+
+    # Note: this might seem sub-optimal in case of singletons
+    # but we follow as closely as possible the logic of compress-db.pl
+
+    # proceed only if at least two seqs
+    # otherwise add lone seq
+    if (@seqs2cap < 2) {
+        $ali->add_seq( shift @seqs2cap );
+        return;
+    }
+
+    # TODO: add debugging comments?
+
+    # try to cap seqs
+    my $cap = Cap3->new(
+        seqs      => \@seqs2cap,
+        cap3_args => {
+            -p => $rp->merge_min_ident * 100.0,     # CAP3 expects percents
+            -o => $rp->merge_min_len,
+        },
+    );
+
+    # add singlet seqs
+    my @singlets = $cap->all_singlets;
+    $ali->add_seq($_) for @singlets;
+
+    # proceed only if contigs of seqs
+    my @contigs  = $cap->all_contigs;
+    return unless @contigs;
+
+    for my $contig (@contigs) {
+        my @ids = map { $_->full_id }
+            @{ $cap->seq_ids_for( $contig->full_id ) };
+        my $contig_id = shift(@ids) . ':::+' . @ids;
+        my $contig_seq = $contig->seq;
+
+        # add contig seq
+        $ali->add_seq(
+            Seq->new( seq_id => $contig_id, seq => $contig_seq )
+        );
+    }
+
+    # Note: we do not need to return anything as we modified $ali in place
+    return;
+}
+
+
 sub _fetch_tax_line_for_transcript {
     my $self       = shift;
     my $orthologue = shift;
@@ -472,10 +602,19 @@ sub _fetch_tax_line_for_transcript {
     my $query_def = $orthologue->query_def;
     my $transcript_acc = $self->orthologous_seqs->long_id_for($query_def);
 
-    # extract range and strand (if any) from transcript accession
+    # extract range and strand (if any) from transcript accession...
     # Note: this mostly makes sense for genomic contigs/scaffolds
+    # ... and extract potential tail '+N' (if orthologues have been merged)
+    # Note: this looks convoluted but it has to work in many different setups
+    # depending on the value of trim_homologues and merge_orthologues:
+    # - off/off: acc
+    # - off/on:  acc:::+N
+    # - on /off: acc:::start:::end:::strand
+    # - on /on:  acc:::start:::end:::strand:::+N
     my @fields = split /:::/xms, $transcript_acc;
-    my ($strip_acc, $start, $end, $strand) = @fields;
+    my ($strip_acc, $start, $end, $strand, $more) = @fields;
+    ($more, $start) = ($start, undef)
+        if !defined $end && defined $start && $start =~ m/\A \+\d+ \z/xms;
 
     # set acc to transcript accession
     my ($first_chunk) = $strip_acc =~ m/^(\S+)/xms;
@@ -483,12 +622,23 @@ sub _fetch_tax_line_for_transcript {
     my $acc = pop @parts;
     ###### [ORG] orthologous transcript: $acc
 
+    # fetch score for best template
+    my $temp_score = $orthologue->get_hit(0)->get_hsp(0)->bit_score;
+
     # check again for paralogy if .para file in use
     if ($ap->para_blastdb) {
-        my $para_score = $self->para_score_for($transcript_acc);
-        my $temp_score = $orthologue->get_hit(0)->get_hsp(0)->bit_score;
+        my $para_score = $self->para_score_for($transcript_acc) // 0;
         if ($para_score > $temp_score) {
             ###### [ORG] rejected for PARA[logy]: "$para_score > $temp_score"
+            return;
+        }
+    }
+
+    # check for contamination if tol_check in use
+    if ($rp->tol_blastdb ) {
+        my  $tol_score = $self->tol_score_for($transcript_acc)  // 0;
+        if ($tol_score  > $temp_score) {
+            ###### [ORG] rejected due to TOL check: "$tol_score > $temp_score"
             return;
         }
     }
@@ -616,7 +766,8 @@ sub _fetch_tax_line_for_transcript {
 
             # optionally tag potential contamination based on LCA
             # Note: LCAs are used "as is" because is_allowed handles them
-            if ($self->_tax_filter) {
+            # Note: tol_check 'on' disables positive taxonomic filtering
+            if ($self->_tax_filter && $rp->tol_check eq 'off') {
                 ######## [DEBUG] pass tax_filter: $self->is_allowed($common_tax)
                 unless ( $self->is_allowed($common_tax) ) {
                     ###### [ORG] tagged as contaminated
@@ -633,10 +784,13 @@ sub _fetch_tax_line_for_transcript {
     my $acc_u = $acc;
     my $count = ++$self->_count_for->{$org}{$acc};
     if ($count > 1) {                       # direct access to private attr
-        carp "Note: more than one orthologue extracted from $acc; "
-            . "appending .$count to accession.";
+        carp "[ORG] Note: more than one orthologue extracted from $acc;"
+            . " appending .$count to accession.";
         $acc_u .= ".$count";
     }
+
+    # add potential accession tail '+N' (if orthologues have been merged)
+    $acc_u .= $more if $more;
 
     # fetch orthologous transcript and give it nearly complete full_id
     my $transcript_seq
@@ -656,7 +810,7 @@ sub _fetch_tax_line_for_transcript {
         mean_ident => $mean_ident,
         lca        => $lca,
         lineage    => $lineage,
-        acc        => $acc,
+        acc        => $acc,             # Note: not $acc_u here!
         start      => $start,
         end        => $end,
         strand     => $strand,
@@ -710,7 +864,7 @@ Bio::MUST::Apps::FortyTwo::OrgProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 AUTHOR
 

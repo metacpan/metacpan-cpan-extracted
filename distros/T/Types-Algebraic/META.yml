@@ -21,8 +21,14 @@ no_index:
     - share
     - t
     - xt
+provides:
+  Types::Algebraic:
+    file: lib/Types/Algebraic.pm
+    version: '0.05'
 requires:
   Keyword::Declare: '0.001015'
+  List::MoreUtils: '0.07'
+  List::Util: '1.33'
   Moops: '0'
   PPR: '0'
   perl: '5.022'
@@ -30,7 +36,7 @@ resources:
   bugtracker: https://github.com/Eckankar/Types-Algebraic/issues
   homepage: https://github.com/Eckankar/Types-Algebraic
   repository: https://github.com/Eckankar/Types-Algebraic.git
-version: '0.03'
+version: '0.05'
 x_contributors:
   - 'Sebastian Paaske Tørholm <Eckankar@gmail.com>'
 x_generated_by_perl: v5.30.0

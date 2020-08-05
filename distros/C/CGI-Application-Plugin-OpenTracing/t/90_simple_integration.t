@@ -3,15 +3,17 @@ use Test::MockObject;
 use Test::OpenTracing::Integration;
 use Test::WWW::Mechanize::CGIApp;
 
+use utf8;
+
 my $mech = Test::WWW::Mechanize::CGIApp->new;
 $mech->app('MyTest::CGI::Application');
 
-$mech->get('https://test.tst/test.cgi?foo=bar;abc=1;abc=2');
+$mech->get('https://test.tst/test.cgi?foo=bar;abc=1;abc=2;skipp_me=1;password=secret');
 
 global_tracer_cmp_easy(
     [
         {
-            operation_name      => "cgi_request",
+            operation_name      => "cgi_application_request",
             level               => 0,
             baggage_items       => { bar => 2, foo => 1 },
             context_item        => "this is bootstrapped span_context",
@@ -20,36 +22,37 @@ global_tracer_cmp_easy(
                 'http.method'         => "GET",
                 'http.status_code'    => "418",
                 'http.status_message' => "I'm a teapot",
-                'http.url'            => "https://test.tst/test.cgi?foo=bar;abc=1;abc=2",
+                'http.url'            => "https://test.tst/test.cgi",
                 'run_method'          => "some_method_start",
                 'run_mode'            => "start",
                 'http.query.foo'      => "bar",
                 'http.query.abc'      => "1;2",
+                'http.query.password' => "* * * * *",
             },
         },
         {
-            operation_name       => "cgi_setup",
-            level                => 1,
-            baggage_items        => { bar => 2, foo => 1 },
+            operation_name      => "cgi_application_setup",
+            level               => 1,
+            baggage_items       => { bar => 2, foo => 1 },
             context_item        => "this is bootstrapped span_context",
         },
         {
-            operation_name       => "cgi_run",
-            level                => 1,
-            baggage_items        => { bar => 2, foo => 1 },
+            operation_name      => "cgi_application_run",
+            level               => 1,
+            baggage_items       => { bar => 2, foo => 1 },
             context_item        => "this is bootstrapped span_context",
         },
         {
-            operation_name       => "we_have_work_to_do",
-            level                => 2,
-            baggage_items        => { bar => 2, foo => 1 },
+            operation_name      => "we_have_work_to_do",
+            level               => 2,
+            baggage_items       => { bar => 2, foo => 1 },
             context_item        => "this is bootstrapped span_context",
-            tags                 => { message => 'Hello World' },
+            tags                => { message => 'Hello World' },
         },
         {
-            operation_name       => "cgi_teardown",
-            level                => 1,
-            baggage_items        => { bar => 2, foo => 1 },
+            operation_name      => "cgi_application_teardown",
+            level               => 1,
+            baggage_items       => { bar => 2, foo => 1 },
             context_item        => "this is bootstrapped span_context",
         },
     ], "Seems we created all spans as expected"
@@ -77,8 +80,11 @@ sub opentracing_baggage_items {
     bar => 2
 }
 
-sub opentracing_format_query_params {
-   return join ';', @{ $_[2] };
+sub opentracing_process_tags_query_params {
+    password => '* * * * *',
+    pwd      => '* * * * *',
+    skipp_me => undef,
+    sub { join ';', @_ },
 }
 
 sub run_modes {

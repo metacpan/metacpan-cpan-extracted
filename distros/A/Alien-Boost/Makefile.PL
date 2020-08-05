@@ -19,14 +19,12 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.52",
   },
-  "PREREQ_PM" => {
-    "Alien::Base" => "0.038",
-  },
   "DISTNAME" => "Alien-Boost",
   "LICENSE" => "perl",
   "NAME" => "Alien::Boost",
   "PREREQ_PM" => {
-    "Alien::Base" => "0.038"
+    "Alien::Base" => "0.038",
+    "Test::Alien::CPP" => "0",
   },
   META_MERGE => {
         no_index => {

@@ -9,7 +9,7 @@ package Vote::Count;
 use namespace::autoclean;
 use Moose;
 
-# use Data::Dumper;
+use Data::Dumper;
 use Time::Piece;
 use Path::Tiny;
 use Vote::Count::Matrix;
@@ -17,49 +17,20 @@ use Storable 3.15 'dclone';
 
 no warnings 'experimental';
 
-our $VERSION='1.06';
+our $VERSION='1.07';
 
 =head1 NAME
 
 Vote::Count
 
 
-=head1 VERSION 1.06
+=head1 VERSION 1.07
 
 =cut
 
 # ABSTRACT: Parent Module for Vote::Count. Toolkit for vote counting.
 
 has 'BallotSet' => ( is => 'ro', isa => 'HashRef', required => 1 );
-
-has 'Active' => (
-  is      => 'ro',
-  isa     => 'HashRef',
-  lazy    => 1,
-  builder => '_defaultactive',
-);
-
-sub _defaultactive ( $self ) { return dclone $self->BallotSet()->{'choices'} }
-
-sub SetActive ( $self, $active ) {
-  # Force deref
-  $self->{'Active'} = dclone $active;
-}
-
-sub ResetActive ( $self ) { 
-  $self->{'Active'} = $self->_defaultactive();
-}
-
-# I was typing the equivalent too often. made a method.
-sub SetActiveFromArrayRef ( $self, $active ) {
-  $self->{'Active'} = { map { $_ => 1 } $active->@* };
-}
-
-sub GetActive ( $self ) {
-  # Force deref
-  my $active = $self->Active();
-  return dclone $active;
-}
 
 has TieBreakMethod => (
   is       => 'rw',
@@ -94,14 +65,6 @@ sub _buildmatrix ( $self ) {
   );
 }
 
-sub UpdatePairMatrix ( $self, $active = undef ) {
-  $active = $self->Active() unless defined $active;
-  $self->{'PairMatrix'} = Vote::Count::Matrix->new(
-    BallotSet => $self->BallotSet(),
-    Active    => $active
-  );
-}
-
 sub BUILD {
   my $self = shift;
   # Verbose Log
@@ -115,6 +78,7 @@ sub BUILD {
 
 # load the roles providing the underlying ops.
 with 
+  'Vote::Count::Common',
   'Vote::Count::Approval',
   'Vote::Count::Borda',
   'Vote::Count::Floor',
@@ -124,41 +88,6 @@ with
   'Vote::Count::TieBreaker',
   'Vote::Count::TopCount',
   ;
-
-sub VotesCast ( $self ) {
-  return $self->BallotSet()->{'votescast'};
-}
-
-sub VotesActive ( $self ) {
-  unless ( $self->BallotSet()->{'options'}{'rcv'} ) {
-    die "VotesActive Method only supports rcv"
-  }
-  my $set         = $self->BallotSet();
-  my $active      = $self->Active();
-  my $activeCount = 0;
-LOOPVOTESACTIVE:
-    for my $B ( values $set->{ballots}->%* ) {
-        for my $V ( $B->{'votes'}->@* ) {
-            if ( defined $active->{$V} ) {
-                $activeCount += $B->{'count'};
-                next LOOPVOTESACTIVE;
-            }
-        }
-    }
-  return $activeCount;
-}
-
-sub BallotSetType ( $self ) {
-  if ( $self->BallotSet()->{'options'}{'rcv'} ) {
-    return 'rcv';
-  }
-  elsif ( $self->BallotSet()->{'options'}{'range'} ) {
-    return 'range';
-  }
-  else {
-    die "BallotSetType is undefined or unknown type.";
-  }
-}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -466,76 +395,77 @@ When logging from your methods, use logt for events that produce a summary, use 
 
 =head3 Active Sets
 
-Active sets are typically represented as a Hash Reference where the keys represent the active choices and the value is true. The VoteCount Object contains an Active Set which can be Accessed via the ->Active() method which will return a reference to the Active Set (changing the reference will change the active set). The ->GetActive and ->SetActive do not preserve any reference links and should be preferred.
+Active sets are typically represented as a Hash Reference where the keys represent the active choices and the value is true. The VoteCount Object contains an Active Set which can be Accessed via the Active() method which will return a reference to the Active Set (changing the reference will change the active set). The GetActive and SetActive methods do not preserve any reference links and should be preferred. GetActiveList returns the Active Set as a sorted list.
 
 Many Components will take an argument for $activeset or default to the current Active set of the Vote::Count object, which will default to the Choices defined in the BallotSet.
 
 
 =head1 Vote::Count Methods
 
-=over
-
-=item *
-
-new
+Most of these are provided by the Role Common and available directly in both Matrix objects and Vote::Count Objects. Vote::Count objects create a child Matrix object: PairMatrix.
 
 
-
-=item *
-
-Active: Set or Get Active Set as HashRef
+=head3 new
 
 
+=head3 Active
 
-=item *
-
-ResetActive: Sets the Active Set to the full choices list of the BallotSet.
-
+Get Active Set as HashRef to the active set. Changing the new HashRef will change the internal Active Set, GetActive is recommended as it will return a HashRef that is a copy instead.
 
 
-=item *
+=head3 GetActive
 
-SetActive: Sets the Active Set to provided HashRef. Using the Active method may preserve a reference between the Active Set and the HashRef, SetActive will not. The values to the hashref should evaluate as True.
-
-
-
-=item *
-
-SetActiveFromArrayRef: Same as SetActive except it takes an ArrayRef of the choices to be set as Active.
+Returns a hashref containing a copy of the Active Set.
 
 
+=head3 GetActiveList
 
-=item *
-
-BallotSet: Get BallotSet
-
+Returns a simple array of the members of the Active Set.
 
 
-=item *
+=head3 ResetActive
 
-PairMatrix: Get a Matrix Object for the Active Set. Generated and cached on the first request.
-
-
-
-=item *
-
-UpdatePairMatrix: Regenerate and cache Matrix with current Active Set.
+Sets the Active Set to the full choices list of the BallotSet.
 
 
+=head3 SetActive
 
-=item *
-
-VotesCast: Returns the number of votes cast.
-
+Sets the Active Set to provided HashRef. The values to the hashref should evaluate as True.
 
 
-=item *
+=head3 SetActiveFromArrayRef
 
-VotesActive: Returns the number of non-exhausted ballots based on the current Active Set.
+Same as SetActive except it takes an ArrayRef of the choices to be set as Active.
 
 
+=head3 BallotSet
 
-=back
+Get BallotSet
+
+
+=head3 PairMatrix
+
+Get a Matrix Object for the Active Set. Generated and cached on the first request.
+
+
+=head3 UpdatePairMatrix
+
+Regenerate and cache Matrix with current Active Set. 
+
+
+=head3 VotesCast
+
+Returns the number of votes cast.
+
+
+=head3 VotesActive
+
+Returns the number of non-exhausted ballots based on the current Active Set.
+
+
+=head1 Minimum Perl Version
+
+It is the policy of Vote::Count to only develop with recent versions of Perl. Support for older versions will be dropped as they either start failing tests or impair adoption of new features. 
 
 
 =head2 Components
@@ -550,7 +480,6 @@ Directory of Vote Counting Methods linking to the Vote::Count module for it.
 =item *
 
 L<Catalog|https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/Catalog.pod>
-
 
 
 =back
@@ -723,7 +652,7 @@ If you're looking at all of this wondering "which method I should recommend to m
 
 I<Instant Runoff Voting> is simple, easy to count by hand, Later Harm protected, and is the most widely used method. It has serious consistency issues, especially how poorly it handles common cloning situations.
 
-I<Benham Condorcet IRV>, meets the two main Condorcet Criteria, and is countable by hand, but it fails Later Harm.
+I<Benham Condorcet IRV>, meets the two original Condorcet Criteria, and is countable by hand, but it fails Later Harm.
 
 Benham and IRV are good choices for Hand Count Methods.
 
@@ -733,9 +662,7 @@ If you like I<Borda> or prefer a I<Range Ballot>, my pick is for I<STAR>.
 
 STAR is handcountable but requires a Range Ballot. Range methods like STAR have less Later Harm effect than Borda Methods.
 
-I<Redacting Condorcet Methods> are the B<best> for a conventional Ranked Choice Ballot. If a Condorcet Winner does not create a Later Harm violation they will always be chosen. They can create a gauge of the later harm effect that then allows for the establishment of a Later Harm tolerance. The steps for I<Condorcet Vs IRV> are easy to understand but the number of steps qualifies it as somewhat complex. Other methods in the family (not yet implemented) will be more complex.
-
-B<Redacting Condorcet> (Condorcet Vs IRV being the only one available here at the moment) is my preference. B<STAR> is my preferred Scoring method. If you need to hand count, Benham is your Condorcet Method and IRV is your Later Harm Protected Method. Smith Set IRV is a simple Condorcet Method that is better on Later Harm than any other non-redacting Condorcer Method, it is a much better choice than Benham. If Later Harm compliance is required a Redacting Condorcet Method is your best choice, and IRV your choice if they're too complex.
+I<Redacting Condorcet Methods> are the B<best> for a conventional Ranked Choice Ballot. If a Condorcet Winner does not create a Later Harm violation they will always be chosen. They can create a gauge of the later harm effect that then allows for the establishment of a Later Harm tolerance. The steps for I<Condorcet Vs IRV> are easy to understand but the number of steps qualifies it as somewhat complex. 
 
 
 =head2 Floor Rules and Tie Breakers

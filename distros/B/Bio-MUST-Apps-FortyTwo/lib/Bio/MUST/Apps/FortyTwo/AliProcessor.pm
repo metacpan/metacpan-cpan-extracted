@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::AliProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::AliProcessor::VERSION = '0.190820';
+$Bio::MUST::Apps::FortyTwo::AliProcessor::VERSION = '0.202160';
 use Moose;
 use namespace::autoclean;
 
@@ -39,7 +39,7 @@ has 'run_proc' => (
 
 
 has '+ali' => (
-    handles  => [ qw(all_new_seqs) ],
+    handles  => [ qw(all_new_seqs all_but_new_seqs) ],
 );
 
 
@@ -79,6 +79,7 @@ has 'tax_report' => (
     handles  => {
             tax_line_for => 'get',
         set_tax_line     => 'set',
+        all_tax_line_ids => 'keys',
     },
 );
 
@@ -152,7 +153,7 @@ sub _build_lookup {
 
 sub _build_blastdb {
     return Bio::MUST::Drivers::Blast::Database::Temporary->new(
-        seqs => shift->ali
+        seqs => [ shift->all_but_new_seqs ]
     );
 }
 
@@ -170,9 +171,19 @@ sub _build_para_blastdb {
 }
 
 
+sub _build_new_seqs_by_org {
+    my $self = shift;
+    return $self->_split_seqs_by_org(
+        Ali->new( seqs => [ $self->all_new_seqs     ] )
+    );
+}
+
+
 sub _build_ali_seqs_by_org {
     my $self = shift;
-    return $self->_split_seqs_by_org( $self->ali );
+    return $self->_split_seqs_by_org(
+        Ali->new( seqs => [ $self->all_but_new_seqs ] )
+    );
 }
 
 
@@ -184,15 +195,6 @@ sub _build_non_seqs_by_org {
 
     #### [ALI] NON file in use: $nonfile
     return $self->_split_seqs_by_org( Ali->load($nonfile) );
-}
-
-
-sub _build_new_seqs_by_org {
-    my $self = shift;
-
-    return $self->_split_seqs_by_org(
-        Ali->new( seqs => [ $self->all_new_seqs ] )
-    );
 }
 
 
@@ -229,7 +231,7 @@ sub _build_query_seqs {
     ;
 
     unless (@seqs) {
-        carp 'Warning: no seq for any query_org; using longest seq instead!';
+        carp '[ALI] Warning: no seq for any query_org; using longest instead!';
         @seqs = ( $self->get_longest_query_seq );
     }
 
@@ -301,7 +303,8 @@ sub _build_best_hits_by_ref_org {
 
         # skip ref_orgs without best hits
         unless ($cmul_score) {
-            carp "Note: no best hit for: $ref_org; removing it from ref_orgs.";
+            carp "[ALI] Note: no best hit for: $ref_org;"
+                . ' removing it from ref_orgs.';
             next ORG;
         }
 
@@ -369,7 +372,8 @@ sub check_brh_among_best_hits {
 
     #### [ALI] Checking BRH among best hits in reference orgs...
     if ($self->count_ref_orgs < 2) {
-        carp 'Warning: not enough ref_orgs for checking BRH among best hits';
+        carp '[ALI] Warning: not enough ref_orgs for checking BRH'
+            . ' among best hits!';
         return;
     }
 
@@ -412,7 +416,8 @@ sub check_brh_among_best_hits {
         # remove ref_orgs that completely failed BRH
         # Note: this should not happen too often because of ref_org_mul
         unless (keys %count_for) {
-            carp "Note: failed BRH for: $ref_org1; removing it from ref_orgs.";
+            carp "[ALI] Note: failed BRH for: $ref_org1;"
+                . ' removing it from ref_orgs.';
             $self->remove_ref_org($ref_org1);
             # Note: the remaining ref_orgs (as 1) will not be tested vs. this
             # ref_org (as 2) from now on; thus early Warnings only due to this
@@ -421,7 +426,7 @@ sub check_brh_among_best_hits {
 
         # check BRH with all *other* ref_orgs (hence - 1)
         my $other_n = $self->all_ref_orgs - 1;
-        carp 'Warning: best hits not in BRH across all ref_orgs!'
+        carp '[ALI] Warning: best hits not in BRH across all ref_orgs!'
             unless List::AllUtils::all {
                 $count_for{$_} == $other_n
             } keys %count_for
@@ -609,6 +614,10 @@ sub BUILD {
         return;
     }
 
+    # default to clearing new tags from Ali
+    $ali->clear_new_tags
+        unless $rp->ali_keep_old_new_tags eq 'on';
+
     # check for optional use of .non and .para
     # Note: lazy builders do not require it but this makes a better log
     $self->count_non_orgs;
@@ -616,7 +625,7 @@ sub BUILD {
 
     #### [ALI] queries: display( $self->query_seqs->all_long_ids )
 
-    if ($rp->ref_brh_mode eq 'on') {
+    if ($rp->ref_brh eq 'on') {
 
         #### [ALI] reference orgs: display( $self->all_ref_orgs )
 
@@ -646,7 +655,7 @@ sub BUILD {
         $self->mark_redundant_seqs;
 
         # TODO: write tests for this
-        if ($rp->ls_action eq 'remove') {
+        if ($rp->ali_keep_lengthened_seqs eq 'off') {
             #### [ALI] Removing lengthened seqs...
             $self->mark_lengthened_seqs;
         }
@@ -663,7 +672,6 @@ sub BUILD {
     }
 
     if ($rp->tax_reports eq 'on') {
-
         # TODO: consider moving this in TaxReport-like class
 
         #### [ALI] Writing taxonomic report...
@@ -675,9 +683,13 @@ sub BUILD {
         say {$fh} '# ' . join "\t", NewSeq->heads;
 
         # print tax_lines for all new_seqs
-        say {$fh} $self->tax_line_for($_)->stringify
-            for map { $_->full_id } $self->all_new_seqs
-    }
+        my @new_seqs = $rp->run_mode eq 'phylogenomic'
+            ? map { $_->full_id } $self->all_new_seqs       # phylogenomic mode
+            :              nsort( $self->all_tax_line_ids ) #  metagenomic mode
+        ;
+        say {$fh} join "\n", map { $_->stringify }
+            map { $self->tax_line_for($_) // () } @new_seqs;
+    }   # Note: skip preexisting new_seqs for which there are no tax_lines
 
     #### [ALI] Done analyzing file...
     return;
@@ -697,7 +709,7 @@ Bio::MUST::Apps::FortyTwo::AliProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 AUTHOR
 

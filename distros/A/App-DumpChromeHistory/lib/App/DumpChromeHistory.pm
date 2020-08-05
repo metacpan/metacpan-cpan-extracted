@@ -3,7 +3,7 @@ package App::DumpChromeHistory;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-04-19'; # DATE
 our $DIST = 'App-DumpChromeHistory'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -53,10 +53,16 @@ sub dump_chrome_history {
 
     my %args = @_;
 
+    my $app = $args{_app} // 'Google Chrome';
+    my $chrome_dir = $args{_chrome_dir};
+
     # list all available firefox profiles
     my $available_profiles;
     {
-        my $res = Chrome::Util::Profile::list_chrome_profiles(detail=>1);
+        my $res = Chrome::Util::Profile::list_chrome_profiles(
+            _chrome_dir => $chrome_dir,
+            detail => 1,
+        );
         return $res unless $res->[0] == 200;
         $available_profiles = $res->[2];
     }
@@ -141,7 +147,7 @@ App::DumpChromeHistory - Dump Chrome history
 
 =head1 VERSION
 
-This document describes version 0.004 of App::DumpChromeHistory (from Perl distribution App-DumpChromeHistory), released on 2020-04-19.
+This document describes version 0.005 of App::DumpChromeHistory (from Perl distribution App-DumpChromeHistory), released on 2020-04-19.
 
 =head1 SYNOPSIS
 

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ requires:
   File::BaseDir: '0.08'
   File::Slurper: '0.012'
   IPC::System::Simple: '1.30'
-  LWP: '6.44'
+  LWP: '6.46'
   MIME::Types: '2.17'
   Method::Signatures::Simple: '1.07'
   Mouse: v2.5.10
@@ -35,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/chocolateboy/wax/issues
   repository: https://github.com/chocolateboy/wax
-version: v2.3.3
+version: v2.4.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

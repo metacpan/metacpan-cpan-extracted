@@ -1,5 +1,10 @@
 Revision history for Perl module DNS::Unbound
 
+0.20 Mon, 3 Aug 2020
+- BUG FIX: Don’t free the unbound context if its reference is already gone.
+- BUG FIX: Use the “real” finally() rather than wrapping then() (badly).
+- Trivial simplification to XS code.
+
 0.19 Tue, 18 Feb 2020
 - Fix compatibility with old libunbounds that didn’t include ub_result.ttl.
 - Forgo version detection in favor of feature detection.

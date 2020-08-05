@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
+use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -25,9 +26,11 @@ my $test_dir = catdir(@path, 'test');
 my $data_dir = catdir(@path, 'tdata');
 
 rmtree($test_dir);
-mkdir $test_dir;
+mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-chdir $test_dir;
+
+chdir $test_dir  or die $!;
+$test_dir = cwd();
 
 my $template_name = catfile($test_dir, 'gallery_template.htm');
 
@@ -73,7 +76,9 @@ EOQ
     my $gallery_dir = catfile($test_dir, 'gallery');
     mkdir($gallery_dir);
     chmod 0755, $gallery_dir;
+
     chdir($gallery_dir);
+    $gallery_dir = cwd();
 
     my $gal = App::Followme::CreateGallery->new(%configuration);
 

@@ -56,6 +56,7 @@ script/complete-tz-name
 script/complete-tz-offset
 script/complete-uid
 script/complete-user
+script/complete-vivaldi-profile-name
 script/complete-weaver-bundle
 script/complete-weaver-plugin
 script/complete-weaver-role

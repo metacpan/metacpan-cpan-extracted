@@ -4,13 +4,14 @@ package JSON::Schema::Draft201909::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 no if "$]" >= 5.031009, feature => 'indirect';
 use Moo;
 use MooX::TypeTiny;
 use Types::Standard qw(ArrayRef InstanceOf Enum);
 use MooX::HandlesVia;
+use JSON::Schema::Draft201909::Annotation;
 use JSON::Schema::Draft201909::Error;
 use JSON::PP ();
 use constant { true => JSON::PP::true, false => JSON::PP::false };
@@ -27,17 +28,17 @@ has result => (
   coerce => sub { $_[0] ? true : false },
 );
 
-has errors => (
+has $_.'s' => (
   is => 'bare',
-  isa => ArrayRef[InstanceOf['JSON::Schema::Draft201909::Error']],
+  isa => ArrayRef[InstanceOf['JSON::Schema::Draft201909::'.ucfirst]],
   lazy => 1,
   default => sub { [] },
   handles_via => 'Array',
   handles => {
-    errors => 'elements',
-    error_count => 'count',
+    $_.'s' => 'elements',
+    $_.'_count' => 'count',
   },
-);
+) foreach qw(error annotation);
 
 has output_format => (
   is => 'ro',
@@ -59,15 +60,15 @@ sub format {
     return +{
       valid => $self->result,
       $self->result
-        ? ()
-        : ( errors => [ map $_->TO_JSON, $self->errors ] ),
+        ? ($self->annotation_count ? (annotations => [ map $_->TO_JSON, $self->annotations ]) : ())
+        : (errors => [ map $_->TO_JSON, $self->errors ]),
     };
   }
 
   die 'unsupported output format';
 }
 
-sub count { $_[0]->result ? 0 : $_[0]->error_count }
+sub count { $_[0]->result ? $_[0]->annotation_count : $_[0]->error_count }
 
 sub TO_JSON {
   my $self = shift;
@@ -88,7 +89,7 @@ JSON::Schema::Draft201909::Result - Contains the result of a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -146,7 +147,8 @@ Calls L</format> with the style configured in L</output_format>.
 
 =head2 count
 
-Returns the number of errors, when the result is false, or zero otherwise.
+Returns the number of annotations when the result is true, or the number of errors when the result
+is false.
 
 =head1 SUPPORT
 

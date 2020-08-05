@@ -82,7 +82,7 @@
          "web" : "https://github.com/perlancar/perl-App-perlmv"
       }
    },
-   "version" : "0.600",
+   "version" : "0.601",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

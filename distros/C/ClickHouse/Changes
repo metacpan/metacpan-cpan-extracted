@@ -1,5 +1,8 @@
 Revision history for ClickHouse
 
+0.04    2020-08-04
+        * FIX: Check socket still exists while disconnecting
+
 0.03    2017-10-15
         * FIX: long (more than 1024 bytes) answers now parsed correctly
         * FIX: long (more than 7k bytes) queries are sended via POST method

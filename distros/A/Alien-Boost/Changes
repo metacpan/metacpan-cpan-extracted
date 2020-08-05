@@ -1,0 +1,15 @@
+Revision history for Alien-libpcre},
+
+
+1.3      2020-08-05 06:57:34 -0600
+         - Add Test::Alien::CPP in prereqs
+ 
+1.2      2020-08-03 06:57:34 -0600
+         - Add cxxflags=-fPIC
+         - Add -lboost_program_options
+         - Remove -lboost
+         - Filter Boost beta versions from candidates
+
+1.1      2020-07-18 06:57:34 -0600
+         - initial version link=static
+   

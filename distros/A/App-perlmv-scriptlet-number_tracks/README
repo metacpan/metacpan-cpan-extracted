@@ -1,0 +1,70 @@
+NAME
+    App::perlmv::scriptlet::number_tracks - Add track number to filenames
+
+VERSION
+    This document describes version 0.001 of
+    App::perlmv::scriptlet::number_tracks (from Perl distribution
+    App-perlmv-scriptlet-number_tracks), released on 2020-08-03.
+
+SYNOPSIS
+    In tracks.txt:
+
+     name of first song
+     name of second song
+     third
+     fourth
+     the fifth and the last
+
+    List of mp4 files in current directory:
+
+     Foo - Fourth.mp4
+     Foo - Name Of First Song.mp4
+     Foo - Name of Second Song.mp4
+     Foo - The Fifth & The Last.mp4
+     Foo - Third.mp4
+
+    To add number prefix to the files:
+
+     % perlmv number-tracks -a tracks.txt *.mp4
+
+    The resulting files:
+
+     01-Foo - Name Of First Song.mp4
+     02-Foo - Name of Second Song.mp4
+     03-Foo - Third.mp4
+     04-Foo - Fourth.mp4
+     05-Foo - The Fifth & The Last.mp4
+
+DESCRIPTION
+    This scriptlet uses Text::Similarity::Overlaps to match filename with
+    track name. It then adds the resulting track number as filename's
+    prefix.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-perlmv-scriptlet-number_tracks>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-perlmv-scriptlet-number_tracks>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-scriptlet-
+    number_tracks>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    perlmv
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

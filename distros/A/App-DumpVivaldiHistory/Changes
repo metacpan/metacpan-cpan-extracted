@@ -1,3 +1,8 @@
+0.002   2020-04-19  Released-By: PERLANCAR; Urgency: medium
+
+	- [dist] Bump minimum version of App::DumpChromeHistory.
+
+
 0.001   2020-04-19  Released-By: PERLANCAR
 
         - First release.

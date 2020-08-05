@@ -23,14 +23,31 @@ sub finalize {
     my @params;
     if (ref $p eq 'HASH') {
         while (my ($k, $v) = each %$p) {
-            if (ref $v) {
-                push @params, encode_utf8($k), $v;
-            } else {
-                push @params, encode_utf8($k), encode_utf8($v);
-            }
+            push @params, _encode($k), _encode($v);
         }
     }
     return (\@params, []);
+}
+
+sub _encode {
+    my ($data) = @_;
+
+    if (ref $data eq "ARRAY") {
+        my @result;
+        for my $d (@$data) {
+            push @result, _encode($d);
+        }
+        return \@result;
+    }
+    elsif (ref $data eq "HASH") {
+        my %result;
+        while (my ($k, $v) = each %$data) {
+            $result{_encode($k)} = _encode($v);
+        }
+        return \%result;
+    }
+
+    return defined $data ? encode_utf8($data) : undef;
 }
 
 1;
@@ -64,5 +81,3 @@ Masahiro Nagano E<lt>kazeburo@gmail.comE<gt>
 Tokuhiro Matsuno E<lt>tokuhirom@gmail.comE<gt>
 
 =cut
-
-

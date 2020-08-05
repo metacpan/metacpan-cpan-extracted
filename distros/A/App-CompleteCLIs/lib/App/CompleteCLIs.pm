@@ -1,7 +1,7 @@
 package App::CompleteCLIs;
 
 our $DATE = '2020-04-19'; # DATE
-our $VERSION = '0.145'; # VERSION
+our $VERSION = '0.146'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +22,7 @@ App::CompleteCLIs - CLI wrappers for complete_*() functions
 
 =head1 VERSION
 
-This document describes version 0.145 of App::CompleteCLIs (from Perl distribution App-CompleteCLIs), released on 2020-04-19.
+This document describes version 0.146 of App::CompleteCLIs (from Perl distribution App-CompleteCLIs), released on 2020-04-19.
 
 =head1 SYNOPSIS
 
@@ -129,6 +129,8 @@ functions on the command-line.
 =item * L<complete-uid>
 
 =item * L<complete-user>
+
+=item * L<complete-vivaldi-profile-name>
 
 =item * L<complete-weaver-bundle>
 

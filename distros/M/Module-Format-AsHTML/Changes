@@ -1,4 +1,7 @@
 Revision history for Module-Format-AsHTML
 
+0.0.2       2020-08-03
+    - Add a warning about potential security issues (XSS).
+
 0.0.1       2020-07-27
     - First version, released on an unsuspecting world

@@ -143,6 +143,21 @@ METHODS
 
       Delay job for this many seconds (from now).
 
+    expire
+
+        expire => 300
+
+      Job is valid for this many seconds (from now) before it expires. Note
+      that this option is EXPERIMENTAL and might change without warning!
+
+    lax
+
+        lax => 1
+
+      Existing jobs this job depends on may also have transitioned to the
+      failed state to allow for it to be processed, defaults to false. Note
+      that this option is EXPERIMENTAL and might change without warning!
+
     notes
 
         notes => {foo => 'bar', baz => [1, 2, 3]}
@@ -168,14 +183,6 @@ METHODS
         queue => 'important'
 
       Queue to put job in, defaults to default.
-
-    sequence
-
-        sequence => 'host:mojolicious.org'
-
-      Sequence this job belongs to. The previous job from the sequence will
-      be automatically added as a parent to continue the sequence. Note
-      that this option is EXPERIMENTAL and might change without warning!
 
  fail_job
 
@@ -248,13 +255,6 @@ METHODS
 
       List only jobs in these queues.
 
-    sequences
-
-        sequences => ['host:localhost', 'host:mojolicious.org']
-
-      List only jobs from these sequences. Note that this option is
-      EXPERIMENTAL and might change without warning!
-
     states
 
         states => ['inactive', 'active']
@@ -299,6 +299,12 @@ METHODS
 
       Epoch time job was delayed to.
 
+    expires
+
+        expires => 784111777
+
+      Epoch time job is valid until before it expires.
+
     finished
 
         finished => 784111777
@@ -311,11 +317,12 @@ METHODS
 
       Job id.
 
-    next
+    lax
 
-        next => 10024
+        lax => 0
 
-      Next job in sequence.
+      Existing jobs this job depends on may also have failed to allow for
+      it to be processed.
 
     notes
 
@@ -328,12 +335,6 @@ METHODS
         parents => ['10023', '10024', '10025']
 
       Jobs this job depends on.
-
-    previous
-
-        previous => 10022
-
-      Previous job in sequence.
 
     priority
 
@@ -364,12 +365,6 @@ METHODS
         retries => 3
 
       Number of times job has been retried.
-
-    sequence
-
-        sequence => 'host:mojolicious.org'
-
-      Sequence name.
 
     started
 
@@ -614,6 +609,21 @@ METHODS
         delay => 10
 
       Delay job for this many seconds (from now).
+
+    expire
+
+        expire => 300
+
+      Job is valid for this many seconds (from now) before it expires. Note
+      that this option is EXPERIMENTAL and might change without warning!
+
+    lax
+
+        lax => 1
+
+      Existing jobs this job depends on may also have transitioned to the
+      failed state to allow for it to be processed, defaults to false. Note
+      that this option is EXPERIMENTAL and might change without warning!
 
     parents
 

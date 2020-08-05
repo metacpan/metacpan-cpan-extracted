@@ -1,0 +1,49 @@
+NAME
+    File::Temp::Patch::NoCleanup - Disable File::Temp::tempdir's automatic
+    cleanup (CLEANUP => 1)
+
+VERSION
+    This document describes version 0.001 of File::Temp::Patch::NoCleanup
+    (from Perl distribution File-Temp-Patch-NoCleanup), released on
+    2020-08-04.
+
+SYNOPSIS
+    From the command-line:
+
+     % PERL5OPT=-MFile::Temp::Patch::NoCleanup yourscript.pl ...
+
+    Now you can inspect temporary directory after the script ends.
+
+DESCRIPTION
+    This module patches File::Temp to disable automatic cleanup of temporary
+    directories. In addition, it prints the created temporary directory to
+    stdout. Useful for debugging.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Temp-Patch-NoCleanup>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Temp-Patch-NoCleanup>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Temp-Patch-NoCle
+    anup>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    File::Temp
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

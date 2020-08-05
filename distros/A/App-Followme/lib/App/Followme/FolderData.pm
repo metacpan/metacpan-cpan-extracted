@@ -12,7 +12,7 @@ use File::Spec::Functions qw(abs2rel catfile rel2abs splitdir);
 use base qw(App::Followme::BaseData);
 use App::Followme::FIO;
 
-our $VERSION = "1.94";
+our $VERSION = "1.95";
 
 #----------------------------------------------------------------------
 # Read the default parameter values
@@ -25,7 +25,7 @@ sub parameters {
             site_url => '',
             author => '',
             size_format => 'kb',
-            date_format => 'Mon d, yyyy h:m',
+            date_format => 'Mon d, yyyy h:mm',
             sort_field => '',
             sort_reverse => 0,
             sort_cutoff => 5,
@@ -44,7 +44,7 @@ sub calculate_author {
 }
 
 #----------------------------------------------------------------------
-# Calculate the creation dat from the modification date
+# Calculate the creation date from the modification date
 
 sub calculate_date {
     my ($self, $filename) = @_;
@@ -515,7 +515,7 @@ sub get_top_files {
 sub get_url {
     my ($self, $filename) = @_;
 
-    return $self->filename_to_url($self->{base_directory},
+    return $self->filename_to_url($self->{top_directory},
                                   $filename,
                                   $self->{web_extension});
 }
@@ -709,6 +709,8 @@ classes that build metadata for specific file types.
 
 All data are accessed through the build method.
 
+=over 4
+
 =item my %data = $obj->build($name, $filename);
 
 Build a variable's value. The first argument is the name of the variable. The
@@ -722,6 +724,7 @@ is used.
 
 The folder metadata class can evaluate the following variables. When passing
 a name to the build method, the sigil should not be used.
+
 =over 4
 
 =item @all_files
@@ -832,7 +835,7 @@ parameter is 0.
 =item sort_cutoff
 
 This determons the number of filenames returned by @top_files. The default
-value of this parameter id 5
+value of this parameter is 5
 
 =item exclude
 

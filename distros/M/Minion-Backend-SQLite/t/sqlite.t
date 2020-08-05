@@ -21,9 +21,9 @@ subtest 'Nothing to repair' => sub {
 };
 
 subtest 'Migrate up and down' => sub {
-  is $minion->backend->sqlite->migrations->active, 9, 'active version is 9';
+  is $minion->backend->sqlite->migrations->active, 10, 'active version is 10';
   is $minion->backend->sqlite->migrations->migrate(0)->active, 0, 'active version is 0';
-  is $minion->backend->sqlite->migrations->migrate->active, 9, 'active version is 9';
+  is $minion->backend->sqlite->migrations->migrate->active, 10, 'active version is 10';
 };
 
 subtest 'Register and unregister' => sub {
@@ -49,7 +49,7 @@ subtest 'Job results' => sub {
   my $id     = $minion->enqueue('test');
   my (@finished, @failed);
   my $promise = $minion->result_p($id, {interval => 0})->then(sub { @finished = @_ })->catch(sub { @failed = @_ });
-  my $job     = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'same id';
   Mojo::IOLoop->one_tick;
   is_deeply \@finished, [], 'not finished';
@@ -65,7 +65,7 @@ subtest 'Job results' => sub {
   (@finished, @failed) = ();
   my $id2 = $minion->enqueue('test');
   $promise = $minion->result_p($id2, {interval => 0})->then(sub { @finished = @_ })->catch(sub { @failed = @_ });
-  $job     = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id2, 'same id';
   $job->fail({works => 'too!'});
   $promise->wait;
@@ -102,7 +102,7 @@ subtest 'Repair missing worker' => sub {
   my $worker2 = $minion->worker->register;
   isnt $worker2->id, $worker->id, 'new id';
   my $id = $minion->enqueue('test');
-  my $job = $worker2->dequeue(0);
+  ok my $job = $worker2->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $worker2->info->{jobs}[0], $job->id, 'right id';
   $id = $worker2->id;
@@ -125,7 +125,7 @@ subtest 'Repair abandoned job' => sub {
   plan skip_all => 'Minion workers do not support fork emulation' if HAS_PSEUDOFORK;
   my $worker = $minion->worker->register;
   my $id  = $minion->enqueue('test');
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(1), 'job dequeued';
   is $job->id, $id, 'right id';
   $worker->unregister;
   $minion->repair;
@@ -137,7 +137,7 @@ subtest 'Repair abandoned job in minion_foreground queue (have to be handled man
   plan skip_all => 'Minion workers do not support fork emulation' if HAS_PSEUDOFORK;
   my $worker = $minion->worker->register;
   my $id = $minion->enqueue('test', [], {queue => 'minion_foreground'});
-  my $job = $worker->dequeue(0, {queues => ['minion_foreground']});
+  ok my $job = $worker->dequeue(0, {queues => ['minion_foreground']}), 'job dequeued';
   is $job->id, $id, 'right id';
   $worker->unregister;
   $minion->repair;
@@ -183,7 +183,7 @@ subtest 'Repair stuck jobs' => sub {
     $minion->stuck_after + 1, $_)
     for $id, $id2, $id3, $id4;
   ok $worker->dequeue(0, {id => $id4})->finish('Works!'), 'job finished';
-  my $job2 = $worker->dequeue(0, {id => $id2});
+  ok my $job2 = $worker->dequeue(0, {id => $id2}), 'job dequeued';
   $minion->repair;
   is $job2->info->{state}, 'active', 'job is still active';
   ok $job2->finish, 'job finished';
@@ -276,7 +276,10 @@ subtest 'Exclusive lock' => sub {
   ok $minion->unlock('foo'), 'unlocked';
   ok !$minion->unlock('foo'), 'not unlocked again';
   ok $minion->lock('foo', -3600), 'locked';
-  ok $minion->lock('foo', 3600),  'locked again';
+  ok $minion->lock('foo', 0),     'locked again';
+  ok !$minion->is_locked('foo'), 'lock does not exist';
+  ok $minion->lock('foo', 3600), 'locked again';
+  ok $minion->is_locked('foo'), 'lock exists';
   ok !$minion->lock('foo', -3600), 'not locked again';
   ok !$minion->lock('foo', 3600),  'not locked again';
   ok $minion->unlock('foo'), 'unlocked';
@@ -286,8 +289,9 @@ subtest 'Exclusive lock' => sub {
 };
 
 subtest 'Shared lock' => sub {
-  ok $minion->lock('bar', 3600,  {limit => 3}), 'locked';
-  ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
+  ok $minion->lock('bar', 3600, {limit => 3}), 'locked';
+  ok $minion->lock('bar', 3600, {limit => 3}), 'locked again';
+  ok $minion->is_locked('bar'), 'lock exists';
   ok $minion->lock('bar', -3600, {limit => 3}), 'locked again';
   ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
   ok !$minion->lock('bar', 3600, {limit => 2}), 'not locked again';
@@ -297,7 +301,8 @@ subtest 'Shared lock' => sub {
   ok $minion->unlock('bar'), 'unlocked again';
   ok $minion->unlock('bar'), 'unlocked again';
   ok $minion->unlock('bar'), 'unlocked again';
-  ok !$minion->unlock('bar'), 'not unlocked again';
+  ok !$minion->unlock('bar'),    'not unlocked again';
+  ok !$minion->is_locked('bar'), 'lock does not exist';
   ok $minion->unlock('baz'), 'unlocked';
   ok !$minion->unlock('baz'), 'not unlocked again';
 };
@@ -417,8 +422,8 @@ subtest 'Stats' => sub {
   is $minion->stats->{inactive_jobs}, 2, 'two inactive jobs';
   my $job;
   SKIP: {
-    skip 'Minion workers do not support fork emulation', 3 if HAS_PSEUDOFORK;
-    $job      = $worker->dequeue(0);
+    skip 'Minion workers do not support fork emulation', 4 if HAS_PSEUDOFORK;
+    ok $job = $worker->dequeue(0), 'job dequeued';
     my $stats = $minion->stats;
     is $stats->{active_workers}, 1, 'one active worker';
     is $stats->{active_jobs},    1, 'one active job';
@@ -426,8 +431,8 @@ subtest 'Stats' => sub {
   }
   $minion->enqueue('fail');
   SKIP: {
-    skip 'Minion workers do not support fork emulation', 18 if HAS_PSEUDOFORK;
-    my $job2 = $worker->dequeue(0);
+    skip 'Minion workers do not support fork emulation', 20 if HAS_PSEUDOFORK;
+    ok my $job2 = $worker->dequeue(0), 'job dequeued';
     my $stats = $minion->stats;
     is $stats->{active_workers}, 1, 'one active worker';
     is $stats->{active_jobs},    2, 'two active jobs';
@@ -435,7 +440,7 @@ subtest 'Stats' => sub {
     ok $job2->finish, 'job finished';
     ok $job->finish,  'job finished';
     is $minion->stats->{finished_jobs}, 2, 'two finished jobs';
-    my $job = $worker->dequeue(0);
+    ok my $job = $worker->dequeue(0), 'job dequeued';
     ok $job->fail, 'job failed';
     is $minion->stats->{failed_jobs}, 1, 'one failed job';
     ok $job->retry, 'job retried';
@@ -457,7 +462,7 @@ subtest 'History' => sub {
   plan skip_all => 'Minion workers do not support fork emulation' if HAS_PSEUDOFORK;
   $minion->enqueue('fail');
   my $worker = $minion->worker->register;
-  my $job    = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   ok $job->fail, 'job failed';
   $worker->unregister;
   my $history = $minion->history;
@@ -628,11 +633,11 @@ subtest 'Enqueue, dequeue and perform' => sub {
   is $info->{priority}, 0,          'right priority';
   is $info->{state},    'inactive', 'right state';
   SKIP: {
-    skip 'Minion workers do not support fork emulation', 19 if HAS_PSEUDOFORK;
+    skip 'Minion workers do not support fork emulation', 20 if HAS_PSEUDOFORK;
     my $worker = $minion->worker;
     is $worker->dequeue(0), undef, 'not registered';
     ok !$minion->job($id)->info->{started}, 'no started timestamp';
-    my $job = $worker->register->dequeue(0);
+    ok my $job = $worker->register->dequeue(0), 'job dequeued';
     is $worker->info->{jobs}[0], $job->id, 'right job';
     like $job->info->{created}, qr/^[\d.]+$/, 'has created timestamp';
     like $job->info->{started}, qr/^[\d.]+$/, 'has started timestamp';
@@ -662,7 +667,7 @@ subtest 'Retry and remove' => sub {
   plan skip_all => 'Minion workers do not support fork emulation' if HAS_PSEUDOFORK;
   my $id = $minion->enqueue(add => [5, 6]);
   my $worker = $minion->worker->register;
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->info->{attempts}, 1, 'job will be attempted once';
   is $job->info->{retries}, 0, 'job has not been retried';
   is $job->id, $id, 'right id';
@@ -674,12 +679,12 @@ subtest 'Retry and remove' => sub {
   like $job->info->{retried}, qr/^[\d.]+$/, 'has retried timestamp';
   is $job->info->{state},     'inactive',   'right state';
   is $job->info->{retries},   1,            'job has been retried once';
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->retries, 1, 'job has been retried once';
   ok $job->retry, 'job retried';
   is $job->id, $id, 'right id';
   is $job->info->{retries}, 2, 'job has been retried twice';
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->info->{state}, 'active', 'right state';
   ok $job->finish, 'job finished';
   ok $job->remove, 'job has been removed';
@@ -692,7 +697,7 @@ subtest 'Retry and remove' => sub {
   ok $job->retry, 'job retried';
   is $job->info->{state},   'inactive', 'right state';
   is $job->info->{retries}, 1,          'job has been retried once';
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   ok $job->fail,   'job failed';
   ok $job->remove, 'job has been removed';
@@ -708,24 +713,24 @@ subtest 'Jobs with priority' => sub {
   $minion->enqueue(add => [1, 2]);
   my $id = $minion->enqueue(add => [2, 4], {priority => 1});
   my $worker = $minion->worker->register;
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->info->{priority}, 1, 'right priority';
   ok $job->finish, 'job finished';
   isnt $worker->dequeue(0)->id, $id, 'different id';
   $id = $minion->enqueue(add => [2, 5]);
-  $job = $worker->register->dequeue(0);
+  ok $job = $worker->register->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->info->{priority}, 0, 'right priority';
   ok $job->finish, 'job finished';
   ok $job->retry({priority => 100}), 'job retried with higher priority';
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->info->{retries},  1,   'job has been retried once';
   is $job->info->{priority}, 100, 'high priority';
   ok $job->finish, 'job finished';
   ok $job->retry({priority => 0}), 'job retried with lower priority';
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->info->{retries},  2, 'job has been retried twice';
   is $job->info->{priority}, 0, 'low priority';
@@ -737,14 +742,14 @@ subtest 'Delayed jobs' => sub {
   my $id = $minion->enqueue(add => [2, 1] => {delay => 100});
   is $minion->stats->{delayed_jobs}, 1, 'one delayed job';
   SKIP: {
-    skip 'Minion workers do not support fork emulation', 15 if HAS_PSEUDOFORK;
+    skip 'Minion workers do not support fork emulation', 17 if HAS_PSEUDOFORK;
     my $worker = $minion->worker->register;
     is $worker->dequeue(0), undef, 'too early for job';
     my $job = $minion->job($id);
     ok $job->info->{delayed} > $job->info->{created}, 'delayed timestamp';
     $minion->backend->sqlite->db->query(
       q{update minion_jobs set delayed = datetime('now','-1 day') where id = ?}, $id);
-    $job = $worker->dequeue(0);
+    ok $job = $worker->dequeue(0), 'job dequeued';
     is $job->id, $id, 'right id';
     like $job->info->{delayed}, qr/^[\d.]+$/, 'has delayed timestamp';
     ok $job->finish, 'job finished';
@@ -754,7 +759,7 @@ subtest 'Delayed jobs' => sub {
     ok $job->remove, 'job removed';
     ok !$job->retry, 'job not retried';
     my $id = $minion->enqueue(add => [6, 9]);
-    $job = $worker->dequeue(0);
+    ok $job = $worker->dequeue(0), 'job dequeued';
     $info = $minion->job($id)->info;
     ok $info->{delayed} <= $info->{created}, 'no delayed timestamp';
     ok $job->fail, 'job failed';
@@ -811,7 +816,7 @@ subtest 'Events' => sub {
   my $id     = $minion->enqueue(add => [3, 3]);
   is $enqueue, $id, 'enqueue event has been emitted';
   $minion->enqueue(add => [4, 3]);
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $failed,   0, 'failed event has not been emitted';
   is $finished, 0, 'finished event has not been emitted';
   my $result;
@@ -824,7 +829,7 @@ subtest 'Events' => sub {
   isnt $pid_start, $$,      'new process id';
   isnt $pid_stop,  $$,      'new process id';
   is $pid_start, $pid_stop, 'same process id';
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   my $err;
   $job->on(failed => sub { $err = pop });
   $job->fail("test\n");
@@ -834,7 +839,7 @@ subtest 'Events' => sub {
   is $finished, 1,        'finished event has been emitted once';
   $minion->add_task(switcheroo => sub { });
   $minion->enqueue(switcheroo => [5, 3] => {notes => {finish_count => 0, before => 23}});
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   $job->perform;
   is_deeply $job->info->{result}, {added => 9}, 'right result';
   is $job->info->{notes}{finish_count}, 1, 'finish event has been emitted once';
@@ -852,18 +857,18 @@ subtest 'Queues' => sub {
   my $id = $minion->enqueue(add => [100, 1]);
   my $worker = $minion->worker->register;
   is $worker->dequeue(0 => {queues => ['test1']}), undef, 'wrong queue';
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->info->{queue}, 'default', 'right queue';
   ok $job->finish, 'job finished';
   $id = $minion->enqueue(add => [100, 3] => {queue => 'test1'});
   is $worker->dequeue(0), undef, 'wrong queue';
-  $job = $worker->dequeue(0 => {queues => ['test1']});
+  ok $job = $worker->dequeue(0 => {queues => ['test1']}), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->info->{queue}, 'test1', 'right queue';
   ok $job->finish, 'job finished';
   ok $job->retry({queue => 'test2'}), 'job retried';
-  $job = $worker->dequeue(0 => {queues => ['default', 'test2']});
+  ok $job = $worker->dequeue(0 => {queues => ['default', 'test2']}), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->info->{queue}, 'test2', 'right queue';
   ok $job->finish, 'job finished';
@@ -874,7 +879,7 @@ subtest 'Failed jobs' => sub {
   plan skip_all => 'Minion workers do not support fork emulation' if HAS_PSEUDOFORK;
   my $id = $minion->enqueue(add => [5, 6]);
   my $worker = $minion->worker->register;
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->info->{result}, undef, 'no result';
   ok $job->fail, 'job failed';
@@ -882,13 +887,13 @@ subtest 'Failed jobs' => sub {
   is $job->info->{state},  'failed',        'right state';
   is $job->info->{result}, 'Unknown error', 'right result';
   $id = $minion->enqueue(add => [6, 7]);
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   ok $job->fail('Something bad happened!'), 'job failed';
   is $job->info->{state}, 'failed', 'right state';
   is $job->info->{result}, 'Something bad happened!', 'right result';
   $id  = $minion->enqueue('fail');
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   $job->perform;
   is $job->info->{state}, 'failed', 'right state';
@@ -908,7 +913,7 @@ subtest 'Nested data structures' => sub {
   );
   $minion->enqueue('nested', [{first => [{second => 'test'}]}, [[3]]], {notes => {foo => [4, 5, 6]}});
   my $worker = $minion->worker->register;
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   $job->perform;
   is $job->info->{state}, 'finished', 'right state';
   ok $job->note(yada => ['works']), 'added metadata';
@@ -935,7 +940,7 @@ subtest 'Job terminated unexpectedly' => sub {
   $minion->add_task(exit => sub { exit 1 });
   my $id  = $minion->enqueue('exit');
   my $worker = $minion->worker->register;
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   $job->perform;
   is $job->info->{state}, 'failed', 'right state';
@@ -952,36 +957,61 @@ subtest 'Multiple attempts while processing' => sub {
   is $minion->backoff->(5),  640,    'right result';
   is $minion->backoff->(25), 390640, 'right result';
   SKIP: {
-    skip 'Minion workers do not support fork emulation', 16 if HAS_PSEUDOFORK;
-    my $id = $minion->enqueue(exit => [] => {attempts => 2});
+    skip 'Minion workers do not support fork emulation', 31 if HAS_PSEUDOFORK;
+
+    my $id = $minion->enqueue(exit => [] => {attempts => 3});
     my $worker = $minion->worker->register;
-    my $job = $worker->dequeue(0);
+    ok my $job = $worker->dequeue(0), 'job dequeued';
     is $job->id, $id, 'right id';
     is $job->retries, 0, 'job has not been retried';
-    $job->perform;
     my $info = $job->info;
-    is $info->{attempts}, 2,          'job will be attempted twice';
+    is $info->{attempts}, 3,        'three attempts';
+    is $info->{state},    'active', 'right state';
+    $job->perform;
+    $info = $job->info;
+    is $info->{attempts}, 2,          'two attempts';
     is $info->{state},    'inactive', 'right state';
     ok $info->{result},   'error message in result';
     ok $info->{retried} < $info->{delayed}, 'delayed timestamp';
+
     $minion->backend->sqlite->db->query(
       q{update minion_jobs set delayed = datetime('now') where id = ?}, $id);
-    $job = $worker->register->dequeue(0);
+    ok $job = $worker->dequeue(0), 'job dequeued';
     is $job->id, $id, 'right id';
-    is $job->retries, 1, 'job has been retried once';
+    is $job->retries, 1, 'job has been retried';
+    $info = $job->info;
+    is $info->{attempts}, 2,        'two attempts';
+    is $info->{state},    'active', 'right state';
     $job->perform;
     $info = $job->info;
-    is $info->{attempts}, 2,        'job will be attempted twice';
-    is $info->{state},    'failed', 'right state';
-    ok $info->{result},   'error message in result';
-    ok $job->retry({attempts => 3}), 'job retried';
-    $job = $worker->register->dequeue(0);
+    is $info->{attempts}, 1,          'one attempt';
+    is $info->{state},    'inactive', 'right state';
+
+    $minion->backend->sqlite->db->query(
+      q{update minion_jobs set delayed = datetime('now') where id = ?}, $id);
+    ok $job = $worker->register->dequeue(0), 'job dequeued';
     is $job->id, $id, 'right id';
+    is $job->retries, 2, 'two retries';
+    $info = $job->info;
+    is $info->{attempts}, 1,        'one attempt';
+    is $info->{state},    'active', 'right state';
     $job->perform;
     $info = $job->info;
-    is $info->{attempts}, 3,        'job will be attempted three times';
+    is $info->{attempts}, 1,        'one attempt';
     is $info->{state},    'failed', 'right state';
     ok $info->{result},   'error message in result';
+
+    ok $job->retry({attempts => 2}), 'job retried';
+    ok $job = $worker->register->dequeue(0), 'job dequeued';
+    is $job->id, $id, 'right id';
+    $job->perform;
+    is $job->info->{state}, 'inactive', 'right state';
+    $minion->backend->sqlite->db->query(
+      q{update minion_jobs set delayed = datetime('now') where id = ?}, $id);
+    ok $job = $worker->register->dequeue(0), 'job dequeued';
+    is $job->id, $id, 'right id';
+    $job->perform;
+    is $job->info->{state}, 'failed', 'right state';
     $worker->unregister;
   }
 };
@@ -990,7 +1020,7 @@ subtest 'Multiple attempts during maintenance' => sub {
   plan skip_all => 'Minion workers do not support fork emulation' if HAS_PSEUDOFORK;
   my $id = $minion->enqueue(exit => [] => {attempts => 2});
   my $worker = $minion->worker->register;
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->retries, 0, 'job has not been retried';
   is $job->info->{attempts}, 2,        'job will be attempted twice';
@@ -1002,7 +1032,7 @@ subtest 'Multiple attempts during maintenance' => sub {
   ok $job->info->{retried} < $job->info->{delayed}, 'delayed timestamp';
   $minion->backend->sqlite->db->query(
     q{update minion_jobs set delayed = datetime('now') where id = ?}, $id);
-  $job = $worker->register->dequeue(0);
+  ok $job = $worker->register->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is $job->retries, 1, 'job has been retried once';
   $worker->unregister;
@@ -1016,13 +1046,13 @@ subtest 'A job needs to be dequeued again after a retry' => sub {
   $minion->add_task(restart => sub { });
   my $id  = $minion->enqueue('restart');
   my $worker = $minion->worker->register;
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   ok $job->finish, 'job finished';
   is $job->info->{state}, 'finished', 'right state';
   ok $job->retry, 'job retried';
   is $job->info->{state}, 'inactive', 'right state';
-  my $job2 = $worker->dequeue(0);
+  ok my $job2 = $worker->dequeue(0), 'job dequeued';
   is $job->info->{state}, 'active', 'right state';
   ok !$job->finish, 'job not finished';
   is $job->info->{state}, 'active', 'right state';
@@ -1040,10 +1070,10 @@ subtest 'Perform jobs concurrently' => sub {
   my $id3 = $minion->enqueue('test');
   my $id4 = $minion->enqueue('exit');
   my $worker = $minion->worker->register;
-  my $job    = $worker->dequeue(0);
-  my $job2   = $worker->dequeue(0);
-  my $job3 = $worker->dequeue(0);
-  my $job4 = $worker->dequeue(0);
+  ok my $job  = $worker->dequeue(0), 'job dequeued';
+  ok my $job2 = $worker->dequeue(0), 'job dequeued';
+  ok my $job3 = $worker->dequeue(0), 'job dequeued';
+  ok my $job4 = $worker->dequeue(0), 'job dequeued';
   my $pid = $job->start;
   my $pid2 = $job2->start;
   my $pid3 = $job3->start;
@@ -1075,7 +1105,7 @@ subtest 'Stopping jobs' => sub {
   );
   my $worker = $minion->worker->register;
   $minion->enqueue('long_running');
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   ok $job->start->pid, 'has a process id';
   ok !$job->is_finished, 'job is not finished';
   $job->stop;
@@ -1083,7 +1113,7 @@ subtest 'Stopping jobs' => sub {
   is $job->info->{state},  'failed', 'right state';
   ok $job->info->{result}, 'error message in result';
   $minion->enqueue('long_running');
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   ok $job->start->pid, 'has a process id';
   ok !$job->is_finished, 'job is not finished';
   usleep 5000 until $job->info->{notes}{started};
@@ -1104,11 +1134,11 @@ subtest 'Job dependencies' => sub {
   my $id  = $minion->enqueue('test');
   my $id2 = $minion->enqueue('test');
   my $id3 = $minion->enqueue(test => [] => {parents => [$id, $id2]});
-  my $job = $worker->dequeue(0);
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is_deeply $job->info->{children}, [$id3], 'right children';
   is_deeply $job->info->{parents}, [], 'right parents';
-  my $job2 = $worker->dequeue(0);
+  ok my $job2 = $worker->dequeue(0), 'job dequeued';
   is $job2->id, $id2, 'right id';
   is_deeply $job2->info->{children}, [$id3], 'right children';
   is_deeply $job2->info->{parents}, [], 'right parents';
@@ -1118,10 +1148,10 @@ subtest 'Job dependencies' => sub {
   ok $job2->fail, 'job failed';
   ok !$worker->dequeue(0), 'parents are not ready yet';
   ok $job2->retry, 'job retried';
-  $job2 = $worker->dequeue(0);
+  ok $job2 = $worker->dequeue(0), 'job dequeued';
   is $job2->id, $id2, 'right id';
   ok $job2->finish, 'job finished';
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id3, 'right id';
   is_deeply $job->info->{children}, [], 'right children';
   is_deeply $job->info->{parents}, [$id, $id2], 'right parents';
@@ -1129,104 +1159,155 @@ subtest 'Job dependencies' => sub {
   is $minion->repair->stats->{finished_jobs}, 2, 'two finished jobs';
   ok $job->finish, 'job finished';
   is $minion->stats->{finished_jobs}, 3, 'three finished jobs';
-  is $minion->repair->stats->{finished_jobs}, 0, 'no finished jobs';
+  is $minion->repair->remove_after(172800)->stats->{finished_jobs}, 0, 'no finished jobs';
   $id = $minion->enqueue(test => [] => {parents => [-1]});
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   ok $job->finish, 'job finished';
   $id = $minion->enqueue(test => [] => {parents => [-1]});
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is_deeply $job->info->{parents}, [-1], 'right parents';
   $job->retry({parents => [-1, -2]});
-  $job = $worker->dequeue(0);
+  ok $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
   is_deeply $job->info->{parents}, [-1, -2], 'right parents';
   ok $job->finish, 'job finished';
+
+  my $id4     = $minion->enqueue('test');
+  my $id5     = $minion->enqueue('test');
+  my $id6     = $minion->enqueue(test => [] => {parents => [$id4, $id5]});
+  my $child   = $minion->job($id6);
+  my $parents = $child->parents;
+  is $parents->size, 2, 'two parents';
+  is $parents->[0]->id, $id4, 'first parent';
+  is $parents->[1]->id, $id5, 'second parent';
+  $_->remove for $parents->each;
+  is $child->parents->size, 0, 'no parents';
+  ok $child->remove, 'job removed';
   $worker->unregister;
 };
 
-subtest 'Sequences' => sub {
+subtest 'Job dependencies (lax)' => sub {
   plan skip_all => 'Minion workers do not support fork emulation' if HAS_PSEUDOFORK;
   my $worker = $minion->worker->register;
-  my $id     = $minion->enqueue('test' => [] => {sequence => 'host:localhost'});
-  is $minion->job($id)->info->{previous}, undef, 'new sequence';
-  is $minion->job($id)->info->{next},     undef, 'new sequence';
-  my $id2 = $minion->enqueue('test' => [] => {sequence => 'host:localhost'});
-  is $minion->job($id2)->info->{previous}, $id,  'sequence in progress';
-  is $minion->job($id)->info->{next},      $id2, 'sequence in progress';
-  my $id3 = $minion->enqueue('test' => [] => {sequence => 'host:localhost', priority => 5});
-  is $minion->job($id3)->info->{previous}, $id2, 'sequence in progress';
-  is $minion->job($id)->info->{next},      $id2, 'sequence in progress';
-  my $job = $worker->dequeue(0);
+  my $id     = $minion->enqueue('test');
+  my $id2    = $minion->enqueue('test');
+  my $id3    = $minion->enqueue(test => [] => {lax => 1, parents => [$id, $id2]});
+  ok my $job = $worker->dequeue(0), 'job dequeued';
   is $job->id, $id, 'right id';
-  is $job->info->{sequence}, 'host:localhost', 'right sequence';
-  is $job->info->{priority}, 0,                'right priority';
-  is_deeply $job->info->{children}, [$id2], 'right children';
-  is_deeply $job->info->{parents}, [], 'no parents';
-  ok $job->finish, 'job finished';
-  my $job2 = $worker->dequeue(0);
+  is_deeply $job->info->{children}, [$id3], 'right children';
+  is_deeply $job->info->{parents}, [], 'right parents';
+  ok my $job2 = $worker->dequeue(0), 'job dequeued';
   is $job2->id, $id2, 'right id';
-  is $job2->info->{sequence}, 'host:localhost', 'right sequence';
-  is $job2->info->{previous}, $id,  'sequence in progress';
-  is $job2->info->{next},     $id3, 'sequence in progress';
-  is $job2->info->{priority}, 0, 'right priority';
   is_deeply $job2->info->{children}, [$id3], 'right children';
-  is_deeply $job2->info->{parents},  [$id],  'right parents';
-  ok $job2->finish, 'job finished';
-  my $job3 = $worker->dequeue(0);
+  is_deeply $job2->info->{parents}, [], 'right parents';
+  ok !$worker->dequeue(0), 'parents are not ready yet';
+  ok $job->finish, 'job finished';
+  ok !$worker->dequeue(0), 'parents are not ready yet';
+  ok $job2->fail, 'job failed';
+  ok my $job3 = $worker->dequeue(0), 'job dequeued';
   is $job3->id, $id3, 'right id';
-  is $job3->info->{sequence}, 'host:localhost', 'right sequence';
-  is $job3->info->{previous}, $id2, 'sequence in progress';
-  is $job3->info->{next},     undef, 'sequence is ending for now';
-  is $job3->info->{priority}, 5,     'right priority';
-  is_deeply $job3->info->{children}, [], 'no children';
-  is_deeply $job3->info->{parents}, [$id2], 'right parents';
+  is_deeply $job3->info->{children}, [], 'right children';
+  is_deeply $job3->info->{parents}, [$id, $id2], 'right parents';
   ok $job3->finish, 'job finished';
 
-  my $id4 = $minion->enqueue('test' => [] => {sequence => 'host:localhost'});
-  is_deeply $job3->info->{children}, [$id4], 'right children';
-  my $job4 = $worker->dequeue(0);
+  my $id4 = $minion->enqueue('test');
+  my $id5 = $minion->enqueue(test => [] => {parents => [$id4]});
+  ok my $job4 = $worker->dequeue(0), 'job dequeued';
   is $job4->id, $id4, 'right id';
-  is $job4->info->{sequence}, 'host:localhost', 'right sequence';
-  is_deeply $job4->info->{children}, [], 'no children';
-  is_deeply $job4->info->{parents}, [$id3], 'right parents';
-  ok $job4->finish, 'job finished';
-
-  my $id5  = $minion->enqueue('test' => [] => {sequence => 'host:localhost', parents => [$id, $id2]});
-  my $job5 = $worker->dequeue(0);
+  ok !$worker->dequeue(0), 'parents are not ready yet';
+  ok $job4->fail, 'job finished';
+  ok !$worker->dequeue(0), 'parents are not ready yet';
+  ok $minion->job($id5)->retry({lax => 1}), 'job is now lax';
+  ok my $job5 = $worker->dequeue(0), 'job dequeued';
   is $job5->id, $id5, 'right id';
-  is $job5->info->{sequence}, 'host:localhost', 'right sequence';
-  is_deeply $job5->info->{children}, [], 'no children';
-  is_deeply $job5->info->{parents}, [$id4, $id, $id2], 'right parents';
+  is_deeply $job5->info->{children}, [], 'right children';
+  is_deeply $job5->info->{parents}, [$id4], 'right parents';
   ok $job5->finish, 'job finished';
+  ok $job4->remove, 'job removed';
+
+  is $minion->jobs({ids => [$id5]})->next->{lax}, 1, 'lax';
+  ok $minion->job($id5)->retry, 'job is still lax';
+  is $minion->jobs({ids => [$id5]})->next->{lax}, 1, 'lax';
+  ok $minion->job($id5)->retry({lax => 0}), 'job is not lax anymore';
+  is $minion->jobs({ids => [$id5]})->next->{lax}, 0, 'not lax';
+  ok $minion->job($id5)->retry, 'job is still not lax';
+  is $minion->jobs({ids => [$id5]})->next->{lax}, 0, 'not lax';
   ok $minion->job($id5)->remove, 'job removed';
-
-  my $id6  = $minion->enqueue('test' => [] => {sequence => 'host:localhost'});
-  my $job6 = $worker->dequeue(0);
-  is $job6->id, $id6, 'right id';
-  is $job6->info->{sequence}, 'host:localhost', 'right sequence';
-  is $job6->info->{previous}, undef,            'sequence restarted';
-  is $job6->info->{next},     undef,            'sequence restarted';
-  is $job4->info->{next}, $id5, 'sequence restarted';
-  is_deeply $job6->info->{children}, [], 'no children';
-  is_deeply $job6->info->{parents},  [], 'no parents';
-  ok $job6->finish, 'job finished';
-
-  $id  = $minion->enqueue('test' => [] => {sequence => 'host:mojolicious.org'});
-  $job = $worker->dequeue(0);
-  is $job->id, $id, 'right id';
-  is $job->info->{sequence}, 'host:mojolicious.org', 'right sequence';
-  is_deeply $job->info->{children}, [], 'no children';
-  is_deeply $job->info->{parents},  [], 'no parents';
-  ok $job->finish, 'job finished';
-
-  is $minion->jobs({sequences => ['host:mojolicious.org']})->total, 1, 'one job';
-  is $minion->jobs({sequences => ['host:mojolicious.org']})->next->{id}, $id, 'same id';
-  is $minion->jobs({sequences => ['host:metacpan.org']})->total, 0, 'no jobs';
-  is $minion->jobs({sequences => ['host:localhost']})->total,    5, 'five jobs';
-  is $minion->jobs({sequences => ['host:localhost', 'host:mojolicious.org']})->total, 6, 'six jobs';
   $worker->unregister;
+};
+
+subtest 'Expiring jobs' => sub {
+  my $id = $minion->enqueue('test');
+  is $minion->job($id)->info->{expires}, undef, 'no expires timestamp';
+  $minion->job($id)->remove;
+
+  $id = $minion->enqueue('test' => [] => {expire => 300});
+  like $minion->job($id)->info->{expires}, qr/^[\d.]+$/, 'has expires timestamp';
+  SKIP: {
+    skip 'Minion workers do not support fork emulation', 35 if HAS_PSEUDOFORK;
+    my $worker = $minion->worker->register;
+    ok my $job = $worker->dequeue(0), 'job dequeued';
+    is $job->id, $id, 'right id';
+    my $expires = $job->info->{expires};
+    like $expires, qr/^[\d.]+$/, 'has expires timestamp';
+    ok $job->finish, 'job finished';
+    ok $job->retry({expire => 600}), 'job retried';
+    my $info = $minion->job($id)->info;
+    is $info->{state},     'inactive',   'rigth state';
+    like $info->{expires}, qr/^[\d.]+$/, 'has expires timestamp';
+    isnt $info->{expires}, $expires, 'retried with new expires timestamp';
+    is $minion->repair->jobs({states => ['inactive']})->total, 1, 'job has not expired yet';
+    ok $job = $worker->dequeue(0), 'job dequeued';
+    is $job->id, $id, 'right id';
+    ok $job->finish, 'job finished';
+
+    $id = $minion->enqueue('test' => [] => {expire => 300});
+    is $minion->repair->jobs({states => ['inactive']})->total, 1, 'job has not expired yet';
+    my $sql = $minion->backend->sqlite;
+    $sql->db->query(q{update minion_jobs set expires = datetime('now', '-1 day') where id = ?}, $id);
+    is $minion->jobs({states => ['inactive']})->total, 0, 'job has expired';
+    ok !$worker->dequeue(0), 'job has expired';
+    ok $sql->db->select('minion_jobs', '*', {id => $id})->hash, 'job still exists in database';
+    $minion->repair;
+    ok !$sql->db->select('minion_jobs', '*', {id => $id})->hash, 'job no longer exists in database';
+
+    $id = $minion->enqueue('test' => [] => {expire => 300});
+    ok $job = $worker->dequeue(0), 'job dequeued';
+    is $job->id, $id, 'right id';
+    ok $job->finish, 'job finished';
+    $sql->db->query(q{update minion_jobs set expires = datetime('now', '-1 day') where id = ?}, $id);
+    $minion->repair;
+    ok $job = $minion->job($id), 'job still exists';
+    is $job->info->{state}, 'finished', 'right state';
+
+    $id = $minion->enqueue('test' => [] => {expire => 300});
+    ok $job = $worker->dequeue(0), 'job dequeued';
+    is $job->id, $id, 'right id';
+    ok $job->fail, 'job failed';
+    $sql->db->query(q{update minion_jobs set expires = datetime('now', '-1 day') where id = ?}, $id);
+    $minion->repair;
+    ok $job = $minion->job($id), 'job still exists';
+    is $job->info->{state}, 'failed', 'right state';
+
+    $id = $minion->enqueue('test' => [] => {expire => 300});
+    ok $job = $worker->dequeue(0), 'job dequeued';
+    is $job->id, $id, 'right id';
+    $sql->db->query(q{update minion_jobs set expires = datetime('now', '-1 day') where id = ?}, $id);
+    $minion->repair;
+    ok $job = $minion->job($id), 'job still exists';
+    is $job->info->{state}, 'active', 'right state';
+    ok $job->finish, 'job finished';
+
+    $id = $minion->enqueue('test' => [] => {expire => 300});
+    my $id2 = $minion->enqueue('test' => [] => {parents => [$id]});
+    ok !$worker->dequeue(0, {id => $id2}), 'parent is still inactive';
+    $sql->db->query(q{update minion_jobs set expires = datetime('now', '-1 day') where id = ?}, $id);
+    ok $job = $worker->dequeue(0, {id => $id2}), 'parent has expired';
+    ok $job->finish, 'job finished';
+    $worker->unregister;
+  }
 };
 
 subtest 'Foreground' => sub {

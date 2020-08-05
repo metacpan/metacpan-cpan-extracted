@@ -1,6 +1,6 @@
 package Net::IPAM::Block;
 
-our $VERSION = '2.00';
+our $VERSION = '2.03';
 
 use 5.10.0;
 use strict;
@@ -668,7 +668,7 @@ sub diff {
   }
 
   # last diff
-  if ( $cursor->cmp( $outer->last ) < 0 ) {
+  if ( $cursor->cmp( $outer->last ) <= 0 ) {
     my $base_ip = $cursor;
     my $last_ip = $outer->last;
 
@@ -817,6 +817,7 @@ sub aggregate {
   my $i = 0;
   while ( $i < @sieved ) {
     my $this = $sieved[$i];
+    my $last_changed;
     my $j;
     for ( $j = $i + 1 ; $j < @sieved ; $j++ ) {
 
@@ -827,6 +828,7 @@ sub aggregate {
       # no overflow in incr possible, next block is still behind this block
       if ( $this->{last}->incr->cmp( $sieved[$j]->{base} ) >= 0 ) {
         $this->{last} = $sieved[$j]->{last};
+        $last_changed++;
         next;
       }
 
@@ -834,8 +836,8 @@ sub aggregate {
     }
     $i = $j;
 
-    # last has changed, calculate new mask, returns undef if no CIDR
-    $this->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $this->{base}, $this->{last} );
+    # this.last may have changed, calculate new mask
+    $this->{mask} = Net::IPAM::Block::Private::_get_mask_ip( $this->{base}, $this->{last} ) if $last_changed;
 
     push @result, $this;
   }

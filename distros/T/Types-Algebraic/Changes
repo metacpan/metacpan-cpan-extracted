@@ -1,5 +1,12 @@
 Revision history for Types-Algebraic
 
+0.05  2020-08-03 23:52:24 CEST
+        - Handle return statements in both array and scalar contexts.
+
+0.04  2020-08-03 23:02:50 CEST
+        - Implement equality and stringification operators.
+        - Add provides section to CPAN meta.
+
 0.03  2020-07-07 20:26:01 CEST
         - Properly compile the default keyword.
         - Bump dependency on Keyword::Declare to 0.001015, as we use features from it.

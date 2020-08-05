@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Cpanel::JSON::XS" => "4.19",
     "Data::Dumper" => 0,
-    "Data::Printer" => 0,
     "Exporter" => 0,
     "Exporter::Easy" => 0,
     "JSON::MaybeXS" => "1.004000",
@@ -42,13 +41,14 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Data::Printer" => 0,
     "File::Temp" => 0,
     "Test2::Bundle::More" => 0,
     "Test2::Tools::Exception" => 0,
     "Test2::V0" => 0,
     "Test::Exception" => 0
   },
-  "VERSION" => "1.06",
+  "VERSION" => "1.07",
   "test" => {
     "TESTS" => "t/*.t"
   }

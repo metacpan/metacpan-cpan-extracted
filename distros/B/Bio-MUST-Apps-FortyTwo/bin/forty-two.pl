@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: forty-two.pl
 # ABSTRACT: The Answer to the Ultimate Question of Phylogenomics
+# CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
 
 use Modern::Perl '2011';
 
@@ -39,6 +40,7 @@ my $ft = FortyTwo->new(
 # Note: CLI parameters are introduced here
 my %args;
 $args{debug_mode} = $ARGV_verbosity > 5 ? 1 : 0;
+$args{threads}    = $ARGV_threads;
 my $rp = $ft->run_proc(\%args);
 
 __END__
@@ -51,9 +53,16 @@ forty-two.pl - The Answer to the Ultimate Question of Phylogenomics
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 USAGE
+
+        ______           __            ______
+       / ____/___  _____/ /___  __    /_  __/      ______
+      / /_  / __ \/ ___/ __/ / / /_____/ / | | /| / / __ \
+     / __/ / /_/ / /  / /_/ /_/ /_____/ /  | |/ |/ / /_/ /
+    /_/    \____/_/   \__/\__, /     /_/   |__/|__/\____/
+                         /____/
 
     forty-two.pl <infiles> --config=<file> [optional arguments]
 
@@ -63,7 +72,7 @@ version 0.190820
 
 =item <infiles>
 
-Path to input ALI files [repeatable argument].
+Path to input ALI (or FASTA) files [repeatable argument].
 
 forty-two should not be called in a shell loop. If so it will run very
 slowly, especially when using tax filters (because loading the NCBI Taxonomy
@@ -90,10 +99,20 @@ directory of the distribution for annotated examples of YAML files.
 
 =over
 
+=item --threads=<n>
+
+Number of threads to run in parallel [default: n.default]. Parallelization is
+achieved by processing several ALI files in parallel using an internal queue.
+Therefore, the specified number of threads should not be larger than the
+number of input ALI files.
+
+=for Euclid: n.type: +int
+    n.default: 1
+
 =item --verbosity=<level>
 
-Verbosity level for logging to STDERR [default: 0]. Available levels range from
-0 to 6. Level 6 corresponds to debugging mode.
+Verbosity level for logging to STDERR [default: level.default]. Available
+levels range from 0 to 6. Level 6 corresponds to debugging mode.
 
 =for Euclid: level.type: int, level >= 0 && level <= 6
     level.default: 0
@@ -113,6 +132,12 @@ Print the usual program information
 =head1 AUTHOR
 
 Denis BAURAIN <denis.baurain@uliege.be>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Mick VAN VLIERBERGHE
+
+Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
 
 =head1 COPYRIGHT AND LICENSE
 

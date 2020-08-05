@@ -35,7 +35,7 @@
             "HTTP::Headers" : "0",
             "HTTP::Status" : "0",
             "OpenTracing::GlobalTracer" : "0",
-            "OpenTracing::Implementation" : "0",
+            "OpenTracing::Implementation" : "v0.31.0",
             "Syntax::Feature::Maybe" : "0",
             "Time::HiRes" : "0"
          }
@@ -51,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.102.0",
+   "version" : "v0.103.0",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

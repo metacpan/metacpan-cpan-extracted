@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 53 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 54 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CompleteCLIs.pm'
@@ -61,6 +61,7 @@ my @scripts = (
     'script/complete-tz-offset',
     'script/complete-uid',
     'script/complete-user',
+    'script/complete-vivaldi-profile-name',
     'script/complete-weaver-bundle',
     'script/complete-weaver-plugin',
     'script/complete-weaver-role',

@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
+use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -23,12 +24,14 @@ require App::Followme::CreateSitemap;
 my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
-mkdir $test_dir;
+mkdir $test_dir  or die $!;
 chmod 0755, $test_dir;
-mkdir catfile($test_dir, "sub");
-chmod 0755, catfile($test_dir, "sub");
-chdir $test_dir;
 
+mkdir catfile(@path, 'test', "sub") or die $!;
+chmod 0755, catfile($test_dir, "sub");
+
+chdir $test_dir or die $!;
+$test_dir = cwd();
 
 #----------------------------------------------------------------------
 # Create pages to list in sitemap

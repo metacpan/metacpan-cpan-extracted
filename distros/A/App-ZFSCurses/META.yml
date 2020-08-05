@@ -21,13 +21,15 @@ no_index:
 requires:
   Curses: '1.36'
   Curses::UI: '0.9609'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
   perl: '5.006'
 resources:
   bugtracker: https://gitlab.com/monsieurp/App-ZFSCurses/-/issues
   homepage: https://gitlab.com/monsieurp/App-ZFSCurses
   license: https://opensource.org/licenses/BSD-3-Clause
   repository: https://gitlab.com/monsieurp/App-ZFSCurses.git
-version: '1.01'
+version: '1.100'
 x_licence:
   - bsd
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

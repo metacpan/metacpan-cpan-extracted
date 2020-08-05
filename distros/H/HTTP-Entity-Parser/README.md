@@ -19,7 +19,7 @@ HTTP::Entity::Parser - PSGI compliant HTTP Entity Parser
 # DESCRIPTION
 
 HTTP::Entity::Parser is a PSGI-compliant HTTP Entity parser. This module also is compatible
-with [HTTP::Body](https://metacpan.org/pod/HTTP::Body). Unlike HTTP::Body, HTTP::Entity::Parser reads HTTP entities from
+with [HTTP::Body](https://metacpan.org/pod/HTTP%3A%3ABody). Unlike HTTP::Body, HTTP::Entity::Parser reads HTTP entities from
 PSGI's environment `$env->{'psgi.input'}` and parses it.
 This module supports application/x-www-form-urlencoded, multipart/form-data and application/json.
 
@@ -70,7 +70,7 @@ This module supports application/x-www-form-urlencoded, multipart/form-data and 
             "tempname" => "/tmp/XXXXX", # path to the temporary file where uploaded file is saved
         }
 
-    When used with [Plack::Request::Upload](https://metacpan.org/pod/Plack::Request::Upload):
+    When used with [Plack::Request::Upload](https://metacpan.org/pod/Plack%3A%3ARequest%3A%3AUpload):
 
         my ( $params, $uploads) = $parser->parse($env);
          my $upload_hmv = Hash::MultiValue->new();
@@ -94,7 +94,7 @@ This module supports application/x-www-form-urlencoded, multipart/form-data and 
 
     For `multipart/form-data`. It is used for HTTP POST contains file upload.
 
-    MultiPart parser use [HTTP::MultiPartParser](https://metacpan.org/pod/HTTP::MultiPartParser).
+    MultiPart parser use [HTTP::MultiPartParser](https://metacpan.org/pod/HTTP%3A%3AMultiPartParser).
 
 - JSON
 
@@ -110,10 +110,10 @@ HTTP::Entity::Parser is able to choose parsers by the instance, HTTP::Body requi
 
 # SEE ALSO
 
-- [HTTP::Body](https://metacpan.org/pod/HTTP::Body)
-- [HTTP::MultiPartParser](https://metacpan.org/pod/HTTP::MultiPartParser)
-- [Plack::Request](https://metacpan.org/pod/Plack::Request)
-- [WWW::Form::UrlEncoded](https://metacpan.org/pod/WWW::Form::UrlEncoded)
+- [HTTP::Body](https://metacpan.org/pod/HTTP%3A%3ABody)
+- [HTTP::MultiPartParser](https://metacpan.org/pod/HTTP%3A%3AMultiPartParser)
+- [Plack::Request](https://metacpan.org/pod/Plack%3A%3ARequest)
+- [WWW::Form::UrlEncoded](https://metacpan.org/pod/WWW%3A%3AForm%3A%3AUrlEncoded)
 
     HTTP::Entity::Parser uses this for parse application/x-www-form-urlencoded
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.26
+    version 2.28
 
 SYNOPSIS
 
@@ -915,6 +915,8 @@ AUTHOR
     Shawn Laffan (SLAFFAN)
 
     Paul Evans (leonerd, PEVANS)
+
+    Håkon Hægland (hakonhagland, HAKONH)
 
 COPYRIGHT AND LICENSE
 

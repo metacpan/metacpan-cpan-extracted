@@ -1,5 +1,15 @@
 Revision history for Net-IPAM-Block
 
+2.03    Mon, 03 Aug 2020 11:01:11 +0200
+        * wrong hint in POD for aggregate()
+
+2.02    Mon, 03 Aug 2020 10:19:28 +0200
+        * fixed: bug in diff() at the block border
+        * more tests
+
+2.01    Sun, 02 Aug 2020 22:16:09 +0200
+        * more test coverage
+
 2.00    Thu, 30 Jul 2020 09:42:09 +0200
         * API CHANGE: aggregate returns now longer the blocks to cidrs,
           just returns the aggregated blocks

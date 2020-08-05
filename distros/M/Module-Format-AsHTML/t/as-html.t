@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 use Module::Format::AsHTML ();
 
@@ -22,4 +22,9 @@ use Module::Format::AsHTML ();
 qq{<a href="https://metacpan.org/release/Module-Format">Module-Format</a>},
         "homepage"
     );
+
+    # TEST
+    is( $cpan->mod( { m => "File::Spec", body => "ma files" } ),
+        qq{<a href="https://metacpan.org/module/File::Spec">ma files</a>},
+        "module", );
 }

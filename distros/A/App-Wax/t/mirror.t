@@ -26,4 +26,3 @@ wax_is(
     "wax --mirror cmd --foo $URL[0] -bar --baz $URL[1]",
     "cmd --foo $KEEP[0] -bar --baz $KEEP[1]"
 );
-

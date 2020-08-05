@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-DumpVivaldiHistory
 requires:
-  App::DumpChromeHistory: '0'
+  App::DumpChromeHistory: '0.005'
   DBD::SQLite: '0'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DumpVivaldiHistory
   homepage: https://metacpan.org/release/App-DumpVivaldiHistory
   repository: git://github.com/perlancar/perl-App-DumpVivaldiHistory.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

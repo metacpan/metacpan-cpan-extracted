@@ -110,7 +110,7 @@ static X509* load_cert(char* crt) {
     return x;
 }
 
-static SV* sign(Crypt_SMIME this, char* plaintext) {
+static SV* sign(Crypt_SMIME this, char* plaintext, unsigned int len) {
     BIO* inbuf;
     BIO* outbuf;
     CMS_ContentInfo* cms;
@@ -120,7 +120,7 @@ static SV* sign(Crypt_SMIME this, char* plaintext) {
     int err;
     int i;
 
-    inbuf = BIO_new_mem_buf(plaintext, -1);
+    inbuf = BIO_new_mem_buf(plaintext, len);
     if (inbuf == NULL) {
         return NULL;
     }
@@ -169,7 +169,7 @@ static SV* sign(Crypt_SMIME this, char* plaintext) {
     return result;
 }
 
-static SV* signonly(Crypt_SMIME this, char* plaintext) {
+static SV* signonly(Crypt_SMIME this, char* plaintext, unsigned int len) {
     BIO* inbuf;
     BIO* outbuf;
     CMS_ContentInfo* cms;
@@ -179,7 +179,7 @@ static SV* signonly(Crypt_SMIME this, char* plaintext) {
     int err;
     int i;
 
-    inbuf = BIO_new_mem_buf(plaintext, -1);
+    inbuf = BIO_new_mem_buf(plaintext, len);
     if (inbuf == NULL) {
         return NULL;
     }
@@ -226,7 +226,7 @@ static SV* signonly(Crypt_SMIME this, char* plaintext) {
     return result;
 }
 
-static SV* check(Crypt_SMIME this, char* signed_mime, int flags) {
+static SV* check(Crypt_SMIME this, char* signed_mime, unsigned int len, int flags) {
     BIO* inbuf;
     BIO* detached = NULL;
     BIO* outbuf;
@@ -235,7 +235,7 @@ static SV* check(Crypt_SMIME this, char* signed_mime, int flags) {
     BUF_MEM* bufmem;
     SV* result;
 
-    inbuf = BIO_new_mem_buf(signed_mime, -1);
+    inbuf = BIO_new_mem_buf(signed_mime, len);
     if (inbuf == NULL) {
         return NULL;
     }
@@ -280,7 +280,7 @@ static SV* check(Crypt_SMIME this, char* signed_mime, int flags) {
 }
 
 /* CMS */
-static SV* _encrypt(Crypt_SMIME this, char* plaintext) {
+static SV* _encrypt(Crypt_SMIME this, char* plaintext, unsigned int len) {
     BIO* inbuf;
     BIO* outbuf;
     CMS_ContentInfo* enc;
@@ -289,7 +289,7 @@ static SV* _encrypt(Crypt_SMIME this, char* plaintext) {
     BUF_MEM* bufmem;
     SV* result;
 
-    inbuf = BIO_new_mem_buf(plaintext, -1);
+    inbuf = BIO_new_mem_buf(plaintext, len);
     if (inbuf == NULL) {
         return NULL;
     }
@@ -326,7 +326,7 @@ static SV* _encrypt(Crypt_SMIME this, char* plaintext) {
     return result;
 }
 
-static SV* _decrypt(Crypt_SMIME this, char* encrypted_mime) {
+static SV* _decrypt(Crypt_SMIME this, char* encrypted_mime, unsigned int len) {
     BIO* inbuf;
     BIO* outbuf;
     CMS_ContentInfo * enc;
@@ -335,7 +335,7 @@ static SV* _decrypt(Crypt_SMIME this, char* encrypted_mime) {
     BUF_MEM* bufmem;
     SV* result;
 
-    inbuf = BIO_new_mem_buf(encrypted_mime, -1);
+    inbuf = BIO_new_mem_buf(encrypted_mime, len);
     if (inbuf == NULL) {
         return NULL;
     }
@@ -747,7 +747,7 @@ setPublicKeyStore(Crypt_SMIME this, ...)
         RETVAL
 
 SV*
-_sign(Crypt_SMIME this, char* plaintext)
+_sign(Crypt_SMIME this, SV* plaintext)
     CODE:
         /* 秘密鍵がまだセットされていなければエラー */
         if (this->priv_key == NULL) {
@@ -757,7 +757,7 @@ _sign(Crypt_SMIME this, char* plaintext)
             croak("Crypt::SMIME#sign: private cert has not yet been set. Set one before signing");
         }
 
-        RETVAL = sign(this, plaintext);
+        RETVAL = sign(this, SvPV_nolen(plaintext), SvCUR(plaintext));
         if (RETVAL == NULL) {
             OPENSSL_CROAK("Crypt::SMIME#sign: failed to sign the message");
         }
@@ -766,7 +766,7 @@ _sign(Crypt_SMIME this, char* plaintext)
         RETVAL
 
 SV*
-_signonly(Crypt_SMIME this, char* plaintext)
+_signonly(Crypt_SMIME this, SV* plaintext)
     CODE:
         /* 秘密鍵がまだセットされていなければエラー */
         if (this->priv_key == NULL) {
@@ -776,7 +776,7 @@ _signonly(Crypt_SMIME this, char* plaintext)
             croak("Crypt::SMIME#signonly: private cert has not yet been set. Set one before signing");
         }
 
-        RETVAL = signonly(this, plaintext);
+        RETVAL = signonly(this, SvPV_nolen(plaintext), SvCUR(plaintext));
         if (RETVAL == NULL) {
             OPENSSL_CROAK("Crypt::SMIME#signonly: failed to sign the message");
         }
@@ -785,7 +785,7 @@ _signonly(Crypt_SMIME this, char* plaintext)
         RETVAL
 
 SV*
-_encrypt(Crypt_SMIME this, char* plaintext)
+_encrypt(Crypt_SMIME this, SV* plaintext)
     CODE:
         /* 公開鍵がまだセットされていなければエラー */
         if (this->pubkeys_stack == NULL) {
@@ -802,7 +802,7 @@ _encrypt(Crypt_SMIME this, char* plaintext)
             this->cipher = EVP_aes_128_cbc();
         }
 
-        RETVAL = _encrypt(this, plaintext);
+        RETVAL = _encrypt(this, SvPV_nolen(plaintext), SvCUR(plaintext));
         if (RETVAL == NULL) {
             OPENSSL_CROAK("Crypt::SMIME#encrypt: failed to encrypt the message");
         }
@@ -811,7 +811,7 @@ _encrypt(Crypt_SMIME this, char* plaintext)
         RETVAL
 
 SV*
-check(Crypt_SMIME this, char* signed_mime, int flags = 0)
+check(Crypt_SMIME this, SV* signed_mime, int flags = 0)
     PROTOTYPE: $$;$
     CODE:
         if (this->pubkeys_store == NULL) {
@@ -820,7 +820,7 @@ check(Crypt_SMIME this, char* signed_mime, int flags = 0)
             }
         }
 
-        RETVAL = check(this, signed_mime, flags);
+        RETVAL = check(this, SvPV_nolen(signed_mime), SvCUR(signed_mime), flags);
         if (RETVAL == NULL) {
             OPENSSL_CROAK("Crypt::SMIME#check: failed to check the signature");
         }
@@ -829,7 +829,7 @@ check(Crypt_SMIME this, char* signed_mime, int flags = 0)
         RETVAL
 
 SV*
-decrypt(Crypt_SMIME this, char* encrypted_mime)
+decrypt(Crypt_SMIME this, SV* encrypted_mime)
     CODE:
         /* 秘密鍵がまだセットされていなければエラー */
         if (this->priv_key == NULL) {
@@ -839,7 +839,7 @@ decrypt(Crypt_SMIME this, char* encrypted_mime)
             croak("Crypt::SMIME#decrypt: private cert has not yet been set. Set one before decrypting");
         }
 
-        RETVAL = _decrypt(this, encrypted_mime);
+        RETVAL = _decrypt(this, SvPV_nolen(encrypted_mime), SvCUR(encrypted_mime));
         if (RETVAL == NULL) {
             OPENSSL_CROAK("Crypt::SMIME#decrypt: failed to decrypt the message");
         }

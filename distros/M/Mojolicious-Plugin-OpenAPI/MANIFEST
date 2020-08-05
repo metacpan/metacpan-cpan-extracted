@@ -34,6 +34,7 @@ t/basic-under-route-authenticate.t
 t/data/image.jpeg
 t/jv-recursion.t
 t/plugin-cors.t
+t/plugin-security-extended-status.t
 t/plugin-security-rules-not-defined.t
 t/plugin-security-v2.t
 t/plugin-security-v3.t

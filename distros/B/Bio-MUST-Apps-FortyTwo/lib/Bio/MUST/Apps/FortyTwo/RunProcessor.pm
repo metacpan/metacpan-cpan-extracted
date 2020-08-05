@@ -1,6 +1,6 @@
 package Bio::MUST::Apps::FortyTwo::RunProcessor;
 # ABSTRACT: Internal class for forty-two tool
-$Bio::MUST::Apps::FortyTwo::RunProcessor::VERSION = '0.190820';
+$Bio::MUST::Apps::FortyTwo::RunProcessor::VERSION = '0.202160';
 use Moose;
 use namespace::autoclean;
 
@@ -12,6 +12,8 @@ use Smart::Comments;                    # logging always enabled here
 use Carp;
 use List::AllUtils;
 use Path::Class qw(file);
+
+use Parallel::Batch;
 
 use Bio::MUST::Core;
 use Bio::MUST::Drivers;
@@ -47,7 +49,7 @@ has 'query_orgs' => (
 # blast_args
 
 
-has 'ref_brh_mode' => (
+has 'ref_brh' => (
     is       => 'ro',
     isa      => 'Str',
     default  => 'on',
@@ -97,22 +99,48 @@ has 'tol_check' => (
     default  => 'off',
 );
 
-has 'tol_db' => (
+has 'tol_bank_dir' => (
     is       => 'ro',
-    isa      => 'Bio::MUST::Drivers::Blast::Database',
+    isa      => 'Str',
 );
 
-# trimming_mode
+has 'tol_bank' => (
+    is       => 'ro',
+    isa      => 'Str',
+);
+
+has 'tol_blastdb' => (
+    is       => 'ro',
+    isa      => 'Maybe[Bio::MUST::Drivers::Blast::Database]',
+    init_arg => undef,
+    lazy     => 1,
+    builder  => '_build_tol_blastdb',
+);
+
+
+# trim_homologues
 
 # trim_max_shift
 
 # trim_extra_margin
 
 
-has 'ls_action' => (
+has 'merge_orthologues' => (
     is       => 'ro',
     isa      => 'Str',
-    default  => 'keep',
+    default  => 'off',
+);
+
+has 'merge_min_ident' => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 0.9,
+);
+
+has 'merge_min_len' => (
+    is       => 'ro',
+    isa      => 'Num',
+    default  => 40,
 );
 
 
@@ -122,7 +150,7 @@ has 'aligner_mode' => (
     default  => 'blast',
 );
 
-has 'ali_patch_mode' => (
+has 'ali_skip_self' => (
     is      => 'ro',
     isa     => 'Str',
     default => 'off',
@@ -132,6 +160,18 @@ has 'ali_cover_mul' => (
     is       => 'ro',
     isa      => 'Num',
     default  => 1.1,
+);
+
+has 'ali_keep_lengthened_seqs' => (
+    is       => 'ro',
+    isa      => 'Str',
+    default  => 'on',
+);
+
+has 'ali_keep_old_new_tags' => (
+    is       => 'ro',
+    isa      => 'Str',
+    default  => 'off',
 );
 
 
@@ -184,6 +224,11 @@ has 'tax_score_mul' => (
 
 # orgs
 
+# infiles
+
+# debug_mode
+
+# threads
 
 has '_ref_blastdb_by_org' => (
     traits   => ['Hash'],
@@ -218,20 +263,32 @@ sub _build_ref_blastdb_by_org {
     return \%ref_blastdb_for;
 }
 
+
+sub _build_tol_blastdb {
+    my $self = shift;
+
+    return if $self->tol_check eq 'off';
+
+    my $tolfile = file( $self->tol_bank_dir, $self->tol_bank );
+    #### [RUN] TOL bank in use: $tolfile->stringify
+    return Bio::MUST::Drivers::Blast::Database->new( file => $tolfile );
+}
+
 ## use critic
 
 
 sub BUILD {
     my $self = shift;
 
-    unless ($self->ref_brh_mode eq 'off') {
-        croak 'Error: ref_bank_dir missing from config file; aborting'
+    unless ($self->ref_brh eq 'off') {
+        croak '[RUN] Error: ref_bank_dir missing from config file; aborting!'
             unless $self->ref_bank_dir;
 
-        croak 'Error: ref_org_mapper missing from config file; aborting'
+        croak '[RUN] Error: ref_org_mapper missing from config file; aborting!'
             unless $self->ref_org_mapper;
 
-        croak 'Error: BLAST databases missing from ref_org_mapper; aborting!'
+        croak '[RUN] Error: BLAST databases missing from ref_org_mapper;'
+            . ' aborting!'
             if List::AllUtils::any {
                 !defined $self->ref_bank_for($_)
             } $self->all_ref_orgs
@@ -256,13 +313,27 @@ sub BUILD {
 #         ;
 #     }
 
-    for my $infile ($self->all_infiles) {
-        ### [RUN] Processing ALI: $infile
-        AliProcessor->new(
-            run_proc => $self,
-            ali      => $infile,
-        );
+    if ($self->threads > 1) {
+        ### [RUN] Multithreading is on: $self->threads
+        ### [RUN] Logging data will be mixed-up!
     }
+
+    # create job queue
+    my $batch = Parallel::Batch->new( {
+        maxprocs => $self->threads,
+        jobs     => [ $self->all_infiles ],
+        code     => sub {                       # closure (providing $self)
+                        my $infile = shift;
+                        ### [RUN] Processing ALI: $infile
+                        return AliProcessor->new(
+                            run_proc => $self,
+                            ali      => $infile,
+                        );
+                    },
+    } );
+
+    # launch jobs
+    $batch->run();
 
     return;
 }
@@ -281,7 +352,7 @@ Bio::MUST::Apps::FortyTwo::RunProcessor - Internal class for forty-two tool
 
 =head1 VERSION
 
-version 0.190820
+version 0.202160
 
 =head1 AUTHOR
 

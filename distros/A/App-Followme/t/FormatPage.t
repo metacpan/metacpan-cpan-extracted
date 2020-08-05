@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
+use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -39,11 +40,15 @@ require App::Followme::FormatPage;
 my $test_dir = catdir(@path, 'test');
 
 rmtree($test_dir);
-mkdir $test_dir;
+mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-mkdir catfile($test_dir, "sub");
-chmod 0755, catfile($test_dir, "sub");
-chdir $test_dir;
+
+my $sub_dir = catfile(@path, 'test', "sub");
+mkdir $sub_dir or die $!;
+chmod 0755, $sub_dir;
+
+chdir $test_dir or die $!;
+$test_dir = cwd();
 
 my %configuration = ();
 
@@ -271,7 +276,8 @@ EOQ
 do {
     my $up = App::Followme::FormatPage->new(%configuration);
     my $bottom = catfile($test_dir, 'sub');
-    chdir($bottom);
+    chdir($bottom) or die $!;
+    $bottom = cwd();
 
     my $prototype_path = $up->get_prototype_path('one.html');
 
@@ -282,12 +288,14 @@ do {
 # Test run
 
 do {
-    chdir ($test_dir);
+    chdir ($test_dir) or die $!;
+    $test_dir = cwd();
     my $up = App::Followme::FormatPage->new(%configuration);
 
     foreach my $dir (('sub', '')) {
         my $path = $dir ? catfile($test_dir, $dir) : $test_dir;
-        chdir($path);
+        chdir($path) or die $!;
+        $path = cwd();
 
         $up->run($path);
         foreach my $count (qw(two one)) {

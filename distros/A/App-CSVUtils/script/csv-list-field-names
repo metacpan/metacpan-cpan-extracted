@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_list_field_names
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-07-30'; # DATE
+our $DATE = '2020-08-03'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.030'; # VERSION
+our $VERSION = '0.031'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,28 +38,29 @@ csv-list-field-names - List field names of CSV file
 
 =head1 VERSION
 
-This document describes version 0.030 of csv-list-field-names (from Perl distribution App-CSVUtils), released on 2020-07-30.
+This document describes version 0.031 of csv-list-field-names (from Perl distribution App-CSVUtils), released on 2020-08-03.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % csv-list-field-names [--escape-char=s] [--format=name] [--header]
-     [--json] [--(no)naked-res] [--no-header] [--no-tsv] [--noheader]
-     [--notsv] [--page-result[=program]] [--quote-char=s] [--sep-char=s]
-     [--tsv] <filename>
+     [--input-header] [--input-tsv] [--json] [--(no)naked-res]
+     [--no-header] [--no-tsv] [--noheader] [--notsv]
+     [--page-result[=program]] [--quote-char=s] [--sep-char=s] [--tsv]
+     <filename>
 
 =head1 OPTIONS
 
 C<*> marks required options.
 
-=head2 Main options
+=head2 Input options
 
 =over
 
 =item B<--escape-char>=I<s>
 
-Specify character to escape value in field, will be passed to Text::CSV_XS.
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to `\\` (backslash). Overrides `--tsv` option.
 
@@ -71,7 +72,7 @@ Input CSV file.
 Use `-` to read from stdin.
 
 
-=item B<--no-header>
+=item B<--no-header>, B<--input-header>
 
 By default (`--header`), the first row of the CSV will be assumed to contain
 field names (and the second row contains the first data row). When you declare
@@ -82,19 +83,19 @@ and so on.
 
 =item B<--quote-char>=I<s>
 
-Specify field quote character, will be passed to Text::CSV_XS.
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to `"` (double quote). Overrides `--tsv` option.
 
 
 =item B<--sep-char>=I<s>
 
-Specify field separator character, will be passed to Text::CSV_XS.
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to `,` (comma). Overrides `--tsv` option.
 
 
-=item B<--tsv>
+=item B<--tsv>, B<--input-tsv>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
 

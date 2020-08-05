@@ -1,3 +1,9 @@
+1.60 2020-08-05 rurban
+----
+  * Increase t/call.t verbosity on failures (PR #12 aatomic)
+  * Push cwd to @INC for PERL_CORE (PR #11 jkeenan)
+  * Update search.cpan.org link to metacpan (PR #10 Grinnz)
+
 1.59 2018-08-04 rurban
 ----
   * Improve tests using FindBin for filter-util.pl [atoomic #9]

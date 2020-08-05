@@ -339,7 +339,7 @@ _resolve( struct ub_ctx *ctx, SV *name, int type, int class = 1 )
         RETVAL
 
 BOOT:
-    HV *stash = gv_stashpvn("DNS::Unbound", 12, FALSE);
+    HV *stash = gv_stashpv("DNS::Unbound", FALSE);
 #if HAS_UB_VERSION
     newCONSTSUB(stash, "unbound_version", newSVpv( ub_version(), 0 ));
 #endif

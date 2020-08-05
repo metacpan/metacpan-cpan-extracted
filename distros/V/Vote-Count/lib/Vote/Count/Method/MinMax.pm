@@ -7,15 +7,15 @@ package Vote::Count::Method::MinMax;
 
 use namespace::autoclean;
 use Moose;
-extends 'Vote::Count::Matrix';
+extends 'Vote::Count';
 
-our $VERSION='1.06';
+our $VERSION='1.07';
 
 =head1 NAME
 
 Vote::Count::Method::MinMax
 
-=head1 VERSION 1.06
+=head1 VERSION 1.07
 
 =cut
 
@@ -25,221 +25,216 @@ Vote::Count::Method::MinMax
 
 =head1 SYNOPSIS
 
-  my $MinMaxElection =
-    Vote::Count::Method::MinMax->new(
-      'BallotSet' => $ballotset ,
-      'DropStyle' => 'all',
-      'DropRule'  => 'topcount',
-    );
+ my $MinMaxElection =
+ Vote::Count::Method::MinMax->new( 'BallotSet' => $ballotset );
+ 
+ # $method is one of: winning margin opposition
+ my $Winner = $MinMaxElection->MinMax( $method )->{'winner'};
+ say $MinMaxElection->logv();
 
-  my $Winner = $CondorcetElection->RunCondorcetDropping( $SmithSet )->{'winner'};
+=head1 The MinMax Methods
 
-=head1 Shameless Piracy of Electowiki
+MinMax (also known as Minimax and Simpson-Kramer) uses a Pairwise comparison Matrix. Instead of looking at wins and losses as with Condorcet Methods, it scores each pairing, the choice with the lowest worst pairing score wins.
 
-Minmax or Minimax (Simpson-Kramer method) is the name of several election methods based on electing the candidate with the lowest score, based on votes received in pairwise contests with other candidates.
+=head2 The Three MinMax Scoring Rules 
 
-Minmax(winning votes) elects the candidate whose greatest pairwise loss to another candidate is the least, when the strength of a pairwise loss is measured as the number of voters who voted for the winning side.
+=head3 Winning Votes ('winning')
 
-Minmax(margins) is the same, except that the strength of a pairwise loss is measured as the number of votes for the winning side minus the number of votes for the losing side.
+When the choice being scored loses, the votes for the winner in the pairing are scored. When the choice wins or ties the pairing is scored as 0.
 
-Criteria passed by both methods: Condorcet criterion, majority criterion
+This scoring method meets the Condorcet Winner and Loser Criteria, but not the Smith or Later Harm Criteria.
 
-Criteria failed by both methods: Smith criterion, mutual majority criterion, Condorcet loser criterion.
+=head3 Margin ('margin')
 
-Minmax(winning votes) also satisfies the Plurality criterion. In the three-candidate case, Minmax(margins) satisfies the Participation criterion.
+When the choice being scored loses, the votes for the winner minus the votes for that choice in the pairing are scored. When the choice wins or ties the pairing is scored as 0.
 
-Minmax(pairwise opposition) or MMPO elects the candidate whose greatest opposition from another candidate is minimal. Pairwise wins or losses are not considered; all that matters is the number of votes for one candidate over another.
+This scoring method meets the Condorcet Winner and Loser Criteria, but not the Smith or Later Harm Criteria.
 
-Pairwise opposition is defined for a pair of candidates. For X and Y, X's pairwise opposition in that pair is the number of ballots ranking Y over X. MMPO elects the candidate whose greatest pairwise opposition is the least.
+=head3 Opposition ('opposition')
 
-Minmax(pairwise opposition) does not strictly satisfy the Condorcet criterion or Smith criterion. It also fails the Plurality criterion, and is more indecisive than the other Minmax methods (unless it's used with a tiebreaking rule such as the simple one described below). However, it satisfies the Later-no-harm criterion, the Favorite Betrayal criterion, and in the three-candidate case, the Participation criterion, and the Chicken Dilemma Criterion.
+The votes for the other choice in the pairing are scored regardless of whether the choice won or lost.
 
-MMPO's choice rule can be regarded as a kind of social optimization: The election of the candidate to whom fewest people prefer another. That choice rule can be offered as a standard in and of itself.
+This scoring method is claimed to meet the Later Harm Criteria, but fails Condorcet Winner and Smith.
 
-MMPO's simple tiebreaker:
+=head2 Tie Breaker
 
-If two or more candidates have the same greatest pairwise opposition, then elect the one that has the lowest next-greatest pairwise opposition. Repeat as needed. 
+As a Tie Breaker it is recommended to use the next worst pairing score. Because it follows the method and should resolve well, this Tie Breaker is implemented by Vote::Count within the MinMax method itself. If it returns a tie your implementation can apply another method like Modified Grand-Junction. 
 
 =cut
 
 no warnings 'experimental';
-use List::Util qw( min max );
+
+use Vote::Count::TextTableTiny qw/generate_markdown_table/;
 use Carp;
 use Try::Tiny;
-use Data::Dumper;
+# use Data::Dumper;
 
-sub _scorewinningvotes ( $self ) {
+=pod
 
+=head2 ScoreMinMax
+
+Generate hashref scoring according the requested $method which is one of three scoring rules: 'winning', 'margin', 'opposition'.
+
+  my $scores = $MinMaxElection->ScoreMinMax( $method );
+
+=cut 
+
+sub ScoreMinMax ( $self, $method ) {
+  my $scores = {};
+  # Always grab the matrix by calling PairMatrix,
+  # build is lazy.
+  my $Matrix = $self->PairMatrix()->{'Matrix'};
+  my @choices = sort ( keys $self->Active()->%* );
+  for my $Choice (@choices) {
+    my @ChoiceLoss = ();
+  LOOPMMMO: for my $Opponent (@choices) {
+      next LOOPMMMO if $Opponent eq $Choice;
+      my $M = $Matrix->{$Choice}{$Opponent};
+      my $S = undef;
+      if ( $method eq 'opposition' ) {
+        $S = $M->{$Opponent};
+      }
+      elsif ( $M->{'winner'} eq $Opponent ) {
+        $S = $M->{$Opponent} if $method eq 'winning';
+        $S = $M->{$Opponent} - $M->{$Choice} if $method eq 'margin';
+      }
+      else {
+        $S = 0;
+      }
+      $scores->{$Choice}{$Opponent} = $S;
+      # there was a bug where sometimes @ChoiceLoss was sorted
+      # alphanumerically. resolution force the sort to be numeric.
+      push @ChoiceLoss, ( $S );
+    }  # LOOPMMMO:
+    $scores->{$Choice}{score}
+      = [ reverse sort { $a <=> $b } @ChoiceLoss ];
+  }
+  return $scores;
+}
+
+sub _pairmatrixtable1 ( $I, $scores ) {
+  my @rows = ( [qw/Choice Choice Votes Opponent Votes Score/] );
+  my @choices = sort ( keys $I->Active()->%* );
+  my $Matrix = $I->PairMatrix()->{'Matrix'};
+  for my $Choice (@choices) {
+    push @rows, [$Choice];
+    for my $Opponent (@choices) {
+      my $Cstr = $Choice;
+      my $Ostr = $Opponent;
+      next if $Opponent eq $Choice;
+      my $CVote = $Matrix->{$Choice}{$Opponent}{$Choice};
+      my $OVote = $Matrix->{$Choice}{$Opponent}{$Opponent};
+      if ( $Matrix->{$Choice}{$Opponent}{'winner'} eq $Choice ) {
+        $Cstr = "**$Cstr**";
+      }
+      if ( $Matrix->{$Choice}{$Opponent}{'winner'} eq $Opponent ) {
+        $Ostr = "**$Ostr**";
+      }
+      my $Score = $scores->{$Choice}{$Opponent};
+      push @rows, [ ' ', $Cstr, $CVote, $Ostr, $OVote, $Score ];
+    }
+  }
+  return generate_markdown_table( rows => \@rows );
+}
+
+sub _pairmatrixtable2 ( $I, $scores ) {
+  my @rows = ( [qw/Choice Scores/] );
+  my @choices = sort ( keys $I->Active()->%* );
+  for my $Choice (@choices) {
+    my $scores = join ', ', ( $scores->{$Choice}{'score'}->@* );
+    push @rows, [ $Choice, $scores ];
+  }
+  return generate_markdown_table( rows => \@rows );
 }
 
 =pod
-has 'Matrix' => (
-  isa     => 'Object',
-  is      => 'ro',
-  lazy    => 1,
-  builder => '_newmatrix',
-);
 
-# DropStyle: whether to apply drop rule against
-# all choices ('all') or the least winning ('leastwins').
-has 'DropStyle' => (
-  isa     => 'Str',
-  is      => 'ro',
-  default => 'leastwins',
-);
+=head2 MinMaxPairingVotesTable
 
-has 'DropRule' => (
-  isa     => 'Str',
-  is      => 'ro',
-  default => 'plurality',
-);
+Generate a formatted table of the Pairing Matrix from a set of scores generated by ScoreMinMax.
 
-has 'SkipLoserDrop' => (
-  isa     => 'Int',
-  is      => 'ro',
-  default => 0,
-);
+  say $MinMaxElection->MinMaxPairingVotesTable( $scores );
 
-sub GetRound ( $self, $active, $roundnum = '' ) {
-  my $rule = lc( $self->DropRule() );
-  if ( $rule =~ m/(plurality|topcount)/ ) {
-    return $self->TopCount($active);
-  }
-  elsif ( $rule eq 'approval' ) {
-    my $round = $self->Approval($active);
-    $self->logv( "Round $roundnum Approval Totals ", $round->RankTable() );
-    return $round;
-  }
-  elsif ( $rule eq 'borda' ) {
-    my $round = $self->Borda($active);
-    $self->logv( "Round $roundnum Borda Count ", $round->RankTable() );
-    return $round;
-  }
-  elsif ( $rule eq 'greatestloss' ) {
-    return $self->Matrix()->RankGreatestLoss($active);
-  }
-  else {
-    croak "undefined dropping rule $rule requested";
-  }
+=cut  
+
+sub MinMaxPairingVotesTable ( $I, $scores ) {
+  my $table1 = $I->_pairmatrixtable1($scores);
+  my $table2 = $I->_pairmatrixtable2($scores);
+  return "\n$table1\n\n$table2\n";
 }
 
-sub DropChoice ( $self, $round, @jeapardy ) {
-  my %roundvotes = $round->RawCount()->%*;
-  my @eliminate  = ();
-  my $lowest     = $round->CountVotes();
-  for my $j (@jeapardy) {
-    $lowest = $roundvotes{$j} if $roundvotes{$j} < $lowest;
-  }
-  for my $j (@jeapardy) {
-    if ( $roundvotes{$j} == $lowest ) {
-      push @eliminate, $j;
-    }
-  }
-  return @eliminate;
-}
+=pod
 
-sub _newmatrix ($self) {
-  return Vote::Count::Matrix->new(
-    'BallotSet' => $self->BallotSet(),
-    Active      => $self->Active()
-  );
-}
+=head2 MinMax
 
-sub _logstart ( $self, $active ) {
-  my $dropdescription = 'Elimination Rule is Applied to All Active Choices.';
-  if ( $self->DropStyle eq 'leastwins' ) {
-    $dropdescription =
-      'Elimination Rule is Applied to only Choices with the Fewest Wins.';
-  }
-  my $rule = '';
-  if ( $self->DropRule() =~ m/(plurality|topcount)/ ) {
-    $rule = "Drop the Choice With the Lowest TopCount.";
-  }
-  elsif ( $self->DropRule() eq 'approval' ) {
-    $rule = "Drop the Choice With the Lowest Approval.";
-  }
-  elsif ( $self->DropRule() eq 'borda' ) {
-    $rule = "Drop the Choice With the Lowest Borda Score.";
-  }
-  elsif ( $self->DropRule() eq 'greatestloss' ) {
-    $rule = "Drop the Choice With the Greatest Loss.";
-  }
-  else {
-    croak "undefined dropping rule $rule requested";
-  }
-  $self->logt( 'CONDORCET SEQUENTIAL DROPPING METHOD',
-    'CHOICES:', join( ', ', ( sort keys %{$active} ) ) );
-  $self->logv( "Elimination Rule: $rule", $dropdescription );
-}
+Run and log the election with MinMax according to scoring $method: 'winning', 'margin', 'opposition'. 
 
-sub RunCondorcetDropping ( $self, $active = undef ) {
-  unless ( defined $active ) { $active = $self->Active() }
-  my $roundctr = 0;
-  my $maxround = scalar( keys %{$active} );
-  $self->_logstart($active);
-  my $result = { tie => 0, tied => undef, winner => 0 };
-DROPLOOP:
-  until (0) {
-    $roundctr++;
-    die "DROPLOOP infinite stopped at $roundctr" if $roundctr > $maxround;
-    my $topcount = $self->TopCount($active);
-    my $round = $self->GetRound( $active, $roundctr );
-    $self->logv( '---', "Round $roundctr TopCount", $topcount->RankTable() );
-    my $majority = $self->EvaluateTopCountMajority($topcount);
-    if ( defined $majority->{'winner'} ) {
-      $result->{'winner'} = $majority->{'winner'};
-      last DROPLOOP;
+  my $result = $MinMaxElection->MinMax( $method );
+
+The returned value is a HashRef:
+
+ { 'tie'    => true or false value, 
+   'winner' => will be false if tie is true -- 
+               otherwise the winning choice.
+   # tied is only present when tie is true.
+   'tied'   => [ array ref of tied choices ],
+ }
+
+=cut
+
+sub MinMax ( $self, $method ) {
+  my $score = $self->ScoreMinMax($method);
+  my @active = $self->GetActiveList();
+  $self->logt( "MinMax $method Choices: ", join( ', ', @active ) );
+  $self->logv( $self->MinMaxPairingVotesTable($score) );
+  my $winner = '';
+  my @tied  = ();
+  my $round = 0;
+  # round inited to 0. The 7th round is 6. round increments at 
+  # end of the loop. this sets correct number of rounds.
+  my $roundlimit = scalar(@active) -1;
+  LOOPMINMAX: while ( $round < $roundlimit ) {
+    # start with $bestscore larger than any possible score
+    my $bestscore = $self->VotesCast() + 1;
+    my @hasbest  = ();
+    for my $a (@active) {
+      my $this = $score->{$a}{'score'}[$round];
+      if ( $this == $bestscore ) { push @hasbest, $a }
+      elsif ( $this < $bestscore ) {
+        $bestscore = $this;
+        @hasbest  = ($a);
+      }
     }
-    my $matrix = Vote::Count::Matrix->new(
-      'BallotSet' => $self->BallotSet,
-      'Active'    => $active
-    );
-    $self->logv( '---', "Round $roundctr Pairings", $matrix->MatrixTable() );
-    my $cw = $matrix->CondorcetWinner() || 0;
-    if ($cw) {
-      my $wstr = "*  Winner $cw  *";
-      my $rpt  = length($wstr);
-      $self->logt( '*' x $rpt, $wstr, '*' x $rpt );
-      $result->{'winner'} = $cw;
-      last DROPLOOP;
+    if ( scalar(@hasbest) == 1 ) {
+      $winner = shift @hasbest;
+      $self->logt("Winner is $winner.");
+      return { 'tie' => 0, 'winner' => $winner };
     }
-    my $eliminated =
-      $self->SkipLoserDrop()
-      ? { 'eliminations' => 0 }
-      : $matrix->CondorcetLoser();
-    if ( $eliminated->{'eliminations'} ) {
-      # tracking active between iterations of matrix.
-      $active = $matrix->Active();
-      $self->logv( $eliminated->{'verbose'} );
-      # active changed, restart loop
-      next DROPLOOP;
-    }
-    my @jeapardy = ();
-    if ( $self->DropStyle eq 'leastwins' ) {
-      @jeapardy = $matrix->LeastWins();
-    }
-    else { @jeapardy = keys %{$active} }
-    for my $goodbye ( $self->DropChoice( $round, @jeapardy ) ) {
-      delete $active->{$goodbye};
-      $self->logv("Eliminating $goodbye");
-    }
-    my @remaining = keys $active->%*;
-    if ( @remaining == 0 ) {
+    # only choices that are tied continue to tie breaking.
+    @active = @hasbest;
+    # if this is the last round @tied must be set.
+    @tied = @hasbest;
+    if( $bestscore == 0 ) {
       $self->logt(
-        "All remaining Choices would be eliminated, Tie between @jeapardy");
-      $result->{'tie'}  = 1;
-      $result->{'tied'} = \@jeapardy;
-      last DROPLOOP;
+        "Tie between @tied. Best Score is 0. No more Tiebreakers available." );
+      last LOOPMINMAX;
     }
-    elsif ( @remaining == 1 ) {
-      my $winner = $remaining[0];
-      $self->logt( "Only 1 choice remains.", "** WINNER : $winner **" );
-      $result->{'winner'} = $winner;
-      last DROPLOOP;
-    }
-  };    #infinite DROPLOOP
-  return $result;
+    $round++;
+    $self->logt(
+      "Tie between @tied. Best Score is $bestscore. Going to Tiebreaker Round $round."
+    );
+  }
+  $self->logt( "Tied: " . join( ', ', @tied ) );
+  return { 'tie' => 1, 'tied' => \@tied, 'winner' => 0 };
 }
+
+=pod
+
+=head2 Floor Rules
+
+It is recommended to use a low Floor or no Floor Rule at all.
+
+This method specifies that the scores from less worst pairings be used as the tie breaker, removing inconsequential choices can affect both the resolveability of the tie breaker and the outcome. Unlike IRV where the presence of inconsequential choices can be seen as a randomizing factor, and their bulk removal as improving the consistency of the method, there is no benefit gained by this method from a Floor Rule. 
 
 =cut
 

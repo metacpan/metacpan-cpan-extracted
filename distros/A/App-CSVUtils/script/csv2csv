@@ -1,0 +1,293 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CSVUtils/csv_csv
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-08-03'; # DATE
+our $DIST = 'App-CSVUtils'; # DIST
+our $VERSION = '0.031'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CSVUtils/csv_csv",
+    program_name => "csv2csv",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Convert CSV to CSV
+# PODNAME: csv2csv
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv2csv - Convert CSV to CSV
+
+=head1 VERSION
+
+This document describes version 0.031 of csv2csv (from Perl distribution App-CSVUtils), released on 2020-08-03.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % csv2csv [-H] [--escape-char=s] [--format=name] [--hash] [--header]
+     [--input-header] [--input-tsv] [--json] [--(no)naked-res]
+     [--no-header] [--no-output-header] [--no-output-tsv] [--no-tsv]
+     [--noheader] [--nooutput-header] [--nooutput-tsv] [--notsv]
+     [--output-escape-char=s] [--output-header] [--output-quote-char=s]
+     [--output-sep-char=s] [--output-tsv] [--page-result[=program]]
+     [--quote-char=s] [--sep-char=s] [--tsv] <filename>
+
+=head1 DESCRIPTION
+
+Why convert CSV to CSV? When you want to change separator/quote/escape
+character, for one.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--hash>, B<-H>
+
+Provide row in $_ as hashref instead of arrayref.
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--escape-char>=I<s>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to `\\` (backslash). Overrides `--tsv` option.
+
+
+=item B<--filename>=I<s>*, B<-f>
+
+Input CSV file.
+
+Use `-` to read from stdin.
+
+
+=item B<--no-header>, B<--input-header>
+
+By default (`--header`), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (`--no-header`), the first row of the CSV is
+assumed to contain the first data row. Fields will be named `field1`, `field2`,
+and so on.
+
+
+=item B<--quote-char>=I<s>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to `"` (double quote). Overrides `--tsv` option.
+
+
+=item B<--sep-char>=I<s>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to `,` (comma). Overrides `--tsv` option.
+
+
+=item B<--tsv>, B<--input-tsv>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by `--sep-char`, `--quote-char`, `--escape-char` options. If one of
+those options is specified, then `--tsv` will be ignored.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--output-escape-char>=I<s>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like `--escape-char` option but for output instead of input.
+
+Defaults to `\\` (backslash). Overrides `--output-tsv` option.
+
+
+=item B<--output-header>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output *if* input CSV has header row. Under
+`--output-header`, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+`--no-output-header`, header row will *not* be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+
+=item B<--output-quote-char>=I<s>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like `--quote-char` option but for output instead of input.
+
+Defaults to `"` (double quote). Overrides `--output-tsv` option.
+
+
+=item B<--output-sep-char>=I<s>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like `--sep-char` option but for output instead of input.
+
+Defaults to `,` (comma). Overrides `--output-tsv` option.
+
+
+=item B<--output-tsv>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like `--tsv` option but for output instead of input.
+
+Overriden by `--output-sep-char`, `--output-quote-char`, `--output-escape-char`
+options. If one of those options is specified, then `--output-tsv` will be
+ignored.
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C csv2csv csv2csv
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete csv2csv 'p/*/`csv2csv`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

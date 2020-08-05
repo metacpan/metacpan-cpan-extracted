@@ -3,6 +3,7 @@ use strict;
 
 use Test::More tests => 10;
 
+use Cwd;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
 
@@ -25,11 +26,15 @@ require App::Followme::FileData;
 my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
 
-mkdir $test_dir;
+mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-mkdir catfile($test_dir, 'archive');
-chmod 0755, catfile($test_dir, 'archive');
-chdir($test_dir);
+
+my $archive = catfile(@path, 'test', 'archive');
+mkdir $archive or die $!;
+chmod 0755, $archive;
+
+chdir($test_dir) or die $!;
+$test_dir = cwd();
 
 #----------------------------------------------------------------------
 # Create object

@@ -2,7 +2,7 @@ NAME
     App::DumpChromeHistory - Dump Chrome history
 
 VERSION
-    This document describes version 0.004 of App::DumpChromeHistory (from
+    This document describes version 0.005 of App::DumpChromeHistory (from
     Perl distribution App-DumpChromeHistory), released on 2020-04-19.
 
 SYNOPSIS

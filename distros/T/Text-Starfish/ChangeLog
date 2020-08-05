@@ -1,5 +1,21 @@
 Revision history for Perl extension Text::Starfish.
 
+1.38 3 Aug 2020
+ - documentation improvements
+ - renamed eval_dispatch to _eval_dispatch since it is more of an internal
+   method
+ - renamed method "scan" to "_scan"
+ - renamed method "digest" to "_digest"
+ - introduced hook type 'string', updated test 06-addHooks to test it
+ - renamed method "evaluate" to "_evaluate"
+ - moving functionality from addHook to add_hook
+ - added test t/01.t for testing _index function
+ - code refactoring
+ - removed evaluate_py since evaluate_py1 exists
+ - better distinguishing evaluator functions (evf) (in progress)
+ - hook type ht:re2 - separating special hook used for Python and Makefile
+   styles into ht:re2
+
 1.37 18 Jul 2020
  - documentation improvements
  - renaming setStyle to set_style and making it method/function
@@ -265,3 +281,7 @@ Revision history for Perl extension Text::Starfish.
    http://marginalhacks.com/Hacks/ePerl/, however it did not offer all the
    features that I needed.
  - The work on the project as an unnamed project started in 1998.
+ - Emacs settings:
+ # Local Variables:
+ # mode: Fundamental;
+ # End:

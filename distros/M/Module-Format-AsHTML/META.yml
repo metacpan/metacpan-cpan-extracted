@@ -21,7 +21,7 @@ name: Module-Format-AsHTML
 provides:
   Module::Format::AsHTML:
     file: lib/Module/Format/AsHTML.pm
-    version: v0.0.1
+    version: v0.0.2
 requires:
   Moo: '0'
   strict: '0'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://github.com/shlomif/module-format-ashtml/issues
   homepage: http://metacpan.org/release/Module-Format-AsHTML
   repository: https://github.com/shlomif/perl-Module-Format-AsHTML.git
-version: 0.0.1
+version: 0.0.2
 x_Dist_Zilla:
   perl:
     version: '5.032000'

@@ -1,4 +1,3 @@
-
 Testing Hook adding:
 
 #
@@ -17,3 +16,11 @@ Test finished.
 
 
   # This is not a comment
+
+
+
+<p>I have decided to work on grouping several Perl programs that I find useful
+in working with files and directories in a Linux file system and put them in a
+Perl module named <a href="https://metacpan.org/release/App-Utils" target="_blank"><code>App::Utils</code></a>.  It is a very general and visible
+name, but it is not taken, so let's use it.  It is a reasonable name for
+command-line utilities for work with files and directories.  This implies that

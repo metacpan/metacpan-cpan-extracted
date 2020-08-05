@@ -10,5 +10,8 @@ MANIFEST
 README.md
 t/00_use_ok.t
 t/90_simple_integration.t
+t/91_form_data.t
+t/92_tag_processing.t
+t/93_error_handling.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

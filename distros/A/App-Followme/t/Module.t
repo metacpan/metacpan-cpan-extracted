@@ -42,12 +42,13 @@ my $test_dir = catdir(@path, 'test');
 rmtree($test_dir);
 mkdir $test_dir;
 chmod 0755, $test_dir;
-chdir $test_dir;
-$test_dir = cwd();
 
-my $subdir = catfile($test_dir, 'sub');
-mkdir ($subdir);
+my $subdir = catfile(@path, 'test', 'sub');
+mkdir ($subdir) or die $!;
 chmod 0755, $subdir;
+
+chdir $test_dir or die $!;
+$test_dir = cwd();
 
 my $template_file = 'template.htm';
 

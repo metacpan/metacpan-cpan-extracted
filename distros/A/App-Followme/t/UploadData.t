@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 
+use Cwd;
 use IO::File;
 use File::Path qw(rmtree);
 use File::Spec::Functions qw(catdir catfile rel2abs splitdir);
@@ -24,11 +25,14 @@ my $test_dir = catdir(@path, 'test');
 my $state_dir = catdir(@path, 'test', '_state');
 
 rmtree($test_dir);
-mkdir $test_dir;
+mkdir $test_dir or die $!;
 chmod 0755, $test_dir;
-mkdir $state_dir;
+
+mkdir $state_dir or die $!;
 chmod 0755, $state_dir;
-chdir $test_dir;
+
+chdir $test_dir or die $!;
+$test_dir = cwd();
 
 my %configuration = (
                      top_directory => $test_dir,
@@ -61,7 +65,7 @@ my @files_ok;
 
 foreach my $dir (@dirs) {
     if ($dir) {
-        mkdir $dir;
+        mkdir $dir or die $!;
         chmod 0755, $dir;
         push(@folders_ok, catfile($test_dir, $dir));
     }

@@ -6,7 +6,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-04-19'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.145'; # VERSION
+our $VERSION = '0.146'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ complete-float - Complete floating number
 
 =head1 VERSION
 
-This document describes version 0.145 of complete-float (from Perl distribution App-CompleteCLIs), released on 2020-04-19.
+This document describes version 0.146 of complete-float (from Perl distribution App-CompleteCLIs), released on 2020-04-19.
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,59 @@
+==================================================
+Changes from 2015-08-05 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.02 at 2020-07-22 13:41:16 +0000
+-----------------------------------------
+
+  Change: 94619f72baf73081b9b4c4a367e6568504439916
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-07-22 14:41:16 +0000
+
+    Add Test::FailWarnings to TestRequires 
+
+  Change: 3f78eef7604e677fac2cb021b7b044c278a425f4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-25 16:20:09 +0000
+
+    Add connect hook test with a postback 
+
+  Change: fa78eadb4389ecc4aa472f4408ea8a97af3005c8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-11-23 16:23:43 +0000
+
+    Add online test 
+
+  Change: 4eff686648a4001756d18dccd08820893b3ecaeb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-10-05 15:43:13 +0000
+
+    Add SSLVersion to simple test 
+
+  Change: af217ffe59999de06b295fc9193080d8a6d60dac
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-09-17 11:00:46 +0000
+
+    Add test to check server hostname of certificate 
+
+  Change: 11b106b11691d700b870bbe1fd5669d80c1e2737
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-09-15 16:55:31 +0000
+
+    Add test for client certificates 
+
+  Change: 40e52335d9640096ccb3588c8a8a6aaf9a973ab2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-09-14 20:56:42 +0000
+
+    Add note about IO::Socket::SSL behaviour with certs 
+
+  Change: 004a32d89c9cfd0691c2ccd8d01161a0ce13f61c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2019-09-02 11:48:28 +0000
+
+    It has to start somewhere 
+
+================
+End of releases.
+================

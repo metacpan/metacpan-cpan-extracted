@@ -48,6 +48,6 @@
          "web" : "https://github.com/yuki-kimoto/DBIx-Custom"
       }
    },
-   "version" : "0.43",
+   "version" : "0.44",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

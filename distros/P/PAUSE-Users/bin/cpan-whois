@@ -1,0 +1,70 @@
+#!/usr/local/bin/perl
+use strict;
+use warnings;
+use PAUSE::Users;
+
+die "usage: $0 <user-id>\n" unless @ARGV > 0;
+
+my $count     = int(@ARGV);
+my %requested = map { (uc($_) => 1) } @ARGV;
+my $users     = PAUSE::Users->new(max_age => '1 day');
+my $iterator  = $users->user_iterator();
+
+binmode(STDOUT, ':utf8');
+
+while (defined(my $user = $iterator->next_user)) {
+    if ($requested{ $user->id }) {
+        printf "%s: %s %s<%s>\n",
+            $user->id,
+            $user->fullname,
+            defined($user->asciiname) ? "(".$user->asciiname.") " : "",
+            $user->email // 'no-email-address';
+        --$count;
+    }
+    exit 0 if $count == 0;
+}
+
+die "Not found\n";
+
+=head1 NAME
+
+cpan-whois - display details of one or more CPAN authors
+
+=head1 SYNOPSIS
+
+ cpan-whois <pause-id> [id2 .. idN]
+
+=head1 DESCRIPTION
+
+B<cpan-whois> takes one or more PAUSE usernames and displays the public
+information known for the account(s).
+By default just the name and email address are displayed:
+
+ % cpan-whois puck
+ PUCK: Andrew Ruthven <puck@cpan.org>
+
+If the user's name includes non-ASCII characters,
+then PAUSE has an ASCII Name field as well.
+If that is set for the user, then it will be displayed as well:
+
+ % cpan-whois kxj
+ KXJ: Jing Kang - 康 小靖 (Jing Kang - Kang Xiao Jing) <kxj@cpan.org>
+
+In a future version, I'll add a B<-a> option, to display other information.
+Feel free to submit a pull request for that :-)
+
+=head1 REPOSITORY
+
+L<https://github.com/neilb/Pause-Users>
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by Neil Bowers <neilb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -12,12 +12,11 @@ A catalog of common Vote Counting Systems and their implementation in Vote::Coun
 
 ## Borda Count
 
-Methods which assign scores to choices by their ranking. 
+And other Methods which assign scores to choices by their ranking. 
 
 * Borda Count: core [Vote::Count::Borda](https://metacpan.org/pod/Vote::Count::Borda)
 * Nansen: *needs example*
 * Baldwin: *needs example*
-* Minet: *needs example*
 * STAR: [Vote::Count::Method::STAR](https://metacpan.org/pod/Vote::Count::Method::STAR)
 
 ## Instant Runoff Voting
@@ -26,7 +25,11 @@ Methods which assign scores to choices by their ranking.
 * Benham Condorcet IRV: [Hand Count](https://metacpan.org/pod/release/BRAINBUZ/Vote-Count/Hand_Count.pod) methods documentation, implemented by [Vote::Count::Method::CondorcetDropping](https://metacpan.org/pod/Vote::Count::Method::CondorcetDropping)
 * SmithSet IRV: [Vote::Count::Method::CondorcetIRV](https://metacpan.org/pod/Vote::Count::Method::CondorcetIRV)
 
-## Condorcet
+## PairWise
+
+### Non Condorcet Pairwise
+
+* MinMax (Opposition) [Vote::Count::Method::MinMax](https://metacpan.org/pod/Vote::Count::Method::MinMax)
 
 ### Simple Condorcet
 
@@ -40,6 +43,7 @@ Methods which assign scores to choices by their ranking.
 * Tiedeman: *unimplemented*
 * SSD: *unimplemented*
 * Kemmeny-Young: *unimplemented*
+* MinMax (Winning Votes and Margin) [Vote::Count::Method::MinMax](https://metacpan.org/pod/Vote::Count::Method::MinMax)
 
 ### Redacting Condorcet
 
@@ -51,7 +55,7 @@ John Karr (BRAINBUZ) brainbuz@cpan.org
 
 ## CONTRIBUTORS
 
-Copyright 2019 by John Karr (BRAINBUZ) brainbuz@cpan.org.
+Copyright 2019, 2020 by John Karr (BRAINBUZ) brainbuz@cpan.org.
 
 # LICENSE
 

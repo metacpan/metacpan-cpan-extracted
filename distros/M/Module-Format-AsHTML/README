@@ -1,5 +1,5 @@
 This archive contains the distribution Module-Format-AsHTML,
-version 0.0.1:
+version 0.0.2:
 
   generate HTML links to metacpan module/dists pages.
 

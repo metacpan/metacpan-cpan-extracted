@@ -209,33 +209,63 @@ When logging from your methods, use logt for events that produce a summary, use 
 
 ### Active Sets
 
-Active sets are typically represented as a Hash Reference where the keys represent the active choices and the value is true. The VoteCount Object contains an Active Set which can be Accessed via the ->Active() method which will return a reference to the Active Set (changing the reference will change the active set). The ->GetActive and ->SetActive do not preserve any reference links and should be preferred.
+Active sets are typically represented as a Hash Reference where the keys represent the active choices and the value is true. The VoteCount Object contains an Active Set which can be Accessed via the Active() method which will return a reference to the Active Set (changing the reference will change the active set). The GetActive and SetActive methods do not preserve any reference links and should be preferred. GetActiveList returns the Active Set as a sorted list.
 
 Many Components will take an argument for $activeset or default to the current Active set of the Vote::Count object, which will default to the Choices defined in the BallotSet.
 
 # Vote::Count Methods
 
-* new
+Most of these are provided by the Role Common and available directly in both Matrix objects and Vote::Count Objects. Vote::Count objects create a child Matrix object: PairMatrix.
 
-* Active: Set or Get Active Set as HashRef
+### new
 
-* ResetActive: Sets the Active Set to the full choices list of the BallotSet.
+### Active
 
-* SetActive: Sets the Active Set to provided HashRef. Using the Active method may preserve a reference between the Active Set and the HashRef, SetActive will not. The values to the hashref should evaluate as True.
+Get Active Set as HashRef to the active set. Changing the new HashRef will change the internal Active Set, GetActive is recommended as it will return a HashRef that is a copy instead.
 
-* SetActiveFromArrayRef: Same as SetActive except it takes an ArrayRef of the choices to be set as Active.
+### GetActive
 
+Returns a hashref containing a copy of the Active Set.
 
+### GetActiveList
 
-* BallotSet: Get BallotSet
+Returns a simple array of the members of the Active Set.
 
-* PairMatrix: Get a Matrix Object for the Active Set. Generated and cached on the first request.
+### ResetActive
 
-* UpdatePairMatrix: Regenerate and cache Matrix with current Active Set.
+Sets the Active Set to the full choices list of the BallotSet.
 
-* VotesCast: Returns the number of votes cast.
+### SetActive
 
-* VotesActive: Returns the number of non-exhausted ballots based on the current Active Set.
+Sets the Active Set to provided HashRef. The values to the hashref should evaluate as True.
+
+### SetActiveFromArrayRef
+
+Same as SetActive except it takes an ArrayRef of the choices to be set as Active.
+
+### BallotSet
+
+Get BallotSet
+
+### PairMatrix
+
+Get a Matrix Object for the Active Set. Generated and cached on the first request.
+
+### UpdatePairMatrix
+
+Regenerate and cache Matrix with current Active Set. 
+
+### VotesCast
+
+Returns the number of votes cast.
+
+### VotesActive
+
+Returns the number of non-exhausted ballots based on the current Active Set.
+
+# Minimum Perl Version
+
+It is the policy of Vote::Count to only develop with recent versions of Perl. Support for older versions will be dropped as they either start failing tests or impair adoption of new features. 
 
 ## Components
 
@@ -245,7 +275,6 @@ Directory of Vote Counting Methods linking to the Vote::Count module for it.
 
   * [Catalog](https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/Catalog.pod)
   
-
 ### Consumed As Roles By Vote::Count
 
   * [Vote::Count::Approval](https://metacpan.org/pod/Vote::Count::Approval)
@@ -285,12 +314,6 @@ Directory of Vote Counting Methods linking to the Vote::Count module for it.
 * [Multi Member](https://metacpan.org/pod/distribution/Vote-Count/lib/Vote/MultiMember.pod)
 * [Vote::Count::Start](https://metacpan.org/pod/Vote::Count::Start)
 
-# Support for Older Perl Versions
-
-Vote::Count will drop support for versions of Perl more than 2 years old for failing CPAN testing or CI testing. 
-
-Vote::Count uses Moose. When COR is stable, it is likely that a switch will be made from Moose to COR. At that time, the minimum supported Perl will be the current stable 7.x version.
-
 # Call for Contributions
 
 This project needs contributions from Programmers and Mathematicians. Review and citations from Mathematicians are urgently requested, because in addition to being a Tool-set for implementing vote counting this documentation will for many also be the manual. From coders there is a lot of help that could be given: any well known method could use a write up if it is easy to implement with the toolkit (see Benham) or a code submission if it is not. Currently Tiedeman, SSD, and Kemmeny-Young are unimplemented.
@@ -303,7 +326,7 @@ If you're looking at all of this wondering "which method I should recommend to m
 
 *Instant Runoff Voting* is simple, easy to count by hand, Later Harm protected, and is the most widely used method. It has serious consistency issues, especially how poorly it handles common cloning situations.
 
-*Benham Condorcet IRV*, meets the two main Condorcet Criteria, and is countable by hand, but it fails Later Harm.
+*Benham Condorcet IRV*, meets the two original Condorcet Criteria, and is countable by hand, but it fails Later Harm.
 
 Benham and IRV are good choices for Hand Count Methods.
 
@@ -313,9 +336,7 @@ If you like *Borda* or prefer a *Range Ballot*, my pick is for *STAR*.
 
 STAR is handcountable but requires a Range Ballot. Range methods like STAR have less Later Harm effect than Borda Methods.
 
-*Redacting Condorcet Methods* are the **best** for a conventional Ranked Choice Ballot. If a Condorcet Winner does not create a Later Harm violation they will always be chosen. They can create a gauge of the later harm effect that then allows for the establishment of a Later Harm tolerance. The steps for *Condorcet Vs IRV* are easy to understand but the number of steps qualifies it as somewhat complex. Other methods in the family (not yet implemented) will be more complex.
-
-**Redacting Condorcet** (Condorcet Vs IRV being the only one available here at the moment) is my preference. **STAR** is my preferred Scoring method. If you need to hand count, Benham is your Condorcet Method and IRV is your Later Harm Protected Method. Smith Set IRV is a simple Condorcet Method that is better on Later Harm than any other non-redacting Condorcer Method, it is a much better choice than Benham. If Later Harm compliance is required a Redacting Condorcet Method is your best choice, and IRV your choice if they're too complex.
+*Redacting Condorcet Methods* are the **best** for a conventional Ranked Choice Ballot. If a Condorcet Winner does not create a Later Harm violation they will always be chosen. They can create a gauge of the later harm effect that then allows for the establishment of a Later Harm tolerance. The steps for *Condorcet Vs IRV* are easy to understand but the number of steps qualifies it as somewhat complex. 
 
 ## Floor Rules and Tie Breakers
 

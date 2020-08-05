@@ -25,7 +25,7 @@ $t->app->plugin( Yancy => {
 $t->app->routes->get( '/not-a-draft' )->to(
     'yancy#get',
     schema => 'pages',
-    id => 'not-a-draft',
+    path => 'not-a-draft',
     template => 'is-draft',
     layout => 'default',
 );
@@ -35,10 +35,10 @@ $t->get_ok( '/not-a-draft.html' )
     ->content_type_like( qr{^text/html} )
     ->content_like( qr{Not a draft} );
 
-$t->app->routes->get( '/*id' )->to(
+$t->app->routes->get( '/*path' )->to(
     'yancy#get',
     schema => 'pages',
-    id => 'index',
+    path => 'index',
     template => 'page',
     layout => 'default',
 );

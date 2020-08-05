@@ -55,6 +55,13 @@ INSTALLATION
 
     Restart your webserver
 
+CONFIGURATION
+    If you have a mix of local and external authentication you can disable
+    requiring a password to create tokens with the following line in
+    RT_SiteConfig.pm :
+
+        Set($DisablePasswordForAuthToken, 1);
+
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
 
@@ -68,7 +75,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Authen-Token>.
 
 COPYRIGHT
-    This extension is Copyright (C) 2017 Best Practical Solutions, LLC.
+    This extension is Copyright (C) 2017-2020 Best Practical Solutions, LLC.
 
     This is free software, licensed under:
 

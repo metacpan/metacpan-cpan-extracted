@@ -7,7 +7,6 @@ use Test2::V0;
 use Test2::Bundle::More;
 # use Test::Exception;
 use Test2::Tools::Exception qw/dies lives/;
-use Data::Printer;
 
 use Path::Tiny;
 use File::Temp;

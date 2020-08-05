@@ -8,17 +8,16 @@ use Carp;
 use JSON::MaybeXS;
 use YAML::XS;
 # use Data::Dumper;
-use Data::Printer;
 
 # ABSTRACT: Read Ballots for Vote::Count. Toolkit for vote counting.
 
-our $VERSION='1.06';
+our $VERSION='1.07';
 
 =head1 NAME
 
 Vote::Count::ReadBallots
 
-=head1 VERSION 1.06
+=head1 VERSION 1.07
 
 =head1 SYNOPSIS
 

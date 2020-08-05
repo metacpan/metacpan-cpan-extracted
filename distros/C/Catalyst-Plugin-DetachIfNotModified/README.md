@@ -4,7 +4,7 @@ Catalyst::Plugin::DetachIfNotModified - Short-circuit requests with If-Modified-
 
 # VERSION
 
-version v0.1.0
+version v0.2.0
 
 # SYNOPSIS
 
@@ -44,17 +44,26 @@ This should be used with [Plack::Middleware::ConditionalGET](https://metacpan.or
 ## detach\_if\_not\_modified\_since
 
 ```
-$c->detach_if_not_modified_since( $timestamp );
+$c->detach_if_not_modified_since( @timestamps );
 ```
 
 This sets the `Last-Modified` header in the response to the
-`$timestamp`, and checks if the request contains a
-`If-Modified-Since` header that not less than the timestamp.  If it
+maximum timestamp, and checks if the request contains a
+`If-Modified-Since` header that not less than the maximum timestamp.  If it
 does, then it will set the response status code to `304` (Not
 Modified) and detach.
 
-The `$timestamp` may be a unix epoch, or an object with an `epoch`
+The `@timestamps` is a list of unix epochs or objects with an `epoch`
 method, such as a [DateTime](https://metacpan.org/pod/DateTime) object.
+
+This should only be used with GET or HEAD requests.
+
+If you later need to reset the `Last-Modified` header after calling
+this method, you can use
+
+```
+$c->res->headers->remove_header('Last-Modified');
+```
 
 # CAVEATS
 
@@ -71,6 +80,8 @@ user agents.
 [Catalyst::Plugin::Cache::HTTP::Preempt](https://metacpan.org/pod/Catalyst::Plugin::Cache::HTTP::Preempt)
 
 [Plack::Middleware::ConditionalGET](https://metacpan.org/pod/Plack::Middleware::ConditionalGET)
+
+[RFC 7232 Section 3.3](https://tools.ietf.org/html/rfc7232#section-3.3)
 
 # SOURCE
 

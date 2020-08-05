@@ -13,6 +13,14 @@ App::ZFSCurses::Text - UI texts and messages.
 
 =cut
 
+=head1 VERSION
+
+Version 1.02.
+
+=cut
+
+our $VERSION = '1.100';
+
 =head1 METHODS
 
 =head2 new

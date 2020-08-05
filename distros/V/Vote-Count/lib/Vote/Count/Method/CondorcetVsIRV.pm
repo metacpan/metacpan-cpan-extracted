@@ -19,9 +19,7 @@ use Vote::Count::Redact qw/RedactSingle RedactPair RedactBullet/;
 use Vote::Count::Method::CondorcetIRV;
 use Try::Tiny;
 
-use Data::Printer;
-
-our $VERSION='1.06';
+our $VERSION='1.07';
 
 # no warnings 'uninitialized';
 no warnings qw/experimental/;
@@ -30,7 +28,7 @@ no warnings qw/experimental/;
 
 Vote::Count::Method::CondorcetVsIRV
 
-=head1 VERSION 1.06
+=head1 VERSION 1.07
 
 =cut
 

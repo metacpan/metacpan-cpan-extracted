@@ -1,6 +1,6 @@
 package Bundle::DadaMailXXL;
 
-$VERSION = '0.0.4';
+$VERSION = '0.0.5';
 
 1;
 
@@ -60,6 +60,8 @@ Digest::Perl::MD5
 
 Email::Address
 
+Email::Address::XS
+
 Email::Find
 
 Email::Valid
@@ -67,6 +69,8 @@ Email::Valid
 Exporter::Lite
 
 File::Spec
+
+File::Slurper
 
 Data::Google::Visualization::DataTable
 
@@ -93,8 +97,6 @@ IO::Stringy
 Bundle::libnet
 
 Mail::DeliveryStatus::BounceParser 
-
-Email::Address
 
 Mail::Address
 
@@ -140,15 +142,13 @@ MIME::Type
 
 MIME::Types
 
-MIME::Lite
-
-MIME::Lite::HTML
-
 MIME::Tools
 
 Net::SMTP
 
-Net::SMTP_auth 
+Net::SMTP_auth
+
+Number::Bytes::Human
 
 Parse::RecDescent
 
@@ -160,6 +160,8 @@ Scalar-List-Utils
 
 Text::CSV
 
+Text::Markdown
+
 Text::Tabs
 
 Text::Wrap
@@ -167,8 +169,6 @@ Text::Wrap
 Time::Local
 
 Time::Piece
-
-Time::Piece::MySQL
 
 Try::Tiny
 

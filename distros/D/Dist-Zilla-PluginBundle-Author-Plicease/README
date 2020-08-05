@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.51
+    version 2.53
 
 SYNOPSIS
 
@@ -138,9 +138,6 @@ OPTIONS
 
     Specify an alternative to [MakeMaker] ([ModuleBuild],
     [ModuleBuildTiny], or [ModuleBuildDatabase] for example).
-
-    If installer is Alien, then any options with the alien_ prefix will be
-    passed to Alien (minus the alien_ prefix).
 
     If installer is ModuleBuild, then any options with the mb_ prefix will
     be passed to ModuleBuild (including the mb_ prefix).

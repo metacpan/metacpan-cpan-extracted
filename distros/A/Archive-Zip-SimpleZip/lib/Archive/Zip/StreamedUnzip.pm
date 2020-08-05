@@ -10,9 +10,9 @@ use IO::File;
 use Carp;
 use Scalar::Util ();
 
-use IO::Compress::Base::Common  2.093 qw(:Status);
-use IO::Compress::Zip::Constants 2.093 ;
-use IO::Uncompress::Unzip 2.093 ;
+use IO::Compress::Base::Common  2.096 qw(:Status);
+use IO::Compress::Zip::Constants 2.096 ;
+use IO::Uncompress::Unzip 2.096 ;
 
 
 require Exporter ;
@@ -201,7 +201,7 @@ sub ckParams
         my $self = shift;
 #        $self->_stdPreq() or return 0 ;
 
-        return substr($self->{Info}{Name}, -1, 1) eq '/' ; 
+        return substr($self->{Info}{Name}, -1, 1) eq '/' ;
     }
 
     sub isFile
@@ -211,6 +211,14 @@ sub ckParams
 
         # TODO - test for symlink
         return ! $self->isDirectory() ;
+    }
+
+    sub isEncrypted
+    {
+        my $self = shift;
+        return $self->{Info}{Encrypted};
+        # my $gpFlag = unpack ("v", substr($self->{Info}{Header}, 4 + 2, 2));
+        # return $gpFlag & (0x01 | (1 << 6)) ;
     }
 
 # TODO
@@ -411,6 +419,13 @@ sub ckParams
         return 0;
     }
 
+    sub clearerr
+    {
+        my $self = shift;
+
+        return 0;
+    }
+
     sub binmode { 1 }
 
 #    sub clearerr { $Archive::Zip::SimpleUnzip::StreamedUnzipError = '' }
@@ -472,10 +487,10 @@ Archive::Zip::StreamedUnzip - Read Zip Archives in streaming mode
 
 Archive::Zip::StreamedUnzip is a module that allows reading of Zip archives in streaming mode.
 This is useful if you are processing a zip coming directly off a socket without having to
-read the complete file into memory and/or store it on disk. Similarly it can be handy when 
+read the complete file into memory and/or store it on disk. Similarly it can be handy when
 woking with a pipelined command.
 
-Working with a streamed zip file does have limitations, so 
+Working with a streamed zip file does have limitations, so
 most of the time L<Archive::Zip::SimpleUnzip> and/or L<Archive::Zip> are a  better choice of
 module for reading file files.
 
@@ -723,7 +738,7 @@ The following features are not currently supported.
 
 =head1 SUPPORT
 
-General feedback/questions/bug reports should be sent to 
+General feedback/questions/bug reports should be sent to
 L<https://github.com/pmqs/Archive-Zip-SimpleZip/issues> (preferred) or
 L<https://rt.cpan.org/Public/Dist/Display.html?Name=Archive-Zip-SimpleZip>.
 

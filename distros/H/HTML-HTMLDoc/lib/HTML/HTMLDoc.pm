@@ -9,7 +9,7 @@ use HTML::HTMLDoc::PDF;
 use vars qw(@ISA $VERSION);
 
 @ISA = qw();
-$VERSION = '0.16';
+$VERSION = '0.17';
 my $DEBUG = 0;
 
 ###############
@@ -63,7 +63,7 @@ sub _init {
 	$self->set_charset('iso-8859-1');
 	$self->_set_doc_config('quiet');
 	$self->set_output_format('pdf');
-	
+
 	# standard-header and footer
 	$self->set_footer('.', '1', '.');
 	$self->set_header('.', 't', '.');
@@ -495,7 +495,7 @@ sub path {
 ###############
 # sets the right margin
 # testet
-# param: margin|NUM, messure:in,cm,mm
+# param: margin|NUM, measure:in,cm,mm
 # return: 1/0
 ###############
 sub set_right_margin {
@@ -508,7 +508,7 @@ sub set_right_margin {
 ###############
 # sets the left margin
 # testet
-# param: margin|NUM, messure:in,cm,mm
+# param: margin|NUM, measure:in,cm,mm
 # return: 1/0
 ###############
 sub set_left_margin {
@@ -520,7 +520,7 @@ sub set_left_margin {
 
 ###############
 # sets the bottom margin
-# param: margin|NUM, messure:in,cm,mm
+# param: margin|NUM, measure:in,cm,mm
 # return: 1/0
 ###############
 sub set_bottom_margin {
@@ -532,7 +532,7 @@ sub set_bottom_margin {
 
 ###############
 # sets the top margin
-# param: margin|NUM, messure:in,cm,mm
+# param: margin|NUM, measure:in,cm,mm
 # return: 1/0
 ###############
 sub set_top_margin {
@@ -738,10 +738,10 @@ sub set_letterhead {
 	}
 
 	$self->_set_doc_config('letterhead', $image);
-	
+
 	# tell htmldoc to use this letterhead
 	$self->set_header('.', 'L', '.');
-	
+
 	return 1;
 }
 
@@ -1002,7 +1002,7 @@ sub get_html_content {
 	}
 
 	return $self->{'html'};
-}           
+}
 
 ###############
 # sets the filename of the html-page that should be rendered
@@ -1040,7 +1040,7 @@ sub get_input_file {
 ###############
 sub _prepare_input_file {
 	my $self = shift;
-                 
+
 	my $i=0;
 	my $filename;
 	return $filename if (defined ($filename = $self->{'input_file'}));
@@ -1107,8 +1107,8 @@ sub generate_pdf {
 		$pdf = `$self->{'config'}->{'bindir'}htmldoc $params --webpage $filename`;
     	$self->_cleanup();
 	}
-	
-	# restore old value 
+
+	# restore old value
 	if (not defined $old_htmldoc_env) {
 		delete $ENV{'HTMLDOC_NOCGI'};
 	} else {
@@ -1116,7 +1116,7 @@ sub generate_pdf {
 	}
 
 	my $doc = new HTML::HTMLDoc::PDF(\$pdf);
-	
+
 	return $doc;
 }
 
@@ -1147,7 +1147,7 @@ sub _build_parameters {
 		}
 
 	}
-	
+
 	return $paramstring;
 }
 
@@ -1200,7 +1200,7 @@ sub get_htmldoc_command {
 	if ($self->_config('mode') eq 'ipc') {
 		$self->error("get_htmldoc_command() only works in file mode.");
 		return 0;
-	} 
+	}
 
 	my $filename = $self->_prepare_input_file();
 	if (!$filename) {
@@ -1250,20 +1250,20 @@ HTML::HTMLDoc - Perl interface to the htmldoc program for producing PDF Files fr
 
   # generate from a string of HTML:
   $htmldoc->set_html_content(qq~<html><body>A PDF file</body></html>~);
-  
+
   # or generate from an HTML file:
-  $htmldoc->set_input_file($filename); 
+  $htmldoc->set_input_file($filename);
 
   # create the PDF
   my $pdf = $htmldoc->generate_pdf();
 
   # print the content of the PDF
   print $pdf->to_string();
-  
+
   # save to a file
   $pdf->to_file('foo.pdf');
 
-  # see the htmldoc command used to generate a PDF -- after using set_input_file() 
+  # see the htmldoc command used to generate a PDF -- after using set_input_file()
   # and all other desired configuration methods
   print $htmldoc->get_htmldoc_command();
 
@@ -1273,9 +1273,9 @@ This module provides an OO interface to the HTMLDOC program.  HTMLDOC is a comma
 line utility which creates PDF and PostScript files from HTML 3.2.  It is actively
 maintained and available via the package manager (apt, yum) of the major Linux distros.
 
-HTML 3.2 is very limited for web interfaces, but it can do a lot when preparing a 
+HTML 3.2 is very limited for web interfaces, but it can do a lot when preparing a
 document for printing.  The complete list of supported HTML tags is listed here:
-L<https://www.msweet.org/htmldoc/htmldoc.html#HTMLREF>  There are also several 
+L<https://www.msweet.org/htmldoc/htmldoc.html#HTMLREF>  There are also several
 HTMLDOC-specific comment options detailed here: L<https://www.msweet.org/htmldoc/htmldoc.html#COMMENTS>
 
 The HTMLDOC home page at L<https://www.msweet.org/htmldoc> and includes complete
@@ -1284,17 +1284,17 @@ documentation for the program and a link to the GitHub repo.
 You will need to install HTMLDOC prior to installing this module, and it is
 recommended to experiment with the 'htmldoc' command prior to utilizing this module.
 
-All the config-setting modules return true for success or false for failure. You can 
+All the config-setting modules return true for success or false for failure. You can
 test if errors occurred by calling the error-method.
 
-Please use the get_htmldoc_command() method to retrieve an HTMLDOC command with your 
+Please use the get_htmldoc_command() method to retrieve an HTMLDOC command with your
 options for easy troubleshooting.  B<If your HTML does not work with the HTMLDOC
 command, it will also not work with this module.>
 
 Normally this module uses IPC::Open3 for communication with the HTMLDOC process.
 This works in PSGI and CGI environments, but if you are working in a Mod_Perl environment,
 you may need to set the file mode in new():
-	
+
 	my $htmldoc = new HTMLDoc('mode'=>'file', 'tmpdir'=>'/tmp');
 
 
@@ -1402,7 +1402,7 @@ $htmldoc->set_permissions('no-modify');
 This one will do the same:
 $htmldoc->set_permissions('no-copy', 'no-modify');
 
-=back 
+=back
 
 =head2 links()
 
@@ -1411,7 +1411,7 @@ Turns link processing on.
 =head2 no_links()
 
 Turns the links off.
- 
+
 
 =head2 path()
 
@@ -1437,22 +1437,22 @@ Turns the title on.
 
 Turns the title off.
 
-=head2 set_right_margin($margin, $messure)
+=head2 set_right_margin($margin, $measure)
 
-Set the right margin. $margin is a INT, $messure one of 'in', 'cm' or 'mm'.
+Set the right margin. $margin is a INT, $measure one of 'in', 'cm' or 'mm'.
 
-=head2 set_left_margin($margin, $messure)
+=head2 set_left_margin($margin, $measure)
 
-Set the left margin. $margin is a INT, $messure one of 'in', 'cm' or 'mm'.
+Set the left margin. $margin is a INT, $measure one of 'in', 'cm' or 'mm'.
 
-=head2 set_bottom_margin($margin, $messure)
+=head2 set_bottom_margin($margin, $measure)
 
-Set the bottom margin. $margin is a INT, $messure one of 'in', 'cm' or 'mm'.
+Set the bottom margin. $margin is a INT, $measure one of 'in', 'cm' or 'mm'.
 
 
-=head2 set_top_margin($margin, $messure)
+=head2 set_top_margin($margin, $measure)
 
-Set the top margin. $margin is a INT, $messure one of 'in', 'cm' or 'mm'.
+Set the top margin. $margin is a INT, $measure one of 'in', 'cm' or 'mm'.
 
 =head2 set_bodycolor($color)
 
@@ -1464,7 +1464,7 @@ a rgb-value (eg set_bodycolor(0,0,0) for black) or a color name (eg. black)
 Sets the default font of the content. Currently the following fonts are supported:
 
 Arial Courier Helvetica Monospace Sans Serif Symbol Times
- 
+
 =head2 set_fontsize($fsize)
 
 Sets the default font size for the body text to the number of points, e.g. 12 for 12-point font.  1 point = 1/72 of an inch.
@@ -1493,7 +1493,7 @@ Reads out a previous set logo-image. You will get the filename to the image.
 
 =head2 set_letterhead($image)
 
-Sets the image to use as a letter for the document. $image is the path to the image in your filesystem. 
+Sets the image to use as a letter for the document. $image is the path to the image in your filesystem.
 The image should be 72DPI, and for portrait mode, 620-650 pixels wide and 72-90 pixels tall.
 The supported formats are BMP, GIF, JPEG, and PNG.
 
@@ -1563,7 +1563,7 @@ tworight - Two columns are displayed with the first page on the right.
 
 =back
 
-This option is only available when generating PDF files. 
+This option is only available when generating PDF files.
 
 =head2 set_pagemode($mode)
 

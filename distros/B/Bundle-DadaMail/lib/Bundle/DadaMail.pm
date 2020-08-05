@@ -1,6 +1,6 @@
 package Bundle::DadaMail;
 
-$VERSION = '0.0.12';
+$VERSION = '0.0.13';
 
 1;
 
@@ -108,9 +108,13 @@ Text::CSV - actually required for Dada Mail - Pure Perl version included, but yo
 
 Time::Piece - used in templates for http://dadamailproject.com/d/features-email_template_syntax.pod.html#Flexible-Date-and-Time-formats
 
+Time::Piece::MySQL
+
 URI::Escape - for Amazon SES
 
 URI::GoogleChart - used for the fancy charts Dada Mail's Tracker plugin uses. 
+
+WWW::StopForumSpam
 
 XML::FeedPP - for sending out RSS feeds as mass mailings
 

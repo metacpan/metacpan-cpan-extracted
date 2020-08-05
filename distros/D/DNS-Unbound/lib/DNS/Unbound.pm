@@ -71,7 +71,7 @@ use DNS::Unbound::AsyncQuery::PromiseES6 ();
 our ($VERSION);
 
 BEGIN {
-    $VERSION = '0.19';
+    $VERSION = '0.20';
     XSLoader::load();
 }
 
@@ -721,7 +721,14 @@ sub DESTROY {
             }
         }
 
-        _destroy_context( delete $_[0]->{'_ub'} );
+        my $ub = delete $_[0]->{'_ub'};
+
+        # If DESTROY fires at global destruction the internal libunbound
+        # context object might already have been garbage-collected, in
+        # which case we don’t want to try to clean up that object since
+        # it’ll throw an unhelpfully-worded “(in cleanup)” warning
+        # (as of perl 5.30, anyhow).
+        _destroy_context($ub) if $ub;
 
         1;
     };

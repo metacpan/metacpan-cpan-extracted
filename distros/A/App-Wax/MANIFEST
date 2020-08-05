@@ -8,7 +8,9 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+t/bundling.t
 t/cache.t
+t/default-directory.t
 t/lib/Test/App/Wax.pm
 t/mirror.t
 t/no-downloads.t
