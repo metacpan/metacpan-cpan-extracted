@@ -14,7 +14,7 @@ use Module::Generate;
 subtest '_make_path' => sub {
 	rmdir('./t/lib/path');
 	eval { Module::Generate::_make_path('./t/lib/unable/path') };
-	like($@, qr/Cannot open file for writing/);
+	like($@, qr/Cannot open file/);
 };
 
 subtest 'generate' => sub {
@@ -36,7 +36,7 @@ subtest 'generate' => sub {
 				->new
 		->generate;
 	};
-	like($@, qr/Cannot open file to write/);
+	like($@, qr/Cannot open file/);
 };
 
 done_testing;

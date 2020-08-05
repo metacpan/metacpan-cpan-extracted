@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version v1.5.5
+    version v1.6.0
 
 SYNOPSIS
 
@@ -271,10 +271,11 @@ METHODS
         my %results = %{ $checker->check(%params) }
 
     Calls all of the registered checks and returns a hashref of the results
-    of processing the checks passed through "summarize". Passes the "full
-    hashref of params" as an even-sized list to the check, without the
-    invocant or check keys. This hashref is shallow merged with and
-    duplicate keys overridden by the %params passed in.
+    of processing the checks passed through "summarize" in
+    HealthCheck::Diagnostic. Passes the "full hashref of params" as an
+    even-sized list to the check, without the invocant or check keys. This
+    hashref is shallow merged with and duplicate keys overridden by the
+    %params passed in.
 
     If there is both an invocant and check in the params, it the check is
     called as a method on the invocant, otherwise check is used as a
@@ -289,6 +290,10 @@ METHODS
   run
 
     Main implementation of the checker is here.
+
+    Passes summarize_result => 0 to each registered check unless overridden
+    to avoid running summarize multiple times. See "check" in
+    HealthCheck::Diagnostic.
 
 INTERNALS
 

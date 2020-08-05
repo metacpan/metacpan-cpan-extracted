@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: A health check for your code
 use version;
-our $VERSION = 'v1.5.5'; # VERSION: 0.01
+our $VERSION = 'v1.6.0'; # VERSION
 
 use 5.010;
 use strict;
@@ -384,7 +384,7 @@ sub register {
 #pod     my %results = %{ $checker->check(%params) }
 #pod
 #pod Calls all of the registered checks and returns a hashref of the results of
-#pod processing the checks passed through L</summarize>.
+#pod processing the checks passed through L<HealthCheck::Diagnostic/summarize>.
 #pod Passes the L</full hashref of params> as an even-sized list to the check,
 #pod without the C<invocant> or C<check> keys.
 #pod This hashref is shallow merged with and duplicate keys overridden by
@@ -405,6 +405,10 @@ sub register {
 #pod
 #pod Main implementation of the checker is here.
 #pod
+#pod Passes C<< summarize_result => 0 >> to each registered check
+#pod unless overridden to avoid running C<summarize> multiple times.
+#pod See L<HealthCheck::Diagnostic/check>.
+#pod
 #pod =cut
 
 sub check {
@@ -416,6 +420,9 @@ sub check {
 
 sub run {
     my ($self, %params) = @_;
+
+    # If we are going to summarize things, no need for our children to
+    $params{summarize_result} = 0 unless exists $params{summarize_result};
 
     my @results = map {
         my %c = %{$_};
@@ -455,6 +462,8 @@ sub run {
         $self->should_run( $_, %params );
     } @{ $registered_checks{$self} || [] };
 
+    return unless @results; # don't return undef, instead an empty list
+    return $results[0] if @{ $registered_checks{$self} || [] } == 1;
     return { results => \@results };
 }
 
@@ -497,6 +506,7 @@ sub _set_check_response_defaults {
 
     $c->{_respond} = \%defaults;
 }
+
 
 #pod =head1 INTERNALS
 #pod
@@ -577,7 +587,7 @@ HealthCheck - A health check for your code
 
 =head1 VERSION
 
-version v1.5.5
+version v1.6.0
 
 =head1 SYNOPSIS
 
@@ -867,7 +877,7 @@ All attributes other than C<invocant> and C<check> are passed to the check.
     my %results = %{ $checker->check(%params) }
 
 Calls all of the registered checks and returns a hashref of the results of
-processing the checks passed through L</summarize>.
+processing the checks passed through L<HealthCheck::Diagnostic/summarize>.
 Passes the L</full hashref of params> as an even-sized list to the check,
 without the C<invocant> or C<check> keys.
 This hashref is shallow merged with and duplicate keys overridden by
@@ -887,6 +897,10 @@ Throws an exception if no checks have been registered.
 =head3 run
 
 Main implementation of the checker is here.
+
+Passes C<< summarize_result => 0 >> to each registered check
+unless overridden to avoid running C<summarize> multiple times.
+See L<HealthCheck::Diagnostic/check>.
 
 =head1 INTERNALS
 

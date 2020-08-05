@@ -37,6 +37,33 @@ sub get_info_and_status {
     return { info => $results->{info}, status => $results->{status} };
 }
 
+# Default params
+my %default_options = (
+    agent => LWP::UserAgent->_agent
+        . ' HealthCheck-Diagnostic-WebRequest/'
+        . ( HealthCheck::Diagnostic::WebRequest->VERSION || 0 ),
+    timeout => 7,
+);
+
+is_deeply( HealthCheck::Diagnostic::WebRequest->new( url => 'x' )->{options},
+    {%default_options}, "Set default LWP::UserAgent options" );
+is_deeply(
+    HealthCheck::Diagnostic::WebRequest->new(
+        url     => 'x',
+        options => { foo => 'bar' }
+    )->{options},
+    { %default_options, foo => 'bar' },
+    "Added default LWP::UserAgent options"
+);
+is_deeply(
+    HealthCheck::Diagnostic::WebRequest->new(
+        url     => 'x',
+        options => { agent => 'custom', foo => 'bar', timeout => 3 }
+    )->{options},
+    { agent => 'custom', foo => 'bar', timeout => 3 },
+    "Added default LWP::UserAgent options"
+);
+
 # Check that we get the right code responses.
 my $mock = mock_http_response();
 my $diagnostic = HealthCheck::Diagnostic::WebRequest->new(

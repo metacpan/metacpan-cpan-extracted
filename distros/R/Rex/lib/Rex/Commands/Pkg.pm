@@ -34,7 +34,7 @@ package Rex::Commands::Pkg;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.0'; # VERSION
+our $VERSION = '1.12.1'; # VERSION
 
 use Rex::Pkg;
 use Rex::Logger;

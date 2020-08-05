@@ -1,5 +1,5 @@
 #
-# $Id: 03-yaml.t,v 0.3 2006/03/22 22:10:28 dankogai Exp $
+# $Id: 03-yaml.t,v 0.05 2020/08/05 18:26:03 dankogai Exp dankogai $
 #
 use strict;
 use Data::Dumper;

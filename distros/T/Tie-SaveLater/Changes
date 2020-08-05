@@ -1,9 +1,17 @@
 # Revision history for Perl extension Tie::SaveLater
 #
-# $Id: Changes,v 0.4 2006/03/23 04:36:36 dankogai Exp dankogai $
+# $Id: Changes,v 0.05 2020/08/05 18:26:03 dankogai Exp dankogai $
 #
+$Revision: 0.05 $ $Date: 2020/08/05 18:26:03 $
+! lib/Tie/SaveLater.pm
+  update POD
+! lib/Tie/YAML.pm
+  Address RT#131985
+  https://rt.cpan.org/Public/Bug/Display.html?id=131985
+! *
+  Migrating to Git repo.
 
-$Revision: 0.4 $ $Date: 2006/03/23 04:36:36 $
+0.04 2006/03/23 04:36:36
 ! lib/Tie/SaveLater.pm
   -                require Tie\:\:$type;
   +                require Tie\:\:$Type;

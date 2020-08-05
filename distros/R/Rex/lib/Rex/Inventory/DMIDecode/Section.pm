@@ -9,7 +9,7 @@ package Rex::Inventory::DMIDecode::Section;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.0'; # VERSION
+our $VERSION = '1.12.1'; # VERSION
 
 require Exporter;
 use Symbol;

@@ -9,7 +9,7 @@ package Rex::Inventory::DMIDecode::Memory;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.0'; # VERSION
+our $VERSION = '1.12.1'; # VERSION
 
 use Rex::Inventory::DMIDecode::Section;
 use base qw(Rex::Inventory::DMIDecode::Section);

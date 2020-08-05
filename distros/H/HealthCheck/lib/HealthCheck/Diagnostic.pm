@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic;
 
 # ABSTRACT: A base clase for writing health check diagnositics
 use version;
-our $VERSION = 'v1.5.5'; # VERSION: 0.01
+our $VERSION = 'v1.6.0'; # VERSION
 
 use 5.010;
 use strict;
@@ -102,6 +102,29 @@ my $iso8601_timestamp = qr/^(?:
 #pod
 #pod =over
 #pod
+#pod =item collapse_single_result
+#pod
+#pod If truthy, will collapse a single sub-result into the current result,
+#pod with the child result overwriting the values from the parent.
+#pod
+#pod For example:
+#pod
+#pod     {   id      => "my_id",
+#pod         label   => "My Label",
+#pod         results => [ {
+#pod             label  => "Sub Label",
+#pod             status => "OK",
+#pod         } ]
+#pod     }
+#pod
+#pod Collapses to:
+#pod
+#pod     {   id     => "my_id",
+#pod         label  => "Sub Label",
+#pod         status => "OK",
+#pod     }
+#pod
+#pod
 #pod =item tags
 #pod
 #pod An arrayref used as the default set of tags for any checks that don't
@@ -135,6 +158,16 @@ sub new {
         ? %{ $params[0] } : @params;
 
     bless \%params, $class;
+}
+
+#pod =head2 collapse_single_result
+#pod
+#pod Read only accessor for the C</collapse_single_result> attribute.
+#pod
+#pod =cut
+
+sub collapse_single_result {
+    return unless ref $_[0]; return shift->{collapse_single_result};
 }
 
 #pod =head2 tags
@@ -172,7 +205,8 @@ sub label { return unless ref $_[0]; return shift->{label} }
 #pod makes sure C<%params> is an even-sided list (possibly unpacking a hashref)
 #pod before passing it to L</run>,
 #pod trapping any exceptions,
-#pod and passing the return value through L</summarize>.
+#pod and passing the return value through L</summarize> unless a falsy
+#pod C<summarize_result> parameter is passed.
 #pod
 #pod This could be used to validate parameters or to modify the the return value
 #pod in some way.
@@ -217,6 +251,11 @@ sub check {
     croak("$class does not implement a 'run' method")
         unless $class_or_self->can('run');
 
+    my $summarize
+        = exists $params{summarize_result}
+        ? $params{summarize_result}
+        : 1;
+
     local $@;
     my $start = $params{runtime} ? [ gettimeofday ] : undef;
     my @res = eval { local $SIG{__DIE__}; $class_or_self->run(%params) };
@@ -230,6 +269,8 @@ sub check {
     }
 
     $res[0]->{runtime} = sprintf "%.03f", tv_interval($start) if $start;
+
+    return $res[0] unless $summarize;
     return $class_or_self->summarize(@res);
 }
 
@@ -323,7 +364,7 @@ sub _summarize {
             @results = @{ $result->{results} };
 
             # Merge if there is only a single result.
-            if ( @results == 1 ) {
+            if ( @results == 1 and $self->collapse_single_result ) {
                 my ($r) = @{ delete $result->{results} };
                 %{$result} = ( %{$result}, %{$r} );
 
@@ -424,7 +465,7 @@ HealthCheck::Diagnostic - A base clase for writing health check diagnositics
 
 =head1 VERSION
 
-version v1.5.5
+version v1.6.0
 
 =head1 SYNOPSIS
 
@@ -500,6 +541,28 @@ by L</summarize>, without overriding anything already set in the result.
 
 =over
 
+=item collapse_single_result
+
+If truthy, will collapse a single sub-result into the current result,
+with the child result overwriting the values from the parent.
+
+For example:
+
+    {   id      => "my_id",
+        label   => "My Label",
+        results => [ {
+            label  => "Sub Label",
+            status => "OK",
+        } ]
+    }
+
+Collapses to:
+
+    {   id     => "my_id",
+        label  => "Sub Label",
+        status => "OK",
+    }
+
 =item tags
 
 An arrayref used as the default set of tags for any checks that don't
@@ -522,6 +585,10 @@ The unique id for this check.
 A human readable name for this check.
 
 =back
+
+=head2 collapse_single_result
+
+Read only accessor for the C</collapse_single_result> attribute.
 
 =head2 tags
 
@@ -546,7 +613,8 @@ This thin wrapper
 makes sure C<%params> is an even-sided list (possibly unpacking a hashref)
 before passing it to L</run>,
 trapping any exceptions,
-and passing the return value through L</summarize>.
+and passing the return value through L</summarize> unless a falsy
+C<summarize_result> parameter is passed.
 
 This could be used to validate parameters or to modify the the return value
 in some way.

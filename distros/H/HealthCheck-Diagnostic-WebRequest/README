@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v1.3.5
+    version v1.4.0
 
 SYNOPSIS
 
@@ -145,6 +145,8 @@ ATTRIBUTES
     etc.
 
     It is optional.
+
+    By default provides a custom agent string and a default timeout of 7.
 
 DEPENDENCIES
 

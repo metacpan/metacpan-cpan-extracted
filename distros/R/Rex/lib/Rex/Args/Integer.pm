@@ -9,7 +9,7 @@ package Rex::Args::Integer;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.0'; # VERSION
+our $VERSION = '1.12.1'; # VERSION
 
 use Rex::Logger;
 

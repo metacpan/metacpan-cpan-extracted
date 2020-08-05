@@ -1,6 +1,22 @@
 Changelog for HealthCheck
 
-v1.5.5 2020-07-02T19:23:35
+v1.6.0 2020-08-04T18:23:15
+ - Update README (Andrew Hewus Fresh)
+ - Add support for skipping result summarization (Andrew Hewus Fresh)
+ - Use a new reference in tests, not the one we modify (Andrew Hewus Fresh)
+ - Return single result correctly (Andrew Hewus Fresh)
+ - Add tests for default collapse rules (Andrew Hewus Fresh)
+ - Don't collapse single results by default (Andrew Hewus Fresh)
+ - Remove diag explain from tests (Andrew Hewus Fresh)
+ - Remove useless extra comment (Andrew Hewus Fresh)
+
+v1.5.7 2020-07-02T17:45:23
+ - No changes found
+
+v1.5.6 2020-07-02T17:45:23
+ - No changes found
+
+v1.5.5 2020-07-02T17:45:23
  - Update README (Maria Cioffi)
  - Add more tests for runtime (Brandon Messineo)
  - Revert back to b8f12974c15 (Andrew Hewus Fresh)

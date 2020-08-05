@@ -59,11 +59,14 @@ DESCRIPTION
     following;
 
     * assign Tie::SaveLater as your base class
+
     * call __PACKAGE_->make_subclasses
+
       That automatically builds *Tie::Them::*SCALAR, *Tie::Them::*ARRAY, and
       *Tie::Them::*HASH for you.
 
     * define "load()" as a class method
+
       Here is a more descriptive way to define Tie::Storable::load().
 
          sub load{
@@ -76,6 +79,7 @@ DESCRIPTION
       the second argument is the filename. It must return a loaded object.
 
     * define "save()" as an object method
+
       Here is a more descriptive way to define Tie::Storable::save().
 
         sub save{ 
@@ -105,10 +109,10 @@ SEE ALSO
     Tie::Storable, Tie::YAML, Tie::DataDumper
 
 AUTHOR
-    Dan Kogai, <dankogai@dan.co.jp>
+    Dan Kogai, <dankogai@cpan.org>
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2006 by Dan Kogai
+    Copyright (C) 2006-2020 by Dan Kogai
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.8.8 or, at

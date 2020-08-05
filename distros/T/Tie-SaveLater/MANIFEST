@@ -11,3 +11,4 @@ t/01-datadumper.t
 t/02-storable.t
 t/03-yaml.t
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

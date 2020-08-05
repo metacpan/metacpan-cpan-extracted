@@ -1,11 +1,11 @@
 #
-# $Id: Storable.pm,v 0.3 2006/03/22 22:10:28 dankogai Exp $
+# $Id: Storable.pm,v 0.05 2020/08/05 18:26:03 dankogai Exp dankogai $
 #
 package Tie::Storable;
 use strict;
 use warnings;
 use base 'Tie::SaveLater';
-our $VERSION = sprintf "%d.%02d", q$Revision: 0.3 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%02d", q$Revision: 0.05 $ =~ /(\d+)/g;
 use Storable ();
 use Carp;
 __PACKAGE__->make_subclasses;

@@ -9,7 +9,7 @@ package Rex::Test::Base::has_stat;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.0'; # VERSION
+our $VERSION = '1.12.1'; # VERSION
 
 use Rex -base;
 use base qw(Rex::Test::Base);

@@ -1,30 +1,12 @@
 package Text::Levenshtein::BV;
 
-
 use strict;
 use warnings;
-our $VERSION = '0.02';
-
-##use standard; # experimental from Guacamole
+our $VERSION = '0.03';
 
 use utf8;
 
 use 5.010001;
-
-#require Exporter;
-
-#BEGIN {
-#    $Text::Levenshtein::BV::VERSION     = '0.02';
-#    @Text::Levenshtein::BV::ISA         = qw(Exporter);
-#    @Text::Levenshtein::BV::EXPORT      = qw();
-#    @Text::Levenshtein::BV::EXPORT_OK
-#        = qw(SES distance sequences2hunks hunks2sequences sequence2char);
-#    %Text::Levenshtein::BV::EXPORT_TAGS = (
-#        'all' => [qw(SES distance sequences2hunks hunks2sequences sequence2char)],
-#    );
-#}
-
-use Data::Dumper;
 
 our $width = int 0.999+log(~0)/log(2);
 
@@ -38,18 +20,13 @@ sub new {
 }
 
 
-
-
 sub SES {
   my ($self, $a, $b) = @_;
-
-  #print STDERR 'SES $a: ',Dumper($a),"\n";
-  #print STDERR 'SES $b: ',Dumper($b),"\n";
 
   my ($amin, $amax, $bmin, $bmax) = (0, $#$a, 0, $#$b);
 
 # NOTE: prefix / suffix optimisation does not work yet
-if (1) {
+if (0) {
   while ($amin <= $amax and $bmin <= $bmax and $a->[$amin] eq $b->[$bmin]) {
     $amin++;
     $bmin++;
@@ -59,14 +36,10 @@ if (1) {
     $bmax--;
   }
 }
-  # m = 10, 0..9, 2..7
-  #my $m = $amax - $amin +1; # 7 - 2 + 1 = 6
+
   my $positions;
 
-  #if ($amax < $width ) {
-  #if ($m < $width ) {
   if (($amax - $amin) < $width ) {
-      #$positions->{$a->[$_]} |= 1 << ($_ % $width) for $amin..$amax;
       $positions->{$a->[$_+$amin]} |= 1 << $_  for 0..($amax-$amin);
 
       my $VPs = [];
@@ -77,7 +50,6 @@ if (1) {
       my ($y,$u,$X,$D0,$HN,$HP);
 
       # outer loop [HN02] Fig. 7
-      #for my $j ($bmin..$bmax) {
       for my $j (0..($bmax - $bmin)) {
           $y = $positions->{$b->[$j + $bmin]} // 0;
           $X = $y | $VN;
@@ -91,11 +63,9 @@ if (1) {
           $VNs->[$j] = $VN;
       }
       return [
-          map { [$_ => $_] } 0 .. ($bmin-1) ,
-          #@lcs,
-          #backtrace($VPs, $VNs,$VP, $VN, $amin, $amax, $bmin, $bmax),
+          #map { [$_ => $_] } 0 .. ($bmin-1) ,
           _backtrace($VPs, $VNs,$VP, $VN, $amin, $amax, $bmin, $bmax),
-          map { [++$amax => $_] } ($bmax+1) .. $#$b
+          #map { [++$amax => $_] } ($bmax+1) .. $#$b
       ];
   }
 
@@ -123,9 +93,7 @@ if (1) {
         $carry = (($S & $u) | (($S | $u) & ~($S + $u + $carry))) >> 63; # TODO: $width-1
       }
     }
-
   }
-
 
 }
 
@@ -146,70 +114,38 @@ if (0) {
     }
 }
 
-    #print STDERR 'backtrace $VPs: ',Dumper($VPs),"\n";
-    #print STDERR 'backtrace $VNs: ',Dumper($VNs),"\n";
-    #print STDERR 'backtrace $amin: ',$amin,"\n";
-    #print STDERR 'backtrace $amax: ',$amax,"\n";
-    #print STDERR 'backtrace $bmin: ',$bmin,"\n";
-    #print STDERR 'backtrace $bmin: ',$bmin,"\n";
-
     # recover alignment
-    #my $i = $amax;
     my $i = $amax - $amin;
-    # my $j = $bmax;
     my $j = $bmax - $bmin;
 
-    my @lcs;
-
-    #print STDERR 'backtrace $amin: ',$amin,' $bmin: ',$bmin,"\n";
-    #my $step = 0;
+    my @lcs = ();
 
     my $none = '-1';
 
-    #while ($i >= $amin && $j >= $bmin) {
     while ($i >= 0 && $j >= 0) {
-
-        #$step++;
-
         if ($VPs->[$j] & (1<<$i)) {
-        #if (($VP & (1<<$j)) & (1<<$i)) {
-            #print STDERR 'step: ',$step,'[$i,-1]',"\n";
-            #unshift @lcs,[$i,-1];
-            #unshift @lcs,[$i,$none];
             unshift @lcs,[$i+$amin,$none];
             $i--;
         }
         else {
-            #if (($j > $bmin) && ($VNs->[$j-1] & (1<<$i))) {
             if (($j > 0) && ($VNs->[$j-1] & (1<<$i))) {
-            #if (($j > $bmin) && (($VN & (1<<$j-1)) & (1<<$i))) {
-            #if ($VNs->[$j-1] & (1<<$i)) {
-            #print STDERR 'step: ',$step,'[-1,$j]',"\n";
-                  #unshift @lcs, [-1,$j];
-                  #unshift @lcs, [$none,$j];
                   unshift @lcs, [$none,$j+$bmin];
                   $j--;
             }
             else {
-            #print STDERR 'step: ',$step,'[$i,$j]',"\n";
-                #unshift @lcs, [$i,$j];
                 unshift @lcs, [$i+$amin,$j+$bmin];
                 $i--;$j--;
             }
-            #$i--;$j--;
         }
     }
-    #while ($i >= $amin) {
     while ($i >= 0) {
         unshift @lcs,[$i+$amin,$none];
         $i--;
     }
-    #while ($j >= $bmin) {
     while ($j >= 0) {
         unshift @lcs,[$none,$j+$bmin];
         $j--;
     }
-    #print STDERR 'backtrace @lcs: ',Dumper(\@lcs);
     return @lcs;
 }
 
@@ -229,33 +165,28 @@ if (1) {
     $bmax--;
   }
 }
+  # return difference of lengths,
+  # if one of the sequences is a complete subset of the other
+  if (($amax < $amin) || ($bmax < $bmin)) { return abs(@$a - @$b); }
 
   my $positions;
 
   if (($amax - $amin) < $width ) {
-      #$positions->{$a->[$_]} |= 1 << ($_ % $width) for $amin..$amax;
       $positions->{$a->[$_+$amin]} |= 1 << $_  for 0..($amax-$amin);
-
-      #my $VPs = [];
-      #my $VNs = [];
-      #my $VP  = ~0;
 
       my $m = $amax-$amin +1;
       my $diff = $m;
-      #print STDERR '$m: ',$m,"\n";
+
       my $m_mask = 1 << $m-1;
-      #print STDERR '$mm: ',sprintf('%064b',$m_mask),"\n";
 
       my $VP = 0;
       $VP  |= 1 << $_  for 0..$m-1;
-      #print STDERR '$VP: ',sprintf('%064b',$VP),"\n";
 
       my $VN  = 0;
 
       my ($y,$u,$X,$D0,$HN,$HP);
 
       # outer loop [HN02] Fig. 7
-      #for my $j ($bmin..$bmax) {
       for my $j (0..($bmax - $bmin)) {
           $y = $positions->{$b->[$j + $bmin]} // 0;
           $X = $y | $VN;
@@ -265,8 +196,6 @@ if (1) {
           $X  = ($HP << 1) | 1;
           $VN = $X & $D0;
           $VP = ($HN << 1) | ~($X | $D0);
-          #$VPs->[$j] = $VP;
-          #$VNs->[$j] = $VN;
 
           if ($HP & $m_mask) { $diff++; }
           if ($HN & $m_mask) { $diff--; }
@@ -298,14 +227,33 @@ sub sequence2char {
 
   $gap = (defined $gap) ? $gap : '_';
 
-  #my $result = [];
-
-  #for my $position (@$sequence) {
-  #  push @$result, ($position >= 0) ? $a->[$position] : $gap;
-  #}
-
   return [ map { ($_ >= 0) ? $a->[$_] : $gap } @$sequence ];
+}
 
+sub hunks2distance {
+  my ($self, $a, $b, $hunks) = @_;
+
+  my $distance = 0;
+
+  for my $hunk (@$hunks) {
+    if (($hunk->[0] < 0) || ($hunk->[1] < 0)) { $distance++ }
+    elsif ($a->[$hunk->[0]] ne $b->[$hunk->[1]]) { $distance++ }
+  }
+  return $distance;
+}
+
+sub hunks2char {
+  my ($self, $a, $b, $hunks) = @_;
+
+  my $chars = [];
+
+  for my $hunk (@$hunks) {
+    my $char1 = ($hunk->[0] >= 0) ? $a->[$hunk->[0]] : '_';
+    my $char2 = ($hunk->[1] >= 0) ? $a->[$hunk->[1]] : '_';
+
+    push @$chars, [$char1,$char2];
+  }
+  return $chars;
 }
 
 1;
@@ -383,6 +331,14 @@ Renders an array of strings into a string.
 =item sequences2hunks(\@a,\@b)
 
 Does the revers of method hunks2sequences.
+
+=item hunks2char(\@a,\@b,\@alignment)
+
+Returns hunks of aligned characters.
+
+=item hunks2distance(\@a,\@b,\@alignment)
+
+Calculates the distance from alignment.
 
 =back
 

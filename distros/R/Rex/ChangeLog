@@ -1,5 +1,13 @@
 Revision history for Rex
 
+1.12.1 2020-08-05 Ferenc Erki <erkiferenc@gmail.com>
+ [DOCUMENTATION]
+ - Document feature flags
+ - Clarify description of the rex script
+
+ [REVISION]
+ - Gather only files tracked by git
+
 1.12.0 2020-07-05 Ferenc Erki <erkiferenc@gmail.com>
  [BUG FIXES]
  - Discontinue support for Windows 7, Windows Server 2008 R2, and older

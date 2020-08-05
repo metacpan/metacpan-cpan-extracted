@@ -9,7 +9,7 @@ package Rex::TaskList::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.0'; # VERSION
+our $VERSION = '1.12.1'; # VERSION
 
 BEGIN {
   use Rex::Shared::Var;

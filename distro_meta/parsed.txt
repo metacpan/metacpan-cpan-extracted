@@ -66406,3 +66406,10 @@ S/SE/SEBBE/Types-Algebraic-0.05.tar.gz
 B/BR/BRAINBUZ/Vote-Count-1.07.tar.gz
 R/RE/RENTOCRON/WWW-Correios-CEP-1.03.tar.gz
 P/PR/PREACTION/Yancy-Backend-Static-0.013.tar.gz
+E/ET/ETJ/GraphQL-0.41.tar.gz
+G/GS/GSG/HealthCheck-v1.6.0.tar.gz
+G/GS/GSG/HealthCheck-Diagnostic-WebRequest-v1.4.0.tar.gz
+L/LN/LNATION/Module-Generate-0.17.tar.gz
+F/FE/FERKI/Rex-1.12.1.tar.gz
+W/WO/WOLLMERS/Text-Levenshtein-BV-0.03.tar.gz
+D/DA/DANKOGAI/Tie-SaveLater-0.05.tar.gz

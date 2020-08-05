@@ -9,7 +9,7 @@ package Rex::TaskList::Parallel_ForkManager;
 use strict;
 use warnings;
 
-our $VERSION = '1.12.0'; # VERSION
+our $VERSION = '1.12.1'; # VERSION
 
 use Data::Dumper;
 use Rex::Logger;

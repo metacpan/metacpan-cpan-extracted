@@ -4,7 +4,7 @@
       "Grant Street Group <developers@grantstreet.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -53,7 +53,7 @@
    "provides" : {
       "HealthCheck::Diagnostic::WebRequest" : {
          "file" : "lib/HealthCheck/Diagnostic/WebRequest.pm",
-         "version" : "v1.3.5"
+         "version" : "v1.4.0"
       }
    },
    "release_status" : "stable",
@@ -67,8 +67,8 @@
          "web" : "https://github.com/GrantStreetGroup/p5-HealthCheck-Diagnostic-WebRequest"
       }
    },
-   "version" : "v1.3.5",
-   "x_generated_by_perl" : "v5.30.2",
+   "version" : "v1.4.0",
+   "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "JSON::XS version 4.02",
    "x_spdx_expression" : "Artistic-2.0",
    "x_static_install" : 1

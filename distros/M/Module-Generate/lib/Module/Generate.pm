@@ -9,7 +9,7 @@ use Perl::Tidy;
 use Data::Dumper;
 use Module::Starter;
 $Data::Dumper::Deparse = 1;
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 our %CLASS;
 our $SUB_INDEX = 1;
 
@@ -465,7 +465,7 @@ Module::Generate - Assisting with module generation.
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
@@ -522,6 +522,12 @@ Version 0.16
 		->generate;
 
 =head1 SUBROUTINES/METHODS
+
+=head2 start
+
+Instantiate a new Module::Generate object.
+
+	my $mg = Module::Generate->start;	
 
 =head2 dist
 
@@ -603,7 +609,7 @@ Unless you are using the fields pragma, consider this discouraged in favor of th
 
 =cut
 
-=head2 paarent
+=head2 parent
 
 Establish an ISA relationship with base classes at compile time.
 
@@ -744,11 +750,43 @@ Provide a code example which will be suffixed to the pod definition.
 
 =cut
 
-=head2 build
+=head2 macro 
+
+Implement a macro that can be inserted across classes.
+
+	my $mg = Module::Generate->author('LNATION')
+		->email('email@lnation.org')
+		->version('0.01');
+	$mg->macro('self', sub {
+		my ($self, $value) = @_;
+	});
+	my $class = $mg->class('Foo');
+	$class->sub('bar')
+		->code(sub { &self; $value; });
+	$class->generate;
+
+	###
+
+	package Foo;
+	use strict;
+	use warnings;
+	our $VERSION = 0.01;
+
+	sub bar {
+		my ( $self, $value ) = @_;
+
+		$value;
+	}
+
+	1;
+
+	__END__
+
+=head2 generate
 
 Compile the code.
 
-	$sub->build(%args);
+	$sub->generate(%args);
 
 =cut
 

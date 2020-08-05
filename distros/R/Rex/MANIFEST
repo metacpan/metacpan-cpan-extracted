@@ -356,7 +356,6 @@ lib/Rex/Virtualization/VBox/share_folder.pm
 lib/Rex/Virtualization/VBox/shutdown.pm
 lib/Rex/Virtualization/VBox/start.pm
 lib/Rex/Virtualization/VBox/status.pm
-rsync.t2
 share/rex-tab-completion.bash
 share/rex-tab-completion.zsh
 t/0.31.t

@@ -1,10 +1,10 @@
 #
-# $Id: SaveLater.pm,v 0.4 2006/03/23 04:36:36 dankogai Exp dankogai $
+# $Id: SaveLater.pm,v 0.05 2020/08/05 18:26:03 dankogai Exp dankogai $
 #
 package Tie::SaveLater;
 use strict;
 use warnings;
-our $VERSION = sprintf "%d.%02d", q$Revision: 0.4 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%02d", q$Revision: 0.05 $ =~ /(\d+)/g;
 use Carp;
 our $DEBUG = 0;
 my (%OBJ2FN, %FN2OBJ, %OPTIONS);
@@ -214,11 +214,11 @@ L<Tie::Storable>, L<Tie::YAML>, L<Tie::DataDumper>
 
 =head1 AUTHOR
 
-Dan Kogai, E<lt>dankogai@dan.co.jpE<gt>
+Dan Kogai, E<lt>dankogai@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006 by Dan Kogai
+Copyright (C) 2006-2020 by Dan Kogai
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

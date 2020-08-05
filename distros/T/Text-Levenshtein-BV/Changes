@@ -1,5 +1,9 @@
 Revision history for Text::Levenshtein::BV
 
+0.03  2020-08-05 20:10:31 CEST
+        - added tests
+        - debugging and cleanup
+
 0.02  2020-07-05 11:46:59 CEST
         - improve pod, remove lcs test
 

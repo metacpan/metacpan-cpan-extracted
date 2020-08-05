@@ -167,15 +167,12 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
             check => sub { @args = @_; status => 'OK' },
             label => "CodeRef Label",
         );
-        HealthCheck->new->register( \%check )->check;
+        HealthCheck->new->register( {%check} )->check;
 
         delete @check{qw( invocant check )};
+        $check{summarize_result} = 0;
 
-        is(
-            \@args,
-            [ %check ],
-            "Without an invocant, called as a function"
-        );
+        is( {@args}, {%check}, "Without an invocant, called as a function" );
     }
     {
         my @args;
@@ -184,12 +181,13 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
             check    => sub { @args = @_; status => 'OK' },
             label    => "Method Label",
         );
-        HealthCheck->new->register( \%check )->check;
+        HealthCheck->new->register( {%check} )->check;
 
         delete @check{qw( invocant check )};
-        is(
-            \@args,
-            [ 'My::Check', %check ],
+        $check{summarize_result} = 0;
+
+        is( [ $args[0],    { @args[ 1 .. $#args ] } ],
+            [ 'My::Check', {%check} ],
             "With an invocant, called as a method"
         );
     }
@@ -199,13 +197,13 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
             check => sub { @args = @_; status => 'OK' },
             label => "CodeRef Label",
         );
-        HealthCheck->new->register( \%check )->check( custom => 'params' );
+        HealthCheck->new->register( {%check} )->check( custom => 'params' );
 
         delete @check{qw( invocant check )};
+        $check{summarize_result} = 0;
 
-        is(
-            \@args,
-            [ %check, custom => 'params' ],
+        is( {@args},
+            { %check, custom => 'params' },
             "Params passed to check merge with check definition"
         );
     }
@@ -215,14 +213,42 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
             check => sub { @args = @_; status => 'OK' },
             label => "CodeRef Label",
         );
-        HealthCheck->new->register( \%check )->check( label => 'Check' );
+        HealthCheck->new->register( {%check} )->check( label => 'Check' );
 
         delete @check{qw( invocant check )};
+        $check{summarize_result} = 0;
 
-        is(
-            \@args,
-            [ %check, label => 'Check' ],
+        is( {@args},
+            { %check, label => 'Check' },
             "Params passed to check override check definition"
+        );
+    }
+    {
+        my @args;
+        my %check = ( check => sub { @args = @_; status => 'OK' } );
+        HealthCheck->new->register( {%check} )
+            ->check( summarize_result => '' );
+
+        delete @check{qw( invocant check )};
+        $check{summarize_result} = 0;
+
+        is( {@args},
+            { %check, summarize_result => '' },
+            "Overriding summarize_result with falsy value works"
+        );
+    }
+    {
+        my @args;
+        my %check = ( check => sub { @args = @_; status => 'OK' } );
+        HealthCheck->new->register( {%check} )
+            ->check( summarize_result => 2 );
+
+        delete @check{qw( invocant check )};
+        $check{summarize_result} = 0;
+
+        is( {@args},
+            { %check, summarize_result => 2 },
+            "Overriding summarize_result with truthy value works"
         );
     }
 }
@@ -344,10 +370,23 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         ],
     }, "Default check runs all checks";
 
+    {
+        local $c->{collapse_single_result} = 1;
+        is $c->check( tags => ['default'] ), {
+            'id'      => 'main',
+            'tags'    => ['default'],
+            'status'  => 'OK',
+        }, "Check with 'default' tags collapses as requested";
+    }
+
     is $c->check( tags => ['default'] ), {
         'id'     => 'main',
         'tags'   => ['default'],
         'status' => 'OK',
+        'results' => [ {
+            'status' => 'OK',
+            'tags'   => ['default'],
+        } ],
     }, "Check with 'default' tags runs only untagged check";
 
     is $c->check( tags => ['easy'] ), {
@@ -360,9 +399,14 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
                 'tags'   => [ 'fast', 'easy' ],
                 'status' => 'OK' },
             {
-                'id'     => 'subcheck_default',
+                'id'     => 'subcheck',
                 'tags'   => [ 'subcheck', 'easy' ],
                 'status' => 'OK',
+                'results' => [ {
+                    'id'     => 'subcheck_default',
+                    'tags'   => [ 'subcheck', 'easy' ],
+                    'status' => 'OK',
+                } ]
             }
         ],
     }, "Check with 'easy' tags runs checks tagged easy";
@@ -371,15 +415,12 @@ my $nl = Carp->VERSION >= 1.25 ? ".\n" : "\n";
         # Because the "subcheck" doesn't have a "hard" tag
         # it doesn't get run, so none of its checks get run
         # so there are no results.
-        is $c->check( tags => ['hard'] ),
-            {
+        is $c->check( tags => ['hard'] ), {
             'id'      => 'main',
             'tags'    => ['default'],
             'status'  => 'UNKNOWN',
             'info'    => 'missing status',
-            'results' => [],
-            },
-            "Check with 'hard' tags runs no checks, so no results";
+        }, "Check with 'hard' tags runs no checks, so no results";
     }
 }
 
